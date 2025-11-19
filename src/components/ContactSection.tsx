@@ -21,8 +21,35 @@ export function ContactSection() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [interests, setInterests] = useState<string[]>([]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const formElement = e.target as HTMLFormElement;
+    const industrySelect = formElement.querySelector('[id="industry"] button');
+    const timelineSelect = formElement.querySelector('[id="timeline"] button');
+
+    const payload = {
+      name: (document.getElementById("name") as HTMLInputElement).value,
+      email: (document.getElementById("email") as HTMLInputElement).value,
+      company: (document.getElementById("company") as HTMLInputElement).value,
+      industry: industrySelect?.getAttribute('data-value') || "",
+      interests,
+      timeline: timelineSelect?.getAttribute('data-value') || "",
+      goal: (document.getElementById("goal") as HTMLTextAreaElement).value,
+      preferredTime: (document.getElementById("preferred-time") as HTMLInputElement).value,
+    };
+
+    const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/contact`;
+
+    await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
     setIsSubmitted(true);
   };
 
@@ -184,9 +211,12 @@ export function ContactSection() {
                 />
               </div>
 
-              <div className="space-y-2 group">
+              <div className="space-y-2 group" id="industry">
                 <Label htmlFor="industry" className="text-gray-700 font-medium transition-colors group-focus-within:text-[#8b5cf6]">Branche</Label>
-                <Select required>
+                <Select required onValueChange={(value) => {
+                  const trigger = document.querySelector('#industry button');
+                  if (trigger) trigger.setAttribute('data-value', value);
+                }}>
                   <SelectTrigger className="bg-white border-gray-300 focus:border-[#8b5cf6] focus:ring-2 focus:ring-[#8b5cf6]/20 transition-all duration-300 hover:border-gray-400">
                     <SelectValue placeholder="Wähle deine Branche" />
                   </SelectTrigger>
@@ -226,9 +256,12 @@ export function ContactSection() {
                 ))}
               </div>
 
-              <div className="space-y-2 group">
+              <div className="space-y-2 group" id="timeline">
                 <Label htmlFor="timeline" className="text-gray-700 font-medium transition-colors group-focus-within:text-[#8b5cf6]">Wunschzeitraum für Start</Label>
-                <Select required>
+                <Select required onValueChange={(value) => {
+                  const trigger = document.querySelector('#timeline button');
+                  if (trigger) trigger.setAttribute('data-value', value);
+                }}>
                   <SelectTrigger className="bg-white border-gray-300 focus:border-[#8b5cf6] focus:ring-2 focus:ring-[#8b5cf6]/20 transition-all duration-300 hover:border-gray-400">
                     <SelectValue placeholder="Wähle einen Zeitraum" />
                   </SelectTrigger>
