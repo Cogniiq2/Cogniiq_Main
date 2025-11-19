@@ -1,50 +1,59 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { motion, stagger, useAnimate, useInView } from "framer-motion";
+import { useEffect } from "react";
 
-export function TypewriterEffectSmooth({
-  words,
+export const TypewriterEffect = ({
+  text,
   className,
   cursorClassName,
 }: {
-  words: { text: string; className?: string }[];
+  text: string;
   className?: string;
   cursorClassName?: string;
-}) {
-  const renderWords = () => {
-    return (
-      <div>
-        {words.map((word, idx) => (
-          <div key={`word-${idx}`} className="inline-block">
-            {word.text.split("").map((char, index) => (
-              <span
-                key={`char-${index}`}
-                className={cn("text-black", word.className)}
-              >
-                {char}
-              </span>
-            ))}
-          </div>
-        ))}
-      </div>
-    );
-  };
+}) => {
+  // Split the SINGLE text into characters
+  const chars = text.split("");
+
+  const [scope, animate] = useAnimate();
+  const isInView = useInView(scope);
+
+  useEffect(() => {
+    if (isInView) {
+      animate(
+        "span",
+        {
+          display: "inline-block",
+          opacity: 1,
+          width: "fit-content",
+        },
+        {
+          duration: 0.3,
+          delay: stagger(0.05),
+          ease: "easeInOut",
+        }
+      );
+    }
+  }, [isInView]);
 
   return (
-    <div className={cn("flex space-x-1 my-6", className)}>
-      <motion.div
-        className="overflow-hidden pb-2"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6 }}
-      >
-        <div
-          className="text-5xl md:text-7xl lg:text-8xl font-bold"
-          style={{ whiteSpace: "nowrap" }}
-        >
-          {renderWords()}
-        </div>
+    <div
+      className={cn(
+        "text-5xl md:text-7xl lg:text-8xl font-bold text-center",
+        className
+      )}
+    >
+      <motion.div ref={scope} className="inline">
+        {chars.map((char, index) => (
+          <motion.span
+            key={index}
+            initial={{}}
+            className="text-black opacity-0 hidden"
+          >
+            {char}
+          </motion.span>
+        ))}
       </motion.div>
 
       <motion.span
@@ -56,10 +65,10 @@ export function TypewriterEffectSmooth({
           repeatType: "reverse",
         }}
         className={cn(
-          "block rounded-sm w-[4px] h-10 bg-black",
+          "inline-block rounded-sm w-[4px] h-10 bg-black",
           cursorClassName
         )}
       ></motion.span>
     </div>
   );
-}
+};
