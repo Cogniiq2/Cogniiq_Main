@@ -57,7 +57,7 @@ export function Navigation() {
               <img
                 src="/COGNI IQ.png"
                 alt="CogniIQ"
-                className="h-28 w-auto"
+                className="h-29 w-auto"
               />
             </motion.div>
 
