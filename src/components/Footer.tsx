@@ -15,11 +15,9 @@ export function Footer() {
 
             {/* LEFT */}
             <div>
-              <div className="text-2xl font-bold mb-4">
-                <span className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] bg-clip-text text-transparent">
-                  Cogniiq
-                </span>
-              </div>
+           <div className="mb-4">
+  <Logo className="h-10" />
+</div>
               <p className="text-gray-600 leading-relaxed">
                 <strong>AI Agentur und Webdesign Agentur in Bayreuth.</strong>{" "}
                 Wir bieten KI Automationen, AI Rezeptionisten und
