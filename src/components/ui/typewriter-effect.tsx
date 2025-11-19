@@ -60,7 +60,17 @@ export const TypewriterEffectSmooth = ({
               fontSize: "clamp(32px, 6vw, 68px)", // responsive luxury size
             }}
           >
-            {char}
+            {/* FIXED SPACING */}
+            {char === " " ? (
+              <span
+                style={{
+                  display: "inline-block",
+                  width: "0.35em", // perfect Apple-like spacing
+                }}
+              ></span>
+            ) : (
+              char
+            )}
           </motion.span>
         ))}
       </motion.div>
