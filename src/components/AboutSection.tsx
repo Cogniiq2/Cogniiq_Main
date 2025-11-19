@@ -6,15 +6,15 @@ import { Target, Wrench, Award } from 'lucide-react';
 const highlights = [
   {
     icon: Target,
-    text: 'Seit 2020 Fokus auf hochkonvertierende Websites, KI Automationen und AI-Lösungen, die vom ersten Tag an messbar sind.',
+    text: 'Seit 2025 Fokus auf Websites und KI-Lösungen, die messbar mehr Anfragen, Termine und Umsatz bringen – nicht nur optisch überzeugen.',
   },
   {
     icon: Wrench,
-    text: 'Expertise in bewährten Technologien: Make.com, n8n, Vapi, Cal.com, Google Workspace und modernen Webdesign-Frameworks.',
+    text: 'Spezialisiert auf Praxen, Architekten, Ingenieurbüros und hochwertige Dienstleister, die ihre Abläufe mit KI und Automatisierung skalieren wollen.',
   },
   {
     icon: Award,
-    text: 'Ausgewählte Projekte statt Massenabfertigung. Persönliche Betreuung aus Bayreuth für ganz Deutschland.',
+    text: 'Limitierte, ausgewählte Projekte mit direkter Zusammenarbeit mit Lazar & Djordje – keine Massenabfertigung, sondern persönliche Verantwortung für Ergebnisse.',
   },
 ];
 
@@ -58,7 +58,7 @@ export function AboutSection() {
             transition={{ duration: 0.8 }}
             className="space-y-8"
           >
-            {/* === Neuer About-Text-Block === */}
+            {/* === About-Text-Block === */}
             <div className="space-y-3 text-base text-gray-600 leading-relaxed">
               <p className="text-lg font-semibold text-gray-800">
                 Über Cogniiq
