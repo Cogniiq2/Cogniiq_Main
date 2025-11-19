@@ -61,7 +61,8 @@ export function AboutSection() {
             <p className="text-lg text-gray-600 leading-relaxed">
               Cogniiq wurde 2025 von Lazar und Djordje Popovic in Bayreuth gegründet – mit einem klaren Anspruch:
 Digitale Lösungen zu bauen, die Umsatz und Prozesse messbar verbessern, statt nur „schön auszusehen“.
-
+            </p>
+        
 Wir arbeiten vor allem mit Praxen, Architekturbüros, Ingenieuren und anderen anspruchsvollen Dienstleistern in ganz Deutschland zusammen. Überall dort, wo Termine, Anfragen und Abläufe heute noch zu viel Zeit kosten, setzen wir an – mit KI-Automationen, AI-Rezeptionisten, Chatbots, Webseiten und AI-Content, die spürbar entlasten und neue Chancen eröffnen.
 
 Was uns ausmacht:
