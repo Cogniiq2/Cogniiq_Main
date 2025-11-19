@@ -35,13 +35,9 @@ export function TypewriterEffectSmooth({
     <div className={cn("flex space-x-1 my-6", className)}>
       <motion.div
         className="overflow-hidden pb-2"
-        initial={{ width: "0%" }}
-        whileInView={{ width: "fit-content" }}
-        transition={{
-          duration: 2,
-          ease: "linear",
-          delay: 0.4,
-        }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
       >
         <div
           className="text-5xl md:text-7xl lg:text-8xl font-bold"
