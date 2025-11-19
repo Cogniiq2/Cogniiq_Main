@@ -48,22 +48,17 @@ export function Navigation() {
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
-
-            {/* LEFT — LOGO */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="flex items-center ml-[-8px]"
+              className="text-2xl font-bold tracking-tight"
             >
-              <img
-                src="/COGNI IQ.png"
-                alt="CogniIQ"
-                className="h-29 w-auto"
-              />
+              <span className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] bg-clip-text text-transparent">
+                Cogniiq
+              </span>
             </motion.div>
 
-            {/* RIGHT — NAVIGATION */}
             <div className="hidden lg:flex items-center gap-8">
               {navItems.map((item, index) => (
                 <motion.a
@@ -88,7 +83,7 @@ export function Navigation() {
               >
                 <Button
                   onClick={() => handleNavClick('#kontakt')}
-                  className="bg-gradient-to-r from-[#D4AF37] to-[#F4E5B0] hover:opacity-90 transition-opacity text-[#1a1a1a] font-semibold"
+                  className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] hover:opacity-90 transition-opacity text-white"
                   aria-label="Kostenloses Erstgespräch buchen"
                 >
                   Erstgespräch
@@ -96,24 +91,18 @@ export function Navigation() {
               </motion.div>
             </div>
 
-            {/* MOBILE MENU BUTTON */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="lg:hidden text-gray-900 p-2"
               aria-label="Menü öffnen"
               aria-expanded={isMobileMenuOpen}
             >
-              {isMobileMenuOpen ? (
-                <X size={24} aria-hidden="true" />
-              ) : (
-                <Menu size={24} aria-hidden="true" />
-              )}
+              {isMobileMenuOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
             </button>
           </div>
         </div>
       </motion.nav>
 
-      {/* MOBILE MENU */}
       {isMobileMenuOpen && (
         <motion.div
           initial={{ opacity: 0, x: '100%' }}
@@ -135,10 +124,9 @@ export function Navigation() {
                 {item.label}
               </a>
             ))}
-
             <Button
               onClick={() => handleNavClick('#kontakt')}
-              className="bg-gradient-to-r from-[#D4AF37] to-[#F4E5B0] hover:opacity-90 transition-opacity text-[#1a1a1a] font-semibold mt-4"
+              className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] hover:opacity-90 transition-opacity text-white mt-4"
               aria-label="Kostenloses Erstgespräch buchen"
             >
               Erstgespräch

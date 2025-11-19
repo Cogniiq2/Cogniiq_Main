@@ -16,7 +16,7 @@ export function Footer() {
             {/* LEFT */}
             <div>
               <div className="text-2xl font-bold mb-4">
-                <span className="bg-gradient-to-r from-[#D4AF37] to-[#C9A961] bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] bg-clip-text text-transparent">
                   Cogniiq
                 </span>
               </div>
@@ -40,14 +40,14 @@ export function Footer() {
 
                 <a
                   href="mailto:info@cogniiq.de"
-                  className="flex items-center gap-2 text-[#D4AF37] hover:text-[#C9A961] transition-colors"
+                  className="flex items-center gap-2 text-[#8b5cf6] hover:text-[#22d3ee] transition-colors"
                 >
                   <Mail size={16} /> info@cogniiq.de
                 </a>
 
                 <a
                   href="tel:01601832917"
-                  className="flex items-center gap-2 text-[#D4AF37] hover:text-[#C9A961] transition-colors"
+                  className="flex items-center gap-2 text-[#8b5cf6] hover:text-[#22d3ee] transition-colors"
                 >
                   <Phone size={16} /> 0160 1832917
                 </a>
