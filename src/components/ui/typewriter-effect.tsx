@@ -22,19 +22,21 @@ export const TypewriterEffectSmooth = ({
 
   useEffect(() => {
     if (isInView) {
-      animate(
-        "span",
-        {
-          opacity: 1,
-          display: "inline-block",
-        },
-        {
-          duration: 0.25,
-          delay: stagger(0.045), // slightly faster, more premium
-          ease: "easeOut",
-        }
-      );
-    }
+  setTimeout(() => {
+    animate(
+      "span",
+      {
+        opacity: 1,
+        display: "inline-block",
+      },
+      {
+        duration: 0.25,
+        delay: stagger(0.045),
+        ease: "easeOut",
+      }
+    );
+  }, 2000); // 2-second delay
+}
   }, [isInView]);
 
   return (
