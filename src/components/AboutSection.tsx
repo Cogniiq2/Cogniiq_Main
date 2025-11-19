@@ -59,15 +59,27 @@ export function AboutSection() {
             className="space-y-8"
           >
             <p className="text-lg text-gray-600 leading-relaxed">
-             Über Cogniiq</p>
-Cogniiq wurde 2025 von Lazar und Djordje Popovic in Bayreuth gegründet. Unser Fokus: digitale Lösungen, die messbar mehr Anfragen und Umsatz bringen – nicht nur schöne Optik.</p>
-Wir arbeiten vor allem mit Praxen, Architekturbüros, Ingenieuren und anderen hochwertigen Dienstleistern in ganz Deutschland.</p>
-Was uns ausmacht:</p>
-• Fokus auf Ergebnisse statt Buzzwords</p>
-• Website, KI-Automationen und AI-Rezeptionisten aus einem Guss</p>
-• Persönliche Betreuung direkt durch Lazar & Djordje, keine Massenabfertigung</p>
-Unser Ziel: Ihre Online-Präsenz soll Ihnen täglich neue Patienten, Mandanten oder Kunden bringen – klar messbar und zuverlässig.</p>
-            </p>
+            <p className="text-lg text-gray-600 leading-relaxed">
+  Über Cogniiq
+</p>
+<p className="mt-3 text-base text-gray-600 leading-relaxed">
+  Cogniiq wurde 2025 von Lazar und Djordje Popovic in Bayreuth gegründet. Unser Fokus: digitale Lösungen, die messbar mehr Anfragen und Umsatz bringen – nicht nur schöne Optik.
+</p>
+<p className="mt-3 text-base text-gray-600 leading-relaxed">
+  Wir arbeiten vor allem mit Praxen, Architekturbüros, Ingenieuren und anderen hochwertigen Dienstleistern in ganz Deutschland.
+</p>
+<p className="mt-4 text-base text-gray-600 leading-relaxed">
+  Was uns ausmacht:
+</p>
+<ul className="mt-2 space-y-1 text-base text-gray-600 leading-relaxed list-disc list-inside">
+  <li>Fokus auf Ergebnisse statt Buzzwords</li>
+  <li>Website, KI-Automationen und AI-Rezeptionisten aus einem Guss</li>
+  <li>Persönliche Betreuung direkt durch Lazar &amp; Djordje – keine Massenabfertigung</li>
+</ul>
+<p className="mt-3 text-base text-gray-600 leading-relaxed">
+  Ziel: Ihre Online-Präsenz soll Ihnen täglich neue Patienten, Mandanten oder Kunden bringen – klar messbar und zuverlässig.
+</p>
+
 
             <div className="space-y-6">
               {highlights.map((highlight, index) => {
