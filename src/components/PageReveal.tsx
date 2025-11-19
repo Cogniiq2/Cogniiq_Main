@@ -1,11 +1,24 @@
 import { motion } from 'framer-motion';
-import { ReactNode } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 
 interface PageRevealProps {
   children: ReactNode;
 }
 
 export function PageReveal({ children }: PageRevealProps) {
+  const [isComplete, setIsComplete] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsComplete(true);
+    }, 1700);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isComplete) {
+    return <>{children}</>;
+  }
+
   return (
     <>
       <svg
@@ -14,44 +27,51 @@ export function PageReveal({ children }: PageRevealProps) {
         style={{ position: 'absolute', pointerEvents: 'none' }}
       >
         <defs>
-          <clipPath id="iq-reveal-mask" clipPathUnits="objectBoundingBox">
-            <rect x="0.325" y="0.2" width="0.125" height="0.6" rx="0.01" />
-            <path
-              d="M 0.65,0.25 A 0.2,0.2 0 1,1 0.65,0.65 A 0.2,0.2 0 1,1 0.65,0.25 Z M 0.65,0.325 A 0.125,0.125 0 1,0 0.65,0.575 A 0.125,0.125 0 1,0 0.65,0.325 Z"
-              fillRule="evenodd"
-            />
-            <rect
-              x="0.75"
-              y="0.525"
-              width="0.1"
-              height="0.175"
-              rx="0.01"
-              transform="rotate(35 0.8 0.525)"
-            />
+          <clipPath id="iq-reveal-mask">
+            <rect x="40" y="20" width="15" height="60" />
+            <circle cx="70" cy="50" r="20" />
+            <circle cx="70" cy="50" r="12" fill="black" />
+            <rect x="78" y="62" width="8" height="18" transform="rotate(45 82 71)" />
           </clipPath>
         </defs>
       </svg>
 
-      <motion.div
-        initial={{
-          clipPath: 'url(#iq-reveal-mask)',
-          scale: 0.01,
-        }}
-        animate={{
-          clipPath: 'url(#iq-reveal-mask)',
-          scale: 80,
-        }}
-        transition={{
-          duration: 1.6,
-          ease: [0.19, 1, 0.22, 1],
-        }}
-        style={{
-          transformOrigin: '50% 50%',
-          willChange: 'transform, clip-path',
-        }}
-      >
-        {children}
-      </motion.div>
+      <div style={{ position: 'fixed', inset: 0, overflow: 'hidden' }}>
+        <motion.div
+          initial={{
+            scale: 0.01,
+          }}
+          animate={{
+            scale: 100,
+          }}
+          transition={{
+            duration: 1.6,
+            ease: [0.19, 1, 0.22, 1],
+          }}
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            width: '100vw',
+            height: '100vh',
+            transformOrigin: 'center center',
+            clipPath: 'url(#iq-reveal-mask)',
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%) scale(0.01)',
+              width: '100vw',
+              height: '100vh',
+            }}
+          >
+            {children}
+          </div>
+        </motion.div>
+      </div>
     </>
   );
 }
