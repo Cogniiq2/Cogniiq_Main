@@ -44,7 +44,7 @@ export function HeroSection() {
               morphTime={1.2}
               cooldownTime={0.8}
               className="font-bold"
-              textClassName="font-bold text-5xl md:text-7xl lg:text-8xl text-gray-400"
+              textClassName="font-bold text-5xl md:text-7xl lg:text-8xl text-black"
             />
           </div>
 
