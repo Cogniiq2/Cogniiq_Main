@@ -4,17 +4,18 @@ import { cn } from "@/lib/utils";
 import { motion, stagger, useAnimate, useInView } from "framer-motion";
 import { useEffect } from "react";
 
-export const TypewriterEffect = ({
-  text,
+// --- CLEAN SINGLE-LINE TYPEWRITER ANIMATION ---
+export const TypewriterEffectSmooth = ({
+  words,
   className,
   cursorClassName,
 }: {
-  text: string;
+  words: { text: string; className?: string }[];
   className?: string;
   cursorClassName?: string;
 }) => {
-  // Split the SINGLE text into characters
-  const chars = text.split("");
+  // Convert words into a single array of characters
+  const chars = words[0].text.split("");
 
   const [scope, animate] = useAnimate();
   const isInView = useInView(scope);
@@ -24,13 +25,12 @@ export const TypewriterEffect = ({
       animate(
         "span",
         {
-          display: "inline-block",
           opacity: 1,
-          width: "fit-content",
+          display: "inline-block",
         },
         {
-          duration: 0.3,
-          delay: stagger(0.05),
+          duration: 0.25,
+          delay: stagger(0.06),
           ease: "easeInOut",
         }
       );
@@ -40,22 +40,22 @@ export const TypewriterEffect = ({
   return (
     <div
       className={cn(
-        "text-5xl md:text-7xl lg:text-8xl font-bold text-center",
+        "flex space-x-1 my-6 items-center justify-center",
         className
       )}
     >
-      <motion.div ref={scope} className="inline">
+      <motion.div ref={scope} className="inline-block">
         {chars.map((char, index) => (
           <motion.span
             key={index}
-            initial={{}}
-            className="text-black opacity-0 hidden"
+            className={cn("opacity-0 text-black", words[0].className)}
           >
             {char}
           </motion.span>
         ))}
       </motion.div>
 
+      {/* Cursor */}
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
