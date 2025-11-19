@@ -34,21 +34,7 @@ Bevorzugte Zeit für Call: ${preferredTime || "Nicht angegeben"}
 Gesendet am: ${new Date().toLocaleString("de-DE", { timeZone: "Europe/Berlin" })}
     `;
 
-    const resendApiKey = Deno.env.get("RESEND_API_KEY");
-    
-    if (!resendApiKey) {
-      console.error("RESEND_API_KEY is not configured");
-      return new Response(
-        JSON.stringify({ success: false, error: "Email service not configured" }),
-        {
-          status: 500,
-          headers: {
-            ...corsHeaders,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
+    const resendApiKey = "re_fev1ABWU_B5FqQCd1NERxY4fR5mziRab8";
 
     const emailResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
