@@ -42,9 +42,17 @@ export function AboutSection() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 id="about-heading" className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
-            Wer hinter Cogniiq steckt
-          </h2>
+        <h2
+  id="about-heading"
+  className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900"
+>
+  Wer hinter{' '}
+  <span className="tracking-tight">
+    <span style={{ color: '#1C2327' }}>Cogni</span>
+    <span style={{ color: '#515A61' }}>IQ</span>
+  </span>{' '}
+  steckt
+</h2>
         </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-12 items-center">
