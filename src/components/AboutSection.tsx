@@ -59,27 +59,14 @@ export function AboutSection() {
             className="space-y-8"
           >
             <p className="text-lg text-gray-600 leading-relaxed">
-              Cogniiq wurde 2025 von Lazar und Djordje Popovic in Bayreuth gegründet – mit einem klaren Anspruch:
-Digitale Lösungen zu bauen, die Umsatz und Prozesse messbar verbessern, statt nur „schön auszusehen“.
-          
-Wir arbeiten vor allem mit Praxen, Architekturbüros, Ingenieuren und anderen anspruchsvollen Dienstleistern in ganz Deutschland zusammen. Überall dort, wo Termine, Anfragen und Abläufe heute noch zu viel Zeit kosten, setzen wir an – mit KI-Automationen, AI-Rezeptionisten, Chatbots, Webseiten und AI-Content, die spürbar entlasten und neue Chancen eröffnen.
-
-Was uns ausmacht:
-
-Fokus auf Ergebnisse statt Buzzwords
-Uns interessiert nicht, welche Trendbegriffe gerade „in“ sind – uns interessiert, wie viele Anfragen, Termine und Aufträge bei Ihnen am Ende wirklich mehr entstehen.
-
-Verständnis für Ihre Branche
-Ob Praxis, Büro oder hochwertiger Dienstleister: Wir wissen, wie wichtig Verlässlichkeit, Professionalität und ein starker erster Eindruck sind – online wie offline.
-
-Ganzheitlicher Ansatz
-Website, Automatisierung, AI – bei uns greift alles ineinander. Besucher werden zu Anfragen, Anfragen zu Terminen, und wiederkehrende Aufgaben laufen im Hintergrund automatisiert.
-
-Persönliche Betreuung statt Massenabfertigung
-Cogniiq ist kein anonymer Baukasten-Dienst. Sie arbeiten direkt mit uns – Lazar und Djordje – und bekommen Lösungen, die wirklich zu Ihrem Unternehmen passen.
-
-Unser Ziel ist einfach:
-Dass Ihre digitale Präsenz nicht nur gut aussieht, sondern messbar mehr neue Patienten, Mandanten oder Kunden bringt – und gleichzeitig Ihren Alltag spürbar erleichtert.
+             Über Cogniiq</p>
+Cogniiq wurde 2025 von Lazar und Djordje Popovic in Bayreuth gegründet. Unser Fokus: digitale Lösungen, die messbar mehr Anfragen und Umsatz bringen – nicht nur schöne Optik.</p>
+Wir arbeiten vor allem mit Praxen, Architekturbüros, Ingenieuren und anderen hochwertigen Dienstleistern in ganz Deutschland.</p>
+Was uns ausmacht:</p>
+• Fokus auf Ergebnisse statt Buzzwords</p>
+• Website, KI-Automationen und AI-Rezeptionisten aus einem Guss</p>
+• Persönliche Betreuung direkt durch Lazar & Djordje, keine Massenabfertigung</p>
+Unser Ziel: Ihre Online-Präsenz soll Ihnen täglich neue Patienten, Mandanten oder Kunden bringen – klar messbar und zuverlässig.</p>
             </p>
 
             <div className="space-y-6">
