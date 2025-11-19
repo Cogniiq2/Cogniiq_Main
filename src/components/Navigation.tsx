@@ -52,11 +52,13 @@ export function Navigation() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-2xl font-bold tracking-tight"
+              className="flex items-center"
             >
-              <span className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] bg-clip-text text-transparent">
-                Cogniiq
-              </span>
+              <img
+                src="/COGNI IQ.png"
+                alt="CogniIQ"
+                className="h-8 w-auto"
+              />
             </motion.div>
 
             <div className="hidden lg:flex items-center gap-8">
@@ -83,7 +85,7 @@ export function Navigation() {
               >
                 <Button
                   onClick={() => handleNavClick('#kontakt')}
-                  className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] hover:opacity-90 transition-opacity text-white"
+                  className="bg-gradient-to-r from-[#D4AF37] to-[#F4E5B0] hover:opacity-90 transition-opacity text-[#1a1a1a] font-semibold"
                   aria-label="Kostenloses Erstgespräch buchen"
                 >
                   Erstgespräch
@@ -126,7 +128,7 @@ export function Navigation() {
             ))}
             <Button
               onClick={() => handleNavClick('#kontakt')}
-              className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] hover:opacity-90 transition-opacity text-white mt-4"
+              className="bg-gradient-to-r from-[#D4AF37] to-[#F4E5B0] hover:opacity-90 transition-opacity text-[#1a1a1a] font-semibold mt-4"
               aria-label="Kostenloses Erstgespräch buchen"
             >
               Erstgespräch

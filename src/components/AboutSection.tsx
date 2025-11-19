@@ -44,7 +44,7 @@ export function AboutSection() {
         >
           <h2 id="about-heading" className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
             Wer hinter{' '}
-            <span className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#D4AF37] to-[#C9A961] bg-clip-text text-transparent">
               Cogniiq
             </span>{' '}
             steckt
@@ -99,8 +99,8 @@ export function AboutSection() {
                     transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
                     className="flex items-start gap-4"
                   >
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-[#8b5cf6]/20 to-[#22d3ee]/20 flex-shrink-0">
-                      <Icon className="w-5 h-5 text-[#8b5cf6]" />
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-[#D4AF37]/20 to-[#F4E5B0]/20 flex-shrink-0">
+                      <Icon className="w-5 h-5 text-[#D4AF37]" />
                     </div>
                     <p className="text-gray-700 leading-relaxed">{highlight.text}</p>
                   </motion.div>
@@ -121,11 +121,11 @@ export function AboutSection() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: 0.4 + index * 0.2 }}
-                className="group relative bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:border-[#8b5cf6]/50 hover:shadow-xl transition-all duration-300"
+                className="group relative bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:border-[#D4AF37]/50 hover:shadow-xl transition-all duration-300"
               >
                 <div className="flex items-center gap-4">
                   <div
-                    className="w-16 h-16 rounded-full bg-gradient-to-br from-[#8b5cf6] to-[#22d3ee] flex items-center justify-center text-2xl font-bold"
+                    className="w-16 h-16 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#C9A961] flex items-center justify-center text-2xl font-bold"
                     aria-hidden="true"
                   >
                     {founder.name.charAt(0)}
@@ -140,7 +140,7 @@ export function AboutSection() {
                   </div>
                 </div>
 
-                <div className="absolute -bottom-px -right-px w-24 h-24 bg-gradient-to-br from-[#8b5cf6] to-[#22d3ee] rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
+                <div className="absolute -bottom-px -right-px w-24 h-24 bg-gradient-to-br from-[#D4AF37] to-[#C9A961] rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
               </motion.div>
             ))}
           </motion.div>

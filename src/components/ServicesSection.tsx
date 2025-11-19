@@ -14,7 +14,7 @@ const services = [
       'Mobile-first, blitzschnelle Ladezeiten, Google-optimiert',
       'Einfache Pflege durch CMS-Integration ohne technische Hürden',
     ],
-    gradient: 'from-[#8b5cf6] to-[#7c3aed]',
+    gradient: 'from-[#D4AF37] to-[#C9A961]',
   },
   {
     icon: Zap,
@@ -26,7 +26,7 @@ const services = [
       'Nahtlose Integration mit Google Calendar, Gmail, PayPal, Stripe, CRM-Systemen',
       'Professionelles Monitoring und Fehlerbehandlung für zuverlässige Abläufe',
     ],
-    gradient: 'from-[#22d3ee] to-[#06b6d4]',
+    gradient: 'from-[#B8956A] to-[#9D7E4E]',
   },
   {
     icon: Headphones,
@@ -38,7 +38,7 @@ const services = [
       'Automatisierte Buchung, Umbuchung, Stornierung und FAQ-Beantwortung',
       'Deutschsprachig trainiert, angepasst an Ihre Prozesse und Unternehmenstonalität',
     ],
-    gradient: 'from-emerald-500 to-teal-500',
+    gradient: 'from-[#C9A961] to-[#F4E5B0]',
   },
   {
     icon: Sparkles,
@@ -50,7 +50,7 @@ const services = [
       'Conversion-optimierte Texte für Landingpages und Werbekampagnen',
       'Social Media Content-Pakete für konsistente Online-Präsenz',
     ],
-    gradient: 'from-violet-500 to-fuchsia-500',
+    gradient: 'from-[#D4AF37] to-[#E5C76B]',
   },
 ];
 
@@ -69,7 +69,7 @@ export function ServicesSection() {
         >
           <h2 id="services-heading" className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
             Was wir für Sie{' '}
-            <span className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#D4AF37] to-[#C9A961] bg-clip-text text-transparent">
               umsetzen
             </span>
           </h2>
@@ -88,7 +88,7 @@ export function ServicesSection() {
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: index * 0.15 }}
                 whileHover={{ scale: 1.02, y: -4 }}
-                className="group relative bg-white rounded-2xl p-8 border border-gray-200 hover:border-[#8b5cf6]/50 hover:shadow-xl transition-all duration-300"
+                className="group relative bg-white rounded-2xl p-8 border border-gray-200 hover:border-[#D4AF37]/50 hover:shadow-xl transition-all duration-300"
               >
                 <div
                   className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}
@@ -127,7 +127,7 @@ export function ServicesSection() {
                       const element = document.querySelector('#kontakt');
                       if (element) element.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-[#8b5cf6] transition-colors group/link"
+                    className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-[#D4AF37] transition-colors group/link"
                     aria-label={`Kontakt aufnehmen für ${service.title}`}
                   >
                     Mehr zu dieser Leistung
