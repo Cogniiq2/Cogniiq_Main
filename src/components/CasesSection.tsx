@@ -69,7 +69,7 @@ export function CasesSection() {
         >
           <h2 id="cases-heading" className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
             Wie das in der{' '}
-            <span className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#D4AF37] to-[#C9A961] bg-clip-text text-transparent">
               Praxis aussieht
             </span>
           </h2>

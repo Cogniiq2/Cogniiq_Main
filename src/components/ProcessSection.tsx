@@ -49,7 +49,7 @@ export function ProcessSection() {
         >
           <h2 id="process-heading" className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
             So arbeiten wir{' '}
-            <span className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#D4AF37] to-[#C9A961] bg-clip-text text-transparent">
               zusammen
             </span>
           </h2>
@@ -69,13 +69,13 @@ export function ProcessSection() {
                 transition={{ duration: 0.6, delay: index * 0.15 }}
                 className="relative group"
               >
-                <div className="relative bg-white rounded-2xl p-6 border border-gray-200 hover:border-[#8b5cf6]/50 hover:shadow-xl transition-all duration-300 h-full">
+                <div className="relative bg-white rounded-2xl p-6 border border-gray-200 hover:border-[#D4AF37]/50 hover:shadow-xl transition-all duration-300 h-full">
                   <div className="absolute -top-4 -left-4 text-6xl font-bold text-gray-200">
                     {step.number}
                   </div>
 
                   <div className="relative">
-                    <div className="inline-flex p-3 rounded-xl bg-gradient-to-br from-[#8b5cf6] to-[#22d3ee] mb-4" aria-hidden="true">
+                    <div className="inline-flex p-3 rounded-xl bg-gradient-to-br from-[#D4AF37] to-[#C9A961] mb-4" aria-hidden="true">
                       <Icon className="w-6 h-6 text-white" />
                     </div>
 

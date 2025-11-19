@@ -72,9 +72,9 @@ export function ContactSection() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="text-center bg-gray-50 rounded-3xl p-12 border-2 border-[#8b5cf6]/50 shadow-xl"
+            className="text-center bg-gray-50 rounded-3xl p-12 border-2 border-[#D4AF37]/50 shadow-xl"
           >
-            <div className="inline-flex p-4 rounded-full bg-gradient-to-br from-[#8b5cf6] to-[#22d3ee] mb-6">
+            <div className="inline-flex p-4 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#F4E5B0] mb-6">
               <CheckCircle2 className="w-12 h-12 text-white" />
             </div>
 
@@ -119,7 +119,7 @@ export function ContactSection() {
             className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900"
           >
             Lassen Sie uns über Ihr{' '}
-            <span className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#D4AF37] to-[#C9A961] bg-clip-text text-transparent">
               Projekt sprechen
             </span>
           </h2>
@@ -158,8 +158,8 @@ export function ContactSection() {
                     }}
                     className="flex items-center gap-4"
                   >
-                    <div className="p-3 rounded-xl bg-gradient-to-br from-[#8b5cf6]/20 to-[#22d3ee]/20">
-                      <Icon className="w-6 h-6 text-[#8b5cf6]" />
+                    <div className="p-3 rounded-xl bg-gradient-to-br from-[#D4AF37]/20 to-[#F4E5B0]/20">
+                      <Icon className="w-6 h-6 text-[#D4AF37]" />
                     </div>
                     <span className="text-gray-700 font-medium">
                       {benefit.text}
@@ -181,35 +181,35 @@ export function ContactSection() {
               className="bg-gray-50 rounded-2xl p-8 border border-gray-200 shadow-lg space-y-6"
             >
               <div className="space-y-2 group">
-                <Label htmlFor="name" className="text-gray-700 font-medium transition-colors group-focus-within:text-[#8b5cf6]">Vollständiger Name</Label>
+                <Label htmlFor="name" className="text-gray-700 font-medium transition-colors group-focus-within:text-[#D4AF37]">Vollständiger Name</Label>
                 <Input
                   id="name"
                   required
-                  className="bg-white border-gray-300 focus:border-[#8b5cf6] focus:ring-2 focus:ring-[#8b5cf6]/20 transition-all duration-300 hover:border-gray-400"
+                  className="bg-white border-gray-300 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition-all duration-300 hover:border-gray-400"
                 />
               </div>
 
               <div className="space-y-2 group">
-                <Label htmlFor="email" className="text-gray-700 font-medium transition-colors group-focus-within:text-[#8b5cf6]">E-Mail</Label>
+                <Label htmlFor="email" className="text-gray-700 font-medium transition-colors group-focus-within:text-[#D4AF37]">E-Mail</Label>
                 <Input
                   id="email"
                   type="email"
                   required
-                  className="bg-white border-gray-300 focus:border-[#8b5cf6] focus:ring-2 focus:ring-[#8b5cf6]/20 transition-all duration-300 hover:border-gray-400"
+                  className="bg-white border-gray-300 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition-all duration-300 hover:border-gray-400"
                 />
               </div>
 
               <div className="space-y-2 group">
-                <Label htmlFor="company" className="text-gray-700 font-medium transition-colors group-focus-within:text-[#8b5cf6]">Unternehmen / Projektname</Label>
+                <Label htmlFor="company" className="text-gray-700 font-medium transition-colors group-focus-within:text-[#D4AF37]">Unternehmen / Projektname</Label>
                 <Input
                   id="company"
                   required
-                  className="bg-white border-gray-300 focus:border-[#8b5cf6] focus:ring-2 focus:ring-[#8b5cf6]/20 transition-all duration-300 hover:border-gray-400"
+                  className="bg-white border-gray-300 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition-all duration-300 hover:border-gray-400"
                 />
               </div>
 
               <div className="space-y-2 group" id="industry">
-                <Label htmlFor="industry" className="text-gray-700 font-medium transition-colors group-focus-within:text-[#8b5cf6]">Branche</Label>
+                <Label htmlFor="industry" className="text-gray-700 font-medium transition-colors group-focus-within:text-[#D4AF37]">Branche</Label>
                 <Select required onValueChange={(value) => {
                   const trigger = document.querySelector('#industry button');
                   if (trigger) trigger.setAttribute('data-value', value);
@@ -218,12 +218,12 @@ export function ContactSection() {
                     <SelectValue placeholder="Wähle deine Branche" />
                   </SelectTrigger>
                   <SelectContent className="bg-white border border-gray-200 shadow-xl rounded-xl overflow-hidden">
-                    <SelectItem value="medical" className="cursor-pointer hover:bg-gradient-to-r hover:from-[#8b5cf6]/10 hover:to-[#22d3ee]/10 transition-all duration-200">Medizin & Kliniken</SelectItem>
-                    <SelectItem value="gastronomy" className="cursor-pointer hover:bg-gradient-to-r hover:from-[#8b5cf6]/10 hover:to-[#22d3ee]/10 transition-all duration-200">Gastronomie</SelectItem>
-                    <SelectItem value="sports" className="cursor-pointer hover:bg-gradient-to-r hover:from-[#8b5cf6]/10 hover:to-[#22d3ee]/10 transition-all duration-200">Sport & Fitness</SelectItem>
-                    <SelectItem value="realestate" className="cursor-pointer hover:bg-gradient-to-r hover:from-[#8b5cf6]/10 hover:to-[#22d3ee]/10 transition-all duration-200">Immobilien</SelectItem>
-                    <SelectItem value="ecommerce" className="cursor-pointer hover:bg-gradient-to-r hover:from-[#8b5cf6]/10 hover:to-[#22d3ee]/10 transition-all duration-200">E-Commerce</SelectItem>
-                    <SelectItem value="other" className="cursor-pointer hover:bg-gradient-to-r hover:from-[#8b5cf6]/10 hover:to-[#22d3ee]/10 transition-all duration-200">Sonstiges</SelectItem>
+                    <SelectItem value="medical" className="cursor-pointer hover:bg-gradient-to-r hover:from-[#D4AF37]/10 hover:to-[#F4E5B0]/10 transition-all duration-200">Medizin & Kliniken</SelectItem>
+                    <SelectItem value="gastronomy" className="cursor-pointer hover:bg-gradient-to-r hover:from-[#D4AF37]/10 hover:to-[#F4E5B0]/10 transition-all duration-200">Gastronomie</SelectItem>
+                    <SelectItem value="sports" className="cursor-pointer hover:bg-gradient-to-r hover:from-[#D4AF37]/10 hover:to-[#F4E5B0]/10 transition-all duration-200">Sport & Fitness</SelectItem>
+                    <SelectItem value="realestate" className="cursor-pointer hover:bg-gradient-to-r hover:from-[#D4AF37]/10 hover:to-[#F4E5B0]/10 transition-all duration-200">Immobilien</SelectItem>
+                    <SelectItem value="ecommerce" className="cursor-pointer hover:bg-gradient-to-r hover:from-[#D4AF37]/10 hover:to-[#F4E5B0]/10 transition-all duration-200">E-Commerce</SelectItem>
+                    <SelectItem value="other" className="cursor-pointer hover:bg-gradient-to-r hover:from-[#D4AF37]/10 hover:to-[#F4E5B0]/10 transition-all duration-200">Sonstiges</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -241,7 +241,7 @@ export function ContactSection() {
                       id={interest}
                       checked={interests.includes(interest)}
                       onCheckedChange={() => toggleInterest(interest)}
-                      className="border-gray-300 data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-[#8b5cf6] data-[state=checked]:to-[#22d3ee] transition-all duration-300 data-[state=checked]:scale-110"
+                      className="border-gray-300 data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-[#D4AF37] data-[state=checked]:to-[#F4E5B0] transition-all duration-300 data-[state=checked]:scale-110"
                     />
                     <label
                       htmlFor={interest}
@@ -254,7 +254,7 @@ export function ContactSection() {
               </div>
 
               <div className="space-y-2 group" id="timeline">
-                <Label htmlFor="timeline" className="text-gray-700 font-medium transition-colors group-focus-within:text-[#8b5cf6]">Wunschzeitraum für Start</Label>
+                <Label htmlFor="timeline" className="text-gray-700 font-medium transition-colors group-focus-within:text-[#D4AF37]">Wunschzeitraum für Start</Label>
                 <Select required onValueChange={(value) => {
                   const trigger = document.querySelector('#timeline button');
                   if (trigger) trigger.setAttribute('data-value', value);
@@ -263,15 +263,15 @@ export function ContactSection() {
                     <SelectValue placeholder="Wähle einen Zeitraum" />
                   </SelectTrigger>
                   <SelectContent className="bg-white border border-gray-200 shadow-xl rounded-xl overflow-hidden">
-                    <SelectItem value="asap" className="cursor-pointer hover:bg-gradient-to-r hover:from-[#8b5cf6]/10 hover:to-[#22d3ee]/10 transition-all duration-200">So schnell wie möglich</SelectItem>
-                    <SelectItem value="1-2months" className="cursor-pointer hover:bg-gradient-to-r hover:from-[#8b5cf6]/10 hover:to-[#22d3ee]/10 transition-all duration-200">In 1–2 Monaten</SelectItem>
-                    <SelectItem value="3+months" className="cursor-pointer hover:bg-gradient-to-r hover:from-[#8b5cf6]/10 hover:to-[#22d3ee]/10 transition-all duration-200">In 3+ Monaten</SelectItem>
+                    <SelectItem value="asap" className="cursor-pointer hover:bg-gradient-to-r hover:from-[#D4AF37]/10 hover:to-[#F4E5B0]/10 transition-all duration-200">So schnell wie möglich</SelectItem>
+                    <SelectItem value="1-2months" className="cursor-pointer hover:bg-gradient-to-r hover:from-[#D4AF37]/10 hover:to-[#F4E5B0]/10 transition-all duration-200">In 1–2 Monaten</SelectItem>
+                    <SelectItem value="3+months" className="cursor-pointer hover:bg-gradient-to-r hover:from-[#D4AF37]/10 hover:to-[#F4E5B0]/10 transition-all duration-200">In 3+ Monaten</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2 group">
-                <Label htmlFor="goal" className="text-gray-700 font-medium transition-colors group-focus-within:text-[#8b5cf6]">
+                <Label htmlFor="goal" className="text-gray-700 font-medium transition-colors group-focus-within:text-[#D4AF37]">
                   Was ist dein Ziel mit diesem Projekt?
                 </Label>
                 <Textarea
@@ -283,20 +283,20 @@ export function ContactSection() {
               </div>
 
               <div className="space-y-2 group">
-                <Label htmlFor="preferred-time" className="text-gray-700 font-medium transition-colors group-focus-within:text-[#8b5cf6]">
+                <Label htmlFor="preferred-time" className="text-gray-700 font-medium transition-colors group-focus-within:text-[#D4AF37]">
                   Bevorzugte Zeit für einen Call (Optional)
                 </Label>
                 <Input
                   id="preferred-time"
                   placeholder="z.B. Montag–Mittwoch, 14–17 Uhr"
-                  className="bg-white border-gray-300 focus:border-[#8b5cf6] focus:ring-2 focus:ring-[#8b5cf6]/20 transition-all duration-300 hover:border-gray-400"
+                  className="bg-white border-gray-300 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition-all duration-300 hover:border-gray-400"
                 />
               </div>
 
               <Button
                 type="submit"
                 size="lg"
-                className="w-full bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] hover:opacity-90 hover:scale-[1.02] transition-all duration-300 text-lg py-6 shadow-[0_0_30px_rgba(139,92,246,0.3)] hover:shadow-[0_0_40px_rgba(139,92,246,0.5)]"
+                className="w-full bg-gradient-to-r from-[#D4AF37] to-[#F4E5B0] hover:opacity-90 hover:scale-[1.02] transition-all duration-300 text-lg py-6 shadow-[0_0_30px_rgba(212,175,55,0.3)] hover:shadow-[0_0_40px_rgba(212,175,55,0.5)] text-[#1a1a1a] font-semibold"
                 aria-label="Kostenloses Erstgespräch anfragen"
               >
                 Jetzt Erstgespräch anfragen
