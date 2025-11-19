@@ -1,7 +1,22 @@
-<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <clipPath id="iqclip" clipPathUnits="objectBoundingBox" transform="scale(0.01, 0.01)">
-      <path d="M35 25 L45 25 L45 75 L35 75 Z M55 25 Q75 25 75 45 Q75 55 70 62 L78 75 L66 75 L60 65 Q55 65 55 65 Q55 55 55 55 Q65 55 65 45 Q65 35 55 35 L55 75 L55 25 Z" />
+    <clipPath id="iq-mask">
+      <!-- I letter -->
+      <rect x="65" y="40" width="25" height="120" rx="2" />
+
+      <!-- Q letter - outer circle -->
+      <path d="M 130,50
+               A 40,40 0 1,1 130,130
+               A 40,40 0 1,1 130,50
+               Z
+               M 130,65
+               A 25,25 0 1,0 130,115
+               A 25,25 0 1,0 130,65
+               Z"
+            fill-rule="evenodd" />
+
+      <!-- Q letter - tail -->
+      <rect x="150" y="105" width="20" height="35" rx="2" transform="rotate(35 160 105)" />
     </clipPath>
   </defs>
 </svg>
