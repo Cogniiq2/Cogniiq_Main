@@ -58,28 +58,35 @@ export function AboutSection() {
             transition={{ duration: 0.8 }}
             className="space-y-8"
           >
-            <p className="text-lg text-gray-600 leading-relaxed">
-            <p className="text-lg text-gray-600 leading-relaxed">
-  Über Cogniiq
-</p>
-<p className="mt-3 text-base text-gray-600 leading-relaxed">
-  Cogniiq wurde 2025 von Lazar und Djordje Popovic in Bayreuth gegründet. Unser Fokus: digitale Lösungen, die messbar mehr Anfragen und Umsatz bringen – nicht nur schöne Optik.
-</p>
-<p className="mt-3 text-base text-gray-600 leading-relaxed">
-  Wir arbeiten vor allem mit Praxen, Architekturbüros, Ingenieuren und anderen hochwertigen Dienstleistern in ganz Deutschland.
-</p>
-<p className="mt-4 text-base text-gray-600 leading-relaxed">
-  Was uns ausmacht:
-</p>
-<ul className="mt-2 space-y-1 text-base text-gray-600 leading-relaxed list-disc list-inside">
-  <li>Fokus auf Ergebnisse statt Buzzwords</li>
-  <li>Website, KI-Automationen und AI-Rezeptionisten aus einem Guss</li>
-  <li>Persönliche Betreuung direkt durch Lazar &amp; Djordje – keine Massenabfertigung</li>
-</ul>
-<p className="mt-3 text-base text-gray-600 leading-relaxed">
-  Ziel: Ihre Online-Präsenz soll Ihnen täglich neue Patienten, Mandanten oder Kunden bringen – klar messbar und zuverlässig.
-</p>
+            {/* === Neuer About-Text-Block === */}
+            <div className="space-y-3 text-base text-gray-600 leading-relaxed">
+              <p className="text-lg font-semibold text-gray-800">
+                Über Cogniiq
+              </p>
 
+              <p>
+                Cogniiq wurde 2025 von Lazar und Djordje Popovic in Bayreuth gegründet. Unser Fokus: digitale Lösungen, die messbar mehr Anfragen und Umsatz bringen – nicht nur schöne Optik.
+              </p>
+
+              <p>
+                Wir arbeiten vor allem mit Praxen, Architekturbüros, Ingenieuren und anderen hochwertigen Dienstleistern in ganz Deutschland.
+              </p>
+
+              <p className="mt-2">
+                Was uns ausmacht:
+              </p>
+
+              <ul className="list-disc list-inside space-y-1">
+                <li>Fokus auf Ergebnisse statt Buzzwords</li>
+                <li>Website, KI-Automationen und AI-Rezeptionisten aus einem Guss</li>
+                <li>Persönliche Betreuung direkt durch Lazar &amp; Djordje – keine Massenabfertigung</li>
+              </ul>
+
+              <p className="mt-2">
+                Ziel: Ihre Online-Präsenz soll Ihnen täglich neue Patienten, Mandanten oder Kunden bringen – klar messbar und zuverlässig.
+              </p>
+            </div>
+            {/* === Ende About-Text-Block === */}
 
             <div className="space-y-6">
               {highlights.map((highlight, index) => {
@@ -117,14 +124,19 @@ export function AboutSection() {
                 className="group relative bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:border-[#8b5cf6]/50 hover:shadow-xl transition-all duration-300"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#8b5cf6] to-[#22d3ee] flex items-center justify-center text-2xl font-bold" aria-hidden="true">
+                  <div
+                    className="w-16 h-16 rounded-full bg-gradient-to-br from-[#8b5cf6] to-[#22d3ee] flex items-center justify-center text-2xl font-bold"
+                    aria-hidden="true"
+                  >
                     {founder.name.charAt(0)}
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 mb-1">
                       {founder.name}
                     </h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">{founder.role}</p>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {founder.role}
+                    </p>
                   </div>
                 </div>
 
