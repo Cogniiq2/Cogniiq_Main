@@ -21,12 +21,12 @@ export function TrustSection() {
           transition={{ duration: 0.8 }}
           className="text-center mb-12"
         >
-          <h2 id="trust-heading" className="text-3xl lg:text-4xl font-bold mb-4 text-gray-900">
-            Nicht nur Optik –{' '}
-            <span className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] bg-clip-text text-transparent">
-              sondern messbare Ergebnisse
-            </span>
-          </h2>
+<h2
+  id="trust-heading"
+  className="text-3xl lg:text-4xl font-bold mb-4 text-gray-900"
+>
+  Nicht nur Optik – sondern messbare Ergebnisse
+</h2>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-8">
