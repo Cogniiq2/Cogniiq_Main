@@ -54,7 +54,7 @@ export function Navigation() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="flex items-center justify-start flex-1 ml-[-12px]"
+              className="flex items-center ml-[-8px]"
             >
               <img
                 src="/COGNI IQ.png"
@@ -81,7 +81,6 @@ export function Navigation() {
                   {item.label}
                 </motion.a>
               ))}
-
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
