@@ -1,4 +1,4 @@
-import { GooeyText } from './ui/gooey-text-morphing';
+import { TypewriterEffectSmooth } from './ui/typewriter-effect';
 import { Button } from './ui/button';
 import { SplineScene } from './ui/splite';
 
@@ -32,20 +32,21 @@ export function HeroSection() {
         <div className="text-center space-y-8">
 
           <div className="mb-8 min-h-[180px] flex items-center justify-center">
-            <h1 className="sr-only">Cogniiq - AI Agentur und Webdesign Agentur in Bayreuth, Deutschland</h1>
-            <GooeyText
-              texts={[
-                "CogniIQ",
-                "the",
-                "Future",
-                "is",
-                "here"
+            <h1 className="sr-only">
+              Cogniiq - AI Agentur und Webdesign Agentur in Bayreuth, Deutschland
+            </h1>
+
+            <TypewriterEffectSmooth
+              words={[
+                {
+                  text: "CogniIQ – The Future is here.",
+                  className: "text-black"
+                }
               ]}
-              morphTime={1.2}
-              cooldownTime={0.8}
-              className="font-bold"
-              textClassName="font-bold text-5xl md:text-7xl lg:text-8xl text-black"
+              className="font-bold text-5xl md:text-7xl lg:text-8xl"
+              cursorClassName="bg-black"
             />
+
           </div>
 
         </div>
