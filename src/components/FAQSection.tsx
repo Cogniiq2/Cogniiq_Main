@@ -51,7 +51,7 @@ export function FAQSection() {
         >
           <h2 id="faq-heading" className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
             Häufige{' '}
-            <span className="bg-gradient-to-r from-[#D4AF37] to-[#C9A961] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] bg-clip-text text-transparent">
               Fragen
             </span>
           </h2>
@@ -70,9 +70,9 @@ export function FAQSection() {
               <AccordionItem
                 key={index}
                 value={`item-${index}`}
-                className="bg-white rounded-2xl border border-gray-200 px-6 data-[state=open]:border-[#D4AF37]/50 data-[state=open]:shadow-lg transition-all"
+                className="bg-white rounded-2xl border border-gray-200 px-6 data-[state=open]:border-[#8b5cf6]/50 data-[state=open]:shadow-lg transition-all"
               >
-                <AccordionTrigger className="text-left text-lg font-semibold text-gray-900 hover:text-[#D4AF37] transition-colors py-6">
+                <AccordionTrigger className="text-left text-lg font-semibold text-gray-900 hover:text-[#8b5cf6] transition-colors py-6">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-gray-600 leading-relaxed pb-6">

@@ -23,7 +23,7 @@ export function TrustSection() {
         >
           <h2 id="trust-heading" className="text-3xl lg:text-4xl font-bold mb-4 text-gray-900">
             Nicht nur Optik –{' '}
-            <span className="bg-gradient-to-r from-[#D4AF37] to-[#C9A961] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] bg-clip-text text-transparent">
               sondern messbare Ergebnisse
             </span>
           </h2>
@@ -36,9 +36,9 @@ export function TrustSection() {
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: index * 0.2 }}
-              className="text-center p-8 rounded-2xl bg-gradient-to-br from-gray-50 to-white border border-gray-200 hover:border-[#D4AF37]/50 hover:shadow-lg transition-all"
+              className="text-center p-8 rounded-2xl bg-gradient-to-br from-gray-50 to-white border border-gray-200 hover:border-[#8b5cf6]/50 hover:shadow-lg transition-all"
             >
-              <div className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-[#D4AF37] to-[#C9A961] bg-clip-text text-transparent mb-3">
+              <div className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] bg-clip-text text-transparent mb-3">
                 {stat.value}
               </div>
               <div className="text-gray-600 font-medium">{stat.label}</div>
