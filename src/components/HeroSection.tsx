@@ -35,7 +35,7 @@ export function HeroSection() {
             <h1 className="sr-only">Cogniiq - AI Agentur und Webdesign Agentur in Bayreuth, Deutschland</h1>
             <GooeyText
               texts={[
-                "Cogniiq",
+                "CogniIQ",
                 "the",
                 "Future",
                 "is",
