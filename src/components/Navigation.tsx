@@ -82,7 +82,6 @@ export function Navigation() {
               >
                 <Button
                   onClick={() => handleNavClick('#kontakt')}
-                  className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] hover:opacity-90 transition-opacity text-white"
                   aria-label="Kostenloses Erstgespräch buchen"
                 >
                   Erstgespräch
@@ -125,7 +124,7 @@ export function Navigation() {
             ))}
             <Button
               onClick={() => handleNavClick('#kontakt')}
-              className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] hover:opacity-90 transition-opacity text-white mt-4"
+              className="mt-4"
               aria-label="Kostenloses Erstgespräch buchen"
             >
               Erstgespräch

@@ -296,7 +296,7 @@ export function ContactSection() {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] hover:opacity-90 hover:scale-[1.02] transition-all duration-300 text-lg py-6 shadow-[0_0_30px_rgba(139,92,246,0.3)] hover:shadow-[0_0_40px_rgba(139,92,246,0.5)]"
+                className="w-full hover:scale-[1.02] transition-all duration-300 text-lg py-6"
                 aria-label="Kostenloses Erstgespräch anfragen"
               >
                 Jetzt Erstgespräch anfragen
