@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
+import { Logo } from './Logo';
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -52,11 +53,9 @@ export function Navigation() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-2xl font-bold tracking-tight"
+              className="flex items-center"
             >
-              <span className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] bg-clip-text text-transparent">
-                Cogniiq
-              </span>
+              <Logo className="h-12" />
             </motion.div>
 
             <div className="hidden lg:flex items-center gap-8">
