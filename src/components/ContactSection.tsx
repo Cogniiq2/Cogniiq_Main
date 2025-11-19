@@ -39,13 +39,10 @@ export function ContactSection() {
       preferredTime: (document.getElementById("preferred-time") as HTMLInputElement).value,
     };
 
-    const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/contact`;
-
-    await fetch(apiUrl, {
+    await fetch("https://hook.eu2.make.com/g7kngisz3tnvrju4q3qnidoi8sqxb65m", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
       },
       body: JSON.stringify(payload),
     });
