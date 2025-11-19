@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { motion, stagger, useAnimate, useInView } from "framer-motion";
 import { useEffect } from "react";
 
-// --- CLEAN SINGLE-LINE TYPEWRITER ANIMATION ---
+// Ultra-modern Apple-like typewriter animation
 export const TypewriterEffectSmooth = ({
   words,
   className,
@@ -14,7 +14,7 @@ export const TypewriterEffectSmooth = ({
   className?: string;
   cursorClassName?: string;
 }) => {
-  // Convert words into a single array of characters
+  // Split into characters
   const chars = words[0].text.split("");
 
   const [scope, animate] = useAnimate();
@@ -30,8 +30,8 @@ export const TypewriterEffectSmooth = ({
         },
         {
           duration: 0.25,
-          delay: stagger(0.06),
-          ease: "easeInOut",
+          delay: stagger(0.045), // slightly faster, more premium
+          ease: "easeOut",
         }
       );
     }
@@ -40,7 +40,7 @@ export const TypewriterEffectSmooth = ({
   return (
     <div
       className={cn(
-        "flex space-x-1 my-6 items-center justify-center",
+        "flex items-center justify-center space-x-2",
         className
       )}
     >
@@ -48,7 +48,17 @@ export const TypewriterEffectSmooth = ({
         {chars.map((char, index) => (
           <motion.span
             key={index}
-            className={cn("opacity-0 text-black", words[0].className)}
+            className={cn(
+              "opacity-0 text-black tracking-tight font-semibold",
+              words[0].className
+            )}
+            style={{
+              fontFamily:
+                "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', Arial",
+              fontWeight: 600,
+              letterSpacing: "-0.03em", // luxury Apple tightness
+              fontSize: "clamp(32px, 6vw, 68px)", // responsive luxury size
+            }}
           >
             {char}
           </motion.span>
@@ -60,14 +70,18 @@ export const TypewriterEffectSmooth = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{
-          duration: 0.8,
+          duration: 0.7,
           repeat: Infinity,
           repeatType: "reverse",
         }}
         className={cn(
-          "inline-block rounded-sm w-[4px] h-10 bg-black",
+          "inline-block rounded-sm bg-black",
           cursorClassName
         )}
+        style={{
+          width: "4px",
+          height: "clamp(28px, 5vw, 54px)",
+        }}
       ></motion.span>
     </div>
   );
