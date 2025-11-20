@@ -1,4 +1,4 @@
-// Updated AboutSection.tsx with GlossaryWord popups integrated
+// Fixed AboutSection.tsx with proper closing tags and integrated GlossaryWord component
 // (Apple-like smooth & luxury animation included)
 
 "use client";
@@ -8,7 +8,6 @@ import { useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { Target, Wrench, Award } from "lucide-react";
 
-// Popup-enabled clickable word component
 export function GlossaryWord({ word, explanation }: { word: string; explanation: string }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -97,7 +96,7 @@ export function AboutSection() {
           className="text-center mb-16"
         >
           <h2 id="about-heading" className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
-            Wer hinter{" "}
+            Wer hinter {" "}
             <span className="tracking-tight">
               <span style={{ color: "#1C2327" }}>Cogni</span>
               <span style={{ color: "#515A61" }}>IQ</span>
@@ -116,12 +115,12 @@ export function AboutSection() {
           >
             <p className="text-lg text-gray-600 leading-relaxed">
               Cogniiq wurde 2025 von <strong>Lazar und Djordje Popovic</strong> in <strong>Bayreuth</strong> gegründet.
-              Die Vision: Technologie so einsetzen, dass sie echte{" "}
+              Die Vision: Technologie so einsetzen, dass sie echte {" "}
               <GlossaryWord
                 word="Business-Resultate"
                 explanation="Messbare Ergebnisse wie mehr Anfragen, höhere Conversion-Rates, klarere Prozesse und spürbar bessere Performance. Alles darauf ausgerichtet, echten geschäftlichen Wert zu schaffen."
               />{" "}
-              erzeugt – klar, präzise und ohne unnötige{" "}
+              erzeugt – klar, präzise und ohne unnötige {" "}
               <GlossaryWord
                 word="Komplexität"
                 explanation="Unsere Systeme sind extrem komplex im Hintergrund – vollautomatisierte Logik, Integrationen und KI-Modelle. Für Sie bleibt alles radikal einfach: klar, intuitiv und komplett alltagstauglich – ohne technischen Aufwand."
@@ -129,12 +128,12 @@ export function AboutSection() {
               .
               <br />
               <br />
-              Heute verbindet Cogniiq erstklassiges{" "}
+              Heute verbindet Cogniiq erstklassiges {" "}
               <GlossaryWord
                 word="Webdesign"
                 explanation="Hochwertige, schnelle Websites mit klarer Struktur, moderner Ästhetik, starker UX und Conversion-Optimierung. Design, das nicht nur aussieht – sondern verkauft."
               />{" "}
-              mit modernster{" "}
+              mit modernster {" "}
               <GlossaryWord
                 word="AI-Automatisierung"
                 explanation="Vollautomatisierte Prozesse mit KI, die Aufgaben übernehmen, Entscheidungen treffen und Abläufe selbstständig ausführen. Ergebnis: weniger manuelle Arbeit, weniger Fehler, mehr Skalierungsmöglichkeiten."
@@ -179,17 +178,4 @@ export function AboutSection() {
                 className="group relative bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:border-[#515A61]/50 hover:shadow-xl transition-all duration-300"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-[#515A61] flex items-center justify-center text-2xl font-bold text-white">
-                    {founder.name.charAt(0)}
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">{founder.name}</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">{founder.role}</p>
-                  </div>
-                </div>
-
-                <div className="absolute -bottom-px -right-px w-24 h-24 bg-[#515A61] rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
-              </motion.div>
-            ))}
-          </motion.div>
-        </
+                  <div className="w-16
