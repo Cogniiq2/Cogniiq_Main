@@ -1,5 +1,5 @@
-// Fixed AboutSection.tsx with proper closing tags and integrated GlossaryWord component
-// (Apple-like smooth & luxury animation included)
+// Fully fixed AboutSection.tsx — no truncation, no unterminated strings, all tags properly closed
+// GlossaryWord popups + Apple-smooth animation integrated cleanly
 
 "use client";
 
@@ -8,6 +8,7 @@ import { useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { Target, Wrench, Award } from "lucide-react";
 
+// CLICKABLE WORD POPUP COMPONENT -------------------------------------------------
 export function GlossaryWord({ word, explanation }: { word: string; explanation: string }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -51,6 +52,7 @@ export function GlossaryWord({ word, explanation }: { word: string; explanation:
   );
 }
 
+// HIGHLIGHTS BLOCK -------------------------------------------------------------
 const highlights = [
   {
     icon: Target,
@@ -69,6 +71,7 @@ const highlights = [
   },
 ];
 
+// FOUNDERS BLOCK --------------------------------------------------------------
 const founders = [
   {
     name: "Lazar Popovic",
@@ -82,6 +85,7 @@ const founders = [
   },
 ];
 
+// ABOUT SECTION ---------------------------------------------------------------
 export function AboutSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.3 });
@@ -89,6 +93,7 @@ export function AboutSection() {
   return (
     <section id="ueber-uns" ref={ref} className="py-32 bg-white" aria-labelledby="about-heading">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        {/* TITLE */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -116,11 +121,14 @@ export function AboutSection() {
             <p className="text-lg text-gray-600 leading-relaxed">
               Cogniiq wurde 2025 von <strong>Lazar und Djordje Popovic</strong> in <strong>Bayreuth</strong> gegründet.
               Die Vision: Technologie so einsetzen, dass sie echte {" "}
+
               <GlossaryWord
                 word="Business-Resultate"
                 explanation="Messbare Ergebnisse wie mehr Anfragen, höhere Conversion-Rates, klarere Prozesse und spürbar bessere Performance. Alles darauf ausgerichtet, echten geschäftlichen Wert zu schaffen."
               />{" "}
+
               erzeugt – klar, präzise und ohne unnötige {" "}
+
               <GlossaryWord
                 word="Komplexität"
                 explanation="Unsere Systeme sind extrem komplex im Hintergrund – vollautomatisierte Logik, Integrationen und KI-Modelle. Für Sie bleibt alles radikal einfach: klar, intuitiv und komplett alltagstauglich – ohne technischen Aufwand."
@@ -128,6 +136,7 @@ export function AboutSection() {
               .
               <br />
               <br />
+
               Heute verbindet Cogniiq erstklassiges {" "}
               <GlossaryWord
                 word="Webdesign"
@@ -141,6 +150,7 @@ export function AboutSection() {
               . Unternehmen in ganz Deutschland profitieren von Websites, die verkaufen – und Systemen, die Arbeit automatisieren.
             </p>
 
+            {/* HIGHLIGHTS */}
             <div className="space-y-6">
               {highlights.map((highlight, index) => {
                 const Icon = highlight.icon;
@@ -178,4 +188,21 @@ export function AboutSection() {
                 className="group relative bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:border-[#515A61]/50 hover:shadow-xl transition-all duration-300"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-16
+                  <div className="w-16 h-16 rounded-full bg-[#515A61] flex items-center justify-center text-2xl font-bold text-white">
+                    {founder.name.charAt(0)}
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-1">{founder.name}</h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">{founder.role}</p>
+                  </div>
+                </div>
+
+                <div className="absolute -bottom-px -right-px w-24 h-24 bg-[#515A61] rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
