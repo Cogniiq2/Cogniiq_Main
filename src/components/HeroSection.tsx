@@ -12,7 +12,7 @@ export function HeroSection() {
 
   return (
     <section
-      className="relative w-full min-h-screen flex items-center justify-center overflow-visible bg-gradient-to-br from-gray-50 via-white to-gray-100 pt-20"
+      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100 pt-20"
       aria-label="Hauptbereich"
     >
 
