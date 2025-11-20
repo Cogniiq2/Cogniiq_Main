@@ -26,7 +26,7 @@ export function GlossaryWord({ word, explanation }: { word: string; explanation:
   return (
     <span className="relative inline-block">
       <motion.span
-        className="cursor-pointer font-medium transition-all duration-200 hover:text-[#515A61] hover:scale-[1.07]"
+        className="cursor-pointer font-medium"
         whileHover={{ color: "#515A61", scale: 1.06 }}
         transition={{ type: "spring", stiffness: 260, damping: 18 }}
         onClick={() => setOpen(!open)}
@@ -193,15 +193,7 @@ export function AboutSection() {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 mb-1">{founder.name}</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-  {founder.role
-    .split("AI-Automationen").join("<GlossaryWord word='AI-Automationen' explanation='Automatisierte Abläufe, die ohne menschliches Eingreifen funktionieren – präzise, zuverlässig und skalierbar.' />")
-    .split("KI-Workflows").join("<GlossaryWord word='KI-Workflows' explanation='Intelligente Abläufe, die Entscheidungen treffen, Inhalte generieren oder Daten analysieren – voll integriert in Ihre Systeme.' />")
-    .split("technische Integrationen").join("<GlossaryWord word='technische Integrationen' explanation='Professionelle Verbindung Ihrer Tools, Buchungssysteme, Zahlungssysteme und Datenquellen – komplett automatisiert.' />")
-    .split("Webdesign").join("<GlossaryWord word='Webdesign' explanation='Hochwertige, schnelle Websites mit klarer Struktur, moderner Ästhetik und Conversion-Fokus.' />")
-    .split("System-Architektur").join("<GlossaryWord word='System-Architektur' explanation='Robuste, skalierbare digitale Systeme, die dauerhaft stabil laufen – selbst bei hoher Last.' />")
-    .split("Performance-Optimierung").join("<GlossaryWord word='Performance-Optimierung' explanation='Verbesserungen, die Websites spürbar schneller machen: bessere Ladezeiten, bessere Google-Scores, mehr Umsatz.' />")}
-</p>
+                    <p className="text-sm text-gray-600 leading-relaxed">{founder.role}</p>
                   </div>
                 </div>
 
