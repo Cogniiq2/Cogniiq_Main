@@ -35,10 +35,10 @@ export const TypewriterEffectSmooth = ({
           {
             duration: 0.25,
             delay: stagger(0.038),
-            ease: [0.19, 1, 0.22, 1], // Apple-esque spring easing
+            ease: [0.19, 1, 0.22, 1], // Apple-like spring easing
           }
         );
-      }, 1400); // Slightly earlier, feels more responsive & expensive
+      }, 1400);
     }
   }, [isInView]);
 
@@ -67,8 +67,7 @@ export const TypewriterEffectSmooth = ({
                 "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', Arial",
               fontWeight: 600,
               letterSpacing: "-0.03em",
-              // APPLE-STYLE RESPONSIVE FONT SIZE ↓
-              fontSize: "clamp(22px, 4vw, 40px)",  
+              fontSize: "clamp(22px, 4vw, 40px)",
             }}
           >
             {char === " " ? (
@@ -84,9 +83,10 @@ export const TypewriterEffectSmooth = ({
           </motion.span>
         ))}
 
-        {/* Cursor */}
+        {/* FOLLOWING CURSOR — MOVES WITH TEXT */}
         {showCursor && (
           <motion.span
+            key="typing-cursor"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{
@@ -95,14 +95,17 @@ export const TypewriterEffectSmooth = ({
               repeatType: "reverse",
             }}
             className={cn(
-              "inline-block rounded-sm bg-black ml-1",
+              "inline-block rounded-sm bg-black",
               cursorClassName
             )}
             style={{
               width: "3px",
-              height: "clamp(22px, 4vw, 38px)", // Matches new Apple-style size
+              height: "clamp(22px, 4vw, 38px)",
+              marginLeft: "2px",
+              position: "relative",
+              top: "0.1em",
             }}
-          ></motion.span>
+          />
         )}
       </motion.div>
     </div>
