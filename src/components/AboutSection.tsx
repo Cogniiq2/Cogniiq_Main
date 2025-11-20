@@ -76,12 +76,12 @@ const founders = [
   {
     name: "Lazar Popovic",
     role:
-      "Co-Founder: AI-Automationen, KI-Workflows & technische Integrationen. Spezialisiert auf Make.com und n8n – von Strategy bis Implementation.",
+      "Founder: AI-Automationen, KI-Workflows & technische Integrationen. Fokus auf präzise Prozessautomatisierung, effiziente Abläufe und skalierbare digitale Systeme – ohne unnötige Komplexität.",
   },
   {
     name: "Djordje Popovic",
     role:
-      "Co-Founder: Webdesign, System-Architektur & Performance-Optimierung. Baut Websites, die nicht nur schön aussehen – sondern Umsatz erzeugen.",
+      "Founder: Webdesign, System-Architektur & Performance-Optimierung. Entwickelt hochmoderne Websites und digitale Erlebnisse, die klar strukturiert sind und echten geschäftlichen Mehrwert liefern.",
   },
 ];
 
