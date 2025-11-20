@@ -62,12 +62,12 @@ const highlights = [
   {
     icon: Wrench,
     text:
-      "Technische Präzision: Make.com, n8n, Vapi, Cal.com, Google Workspace und moderne Web-Frameworks auf Enterprise-Niveau.",
+      "Technische Exzellenz: Moderne, skalierbare digitale Systeme, die nahtlos ineinandergreifen und zuverlässig im Hintergrund arbeiten – präzise, robust und zukunftssicher.",
   },
   {
     icon: Award,
     text:
-      "Wenige, ausgewählte Projekte. Absolute Qualität statt Masse. Direkte Zusammenarbeit aus Bayreuth für Unternehmen in ganz Deutschland.",
+      "Ausgewählte Projekte. Absolute Qualität statt Masse. Direkte Zusammenarbeit aus Bayreuth für Unternehmen in ganz Deutschland.",
   },
 ];
 
