@@ -1,31 +1,85 @@
-import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import { useRef } from 'react';
-import { Target, Wrench, Award } from 'lucide-react';
+// Updated AboutSection.tsx with GlossaryWord popups integrated
+// (Apple-like smooth & luxury animation included)
+
+"use client";
+
+import { motion, AnimatePresence } from "framer-motion";
+import { useInView } from "framer-motion";
+import { useRef, useState, useEffect } from "react";
+import { Target, Wrench, Award } from "lucide-react";
+
+// Popup-enabled clickable word component
+export function GlossaryWord({ word, explanation }: { word: string; explanation: string }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  return (
+    <span className="relative inline-block">
+      <motion.span
+        className="cursor-pointer font-medium"
+        whileHover={{ color: "#515A61", scale: 1.06 }}
+        transition={{ type: "spring", stiffness: 260, damping: 18 }}
+        onClick={() => setOpen(!open)}
+      >
+        {word}
+      </motion.span>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            ref={ref}
+            initial={{ opacity: 0, scale: 0.85, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 10 }}
+            transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
+            className="absolute left-1/2 top-8 z-50 w-64 -translate-x-1/2 rounded-2xl bg-white/80 backdrop-blur-xl p-4 shadow-xl border border-gray-200"
+          >
+            <p className="text-sm text-gray-700 leading-relaxed">{explanation}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </span>
+  );
+}
 
 const highlights = [
   {
     icon: Target,
-    text: 'Seit 2025 konsequenter Fokus auf hochkonvertierende Websites, KI-Automationen und AI-Systeme, die messbar Resultate liefern – nicht nur Eindruck.',
+    text:
+      "Seit 2025 konsequenter Fokus auf hochkonvertierende Websites, KI-Automationen und AI-Systeme, die messbar Resultate liefern – nicht nur Eindruck.",
   },
   {
     icon: Wrench,
-    text: 'Technische Präzision: Make.com, n8n, Vapi, Cal.com, Google Workspace und moderne Web-Frameworks auf Enterprise-Niveau.',
+    text:
+      "Technische Präzision: Make.com, n8n, Vapi, Cal.com, Google Workspace und moderne Web-Frameworks auf Enterprise-Niveau.",
   },
   {
     icon: Award,
-    text: 'Wenige, ausgewählte Projekte. Absolute Qualität statt Masse. Direkte Zusammenarbeit aus Bayreuth für Unternehmen in ganz Deutschland.',
+    text:
+      "Wenige, ausgewählte Projekte. Absolute Qualität statt Masse. Direkte Zusammenarbeit aus Bayreuth für Unternehmen in ganz Deutschland.",
   },
 ];
 
 const founders = [
   {
-    name: 'Lazar Popovic',
-    role: 'Co-Founder: AI-Automationen, KI-Workflows & technische Integrationen. Spezialisiert auf Make.com und n8n – von Strategy bis Implementation.',
+    name: "Lazar Popovic",
+    role:
+      "Co-Founder: AI-Automationen, KI-Workflows & technische Integrationen. Spezialisiert auf Make.com und n8n – von Strategy bis Implementation.",
   },
   {
-    name: 'Djordje Popovic',
-    role: 'Co-Founder: Webdesign, System-Architektur & Performance-Optimierung. Baut Websites, die nicht nur schön aussehen – sondern Umsatz erzeugen.',
+    name: "Djordje Popovic",
+    role:
+      "Co-Founder: Webdesign, System-Architektur & Performance-Optimierung. Baut Websites, die nicht nur schön aussehen – sondern Umsatz erzeugen.",
   },
 ];
 
@@ -42,20 +96,18 @@ export function AboutSection() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-        <h2
-  id="about-heading"
-  className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900"
->
-  Wer hinter{' '}
-  <span className="tracking-tight">
-    <span style={{ color: '#1C2327' }}>Cogni</span>
-    <span style={{ color: '#515A61' }}>IQ</span>
-  </span>{' '}
-  steckt
-</h2>
+          <h2 id="about-heading" className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
+            Wer hinter{" "}
+            <span className="tracking-tight">
+              <span style={{ color: "#1C2327" }}>Cogni</span>
+              <span style={{ color: "#515A61" }}>IQ</span>
+            </span>{" "}
+            steckt
+          </h2>
         </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* LEFT COLUMN */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
@@ -64,11 +116,30 @@ export function AboutSection() {
           >
             <p className="text-lg text-gray-600 leading-relaxed">
               Cogniiq wurde 2025 von <strong>Lazar und Djordje Popovic</strong> in <strong>Bayreuth</strong> gegründet.
-              Die Vision: Technologie so einsetzen, dass sie echte Business-Resultate erzeugt – klar, präzise und ohne
-              unnötige Komplexität.  
-              <br /><br />
-              Heute verbindet Cogniiq erstklassiges Webdesign mit modernster AI-Automatisierung. Unternehmen in ganz Deutschland
-              profitieren von Websites, die verkaufen – und Systemen, die Arbeit automatisieren.
+              Die Vision: Technologie so einsetzen, dass sie echte{" "}
+              <GlossaryWord
+                word="Business-Resultate"
+                explanation="Messbare Ergebnisse wie mehr Anfragen, höhere Conversion-Rates, klarere Prozesse und spürbar bessere Performance. Alles darauf ausgerichtet, echten geschäftlichen Wert zu schaffen."
+              />{" "}
+              erzeugt – klar, präzise und ohne unnötige{" "}
+              <GlossaryWord
+                word="Komplexität"
+                explanation="Unsere Systeme sind extrem komplex im Hintergrund – vollautomatisierte Logik, Integrationen und KI-Modelle. Für Sie bleibt alles radikal einfach: klar, intuitiv und komplett alltagstauglich – ohne technischen Aufwand."
+              />
+              .
+              <br />
+              <br />
+              Heute verbindet Cogniiq erstklassiges{" "}
+              <GlossaryWord
+                word="Webdesign"
+                explanation="Hochwertige, schnelle Websites mit klarer Struktur, moderner Ästhetik, starker UX und Conversion-Optimierung. Design, das nicht nur aussieht – sondern verkauft."
+              />{" "}
+              mit modernster{" "}
+              <GlossaryWord
+                word="AI-Automatisierung"
+                explanation="Vollautomatisierte Prozesse mit KI, die Aufgaben übernehmen, Entscheidungen treffen und Abläufe selbstständig ausführen. Ergebnis: weniger manuelle Arbeit, weniger Fehler, mehr Skalierungsmöglichkeiten."
+              />
+              . Unternehmen in ganz Deutschland profitieren von Websites, die verkaufen – und Systemen, die Arbeit automatisieren.
             </p>
 
             <div className="space-y-6">
@@ -92,6 +163,7 @@ export function AboutSection() {
             </div>
           </motion.div>
 
+          {/* RIGHT COLUMN */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
@@ -111,9 +183,7 @@ export function AboutSection() {
                     {founder.name.charAt(0)}
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">
-                      {founder.name}
-                    </h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-1">{founder.name}</h3>
                     <p className="text-sm text-gray-600 leading-relaxed">{founder.role}</p>
                   </div>
                 </div>
@@ -122,8 +192,4 @@ export function AboutSection() {
               </motion.div>
             ))}
           </motion.div>
-        </div>
-      </div>
-    </section>
-  );
-}
+        </
