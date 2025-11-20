@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { motion, stagger, useAnimate, useInView } from "framer-motion";
 import { useEffect, useState } from "react";
 
-// Ultra-modern Apple-like typewriter animation (premium version)
+// Apple-style typewriter where the cursor truly follows the text
 export const TypewriterEffectSmooth = ({
   words,
   className,
@@ -18,6 +18,7 @@ export const TypewriterEffectSmooth = ({
 
   const [scope, animate] = useAnimate();
   const isInView = useInView(scope);
+
   const [showCursor, setShowCursor] = useState(false);
 
   useEffect(() => {
@@ -27,28 +28,22 @@ export const TypewriterEffectSmooth = ({
 
         animate(
           "span.char",
-          {
+          { 
             opacity: 1,
-            display: "inline-block",
-            y: 0,
+            width: "auto",
           },
           {
             duration: 0.25,
-            delay: stagger(0.038),
-            ease: [0.19, 1, 0.22, 1], // Apple-like spring easing
+            delay: stagger(0.045),
+            ease: [0.19, 1, 0.22, 1],
           }
         );
-      }, 1400);
+      }, 1200);
     }
   }, [isInView]);
 
   return (
-    <div
-      className={cn(
-        "flex items-center justify-center",
-        className
-      )}
-    >
+    <div className={cn("flex items-center justify-center", className)}>
       <motion.div
         ref={scope}
         className="inline-flex items-center"
@@ -57,11 +52,11 @@ export const TypewriterEffectSmooth = ({
         {chars.map((char, index) => (
           <motion.span
             key={index}
-            initial={{ opacity: 0, y: 3 }}
             className={cn(
-              "char opacity-0 tracking-tight font-semibold",
+              "char opacity-0 overflow-hidden inline-block",
               words[0].className
             )}
+            initial={{ opacity: 0, width: 0 }}
             style={{
               fontFamily:
                 "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', Arial",
@@ -71,37 +66,31 @@ export const TypewriterEffectSmooth = ({
             }}
           >
             {char === " " ? (
-              <span
-                style={{
-                  display: "inline-block",
-                  width: "0.35em",
-                }}
-              ></span>
+              <span style={{ display: "inline-block", width: "0.35em" }}></span>
             ) : (
               char
             )}
           </motion.span>
         ))}
 
-        {/* FOLLOWING CURSOR — MOVES WITH TEXT */}
+        {/* REAL FOLLOWING CURSOR */}
         {showCursor && (
           <motion.span
-            key="typing-cursor"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{
-              duration: 0.7,
+              duration: 0.8,
               repeat: Infinity,
               repeatType: "reverse",
             }}
             className={cn(
-              "inline-block rounded-sm bg-black",
+              "inline-block bg-black",
               cursorClassName
             )}
             style={{
               width: "3px",
               height: "clamp(22px, 4vw, 38px)",
-              marginLeft: "2px",
+              marginLeft: "3px",
               position: "relative",
               top: "0.1em",
             }}
