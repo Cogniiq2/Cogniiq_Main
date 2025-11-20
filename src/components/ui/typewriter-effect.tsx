@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { motion, stagger, useAnimate, useInView } from "framer-motion";
 import { useEffect, useState } from "react";
 
-// Ultra-modern Apple-like typewriter animation
+// Ultra-modern Apple-like typewriter animation (premium version)
 export const TypewriterEffectSmooth = ({
   words,
   className,
@@ -23,21 +23,22 @@ export const TypewriterEffectSmooth = ({
   useEffect(() => {
     if (isInView) {
       setTimeout(() => {
-        setShowCursor(true); // cursor appears exactly when animation starts
+        setShowCursor(true);
 
         animate(
-          "span.char", // only animate characters
+          "span.char",
           {
             opacity: 1,
             display: "inline-block",
+            y: 0,
           },
           {
             duration: 0.25,
-            delay: stagger(0.045),
-            ease: "easeOut",
+            delay: stagger(0.038),
+            ease: [0.19, 1, 0.22, 1], // Apple-esque spring easing
           }
         );
-      }, 2000); // 2-second delay
+      }, 1400); // Slightly earlier, feels more responsive & expensive
     }
   }, [isInView]);
 
@@ -56,8 +57,9 @@ export const TypewriterEffectSmooth = ({
         {chars.map((char, index) => (
           <motion.span
             key={index}
+            initial={{ opacity: 0, y: 3 }}
             className={cn(
-              "char opacity-0 text-black tracking-tight font-semibold",
+              "char opacity-0 tracking-tight font-semibold",
               words[0].className
             )}
             style={{
@@ -65,7 +67,8 @@ export const TypewriterEffectSmooth = ({
                 "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', Arial",
               fontWeight: 600,
               letterSpacing: "-0.03em",
-              fontSize: "clamp(32px, 6vw, 68px)",
+              // APPLE-STYLE RESPONSIVE FONT SIZE ↓
+              fontSize: "clamp(22px, 4vw, 40px)",  
             }}
           >
             {char === " " ? (
@@ -81,7 +84,7 @@ export const TypewriterEffectSmooth = ({
           </motion.span>
         ))}
 
-        {/* Cursor now INSIDE the text container */}
+        {/* Cursor */}
         {showCursor && (
           <motion.span
             initial={{ opacity: 0 }}
@@ -96,8 +99,8 @@ export const TypewriterEffectSmooth = ({
               cursorClassName
             )}
             style={{
-              width: "4px",
-              height: "clamp(28px, 5vw, 54px)",
+              width: "3px",
+              height: "clamp(22px, 4vw, 38px)", // Matches new Apple-style size
             }}
           ></motion.span>
         )}
