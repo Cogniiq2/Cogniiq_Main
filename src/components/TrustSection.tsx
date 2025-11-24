@@ -65,25 +65,45 @@ export function TrustSection() {
           </p>
         </motion.div>
 
-        {/* Cards */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-10 place-items-center">
-          {points.map((item, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 40, scale: 0.98 }}
-              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
-              transition={{
-                duration: 0.7,
-                delay: index * 0.15,
-                ease: [0.22, 1, 0.36, 1]
-              }}
-              whileHover={{
-                y: -6,
-                scale: 1.02,
-                boxShadow:
-                  "0 20px 40px -10px rgba(0,0,0,0.1), 0 8px 20px -10px rgba(0,0,0,0.05)"
-              }}
-              className="p-8 rounded-3xl bg-gradient-to-br from-gray-50 to-white border border-gray-200 shadow-sm transition-all duration-300 cursor-default w-full max-w-md"
+      {/* Cards */}
+<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
+  {points.map((item, index) => (
+    <motion.div
+      key={index}
+      initial={{ opacity: 0, y: 40, scale: 0.98 }}
+      animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+      transition={{
+        duration: 0.7,
+        delay: index * 0.15,
+        ease: [0.22, 1, 0.36, 1]
+      }}
+      whileHover={{
+        y: -6,
+        scale: 1.02,
+        boxShadow:
+          "0 20px 40px -10px rgba(0,0,0,0.1), 0 8px 20px -10px rgba(0,0,0,0.05)"
+      }}
+      className={`
+        p-8 rounded-3xl bg-gradient-to-br from-gray-50 to-white 
+        border border-gray-200 shadow-sm transition-all duration-300 
+        cursor-default w-full max-w-md mx-auto
+        ${index >= 3 ? "col-span-3 flex justify-center lg:col-span-1 lg:mx-auto" : ""}
+      `}
+    >
+      {/* Icon */}
+      <div className="mb-4">{item.icon}</div>
+
+      <h3 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4 leading-snug">
+        {item.title}
+      </h3>
+
+      <p className="text-gray-600 text-base leading-relaxed">
+        {item.text}
+      </p>
+    </motion.div>
+  ))}
+</div>
+
             >
               {/* Icon */}
               <div className="mb-4">{item.icon}</div>
