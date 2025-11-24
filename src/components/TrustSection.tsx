@@ -1,92 +1,94 @@
-import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { motion } from "framer-motion";
+import { useInView } from "framer-motion";
+import { useRef } from "react";
 
-const results = [
+const points = [
   {
-    title: 'Padel Club Heinersreuth',
-    result: 'Vollautomatisierte Buchungen + Smart Locks',
-    metric: '0 Personal – läuft komplett autonom',
+    title: "Technologie soll für Unternehmen arbeiten – nicht andersherum.",
+    text: "Wir bauen Systeme, die Aufgaben übernehmen, bevor sie entstehen. Automationen, die Entscheidungen treffen. Websites, die verkaufen. AI, die Prozesse steuert – unsichtbar, nahtlos, rund um die Uhr."
   },
   {
-    title: 'L’Osteria Automation',
-    result: 'AI-Rezeptionist beantwortet alle Anrufe',
-    metric: '100% telefonische Entlastung',
+    title: "Geschwindigkeit schlägt alles.",
+    text: "Nicht in Monaten, sondern in Tagen. Keine endlosen Abstimmungen. Keine Meetings, die Zeit verbrennen. Unsere Lösungen laufen, während andere noch planen."
   },
   {
-    title: 'Lokale Dienstleister',
-    result: 'Demo-Websites & klare Positionierung',
-    metric: 'Erstgespräche innerhalb von 24 Stunden',
+    title: "Fokus auf das Wesentliche.",
+    text: "Keine komplizierten Tools, keine Worthülsen. Nur klare, schnelle, profitable Ergebnisse. Was Zeit spart, bringt Wachstum – sofort spürbar."
   },
+  {
+    title: "Perfektion, die man nicht bemerkt.",
+    text: "Wir entwickeln Systeme, die reibungslos funktionieren, elegant bleiben und im Hintergrund Ihre digitale Infrastruktur tragen. Technologie ist dann am stärksten, wenn man sie nicht sieht."
+  },
+  {
+    title: "Wir bauen die Grundlage für die nächsten 10 Jahre.",
+    text: "Unternehmen, die heute nicht automatisieren, sind morgen nicht mehr da. Unsere Mission: Betriebe in die Zukunft bringen – schneller, einfacher, besser."
+  }
 ];
 
-export function TrustSection() {
+export function PhilosophySection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
 
   return (
     <section
       ref={ref}
-      className="py-24 bg-white border-y border-gray-200"
-      aria-labelledby="trust-heading"
+      className="py-28 bg-white"
+      aria-labelledby="philosophy-heading"
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto px-6 lg:px-8">
 
-        {/* Heading */}
+        {/* Main Heading */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="text-center mb-20"
         >
           <h2
-            id="trust-heading"
-            className="text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight"
+            id="philosophy-heading"
+            className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight tracking-tight"
           >
-            Ergebnisse, die für sich sprechen
+            Wie wir denken
           </h2>
-          <p className="mt-5 text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Keine theoretischen Zahlen. Sondern echte Resultate aus realen
-            Projekten, die Unternehmen sofort entlasten, automatisieren
-            und skalieren.
+          <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Die Grundprinzipien, die Cogniiq ausmachen – klar, ruhig, kompromisslos.
           </p>
         </motion.div>
 
-        {/* Result Grid */}
-        <div className="grid md:grid-cols-3 gap-10">
-          {results.map((item, index) => (
+        {/* Philosophy Items */}
+        <div className="space-y-20">
+          {points.map((item, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 40 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: index * 0.2 }}
-              className="p-10 rounded-2xl bg-gradient-to-br from-gray-50 to-white border border-gray-200 shadow-sm hover:shadow-xl hover:border-[#8b5cf6]/50 transition-all"
+              transition={{ duration: 0.7, delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
+              className="max-w-4xl mx-auto"
             >
-              <h3 className="text-2xl font-bold text-gray-900 mb-4 tracking-tight">
+              <h3 className="text-2xl lg:text-3xl font-semibold text-gray-900 mb-4 tracking-tight leading-snug">
                 {item.title}
               </h3>
-
-              <p className="text-lg text-gray-700 font-medium leading-snug">
-                {item.result}
-              </p>
-
-              <p className="mt-5 text-[#6d28d9] text-xl font-semibold">
-                {item.metric}
+              <p className="text-gray-600 text-lg leading-relaxed">
+                {item.text}
               </p>
             </motion.div>
           ))}
         </div>
 
-        {/* Bottom Line */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : {}}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="text-center text-lg text-gray-600 mt-16 max-w-3xl mx-auto leading-relaxed"
+        {/* Closing Line */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: points.length * 0.15 }}
+          className="text-center mt-28"
         >
-          Wir entwickeln Systeme, die wie Mitarbeiter arbeiten – nur schneller,
-          zuverlässiger und rund um die Uhr.
-        </motion.p>
+          <p className="text-2xl lg:text-3xl font-semibold text-gray-900 tracking-tight">
+            Das ist Cogniiq.
+          </p>
+          <p className="mt-4 text-lg text-gray-600">
+            Mehr als Systeme. Mehr als AI. Eine neue Art, wie Unternehmen funktionieren.
+          </p>
+        </motion.div>
       </div>
     </section>
   );
