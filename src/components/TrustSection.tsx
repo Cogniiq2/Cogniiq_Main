@@ -25,7 +25,7 @@ const points = [
   }
 ];
 
-export function PhilosophySection() {
+export function TrustSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
 
