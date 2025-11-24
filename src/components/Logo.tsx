@@ -23,7 +23,7 @@ export function Logo({ className }: LogoProps) {
         style={{ fontFeatureSettings: "'kern' 1" }}
       >
         <tspan fill="#1C2327">Cogni</tspan>
-        <tspan fill="#515A61">I</tspan>
+        <tspan dx="6" fill="#515A61">I</tspan>
         <tspan fill="#515A61">Q</tspan>
       </text>
     </svg>
