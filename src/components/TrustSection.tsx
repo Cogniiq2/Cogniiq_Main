@@ -29,31 +29,31 @@ const points = [
   {
     icon: EyeDropperIcon,
     title: "Perfektion, die man nicht bemerkt.",
-    text: "Wir entwickeln Systeme, die reibungslos funktionieren, elegant bleiben und im Hintergrund Ihre digitale Infrastruktur tragen. Technologie ist dann am stärksten, wenn man sie nicht sieht.",
+    text: "Wir entwickeln Systeme, die reibungslos funktionieren, elegant bleiben und im Hintergrund Ihre digitale Infrastruktur tragen.",
   },
   {
     icon: ChartBarIcon,
     title: "Wir bauen die Grundlage für die nächsten 10 Jahre.",
-    text: "Unternehmen, die heute nicht automatisieren, sind morgen nicht mehr da. Unsere Mission: Betriebe in die Zukunft bringen – schneller, einfacher, besser.",
+    text: "Unternehmen, die heute nicht automatisieren, sind morgen nicht mehr da. Unsere Mission: Betriebe in die Zukunft bringen.",
   },
 ];
 
-export function PhilosophySection() {
+export function TrustSection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.25 });
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
 
   return (
-    <section ref={ref} className="py-28 bg-white" aria-labelledby="philosophy-heading">
+    <section ref={ref} className="py-28 bg-white">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
 
         {/* Heading */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 25 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.6 }}
           className="text-center mb-20"
         >
-          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight">
+          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900">
             Wie wir denken
           </h2>
           <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
@@ -61,80 +61,49 @@ export function PhilosophySection() {
           </p>
         </motion.div>
 
-        {/* ROW 1 */}
-        <motion.div
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          variants={{
-            visible: { transition: { staggerChildren: 0.15 } },
-          }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mb-10"
-        >
-          {points.slice(0, 3).map((item, index) => {
+        {/* ROW 1 — 3 CARDS */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
+          {points.slice(0, 3).map((item, i) => {
             const Icon = item.icon;
             return (
               <motion.div
-                key={index}
-                variants={{
-                  hidden: { opacity: 0, y: 40 },
-                  visible: { opacity: 1, y: 0 },
-                }}
-                className="p-8 h-full rounded-3xl bg-gradient-to-br from-gray-50 to-white border border-gray-200 shadow-sm hover:shadow-lg transition-all max-w-md mx-auto"
+                key={i}
+                initial={{ opacity: 0, y: 25 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                className="p-8 bg-white border border-gray-200 rounded-3xl shadow-sm hover:shadow-lg transition-all h-full"
               >
                 <Icon className="w-10 h-10 text-indigo-600 mb-4" />
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-4 leading-snug">
                   {item.title}
                 </h3>
-                <p className="text-gray-600 leading-relaxed text-lg">{item.text}</p>
+                <p className="text-gray-600 text-lg">{item.text}</p>
               </motion.div>
             );
           })}
-        </motion.div>
+        </div>
 
-        {/* ROW 2 — centered */}
-        <motion.div
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          variants={{
-            visible: { transition: { staggerChildren: 0.15 } },
-          }}
-          className="flex justify-center gap-10 flex-wrap"
-        >
-          {points.slice(3).map((item, index) => {
+        {/* ROW 2 — 2 CARDS CENTERED */}
+        <div className="flex justify-center gap-10 flex-wrap">
+          {points.slice(3).map((item, i) => {
             const Icon = item.icon;
             return (
               <motion.div
-                key={index}
-                variants={{
-                  hidden: { opacity: 0, y: 40 },
-                  visible: { opacity: 1, y: 0 },
-                }}
-                className="p-8 rounded-3xl bg-gradient-to-br from-gray-50 to-white border border-gray-200 shadow-sm hover:shadow-lg transition-all max-w-md w-full sm:w-[48%] lg:w-[30%]"
+                key={i}
+                initial={{ opacity: 0, y: 25 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: (i + 3) * 0.1 }}
+                className="p-8 bg-white border border-gray-200 rounded-3xl shadow-sm hover:shadow-lg transition-all w-full max-w-md"
               >
                 <Icon className="w-10 h-10 text-indigo-600 mb-4" />
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-4 leading-snug">
                   {item.title}
                 </h3>
-                <p className="text-gray-600 leading-relaxed text-lg">{item.text}</p>
+                <p className="text-gray-600 text-lg">{item.text}</p>
               </motion.div>
             );
           })}
-        </motion.div>
-
-        {/* Closing Text */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-          className="text-center mt-28"
-        >
-          <p className="text-2xl lg:text-3xl font-semibold text-gray-900">
-            Das ist Cogniiq.
-          </p>
-          <p className="mt-4 text-lg text-gray-600">
-            Mehr als Systeme. Mehr als AI. Eine neue Art, wie Unternehmen funktionieren.
-          </p>
-        </motion.div>
+        </div>
 
       </div>
     </section>
