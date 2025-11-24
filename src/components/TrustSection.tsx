@@ -58,7 +58,7 @@ export function PhilosophySection() {
           className="text-center mb-20"
         >
           <h2
-            id="philosophy-heading"
+            id="trust-heading"
             className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight tracking-tight"
           >
             Wie wir denken
