@@ -11,7 +11,7 @@ export function Logo({ className }: LogoProps) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={cn("w-auto", className)}
-      aria-label="CogniIQ"
+      aria-label="Cogni IQ"
     >
       <text
         x="0"
