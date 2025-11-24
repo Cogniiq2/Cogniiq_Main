@@ -27,7 +27,7 @@ const points = [
 
 export function TrustSection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const isInView = useInView(ref, { once: true, amount: 0.25 });
 
   return (
     <section
@@ -35,19 +35,16 @@ export function TrustSection() {
       className="py-28 bg-white"
       aria-labelledby="philosophy-heading"
     >
-      <div className="max-w-5xl mx-auto px-6 lg:px-8">
-
-        {/* Main Heading */}
+      <div className="max-w-6xl mx-auto px-6 lg:px-8">
+        
+        {/* Heading */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.7 }}
           className="text-center mb-20"
         >
-          <h2
-            id="philosophy-heading"
-            className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight tracking-tight"
-          >
+          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight">
             Wie wir denken
           </h2>
           <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
@@ -55,32 +52,42 @@ export function TrustSection() {
           </p>
         </motion.div>
 
-        {/* Philosophy Items */}
-        <div className="space-y-20">
+        {/* Cards */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
           {points.map((item, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 40 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.7, delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
-              className="max-w-4xl mx-auto"
+              initial={{ opacity: 0, y: 40, scale: 0.98 }}
+              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+              transition={{
+                duration: 0.7,
+                delay: index * 0.15,
+                ease: [0.22, 1, 0.36, 1]
+              }}
+              whileHover={{
+                y: -6,
+                scale: 1.02,
+                boxShadow:
+                  "0 20px 40px -10px rgba(0,0,0,0.1), 0 8px 20px -10px rgba(0,0,0,0.05)"
+              }}
+              className="p-8 rounded-3xl bg-gradient-to-br from-gray-50 to-white border border-gray-200 shadow-sm transition-all duration-300 cursor-default"
             >
-              <h3 className="text-2xl lg:text-3xl font-semibold text-gray-900 mb-4 tracking-tight leading-snug">
+              <h3 className="text-xl lg:text-2xl font-semibold text-gray-900 mb-4 leading-snug">
                 {item.title}
               </h3>
-              <p className="text-gray-600 text-lg leading-relaxed">
+              <p className="text-gray-600 text-base leading-relaxed">
                 {item.text}
               </p>
             </motion.div>
           ))}
         </div>
 
-        {/* Closing Line */}
+        {/* Closing */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: points.length * 0.15 }}
-          className="text-center mt-28"
+          transition={{ duration: 0.7, delay: points.length * 0.15 }}
+          className="text-center mt-24"
         >
           <p className="text-2xl lg:text-3xl font-semibold text-gray-900 tracking-tight">
             Das ist Cogniiq.
