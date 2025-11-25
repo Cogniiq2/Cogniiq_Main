@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 interface LogoProps {
   className?: string;
@@ -7,58 +7,25 @@ interface LogoProps {
 export function Logo({ className }: LogoProps) {
   return (
     <svg
-      viewBox="0 0 420 110"
+      viewBox="0 0 280 80"
+      fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={cn("w-auto", className)}
-      aria-label="CogniIQ"
+      aria-label="Cogni IQ"
     >
-
-      {/* === COGNI (deep graphite) === */}
       <text
         x="0"
-        y="78"
-        fontFamily="system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Ubuntu'"
-        fontSize="72"
+        y="62"
+        fontFamily="system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Ubuntu', 'Cantarell', 'Noto Sans', sans-serif"
+        fontSize="68"
         fontWeight="700"
         letterSpacing="-2"
-        fill="#1C2327"
         style={{ fontFeatureSettings: "'kern' 1" }}
       >
-        Cogni
+        <tspan fill="#1C2327">Cogni</tspan>
+        <tspan dx="6" fill="#515A61">I</tspan>
+        <tspan fill="#515A61">Q</tspan>
       </text>
-
-      {/* === IQ BLOCK (luxury) === */}
-      <g transform="translate(250, 8)">
-        
-        {/* I — premium bar */}
-        <rect
-          x="0"
-          y="0"
-          width="20"
-          height="86"
-          rx="4"
-          fill="#515A61"
-        />
-
-        {/* Q — luxury circle */}
-        <circle
-          cx="70"
-          cy="43"
-          r="38"
-          stroke="#515A61"
-          strokeWidth="10"
-          fill="none"
-        />
-
-        {/* Q tail — luxury angled stroke */}
-        <path
-          d="M102 69 L128 95"
-          stroke="#515A61"
-          strokeWidth="10"
-          strokeLinecap="round"
-        />
-      </g>
-
     </svg>
   );
 }
