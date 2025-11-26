@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { Logo } from './Logo';
+import ThemeSwitch from './ui/theme-switch';
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -80,6 +81,13 @@ export function Navigation() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
               >
+                <ThemeSwitch />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+              >
                 <Button
                   onClick={() => handleNavClick('#kontakt')}
                   aria-label="Kostenloses Erstgespräch buchen"
@@ -122,6 +130,7 @@ export function Navigation() {
                 {item.label}
               </a>
             ))}
+            <ThemeSwitch />
             <Button
               onClick={() => handleNavClick('#kontakt')}
               className="mt-4"
