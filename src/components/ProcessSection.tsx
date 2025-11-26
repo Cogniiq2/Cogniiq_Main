@@ -47,12 +47,12 @@ export function ProcessSection() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 id="process-heading" className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
-            So arbeiten wir{' '}
-            <span className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] bg-clip-text text-transparent">
-              zusammen
-            </span>
-          </h2>
+         <h2
+  id="process-heading"
+  className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900"
+>
+  So arbeiten wir zusammen
+</h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Transparenter Prozess: Von der ersten Anfrage bis zum erfolgreichen Go-Live
           </p>
