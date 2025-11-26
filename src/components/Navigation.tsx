@@ -79,13 +79,6 @@ export function Navigation() {
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-              >
-                <ThemeSwitch />
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
               >
                 <Button
@@ -130,7 +123,6 @@ export function Navigation() {
                 {item.label}
               </a>
             ))}
-            <ThemeSwitch />
             <Button
               onClick={() => handleNavClick('#kontakt')}
               className="mt-4"
