@@ -114,12 +114,15 @@ export function ContactSection() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-      <h2
-  id="contact-heading"
-  className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900"
->
-  Lassen Sie uns über Ihr Projekt sprechen
-</h2>
+          <h2
+            id="contact-heading"
+            className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900"
+          >
+            Lassen Sie uns über Ihr{' '}
+            <span className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] bg-clip-text text-transparent">
+              Projekt sprechen
+            </span>
+          </h2>
         </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-12 items-start">

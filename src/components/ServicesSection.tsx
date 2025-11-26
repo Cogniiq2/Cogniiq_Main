@@ -67,9 +67,12 @@ export function ServicesSection() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-        <h2 id="services-heading" className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
-  Was wir für Sie umsetzen
-</h2>
+          <h2 id="services-heading" className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
+            Was wir für Sie{' '}
+            <span className="bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] bg-clip-text text-transparent">
+              umsetzen
+            </span>
+          </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Vier Kernleistungen unserer AI und Webdesign Agentur aus Bayreuth
           </p>

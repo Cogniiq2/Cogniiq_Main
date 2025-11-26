@@ -11,7 +11,7 @@ export function Logo({ className }: LogoProps) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={cn("w-auto", className)}
-      aria-label="Cogni IQ"
+      aria-label="CogniIQ"
     >
       <text
         x="0"
@@ -23,7 +23,7 @@ export function Logo({ className }: LogoProps) {
         style={{ fontFeatureSettings: "'kern' 1" }}
       >
         <tspan fill="#1C2327">Cogni</tspan>
-        <tspan dx="6" fill="#515A61">I</tspan>
+        <tspan fill="#515A61">I</tspan>
         <tspan fill="#515A61">Q</tspan>
       </text>
     </svg>
