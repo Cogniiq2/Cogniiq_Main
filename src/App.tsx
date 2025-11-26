@@ -13,7 +13,7 @@ import { Footer } from './components/Footer';
 function App() {
   return (
     <PageReveal>
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-screen bg-[#fafafa] text-gray-900">
         <Navigation />
         <HeroSection />
         <TrustSection />
