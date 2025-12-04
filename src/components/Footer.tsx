@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { Mail, Phone, X } from "lucide-react";
+import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Logo } from "./Logo";
+import { NAP } from "./NAP";
+import { BUSINESS_INFO } from "@/lib/seo-data";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -29,28 +31,11 @@ export function Footer() {
             {/* CONTACT */}
             <div>
               <h4 className="font-semibold text-gray-900 mb-4">Kontakt</h4>
-              <div className="space-y-3 text-gray-600">
-                <address className="not-italic">
-                  <Logo className="h-6 mb-1" />
-                  Lazar & Djordje Popovic<br />
-                  Am Main Straße 3<br />
-                  95444 Bayreuth, Deutschland
-                </address>
-
-                <a
-                  href="mailto:info@cogniiq.de"
-                  className="flex items-center gap-2 text-[#515A61] hover:text-[#434A51] transition-colors"
-                >
-                  <Mail size={16} /> info@cogniiq.de
-                </a>
-
-                <a
-                  href="tel:01601832917"
-                  className="flex items-center gap-2 text-[#515A61] hover:text-[#434A51] transition-colors"
-                >
-                  <Phone size={16} /> 0160 1832917
-                </a>
+              <div className="mb-3 text-sm text-gray-600">
+                <Logo className="h-6 mb-1" />
+                {BUSINESS_INFO.legalName.replace('Cogniiq – ', '')}
               </div>
+              <NAP variant="vertical" showIcons={true} />
             </div>
 
             {/* LINKS */}
@@ -119,16 +104,16 @@ export function Footer() {
                 <div className="prose prose-gray max-w-none">
                   <h4>Angaben gemäß § 5 TMG</h4>
                   <p>
-                    Cogniiq – Lazar & Djordje Popovic<br />
-                    Am Main Straße 3<br />
-                    95444 Bayreuth<br />
+                    {BUSINESS_INFO.legalName}<br />
+                    {BUSINESS_INFO.address.streetAddress}<br />
+                    {BUSINESS_INFO.address.postalCode} {BUSINESS_INFO.address.addressLocality}<br />
                     Deutschland
                   </p>
 
                   <h4>Kontakt</h4>
                   <p>
-                    Telefon: 0160 1832917<br />
-                    E-Mail: info@cogniiq.de
+                    Telefon: {BUSINESS_INFO.contact.phoneDisplay}<br />
+                    E-Mail: {BUSINESS_INFO.contact.email}
                   </p>
 
                   <h4>Haftung für Inhalte</h4>
@@ -153,9 +138,9 @@ export function Footer() {
 
                   <h4>2. Verantwortliche Stelle</h4>
                   <p>
-                    Cogniiq – Lazar & Djordje Popovic<br />
-                    Am Main Straße 3, 95444 Bayreuth<br />
-                    info@cogniiq.de
+                    {BUSINESS_INFO.legalName}<br />
+                    {BUSINESS_INFO.address.streetAddress}, {BUSINESS_INFO.address.postalCode} {BUSINESS_INFO.address.addressLocality}<br />
+                    {BUSINESS_INFO.contact.email}
                   </p>
 
                   <h4>3. Erhebung und Verarbeitung personenbezogener Daten</h4>
