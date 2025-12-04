@@ -25,9 +25,8 @@ export function Navigation() {
   }, [location.pathname]);
 
   const navItems = [
+    { label: 'Home', href: '/' },
     { label: 'Leistungen', href: '/leistungen' },
-    { label: 'Cases', href: '/cases' },
-    { label: 'Ablauf', href: '/ablauf' },
     { label: 'Über uns', href: '/ueber-uns' },
     { label: 'FAQ', href: '/faq' },
     { label: 'Kontakt', href: '/kontakt' },

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { ServicesSection } from '@/components/ServicesSection';
+import { CasesSection } from '@/components/CasesSection';
 
 export function LeistungenPage() {
   return (
@@ -31,6 +32,7 @@ export function LeistungenPage() {
         </div>
       </motion.div>
       <ServicesSection />
+      <CasesSection />
     </>
   );
 }

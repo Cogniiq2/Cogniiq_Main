@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { AboutSection } from '@/components/AboutSection';
+import { ProcessSection } from '@/components/ProcessSection';
 
 export function UeberUnsPage() {
   return (
@@ -31,6 +32,7 @@ export function UeberUnsPage() {
         </div>
       </motion.div>
       <AboutSection />
+      <ProcessSection />
     </>
   );
 }
