@@ -103,48 +103,48 @@ export function ServicesSection() {
                   hidden: { opacity: 0, y: 24 },
                   visible: { opacity: 1, y: 0 },
                 }}
-                whileHover={{ y: -4, scale: 1.02 }}
+                whileHover={{ y: -6 }}
                 transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-                className="group relative bg-white rounded-2xl p-8 border border-gray-200 hover:border-violet-400/60 hover:shadow-xl transition-all duration-300"
+                className="group relative bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:border-violet-400/50 hover:shadow-xl transition-all duration-300"
               >
                 <div
-                  className={`pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
+                  className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}
                 />
 
-                <div className="relative">
+                <div className="relative flex items-start gap-6">
                   <div
-                    className={`inline-flex p-3 rounded-xl bg-gradient-to-br ${service.gradient} mb-6`}
+                    className={`p-4 rounded-xl bg-gradient-to-br ${service.gradient} flex-shrink-0`}
+                    aria-hidden="true"
                   >
-                    <Icon className="w-7 h-7 text-white" />
+                    <Icon className="w-8 h-8 text-white" />
                   </div>
 
-                  <h3 className="text-2xl font-bold mb-3 text-gray-900">
-                    {service.title}
-                  </h3>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold mb-3 text-gray-900">
+                      {service.title}
+                    </h3>
+                    <p className="text-gray-600 mb-6 leading-relaxed text-sm">
+                      {service.description}
+                    </p>
 
-                  <p className="text-gray-600 mb-6 leading-relaxed">
-                    {service.description}
-                  </p>
-
-                  <ul className="space-y-3">
-                    {service.features.map((feature) => (
-                      <li
-                        key={feature}
-                        className="flex items-start gap-3 text-gray-700"
-                      >
+                    <div className="space-y-2">
+                      {service.features.map((feature, index) => (
                         <div
-                          className={`mt-1 w-1.5 h-1.5 rounded-full bg-gradient-to-r ${service.gradient} flex-shrink-0`}
-                        />
-                        <span className="text-sm leading-relaxed">
-                          {feature}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                          key={index}
+                          className="flex items-center gap-2"
+                        >
+                          <div
+                            className={`w-1 h-1 rounded-full bg-gradient-to-r ${service.gradient}`}
+                          />
+                          <span className="text-sm text-gray-700">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
                 <div
-                  className={`pointer-events-none absolute -bottom-px -right-px w-32 h-32 bg-gradient-to-br ${service.gradient} rounded-full blur-3xl opacity-0 group-hover:opacity-25 transition-opacity duration-500`}
+                  className={`absolute -bottom-px -right-px w-24 h-24 bg-gradient-to-br ${service.gradient} rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-500`}
                 />
               </motion.div>
             );
