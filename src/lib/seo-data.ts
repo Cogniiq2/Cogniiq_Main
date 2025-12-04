@@ -124,7 +124,7 @@ export function formatAddress(inline: boolean = false): string {
 }
 
 export function getGoogleMapsUrl(): string {
-  return `https://www.google.com/maps/search/?api=1&query=${BUSINESS_INFO.geo.latitude},${BUSINESS_INFO.geo.longitude}`;
+  return `https://www.google.com/maps/place/Cogni+IQ/@49.9471651,11.5710085,17z/data=!3m1!4b1!4m6!3m5!1s0x47a1a30b011831f5:0x9a1f8b5c17a30837!8m2!3d49.9471651!4d11.5735834!16s%2Fg%2F11ms0md3q0?entry=ttu&g_ep=EgoyMDI1MTIwMS4wIKXMDSoASAFQAw%3D%3D`;
 }
 
 export function getGoogleBusinessProfileUrl(): string {
