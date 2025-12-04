@@ -90,13 +90,24 @@ export function Navigation() {
                   <Button
                     onClick={() => handleNavClick('/kontakt')}
                     aria-label="Kostenloses Erstgespräch buchen"
-                    className="relative bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black text-white rounded-full px-6 py-2.5 text-sm font-semibold shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
+                    className={`relative rounded-full px-6 py-2.5 text-sm font-semibold transition-all duration-300 overflow-hidden group ${
+                      location.pathname === '/kontakt'
+                        ? 'bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-lg'
+                        : 'bg-white/60 text-gray-900 hover:bg-white/80 border border-gray-300/50 shadow-md hover:shadow-lg'
+                    }`}
                   >
                     <span className="relative z-10">Erstgespräch</span>
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-gray-700 to-gray-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      initial={false}
-                    />
+                    {location.pathname === '/kontakt' ? (
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-gray-700 to-gray-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        initial={false}
+                      />
+                    ) : (
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-gray-100 to-gray-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        initial={false}
+                      />
+                    )}
                   </Button>
                 </motion.div>
               </motion.div>
