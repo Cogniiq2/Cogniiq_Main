@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { Logo } from './Logo';
+import { InteractiveMenu } from './ui/modern-mobile-menu';
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -33,7 +32,6 @@ export function Navigation() {
   ];
 
   const handleNavClick = (path: string) => {
-    setIsMobileMenuOpen(false);
     navigate(path);
   };
 
@@ -96,51 +94,18 @@ export function Navigation() {
                 </Button>
               </motion.div>
             </div>
-
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden text-gray-900 p-2"
-              aria-label="Menü öffnen"
-              aria-expanded={isMobileMenuOpen}
-            >
-              {isMobileMenuOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
-            </button>
           </div>
         </div>
       </motion.nav>
 
-      {isMobileMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, x: '100%' }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: '100%' }}
-          className="fixed inset-0 z-40 lg:hidden bg-white pt-20"
-        >
-          <div className="flex flex-col items-center gap-6 p-8">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                to={item.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`text-lg font-medium transition-colors ${
-                  location.pathname === item.href
-                    ? 'text-gray-900'
-                    : 'text-gray-700 hover:text-gray-900'
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
-            <Button
-              onClick={() => handleNavClick('/kontakt')}
-              className="mt-4"
-              aria-label="Kostenloses Erstgespräch buchen"
-            >
-              Erstgespräch
-            </Button>
-          </div>
-        </motion.div>
-      )}
+      <motion.div
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+        className="fixed bottom-4 left-4 right-4 z-50 lg:hidden"
+      >
+        <InteractiveMenu />
+      </motion.div>
     </>
   );
 }
