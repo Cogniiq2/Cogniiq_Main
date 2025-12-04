@@ -92,29 +92,11 @@ function PremiumNavBar({
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [activeIndex, setActiveIndex] = useState<number>(-1);
   const containerRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
 
   useEffect(() => {
     const index = navItems.findIndex(item => item.href === currentPath);
     setActiveIndex(index);
-    updateIndicator(index);
   }, [currentPath, navItems]);
-
-  const updateIndicator = (index: number) => {
-    if (index === -1 || !itemRefs.current[index] || !containerRef.current) return;
-
-    const item = itemRefs.current[index];
-    const container = containerRef.current;
-    const containerRect = container.getBoundingClientRect();
-    const itemRect = item.getBoundingClientRect();
-
-    setIndicatorStyle({
-      left: itemRect.left - containerRect.left,
-      width: itemRect.width,
-    });
-  };
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -139,44 +121,6 @@ function PremiumNavBar({
         background: 'linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.4) 100%)',
       }}
     >
-      <AnimatePresence>
-        {activeIndex !== -1 && (
-          <motion.div
-            layoutId="activeIndicator"
-            className="absolute h-[44px] bg-gradient-to-br from-gray-800 via-gray-900 to-black rounded-full"
-            initial={false}
-            animate={{
-              left: indicatorStyle.left,
-              width: indicatorStyle.width,
-            }}
-            transition={{
-              type: "spring",
-              stiffness: 380,
-              damping: 30,
-            }}
-            style={{
-              boxShadow: '0 4px 20px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.15)',
-            }}
-          >
-            <motion.div
-              className="absolute inset-0 rounded-full opacity-50"
-              animate={{
-                background: [
-                  'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.8) 0%, transparent 50%)',
-                  'radial-gradient(circle at 80% 50%, rgba(255,255,255,0.8) 0%, transparent 50%)',
-                  'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.8) 0%, transparent 50%)',
-                ],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {navItems.map((item, index) => (
         <PremiumNavItem
           key={item.href}
@@ -187,7 +131,6 @@ function PremiumNavBar({
           onHover={setHoveredIndex}
           mouseX={mouseX}
           mouseY={mouseY}
-          ref={(el) => (itemRefs.current[index] = el)}
         />
       ))}
 
@@ -222,7 +165,6 @@ const PremiumNavItem = ({
   onHover: (index: number | null) => void;
   mouseX: any;
   mouseY: any;
-  ref?: any;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const distance = useMotionValue(0);
@@ -296,34 +238,19 @@ const PremiumNavItem = ({
         <motion.div
           className={`relative px-5 py-2.5 rounded-full text-sm font-semibold transition-colors duration-300 ${
             isActive
-              ? 'text-white'
+              ? 'text-gray-900'
               : 'text-gray-700'
           }`}
         >
           <AnimatePresence>
             {!isActive && isHovered && (
-              <>
-                <motion.div
-                  layoutId={`hoverBackground-${index}`}
-                  className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-100 to-gray-50"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.2 }}
-                  style={{
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                  }}
-                />
-                <motion.div
-                  className="absolute inset-0 rounded-full"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  style={{
-                    background: 'radial-gradient(circle at 50% 0%, rgba(139,92,246,0.1) 0%, transparent 70%)',
-                  }}
-                />
-              </>
+              <motion.div
+                className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-100/50 to-gray-50/30"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+              />
             )}
           </AnimatePresence>
 
@@ -333,7 +260,7 @@ const PremiumNavItem = ({
                 key={i}
                 initial={{ opacity: 1, y: 0 }}
                 animate={{
-                  y: isHovered && !isActive ? [0, -2, 0] : 0,
+                  y: isHovered ? [0, -2, 0] : 0,
                 }}
                 transition={{
                   duration: 0.3,
@@ -347,9 +274,29 @@ const PremiumNavItem = ({
           </span>
 
           <AnimatePresence>
+            {isActive && (
+              <motion.div
+                layoutId="activeUnderline"
+                className="absolute bottom-1 left-1/2 h-[2px] bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 rounded-full"
+                initial={{ width: '0%', x: '-50%' }}
+                animate={{ width: '80%', x: '-50%' }}
+                exit={{ width: '0%', x: '-50%' }}
+                transition={{
+                  duration: 0.4,
+                  ease: [0.22, 1, 0.36, 1],
+                  layout: { duration: 0.3 }
+                }}
+                style={{
+                  boxShadow: '0 0 8px rgba(0,0,0,0.2)',
+                }}
+              />
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence>
             {!isActive && isHovered && (
               <motion.div
-                className="absolute bottom-1.5 left-1/2 h-[2px] bg-gradient-to-r from-transparent via-gray-400 to-transparent rounded-full"
+                className="absolute bottom-1 left-1/2 h-[2px] bg-gradient-to-r from-transparent via-gray-400 to-transparent rounded-full"
                 initial={{ width: '0%', x: '-50%' }}
                 animate={{ width: '70%', x: '-50%' }}
                 exit={{ width: '0%', x: '-50%' }}
@@ -359,12 +306,12 @@ const PremiumNavItem = ({
           </AnimatePresence>
         </motion.div>
 
-        {isHovered && (
+        {isHovered && !isActive && (
           <motion.div
-            className="absolute -inset-2 rounded-full opacity-0"
+            className="absolute -inset-2 rounded-full opacity-0 pointer-events-none"
             animate={{
-              opacity: [0, 0.5, 0],
-              scale: [0.8, 1.2, 1.4],
+              opacity: [0, 0.3, 0],
+              scale: [0.9, 1.1, 1.3],
             }}
             transition={{
               duration: 1.5,
@@ -372,7 +319,7 @@ const PremiumNavItem = ({
               ease: "easeOut",
             }}
             style={{
-              background: 'radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(156,163,175,0.2) 0%, transparent 70%)',
             }}
           />
         )}
