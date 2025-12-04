@@ -1,10 +1,5 @@
 import { motion } from 'framer-motion';
-import {
-  MonitorSmartphone,
-  PhoneCall,
-  Bot,
-  Workflow,
-} from 'lucide-react';
+import { MonitorSmartphone, PhoneCall, Bot, Workflow } from 'lucide-react';
 
 const services = [
   {
@@ -104,7 +99,10 @@ export function ServicesSection() {
             return (
               <motion.div
                 key={service.title}
-                variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}
+                variants={{
+                  hidden: { opacity: 0, y: 24 },
+                  visible: { opacity: 1, y: 0 },
+                }}
                 whileHover={{ y: -4, scale: 1.02 }}
                 transition={{ type: 'spring', stiffness: 260, damping: 20 }}
                 className="group relative bg-white rounded-2xl p-8 border border-gray-200 hover:border-violet-400/60 hover:shadow-xl transition-all duration-300"
