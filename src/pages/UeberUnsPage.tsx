@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+
 import { AboutSection } from '@/components/AboutSection';
 import { ProcessSection } from '@/components/ProcessSection';
 
@@ -20,17 +21,9 @@ export function UeberUnsPage() {
           >
             Über uns
           </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="text-xl text-gray-600 max-w-3xl"
-          >
-            Lernen Sie das Team hinter Cogniiq kennen -
-            Ihre Partner für AI und Webdesign.
-          </motion.p>
         </div>
       </motion.div>
+
       <AboutSection />
       <ProcessSection />
     </>
