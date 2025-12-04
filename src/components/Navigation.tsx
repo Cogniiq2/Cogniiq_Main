@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
@@ -7,6 +8,8 @@ import { Logo } from './Logo';
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,21 +20,22 @@ export function Navigation() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   const navItems = [
-    { label: 'Leistungen', href: '#leistungen' },
-    { label: 'Cases', href: '#cases' },
-    { label: 'Ablauf', href: '#ablauf' },
-    { label: 'Über uns', href: '#ueber-uns' },
-    { label: 'FAQ', href: '#faq' },
-    { label: 'Kontakt', href: '#kontakt' },
+    { label: 'Leistungen', href: '/leistungen' },
+    { label: 'Cases', href: '/cases' },
+    { label: 'Ablauf', href: '/ablauf' },
+    { label: 'Über uns', href: '/ueber-uns' },
+    { label: 'FAQ', href: '/faq' },
+    { label: 'Kontakt', href: '/kontakt' },
   ];
 
-  const handleNavClick = (href: string) => {
+  const handleNavClick = (path: string) => {
     setIsMobileMenuOpen(false);
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+    navigate(path);
   };
 
   return (
@@ -49,31 +53,36 @@ export function Navigation() {
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="flex items-center"
-            >
-              <Logo className="h-12" />
-            </motion.div>
+            <Link to="/">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="flex items-center"
+              >
+                <Logo className="h-12" />
+              </motion.div>
+            </Link>
 
             <div className="hidden lg:flex items-center gap-8">
               {navItems.map((item, index) => (
-                <motion.a
+                <motion.div
                   key={item.href}
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 * index }}
-                  href={item.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNavClick(item.href);
-                  }}
-                  className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
                 >
-                  {item.label}
-                </motion.a>
+                  <Link
+                    to={item.href}
+                    className={`text-sm font-medium transition-colors ${
+                      location.pathname === item.href
+                        ? 'text-gray-900'
+                        : 'text-gray-700 hover:text-gray-900'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                </motion.div>
               ))}
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
@@ -81,7 +90,7 @@ export function Navigation() {
                 transition={{ delay: 0.6 }}
               >
                 <Button
-                  onClick={() => handleNavClick('#kontakt')}
+                  onClick={() => handleNavClick('/kontakt')}
                   aria-label="Kostenloses Erstgespräch buchen"
                 >
                   Erstgespräch
@@ -110,20 +119,21 @@ export function Navigation() {
         >
           <div className="flex flex-col items-center gap-6 p-8">
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item.href}
-                href={item.href}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick(item.href);
-                }}
-                className="text-lg font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                to={item.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`text-lg font-medium transition-colors ${
+                  location.pathname === item.href
+                    ? 'text-gray-900'
+                    : 'text-gray-700 hover:text-gray-900'
+                }`}
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
             <Button
-              onClick={() => handleNavClick('#kontakt')}
+              onClick={() => handleNavClick('/kontakt')}
               className="mt-4"
               aria-label="Kostenloses Erstgespräch buchen"
             >
