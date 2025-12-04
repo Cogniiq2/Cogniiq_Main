@@ -103,48 +103,57 @@ export function ServicesSection() {
                   hidden: { opacity: 0, y: 24 },
                   visible: { opacity: 1, y: 0 },
                 }}
-                whileHover={{ y: -6 }}
-                transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-                className="group relative bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:border-violet-400/50 hover:shadow-xl transition-all duration-300"
+                whileHover={{ y: -6, scale: 1.01 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+                className="group relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 shadow-[0_18px_45px_rgba(15,23,42,0.12)] backdrop-blur-xl px-6 py-7 flex flex-col"
               >
+                {/* subtle gradient aura on hover */}
                 <div
-                  className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}
+                  className={`pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
                 />
 
-                <div className="relative flex items-start gap-6">
-                  <div
-                    className={`p-4 rounded-xl bg-gradient-to-br ${service.gradient} flex-shrink-0`}
-                    aria-hidden="true"
-                  >
-                    <Icon className="w-8 h-8 text-white" />
-                  </div>
-
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold mb-3 text-gray-900">
-                      {service.title}
-                    </h3>
-                    <p className="text-gray-600 mb-6 leading-relaxed text-sm">
-                      {service.description}
-                    </p>
-
-                    <div className="space-y-2">
-                      {service.features.map((feature, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center gap-2"
-                        >
-                          <div
-                            className={`w-1 h-1 rounded-full bg-gradient-to-r ${service.gradient}`}
-                          />
-                          <span className="text-sm text-gray-700">{feature}</span>
-                        </div>
-                      ))}
+                <div className="relative z-10 flex flex-col gap-6">
+                  {/* top row: icon + title */}
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${service.gradient} shadow-lg shadow-black/10`}
+                    >
+                      <Icon className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold tracking-tight text-slate-900">
+                        {service.title}
+                      </h3>
                     </div>
                   </div>
+
+                  {/* description */}
+                  <p className="text-sm leading-relaxed text-slate-600">
+                    {service.description}
+                  </p>
+
+                  {/* divider */}
+                  <div className="h-px w-full bg-gradient-to-r from-slate-200/60 via-slate-100 to-slate-200/60" />
+
+                  {/* features, more compact, less vertical stretch */}
+                  <ul className="space-y-2.5 text-sm">
+                    {service.features.map((feature) => (
+                      <li
+                        key={feature}
+                        className="flex items-start gap-2.5 text-slate-700"
+                      >
+                        <div
+                          className={`mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-gradient-to-r ${service.gradient}`}
+                        />
+                        <span className="leading-snug">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
+                {/* bottom glow */}
                 <div
-                  className={`absolute -bottom-px -right-px w-24 h-24 bg-gradient-to-br ${service.gradient} rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-500`}
+                  className={`pointer-events-none absolute -bottom-10 inset-x-10 h-24 bg-gradient-to-br ${service.gradient} blur-3xl opacity-0 group-hover:opacity-40 transition-opacity duration-700`}
                 />
               </motion.div>
             );
