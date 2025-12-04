@@ -1,4 +1,6 @@
 import { motion } from 'framer-motion';
+import { useInView } from 'framer-motion';
+import { useRef } from 'react';
 import { MonitorSmartphone, PhoneCall, Bot, Workflow } from 'lucide-react';
 
 const services = [
@@ -57,100 +59,85 @@ const services = [
 ];
 
 export function ServicesSection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
+
   return (
-    <section id="leistungen" className="py-24 bg-slate-50">
+    <section id="leistungen" ref={ref} className="py-32 bg-white" aria-labelledby="services-heading">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-3xl"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
         >
-          <p className="text-sm font-medium tracking-[0.2em] uppercase text-violet-500">
-            Leistungen
-          </p>
-          <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900">
+          <h2
+            id="services-heading"
+            className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900"
+          >
             Was wir für Sie bauen
           </h2>
-          <p className="mt-4 text-gray-600">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Fokus: mehr Umsatz, mehr Anfragen, weniger manuelle Arbeit. Alles,
             was wir entwickeln, zahlt direkt auf diese Ziele ein.
           </p>
         </motion.div>
 
-        <motion.div
-          className="mt-16 grid gap-8 md:grid-cols-2 xl:grid-cols-4"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={{
-            hidden: { opacity: 0, y: 24 },
-            visible: {
-              opacity: 1,
-              y: 0,
-              transition: { staggerChildren: 0.08 },
-            },
-          }}
-        >
-          {services.map((service) => {
+        <div className="grid md:grid-cols-2 gap-6">
+          {services.map((service, index) => {
             const Icon = service.icon;
-
             return (
               <motion.div
-                key={service.title}
-                variants={{
-                  hidden: { opacity: 0, y: 24 },
-                  visible: { opacity: 1, y: 0 },
-                }}
-                whileHover={{ y: -4 }}
-                transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-                className="group relative bg-white rounded-[32px] px-8 py-10 border border-slate-100 shadow-[0_22px_70px_rgba(15,23,42,0.10)]"
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: index * 0.15 }}
+                whileHover={{ y: -6 }}
+                className="group relative bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:border-[#8b5cf6]/50 hover:shadow-xl transition-all duration-300"
               >
-                {/* soft background tint like first screenshot */}
                 <div
-                  className={`pointer-events-none absolute inset-0 rounded-[32px] bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-[0.07] transition-opacity duration-300`}
+                  className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}
                 />
 
-                <div className="relative">
-                  {/* icon + title row */}
-                  <div className="flex items-start gap-4 mb-6">
-                    <div
-                      className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${service.gradient} shadow-lg shadow-black/10`}
-                    >
-                      <Icon className="w-7 h-7 text-white" />
-                    </div>
-                    <div className="mt-1">
-                      <h3 className="text-lg font-semibold text-slate-900">
-                        {service.title}
-                      </h3>
-                    </div>
+                <div className="relative flex items-start gap-6">
+                  <div
+                    className={`p-4 rounded-xl bg-gradient-to-br ${service.gradient} flex-shrink-0`}
+                    aria-hidden="true"
+                  >
+                    <Icon className="w-8 h-8 text-white" />
                   </div>
 
-                  {/* description */}
-                  <p className="text-sm leading-relaxed text-slate-600 mb-6 max-w-xs">
-                    {service.description}
-                  </p>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold mb-3 text-gray-900">
+                      {service.title}
+                    </h3>
+                    <p className="text-gray-600 mb-6 leading-relaxed text-sm">
+                      {service.description}
+                    </p>
 
-                  {/* features with bullet dots like screenshot */}
-                  <ul className="space-y-3 text-sm">
-                    {service.features.map((feature) => (
-                      <li
-                        key={feature}
-                        className="flex items-start gap-3 text-slate-700"
-                      >
-                        <span
-                          className={`mt-2 h-1.5 w-1.5 rounded-full bg-gradient-to-r ${service.gradient}`}
-                        />
-                        <span className="leading-snug">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                    <div className="space-y-2">
+                      {service.features.map((feature, featureIndex) => (
+                        <div
+                          key={featureIndex}
+                          className="flex items-center gap-2"
+                        >
+                          <div
+                            className={`w-1 h-1 rounded-full bg-gradient-to-r ${service.gradient}`}
+                          />
+                          <span className="text-sm text-gray-700">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
+
+                <div
+                  className={`absolute -bottom-px -right-px w-24 h-24 bg-gradient-to-br ${service.gradient} rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-500`}
+                />
               </motion.div>
             );
           })}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
