@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button } from './ui/button';
 import { Logo } from './Logo';
 import { InteractiveMenu } from './ui/modern-mobile-menu';
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,10 +28,6 @@ export function Navigation() {
     { label: 'FAQ', href: '/faq' },
     { label: 'Kontakt', href: '/kontakt' },
   ];
-
-  const handleNavClick = (path: string) => {
-    navigate(path);
-  };
 
   return (
     <>
@@ -77,21 +71,6 @@ export function Navigation() {
                   index={index}
                 />
               ))}
-
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5 }}
-                className="ml-4"
-              >
-                <Button
-                  onClick={() => handleNavClick('/kontakt')}
-                  aria-label="Kostenloses Erstgespräch buchen"
-                  className="relative rounded-full px-7 py-2.5 text-sm font-medium bg-gray-900 text-white hover:bg-gray-800 transition-all duration-300 shadow-sm hover:shadow-md border-0"
-                >
-                  Erstgespräch
-                </Button>
-              </motion.div>
             </motion.div>
           </div>
         </div>
