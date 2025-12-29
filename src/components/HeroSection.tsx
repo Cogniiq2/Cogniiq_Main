@@ -12,8 +12,8 @@ export function HeroSection() {
         fill="white"
       />
 
-      <div className="flex h-full w-full max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex-1 p-8 relative z-10 flex flex-col justify-center">
+      <div className="flex h-full w-full max-w-7xl mx-auto px-6 lg:px-8 min-h-screen items-center">
+        <div className="flex-1 p-8 relative z-10 flex flex-col justify-center max-w-xl">
           <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400">
             CogniIQ – The Future is here.
           </h1>
@@ -23,7 +23,7 @@ export function HeroSection() {
           </p>
         </div>
 
-        <div className="flex-1 relative hidden lg:block">
+        <div className="flex-1 relative hidden lg:flex items-center justify-center h-screen">
           <SplineScene
             scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
             className="w-full h-full"
