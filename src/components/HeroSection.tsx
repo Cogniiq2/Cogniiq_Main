@@ -4,7 +4,7 @@ import { Spotlight } from './ui/spotlight';
 export function HeroSection() {
   return (
     <section
-      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-black/[0.96] pt-20"
+      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-[#fafafa] pt-20"
       aria-label="Hauptbereich"
     >
       <Spotlight
@@ -14,10 +14,10 @@ export function HeroSection() {
 
       <div className="flex h-full w-full max-w-7xl mx-auto px-6 lg:px-8 min-h-screen items-center gap-8">
         <div className="flex-none w-full lg:w-[400px] xl:w-[450px] p-4 lg:p-8 relative z-10 flex flex-col justify-center">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 leading-tight">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 to-neutral-600 leading-tight">
             CogniIQ – The Future is here.
           </h1>
-          <p className="mt-4 lg:mt-6 text-neutral-300 text-base lg:text-lg">
+          <p className="mt-4 lg:mt-6 text-gray-700 text-base lg:text-lg">
             Erleben Sie die Zukunft der KI-gestützten Webentwicklung.
             Interaktive 3D-Erlebnisse, die Ihre Vision zum Leben erwecken.
           </p>
