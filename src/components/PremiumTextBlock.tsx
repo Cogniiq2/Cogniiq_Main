@@ -27,12 +27,6 @@ export function PremiumTextBlock() {
   }, []);
 
   const headingWords = ['CogniIQ', '–', 'The', 'Future', 'is', 'here.'];
-  const descriptionLines = [
-    'Erleben Sie die Zukunft der KI-gestützten',
-    'Webentwicklung. Interaktive 3D-',
-    'Erlebnisse, die Ihre Vision zum Leben',
-    'erwecken.',
-  ];
 
   return (
     <motion.div
@@ -228,113 +222,6 @@ export function PremiumTextBlock() {
             />
           </h1>
         </div>
-
-        {/* Premium Description with Staggered Animation */}
-        <motion.div
-          className="mt-6 lg:mt-8 relative"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.8 }}
-        >
-          {/* Floating particles */}
-          <div className="absolute inset-0 pointer-events-none">
-            {[...Array(6)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute w-1 h-1 bg-gray-400/30 rounded-full"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                }}
-                animate={{
-                  y: [-20, 20, -20],
-                  opacity: [0.2, 0.5, 0.2],
-                  scale: [1, 1.5, 1],
-                }}
-                transition={{
-                  duration: 3 + Math.random() * 2,
-                  repeat: Infinity,
-                  delay: Math.random() * 2,
-                  ease: 'easeInOut',
-                }}
-              />
-            ))}
-          </div>
-
-          {descriptionLines.map((line, lineIndex) => (
-            <motion.p
-              key={lineIndex}
-              className="text-gray-700 text-base lg:text-lg leading-relaxed"
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{
-                duration: 0.6,
-                delay: 1 + lineIndex * 0.1,
-                ease: 'easeOut',
-              }}
-              whileHover={{
-                x: 5,
-                color: '#000',
-                transition: { duration: 0.2 },
-              }}
-              style={{
-                textShadow: '0 1px 1px rgba(0,0,0,0.05)',
-              }}
-            >
-              {line.split('').map((char, charIndex) => (
-                <motion.span
-                  key={charIndex}
-                  className="inline-block"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{
-                    duration: 0.02,
-                    delay: 1 + lineIndex * 0.1 + charIndex * 0.01,
-                  }}
-                >
-                  {char}
-                </motion.span>
-              ))}
-            </motion.p>
-          ))}
-
-          {/* Premium indicator line */}
-          <motion.div
-            className="mt-6 flex items-center gap-3"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 1.5 }}
-          >
-            <motion.div
-              className="h-[1px] bg-gradient-to-r from-gray-900 via-gray-400 to-transparent"
-              initial={{ width: 0 }}
-              animate={{ width: 120 }}
-              transition={{ duration: 1, delay: 1.7 }}
-            />
-            <motion.div
-              className="flex gap-1"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 2 }}
-            >
-              {[...Array(3)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="w-1 h-1 rounded-full bg-gray-900"
-                  animate={{
-                    scale: [1, 1.5, 1],
-                    opacity: [0.3, 1, 0.3],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: i * 0.2,
-                  }}
-                />
-              ))}
-            </motion.div>
-          </motion.div>
-        </motion.div>
 
         {/* Noise texture overlay */}
         <div
