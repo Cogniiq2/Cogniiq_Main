@@ -16,11 +16,13 @@ export function HeroSection() {
       <div className="flex h-full w-full max-w-7xl mx-auto px-6 lg:px-8 min-h-screen items-center gap-8">
         <PremiumTextBlock />
 
-        <div className="flex-1 relative hidden lg:flex items-center justify-center h-screen">
-          <SplineScene
-            scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-            className="w-full h-full"
-          />
+        <div className="flex-1 relative hidden lg:flex items-center justify-center overflow-visible">
+          <div className="w-[150%] h-[150vh] max-w-none">
+            <SplineScene
+              scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+              className="w-full h-full scale-[0.7] origin-center"
+            />
+          </div>
         </div>
       </div>
     </section>
