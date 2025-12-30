@@ -1,7 +1,6 @@
 import { TypewriterEffectSmooth } from './ui/typewriter-effect';
 import { Button } from './ui/button';
 import { SplineScene } from './ui/splite';
-import { Spotlight } from './ui/spotlight';
 
 export function HeroSection() {
   const handleScrollTo = (id: string) => {
@@ -13,16 +12,12 @@ export function HeroSection() {
 
   return (
     <section
-      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-black/[0.96] pt-20"
+      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100 pt-20"
       aria-label="Hauptbereich"
     >
-      <Spotlight
-        className="-top-40 left-0 md:left-60 md:-top-20"
-        fill="white"
-      />
 
       <div
-        className="absolute inset-0 w-full h-full flex items-center justify-center opacity-30 pointer-events-none z-0"
+        className="absolute inset-0 w-full h-full flex items-center justify-center opacity-40 pointer-events-none z-0"
         aria-hidden="true"
         role="img"
         aria-label="3D Roboter Animation im Hintergrund"
@@ -45,11 +40,11 @@ export function HeroSection() {
               words={[
                 {
                   text: "CogniIQ – The Future is here.",
-                  className: "bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400"
+                  className: "text-black"
                 }
               ]}
               className="font-bold text-5xl md:text-7xl lg:text-8xl"
-              cursorClassName="bg-white"
+              cursorClassName="bg-black"
             />
 
           </div>
