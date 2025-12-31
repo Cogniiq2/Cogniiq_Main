@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Logo } from "./Logo";
 import { NAP } from "./NAP";
 import { BUSINESS_INFO } from "@/lib/seo-data";
+import { ThemeToggle } from "./ui/theme-toggle";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -55,6 +56,10 @@ export function Footer() {
                 >
                   Datenschutz
                 </button>
+              </div>
+
+              <div className="mt-6">
+                <ThemeToggle />
               </div>
             </div>
 
