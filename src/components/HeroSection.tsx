@@ -5,7 +5,7 @@ import { PremiumTextBlock } from './PremiumTextBlock';
 export function HeroSection() {
   return (
     <section
-      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-[#fafafa] pt-20"
+      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-white pt-20"
       aria-label="Hauptbereich"
     >
       <Spotlight
