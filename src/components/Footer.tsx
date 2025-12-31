@@ -13,7 +13,7 @@ export function Footer() {
   return (
     <>
       {/* ====== FOOTER ====== */}
-      <footer className="bg-gray-50 border-t border-gray-200 py-16" role="contentinfo">
+      <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-16 transition-colors duration-300" role="contentinfo">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12 mb-12">
 
@@ -22,7 +22,7 @@ export function Footer() {
               <div className="mb-4">
                 <Logo className="h-10" />
               </div>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                 <strong>AI Agentur und Webdesign Agentur in Bayreuth.</strong>{" "}
                 Wir bieten KI Automationen, AI Rezeptionisten und
                 hochkonvertierende Websites für Unternehmen in ganz Deutschland.
@@ -31,8 +31,8 @@ export function Footer() {
 
             {/* CONTACT */}
             <div>
-              <h4 className="font-semibold text-gray-900 mb-4">Kontakt</h4>
-              <div className="mb-3 text-sm text-gray-600">
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">Kontakt</h4>
+              <div className="mb-3 text-sm text-gray-600 dark:text-gray-400">
                 <Logo className="h-6 mb-1" />
                 {BUSINESS_INFO.legalName.replace('Cogniiq – ', '')}
               </div>
@@ -41,18 +41,18 @@ export function Footer() {
 
             {/* LINKS */}
             <div>
-              <h4 className="font-semibold text-gray-900 mb-4">Links</h4>
-              <div className="space-y-2 text-gray-600">
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">Links</h4>
+              <div className="space-y-2 text-gray-600 dark:text-gray-400">
                 <button
                   onClick={() => setOpenPanel("impressum")}
-                  className="block hover:text-gray-900 transition-colors text-left w-full"
+                  className="block hover:text-gray-900 dark:hover:text-gray-100 transition-colors text-left w-full"
                 >
                   Impressum
                 </button>
 
                 <button
                   onClick={() => setOpenPanel("datenschutz")}
-                  className="block hover:text-gray-900 transition-colors text-left w-full"
+                  className="block hover:text-gray-900 dark:hover:text-gray-100 transition-colors text-left w-full"
                 >
                   Datenschutz
                 </button>
@@ -65,7 +65,7 @@ export function Footer() {
 
           </div>
 
-          <div className="pt-8 border-t border-gray-200 text-center text-sm text-gray-500">
+          <div className="pt-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-500 dark:text-gray-400">
             © {currentYear} <Logo className="inline-block h-4 align-text-bottom" />. Alle Rechte vorbehalten.
           </div>
         </div>
@@ -86,19 +86,19 @@ export function Footer() {
 
             {/* Panel */}
             <motion.div
-              className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl z-50 max-h-[80vh] overflow-y-auto p-8"
+              className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 rounded-t-3xl shadow-2xl z-50 max-h-[80vh] overflow-y-auto p-8"
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 260 }}
             >
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-2xl font-semibold">
+                <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
                   {openPanel === "impressum" ? "Impressum" : "Datenschutzerklärung"}
                 </h3>
                 <button
                   onClick={() => setOpenPanel(null)}
-                  className="text-gray-500 hover:text-gray-800 transition"
+                  className="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 transition"
                 >
                   <X size={26} />
                 </button>
@@ -106,7 +106,7 @@ export function Footer() {
 
               {/* ====== LEGAL TEXT CONTENT ====== */}
               {openPanel === "impressum" ? (
-                <div className="prose prose-gray max-w-none">
+                <div className="prose prose-gray dark:prose-invert max-w-none">
                   <h4>Angaben gemäß § 5 TMG</h4>
                   <p>
                     {BUSINESS_INFO.legalName}<br />
@@ -137,7 +137,7 @@ export function Footer() {
                   </p>
                 </div>
               ) : (
-                <div className="prose prose-gray max-w-none">
+                <div className="prose prose-gray dark:prose-invert max-w-none">
                   <h4>1. Datenschutz auf einen Blick</h4>
                   <p>Der Schutz Ihrer persönlichen Daten ist uns wichtig …</p>
 

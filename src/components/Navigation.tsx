@@ -36,7 +36,7 @@ export function Navigation() {
         animate={{ y: 0 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           isScrolled
-            ? 'bg-white/95 backdrop-blur-md border-b border-gray-100'
+            ? 'bg-white/95 dark:bg-gray-950/95 backdrop-blur-md border-b border-gray-100 dark:border-gray-800'
             : 'bg-transparent'
         }`}
         role="navigation"
@@ -113,7 +113,7 @@ function MinimalNavItem({
       >
         <motion.span
           className={`text-sm font-medium tracking-wide transition-colors duration-300 ${
-            isActive ? 'text-gray-900' : 'text-gray-600'
+            isActive ? 'text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400'
           }`}
           animate={{
             color: isHovered && !isActive ? '#111827' : undefined,
@@ -123,7 +123,7 @@ function MinimalNavItem({
         </motion.span>
 
         <motion.div
-          className="absolute -bottom-1.5 left-0 right-0 h-[1.5px] bg-gray-900 origin-left"
+          className="absolute -bottom-1.5 left-0 right-0 h-[1.5px] bg-gray-900 dark:bg-gray-100 origin-left"
           initial={false}
           animate={{
             scaleX: isActive ? 1 : 0,
@@ -136,7 +136,7 @@ function MinimalNavItem({
         />
 
         <motion.div
-          className="absolute -bottom-1.5 left-0 right-0 h-[1px] bg-gray-300 origin-left"
+          className="absolute -bottom-1.5 left-0 right-0 h-[1px] bg-gray-300 dark:bg-gray-700 origin-left"
           initial={false}
           animate={{
             scaleX: !isActive && isHovered ? 1 : 0,

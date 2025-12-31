@@ -43,7 +43,7 @@ export function TrustSection() {
   const isInView = useInView(ref, { once: true, amount: 0.2 });
 
   return (
-    <section ref={ref} className="py-28 bg-white">
+    <section ref={ref} className="py-28 bg-white dark:bg-gray-950 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
 
         {/* Heading */}
@@ -53,10 +53,10 @@ export function TrustSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-20"
         >
-          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900">
+          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100">
             Wie wir denken
           </h2>
-          <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="mt-6 text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Die Grundprinzipien, die Cogniiq ausmachen – klar, ruhig, kompromisslos.
           </p>
         </motion.div>
@@ -71,13 +71,13 @@ export function TrustSection() {
                 initial={{ opacity: 0, y: 25 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="p-8 bg-white border border-gray-200 rounded-3xl shadow-sm hover:shadow-lg transition-all h-full"
+                className="p-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm hover:shadow-lg transition-all h-full"
               >
-                <Icon className="w-10 h-10 text-indigo-600 mb-4" />
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4 leading-snug">
+                <Icon className="w-10 h-10 text-blue-600 dark:text-blue-400 mb-4" />
+                <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4 leading-snug">
                   {item.title}
                 </h3>
-                <p className="text-gray-600 text-lg">{item.text}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-lg">{item.text}</p>
               </motion.div>
             );
           })}
@@ -93,13 +93,13 @@ export function TrustSection() {
                 initial={{ opacity: 0, y: 25 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: (i + 3) * 0.1 }}
-                className="p-8 bg-white border border-gray-200 rounded-3xl shadow-sm hover:shadow-lg transition-all w-full max-w-md"
+                className="p-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm hover:shadow-lg transition-all w-full max-w-md"
               >
-                <Icon className="w-10 h-10 text-indigo-600 mb-4" />
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4 leading-snug">
+                <Icon className="w-10 h-10 text-blue-600 dark:text-blue-400 mb-4" />
+                <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4 leading-snug">
                   {item.title}
                 </h3>
-                <p className="text-gray-600 text-lg">{item.text}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-lg">{item.text}</p>
               </motion.div>
             );
           })}

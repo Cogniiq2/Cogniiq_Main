@@ -14,7 +14,7 @@ function App() {
     <Router>
       <LocalBusinessSchema />
       <PageReveal>
-        <div className="min-h-screen bg-[#fafafa] text-gray-900">
+        <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
           <Navigation />
           <Routes>
             <Route path="/" element={<HomePage />} />

@@ -41,7 +41,7 @@ export function PremiumTextBlock() {
       {/* Floating Geometric Shapes */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
-          className="absolute top-0 right-0 w-32 h-32 border border-gray-300/20"
+          className="absolute top-0 right-0 w-32 h-32 border border-gray-300/20 dark:border-gray-700/20"
           animate={{
             rotate: [0, 90, 180, 270, 360],
             scale: [1, 1.1, 1, 0.9, 1],
@@ -56,7 +56,7 @@ export function PremiumTextBlock() {
           }}
         />
         <motion.div
-          className="absolute bottom-10 left-0 w-24 h-24 border border-gray-400/20 rounded-full"
+          className="absolute bottom-10 left-0 w-24 h-24 border border-gray-400/20 dark:border-gray-600/20 rounded-full"
           animate={{
             scale: [1, 1.2, 1],
             opacity: [0.3, 0.6, 0.3],
@@ -71,7 +71,7 @@ export function PremiumTextBlock() {
           }}
         />
         <motion.div
-          className="absolute top-1/2 right-10 w-16 h-16 bg-gradient-to-br from-gray-200/30 to-transparent backdrop-blur-sm"
+          className="absolute top-1/2 right-10 w-16 h-16 bg-gradient-to-br from-gray-200/30 dark:from-gray-800/30 to-transparent backdrop-blur-sm"
           animate={{
             rotate: [0, -180, -360],
             y: [-10, 10, -10],
@@ -125,13 +125,13 @@ export function PremiumTextBlock() {
 
         {/* Glowing Accent Lines */}
         <motion.div
-          className="absolute top-0 left-0 w-20 h-[2px] bg-gradient-to-r from-gray-900 to-transparent"
+          className="absolute top-0 left-0 w-20 h-[2px] bg-gradient-to-r from-gray-900 dark:from-gray-100 to-transparent"
           initial={{ width: 0, opacity: 0 }}
           animate={{ width: 80, opacity: 1 }}
           transition={{ duration: 1, delay: 0.5 }}
         />
         <motion.div
-          className="absolute bottom-0 right-0 w-20 h-[2px] bg-gradient-to-l from-gray-900 to-transparent"
+          className="absolute bottom-0 right-0 w-20 h-[2px] bg-gradient-to-l from-gray-900 dark:from-gray-100 to-transparent"
           initial={{ width: 0, opacity: 0 }}
           animate={{ width: 80, opacity: 1 }}
           transition={{ duration: 1, delay: 0.7 }}
@@ -182,7 +182,7 @@ export function PremiumTextBlock() {
                 {word.split('').map((char, charIndex) => (
                   <motion.span
                     key={charIndex}
-                    className="inline-block bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 via-neutral-700 to-neutral-600"
+                    className="inline-block bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 via-neutral-700 to-neutral-600 dark:from-neutral-100 dark:via-neutral-300 dark:to-neutral-400"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{
