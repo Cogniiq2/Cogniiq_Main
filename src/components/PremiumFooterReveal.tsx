@@ -17,13 +17,11 @@ export function PremiumFooterReveal({ children }: PremiumFooterRevealProps) {
 
   const rawOpacity = useTransform(scrollYProgress, [0, 0.4, 1], [0, 0.3, 1]);
   const rawScale = useTransform(scrollYProgress, [0, 0.4, 1], [0.88, 0.94, 1]);
-  const rawBlur = useTransform(scrollYProgress, [0, 0.4, 1], [20, 8, 0]);
   const rawY = useTransform(scrollYProgress, [0, 0.4, 1], [150, 60, 0]);
   const rawRotateX = useTransform(scrollYProgress, [0, 0.4, 1], [25, 10, 0]);
 
   const opacity = useSpring(rawOpacity, springConfig);
   const scale = useSpring(rawScale, springConfig);
-  const blur = useSpring(rawBlur, springConfig);
   const y = useSpring(rawY, springConfig);
   const rotateX = useSpring(rawRotateX, springConfig);
 
@@ -188,26 +186,20 @@ export function PremiumFooterReveal({ children }: PremiumFooterRevealProps) {
           transformStyle: 'preserve-3d',
         }}
         className="relative"
+        initial={{ opacity: 0 }}
+        animate={isVisible ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 1.2, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
       >
+        {/* Subtle inner glow on footer */}
         <motion.div
+          className="absolute -inset-4 pointer-events-none rounded-3xl"
           style={{
-            filter: blur.get() ? `blur(${blur.get()}px)` : 'blur(0px)',
+            opacity: useTransform(scrollYProgress, [0.3, 0.7, 1], [0, 0.5, 0.2]),
+            background: 'radial-gradient(ellipse at center, rgba(150,150,150,0.08) 0%, transparent 60%)',
+            filter: 'blur(30px)',
           }}
-          initial={{ opacity: 0 }}
-          animate={isVisible ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 1.2, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-        >
-          {/* Subtle inner glow on footer */}
-          <motion.div
-            className="absolute -inset-4 pointer-events-none rounded-3xl"
-            style={{
-              opacity: useTransform(scrollYProgress, [0.3, 0.7, 1], [0, 0.5, 0.2]),
-              background: 'radial-gradient(ellipse at center, rgba(150,150,150,0.08) 0%, transparent 60%)',
-              filter: 'blur(30px)',
-            }}
-          />
-          {children}
-        </motion.div>
+        />
+        {children}
       </motion.div>
 
       {/* Expansive bottom glow with animation */}
