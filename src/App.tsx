@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { PageReveal } from './components/PageReveal';
 import { Navigation } from './components/Navigation';
 import { Footer } from './components/Footer';
+import { PremiumFooterReveal } from './components/PremiumFooterReveal';
 import { LocalBusinessSchema } from './components/LocalBusinessSchema';
 import { HomePage } from './pages/HomePage';
 import { LeistungenPage } from './pages/LeistungenPage';
@@ -23,7 +24,9 @@ function App() {
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/kontakt" element={<KontaktPage />} />
           </Routes>
-          <Footer />
+          <PremiumFooterReveal>
+            <Footer />
+          </PremiumFooterReveal>
         </div>
       </PageReveal>
     </Router>
