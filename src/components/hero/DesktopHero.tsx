@@ -24,7 +24,7 @@ function DesktopParticles() {
       {particles.map((p) => (
         <motion.div
           key={p.id}
-          className="absolute rounded-full bg-sky-700/60"
+          className="absolute rounded-full bg-sky-400/40"
           style={{ width: p.size, height: p.size, left: `${p.x}%`, top: `${p.y}%` }}
           animate={{ y: [0, -25, 0], opacity: [0.02, 0.15, 0.02] }}
           transition={{ duration: p.duration, repeat: Infinity, delay: p.delay, ease: 'easeInOut' }}
@@ -52,16 +52,16 @@ function DesktopCTA() {
         transition={{ duration: 0.8, delay: 2.6 }}
       >
         <motion.div
-          className="w-8 h-px bg-gray-300"
+          className="w-8 h-px bg-gray-400"
           initial={{ width: 0 }}
           animate={{ width: 32 }}
           transition={{ duration: 0.6, delay: 2.8 }}
         />
-        <span className="text-[11px] uppercase tracking-[0.25em] text-gray-400 font-medium">
+        <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500 font-medium">
           Ihr Weg beginnt hier
         </span>
         <motion.div
-          className="w-8 h-px bg-gray-300"
+          className="w-8 h-px bg-gray-400"
           initial={{ width: 0 }}
           animate={{ width: 32 }}
           transition={{ duration: 0.6, delay: 2.8 }}
@@ -113,14 +113,14 @@ function DesktopCTA() {
 export function DesktopHero() {
   return (
     <section
-      className="relative w-full min-h-screen flex items-center overflow-hidden bg-black"
+      className="relative w-full min-h-screen flex items-center overflow-hidden bg-white"
       aria-label="Hauptbereich"
     >
       <div className="absolute inset-0">
         <div
           className="absolute inset-0"
           style={{
-            background: 'radial-gradient(ellipse at 50% 50%, rgba(2,132,199,0.08) 0%, transparent 60%)',
+            background: 'radial-gradient(ellipse at 50% 50%, rgba(2,132,199,0.06) 0%, transparent 60%)',
           }}
         />
       </div>
@@ -128,8 +128,8 @@ export function DesktopHero() {
       <motion.div
         className="absolute left-0 right-0 h-px z-30 pointer-events-none"
         style={{
-          background: 'linear-gradient(90deg, transparent 5%, rgba(3,105,161,0.2) 30%, rgba(2,132,199,0.4) 50%, rgba(3,105,161,0.2) 70%, transparent 95%)',
-          boxShadow: '0 0 20px 4px rgba(3,105,161,0.08)',
+          background: 'linear-gradient(90deg, transparent 5%, rgba(3,105,161,0.15) 30%, rgba(2,132,199,0.3) 50%, rgba(3,105,161,0.15) 70%, transparent 95%)',
+          boxShadow: '0 0 20px 4px rgba(3,105,161,0.06)',
         }}
         initial={{ top: 0, opacity: 0 }}
         animate={{ top: ['0%', '100%'], opacity: [0, 1, 1, 0] }}
@@ -143,7 +143,7 @@ export function DesktopHero() {
               {'CogniIQ'.split('').map((char, i) => (
                 <motion.span
                   key={i}
-                  className="inline-block bg-clip-text text-transparent bg-gradient-to-b from-white via-gray-200 to-gray-500"
+                  className="inline-block bg-clip-text text-transparent bg-gradient-to-b from-gray-900 via-gray-700 to-gray-400"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 1.0 + i * 0.08, ease: EASE_OUT }}
@@ -176,7 +176,7 @@ export function DesktopHero() {
           />
 
           <motion.p
-            className="text-xl lg:text-2xl font-light tracking-wide text-gray-400"
+            className="text-xl lg:text-2xl font-light tracking-wide text-gray-500"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 2.0, ease: EASE_OUT }}
@@ -204,7 +204,7 @@ export function DesktopHero() {
 
       <div
         className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-        style={{ background: 'linear-gradient(to bottom, transparent, black)' }}
+        style={{ background: 'linear-gradient(to bottom, transparent, white)' }}
       />
 
       <motion.div
@@ -214,12 +214,12 @@ export function DesktopHero() {
         transition={{ delay: 4.0, duration: 1 }}
       >
         <motion.div
-          className="w-5 h-8 rounded-full border border-gray-600 flex items-start justify-center p-1"
+          className="w-5 h-8 rounded-full border border-gray-300 flex items-start justify-center p-1"
           animate={{ opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
           <motion.div
-            className="w-1 h-1.5 rounded-full bg-gray-500"
+            className="w-1 h-1.5 rounded-full bg-gray-400"
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
           />
