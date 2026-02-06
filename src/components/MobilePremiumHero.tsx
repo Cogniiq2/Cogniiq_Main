@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -184,6 +185,7 @@ function NeuralNetwork() {
 }
 
 function PersonalCTA() {
+  const navigate = useNavigate();
   const words = ['Erstberatung', 'vereinbaren'];
 
   return (
@@ -216,9 +218,9 @@ function PersonalCTA() {
         />
       </motion.div>
 
-      <motion.a
-        href="#kontakt"
-        className="group relative px-8 py-3.5 rounded-full overflow-hidden"
+      <motion.button
+        onClick={() => navigate('/kontakt')}
+        className="group relative px-8 py-3.5 rounded-full overflow-hidden cursor-pointer"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 4.0 }}
@@ -258,7 +260,7 @@ function PersonalCTA() {
             <path d="M6 3L11 8L6 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </motion.svg>
         </div>
-      </motion.a>
+      </motion.button>
     </motion.div>
   );
 }
