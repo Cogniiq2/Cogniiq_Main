@@ -4,10 +4,27 @@ import { NeuralCanvas } from './hero/NeuralCanvas';
 import { HeroText } from './hero/HeroText';
 import { HeroCTA } from './hero/HeroCTA';
 import { HeroParticles } from './hero/HeroParticles';
+import { DesktopHero } from './hero/DesktopHero';
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-export function HeroSection() {
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth >= 1024 : false
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener('change', handler);
+    setIsDesktop(mq.matches);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  return isDesktop;
+}
+
+function MobileHero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
   const [isReady, setIsReady] = useState(false);
@@ -60,15 +77,14 @@ export function HeroSection() {
         transition={{ duration: 3, delay: 0.5, ease: EASE_OUT }}
       />
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-8 min-h-screen flex items-center">
-        <div className="w-full flex flex-col lg:flex-row items-center gap-12 lg:gap-0">
-          <div className="w-full lg:w-[48%] flex flex-col items-center lg:items-start">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 min-h-screen flex items-center">
+        <div className="w-full flex flex-col items-center gap-12">
+          <div className="w-full max-w-[320px]">
+            <NeuralCanvas mousePos={mousePos} isReady={isReady} />
+          </div>
+          <div className="flex flex-col items-center">
             <HeroText />
             <HeroCTA />
-          </div>
-
-          <div className="w-full lg:w-[52%] flex items-center justify-center relative">
-            <NeuralCanvas mousePos={mousePos} isReady={isReady} />
           </div>
         </div>
       </div>
@@ -100,6 +116,11 @@ export function HeroSection() {
       </motion.div>
     </section>
   );
+}
+
+export function HeroSection() {
+  const isDesktop = useIsDesktop();
+  return isDesktop ? <DesktopHero /> : <MobileHero />;
 }
 
 export default HeroSection;
