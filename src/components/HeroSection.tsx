@@ -1,37 +1,103 @@
-import { SplineScene } from './ui/splite';
-import { Spotlight } from './ui/spotlight';
-import { PremiumTextBlock } from './PremiumTextBlock';
-import { MobilePremiumHero } from './MobilePremiumHero';
+import { motion } from 'framer-motion';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { NeuralCanvas } from './hero/NeuralCanvas';
+import { HeroText } from './hero/HeroText';
+import { HeroCTA } from './hero/HeroCTA';
+import { HeroParticles } from './hero/HeroParticles';
+
+const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export function HeroSection() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsReady(true), 200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setMousePos({
+      x: (e.clientX - rect.left) / rect.width,
+      y: (e.clientY - rect.top) / rect.height,
+    });
+  }, []);
+
   return (
     <section
-      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-white dark:bg-gray-950 pt-20 transition-colors duration-300"
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-white pt-20"
       aria-label="Hauptbereich"
     >
-      <Spotlight
-        className="-top-40 left-0 md:left-60 md:-top-20"
-        fill="white"
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `radial-gradient(ellipse 80% 60% at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(2,132,199,0.03) 0%, transparent 60%)`,
+            transition: 'background 0.8s ease-out',
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse 60% 50% at 70% 50%, rgba(14,165,233,0.02) 0%, transparent 50%)',
+          }}
+        />
+      </div>
+
+      <motion.div
+        className="absolute left-0 right-0 h-px pointer-events-none z-20"
+        style={{
+          background: 'linear-gradient(90deg, transparent 10%, rgba(2,132,199,0.12) 30%, rgba(14,165,233,0.2) 50%, rgba(2,132,199,0.12) 70%, transparent 90%)',
+          boxShadow: '0 0 30px 6px rgba(2,132,199,0.04)',
+        }}
+        initial={{ top: 0, opacity: 0 }}
+        animate={{ top: ['0%', '100%'], opacity: [0, 1, 1, 0] }}
+        transition={{ duration: 3, delay: 0.5, ease: EASE_OUT }}
       />
 
-      {/* Desktop Version */}
-      <div className="hidden lg:flex h-full w-full max-w-7xl mx-auto px-6 lg:px-8 min-h-screen items-center gap-8">
-        <PremiumTextBlock />
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-8 min-h-screen flex items-center">
+        <div className="w-full flex flex-col lg:flex-row items-center gap-12 lg:gap-0">
+          <div className="w-full lg:w-[48%] flex flex-col items-center lg:items-start">
+            <HeroText />
+            <HeroCTA />
+          </div>
 
-        <div className="flex-1 relative flex items-center justify-center h-screen overflow-hidden">
-          <div className="absolute inset-0 flex items-center justify-center" style={{ width: '180%', height: '100%', left: '-40%' }}>
-            <SplineScene
-              scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-              className="w-full h-full"
-            />
+          <div className="w-full lg:w-[52%] flex items-center justify-center relative">
+            <NeuralCanvas mousePos={mousePos} isReady={isReady} />
           </div>
         </div>
       </div>
 
-      {/* Mobile Version */}
-      <div className="lg:hidden w-full h-full">
-        <MobilePremiumHero />
-      </div>
+      <HeroParticles />
+
+      <div
+        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+        style={{ background: 'linear-gradient(to bottom, transparent, white)' }}
+      />
+
+      <motion.div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center z-10"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 4.5, duration: 1 }}
+      >
+        <motion.div
+          className="w-5 h-8 rounded-full border border-gray-200 flex items-start justify-center p-1"
+          animate={{ opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          <motion.div
+            className="w-0.5 h-1.5 rounded-full bg-gray-300"
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        </motion.div>
+      </motion.div>
     </section>
   );
 }
