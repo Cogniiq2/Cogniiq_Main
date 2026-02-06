@@ -4,31 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-const NODES = [
-  { x: 50, y: 18, s: 3.5 },
-  { x: 30, y: 28, s: 3 },
-  { x: 70, y: 28, s: 3 },
-  { x: 15, y: 40, s: 2.5 },
-  { x: 50, y: 42, s: 5 },
-  { x: 85, y: 40, s: 2.5 },
-  { x: 25, y: 55, s: 3 },
-  { x: 75, y: 55, s: 3 },
-  { x: 40, y: 65, s: 2.5 },
-  { x: 60, y: 65, s: 2.5 },
-  { x: 50, y: 75, s: 3 },
-  { x: 8, y: 48, s: 2 },
-  { x: 92, y: 48, s: 2 },
-];
-
-const EDGES: [number, number][] = [
-  [0, 1], [0, 2], [1, 3], [1, 4], [2, 4], [2, 5],
-  [3, 6], [4, 6], [4, 7], [5, 7],
-  [6, 8], [7, 9], [8, 10], [9, 10],
-  [3, 11], [6, 11], [5, 12], [7, 12],
-  [0, 4], [4, 10],
-];
-
-function NeuralNetwork() {
+function RobotIcon() {
   return (
     <div className="relative w-64 h-64 sm:w-72 sm:h-72 flex-shrink-0">
       <svg
@@ -37,93 +13,233 @@ function NeuralNetwork() {
         preserveAspectRatio="xMidYMid meet"
       >
         <defs>
-          <linearGradient id="m-edge-g" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#0369a1" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#0891b2" stopOpacity="0.12" />
+          <linearGradient id="robot-body" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#0369a1" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="#0284c7" stopOpacity="0.6" />
           </linearGradient>
-          <radialGradient id="m-node-glow">
-            <stop offset="0%" stopColor="#0284c7" stopOpacity="0.25" />
+          <radialGradient id="robot-glow">
+            <stop offset="0%" stopColor="#0284c7" stopOpacity="0.4" />
             <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0" />
           </radialGradient>
-          <radialGradient id="m-core-glow">
-            <stop offset="0%" stopColor="#0284c7" stopOpacity="0.12" />
-            <stop offset="40%" stopColor="#0ea5e9" stopOpacity="0.04" />
+          <radialGradient id="core-energy">
+            <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.8" />
+            <stop offset="50%" stopColor="#0284c7" stopOpacity="0.4" />
             <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0" />
           </radialGradient>
+          <linearGradient id="eye-glow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#0284c7" />
+            <stop offset="100%" stopColor="#38bdf8" />
+          </linearGradient>
         </defs>
 
         <motion.circle
-          cx="50" cy="42" r="28"
-          fill="url(#m-core-glow)"
+          cx="50" cy="50" r="35"
+          fill="url(#robot-glow)"
           initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.8, 0.4] }}
-          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
         />
 
-        {EDGES.map(([from, to], i) => (
+        <motion.g
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.2, ease: EASE_OUT }}
+        >
           <motion.line
-            key={`e-${i}`}
-            x1={NODES[from].x}
-            y1={NODES[from].y}
-            x2={NODES[to].x}
-            y2={NODES[to].y}
-            stroke="url(#m-edge-g)"
-            strokeWidth="0.4"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 1 }}
-            transition={{ duration: 1, delay: 0.8 + i * 0.06, ease: EASE_OUT }}
-          />
-        ))}
-
-        {EDGES.slice(0, 12).map(([from, to], i) => (
-          <motion.line
-            key={`pulse-${i}`}
-            x1={NODES[from].x}
-            y1={NODES[from].y}
-            x2={NODES[to].x}
-            y2={NODES[to].y}
-            stroke="#0284c7"
-            strokeWidth="0.8"
+            x1="50" y1="20" x2="50" y2="28"
+            stroke="#0369a1"
+            strokeWidth="1.5"
             strokeLinecap="round"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: [0, 1], opacity: [0, 0.6, 0] }}
-            transition={{
-              duration: 1.2,
-              delay: 3.5 + i * 0.5,
-              repeat: Infinity,
-              repeatDelay: 6,
-              ease: 'easeInOut',
-            }}
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 0.6, delay: 1.4 }}
           />
-        ))}
+          <motion.circle
+            cx="50" cy="18" r="2.5"
+            fill="#0284c7"
+            initial={{ scale: 0 }}
+            animate={{ scale: [1, 1.3, 1] }}
+            transition={{ duration: 2, repeat: Infinity, delay: 2, ease: 'easeInOut' }}
+          />
+          <motion.circle
+            cx="50" cy="18" r="5"
+            fill="none"
+            stroke="#0284c7"
+            strokeWidth="0.5"
+            opacity="0.3"
+            animate={{ scale: [1, 1.8, 1], opacity: [0.3, 0, 0.3] }}
+            transition={{ duration: 2, repeat: Infinity, delay: 2, ease: 'easeOut' }}
+          />
+        </motion.g>
 
-        {NODES.map((node, i) => (
-          <g key={`node-${i}`}>
-            <motion.circle
-              cx={node.x}
-              cy={node.y}
-              r={node.s * 1.8}
-              fill="url(#m-node-glow)"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ opacity: [0.15, 0.45, 0.15], scale: [0.9, 1.2, 0.9] }}
+        <motion.rect
+          x="37" y="30" width="26" height="20" rx="4"
+          fill="url(#robot-body)"
+          stroke="#0369a1"
+          strokeWidth="1"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.6, delay: 1.0, ease: 'backOut' }}
+        />
+
+        <motion.g
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: 1.4 }}
+        >
+          <motion.rect
+            x="41" y="37" width="6" height="4" rx="2"
+            fill="url(#eye-glow)"
+            animate={{ opacity: [1, 0.3, 1] }}
+            transition={{ duration: 3, repeat: Infinity, delay: 2.5, ease: 'easeInOut' }}
+          />
+          <motion.rect
+            x="53" y="37" width="6" height="4" rx="2"
+            fill="url(#eye-glow)"
+            animate={{ opacity: [1, 0.3, 1] }}
+            transition={{ duration: 3, repeat: Infinity, delay: 2.5, ease: 'easeInOut' }}
+          />
+        </motion.g>
+
+        <motion.rect
+          x="40" y="52" width="20" height="24" rx="3"
+          fill="url(#robot-body)"
+          stroke="#0369a1"
+          strokeWidth="1"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.6, delay: 1.1, ease: 'backOut' }}
+        />
+
+        <motion.circle
+          cx="50" cy="62" r="5"
+          fill="url(#core-energy)"
+          initial={{ scale: 0 }}
+          animate={{ scale: [1, 1.15, 1], opacity: [0.8, 1, 0.8] }}
+          transition={{ duration: 2.5, repeat: Infinity, delay: 1.8, ease: 'easeInOut' }}
+        />
+        <motion.circle
+          cx="50" cy="62" r="3"
+          fill="#38bdf8"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.4, delay: 1.6, ease: 'backOut' }}
+        />
+
+        <motion.g
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 1.7 }}
+        >
+          {[0, 1, 2].map((i) => (
+            <motion.line
+              key={`energy-${i}`}
+              x1="45" y1={62 + (i - 1) * 2.5}
+              x2="55" y2={62 + (i - 1) * 2.5}
+              stroke="#38bdf8"
+              strokeWidth="0.5"
+              strokeLinecap="round"
+              opacity="0.4"
+              animate={{ x1: [45, 43], x2: [55, 57], opacity: [0.4, 0, 0.4] }}
               transition={{
-                duration: 3 + i * 0.2,
+                duration: 1.5,
                 repeat: Infinity,
-                delay: 1.2 + i * 0.1,
-                ease: 'easeInOut',
+                delay: 2.5 + i * 0.2,
+                ease: 'easeOut',
               }}
             />
+          ))}
+        </motion.g>
+
+        <motion.g
+          initial={{ opacity: 0, x: -5 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 1.3, ease: EASE_OUT }}
+        >
+          <motion.line
+            x1="39" y1="56" x2="30" y2="58"
+            stroke="#0369a1"
+            strokeWidth="2"
+            strokeLinecap="round"
+            animate={{ x2: [30, 28, 30] }}
+            transition={{ duration: 2.5, repeat: Infinity, delay: 3, ease: 'easeInOut' }}
+          />
+          <motion.circle
+            cx="29" cy="58" r="2.5"
+            fill="#0284c7"
+            animate={{ x: [0, -2, 0] }}
+            transition={{ duration: 2.5, repeat: Infinity, delay: 3, ease: 'easeInOut' }}
+          />
+        </motion.g>
+
+        <motion.g
+          initial={{ opacity: 0, x: 5 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 1.3, ease: EASE_OUT }}
+        >
+          <motion.line
+            x1="61" y1="56" x2="70" y2="58"
+            stroke="#0369a1"
+            strokeWidth="2"
+            strokeLinecap="round"
+            animate={{ x2: [70, 72, 70] }}
+            transition={{ duration: 2.5, repeat: Infinity, delay: 3, ease: 'easeInOut' }}
+          />
+          <motion.circle
+            cx="71" cy="58" r="2.5"
+            fill="#0284c7"
+            animate={{ x: [0, 2, 0] }}
+            transition={{ duration: 2.5, repeat: Infinity, delay: 3, ease: 'easeInOut' }}
+          />
+        </motion.g>
+
+        <motion.g
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 1.4, ease: EASE_OUT }}
+        >
+          <motion.rect
+            x="43" y="77" width="4" height="8" rx="1"
+            fill="#0369a1"
+            animate={{ height: [8, 6, 8] }}
+            transition={{ duration: 2, repeat: Infinity, delay: 3.5, ease: 'easeInOut' }}
+          />
+          <motion.rect
+            x="53" y="77" width="4" height="8" rx="1"
+            fill="#0369a1"
+            animate={{ height: [8, 6, 8] }}
+            transition={{ duration: 2, repeat: Infinity, delay: 3.7, ease: 'easeInOut' }}
+          />
+        </motion.g>
+
+        <motion.g
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0.6, 0] }}
+          transition={{ duration: 1, delay: 2, repeat: Infinity, repeatDelay: 4 }}
+        >
+          {[1, 2, 3].map((i) => (
             <motion.circle
-              cx={node.x}
-              cy={node.y}
-              r={i === 4 ? node.s * 0.9 : node.s * 0.6}
-              fill={i === 4 ? '#0284c7' : '#0369a1'}
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.5, delay: 1 + i * 0.07, ease: 'backOut' }}
+              key={`particle-${i}`}
+              cx="50"
+              cy="62"
+              r="1"
+              fill="#38bdf8"
+              initial={{ opacity: 0 }}
+              animate={{
+                cy: [62, 62 - 15],
+                opacity: [0.8, 0],
+                scale: [1, 0.3],
+              }}
+              transition={{
+                duration: 1.5,
+                delay: 3 + i * 0.3,
+                repeat: Infinity,
+                repeatDelay: 4,
+                ease: 'easeOut',
+              }}
             />
-          </g>
-        ))}
+          ))}
+        </motion.g>
       </svg>
 
       {[
@@ -133,7 +249,7 @@ function NeuralNetwork() {
       ].map((orbit, i) => (
         <motion.div
           key={`orb-${i}`}
-          className="absolute left-1/2 top-[42%] pointer-events-none"
+          className="absolute left-1/2 top-1/2 pointer-events-none"
           style={{ width: 0, height: 0 }}
           initial={{ rotate: i * 120, opacity: 0 }}
           animate={{ rotate: [i * 120, i * 120 + 360], opacity: 1 }}
@@ -163,7 +279,7 @@ function NeuralNetwork() {
             width: size,
             height: size,
             left: '50%',
-            top: '42%',
+            top: '50%',
             marginLeft: -size / 2,
             marginTop: -size / 2,
           }}
@@ -338,7 +454,7 @@ export function MobilePremiumHero() {
         transition={{ duration: 2.5, delay: 0.3, ease: EASE_OUT }}
       />
 
-      <NeuralNetwork />
+      <RobotIcon />
 
       <div className="relative z-10 text-center px-6 mt-2">
         <div className="relative mb-4">
