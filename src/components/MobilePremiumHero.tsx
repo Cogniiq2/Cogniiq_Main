@@ -4,6 +4,49 @@ import { useNavigate } from 'react-router-dom';
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
+const HEAD_WIREFRAME = [
+  'M50 18 L35 28 L30 44 L35 58 L42 62 L50 64 L58 62 L65 58 L70 44 L65 28 Z',
+  'M35 28 L65 28',
+  'M30 44 L70 44',
+  'M35 58 L65 58',
+  'M42 62 L58 62',
+  'M50 18 L50 64',
+  'M35 28 L50 44',
+  'M65 28 L50 44',
+  'M30 44 L50 58',
+  'M70 44 L50 58',
+  'M35 28 L30 44',
+  'M65 28 L70 44',
+  'M50 44 L42 62',
+  'M50 44 L58 62',
+];
+
+const FACE_NODES = [
+  { x: 50, y: 18, s: 1.8 },
+  { x: 35, y: 28, s: 1.4 },
+  { x: 65, y: 28, s: 1.4 },
+  { x: 30, y: 44, s: 1.2 },
+  { x: 50, y: 44, s: 2.2 },
+  { x: 70, y: 44, s: 1.2 },
+  { x: 35, y: 58, s: 1.0 },
+  { x: 65, y: 58, s: 1.0 },
+  { x: 42, y: 62, s: 0.8 },
+  { x: 50, y: 64, s: 1.0 },
+  { x: 58, y: 62, s: 0.8 },
+];
+
+const DATA_STREAMS = [
+  { x1: 15, y1: 35, x2: 28, y2: 40 },
+  { x1: 85, y1: 35, x2: 72, y2: 40 },
+  { x1: 12, y1: 50, x2: 27, y2: 48 },
+  { x1: 88, y1: 50, x2: 73, y2: 48 },
+  { x1: 18, y1: 60, x2: 32, y2: 56 },
+  { x1: 82, y1: 60, x2: 68, y2: 56 },
+  { x1: 42, y1: 70, x2: 46, y2: 65 },
+  { x1: 58, y1: 70, x2: 54, y2: 65 },
+  { x1: 50, y1: 72, x2: 50, y2: 66 },
+];
+
 function RobotIcon() {
   return (
     <div className="relative w-64 h-64 sm:w-72 sm:h-72 flex-shrink-0">
@@ -13,243 +56,297 @@ function RobotIcon() {
         preserveAspectRatio="xMidYMid meet"
       >
         <defs>
-          <linearGradient id="robot-body" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#0369a1" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#0284c7" stopOpacity="0.6" />
-          </linearGradient>
-          <radialGradient id="robot-glow">
-            <stop offset="0%" stopColor="#0284c7" stopOpacity="0.4" />
+          <radialGradient id="ai-ambient">
+            <stop offset="0%" stopColor="#0284c7" stopOpacity="0.12" />
+            <stop offset="50%" stopColor="#0369a1" stopOpacity="0.04" />
             <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0" />
           </radialGradient>
-          <radialGradient id="core-energy">
-            <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.8" />
-            <stop offset="50%" stopColor="#0284c7" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0" />
-          </radialGradient>
-          <linearGradient id="eye-glow" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#0284c7" />
-            <stop offset="100%" stopColor="#38bdf8" />
+          <linearGradient id="wire-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#0369a1" stopOpacity="0.5" />
+            <stop offset="50%" stopColor="#0284c7" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#0369a1" stopOpacity="0.5" />
           </linearGradient>
+          <linearGradient id="visor-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#0284c7" stopOpacity="0" />
+            <stop offset="30%" stopColor="#0284c7" stopOpacity="0.9" />
+            <stop offset="70%" stopColor="#38bdf8" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#0284c7" stopOpacity="0" />
+          </linearGradient>
+          <radialGradient id="node-pulse">
+            <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#0284c7" stopOpacity="0" />
+          </radialGradient>
+          <linearGradient id="scan-line" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#0284c7" stopOpacity="0" />
+            <stop offset="50%" stopColor="#38bdf8" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#0284c7" stopOpacity="0" />
+          </linearGradient>
+          <filter id="glow-sm">
+            <feGaussianBlur stdDeviation="1" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <filter id="glow-lg">
+            <feGaussianBlur stdDeviation="2.5" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <clipPath id="head-clip">
+            <path d="M50 16 L33 27 L28 44 L33 60 L41 64 L50 66 L59 64 L67 60 L72 44 L67 27 Z" />
+          </clipPath>
         </defs>
 
         <motion.circle
-          cx="50" cy="50" r="35"
-          fill="url(#robot-glow)"
+          cx="50" cy="42" r="32"
+          fill="url(#ai-ambient)"
           initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+          animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.8, 0.5] }}
+          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
         />
 
-        <motion.g
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.2, ease: EASE_OUT }}
-        >
+        {HEAD_WIREFRAME.map((d, i) => (
+          <motion.path
+            key={`wire-${i}`}
+            d={d}
+            fill="none"
+            stroke="url(#wire-grad)"
+            strokeWidth={i === 0 ? '0.6' : '0.3'}
+            strokeLinecap="round"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{
+              pathLength: { duration: 0.8, delay: 0.8 + i * 0.06, ease: EASE_OUT },
+              opacity: { duration: 0.3, delay: 0.8 + i * 0.06 },
+            }}
+          />
+        ))}
+
+        {HEAD_WIREFRAME.slice(1).map((d, i) => (
+          <motion.path
+            key={`pulse-wire-${i}`}
+            d={d}
+            fill="none"
+            stroke="#38bdf8"
+            strokeWidth="0.6"
+            strokeLinecap="round"
+            filter="url(#glow-sm)"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: [0, 1], opacity: [0, 0.7, 0] }}
+            transition={{
+              duration: 1.0,
+              delay: 3.5 + i * 0.7,
+              repeat: Infinity,
+              repeatDelay: 8,
+              ease: 'easeInOut',
+            }}
+          />
+        ))}
+
+        {FACE_NODES.map((node, i) => (
+          <g key={`fn-${i}`}>
+            <motion.circle
+              cx={node.x}
+              cy={node.y}
+              r={node.s * 2.5}
+              fill="url(#node-pulse)"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ opacity: [0.1, 0.4, 0.1], scale: [0.8, 1.2, 0.8] }}
+              transition={{
+                duration: 3 + i * 0.3,
+                repeat: Infinity,
+                delay: 1.5 + i * 0.12,
+                ease: 'easeInOut',
+              }}
+            />
+            <motion.circle
+              cx={node.x}
+              cy={node.y}
+              r={node.s}
+              fill={i === 4 ? '#0284c7' : '#0369a1'}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.4, delay: 1.2 + i * 0.08, ease: 'backOut' }}
+            />
+          </g>
+        ))}
+
+        <motion.g filter="url(#glow-lg)">
           <motion.line
-            x1="50" y1="20" x2="50" y2="28"
-            stroke="#0369a1"
+            x1="36" y1="38" x2="47" y2="38"
+            stroke="url(#visor-grad)"
             strokeWidth="1.5"
             strokeLinecap="round"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 0.6, delay: 1.4 }}
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 1.8, ease: EASE_OUT }}
           />
-          <motion.circle
-            cx="50" cy="18" r="2.5"
-            fill="#0284c7"
-            initial={{ scale: 0 }}
-            animate={{ scale: [1, 1.3, 1] }}
-            transition={{ duration: 2, repeat: Infinity, delay: 2, ease: 'easeInOut' }}
+          <motion.line
+            x1="53" y1="38" x2="64" y2="38"
+            stroke="url(#visor-grad)"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 1.9, ease: EASE_OUT }}
           />
+        </motion.g>
+
+        <motion.line
+          x1="36" y1="38" x2="64" y2="38"
+          stroke="#38bdf8"
+          strokeWidth="2"
+          strokeLinecap="round"
+          filter="url(#glow-lg)"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0.8, 0] }}
+          transition={{
+            duration: 0.15,
+            delay: 2.2,
+            repeat: Infinity,
+            repeatDelay: 4,
+            ease: 'easeOut',
+          }}
+        />
+
+        <motion.rect
+          x="28" y="20"
+          width="44" height="2"
+          fill="url(#scan-line)"
+          clipPath="url(#head-clip)"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: [20, 60, 20], opacity: [0, 0.6, 0.6, 0] }}
+          transition={{
+            duration: 3,
+            delay: 2.5,
+            repeat: Infinity,
+            repeatDelay: 5,
+            ease: 'easeInOut',
+          }}
+        />
+
+        {DATA_STREAMS.map((s, i) => (
+          <motion.line
+            key={`ds-${i}`}
+            x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2}
+            stroke="#0369a1"
+            strokeWidth="0.3"
+            strokeLinecap="round"
+            strokeDasharray="1.5 2"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: [0, 1], opacity: [0, 0.4, 0] }}
+            transition={{
+              duration: 1.5,
+              delay: 3 + i * 0.5,
+              repeat: Infinity,
+              repeatDelay: 4,
+              ease: 'easeOut',
+            }}
+          />
+        ))}
+
+        {DATA_STREAMS.map((s, i) => (
           <motion.circle
-            cx="50" cy="18" r="5"
+            key={`dp-${i}`}
+            cx={s.x2} cy={s.y2} r="0.8"
+            fill="#38bdf8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 0.8, 0] }}
+            transition={{
+              duration: 0.8,
+              delay: 4.2 + i * 0.5,
+              repeat: Infinity,
+              repeatDelay: 4.7,
+              ease: 'easeOut',
+            }}
+          />
+        ))}
+
+        {[
+          { cx: 50, cy: 42, r: 18, dur: 20, dir: 1 },
+          { cx: 50, cy: 42, r: 25, dur: 30, dir: -1 },
+        ].map((ring, i) => (
+          <motion.circle
+            key={`hex-ring-${i}`}
+            cx={ring.cx} cy={ring.cy} r={ring.r}
             fill="none"
-            stroke="#0284c7"
-            strokeWidth="0.5"
-            opacity="0.3"
-            animate={{ scale: [1, 1.8, 1], opacity: [0.3, 0, 0.3] }}
-            transition={{ duration: 2, repeat: Infinity, delay: 2, ease: 'easeOut' }}
-          />
-        </motion.g>
-
-        <motion.rect
-          x="37" y="30" width="26" height="20" rx="4"
-          fill="url(#robot-body)"
-          stroke="#0369a1"
-          strokeWidth="1"
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 1.0, ease: 'backOut' }}
-        />
-
-        <motion.g
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 1.4 }}
-        >
-          <motion.rect
-            x="41" y="37" width="6" height="4" rx="2"
-            fill="url(#eye-glow)"
-            animate={{ opacity: [1, 0.3, 1] }}
-            transition={{ duration: 3, repeat: Infinity, delay: 2.5, ease: 'easeInOut' }}
-          />
-          <motion.rect
-            x="53" y="37" width="6" height="4" rx="2"
-            fill="url(#eye-glow)"
-            animate={{ opacity: [1, 0.3, 1] }}
-            transition={{ duration: 3, repeat: Infinity, delay: 2.5, ease: 'easeInOut' }}
-          />
-        </motion.g>
-
-        <motion.rect
-          x="40" y="52" width="20" height="24" rx="3"
-          fill="url(#robot-body)"
-          stroke="#0369a1"
-          strokeWidth="1"
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 1.1, ease: 'backOut' }}
-        />
-
-        <motion.circle
-          cx="50" cy="62" r="5"
-          fill="url(#core-energy)"
-          initial={{ scale: 0 }}
-          animate={{ scale: [1, 1.15, 1], opacity: [0.8, 1, 0.8] }}
-          transition={{ duration: 2.5, repeat: Infinity, delay: 1.8, ease: 'easeInOut' }}
-        />
-        <motion.circle
-          cx="50" cy="62" r="3"
-          fill="#38bdf8"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.4, delay: 1.6, ease: 'backOut' }}
-        />
-
-        <motion.g
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 1.7 }}
-        >
-          {[0, 1, 2].map((i) => (
-            <motion.line
-              key={`energy-${i}`}
-              x1="45" y1={62 + (i - 1) * 2.5}
-              x2="55" y2={62 + (i - 1) * 2.5}
-              stroke="#38bdf8"
-              strokeWidth="0.5"
-              strokeLinecap="round"
-              opacity="0.4"
-              animate={{ x1: [45, 43], x2: [55, 57], opacity: [0.4, 0, 0.4] }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                delay: 2.5 + i * 0.2,
-                ease: 'easeOut',
-              }}
-            />
-          ))}
-        </motion.g>
-
-        <motion.g
-          initial={{ opacity: 0, x: -5 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 1.3, ease: EASE_OUT }}
-        >
-          <motion.line
-            x1="39" y1="56" x2="30" y2="58"
             stroke="#0369a1"
-            strokeWidth="2"
-            strokeLinecap="round"
-            animate={{ x2: [30, 28, 30] }}
-            transition={{ duration: 2.5, repeat: Infinity, delay: 3, ease: 'easeInOut' }}
+            strokeWidth="0.2"
+            strokeDasharray="2 4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0.1, 0.25, 0.1] }}
+            transition={{ duration: 4, repeat: Infinity, delay: 2 + i * 0.5, ease: 'easeInOut' }}
+            style={{
+              transformOrigin: `${ring.cx}px ${ring.cy}px`,
+            }}
           />
-          <motion.circle
-            cx="29" cy="58" r="2.5"
-            fill="#0284c7"
-            animate={{ x: [0, -2, 0] }}
-            transition={{ duration: 2.5, repeat: Infinity, delay: 3, ease: 'easeInOut' }}
-          />
-        </motion.g>
+        ))}
 
-        <motion.g
-          initial={{ opacity: 0, x: 5 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 1.3, ease: EASE_OUT }}
-        >
-          <motion.line
-            x1="61" y1="56" x2="70" y2="58"
-            stroke="#0369a1"
-            strokeWidth="2"
-            strokeLinecap="round"
-            animate={{ x2: [70, 72, 70] }}
-            transition={{ duration: 2.5, repeat: Infinity, delay: 3, ease: 'easeInOut' }}
-          />
-          <motion.circle
-            cx="71" cy="58" r="2.5"
-            fill="#0284c7"
-            animate={{ x: [0, 2, 0] }}
-            transition={{ duration: 2.5, repeat: Infinity, delay: 3, ease: 'easeInOut' }}
-          />
-        </motion.g>
-
-        <motion.g
-          initial={{ opacity: 0, y: 5 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 1.4, ease: EASE_OUT }}
-        >
-          <motion.rect
-            x="43" y="77" width="4" height="8" rx="1"
-            fill="#0369a1"
-            animate={{ height: [8, 6, 8] }}
-            transition={{ duration: 2, repeat: Infinity, delay: 3.5, ease: 'easeInOut' }}
-          />
-          <motion.rect
-            x="53" y="77" width="4" height="8" rx="1"
-            fill="#0369a1"
-            animate={{ height: [8, 6, 8] }}
-            transition={{ duration: 2, repeat: Infinity, delay: 3.7, ease: 'easeInOut' }}
-          />
-        </motion.g>
-
-        <motion.g
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 0.6, 0] }}
-          transition={{ duration: 1, delay: 2, repeat: Infinity, repeatDelay: 4 }}
-        >
-          {[1, 2, 3].map((i) => (
+        {[0, 60, 120, 180, 240, 300].map((angle, i) => {
+          const rad = (angle * Math.PI) / 180;
+          const r = 22;
+          const cx = 50 + Math.cos(rad) * r;
+          const cy = 42 + Math.sin(rad) * r;
+          return (
             <motion.circle
-              key={`particle-${i}`}
-              cx="50"
-              cy="62"
-              r="1"
-              fill="#38bdf8"
+              key={`orbit-node-${i}`}
+              cx={cx} cy={cy} r="0.6"
+              fill="#0284c7"
               initial={{ opacity: 0 }}
-              animate={{
-                cy: [62, 62 - 15],
-                opacity: [0.8, 0],
-                scale: [1, 0.3],
-              }}
+              animate={{ opacity: [0.2, 0.6, 0.2] }}
               transition={{
-                duration: 1.5,
-                delay: 3 + i * 0.3,
+                duration: 2,
                 repeat: Infinity,
-                repeatDelay: 4,
-                ease: 'easeOut',
+                delay: 2.5 + i * 0.3,
+                ease: 'easeInOut',
               }}
             />
-          ))}
+          );
+        })}
+
+        <motion.g
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2.5, duration: 1 }}
+        >
+          {Array.from({ length: 8 }).map((_, i) => {
+            const angle = (i * 45 * Math.PI) / 180;
+            const innerR = 30;
+            const outerR = 38;
+            return (
+              <motion.line
+                key={`ray-${i}`}
+                x1={50 + Math.cos(angle) * innerR}
+                y1={42 + Math.sin(angle) * innerR}
+                x2={50 + Math.cos(angle) * outerR}
+                y2={42 + Math.sin(angle) * outerR}
+                stroke="#0369a1"
+                strokeWidth="0.15"
+                strokeLinecap="round"
+                animate={{ opacity: [0.05, 0.2, 0.05] }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  delay: 3 + i * 0.2,
+                  ease: 'easeInOut',
+                }}
+              />
+            );
+          })}
         </motion.g>
       </svg>
 
       {[
-        { r: 50, dur: 12, s: 3 },
-        { r: 72, dur: 18, s: 2.5 },
-        { r: 95, dur: 25, s: 2 },
+        { r: 52, dur: 14, s: 2.5 },
+        { r: 74, dur: 20, s: 2 },
+        { r: 100, dur: 28, s: 1.5 },
       ].map((orbit, i) => (
         <motion.div
           key={`orb-${i}`}
-          className="absolute left-1/2 top-1/2 pointer-events-none"
+          className="absolute left-1/2 top-[45%] pointer-events-none"
           style={{ width: 0, height: 0 }}
           initial={{ rotate: i * 120, opacity: 0 }}
           animate={{ rotate: [i * 120, i * 120 + 360], opacity: 1 }}
@@ -259,34 +356,36 @@ function RobotIcon() {
           }}
         >
           <div
-            className="absolute rounded-full bg-sky-600"
+            className="absolute rounded-full"
             style={{
               width: orbit.s,
               height: orbit.s,
               left: -orbit.s / 2,
               top: -orbit.r,
-              boxShadow: `0 0 ${orbit.s * 3}px ${orbit.s}px rgba(2,132,199,0.35)`,
+              background: '#0284c7',
+              boxShadow: `0 0 ${orbit.s * 4}px ${orbit.s * 1.5}px rgba(2,132,199,0.3)`,
             }}
           />
         </motion.div>
       ))}
 
-      {[55, 80, 110, 140].map((size, i) => (
+      {[60, 90, 125, 160].map((size, i) => (
         <motion.div
           key={`ring-${i}`}
-          className="absolute rounded-full border border-sky-600/8"
+          className="absolute rounded-full"
           style={{
             width: size,
             height: size,
             left: '50%',
-            top: '50%',
+            top: '45%',
             marginLeft: -size / 2,
             marginTop: -size / 2,
+            border: '1px solid rgba(3,105,161,0.08)',
           }}
           initial={{ scale: 0, opacity: 0 }}
           animate={{
-            scale: [1, 1.03, 1],
-            opacity: [0.12 - i * 0.02, 0.25 - i * 0.04, 0.12 - i * 0.02],
+            scale: [1, 1.02, 1],
+            opacity: [0.1 - i * 0.015, 0.2 - i * 0.03, 0.1 - i * 0.015],
           }}
           transition={{
             duration: 4,
