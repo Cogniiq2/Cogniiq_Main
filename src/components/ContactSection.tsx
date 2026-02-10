@@ -39,7 +39,7 @@ export function ContactSection() {
       preferredTime: (document.getElementById("preferred-time") as HTMLInputElement).value,
     };
 
-    await fetch("https://hook.eu2.make.com/g7kngisz3tnvrju4q3qnidoi8sqxb65m", {
+    await fetch("https://n8n.cogniiq.co/webhook/contact", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
