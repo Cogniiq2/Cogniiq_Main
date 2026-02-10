@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { NeuralCanvas } from './hero/NeuralCanvas';
 import { HeroText } from './hero/HeroText';
 import { HeroCTA } from './hero/HeroCTA';
 import { HeroParticles } from './hero/HeroParticles';
@@ -26,6 +27,12 @@ function useIsDesktop() {
 function MobileHero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsReady(true), 200);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (!containerRef.current) return;
@@ -71,7 +78,10 @@ function MobileHero() {
       />
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6 min-h-screen flex items-center">
-        <div className="w-full flex flex-col items-center">
+        <div className="w-full flex flex-col items-center gap-12">
+          <div className="w-full max-w-[320px]">
+            <NeuralCanvas mousePos={mousePos} isReady={isReady} />
+          </div>
           <div className="flex flex-col items-center">
             <HeroText />
             <HeroCTA />
