@@ -39,7 +39,7 @@ export function ContactSection() {
       preferredTime: (document.getElementById("preferred-time") as HTMLInputElement).value,
     };
 
-    await fetch("https://n8n.cogniiq.co/webhook/contact", {
+    await fetch("https://n8n.cogniiq.co/webhook/contacts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
