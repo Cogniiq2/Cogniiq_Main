@@ -12,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
-import { Checkbox } from './ui/checkbox';
 import { CheckCircle2, Sparkles, Zap, Target, ArrowRight, Mail, Building2, Globe, Calendar } from 'lucide-react';
 import { PremiumCalendar } from './PremiumCalendar';
 
@@ -383,10 +382,8 @@ export function ContactSection() {
                       const isChecked = interests.includes(option.value);
 
                       return (
-                        <motion.div
+                        <div
                           key={option.value}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
                           className={`
                             relative overflow-hidden flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all duration-300 border-2
                             ${isChecked
@@ -396,32 +393,35 @@ export function ContactSection() {
                           `}
                           onClick={(e) => {
                             e.preventDefault();
+                            e.stopPropagation();
                             toggleInterest(option.value);
                           }}
                         >
-                          <motion.div
-                            initial={false}
-                            animate={{
-                              opacity: isChecked ? 1 : 0,
-                            }}
-                            transition={{ duration: 0.2 }}
-                            className={`absolute inset-0 bg-gradient-to-br ${option.color}`}
-                          />
-
                           <div className="relative z-10 flex items-center gap-3 w-full">
-                            <Checkbox
-                              checked={isChecked}
-                              onCheckedChange={(checked) => {
-                                toggleInterest(option.value);
-                              }}
+                            <div
                               className={`
-                                border-2 transition-all duration-300 pointer-events-none
+                                h-4 w-4 shrink-0 rounded-sm border-2 transition-all duration-300 flex items-center justify-center
                                 ${isChecked
-                                  ? 'border-white bg-white data-[state=checked]:bg-white data-[state=checked]:text-sky-600'
-                                  : 'border-gray-300 bg-white data-[state=checked]:bg-gradient-to-br data-[state=checked]:from-sky-500 data-[state=checked]:to-violet-500'
+                                  ? 'border-white bg-white'
+                                  : 'border-gray-300 bg-white'
                                 }
                               `}
-                            />
+                            >
+                              {isChecked && (
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="3"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="w-3 h-3 text-sky-600"
+                                >
+                                  <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                              )}
+                            </div>
                             <div className="flex items-center gap-2 flex-1">
                               <Icon className={`w-4 h-4 ${isChecked ? 'text-white' : 'text-gray-600'}`} />
                               <span className={`text-sm font-medium ${isChecked ? 'text-white' : 'text-gray-700'}`}>
@@ -429,7 +429,7 @@ export function ContactSection() {
                               </span>
                             </div>
                           </div>
-                        </motion.div>
+                        </div>
                       );
                     })}
                   </div>
