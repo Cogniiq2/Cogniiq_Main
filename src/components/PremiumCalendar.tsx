@@ -83,14 +83,14 @@ export function PremiumCalendar({ onSelect, selectedDateTime }: PremiumCalendarP
   };
 
   return (
-    <div className="space-y-6">
-      <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 shadow-lg">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-lg">
         <div className="absolute inset-0 bg-gradient-to-br from-amber-50/30 via-transparent to-slate-50/30" />
 
         <div className="relative">
-          <div className="mb-6 flex items-center justify-between">
+          <div className="mb-4 sm:mb-6 flex items-center justify-between">
             <motion.h3
-              className="text-2xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 bg-clip-text text-transparent"
+              className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 bg-clip-text text-transparent"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
@@ -119,7 +119,7 @@ export function PremiumCalendar({ onSelect, selectedDateTime }: PremiumCalendarP
             </div>
           </div>
 
-          <div className="mb-3 grid grid-cols-7 gap-2">
+          <div className="mb-2 sm:mb-3 grid grid-cols-7 gap-1 sm:gap-2">
             {['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'].map((day) => (
               <div
                 key={day}
@@ -137,7 +137,7 @@ export function PremiumCalendar({ onSelect, selectedDateTime }: PremiumCalendarP
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="grid grid-cols-7 gap-2"
+              className="grid grid-cols-7 gap-1 sm:gap-2"
             >
               {days.map((date, index) => {
                 if (!date) {
@@ -190,7 +190,7 @@ export function PremiumCalendar({ onSelect, selectedDateTime }: PremiumCalendarP
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 shadow-lg"
+          className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-lg"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-slate-50/50 via-transparent to-amber-50/30" />
 
@@ -207,7 +207,7 @@ export function PremiumCalendar({ onSelect, selectedDateTime }: PremiumCalendarP
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {timeSlots.map((time) => {
                 const isSelected = selectedTime === time;
                 return (

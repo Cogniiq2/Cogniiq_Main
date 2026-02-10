@@ -104,12 +104,12 @@ export function ContactSection() {
         <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-slate-50" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-200/20 via-transparent to-transparent" />
 
-        <div className="relative max-w-4xl mx-auto px-6 lg:px-8">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.6, type: 'spring', stiffness: 100 }}
-            className="relative overflow-hidden bg-white rounded-3xl p-12 lg:p-16 shadow-2xl border border-slate-200/80"
+            className="relative overflow-hidden bg-white rounded-3xl p-8 sm:p-12 lg:p-16 shadow-2xl border border-slate-200/80"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-amber-50/50 via-transparent to-slate-50/50" />
             <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-slate-300 to-transparent" />
@@ -182,7 +182,7 @@ export function ContactSection() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-200/20 via-transparent to-transparent" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-amber-100/30 via-transparent to-transparent" />
 
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -213,12 +213,12 @@ export function ContactSection() {
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-5 gap-12 items-start">
+        <div className="grid lg:grid-cols-5 gap-6 lg:gap-12 items-start">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8 }}
-            className="lg:col-span-2 space-y-8"
+            className="lg:col-span-2 space-y-6 lg:space-y-8"
           >
             <div className="space-y-6">
               {benefits.map((benefit, index) => {
@@ -232,7 +232,7 @@ export function ContactSection() {
                       duration: 0.6,
                       delay: 0.2 + index * 0.1,
                     }}
-                    className="group relative overflow-hidden bg-white rounded-2xl p-6 border border-slate-200/80 shadow-lg hover:shadow-xl hover:border-slate-300 transition-all duration-500"
+                    className="group relative overflow-hidden bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-lg hover:shadow-xl hover:border-slate-300 transition-all duration-500"
                   >
                     <div className={`absolute inset-0 bg-gradient-to-br ${benefit.accent} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
 
@@ -258,7 +258,7 @@ export function ContactSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="relative overflow-hidden bg-gradient-to-br from-slate-700 via-slate-800 to-slate-700 rounded-2xl p-8 border border-slate-600/50 shadow-2xl"
+              className="relative overflow-hidden bg-gradient-to-br from-slate-700 via-slate-800 to-slate-700 rounded-2xl p-6 sm:p-8 border border-slate-600/50 shadow-2xl"
             >
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-400/20 via-transparent to-transparent" />
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-400/10 via-transparent to-transparent" />
@@ -288,7 +288,7 @@ export function ContactSection() {
           >
             <form
               onSubmit={handleSubmit}
-              className="relative overflow-hidden bg-white rounded-3xl p-8 lg:p-10 border border-slate-200/80 shadow-2xl"
+              className="relative overflow-hidden bg-white rounded-3xl p-6 lg:p-10 border border-slate-200/80 shadow-2xl"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-amber-50/30 via-transparent to-slate-50/30" />
               <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-slate-300 to-transparent" />
