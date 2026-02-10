@@ -394,23 +394,28 @@ export function ContactSection() {
                               : 'border-gray-200 bg-gray-50/50 hover:border-gray-300 hover:bg-white hover:shadow-md'
                             }
                           `}
-                          onClick={() => toggleInterest(option.value)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            toggleInterest(option.value);
+                          }}
                         >
-                          {isChecked && (
-                            <motion.div
-                              layoutId={`interest-${option.value}`}
-                              className={`absolute inset-0 bg-gradient-to-br ${option.color}`}
-                              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                            />
-                          )}
+                          <motion.div
+                            initial={false}
+                            animate={{
+                              opacity: isChecked ? 1 : 0,
+                            }}
+                            transition={{ duration: 0.2 }}
+                            className={`absolute inset-0 bg-gradient-to-br ${option.color}`}
+                          />
 
                           <div className="relative z-10 flex items-center gap-3 w-full">
                             <Checkbox
-                              id={option.value}
                               checked={isChecked}
-                              onCheckedChange={() => toggleInterest(option.value)}
+                              onCheckedChange={(checked) => {
+                                toggleInterest(option.value);
+                              }}
                               className={`
-                                border-2 transition-all duration-300
+                                border-2 transition-all duration-300 pointer-events-none
                                 ${isChecked
                                   ? 'border-white bg-white data-[state=checked]:bg-white data-[state=checked]:text-sky-600'
                                   : 'border-gray-300 bg-white data-[state=checked]:bg-gradient-to-br data-[state=checked]:from-sky-500 data-[state=checked]:to-violet-500'
@@ -419,12 +424,9 @@ export function ContactSection() {
                             />
                             <div className="flex items-center gap-2 flex-1">
                               <Icon className={`w-4 h-4 ${isChecked ? 'text-white' : 'text-gray-600'}`} />
-                              <label
-                                htmlFor={option.value}
-                                className={`text-sm font-medium cursor-pointer ${isChecked ? 'text-white' : 'text-gray-700'}`}
-                              >
+                              <span className={`text-sm font-medium ${isChecked ? 'text-white' : 'text-gray-700'}`}>
                                 {option.value}
-                              </label>
+                              </span>
                             </div>
                           </div>
                         </motion.div>
