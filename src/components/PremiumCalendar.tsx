@@ -84,13 +84,13 @@ export function PremiumCalendar({ onSelect, selectedDateTime }: PremiumCalendarP
 
   return (
     <div className="space-y-6">
-      <div className="relative overflow-hidden rounded-2xl border border-gray-200/50 bg-gradient-to-br from-white via-gray-50/30 to-white p-6 shadow-lg backdrop-blur-sm">
-        <div className="absolute inset-0 bg-gradient-to-br from-sky-500/[0.02] via-transparent to-violet-500/[0.02]" />
+      <div className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/30 backdrop-blur-xl p-6 shadow-2xl">
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/[0.03] via-transparent to-blue-500/[0.03]" />
 
         <div className="relative">
           <div className="mb-6 flex items-center justify-between">
             <motion.h3
-              className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent"
+              className="text-2xl font-bold bg-gradient-to-r from-slate-100 via-slate-200 to-slate-100 bg-clip-text text-transparent"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
@@ -103,7 +103,7 @@ export function PremiumCalendar({ onSelect, selectedDateTime }: PremiumCalendarP
                 onClick={handlePrevMonth}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm border border-gray-200/50 text-gray-600 transition-all hover:bg-gray-50 hover:shadow-md hover:border-gray-300"
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800/50 backdrop-blur-sm shadow-sm border border-slate-700/50 text-slate-400 transition-all hover:bg-slate-700/50 hover:shadow-md hover:border-slate-600 hover:text-amber-400"
               >
                 <ChevronLeft size={20} />
               </motion.button>
@@ -112,7 +112,7 @@ export function PremiumCalendar({ onSelect, selectedDateTime }: PremiumCalendarP
                 onClick={handleNextMonth}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm border border-gray-200/50 text-gray-600 transition-all hover:bg-gray-50 hover:shadow-md hover:border-gray-300"
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800/50 backdrop-blur-sm shadow-sm border border-slate-700/50 text-slate-400 transition-all hover:bg-slate-700/50 hover:shadow-md hover:border-slate-600 hover:text-amber-400"
               >
                 <ChevronRight size={20} />
               </motion.button>
@@ -123,7 +123,7 @@ export function PremiumCalendar({ onSelect, selectedDateTime }: PremiumCalendarP
             {['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'].map((day) => (
               <div
                 key={day}
-                className="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                className="text-center text-xs font-semibold text-slate-500 uppercase tracking-wider"
               >
                 {day}
               </div>
@@ -159,20 +159,20 @@ export function PremiumCalendar({ onSelect, selectedDateTime }: PremiumCalendarP
                     className={`
                       aspect-square rounded-xl text-sm font-medium transition-all relative
                       ${disabled
-                        ? 'text-gray-300 cursor-not-allowed'
-                        : 'text-gray-700 hover:bg-white hover:shadow-md cursor-pointer'
+                        ? 'text-slate-700 cursor-not-allowed'
+                        : 'text-slate-300 hover:bg-slate-700/50 hover:shadow-md cursor-pointer hover:text-slate-100'
                       }
-                      ${today && !selected ? 'ring-2 ring-sky-500/30 bg-sky-50/50' : ''}
+                      ${today && !selected ? 'ring-2 ring-amber-500/30 bg-amber-900/20' : ''}
                       ${selected
-                        ? 'bg-gradient-to-br from-sky-500 to-violet-500 text-white shadow-lg shadow-sky-500/30'
-                        : 'bg-white/60 border border-gray-200/50'
+                        ? 'bg-gradient-to-br from-slate-700 to-slate-800 text-amber-300 shadow-lg shadow-amber-900/30 border-amber-500/50'
+                        : 'bg-slate-800/30 border border-slate-700/50'
                       }
                     `}
                   >
                     {selected && (
                       <motion.div
                         layoutId="selected-date"
-                        className="absolute inset-0 rounded-xl bg-gradient-to-br from-sky-500 to-violet-500"
+                        className="absolute inset-0 rounded-xl bg-gradient-to-br from-slate-700 to-slate-800 border border-amber-500/50"
                         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                       />
                     )}
@@ -190,18 +190,18 @@ export function PremiumCalendar({ onSelect, selectedDateTime }: PremiumCalendarP
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="relative overflow-hidden rounded-2xl border border-gray-200/50 bg-gradient-to-br from-white via-gray-50/30 to-white p-6 shadow-lg backdrop-blur-sm"
+          className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/30 backdrop-blur-xl p-6 shadow-2xl"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-violet-500/[0.02] via-transparent to-sky-500/[0.02]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/[0.03] via-transparent to-amber-500/[0.03]" />
 
           <div className="relative">
             <div className="mb-4 flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500/10 to-violet-500/10">
-                <Clock size={20} className="text-sky-600" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-600/20 border border-amber-500/30">
+                <Clock size={20} className="text-amber-400" />
               </div>
               <div>
-                <h4 className="text-sm font-medium text-gray-500">Wunschzeit auswählen</h4>
-                <p className="text-xs text-gray-400">
+                <h4 className="text-sm font-medium text-slate-300">Wunschzeit auswählen</h4>
+                <p className="text-xs text-slate-500">
                   {selectedDate.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}
                 </p>
               </div>
@@ -220,15 +220,15 @@ export function PremiumCalendar({ onSelect, selectedDateTime }: PremiumCalendarP
                     className={`
                       relative overflow-hidden rounded-xl px-4 py-3 text-sm font-medium transition-all
                       ${isSelected
-                        ? 'bg-gradient-to-br from-sky-500 to-violet-500 text-white shadow-lg shadow-sky-500/20'
-                        : 'bg-white border border-gray-200/50 text-gray-700 hover:bg-gray-50 hover:shadow-md hover:border-gray-300'
+                        ? 'bg-gradient-to-br from-slate-700 to-slate-800 text-amber-300 shadow-lg shadow-amber-900/20 border border-amber-500/50'
+                        : 'bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 text-slate-300 hover:bg-slate-700/50 hover:shadow-md hover:border-slate-600 hover:text-slate-100'
                       }
                     `}
                   >
                     {isSelected && (
                       <motion.div
                         layoutId="selected-time"
-                        className="absolute inset-0 bg-gradient-to-br from-sky-500 to-violet-500"
+                        className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-800 border border-amber-500/50"
                         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                       />
                     )}
@@ -242,10 +242,10 @@ export function PremiumCalendar({ onSelect, selectedDateTime }: PremiumCalendarP
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-4 rounded-xl bg-gradient-to-r from-sky-500/10 via-violet-500/10 to-sky-500/10 p-4 border border-sky-200/50"
+                className="mt-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-600/10 to-amber-500/10 p-4 border border-amber-900/30"
               >
-                <p className="text-sm font-medium text-gray-700 text-center">
-                  Ausgewählt: <span className="text-sky-600">{selectedDate.toLocaleDateString('de-DE')} um {selectedTime} Uhr</span>
+                <p className="text-sm font-medium text-slate-300 text-center">
+                  Ausgewählt: <span className="text-amber-400">{selectedDate.toLocaleDateString('de-DE')} um {selectedTime} Uhr</span>
                 </p>
               </motion.div>
             )}
