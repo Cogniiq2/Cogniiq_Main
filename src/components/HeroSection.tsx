@@ -1,11 +1,5 @@
-import { motion } from 'framer-motion';
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { HeroText } from './hero/HeroText';
-import { HeroCTA } from './hero/HeroCTA';
-import { HeroParticles } from './hero/HeroParticles';
+import { useEffect, useState } from 'react';
 import { DesktopHero } from './hero/DesktopHero';
-
-const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 function useIsDesktop() {
   const [isDesktop, setIsDesktop] = useState(() =>
@@ -24,86 +18,105 @@ function useIsDesktop() {
 }
 
 function MobileHero() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
-
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    setMousePos({
-      x: (e.clientX - rect.left) / rect.width,
-      y: (e.clientY - rect.top) / rect.height,
-    });
-  }, []);
-
   return (
     <section
-      ref={containerRef}
-      onMouseMove={handleMouseMove}
-      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-white pt-20"
+      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-white pt-24 pb-16"
       aria-label="Hauptbereich"
     >
+      {/* Minimal subtle background */}
       <div className="absolute inset-0 pointer-events-none">
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 opacity-30"
           style={{
-            background: `radial-gradient(ellipse 80% 60% at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(2,132,199,0.03) 0%, transparent 60%)`,
-            transition: 'background 0.8s ease-out',
-          }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'radial-gradient(ellipse 60% 50% at 70% 50%, rgba(14,165,233,0.02) 0%, transparent 50%)',
+            background: 'radial-gradient(circle at 50% 0%, rgba(250,250,250,1) 0%, rgba(255,255,255,1) 60%)',
           }}
         />
       </div>
 
-      <motion.div
-        className="absolute left-0 right-0 h-px pointer-events-none z-20"
-        style={{
-          background: 'linear-gradient(90deg, transparent 10%, rgba(2,132,199,0.12) 30%, rgba(14,165,233,0.2) 50%, rgba(2,132,199,0.12) 70%, transparent 90%)',
-          boxShadow: '0 0 30px 6px rgba(2,132,199,0.04)',
-        }}
-        initial={{ top: 0, opacity: 0 }}
-        animate={{ top: ['0%', '100%'], opacity: [0, 1, 1, 0] }}
-        transition={{ duration: 3, delay: 0.5, ease: EASE_OUT }}
-      />
+      {/* Minimal geometric visual anchor - subtle signal lines */}
+      <div className="absolute top-32 left-0 right-0 pointer-events-none opacity-20">
+        <svg
+          className="mx-auto"
+          width="280"
+          height="120"
+          viewBox="0 0 280 120"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          {/* Minimal abstract lines representing AI/signals */}
+          <line x1="40" y1="60" x2="120" y2="60" stroke="currentColor" strokeWidth="0.5" className="text-gray-300" />
+          <line x1="160" y1="60" x2="240" y2="60" stroke="currentColor" strokeWidth="0.5" className="text-gray-300" />
+          <circle cx="140" cy="60" r="3" fill="currentColor" className="text-gray-400" />
+          <line x1="140" y1="40" x2="140" y2="56" stroke="currentColor" strokeWidth="0.5" className="text-gray-300" />
+          <line x1="140" y1="64" x2="140" y2="80" stroke="currentColor" strokeWidth="0.5" className="text-gray-300" />
+        </svg>
+      </div>
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 min-h-screen flex items-center">
-        <div className="w-full flex flex-col items-center">
-          <div className="flex flex-col items-center">
-            <HeroText />
-            <HeroCTA />
+      {/* Main content */}
+      <div className="relative z-10 w-full max-w-[480px] mx-auto px-8">
+        <div className="flex flex-col items-center text-center">
+          {/* Compact badge */}
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 bg-white mb-10">
+            <div className="w-1.5 h-1.5 rounded-full bg-gray-900" />
+            <span className="text-[10px] uppercase tracking-[0.15em] text-gray-600 font-medium">
+              AI Solutions · Webdesign
+            </span>
+          </div>
+
+          {/* Headline - premium typography */}
+          <h1 className="mb-6">
+            <span className="block text-[56px] leading-[0.95] font-bold tracking-[-0.03em] text-gray-900 mb-3">
+              CogniIQ
+            </span>
+            <span className="block text-[32px] leading-[1.1] font-light tracking-[-0.01em] text-gray-500">
+              The Future
+            </span>
+            <span className="block text-[32px] leading-[1.1] font-light tracking-[-0.01em] text-gray-500">
+              is here.
+            </span>
+          </h1>
+
+          {/* Subheadline */}
+          <p className="text-[15px] leading-relaxed text-gray-600 font-light mb-12 max-w-[340px]">
+            KI-Automatisierung und hochkonvertierende Websites aus Bayreuth, Bayern.
+          </p>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col gap-3 w-full max-w-[340px] mb-8">
+            {/* Primary CTA - dominant */}
+            <button
+              onClick={() => window.location.href = '/kontakt'}
+              className="w-full px-8 py-4 rounded-full bg-gray-900 text-white text-[14px] font-medium tracking-wide transition-all hover:bg-gray-800 active:scale-[0.98]"
+            >
+              Erstberatung vereinbaren
+            </button>
+
+            {/* Secondary CTA - subtle */}
+            <button
+              onClick={() => window.location.href = '/leistungen'}
+              className="w-full px-8 py-4 rounded-full border border-gray-200 text-gray-600 text-[13px] font-medium tracking-wide transition-all hover:border-gray-300 hover:text-gray-900 active:scale-[0.98]"
+            >
+              Leistungen entdecken
+            </button>
+          </div>
+
+          {/* Compact trust line */}
+          <div className="flex items-center gap-3 text-[11px] text-gray-400 font-medium tracking-wide">
+            <span>Bayreuth</span>
+            <div className="w-1 h-1 rounded-full bg-gray-300" />
+            <span>Schnell</span>
+            <div className="w-1 h-1 rounded-full bg-gray-300" />
+            <span>Messbar</span>
           </div>
         </div>
       </div>
 
-      <HeroParticles />
-
-      <div
-        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-        style={{ background: 'linear-gradient(to bottom, transparent, white)' }}
-      />
-
-      <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center z-10"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 4.5, duration: 1 }}
-      >
-        <motion.div
-          className="w-5 h-8 rounded-full border border-gray-200 flex items-start justify-center p-1"
-          animate={{ opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <motion.div
-            className="w-0.5 h-1.5 rounded-full bg-gray-300"
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        </motion.div>
-      </motion.div>
+      {/* Minimal scroll indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center">
+        <div className="w-5 h-8 rounded-full border border-gray-200 flex items-start justify-center p-1">
+          <div className="w-0.5 h-1.5 rounded-full bg-gray-300" />
+        </div>
+      </div>
     </section>
   );
 }
