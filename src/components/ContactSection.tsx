@@ -12,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
-import { Checkbox } from './ui/checkbox';
 import { CheckCircle2, Sparkles, Zap, Target, ArrowRight, Mail, Building2, Globe, Calendar } from 'lucide-react';
 import { PremiumCalendar } from './PremiumCalendar';
 
@@ -377,52 +376,63 @@ export function ContactSection() {
                     <div className="w-1.5 h-1.5 rounded-full bg-pink-500" />
                     Ihre Interessen
                   </Label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {interestOptions.map((option) => {
                       const Icon = option.icon;
                       const isChecked = interests.includes(option.value);
 
                       return (
-                        <div
+                        <button
                           key={option.value}
+                          type="button"
+                          onClick={() => toggleInterest(option.value)}
                           className={`
-                            relative overflow-hidden flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all duration-300 border-2
+                            group relative overflow-hidden flex items-center gap-4 p-5 rounded-2xl
+                            transition-all duration-500 border-2 text-left
                             ${isChecked
-                              ? `border-transparent bg-gradient-to-br ${option.color} shadow-lg`
-                              : 'border-gray-200 bg-gray-50/50 hover:border-gray-300 hover:bg-white hover:shadow-md'
+                              ? `border-transparent bg-gradient-to-br ${option.color} shadow-xl scale-[1.02]`
+                              : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-lg hover:scale-[1.01]'
                             }
                           `}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            toggleInterest(option.value);
-                          }}
                         >
-                          <div className="relative z-10 flex items-center gap-3 w-full">
-                            <Checkbox
-                              id={option.value}
-                              checked={isChecked}
-                              onCheckedChange={(checked) => {
-                                toggleInterest(option.value);
-                              }}
-                              onClick={(e) => e.stopPropagation()}
-                              className={`
-                                border-2 transition-all duration-300
-                                ${isChecked
-                                  ? 'border-white bg-white data-[state=checked]:bg-white data-[state=checked]:text-sky-600'
-                                  : 'border-gray-300 bg-white data-[state=checked]:bg-gradient-to-br data-[state=checked]:from-sky-500 data-[state=checked]:to-violet-500'
-                                }
-                              `}
-                            />
-                            <div className="flex items-center gap-2 flex-1">
-                              <Icon className={`w-4 h-4 ${isChecked ? 'text-white' : 'text-gray-600'}`} />
-                              <span
-                                className={`text-sm font-medium ${isChecked ? 'text-white' : 'text-gray-700'}`}
+                          <div
+                            className={`
+                              flex-shrink-0 w-6 h-6 rounded-lg border-2 flex items-center justify-center
+                              transition-all duration-300
+                              ${isChecked
+                                ? 'bg-white border-white'
+                                : 'bg-gray-50 border-gray-300 group-hover:border-gray-400'
+                              }
+                            `}
+                          >
+                            {isChecked && (
+                              <svg
+                                className="w-4 h-4 text-sky-600"
+                                fill="none"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="3"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
                               >
-                                {option.value}
-                              </span>
-                            </div>
+                                <path d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
                           </div>
-                        </div>
+
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <Icon className={`
+                              flex-shrink-0 w-5 h-5 transition-all duration-300
+                              ${isChecked ? 'text-white' : 'text-gray-600 group-hover:text-gray-800'}
+                            `} />
+                            <span className={`
+                              text-sm font-semibold transition-colors duration-300
+                              ${isChecked ? 'text-white' : 'text-gray-700 group-hover:text-gray-900'}
+                            `}>
+                              {option.value}
+                            </span>
+                          </div>
+                        </button>
                       );
                     })}
                   </div>
