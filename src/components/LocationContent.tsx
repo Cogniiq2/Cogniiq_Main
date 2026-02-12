@@ -85,9 +85,10 @@ export function LocationContent() {
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.4 }}
           className="bg-white rounded-2xl shadow-lg p-8 md:p-12"
         >
           <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -120,17 +121,26 @@ export function LocationContent() {
               </a>
             </div>
 
-            <div className="rounded-xl overflow-hidden shadow-md h-[300px] md:h-[400px]">
-              <iframe
-                src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2562.8!2d${BUSINESS_INFO.geo.longitude}!3d${BUSINESS_INFO.geo.latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDnCsDU2JzUzLjciTiAxMcKwMzQnNDEuOCJF!5e0!3m2!1sde!2sde!4v1234567890`}
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title={`Standort von ${BUSINESS_INFO.name} in ${BUSINESS_INFO.address.addressLocality}`}
+            <div className="relative rounded-xl overflow-hidden shadow-md h-[300px] md:h-[400px] group">
+              <div
+                className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect fill='%23f5f5f5' width='100%25' height='100%25'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='16' font-weight='600' fill='%23666'%3EBayreuth, Bayern%3C/text%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='12' fill='%23999'%3E${BUSINESS_INFO.address.streetAddress}%3C/text%3E%3C/svg%3E")`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
+                }}
               />
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                <a
+                  href={getGoogleMapsUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-6 py-3 bg-white hover:bg-gray-50 rounded-full shadow-lg font-semibold text-gray-900 text-sm flex items-center gap-2 transition-all hover:scale-105"
+                >
+                  <MapPin size={18} className="text-[#515A61]" />
+                  In Google Maps öffnen
+                </a>
+              </div>
             </div>
           </div>
         </motion.div>
