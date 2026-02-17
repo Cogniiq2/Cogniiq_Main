@@ -1,100 +1,114 @@
-import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import { useRef } from 'react';
-import { MessageSquare, FileText, Cog, Rocket } from 'lucide-react';
+import { MessageSquare, FileText, Cog, Rocket, CheckCircle } from 'lucide-react';
+import { Timeline } from './ui/timeline';
 
-const steps = [
+const stageContent = [
   {
-    number: '01',
-    icon: MessageSquare,
     title: 'Kennenlernen & Zieldefinition',
+    icon: MessageSquare,
+    color: 'from-sky-500 to-cyan-400',
     description:
       'Kurzes Erstgespräch (30–45 Minuten), in dem wir dein Geschäftsmodell, deine Ziele und deinen Status Quo verstehen.',
+    items: [
+      'Kostenloser Strategiecall',
+      'Analyse des Status Quo',
+      'Klare Zielsetzung & KPIs',
+      'Erste Einschätzung der Möglichkeiten',
+    ],
   },
   {
-    number: '02',
-    icon: FileText,
     title: 'Konzept & Angebot',
+    icon: FileText,
+    color: 'from-teal-500 to-emerald-400',
     description:
       'Wir skizzieren Website/Automation/AI-Setup und erstellen ein klares, individuelles Angebot – ohne versteckte Kosten.',
+    items: [
+      'Maßgeschneidertes Konzept',
+      'Detaillierte Roadmap',
+      'Transparente Preisgestaltung',
+      'Klare Meilensteine',
+    ],
   },
   {
-    number: '03',
-    icon: Cog,
     title: 'Umsetzung & Feinschliff',
+    icon: Cog,
+    color: 'from-blue-500 to-sky-400',
     description:
       'Umsetzung in klaren Sprints, regelmäßige Zwischenstände, Feedbackrunden, Tests. Fokus auf Performance und Stabilität.',
+    items: [
+      'Entwicklung in Sprints',
+      'Regelmäßige Updates',
+      'Ausgiebige Feedbackrunden',
+      'Performance-Tests',
+    ],
   },
   {
-    number: '04',
-    icon: Rocket,
     title: 'Go-Live & Optimierung',
+    icon: Rocket,
+    color: 'from-cyan-500 to-teal-400',
     description:
       'Launch, Monitoring und Optimierung auf das, was zählt: Anfragen, Buchungen, Umsatz – nicht nur Pixel.',
+    items: [
+      'Reibungsloser Launch',
+      'Laufendes Monitoring',
+      'Datenbasierte Optimierung',
+      'Langfristige Partnerschaft',
+    ],
   },
 ];
 
-export function ProcessSection() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.2 });
+const timelineData = stageContent.map((stage, index) => {
+  const Icon = stage.icon;
+  return {
+    title: `${String(index + 1).padStart(2, '0')}`,
+    content: (
+      <div className="group relative overflow-hidden bg-white rounded-2xl p-7 border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-500">
+        <div className={`absolute top-0 left-0 w-1 h-full bg-gradient-to-b ${stage.color} rounded-l-2xl`} />
 
+        <div className="flex items-start gap-4 mb-5">
+          <div className={`flex-shrink-0 p-3 rounded-xl bg-gradient-to-br ${stage.color} shadow-md`}>
+            <Icon className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h4 className="text-xl font-bold text-gray-900 leading-tight">
+              {stage.title}
+            </h4>
+          </div>
+        </div>
+
+        <p className="text-gray-600 leading-relaxed mb-5 text-sm md:text-base">
+          {stage.description}
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {stage.items.map((item, i) => (
+            <div key={i} className="flex items-center gap-2.5">
+              <CheckCircle className="w-4 h-4 flex-shrink-0 text-sky-500" />
+              <span className="text-sm text-gray-700 font-medium">{item}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    ),
+  };
+});
+
+export function ProcessSection() {
   return (
-    <section id="ablauf" ref={ref} className="py-32 bg-gray-50" aria-labelledby="process-heading">
+    <section id="ablauf" className="py-20 bg-gray-50" aria-labelledby="process-heading">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
-        >
-         <h2
-  id="process-heading"
-  className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900"
->
-  So arbeiten wir zusammen
-</h2>
+        <div className="text-center mb-4">
+          <h2
+            id="process-heading"
+            className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900"
+          >
+            So arbeiten wir zusammen
+          </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Transparenter Prozess: Von der ersten Anfrage bis zum erfolgreichen Go-Live
           </p>
-        </motion.div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {steps.map((step, index) => {
-            const Icon = step.icon;
-            return (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: index * 0.15 }}
-                className="relative group"
-              >
-                <div className="relative bg-white rounded-2xl p-6 border border-gray-200 hover:border-[#8b5cf6]/50 hover:shadow-xl transition-all duration-300 h-full">
-                  <div className="absolute -top-4 -left-4 text-6xl font-bold text-gray-200">
-                    {step.number}
-                  </div>
-
-                  <div className="relative">
-                    <div className="inline-flex p-3 rounded-xl bg-gradient-to-br from-[#8b5cf6] to-[#22d3ee] mb-4" aria-hidden="true">
-                      <Icon className="w-6 h-6 text-white" />
-                    </div>
-
-                    <h3 className="text-lg font-bold mb-3 text-gray-900">
-                      {step.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      {step.description}
-                    </p>
-                  </div>
-                </div>
-
-                {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-px bg-gradient-to-r from-gray-300 to-transparent" />
-                )}
-              </motion.div>
-            );
-          })}
         </div>
+
+        <Timeline data={timelineData} />
       </div>
     </section>
   );
