@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { CheckCircle2, ArrowRight, MapPin, ChevronRight, Info } from "lucide-react";
+import { CheckCircle2, ArrowRight, MapPin, ChevronRight, Info, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Accordion,
@@ -28,9 +28,49 @@ interface CityServicePageProps {
 export function CityServicePage({ config }: CityServicePageProps) {
   const breadcrumbs = [
     { name: "Home", url: BUSINESS_INFO.website },
+    { name: "Bayern", url: `${BUSINESS_INFO.website}/bayern` },
     { name: config.city, url: `${BUSINESS_INFO.website}/${config.citySlug}` },
     { name: config.service, url: `${BUSINESS_INFO.website}${config.route}` },
   ];
+
+  const localBusinessSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "LocalBusiness",
+        "@id": `${BUSINESS_INFO.website}/#localbusiness`,
+        "name": BUSINESS_INFO.name,
+        "url": BUSINESS_INFO.website,
+        "telephone": BUSINESS_INFO.contact.phone,
+        "email": BUSINESS_INFO.contact.email,
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": BUSINESS_INFO.address.addressLocality,
+          "addressRegion": BUSINESS_INFO.address.addressRegion,
+          "postalCode": BUSINESS_INFO.address.postalCode,
+          "addressCountry": BUSINESS_INFO.address.addressCountry,
+        },
+        "areaServed": [
+          { "@type": "City", "name": config.city },
+          { "@type": "State", "name": "Bayern" },
+        ],
+      },
+      {
+        "@type": "Service",
+        "name": `${config.service} ${config.city}`,
+        "description": config.seo.description,
+        "url": config.seo.canonical,
+        "provider": {
+          "@id": `${BUSINESS_INFO.website}/#localbusiness`,
+        },
+        "areaServed": {
+          "@type": "City",
+          "name": config.city,
+        },
+        "serviceType": config.service,
+      },
+    ],
+  };
 
   return (
     <>
@@ -40,12 +80,15 @@ export function CityServicePage({ config }: CityServicePageProps) {
         canonical={config.seo.canonical}
         breadcrumbs={breadcrumbs}
         faqItems={config.faq}
+        additionalSchema={localBusinessSchema}
       />
 
       <main className="min-h-screen">
         <HeroSection config={config} breadcrumbs={breadcrumbs} />
         <TrustStrip config={config} />
+        <LocalIntroSection config={config} />
         <WarumCogniiq config={config} />
+        <MidPageCTA config={config} />
         <UseCasesSection config={config} />
         <ProcessSection config={config} />
         <LocalRelevanzSection config={config} />
@@ -63,7 +106,7 @@ function HeroSection({ config, breadcrumbs }: { config: CityServiceConfig; bread
       <div className="max-w-5xl mx-auto px-6 lg:px-8">
         <motion.nav
           aria-label="Breadcrumb"
-          className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8"
+          className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8 flex-wrap"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
@@ -92,7 +135,7 @@ function HeroSection({ config, breadcrumbs }: { config: CityServiceConfig; bread
         >
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium tracking-wide uppercase mb-6">
             <MapPin size={12} />
-            {config.city} · Bayern · Deutschland
+            {config.city} · Bayern · DSGVO-konform · Persönliche Betreuung
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 leading-tight tracking-tight mb-6">
@@ -136,9 +179,9 @@ function TrustStrip({ config }: { config: CityServiceConfig }) {
     config.city,
     config.service,
     "Bayern",
-    "Deutschland",
     "DSGVO-konform",
     "Persönliche Betreuung",
+    "Einrichtung in 7–14 Tagen",
   ];
 
   return (
@@ -157,9 +200,37 @@ function TrustStrip({ config }: { config: CityServiceConfig }) {
   );
 }
 
+function LocalIntroSection({ config }: { config: CityServiceConfig }) {
+  return (
+    <section className="py-20 bg-white dark:bg-gray-950 transition-colors duration-300" aria-labelledby="local-intro-heading">
+      <div className="max-w-3xl mx-auto px-6 lg:px-8">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeUp}
+          custom={0}
+        >
+          <h2 id="local-intro-heading" className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">
+            {config.service} in {config.city} – lokale Relevanz, digitale Umsetzung
+          </h2>
+
+          <div className="space-y-5">
+            {config.localIntro.paragraphs.map((paragraph, i) => (
+              <p key={i} className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
 function WarumCogniiq({ config }: { config: CityServiceConfig }) {
   return (
-    <section className="py-20 bg-white dark:bg-gray-950 transition-colors duration-300" aria-labelledby="warum-heading">
+    <section className="py-20 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300" aria-labelledby="warum-heading">
       <div className="max-w-5xl mx-auto px-6 lg:px-8">
         <motion.div
           initial="hidden"
@@ -169,7 +240,7 @@ function WarumCogniiq({ config }: { config: CityServiceConfig }) {
           custom={0}
         >
           <h2 id="warum-heading" className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Warum Cogniiq
+            Warum Cogniiq für {config.service} in {config.city}
           </h2>
           <p className="text-gray-500 dark:text-gray-400 mb-10">
             Was konkret für uns spricht – ohne Hochglanz-Versprechen.
@@ -185,7 +256,7 @@ function WarumCogniiq({ config }: { config: CityServiceConfig }) {
               viewport={{ once: true }}
               variants={fadeUp}
               custom={i * 0.07}
-              className="flex items-start gap-3 p-5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50"
+              className="flex items-start gap-3 p-5 rounded-xl bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50"
             >
               <CheckCircle2 size={18} className="flex-shrink-0 mt-0.5 text-[#515A61] dark:text-sky-400" />
               <span className="text-gray-700 dark:text-gray-300">{point}</span>
@@ -194,6 +265,50 @@ function WarumCogniiq({ config }: { config: CityServiceConfig }) {
         </ul>
       </div>
     </section>
+  );
+}
+
+function MidPageCTA({ config }: { config: CityServiceConfig }) {
+  return (
+    <div className="bg-white dark:bg-gray-950 transition-colors duration-300">
+      <div className="max-w-5xl mx-auto px-6 lg:px-8 py-10">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeUp}
+          custom={0}
+          className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
+        >
+          <div className="flex-1">
+            <p className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
+              {config.service} in {config.city} – kostenloses Erstgespräch
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              30–45 Minuten, unverbindlich, mit konkretem Ergebnis.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/kontakt"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors whitespace-nowrap"
+            >
+              Gespräch vereinbaren
+              <ArrowRight size={14} />
+            </Link>
+            {BUSINESS_INFO.contact.phone && (
+              <a
+                href={`tel:${BUSINESS_INFO.contact.phone.replace(/\s/g, "")}`}
+                className="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm hover:border-gray-500 dark:hover:border-gray-400 transition-colors whitespace-nowrap"
+              >
+                <Phone size={14} />
+                Anrufen
+              </a>
+            )}
+          </div>
+        </motion.div>
+      </div>
+    </div>
   );
 }
 
@@ -210,10 +325,10 @@ function UseCasesSection({ config }: { config: CityServiceConfig }) {
           className="mb-12"
         >
           <h2 id="usecases-heading" className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Typische Einsatzszenarien
+            Typische Einsatzszenarien in {config.city}
           </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Wie {config.service} in {config.city} konkret funktioniert.
+            Wie {config.service} in {config.city} konkret eingesetzt wird.
           </p>
         </motion.div>
 
@@ -258,7 +373,7 @@ function ProcessSection({ config }: { config: CityServiceConfig }) {
           className="mb-12"
         >
           <h2 id="process-heading" className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            So läuft's ab
+            So läuft ein Projekt ab
           </h2>
           <p className="text-gray-500 dark:text-gray-400">
             Von der ersten Anfrage bis zum fertigen Ergebnis – in vier klaren Schritten.
@@ -328,7 +443,7 @@ function LocalRelevanzSection({ config }: { config: CityServiceConfig }) {
             custom={0.1}
           >
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-              Geeignet für
+              Geeignet für diese Branchen in {config.city}
             </h2>
             <div className="flex flex-wrap gap-2">
               {config.industries.map((industry) => (
@@ -363,7 +478,7 @@ function FAQSection({ config }: { config: CityServiceConfig }) {
             Häufige Fragen
           </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Alles Wichtige zu {config.service} in {config.city}.
+            Alles Wichtige zu {config.service} in {config.city} – konkret beantwortet.
           </p>
         </motion.div>
 
@@ -408,7 +523,7 @@ function CTASection({ config }: { config: CityServiceConfig }) {
           custom={0}
         >
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-            Projekt besprechen
+            {config.service} in {config.city} – Projekt besprechen
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
             Kostenloses Erstgespräch, 30–45 Minuten, ohne Verpflichtung. Danach wissen Sie genau, was möglich ist und was es kostet.

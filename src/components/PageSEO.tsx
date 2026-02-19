@@ -13,6 +13,7 @@ interface PageSEOProps {
   breadcrumbs?: Array<{ name: string; url: string }>;
   faqItems?: FaqItem[];
   ogImage?: string;
+  additionalSchema?: object;
 }
 
 function setMeta(name: string, content: string, attr: "name" | "property" = "name") {
@@ -58,6 +59,7 @@ export function PageSEO({
   breadcrumbs,
   faqItems,
   ogImage = `${BUSINESS_INFO.website}/og-image.jpg`,
+  additionalSchema,
 }: PageSEOProps) {
   useEffect(() => {
     document.title = title;
@@ -109,11 +111,18 @@ export function PageSEO({
       removeScript("page-faq-schema");
     }
 
+    if (additionalSchema) {
+      injectScript("page-additional-schema", JSON.stringify(additionalSchema));
+    } else {
+      removeScript("page-additional-schema");
+    }
+
     return () => {
       removeScript("page-breadcrumb-schema");
       removeScript("page-faq-schema");
+      removeScript("page-additional-schema");
     };
-  }, [title, description, canonical, breadcrumbs, faqItems, ogImage]);
+  }, [title, description, canonical, breadcrumbs, faqItems, ogImage, additionalSchema]);
 
   return null;
 }
