@@ -1,7 +1,5 @@
-import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
-import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
@@ -12,156 +10,93 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
-import { CheckCircle2, Sparkles, Zap, Target, ArrowRight, Mail, Building2, Globe, Calendar } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { PremiumCalendar } from './PremiumCalendar';
+
+const INTEREST_OPTIONS = [
+  'Cutting-Edge Webdesign',
+  'AI Automations',
+  'AI Receptionist',
+  'AI Content Creation',
+];
+
+const FIELD_META = [
+  { id: 'name',    label: 'Name',              type: 'text',  placeholder: 'Max Mustermann',        required: true },
+  { id: 'email',   label: 'E-Mail',             type: 'email', placeholder: 'max@unternehmen.de',    required: true },
+  { id: 'company', label: 'Unternehmen',        type: 'text',  placeholder: 'Unternehmensname',      required: true },
+];
 
 export function ContactSection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [interests, setInterests] = useState<string[]>([]);
-  const [selectedDateTime, setSelectedDateTime] = useState<string>('');
+  const [selectedDateTime, setSelectedDateTime] = useState('');
+  const [industryValue, setIndustryValue] = useState('');
+  const [timelineValue, setTimelineValue] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const formElement = e.target as HTMLFormElement;
-    const industrySelect = formElement.querySelector('[id="industry"] button');
-    const timelineSelect = formElement.querySelector('[id="timeline"] button');
-
     const payload = {
-      name: (document.getElementById("name") as HTMLInputElement).value,
-      email: (document.getElementById("email") as HTMLInputElement).value,
-      company: (document.getElementById("company") as HTMLInputElement).value,
-      industry: industrySelect?.getAttribute('data-value') || "",
+      name:          (document.getElementById('name')    as HTMLInputElement).value,
+      email:         (document.getElementById('email')   as HTMLInputElement).value,
+      company:       (document.getElementById('company') as HTMLInputElement).value,
+      industry:      industryValue,
       interests,
-      timeline: timelineSelect?.getAttribute('data-value') || "",
-      goal: (document.getElementById("goal") as HTMLTextAreaElement).value,
-      preferredTime: selectedDateTime || "Keine Angabe",
+      timeline:      timelineValue,
+      goal:          (document.getElementById('goal')    as HTMLTextAreaElement).value,
+      preferredTime: selectedDateTime || 'Keine Angabe',
     };
 
     try {
-      await fetch("https://n8n.cogniiq.co/webhook/contacts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      await fetch('https://n8n.cogniiq.co/webhook/contacts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-
       setIsSubmitted(true);
-    } catch (error) {
-      console.error('Error submitting form:', error);
+    } catch (err) {
+      console.error(err);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const toggleInterest = (interest: string) => {
-    setInterests((prev) =>
-      prev.includes(interest)
-        ? prev.filter((i) => i !== interest)
-        : [...prev, interest]
-    );
-  };
-
-  const benefits = [
-    {
-      icon: Sparkles,
-      title: 'Premium-Beratung',
-      text: '30–45 Min. persönlicher Videocall',
-      gradient: 'from-violet-500 to-purple-600'
-    },
-    {
-      icon: Target,
-      title: 'Maßgeschneidert',
-      text: 'Detaillierte Analyse Ihres Status Quo',
-      gradient: 'from-sky-500 to-blue-600'
-    },
-    {
-      icon: Zap,
-      title: 'Sofort umsetzbar',
-      text: 'Konkrete Roadmap & Budget-Transparenz',
-      gradient: 'from-emerald-500 to-teal-600'
-    },
-  ];
-
-  const interestOptions = [
-    { value: 'Cutting-Edge Webdesign', icon: Globe, color: 'from-violet-500 to-purple-600' },
-    { value: 'AI Automations', icon: Zap, color: 'from-sky-500 to-blue-600' },
-    { value: 'AI Receptionist', icon: Mail, color: 'from-emerald-500 to-teal-600' },
-    { value: 'AI Content Creation', icon: Sparkles, color: 'from-orange-500 to-red-600' },
-  ];
+  const toggleInterest = (v: string) =>
+    setInterests(prev => prev.includes(v) ? prev.filter(i => i !== v) : [...prev, v]);
 
   if (isSubmitted) {
     return (
-      <section id="kontakt" ref={ref} className="relative py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-50" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-100/40 via-transparent to-transparent" />
-
-        <div className="relative max-w-4xl mx-auto px-6 lg:px-8">
+      <section id="kontakt" className="relative py-32 bg-white overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 60% 40% at 50% 0%, rgba(15,23,42,0.04) 0%, transparent 100%)' }} />
+        <div className="max-w-2xl mx-auto px-6 text-center">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.6, type: 'spring', stiffness: 100 }}
-            className="relative overflow-hidden bg-white rounded-3xl p-12 lg:p-16 shadow-2xl border border-gray-100"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 via-violet-500/5 to-emerald-500/5" />
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sky-500 via-violet-500 to-emerald-500" />
-
-            <div className="relative z-10 text-center">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                className="inline-flex items-center justify-center mb-8"
-              >
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-sky-500 to-violet-500 rounded-full blur-2xl opacity-30 animate-pulse" />
-                  <div className="relative p-6 rounded-full bg-gradient-to-br from-sky-500 to-violet-500 shadow-lg shadow-sky-500/50">
-                    <CheckCircle2 className="w-16 h-16 text-white" strokeWidth={2.5} />
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.h3
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent"
-              >
-                Vielen Dank!
-              </motion.h3>
-
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="text-xl lg:text-2xl text-gray-600 mb-8 leading-relaxed"
-              >
-                Ihre Anfrage wurde erfolgreich übermittelt.
-                <br />
-                <span className="text-sky-600 font-medium">Wir melden uns innerhalb von 24–48 Stunden.</span>
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-              >
-                <Button
-                  onClick={() => setIsSubmitted(false)}
-                  variant="outline"
-                  size="lg"
-                  className="group border-2 border-gray-300 hover:border-sky-500 hover:bg-sky-50 text-gray-900 px-8 py-6 text-lg font-medium transition-all duration-300"
-                >
-                  <span>Weitere Anfrage senden</span>
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </motion.div>
+            <div className="inline-flex items-center justify-center w-16 h-16 mb-10 border border-gray-200 rounded-2xl">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111827" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
             </div>
+            <h3 className="text-3xl font-semibold text-gray-900 mb-4" style={{ letterSpacing: '-0.02em' }}>
+              Anfrage eingegangen.
+            </h3>
+            <p className="text-gray-500 text-lg leading-relaxed mb-10" style={{ fontWeight: 400 }}>
+              Wir melden uns innerhalb von 24–48 Stunden für Ihr Analysegespräch.
+            </p>
+            <button
+              onClick={() => setIsSubmitted(false)}
+              className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
+              style={{ letterSpacing: '0.01em' }}
+            >
+              Weitere Anfrage senden
+              <ArrowRight size={14} />
+            </button>
           </motion.div>
         </div>
       </section>
@@ -172,365 +107,291 @@ export function ContactSection() {
     <section
       id="kontakt"
       ref={ref}
-      className="relative py-32 overflow-hidden"
+      className="relative py-24 lg:py-32 bg-white overflow-hidden"
       aria-labelledby="contact-heading"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-50" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-100/40 via-transparent to-transparent" />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse 70% 35% at 50% 0%, rgba(15,23,42,0.04) 0%, transparent 100%)' }}
+      />
 
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="relative max-w-6xl mx-auto px-6 lg:px-8">
+
+        {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-20"
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-16 lg:mb-20"
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-sky-500/10 to-violet-500/10 border border-sky-200/50 mb-6"
+          <p
+            className="text-gray-400 uppercase mb-4"
+            style={{ fontSize: '10.5px', fontWeight: 500, letterSpacing: '0.20em' }}
           >
-            <Sparkles className="w-4 h-4 text-sky-600" />
-            <span className="text-sm font-medium text-gray-700">Premium-Erstberatung</span>
-          </motion.div>
-
+            Analysegespräch
+          </p>
           <h2
             id="contact-heading"
-            className="text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent"
+            className="text-gray-900"
+            style={{
+              fontSize: 'clamp(28px, 4vw, 40px)',
+              fontWeight: 700,
+              lineHeight: 1.1,
+              letterSpacing: '-0.022em',
+              maxWidth: '18ch',
+            }}
           >
-            Lassen Sie uns über
-            <br />
-            Ihr Projekt sprechen
+            System anfragen.
           </h2>
-
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Starten Sie Ihre digitale Transformation mit einer persönlichen Beratung
+          <p
+            className="text-gray-500 mt-4"
+            style={{ fontSize: '15px', fontWeight: 400, lineHeight: 1.65, maxWidth: '44ch' }}
+          >
+            Schildern Sie Ihre Ausgangssituation. Wir analysieren Ihren Prozessstatus und zeigen, wo operative KI-Systeme den größten Hebel erzeugen.
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-5 gap-12 items-start">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8 }}
-            className="lg:col-span-2 space-y-8"
-          >
-            <div className="space-y-6">
-              {benefits.map((benefit, index) => {
-                const Icon = benefit.icon;
-                return (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -30 }}
-                    animate={isInView ? { opacity: 1, x: 0 } : {}}
-                    transition={{
-                      duration: 0.6,
-                      delay: 0.2 + index * 0.1,
-                    }}
-                    className="group relative overflow-hidden bg-white rounded-2xl p-6 border border-gray-200/50 shadow-lg hover:shadow-xl transition-all duration-300"
-                  >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${benefit.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
 
-                    <div className="relative flex items-start gap-4">
-                      <div className={`flex-shrink-0 p-3 rounded-xl bg-gradient-to-br ${benefit.gradient} shadow-lg`}>
-                        <Icon className="w-6 h-6 text-white" strokeWidth={2} />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-bold text-gray-900 mb-1">
-                          {benefit.title}
-                        </h3>
-                        <p className="text-gray-600">
-                          {benefit.text}
-                        </p>
-                      </div>
+          {/* Left — context panel */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            className="lg:col-span-4 flex flex-col gap-8"
+          >
+            {/* What happens after */}
+            <div>
+              <p
+                className="text-gray-400 uppercase mb-5"
+                style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.18em' }}
+              >
+                Nach Ihrer Anfrage
+              </p>
+              <div className="flex flex-col gap-0">
+                {[
+                  { n: '01', label: 'Eingangsbestätigung', sub: 'Automatisch · sofort' },
+                  { n: '02', label: 'Systemanalyse',       sub: 'Innerhalb 24 h' },
+                  { n: '03', label: 'Analysegespräch',     sub: '45 Min. · video' },
+                  { n: '04', label: 'Systemkonzept',       sub: 'Maßgeschneidert' },
+                ].map((step, i) => (
+                  <div
+                    key={step.n}
+                    className="flex items-start gap-4 py-4 border-b border-gray-100 last:border-0"
+                  >
+                    <span
+                      className="text-gray-300 tabular-nums"
+                      style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.05em', paddingTop: '2px', minWidth: '20px' }}
+                    >
+                      {step.n}
+                    </span>
+                    <div>
+                      <p className="text-gray-900 text-sm font-medium" style={{ lineHeight: 1.3 }}>
+                        {step.label}
+                      </p>
+                      <p className="text-gray-400 mt-0.5" style={{ fontSize: '12px', lineHeight: 1.4 }}>
+                        {step.sub}
+                      </p>
                     </div>
-                  </motion.div>
-                );
-              })}
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="relative overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 border border-gray-700 shadow-2xl"
+            {/* Scope note */}
+            <div
+              className="border border-gray-100 rounded-xl p-5"
+              style={{ background: '#fafafa' }}
             >
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-sky-500/20 via-transparent to-transparent" />
-
-              <div className="relative">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 rounded-lg bg-gradient-to-br from-sky-500 to-violet-500">
-                    <Sparkles className="w-5 h-5 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white">
-                    Exklusiver Vorteil
-                  </h3>
-                </div>
-                <p className="text-gray-300 leading-relaxed">
-                  Als einer unserer ersten Kunden profitieren Sie von unserem Launch-Angebot mit{' '}
-                  <span className="text-sky-400 font-semibold">bis zu 30% Rabatt</span> auf Ihr Projekt.
-                </p>
-              </div>
-            </motion.div>
+              <p
+                className="text-gray-400 uppercase mb-3"
+                style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.16em' }}
+              >
+                Für wen
+              </p>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Unternehmen in Deutschland, die operative Prozesse systematisch automatisieren wollen — keine Experimente, keine Demos.
+              </p>
+            </div>
           </motion.div>
 
+          {/* Right — form */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8 }}
-            className="lg:col-span-3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            className="lg:col-span-8"
           >
-            <form
-              onSubmit={handleSubmit}
-              className="relative overflow-hidden bg-white rounded-3xl p-8 lg:p-10 border border-gray-200/50 shadow-2xl"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-sky-500/[0.02] via-violet-500/[0.02] to-emerald-500/[0.02]" />
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sky-500 via-violet-500 to-emerald-500" />
+            <form onSubmit={handleSubmit} className="flex flex-col gap-7">
 
-              <div className="relative space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                      <div className="w-1.5 h-1.5 rounded-full bg-sky-500" />
-                      Vollständiger Name
-                    </Label>
+              {/* Row: Name / Email / Company */}
+              <div className="grid md:grid-cols-2 gap-5">
+                {FIELD_META.map(f => (
+                  <div key={f.id} className={f.id === 'company' ? 'md:col-span-2' : ''}>
+                    <FormLabel>{f.label}</FormLabel>
                     <Input
-                      id="name"
-                      required
-                      placeholder="Max Mustermann"
-                      className="h-12 bg-gray-50/50 border-gray-200 focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 transition-all duration-300 hover:border-gray-300 hover:bg-white"
+                      id={f.id}
+                      type={f.type}
+                      required={f.required}
+                      placeholder={f.placeholder}
+                      className="h-11 bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus:ring-0 transition-colors"
                     />
                   </div>
+                ))}
+              </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                      <div className="w-1.5 h-1.5 rounded-full bg-violet-500" />
-                      E-Mail-Adresse
-                    </Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      required
-                      placeholder="max@unternehmen.de"
-                      className="h-12 bg-gray-50/50 border-gray-200 focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 transition-all duration-300 hover:border-gray-300 hover:bg-white"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="company" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      Unternehmen / Projekt
-                    </Label>
-                    <Input
-                      id="company"
-                      required
-                      placeholder="Ihr Unternehmensname"
-                      className="h-12 bg-gray-50/50 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-300 hover:border-gray-300 hover:bg-white"
-                    />
-                  </div>
-
-                  <div className="space-y-2" id="industry">
-                    <Label htmlFor="industry" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                      <div className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-                      Branche
-                    </Label>
-                    <Select
-                      required
-                      onValueChange={(value) => {
-                        const trigger = document.querySelector('#industry button');
-                        if (trigger) trigger.setAttribute('data-value', value);
-                      }}
-                    >
-                      <SelectTrigger className="h-12 bg-gray-50/50 border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all duration-300 hover:border-gray-300 hover:bg-white">
-                        <SelectValue placeholder="Wählen Sie Ihre Branche" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white border border-gray-200 shadow-2xl rounded-2xl overflow-hidden">
-                        <SelectItem value="medical" className="cursor-pointer hover:bg-gradient-to-r hover:from-sky-500/10 hover:to-violet-500/10 transition-all duration-200 py-3">
-                          Medizin & Kliniken
-                        </SelectItem>
-                        <SelectItem value="gastronomy" className="cursor-pointer hover:bg-gradient-to-r hover:from-sky-500/10 hover:to-violet-500/10 transition-all duration-200 py-3">
-                          Gastronomie
-                        </SelectItem>
-                        <SelectItem value="sports" className="cursor-pointer hover:bg-gradient-to-r hover:from-sky-500/10 hover:to-violet-500/10 transition-all duration-200 py-3">
-                          Sport & Fitness
-                        </SelectItem>
-                        <SelectItem value="realestate" className="cursor-pointer hover:bg-gradient-to-r hover:from-sky-500/10 hover:to-violet-500/10 transition-all duration-200 py-3">
-                          Immobilien
-                        </SelectItem>
-                        <SelectItem value="ecommerce" className="cursor-pointer hover:bg-gradient-to-r hover:from-sky-500/10 hover:to-violet-500/10 transition-all duration-200 py-3">
-                          E-Commerce
-                        </SelectItem>
-                        <SelectItem value="other" className="cursor-pointer hover:bg-gradient-to-r hover:from-sky-500/10 hover:to-violet-500/10 transition-all duration-200 py-3">
-                          Sonstiges
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <Label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                    <div className="w-1.5 h-1.5 rounded-full bg-pink-500" />
-                    Ihre Interessen
-                  </Label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {interestOptions.map((option) => {
-                      const Icon = option.icon;
-                      const isChecked = interests.includes(option.value);
-
-                      return (
-                        <button
-                          key={option.value}
-                          type="button"
-                          onClick={() => toggleInterest(option.value)}
-                          className={`
-                            group relative overflow-hidden flex items-center gap-4 p-5 rounded-2xl
-                            transition-all duration-500 border-2 text-left
-                            ${isChecked
-                              ? `border-transparent bg-gradient-to-br ${option.color} shadow-xl scale-[1.02]`
-                              : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-lg hover:scale-[1.01]'
-                            }
-                          `}
-                        >
-                          <div
-                            className={`
-                              flex-shrink-0 w-6 h-6 rounded-lg border-2 flex items-center justify-center
-                              transition-all duration-300
-                              ${isChecked
-                                ? 'bg-white border-white'
-                                : 'bg-gray-50 border-gray-300 group-hover:border-gray-400'
-                              }
-                            `}
-                          >
-                            {isChecked && (
-                              <svg
-                                className="w-4 h-4 text-sky-600"
-                                fill="none"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="3"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path d="M5 13l4 4L19 7" />
-                              </svg>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-3 flex-1 min-w-0">
-                            <Icon className={`
-                              flex-shrink-0 w-5 h-5 transition-all duration-300
-                              ${isChecked ? 'text-white' : 'text-gray-600 group-hover:text-gray-800'}
-                            `} />
-                            <span className={`
-                              text-sm font-semibold transition-colors duration-300
-                              ${isChecked ? 'text-white' : 'text-gray-700 group-hover:text-gray-900'}
-                            `}>
-                              {option.value}
-                            </span>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="space-y-2" id="timeline">
-                  <Label htmlFor="timeline" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                    Wunschzeitraum für Start
-                  </Label>
-                  <Select
-                    required
-                    onValueChange={(value) => {
-                      const trigger = document.querySelector('#timeline button');
-                      if (trigger) trigger.setAttribute('data-value', value);
-                    }}
-                  >
-                    <SelectTrigger className="h-12 bg-gray-50/50 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 hover:border-gray-300 hover:bg-white">
-                      <SelectValue placeholder="Wählen Sie einen Zeitraum" />
+              {/* Row: Industry / Timeline */}
+              <div className="grid md:grid-cols-2 gap-5">
+                <div id="industry">
+                  <FormLabel>Branche</FormLabel>
+                  <Select required onValueChange={setIndustryValue}>
+                    <SelectTrigger className="h-11 bg-white border-gray-200 rounded-lg text-sm focus:border-gray-400 focus:ring-0 transition-colors">
+                      <SelectValue placeholder="Branche wählen" />
                     </SelectTrigger>
-                    <SelectContent className="bg-white border border-gray-200 shadow-2xl rounded-2xl overflow-hidden">
-                      <SelectItem value="asap" className="cursor-pointer hover:bg-gradient-to-r hover:from-sky-500/10 hover:to-violet-500/10 transition-all duration-200 py-3">
-                        So schnell wie möglich
-                      </SelectItem>
-                      <SelectItem value="1-2months" className="cursor-pointer hover:bg-gradient-to-r hover:from-sky-500/10 hover:to-violet-500/10 transition-all duration-200 py-3">
-                        In 1–2 Monaten
-                      </SelectItem>
-                      <SelectItem value="3+months" className="cursor-pointer hover:bg-gradient-to-r hover:from-sky-500/10 hover:to-violet-500/10 transition-all duration-200 py-3">
-                        In 3+ Monaten
-                      </SelectItem>
+                    <SelectContent className="bg-white border border-gray-200 shadow-lg rounded-xl text-sm">
+                      {['Medizin & Kliniken', 'Gastronomie', 'Sport & Fitness', 'Immobilien', 'E-Commerce', 'Sonstiges'].map(v => (
+                        <SelectItem key={v} value={v.toLowerCase().replace(/[^a-z]/g, '')} className="py-2.5 cursor-pointer">
+                          {v}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="goal" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                    <div className="w-1.5 h-1.5 rounded-full bg-teal-500" />
-                    Was ist Ihr Ziel mit diesem Projekt?
-                  </Label>
-                  <Textarea
-                    id="goal"
-                    required
-                    rows={4}
-                    placeholder="Beschreiben Sie Ihre Vision und Ziele..."
-                    className="bg-gray-50/50 border-gray-200 focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 resize-none transition-all duration-300 hover:border-gray-300 hover:bg-white"
-                  />
+                <div id="timeline">
+                  <FormLabel>Startzeitraum</FormLabel>
+                  <Select required onValueChange={setTimelineValue}>
+                    <SelectTrigger className="h-11 bg-white border-gray-200 rounded-lg text-sm focus:border-gray-400 focus:ring-0 transition-colors">
+                      <SelectValue placeholder="Zeitraum wählen" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border border-gray-200 shadow-lg rounded-xl text-sm">
+                      <SelectItem value="asap"     className="py-2.5 cursor-pointer">So schnell wie möglich</SelectItem>
+                      <SelectItem value="1-2months" className="py-2.5 cursor-pointer">In 1–2 Monaten</SelectItem>
+                      <SelectItem value="3+months" className="py-2.5 cursor-pointer">In 3+ Monaten</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
+              </div>
 
-                <div className="space-y-3">
-                  <Label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                    <Calendar className="w-4 h-4 text-sky-600" />
-                    Bevorzugter Termin für Erstgespräch (Optional)
-                  </Label>
+              {/* Interests */}
+              <div>
+                <FormLabel>Interessensfelder</FormLabel>
+                <div className="grid grid-cols-2 gap-2.5 mt-1">
+                  {INTEREST_OPTIONS.map(opt => {
+                    const active = interests.includes(opt);
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => toggleInterest(opt)}
+                        className="flex items-center gap-3 px-4 py-3 border rounded-lg text-sm text-left transition-all"
+                        style={{
+                          borderColor: active ? '#111827' : '#e5e7eb',
+                          background: active ? '#111827' : '#ffffff',
+                          color: active ? '#ffffff' : '#374151',
+                          fontWeight: 400,
+                        }}
+                      >
+                        <span
+                          className="flex-shrink-0 w-3.5 h-3.5 border rounded-sm flex items-center justify-center transition-all"
+                          style={{
+                            borderColor: active ? '#ffffff' : '#d1d5db',
+                            background: active ? '#ffffff' : 'transparent',
+                          }}
+                        >
+                          {active && (
+                            <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+                              <path d="M1 3.5L3.5 6L8 1" stroke="#111827" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          )}
+                        </span>
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Goal */}
+              <div>
+                <FormLabel>Ziel und Ausgangssituation</FormLabel>
+                <Textarea
+                  id="goal"
+                  required
+                  rows={4}
+                  placeholder="Beschreiben Sie Ihre aktuelle Situation und was Sie verändern möchten …"
+                  className="bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus:ring-0 resize-none transition-colors leading-relaxed"
+                />
+              </div>
+
+              {/* Calendar */}
+              <div>
+                <FormLabel optional>Bevorzugter Gesprächstermin</FormLabel>
+                <div className="mt-1">
                   <PremiumCalendar
-                    onSelect={(dateTime) => setSelectedDateTime(dateTime)}
+                    onSelect={setSelectedDateTime}
                     selectedDateTime={selectedDateTime}
                   />
                 </div>
-
-                <motion.div
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                >
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    size="lg"
-                    className="group relative w-full h-14 bg-gradient-to-r from-sky-500 via-violet-500 to-emerald-500 hover:shadow-2xl hover:shadow-sky-500/50 transition-all duration-500 text-white font-semibold text-lg overflow-hidden"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-sky-600 via-violet-600 to-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <span className="relative flex items-center justify-center gap-2">
-                      {isSubmitting ? (
-                        <>
-                          <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                            className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                          />
-                          Wird gesendet...
-                        </>
-                      ) : (
-                        <>
-                          Jetzt Premium-Beratung anfragen
-                          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                        </>
-                      )}
-                    </span>
-                  </Button>
-                </motion.div>
-
-                <p className="text-center text-sm text-gray-500">
-                  Ihre Daten werden vertraulich behandelt und nicht an Dritte weitergegeben.
-                </p>
               </div>
+
+              {/* Divider */}
+              <div className="w-full h-px bg-gray-100" />
+
+              {/* Submit */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
+                <p className="text-gray-400 text-xs leading-relaxed" style={{ maxWidth: '34ch' }}>
+                  Ihre Daten werden vertraulich behandelt und nicht weitergegeben.
+                </p>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-shrink-0 flex items-center gap-2.5 text-white transition-all"
+                  style={{
+                    background: '#111827',
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    letterSpacing: '0.01em',
+                    borderRadius: '8px',
+                    minHeight: '46px',
+                    padding: '0 22px',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.10)',
+                    opacity: isSubmitting ? 0.6 : 1,
+                    cursor: isSubmitting ? 'wait' : 'pointer',
+                    border: 'none',
+                  }}
+                >
+                  {isSubmitting ? (
+                    <span>Wird gesendet …</span>
+                  ) : (
+                    <>
+                      <span>Anfrage absenden</span>
+                      <ArrowRight size={15} />
+                    </>
+                  )}
+                </button>
+              </div>
+
             </form>
           </motion.div>
         </div>
       </div>
     </section>
+  );
+}
+
+function FormLabel({ children, optional }: { children: React.ReactNode; optional?: boolean }) {
+  return (
+    <Label
+      className="block text-gray-700 mb-1.5"
+      style={{ fontSize: '12.5px', fontWeight: 500, letterSpacing: '0.01em' }}
+    >
+      {children}
+      {optional && (
+        <span className="text-gray-400 ml-1.5 font-normal" style={{ fontSize: '11px' }}>
+          optional
+        </span>
+      )}
+    </Label>
   );
 }
