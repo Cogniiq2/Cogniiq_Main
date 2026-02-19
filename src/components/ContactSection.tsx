@@ -14,10 +14,10 @@ import { ArrowRight } from 'lucide-react';
 import { PremiumCalendar } from './PremiumCalendar';
 
 const INTEREST_OPTIONS = [
-  'Cutting-Edge Webdesign',
-  'AI Automations',
-  'AI Receptionist',
-  'AI Content Creation',
+  'Webdesign',
+  'Automationen',
+  'KI Telefonassistent',
+  'KI Content Creation',
 ];
 
 const FIELD_META = [
