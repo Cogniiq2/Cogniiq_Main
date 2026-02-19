@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { X } from "lucide-react";
+import { Link } from "react-router-dom";
+import { X, MapPin } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Logo } from "./Logo";
 import { NAP } from "./NAP";
 import { BUSINESS_INFO } from "@/lib/seo-data";
+import { CITY_LINKS } from "@/lib/standorte-data";
 import { ThemeToggle } from "./ui/theme-toggle";
 
 export function Footer() {
@@ -15,7 +17,7 @@ export function Footer() {
       {/* ====== FOOTER ====== */}
       <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-16 transition-colors duration-300" role="contentinfo">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12 mb-12">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
 
             {/* LEFT */}
             <div>
@@ -60,6 +62,41 @@ export function Footer() {
 
               <div className="mt-6">
                 <ThemeToggle />
+              </div>
+            </div>
+
+            {/* STANDORTE */}
+            <div>
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">Standorte</h4>
+              <div className="mb-3">
+                <Link
+                  to="/bayern"
+                  className="inline-flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors font-medium"
+                >
+                  <MapPin size={13} className="text-gray-400" />
+                  Bayern – Alle Standorte
+                </Link>
+              </div>
+              <div className="space-y-4">
+                {(Object.entries(CITY_LINKS) as Array<[string, typeof CITY_LINKS[keyof typeof CITY_LINKS]]>).map(([slug, cityData]) => (
+                  <div key={slug}>
+                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase tracking-wider mb-1.5">
+                      {cityData.label}
+                    </p>
+                    <ul className="space-y-1">
+                      {cityData.services.map((service) => (
+                        <li key={service.href}>
+                          <Link
+                            to={service.href}
+                            className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+                          >
+                            {service.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
               </div>
             </div>
 

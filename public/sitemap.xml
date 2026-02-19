@@ -42,4 +42,88 @@
     <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/kontakt"/>
   </url>
 
+  <!-- Bayern Hub -->
+  <url>
+    <loc>https://cogniiq.com/bayern</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/bayern"/>
+  </url>
+
+  <!-- Bayreuth -->
+  <url>
+    <loc>https://cogniiq.com/bayreuth/ki-telefonassistent</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/bayreuth/ki-telefonassistent"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.com/bayreuth/automatisierung</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/bayreuth/automatisierung"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.com/bayreuth/webdesign</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/bayreuth/webdesign"/>
+  </url>
+
+  <!-- Regensburg -->
+  <url>
+    <loc>https://cogniiq.com/regensburg/ki-telefonassistent</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/regensburg/ki-telefonassistent"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.com/regensburg/automatisierung</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/regensburg/automatisierung"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.com/regensburg/webdesign</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/regensburg/webdesign"/>
+  </url>
+
+  <!-- München -->
+  <url>
+    <loc>https://cogniiq.com/muenchen/ki-telefonassistent</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/muenchen/ki-telefonassistent"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.com/muenchen/automatisierung</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/muenchen/automatisierung"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.com/muenchen/webdesign</loc>
+    <lastmod>2025-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/muenchen/webdesign"/>
+  </url>
+
 </urlset>

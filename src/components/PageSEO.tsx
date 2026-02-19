@@ -1,11 +1,17 @@
 import { useEffect } from "react";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 
+interface FaqItem {
+  question: string;
+  answer: string;
+}
+
 interface PageSEOProps {
   title: string;
   description: string;
   canonical: string;
   breadcrumbs?: Array<{ name: string; url: string }>;
+  faqItems?: FaqItem[];
   ogImage?: string;
 }
 
@@ -50,6 +56,7 @@ export function PageSEO({
   description,
   canonical,
   breadcrumbs,
+  faqItems,
   ogImage = `${BUSINESS_INFO.website}/og-image.jpg`,
 }: PageSEOProps) {
   useEffect(() => {
@@ -84,10 +91,29 @@ export function PageSEO({
       removeScript("page-breadcrumb-schema");
     }
 
+    if (faqItems && faqItems.length > 0) {
+      const faqSchema = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqItems.map((item) => ({
+          "@type": "Question",
+          name: item.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: item.answer,
+          },
+        })),
+      };
+      injectScript("page-faq-schema", JSON.stringify(faqSchema));
+    } else {
+      removeScript("page-faq-schema");
+    }
+
     return () => {
       removeScript("page-breadcrumb-schema");
+      removeScript("page-faq-schema");
     };
-  }, [title, description, canonical, breadcrumbs, ogImage]);
+  }, [title, description, canonical, breadcrumbs, faqItems, ogImage]);
 
   return null;
 }

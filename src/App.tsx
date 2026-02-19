@@ -4,11 +4,14 @@ import { Navigation } from './components/Navigation';
 import { Footer } from './components/Footer';
 import { PremiumFooterReveal } from './components/PremiumFooterReveal';
 import { LocalBusinessSchema } from './components/LocalBusinessSchema';
+import { CityServicePage } from './components/CityServicePage';
 import { HomePage } from './pages/HomePage';
 import { LeistungenPage } from './pages/LeistungenPage';
 import { UeberUnsPage } from './pages/UeberUnsPage';
 import { FAQPage } from './pages/FAQPage';
 import { KontaktPage } from './pages/KontaktPage';
+import { BayernPage } from './pages/BayernPage';
+import { CITY_SERVICE_CONFIGS } from './lib/standorte-data';
 
 function App() {
   return (
@@ -23,6 +26,14 @@ function App() {
             <Route path="/ueber-uns" element={<UeberUnsPage />} />
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/kontakt" element={<KontaktPage />} />
+            <Route path="/bayern" element={<BayernPage />} />
+            {Object.values(CITY_SERVICE_CONFIGS).map((config) => (
+              <Route
+                key={config.route}
+                path={config.route}
+                element={<CityServicePage config={config} />}
+              />
+            ))}
           </Routes>
           <PremiumFooterReveal>
             <Footer />
