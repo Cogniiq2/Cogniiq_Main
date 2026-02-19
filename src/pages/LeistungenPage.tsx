@@ -47,10 +47,10 @@ const ARCHITECTURE_LAYERS = [
     definition:
       "Hintergrund-Automatisierung, die Tools verbindet, manuelle Arbeit eliminiert und Abläufe stabil hält — ohne tägliches Eingreifen.",
     capabilities: [
-      "n8n / Make Workflows",
-      "API- & Tool-Integrationen",
-      "Follow-ups & Benachrichtigungen",
-      "Monitoring & Reporting",
+      "System-Integrationen (CRM, Kalender, Buchung, Payments)",
+      "Operational Workflows & Prozess-Orchestrierung",
+      "Benachrichtigungen, Eskalationen & SLA-Logik",
+      "Monitoring, Logging & Ausfall-Absicherung",
     ],
   },
 ];
