@@ -36,76 +36,53 @@ function DesktopParticles() {
 
 function DesktopCTA() {
   const navigate = useNavigate();
-  const words = ['Erstberatung', 'vereinbaren'];
 
   return (
     <motion.div
-      className="mt-10 flex flex-col items-center gap-5"
+      className="mt-12 flex flex-col items-start gap-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1, delay: 2.4, ease: EASE_OUT }}
     >
       <motion.div
-        className="flex items-center gap-3"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 2.6 }}
-      >
-        <motion.div
-          className="w-8 h-px bg-gray-400"
-          initial={{ width: 0 }}
-          animate={{ width: 32 }}
-          transition={{ duration: 0.6, delay: 2.8 }}
-        />
-        <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500 font-medium">
-          Ihr Weg beginnt hier
-        </span>
-        <motion.div
-          className="w-8 h-px bg-gray-400"
-          initial={{ width: 0 }}
-          animate={{ width: 32 }}
-          transition={{ duration: 0.6, delay: 2.8 }}
-        />
-      </motion.div>
+        className="w-12 h-px bg-gray-300"
+        initial={{ width: 0, opacity: 0 }}
+        animate={{ width: 48, opacity: 1 }}
+        transition={{ duration: 0.5, delay: 2.5 }}
+      />
 
       <motion.button
         onClick={() => navigate('/kontakt')}
-        className="group relative px-8 py-3.5 rounded-full overflow-hidden cursor-pointer"
+        className="group relative px-7 py-3.5 overflow-hidden cursor-pointer"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 3.0 }}
-        whileTap={{ scale: 0.97 }}
+        transition={{ duration: 0.6, delay: 2.7, ease: EASE_OUT }}
+        whileTap={{ scale: 0.98 }}
       >
-        <div className="absolute inset-0 bg-gray-900 rounded-full" />
-        <motion.div
-          className="absolute inset-0 rounded-full opacity-0 group-active:opacity-100"
-          style={{ background: 'linear-gradient(135deg, #0369a1 0%, #0284c7 100%)' }}
-          transition={{ duration: 0.3 }}
-        />
-        <div className="relative flex items-center gap-2">
-          <span className="text-sm font-medium tracking-wide text-white">
-            {words.map((word, wi) => (
-              <motion.span
-                key={wi}
-                className="inline-block mr-1.5"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 3.2 + wi * 0.12 }}
-              >
-                {word}
-              </motion.span>
-            ))}
+        <div className="absolute inset-0 bg-gray-900 transition-colors duration-200 group-hover:bg-gray-700" />
+        <div className="relative flex items-center gap-2.5">
+          <span className="text-sm font-semibold tracking-wide text-white">
+            System anfragen
           </span>
           <motion.svg
-            width="16" height="16" viewBox="0 0 16 16" fill="none"
-            className="text-white/70"
+            width="14" height="14" viewBox="0 0 16 16" fill="none"
+            className="text-white/60"
             animate={{ x: [0, 3, 0] }}
-            transition={{ duration: 2, repeat: Infinity, delay: 4, ease: 'easeInOut' }}
+            transition={{ duration: 2.5, repeat: Infinity, delay: 4.5, ease: 'easeInOut' }}
           >
             <path d="M6 3L11 8L6 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </motion.svg>
         </div>
       </motion.button>
+
+      <motion.span
+        className="text-[11px] text-gray-400 tracking-wide"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 3.0 }}
+      >
+        Für Unternehmen in Deutschland
+      </motion.span>
     </motion.div>
   );
 }
@@ -138,7 +115,16 @@ export function DesktopHero() {
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-8 flex items-center gap-0">
         <div className="flex-1 max-w-xl">
-          <div className="relative mb-6">
+          <motion.p
+            className="text-[11px] font-semibold tracking-[0.25em] uppercase text-gray-400 mb-10"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.7, ease: EASE_OUT }}
+          >
+            Operative AI Systems
+          </motion.p>
+
+          <div className="relative mb-0">
             <h1 className="text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none">
               {'CogniIQ'.split('').map((char, i) => (
                 <motion.span
@@ -168,20 +154,13 @@ export function DesktopHero() {
             />
           </div>
 
-          <motion.div
-            className="h-px bg-gradient-to-r from-sky-700/40 to-transparent mb-5 max-w-[200px]"
-            initial={{ width: 0, opacity: 0 }}
-            animate={{ width: 200, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 1.8 }}
-          />
-
           <motion.p
-            className="text-xl lg:text-2xl font-light tracking-wide text-gray-500"
+            className="mt-8 text-lg lg:text-xl text-gray-500 font-light leading-relaxed max-w-[380px]"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 2.0, ease: EASE_OUT }}
           >
-            The Future is here.
+            Digitale Systeme, die Prozesse übernehmen, Anfragen erzeugen und Wachstum automatisieren.
           </motion.p>
 
           <DesktopCTA />
