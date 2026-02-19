@@ -3,127 +3,127 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
   <url>
-    <loc>https://cogniiq.com/</loc>
+    <loc>https://cogniiq.de/</loc>
     <lastmod>2025-01-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/"/>
   </url>
 
   <url>
-    <loc>https://cogniiq.com/leistungen</loc>
+    <loc>https://cogniiq.de/leistungen</loc>
     <lastmod>2025-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/leistungen"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/leistungen"/>
   </url>
 
   <url>
-    <loc>https://cogniiq.com/ueber-uns</loc>
+    <loc>https://cogniiq.de/ueber-uns</loc>
     <lastmod>2025-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/ueber-uns"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/ueber-uns"/>
   </url>
 
   <url>
-    <loc>https://cogniiq.com/faq</loc>
+    <loc>https://cogniiq.de/faq</loc>
     <lastmod>2025-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/faq"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/faq"/>
   </url>
 
   <url>
-    <loc>https://cogniiq.com/kontakt</loc>
+    <loc>https://cogniiq.de/kontakt</loc>
     <lastmod>2025-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/kontakt"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/kontakt"/>
   </url>
 
   <!-- Bayern Hub -->
   <url>
-    <loc>https://cogniiq.com/bayern</loc>
+    <loc>https://cogniiq.de/bayern</loc>
     <lastmod>2025-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/bayern"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/bayern"/>
   </url>
 
   <!-- Bayreuth -->
   <url>
-    <loc>https://cogniiq.com/bayreuth/ki-telefonassistent</loc>
+    <loc>https://cogniiq.de/bayreuth/ki-telefonassistent</loc>
     <lastmod>2025-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/bayreuth/ki-telefonassistent"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/bayreuth/ki-telefonassistent"/>
   </url>
 
   <url>
-    <loc>https://cogniiq.com/bayreuth/automatisierung</loc>
+    <loc>https://cogniiq.de/bayreuth/automatisierung</loc>
     <lastmod>2025-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/bayreuth/automatisierung"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/bayreuth/automatisierung"/>
   </url>
 
   <url>
-    <loc>https://cogniiq.com/bayreuth/webdesign</loc>
+    <loc>https://cogniiq.de/bayreuth/webdesign</loc>
     <lastmod>2025-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/bayreuth/webdesign"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/bayreuth/webdesign"/>
   </url>
 
   <!-- Regensburg -->
   <url>
-    <loc>https://cogniiq.com/regensburg/ki-telefonassistent</loc>
+    <loc>https://cogniiq.de/regensburg/ki-telefonassistent</loc>
     <lastmod>2025-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/regensburg/ki-telefonassistent"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/regensburg/ki-telefonassistent"/>
   </url>
 
   <url>
-    <loc>https://cogniiq.com/regensburg/automatisierung</loc>
+    <loc>https://cogniiq.de/regensburg/automatisierung</loc>
     <lastmod>2025-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/regensburg/automatisierung"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/regensburg/automatisierung"/>
   </url>
 
   <url>
-    <loc>https://cogniiq.com/regensburg/webdesign</loc>
+    <loc>https://cogniiq.de/regensburg/webdesign</loc>
     <lastmod>2025-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/regensburg/webdesign"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/regensburg/webdesign"/>
   </url>
 
   <!-- München -->
   <url>
-    <loc>https://cogniiq.com/muenchen/ki-telefonassistent</loc>
+    <loc>https://cogniiq.de/muenchen/ki-telefonassistent</loc>
     <lastmod>2025-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/muenchen/ki-telefonassistent"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/muenchen/ki-telefonassistent"/>
   </url>
 
   <url>
-    <loc>https://cogniiq.com/muenchen/automatisierung</loc>
+    <loc>https://cogniiq.de/muenchen/automatisierung</loc>
     <lastmod>2025-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/muenchen/automatisierung"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/muenchen/automatisierung"/>
   </url>
 
   <url>
-    <loc>https://cogniiq.com/muenchen/webdesign</loc>
+    <loc>https://cogniiq.de/muenchen/webdesign</loc>
     <lastmod>2025-01-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.com/muenchen/webdesign"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/muenchen/webdesign"/>
   </url>
 
 </urlset>
