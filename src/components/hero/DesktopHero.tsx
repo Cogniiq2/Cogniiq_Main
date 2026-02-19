@@ -160,7 +160,7 @@ export function DesktopHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 2.0, ease: EASE_OUT }}
           >
-            Digitale Systeme, die Prozesse übernehmen, Anfragen erzeugen und Wachstum automatisieren.
+            Digitale Systeme, die Anfragen übernehmen, Prozesse steuern und Wachstum automatisieren.
           </motion.p>
 
           <DesktopCTA />
