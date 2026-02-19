@@ -56,10 +56,19 @@
 
   body {
     @apply bg-background text-foreground;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   html {
     scroll-behavior: smooth;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-property: background-color, border-color, color;
+    transition-duration: 0.3s;
+    transition-timing-function: ease;
   }
 }
 

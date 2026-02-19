@@ -61,7 +61,7 @@ const timelineData = stageContent.map((stage, index) => {
   return {
     title: `${String(index + 1).padStart(2, '0')}`,
     content: (
-      <div className="group relative overflow-hidden bg-white rounded-2xl p-7 border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-500">
+      <div className="group relative overflow-hidden bg-white dark:bg-gray-900 rounded-2xl p-7 border border-gray-100 dark:border-gray-800 shadow-lg hover:shadow-xl transition-all duration-500">
         <div className={`absolute top-0 left-0 w-1 h-full bg-gradient-to-b ${stage.color} rounded-l-2xl`} />
 
         <div className="flex items-start gap-4 mb-5">
@@ -69,13 +69,13 @@ const timelineData = stageContent.map((stage, index) => {
             <Icon className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h4 className="text-xl font-bold text-gray-900 leading-tight">
+            <h4 className="text-xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
               {stage.title}
             </h4>
           </div>
         </div>
 
-        <p className="text-gray-600 leading-relaxed mb-5 text-sm md:text-base">
+        <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-5 text-sm md:text-base">
           {stage.description}
         </p>
 
@@ -83,7 +83,7 @@ const timelineData = stageContent.map((stage, index) => {
           {stage.items.map((item, i) => (
             <div key={i} className="flex items-center gap-2.5">
               <CheckCircle className="w-4 h-4 flex-shrink-0 text-sky-500" />
-              <span className="text-sm text-gray-700 font-medium">{item}</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{item}</span>
             </div>
           ))}
         </div>
@@ -94,16 +94,16 @@ const timelineData = stageContent.map((stage, index) => {
 
 export function ProcessSection() {
   return (
-    <section id="ablauf" className="py-20 bg-gray-50" aria-labelledby="process-heading">
+    <section id="ablauf" className="py-20 bg-gray-50 dark:bg-gray-900 transition-colors duration-300" aria-labelledby="process-heading">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center mb-4">
           <h2
             id="process-heading"
-            className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900"
+            className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900 dark:text-gray-100"
           >
             So arbeiten wir zusammen
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             Transparenter Prozess: Von der ersten Anfrage bis zum erfolgreichen Go-Live
           </p>
         </div>

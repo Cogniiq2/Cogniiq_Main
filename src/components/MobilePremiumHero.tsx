@@ -565,7 +565,7 @@ function PersonalCTA() {
         transition={{ duration: 0.8, delay: 3.6 }}
       >
         <motion.div
-          className="w-8 h-px bg-gray-300"
+          className="w-8 h-px bg-gray-300 dark:bg-gray-600"
           initial={{ width: 0 }}
           animate={{ width: 32 }}
           transition={{ duration: 0.6, delay: 3.8 }}
@@ -574,7 +574,7 @@ function PersonalCTA() {
           Ihr Weg beginnt hier
         </span>
         <motion.div
-          className="w-8 h-px bg-gray-300"
+          className="w-8 h-px bg-gray-300 dark:bg-gray-600"
           initial={{ width: 0 }}
           animate={{ width: 32 }}
           transition={{ duration: 0.6, delay: 3.8 }}
@@ -665,7 +665,7 @@ export function MobilePremiumHero() {
       ref={containerRef}
       className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden"
     >
-      <div className="absolute inset-0 bg-white" />
+      <div className="absolute inset-0 bg-white dark:bg-gray-950 transition-colors duration-300" />
 
       <div
         className="absolute inset-0"
@@ -709,7 +709,7 @@ export function MobilePremiumHero() {
             {'CogniIQ'.split('').map((char, i) => (
               <motion.span
                 key={i}
-                className="inline-block bg-clip-text text-transparent bg-gradient-to-b from-gray-900 via-gray-800 to-gray-500"
+                className="inline-block bg-clip-text text-transparent bg-gradient-to-b from-gray-900 via-gray-800 to-gray-500 dark:from-gray-100 dark:via-gray-300 dark:to-gray-500"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 2.0 + i * 0.08, ease: EASE_OUT }}
@@ -752,7 +752,7 @@ export function MobilePremiumHero() {
         />
 
         <motion.p
-          className="text-lg sm:text-xl font-light tracking-wide text-gray-500"
+          className="text-lg sm:text-xl font-light tracking-wide text-gray-500 dark:text-gray-400"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 3.0, ease: EASE_OUT }}
@@ -797,8 +797,9 @@ export function MobilePremiumHero() {
       <div
         className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none"
         style={{
-          background: 'linear-gradient(to bottom, transparent, white)',
+          background: 'linear-gradient(to bottom, transparent, var(--mobile-hero-fade, white))',
         }}
+        className="dark:[--mobile-hero-fade:rgb(3_7_18)]"
       />
 
       <motion.div
@@ -808,12 +809,12 @@ export function MobilePremiumHero() {
         transition={{ delay: 4.8, duration: 1 }}
       >
         <motion.div
-          className="w-5 h-8 rounded-full border border-gray-300 flex items-start justify-center p-1"
+          className="w-5 h-8 rounded-full border border-gray-300 dark:border-gray-700 flex items-start justify-center p-1"
           animate={{ opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
           <motion.div
-            className="w-1 h-1.5 rounded-full bg-gray-400"
+            className="w-1 h-1.5 rounded-full bg-gray-400 dark:bg-gray-600"
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
           />
