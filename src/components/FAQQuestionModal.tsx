@@ -1,7 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { X, ArrowRight } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
 
 interface Props {
   open: boolean;
@@ -85,19 +84,11 @@ export function FAQQuestionModal({ open, onClose }: Props) {
       question: form.message.trim(),
     };
     try {
-      await Promise.all([
-        supabase.from('faq_questions').insert({
-          name: payload.name,
-          email: payload.email,
-          phone: payload.phone,
-          message: payload.question,
-        }),
-        fetch('https://n8n.cogniiq.co/webhook/faq', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        }),
-      ]);
+      await fetch('https://n8n.cogniiq.co/webhook/faq', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
       setSuccess(true);
     } catch {
     } finally {
