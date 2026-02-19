@@ -39,34 +39,34 @@ function DesktopCTA() {
 
   return (
     <motion.div
-      className="mt-12 flex flex-col items-start gap-4"
+      className="mt-11 flex flex-col items-start gap-3"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1, delay: 2.4, ease: EASE_OUT }}
     >
       <motion.div
-        className="w-12 h-px bg-gray-300"
+        className="h-px bg-gray-200"
         initial={{ width: 0, opacity: 0 }}
-        animate={{ width: 48, opacity: 1 }}
+        animate={{ width: 40, opacity: 1 }}
         transition={{ duration: 0.5, delay: 2.5 }}
       />
 
       <motion.button
         onClick={() => navigate('/kontakt')}
-        className="group relative px-7 py-3.5 overflow-hidden cursor-pointer"
-        initial={{ opacity: 0, y: 10 }}
+        className="group relative px-6 py-3 overflow-hidden cursor-pointer rounded-[3px]"
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 2.7, ease: EASE_OUT }}
         whileTap={{ scale: 0.98 }}
       >
-        <div className="absolute inset-0 bg-gray-900 transition-colors duration-200 group-hover:bg-gray-700" />
+        <div className="absolute inset-0 bg-gray-900 transition-colors duration-200 group-hover:bg-gray-800" />
         <div className="relative flex items-center gap-2.5">
-          <span className="text-sm font-semibold tracking-wide text-white">
+          <span className="text-[13px] font-semibold tracking-[0.04em] text-white">
             System anfragen
           </span>
           <motion.svg
-            width="14" height="14" viewBox="0 0 16 16" fill="none"
-            className="text-white/60"
+            width="13" height="13" viewBox="0 0 16 16" fill="none"
+            className="text-white/50"
             animate={{ x: [0, 3, 0] }}
             transition={{ duration: 2.5, repeat: Infinity, delay: 4.5, ease: 'easeInOut' }}
           >
@@ -75,14 +75,19 @@ function DesktopCTA() {
         </div>
       </motion.button>
 
-      <motion.span
-        className="text-[11px] text-gray-400 tracking-wide"
+      <motion.div
+        className="flex flex-col gap-0.5"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 3.0 }}
       >
-        Für Unternehmen in Deutschland
-      </motion.span>
+        <span className="text-[11px] text-gray-400 tracking-wide leading-snug">
+          Analysegespräch für Ihr Unternehmen
+        </span>
+        <span className="text-[11px] text-gray-400 tracking-wide leading-snug">
+          Für Unternehmen in Deutschland
+        </span>
+      </motion.div>
     </motion.div>
   );
 }
@@ -115,9 +120,13 @@ export function DesktopHero() {
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-8 flex items-center gap-0">
         <div className="flex-1 max-w-xl">
+          <h1 className="sr-only">
+            KI Automatisierung und operative AI Systeme für Unternehmen – Cogniiq
+          </h1>
+
           <motion.p
-            className="text-[11px] font-semibold tracking-[0.25em] uppercase text-gray-400 mb-10"
-            initial={{ opacity: 0, y: 8 }}
+            className="text-[10px] font-medium tracking-[0.18em] uppercase text-gray-400 mb-6"
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.7, ease: EASE_OUT }}
           >
@@ -125,19 +134,26 @@ export function DesktopHero() {
           </motion.p>
 
           <div className="relative mb-0">
-            <h1 className="text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none">
-              {'CogniIQ'.split('').map((char, i) => (
+            <motion.h2
+              className="text-5xl lg:text-6xl xl:text-[4rem] font-bold text-gray-900"
+              style={{ letterSpacing: '-0.02em', lineHeight: 1.05 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.9 }}
+              aria-hidden="true"
+            >
+              {'Digitale Systeme,\ndie Unternehmen führen.'.split('').map((char, i) => (
                 <motion.span
                   key={i}
-                  className="inline-block bg-clip-text text-transparent bg-gradient-to-b from-gray-900 via-gray-700 to-gray-400"
-                  initial={{ opacity: 0, y: 20 }}
+                  className={`inline-block${char === '\n' ? ' block' : ''}`}
+                  initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 1.0 + i * 0.08, ease: EASE_OUT }}
+                  transition={{ duration: 0.45, delay: 1.0 + i * 0.022, ease: EASE_OUT }}
                 >
-                  {char}
+                  {char === '\n' ? null : char === ' ' ? '\u00A0' : char}
                 </motion.span>
               ))}
-            </h1>
+            </motion.h2>
 
             <motion.div
               className="absolute top-1/2 -translate-y-1/2 w-[2px] h-[55%] rounded-full pointer-events-none"
@@ -155,12 +171,13 @@ export function DesktopHero() {
           </div>
 
           <motion.p
-            className="mt-8 text-lg lg:text-xl text-gray-500 font-light leading-relaxed max-w-[380px]"
+            className="mt-7 text-base lg:text-[17px] text-gray-500 font-light leading-[1.65]"
+            style={{ maxWidth: '38ch' }}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 2.0, ease: EASE_OUT }}
           >
-            Digitale Systeme, die Anfragen übernehmen, Prozesse steuern und Wachstum automatisieren.
+            Wir entwickeln operative KI-Strukturen, die Anfragen übernehmen, Prozesse steuern und Wachstum automatisieren.
           </motion.p>
 
           <DesktopCTA />
