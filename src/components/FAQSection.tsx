@@ -1,6 +1,7 @@
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { Plus } from 'lucide-react';
+import { FAQQuestionModal } from './FAQQuestionModal';
 
 const faqs = [
   {
@@ -70,6 +71,7 @@ export function FAQSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.08 });
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const toggle = (i: number) => setOpenIndex(prev => (prev === i ? null : i));
 
@@ -258,8 +260,9 @@ export function FAQSection() {
                   Wir antworten direkt — kein Formular-Chaos.
                 </p>
               </div>
-              <a
-                href="#kontakt"
+              <button
+                type="button"
+                onClick={() => setModalOpen(true)}
                 className="flex-shrink-0 flex items-center gap-2 text-white transition-opacity hover:opacity-80"
                 style={{
                   background: '#111827',
@@ -269,16 +272,19 @@ export function FAQSection() {
                   borderRadius: '8px',
                   height: '40px',
                   padding: '0 18px',
-                  textDecoration: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
                 }}
               >
-                Gespräch anfragen
-              </a>
+                Frage stellen
+              </button>
             </motion.div>
           </motion.div>
 
         </div>
       </div>
+
+      <FAQQuestionModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </section>
   );
 }
