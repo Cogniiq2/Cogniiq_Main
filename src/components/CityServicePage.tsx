@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { CheckCircle2, ArrowRight, MapPin, ChevronRight, Info, Phone } from "lucide-react";
+import { CheckCircle2, ArrowRight, MapPin, ChevronRight, Info, Phone, Building2, Lightbulb } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Accordion,
@@ -91,6 +91,8 @@ export function CityServicePage({ config }: CityServicePageProps) {
         <MidPageCTA config={config} />
         <UseCasesSection config={config} />
         <ProcessSection config={config} />
+        <BranchenSection config={config} />
+        <LocalSzenarienSection config={config} />
         <LocalRelevanzSection config={config} />
         <FAQSection config={config} />
         <RelatedPages config={config} />
@@ -456,6 +458,125 @@ function LocalRelevanzSection({ config }: { config: CityServiceConfig }) {
               ))}
             </div>
           </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BranchenSection({ config }: { config: CityServiceConfig }) {
+  if (!config.industriesExpanded || config.industriesExpanded.length === 0) return null;
+
+  return (
+    <section className="py-20 bg-white dark:bg-gray-950 transition-colors duration-300" aria-labelledby="branchen-heading">
+      <div className="max-w-5xl mx-auto px-6 lg:px-8">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeUp}
+          custom={0}
+          className="mb-12"
+        >
+          <h2 id="branchen-heading" className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+            Branchen in {config.city}, die besonders profitieren
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400">
+            Wer in {config.city} am meisten von {config.service} gewinnt – und warum.
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 gap-5">
+          {config.industriesExpanded.map((block, i) => (
+            <motion.div
+              key={i}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUp}
+              custom={i * 0.07}
+              className="p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/50"
+            >
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="w-8 h-8 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+                  <Building2 size={14} className="text-gray-500 dark:text-gray-400" />
+                </div>
+                <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wide">
+                  {block.name}
+                </h3>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">
+                    Herausforderung
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                    {block.problem}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-[#515A61] dark:text-sky-400 uppercase tracking-widest mb-1">
+                    Lösung
+                  </p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                    {block.solution}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function LocalSzenarienSection({ config }: { config: CityServiceConfig }) {
+  if (!config.localScenarios || config.localScenarios.length === 0) return null;
+
+  return (
+    <section className="py-20 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300" aria-labelledby="szenarien-heading">
+      <div className="max-w-5xl mx-auto px-6 lg:px-8">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeUp}
+          custom={0}
+          className="mb-12"
+        >
+          <h2 id="szenarien-heading" className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+            Typische Einsatzsituationen in {config.city}
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400">
+            Reale Ausgangssituationen – wie {config.service} in {config.city} konkret hilft.
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {config.localScenarios.map((scenario, i) => (
+            <motion.div
+              key={i}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUp}
+              custom={i * 0.09}
+              className="flex gap-4 p-6 rounded-2xl bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
+            >
+              <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                <Lightbulb size={15} className="text-gray-400 dark:text-gray-500" />
+              </div>
+              <div>
+                <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                  {scenario.title}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                  {scenario.description}
+                </p>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
