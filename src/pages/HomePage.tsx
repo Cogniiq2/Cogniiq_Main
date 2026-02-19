@@ -1,4 +1,5 @@
 import { HeroSection } from '@/components/HeroSection';
+import { TrustStrip } from '@/components/TrustStrip';
 import { TrustSection } from '@/components/TrustSection';
 import { LocationContent } from '@/components/LocationContent';
 import { PageSEO } from '@/components/PageSEO';
@@ -14,6 +15,7 @@ export function HomePage() {
         breadcrumbs={[{ name: "Home", url: BUSINESS_INFO.website }]}
       />
       <HeroSection />
+      <TrustStrip />
       <TrustSection />
       <LocationContent />
     </>
