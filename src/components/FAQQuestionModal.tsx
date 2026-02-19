@@ -78,13 +78,26 @@ export function FAQQuestionModal({ open, onClose }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    const payload = {
+      name: form.name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim() || null,
+      question: form.message.trim(),
+    };
     try {
-      await supabase.from('faq_questions').insert({
-        name: form.name.trim(),
-        email: form.email.trim(),
-        phone: form.phone.trim() || null,
-        message: form.message.trim(),
-      });
+      await Promise.all([
+        supabase.from('faq_questions').insert({
+          name: payload.name,
+          email: payload.email,
+          phone: payload.phone,
+          message: payload.question,
+        }),
+        fetch('https://n8n.cogniiq.co/webhook/faq', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }),
+      ]);
       setSuccess(true);
     } catch {
     } finally {
