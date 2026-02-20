@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, MapPin } from 'lucide-react';
 import { Logo } from './Logo';
-import { InteractiveMenu } from './ui/modern-mobile-menu';
+import { PremiumMobileNav } from './ui/premium-mobile-nav';
 import { CITY_LINKS } from '@/lib/standorte-data';
 
 const cityEntries = Object.entries(CITY_LINKS) as Array<[string, typeof CITY_LINKS[keyof typeof CITY_LINKS]]>;
@@ -80,14 +80,7 @@ export function Navigation() {
         </div>
       </motion.nav>
 
-      <motion.div
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.5 }}
-        className="fixed bottom-4 left-4 right-4 z-50 lg:hidden"
-      >
-        <InteractiveMenu />
-      </motion.div>
+      <PremiumMobileNav />
     </>
   );
 }
