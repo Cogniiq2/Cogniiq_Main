@@ -11,6 +11,7 @@ import { UeberUnsPage } from './pages/UeberUnsPage';
 import { FAQPage } from './pages/FAQPage';
 import { KontaktPage } from './pages/KontaktPage';
 import { BayernPage } from './pages/BayernPage';
+import { CityLandingPage } from './pages/CityLandingPage';
 import { CITY_SERVICE_CONFIGS } from './lib/standorte-data';
 
 function App() {
@@ -27,6 +28,9 @@ function App() {
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/kontakt" element={<KontaktPage />} />
             <Route path="/bayern" element={<BayernPage />} />
+            <Route path="/bayreuth" element={<CityLandingPage citySlug="bayreuth" />} />
+            <Route path="/muenchen" element={<CityLandingPage citySlug="muenchen" />} />
+            <Route path="/regensburg" element={<CityLandingPage citySlug="regensburg" />} />
             {Object.values(CITY_SERVICE_CONFIGS).map((config) => (
               <Route
                 key={config.route}

@@ -155,12 +155,12 @@ export function DesktopHero() {
           </div>
 
           <motion.p
-            className="mt-8 text-lg lg:text-xl text-gray-500 font-light leading-relaxed max-w-[380px]"
+            className="mt-8 text-lg lg:text-xl text-gray-500 font-light leading-relaxed max-w-[420px]"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 2.0, ease: EASE_OUT }}
           >
-            Digitale Systeme, die Prozesse übernehmen, Anfragen erzeugen und Wachstum automatisieren.
+            AI-Systeme, Webdesign &amp; Automatisierung für Unternehmen in Bayreuth, München und Regensburg.
           </motion.p>
 
           <DesktopCTA />

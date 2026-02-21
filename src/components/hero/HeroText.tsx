@@ -88,9 +88,9 @@ export function HeroText() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 1.6, ease: EASE_OUT }}
       >
-        KI-Automatisierung und hochkonvertierende Websites
+        AI-Systeme, Webdesign &amp; Automatisierung
         <br className="hidden sm:block" />
-        {' '}aus Bayreuth, Bayern.
+        {' '}für Unternehmen in Bayreuth, München und Regensburg.
       </motion.p>
     </div>
   );

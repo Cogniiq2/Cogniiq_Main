@@ -1210,25 +1210,25 @@ export const CITY_LINKS: Record<CitySlug, { label: string; services: Array<{ lab
   bayreuth: {
     label: "Bayreuth",
     services: [
-      { label: "KI Telefonassistent", href: "/bayreuth/ki-telefonassistent" },
-      { label: "Automatisierung", href: "/bayreuth/automatisierung" },
-      { label: "Webdesign", href: "/bayreuth/webdesign" },
-    ],
-  },
-  regensburg: {
-    label: "Regensburg",
-    services: [
-      { label: "KI Telefonassistent", href: "/regensburg/ki-telefonassistent" },
-      { label: "Automatisierung", href: "/regensburg/automatisierung" },
-      { label: "Webdesign", href: "/regensburg/webdesign" },
+      { label: "Webdesign Bayreuth", href: "/bayreuth/webdesign" },
+      { label: "KI-Telefonassistent Bayreuth", href: "/bayreuth/ki-telefonassistent" },
+      { label: "Automatisierung Bayreuth", href: "/bayreuth/automatisierung" },
     ],
   },
   muenchen: {
     label: "München",
     services: [
-      { label: "KI Telefonassistent", href: "/muenchen/ki-telefonassistent" },
-      { label: "Automatisierung", href: "/muenchen/automatisierung" },
-      { label: "Webdesign", href: "/muenchen/webdesign" },
+      { label: "Webdesign München", href: "/muenchen/webdesign" },
+      { label: "KI-Telefonassistent München", href: "/muenchen/ki-telefonassistent" },
+      { label: "Automatisierung München", href: "/muenchen/automatisierung" },
+    ],
+  },
+  regensburg: {
+    label: "Regensburg",
+    services: [
+      { label: "Webdesign Regensburg", href: "/regensburg/webdesign" },
+      { label: "KI-Telefonassistent Regensburg", href: "/regensburg/ki-telefonassistent" },
+      { label: "Automatisierung Regensburg", href: "/regensburg/automatisierung" },
     ],
   },
 };

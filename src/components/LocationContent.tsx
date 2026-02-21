@@ -1,36 +1,70 @@
 import { MapPin, Users, Building2, Zap, Clock, Phone, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 import { BUSINESS_INFO, getGoogleMapsUrl, getGoogleMapsEmbedUrl } from "@/lib/seo-data";
 import { motion } from "framer-motion";
 
-const SERVICE_CITIES = [
-  "Bayreuth", "München", "Nürnberg", "Regensburg",
-  "Bamberg", "Würzburg", "Erlangen", "Fürth",
-  "Ingolstadt", "Augsburg",
+const SERVICE_CITIES: Array<{ label: string; href: string }> = [
+  { label: "Bayreuth", href: "/bayreuth" },
+  { label: "München", href: "/muenchen" },
+  { label: "Regensburg", href: "/regensburg" },
+  { label: "Nürnberg", href: "#" },
+  { label: "Bamberg", href: "#" },
+  { label: "Würzburg", href: "#" },
+  { label: "Erlangen", href: "#" },
+  { label: "Fürth", href: "#" },
+  { label: "Ingolstadt", href: "#" },
+  { label: "Augsburg", href: "#" },
 ];
 
-export function LocationContent() {
-  const locations = [
-    {
-      icon: MapPin,
-      title: "Bayreuth",
-      description: "Unser Hauptsitz im Herzen von Bayreuth. Persönliche Beratung vor Ort jederzeit möglich.",
-      emphasis: "primary",
-      badge: "Hauptsitz",
-    },
-    {
-      icon: Building2,
-      title: "Bayern",
-      description: "Wir betreuen Unternehmen in ganz Bayern – von München bis Nürnberg, von Augsburg bis Regensburg.",
-      emphasis: "secondary",
-    },
-    {
-      icon: Users,
-      title: "Deutschland",
-      description: "Remote-Zusammenarbeit mit Kunden in ganz Deutschland und darüber hinaus.",
-      emphasis: "secondary",
-    },
-  ];
+const BAYREUTH_SERVICES = [
+  { label: "Webdesign Bayreuth", href: "/bayreuth/webdesign" },
+  { label: "KI-Telefonassistent Bayreuth", href: "/bayreuth/ki-telefonassistent" },
+  { label: "Automatisierung Bayreuth", href: "/bayreuth/automatisierung" },
+];
 
+const BAYERN_SERVICES = [
+  { label: "Webdesign München", href: "/muenchen/webdesign" },
+  { label: "Webdesign Regensburg", href: "/regensburg/webdesign" },
+  { label: "KI-Telefonassistent München", href: "/muenchen/ki-telefonassistent" },
+  { label: "KI-Telefonassistent Regensburg", href: "/regensburg/ki-telefonassistent" },
+  { label: "Automatisierung München", href: "/muenchen/automatisierung" },
+  { label: "Automatisierung Regensburg", href: "/regensburg/automatisierung" },
+];
+
+const DEUTSCHLAND_SERVICES = [
+  { label: "Webdesign Deutschland", href: "/leistungen" },
+  { label: "KI-Telefonassistent Deutschland", href: "/leistungen" },
+  { label: "Automatisierung Deutschland", href: "/leistungen" },
+];
+
+const LOKAL_LINKS = [
+  { label: "Webdesign Bayreuth", href: "/bayreuth/webdesign" },
+  { label: "Webdesign München", href: "/muenchen/webdesign" },
+  { label: "Webdesign Regensburg", href: "/regensburg/webdesign" },
+  { label: "KI-Telefonassistent Bayreuth", href: "/bayreuth/ki-telefonassistent" },
+  { label: "KI-Telefonassistent München", href: "/muenchen/ki-telefonassistent" },
+  { label: "KI-Telefonassistent Regensburg", href: "/regensburg/ki-telefonassistent" },
+  { label: "Automatisierung Bayreuth", href: "/bayreuth/automatisierung" },
+  { label: "Automatisierung München", href: "/muenchen/automatisierung" },
+  { label: "Automatisierung Regensburg", href: "/regensburg/automatisierung" },
+];
+
+function InternalLink({ href, label }: { href: string; label: string }) {
+  const isExternal = href === "#";
+  if (isExternal) {
+    return <span className="text-[#515A61] dark:text-sky-400 font-medium">{label}</span>;
+  }
+  return (
+    <Link
+      to={href}
+      className="text-[#515A61] dark:text-sky-400 hover:text-[#3a4147] dark:hover:text-sky-300 font-medium underline underline-offset-2 decoration-[#515A61]/30 dark:decoration-sky-400/30 hover:decoration-[#515A61] dark:hover:decoration-sky-300 transition-colors"
+    >
+      {label}
+    </Link>
+  );
+}
+
+export function LocationContent() {
   return (
     <section
       id="standort"
@@ -76,65 +110,110 @@ export function LocationContent() {
             id="location-heading"
             className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4"
           >
-            Ihre AI & Webdesign Agentur in{" "}
+            Ihre AI &amp; Webdesign Agentur in{" "}
             <span className="text-[#515A61] dark:text-sky-400">Bayreuth</span>
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Mit Sitz in Bayreuth betreuen wir Unternehmen in ganz Deutschland.
-            Ob persönlich vor Ort oder remote – wir finden die beste Lösung für Ihr Projekt.
+            Als AI- und Webdesign-Agentur in Bayreuth entwickelt Cogniiq Websites,{" "}
+            <InternalLink href="/bayreuth/ki-telefonassistent" label="KI-Telefonassistenten" />{" "}
+            und{" "}
+            <InternalLink href="/bayreuth/automatisierung" label="Automatisierungssysteme" />{" "}
+            für Unternehmen jeder Größe. Unsere Lösungen verbinden{" "}
+            <InternalLink href="/bayreuth/webdesign" label="Webdesign" />,
+            künstliche Intelligenz und Prozessautomatisierung zu einem durchgängigen digitalen Vertriebssystem.
           </p>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-8 mb-16">
-          {locations.map((location, index) => {
-            const Icon = location.icon;
-            return (
-              <motion.div
-                key={location.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className={`relative p-6 rounded-2xl transition-colors duration-300 ${
-                  location.emphasis === "primary"
-                    ? "bg-[#515A61] dark:bg-gray-800 text-white shadow-lg"
-                    : "bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
-                }`}
-              >
-                {location.badge && (
-                  <span className="absolute top-4 right-4 text-[10px] font-semibold uppercase tracking-widest bg-white/20 dark:bg-white/10 px-2 py-0.5 rounded-full text-white">
-                    {location.badge}
-                  </span>
-                )}
-                <Icon
-                  size={32}
-                  className={`mb-4 ${
-                    location.emphasis === "primary"
-                      ? "text-white"
-                      : "text-[#515A61] dark:text-sky-400"
-                  }`}
-                />
-                <h3
-                  className={`text-xl font-semibold mb-2 ${
-                    location.emphasis === "primary"
-                      ? "text-white"
-                      : "text-gray-900 dark:text-gray-100"
-                  }`}
-                >
-                  {location.title}
-                </h3>
-                <p
-                  className={
-                    location.emphasis === "primary"
-                      ? "text-gray-100"
-                      : "text-gray-600 dark:text-gray-400"
-                  }
-                >
-                  {location.description}
-                </p>
-              </motion.div>
-            );
-          })}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0 }}
+            className="relative p-6 rounded-2xl transition-colors duration-300 bg-[#515A61] dark:bg-gray-800 text-white shadow-lg"
+          >
+            <span className="absolute top-4 right-4 text-[10px] font-semibold uppercase tracking-widest bg-white/20 dark:bg-white/10 px-2 py-0.5 rounded-full text-white">
+              Hauptsitz
+            </span>
+            <MapPin size={32} className="mb-4 text-white" />
+            <h3 className="text-xl font-semibold mb-2 text-white">Bayreuth</h3>
+            <p className="text-gray-100 mb-5">
+              Unser Hauptsitz im Herzen von Bayreuth. Persönliche Beratung vor Ort jederzeit möglich.
+            </p>
+            <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-2">
+              Leistungen in Bayreuth
+            </p>
+            <ul className="space-y-1.5">
+              {BAYREUTH_SERVICES.map((s) => (
+                <li key={s.href}>
+                  <Link
+                    to={s.href}
+                    className="text-sm text-white/80 hover:text-white transition-colors underline underline-offset-2 decoration-white/30 hover:decoration-white"
+                  >
+                    {s.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="relative p-6 rounded-2xl transition-colors duration-300 bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
+          >
+            <Building2 size={32} className="mb-4 text-[#515A61] dark:text-sky-400" />
+            <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">Bayern</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-5">
+              Wir betreuen Unternehmen in ganz Bayern – von München bis Nürnberg, von Augsburg bis Regensburg.
+            </p>
+            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+              Leistungen in Bayern
+            </p>
+            <ul className="space-y-1.5">
+              {BAYERN_SERVICES.map((s) => (
+                <li key={s.href}>
+                  <Link
+                    to={s.href}
+                    className="text-sm text-[#515A61] dark:text-sky-400 hover:text-[#3a4147] dark:hover:text-sky-300 transition-colors underline underline-offset-2 decoration-[#515A61]/30 dark:decoration-sky-400/30 hover:decoration-[#515A61] dark:hover:decoration-sky-300"
+                  >
+                    {s.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="relative p-6 rounded-2xl transition-colors duration-300 bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
+          >
+            <Users size={32} className="mb-4 text-[#515A61] dark:text-sky-400" />
+            <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">Deutschland</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-5">
+              Remote-Zusammenarbeit mit Kunden in ganz Deutschland und darüber hinaus.
+            </p>
+            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+              Digitale Leistungen
+            </p>
+            <ul className="space-y-1.5">
+              {DEUTSCHLAND_SERVICES.map((s) => (
+                <li key={s.label}>
+                  <Link
+                    to={s.href}
+                    className="text-sm text-[#515A61] dark:text-sky-400 hover:text-[#3a4147] dark:hover:text-sky-300 transition-colors underline underline-offset-2 decoration-[#515A61]/30 dark:decoration-sky-400/30 hover:decoration-[#515A61] dark:hover:decoration-sky-300"
+                  >
+                    {s.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
         </div>
 
         <motion.div
@@ -153,15 +232,28 @@ export function LocationContent() {
                 </h3>
               </div>
               <p className="text-gray-600 dark:text-gray-400 mb-5 leading-relaxed">
-                Als <strong className="text-gray-800 dark:text-gray-200">AI Agentur und Webdesign Agentur in Bayreuth</strong> verstehen
-                wir die Bedürfnisse lokaler Unternehmen. Gleichzeitig nutzen wir modernste
-                Technologien, um Kunden in ganz Deutschland zu betreuen.
+                Als <strong className="text-gray-800 dark:text-gray-200">AI- und Webdesign-Agentur in Bayreuth</strong> verstehen
+                wir die Anforderungen lokaler Unternehmen. Gleichzeitig betreuen wir Kunden in{" "}
+                <Link to="/muenchen" className="font-medium text-[#515A61] dark:text-sky-400 hover:underline">München</Link>{" "}
+                und{" "}
+                <Link to="/regensburg" className="font-medium text-[#515A61] dark:text-sky-400 hover:underline">Regensburg</Link>{" "}
+                mit denselben hochwertigen Systemen.
               </p>
               <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
-                <strong className="text-gray-800 dark:text-gray-200">Persönliche Termine</strong> sind im Raum Bayreuth, Regensburg und
-                München möglich. Für alle anderen Standorte arbeiten wir remote – mit den
-                gleichen hohen Standards.
+                Unsere Kernleistungen stehen für alle drei Standorte zur Verfügung:
               </p>
+
+              <div className="grid grid-cols-1 gap-1.5 mb-6">
+                {LOKAL_LINKS.map((link) => (
+                  <Link
+                    key={link.href}
+                    to={link.href}
+                    className="text-sm text-[#515A61] dark:text-sky-400 hover:text-[#3a4147] dark:hover:text-sky-300 font-medium underline underline-offset-2 decoration-[#515A61]/30 dark:decoration-sky-400/30 hover:decoration-[#515A61] dark:hover:decoration-sky-300 transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
 
               <div className="space-y-3 mb-6">
                 <a
@@ -236,16 +328,27 @@ export function LocationContent() {
           </p>
           <div className="flex flex-wrap justify-center gap-2">
             {SERVICE_CITIES.map((city) => (
-              <span
-                key={city}
-                className="px-3 py-1 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 rounded-full transition-colors duration-300"
-                itemProp="areaServed"
-              >
-                {city}
-              </span>
+              city.href === "#" ? (
+                <span
+                  key={city.label}
+                  className="px-3 py-1 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 rounded-full transition-colors duration-300"
+                  itemProp="areaServed"
+                >
+                  {city.label}
+                </span>
+              ) : (
+                <Link
+                  key={city.label}
+                  to={city.href}
+                  className="px-3 py-1 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-[#515A61] dark:text-sky-400 hover:border-[#515A61] dark:hover:border-sky-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-full transition-colors duration-300 font-medium"
+                  itemProp="areaServed"
+                >
+                  {city.label}
+                </Link>
+              )
             ))}
             <span className="px-3 py-1 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-500 rounded-full italic transition-colors duration-300">
-              & ganz Deutschland
+              &amp; ganz Deutschland
             </span>
           </div>
         </motion.div>
