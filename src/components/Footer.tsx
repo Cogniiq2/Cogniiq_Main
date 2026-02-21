@@ -108,13 +108,13 @@ export function Footer() {
             {/* LEISTUNGEN */}
             <AccordionCol heading="Leistungen">
               <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-1 pb-0.5">Deutschland</p>
-              <Link to="/leistungen" className={navLink}>Webdesign Deutschland</Link>
-              <Link to="/leistungen" className={navLink}>KI-Telefonassistent DE</Link>
-              <Link to="/leistungen" className={navLink}>Automatisierung DE</Link>
+              <Link to="/deutschland" className={navLink}>Webdesign Deutschland</Link>
+              <Link to="/deutschland" className={navLink}>KI-Telefonassistent DE</Link>
+              <Link to="/deutschland" className={navLink}>Automatisierung DE</Link>
               <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-3 pb-0.5">Bayern</p>
-              <Link to="/bayreuth/webdesign" className={navLink}>Webdesign Bayern</Link>
-              <Link to="/bayreuth/ki-telefonassistent" className={navLink}>KI-Telefonassistent BY</Link>
-              <Link to="/bayreuth/automatisierung" className={navLink}>Automatisierung BY</Link>
+              <Link to="/bayern" className={navLink}>Webdesign Bayern</Link>
+              <Link to="/bayern" className={navLink}>KI-Telefonassistent BY</Link>
+              <Link to="/bayern" className={navLink}>Automatisierung BY</Link>
               <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-3 pb-0.5">Branchen Bayreuth</p>
               <Link to="/webdesign-arzt-bayreuth" className={navLink}>Arztpraxis Bayreuth</Link>
               <Link to="/webdesign-gastronomie-bayreuth" className={navLink}>Gastronomie Bayreuth</Link>
@@ -182,8 +182,8 @@ export function Footer() {
               <Link to="/bayreuth" className="hover:text-gray-600 dark:hover:text-gray-400 transition-colors">Bayreuth</Link>.
               {" "}Wir entwickeln{" "}
               <Link to="/leistungen" className="hover:text-gray-600 dark:hover:text-gray-400 transition-colors">Websites</Link>,{" "}
-              <Link to="/bayreuth/ki-telefonassistent" className="hover:text-gray-600 dark:hover:text-gray-400 transition-colors">KI-Telefonassistenten</Link> und{" "}
-              <Link to="/bayreuth/automatisierung" className="hover:text-gray-600 dark:hover:text-gray-400 transition-colors">Automatisierungssysteme</Link> für Unternehmen in{" "}
+              <Link to="/leistungen" className="hover:text-gray-600 dark:hover:text-gray-400 transition-colors">KI-Telefonassistenten</Link> und{" "}
+              <Link to="/leistungen" className="hover:text-gray-600 dark:hover:text-gray-400 transition-colors">Automatisierungssysteme</Link> für Unternehmen in{" "}
               <Link to="/bayern" className="hover:text-gray-600 dark:hover:text-gray-400 transition-colors">Bayern</Link> und ganz{" "}
               <Link to="/deutschland" className="hover:text-gray-600 dark:hover:text-gray-400 transition-colors">Deutschland</Link>.
               {" "}Unsere Leistungen verbinden{" "}
