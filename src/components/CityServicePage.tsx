@@ -644,24 +644,24 @@ function CTASection({ config }: { config: CityServiceConfig }) {
           custom={0}
         >
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-            {config.service} in {config.city} – Projekt besprechen
+            {config.service} in {config.city} anfragen
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-            Kostenloses Erstgespräch, 30–45 Minuten, ohne Verpflichtung. Danach wissen Sie genau, was möglich ist und was es kostet.
+            Kostenloses Erstgespräch für Unternehmen in {config.city} – 30 bis 45 Minuten, ohne Verpflichtung. Danach wissen Sie genau, was möglich ist und was es kostet.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
               to="/kontakt"
               className="inline-flex items-center gap-2 px-7 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-gray-700 dark:hover:bg-white transition-colors"
             >
-              Kostenloses Erstgespräch
+              {config.service} in {config.city} anfragen
               <ArrowRight size={16} />
             </Link>
             <Link
               to="/leistungen"
               className="inline-flex items-center gap-2 px-7 py-3.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:border-gray-500 dark:hover:border-gray-400 transition-colors"
             >
-              Beispiele ansehen
+              Alle Leistungen ansehen
             </Link>
           </div>
 

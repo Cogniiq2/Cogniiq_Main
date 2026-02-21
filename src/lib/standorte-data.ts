@@ -198,12 +198,12 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       },
     ],
     sameServiceOtherCities: [
-      { label: "KI Telefonassistent Regensburg", href: "/regensburg/ki-telefonassistent" },
-      { label: "KI Telefonassistent München", href: "/muenchen/ki-telefonassistent" },
+      { label: "KI-Telefonassistent Regensburg", href: "/regensburg/ki-telefonassistent" },
+      { label: "KI-Telefonassistent München", href: "/muenchen/ki-telefonassistent" },
     ],
     otherServicesInCity: [
-      { label: "Automatisierung in Bayreuth", href: "/bayreuth/automatisierung" },
-      { label: "Webdesign in Bayreuth", href: "/bayreuth/webdesign" },
+      { label: "Automatisierung Bayreuth", href: "/bayreuth/automatisierung" },
+      { label: "Webdesign Bayreuth", href: "/bayreuth/webdesign" },
     ],
   },
 
@@ -329,8 +329,8 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { label: "Automatisierung München", href: "/muenchen/automatisierung" },
     ],
     otherServicesInCity: [
-      { label: "KI Telefonassistent in Bayreuth", href: "/bayreuth/ki-telefonassistent" },
-      { label: "Webdesign in Bayreuth", href: "/bayreuth/webdesign" },
+      { label: "KI-Telefonassistent Bayreuth", href: "/bayreuth/ki-telefonassistent" },
+      { label: "Webdesign Bayreuth", href: "/bayreuth/webdesign" },
     ],
   },
 
@@ -456,8 +456,8 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { label: "Webdesign München", href: "/muenchen/webdesign" },
     ],
     otherServicesInCity: [
-      { label: "KI Telefonassistent in Bayreuth", href: "/bayreuth/ki-telefonassistent" },
-      { label: "Automatisierung in Bayreuth", href: "/bayreuth/automatisierung" },
+      { label: "KI-Telefonassistent Bayreuth", href: "/bayreuth/ki-telefonassistent" },
+      { label: "Automatisierung Bayreuth", href: "/bayreuth/automatisierung" },
     ],
   },
 
@@ -582,12 +582,12 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       },
     ],
     sameServiceOtherCities: [
-      { label: "KI Telefonassistent Bayreuth", href: "/bayreuth/ki-telefonassistent" },
-      { label: "KI Telefonassistent München", href: "/muenchen/ki-telefonassistent" },
+      { label: "KI-Telefonassistent Bayreuth", href: "/bayreuth/ki-telefonassistent" },
+      { label: "KI-Telefonassistent München", href: "/muenchen/ki-telefonassistent" },
     ],
     otherServicesInCity: [
-      { label: "Automatisierung in Regensburg", href: "/regensburg/automatisierung" },
-      { label: "Webdesign in Regensburg", href: "/regensburg/webdesign" },
+      { label: "Automatisierung Regensburg", href: "/regensburg/automatisierung" },
+      { label: "Webdesign Regensburg", href: "/regensburg/webdesign" },
     ],
   },
 
@@ -706,8 +706,8 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { label: "Automatisierung München", href: "/muenchen/automatisierung" },
     ],
     otherServicesInCity: [
-      { label: "KI Telefonassistent in Regensburg", href: "/regensburg/ki-telefonassistent" },
-      { label: "Webdesign in Regensburg", href: "/regensburg/webdesign" },
+      { label: "KI-Telefonassistent Regensburg", href: "/regensburg/ki-telefonassistent" },
+      { label: "Webdesign Regensburg", href: "/regensburg/webdesign" },
     ],
   },
 
@@ -826,8 +826,8 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { label: "Webdesign München", href: "/muenchen/webdesign" },
     ],
     otherServicesInCity: [
-      { label: "KI Telefonassistent in Regensburg", href: "/regensburg/ki-telefonassistent" },
-      { label: "Automatisierung in Regensburg", href: "/regensburg/automatisierung" },
+      { label: "KI-Telefonassistent Regensburg", href: "/regensburg/ki-telefonassistent" },
+      { label: "Automatisierung Regensburg", href: "/regensburg/automatisierung" },
     ],
   },
 
@@ -953,12 +953,12 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       },
     ],
     sameServiceOtherCities: [
-      { label: "KI Telefonassistent Bayreuth", href: "/bayreuth/ki-telefonassistent" },
-      { label: "KI Telefonassistent Regensburg", href: "/regensburg/ki-telefonassistent" },
+      { label: "KI-Telefonassistent Bayreuth", href: "/bayreuth/ki-telefonassistent" },
+      { label: "KI-Telefonassistent Regensburg", href: "/regensburg/ki-telefonassistent" },
     ],
     otherServicesInCity: [
-      { label: "Automatisierung für München", href: "/muenchen/automatisierung" },
-      { label: "Webdesign für München", href: "/muenchen/webdesign" },
+      { label: "Automatisierung München", href: "/muenchen/automatisierung" },
+      { label: "Webdesign München", href: "/muenchen/webdesign" },
     ],
   },
 
@@ -1078,8 +1078,8 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { label: "Automatisierung Regensburg", href: "/regensburg/automatisierung" },
     ],
     otherServicesInCity: [
-      { label: "KI Telefonassistent für München", href: "/muenchen/ki-telefonassistent" },
-      { label: "Webdesign für München", href: "/muenchen/webdesign" },
+      { label: "KI-Telefonassistent München", href: "/muenchen/ki-telefonassistent" },
+      { label: "Webdesign München", href: "/muenchen/webdesign" },
     ],
   },
 
@@ -1200,8 +1200,8 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { label: "Webdesign Regensburg", href: "/regensburg/webdesign" },
     ],
     otherServicesInCity: [
-      { label: "KI Telefonassistent für München", href: "/muenchen/ki-telefonassistent" },
-      { label: "Automatisierung für München", href: "/muenchen/automatisierung" },
+      { label: "KI-Telefonassistent München", href: "/muenchen/ki-telefonassistent" },
+      { label: "Automatisierung München", href: "/muenchen/automatisierung" },
     ],
   },
 };
