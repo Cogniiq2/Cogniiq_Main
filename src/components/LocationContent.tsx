@@ -32,9 +32,9 @@ const BAYERN_SERVICES = [
 ];
 
 const DEUTSCHLAND_SERVICES = [
-  { label: "Webdesign Deutschland", href: "/leistungen" },
-  { label: "KI-Telefonassistent Deutschland", href: "/leistungen" },
-  { label: "Automatisierung Deutschland", href: "/leistungen" },
+  { label: "Webdesign Deutschland", href: "/deutschland" },
+  { label: "KI-Telefonassistent Deutschland", href: "/deutschland" },
+  { label: "Automatisierung Deutschland", href: "/deutschland" },
 ];
 
 const LOKAL_LINKS = [
