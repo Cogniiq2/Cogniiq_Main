@@ -17,6 +17,12 @@ import { CITY_SERVICE_CONFIGS } from './lib/standorte-data';
 import { WebdesignArztBayreuth } from './pages/WebdesignArztBayreuth';
 import { WebdesignGastronomieBayreuth } from './pages/WebdesignGastronomieBayreuth';
 import { WebdesignImmobilienBayreuth } from './pages/WebdesignImmobilienBayreuth';
+import { WebdesignArztMuenchen } from './pages/WebdesignArztMuenchen';
+import { WebdesignGastronomieMuenchen } from './pages/WebdesignGastronomieMuenchen';
+import { WebdesignImmobilienMuenchen } from './pages/WebdesignImmobilienMuenchen';
+import { WebdesignArztRegensburg } from './pages/WebdesignArztRegensburg';
+import { WebdesignGastronomieRegensburg } from './pages/WebdesignGastronomieRegensburg';
+import { WebdesignImmobilienRegensburg } from './pages/WebdesignImmobilienRegensburg';
 
 function App() {
   return (
@@ -39,6 +45,12 @@ function App() {
             <Route path="/webdesign-arzt-bayreuth" element={<WebdesignArztBayreuth />} />
             <Route path="/webdesign-gastronomie-bayreuth" element={<WebdesignGastronomieBayreuth />} />
             <Route path="/webdesign-immobilien-bayreuth" element={<WebdesignImmobilienBayreuth />} />
+            <Route path="/webdesign-arzt-muenchen" element={<WebdesignArztMuenchen />} />
+            <Route path="/webdesign-gastronomie-muenchen" element={<WebdesignGastronomieMuenchen />} />
+            <Route path="/webdesign-immobilien-muenchen" element={<WebdesignImmobilienMuenchen />} />
+            <Route path="/webdesign-arzt-regensburg" element={<WebdesignArztRegensburg />} />
+            <Route path="/webdesign-gastronomie-regensburg" element={<WebdesignGastronomieRegensburg />} />
+            <Route path="/webdesign-immobilien-regensburg" element={<WebdesignImmobilienRegensburg />} />
             {Object.values(CITY_SERVICE_CONFIGS).map((config) => (
               <Route
                 key={config.route}

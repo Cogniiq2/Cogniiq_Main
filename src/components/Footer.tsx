@@ -116,9 +116,17 @@ export function Footer() {
               <Link to="/bayreuth/ki-telefonassistent" className={navLink}>KI-Telefonassistent BY</Link>
               <Link to="/bayreuth/automatisierung" className={navLink}>Automatisierung BY</Link>
               <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-3 pb-0.5">Branchen Bayreuth</p>
-              <Link to="/webdesign-arzt-bayreuth" className={navLink}>Webdesign Arztpraxis BT</Link>
-              <Link to="/webdesign-gastronomie-bayreuth" className={navLink}>Webdesign Gastronomie BT</Link>
-              <Link to="/webdesign-immobilien-bayreuth" className={navLink}>Webdesign Immobilien BT</Link>
+              <Link to="/webdesign-arzt-bayreuth" className={navLink}>Arztpraxis Bayreuth</Link>
+              <Link to="/webdesign-gastronomie-bayreuth" className={navLink}>Gastronomie Bayreuth</Link>
+              <Link to="/webdesign-immobilien-bayreuth" className={navLink}>Immobilien Bayreuth</Link>
+              <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-3 pb-0.5">Branchen München</p>
+              <Link to="/webdesign-arzt-muenchen" className={navLink}>Arztpraxis München</Link>
+              <Link to="/webdesign-gastronomie-muenchen" className={navLink}>Gastronomie München</Link>
+              <Link to="/webdesign-immobilien-muenchen" className={navLink}>Immobilien München</Link>
+              <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-3 pb-0.5">Branchen Regensburg</p>
+              <Link to="/webdesign-arzt-regensburg" className={navLink}>Arztpraxis Regensburg</Link>
+              <Link to="/webdesign-gastronomie-regensburg" className={navLink}>Gastronomie Regensburg</Link>
+              <Link to="/webdesign-immobilien-regensburg" className={navLink}>Immobilien Regensburg</Link>
             </AccordionCol>
 
             {/* REGIONEN */}

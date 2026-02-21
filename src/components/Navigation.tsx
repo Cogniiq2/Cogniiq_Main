@@ -221,27 +221,27 @@ function StandorteDropdown({ index }: { index: number }) {
 
               <div className="px-3 pb-2">
                 <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">
-                  Branchen Bayreuth
+                  Branchen
                 </p>
-                <div className="flex flex-wrap gap-1">
-                  <Link
-                    to="/webdesign-arzt-bayreuth"
-                    className="px-2.5 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors"
-                  >
-                    Arztpraxis
-                  </Link>
-                  <Link
-                    to="/webdesign-gastronomie-bayreuth"
-                    className="px-2.5 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors"
-                  >
-                    Gastronomie
-                  </Link>
-                  <Link
-                    to="/webdesign-immobilien-bayreuth"
-                    className="px-2.5 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors"
-                  >
-                    Immobilien
-                  </Link>
+                <div className="grid grid-cols-3 gap-x-2">
+                  <div>
+                    <p className="text-[9px] font-semibold text-gray-300 dark:text-gray-600 uppercase tracking-wider mb-1 px-1">Bayreuth</p>
+                    <Link to="/webdesign-arzt-bayreuth" className="block px-1 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors">Arztpraxis</Link>
+                    <Link to="/webdesign-gastronomie-bayreuth" className="block px-1 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors">Gastronomie</Link>
+                    <Link to="/webdesign-immobilien-bayreuth" className="block px-1 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors">Immobilien</Link>
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-semibold text-gray-300 dark:text-gray-600 uppercase tracking-wider mb-1 px-1">München</p>
+                    <Link to="/webdesign-arzt-muenchen" className="block px-1 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors">Arztpraxis</Link>
+                    <Link to="/webdesign-gastronomie-muenchen" className="block px-1 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors">Gastronomie</Link>
+                    <Link to="/webdesign-immobilien-muenchen" className="block px-1 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors">Immobilien</Link>
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-semibold text-gray-300 dark:text-gray-600 uppercase tracking-wider mb-1 px-1">Regensburg</p>
+                    <Link to="/webdesign-arzt-regensburg" className="block px-1 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors">Arztpraxis</Link>
+                    <Link to="/webdesign-gastronomie-regensburg" className="block px-1 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors">Gastronomie</Link>
+                    <Link to="/webdesign-immobilien-regensburg" className="block px-1 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors">Immobilien</Link>
+                  </div>
                 </div>
               </div>
 
