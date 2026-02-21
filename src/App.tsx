@@ -14,6 +14,9 @@ import { BayernPage } from './pages/BayernPage';
 import { DeutschlandPage } from './pages/DeutschlandPage';
 import { CityLandingPage } from './pages/CityLandingPage';
 import { CITY_SERVICE_CONFIGS } from './lib/standorte-data';
+import { WebdesignArztBayreuth } from './pages/WebdesignArztBayreuth';
+import { WebdesignGastronomieBayreuth } from './pages/WebdesignGastronomieBayreuth';
+import { WebdesignImmobilienBayreuth } from './pages/WebdesignImmobilienBayreuth';
 
 function App() {
   return (
@@ -33,6 +36,9 @@ function App() {
             <Route path="/bayreuth" element={<CityLandingPage citySlug="bayreuth" />} />
             <Route path="/muenchen" element={<CityLandingPage citySlug="muenchen" />} />
             <Route path="/regensburg" element={<CityLandingPage citySlug="regensburg" />} />
+            <Route path="/webdesign-arzt-bayreuth" element={<WebdesignArztBayreuth />} />
+            <Route path="/webdesign-gastronomie-bayreuth" element={<WebdesignGastronomieBayreuth />} />
+            <Route path="/webdesign-immobilien-bayreuth" element={<WebdesignImmobilienBayreuth />} />
             {Object.values(CITY_SERVICE_CONFIGS).map((config) => (
               <Route
                 key={config.route}
