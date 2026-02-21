@@ -219,6 +219,34 @@ function StandorteDropdown({ index }: { index: number }) {
 
               <div className="h-px bg-gray-100 dark:bg-gray-800 my-2" />
 
+              <div className="px-3 pb-2">
+                <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">
+                  Branchen Bayreuth
+                </p>
+                <div className="flex flex-wrap gap-1">
+                  <Link
+                    to="/webdesign-arzt-bayreuth"
+                    className="px-2.5 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors"
+                  >
+                    Arztpraxis
+                  </Link>
+                  <Link
+                    to="/webdesign-gastronomie-bayreuth"
+                    className="px-2.5 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors"
+                  >
+                    Gastronomie
+                  </Link>
+                  <Link
+                    to="/webdesign-immobilien-bayreuth"
+                    className="px-2.5 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors"
+                  >
+                    Immobilien
+                  </Link>
+                </div>
+              </div>
+
+              <div className="h-px bg-gray-100 dark:bg-gray-800 my-2" />
+
               <div className="grid grid-cols-3 gap-1">
                 {cityEntries.map(([slug, cityData]) => (
                   <div key={slug} className="p-2">

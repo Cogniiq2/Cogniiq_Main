@@ -115,11 +115,10 @@ export function Footer() {
               <Link to="/bayreuth/webdesign" className={navLink}>Webdesign Bayern</Link>
               <Link to="/bayreuth/ki-telefonassistent" className={navLink}>KI-Telefonassistent BY</Link>
               <Link to="/bayreuth/automatisierung" className={navLink}>Automatisierung BY</Link>
-              <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-3 pb-0.5">Branchen</p>
-              <Link to="/leistungen" className={navLink}>KI für Praxen</Link>
-              <Link to="/leistungen" className={navLink}>KI für Gastronomie</Link>
-              <Link to="/leistungen" className={navLink}>KI für Handwerk</Link>
-              <Link to="/leistungen" className={navLink}>KI für Dienstleister</Link>
+              <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-3 pb-0.5">Branchen Bayreuth</p>
+              <Link to="/webdesign-arzt-bayreuth" className={navLink}>Webdesign Arztpraxis BT</Link>
+              <Link to="/webdesign-gastronomie-bayreuth" className={navLink}>Webdesign Gastronomie BT</Link>
+              <Link to="/webdesign-immobilien-bayreuth" className={navLink}>Webdesign Immobilien BT</Link>
             </AccordionCol>
 
             {/* REGIONEN */}
