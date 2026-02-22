@@ -1,4 +1,9 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://cogniiq.com/sitemap.xml
+Disallow: /api/
+Disallow: /_debug/
+Disallow: /preview/
+Disallow: /__/
+
+Sitemap: https://cogniiq.de/sitemap.xml

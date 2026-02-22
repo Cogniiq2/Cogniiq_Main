@@ -9,6 +9,8 @@ import {
   Zap,
   AlertCircle,
   Lightbulb,
+  Package,
+  ArrowUpRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -45,10 +47,32 @@ export interface IndustryFAQ {
   answer: string;
 }
 
+export interface IndustryPaket {
+  name: string;
+  tagline: string;
+  deliverables: string[];
+}
+
+export interface IndustrySolutionStep {
+  step: string;
+  title: string;
+  description: string;
+}
+
+export interface IndustryWorkflow {
+  title: string;
+  trigger: string;
+  process: string;
+  result: string;
+}
+
 export interface IndustryPageConfig {
   route: string;
   industry: string;
   industrySlug: string;
+  city: string;
+  citySlug: string;
+  cityHub: string;
   seo: {
     title: string;
     description: string;
@@ -63,6 +87,10 @@ export interface IndustryPageConfig {
     h1: string;
     lead: string;
   };
+  engpaesse: string[];
+  solutionSteps: IndustrySolutionStep[];
+  workflow: IndustryWorkflow;
+  pakete: IndustryPaket[];
   problems: string[];
   services: IndustryServiceBlock[];
   useCases: IndustryUseCase[];
@@ -80,7 +108,7 @@ export function IndustryPage({ config }: IndustryPageProps) {
   const breadcrumbs = [
     { name: "Home", url: BUSINESS_INFO.website },
     { name: "Bayern", url: `${BUSINESS_INFO.website}/bayern` },
-    { name: "Bayreuth", url: `${BUSINESS_INFO.website}/bayreuth` },
+    { name: config.city, url: `${BUSINESS_INFO.website}${config.cityHub}` },
     { name: config.industry, url: `${BUSINESS_INFO.website}${config.route}` },
   ];
 
@@ -96,23 +124,26 @@ export function IndustryPage({ config }: IndustryPageProps) {
         email: BUSINESS_INFO.contact.email,
         address: {
           "@type": "PostalAddress",
+          streetAddress: BUSINESS_INFO.address.streetAddress,
           addressLocality: BUSINESS_INFO.address.addressLocality,
           addressRegion: BUSINESS_INFO.address.addressRegion,
           postalCode: BUSINESS_INFO.address.postalCode,
           addressCountry: BUSINESS_INFO.address.addressCountry,
         },
         areaServed: [
-          { "@type": "City", name: "Bayreuth" },
+          { "@type": "City", name: config.city },
           { "@type": "State", name: "Bayern" },
+          { "@type": "Country", name: "Deutschland" },
         ],
       },
       {
         "@type": "Service",
-        name: `Webdesign & KI-Telefonassistent für ${config.industry} in Bayreuth`,
+        name: `Webdesign & KI-Telefonassistent für ${config.industry} in ${config.city}`,
         description: config.seo.description,
         url: config.seo.canonical,
         provider: { "@id": `${BUSINESS_INFO.website}/#localbusiness` },
-        areaServed: { "@type": "City", name: "Bayreuth" },
+        areaServed: { "@type": "City", name: config.city },
+        keywords: config.seo.keywords,
       },
     ],
   };
@@ -131,7 +162,10 @@ export function IndustryPage({ config }: IndustryPageProps) {
       <main className="min-h-screen">
         <HeroSection config={config} breadcrumbs={breadcrumbs} />
         <TrustStripSection config={config} />
-        <ProblemsSection config={config} />
+        <EngpaesseSection config={config} />
+        <SolutionSection config={config} />
+        <WorkflowSection config={config} />
+        <PaketeSection config={config} />
         <ServicesSection config={config} />
         <UseCasesSection config={config} />
         <BenefitsSection config={config} />
@@ -217,12 +251,12 @@ function HeroSection({
 
 function TrustStripSection({ config }: { config: IndustryPageConfig }) {
   const items = [
-    "Bayreuth",
+    config.city,
     config.industry,
     "DSGVO-konform",
     "KI-Integration",
-    "Terminprozesse",
     "Automatisierung",
+    "7–14 Tage Setup",
   ];
 
   return (
@@ -246,11 +280,11 @@ function TrustStripSection({ config }: { config: IndustryPageConfig }) {
   );
 }
 
-function ProblemsSection({ config }: { config: IndustryPageConfig }) {
+function EngpaesseSection({ config }: { config: IndustryPageConfig }) {
   return (
     <section
       className="py-20 bg-white dark:bg-gray-950 transition-colors duration-300"
-      aria-labelledby="problems-heading"
+      aria-labelledby="engpaesse-heading"
     >
       <div className="max-w-5xl mx-auto px-6 lg:px-8">
         <motion.div
@@ -262,18 +296,18 @@ function ProblemsSection({ config }: { config: IndustryPageConfig }) {
           className="mb-12"
         >
           <h2
-            id="problems-heading"
+            id="engpaesse-heading"
             className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
           >
-            Herausforderungen für {config.industry} in Bayreuth
+            Typische Engpässe in {config.industry}
           </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Was lokale Betriebe täglich bremst – und wie digitale Lösungen das ändern.
+            Was Betriebe in {config.city} täglich bremst – operative Realität, keine Theorie.
           </p>
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-4">
-          {config.problems.map((problem, i) => (
+          {config.engpaesse.map((item, i) => (
             <motion.div
               key={i}
               initial="hidden"
@@ -287,7 +321,183 @@ function ProblemsSection({ config }: { config: IndustryPageConfig }) {
                 size={16}
                 className="flex-shrink-0 mt-0.5 text-gray-400 dark:text-gray-500"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">{problem}</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">{item}</span>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SolutionSection({ config }: { config: IndustryPageConfig }) {
+  return (
+    <section
+      className="py-20 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300"
+      aria-labelledby="solution-heading"
+    >
+      <div className="max-w-5xl mx-auto px-6 lg:px-8">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeUp}
+          custom={0}
+          className="mb-12"
+        >
+          <h2
+            id="solution-heading"
+            className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
+          >
+            So löst Cogniiq das in {config.city}
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400">
+            Drei konkrete Schritte – von der Analyse bis zum laufenden System.
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {config.solutionSteps.map((step, i) => (
+            <motion.div
+              key={i}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUp}
+              custom={i * 0.1}
+              className="relative bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-6"
+            >
+              <div className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
+                {step.step}
+              </div>
+              <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-2">
+                {step.title}
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                {step.description}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function WorkflowSection({ config }: { config: IndustryPageConfig }) {
+  return (
+    <section
+      className="py-20 bg-white dark:bg-gray-950 transition-colors duration-300"
+      aria-labelledby="workflow-heading"
+    >
+      <div className="max-w-3xl mx-auto px-6 lg:px-8">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeUp}
+          custom={0}
+          className="mb-10"
+        >
+          <h2
+            id="workflow-heading"
+            className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
+          >
+            Beispiel-Workflow
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400">
+            Anonymisiertes Praxisbeispiel aus dem Bereich {config.industry} – so läuft ein typisches Projekt ab.
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeUp}
+          custom={0.1}
+          className="bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden"
+        >
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">Ausgangslage</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{config.workflow.trigger}</p>
+          </div>
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">Vorgehen</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{config.workflow.process}</p>
+          </div>
+          <div className="p-6">
+            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">Ergebnis</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{config.workflow.result}</p>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+function PaketeSection({ config }: { config: IndustryPageConfig }) {
+  return (
+    <section
+      className="py-20 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300"
+      aria-labelledby="pakete-heading"
+    >
+      <div className="max-w-5xl mx-auto px-6 lg:px-8">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeUp}
+          custom={0}
+          className="mb-12"
+        >
+          <h2
+            id="pakete-heading"
+            className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
+          >
+            Pakete für {config.industry} in {config.city}
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400">
+            Klare Leistungspakete – skalierbar nach Bedarf und Betriebsgröße.
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {config.pakete.map((paket, i) => (
+            <motion.div
+              key={i}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUp}
+              custom={i * 0.1}
+              className="bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 flex flex-col gap-5"
+            >
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Package size={14} className="text-gray-400 dark:text-gray-500" />
+                  <span className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+                    {paket.name}
+                  </span>
+                </div>
+                <p className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                  {paket.tagline}
+                </p>
+              </div>
+              <ul className="space-y-2.5">
+                {paket.deliverables.map((item, j) => (
+                  <li key={j} className="flex items-start gap-2.5">
+                    <CheckCircle2 size={14} className="flex-shrink-0 mt-0.5 text-[#515A61] dark:text-sky-400" />
+                    <span className="text-sm text-gray-600 dark:text-gray-400">{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                to="/kontakt"
+                className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+              >
+                Jetzt anfragen <ArrowUpRight size={13} />
+              </Link>
             </motion.div>
           ))}
         </div>
@@ -305,7 +515,7 @@ const ICON_MAP = {
 function ServicesSection({ config }: { config: IndustryPageConfig }) {
   return (
     <section
-      className="py-20 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300"
+      className="py-20 bg-white dark:bg-gray-950 transition-colors duration-300"
       aria-labelledby="services-heading"
     >
       <div className="max-w-5xl mx-auto px-6 lg:px-8">
@@ -321,7 +531,7 @@ function ServicesSection({ config }: { config: IndustryPageConfig }) {
             id="services-heading"
             className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
           >
-            Digitale Lösungen für {config.industry} in Bayreuth
+            Digitale Lösungen für {config.industry} in {config.city}
           </h2>
           <p className="text-gray-500 dark:text-gray-400">
             Webdesign, KI-Telefonassistent und Automatisierung – branchenspezifisch eingesetzt.
@@ -339,9 +549,9 @@ function ServicesSection({ config }: { config: IndustryPageConfig }) {
                 viewport={{ once: true }}
                 variants={fadeUp}
                 custom={i * 0.1}
-                className="bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 flex flex-col gap-4"
+                className="bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 flex flex-col gap-4"
               >
-                <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-white dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
                   <Icon size={18} className="text-gray-600 dark:text-gray-400" />
                 </div>
                 <div>
@@ -364,7 +574,7 @@ function ServicesSection({ config }: { config: IndustryPageConfig }) {
 function UseCasesSection({ config }: { config: IndustryPageConfig }) {
   return (
     <section
-      className="py-20 bg-white dark:bg-gray-950 transition-colors duration-300"
+      className="py-20 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300"
       aria-labelledby="usecases-heading"
     >
       <div className="max-w-5xl mx-auto px-6 lg:px-8">
@@ -380,10 +590,10 @@ function UseCasesSection({ config }: { config: IndustryPageConfig }) {
             id="usecases-heading"
             className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
           >
-            Einsatzbeispiele in Bayreuth
+            Einsatzbeispiele in {config.city}
           </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Konkrete Situationen, in denen die Lösung für {config.industry} in Bayreuth greift.
+            Konkrete Situationen, in denen die Lösung für {config.industry} in {config.city} greift.
           </p>
         </motion.div>
 
@@ -396,9 +606,9 @@ function UseCasesSection({ config }: { config: IndustryPageConfig }) {
               viewport={{ once: true }}
               variants={fadeUp}
               custom={i * 0.08}
-              className="flex gap-4 p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/50"
+              className="flex gap-4 p-6 rounded-2xl bg-white dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/50"
             >
-              <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center">
+              <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center">
                 <Lightbulb size={15} className="text-gray-400 dark:text-gray-500" />
               </div>
               <div>
@@ -420,7 +630,7 @@ function UseCasesSection({ config }: { config: IndustryPageConfig }) {
 function BenefitsSection({ config }: { config: IndustryPageConfig }) {
   return (
     <section
-      className="py-20 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300"
+      className="py-20 bg-white dark:bg-gray-950 transition-colors duration-300"
       aria-labelledby="benefits-heading"
     >
       <div className="max-w-5xl mx-auto px-6 lg:px-8">
@@ -435,10 +645,10 @@ function BenefitsSection({ config }: { config: IndustryPageConfig }) {
             id="benefits-heading"
             className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
           >
-            Vorteile für {config.industry} in Bayreuth
+            Vorteile für {config.industry} in {config.city}
           </h2>
           <p className="text-gray-500 dark:text-gray-400 mb-10">
-            Was sich für Betriebe in Bayreuth konkret verändert – messbar und dauerhaft.
+            Was sich für Betriebe in {config.city} konkret verändert – messbar und dauerhaft.
           </p>
         </motion.div>
 
@@ -451,7 +661,7 @@ function BenefitsSection({ config }: { config: IndustryPageConfig }) {
               viewport={{ once: true }}
               variants={fadeUp}
               custom={i * 0.07}
-              className="flex items-start gap-3 p-5 rounded-xl bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50"
+              className="flex items-start gap-3 p-5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50"
             >
               <CheckCircle2
                 size={18}
@@ -469,7 +679,7 @@ function BenefitsSection({ config }: { config: IndustryPageConfig }) {
 function LocalContextSection({ config }: { config: IndustryPageConfig }) {
   return (
     <section
-      className="py-20 bg-white dark:bg-gray-950 transition-colors duration-300"
+      className="py-20 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300"
       aria-labelledby="local-heading"
     >
       <div className="max-w-3xl mx-auto px-6 lg:px-8">
@@ -484,7 +694,7 @@ function LocalContextSection({ config }: { config: IndustryPageConfig }) {
             id="local-heading"
             className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8"
           >
-            Cogniiq – Ihr Partner für {config.industry} in Bayreuth
+            Cogniiq – Ihr Partner für {config.industry} in {config.city}
           </h2>
           <div className="space-y-5">
             {config.localContext.map((para, i) => (
@@ -501,7 +711,7 @@ function LocalContextSection({ config }: { config: IndustryPageConfig }) {
 
 function InternalLinksSection({ config }: { config: IndustryPageConfig }) {
   return (
-    <section className="py-10 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
+    <section className="py-10 bg-white dark:bg-gray-950 transition-colors duration-300">
       <div className="max-w-5xl mx-auto px-6 lg:px-8">
         <motion.div
           initial="hidden"
@@ -512,7 +722,7 @@ function InternalLinksSection({ config }: { config: IndustryPageConfig }) {
           className="mb-6"
         >
           <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
-            Leistungen für {config.industry} in Bayreuth
+            Weiterführende Seiten
           </h2>
         </motion.div>
 
@@ -528,7 +738,7 @@ function InternalLinksSection({ config }: { config: IndustryPageConfig }) {
             >
               <Link
                 to={link.href}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/60 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
               >
                 {link.label}
                 <ArrowRight size={12} />
@@ -544,7 +754,7 @@ function InternalLinksSection({ config }: { config: IndustryPageConfig }) {
 function FAQSection({ config }: { config: IndustryPageConfig }) {
   return (
     <section
-      className="py-20 bg-white dark:bg-gray-950 transition-colors duration-300"
+      className="py-20 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300"
       aria-labelledby="faq-heading"
     >
       <div className="max-w-3xl mx-auto px-6 lg:px-8">
@@ -557,11 +767,10 @@ function FAQSection({ config }: { config: IndustryPageConfig }) {
           className="mb-10"
         >
           <h2 id="faq-heading" className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Häufige Fragen
+            Häufige Fragen – {config.industry} in {config.city}
           </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Webdesign, KI-Telefonassistent und Automatisierung für {config.industry} in Bayreuth –
-            konkret beantwortet.
+            Webdesign, KI-Telefonassistent und Automatisierung für {config.industry} in {config.city} – konkret beantwortet.
           </p>
         </motion.div>
 
@@ -577,7 +786,7 @@ function FAQSection({ config }: { config: IndustryPageConfig }) {
               <AccordionItem
                 key={i}
                 value={`faq-${i}`}
-                className="bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-xl px-5 data-[state=open]:border-gray-300 dark:data-[state=open]:border-gray-600 transition-colors"
+                className="bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-xl px-5 data-[state=open]:border-gray-300 dark:data-[state=open]:border-gray-600 transition-colors"
               >
                 <AccordionTrigger className="text-left text-sm font-semibold text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 transition-colors py-5 [&>svg]:text-gray-400">
                   {item.question}
@@ -596,7 +805,7 @@ function FAQSection({ config }: { config: IndustryPageConfig }) {
 
 function CTASection({ config }: { config: IndustryPageConfig }) {
   return (
-    <section className="py-20 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
+    <section className="py-20 bg-white dark:bg-gray-950 transition-colors duration-300">
       <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
         <motion.div
           initial="hidden"
@@ -606,11 +815,10 @@ function CTASection({ config }: { config: IndustryPageConfig }) {
           custom={0}
         >
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-            Digitalisierung für {config.industry} in Bayreuth starten
+            Nächster Schritt: {config.industry} in {config.city} digital aufstellen
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-            Kostenloses Erstgespräch für {config.industry}-Betriebe in Bayreuth – 30 bis 45 Minuten,
-            ohne Verpflichtung. Danach wissen Sie genau, was möglich ist und was es kostet.
+            Kostenloses Erstgespräch für {config.industry}-Betriebe in {config.city} – 30 bis 45 Minuten, ohne Verpflichtung, mit konkretem Ergebnis.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
@@ -621,10 +829,10 @@ function CTASection({ config }: { config: IndustryPageConfig }) {
               <ArrowRight size={16} />
             </Link>
             <Link
-              to="/bayreuth"
+              to={config.cityHub}
               className="inline-flex items-center gap-2 px-7 py-3.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:border-gray-500 dark:hover:border-gray-400 transition-colors"
             >
-              Cogniiq Bayreuth
+              Cogniiq {config.city}
             </Link>
           </div>
           <p className="mt-6 text-xs text-gray-400 dark:text-gray-500">

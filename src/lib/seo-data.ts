@@ -23,7 +23,7 @@ export const BUSINESS_INFO = {
     email: "info@cogniiq.de",
   },
 
-  website: "https://cogniiq.com",
+  website: "https://cogniiq.de",
 
   founders: [
     {
@@ -150,7 +150,7 @@ export const LOCATION_PAGES: LocationPage[] = [
     title: "AI Agentur & Webdesign Agentur Bayreuth",
     description: "Cogniiq – Ihre AI Agentur und Webdesign Agentur in Bayreuth. KI Automationen, AI Rezeptionistin und hochkonvertierende Websites direkt vor Ort.",
     keywords: ["AI Agentur Bayreuth", "Webdesign Agentur Bayreuth", "KI Automationen Bayreuth"],
-    canonical: "https://cogniiq.com",
+    canonical: "https://cogniiq.de",
     isHeadquarters: true,
   },
   {
@@ -160,7 +160,7 @@ export const LOCATION_PAGES: LocationPage[] = [
     title: "AI Agentur & Webdesign Agentur München",
     description: "Cogniiq betreut Unternehmen in München mit KI Automationen, AI Rezeptionistin und modernen Websites. Remote und vor Ort.",
     keywords: ["AI Agentur München", "Webdesign München", "KI Automationen München"],
-    canonical: "https://cogniiq.com",
+    canonical: "https://cogniiq.de",
   },
   {
     city: "Nürnberg",
@@ -169,7 +169,7 @@ export const LOCATION_PAGES: LocationPage[] = [
     title: "AI Agentur & Webdesign Nürnberg",
     description: "KI Automationen und Webdesign für Unternehmen in Nürnberg. Cogniiq – professionelle AI-Lösungen für Ihre Digitalisierung.",
     keywords: ["AI Agentur Nürnberg", "Webdesign Nürnberg", "KI Automationen Nürnberg"],
-    canonical: "https://cogniiq.com",
+    canonical: "https://cogniiq.de",
   },
   {
     city: "Regensburg",
@@ -178,7 +178,7 @@ export const LOCATION_PAGES: LocationPage[] = [
     title: "AI Agentur & Webdesign Regensburg",
     description: "Cogniiq – AI Lösungen und Webdesign für Unternehmen in Regensburg. Persönliche Termine möglich.",
     keywords: ["AI Agentur Regensburg", "Webdesign Regensburg", "KI Automationen Regensburg"],
-    canonical: "https://cogniiq.com",
+    canonical: "https://cogniiq.de",
   },
 ];
 
@@ -186,27 +186,27 @@ export const PAGE_META = {
   home: {
     title: "Cogniiq | AI Agentur & Webdesign Agentur Bayreuth | KI Automationen Deutschland",
     description: "Cogniiq ist Ihre AI Agentur und Webdesign Agentur in Bayreuth. Wir bieten KI Automationen, AI Rezeptionistin, hochkonvertierende Websites und Make.com Automationen für lokale Unternehmen in ganz Deutschland.",
-    canonical: "https://cogniiq.com",
+    canonical: "https://cogniiq.de",
   },
   leistungen: {
     title: "Leistungen | Webdesign, KI Automationen & AI Rezeptionistin – Cogniiq Bayreuth",
     description: "Entdecken Sie die Leistungen von Cogniiq: Hochkonvertierende Websites, Make.com Automationen, AI Rezeptionistin und AI Content Erstellung für Unternehmen in Deutschland.",
-    canonical: "https://cogniiq.com/leistungen",
+    canonical: "https://cogniiq.de/leistungen",
   },
   ueberUns: {
     title: "Über Uns | Team & Prozess – Cogniiq AI Agentur Bayreuth",
     description: "Lernen Sie das Team hinter Cogniiq kennen. Wir sind eine AI Agentur aus Bayreuth, spezialisiert auf KI Automationen und modernes Webdesign für lokale Unternehmen in Deutschland.",
-    canonical: "https://cogniiq.com/ueber-uns",
+    canonical: "https://cogniiq.de/ueber-uns",
   },
   faq: {
     title: "FAQ | Häufige Fragen – Cogniiq AI Agentur Bayreuth",
     description: "Häufig gestellte Fragen zu Cogniiq: Kosten, Projektstart, Wartung und mehr. Alle Antworten rund um unsere AI und Webdesign Dienstleistungen.",
-    canonical: "https://cogniiq.com/faq",
+    canonical: "https://cogniiq.de/faq",
   },
   kontakt: {
     title: "Kontakt | Erstgespräch vereinbaren – Cogniiq Bayreuth",
     description: "Kontaktieren Sie Cogniiq für ein kostenloses Erstgespräch. AI Agentur und Webdesign Agentur in Bayreuth – persönlich vor Ort oder remote in ganz Deutschland.",
-    canonical: "https://cogniiq.com/kontakt",
+    canonical: "https://cogniiq.de/kontakt",
   },
 };
 

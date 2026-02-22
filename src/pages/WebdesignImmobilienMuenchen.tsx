@@ -6,98 +6,172 @@ const base = BUSINESS_INFO.website;
 
 const config: IndustryPageConfig = {
   route: "/webdesign-immobilien-muenchen",
-  industry: "Immobilien & Makler",
-  industrySlug: "immobilien-makler",
+  industry: "Immobilien",
+  industrySlug: "immobilien",
+  city: "München",
+  citySlug: "muenchen",
+  cityHub: "/muenchen",
   seo: {
     title: "Webdesign & KI-Telefonassistent für Immobilienmakler in München | Cogniiq",
     description:
-      "Makler Website München: Cogniiq entwickelt Immobilien-Websites, KI-Telefonassistenten und Automatisierungen für Makler in München. Mehr Immobilien-Leads, automatisierte Besichtigungen, DSGVO-konform.",
+      "Immobilien Website München: Cogniiq entwickelt Websites, KI-Telefonassistenten und Lead-Automatisierungen für Immobilienmakler in München. Mehr Anfragen, automatisierte Besichtigungen, DSGVO-konform.",
     canonical: `${base}/webdesign-immobilien-muenchen`,
     keywords:
-      "Makler Website München, Immobilien Website München, Immobilien Leads München, KI Telefonassistent Makler München",
+      "Immobilien Website München, Makler Website München, Immobilienmakler München Digital, KI Telefonassistent Immobilien München",
   },
   hero: {
-    trustTags: ["München", "DSGVO-konform", "KI-Integration", "Immobilien-Leads", "Automatisierung"],
+    trustTags: ["München", "DSGVO-konform", "KI-Integration", "Lead-Qualifizierung", "Automatisierung"],
     ctaLabel: "Projekt für Immobilienmakler starten",
   },
   intro: {
     h1: "Webdesign & KI-Telefonassistent für Immobilienmakler in München",
-    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Immobilienmakler in München – für mehr qualifizierte Leads, automatisierte Besichtigungstermine und professionelle Objektpräsentation in einem der teuersten Immobilienmärkte Deutschlands.",
+    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Immobilienmakler in München – für mehr qualifizierte Kaufanfragen, automatisierte Besichtigungsprozesse und professionelle Objektpräsentation im teuersten Immobilienmarkt Deutschlands.",
   },
+  engpaesse: [
+    "Im teuersten Immobilienmarkt Deutschlands ist die Erwartungshaltung von Käufern und Verkäufern maximal – eine schwache Website kostet direkt Vertrauen und Aufträge",
+    "Hohe Anfragenzahl ohne strukturierte Vorqualifizierung verschlingt Maklerzeit ohne messbaren Ertrag",
+    "Besichtigungskoordination für mehrere hochpreisige Objekte gleichzeitig ist manuell kaum sauber zu handhaben",
+    "Ohne Follow-up-System nach Besichtigungen verliert man kaufbereite Interessenten an schnellere Mitbewerber",
+    "Verkäufer-Akquise funktioniert in München zunehmend digital – wer keine Bewertungsseite hat, verliert Eigentümer-Leads",
+  ],
+  solutionSteps: [
+    {
+      step: "Schritt 1",
+      title: "Analyse & Konzept",
+      description:
+        "Wir analysieren den bestehenden Lead-Prozess, Objektstruktur und Anfragemuster des Münchner Maklerbüros und entwickeln ein Konzept für Website, KI-Assistent und Automatisierung – abgestimmt auf die Anforderungen des Premiummarkts.",
+    },
+    {
+      step: "Schritt 2",
+      title: "Umsetzung in 7–14 Tagen",
+      description:
+        "Makler-Website, KI-Telefonassistent und Lead-Automatisierungsworkflows werden vollständig von Cogniiq aufgebaut. Sie erhalten alles schlüsselfertig – kein technischer Aufwand auf Maklerbüro-Seite.",
+    },
+    {
+      step: "Schritt 3",
+      title: "Go-live & laufende Betreuung",
+      description:
+        "Alle Systeme gehen nach Abnahme live. Cogniiq betreut das Setup dauerhaft remote – für neue Objekte, Marktanpassungen und Erweiterungen des Lead-Automatisierungssystems.",
+    },
+  ],
+  workflow: {
+    title: "Beispiel-Workflow: Immobilienmakler München",
+    trigger:
+      "Ein Immobilienmakler in München betreute mehrere hochpreisige Objekte gleichzeitig. Eingehende Anfragen über Website und Telefon kamen ungefiltert und ohne Vorqualifizierung – jede Anfrage bedeutete potenziell unverhältnismäßig hohen Zeitaufwand.",
+    process:
+      "Cogniiq baute eine neue hochwertige Makler-Website mit strukturierten Objektseiten und automatischer Lead-Qualifizierung. Ein KI-Telefonassistent beantwortet Fragen zu Objekten und nimmt Besichtigungswünsche auf. Qualifizierte Leads werden mit vollständigen Angaben ans Büro weitergeleitet.",
+    result:
+      "Das Maklerbüro erhält strukturierte, vorqualifizierte Leads. Besichtigungstermine werden automatisch koordiniert. Follow-ups nach Besichtigungen laufen automatisiert – ohne manuelle Nacharbeit.",
+  },
+  pakete: [
+    {
+      name: "Start",
+      tagline: "Premium Makler-Website für den Münchner Markt",
+      deliverables: [
+        "Responsive Immobilien-Website (bis 8 Seiten)",
+        "Strukturierte Objektseiten mit Exposé-Darstellung",
+        "Kontaktformular mit automatischer Lead-Benachrichtigung",
+        "On-Page SEO für 'Immobilienmakler München'",
+        "DSGVO-konforme Datenschutzdokumentation",
+      ],
+    },
+    {
+      name: "Growth",
+      tagline: "Website + KI-Telefonassistent für qualifizierte Leads",
+      deliverables: [
+        "Alles aus Start",
+        "KI-Telefonassistent (Objektanfragen & FAQ)",
+        "Automatische Besichtigungskoordination",
+        "Lead-Qualifizierungsworkflow",
+        "Monatliches Reporting & Optimierungsgespräch",
+      ],
+    },
+    {
+      name: "Premium",
+      tagline: "Vollständige Digitalisierung für Münchner Maklerbüros",
+      deliverables: [
+        "Alles aus Growth",
+        "Automatisierte Follow-up-Sequenzen nach Besichtigung",
+        "CRM-Integration & Lead-Scoring",
+        "Verkäufer-Akquise-Workflow für Münchner Eigentümer",
+        "Laufende Betreuung, Updates & Priorisierung",
+      ],
+    },
+  ],
   problems: [
-    "Der Münchner Immobilienmarkt bewegt sich auf höchstem Preisniveau – Interessenten erwarten ein ebenso professionelles digitales Auftreten",
-    "Telefonanfragen zu Objekten in München sind zahlreich und binden den Makler, der gleichzeitig Besichtigungen koordiniert",
-    "Potenzielle Käufer und Mieter kontaktieren bevorzugt abends und am Wochenende – außerhalb der Geschäftszeiten",
-    "Veraltete oder unübersichtliche Makler-Website lässt hochwertige Leads an besser aufgestellte Wettbewerber",
-    "Exposé-Anfragen werden manuell bearbeitet – in München bedeutet langsame Reaktionszeit verlorene Kaufinteressenten",
-    "Besichtigungstermine werden telefonisch koordiniert – fehleranfällig und unverhältnismäßig zeitintensiv",
-    "Fehlende Sichtbarkeit bei Suchanfragen wie 'Makler München' oder 'Immobilien kaufen München'",
+    "München ist mit Abstand der teuerste Immobilienmarkt Deutschlands – eine schwache digitale Präsenz kostet sofort Vertrauen",
+    "Kaufinteressenten in München sind gut informiert und erwarten sofortige, präzise Antworten auf ihre Anfragen",
+    "Ohne strukturierte Leadqualifizierung ist jeder Anruf ein potenzieller Zeitaufwand ohne Garantie",
+    "Besichtigungskoordination für hochpreisige Objekte ist manuell fehleranfällig und zeitintensiv",
+    "Follow-ups nach Besichtigungen passieren unregelmäßig – dabei entscheiden oft kleine Nuancen über den Abschluss",
+    "Verkäufer-Akquise läuft in München zunehmend digital – fehlende Landingpages kosten Eigentümer-Leads",
+    "Keine strukturierte Erfassung von Interessenten führt zu fragmentierter Kommunikation bei komplexen Deals",
   ],
   services: [
     {
       icon: "web",
       title: "Immobilien-Website München",
       description:
-        "Hochwertige Makler-Website mit Objektübersicht, Exposé-Download, Kontaktformularen und gezieltem Local-SEO für Suchanfragen wie 'Immobilienmakler München' oder 'Wohnung kaufen München'. Das Design spiegelt das Premium-Niveau des Münchner Immobilienmarkts wider.",
+        "Hochwertige Makler-Website mit professionellen Objektseiten, Exposé-Darstellung, Anfrage-Workflow und gezieltem SEO für Suchanfragen wie 'Immobilienmakler München' oder 'Wohnung kaufen München'. Premiumauftritt für den anspruchsvollsten Markt Deutschlands.",
     },
     {
       icon: "phone",
-      title: "KI-Telefonassistent für Münchner Makler",
+      title: "KI-Telefonassistent für Immobilienmakler in München",
       description:
-        "Der KI-Telefonassistent qualifiziert eingehende Objektanfragen automatisch vor, beantwortet Fragen zu Lage, Größe und Preis, vereinbart Besichtigungstermine direkt und leitet qualifizierte Interessenten strukturiert an den Makler weiter – rund um die Uhr, auch an Wochenenden.",
+        "Der KI-Telefonassistent beantwortet Fragen zu Objekten, nimmt Besichtigungswünsche auf und qualifiziert Interessenten automatisch vor – damit der Makler nur noch mit kaufbereiten Interessenten spricht.",
     },
     {
       icon: "zap",
-      title: "Immobilien-Automatisierung München",
+      title: "Lead-Automatisierung München",
       description:
-        "Exposé-Versand nach Anfrage, Besichtigungsbestätigungen, automatisches Follow-up bei Interessenten und Lead-Qualifizierung laufen vollautomatisch ab. Kein manuelles Nachfassen, keine verlorenen Kontakte – gerade im schnelllebigen Münchner Markt ein entscheidender Vorteil.",
+        "Eingehende Anfragen werden automatisch qualifiziert, Besichtigungen koordiniert und Follow-ups nach Terminen strukturiert versandt. Keine Anfrage geht verloren, kein Interessent bleibt ohne Reaktion – besonders wichtig im Münchner Premiumsegment.",
     },
   ],
   useCases: [
     {
-      title: "Besichtigungstermine automatisch vereinbaren",
+      title: "Qualifizierte Kaufinteressenten automatisch erfassen",
       description:
-        "Interessenten wählen Besichtigungstermine direkt über die Website oder per KI-Telefonassistent. Der Termin wird automatisch eingetragen und eine Bestätigung versendet – ohne manuellen Koordinationsaufwand.",
+        "Interessenten für Objekte in München füllen ein strukturiertes Anfrage-Formular aus – mit Budget, Zeitraum und Anforderungen. Der Makler erhält vorqualifizierte Leads statt ungefilterter Anrufe.",
     },
     {
-      title: "Objektanfragen rund um die Uhr beantworten",
+      title: "Besichtigungstermine ohne manuelle Koordination",
       description:
-        "Der KI-Telefonassistent beantwortet Fragen zu Objekten, Lage, Miet- und Kaufpreisen sowie Verfügbarkeit – auch abends und am Wochenende, wenn der Markt in München besonders aktiv ist.",
+        "Interessenten buchen Besichtigungstermine direkt über die Website oder per KI-Assistent. Bestätigungen, Erinnerungen und Nachfassaktionen laufen vollautomatisch – auch bei parallelen Objekten.",
     },
     {
-      title: "Exposé-Anfragen automatisch bearbeiten",
+      title: "Objektanfragen außerhalb der Bürozeiten",
       description:
-        "Nach einer Anfrage über die Website wird das Exposé automatisch versendet, der Interessent im CRM erfasst und ein Follow-up-Prozess gestartet – in München zählt jede Minute Reaktionsvorteil.",
+        "Der KI-Telefonassistent beantwortet Fragen zu Lage, Ausstattung, Preis und Verfügbarkeit rund um die Uhr – gerade in München, wo Interessenten oft abends und am Wochenende recherchieren.",
     },
     {
-      title: "Qualifizierte Leads aus Münchner Suchanfragen",
+      title: "Follow-up nach Besichtigung automatisieren",
       description:
-        "Die Immobilien-Website wird für Suchanfragen wie 'Immobilien kaufen München', 'Wohnung mieten München' oder 'Makler München' optimiert – messbarer Anstieg organischer Anfragen.",
+        "Nach jeder Besichtigung wird automatisch eine strukturierte Nachfass-Sequenz ausgelöst. Im Münchner Premiummarkt entscheidet schnelles und professionelles Follow-up häufig über den Abschluss.",
     },
     {
-      title: "Telefonleads außerhalb der Geschäftszeiten erfassen",
+      title: "Verkäufer-Akquise über digitale Kanäle",
       description:
-        "Anrufe außerhalb der Bürozeiten landen beim KI-Telefonassistenten. Interessenten hinterlassen ihre Kontaktdaten und Objektwünsche – der Makler erhält am nächsten Morgen eine strukturierte Zusammenfassung.",
+        "Eigentümer in München, die ihre Immobilie bewerten lassen oder verkaufen möchten, werden gezielt auf der Website abgeholt – mit strukturiertem Bewertungsformular und sofortiger Reaktion.",
     },
     {
-      title: "Automatisches Follow-up für Interessenten",
+      title: "Sichtbarkeit bei lokalen Suchanfragen in München",
       description:
-        "Nach einer Besichtigung oder einem Erstkontakt erhalten Interessenten automatisiert weiterführende Informationen und vergleichbare Objekte – ohne manuelles Eingreifen, mit messbarem Einfluss auf die Abschlussrate.",
+        "Die Website wird für Suchanfragen wie 'Immobilienmakler München', 'Wohnung kaufen München' oder 'Haus verkaufen München' optimiert – für nachhaltigen organischen Traffic im größten Markt Bayerns.",
     },
   ],
   benefits: [
-    "Keine verpassten Telefonanfragen – der KI-Assistent qualifiziert und erfasst Leads rund um die Uhr",
-    "Automatisierte Besichtigungsprozesse sparen dem Makler in München mehrere Stunden pro Woche",
-    "Mehr hochwertige Immobilien-Leads durch eine suchmaschinenoptimierte Makler-Website für München",
-    "Professioneller Marktauftritt auf dem Niveau des Münchner Immobilienmarkts",
-    "Zeitersparnis durch automatisierten Exposé-Versand, Bestätigungen und Interessenten-Follow-up",
-    "Schnellere Reaktionszeiten – in München entscheidet oft die erste Antwort über den Lead",
-    "Vollständige DSGVO-Konformität – alle Interessentendaten werden sicher auf europäischen Servern verarbeitet",
+    "Mehr qualifizierte Leads durch strukturierte Vorqualifizierung im Anfrage-Prozess",
+    "Automatisierte Besichtigungskoordination spart Maklerzeit – besonders bei mehreren hochpreisigen Objekten",
+    "Premium-Webauftritt stärkt Vertrauen bei anspruchsvollen Käufern und Verkäufern in München",
+    "Keine verpassten Anfragen – KI-Assistent beantwortet auch abends und am Wochenende",
+    "Follow-up-Automatisierung erhöht die Abschlussrate im wettbewerbsintensiven Münchner Markt",
+    "Bessere Sichtbarkeit bei lokalen Suchanfragen – mehr organische Anfragen aus dem Raum München",
+    "Vollständige DSGVO-Konformität – alle Kundendaten sicher auf europäischen Servern",
   ],
   localContext: [
-    "München ist mit Abstand der teuerste Immobilienmarkt Deutschlands. Kaufinteressenten und Mieter sind im Schnitt besser informiert und haben höhere Ansprüche an den gesamten Prozess – von der Website-Recherche bis zur Besichtigungsorganisation. Makler, die digital nicht professionell aufgestellt sind, verlieren Interessenten an Wettbewerber mit besserer Online-Präsenz.",
-    "Cogniiq entwickelt für Immobilienmakler in München passgenaue Digitallösungen: eine hochwertige Makler-Website mit SEO-Fokus auf lokale Suchanfragen, einen KI-Telefonassistenten, der Objektanfragen qualifiziert und Besichtigungstermine vereinbart, sowie Automatisierungssysteme, die Exposé-Versand, Interessenten-Nachverfolgung und Lead-Management ohne manuellen Aufwand steuern.",
-    "Alle Systeme sind vollständig DSGVO-konform, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Die Betreuung erfolgt durch Cogniiq direkt und persönlich.",
+    "München ist mit Abstand der teuerste Immobilienmarkt Deutschlands. Kaufinteressenten und Mieter sind im Schnitt besser informiert und haben höhere Ansprüche an den gesamten Prozess – von der Website-Recherche bis zur Besichtigungsorganisation.",
+    "Cogniiq entwickelt für Immobilienmakler in München maßgeschneiderte Digitallösungen: eine hochwertige Makler-Website mit strukturierten Objektseiten, einen KI-Telefonassistenten für Interessentenanfragen sowie Automatisierungssysteme für Lead-Qualifizierung, Besichtigungsplanung und Follow-up-Prozesse.",
+    "Alle Systeme sind vollständig DSGVO-konform, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut alle Systeme langfristig remote.",
   ],
   internalLinks: [
     { label: "Webdesign München", href: "/muenchen/webdesign" },
@@ -106,35 +180,44 @@ const config: IndustryPageConfig = {
     { label: "Cogniiq München", href: "/muenchen" },
     { label: "Immobilien Bayreuth", href: "/webdesign-immobilien-bayreuth" },
     { label: "Immobilien Regensburg", href: "/webdesign-immobilien-regensburg" },
-    { label: "Alle Leistungen", href: "/leistungen" },
     { label: "Bayern", href: "/bayern" },
     { label: "Deutschland", href: "/deutschland" },
   ],
   faq: [
     {
-      question: "Kann Cogniiq eine Immobilien-Website mit Objektverwaltung in München erstellen?",
+      question: "Kann Cogniiq eine DSGVO-konforme Makler-Website in München erstellen?",
       answer:
-        "Ja. Wir entwickeln Makler-Websites mit strukturierter Objektübersicht, Filterfunktionen und einfacher Verwaltung von Exposés und Objektfotos – individuell abgestimmt auf Ihr Portfolio und das Niveau des Münchner Markts.",
+        "Ja. Alle Websites und Systeme sind vollständig DSGVO-konform – mit korrekten Datenschutzdokumentationen, Cookie-Einwilligungen und sicherer Verarbeitung aller Interessentendaten auf europäischen Servern.",
     },
     {
-      question: "Wie hilft der KI-Telefonassistent bei der Lead-Qualifizierung in München?",
+      question: "Wie werden Interessentenanfragen über die Website automatisch vorqualifiziert?",
       answer:
-        "Der KI-Telefonassistent stellt Interessenten gezielte Fragen zur gewünschten Lage, Objektgröße und Budget, erfasst die Daten strukturiert und leitet nur qualifizierte Anfragen an Sie weiter.",
+        "Wir integrieren ein strukturiertes Anfrage-Formular, das Budget, Kaufzeitraum, Anforderungen und Kontaktdaten abfragt. Eingehende Anfragen werden direkt kategorisiert und mit vollständigen Informationen ans Maklerbüro weitergeleitet.",
     },
     {
-      question: "Kann ich Besichtigungstermine direkt über die Website vereinbaren lassen?",
+      question: "Wie lange dauert die Einrichtung für einen Immobilienmakler in München?",
       answer:
-        "Ja. Wir integrieren eine Terminbuchungsfunktion in Ihre Website, die Interessenten Besichtigungstermine direkt buchen lässt – mit automatischer Bestätigung und Kalendereintrag.",
+        "Die Einrichtung dauert in der Regel 7–14 Tage. Website, KI-Assistent und Automatisierungs-Workflows werden vollständig von Cogniiq aufgebaut – Sie müssen keine technischen Vorkenntnisse mitbringen.",
     },
     {
-      question: "Werden Interessentendaten DSGVO-konform verarbeitet?",
+      question: "Kann der KI-Telefonassistent auch Fragen zu spezifischen Objekten in München beantworten?",
       answer:
-        "Ja. Alle Kontakt- und Interessentendaten werden ausschließlich auf europäischen Servern gespeichert und nach den Anforderungen der DSGVO verarbeitet.",
+        "Ja. Wir konfigurieren den KI-Assistenten mit den relevanten Informationen zu Ihren Objekten – Lage, Ausstattung, Preis, Verfügbarkeit. Interessenten erhalten sofortige und präzise Antworten.",
     },
     {
-      question: "Wie lange dauert die Einrichtung für ein Immobilienbüro in München?",
+      question: "Kann die Website auch neue Objekte einfach aufnehmen?",
       answer:
-        "Die Einrichtung dauert in der Regel 7–14 Tage. Website, KI-Telefonassistent und Automatisierungssysteme werden vollständig von Cogniiq eingerichtet – keine technischen Vorkenntnisse erforderlich.",
+        "Ja. Wir bauen die Website so, dass Sie neue Objekte selbst einstellen können – ohne Programmierkenntnisse. Auf Wunsch übernimmt Cogniiq auch die laufende Pflege.",
+    },
+    {
+      question: "Betreut Cogniiq die Systeme auch nach dem Go-live?",
+      answer:
+        "Ja. Cogniiq betreut alle Systeme remote – für Updates, Optimierungen, neue Objekte und Systemerweiterungen. Persönliche Termine in München sind auf Anfrage möglich.",
+    },
+    {
+      question: "Kann Cogniiq auch bei der digitalen Verkäufer-Akquise in München helfen?",
+      answer:
+        "Ja. Wir konzipieren Seiten und Formulare speziell für Eigentümer, die ihre Münchner Immobilie bewerten lassen oder verkaufen möchten – mit sofortiger Reaktion und professionellem ersten Eindruck.",
     },
   ],
 };

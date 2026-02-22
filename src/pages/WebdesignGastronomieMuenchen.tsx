@@ -8,13 +8,16 @@ const config: IndustryPageConfig = {
   route: "/webdesign-gastronomie-muenchen",
   industry: "Gastronomie",
   industrySlug: "gastronomie",
+  city: "München",
+  citySlug: "muenchen",
+  cityHub: "/muenchen",
   seo: {
     title: "Webdesign & KI-Telefonassistent für Gastronomie in München | Cogniiq",
     description:
-      "Restaurant Website München: Cogniiq erstellt Websites, KI-Telefonassistenten und Reservierungsautomatisierungen für Restaurants und Gastronomie in München. Mehr Reservierungen, weniger Telefonaufwand, DSGVO-konform.",
+      "Restaurant Website München: Cogniiq entwickelt Websites, KI-Telefonassistenten und Reservierungsautomatisierungen für Restaurants in München. Mehr Tischreservierungen, weniger Telefonaufwand, DSGVO-konform.",
     canonical: `${base}/webdesign-gastronomie-muenchen`,
     keywords:
-      "Restaurant Website München, Reservierungssystem Gastronomie München, Website Gastronomie München, KI Telefonassistent Restaurant München",
+      "Restaurant Website München, Reservierungssystem Gastronomie München, Website Restaurant München, KI Telefonassistent Gastronomie München",
   },
   hero: {
     trustTags: ["München", "DSGVO-konform", "KI-Integration", "Reservierungen", "Automatisierung"],
@@ -22,82 +25,153 @@ const config: IndustryPageConfig = {
   },
   intro: {
     h1: "Webdesign & KI-Telefonassistent für Gastronomie in München",
-    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Restaurants und Gastronomie in München – für mehr Tischreservierungen, bessere Erreichbarkeit und automatisierte Gästekommunikation in einem der wettbewerbsintensivsten Gastronomiemärkte Deutschlands.",
+    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Restaurants und Gastronomie in München – für mehr Tischreservierungen, bessere Erreichbarkeit und automatisierte Gästekommunikation. DSGVO-konform, schnell eingerichtet.",
   },
+  engpaesse: [
+    "In Münchens wettbewerbsintensivem Gastronomiemarkt kostet eine fehlende Online-Präsenz täglich Tischbuchungen",
+    "Reservierungsanrufe während des Betriebs sind in München besonders häufig – Personal ist selten verfügbar",
+    "Gäste aus dem internationalen und überregionalen Segment erwarten mehrsprachige Buchungsoptionen und sofortige Bestätigung",
+    "Ohne automatisierte Erinnerungen ist die No-Show-Rate besonders an Wochenenden hoch",
+    "Eventanfragen für Firmenessen, Oktoberfest-Feiern oder private Veranstaltungen kommen strukturlos an und werden nicht optimal bearbeitet",
+  ],
+  solutionSteps: [
+    {
+      step: "Schritt 1",
+      title: "Analyse & Konzept",
+      description:
+        "Wir erfassen Reservierungsvolumen, Veranstaltungsstruktur und typische Anfragen – und entwickeln ein Konzept aus Website, KI-Telefonassistent und Reservierungsautomatisierung, das dem Münchner Gastronomiebetrieb gerecht wird.",
+    },
+    {
+      step: "Schritt 2",
+      title: "Umsetzung in 7–14 Tagen",
+      description:
+        "Restaurant-Website, Reservierungssystem, KI-Assistent und Automations-Workflows werden vollständig von Cogniiq aufgebaut – ohne IT-Aufwand für den Betrieb, schlüsselfertig in Betrieb.",
+    },
+    {
+      step: "Schritt 3",
+      title: "Go-live & laufende Betreuung",
+      description:
+        "Alle Systeme gehen nach Abnahme live. Cogniiq betreut das Setup dauerhaft – für saisonale Anpassungen, neue Menükarten, Event-Seiten und Erweiterungen des Automatisierungssystems.",
+    },
+  ],
+  workflow: {
+    title: "Beispiel-Workflow: Restaurant München Innenstadt",
+    trigger:
+      "Ein Restaurant in der Münchner Innenstadt erhielt täglich viele Reservierungsanrufe – vor allem abends und am Wochenende. Das Personal war im Service gebunden, Anrufe gingen ins Leere, Reservierungen wurden verpasst.",
+    process:
+      "Cogniiq baute eine neue Restaurant-Website mit Online-Reservierungssystem und implementierte einen KI-Telefonassistenten für Reservierungen und FAQ. Tischbuchungen werden automatisch erfasst und bestätigt. Gruppenanfragen werden strukturiert ans Team weitergeleitet.",
+    result:
+      "Reservierungen laufen vollautomatisch ein – auch wenn kein Personal ans Telefon geht. Das Serviceteam konzentriert sich auf den Gast. Die Website bringt kontinuierlich neue Buchungen über organische Suchanfragen.",
+  },
+  pakete: [
+    {
+      name: "Start",
+      tagline: "Professionelle Restaurant-Website für München",
+      deliverables: [
+        "Responsive Gastronomie-Website (bis 5 Seiten)",
+        "Online-Reservierungssystem (Tischbuchung)",
+        "Speisekarte & Veranstaltungsbereich",
+        "On-Page SEO für 'Restaurant München'",
+        "DSGVO-konforme Gästekommunikation",
+      ],
+    },
+    {
+      name: "Growth",
+      tagline: "Website + KI-Telefonassistent für 24/7-Erreichbarkeit",
+      deliverables: [
+        "Alles aus Start",
+        "KI-Telefonassistent (Reservierungen & FAQ)",
+        "Automatische Bestätigungen & Erinnerungen",
+        "Integration mit Reservierungskalender",
+        "Monatliches Reporting & Optimierungsgespräch",
+      ],
+    },
+    {
+      name: "Premium",
+      tagline: "Vollständige Digitalisierung für Münchner Gastronomiebetriebe",
+      deliverables: [
+        "Alles aus Growth",
+        "Automatisierter Feedback-Prozess nach Besuch",
+        "Gruppenreservierungen & Event-Anfragen-Workflow",
+        "Saisonale Inhalte & Oktoberfest-Kommunikation",
+        "Laufende Betreuung, Updates & Priorisierung",
+      ],
+    },
+  ],
   problems: [
-    "München hat über 5.000 Restaurants – ohne starke Online-Präsenz und Reservierungssystem gehen Gäste zur Konkurrenz",
-    "Telefonanrufe für Reservierungen binden Servicepersonal genau dann, wenn es am Tisch gebraucht wird",
-    "Außerhalb der Öffnungszeiten eingegangene Reservierungsanfragen bleiben unbeantwortet – Tische bleiben leer",
-    "Gäste in München erwarten eine mobile-optimierte Website mit Menü, Fotos und direkt buchbaren Tischen",
-    "Keine zentrale Lösung für Online-Tischreservierungen über Website, Google und Telefon",
-    "Manuelle Bestätigungen und Erinnerungen für Reservierungen kosten Zeit und werden häufig vergessen",
-    "Fehlende Sichtbarkeit bei Suchanfragen wie 'Restaurant München' oder 'Tisch reservieren München'",
+    "Reservierungsanrufe binden Servicepersonal zur umsatzstärksten Zeit im laufenden Betrieb",
+    "Außerhalb der Öffnungszeiten eingegangene Reservierungsanfragen bleiben unbeantwortet",
+    "In München ohne professionelle Restaurant-Website und SEO unsichtbar bei relevanten Suchanfragen",
+    "Anfragen zu Öffnungszeiten, Menü und Parkmöglichkeiten kosten täglich wertvolle Servicezeit",
+    "Keine automatisierte Erinnerung führt zu hoher No-Show-Rate besonders am Wochenende",
+    "Eventanfragen und Gruppenreservierungen kommen unstrukturiert und werden nicht optimal bearbeitet",
+    "Telefonbestellungen für Take-away sind nicht sauber strukturiert und erfasst",
   ],
   services: [
     {
       icon: "web",
       title: "Restaurant-Website München",
       description:
-        "Professionelle Gastronomie-Website mit Online-Reservierungssystem, Speisekarte, Veranstaltungskalender und gezieltem Local-SEO für Suchanfragen wie 'Restaurant München' oder 'Tisch reservieren München'. Visuell stark, mobiloptimiert und auf Conversions ausgelegt.",
+        "Hochwertige Gastronomie-Website mit Online-Reservierungssystem, digitaler Speisekarte, Event-Seiten und gezieltem SEO für Suchanfragen wie 'Restaurant München' oder 'Tisch reservieren München'. Mobiloptimiert, conversion-stark, DSGVO-konform.",
     },
     {
       icon: "phone",
-      title: "KI-Telefonassistent für Münchner Restaurants",
+      title: "KI-Telefonassistent für Restaurants in München",
       description:
-        "Der KI-Telefonassistent nimmt Reservierungsanrufe automatisch entgegen, beantwortet Fragen zu Öffnungszeiten, Verfügbarkeit und Sonderangeboten, trägt Tischbuchungen direkt ins System ein und entlastet so Ihr Servicepersonal – auch während des Abendservice und an Wochenenden.",
+        "Der KI-Telefonassistent nimmt Reservierungsanrufe automatisch entgegen, beantwortet Fragen zu Öffnungszeiten, Verfügbarkeit und Menü, trägt Tischbuchungen ins System ein und entlastet das Servicepersonal – auch beim Oktoberfest-Betrieb.",
     },
     {
       icon: "zap",
-      title: "Reservierungs-Automatisierung",
+      title: "Reservierungs-Automatisierung München",
       description:
-        "Reservierungsbestätigungen, Erinnerungen vor dem Besuch und automatisierte Feedback-Anfragen nach dem Restaurantbesuch laufen ohne manuellen Aufwand ab. In einem hochfrequentierten Münchner Restaurant sind strukturierte Gästeprozesse kein Luxus, sondern Effizienzvoraussetzung.",
+        "Reservierungsbestätigungen, Erinnerungen und automatisierte Feedback-Anfragen nach dem Restaurantbesuch laufen ohne manuellen Aufwand ab. Strukturierte Gästedaten, weniger No-Shows, konsistenter Gäste-Workflow.",
     },
   ],
   useCases: [
     {
-      title: "Tischreservierungen rund um die Uhr",
+      title: "Tischreservierungen rund um die Uhr in München",
       description:
-        "Münchner Gäste reservieren spontan – auch spätabends oder am Wochenende. Über die Restaurant-Website oder per KI-Telefonassistent können Tische jederzeit gebucht werden, ohne dass Ihr Team eingebunden werden muss.",
+        "Gäste reservieren über die Website oder per KI-Assistent jederzeit – auch wenn das Restaurant im Vollbetrieb ist oder geschlossen hat. In einer Stadt wie München ist 24/7-Verfügbarkeit selbstverständlich.",
     },
     {
       title: "Automatische Reservierungsbestätigung und Erinnerung",
       description:
-        "Nach einer Buchung erhalten Gäste sofort eine Bestätigung. Kurz vor dem Termin folgt eine automatische Erinnerung – die No-Show-Rate sinkt, Tische bleiben gefüllt. Gerade am Wochenende in München ein entscheidender Vorteil.",
+        "Nach einer Buchung erhalten Gäste sofort eine Bestätigung. Kurz vor dem Termin folgt eine automatische Erinnerung – besonders wichtig bei vorab gebuchten Events und Firmenfeiern.",
     },
     {
       title: "Öffnungszeitenanfragen automatisch beantworten",
       description:
-        "Der KI-Telefonassistent beantwortet wiederkehrende Fragen zu Öffnungszeiten, Parkmöglichkeiten, Speisekarte und Sonderveranstaltungen – ohne Personalaufwand, rund um die Uhr.",
+        "Der KI-Telefonassistent beantwortet wiederkehrende Fragen zu Öffnungszeiten, Parkplätzen, Menü und Sonderaktionen – ohne Personalaufwand, rund um die Uhr, auch in Stoßzeiten.",
     },
     {
-      title: "Anfragen für Events und Gruppenreservierungen",
+      title: "Gruppenreservierungen und Events in München",
       description:
-        "Anfragen für Firmenfeiern, Geburtstage oder geschlossene Gesellschaften werden über ein strukturiertes Formular auf der Website oder per KI-Assistent qualifiziert erfasst und direkt an die zuständige Person weitergeleitet.",
+        "Anfragen für Firmenfeiern, Geburtstage oder Betriebsausflüge werden über ein strukturiertes Formular erfasst und mit allen relevanten Informationen ans Team weitergeleitet.",
     },
     {
       title: "Sichtbarkeit bei lokalen Suchanfragen in München",
       description:
-        "Die Restaurant-Website wird für Suchanfragen wie 'Restaurant München Innenstadt', 'Biergarten München' oder 'Tisch reservieren München' optimiert – mehr organische Sichtbarkeit in einer der meistgesuchten Gastrometropolen Deutschlands.",
+        "Die Restaurant-Website wird für Suchanfragen wie 'Restaurant München Innenstadt', 'Biergarten München' oder 'Tisch reservieren München' optimiert – mehr organische Sichtbarkeit, mehr Buchungen.",
     },
     {
-      title: "Telefonbestellungen für Take-away strukturiert erfassen",
+      title: "Automatisierter Feedback-Prozess",
       description:
-        "Bestellungen für Take-away werden per KI-Telefonassistent oder Online-Formular strukturiert entgegengenommen – mit automatischer Übergabe an die Küche und sofortiger Bestätigung an den Gast.",
+        "Nach dem Besuch erhalten Gäste automatisch eine Nachricht mit einer Feedback-Anfrage. Positives Feedback wird in Richtung Google-Bewertung gelenkt – wichtig für das Münchner Ranking.",
     },
   ],
   benefits: [
-    "Keine verpassten Reservierungsanrufe – auch im laufenden Abendservice und außerhalb der Öffnungszeiten",
-    "Automatisierte Reservierungsprozesse entlasten Ihr Serviceteam in einem der busiest Gastronomiestandorte Deutschlands",
-    "Mehr qualifizierte Tischbuchungen durch eine suchmaschinenoptimierte Restaurant-Website für München",
-    "24/7-Erreichbarkeit für Münchner Gäste – auf jedem Kanal, zu jeder Zeit",
+    "Weniger verpasste Reservierungsanrufe – auch im laufenden Betrieb und außerhalb der Öffnungszeiten",
+    "Automatisierte Reservierungsprozesse entlasten das Serviceteam in einem der busiest Gastronomiestandorte",
+    "Mehr qualifizierte Tischbuchungen durch eine suchmaschinenoptimierte Restaurant-Website in München",
+    "Höhere Erreichbarkeit für Gäste – rund um die Uhr, in einer Stadt, die nie schläft",
     "Zeitersparnis durch automatisierte Bestätigungen, Erinnerungen und Gästekommunikation",
-    "Professioneller Marktauftritt durch moderne Website – entscheidend in Münchens hart umkämpfter Gastrolandschaft",
-    "Vollständige DSGVO-Konformität – alle Gästedaten werden sicher auf europäischen Servern verarbeitet",
+    "Professioneller erster Eindruck im wettbewerbsintensivsten Gastronomiemarkt Bayerns",
+    "Vollständige DSGVO-Konformität – alle Gästedaten sicher auf europäischen Servern",
   ],
   localContext: [
-    "München ist die Gastronomiehauptstadt Bayerns – mit über 5.000 Restaurants, Bars, Cafés und Event-Locations. Der Wettbewerb um Gäste ist in keiner anderen deutschen Stadt so intensiv. Gleichzeitig sind die Ansprüche der Münchner Gäste hoch: digitale Buchbarkeit, schnelle Reaktionszeiten und ein überzeugender erster Eindruck online sind keine Extras, sondern Grundvoraussetzung.",
-    "Cogniiq entwickelt für Gastronomiebetriebe in München passgenaue Digitallösungen: eine moderne Restaurant-Website mit integriertem Reservierungssystem, einen KI-Telefonassistenten, der Reservierungen entgegennimmt und Fragen beantwortet, sowie Automatisierungen, die Bestätigungen, Erinnerungen und Feedback-Prozesse ohne manuellen Aufwand steuern.",
-    "Alle Systeme sind vollständig DSGVO-konform und in der Regel innerhalb von 7–14 Tagen einsatzbereit. Die Betreuung erfolgt durch Cogniiq direkt – persönlich, transparent und ohne unnötige Zwischenstellen.",
+    "München hat eine der dichtesten und wettbewerbsintensivsten Gastronomieszenen in Deutschland. Restaurants konkurrieren nicht nur um lokale Stammgäste, sondern auch um Touristen, Geschäftsreisende und den überregionalen Markt. Eine professionelle Online-Präsenz ist keine Option, sondern Grundvoraussetzung.",
+    "Cogniiq entwickelt für Gastronomiebetriebe in München passgenaue Digitallösungen: eine moderne Restaurant-Website mit integriertem Reservierungssystem, einen KI-Telefonassistenten sowie Automatisierungen für Bestätigungen, Erinnerungen und Feedback-Prozesse.",
+    "Alle Systeme sind vollständig DSGVO-konform, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut das Setup langfristig remote – saisonale Anpassungen und neue Menükarten inklusive.",
   ],
   internalLinks: [
     { label: "Webdesign München", href: "/muenchen/webdesign" },
@@ -106,35 +180,44 @@ const config: IndustryPageConfig = {
     { label: "Cogniiq München", href: "/muenchen" },
     { label: "Gastronomie Bayreuth", href: "/webdesign-gastronomie-bayreuth" },
     { label: "Gastronomie Regensburg", href: "/webdesign-gastronomie-regensburg" },
-    { label: "Alle Leistungen", href: "/leistungen" },
     { label: "Bayern", href: "/bayern" },
     { label: "Deutschland", href: "/deutschland" },
   ],
   faq: [
     {
-      question: "Kann Cogniiq ein Reservierungssystem in die Restaurant-Website integrieren?",
+      question: "Kann Cogniiq ein Reservierungssystem in meine Restaurant-Website in München integrieren?",
       answer:
-        "Ja. Wir integrieren ein maßgeschneidertes Online-Reservierungssystem direkt in Ihre Website – abgestimmt auf Ihre Tischkapazitäten, Öffnungszeiten und Sonderveranstaltungen.",
+        "Ja. Wir integrieren ein maßgeschneidertes Online-Reservierungssystem direkt in Ihre Website – abgestimmt auf Ihre Tischkapazitäten, Öffnungszeiten, Sonderveranstaltungen und die spezifischen Anforderungen des Münchner Markts.",
     },
     {
-      question: "Funktioniert der KI-Telefonassistent auch während des laufenden Abendservices?",
+      question: "Funktioniert der KI-Telefonassistent auch beim Oktoberfest-Betrieb oder bei Spitzenauslastung?",
       answer:
-        "Ja. Der KI-Telefonassistent nimmt Anrufe unabhängig davon entgegen, ob Ihr Personal gerade im Service gebunden ist. Reservierungen werden automatisch erfasst und an Ihr System übergeben.",
+        "Ja. Der KI-Telefonassistent skaliert beliebig – er nimmt unbegrenzt parallel Anrufe entgegen, ohne Wartezeit. Gerade in Hochsaison wie dem Oktoberfest ist das ein entscheidender Vorteil.",
     },
     {
       question: "Wie lange dauert die Einrichtung für ein Restaurant in München?",
       answer:
-        "Die Einrichtung dauert in der Regel 7–14 Tage und wird vollständig von Cogniiq übernommen. Keine technischen Vorkenntnisse erforderlich.",
+        "Die Einrichtung dauert in der Regel 7–14 Tage und wird vollständig von Cogniiq übernommen. Keine technischen Vorkenntnisse erforderlich – wir liefern alles schlüsselfertig.",
     },
     {
-      question: "Kann die Website auch saisonale Menüs und Events abbilden?",
+      question: "Kann die Website auch Veranstaltungen, Saisonkarten und Events abbilden?",
       answer:
-        "Ja. Wir bauen Ihre Website so, dass Sie Menüs, Aktionswochen und Events selbst aktualisieren können – einfach, ohne Programmierkenntnisse.",
+        "Ja. Wir bauen Ihre Website so, dass Sie Menüs, Events und saisonale Aktionen selbst aktualisieren können – einfach, ohne Programmierkenntnisse. Auf Wunsch übernehmen wir auch die Pflege.",
     },
     {
-      question: "Sind Gästedaten aus Reservierungen DSGVO-konform gespeichert?",
+      question: "Sind Gästedaten aus Reservierungen DSGVO-konform?",
       answer:
-        "Ja. Alle Gästedaten werden ausschließlich auf europäischen Servern verarbeitet und nach den Anforderungen der DSGVO gespeichert und verwaltet.",
+        "Ja. Alle Gästedaten werden ausschließlich auf europäischen Servern verarbeitet und nach den Anforderungen der DSGVO gespeichert.",
+    },
+    {
+      question: "Kann der KI-Assistent auch englischsprachige Gäste bedienen?",
+      answer:
+        "Ja. Der KI-Telefonassistent kann mehrsprachig konfiguriert werden – besonders relevant in München mit einem hohen internationalen Gästeanteil.",
+    },
+    {
+      question: "Kann Cogniiq auch bei bestehenden Restaurant-Websites Reservierungsfunktionen nachrüsten?",
+      answer:
+        "Ja. Wir können ein Reservierungssystem und KI-Telefonassistenten auch an bestehende Restaurant-Websites anbinden, ohne die gesamte Website neu bauen zu müssen.",
     },
   ],
 };
