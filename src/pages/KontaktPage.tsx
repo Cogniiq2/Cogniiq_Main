@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -13,6 +13,8 @@ import {
   CheckCircle2,
   Building2,
   Calendar,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO, getGoogleMapsUrl, getGoogleMapsEmbedUrl } from "@/lib/seo-data";
@@ -117,6 +119,87 @@ const STANDORT_OPTIONS = [
   "Regensburg",
   "Deutschlandweit",
 ];
+
+interface PremiumSelectProps {
+  value: string;
+  onChange: (val: string) => void;
+  placeholder: string;
+  options: string[];
+}
+
+function PremiumSelect({ value, onChange, placeholder, options }: PremiumSelectProps) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border bg-white dark:bg-gray-900 text-sm transition-all duration-200 focus:outline-none ${
+          open
+            ? "border-gray-400 dark:border-gray-500"
+            : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+        }`}
+      >
+        <span className={value ? "text-gray-900 dark:text-gray-100" : "text-gray-400 dark:text-gray-600"}>
+          {value || placeholder}
+        </span>
+        <motion.div
+          animate={{ rotate: open ? 180 : 0 }}
+          transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <ChevronDown size={14} className="text-gray-400 dark:text-gray-500" />
+        </motion.div>
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -6, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.98 }}
+            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute z-50 top-full mt-1.5 left-0 right-0 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-xl shadow-gray-200/60 dark:shadow-black/40 overflow-hidden"
+          >
+            <div className="p-1.5">
+              {options.map((opt, i) => {
+                const selected = value === opt;
+                return (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => { onChange(opt); setOpen(false); }}
+                    className={`w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 text-left ${
+                      selected
+                        ? "bg-gray-900 dark:bg-gray-50 text-white dark:text-gray-900"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                    } ${i > 0 ? "" : ""}`}
+                  >
+                    <span>{opt}</span>
+                    {selected && (
+                      <Check size={13} className="flex-shrink-0 text-white dark:text-gray-900" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export function KontaktPage() {
   const [interests, setInterests] = useState<string[]>([]);
@@ -484,31 +567,23 @@ export function KontaktPage() {
                         <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
                           Branche
                         </label>
-                        <select
+                        <PremiumSelect
                           value={formData.branche}
-                          onChange={(e) => setFormData((p) => ({ ...p, branche: e.target.value }))}
-                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500 transition-colors appearance-none cursor-pointer"
-                        >
-                          <option value="">Branche wählen</option>
-                          {BRANCHE_OPTIONS.map((b) => (
-                            <option key={b} value={b}>{b}</option>
-                          ))}
-                        </select>
+                          onChange={(val) => setFormData((p) => ({ ...p, branche: val }))}
+                          placeholder="Branche wählen"
+                          options={BRANCHE_OPTIONS}
+                        />
                       </div>
                       <div>
                         <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
                           Standort
                         </label>
-                        <select
+                        <PremiumSelect
                           value={formData.standort}
-                          onChange={(e) => setFormData((p) => ({ ...p, standort: e.target.value }))}
-                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500 transition-colors appearance-none cursor-pointer"
-                        >
-                          <option value="">Standort wählen</option>
-                          {STANDORT_OPTIONS.map((s) => (
-                            <option key={s} value={s}>{s}</option>
-                          ))}
-                        </select>
+                          onChange={(val) => setFormData((p) => ({ ...p, standort: val }))}
+                          placeholder="Standort wählen"
+                          options={STANDORT_OPTIONS}
+                        />
                       </div>
                     </div>
 
