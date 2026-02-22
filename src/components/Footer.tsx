@@ -11,6 +11,26 @@ const navLink =
 const colHeading =
   "text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4";
 
+const ease = [0.22, 1, 0.36, 1] as const;
+
+const fadeSlide = {
+  hidden: { opacity: 0, y: 18 },
+  visible: (delay = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.75, delay, ease },
+  }),
+};
+
+const fadeLine = {
+  hidden: { scaleX: 0, opacity: 0 },
+  visible: (delay = 0) => ({
+    scaleX: 1,
+    opacity: 1,
+    transition: { duration: 0.9, delay, ease },
+  }),
+};
+
 interface AccordionColProps {
   heading: string;
   children: React.ReactNode;
@@ -46,7 +66,7 @@ export function Footer() {
   return (
     <>
       <footer
-        className="bg-white dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800/60"
+        className="bg-white dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800/60 overflow-hidden"
         role="contentinfo"
       >
         {/* TOP SECTION */}
@@ -54,7 +74,14 @@ export function Footer() {
           <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-12 lg:gap-8">
 
             {/* BRAND */}
-            <div className="lg:pr-8">
+            <motion.div
+              className="lg:pr-8"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-40px" }}
+              variants={fadeSlide}
+              custom={0}
+            >
               <Link to="/" aria-label="Cogniiq Startseite">
                 <Logo className="h-8 mb-5" />
               </Link>
@@ -103,80 +130,125 @@ export function Footer() {
                   </span>
                 </a>
               </div>
-            </div>
+            </motion.div>
 
             {/* LEISTUNGEN */}
-            <AccordionCol heading="Leistungen">
-              <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-1 pb-0.5">Deutschland</p>
-              <Link to="/deutschland" className={navLink}>Webdesign Deutschland</Link>
-              <Link to="/deutschland" className={navLink}>KI-Telefonassistent DE</Link>
-              <Link to="/deutschland" className={navLink}>Automatisierung DE</Link>
-              <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-3 pb-0.5">Bayern</p>
-              <Link to="/bayern" className={navLink}>Webdesign Bayern</Link>
-              <Link to="/bayern" className={navLink}>KI-Telefonassistent BY</Link>
-              <Link to="/bayern" className={navLink}>Automatisierung BY</Link>
-              <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-3 pb-0.5">Branchen Bayreuth</p>
-              <Link to="/webdesign-arzt-bayreuth" className={navLink}>Arztpraxis Bayreuth</Link>
-              <Link to="/webdesign-gastronomie-bayreuth" className={navLink}>Gastronomie Bayreuth</Link>
-              <Link to="/webdesign-immobilien-bayreuth" className={navLink}>Immobilien Bayreuth</Link>
-              <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-3 pb-0.5">Branchen München</p>
-              <Link to="/webdesign-arzt-muenchen" className={navLink}>Arztpraxis München</Link>
-              <Link to="/webdesign-gastronomie-muenchen" className={navLink}>Gastronomie München</Link>
-              <Link to="/webdesign-immobilien-muenchen" className={navLink}>Immobilien München</Link>
-              <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-3 pb-0.5">Branchen Regensburg</p>
-              <Link to="/webdesign-arzt-regensburg" className={navLink}>Arztpraxis Regensburg</Link>
-              <Link to="/webdesign-gastronomie-regensburg" className={navLink}>Gastronomie Regensburg</Link>
-              <Link to="/webdesign-immobilien-regensburg" className={navLink}>Immobilien Regensburg</Link>
-            </AccordionCol>
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-40px" }}
+              variants={fadeSlide}
+              custom={0.08}
+            >
+              <AccordionCol heading="Leistungen">
+                <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-1 pb-0.5">Deutschland</p>
+                <Link to="/deutschland" className={navLink}>Webdesign Deutschland</Link>
+                <Link to="/deutschland" className={navLink}>KI-Telefonassistent DE</Link>
+                <Link to="/deutschland" className={navLink}>Automatisierung DE</Link>
+                <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-3 pb-0.5">Bayern</p>
+                <Link to="/bayern" className={navLink}>Webdesign Bayern</Link>
+                <Link to="/bayern" className={navLink}>KI-Telefonassistent BY</Link>
+                <Link to="/bayern" className={navLink}>Automatisierung BY</Link>
+                <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-3 pb-0.5">Branchen Bayreuth</p>
+                <Link to="/webdesign-arzt-bayreuth" className={navLink}>Arztpraxis Bayreuth</Link>
+                <Link to="/webdesign-gastronomie-bayreuth" className={navLink}>Gastronomie Bayreuth</Link>
+                <Link to="/webdesign-immobilien-bayreuth" className={navLink}>Immobilien Bayreuth</Link>
+                <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-3 pb-0.5">Branchen München</p>
+                <Link to="/webdesign-arzt-muenchen" className={navLink}>Arztpraxis München</Link>
+                <Link to="/webdesign-gastronomie-muenchen" className={navLink}>Gastronomie München</Link>
+                <Link to="/webdesign-immobilien-muenchen" className={navLink}>Immobilien München</Link>
+                <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-3 pb-0.5">Branchen Regensburg</p>
+                <Link to="/webdesign-arzt-regensburg" className={navLink}>Arztpraxis Regensburg</Link>
+                <Link to="/webdesign-gastronomie-regensburg" className={navLink}>Gastronomie Regensburg</Link>
+                <Link to="/webdesign-immobilien-regensburg" className={navLink}>Immobilien Regensburg</Link>
+              </AccordionCol>
+            </motion.div>
 
             {/* REGIONEN */}
-            <AccordionCol heading="Regionen">
-              <Link to="/deutschland" className={navLink}>
-                <span className="font-medium text-gray-700 dark:text-gray-300">Deutschland</span>
-              </Link>
-              <Link to="/bayern" className={navLink}>
-                <span className="font-medium text-gray-700 dark:text-gray-300">Bayern</span>
-              </Link>
-              <Link to="/bayreuth" className={navLink}>Bayreuth</Link>
-              <Link to="/muenchen" className={navLink}>München</Link>
-              <Link to="/regensburg" className={navLink}>Regensburg</Link>
-            </AccordionCol>
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-40px" }}
+              variants={fadeSlide}
+              custom={0.16}
+            >
+              <AccordionCol heading="Regionen">
+                <Link to="/deutschland" className={navLink}>
+                  <span className="font-medium text-gray-700 dark:text-gray-300">Deutschland</span>
+                </Link>
+                <Link to="/bayern" className={navLink}>
+                  <span className="font-medium text-gray-700 dark:text-gray-300">Bayern</span>
+                </Link>
+                <Link to="/bayreuth" className={navLink}>Bayreuth</Link>
+                <Link to="/muenchen" className={navLink}>München</Link>
+                <Link to="/regensburg" className={navLink}>Regensburg</Link>
+              </AccordionCol>
+            </motion.div>
 
             {/* STANDORTE */}
-            <AccordionCol heading="Nach Standort">
-              <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pb-0.5">Bayreuth</p>
-              <Link to="/bayreuth/webdesign" className={navLink}>Webdesign Bayreuth</Link>
-              <Link to="/bayreuth/ki-telefonassistent" className={navLink}>KI-Telefonassistent BT</Link>
-              <Link to="/bayreuth/automatisierung" className={navLink}>Automatisierung BT</Link>
-              <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-3 pb-0.5">München</p>
-              <Link to="/muenchen/webdesign" className={navLink}>Webdesign München</Link>
-              <Link to="/muenchen/ki-telefonassistent" className={navLink}>KI-Telefonassistent MUC</Link>
-              <Link to="/muenchen/automatisierung" className={navLink}>Automatisierung MUC</Link>
-              <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-3 pb-0.5">Regensburg</p>
-              <Link to="/regensburg/webdesign" className={navLink}>Webdesign Regensburg</Link>
-              <Link to="/regensburg/ki-telefonassistent" className={navLink}>KI-Telefonassistent R</Link>
-              <Link to="/regensburg/automatisierung" className={navLink}>Automatisierung R</Link>
-            </AccordionCol>
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-40px" }}
+              variants={fadeSlide}
+              custom={0.24}
+            >
+              <AccordionCol heading="Nach Standort">
+                <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pb-0.5">Bayreuth</p>
+                <Link to="/bayreuth/webdesign" className={navLink}>Webdesign Bayreuth</Link>
+                <Link to="/bayreuth/ki-telefonassistent" className={navLink}>KI-Telefonassistent BT</Link>
+                <Link to="/bayreuth/automatisierung" className={navLink}>Automatisierung BT</Link>
+                <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-3 pb-0.5">München</p>
+                <Link to="/muenchen/webdesign" className={navLink}>Webdesign München</Link>
+                <Link to="/muenchen/ki-telefonassistent" className={navLink}>KI-Telefonassistent MUC</Link>
+                <Link to="/muenchen/automatisierung" className={navLink}>Automatisierung MUC</Link>
+                <p className="text-[10px] font-medium uppercase tracking-wider text-gray-300 dark:text-gray-600 pt-3 pb-0.5">Regensburg</p>
+                <Link to="/regensburg/webdesign" className={navLink}>Webdesign Regensburg</Link>
+                <Link to="/regensburg/ki-telefonassistent" className={navLink}>KI-Telefonassistent R</Link>
+                <Link to="/regensburg/automatisierung" className={navLink}>Automatisierung R</Link>
+              </AccordionCol>
+            </motion.div>
 
             {/* UNTERNEHMEN */}
-            <AccordionCol heading="Unternehmen">
-              <Link to="/" className={navLink}>Start</Link>
-              <Link to="/leistungen" className={navLink}>Leistungen</Link>
-              <Link to="/ueber-uns" className={navLink}>Über uns</Link>
-              <Link to="/faq" className={navLink}>FAQ</Link>
-              <Link to="/kontakt" className={navLink + " inline-flex items-center gap-1"}>
-                Kontakt
-                <ArrowUpRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-              </Link>
-            </AccordionCol>
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-40px" }}
+              variants={fadeSlide}
+              custom={0.32}
+            >
+              <AccordionCol heading="Unternehmen">
+                <Link to="/" className={navLink}>Start</Link>
+                <Link to="/leistungen" className={navLink}>Leistungen</Link>
+                <Link to="/ueber-uns" className={navLink}>Über uns</Link>
+                <Link to="/faq" className={navLink}>FAQ</Link>
+                <Link to="/kontakt" className={navLink + " inline-flex items-center gap-1"}>
+                  Kontakt
+                  <ArrowUpRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Link>
+              </AccordionCol>
+            </motion.div>
 
           </div>
         </div>
 
         {/* SEO TEXT STRIP */}
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="border-t border-gray-100 dark:border-gray-800/60 py-6">
-            <p className="text-[11px] leading-relaxed text-gray-400 dark:text-gray-600 max-w-5xl">
+          <motion.div
+            className="border-t border-gray-100 dark:border-gray-800/60 py-6 origin-left"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-20px" }}
+            variants={fadeLine}
+            custom={0}
+          >
+            <motion.p
+              className="text-[11px] leading-relaxed text-gray-400 dark:text-gray-600 max-w-5xl"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.9, delay: 0.15, ease }}
+            >
               <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-400 transition-colors">Cogniiq</Link> ist eine{" "}
               <Link to="/leistungen" className="hover:text-gray-600 dark:hover:text-gray-400 transition-colors">KI- und Webdesign-Agentur</Link> mit Sitz in{" "}
               <Link to="/bayreuth" className="hover:text-gray-600 dark:hover:text-gray-400 transition-colors">Bayreuth</Link>.
@@ -189,13 +261,19 @@ export function Footer() {
               {" "}Unsere Leistungen verbinden{" "}
               <Link to="/leistungen" className="hover:text-gray-600 dark:hover:text-gray-400 transition-colors">Webdesign</Link>,
               künstliche Intelligenz und Prozessautomatisierung zu einem durchgängigen digitalen Vertriebssystem.
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
         </div>
 
         {/* BOTTOM BAR */}
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="border-t border-gray-100 dark:border-gray-800/60 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <motion.div
+            className="border-t border-gray-100 dark:border-gray-800/60 py-5 flex flex-col sm:flex-row items-center justify-between gap-3"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.1, ease }}
+          >
             <p className="text-xs text-gray-400 dark:text-gray-600">
               © {currentYear} Cogniiq. Alle Rechte vorbehalten.
             </p>
@@ -213,7 +291,7 @@ export function Footer() {
                 Datenschutz
               </button>
             </div>
-          </div>
+          </motion.div>
         </div>
       </footer>
 
