@@ -194,8 +194,8 @@ export const PAGE_META = {
     canonical: "https://cogniiq.de/leistungen",
   },
   ueberUns: {
-    title: "Über Uns | Team & Prozess – Cogniiq AI Agentur Bayreuth",
-    description: "Lernen Sie das Team hinter Cogniiq kennen. Wir sind eine AI Agentur aus Bayreuth, spezialisiert auf KI Automationen und modernes Webdesign für lokale Unternehmen in Deutschland.",
+    title: "Über Uns | AI Agentur Bayreuth – Webdesign & KI-Automatisierung – Cogniiq",
+    description: "Cogniiq – AI-Agentur aus Bayreuth von Lazar und Djordje Popovic. Spezialisierung auf Webdesign, KI-Automatisierung und digitale Systeme für Unternehmen in ganz Deutschland.",
     canonical: "https://cogniiq.de/ueber-uns",
   },
   faq: {
