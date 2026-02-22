@@ -1,88 +1,843 @@
-import { motion } from 'framer-motion';
-import { ContactSection } from '@/components/ContactSection';
-import { NAP } from '@/components/NAP';
-import { PageSEO } from '@/components/PageSEO';
-import { getGoogleMapsUrl, getGoogleMapsEmbedUrl, BUSINESS_INFO, PAGE_META } from '@/lib/seo-data';
-import { MapPin } from 'lucide-react';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import {
+  ArrowRight,
+  ChevronRight,
+  Globe,
+  Phone,
+  Zap,
+  Mail,
+  MapPin,
+  Clock,
+  CheckCircle2,
+  Building2,
+  Calendar,
+} from "lucide-react";
+import { PageSEO } from "@/components/PageSEO";
+import { BUSINESS_INFO, getGoogleMapsUrl, getGoogleMapsEmbedUrl } from "@/lib/seo-data";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (delay = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] },
+  }),
+};
+
+const FOCUS_CARDS = [
+  {
+    icon: Zap,
+    title: "KI-Automatisierung",
+    description:
+      "Unternehmen, die Prozesse automatisieren und manuelle Arbeit systematisch reduzieren wollen.",
+    href: "/leistungen",
+    label: "Mehr erfahren",
+  },
+  {
+    icon: Globe,
+    title: "Webdesign & Conversion",
+    description:
+      "Unternehmen, die mehr Anfragen und Kunden über ihre Website gewinnen wollen.",
+    href: "/leistungen",
+    label: "Mehr erfahren",
+  },
+  {
+    icon: Phone,
+    title: "KI-Telefonassistent",
+    description:
+      "Unternehmen mit vielen Anrufen, Terminen oder Kundenanfragen die automatisiert bearbeitet werden sollen.",
+    href: "/leistungen",
+    label: "Mehr erfahren",
+  },
+];
+
+const PROCESS_STEPS = [
+  {
+    number: "01",
+    title: "Anfrage senden",
+    description: "Kurze Beschreibung Ihrer Situation – kein Aufwand, keine Vorbereitung nötig.",
+  },
+  {
+    number: "02",
+    title: "Kurzanalyse Ihres Status quo",
+    description: "Wir analysieren Ihren Fall strukturiert und bereiten das Gespräch vor.",
+  },
+  {
+    number: "03",
+    title: "Strategiegespräch (Video)",
+    description: "30–45 Minuten fokussiertes Gespräch über konkrete Potenziale und nächste Schritte.",
+  },
+  {
+    number: "04",
+    title: "Klare Empfehlung & nächste Schritte",
+    description: "Sie erhalten eine ehrliche Einschätzung – kein Pitch, keine Verkaufsveranstaltung.",
+  },
+];
+
+const REGIONS = [
+  { label: "KI Agentur Bayreuth", href: "/bayreuth" },
+  { label: "KI Agentur München", href: "/muenchen" },
+  { label: "KI Agentur Regensburg", href: "/regensburg" },
+  { label: "KI Agentur Deutschland", href: "/deutschland" },
+];
+
+const SERVICES_LINKS = [
+  { label: "Webdesign", href: "/leistungen" },
+  { label: "KI-Telefonassistent", href: "/leistungen" },
+  { label: "Automatisierung", href: "/leistungen" },
+];
+
+const BRANCHEN_ITEMS = [
+  { label: "Arztpraxis Bayreuth", href: "/webdesign-arzt-bayreuth" },
+  { label: "Gastronomie München", href: "/webdesign-gastronomie-muenchen" },
+  { label: "Immobilien Regensburg", href: "/webdesign-immobilien-regensburg" },
+];
+
+const INTEREST_OPTIONS = [
+  "Webdesign",
+  "KI Telefonassistent",
+  "Automatisierung",
+  "KI Systeme",
+];
+
+const BRANCHE_OPTIONS = [
+  "Arzt / Praxis",
+  "Gastronomie",
+  "Immobilien",
+  "Industrie",
+  "Dienstleistung",
+  "Sonstige",
+];
+
+const STANDORT_OPTIONS = [
+  "Bayreuth",
+  "München",
+  "Regensburg",
+  "Deutschlandweit",
+];
 
 export function KontaktPage() {
+  const [interests, setInterests] = useState<string[]>([]);
+  const [submitted, setSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    unternehmen: "",
+    branche: "",
+    standort: "",
+    ziel: "",
+    termin: "",
+  });
+
+  function toggleInterest(item: string) {
+    setInterests((prev) =>
+      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
+    );
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSubmitted(true);
+  }
+
   return (
     <>
       <PageSEO
-        title={PAGE_META.kontakt.title}
-        description={PAGE_META.kontakt.description}
-        canonical={PAGE_META.kontakt.canonical}
+        title="KI Beratung & Kontakt | Cogniiq AI Agentur Deutschland"
+        description="Kontaktieren Sie Cogniiq für KI-Automatisierung, Webdesign und KI-Telefonassistent. Analysegespräch für Unternehmen in Deutschland, München, Regensburg und Bayreuth."
+        canonical="https://cogniiq.de/kontakt"
         breadcrumbs={[
-          { name: "Home", url: BUSINESS_INFO.website },
-          { name: "Kontakt", url: PAGE_META.kontakt.canonical },
+          { name: "Start", url: "https://cogniiq.de" },
+          { name: "Kontakt", url: "https://cogniiq.de/kontakt" },
         ]}
       />
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="pt-32 pb-16"
-      >
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6"
-          >
-            Kontakt
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mb-12"
-          >
-            Lassen Sie uns über Ihr Projekt sprechen.
-            Wir freuen uns auf Ihre Nachricht!
-          </motion.p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="grid md:grid-cols-2 gap-12 mb-16"
-          >
-            <div className="bg-white dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-lg p-8 transition-colors duration-300">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-                Kontaktdaten
-              </h2>
-              <NAP variant="vertical" showIcons={true} />
-              <div className="mt-8">
+      <div className="min-h-screen bg-white dark:bg-gray-950">
+
+        {/* SECTION 1: HERO */}
+        <section className="pt-32 pb-20 px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+              custom={0}
+              className="flex items-center gap-2 mb-6"
+            >
+              <Link
+                to="/"
+                className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              >
+                Start
+              </Link>
+              <ChevronRight size={12} className="text-gray-300 dark:text-gray-600" />
+              <span className="text-xs text-gray-900 dark:text-gray-100 font-medium">
+                Kontakt
+              </span>
+            </motion.div>
+
+            <div className="max-w-[780px]">
+              <motion.p
+                initial="hidden"
+                animate="visible"
+                variants={fadeUp}
+                custom={0.05}
+                className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4"
+              >
+                Analysegespräch
+              </motion.p>
+
+              <motion.h1
+                initial="hidden"
+                animate="visible"
+                variants={fadeUp}
+                custom={0.1}
+                className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-50 leading-[1.08] tracking-tight mb-6"
+              >
+                KI-Systeme für Ihr<br />
+                <span className="font-light text-gray-500 dark:text-gray-400">Unternehmen besprechen</span>
+              </motion.h1>
+
+              <motion.p
+                initial="hidden"
+                animate="visible"
+                variants={fadeUp}
+                custom={0.15}
+                className="text-lg text-gray-500 dark:text-gray-400 leading-relaxed mb-8 max-w-[620px]"
+              >
+                In einem strukturierten Analysegespräch prüfen wir, wo KI-Automatisierung,
+                Webdesign oder digitale Systeme in Ihrem Unternehmen konkret Umsatz, Effizienz
+                und Anfragen steigern können.
+              </motion.p>
+
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={fadeUp}
+                custom={0.2}
+                className="flex flex-col sm:flex-row gap-3 mb-10"
+              >
                 <a
-                  href={getGoogleMapsUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-[#515A61] dark:text-sky-400 hover:text-[#434A51] dark:hover:text-sky-300 font-medium transition-colors"
+                  href="#kontaktformular"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gray-900 dark:bg-gray-50 text-white dark:text-gray-900 text-sm font-semibold hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors duration-200"
                 >
-                  <MapPin size={18} />
-                  Auf Google Maps anzeigen
+                  Analysegespräch starten
+                  <ArrowRight size={15} />
                 </a>
+                <Link
+                  to="/leistungen"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500 transition-colors duration-200"
+                >
+                  Leistungen ansehen
+                  <ArrowRight size={14} className="opacity-60" />
+                </Link>
+              </motion.div>
+
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={fadeUp}
+                custom={0.25}
+                className="flex flex-col sm:flex-row gap-4 sm:gap-8"
+              >
+                {[
+                  "30–45 Minuten Strategiegespräch",
+                  "Konkrete Einschätzung statt Verkauf",
+                  "Für Unternehmen in Deutschland",
+                ].map((bullet) => (
+                  <div key={bullet} className="flex items-center gap-2">
+                    <CheckCircle2 size={14} className="text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                    <span className="text-sm text-gray-500 dark:text-gray-400">{bullet}</span>
+                  </div>
+                ))}
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 2: FÜR WEN */}
+        <section className="py-20 px-6 lg:px-8 border-t border-gray-100 dark:border-gray-800/60">
+          <div className="max-w-7xl mx-auto">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-60px" }}
+              variants={fadeUp}
+              custom={0}
+              className="mb-12"
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-3">
+                Für wen
+              </p>
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">
+                Für welche Unternehmen<br />
+                <span className="font-light text-gray-500 dark:text-gray-400">Cogniiq arbeitet</span>
+              </h2>
+            </motion.div>
+
+            <div className="grid md:grid-cols-3 gap-5">
+              {FOCUS_CARDS.map((card, i) => {
+                const Icon = card.icon;
+                return (
+                  <motion.div
+                    key={card.title}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-40px" }}
+                    variants={fadeUp}
+                    custom={i * 0.07}
+                    className="group relative bg-gray-50 dark:bg-gray-900/40 rounded-2xl p-7 border border-gray-100 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-300"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-gray-900 dark:bg-gray-50 flex items-center justify-center mb-5">
+                      <Icon size={18} className="text-white dark:text-gray-900" />
+                    </div>
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                      {card.title}
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-5">
+                      {card.description}
+                    </p>
+                    <Link
+                      to={card.href}
+                      className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                    >
+                      {card.label}
+                      <ArrowRight size={12} />
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 3: ABLAUF */}
+        <section className="py-20 px-6 lg:px-8 border-t border-gray-100 dark:border-gray-800/60">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid lg:grid-cols-[1fr_1.4fr] gap-16 lg:gap-24 items-start">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-60px" }}
+                variants={fadeUp}
+                custom={0}
+                className="lg:sticky lg:top-32"
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-3">
+                  Ablauf
+                </p>
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-50 tracking-tight mb-5">
+                  So läuft das<br />
+                  <span className="font-light text-gray-500 dark:text-gray-400">Analysegespräch ab</span>
+                </h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                  Keine Vorbereitung nötig. Wir analysieren Ihre Situation strukturiert
+                  und zeigen konkrete Möglichkeiten in Ihrem spezifischen Kontext.
+                </p>
+              </motion.div>
+
+              <div className="space-y-0">
+                {PROCESS_STEPS.map((step, i) => (
+                  <motion.div
+                    key={step.number}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-40px" }}
+                    variants={fadeUp}
+                    custom={i * 0.08}
+                    className="relative flex gap-6 pb-10 last:pb-0"
+                  >
+                    {i < PROCESS_STEPS.length - 1 && (
+                      <div className="absolute left-[19px] top-10 w-px h-full bg-gradient-to-b from-gray-200 to-transparent dark:from-gray-700" />
+                    )}
+                    <div className="flex-shrink-0 w-10 h-10 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex items-center justify-center">
+                      <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500 tracking-wide">
+                        {step.number}
+                      </span>
+                    </div>
+                    <div className="pt-2">
+                      <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-1.5">
+                        {step.title}
+                      </h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                        {step.description}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
             </div>
+          </div>
+        </section>
 
-            <div className="rounded-2xl overflow-hidden shadow-lg ring-1 ring-gray-200 dark:ring-gray-700 h-[400px]">
-              <iframe
-                src={getGoogleMapsEmbedUrl()}
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title={`Standort von ${BUSINESS_INFO.name} in ${BUSINESS_INFO.address.addressLocality}`}
-                className="w-full h-full"
-              />
+        {/* SECTION 4: KONTAKTFORMULAR */}
+        <section
+          id="kontaktformular"
+          className="py-20 px-6 lg:px-8 border-t border-gray-100 dark:border-gray-800/60 scroll-mt-20"
+        >
+          <div className="max-w-7xl mx-auto">
+            <div className="grid lg:grid-cols-[1fr_1.6fr] gap-16 lg:gap-24 items-start">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-60px" }}
+                variants={fadeUp}
+                custom={0}
+                className="lg:sticky lg:top-32"
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-3">
+                  Anfrage
+                </p>
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-50 tracking-tight mb-5">
+                  System anfragen
+                </h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-8">
+                  Beschreiben Sie kurz Ihre Situation – wir melden uns innerhalb von
+                  24 Stunden mit einer ersten Einschätzung.
+                </p>
+                <div className="space-y-4">
+                  {[
+                    { icon: Clock, text: "Antwort innerhalb von 24h" },
+                    { icon: CheckCircle2, text: "Kostenlose Ersteinschätzung" },
+                    { icon: Building2, text: "Für Unternehmen in ganz Deutschland" },
+                  ].map(({ icon: Icon, text }) => (
+                    <div key={text} className="flex items-center gap-3">
+                      <div className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
+                        <Icon size={13} className="text-gray-500 dark:text-gray-400" />
+                      </div>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{text}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-40px" }}
+                variants={fadeUp}
+                custom={0.1}
+              >
+                {submitted ? (
+                  <div className="bg-gray-50 dark:bg-gray-900/40 rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center">
+                    <div className="w-12 h-12 rounded-2xl bg-gray-900 dark:bg-gray-50 flex items-center justify-center mx-auto mb-5">
+                      <CheckCircle2 size={22} className="text-white dark:text-gray-900" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                      Anfrage eingegangen
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Wir melden uns innerhalb von 24 Stunden mit einer ersten Einschätzung.
+                    </p>
+                  </div>
+                ) : (
+                  <form
+                    onSubmit={handleSubmit}
+                    className="bg-gray-50 dark:bg-gray-900/40 rounded-2xl border border-gray-100 dark:border-gray-800 p-8 space-y-6"
+                  >
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
+                          Name
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="Max Mustermann"
+                          value={formData.name}
+                          onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500 transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
+                          E-Mail
+                        </label>
+                        <input
+                          type="email"
+                          required
+                          placeholder="max@unternehmen.de"
+                          value={formData.email}
+                          onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))}
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500 transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
+                        Unternehmen
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Unternehmensname"
+                        value={formData.unternehmen}
+                        onChange={(e) => setFormData((p) => ({ ...p, unternehmen: e.target.value }))}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500 transition-colors"
+                      />
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
+                          Branche
+                        </label>
+                        <select
+                          value={formData.branche}
+                          onChange={(e) => setFormData((p) => ({ ...p, branche: e.target.value }))}
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500 transition-colors appearance-none cursor-pointer"
+                        >
+                          <option value="">Branche wählen</option>
+                          {BRANCHE_OPTIONS.map((b) => (
+                            <option key={b} value={b}>{b}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
+                          Standort
+                        </label>
+                        <select
+                          value={formData.standort}
+                          onChange={(e) => setFormData((p) => ({ ...p, standort: e.target.value }))}
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500 transition-colors appearance-none cursor-pointer"
+                        >
+                          <option value="">Standort wählen</option>
+                          {STANDORT_OPTIONS.map((s) => (
+                            <option key={s} value={s}>{s}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-3">
+                        Interessensfelder
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {INTEREST_OPTIONS.map((item) => {
+                          const active = interests.includes(item);
+                          return (
+                            <button
+                              key={item}
+                              type="button"
+                              onClick={() => toggleInterest(item)}
+                              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-sm font-medium transition-all duration-200 text-left ${
+                                active
+                                  ? "border-gray-900 dark:border-gray-100 bg-gray-900 dark:bg-gray-50 text-white dark:text-gray-900"
+                                  : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500"
+                              }`}
+                            >
+                              <div className={`w-3.5 h-3.5 rounded flex items-center justify-center flex-shrink-0 border transition-colors ${
+                                active
+                                  ? "border-white dark:border-gray-900 bg-white dark:bg-gray-900"
+                                  : "border-gray-300 dark:border-gray-600"
+                              }`}>
+                                {active && (
+                                  <div className="w-1.5 h-1.5 rounded-sm bg-gray-900 dark:bg-white" />
+                                )}
+                              </div>
+                              {item}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
+                        Ziel & Ausgangssituation
+                      </label>
+                      <textarea
+                        rows={4}
+                        required
+                        placeholder="Beschreiben Sie Ihre aktuelle Situation und was Sie verändern möchten..."
+                        value={formData.ziel}
+                        onChange={(e) => setFormData((p) => ({ ...p, ziel: e.target.value }))}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500 transition-colors resize-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
+                        <span className="flex items-center gap-1.5">
+                          <Calendar size={12} />
+                          Bevorzugter Gesprächstermin
+                          <span className="text-gray-400 dark:text-gray-600 font-normal">(optional)</span>
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="z. B. Di–Do Nachmittag, KW 10"
+                        value={formData.termin}
+                        onChange={(e) => setFormData((p) => ({ ...p, termin: e.target.value }))}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:border-gray-400 dark:focus:border-gray-500 transition-colors"
+                      />
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-2">
+                      <p className="text-xs text-gray-400 dark:text-gray-600 max-w-xs leading-relaxed">
+                        Ihre Daten werden vertraulich behandelt und nicht weitergegeben.
+                      </p>
+                      <button
+                        type="submit"
+                        className="flex-shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gray-900 dark:bg-gray-50 text-white dark:text-gray-900 text-sm font-semibold hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors duration-200"
+                      >
+                        Analyse anfragen
+                        <ArrowRight size={15} />
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </motion.div>
             </div>
-          </motion.div>
-        </div>
-      </motion.div>
-      <ContactSection />
+          </div>
+        </section>
+
+        {/* SECTION 5: STANDORT & KONTAKT */}
+        <section className="py-20 px-6 lg:px-8 border-t border-gray-100 dark:border-gray-800/60">
+          <div className="max-w-7xl mx-auto">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-60px" }}
+              variants={fadeUp}
+              custom={0}
+              className="mb-12"
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-3">
+                Standort
+              </p>
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">
+                Direkter Kontakt
+              </h2>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-40px" }}
+                variants={fadeUp}
+                custom={0.05}
+                className="bg-gray-50 dark:bg-gray-900/40 rounded-2xl border border-gray-100 dark:border-gray-800 p-8 space-y-7"
+              >
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500 mb-4">
+                    Adresse
+                  </p>
+                  <a
+                    href={getGoogleMapsUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-start gap-3 group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:border-gray-400 dark:group-hover:border-gray-500 transition-colors">
+                      <MapPin size={14} className="text-gray-500 dark:text-gray-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors">
+                        {BUSINESS_INFO.address.streetAddress}
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {BUSINESS_INFO.address.postalCode} {BUSINESS_INFO.address.addressLocality}
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Deutschland</p>
+                    </div>
+                  </a>
+                </div>
+
+                <div className="border-t border-gray-100 dark:border-gray-800 pt-7 space-y-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500 mb-4">
+                    Kontakt
+                  </p>
+                  <a
+                    href={`mailto:${BUSINESS_INFO.contact.email}`}
+                    className="flex items-center gap-3 group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center flex-shrink-0 group-hover:border-gray-400 dark:group-hover:border-gray-500 transition-colors">
+                      <Mail size={14} className="text-gray-500 dark:text-gray-400" />
+                    </div>
+                    <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                      {BUSINESS_INFO.contact.email}
+                    </span>
+                  </a>
+                  <a
+                    href={`tel:${BUSINESS_INFO.contact.phone}`}
+                    className="flex items-center gap-3 group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center flex-shrink-0 group-hover:border-gray-400 dark:group-hover:border-gray-500 transition-colors">
+                      <Phone size={14} className="text-gray-500 dark:text-gray-400" />
+                    </div>
+                    <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                      {BUSINESS_INFO.contact.phoneDisplay}
+                    </span>
+                  </a>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-40px" }}
+                variants={fadeUp}
+                custom={0.1}
+                className="rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden min-h-[320px]"
+              >
+                <iframe
+                  src={getGoogleMapsEmbedUrl()}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0, minHeight: "320px" }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Cogniiq Standort Bayreuth"
+                  className="grayscale hover:grayscale-0 transition-all duration-500"
+                />
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 6 + 7: REGIONEN & LEISTUNGEN */}
+        <section className="py-20 px-6 lg:px-8 border-t border-gray-100 dark:border-gray-800/60">
+          <div className="max-w-7xl mx-auto">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-60px" }}
+              variants={fadeUp}
+              custom={0}
+              className="mb-10"
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-3">
+                Regionen & Leistungen
+              </p>
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">
+                Beratung für Unternehmen<br />
+                <span className="font-light text-gray-500 dark:text-gray-400">in ganz Deutschland</span>
+              </h2>
+            </motion.div>
+
+            <div className="grid md:grid-cols-3 gap-5">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-40px" }}
+                variants={fadeUp}
+                custom={0.04}
+                className="bg-gray-50 dark:bg-gray-900/40 rounded-2xl border border-gray-100 dark:border-gray-800 p-7"
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500 mb-4">
+                  Standorte
+                </p>
+                <ul className="space-y-2">
+                  {REGIONS.map((r) => (
+                    <li key={r.href}>
+                      <Link
+                        to={r.href}
+                        className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group"
+                      >
+                        <ChevronRight size={13} className="text-gray-300 dark:text-gray-600 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
+                        {r.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-40px" }}
+                variants={fadeUp}
+                custom={0.08}
+                className="bg-gray-50 dark:bg-gray-900/40 rounded-2xl border border-gray-100 dark:border-gray-800 p-7"
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500 mb-4">
+                  Unsere Systeme
+                </p>
+                <ul className="space-y-2">
+                  {SERVICES_LINKS.map((s) => (
+                    <li key={s.label}>
+                      <Link
+                        to={s.href}
+                        className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group"
+                      >
+                        <ChevronRight size={13} className="text-gray-300 dark:text-gray-600 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
+                        {s.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-40px" }}
+                variants={fadeUp}
+                custom={0.12}
+                className="bg-gray-50 dark:bg-gray-900/40 rounded-2xl border border-gray-100 dark:border-gray-800 p-7"
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500 mb-4">
+                  Branchen
+                </p>
+                <ul className="space-y-2">
+                  {BRANCHEN_ITEMS.map((b) => (
+                    <li key={b.label}>
+                      <Link
+                        to={b.href}
+                        className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group"
+                      >
+                        <ChevronRight size={13} className="text-gray-300 dark:text-gray-600 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
+                        {b.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 8: FINAL CTA */}
+        <section className="py-20 px-6 lg:px-8 border-t border-gray-100 dark:border-gray-800/60">
+          <div className="max-w-7xl mx-auto">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-60px" }}
+              variants={fadeUp}
+              custom={0}
+              className="max-w-[640px]"
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+                Analysegespräch
+              </p>
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-50 tracking-tight mb-5">
+                KI-Potenziale in Ihrem<br />
+                <span className="font-light text-gray-500 dark:text-gray-400">Unternehmen erkennen</span>
+              </h2>
+              <p className="text-base text-gray-500 dark:text-gray-400 leading-relaxed mb-8">
+                In einem kurzen Analysegespräch zeigen wir, wo digitale Systeme konkret
+                Umsatz, Effizienz und Wachstum steigern können.
+              </p>
+              <a
+                href="#kontaktformular"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gray-900 dark:bg-gray-50 text-white dark:text-gray-900 text-sm font-semibold hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors duration-200"
+              >
+                Analysegespräch starten
+                <ArrowRight size={15} />
+              </a>
+            </motion.div>
+          </div>
+        </section>
+
+      </div>
     </>
   );
 }
