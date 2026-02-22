@@ -189,8 +189,8 @@ export const PAGE_META = {
     canonical: "https://cogniiq.de",
   },
   leistungen: {
-    title: "Leistungen | Webdesign, KI Automationen & AI Rezeptionistin – Cogniiq Bayreuth",
-    description: "Entdecken Sie die Leistungen von Cogniiq: Hochkonvertierende Websites, Make.com Automationen, AI Rezeptionistin und AI Content Erstellung für Unternehmen in Deutschland.",
+    title: "Leistungen | Webdesign, KI-Telefonassistent & Automatisierung – Cogniiq",
+    description: "Drei Services. Ein Systemgedanke. Cogniiq entwickelt integrierte digitale Systeme für Mittelstand und wachsende Betriebe: Webdesign, KI-Telefonassistent und Automatisierung.",
     canonical: "https://cogniiq.de/leistungen",
   },
   ueberUns: {
