@@ -715,27 +715,45 @@ function PremiumPackageModal({
     );
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    const terminStr = termin.date
-      ? `${termin.date.getDate()}. ${MONTHS[termin.date.getMonth()]} ${termin.date.getFullYear()}${termin.time ? " " + termin.time + " Uhr" : ""}`
-      : "";
-    try {
-      await fetch("https://n8n.cogniiq.co/webhook/contacts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          interessensfelder: interests,
-          termin: terminStr,
-        }),
-      });
-    } catch {}
-    setLoading(false);
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 4500);
+ async function handleSubmit(e: React.FormEvent) {
+  e.preventDefault();
+
+  // ✅ Required: if user selected a service with packages, they must pick exactly one
+  for (const interest of interests as InterestKey[]) {
+    const hasPackages = !!PACKAGE_CATALOG[interest]?.length;
+    if (hasPackages && !selectedPackages[interest]) {
+      openPackageModal(interest);
+      return;
+    }
   }
+
+  setLoading(true);
+
+  const terminStr = termin.date
+    ? `${termin.date.getDate()}. ${MONTHS[termin.date.getMonth()]} ${termin.date.getFullYear()}${termin.time ? " " + termin.time + " Uhr" : ""}`
+    : "";
+
+  try {
+    await fetch("https://n8n.cogniiq.co/webhook/contacts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...formData,
+        interessensfelder: interests,
+        termin: terminStr,
+
+        // ✅ new fields for premium package selection
+        selectedPackages,
+        primaryInterest: interests[0] ?? "",
+        source: "kontakt-page",
+      }),
+    });
+  } catch {}
+
+  setLoading(false);
+  setSubmitted(true);
+  setTimeout(() => setSubmitted(false), 4500);
+}
 
   return (
     <>
@@ -1158,7 +1176,7 @@ function PremiumPackageModal({
                             <button
                               key={item}
                               type="button"
-                              onClick={() => toggleInterest(item)}
+                         onClick={() => toggleInterestWithPackage(item as InterestKey)}
                               className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-sm font-medium transition-all duration-200 text-left ${
                                 active
                                   ? "border-gray-900 dark:border-gray-100 bg-gray-900 dark:bg-gray-50 text-white dark:text-gray-900"
