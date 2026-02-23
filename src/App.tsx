@@ -26,6 +26,23 @@ import { WebdesignImmobilienRegensburg } from './pages/WebdesignImmobilienRegens
 import { WebdesignBayreuth } from './pages/WebdesignBayreuth';
 import { WebdesignRegensburg } from './pages/WebdesignRegensburg';
 import { WebdesignMuenchen } from './pages/WebdesignMuenchen';
+import { ReferenzenPage } from './pages/ReferenzenPage';
+import { BewertungenPage } from './pages/BewertungenPage';
+import { WebdesignKostenBayreuth } from './pages/cluster/bayreuth/WebdesignKostenBayreuth';
+import { WebsiteErstellenBayreuth } from './pages/cluster/bayreuth/WebsiteErstellenBayreuth';
+import { LandingpageBayreuth } from './pages/cluster/bayreuth/LandingpageBayreuth';
+import { WebsiteRelaunchBayreuth } from './pages/cluster/bayreuth/WebsiteRelaunchBayreuth';
+import { LokalesSEOBayreuth } from './pages/cluster/bayreuth/LokalesSEOBayreuth';
+import { WebdesignKostenRegensburg } from './pages/cluster/regensburg/WebdesignKostenRegensburg';
+import { WebsiteErstellenRegensburg } from './pages/cluster/regensburg/WebsiteErstellenRegensburg';
+import { LandingpageRegensburg } from './pages/cluster/regensburg/LandingpageRegensburg';
+import { WebsiteRelaunchRegensburg } from './pages/cluster/regensburg/WebsiteRelaunchRegensburg';
+import { LokalesSEORegensburg } from './pages/cluster/regensburg/LokalesSEORegensburg';
+import { WebdesignKostenMuenchen } from './pages/cluster/muenchen/WebdesignKostenMuenchen';
+import { WebsiteErstellenMuenchen } from './pages/cluster/muenchen/WebsiteErstellenMuenchen';
+import { LandingpageMuenchen } from './pages/cluster/muenchen/LandingpageMuenchen';
+import { WebsiteRelaunchMuenchen } from './pages/cluster/muenchen/WebsiteRelaunchMuenchen';
+import { LokalesSEOMuenchen } from './pages/cluster/muenchen/LokalesSEOMuenchen';
 
 function App() {
   return (
@@ -48,6 +65,23 @@ function App() {
             <Route path="/bayreuth/webdesign" element={<WebdesignBayreuth />} />
             <Route path="/regensburg/webdesign" element={<WebdesignRegensburg />} />
             <Route path="/muenchen/webdesign" element={<WebdesignMuenchen />} />
+            <Route path="/referenzen" element={<ReferenzenPage />} />
+            <Route path="/bewertungen" element={<BewertungenPage />} />
+            <Route path="/bayreuth/webdesign-kosten" element={<WebdesignKostenBayreuth />} />
+            <Route path="/bayreuth/website-erstellen" element={<WebsiteErstellenBayreuth />} />
+            <Route path="/bayreuth/landingpage" element={<LandingpageBayreuth />} />
+            <Route path="/bayreuth/website-relaunch" element={<WebsiteRelaunchBayreuth />} />
+            <Route path="/bayreuth/lokales-seo" element={<LokalesSEOBayreuth />} />
+            <Route path="/regensburg/webdesign-kosten" element={<WebdesignKostenRegensburg />} />
+            <Route path="/regensburg/website-erstellen" element={<WebsiteErstellenRegensburg />} />
+            <Route path="/regensburg/landingpage" element={<LandingpageRegensburg />} />
+            <Route path="/regensburg/website-relaunch" element={<WebsiteRelaunchRegensburg />} />
+            <Route path="/regensburg/lokales-seo" element={<LokalesSEORegensburg />} />
+            <Route path="/muenchen/webdesign-kosten" element={<WebdesignKostenMuenchen />} />
+            <Route path="/muenchen/website-erstellen" element={<WebsiteErstellenMuenchen />} />
+            <Route path="/muenchen/landingpage" element={<LandingpageMuenchen />} />
+            <Route path="/muenchen/website-relaunch" element={<WebsiteRelaunchMuenchen />} />
+            <Route path="/muenchen/lokales-seo" element={<LokalesSEOMuenchen />} />
             <Route path="/webdesign-arzt-bayreuth" element={<WebdesignArztBayreuth />} />
             <Route path="/webdesign-gastronomie-bayreuth" element={<WebdesignGastronomieBayreuth />} />
             <Route path="/webdesign-immobilien-bayreuth" element={<WebdesignImmobilienBayreuth />} />
