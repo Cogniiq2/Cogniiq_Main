@@ -1192,7 +1192,23 @@ function PremiumPackageModal({
                                   <div className="w-1.5 h-1.5 rounded-sm bg-gray-900 dark:bg-white" />
                                 )}
                               </div>
-                              {item}
+                              <div className="flex flex-col">
+  <span>{item}</span>
+
+  {active && selectedPackages[item as InterestKey] && (
+    <span className="mt-1 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-300 dark:text-gray-600">
+      <span className="w-1.5 h-1.5 rounded-sm bg-emerald-400" />
+      Paket: {selectedPackages[item as InterestKey]}
+    </span>
+  )}
+
+  {active && PACKAGE_CATALOG[item as InterestKey]?.length && !selectedPackages[item as InterestKey] && (
+    <span className="mt-1 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-300 dark:text-gray-600">
+      <span className="w-1.5 h-1.5 rounded-sm bg-amber-400" />
+      Paket wählen erforderlich
+    </span>
+  )}
+</div>
                             </button>
                           );
                         })}
