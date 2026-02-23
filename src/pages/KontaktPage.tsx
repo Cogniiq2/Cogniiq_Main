@@ -375,12 +375,6 @@ function PremiumDateTimePicker({ value, onChange }: DateTimePickerProps) {
     </div>
   );
 }
-const INTEREST_OPTIONS = [
-  "Webdesign",
-  "KI Telefonassistent",
-  "Automatisierung",
-  "KI Systeme",
-];
 export function KontaktPage() {
   const [interests, setInterests] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
