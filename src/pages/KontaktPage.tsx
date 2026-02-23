@@ -1094,7 +1094,28 @@ function PremiumPackageModal({
                   </AnimatePresence>
                 )}
                 {!submitted && (
-                  <form
+  <>
+    <PremiumPackageModal
+      open={pkgModalOpen}
+      service={pkgModalService}
+      options={(pkgModalService ? (PACKAGE_CATALOG[pkgModalService] ?? []) : []) as PackageOption[]}
+      selectedId={pkgModalService ? (selectedPackages[pkgModalService] ?? null) : null}
+      onSelect={(id) => {
+        const svc = pkgModalService;
+        if (!svc) return;
+        setSelectedPackages((p) => ({ ...p, [svc]: id }));
+      }}
+      onClose={() => {
+        const svc = pkgModalService;
+        if (svc && PACKAGE_CATALOG[svc]?.length && !selectedPackages[svc]) {
+          setInterests((prev) => prev.filter((x) => x !== svc));
+        }
+        closePackageModal();
+      }}
+      onConfirm={confirmPackageSelection}
+    />
+
+    <form
                     onSubmit={handleSubmit}
                     className="bg-gray-50 dark:bg-gray-900/40 rounded-2xl border border-gray-100 dark:border-gray-800 p-8 space-y-6"
                   >
