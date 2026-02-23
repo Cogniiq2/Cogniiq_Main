@@ -375,7 +375,12 @@ function PremiumDateTimePicker({ value, onChange }: DateTimePickerProps) {
     </div>
   );
 }
-
+const INTEREST_OPTIONS = [
+  "Webdesign",
+  "KI Telefonassistent",
+  "Automatisierung",
+  "KI Systeme",
+];
 export function KontaktPage() {
   const [interests, setInterests] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
@@ -389,7 +394,321 @@ export function KontaktPage() {
     ziel: "",
   });
   const [termin, setTermin] = useState<{ date: Date | null; time: string }>({ date: null, time: "" });
+type InterestKey = (typeof INTEREST_OPTIONS)[number];
 
+type PackageOption = {
+  id: string;
+  label: string;
+  subtitle: string;
+  bullets: string[];
+  badge?: string;
+};
+
+const PACKAGE_CATALOG: Partial<Record<InterestKey, PackageOption[]>> = {
+  Webdesign: [
+    {
+      id: "website-launch",
+      label: "Website Launch",
+      subtitle: "Professionelle Präsenz – schnell und solide",
+      bullets: [
+        "Responsive Website (bis 6 Seiten)",
+        "Individuelles Design nach Marke",
+        "On-Page SEO Grundoptimierung",
+        "DSGVO: Impressum, Datenschutz, Cookie-Consent",
+        "Kontaktformular + Bestätigungs-Mail",
+        "Übergabe & Kurzschulung",
+      ],
+      badge: "Schnellster Start",
+    },
+    {
+      id: "website-wachstum",
+      label: "Website Wachstum",
+      subtitle: "Conversion & Local SEO für nachhaltiges Wachstum",
+      bullets: [
+        "Alles aus Website Launch",
+        "Erweiterte Seitenstruktur (bis 12 Seiten)",
+        "Conversion-optimierte Texte & CTAs",
+        "Lokale SEO-Strategie (Bayreuth/Oberfranken)",
+        "Strukturierte Daten (Schema.org)",
+        "GA4 + Search Console Setup",
+        "Performance (Core Web Vitals)",
+        "3 Monate Nachbetreuung",
+      ],
+      badge: "Bester ROI",
+    },
+    {
+      id: "website-marktfuehrer",
+      label: "Website Marktführer",
+      subtitle: "Marktführer-Positionierung & Skalierung",
+      bullets: [
+        "Alles aus Website Wachstum",
+        "Unbegrenzte Seitenstruktur & Unterseiten",
+        "KI-gestützte Conversion-Optimierung",
+        "Regionale SEO-Dominanz",
+        "Blog-/Content-Strategie für Reichweite",
+        "Lokale Backlink-Strategie",
+        "Integration KI-Telefonassistent & Automatisierung",
+        "Laufende Betreuung & monatliches Reporting",
+      ],
+      badge: "Maximale Dominanz",
+    },
+  ],
+
+  "KI Telefonassistent": [
+    {
+      id: "telefon-essentials",
+      label: "Assistant Essentials",
+      subtitle: "Einstieg für strukturierte Anrufannahme",
+      bullets: [
+        "Anrufannahme + Basis-FAQ",
+        "Kontakt-/Lead-Erfassung",
+        "Weiterleitung & Rückruflogik",
+        "Grundlegendes Reporting",
+      ],
+      badge: "Start",
+    },
+    {
+      id: "telefon-growth",
+      label: "Assistant Growth",
+      subtitle: "Mehr Logik, bessere Qualifizierung",
+      bullets: [
+        "Alles aus Essentials",
+        "Intent-Routing (Termine / Fragen / Anliegen)",
+        "Qualifizierungsfragen + Datenstruktur",
+        "Integrationen (z. B. Mail/Sheets)",
+      ],
+      badge: "Empfohlen",
+    },
+    {
+      id: "telefon-scale",
+      label: "Assistant Scale",
+      subtitle: "Workflows, Automationen, Multi-Step",
+      bullets: [
+        "Alles aus Growth",
+        "Mehrstufige Workflows",
+        "Erweiterte Ausnahmen & Eskalation",
+        "Monatliches Optimierungs-Review",
+      ],
+      badge: "Premium",
+    },
+  ],
+
+  Automatisierung: [
+    {
+      id: "auto-essentials",
+      label: "Automation Essentials",
+      subtitle: "Schnelle Entlastung im Tagesgeschäft",
+      bullets: [
+        "1–2 Kern-Workflows",
+        "Datenfluss in Sheets/CRM",
+        "Benachrichtigungen & Routing",
+        "Basis-Logging",
+      ],
+      badge: "Start",
+    },
+    {
+      id: "auto-growth",
+      label: "Automation Growth",
+      subtitle: "Mehr Systeme, mehr Zuverlässigkeit",
+      bullets: [
+        "Alles aus Essentials",
+        "3–5 Workflows",
+        "Fehlerhandling & Retries",
+        "Monitoring / Alerts",
+      ],
+      badge: "Empfohlen",
+    },
+    {
+      id: "auto-scale",
+      label: "Automation Scale",
+      subtitle: "Systemlandschaft + Reporting + Skalierung",
+      bullets: [
+        "Alles aus Growth",
+        "Erweiterte Datenmodelle",
+        "Reporting + KPI-Tracking",
+        "Monatliche Iterationen",
+      ],
+      badge: "Premium",
+    },
+  ],
+};
+
+function PremiumPackageModal({
+  open,
+  service,
+  options,
+  selectedId,
+  onSelect,
+  onClose,
+  onConfirm,
+}: {
+  open: boolean;
+  service: InterestKey | null;
+  options: PackageOption[];
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  if (!open || !service) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        key="package-modal"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className="fixed inset-0 z-[9998] flex items-center justify-center px-6"
+        style={{
+          backdropFilter: "blur(10px)",
+          WebkitBackdropFilter: "blur(10px)",
+          backgroundColor: "rgba(0,0,0,0.55)",
+        }}
+        onMouseDown={onClose}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 22, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 14, scale: 0.98 }}
+          transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+          className="w-full max-w-3xl bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-2xl shadow-black/25 overflow-hidden"
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          <div className="p-7 sm:p-8 border-b border-gray-100 dark:border-gray-800">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-2">
+                  Paket auswählen
+                </p>
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">
+                  {service}
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1.5">
+                  Wählen Sie genau ein Paket. Damit können wir Ihre Anfrage sofort richtig priorisieren.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-9 h-9 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+                aria-label="Schließen"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+
+          <div className="p-7 sm:p-8">
+            <div className="grid md:grid-cols-3 gap-4">
+              {options.map((opt, idx) => {
+                const active = selectedId === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => onSelect(opt.id)}
+                    className={`text-left rounded-2xl border p-5 transition-all duration-200 ${
+                      active
+                        ? "border-gray-900 dark:border-gray-50 bg-gray-900 dark:bg-gray-50"
+                        : "border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40 hover:border-gray-400 dark:hover:border-gray-600"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div>
+                        <p
+                          className={`text-[11px] font-semibold uppercase tracking-[0.16em] ${
+                            active ? "text-white/70 dark:text-gray-600" : "text-gray-400 dark:text-gray-500"
+                          }`}
+                        >
+                          Option {String(idx + 1).padStart(2, "0")}
+                        </p>
+                        <h4
+                          className={`text-base font-semibold ${
+                            active ? "text-white dark:text-gray-900" : "text-gray-900 dark:text-gray-100"
+                          }`}
+                        >
+                          {opt.label}
+                        </h4>
+                      </div>
+
+                      <div
+                        className={`w-6 h-6 rounded-lg flex items-center justify-center border ${
+                          active
+                            ? "border-white/30 dark:border-gray-300"
+                            : "border-gray-200 dark:border-gray-700"
+                        }`}
+                      >
+                        {active && <Check size={14} className={active ? "text-white dark:text-gray-900" : ""} />}
+                      </div>
+                    </div>
+
+                    <p
+                      className={`text-sm leading-relaxed mb-4 ${
+                        active ? "text-white/80 dark:text-gray-700" : "text-gray-500 dark:text-gray-400"
+                      }`}
+                    >
+                      {opt.subtitle}
+                    </p>
+
+                    {opt.badge && (
+                      <div
+                        className={`inline-flex items-center text-[10px] font-semibold uppercase tracking-[0.16em] px-2.5 py-1 rounded-full border mb-4 ${
+                          active
+                            ? "border-white/20 text-white/80 dark:border-gray-300 dark:text-gray-700"
+                            : "border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400"
+                        }`}
+                      >
+                        {opt.badge}
+                      </div>
+                    )}
+
+                    <ul className="space-y-2">
+                      {opt.bullets.slice(0, 6).map((b) => (
+                        <li key={b} className="flex items-start gap-2">
+                          <span
+                            className={`mt-1 w-1.5 h-1.5 rounded-sm ${
+                              active ? "bg-white/70 dark:bg-gray-600" : "bg-gray-300 dark:bg-gray-700"
+                            }`}
+                          />
+                          <span
+                            className={`text-xs leading-relaxed ${
+                              active ? "text-white/80 dark:text-gray-700" : "text-gray-600 dark:text-gray-400"
+                            }`}
+                          >
+                            {b}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-7 pt-6 border-t border-gray-100 dark:border-gray-800">
+              <p className="text-xs text-gray-400 dark:text-gray-600">
+                Pflichtfeld — ohne Paket können wir die Anfrage nicht korrekt einordnen.
+              </p>
+
+              <button
+                type="button"
+                onClick={onConfirm}
+                disabled={!selectedId}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gray-900 dark:bg-gray-50 text-white dark:text-gray-900 text-sm font-semibold hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Paket bestätigen
+                <ArrowRight size={15} />
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
   function toggleInterest(item: string) {
     setInterests((prev) =>
       prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
