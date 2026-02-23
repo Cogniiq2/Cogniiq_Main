@@ -23,6 +23,9 @@ import { WebdesignImmobilienMuenchen } from './pages/WebdesignImmobilienMuenchen
 import { WebdesignArztRegensburg } from './pages/WebdesignArztRegensburg';
 import { WebdesignGastronomieRegensburg } from './pages/WebdesignGastronomieRegensburg';
 import { WebdesignImmobilienRegensburg } from './pages/WebdesignImmobilienRegensburg';
+import { WebdesignBayreuth } from './pages/WebdesignBayreuth';
+import { WebdesignRegensburg } from './pages/WebdesignRegensburg';
+import { WebdesignMuenchen } from './pages/WebdesignMuenchen';
 
 function App() {
   return (
@@ -42,6 +45,9 @@ function App() {
             <Route path="/bayreuth" element={<CityLandingPage citySlug="bayreuth" />} />
             <Route path="/muenchen" element={<CityLandingPage citySlug="muenchen" />} />
             <Route path="/regensburg" element={<CityLandingPage citySlug="regensburg" />} />
+            <Route path="/bayreuth/webdesign" element={<WebdesignBayreuth />} />
+            <Route path="/regensburg/webdesign" element={<WebdesignRegensburg />} />
+            <Route path="/muenchen/webdesign" element={<WebdesignMuenchen />} />
             <Route path="/webdesign-arzt-bayreuth" element={<WebdesignArztBayreuth />} />
             <Route path="/webdesign-gastronomie-bayreuth" element={<WebdesignGastronomieBayreuth />} />
             <Route path="/webdesign-immobilien-bayreuth" element={<WebdesignImmobilienBayreuth />} />
