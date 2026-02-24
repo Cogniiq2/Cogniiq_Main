@@ -1231,31 +1231,36 @@ function PremiumPackageModal({
                         onClick={() => {
   const svc = item as InterestKey;
 
-  const isService =
-    svc === "Webdesign" ||
-    svc === "KI Telefonassistent" ||
-    svc === "Automatisierung";
+  const hasPackages = Boolean(PACKAGE_CATALOG[svc]?.length);
 
-// non-service interests behave normally (e.g. "KI Systeme")
-if (!isService) {
-  setInterests((prev) =>
-    prev.includes(item) ? prev.filter((x) => x !== item) : [...prev, item]
-  );
-  return;
-}
+  // If this interest has no packages (e.g. "KI Systeme") → behave like a normal toggle.
+  if (!hasPackages) {
+    setInterests((prev) =>
+      prev.includes(item) ? prev.filter((x) => x !== item) : [...prev, item]
+    );
+    return;
+  }
 
-  const active = interests.includes(svc);
+  const isActive = interests.includes(svc);
 
-  // deselect service → also clear selected package
-  if (active) {
+  // Deselect service → also clear selected package
+  if (isActive) {
     setInterests((prev) => prev.filter((x) => x !== svc));
     setSelectedPackages((p) => ({ ...p, [svc]: null }));
     return;
   }
 
-  // select service → OPEN MODAL (required)
+  // Select service
   setInterests((prev) => [...prev, svc]);
-  openPackageModal(svc);
+
+  // ULTRA PREMIUM TWEAK:
+  // If you want the popup immediately -> always open.
+  // If you want to reduce lead friction -> only open when user has no package selected yet.
+  const alreadySelected = Boolean(selectedPackages[svc]);
+
+  if (!alreadySelected) {
+    openPackageModal(svc);
+  }
 }}
                               className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-sm font-medium transition-all duration-200 text-left ${
                                 active
