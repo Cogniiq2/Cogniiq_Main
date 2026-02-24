@@ -1279,7 +1279,15 @@ function PremiumPackageModal({
                               </div>
                               <div className="flex flex-col">
   <span>{item}</span>
+<div className="flex flex-col">
+  <span>{item}</span>
 
+  {active && (
+    <>
+      ...
+    </>
+  )}
+</div>
 {active && (
   <>
     {/* service with selected package */}
