@@ -391,16 +391,6 @@ export function KontaktPage() {
   // --- Premium Package Modal State (required) ---
 type ServiceKey = "Webdesign" | "KI Telefonassistent" | "Automatisierung";
 
-type PackageOption = {
-  id: string;
-  name: string;
-  priceLabel: string;
-  short: string;
-  points: string[];
-  recommended?: boolean;
-};
-
-
 const [selectedPackages, setSelectedPackages] = useState<Record<ServiceKey, string | null>>({
   Webdesign: null,
   "KI Telefonassistent": null,
