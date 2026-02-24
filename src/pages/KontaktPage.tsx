@@ -1228,7 +1228,33 @@ function PremiumPackageModal({
                             <button
                               key={item}
                               type="button"
-                         onClick={() => toggleInterestWithPackage(item as InterestKey)}
+                        onClick={() => {
+  const svc = item as InterestKey;
+
+  const isService =
+    svc === "Webdesign" ||
+    svc === "KI Telefonassistent" ||
+    svc === "Automatisierung";
+
+  // non-service interests behave normally
+  if (!isService) {
+    toggleInterestWithPackage(svc);
+    return;
+  }
+
+  const active = interests.includes(svc);
+
+  // deselect service → also clear selected package
+  if (active) {
+    setInterests((prev) => prev.filter((x) => x !== svc));
+    setSelectedPackages((p) => ({ ...p, [svc]: null }));
+    return;
+  }
+
+  // select service → OPEN MODAL (required)
+  setInterests((prev) => [...prev, svc]);
+  openPackageModal(svc);
+}}
                               className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-sm font-medium transition-all duration-200 text-left ${
                                 active
                                   ? "border-gray-900 dark:border-gray-100 bg-gray-900 dark:bg-gray-50 text-white dark:text-gray-900"
