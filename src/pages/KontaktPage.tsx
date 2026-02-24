@@ -388,6 +388,62 @@ export function KontaktPage() {
     ziel: "",
   });
   const [termin, setTermin] = useState<{ date: Date | null; time: string }>({ date: null, time: "" });
+  // --- Premium Package Modal State (required) ---
+type ServiceKey = "Webdesign" | "KI Telefonassistent" | "Automatisierung";
+
+type PackageOption = {
+  id: string;
+  name: string;
+  priceLabel: string;
+  short: string;
+  points: string[];
+  recommended?: boolean;
+};
+
+const PACKAGE_CATALOG: Record<ServiceKey, PackageOption[]> = {
+  Webdesign: [
+    // TODO: replace with your real packages from screenshot
+    { id: "launch", name: "Website Launch", priceLabel: "ab … €", short: "Für schnellen, hochwertigen Go-Live.", points: ["…", "…", "…"] },
+    { id: "growth", name: "Wachstum", priceLabel: "ab … €", short: "Für mehr Leads & messbare Performance.", points: ["…", "…", "…"], recommended: true },
+    { id: "market", name: "Marktführer", priceLabel: "ab … €", short: "Für maximale Dominanz & Premium-Brand.", points: ["…", "…", "…"] },
+  ],
+  "KI Telefonassistent": [
+    { id: "starter", name: "Starter", priceLabel: "Platzhalter", short: "Platzhalter-Paket.", points: ["…", "…", "…"] },
+    { id: "pro", name: "Pro", priceLabel: "Platzhalter", short: "Platzhalter-Paket.", points: ["…", "…", "…"], recommended: true },
+    { id: "enterprise", name: "Enterprise", priceLabel: "Platzhalter", short: "Platzhalter-Paket.", points: ["…", "…", "…"] },
+  ],
+  Automatisierung: [
+    { id: "audit", name: "Audit", priceLabel: "Platzhalter", short: "Platzhalter-Paket.", points: ["…", "…", "…"] },
+    { id: "build", name: "Build", priceLabel: "Platzhalter", short: "Platzhalter-Paket.", points: ["…", "…", "…"], recommended: true },
+    { id: "scale", name: "Scale", priceLabel: "Platzhalter", short: "Platzhalter-Paket.", points: ["…", "…", "…"] },
+  ],
+};
+
+const [selectedPackages, setSelectedPackages] = useState<Record<ServiceKey, string | null>>({
+  Webdesign: null,
+  "KI Telefonassistent": null,
+  Automatisierung: null,
+});
+
+const [pkgModalOpen, setPkgModalOpen] = useState(false);
+const [pkgModalService, setPkgModalService] = useState<ServiceKey | null>(null);
+
+function openPackageModal(service: ServiceKey) {
+  setPkgModalService(service);
+  setPkgModalOpen(true);
+}
+
+function closePackageModal() {
+  setPkgModalOpen(false);
+  setPkgModalService(null);
+}
+
+function confirmPackageSelection() {
+  // modal closes only if selection exists
+  if (!pkgModalService) return;
+  if (!selectedPackages[pkgModalService]) return;
+  closePackageModal();
+}
 type InterestKey = (typeof INTEREST_OPTIONS)[number];
 
 type PackageOption = {
