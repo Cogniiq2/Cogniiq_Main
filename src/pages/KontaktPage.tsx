@@ -1268,48 +1268,49 @@ function PremiumPackageModal({
                                   : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500"
                               }`}
                             >
-                              <div className={`w-3.5 h-3.5 rounded flex items-center justify-center flex-shrink-0 border transition-colors ${
-                                active
-                                  ? "border-white dark:border-gray-900 bg-white dark:bg-gray-900"
-                                  : "border-gray-300 dark:border-gray-600"
-                              }`}>
-                                {active && (
-                                  <div className="w-1.5 h-1.5 rounded-sm bg-gray-900 dark:bg-white" />
-                                )}
-                              </div>
-                              <div className="flex flex-col">
-  <span>{item}</span>
+                              <div
+  className={`w-3.5 h-3.5 rounded flex items-center justify-center flex-shrink-0 border transition-colors ${
+    active
+      ? "border-white dark:border-gray-900 bg-white dark:bg-gray-900"
+      : "border-gray-300 dark:border-gray-600"
+  }`}
+>
+  {active && (
+    <div className="w-1.5 h-1.5 rounded-sm bg-gray-900 dark:bg-white" />
+  )}
+</div>
+
 <div className="flex flex-col">
   <span>{item}</span>
-  
-{active && (
-  <>
-    {/* service with selected package */}
-    {selectedPackages[item as InterestKey] && (
-      <span className="mt-1 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-300 dark:text-gray-600">
-        <span className="w-1.5 h-1.5 rounded-sm bg-emerald-400" />
-        Paket: {selectedPackages[item as InterestKey]}
-      </span>
-    )}
 
-    {/* service requires package */}
-    {!selectedPackages[item as InterestKey] &&
-      PACKAGE_CATALOG[item as InterestKey]?.length && (
+  {active && (
+    <>
+      {/* service with selected package */}
+      {selectedPackages[item as InterestKey] && (
         <span className="mt-1 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-300 dark:text-gray-600">
-          <span className="w-1.5 h-1.5 rounded-sm bg-amber-400" />
-          Paket wählen erforderlich
+          <span className="w-1.5 h-1.5 rounded-sm bg-emerald-400" />
+          Paket: {selectedPackages[item as InterestKey]}
         </span>
       )}
 
-    {/* non-package interest (KI Systeme) */}
-    {!PACKAGE_CATALOG[item as InterestKey]?.length && (
-      <span className="mt-1 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500">
-        <span className="w-1.5 h-1.5 rounded-sm bg-gray-300 dark:bg-gray-600" />
-        Kein Paket erforderlich
-      </span>
-    )}
-  </>
-)}
+      {/* service requires package */}
+      {!selectedPackages[item as InterestKey] &&
+        PACKAGE_CATALOG[item as InterestKey]?.length && (
+          <span className="mt-1 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-300 dark:text-gray-600">
+            <span className="w-1.5 h-1.5 rounded-sm bg-amber-400" />
+            Paket wählen erforderlich
+          </span>
+        )}
+
+      {/* non-package interest (KI Systeme) */}
+      {!PACKAGE_CATALOG[item as InterestKey]?.length && (
+        <span className="mt-1 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500">
+          <span className="w-1.5 h-1.5 rounded-sm bg-gray-300 dark:bg-gray-600" />
+          Kein Paket erforderlich
+        </span>
+      )}
+    </>
+  )}
 </div>
                             </button>
                           );
