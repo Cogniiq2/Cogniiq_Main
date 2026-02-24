@@ -1236,11 +1236,13 @@ function PremiumPackageModal({
     svc === "KI Telefonassistent" ||
     svc === "Automatisierung";
 
-  // non-service interests behave normally
-  if (!isService) {
-    toggleInterestWithPackage(svc);
-    return;
-  }
+// non-service interests behave normally (e.g. "KI Systeme")
+if (!isService) {
+  setInterests((prev) =>
+    prev.includes(item) ? prev.filter((x) => x !== item) : [...prev, item]
+  );
+  return;
+}
 
   const active = interests.includes(svc);
 
