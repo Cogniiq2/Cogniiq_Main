@@ -759,11 +759,20 @@ function PremiumPackageModal({
     </AnimatePresence>
   );
 }
-  function toggleInterest(item: string) {
-    setInterests((prev) =>
-      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
-    );
-  }
+ function toggleInterest(item: string) {
+  const isService = item === "Webdesign" || item === "KI Telefonassistent" || item === "Automatisierung";
+
+  setInterests((prev) => {
+    const next = prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item];
+
+    // If user just selected a service → open premium package modal
+    if (isService && !prev.includes(item)) {
+      openPackageModal(item as ServiceKey);
+    }
+
+    return next;
+  });
+}
 
  async function handleSubmit(e: React.FormEvent) {
   e.preventDefault();
