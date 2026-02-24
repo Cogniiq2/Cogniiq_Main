@@ -400,24 +400,6 @@ type PackageOption = {
   recommended?: boolean;
 };
 
-const PACKAGE_CATALOG: Record<ServiceKey, PackageOption[]> = {
-  Webdesign: [
-    // TODO: replace with your real packages from screenshot
-    { id: "launch", name: "Website Launch", priceLabel: "ab … €", short: "Für schnellen, hochwertigen Go-Live.", points: ["…", "…", "…"] },
-    { id: "growth", name: "Wachstum", priceLabel: "ab … €", short: "Für mehr Leads & messbare Performance.", points: ["…", "…", "…"], recommended: true },
-    { id: "market", name: "Marktführer", priceLabel: "ab … €", short: "Für maximale Dominanz & Premium-Brand.", points: ["…", "…", "…"] },
-  ],
-  "KI Telefonassistent": [
-    { id: "starter", name: "Starter", priceLabel: "Platzhalter", short: "Platzhalter-Paket.", points: ["…", "…", "…"] },
-    { id: "pro", name: "Pro", priceLabel: "Platzhalter", short: "Platzhalter-Paket.", points: ["…", "…", "…"], recommended: true },
-    { id: "enterprise", name: "Enterprise", priceLabel: "Platzhalter", short: "Platzhalter-Paket.", points: ["…", "…", "…"] },
-  ],
-  Automatisierung: [
-    { id: "audit", name: "Audit", priceLabel: "Platzhalter", short: "Platzhalter-Paket.", points: ["…", "…", "…"] },
-    { id: "build", name: "Build", priceLabel: "Platzhalter", short: "Platzhalter-Paket.", points: ["…", "…", "…"], recommended: true },
-    { id: "scale", name: "Scale", priceLabel: "Platzhalter", short: "Platzhalter-Paket.", points: ["…", "…", "…"] },
-  ],
-};
 
 const [selectedPackages, setSelectedPackages] = useState<Record<ServiceKey, string | null>>({
   Webdesign: null,
