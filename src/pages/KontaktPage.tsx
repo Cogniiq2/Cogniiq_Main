@@ -1087,7 +1087,7 @@ function PremiumPackageModal({
                     </motion.div>
                   </AnimatePresence>
                 )}
-                {!submitted && (
+               {!submitted && (
   <>
     <PremiumPackageModal
       open={pkgModalOpen}
@@ -1110,9 +1110,9 @@ function PremiumPackageModal({
     />
 
     <form
-                    onSubmit={handleSubmit}
-                    className="bg-gray-50 dark:bg-gray-900/40 rounded-2xl border border-gray-100 dark:border-gray-800 p-8 space-y-6"
-                  >
+      onSubmit={handleSubmit}
+      className="bg-gray-50 dark:bg-gray-900/40 rounded-2xl border border-gray-100 dark:border-gray-800 p-8 space-y-6"
+    >
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
