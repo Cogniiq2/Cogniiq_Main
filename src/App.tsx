@@ -4,6 +4,7 @@ import { Navigation } from './components/Navigation';
 import { Footer } from './components/Footer';
 import { PremiumFooterReveal } from './components/PremiumFooterReveal';
 import { LocalBusinessSchema } from './components/LocalBusinessSchema';
+import { CanonicalManager } from './components/CanonicalManager';
 import { CityServicePage } from './components/CityServicePage';
 import { HomePage } from './pages/HomePage';
 import { LeistungenPage } from './pages/LeistungenPage';
@@ -47,6 +48,7 @@ import { LokalesSEOMuenchen } from './pages/cluster/muenchen/LokalesSEOMuenchen'
 function App() {
   return (
     <Router>
+      <CanonicalManager />
       <LocalBusinessSchema />
       <PageReveal>
         <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
