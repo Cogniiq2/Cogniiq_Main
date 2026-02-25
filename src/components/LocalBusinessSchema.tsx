@@ -1,4 +1,4 @@
-import { BUSINESS_INFO, SERVICES, FAQ_ITEMS, getGoogleMapsUrl } from "@/lib/seo-data";
+import { BUSINESS_INFO, SERVICES, getGoogleMapsUrl } from "@/lib/seo-data";
 
 export function LocalBusinessSchema() {
   const sameAsUrls = Object.values(BUSINESS_INFO.socialMedia).filter(Boolean);
@@ -159,19 +159,6 @@ export function LocalBusinessSchema() {
           name: "German",
         },
       })),
-
-      {
-        "@type": "FAQPage",
-        "@id": `${BUSINESS_INFO.website}/#faq`,
-        mainEntity: FAQ_ITEMS.map((faq) => ({
-          "@type": "Question",
-          name: faq.question,
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: faq.answer,
-          },
-        })),
-      },
 
       {
         "@type": "BreadcrumbList",
