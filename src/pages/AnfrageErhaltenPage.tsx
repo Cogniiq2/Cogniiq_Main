@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, CircleCheck as CheckCircle2 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 
 const fadeUp = {
