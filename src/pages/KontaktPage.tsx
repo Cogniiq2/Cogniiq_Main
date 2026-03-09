@@ -1302,98 +1302,157 @@ function PremiumPackageModal({
                       <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-3">
                         Interessensfelder
                       </label>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-2 gap-2.5">
                         {INTEREST_OPTIONS.map((item) => {
                           const active = interests.includes(item);
+                          const svcAccent = SERVICE_ACCENT[item as InterestKey];
+                          const pkg = selectedPackages[item as InterestKey];
+                          const hasPackages = Boolean(PACKAGE_CATALOG[item as InterestKey]?.length);
+                          const needsPkg = active && hasPackages && !pkg;
+                          const ItemIcon = svcAccent?.icon;
+
                           return (
-                            <button
+                            <motion.button
                               key={item}
                               type="button"
-                        onClick={() => {
-  const svc = item as InterestKey;
-
-  const hasPackages = Boolean(PACKAGE_CATALOG[svc]?.length);
-
-  // If this interest has no packages (e.g. "KI Systeme") → behave like a normal toggle.
-  if (!hasPackages) {
-    setInterests((prev) =>
-      prev.includes(item) ? prev.filter((x) => x !== item) : [...prev, item]
-    );
-    return;
-  }
-
-  const isActive = interests.includes(svc);
-
-  // Deselect service → also clear selected package
-  if (isActive) {
-    setInterests((prev) => prev.filter((x) => x !== svc));
-    setSelectedPackages((p) => ({ ...p, [svc]: null }));
-    return;
-  }
-
-  // Select service
-  setInterests((prev) => [...prev, svc]);
-
-  // ULTRA PREMIUM TWEAK:
-  // If you want the popup immediately -> always open.
-  // If you want to reduce lead friction -> only open when user has no package selected yet.
-  const alreadySelected = Boolean(selectedPackages[svc]);
-
-  if (!alreadySelected) {
-    openPackageModal(svc);
-  }
-}}
-                              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-sm font-medium transition-all duration-200 text-left ${
-                                active
-                                  ? "border-gray-900 dark:border-gray-700 bg-gray-900 dark:bg-gray-900/80 text-white"
-                                  : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500"
+                              layout
+                              onClick={() => {
+                                const svc = item as InterestKey;
+                                const hasP = Boolean(PACKAGE_CATALOG[svc]?.length);
+                                if (!hasP) {
+                                  setInterests((prev) =>
+                                    prev.includes(item) ? prev.filter((x) => x !== item) : [...prev, item]
+                                  );
+                                  return;
+                                }
+                                const isActive = interests.includes(svc);
+                                if (isActive) {
+                                  setInterests((prev) => prev.filter((x) => x !== svc));
+                                  setSelectedPackages((p) => ({ ...p, [svc]: null }));
+                                  return;
+                                }
+                                setInterests((prev) => [...prev, svc]);
+                                if (!selectedPackages[svc]) openPackageModal(svc);
+                              }}
+                              className={`relative text-left focus:outline-none group transition-all duration-200 ${
+                                !active ? "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500" : ""
                               }`}
+                              style={
+                                active && svcAccent
+                                  ? {
+                                      borderRadius: "14px",
+                                      background: "linear-gradient(145deg, #0f1117 0%, #131620 100%)",
+                                      border: `1px solid rgba(255,255,255,0.10)`,
+                                      boxShadow: `0 0 0 1px rgba(255,255,255,0.05), 0 4px 24px ${svcAccent.glow}`,
+                                    }
+                                  : {
+                                      borderRadius: "14px",
+                                    }
+                              }
                             >
-                              <div
-  className={`w-3.5 h-3.5 rounded flex items-center justify-center flex-shrink-0 border transition-colors ${
-    active
-      ? "border-white dark:border-gray-900 bg-white dark:bg-gray-900"
-      : "border-gray-300 dark:border-gray-600"
-  }`}
->
-  {active && (
-    <div className="w-1.5 h-1.5 rounded-sm bg-gray-900 dark:bg-white" />
-  )}
-</div>
+                              {/* Active: accent top-bar */}
+                              {active && svcAccent && (
+                                <motion.div
+                                  layoutId={`bar-${item}`}
+                                  initial={{ scaleX: 0 }}
+                                  animate={{ scaleX: 1 }}
+                                  className={`absolute top-0 left-0 right-0 h-[2px] rounded-t-[14px] bg-gradient-to-r ${svcAccent.color}`}
+                                />
+                              )}
 
-<div className="flex flex-col">
-  <span>{item}</span>
+                              <div className="px-4 py-3.5">
+                                <div className="flex items-center justify-between gap-2 mb-0.5">
+                                  <div className="flex items-center gap-2.5">
+                                    {/* Icon (only for service items with accent) */}
+                                    {ItemIcon && (
+                                      <div
+                                        className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
+                                          active
+                                            ? `bg-gradient-to-br ${svcAccent.color}`
+                                            : "bg-gray-100 dark:bg-gray-800"
+                                        }`}
+                                        style={active ? { boxShadow: `0 0 10px ${svcAccent.glow}` } : {}}
+                                      >
+                                        <ItemIcon
+                                          size={13}
+                                          className={active ? "text-white" : "text-gray-400 dark:text-gray-500"}
+                                          strokeWidth={1.8}
+                                        />
+                                      </div>
+                                    )}
+                                    {!ItemIcon && (
+                                      <div
+                                        className={`w-3.5 h-3.5 rounded flex items-center justify-center flex-shrink-0 border transition-colors ${
+                                          active
+                                            ? "border-gray-400 bg-gray-800"
+                                            : "border-gray-300 dark:border-gray-600"
+                                        }`}
+                                      >
+                                        {active && <div className="w-1.5 h-1.5 rounded-sm bg-white" />}
+                                      </div>
+                                    )}
+                                    <span
+                                      className={`text-sm font-semibold transition-colors ${
+                                        active ? "text-white" : "text-gray-700 dark:text-gray-300"
+                                      }`}
+                                    >
+                                      {item}
+                                    </span>
+                                  </div>
 
-  {active && (
-    <>
-      {/* service with selected package */}
-      {selectedPackages[item as InterestKey] && (
-        <span className="mt-1 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-300 dark:text-gray-600">
-          <span className="w-1.5 h-1.5 rounded-sm bg-emerald-400" />
-          Paket: {selectedPackages[item as InterestKey]}
-        </span>
-      )}
+                                  {/* Checkmark */}
+                                  {active && (
+                                    <motion.div
+                                      initial={{ scale: 0, opacity: 0 }}
+                                      animate={{ scale: 1, opacity: 1 }}
+                                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                                      className={`w-4.5 h-4.5 rounded-full flex items-center justify-center bg-gradient-to-br ${svcAccent?.color ?? "from-gray-400 to-gray-500"}`}
+                                      style={{ width: 18, height: 18 }}
+                                    >
+                                      <Check size={10} className="text-white" strokeWidth={2.5} />
+                                    </motion.div>
+                                  )}
+                                </div>
 
-      {/* service requires package */}
-      {!selectedPackages[item as InterestKey] &&
-        PACKAGE_CATALOG[item as InterestKey]?.length && (
-          <span className="mt-1 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-300 dark:text-gray-600">
-            <span className="w-1.5 h-1.5 rounded-sm bg-amber-400" />
-            Paket wählen erforderlich
-          </span>
-        )}
-
-      {/* non-package interest (KI Systeme) */}
-      {!PACKAGE_CATALOG[item as InterestKey]?.length && (
-        <span className="mt-1 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500">
-          <span className="w-1.5 h-1.5 rounded-sm bg-gray-300 dark:bg-gray-600" />
-          Kein Paket erforderlich
-        </span>
-      )}
-    </>
-  )}
-</div>
-                            </button>
+                                {/* Sub-label when active */}
+                                {active && (
+                                  <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: "auto" }}
+                                    transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                                    className="overflow-hidden"
+                                  >
+                                    <div className="mt-2.5 pt-2.5 border-t border-white/[0.08]">
+                                      {pkg ? (
+                                        <div className="flex items-center gap-1.5">
+                                          <span
+                                            className={`inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.14em] px-2 py-0.5 rounded-full border ${svcAccent?.badge ?? ""}`}
+                                          >
+                                            <span className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${svcAccent?.color ?? ""}`} />
+                                            {pkg}
+                                          </span>
+                                        </div>
+                                      ) : needsPkg ? (
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            openPackageModal(item as ServiceKey);
+                                          }}
+                                          className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-400 hover:text-amber-300 transition-colors"
+                                        >
+                                          Paket wählen →
+                                        </button>
+                                      ) : (
+                                        <span className="text-[10px] text-white/30 uppercase tracking-[0.12em] font-medium">
+                                          Ausgewählt
+                                        </span>
+                                      )}
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </div>
+                            </motion.button>
                           );
                         })}
                       </div>
