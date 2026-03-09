@@ -1,16 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import {
-  ArrowRight,
-  Phone,
-  Clock,
-  Calendar,
-  CheckCircle2,
-  Shield,
-  Zap,
-  Building2,
-} from "lucide-react";
+import { ArrowRight, Phone, Clock, Calendar, CircleCheck as CheckCircle2, Shield, Zap, Building2 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 

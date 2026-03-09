@@ -1,22 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import {
-  ArrowRight,
-  Phone,
-  Clock,
-  Calendar,
-  CheckCircle2,
-  AlertCircle,
-  Zap,
-  Users,
-  TrendingUp,
-  Shield,
-  Building2,
-  Stethoscope,
-  Wrench,
-  Home,
-  Briefcase,
-} from "lucide-react";
+import { ArrowRight, Phone, Clock, Calendar, CircleCheck as CheckCircle2, CircleAlert as AlertCircle, Zap, Users, TrendingUp, Shield, Building2, Stethoscope, Wrench, Chrome as Home, Briefcase } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 
