@@ -1,23 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import {
-  ArrowRight,
-  ChevronRight,
-  Globe,
-  Phone,
-  Zap,
-  Mail,
-  MapPin,
-  Clock,
-  CheckCircle2,
-  Building2,
-  Calendar,
-  ChevronDown,
-  Check,
-  ChevronLeft,
-  Loader2,
-} from "lucide-react";
+import { ArrowRight, ChevronRight, Globe, Phone, Zap, Mail, MapPin, Clock, CircleCheck as CheckCircle2, Building2, Calendar, ChevronDown, Check, ChevronLeft, Loader as Loader2 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO, getGoogleMapsUrl, getGoogleMapsEmbedUrl } from "@/lib/seo-data";
 
