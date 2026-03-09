@@ -851,11 +851,11 @@ function PremiumPackageModal({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...formData,
-        interessensfelder: interests,
+        interessensfelder: interests.map((svc) => ({
+          service: svc,
+          paket: selectedPackages[svc as InterestKey] ?? null,
+        })),
         termin: terminStr,
-
-        // ✅ new fields for premium package selection
-        selectedPackages,
         primaryInterest: interests[0] ?? "",
         source: "kontakt-page",
       }),
