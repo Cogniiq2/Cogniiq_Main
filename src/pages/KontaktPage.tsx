@@ -1302,7 +1302,7 @@ function PremiumPackageModal({
                       <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-3">
                         Interessensfelder
                       </label>
-                      <div className="grid grid-cols-2 gap-2.5">
+                      <div className="grid grid-cols-2 gap-2">
                         {INTEREST_OPTIONS.map((item) => {
                           const active = interests.includes(item);
                           const svcAccent = SERVICE_ACCENT[item as InterestKey];
@@ -1311,11 +1311,23 @@ function PremiumPackageModal({
                           const needsPkg = active && hasPackages && !pkg;
                           const ItemIcon = svcAccent?.icon;
 
+                          const PACKAGE_LABEL: Record<string, string> = {
+                            "website-launch": "Launch",
+                            "website-wachstum": "Wachstum",
+                            "website-marktfuehrer": "Marktführer",
+                            "telefon-essentials": "Essentials",
+                            "telefon-growth": "Growth",
+                            "telefon-scale": "Scale",
+                            "auto-essentials": "Essentials",
+                            "auto-growth": "Growth",
+                            "auto-scale": "Scale",
+                          };
+
                           return (
                             <motion.button
                               key={item}
                               type="button"
-                              layout
+                              layout="position"
                               onClick={() => {
                                 const svc = item as InterestKey;
                                 const hasP = Boolean(PACKAGE_CATALOG[svc]?.length);
@@ -1334,123 +1346,130 @@ function PremiumPackageModal({
                                 setInterests((prev) => [...prev, svc]);
                                 if (!selectedPackages[svc]) openPackageModal(svc);
                               }}
-                              className={`relative text-left focus:outline-none group transition-all duration-200 ${
-                                !active ? "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500" : ""
-                              }`}
+                              className="relative text-left focus:outline-none overflow-hidden rounded-2xl transition-shadow duration-300"
                               style={
-                                active && svcAccent
+                                active
                                   ? {
-                                      borderRadius: "14px",
-                                      background: "linear-gradient(145deg, #0f1117 0%, #131620 100%)",
-                                      border: `1px solid rgba(255,255,255,0.10)`,
-                                      boxShadow: `0 0 0 1px rgba(255,255,255,0.05), 0 4px 24px ${svcAccent.glow}`,
+                                      background: "#fff",
+                                      border: "1.5px solid #111",
+                                      boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
                                     }
                                   : {
-                                      borderRadius: "14px",
+                                      background: "#fff",
+                                      border: "1.5px solid #e5e7eb",
                                     }
                               }
                             >
-                              {/* Active: accent top-bar */}
-                              {active && svcAccent && (
-                                <motion.div
-                                  layoutId={`bar-${item}`}
-                                  initial={{ scaleX: 0 }}
-                                  animate={{ scaleX: 1 }}
-                                  className={`absolute top-0 left-0 right-0 h-[2px] rounded-t-[14px] bg-gradient-to-r ${svcAccent.color}`}
-                                />
-                              )}
+                              {/* Left accent bar — thin colored strip when active */}
+                              <AnimatePresence>
+                                {active && svcAccent && (
+                                  <motion.div
+                                    key={`accent-${item}`}
+                                    initial={{ scaleY: 0 }}
+                                    animate={{ scaleY: 1 }}
+                                    exit={{ scaleY: 0 }}
+                                    transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                                    className={`absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b ${svcAccent.color} origin-top`}
+                                  />
+                                )}
+                              </AnimatePresence>
 
-                              <div className="px-4 py-3.5">
-                                <div className="flex items-center justify-between gap-2 mb-0.5">
-                                  <div className="flex items-center gap-2.5">
-                                    {/* Icon (only for service items with accent) */}
-                                    {ItemIcon && (
+                              <div className={`px-4 py-3.5 ${active ? "pl-5" : ""}`}>
+                                {/* Row 1: icon + label + check */}
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2.5 min-w-0">
+                                    {ItemIcon ? (
                                       <div
-                                        className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
-                                          active
-                                            ? `bg-gradient-to-br ${svcAccent.color}`
-                                            : "bg-gray-100 dark:bg-gray-800"
-                                        }`}
-                                        style={active ? { boxShadow: `0 0 10px ${svcAccent.glow}` } : {}}
+                                        className={`w-[26px] h-[26px] rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-200 ${active && svcAccent ? `bg-gradient-to-br ${svcAccent.color}` : ""}`}
+                                        style={
+                                          active && svcAccent
+                                            ? { boxShadow: `0 2px 8px ${svcAccent.glow}` }
+                                            : { background: "#f3f4f6" }
+                                        }
                                       >
                                         <ItemIcon
                                           size={13}
-                                          className={active ? "text-white" : "text-gray-400 dark:text-gray-500"}
+                                          className={active ? "text-white" : "text-gray-400"}
                                           strokeWidth={1.8}
                                         />
                                       </div>
-                                    )}
-                                    {!ItemIcon && (
+                                    ) : (
                                       <div
-                                        className={`w-3.5 h-3.5 rounded flex items-center justify-center flex-shrink-0 border transition-colors ${
+                                        className="w-4 h-4 rounded-[5px] flex items-center justify-center flex-shrink-0 border transition-all duration-200"
+                                        style={
                                           active
-                                            ? "border-gray-400 bg-gray-800"
-                                            : "border-gray-300 dark:border-gray-600"
-                                        }`}
+                                            ? { borderColor: "#111", background: "#111" }
+                                            : { borderColor: "#d1d5db" }
+                                        }
                                       >
-                                        {active && <div className="w-1.5 h-1.5 rounded-sm bg-white" />}
+                                        {active && <Check size={9} className="text-white" strokeWidth={2.5} />}
                                       </div>
                                     )}
                                     <span
-                                      className={`text-sm font-semibold transition-colors ${
-                                        active ? "text-white" : "text-gray-700 dark:text-gray-300"
-                                      }`}
+                                      className="text-[13px] leading-none truncate transition-colors duration-150"
+                                      style={{ fontWeight: active ? 600 : 500, color: active ? "#0a0a0a" : "#4b5563" }}
                                     >
                                       {item}
                                     </span>
                                   </div>
 
-                                  {/* Checkmark */}
-                                  {active && (
-                                    <motion.div
-                                      initial={{ scale: 0, opacity: 0 }}
-                                      animate={{ scale: 1, opacity: 1 }}
-                                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                                      className={`w-4.5 h-4.5 rounded-full flex items-center justify-center bg-gradient-to-br ${svcAccent?.color ?? "from-gray-400 to-gray-500"}`}
-                                      style={{ width: 18, height: 18 }}
-                                    >
-                                      <Check size={10} className="text-white" strokeWidth={2.5} />
-                                    </motion.div>
-                                  )}
+                                  <AnimatePresence>
+                                    {active && (
+                                      <motion.div
+                                        initial={{ scale: 0, opacity: 0 }}
+                                        animate={{ scale: 1, opacity: 1 }}
+                                        exit={{ scale: 0, opacity: 0 }}
+                                        transition={{ type: "spring", stiffness: 500, damping: 22 }}
+                                        className="flex-shrink-0 w-[18px] h-[18px] rounded-full flex items-center justify-center"
+                                        style={{ background: "#0a0a0a" }}
+                                      >
+                                        <Check size={10} className="text-white" strokeWidth={2.5} />
+                                      </motion.div>
+                                    )}
+                                  </AnimatePresence>
                                 </div>
 
-                                {/* Sub-label when active */}
-                                {active && (
-                                  <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: "auto" }}
-                                    transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                                    className="overflow-hidden"
-                                  >
-                                    <div className="mt-2.5 pt-2.5 border-t border-white/[0.08]">
+                                {/* Row 2: package pill or prompt — slides in */}
+                                <AnimatePresence>
+                                  {active && (
+                                    <motion.div
+                                      initial={{ opacity: 0, y: -4 }}
+                                      animate={{ opacity: 1, y: 0 }}
+                                      exit={{ opacity: 0, y: -4 }}
+                                      transition={{ duration: 0.2, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
+                                      className="mt-2.5"
+                                    >
                                       {pkg ? (
-                                        <div className="flex items-center gap-1.5">
-                                          <span
-                                            className={`inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.14em] px-2 py-0.5 rounded-full border ${svcAccent?.badge ?? ""}`}
-                                          >
-                                            <span className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${svcAccent?.color ?? ""}`} />
-                                            {pkg}
-                                          </span>
-                                        </div>
-                                      ) : needsPkg ? (
-                                        <button
-                                          type="button"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            openPackageModal(item as ServiceKey);
-                                          }}
-                                          className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-400 hover:text-amber-300 transition-colors"
+                                        <span
+                                          className="inline-flex items-center gap-1.5 text-[10.5px] font-semibold tracking-wide"
+                                          style={{ color: "#6b7280" }}
                                         >
-                                          Paket wählen →
-                                        </button>
+                                          <span
+                                            className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                                            style={{
+                                              background: svcAccent
+                                                ? `linear-gradient(135deg, ${svcAccent.glow.replace("0.18", "1")}, ${svcAccent.glow.replace("0.18", "0.7")})`
+                                                : "#10b981",
+                                            }}
+                                          />
+                                          {PACKAGE_LABEL[pkg] ?? pkg}
+                                        </span>
+                                      ) : needsPkg ? (
+                                        <span
+                                          className="inline-flex items-center gap-1 text-[10.5px] font-medium"
+                                          style={{ color: "#9ca3af" }}
+                                        >
+                                          Paket auswählen
+                                          <ArrowRight size={10} />
+                                        </span>
                                       ) : (
-                                        <span className="text-[10px] text-white/30 uppercase tracking-[0.12em] font-medium">
+                                        <span className="text-[10.5px] font-medium" style={{ color: "#9ca3af" }}>
                                           Ausgewählt
                                         </span>
                                       )}
-                                    </div>
-                                  </motion.div>
-                                )}
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
                               </div>
                             </motion.button>
                           );
