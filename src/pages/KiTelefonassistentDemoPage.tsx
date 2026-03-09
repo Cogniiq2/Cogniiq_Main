@@ -191,7 +191,7 @@ export function KiTelefonassistentDemoPage() {
     } catch {}
 
     setLoading(false);
-    setSent(true);
+    window.location.href = "https://cogniiq.de/anfrage-erhalten";
   }
 
   const schema = {
