@@ -45,6 +45,9 @@ import { LandingpageMuenchen } from './pages/cluster/muenchen/LandingpageMuenche
 import { WebsiteRelaunchMuenchen } from './pages/cluster/muenchen/WebsiteRelaunchMuenchen';
 import { LokalesSEOMuenchen } from './pages/cluster/muenchen/LokalesSEOMuenchen';
 import { AnfrageErhaltenPage } from './pages/AnfrageErhaltenPage';
+import { KiTelefonassistentPage } from './pages/KiTelefonassistentPage';
+import { KiTelefonassistentDemoPage } from './pages/KiTelefonassistentDemoPage';
+import { BayernKiTelefonassistentPage } from './pages/BayernKiTelefonassistentPage';
 
 function App() {
   return (
@@ -61,6 +64,9 @@ function App() {
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/kontakt" element={<KontaktPage />} />
             <Route path="/anfrage-erhalten" element={<AnfrageErhaltenPage />} />
+            <Route path="/ki-telefonassistent" element={<KiTelefonassistentPage />} />
+            <Route path="/ki-telefonassistent/demo" element={<KiTelefonassistentDemoPage />} />
+            <Route path="/bayern/ki-telefonassistent" element={<BayernKiTelefonassistentPage />} />
             <Route path="/bayern" element={<BayernPage />} />
             <Route path="/deutschland" element={<DeutschlandPage />} />
             <Route path="/bayreuth" element={<CityLandingPage citySlug="bayreuth" />} />
