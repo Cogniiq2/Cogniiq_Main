@@ -362,7 +362,7 @@ function PremiumDateTimePicker({ value, onChange }: DateTimePickerProps) {
 export function KontaktPage() {
   const navigate = useNavigate();
   const [interests, setInterests] = useState<string[]>([]);
-  const [submitted, setSubmitted] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -864,11 +864,7 @@ function PremiumPackageModal({
   } catch {}
 
   setLoading(false);
-  setSubmitted(true);
-  setTimeout(() => {
-    setSubmitted(false);
-    navigate("/anfrage-erhalten");
-  }, 1500);
+  navigate("/anfrage-erhalten");
 }
 
   return (
@@ -1149,69 +1145,7 @@ function PremiumPackageModal({
                 variants={fadeUp}
                 custom={0.1}
               >
-                {submitted && (
-                  <AnimatePresence>
-                    <motion.div
-                      key="success-overlay"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.35 }}
-                      className="fixed inset-0 z-[9999] flex items-center justify-center px-6"
-                      style={{ backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", backgroundColor: "rgba(0,0,0,0.45)" }}
-                    >
-                      <motion.div
-                        initial={{ opacity: 0, y: 24, scale: 0.94 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 12, scale: 0.96 }}
-                        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                        className="relative w-full max-w-sm bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-2xl shadow-black/20 overflow-hidden p-10 text-center"
-                      >
-                        {/* progress bar */}
-                        <motion.div
-                          className="absolute top-0 left-0 h-[2px] bg-emerald-400"
-                          initial={{ width: "100%" }}
-                          animate={{ width: "0%" }}
-                          transition={{ duration: 4, ease: "linear" }}
-                        />
-
-                        {/* icon */}
-                        <div className="relative mx-auto mb-6 w-16 h-16">
-                          <div className="absolute inset-0 rounded-full bg-emerald-100 dark:bg-emerald-900/30 animate-ping opacity-30" />
-                          <div className="relative w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center">
-                            <motion.div
-                              initial={{ scale: 0, rotate: -20 }}
-                              animate={{ scale: 1, rotate: 0 }}
-                              transition={{ delay: 0.2, type: "spring", stiffness: 260, damping: 18 }}
-                            >
-                              <CheckCircle2 size={28} className="text-emerald-400" strokeWidth={1.8} />
-                            </motion.div>
-                          </div>
-                        </div>
-
-                        <motion.h3
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.25, duration: 0.4 }}
-                          className="text-xl font-bold text-gray-900 dark:text-gray-50 mb-2 tracking-tight"
-                        >
-                          Anfrage eingegangen
-                        </motion.h3>
-                        <motion.p
-                          initial={{ opacity: 0, y: 6 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.35, duration: 0.4 }}
-                          className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed"
-                        >
-                          Wir melden uns innerhalb von 24&nbsp;Stunden mit einer ersten Einschätzung.
-                        </motion.p>
-                      </motion.div>
-                    </motion.div>
-                  </AnimatePresence>
-                )}
-               {!submitted && (
-  <>
-    <PremiumPackageModal
+               <PremiumPackageModal
       open={pkgModalOpen}
       service={pkgModalService}
       options={(pkgModalService ? (PACKAGE_CATALOG[pkgModalService] ?? []) : []) as PackageOption[]}
@@ -1529,8 +1463,6 @@ function PremiumPackageModal({
                       </button>
                     </div>
                    </form>
-                   </>
-                   )}
               </motion.div>
             </div>
           </div>
