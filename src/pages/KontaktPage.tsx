@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, ChevronRight, Globe, Phone, Zap, Mail, MapPin, Clock, CircleCheck as CheckCircle2, Building2, Calendar, ChevronDown, Check, ChevronLeft, Loader as Loader2 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO, getGoogleMapsUrl, getGoogleMapsEmbedUrl } from "@/lib/seo-data";
@@ -360,6 +360,7 @@ function PremiumDateTimePicker({ value, onChange }: DateTimePickerProps) {
   );
 }
 export function KontaktPage() {
+  const navigate = useNavigate();
   const [interests, setInterests] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -864,7 +865,10 @@ function PremiumPackageModal({
 
   setLoading(false);
   setSubmitted(true);
-  setTimeout(() => setSubmitted(false), 4500);
+  setTimeout(() => {
+    setSubmitted(false);
+    navigate("/anfrage-erhalten");
+  }, 1500);
 }
 
   return (

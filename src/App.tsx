@@ -44,6 +44,7 @@ import { WebsiteErstellenMuenchen } from './pages/cluster/muenchen/WebsiteErstel
 import { LandingpageMuenchen } from './pages/cluster/muenchen/LandingpageMuenchen';
 import { WebsiteRelaunchMuenchen } from './pages/cluster/muenchen/WebsiteRelaunchMuenchen';
 import { LokalesSEOMuenchen } from './pages/cluster/muenchen/LokalesSEOMuenchen';
+import { AnfrageErhaltenPage } from './pages/AnfrageErhaltenPage';
 
 function App() {
   return (
@@ -59,6 +60,7 @@ function App() {
             <Route path="/ueber-uns" element={<UeberUnsPage />} />
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/kontakt" element={<KontaktPage />} />
+            <Route path="/anfrage-erhalten" element={<AnfrageErhaltenPage />} />
             <Route path="/bayern" element={<BayernPage />} />
             <Route path="/deutschland" element={<DeutschlandPage />} />
             <Route path="/bayreuth" element={<CityLandingPage citySlug="bayreuth" />} />
