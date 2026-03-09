@@ -555,6 +555,30 @@ const PACKAGE_CATALOG: Partial<Record<InterestKey, PackageOption[]>> = {
   ],
 };
 
+const SERVICE_ACCENT: Record<string, { color: string; glow: string; ring: string; badge: string; icon: React.ElementType }> = {
+  Webdesign: {
+    color: "from-blue-500 to-cyan-400",
+    glow: "rgba(59,130,246,0.18)",
+    ring: "ring-blue-500/40",
+    badge: "bg-blue-500/10 text-blue-300 border-blue-500/20",
+    icon: Globe,
+  },
+  "KI Telefonassistent": {
+    color: "from-emerald-400 to-teal-400",
+    glow: "rgba(52,211,153,0.18)",
+    ring: "ring-emerald-400/40",
+    badge: "bg-emerald-500/10 text-emerald-300 border-emerald-500/20",
+    icon: Phone,
+  },
+  Automatisierung: {
+    color: "from-amber-400 to-orange-400",
+    glow: "rgba(251,191,36,0.18)",
+    ring: "ring-amber-400/40",
+    badge: "bg-amber-500/10 text-amber-300 border-amber-500/20",
+    icon: Zap,
+  },
+};
+
 function PremiumPackageModal({
   open,
   service,
@@ -572,162 +596,235 @@ function PremiumPackageModal({
   onClose: () => void;
   onConfirm: () => void;
 }) {
-  if (!open || !service) return null;
+  const accent = service ? SERVICE_ACCENT[service] ?? SERVICE_ACCENT["Webdesign"] : SERVICE_ACCENT["Webdesign"];
+  const AccentIcon = accent.icon;
 
   return (
     <AnimatePresence>
-      <motion.div
-        key="package-modal"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.25 }}
-        className="fixed inset-0 z-[9998] flex items-center justify-center px-6"
-        style={{
-          backdropFilter: "blur(10px)",
-          WebkitBackdropFilter: "blur(10px)",
-          backgroundColor: "rgba(0,0,0,0.55)",
-        }}
-        onMouseDown={onClose}
-      >
+      {open && service && (
         <motion.div
-          initial={{ opacity: 0, y: 22, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 14, scale: 0.98 }}
-          transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full max-w-3xl bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-2xl shadow-black/25 overflow-hidden"
-          onMouseDown={(e) => e.stopPropagation()}
+          key="package-modal-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 z-[9998] flex items-end sm:items-center justify-center sm:px-6 px-0"
+          style={{
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            backgroundColor: "rgba(0,0,0,0.72)",
+          }}
+          onMouseDown={onClose}
         >
-          <div className="p-7 sm:p-8 border-b border-gray-100 dark:border-gray-800">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-2">
-                  Paket auswählen
-                </p>
-                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">
-                  {service}
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1.5">
-                  Wählen Sie genau ein Paket. Damit können wir Ihre Anfrage sofort richtig priorisieren.
-                </p>
+          <motion.div
+            initial={{ opacity: 0, y: 40, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 24, scale: 0.98 }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            className="relative w-full sm:max-w-4xl overflow-hidden rounded-t-3xl sm:rounded-3xl"
+            style={{
+              background: "linear-gradient(160deg, #0f1117 0%, #131620 50%, #0a0d14 100%)",
+              border: "1px solid rgba(255,255,255,0.07)",
+              boxShadow: "0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.06)",
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            {/* Ambient glow behind modal */}
+            <div
+              className="absolute -top-20 left-1/2 -translate-x-1/2 w-[500px] h-[200px] rounded-full pointer-events-none"
+              style={{
+                background: `radial-gradient(ellipse at center, ${accent.glow} 0%, transparent 70%)`,
+                filter: "blur(40px)",
+              }}
+            />
+
+            {/* Header */}
+            <div className="relative flex items-start justify-between gap-4 px-7 sm:px-9 pt-8 pb-7 border-b border-white/[0.06]">
+              <div className="flex items-center gap-4">
+                <div
+                  className={`w-11 h-11 rounded-2xl bg-gradient-to-br ${accent.color} flex items-center justify-center flex-shrink-0`}
+                  style={{ boxShadow: `0 0 20px ${accent.glow}` }}
+                >
+                  <AccentIcon size={20} className="text-white" strokeWidth={1.8} />
+                </div>
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/30 mb-1">
+                    Paket wählen
+                  </p>
+                  <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight leading-tight">
+                    {service}
+                  </h3>
+                </div>
               </div>
 
               <button
                 type="button"
                 onClick={onClose}
-                className="w-9 h-9 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+                className="w-9 h-9 rounded-xl flex items-center justify-center text-white/30 hover:text-white/70 transition-colors"
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
                 aria-label="Schließen"
               >
-                ✕
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                </svg>
               </button>
             </div>
-          </div>
 
-          <div className="p-7 sm:p-8">
-            <div className="grid md:grid-cols-3 gap-4">
-              {options.map((opt, idx) => {
-                const active = selectedId === opt.id;
-                return (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => onSelect(opt.id)}
-                    className={`text-left rounded-2xl border p-5 transition-all duration-200 ${
-                      active
-                        ? "border-gray-900 dark:border-gray-50 bg-gray-900 dark:bg-gray-50"
-                        : "border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40 hover:border-gray-400 dark:hover:border-gray-600"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-3 mb-3">
-                      <div>
-                        <p
-                          className={`text-[11px] font-semibold uppercase tracking-[0.16em] ${
-                            active ? "text-white/70 dark:text-gray-600" : "text-gray-400 dark:text-gray-500"
-                          }`}
-                        >
-                          Option {String(idx + 1).padStart(2, "0")}
-                        </p>
-                        <h4
-                          className={`text-base font-semibold ${
-                            active ? "text-white dark:text-gray-900" : "text-gray-900 dark:text-gray-100"
-                          }`}
-                        >
-                          {opt.label}
-                        </h4>
-                      </div>
-
-                      <div
-                        className={`w-6 h-6 rounded-lg flex items-center justify-center border ${
-                          active
-                            ? "border-white/30 dark:border-gray-300"
-                            : "border-gray-200 dark:border-gray-700"
-                        }`}
-                      >
-                        {active && <Check size={14} className={active ? "text-white dark:text-gray-900" : ""} />}
-                      </div>
-                    </div>
-
-                    <p
-                      className={`text-sm leading-relaxed mb-4 ${
-                        active ? "text-white/80 dark:text-gray-700" : "text-gray-500 dark:text-gray-400"
+            {/* Cards */}
+            <div className="px-7 sm:px-9 pt-7 pb-8">
+              <div className="grid md:grid-cols-3 gap-3.5">
+                {options.map((opt, idx) => {
+                  const active = selectedId === opt.id;
+                  const isRecommended = opt.badge === "Bester ROI" || opt.badge === "Empfohlen";
+                  return (
+                    <motion.button
+                      key={opt.id}
+                      type="button"
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: idx * 0.07, ease: [0.22, 1, 0.36, 1] }}
+                      onClick={() => onSelect(opt.id)}
+                      className={`relative text-left rounded-2xl p-5 transition-all duration-300 focus:outline-none ${
+                        active ? `ring-2 ${accent.ring}` : ""
                       }`}
+                      style={
+                        active
+                          ? {
+                              background: "linear-gradient(145deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.04) 100%)",
+                              border: "1px solid rgba(255,255,255,0.14)",
+                              boxShadow: `0 0 30px ${accent.glow}, inset 0 1px 0 rgba(255,255,255,0.08)`,
+                            }
+                          : {
+                              background: "rgba(255,255,255,0.03)",
+                              border: "1px solid rgba(255,255,255,0.07)",
+                            }
+                      }
                     >
-                      {opt.subtitle}
-                    </p>
+                      {/* Recommended pill */}
+                      {isRecommended && (
+                        <div
+                          className={`absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-[0.14em] border ${accent.badge}`}
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${accent.color}`} />
+                          Empfohlen
+                        </div>
+                      )}
 
-                    {opt.badge && (
-                      <div
-                        className={`inline-flex items-center text-[10px] font-semibold uppercase tracking-[0.16em] px-2.5 py-1 rounded-full border mb-4 ${
-                          active
-                            ? "border-white/20 text-white/80 dark:border-gray-300 dark:text-gray-700"
-                            : "border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400"
-                        }`}
-                      >
-                        {opt.badge}
+                      {/* Card header */}
+                      <div className="flex items-start justify-between gap-3 mb-3.5">
+                        <div>
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/25 mb-1">
+                            {String(idx + 1).padStart(2, "0")}
+                          </p>
+                          <h4 className="text-[15px] font-semibold text-white leading-tight">
+                            {opt.label}
+                          </h4>
+                        </div>
+                        <div
+                          className={`w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center transition-all duration-200 ${
+                            active
+                              ? `bg-gradient-to-br ${accent.color}`
+                              : "border border-white/15"
+                          }`}
+                        >
+                          {active && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                            >
+                              <Check size={11} className="text-white" strokeWidth={2.5} />
+                            </motion.div>
+                          )}
+                        </div>
                       </div>
-                    )}
 
-                    <ul className="space-y-2">
-                      {opt.bullets.slice(0, 6).map((b) => (
-                        <li key={b} className="flex items-start gap-2">
+                      {/* Subtitle */}
+                      <p className="text-[12.5px] text-white/45 leading-relaxed mb-4">
+                        {opt.subtitle}
+                      </p>
+
+                      {/* Divider */}
+                      <div className="w-full h-px bg-white/[0.06] mb-4" />
+
+                      {/* Bullets */}
+                      <ul className="space-y-2.5">
+                        {opt.bullets.slice(0, 6).map((b, bi) => (
+                          <motion.li
+                            key={b}
+                            initial={{ opacity: 0, x: -6 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.3, delay: active ? bi * 0.04 : 0 }}
+                            className="flex items-start gap-2.5"
+                          >
+                            <span
+                              className={`mt-[5px] flex-shrink-0 w-3.5 h-3.5 rounded flex items-center justify-center ${
+                                active
+                                  ? `bg-gradient-to-br ${accent.color}`
+                                  : "bg-white/[0.06] border border-white/10"
+                              }`}
+                            >
+                              <Check size={8} className="text-white" strokeWidth={2.5} />
+                            </span>
+                            <span className={`text-[12px] leading-relaxed ${active ? "text-white/75" : "text-white/35"}`}>
+                              {b}
+                            </span>
+                          </motion.li>
+                        ))}
+                      </ul>
+
+                      {/* Bottom badge */}
+                      {opt.badge && (
+                        <div className="mt-4 pt-3.5 border-t border-white/[0.06]">
                           <span
-                            className={`mt-1 w-1.5 h-1.5 rounded-sm ${
-                              active ? "bg-white/70 dark:bg-gray-600" : "bg-gray-300 dark:bg-gray-700"
-                            }`}
-                          />
-                          <span
-                            className={`text-xs leading-relaxed ${
-                              active ? "text-white/80 dark:text-gray-700" : "text-gray-600 dark:text-gray-400"
+                            className={`inline-flex items-center text-[10px] font-semibold uppercase tracking-[0.14em] px-2.5 py-1 rounded-full border ${
+                              active ? accent.badge : "border-white/10 text-white/25"
                             }`}
                           >
-                            {b}
+                            {opt.badge}
                           </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </button>
-                );
-              })}
-            </div>
+                        </div>
+                      )}
+                    </motion.button>
+                  );
+                })}
+              </div>
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-7 pt-6 border-t border-gray-100 dark:border-gray-800">
-              <p className="text-xs text-gray-400 dark:text-gray-600">
-                Pflichtfeld — ohne Paket können wir die Anfrage nicht korrekt einordnen.
-              </p>
+              {/* Footer */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-7 pt-6 border-t border-white/[0.06]">
+                <p className="text-[11.5px] text-white/25 leading-relaxed">
+                  Wählen Sie ein Paket — wir passen das Gespräch darauf ab.
+                </p>
 
-              <button
-                type="button"
-                onClick={onConfirm}
-                disabled={!selectedId}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gray-900 dark:bg-gray-50 text-white dark:text-gray-900 text-sm font-semibold hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Paket bestätigen
-                <ArrowRight size={15} />
-              </button>
+                <motion.button
+                  type="button"
+                  onClick={onConfirm}
+                  disabled={!selectedId}
+                  whileHover={selectedId ? { scale: 1.02 } : {}}
+                  whileTap={selectedId ? { scale: 0.98 } : {}}
+                  className={`relative inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl text-[13.5px] font-semibold transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed overflow-hidden`}
+                  style={
+                    selectedId
+                      ? {
+                          background: `linear-gradient(135deg, white 0%, rgba(230,240,255,0.9) 100%)`,
+                          color: "#0a0d14",
+                          boxShadow: "0 4px 20px rgba(255,255,255,0.15), inset 0 1px 0 rgba(255,255,255,0.6)",
+                        }
+                      : {
+                          background: "rgba(255,255,255,0.06)",
+                          color: "rgba(255,255,255,0.3)",
+                          border: "1px solid rgba(255,255,255,0.08)",
+                        }
+                  }
+                >
+                  Paket bestätigen
+                  <ArrowRight size={15} />
+                </motion.button>
+              </div>
             </div>
-          </div>
+          </motion.div>
         </motion.div>
-      </motion.div>
+      )}
     </AnimatePresence>
   );
 }
@@ -1264,7 +1361,7 @@ function PremiumPackageModal({
 }}
                               className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-sm font-medium transition-all duration-200 text-left ${
                                 active
-                                  ? "border-gray-900 dark:border-gray-100 bg-gray-900 dark:bg-gray-50 text-white dark:text-gray-900"
+                                  ? "border-gray-900 dark:border-gray-700 bg-gray-900 dark:bg-gray-900/80 text-white"
                                   : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500"
                               }`}
                             >
