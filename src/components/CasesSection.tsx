@@ -1,47 +1,64 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { Building2, Trophy, Utensils, Shirt } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Building2, Trophy, Utensils, Shirt, ArrowRight } from 'lucide-react';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: (delay = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] },
+  }),
+};
 
 const cases = [
   {
     icon: Building2,
-    title: 'Klinik: AI-Rezeptionistin + Automatisiertes Buchungssystem',
+    category: 'Medizin & Gesundheit',
+    title: 'Klinik: KI-Rezeptionistin + Automatisiertes Buchungssystem',
     description:
-      'Eingehende Anrufe werden von einer AI-Rezeptionistin angenommen, Termine direkt im Kalender gebucht, Folge-SMS und E-Mails automatisch versendet.',
+      'Eingehende Anrufe werden von einer KI-Rezeptionistin angenommen, Termine direkt im Kalender gebucht, Folge-SMS und E-Mails automatisch versendet.',
     highlights: [
-      'Weniger verpasste Anrufe',
+      'Deutlich weniger verpasste Anrufe',
       'Klare Struktur bei Neu- & Bestandspatienten',
-      'Team am Empfang entlastet',
+      'Empfangsteam spürbar entlastet',
     ],
-    gradient: 'from-emerald-500 to-teal-500',
+    link: '/ki-telefonassistent',
+    linkLabel: 'KI Telefonassistent ansehen',
   },
   {
     icon: Trophy,
+    category: 'Sport & Freizeit',
     title: 'Padel- & Tennisanlage: Website + Buchung + Smartlocks',
     description:
-      'Moderne Website mit Buchungssystem, automatischer Lichtsteuerung und Türöffnung – alles synchron mit Zahlungen.',
+      'Moderne Website mit Buchungssystem, automatischer Lichtsteuerung und Türöffnung – alles synchron mit Zahlungen und ohne Personalaufwand.',
     highlights: [
       'Buchungen laufen 24/7 online',
-      'Licht & Zugang sind automatisiert',
+      'Licht & Zugang vollständig automatisiert',
       'Kein Personal nötig für Standardzeiten',
     ],
-    gradient: 'from-[#8b5cf6] to-[#7c3aed]',
+    link: '/leistungen',
+    linkLabel: 'Leistungen entdecken',
   },
   {
     icon: Utensils,
-    title: 'Restaurant: Webdesign + AI-Rezeptionistin + Reservierungssystem',
+    category: 'Gastronomie',
+    title: 'Restaurant: Webdesign + KI-Rezeptionistin + Reservierung',
     description:
-      'Website mit Speisekarte, Fotos, und AI-Telefonistin, die Anrufe annimmt, Reservierungen einträgt und No-Show-Risiko reduziert.',
+      'Website mit Speisekarte und KI-Telefonistin, die Anrufe annimmt, Reservierungen einträgt und No-Show-Risiko reduziert.',
     highlights: [
       'Mehr Online-Reservierungen',
-      'Weniger Stress für Service-Personal',
+      'Weniger Stress für das Service-Personal',
       'Mehr Zeit für Gäste statt fürs Telefon',
     ],
-    gradient: 'from-[#22d3ee] to-[#06b6d4]',
+    link: '/webdesign-gastronomie-bayreuth',
+    linkLabel: 'Webdesign Gastronomie',
   },
   {
     icon: Shirt,
+    category: 'Fashion & E-Commerce',
     title: 'Fashion-Brand: AI-Content für Kampagnen',
     description:
       'AI-generierte Produktbilder und Social-Content im Brand-Look, kombiniert mit Landingpages für neue Drops.',
@@ -50,89 +67,121 @@ const cases = [
       'Konsistenter Brand-Look',
       'Kein komplexes Shooting-Setup nötig',
     ],
-    gradient: 'from-violet-500 to-fuchsia-500',
+    link: '/leistungen',
+    linkLabel: 'Alle Leistungen',
   },
 ];
 
 export function CasesSection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
 
   return (
-    <section id="cases" ref={ref} className="py-32 bg-white" aria-labelledby="cases-heading">
+    <section
+      id="cases"
+      ref={ref}
+      className="py-28 bg-gray-50 dark:bg-gray-900/40"
+      aria-labelledby="cases-heading"
+    >
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          initial="hidden"
+          animate={isInView ? 'visible' : 'hidden'}
+          variants={fadeUp}
+          custom={0}
+          className="max-w-2xl mb-16"
         >
-         <h2
-  id="cases-heading"
-  className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900"
->
-  Wie das in der Praxis aussieht
-</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Erfolgreiche Projekte: AI Automationen und Webdesign für verschiedene Branchen in Deutschland
+          <p className="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-gray-400 dark:text-gray-500 mb-5">
+            Referenzen
+          </p>
+          <h2
+            id="cases-heading"
+            className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-[1.08] tracking-tight mb-5"
+          >
+            Wie das in der
+            <br />
+            <span className="text-gray-400 dark:text-gray-600">Praxis aussieht.</span>
+          </h2>
+          <p className="text-lg text-gray-500 dark:text-gray-400 leading-relaxed">
+            Reale Projekte: KI-Automationen und{' '}
+            <Link
+              to="/leistungen"
+              className="font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors underline underline-offset-2 decoration-gray-300 dark:decoration-gray-600"
+            >
+              Webdesign für verschiedene Branchen
+            </Link>{' '}
+            in Deutschland – mit messbaren Ergebnissen.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-5">
           {cases.map((caseItem, index) => {
             const Icon = caseItem.icon;
             return (
-              <motion.div
+              <motion.article
                 key={index}
-                initial={{ opacity: 0, y: 30 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: index * 0.15 }}
-                whileHover={{ y: -6 }}
-                className="group relative bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:border-[#8b5cf6]/50 hover:shadow-xl transition-all duration-300"
+                initial="hidden"
+                animate={isInView ? 'visible' : 'hidden'}
+                variants={fadeUp}
+                custom={index * 0.1}
+                className="group relative bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 p-8 transition-all duration-300"
               >
-                <div
-                  className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${caseItem.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}
-                />
-
-                <div className="relative flex items-start gap-6">
-                  <div
-                    className={`p-4 rounded-xl bg-gradient-to-br ${caseItem.gradient} flex-shrink-0`}
-                    aria-hidden="true"
-                  >
-                    <Icon className="w-8 h-8 text-white" />
+                <div className="flex items-start gap-5">
+                  <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-gray-200 dark:group-hover:bg-gray-700 transition-colors">
+                    <Icon size={18} className="text-gray-600 dark:text-gray-400" />
                   </div>
-
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold mb-3 text-gray-900">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400 dark:text-gray-500 mb-2">
+                      {caseItem.category}
+                    </p>
+                    <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-3 leading-snug">
                       {caseItem.title}
                     </h3>
-                    <p className="text-gray-600 mb-6 leading-relaxed text-sm">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-5">
                       {caseItem.description}
                     </p>
 
-                    <div className="space-y-2">
-                      {caseItem.highlights.map((highlight, highlightIndex) => (
-                        <div
-                          key={highlightIndex}
-                          className="flex items-center gap-2"
-                        >
-                          <div
-                            className={`w-1 h-1 rounded-full bg-gradient-to-r ${caseItem.gradient}`}
-                          />
-                          <span className="text-sm text-gray-700">{highlight}</span>
+                    <div className="space-y-1.5 mb-6">
+                      {caseItem.highlights.map((highlight, hi) => (
+                        <div key={hi} className="flex items-center gap-2.5">
+                          <div className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600 flex-shrink-0" />
+                          <span className="text-sm text-gray-600 dark:text-gray-400">{highlight}</span>
                         </div>
                       ))}
                     </div>
+
+                    <Link
+                      to={caseItem.link}
+                      className="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors uppercase tracking-[0.1em] group/link"
+                    >
+                      {caseItem.linkLabel}
+                      <ArrowRight
+                        size={11}
+                        className="transition-transform duration-200 group-hover/link:translate-x-1"
+                      />
+                    </Link>
                   </div>
                 </div>
-
-                <div
-                  className={`absolute -bottom-px -right-px w-24 h-24 bg-gradient-to-br ${caseItem.gradient} rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-500`}
-                />
-              </motion.div>
+              </motion.article>
             );
           })}
         </div>
+
+        <motion.div
+          initial="hidden"
+          animate={isInView ? 'visible' : 'hidden'}
+          variants={fadeUp}
+          custom={0.5}
+          className="mt-10 text-center"
+        >
+          <Link
+            to="/referenzen"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 px-6 py-3 rounded-xl"
+          >
+            Alle Referenzen ansehen
+            <ArrowRight size={14} />
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

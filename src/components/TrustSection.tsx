@@ -1,110 +1,145 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
+import { Link } from "react-router-dom";
+import { Zap, Target, Shield, TrendingUp, Cpu, Clock } from "lucide-react";
 
-import {
-  CpuChipIcon,
-  BoltIcon,
-  FunnelIcon,
-  EyeDropperIcon,
-  ChartBarIcon,
-} from "@heroicons/react/24/outline";
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: (delay = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] },
+  }),
+};
 
-const points = [
+const principles = [
   {
-    icon: CpuChipIcon,
-    title: "Technologie soll für Unternehmen arbeiten – nicht andersherum.",
-    text: "Wir bauen Systeme, die Aufgaben übernehmen, bevor sie entstehen. Automationen, die Entscheidungen treffen. Websites, die verkaufen. AI, die Prozesse steuert – unsichtbar, nahtlos, rund um die Uhr.",
+    icon: Cpu,
+    title: "Technologie, die für Sie arbeitet.",
+    text: "Wir bauen operative KI-Systeme, die Aufgaben übernehmen, bevor sie entstehen. Automationen, die entscheiden. Websites, die konvertieren. AI, die Prozesse steuert – nahtlos, 24/7.",
+    link: "/leistungen",
+    linkLabel: "Leistungen ansehen",
   },
   {
-    icon: BoltIcon,
+    icon: Zap,
     title: "Geschwindigkeit schlägt alles.",
-    text: "Nicht in Monaten, sondern in Tagen. Keine endlosen Abstimmungen. Keine Meetings, die Zeit verbrennen. Unsere Lösungen laufen, während andere noch planen.",
+    text: "Nicht in Monaten – in Tagen. Keine endlosen Abstimmungsrunden. Unsere Systeme laufen, während andere noch planen.",
+    link: "/kontakt",
+    linkLabel: "Jetzt starten",
   },
   {
-    icon: FunnelIcon,
+    icon: Target,
     title: "Fokus auf das Wesentliche.",
-    text: "Keine komplizierten Tools, keine Worthülsen. Nur klare, schnelle, profitable Ergebnisse. Was Zeit spart, bringt Wachstum – sofort spürbar.",
+    text: "Keine komplizierten Tools. Keine Worthülsen. Klare, schnelle, profitable Ergebnisse. Was Zeit spart, bringt Wachstum – sofort messbar.",
+    link: "/leistungen",
+    linkLabel: "Unsere Methode",
   },
   {
-    icon: EyeDropperIcon,
-    title: "Perfektion, die man nicht bemerkt.",
-    text: "Wir entwickeln Systeme, die reibungslos funktionieren, elegant bleiben und im Hintergrund Ihre digitale Infrastruktur tragen.",
+    icon: Shield,
+    title: "Perfektion im Hintergrund.",
+    text: "Komplexität gehört in die Infrastruktur – nicht in Ihre tägliche Arbeit. Systeme, die reibungslos funktionieren und elegant bleiben.",
+    link: "/ueber-uns",
+    linkLabel: "Über Cogniiq",
   },
   {
-    icon: ChartBarIcon,
-    title: "Wir bauen die Grundlage für die nächsten 10 Jahre.",
-    text: "Unternehmen, die heute nicht automatisieren, sind morgen nicht mehr da. Unsere Mission: Betriebe in die Zukunft bringen.",
+    icon: TrendingUp,
+    title: "Fundament für die nächsten 10 Jahre.",
+    text: "Unternehmen, die heute nicht automatisieren, sind morgen nicht mehr da. Unsere Mission: Betriebe strukturiert, skalierbar und zukunftssicher aufstellen.",
+    link: "/leistungen",
+    linkLabel: "Mehr erfahren",
+  },
+  {
+    icon: Clock,
+    title: "Ergebnisse, nicht Versprechen.",
+    text: "Jedes Projekt wird an messbaren Zielen gemessen: mehr Anfragen, mehr Buchungen, weniger manuelle Arbeit. Wir liefern – nachweislich.",
+    link: "/kontakt",
+    linkLabel: "Demo anfragen",
   },
 ];
 
 export function TrustSection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const isInView = useInView(ref, { once: true, amount: 0.12 });
 
   return (
-    <section ref={ref} className="py-28 bg-white dark:bg-gray-950 transition-colors duration-300">
+    <section
+      ref={ref}
+      id="prinzipien"
+      aria-labelledby="trust-heading"
+      className="py-28 bg-white dark:bg-gray-950"
+    >
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-
-        {/* Heading */}
         <motion.div
-          initial={{ opacity: 0, y: 25 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-20"
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          variants={fadeUp}
+          custom={0}
+          className="max-w-2xl mb-16"
         >
-          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100">
+          <p className="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-gray-400 dark:text-gray-500 mb-5">
             Wie wir denken
+          </p>
+          <h2
+            id="trust-heading"
+            className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-[1.08] tracking-tight mb-5"
+          >
+            Die Grundlage für
+            <br />
+            <span className="text-gray-400 dark:text-gray-600">operative Exzellenz.</span>
           </h2>
-          <p className="mt-6 text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Die Grundprinzipien, die Cogniiq ausmachen – klar, ruhig, kompromisslos.
+          <p className="text-lg text-gray-500 dark:text-gray-400 leading-relaxed">
+            Sechs Prinzipien, die jede Entscheidung bei{" "}
+            <Link
+              to="/"
+              className="font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+            >
+              Cogniiq
+            </Link>{" "}
+            treiben – klar, direkt, kompromisslos.
           </p>
         </motion.div>
 
-        {/* ROW 1 — 3 CARDS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
-          {points.slice(0, 3).map((item, i) => {
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-gray-100 dark:bg-gray-800 border border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden">
+          {principles.map((item, i) => {
             const Icon = item.icon;
             return (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 25 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="p-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm hover:shadow-lg transition-all h-full"
+                initial="hidden"
+                animate={isInView ? "visible" : "hidden"}
+                variants={fadeUp}
+                custom={i * 0.08}
+                className="bg-white dark:bg-gray-950 p-8 group hover:bg-gray-50 dark:hover:bg-gray-900/70 transition-colors duration-300"
               >
-                <Icon className="w-10 h-10 text-blue-600 dark:text-blue-400 mb-4" />
-                <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4 leading-snug">
+                <div className="w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-5 group-hover:bg-gray-200 dark:group-hover:bg-gray-700 transition-colors">
+                  <Icon size={16} className="text-gray-600 dark:text-gray-400" />
+                </div>
+                <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3 leading-snug">
                   {item.title}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400 text-lg">{item.text}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-5">
+                  {item.text}
+                </p>
+                <Link
+                  to={item.link}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 transition-colors uppercase tracking-[0.1em]"
+                >
+                  {item.linkLabel}
+                  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" className="opacity-60">
+                    <path
+                      d="M4 2L8 6L4 10"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </Link>
               </motion.div>
             );
           })}
         </div>
-
-        {/* ROW 2 — 2 CARDS CENTERED */}
-        <div className="flex justify-center gap-10 flex-wrap">
-          {points.slice(3).map((item, i) => {
-            const Icon = item.icon;
-            return (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 25 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: (i + 3) * 0.1 }}
-                className="p-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-sm hover:shadow-lg transition-all w-full max-w-md"
-              >
-                <Icon className="w-10 h-10 text-blue-600 dark:text-blue-400 mb-4" />
-                <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4 leading-snug">
-                  {item.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 text-lg">{item.text}</p>
-              </motion.div>
-            );
-          })}
-        </div>
-
       </div>
     </section>
   );
