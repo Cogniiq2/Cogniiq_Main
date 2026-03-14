@@ -280,7 +280,12 @@ export function KiAgenturDeutschland() {
                   Unser Fokus liegt auf zwei Bereichen, die sofort ROI erzeugen: KI-Telefonassistenten, die kein Unternehmen mehr unerreichbar machen – und Automatisierungen, die manuelle Abläufe ein für allemal lösen. Beides DSGVO-konform, beides auf europäischen Servern, beides in Wochen statt Monaten umgesetzt.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Mit Hauptsitz in <Link to="/bayreuth/ki-telefonassistent" className="text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">Bayreuth</Link> betreuen wir Projekte in ganz Deutschland – in <Link to="/muenchen/ki-telefonassistent" className=\"text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">München</Link>, <Link to="/regensburg/ki-telefonassistent" className=\"text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">Regensburg</Link> und bundesweit. Vollständig remote, transparent und mit direkten Ansprechpartnern.
+                  Mit Hauptsitz in{" "}
+                  <Link to="/bayreuth/ki-telefonassistent" className="text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">Bayreuth</Link>{" "}
+                  betreuen wir Projekte in ganz Deutschland – in{" "}
+                  <Link to="/muenchen/ki-telefonassistent" className="text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">München</Link>,{" "}
+                  <Link to="/regensburg/ki-telefonassistent" className="text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">Regensburg</Link>{" "}
+                  und bundesweit. Vollständig remote, transparent und mit direkten Ansprechpartnern.
                 </p>
               </div>
             </motion.div>

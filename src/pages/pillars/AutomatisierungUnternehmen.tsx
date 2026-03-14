@@ -201,7 +201,6 @@ export function AutomatisierungUnternehmen() {
       />
 
       <main>
-        {/* ── HERO ── */}
         <section className="pt-32 pb-20 bg-white dark:bg-gray-950 transition-colors duration-300">
           <div className="max-w-5xl mx-auto px-6 lg:px-8">
             <motion.nav
@@ -249,7 +248,6 @@ export function AutomatisierungUnternehmen() {
           </div>
         </section>
 
-        {/* ── TRUST BAR ── */}
         <div className="border-y border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
@@ -263,7 +261,6 @@ export function AutomatisierungUnternehmen() {
           </div>
         </div>
 
-        {/* ── INTRO ── */}
         <section className="py-20 bg-white dark:bg-gray-950 transition-colors duration-300" aria-labelledby="intro-heading">
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}>
@@ -278,14 +275,17 @@ export function AutomatisierungUnternehmen() {
                   Cogniiq automatisiert mit n8n und Make.com – den führenden Automatisierungsplattformen, die DSGVO-konform auf europäischen Servern betrieben werden können. Wir beginnen immer mit dem Prozess, der den schnellsten ROI erzeugt, und skalieren von dort aus. Von einem einzelnen Workflow zur vollständig automatisierten Geschäftsstruktur.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Mit Projekten in <Link to="/bayreuth/automatisierung" className="text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">Bayreuth</Link>, <Link to="/muenchen/automatisierung" className=\"text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">München</Link>, <Link to="/regensburg/automatisierung" className=\"text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">Regensburg</Link> und deutschlandweit betreuen wir Unternehmen vollständig remote – transparent, mit vollständiger Dokumentation und ohne Abhängigkeit.
+                  Mit Projekten in{" "}
+                  <Link to="/bayreuth/automatisierung" className="text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">Bayreuth</Link>,{" "}
+                  <Link to="/muenchen/automatisierung" className="text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">München</Link>,{" "}
+                  <Link to="/regensburg/automatisierung" className="text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">Regensburg</Link>{" "}
+                  und deutschlandweit betreuen wir Unternehmen vollständig remote – transparent, mit vollständiger Dokumentation und ohne Abhängigkeit.
                 </p>
               </div>
             </motion.div>
           </div>
         </section>
 
-        {/* ── LEISTUNGEN ── */}
         <section className="py-20 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300" aria-labelledby="services-heading">
           <div className="max-w-5xl mx-auto px-6 lg:px-8">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0} className="mb-12">
@@ -328,7 +328,6 @@ export function AutomatisierungUnternehmen() {
           </div>
         </section>
 
-        {/* ── HERAUSFORDERUNGEN ── */}
         <section className="py-20 bg-white dark:bg-gray-950 transition-colors duration-300" aria-labelledby="challenges-heading">
           <div className="max-w-5xl mx-auto px-6 lg:px-8">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0} className="mb-12">
@@ -367,7 +366,6 @@ export function AutomatisierungUnternehmen() {
           </div>
         </section>
 
-        {/* ── BRANCHEN ── */}
         <section className="py-20 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300" aria-labelledby="industries-heading">
           <div className="max-w-5xl mx-auto px-6 lg:px-8">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0} className="mb-12">
@@ -405,7 +403,6 @@ export function AutomatisierungUnternehmen() {
           </div>
         </section>
 
-        {/* ── EINSATZBEISPIELE ── */}
         <section className="py-20 bg-white dark:bg-gray-950 transition-colors duration-300" aria-labelledby="usecases-heading">
           <div className="max-w-5xl mx-auto px-6 lg:px-8">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0} className="mb-12">
@@ -441,7 +438,6 @@ export function AutomatisierungUnternehmen() {
           </div>
         </section>
 
-        {/* ── INTERNE LINKS ── */}
         <section className="py-16 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-800 transition-colors duration-300" aria-labelledby="links-heading">
           <div className="max-w-5xl mx-auto px-6 lg:px-8">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0} className="mb-10">
@@ -487,7 +483,6 @@ export function AutomatisierungUnternehmen() {
           </div>
         </section>
 
-        {/* ── FAQ ── */}
         <section className="py-20 bg-white dark:bg-gray-950 transition-colors duration-300" aria-labelledby="faq-heading">
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0} className="mb-10">
@@ -518,7 +513,6 @@ export function AutomatisierungUnternehmen() {
           </div>
         </section>
 
-        {/* ── CTA ── */}
         <section className="py-20 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
           <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}>

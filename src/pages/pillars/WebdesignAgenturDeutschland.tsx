@@ -276,7 +276,11 @@ export function WebdesignAgenturDeutschland() {
                   Der Großteil der Unternehmenswebsites in Deutschland erfüllt seinen eigentlichen Zweck nicht: gefunden werden und Anfragen generieren. Entweder rankt die Website nicht, oder sie überzeugt nicht – oft beides. Das Ergebnis: Wachstum findet offline statt, während die digitale Präsenz Kosten produziert, aber keinen Umsatz.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Cogniiq entwickelt Websites, die beides leisten. Technisch sauber und schnell genug für Google, inhaltlich und strukturell überzeugend genug für Ihre Zielgruppe. Mit integriertem lokalem SEO für Ihre Stadt und Ihrer Branche – ob in <Link to="/bayreuth/webdesign" className="text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">Bayreuth</Link>, <Link to="/muenchen/webdesign" className=\"text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">München</Link>, <Link to="/regensburg/webdesign" className=\"text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">Regensburg</Link> oder deutschlandweit.
+                  Cogniiq entwickelt Websites, die beides leisten. Technisch sauber und schnell genug für Google, inhaltlich und strukturell überzeugend genug für Ihre Zielgruppe. Mit integriertem lokalem SEO für Ihre Stadt und Ihrer Branche – ob in{" "}
+                  <Link to="/bayreuth/webdesign" className="text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">Bayreuth</Link>,{" "}
+                  <Link to="/muenchen/webdesign" className="text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">München</Link>,{" "}
+                  <Link to="/regensburg/webdesign" className="text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">Regensburg</Link>{" "}
+                  oder deutschlandweit.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                   Kein Münchner Agenturoverhead, kein Team von 30 Personen, das Projekte verzögert. Direkte Ansprechpartner, schnelle Umsetzung, faire Preise – und Websites, die nachweislich besser ranken und mehr konvertieren als das, was die meisten Agenturen liefern.
