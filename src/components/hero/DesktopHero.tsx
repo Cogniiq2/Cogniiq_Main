@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Zap, Globe, Brain } from 'lucide-react';
@@ -36,23 +36,30 @@ function DesktopParticles() {
 }
 
 function AnimatedCounter({ to, suffix = '' }: { to: number; suffix?: string }) {
-  const count = useMotionValue(0);
-  const rounded = useTransform(count, (v) => Math.round(v));
   const [display, setDisplay] = useState(0);
-  const ref = useRef(false);
+  const started = useRef(false);
 
   useEffect(() => {
-    const unsubscribe = rounded.on('change', setDisplay);
-    if (!ref.current) {
-      ref.current = true;
-      const controls = animate(count, to, { duration: 1.8, delay: 3.2, ease: 'easeOut' });
-      return () => {
-        controls.stop();
-        unsubscribe();
+    if (started.current) return;
+    started.current = true;
+
+    const timeout = setTimeout(() => {
+      const start = Date.now();
+      const duration = 1800;
+
+      const tick = () => {
+        const elapsed = Date.now() - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        setDisplay(Math.round(eased * to));
+        if (progress < 1) requestAnimationFrame(tick);
       };
-    }
-    return unsubscribe;
-  }, [count, rounded, to]);
+
+      requestAnimationFrame(tick);
+    }, 3200);
+
+    return () => clearTimeout(timeout);
+  }, [to]);
 
   return (
     <span>
