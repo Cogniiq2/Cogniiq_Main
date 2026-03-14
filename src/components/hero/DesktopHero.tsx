@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Zap, Globe, Brain } from 'lucide-react';
 import { SplineScene } from '../ui/splite';
@@ -36,30 +36,7 @@ function DesktopParticles() {
 }
 
 function AnimatedCounter({ to, suffix = '' }: { to: number; suffix?: string }) {
-  const [display, setDisplay] = useState(0);
-  const started = useRef(false);
-
-  useEffect(() => {
-    if (started.current) return;
-    started.current = true;
-
-    const timeout = setTimeout(() => {
-      const start = Date.now();
-      const duration = 1800;
-
-      const tick = () => {
-        const elapsed = Date.now() - start;
-        const progress = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        setDisplay(Math.round(eased * to));
-        if (progress < 1) requestAnimationFrame(tick);
-      };
-
-      requestAnimationFrame(tick);
-    }, 3200);
-
-    return () => clearTimeout(timeout);
-  }, [to]);
+  const [display, setDisplay] = useState(to);
 
   return (
     <span>
