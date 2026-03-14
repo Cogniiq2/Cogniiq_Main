@@ -224,7 +224,7 @@ export function FAQSection() {
               initial={{ opacity: 0 }}
               animate={isInView ? { opacity: 1 } : {}}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="mt-10 border border-gray-100 dark:border-gray-800 rounded-xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gray-50 dark:bg-gray-900/50"
+              className="mt-10 border border-gray-100 dark:border-gray-800 rounded-xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white dark:bg-transparent"
             >
               <div>
                 <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 tracking-tight">

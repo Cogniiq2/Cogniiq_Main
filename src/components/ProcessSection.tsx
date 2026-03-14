@@ -3,12 +3,14 @@ import { motion, useInView } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { MessageSquare, FileText, Cog, Rocket, ArrowRight } from 'lucide-react';
 
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
 const fadeUp = {
-  hidden: { opacity: 0, y: 28 },
+  hidden: { opacity: 0, y: 24 },
   visible: (delay = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.65, delay, ease: EASE },
   }),
 };
 
@@ -17,7 +19,6 @@ const stages = [
     number: '01',
     title: 'Kennenlernen & Zieldefinition',
     icon: MessageSquare,
-    accentColor: '#0ea5e9',
     description:
       'Kurzes Erstgespräch (30–45 Min.), in dem wir Ihr Geschäftsmodell, Ihre Ziele und den Status quo verstehen. Kostenlos und unverbindlich.',
     items: [
@@ -31,7 +32,6 @@ const stages = [
     number: '02',
     title: 'Konzept & Angebot',
     icon: FileText,
-    accentColor: '#14b8a6',
     description:
       'Wir skizzieren Website / Automation / AI-Setup und erstellen ein klares, individuelles Angebot – keine versteckten Kosten.',
     items: [
@@ -45,7 +45,6 @@ const stages = [
     number: '03',
     title: 'Umsetzung & Feinschliff',
     icon: Cog,
-    accentColor: '#3b82f6',
     description:
       'Umsetzung in klaren Sprints, regelmäßige Zwischenstände, Feedbackrunden, Tests. Fokus auf Performance und Stabilität.',
     items: [
@@ -59,7 +58,6 @@ const stages = [
     number: '04',
     title: 'Go-Live & Optimierung',
     icon: Rocket,
-    accentColor: '#06b6d4',
     description:
       'Launch, Monitoring und Optimierung auf das, was zählt: Anfragen, Buchungen, Umsatz – nicht nur Pixel.',
     items: [
@@ -73,8 +71,9 @@ const stages = [
 
 function StageCard({ stage, index }: { stage: typeof stages[0]; index: number }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.25 });
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
   const Icon = stage.icon;
+  const isLast = index === stages.length - 1;
 
   return (
     <motion.div
@@ -83,37 +82,31 @@ function StageCard({ stage, index }: { stage: typeof stages[0]; index: number })
       animate={isInView ? 'visible' : 'hidden'}
       variants={fadeUp}
       custom={index * 0.1}
-      className="relative group"
+      className="relative"
     >
-      <div className="grid grid-cols-[auto_1fr] gap-0 items-stretch">
+      <div className="grid grid-cols-[auto_1fr] items-stretch">
         <div className="flex flex-col items-center">
-          <div
-            className="relative w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-105"
-            style={{ backgroundColor: `${stage.accentColor}15`, border: `1px solid ${stage.accentColor}25` }}
-          >
-            <Icon size={18} style={{ color: stage.accentColor }} />
+          <div className="w-10 h-10 rounded-xl bg-gray-100 border border-gray-150 flex items-center justify-center flex-shrink-0 border-gray-200">
+            <Icon size={16} className="text-gray-500" />
           </div>
-          {index < stages.length - 1 && (
-            <div className="w-px flex-1 mt-4 bg-gradient-to-b from-gray-200 dark:from-gray-700 to-transparent min-h-[3rem]" />
+          {!isLast && (
+            <div className="w-px flex-1 mt-3 min-h-[2.5rem]" style={{ background: 'linear-gradient(to bottom, #e5e7eb, transparent)' }} />
           )}
         </div>
 
-        <div className="pl-6 pb-14">
+        <div className="pl-7 pb-12">
           <div className="flex items-center gap-3 mb-3">
-            <span
-              className="text-xs font-bold tracking-[0.2em] uppercase"
-              style={{ color: stage.accentColor }}
-            >
+            <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-gray-300 tabular-nums">
               {stage.number}
             </span>
-            <div className="h-px flex-1 bg-gradient-to-r from-gray-200 dark:from-gray-700 to-transparent max-w-[2.5rem]" />
+            <div className="h-px w-8 bg-gray-100" />
           </div>
 
-          <h3 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white mb-3 leading-tight tracking-tight">
+          <h3 className="text-[20px] font-bold text-gray-900 mb-3 leading-tight tracking-tight">
             {stage.title}
           </h3>
 
-          <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-5 max-w-lg">
+          <p className="text-[13.5px] text-gray-500 leading-relaxed mb-5 max-w-lg">
             {stage.description}
           </p>
 
@@ -121,18 +114,13 @@ function StageCard({ stage, index }: { stage: typeof stages[0]; index: number })
             {stage.items.map((item, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, x: -8 }}
+                initial={{ opacity: 0, x: -6 }}
                 animate={isInView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.4, delay: index * 0.1 + i * 0.07 + 0.2 }}
+                transition={{ duration: 0.4, delay: index * 0.1 + i * 0.06 + 0.2, ease: EASE }}
                 className="flex items-center gap-2.5"
               >
-                <div
-                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: stage.accentColor }}
-                />
-                <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
-                  {item}
-                </span>
+                <div className="w-[3px] h-[3px] rounded-full bg-gray-300 flex-shrink-0" />
+                <span className="text-[13px] text-gray-600 font-medium">{item}</span>
               </motion.div>
             ))}
           </div>
@@ -150,7 +138,7 @@ export function ProcessSection() {
     <section
       id="ablauf"
       ref={sectionRef}
-      className="py-28 bg-white dark:bg-gray-950"
+      className="py-28 bg-white border-t border-gray-100"
       aria-labelledby="process-heading"
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -162,25 +150,24 @@ export function ProcessSection() {
               variants={fadeUp}
               custom={0}
             >
-              <p className="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-gray-400 dark:text-gray-500 mb-5">
+              <p className="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-gray-400 mb-5">
                 Prozess
               </p>
 
               <h2
                 id="process-heading"
-                className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white leading-[1.08] tracking-tight mb-6"
+                className="text-4xl lg:text-5xl font-bold text-gray-900 leading-[1.08] tracking-tight mb-6"
               >
                 So arbeiten
                 <br />
-                <span className="text-gray-400 dark:text-gray-600">wir zusammen.</span>
+                <span className="text-gray-300">wir zusammen.</span>
               </h2>
 
-              <p className="text-base text-gray-500 dark:text-gray-400 leading-relaxed max-w-sm mb-10">
-                Transparenter Prozess von der ersten Anfrage bis zum Go-Live –
-                klar, schnell, ohne Überraschungen.{' '}
+              <p className="text-base text-gray-500 leading-relaxed max-w-sm mb-10">
+                Transparenter Prozess von der ersten Anfrage bis zum Go-Live – klar, schnell, ohne Überraschungen.{' '}
                 <Link
                   to="/kontakt"
-                  className="font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors underline underline-offset-2 decoration-gray-300 dark:decoration-gray-600"
+                  className="font-medium text-gray-700 hover:text-gray-900 transition-colors underline underline-offset-2 decoration-gray-200"
                 >
                   Jetzt starten
                 </Link>
@@ -188,27 +175,27 @@ export function ProcessSection() {
               </p>
 
               <div className="flex flex-col gap-3 mb-10">
-                {stages.map((stage, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <div
-                      className="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold flex-shrink-0"
-                      style={{ backgroundColor: `${stage.accentColor}15`, color: stage.accentColor }}
-                    >
-                      {i + 1}
+                {stages.map((stage, i) => {
+                  const Icon = stage.icon;
+                  return (
+                    <div key={i} className="flex items-center gap-3 group cursor-default">
+                      <div className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 group-hover:bg-gray-200 transition-colors">
+                        <Icon size={13} className="text-gray-500" />
+                      </div>
+                      <span className="text-[13px] text-gray-500 font-medium leading-snug">
+                        {stage.title}
+                      </span>
                     </div>
-                    <span className="text-sm text-gray-500 dark:text-gray-500 font-medium">
-                      {stage.title}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <Link
                 to="/kontakt"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-gray-100 hover:gap-3 transition-all group"
+                className="group inline-flex items-center gap-2 text-[13px] font-semibold text-gray-900 transition-all"
               >
                 Kostenloses Erstgespräch
-                <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-1" />
+                <ArrowRight size={13} className="transition-transform duration-200 group-hover:translate-x-1" />
               </Link>
             </motion.div>
           </div>
