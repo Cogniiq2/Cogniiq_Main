@@ -165,7 +165,7 @@ export function PremiumMobileNav() {
 
                 {/* HEADER */}
                 <div className="flex items-center justify-between px-6 pt-3 pb-5 flex-shrink-0">
-                  <Logo className="h-7 brightness-0 invert opacity-90" />
+                  <Logo className="h-7" variant="light" />
                   <motion.button
                     onClick={() => setIsOpen(false)}
                     className="w-8 h-8 rounded-full bg-white/[0.06] border border-white/[0.06] flex items-center justify-center"
