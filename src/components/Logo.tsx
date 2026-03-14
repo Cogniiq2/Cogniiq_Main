@@ -6,13 +6,20 @@ interface LogoProps {
   concept?: 1 | 2 | 3 | 4 | 5;
 }
 
+interface ConceptProps {
+  ink: string;
+  inkMid: string;
+  inkFaint: string;
+  className?: string;
+}
+
 // ─── CONCEPT 1 ── "Neural Chip"
 // IQ rendered as a micro-chip PCB die with pin traces.
 // The square is the chip body, "Cogni" is clean medium weight,
 // "IQ" sits inside/beside a chip die with tiny data-pin traces.
-function Concept1({ ink, inkMid, inkFaint }: { ink: string; inkMid: string; inkFaint: string }) {
+function Concept1({ ink, inkMid, inkFaint, className }: ConceptProps) {
   return (
-    <svg viewBox="0 0 180 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq">
+    <svg viewBox="0 0 180 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq" className={className} style={{ height: '100%', width: 'auto' }}>
       {/* Chip body */}
       <rect x="9" y="8" width="18" height="20" rx="2.5" stroke={ink} strokeWidth="1.4" />
 
@@ -51,9 +58,9 @@ function Concept1({ ink, inkMid, inkFaint }: { ink: string; inkMid: string; inkF
 // The mark is a rounded square (the chip) with a signal/pulse waveform
 // cut through it horizontally — like a brain EEG scan / data throughput.
 // "IQ" uses a subtle weight shift + underscore-style accent line.
-function Concept2({ ink, inkMid, inkFaint }: { ink: string; inkMid: string; inkFaint: string }) {
+function Concept2({ ink, inkMid, inkFaint, className }: ConceptProps) {
   return (
-    <svg viewBox="0 0 178 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq">
+    <svg viewBox="0 0 178 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq" className={className} style={{ height: '100%', width: 'auto' }}>
       {/* Outer ring — chip boundary */}
       <rect x="8" y="8.5" width="19" height="19" rx="4" stroke={ink} strokeWidth="1.5" />
 
@@ -89,7 +96,7 @@ function Concept2({ ink, inkMid, inkFaint }: { ink: string; inkMid: string; inkF
 // The mark is a hexagonal frame (hardware/silicon aesthetic) with
 // concentric inner structure. "IQ" rendered in a distinctly different weight
 // — heavier than "Cogni" — with a small superscript-like treatment.
-function Concept3({ ink, inkMid, inkFaint }: { ink: string; inkMid: string; inkFaint: string }) {
+function Concept3({ ink, inkMid, inkFaint, className }: ConceptProps) {
   // Hexagon points for a 18×18 hex centred at (18, 18)
   const R = 10, cx = 18, cy = 18;
   const hex = Array.from({ length: 6 }, (_, i) => {
@@ -102,7 +109,7 @@ function Concept3({ ink, inkMid, inkFaint }: { ink: string; inkMid: string; inkF
   }).join(' ');
 
   return (
-    <svg viewBox="0 0 180 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq">
+    <svg viewBox="0 0 180 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq" className={className} style={{ height: '100%', width: 'auto' }}>
       {/* Outer hex */}
       <polygon points={hex} stroke={ink} strokeWidth="1.4" />
       {/* Inner hex */}
@@ -132,9 +139,9 @@ function Concept3({ ink, inkMid, inkFaint }: { ink: string; inkMid: string; inkF
 // The original concept polished to perfection:
 // cleaner proportions, thicker outer ring, animated-feel inner arc,
 // IQ in a distinct mono/technical typeface feeling.
-function Concept4({ ink, inkMid, inkFaint }: { ink: string; inkMid: string; inkFaint: string }) {
+function Concept4({ ink, inkMid, inkFaint, className }: ConceptProps) {
   return (
-    <svg viewBox="0 0 176 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq">
+    <svg viewBox="0 0 176 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq" className={className} style={{ height: '100%', width: 'auto' }}>
       {/* Cross hairs — ultra-fine */}
       <line x1="0" y1="18" x2="8.5" y2="18" stroke={inkFaint} strokeWidth="0.9" strokeLinecap="round"/>
       <line x1="27.5" y1="18" x2="36" y2="18" stroke={inkFaint} strokeWidth="0.9" strokeLinecap="round"/>
@@ -170,9 +177,9 @@ function Concept4({ ink, inkMid, inkFaint }: { ink: string; inkMid: string; inkF
 // The mark blends a rounded square chip with a partial circle arc that
 // suggests a brain hemisphere scan. Two data-trace lines exit the chip
 // bottom like PCB traces routing to a board. Most dynamic of the five.
-function Concept5({ ink, inkMid, inkFaint }: { ink: string; inkMid: string; inkFaint: string }) {
+function Concept5({ ink, inkMid, inkFaint, className }: ConceptProps) {
   return (
-    <svg viewBox="0 0 180 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq">
+    <svg viewBox="0 0 180 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq" className={className} style={{ height: '100%', width: 'auto' }}>
       {/* Main chip square */}
       <rect x="8" y="8" width="20" height="20" rx="3.5" stroke={ink} strokeWidth="1.5" />
 
@@ -214,12 +221,12 @@ export function Logo({ className, variant = 'default', concept = 4 }: LogoProps)
   const props = { ink, inkMid, inkFaint };
 
   return (
-    <span className={cn('inline-flex items-center', className)}>
-      {concept === 1 && <Concept1 {...props} />}
-      {concept === 2 && <Concept2 {...props} />}
-      {concept === 3 && <Concept3 {...props} />}
-      {concept === 4 && <Concept4 {...props} />}
-      {concept === 5 && <Concept5 {...props} />}
-    </span>
+    <>
+      {concept === 1 && <Concept1 {...props} className={cn('w-auto', className)} />}
+      {concept === 2 && <Concept2 {...props} className={cn('w-auto', className)} />}
+      {concept === 3 && <Concept3 {...props} className={cn('w-auto', className)} />}
+      {concept === 4 && <Concept4 {...props} className={cn('w-auto', className)} />}
+      {concept === 5 && <Concept5 {...props} className={cn('w-auto', className)} />}
+    </>
   );
 }
