@@ -27,7 +27,7 @@ const SERVICES = [
   {
     icon: Zap,
     title: "Prozessautomatisierung",
-    description: "Wiederkehrende Prozesse automatisieren mit n8n, Make.com und API-Integrationen. Für Unternehmen, die täglich Zeit durch manuelle Abläufe verlieren.",
+    description: "Wiederkehrende Prozesse automatisieren mit maßgeschneiderten Workflows und API-Integrationen. Für Unternehmen, die täglich Zeit durch manuelle Abläufe verlieren.",
     benefits: [
       "Quick-Win-Automatisierungen in 1–3 Wochen",
       "Vollständig dokumentiert, wartbar",

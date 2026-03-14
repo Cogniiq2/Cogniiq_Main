@@ -1,19 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import {
-  ArrowRight,
-  MapPin,
-  Phone,
-  Zap,
-  Globe,
-  CheckCircle2,
-  ChevronRight,
-  Building2,
-  Lightbulb,
-  Users,
-  TrendingUp,
-  Shield,
-} from "lucide-react";
+import { ArrowRight, MapPin, Phone, Zap, Globe, CircleCheck as CheckCircle2, ChevronRight, Building2, Lightbulb, Users, TrendingUp, Shield } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 import { CITY_LINKS } from "@/lib/standorte-data";
@@ -57,7 +44,7 @@ const SERVICES = [
     title: "Automatisierung Deutschland",
     slug: "automatisierung",
     description:
-      "Wiederkehrende Prozesse automatisieren mit n8n, Make.com und direkten API-Integrationen. Für Unternehmen, die täglich Zeit durch manuelle Abläufe verlieren.",
+      "Wiederkehrende Prozesse automatisieren mit maßgeschneiderten Workflows und direkten API-Integrationen. Für Unternehmen, die täglich Zeit durch manuelle Abläufe verlieren.",
     benefits: [
       "Skalierbar ohne Mehrpersonal",
       "Vollständig dokumentiert, wartbar",
@@ -221,7 +208,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Welche Technologien nutzt Cogniiq für Automatisierungen?",
-    a: "Primär n8n und Make.com – je nach Anforderungen an Datenschutz, Skalierbarkeit und Budget. Bei komplexeren Anforderungen auch direkte API-Integrationen.",
+    a: "Wir setzen auf professionelle Automatisierungsplattformen – je nach Anforderungen an Datenschutz, Skalierbarkeit und Budget. Bei komplexeren Anforderungen auch direkte API-Integrationen.",
   },
   {
     q: "Wie schnell können Projekte starten?",

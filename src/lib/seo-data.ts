@@ -56,7 +56,7 @@ export const BUSINESS_INFO = {
     "Webdesign Agentur Bayreuth",
     "KI Automationen",
     "AI Rezeptionistin",
-    "Make.com Automationen",
+    "Prozessautomatisierung",
     "AI Chatbot für Unternehmen",
     "Webdesign für lokale Unternehmen",
     "Website Performance Optimierung",
@@ -87,7 +87,7 @@ export const SERVICES = [
   },
   {
     id: "ai-automation",
-    name: "Make.com Automationen",
+    name: "Prozessautomatisierung",
     description: "Automatisierte Workflows für Buchungen, Leads und Geschäftsprozesse",
     category: "AI Automation",
     url: `${BUSINESS_INFO.website}/leistungen`,
@@ -185,7 +185,7 @@ export const LOCATION_PAGES: LocationPage[] = [
 export const PAGE_META = {
   home: {
     title: "Cogniiq | AI Agentur & Webdesign Agentur Bayreuth | KI Automationen Deutschland",
-    description: "Cogniiq ist Ihre AI Agentur und Webdesign Agentur in Bayreuth. Wir bieten KI Automationen, AI Rezeptionistin, hochkonvertierende Websites und Make.com Automationen für lokale Unternehmen in ganz Deutschland.",
+    description: "Cogniiq ist Ihre AI Agentur und Webdesign Agentur in Bayreuth. Wir bieten KI Automationen, AI Rezeptionistin, hochkonvertierende Websites und Prozessautomatisierung für lokale Unternehmen in ganz Deutschland.",
     canonical: "https://cogniiq.de",
   },
   leistungen: {

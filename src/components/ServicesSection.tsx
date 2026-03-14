@@ -75,7 +75,7 @@ const services = [
     number: '04',
     title: 'Automationen & Workflows',
     description:
-      'Wir verbinden Ihre Tools zu einem System, das im Hintergrund arbeitet – Make, n8n, Zapier und maßgeschneiderte Flows.',
+      'Wir verbinden Ihre Tools zu einem System, das im Hintergrund arbeitet – maßgeschneiderte Workflows und direkte API-Integrationen.',
     icon: Workflow,
     link: '/leistungen',
     cityLinks: [
@@ -84,7 +84,7 @@ const services = [
       { label: 'Automatisierung Regensburg', href: '/regensburg/automatisierung' },
     ],
     features: [
-      'n8n & Make Szenarien für Ihre Prozesse',
+      'Individuelle Workflow-Szenarien für Ihre Prozesse',
       'Automatisierte E-Mails, Reviews & Follow-ups',
       'Reporting, Alerts & Monitoring',
       'Zuverlässige, skalierbare Infrastruktur',

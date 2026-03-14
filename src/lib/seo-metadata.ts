@@ -17,7 +17,7 @@ export function generateLocationMetadata(
 
   const description =
     customDescription ||
-    `${BUSINESS_INFO.name} ist Ihre AI Agentur und Webdesign Agentur in ${BUSINESS_INFO.address.addressLocality}. Wir bieten KI Automationen, AI Rezeptionistin, hochkonvertierende Websites und Make.com Automationen für lokale Unternehmen in ganz Deutschland.`;
+    `${BUSINESS_INFO.name} ist Ihre AI Agentur und Webdesign Agentur in ${BUSINESS_INFO.address.addressLocality}. Wir bieten KI Automationen, AI Rezeptionistin, hochkonvertierende Websites und Prozessautomatisierung für lokale Unternehmen in ganz Deutschland.`;
 
   return {
     title,

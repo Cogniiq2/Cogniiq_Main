@@ -17,7 +17,7 @@ const SERVICES = [
   {
     icon: Settings,
     title: "Workflow-Automatisierung",
-    description: "Wiederkehrende Prozesse mit n8n und Make.com automatisieren – Leadverarbeitung, Terminbestätigung, Rechnungsstellung, Kundenkommunikation.",
+    description: "Wiederkehrende Prozesse vollautomatisch abwickeln – Leadverarbeitung, Terminbestätigung, Rechnungsstellung, Kundenkommunikation.",
     benefits: [
       "Quick-Wins in 1–3 Wochen live",
       "Skalierbar ohne Mehrpersonal",
@@ -138,7 +138,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "Welche Tools können automatisiert werden?",
-    answer: "Die meisten gängigen Business-Tools: HubSpot, Pipedrive, Salesforce, Google Workspace, Microsoft 365, Calendly, Stripe, Lexoffice, Datev, Slack, und Hunderte weitere – über n8n, Make.com oder direkte APIs.",
+    answer: "Die meisten gängigen Business-Tools: HubSpot, Pipedrive, Salesforce, Google Workspace, Microsoft 365, Calendly, Stripe, Lexoffice, Datev, Slack und Hunderte weitere – über maßgeschneiderte Workflows und direkte API-Integrationen.",
   },
   {
     question: "Muss ich technisches Wissen haben?",
@@ -176,7 +176,7 @@ const automatisierungSchema = {
         "name": "Deutschland",
       },
       "serviceType": "Prozessautomatisierung",
-      "description": "Prozessautomatisierung mit n8n und Make.com für Unternehmen in Deutschland. DSGVO-konform, Quick-Wins in 1–3 Wochen, vollständig dokumentiert.",
+      "description": "Prozessautomatisierung für Unternehmen in Deutschland. DSGVO-konform, Quick-Wins in 1–3 Wochen, vollständig dokumentiert.",
     },
   ],
 };
@@ -251,7 +251,7 @@ export function AutomatisierungUnternehmen() {
         <div className="border-y border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
-              {["Quick-Wins in 1–3 Wochen", "n8n & Make.com", "DSGVO-konform", "Europäische Server", "Vollständig dokumentiert", "Skalierbar"].map((item, i) => (
+              {["Quick-Wins in 1–3 Wochen", "API-Integrationen", "DSGVO-konform", "Europäische Server", "Vollständig dokumentiert", "Skalierbar"].map((item, i) => (
                 <span key={i} className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   {i > 0 && <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" aria-hidden="true" />}
                   {item}
@@ -272,7 +272,7 @@ export function AutomatisierungUnternehmen() {
                   Deutsche Unternehmen stehen unter Druck: Fachkräftemangel, steigende Lohnkosten, wachsender Wettbewerb. Die Antwort auf alle drei Probleme ist dieselbe – Automatisierung. Prozesse, die heute manuell 30 Minuten kosten, laufen automatisch in Sekunden. Ohne Fehler, ohne Personalaufwand, ohne Urlaub.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Cogniiq automatisiert mit n8n und Make.com – den führenden Automatisierungsplattformen, die DSGVO-konform auf europäischen Servern betrieben werden können. Wir beginnen immer mit dem Prozess, der den schnellsten ROI erzeugt, und skalieren von dort aus. Von einem einzelnen Workflow zur vollständig automatisierten Geschäftsstruktur.
+                  Cogniiq automatisiert Geschäftsprozesse mit professionellen Workflow-Systemen und direkten API-Integrationen – DSGVO-konform, auf europäischen Servern betrieben. Wir beginnen immer mit dem Prozess, der den schnellsten ROI erzeugt, und skalieren von dort aus. Von einem einzelnen Workflow zur vollständig automatisierten Geschäftsstruktur.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                   Mit Projekten in{" "}

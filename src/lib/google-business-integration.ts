@@ -34,7 +34,7 @@ export function generateGooglePostsContent() {
       {
         title: "AI Automationen für Ihr Business",
         description:
-          "Automatisieren Sie wiederkehrende Aufgaben und sparen Sie Zeit mit unseren Make.com Automationen.",
+          "Automatisieren Sie wiederkehrende Aufgaben und sparen Sie Zeit mit unseren intelligenten Prozessautomatisierungen.",
         callToAction: "Jetzt beraten lassen",
         link: `${BUSINESS_INFO.website}#kontakt`,
       },
@@ -107,7 +107,7 @@ export const GOOGLE_BUSINESS_SETUP_GUIDE = {
       description: "List your services with descriptions",
       services: [
         "Webdesign & Website Development",
-        "AI Automationen & Make.com Integration",
+        "AI Automationen & Prozessautomatisierung",
         "AI Rezeptionistin & Chatbots",
         "AI Content Creation",
         "SEO Optimization",

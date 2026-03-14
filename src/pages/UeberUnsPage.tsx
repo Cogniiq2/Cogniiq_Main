@@ -112,7 +112,7 @@ const FOUNDERS = [
     description:
       "Spezialisierung auf KI-Automatisierung, Prozesssysteme und technische Integrationen für effiziente Geschäftsabläufe. Konzipiert und implementiert Systemarchitekturen, die operative Abläufe dauerhaft entlasten — präzise, skalierbar und ohne unnötige Komplexität.",
     expertise: [
-      "n8n & KI-Workflow-Architekturen",
+      "KI-Workflow-Architekturen & Automatisierung",
       "API-Integrationen & System-Orchestrierung",
       "KI-Telefonassistenten & Voice-Systeme",
       "Prozessanalyse & Automatisierungsstrategie",

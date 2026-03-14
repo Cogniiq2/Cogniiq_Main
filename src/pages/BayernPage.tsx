@@ -1,19 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import {
-  ArrowRight,
-  MapPin,
-  Phone,
-  Zap,
-  Globe,
-  CheckCircle2,
-  ChevronRight,
-  Building2,
-  Users,
-  TrendingUp,
-  Shield,
-  Lightbulb,
-} from "lucide-react";
+import { ArrowRight, MapPin, Phone, Zap, Globe, CircleCheck as CheckCircle2, ChevronRight, Building2, Users, TrendingUp, Shield, Lightbulb } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 import { CITY_LINKS } from "@/lib/standorte-data";
@@ -45,7 +32,7 @@ const SERVICES_OVERVIEW = [
     title: "Automatisierung Bayern",
     slug: "automatisierung",
     description:
-      "Wiederkehrende Prozesse mit n8n, Make.com und direkten API-Integrationen automatisieren. Einmalig eingerichtet, dauerhaft entlastend, vollständig dokumentiert.",
+      "Wiederkehrende Prozesse mit maßgeschneiderten Workflows und direkten API-Integrationen automatisieren. Einmalig eingerichtet, dauerhaft entlastend, vollständig dokumentiert.",
     benefits: [
       "Zeitersparnis täglich ab dem ersten Tag",
       "Fehlerreduktion durch saubere Datenflüsse",

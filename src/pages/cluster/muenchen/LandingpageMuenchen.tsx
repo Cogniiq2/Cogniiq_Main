@@ -52,7 +52,7 @@ const config: ClusterPageConfig = {
       "Google Analytics 4 Conversion-Tracking vollständig eingerichtet",
       "DSGVO-konformes Setup",
       "A/B-Test-ready Grundstruktur",
-      "Optional: CRM-Anbindung, Hubspot-Integration, Zapier-Workflow",
+      "Optional: CRM-Anbindung, Hubspot-Integration, Workflow-Automatisierung",
       "Übergabe mit Bearbeitungszugang",
     ],
   },

@@ -216,17 +216,17 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     route: "/bayreuth/automatisierung",
     seo: {
       title: "Automatisierung Bayreuth – Prozessautomatisierung & Workflows | Cogniiq",
-      description: "Prozessautomatisierung für Unternehmen in Bayreuth: n8n, Make.com & API-Workflows. Buchungen, CRM, Leads, Rechnungen automatisieren. Persönliche Betreuung vor Ort.",
+      description: "Prozessautomatisierung für Unternehmen in Bayreuth: Workflows & API-Integrationen. Buchungen, CRM, Leads, Rechnungen automatisieren. Persönliche Betreuung vor Ort.",
       canonical: `${base}/bayreuth/automatisierung`,
     },
     intro: {
       h1: "Automatisierung für Unternehmen in Bayreuth",
-      lead: "Wiederkehrende Prozesse kosten täglich Zeit und binden Personal, das Sie anderswo dringend brauchen. Mit gezielter Prozessautomatisierung – auf Basis von n8n, Make.com oder direkten API-Integrationen – lösen wir diese Engpässe einmalig und dauerhaft.",
+      lead: "Wiederkehrende Prozesse kosten täglich Zeit und binden Personal, das Sie anderswo dringend brauchen. Mit gezielter Prozessautomatisierung – auf Basis maßgeschneiderter Workflows und direkter API-Integrationen – lösen wir diese Engpässe einmalig und dauerhaft.",
     },
     localIntro: {
       paragraphs: [
         "In Bayreuth arbeiten viele kleine und mittelständische Unternehmen – Handwerksbetriebe, Dienstleister, Arztpraxen, Gastronomie – mit gewachsenen Software-Landschaften, die über die Jahre entstanden sind. Das Ergebnis sind Systeme, die nicht miteinander kommunizieren: Daten werden manuell von einer Anwendung in die nächste übertragen, Buchungsbestätigungen per Hand verschickt, CRM-Einträge nach jedem Telefonat neu angelegt. Diese Prozesse kosten täglich Stunden, die für Kernaufgaben fehlen.",
-        "Cogniiq analysiert, welche Abläufe in Ihrem Betrieb in Bayreuth automatisiert werden können – und setzt die Lösungen mit marktführenden Tools wie n8n und Make.com um. Das Ergebnis sind zuverlässige Workflows, die vollständig im Hintergrund laufen: Buchungsbestätigungen, die automatisch ausgehen. Leads, die direkt qualifiziert ins CRM wandern. Rechnungen, die sich selbst erstellen. Fehlerbenachrichtigungen, die sofort informieren, wenn etwas schiefläuft.",
+        "Cogniiq analysiert, welche Abläufe in Ihrem Betrieb in Bayreuth automatisiert werden können – und setzt die Lösungen mit marktführenden Automatisierungsplattformen und direkten API-Integrationen um. Das Ergebnis sind zuverlässige Workflows, die vollständig im Hintergrund laufen: Buchungsbestätigungen, die automatisch ausgehen. Leads, die direkt qualifiziert ins CRM wandern. Rechnungen, die sich selbst erstellen. Fehlerbenachrichtigungen, die sofort informieren, wenn etwas schiefläuft.",
         "Ein entscheidender Vorteil gegenüber anonymen Online-Agenturen: Als Anbieter mit Hauptsitz in Bayreuth kennen wir die lokalen Betriebsrealitäten. Wir verstehen, wie ein Handwerksbetrieb in Oberfranken tickt, was eine Arztpraxis im Stadtgebiet täglich belastet und wo der Einzelhandel seine Zeitverluste hat. Diese lokale Perspektive fließt direkt in die Konzeption der Automatisierungen ein.",
         "Schrittweise Umsetzung ist unser Standard: Wir beginnen mit dem Prozess, der die meiste Zeit kostet, setzen ihn sauber um und zeigen das Ergebnis, bevor wir weitermachen. Keine Black Boxes, keine Systeme, die nur wir verstehen. Jede Automatisierung wird vollständig dokumentiert, sodass Ihr Team bei Bedarf einfache Anpassungen selbst vornehmen kann.",
         "Neben der Automatisierung bieten wir in Bayreuth auch den [KI Telefonassistenten](/bayreuth/ki-telefonassistent) sowie professionelles [Webdesign für Bayreuth](/bayreuth/webdesign) an – drei Bausteine, die sich ideal ergänzen und zusammen die digitale Basis eines modernen lokalen Unternehmens bilden. Alle Lösungen sind DSGVO-konform und werden ausschließlich auf europäischen Servern betrieben.",
@@ -264,7 +264,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { number: "04", title: "Go-Live & Optimierung", description: "Deployment, Einweisung Ihres Teams und vollständige Dokumentation. Sie verstehen, was läuft – und können einfache Anpassungen selbst vornehmen. Bei Fragen sind wir direkt erreichbar." },
     ],
     faq: [
-      { question: "Welche Tools nutzt Cogniiq für Automatisierungen in Bayreuth?", answer: "Primär n8n und Make.com (ehemals Integromat), bei Bedarf auch direkte API-Integrationen, Zapier oder Pipedream. Wir empfehlen immer das Tool, das langfristig am sinnvollsten für Ihren Betrieb ist – nicht das teuerste." },
+      { question: "Welche Tools nutzt Cogniiq für Automatisierungen in Bayreuth?", answer: "Wir setzen auf professionelle, DSGVO-konforme Automatisierungsplattformen und direkte API-Integrationen. Wir empfehlen immer die Lösung, die langfristig am sinnvollsten für Ihren Betrieb ist – nicht die teuerste." },
       { question: "Brauche ich technisches Vorwissen für Prozessautomatisierung?", answer: "Nein. Wir übernehmen den vollständigen Aufbau und erklären Ihnen das Ergebnis in verständlichen Worten. Nach der Übergabe können Sie einfache Änderungen selbst vornehmen." },
       { question: "Was kostet Prozessautomatisierung in Bayreuth?", answer: "Das hängt von der Komplexität ab. Einfache Workflows starten ab ca. 500–1.500 €, komplexere Projekte nach Aufwand. Das Erstgespräch und eine erste Einschätzung sind kostenlos und unverbindlich." },
       { question: "Wie sicher sind die automatisierten Workflows?", answer: "Wir bauen ausschließlich auf etablierte, sicherheitszertifizierte Plattformen. Sensible Daten verlassen Europa nicht ohne Ihre ausdrückliche Zustimmung. Alle Workflows sind DSGVO-konform." },
@@ -274,7 +274,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { question: "Für welche Unternehmensgrößen lohnt sich Automatisierung in Bayreuth?", answer: "Ab etwa 3–5 Mitarbeitern gibt es fast immer Prozesse, die sich lohnen zu automatisieren und sich schnell amortisieren. Wir schauen uns das gemeinsam an – ohne Verkaufsdruck." },
       { question: "Wie lange dauert die Einrichtung einer Automatisierung?", answer: "Einfache Workflows können innerhalb einer Woche live gehen. Komplexere Projekte mit mehreren integrierten Systemen dauern typisch 2–4 Wochen. Realistischer Zeitplan nach der Analyse." },
       { question: "Kann ich Automatisierungen auch für saisonale Prozesse nutzen?", answer: "Ja. Workflows können zeitbasiert aktiviert und deaktiviert werden – z. B. für die Bayreuth Festspielzeit, saisonale Öffnungszeiten oder Jahresendkampagnen." },
-      { question: "Was ist der Unterschied zwischen n8n und Make.com?", answer: "Beide sind leistungsfähige Automatisierungsplattformen. n8n ist self-hosted und bietet maximale Datenkontrolle, Make.com ist cloud-basiert und einsteigerfreundlicher. Wir wählen je nach Ihren Anforderungen und Datenschutzbedürfnissen das passende Tool." },
+      { question: "Welche Automatisierungsplattform ist die richtige für meinen Betrieb?", answer: "Das hängt von Ihren Anforderungen ab: Datenschutz, Skalierbarkeit und Komplexität der Prozesse. Wir beraten unabhängig und wählen gemeinsam mit Ihnen die Lösung, die langfristig am besten passt." },
       { question: "Bietet Cogniiq auch laufende Betreuung nach dem Go-Live?", answer: "Ja. Auf Wunsch übernehmen wir einen Support-Vertrag für regelmäßige Wartung, Updates und Erweiterungen. Alternativ übergeben wir vollständig und sind bei Bedarf erreichbar." },
     ],
     localChallenges: [
@@ -600,7 +600,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     route: "/regensburg/automatisierung",
     seo: {
       title: "Automatisierung Regensburg – Prozessautomatisierung & Workflows | Cogniiq",
-      description: "Prozessautomatisierung für Unternehmen in Regensburg: n8n & Make.com Workflows, CRM-Integration, Leadverarbeitung. Wartbar, DSGVO-konform, persönliche Betreuung.",
+      description: "Prozessautomatisierung für Unternehmen in Regensburg: Workflows & CRM-Integration, Leadverarbeitung. Wartbar, DSGVO-konform, persönliche Betreuung.",
       canonical: `${base}/regensburg/automatisierung`,
     },
     intro: {
@@ -610,7 +610,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     localIntro: {
       paragraphs: [
         "Regensburg ist ein bedeutender Wirtschaftsstandort in Bayern: Industrie, Mittelstand, Gastronomie, Tourismus und eine dynamische Start-up-Szene prägen die Stadt gleichermaßen. Viele dieser Unternehmen sind in den letzten Jahren schnell gewachsen – und haben dabei eine IT-Infrastruktur aufgebaut, die nicht mitwächst. Insellösungen kommunizieren nicht miteinander, Prozesse werden doppelt geführt, und manuelle Datenübertragung zwischen Systemen frisst täglich wertvolle Zeit.",
-        "Cogniiq löst dieses Problem mit gezielter Geschäftsprozess-Automatisierung: Wir analysieren, welche Abläufe in Ihrem Regensburger Unternehmen automatisiert werden können, und welche Tools und Integrationen dafür am sinnvollsten sind. Das Ergebnis sind stabile, vollständig dokumentierte Workflows auf Basis von n8n oder Make.com – die im Hintergrund laufen, ohne dass jemand täglich daran denken muss.",
+        "Cogniiq löst dieses Problem mit gezielter Geschäftsprozess-Automatisierung: Wir analysieren, welche Abläufe in Ihrem Regensburger Unternehmen automatisiert werden können, und welche Integrationen dafür am sinnvollsten sind. Das Ergebnis sind stabile, vollständig dokumentierte Workflows – die im Hintergrund laufen, ohne dass jemand täglich daran denken muss.",
         "Von der automatischen Buchungsbestätigung für Regensburger Gastronomiebetriebe über die CRM-Synchronisation für mittelständische Dienstleister bis zur automatisierten Rechnungsstellung für Handwerksbetriebe im Landkreis Regensburg: Wir starten dort, wo der Hebel am größten ist, und bauen das System so, dass es mit Ihrem Unternehmen wachsen kann.",
         "Als Automatisierungs-Agentur mit bayerischer Verwurzelung bringen wir nicht nur technisches Know-how mit, sondern auch das Verständnis für mittelständische Prozessrealitäten. Wir erklären keine Konzepte – wir analysieren Ihren Betrieb, priorisieren nach ROI und liefern Ergebnisse, die spürbar sind.",
         "Die Kombination aus Prozessautomatisierung und [KI Telefonassistent für Regensburg](/regensburg/ki-telefonassistent) sowie professionellem [Webdesign für Regensburg](/regensburg/webdesign) schafft eine vollständige digitale Betriebsinfrastruktur. Alle Lösungen werden DSGVO-konform umgesetzt und sind auf den langfristigen Betrieb ausgelegt.",
@@ -972,7 +972,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     locationNote: "Cogniiq betreut Automatisierungsprojekte für Unternehmen in München vollständig remote – transparent, effizient, ohne Qualitätseinbußen.",
     seo: {
       title: "Automatisierung München – Prozessautomatisierung & Workflows | Cogniiq",
-      description: "Prozessautomatisierung für Unternehmen in München: n8n & Make.com Workflows, ERP-Integration, Leadverarbeitung. Remote betreut, skalierbar, DSGVO-konform. Kein Münchner Overhead.",
+      description: "Prozessautomatisierung für Unternehmen in München: Workflows & ERP-Integration, Leadverarbeitung. Remote betreut, skalierbar, DSGVO-konform. Kein Münchner Overhead.",
       canonical: `${base}/muenchen/automatisierung`,
     },
     intro: {
@@ -983,14 +983,14 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       paragraphs: [
         "München ist ein Ausnahmestandort für Prozessautomatisierung: Schnell wachsende Startups brauchen von Anfang an skalierbare Prozesse. Mittelständler kämpfen mit gewachsenen Tool-Landschaften und manuellen Brücken zwischen Systemen. Konzerne digitalisieren einzelne Abteilungen ohne das große IT-Projekt anzufassen. Und Premium-Dienstleister wollen Effizienz, ohne Qualität und Markenwahrnehmung zu kompromittieren. Cogniiq liefert für alle diese Szenarien präzise Automatisierungslösungen.",
         "Als Automatisierungs-Agentur, die Münchner Unternehmen vollständig remote betreut, kombinieren wir das technische Know-how einer spezialisierten Agentur mit den Preisstrukturen, die großen Münchner Agenturen mit teurer Büromiete fehlen. Die Zusammenarbeit läuft über Video-Calls, geteilte Boards und vollständig dokumentierte Konzepte – genauso professionell wie vor Ort, ohne Fahrtzeiten und ohne Overhead-Kosten.",
-        "Unsere primären Plattformen für Workflow-Automatisierung in München sind n8n und Make.com – je nach Ihren Anforderungen an Datenschutz, Skalierbarkeit und Kosten empfehlen wir das passende Tool. Bei komplexen ERP-Integrationen oder spezifischen API-Anforderungen entwickeln wir auch direkte Schnittstellen. Alle Lösungen sind vollständig dokumentiert und so gebaut, dass sie Ihr Team versteht und selbst warten kann.",
+        "Für Workflow-Automatisierung in München setzen wir auf professionelle, skalierbare Plattformen – je nach Ihren Anforderungen an Datenschutz, Skalierbarkeit und Kosten empfehlen wir die passende Lösung. Bei komplexen ERP-Integrationen oder spezifischen API-Anforderungen entwickeln wir auch direkte Schnittstellen. Alle Lösungen sind vollständig dokumentiert und so gebaut, dass sie Ihr Team versteht und selbst warten kann.",
         "Was den Münchner Markt besonders macht: Personalkosten sind die höchsten in Deutschland – jede Stunde, die durch Automatisierung eingespart wird, hat hier den höchsten ROI. Ein Workflow, der täglich 2 Stunden Arbeit ersetzt, amortisiert sich in München schneller als in jeder anderen deutschen Stadt. Das macht Automatisierungsinvestitions in München besonders attraktiv.",
         "Neben der Automatisierung bieten wir für München auch den [KI Telefonassistenten für München](/muenchen/ki-telefonassistent) und professionelles [Webdesign für München](/muenchen/webdesign) an. Unternehmen, die alle drei Bereiche kombinieren, haben im Münchner Wettbewerbsmarkt einen messbaren operativen Vorteil.",
       ],
     },
     warumCogniiq: [
       "Kein Münchner Agentur-Overhead – direkte Zusammenarbeit, faire Preise",
-      "Technologieoffene Beratung: n8n, Make.com, Zapier, direkte APIs – je nach Bedarf",
+      "Technologieoffene Beratung: professionelle Plattformen und direkte APIs – je nach Bedarf",
       "Saubere Dokumentation, die Ihr Team versteht und nutzen kann",
       "DSGVO-konforme Verarbeitung auf europäischen Servern – kein Datenschutz-Risiko",
       "Erfahrung mit Skalierung: von 5 bis 500 automatisierten Prozessen",
@@ -1027,7 +1027,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { question: "Was wenn sich unsere Prozesse ändern?", answer: "Wir passen die Automatisierungen an. Durch vollständige Dokumentation können einfache Änderungen auch intern vorgenommen werden." },
       { question: "Wie lange dauert ein Automatisierungsprojekt in München?", answer: "Einfache Workflows: 1–2 Wochen. Komplexe Integrationen: 4–8 Wochen. Realistischer Zeitplan nach der Analyse." },
       { question: "Welche Branchen in München betreut ihr?", answer: "Startups, Scaleups, E-Commerce, Beratung, Finanzdienstleistung, Mittelstand, Medizintechnik und SaaS – wir passen uns Ihrer Branche an." },
-      { question: "Ist n8n oder Make.com besser für Münchner Unternehmen?", answer: "Kommt auf die Anforderungen an. n8n bietet maximale Datenkontrolle und ist self-hosted möglich. Make.com ist einfacher in der Handhabung und cloud-basiert. Wir empfehlen nach Ihrer Situation." },
+      { question: "Welche Automatisierungsplattform ist die richtige für mein Unternehmen in München?", answer: "Das hängt von Ihren Anforderungen ab: Datenschutzbedürfnisse, Skalierbarkeit und technische Komplexität. Wir beraten unabhängig und empfehlen die Lösung, die langfristig am besten zu Ihrem Unternehmen passt." },
       { question: "Wie hoch ist der ROI von Automatisierungen in München?", answer: "Durch die hohen Personalkosten in München amortisieren sich Automatisierungen schneller als in anderen Städten. Ein Workflow, der täglich 2 Stunden Arbeit ersetzt, zahlt sich bei Münchner Lohnniveau oft in wenigen Monaten." },
       { question: "Bietet Cogniiq auch laufende Wartung an?", answer: "Ja. Auf Wunsch übernehmen wir laufenden Support, Updates und Erweiterungen – mit definierten Reaktionszeiten." },
     ],

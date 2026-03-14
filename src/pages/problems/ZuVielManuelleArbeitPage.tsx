@@ -46,7 +46,7 @@ const config: ProblemPageConfig = {
   },
   solution: {
     headline: "Automatisierung, die sofort Zeit freisetzt.",
-    text: "Cogniiq automatisiert die zeitaufwändigsten Prozesse Ihres Unternehmens mit n8n und Make.com – DSGVO-konform, auf europäischen Servern, vollständig dokumentiert. Die meisten Workflows sind in 1–3 Wochen live.",
+    text: "Cogniiq automatisiert die zeitaufwändigsten Prozesse Ihres Unternehmens – DSGVO-konform, auf europäischen Servern, vollständig dokumentiert. Die meisten Workflows sind in 1–3 Wochen live.",
     bullets: [
       "Lead-Management vollständig automatisiert",
       "Terminbestätigung und Erinnerungen automatisch",

@@ -101,7 +101,7 @@ const config: CostPageConfig = {
     },
     {
       question: "Welche Tools nutzt Cogniiq für Automatisierungen?",
-      answer: "Wir arbeiten primär mit n8n und Make.com – beides DSGVO-konforme Tools, die auf europäischen Servern betrieben werden können. Bei spezifischen Anforderungen auch direkte API-Integrationen.",
+      answer: "Wir setzen auf professionelle, DSGVO-konforme Automatisierungsplattformen, die auf europäischen Servern betrieben werden. Bei spezifischen Anforderungen auch direkte API-Integrationen.",
     },
     {
       question: "Kann ich die Automatisierung später selbst anpassen?",

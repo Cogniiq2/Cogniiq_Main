@@ -43,7 +43,7 @@ const faqItems = [
   },
   {
     question: "Welche Systeme können integriert werden?",
-    answer: "Der Assistent verbindet sich mit Google Calendar, Outlook, gängigen CRM-Systemen sowie Automationstools wie Make oder Zapier. Die Integration erfolgt ohne technischen Aufwand für Ihr Team.",
+    answer: "Der Assistent verbindet sich mit Google Calendar, Outlook, gängigen CRM-Systemen sowie bestehenden Automatisierungs-Workflows. Die Integration erfolgt ohne technischen Aufwand für Ihr Team.",
   },
   {
     question: "Ist der KI Telefonassistent DSGVO-konform?",
