@@ -1,26 +1,48 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Home,
-  Briefcase,
-  Users,
-  HelpCircle,
-  Mail,
-  MapPin,
-  ChevronDown,
-  X,
-  ArrowRight,
-} from 'lucide-react';
+import { Chrome as Home, Briefcase, Users, CircleHelp as HelpCircle, Mail, MapPin, ChevronDown, X, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { CITY_LINKS } from '@/lib/standorte-data';
 import { Logo } from '@/components/Logo';
 
 const navItems = [
   { label: 'Home', icon: Home, path: '/' },
-  { label: 'Leistungen', icon: Briefcase, path: '/leistungen' },
   { label: 'Über uns', icon: Users, path: '/ueber-uns' },
   { label: 'FAQ', icon: HelpCircle, path: '/faq' },
   { label: 'Kontakt', icon: Mail, path: '/kontakt' },
+];
+
+const leistungenItems = [
+  {
+    group: 'Webdesign',
+    links: [
+      { label: 'Webdesign Agentur Deutschland', href: '/webdesign-agentur-deutschland' },
+      { label: 'Für Arztpraxen', href: '/webdesign-arzt' },
+      { label: 'Für Gastronomie', href: '/webdesign-gastronomie' },
+      { label: 'Für Immobilien', href: '/webdesign-immobilien' },
+      { label: 'Für Hotels', href: '/webdesign-hotel' },
+      { label: 'Kosten Webdesign', href: '/kosten-webdesign' },
+    ],
+  },
+  {
+    group: 'KI-Telefonassistent',
+    links: [
+      { label: 'KI-Agentur Deutschland', href: '/ki-agentur-deutschland' },
+      { label: 'Für Arztpraxen', href: '/ki-telefonassistent-arzt' },
+      { label: 'Für Restaurants', href: '/ki-telefonassistent-restaurant' },
+      { label: 'Für Hotels', href: '/ki-telefonassistent-hotel' },
+      { label: 'Demo anhören', href: '/ki-telefonassistent/demo' },
+    ],
+  },
+  {
+    group: 'Automatisierung',
+    links: [
+      { label: 'Automatisierung Unternehmen', href: '/automatisierung-unternehmen' },
+      { label: 'Für Restaurants', href: '/automatisierung-restaurant' },
+      { label: 'Für Arztpraxen', href: '/automatisierung-arzt' },
+      { label: 'Kosten Automatisierung', href: '/kosten-automatisierung' },
+    ],
+  },
 ];
 
 const cityEntries = Object.entries(CITY_LINKS) as Array<[string, typeof CITY_LINKS[keyof typeof CITY_LINKS]]>;
@@ -33,19 +55,30 @@ export function PremiumMobileNav() {
   const touchStartY = useRef(0);
   const touchEndY = useRef(0);
 
+  const [showLeistungen, setShowLeistungen] = useState(false);
+
   const isStandortePage =
     location.pathname.startsWith('/bayreuth') ||
     location.pathname.startsWith('/regensburg') ||
     location.pathname.startsWith('/muenchen') ||
     location.pathname === '/bayern';
 
+  const isLeistungePage =
+    location.pathname.startsWith('/webdesign') ||
+    location.pathname.startsWith('/ki-') ||
+    location.pathname.startsWith('/automatisierung') ||
+    location.pathname.startsWith('/kosten-') ||
+    location.pathname === '/leistungen';
+
   const currentLabel =
     navItems.find((i) => i.path === location.pathname)?.label ||
-    (isStandortePage ? 'Standorte' : null);
+    (isStandortePage ? 'Standorte' : null) ||
+    (isLeistungePage ? 'Leistungen' : null);
 
   useEffect(() => {
     setIsOpen(false);
     setShowStandorte(false);
+    setShowLeistungen(false);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -199,6 +232,91 @@ export function PremiumMobileNav() {
                       );
                     })}
                   </nav>
+
+                  {/* DIVIDER */}
+                  <div className="h-px bg-white/[0.05] mx-4 mb-4" />
+
+                  {/* LEISTUNGEN SECTION */}
+                  <div className="mb-2">
+                    <motion.button
+                      onClick={() => setShowLeistungen(!showLeistungen)}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: navItems.length * 0.04, duration: 0.28 }}
+                      className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all group ${
+                        isLeistungePage ? 'bg-white/[0.07]' : 'hover:bg-white/[0.04]'
+                      }`}
+                      whileTap={{ scale: 0.985 }}
+                    >
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-colors ${
+                        isLeistungePage
+                          ? 'bg-white/10 border-white/10'
+                          : 'bg-white/[0.04] border-white/[0.05] group-hover:bg-white/[0.07]'
+                      }`}>
+                        <Briefcase
+                          size={18}
+                          className={isLeistungePage ? 'text-white' : 'text-white/40 group-hover:text-white/60 transition-colors'}
+                        />
+                      </div>
+                      <span className={`flex-1 text-left text-[15px] font-medium transition-colors ${
+                        isLeistungePage ? 'text-white' : 'text-white/50 group-hover:text-white/80'
+                      }`}>
+                        Leistungen
+                      </span>
+                      <motion.div animate={{ rotate: showLeistungen ? 180 : 0 }} transition={{ duration: 0.22 }}>
+                        <ChevronDown size={16} className="text-white/25" />
+                      </motion.div>
+                    </motion.button>
+
+                    <AnimatePresence>
+                      {showLeistungen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                          className="overflow-hidden"
+                        >
+                          <div className="pt-2 pb-1 px-2 space-y-4">
+                            {leistungenItems.map((group, gi) => (
+                              <motion.div
+                                key={group.group}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.05 + gi * 0.04 }}
+                              >
+                                <p className="text-[10px] font-semibold text-white/25 uppercase tracking-[0.12em] px-4 mb-1.5">
+                                  {group.group}
+                                </p>
+                                <div className="space-y-0.5">
+                                  {group.links.map((link) => {
+                                    const isActive = location.pathname === link.href;
+                                    return (
+                                      <button
+                                        key={link.href}
+                                        onClick={() => go(link.href)}
+                                        className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all ${
+                                          isActive
+                                            ? 'bg-white/[0.07] text-white'
+                                            : 'text-white/40 hover:bg-white/[0.04] hover:text-white/70'
+                                        }`}
+                                      >
+                                        <div className={`w-1 h-1 rounded-full flex-shrink-0 ${
+                                          isActive ? 'bg-white/60' : 'bg-white/15'
+                                        }`} />
+                                        <span className="text-[13px] font-medium text-left">{link.label}</span>
+                                        <ArrowUpRight size={11} className="ml-auto text-white/15 flex-shrink-0" />
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
 
                   {/* DIVIDER */}
                   <div className="h-px bg-white/[0.05] mx-4 mb-4" />
