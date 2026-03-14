@@ -45,9 +45,10 @@ const SERVICES = [
       { label: "Regensburg", href: "/regensburg" },
     ],
     branchenLinks: [
-      { label: "Webdesign Arzt Bayreuth", href: "/webdesign-arzt-bayreuth" },
-      { label: "Webdesign Gastronomie München", href: "/webdesign-gastronomie-muenchen" },
-      { label: "Webdesign Immobilien Regensburg", href: "/webdesign-immobilien-regensburg" },
+      { label: "Webdesign Gastronomie", href: "/webdesign-gastronomie" },
+      { label: "Webdesign Arzt", href: "/webdesign-arzt" },
+      { label: "Webdesign Immobilien", href: "/webdesign-immobilien" },
+      { label: "Webdesign Kosten", href: "/kosten-webdesign" },
     ],
   },
   {
@@ -62,16 +63,17 @@ const SERVICES = [
       "Intelligente Weiterleitung und Eskalationslogik",
       "Synchronisation mit Kalender und CRM",
     ],
-    usecases: ["Praxis & Klinik", "Immobilienmakler"],
+    usecases: ["Praxis & Klinik", "Gastronomie & Hotel"],
     cities: [
       { label: "Bayreuth", href: "/bayreuth" },
       { label: "München", href: "/muenchen" },
       { label: "Regensburg", href: "/regensburg" },
     ],
     branchenLinks: [
-      { label: "Arzt-System Bayreuth", href: "/webdesign-arzt-bayreuth" },
-      { label: "Arzt-System München", href: "/webdesign-arzt-muenchen" },
-      { label: "Arzt-System Regensburg", href: "/webdesign-arzt-regensburg" },
+      { label: "KI Telefonassistent Arzt", href: "/ki-telefonassistent-arzt" },
+      { label: "KI Telefonassistent Restaurant", href: "/ki-telefonassistent-restaurant" },
+      { label: "KI Telefonassistent Hotel", href: "/ki-telefonassistent-hotel" },
+      { label: "KI Telefonassistent Kosten", href: "/kosten-ki-telefonassistent" },
     ],
   },
   {
@@ -86,16 +88,17 @@ const SERVICES = [
       "Prozess-Workflows mit Eskalations- und SLA-Logik",
       "Monitoring, Logging und Ausfall-Absicherung",
     ],
-    usecases: ["Sportanlagen & Studios", "E-Commerce & Marken"],
+    usecases: ["Restaurants & Gastronomie", "Arztpraxen & Therapeuten"],
     cities: [
       { label: "Bayreuth", href: "/bayreuth" },
       { label: "München", href: "/muenchen" },
       { label: "Regensburg", href: "/regensburg" },
     ],
     branchenLinks: [
-      { label: "Gastronomie-System Bayreuth", href: "/webdesign-gastronomie-bayreuth" },
-      { label: "Gastronomie-System München", href: "/webdesign-gastronomie-muenchen" },
-      { label: "Gastronomie-System Regensburg", href: "/webdesign-gastronomie-regensburg" },
+      { label: "Automatisierung Restaurant", href: "/automatisierung-restaurant" },
+      { label: "Automatisierung Arzt", href: "/automatisierung-arzt" },
+      { label: "Automatisierung Immobilien", href: "/automatisierung-immobilien" },
+      { label: "Automatisierung Kosten", href: "/kosten-automatisierung" },
     ],
   },
 ];

@@ -48,6 +48,30 @@ import { AnfrageErhaltenPage } from './pages/AnfrageErhaltenPage';
 import { KiTelefonassistentPage } from './pages/KiTelefonassistentPage';
 import { KiTelefonassistentDemoPage } from './pages/KiTelefonassistentDemoPage';
 import { BayernKiTelefonassistentPage } from './pages/BayernKiTelefonassistentPage';
+import { KostenWebdesign } from './pages/costs/KostenWebdesign';
+import { KostenKiTelefonassistent } from './pages/costs/KostenKiTelefonassistent';
+import { KostenAutomatisierung } from './pages/costs/KostenAutomatisierung';
+import { WebdesignGastronomie } from './pages/industries/WebdesignGastronomie';
+import { WebdesignArzt } from './pages/industries/WebdesignArzt';
+import { WebdesignImmobilien } from './pages/industries/WebdesignImmobilien';
+import { WebdesignHotel } from './pages/industries/WebdesignHotel';
+import { WebdesignSport } from './pages/industries/WebdesignSport';
+import { KiTelefonassistentArzt } from './pages/industries/KiTelefonassistentArzt';
+import { KiTelefonassistentRestaurant } from './pages/industries/KiTelefonassistentRestaurant';
+import { KiTelefonassistentHotel } from './pages/industries/KiTelefonassistentHotel';
+import { KiTelefonassistentPraxis } from './pages/industries/KiTelefonassistentPraxis';
+import { AutomatisierungRestaurant } from './pages/industries/AutomatisierungRestaurant';
+import { AutomatisierungArzt } from './pages/industries/AutomatisierungArzt';
+import { AutomatisierungImmobilien } from './pages/industries/AutomatisierungImmobilien';
+import { AutomatisierungSport } from './pages/industries/AutomatisierungSport';
+import { VerpassteAnrufePage } from './pages/problems/VerpassteAnrufePage';
+import { KeineAnfragenWebsitePage } from './pages/problems/KeineAnfragenWebsitePage';
+import { KeineTerminbuchungPage } from './pages/problems/KeineTerminbuchungPage';
+import { ZuVielManuelleArbeitPage } from './pages/problems/ZuVielManuelleArbeitPage';
+import { DigitaleAutomatisierungPage } from './pages/problems/DigitaleAutomatisierungPage';
+import { WebdesignAgenturDeutschland } from './pages/pillars/WebdesignAgenturDeutschland';
+import { KiAgenturDeutschland } from './pages/pillars/KiAgenturDeutschland';
+import { AutomatisierungUnternehmen } from './pages/pillars/AutomatisierungUnternehmen';
 
 function App() {
   return (
@@ -108,6 +132,30 @@ function App() {
                 element={<CityServicePage config={config} />}
               />
             ))}
+            <Route path="/kosten-webdesign" element={<KostenWebdesign />} />
+            <Route path="/kosten-ki-telefonassistent" element={<KostenKiTelefonassistent />} />
+            <Route path="/kosten-automatisierung" element={<KostenAutomatisierung />} />
+            <Route path="/webdesign-gastronomie" element={<WebdesignGastronomie />} />
+            <Route path="/webdesign-arzt" element={<WebdesignArzt />} />
+            <Route path="/webdesign-immobilien" element={<WebdesignImmobilien />} />
+            <Route path="/webdesign-hotel" element={<WebdesignHotel />} />
+            <Route path="/webdesign-sport" element={<WebdesignSport />} />
+            <Route path="/ki-telefonassistent-arzt" element={<KiTelefonassistentArzt />} />
+            <Route path="/ki-telefonassistent-restaurant" element={<KiTelefonassistentRestaurant />} />
+            <Route path="/ki-telefonassistent-hotel" element={<KiTelefonassistentHotel />} />
+            <Route path="/ki-telefonassistent-praxis" element={<KiTelefonassistentPraxis />} />
+            <Route path="/automatisierung-restaurant" element={<AutomatisierungRestaurant />} />
+            <Route path="/automatisierung-arzt" element={<AutomatisierungArzt />} />
+            <Route path="/automatisierung-immobilien" element={<AutomatisierungImmobilien />} />
+            <Route path="/automatisierung-sport" element={<AutomatisierungSport />} />
+            <Route path="/verpasste-anrufe-verlust" element={<VerpassteAnrufePage />} />
+            <Route path="/keine-anfragen-website" element={<KeineAnfragenWebsitePage />} />
+            <Route path="/keine-terminbuchung-online" element={<KeineTerminbuchungPage />} />
+            <Route path="/zu-viel-manuelle-arbeit" element={<ZuVielManuelleArbeitPage />} />
+            <Route path="/digitale-automatisierung-unternehmen" element={<DigitaleAutomatisierungPage />} />
+            <Route path="/webdesign-agentur-deutschland" element={<WebdesignAgenturDeutschland />} />
+            <Route path="/ki-agentur-deutschland" element={<KiAgenturDeutschland />} />
+            <Route path="/automatisierung-unternehmen" element={<AutomatisierungUnternehmen />} />
           </Routes>
           <PremiumFooterReveal>
             <Footer />

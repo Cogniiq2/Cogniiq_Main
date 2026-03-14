@@ -187,6 +187,7 @@ export function KiTelefonassistentPage() {
         <UseCasesSection />
         <DemoCtaSection />
         <FAQSectionBlock />
+        <InternalLinksSection />
         <FinalCtaSection />
       </main>
     </>
@@ -900,6 +901,84 @@ function FAQSectionBlock() {
                 {item.answer}
               </p>
             </details>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+function InternalLinksSection() {
+  const cols = [
+    {
+      heading: "Nach Branche",
+      links: [
+        { label: "KI Telefonassistent Arzt", href: "/ki-telefonassistent-arzt" },
+        { label: "KI Telefonassistent Restaurant", href: "/ki-telefonassistent-restaurant" },
+        { label: "KI Telefonassistent Hotel", href: "/ki-telefonassistent-hotel" },
+        { label: "KI Telefonassistent Praxis", href: "/ki-telefonassistent-praxis" },
+      ],
+    },
+    {
+      heading: "Nach Stadt",
+      links: [
+        { label: "KI Telefonassistent Bayreuth", href: "/bayreuth/ki-telefonassistent" },
+        { label: "KI Telefonassistent München", href: "/muenchen/ki-telefonassistent" },
+        { label: "KI Telefonassistent Regensburg", href: "/regensburg/ki-telefonassistent" },
+        { label: "Bayern KI Telefonassistent", href: "/bayern/ki-telefonassistent" },
+      ],
+    },
+    {
+      heading: "Verwandte Themen",
+      links: [
+        { label: "KI Telefonassistent Kosten", href: "/kosten-ki-telefonassistent" },
+        { label: "KI Agentur Deutschland", href: "/ki-agentur-deutschland" },
+        { label: "Verpasste Anrufe", href: "/verpasste-anrufe-verlust" },
+        { label: "Automatisierung Unternehmen", href: "/automatisierung-unternehmen" },
+      ],
+    },
+  ];
+
+  return (
+    <section className="py-16 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-800">
+      <div className="max-w-4xl mx-auto px-6 lg:px-8">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeUp}
+          custom={0}
+          className="mb-8"
+        >
+          <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">
+            Weiterführende Seiten
+          </p>
+        </motion.div>
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeUp}
+          custom={0.1}
+          className="grid sm:grid-cols-3 gap-8"
+        >
+          {cols.map((col) => (
+            <div key={col.heading}>
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">{col.heading}</p>
+              <ul className="space-y-2">
+                {col.links.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      to={link.href}
+                      className="group inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 font-medium transition-colors"
+                    >
+                      <ArrowRight size={12} className="text-gray-300 dark:text-gray-600 group-hover:text-gray-500 transition-colors flex-shrink-0" />
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
         </motion.div>
       </div>
