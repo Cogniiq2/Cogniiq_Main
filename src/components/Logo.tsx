@@ -211,7 +211,7 @@ function Concept5({ ink, inkMid, inkFaint, className }: ConceptProps) {
   );
 }
 
-export function Logo({ className, variant = 'default', concept = 4 }: LogoProps) {
+export function Logo({ className, variant = 'default', concept = 3 }: LogoProps) {
   const light = variant === 'light';
 
   const ink = light ? '#ffffff' : '#0d1821';
