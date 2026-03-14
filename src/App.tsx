@@ -73,6 +73,7 @@ import { WebdesignAgenturDeutschland } from './pages/pillars/WebdesignAgenturDeu
 import { KiAgenturDeutschland } from './pages/pillars/KiAgenturDeutschland';
 import { AutomatisierungUnternehmen } from './pages/pillars/AutomatisierungUnternehmen';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { LogoShowcasePage } from './pages/LogoShowcasePage';
 
 function App() {
   return (
@@ -157,6 +158,7 @@ function App() {
             <Route path="/webdesign-agentur-deutschland" element={<WebdesignAgenturDeutschland />} />
             <Route path="/ki-agentur-deutschland" element={<KiAgenturDeutschland />} />
             <Route path="/automatisierung-unternehmen" element={<AutomatisierungUnternehmen />} />
+            <Route path="/logo-preview" element={<LogoShowcasePage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
           <PremiumFooterReveal>
