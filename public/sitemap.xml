@@ -2,237 +2,629 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
-  <!-- Core Pages -->
+  <!-- ══════════════════════════════════════════════
+       CORE PAGES
+  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/</loc>
-    <lastmod>2026-02-01</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/"/>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cogniiq.de/"/>
   </url>
 
   <url>
     <loc>https://cogniiq.de/leistungen</loc>
-    <lastmod>2026-02-01</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/leistungen"/>
+    <priority>0.95</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/leistungen"/>
   </url>
 
   <url>
     <loc>https://cogniiq.de/kontakt</loc>
-    <lastmod>2026-02-01</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/kontakt"/>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/kontakt"/>
   </url>
 
   <url>
     <loc>https://cogniiq.de/ueber-uns</loc>
-    <lastmod>2026-02-01</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/ueber-uns"/>
+    <priority>0.75</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/ueber-uns"/>
   </url>
 
   <url>
     <loc>https://cogniiq.de/faq</loc>
-    <lastmod>2026-02-01</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/faq"/>
+    <priority>0.75</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/faq"/>
   </url>
 
-  <!-- Geo Hubs -->
+  <url>
+    <loc>https://cogniiq.de/referenzen</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/referenzen"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/bewertungen</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/bewertungen"/>
+  </url>
+
+  <!-- ══════════════════════════════════════════════
+       PILLAR SERVICE PAGES
+  ══════════════════════════════════════════════ -->
+  <url>
+    <loc>https://cogniiq.de/ki-telefonassistent</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.90</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/ki-telefonassistent"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/webdesign-agentur-deutschland</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.92</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/webdesign-agentur-deutschland"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/ki-agentur-deutschland</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.92</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/ki-agentur-deutschland"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/automatisierung-unternehmen</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.90</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/automatisierung-unternehmen"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/ki-telefonassistent/demo</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.70</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/ki-telefonassistent/demo"/>
+  </url>
+
+  <!-- ══════════════════════════════════════════════
+       GEO HUBS
+  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/deutschland</loc>
-    <lastmod>2026-02-01</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/deutschland"/>
+    <priority>0.88</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/deutschland"/>
   </url>
 
   <url>
     <loc>https://cogniiq.de/bayern</loc>
-    <lastmod>2026-02-01</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/bayern"/>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/bayern"/>
   </url>
 
-  <!-- City Landing Pages -->
+  <url>
+    <loc>https://cogniiq.de/bayern/ki-telefonassistent</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/bayern/ki-telefonassistent"/>
+  </url>
+
+  <!-- ══════════════════════════════════════════════
+       CITY LANDING PAGES
+  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/bayreuth</loc>
-    <lastmod>2026-02-01</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/bayreuth"/>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/bayreuth"/>
   </url>
 
   <url>
     <loc>https://cogniiq.de/muenchen</loc>
-    <lastmod>2026-02-01</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/muenchen"/>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/muenchen"/>
   </url>
 
   <url>
     <loc>https://cogniiq.de/regensburg</loc>
-    <lastmod>2026-02-01</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/regensburg"/>
+    <priority>0.80</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/regensburg"/>
   </url>
 
-  <!-- Bayreuth City Services -->
+  <!-- ══════════════════════════════════════════════
+       BAYREUTH — CITY SERVICES
+  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/bayreuth/webdesign</loc>
-    <lastmod>2026-02-01</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/bayreuth/webdesign"/>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/bayreuth/webdesign"/>
   </url>
 
   <url>
     <loc>https://cogniiq.de/bayreuth/ki-telefonassistent</loc>
-    <lastmod>2026-02-01</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/bayreuth/ki-telefonassistent"/>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/bayreuth/ki-telefonassistent"/>
   </url>
 
   <url>
     <loc>https://cogniiq.de/bayreuth/automatisierung</loc>
-    <lastmod>2026-02-01</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/bayreuth/automatisierung"/>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/bayreuth/automatisierung"/>
   </url>
 
-  <!-- München City Services -->
+  <!-- ══════════════════════════════════════════════
+       BAYREUTH — CLUSTER PAGES
+  ══════════════════════════════════════════════ -->
+  <url>
+    <loc>https://cogniiq.de/bayreuth/webdesign-kosten</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.78</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/bayreuth/webdesign-kosten"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/bayreuth/website-erstellen</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.78</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/bayreuth/website-erstellen"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/bayreuth/landingpage</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.78</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/bayreuth/landingpage"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/bayreuth/website-relaunch</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.78</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/bayreuth/website-relaunch"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/bayreuth/lokales-seo</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.78</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/bayreuth/lokales-seo"/>
+  </url>
+
+  <!-- ══════════════════════════════════════════════
+       MÜNCHEN — CITY SERVICES
+  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/muenchen/webdesign</loc>
-    <lastmod>2026-02-01</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/muenchen/webdesign"/>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/muenchen/webdesign"/>
   </url>
 
   <url>
     <loc>https://cogniiq.de/muenchen/ki-telefonassistent</loc>
-    <lastmod>2026-02-01</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/muenchen/ki-telefonassistent"/>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/muenchen/ki-telefonassistent"/>
   </url>
 
   <url>
     <loc>https://cogniiq.de/muenchen/automatisierung</loc>
-    <lastmod>2026-02-01</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/muenchen/automatisierung"/>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/muenchen/automatisierung"/>
   </url>
 
-  <!-- Regensburg City Services -->
+  <!-- ══════════════════════════════════════════════
+       MÜNCHEN — CLUSTER PAGES
+  ══════════════════════════════════════════════ -->
+  <url>
+    <loc>https://cogniiq.de/muenchen/webdesign-kosten</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.78</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/muenchen/webdesign-kosten"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/muenchen/website-erstellen</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.78</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/muenchen/website-erstellen"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/muenchen/landingpage</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.78</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/muenchen/landingpage"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/muenchen/website-relaunch</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.78</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/muenchen/website-relaunch"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/muenchen/lokales-seo</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.78</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/muenchen/lokales-seo"/>
+  </url>
+
+  <!-- ══════════════════════════════════════════════
+       REGENSBURG — CITY SERVICES
+  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/regensburg/webdesign</loc>
-    <lastmod>2026-02-01</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/regensburg/webdesign"/>
+    <priority>0.80</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/regensburg/webdesign"/>
   </url>
 
   <url>
     <loc>https://cogniiq.de/regensburg/ki-telefonassistent</loc>
-    <lastmod>2026-02-01</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/regensburg/ki-telefonassistent"/>
+    <priority>0.80</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/regensburg/ki-telefonassistent"/>
   </url>
 
   <url>
     <loc>https://cogniiq.de/regensburg/automatisierung</loc>
-    <lastmod>2026-02-01</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/regensburg/automatisierung"/>
+    <priority>0.80</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/regensburg/automatisierung"/>
   </url>
 
-  <!-- Branchen: Arzt & Praxis -->
+  <!-- ══════════════════════════════════════════════
+       REGENSBURG — CLUSTER PAGES
+  ══════════════════════════════════════════════ -->
+  <url>
+    <loc>https://cogniiq.de/regensburg/webdesign-kosten</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/regensburg/webdesign-kosten"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/regensburg/website-erstellen</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/regensburg/website-erstellen"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/regensburg/landingpage</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/regensburg/landingpage"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/regensburg/website-relaunch</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/regensburg/website-relaunch"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/regensburg/lokales-seo</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/regensburg/lokales-seo"/>
+  </url>
+
+  <!-- ══════════════════════════════════════════════
+       INDUSTRY × LOCATION — WEBDESIGN
+  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/webdesign-arzt-bayreuth</loc>
-    <lastmod>2026-02-22</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/webdesign-arzt-bayreuth"/>
+    <priority>0.82</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/webdesign-arzt-bayreuth"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/webdesign-gastronomie-bayreuth</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/webdesign-gastronomie-bayreuth"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/webdesign-immobilien-bayreuth</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/webdesign-immobilien-bayreuth"/>
   </url>
 
   <url>
     <loc>https://cogniiq.de/webdesign-arzt-muenchen</loc>
-    <lastmod>2026-02-22</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/webdesign-arzt-muenchen"/>
-  </url>
-
-  <url>
-    <loc>https://cogniiq.de/webdesign-arzt-regensburg</loc>
-    <lastmod>2026-02-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/webdesign-arzt-regensburg"/>
-  </url>
-
-  <!-- Branchen: Gastronomie -->
-  <url>
-    <loc>https://cogniiq.de/webdesign-gastronomie-bayreuth</loc>
-    <lastmod>2026-02-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/webdesign-gastronomie-bayreuth"/>
+    <priority>0.82</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/webdesign-arzt-muenchen"/>
   </url>
 
   <url>
     <loc>https://cogniiq.de/webdesign-gastronomie-muenchen</loc>
-    <lastmod>2026-02-22</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/webdesign-gastronomie-muenchen"/>
-  </url>
-
-  <url>
-    <loc>https://cogniiq.de/webdesign-gastronomie-regensburg</loc>
-    <lastmod>2026-02-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/webdesign-gastronomie-regensburg"/>
-  </url>
-
-  <!-- Branchen: Immobilien -->
-  <url>
-    <loc>https://cogniiq.de/webdesign-immobilien-bayreuth</loc>
-    <lastmod>2026-02-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/webdesign-immobilien-bayreuth"/>
+    <priority>0.82</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/webdesign-gastronomie-muenchen"/>
   </url>
 
   <url>
     <loc>https://cogniiq.de/webdesign-immobilien-muenchen</loc>
-    <lastmod>2026-02-22</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/webdesign-immobilien-muenchen"/>
+    <priority>0.82</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/webdesign-immobilien-muenchen"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/webdesign-arzt-regensburg</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.78</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/webdesign-arzt-regensburg"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/webdesign-gastronomie-regensburg</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.78</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/webdesign-gastronomie-regensburg"/>
   </url>
 
   <url>
     <loc>https://cogniiq.de/webdesign-immobilien-regensburg</loc>
-    <lastmod>2026-02-22</lastmod>
+    <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="de" href="https://cogniiq.de/webdesign-immobilien-regensburg"/>
+    <priority>0.78</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/webdesign-immobilien-regensburg"/>
+  </url>
+
+  <!-- ══════════════════════════════════════════════
+       INDUSTRY-SPECIFIC SERVICE PAGES — WEBDESIGN
+  ══════════════════════════════════════════════ -->
+  <url>
+    <loc>https://cogniiq.de/webdesign-gastronomie</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/webdesign-gastronomie"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/webdesign-arzt</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/webdesign-arzt"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/webdesign-immobilien</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/webdesign-immobilien"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/webdesign-hotel</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/webdesign-hotel"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/webdesign-sport</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/webdesign-sport"/>
+  </url>
+
+  <!-- ══════════════════════════════════════════════
+       INDUSTRY-SPECIFIC SERVICE PAGES — KI-TELEFONASSISTENT
+  ══════════════════════════════════════════════ -->
+  <url>
+    <loc>https://cogniiq.de/ki-telefonassistent-arzt</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.87</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/ki-telefonassistent-arzt"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/ki-telefonassistent-restaurant</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/ki-telefonassistent-restaurant"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/ki-telefonassistent-hotel</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/ki-telefonassistent-hotel"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/ki-telefonassistent-praxis</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/ki-telefonassistent-praxis"/>
+  </url>
+
+  <!-- ══════════════════════════════════════════════
+       INDUSTRY-SPECIFIC SERVICE PAGES — AUTOMATISIERUNG
+  ══════════════════════════════════════════════ -->
+  <url>
+    <loc>https://cogniiq.de/automatisierung-restaurant</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/automatisierung-restaurant"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/automatisierung-arzt</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/automatisierung-arzt"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/automatisierung-immobilien</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/automatisierung-immobilien"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/automatisierung-sport</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/automatisierung-sport"/>
+  </url>
+
+  <!-- ══════════════════════════════════════════════
+       COST / PRICING PAGES
+  ══════════════════════════════════════════════ -->
+  <url>
+    <loc>https://cogniiq.de/kosten-webdesign</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.88</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/kosten-webdesign"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/kosten-ki-telefonassistent</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.88</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/kosten-ki-telefonassistent"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/kosten-automatisierung</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.88</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/kosten-automatisierung"/>
+  </url>
+
+  <!-- ══════════════════════════════════════════════
+       PROBLEM-BASED LANDING PAGES
+  ══════════════════════════════════════════════ -->
+  <url>
+    <loc>https://cogniiq.de/verpasste-anrufe-verlust</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/verpasste-anrufe-verlust"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/keine-anfragen-website</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/keine-anfragen-website"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/keine-terminbuchung-online</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/keine-terminbuchung-online"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/zu-viel-manuelle-arbeit</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/zu-viel-manuelle-arbeit"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/digitale-automatisierung-unternehmen</loc>
+    <lastmod>2026-03-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/digitale-automatisierung-unternehmen"/>
   </url>
 
 </urlset>

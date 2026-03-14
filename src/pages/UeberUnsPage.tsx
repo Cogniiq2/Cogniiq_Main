@@ -370,6 +370,50 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
   );
 }
 
+const ueberUnsSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "AboutPage",
+      "@id": `${BUSINESS_INFO.website}/ueber-uns#webpage`,
+      url: `${BUSINESS_INFO.website}/ueber-uns`,
+      name: "Über Cogniiq – AI Agentur Bayreuth",
+      description: "Cogniiq – gegründet von Lazar und Djordje Popovic. AI Agentur aus Bayreuth, spezialisiert auf Webdesign, KI-Automatisierung und digitale Systeme.",
+      isPartOf: { "@id": `${BUSINESS_INFO.website}/#website` },
+      about: { "@id": `${BUSINESS_INFO.website}/#organization` },
+      inLanguage: "de-DE",
+    },
+    {
+      "@type": "Person",
+      "@id": `${BUSINESS_INFO.website}/#lazar-popovic`,
+      name: "Lazar Popovic",
+      jobTitle: "Co-Founder, Webdesign & System Architecture",
+      description: "Lazar Popovic ist Co-Gründer von Cogniiq und verantwortet Webdesign und System-Architektur. Spezialist für hochkonvertierende Websites und digitale Systemarchitektur.",
+      worksFor: {
+        "@type": "Organization",
+        "@id": `${BUSINESS_INFO.website}/#organization`,
+        name: BUSINESS_INFO.name,
+      },
+      url: `${BUSINESS_INFO.website}/ueber-uns`,
+      knowsAbout: ["Webdesign", "Conversion Optimierung", "System Architecture", "Frontend Development", "SEO"],
+    },
+    {
+      "@type": "Person",
+      "@id": `${BUSINESS_INFO.website}/#djordje-popovic`,
+      name: "Djordje Popovic",
+      jobTitle: "Co-Founder, AI & Automation Specialist",
+      description: "Djordje Popovic ist Co-Gründer von Cogniiq und Spezialist für KI-Automatisierung, KI-Telefonassistenten und Make.com Prozessautomatisierung.",
+      worksFor: {
+        "@type": "Organization",
+        "@id": `${BUSINESS_INFO.website}/#organization`,
+        name: BUSINESS_INFO.name,
+      },
+      url: `${BUSINESS_INFO.website}/ueber-uns`,
+      knowsAbout: ["KI-Automatisierung", "Make.com", "AI Telefonassistent", "Prozessautomatisierung", "n8n"],
+    },
+  ],
+};
+
 export function UeberUnsPage() {
   const breadcrumbs = [
     { name: "Home", url: BUSINESS_INFO.website },
@@ -383,6 +427,7 @@ export function UeberUnsPage() {
         description={PAGE_META.ueberUns.description}
         canonical={PAGE_META.ueberUns.canonical}
         breadcrumbs={breadcrumbs}
+        additionalSchema={ueberUnsSchema}
       />
 
       <main className="min-h-screen bg-white dark:bg-gray-950 transition-colors duration-300">

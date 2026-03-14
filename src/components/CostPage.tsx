@@ -84,9 +84,34 @@ export function CostPage({ config }: CostPageProps) {
         url: config.seo.canonical,
         provider: {
           "@type": "Organization",
+          "@id": `${BUSINESS_INFO.website}/#organization`,
           name: BUSINESS_INFO.name,
           url: BUSINESS_INFO.website,
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: BUSINESS_INFO.address.streetAddress,
+            addressLocality: BUSINESS_INFO.address.addressLocality,
+            addressRegion: BUSINESS_INFO.address.addressRegion,
+            postalCode: BUSINESS_INFO.address.postalCode,
+            addressCountry: BUSINESS_INFO.address.addressCountry,
+          },
         },
+        offers: config.priceRanges.map((p) => ({
+          "@type": "Offer",
+          name: p.label,
+          description: p.description,
+          price: p.range,
+          priceCurrency: "EUR",
+          seller: {
+            "@type": "Organization",
+            name: BUSINESS_INFO.name,
+          },
+        })),
+        areaServed: {
+          "@type": "Country",
+          name: "Deutschland",
+        },
+        inLanguage: "de-DE",
       },
     ],
   };

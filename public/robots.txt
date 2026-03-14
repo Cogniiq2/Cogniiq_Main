@@ -5,5 +5,14 @@ Disallow: /api/
 Disallow: /_debug/
 Disallow: /preview/
 Disallow: /__/
+Disallow: /anfrage-erhalten
+
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
 
 Sitemap: https://cogniiq.de/sitemap.xml
