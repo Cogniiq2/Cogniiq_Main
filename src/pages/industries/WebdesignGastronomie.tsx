@@ -10,8 +10,8 @@ const config: NationalIndustryPageConfig = {
     keywords: "Webdesign Gastronomie, Restaurant Website erstellen, Homepage Restaurant, Website Gastronomie, SEO Restaurant",
   },
   h1: "Webdesign für Restaurants & Gastronomie",
-  tagline: "Gastronomie · Webdesign · Deutschland",
-  intro: "Eine professionelle Restaurant-Website ist mehr als ein digitales Schaufenster – sie ist Ihr wichtigstes Werkzeug, um neue Gäste zu gewinnen, Reservierungen zu erhöhen und bei lokalen Google-Suchen sichtbar zu sein.",
+  tagline: "Gastronomie · Webdesign · Reservierung online",
+  intro: "Gäste entscheiden sich heute online – sie schauen sich Menü und Atmosphäre an, bevor sie reservieren. Eine professionelle Restaurant-Website mit klarer Speisekarte, Online-Reservierung und guter Google-Sichtbarkeit füllt Ihre Tische. Eine schwache Website schickt Gäste zur Konkurrenz.",
   serviceSlug: "leistungen",
   serviceLabel: "Webdesign Leistungen",
   costLink: "/kosten-webdesign",
@@ -19,59 +19,59 @@ const config: NationalIndustryPageConfig = {
   problems: [
     {
       title: "Kein Platz auf der ersten Google-Seite",
-      description: "Wenn Gäste nach 'Restaurant Bayreuth' suchen, erscheinen Sie nicht. Neue Gäste finden Ihre Konkurrenz statt Sie – obwohl Ihre Küche besser ist.",
+      description: "Bei Suchen wie 'Restaurant Bayreuth' erscheinen Betriebe ohne Local SEO nicht auf Seite 1. Neue Gäste finden die Konkurrenz – obwohl Ihre Küche besser ist.",
     },
     {
       title: "Keine Online-Reservierungsmöglichkeit",
-      description: "Gäste, die abends reservieren möchten, wenn niemand ans Telefon geht, buchen woanders. Jede verpasste Reservierung ist ein verlorener Umsatz.",
+      description: "Gäste, die abends reservieren möchten, wenn niemand ans Telefon geht, buchen woanders. Jede nicht mögliche Reservierung ist direkter Umsatzverlust.",
     },
     {
-      title: "Veraltete oder nicht mobile Website",
-      description: "Über 70 % aller Restaurant-Suchanfragen kommen vom Smartphone. Eine nicht-mobile Website verliert diese Gäste sofort.",
+      title: "Website nicht für Smartphones optimiert",
+      description: "Über 70 % aller Restaurant-Suchanfragen kommen vom Smartphone. Eine nicht-mobile Website verliert diese Gäste sofort – an Konkurrenten mit besserem mobilen Auftritt.",
     },
     {
-      title: "Keine digitale Speisekarte",
-      description: "Gäste möchten vor dem Besuch die Speisekarte online prüfen. Fehlt sie, entscheiden sie sich oft für ein anderes Restaurant.",
+      title: "Keine digitale Speisekarte verfügbar",
+      description: "Gäste prüfen die Speisekarte online, bevor sie entscheiden. Fehlt sie – oder ist sie veraltet – entscheiden sich viele für ein anderes Restaurant.",
     },
     {
-      title: "Schwache Festspiel- und Saisonpräsenz",
-      description: "Gerade bei Events und Festspielen suchen Touristen aktiv nach Restaurants. Ohne SEO-Sichtbarkeit verpassen Sie diese Hochsaison-Gäste.",
+      title: "Saisonale und event-bedingte Sichtbarkeit nicht genutzt",
+      description: "Festspielzeit, Weihnachtsmarkt und Feiertage sind Hochphasen. Betriebe ohne SEO-Sichtbarkeit für saisonale Suchen verpassen genau diese Buchungsspitzen.",
     },
     {
-      title: "Kein Vertrauensaufbau online",
-      description: "Fotos, Bewertungen und professionelle Außenwirkung entscheiden, ob ein Gast reserviert. Eine schwache Website kostet Vertrauen noch vor dem ersten Besuch.",
+      title: "Schwache Außenwirkung kostet Vertrauen",
+      description: "Fotos, Bewertungsintegration und professionelle Darstellung entscheiden, ob ein Gast reserviert. Eine veraltete Website kostet Vertrauen noch vor dem ersten Besuch.",
     },
   ],
   solution: {
-    headline: "Restaurants, die online überzeugen, sind immer ausgebucht.",
-    text: "Cogniiq entwickelt Restaurant-Websites, die bei lokalen Google-Suchen sichtbar sind, Reservierungen automatisch entgegennehmen und die Qualität Ihrer Gastronomie digital widerspiegeln. Von der Speisekarte bis zur Tischreservierung – alles in einem System.",
+    headline: "Restaurants, die online überzeugen, sind ausgebucht.",
+    text: "Cogniiq entwickelt Restaurant-Websites mit Online-Reservierung, aktueller Speisekarte und Local SEO-Setup – damit Ihre Qualität digital sichtbar wird und neue Gäste direkt reservieren können, ohne anzurufen.",
   },
   benefits: [
     "Automatische Tischreservierung – auch außerhalb der Öffnungszeiten",
     "Lokales SEO-Setup: gefunden bei 'Restaurant [Stadt]'",
-    "Mobile-optimiert: perfekt auf jedem Smartphone",
-    "Digitale Speisekarte mit Saisonupdates",
+    "Mobile-first: perfekt auf jedem Smartphone",
+    "Digitale Speisekarte mit einfacher Aktualisierung",
     "Google Business Profil Optimierung",
     "DSGVO-konforme Website mit Datenschutzerklärung",
     "Integration KI-Telefonassistent für Anruf-Reservierungen",
   ],
   workflow: {
-    title: "So funktioniert eine Restaurant-Website mit Cogniiq",
+    title: "So entsteht Ihre Restaurant-Website",
     steps: [
       {
-        step: "Schritt 1",
+        step: "01",
         title: "Konzept & Design",
-        description: "Wir analysieren Ihre Zielgruppe, Konkurrenz und entwickeln ein Design, das Ihre Küche und Atmosphäre digital transportiert.",
+        description: "Wir analysieren Ihre Zielgruppe und Wettbewerbssituation und entwickeln ein Design, das die Atmosphäre und Qualität Ihrer Gastronomie digital transportiert.",
       },
       {
-        step: "Schritt 2",
-        title: "SEO & Reservierung",
-        description: "Lokales SEO-Setup, Google Business Optimierung und Integration eines Reservierungssystems für automatische Buchungen rund um die Uhr.",
+        step: "02",
+        title: "Reservierung & SEO",
+        description: "Integration des Reservierungssystems, Speisekarten-Setup, Google Business Optimierung und Local SEO für maximale Sichtbarkeit in Ihrer Region.",
       },
       {
-        step: "Schritt 3",
+        step: "03",
         title: "Live & wachsen",
-        description: "Go-Live mit vollständiger Einrichtung, Schulung und optionalem KI-Telefonassistenten für verpasste Anrufe.",
+        description: "Go-Live mit vollständiger Einrichtung, Schulung und optionalem KI-Telefonassistenten für Reservierungsanrufe, die außerhalb der Servicezeiten ankommen.",
       },
     ],
   },
@@ -92,23 +92,23 @@ const config: NationalIndustryPageConfig = {
   faq: [
     {
       question: "Was kostet eine Restaurant-Website?",
-      answer: "Restaurant-Websites starten bei ca. 1.800 € für eine professionelle Präsenz mit Speisekarte und Reservierungsformular. Mit Tischreservierungssystem und erweitertem SEO typischerweise 3.000–5.000 €.",
+      answer: "Restaurant-Websites starten bei ca. 1.800 € für eine professionelle Präsenz mit Speisekarte und Reservierungsformular. Mit vollständigem Reservierungssystem und erweitertem SEO-Setup typischerweise 3.000–5.000 €.",
     },
     {
       question: "Kann Cogniiq eine Online-Reservierung integrieren?",
-      answer: "Ja. Wir integrieren Reservierungssysteme, die sich nahtlos in Ihre Website und optionalem KI-Telefonassistenten verbinden. Reservierungen laufen dann automatisch – auch nachts und am Wochenende.",
+      answer: "Ja. Wir integrieren Reservierungssysteme, die sich mit Ihrer Website und optional mit dem KI-Telefonassistenten verbinden. Reservierungen laufen dann automatisch – auch nachts und am Wochenende.",
     },
     {
       question: "Wie wichtig ist Local SEO für Restaurants?",
-      answer: "Extrem wichtig. Über 80 % der Restaurant-Suchen sind lokal ('Restaurant München'). Ohne Local SEO und Google Business Optimierung erscheinen Sie nicht in den relevanten Suchergebnissen.",
+      answer: "Sehr wichtig. Die meisten Restaurant-Suchen sind lokal ('Restaurant München'). Ohne Local SEO und Google Business Optimierung erscheinen Sie nicht in den relevanten Ergebnissen.",
     },
     {
       question: "Kann die Speisekarte regelmäßig aktualisiert werden?",
-      answer: "Ja. Wir richten ein einfaches Content-Management-System ein, über das Sie Ihre Speisekarte selbst aktualisieren können – ohne technische Kenntnisse.",
+      answer: "Ja. Wir richten ein einfaches Content-Management-System ein, über das Sie Speisekarte, Tagesgerichte und Sonderangebote selbst aktualisieren können – ohne technische Kenntnisse.",
     },
     {
-      question: "Ist die Restaurant-Website DSGVO-konform?",
-      answer: "Ja. Alle Websites von Cogniiq werden mit vollständiger DSGVO-Konformität geliefert: Datenschutzerklärung, Impressum, Cookie-Consent und DSGVO-konforme Formularverarbeitung.",
+      question: "Ist die Website DSGVO-konform?",
+      answer: "Ja. Alle Cogniiq-Websites werden mit vollständiger DSGVO-Konformität geliefert: Datenschutzerklärung, Impressum, Cookie-Consent und DSGVO-konforme Formularverarbeitung.",
     },
   ],
 };

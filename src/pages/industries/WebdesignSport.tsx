@@ -11,35 +11,35 @@ const config: NationalIndustryPageConfig = {
   },
   h1: "Webdesign für Sport, Fitness & Vereine",
   tagline: "Sport · Fitness · Online-Anmeldung",
-  intro: "Fitnessstudios, Sportvereine und Yogastudios brauchen eine Website, die Kurse übersichtlich präsentiert, Online-Anmeldungen ermöglicht und bei lokalen Suchanfragen sichtbar ist. Mehr Mitglieder durch besseres digitales Auftreten.",
+  intro: "Wer ein Fitnessstudio oder Yogastudio sucht, googelt zuerst. Ohne professionelle Website mit klarem Kursangebot, Online-Anmeldung und guter lokaler Sichtbarkeit entscheiden sich Interessenten für die Konkurrenz – noch bevor sie Ihre Türschwelle betreten haben.",
   serviceSlug: "leistungen",
   serviceLabel: "Webdesign Leistungen",
   costLink: "/kosten-webdesign",
   costLinkLabel: "Webdesign Kosten",
   problems: [
     {
-      title: "Neukunden finden das Studio nicht online",
-      description: "Wenn jemand nach 'Fitnessstudio [Stadt]' sucht, erscheinen Studios ohne Local SEO nicht. Täglich verlieren sie potenzielle Mitglieder an Konkurrenten mit besserer Online-Präsenz.",
+      title: "Neukunden finden das Studio bei Google nicht",
+      description: "Bei Suchen nach 'Fitnessstudio [Stadt]' erscheinen Studios ohne Local SEO nicht auf Seite 1. Täglich verlieren sie potenzielle Mitglieder an Konkurrenten mit besserer Online-Präsenz.",
     },
     {
       title: "Kurskalender nicht digital verfügbar",
-      description: "Interessenten möchten vor der Anmeldung wissen, welche Kurse wann stattfinden. Ohne digitalen Kurskalender verlieren sie das Interesse.",
+      description: "Interessenten möchten vor der Anmeldung wissen, welche Kurse wann stattfinden. Fehlt der digitale Kurskalender, springen viele ab.",
     },
     {
       title: "Keine Online-Anmeldung für Kurse",
-      description: "Telefonische Kursanmeldungen kosten Zeit und schrecken ab. Online-Anmeldung erhöht die Konversionsrate deutlich.",
+      description: "Telefonische Kursanmeldungen schrecken ab und kosten Personalzeit. Online-Anmeldung erhöht die Konversionsrate und reduziert Verwaltungsaufwand.",
     },
     {
-      title: "Website spiegelt die Energie und Qualität nicht wider",
-      description: "Ein Fitnessstudio mit modernen Geräten und motivierten Trainern verdient eine Website, die diese Energie und Qualität transportiert.",
+      title: "Website transportiert Energie und Qualität nicht",
+      description: "Ein modernes Fitnessstudio mit qualifizierten Trainern verdient eine Website, die genau diese Energie und Qualität digital vermittelt.",
     },
     {
-      title: "Mitgliedschaften und Preise nicht klar kommuniziert",
-      description: "Unklare Preisstrukturen und fehlende Mitgliedschaftsoptionen führen zu Abbrüchen vor der Anmeldung.",
+      title: "Mitgliedschaften und Preise unklar kommuniziert",
+      description: "Unklare Preisstrukturen und fehlende Mitgliedschaftsoptionen führen zu Abbrüchen vor der Anmeldung – potenzielle Mitglieder wechseln zum nächsten Anbieter.",
     },
     {
-      title: "Keine Social Proof und Bewertungen integriert",
-      description: "Mitglieder-Bewertungen und Erfolgsgeschichten sind entscheidend für die Entscheidung zur Mitgliedschaft – fehlen sie, entscheiden sich Interessenten gegen den Beitritt.",
+      title: "Fehlende Bewertungen und Social Proof",
+      description: "Mitglieder-Erfolgsgeschichten und Bewertungen sind entscheidend für die Mitgliedschaftsentscheidung. Fehlen sie, entscheiden sich Interessenten gegen den Beitritt.",
     },
   ],
   solution: {
@@ -47,31 +47,31 @@ const config: NationalIndustryPageConfig = {
     text: "Cogniiq entwickelt Sport- und Fitness-Websites mit digitalem Kurskalender, Online-Anmeldung und Local SEO-Setup. Das Ergebnis: mehr qualifizierte Anfragen, weniger telefonischer Aufwand und messbar mehr Neumitglieder.",
   },
   benefits: [
-    "Digitaler Kurskalender mit Filterfunktion",
+    "Digitaler Kurskalender mit Filter- und Buchungsfunktion",
     "Online-Anmeldung für Kurse und Probestunden",
     "Local SEO: gefunden bei 'Fitnessstudio [Stadt]'",
-    "Mitgliedschaftsoptionen übersichtlich dargestellt",
+    "Mitgliedschaftsoptionen übersichtlich und überzeugend dargestellt",
     "Trainer-Profile und Social Proof integriert",
-    "Mobile-optimiert für Smartphone-Nutzer",
+    "Mobile-first: optimiert für Smartphone-Nutzer",
     "DSGVO-konforme Mitgliederdatenverarbeitung",
   ],
   workflow: {
-    title: "Sport-Website mit Online-Anmeldung",
+    title: "So entsteht Ihre Sport-Website",
     steps: [
       {
-        step: "Schritt 1",
+        step: "01",
         title: "Konzept & Positionierung",
-        description: "Analyse Ihrer Zielgruppe (Freizeitaktive, Leistungssportler, Familien) und Design einer Website, die Ihre Stärken kommuniziert.",
+        description: "Analyse Ihrer Zielgruppe und Stärken. Design einer Website, die die Energie, Qualität und Atmosphäre Ihres Studios digital transportiert.",
       },
       {
-        step: "Schritt 2",
+        step: "02",
         title: "Kurskalender & Anmeldung",
-        description: "Entwicklung des digitalen Kurskalenders, Online-Anmeldesystems und Mitgliedschafts-Darstellung mit klaren Konversionspfaden.",
+        description: "Digitaler Kurskalender, Online-Anmeldesystem und Mitgliedschaftsdarstellung mit klaren Konversionspfaden zur Probestunden-Buchung.",
       },
       {
-        step: "Schritt 3",
+        step: "03",
         title: "SEO & Launch",
-        description: "Local SEO Setup, Google Business Optimierung und Go-Live mit vollständiger Einrichtung und optionalem KI-Telefonassistenten.",
+        description: "Local SEO-Setup, Google Business Optimierung und Go-Live mit vollständiger Einrichtung und optionalem KI-Telefonassistenten.",
       },
     ],
   },
@@ -99,8 +99,8 @@ const config: NationalIndustryPageConfig = {
       answer: "Ja. Wir richten ein einfaches Content-Management-System ein, über das Sie Kurse, Zeiten und Trainer selbst pflegen können – ohne technische Kenntnisse.",
     },
     {
-      question: "Kann die Website Online-Probestunden buchen?",
-      answer: "Ja. Probestunden-Buchungen sind eine der effektivsten Konversionsmaßnahmen für Fitnessstudios. Wir integrieren ein einfaches Buchungsformular mit automatischer Bestätigung.",
+      question: "Kann die Website Probestunden-Buchungen ermöglichen?",
+      answer: "Ja. Probestunden-Buchungen sind eine der wirksamsten Konversionsmaßnahmen für Fitnessstudios. Wir integrieren ein einfaches Buchungsformular mit automatischer Bestätigung.",
     },
     {
       question: "Wie hilft Local SEO Fitnessstudios?",
@@ -108,7 +108,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Eignet sich die Lösung auch für gemeinnützige Sportvereine?",
-      answer: "Ja. Wir entwickeln Vereins-Websites mit reduzierten Preisen für gemeinnützige Organisationen. Kontakt für individuelle Konditionen.",
+      answer: "Ja. Wir entwickeln Vereins-Websites mit angepassten Konditionen für gemeinnützige Organisationen. Sprechen Sie uns für ein individuelles Angebot an.",
     },
   ],
 };

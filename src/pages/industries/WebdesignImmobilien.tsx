@@ -11,47 +11,47 @@ const config: NationalIndustryPageConfig = {
   },
   h1: "Webdesign für Immobilienmakler & Immobilienbüros",
   tagline: "Immobilien · Premium-Webdesign · Lead-Generierung",
-  intro: "Immobilien werden über Vertrauen verkauft – und Vertrauen entsteht zuerst online. Eine professionelle Makler-Website mit klarer Positionierung, Exposé-Präsentation und automatisierter Lead-Erfassung ist der Schlüssel zu mehr Anfragen.",
+  intro: "Immobilien werden über Vertrauen entschieden – und Vertrauen entsteht heute zuerst online. Bevor ein Eigentümer einen Makler beauftragt, recherchiert er. Eine professionelle Makler-Website mit klarer Positionierung, überzeugender Exposé-Darstellung und automatisierter Lead-Erfassung ist der entscheidende erste Eindruck.",
   serviceSlug: "leistungen",
   serviceLabel: "Webdesign Leistungen",
   costLink: "/kosten-webdesign",
   costLinkLabel: "Webdesign Kosten",
   problems: [
     {
-      title: "Mangelnde Online-Sichtbarkeit bei lokalen Suchanfragen",
-      description: "Kaufinteressenten suchen bei Google nach 'Immobilienmakler [Stadt]'. Ohne Local SEO erscheinen Sie nicht – und vergeben wertvolle Leads an Konkurrenten.",
+      title: "Bei lokalen Suchanfragen nicht sichtbar",
+      description: "Kaufinteressenten suchen bei Google nach 'Immobilienmakler [Stadt]'. Ohne Local SEO erscheinen Sie nicht – und vergeben qualifizierte Leads an Konkurrenten.",
     },
     {
       title: "Exposés nicht optimal präsentiert",
-      description: "Hochwertige Immobilien verdienen eine hochwertige digitale Präsentation. Schlechte Bildqualität, unübersichtliche Exposés oder fehlende Filter schrecken Interessenten ab.",
+      description: "Hochwertige Immobilien verdienen eine professionelle digitale Präsentation. Schlechte Bildqualität, unklare Exposé-Struktur oder fehlende Filter kosten Interessenten.",
     },
     {
-      title: "Anfragen nicht automatisiert erfasst",
-      description: "Anfragen kommen per Telefon, E-Mail und Formular – aber ohne System gehen sie verloren oder werden zu spät bearbeitet. Interessenten wenden sich an schnellere Makler.",
+      title: "Anfragen ohne System verloren",
+      description: "Anfragen kommen per Telefon, E-Mail und Formular – ohne strukturierte Erfassung gehen sie unter oder werden zu spät bearbeitet. Interessenten wenden sich an schnellere Makler.",
     },
     {
       title: "Website entspricht nicht dem Premium-Anspruch",
-      description: "Eine veraltete Website passt nicht zum Premium-Image, das Immobilienmakler aufbauen müssen, um hochwertige Objekte und Käufer zu gewinnen.",
+      description: "Eine veraltete Website passt nicht zum Markenwert, den Immobilienmakler aufbauen müssen – besonders im gehobenen Segment, wo Eigentümer und Käufer hohe Erwartungen haben.",
     },
     {
-      title: "Kein Vertrauensaufbau vor dem Erstgespräch",
-      description: "Bevor ein Eigentümer seinen Makler auswählt, recherchiert er online. Fehlen Referenzen, Bewertungen und professionelle Darstellung, entscheidet er sich anders.",
+      title: "Vertrauen fehlt vor dem Erstgespräch",
+      description: "Bevor ein Eigentümer seinen Makler auswählt, recherchiert er online. Fehlen Referenzen, Bewertungen und professionelle Außenwirkung, entscheidet er sich anders.",
     },
     {
       title: "Besichtigungstermine ineffizient koordiniert",
-      description: "Telefonische Terminkoordination für Besichtigungen kostet täglich wertvolle Zeit. Automatisierte Terminbuchung löst dieses Problem dauerhaft.",
+      description: "Telefonische Terminkoordination für Besichtigungen kostet täglich wertvolle Kapazität. Automatisierte Buchung löst dieses Problem dauerhaft.",
     },
   ],
   solution: {
     headline: "Premium-Webdesign, das Immobilien und Makler optimal präsentiert.",
-    text: "Cogniiq entwickelt Immobilien-Websites, die Vertrauen aufbauen, Exposés professionell präsentieren und Leads automatisch erfassen. Das Ergebnis: mehr qualifizierte Anfragen mit weniger manuellem Aufwand.",
+    text: "Cogniiq entwickelt Immobilien-Websites, die Vertrauen aufbauen, Exposés professionell präsentieren und Leads automatisch erfassen. Das Ergebnis: mehr qualifizierte Anfragen, weniger manueller Aufwand, stärkere Marktposition.",
   },
   benefits: [
     "Exposé-Präsentation mit Bildgalerie und Filterfunktion",
     "Automatische Lead-Erfassung aus Anfrage-Formularen",
     "Local SEO: gefunden bei 'Immobilienmakler [Stadt]'",
     "Premium-Design, das Ihren Markenwert widerspiegelt",
-    "Automatische Besichtigungstermin-Koordination",
+    "Automatisierte Besichtigungstermin-Koordination",
     "CRM-Integration für lückenloses Lead-Management",
     "DSGVO-konforme Verarbeitung von Interessentendaten",
   ],
@@ -59,19 +59,19 @@ const config: NationalIndustryPageConfig = {
     title: "Immobilien-Website mit automatisierter Lead-Erfassung",
     steps: [
       {
-        step: "Schritt 1",
-        title: "Positioning & Design",
-        description: "Analyse Ihrer Positionierung, Zielgruppe und Wettbewerbsumfeld. Premium-Design, das Ihren Markenwert und Ihre Expertise kommuniziert.",
+        step: "01",
+        title: "Positionierung & Design",
+        description: "Analyse Ihrer Positionierung, Zielgruppe und Wettbewerbsumfeld. Premium-Design, das Ihren Markenwert, Ihre Expertise und Ihre Referenzen überzeugend kommuniziert.",
       },
       {
-        step: "Schritt 2",
+        step: "02",
         title: "Exposés & Lead-System",
         description: "Exposé-Darstellung, automatisierte Lead-Erfassung, CRM-Integration und Local SEO-Setup für maximale Sichtbarkeit in Ihrer Region.",
       },
       {
-        step: "Schritt 3",
+        step: "03",
         title: "Automatisierung & Wachstum",
-        description: "Integration von Terminbuchung, automatischer Interessenten-Kommunikation und optionalem KI-Telefonassistenten für verpasste Anrufe.",
+        description: "Terminbuchung, automatische Interessenten-Kommunikation und optionaler KI-Telefonassistent für Anrufe außerhalb Ihrer Bürozeiten.",
       },
     ],
   },
@@ -92,7 +92,7 @@ const config: NationalIndustryPageConfig = {
   faq: [
     {
       question: "Was sollte eine Immobilien-Website unbedingt enthalten?",
-      answer: "Eine professionelle Immobilien-Website braucht: Exposé-Präsentation mit Filterfunktion, Anfrage-Formulare, Makler-Profil mit Referenzen, Google Business Optimierung und Local SEO. Terminbuchung und CRM-Integration erhöhen den ROI deutlich.",
+      answer: "Exposé-Präsentation mit Filterfunktion, strukturierte Anfrage-Formulare, Makler-Profil mit Referenzen, Google Business Optimierung und Local SEO. Terminbuchung und CRM-Integration erhöhen den ROI deutlich.",
     },
     {
       question: "Kann die Website Exposés automatisch anzeigen?",
@@ -103,8 +103,8 @@ const config: NationalIndustryPageConfig = {
       answer: "Lokale Käufer und Verkäufer suchen gezielt nach Maklern in ihrer Stadt. Mit Local SEO erscheinen Sie bei Suchen wie 'Immobilienmakler München' auf Seite 1 – das erhöht qualifizierte Anfragen messbar.",
     },
     {
-      question: "Kann die Website mit einem CRM-System verbunden werden?",
-      answer: "Ja. Wir integrieren Anfragen aus der Website direkt in Ihr CRM – ob OnOffice, Propstack oder andere Systeme. Kein Lead geht mehr verloren.",
+      question: "Kann die Website mit einem CRM verbunden werden?",
+      answer: "Ja. Wir integrieren Anfragen direkt in Ihr CRM – ob OnOffice, Propstack oder andere Systeme. Kein Lead geht verloren, jede Anfrage wird systematisch erfasst.",
     },
     {
       question: "Was kostet eine Immobilien-Website?",

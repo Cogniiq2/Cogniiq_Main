@@ -5,13 +5,13 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 const config: NationalIndustryPageConfig = {
   seo: {
     title: "KI Telefonassistent für Hotels & Pensionen | 24/7 Rezeption | Cogniiq",
-    description: "KI Telefonassistent für Hotels: 24/7 Rezeptionsdienst, automatische Zimmerbuchungen und Gästeanfragen. Nie wieder verpasste Buchungen außerhalb der Rezeptionszeiten.",
+    description: "KI Telefonassistent für Hotels: 24/7 Rezeptionsdienst, automatische Zimmerbuchungen und Gästeanfragen. Keine verpassten Direktbuchungen mehr – auch außerhalb der Rezeptionszeiten.",
     canonical: `${BUSINESS_INFO.website}/ki-telefonassistent-hotel`,
     keywords: "KI Telefonassistent Hotel, 24/7 Rezeption, automatische Zimmerbuchung, KI Rezeptionistin Hotel, Telefonservice Hotellerie",
   },
   h1: "KI Telefonassistent für Hotels & Pensionen",
-  tagline: "Hotellerie · 24/7 Rezeption · Buchungsautomatisierung",
-  intro: "Hotels verlieren Direktbuchungen, weil außerhalb der Rezeptionszeiten niemand ans Telefon geht. Der KI Telefonassistent übernimmt Buchungsanfragen, Zimmerverfügbarkeit und Gästeanfragen – rund um die Uhr, mehrsprachig und DSGVO-konform.",
+  tagline: "Hotellerie · 24/7 Rezeption · Direktbuchungen",
+  intro: "Reisende buchen spät abends und nachts – dann, wenn die Rezeption nicht mehr besetzt ist. Der KI Telefonassistent übernimmt Buchungsanfragen, Zimmerverfügbarkeit und Gästeanfragen rund um die Uhr. Direktbuchungen gehen nicht mehr an OTAs verloren.",
   serviceSlug: "ki-telefonassistent",
   serviceLabel: "KI Telefonassistent",
   costLink: "/kosten-ki-telefonassistent",
@@ -19,59 +19,59 @@ const config: NationalIndustryPageConfig = {
   problems: [
     {
       title: "Buchungsanfragen außerhalb der Rezeptionszeiten",
-      description: "Reisende buchen oft spät abends oder nachts. Ohne 24/7-Erreichbarkeit gehen diese Buchungen an OTAs oder Konkurrenten – mit Provision-Verlust.",
+      description: "Reisende entscheiden sich oft spät abends oder am Wochenende. Ohne 24/7-Erreichbarkeit gehen diese Direktbuchungen an OTAs – mit Provisionsverlust für das Hotel.",
     },
     {
-      title: "Rezeptionsteam überlastet in Stoßzeiten",
-      description: "Check-in, Check-out und gleichzeitig eingehende Anrufe sind für kleine Teams kaum zu bewältigen. Gäste müssen warten oder werden vertröstet.",
+      title: "Rezeptionsteam in Stoßzeiten überlastet",
+      description: "Check-in, Check-out und gleichzeitig klingelnde Telefone: kleine Teams können das nicht vollständig bewältigen. Gäste warten oder kommen nicht durch.",
     },
     {
-      title: "Standardfragen binden wertvolle Personalzeit",
-      description: "Fragen zu Parkmöglichkeiten, Frühstückszeiten, Haustierfreundlichkeit und WLAN können vollständig automatisiert beantwortet werden.",
+      title: "Standardfragen binden wertvolle Rezeptionszeit",
+      description: "Parkmöglichkeiten, Frühstückszeiten, Haustierfreundlichkeit, WLAN – diese Fragen können vollautomatisch beantwortet werden, ohne das Rezeptionsteam zu belasten.",
     },
     {
-      title: "Gruppenanfragen nicht effizient koordiniert",
-      description: "Gruppen- und Eventbuchungen erfordern komplexe Kommunikation. Ohne System gehen Anfragen verloren oder werden zu spät bearbeitet.",
+      title: "Gruppen- und Eventanfragen werden verzögert bearbeitet",
+      description: "Gruppenanfragen erfordern koordinierte Kommunikation. Ohne klaren Prozess gehen Anfragen verloren oder werden zu spät bearbeitet.",
     },
     {
-      title: "Mehrsprachige Gäste nicht bedient",
-      description: "Internationale Reisende rufen auf Englisch an. Ohne mehrsprachigen Service entgehen internationale Buchungen – besonders in touristisch geprägten Regionen.",
+      title: "Internationale Gäste nicht bedient",
+      description: "Reisende aus dem Ausland rufen auf Englisch an. Ohne mehrsprachigen Telefonservice entgehen internationale Buchungen.",
     },
     {
       title: "Keine automatischen Buchungsbestätigungen",
-      description: "Manuelle Bestätigungs-E-Mails kosten Zeit und sind fehleranfällig. Automatisierte Bestätigungen erhöhen Gästezufriedenheit und reduzieren No-Shows.",
+      description: "Manuelle Bestätigungs-E-Mails kosten Zeit und sind fehleranfällig. Automatisierte Bestätigungen erhöhen die Gästezufriedenheit und reduzieren No-Shows messbar.",
     },
   ],
   solution: {
-    headline: "24/7 erreichbar – wie eine Rezeption, die nie schläft.",
-    text: "Der KI Telefonassistent übernimmt die telefonische Erreichbarkeit außerhalb der Rezeptionszeiten: Buchungsanfragen, Zimmerverfügbarkeit, Standardauskünfte – und leitet komplexe Anfragen automatisch weiter.",
+    headline: "24/7 erreichbar – wie eine Rezeption, die nie schließt.",
+    text: "Der KI Telefonassistent übernimmt die telefonische Erreichbarkeit vollautomatisch: Buchungsanfragen, Zimmerverfügbarkeit, Standardauskünfte – und leitet komplexe Anliegen mit vollständiger Zusammenfassung an das Rezeptionsteam weiter.",
   },
   benefits: [
     "24/7 telefonische Erreichbarkeit für Gäste",
     "Automatische Zimmerbuchungen und Bestätigungen",
-    "Mehrsprachig: Deutsch und Englisch",
-    "Standardauskünfte vollständig automatisiert",
-    "Integration mit Channel-Manager und PMS",
-    "Reduktion von No-Shows durch Erinnerungen",
+    "Mehrsprachig konfigurierbar: Deutsch und Englisch",
+    "Standardauskünfte vollautomatisch beantwortet",
+    "Integration mit Channel-Manager und PMS-Systemen",
+    "Erinnerungen zur Reduktion von No-Shows",
     "Keine verpassten Direktbuchungen mehr",
   ],
   workflow: {
-    title: "KI Telefonassistent als 24/7 Rezeptionsdienst",
+    title: "So läuft eine Buchungsanfrage ab",
     steps: [
       {
-        step: "Schritt 1",
+        step: "01",
         title: "Gast ruft an",
-        description: "Ob Anfrage zur Zimmerverfügbarkeit, Buchungsänderung oder Standardfrage – der Assistent ist sofort erreichbar, auch nachts und am Wochenende.",
+        description: "Ob Buchungsanfrage, Zimmerverfügbarkeit oder Standardfrage – der Assistent ist sofort erreichbar, auch nachts und am Wochenende. Kein Besetztzeichen, keine Warteschleife.",
       },
       {
-        step: "Schritt 2",
-        title: "Anliegen klären",
-        description: "Verfügbarkeit prüfen, Zimmertypen erklären, Sonderwünsche aufnehmen und Preise kommunizieren – vollautomatisch und korrekt.",
+        step: "02",
+        title: "Anliegen klären und prüfen",
+        description: "Verfügbarkeit prüfen, Zimmertypen erklären, Sonderwünsche aufnehmen und Preise kommunizieren – vollautomatisch, korrekt und freundlich.",
       },
       {
-        step: "Schritt 3",
+        step: "03",
         title: "Buchung bestätigen",
-        description: "Buchung in das Hotelsystem eintragen, Bestätigung versenden und Gast verabschieden – in unter zwei Minuten.",
+        description: "Buchung ins System eintragen, Bestätigung versenden und Gast verabschieden. Vollständig ohne manuellen Aufwand – in unter zwei Minuten abgeschlossen.",
       },
     ],
   },
@@ -91,24 +91,24 @@ const config: NationalIndustryPageConfig = {
   ],
   faq: [
     {
-      question: "Kann der KI Assistent in das Hotelverwaltungssystem integriert werden?",
-      answer: "Ja. Wir integrieren in gängige PMS-Systeme und Channel-Manager. Buchungen laufen direkt ins Hotelsystem – ohne manuelle Nacherfassung.",
+      question: "Kann der Assistent in unser Hotelverwaltungssystem integriert werden?",
+      answer: "Ja. Wir integrieren in gängige PMS-Systeme und Channel-Manager. Buchungen laufen direkt ins Hotelsystem – ohne manuelle Nacherfassung durch das Rezeptionsteam.",
     },
     {
       question: "Spricht der Assistent auch Englisch?",
-      answer: "Ja. Hotels können den Assistenten für Deutsch und Englisch konfigurieren lassen. Weitere Sprachen auf Anfrage.",
+      answer: "Ja. Hotels können den Assistenten für Deutsch und Englisch konfigurieren lassen. Weitere Sprachen sind auf Anfrage möglich.",
     },
     {
       question: "Was passiert bei komplexen Gruppenanfragen?",
-      answer: "Gruppenanfragen werden automatisch aufgenommen, kategorisiert und an den zuständigen Mitarbeiter weitergeleitet – mit vollständiger Zusammenfassung des Anliegens.",
+      answer: "Gruppenanfragen werden vollständig aufgenommen, kategorisiert und mit Gesprächszusammenfassung an den zuständigen Mitarbeiter weitergeleitet – kein Informationsverlust.",
     },
     {
       question: "Kann der Assistent Sonderwünsche aufnehmen?",
-      answer: "Ja. Allergien, Zimmerausstattung, Anreisezeiten und andere Sonderwünsche werden erfasst und im System notiert.",
+      answer: "Ja. Allergien, Zimmerausstattung, Anreisezeiten und andere Sonderwünsche werden während des Gesprächs erfasst und im System dokumentiert.",
     },
     {
       question: "Wie lange dauert die Einrichtung?",
-      answer: "In den meisten Fällen ist der Assistent innerhalb von 7–14 Tagen konfiguriert und live. Komplexe Integrationen können etwas länger dauern.",
+      answer: "In den meisten Fällen ist der Assistent innerhalb von 7–14 Tagen konfiguriert und live. Komplexe PMS-Integrationen werden individuell abgestimmt.",
     },
   ],
 };

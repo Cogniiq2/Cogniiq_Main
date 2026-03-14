@@ -5,73 +5,73 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 const config: NationalIndustryPageConfig = {
   seo: {
     title: "Webdesign für Arztpraxen | DSGVO-konforme Praxis-Website | Cogniiq",
-    description: "Webdesign für Arztpraxen: DSGVO-konforme Praxis-Website mit Online-Terminbuchung und Local SEO. Mehr Patienten durch bessere Google-Sichtbarkeit. Für Allgemeinmedizin, Fachärzte und Therapeuten.",
+    description: "Webdesign für Arztpraxen: DSGVO-konforme Praxis-Website mit Online-Terminbuchung und Local SEO. Mehr Patienten durch bessere Google-Sichtbarkeit – für Allgemeinmedizin, Fachärzte und Therapeuten.",
     canonical: `${BUSINESS_INFO.website}/webdesign-arzt`,
     keywords: "Webdesign Arztpraxis, Praxis Website, Arzt Homepage, Website Arztpraxis DSGVO, Webdesign Praxis",
   },
   h1: "Webdesign für Arztpraxen & Medizinische Einrichtungen",
   tagline: "Arztpraxis · DSGVO-konform · Online-Terminbuchung",
-  intro: "Eine professionelle Praxis-Website stärkt das Patientenvertrauen, reduziert Anrufvolumen und steigert die Sichtbarkeit bei lokalen Suchen wie 'Zahnarzt München'. DSGVO-konform, mobil-optimiert und mit optionaler Terminbuchung.",
+  intro: "Neue Patienten entscheiden sich heute zuerst online für eine Praxis – und oft schon vor dem ersten Anruf. Eine professionelle Praxis-Website stärkt Vertrauen, reduziert Anrufvolumen durch Online-Buchung und sorgt dafür, dass Sie bei lokalen Suchen wie 'Arzt München' auf Seite 1 erscheinen.",
   serviceSlug: "leistungen",
   serviceLabel: "Webdesign Leistungen",
   costLink: "/kosten-webdesign",
   costLinkLabel: "Webdesign Kosten",
   problems: [
     {
-      title: "Patienten finden die Praxis nicht bei Google",
-      description: "Wenn neue Patienten nach 'Arzt [Stadt]' suchen, erscheinen Praxen ohne Local SEO nicht auf Seite 1. Das Potenzial an Neupatienten bleibt ungenutzt.",
+      title: "Neue Patienten finden die Praxis bei Google nicht",
+      description: "Wer nach 'Arzt [Stadt]' sucht, findet Praxen ohne Local SEO auf Seite 2 oder gar nicht. Das Potenzial an Neupatienten bleibt vollständig ungenutzt.",
     },
     {
-      title: "Telefonisches Anfrageaufkommen überlastet das Team",
-      description: "Routineanfragen zu Öffnungszeiten, Leistungen und Terminverfügbarkeit belasten das Praxisteam täglich und lenken von der Patientenversorgung ab.",
+      title: "Telefonanfragen überlasten das Praxisteam",
+      description: "Routineanfragen zu Öffnungszeiten, Leistungen und Terminverfügbarkeit nehmen Praxismitarbeiterinnen täglich stundenlang in Anspruch – Zeit, die für Patienten fehlt.",
     },
     {
       title: "Veraltete Website schafft kein Vertrauen",
-      description: "Eine veraltete oder unprofessionelle Praxis-Website wirkt auf Patienten abschreckend – noch bevor sie die Praxis betreten haben.",
+      description: "Patienten entscheiden sich bewusst oder unbewusst gegen eine Praxis, deren Website veraltet oder unprofessionell wirkt – noch bevor sie einen Fuß in die Praxis setzen.",
     },
     {
-      title: "Keine Online-Terminbuchung",
-      description: "Patienten, die außerhalb der Öffnungszeiten einen Termin buchen möchten, können dies nicht und wechseln zur Konkurrenz.",
+      title: "Keine Online-Terminbuchung verfügbar",
+      description: "Patienten, die abends oder am Wochenende einen Termin buchen möchten, können das nicht – und buchen in der nächsten Praxis, die Online-Buchung anbietet.",
     },
     {
-      title: "DSGVO-Compliance nicht sichergestellt",
-      description: "Praxis-Websites müssen besondere DSGVO-Anforderungen erfüllen. Unvollständige Datenschutzrichtlinien können rechtliche Konsequenzen haben.",
+      title: "DSGVO-Konformität nicht vollständig sichergestellt",
+      description: "Praxis-Websites unterliegen besonderen datenschutzrechtlichen Anforderungen. Unvollständige Datenschutzrichtlinien und fehlende AVV sind rechtliche Risiken.",
     },
     {
-      title: "Keine Patienteninformationen digital verfügbar",
-      description: "Informationen zu Leistungen, Vorbereitung auf Untersuchungen und Formulare werden noch postalisch oder telefonisch übermittelt – zeitaufwändig und ineffizient.",
+      title: "Patienteninformationen fehlen oder sind unstrukturiert",
+      description: "Leistungsübersichten, Vorbereitungshinweise und Formulare noch postalisch oder telefonisch bereitzustellen kostet Zeit – und wirkt unprofessionell.",
     },
   ],
   solution: {
     headline: "Praxis-Websites, die Vertrauen aufbauen und Patienten entlasten.",
-    text: "Cogniiq entwickelt DSGVO-konforme Praxis-Websites mit Online-Terminbuchung, strukturierten Daten für Suchergebnisse und Local SEO-Setup. Das Ergebnis: mehr qualifizierte Neupatienten und weniger Routineanrufe.",
+    text: "Cogniiq entwickelt DSGVO-konforme Praxis-Websites mit Online-Terminbuchung, Local SEO-Setup und strukturierten Daten für bessere Google-Darstellung. Das Ergebnis: mehr qualifizierte Neupatienten und deutlich weniger Routineanrufe.",
   },
   benefits: [
     "DSGVO-konforme Verarbeitung aller Patientendaten",
     "Online-Terminbuchung rund um die Uhr",
     "Local SEO: gefunden bei 'Arzt [Stadt]'",
-    "Praxis-Informationen und Leistungen übersichtlich dargestellt",
+    "Praxis-Leistungen klar und vertrauenswürdig dargestellt",
     "Digitale Formulare für Neupatienten",
     "Integration KI-Telefonassistent für automatische Terminbuchung",
-    "Strukturierte Daten für bessere Google-Darstellung",
+    "Strukturierte Daten für bessere Darstellung in Google",
   ],
   workflow: {
-    title: "Praxis-Website in 3 Schritten",
+    title: "Praxis-Website in drei klar definierten Phasen",
     steps: [
       {
-        step: "Schritt 1",
+        step: "01",
         title: "DSGVO-Analyse & Konzept",
-        description: "Analyse der rechtlichen Anforderungen, Patientenstruktur und lokalen Wettbewerbssituation. Konzept für DSGVO-konforme Website mit optimalem Content.",
+        description: "Analyse der rechtlichen Anforderungen, Patientenstruktur und lokalen Wettbewerbssituation. Konzept für eine DSGVO-konforme Website mit optimalem Informationsaufbau.",
       },
       {
-        step: "Schritt 2",
+        step: "02",
         title: "Entwicklung & SEO",
-        description: "Individuelle Praxis-Website mit Terminbuchungsintegration, Local SEO Setup, strukturierten Daten und vollständiger DSGVO-Konformität.",
+        description: "Individuelle Praxis-Website mit Terminbuchungsintegration, Local SEO-Setup, strukturierten Daten und vollständiger DSGVO-Konformität.",
       },
       {
-        step: "Schritt 3",
+        step: "03",
         title: "Go-Live & Betreuung",
-        description: "Launch mit vollständiger Dokumentation, optionalem KI-Telefonassistenten und laufender Betreuung für Updates.",
+        description: "Launch mit vollständiger Dokumentation, optionalem KI-Telefonassistenten und laufender Betreuung für Updates und Anpassungen.",
       },
     ],
   },
@@ -92,23 +92,23 @@ const config: NationalIndustryPageConfig = {
   faq: [
     {
       question: "Welche DSGVO-Anforderungen gelten für Praxis-Websites?",
-      answer: "Praxis-Websites benötigen eine vollständige Datenschutzerklärung, DSGVO-konformes Cookie-Consent, sichere Formularübertragung (SSL), und bei Terminbuchungstools einen Auftragsverarbeitungsvertrag (AVV). Cogniiq liefert alle Komponenten.",
+      answer: "Praxis-Websites benötigen eine vollständige Datenschutzerklärung, DSGVO-konformes Cookie-Consent, gesicherte Formularübertragung (SSL) und bei Terminbuchungstools einen Auftragsverarbeitungsvertrag (AVV). Cogniiq liefert alle Komponenten vollständig.",
     },
     {
       question: "Kann eine Praxis-Website Terminbuchungen automatisieren?",
-      answer: "Ja. Wir integrieren Terminbuchungssysteme, die mit Ihrem Praxiskalender synchronisiert sind. Patienten können online Termine buchen – auch nachts und am Wochenende.",
+      answer: "Ja. Wir integrieren Terminbuchungssysteme, die mit Ihrem Praxiskalender synchronisiert sind. Patienten können online Termine buchen – auch abends und am Wochenende.",
     },
     {
       question: "Wie lange dauert die Entwicklung einer Praxis-Website?",
-      answer: "Einfache Praxis-Websites sind in 2–3 Wochen fertig. Mit Terminbuchungssystem und erweitertem SEO-Setup typischerweise 4–6 Wochen.",
+      answer: "Einfache Praxis-Websites sind in 2–3 Wochen fertig. Mit Terminbuchungssystem und erweitertem SEO-Setup typischerweise 4–6 Wochen – ohne Unterbrechung des Praxisbetriebs.",
     },
     {
       question: "Was kostet eine Praxis-Website?",
-      answer: "Praxis-Websites beginnen bei ca. 2.000 €. Mit Terminbuchungsintegration und DSGVO-konformem Setup typischerweise 3.000–5.000 €. Genaues Angebot nach kostenlosem Erstgespräch.",
+      answer: "Praxis-Websites beginnen bei ca. 2.000 €. Mit Terminbuchungsintegration und DSGVO-Setup typischerweise 3.000–5.000 €. Ein genaues Angebot erhalten Sie im kostenlosen Erstgespräch.",
     },
     {
       question: "Können mehrere Ärzte oder Standorte abgebildet werden?",
-      answer: "Ja. Gemeinschaftspraxen, MVZ oder Praxen mit mehreren Standorten werden vollständig abgebildet – inkl. individueller SEO-Seiten je Standort.",
+      answer: "Ja. Gemeinschaftspraxen, MVZ oder Praxen mit mehreren Standorten werden vollständig abgebildet – inkl. individueller SEO-Seiten je Standort und Arztprofilen.",
     },
   ],
 };

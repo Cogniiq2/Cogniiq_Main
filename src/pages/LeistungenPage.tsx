@@ -31,12 +31,12 @@ const SERVICES = [
     index: "01",
     icon: Globe,
     name: "Webdesign",
-    tagline: "Eine Website, die qualifizierte Anfragen erzeugt — nicht nur existiert.",
+    tagline: "Eine Website, die gefunden wird, überzeugt und Anfragen erzeugt — nicht nur existiert.",
     benefits: [
-      "Conversion-Architektur statt Designvorlagen",
-      "Technisches SEO für organische Sichtbarkeit",
-      "Schnelle Ladezeiten und mobile Optimierung",
-      "Integration von Buchungs- und Kontaktsystemen",
+      "Conversion-Architektur für messbar mehr Anfragen",
+      "Technisches SEO und Local SEO für organische Sichtbarkeit",
+      "Schnelle Ladezeiten und Mobile-first Entwicklung",
+      "Integration von Buchungs-, Kalender- und Kontaktsystemen",
     ],
     usecases: ["Arzt & Praxis", "Gastronomie & Restaurant"],
     cities: [
@@ -56,12 +56,12 @@ const SERVICES = [
     index: "02",
     icon: Phone,
     name: "KI-Telefonassistent",
-    tagline: "Kein Anruf geht verloren. Kein Termin bleibt ungebucht.",
+    tagline: "24/7 Anrufannahme in natürlicher Sprache — kein verpasster Termin, kein verpasster Umsatz.",
     benefits: [
-      "24/7-Anrufannahme in natürlicher Sprache",
-      "Automatische Terminbuchung und Bestätigung",
-      "Intelligente Weiterleitung und Eskalationslogik",
-      "Synchronisation mit Kalender und CRM",
+      "Anrufannahme rund um die Uhr in natürlicher Sprache",
+      "Automatische Terminbuchung, Bestätigung und Erinnerung",
+      "Intelligente Weiterleitung bei komplexen Anfragen",
+      "Vollständige Synchronisation mit Kalender und CRM",
     ],
     usecases: ["Praxis & Klinik", "Gastronomie & Hotel"],
     cities: [
@@ -81,12 +81,12 @@ const SERVICES = [
     index: "03",
     icon: Zap,
     name: "Automatisierung",
-    tagline: "Operative Abläufe laufen im Hintergrund — ohne tägliches Eingreifen.",
+    tagline: "Routineaufgaben laufen vollautomatisch — ohne tägliches Eingreifen, ohne zusätzliches Personal.",
     benefits: [
-      "Systemintegrationen zwischen CRM, Kalender und Buchung",
-      "Automatische Benachrichtigungen und Erinnerungen",
-      "Prozess-Workflows mit Eskalations- und SLA-Logik",
-      "Monitoring, Logging und Ausfall-Absicherung",
+      "Nahtlose Systemintegration: CRM, Kalender, Buchung, Kasse",
+      "Automatische Benachrichtigungen, Erinnerungen und Follow-ups",
+      "Prozess-Workflows mit Eskalations- und Ausfall-Logik",
+      "Monitoring und Logging für zuverlässigen Dauerbetrieb",
     ],
     usecases: ["Restaurants & Gastronomie", "Arztpraxen & Therapeuten"],
     cities: [
@@ -104,11 +104,11 @@ const SERVICES = [
 ];
 
 const OUTCOMES = [
-  { metric: "Weniger verpasste Anrufe", context: "Durch KI-Rezeption rund um die Uhr" },
-  { metric: "Schnellere Terminvergabe", context: "Automatische Buchungslogik ohne Rückruf" },
-  { metric: "Weniger No-Shows", context: "Automatisierte Erinnerungen vor dem Termin" },
-  { metric: "Mehr qualifizierte Anfragen", context: "Durch SEO-optimierte Conversion-Architektur" },
-  { metric: "Weniger manuelle Verwaltung", context: "Prozesse laufen automatisiert im Hintergrund" },
+  { metric: "Keine verpassten Anrufe mehr", context: "KI-Assistent nimmt 24/7 ab — auch nachts, am Wochenende und bei Stoßzeiten" },
+  { metric: "Terminbuchung ohne Rückruf", context: "Patienten, Gäste und Kunden buchen direkt — ohne auf eine Antwort zu warten" },
+  { metric: "No-Shows messbar reduziert", context: "Automatische Erinnerungen mit Bestätigungslink bis zu 48 Stunden vorher" },
+  { metric: "Mehr qualifizierte Anfragen", context: "SEO-optimierte Websites, die gefunden werden — und Besucher in Kunden verwandeln" },
+  { metric: "Stunden Verwaltung eingespart", context: "Bestätigungen, Erinnerungen, Follow-ups und CRM-Pflege laufen ohne manuellen Aufwand" },
 ];
 
 const SYSTEM_PANELS = [
@@ -192,31 +192,31 @@ const PROCESS_STEPS = [
 const FAQ_ITEMS = [
   {
     q: "Wie schnell ist ein Go-Live realistisch?",
-    a: "Je nach Systemumfang sind 7 bis 14 Tage für einen ersten Go-Live erreichbar. Komplexere Systemverbünde (Website + KI + Automatisierung) planen wir in 3 bis 5 Wochen.",
+    a: "Einzelne Workflows wie Terminbestätigungen oder der KI-Telefonassistent sind oft in 7–14 Tagen live. Vollständige Systemverbünde aus Website, KI-Assistenten und Automatisierung planen wir in 3–6 Wochen — abhängig vom Scope und wie schnell Feedback kommt.",
   },
   {
-    q: "Was kostet ein System grob?",
-    a: "Der Rahmen hängt vom Scope ab. Einzellösungen starten im niedrigen vierstelligen Bereich; integrierte Systemarchitekturen liegen je nach Komplexität höher. Eine konkrete Einschätzung erhalten Sie im kostenlosen Erstgespräch.",
+    q: "Was kostet ein System?",
+    a: "Einzellösungen starten im niedrigen vierstelligen Bereich. Integrierte Systemarchitekturen — Website, KI-Assistent und Automatisierung kombiniert — liegen je nach Komplexität höher. Eine konkrete Einschätzung Ihres spezifischen Setups erhalten Sie im kostenlosen Erstgespräch, ohne Verpflichtung.",
   },
   {
     q: "Sind die Systeme DSGVO-konform?",
-    a: "Ja. Alle Daten werden auf europäischen Servern verarbeitet und gespeichert. Wir implementieren datenschutzkonforme Architekturen und stellen notwendige Dokumentation bereit.",
+    a: "Ja, und das ist kein Marketingversprechen. Alle Daten werden ausschließlich auf europäischen Servern verarbeitet. Wir liefern mit jedem System die notwendige Dokumentation: Datenschutzerklärung, AVV und Cookie-Consent. Für Praxen und Betriebe mit sensiblen Patientendaten gibt es spezielle Konfigurationen.",
   },
   {
-    q: "Kann das in bestehende Tools integriert werden?",
-    a: "In der Regel ja. Wir integrieren in gängige Kalender-, CRM-, Buchungs- und Kommunikationssysteme. Im Erstgespräch klären wir, was in Ihrer Infrastruktur möglich und sinnvoll ist.",
+    q: "Kann das in unsere bestehenden Tools integriert werden?",
+    a: "In der Regel ja. Wir integrieren in gängige Kalender-, CRM-, Buchungs- und Kassensysteme: von Tomedo und CGM über OnOffice und HubSpot bis zu Lightspeed und Magicline. Im Erstgespräch klären wir konkret, was mit Ihrer Infrastruktur möglich und sinnvoll ist.",
   },
   {
-    q: "Was, wenn wir nur mit einem Service starten?",
-    a: "Das ist der häufigste Einstieg. Sie wählen das, was den größten unmittelbaren Hebel hat. Die Architektur ist so gestaltet, dass spätere Erweiterungen ohne Umbauten möglich sind.",
+    q: "Was, wenn wir nur mit einem Service starten möchten?",
+    a: "Das ist der häufigste Einstieg — und der richtige. Starten Sie mit dem, was den größten unmittelbaren Hebel hat. Die Architektur ist von Anfang an so gestaltet, dass spätere Erweiterungen um weitere Services ohne Umbauten möglich sind.",
   },
   {
     q: "Wie läuft die Zusammenarbeit remote ab?",
-    a: "Vollständig remote — von der Analyse bis zum Go-Live. Abstimmungen per Video-Call, technische Übergaben asynchron mit Dokumentation. Für Bayreuth, München und Regensburg sind auch Vor-Ort-Termine möglich.",
+    a: "Vollständig remote — von der Analyse bis zum Go-Live. Abstimmungen per Video-Call, Zwischenstände mit Dokumentation, technische Übergaben asynchron. Für Standorte in Bayreuth, München und Regensburg sind auch Vor-Ort-Termine möglich.",
   },
   {
     q: "Gibt es laufende Betreuung nach dem Go-Live?",
-    a: "Ja. Wir bieten Monitoring, Optimierung und Anpassungen auf Basis realer Nutzungsdaten. Der Umfang wird projektspezifisch vereinbart.",
+    a: "Ja. Wir bieten Monitoring, Optimierung und Anpassungen auf Basis realer Nutzungsdaten. Kein System ist nach dem Launch fertig — das Optimierungspotenzial entsteht erst, wenn echte Nutzer mit dem System interagieren. Der Umfang wird projektspezifisch vereinbart.",
   },
 ];
 
@@ -447,7 +447,7 @@ export function LeistungenPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             >
-              Für Mittelständler und wachsende Betriebe, die aufgehört haben, Einzellösungen zu stapeln — und ein System wollen, das tatsächlich funktioniert.
+              Für Praxen, Restaurants, Makler und Studios, die aufgehört haben, Einzellösungen zu stapeln — und ein System wollen, das tatsächlich Ergebnisse erzeugt.
             </motion.p>
 
             <motion.p
@@ -636,7 +636,7 @@ export function LeistungenPage() {
                 id="outcomes-heading"
                 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 tracking-tight max-w-lg"
               >
-                Was Kunden typischerweise erreichen
+                Was unsere Kunden typischerweise erreichen
               </h2>
             </motion.div>
 
