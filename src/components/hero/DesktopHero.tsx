@@ -1,6 +1,7 @@
-import { motion } from 'framer-motion';
-import { useMemo } from 'react';
+import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowRight, Zap, Globe, Brain } from 'lucide-react';
 import { SplineScene } from '../ui/splite';
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -34,55 +35,103 @@ function DesktopParticles() {
   );
 }
 
+function AnimatedCounter({ to, suffix = '' }: { to: number; suffix?: string }) {
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (v) => Math.round(v));
+  const [display, setDisplay] = useState(0);
+  const ref = useRef(false);
+
+  useEffect(() => {
+    const unsubscribe = rounded.on('change', setDisplay);
+    if (!ref.current) {
+      ref.current = true;
+      const controls = animate(count, to, { duration: 1.8, delay: 3.2, ease: 'easeOut' });
+      return () => {
+        controls.stop();
+        unsubscribe();
+      };
+    }
+    return unsubscribe;
+  }, [count, rounded, to]);
+
+  return (
+    <span>
+      {display}
+      {suffix}
+    </span>
+  );
+}
+
+const SERVICES = [
+  { icon: Brain, label: 'KI-Systeme' },
+  { icon: Globe, label: 'Webdesign' },
+  { icon: Zap, label: 'Automatisierung' },
+];
+
+const STATS = [
+  { value: 48, suffix: 'h', label: 'Bis zum ersten Workflow' },
+  { value: 100, suffix: '%', label: 'DSGVO-konform' },
+  { value: 3, suffix: 'x', label: 'Mehr Effizienz' },
+];
+
 function DesktopCTA() {
   const navigate = useNavigate();
 
   return (
     <motion.div
-      className="mt-12 flex flex-col items-start gap-4"
+      className="mt-10 flex items-center gap-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 1, delay: 2.4, ease: EASE_OUT }}
+      transition={{ duration: 0.8, delay: 2.8, ease: EASE_OUT }}
     >
-      <motion.div
-        className="w-12 h-px bg-gray-300"
-        initial={{ width: 0, opacity: 0 }}
-        animate={{ width: 48, opacity: 1 }}
-        transition={{ duration: 0.5, delay: 2.5 }}
-      />
-
       <motion.button
         onClick={() => navigate('/kontakt')}
-        className="group relative px-7 py-3.5 overflow-hidden cursor-pointer"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 2.7, ease: EASE_OUT }}
-        whileTap={{ scale: 0.98 }}
+        className="group relative flex items-center gap-3 px-6 py-3.5 overflow-hidden cursor-pointer"
+        initial={{ opacity: 0, x: -10 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 2.9, ease: EASE_OUT }}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.97 }}
       >
-        <div className="absolute inset-0 bg-gray-900 transition-colors duration-200 group-hover:bg-gray-700" />
+        <div className="absolute inset-0 bg-gray-950 transition-colors duration-300 group-hover:bg-gray-800" />
+        <motion.div
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          style={{
+            background: 'linear-gradient(120deg, rgba(2,132,199,0.18) 0%, transparent 60%)',
+          }}
+        />
         <div className="relative flex items-center gap-2.5">
-          <span className="text-sm font-semibold tracking-wide text-white">
+          <span className="text-[13px] font-semibold tracking-wide text-white whitespace-nowrap">
             System anfragen
           </span>
-          <motion.svg
-            width="14" height="14" viewBox="0 0 16 16" fill="none"
-            className="text-white/60"
-            animate={{ x: [0, 3, 0] }}
-            transition={{ duration: 2.5, repeat: Infinity, delay: 4.5, ease: 'easeInOut' }}
+          <motion.div
+            animate={{ x: [0, 4, 0] }}
+            transition={{ duration: 2.2, repeat: Infinity, delay: 4, ease: 'easeInOut' }}
           >
-            <path d="M6 3L11 8L6 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </motion.svg>
+            <ArrowRight className="w-3.5 h-3.5 text-white/60 group-hover:text-white transition-colors" />
+          </motion.div>
         </div>
+        <motion.div
+          className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-sky-500 to-transparent"
+          initial={{ width: 0 }}
+          whileHover={{ width: '100%' }}
+          transition={{ duration: 0.3 }}
+        />
       </motion.button>
 
-      <motion.span
-        className="text-[11px] text-gray-400 tracking-wide"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 3.0 }}
+      <motion.button
+        onClick={() => navigate('/leistungen')}
+        className="group relative flex items-center gap-2 px-6 py-3.5 cursor-pointer border border-gray-200 hover:border-gray-400 transition-colors duration-300"
+        initial={{ opacity: 0, x: -10 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 3.1, ease: EASE_OUT }}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.97 }}
       >
-        Für Unternehmen in Deutschland
-      </motion.span>
+        <span className="text-[13px] font-medium tracking-wide text-gray-500 group-hover:text-gray-900 transition-colors whitespace-nowrap">
+          Leistungen ansehen
+        </span>
+      </motion.button>
     </motion.div>
   );
 }
@@ -115,17 +164,27 @@ export function DesktopHero() {
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-8 flex items-center gap-0">
         <div className="flex-1 max-w-xl">
-          <motion.p
-            className="text-[11px] font-semibold tracking-[0.25em] uppercase text-gray-400 mb-10"
+
+          <motion.div
+            className="flex items-center gap-3 mb-8"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.7, ease: EASE_OUT }}
           >
-            Operative AI Systems
-          </motion.p>
+            <div className="flex items-center gap-2 px-3 py-1.5 border border-gray-200 bg-gray-50">
+              <motion.div
+                className="w-1.5 h-1.5 rounded-full bg-emerald-500"
+                animate={{ opacity: [1, 0.3, 1] }}
+                transition={{ duration: 1.8, repeat: Infinity }}
+              />
+              <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-gray-500">
+                Operative AI Systems
+              </span>
+            </div>
+          </motion.div>
 
           <div className="relative mb-0">
-            <h1 className="text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-none">
+            <h1 className="text-7xl lg:text-8xl xl:text-[6.5rem] font-bold tracking-tight leading-none">
               {'CogniIQ'.split('').map((char, i) => (
                 <motion.span
                   key={i}
@@ -155,7 +214,7 @@ export function DesktopHero() {
           </div>
 
           <motion.p
-            className="mt-8 text-lg lg:text-xl text-gray-500 font-light leading-relaxed max-w-[420px]"
+            className="mt-7 text-[15px] lg:text-base text-gray-500 font-light leading-[1.75] max-w-[400px]"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 2.0, ease: EASE_OUT }}
@@ -163,7 +222,49 @@ export function DesktopHero() {
             AI-Systeme, Webdesign &amp; Automatisierung für Unternehmen in Bayreuth, München und Regensburg.
           </motion.p>
 
+          <motion.div
+            className="mt-8 flex items-center gap-1.5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 2.3, ease: EASE_OUT }}
+          >
+            {SERVICES.map(({ icon: Icon, label }, i) => (
+              <motion.div
+                key={label}
+                className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-100 bg-white/80"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 2.4 + i * 0.1, ease: EASE_OUT }}
+              >
+                <Icon className="w-3 h-3 text-sky-600" />
+                <span className="text-[11px] font-medium text-gray-600 whitespace-nowrap">{label}</span>
+              </motion.div>
+            ))}
+          </motion.div>
+
           <DesktopCTA />
+
+          <motion.div
+            className="mt-10 pt-8 border-t border-gray-100 grid grid-cols-3 gap-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 3.0, ease: EASE_OUT }}
+          >
+            {STATS.map(({ value, suffix, label }, i) => (
+              <motion.div
+                key={label}
+                className="flex flex-col gap-0.5"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 3.1 + i * 0.12, ease: EASE_OUT }}
+              >
+                <span className="text-2xl font-bold text-gray-900 tabular-nums">
+                  <AnimatedCounter to={value} suffix={suffix} />
+                </span>
+                <span className="text-[11px] text-gray-400 font-light leading-tight">{label}</span>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
 
         <motion.div
