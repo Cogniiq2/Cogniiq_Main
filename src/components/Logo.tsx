@@ -92,45 +92,78 @@ function Concept2({ ink, inkMid, inkFaint, className }: ConceptProps) {
   );
 }
 
-// ─── CONCEPT 3 ── "Quantum Core"
-// The mark is a hexagonal frame (hardware/silicon aesthetic) with
-// concentric inner structure. "IQ" rendered in a distinctly different weight
-// — heavier than "Cogni" — with a small superscript-like treatment.
+// ─── CONCEPT 3 ── "Quantum Core" — Premium Revision
 function Concept3({ ink, inkMid, inkFaint, className }: ConceptProps) {
-  // Hexagon points for a 18×18 hex centred at (18, 18)
-  const R = 10, cx = 18, cy = 18;
-  const hex = Array.from({ length: 6 }, (_, i) => {
-    const a = (Math.PI / 180) * (60 * i - 30);
-    return `${(cx + R * Math.cos(a)).toFixed(2)},${(cy + R * Math.sin(a)).toFixed(2)}`;
-  }).join(' ');
-  const innerHex = Array.from({ length: 6 }, (_, i) => {
-    const a = (Math.PI / 180) * (60 * i - 30);
-    return `${(cx + (R * 0.55) * Math.cos(a)).toFixed(2)},${(cy + (R * 0.55) * Math.sin(a)).toFixed(2)}`;
-  }).join(' ');
+  const R = 11, cx = 19, cy = 18;
+  const hexPts = (r: number) =>
+    Array.from({ length: 6 }, (_, i) => {
+      const a = (Math.PI / 180) * (60 * i - 30);
+      return `${(cx + r * Math.cos(a)).toFixed(3)},${(cy + r * Math.sin(a)).toFixed(3)}`;
+    }).join(' ');
+
+  const midR = R * 0.58;
+  const midPts = hexPts(midR);
 
   return (
-    <svg viewBox="0 0 180 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq" className={className} height="36" style={{ width: 'auto' }}>
-      {/* Outer hex */}
-      <polygon points={hex} stroke={ink} strokeWidth="1.4" />
-      {/* Inner hex */}
-      <polygon points={innerHex} stroke={inkFaint} strokeWidth="1" />
-      {/* Core dot */}
-      <circle cx="18" cy="18" r="2.4" fill={ink} />
-      {/* Spoke lines to corners of inner hex */}
+    <svg viewBox="0 0 200 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq" className={className} height="36" style={{ width: 'auto' }}>
+      <defs>
+        <linearGradient id="hexGrad" x1="8" y1="7" x2="30" y2="29" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor={inkMid} stopOpacity="0.9" />
+          <stop offset="100%" stopColor={ink} stopOpacity="0.6" />
+        </linearGradient>
+        <linearGradient id="coreGrad" x1="16" y1="15" x2="22" y2="21" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor={inkMid} />
+          <stop offset="100%" stopColor={ink} />
+        </linearGradient>
+        <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="0.6" result="blur" />
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      {/* Outer hex — primary stroke */}
+      <polygon points={hexPts(R)} stroke="url(#hexGrad)" strokeWidth="1.6" strokeLinejoin="round" />
+
+      {/* Mid hex — structural ring */}
+      <polygon points={midPts} stroke={inkFaint} strokeWidth="0.9" strokeLinejoin="round" />
+
+      {/* Spoke lines from mid hex corners to core */}
       {Array.from({ length: 6 }, (_, i) => {
         const a = (Math.PI / 180) * (60 * i - 30);
-        const ix = (cx + (R * 0.55) * Math.cos(a)).toFixed(2);
-        const iy = (cy + (R * 0.55) * Math.sin(a)).toFixed(2);
-        return <line key={i} x1={18} y1={18} x2={ix} y2={iy} stroke={inkFaint} strokeWidth="0.8" />;
+        const x2 = (cx + midR * Math.cos(a)).toFixed(3);
+        const y2 = (cy + midR * Math.sin(a)).toFixed(3);
+        return <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} stroke={inkFaint} strokeWidth="0.7" />;
       })}
 
-      {/* Cogni — normal weight */}
-      <text x="40" y="22.5" fontFamily="'SF Pro Text',-apple-system,'Helvetica Neue',Arial,sans-serif"
-        fontSize="17" fontWeight="400" letterSpacing="-0.3" fill={ink}>Cogni</text>
+      {/* Subtle tick marks at outer hex midpoints */}
+      {Array.from({ length: 6 }, (_, i) => {
+        const a = (Math.PI / 180) * (60 * i);
+        const ox = cx + R * Math.cos(a);
+        const oy = cy + R * Math.sin(a);
+        const ix = cx + (R - 2.2) * Math.cos(a);
+        const iy = cy + (R - 2.2) * Math.sin(a);
+        return <line key={i} x1={ox.toFixed(2)} y1={oy.toFixed(2)} x2={ix.toFixed(2)} y2={iy.toFixed(2)} stroke={inkMid} strokeWidth="1" strokeLinecap="round" />;
+      })}
 
-      {/* IQ — bold weight for contrast */}
-      <text x="104" y="22.5" fontFamily="'SF Pro Text',-apple-system,'Helvetica Neue',Arial,sans-serif"
-        fontSize="17" fontWeight="700" letterSpacing="0.2" fill={inkMid}>IQ</text>
+      {/* Core circle with gradient */}
+      <circle cx={cx} cy={cy} r="2.6" fill="url(#coreGrad)" filter="url(#glow)" />
+
+      {/* Wordmark — "Cogni" light weight, wide tracking */}
+      <text
+        x="42" y="23"
+        fontFamily="'SF Pro Display','SF Pro Text',-apple-system,'Helvetica Neue',Arial,sans-serif"
+        fontSize="16" fontWeight="300" letterSpacing="1.8" fill={ink}
+      >COGNI</text>
+
+      {/* Hairline separator */}
+      <line x1="118" y1="10" x2="118" y2="26" stroke={inkFaint} strokeWidth="0.8" />
+
+      {/* IQ — bold, tracked, accent color */}
+      <text
+        x="124" y="23"
+        fontFamily="'SF Pro Display','SF Pro Text',-apple-system,'Helvetica Neue',Arial,sans-serif"
+        fontSize="16" fontWeight="600" letterSpacing="2.5" fill={inkMid}
+      >IQ</text>
     </svg>
   );
 }
