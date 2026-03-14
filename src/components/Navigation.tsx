@@ -69,10 +69,7 @@ export function Navigation() {
                 whileTap={{ scale: 0.98 }}
                 className="flex items-center"
               >
-                <Logo
-                  className="h-9"
-                  variant={isScrolled ? 'default' : 'default'}
-                />
+                <Logo className="h-9" />
               </motion.div>
             </Link>
 

@@ -2,135 +2,152 @@ import { cn } from '@/lib/utils';
 
 interface LogoProps {
   className?: string;
-  variant?: 'default' | 'light' | 'dark';
+  variant?: 'default' | 'light';
 }
 
 export function Logo({ className, variant = 'default' }: LogoProps) {
-  const isDark = variant === 'light';
-
-  const markPrimary = isDark ? '#ffffff' : '#0a0f14';
-  const markAccent = isDark ? 'rgba(255,255,255,0.55)' : '#4a90a4';
-  const markAccentAlt = isDark ? 'rgba(255,255,255,0.25)' : '#c8dde6';
-  const wordPrimary = isDark ? '#ffffff' : '#0d1821';
-  const wordSuffix = isDark ? 'rgba(255,255,255,0.5)' : '#7a9aaa';
+  const light = variant === 'light';
 
   return (
     <svg
-      viewBox="0 0 210 44"
+      viewBox="0 0 188 40"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={cn('w-auto', className)}
       aria-label="Cogniiq"
     >
       <defs>
-        <linearGradient id="cq-grad-mark" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={isDark ? '#ffffff' : '#1a2d3a'} />
-          <stop offset="100%" stopColor={isDark ? 'rgba(255,255,255,0.7)' : '#3a7a96'} />
+        <linearGradient id="cq-g1" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor={light ? '#ffffff' : '#0d1f2d'} />
+          <stop offset="100%" stopColor={light ? 'rgba(255,255,255,0.7)' : '#2e6f8f'} />
         </linearGradient>
-        <linearGradient id="cq-grad-node" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={isDark ? '#ffffff' : '#2a6080'} />
-          <stop offset="100%" stopColor={isDark ? 'rgba(255,255,255,0.6)' : '#4a9ab8'} />
+        <linearGradient id="cq-g2" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stopColor={light ? 'rgba(255,255,255,0.4)' : '#1a4a62'} />
+          <stop offset="100%" stopColor={light ? 'rgba(255,255,255,0.9)' : '#3d8fad'} />
         </linearGradient>
-        <linearGradient id="cq-grad-ring" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={isDark ? 'rgba(255,255,255,0.9)' : '#1e3a4a'} />
-          <stop offset="100%" stopColor={isDark ? 'rgba(255,255,255,0.3)' : '#5a9ab4'} />
+        <linearGradient id="cq-g3" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor={light ? '#ffffff' : '#0d1f2d'} />
+          <stop offset="100%" stopColor={light ? 'rgba(255,255,255,0.5)' : '#2a6080'} />
         </linearGradient>
       </defs>
 
-      {/* ── MARK: Hexagonal intelligence node ── */}
-      <g transform="translate(0, 0)">
+      {/* ── MARK: Neural lattice diamond ──────────────────────────────── */}
+      {/*
+          Concept: A diamond/rhombus subdivided into 4 triangular facets,
+          with a glowing core node and 4 satellite nodes at each corner.
+          No letters — pure geometric intelligence signal.
+          Inspired by: DeepMind, Palantir, high-end tech marks.
+      */}
+      <g transform="translate(1, 1)">
 
-        {/* Outer hex shape — crisp, architectural */}
+        {/* Outer diamond outline — architectural precision */}
         <polygon
-          points="22,2 38,11 38,29 22,38 6,29 6,11"
+          points="19,0 36,18 19,36 2,18"
           fill="none"
-          stroke="url(#cq-grad-ring)"
-          strokeWidth="1.2"
-          opacity="0.35"
+          stroke={light ? 'rgba(255,255,255,0.25)' : 'rgba(13,31,45,0.18)'}
+          strokeWidth="1"
         />
 
-        {/* Inner hex fill — subtle depth */}
+        {/* Top-left facet */}
         <polygon
-          points="22,6 34,13 34,27 22,34 10,27 10,13"
-          fill={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(26,60,80,0.05)'}
+          points="19,0 2,18 19,18"
+          fill={light ? 'rgba(255,255,255,0.12)' : 'rgba(13,31,45,0.08)'}
+          stroke={light ? 'rgba(255,255,255,0.0)' : 'rgba(0,0,0,0)'}
         />
 
-        {/* Arc: the "C" of Cogniiq, precise quarter arc top-left */}
-        <path
-          d="M 22 9
-             A 13 13 0 1 0 22 31"
-          stroke="url(#cq-grad-mark)"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          fill="none"
+        {/* Top-right facet — slightly brighter */}
+        <polygon
+          points="19,0 36,18 19,18"
+          fill={light ? 'rgba(255,255,255,0.07)' : 'rgba(46,111,143,0.1)'}
         />
 
-        {/* Arc cap — top dot */}
-        <circle cx="22" cy="9" r="1.6" fill={isDark ? '#ffffff' : '#1a2d3a'} />
+        {/* Bottom-left facet */}
+        <polygon
+          points="2,18 19,36 19,18"
+          fill={light ? 'rgba(255,255,255,0.05)' : 'rgba(46,111,143,0.06)'}
+        />
 
-        {/* Arc cap — bottom dot */}
-        <circle cx="22" cy="31" r="1.6" fill={isDark ? '#ffffff' : '#1a2d3a'} />
+        {/* Bottom-right facet */}
+        <polygon
+          points="36,18 19,36 19,18"
+          fill={light ? 'rgba(255,255,255,0.03)' : 'rgba(13,31,45,0.04)'}
+        />
 
-        {/* Central node — the intelligence core */}
-        <circle cx="22" cy="20" r="3.2" fill="url(#cq-grad-node)" />
-        <circle cx="22" cy="20" r="1.4" fill={isDark ? '#ffffff' : '#ffffff'} />
+        {/* Facet dividers — hairline precision */}
+        <line x1="19" y1="0" x2="19" y2="36"
+          stroke={light ? 'rgba(255,255,255,0.2)' : 'rgba(46,111,143,0.25)'}
+          strokeWidth="0.6" />
+        <line x1="2" y1="18" x2="36" y2="18"
+          stroke={light ? 'rgba(255,255,255,0.14)' : 'rgba(46,111,143,0.18)'}
+          strokeWidth="0.6" />
 
-        {/* Neural connectors — 3 lines radiating from center to hex vertices */}
-        <line x1="22" y1="20" x2="38" y2="11" stroke={markAccent} strokeWidth="0.8" opacity="0.55" />
-        <line x1="22" y1="20" x2="38" y2="29" stroke={markAccent} strokeWidth="0.8" opacity="0.55" />
-        <line x1="22" y1="20" x2="22" y2="6" stroke={markAccent} strokeWidth="0.8" opacity="0.35" />
+        {/* Diagonal cross connectors — neural structure */}
+        <line x1="2" y1="18" x2="19" y2="0"
+          stroke={light ? 'rgba(255,255,255,0.08)' : 'rgba(46,111,143,0.12)'}
+          strokeWidth="0.5" strokeDasharray="1.5 2.5" />
+        <line x1="36" y1="18" x2="19" y2="0"
+          stroke={light ? 'rgba(255,255,255,0.08)' : 'rgba(46,111,143,0.12)'}
+          strokeWidth="0.5" strokeDasharray="1.5 2.5" />
+        <line x1="2" y1="18" x2="19" y2="36"
+          stroke={light ? 'rgba(255,255,255,0.08)' : 'rgba(46,111,143,0.12)'}
+          strokeWidth="0.5" strokeDasharray="1.5 2.5" />
+        <line x1="36" y1="18" x2="19" y2="36"
+          stroke={light ? 'rgba(255,255,255,0.08)' : 'rgba(46,111,143,0.12)'}
+          strokeWidth="0.5" strokeDasharray="1.5 2.5" />
 
-        {/* Vertex nodes on the right side — 2 bright, 1 dim */}
-        <circle cx="38" cy="11" r="1.5" fill={markAccent} opacity="0.8" />
-        <circle cx="38" cy="29" r="1.5" fill={markAccent} opacity="0.8" />
-        <circle cx="22" cy="6" r="1.2" fill={markAccentAlt} opacity="0.6" />
+        {/* Core node — the intelligence pulse */}
+        <circle cx="19" cy="18" r="3.6" fill="url(#cq-g1)" />
+        <circle cx="19" cy="18" r="1.6" fill={light ? '#ffffff' : '#ffffff'} opacity="0.95" />
+
+        {/* Corner satellite nodes */}
+        <circle cx="19" cy="0" r="2" fill="url(#cq-g1)" opacity="0.9" />
+        <circle cx="19" cy="36" r="1.4" fill="url(#cq-g2)" opacity="0.65" />
+        <circle cx="2" cy="18" r="1.6" fill="url(#cq-g2)" opacity="0.75" />
+        <circle cx="36" cy="18" r="2" fill="url(#cq-g1)" opacity="0.9" />
+
+        {/* Midpoint nodes on the facet edges — micro detail */}
+        <circle cx="10.5" cy="9" r="1" fill={light ? 'rgba(255,255,255,0.5)' : '#2e6f8f'} opacity="0.6" />
+        <circle cx="27.5" cy="9" r="1" fill={light ? 'rgba(255,255,255,0.5)' : '#2e6f8f'} opacity="0.6" />
+        <circle cx="10.5" cy="27" r="0.8" fill={light ? 'rgba(255,255,255,0.3)' : '#1a4a62'} opacity="0.5" />
+        <circle cx="27.5" cy="27" r="0.8" fill={light ? 'rgba(255,255,255,0.3)' : '#1a4a62'} opacity="0.5" />
       </g>
 
-      {/* ── WORDMARK ── */}
-      <g transform="translate(52, 0)">
-        {/* "Cogni" — tight, geometric, high contrast */}
+      {/* ── WORDMARK ────────────────────────────────────────────────────── */}
+      <g>
+        {/* "Cogni" — semibold, high contrast */}
         <text
-          y="29"
-          fontFamily="-apple-system, 'SF Pro Display', 'Helvetica Neue', 'Arial', sans-serif"
-          fontSize="22"
+          x="50"
+          y="27"
+          fontFamily="'SF Pro Display', -apple-system, 'Helvetica Neue', Arial, sans-serif"
+          fontSize="20"
           fontWeight="600"
-          letterSpacing="-0.6"
-          fill={wordPrimary}
+          letterSpacing="-0.5"
+          fill={light ? '#ffffff' : '#0d1821'}
         >
           Cogni
         </text>
 
-        {/* "iq" — lighter weight, color-shifted for sophistication */}
+        {/* "iq" — light weight, steel-teal accent */}
         <text
-          x="82"
-          y="29"
-          fontFamily="-apple-system, 'SF Pro Display', 'Helvetica Neue', 'Arial', sans-serif"
-          fontSize="22"
+          x="124"
+          y="27"
+          fontFamily="'SF Pro Display', -apple-system, 'Helvetica Neue', Arial, sans-serif"
+          fontSize="20"
           fontWeight="300"
-          letterSpacing="-0.3"
-          fill={wordSuffix}
+          letterSpacing="-0.2"
+          fill={light ? 'rgba(255,255,255,0.55)' : '#6a9fb5'}
         >
           iq
         </text>
 
-        {/* Separator line between Cogni and iq — ultra-thin, premium */}
+        {/* Ultra-thin vertical separator between "Cogni" and "iq" */}
         <line
-          x1="80"
-          y1="10"
-          x2="80"
-          y2="30"
-          stroke={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(26,60,80,0.12)'}
-          strokeWidth="0.8"
-        />
-
-        {/* Tagline pixel-dot — optional micro detail under the wordmark */}
-        <line
-          x1="0"
-          y1="34"
-          x2="106"
-          y2="34"
-          stroke={isDark ? 'rgba(255,255,255,0.08)' : 'rgba(26,60,80,0.07)'}
-          strokeWidth="0.5"
+          x1="122"
+          y1="11"
+          x2="122"
+          y2="29"
+          stroke={light ? 'rgba(255,255,255,0.18)' : 'rgba(46,111,143,0.25)'}
+          strokeWidth="0.75"
         />
       </g>
     </svg>
