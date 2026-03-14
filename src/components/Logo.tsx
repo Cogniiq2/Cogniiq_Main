@@ -19,7 +19,7 @@ interface ConceptProps {
 // "IQ" sits inside/beside a chip die with tiny data-pin traces.
 function Concept1({ ink, inkMid, inkFaint, className }: ConceptProps) {
   return (
-    <svg viewBox="0 0 180 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq" className={className} style={{ height: '100%', width: 'auto' }}>
+    <svg viewBox="0 0 180 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq" className={className} height="36" style={{ width: 'auto' }}>
       {/* Chip body */}
       <rect x="9" y="8" width="18" height="20" rx="2.5" stroke={ink} strokeWidth="1.4" />
 
@@ -60,7 +60,7 @@ function Concept1({ ink, inkMid, inkFaint, className }: ConceptProps) {
 // "IQ" uses a subtle weight shift + underscore-style accent line.
 function Concept2({ ink, inkMid, inkFaint, className }: ConceptProps) {
   return (
-    <svg viewBox="0 0 178 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq" className={className} style={{ height: '100%', width: 'auto' }}>
+    <svg viewBox="0 0 178 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq" className={className} height="36" style={{ width: 'auto' }}>
       {/* Outer ring — chip boundary */}
       <rect x="8" y="8.5" width="19" height="19" rx="4" stroke={ink} strokeWidth="1.5" />
 
@@ -109,7 +109,7 @@ function Concept3({ ink, inkMid, inkFaint, className }: ConceptProps) {
   }).join(' ');
 
   return (
-    <svg viewBox="0 0 180 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq" className={className} style={{ height: '100%', width: 'auto' }}>
+    <svg viewBox="0 0 180 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq" className={className} height="36" style={{ width: 'auto' }}>
       {/* Outer hex */}
       <polygon points={hex} stroke={ink} strokeWidth="1.4" />
       {/* Inner hex */}
@@ -141,7 +141,7 @@ function Concept3({ ink, inkMid, inkFaint, className }: ConceptProps) {
 // IQ in a distinct mono/technical typeface feeling.
 function Concept4({ ink, inkMid, inkFaint, className }: ConceptProps) {
   return (
-    <svg viewBox="0 0 176 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq" className={className} style={{ height: '100%', width: 'auto' }}>
+    <svg viewBox="0 0 176 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq" className={className} height="36" style={{ width: 'auto' }}>
       {/* Cross hairs — ultra-fine */}
       <line x1="0" y1="18" x2="8.5" y2="18" stroke={inkFaint} strokeWidth="0.9" strokeLinecap="round"/>
       <line x1="27.5" y1="18" x2="36" y2="18" stroke={inkFaint} strokeWidth="0.9" strokeLinecap="round"/>
@@ -179,7 +179,7 @@ function Concept4({ ink, inkMid, inkFaint, className }: ConceptProps) {
 // bottom like PCB traces routing to a board. Most dynamic of the five.
 function Concept5({ ink, inkMid, inkFaint, className }: ConceptProps) {
   return (
-    <svg viewBox="0 0 180 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq" className={className} style={{ height: '100%', width: 'auto' }}>
+    <svg viewBox="0 0 180 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cogniiq" className={className} height="36" style={{ width: 'auto' }}>
       {/* Main chip square */}
       <rect x="8" y="8" width="20" height="20" rx="3.5" stroke={ink} strokeWidth="1.5" />
 

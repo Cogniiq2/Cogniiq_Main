@@ -69,7 +69,7 @@ export function Navigation() {
                 whileTap={{ scale: 0.98 }}
                 className="flex items-center"
               >
-                <Logo className="h-9" />
+                <Logo />
               </motion.div>
             </Link>
 
