@@ -1,7 +1,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, PhoneCall, Globe, Zap, CircleCheck as CheckCircle, Star, TrendingUp, Lock } from 'lucide-react';
+import { ArrowRight, PhoneCall, Globe, Zap, CircleCheck as CheckCircle, Star, Lock } from 'lucide-react';
 import { SplineScene } from '../ui/splite';
 
 const E: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -99,20 +99,13 @@ export function DesktopHero() {
         {/* ─── LEFT: Copy ─── */}
         <div className="flex-1 max-w-[560px]">
 
-          {/* Urgency + live status bar */}
+          {/* Live status pill */}
           <motion.div
             className="flex items-center gap-3 mb-8"
             initial={{ opacity: 0, y: 10 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.5, ease: E }}
           >
-            {/* Scarcity badge */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200">
-              <TrendingUp className="w-3 h-3 text-amber-600" />
-              <span className="text-[10.5px] font-semibold tracking-[0.12em] uppercase text-amber-700">
-                3 Projekte verfügbar
-              </span>
-            </div>
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-gray-200 bg-white shadow-sm">
               <motion.div
                 className="w-1.5 h-1.5 rounded-full bg-emerald-500"
@@ -120,7 +113,7 @@ export function DesktopHero() {
                 transition={{ duration: 2, repeat: Infinity }}
               />
               <span className="text-[10.5px] font-semibold tracking-[0.16em] uppercase text-gray-500">
-                Systeme aktiv
+                Systeme aktiv · Bayreuth, München, Regensburg
               </span>
             </div>
           </motion.div>
