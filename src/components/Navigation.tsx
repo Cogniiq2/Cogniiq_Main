@@ -150,12 +150,14 @@ export function Navigation() {
             <LeistungenMega
               onMouseEnter={cancelClose}
               onMouseLeave={closeMenu}
+              currentPath={location.pathname}
             />
           )}
           {activeMenu === 'standorte' && (
             <StandorteMega
               onMouseEnter={cancelClose}
               onMouseLeave={closeMenu}
+              currentPath={location.pathname}
             />
           )}
         </AnimatePresence>
@@ -222,7 +224,7 @@ function NavDropdownTrigger({
 }
 
 /* ─── Leistungen Mega Menu ────────────────────────────────────────────── */
-function LeistungenMega({ onMouseEnter, onMouseLeave }: { onMouseEnter: () => void; onMouseLeave: () => void }) {
+function LeistungenMega({ onMouseEnter, onMouseLeave, currentPath }: { onMouseEnter: () => void; onMouseLeave: () => void; currentPath: string }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: -6 }}
@@ -241,6 +243,7 @@ function LeistungenMega({ onMouseEnter, onMouseLeave }: { onMouseEnter: () => vo
             label="Webdesign"
             href="/leistungen"
             description="Websites die konvertieren"
+            currentPath={currentPath}
             items={[
               { label: 'Webdesign Agentur Deutschland', href: '/webdesign-agentur-deutschland', featured: true },
               { label: 'Für Arztpraxen', href: '/webdesign-arzt' },
@@ -257,6 +260,7 @@ function LeistungenMega({ onMouseEnter, onMouseLeave }: { onMouseEnter: () => vo
             label="KI-Telefonassistent"
             href="/ki-telefonassistent"
             description="24/7 automatisch erreichbar"
+            currentPath={currentPath}
             items={[
               { label: 'KI-Agentur Deutschland', href: '/ki-agentur-deutschland', featured: true },
               { label: 'Für Arztpraxen', href: '/ki-telefonassistent-arzt' },
@@ -273,6 +277,7 @@ function LeistungenMega({ onMouseEnter, onMouseLeave }: { onMouseEnter: () => vo
             label="Automatisierung"
             href="/automatisierung-unternehmen"
             description="Prozesse auf Autopilot"
+            currentPath={currentPath}
             items={[
               { label: 'Automatisierung Unternehmen', href: '/automatisierung-unternehmen', featured: true },
               { label: 'Für Restaurants', href: '/automatisierung-restaurant' },
@@ -297,9 +302,15 @@ function LeistungenMega({ onMouseEnter, onMouseLeave }: { onMouseEnter: () => vo
                 <Link
                   key={item.href}
                   to={item.href}
-                  className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[12.5px] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-all group"
+                  className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-[12.5px] transition-all group ${
+                    currentPath === item.href
+                      ? 'text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-white/[0.06] font-medium'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-white/[0.04]'
+                  }`}
                 >
-                  <div className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700 flex-shrink-0 group-hover:bg-gray-500 dark:group-hover:bg-gray-400 transition-colors" />
+                  <div className={`w-1 h-1 rounded-full flex-shrink-0 transition-colors ${
+                    currentPath === item.href ? 'bg-gray-700 dark:bg-gray-300' : 'bg-gray-300 dark:bg-gray-700 group-hover:bg-gray-500 dark:group-hover:bg-gray-400'
+                  }`} />
                   {item.label}
                 </Link>
               ))}
@@ -316,9 +327,15 @@ function LeistungenMega({ onMouseEnter, onMouseLeave }: { onMouseEnter: () => vo
                   <Link
                     key={item.href}
                     to={item.href}
-                    className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[12.5px] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-all group"
+                    className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-[12.5px] transition-all group ${
+                      currentPath === item.href
+                        ? 'text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-white/[0.06] font-medium'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-white/[0.04]'
+                    }`}
                   >
-                    <div className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700 flex-shrink-0 group-hover:bg-gray-500 dark:group-hover:bg-gray-400 transition-colors" />
+                    <div className={`w-1 h-1 rounded-full flex-shrink-0 transition-colors ${
+                      currentPath === item.href ? 'bg-gray-700 dark:bg-gray-300' : 'bg-gray-300 dark:bg-gray-700 group-hover:bg-gray-500 dark:group-hover:bg-gray-400'
+                    }`} />
                     {item.label}
                   </Link>
                 ))}
@@ -333,7 +350,7 @@ function LeistungenMega({ onMouseEnter, onMouseLeave }: { onMouseEnter: () => vo
 }
 
 /* ─── Standorte Mega Menu ─────────────────────────────────────────────── */
-function StandorteMega({ onMouseEnter, onMouseLeave }: { onMouseEnter: () => void; onMouseLeave: () => void }) {
+function StandorteMega({ onMouseEnter, onMouseLeave, currentPath }: { onMouseEnter: () => void; onMouseLeave: () => void; currentPath: string }) {
   const cities = [
     {
       label: 'Bayreuth',
@@ -456,9 +473,15 @@ function StandorteMega({ onMouseEnter, onMouseLeave }: { onMouseEnter: () => voi
                   <Link
                     key={s.href}
                     to={s.href}
-                    className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[12.5px] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-all group"
+                    className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-[12.5px] transition-all group ${
+                      currentPath === s.href
+                        ? 'text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-white/[0.06] font-medium'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-white/[0.04]'
+                    }`}
                   >
-                    <div className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700 flex-shrink-0 group-hover:bg-gray-500 dark:group-hover:bg-gray-400 transition-colors" />
+                    <div className={`w-1 h-1 rounded-full flex-shrink-0 transition-colors ${
+                      currentPath === s.href ? 'bg-gray-700 dark:bg-gray-300' : 'bg-gray-300 dark:bg-gray-700 group-hover:bg-gray-500 dark:group-hover:bg-gray-400'
+                    }`} />
                     {s.label}
                   </Link>
                 ))}
@@ -470,9 +493,15 @@ function StandorteMega({ onMouseEnter, onMouseLeave }: { onMouseEnter: () => voi
                   <Link
                     key={ind.href}
                     to={ind.href}
-                    className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[12px] text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-all"
+                    className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-[12px] transition-all group ${
+                      currentPath === ind.href
+                        ? 'text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-white/[0.06] font-medium'
+                        : 'text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/[0.04]'
+                    }`}
                   >
-                    <div className="w-1 h-1 rounded-full bg-gray-200 dark:bg-gray-800 flex-shrink-0" />
+                    <div className={`w-1 h-1 rounded-full flex-shrink-0 ${
+                      currentPath === ind.href ? 'bg-gray-500 dark:bg-gray-400' : 'bg-gray-200 dark:bg-gray-800'
+                    }`} />
                     {ind.label}
                   </Link>
                 ))}
@@ -488,11 +517,12 @@ function StandorteMega({ onMouseEnter, onMouseLeave }: { onMouseEnter: () => voi
 
 /* ─── Mega Column ─────────────────────────────────────────────────────── */
 function MegaColumn({
-  label, href, description, items,
+  label, href, description, items, currentPath,
 }: {
   label: string;
   href: string;
   description: string;
+  currentPath: string;
   items: { label: string; href: string; featured?: boolean; small?: boolean }[];
 }) {
   return (
@@ -504,31 +534,38 @@ function MegaColumn({
         <p className="text-[11px] text-gray-400 dark:text-gray-600">{description}</p>
       </Link>
       <div className="space-y-0.5">
-        {items.map((item) => (
-          <Link
-            key={item.href}
-            to={item.href}
-            className={`flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all group ${
-              item.featured
-                ? 'text-[12.5px] font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-white/[0.04]'
-                : item.small
-                ? 'text-[11.5px] text-gray-400 dark:text-gray-600 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/[0.04]'
-                : 'text-[12.5px] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-white/[0.04]'
-            }`}
-          >
-            <div className={`w-1 h-1 rounded-full flex-shrink-0 transition-colors ${
-              item.featured
-                ? 'bg-gray-400 dark:bg-gray-500 group-hover:bg-gray-600 dark:group-hover:bg-gray-300'
-                : item.small
-                ? 'bg-gray-200 dark:bg-gray-800'
-                : 'bg-gray-300 dark:bg-gray-700 group-hover:bg-gray-500 dark:group-hover:bg-gray-400'
-            }`} />
-            {item.label}
-            {item.featured && (
-              <ArrowUpRight size={10} className="ml-auto text-gray-300 dark:text-gray-700 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
-            )}
-          </Link>
-        ))}
+        {items.map((item) => {
+          const isActive = currentPath === item.href;
+          return (
+            <Link
+              key={item.href}
+              to={item.href}
+              className={`flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all group ${
+                isActive
+                  ? 'bg-gray-50 dark:bg-white/[0.06] text-gray-900 dark:text-gray-100 font-semibold'
+                  : item.featured
+                  ? 'text-[12.5px] font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-white/[0.04]'
+                  : item.small
+                  ? 'text-[11.5px] text-gray-400 dark:text-gray-600 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/[0.04]'
+                  : 'text-[12.5px] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-white/[0.04]'
+              }`}
+            >
+              <div className={`w-1 h-1 rounded-full flex-shrink-0 transition-colors ${
+                isActive
+                  ? 'bg-gray-700 dark:bg-gray-300'
+                  : item.featured
+                  ? 'bg-gray-400 dark:bg-gray-500 group-hover:bg-gray-600 dark:group-hover:bg-gray-300'
+                  : item.small
+                  ? 'bg-gray-200 dark:bg-gray-800'
+                  : 'bg-gray-300 dark:bg-gray-700 group-hover:bg-gray-500 dark:group-hover:bg-gray-400'
+              }`} />
+              {item.label}
+              {item.featured && !isActive && (
+                <ArrowUpRight size={10} className="ml-auto text-gray-300 dark:text-gray-700 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
+              )}
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
