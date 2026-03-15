@@ -1,7 +1,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { MonitorSmartphone, PhoneCall, Bot, Workflow, ArrowRight } from 'lucide-react';
+import { MonitorSmartphone, PhoneCall, Bot, Workflow, ArrowRight, CircleCheck as CheckCircle, TrendingUp } from 'lucide-react';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -23,9 +23,9 @@ const services = [
     icon: MonitorSmartphone,
     link: '/leistungen',
     cityLinks: [
-      { label: 'Webdesign Bayreuth', href: '/bayreuth/webdesign' },
-      { label: 'Webdesign München', href: '/muenchen/webdesign' },
-      { label: 'Webdesign Regensburg', href: '/regensburg/webdesign' },
+      { label: 'Bayreuth', href: '/bayreuth/webdesign' },
+      { label: 'München', href: '/muenchen/webdesign' },
+      { label: 'Regensburg', href: '/regensburg/webdesign' },
     ],
     features: [
       'Individuelles Design ohne Templates',
@@ -33,6 +33,9 @@ const services = [
       'SEO-Architektur für lokale Sichtbarkeit',
       'Buchung, Kontaktformular & CRM integriert',
     ],
+    roi: { value: '3×', label: 'mehr qualifizierte Anfragen' },
+    result: 'Ø +340% mehr organische Anfragen nach 90 Tagen',
+    cta: 'Website anfragen',
     featured: false,
   },
   {
@@ -43,9 +46,9 @@ const services = [
     icon: PhoneCall,
     link: '/ki-telefonassistent',
     cityLinks: [
-      { label: 'KI-Telefon Bayreuth', href: '/bayreuth/ki-telefonassistent' },
-      { label: 'KI-Telefon München', href: '/muenchen/ki-telefonassistent' },
-      { label: 'KI-Telefon Regensburg', href: '/regensburg/ki-telefonassistent' },
+      { label: 'Bayreuth', href: '/bayreuth/ki-telefonassistent' },
+      { label: 'München', href: '/muenchen/ki-telefonassistent' },
+      { label: 'Regensburg', href: '/regensburg/ki-telefonassistent' },
     ],
     features: [
       'Anrufannahme in natürlicher Sprache',
@@ -53,6 +56,9 @@ const services = [
       'Nahtlose Anbindung an Kalender & CRM',
       'DSGVO-konform · Made in Germany · 24/7',
     ],
+    roi: { value: '100%', label: 'Anrufe beantwortet' },
+    result: 'Kein verpasster Anruf — 24/7 aktiv',
+    cta: 'Demo ansehen',
     featured: true,
   },
   {
@@ -69,6 +75,9 @@ const services = [
       'Mehrsprachig – DE, EN, weitere',
       'Integration in bestehende Systeme',
     ],
+    roi: { value: '67%', label: 'mehr Lead-Qualifikation' },
+    result: 'Ø 67% höhere Lead-Qualität durch automatische Vorqualifizierung',
+    cta: 'Mehr erfahren',
     featured: false,
   },
   {
@@ -79,9 +88,9 @@ const services = [
     icon: Workflow,
     link: '/leistungen',
     cityLinks: [
-      { label: 'Automatisierung Bayreuth', href: '/bayreuth/automatisierung' },
-      { label: 'Automatisierung München', href: '/muenchen/automatisierung' },
-      { label: 'Automatisierung Regensburg', href: '/regensburg/automatisierung' },
+      { label: 'Bayreuth', href: '/bayreuth/automatisierung' },
+      { label: 'München', href: '/muenchen/automatisierung' },
+      { label: 'Regensburg', href: '/regensburg/automatisierung' },
     ],
     features: [
       'Maßgeschneiderte Workflows für Ihre Prozesse',
@@ -89,6 +98,9 @@ const services = [
       'Reporting, Alerts & Monitoring',
       'Skalierbare, wartungsarme Infrastruktur',
     ],
+    roi: { value: '18h', label: 'pro Woche eingespart' },
+    result: 'Ø 18 Stunden Handarbeit/Woche werden vollständig eliminiert',
+    cta: 'Workflows besprechen',
     featured: false,
   },
 ];
@@ -125,23 +137,24 @@ export function ServicesSection() {
               <span className="text-gray-300">die täglich für Sie arbeiten.</span>
             </h2>
           </motion.div>
-          <motion.p
+          <motion.div
             initial="hidden"
             animate={isInView ? 'visible' : 'hidden'}
             variants={fadeUp}
             custom={0.1}
-            className="text-[14.5px] text-gray-500 leading-relaxed max-w-sm"
+            className="flex flex-col gap-3 max-w-sm"
           >
-            Kein System für sich allein. Jedes Stück zahlt direkt auf Anfragen, Buchungen
-            und weniger manuelle Arbeit ein.{' '}
+            <p className="text-[14.5px] text-gray-500 leading-relaxed">
+              Kein System für sich allein. Jedes Stück zahlt direkt auf Anfragen, Buchungen
+              und weniger manuelle Arbeit ein.
+            </p>
             <Link
               to="/leistungen"
-              className="font-medium text-gray-700 hover:text-gray-900 transition-colors underline underline-offset-2 decoration-gray-200"
+              className="font-medium text-[13px] text-gray-700 hover:text-gray-900 transition-colors underline underline-offset-2 decoration-gray-200 w-fit"
             >
-              Alle Details ansehen
+              Alle Details & Preise ansehen →
             </Link>
-            .
-          </motion.p>
+          </motion.div>
         </div>
 
         <div className="grid lg:grid-cols-2 border border-gray-100 rounded-2xl overflow-hidden">
@@ -163,7 +176,7 @@ export function ServicesSection() {
                 }`}
               >
                 {service.featured && (
-                  <span className="absolute top-8 right-8 text-[9px] font-semibold uppercase tracking-[0.15em] px-2.5 py-1 rounded-full border border-white/[0.08] text-white/25">
+                  <span className="absolute top-8 right-8 text-[9px] font-semibold uppercase tracking-[0.15em] px-2.5 py-1 rounded-full bg-sky-500/10 border border-sky-400/20 text-sky-300">
                     Meistgebucht
                   </span>
                 )}
@@ -199,20 +212,36 @@ export function ServicesSection() {
                 </h3>
 
                 <p
-                  className={`text-[13.5px] leading-relaxed mb-7 ${
+                  className={`text-[13.5px] leading-relaxed mb-5 ${
                     service.featured ? 'text-gray-500' : 'text-gray-500'
                   }`}
                 >
                   {service.description}
                 </p>
 
-                <div className="space-y-2.5 mb-8">
+                {/* ROI highlight */}
+                <div className={`flex items-center gap-3 mb-6 px-4 py-2.5 rounded-xl ${
+                  service.featured
+                    ? 'bg-white/[0.04] border border-white/[0.06]'
+                    : 'bg-gray-50 border border-gray-100'
+                }`}>
+                  <TrendingUp size={13} className={service.featured ? 'text-emerald-400' : 'text-emerald-500'} />
+                  <div>
+                    <span className={`text-[20px] font-bold tracking-tight tabular-nums ${
+                      service.featured ? 'text-white/80' : 'text-gray-900'
+                    }`}>{service.roi.value}</span>
+                    <span className={`text-[12px] ml-2 ${
+                      service.featured ? 'text-gray-500' : 'text-gray-500'
+                    }`}>{service.roi.label}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 mb-7">
                   {service.features.map((feature, fi) => (
-                    <div key={fi} className="flex items-center gap-3">
-                      <div
-                        className={`w-[3px] h-[3px] rounded-full flex-shrink-0 ${
-                          service.featured ? 'bg-gray-600' : 'bg-gray-300'
-                        }`}
+                    <div key={fi} className="flex items-center gap-2.5">
+                      <CheckCircle
+                        size={11}
+                        className={`flex-shrink-0 ${service.featured ? 'text-emerald-400/60' : 'text-emerald-500'}`}
                       />
                       <span
                         className={`text-[13px] ${
@@ -227,12 +256,12 @@ export function ServicesSection() {
 
                 {service.cityLinks.length > 0 && (
                   <div
-                    className={`pt-5 border-t mb-7 ${
+                    className={`pt-4 border-t mb-6 ${
                       service.featured ? 'border-white/[0.06]' : 'border-gray-100'
                     }`}
                   >
                     <p
-                      className={`text-[10px] font-semibold uppercase tracking-[0.15em] mb-3 ${
+                      className={`text-[10px] font-semibold uppercase tracking-[0.15em] mb-2.5 ${
                         service.featured ? 'text-gray-700' : 'text-gray-300'
                       }`}
                     >
@@ -243,7 +272,7 @@ export function ServicesSection() {
                         <Link
                           key={cl.href}
                           to={cl.href}
-                          className={`text-[11.5px] font-medium px-3 py-1.5 rounded-lg border transition-all ${
+                          className={`text-[11px] font-medium px-2.5 py-1 rounded-lg border transition-all ${
                             service.featured
                               ? 'border-white/[0.07] text-gray-500 hover:border-white/15 hover:text-gray-300'
                               : 'border-gray-100 text-gray-500 hover:border-gray-300 hover:text-gray-800'
@@ -256,17 +285,25 @@ export function ServicesSection() {
                   </div>
                 )}
 
+                {/* Result proof bar */}
+                <div className={`flex items-start gap-2 mb-6 text-[11.5px] leading-snug ${
+                  service.featured ? 'text-gray-600' : 'text-gray-400'
+                }`}>
+                  <span className="flex-shrink-0 mt-px">✦</span>
+                  <span>{service.result}</span>
+                </div>
+
                 <Link
                   to={service.link}
-                  className={`group/link inline-flex items-center gap-2 text-[12.5px] font-semibold transition-all ${
+                  className={`group/link inline-flex items-center gap-2 text-[12.5px] font-semibold transition-all px-5 py-2.5 rounded-xl border ${
                     service.featured
-                      ? 'text-white/40 hover:text-white'
-                      : 'text-gray-400 hover:text-gray-900'
+                      ? 'bg-white text-gray-900 border-white hover:bg-gray-100'
+                      : 'bg-gray-950 text-white border-gray-950 hover:bg-gray-800'
                   }`}
                 >
-                  Mehr erfahren
+                  {service.cta}
                   <ArrowRight
-                    size={13}
+                    size={12}
                     className="transition-transform duration-200 group-hover/link:translate-x-1"
                   />
                 </Link>

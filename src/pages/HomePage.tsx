@@ -9,6 +9,7 @@ import { TrustSection } from '@/components/TrustSection';
 import { ProcessSection } from '@/components/ProcessSection';
 import { CasesSection } from '@/components/CasesSection';
 import { KiCTASection } from '@/components/KiCTASection';
+import { TestimonialsSection } from '@/components/TestimonialsSection';
 import { FAQSection } from '@/components/FAQSection';
 import { FinalCTASection } from '@/components/FinalCTASection';
 import { LocationContent } from '@/components/LocationContent';
@@ -35,6 +36,7 @@ export function HomePage() {
       <ProcessSection />
       <CasesSection />
       <KiCTASection />
+      <TestimonialsSection />
       <FAQSection />
       <FinalCTASection />
       <LocationContent />

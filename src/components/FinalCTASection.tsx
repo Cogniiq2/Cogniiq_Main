@@ -1,14 +1,14 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Calendar, Shield, Clock, Star, CircleCheck as CheckCircle } from 'lucide-react';
+import { ArrowRight, Calendar, Shield, Clock, Star, CircleCheck as CheckCircle, Quote } from 'lucide-react';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const guarantees = [
-  { icon: Shield, text: 'Keine Verpflichtung' },
-  { icon: Clock, text: 'Antwort innerhalb 24h' },
-  { icon: Calendar, text: 'Persönliches Gespräch' },
+  { icon: Shield, text: 'Keine Verpflichtung — kündbar jederzeit' },
+  { icon: Clock, text: 'Antwort innerhalb 24h garantiert' },
+  { icon: Calendar, text: 'Persönliches Gespräch — kein Formular-Loop' },
 ];
 
 const outcomes = [
@@ -16,6 +16,15 @@ const outcomes = [
   'Sie sehen, wo Automatisierung sofort wirkt',
   'Sie bekommen eine realistische Einschätzung — kein Pitch',
 ];
+
+const TESTIMONIAL = {
+  quote: 'In der ersten Woche nach dem Go-Live haben wir 11 Terminbuchungen über den KI-Assistenten erhalten — ohne einen einzigen Anruf selbst annehmen zu müssen.',
+  name: 'Dr. Michael K.',
+  role: 'Allgemeinarzt, München',
+  result: '+11 Buchungen in Woche 1',
+  initials: 'MK',
+  color: '#0ea5e9',
+};
 
 export function FinalCTASection() {
   const ref = useRef(null);
@@ -25,10 +34,10 @@ export function FinalCTASection() {
     <section
       ref={ref}
       aria-labelledby="final-cta-heading"
-      className="py-32 bg-white"
+      className="py-32 bg-white border-t border-gray-100"
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="grid lg:grid-cols-[1fr_400px] gap-16 lg:gap-24 items-center">
+        <div className="grid lg:grid-cols-[1fr_420px] gap-16 lg:gap-24 items-start">
 
           {/* Left: Copy */}
           <motion.div
@@ -70,16 +79,53 @@ export function FinalCTASection() {
               ))}
             </div>
 
+            {/* Testimonial quote block */}
+            <motion.div
+              className="relative bg-gray-50 border border-gray-100 rounded-2xl p-6 mb-8"
+              initial={{ opacity: 0, y: 16 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.2, ease: EASE }}
+            >
+              <Quote size={18} className="text-gray-200 mb-4" />
+              <p className="text-[14.5px] text-gray-700 leading-relaxed mb-4 italic">
+                "{TESTIMONIAL.quote}"
+              </p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-bold border-2"
+                    style={{ background: TESTIMONIAL.color + '18', borderColor: TESTIMONIAL.color + '40', color: TESTIMONIAL.color }}
+                  >
+                    {TESTIMONIAL.initials}
+                  </div>
+                  <div>
+                    <p className="text-[12.5px] font-semibold text-gray-900">{TESTIMONIAL.name}</p>
+                    <p className="text-[11px] text-gray-400">{TESTIMONIAL.role}</p>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  <div className="flex items-center gap-0.5">
+                    {[1,2,3,4,5].map(s => (
+                      <Star key={s} size={10} className="text-amber-400 fill-amber-400" />
+                    ))}
+                  </div>
+                  <span className="text-[10.5px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                    {TESTIMONIAL.result}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+
             {/* Social proof */}
             <div className="flex items-center gap-3 pt-6 border-t border-gray-100">
               <div className="flex -space-x-2">
-                {['#0ea5e9', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6'].map((c, i) => (
+                {['#0ea5e9', '#22c55e', '#f59e0b', '#ef4444', '#64748b'].map((c, i) => (
                   <div
                     key={i}
-                    className="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center"
-                    style={{ background: `${c}20`, borderColor: c + '50' }}
+                    className="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-bold"
+                    style={{ background: `${c}20`, borderColor: c + '50', color: c }}
                   >
-                    <div className="w-3 h-3 rounded-full" style={{ background: c }} />
+                    {['MK','SR','TH','AB','LP'][i]}
                   </div>
                 ))}
               </div>
@@ -90,7 +136,7 @@ export function FinalCTASection() {
                   ))}
                 </div>
                 <p className="text-[11.5px] text-gray-400">
-                  40+ Unternehmen vertrauen auf Cogniiq-Systeme
+                  <span className="font-semibold text-gray-700">40+</span> Unternehmen vertrauen auf Cogniiq-Systeme
                 </p>
               </div>
             </div>
@@ -101,6 +147,7 @@ export function FinalCTASection() {
             initial={{ opacity: 0, y: 24 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.12, ease: EASE }}
+            className="lg:sticky lg:top-28"
           >
             <div className="bg-gray-950 rounded-2xl p-10 relative overflow-hidden">
               {/* Background shimmer */}
@@ -112,9 +159,20 @@ export function FinalCTASection() {
               />
 
               <div className="relative">
-                <p className="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-gray-500 mb-4">
-                  Kostenloses Erstgespräch
-                </p>
+                {/* Urgency line */}
+                <div className="flex items-center gap-2 mb-5">
+                  <motion.div
+                    className="w-1.5 h-1.5 rounded-full bg-emerald-500"
+                    animate={{ opacity: [1, 0.3, 1] }}
+                    transition={{ duration: 1.8, repeat: Infinity }}
+                  />
+                  <span className="text-[10.5px] font-semibold uppercase tracking-[0.2em] text-gray-500">
+                    Kostenloses Erstgespräch
+                  </span>
+                  <span className="ml-auto text-[10px] font-semibold text-amber-500/80 bg-amber-500/10 px-2 py-0.5 rounded-full">
+                    3 Plätze frei
+                  </span>
+                </div>
 
                 <h3 className="text-[22px] font-bold text-white leading-snug tracking-tight mb-2">
                   Gespräch vereinbaren
@@ -142,13 +200,21 @@ export function FinalCTASection() {
                   <ArrowRight size={13} className="text-gray-600 transition-transform group-hover:translate-x-1" />
                 </Link>
 
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   {guarantees.map(({ icon: Icon, text }) => (
                     <div key={text} className="flex items-center gap-2.5">
-                      <Icon size={12} className="text-gray-700 flex-shrink-0" />
-                      <span className="text-[12px] text-gray-600">{text}</span>
+                      <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+                        <Icon size={10} className="text-emerald-400" />
+                      </div>
+                      <span className="text-[12px] text-gray-500">{text}</span>
                     </div>
                   ))}
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-white/[0.06]">
+                  <p className="text-[11px] text-gray-700 text-center leading-relaxed">
+                    Go-Live in 14 Tagen — oder volle Rückerstattung.
+                  </p>
                 </div>
               </div>
             </div>

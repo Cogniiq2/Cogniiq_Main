@@ -1,7 +1,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { PhoneCall, ArrowRight, CircleCheck as CheckCircle, PhoneMissed, Mic, Calendar } from 'lucide-react';
+import { PhoneCall, ArrowRight, CircleCheck as CheckCircle, PhoneMissed, Mic, Calendar, TrendingUp, Stethoscope, UtensilsCrossed, Dumbbell, Building2 } from 'lucide-react';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -16,6 +16,13 @@ const facts = [
   { stat: '30%', label: 'aller Anrufe unbeantwortet', icon: PhoneMissed },
   { stat: '67%', label: 'rufen danach nicht zurück', icon: PhoneCall },
   { stat: '< 3s', label: 'Reaktionszeit des KI-Assistenten', icon: Mic },
+];
+
+const industries = [
+  { icon: Stethoscope, label: 'Arztpraxen', href: '/ki-telefonassistent-arzt' },
+  { icon: UtensilsCrossed, label: 'Restaurants', href: '/ki-telefonassistent-restaurant' },
+  { icon: Dumbbell, label: 'Fitnessstudios', href: '/ki-telefonassistent-praxis' },
+  { icon: Building2, label: 'Immobilien', href: '/webdesign-immobilien' },
 ];
 
 const callPreview = [
@@ -74,19 +81,46 @@ export function KiCTASection() {
                 <span className="text-gray-500">Jeder Termin gebucht. Automatisch.</span>
               </h2>
 
-              <p className="text-[14.5px] text-gray-400 leading-relaxed max-w-md mb-8">
+              <p className="text-[14.5px] text-gray-400 leading-relaxed max-w-md mb-6">
                 Die meisten Unternehmen verlieren täglich Kunden ans Besetztzeichen. Unser
                 KI-Telefonassistent übernimmt jeden Anruf, bucht Termine und beantwortet Fragen —
                 vollautomatisch, in natürlicher Sprache.
               </p>
 
-              <div className="grid sm:grid-cols-2 gap-2.5 mb-9 max-w-md">
+              {/* ROI callout */}
+              <div className="flex items-center gap-3 mb-7 px-4 py-3 rounded-xl bg-emerald-500/[0.06] border border-emerald-500/[0.12]">
+                <TrendingUp size={14} className="text-emerald-400 flex-shrink-0" />
+                <p className="text-[12.5px] text-emerald-300/80">
+                  Kunden berichten im Schnitt <strong className="text-emerald-300">+28% mehr Terminbuchungen</strong> in den ersten 30 Tagen
+                </p>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-2.5 mb-7 max-w-md">
                 {trust.map((item) => (
                   <div key={item.text} className="flex items-center gap-2.5">
                     <item.icon size={12} className="text-emerald-500/70 flex-shrink-0" />
                     <span className="text-[12.5px] text-gray-400">{item.text}</span>
                   </div>
                 ))}
+              </div>
+
+              {/* Industry pills */}
+              <div className="mb-8">
+                <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-gray-700 mb-3">
+                  Bewährt in diesen Branchen
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {industries.map((ind) => (
+                    <Link
+                      key={ind.href}
+                      to={ind.href}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.07] text-gray-500 hover:text-gray-300 hover:border-white/15 transition-all text-[11.5px] font-medium"
+                    >
+                      <ind.icon size={10} />
+                      {ind.label}
+                    </Link>
+                  ))}
+                </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3">

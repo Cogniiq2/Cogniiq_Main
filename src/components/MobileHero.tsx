@@ -426,7 +426,7 @@ export function MobileHero() {
       >
 
         <motion.div
-          className="flex items-center gap-2 mb-8"
+          className="flex items-center gap-2 mb-8 flex-wrap justify-center"
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4, ease: EASE_OUT }}
@@ -437,6 +437,17 @@ export function MobileHero() {
               Systeme aktiv
             </span>
           </BadgePill>
+          <motion.div
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+            style={{ background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.2)' }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.7, ease: EASE_OUT }}
+          >
+            <span style={{ fontSize: '10px', fontWeight: 700, color: '#b45309', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              3 Plätze frei
+            </span>
+          </motion.div>
         </motion.div>
 
         <DiamondMark />
@@ -546,7 +557,7 @@ export function MobileHero() {
               whileTap={{ opacity: 1 }}
             />
             <span className="relative flex items-center justify-center gap-2">
-              System anfragen
+              Kostenloses Gespräch sichern
               <motion.svg
                 width="16" height="16" viewBox="0 0 16 16" fill="none"
                 animate={{ x: [0, 3, 0] }}
@@ -579,11 +590,70 @@ export function MobileHero() {
           </motion.button>
         </motion.div>
 
+        {/* Social proof row */}
         <motion.div
-          className="flex flex-col items-center gap-1.5 mt-6"
+          className="flex items-center justify-center gap-2 mt-5"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 3.6, duration: 0.8 }}
+          transition={{ delay: 3.5, duration: 0.7 }}
+        >
+          <div style={{ display: 'flex', marginRight: 2 }}>
+            {['#0ea5e9', '#22c55e', '#f59e0b', '#ef4444'].map((c, i) => (
+              <div
+                key={i}
+                style={{
+                  width: 22, height: 22, borderRadius: '50%',
+                  border: '1.5px solid white',
+                  background: c + '22',
+                  borderColor: c + '66',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '7px', fontWeight: 700, color: c,
+                  marginLeft: i > 0 ? -6 : 0,
+                }}
+              >
+                {['MK','SR','TH','AB'][i]}
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: 1 }}>
+            {[1,2,3,4,5].map(s => (
+              <svg key={s} width="9" height="9" viewBox="0 0 9 9" fill="#f59e0b">
+                <polygon points="4.5,0.5 5.5,3.5 8.5,3.5 6.1,5.5 7,8.5 4.5,6.8 2,8.5 2.9,5.5 0.5,3.5 3.5,3.5" />
+              </svg>
+            ))}
+          </div>
+          <span style={{ fontSize: '11px', color: '#6b7280', fontWeight: 400 }}>
+            <strong style={{ color: '#374151' }}>40+</strong> Unternehmen
+          </span>
+        </motion.div>
+
+        {/* Guarantee strip */}
+        <motion.div
+          className="flex items-center justify-center gap-1.5 mt-3"
+          style={{
+            padding: '8px 16px',
+            borderRadius: 10,
+            background: 'rgba(22,163,74,0.06)',
+            border: '1px solid rgba(22,163,74,0.15)',
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 3.8, duration: 0.6 }}
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M6 1L1.5 3v3.5C1.5 9.5 3.5 11 6 11s4.5-1.5 4.5-4.5V3L6 1z" stroke="#16a34a" strokeWidth="1" fill="rgba(22,163,74,0.12)" />
+            <path d="M4 6l1.5 1.5L8 4" stroke="#16a34a" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span style={{ fontSize: '11.5px', fontWeight: 600, color: '#15803d' }}>
+            Go-Live in 14 Tagen — oder Geld zurück
+          </span>
+        </motion.div>
+
+        <motion.div
+          className="flex flex-col items-center gap-1.5 mt-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 4.0, duration: 0.8 }}
         >
           <div className="flex items-center gap-1.5">
             {['DE', 'AT', 'CH'].map((flag, i) => (
@@ -592,14 +662,14 @@ export function MobileHero() {
                 style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.06em', color: '#9ca3af' }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 3.7 + i * 0.1 }}
+                transition={{ delay: 4.1 + i * 0.1 }}
               >
                 {flag}{i < 2 ? ' ·' : ''}
               </motion.span>
             ))}
           </div>
           <span style={{ fontSize: '10.5px', fontWeight: 400, color: '#9ca3af', letterSpacing: '0.005em' }}>
-            Analysegespräch — kostenlos & unverbindlich
+            Kostenlos & unverbindlich
           </span>
         </motion.div>
 

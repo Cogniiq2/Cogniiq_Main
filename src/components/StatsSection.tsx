@@ -1,5 +1,7 @@
 import { motion, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useRef, useEffect } from 'react';
+import { ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -23,20 +25,26 @@ const stats = [
     numeric: null,
     label: 'Kein Anruf geht verloren',
     sub: 'Der KI-Assistent antwortet — immer',
+    context: 'Während Wettbewerber schlafen',
+    href: '/ki-telefonassistent',
     accent: false,
   },
   {
     display: null,
     numeric: { to: 14, prefix: '< ', suffix: '' },
     label: 'Tage bis zum Go-Live',
-    sub: 'Kein monatelanger Vorlauf — garantiert',
+    sub: 'Kein monatelanger Vorlauf',
+    context: 'Klassische Agenturen: 3–6 Monate',
+    href: '/kontakt',
     accent: true,
   },
   {
     display: null,
     numeric: { to: 30, prefix: '', suffix: '%' },
     label: 'Anrufe unbeantwortet',
-    sub: 'In deutschen KMU — täglich Umsatzverlust',
+    sub: 'In deutschen KMU täglich',
+    context: 'Das kostet Sie täglich Umsatz',
+    href: '/verpasste-anrufe-verlust',
     accent: false,
   },
   {
@@ -44,6 +52,8 @@ const stats = [
     numeric: { to: 100, prefix: '', suffix: '%' },
     label: 'DSGVO-konform',
     sub: 'Deutsche Server · Made in Germany',
+    context: 'Keine Daten in die USA',
+    href: '/ki-telefonassistent',
     accent: false,
   },
 ];
@@ -93,7 +103,17 @@ export function StatsSection() {
               <p className="text-[13px] font-semibold text-gray-700 tracking-tight mb-1">
                 {stat.label}
               </p>
-              <p className="text-[11.5px] text-gray-400 leading-snug">{stat.sub}</p>
+              <p className="text-[11.5px] text-gray-400 leading-snug mb-3">{stat.sub}</p>
+              <p className="text-[10.5px] text-gray-300 leading-snug font-medium italic">
+                {stat.context}
+              </p>
+              <Link
+                to={stat.href}
+                className="mt-3 inline-flex items-center gap-1 text-[10.5px] font-semibold text-gray-400 hover:text-gray-900 transition-colors opacity-0 group-hover:opacity-100"
+              >
+                Mehr erfahren
+                <ArrowRight size={9} />
+              </Link>
             </motion.div>
           ))}
         </div>
