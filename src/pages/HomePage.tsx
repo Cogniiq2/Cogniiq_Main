@@ -2,6 +2,7 @@ import { HeroSection } from '@/components/HeroSection';
 import { TrustStrip } from '@/components/TrustStrip';
 import { StatsSection } from '@/components/StatsSection';
 import { ROICalculator } from '@/components/ROICalculator';
+import { CostComparisonSection } from '@/components/CostComparisonSection';
 import { SolutionShowcase } from '@/components/SolutionShowcase';
 import { ProblemSection } from '@/components/ProblemSection';
 import { ServicesSection } from '@/components/ServicesSection';
@@ -29,6 +30,7 @@ export function HomePage() {
       <TrustStrip />
       <StatsSection />
       <ROICalculator />
+      <CostComparisonSection />
       <SolutionShowcase />
       <ProblemSection />
       <ServicesSection />
