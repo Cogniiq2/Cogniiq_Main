@@ -5,55 +5,55 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 const config: NationalIndustryPageConfig = {
   seo: {
     title: "KI Telefonassistent für Therapeuten & Praxen | Automatisierte Terminbuchung | Cogniiq",
-    description: "KI Telefonassistent für Therapeuten, Physio- und Logopädiepraxen: Automatische Terminbuchung, Patientenkommunikation und Praxisentlastung. DSGVO-konform.",
+    description: "KI Telefonassistent für Physio-, Logo- und Ergotherapeuten: Automatische Terminbuchung, Erinnerungen und Praxisentlastung. DSGVO-konform, keine verpassten Patienten mehr.",
     canonical: `${BUSINESS_INFO.website}/ki-telefonassistent-praxis`,
     keywords: "KI Telefonassistent Praxis, Physiotherapie Telefonservice, Terminbuchung Therapeut, KI Rezeptionistin Therapiepraxis",
   },
   h1: "KI Telefonassistent für Therapeuten & Praxen",
   tagline: "Therapeuten · Terminbuchung · Praxisentlastung",
-  intro: "Während Sie behandeln, klingelt das Telefon – und niemand kann abnehmen. Patienten, die keinen Termin bekommen, wechseln zum nächsten Therapeuten. Der KI Telefonassistent nimmt Terminanfragen sofort entgegen, bucht direkt in Ihren Kalender und entlastet Ihr Team von Routinekommunikation.",
+  intro: "Sie behandeln – und gleichzeitig klingelt das Telefon. Wer alleine oder mit kleinem Team arbeitet, kann keine Sitzung unterbrechen, um einen Terminwunsch entgegenzunehmen. Der Patient wartet kurz, bekommt keine Antwort und ruft den nächsten Therapeuten an. Der KI Telefonassistent nimmt ab, solange Sie im Behandlungsraum sind – und bucht den Termin direkt in Ihren Kalender.",
   serviceSlug: "ki-telefonassistent",
   serviceLabel: "KI Telefonassistent",
   costLink: "/kosten-ki-telefonassistent",
   costLinkLabel: "Kosten KI Telefonassistent",
   problems: [
     {
-      title: "Anrufe kommen während der Behandlung",
-      description: "Im Behandlungsraum kann niemand ans Telefon. Patienten, die einen Termin wollen, wählen beim nächsten erreichbaren Therapeuten.",
+      title: "Behandlung und Telefon gleichzeitig ist nicht möglich",
+      description: "Physiotherapeuten, Ergotherapeuten und Logopäden haben keine freien Hände und keine freie Aufmerksamkeit während einer Sitzung. Anrufe in dieser Zeit gehen verloren – und mit ihnen potenzielle Patienten.",
     },
     {
-      title: "Terminkoordination frisst Verwaltungszeit",
-      description: "Folgetermine, Absagen und Umplanungen per Telefon koordinieren – das kostet täglich wertvolle Stunden, die für die Therapie fehlen.",
+      title: "Folgetermine werden telefonisch koordiniert – statt direkt gebucht",
+      description: "Nach jeder Behandlung die nächsten Termine koordinieren, Absagen umplanen, Wartelistenkontakt halten: Das summiert sich täglich auf wertvolle Stunden, die der Therapiearbeit fehlen.",
     },
     {
-      title: "No-Shows erhöhen sich ohne Erinnerungen",
-      description: "Patienten ohne Terminerinnerung erscheinen seltener. Jeder unbesetzte Termin ist direkter Umsatzverlust, der sich mit automatischen Erinnerungen verhindern lässt.",
+      title: "No-Shows treffen kleine Praxen besonders hart",
+      description: "Ein gebuchter Termin, der unbesetzt bleibt, ist in einer Einzelpraxis nicht durch andere Kapazitäten aufgefangen. Automatische Erinnerungen verhindern das zuverlässig – ohne tägliche Arbeit.",
     },
     {
-      title: "Keine Erreichbarkeit außerhalb der Öffnungszeiten",
-      description: "Patienten, die abends oder am Wochenende einen Folgetermin buchen wollen, erreichen niemanden und rufen bei einem anderen Therapeuten an.",
+      title: "Abends und am Wochenende erreichbar sein ist die Ausnahme",
+      description: "Patienten, die nach Feierabend einen Termin buchen wollen, landen auf der Mailbox. Viele versuchen es nicht noch einmal. Erreichbarkeit außerhalb der Öffnungszeiten entscheidet heute über Patientenbindung.",
     },
     {
-      title: "DSGVO-Anforderungen bei Patientenkommunikation",
-      description: "Therapeuten müssen Patientendaten rechtssicher verarbeiten. Ohne strukturiertes System und AVV entstehen vermeidbare rechtliche Risiken.",
+      title: "Patientendaten ohne strukturiertes System",
+      description: "Name, Anliegen, Kontaktdaten – am Telefon abgenommen und auf einem Notizzettel. Für Therapiepraxen mit ihren datenschutzrechtlichen Anforderungen ist das eine unnötige Schwachstelle.",
     },
     {
-      title: "Rezeptanfragen und Routinekommunikation",
-      description: "Wiederholte Anfragen zu Rezepten, Überweisungen und Folgeterminen belasten das Team täglich – obwohl sie vollständig automatisierbar sind.",
+      title: "Rezept- und Routineanfragen fressen Verwaltungszeit",
+      description: "Kann ich meine Folgerezeptur verlängern lassen? Wann ist der nächste freie Termin? Wie lange dauert eine Einheit? Diese Fragen lassen sich vollständig automatisieren – und entlasten den Praxisalltag dauerhaft.",
     },
   ],
   solution: {
-    headline: "Mehr Zeit für Therapie – weniger Zeit am Telefon.",
-    text: "Der KI Telefonassistent übernimmt Terminannahme, Bestätigung und Erinnerungen vollautomatisch. Das Team konzentriert sich auf die Behandlung – und Patienten werden nie abgewiesen, weil niemand ans Telefon geht.",
+    headline: "Mehr Zeit für Therapie. Kein verpasster Patient mehr.",
+    text: "Der KI Telefonassistent übernimmt Terminannahme, Bestätigung und Erinnerungen – vollständig automatisch. Sie behandeln, der Assistent verwaltet. Patienten werden nicht mehr abgewiesen, weil Sie gerade im Behandlungsraum sind.",
   },
   benefits: [
-    "Automatische Terminbuchung und -bestätigung",
-    "Erinnerungen vor Terminen – No-Shows messbar reduziert",
-    "DSGVO-konform – Patientendaten auf deutschen Servern",
-    "24/7 erreichbar für Terminanfragen",
-    "Entlastung des Teams von Routinekommunikation",
+    "Terminbuchung während der Behandlung – kein Anruf geht verloren",
+    "Automatische Terminerinnerungen reduzieren No-Shows messbar",
+    "DSGVO-konform – Patientendaten auf deutschen Servern mit AVV",
+    "24/7 erreichbar für Terminwünsche und Standardfragen",
+    "Folgetermine automatisch angeboten und eingetragen",
     "Integration mit Praxisverwaltungssystemen",
-    "Folgetermine automatisch koordiniert",
+    "Eingerichtet in 7–14 Tagen – keine Unterbrechung des Betriebs",
   ],
   workflow: {
     title: "So läuft ein Terminanruf in der Therapeutenpraxis ab",
@@ -61,17 +61,17 @@ const config: NationalIndustryPageConfig = {
       {
         step: "01",
         title: "Patient ruft an",
-        description: "Der Assistent nimmt sofort ab – auch während alle Behandlungsräume belegt sind. Kein verpasster Anruf, keine Warteschleife.",
+        description: "Der Assistent nimmt sofort ab – auch wenn alle Behandlungsräume belegt sind. Kein verpasster Anruf, keine Warteschleife, kein Besetztzeichen.",
       },
       {
         step: "02",
         title: "Termin prüfen und buchen",
-        description: "Freie Termine werden in Echtzeit geprüft und dem Patienten vorgeschlagen. Nach Bestätigung wird der Termin direkt eingetragen.",
+        description: "Freie Termine werden in Echtzeit geprüft und dem Patienten vorgeschlagen – nach den Regeln und Zeitfenstern, die Sie vorgeben. Nach Bestätigung wird der Termin direkt eingetragen.",
       },
       {
         step: "03",
-        title: "Bestätigen und erinnern",
-        description: "Sofortige Buchungsbestätigung und automatische Erinnerung 24 Stunden vorher – No-Shows werden zuverlässig reduziert.",
+        title: "Bestätigung sofort, Erinnerung automatisch",
+        description: "Sofortige Buchungsbestätigung per SMS oder E-Mail. 24 Stunden vorher folgt eine automatische Erinnerung – No-Shows sinken, ohne dass Sie einen Finger rühren.",
       },
     ],
   },
@@ -92,23 +92,23 @@ const config: NationalIndustryPageConfig = {
   faq: [
     {
       question: "Welche Praxisarten profitieren am meisten?",
-      answer: "Physiotherapeuten, Logopäden, Ergotherapeuten, Psychotherapeuten und Heilpraktiker profitieren besonders, da Terminkoordination einen erheblichen Teil ihrer Verwaltungszeit ausmacht.",
+      answer: "Physiotherapeuten, Ergotherapeuten, Logopäden, Psychotherapeuten und Heilpraktiker profitieren besonders stark – weil bei ihnen Behandlungszeit und Telefonzeit direkt konkurrieren. Je weniger Assistenz, desto höher der Gewinn durch Automatisierung.",
     },
     {
-      question: "Ist der Assistent DSGVO-konform für Patientendaten?",
-      answer: "Ja. Alle Daten werden auf deutschen Servern verarbeitet. Der Assistent wird mit einem Auftragsverarbeitungsvertrag (AVV) geliefert – vollständig rechtssicher für den Einsatz in Therapiepraxen.",
+      question: "Ist der Assistent DSGVO-konform für Patientendaten in Therapiepraxen?",
+      answer: "Ja. Alle Daten werden auf deutschen Servern verarbeitet. Der Assistent wird mit einem Auftragsverarbeitungsvertrag (AVV) geliefert – vollständig rechtssicher für Therapiepraxen, die sensible Gesundheitsdaten verarbeiten.",
     },
     {
-      question: "Kann der Assistent Folgetermine automatisch einplanen?",
-      answer: "Ja. Nach einer Behandlung kann der Assistent automatisch Folgetermine anbieten und einplanen – nach den Regeln und Zeitfenstern, die Sie vorgeben.",
+      question: "Kann der Assistent automatisch Folgetermine einplanen?",
+      answer: "Ja. Nach einer Sitzung kann der Assistent automatisch Folgetermine anbieten und einplanen – nach den Zeitfenstern und Regeln, die Sie vorgeben. Patienten müssen nicht aktiv nachfragen oder nochmals anrufen.",
+    },
+    {
+      question: "Was passiert mit Anfragen, die der Assistent nicht beantworten kann?",
+      answer: "Komplexe medizinische Fragen, unklare Anliegen oder Eskalationsszenarien werden mit vollständiger Gesprächszusammenfassung an Sie weitergeleitet – als Nachricht oder in Ihr Verwaltungssystem. Kein Informationsverlust.",
     },
     {
       question: "Kann ich den Assistenten testen, bevor ich mich entscheide?",
-      answer: "Ja. Im kostenlosen Erstgespräch demonstrieren wir den Assistenten live – konfiguriert auf Ihre Praxis und Ihre häufigsten Anrufszenarien.",
-    },
-    {
-      question: "Wie schnell ist der Assistent einsatzbereit?",
-      answer: "In den meisten Fällen innerhalb von 7–14 Tagen – ohne IT-Aufwand auf Ihrer Seite. Cogniiq übernimmt Konfiguration und Integration vollständig.",
+      answer: "Ja. Im kostenlosen Erstgespräch zeigen wir den Assistenten live – konfiguriert auf Ihre Praxis, Ihre häufigsten Anrufszenarien und Ihren Kalender. Sie können den Unterschied sofort einschätzen.",
     },
   ],
 };
