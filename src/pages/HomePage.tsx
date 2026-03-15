@@ -1,11 +1,12 @@
 import { HeroSection } from '@/components/HeroSection';
 import { TrustStrip } from '@/components/TrustStrip';
 import { StatsSection } from '@/components/StatsSection';
+import { ROICalculator } from '@/components/ROICalculator';
+import { SolutionShowcase } from '@/components/SolutionShowcase';
 import { ProblemSection } from '@/components/ProblemSection';
 import { ServicesSection } from '@/components/ServicesSection';
 import { TrustSection } from '@/components/TrustSection';
 import { ProcessSection } from '@/components/ProcessSection';
-import { ROICalculator } from '@/components/ROICalculator';
 import { CasesSection } from '@/components/CasesSection';
 import { KiCTASection } from '@/components/KiCTASection';
 import { FAQSection } from '@/components/FAQSection';
@@ -26,11 +27,12 @@ export function HomePage() {
       <HeroSection />
       <TrustStrip />
       <StatsSection />
+      <ROICalculator />
+      <SolutionShowcase />
       <ProblemSection />
       <ServicesSection />
       <TrustSection />
       <ProcessSection />
-      <ROICalculator />
       <CasesSection />
       <KiCTASection />
       <FAQSection />
