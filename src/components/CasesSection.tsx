@@ -1,16 +1,16 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Building2, Trophy, Utensils, Shirt, ArrowRight, TrendingUp } from 'lucide-react';
+import { Building2, Trophy, Utensils, Shirt, ArrowRight, TrendingUp, Quote, CircleCheck as CheckCircle } from 'lucide-react';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
-  visible: (delay = 0) => ({
+  visible: (d = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.65, delay, ease: EASE },
+    transition: { duration: 0.65, delay: d, ease: EASE },
   }),
 };
 
@@ -18,60 +18,90 @@ const cases = [
   {
     icon: Building2,
     category: 'Medizin & Gesundheit',
-    title: 'Arztpraxis: KI-Rezeptionistin ersetzt manuelle Terminannahme',
-    situation: 'Die Praxis verpasste täglich 20–30 Anrufe. Das Empfangsteam war ausgelastet, Neupatienten sprangen ab.',
-    solution: 'KI-Telefonassistentin übernimmt Anrufannahme rund um die Uhr, bucht Termine direkt ins System, sendet Bestätigungs-SMS automatisch.',
+    title: 'Arztpraxis',
+    headline: 'KI-Rezeptionistin eliminiert täglich 20–30 verpasste Anrufe.',
+    situation: 'Das Empfangsteam war ausgelastet. Neupatienten sprangen ab, bevor jemand abnahm.',
+    solution: 'KI-Telefonassistentin übernimmt Anrufannahme 24/7, bucht Termine direkt, sendet Bestätigungs-SMS.',
     outcomes: [
-      'Keine verpassten Anrufe mehr außerhalb der Öffnungszeiten',
-      'Empfangsteam fokussiert sich auf Patienten vor Ort',
-      'Neupatienten-Buchungen spürbar angestiegen',
+      { label: 'Verpasste Anrufe', before: '20–30/Tag', after: '0', positive: true },
+      { label: 'Empfang fokussiert auf', before: 'Telefon', after: 'Patienten vor Ort', positive: true },
+      { label: 'Neupatienten', before: 'stagnierend', after: 'spürbar angestiegen', positive: true },
     ],
+    quote: 'Das System nimmt ab, qualifiziert und bucht — ohne unser Team zu belasten.',
+    quoteRole: 'Praxisinhaber, Bayern',
     link: '/ki-telefonassistent',
-    linkLabel: 'KI Telefonassistent ansehen',
+    linkLabel: 'KI-Telefonassistent ansehen',
+    accentColor: 'sky',
   },
   {
     icon: Trophy,
     category: 'Sport & Freizeit',
-    title: 'Sportanlage: Website + Buchung + vollautomatischer Zugang',
-    situation: 'Personal wurde täglich mit Buchungsanfragen und Zugangsproblemen belastet. Keine Online-Präsenz.',
-    solution: 'Neue Website mit integriertem Buchungssystem, automatischer Lichtsteuerung und KI-gesteuerter Türöffnung – alles synchron mit Zahlungen.',
+    title: 'Sportanlage',
+    headline: 'Website + vollautomatischer Zugang — ohne Personalaufwand.',
+    situation: 'Personal täglich belastet mit Buchungsanfragen und Zugangsproblemen. Keine Online-Präsenz.',
+    solution: 'Website mit Buchungssystem, automatische Lichtsteuerung und KI-gesteuerte Türöffnung — synchron mit Zahlungen.',
     outcomes: [
-      '24/7 Buchungen ohne Personalaufwand',
-      'Licht & Zugang vollautomatisch gesteuert',
-      'Umsatz auch außerhalb der Kernzeiten',
+      { label: 'Buchungen', before: 'nur persönlich', after: '24/7 online', positive: true },
+      { label: 'Personalaufwand', before: 'täglich', after: 'eliminiert', positive: true },
+      { label: 'Umsatz außerhalb Kernzeit', before: 'nicht möglich', after: 'voll aktiviert', positive: true },
     ],
+    quote: 'Kunden buchen und kommen rein — wir müssen nichts tun.',
+    quoteRole: 'Betreiber Sportanlage, Bayern',
     link: '/leistungen',
     linkLabel: 'Automation ansehen',
+    accentColor: 'emerald',
   },
   {
     icon: Utensils,
     category: 'Gastronomie',
-    title: 'Restaurant: KI-Rezeptionistin + Webauftritt mit Conversion',
-    situation: 'Das Serviceteam verlor täglich Zeit am Telefon. Tischreservierungen liefen chaotisch, No-Shows waren häufig.',
-    solution: 'Neue Website mit Speisekarte, KI-Telefonistin für Reservierungen und automatische Bestätigungs-/Erinnerungssequenz.',
+    title: 'Restaurant',
+    headline: 'No-Show-Rate um 40% reduziert. Service-Team entlastet.',
+    situation: 'Serviceteam verlor täglich Stunden am Telefon. Tischreservierungen liefen chaotisch, No-Shows häufig.',
+    solution: 'Website mit Speisekarte, KI-Telefonistin für Reservierungen, automatische Bestätigungs- und Erinnerungssequenz.',
     outcomes: [
-      'No-Show-Rate um ca. 40% reduziert',
-      'Service-Team nimmt deutlich seltener Anrufe entgegen',
-      'Online-Reservierungen als primärer Buchungskanal',
+      { label: 'No-Show-Rate', before: 'hoch', after: '↓ 40%', positive: true },
+      { label: 'Anrufe durch Service-Team', before: 'täglich viele', after: 'fast keine mehr', positive: true },
+      { label: 'Online-Reservierungen', before: 'kaum', after: 'primärer Kanal', positive: true },
     ],
+    quote: 'Das System reserviert, erinnert und reduziert No-Shows. Wir kochen.',
+    quoteRole: 'Restaurantinhaber, Bayern',
     link: '/webdesign-gastronomie-bayreuth',
     linkLabel: 'Webdesign Gastronomie',
+    accentColor: 'amber',
   },
   {
     icon: Shirt,
     category: 'Fashion & E-Commerce',
-    title: 'Fashion-Brand: AI-Content-Produktion für Kampagnen',
+    title: 'Fashion-Brand',
+    headline: 'Kampagnenproduktion von Wochen auf Tage reduziert.',
     situation: 'Kampagnenproduktion dauerte Wochen und war teuer. Shooting-Setups für jede Kollektion nicht skalierbar.',
     solution: 'AI-generierte Produktbilder und Social-Content im exakten Brand-Look, kombiniert mit Landingpages für jeden Drop.',
     outcomes: [
-      'Kampagnenzeit von Wochen auf Tage reduziert',
-      'Konsistenter Brand-Look über alle Kanäle',
-      'Shooting-Kosten erheblich gesunken',
+      { label: 'Kampagnenzeit', before: 'Wochen', after: 'Tage', positive: true },
+      { label: 'Shooting-Kosten', before: 'hoch', after: 'erheblich gesunken', positive: true },
+      { label: 'Brand-Konsistenz', before: 'variierend', after: 'kanalübergreifend', positive: true },
     ],
+    quote: 'AI produziert Content in unserem Look — schneller und günstiger als jedes Shooting.',
+    quoteRole: 'Creative Director, Fashion-Brand',
     link: '/leistungen',
     linkLabel: 'Alle Leistungen',
+    accentColor: 'rose',
   },
 ];
+
+const accentMap: Record<string, string> = {
+  sky: 'bg-sky-50 text-sky-600 border-sky-100',
+  emerald: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+  amber: 'bg-amber-50 text-amber-600 border-amber-100',
+  rose: 'bg-rose-50 text-rose-600 border-rose-100',
+};
+
+const accentBar: Record<string, string> = {
+  sky: 'bg-sky-500',
+  emerald: 'bg-emerald-500',
+  amber: 'bg-amber-500',
+  rose: 'bg-rose-500',
+};
 
 export function CasesSection() {
   const ref = useRef(null);
@@ -85,6 +115,8 @@ export function CasesSection() {
       aria-labelledby="cases-heading"
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
+
+        {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-20">
           <motion.div
             initial="hidden"
@@ -105,75 +137,72 @@ export function CasesSection() {
               <span className="text-gray-300">Messbare Ergebnisse.</span>
             </h2>
           </motion.div>
-          <motion.p
+
+          <motion.div
             initial="hidden"
             animate={isInView ? 'visible' : 'hidden'}
             variants={fadeUp}
             custom={0.1}
-            className="text-[14.5px] text-gray-500 leading-relaxed max-w-sm"
+            className="flex flex-col gap-3 max-w-sm"
           >
-            Projekte, die mit einem konkreten Problem starteten – und mit einem System endeten,
-            das selbstständig arbeitet.{' '}
+            <p className="text-[14.5px] text-gray-500 leading-relaxed">
+              Projekte, die mit einem konkreten Problem starteten — und mit einem System endeten, das selbstständig arbeitet.
+            </p>
             <Link
               to="/referenzen"
-              className="font-medium text-gray-700 hover:text-gray-900 transition-colors underline underline-offset-2 decoration-gray-200"
+              className="group inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-gray-400 hover:text-gray-900 transition-colors"
             >
               Alle Referenzen ansehen
+              <ArrowRight size={12} className="transition-transform group-hover:translate-x-1" />
             </Link>
-            .
-          </motion.p>
+          </motion.div>
         </div>
 
-        <div className="grid lg:grid-cols-2 border border-gray-100 rounded-2xl overflow-hidden">
-          {cases.map((caseItem, index) => {
-            const Icon = caseItem.icon;
-            const isRight = index % 2 === 1;
-            const isBottom = index >= 2;
+        {/* Cases grid */}
+        <div className="grid lg:grid-cols-2 gap-px bg-gray-100 rounded-2xl overflow-hidden border border-gray-100">
+          {cases.map((c, index) => {
+            const Icon = c.icon;
             return (
               <motion.article
                 key={index}
                 initial="hidden"
                 animate={isInView ? 'visible' : 'hidden'}
                 variants={fadeUp}
-                custom={index * 0.08}
-                className={`group relative bg-white p-10 transition-colors duration-300 hover:bg-gray-50/40 ${
-                  isRight ? 'border-l border-gray-100' : ''
-                } ${isBottom ? 'border-t border-gray-100' : ''}`}
+                custom={index * 0.09}
+                className="group relative bg-white p-10 transition-colors duration-300 hover:bg-gray-50/40 flex flex-col"
               >
+                {/* Top accent bar on hover */}
+                <div className={`absolute top-0 left-0 right-0 h-[2px] ${accentBar[c.accentColor]} scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left`} />
+
+                {/* Header row */}
                 <div className="flex items-start gap-4 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-gray-200 transition-colors duration-300">
-                    <Icon size={16} className="text-gray-500" />
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 border ${accentMap[c.accentColor]}`}>
+                    <Icon size={16} />
                   </div>
                   <div>
                     <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-300 mb-1.5">
-                      {caseItem.category}
+                      {c.category} · {c.title}
                     </p>
                     <h3 className="text-[15px] font-bold text-gray-900 leading-snug tracking-tight">
-                      {caseItem.title}
+                      {c.headline}
                     </h3>
                   </div>
                 </div>
 
-                <div className="space-y-3 mb-6">
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-300 mb-1">
-                      Ausgangslage
-                    </p>
-                    <p className="text-[13px] text-gray-500 leading-relaxed">
-                      {caseItem.situation}
-                    </p>
+                {/* Situation + Solution */}
+                <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                    <p className="text-[9.5px] font-semibold uppercase tracking-[0.14em] text-gray-300 mb-2">Vorher</p>
+                    <p className="text-[12.5px] text-gray-500 leading-relaxed">{c.situation}</p>
                   </div>
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-300 mb-1">
-                      Lösung
-                    </p>
-                    <p className="text-[13px] text-gray-500 leading-relaxed">
-                      {caseItem.solution}
-                    </p>
+                  <div className="bg-gray-950/[0.02] rounded-xl p-4 border border-gray-100">
+                    <p className="text-[9.5px] font-semibold uppercase tracking-[0.14em] text-gray-400 mb-2">Lösung</p>
+                    <p className="text-[12.5px] text-gray-600 leading-relaxed">{c.solution}</p>
                   </div>
                 </div>
 
-                <div className="pt-5 border-t border-gray-100 mb-7">
+                {/* Outcomes */}
+                <div className="pt-5 border-t border-gray-100 mb-6">
                   <div className="flex items-center gap-1.5 mb-3">
                     <TrendingUp size={11} className="text-gray-400" />
                     <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-400">
@@ -181,29 +210,46 @@ export function CasesSection() {
                     </p>
                   </div>
                   <div className="space-y-2">
-                    {caseItem.outcomes.map((outcome, oi) => (
-                      <div key={oi} className="flex items-start gap-2.5">
-                        <div className="w-[3px] h-[3px] rounded-full bg-gray-300 flex-shrink-0 mt-[6px]" />
-                        <span className="text-[13px] text-gray-600 leading-snug">{outcome}</span>
+                    {c.outcomes.map((o, oi) => (
+                      <div key={oi} className="flex items-center gap-2.5">
+                        <CheckCircle size={11} className="text-emerald-500 flex-shrink-0" />
+                        <span className="text-[12.5px] text-gray-500">
+                          <span className="font-medium text-gray-700">{o.label}:</span>{' '}
+                          <span className="line-through text-gray-300">{o.before}</span>
+                          {' → '}
+                          <span className="font-semibold text-gray-800">{o.after}</span>
+                        </span>
                       </div>
                     ))}
                   </div>
                 </div>
 
+                {/* Quote */}
+                <div className="mt-auto pt-5 border-t border-gray-100">
+                  <div className="flex items-start gap-3">
+                    <Quote size={14} className="text-gray-200 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-[13px] text-gray-500 italic leading-relaxed mb-1.5">
+                        "{c.quote}"
+                      </p>
+                      <p className="text-[11px] font-medium text-gray-400">{c.quoteRole}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* CTA */}
                 <Link
-                  to={caseItem.link}
-                  className="group/link inline-flex items-center gap-1.5 text-[11px] font-semibold text-gray-400 hover:text-gray-900 transition-colors uppercase tracking-[0.12em]"
+                  to={c.link}
+                  className="group/link mt-6 inline-flex items-center gap-1.5 text-[11px] font-semibold text-gray-400 hover:text-gray-900 transition-colors uppercase tracking-[0.12em]"
                 >
-                  {caseItem.linkLabel}
-                  <ArrowRight
-                    size={11}
-                    className="transition-transform duration-200 group-hover/link:translate-x-1"
-                  />
+                  {c.linkLabel}
+                  <ArrowRight size={11} className="transition-transform group-hover/link:translate-x-1" />
                 </Link>
               </motion.article>
             );
           })}
         </div>
+
       </div>
     </section>
   );

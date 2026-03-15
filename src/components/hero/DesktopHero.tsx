@@ -1,251 +1,296 @@
-import { motion } from 'framer-motion';
-import { useMemo } from 'react';
+import { motion, useInView } from 'framer-motion';
+import { useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, PhoneCall, Globe, Zap } from 'lucide-react';
+import { ArrowRight, PhoneCall, Globe, Zap, CircleCheck as CheckCircle, Star } from 'lucide-react';
 import { SplineScene } from '../ui/splite';
 
-const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const E: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-function DesktopParticles() {
-  const particles = useMemo(
+function Particles() {
+  const pts = useMemo(
     () =>
-      Array.from({ length: 22 }, (_, i) => ({
+      Array.from({ length: 18 }, (_, i) => ({
         id: i,
         x: Math.random() * 100,
         y: Math.random() * 100,
-        size: Math.random() * 1.2 + 0.4,
-        duration: Math.random() * 7 + 5,
+        s: Math.random() * 1.4 + 0.5,
+        dur: Math.random() * 8 + 6,
         delay: Math.random() * 5,
       })),
     []
   );
-
   return (
     <div className="absolute inset-0 pointer-events-none">
-      {particles.map((p) => (
+      {pts.map((p) => (
         <motion.div
           key={p.id}
-          className="absolute rounded-full bg-sky-400/30"
-          style={{ width: p.size, height: p.size, left: `${p.x}%`, top: `${p.y}%` }}
-          animate={{ y: [0, -20, 0], opacity: [0.01, 0.12, 0.01] }}
-          transition={{ duration: p.duration, repeat: Infinity, delay: p.delay, ease: 'easeInOut' }}
+          className="absolute rounded-full bg-sky-400/20"
+          style={{ width: p.s, height: p.s, left: `${p.x}%`, top: `${p.y}%` }}
+          animate={{ y: [0, -22, 0], opacity: [0, 0.15, 0] }}
+          transition={{ duration: p.dur, repeat: Infinity, delay: p.delay, ease: 'easeInOut' }}
         />
       ))}
     </div>
   );
 }
 
-const SERVICES = [
-  { icon: PhoneCall, label: 'KI-Telefonassistent' },
-  { icon: Globe, label: 'Webdesign' },
-  { icon: Zap, label: 'Automatisierung' },
+const trustItems = [
+  'DSGVO-konform',
+  'Deutsche Server',
+  'Live in < 14 Tagen',
+  'Persönliche Betreuung',
 ];
 
-const STATS = [
-  { value: '24/7', label: 'Kein Anruf geht verloren' },
-  { value: '< 14d', label: 'Bis zum Go-Live' },
+const services = [
+  { icon: PhoneCall, label: 'KI-Telefonassistent', href: '/ki-telefonassistent' },
+  { icon: Globe, label: 'Webdesign', href: '/webdesign-agentur-deutschland' },
+  { icon: Zap, label: 'Automatisierung', href: '/automatisierung-unternehmen' },
+];
+
+const proof = [
+  { value: '24/7', label: 'Kein Anruf verpasst' },
+  { value: '< 14d', label: 'Go-Live garantiert' },
   { value: '100%', label: 'DSGVO-konform' },
 ];
 
-function DesktopCTA() {
+export function DesktopHero() {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true });
   const navigate = useNavigate();
 
   return (
-    <motion.div
-      className="mt-10 flex flex-col gap-3"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8, delay: 2.6, ease: EASE_OUT }}
-    >
-      <motion.button
-        onClick={() => navigate('/kontakt')}
-        className="group relative flex items-center gap-3 px-6 py-3.5 overflow-hidden cursor-pointer w-fit"
-        initial={{ opacity: 0, x: -10 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6, delay: 2.7, ease: EASE_OUT }}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.97 }}
-      >
-        <div className="absolute inset-0 bg-gray-950 transition-colors duration-300 group-hover:bg-gray-800" />
-        <motion.div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{
-            background: 'linear-gradient(120deg, rgba(2,132,199,0.15) 0%, transparent 60%)',
-          }}
-        />
-        <div className="relative flex items-center gap-2.5">
-          <span className="text-[13px] font-semibold tracking-wide text-white whitespace-nowrap">
-            Kostenloses Erstgespräch
-          </span>
-          <motion.div
-            animate={{ x: [0, 4, 0] }}
-            transition={{ duration: 2.2, repeat: Infinity, delay: 4, ease: 'easeInOut' }}
-          >
-            <ArrowRight className="w-3.5 h-3.5 text-white/60 group-hover:text-white transition-colors" />
-          </motion.div>
-        </div>
-        <motion.div
-          className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-sky-500 to-transparent"
-          initial={{ width: 0 }}
-          whileHover={{ width: '100%' }}
-          transition={{ duration: 0.3 }}
-        />
-      </motion.button>
-
-      <motion.button
-        onClick={() => navigate('/ki-telefonassistent')}
-        className="group relative flex items-center gap-2 px-1 py-1 cursor-pointer w-fit"
-        initial={{ opacity: 0, x: -10 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6, delay: 2.9, ease: EASE_OUT }}
-        whileTap={{ scale: 0.97 }}
-      >
-        <span className="text-[12px] font-medium tracking-wide text-gray-400 group-hover:text-gray-700 transition-colors whitespace-nowrap underline underline-offset-2 decoration-gray-200 group-hover:decoration-gray-400">
-          KI-Telefonassistent live erleben
-        </span>
-        <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-gray-600 transition-colors" />
-      </motion.button>
-    </motion.div>
-  );
-}
-
-export function DesktopHero() {
-  return (
     <section
+      ref={ref}
       className="relative w-full min-h-screen flex items-center overflow-hidden bg-white"
-      aria-label="Hauptbereich"
+      aria-label="Cogniiq — Operative KI-Systeme"
     >
-      <div className="absolute inset-0">
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'radial-gradient(ellipse at 45% 50%, rgba(2,132,199,0.05) 0%, transparent 55%)',
-          }}
-        />
-      </div>
+      {/* Background treatments */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(ellipse 60% 70% at 68% 50%, rgba(2,132,199,0.04) 0%, transparent 65%), radial-gradient(ellipse 40% 40% at 10% 20%, rgba(16,185,129,0.03) 0%, transparent 55%)',
+        }}
+      />
+      <div
+        className="absolute top-0 left-0 right-0 h-px"
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(2,132,199,0.12), transparent)' }}
+      />
 
+      {/* Animated scan line */}
       <motion.div
         className="absolute left-0 right-0 h-px z-30 pointer-events-none"
         style={{
-          background: 'linear-gradient(90deg, transparent 5%, rgba(3,105,161,0.12) 30%, rgba(2,132,199,0.25) 50%, rgba(3,105,161,0.12) 70%, transparent 95%)',
-          boxShadow: '0 0 20px 4px rgba(3,105,161,0.04)',
+          background:
+            'linear-gradient(90deg, transparent 5%, rgba(3,105,161,0.1) 30%, rgba(2,132,199,0.2) 50%, rgba(3,105,161,0.1) 70%, transparent 95%)',
         }}
         initial={{ top: 0, opacity: 0 }}
         animate={{ top: ['0%', '100%'], opacity: [0, 1, 1, 0] }}
-        transition={{ duration: 2.5, delay: 0.3, ease: EASE_OUT }}
+        transition={{ duration: 2.8, delay: 0.3, ease: E }}
       />
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-8 flex items-center gap-0">
-        <div className="flex-1 max-w-xl">
+      <Particles />
 
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-8 lg:px-12 flex items-center gap-4">
+
+        {/* ─── LEFT: Copy ─── */}
+        <div className="flex-1 max-w-[520px]">
+
+          {/* Live status pill */}
           <motion.div
-            className="flex items-center gap-3 mb-8"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.7, ease: EASE_OUT }}
+            className="flex items-center gap-3 mb-10"
+            initial={{ opacity: 0, y: 10 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.5, ease: E }}
           >
-            <div className="flex items-center gap-2 px-3 py-1.5 border border-gray-200 bg-gray-50">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-gray-200 bg-white shadow-sm">
               <motion.div
                 className="w-1.5 h-1.5 rounded-full bg-emerald-500"
-                animate={{ opacity: [1, 0.3, 1] }}
-                transition={{ duration: 1.8, repeat: Infinity }}
+                animate={{ opacity: [1, 0.3, 1], scale: [1, 1.3, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
               />
-              <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-gray-500">
-                Operative AI Systems
+              <span className="text-[10.5px] font-semibold tracking-[0.16em] uppercase text-gray-500">
+                Systeme aktiv · Bayreuth, München, Regensburg
               </span>
             </div>
           </motion.div>
 
-          <div className="relative mb-0">
-            <h1 className="text-7xl lg:text-8xl xl:text-[6.5rem] font-bold tracking-tight leading-none">
-              {'CogniIQ'.split('').map((char, i) => (
-                <motion.span
-                  key={i}
-                  className="inline-block bg-clip-text text-transparent bg-gradient-to-b from-gray-900 via-gray-700 to-gray-400"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 1.0 + i * 0.08, ease: EASE_OUT }}
-                >
-                  {char}
-                </motion.span>
-              ))}
-            </h1>
+          {/* Main headline */}
+          <h1 className="mb-6">
+            <div className="overflow-hidden">
+              <motion.div
+                className="text-[clamp(44px,5.2vw,68px)] font-bold tracking-[-0.025em] leading-[1.04] text-gray-950"
+                initial={{ y: '110%' }}
+                animate={inView ? { y: 0 } : {}}
+                transition={{ duration: 0.75, delay: 0.65, ease: E }}
+              >
+                Kein Anruf
+              </motion.div>
+            </div>
+            <div className="overflow-hidden">
+              <motion.div
+                className="text-[clamp(44px,5.2vw,68px)] font-bold tracking-[-0.025em] leading-[1.04] text-gray-950"
+                initial={{ y: '110%' }}
+                animate={inView ? { y: 0 } : {}}
+                transition={{ duration: 0.75, delay: 0.78, ease: E }}
+              >
+                mehr verpasst.
+              </motion.div>
+            </div>
+            <div className="overflow-hidden mt-1">
+              <motion.div
+                className="text-[clamp(44px,5.2vw,68px)] font-bold tracking-[-0.025em] leading-[1.04] text-gray-300"
+                initial={{ y: '110%' }}
+                animate={inView ? { y: 0 } : {}}
+                transition={{ duration: 0.75, delay: 0.91, ease: E }}
+              >
+                Kein Lead verloren.
+              </motion.div>
+            </div>
+          </h1>
 
-            <motion.div
-              className="absolute top-1/2 -translate-y-1/2 w-[2px] h-[55%] rounded-full pointer-events-none"
-              style={{
-                background: 'linear-gradient(to bottom, transparent, #0284c7, transparent)',
-                boxShadow: '0 0 8px 2px rgba(2,132,199,0.3)',
-              }}
-              initial={{ left: '5%', opacity: 0 }}
-              animate={{ left: ['5%', '95%'], opacity: [0, 1, 1, 0] }}
-              transition={{
-                left: { duration: 0.55, delay: 1.0, ease: EASE_OUT },
-                opacity: { times: [0, 0.05, 0.85, 1], duration: 0.6, delay: 0.95 },
-              }}
-            />
-          </div>
-
+          {/* Sub copy */}
           <motion.p
-            className="mt-7 text-[15px] lg:text-base text-gray-500 font-light leading-[1.75] max-w-[400px]"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 2.0, ease: EASE_OUT }}
+            className="text-[16px] text-gray-500 leading-[1.75] max-w-[420px] mb-8"
+            initial={{ opacity: 0, y: 12 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.75, delay: 1.15, ease: E }}
           >
-            KI-Telefonsysteme, konvertierende Websites und operative Automatisierung –
-            gebaut für Unternehmen, die täglich Anrufe, Leads und Zeit verlieren.
+            Cogniiq baut KI-Telefonsysteme, Websites und operative Automationen —
+            für Unternehmen, die aufgehört haben, Kunden zu verlieren.
           </motion.p>
 
+          {/* Service pills */}
           <motion.div
-            className="mt-8 flex items-center gap-1.5"
+            className="flex items-center gap-2 mb-10"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 2.3, ease: EASE_OUT }}
+            animate={inView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.5, delay: 1.3, ease: E }}
           >
-            {SERVICES.map(({ icon: Icon, label }, i) => (
+            {services.map(({ icon: Icon, label, href }, i) => (
+              <motion.a
+                key={label}
+                href={href}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-100 bg-gray-50 hover:border-sky-200 hover:bg-sky-50 transition-colors group cursor-pointer"
+                initial={{ opacity: 0, y: 6 }}
+                animate={inView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.4, delay: 1.35 + i * 0.08, ease: E }}
+              >
+                <Icon className="w-3 h-3 text-sky-500 group-hover:text-sky-600 transition-colors" />
+                <span className="text-[11.5px] font-medium text-gray-600 group-hover:text-gray-900 transition-colors whitespace-nowrap">
+                  {label}
+                </span>
+              </motion.a>
+            ))}
+          </motion.div>
+
+          {/* Primary CTA */}
+          <motion.div
+            className="flex flex-col gap-3"
+            initial={{ opacity: 0, y: 10 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 1.55, ease: E }}
+          >
+            <div className="flex items-center gap-3">
+              <motion.button
+                onClick={() => navigate('/kontakt')}
+                className="group relative flex items-center gap-3 px-7 py-3.5 bg-gray-950 text-white text-[13.5px] font-semibold overflow-hidden hover:bg-gray-800 transition-colors"
+                whileHover={{ scale: 1.015 }}
+                whileTap={{ scale: 0.975 }}
+              >
+                <motion.div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: 'linear-gradient(120deg, rgba(2,132,199,0.18) 0%, transparent 60%)' }}
+                />
+                <span className="relative whitespace-nowrap">Kostenloses Erstgespräch</span>
+                <motion.div
+                  className="relative"
+                  animate={{ x: [0, 4, 0] }}
+                  transition={{ duration: 2.5, repeat: Infinity, delay: 3, ease: 'easeInOut' }}
+                >
+                  <ArrowRight className="w-3.5 h-3.5 text-white/70 group-hover:text-white transition-colors" />
+                </motion.div>
+                <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-sky-500/40 via-sky-500/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              </motion.button>
+
+              <button
+                onClick={() => navigate('/ki-telefonassistent')}
+                className="group flex items-center gap-1.5 text-[12.5px] font-medium text-gray-400 hover:text-gray-800 transition-colors"
+              >
+                Demo anhören
+                <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-gray-600 transition-colors" />
+              </button>
+            </div>
+
+            {/* Micro-social proof under CTA */}
+            <div className="flex items-center gap-2.5">
+              <div className="flex -space-x-1.5">
+                {['#0ea5e9', '#22c55e', '#f59e0b', '#ef4444'].map((c, i) => (
+                  <div
+                    key={i}
+                    className="w-5 h-5 rounded-full border-[1.5px] border-white flex items-center justify-center"
+                    style={{ background: `${c}22`, borderColor: c + '66' }}
+                  >
+                    <div className="w-2 h-2 rounded-full" style={{ background: c }} />
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center gap-0.5">
+                {[1,2,3,4,5].map(s => (
+                  <Star key={s} size={9} className="text-amber-400 fill-amber-400" />
+                ))}
+              </div>
+              <span className="text-[11px] text-gray-400">
+                Vertrauen von 40+ Unternehmen in Deutschland
+              </span>
+            </div>
+          </motion.div>
+
+          {/* Stats row */}
+          <motion.div
+            className="mt-10 pt-8 border-t border-gray-100 grid grid-cols-3 gap-6"
+            initial={{ opacity: 0 }}
+            animate={inView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.8, delay: 1.9, ease: E }}
+          >
+            {proof.map(({ value, label }, i) => (
               <motion.div
                 key={label}
-                className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-100 bg-white/80"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 2.4 + i * 0.1, ease: EASE_OUT }}
+                className="flex flex-col gap-1"
+                initial={{ opacity: 0, y: 8 }}
+                animate={inView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5, delay: 2.0 + i * 0.1, ease: E }}
               >
-                <Icon className="w-3 h-3 text-sky-600" />
-                <span className="text-[11px] font-medium text-gray-600 whitespace-nowrap">{label}</span>
+                <span className="text-[26px] font-bold text-gray-900 tabular-nums tracking-tight">
+                  {value}
+                </span>
+                <span className="text-[11.5px] text-gray-400 leading-tight">{label}</span>
               </motion.div>
             ))}
           </motion.div>
 
-          <DesktopCTA />
-
+          {/* Trust items */}
           <motion.div
-            className="mt-10 pt-8 border-t border-gray-100 grid grid-cols-3 gap-6"
+            className="mt-6 flex flex-wrap gap-x-4 gap-y-1"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 3.0, ease: EASE_OUT }}
+            animate={inView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.6, delay: 2.2, ease: E }}
           >
-            {STATS.map(({ value, label }, i) => (
-              <motion.div
-                key={label}
-                className="flex flex-col gap-0.5"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 3.1 + i * 0.12, ease: EASE_OUT }}
-              >
-                <span className="text-2xl font-bold text-gray-900 tabular-nums tracking-tight">
-                  {value}
-                </span>
-                <span className="text-[11px] text-gray-400 font-light leading-tight">{label}</span>
-              </motion.div>
+            {trustItems.map((t) => (
+              <div key={t} className="flex items-center gap-1.5">
+                <CheckCircle size={10} className="text-emerald-500 flex-shrink-0" />
+                <span className="text-[11px] text-gray-400">{t}</span>
+              </div>
             ))}
           </motion.div>
         </div>
 
+        {/* ─── RIGHT: 3D Scene ─── */}
         <motion.div
           className="flex-1 h-[600px] lg:h-[700px] xl:h-[800px] relative"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.5, delay: 0.5 }}
+          animate={inView ? { opacity: 1 } : {}}
+          transition={{ duration: 1.6, delay: 0.4 }}
         >
           <SplineScene
             scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
@@ -254,28 +299,28 @@ export function DesktopHero() {
         </motion.div>
       </div>
 
-      <DesktopParticles />
-
+      {/* Bottom fade */}
       <div
         className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
         style={{ background: 'linear-gradient(to bottom, transparent, white)' }}
       />
 
+      {/* Scroll cue */}
       <motion.div
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 z-10"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 z-10"
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 4.0, duration: 1 }}
+        animate={inView ? { opacity: 1 } : {}}
+        transition={{ delay: 3.0, duration: 1 }}
       >
         <motion.div
-          className="w-5 h-8 rounded-full border border-gray-300 flex items-start justify-center p-1"
+          className="w-5 h-8 rounded-full border border-gray-200 flex items-start justify-center p-1"
           animate={{ opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: 2, repeat: Infinity }}
+          transition={{ duration: 2.2, repeat: Infinity }}
         >
           <motion.div
             className="w-1 h-1.5 rounded-full bg-gray-400"
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
           />
         </motion.div>
       </motion.div>

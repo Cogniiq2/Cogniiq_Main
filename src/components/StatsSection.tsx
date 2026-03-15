@@ -1,28 +1,50 @@
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { motion, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useRef, useEffect } from 'react';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
+function CountUp({ to, suffix = '', prefix = '' }: { to: number; suffix?: string; prefix?: string }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+  const motionValue = useMotionValue(0);
+  const spring = useSpring(motionValue, { duration: 1800, bounce: 0 });
+  const display = useTransform(spring, (v) => `${prefix}${Math.round(v)}${suffix}`);
+
+  useEffect(() => {
+    if (isInView) motionValue.set(to);
+  }, [isInView, motionValue, to]);
+
+  return <motion.span ref={ref}>{display}</motion.span>;
+}
+
 const stats = [
   {
-    value: '24/7',
+    display: '24/7',
+    numeric: null,
     label: 'Kein Anruf geht verloren',
-    sub: 'Der KI-Assistent antwortet – immer',
+    sub: 'Der KI-Assistent antwortet — immer',
+    accent: false,
   },
   {
-    value: '< 14',
+    display: null,
+    numeric: { to: 14, prefix: '< ', suffix: '' },
     label: 'Tage bis zum Go-Live',
-    sub: 'Kein monatelanger Vorlauf',
+    sub: 'Kein monatelanger Vorlauf — garantiert',
+    accent: true,
   },
   {
-    value: '3×',
-    label: 'Systeme gebündelt',
-    sub: 'Web · KI-Telefon · Automation',
+    display: null,
+    numeric: { to: 30, prefix: '', suffix: '%' },
+    label: 'Anrufe unbeantwortet',
+    sub: 'In deutschen KMU — täglich Umsatzverlust',
+    accent: false,
   },
   {
-    value: '∅ 30%',
-    label: 'Anrufe gehen unbeantwortet',
-    sub: 'In deutschen KMU – täglich',
+    display: null,
+    numeric: { to: 100, prefix: '', suffix: '%' },
+    label: 'DSGVO-konform',
+    sub: 'Deutsche Server · Made in Germany',
+    accent: false,
   },
 ];
 
@@ -39,23 +61,38 @@ export function StatsSection() {
               key={i}
               initial={{ opacity: 0, y: 16 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: i * 0.07, ease: EASE }}
-              className={`group relative flex flex-col justify-center px-8 py-12 border-b border-gray-100 lg:border-b-0 transition-colors duration-300 hover:bg-gray-50/50 ${
+              transition={{ duration: 0.65, delay: i * 0.08, ease: EASE }}
+              className={`group relative flex flex-col justify-center px-8 py-12 transition-colors duration-300 hover:bg-gray-50/60 border-b border-gray-100 lg:border-b-0 ${
                 i < stats.length - 1 ? 'border-r border-gray-100' : ''
-              } ${i === 1 || i === 3 ? 'lg:border-r-0' : ''}`}
+              } ${i === 1 || i === 3 ? 'lg:border-r-0' : ''} ${
+                stat.accent ? 'bg-gray-50/40' : ''
+              }`}
             >
-              <div
-                className="absolute bottom-0 left-0 right-0 h-[2px] bg-gray-900 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"
-                style={{ transitionTimingFunction: 'cubic-bezier(0.22,1,0.36,1)' }}
-              />
+              {/* Hover bottom accent */}
+              <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gray-900 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)]" />
+
+              {stat.accent && (
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-sky-500/40" />
+              )}
+
               <p
-                className="font-bold text-gray-900 tracking-tight leading-none mb-3"
-                style={{ fontSize: 'clamp(32px, 4.2vw, 48px)', fontVariantNumeric: 'tabular-nums' }}
+                className="font-bold text-gray-900 tracking-tight leading-none mb-3 tabular-nums"
+                style={{ fontSize: 'clamp(32px, 4.2vw, 48px)' }}
               >
-                {stat.value}
+                {stat.display ?? (
+                  stat.numeric && (
+                    <CountUp
+                      to={stat.numeric.to}
+                      prefix={stat.numeric.prefix}
+                      suffix={stat.numeric.suffix}
+                    />
+                  )
+                )}
               </p>
               <div className="w-5 h-px bg-gray-200 mb-3" />
-              <p className="text-[13px] font-semibold text-gray-700 tracking-tight mb-1">{stat.label}</p>
+              <p className="text-[13px] font-semibold text-gray-700 tracking-tight mb-1">
+                {stat.label}
+              </p>
               <p className="text-[11.5px] text-gray-400 leading-snug">{stat.sub}</p>
             </motion.div>
           ))}
