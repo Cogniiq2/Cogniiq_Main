@@ -373,7 +373,7 @@ export function MobileHero() {
     <section
       ref={sectionRef}
       className="relative w-full flex flex-col items-center overflow-hidden"
-      style={{ minHeight: '100svh', background: '#f8fafc' }}
+      style={{ minHeight: '100svh', background: '#ffffff' }}
       aria-label="CogniIQ – Operative AI Systems"
       onTouchStart={handleTouch}
     >
@@ -383,7 +383,7 @@ export function MobileHero() {
 
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: 'linear-gradient(160deg, #ffffff 0%, #f0f4f8 45%, #e8f0f6 100%)' }}
+        style={{ background: 'linear-gradient(160deg, #ffffff 0%, #fafafa 60%, #f5f5f5 100%)' }}
         aria-hidden="true"
       />
       <div
@@ -607,7 +607,7 @@ export function MobileHero() {
 
       <div
         className="absolute bottom-0 left-0 right-0 pointer-events-none"
-        style={{ height: 100, background: 'linear-gradient(to bottom, transparent, rgba(240,244,248,0.8))' }}
+        style={{ height: 100, background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.9))' }}
         aria-hidden="true"
       />
 

@@ -76,7 +76,7 @@ export function ProblemSection() {
   const isInView = useInView(ref, { once: true, amount: 0.06 });
 
   return (
-    <section ref={ref} className="py-28 bg-gray-950" aria-labelledby="problem-heading">
+    <section ref={ref} className="py-28 bg-white border-t border-gray-100" aria-labelledby="problem-heading">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
 
         {/* Header */}
@@ -88,16 +88,16 @@ export function ProblemSection() {
             custom={0}
             className="max-w-2xl"
           >
-            <p className="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-gray-600 mb-5">
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-gray-400 mb-5">
               Warum Unternehmen stagnieren
             </p>
             <h2
               id="problem-heading"
-              className="text-4xl lg:text-5xl font-bold text-white leading-[1.08] tracking-tight"
+              className="text-4xl lg:text-5xl font-bold text-gray-900 leading-[1.08] tracking-tight"
             >
               Das kostet Sie täglich
               <br />
-              <span className="text-gray-600">bares Geld.</span>
+              <span className="text-gray-300">bares Geld.</span>
             </h2>
           </motion.div>
 
@@ -113,7 +113,7 @@ export function ProblemSection() {
             </p>
             <Link
               to="/kontakt"
-              className="group inline-flex items-center gap-2 text-[12.5px] font-semibold text-gray-400 hover:text-white transition-colors"
+              className="group inline-flex items-center gap-2 text-[12.5px] font-semibold text-gray-400 hover:text-gray-900 transition-colors"
             >
               Problem lösen lassen
               <ArrowRight size={12} className="transition-transform group-hover:translate-x-1" />
@@ -122,7 +122,7 @@ export function ProblemSection() {
         </div>
 
         {/* Problem grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/[0.03] rounded-2xl overflow-hidden border border-white/[0.04]">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-gray-100 rounded-2xl overflow-hidden border border-gray-100">
           {problems.map((problem, i) => {
             const Icon = problem.icon;
             return (
@@ -134,8 +134,8 @@ export function ProblemSection() {
                 custom={i * 0.07}
                 className={`group relative flex flex-col p-8 transition-all duration-300 ${
                   problem.accent
-                    ? 'bg-white/[0.04] hover:bg-white/[0.07]'
-                    : 'bg-gray-950 hover:bg-gray-900/50'
+                    ? 'bg-gray-50 hover:bg-gray-100/60'
+                    : 'bg-white hover:bg-gray-50/60'
                 }`}
               >
                 {/* Hover left accent bar */}
@@ -144,37 +144,33 @@ export function ProblemSection() {
                 <div className="flex items-start justify-between mb-6">
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
                     problem.accent
-                      ? 'bg-white/[0.08] border border-white/[0.12] group-hover:bg-white/[0.12]'
-                      : 'bg-white/[0.04] border border-white/[0.07] group-hover:bg-white/[0.08]'
+                      ? 'bg-gray-200 border border-gray-200 group-hover:bg-gray-300'
+                      : 'bg-gray-100 border border-gray-100 group-hover:bg-gray-200'
                   }`}>
-                    <Icon size={15} className={problem.accent ? 'text-gray-300' : 'text-gray-500'} />
+                    <Icon size={15} className="text-gray-500" />
                   </div>
 
                   {/* Stat chip */}
                   <div className="text-right">
-                    <p className="text-[22px] font-bold text-white/20 tabular-nums leading-none group-hover:text-white/40 transition-colors">
+                    <p className="text-[22px] font-bold text-gray-200 tabular-nums leading-none group-hover:text-gray-400 transition-colors">
                       {problem.stat}
                     </p>
-                    <p className="text-[9px] text-gray-700 uppercase tracking-[0.1em] leading-tight mt-0.5">
+                    <p className="text-[9px] text-gray-300 uppercase tracking-[0.1em] leading-tight mt-0.5">
                       {problem.statLabel}
                     </p>
                   </div>
                 </div>
 
-                <h3 className={`text-[14px] font-semibold leading-snug tracking-tight mb-3 ${
-                  problem.accent ? 'text-white' : 'text-white/85'
-                }`}>
+                <h3 className="text-[14px] font-semibold leading-snug tracking-tight mb-3 text-gray-900">
                   {problem.title}
                 </h3>
-                <p className={`text-[13px] leading-relaxed flex-1 ${
-                  problem.accent ? 'text-gray-400' : 'text-gray-500'
-                }`}>
+                <p className="text-[13px] leading-relaxed flex-1 text-gray-500">
                   {problem.body}
                 </p>
 
                 <Link
                   to={problem.href}
-                  className="mt-5 inline-flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-gray-700 hover:text-gray-300 transition-colors group/link"
+                  className="mt-5 inline-flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-gray-400 hover:text-gray-900 transition-colors group/link"
                 >
                   Lösung ansehen
                   <ArrowRight size={9} className="transition-transform group-hover/link:translate-x-0.5" />
@@ -190,15 +186,15 @@ export function ProblemSection() {
           animate={isInView ? 'visible' : 'hidden'}
           variants={fadeUp}
           custom={0.5}
-          className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-6 pt-10 border-t border-white/[0.04]"
+          className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-6 pt-10 border-t border-gray-100"
         >
-          <p className="text-[14px] text-gray-600 max-w-lg">
+          <p className="text-[14px] text-gray-500 max-w-lg">
             Diese Probleme sind lösbar — in Tagen, nicht Monaten.
             Wir bauen das System, das sie vollständig eliminiert.
           </p>
           <Link
             to="/kontakt"
-            className="group flex-shrink-0 inline-flex items-center gap-2.5 bg-white text-gray-900 font-semibold text-[13px] px-7 py-3.5 hover:bg-gray-100 transition-colors"
+            className="group flex-shrink-0 inline-flex items-center gap-2.5 bg-gray-950 text-white font-semibold text-[13px] px-7 py-3.5 hover:bg-gray-800 transition-colors"
           >
             Jetzt Lösung anfragen
             <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
