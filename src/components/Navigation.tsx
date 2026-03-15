@@ -126,16 +126,11 @@ export function Navigation() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.5 }}
             >
-              <Link
-                to="/referenzen"
-                className={`text-[13px] font-medium tracking-wide transition-colors duration-200 px-4 py-2 ${
-                  location.pathname === '/referenzen'
-                    ? 'text-gray-900 dark:text-gray-100'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
-                }`}
-              >
-                Referenzen
-              </Link>
+              <SimpleNavItem
+                label="Referenzen"
+                href="/referenzen"
+                isActive={location.pathname === '/referenzen'}
+              />
               <Link
                 to="/kontakt"
                 className="group relative flex items-center gap-1.5 px-5 py-2.5 bg-gray-950 dark:bg-white text-white dark:text-gray-950 text-[13px] font-semibold tracking-wide rounded-full overflow-hidden transition-all duration-300 hover:shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:scale-[1.02] active:scale-[0.99]"
