@@ -99,25 +99,6 @@ export function DesktopHero() {
         {/* ─── LEFT: Copy ─── */}
         <div className="flex-1 max-w-[560px]">
 
-          {/* Live status pill */}
-          <motion.div
-            className="flex items-center gap-3 mb-8"
-            initial={{ opacity: 0, y: 10 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.5, ease: E }}
-          >
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-gray-200 bg-white shadow-sm">
-              <motion.div
-                className="w-1.5 h-1.5 rounded-full bg-emerald-500"
-                animate={{ opacity: [1, 0.3, 1], scale: [1, 1.3, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-              <span className="text-[10.5px] font-semibold tracking-[0.16em] uppercase text-gray-500">
-                Systeme aktiv · Bayreuth, München, Regensburg
-              </span>
-            </div>
-          </motion.div>
-
           {/* Main headline */}
           <h1 className="mb-6">
             <div className="overflow-hidden">
