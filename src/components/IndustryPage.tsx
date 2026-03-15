@@ -1,17 +1,5 @@
 import { motion } from "framer-motion";
-import {
-  CheckCircle2,
-  ArrowRight,
-  MapPin,
-  ChevronRight,
-  Phone,
-  Globe,
-  Zap,
-  AlertCircle,
-  Lightbulb,
-  Package,
-  ArrowUpRight,
-} from "lucide-react";
+import { CircleCheck as CheckCircle2, ArrowRight, MapPin, ChevronRight, Phone, Globe, Zap, CircleAlert as AlertCircle, Lightbulb, Package, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Accordion,
@@ -299,10 +287,10 @@ function EngpaesseSection({ config }: { config: IndustryPageConfig }) {
             id="engpaesse-heading"
             className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
           >
-            Typische Engpässe in {config.industry}
+            Was {config.industry}-Betriebe in {config.city} täglich kostet
           </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Was Betriebe in {config.city} täglich bremst – operative Realität, keine Theorie.
+            Operative Realität – keine Theorie. Das sind die häufigsten Blockaden.
           </p>
         </motion.div>
 
@@ -349,10 +337,10 @@ function SolutionSection({ config }: { config: IndustryPageConfig }) {
             id="solution-heading"
             className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
           >
-            So löst Cogniiq das in {config.city}
+            Vom Problem zum laufenden System
           </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Drei konkrete Schritte – von der Analyse bis zum laufenden System.
+            Wie ein {config.industry}-Projekt mit Cogniiq in {config.city} konkret abläuft – Schritt für Schritt.
           </p>
         </motion.div>
 
@@ -455,10 +443,10 @@ function PaketeSection({ config }: { config: IndustryPageConfig }) {
             id="pakete-heading"
             className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
           >
-            Pakete für {config.industry} in {config.city}
+            Was wir für {config.industry} bauen
           </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Klare Leistungspakete – skalierbar nach Bedarf und Betriebsgröße.
+            Konkrete Leistungspakete – skalierbar nach Betriebsgröße und Zielsetzung.
           </p>
         </motion.div>
 
@@ -531,10 +519,10 @@ function ServicesSection({ config }: { config: IndustryPageConfig }) {
             id="services-heading"
             className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
           >
-            Digitale Lösungen für {config.industry} in {config.city}
+            Drei Systeme, die für Sie arbeiten
           </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Webdesign, KI-Telefonassistent und Automatisierung – branchenspezifisch eingesetzt.
+            Webdesign, KI-Telefonassistent und Automatisierung – auf {config.industry} in {config.city} zugeschnitten.
           </p>
         </motion.div>
 
@@ -590,10 +578,10 @@ function UseCasesSection({ config }: { config: IndustryPageConfig }) {
             id="usecases-heading"
             className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
           >
-            Einsatzbeispiele in {config.city}
+            Wie das in der Praxis aussieht
           </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Konkrete Situationen, in denen die Lösung für {config.industry} in {config.city} greift.
+            Reale Ausgangssituationen aus dem {config.industry}-Bereich – anonymisiert, konkret.
           </p>
         </motion.div>
 
@@ -645,10 +633,10 @@ function BenefitsSection({ config }: { config: IndustryPageConfig }) {
             id="benefits-heading"
             className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
           >
-            Vorteile für {config.industry} in {config.city}
+            Was sich konkret verändert
           </h2>
           <p className="text-gray-500 dark:text-gray-400 mb-10">
-            Was sich für Betriebe in {config.city} konkret verändert – messbar und dauerhaft.
+            Messbare Unterschiede für {config.industry}-Betriebe – nach dem ersten Live-System.
           </p>
         </motion.div>
 
@@ -709,42 +697,66 @@ function LocalContextSection({ config }: { config: IndustryPageConfig }) {
   );
 }
 
+const PROBLEM_LINKS = [
+  { label: "Verpasste Anrufe & Umsatzverlust", href: "/verpasste-anrufe-verlust" },
+  { label: "Keine Anfragen über die Website", href: "/keine-anfragen-website" },
+  { label: "Zu viel manuelle Arbeit", href: "/zu-viel-manuelle-arbeit" },
+  { label: "Keine automatische Terminbuchung", href: "/keine-terminbuchung" },
+];
+
 function InternalLinksSection({ config }: { config: IndustryPageConfig }) {
   return (
-    <section className="py-10 bg-white dark:bg-gray-950 transition-colors duration-300">
+    <section className="py-14 bg-white dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 transition-colors duration-300">
       <div className="max-w-5xl mx-auto px-6 lg:px-8">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUp}
-          custom={0}
-          className="mb-6"
-        >
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
-            Weiterführende Seiten
-          </h2>
-        </motion.div>
+        <div className="grid md:grid-cols-2 gap-10">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
+            custom={0}
+          >
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
+              Verwandte Seiten
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {config.internalLinks.map((link, i) => (
+                <Link
+                  key={i}
+                  to={link.href}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+                >
+                  {link.label}
+                  <ArrowRight size={11} className="text-gray-400" />
+                </Link>
+              ))}
+            </div>
+          </motion.div>
 
-        <div className="flex flex-wrap gap-3">
-          {config.internalLinks.map((link, i) => (
-            <motion.div
-              key={i}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeUp}
-              custom={i * 0.06}
-            >
-              <Link
-                to={link.href}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
-              >
-                {link.label}
-                <ArrowRight size={12} />
-              </Link>
-            </motion.div>
-          ))}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
+            custom={0.1}
+          >
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
+              Häufige Probleme – direkt adressiert
+            </p>
+            <ul className="space-y-2">
+              {PROBLEM_LINKS.map((link, i) => (
+                <li key={i}>
+                  <Link
+                    to={link.href}
+                    className="group inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+                  >
+                    <ArrowRight size={13} className="text-gray-300 group-hover:text-gray-500 transition-colors flex-shrink-0" />
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
         </div>
       </div>
     </section>

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { CheckCircle2, ArrowRight, MapPin, ChevronRight, Info, Phone, Building2, Lightbulb } from "lucide-react";
+import { CircleCheck as CheckCircle2, ArrowRight, MapPin, ChevronRight, Info, Phone, Building2, Lightbulb } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Accordion,
@@ -214,7 +214,7 @@ function LocalIntroSection({ config }: { config: CityServiceConfig }) {
           custom={0}
         >
           <h2 id="local-intro-heading" className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">
-            {config.service} in {config.city} – lokale Relevanz, digitale Umsetzung
+            {config.service} in {config.city} – was das konkret für Ihren Betrieb bedeutet
           </h2>
 
           <div className="space-y-5">
@@ -327,10 +327,10 @@ function UseCasesSection({ config }: { config: CityServiceConfig }) {
           className="mb-12"
         >
           <h2 id="usecases-heading" className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Typische Einsatzszenarien in {config.city}
+            Wer in {config.city} davon profitiert
           </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Wie {config.service} in {config.city} konkret eingesetzt wird.
+            Branchen und Betriebe, bei denen {config.service} in {config.city} sofort wirkt.
           </p>
         </motion.div>
 
@@ -423,7 +423,7 @@ function LocalRelevanzSection({ config }: { config: CityServiceConfig }) {
             custom={0}
           >
             <h2 id="local-heading" className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-              Typische Herausforderungen in {config.city}
+              Was Betriebe in {config.city} bremst
             </h2>
             <ul className="space-y-4">
               {config.localChallenges.map((challenge, i) => (
@@ -479,10 +479,10 @@ function BranchenSection({ config }: { config: CityServiceConfig }) {
           className="mb-12"
         >
           <h2 id="branchen-heading" className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Branchen in {config.city}, die besonders profitieren
+            Herausforderung & Lösung – branchenspezifisch
           </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Wer in {config.city} am meisten von {config.service} gewinnt – und warum.
+            Typische Ausgangssituationen in {config.city} – und wie {config.service} konkret hilft.
           </p>
         </motion.div>
 
@@ -546,10 +546,10 @@ function LocalSzenarienSection({ config }: { config: CityServiceConfig }) {
           className="mb-12"
         >
           <h2 id="szenarien-heading" className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Typische Einsatzsituationen in {config.city}
+            Reale Situationen, in denen {config.service} greift
           </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Reale Ausgangssituationen – wie {config.service} in {config.city} konkret hilft.
+            Ausgangssituationen aus der Praxis – anonymisiert, aus {config.city} und Umgebung.
           </p>
         </motion.div>
 
@@ -665,9 +665,17 @@ function CTASection({ config }: { config: CityServiceConfig }) {
             </Link>
           </div>
 
-          <p className="mt-6 text-xs text-gray-400 dark:text-gray-500">
-            {BUSINESS_INFO.name} · {BUSINESS_INFO.address.addressLocality} · {BUSINESS_INFO.contact.email}
-          </p>
+          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-center gap-4 text-xs text-gray-400 dark:text-gray-500">
+            <Link to="/ki-telefonassistent" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">KI-Telefonassistent</Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/webdesign-agentur-deutschland" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Webdesign Agentur</Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/automatisierung-unternehmen" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Automatisierung</Link>
+            <span aria-hidden="true">·</span>
+            <Link to="/verpasste-anrufe-verlust" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Verpasste Anrufe</Link>
+            <span aria-hidden="true">·</span>
+            <span>{BUSINESS_INFO.contact.email}</span>
+          </div>
         </motion.div>
       </div>
     </section>
