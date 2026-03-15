@@ -17,9 +17,9 @@ const fadeUp = {
 const services = [
   {
     number: '01',
-    title: 'High-End Websites',
+    title: 'Websites, die Anfragen generieren',
     description:
-      'Premium-Webauftritte mit Fokus auf Conversion, Core Web Vitals und organische Sichtbarkeit. Individuell – kein Baukasten.',
+      'Kein Baukasten, kein Standard-Theme. Entwickelt auf Basis Ihres Conversion-Ziels – mit SEO-Architektur, Core Web Vitals und klarer Nutzerführung.',
     icon: MonitorSmartphone,
     link: '/leistungen',
     cityLinks: [
@@ -28,18 +28,18 @@ const services = [
       { label: 'Webdesign Regensburg', href: '/regensburg/webdesign' },
     ],
     features: [
-      'Individuelles Design – kein Template',
-      'Ultra-schnelle Ladezeiten (Core Web Vitals)',
-      'SEO-Architektur für maximale Sichtbarkeit',
-      'Integration von Buchung, Kontakt & CRM',
+      'Individuelles Design ohne Templates',
+      'Core Web Vitals optimiert – messbar schnell',
+      'SEO-Architektur für lokale Sichtbarkeit',
+      'Buchung, Kontaktformular & CRM integriert',
     ],
     featured: false,
   },
   {
     number: '02',
-    title: 'KI Telefonassistent',
+    title: 'KI-Telefonassistent',
     description:
-      '24/7 digitale Rezeption – nimmt Anrufe an, bucht Termine, beantwortet Fragen. Vollautomatisch, in natürlicher Sprache.',
+      'Nimmt jeden Anruf entgegen, bucht Termine und beantwortet Fragen – vollautomatisch, in natürlicher Sprache, rund um die Uhr. Kein Anruf geht verloren.',
     icon: PhoneCall,
     link: '/ki-telefonassistent',
     cityLinks: [
@@ -51,31 +51,31 @@ const services = [
       'Anrufannahme in natürlicher Sprache',
       'Terminbuchung & -änderung in Echtzeit',
       'Nahtlose Anbindung an Kalender & CRM',
-      'DSGVO-konform, Made in Germany',
+      'DSGVO-konform · Made in Germany · 24/7',
     ],
     featured: true,
   },
   {
     number: '03',
-    title: 'AI Chatbots & Concierge',
+    title: 'AI-Chatbot & digitaler Berater',
     description:
-      'Intelligente Chatbots für Web, WhatsApp & Social. Verkaufen, beraten, qualifizieren – vollautomatisch und on-brand.',
+      'Qualifiziert Leads, beantwortet Anfragen und übergibt an Ihr CRM – automatisch und on-brand. Auf Web, WhatsApp und Social Media.',
     icon: Bot,
     link: '/leistungen',
     cityLinks: [],
     features: [
-      'On-Brand Antworten mit Ihrem Wording',
-      'Lead-Qualifizierung & CRM-Übergabe',
-      'Mehrsprachige Kommunikation',
+      'Antworten in Ihrem Wording & Stil',
+      'Lead-Qualifizierung mit CRM-Übergabe',
+      'Mehrsprachig – DE, EN, weitere',
       'Integration in bestehende Systeme',
     ],
     featured: false,
   },
   {
     number: '04',
-    title: 'Automationen & Workflows',
+    title: 'Automationen & operative Workflows',
     description:
-      'Wir verbinden Ihre Tools zu einem System, das im Hintergrund arbeitet – maßgeschneiderte Workflows und direkte API-Integrationen.',
+      'Verbindet Ihre Tools zu einem System, das im Hintergrund entscheidet und handelt – Follow-ups, Benachrichtigungen, Berichte, API-Integrationen.',
     icon: Workflow,
     link: '/leistungen',
     cityLinks: [
@@ -84,10 +84,10 @@ const services = [
       { label: 'Automatisierung Regensburg', href: '/regensburg/automatisierung' },
     ],
     features: [
-      'Individuelle Workflow-Szenarien für Ihre Prozesse',
-      'Automatisierte E-Mails, Reviews & Follow-ups',
+      'Maßgeschneiderte Workflows für Ihre Prozesse',
+      'Automatisierte Follow-ups, Reviews, E-Mails',
       'Reporting, Alerts & Monitoring',
-      'Zuverlässige, skalierbare Infrastruktur',
+      'Skalierbare, wartungsarme Infrastruktur',
     ],
     featured: false,
   },
@@ -120,9 +120,9 @@ export function ServicesSection() {
               id="services-heading"
               className="text-4xl lg:text-5xl font-bold text-gray-900 leading-[1.08] tracking-tight"
             >
-              Vier Systeme.
+              Vier Systeme,
               <br />
-              <span className="text-gray-300">Ein Ziel: Wachstum.</span>
+              <span className="text-gray-300">die täglich für Sie arbeiten.</span>
             </h2>
           </motion.div>
           <motion.p
@@ -130,14 +130,15 @@ export function ServicesSection() {
             animate={isInView ? 'visible' : 'hidden'}
             variants={fadeUp}
             custom={0.1}
-            className="text-base text-gray-500 leading-relaxed max-w-sm"
+            className="text-[14.5px] text-gray-500 leading-relaxed max-w-sm"
           >
-            Alles zahlt direkt auf Umsatz, Anfragen und weniger manuelle Arbeit ein.{' '}
+            Kein System für sich allein. Jedes Stück zahlt direkt auf Anfragen, Buchungen
+            und weniger manuelle Arbeit ein.{' '}
             <Link
               to="/leistungen"
               className="font-medium text-gray-700 hover:text-gray-900 transition-colors underline underline-offset-2 decoration-gray-200"
             >
-              Alle Leistungen ansehen
+              Alle Details ansehen
             </Link>
             .
           </motion.p>
@@ -162,8 +163,8 @@ export function ServicesSection() {
                 }`}
               >
                 {service.featured && (
-                  <span className="absolute top-8 right-8 text-[9px] font-semibold uppercase tracking-[0.15em] px-2.5 py-1 rounded-full border border-white/[0.08] text-white/30">
-                    Beliebt
+                  <span className="absolute top-8 right-8 text-[9px] font-semibold uppercase tracking-[0.15em] px-2.5 py-1 rounded-full border border-white/[0.08] text-white/25">
+                    Meistgebucht
                   </span>
                 )}
 
@@ -177,12 +178,12 @@ export function ServicesSection() {
                   >
                     <Icon
                       size={17}
-                      className={service.featured ? 'text-white/50' : 'text-gray-500'}
+                      className={service.featured ? 'text-white/40' : 'text-gray-500'}
                     />
                   </div>
                   <span
                     className={`text-[11px] font-bold tracking-[0.22em] tabular-nums ${
-                      service.featured ? 'text-white/15' : 'text-gray-200'
+                      service.featured ? 'text-white/10' : 'text-gray-200'
                     }`}
                   >
                     {service.number}
@@ -190,7 +191,7 @@ export function ServicesSection() {
                 </div>
 
                 <h3
-                  className={`text-[19px] font-bold mb-3 leading-snug tracking-tight ${
+                  className={`text-[18px] font-bold mb-3 leading-snug tracking-tight ${
                     service.featured ? 'text-white' : 'text-gray-900'
                   }`}
                 >
@@ -259,7 +260,7 @@ export function ServicesSection() {
                   to={service.link}
                   className={`group/link inline-flex items-center gap-2 text-[12.5px] font-semibold transition-all ${
                     service.featured
-                      ? 'text-white/50 hover:text-white'
+                      ? 'text-white/40 hover:text-white'
                       : 'text-gray-400 hover:text-gray-900'
                   }`}
                 >

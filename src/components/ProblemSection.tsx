@@ -7,33 +7,39 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const problems = [
   {
     icon: PhoneMissed,
-    title: 'Verpasste Anrufe kosten Umsatz',
-    body: 'Jeder Anruf, der ins Leere läuft, ist ein Kunde, der beim nächsten Anbieter landet. Ohne KI-Lösung passiert das täglich.',
+    title: 'Jeder verpasste Anruf ist ein verlorener Kunde.',
+    body: 'Im Schnitt 30% aller Anrufe gehen unbeantwortet – das sind keine Statistiken, das ist täglicher Umsatzverlust. Wer nicht abhebt, verliert an den Mitbewerber, der es tut.',
+    accent: true,
   },
   {
     icon: Globe,
-    title: 'Website, die keine Anfragen bringt',
-    body: 'Eine Website ohne SEO-Architektur, ohne klare Conversion-Führung und ohne Ladezeit-Optimierung generiert kaum Leads.',
+    title: 'Ihre Website bringt keine Anfragen.',
+    body: 'Eine Website ohne klare Conversion-Führung, ohne Ladezeit-Optimierung und ohne SEO-Struktur ist unsichtbar. Sie existiert – aber sie arbeitet nicht.',
+    accent: false,
   },
   {
     icon: Clock,
-    title: 'Manuelle Arbeit frisst Arbeitszeit',
-    body: 'Terminverwaltung, E-Mail-Antworten, Rechnungen – alles manuell. Das kostet Stunden pro Woche, die besser investiert wären.',
+    title: 'Manuelle Arbeit ist der teuerste Posten.',
+    body: 'Terminverwaltung, Follow-ups, Angebote per Hand – das summiert sich auf 10–20 Stunden pro Woche. Zeit, die für das Kerngeschäft fehlt.',
+    accent: false,
   },
   {
     icon: TrendingDown,
-    title: 'Keine Sichtbarkeit bei lokalen Suchen',
-    body: 'Wer nicht auf Seite 1 erscheint, wenn jemand lokal sucht, existiert für neue Kunden schlicht nicht.',
+    title: 'Nicht sichtbar. Nicht existent.',
+    body: 'Wer bei lokalen Suchanfragen nicht auf Seite 1 erscheint, existiert für potenzielle Neukunden schlicht nicht. Google entscheidet täglich, wer die Anfrage bekommt.',
+    accent: false,
   },
   {
     icon: Zap,
-    title: 'Tools, die nicht zusammenarbeiten',
-    body: 'CRM, Kalender, Buchhaltung, Buchungssystem – alle isoliert. Daten werden manuell übertragen, Fehler entstehen.',
+    title: 'Tools, die nicht zusammenarbeiten.',
+    body: 'CRM, Kalender, Buchungssystem, Buchhaltung – alle isoliert. Jede manuelle Übertragung ist eine Fehlerquelle. Ein System, das kommuniziert, ist kein Luxus.',
+    accent: false,
   },
   {
     icon: LayoutDashboard,
-    title: 'Kein Überblick, kein System',
-    body: 'Ohne automatisiertes Reporting weiß niemand genau, was läuft, was stockt und wo Umsatz verloren geht.',
+    title: 'Kein Überblick bedeutet kein Wachstum.',
+    body: 'Ohne automatisiertes Reporting weiß niemand, wo Leads hängen bleiben, wo Umsatz verloren geht und welche Maßnahmen tatsächlich wirken.',
+    accent: false,
   },
 ];
 
@@ -69,12 +75,15 @@ export function ProblemSection() {
           </p>
           <h2
             id="problem-heading"
-            className="text-4xl lg:text-5xl font-bold text-white leading-[1.08] tracking-tight"
+            className="text-4xl lg:text-5xl font-bold text-white leading-[1.08] tracking-tight mb-6"
           >
-            Wachstum blockiert.
+            Das kostet Sie täglich
             <br />
-            <span className="text-gray-600">Täglich.</span>
+            <span className="text-gray-600">bares Geld.</span>
           </h2>
+          <p className="text-[15px] text-gray-500 leading-relaxed max-w-xl">
+            Nicht weil die Kunden ausbleiben. Sondern weil operative Lücken sie still wegschicken.
+          </p>
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/[0.04] rounded-2xl overflow-hidden border border-white/[0.05]">
@@ -87,15 +96,27 @@ export function ProblemSection() {
                 animate={isInView ? 'visible' : 'hidden'}
                 variants={fadeUp}
                 custom={i * 0.07}
-                className="bg-gray-950 p-8 hover:bg-gray-900/60 transition-colors duration-300"
+                className={`group p-8 transition-colors duration-300 ${
+                  problem.accent
+                    ? 'bg-white/[0.03] hover:bg-white/[0.06]'
+                    : 'bg-gray-950 hover:bg-gray-900/60'
+                }`}
               >
-                <div className="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.07] flex items-center justify-center mb-6">
-                  <Icon size={16} className="text-gray-500" />
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-6 transition-colors ${
+                  problem.accent
+                    ? 'bg-white/[0.07] border border-white/[0.12] group-hover:bg-white/[0.1]'
+                    : 'bg-white/[0.04] border border-white/[0.07] group-hover:bg-white/[0.07]'
+                }`}>
+                  <Icon size={16} className={problem.accent ? 'text-gray-300' : 'text-gray-500'} />
                 </div>
-                <h3 className="text-[14px] font-semibold text-white leading-snug tracking-tight mb-3">
+                <h3 className={`text-[14px] font-semibold leading-snug tracking-tight mb-3 ${
+                  problem.accent ? 'text-white' : 'text-white/90'
+                }`}>
                   {problem.title}
                 </h3>
-                <p className="text-[13px] text-gray-500 leading-relaxed">
+                <p className={`text-[13px] leading-relaxed ${
+                  problem.accent ? 'text-gray-400' : 'text-gray-500'
+                }`}>
                   {problem.body}
                 </p>
               </motion.div>

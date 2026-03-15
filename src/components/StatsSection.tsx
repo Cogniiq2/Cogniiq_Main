@@ -4,10 +4,26 @@ import { useRef } from 'react';
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const stats = [
-  { value: '24/7', label: 'KI-Verfügbarkeit', sub: 'Kein Ausfall, kein Urlaub' },
-  { value: '< 14', label: 'Tage bis Go-Live', sub: 'Schnell. Präzise. Messbar.' },
-  { value: '3×', label: 'Systeme integriert', sub: 'Web · KI · Automation' },
-  { value: '100%', label: 'Remote-fähig', sub: 'Ganz Deutschland' },
+  {
+    value: '24/7',
+    label: 'Kein Anruf geht verloren',
+    sub: 'Der KI-Assistent antwortet – immer',
+  },
+  {
+    value: '< 14',
+    label: 'Tage bis zum Go-Live',
+    sub: 'Kein monatelanger Vorlauf',
+  },
+  {
+    value: '3×',
+    label: 'Systeme gebündelt',
+    sub: 'Web · KI-Telefon · Automation',
+  },
+  {
+    value: '∅ 30%',
+    label: 'Anrufe gehen unbeantwortet',
+    sub: 'In deutschen KMU – täglich',
+  },
 ];
 
 export function StatsSection() {
@@ -34,13 +50,13 @@ export function StatsSection() {
               />
               <p
                 className="font-bold text-gray-900 tracking-tight leading-none mb-3"
-                style={{ fontSize: 'clamp(36px, 5vw, 52px)', fontVariantNumeric: 'tabular-nums' }}
+                style={{ fontSize: 'clamp(32px, 4.2vw, 48px)', fontVariantNumeric: 'tabular-nums' }}
               >
                 {stat.value}
               </p>
               <div className="w-5 h-px bg-gray-200 mb-3" />
               <p className="text-[13px] font-semibold text-gray-700 tracking-tight mb-1">{stat.label}</p>
-              <p className="text-[11.5px] text-gray-400">{stat.sub}</p>
+              <p className="text-[11.5px] text-gray-400 leading-snug">{stat.sub}</p>
             </motion.div>
           ))}
         </div>

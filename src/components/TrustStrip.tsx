@@ -1,15 +1,15 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { Shield, Clock, Users, MapPin, Star } from 'lucide-react';
+import { Shield, Clock, Users, Award, Lock } from 'lucide-react';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const ITEMS = [
-  { icon: Shield, label: 'DSGVO-konforme Systeme', sub: 'Daten bleiben in Deutschland' },
-  { icon: Clock, label: 'Go-Live in 1–2 Wochen', sub: 'Kein langer Vorlauf' },
-  { icon: Users, label: 'Persönlicher Ansprechpartner', sub: 'Direkt, kein Ticket-System' },
-  { icon: MapPin, label: '100% Remote', sub: 'Ganz Deutschland betreut' },
-  { icon: Star, label: 'Auf echte Prozesse gebaut', sub: 'Keine Generic-Templates' },
+  { icon: Shield, label: 'DSGVO-konform', sub: 'Daten bleiben in Deutschland' },
+  { icon: Clock, label: 'Go-Live in 7–14 Tagen', sub: 'Nicht Monate – Wochen' },
+  { icon: Users, label: 'Direkter Ansprechpartner', sub: 'Kein Ticket-System, kein Account-Manager' },
+  { icon: Award, label: 'Keine Templates', sub: 'Gebaut für Ihren Prozess' },
+  { icon: Lock, label: 'Festpreis-Projekte', sub: 'Kein verstecktes Scope-Creep' },
 ];
 
 export function TrustStrip() {
@@ -17,28 +17,28 @@ export function TrustStrip() {
   const isInView = useInView(ref, { once: true, amount: 0.4 });
 
   return (
-    <div ref={ref} className="w-full bg-white border-t border-gray-100">
+    <div ref={ref} className="w-full bg-white border-t border-b border-gray-100/80">
       <motion.div
-        className="max-w-7xl mx-auto px-6 lg:px-8 py-10"
-        initial={{ opacity: 0, y: 12 }}
+        className="max-w-7xl mx-auto px-6 lg:px-8 py-5"
+        initial={{ opacity: 0, y: 10 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.65, ease: EASE }}
+        transition={{ duration: 0.55, ease: EASE }}
       >
-        <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
+        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 lg:gap-x-12">
           {ITEMS.map(({ icon: Icon, label, sub }, i) => (
             <motion.div
               key={label}
-              className="flex items-center gap-2.5"
-              initial={{ opacity: 0, y: 8 }}
+              className="flex items-center gap-2.5 group"
+              initial={{ opacity: 0, y: 6 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: i * 0.07, ease: EASE }}
+              transition={{ duration: 0.45, delay: i * 0.06, ease: EASE }}
             >
-              <div className="w-7 h-7 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0">
-                <Icon size={13} className="text-gray-400" />
+              <div className="w-[28px] h-[28px] rounded-[8px] bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0">
+                <Icon size={12} className="text-gray-400" />
               </div>
               <div>
-                <p className="text-[12px] font-semibold text-gray-700 leading-none mb-0.5">{label}</p>
-                <p className="text-[11px] text-gray-400 leading-none">{sub}</p>
+                <p className="text-[11.5px] font-semibold text-gray-800 leading-none mb-[3px] tracking-[-0.01em]">{label}</p>
+                <p className="text-[10.5px] text-gray-400 leading-none">{sub}</p>
               </div>
             </motion.div>
           ))}

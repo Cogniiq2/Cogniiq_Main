@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Zap, Globe, Brain } from 'lucide-react';
+import { ArrowRight, PhoneCall, Globe, Zap } from 'lucide-react';
 import { SplineScene } from '../ui/splite';
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -9,13 +9,13 @@ const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 function DesktopParticles() {
   const particles = useMemo(
     () =>
-      Array.from({ length: 30 }, (_, i) => ({
+      Array.from({ length: 22 }, (_, i) => ({
         id: i,
         x: Math.random() * 100,
         y: Math.random() * 100,
-        size: Math.random() * 1.5 + 0.5,
-        duration: Math.random() * 6 + 4,
-        delay: Math.random() * 4,
+        size: Math.random() * 1.2 + 0.4,
+        duration: Math.random() * 7 + 5,
+        delay: Math.random() * 5,
       })),
     []
   );
@@ -25,9 +25,9 @@ function DesktopParticles() {
       {particles.map((p) => (
         <motion.div
           key={p.id}
-          className="absolute rounded-full bg-sky-400/40"
+          className="absolute rounded-full bg-sky-400/30"
           style={{ width: p.size, height: p.size, left: `${p.x}%`, top: `${p.y}%` }}
-          animate={{ y: [0, -25, 0], opacity: [0.02, 0.15, 0.02] }}
+          animate={{ y: [0, -20, 0], opacity: [0.01, 0.12, 0.01] }}
           transition={{ duration: p.duration, repeat: Infinity, delay: p.delay, ease: 'easeInOut' }}
         />
       ))}
@@ -35,27 +35,16 @@ function DesktopParticles() {
   );
 }
 
-function AnimatedCounter({ to, suffix = '' }: { to: number; suffix?: string }) {
-  const [display, setDisplay] = useState(to);
-
-  return (
-    <span>
-      {display}
-      {suffix}
-    </span>
-  );
-}
-
 const SERVICES = [
-  { icon: Brain, label: 'KI-Systeme' },
+  { icon: PhoneCall, label: 'KI-Telefonassistent' },
   { icon: Globe, label: 'Webdesign' },
   { icon: Zap, label: 'Automatisierung' },
 ];
 
 const STATS = [
-  { value: 48, suffix: 'h', label: 'Bis zum ersten Workflow' },
-  { value: 100, suffix: '%', label: 'DSGVO-konform' },
-  { value: 3, suffix: 'x', label: 'Mehr Effizienz' },
+  { value: '24/7', label: 'Kein Anruf geht verloren' },
+  { value: '< 14d', label: 'Bis zum Go-Live' },
+  { value: '100%', label: 'DSGVO-konform' },
 ];
 
 function DesktopCTA() {
@@ -63,17 +52,17 @@ function DesktopCTA() {
 
   return (
     <motion.div
-      className="mt-10 flex items-center gap-4"
+      className="mt-10 flex flex-col gap-3"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.8, delay: 2.8, ease: EASE_OUT }}
+      transition={{ duration: 0.8, delay: 2.6, ease: EASE_OUT }}
     >
       <motion.button
         onClick={() => navigate('/kontakt')}
-        className="group relative flex items-center gap-3 px-6 py-3.5 overflow-hidden cursor-pointer"
+        className="group relative flex items-center gap-3 px-6 py-3.5 overflow-hidden cursor-pointer w-fit"
         initial={{ opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6, delay: 2.9, ease: EASE_OUT }}
+        transition={{ duration: 0.6, delay: 2.7, ease: EASE_OUT }}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.97 }}
       >
@@ -81,12 +70,12 @@ function DesktopCTA() {
         <motion.div
           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
           style={{
-            background: 'linear-gradient(120deg, rgba(2,132,199,0.18) 0%, transparent 60%)',
+            background: 'linear-gradient(120deg, rgba(2,132,199,0.15) 0%, transparent 60%)',
           }}
         />
         <div className="relative flex items-center gap-2.5">
           <span className="text-[13px] font-semibold tracking-wide text-white whitespace-nowrap">
-            System anfragen
+            Kostenloses Erstgespräch
           </span>
           <motion.div
             animate={{ x: [0, 4, 0] }}
@@ -104,17 +93,17 @@ function DesktopCTA() {
       </motion.button>
 
       <motion.button
-        onClick={() => navigate('/leistungen')}
-        className="group relative flex items-center gap-2 px-6 py-3.5 cursor-pointer border border-gray-200 hover:border-gray-400 transition-colors duration-300"
+        onClick={() => navigate('/ki-telefonassistent')}
+        className="group relative flex items-center gap-2 px-1 py-1 cursor-pointer w-fit"
         initial={{ opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6, delay: 3.1, ease: EASE_OUT }}
-        whileHover={{ scale: 1.02 }}
+        transition={{ duration: 0.6, delay: 2.9, ease: EASE_OUT }}
         whileTap={{ scale: 0.97 }}
       >
-        <span className="text-[13px] font-medium tracking-wide text-gray-500 group-hover:text-gray-900 transition-colors whitespace-nowrap">
-          Leistungen ansehen
+        <span className="text-[12px] font-medium tracking-wide text-gray-400 group-hover:text-gray-700 transition-colors whitespace-nowrap underline underline-offset-2 decoration-gray-200 group-hover:decoration-gray-400">
+          KI-Telefonassistent live erleben
         </span>
+        <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-gray-600 transition-colors" />
       </motion.button>
     </motion.div>
   );
@@ -130,7 +119,7 @@ export function DesktopHero() {
         <div
           className="absolute inset-0"
           style={{
-            background: 'radial-gradient(ellipse at 50% 50%, rgba(2,132,199,0.06) 0%, transparent 60%)',
+            background: 'radial-gradient(ellipse at 45% 50%, rgba(2,132,199,0.05) 0%, transparent 55%)',
           }}
         />
       </div>
@@ -138,8 +127,8 @@ export function DesktopHero() {
       <motion.div
         className="absolute left-0 right-0 h-px z-30 pointer-events-none"
         style={{
-          background: 'linear-gradient(90deg, transparent 5%, rgba(3,105,161,0.15) 30%, rgba(2,132,199,0.3) 50%, rgba(3,105,161,0.15) 70%, transparent 95%)',
-          boxShadow: '0 0 20px 4px rgba(3,105,161,0.06)',
+          background: 'linear-gradient(90deg, transparent 5%, rgba(3,105,161,0.12) 30%, rgba(2,132,199,0.25) 50%, rgba(3,105,161,0.12) 70%, transparent 95%)',
+          boxShadow: '0 0 20px 4px rgba(3,105,161,0.04)',
         }}
         initial={{ top: 0, opacity: 0 }}
         animate={{ top: ['0%', '100%'], opacity: [0, 1, 1, 0] }}
@@ -203,7 +192,8 @@ export function DesktopHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 2.0, ease: EASE_OUT }}
           >
-            AI-Systeme, Webdesign &amp; Automatisierung für Unternehmen in Bayreuth, München und Regensburg.
+            KI-Telefonsysteme, konvertierende Websites und operative Automatisierung –
+            gebaut für Unternehmen, die täglich Anrufe, Leads und Zeit verlieren.
           </motion.p>
 
           <motion.div
@@ -234,7 +224,7 @@ export function DesktopHero() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 3.0, ease: EASE_OUT }}
           >
-            {STATS.map(({ value, suffix, label }, i) => (
+            {STATS.map(({ value, label }, i) => (
               <motion.div
                 key={label}
                 className="flex flex-col gap-0.5"
@@ -242,8 +232,8 @@ export function DesktopHero() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 3.1 + i * 0.12, ease: EASE_OUT }}
               >
-                <span className="text-2xl font-bold text-gray-900 tabular-nums">
-                  <AnimatedCounter to={value} suffix={suffix} />
+                <span className="text-2xl font-bold text-gray-900 tabular-nums tracking-tight">
+                  {value}
                 </span>
                 <span className="text-[11px] text-gray-400 font-light leading-tight">{label}</span>
               </motion.div>
