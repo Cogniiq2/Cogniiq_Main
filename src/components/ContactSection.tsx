@@ -1,4 +1,4 @@
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -10,25 +10,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, CircleCheck as CheckCircle, Sparkles } from 'lucide-react';
 import { PremiumCalendar } from './PremiumCalendar';
 
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
 const INTEREST_OPTIONS = [
-  'Webdesign',
-  'Automationen',
-  'KI Telefonassistent',
-  'KI Content Creation',
+  { id: 'Webdesign', label: 'Webdesign', desc: 'Neue Website oder Relaunch' },
+  { id: 'Automationen', label: 'Automationen', desc: 'Prozesse automatisieren' },
+  { id: 'KI Telefonassistent', label: 'KI Telefonassistent', desc: 'Anrufe automatisch bearbeiten' },
+  { id: 'KI Content Creation', label: 'KI Content', desc: 'Content automatisch erstellen' },
 ];
 
 const FIELD_META = [
-  { id: 'name',    label: 'Name',              type: 'text',  placeholder: 'Max Mustermann',        required: true },
-  { id: 'email',   label: 'E-Mail',             type: 'email', placeholder: 'max@unternehmen.de',    required: true },
-  { id: 'company', label: 'Unternehmen',        type: 'text',  placeholder: 'Unternehmensname',      required: true },
+  { id: 'name', label: 'Name', type: 'text', placeholder: 'Max Mustermann', required: true },
+  { id: 'email', label: 'E-Mail', type: 'email', placeholder: 'max@unternehmen.de', required: true },
+  { id: 'company', label: 'Unternehmen', type: 'text', placeholder: 'Unternehmensname', required: true },
+];
+
+const steps = [
+  { n: '01', label: 'Eingangsbestätigung', sub: 'Automatisch · sofort' },
+  { n: '02', label: 'Systemanalyse', sub: 'Innerhalb 24 h' },
+  { n: '03', label: 'Analysegespräch', sub: '45 Min. · Video' },
+  { n: '04', label: 'Systemkonzept', sub: 'Maßgeschneidert' },
 ];
 
 export function ContactSection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.1 });
+  const isInView = useInView(ref, { once: true, amount: 0.08 });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [interests, setInterests] = useState<string[]>([]);
@@ -41,13 +50,13 @@ export function ContactSection() {
     setIsSubmitting(true);
 
     const payload = {
-      name:          (document.getElementById('name')    as HTMLInputElement).value,
-      email:         (document.getElementById('email')   as HTMLInputElement).value,
-      company:       (document.getElementById('company') as HTMLInputElement).value,
-      industry:      industryValue,
+      name: (document.getElementById('name') as HTMLInputElement).value,
+      email: (document.getElementById('email') as HTMLInputElement).value,
+      company: (document.getElementById('company') as HTMLInputElement).value,
+      industry: industryValue,
       interests,
-      timeline:      timelineValue,
-      goal:          (document.getElementById('goal')    as HTMLTextAreaElement).value,
+      timeline: timelineValue,
+      goal: (document.getElementById('goal') as HTMLTextAreaElement).value,
       preferredTime: selectedDateTime || 'Keine Angabe',
     };
 
@@ -66,36 +75,41 @@ export function ContactSection() {
   };
 
   const toggleInterest = (v: string) =>
-    setInterests(prev => prev.includes(v) ? prev.filter(i => i !== v) : [...prev, v]);
+    setInterests((prev) => (prev.includes(v) ? prev.filter((i) => i !== v) : [...prev, v]));
 
   if (isSubmitted) {
     return (
       <section id="kontakt" className="relative py-32 bg-white overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 60% 40% at 50% 0%, rgba(15,23,42,0.04) 0%, transparent 100%)' }} />
-        <div className="max-w-2xl mx-auto px-6 text-center">
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse 60% 40% at 50% 0%, rgba(16,185,129,0.04) 0%, transparent 70%)' }}
+        />
+        <div className="max-w-xl mx-auto px-6 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0, scale: 0.95, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: EASE }}
           >
-            <div className="inline-flex items-center justify-center w-16 h-16 mb-10 border border-gray-200 rounded-2xl">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111827" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            </div>
-            <h3 className="text-3xl font-semibold text-gray-900 mb-4" style={{ letterSpacing: '-0.02em' }}>
+            <motion.div
+              className="inline-flex items-center justify-center w-16 h-16 mb-8 rounded-2xl bg-emerald-50 border border-emerald-100"
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.1, ease: EASE }}
+            >
+              <CheckCircle size={24} className="text-emerald-600" />
+            </motion.div>
+            <h3 className="text-[28px] font-bold text-gray-900 mb-3 tracking-tight">
               Anfrage eingegangen.
             </h3>
-            <p className="text-gray-500 text-lg leading-relaxed mb-10" style={{ fontWeight: 400 }}>
-              Wir melden uns innerhalb von 24–48 Stunden für Ihr Analysegespräch.
+            <p className="text-gray-500 text-[15px] leading-[1.75] mb-8">
+              Wir melden uns innerhalb von <span className="font-medium text-gray-700">24–48 Stunden</span> für Ihr persönliches Analysegespräch.
             </p>
             <button
               onClick={() => setIsSubmitted(false)}
-              className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
-              style={{ letterSpacing: '0.01em' }}
+              className="inline-flex items-center gap-2 text-[13px] text-gray-400 hover:text-gray-700 transition-colors"
             >
               Weitere Anfrage senden
-              <ArrowRight size={14} />
+              <ArrowRight size={13} />
             </button>
           </motion.div>
         </div>
@@ -112,7 +126,7 @@ export function ContactSection() {
     >
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 70% 35% at 50% 0%, rgba(15,23,42,0.04) 0%, transparent 100%)' }}
+        style={{ background: 'radial-gradient(ellipse 70% 35% at 50% 0%, rgba(15,23,42,0.035) 0%, transparent 100%)' }}
       />
 
       <div className="relative max-w-6xl mx-auto px-6 lg:px-8">
@@ -121,112 +135,109 @@ export function ContactSection() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-16 lg:mb-20"
+          transition={{ duration: 0.7, ease: EASE }}
+          className="mb-14 lg:mb-18"
         >
-          <p
-            className="text-gray-400 uppercase mb-4"
-            style={{ fontSize: '10.5px', fontWeight: 500, letterSpacing: '0.20em' }}
-          >
-            Analysegespräch
-          </p>
+          <div className="flex items-center gap-2 mb-5">
+            <Sparkles size={11} className="text-gray-300" />
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-gray-400">
+              Analysegespräch
+            </p>
+          </div>
           <h2
             id="contact-heading"
-            className="text-gray-900"
+            className="text-gray-900 mb-4"
             style={{
-              fontSize: 'clamp(28px, 4vw, 40px)',
+              fontSize: 'clamp(28px, 4vw, 42px)',
               fontWeight: 700,
-              lineHeight: 1.1,
-              letterSpacing: '-0.022em',
-              maxWidth: '18ch',
+              lineHeight: 1.08,
+              letterSpacing: '-0.024em',
+              maxWidth: '16ch',
             }}
           >
             System anfragen.
           </h2>
-          <p
-            className="text-gray-500 mt-4"
-            style={{ fontSize: '15px', fontWeight: 400, lineHeight: 1.65, maxWidth: '44ch' }}
-          >
-            Schildern Sie Ihre Ausgangssituation. Wir analysieren Ihren Prozessstatus und zeigen, wo operative KI-Systeme den größten Hebel erzeugen.
+          <p className="text-gray-500 text-[15px] leading-[1.7] max-w-[42ch]">
+            Schildern Sie Ihre Ausgangssituation. Wir analysieren Ihren Prozessstatus und
+            zeigen, wo KI-Systeme den größten Hebel erzeugen.
           </p>
         </motion.div>
 
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
 
-          {/* Left — context panel */}
+          {/* ─── Left: context panel ─── */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.7, delay: 0.1, ease: EASE }}
             className="lg:col-span-4 flex flex-col gap-8"
           >
-            {/* What happens after */}
+            {/* Process steps */}
             <div>
-              <p
-                className="text-gray-400 uppercase mb-5"
-                style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.18em' }}
-              >
+              <p className="text-[9.5px] font-semibold uppercase tracking-[0.2em] text-gray-400 mb-5">
                 Nach Ihrer Anfrage
               </p>
-              <div className="flex flex-col gap-0">
-                {[
-                  { n: '01', label: 'Eingangsbestätigung', sub: 'Automatisch · sofort' },
-                  { n: '02', label: 'Systemanalyse',       sub: 'Innerhalb 24 h' },
-                  { n: '03', label: 'Analysegespräch',     sub: '45 Min. · video' },
-                  { n: '04', label: 'Systemkonzept',       sub: 'Maßgeschneidert' },
-                ].map((step, i) => (
+              <div className="flex flex-col">
+                {steps.map((step, i) => (
                   <div
                     key={step.n}
                     className="flex items-start gap-4 py-4 border-b border-gray-100 last:border-0"
                   >
-                    <span
-                      className="text-gray-300 tabular-nums"
-                      style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.05em', paddingTop: '2px', minWidth: '20px' }}
-                    >
-                      {step.n}
-                    </span>
+                    <div className="flex flex-col items-center gap-1 flex-shrink-0 pt-0.5">
+                      <span
+                        className="text-gray-300 tabular-nums font-medium"
+                        style={{ fontSize: '11px', letterSpacing: '0.04em', minWidth: '22px' }}
+                      >
+                        {step.n}
+                      </span>
+                      {i < steps.length - 1 && (
+                        <div className="w-px h-4 bg-gray-100" />
+                      )}
+                    </div>
                     <div>
-                      <p className="text-gray-900 text-sm font-medium" style={{ lineHeight: 1.3 }}>
+                      <p className="text-[13.5px] font-medium text-gray-800 leading-snug">
                         {step.label}
                       </p>
-                      <p className="text-gray-400 mt-0.5" style={{ fontSize: '12px', lineHeight: 1.4 }}>
-                        {step.sub}
-                      </p>
+                      <p className="text-[11.5px] text-gray-400 mt-0.5">{step.sub}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Scope note */}
-            <div
-              className="border border-gray-100 rounded-xl p-5"
-              style={{ background: '#fafafa' }}
-            >
-              <p
-                className="text-gray-400 uppercase mb-3"
-                style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.16em' }}
-              >
+            {/* For whom note */}
+            <div className="border border-gray-100 rounded-xl p-5 bg-gray-50/60">
+              <p className="text-[9.5px] font-semibold uppercase tracking-[0.18em] text-gray-400 mb-3">
                 Für wen
               </p>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Unternehmen in Deutschland, die operative Prozesse systematisch automatisieren wollen — keine Experimente, keine Demos.
+              <p className="text-[13px] text-gray-500 leading-[1.68]">
+                Unternehmen in Deutschland, die operative Prozesse systematisch automatisieren
+                wollen — keine Experimente, keine Demos.
+              </p>
+            </div>
+
+            {/* Response guarantee */}
+            <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-emerald-50/60 border border-emerald-100">
+              <CheckCircle size={13} className="text-emerald-600 flex-shrink-0 mt-0.5" />
+              <p className="text-[12px] text-emerald-700 leading-relaxed">
+                Antwort garantiert innerhalb von{' '}
+                <span className="font-semibold">24–48 Stunden</span>
               </p>
             </div>
           </motion.div>
 
-          {/* Right — form */}
+          {/* ─── Right: Form ─── */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.7, delay: 0.16, ease: EASE }}
             className="lg:col-span-8"
           >
             <form onSubmit={handleSubmit} className="flex flex-col gap-7">
 
-              {/* Row: Name / Email / Company */}
+              {/* Name / Email / Company */}
               <div className="grid md:grid-cols-2 gap-5">
-                {FIELD_META.map(f => (
+                {FIELD_META.map((f) => (
                   <div key={f.id} className={f.id === 'company' ? 'md:col-span-2' : ''}>
                     <FormLabel>{f.label}</FormLabel>
                     <Input
@@ -234,22 +245,22 @@ export function ContactSection() {
                       type={f.type}
                       required={f.required}
                       placeholder={f.placeholder}
-                      className="h-11 bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus:ring-0 transition-colors"
+                      className="h-11 bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus-visible:ring-0 transition-colors"
                     />
                   </div>
                 ))}
               </div>
 
-              {/* Row: Industry / Timeline */}
+              {/* Industry / Timeline */}
               <div className="grid md:grid-cols-2 gap-5">
-                <div id="industry">
+                <div>
                   <FormLabel>Branche</FormLabel>
                   <Select required onValueChange={setIndustryValue}>
                     <SelectTrigger className="h-11 bg-white border-gray-200 rounded-lg text-sm focus:border-gray-400 focus:ring-0 transition-colors">
                       <SelectValue placeholder="Branche wählen" />
                     </SelectTrigger>
                     <SelectContent className="bg-white border border-gray-200 shadow-lg rounded-xl text-sm">
-                      {['Medizin & Kliniken', 'Gastronomie', 'Sport & Fitness', 'Immobilien', 'E-Commerce', 'Sonstiges'].map(v => (
+                      {['Medizin & Kliniken', 'Gastronomie', 'Sport & Fitness', 'Immobilien', 'E-Commerce', 'Sonstiges'].map((v) => (
                         <SelectItem key={v} value={v.toLowerCase().replace(/[^a-z]/g, '')} className="py-2.5 cursor-pointer">
                           {v}
                         </SelectItem>
@@ -258,14 +269,14 @@ export function ContactSection() {
                   </Select>
                 </div>
 
-                <div id="timeline">
+                <div>
                   <FormLabel>Startzeitraum</FormLabel>
                   <Select required onValueChange={setTimelineValue}>
                     <SelectTrigger className="h-11 bg-white border-gray-200 rounded-lg text-sm focus:border-gray-400 focus:ring-0 transition-colors">
                       <SelectValue placeholder="Zeitraum wählen" />
                     </SelectTrigger>
                     <SelectContent className="bg-white border border-gray-200 shadow-lg rounded-xl text-sm">
-                      <SelectItem value="asap"     className="py-2.5 cursor-pointer">So schnell wie möglich</SelectItem>
+                      <SelectItem value="asap" className="py-2.5 cursor-pointer">So schnell wie möglich</SelectItem>
                       <SelectItem value="1-2months" className="py-2.5 cursor-pointer">In 1–2 Monaten</SelectItem>
                       <SelectItem value="3+months" className="py-2.5 cursor-pointer">In 3+ Monaten</SelectItem>
                     </SelectContent>
@@ -277,35 +288,48 @@ export function ContactSection() {
               <div>
                 <FormLabel>Interessensfelder</FormLabel>
                 <div className="grid grid-cols-2 gap-2.5 mt-1">
-                  {INTEREST_OPTIONS.map(opt => {
-                    const active = interests.includes(opt);
+                  {INTEREST_OPTIONS.map((opt) => {
+                    const active = interests.includes(opt.id);
                     return (
                       <button
-                        key={opt}
+                        key={opt.id}
                         type="button"
-                        onClick={() => toggleInterest(opt)}
-                        className="flex items-center gap-3 px-4 py-3 border rounded-lg text-sm text-left transition-all"
+                        onClick={() => toggleInterest(opt.id)}
+                        className="group flex flex-col items-start gap-0.5 px-4 py-3 border rounded-xl text-left transition-all"
                         style={{
                           borderColor: active ? '#111827' : '#e5e7eb',
                           background: active ? '#111827' : '#ffffff',
-                          color: active ? '#ffffff' : '#374151',
-                          fontWeight: 400,
                         }}
                       >
-                        <span
-                          className="flex-shrink-0 w-3.5 h-3.5 border rounded-sm flex items-center justify-center transition-all"
-                          style={{
-                            borderColor: active ? '#ffffff' : '#d1d5db',
-                            background: active ? '#ffffff' : 'transparent',
-                          }}
-                        >
-                          {active && (
-                            <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
-                              <path d="M1 3.5L3.5 6L8 1" stroke="#111827" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                          )}
+                        <div className="flex items-center gap-2 w-full">
+                          <span
+                            className="flex-shrink-0 w-3.5 h-3.5 border rounded-sm flex items-center justify-center transition-all"
+                            style={{
+                              borderColor: active ? '#ffffff60' : '#d1d5db',
+                              background: active ? '#ffffff18' : 'transparent',
+                            }}
+                          >
+                            <AnimatePresence>
+                              {active && (
+                                <motion.svg
+                                  initial={{ scale: 0, opacity: 0 }}
+                                  animate={{ scale: 1, opacity: 1 }}
+                                  exit={{ scale: 0, opacity: 0 }}
+                                  transition={{ duration: 0.15 }}
+                                  width="9" height="7" viewBox="0 0 9 7" fill="none"
+                                >
+                                  <path d="M1 3.5L3.5 6L8 1" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </motion.svg>
+                              )}
+                            </AnimatePresence>
+                          </span>
+                          <span className="text-[13px] font-medium" style={{ color: active ? '#ffffff' : '#374151' }}>
+                            {opt.label}
+                          </span>
+                        </div>
+                        <span className="text-[11px] pl-5" style={{ color: active ? '#ffffff70' : '#9ca3af' }}>
+                          {opt.desc}
                         </span>
-                        {opt}
                       </button>
                     );
                   })}
@@ -320,7 +344,7 @@ export function ContactSection() {
                   required
                   rows={4}
                   placeholder="Beschreiben Sie Ihre aktuelle Situation und was Sie verändern möchten …"
-                  className="bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus:ring-0 resize-none transition-colors leading-relaxed"
+                  className="bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus-visible:ring-0 resize-none transition-colors leading-relaxed"
                 />
               </div>
 
@@ -335,41 +359,43 @@ export function ContactSection() {
                 </div>
               </div>
 
-              {/* Divider */}
               <div className="w-full h-px bg-gray-100" />
 
-              {/* Submit */}
+              {/* Submit row */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
-                <p className="text-gray-400 text-xs leading-relaxed" style={{ maxWidth: '34ch' }}>
+                <p className="text-[11.5px] text-gray-400 leading-relaxed max-w-[32ch]">
                   Ihre Daten werden vertraulich behandelt und nicht weitergegeben.
                 </p>
-                <button
+                <motion.button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-shrink-0 flex items-center gap-2.5 text-white transition-all"
+                  className="flex-shrink-0 flex items-center gap-2.5 text-white"
                   style={{
                     background: '#111827',
-                    fontSize: '14px',
-                    fontWeight: 500,
+                    fontSize: '13.5px',
+                    fontWeight: 600,
                     letterSpacing: '0.01em',
                     borderRadius: '8px',
                     minHeight: '46px',
                     padding: '0 22px',
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.10)',
-                    opacity: isSubmitting ? 0.6 : 1,
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06)',
+                    opacity: isSubmitting ? 0.65 : 1,
                     cursor: isSubmitting ? 'wait' : 'pointer',
                     border: 'none',
+                    transition: 'opacity 0.2s, transform 0.15s',
                   }}
+                  whileHover={{ scale: isSubmitting ? 1 : 1.015 }}
+                  whileTap={{ scale: 0.975 }}
                 >
                   {isSubmitting ? (
                     <span>Wird gesendet …</span>
                   ) : (
                     <>
                       <span>Anfrage absenden</span>
-                      <ArrowRight size={15} />
+                      <ArrowRight size={14} />
                     </>
                   )}
-                </button>
+                </motion.button>
               </div>
 
             </form>

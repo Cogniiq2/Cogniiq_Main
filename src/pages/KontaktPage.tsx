@@ -882,101 +882,177 @@ function PremiumPackageModal({
       <div className="min-h-screen bg-white dark:bg-gray-950">
 
         {/* SECTION 1: HERO */}
-        <section className="pt-32 pb-20 px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
+        <section className="relative pt-32 pb-24 px-6 lg:px-8 overflow-hidden">
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(15,23,42,0.04) 0%, transparent 70%), radial-gradient(ellipse 40% 40% at 80% 60%, rgba(2,132,199,0.03) 0%, transparent 55%)',
+            }}
+          />
+          <div className="relative max-w-7xl mx-auto">
+            {/* Breadcrumb */}
             <motion.div
               initial="hidden"
               animate="visible"
               variants={fadeUp}
               custom={0}
-              className="flex items-center gap-2 mb-6"
+              className="flex items-center gap-2 mb-8"
             >
               <Link
                 to="/"
-                className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                className="text-[11px] text-gray-400 hover:text-gray-600 transition-colors"
               >
                 Start
               </Link>
-              <ChevronRight size={12} className="text-gray-300 dark:text-gray-600" />
-              <span className="text-xs text-gray-900 dark:text-gray-100 font-medium">
-                Kontakt
-              </span>
+              <ChevronRight size={10} className="text-gray-300" />
+              <span className="text-[11px] text-gray-700 font-medium">Kontakt</span>
             </motion.div>
 
-            <div className="max-w-[780px]">
-              <motion.p
-                initial="hidden"
-                animate="visible"
-                variants={fadeUp}
-                custom={0.05}
-                className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4"
-              >
-                Analysegespräch
-              </motion.p>
-
-              <motion.h1
-                initial="hidden"
-                animate="visible"
-                variants={fadeUp}
-                custom={0.1}
-                className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-50 leading-[1.08] tracking-tight mb-6"
-              >
-                KI-Systeme für Ihr<br />
-                <span className="font-light text-gray-500 dark:text-gray-400">Unternehmen besprechen</span>
-              </motion.h1>
-
-              <motion.p
-                initial="hidden"
-                animate="visible"
-                variants={fadeUp}
-                custom={0.15}
-                className="text-lg text-gray-500 dark:text-gray-400 leading-relaxed mb-8 max-w-[620px]"
-              >
-                In einem strukturierten Analysegespräch prüfen wir, wo KI-Automatisierung,
-                Webdesign oder digitale Systeme in Ihrem Unternehmen konkret Umsatz, Effizienz
-                und Anfragen steigern können.
-              </motion.p>
-
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                variants={fadeUp}
-                custom={0.2}
-                className="flex flex-col sm:flex-row gap-3 mb-10"
-              >
-                <a
-                  href="#kontaktformular"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gray-900 dark:bg-gray-50 text-white dark:text-gray-900 text-sm font-semibold hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors duration-200"
+            <div className="grid lg:grid-cols-[1fr_420px] gap-16 lg:gap-20 items-start">
+              {/* Left: Headline */}
+              <div>
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  variants={fadeUp}
+                  custom={0.04}
+                  className="flex items-center gap-2 mb-5"
                 >
-                  Analysegespräch starten
-                  <ArrowRight size={15} />
-                </a>
-                <Link
-                  to="/leistungen"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500 transition-colors duration-200"
-                >
-                  Leistungen ansehen
-                  <ArrowRight size={14} className="opacity-60" />
-                </Link>
-              </motion.div>
-
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                variants={fadeUp}
-                custom={0.25}
-                className="flex flex-col sm:flex-row gap-4 sm:gap-8"
-              >
-                {[
-                  "30–45 Minuten Strategiegespräch",
-                  "Konkrete Einschätzung statt Verkauf",
-                  "Für Unternehmen in Deutschland",
-                ].map((bullet) => (
-                  <div key={bullet} className="flex items-center gap-2">
-                    <CheckCircle2 size={14} className="text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                    <span className="text-sm text-gray-500 dark:text-gray-400">{bullet}</span>
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-50 border border-gray-100">
+                    <motion.div
+                      className="w-1.5 h-1.5 rounded-full bg-emerald-500"
+                      animate={{ opacity: [1, 0.4, 1], scale: [1, 1.2, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                    <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-gray-500">
+                      Analysegespräch
+                    </span>
                   </div>
-                ))}
+                </motion.div>
+
+                <motion.h1
+                  initial="hidden"
+                  animate="visible"
+                  variants={fadeUp}
+                  custom={0.08}
+                  className="text-4xl sm:text-5xl lg:text-[3.6rem] font-bold text-gray-900 leading-[1.06] tracking-[-0.024em] mb-6"
+                >
+                  KI-Systeme für Ihr
+                  <br />
+                  <span className="text-gray-200">Unternehmen besprechen</span>
+                </motion.h1>
+
+                <motion.p
+                  initial="hidden"
+                  animate="visible"
+                  variants={fadeUp}
+                  custom={0.13}
+                  className="text-[16px] text-gray-500 leading-[1.75] mb-8 max-w-[560px]"
+                >
+                  In einem strukturierten Analysegespräch prüfen wir, wo KI-Automatisierung,
+                  Webdesign oder digitale Systeme in Ihrem Unternehmen konkret Umsatz,
+                  Effizienz und Anfragen steigern können.
+                </motion.p>
+
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  variants={fadeUp}
+                  custom={0.18}
+                  className="flex flex-col sm:flex-row gap-3 mb-10"
+                >
+                  <a
+                    href="#kontaktformular"
+                    className="group inline-flex items-center justify-center gap-2.5 px-7 py-3.5 bg-gray-950 text-white text-[13.5px] font-semibold hover:bg-gray-800 transition-colors"
+                    style={{ borderRadius: '4px' }}
+                  >
+                    Analysegespräch starten
+                    <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+                  </a>
+                  <Link
+                    to="/leistungen"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg border border-gray-200 text-[13px] font-medium text-gray-600 hover:border-gray-400 hover:text-gray-900 transition-colors"
+                  >
+                    Leistungen ansehen
+                    <ArrowRight size={13} className="opacity-50" />
+                  </Link>
+                </motion.div>
+
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  variants={fadeUp}
+                  custom={0.23}
+                  className="flex flex-wrap gap-x-6 gap-y-2.5"
+                >
+                  {[
+                    { icon: Clock, text: '30–45 Min. Strategiegespräch' },
+                    { icon: CheckCircle2, text: 'Einschätzung statt Verkauf' },
+                    { icon: MapPin, text: 'Für Unternehmen in Deutschland' },
+                  ].map(({ icon: Icon, text }) => (
+                    <div key={text} className="flex items-center gap-2">
+                      <Icon size={12} className="text-gray-300 flex-shrink-0" />
+                      <span className="text-[12.5px] text-gray-500">{text}</span>
+                    </div>
+                  ))}
+                </motion.div>
+              </div>
+
+              {/* Right: Value card */}
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={fadeUp}
+                custom={0.14}
+                className="hidden lg:block"
+              >
+                <div className="bg-gray-950 rounded-2xl p-8 relative overflow-hidden">
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{ background: 'radial-gradient(ellipse at 70% 20%, rgba(2,132,199,0.09) 0%, transparent 55%)' }}
+                  />
+                  <div
+                    className="absolute top-0 left-0 right-0 h-px"
+                    style={{ background: 'linear-gradient(90deg, transparent, rgba(2,132,199,0.35), transparent)' }}
+                  />
+
+                  <div className="relative">
+                    <p className="text-[9.5px] font-semibold uppercase tracking-[0.22em] text-gray-600 mb-4">
+                      Was Sie mitnehmen
+                    </p>
+
+                    <div className="space-y-4 mb-7">
+                      {[
+                        { n: '01', text: 'Klares Bild Ihrer Verlustquellen' },
+                        { n: '02', text: 'Konkrete Automatisierungspotenziale' },
+                        { n: '03', text: 'Realistische ROI-Einschätzung' },
+                        { n: '04', text: 'Klarer nächster Schritt — kein Pitch' },
+                      ].map(({ n, text }) => (
+                        <div key={n} className="flex items-start gap-3.5">
+                          <span className="text-[10px] font-medium text-gray-700 tabular-nums mt-0.5 min-w-[20px]">{n}</span>
+                          <p className="text-[13px] text-gray-400 leading-snug">{text}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="w-full h-px bg-white/[0.05] mb-6" />
+
+                    <div className="flex items-center gap-2 mb-2">
+                      <motion.div
+                        className="w-1.5 h-1.5 rounded-full bg-emerald-500"
+                        animate={{ opacity: [1, 0.3, 1] }}
+                        transition={{ duration: 1.8, repeat: Infinity }}
+                      />
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-500">
+                        Garantien
+                      </span>
+                    </div>
+                    <p className="text-[11.5px] text-gray-600 leading-relaxed">
+                      Antwort innerhalb 24h · Go-Live in 14 Tagen oder Geld zurück ·
+                      kein Formular-Loop — persönliches Gespräch
+                    </p>
+                  </div>
+                </div>
               </motion.div>
             </div>
           </div>
