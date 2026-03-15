@@ -39,16 +39,16 @@ function FooterCol({ title, sections, delay = 0 }: FooterColProps) {
       custom={delay}
     >
       <button
-        className="flex w-full items-center justify-between border-b border-white/[0.06] pb-3 mb-5 lg:cursor-default lg:pointer-events-none"
+        className="flex w-full items-center justify-between border-b border-gray-100 dark:border-white/[0.06] pb-3 mb-5 lg:cursor-default lg:pointer-events-none"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
       >
-        <span className="text-[11px] font-semibold tracking-[0.14em] uppercase text-white/40">
+        <span className="text-[11px] font-semibold tracking-[0.14em] uppercase text-gray-400 dark:text-white/40">
           {title}
         </span>
         <ChevronDown
           size={13}
-          className={`lg:hidden text-white/30 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          className={`lg:hidden text-gray-300 dark:text-white/30 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
         />
       </button>
 
@@ -56,7 +56,7 @@ function FooterCol({ title, sections, delay = 0 }: FooterColProps) {
         {sections.map((section) => (
           <div key={section.label}>
             {section.label && (
-              <p className="text-[10px] font-semibold tracking-[0.16em] uppercase text-white/25 mb-2.5">
+              <p className="text-[10px] font-semibold tracking-[0.16em] uppercase text-gray-300 dark:text-white/25 mb-2.5">
                 {section.label}
               </p>
             )}
@@ -65,7 +65,7 @@ function FooterCol({ title, sections, delay = 0 }: FooterColProps) {
                 <li key={link.to}>
                   <Link
                     to={link.to}
-                    className="block text-[13px] text-white/50 hover:text-white transition-colors duration-200 leading-snug"
+                    className="block text-[13px] text-gray-500 dark:text-white/50 hover:text-gray-900 dark:hover:text-white transition-colors duration-200 leading-snug"
                   >
                     {link.text}
                   </Link>
@@ -85,7 +85,7 @@ export function Footer() {
 
   return (
     <>
-      <footer className="bg-[#0c0d0f] text-white" role="contentinfo">
+      <footer className="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 border-t border-gray-100 dark:border-gray-800" role="contentinfo">
 
         {/* ─── UPPER GRID ─── */}
         <div className="max-w-7xl mx-auto px-6 lg:px-10 pt-16 pb-12 lg:pt-20 lg:pb-16">
@@ -102,9 +102,9 @@ export function Footer() {
             >
               <div>
                 <Link to="/" aria-label="Cogniiq Startseite" className="inline-block mb-5">
-                  <Logo className="h-6 brightness-0 invert" />
+                  <Logo className="h-6" />
                 </Link>
-                <p className="text-[13px] text-white/45 leading-relaxed max-w-[220px]">
+                <p className="text-[13px] text-gray-500 dark:text-white/45 leading-relaxed max-w-[220px]">
                   Operative KI-Systeme für Unternehmen in Bayern und Deutschland.
                 </p>
               </div>
@@ -119,10 +119,10 @@ export function Footer() {
                 <a
                   href={`mailto:${BUSINESS_INFO.contact.email}`}
                   itemProp="email"
-                  className="flex items-center gap-3 text-[13px] text-white/45 hover:text-white transition-colors group"
+                  className="flex items-center gap-3 text-[13px] text-gray-500 dark:text-white/45 hover:text-gray-900 dark:hover:text-white transition-colors group"
                 >
-                  <span className="w-7 h-7 rounded-lg bg-white/[0.06] flex items-center justify-center flex-shrink-0 group-hover:bg-white/10 transition-colors">
-                    <Mail size={12} className="text-white/50" />
+                  <span className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-white/[0.06] flex items-center justify-center flex-shrink-0 group-hover:bg-gray-200 dark:group-hover:bg-white/10 transition-colors">
+                    <Mail size={12} className="text-gray-400 dark:text-white/50" />
                   </span>
                   {BUSINESS_INFO.contact.email}
                 </a>
@@ -130,10 +130,10 @@ export function Footer() {
                 <a
                   href={`tel:${BUSINESS_INFO.contact.phone}`}
                   itemProp="telephone"
-                  className="flex items-center gap-3 text-[13px] text-white/45 hover:text-white transition-colors group"
+                  className="flex items-center gap-3 text-[13px] text-gray-500 dark:text-white/45 hover:text-gray-900 dark:hover:text-white transition-colors group"
                 >
-                  <span className="w-7 h-7 rounded-lg bg-white/[0.06] flex items-center justify-center flex-shrink-0 group-hover:bg-white/10 transition-colors">
-                    <Phone size={12} className="text-white/50" />
+                  <span className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-white/[0.06] flex items-center justify-center flex-shrink-0 group-hover:bg-gray-200 dark:group-hover:bg-white/10 transition-colors">
+                    <Phone size={12} className="text-gray-400 dark:text-white/50" />
                   </span>
                   {BUSINESS_INFO.contact.phoneDisplay}
                 </a>
@@ -145,10 +145,10 @@ export function Footer() {
                   itemProp="address"
                   itemScope
                   itemType="https://schema.org/PostalAddress"
-                  className="flex items-start gap-3 text-[13px] text-white/45 hover:text-white transition-colors group"
+                  className="flex items-start gap-3 text-[13px] text-gray-500 dark:text-white/45 hover:text-gray-900 dark:hover:text-white transition-colors group"
                 >
-                  <span className="w-7 h-7 rounded-lg bg-white/[0.06] flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-white/10 transition-colors">
-                    <MapPin size={12} className="text-white/50" />
+                  <span className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-white/[0.06] flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-gray-200 dark:group-hover:bg-white/10 transition-colors">
+                    <MapPin size={12} className="text-gray-400 dark:text-white/50" />
                   </span>
                   <span>
                     <span itemProp="streetAddress">{BUSINESS_INFO.address.streetAddress}</span>
@@ -163,7 +163,7 @@ export function Footer() {
                 {["DSGVO", "Festpreis", "7–14 Tage", "Made in Bavaria"].map((t) => (
                   <span
                     key={t}
-                    className="px-2.5 py-1 rounded-md text-[10px] font-medium bg-white/[0.06] text-white/35 border border-white/[0.06]"
+                    className="px-2.5 py-1 rounded-md text-[10px] font-medium bg-gray-100 dark:bg-white/[0.06] text-gray-500 dark:text-white/35 border border-gray-200 dark:border-white/[0.06]"
                   >
                     {t}
                   </span>
@@ -365,37 +365,37 @@ export function Footer() {
 
         {/* ─── DIVIDER ─── */}
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="h-px bg-white/[0.06]" />
+          <div className="h-px bg-gray-100 dark:bg-white/[0.06]" />
         </div>
 
         {/* ─── SEO PARAGRAPH ─── */}
         <div className="max-w-7xl mx-auto px-6 lg:px-10 py-5">
           <motion.p
-            className="text-[11px] leading-loose text-white/20 max-w-4xl"
+            className="text-[11px] leading-loose text-gray-300 dark:text-white/20 max-w-4xl"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 1, ease }}
           >
-            <Link to="/" className="hover:text-white/40 transition-colors">Cogniiq</Link> ist eine{" "}
-            <Link to="/ki-agentur-deutschland" className="hover:text-white/40 transition-colors">KI-Agentur</Link> und{" "}
-            <Link to="/webdesign-agentur-deutschland" className="hover:text-white/40 transition-colors">Webdesign-Agentur</Link> mit Sitz in{" "}
-            <Link to="/bayreuth" className="hover:text-white/40 transition-colors">Bayreuth</Link>.{" "}
+            <Link to="/" className="hover:text-gray-500 dark:hover:text-white/40 transition-colors">Cogniiq</Link> ist eine{" "}
+            <Link to="/ki-agentur-deutschland" className="hover:text-gray-500 dark:hover:text-white/40 transition-colors">KI-Agentur</Link> und{" "}
+            <Link to="/webdesign-agentur-deutschland" className="hover:text-gray-500 dark:hover:text-white/40 transition-colors">Webdesign-Agentur</Link> mit Sitz in{" "}
+            <Link to="/bayreuth" className="hover:text-gray-500 dark:hover:text-white/40 transition-colors">Bayreuth</Link>.{" "}
             Wir entwickeln operative Systeme:{" "}
-            <Link to="/ki-telefonassistent" className="hover:text-white/40 transition-colors">KI-Telefonassistenten</Link>,{" "}
-            <Link to="/webdesign-agentur-deutschland" className="hover:text-white/40 transition-colors">hochkonvertierende Websites</Link> und{" "}
-            <Link to="/automatisierung-unternehmen" className="hover:text-white/40 transition-colors">Prozessautomatisierung</Link>{" "}
+            <Link to="/ki-telefonassistent" className="hover:text-gray-500 dark:hover:text-white/40 transition-colors">KI-Telefonassistenten</Link>,{" "}
+            <Link to="/webdesign-agentur-deutschland" className="hover:text-gray-500 dark:hover:text-white/40 transition-colors">hochkonvertierende Websites</Link> und{" "}
+            <Link to="/automatisierung-unternehmen" className="hover:text-gray-500 dark:hover:text-white/40 transition-colors">Prozessautomatisierung</Link>{" "}
             für{" "}
-            <Link to="/muenchen" className="hover:text-white/40 transition-colors">München</Link>,{" "}
-            <Link to="/regensburg" className="hover:text-white/40 transition-colors">Regensburg</Link>,{" "}
-            <Link to="/bayreuth" className="hover:text-white/40 transition-colors">Bayreuth</Link> und ganz{" "}
-            <Link to="/deutschland" className="hover:text-white/40 transition-colors">Deutschland</Link>.
+            <Link to="/muenchen" className="hover:text-gray-500 dark:hover:text-white/40 transition-colors">München</Link>,{" "}
+            <Link to="/regensburg" className="hover:text-gray-500 dark:hover:text-white/40 transition-colors">Regensburg</Link>,{" "}
+            <Link to="/bayreuth" className="hover:text-gray-500 dark:hover:text-white/40 transition-colors">Bayreuth</Link> und ganz{" "}
+            <Link to="/deutschland" className="hover:text-gray-500 dark:hover:text-white/40 transition-colors">Deutschland</Link>.
           </motion.p>
         </div>
 
         {/* ─── DIVIDER ─── */}
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="h-px bg-white/[0.06]" />
+          <div className="h-px bg-gray-100 dark:bg-white/[0.06]" />
         </div>
 
         {/* ─── BOTTOM BAR ─── */}
@@ -407,25 +407,25 @@ export function Footer() {
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease }}
           >
-            <p className="text-[12px] text-white/20">
+            <p className="text-[12px] text-gray-400 dark:text-white/20">
               © {year} {BUSINESS_INFO.name} · Alle Rechte vorbehalten
             </p>
             <div className="flex items-center gap-6">
               <button
                 onClick={() => setPanel("impressum")}
-                className="text-[12px] text-white/25 hover:text-white/55 transition-colors"
+                className="text-[12px] text-gray-400 dark:text-white/25 hover:text-gray-700 dark:hover:text-white/55 transition-colors"
               >
                 Impressum
               </button>
               <button
                 onClick={() => setPanel("datenschutz")}
-                className="text-[12px] text-white/25 hover:text-white/55 transition-colors"
+                className="text-[12px] text-gray-400 dark:text-white/25 hover:text-gray-700 dark:hover:text-white/55 transition-colors"
               >
                 Datenschutz
               </button>
               <Link
                 to="/kontakt"
-                className="inline-flex items-center gap-1.5 text-[12px] font-medium text-white/40 hover:text-white transition-colors group"
+                className="inline-flex items-center gap-1.5 text-[12px] font-medium text-gray-500 dark:text-white/40 hover:text-gray-900 dark:hover:text-white transition-colors group"
               >
                 Erstgespräch
                 <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
