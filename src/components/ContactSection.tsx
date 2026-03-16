@@ -364,6 +364,10 @@ export function ContactSection() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (step < STEPS.length - 1) {
+      handleNext();
+      return;
+    }
     setIsSubmitting(true);
     try {
       await fetch('https://n8n.cogniiq.co/webhook/contacts', {
