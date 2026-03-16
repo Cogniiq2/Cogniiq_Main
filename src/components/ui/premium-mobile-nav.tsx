@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Chrome as Home, Briefcase, Users, CircleHelp as HelpCircle, Mail, MapPin, ChevronDown, X, ArrowRight, ArrowUpRight, Star } from 'lucide-react';
+import { Chrome as Home, Briefcase, Users, CircleHelp as HelpCircle, Mail, MapPin, ChevronDown, X, ArrowRight, ArrowUpRight, Star, BookOpen } from 'lucide-react';
 import { CITY_LINKS } from '@/lib/standorte-data';
 import { Logo } from '@/components/Logo';
 
@@ -45,7 +45,7 @@ const leistungenItems = [
 
 const cityEntries = Object.entries(CITY_LINKS) as Array<[string, typeof CITY_LINKS[keyof typeof CITY_LINKS]]>;
 
-type NavSection = 'home' | 'leistungen' | 'standorte' | 'ueber-uns' | 'faq' | 'referenzen' | 'kontakt';
+type NavSection = 'home' | 'leistungen' | 'standorte' | 'ueber-uns' | 'faq' | 'referenzen' | 'blog' | 'kontakt';
 
 const pillItems: { id: NavSection; label: string }[] = [
   { id: 'home', label: 'Home' },
@@ -54,6 +54,7 @@ const pillItems: { id: NavSection; label: string }[] = [
   { id: 'ueber-uns', label: 'Über uns' },
   { id: 'faq', label: 'FAQ' },
   { id: 'referenzen', label: 'Referenzen' },
+  { id: 'blog', label: 'Blog' },
   { id: 'kontakt', label: 'Kontakt' },
 ];
 
@@ -76,6 +77,7 @@ function getActiveSection(pathname: string): NavSection {
   if (pathname === '/ueber-uns') return 'ueber-uns';
   if (pathname === '/faq') return 'faq';
   if (pathname === '/referenzen') return 'referenzen';
+  if (pathname.startsWith('/blog')) return 'blog';
   if (pathname === '/kontakt') return 'kontakt';
   return 'home';
 }
@@ -344,12 +346,21 @@ export function PremiumMobileNav() {
                       onClick={() => go('/referenzen')}
                     />
 
+                    {/* BLOG */}
+                    <NavRow
+                      icon={BookOpen}
+                      label="Blog"
+                      isActive={activeSection === 'blog'}
+                      delay={0.22}
+                      onClick={() => go('/blog')}
+                    />
+
                     {/* KONTAKT */}
                     <NavRow
                       icon={Mail}
                       label="Kontakt"
                       isActive={activeSection === 'kontakt'}
-                      delay={0.24}
+                      delay={0.26}
                       onClick={() => go('/kontakt')}
                     />
 

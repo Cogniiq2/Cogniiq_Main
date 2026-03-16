@@ -131,6 +131,11 @@ export function Navigation() {
                 href="/referenzen"
                 isActive={location.pathname === '/referenzen'}
               />
+              <SimpleNavItem
+                label="Blog"
+                href="/blog"
+                isActive={location.pathname.startsWith('/blog')}
+              />
               <Link
                 to="/kontakt"
                 className="group relative flex items-center gap-1.5 px-5 py-2.5 bg-gray-950 dark:bg-white text-white dark:text-gray-950 text-[13px] font-semibold tracking-wide rounded-full overflow-hidden transition-all duration-300 hover:shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:scale-[1.02] active:scale-[0.99]"

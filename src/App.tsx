@@ -74,6 +74,8 @@ import { KiAgenturDeutschland } from './pages/pillars/KiAgenturDeutschland';
 import { AutomatisierungUnternehmen } from './pages/pillars/AutomatisierungUnternehmen';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { LogoShowcasePage } from './pages/LogoShowcasePage';
+import { BlogIndexPage } from './pages/blog/BlogIndexPage';
+import { BlogPostPage } from './pages/blog/BlogPostPage';
 
 function App() {
   return (
@@ -159,6 +161,8 @@ function App() {
             <Route path="/ki-agentur-deutschland" element={<KiAgenturDeutschland />} />
             <Route path="/automatisierung-unternehmen" element={<AutomatisierungUnternehmen />} />
             <Route path="/logo-preview" element={<LogoShowcasePage />} />
+            <Route path="/blog" element={<BlogIndexPage />} />
+            <Route path="/blog/:slug" element={<BlogPostPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
           <PremiumFooterReveal>

@@ -333,6 +333,7 @@ export function Footer() {
                       { text: "Leistungen", to: "/leistungen" },
                       { text: "Referenzen", to: "/referenzen" },
                       { text: "Bewertungen", to: "/bewertungen" },
+                      { text: "Blog", to: "/blog" },
                       { text: "FAQ", to: "/faq" },
                       { text: "Kontakt", to: "/kontakt" },
                     ],
