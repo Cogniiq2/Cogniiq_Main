@@ -362,12 +362,7 @@ export function ContactSection() {
 
   const handleBack = () => setStep(s => Math.max(s - 1, 0));
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (step < STEPS.length - 1) {
-      handleNext();
-      return;
-    }
+  const handleFinalSubmit = async () => {
     setIsSubmitting(true);
     try {
       await fetch('https://n8n.cogniiq.co/webhook/contacts', {
@@ -529,7 +524,7 @@ export function ContactSection() {
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit}>
+              <div>
                 <AnimatePresence mode="wait">
                   {step === 0 && <Step1 key="s1" data={data} onChange={update} />}
                   {step === 1 && <Step2 key="s2" data={data} onChange={update} />}
@@ -576,7 +571,8 @@ export function ContactSection() {
                     </motion.button>
                   ) : (
                     <motion.button
-                      type="submit"
+                      type="button"
+                      onClick={handleFinalSubmit}
                       disabled={isSubmitting}
                       className="flex items-center gap-2.5 text-white"
                       style={{
@@ -607,7 +603,7 @@ export function ContactSection() {
                     </motion.button>
                   )}
                 </div>
-              </form>
+              </div>
             </div>
           </motion.div>
         </div>
