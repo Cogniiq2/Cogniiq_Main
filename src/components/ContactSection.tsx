@@ -1,5 +1,6 @@
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
@@ -340,9 +341,9 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
 
 export function ContactSection() {
   const ref = useRef(null);
+  const navigate = useNavigate();
   const isInView = useInView(ref, { once: true, amount: 0.08 });
   const [step, setStep] = useState(0);
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [data, setData] = useState<FormData>(EMPTY);
 
@@ -363,61 +364,20 @@ export function ContactSection() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canAdvance()) return;
     setIsSubmitting(true);
     try {
       await fetch('https://n8n.cogniiq.co/webhook/contacts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data }),
+        body: JSON.stringify({ ...data, source: 'kontakt-page' }),
       });
-      setIsSubmitted(true);
     } catch (err) {
       console.error(err);
     } finally {
       setIsSubmitting(false);
+      navigate('/anfrage-erhalten');
     }
   };
-
-  if (isSubmitted) {
-    return (
-      <section id="kontakt" className="relative py-32 bg-white overflow-hidden">
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse 60% 40% at 50% 0%, rgba(16,185,129,0.04) 0%, transparent 70%)' }}
-        />
-        <div className="max-w-xl mx-auto px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 16 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: EASE }}
-          >
-            <motion.div
-              className="inline-flex items-center justify-center w-16 h-16 mb-8 rounded-2xl bg-emerald-50 border border-emerald-100"
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.1, ease: EASE }}
-            >
-              <CheckCircle size={24} className="text-emerald-600" />
-            </motion.div>
-            <h3 className="text-[28px] font-bold text-gray-900 mb-3 tracking-tight">
-              Anfrage eingegangen.
-            </h3>
-            <p className="text-gray-500 text-[15px] leading-[1.75] mb-8">
-              Wir melden uns innerhalb von <span className="font-medium text-gray-700">24–48 Stunden</span> für Ihr persönliches Analysegespräch.
-            </p>
-            <button
-              onClick={() => { setIsSubmitted(false); setStep(0); setData(EMPTY); }}
-              className="inline-flex items-center gap-2 text-[13px] text-gray-400 hover:text-gray-700 transition-colors"
-            >
-              Weitere Anfrage senden
-              <ArrowRight size={13} />
-            </button>
-          </motion.div>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section
