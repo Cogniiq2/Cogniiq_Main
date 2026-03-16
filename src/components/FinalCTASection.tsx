@@ -2,6 +2,7 @@ import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Calendar, Shield, Clock, Star, CircleCheck as CheckCircle, Quote, TrendingUp, PhoneCall, Zap } from 'lucide-react';
+import { useAvailability } from '@/hooks/useAvailability';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -35,6 +36,7 @@ const microResults = [
 export function FinalCTASection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const { label: availLabel } = useAvailability();
 
   return (
     <section
@@ -198,7 +200,7 @@ export function FinalCTASection() {
                     Kostenloses Erstgespräch
                   </span>
                   <span className="ml-auto text-[10px] font-semibold text-amber-400/80 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full">
-                    3 Plätze verfügbar
+                    {availLabel}
                   </span>
                 </div>
 

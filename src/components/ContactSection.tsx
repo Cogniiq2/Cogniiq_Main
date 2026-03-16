@@ -10,7 +10,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
-import { ArrowRight, CircleCheck as CheckCircle, Sparkles } from 'lucide-react';
+import {
+  ArrowRight,
+  ArrowLeft,
+  CircleCheck as CheckCircle,
+  Sparkles,
+  ShieldCheck,
+  Lock,
+  Server,
+  BadgeCheck,
+} from 'lucide-react';
 import { PremiumCalendar } from './PremiumCalendar';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -22,49 +31,345 @@ const INTEREST_OPTIONS = [
   { id: 'KI Content Creation', label: 'KI Content', desc: 'Content automatisch erstellen' },
 ];
 
-const FIELD_META = [
-  { id: 'name', label: 'Name', type: 'text', placeholder: 'Max Mustermann', required: true },
-  { id: 'email', label: 'E-Mail', type: 'email', placeholder: 'max@unternehmen.de', required: true },
-  { id: 'company', label: 'Unternehmen', type: 'text', placeholder: 'Unternehmensname', required: true },
+const STEPS = [
+  { label: 'Kontaktdaten', short: 'Kontakt' },
+  { label: 'Ihr Vorhaben', short: 'Vorhaben' },
+  { label: 'Wunschtermin', short: 'Termin' },
 ];
 
-const steps = [
+const afterSteps = [
   { n: '01', label: 'Eingangsbestätigung', sub: 'Automatisch · sofort' },
   { n: '02', label: 'Systemanalyse', sub: 'Innerhalb 24 h' },
   { n: '03', label: 'Analysegespräch', sub: '45 Min. · Video' },
   { n: '04', label: 'Systemkonzept', sub: 'Maßgeschneidert' },
 ];
 
+const DSGVO_BADGES = [
+  { icon: Lock, label: 'DSGVO-konform' },
+  { icon: Server, label: 'Deutsche Server' },
+  { icon: ShieldCheck, label: 'SSL-verschlüsselt' },
+  { icon: BadgeCheck, label: 'Keine Weitergabe' },
+];
+
+interface FormData {
+  name: string;
+  email: string;
+  company: string;
+  industry: string;
+  timeline: string;
+  interests: string[];
+  goal: string;
+  preferredTime: string;
+}
+
+const EMPTY: FormData = {
+  name: '',
+  email: '',
+  company: '',
+  industry: '',
+  timeline: '',
+  interests: [],
+  goal: '',
+  preferredTime: '',
+};
+
+function ProgressBar({ step }: { step: number }) {
+  const pct = ((step + 1) / STEPS.length) * 100;
+  return (
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-3">
+        {STEPS.map((s, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <motion.div
+              className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border transition-colors"
+              animate={{
+                background: i < step ? '#111827' : i === step ? '#111827' : '#ffffff',
+                borderColor: i <= step ? '#111827' : '#e5e7eb',
+                color: i <= step ? '#ffffff' : '#9ca3af',
+              }}
+              transition={{ duration: 0.3 }}
+            >
+              {i < step ? (
+                <motion.svg
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  width="10" height="8" viewBox="0 0 10 8" fill="none"
+                >
+                  <path d="M1 4L3.5 6.5L9 1" stroke="#ffffff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </motion.svg>
+              ) : (
+                i + 1
+              )}
+            </motion.div>
+            <span
+              className="text-[11px] font-medium hidden sm:block transition-colors"
+              style={{ color: i === step ? '#111827' : '#9ca3af' }}
+            >
+              {s.short}
+            </span>
+            {i < STEPS.length - 1 && (
+              <div className="h-px w-8 sm:w-12 lg:w-16 mx-1" style={{ background: '#e5e7eb' }}>
+                <motion.div
+                  className="h-full"
+                  style={{ background: '#111827', transformOrigin: 'left' }}
+                  animate={{ scaleX: step > i ? 1 : 0 }}
+                  transition={{ duration: 0.4, ease: EASE }}
+                />
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="h-[2px] w-full bg-gray-100 rounded-full overflow-hidden">
+        <motion.div
+          className="h-full bg-gray-900 rounded-full"
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.5, ease: EASE }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
+  return (
+    <motion.div
+      key="step1"
+      initial={{ opacity: 0, x: 24 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -24 }}
+      transition={{ duration: 0.35, ease: EASE }}
+      className="flex flex-col gap-5"
+    >
+      <div className="grid md:grid-cols-2 gap-5">
+        <div>
+          <FormLabel>Name *</FormLabel>
+          <Input
+            value={data.name}
+            onChange={e => onChange({ name: e.target.value })}
+            required
+            placeholder="Max Mustermann"
+            className="h-11 bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus-visible:ring-0 transition-colors"
+          />
+        </div>
+        <div>
+          <FormLabel>E-Mail *</FormLabel>
+          <Input
+            type="email"
+            value={data.email}
+            onChange={e => onChange({ email: e.target.value })}
+            required
+            placeholder="max@unternehmen.de"
+            className="h-11 bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus-visible:ring-0 transition-colors"
+          />
+        </div>
+      </div>
+      <div>
+        <FormLabel>Unternehmen *</FormLabel>
+        <Input
+          value={data.company}
+          onChange={e => onChange({ company: e.target.value })}
+          required
+          placeholder="Unternehmensname"
+          className="h-11 bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus-visible:ring-0 transition-colors"
+        />
+      </div>
+      <div className="grid md:grid-cols-2 gap-5">
+        <div>
+          <FormLabel>Branche *</FormLabel>
+          <Select value={data.industry} onValueChange={v => onChange({ industry: v })} required>
+            <SelectTrigger className="h-11 bg-white border-gray-200 rounded-lg text-sm focus:border-gray-400 focus:ring-0 transition-colors">
+              <SelectValue placeholder="Branche wählen" />
+            </SelectTrigger>
+            <SelectContent className="bg-white border border-gray-200 shadow-lg rounded-xl text-sm">
+              {['Medizin & Kliniken', 'Gastronomie', 'Sport & Fitness', 'Immobilien', 'E-Commerce', 'Sonstiges'].map((v) => (
+                <SelectItem key={v} value={v.toLowerCase().replace(/[^a-z]/g, '')} className="py-2.5 cursor-pointer">
+                  {v}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <FormLabel>Startzeitraum *</FormLabel>
+          <Select value={data.timeline} onValueChange={v => onChange({ timeline: v })} required>
+            <SelectTrigger className="h-11 bg-white border-gray-200 rounded-lg text-sm focus:border-gray-400 focus:ring-0 transition-colors">
+              <SelectValue placeholder="Zeitraum wählen" />
+            </SelectTrigger>
+            <SelectContent className="bg-white border border-gray-200 shadow-lg rounded-xl text-sm">
+              <SelectItem value="asap" className="py-2.5 cursor-pointer">So schnell wie möglich</SelectItem>
+              <SelectItem value="1-2months" className="py-2.5 cursor-pointer">In 1–2 Monaten</SelectItem>
+              <SelectItem value="3+months" className="py-2.5 cursor-pointer">In 3+ Monaten</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function Step2({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
+  const toggleInterest = (v: string) =>
+    onChange({
+      interests: data.interests.includes(v)
+        ? data.interests.filter(i => i !== v)
+        : [...data.interests, v],
+    });
+
+  return (
+    <motion.div
+      key="step2"
+      initial={{ opacity: 0, x: 24 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -24 }}
+      transition={{ duration: 0.35, ease: EASE }}
+      className="flex flex-col gap-6"
+    >
+      <div>
+        <FormLabel>Interessensfelder</FormLabel>
+        <div className="grid grid-cols-2 gap-2.5 mt-1">
+          {INTEREST_OPTIONS.map((opt) => {
+            const active = data.interests.includes(opt.id);
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => toggleInterest(opt.id)}
+                className="group flex flex-col items-start gap-0.5 px-4 py-3 border rounded-xl text-left transition-all"
+                style={{
+                  borderColor: active ? '#111827' : '#e5e7eb',
+                  background: active ? '#111827' : '#ffffff',
+                }}
+              >
+                <div className="flex items-center gap-2 w-full">
+                  <span
+                    className="flex-shrink-0 w-3.5 h-3.5 border rounded-sm flex items-center justify-center transition-all"
+                    style={{
+                      borderColor: active ? '#ffffff60' : '#d1d5db',
+                      background: active ? '#ffffff18' : 'transparent',
+                    }}
+                  >
+                    <AnimatePresence>
+                      {active && (
+                        <motion.svg
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0, opacity: 0 }}
+                          transition={{ duration: 0.15 }}
+                          width="9" height="7" viewBox="0 0 9 7" fill="none"
+                        >
+                          <path d="M1 3.5L3.5 6L8 1" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </motion.svg>
+                      )}
+                    </AnimatePresence>
+                  </span>
+                  <span className="text-[13px] font-medium" style={{ color: active ? '#ffffff' : '#374151' }}>
+                    {opt.label}
+                  </span>
+                </div>
+                <span className="text-[11px] pl-5" style={{ color: active ? '#ffffff70' : '#9ca3af' }}>
+                  {opt.desc}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div>
+        <FormLabel>Ziel und Ausgangssituation *</FormLabel>
+        <Textarea
+          value={data.goal}
+          onChange={e => onChange({ goal: e.target.value })}
+          required
+          rows={4}
+          placeholder="Beschreiben Sie Ihre aktuelle Situation und was Sie verändern möchten …"
+          className="bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus-visible:ring-0 resize-none transition-colors leading-relaxed"
+        />
+      </div>
+    </motion.div>
+  );
+}
+
+function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormData>) => void }) {
+  return (
+    <motion.div
+      key="step3"
+      initial={{ opacity: 0, x: 24 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -24 }}
+      transition={{ duration: 0.35, ease: EASE }}
+      className="flex flex-col gap-5"
+    >
+      <div>
+        <FormLabel optional>Bevorzugter Gesprächstermin</FormLabel>
+        <p className="text-[12px] text-gray-400 mb-3 leading-relaxed">
+          Wählen Sie optional einen Wunschtermin. Wir bestätigen Ihnen den Termin innerhalb von 24 h.
+        </p>
+        <div className="mt-1">
+          <PremiumCalendar
+            onSelect={(dt) => onChange({ preferredTime: dt })}
+            selectedDateTime={data.preferredTime}
+          />
+        </div>
+      </div>
+
+      <div className="mt-2 p-4 rounded-xl bg-gray-50 border border-gray-100">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-400 mb-3">
+          Zusammenfassung
+        </p>
+        <div className="grid grid-cols-2 gap-2 text-[12.5px]">
+          {[
+            { label: 'Name', value: data.name },
+            { label: 'E-Mail', value: data.email },
+            { label: 'Unternehmen', value: data.company },
+            { label: 'Branche', value: data.industry },
+            { label: 'Start', value: data.timeline === 'asap' ? 'So schnell wie möglich' : data.timeline === '1-2months' ? '1–2 Monate' : '3+ Monate' },
+            { label: 'Services', value: data.interests.join(', ') || '—' },
+          ].map(({ label, value }) => (
+            <div key={label}>
+              <span className="text-gray-400">{label}: </span>
+              <span className="text-gray-700 font-medium">{value || '—'}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export function ContactSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.08 });
+  const [step, setStep] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [interests, setInterests] = useState<string[]>([]);
-  const [selectedDateTime, setSelectedDateTime] = useState('');
-  const [industryValue, setIndustryValue] = useState('');
-  const [timelineValue, setTimelineValue] = useState('');
+  const [data, setData] = useState<FormData>(EMPTY);
+
+  const update = (partial: Partial<FormData>) => setData(d => ({ ...d, ...partial }));
+
+  const canAdvance = () => {
+    if (step === 0) return data.name && data.email && data.company && data.industry && data.timeline;
+    if (step === 1) return !!data.goal;
+    return true;
+  };
+
+  const handleNext = () => {
+    if (!canAdvance()) return;
+    setStep(s => Math.min(s + 1, STEPS.length - 1));
+  };
+
+  const handleBack = () => setStep(s => Math.max(s - 1, 0));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!canAdvance()) return;
     setIsSubmitting(true);
-
-    const payload = {
-      name: (document.getElementById('name') as HTMLInputElement).value,
-      email: (document.getElementById('email') as HTMLInputElement).value,
-      company: (document.getElementById('company') as HTMLInputElement).value,
-      industry: industryValue,
-      interests,
-      timeline: timelineValue,
-      goal: (document.getElementById('goal') as HTMLTextAreaElement).value,
-      preferredTime: selectedDateTime || 'Keine Angabe',
-    };
-
     try {
       await fetch('https://n8n.cogniiq.co/webhook/contacts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...data }),
       });
       setIsSubmitted(true);
     } catch (err) {
@@ -73,9 +378,6 @@ export function ContactSection() {
       setIsSubmitting(false);
     }
   };
-
-  const toggleInterest = (v: string) =>
-    setInterests((prev) => (prev.includes(v) ? prev.filter((i) => i !== v) : [...prev, v]));
 
   if (isSubmitted) {
     return (
@@ -105,7 +407,7 @@ export function ContactSection() {
               Wir melden uns innerhalb von <span className="font-medium text-gray-700">24–48 Stunden</span> für Ihr persönliches Analysegespräch.
             </p>
             <button
-              onClick={() => setIsSubmitted(false)}
+              onClick={() => { setIsSubmitted(false); setStep(0); setData(EMPTY); }}
               className="inline-flex items-center gap-2 text-[13px] text-gray-400 hover:text-gray-700 transition-colors"
             >
               Weitere Anfrage senden
@@ -131,7 +433,6 @@ export function ContactSection() {
 
       <div className="relative max-w-6xl mx-auto px-6 lg:px-8">
 
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -172,15 +473,14 @@ export function ContactSection() {
             transition={{ duration: 0.7, delay: 0.1, ease: EASE }}
             className="lg:col-span-4 flex flex-col gap-8"
           >
-            {/* Process steps */}
             <div>
               <p className="text-[9.5px] font-semibold uppercase tracking-[0.2em] text-gray-400 mb-5">
                 Nach Ihrer Anfrage
               </p>
               <div className="flex flex-col">
-                {steps.map((step, i) => (
+                {afterSteps.map((s, i) => (
                   <div
-                    key={step.n}
+                    key={s.n}
                     className="flex items-start gap-4 py-4 border-b border-gray-100 last:border-0"
                   >
                     <div className="flex flex-col items-center gap-1 flex-shrink-0 pt-0.5">
@@ -188,24 +488,21 @@ export function ContactSection() {
                         className="text-gray-300 tabular-nums font-medium"
                         style={{ fontSize: '11px', letterSpacing: '0.04em', minWidth: '22px' }}
                       >
-                        {step.n}
+                        {s.n}
                       </span>
-                      {i < steps.length - 1 && (
+                      {i < afterSteps.length - 1 && (
                         <div className="w-px h-4 bg-gray-100" />
                       )}
                     </div>
                     <div>
-                      <p className="text-[13.5px] font-medium text-gray-800 leading-snug">
-                        {step.label}
-                      </p>
-                      <p className="text-[11.5px] text-gray-400 mt-0.5">{step.sub}</p>
+                      <p className="text-[13.5px] font-medium text-gray-800 leading-snug">{s.label}</p>
+                      <p className="text-[11.5px] text-gray-400 mt-0.5">{s.sub}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* For whom note */}
             <div className="border border-gray-100 rounded-xl p-5 bg-gray-50/60">
               <p className="text-[9.5px] font-semibold uppercase tracking-[0.18em] text-gray-400 mb-3">
                 Für wen
@@ -216,7 +513,6 @@ export function ContactSection() {
               </p>
             </div>
 
-            {/* Response guarantee */}
             <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-emerald-50/60 border border-emerald-100">
               <CheckCircle size={13} className="text-emerald-600 flex-shrink-0 mt-0.5" />
               <p className="text-[12px] text-emerald-700 leading-relaxed">
@@ -224,181 +520,131 @@ export function ContactSection() {
                 <span className="font-semibold">24–48 Stunden</span>
               </p>
             </div>
+
+            {/* DSGVO Trust Badges */}
+            <div>
+              <p className="text-[9.5px] font-semibold uppercase tracking-[0.18em] text-gray-400 mb-3">
+                Datenschutz & Sicherheit
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {DSGVO_BADGES.map(({ icon: Icon, label }) => (
+                  <div
+                    key={label}
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg border border-gray-100 bg-white"
+                  >
+                    <Icon size={12} className="text-emerald-600 flex-shrink-0" />
+                    <span className="text-[11.5px] text-gray-600 font-medium leading-tight">{label}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[10.5px] text-gray-400 mt-3 leading-relaxed">
+                Ihre Daten werden ausschließlich zur Bearbeitung Ihrer Anfrage verwendet und niemals an Dritte weitergegeben.
+              </p>
+            </div>
           </motion.div>
 
-          {/* ─── Right: Form ─── */}
+          {/* ─── Right: Multistep Form ─── */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.16, ease: EASE }}
             className="lg:col-span-8"
           >
-            <form onSubmit={handleSubmit} className="flex flex-col gap-7">
+            <div
+              className="rounded-2xl border border-gray-100 bg-white p-8"
+              style={{ boxShadow: '0 4px 32px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.04)' }}
+            >
+              <ProgressBar step={step} />
 
-              {/* Name / Email / Company */}
-              <div className="grid md:grid-cols-2 gap-5">
-                {FIELD_META.map((f) => (
-                  <div key={f.id} className={f.id === 'company' ? 'md:col-span-2' : ''}>
-                    <FormLabel>{f.label}</FormLabel>
-                    <Input
-                      id={f.id}
-                      type={f.type}
-                      required={f.required}
-                      placeholder={f.placeholder}
-                      className="h-11 bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus-visible:ring-0 transition-colors"
-                    />
-                  </div>
-                ))}
-              </div>
-
-              {/* Industry / Timeline */}
-              <div className="grid md:grid-cols-2 gap-5">
-                <div>
-                  <FormLabel>Branche</FormLabel>
-                  <Select required onValueChange={setIndustryValue}>
-                    <SelectTrigger className="h-11 bg-white border-gray-200 rounded-lg text-sm focus:border-gray-400 focus:ring-0 transition-colors">
-                      <SelectValue placeholder="Branche wählen" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white border border-gray-200 shadow-lg rounded-xl text-sm">
-                      {['Medizin & Kliniken', 'Gastronomie', 'Sport & Fitness', 'Immobilien', 'E-Commerce', 'Sonstiges'].map((v) => (
-                        <SelectItem key={v} value={v.toLowerCase().replace(/[^a-z]/g, '')} className="py-2.5 cursor-pointer">
-                          {v}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <FormLabel>Startzeitraum</FormLabel>
-                  <Select required onValueChange={setTimelineValue}>
-                    <SelectTrigger className="h-11 bg-white border-gray-200 rounded-lg text-sm focus:border-gray-400 focus:ring-0 transition-colors">
-                      <SelectValue placeholder="Zeitraum wählen" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white border border-gray-200 shadow-lg rounded-xl text-sm">
-                      <SelectItem value="asap" className="py-2.5 cursor-pointer">So schnell wie möglich</SelectItem>
-                      <SelectItem value="1-2months" className="py-2.5 cursor-pointer">In 1–2 Monaten</SelectItem>
-                      <SelectItem value="3+months" className="py-2.5 cursor-pointer">In 3+ Monaten</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Interests */}
-              <div>
-                <FormLabel>Interessensfelder</FormLabel>
-                <div className="grid grid-cols-2 gap-2.5 mt-1">
-                  {INTEREST_OPTIONS.map((opt) => {
-                    const active = interests.includes(opt.id);
-                    return (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => toggleInterest(opt.id)}
-                        className="group flex flex-col items-start gap-0.5 px-4 py-3 border rounded-xl text-left transition-all"
-                        style={{
-                          borderColor: active ? '#111827' : '#e5e7eb',
-                          background: active ? '#111827' : '#ffffff',
-                        }}
-                      >
-                        <div className="flex items-center gap-2 w-full">
-                          <span
-                            className="flex-shrink-0 w-3.5 h-3.5 border rounded-sm flex items-center justify-center transition-all"
-                            style={{
-                              borderColor: active ? '#ffffff60' : '#d1d5db',
-                              background: active ? '#ffffff18' : 'transparent',
-                            }}
-                          >
-                            <AnimatePresence>
-                              {active && (
-                                <motion.svg
-                                  initial={{ scale: 0, opacity: 0 }}
-                                  animate={{ scale: 1, opacity: 1 }}
-                                  exit={{ scale: 0, opacity: 0 }}
-                                  transition={{ duration: 0.15 }}
-                                  width="9" height="7" viewBox="0 0 9 7" fill="none"
-                                >
-                                  <path d="M1 3.5L3.5 6L8 1" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                </motion.svg>
-                              )}
-                            </AnimatePresence>
-                          </span>
-                          <span className="text-[13px] font-medium" style={{ color: active ? '#ffffff' : '#374151' }}>
-                            {opt.label}
-                          </span>
-                        </div>
-                        <span className="text-[11px] pl-5" style={{ color: active ? '#ffffff70' : '#9ca3af' }}>
-                          {opt.desc}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Goal */}
-              <div>
-                <FormLabel>Ziel und Ausgangssituation</FormLabel>
-                <Textarea
-                  id="goal"
-                  required
-                  rows={4}
-                  placeholder="Beschreiben Sie Ihre aktuelle Situation und was Sie verändern möchten …"
-                  className="bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus-visible:ring-0 resize-none transition-colors leading-relaxed"
-                />
-              </div>
-
-              {/* Calendar */}
-              <div>
-                <FormLabel optional>Bevorzugter Gesprächstermin</FormLabel>
-                <div className="mt-1">
-                  <PremiumCalendar
-                    onSelect={setSelectedDateTime}
-                    selectedDateTime={selectedDateTime}
-                  />
-                </div>
-              </div>
-
-              <div className="w-full h-px bg-gray-100" />
-
-              {/* Submit row */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
-                <p className="text-[11.5px] text-gray-400 leading-relaxed max-w-[32ch]">
-                  Ihre Daten werden vertraulich behandelt und nicht weitergegeben.
+              <div className="mb-6">
+                <h3 className="text-[15px] font-bold text-gray-900 leading-tight">
+                  {STEPS[step].label}
+                </h3>
+                <p className="text-[12px] text-gray-400 mt-0.5">
+                  Schritt {step + 1} von {STEPS.length}
                 </p>
-                <motion.button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="flex-shrink-0 flex items-center gap-2.5 text-white"
-                  style={{
-                    background: '#111827',
-                    fontSize: '13.5px',
-                    fontWeight: 600,
-                    letterSpacing: '0.01em',
-                    borderRadius: '8px',
-                    minHeight: '46px',
-                    padding: '0 22px',
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06)',
-                    opacity: isSubmitting ? 0.65 : 1,
-                    cursor: isSubmitting ? 'wait' : 'pointer',
-                    border: 'none',
-                    transition: 'opacity 0.2s, transform 0.15s',
-                  }}
-                  whileHover={{ scale: isSubmitting ? 1 : 1.015 }}
-                  whileTap={{ scale: 0.975 }}
-                >
-                  {isSubmitting ? (
-                    <span>Wird gesendet …</span>
-                  ) : (
-                    <>
-                      <span>Anfrage absenden</span>
-                      <ArrowRight size={14} />
-                    </>
-                  )}
-                </motion.button>
               </div>
 
-            </form>
+              <form onSubmit={handleSubmit}>
+                <AnimatePresence mode="wait">
+                  {step === 0 && <Step1 key="s1" data={data} onChange={update} />}
+                  {step === 1 && <Step2 key="s2" data={data} onChange={update} />}
+                  {step === 2 && <Step3 key="s3" data={data} onChange={update} />}
+                </AnimatePresence>
+
+                <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
+                  <div>
+                    {step > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleBack}
+                        className="flex items-center gap-2 text-[13px] text-gray-400 hover:text-gray-700 transition-colors"
+                      >
+                        <ArrowLeft size={13} />
+                        Zurück
+                      </button>
+                    )}
+                  </div>
+
+                  {step < STEPS.length - 1 ? (
+                    <motion.button
+                      type="button"
+                      onClick={handleNext}
+                      disabled={!canAdvance()}
+                      className="flex items-center gap-2.5 text-white"
+                      style={{
+                        background: canAdvance() ? '#111827' : '#d1d5db',
+                        fontSize: '13.5px',
+                        fontWeight: 600,
+                        letterSpacing: '0.01em',
+                        borderRadius: '8px',
+                        minHeight: '46px',
+                        padding: '0 22px',
+                        border: 'none',
+                        cursor: canAdvance() ? 'pointer' : 'not-allowed',
+                        transition: 'background 0.2s',
+                      }}
+                      whileHover={canAdvance() ? { scale: 1.015 } : {}}
+                      whileTap={canAdvance() ? { scale: 0.975 } : {}}
+                    >
+                      Weiter
+                      <ArrowRight size={14} />
+                    </motion.button>
+                  ) : (
+                    <motion.button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="flex items-center gap-2.5 text-white"
+                      style={{
+                        background: '#111827',
+                        fontSize: '13.5px',
+                        fontWeight: 600,
+                        letterSpacing: '0.01em',
+                        borderRadius: '8px',
+                        minHeight: '46px',
+                        padding: '0 22px',
+                        boxShadow: '0 1px 4px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06)',
+                        opacity: isSubmitting ? 0.65 : 1,
+                        cursor: isSubmitting ? 'wait' : 'pointer',
+                        border: 'none',
+                        transition: 'opacity 0.2s',
+                      }}
+                      whileHover={{ scale: isSubmitting ? 1 : 1.015 }}
+                      whileTap={{ scale: 0.975 }}
+                    >
+                      {isSubmitting ? (
+                        <span>Wird gesendet …</span>
+                      ) : (
+                        <>
+                          <span>Anfrage absenden</span>
+                          <ArrowRight size={14} />
+                        </>
+                      )}
+                    </motion.button>
+                  )}
+                </div>
+              </form>
+            </div>
           </motion.div>
         </div>
       </div>

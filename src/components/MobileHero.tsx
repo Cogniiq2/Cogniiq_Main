@@ -1,6 +1,7 @@
 import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAvailability } from '@/hooks/useAvailability';
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const EASE_CIRC: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -353,6 +354,7 @@ export function MobileHero() {
   const sectionRef = useRef<HTMLElement>(null);
   const [ripples, setRipples] = useState<Array<{ id: number; x: number; y: number }>>([]);
   const rippleId = useRef(0);
+  const { label: availLabel } = useAvailability();
 
   const particles = useParticles(28);
 
@@ -445,7 +447,7 @@ export function MobileHero() {
             transition={{ duration: 0.5, delay: 0.7, ease: EASE_OUT }}
           >
             <span style={{ fontSize: '10px', fontWeight: 700, color: '#b45309', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-              3 Plätze frei
+              {availLabel}
             </span>
           </motion.div>
         </motion.div>

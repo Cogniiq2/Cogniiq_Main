@@ -8,6 +8,7 @@ import { ProblemSection } from '@/components/ProblemSection';
 import { ServicesSection } from '@/components/ServicesSection';
 import { TrustSection } from '@/components/TrustSection';
 import { ProcessSection } from '@/components/ProcessSection';
+import { HowItWorksSection } from '@/components/HowItWorksSection';
 import { CasesSection } from '@/components/CasesSection';
 import { KiCTASection } from '@/components/KiCTASection';
 import { TestimonialsSection } from '@/components/TestimonialsSection';
@@ -34,6 +35,7 @@ export function HomePage() {
       <SolutionShowcase />
       <ProblemSection />
       <ServicesSection />
+      <HowItWorksSection />
       <TrustSection />
       <ProcessSection />
       <CasesSection />
