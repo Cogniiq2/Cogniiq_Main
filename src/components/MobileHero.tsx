@@ -1,7 +1,6 @@
 import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAvailability } from '@/hooks/useAvailability';
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const EASE_CIRC: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -101,37 +100,6 @@ function HorizonLine({ delay }: { delay: number }) {
   );
 }
 
-function BadgePill({ children, delay }: { children: React.ReactNode; delay: number }) {
-  return (
-    <motion.div
-      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-      style={{
-        background: 'rgba(15,23,42,0.04)',
-        border: '1px solid rgba(15,23,42,0.08)',
-        backdropFilter: 'blur(8px)',
-      }}
-      initial={{ opacity: 0, y: 8, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.6, delay, ease: EASE_OUT }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-function StatusDot() {
-  return (
-    <span className="relative flex items-center justify-center" style={{ width: 7, height: 7 }}>
-      <motion.span
-        className="absolute inline-flex rounded-full"
-        style={{ background: 'rgba(34,197,94,0.25)', width: 7, height: 7 }}
-        animate={{ scale: [1, 1.8, 1], opacity: [0.6, 0, 0.6] }}
-        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
-      />
-      <span className="relative inline-flex rounded-full" style={{ width: 5, height: 5, background: '#16a34a' }} />
-    </span>
-  );
-}
 
 function TickerWord({ text, delay }: { text: string; delay: number }) {
   return (
@@ -354,7 +322,6 @@ export function MobileHero() {
   const sectionRef = useRef<HTMLElement>(null);
   const [ripples, setRipples] = useState<Array<{ id: number; x: number; y: number }>>([]);
   const rippleId = useRef(0);
-  const { label: availLabel } = useAvailability();
 
   const particles = useParticles(28);
 
@@ -427,30 +394,6 @@ export function MobileHero() {
         style={{ paddingTop: '88px', paddingBottom: '96px', maxWidth: 440, padding: '88px 28px 96px' }}
       >
 
-        <motion.div
-          className="flex items-center gap-2 mb-8 flex-wrap justify-center"
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.4, ease: EASE_OUT }}
-        >
-          <BadgePill delay={0.5}>
-            <StatusDot />
-            <span style={{ fontSize: '10.5px', fontWeight: 600, color: '#374151', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-              Systeme aktiv
-            </span>
-          </BadgePill>
-          <motion.div
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-            style={{ background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.2)' }}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.7, ease: EASE_OUT }}
-          >
-            <span style={{ fontSize: '10px', fontWeight: 700, color: '#b45309', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-              {availLabel}
-            </span>
-          </motion.div>
-        </motion.div>
 
         <DiamondMark />
 
