@@ -77,13 +77,6 @@ export function TrustStrip() {
             </motion.div>
           ))}
 
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.45, delay: 0.35, ease: EASE }}
-          >
-            <LiveCounter />
-          </motion.div>
         </div>
       </motion.div>
     </div>
