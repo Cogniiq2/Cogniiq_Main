@@ -60,7 +60,7 @@ export function Navigation() {
           <div className="flex items-center justify-between h-[72px]">
 
             {/* LOGO */}
-            <Link to="/" aria-label="Cogniiq Startseite">
+            <Link to="/" aria-label="Cogniiq Startseite" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
