@@ -19,8 +19,8 @@ function WordmarkTrace({ animPhase }: { animPhase: "stroke" | "fill" | "solid" }
       }}
     >
       {LETTERS.map((letter, i) => {
-        const strokeDelay = i * 0.11;
-        const fillDelay = LETTERS.length * 0.11 + 0.05 + i * 0.045;
+        const strokeDelay = i * 0.1;
+        const fillDelay = LETTERS.length * 0.1 + 0.04 + i * 0.04;
 
         return (
           <div
@@ -33,16 +33,15 @@ function WordmarkTrace({ animPhase }: { animPhase: "stroke" | "fill" | "solid" }
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: strokeDelay, duration: 0.08 }}
+              transition={{ delay: strokeDelay, duration: 0.06 }}
               style={{
-                fontFamily:
-                  "'SF Pro Display', 'Helvetica Neue', Arial, sans-serif",
-                fontSize: "clamp(52px, 10vw, 112px)",
+                fontFamily: "'SF Pro Display', 'Helvetica Neue', Arial, sans-serif",
+                fontSize: "clamp(48px, 9vw, 104px)",
                 fontWeight: 100,
-                letterSpacing: "-0.025em",
+                letterSpacing: "-0.03em",
                 lineHeight: 1,
                 color: "transparent",
-                WebkitTextStroke: "1px rgba(255,255,255,0.9)",
+                WebkitTextStroke: "0.5px rgba(0,0,0,0.85)",
                 display: "block",
                 position: "relative",
                 zIndex: 1,
@@ -60,17 +59,16 @@ function WordmarkTrace({ animPhase }: { animPhase: "stroke" | "fill" | "solid" }
               }
               transition={{
                 delay: fillDelay,
-                duration: 0.18,
+                duration: 0.2,
                 ease: [0.4, 0, 0.2, 1],
               }}
               style={{
-                fontFamily:
-                  "'SF Pro Display', 'Helvetica Neue', Arial, sans-serif",
-                fontSize: "clamp(52px, 10vw, 112px)",
+                fontFamily: "'SF Pro Display', 'Helvetica Neue', Arial, sans-serif",
+                fontSize: "clamp(48px, 9vw, 104px)",
                 fontWeight: 100,
-                letterSpacing: "-0.025em",
+                letterSpacing: "-0.03em",
                 lineHeight: 1,
-                color: "#ffffff",
+                color: "#000000",
                 WebkitTextStroke: "0px transparent",
                 display: "block",
                 position: "absolute",
@@ -100,8 +98,8 @@ function ProgressLine({
       style={{
         width: "100%",
         height: "1px",
-        background: "rgba(255,255,255,0.1)",
-        marginTop: "clamp(14px, 2.5vw, 24px)",
+        background: "rgba(0,0,0,0.08)",
+        marginTop: "clamp(16px, 2.8vw, 28px)",
         position: "relative",
         overflow: "hidden",
       }}
@@ -112,13 +110,13 @@ function ProgressLine({
         transition={{
           duration: 1.05,
           ease: [0.4, 0, 0.2, 1],
-          delay: 0.05,
+          delay: 0.04,
         }}
         onAnimationComplete={active ? onComplete : undefined}
         style={{
           position: "absolute",
           inset: 0,
-          background: "rgba(255,255,255,0.85)",
+          background: "rgba(0,0,0,0.7)",
           transformOrigin: "left center",
         }}
       />
@@ -133,20 +131,14 @@ export function PageReveal({ children }: PageRevealProps) {
 
   useEffect(() => {
     if (phase === "stroke") {
-      const totalStrokeDuration = LETTERS.length * 0.11 + 0.08 + 0.12;
-      const t = setTimeout(
-        () => setPhase("fill"),
-        totalStrokeDuration * 1000
-      );
+      const totalStrokeDuration = LETTERS.length * 0.1 + 0.06 + 0.1;
+      const t = setTimeout(() => setPhase("fill"), totalStrokeDuration * 1000);
       return () => clearTimeout(t);
     }
     if (phase === "fill") {
       const totalFillDuration =
-        LETTERS.length * 0.11 + 0.05 + LETTERS.length * 0.045 + 0.22;
-      const t = setTimeout(
-        () => setPhase("progress"),
-        totalFillDuration * 1000
-      );
+        LETTERS.length * 0.1 + 0.04 + LETTERS.length * 0.04 + 0.24;
+      const t = setTimeout(() => setPhase("progress"), totalFillDuration * 1000);
       return () => clearTimeout(t);
     }
   }, [phase]);
@@ -158,6 +150,29 @@ export function PageReveal({ children }: PageRevealProps) {
   const handleSplitDone = () => {
     setPhase("done");
   };
+
+  const loaderContent = (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "0 clamp(24px, 5vw, 48px)",
+        maxWidth: "clamp(280px, 55vw, 680px)",
+        width: "100%",
+      }}
+    >
+      <WordmarkTrace
+        animPhase={
+          phase === "stroke" ? "stroke" : phase === "fill" ? "fill" : "solid"
+        }
+      />
+      <ProgressLine
+        active={phase === "progress"}
+        onComplete={handleProgressComplete}
+      />
+    </div>
+  );
 
   return (
     <>
@@ -171,7 +186,7 @@ export function PageReveal({ children }: PageRevealProps) {
               position: "fixed",
               inset: 0,
               zIndex: 999999,
-              background: "#000000",
+              background: "#ffffff",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -179,30 +194,7 @@ export function PageReveal({ children }: PageRevealProps) {
               overflow: "hidden",
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "stretch",
-                padding: "0 clamp(24px, 5vw, 48px)",
-                maxWidth: "clamp(300px, 60vw, 720px)",
-                width: "100%",
-              }}
-            >
-              <WordmarkTrace
-                animPhase={
-                  phase === "stroke"
-                    ? "stroke"
-                    : phase === "fill"
-                    ? "fill"
-                    : "solid"
-                }
-              />
-              <ProgressLine
-                active={phase === "progress"}
-                onComplete={handleProgressComplete}
-              />
-            </div>
+            {loaderContent}
           </motion.div>
         )}
       </AnimatePresence>
@@ -214,11 +206,10 @@ export function PageReveal({ children }: PageRevealProps) {
               position: "fixed",
               inset: 0,
               zIndex: 999999,
-              background: "#000000",
+              background: "#ffffff",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              flexDirection: "column",
               overflow: "hidden",
               pointerEvents: "none",
             }}
@@ -227,9 +218,9 @@ export function PageReveal({ children }: PageRevealProps) {
               style={{
                 display: "flex",
                 flexDirection: "column",
-                alignItems: "stretch",
+                alignItems: "center",
                 padding: "0 clamp(24px, 5vw, 48px)",
-                maxWidth: "clamp(300px, 60vw, 720px)",
+                maxWidth: "clamp(280px, 55vw, 680px)",
                 width: "100%",
               }}
             >
@@ -249,7 +240,7 @@ export function PageReveal({ children }: PageRevealProps) {
               left: 0,
               width: "50%",
               height: "100%",
-              background: "#000000",
+              background: "#ffffff",
               zIndex: 9999999,
             }}
           />
@@ -263,7 +254,7 @@ export function PageReveal({ children }: PageRevealProps) {
               right: 0,
               width: "50%",
               height: "100%",
-              background: "#000000",
+              background: "#ffffff",
               zIndex: 9999999,
             }}
           />
