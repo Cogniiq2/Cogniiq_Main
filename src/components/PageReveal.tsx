@@ -36,12 +36,12 @@ function WordmarkTrace({ animPhase }: { animPhase: "stroke" | "fill" | "solid" }
               transition={{ delay: strokeDelay, duration: 0.06 }}
               style={{
                 fontFamily: "'SF Pro Display', 'Helvetica Neue', Arial, sans-serif",
-                fontSize: "clamp(48px, 9vw, 104px)",
+                fontSize: "clamp(18px, 2.8vw, 32px)",
                 fontWeight: 100,
-                letterSpacing: "-0.03em",
+                letterSpacing: "0.18em",
                 lineHeight: 1,
                 color: "transparent",
-                WebkitTextStroke: "0.5px rgba(0,0,0,0.85)",
+                WebkitTextStroke: "0.4px rgba(0,0,0,0.8)",
                 display: "block",
                 position: "relative",
                 zIndex: 1,
@@ -64,9 +64,9 @@ function WordmarkTrace({ animPhase }: { animPhase: "stroke" | "fill" | "solid" }
               }}
               style={{
                 fontFamily: "'SF Pro Display', 'Helvetica Neue', Arial, sans-serif",
-                fontSize: "clamp(48px, 9vw, 104px)",
+                fontSize: "clamp(18px, 2.8vw, 32px)",
                 fontWeight: 100,
-                letterSpacing: "-0.03em",
+                letterSpacing: "0.18em",
                 lineHeight: 1,
                 color: "#000000",
                 WebkitTextStroke: "0px transparent",
@@ -137,8 +137,8 @@ export function PageReveal({ children }: PageRevealProps) {
     }
     if (phase === "fill") {
       const totalFillDuration =
-        LETTERS.length * 0.1 + 0.04 + LETTERS.length * 0.04 + 0.24;
-      const t = setTimeout(() => setPhase("progress"), totalFillDuration * 1000);
+        LETTERS.length * 0.1 + 0.04 + LETTERS.length * 0.04 + 0.32;
+      const t = setTimeout(() => setPhase("split"), totalFillDuration * 1000);
       return () => clearTimeout(t);
     }
   }, [phase]);
@@ -166,10 +166,6 @@ export function PageReveal({ children }: PageRevealProps) {
         animPhase={
           phase === "stroke" ? "stroke" : phase === "fill" ? "fill" : "solid"
         }
-      />
-      <ProgressLine
-        active={phase === "progress"}
-        onComplete={handleProgressComplete}
       />
     </div>
   );
@@ -225,7 +221,6 @@ export function PageReveal({ children }: PageRevealProps) {
               }}
             >
               <WordmarkTrace animPhase="solid" />
-              <ProgressLine active={false} onComplete={() => {}} />
             </div>
           </div>
 
