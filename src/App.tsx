@@ -76,6 +76,7 @@ import { NotFoundPage } from './pages/NotFoundPage';
 import { LogoShowcasePage } from './pages/LogoShowcasePage';
 import { BlogIndexPage } from './pages/blog/BlogIndexPage';
 import { BlogPostPage } from './pages/blog/BlogPostPage';
+import { ScanPage } from './pages/ScanPage';
 
 function App() {
   return (
@@ -163,6 +164,7 @@ function App() {
             <Route path="/logo-preview" element={<LogoShowcasePage />} />
             <Route path="/blog" element={<BlogIndexPage />} />
             <Route path="/blog/:slug" element={<BlogPostPage />} />
+            <Route path="/scan" element={<ScanPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
           <PremiumFooterReveal>
