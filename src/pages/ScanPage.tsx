@@ -369,7 +369,7 @@ export function ScanPage() {
                 {/* QR image */}
                 <div className="w-44 h-44 sm:w-48 sm:h-48 rounded-xl overflow-hidden border border-gray-100 bg-white flex items-center justify-center">
                   <img
-                    src="/qr-contact.png"
+                    src="/Lazar_Popovic.png"
                     alt="Cogniiq Kontakt QR Code"
                     className="w-full h-full object-contain p-2"
                     onError={(e) => {
