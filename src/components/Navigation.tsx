@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ArrowUpRight } from 'lucide-react';
 import { Logo } from './Logo';
 import { PremiumMobileNav } from './ui/premium-mobile-nav';
+import { ScrollProgress } from './ScrollProgress';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -169,6 +170,7 @@ export function Navigation() {
       </motion.nav>
 
       <PremiumMobileNav />
+      <ScrollProgress />
     </>
   );
 }
