@@ -11,7 +11,8 @@ import { TaskFilters } from '../components/admin/TaskFilters';
 import { QuickCreateModal } from '../components/admin/QuickCreateModal';
 import { OperatorIntelligence } from '../components/admin/OperatorIntelligence';
 import { LoadingSkeleton, EmptyState } from '../components/admin/EmptyAndLoading';
-import { ListChecks, OctagonAlert as AlertOctagon, Clock4, TrendingUp, ShieldAlert } from 'lucide-react';
+import { AdminGate } from '../components/admin/AdminGate';
+import { ListChecks, OctagonAlert as AlertOctagon, Clock4, TrendingUp } from 'lucide-react';
 
 /* ── helpers ──────────────────────────────────────────────── */
 
@@ -172,6 +173,7 @@ export function AdminPage() {
 
   /* ── render ─────────────────────────────────────────────── */
   return (
+    <AdminGate>
     <div
       className="min-h-screen text-white"
       style={{
@@ -200,14 +202,6 @@ export function AdminPage() {
             backgroundSize: '60px 60px',
           }}
         />
-      </div>
-
-      {/* Unprotected warning */}
-      <div className="relative z-10 flex items-center gap-2 px-6 py-2 bg-amber-500/[0.06] border-b border-amber-500/[0.12]">
-        <ShieldAlert size={12} className="text-amber-400/60 flex-shrink-0" />
-        <p className="text-[10px] text-amber-400/50 tracking-wide">
-          Admin route currently unprotected — add authentication before public launch.
-        </p>
       </div>
 
       {/* Header */}
@@ -431,5 +425,6 @@ export function AdminPage() {
         )}
       </AnimatePresence>
     </div>
+    </AdminGate>
   );
 }
