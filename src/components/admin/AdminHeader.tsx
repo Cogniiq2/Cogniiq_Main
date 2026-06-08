@@ -1,107 +1,109 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
-const LABELS: Record<string, string> = {
-  overview: 'Overview',
-  today: 'Today',
-  overdue: 'Overdue',
-  completed: 'Completed',
-  revenue: 'Revenue Focus',
-};
-
 interface Props {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  todayCount: number;
+  overdueCount: number;
 }
 
-export function AdminHeader({ activeTab, onTabChange }: Props) {
-  const [time, setTime] = useState(new Date());
+const TABS = [
+  { key: 'overview', label: 'Overview' },
+  { key: 'today', label: 'Today' },
+  { key: 'overdue', label: 'Overdue' },
+  { key: 'completed', label: 'Completed' },
+  { key: 'revenue', label: 'Revenue Focus' },
+];
 
+export function AdminHeader({ activeTab, onTabChange, todayCount, overdueCount }: Props) {
+  const [time, setTime] = useState(new Date());
   useEffect(() => {
     const id = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
 
-  const dateStr = time.toLocaleDateString('de-DE', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  });
-
-  const timeStr = time.toLocaleTimeString('de-DE', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  });
-
-  const tabs = ['overview', 'today', 'overdue', 'completed', 'revenue'];
+  const dateStr = time.toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+  const hh = String(time.getHours()).padStart(2, '0');
+  const mm = String(time.getMinutes()).padStart(2, '0');
+  const ss = String(time.getSeconds()).padStart(2, '0');
 
   return (
-    <header className="relative z-10 border-b border-white/[0.06] bg-black/20 backdrop-blur-xl">
-      {/* Top bar */}
-      <div className="max-w-[1600px] mx-auto px-6 lg:px-10 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        {/* Left: Identity */}
-        <div>
-          <p className="text-[10px] font-semibold tracking-[0.22em] uppercase text-[#3d9fbe]/60 mb-1.5">
-            Cogniiq Command Center
-          </p>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-none">
-            Today's Operating System
-          </h1>
-          <p className="mt-1.5 text-sm text-white/30 max-w-md leading-relaxed">
-            Real-time execution cockpit for revenue, delivery, and client protection.
-          </p>
-        </div>
+    <header className="relative z-20 border-b" style={{ borderColor: 'rgba(0,212,255,0.07)', background: 'rgba(4,8,15,0.92)', backdropFilter: 'blur(20px)' }}>
+      {/* Top scan line */}
+      <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(0,212,255,0.3) 30%, rgba(0,212,255,0.5) 50%, rgba(0,212,255,0.3) 70%, transparent 100%)' }} />
 
-        {/* Right: Clock + status */}
-        <div className="flex flex-col items-start sm:items-end gap-2">
-          {/* System online */}
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-            </span>
-            <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-emerald-400/80">
-              System Online
-            </span>
+      <div className="max-w-[1680px] mx-auto px-4 sm:px-6 lg:px-10">
+        {/* Main header row */}
+        <div className="flex items-center justify-between py-4 gap-4">
+          {/* Left: Identity */}
+          <div className="flex items-center gap-4">
+            {/* Logo mark */}
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(0,212,255,0.08)', border: '1px solid rgba(0,212,255,0.2)' }}>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <rect x="1" y="1" width="5" height="12" rx="1.5" fill="rgba(0,212,255,0.8)" />
+                <circle cx="10.5" cy="7" r="3.5" fill="none" stroke="rgba(0,212,255,0.8)" strokeWidth="1.5" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-[9px] font-bold tracking-[0.28em] uppercase" style={{ color: 'rgba(0,212,255,0.5)' }}>
+                Cogniiq Command Center
+              </p>
+              <h1 className="text-sm font-bold text-white/80 tracking-tight leading-tight">
+                Today's Operating System
+              </h1>
+            </div>
           </div>
-          {/* Date */}
-          <p className="text-xs text-white/30 tracking-wide">{dateStr}</p>
-          {/* Clock */}
-          <p className="text-xl font-mono font-semibold text-white/70 tabular-nums tracking-widest">
-            {timeStr}
-          </p>
-        </div>
-      </div>
 
-      {/* Tab navigation */}
-      <div className="max-w-[1600px] mx-auto px-6 lg:px-10">
-        <nav className="flex gap-1 overflow-x-auto pb-0 no-scrollbar">
-          {tabs.map((tab) => (
+          {/* Center: live counters */}
+          <div className="hidden md:flex items-center gap-3">
+            <StatPill label="OPEN" value={todayCount} color="#00d4ff" />
+            {overdueCount > 0 && <StatPill label="OVERDUE" value={overdueCount} color="#f59e0b" pulse />}
+          </div>
+
+          {/* Right: clock + online */}
+          <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60" style={{ background: '#10b981' }} />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5" style={{ background: '#10b981' }} />
+              </span>
+              <span className="text-[9px] font-bold tracking-[0.18em] uppercase" style={{ color: 'rgba(16,185,129,0.7)' }}>System Online</span>
+            </div>
+            <div className="font-mono text-lg font-semibold tabular-nums leading-none" style={{ color: 'rgba(255,255,255,0.6)' }}>
+              {hh}<span className="animate-pulse" style={{ color: 'rgba(0,212,255,0.6)' }}>:</span>{mm}<span className="animate-pulse" style={{ color: 'rgba(0,212,255,0.6)' }}>:</span>{ss}
+            </div>
+            <p className="text-[9px] tracking-wide" style={{ color: 'rgba(255,255,255,0.2)' }}>{dateStr}</p>
+          </div>
+        </div>
+
+        {/* Tab nav */}
+        <nav className="flex gap-0 overflow-x-auto no-scrollbar">
+          {TABS.map((tab) => (
             <button
-              key={tab}
-              onClick={() => onTabChange(tab)}
-              className={`relative px-4 py-3 text-xs font-semibold tracking-[0.12em] uppercase transition-colors duration-200 whitespace-nowrap ${
-                activeTab === tab ? 'text-white' : 'text-white/30 hover:text-white/60'
-              }`}
+              key={tab.key}
+              onClick={() => onTabChange(tab.key)}
+              className="relative px-4 py-2.5 text-[11px] font-semibold tracking-[0.1em] uppercase transition-colors duration-200 whitespace-nowrap"
+              style={{ color: activeTab === tab.key ? '#00d4ff' : 'rgba(255,255,255,0.28)' }}
             >
-              {LABELS[tab]}
-              {activeTab === tab && (
-                <motion.div
-                  layoutId="admin-tab-indicator"
-                  className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full"
-                  style={{
-                    background:
-                      'linear-gradient(90deg, #1a4a62 0%, #2e6f8f 50%, #3d9fbe 100%)',
-                  }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 32 }}
-                />
+              {tab.label}
+              {activeTab === tab.key && (
+                <motion.div layoutId="admin-tab-line" className="absolute bottom-0 left-2 right-2 h-[2px] rounded-full" style={{ background: 'linear-gradient(90deg, transparent, #00d4ff, transparent)' }} transition={{ type: 'spring', stiffness: 500, damping: 36 }} />
               )}
             </button>
           ))}
         </nav>
       </div>
     </header>
+  );
+}
+
+function StatPill({ label, value, color, pulse }: { label: string; value: number; color: string; pulse?: boolean }) {
+  return (
+    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg" style={{ background: `${color}08`, border: `1px solid ${color}18` }}>
+      {pulse && <span className="relative flex h-1.5 w-1.5 flex-shrink-0"><span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60" style={{ background: color }} /><span className="relative inline-flex rounded-full h-1.5 w-1.5" style={{ background: color }} /></span>}
+      <span className="text-[10px] font-bold tracking-[0.14em] uppercase font-mono" style={{ color: `${color}90` }}>{label}</span>
+      <span className="text-[13px] font-bold font-mono tabular-nums" style={{ color }}>{value}</span>
+    </div>
   );
 }
