@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, AlertCircle } from 'lucide-react';
+import { X, CircleAlert as AlertCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { slugify } from './types';
 
