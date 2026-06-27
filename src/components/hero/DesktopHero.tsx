@@ -136,8 +136,7 @@ export function DesktopHero() {
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.75, delay: 1.05, ease: E }}
           >
-            Cogniiq entwickelt KI-Telefonsysteme, leistungsstarke Websites und
-            Prozessautomationen — für Unternehmen, die aufgehört haben, Kunden zu verlieren.
+            Ihr KI-Telefonassistent nimmt jeden Anruf an — auch um 2 Uhr nachts, am Wochenende, bei Stoßzeiten. Kein Rückruf nötig. Kein Kunde verloren.
           </motion.p>
 
           {/* Guarantee badge */}
