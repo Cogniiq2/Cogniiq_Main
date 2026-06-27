@@ -852,10 +852,10 @@ export const BLOG_ARTICLES: BlogArticle[] = [
           "Als Faustregel gilt: 1–3 % des Jahresumsatzes für Digitalisierung. Für KMU mit 500.000 € Umsatz sind das 5.000–15.000 €/Jahr – meist deutlich weniger als die eingesparten Kosten.",
       },
       {
-        question: "Welche Tools sind für den Einstieg empfehlenswert?",
-        answer:
-          "CRM: HubSpot Free oder Pipedrive. Rechnungswesen: Lexoffice oder sevDesk. Terminbuchung: Calendly oder Bookingkit. Prozessautomatisierung: Zapier, Make oder n8n.",
-      },
+  question: "Welche Tools sind für den Einstieg empfehlenswert?",
+  answer:
+    "Für den Einstieg reichen wenige, sauber integrierte Systeme: ein CRM wie HubSpot oder Pipedrive, eine Buchhaltungslösung wie Lexoffice oder sevDesk, ein Terminbuchungssystem wie Calendly und individuelle KI-Automationen über n8n oder maßgeschneiderte Cogniiq-Workflows. Entscheidend ist nicht die Anzahl der Tools, sondern dass Prozesse messbar schneller, sauberer und profitabler werden.",
+},
       {
         question: "Gibt es staatliche Förderungen für KMU-Digitalisierung?",
         answer:
