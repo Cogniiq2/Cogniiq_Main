@@ -139,7 +139,7 @@ console.log(homepageMetadata.description);
 // For service page
 const serviceMetadata = generateServiceMetadata(
   'AI Automationen',
-  'Automatisieren Sie wiederkehrende Aufgaben mit Make.com'
+  'Automatisieren Sie wiederkehrende Aufgaben'
 );
 
 // Get geo meta tags
