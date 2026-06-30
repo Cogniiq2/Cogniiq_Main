@@ -10,7 +10,6 @@ const seoConfigPath = path.resolve(__dirname, '../src/config/seoConfig.ts');
 
 // ── Routes to generate ────────────────────────────────────────────────────────
 const ROUTES = [
-  '/',
   '/leistungen',
   '/ueber-uns',
   '/faq',
@@ -88,21 +87,16 @@ const ROUTES = [
 ];
 
 // ── Parse seoConfig.ts ────────────────────────────────────────────────────────
-// Reads the TypeScript source as text and extracts metadata per route.
-// Handles both single-quoted strings and template literals.
 function parseSeoConfig(tsSource) {
   const config = {};
 
-  // Match each top-level route block: '/some/path': { ... },
-  // We find the key, then extract the object body between balanced braces.
   const keyPattern = /\n\s+'([^']+)':\s*\{/g;
   let match;
 
   while ((match = keyPattern.exec(tsSource)) !== null) {
     const routeKey = match[1];
-    const blockStart = match.index + match[0].length - 1; // position of '{'
+    const blockStart = match.index + match[0].length - 1;
 
-    // Walk forward counting braces to find the matching '}'
     let depth = 0;
     let i = blockStart;
     while (i < tsSource.length) {
@@ -116,23 +110,18 @@ function parseSeoConfig(tsSource) {
     const blockBody = tsSource.slice(blockStart, i + 1);
 
     const extractField = (field) => {
-      // Match: field: 'value' or field: `value` or field: "value"
       const re = new RegExp(`${field}:\\s*(['"\`])([\\s\\S]*?)\\1`, 'm');
       const m = blockBody.match(re);
       if (!m) return null;
-      // Collapse template literal expressions like ${BASE}/path → the literal path part
       return m[2].replace(/\$\{[^}]+\}/g, '').trim();
     };
 
-    // For canonical we need special handling since it uses ${BASE}
     const extractCanonical = () => {
       const re = /canonical:\s*`([^`]+)`/m;
       const m = blockBody.match(re);
       if (m) {
-        // Replace ${BASE} with the actual base URL
         return m[1].replace(/\$\{BASE\}/g, 'https://cogniiq.de');
       }
-      // Fallback: single-quoted string
       const re2 = /canonical:\s*'([^']+)'/m;
       const m2 = blockBody.match(re2);
       return m2 ? m2[1] : null;
@@ -157,7 +146,6 @@ function getSEO(route) {
   const cfg = SEO_CONFIG[route];
   if (cfg && cfg.title) return cfg;
 
-  // Fallback defaults
   return {
     title: 'Cogniiq | AI Agentur & KI-Automatisierung Deutschland',
     description: 'Cogniiq ist Ihre AI Agentur für KI-Telefonassistenten, Webdesign und Prozessautomatisierung für Unternehmen in Bayern.',
@@ -167,8 +155,6 @@ function getSEO(route) {
 }
 
 // ── HTML tag replacement helpers ──────────────────────────────────────────────
-// Each replacer is safe: if the tag isn't in the HTML, the string is unchanged.
-
 function replaceTitle(html, title) {
   return html.replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(title)}</title>`);
 }
@@ -197,7 +183,6 @@ function replaceCanonical(html, canonical) {
 }
 
 function replaceHreflang(html, canonical) {
-  // Replace de-DE and x-default hreflang values
   html = html.replace(
     /(<link\s+rel="alternate"\s+hreflang="de-DE"\s+href=")[^"]*(")/gi,
     `$1${canonical}$2`
@@ -238,12 +223,10 @@ function generateHTML(route) {
   html = replaceCanonical(html, canonical);
   html = replaceHreflang(html, canonical);
 
-  // Open Graph
   html = replacePropertyMeta(html, 'og:title', seo.title);
   html = replacePropertyMeta(html, 'og:description', seo.description);
   html = replacePropertyMeta(html, 'og:url', canonical);
 
-  // Twitter
   html = replaceMeta(html, 'name', 'twitter:title', seo.title);
   html = replaceMeta(html, 'name', 'twitter:description', seo.description);
   html = replaceMeta(html, 'name', 'twitter:url', canonical);
@@ -255,15 +238,16 @@ function generateHTML(route) {
 function writeRoute(route) {
   const html = generateHTML(route);
 
-  let outputPath;
   if (route === '/') {
-    outputPath = path.join(distDir, 'index.html');
-  } else {
-    const dir = path.join(distDir, route.slice(1)); // strip leading /
-    fs.mkdirSync(dir, { recursive: true });
-    outputPath = path.join(dir, 'index.html');
+    // Skip writing public/index.html — Vite uses root index.html as its
+    // entry point. Writing here corrupts the build template.
+    // Homepage SEO is already correct in root index.html.
+    return path.join(distDir, 'index.html');
   }
 
+  const dir = path.join(distDir, route.slice(1));
+  fs.mkdirSync(dir, { recursive: true });
+  const outputPath = path.join(dir, 'index.html');
   fs.writeFileSync(outputPath, html, 'utf-8');
   return outputPath;
 }
