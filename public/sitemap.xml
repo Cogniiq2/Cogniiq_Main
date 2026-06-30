@@ -67,10 +67,26 @@
   ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/ki-telefonassistent</loc>
-    <lastmod>2026-03-14</lastmod>
+    <lastmod>2026-06-30</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.90</priority>
+    <priority>0.92</priority>
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/ki-telefonassistent"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/webdesign</loc>
+    <lastmod>2026-06-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.92</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/webdesign"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/prozessautomatisierung</loc>
+    <lastmod>2026-06-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.92</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/prozessautomatisierung"/>
   </url>
 
   <url>

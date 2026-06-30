@@ -6,6 +6,7 @@ Disallow: /_debug/
 Disallow: /preview/
 Disallow: /__/
 Disallow: /anfrage-erhalten
+Disallow: /admin
 
 User-agent: Googlebot
 Allow: /

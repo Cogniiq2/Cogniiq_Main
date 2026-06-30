@@ -183,7 +183,10 @@ export function Footer() {
                     links: [
                       { text: "Alle Leistungen", to: "/leistungen" },
                       { text: "KI-Telefonassistent", to: "/ki-telefonassistent" },
-                      { text: "Webdesign", to: "/webdesign-agentur-deutschland" },
+                      { text: "Webdesign", to: "/webdesign" },
+                      { text: "Prozessautomatisierung", to: "/prozessautomatisierung" },
+                      { text: "Webdesign Agentur DE", to: "/webdesign-agentur-deutschland" },
+                      { text: "KI Agentur DE", to: "/ki-agentur-deutschland" },
                       { text: "Automatisierung", to: "/automatisierung-unternehmen" },
                       { text: "Live-Demo", to: "/ki-telefonassistent/demo" },
                     ],

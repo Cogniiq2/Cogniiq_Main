@@ -78,6 +78,8 @@ import { BlogIndexPage } from './pages/blog/BlogIndexPage';
 import { BlogPostPage } from './pages/blog/BlogPostPage';
 import { ScanPage } from './pages/ScanPage';
 import { AdminPage } from './pages/AdminPage';
+import { WebdesignHub } from './pages/WebdesignHub';
+import { ProzessautomatisierungHub } from './pages/ProzessautomatisierungHub';
 import { useLocation } from 'react-router-dom';
 
 function AppInner() {
@@ -97,6 +99,8 @@ function AppInner() {
           <Route path="/anfrage-erhalten" element={<AnfrageErhaltenPage />} />
           <Route path="/ki-telefonassistent" element={<KiTelefonassistentPage />} />
           <Route path="/ki-telefonassistent/demo" element={<KiTelefonassistentDemoPage />} />
+          <Route path="/webdesign" element={<WebdesignHub />} />
+          <Route path="/prozessautomatisierung" element={<ProzessautomatisierungHub />} />
           <Route path="/bayern/ki-telefonassistent" element={<BayernKiTelefonassistentPage />} />
           <Route path="/bayern" element={<BayernPage />} />
           <Route path="/deutschland" element={<DeutschlandPage />} />
