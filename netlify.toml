@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "vite build && node scripts/generate-static.mjs"
   publish = "dist"
 
 [build.environment]
@@ -9,4 +9,3 @@
   from = "/*"
   to = "/index.html"
   status = "200"
-  force = false
