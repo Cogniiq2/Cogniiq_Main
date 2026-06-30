@@ -44,6 +44,12 @@ export const SEO_CONFIG: Record<string, RouteSEO> = {
     canonical: `${BASE}/ki-telefonassistent`,
     keywords: 'KI Telefonassistent, AI Rezeptionistin, KI Telefon Unternehmen, Anruf automatisieren, 24/7 Telefonie',
   },
+  '/ki-telefonassistent/demo': {
+    title: 'KI-Telefonassistent Demo | Live-Vorführung AI-Rezeptionistin – Cogniiq',
+    description: 'Testen Sie den KI-Telefonassistenten von Cogniiq live. Hören Sie, wie die AI-Rezeptionistin Anrufe annimmt, Termine bucht und Fragen beantwortet – rund um die Uhr.',
+    canonical: `${BASE}/ki-telefonassistent/demo`,
+    keywords: 'KI Telefonassistent Demo, AI Rezeptionistin testen, KI Telefon Demo, Cogniiq Demo',
+  },
   '/webdesign': {
     title: 'Webdesign Agentur – Hochkonvertierende Websites für Unternehmen | Cogniiq',
     description: 'Cogniiq entwickelt individuelle Websites, die bei Google ranken und Besucher in Anfragen verwandeln. Kein Template, kein Baukasten – sauberer Code, Core Web Vitals, Local SEO.',
