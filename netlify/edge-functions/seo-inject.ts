@@ -100,20 +100,10 @@ export default async function handler(request: Request, context: Context) {
     pathname = pathname.slice(0, -1);
   }
 
-  const acceptHeader = request.headers.get('accept') || '';
-  if (!acceptHeader.includes('text/html')) {
-    return context.next();
-  }
+  const config = seoConfig[pathname];
+  if (!config) return context.next();
 
   const response = await context.next();
-  const contentType = response.headers.get('content-type') || '';
-
-  if (!contentType.includes('text/html')) {
-    return response;
-  }
-
-  const config = seoConfig[pathname];
-  if (!config) return response;
 
   let html = await response.text();
 
