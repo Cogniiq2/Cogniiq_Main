@@ -1,11 +1,4 @@
-import { Context } from "https://edge.netlify.com";
-
 const seoConfig: Record<string, { title: string; description: string; canonical: string; keywords?: string }> = {
-  '/': {
-    title: 'Cogniiq | AI Agentur & KI-Automatisierung Deutschland',
-    description: 'Cogniiq ist Ihre AI Agentur für KI-Telefonassistenten, Webdesign und Prozessautomatisierung für Unternehmen in Bayern.',
-    canonical: 'https://cogniiq.de/',
-  },
   '/bayreuth/ki-telefonassistent': {
     title: 'KI-Telefonassistent Bayreuth | Cogniiq – 24/7 AI Rezeptionistin',
     description: 'KI-Telefonassistent für Unternehmen in Bayreuth. Cogniiq automatisiert Ihre Telefonkommunikation – für Arztpraxen, Kanzleien und KMUs. Jetzt Demo anfragen.',
@@ -90,10 +83,28 @@ const seoConfig: Record<string, { title: string; description: string; canonical:
     canonical: 'https://cogniiq.de/arztpraxen/webdesign',
     keywords: 'Webdesign Arztpraxis, Praxis Website',
   },
+  '/leistungen': {
+    title: 'Leistungen | Cogniiq – KI-Telefonassistent, Webdesign & Automatisierung',
+    description: 'Alle Leistungen von Cogniiq: KI-Telefonassistent, Premium Webdesign und Prozessautomatisierung für KMUs in Bayern und Deutschland.',
+    canonical: 'https://cogniiq.de/leistungen',
+    keywords: 'Cogniiq Leistungen, KI Agentur Bayern',
+  },
+  '/ueber-uns': {
+    title: 'Über uns | Cogniiq – Ihr KI & Webdesign Partner in Bayern',
+    description: 'Lernen Sie das Team hinter Cogniiq kennen. Wir sind eine KI-Agentur aus Bayreuth, spezialisiert auf KI-Telefonassistenten, Webdesign und Automatisierung.',
+    canonical: 'https://cogniiq.de/ueber-uns',
+    keywords: 'Cogniiq Team, KI Agentur Bayreuth',
+  },
+  '/kontakt': {
+    title: 'Kontakt | Cogniiq – Jetzt Beratungsgespräch buchen',
+    description: 'Nehmen Sie Kontakt mit Cogniiq auf. Kostenloses Erstgespräch für KI-Telefonassistent, Webdesign und Prozessautomatisierung.',
+    canonical: 'https://cogniiq.de/kontakt',
+    keywords: 'Cogniiq Kontakt, KI Beratung Bayern',
+  },
 };
 
-export default async function handler(request: Request, context: Context) {
-  const url = new URL(request.url);
+export async function onRequest(context: any) {
+  const url = new URL(context.request.url);
   let pathname = url.pathname;
 
   if (pathname !== '/' && pathname.endsWith('/')) {
@@ -101,9 +112,8 @@ export default async function handler(request: Request, context: Context) {
   }
 
   const config = seoConfig[pathname];
-  if (!config) return context.next();
-
   const response = await context.next();
+  if (!config) return response;
 
   let html = await response.text();
 
@@ -128,5 +138,3 @@ export default async function handler(request: Request, context: Context) {
     headers: response.headers,
   });
 }
-
-export const config = { path: "/*" };
