@@ -118,62 +118,19 @@ export default async function handler(request: Request, context: Context) {
   let html = await response.text();
 
   html = html.replace(/<title>[^<]*<\/title>/, `<title>${config.title}</title>`);
-
-  html = html.replace(
-    /(<meta\s+name="description"\s+content=")[^"]*(")/i,
-    `$1${config.description}$2`
-  );
-
-  html = html.replace(
-    /(<link\s+rel="canonical"\s+href=")[^"]*(")/i,
-    `$1${config.canonical}$2`
-  );
-
-  html = html.replace(
-    /(<link\s+rel="alternate"\s+hreflang="de-DE"\s+href=")[^"]*(")/gi,
-    `$1${config.canonical}$2`
-  );
-
-  html = html.replace(
-    /(<link\s+rel="alternate"\s+hreflang="x-default"\s+href=")[^"]*(")/gi,
-    `$1${config.canonical}$2`
-  );
-
-  html = html.replace(
-    /(<meta\s+property="og:url"\s+content=")[^"]*(")/i,
-    `$1${config.canonical}$2`
-  );
-
-  html = html.replace(
-    /(<meta\s+property="og:title"\s+content=")[^"]*(")/i,
-    `$1${config.title}$2`
-  );
-
-  html = html.replace(
-    /(<meta\s+property="og:description"\s+content=")[^"]*(")/i,
-    `$1${config.description}$2`
-  );
-
-  html = html.replace(
-    /(<meta\s+name="twitter:title"\s+content=")[^"]*(")/i,
-    `$1${config.title}$2`
-  );
-
-  html = html.replace(
-    /(<meta\s+name="twitter:description"\s+content=")[^"]*(")/i,
-    `$1${config.description}$2`
-  );
-
-  html = html.replace(
-    /(<meta\s+name="twitter:url"\s+content=")[^"]*(")/i,
-    `$1${config.canonical}$2`
-  );
+  html = html.replace(/(<meta\s+name="description"\s+content=")[^"]*/i, `$1${config.description}`);
+  html = html.replace(/(<link\s+rel="canonical"\s+href=")[^"]*/i, `$1${config.canonical}`);
+  html = html.replace(/(<link\s+rel="alternate"\s+hreflang="de-DE"\s+href=")[^"]*/gi, `$1${config.canonical}`);
+  html = html.replace(/(<link\s+rel="alternate"\s+hreflang="x-default"\s+href=")[^"]*/gi, `$1${config.canonical}`);
+  html = html.replace(/(<meta\s+property="og:url"\s+content=")[^"]*/i, `$1${config.canonical}`);
+  html = html.replace(/(<meta\s+property="og:title"\s+content=")[^"]*/i, `$1${config.title}`);
+  html = html.replace(/(<meta\s+property="og:description"\s+content=")[^"]*/i, `$1${config.description}`);
+  html = html.replace(/(<meta\s+name="twitter:title"\s+content=")[^"]*/i, `$1${config.title}`);
+  html = html.replace(/(<meta\s+name="twitter:description"\s+content=")[^"]*/i, `$1${config.description}`);
+  html = html.replace(/(<meta\s+name="twitter:url"\s+content=")[^"]*/i, `$1${config.canonical}`);
 
   if (config.keywords) {
-    html = html.replace(
-      /(<meta\s+name="keywords"\s+content=")[^"]*(")/i,
-      `$1${config.keywords}$2`
-    );
+    html = html.replace(/(<meta\s+name="keywords"\s+content=")[^"]*/i, `$1${config.keywords}`);
   }
 
   return new Response(html, {
