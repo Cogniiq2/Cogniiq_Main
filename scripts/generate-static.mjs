@@ -222,7 +222,7 @@ function escapeRegex(str) {
 }
 
 // ── Generate HTML for one route ───────────────────────────────────────────────
-const baseHTML = fs.readFileSync(path.join(distDir, 'index.html'), 'utf-8');
+const baseHTML = fs.readFileSync(path.resolve(__dirname, '../index.html'), 'utf-8');
 
 function generateHTML(route) {
   const seo = getSEO(route);
