@@ -4,6 +4,8 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distDir = path.resolve(__dirname, '../dist');
+console.log('DIST DIR EXISTS:', fs.existsSync(distDir));
+console.log('DIST INDEX EXISTS:', fs.existsSync(path.join(distDir, 'index.html')));
 const seoConfigPath = path.resolve(__dirname, '../src/config/seoConfig.ts');
 
 // ── Routes to generate ────────────────────────────────────────────────────────
