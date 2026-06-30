@@ -1,6 +1,15 @@
 [build]
-  command = "node scripts/generate-static.mjs && vite build"
+  command = "vite build"
   publish = "dist"
 
 [build.environment]
   NODE_VERSION = "18"
+
+[[edge_functions]]
+  function = "seo-inject"
+  path = "/*"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = "200"
