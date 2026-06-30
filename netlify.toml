@@ -1,12 +1,9 @@
 [build]
-  command = "vite build && node scripts/generate-static.mjs"
+  command = "node scripts/generate-static.mjs && vite build"
   publish = "dist"
 
 [build.environment]
   NODE_VERSION = "18"
-
-[[plugins]]
-  package = "@netlify/plugin-gatsby"
 
 [[redirects]]
   from = "/*"
