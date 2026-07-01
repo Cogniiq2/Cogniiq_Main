@@ -21,6 +21,51 @@ const fadeUp = {
   }),
 };
 
+const CITY_COORDINATES: Record<string, {
+  lat: string;
+  lng: string;
+  postalCodes: string[];
+}> = {
+  bayreuth: {
+    lat: "49.9483",
+    lng: "11.5783",
+    postalCodes: ["95444", "95445", "95447", "95448"],
+  },
+  muenchen: {
+    lat: "48.1372",
+    lng: "11.5761",
+    postalCodes: ["80331", "80333", "80335", "80336", "80337"],
+  },
+  regensburg: {
+    lat: "49.0134",
+    lng: "12.1016",
+    postalCodes: ["93047", "93049", "93051", "93053", "93055"],
+  },
+};
+
+function renderWithLinks(text: string) {
+  const parts = text.split(/(\[[^\]]+\]\([^)]+\))/g);
+  return (
+    <>
+      {parts.map((part, i) => {
+        const match = part.match(/\[([^\]]+)\]\(([^)]+)\)/);
+        if (match) {
+          return (
+            <Link
+              key={i}
+              to={match[2]}
+              className="text-gray-800 dark:text-gray-200 underline underline-offset-2 decoration-gray-300 dark:decoration-gray-600 hover:decoration-gray-500 transition-colors"
+            >
+              {match[1]}
+            </Link>
+          );
+        }
+        return <span key={i}>{part}</span>;
+      })}
+    </>
+  );
+}
+
 interface CityServicePageProps {
   config: CityServiceConfig;
 }
@@ -32,6 +77,8 @@ export function CityServicePage({ config }: CityServicePageProps) {
     { name: config.city, url: `${BUSINESS_INFO.website}/${config.citySlug}` },
     { name: config.service, url: `${BUSINESS_INFO.website}${config.route}` },
   ];
+
+  const coords = CITY_COORDINATES[config.citySlug] ?? CITY_COORDINATES.bayreuth;
 
   const localBusinessSchema = {
     "@context": "https://schema.org",
@@ -50,9 +97,25 @@ export function CityServicePage({ config }: CityServicePageProps) {
           "postalCode": BUSINESS_INFO.address.postalCode,
           "addressCountry": BUSINESS_INFO.address.addressCountry,
         },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": coords.lat,
+          "longitude": coords.lng,
+        },
+        "hasMap": `https://www.google.com/maps/search/${encodeURIComponent(config.city)}+${encodeURIComponent(config.service)}`,
         "areaServed": [
-          { "@type": "City", "name": config.city },
-          { "@type": "State", "name": "Bayern" },
+          {
+            "@type": "City",
+            "name": config.city,
+            "@id": `https://www.wikidata.org/wiki/${
+              config.citySlug === "muenchen" ? "Q1726" :
+              config.citySlug === "regensburg" ? "Q2749" : "Q3506"
+            }`,
+          },
+          {
+            "@type": "State",
+            "name": "Bayern",
+          },
         ],
       },
       {
@@ -220,7 +283,7 @@ function LocalIntroSection({ config }: { config: CityServiceConfig }) {
           <div className="space-y-5">
             {config.localIntro.paragraphs.map((paragraph, i) => (
               <p key={i} className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                {paragraph}
+                {renderWithLinks(paragraph)}
               </p>
             ))}
           </div>

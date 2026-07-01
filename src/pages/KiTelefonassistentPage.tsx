@@ -186,6 +186,48 @@ export function KiTelefonassistentPage() {
           acceptedAnswer: { "@type": "Answer", text: f.answer },
         })),
       },
+      {
+        "@type": "HowTo",
+        "name": "KI-Telefonassistent einrichten – in 4 Schritten",
+        "description": "So wird der KI-Telefonassistent von Cogniiq für Ihr Unternehmen eingerichtet – von der Analyse bis zum Live-Betrieb.",
+        "totalTime": "P14D",
+        "estimatedCost": {
+          "@type": "MonetaryAmount",
+          "currency": "EUR",
+          "value": "0",
+          "minValue": "0",
+        },
+        "step": [
+          {
+            "@type": "HowToStep",
+            "position": 1,
+            "name": "Analyse",
+            "text": "Wir verstehen Ihre Branche, häufigsten Anrufthemen und bestehenden Systeme.",
+            "url": "https://cogniiq.de/ki-telefonassistent#einrichtung",
+          },
+          {
+            "@type": "HowToStep",
+            "position": 2,
+            "name": "Konfiguration",
+            "text": "Der Assistent wird auf Ihre Sprache, Prozesse und Weiterleitungsregeln eingestellt.",
+            "url": "https://cogniiq.de/ki-telefonassistent#einrichtung",
+          },
+          {
+            "@type": "HowToStep",
+            "position": 3,
+            "name": "Integration",
+            "text": "Anbindung an Kalender, CRM oder Ihre bestehende Rufnummer – ohne IT-Aufwand.",
+            "url": "https://cogniiq.de/ki-telefonassistent#einrichtung",
+          },
+          {
+            "@type": "HowToStep",
+            "position": 4,
+            "name": "Live-Betrieb",
+            "text": "Der Assistent übernimmt Anrufe. Bei Bedarf passen wir ihn laufend an.",
+            "url": "https://cogniiq.de/ki-telefonassistent#einrichtung",
+          },
+        ],
+      },
     ],
   };
 
@@ -944,7 +986,7 @@ function SetupSection() {
   ];
 
   return (
-    <section className="py-20 bg-gray-50 dark:bg-gray-900/40 border-y border-gray-100 dark:border-gray-800">
+    <section id="einrichtung" className="py-20 bg-gray-50 dark:bg-gray-900/40 border-y border-gray-100 dark:border-gray-800">
       <div className="max-w-6xl mx-auto px-6 lg:px-8">
         <div className="grid lg:grid-cols-[1fr_1fr] gap-16 items-center">
           <motion.div
