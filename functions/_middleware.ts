@@ -459,11 +459,26 @@ export async function onRequest(context: any) {
     },
   };
 
-  const config = seoConfig[pathname];
-  const response = await context.next();
-  if (!config) return response;
+ const config = seoConfig[pathname];
+  let response = await context.next();
+
+  // Handle SPA routing — serve index.html for 404s
+  if (response.status === 404) {
+    const indexRequest = new Request(
+      new URL('/index.html', context.request.url).toString(),
+      context.request
+    );
+    response = await context.env.ASSETS.fetch(indexRequest);
+  }
 
   let html = await response.text();
+
+  if (!config) {
+    return new Response(html, {
+      status: 200,
+      headers: response.headers,
+    });
+  }
 
   html = html.replace(/<title>[^<]*<\/title>/, `<title>${config.title}</title>`);
   html = html.replace(/(<meta\s+name="description"\s+content=")[^"]*/i, `$1${config.description}`);
@@ -482,7 +497,7 @@ export async function onRequest(context: any) {
   }
 
   return new Response(html, {
-    status: response.status,
+    status: 200,
     headers: response.headers,
   });
 }
