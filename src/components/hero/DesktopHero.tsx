@@ -1,8 +1,22 @@
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, PhoneCall, Globe, Zap, CircleCheck as CheckCircle, Star, ShieldCheck, Clock } from 'lucide-react';
-import { SplineScene } from '../ui/splite';
+import {
+  ArrowRight,
+  PhoneCall,
+  Globe,
+  Zap,
+  CircleCheck as CheckCircle,
+  Star,
+  ShieldCheck,
+  Clock,
+} from 'lucide-react';
+
+const LazySplineScene = lazy(() =>
+  import('../ui/splite').then((module) => ({
+    default: module.SplineScene,
+  }))
+);
 
 const E: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -12,7 +26,7 @@ const AVATAR_COLORS = ['#0ea5e9', '#22c55e', '#f59e0b', '#ef4444', '#64748b'];
 function Particles() {
   const pts = useMemo(
     () =>
-      Array.from({ length: 22 }, (_, i) => ({
+      Array.from({ length: 12 }, (_, i) => ({
         id: i,
         x: Math.random() * 100,
         y: Math.random() * 100,
@@ -22,8 +36,9 @@ function Particles() {
       })),
     []
   );
+
   return (
-    <div className="absolute inset-0 pointer-events-none">
+    <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
       {pts.map((p) => (
         <motion.div
           key={p.id}
@@ -34,6 +49,42 @@ function Particles() {
         />
       ))}
     </div>
+  );
+}
+
+function SplineFallback() {
+  return (
+    <div
+      className="w-full h-full rounded-[2rem] bg-gradient-to-br from-sky-50 via-white to-emerald-50 border border-gray-100"
+      aria-hidden="true"
+    />
+  );
+}
+
+function DeferredSplineScene() {
+  const [shouldLoad, setShouldLoad] = useState(false);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setShouldLoad(true);
+    }, 1800);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, []);
+
+  if (!shouldLoad) {
+    return <SplineFallback />;
+  }
+
+  return (
+    <Suspense fallback={<SplineFallback />}>
+      <LazySplineScene
+        scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+        className="w-full h-full"
+      />
+    </Suspense>
   );
 }
 
@@ -62,18 +113,22 @@ export function DesktopHero() {
     >
       <div
         className="absolute inset-0 pointer-events-none"
+        aria-hidden="true"
         style={{
           background:
             'radial-gradient(ellipse 65% 75% at 72% 50%, rgba(2,132,199,0.05) 0%, transparent 65%), radial-gradient(ellipse 45% 45% at 8% 15%, rgba(16,185,129,0.03) 0%, transparent 55%)',
         }}
       />
+
       <div
         className="absolute top-0 left-0 right-0 h-px"
+        aria-hidden="true"
         style={{ background: 'linear-gradient(90deg, transparent, rgba(2,132,199,0.15), transparent)' }}
       />
 
       <motion.div
         className="absolute left-0 right-0 h-px z-30 pointer-events-none"
+        aria-hidden="true"
         style={{
           background:
             'linear-gradient(90deg, transparent 5%, rgba(3,105,161,0.12) 30%, rgba(2,132,199,0.22) 50%, rgba(3,105,161,0.12) 70%, transparent 95%)',
@@ -86,11 +141,7 @@ export function DesktopHero() {
       <Particles />
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-8 lg:px-12 flex items-center gap-4 pt-20">
-
-        {/* ─── LEFT: Copy ─── */}
         <div className="flex-1 max-w-[580px]">
-
-          {/* Eyebrow */}
           <motion.div
             className="flex items-center gap-2 mb-8"
             initial={{ opacity: 0, y: 8 }}
@@ -100,6 +151,7 @@ export function DesktopHero() {
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-50 border border-gray-100">
               <motion.div
                 className="w-1.5 h-1.5 rounded-full bg-emerald-500"
+                aria-hidden="true"
                 animate={{ opacity: [1, 0.4, 1], scale: [1, 1.2, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               />
@@ -109,7 +161,6 @@ export function DesktopHero() {
             </div>
           </motion.div>
 
-          {/* Main headline */}
           <h1 className="mb-6">
             {[
               { text: 'Kein Anruf', color: 'text-gray-950', delay: 0.55 },
@@ -129,17 +180,16 @@ export function DesktopHero() {
             ))}
           </h1>
 
-          {/* Sub copy */}
           <motion.p
             className="text-[16px] text-gray-500 leading-[1.78] max-w-[430px] mb-8"
             initial={{ opacity: 0, y: 12 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.75, delay: 1.05, ease: E }}
           >
-            Ihr KI-Telefonassistent nimmt jeden Anruf an — auch um 2 Uhr nachts, am Wochenende, bei Stoßzeiten. Kein Rückruf nötig. Kein Kunde verloren.
+            Ihr KI-Telefonassistent nimmt jeden Anruf an — auch um 2 Uhr nachts, am Wochenende, bei Stoßzeiten.
+            Kein Rückruf nötig. Kein Kunde verloren.
           </motion.p>
 
-          {/* Guarantee badge */}
           <motion.div
             className="inline-flex items-center gap-2.5 mb-8 px-4 py-2.5 bg-white border rounded-xl"
             style={{
@@ -150,13 +200,12 @@ export function DesktopHero() {
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 1.18, ease: E }}
           >
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" aria-hidden="true" />
             <span className="text-[12px] font-semibold text-gray-700">
               Go-Live in 14 Tagen — oder volle Rückerstattung
             </span>
           </motion.div>
 
-          {/* Service pills */}
           <motion.div
             className="flex items-center gap-2 mb-10"
             initial={{ opacity: 0 }}
@@ -172,7 +221,7 @@ export function DesktopHero() {
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.4, delay: 1.32 + i * 0.08, ease: E }}
               >
-                <Icon className="w-3 h-3 text-sky-500 group-hover:text-sky-600 transition-colors" />
+                <Icon className="w-3 h-3 text-sky-500 group-hover:text-sky-600 transition-colors" aria-hidden="true" />
                 <span className="text-[11.5px] font-medium text-gray-600 group-hover:text-gray-900 transition-colors whitespace-nowrap">
                   {label}
                 </span>
@@ -180,7 +229,6 @@ export function DesktopHero() {
             ))}
           </motion.div>
 
-          {/* Primary CTA block */}
           <motion.div
             className="flex flex-col gap-4"
             initial={{ opacity: 0, y: 10 }}
@@ -189,39 +237,47 @@ export function DesktopHero() {
           >
             <div className="flex items-center gap-3">
               <motion.button
+                type="button"
                 onClick={() => navigate('/kontakt')}
                 className="group relative flex items-center gap-3 px-7 py-3.5 bg-gray-950 text-white text-[13.5px] font-semibold overflow-hidden"
                 style={{ borderRadius: '4px' }}
                 whileHover={{ scale: 1.015 }}
                 whileTap={{ scale: 0.975 }}
+                aria-label="Kostenloses Erstgespräch sichern"
               >
                 <motion.div
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  aria-hidden="true"
                   style={{ background: 'linear-gradient(120deg, rgba(2,132,199,0.2) 0%, transparent 60%)' }}
                 />
                 <span className="relative whitespace-nowrap">Kostenloses Erstgespräch sichern</span>
                 <motion.div
                   className="relative"
+                  aria-hidden="true"
                   animate={{ x: [0, 4, 0] }}
                   transition={{ duration: 2.5, repeat: Infinity, delay: 3, ease: 'easeInOut' }}
                 >
                   <ArrowRight className="w-3.5 h-3.5 text-white/70 group-hover:text-white transition-colors" />
                 </motion.div>
-                <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-sky-500/40 via-sky-500/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div
+                  className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-sky-500/40 via-sky-500/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                  aria-hidden="true"
+                />
               </motion.button>
 
               <button
+                type="button"
                 onClick={() => navigate('/ki-telefonassistent')}
                 className="group flex items-center gap-1.5 text-[12.5px] font-medium text-gray-400 hover:text-gray-800 transition-colors"
+                aria-label="Demo des KI-Telefonassistenten anhören"
               >
                 Demo anhören
-                <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-gray-600 transition-colors" />
+                <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-gray-600 transition-colors" aria-hidden="true" />
               </button>
             </div>
 
-            {/* Social proof */}
             <div className="flex items-center gap-3">
-              <div className="flex -space-x-1.5">
+              <div className="flex -space-x-1.5" aria-hidden="true">
                 {AVATAR_COLORS.map((c, i) => (
                   <div
                     key={i}
@@ -232,17 +288,18 @@ export function DesktopHero() {
                   </div>
                 ))}
               </div>
-              <div className="flex items-center gap-0.5">
+
+              <div className="flex items-center gap-0.5" aria-label="5 Sterne Bewertung">
                 {[1, 2, 3, 4, 5].map((s) => (
-                  <Star key={s} size={9} className="text-amber-400 fill-amber-400" />
+                  <Star key={s} size={9} className="text-amber-400 fill-amber-400" aria-hidden="true" />
                 ))}
               </div>
+
               <span className="text-[11px] text-gray-400">
                 <span className="font-semibold text-gray-600">40+</span> Unternehmen vertrauen Cogniiq
               </span>
             </div>
 
-            {/* Micro trust */}
             <div className="flex items-center gap-4 pt-0.5">
               {[
                 { icon: ShieldCheck, text: 'DSGVO-konform' },
@@ -250,14 +307,13 @@ export function DesktopHero() {
                 { icon: CheckCircle, text: 'Deutsche Server' },
               ].map(({ icon: Icon, text }) => (
                 <div key={text} className="flex items-center gap-1.5">
-                  <Icon size={10} className="text-emerald-500 flex-shrink-0" />
+                  <Icon size={10} className="text-emerald-500 flex-shrink-0" aria-hidden="true" />
                   <span className="text-[11px] text-gray-400">{text}</span>
                 </div>
               ))}
             </div>
           </motion.div>
 
-          {/* Stats row */}
           <motion.div
             className="mt-10 pt-8 border-t border-gray-100 grid grid-cols-3 gap-6"
             initial={{ opacity: 0 }}
@@ -282,27 +338,26 @@ export function DesktopHero() {
           </motion.div>
         </div>
 
-        {/* ─── RIGHT: 3D Scene ─── */}
         <motion.div
           className="flex-1 h-[600px] lg:h-[700px] xl:h-[800px] relative"
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
           transition={{ duration: 1.6, delay: 0.4 }}
+          aria-hidden="true"
         >
-          <SplineScene
-            scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-            className="w-full h-full"
-          />
+          <DeferredSplineScene />
         </motion.div>
       </div>
 
       <div
         className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+        aria-hidden="true"
         style={{ background: 'linear-gradient(to bottom, transparent, white)' }}
       />
 
       <motion.div
         className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 z-10"
+        aria-hidden="true"
         initial={{ opacity: 0 }}
         animate={inView ? { opacity: 1 } : {}}
         transition={{ delay: 3.2, duration: 1 }}
