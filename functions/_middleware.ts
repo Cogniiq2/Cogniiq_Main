@@ -2,6 +2,23 @@ export async function onRequest(context: any) {
   const url = new URL(context.request.url);
   let pathname = url.pathname;
 
+  // ============================================================
+  // CRITICAL GUARD: never process file/asset requests.
+  //
+  // Any path with a file extension (.js, .css, .png, .xml, ...)
+  // or under /assets/ is passed through UNTOUCHED:
+  //  - reading them via response.text() corrupts binary files
+  //  - converting their 404s into index.html-with-200 poisons
+  //    browser/edge caches and breaks ES module loading
+  //    ("Expected JavaScript but got text/plain" white pages)
+  //  - a missing hashed chunk MUST return a real 404 so the
+  //    client-side vite:preloadError handler can recover
+  // ============================================================
+  const isFileRequest = /\.[a-zA-Z0-9]+$/.test(pathname);
+  if (isFileRequest || pathname.startsWith('/assets/')) {
+    return context.next();
+  }
+
   if (pathname !== '/' && pathname.endsWith('/')) {
     pathname = pathname.slice(0, -1);
   }
@@ -459,10 +476,11 @@ export async function onRequest(context: any) {
     },
   };
 
- const config = seoConfig[pathname];
+  const config = seoConfig[pathname];
   let response = await context.next();
 
-  // Handle SPA routing — serve index.html for 404s
+  // SPA fallback: ONLY for extension-less route paths (real pages).
+  // Asset 404s never reach this point — they returned real 404s above.
   if (response.status === 404) {
     const indexRequest = new Request(
       new URL('/index.html', context.request.url).toString(),
@@ -473,10 +491,23 @@ export async function onRequest(context: any) {
 
   let html = await response.text();
 
+  // ============================================================
+  // Cache semantics for HTML (the pointer to hashed assets):
+  //  - HTML must ALWAYS revalidate, otherwise stale HTML keeps
+  //    referencing chunk hashes deleted by newer deployments
+  //    -> white pages after every deploy.
+  //  - Hashed assets under /assets/ keep Cloudflare Pages'
+  //    default immutable long-term caching (handled above by
+  //    passing them through untouched).
+  // ============================================================
+  const headers = new Headers(response.headers);
+  headers.set('Content-Type', 'text/html; charset=utf-8');
+  headers.set('Cache-Control', 'no-cache');
+
   if (!config) {
     return new Response(html, {
       status: 200,
-      headers: response.headers,
+      headers,
     });
   }
 
@@ -498,6 +529,6 @@ export async function onRequest(context: any) {
 
   return new Response(html, {
     status: 200,
-    headers: response.headers,
+    headers,
   });
 }
