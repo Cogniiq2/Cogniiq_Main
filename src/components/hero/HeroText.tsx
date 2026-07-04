@@ -34,17 +34,9 @@ export function HeroText() {
             animate={{ y: 0 }}
             transition={{ duration: 1, delay: 0.4, ease: EASE_OUT }}
           >
-            {line1.split('').map((char, i) => (
-              <motion.span
-                key={i}
-                className="inline-block bg-clip-text text-transparent bg-gradient-to-b from-gray-900 via-gray-800 to-gray-600"
-                initial={{ opacity: 0, filter: 'blur(8px)' }}
-                animate={{ opacity: 1, filter: 'blur(0px)' }}
-                transition={{ duration: 0.6, delay: 0.6 + i * 0.04, ease: EASE_OUT }}
-              >
-                {char}
-              </motion.span>
-            ))}
+           <span className="inline-block bg-clip-text text-transparent bg-gradient-to-b from-gray-900 via-gray-800 to-gray-600">
+  {line1}
+</span>
           </motion.span>
         </span>
 
