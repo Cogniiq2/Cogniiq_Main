@@ -3,10 +3,20 @@ import { lazy, Suspense } from 'react';
 import { HeroSection } from '@/components/HeroSection';
 import { TrustStrip } from '@/components/TrustStrip';
 import { StatsSection } from '@/components/StatsSection';
-import { ROICalculator } from '@/components/ROICalculator';
-import { CostComparisonSection } from '@/components/CostComparisonSection';
 import { PageSEO } from '@/components/PageSEO';
 import { PAGE_META, BUSINESS_INFO } from '@/lib/seo-data';
+
+const ROICalculator = lazy(() =>
+  import('@/components/ROICalculator').then((module) => ({
+    default: module.ROICalculator,
+  }))
+);
+
+const CostComparisonSection = lazy(() =>
+  import('@/components/CostComparisonSection').then((module) => ({
+    default: module.CostComparisonSection,
+  }))
+);
 
 const SolutionShowcase = lazy(() =>
   import('@/components/SolutionShowcase').then((module) => ({
@@ -97,10 +107,10 @@ export function HomePage() {
       <HeroSection />
       <TrustStrip />
       <StatsSection />
-      <ROICalculator />
-      <CostComparisonSection />
 
       <Suspense fallback={<SectionFallback />}>
+        <ROICalculator />
+        <CostComparisonSection />
         <SolutionShowcase />
         <ProblemSection />
         <ServicesSection />
