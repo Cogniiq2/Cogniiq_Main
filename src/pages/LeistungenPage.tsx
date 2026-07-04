@@ -430,16 +430,13 @@ export function LeistungenPage() {
               <span className="text-gray-500 dark:text-gray-400">Leistungen</span>
             </motion.nav>
 
-            <motion.h1
+            <h1
               className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-gray-100 tracking-tight leading-[1.05] mb-7"
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             >
               Digitale Systeme,<br />
               die Umsatz erzeugen<br />
               und Arbeit eliminieren.
-            </motion.h1>
+            </h1>
 
             <motion.p
               className="text-lg text-gray-500 dark:text-gray-400 leading-relaxed font-light max-w-[560px] mb-8"
