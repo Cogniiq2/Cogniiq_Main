@@ -101,17 +101,8 @@ function HorizonLine({ delay }: { delay: number }) {
 }
 
 
-function TickerWord({ text, delay }: { text: string; delay: number }) {
-  return (
-    <motion.span
-      className="inline-block"
-      initial={{ opacity: 0, y: 12, filter: 'blur(4px)' }}
-      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      transition={{ duration: 0.55, delay, ease: EASE_OUT }}
-    >
-      {text}
-    </motion.span>
-  );
+function TickerWord({ text }: { text: string; delay?: number }) {
+  return <span className="inline-block">{text}</span>;
 }
 
 function MetricCard({
