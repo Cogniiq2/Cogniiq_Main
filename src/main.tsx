@@ -4,7 +4,15 @@ import App from './App.tsx';
 import './index.css';
 import { ThemeProvider } from './components/theme-provider';
 
-const rootElement = document.getElementById('root')!;
+window.addEventListener('vite:preloadError', () => {
+  window.location.reload();
+});
+
+const rootElement = document.getElementById('root');
+
+if (!rootElement) {
+  throw new Error('Root element #root not found');
+}
 
 const app = (
   <StrictMode>
