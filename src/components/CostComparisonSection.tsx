@@ -152,29 +152,25 @@ export function CostComparisonSection() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
 
         {/* ─── Header ─── */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.65, ease: EASE }}
-          className="max-w-2xl mb-14"
-        >
-          <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-gray-400 mb-5">
-            Direktvergleich
-          </p>
-          <h2
-            id="cost-compare-heading"
-            className="text-4xl lg:text-5xl font-bold text-gray-900 leading-[1.06] tracking-[-0.022em] mb-5"
-          >
-            Menschlicher Assistent
-            <br />
-            <span className="text-gray-200">vs. KI-Telefonassistent</span>
-          </h2>
-          <p className="text-[15.5px] text-gray-500 leading-[1.72]">
-            Stellen Sie Ihre Personalkosten ein — und sehen Sie sofort, was der Unterschied
-            für Ihr Unternehmen bedeutet. Die Zahlen sind Ihre, nicht unsere.
-          </p>
-        </motion.div>
+<div className="max-w-2xl mb-14">
+  <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-gray-400 mb-5">
+    Direktvergleich
+  </p>
 
+  <h2
+    id="cost-compare-heading"
+    className="text-4xl lg:text-5xl font-bold text-gray-900 leading-[1.06] tracking-[-0.022em] mb-5"
+  >
+    Menschlicher Assistent
+    <br />
+    <span className="text-gray-200">vs. KI-Telefonassistent</span>
+  </h2>
+
+  <p className="text-[15.5px] text-gray-500 leading-[1.72]">
+    Stellen Sie Ihre Personalkosten ein — und sehen Sie sofort, was der Unterschied
+    für Ihr Unternehmen bedeutet. Die Zahlen sind Ihre, nicht unsere.
+  </p>
+</div>
         {/* ─── Industry selector ─── */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
