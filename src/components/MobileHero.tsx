@@ -400,26 +400,24 @@ export function MobileHero() {
             }}
           >
             {headline1.split(' ').map((w, i) => (
-              <TickerWord key={`h1-${i}`} text={w + (i < headline1.split(' ').length - 1 ? '\u00A0' : '')} delay={1.1 + i * 0.1} />
-            ))}
-            <br />
-            {headline2.split(' ').map((w, i) => (
-              <TickerWord key={`h2-${i}`} text={w + (i < headline2.split(' ').length - 1 ? '\u00A0' : '')} delay={1.4 + i * 0.1} />
-            ))}
-            <br />
-            <span style={{ color: '#2e6f8f' }}>
-              {headline3.split('').map((c, i) => (
-                <motion.span
-                  key={`h3-${i}`}
-                  className="inline-block"
-                  initial={{ opacity: 0, y: 10, filter: 'blur(3px)' }}
-                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                  transition={{ duration: 0.45, delay: 1.7 + i * 0.04, ease: EASE_OUT }}
-                >
-                  {c}
-                </motion.span>
-              ))}
-            </span>
+  <TickerWord
+    key={`h1-${i}`}
+    text={w + (i < headline1.split(' ').length - 1 ? '\u00A0' : '')}
+  />
+))}
+<br />
+
+{headline2.split(' ').map((w, i) => (
+  <TickerWord
+    key={`h2-${i}`}
+    text={w + (i < headline2.split(' ').length - 1 ? '\u00A0' : '')}
+  />
+))}
+<br />
+
+<span style={{ color: '#2e6f8f' }}>
+  {headline3}
+</span>
           </h1>
         </div>
 
