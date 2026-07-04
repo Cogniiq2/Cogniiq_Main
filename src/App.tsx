@@ -287,114 +287,116 @@ function AppInner() {
   return (
     <PageReveal>
       <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-        <Navigation />
+       <Navigation />
 
-        <Suspense fallback={<PageFallback />}>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/leistungen" element={<LeistungenPage />} />
-            <Route path="/ueber-uns" element={<UeberUnsPage />} />
-            <Route path="/faq" element={<FAQPage />} />
-            <Route path="/kontakt" element={<KontaktPage />} />
-            <Route path="/anfrage-erhalten" element={<AnfrageErhaltenPage />} />
+<main id="main-content">
+  <Suspense fallback={<PageFallback />}>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/leistungen" element={<LeistungenPage />} />
+      <Route path="/ueber-uns" element={<UeberUnsPage />} />
+      <Route path="/faq" element={<FAQPage />} />
+      <Route path="/kontakt" element={<KontaktPage />} />
+      <Route path="/anfrage-erhalten" element={<AnfrageErhaltenPage />} />
 
-            <Route path="/ki-telefonassistent" element={<KiTelefonassistentPage />} />
-            <Route path="/ki-telefonassistent/demo" element={<KiTelefonassistentDemoPage />} />
-            <Route path="/bayern/ki-telefonassistent" element={<BayernKiTelefonassistentPage />} />
+      <Route path="/ki-telefonassistent" element={<KiTelefonassistentPage />} />
+      <Route path="/ki-telefonassistent/demo" element={<KiTelefonassistentDemoPage />} />
+      <Route path="/bayern/ki-telefonassistent" element={<BayernKiTelefonassistentPage />} />
 
-            <Route path="/webdesign" element={<WebdesignHub />} />
-            <Route path="/prozessautomatisierung" element={<ProzessautomatisierungHub />} />
+      <Route path="/webdesign" element={<WebdesignHub />} />
+      <Route path="/prozessautomatisierung" element={<ProzessautomatisierungHub />} />
 
-            <Route path="/bayern" element={<BayernPage />} />
-            <Route path="/deutschland" element={<DeutschlandPage />} />
-            <Route path="/bayreuth" element={<CityLandingPage citySlug="bayreuth" />} />
-            <Route path="/muenchen" element={<CityLandingPage citySlug="muenchen" />} />
-            <Route path="/regensburg" element={<CityLandingPage citySlug="regensburg" />} />
+      <Route path="/bayern" element={<BayernPage />} />
+      <Route path="/deutschland" element={<DeutschlandPage />} />
+      <Route path="/bayreuth" element={<CityLandingPage citySlug="bayreuth" />} />
+      <Route path="/muenchen" element={<CityLandingPage citySlug="muenchen" />} />
+      <Route path="/regensburg" element={<CityLandingPage citySlug="regensburg" />} />
 
-            <Route path="/bayreuth/webdesign" element={<WebdesignBayreuth />} />
-            <Route path="/regensburg/webdesign" element={<WebdesignRegensburg />} />
-            <Route path="/muenchen/webdesign" element={<WebdesignMuenchen />} />
+      <Route path="/bayreuth/webdesign" element={<WebdesignBayreuth />} />
+      <Route path="/regensburg/webdesign" element={<WebdesignRegensburg />} />
+      <Route path="/muenchen/webdesign" element={<WebdesignMuenchen />} />
 
-            <Route path="/referenzen" element={<ReferenzenPage />} />
-            <Route path="/bewertungen" element={<BewertungenPage />} />
+      <Route path="/referenzen" element={<ReferenzenPage />} />
+      <Route path="/bewertungen" element={<BewertungenPage />} />
 
-            <Route path="/bayreuth/webdesign-kosten" element={<WebdesignKostenBayreuth />} />
-            <Route path="/bayreuth/website-erstellen" element={<WebsiteErstellenBayreuth />} />
-            <Route path="/bayreuth/landingpage" element={<LandingpageBayreuth />} />
-            <Route path="/bayreuth/website-relaunch" element={<WebsiteRelaunchBayreuth />} />
-            <Route path="/bayreuth/lokales-seo" element={<LokalesSEOBayreuth />} />
+      <Route path="/bayreuth/webdesign-kosten" element={<WebdesignKostenBayreuth />} />
+      <Route path="/bayreuth/website-erstellen" element={<WebsiteErstellenBayreuth />} />
+      <Route path="/bayreuth/landingpage" element={<LandingpageBayreuth />} />
+      <Route path="/bayreuth/website-relaunch" element={<WebsiteRelaunchBayreuth />} />
+      <Route path="/bayreuth/lokales-seo" element={<LokalesSEOBayreuth />} />
 
-            <Route path="/regensburg/webdesign-kosten" element={<WebdesignKostenRegensburg />} />
-            <Route path="/regensburg/website-erstellen" element={<WebsiteErstellenRegensburg />} />
-            <Route path="/regensburg/landingpage" element={<LandingpageRegensburg />} />
-            <Route path="/regensburg/website-relaunch" element={<WebsiteRelaunchRegensburg />} />
-            <Route path="/regensburg/lokales-seo" element={<LokalesSEORegensburg />} />
+      <Route path="/regensburg/webdesign-kosten" element={<WebdesignKostenRegensburg />} />
+      <Route path="/regensburg/website-erstellen" element={<WebsiteErstellenRegensburg />} />
+      <Route path="/regensburg/landingpage" element={<LandingpageRegensburg />} />
+      <Route path="/regensburg/website-relaunch" element={<WebsiteRelaunchRegensburg />} />
+      <Route path="/regensburg/lokales-seo" element={<LokalesSEORegensburg />} />
 
-            <Route path="/muenchen/webdesign-kosten" element={<WebdesignKostenMuenchen />} />
-            <Route path="/muenchen/website-erstellen" element={<WebsiteErstellenMuenchen />} />
-            <Route path="/muenchen/landingpage" element={<LandingpageMuenchen />} />
-            <Route path="/muenchen/website-relaunch" element={<WebsiteRelaunchMuenchen />} />
-            <Route path="/muenchen/lokales-seo" element={<LokalesSEOMuenchen />} />
+      <Route path="/muenchen/webdesign-kosten" element={<WebdesignKostenMuenchen />} />
+      <Route path="/muenchen/website-erstellen" element={<WebsiteErstellenMuenchen />} />
+      <Route path="/muenchen/landingpage" element={<LandingpageMuenchen />} />
+      <Route path="/muenchen/website-relaunch" element={<WebsiteRelaunchMuenchen />} />
+      <Route path="/muenchen/lokales-seo" element={<LokalesSEOMuenchen />} />
 
-            <Route path="/webdesign-arzt-bayreuth" element={<WebdesignArztBayreuth />} />
-            <Route path="/webdesign-gastronomie-bayreuth" element={<WebdesignGastronomieBayreuth />} />
-            <Route path="/webdesign-immobilien-bayreuth" element={<WebdesignImmobilienBayreuth />} />
-            <Route path="/webdesign-arzt-muenchen" element={<WebdesignArztMuenchen />} />
-            <Route path="/webdesign-gastronomie-muenchen" element={<WebdesignGastronomieMuenchen />} />
-            <Route path="/webdesign-immobilien-muenchen" element={<WebdesignImmobilienMuenchen />} />
-            <Route path="/webdesign-arzt-regensburg" element={<WebdesignArztRegensburg />} />
-            <Route path="/webdesign-gastronomie-regensburg" element={<WebdesignGastronomieRegensburg />} />
-            <Route path="/webdesign-immobilien-regensburg" element={<WebdesignImmobilienRegensburg />} />
+      <Route path="/webdesign-arzt-bayreuth" element={<WebdesignArztBayreuth />} />
+      <Route path="/webdesign-gastronomie-bayreuth" element={<WebdesignGastronomieBayreuth />} />
+      <Route path="/webdesign-immobilien-bayreuth" element={<WebdesignImmobilienBayreuth />} />
+      <Route path="/webdesign-arzt-muenchen" element={<WebdesignArztMuenchen />} />
+      <Route path="/webdesign-gastronomie-muenchen" element={<WebdesignGastronomieMuenchen />} />
+      <Route path="/webdesign-immobilien-muenchen" element={<WebdesignImmobilienMuenchen />} />
+      <Route path="/webdesign-arzt-regensburg" element={<WebdesignArztRegensburg />} />
+      <Route path="/webdesign-gastronomie-regensburg" element={<WebdesignGastronomieRegensburg />} />
+      <Route path="/webdesign-immobilien-regensburg" element={<WebdesignImmobilienRegensburg />} />
 
-            {Object.values(CITY_SERVICE_CONFIGS).map((config) => (
-              <Route
-                key={config.route}
-                path={config.route}
-                element={<CityServicePage config={config} />}
-              />
-            ))}
+      {Object.values(CITY_SERVICE_CONFIGS).map((config) => (
+        <Route
+          key={config.route}
+          path={config.route}
+          element={<CityServicePage config={config} />}
+        />
+      ))}
 
-            <Route path="/kosten-webdesign" element={<KostenWebdesign />} />
-            <Route path="/kosten-ki-telefonassistent" element={<KostenKiTelefonassistent />} />
-            <Route path="/kosten-automatisierung" element={<KostenAutomatisierung />} />
+      <Route path="/kosten-webdesign" element={<KostenWebdesign />} />
+      <Route path="/kosten-ki-telefonassistent" element={<KostenKiTelefonassistent />} />
+      <Route path="/kosten-automatisierung" element={<KostenAutomatisierung />} />
 
-            <Route path="/webdesign-gastronomie" element={<WebdesignGastronomie />} />
-            <Route path="/webdesign-arzt" element={<WebdesignArzt />} />
-            <Route path="/webdesign-immobilien" element={<WebdesignImmobilien />} />
-            <Route path="/webdesign-hotel" element={<WebdesignHotel />} />
-            <Route path="/webdesign-sport" element={<WebdesignSport />} />
+      <Route path="/webdesign-gastronomie" element={<WebdesignGastronomie />} />
+      <Route path="/webdesign-arzt" element={<WebdesignArzt />} />
+      <Route path="/webdesign-immobilien" element={<WebdesignImmobilien />} />
+      <Route path="/webdesign-hotel" element={<WebdesignHotel />} />
+      <Route path="/webdesign-sport" element={<WebdesignSport />} />
 
-            <Route path="/ki-telefonassistent-arzt" element={<KiTelefonassistentArzt />} />
-            <Route path="/ki-telefonassistent-restaurant" element={<KiTelefonassistentRestaurant />} />
-            <Route path="/ki-telefonassistent-hotel" element={<KiTelefonassistentHotel />} />
-            <Route path="/ki-telefonassistent-praxis" element={<KiTelefonassistentPraxis />} />
+      <Route path="/ki-telefonassistent-arzt" element={<KiTelefonassistentArzt />} />
+      <Route path="/ki-telefonassistent-restaurant" element={<KiTelefonassistentRestaurant />} />
+      <Route path="/ki-telefonassistent-hotel" element={<KiTelefonassistentHotel />} />
+      <Route path="/ki-telefonassistent-praxis" element={<KiTelefonassistentPraxis />} />
 
-            <Route path="/automatisierung-restaurant" element={<AutomatisierungRestaurant />} />
-            <Route path="/automatisierung-arzt" element={<AutomatisierungArzt />} />
-            <Route path="/automatisierung-immobilien" element={<AutomatisierungImmobilien />} />
-            <Route path="/automatisierung-sport" element={<AutomatisierungSport />} />
+      <Route path="/automatisierung-restaurant" element={<AutomatisierungRestaurant />} />
+      <Route path="/automatisierung-arzt" element={<AutomatisierungArzt />} />
+      <Route path="/automatisierung-immobilien" element={<AutomatisierungImmobilien />} />
+      <Route path="/automatisierung-sport" element={<AutomatisierungSport />} />
 
-            <Route path="/verpasste-anrufe-verlust" element={<VerpassteAnrufePage />} />
-            <Route path="/keine-anfragen-website" element={<KeineAnfragenWebsitePage />} />
-            <Route path="/keine-terminbuchung-online" element={<KeineTerminbuchungPage />} />
-            <Route path="/zu-viel-manuelle-arbeit" element={<ZuVielManuelleArbeitPage />} />
-            <Route path="/digitale-automatisierung-unternehmen" element={<DigitaleAutomatisierungPage />} />
+      <Route path="/verpasste-anrufe-verlust" element={<VerpassteAnrufePage />} />
+      <Route path="/keine-anfragen-website" element={<KeineAnfragenWebsitePage />} />
+      <Route path="/keine-terminbuchung-online" element={<KeineTerminbuchungPage />} />
+      <Route path="/zu-viel-manuelle-arbeit" element={<ZuVielManuelleArbeitPage />} />
+      <Route path="/digitale-automatisierung-unternehmen" element={<DigitaleAutomatisierungPage />} />
 
-            <Route path="/webdesign-agentur-deutschland" element={<WebdesignAgenturDeutschland />} />
-            <Route path="/ki-agentur-deutschland" element={<KiAgenturDeutschland />} />
-            <Route path="/automatisierung-unternehmen" element={<AutomatisierungUnternehmen />} />
+      <Route path="/webdesign-agentur-deutschland" element={<WebdesignAgenturDeutschland />} />
+      <Route path="/ki-agentur-deutschland" element={<KiAgenturDeutschland />} />
+      <Route path="/automatisierung-unternehmen" element={<AutomatisierungUnternehmen />} />
 
-            <Route path="/logo-preview" element={<LogoShowcasePage />} />
-            <Route path="/blog" element={<BlogIndexPage />} />
-            <Route path="/blog/:slug" element={<BlogPostPage />} />
-            <Route path="/scan" element={<ScanPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </Suspense>
+      <Route path="/logo-preview" element={<LogoShowcasePage />} />
+      <Route path="/blog" element={<BlogIndexPage />} />
+      <Route path="/blog/:slug" element={<BlogPostPage />} />
+      <Route path="/scan" element={<ScanPage />} />
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  </Suspense>
+</main>
 
-        <PremiumFooterReveal>
-          <Footer />
-        </PremiumFooterReveal>
+<PremiumFooterReveal>
+  <Footer />
+</PremiumFooterReveal>
       </div>
     </PageReveal>
   );
