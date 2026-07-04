@@ -96,12 +96,7 @@ const LocationContent = lazy(() =>
 );
 
 function SectionFallback() {
-  return (
-    <div
-      className="min-h-[1800px] md:min-h-[2200px] lg:min-h-[2600px]"
-      aria-hidden="true"
-    />
-  );
+  return null;
 }
 
 export function HomePage() {
