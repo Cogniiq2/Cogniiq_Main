@@ -14,6 +14,7 @@ const TABS = [
   { key: 'overdue', label: 'Overdue' },
   { key: 'completed', label: 'Completed' },
   { key: 'revenue', label: 'Revenue Focus' },
+  { key: 'execution', label: 'Execution OS', href: '/admin/execution' },
 ];
 
 export function AdminHeader({ activeTab, onTabChange, todayCount, overdueCount }: Props) {
@@ -79,19 +80,30 @@ export function AdminHeader({ activeTab, onTabChange, todayCount, overdueCount }
 
         {/* Tab nav */}
         <nav className="flex gap-0 overflow-x-auto no-scrollbar">
-          {TABS.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => onTabChange(tab.key)}
-              className="relative px-4 py-2.5 text-[11px] font-semibold tracking-[0.1em] uppercase transition-colors duration-200 whitespace-nowrap"
-              style={{ color: activeTab === tab.key ? '#00d4ff' : 'rgba(255,255,255,0.28)' }}
-            >
-              {tab.label}
-              {activeTab === tab.key && (
-                <motion.div layoutId="admin-tab-line" className="absolute bottom-0 left-2 right-2 h-[2px] rounded-full" style={{ background: 'linear-gradient(90deg, transparent, #00d4ff, transparent)' }} transition={{ type: 'spring', stiffness: 500, damping: 36 }} />
-              )}
-            </button>
-          ))}
+          {TABS.map((tab) =>
+            tab.href ? (
+              <a
+                key={tab.key}
+                href={tab.href}
+                className="relative px-4 py-2.5 text-[11px] font-semibold tracking-[0.1em] uppercase transition-colors duration-200 whitespace-nowrap"
+                style={{ color: 'rgba(255,255,255,0.28)' }}
+              >
+                {tab.label}
+              </a>
+            ) : (
+              <button
+                key={tab.key}
+                onClick={() => onTabChange(tab.key)}
+                className="relative px-4 py-2.5 text-[11px] font-semibold tracking-[0.1em] uppercase transition-colors duration-200 whitespace-nowrap"
+                style={{ color: activeTab === tab.key ? '#00d4ff' : 'rgba(255,255,255,0.28)' }}
+              >
+                {tab.label}
+                {activeTab === tab.key && (
+                  <motion.div layoutId="admin-tab-line" className="absolute bottom-0 left-2 right-2 h-[2px] rounded-full" style={{ background: 'linear-gradient(90deg, transparent, #00d4ff, transparent)' }} transition={{ type: 'spring', stiffness: 500, damping: 36 }} />
+                )}
+              </button>
+            )
+          )}
         </nav>
       </div>
     </header>

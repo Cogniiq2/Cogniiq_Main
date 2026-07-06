@@ -272,11 +272,19 @@ const BlogIndexPage = lazyNamed(() => import('./pages/blog/BlogIndexPage'), 'Blo
 const BlogPostPage = lazyNamed(() => import('./pages/blog/BlogPostPage'), 'BlogPostPage');
 const ScanPage = lazyNamed(() => import('./pages/ScanPage'), 'ScanPage');
 const AdminPage = lazyNamed(() => import('./pages/AdminPage'), 'AdminPage');
+const ExecutionPage = lazyNamed(() => import('./pages/ExecutionPage'), 'ExecutionPage');
 
 function AppInner() {
   const location = useLocation();
 
   if (location.pathname.startsWith('/admin')) {
+    if (location.pathname === '/admin/execution') {
+      return (
+        <Suspense fallback={<PageFallback />}>
+          <ExecutionPage />
+        </Suspense>
+      );
+    }
     return (
       <Suspense fallback={<PageFallback />}>
         <AdminPage />
