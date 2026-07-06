@@ -101,14 +101,20 @@ export function ExecutionPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
+
+    console.log('[ExecutionPage] todayDate:', today);
+
     try {
       const { data: dayData, error: dayError } = await supabase
         .from('execution_days')
         .select('*')
         .eq('plan_date', today)
-        .single();
+        .maybeSingle();
 
-      if (dayError && dayError.code !== 'PGRST116') throw dayError;
+      console.log('[ExecutionPage] day:', dayData);
+      console.log('[ExecutionPage] dayError:', dayError);
+
+      if (dayError) throw dayError;
 
       setDay(dayData);
 
@@ -119,13 +125,19 @@ export function ExecutionPage() {
           .eq('execution_day_id', dayData.id)
           .order('sort_order', { ascending: true });
 
+        console.log('[ExecutionPage] tasks:', taskData);
+        console.log('[ExecutionPage] tasksError:', taskError);
+
         if (taskError) throw taskError;
         setTasks(taskData || []);
       } else {
+        console.log('[ExecutionPage] No day found, setting empty tasks');
         setTasks([]);
       }
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : String(e));
+      console.error('[ExecutionPage] Fetch error:', e);
+      const errorMsg = e instanceof Error ? e.message : String(e);
+      setError(`Fetch error: ${errorMsg}`);
     } finally {
       setLoading(false);
     }
@@ -213,6 +225,16 @@ export function ExecutionPage() {
 
         {/* Main content */}
         <div className="relative z-10 max-w-[1680px] mx-auto px-4 sm:px-6 lg:px-10 py-6">
+          {/* Debug info */}
+          <div className="rounded-xl p-3 mb-4 font-mono text-[10px]" style={{ background: 'rgba(0,212,255,0.03)', border: '1px solid rgba(0,212,255,0.1)' }}>
+            <span style={{ color: 'rgba(255,255,255,0.4)' }}>Debug: </span>
+            <span style={{ color: '#00d4ff' }}>todayDate={today}</span>
+            <span style={{ color: 'rgba(255,255,255,0.3)' }}> | </span>
+            <span style={{ color: day ? '#10b981' : '#f59e0b' }}>day={day ? 'found' : 'not found'}</span>
+            <span style={{ color: 'rgba(255,255,255,0.3)' }}> | </span>
+            <span style={{ color: 'rgba(255,255,255,0.5)' }}>tasks={tasks.length}</span>
+          </div>
+
           {/* Error state */}
           <AnimatePresence>
             {error && (
