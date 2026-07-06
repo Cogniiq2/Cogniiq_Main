@@ -7,11 +7,11 @@ import { slugify } from './types';
 const CATEGORIES = ['sales', 'follow_up', 'client_issue', 'delivery', 'finance', 'outreach', 'admin'];
 const PRIORITIES = ['critical', 'high', 'medium', 'low'] as const;
 
-const PRIORITY_COLORS = {
-  critical: '#ff4444',
-  high: '#ff8c00',
-  medium: '#00d4ff',
-  low: '#6b7280',
+const PRIORITY_VARS: Record<string, { bg: string; border: string; text: string }> = {
+  critical: { bg: 'var(--admin-priority-critical-bg)', border: 'var(--admin-priority-critical-border)', text: 'var(--admin-priority-critical-text)' },
+  high: { bg: 'var(--admin-priority-high-bg)', border: 'var(--admin-priority-high-border)', text: 'var(--admin-priority-high-text)' },
+  medium: { bg: 'var(--admin-priority-medium-bg)', border: 'var(--admin-priority-medium-border)', text: 'var(--admin-priority-medium-text)' },
+  low: { bg: 'var(--admin-priority-low-bg)', border: 'var(--admin-priority-low-border)', text: 'var(--admin-priority-low-text)' },
 };
 
 interface Props {
@@ -71,7 +71,6 @@ export function CreateTaskPanel({ open, onClose, onCreated, today }: Props) {
       task_key,
     };
 
-    // Use .select() so Supabase returns the row and surfaces RLS errors properly
     const { data, error: err } = await supabase
       .from('tasks')
       .insert(payload)
@@ -94,21 +93,19 @@ export function CreateTaskPanel({ open, onClose, onCreated, today }: Props) {
     onCreated();
   };
 
-  /* ── styles ─── */
   const fieldWrap = 'flex flex-col gap-1.5';
-  const label = 'text-[9px] font-bold tracking-[0.2em] uppercase font-mono text-white/30';
-  const input = 'w-full px-3 py-2.5 rounded-xl text-sm text-white/70 placeholder-white/15 outline-none transition-all duration-200';
+  const label = 'text-[9px] font-bold tracking-[0.2em] uppercase font-mono';
+  const input = 'w-full px-3 py-2.5 rounded-xl text-sm outline-none transition-all duration-200';
   const inputStyle = {
-    background: 'rgba(8,18,32,0.9)',
-    border: '1px solid rgba(255,255,255,0.07)',
+    background: 'var(--admin-input-bg)',
+    border: '1px solid var(--admin-input-border)',
+    color: 'var(--admin-input-text)',
   };
   const inputFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    e.currentTarget.style.borderColor = 'rgba(0,212,255,0.3)';
-    e.currentTarget.style.background = 'rgba(0,20,40,0.95)';
+    e.currentTarget.style.borderColor = 'var(--admin-border-focus)';
   };
   const inputBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)';
-    e.currentTarget.style.background = 'rgba(8,18,32,0.9)';
+    e.currentTarget.style.borderColor = 'var(--admin-input-border)';
   };
 
   return (
@@ -124,24 +121,24 @@ export function CreateTaskPanel({ open, onClose, onCreated, today }: Props) {
             style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)' }}
           />
 
-          {/* Panel — slides in from right on desktop, bottom sheet on mobile */}
+          {/* Panel */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 40 }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
             className="fixed right-0 top-0 bottom-0 z-[201] w-full sm:w-[480px] overflow-y-auto flex flex-col"
-            style={{ background: '#060d1a', borderLeft: '1px solid rgba(0,212,255,0.1)', boxShadow: '-20px 0 60px rgba(0,0,0,0.6)' }}
+            style={{ background: 'var(--admin-bg)', borderLeft: '1px solid var(--admin-border)', boxShadow: '-20px 0 60px rgba(0,0,0,0.3)' }}
           >
             {/* Panel header */}
-            <div className="flex-shrink-0 flex items-center justify-between px-6 py-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <div className="flex-shrink-0 flex items-center justify-between px-6 py-5" style={{ borderBottom: '1px solid var(--admin-border)' }}>
               <div>
-                <p className="text-[9px] font-bold tracking-[0.24em] uppercase font-mono mb-1" style={{ color: 'rgba(0,212,255,0.5)' }}>
+                <p className="text-[9px] font-bold tracking-[0.24em] uppercase font-mono mb-1" style={{ color: 'var(--admin-accent-subtle)' }}>
                   Command Center
                 </p>
-                <h2 className="text-base font-bold text-white/90">Create New Task</h2>
+                <h2 className="text-base font-bold" style={{ color: 'var(--admin-text-primary)' }}>Create New Task</h2>
               </div>
-              <button onClick={handleClose} className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-150" style={{ color: 'rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.04)' }} onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.7)'; }} onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.3)'; }}>
+              <button onClick={handleClose} className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-150" style={{ color: 'var(--admin-text-muted)', background: 'var(--admin-surface)' }} onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--admin-text-secondary)'; }} onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--admin-text-muted)'; }}>
                 <X size={15} />
               </button>
             </div>
@@ -151,7 +148,7 @@ export function CreateTaskPanel({ open, onClose, onCreated, today }: Props) {
 
               {/* Title */}
               <div className={fieldWrap}>
-                <label className={label}>Task Title *</label>
+                <label className={label} style={{ color: 'var(--admin-text-muted)' }}>Task Title *</label>
                 <input
                   type="text" required autoFocus
                   placeholder="What needs to be executed?"
@@ -164,7 +161,7 @@ export function CreateTaskPanel({ open, onClose, onCreated, today }: Props) {
 
               {/* Description */}
               <div className={fieldWrap}>
-                <label className={label}>Description</label>
+                <label className={label} style={{ color: 'var(--admin-text-muted)' }}>Description</label>
                 <textarea
                   rows={2} placeholder="Context or details…"
                   value={form.description}
@@ -174,49 +171,52 @@ export function CreateTaskPanel({ open, onClose, onCreated, today }: Props) {
                 />
               </div>
 
-              {/* Priority selector — visual */}
+              {/* Priority selector */}
               <div className={fieldWrap}>
-                <label className={label}>Priority</label>
+                <label className={label} style={{ color: 'var(--admin-text-muted)' }}>Priority</label>
                 <div className="grid grid-cols-4 gap-1.5">
-                  {PRIORITIES.map((p) => (
-                    <button
-                      key={p} type="button"
-                      onClick={() => set('priority', p)}
-                      className="py-2 rounded-lg text-[10px] font-bold uppercase font-mono tracking-wide transition-all duration-150"
-                      style={form.priority === p
-                        ? { background: `${PRIORITY_COLORS[p]}18`, color: PRIORITY_COLORS[p], border: `1px solid ${PRIORITY_COLORS[p]}35`, boxShadow: `0 0 10px ${PRIORITY_COLORS[p]}10` }
-                        : { background: 'rgba(255,255,255,0.03)', color: 'rgba(255,255,255,0.25)', border: '1px solid rgba(255,255,255,0.06)' }
-                      }
-                    >
-                      {p}
-                    </button>
-                  ))}
+                  {PRIORITIES.map((p) => {
+                    const vars = PRIORITY_VARS[p];
+                    return (
+                      <button
+                        key={p} type="button"
+                        onClick={() => set('priority', p)}
+                        className="py-2 rounded-lg text-[10px] font-bold uppercase font-mono tracking-wide transition-all duration-150"
+                        style={form.priority === p
+                          ? { background: vars.bg, color: vars.text, border: `1px solid ${vars.border}` }
+                          : { background: 'var(--admin-surface)', color: 'var(--admin-text-muted)', border: '1px solid var(--admin-border)' }
+                        }
+                      >
+                        {p}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
               {/* Category */}
               <div className={fieldWrap}>
-                <label className={label}>Category</label>
+                <label className={label} style={{ color: 'var(--admin-text-muted)' }}>Category</label>
                 <select value={form.category} onChange={(e) => set('category', e.target.value)} className={input} style={{ ...inputStyle, appearance: 'auto' }} onFocus={inputFocus} onBlur={inputBlur}>
-                  {CATEGORIES.map((c) => <option key={c} value={c} style={{ background: '#060d1a' }}>{c.replace(/_/g, ' ')}</option>)}
+                  {CATEGORIES.map((c) => <option key={c} value={c} style={{ background: 'var(--admin-bg)' }}>{c.replace(/_/g, ' ')}</option>)}
                 </select>
               </div>
 
               {/* Date + Time */}
               <div className="grid grid-cols-2 gap-3">
                 <div className={fieldWrap}>
-                  <label className={label}>Due Date</label>
+                  <label className={label} style={{ color: 'var(--admin-text-muted)' }}>Due Date</label>
                   <input type="date" value={form.due_date} onChange={(e) => set('due_date', e.target.value)} className={input} style={inputStyle} onFocus={inputFocus} onBlur={inputBlur} />
                 </div>
                 <div className={fieldWrap}>
-                  <label className={label}>Due Time</label>
+                  <label className={label} style={{ color: 'var(--admin-text-muted)' }}>Due Time</label>
                   <input type="time" value={form.due_time} onChange={(e) => set('due_time', e.target.value)} className={input} style={inputStyle} onFocus={inputFocus} onBlur={inputBlur} />
                 </div>
               </div>
 
               {/* Money impact */}
               <div className={fieldWrap}>
-                <label className={label}>Revenue Impact (EUR)</label>
+                <label className={label} style={{ color: 'var(--admin-text-muted)' }}>Revenue Impact (EUR)</label>
                 <input
                   type="number" min="0" step="100" placeholder="e.g. 3000"
                   value={form.money_impact}
@@ -228,7 +228,7 @@ export function CreateTaskPanel({ open, onClose, onCreated, today }: Props) {
 
               {/* Reason */}
               <div className={fieldWrap}>
-                <label className={label}>Reason / Why</label>
+                <label className={label} style={{ color: 'var(--admin-text-muted)' }}>Reason / Why</label>
                 <input
                   type="text" placeholder="Why does this task exist?"
                   value={form.reason}
@@ -243,7 +243,7 @@ export function CreateTaskPanel({ open, onClose, onCreated, today }: Props) {
                 {error && (
                   <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                     className="flex items-start gap-2.5 px-4 py-3 rounded-xl text-xs font-mono"
-                    style={{ background: 'rgba(255,68,68,0.08)', border: '1px solid rgba(255,68,68,0.2)', color: '#ff8080' }}
+                    style={{ background: 'var(--admin-danger-bg)', border: '1px solid var(--admin-danger-border)', color: 'var(--admin-danger)' }}
                   >
                     <AlertCircle size={12} className="flex-shrink-0 mt-0.5" />
                     {error}
@@ -257,11 +257,11 @@ export function CreateTaskPanel({ open, onClose, onCreated, today }: Props) {
                   type="submit" disabled={saving}
                   className="flex-1 py-3 rounded-xl text-sm font-bold tracking-wide transition-all duration-200"
                   style={saving
-                    ? { background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.06)', cursor: 'not-allowed' }
-                    : { background: 'rgba(0,212,255,0.1)', color: '#00d4ff', border: '1px solid rgba(0,212,255,0.2)' }
+                    ? { background: 'var(--admin-surface)', color: 'var(--admin-text-muted)', border: '1px solid var(--admin-border)', cursor: 'not-allowed' }
+                    : { background: 'var(--admin-button-primary-bg)', color: 'var(--admin-accent)', border: '1px solid var(--admin-button-primary-border)' }
                   }
-                  onMouseEnter={(e) => { if (!saving) { const el = e.currentTarget; el.style.background = 'rgba(0,212,255,0.18)'; } }}
-                  onMouseLeave={(e) => { if (!saving) { const el = e.currentTarget; el.style.background = 'rgba(0,212,255,0.1)'; } }}
+                  onMouseEnter={(e) => { if (!saving) { const el = e.currentTarget; el.style.background = 'var(--admin-button-primary-hover)'; } }}
+                  onMouseLeave={(e) => { if (!saving) { const el = e.currentTarget; el.style.background = 'var(--admin-button-primary-bg)'; } }}
                 >
                   {saving ? (
                     <span className="inline-flex items-center gap-2 justify-center">
@@ -270,7 +270,7 @@ export function CreateTaskPanel({ open, onClose, onCreated, today }: Props) {
                     </span>
                   ) : '+ Create Task'}
                 </button>
-                <button type="button" onClick={handleClose} className="px-4 py-3 rounded-xl text-sm transition-colors duration-150" style={{ color: 'rgba(255,255,255,0.25)' }} onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)'; }} onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.25)'; }}>
+                <button type="button" onClick={handleClose} className="px-4 py-3 rounded-xl text-sm transition-colors duration-150" style={{ color: 'var(--admin-text-muted)' }} onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--admin-text-secondary)'; }} onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--admin-text-muted)'; }}>
                   Cancel
                 </button>
               </div>

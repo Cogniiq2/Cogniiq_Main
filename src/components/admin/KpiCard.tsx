@@ -83,7 +83,7 @@ function KpiCard({ label, value, sub, accent, icon, delay = 0 }: KpiCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
       className="group relative rounded-2xl overflow-hidden cursor-default"
-      style={{ background: 'rgba(8,18,32,0.9)', border: `1px solid ${accent}12`, boxShadow: `0 1px 0 rgba(255,255,255,0.03) inset` }}
+      style={{ background: 'var(--admin-surface-elevated)', border: '1px solid var(--admin-border)', boxShadow: 'var(--admin-card-shadow)' }}
       whileHover={{ scale: 1.01 }}
     >
       {/* Top accent bar */}
@@ -94,7 +94,7 @@ function KpiCard({ label, value, sub, accent, icon, delay = 0 }: KpiCardProps) {
 
       <div className="relative p-4 sm:p-5">
         <div className="flex items-start justify-between gap-3 mb-3">
-          <p className="text-[9px] font-bold tracking-[0.2em] uppercase font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>{label}</p>
+          <p className="text-[9px] font-bold tracking-[0.2em] uppercase font-mono" style={{ color: 'var(--admin-text-muted)' }}>{label}</p>
           <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${accent}10`, color: accent, border: `1px solid ${accent}18` }}>
             {icon}
           </div>
@@ -102,7 +102,7 @@ function KpiCard({ label, value, sub, accent, icon, delay = 0 }: KpiCardProps) {
         <p className="text-2xl sm:text-3xl font-bold tabular-nums tracking-tight leading-none mb-2 font-mono" style={{ color: accent }}>
           {value}
         </p>
-        <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.22)' }}>{sub}</p>
+        <p className="text-[10px] leading-relaxed" style={{ color: 'var(--admin-text-muted)' }}>{sub}</p>
 
         {/* Bottom accent */}
         <div className="absolute bottom-0 left-4 right-4 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: `linear-gradient(90deg, transparent, ${accent}30, transparent)` }} />

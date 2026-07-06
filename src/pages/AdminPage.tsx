@@ -12,6 +12,7 @@ import { TaskFilters } from '../components/admin/TaskFilters';
 import { CreateTaskPanel } from '../components/admin/QuickCreateModal';
 import { OperatorIntelligence } from '../components/admin/OperatorIntelligence';
 import { LoadingSkeleton, EmptyState } from '../components/admin/EmptyAndLoading';
+import { useAdminTheme } from '../hooks/useAdminTheme';
 
 /* ── filter helper ─────────────────────────────────────────── */
 function applyFilter(tasks: Task[], filter: FilterOption, search: string): Task[] {
@@ -34,6 +35,7 @@ function applyFilter(tasks: Task[], filter: FilterOption, search: string): Task[
 
 /* ── page ──────────────────────────────────────────────────── */
 export function AdminPage() {
+  const { theme, toggleTheme } = useAdminTheme();
   const today = getLocalDateString();
 
   const [loading, setLoading] = useState(true);
@@ -111,20 +113,20 @@ export function AdminPage() {
   /* ── render ────────────────────────────────────────────────── */
   return (
     <AdminGate>
-      <div className="admin-root min-h-screen text-white font-sans" style={{ background: '#04080f' }}>
+      <div className="admin-root min-h-screen font-sans" style={{ background: 'var(--admin-bg)', color: 'var(--admin-text-primary)' }}>
         {/* Ambient layer */}
         <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-          <div className="absolute -top-40 -left-40 w-[700px] h-[700px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(0,180,255,0.04) 0%, transparent 70%)' }} />
-          <div className="absolute top-1/2 -right-48 w-[500px] h-[500px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(0,100,200,0.035) 0%, transparent 70%)' }} />
-          <div className="absolute bottom-0 left-1/3 w-[600px] h-[400px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(0,212,255,0.025) 0%, transparent 70%)' }} />
+          <div className="absolute -top-40 -left-40 w-[700px] h-[700px] rounded-full" style={{ background: 'var(--admin-glow-radial)' }} />
+          <div className="absolute top-1/2 -right-48 w-[500px] h-[500px] rounded-full" style={{ background: 'var(--admin-glow-radial)' }} />
+          <div className="absolute bottom-0 left-1/3 w-[600px] h-[400px] rounded-full" style={{ background: 'var(--admin-glow-radial)' }} />
           {/* Grid */}
-          <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(rgba(0,212,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.025) 1px, transparent 1px)', backgroundSize: '64px 64px', opacity: 0.7 }} />
+          <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(var(--admin-grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--admin-grid-line) 1px, transparent 1px)', backgroundSize: '64px 64px', opacity: 0.7 }} />
           {/* Scan line */}
-          <motion.div className="absolute left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(0,212,255,0.15) 50%, transparent 100%)' }} animate={{ top: ['0%', '100%'] }} transition={{ duration: 12, repeat: Infinity, ease: 'linear' }} />
+          <motion.div className="absolute left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent 0%, var(--admin-scan-line) 50%, transparent 100%)' }} animate={{ top: ['0%', '100%'] }} transition={{ duration: 12, repeat: Infinity, ease: 'linear' }} />
         </div>
 
         {/* Header */}
-        <AdminHeader activeTab={activeTab} onTabChange={setActiveTab} todayCount={todayOpen.length} overdueCount={overdueOpen.length} />
+        <AdminHeader activeTab={activeTab} onTabChange={setActiveTab} todayCount={todayOpen.length} overdueCount={overdueOpen.length} theme={theme} onThemeToggle={toggleTheme} />
 
         {/* Main layout */}
         <div className="relative z-10 max-w-[1680px] mx-auto px-4 sm:px-6 lg:px-10 py-6 flex flex-col xl:flex-row gap-6">
@@ -136,9 +138,9 @@ export function AdminPage() {
             <AnimatePresence>
               {dbError && (
                 <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                  className="rounded-2xl border border-red-500/20 bg-red-500/[0.05] px-5 py-4">
-                  <p className="text-sm font-semibold text-red-400 mb-1 font-mono">ERR: supabase_connection_failed</p>
-                  <p className="text-xs text-red-400/50 font-mono">{dbError}</p>
+                  className="rounded-2xl border px-5 py-4" style={{ borderColor: 'var(--admin-danger-border)', background: 'var(--admin-danger-bg)' }}>
+                  <p className="text-sm font-semibold mb-1 font-mono" style={{ color: 'var(--admin-danger)' }}>ERR: supabase_connection_failed</p>
+                  <p className="text-xs font-mono" style={{ color: 'var(--admin-danger)', opacity: 0.6 }}>{dbError}</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -157,9 +159,9 @@ export function AdminPage() {
               <button
                 onClick={() => setCreateOpen(true)}
                 className="sm:ml-auto inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold tracking-[0.1em] uppercase transition-all duration-200 border whitespace-nowrap"
-                style={{ background: 'rgba(0,212,255,0.07)', borderColor: 'rgba(0,212,255,0.2)', color: '#00d4ff', boxShadow: 'inset 0 1px 0 rgba(0,212,255,0.06)' }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.13)'; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.07)'; }}
+                style={{ background: 'var(--admin-button-primary-bg)', borderColor: 'var(--admin-button-primary-border)', color: 'var(--admin-accent)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.03)' }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--admin-button-primary-hover)'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--admin-button-primary-bg)'; }}
               >
                 <span className="text-base leading-none">+</span> New Task
               </button>
@@ -195,12 +197,12 @@ export function AdminPage() {
               <section>
                 <SectionLabel text="Overdue — Fix These First" count={overdueOpen.length} accent="#f59e0b" />
                 {loading ? <LoadingSkeleton /> : overdueOpen.length === 0 ? (
-                  <div className="flex items-center gap-3 px-5 py-4 rounded-2xl border" style={{ borderColor: 'rgba(16,185,129,0.15)', background: 'rgba(16,185,129,0.04)' }}>
-                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#10b981', boxShadow: '0 0 6px #10b981' }} />
-                    <span className="text-sm font-mono" style={{ color: '#10b981' }}>No overdue tasks. Execution is clean.</span>
+                  <div className="flex items-center gap-3 px-5 py-4 rounded-2xl border" style={{ borderColor: 'var(--admin-success-border)', background: 'var(--admin-success-bg)' }}>
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: 'var(--admin-success)', boxShadow: '0 0 6px var(--admin-success)' }} />
+                    <span className="text-sm font-mono" style={{ color: 'var(--admin-success)' }}>No overdue tasks. Execution is clean.</span>
                   </div>
                 ) : (
-                  <div className="space-y-2.5 rounded-2xl border p-4" style={{ borderColor: 'rgba(245,158,11,0.12)', background: 'rgba(245,158,11,0.02)' }}>
+                  <div className="space-y-2.5 rounded-2xl border p-4" style={{ borderColor: 'var(--admin-warning-border)', background: 'var(--admin-warning-bg)' }}>
                     <AnimatePresence>
                       {overdueOpen.map((task, i) => (
                         <motion.div key={task.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.3, delay: i * 0.04, ease: [0.22, 1, 0.36, 1] }}>
@@ -264,9 +266,9 @@ export function AdminPage() {
             <motion.div initial={{ opacity: 0, y: 16, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 8 }}
               transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
               className="fixed bottom-6 right-6 z-[500] flex items-center gap-2.5 px-4 py-3 rounded-xl border text-sm font-mono"
-              style={{ background: '#060d1a', backdropFilter: 'blur(20px)', borderColor: toast.ok ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)', color: toast.ok ? '#34d399' : '#f87171', boxShadow: `0 0 20px ${toast.ok ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'}` }}
+              style={{ background: 'var(--admin-surface-elevated)', backdropFilter: 'blur(20px)', borderColor: toast.ok ? 'var(--admin-success-border)' : 'var(--admin-danger-border)', color: toast.ok ? 'var(--admin-success)' : 'var(--admin-danger)', boxShadow: `0 0 20px ${toast.ok ? 'rgba(90,138,106,0.15)' : 'rgba(184,90,90,0.15)'}` }}
             >
-              <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: toast.ok ? '#34d399' : '#f87171' }} />
+              <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: toast.ok ? 'var(--admin-success)' : 'var(--admin-danger)' }} />
               {toast.msg}
             </motion.div>
           )}
@@ -281,13 +283,13 @@ function SectionLabel({ text, count, accent }: { text: string; count: number; ac
   return (
     <div className="flex items-center gap-3 mb-3">
       <div className="w-1 h-4 rounded-full" style={{ background: accent, boxShadow: `0 0 6px ${accent}` }} />
-      <span className="text-[10px] font-bold tracking-[0.2em] uppercase" style={{ color: 'rgba(255,255,255,0.4)' }}>{text}</span>
+      <span className="text-[10px] font-bold tracking-[0.2em] uppercase" style={{ color: 'var(--admin-text-muted)' }}>{text}</span>
       {count > 0 && (
         <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-md" style={{ background: `${accent}15`, color: accent, border: `1px solid ${accent}25` }}>
           {count}
         </span>
       )}
-      <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.04)' }} />
+      <div className="flex-1 h-px" style={{ background: 'var(--admin-border)' }} />
     </div>
   );
 }
