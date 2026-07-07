@@ -4,9 +4,17 @@ import { supabase } from '../lib/supabase';
 import type { Task, FilterOption } from '../components/admin/types';
 import { getLocalDateString, sortTasks, formatMoney } from '../components/admin/types';
 import { AdminGate } from '../components/admin/AdminGate';
+import { AdminHeader } from '../components/admin/AdminHeader';
+import { KpiStrip } from '../components/admin/KpiCard';
+import { TaskCard } from '../components/admin/TaskCard';
+import { NextBestAction } from '../components/admin/NextBestAction';
+import { TaskFilters } from '../components/admin/TaskFilters';
 import { CreateTaskPanel } from '../components/admin/QuickCreateModal';
+import { OperatorIntelligence } from '../components/admin/OperatorIntelligence';
+import { LoadingSkeleton, EmptyState } from '../components/admin/EmptyAndLoading';
 import { useAdminTheme } from '../hooks/useAdminTheme';
 
+/* filter helper */
 function applyFilter(tasks: Task[], filter: FilterOption, search: string): Task[] {
   let r = tasks;
   if (filter === 'critical') r = r.filter((t) => t.priority === 'critical');
@@ -25,6 +33,7 @@ function applyFilter(tasks: Task[], filter: FilterOption, search: string): Task[
   return r;
 }
 
+/* page */
 export function AdminPage() {
   const { theme, toggleTheme } = useAdminTheme();
   const today = getLocalDateString();
@@ -41,6 +50,7 @@ export function AdminPage() {
   const [search, setSearch] = useState('');
   const [createOpen, setCreateOpen] = useState(false);
 
+  /* fetch */
   const fetchAll = useCallback(async () => {
     setLoading(true);
     setDbError(null);
@@ -65,6 +75,7 @@ export function AdminPage() {
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
+  /* complete */
   const handleComplete = useCallback(async (id: string) => {
     setCompleting((p) => ({ ...p, [id]: true }));
     const now = new Date().toISOString();
@@ -88,6 +99,7 @@ export function AdminPage() {
     setTimeout(() => setToast(null), 3200);
   };
 
+  /* derived */
   const nextTask = todayOpen[0] ?? null;
   const filtered = applyFilter(todayOpen, filter, search);
   const moneyToday = todayOpen.reduce((s, t) => s + (t.money_impact ?? 0), 0);
@@ -101,162 +113,143 @@ export function AdminPage() {
   const showCompleted = activeTab === 'overview' || activeTab === 'completed';
   const showRevenue = activeTab === 'revenue';
 
+  /* render */
   return (
     <AdminGate>
-      <div className="min-h-screen overflow-hidden font-sans" style={{ background: 'var(--admin-bg)', color: 'var(--admin-text-primary)' }}>
-        <LuxuryBackdrop />
+      <div className="admin-root min-h-screen overflow-hidden font-sans" style={{ background: 'var(--admin-bg)', color: 'var(--admin-text-primary)' }}>
+        <AmbientLayer />
 
-        <TopBar
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          todayCount={todayOpen.length}
-          overdueCount={overdueOpen.length}
-          theme={theme}
-          onThemeToggle={toggleTheme}
-        />
+        <AdminHeader activeTab={activeTab} onTabChange={setActiveTab} todayCount={todayOpen.length} overdueCount={overdueOpen.length} theme={theme} onThemeToggle={toggleTheme} />
 
-        <main className="relative z-10 mx-auto max-w-[1780px] px-4 pb-10 pt-5 sm:px-6 lg:px-8 xl:px-10">
-          <PrivateOfficeHero
+        <main className="relative z-10 mx-auto max-w-[1760px] px-4 py-5 sm:px-6 lg:px-8 xl:px-10">
+          <CommandOverview
             today={today}
-            loading={loading}
+            activeTab={activeTab}
             todayOpen={todayOpen}
             todayCompleted={todayCompleted}
             overdueOpen={overdueOpen}
             criticalHigh={criticalHigh}
             moneyToday={moneyToday}
+            loading={loading}
             onCreate={() => setCreateOpen(true)}
           />
 
-          <div className="mt-6 grid grid-cols-1 gap-6 2xl:grid-cols-[minmax(0,1fr)_370px]">
-            <div className="min-w-0 space-y-6">
+          <div className="mt-5 grid grid-cols-1 gap-5 2xl:grid-cols-[minmax(0,1fr)_340px]">
+            <div className="min-w-0 space-y-5">
               <AnimatePresence>
-                {dbError && <ConnectionNotice error={dbError} />}
+                {dbError && <DbErrorBanner error={dbError} />}
               </AnimatePresence>
 
-              <FilterBar
-                tasks={todayOpen}
-                active={filter}
-                search={search}
-                onChange={setFilter}
-                onSearch={setSearch}
-                onCreate={() => setCreateOpen(true)}
-              />
+              <section className="rounded-[1.65rem] border p-3 sm:p-4" style={{ background: 'var(--admin-surface)', borderColor: 'var(--admin-border)', boxShadow: 'var(--admin-card-shadow, none)' }}>
+                <KpiStrip
+                  todayOpen={todayOpen.length}
+                  criticalHigh={criticalHigh}
+                  overdueCount={overdueOpen.length}
+                  moneyToday={moneyToday}
+                />
+              </section>
+
+              <section className="rounded-[1.65rem] border p-3 sm:p-4" style={{ background: 'var(--admin-surface)', borderColor: 'var(--admin-border)', boxShadow: 'var(--admin-card-shadow, none)' }}>
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+                  <div className="min-w-0 flex-1">
+                    <TaskFilters active={filter} search={search} onChange={setFilter} onSearch={setSearch} />
+                  </div>
+                  <button
+                    onClick={() => setCreateOpen(true)}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-xs font-black uppercase tracking-[0.12em] transition-all duration-200 hover:-translate-y-0.5 lg:ml-auto"
+                    style={{ background: 'var(--admin-button-primary-bg)', borderColor: 'var(--admin-button-primary-border)', color: 'var(--admin-accent)', boxShadow: 'var(--accent-glow)' }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--admin-button-primary-hover)'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--admin-button-primary-bg)'; }}
+                  >
+                    <span className="text-base leading-none">+</span> New Task
+                  </button>
+                </div>
+              </section>
 
               {!loading && nextTask && showTodayQueue && (
-                <PrioritySuite task={nextTask} completing={!!completing[nextTask.id]} onComplete={handleComplete} />
+                <section>
+                  <SectionLabel text="Next Best Action" count={1} accent="var(--admin-accent)" />
+                  <NextBestAction task={nextTask} onComplete={handleComplete} completing={!!completing[nextTask.id]} />
+                </section>
               )}
 
               {showTodayQueue && (
-                <TaskSection
-                  title="Today"
-                  subtitle="The work that deserves your full attention now."
-                  count={filtered.length}
-                >
-                  {loading ? <LoadingGallery /> : filtered.length === 0 ? (
-                    <EmptyPanel
-                      title="Nothing here right now"
-                      text="No tasks match this view. Adjust the filter or create a new priority."
-                      actionLabel="New Task"
-                      onAction={() => setCreateOpen(true)}
-                    />
+                <section>
+                  <SectionLabel text="Execution Queue" count={filtered.length} accent="var(--admin-accent)" />
+                  {loading ? <LoadingSkeleton /> : filtered.length === 0 ? (
+                    <EmptyState message="Execution queue is empty." sub="No tasks match the current filter - or create the first one." action={{ label: '+ New Task', onClick: () => setCreateOpen(true) }} />
                   ) : (
-                    <TaskGallery>
-                      {filtered.map((task, i) => (
-                        <LuxuryTaskCard
-                          key={task.id}
-                          task={task}
-                          index={i + 1}
-                          completing={!!completing[task.id]}
-                          onComplete={handleComplete}
-                        />
-                      ))}
-                    </TaskGallery>
+                    <div className="space-y-2.5">
+                      <AnimatePresence>
+                        {filtered.map((task, i) => (
+                          <motion.div key={task.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -20, transition: { duration: 0.18 } }} transition={{ duration: 0.28, delay: i * 0.025, ease: [0.22, 1, 0.36, 1] }}>
+                            <TaskCard task={task} onComplete={handleComplete} completing={!!completing[task.id]} />
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+                    </div>
                   )}
-                </TaskSection>
+                </section>
               )}
 
               {showOverdue && (
-                <TaskSection
-                  title="Needs attention"
-                  subtitle="Clear these first so the day feels expensive again."
-                  count={overdueOpen.length}
-                  tone="warning"
-                >
-                  {loading ? <LoadingGallery /> : overdueOpen.length === 0 ? (
-                    <CleanSlate />
+                <section>
+                  <SectionLabel text="Overdue - Fix These First" count={overdueOpen.length} accent="var(--admin-warning)" />
+                  {loading ? <LoadingSkeleton /> : overdueOpen.length === 0 ? (
+                    <CleanState />
                   ) : (
-                    <TaskGallery>
-                      {overdueOpen.map((task, i) => (
-                        <LuxuryTaskCard
-                          key={task.id}
-                          task={task}
-                          index={i + 1}
-                          completing={!!completing[task.id]}
-                          onComplete={handleComplete}
-                          overdue
-                        />
-                      ))}
-                    </TaskGallery>
+                    <div className="space-y-2.5 rounded-[1.65rem] border p-3 sm:p-4" style={{ borderColor: 'var(--admin-warning-border)', background: 'var(--admin-warning-bg)' }}>
+                      <AnimatePresence>
+                        {overdueOpen.map((task, i) => (
+                          <motion.div key={task.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.28, delay: i * 0.03, ease: [0.22, 1, 0.36, 1] }}>
+                            <TaskCard task={task} onComplete={handleComplete} completing={!!completing[task.id]} overdue />
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+                    </div>
                   )}
-                </TaskSection>
+                </section>
               )}
 
               {showCompleted && (
-                <TaskSection
-                  title="Finished"
-                  subtitle="Proof that the day is moving."
-                  count={todayCompleted.length}
-                  tone="success"
-                >
-                  {loading ? <LoadingGallery /> : todayCompleted.length === 0 ? (
-                    <EmptyPanel title="No finished tasks yet" text="Complete the first important item and let the momentum begin." />
+                <section>
+                  <SectionLabel text="Completed Today" count={todayCompleted.length} accent="var(--admin-success)" />
+                  {loading ? <LoadingSkeleton /> : todayCompleted.length === 0 ? (
+                    <EmptyState message="No completed tasks yet today." />
                   ) : (
-                    <TaskGallery>
-                      {todayCompleted.map((task, i) => (
-                        <LuxuryTaskCard key={task.id} task={task} index={i + 1} onComplete={() => {}} muted />
+                    <div className="space-y-2">
+                      {todayCompleted.map((task) => (
+                        <TaskCard key={task.id} task={task} onComplete={() => {}} muted />
                       ))}
-                    </TaskGallery>
+                    </div>
                   )}
-                </TaskSection>
+                </section>
               )}
 
               {showRevenue && (
-                <TaskSection
-                  title="Revenue room"
-                  subtitle="Every task here has a direct money signal."
-                  count={revenueTasks.length}
-                  tone="success"
-                >
-                  {loading ? <LoadingGallery /> : revenueTasks.length === 0 ? (
-                    <EmptyPanel title="No revenue-linked tasks" text="Add money impact to the tasks that move the business forward." />
+                <section>
+                  <SectionLabel text="Revenue Focus" count={revenueTasks.length} accent="var(--admin-success)" />
+                  {loading ? <LoadingSkeleton /> : revenueTasks.length === 0 ? (
+                    <EmptyState message="No revenue-linked tasks." sub="Add money impact to the tasks that move the business forward." />
                   ) : (
-                    <TaskGallery>
+                    <div className="space-y-2.5">
                       {revenueTasks.map((task, i) => (
-                        <LuxuryTaskCard
-                          key={task.id}
-                          task={task}
-                          index={i + 1}
-                          completing={!!completing[task.id]}
-                          onComplete={handleComplete}
-                        />
+                        <motion.div key={task.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.26, delay: i * 0.025, ease: [0.22, 1, 0.36, 1] }}>
+                          <TaskCard task={task} onComplete={handleComplete} completing={!!completing[task.id]} />
+                        </motion.div>
                       ))}
-                    </TaskGallery>
+                    </div>
                   )}
-                </TaskSection>
+                </section>
               )}
             </div>
 
             <aside className="min-w-0">
-              <PrivateBriefing
-                todayOpen={todayOpen}
-                todayCompleted={todayCompleted}
-                overdueOpen={overdueOpen}
-                dbError={dbError}
-                moneyToday={moneyToday}
-                criticalHigh={criticalHigh}
-                nextTask={nextTask}
-                revenueTasks={revenueTasks}
-              />
+              <div className="space-y-4 2xl:sticky 2xl:top-[100px]">
+                <div className="rounded-[1.65rem] border p-3" style={{ background: 'var(--admin-surface)', borderColor: 'var(--admin-border)', boxShadow: 'var(--admin-card-shadow, none)' }}>
+                  <OperatorIntelligence todayOpen={todayOpen} overdueOpen={overdueOpen} dbStatus={dbError ? 'error' : 'ok'} dbError={dbError ?? undefined} />
+                </div>
+              </div>
             </aside>
           </div>
         </main>
@@ -271,227 +264,121 @@ export function AdminPage() {
   );
 }
 
-function LuxuryBackdrop() {
+function AmbientLayer() {
   return (
     <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
       <div
         className="absolute inset-0"
         style={{
           background:
-            'linear-gradient(135deg, color-mix(in srgb, var(--admin-bg) 96%, white), var(--admin-bg) 48%, color-mix(in srgb, var(--admin-surface) 34%, var(--admin-bg)))',
+            'radial-gradient(circle at 18% -8%, color-mix(in srgb, var(--admin-accent) 12%, transparent), transparent 34%), radial-gradient(circle at 85% 12%, color-mix(in srgb, var(--admin-success) 8%, transparent), transparent 30%), linear-gradient(180deg, color-mix(in srgb, var(--admin-surface) 18%, transparent), transparent 48%)',
         }}
       />
       <div
-        className="absolute left-[-12%] top-[-20%] h-[560px] w-[560px] rounded-full blur-3xl"
-        style={{ background: 'color-mix(in srgb, var(--admin-accent) 10%, transparent)' }}
-      />
-      <div
-        className="absolute bottom-[-18%] right-[-10%] h-[620px] w-[620px] rounded-full blur-3xl"
-        style={{ background: 'color-mix(in srgb, var(--admin-success) 8%, transparent)' }}
-      />
-      <div
-        className="absolute inset-x-0 top-0 h-40"
+        className="absolute inset-0"
         style={{
-          background: 'linear-gradient(180deg, color-mix(in srgb, white 5%, transparent), transparent)',
+          backgroundImage: 'linear-gradient(var(--admin-grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--admin-grid-line) 1px, transparent 1px)',
+          backgroundSize: '56px 56px',
+          maskImage: 'linear-gradient(to bottom, black, transparent 72%)',
+          opacity: 0.35,
         }}
+      />
+      <motion.div
+        className="absolute left-0 right-0 h-px"
+        style={{ background: 'linear-gradient(90deg, transparent 0%, var(--admin-scan-line) 50%, transparent 100%)' }}
+        animate={{ top: ['0%', '100%'] }}
+        transition={{ duration: 14, repeat: Infinity, ease: 'linear' }}
       />
     </div>
   );
 }
 
-function TopBar({
-  activeTab,
-  onTabChange,
-  todayCount,
-  overdueCount,
-  theme,
-  onThemeToggle,
-}: {
-  activeTab: string;
-  onTabChange: (tab: string) => void;
-  todayCount: number;
-  overdueCount: number;
-  theme: string;
-  onThemeToggle: () => void;
-}) {
-  const tabs = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'today', label: 'Today', count: todayCount },
-    { id: 'overdue', label: 'Attention', count: overdueCount },
-    { id: 'completed', label: 'Finished' },
-    { id: 'revenue', label: 'Revenue' },
-  ];
-
-  return (
-    <header
-      className="sticky top-0 z-30 border-b"
-      style={{
-        background: 'color-mix(in srgb, var(--admin-bg) 86%, transparent)',
-        borderColor: 'var(--admin-border)',
-        backdropFilter: 'blur(24px)',
-      }}
-    >
-      <div className="mx-auto flex max-w-[1780px] flex-col gap-3 px-4 py-3 sm:px-6 lg:px-8 xl:px-10">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-[11px] font-semibold tracking-[0.2em]" style={{ color: 'var(--admin-text-muted)' }}>
-              COGNIIQ
-            </p>
-            <h1 className="text-xl font-semibold tracking-[-0.03em] sm:text-2xl" style={{ color: 'var(--admin-text-primary)' }}>
-              Private Office
-            </h1>
-          </div>
-
-          <button
-            type="button"
-            onClick={onThemeToggle}
-            className="rounded-lg border px-4 py-2 text-sm font-medium transition-all duration-200 hover:-translate-y-0.5"
-            style={{
-              background: 'var(--admin-surface)',
-              borderColor: 'var(--admin-border)',
-              color: 'var(--admin-text-secondary)',
-              boxShadow: 'var(--admin-card-shadow, none)',
-            }}
-          >
-            {theme === 'dark' ? 'Evening' : 'Daylight'}
-          </button>
-        </div>
-
-        <nav className="flex gap-2 overflow-x-auto pb-1">
-          {tabs.map((tab) => {
-            const active = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => onTabChange(tab.id)}
-                className="inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-all duration-200"
-                style={{
-                  background: active ? 'var(--admin-text-primary)' : 'var(--admin-surface)',
-                  borderColor: active ? 'var(--admin-text-primary)' : 'var(--admin-border)',
-                  color: active ? 'var(--admin-bg)' : 'var(--admin-text-secondary)',
-                }}
-              >
-                {tab.label}
-                {typeof tab.count === 'number' && tab.count > 0 && (
-                  <span
-                    className="rounded-full px-2 py-0.5 text-[11px]"
-                    style={{
-                      background: active ? 'color-mix(in srgb, var(--admin-bg) 18%, transparent)' : 'var(--admin-surface-hover)',
-                      color: active ? 'var(--admin-bg)' : 'var(--admin-text-muted)',
-                    }}
-                  >
-                    {tab.count}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-    </header>
-  );
-}
-
-function PrivateOfficeHero({
+function CommandOverview({
   today,
-  loading,
+  activeTab,
   todayOpen,
   todayCompleted,
   overdueOpen,
   criticalHigh,
   moneyToday,
+  loading,
   onCreate,
 }: {
   today: string;
-  loading: boolean;
+  activeTab: string;
   todayOpen: Task[];
   todayCompleted: Task[];
   overdueOpen: Task[];
   criticalHigh: number;
   moneyToday: number;
+  loading: boolean;
   onCreate: () => void;
 }) {
-  const total = todayOpen.length + todayCompleted.length;
-  const completion = total > 0 ? Math.round((todayCompleted.length / total) * 100) : 0;
+  const totalToday = todayOpen.length + todayCompleted.length;
+  const completion = totalToday > 0 ? Math.round((todayCompleted.length / totalToday) * 100) : 0;
 
   return (
     <section
-      className="relative overflow-hidden rounded-lg border p-5 sm:p-7 lg:p-8"
+      className="relative overflow-hidden rounded-[1.9rem] border p-4 sm:p-5 lg:p-6"
       style={{
-        background:
-          'linear-gradient(135deg, color-mix(in srgb, var(--admin-surface) 94%, white), color-mix(in srgb, var(--admin-surface-hover) 72%, var(--admin-surface)))',
+        background: 'linear-gradient(135deg, color-mix(in srgb, var(--admin-surface) 96%, transparent), color-mix(in srgb, var(--admin-surface-hover) 72%, var(--admin-surface)))',
         borderColor: 'var(--admin-border-strong)',
-        boxShadow: 'var(--admin-card-shadow, 0 34px 90px rgba(0,0,0,0.10))',
+        boxShadow: 'var(--admin-card-shadow, 0 24px 70px rgba(0,0,0,0.12))',
       }}
     >
-      <div
-        className="absolute inset-x-0 top-0 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent, var(--admin-accent), transparent)' }}
-      />
-
-      <div className="relative grid gap-8 xl:grid-cols-[minmax(0,1fr)_480px] xl:items-end">
+      <div className="absolute inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--admin-accent) 48%, transparent), color-mix(in srgb, var(--admin-success) 32%, transparent), transparent)' }} />
+      <div className="relative grid gap-5 xl:grid-cols-[minmax(0,1fr)_420px] xl:items-end">
         <div className="min-w-0">
-          <div className="mb-5 flex flex-wrap items-center gap-2">
-            <Pill label={loading ? 'Preparing the room' : 'Everything is live'} tone={loading ? 'warning' : 'success'} />
-            <Pill label={today} />
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <span className="rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em]" style={{ borderColor: 'var(--admin-border)', background: 'var(--admin-surface)', color: 'var(--admin-accent)' }}>
+              Command Center
+            </span>
+            <span className="rounded-full border px-2.5 py-1 text-[10px] font-mono capitalize" style={{ borderColor: 'var(--admin-border)', background: 'var(--admin-surface)', color: 'var(--admin-text-muted)' }}>
+              {activeTab}
+            </span>
+            <span className="rounded-full border px-2.5 py-1 text-[10px] font-mono" style={{ borderColor: 'var(--admin-border)', background: 'var(--admin-surface)', color: loading ? 'var(--admin-warning)' : 'var(--admin-success)' }}>
+              {loading ? 'Syncing' : 'Live'}
+            </span>
           </div>
 
-          <h2 className="max-w-4xl text-4xl font-semibold leading-[1.02] tracking-[-0.05em] sm:text-5xl lg:text-6xl" style={{ color: 'var(--admin-text-primary)' }}>
-            The calmest place to run your day.
-          </h2>
-
-          <p className="mt-5 max-w-2xl text-base leading-7" style={{ color: 'var(--admin-text-muted)' }}>
-            A focused command room for the tasks that build Cogniiq, protect your standards and move revenue forward.
+          <h1 className="text-3xl font-semibold leading-tight tracking-[-0.045em] sm:text-4xl lg:text-5xl" style={{ color: 'var(--admin-text-primary)' }}>
+            Operate the day from one clean cockpit.
+          </h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6" style={{ color: 'var(--admin-text-muted)' }}>
+            Today is {today}. Protect attention, clear critical work first, and keep revenue momentum visible.
           </p>
 
-          <div className="mt-7 flex flex-wrap gap-3">
+          <div className="mt-5 flex flex-wrap gap-2">
             <button
               type="button"
               onClick={onCreate}
-              className="rounded-lg border px-5 py-3 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5"
-              style={{
-                background: 'var(--admin-text-primary)',
-                borderColor: 'var(--admin-text-primary)',
-                color: 'var(--admin-bg)',
-              }}
+              className="rounded-2xl border px-4 py-3 text-xs font-black uppercase tracking-[0.12em] transition-all duration-200 hover:-translate-y-0.5"
+              style={{ background: 'var(--admin-button-primary-bg)', borderColor: 'var(--admin-button-primary-border)', color: 'var(--admin-accent)', boxShadow: 'var(--accent-glow)' }}
             >
-              New Task
+              + New Task
             </button>
-            <div
-              className="rounded-lg border px-5 py-3 text-sm"
-              style={{
-                background: 'var(--admin-surface)',
-                borderColor: 'var(--admin-border)',
-                color: 'var(--admin-text-secondary)',
-              }}
-            >
-              Revenue in motion: <span className="font-semibold" style={{ color: 'var(--admin-success)' }}>{formatMoney(moneyToday)}</span>
+            <div className="rounded-2xl border px-4 py-3 text-xs font-mono" style={{ background: 'var(--admin-surface)', borderColor: 'var(--admin-border)', color: 'var(--admin-text-muted)' }}>
+              Revenue at stake: <span style={{ color: 'var(--admin-success)' }}>{formatMoney(moneyToday)}</span>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <HeroStat label="Open" value={todayOpen.length} />
-          <HeroStat label="Finished" value={todayCompleted.length} tone="success" />
-          <HeroStat label="Critical" value={criticalHigh} tone="warning" />
-          <HeroStat label="Overdue" value={overdueOpen.length} tone="danger" />
-
-          <div className="col-span-2 rounded-lg border p-4" style={{ background: 'var(--admin-surface)', borderColor: 'var(--admin-border)' }}>
+          <HeroMetric label="Open" value={todayOpen.length} tone="accent" />
+          <HeroMetric label="Completed" value={todayCompleted.length} tone="success" />
+          <HeroMetric label="Critical/High" value={criticalHigh} tone="warning" />
+          <HeroMetric label="Overdue" value={overdueOpen.length} tone="danger" />
+          <div className="col-span-2 rounded-3xl border p-4" style={{ background: 'var(--admin-surface)', borderColor: 'var(--admin-border)' }}>
             <div className="mb-3 flex items-center justify-between">
-              <span className="text-sm font-medium" style={{ color: 'var(--admin-text-secondary)' }}>
-                Day completion
-              </span>
-              <span className="text-sm font-semibold" style={{ color: 'var(--admin-text-primary)' }}>
-                {completion}%
-              </span>
+              <span className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: 'var(--admin-text-muted)' }}>Daily Completion</span>
+              <span className="font-mono text-xs" style={{ color: 'var(--admin-text-secondary)' }}>{completion}%</span>
             </div>
             <div className="h-2 overflow-hidden rounded-full" style={{ background: 'var(--admin-surface-hover)' }}>
               <motion.div
                 className="h-full rounded-full"
                 initial={{ width: 0 }}
                 animate={{ width: `${completion}%` }}
-                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                 style={{ background: 'linear-gradient(90deg, var(--admin-accent), var(--admin-success))' }}
               />
             </div>
@@ -502,423 +389,7 @@ function PrivateOfficeHero({
   );
 }
 
-function FilterBar({
-  tasks,
-  active,
-  search,
-  onChange,
-  onSearch,
-  onCreate,
-}: {
-  tasks: Task[];
-  active: FilterOption;
-  search: string;
-  onChange: (filter: FilterOption) => void;
-  onSearch: (value: string) => void;
-  onCreate: () => void;
-}) {
-  const categories = Array.from(new Set(tasks.map((t) => t.category).filter(Boolean))).slice(0, 6);
-  const filters: Array<{ label: string; value: FilterOption }> = [
-    { label: 'All', value: 'all' as FilterOption },
-    { label: 'Critical', value: 'critical' as FilterOption },
-    { label: 'High', value: 'high' as FilterOption },
-    ...categories.map((category) => ({
-      label: titleCase(category),
-      value: category as FilterOption,
-    })),
-  ];
-
-  return (
-    <section
-      className="rounded-lg border p-3 sm:p-4"
-      style={{
-        background: 'color-mix(in srgb, var(--admin-surface) 92%, transparent)',
-        borderColor: 'var(--admin-border)',
-        boxShadow: 'var(--admin-card-shadow, none)',
-      }}
-    >
-      <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
-        <div className="flex flex-1 gap-2 overflow-x-auto pb-1 xl:pb-0">
-          {filters.map((item) => {
-            const selected = active === item.value;
-            return (
-              <button
-                key={String(item.value)}
-                type="button"
-                onClick={() => onChange(item.value)}
-                className="shrink-0 rounded-lg border px-4 py-2 text-sm font-medium transition-all duration-200"
-                style={{
-                  background: selected ? 'var(--admin-text-primary)' : 'var(--admin-surface)',
-                  borderColor: selected ? 'var(--admin-text-primary)' : 'var(--admin-border)',
-                  color: selected ? 'var(--admin-bg)' : 'var(--admin-text-secondary)',
-                }}
-              >
-                {item.label}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="flex flex-col gap-2 sm:flex-row xl:w-[460px]">
-          <input
-            value={search}
-            onChange={(e) => onSearch(e.target.value)}
-            placeholder="Search your priorities"
-            className="h-11 min-w-0 flex-1 rounded-lg border px-4 text-sm outline-none transition-all"
-            style={{
-              background: 'var(--admin-surface)',
-              borderColor: 'var(--admin-border)',
-              color: 'var(--admin-text-primary)',
-            }}
-          />
-          <button
-            type="button"
-            onClick={onCreate}
-            className="h-11 rounded-lg border px-4 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5"
-            style={{
-              background: 'var(--admin-text-primary)',
-              borderColor: 'var(--admin-text-primary)',
-              color: 'var(--admin-bg)',
-            }}
-          >
-            New Task
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function PrioritySuite({
-  task,
-  completing,
-  onComplete,
-}: {
-  task: Task;
-  completing: boolean;
-  onComplete: (id: string) => void;
-}) {
-  const priority = priorityDesign(task.priority);
-
-  return (
-    <section
-      className="rounded-lg border p-5 sm:p-6"
-      style={{
-        background: 'linear-gradient(135deg, color-mix(in srgb, var(--admin-surface) 96%, white), color-mix(in srgb, var(--admin-surface-hover) 72%, var(--admin-surface)))',
-        borderColor: 'var(--admin-border-strong)',
-        boxShadow: 'var(--admin-card-shadow, none)',
-      }}
-    >
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-center">
-        <div className="min-w-0">
-          <p className="mb-2 text-sm font-medium" style={{ color: 'var(--admin-text-muted)' }}>
-            First move
-          </p>
-          <h3 className="text-2xl font-semibold leading-tight tracking-[-0.035em] sm:text-3xl" style={{ color: 'var(--admin-text-primary)' }}>
-            {task.title}
-          </h3>
-          {(task.description || task.reason) && (
-            <p className="mt-3 max-w-3xl text-sm leading-6" style={{ color: 'var(--admin-text-muted)' }}>
-              {task.description || task.reason}
-            </p>
-          )}
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Pill label={titleCase(task.category || 'General')} />
-            <Pill label={priority.label} tone={priority.tone} />
-            {(task.money_impact ?? 0) > 0 && <Pill label={formatMoney(task.money_impact ?? 0)} tone="success" />}
-          </div>
-        </div>
-
-        <button
-          type="button"
-          disabled={completing}
-          onClick={() => onComplete(task.id)}
-          className="rounded-lg border px-5 py-4 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
-          style={{
-            background: 'var(--admin-text-primary)',
-            borderColor: 'var(--admin-text-primary)',
-            color: 'var(--admin-bg)',
-          }}
-        >
-          {completing ? 'Finishing...' : 'Mark Complete'}
-        </button>
-      </div>
-    </section>
-  );
-}
-
-function TaskSection({
-  title,
-  subtitle,
-  count,
-  tone = 'default',
-  children,
-}: {
-  title: string;
-  subtitle: string;
-  count: number;
-  tone?: 'default' | 'warning' | 'success';
-  children: React.ReactNode;
-}) {
-  const accent =
-    tone === 'warning'
-      ? 'var(--admin-warning)'
-      : tone === 'success'
-        ? 'var(--admin-success)'
-        : 'var(--admin-accent)';
-
-  return (
-    <section>
-      <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="mb-2 h-px w-16" style={{ background: accent }} />
-          <h2 className="text-2xl font-semibold tracking-[-0.035em]" style={{ color: 'var(--admin-text-primary)' }}>
-            {title}
-          </h2>
-          <p className="mt-1 text-sm" style={{ color: 'var(--admin-text-muted)' }}>
-            {subtitle}
-          </p>
-        </div>
-        <span
-          className="w-fit rounded-full border px-3 py-1 text-sm font-medium"
-          style={{
-            background: 'var(--admin-surface)',
-            borderColor: 'var(--admin-border)',
-            color: 'var(--admin-text-secondary)',
-          }}
-        >
-          {count} {count === 1 ? 'item' : 'items'}
-        </span>
-      </div>
-      {children}
-    </section>
-  );
-}
-
-function TaskGallery({ children }: { children: React.ReactNode }) {
-  return <div className="grid gap-3">{children}</div>;
-}
-
-function LuxuryTaskCard({
-  task,
-  index,
-  onComplete,
-  completing = false,
-  muted = false,
-  overdue = false,
-}: {
-  task: Task;
-  index: number;
-  onComplete: (id: string) => void;
-  completing?: boolean;
-  muted?: boolean;
-  overdue?: boolean;
-}) {
-  const priority = priorityDesign(task.priority);
-  const hasMoney = (task.money_impact ?? 0) > 0;
-
-  return (
-    <motion.article
-      layout
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, x: -16 }}
-      transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-      className="group rounded-lg border p-4 transition-all duration-300 hover:-translate-y-0.5 sm:p-5"
-      style={{
-        background: muted
-          ? 'color-mix(in srgb, var(--admin-surface) 82%, transparent)'
-          : 'linear-gradient(135deg, var(--admin-surface), color-mix(in srgb, var(--admin-surface-hover) 42%, var(--admin-surface)))',
-        borderColor: overdue ? 'var(--admin-warning-border)' : muted ? 'var(--admin-success-border)' : 'var(--admin-border)',
-        boxShadow: muted ? 'none' : 'var(--admin-card-shadow, 0 18px 44px rgba(0,0,0,0.07))',
-      }}
-    >
-      <div className="grid gap-4 lg:grid-cols-[56px_minmax(0,1fr)_auto] lg:items-start">
-        <div
-          className="flex h-11 w-11 items-center justify-center rounded-lg border text-sm font-semibold"
-          style={{
-            background: 'var(--admin-surface-hover)',
-            borderColor: 'var(--admin-border)',
-            color: muted ? 'var(--admin-success)' : 'var(--admin-text-muted)',
-          }}
-        >
-          {muted ? 'Done' : String(index).padStart(2, '0')}
-        </div>
-
-        <div className="min-w-0">
-          <div className="mb-3 flex flex-wrap gap-2">
-            <Pill label={titleCase(task.category || 'General')} />
-            <Pill label={priority.label} tone={priority.tone} />
-            {overdue && <Pill label="Needs attention" tone="warning" />}
-            {hasMoney && <Pill label={formatMoney(task.money_impact ?? 0)} tone="success" />}
-          </div>
-
-          <h3
-            className="text-lg font-semibold leading-snug tracking-[-0.02em]"
-            style={{ color: muted ? 'var(--admin-text-muted)' : 'var(--admin-text-primary)' }}
-          >
-            {task.title}
-          </h3>
-
-          {(task.description || task.reason) && (
-            <p className="mt-2 max-w-4xl text-sm leading-6" style={{ color: 'var(--admin-text-muted)' }}>
-              {task.description || task.reason}
-            </p>
-          )}
-
-          {task.reason && task.description && (
-            <p className="mt-3 rounded-lg border px-3 py-2 text-sm" style={{ background: 'var(--admin-surface-hover)', borderColor: 'var(--admin-border)', color: 'var(--admin-text-secondary)' }}>
-              {task.reason}
-            </p>
-          )}
-        </div>
-
-        {!muted && (
-          <button
-            type="button"
-            disabled={completing}
-            onClick={() => onComplete(task.id)}
-            className="rounded-lg border px-4 py-2.5 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
-            style={{
-              background: 'var(--admin-text-primary)',
-              borderColor: 'var(--admin-text-primary)',
-              color: 'var(--admin-bg)',
-            }}
-          >
-            {completing ? 'Finishing...' : 'Complete'}
-          </button>
-        )}
-      </div>
-    </motion.article>
-  );
-}
-
-function PrivateBriefing({
-  todayOpen,
-  todayCompleted,
-  overdueOpen,
-  dbError,
-  moneyToday,
-  criticalHigh,
-  nextTask,
-  revenueTasks,
-}: {
-  todayOpen: Task[];
-  todayCompleted: Task[];
-  overdueOpen: Task[];
-  dbError: string | null;
-  moneyToday: number;
-  criticalHigh: number;
-  nextTask: Task | null;
-  revenueTasks: Task[];
-}) {
-  const total = todayOpen.length + todayCompleted.length;
-  const completion = total > 0 ? Math.round((todayCompleted.length / total) * 100) : 0;
-  const topRevenue = revenueTasks[0] ?? null;
-
-  return (
-    <div className="space-y-4 2xl:sticky 2xl:top-[116px]">
-      <Panel>
-        <p className="text-sm font-medium" style={{ color: 'var(--admin-text-muted)' }}>Room status</p>
-        <div className="mt-3 flex items-center justify-between gap-3">
-          <h3 className="text-xl font-semibold tracking-[-0.03em]" style={{ color: 'var(--admin-text-primary)' }}>
-            {dbError ? 'Needs attention' : 'Composed'}
-          </h3>
-          <span
-            className="h-2.5 w-2.5 rounded-full"
-            style={{
-              background: dbError ? 'var(--admin-danger)' : 'var(--admin-success)',
-              boxShadow: dbError ? '0 0 12px var(--admin-danger)' : '0 0 12px var(--admin-success)',
-            }}
-          />
-        </div>
-        <p className="mt-2 text-sm leading-6" style={{ color: 'var(--admin-text-muted)' }}>
-          {dbError ? 'The task room is visible, but the connection needs a look.' : 'Tasks, focus and progress are flowing cleanly.'}
-        </p>
-      </Panel>
-
-      <Panel>
-        <p className="text-sm font-medium" style={{ color: 'var(--admin-text-muted)' }}>Daily rhythm</p>
-        <div className="mt-3 flex items-end justify-between">
-          <span className="text-4xl font-semibold tracking-[-0.06em]" style={{ color: 'var(--admin-text-primary)' }}>{completion}%</span>
-          <span className="text-sm" style={{ color: 'var(--admin-text-muted)' }}>{todayCompleted.length}/{total || 0} finished</span>
-        </div>
-        <div className="mt-4 h-2 overflow-hidden rounded-full" style={{ background: 'var(--admin-surface-hover)' }}>
-          <motion.div
-            className="h-full rounded-full"
-            initial={{ width: 0 }}
-            animate={{ width: `${completion}%` }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            style={{ background: 'linear-gradient(90deg, var(--admin-accent), var(--admin-success))' }}
-          />
-        </div>
-      </Panel>
-
-      <Panel>
-        <p className="text-sm font-medium" style={{ color: 'var(--admin-text-muted)' }}>Signals</p>
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <SmallBrief label="Open" value={todayOpen.length} />
-          <SmallBrief label="Critical" value={criticalHigh} />
-          <SmallBrief label="Overdue" value={overdueOpen.length} tone="warning" />
-          <SmallBrief label="Revenue" value={formatMoney(moneyToday)} tone="success" />
-        </div>
-      </Panel>
-
-      <Panel>
-        <p className="text-sm font-medium" style={{ color: 'var(--admin-text-muted)' }}>First priority</p>
-        {nextTask ? (
-          <>
-            <h3 className="mt-3 text-lg font-semibold leading-snug tracking-[-0.02em]" style={{ color: 'var(--admin-text-primary)' }}>
-              {nextTask.title}
-            </h3>
-            <p className="mt-2 text-sm leading-6" style={{ color: 'var(--admin-text-muted)' }}>
-              {nextTask.description || nextTask.reason || 'This is the cleanest next move.'}
-            </p>
-          </>
-        ) : (
-          <p className="mt-3 text-sm leading-6" style={{ color: 'var(--admin-text-muted)' }}>
-            No open priority is waiting.
-          </p>
-        )}
-      </Panel>
-
-      <Panel>
-        <p className="text-sm font-medium" style={{ color: 'var(--admin-text-muted)' }}>Largest money move</p>
-        {topRevenue ? (
-          <>
-            <h3 className="mt-3 text-lg font-semibold leading-snug tracking-[-0.02em]" style={{ color: 'var(--admin-text-primary)' }}>
-              {topRevenue.title}
-            </h3>
-            <p className="mt-2 text-sm font-semibold" style={{ color: 'var(--admin-success)' }}>
-              {formatMoney(topRevenue.money_impact ?? 0)}
-            </p>
-          </>
-        ) : (
-          <p className="mt-3 text-sm leading-6" style={{ color: 'var(--admin-text-muted)' }}>
-            No money impact is attached yet.
-          </p>
-        )}
-      </Panel>
-    </div>
-  );
-}
-
-function Panel({ children }: { children: React.ReactNode }) {
-  return (
-    <section
-      className="rounded-lg border p-5"
-      style={{
-        background: 'color-mix(in srgb, var(--admin-surface) 94%, transparent)',
-        borderColor: 'var(--admin-border)',
-        boxShadow: 'var(--admin-card-shadow, none)',
-      }}
-    >
-      {children}
-    </section>
-  );
-}
-
-function HeroStat({ label, value, tone = 'default' }: { label: string; value: number; tone?: 'default' | 'success' | 'warning' | 'danger' }) {
+function HeroMetric({ label, value, tone }: { label: string; value: number; tone: 'accent' | 'success' | 'warning' | 'danger' }) {
   const color =
     tone === 'success'
       ? 'var(--admin-success)'
@@ -926,109 +397,37 @@ function HeroStat({ label, value, tone = 'default' }: { label: string; value: nu
         ? 'var(--admin-warning)'
         : tone === 'danger'
           ? 'var(--admin-danger)'
-          : 'var(--admin-text-primary)';
+          : 'var(--admin-accent)';
 
   return (
-    <div className="rounded-lg border p-4" style={{ background: 'var(--admin-surface)', borderColor: 'var(--admin-border)' }}>
-      <p className="text-sm" style={{ color: 'var(--admin-text-muted)' }}>{label}</p>
-      <p className="mt-2 text-3xl font-semibold tracking-[-0.05em]" style={{ color }}>{value}</p>
+    <div className="rounded-3xl border p-4" style={{ background: 'var(--admin-surface)', borderColor: 'var(--admin-border)' }}>
+      <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: 'var(--admin-text-muted)' }}>{label}</p>
+      <p className="mt-2 font-mono text-3xl font-semibold tracking-[-0.05em]" style={{ color }}>{value}</p>
     </div>
   );
 }
 
-function SmallBrief({ label, value, tone = 'default' }: { label: string; value: number | string; tone?: 'default' | 'success' | 'warning' }) {
-  const color = tone === 'success' ? 'var(--admin-success)' : tone === 'warning' ? 'var(--admin-warning)' : 'var(--admin-text-primary)';
-
-  return (
-    <div className="rounded-lg border p-3" style={{ background: 'var(--admin-surface-hover)', borderColor: 'var(--admin-border)' }}>
-      <p className="text-xs" style={{ color: 'var(--admin-text-muted)' }}>{label}</p>
-      <p className="mt-1 text-lg font-semibold tracking-[-0.03em]" style={{ color }}>{value}</p>
-    </div>
-  );
-}
-
-function Pill({ label, tone = 'default' }: { label: string; tone?: 'default' | 'success' | 'warning' | 'danger' }) {
-  const color =
-    tone === 'success'
-      ? 'var(--admin-success)'
-      : tone === 'warning'
-        ? 'var(--admin-warning)'
-        : tone === 'danger'
-          ? 'var(--admin-danger)'
-          : 'var(--admin-text-muted)';
-
-  return (
-    <span
-      className="inline-flex rounded-full border px-3 py-1 text-xs font-medium"
-      style={{
-        background: `color-mix(in srgb, ${color} 7%, var(--admin-surface))`,
-        borderColor: `color-mix(in srgb, ${color} 20%, var(--admin-border))`,
-        color,
-      }}
-    >
-      {label}
-    </span>
-  );
-}
-
-function LoadingGallery() {
-  return (
-    <div className="grid gap-3">
-      {[1, 2, 3, 4].map((item) => (
-        <div key={item} className="h-28 animate-pulse rounded-lg border" style={{ background: 'var(--admin-surface)', borderColor: 'var(--admin-border)' }} />
-      ))}
-    </div>
-  );
-}
-
-function EmptyPanel({ title, text, actionLabel, onAction }: { title: string; text?: string; actionLabel?: string; onAction?: () => void }) {
-  return (
-    <div className="rounded-lg border p-8 text-center" style={{ background: 'var(--admin-surface)', borderColor: 'var(--admin-border)' }}>
-      <h3 className="text-xl font-semibold tracking-[-0.03em]" style={{ color: 'var(--admin-text-primary)' }}>{title}</h3>
-      {text && <p className="mx-auto mt-2 max-w-md text-sm leading-6" style={{ color: 'var(--admin-text-muted)' }}>{text}</p>}
-      {actionLabel && onAction && (
-        <button
-          type="button"
-          onClick={onAction}
-          className="mt-5 rounded-lg border px-5 py-3 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5"
-          style={{ background: 'var(--admin-text-primary)', borderColor: 'var(--admin-text-primary)', color: 'var(--admin-bg)' }}
-        >
-          {actionLabel}
-        </button>
-      )}
-    </div>
-  );
-}
-
-function CleanSlate() {
-  return (
-    <div className="rounded-lg border p-5" style={{ background: 'var(--admin-success-bg)', borderColor: 'var(--admin-success-border)' }}>
-      <h3 className="text-lg font-semibold tracking-[-0.02em]" style={{ color: 'var(--admin-success)' }}>
-        Nothing is overdue.
-      </h3>
-      <p className="mt-1 text-sm" style={{ color: 'var(--admin-text-muted)' }}>
-        The room is clean. Stay ahead of the day.
-      </p>
-    </div>
-  );
-}
-
-function ConnectionNotice({ error }: { error: string }) {
+function DbErrorBanner({ error }: { error: string }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
-      className="rounded-lg border p-5"
-      style={{ background: 'var(--admin-danger-bg)', borderColor: 'var(--admin-danger-border)' }}
+      className="rounded-[1.4rem] border px-5 py-4"
+      style={{ borderColor: 'var(--admin-danger-border)', background: 'var(--admin-danger-bg)' }}
     >
-      <h3 className="text-lg font-semibold" style={{ color: 'var(--admin-danger)' }}>
-        Connection needs attention
-      </h3>
-      <p className="mt-2 text-sm leading-6" style={{ color: 'var(--admin-danger)', opacity: 0.75 }}>
-        {error}
-      </p>
+      <p className="mb-1 font-mono text-sm font-semibold" style={{ color: 'var(--admin-danger)' }}>ERR: supabase_connection_failed</p>
+      <p className="font-mono text-xs leading-5" style={{ color: 'var(--admin-danger)', opacity: 0.72 }}>{error}</p>
     </motion.div>
+  );
+}
+
+function CleanState() {
+  return (
+    <div className="flex items-center gap-3 rounded-[1.4rem] border px-5 py-4" style={{ borderColor: 'var(--admin-success-border)', background: 'var(--admin-success-bg)' }}>
+      <span className="h-2 w-2 flex-shrink-0 rounded-full" style={{ background: 'var(--admin-success)', boxShadow: '0 0 10px var(--admin-success)' }} />
+      <span className="font-mono text-sm" style={{ color: 'var(--admin-success)' }}>No overdue tasks. Execution is clean.</span>
+    </div>
   );
 }
 
@@ -1039,31 +438,33 @@ function Toast({ toast }: { toast: { msg: string; ok: boolean } }) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 8 }}
       transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed bottom-6 right-6 z-[500] rounded-lg border px-5 py-4 text-sm font-medium"
+      className="fixed bottom-6 right-6 z-[500] flex items-center gap-2.5 rounded-2xl border px-4 py-3 font-mono text-sm"
       style={{
-        background: 'var(--admin-surface-elevated, var(--admin-surface))',
+        background: 'var(--admin-surface-elevated)',
         backdropFilter: 'blur(20px)',
         borderColor: toast.ok ? 'var(--admin-success-border)' : 'var(--admin-danger-border)',
         color: toast.ok ? 'var(--admin-success)' : 'var(--admin-danger)',
-        boxShadow: '0 18px 60px rgba(0,0,0,0.14)',
+        boxShadow: `0 18px 60px ${toast.ok ? 'rgba(90,138,106,0.18)' : 'rgba(184,90,90,0.18)'}`,
       }}
     >
+      <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full" style={{ background: toast.ok ? 'var(--admin-success)' : 'var(--admin-danger)' }} />
       {toast.msg}
     </motion.div>
   );
 }
 
-function priorityDesign(priority: Task['priority']): { label: string; tone: 'default' | 'success' | 'warning' | 'danger' } {
-  if (priority === 'critical') return { label: 'Critical', tone: 'danger' };
-  if (priority === 'high') return { label: 'High priority', tone: 'warning' };
-  if (priority === 'medium') return { label: 'Medium priority', tone: 'default' };
-  return { label: 'Low priority', tone: 'default' };
+/* Section label */
+function SectionLabel({ text, count, accent }: { text: string; count: number; accent: string }) {
+  return (
+    <div className="mb-3 flex items-center gap-3">
+      <div className="h-4 w-1 rounded-full" style={{ background: accent, boxShadow: `0 0 10px ${accent}` }} />
+      <span className="text-[10px] font-black uppercase tracking-[0.18em]" style={{ color: 'var(--admin-text-muted)' }}>{text}</span>
+      {count > 0 && (
+        <span className="rounded-full px-2 py-0.5 font-mono text-[10px]" style={{ background: `color-mix(in srgb, ${accent} 12%, transparent)`, color: accent, border: `1px solid color-mix(in srgb, ${accent} 24%, transparent)` }}>
+          {count}
+        </span>
+      )}
+      <div className="h-px flex-1" style={{ background: 'var(--admin-border)' }} />
+    </div>
+  );
 }
-
-function titleCase(value: string): string {
-  return value
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, (char) => char.toUpperCase());
-}
-
-export default AdminPage;
