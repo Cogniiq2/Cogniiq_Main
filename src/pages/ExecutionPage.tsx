@@ -1,4 +1,3 @@
-```tsx
 import { useState, useEffect, useCallback } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -1497,4 +1496,3 @@ function MiniInfo({ label, value }: { label: string; value: string }) {
 }
 
 export default ExecutionPage;
-```
