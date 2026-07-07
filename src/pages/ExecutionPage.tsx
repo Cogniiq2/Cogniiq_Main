@@ -1,3 +1,4 @@
+```tsx
 import { useState, useEffect, useCallback } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -124,7 +125,7 @@ function getErrorMessage(error: unknown): string {
 }
 
 function formatTimeOnly(time: string | null): string {
-  if (!time) return '—';
+  if (!time) return '--';
 
   if (/^\d{2}:\d{2}/.test(time)) {
     return time.slice(0, 5);
@@ -468,7 +469,7 @@ export function ExecutionPage() {
           loading={loading}
         />
 
-        <main className="relative z-10 mx-auto max-w-[1760px] px-4 py-6 sm:px-6 lg:px-10 lg:py-8">
+        <main className="relative z-10 mx-auto max-w-[1720px] px-4 py-5 sm:px-6 lg:px-8 lg:py-7">
           <DiagnosticsToggle
             today={today}
             day={day}
@@ -486,8 +487,8 @@ export function ExecutionPage() {
           ) : !day ? (
             <EmptyExecutionState onGenerate={handleGenerate} generating={generating} />
           ) : (
-            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-              <div className="min-w-0 space-y-6">
+            <div className="grid grid-cols-1 gap-5 2xl:grid-cols-[minmax(0,1fr)_380px]">
+              <div className="min-w-0 space-y-5">
                 <ExecutiveHero
                   day={day}
                   completedTaskCount={completedTaskCount}
@@ -501,8 +502,8 @@ export function ExecutionPage() {
                 <TaskTimeline tasks={tasks} updating={updating} onToggle={handleToggle} />
               </div>
 
-              <aside className="min-w-0 xl:sticky xl:top-[112px] xl:self-start">
-                <div className="space-y-4">
+              <aside className="min-w-0 2xl:sticky 2xl:top-[96px] 2xl:self-start">
+                <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-1">
                   <FocusCard planType={day.plan_type} />
                   <NonNegotiablesCard tasks={nonNegotiables} total={totalNonNegotiables} completed={completedNonNegotiables} />
                   <CategoryBreakdown breakdown={categoryBreakdown} />
@@ -523,28 +524,22 @@ export function ExecutionPage() {
 
 function AmbientLayer() {
   return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
       <div
-        className="absolute -left-48 -top-48 h-[720px] w-[720px] rounded-full blur-3xl"
-        style={{ background: 'var(--admin-glow-radial)', opacity: 0.9 }}
-      />
-      <div
-        className="absolute -right-40 top-1/3 h-[560px] w-[560px] rounded-full blur-3xl"
-        style={{ background: 'var(--admin-glow-radial)', opacity: 0.55 }}
+        className="absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--admin-accent) 10%, transparent), transparent 34%), radial-gradient(circle at 82% 10%, color-mix(in srgb, var(--admin-success) 7%, transparent), transparent 28%), linear-gradient(180deg, color-mix(in srgb, var(--admin-surface) 20%, transparent), transparent 42%)',
+        }}
       />
       <div
         className="absolute inset-0"
         style={{
           backgroundImage:
             'linear-gradient(var(--admin-grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--admin-grid-line) 1px, transparent 1px)',
-          backgroundSize: '72px 72px',
-          opacity: 0.58,
-        }}
-      />
-      <div
-        className="absolute inset-x-0 top-0 h-64"
-        style={{
-          background: 'linear-gradient(180deg, color-mix(in srgb, var(--admin-accent) 9%, transparent), transparent)',
+          backgroundSize: '56px 56px',
+          maskImage: 'linear-gradient(to bottom, black, transparent 70%)',
+          opacity: 0.34,
         }}
       />
     </div>
@@ -566,83 +561,58 @@ function Header({
 }) {
   return (
     <header
-      className="relative z-20 border-b"
+      className="sticky top-0 z-20 border-b"
       style={{
         borderColor: 'var(--admin-header-border)',
-        background: 'var(--admin-header-bg)',
-        backdropFilter: 'blur(26px)',
+        background: 'color-mix(in srgb, var(--admin-header-bg) 88%, transparent)',
+        backdropFilter: 'blur(24px)',
       }}
     >
-      <div
-        className="absolute inset-x-0 top-0 h-px"
-        style={{
-          background:
-            'linear-gradient(90deg, transparent, var(--admin-header-scan), color-mix(in srgb, var(--admin-accent) 60%, transparent), var(--admin-header-scan), transparent)',
-        }}
-      />
-
-      <div className="mx-auto max-w-[1760px] px-4 py-4 sm:px-6 lg:px-10">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-4">
+      <div className="mx-auto max-w-[1720px] px-4 py-3 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex min-w-0 items-center gap-3">
             <div
-              className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl"
-              style={{
-                background:
-                  'linear-gradient(135deg, color-mix(in srgb, var(--admin-accent) 20%, var(--admin-surface)), var(--admin-surface-hover))',
-                border: '1px solid var(--admin-border-strong)',
-                boxShadow: 'var(--accent-glow)',
-              }}
-            >
-              <div
-                className="absolute inset-0 opacity-60"
-                style={{
-                  background: 'radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--admin-accent) 22%, transparent), transparent 48%)',
-                }}
-              />
-              <Zap size={20} className="relative" style={{ color: 'var(--admin-accent)' }} />
-            </div>
-
-            <div>
-              <div className="mb-1 flex items-center gap-2">
-                <span
-                  className="h-1.5 w-1.5 rounded-full"
-                  style={{
-                    background: 'var(--admin-accent)',
-                    boxShadow: '0 0 16px var(--admin-accent)',
-                  }}
-                />
-                <p
-                  className="text-[9px] font-black uppercase tracking-[0.32em]"
-                  style={{ color: 'var(--admin-accent-subtle)' }}
-                >
-                  Cogniiq Execution OS
-                </p>
-              </div>
-              <h1
-                className="text-xl font-semibold tracking-[-0.04em] sm:text-2xl"
-                style={{ color: 'var(--admin-text-primary)' }}
-              >
-                Daily Command Center
-              </h1>
-              <p className="mt-1 text-xs" style={{ color: 'var(--admin-text-muted)' }}>
-                Performance, recovery and revenue — controlled with one clean operating system.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 lg:justify-end">
-            <div
-              className="rounded-2xl px-4 py-2 text-right"
+              className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl"
               style={{
                 background: 'var(--admin-surface)',
-                border: '1px solid var(--admin-border)',
+                border: '1px solid var(--admin-border-strong)',
                 boxShadow: 'var(--admin-card-shadow, none)',
               }}
             >
-              <p className="text-[10px] font-mono tracking-wide" style={{ color: 'var(--admin-text-muted)' }}>
-                {today}
-              </p>
-              <p className="text-sm font-semibold" style={{ color: 'var(--admin-text-primary)' }}>
+              <Gauge size={19} style={{ color: 'var(--admin-accent)' }} />
+            </div>
+
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{
+                    background: loading ? 'var(--admin-warning)' : 'var(--admin-success)',
+                    boxShadow: loading ? '0 0 14px var(--admin-warning)' : '0 0 14px var(--admin-success)',
+                  }}
+                />
+                <p className="text-[10px] font-black uppercase tracking-[0.18em]" style={{ color: 'var(--admin-text-muted)' }}>
+                  Cogniiq Admin
+                </p>
+                <span className="text-[10px] font-mono" style={{ color: 'var(--admin-text-muted)' }}>
+                  {today}
+                </span>
+              </div>
+              <h1 className="mt-0.5 truncate text-xl font-semibold tracking-[-0.035em] sm:text-2xl" style={{ color: 'var(--admin-text-primary)' }}>
+                Daily Execution
+              </h1>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+            <div
+              className="hidden rounded-2xl px-3 py-2 text-right sm:block"
+              style={{
+                background: 'var(--admin-surface)',
+                border: '1px solid var(--admin-border)',
+              }}
+            >
+              <p className="text-[10px] font-mono" style={{ color: 'var(--admin-text-muted)' }}>
                 {formatDateGerman(today)}
               </p>
             </div>
@@ -651,12 +621,11 @@ function Header({
               type="button"
               onClick={onRefresh}
               disabled={loading}
-              className="inline-flex h-11 items-center gap-2 rounded-2xl px-4 text-xs font-bold uppercase tracking-[0.14em] transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-10 items-center gap-2 rounded-2xl px-3 text-xs font-bold transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
               style={{
-                background: 'var(--admin-surface-hover)',
+                background: 'var(--admin-surface)',
                 border: '1px solid var(--admin-border)',
                 color: 'var(--admin-text-secondary)',
-                boxShadow: 'var(--admin-card-shadow, none)',
               }}
             >
               <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
@@ -685,11 +654,11 @@ function DiagnosticsToggle({
   setShowDiagnostics: (value: boolean) => void;
 }) {
   return (
-    <div className="mb-5 flex justify-end">
+    <div className="relative mb-4 flex justify-end">
       <button
         type="button"
         onClick={() => setShowDiagnostics(!showDiagnostics)}
-        className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] transition-all hover:-translate-y-0.5"
+        className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] transition-all hover:-translate-y-0.5"
         style={{
           background: 'var(--admin-surface)',
           border: '1px solid var(--admin-border)',
@@ -707,7 +676,7 @@ function DiagnosticsToggle({
             initial={{ opacity: 0, y: -8, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
-            className="absolute right-4 top-[138px] z-30 rounded-2xl p-4 font-mono text-[10px] shadow-2xl sm:right-6 lg:right-10"
+            className="absolute right-0 top-10 z-30 rounded-2xl p-4 font-mono text-[10px] shadow-2xl"
             style={{
               background: 'var(--admin-surface)',
               border: '1px solid var(--admin-border-strong)',
@@ -715,7 +684,7 @@ function DiagnosticsToggle({
               minWidth: 280,
             }}
           >
-            <div className="mb-2 flex items-center gap-2 font-sans text-[10px] font-black uppercase tracking-[0.18em]" style={{ color: 'var(--admin-accent)' }}>
+            <div className="mb-2 flex items-center gap-2 font-sans text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: 'var(--admin-accent)' }}>
               <Gauge size={12} /> Runtime
             </div>
             <p><span style={{ color: 'var(--admin-text-muted)' }}>today:</span> {today}</p>
@@ -760,70 +729,38 @@ function ExecutiveHero({
 
   return (
     <section
-      className="relative overflow-hidden rounded-[2rem] p-5 sm:p-6 lg:p-7"
+      className="relative overflow-hidden rounded-[1.75rem] p-4 sm:p-5 lg:p-6"
       style={{
         background:
-          'linear-gradient(135deg, color-mix(in srgb, var(--admin-surface) 94%, transparent), color-mix(in srgb, var(--admin-surface-hover) 86%, transparent))',
+          'linear-gradient(135deg, color-mix(in srgb, var(--admin-surface) 96%, transparent), color-mix(in srgb, var(--admin-surface-hover) 76%, var(--admin-surface)))',
         border: '1px solid var(--admin-border-strong)',
-        boxShadow: 'var(--admin-card-shadow, 0 28px 80px rgba(0,0,0,0.12))',
+        boxShadow: 'var(--admin-card-shadow, 0 24px 70px rgba(0,0,0,0.12))',
       }}
     >
-      <div
-        className="absolute -right-28 -top-32 h-80 w-80 rounded-full blur-3xl"
-        style={{ background: `color-mix(in srgb, ${scoreColor} 14%, transparent)` }}
-      />
       <div
         className="absolute inset-x-0 top-0 h-px"
         style={{
           background:
-            'linear-gradient(90deg, transparent, color-mix(in srgb, var(--admin-accent) 48%, transparent), transparent)',
+            'linear-gradient(90deg, transparent, color-mix(in srgb, var(--admin-accent) 50%, transparent), color-mix(in srgb, var(--admin-success) 38%, transparent), transparent)',
         }}
       />
+      <div
+        className="absolute -right-24 -top-24 h-72 w-72 rounded-full blur-3xl"
+        style={{ background: `color-mix(in srgb, ${scoreColor} 10%, transparent)` }}
+      />
 
-      <div className="relative grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-center">
-        <div className="flex justify-center lg:justify-start">
+      <div className="relative grid gap-5 xl:grid-cols-[230px_minmax(0,1fr)] xl:items-stretch">
+        <div className="grid gap-4 sm:grid-cols-[190px_minmax(0,1fr)] xl:block">
           <ScoreOrb score={score} color={scoreColor} />
-        </div>
 
-        <div className="min-w-0 space-y-5">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-            <div>
-              <div className="mb-2 flex flex-wrap items-center gap-2">
-                <LuxuryBadge icon={<Trophy size={12} />} label="Daily Plan" tone="accent" />
-                <LuxuryBadge icon={<ShieldCheck size={12} />} label={day.status || 'pending'} tone={tone} />
-              </div>
-              <h2
-                className="text-2xl font-semibold tracking-[-0.045em] sm:text-3xl"
-                style={{ color: 'var(--admin-text-primary)' }}
-              >
-                {day.title}
-              </h2>
-              <p className="mt-2 max-w-3xl text-sm leading-6" style={{ color: 'var(--admin-text-muted)' }}>
-                Execute the day like a machine: complete the critical blocks, protect recovery, and keep revenue moving.
-              </p>
-            </div>
-
-            <div className="rounded-2xl px-4 py-3 lg:text-right" style={{ background: 'var(--admin-surface-hover)', border: '1px solid var(--admin-border)' }}>
-              <p className="text-[9px] font-black uppercase tracking-[0.18em]" style={{ color: 'var(--admin-text-muted)' }}>
-                Plan Type
-              </p>
-              <p className="mt-1 font-mono text-sm capitalize" style={{ color: 'var(--admin-text-primary)' }}>
-                {getPlanTypeLabel(day.plan_type || 'standard')}
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-            <MetricTile icon={<BarChart3 size={15} />} label="Points" value={`${day.completed_points || 0}/${day.total_points || 0}`} accent="var(--admin-accent)" />
-            <MetricTile icon={<ListChecks size={15} />} label="Tasks" value={`${completedTaskCount}/${totalTaskCount}`} accent="var(--admin-success)" />
-            <MetricTile icon={<Flame size={15} />} label="Remaining" value={`${remainingTaskCount}`} accent="var(--admin-warning)" />
-            <MetricTile icon={<ShieldCheck size={15} />} label="Non-Neg" value={`${completedNonNegotiables}/${totalNonNegotiables}`} accent="var(--admin-danger)" />
-          </div>
-
-          <div>
-            <div className="mb-2 flex items-center justify-between text-[10px] font-black uppercase tracking-[0.16em]">
-              <span style={{ color: 'var(--admin-text-muted)' }}>Execution Completion</span>
-              <span style={{ color: 'var(--admin-text-secondary)' }}>{Math.round(completedPercent)}%</span>
+          <div className="rounded-3xl p-4 xl:mt-4" style={{ background: 'var(--admin-surface)', border: '1px solid var(--admin-border)' }}>
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <span className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: 'var(--admin-text-muted)' }}>
+                Completion
+              </span>
+              <span className="font-mono text-xs" style={{ color: 'var(--admin-text-secondary)' }}>
+                {Math.round(completedPercent)}%
+              </span>
             </div>
             <div className="h-2 overflow-hidden rounded-full" style={{ background: 'var(--admin-surface-hover)' }}>
               <motion.div
@@ -832,13 +769,57 @@ function ExecutiveHero({
                 animate={{ width: `${clampPct(completedPercent)}%` }}
                 transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                 style={{
-                  background:
-                    'linear-gradient(90deg, var(--admin-accent), color-mix(in srgb, var(--admin-success) 70%, var(--admin-accent)))',
-                  boxShadow: '0 0 24px color-mix(in srgb, var(--admin-accent) 32%, transparent)',
+                  background: 'linear-gradient(90deg, var(--admin-accent), var(--admin-success))',
                 }}
               />
             </div>
           </div>
+        </div>
+
+        <div className="min-w-0">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="min-w-0">
+              <div className="mb-3 flex flex-wrap items-center gap-2">
+                <LuxuryBadge icon={<Trophy size={12} />} label="Daily Plan" tone="accent" />
+                <LuxuryBadge icon={<ShieldCheck size={12} />} label={day.status || 'pending'} tone={tone} />
+              </div>
+              <h2 className="text-2xl font-semibold leading-tight tracking-[-0.04em] sm:text-3xl lg:text-4xl" style={{ color: 'var(--admin-text-primary)' }}>
+                {day.title}
+              </h2>
+              <p className="mt-3 max-w-3xl text-sm leading-6" style={{ color: 'var(--admin-text-muted)' }}>
+                Win the day by finishing the highest-leverage blocks first: critical tasks, body, recovery and business momentum.
+              </p>
+            </div>
+
+            <div
+              className="grid min-w-[210px] grid-cols-2 gap-2 rounded-3xl p-3"
+              style={{
+                background: 'var(--admin-surface)',
+                border: '1px solid var(--admin-border)',
+              }}
+            >
+              <MiniInfo label="Plan" value={getPlanTypeLabel(day.plan_type || 'standard')} />
+              <MiniInfo label="Status" value={day.status || 'pending'} />
+            </div>
+          </div>
+
+          <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <MetricTile icon={<BarChart3 size={15} />} label="Points" value={`${day.completed_points || 0}/${day.total_points || 0}`} accent="var(--admin-accent)" />
+            <MetricTile icon={<ListChecks size={15} />} label="Tasks" value={`${completedTaskCount}/${totalTaskCount}`} accent="var(--admin-success)" />
+            <MetricTile icon={<Flame size={15} />} label="Open" value={`${remainingTaskCount}`} accent="var(--admin-warning)" />
+            <MetricTile icon={<ShieldCheck size={15} />} label="Protocols" value={`${completedNonNegotiables}/${totalNonNegotiables}`} accent="var(--admin-danger)" />
+          </div>
+
+          {day.notes && (
+            <div className="mt-4 rounded-3xl p-4" style={{ background: 'var(--admin-surface)', border: '1px solid var(--admin-border)' }}>
+              <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: 'var(--admin-text-muted)' }}>
+                Notes
+              </p>
+              <p className="mt-2 text-sm leading-6" style={{ color: 'var(--admin-text-secondary)' }}>
+                {day.notes}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </section>
@@ -850,10 +831,14 @@ function ScoreOrb({ score, color }: { score: number; color: string }) {
   const offset = circumference - (score / 100) * circumference;
 
   return (
-    <div className="relative flex h-[190px] w-[190px] items-center justify-center">
+    <div className="relative mx-auto flex h-[190px] w-[190px] items-center justify-center">
       <div
-        className="absolute inset-0 rounded-full blur-2xl"
-        style={{ background: `color-mix(in srgb, ${color} 16%, transparent)` }}
+        className="absolute inset-4 rounded-full"
+        style={{
+          background: 'var(--admin-surface)',
+          border: '1px solid var(--admin-border)',
+          boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--admin-border) 60%, transparent)',
+        }}
       />
       <svg className="relative h-[168px] w-[168px] -rotate-90" viewBox="0 0 128 128">
         <circle
@@ -876,15 +861,15 @@ function ScoreOrb({ score, color }: { score: number; color: string }) {
           initial={{ strokeDashoffset: circumference }}
           animate={{ strokeDashoffset: offset }}
           transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-          style={{ filter: `drop-shadow(0 0 10px ${color})` }}
+          style={{ filter: `drop-shadow(0 0 8px ${color})` }}
         />
       </svg>
       <div className="absolute text-center">
-        <p className="mb-1 text-[9px] font-black uppercase tracking-[0.22em]" style={{ color: 'var(--admin-text-muted)' }}>
+        <p className="mb-1 text-[9px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--admin-text-muted)' }}>
           Score
         </p>
         <div className="flex items-start justify-center">
-          <span className="text-5xl font-semibold tabular-nums tracking-[-0.08em]" style={{ color }}>
+          <span className="text-5xl font-semibold tabular-nums tracking-[-0.07em]" style={{ color }}>
             {Math.round(score)}
           </span>
           <span className="ml-1 mt-2 text-sm font-mono" style={{ color: 'var(--admin-text-muted)' }}>
@@ -907,7 +892,7 @@ function TaskTimeline({
 }) {
   return (
     <section
-      className="rounded-[2rem] p-4 sm:p-5 lg:p-6"
+      className="rounded-[1.75rem] p-4 sm:p-5"
       style={{
         background: 'var(--admin-surface)',
         border: '1px solid var(--admin-border)',
@@ -916,32 +901,22 @@ function TaskTimeline({
     >
       <SectionHeader
         icon={<ListChecks size={15} />}
-        eyebrow="Execution Timeline"
-        title="Today’s operating blocks"
+        eyebrow="Execution Queue"
+        title="Today's operating blocks"
         count={tasks.length}
       />
 
-      <div className="relative mt-5 space-y-3 pl-4 sm:pl-5">
-        <div
-          className="absolute bottom-4 left-[7px] top-4 w-px sm:left-[9px]"
-          style={{
-            background:
-              'linear-gradient(to bottom, transparent, var(--admin-border-strong) 12%, var(--admin-border-strong) 88%, transparent)',
-          }}
-        />
-
+      <div className="mt-5 grid gap-3">
         <AnimatePresence>
           {tasks.map((task, i) => (
             <motion.div
               key={task.id}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.26, delay: i * 0.025, ease: [0.22, 1, 0.36, 1] }}
-              className="relative"
+              exit={{ opacity: 0, x: -16 }}
+              transition={{ duration: 0.24, delay: i * 0.018, ease: [0.22, 1, 0.36, 1] }}
             >
-              <TimelineDot task={task} />
-              <TaskCard task={task} onToggle={onToggle} updating={!!updating[task.id]} />
+              <TaskCard task={task} onToggle={onToggle} updating={!!updating[task.id]} index={i + 1} />
             </motion.div>
           ))}
         </AnimatePresence>
@@ -950,84 +925,77 @@ function TaskTimeline({
   );
 }
 
-function TimelineDot({ task }: { task: ExecutionTask }) {
-  const meta = getCategoryMeta(task.category);
-  return (
-    <div
-      className="absolute -left-[18px] top-6 z-10 h-3.5 w-3.5 rounded-full sm:-left-[22px]"
-      style={{
-        background: task.is_completed ? 'var(--admin-success)' : meta.accent,
-        boxShadow: `0 0 0 4px var(--admin-surface), 0 0 18px ${task.is_completed ? 'var(--admin-success)' : meta.accent}`,
-      }}
-    />
-  );
-}
-
 function TaskCard({
   task,
   onToggle,
   updating,
+  index,
 }: {
   task: ExecutionTask;
   onToggle: (t: ExecutionTask) => void;
   updating: boolean;
+  index: number;
 }) {
   const meta = getCategoryMeta(task.category);
   const timeRange =
     task.planned_start && task.planned_end
-      ? `${formatTimeOnly(task.planned_start)}–${formatTimeOnly(task.planned_end)}`
+      ? `${formatTimeOnly(task.planned_start)}-${formatTimeOnly(task.planned_end)}`
       : null;
+
+  const priorityTone = task.priority === 'critical' ? 'danger' : task.priority === 'high' ? 'warning' : 'muted';
 
   return (
     <div
       className={cx(
-        'group relative overflow-hidden rounded-3xl p-4 transition-all duration-300 hover:-translate-y-[2px]',
+        'group relative overflow-hidden rounded-3xl p-3 transition-all duration-300 hover:-translate-y-[2px] sm:p-4',
         updating && 'opacity-60',
       )}
       style={{
         background: task.is_completed
-          ? 'linear-gradient(135deg, var(--admin-success-bg), color-mix(in srgb, var(--admin-success-bg) 55%, var(--admin-surface)))'
-          : 'linear-gradient(135deg, var(--admin-surface), color-mix(in srgb, var(--admin-surface-hover) 46%, var(--admin-surface)))',
-        border: `1px solid ${task.is_completed ? 'var(--admin-success-border)' : 'var(--admin-border)'}`,
-        boxShadow: task.is_completed ? 'none' : 'var(--admin-card-shadow, 0 18px 55px rgba(0,0,0,0.08))',
+          ? 'linear-gradient(135deg, color-mix(in srgb, var(--admin-success-bg) 78%, var(--admin-surface)), var(--admin-surface))'
+          : 'linear-gradient(135deg, var(--admin-surface-hover), color-mix(in srgb, var(--admin-surface) 86%, var(--admin-surface-hover)))',
+        border: `1px solid ${task.is_completed ? 'var(--admin-success-border)' : task.is_non_negotiable ? 'var(--admin-danger-border)' : 'var(--admin-border)'}`,
+        boxShadow: task.is_completed ? 'none' : 'var(--admin-card-shadow, 0 18px 45px rgba(0,0,0,0.08))',
       }}
     >
       <div
-        className="absolute inset-y-0 left-0 w-[3px]"
-        style={{ background: task.is_completed ? 'var(--admin-success)' : meta.accent, opacity: task.is_completed ? 0.45 : 0.9 }}
-      />
-      <div
-        className="absolute right-0 top-0 h-24 w-24 rounded-bl-full opacity-40"
-        style={{ background: meta.soft }}
+        className="absolute inset-y-0 left-0 w-[4px]"
+        style={{ background: task.is_completed ? 'var(--admin-success)' : task.is_non_negotiable ? 'var(--admin-danger)' : meta.accent }}
       />
 
-      <div className="relative flex items-start gap-4">
-        <button
-          type="button"
-          onClick={() => onToggle(task)}
-          disabled={updating}
-          aria-label={task.is_completed ? 'Mark task incomplete' : 'Mark task complete'}
-          className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-2xl transition-all duration-200 hover:scale-105 disabled:cursor-not-allowed"
-          style={{
-            background: task.is_completed ? 'var(--admin-success-bg)' : 'var(--admin-surface-hover)',
-            border: `1px solid ${task.is_completed ? 'var(--admin-success)' : 'var(--admin-border-strong)'}`,
-            color: task.is_completed ? 'var(--admin-success)' : 'var(--admin-text-muted)',
-          }}
-        >
-          {updating ? <RefreshCw size={14} className="animate-spin" /> : task.is_completed ? <CheckCircle2 size={16} /> : null}
-        </button>
+      <div className="relative grid gap-3 sm:grid-cols-[44px_minmax(0,1fr)_auto] sm:items-start">
+        <div className="flex items-center gap-3 sm:block">
+          <button
+            type="button"
+            onClick={() => onToggle(task)}
+            disabled={updating}
+            aria-label={task.is_completed ? 'Mark task incomplete' : 'Mark task complete'}
+            className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl transition-all duration-200 hover:scale-105 disabled:cursor-not-allowed"
+            style={{
+              background: task.is_completed ? 'var(--admin-success-bg)' : 'var(--admin-surface)',
+              border: `1px solid ${task.is_completed ? 'var(--admin-success)' : 'var(--admin-border-strong)'}`,
+              color: task.is_completed ? 'var(--admin-success)' : 'var(--admin-text-muted)',
+            }}
+          >
+            {updating ? <RefreshCw size={15} className="animate-spin" /> : task.is_completed ? <CheckCircle2 size={18} /> : <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'currentColor', opacity: 0.35 }} />}
+          </button>
 
-        <div className="min-w-0 flex-1">
+          <span className="font-mono text-[10px] sm:mt-2 sm:block sm:text-center" style={{ color: 'var(--admin-text-muted)' }}>
+            #{String(index).padStart(2, '0')}
+          </span>
+        </div>
+
+        <div className="min-w-0">
           <div className="mb-2 flex flex-wrap items-center gap-2">
             {timeRange && <Badge label={timeRange} icon={<Clock size={11} />} tone="muted" />}
-            <Badge label={meta.label} icon={meta.icon} tone="custom" customColor={meta.accent} />
-            <Badge label={PRIORITY_LABEL[task.priority] || task.priority} tone={task.priority === 'critical' ? 'danger' : task.priority === 'high' ? 'warning' : 'muted'} />
+            <Badge label={meta.shortLabel || meta.label} icon={meta.icon} tone="custom" customColor={meta.accent} />
+            <Badge label={PRIORITY_LABEL[task.priority] || task.priority} tone={priorityTone} />
             {task.is_non_negotiable && <Badge label="Non-negotiable" icon={<ShieldCheck size={11} />} tone="danger" />}
             <Badge label={`+${task.points} pts`} tone="accent" />
           </div>
 
           <h3
-            className={cx('text-[15px] font-semibold leading-snug tracking-[-0.02em]', task.is_completed && 'line-through decoration-[1.5px]')}
+            className={cx('text-[15px] font-semibold leading-snug tracking-[-0.015em]', task.is_completed && 'line-through decoration-[1.5px]')}
             style={{ color: task.is_completed ? 'var(--admin-text-muted)' : 'var(--admin-text-primary)' }}
           >
             {task.title}
@@ -1047,7 +1015,7 @@ function TaskCard({
         </div>
 
         <div
-          className="hidden h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl sm:flex"
+          className="hidden h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl sm:flex"
           style={{ background: meta.soft, color: meta.accent, border: '1px solid var(--admin-border)' }}
         >
           {meta.icon}
@@ -1133,10 +1101,10 @@ function FocusCard({ planType }: { planType: string }) {
           {focus.icon}
         </div>
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.18em]" style={{ color: 'var(--admin-success)' }}>
-            Today’s Focus
+          <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: 'var(--admin-success)' }}>
+            Today's Focus
           </p>
-          <h3 className="mt-1 text-base font-semibold tracking-[-0.03em]" style={{ color: 'var(--admin-text-primary)' }}>
+          <h3 className="mt-1 text-base font-semibold tracking-[-0.025em]" style={{ color: 'var(--admin-text-primary)' }}>
             {focus.title}
           </h3>
           <p className="mt-1 text-xs leading-5" style={{ color: 'var(--admin-text-muted)' }}>
@@ -1222,7 +1190,7 @@ function CategoryBreakdown({
                   </span>
                 </div>
                 <span className="text-[10px] font-mono" style={{ color: 'var(--admin-text-muted)' }}>
-                  {completed}/{total} pts · {completedCount}/{count}
+                  {completed}/{total} pts - {completedCount}/{count}
                 </span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full" style={{ background: 'var(--admin-surface-hover)' }}>
@@ -1265,18 +1233,18 @@ function ProtocolCard({ day, tasks }: { day: ExecutionDay; tasks: ExecutionTask[
 
 function LoadingSkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-      <div className="space-y-6">
-        <div className="h-64 animate-pulse rounded-[2rem]" style={{ background: 'var(--admin-surface)', border: '1px solid var(--admin-border)' }} />
-        <div className="space-y-3 rounded-[2rem] p-5" style={{ background: 'var(--admin-surface)', border: '1px solid var(--admin-border)' }}>
+    <div className="grid grid-cols-1 gap-5 2xl:grid-cols-[minmax(0,1fr)_380px]">
+      <div className="space-y-5">
+        <div className="h-72 animate-pulse rounded-[1.75rem]" style={{ background: 'var(--admin-surface)', border: '1px solid var(--admin-border)' }} />
+        <div className="space-y-3 rounded-[1.75rem] p-5" style={{ background: 'var(--admin-surface)', border: '1px solid var(--admin-border)' }}>
           {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="h-24 animate-pulse rounded-3xl" style={{ background: 'var(--admin-surface-hover)' }} />
           ))}
         </div>
       </div>
-      <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="h-40 animate-pulse rounded-[2rem]" style={{ background: 'var(--admin-surface)', border: '1px solid var(--admin-border)' }} />
+      <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-1">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="h-40 animate-pulse rounded-[1.65rem]" style={{ background: 'var(--admin-surface)', border: '1px solid var(--admin-border)' }} />
         ))}
       </div>
     </div>
@@ -1292,27 +1260,26 @@ function EmptyExecutionState({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       className="mx-auto flex max-w-2xl flex-col items-center justify-center py-24 text-center"
     >
       <div
         className="relative mb-7 flex h-24 w-24 items-center justify-center overflow-hidden rounded-[2rem]"
         style={{
-          background:
-            'linear-gradient(135deg, color-mix(in srgb, var(--admin-accent) 16%, var(--admin-surface)), var(--admin-surface-hover))',
+          background: 'var(--admin-surface)',
           border: '1px solid var(--admin-border-strong)',
-          boxShadow: 'var(--accent-glow)',
+          boxShadow: 'var(--admin-card-shadow, none)',
         }}
       >
         <Sparkles size={34} style={{ color: 'var(--admin-accent)' }} />
       </div>
 
-      <p className="mb-2 text-[10px] font-black uppercase tracking-[0.28em]" style={{ color: 'var(--admin-accent-subtle)' }}>
+      <p className="mb-2 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--admin-accent-subtle)' }}>
         No active command file
       </p>
-      <h2 className="text-3xl font-semibold tracking-[-0.05em]" style={{ color: 'var(--admin-text-primary)' }}>
-        Generate today’s execution plan
+      <h2 className="text-3xl font-semibold tracking-[-0.045em]" style={{ color: 'var(--admin-text-primary)' }}>
+        Generate today's execution plan
       </h2>
       <p className="mt-3 max-w-lg text-sm leading-6" style={{ color: 'var(--admin-text-muted)' }}>
         Pull the correct weekday protocol from Supabase and start tracking the day with points, non-negotiables and execution status.
@@ -1321,7 +1288,7 @@ function EmptyExecutionState({
       <button
         onClick={onGenerate}
         disabled={generating}
-        className="mt-8 inline-flex items-center gap-3 rounded-2xl px-6 py-4 text-sm font-black uppercase tracking-[0.14em] transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-8 inline-flex items-center gap-3 rounded-2xl px-6 py-4 text-sm font-black uppercase tracking-[0.12em] transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
         style={{
           background: generating ? 'var(--admin-surface-hover)' : 'var(--admin-button-primary-bg)',
           border: '1px solid var(--admin-button-primary-border)',
@@ -1342,7 +1309,7 @@ function ErrorCard({ error, onClose, onRetry }: { error: string; onClose: () => 
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
-      className="mb-6 overflow-hidden rounded-[1.5rem] border p-4"
+      className="mb-5 overflow-hidden rounded-3xl border p-4"
       style={{ borderColor: 'var(--admin-danger-border)', background: 'var(--admin-danger-bg)' }}
     >
       <div className="flex items-start justify-between gap-4">
@@ -1351,7 +1318,7 @@ function ErrorCard({ error, onClose, onRetry }: { error: string; onClose: () => 
             <AlertTriangle size={16} />
           </div>
           <div className="min-w-0">
-            <p className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: 'var(--admin-danger)' }}>
+            <p className="text-xs font-black uppercase tracking-[0.16em]" style={{ color: 'var(--admin-danger)' }}>
               Execution OS Error
             </p>
             <pre className="mt-2 max-w-full whitespace-pre-wrap break-words text-xs leading-5" style={{ color: 'var(--admin-danger)' }}>
@@ -1380,15 +1347,14 @@ function ErrorCard({ error, onClose, onRetry }: { error: string; onClose: () => 
 // =============================================================================
 
 function PremiumPanel({ children }: { children: ReactNode }) {
+  const panelStyle: CSSProperties = {
+    background: 'var(--admin-surface)',
+    border: '1px solid var(--admin-border)',
+    boxShadow: 'var(--admin-card-shadow, none)',
+  };
+
   return (
-    <div
-      className="rounded-[1.65rem] p-4"
-      style={{
-        background: 'var(--admin-surface)',
-        border: '1px solid var(--admin-border)',
-        boxShadow: 'var(--admin-card-shadow, none)',
-      }}
-    >
+    <div className="rounded-[1.65rem] p-4" style={panelStyle}>
       {children}
     </div>
   );
@@ -1414,10 +1380,10 @@ function SectionHeader({
           {icon}
         </div>
         <div className="min-w-0">
-          <p className="text-[9px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--admin-text-muted)' }}>
+          <p className="text-[9px] font-black uppercase tracking-[0.18em]" style={{ color: 'var(--admin-text-muted)' }}>
             {eyebrow}
           </p>
-          <h3 className={cx('font-semibold tracking-[-0.035em]', compact ? 'text-sm' : 'text-lg')} style={{ color: 'var(--admin-text-primary)' }}>
+          <h3 className={cx('font-semibold tracking-[-0.03em]', compact ? 'text-sm' : 'text-lg')} style={{ color: 'var(--admin-text-primary)' }}>
             {title}
           </h3>
         </div>
@@ -1443,7 +1409,7 @@ function LuxuryBadge({ icon, label, tone }: { icon?: ReactNode; label: string; t
 
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.14em]"
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.12em]"
       style={{
         background: `color-mix(in srgb, ${color} 10%, transparent)`,
         border: `1px solid color-mix(in srgb, ${color} 24%, transparent)`,
@@ -1480,7 +1446,7 @@ function Badge({
 
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.1em]"
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.08em]"
       style={{
         background: `color-mix(in srgb, ${color} 9%, transparent)`,
         border: `1px solid color-mix(in srgb, ${color} 22%, transparent)`,
@@ -1498,7 +1464,7 @@ function MetricTile({ icon, label, value, accent }: { icon: ReactNode; label: st
     <div
       className="rounded-2xl p-4"
       style={{
-        background: 'var(--admin-surface-hover)',
+        background: 'var(--admin-surface)',
         border: '1px solid var(--admin-border)',
       }}
     >
@@ -1506,11 +1472,11 @@ function MetricTile({ icon, label, value, accent }: { icon: ReactNode; label: st
         <span className="flex h-8 w-8 items-center justify-center rounded-xl" style={{ background: `color-mix(in srgb, ${accent} 10%, transparent)`, color: accent }}>
           {icon}
         </span>
-        <span className="text-[9px] font-black uppercase tracking-[0.15em]" style={{ color: 'var(--admin-text-muted)' }}>
+        <span className="text-[9px] font-black uppercase tracking-[0.12em]" style={{ color: 'var(--admin-text-muted)' }}>
           {label}
         </span>
       </div>
-      <p className="font-mono text-lg font-semibold tracking-[-0.04em]" style={{ color: 'var(--admin-text-primary)' }}>
+      <p className="font-mono text-lg font-semibold tracking-[-0.03em]" style={{ color: 'var(--admin-text-primary)' }}>
         {value}
       </p>
     </div>
@@ -1520,10 +1486,10 @@ function MetricTile({ icon, label, value, accent }: { icon: ReactNode; label: st
 function MiniInfo({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-2xl p-3" style={{ background: 'var(--admin-surface-hover)', border: '1px solid var(--admin-border)' }}>
-      <p className="text-[9px] font-black uppercase tracking-[0.14em]" style={{ color: 'var(--admin-text-muted)' }}>
+      <p className="text-[9px] font-black uppercase tracking-[0.12em]" style={{ color: 'var(--admin-text-muted)' }}>
         {label}
       </p>
-      <p className="mt-1 truncate font-mono text-xs" style={{ color: 'var(--admin-text-primary)' }}>
+      <p className="mt-1 truncate font-mono text-xs capitalize" style={{ color: 'var(--admin-text-primary)' }}>
         {value}
       </p>
     </div>
@@ -1531,3 +1497,4 @@ function MiniInfo({ label, value }: { label: string; value: string }) {
 }
 
 export default ExecutionPage;
+```
