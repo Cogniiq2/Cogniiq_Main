@@ -273,6 +273,7 @@ const BlogPostPage = lazyNamed(() => import('./pages/blog/BlogPostPage'), 'BlogP
 const ScanPage = lazyNamed(() => import('./pages/ScanPage'), 'ScanPage');
 const AdminPage = lazyNamed(() => import('./pages/AdminPage'), 'AdminPage');
 const ExecutionPage = lazyNamed(() => import('./pages/ExecutionPage'), 'ExecutionPage');
+const OuraAnalyticsPage = lazyNamed(() => import('./pages/OuraAnalyticsPage'), 'OuraAnalyticsPage');
 
 function AppInner() {
   const location = useLocation();
@@ -282,6 +283,13 @@ function AppInner() {
       return (
         <Suspense fallback={<PageFallback />}>
           <ExecutionPage />
+        </Suspense>
+      );
+    }
+    if (location.pathname === '/admin/oura-analytics') {
+      return (
+        <Suspense fallback={<PageFallback />}>
+          <OuraAnalyticsPage />
         </Suspense>
       );
     }

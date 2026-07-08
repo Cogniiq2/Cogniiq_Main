@@ -18,6 +18,7 @@ const TABS = [
   { key: 'overdue', label: 'Overdue' },
   { key: 'completed', label: 'Completed' },
   { key: 'revenue', label: 'Revenue Focus' },
+  { key: 'oura-analytics', label: 'Oura Analytics', href: '/admin/oura-analytics' },
   { key: 'execution', label: 'Execution OS', href: '/admin/execution' },
 ];
 
@@ -93,9 +94,12 @@ export function AdminHeader({ activeTab, onTabChange, todayCount, overdueCount, 
                 key={tab.key}
                 href={tab.href}
                 className="relative px-4 py-2.5 text-[11px] font-semibold tracking-[0.1em] uppercase transition-colors duration-200 whitespace-nowrap"
-                style={{ color: 'var(--admin-text-muted)' }}
+                style={{ color: activeTab === tab.key ? 'var(--admin-accent)' : 'var(--admin-text-muted)' }}
               >
                 {tab.label}
+                {activeTab === tab.key && (
+                  <motion.div layoutId="admin-tab-line" className="absolute bottom-0 left-2 right-2 h-[2px] rounded-full" style={{ background: 'linear-gradient(90deg, transparent, var(--admin-accent), transparent)' }} transition={{ type: 'spring', stiffness: 500, damping: 36 }} />
+                )}
               </a>
             ) : (
               <button
