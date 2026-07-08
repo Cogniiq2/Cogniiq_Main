@@ -112,10 +112,24 @@ function mergeDailyRows(
 }
 
 function getCallbackParams(): CallbackParams {
-  const search = new URLSearchParams(window.location.search);
-  const connected = search.get('connected');
-  const connectionId = search.get('connection_id');
-  const error = search.get('error');
+  const sources = [new URLSearchParams(window.location.search)];
+  const hashQueryIndex = window.location.hash.indexOf('?');
+
+  if (hashQueryIndex >= 0) {
+    sources.push(new URLSearchParams(window.location.hash.slice(hashQueryIndex + 1)));
+  }
+
+  const readParam = (key: string): string | null => {
+    for (const source of sources) {
+      const value = source.get(key);
+      if (value) return value;
+    }
+    return null;
+  };
+
+  const connected = readParam('connected');
+  const connectionId = readParam('connection_id');
+  const error = readParam('error');
 
   return {
     connected,
@@ -126,7 +140,10 @@ function getCallbackParams(): CallbackParams {
 }
 
 function clearCallbackParams() {
-  const cleanUrl = `${window.location.origin}${window.location.pathname}`;
+  const hash = window.location.hash;
+  const hashQueryIndex = hash.indexOf('?');
+  const cleanHash = hashQueryIndex >= 0 ? hash.slice(0, hashQueryIndex) : hash;
+  const cleanUrl = `${window.location.origin}${window.location.pathname}${cleanHash}`;
   window.history.replaceState(null, document.title, cleanUrl);
 }
 
@@ -378,9 +395,10 @@ export function OuraAnalyticsPage() {
     if (params.connectionId) {
       window.localStorage.setItem(OURA_CONNECTION_STORAGE_KEY, params.connectionId);
       setConnectionId(params.connectionId);
+      showNotice({ type: 'success', message: 'Oura connected successfully.' });
     }
 
-    if (params.connected === 'true') {
+    if (params.connected === 'true' && !params.connectionId) {
       showNotice({ type: 'success', message: 'Oura connected successfully.' });
     }
 
