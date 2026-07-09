@@ -1,0 +1,2 @@
+[functions.sync-oura]
+verify_jwt = false
