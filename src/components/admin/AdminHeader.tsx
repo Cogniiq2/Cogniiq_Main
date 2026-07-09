@@ -18,7 +18,7 @@ const TABS = [
   { key: 'overdue', label: 'Overdue' },
   { key: 'completed', label: 'Completed' },
   { key: 'revenue', label: 'Revenue Focus' },
-  { key: 'oura-analytics', label: 'Oura Analytics', href: '/admin/oura-analytics' },
+  { key: 'oura-analytics', label: 'Oura Analytics', href: '/admin/#/oura-analytics' },
   { key: 'execution', label: 'Execution OS', href: '/admin/execution' },
 ];
 

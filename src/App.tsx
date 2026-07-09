@@ -277,6 +277,7 @@ const OuraAnalyticsPage = lazyNamed(() => import('./pages/OuraAnalyticsPage'), '
 
 function AppInner() {
   const location = useLocation();
+  const adminHashPath = location.hash.split('?')[0];
 
   if (location.pathname.startsWith('/admin')) {
     if (location.pathname === '/admin/execution') {
@@ -286,7 +287,7 @@ function AppInner() {
         </Suspense>
       );
     }
-    if (location.pathname === '/admin/oura-analytics') {
+    if (location.pathname === '/admin/oura-analytics' || adminHashPath === '#/oura-analytics') {
       return (
         <Suspense fallback={<PageFallback />}>
           <OuraAnalyticsPage />
