@@ -1,136 +1,228 @@
 import { useEffect, useState } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 import { motion } from 'framer-motion';
+import {
+  Activity,
+  BarChart3,
+  Calendar,
+  CircleCheck as CheckCircle,
+  Gauge,
+  HeartPulse,
+  LayoutDashboard,
+  TriangleAlert,
+  type LucideIcon,
+} from 'lucide-react';
 import { AdminThemeToggle } from './AdminThemeToggle';
-import { AdminTheme } from '../../hooks/useAdminTheme';
+import type { AdminTheme } from '../../hooks/useAdminTheme';
 
 interface Props {
   activeTab: string;
-  onTabChange: (tab: string) => void;
+  onTabChange?: (tab: string) => void;
   todayCount: number;
   overdueCount: number;
   theme?: AdminTheme;
   onThemeToggle?: () => void;
+  utilityAction?: ReactNode;
 }
 
-const TABS = [
-  { key: 'overview', label: 'Overview' },
-  { key: 'today', label: 'Today' },
-  { key: 'overdue', label: 'Overdue' },
-  { key: 'completed', label: 'Completed' },
-  { key: 'revenue', label: 'Revenue Focus' },
-  { key: 'oura-analytics', label: 'Oura Analytics', href: '/admin/#/oura-analytics' },
-  { key: 'execution', label: 'Execution OS', href: '/admin/execution' },
+type AdminNavItem = {
+  key: string;
+  label: string;
+  shortLabel: string;
+  href: string;
+  icon: LucideIcon;
+  tone: 'accent' | 'success' | 'warning' | 'info';
+  localView?: boolean;
+  count?: (props: Pick<Props, 'todayCount' | 'overdueCount'>) => number | null;
+};
+
+const ADMIN_NAV: AdminNavItem[] = [
+  { key: 'overview', label: 'Overview', shortLabel: 'Core', href: '/admin', icon: LayoutDashboard, tone: 'accent', localView: true },
+  { key: 'today', label: 'Today', shortLabel: 'Now', href: '/admin#today', icon: Calendar, tone: 'info', localView: true, count: ({ todayCount }) => todayCount },
+  { key: 'overdue', label: 'Overdue', shortLabel: 'Risk', href: '/admin#overdue', icon: TriangleAlert, tone: 'warning', localView: true, count: ({ overdueCount }) => overdueCount || null },
+  { key: 'completed', label: 'Completed', shortLabel: 'Done', href: '/admin#completed', icon: CheckCircle, tone: 'success', localView: true },
+  { key: 'revenue', label: 'Revenue Focus', shortLabel: 'Value', href: '/admin#revenue', icon: BarChart3, tone: 'success', localView: true },
+  { key: 'oura-analytics', label: 'Oura Analytics', shortLabel: 'Health', href: '/admin/#/oura-analytics', icon: HeartPulse, tone: 'info' },
+  { key: 'execution', label: 'Execution OS', shortLabel: 'Execute', href: '/admin/execution', icon: Gauge, tone: 'accent' },
 ];
 
-export function AdminHeader({ activeTab, onTabChange, todayCount, overdueCount, theme = 'dark', onThemeToggle }: Props) {
+function colorForTone(tone: AdminNavItem['tone']): string {
+  if (tone === 'success') return 'var(--admin-success)';
+  if (tone === 'warning') return 'var(--admin-warning)';
+  if (tone === 'info') return 'var(--admin-info)';
+  return 'var(--admin-accent)';
+}
+
+function isOnAdminWorkspace() {
+  if (typeof window === 'undefined') return false;
+  return window.location.pathname.replace(/\/$/, '') === '/admin' && !window.location.hash.startsWith('#/');
+}
+
+function setAdminHash(tabKey: string) {
+  if (typeof window === 'undefined') return;
+  const nextUrl = tabKey === 'overview' ? '/admin' : `/admin#${tabKey}`;
+  window.history.replaceState(null, '', nextUrl);
+}
+
+export function AdminHeader({ activeTab, onTabChange, todayCount, overdueCount, theme = 'dark', onThemeToggle, utilityAction }: Props) {
   const [time, setTime] = useState(new Date());
+
   useEffect(() => {
     const id = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
 
-  const dateStr = time.toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+  const dateStr = time.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: 'short' });
   const hh = String(time.getHours()).padStart(2, '0');
   const mm = String(time.getMinutes()).padStart(2, '0');
   const ss = String(time.getSeconds()).padStart(2, '0');
 
+  const handleLocalViewClick = (event: MouseEvent<HTMLAnchorElement>, item: AdminNavItem) => {
+    if (!item.localView || !isOnAdminWorkspace()) return;
+    event.preventDefault();
+    onTabChange?.(item.key);
+    setAdminHash(item.key);
+  };
+
   return (
-    <header className="relative z-20 border-b admin-header" style={{ borderColor: 'var(--admin-header-border)', background: 'var(--admin-header-bg)', backdropFilter: 'blur(20px)' }}>
-      {/* Top scan line */}
-      <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent 0%, var(--admin-header-scan) 30%, var(--admin-header-scan) 50%, var(--admin-header-scan) 70%, transparent 100%)' }} />
+    <header
+      className="sticky top-0 z-30 border-b admin-header"
+      style={{
+        borderColor: 'var(--admin-header-border)',
+        background: 'linear-gradient(180deg, color-mix(in srgb, var(--admin-header-bg) 96%, transparent), color-mix(in srgb, var(--admin-header-bg) 86%, transparent))',
+        backdropFilter: 'blur(24px)',
+      }}
+    >
+      <div className="absolute inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent 0%, var(--admin-header-scan) 28%, var(--admin-success) 50%, var(--admin-header-scan) 72%, transparent 100%)' }} />
 
-      <div className="max-w-[1680px] mx-auto px-4 sm:px-6 lg:px-10">
-        {/* Main header row */}
-        <div className="flex items-center justify-between py-4 gap-4">
-          {/* Left: Identity */}
-          <div className="flex items-center gap-4">
-            {/* Logo mark */}
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'var(--admin-surface-hover)', border: '1px solid var(--admin-border-strong)' }}>
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <rect x="1" y="1" width="5" height="12" rx="1.5" fill="var(--admin-accent)" style={{ opacity: 0.8 }} />
-                <circle cx="10.5" cy="7" r="3.5" fill="none" stroke="var(--admin-accent)" strokeWidth="1.5" style={{ opacity: 0.8 }} />
-              </svg>
+      <div className="mx-auto max-w-[1760px] px-4 py-3 sm:px-6 lg:px-8 xl:px-10">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+          <div className="flex min-w-0 items-center justify-between gap-3 xl:justify-start">
+            <div className="flex min-w-0 items-center gap-3">
+              <div
+                className="relative flex h-11 w-11 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl"
+                style={{
+                  background: 'linear-gradient(135deg, var(--admin-surface-hover), var(--admin-surface))',
+                  border: '1px solid var(--admin-border-strong)',
+                  boxShadow: 'var(--accent-glow)',
+                }}
+              >
+                <div className="absolute inset-1 rounded-xl" style={{ border: '1px solid color-mix(in srgb, var(--admin-accent) 22%, transparent)' }} />
+                <Activity size={19} style={{ color: 'var(--admin-accent)' }} />
+              </div>
+
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[9px] font-black uppercase" style={{ color: 'var(--admin-accent-subtle)' }}>
+                    Cogniiq Admin
+                  </span>
+                  <span className="hidden h-1 w-1 rounded-full sm:inline-flex" style={{ background: 'var(--admin-border-strong)' }} />
+                  <span className="hidden text-[10px] font-mono sm:inline" style={{ color: 'var(--admin-text-muted)' }}>
+                    {dateStr}
+                  </span>
+                </div>
+                <h1 className="truncate text-base font-semibold sm:text-lg" style={{ color: 'var(--admin-text-primary)' }}>
+                  Command Constellation
+                </h1>
+              </div>
             </div>
-            <div>
-              <p className="text-[9px] font-bold tracking-[0.28em] uppercase" style={{ color: 'var(--admin-accent-subtle)' }}>
-                Cogniiq Command Center
-              </p>
-              <h1 className="text-sm font-bold tracking-tight leading-tight" style={{ color: 'var(--admin-text-primary)' }}>
-                Today's Operating System
-              </h1>
+
+            <div className="flex items-center gap-2 xl:hidden">
+              {utilityAction}
+              {onThemeToggle && <AdminThemeToggle theme={theme} onToggle={onThemeToggle} />}
             </div>
           </div>
 
-          {/* Center: live counters */}
-          <div className="hidden md:flex items-center gap-3">
-            <StatPill label="OPEN" value={todayCount} colorKey="accent" />
-            {overdueCount > 0 && <StatPill label="OVERDUE" value={overdueCount} colorKey="warning" pulse />}
-          </div>
+          <nav
+            aria-label="Admin sections"
+            className="flex min-w-0 flex-1 gap-2 overflow-x-auto no-scrollbar rounded-[1.35rem] border p-1.5"
+            style={{
+              background: 'linear-gradient(135deg, color-mix(in srgb, var(--admin-surface) 94%, transparent), color-mix(in srgb, var(--admin-surface-hover) 76%, transparent))',
+              borderColor: 'var(--admin-border)',
+              boxShadow: 'var(--admin-card-shadow, none)',
+            }}
+          >
+            {ADMIN_NAV.map((item) => {
+              const Icon = item.icon;
+              const active = activeTab === item.key;
+              const accent = colorForTone(item.tone);
+              const count = item.count?.({ todayCount, overdueCount }) ?? null;
 
-          {/* Right: clock, online, theme toggle */}
-          <div className="flex items-center gap-4 flex-shrink-0">
-            <div className="flex flex-col items-end gap-0.5">
-              <div className="flex items-center gap-1.5 mb-0.5">
+              return (
+                <a
+                  key={item.key}
+                  href={item.href}
+                  onClick={(event) => handleLocalViewClick(event, item)}
+                  className="group relative flex min-w-[128px] flex-1 items-center gap-2 overflow-hidden rounded-[1rem] px-3 py-2.5 text-left transition-all duration-200 hover:-translate-y-0.5 sm:min-w-[146px]"
+                  style={{
+                    color: active ? accent : 'var(--admin-text-muted)',
+                    border: `1px solid ${active ? `color-mix(in srgb, ${accent} 34%, transparent)` : 'transparent'}`,
+                    background: active ? `linear-gradient(135deg, color-mix(in srgb, ${accent} 13%, transparent), color-mix(in srgb, var(--admin-surface-hover) 84%, transparent))` : 'transparent',
+                    boxShadow: active ? `0 16px 44px color-mix(in srgb, ${accent} 10%, transparent)` : 'none',
+                  }}
+                >
+                  {active && (
+                    <motion.div
+                      layoutId="admin-section-lens"
+                      className="absolute inset-x-3 bottom-0 h-px"
+                      style={{ background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }}
+                      transition={{ type: 'spring', stiffness: 480, damping: 38 }}
+                    />
+                  )}
+                  <span
+                    className="relative flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl"
+                    style={{
+                      background: active ? `color-mix(in srgb, ${accent} 14%, transparent)` : 'var(--admin-surface)',
+                      border: `1px solid ${active ? `color-mix(in srgb, ${accent} 24%, transparent)` : 'var(--admin-border)'}`,
+                    }}
+                  >
+                    <Icon size={15} />
+                  </span>
+                  <span className="relative min-w-0 flex-1">
+                    <span className="block truncate text-[10px] font-black uppercase">
+                      {item.label}
+                    </span>
+                    <span className="mt-0.5 block truncate font-mono text-[10px]" style={{ color: active ? accent : 'var(--admin-text-faint)' }}>
+                      {item.shortLabel}
+                    </span>
+                  </span>
+                  {count !== null && (
+                    <span
+                      className="relative flex h-6 min-w-6 flex-shrink-0 items-center justify-center rounded-full px-1.5 text-[10px] font-black tabular-nums"
+                      style={{
+                        background: `color-mix(in srgb, ${accent} 13%, transparent)`,
+                        border: `1px solid color-mix(in srgb, ${accent} 24%, transparent)`,
+                        color: accent,
+                      }}
+                    >
+                      {count}
+                    </span>
+                  )}
+                </a>
+              );
+            })}
+          </nav>
+
+          <div className="hidden flex-shrink-0 items-center gap-3 xl:flex">
+            {utilityAction}
+            <div className="rounded-2xl border px-3 py-2 text-right" style={{ background: 'var(--admin-surface)', borderColor: 'var(--admin-border)' }}>
+              <div className="flex items-center justify-end gap-1.5">
                 <span className="relative flex h-1.5 w-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60" style={{ background: 'var(--admin-success)' }} />
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5" style={{ background: 'var(--admin-success)' }} />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-60" style={{ background: 'var(--admin-success)' }} />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: 'var(--admin-success)' }} />
                 </span>
-                <span className="text-[9px] font-bold tracking-[0.18em] uppercase" style={{ color: 'var(--admin-success)' }}>System Online</span>
+                <span className="text-[9px] font-black uppercase" style={{ color: 'var(--admin-success)' }}>
+                  Live
+                </span>
               </div>
-              <div className="font-mono text-lg font-semibold tabular-nums leading-none" style={{ color: 'var(--admin-text-secondary)' }}>
-                {hh}<span className="animate-pulse" style={{ color: 'var(--admin-accent)' }}>:</span>{mm}<span className="animate-pulse" style={{ color: 'var(--admin-accent)' }}>:</span>{ss}
+              <div className="mt-0.5 font-mono text-lg font-semibold tabular-nums leading-none" style={{ color: 'var(--admin-text-secondary)' }}>
+                {hh}<span style={{ color: 'var(--admin-accent)' }}>:</span>{mm}<span style={{ color: 'var(--admin-accent)' }}>:</span>{ss}
               </div>
-              <p className="text-[9px] tracking-wide" style={{ color: 'var(--admin-text-muted)' }}>{dateStr}</p>
             </div>
             {onThemeToggle && <AdminThemeToggle theme={theme} onToggle={onThemeToggle} />}
           </div>
         </div>
-
-        {/* Tab nav */}
-        <nav className="flex gap-0 overflow-x-auto no-scrollbar">
-          {TABS.map((tab) =>
-            tab.href ? (
-              <a
-                key={tab.key}
-                href={tab.href}
-                className="relative px-4 py-2.5 text-[11px] font-semibold tracking-[0.1em] uppercase transition-colors duration-200 whitespace-nowrap"
-                style={{ color: activeTab === tab.key ? 'var(--admin-accent)' : 'var(--admin-text-muted)' }}
-              >
-                {tab.label}
-                {activeTab === tab.key && (
-                  <motion.div layoutId="admin-tab-line" className="absolute bottom-0 left-2 right-2 h-[2px] rounded-full" style={{ background: 'linear-gradient(90deg, transparent, var(--admin-accent), transparent)' }} transition={{ type: 'spring', stiffness: 500, damping: 36 }} />
-                )}
-              </a>
-            ) : (
-              <button
-                key={tab.key}
-                onClick={() => onTabChange(tab.key)}
-                className="relative px-4 py-2.5 text-[11px] font-semibold tracking-[0.1em] uppercase transition-colors duration-200 whitespace-nowrap"
-                style={{ color: activeTab === tab.key ? 'var(--admin-accent)' : 'var(--admin-text-muted)' }}
-              >
-                {tab.label}
-                {activeTab === tab.key && (
-                  <motion.div layoutId="admin-tab-line" className="absolute bottom-0 left-2 right-2 h-[2px] rounded-full" style={{ background: 'linear-gradient(90deg, transparent, var(--admin-accent), transparent)' }} transition={{ type: 'spring', stiffness: 500, damping: 36 }} />
-                )}
-              </button>
-            )
-          )}
-        </nav>
       </div>
     </header>
-  );
-}
-
-function StatPill({ label, value, colorKey, pulse }: { label: string; value: number; colorKey: 'accent' | 'warning'; pulse?: boolean }) {
-  const color = colorKey === 'accent' ? 'var(--admin-accent)' : 'var(--admin-warning)';
-  const bgColor = colorKey === 'accent' ? 'var(--admin-surface-hover)' : 'var(--admin-warning-bg)';
-  const borderColor = colorKey === 'accent' ? 'var(--admin-border-strong)' : 'var(--admin-warning-border)';
-
-  return (
-    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg" style={{ background: bgColor, border: `1px solid ${borderColor}` }}>
-      {pulse && <span className="relative flex h-1.5 w-1.5 flex-shrink-0"><span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60" style={{ background: color }} /><span className="relative inline-flex rounded-full h-1.5 w-1.5" style={{ background: color }} /></span>}
-      <span className="text-[10px] font-bold tracking-[0.14em] uppercase font-mono" style={{ color }}>{label}</span>
-      <span className="text-[13px] font-bold font-mono tabular-nums" style={{ color }}>{value}</span>
-    </div>
   );
 }

@@ -15,6 +15,14 @@ import { LoadingSkeleton, EmptyState } from '../components/admin/EmptyAndLoading
 import { useAdminTheme } from '../hooks/useAdminTheme';
 
 /* filter helper */
+const ADMIN_TAB_KEYS = new Set(['overview', 'today', 'overdue', 'completed', 'revenue']);
+
+function getInitialAdminTab(): string {
+  if (typeof window === 'undefined') return 'overview';
+  const hash = window.location.hash.replace(/^#/, '');
+  return ADMIN_TAB_KEYS.has(hash) ? hash : 'overview';
+}
+
 function applyFilter(tasks: Task[], filter: FilterOption, search: string): Task[] {
   let r = tasks;
   if (filter === 'critical') r = r.filter((t) => t.priority === 'critical');
@@ -45,7 +53,7 @@ export function AdminPage() {
   const [overdueOpen, setOverdueOpen] = useState<Task[]>([]);
   const [completing, setCompleting] = useState<Record<string, boolean>>({});
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState(() => getInitialAdminTab());
   const [filter, setFilter] = useState<FilterOption>('all');
   const [search, setSearch] = useState('');
   const [createOpen, setCreateOpen] = useState(false);
@@ -74,6 +82,13 @@ export function AdminPage() {
   }, [today]);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
+
+  useEffect(() => {
+    const syncTabFromHash = () => setActiveTab(getInitialAdminTab());
+    window.addEventListener('hashchange', syncTabFromHash);
+    syncTabFromHash();
+    return () => window.removeEventListener('hashchange', syncTabFromHash);
+  }, []);
 
   /* complete */
   const handleComplete = useCallback(async (id: string) => {

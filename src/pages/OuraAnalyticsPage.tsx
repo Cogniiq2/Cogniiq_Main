@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   Activity,
@@ -47,19 +46,22 @@ const OURA_CONNECTION_STORAGE_KEY = 'oura_connection_id';
 const OURA_SCOPE = 'email personal daily heartrate workout tag session spo2Daily';
 
 const COLORS = {
-  cyan: '#22d3ee',
-  cyanSoft: 'rgba(34, 211, 238, 0.14)',
-  emerald: '#34d399',
-  blue: '#60a5fa',
-  violet: '#a78bfa',
-  amber: '#fbbf24',
-  rose: '#fb7185',
-  text: 'rgba(240, 249, 255, 0.92)',
-  muted: 'rgba(186, 230, 253, 0.56)',
-  faint: 'rgba(186, 230, 253, 0.32)',
-  panel: 'rgba(8, 18, 32, 0.72)',
-  panelStrong: 'rgba(7, 16, 29, 0.88)',
-  border: 'rgba(125, 211, 252, 0.16)',
+  cyan: 'var(--oura-accent)',
+  cyanSoft: 'var(--oura-accent-soft)',
+  emerald: 'var(--oura-recovery)',
+  blue: 'var(--oura-sleep)',
+  violet: 'var(--oura-strain)',
+  amber: 'var(--oura-warning)',
+  rose: 'var(--oura-danger)',
+  text: 'var(--oura-text)',
+  muted: 'var(--oura-muted)',
+  faint: 'var(--oura-faint)',
+  panel: 'var(--oura-panel)',
+  panelStrong: 'var(--oura-panel-strong)',
+  border: 'var(--oura-border)',
+  grid: 'var(--oura-grid)',
+  heroSurface: 'var(--oura-hero-surface)',
+  chartBar: 'var(--oura-chart-bar)',
 };
 
 type NumericValue = number | string | null;
@@ -168,9 +170,9 @@ const emptyContributors: OuraContributors = {
 };
 
 const glassPanelStyle: CSSProperties = {
-  background: 'linear-gradient(145deg, rgba(8, 18, 32, 0.86), rgba(4, 11, 22, 0.68))',
+  background: 'linear-gradient(145deg, color-mix(in srgb, var(--oura-panel-strong) 92%, transparent), color-mix(in srgb, var(--oura-panel) 82%, transparent))',
   border: `1px solid ${COLORS.border}`,
-  boxShadow: '0 24px 80px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+  boxShadow: 'var(--oura-panel-shadow)',
   backdropFilter: 'blur(22px)',
 };
 
@@ -820,20 +822,20 @@ function AmbientLayer() {
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(circle at 15% -8%, rgba(34, 211, 238, 0.16), transparent 32%), radial-gradient(circle at 84% 8%, rgba(52, 211, 153, 0.12), transparent 28%), linear-gradient(180deg, #020617 0%, #04111f 48%, #020617 100%)',
+            'radial-gradient(circle at 15% -8%, color-mix(in srgb, var(--oura-accent) 16%, transparent), transparent 32%), radial-gradient(circle at 84% 8%, color-mix(in srgb, var(--oura-recovery) 12%, transparent), transparent 28%), linear-gradient(180deg, var(--admin-bg) 0%, var(--admin-bg-subtle) 48%, var(--admin-bg) 100%)',
         }}
       />
       <div
         className="absolute inset-0"
         style={{
-          backgroundImage: 'linear-gradient(rgba(125, 211, 252, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(125, 211, 252, 0.035) 1px, transparent 1px)',
+          backgroundImage: 'linear-gradient(var(--admin-grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--admin-grid-line) 1px, transparent 1px)',
           backgroundSize: '58px 58px',
           maskImage: 'linear-gradient(to bottom, black, transparent 78%)',
         }}
       />
       <motion.div
         className="absolute left-0 right-0 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.45), transparent)' }}
+        style={{ background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--oura-accent) 45%, transparent), transparent)' }}
         animate={{ top: ['0%', '100%'] }}
         transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
       />
@@ -862,7 +864,7 @@ function ChartShell({ title, eyebrow, children, action }: { title: string; eyebr
 
 function EmptyPanel({ title, description, action }: { title: string; description: string; action?: ReactNode }) {
   return (
-    <div className="flex min-h-[280px] flex-col items-center justify-center rounded-[1.5rem] border px-6 py-12 text-center" style={{ borderColor: COLORS.border, background: 'rgba(2, 6, 23, 0.34)' }}>
+    <div className="flex min-h-[280px] flex-col items-center justify-center rounded-[1.5rem] border px-6 py-12 text-center" style={{ borderColor: COLORS.border, background: COLORS.heroSurface }}>
       <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-3xl" style={{ background: COLORS.cyanSoft, border: `1px solid ${COLORS.border}` }}>
         <Sparkles size={24} color={COLORS.cyan} />
       </div>
@@ -888,9 +890,9 @@ function SummaryCard({ metric }: { metric: SummaryMetric }) {
       animate={{ opacity: 1, y: 0 }}
       className="relative overflow-hidden rounded-[1.55rem] border p-4"
       style={{
-        background: 'linear-gradient(145deg, rgba(8, 18, 32, 0.78), rgba(2, 8, 23, 0.54))',
-        borderColor: 'rgba(125, 211, 252, 0.14)',
-        boxShadow: '0 18px 60px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.05)',
+        background: 'linear-gradient(145deg, color-mix(in srgb, var(--oura-panel-strong) 82%, transparent), color-mix(in srgb, var(--oura-panel) 74%, transparent))',
+        borderColor: COLORS.border,
+        boxShadow: 'var(--oura-panel-shadow)',
       }}
     >
       <div className="absolute inset-x-0 top-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }} />
@@ -945,10 +947,10 @@ function HeroButton({ icon: Icon, label, onClick, disabled, primary = false }: {
       disabled={disabled}
       className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl px-4 text-xs font-black uppercase tracking-[0.12em] transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
       style={{
-        background: primary ? 'linear-gradient(135deg, rgba(34, 211, 238, 0.22), rgba(52, 211, 153, 0.16))' : 'rgba(8, 18, 32, 0.72)',
-        border: `1px solid ${primary ? 'rgba(34, 211, 238, 0.35)' : COLORS.border}`,
+        background: primary ? 'linear-gradient(135deg, color-mix(in srgb, var(--oura-accent) 18%, transparent), color-mix(in srgb, var(--oura-recovery) 14%, transparent))' : 'var(--oura-button-bg)',
+        border: `1px solid ${primary ? 'color-mix(in srgb, var(--oura-accent) 35%, transparent)' : COLORS.border}`,
         color: primary ? COLORS.cyan : COLORS.text,
-        boxShadow: primary ? '0 0 34px rgba(34, 211, 238, 0.13)' : 'none',
+        boxShadow: primary ? '0 0 34px color-mix(in srgb, var(--oura-accent) 13%, transparent)' : 'none',
       }}
     >
       <Icon size={15} className={disabled ? 'animate-spin' : undefined} />
@@ -959,7 +961,7 @@ function HeroButton({ icon: Icon, label, onClick, disabled, primary = false }: {
 
 function MetricMini({ label, value, icon: Icon }: { label: string; value: string; icon: LucideIcon }) {
   return (
-    <div className="rounded-2xl border p-3" style={{ borderColor: COLORS.border, background: 'rgba(2, 6, 23, 0.28)' }}>
+    <div className="rounded-2xl border p-3" style={{ borderColor: COLORS.border, background: COLORS.heroSurface }}>
       <div className="mb-2 flex items-center gap-2">
         <Icon size={14} color={COLORS.cyan} />
         <span className="text-[10px] font-black uppercase tracking-[0.12em]" style={{ color: COLORS.faint }}>
@@ -978,7 +980,7 @@ function ContributorCard({ label, value }: { label: string; value: number | null
   const accent = toneColor(status.tone);
 
   return (
-    <div className="rounded-2xl border p-4" style={{ borderColor: COLORS.border, background: 'rgba(2, 6, 23, 0.28)' }}>
+    <div className="rounded-2xl border p-4" style={{ borderColor: COLORS.border, background: COLORS.heroSurface }}>
       <div className="mb-3 flex items-center justify-between gap-3">
         <p className="text-xs font-semibold" style={{ color: COLORS.text }}>
           {label}
@@ -989,7 +991,7 @@ function ContributorCard({ label, value }: { label: string; value: number | null
         {value === null ? 'Not available' : Math.round(value)}
       </p>
       {value !== null && (
-        <div className="mt-3 h-1.5 overflow-hidden rounded-full" style={{ background: 'rgba(125, 211, 252, 0.1)' }}>
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full" style={{ background: COLORS.grid }}>
           <div className="h-full rounded-full" style={{ width: `${Math.max(0, Math.min(100, value))}%`, background: accent }} />
         </div>
       )}
@@ -1001,7 +1003,7 @@ function InsightCard({ insight }: { insight: Insight }) {
   const accent = toneColor(insight.tone);
 
   return (
-    <div className="rounded-3xl border p-4" style={{ borderColor: `color-mix(in srgb, ${accent} 28%, transparent)`, background: `linear-gradient(145deg, color-mix(in srgb, ${accent} 10%, transparent), rgba(2, 6, 23, 0.34))` }}>
+    <div className="rounded-3xl border p-4" style={{ borderColor: `color-mix(in srgb, ${accent} 28%, transparent)`, background: `linear-gradient(145deg, color-mix(in srgb, ${accent} 10%, transparent), var(--oura-hero-surface))` }}>
       <div className="mb-3 flex items-center gap-2">
         <Sparkles size={15} color={accent} />
         <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: accent }}>
@@ -1031,7 +1033,7 @@ function NoticeToast({ notice, onClose }: { notice: Notice; onClose: () => void 
         background: COLORS.panelStrong,
         borderColor: `color-mix(in srgb, ${accent} 34%, transparent)`,
         color: accent,
-        boxShadow: '0 22px 70px rgba(0, 0, 0, 0.44)',
+        boxShadow: 'var(--oura-panel-shadow)',
       }}
     >
       <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full" style={{ background: accent }} />
@@ -1049,7 +1051,7 @@ function InlineError({ message, onRetry }: { message: string; onRetry: () => voi
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       className="mb-5 rounded-[1.4rem] border px-5 py-4"
-      style={{ borderColor: 'rgba(251, 113, 133, 0.32)', background: 'rgba(251, 113, 133, 0.08)' }}
+      style={{ borderColor: 'var(--admin-danger-border)', background: 'var(--admin-danger-bg)' }}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">
@@ -1070,7 +1072,6 @@ function InlineError({ message, onRetry }: { message: string; onRetry: () => voi
 }
 
 export function OuraAnalyticsPage() {
-  const navigate = useNavigate();
   const { theme, toggleTheme } = useAdminTheme();
   const [connectionId, setConnectionId] = useState<string | null>(() => getStoredConnectionId());
   const [dailyRows, setDailyRows] = useState<OuraDailySummary[]>([]);
@@ -1212,12 +1213,11 @@ export function OuraAnalyticsPage() {
 
   return (
     <AdminGate>
-      <div className="admin-root min-h-screen overflow-hidden font-sans" style={{ background: '#020617', color: COLORS.text }}>
+      <div className="admin-root min-h-screen overflow-hidden font-sans" style={{ background: 'var(--admin-bg)', color: COLORS.text }}>
         <AmbientLayer />
 
         <AdminHeader
           activeTab="oura-analytics"
-          onTabChange={() => navigate('/admin')}
           todayCount={0}
           overdueCount={0}
           theme={theme}
@@ -1233,7 +1233,7 @@ export function OuraAnalyticsPage() {
                   <span className="rounded-full border px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em]" style={{ borderColor: COLORS.border, background: COLORS.cyanSoft, color: COLORS.cyan }}>
                     Health Intelligence
                   </span>
-                  <span className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.12em]" style={{ background: isConnected ? 'rgba(52, 211, 153, 0.12)' : 'rgba(251, 191, 36, 0.12)', borderColor: isConnected ? 'rgba(52, 211, 153, 0.28)' : 'rgba(251, 191, 36, 0.28)', color: isConnected ? COLORS.emerald : COLORS.amber }}>
+                  <span className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.12em]" style={{ background: isConnected ? 'var(--admin-success-bg)' : 'var(--admin-warning-bg)', borderColor: isConnected ? 'var(--admin-success-border)' : 'var(--admin-warning-border)', color: isConnected ? COLORS.emerald : COLORS.amber }}>
                     <span className="h-1.5 w-1.5 rounded-full" style={{ background: isConnected ? COLORS.emerald : COLORS.amber, boxShadow: `0 0 14px ${isConnected ? COLORS.emerald : COLORS.amber}` }} />
                     {isConnected ? 'Connected' : 'Not connected'}
                   </span>
@@ -1256,7 +1256,7 @@ export function OuraAnalyticsPage() {
                 </div>
               </div>
 
-              <div className="rounded-[1.6rem] border p-5" style={{ borderColor: COLORS.border, background: 'rgba(2, 6, 23, 0.35)' }}>
+              <div className="rounded-[1.6rem] border p-5" style={{ borderColor: COLORS.border, background: COLORS.heroSurface }}>
                 <div className="mb-5 flex items-start gap-3">
                   <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-3xl" style={{ background: COLORS.cyanSoft, border: `1px solid ${COLORS.border}` }}>
                     <HeartPulse size={22} color={COLORS.cyan} />
@@ -1314,7 +1314,7 @@ export function OuraAnalyticsPage() {
                 <div className="h-[360px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={chartPoints}>
-                      <CartesianGrid stroke="rgba(125, 211, 252, 0.08)" vertical={false} />
+                      <CartesianGrid stroke={COLORS.grid} vertical={false} />
                       <XAxis dataKey="label" tick={{ fill: COLORS.faint, fontSize: 11 }} tickLine={false} axisLine={false} />
                       <YAxis domain={[0, 100]} tick={{ fill: COLORS.faint, fontSize: 11 }} tickLine={false} axisLine={false} />
                       <Tooltip contentStyle={{ background: COLORS.panelStrong, border: `1px solid ${COLORS.border}`, borderRadius: 16, color: COLORS.text }} />
@@ -1356,7 +1356,7 @@ export function OuraAnalyticsPage() {
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartPoints}>
-                      <CartesianGrid stroke="rgba(125, 211, 252, 0.08)" vertical={false} />
+                      <CartesianGrid stroke={COLORS.grid} vertical={false} />
                       <XAxis dataKey="label" tick={{ fill: COLORS.faint, fontSize: 11 }} tickLine={false} axisLine={false} />
                       <YAxis tick={{ fill: COLORS.faint, fontSize: 11 }} tickLine={false} axisLine={false} unit="h" />
                       <Tooltip contentStyle={{ background: COLORS.panelStrong, border: `1px solid ${COLORS.border}`, borderRadius: 16, color: COLORS.text }} />
@@ -1401,12 +1401,12 @@ export function OuraAnalyticsPage() {
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <ComposedChart data={chartPoints}>
-                      <CartesianGrid stroke="rgba(125, 211, 252, 0.08)" vertical={false} />
+                      <CartesianGrid stroke={COLORS.grid} vertical={false} />
                       <XAxis dataKey="label" tick={{ fill: COLORS.faint, fontSize: 11 }} tickLine={false} axisLine={false} />
                       <YAxis yAxisId="left" tick={{ fill: COLORS.faint, fontSize: 11 }} tickLine={false} axisLine={false} />
                       <YAxis yAxisId="right" orientation="right" domain={[0, 100]} tick={{ fill: COLORS.faint, fontSize: 11 }} tickLine={false} axisLine={false} />
                       <Tooltip contentStyle={{ background: COLORS.panelStrong, border: `1px solid ${COLORS.border}`, borderRadius: 16, color: COLORS.text }} />
-                      <Bar yAxisId="left" dataKey="steps" name="Steps" fill="rgba(34, 211, 238, 0.28)" radius={[8, 8, 0, 0]} />
+                      <Bar yAxisId="left" dataKey="steps" name="Steps" fill={COLORS.chartBar} radius={[8, 8, 0, 0]} />
                       <Line yAxisId="right" type="monotone" dataKey="activityScore" name="Activity Score" stroke={COLORS.emerald} strokeWidth={2.4} dot={false} connectNulls />
                     </ComposedChart>
                   </ResponsiveContainer>
@@ -1431,7 +1431,7 @@ export function OuraAnalyticsPage() {
                           <stop offset="95%" stopColor={COLORS.rose} stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid stroke="rgba(125, 211, 252, 0.08)" vertical={false} />
+                      <CartesianGrid stroke={COLORS.grid} vertical={false} />
                       <XAxis dataKey="label" tick={{ fill: COLORS.faint, fontSize: 11 }} tickLine={false} axisLine={false} />
                       <YAxis tick={{ fill: COLORS.faint, fontSize: 11 }} tickLine={false} axisLine={false} />
                       <Tooltip contentStyle={{ background: COLORS.panelStrong, border: `1px solid ${COLORS.border}`, borderRadius: 16, color: COLORS.text }} />
@@ -1453,7 +1453,7 @@ export function OuraAnalyticsPage() {
             <div className="w-full overflow-x-auto rounded-[1.25rem] border" style={{ borderColor: COLORS.border }}>
               <table className="w-full min-w-[860px] border-collapse text-sm">
                 <thead>
-                  <tr style={{ background: 'rgba(34, 211, 238, 0.08)' }}>
+                  <tr style={{ background: COLORS.cyanSoft }}>
                     {['Date', 'Sleep', 'Readiness', 'Activity', 'Steps', 'HRV', 'RHR', 'Temperature'].map((header) => (
                       <th
                         key={header}
@@ -1467,7 +1467,7 @@ export function OuraAnalyticsPage() {
                 </thead>
                 <tbody>
                   {dailyRows.map((row) => (
-                    <tr key={row.day} className="border-b" style={{ borderColor: 'rgba(125, 211, 252, 0.08)' }}>
+                    <tr key={row.day} className="border-b" style={{ borderColor: COLORS.grid }}>
                       <td className="px-4 py-3 font-mono text-xs font-semibold" style={{ color: COLORS.text }}>
                         {formatDay(row.day)}
                       </td>

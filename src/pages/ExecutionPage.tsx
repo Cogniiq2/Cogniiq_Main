@@ -3,7 +3,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { AdminGate } from '../components/admin/AdminGate';
-import { AdminThemeToggle } from '../components/admin/AdminThemeToggle';
+import { AdminHeader } from '../components/admin/AdminHeader';
 import { useAdminTheme } from '../hooks/useAdminTheme';
 import {
   Activity,
@@ -140,15 +140,6 @@ function formatTimeOnly(time: string | null): string {
   }
 
   return time.slice(0, 5);
-}
-
-function formatDateGerman(date: string): string {
-  return new Date(date + 'T12:00:00').toLocaleDateString('de-DE', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  });
 }
 
 function getPlanTypeLabel(planType: string): string {
@@ -460,12 +451,28 @@ export function ExecutionPage() {
       >
         <AmbientLayer />
 
-        <Header
-          today={today}
+        <AdminHeader
+          activeTab="execution"
+          todayCount={remainingTaskCount}
+          overdueCount={0}
           theme={theme}
-          toggleTheme={toggleTheme}
-          onRefresh={fetchData}
-          loading={loading}
+          onThemeToggle={toggleTheme}
+          utilityAction={
+            <button
+              type="button"
+              onClick={fetchData}
+              disabled={loading}
+              className="inline-flex h-10 items-center gap-2 rounded-2xl px-3 text-xs font-bold transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+              style={{
+                background: 'var(--admin-surface)',
+                border: '1px solid var(--admin-border)',
+                color: 'var(--admin-text-secondary)',
+              }}
+            >
+              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+              Refresh
+            </button>
+          }
         />
 
         <main className="relative z-10 mx-auto max-w-[1720px] px-4 py-5 sm:px-6 lg:px-8 lg:py-7">
@@ -542,100 +549,6 @@ function AmbientLayer() {
         }}
       />
     </div>
-  );
-}
-
-function Header({
-  today,
-  theme,
-  toggleTheme,
-  onRefresh,
-  loading,
-}: {
-  today: string;
-  theme: string;
-  toggleTheme: () => void;
-  onRefresh: () => void;
-  loading: boolean;
-}) {
-  return (
-    <header
-      className="sticky top-0 z-20 border-b"
-      style={{
-        borderColor: 'var(--admin-header-border)',
-        background: 'color-mix(in srgb, var(--admin-header-bg) 88%, transparent)',
-        backdropFilter: 'blur(24px)',
-      }}
-    >
-      <div className="mx-auto max-w-[1720px] px-4 py-3 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex min-w-0 items-center gap-3">
-            <div
-              className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl"
-              style={{
-                background: 'var(--admin-surface)',
-                border: '1px solid var(--admin-border-strong)',
-                boxShadow: 'var(--admin-card-shadow, none)',
-              }}
-            >
-              <Gauge size={19} style={{ color: 'var(--admin-accent)' }} />
-            </div>
-
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <span
-                  className="h-1.5 w-1.5 rounded-full"
-                  style={{
-                    background: loading ? 'var(--admin-warning)' : 'var(--admin-success)',
-                    boxShadow: loading ? '0 0 14px var(--admin-warning)' : '0 0 14px var(--admin-success)',
-                  }}
-                />
-                <p className="text-[10px] font-black uppercase tracking-[0.18em]" style={{ color: 'var(--admin-text-muted)' }}>
-                  Cogniiq Admin
-                </p>
-                <span className="text-[10px] font-mono" style={{ color: 'var(--admin-text-muted)' }}>
-                  {today}
-                </span>
-              </div>
-              <h1 className="mt-0.5 truncate text-xl font-semibold tracking-[-0.035em] sm:text-2xl" style={{ color: 'var(--admin-text-primary)' }}>
-                Daily Execution
-              </h1>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-            <div
-              className="hidden rounded-2xl px-3 py-2 text-right sm:block"
-              style={{
-                background: 'var(--admin-surface)',
-                border: '1px solid var(--admin-border)',
-              }}
-            >
-              <p className="text-[10px] font-mono" style={{ color: 'var(--admin-text-muted)' }}>
-                {formatDateGerman(today)}
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={onRefresh}
-              disabled={loading}
-              className="inline-flex h-10 items-center gap-2 rounded-2xl px-3 text-xs font-bold transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
-              style={{
-                background: 'var(--admin-surface)',
-                border: '1px solid var(--admin-border)',
-                color: 'var(--admin-text-secondary)',
-              }}
-            >
-              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-              Refresh
-            </button>
-
-            <AdminThemeToggle theme={theme} onToggle={toggleTheme} />
-          </div>
-        </div>
-      </div>
-    </header>
   );
 }
 
