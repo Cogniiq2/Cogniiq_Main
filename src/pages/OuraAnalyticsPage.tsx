@@ -1,24 +1,44 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   Activity,
   BatteryCharging,
+  Brain,
   CalendarClock,
   Clock3,
   Footprints,
+  Gauge,
   HeartPulse,
   Link2,
   Moon,
   RefreshCw,
+  Sparkles,
+  Thermometer,
   TriangleAlert,
+  Waves,
   X,
+  Zap,
   type LucideIcon,
 } from 'lucide-react';
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ComposedChart,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import { supabase } from '../lib/supabase';
 import { AdminGate } from '../components/admin/AdminGate';
 import { AdminHeader } from '../components/admin/AdminHeader';
-import { EmptyState } from '../components/admin/EmptyAndLoading';
 import { useAdminTheme } from '../hooks/useAdminTheme';
 
 const OURA_CALLBACK_URL = 'https://lqgtmoulqzmrhglabrms.supabase.co/functions/v1/oura-callback';
@@ -26,16 +46,41 @@ const OURA_SYNC_URL = 'https://lqgtmoulqzmrhglabrms.supabase.co/functions/v1/syn
 const OURA_CONNECTION_STORAGE_KEY = 'oura_connection_id';
 const OURA_SCOPE = 'email personal daily heartrate workout tag session spo2Daily';
 
-type NumericValue = number | string | null;
-type Notice = { type: 'success' | 'error' | 'warning'; message: string };
+const COLORS = {
+  cyan: '#22d3ee',
+  cyanSoft: 'rgba(34, 211, 238, 0.14)',
+  emerald: '#34d399',
+  blue: '#60a5fa',
+  violet: '#a78bfa',
+  amber: '#fbbf24',
+  rose: '#fb7185',
+  text: 'rgba(240, 249, 255, 0.92)',
+  muted: 'rgba(186, 230, 253, 0.56)',
+  faint: 'rgba(186, 230, 253, 0.32)',
+  panel: 'rgba(8, 18, 32, 0.72)',
+  panelStrong: 'rgba(7, 16, 29, 0.88)',
+  border: 'rgba(125, 211, 252, 0.16)',
+};
 
-interface OuraScoreRow {
-  day: string | null;
-  score: NumericValue;
+type NumericValue = number | string | null;
+type JsonRecord = Record<string, unknown>;
+type Notice = { type: 'success' | 'error' | 'warning'; message: string };
+type StatusTone = 'optimal' | 'good' | 'fair' | 'attention' | 'neutral';
+
+interface OuraTableRow extends JsonRecord {
+  day?: string | null;
+  score?: NumericValue;
+  steps?: NumericValue;
 }
 
-interface OuraActivityRow extends OuraScoreRow {
-  steps: NumericValue;
+interface OuraContributors {
+  hrvBalance: number | null;
+  recoveryIndex: number | null;
+  restingHeartRate: number | null;
+  bodyTemperature: number | null;
+  previousDayActivity: number | null;
+  sleepBalance: number | null;
+  activityBalance: number | null;
 }
 
 interface OuraDailySummary {
@@ -44,6 +89,27 @@ interface OuraDailySummary {
   readinessScore: number | null;
   activityScore: number | null;
   steps: number | null;
+  hrv: number | null;
+  restingHeartRate: number | null;
+  lowestHeartRate: number | null;
+  respiratoryRate: number | null;
+  temperatureDeviation: number | null;
+  totalSleepDuration: number | null;
+  timeInBed: number | null;
+  sleepEfficiency: number | null;
+  latency: number | null;
+  remSleep: number | null;
+  deepSleep: number | null;
+  lightSleep: number | null;
+  awakeTime: number | null;
+  restfulness: number | null;
+  activeCalories: number | null;
+  walkingDistance: number | null;
+  highActivityTime: number | null;
+  mediumActivityTime: number | null;
+  lowActivityTime: number | null;
+  contributors: OuraContributors;
+  lastSyncAt: string | null;
 }
 
 interface CallbackParams {
@@ -53,57 +119,275 @@ interface CallbackParams {
   hasParams: boolean;
 }
 
+interface ChartPoint {
+  day: string;
+  label: string;
+  sleepScore: number | null;
+  readinessScore: number | null;
+  activityScore: number | null;
+  steps: number | null;
+  hrv: number | null;
+  restingHeartRate: number | null;
+  lowestHeartRate: number | null;
+  respiratoryRate: number | null;
+  temperatureDeviation: number | null;
+  remSleepHours: number | null;
+  deepSleepHours: number | null;
+  lightSleepHours: number | null;
+  awakeHours: number | null;
+}
+
+interface SummaryMetric {
+  key: string;
+  label: string;
+  icon: LucideIcon;
+  value: string;
+  rawValue: number | null;
+  unit?: string;
+  status: string;
+  tone: StatusTone;
+  trend: string;
+  trendDirection: 'up' | 'down' | 'flat';
+  sparkline: Array<{ label: string; value: number | null }>;
+}
+
+interface Insight {
+  tone: StatusTone;
+  title: string;
+  description: string;
+}
+
+const emptyContributors: OuraContributors = {
+  hrvBalance: null,
+  recoveryIndex: null,
+  restingHeartRate: null,
+  bodyTemperature: null,
+  previousDayActivity: null,
+  sleepBalance: null,
+  activityBalance: null,
+};
+
+const glassPanelStyle: CSSProperties = {
+  background: 'linear-gradient(145deg, rgba(8, 18, 32, 0.86), rgba(4, 11, 22, 0.68))',
+  border: `1px solid ${COLORS.border}`,
+  boxShadow: '0 24px 80px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+  backdropFilter: 'blur(22px)',
+};
+
 function getStoredConnectionId(): string | null {
   if (typeof window === 'undefined') return null;
   return window.localStorage.getItem(OURA_CONNECTION_STORAGE_KEY);
 }
 
-function toNumber(value: NumericValue): number | null {
+function isRecord(value: unknown): value is JsonRecord {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function parseJsonRecord(value: unknown): JsonRecord | null {
+  if (isRecord(value)) return value;
+  if (typeof value !== 'string') return null;
+
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return isRecord(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function getByPath(record: JsonRecord, path: string): unknown {
+  return path.split('.').reduce<unknown>((current, segment) => {
+    if (!isRecord(current)) return undefined;
+    return current[segment];
+  }, record);
+}
+
+function findDeepValue(record: JsonRecord, key: string, depth = 0): unknown {
+  if (depth > 4) return undefined;
+  if (Object.prototype.hasOwnProperty.call(record, key)) return record[key];
+
+  for (const value of Object.values(record)) {
+    if (!isRecord(value)) continue;
+    const nested = findDeepValue(value, key, depth + 1);
+    if (nested !== undefined) return nested;
+  }
+
+  return undefined;
+}
+
+function candidateRecords(row: OuraTableRow): JsonRecord[] {
+  const candidates: JsonRecord[] = [row];
+  const rawKeys = ['raw', 'raw_json', 'raw_data', 'data', 'payload', 'oura_data', 'json', 'details'];
+
+  rawKeys.forEach((key) => {
+    const parsed = parseJsonRecord(row[key]);
+    if (!parsed) return;
+    candidates.push(parsed);
+
+    const nestedData = parseJsonRecord(parsed.data);
+    if (nestedData) candidates.push(nestedData);
+  });
+
+  return candidates;
+}
+
+function toNumber(value: unknown): number | null {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null;
-  if (typeof value === 'string') {
+  if (typeof value === 'string' && value.trim()) {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : null;
   }
   return null;
 }
 
-function ensureSummary(map: Map<string, OuraDailySummary>, day: string): OuraDailySummary {
-  const existing = map.get(day);
-  if (existing) return existing;
+function readNumber(row: OuraTableRow, keys: string[]): number | null {
+  for (const record of candidateRecords(row)) {
+    for (const key of keys) {
+      const direct = getByPath(record, key);
+      const parsedDirect = toNumber(direct);
+      if (parsedDirect !== null) return parsedDirect;
 
-  const summary: OuraDailySummary = {
+      const deep = findDeepValue(record, key);
+      const parsedDeep = toNumber(deep);
+      if (parsedDeep !== null) return parsedDeep;
+    }
+  }
+
+  return null;
+}
+
+function readString(row: OuraTableRow, keys: string[]): string | null {
+  for (const record of candidateRecords(row)) {
+    for (const key of keys) {
+      const direct = getByPath(record, key);
+      if (typeof direct === 'string' && direct.trim()) return direct;
+
+      const deep = findDeepValue(record, key);
+      if (typeof deep === 'string' && deep.trim()) return deep;
+    }
+  }
+
+  return null;
+}
+
+function createEmptySummary(day: string): OuraDailySummary {
+  return {
     day,
     sleepScore: null,
     readinessScore: null,
     activityScore: null,
     steps: null,
+    hrv: null,
+    restingHeartRate: null,
+    lowestHeartRate: null,
+    respiratoryRate: null,
+    temperatureDeviation: null,
+    totalSleepDuration: null,
+    timeInBed: null,
+    sleepEfficiency: null,
+    latency: null,
+    remSleep: null,
+    deepSleep: null,
+    lightSleep: null,
+    awakeTime: null,
+    restfulness: null,
+    activeCalories: null,
+    walkingDistance: null,
+    highActivityTime: null,
+    mediumActivityTime: null,
+    lowActivityTime: null,
+    contributors: { ...emptyContributors },
+    lastSyncAt: null,
   };
+}
+
+function ensureSummary(map: Map<string, OuraDailySummary>, day: string): OuraDailySummary {
+  const existing = map.get(day);
+  if (existing) return existing;
+
+  const summary = createEmptySummary(day);
   map.set(day, summary);
   return summary;
 }
 
+function firstNumber(...values: Array<number | null>): number | null {
+  return values.find((value) => value !== null) ?? null;
+}
+
+function updateLastSync(summary: OuraDailySummary, row: OuraTableRow) {
+  summary.lastSyncAt = summary.lastSyncAt ?? readString(row, ['synced_at', 'updated_at', 'created_at', 'timestamp']);
+}
+
+function applySleepRow(summary: OuraDailySummary, row: OuraTableRow) {
+  summary.sleepScore = firstNumber(summary.sleepScore, readNumber(row, ['score', 'sleep_score']));
+  summary.hrv = firstNumber(summary.hrv, readNumber(row, ['average_hrv', 'hrv', 'heart_rate_variability', 'hrv_rmssd']));
+  summary.restingHeartRate = firstNumber(summary.restingHeartRate, readNumber(row, ['resting_heart_rate', 'average_heart_rate', 'average_hr']));
+  summary.lowestHeartRate = firstNumber(summary.lowestHeartRate, readNumber(row, ['lowest_heart_rate', 'lowest_hr']));
+  summary.respiratoryRate = firstNumber(summary.respiratoryRate, readNumber(row, ['respiratory_rate', 'average_breath', 'average_breathing_rate']));
+  summary.temperatureDeviation = firstNumber(summary.temperatureDeviation, readNumber(row, ['temperature_deviation', 'temperature_delta', 'body_temperature_deviation']));
+  summary.totalSleepDuration = firstNumber(summary.totalSleepDuration, readNumber(row, ['total_sleep_duration', 'total_sleep', 'sleep_duration']));
+  summary.timeInBed = firstNumber(summary.timeInBed, readNumber(row, ['time_in_bed']));
+  summary.sleepEfficiency = firstNumber(summary.sleepEfficiency, readNumber(row, ['efficiency', 'sleep_efficiency']));
+  summary.latency = firstNumber(summary.latency, readNumber(row, ['latency', 'sleep_latency']));
+  summary.remSleep = firstNumber(summary.remSleep, readNumber(row, ['rem_sleep_duration', 'rem_sleep']));
+  summary.deepSleep = firstNumber(summary.deepSleep, readNumber(row, ['deep_sleep_duration', 'deep_sleep']));
+  summary.lightSleep = firstNumber(summary.lightSleep, readNumber(row, ['light_sleep_duration', 'light_sleep']));
+  summary.awakeTime = firstNumber(summary.awakeTime, readNumber(row, ['awake_time', 'awake_duration']));
+  summary.restfulness = firstNumber(summary.restfulness, readNumber(row, ['restfulness', 'contributors.restfulness']));
+  updateLastSync(summary, row);
+}
+
+function applyReadinessRow(summary: OuraDailySummary, row: OuraTableRow) {
+  summary.readinessScore = firstNumber(summary.readinessScore, readNumber(row, ['score', 'readiness_score']));
+  summary.hrv = firstNumber(summary.hrv, readNumber(row, ['hrv', 'average_hrv', 'heart_rate_variability']));
+  summary.restingHeartRate = firstNumber(summary.restingHeartRate, readNumber(row, ['resting_heart_rate', 'average_heart_rate']));
+  summary.temperatureDeviation = firstNumber(summary.temperatureDeviation, readNumber(row, ['temperature_deviation', 'temperature_delta', 'body_temperature_deviation']));
+  summary.contributors = {
+    hrvBalance: firstNumber(summary.contributors.hrvBalance, readNumber(row, ['contributors.hrv_balance', 'hrv_balance'])),
+    recoveryIndex: firstNumber(summary.contributors.recoveryIndex, readNumber(row, ['contributors.recovery_index', 'recovery_index'])),
+    restingHeartRate: firstNumber(summary.contributors.restingHeartRate, readNumber(row, ['contributors.resting_heart_rate', 'resting_heart_rate_score'])),
+    bodyTemperature: firstNumber(summary.contributors.bodyTemperature, readNumber(row, ['contributors.body_temperature', 'body_temperature'])),
+    previousDayActivity: firstNumber(summary.contributors.previousDayActivity, readNumber(row, ['contributors.previous_day_activity', 'previous_day_activity'])),
+    sleepBalance: firstNumber(summary.contributors.sleepBalance, readNumber(row, ['contributors.sleep_balance', 'sleep_balance'])),
+    activityBalance: firstNumber(summary.contributors.activityBalance, readNumber(row, ['contributors.activity_balance', 'activity_balance'])),
+  };
+  updateLastSync(summary, row);
+}
+
+function applyActivityRow(summary: OuraDailySummary, row: OuraTableRow) {
+  summary.activityScore = firstNumber(summary.activityScore, readNumber(row, ['score', 'activity_score']));
+  summary.steps = firstNumber(summary.steps, readNumber(row, ['steps']));
+  summary.activeCalories = firstNumber(summary.activeCalories, readNumber(row, ['active_calories', 'active_calorie']));
+  summary.walkingDistance = firstNumber(summary.walkingDistance, readNumber(row, ['equivalent_walking_distance', 'walking_distance', 'distance']));
+  summary.highActivityTime = firstNumber(summary.highActivityTime, readNumber(row, ['high_activity_time', 'high_activity_duration']));
+  summary.mediumActivityTime = firstNumber(summary.mediumActivityTime, readNumber(row, ['medium_activity_time', 'medium_activity_duration']));
+  summary.lowActivityTime = firstNumber(summary.lowActivityTime, readNumber(row, ['low_activity_time', 'low_activity_duration']));
+  updateLastSync(summary, row);
+}
+
 function mergeDailyRows(
-  sleepRows: OuraScoreRow[],
-  readinessRows: OuraScoreRow[],
-  activityRows: OuraActivityRow[],
+  sleepRows: OuraTableRow[],
+  readinessRows: OuraTableRow[],
+  activityRows: OuraTableRow[],
 ): OuraDailySummary[] {
   const byDay = new Map<string, OuraDailySummary>();
 
   sleepRows.forEach((row) => {
-    if (!row.day) return;
-    ensureSummary(byDay, row.day).sleepScore = toNumber(row.score);
+    const day = typeof row.day === 'string' ? row.day : readString(row, ['day', 'date']);
+    if (!day) return;
+    applySleepRow(ensureSummary(byDay, day), row);
   });
 
   readinessRows.forEach((row) => {
-    if (!row.day) return;
-    ensureSummary(byDay, row.day).readinessScore = toNumber(row.score);
+    const day = typeof row.day === 'string' ? row.day : readString(row, ['day', 'date']);
+    if (!day) return;
+    applyReadinessRow(ensureSummary(byDay, day), row);
   });
 
   activityRows.forEach((row) => {
-    if (!row.day) return;
-    const summary = ensureSummary(byDay, row.day);
-    summary.activityScore = toNumber(row.score);
-    summary.steps = toNumber(row.steps);
+    const day = typeof row.day === 'string' ? row.day : readString(row, ['day', 'date']);
+    if (!day) return;
+    applyActivityRow(ensureSummary(byDay, day), row);
   });
 
   return Array.from(byDay.values())
@@ -147,12 +431,49 @@ function clearCallbackParams() {
   window.history.replaceState(null, document.title, cleanUrl);
 }
 
+function numericAverage(values: Array<number | null>): number | null {
+  const present = values.filter((value): value is number => value !== null && Number.isFinite(value));
+  if (present.length === 0) return null;
+  return present.reduce((sum, value) => sum + value, 0) / present.length;
+}
+
 function formatScore(value: number | null): string {
   return value === null ? 'No data' : String(Math.round(value));
 }
 
-function formatSteps(value: number | null): string {
+function formatInteger(value: number | null): string {
   return value === null ? 'No data' : new Intl.NumberFormat('en-US').format(Math.round(value));
+}
+
+function formatDecimal(value: number | null, digits = 1): string {
+  return value === null ? 'No data' : value.toFixed(digits);
+}
+
+function formatSignedDecimal(value: number | null, digits = 1): string {
+  if (value === null) return 'No data';
+  return `${value > 0 ? '+' : ''}${value.toFixed(digits)}`;
+}
+
+function secondsToHours(value: number | null): number | null {
+  if (value === null) return null;
+  return value / 3600;
+}
+
+function formatDuration(value: number | null): string {
+  if (value === null) return 'No data';
+
+  const totalMinutes = Math.round(value / 60);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  if (hours <= 0) return `${minutes}m`;
+  return `${hours}h ${minutes}m`;
+}
+
+function formatDistanceMeters(value: number | null): string {
+  if (value === null) return 'No data';
+  if (value >= 1000) return `${(value / 1000).toFixed(1)} km`;
+  return `${Math.round(value)} m`;
 }
 
 function formatDay(value: string | null): string {
@@ -172,6 +493,326 @@ function formatDay(value: string | null): string {
   return value;
 }
 
+function shortDay(value: string): string {
+  const dateParts = value.split('-').map(Number);
+  if (dateParts.length !== 3 || !dateParts.every(Number.isFinite)) return value;
+
+  const [year, month, day] = dateParts;
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(year, month - 1, day)));
+}
+
+function formatTimestamp(value: string | null): string {
+  if (!value) return 'No synced rows yet';
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return formatDay(value);
+
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(parsed);
+}
+
+function statusFromScore(value: number | null): { label: string; tone: StatusTone } {
+  if (value === null) return { label: 'Not available', tone: 'neutral' };
+  if (value >= 85) return { label: 'Optimal', tone: 'optimal' };
+  if (value >= 75) return { label: 'Good', tone: 'good' };
+  if (value >= 60) return { label: 'Fair', tone: 'fair' };
+  return { label: 'Pay attention', tone: 'attention' };
+}
+
+function statusFromHrv(value: number | null, baseline: number | null): { label: string; tone: StatusTone } {
+  if (value === null) return { label: 'Not available', tone: 'neutral' };
+  if (baseline === null || baseline <= 0) return { label: 'Good', tone: 'good' };
+  if (value >= baseline) return { label: 'Optimal', tone: 'optimal' };
+  if (value >= baseline * 0.9) return { label: 'Good', tone: 'good' };
+  if (value >= baseline * 0.8) return { label: 'Fair', tone: 'fair' };
+  return { label: 'Pay attention', tone: 'attention' };
+}
+
+function statusFromRestingHeartRate(value: number | null, baseline: number | null): { label: string; tone: StatusTone } {
+  if (value === null) return { label: 'Not available', tone: 'neutral' };
+  if (baseline === null || baseline <= 0) return { label: 'Good', tone: 'good' };
+  if (value <= baseline) return { label: 'Optimal', tone: 'optimal' };
+  if (value <= baseline * 1.04) return { label: 'Good', tone: 'good' };
+  if (value <= baseline * 1.08) return { label: 'Fair', tone: 'fair' };
+  return { label: 'Pay attention', tone: 'attention' };
+}
+
+function statusFromTemperature(value: number | null): { label: string; tone: StatusTone } {
+  if (value === null) return { label: 'Not available', tone: 'neutral' };
+  const absolute = Math.abs(value);
+  if (absolute <= 0.2) return { label: 'Optimal', tone: 'optimal' };
+  if (absolute <= 0.5) return { label: 'Good', tone: 'good' };
+  if (absolute <= 0.9) return { label: 'Fair', tone: 'fair' };
+  return { label: 'Pay attention', tone: 'attention' };
+}
+
+function statusFromSteps(value: number | null): { label: string; tone: StatusTone } {
+  if (value === null) return { label: 'Not available', tone: 'neutral' };
+  if (value >= 10000) return { label: 'Optimal', tone: 'optimal' };
+  if (value >= 7500) return { label: 'Good', tone: 'good' };
+  if (value >= 4500) return { label: 'Fair', tone: 'fair' };
+  return { label: 'Pay attention', tone: 'attention' };
+}
+
+function trendText(current: number | null, previousValues: Array<number | null>, lowerIsBetter = false): { text: string; direction: 'up' | 'down' | 'flat' } {
+  const baseline = numericAverage(previousValues);
+  if (current === null || baseline === null) return { text: 'No 7-day trend', direction: 'flat' };
+
+  const delta = current - baseline;
+  const displayDelta = Math.abs(delta) >= 10 ? Math.round(delta) : Number(delta.toFixed(1));
+  if (Math.abs(delta) < 0.5) return { text: 'Flat vs 7-day avg', direction: 'flat' };
+
+  const positive = lowerIsBetter ? delta < 0 : delta > 0;
+  return {
+    text: `${positive ? '+' : '-'}${Math.abs(displayDelta)} vs 7-day avg`,
+    direction: positive ? 'up' : 'down',
+  };
+}
+
+function metricValue(row: OuraDailySummary, key: keyof OuraDailySummary): number | null {
+  const value = row[key];
+  return typeof value === 'number' ? value : null;
+}
+
+function buildSparkline(rows: OuraDailySummary[], key: keyof OuraDailySummary) {
+  return rows
+    .slice(0, 7)
+    .reverse()
+    .map((row) => ({ label: shortDay(row.day), value: metricValue(row, key) }));
+}
+
+function buildSummaryMetrics(rows: OuraDailySummary[]): SummaryMetric[] {
+  const latest = rows[0] ?? null;
+  const previousSeven = rows.slice(1, 8);
+  const hrvBaseline = numericAverage(previousSeven.map((row) => row.hrv));
+  const rhrBaseline = numericAverage(previousSeven.map((row) => row.restingHeartRate));
+  const recoveryIndex = latest?.contributors.recoveryIndex ?? latest?.readinessScore ?? null;
+  const recoveryTrend = trendText(recoveryIndex, previousSeven.map((row) => row.contributors.recoveryIndex ?? row.readinessScore));
+  const sleepTrend = trendText(latest?.sleepScore ?? null, previousSeven.map((row) => row.sleepScore));
+  const readinessTrend = trendText(latest?.readinessScore ?? null, previousSeven.map((row) => row.readinessScore));
+  const activityTrend = trendText(latest?.activityScore ?? null, previousSeven.map((row) => row.activityScore));
+  const hrvTrend = trendText(latest?.hrv ?? null, previousSeven.map((row) => row.hrv));
+  const rhrTrend = trendText(latest?.restingHeartRate ?? null, previousSeven.map((row) => row.restingHeartRate), true);
+  const stepsTrend = trendText(latest?.steps ?? null, previousSeven.map((row) => row.steps));
+  const tempTrend = trendText(latest?.temperatureDeviation ?? null, previousSeven.map((row) => row.temperatureDeviation), true);
+  const recoveryStatus = statusFromScore(recoveryIndex);
+  const sleepStatus = statusFromScore(latest?.sleepScore ?? null);
+  const readinessStatus = statusFromScore(latest?.readinessScore ?? null);
+  const activityStatus = statusFromScore(latest?.activityScore ?? null);
+  const hrvStatus = statusFromHrv(latest?.hrv ?? null, hrvBaseline);
+  const rhrStatus = statusFromRestingHeartRate(latest?.restingHeartRate ?? null, rhrBaseline);
+  const stepsStatus = statusFromSteps(latest?.steps ?? null);
+  const tempStatus = statusFromTemperature(latest?.temperatureDeviation ?? null);
+
+  return [
+    {
+      key: 'recovery',
+      label: 'Recovery Index',
+      icon: Brain,
+      value: formatScore(recoveryIndex),
+      rawValue: recoveryIndex,
+      status: recoveryStatus.label,
+      tone: recoveryStatus.tone,
+      trend: recoveryTrend.text,
+      trendDirection: recoveryTrend.direction,
+      sparkline: rows.slice(0, 7).reverse().map((row) => ({
+        label: shortDay(row.day),
+        value: row.contributors.recoveryIndex ?? row.readinessScore,
+      })),
+    },
+    {
+      key: 'sleep',
+      label: 'Sleep Score',
+      icon: Moon,
+      value: formatScore(latest?.sleepScore ?? null),
+      rawValue: latest?.sleepScore ?? null,
+      status: sleepStatus.label,
+      tone: sleepStatus.tone,
+      trend: sleepTrend.text,
+      trendDirection: sleepTrend.direction,
+      sparkline: buildSparkline(rows, 'sleepScore'),
+    },
+    {
+      key: 'readiness',
+      label: 'Readiness Score',
+      icon: BatteryCharging,
+      value: formatScore(latest?.readinessScore ?? null),
+      rawValue: latest?.readinessScore ?? null,
+      status: readinessStatus.label,
+      tone: readinessStatus.tone,
+      trend: readinessTrend.text,
+      trendDirection: readinessTrend.direction,
+      sparkline: buildSparkline(rows, 'readinessScore'),
+    },
+    {
+      key: 'activity',
+      label: 'Activity Score',
+      icon: Activity,
+      value: formatScore(latest?.activityScore ?? null),
+      rawValue: latest?.activityScore ?? null,
+      status: activityStatus.label,
+      tone: activityStatus.tone,
+      trend: activityTrend.text,
+      trendDirection: activityTrend.direction,
+      sparkline: buildSparkline(rows, 'activityScore'),
+    },
+    {
+      key: 'hrv',
+      label: 'HRV',
+      icon: Waves,
+      value: formatDecimal(latest?.hrv ?? null, 0),
+      rawValue: latest?.hrv ?? null,
+      unit: 'ms',
+      status: hrvStatus.label,
+      tone: hrvStatus.tone,
+      trend: hrvTrend.text,
+      trendDirection: hrvTrend.direction,
+      sparkline: buildSparkline(rows, 'hrv'),
+    },
+    {
+      key: 'rhr',
+      label: 'Resting Heart Rate',
+      icon: HeartPulse,
+      value: formatDecimal(latest?.restingHeartRate ?? null, 0),
+      rawValue: latest?.restingHeartRate ?? null,
+      unit: 'bpm',
+      status: rhrStatus.label,
+      tone: rhrStatus.tone,
+      trend: rhrTrend.text,
+      trendDirection: rhrTrend.direction,
+      sparkline: buildSparkline(rows, 'restingHeartRate'),
+    },
+    {
+      key: 'steps',
+      label: 'Steps',
+      icon: Footprints,
+      value: formatInteger(latest?.steps ?? null),
+      rawValue: latest?.steps ?? null,
+      status: stepsStatus.label,
+      tone: stepsStatus.tone,
+      trend: stepsTrend.text,
+      trendDirection: stepsTrend.direction,
+      sparkline: buildSparkline(rows, 'steps'),
+    },
+    {
+      key: 'temperature',
+      label: 'Body Temperature Deviation',
+      icon: Thermometer,
+      value: formatSignedDecimal(latest?.temperatureDeviation ?? null, 1),
+      rawValue: latest?.temperatureDeviation ?? null,
+      unit: 'C',
+      status: tempStatus.label,
+      tone: tempStatus.tone,
+      trend: tempTrend.text,
+      trendDirection: tempTrend.direction,
+      sparkline: buildSparkline(rows, 'temperatureDeviation'),
+    },
+  ];
+}
+
+function buildChartPoints(rows: OuraDailySummary[]): ChartPoint[] {
+  return rows
+    .slice()
+    .reverse()
+    .map((row) => ({
+      day: row.day,
+      label: shortDay(row.day),
+      sleepScore: row.sleepScore,
+      readinessScore: row.readinessScore,
+      activityScore: row.activityScore,
+      steps: row.steps,
+      hrv: row.hrv,
+      restingHeartRate: row.restingHeartRate,
+      lowestHeartRate: row.lowestHeartRate,
+      respiratoryRate: row.respiratoryRate,
+      temperatureDeviation: row.temperatureDeviation,
+      remSleepHours: secondsToHours(row.remSleep),
+      deepSleepHours: secondsToHours(row.deepSleep),
+      lightSleepHours: secondsToHours(row.lightSleep),
+      awakeHours: secondsToHours(row.awakeTime),
+    }));
+}
+
+function buildInsights(rows: OuraDailySummary[]): Insight[] {
+  const latest = rows[0];
+  if (!latest) return [];
+
+  const previousSeven = rows.slice(1, 8);
+  const readinessAverage = numericAverage(previousSeven.map((row) => row.readinessScore));
+  const hrvAverage = numericAverage(previousSeven.map((row) => row.hrv));
+  const rhrAverage = numericAverage(previousSeven.map((row) => row.restingHeartRate));
+  const insights: Insight[] = [];
+
+  if (latest.readinessScore !== null && readinessAverage !== null && latest.readinessScore < readinessAverage - 10) {
+    insights.push({
+      tone: 'attention',
+      title: 'Recovery warning',
+      description: `Readiness is ${Math.round(readinessAverage - latest.readinessScore)} points below the 7-day baseline. Reduce load and prioritize recovery today.`,
+    });
+  }
+
+  if (latest.sleepScore !== null && latest.sleepScore < 70) {
+    insights.push({
+      tone: 'fair',
+      title: 'Sleep priority',
+      description: 'Sleep score is below 70. Shift the next cycle toward earlier wind-down, lower evening stimulation, and more time in bed.',
+    });
+  }
+
+  if ((latest.activityScore ?? 0) >= 85 && (latest.readinessScore ?? 100) < 70) {
+    insights.push({
+      tone: 'attention',
+      title: 'Overreaching risk',
+      description: 'Activity is high while readiness is low. This pattern can signal accumulated strain. Keep intensity controlled.',
+    });
+  }
+
+  if (latest.hrv !== null && hrvAverage !== null && latest.hrv < hrvAverage * 0.85) {
+    insights.push({
+      tone: 'attention',
+      title: 'Nervous-system fatigue',
+      description: 'HRV is more than 15% below the 7-day average. Favor low-intensity work, hydration, and sleep consistency.',
+    });
+  }
+
+  if (latest.restingHeartRate !== null && rhrAverage !== null && latest.restingHeartRate > rhrAverage * 1.05) {
+    insights.push({
+      tone: 'fair',
+      title: 'Recovery stress signal',
+      description: 'Resting heart rate is elevated versus baseline. Watch caffeine, illness signals, heat, and training load.',
+    });
+  }
+
+  if (insights.length === 0) {
+    insights.push({
+      tone: 'optimal',
+      title: 'Stable biometric profile',
+      description: 'No major recovery warnings detected from the synced Oura metrics. Keep the routine steady and continue monitoring trends.',
+    });
+  }
+
+  return insights.slice(0, 4);
+}
+
+function hasAnyValue(points: ChartPoint[], keys: Array<keyof ChartPoint>): boolean {
+  return points.some((point) => keys.some((key) => typeof point[key] === 'number'));
+}
+
+function toneColor(tone: StatusTone): string {
+  if (tone === 'optimal') return COLORS.emerald;
+  if (tone === 'good') return COLORS.cyan;
+  if (tone === 'fair') return COLORS.amber;
+  if (tone === 'attention') return COLORS.rose;
+  return COLORS.faint;
+}
+
 function AmbientLayer() {
   return (
     <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
@@ -179,120 +820,223 @@ function AmbientLayer() {
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(circle at 18% -8%, color-mix(in srgb, var(--admin-accent) 10%, transparent), transparent 34%), radial-gradient(circle at 82% 10%, color-mix(in srgb, var(--admin-success) 7%, transparent), transparent 28%), linear-gradient(180deg, color-mix(in srgb, var(--admin-surface) 20%, transparent), transparent 44%)',
+            'radial-gradient(circle at 15% -8%, rgba(34, 211, 238, 0.16), transparent 32%), radial-gradient(circle at 84% 8%, rgba(52, 211, 153, 0.12), transparent 28%), linear-gradient(180deg, #020617 0%, #04111f 48%, #020617 100%)',
         }}
       />
       <div
         className="absolute inset-0"
         style={{
-          backgroundImage:
-            'linear-gradient(var(--admin-grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--admin-grid-line) 1px, transparent 1px)',
-          backgroundSize: '56px 56px',
-          maskImage: 'linear-gradient(to bottom, black, transparent 72%)',
-          opacity: 0.35,
+          backgroundImage: 'linear-gradient(rgba(125, 211, 252, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(125, 211, 252, 0.035) 1px, transparent 1px)',
+          backgroundSize: '58px 58px',
+          maskImage: 'linear-gradient(to bottom, black, transparent 78%)',
         }}
+      />
+      <motion.div
+        className="absolute left-0 right-0 h-px"
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.45), transparent)' }}
+        animate={{ top: ['0%', '100%'] }}
+        transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
       />
     </div>
   );
 }
 
-function MetricCard({
-  icon: Icon,
-  iconColor,
-  label,
-  value,
-  subtext,
-  delay = 0,
-}: {
-  icon: LucideIcon;
-  iconColor: string;
-  label: string;
-  value: string;
-  subtext: string;
-  delay?: number;
-}) {
+function ChartShell({ title, eyebrow, children, action }: { title: string; eyebrow: string; children: ReactNode; action?: ReactNode }) {
+  return (
+    <section className="rounded-[1.75rem] p-4 sm:p-5" style={glassPanelStyle}>
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-[0.18em]" style={{ color: COLORS.cyan }}>
+            {eyebrow}
+          </p>
+          <h2 className="mt-1 text-xl font-semibold tracking-[-0.035em]" style={{ color: COLORS.text }}>
+            {title}
+          </h2>
+        </div>
+        {action}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function EmptyPanel({ title, description, action }: { title: string; description: string; action?: ReactNode }) {
+  return (
+    <div className="flex min-h-[280px] flex-col items-center justify-center rounded-[1.5rem] border px-6 py-12 text-center" style={{ borderColor: COLORS.border, background: 'rgba(2, 6, 23, 0.34)' }}>
+      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-3xl" style={{ background: COLORS.cyanSoft, border: `1px solid ${COLORS.border}` }}>
+        <Sparkles size={24} color={COLORS.cyan} />
+      </div>
+      <h3 className="text-xl font-semibold tracking-[-0.035em]" style={{ color: COLORS.text }}>
+        {title}
+      </h3>
+      <p className="mt-2 max-w-md text-sm leading-6" style={{ color: COLORS.muted }}>
+        {description}
+      </p>
+      {action && <div className="mt-6">{action}</div>}
+    </div>
+  );
+}
+
+function SummaryCard({ metric }: { metric: SummaryMetric }) {
+  const Icon = metric.icon;
+  const accent = toneColor(metric.tone);
+  const hasSparkline = metric.sparkline.some((point) => typeof point.value === 'number');
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, delay }}
-      className="rounded-[1.45rem] border p-4 sm:p-5"
+      className="relative overflow-hidden rounded-[1.55rem] border p-4"
       style={{
-        background: 'var(--admin-surface)',
-        borderColor: 'var(--admin-border)',
-        boxShadow: 'var(--admin-card-shadow, none)',
+        background: 'linear-gradient(145deg, rgba(8, 18, 32, 0.78), rgba(2, 8, 23, 0.54))',
+        borderColor: 'rgba(125, 211, 252, 0.14)',
+        boxShadow: '0 18px 60px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.05)',
       }}
     >
-      <div className="mb-4 flex items-center gap-3">
-        <div
-          className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl"
-          style={{
-            background: `color-mix(in srgb, ${iconColor} 12%, transparent)`,
-            border: `1px solid color-mix(in srgb, ${iconColor} 24%, transparent)`,
-          }}
-        >
-          <Icon size={18} color={iconColor} />
+      <div className="absolute inset-x-0 top-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }} />
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl" style={{ background: `color-mix(in srgb, ${accent} 14%, transparent)`, border: `1px solid color-mix(in srgb, ${accent} 28%, transparent)` }}>
+          <Icon size={19} color={accent} />
         </div>
-        <span className="text-xs font-black uppercase tracking-[0.12em]" style={{ color: 'var(--admin-text-muted)' }}>
-          {label}
+        <span className="rounded-full px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.12em]" style={{ background: `color-mix(in srgb, ${accent} 12%, transparent)`, color: accent, border: `1px solid color-mix(in srgb, ${accent} 24%, transparent)` }}>
+          {metric.status}
         </span>
       </div>
-      <p
-        className="font-mono text-2xl font-semibold tracking-[-0.04em] sm:text-3xl"
-        style={{ color: 'var(--admin-text-primary)' }}
-      >
-        {value}
+
+      <p className="text-[10px] font-black uppercase tracking-[0.15em]" style={{ color: COLORS.faint }}>
+        {metric.label}
       </p>
-      <p className="mt-2 text-xs leading-5" style={{ color: 'var(--admin-text-muted)' }}>
-        {subtext}
+      <div className="mt-2 flex items-baseline gap-2">
+        <p className="font-mono text-3xl font-semibold tracking-[-0.05em]" style={{ color: COLORS.text }}>
+          {metric.value}
+        </p>
+        {metric.unit && metric.rawValue !== null && (
+          <span className="font-mono text-xs" style={{ color: COLORS.muted }}>
+            {metric.unit}
+          </span>
+        )}
+      </div>
+      <p className="mt-2 text-xs" style={{ color: metric.trendDirection === 'down' ? COLORS.rose : metric.trendDirection === 'up' ? COLORS.emerald : COLORS.muted }}>
+        {metric.trend}
       </p>
+
+      <div className="mt-4 h-12">
+        {hasSparkline ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={metric.sparkline}>
+              <Line type="monotone" dataKey="value" stroke={accent} strokeWidth={2} dot={false} connectNulls />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex h-full items-center text-xs" style={{ color: COLORS.faint }}>
+            No trend data
+          </div>
+        )}
+      </div>
     </motion.div>
   );
 }
 
-function StatusPill({ connected }: { connected: boolean }) {
+function HeroButton({ icon: Icon, label, onClick, disabled, primary = false }: { icon: LucideIcon; label: string; onClick: () => void; disabled?: boolean; primary?: boolean }) {
   return (
-    <span
-      className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.12em]"
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl px-4 text-xs font-black uppercase tracking-[0.12em] transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
       style={{
-        background: connected ? 'var(--admin-success-bg)' : 'var(--admin-warning-bg)',
-        borderColor: connected ? 'var(--admin-success-border)' : 'var(--admin-warning-border)',
-        color: connected ? 'var(--admin-success)' : 'var(--admin-warning)',
+        background: primary ? 'linear-gradient(135deg, rgba(34, 211, 238, 0.22), rgba(52, 211, 153, 0.16))' : 'rgba(8, 18, 32, 0.72)',
+        border: `1px solid ${primary ? 'rgba(34, 211, 238, 0.35)' : COLORS.border}`,
+        color: primary ? COLORS.cyan : COLORS.text,
+        boxShadow: primary ? '0 0 34px rgba(34, 211, 238, 0.13)' : 'none',
       }}
     >
-      <span
-        className="h-1.5 w-1.5 rounded-full"
-        style={{
-          background: connected ? 'var(--admin-success)' : 'var(--admin-warning)',
-          boxShadow: connected ? '0 0 10px var(--admin-success)' : '0 0 10px var(--admin-warning)',
-        }}
-      />
-      {connected ? 'Connected' : 'Not connected'}
-    </span>
+      <Icon size={15} className={disabled ? 'animate-spin' : undefined} />
+      {label}
+    </button>
+  );
+}
+
+function MetricMini({ label, value, icon: Icon }: { label: string; value: string; icon: LucideIcon }) {
+  return (
+    <div className="rounded-2xl border p-3" style={{ borderColor: COLORS.border, background: 'rgba(2, 6, 23, 0.28)' }}>
+      <div className="mb-2 flex items-center gap-2">
+        <Icon size={14} color={COLORS.cyan} />
+        <span className="text-[10px] font-black uppercase tracking-[0.12em]" style={{ color: COLORS.faint }}>
+          {label}
+        </span>
+      </div>
+      <p className="font-mono text-sm font-semibold" style={{ color: COLORS.text }}>
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function ContributorCard({ label, value }: { label: string; value: number | null }) {
+  const status = statusFromScore(value);
+  const accent = toneColor(status.tone);
+
+  return (
+    <div className="rounded-2xl border p-4" style={{ borderColor: COLORS.border, background: 'rgba(2, 6, 23, 0.28)' }}>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <p className="text-xs font-semibold" style={{ color: COLORS.text }}>
+          {label}
+        </p>
+        <span className="h-2 w-2 rounded-full" style={{ background: accent, boxShadow: `0 0 14px ${accent}` }} />
+      </div>
+      <p className="font-mono text-2xl font-semibold" style={{ color: value === null ? COLORS.faint : accent }}>
+        {value === null ? 'Not available' : Math.round(value)}
+      </p>
+      {value !== null && (
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full" style={{ background: 'rgba(125, 211, 252, 0.1)' }}>
+          <div className="h-full rounded-full" style={{ width: `${Math.max(0, Math.min(100, value))}%`, background: accent }} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function InsightCard({ insight }: { insight: Insight }) {
+  const accent = toneColor(insight.tone);
+
+  return (
+    <div className="rounded-3xl border p-4" style={{ borderColor: `color-mix(in srgb, ${accent} 28%, transparent)`, background: `linear-gradient(145deg, color-mix(in srgb, ${accent} 10%, transparent), rgba(2, 6, 23, 0.34))` }}>
+      <div className="mb-3 flex items-center gap-2">
+        <Sparkles size={15} color={accent} />
+        <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: accent }}>
+          Insight Engine
+        </p>
+      </div>
+      <h3 className="text-base font-semibold tracking-[-0.025em]" style={{ color: COLORS.text }}>
+        {insight.title}
+      </h3>
+      <p className="mt-2 text-sm leading-6" style={{ color: COLORS.muted }}>
+        {insight.description}
+      </p>
+    </div>
   );
 }
 
 function NoticeToast({ notice, onClose }: { notice: Notice; onClose: () => void }) {
-  const isSuccess = notice.type === 'success';
-  const color = isSuccess ? 'var(--admin-success)' : notice.type === 'warning' ? 'var(--admin-warning)' : 'var(--admin-danger)';
-  const border = isSuccess ? 'var(--admin-success-border)' : notice.type === 'warning' ? 'var(--admin-warning-border)' : 'var(--admin-danger-border)';
+  const accent = notice.type === 'success' ? COLORS.emerald : notice.type === 'warning' ? COLORS.amber : COLORS.rose;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 16, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 8 }}
-      className="fixed bottom-6 right-6 z-[500] flex max-w-[360px] items-start gap-3 rounded-2xl border px-4 py-3 font-mono text-sm"
+      className="fixed bottom-6 right-6 z-[500] flex max-w-[380px] items-start gap-3 rounded-2xl border px-4 py-3 font-mono text-sm"
       style={{
-        background: 'var(--admin-surface-elevated)',
-        borderColor: border,
-        color,
-        boxShadow: 'var(--admin-card-shadow, none)',
+        background: COLORS.panelStrong,
+        borderColor: `color-mix(in srgb, ${accent} 34%, transparent)`,
+        color: accent,
+        boxShadow: '0 22px 70px rgba(0, 0, 0, 0.44)',
       }}
     >
-      <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full" style={{ background: color }} />
+      <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full" style={{ background: accent }} />
       <span className="min-w-0 flex-1 break-words">{notice.message}</span>
-      <button type="button" onClick={onClose} className="rounded-lg p-1 transition-all hover:scale-105" style={{ color }}>
+      <button type="button" onClick={onClose} className="rounded-lg p-1 transition-all hover:scale-105" style={{ color: accent }}>
         <X size={14} />
       </button>
     </motion.div>
@@ -305,29 +1049,21 @@ function InlineError({ message, onRetry }: { message: string; onRetry: () => voi
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       className="mb-5 rounded-[1.4rem] border px-5 py-4"
-      style={{ borderColor: 'var(--admin-danger-border)', background: 'var(--admin-danger-bg)' }}
+      style={{ borderColor: 'rgba(251, 113, 133, 0.32)', background: 'rgba(251, 113, 133, 0.08)' }}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">
-          <TriangleAlert size={17} className="mt-0.5 flex-shrink-0" style={{ color: 'var(--admin-danger)' }} />
+          <TriangleAlert size={17} className="mt-0.5 flex-shrink-0" style={{ color: COLORS.rose }} />
           <div className="min-w-0">
-            <p className="font-mono text-sm font-semibold" style={{ color: 'var(--admin-danger)' }}>
+            <p className="font-mono text-sm font-semibold" style={{ color: COLORS.rose }}>
               Oura data load failed
             </p>
-            <p className="mt-1 break-words font-mono text-xs leading-5" style={{ color: 'var(--admin-danger)', opacity: 0.75 }}>
+            <p className="mt-1 break-words font-mono text-xs leading-5" style={{ color: COLORS.rose, opacity: 0.8 }}>
               {message}
             </p>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={onRetry}
-          className="inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-bold transition-all hover:-translate-y-0.5"
-          style={{ background: 'var(--admin-surface)', border: '1px solid var(--admin-danger-border)', color: 'var(--admin-danger)' }}
-        >
-          <RefreshCw size={13} />
-          Retry
-        </button>
+        <HeroButton icon={RefreshCw} label="Retry" onClick={onRetry} />
       </div>
     </motion.div>
   );
@@ -346,6 +1082,13 @@ export function OuraAnalyticsPage() {
 
   const latestRow = dailyRows[0] ?? null;
   const isConnected = Boolean(connectionId);
+  const chartPoints = useMemo(() => buildChartPoints(dailyRows), [dailyRows]);
+  const summaryMetrics = useMemo(() => buildSummaryMetrics(dailyRows), [dailyRows]);
+  const insights = useMemo(() => buildInsights(dailyRows), [dailyRows]);
+  const hasData = dailyRows.length > 0;
+  const lastSyncLabel = formatTimestamp(latestRow?.lastSyncAt ?? latestRow?.day ?? null);
+  const sleepStageAvailable = hasAnyValue(chartPoints, ['remSleepHours', 'deepSleepHours', 'lightSleepHours', 'awakeHours']);
+  const heartSignalsAvailable = hasAnyValue(chartPoints, ['hrv', 'restingHeartRate', 'lowestHeartRate', 'respiratoryRate', 'temperatureDeviation']);
 
   const showNotice = useCallback((nextNotice: Notice) => {
     setNotice(nextNotice);
@@ -358,18 +1101,18 @@ export function OuraAnalyticsPage() {
 
     try {
       const [sleepResult, readinessResult, activityResult] = await Promise.all([
-        supabase.from('oura_daily_sleep').select('day, score').order('day', { ascending: false }).limit(30),
-        supabase.from('oura_daily_readiness').select('day, score').order('day', { ascending: false }).limit(30),
-        supabase.from('oura_daily_activity').select('day, score, steps').order('day', { ascending: false }).limit(30),
+        supabase.from('oura_daily_sleep').select('*').order('day', { ascending: false }).limit(30),
+        supabase.from('oura_daily_readiness').select('*').order('day', { ascending: false }).limit(30),
+        supabase.from('oura_daily_activity').select('*').order('day', { ascending: false }).limit(30),
       ]);
 
       const firstError = sleepResult.error ?? readinessResult.error ?? activityResult.error;
       if (firstError) throw new Error(firstError.message);
 
       setDailyRows(mergeDailyRows(
-        (sleepResult.data ?? []) as OuraScoreRow[],
-        (readinessResult.data ?? []) as OuraScoreRow[],
-        (activityResult.data ?? []) as OuraActivityRow[],
+        (sleepResult.data ?? []) as OuraTableRow[],
+        (readinessResult.data ?? []) as OuraTableRow[],
+        (activityResult.data ?? []) as OuraTableRow[],
       ));
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Could not load Oura data.';
@@ -409,44 +1152,6 @@ export function OuraAnalyticsPage() {
     clearCallbackParams();
   }, [showNotice]);
 
-  const metricCards = useMemo(() => [
-    {
-      icon: Moon,
-      iconColor: 'var(--admin-info)',
-      label: 'Sleep Score',
-      value: formatScore(latestRow?.sleepScore ?? null),
-      subtext: latestRow ? formatDay(latestRow.day) : 'Latest synced daily sleep',
-    },
-    {
-      icon: BatteryCharging,
-      iconColor: 'var(--admin-success)',
-      label: 'Readiness Score',
-      value: formatScore(latestRow?.readinessScore ?? null),
-      subtext: latestRow ? formatDay(latestRow.day) : 'Latest readiness snapshot',
-    },
-    {
-      icon: Activity,
-      iconColor: 'var(--admin-accent)',
-      label: 'Activity Score',
-      value: formatScore(latestRow?.activityScore ?? null),
-      subtext: latestRow ? formatDay(latestRow.day) : 'Latest activity snapshot',
-    },
-    {
-      icon: Footprints,
-      iconColor: 'var(--admin-warning)',
-      label: 'Steps',
-      value: formatSteps(latestRow?.steps ?? null),
-      subtext: latestRow ? formatDay(latestRow.day) : 'Daily movement total',
-    },
-    {
-      icon: Clock3,
-      iconColor: 'var(--admin-accent-subtle)',
-      label: 'Last Sync',
-      value: latestRow ? formatDay(latestRow.day) : 'No data',
-      subtext: 'Most recent synced Oura day',
-    },
-  ], [latestRow]);
-
   const connectOura = () => {
     const clientId = import.meta.env.VITE_OURA_CLIENT_ID;
 
@@ -470,7 +1175,7 @@ export function OuraAnalyticsPage() {
     const storedConnectionId = getStoredConnectionId();
 
     if (!storedConnectionId) {
-      showNotice({ type: 'warning', message: 'Connect Oura first.' });
+      showNotice({ type: 'warning', message: 'Connect Oura first' });
       return;
     }
 
@@ -501,9 +1206,13 @@ export function OuraAnalyticsPage() {
     }
   };
 
+  const refreshDashboard = () => {
+    loadDashboardData();
+  };
+
   return (
     <AdminGate>
-      <div className="admin-root min-h-screen overflow-hidden font-sans" style={{ background: 'var(--admin-bg)', color: 'var(--admin-text-primary)' }}>
+      <div className="admin-root min-h-screen overflow-hidden font-sans" style={{ background: '#020617', color: COLORS.text }}>
         <AmbientLayer />
 
         <AdminHeader
@@ -516,69 +1225,60 @@ export function OuraAnalyticsPage() {
         />
 
         <main className="relative z-10 mx-auto max-w-[1760px] px-4 py-5 sm:px-6 lg:px-8 xl:px-10">
-          <section
-            className="relative overflow-hidden rounded-[1.9rem] border p-4 sm:p-5 lg:p-6"
-            style={{
-              background: 'linear-gradient(135deg, color-mix(in srgb, var(--admin-surface) 96%, transparent), color-mix(in srgb, var(--admin-surface-hover) 72%, var(--admin-surface)))',
-              borderColor: 'var(--admin-border-strong)',
-              boxShadow: 'var(--admin-card-shadow, none)',
-            }}
-          >
-            <div className="absolute inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--admin-accent) 48%, transparent), color-mix(in srgb, var(--admin-success) 32%, transparent), transparent)' }} />
-            <div className="relative grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(280px,420px)] xl:items-end">
+          <section className="relative overflow-hidden rounded-[2rem] border p-5 sm:p-6 lg:p-8" style={glassPanelStyle}>
+            <div className="absolute inset-x-0 top-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${COLORS.cyan}, ${COLORS.emerald}, transparent)` }} />
+            <div className="relative grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(320px,460px)] xl:items-end">
               <div className="min-w-0">
-                <div className="mb-3 flex flex-wrap items-center gap-2">
-                  <span className="rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em]" style={{ borderColor: 'var(--admin-border)', background: 'var(--admin-surface)', color: 'var(--admin-accent)' }}>
+                <div className="mb-4 flex flex-wrap items-center gap-2">
+                  <span className="rounded-full border px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em]" style={{ borderColor: COLORS.border, background: COLORS.cyanSoft, color: COLORS.cyan }}>
                     Health Intelligence
                   </span>
-                  <StatusPill connected={isConnected} />
+                  <span className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.12em]" style={{ background: isConnected ? 'rgba(52, 211, 153, 0.12)' : 'rgba(251, 191, 36, 0.12)', borderColor: isConnected ? 'rgba(52, 211, 153, 0.28)' : 'rgba(251, 191, 36, 0.28)', color: isConnected ? COLORS.emerald : COLORS.amber }}>
+                    <span className="h-1.5 w-1.5 rounded-full" style={{ background: isConnected ? COLORS.emerald : COLORS.amber, boxShadow: `0 0 14px ${isConnected ? COLORS.emerald : COLORS.amber}` }} />
+                    {isConnected ? 'Connected' : 'Not connected'}
+                  </span>
+                  <span className="rounded-full border px-3 py-1.5 text-[10px] font-mono" style={{ borderColor: COLORS.border, color: COLORS.muted }}>
+                    Last sync: {lastSyncLabel}
+                  </span>
                 </div>
 
-                <h1 className="text-3xl font-semibold leading-tight tracking-[-0.045em] sm:text-4xl lg:text-5xl" style={{ color: 'var(--admin-text-primary)' }}>
-                  Oura Analytics
+                <h1 className="max-w-4xl text-4xl font-semibold leading-tight tracking-[-0.055em] sm:text-5xl lg:text-6xl" style={{ color: COLORS.text }}>
+                  Health Intelligence
                 </h1>
-                <p className="mt-3 max-w-3xl text-sm leading-6" style={{ color: 'var(--admin-text-muted)' }}>
-                  Sync and analyze Oura Ring health metrics inside Cogniiq.
+                <p className="mt-4 max-w-3xl text-sm leading-6 sm:text-base" style={{ color: COLORS.muted }}>
+                  Biometric recovery, sleep, stress, and performance analytics powered by Oura.
                 </p>
+
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <HeroButton icon={Link2} label="Connect Oura" onClick={connectOura} />
+                  <HeroButton icon={RefreshCw} label={isSyncing ? 'Syncing' : 'Sync Oura Data'} onClick={syncOuraData} disabled={isSyncing} primary />
+                  <HeroButton icon={Gauge} label="Refresh Dashboard" onClick={refreshDashboard} disabled={isLoading} />
+                </div>
               </div>
 
-              <div className="rounded-[1.45rem] border p-4" style={{ background: 'var(--admin-surface)', borderColor: 'var(--admin-border)' }}>
-                <div className="mb-4 flex items-start gap-3">
-                  <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl" style={{ background: 'var(--admin-surface-hover)', border: '1px solid var(--admin-border-strong)' }}>
-                    <HeartPulse size={20} style={{ color: 'var(--admin-accent)' }} />
+              <div className="rounded-[1.6rem] border p-5" style={{ borderColor: COLORS.border, background: 'rgba(2, 6, 23, 0.35)' }}>
+                <div className="mb-5 flex items-start gap-3">
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-3xl" style={{ background: COLORS.cyanSoft, border: `1px solid ${COLORS.border}` }}>
+                    <HeartPulse size={22} color={COLORS.cyan} />
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: 'var(--admin-text-muted)' }}>
-                      Connection status
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: COLORS.faint }}>
+                      Biometric Command Center
                     </p>
-                    <p className="mt-1 text-xs leading-5" style={{ color: 'var(--admin-text-secondary)' }}>
+                    <p className="mt-1 text-sm leading-6" style={{ color: COLORS.muted }}>
                       {isConnected
-                        ? 'Connection ID is stored locally. Oura tokens stay server-side in Supabase.'
-                        : 'Connect Oura to authorize server-side health data syncs.'}
+                        ? hasData
+                          ? 'Your latest synced biometric timeline is active.'
+                          : 'Connected. Run your first sync.'
+                        : 'Connect Oura and sync your first 30 days of data.'}
                     </p>
                   </div>
                 </div>
-
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-1">
-                  <button
-                    type="button"
-                    onClick={connectOura}
-                    className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl px-4 text-xs font-black uppercase tracking-[0.12em] transition-all duration-200 hover:-translate-y-0.5"
-                    style={{ background: 'var(--admin-surface)', border: '1px solid var(--admin-border-strong)', color: 'var(--admin-text-secondary)' }}
-                  >
-                    <Link2 size={15} />
-                    Connect Oura
-                  </button>
-                  <button
-                    type="button"
-                    onClick={syncOuraData}
-                    disabled={isSyncing}
-                    className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl px-4 text-xs font-black uppercase tracking-[0.12em] transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
-                    style={{ background: 'var(--admin-button-primary-bg)', border: '1px solid var(--admin-button-primary-border)', color: 'var(--admin-accent)', boxShadow: 'var(--accent-glow)' }}
-                  >
-                    <RefreshCw size={15} className={isSyncing ? 'animate-spin' : undefined} />
-                    {isSyncing ? 'Syncing' : 'Sync Oura Data'}
-                  </button>
+                <div className="grid grid-cols-2 gap-3">
+                  <MetricMini label="Rows" value={formatInteger(dailyRows.length)} icon={CalendarClock} />
+                  <MetricMini label="Latest day" value={latestRow ? formatDay(latestRow.day) : 'No data'} icon={Clock3} />
+                  <MetricMini label="Recovery" value={formatScore(latestRow?.readinessScore ?? null)} icon={BatteryCharging} />
+                  <MetricMini label="Sleep" value={formatScore(latestRow?.sleepScore ?? null)} icon={Moon} />
                 </div>
               </div>
             </div>
@@ -588,80 +1288,209 @@ export function OuraAnalyticsPage() {
             {loadError && <InlineError message={loadError} onRetry={loadDashboardData} />}
           </AnimatePresence>
 
-          <section className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
-            {metricCards.map((card, index) => (
-              <MetricCard key={card.label} {...card} delay={0.04 * index} />
+          {!isLoading && !hasData && (
+            <div className="mt-5">
+              <EmptyPanel
+                title={isConnected ? 'Connected. Run your first sync.' : 'No Oura data yet'}
+                description={isConnected ? 'Sync Oura Data to load your first biometric timeline.' : 'Connect Oura and sync your first 30 days of data.'}
+                action={<HeroButton icon={isConnected ? RefreshCw : Link2} label={isConnected ? 'Sync Oura Data' : 'Connect Oura'} onClick={isConnected ? syncOuraData : connectOura} primary />}
+              />
+            </div>
+          )}
+
+          <section className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {summaryMetrics.map((metric) => (
+              <SummaryCard key={metric.key} metric={metric} />
             ))}
           </section>
 
-          <section className="mt-5 overflow-hidden rounded-[1.65rem] border" style={{ background: 'var(--admin-surface)', borderColor: 'var(--admin-border)', boxShadow: 'var(--admin-card-shadow, none)' }}>
-            <div className="flex flex-col gap-3 border-b px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5" style={{ borderColor: 'var(--admin-border)' }}>
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: 'var(--admin-text-muted)' }}>
-                  Latest daily data
-                </p>
-                <h2 className="mt-1 text-lg font-semibold tracking-[-0.03em]" style={{ color: 'var(--admin-text-primary)' }}>
-                  Sleep, readiness, activity and steps
-                </h2>
-              </div>
-              <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-mono" style={{ background: 'var(--admin-surface-hover)', borderColor: 'var(--admin-border)', color: 'var(--admin-text-muted)' }}>
-                <CalendarClock size={14} />
-                {dailyRows.length > 0 ? `${dailyRows.length} days` : 'No synced days'}
-              </div>
-            </div>
+          <div className="mt-5 grid grid-cols-1 gap-5 2xl:grid-cols-[minmax(0,1.35fr)_minmax(360px,0.65fr)]">
+            <ChartShell
+              eyebrow="Recovery Matrix"
+              title="30-day readiness, sleep and activity signal"
+              action={<span className="rounded-full border px-3 py-1.5 text-xs font-mono" style={{ borderColor: COLORS.border, color: COLORS.muted }}>Last 30 days</span>}
+            >
+              {hasAnyValue(chartPoints, ['sleepScore', 'readinessScore', 'activityScore']) ? (
+                <div className="h-[360px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={chartPoints}>
+                      <CartesianGrid stroke="rgba(125, 211, 252, 0.08)" vertical={false} />
+                      <XAxis dataKey="label" tick={{ fill: COLORS.faint, fontSize: 11 }} tickLine={false} axisLine={false} />
+                      <YAxis domain={[0, 100]} tick={{ fill: COLORS.faint, fontSize: 11 }} tickLine={false} axisLine={false} />
+                      <Tooltip contentStyle={{ background: COLORS.panelStrong, border: `1px solid ${COLORS.border}`, borderRadius: 16, color: COLORS.text }} />
+                      <Line type="monotone" dataKey="sleepScore" name="Sleep Score" stroke={COLORS.blue} strokeWidth={2.4} dot={false} connectNulls />
+                      <Line type="monotone" dataKey="readinessScore" name="Readiness Score" stroke={COLORS.emerald} strokeWidth={2.4} dot={false} connectNulls />
+                      <Line type="monotone" dataKey="activityScore" name="Activity Score" stroke={COLORS.cyan} strokeWidth={2.4} dot={false} connectNulls />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <EmptyPanel title="No matrix data" description="Sync Oura scores to unlock the recovery matrix." />
+              )}
+            </ChartShell>
 
-            {isLoading ? (
-              <div className="p-5">
-                <div className="h-24 animate-pulse rounded-2xl" style={{ background: 'var(--admin-surface-hover)', border: '1px solid var(--admin-border)' }} />
+            <ChartShell eyebrow="Insight Engine" title="Rule-based biometric intelligence">
+              <div className="grid gap-3">
+                {insights.map((insight) => (
+                  <InsightCard key={insight.title} insight={insight} />
+                ))}
               </div>
-            ) : dailyRows.length === 0 ? (
-              <div className="p-5">
-                <EmptyState
-                  message="Connect Oura and run your first sync to see your health analytics."
-                  action={{ label: 'Connect Oura', onClick: connectOura }}
-                />
+            </ChartShell>
+          </div>
+
+          <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
+            <ChartShell eyebrow="Sleep Architecture" title="Nightly sleep-stage composition">
+              <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+                <MetricMini label="Total sleep" value={formatDuration(latestRow?.totalSleepDuration ?? null)} icon={Moon} />
+                <MetricMini label="Time in bed" value={formatDuration(latestRow?.timeInBed ?? null)} icon={Clock3} />
+                <MetricMini label="Efficiency" value={latestRow?.sleepEfficiency !== null && latestRow?.sleepEfficiency !== undefined ? `${Math.round(latestRow.sleepEfficiency)}%` : 'No data'} icon={Gauge} />
+                <MetricMini label="Latency" value={formatDuration(latestRow?.latency ?? null)} icon={Zap} />
+                <MetricMini label="REM" value={formatDuration(latestRow?.remSleep ?? null)} icon={Brain} />
+                <MetricMini label="Deep" value={formatDuration(latestRow?.deepSleep ?? null)} icon={BatteryCharging} />
+                <MetricMini label="Light" value={formatDuration(latestRow?.lightSleep ?? null)} icon={Waves} />
+                <MetricMini label="Awake" value={formatDuration(latestRow?.awakeTime ?? null)} icon={Activity} />
+                <MetricMini label="Restfulness" value={formatScore(latestRow?.restfulness ?? null)} icon={Sparkles} />
               </div>
-            ) : (
-              <div className="w-full overflow-x-auto">
-                <table className="w-full min-w-[720px] border-collapse text-sm">
-                  <thead>
-                    <tr style={{ background: 'var(--admin-surface-hover)' }}>
-                      {['Date', 'Sleep Score', 'Readiness Score', 'Activity Score', 'Steps'].map((header) => (
-                        <th
-                          key={header}
-                          className="px-4 py-3 text-[10px] font-black uppercase tracking-[0.14em] sm:px-5"
-                          style={{ color: 'var(--admin-text-muted)', textAlign: header === 'Date' ? 'left' : 'right' }}
-                        >
-                          {header}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {dailyRows.map((row) => (
-                      <tr key={row.day} className="border-b transition-colors" style={{ borderColor: 'var(--admin-border)' }}>
-                        <td className="px-4 py-4 font-mono text-xs font-semibold sm:px-5" style={{ color: 'var(--admin-text-primary)' }}>
-                          {formatDay(row.day)}
-                        </td>
-                        <td className="px-4 py-4 text-right font-mono text-xs sm:px-5" style={{ color: 'var(--admin-text-secondary)' }}>
-                          {formatScore(row.sleepScore)}
-                        </td>
-                        <td className="px-4 py-4 text-right font-mono text-xs sm:px-5" style={{ color: 'var(--admin-text-secondary)' }}>
-                          {formatScore(row.readinessScore)}
-                        </td>
-                        <td className="px-4 py-4 text-right font-mono text-xs sm:px-5" style={{ color: 'var(--admin-text-secondary)' }}>
-                          {formatScore(row.activityScore)}
-                        </td>
-                        <td className="px-4 py-4 text-right font-mono text-xs sm:px-5" style={{ color: 'var(--admin-text-secondary)' }}>
-                          {formatSteps(row.steps)}
-                        </td>
-                      </tr>
+
+              {sleepStageAvailable ? (
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartPoints}>
+                      <CartesianGrid stroke="rgba(125, 211, 252, 0.08)" vertical={false} />
+                      <XAxis dataKey="label" tick={{ fill: COLORS.faint, fontSize: 11 }} tickLine={false} axisLine={false} />
+                      <YAxis tick={{ fill: COLORS.faint, fontSize: 11 }} tickLine={false} axisLine={false} unit="h" />
+                      <Tooltip contentStyle={{ background: COLORS.panelStrong, border: `1px solid ${COLORS.border}`, borderRadius: 16, color: COLORS.text }} />
+                      <Bar dataKey="deepSleepHours" name="Deep" stackId="sleep" fill={COLORS.emerald} radius={[0, 0, 6, 6]} />
+                      <Bar dataKey="remSleepHours" name="REM" stackId="sleep" fill={COLORS.cyan} />
+                      <Bar dataKey="lightSleepHours" name="Light" stackId="sleep" fill={COLORS.blue} />
+                      <Bar dataKey="awakeHours" name="Awake" stackId="sleep" fill={COLORS.rose} radius={[6, 6, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <EmptyPanel title="Sleep-stage fields unavailable" description="This view appears when Oura raw sleep-stage durations are present in the synced rows." />
+              )}
+            </ChartShell>
+
+            <ChartShell eyebrow="Readiness Deep Dive" title="Contributor-level recovery drivers">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <ContributorCard label="HRV Balance" value={latestRow?.contributors.hrvBalance ?? null} />
+                <ContributorCard label="Recovery Index" value={latestRow?.contributors.recoveryIndex ?? null} />
+                <ContributorCard label="Resting Heart Rate" value={latestRow?.contributors.restingHeartRate ?? null} />
+                <ContributorCard label="Body Temperature" value={latestRow?.contributors.bodyTemperature ?? null} />
+                <ContributorCard label="Previous Day Activity" value={latestRow?.contributors.previousDayActivity ?? null} />
+                <ContributorCard label="Sleep Balance" value={latestRow?.contributors.sleepBalance ?? null} />
+                <ContributorCard label="Activity Balance" value={latestRow?.contributors.activityBalance ?? null} />
+              </div>
+            </ChartShell>
+          </div>
+
+          <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
+            <ChartShell eyebrow="Activity & Load" title="Movement, steps and activity pressure">
+              <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-3">
+                <MetricMini label="Activity Score" value={formatScore(latestRow?.activityScore ?? null)} icon={Activity} />
+                <MetricMini label="Steps" value={formatInteger(latestRow?.steps ?? null)} icon={Footprints} />
+                <MetricMini label="Active Calories" value={formatInteger(latestRow?.activeCalories ?? null)} icon={Zap} />
+                <MetricMini label="Walk Distance" value={formatDistanceMeters(latestRow?.walkingDistance ?? null)} icon={Gauge} />
+                <MetricMini label="High Activity" value={formatDuration(latestRow?.highActivityTime ?? null)} icon={Activity} />
+                <MetricMini label="Medium Activity" value={formatDuration(latestRow?.mediumActivityTime ?? null)} icon={Waves} />
+                <MetricMini label="Low Activity" value={formatDuration(latestRow?.lowActivityTime ?? null)} icon={Clock3} />
+              </div>
+
+              {hasAnyValue(chartPoints, ['steps', 'activityScore']) ? (
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ComposedChart data={chartPoints}>
+                      <CartesianGrid stroke="rgba(125, 211, 252, 0.08)" vertical={false} />
+                      <XAxis dataKey="label" tick={{ fill: COLORS.faint, fontSize: 11 }} tickLine={false} axisLine={false} />
+                      <YAxis yAxisId="left" tick={{ fill: COLORS.faint, fontSize: 11 }} tickLine={false} axisLine={false} />
+                      <YAxis yAxisId="right" orientation="right" domain={[0, 100]} tick={{ fill: COLORS.faint, fontSize: 11 }} tickLine={false} axisLine={false} />
+                      <Tooltip contentStyle={{ background: COLORS.panelStrong, border: `1px solid ${COLORS.border}`, borderRadius: 16, color: COLORS.text }} />
+                      <Bar yAxisId="left" dataKey="steps" name="Steps" fill="rgba(34, 211, 238, 0.28)" radius={[8, 8, 0, 0]} />
+                      <Line yAxisId="right" type="monotone" dataKey="activityScore" name="Activity Score" stroke={COLORS.emerald} strokeWidth={2.4} dot={false} connectNulls />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <EmptyPanel title="No activity timeline" description="Steps and activity score will appear after synced activity rows are available." />
+              )}
+            </ChartShell>
+
+            <ChartShell eyebrow="Heart & Recovery Signals" title="HRV, heart rate, breath and temperature">
+              {heartSignalsAvailable ? (
+                <div className="h-[390px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartPoints}>
+                      <defs>
+                        <linearGradient id="hrvFill" x1="0" x2="0" y1="0" y2="1">
+                          <stop offset="5%" stopColor={COLORS.cyan} stopOpacity={0.32} />
+                          <stop offset="95%" stopColor={COLORS.cyan} stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="tempFill" x1="0" x2="0" y1="0" y2="1">
+                          <stop offset="5%" stopColor={COLORS.rose} stopOpacity={0.22} />
+                          <stop offset="95%" stopColor={COLORS.rose} stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid stroke="rgba(125, 211, 252, 0.08)" vertical={false} />
+                      <XAxis dataKey="label" tick={{ fill: COLORS.faint, fontSize: 11 }} tickLine={false} axisLine={false} />
+                      <YAxis tick={{ fill: COLORS.faint, fontSize: 11 }} tickLine={false} axisLine={false} />
+                      <Tooltip contentStyle={{ background: COLORS.panelStrong, border: `1px solid ${COLORS.border}`, borderRadius: 16, color: COLORS.text }} />
+                      <Area type="monotone" dataKey="hrv" name="HRV" stroke={COLORS.cyan} fill="url(#hrvFill)" strokeWidth={2.2} connectNulls />
+                      <Line type="monotone" dataKey="restingHeartRate" name="Resting HR" stroke={COLORS.rose} strokeWidth={2.2} dot={false} connectNulls />
+                      <Line type="monotone" dataKey="lowestHeartRate" name="Lowest HR" stroke={COLORS.violet} strokeWidth={2} dot={false} connectNulls />
+                      <Line type="monotone" dataKey="respiratoryRate" name="Respiratory Rate" stroke={COLORS.emerald} strokeWidth={2} dot={false} connectNulls />
+                      <Area type="monotone" dataKey="temperatureDeviation" name="Temperature Deviation" stroke={COLORS.amber} fill="url(#tempFill)" strokeWidth={2} connectNulls />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <EmptyPanel title="Heart signals unavailable" description="HRV, resting heart rate, respiratory rate and temperature trends appear when those raw Oura fields are synced." />
+              )}
+            </ChartShell>
+          </div>
+
+          <ChartShell eyebrow="Data Table" title="Compact biometric ledger" action={<span className="text-xs font-mono" style={{ color: COLORS.faint }}>Secondary view</span>}>
+            <div className="w-full overflow-x-auto rounded-[1.25rem] border" style={{ borderColor: COLORS.border }}>
+              <table className="w-full min-w-[860px] border-collapse text-sm">
+                <thead>
+                  <tr style={{ background: 'rgba(34, 211, 238, 0.08)' }}>
+                    {['Date', 'Sleep', 'Readiness', 'Activity', 'Steps', 'HRV', 'RHR', 'Temperature'].map((header) => (
+                      <th
+                        key={header}
+                        className="px-4 py-3 text-[10px] font-black uppercase tracking-[0.14em]"
+                        style={{ color: COLORS.faint, textAlign: header === 'Date' ? 'left' : 'right' }}
+                      >
+                        {header}
+                      </th>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
+                  </tr>
+                </thead>
+                <tbody>
+                  {dailyRows.map((row) => (
+                    <tr key={row.day} className="border-b" style={{ borderColor: 'rgba(125, 211, 252, 0.08)' }}>
+                      <td className="px-4 py-3 font-mono text-xs font-semibold" style={{ color: COLORS.text }}>
+                        {formatDay(row.day)}
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono text-xs" style={{ color: COLORS.muted }}>{formatScore(row.sleepScore)}</td>
+                      <td className="px-4 py-3 text-right font-mono text-xs" style={{ color: COLORS.muted }}>{formatScore(row.readinessScore)}</td>
+                      <td className="px-4 py-3 text-right font-mono text-xs" style={{ color: COLORS.muted }}>{formatScore(row.activityScore)}</td>
+                      <td className="px-4 py-3 text-right font-mono text-xs" style={{ color: COLORS.muted }}>{formatInteger(row.steps)}</td>
+                      <td className="px-4 py-3 text-right font-mono text-xs" style={{ color: COLORS.muted }}>{formatDecimal(row.hrv, 0)}</td>
+                      <td className="px-4 py-3 text-right font-mono text-xs" style={{ color: COLORS.muted }}>{formatDecimal(row.restingHeartRate, 0)}</td>
+                      <td className="px-4 py-3 text-right font-mono text-xs" style={{ color: COLORS.muted }}>{formatSignedDecimal(row.temperatureDeviation, 1)}</td>
+                    </tr>
+                  ))}
+                  {!isLoading && dailyRows.length === 0 && (
+                    <tr>
+                      <td colSpan={8} className="px-4 py-10 text-center text-sm" style={{ color: COLORS.muted }}>
+                        {isConnected ? 'Connected. Run your first sync.' : 'Connect Oura and sync your first 30 days of data.'}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </ChartShell>
         </main>
 
         <AnimatePresence>
