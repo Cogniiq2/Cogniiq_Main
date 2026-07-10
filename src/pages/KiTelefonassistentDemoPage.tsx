@@ -14,6 +14,7 @@ import {
   Check,
 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
+import { N8N_ENDPOINTS } from "@/config/externalEndpoints";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 
 const fadeUp = {
@@ -151,8 +152,6 @@ function PremiumSelect({ value, onChange, placeholder, options }: PremiumSelectP
   );
 }
 
-const N8N_WEBHOOK = "https://n8n.cogniiq.co/webhook/google-ads";
-
 export function KiTelefonassistentDemoPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -183,7 +182,7 @@ export function KiTelefonassistentDemoPage() {
     };
 
     try {
-      await fetch(N8N_WEBHOOK, {
+      await fetch(N8N_ENDPOINTS.receptionistDemo, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

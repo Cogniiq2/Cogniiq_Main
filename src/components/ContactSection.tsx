@@ -22,6 +22,7 @@ import {
   BadgeCheck,
 } from 'lucide-react';
 import { PremiumCalendar } from './PremiumCalendar';
+import { N8N_ENDPOINTS } from '@/config/externalEndpoints';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -365,7 +366,7 @@ export function ContactSection() {
   const handleFinalSubmit = async () => {
     setIsSubmitting(true);
     try {
-      await fetch('https://n8n.cogniiq.co/webhook/contacts', {
+      await fetch(N8N_ENDPOINTS.contact, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...data, source: 'kontakt-page' }),

@@ -8,6 +8,8 @@ import { PremiumFooterReveal } from './components/PremiumFooterReveal';
 import { LocalBusinessSchema } from './components/LocalBusinessSchema';
 import { CanonicalManager } from './components/CanonicalManager';
 import { CityServicePage } from './components/CityServicePage';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { AuthProvider } from './contexts/AuthContext';
 import { CITY_SERVICE_CONFIGS } from './lib/standorte-data';
 
 function lazyNamed<T extends Record<string, any>, K extends keyof T>(
@@ -274,6 +276,11 @@ const ScanPage = lazyNamed(() => import('./pages/ScanPage'), 'ScanPage');
 const AdminPage = lazyNamed(() => import('./pages/AdminPage'), 'AdminPage');
 const ExecutionPage = lazyNamed(() => import('./pages/ExecutionPage'), 'ExecutionPage');
 const OuraAnalyticsPage = lazyNamed(() => import('./pages/OuraAnalyticsPage'), 'OuraAnalyticsPage');
+const AppHomePage = lazyNamed(() => import('./pages/app/AppHomePage'), 'AppHomePage');
+const LoginPage = lazyNamed(() => import('./pages/app/LoginPage'), 'LoginPage');
+const SignupPage = lazyNamed(() => import('./pages/app/SignupPage'), 'SignupPage');
+const ForgotPasswordPage = lazyNamed(() => import('./pages/app/ForgotPasswordPage'), 'ForgotPasswordPage');
+const ResetPasswordPage = lazyNamed(() => import('./pages/app/ResetPasswordPage'), 'ResetPasswordPage');
 
 function AppInner() {
   const location = useLocation();
@@ -297,6 +304,35 @@ function AppInner() {
     return (
       <Suspense fallback={<PageFallback />}>
         <AdminPage />
+      </Suspense>
+    );
+  }
+
+  if (location.pathname.startsWith('/app')) {
+    return (
+      <Suspense fallback={<PageFallback />}>
+        <Routes>
+          <Route path="/app/login" element={<LoginPage />} />
+          <Route path="/app/signup" element={<SignupPage />} />
+          <Route path="/app/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/app/reset-password" element={<ResetPasswordPage />} />
+          <Route
+            path="/app"
+            element={
+              <ProtectedRoute>
+                <AppHomePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/*"
+            element={
+              <ProtectedRoute>
+                <AppHomePage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
       </Suspense>
     );
   }
@@ -422,9 +458,11 @@ function AppInner() {
 function App() {
   return (
     <Router>
-      <CanonicalManager />
-      <LocalBusinessSchema />
-      <AppInner />
+      <AuthProvider>
+        <CanonicalManager />
+        <LocalBusinessSchema />
+        <AppInner />
+      </AuthProvider>
     </Router>
   );
 }

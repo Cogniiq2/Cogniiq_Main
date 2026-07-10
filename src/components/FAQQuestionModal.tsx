@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { X, ArrowRight } from 'lucide-react';
+import { N8N_ENDPOINTS } from '@/config/externalEndpoints';
 
 interface Props {
   open: boolean;
@@ -84,7 +85,7 @@ export function FAQQuestionModal({ open, onClose }: Props) {
       question: form.message.trim(),
     };
     try {
-      await fetch('https://n8n.cogniiq.co/webhook/faq', {
+      await fetch(N8N_ENDPOINTS.faqQuestion, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, ChevronRight, Globe, Phone, Zap, Mail, MapPin, Clock, CircleCheck as CheckCircle2, Building2, Calendar, ChevronDown, Check, ChevronLeft, Loader as Loader2 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
+import { N8N_ENDPOINTS } from "@/config/externalEndpoints";
 import { BUSINESS_INFO, getGoogleMapsUrl, getGoogleMapsEmbedUrl } from "@/lib/seo-data";
 import { ContactSection } from "@/components/ContactSection";
 
@@ -848,7 +849,7 @@ function PremiumPackageModal({
     : "";
 
   try {
-    await fetch("https://n8n.cogniiq.co/webhook/contacts", {
+    await fetch(N8N_ENDPOINTS.contact, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
