@@ -1,18 +1,20 @@
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 import { AlertCircle, Check, Circle, Info, Plus } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import type { LaunchChecklistItem, LifecycleTone, SetupStep } from './customerPortalModel';
 
+export const appEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
 export const appFadeUp = {
-  hidden: { opacity: 0, y: 18 },
+  hidden: { opacity: 0, y: 10 },
   visible: (delay = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.42, delay, ease: appEase },
   }),
 };
 
@@ -40,11 +42,11 @@ export function AppPageHeader({
   meta?: ReactNode;
 }) {
   return (
-    <motion.div initial="hidden" animate="visible" variants={appFadeUp} className="mb-8">
+    <motion.div initial="hidden" animate="visible" variants={appFadeUp} className="mb-10">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-3xl">
           <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.22em] text-gray-400">{eyebrow}</p>
-          <h1 className="text-3xl font-bold leading-[1.08] tracking-tight text-gray-950 sm:text-4xl lg:text-5xl">
+          <h1 className="text-3xl font-bold leading-[1.06] tracking-tight text-gray-950 sm:text-4xl lg:text-[2.75rem]">
             {title}
           </h1>
           <p className="mt-4 max-w-2xl text-[15px] leading-[1.75] text-gray-500">{description}</p>
@@ -59,19 +61,24 @@ export function AppPageHeader({
 export function AppCard({
   children,
   className,
+  interactive = false,
 }: {
   children: ReactNode;
   className?: string;
+  interactive?: boolean;
 }) {
   return (
-    <div
+    <motion.div
+      whileHover={interactive ? { y: -2 } : undefined}
+      transition={{ duration: 0.2, ease: appEase }}
       className={cn(
-        'rounded-2xl border border-gray-200 bg-white p-5 shadow-[0_18px_60px_rgba(15,23,42,0.04)] sm:p-6',
+        'rounded-2xl border border-gray-100 bg-white p-5 shadow-[0_18px_60px_rgba(15,23,42,0.035)] sm:p-6',
+        interactive && 'transition-colors duration-200 hover:border-gray-200 hover:shadow-[0_20px_70px_rgba(15,23,42,0.06)]',
         className
       )}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }
 
@@ -129,7 +136,7 @@ export function AppButton({
   onClick?: ButtonHTMLAttributes<HTMLButtonElement>['onClick'];
 }) {
   const baseClass = cn(
-    'inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2',
+    'group inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 active:scale-[0.99]',
     variant === 'primary' &&
       'bg-gray-900 px-6 py-3.5 text-white shadow-sm hover:-translate-y-0.5 hover:bg-gray-700 hover:shadow-md',
     variant === 'secondary' &&
@@ -140,7 +147,13 @@ export function AppButton({
   );
   const content = (
     <>
-      {Icon ? <Icon size={15} aria-hidden="true" /> : null}
+      {Icon ? (
+        <Icon
+          size={15}
+          className={cn('transition-transform duration-200', !disabled && variant !== 'text' && 'group-hover:translate-x-0.5')}
+          aria-hidden="true"
+        />
+      ) : null}
       {children}
     </>
   );
@@ -196,11 +209,11 @@ export function AppEmptyState({
   compact?: boolean;
 }) {
   return (
-    <div className={cn('rounded-2xl border border-gray-200 bg-gray-50 p-6', compact && 'p-4')}>
-      <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500">
+    <div className={cn('rounded-2xl border border-gray-100 bg-gray-50/80 p-6', compact && 'p-4')}>
+      <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500 shadow-sm">
         <Icon size={17} aria-hidden="true" />
       </div>
-      <h3 className="text-base font-bold tracking-tight text-gray-950">{title}</h3>
+      <h3 className="text-base font-semibold tracking-tight text-gray-950">{title}</h3>
       <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">{description}</p>
       {action ? <div className="mt-5 flex flex-wrap gap-2">{action}</div> : null}
     </div>
@@ -224,7 +237,12 @@ export function AppProgress({
         </div>
       ) : null}
       <div className="h-1.5 overflow-hidden rounded-full bg-gray-100">
-        <div className="h-full rounded-full bg-gray-900 transition-all duration-300" style={{ width: `${normalized}%` }} />
+        <motion.div
+          className="h-full rounded-full bg-gray-900"
+          initial={false}
+          animate={{ width: `${normalized}%` }}
+          transition={{ duration: 0.45, ease: appEase }}
+        />
       </div>
     </div>
   );
@@ -243,14 +261,17 @@ export function AppStepList({
         const isActive = index === currentIndex;
         const isPast = index < currentIndex;
         return (
-          <li
+          <motion.li
             key={step.id}
+            layout
+            transition={{ duration: 0.24, ease: appEase }}
             className={cn(
-              'rounded-2xl border p-4 transition-colors duration-200',
-              isActive ? 'border-gray-300 bg-white shadow-sm' : 'border-gray-100 bg-gray-50',
-              isPast && 'border-emerald-100 bg-emerald-50/50'
+              'relative overflow-hidden rounded-2xl border p-4 transition-colors duration-200',
+              isActive ? 'border-gray-300 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.045)]' : 'border-gray-100 bg-gray-50/80',
+              isPast && 'border-emerald-100 bg-emerald-50/40'
             )}
           >
+            {isActive ? <motion.div layoutId="app-step-active" className="absolute inset-x-0 top-0 h-0.5 bg-gray-900" /> : null}
             <div className="mb-4 flex items-center justify-between gap-3">
               <span className="flex h-8 w-8 items-center justify-center rounded-xl border border-gray-200 bg-white text-xs font-bold text-gray-600">
                 {isPast ? <Check size={14} aria-label="Abgeschlossen" /> : index + 1}
@@ -262,7 +283,7 @@ export function AppStepList({
             </div>
             <h3 className="text-sm font-semibold leading-snug text-gray-950">{step.title}</h3>
             <p className="mt-2 text-[13px] leading-relaxed text-gray-500">{step.description}</p>
-          </li>
+          </motion.li>
         );
       })}
     </ol>
@@ -285,7 +306,7 @@ export function AppField({
       <span className="mb-1.5 block text-xs font-semibold text-gray-700">{label}</span>
       <input
         id={id}
-        className="h-11 w-full rounded-lg border border-gray-200 bg-white px-3.5 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-300 focus:border-gray-400 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
+        className="h-11 w-full rounded-lg border border-gray-200 bg-white px-3.5 text-sm text-gray-900 outline-none transition-all duration-200 placeholder:text-gray-300 focus:border-gray-400 focus:shadow-[0_0_0_3px_rgba(156,163,175,0.12)] disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
         {...props}
       />
       {description ? <span className="mt-1.5 block text-[12px] leading-5 text-gray-400">{description}</span> : null}
@@ -309,7 +330,7 @@ export function AppTextarea({
       <span className="mb-1.5 block text-xs font-semibold text-gray-700">{label}</span>
       <textarea
         id={id}
-        className="min-h-[112px] w-full resize-none rounded-lg border border-gray-200 bg-white px-3.5 py-3 text-sm leading-relaxed text-gray-900 outline-none transition-colors placeholder:text-gray-300 focus:border-gray-400 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
+        className="min-h-[112px] w-full resize-none rounded-lg border border-gray-200 bg-white px-3.5 py-3 text-sm leading-relaxed text-gray-900 outline-none transition-all duration-200 placeholder:text-gray-300 focus:border-gray-400 focus:shadow-[0_0_0_3px_rgba(156,163,175,0.12)] disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
         {...props}
       />
       {description ? <span className="mt-1.5 block text-[12px] leading-5 text-gray-400">{description}</span> : null}
@@ -341,7 +362,7 @@ export function AppSelect({
         id={id}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-11 w-full rounded-lg border border-gray-200 bg-white px-3.5 text-sm text-gray-900 outline-none transition-colors focus:border-gray-400"
+        className="h-11 w-full rounded-lg border border-gray-200 bg-white px-3.5 text-sm text-gray-900 outline-none transition-all duration-200 focus:border-gray-400 focus:shadow-[0_0_0_3px_rgba(156,163,175,0.12)]"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -377,11 +398,12 @@ export function AppSegmentedControl({
               key={option.value}
               onClick={() => onChange(option.value)}
               className={cn(
-                'rounded-xl border px-4 py-3 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2',
+                'group relative overflow-hidden rounded-xl border px-4 py-3 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 active:scale-[0.99]',
                 active ? 'border-gray-400 bg-gray-900 text-white shadow-sm' : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
               )}
               aria-pressed={active}
             >
+              {active ? <motion.span layoutId={`segmented-${label}`} className="absolute inset-x-0 top-0 h-0.5 bg-white/70" /> : null}
               <span className="block text-sm font-semibold">{option.label}</span>
               {option.description ? (
                 <span className={cn('mt-1 block text-[12px] leading-5', active ? 'text-white/65' : 'text-gray-400')}>
@@ -473,7 +495,12 @@ export function AppSaveBar({
   actionLabel?: string;
 }) {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+    <motion.div
+      initial={{ opacity: 0.9, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.28, ease: appEase }}
+      className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white/90 px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between"
+    >
       <p className="text-[13px] leading-5 text-gray-500">{message}</p>
       {actionLabel ? (
         <button
@@ -484,7 +511,7 @@ export function AppSaveBar({
           {actionLabel}
         </button>
       ) : null}
-    </div>
+    </motion.div>
   );
 }
 
@@ -517,6 +544,30 @@ export function AppAddButton({ children }: { children: ReactNode }) {
     <AppButton variant="secondary" disabled icon={Plus}>
       {children}
     </AppButton>
+  );
+}
+
+export function AppRouteTransition({ children, routeKey }: { children: ReactNode; routeKey: string }) {
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <motion.div
+      key={routeKey}
+      initial={reduceMotion ? false : { opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={reduceMotion ? undefined : { opacity: 0, y: -4 }}
+      transition={{ duration: 0.24, ease: appEase }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+export function AppPreviewNotice({ children }: { children: ReactNode }) {
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-white/75 px-4 py-3">
+      <p className="text-[12.5px] leading-5 text-gray-500">{children}</p>
+    </div>
   );
 }
 

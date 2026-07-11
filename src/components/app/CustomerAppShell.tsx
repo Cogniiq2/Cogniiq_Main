@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   BookOpen,
   ChevronDown,
@@ -21,7 +22,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
-import { AppStatusBadge } from '@/components/app/CustomerAppPrimitives';
+import { AppRouteTransition, AppStatusBadge, appEase } from '@/components/app/CustomerAppPrimitives';
 import { defaultLifecycleState, lifecycleDisplays } from '@/components/app/customerPortalModel';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOrganizations } from '@/hooks/useOrganizations';
@@ -144,9 +145,14 @@ export function CustomerAppShell({ children }: { children: ReactNode }) {
                 <ChevronDown size={13} className="text-gray-400" aria-hidden="true" />
               </button>
 
-              {userMenuOpen ? (
-                <div
+              <AnimatePresence>
+                {userMenuOpen ? (
+                <motion.div
                   role="menu"
+                  initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 4, scale: 0.98 }}
+                  transition={{ duration: 0.18, ease: appEase }}
                   className="absolute right-0 mt-2 w-72 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-[0_18px_60px_rgba(15,23,42,0.12)]"
                 >
                   <div className="border-b border-gray-100 px-4 py-3">
@@ -169,8 +175,9 @@ export function CustomerAppShell({ children }: { children: ReactNode }) {
                       Abmelden
                     </button>
                   </div>
-                </div>
-              ) : null}
+                </motion.div>
+                ) : null}
+              </AnimatePresence>
             </div>
           </div>
 
@@ -202,8 +209,16 @@ export function CustomerAppShell({ children }: { children: ReactNode }) {
           </nav>
         </div>
 
+        <AnimatePresence>
         {mobileOpen ? (
-          <div className="border-t border-gray-100 bg-white px-4 py-4 md:hidden">
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.22, ease: appEase }}
+            className="overflow-hidden border-t border-gray-100 bg-white md:hidden"
+          >
+          <div className="px-4 py-4">
             <div className="mb-4 rounded-2xl border border-gray-100 bg-gray-50 p-4">
               <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">Workspace</p>
               <p className="mt-1 truncate text-sm font-semibold text-gray-900">
@@ -254,10 +269,14 @@ export function CustomerAppShell({ children }: { children: ReactNode }) {
               </button>
             </div>
           </div>
+          </motion.div>
         ) : null}
+        </AnimatePresence>
       </header>
 
-      <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">{children}</main>
+      <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <AppRouteTransition routeKey={location.pathname}>{children}</AppRouteTransition>
+      </main>
     </div>
   );
 }
@@ -269,12 +288,19 @@ function AppNavLink({ item, active }: { item: CustomerNavItem; active: boolean }
       to={item.href}
       aria-current={active ? 'page' : undefined}
       className={cn(
-        'inline-flex h-10 items-center gap-2 whitespace-nowrap rounded-xl px-3 text-[13px] font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2',
-        active ? 'bg-gray-950 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-950'
+        'relative inline-flex h-10 items-center gap-2 overflow-hidden whitespace-nowrap rounded-xl px-3 text-[13px] font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2',
+        active ? 'text-white' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-950'
       )}
     >
-      <Icon size={14} className={active ? 'text-white' : 'text-gray-400'} aria-hidden="true" />
-      {item.label}
+      {active ? (
+        <motion.span
+          layoutId="customer-nav-active"
+          className="absolute inset-0 rounded-xl bg-gray-950 shadow-sm"
+          transition={{ duration: 0.22, ease: appEase }}
+        />
+      ) : null}
+      <Icon size={14} className={cn('relative z-10', active ? 'text-white' : 'text-gray-400')} aria-hidden="true" />
+      <span className="relative z-10">{item.label}</span>
     </Link>
   );
 }
@@ -295,12 +321,13 @@ function MobileNavLink({
       onClick={onClick}
       aria-current={active ? 'page' : undefined}
       className={cn(
-        'flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors',
-        active ? 'bg-gray-950 text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-950'
+        'relative flex min-h-11 items-center gap-3 overflow-hidden rounded-xl px-3 text-sm font-semibold transition-colors',
+        active ? 'text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-950'
       )}
     >
-      <Icon size={16} className={active ? 'text-white' : 'text-gray-400'} aria-hidden="true" />
-      {item.label}
+      {active ? <span className="absolute inset-0 rounded-xl bg-gray-950" /> : null}
+      <Icon size={16} className={cn('relative z-10', active ? 'text-white' : 'text-gray-400')} aria-hidden="true" />
+      <span className="relative z-10">{item.label}</span>
     </Link>
   );
 }

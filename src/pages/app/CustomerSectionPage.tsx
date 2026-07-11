@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertCircle,
   BookOpen,
@@ -32,6 +33,7 @@ import {
   AppInlineEditor,
   AppLaunchChecklist,
   AppPageHeader,
+  AppPreviewNotice,
   AppProgress,
   AppSaveBar,
   AppSection,
@@ -40,6 +42,7 @@ import {
   AppStatusBadge,
   AppStepList,
   AppTextarea,
+  appEase,
 } from '@/components/app/CustomerAppPrimitives';
 import {
   billingAreas,
@@ -204,7 +207,8 @@ function OnboardingExperience() {
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
       <div className="space-y-6">
-        <AppCard>
+        <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.045)]">
+          <div className="p-6 sm:p-8">
           <div className="mb-6">
             <AppProgress value={progress} label={`Schritt ${stageIndex + 1} von ${onboardingStages.length}`} />
           </div>
@@ -216,6 +220,14 @@ function OnboardingExperience() {
             <AppStatusBadge label="nicht gespeichert" tone="attention" />
           </div>
 
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeStage.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.22, ease: appEase }}
+            >
           {stageIndex === 0 ? (
             <div className="grid gap-4 sm:grid-cols-2">
               <AppField id="company-name" label="Unternehmensname" value={form.companyName} onChange={(event) => updateField('companyName', event.target.value)} placeholder="z. B. Cogniiq GmbH" />
@@ -307,6 +319,16 @@ function OnboardingExperience() {
               />
             </div>
           ) : null}
+            </motion.div>
+          </AnimatePresence>
+
+          {stageIndex === 0 && !form.companyName ? (
+            <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
+              <p className="text-[12.5px] font-medium leading-5 text-amber-800">
+                Empfohlen: Unternehmensname und Website zuerst ausfuellen, damit spaetere Recherche und Wissenspruefung sinnvoll starten koennen.
+              </p>
+            </div>
+          ) : null}
 
           <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
             <AppButton variant="secondary" disabled={stageIndex === 0} onClick={() => setStageIndex((index) => Math.max(0, index - 1))}>
@@ -316,12 +338,12 @@ function OnboardingExperience() {
               Weiter
             </AppButton>
           </div>
-        </AppCard>
+          </div>
+        </div>
 
-        <AppSaveBar
-          message="Diese Eingaben bleiben nur in der aktuellen Browser-Sitzung. Es wird noch nichts dauerhaft gespeichert."
-          actionLabel="Dauerhaft speichern folgt"
-        />
+        <AppPreviewNotice>
+          Diese Eingaben werden in dieser Vorschau noch nicht dauerhaft gespeichert. Ein Neuladen der Seite kann sie zuruecksetzen.
+        </AppPreviewNotice>
       </div>
 
       <aside className="space-y-6">
@@ -365,9 +387,10 @@ function ReceptionistExperience() {
   return (
     <div className="space-y-8">
       <AppSection eyebrow="Identitaet" title="Wie der Rezeptionist spaeter auftreten soll">
-        <AppCard>
+        <AppCard className="rounded-3xl">
           <div className="grid gap-4 md:grid-cols-2">
             <AppField id="receptionist-name" label="Rezeptionistenname" value={identity.name} onChange={(event) => updateIdentity('name', event.target.value)} placeholder="Noch nicht festgelegt" />
+            <AppField id="voice-placeholder" label="Voice placeholder" placeholder="Noch nicht verbunden" disabled />
             <AppSelect
               id="primary-language"
               label="Hauptsprache"
@@ -397,7 +420,7 @@ function ReceptionistExperience() {
 
       <AppSection eyebrow="Kommunikation" title="Tonalitaet und Aufgaben">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-          <AppCard>
+          <AppCard className="rounded-3xl">
             <AppSegmentedControl
               label="Kommunikationsstil"
               value={style}
@@ -410,7 +433,7 @@ function ReceptionistExperience() {
               ]}
             />
           </AppCard>
-          <AppCard>
+          <AppCard className="rounded-3xl">
             <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Status</p>
             <AppEmptyState
               compact
@@ -443,6 +466,11 @@ function ReceptionistExperience() {
 }
 
 function KnowledgeExperience() {
+  const [activeSectionId, setActiveSectionId] = useState(knowledgeSections[0]?.id ?? 'profile');
+  const activeSection = knowledgeSections.find((section) => section.id === activeSectionId) ?? knowledgeSections[0];
+
+  if (!activeSection) return null;
+
   return (
     <div className="space-y-8">
       <AppSection
@@ -451,24 +479,60 @@ function KnowledgeExperience() {
         description="Jeder Bereich ist fuer Wert, Quelle, Vertrauen, Bestaetigung und manuelle Korrektur vorbereitet. Aktuell gibt es keine recherchierten Datensaetze."
         action={<AppAddButton>Information hinzufuegen</AppAddButton>}
       >
-        <div className="grid gap-4 lg:grid-cols-2">
-          {knowledgeSections.map((section) => (
-            <AppCard key={section.id} className="shadow-none">
-              <div className="mb-5 flex items-start justify-between gap-4">
+        <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+          <div className="rounded-3xl border border-gray-100 bg-white p-3 shadow-[0_18px_60px_rgba(15,23,42,0.035)]">
+            <p className="px-3 pb-3 pt-2 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Kategorien</p>
+            <div className="space-y-1">
+              {knowledgeSections.map((section) => {
+                const active = section.id === activeSectionId;
+                return (
+                  <button
+                    key={section.id}
+                    type="button"
+                    onClick={() => setActiveSectionId(section.id)}
+                    className={cn(
+                      'relative w-full rounded-2xl px-3 py-3 text-left transition-colors duration-200',
+                      active ? 'bg-gray-950 text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-950'
+                    )}
+                  >
+                    <span className="block text-sm font-semibold">{section.title}</span>
+                    <span className={cn('mt-1 block text-[11.5px] leading-5', active ? 'text-white/55' : 'text-gray-400')}>
+                      {section.emptyLabel}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.045)]">
+            <div className="border-b border-gray-100 px-6 py-6 sm:px-8">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <p className="text-sm font-semibold text-gray-950">{section.title}</p>
-                  <p className="mt-2 text-[13px] leading-relaxed text-gray-500">{section.description}</p>
+                  <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Review Bereich</p>
+                  <h2 className="text-2xl font-semibold tracking-tight text-gray-950">{activeSection.title}</h2>
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">{activeSection.description}</p>
                 </div>
                 <AppStatusBadge label="leer" tone="neutral" />
               </div>
+            </div>
+            <div className="space-y-5 bg-gray-50/70 p-6 sm:p-8">
               <AppInlineEditor
-                label={section.emptyLabel}
+                label={activeSection.emptyLabel}
                 value="Noch kein Wert vorhanden"
                 source="Keine Quelle"
                 status="Wartet auf Daten"
               />
-            </AppCard>
-          ))}
+              <div className="grid gap-3 md:grid-cols-3">
+                {['Quelle', 'Bestaetigung', 'Manuelle Korrektur'].map((label) => (
+                  <div key={label} className="rounded-2xl border border-gray-100 bg-white p-4">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">{label}</p>
+                    <p className="mt-2 text-[13px] leading-relaxed text-gray-500">Wird verfuegbar, sobald echte Daten existieren.</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </AppSection>
       <AppSaveBar
@@ -507,6 +571,11 @@ function PhoneExperience() {
               description="Es wird keine Nummer gekauft, provisioniert oder verbunden."
             />
           </AppCard>
+        </div>
+        <div className="mt-4">
+          <AppPreviewNotice>
+            Diese Telefonansicht konfiguriert nur die Vorschau. Es wird keine Nummer gekauft, weitergeleitet oder aktiviert.
+          </AppPreviewNotice>
         </div>
       </AppSection>
 
@@ -612,6 +681,9 @@ function TestExperience() {
           </AppCard>
         </div>
       </AppSection>
+      <AppPreviewNotice>
+        Test und Go-live bleiben bewusst deaktiviert, bis ein echter Assistent, Telefonie, Abrechnung und Provisionierung verbunden sind.
+      </AppPreviewNotice>
     </div>
   );
 }
@@ -650,6 +722,9 @@ function OperationalExperience({ type }: { type: 'calls' | 'leads' }) {
           </div>
         </div>
       </AppCard>
+      <AppPreviewNotice>
+        Suche, Filter und Detailfelder sind nur als Struktur vorbereitet. Es werden keine Anruf- oder Lead-Daten erfunden.
+      </AppPreviewNotice>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,420px)_1fr]">
         <AppCard>
@@ -751,7 +826,7 @@ function SettingsExperience() {
 
 function RuleColumn({ title, items }: { title: string; items: string[] }) {
   return (
-    <AppCard className="shadow-none">
+    <div className="rounded-3xl border border-gray-100 bg-white/75 p-6 transition-colors duration-200 hover:border-gray-200">
       <h3 className="text-sm font-semibold text-gray-950">{title}</h3>
       <ul className="mt-4 space-y-3">
         {items.map((item) => (
@@ -761,7 +836,7 @@ function RuleColumn({ title, items }: { title: string; items: string[] }) {
           </li>
         ))}
       </ul>
-    </AppCard>
+    </div>
   );
 }
 
