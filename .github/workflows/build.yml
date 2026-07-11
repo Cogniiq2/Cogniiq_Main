@@ -67,3 +67,8 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
         run: bash supabase/tests/run_phase0_migration_smoke.sh
+
+      - name: Run receptionist persistence migration smoke test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+        run: bash supabase/tests/run_receptionist_persistence_smoke.sh

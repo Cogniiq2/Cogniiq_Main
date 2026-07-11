@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertCircle,
   BookOpen,
+  Building2,
   CheckCircle2,
   Circle,
   CreditCard,
@@ -29,6 +30,7 @@ import {
   AppButton,
   AppCard,
   AppEmptyState,
+  AppErrorState,
   AppField,
   AppInlineEditor,
   AppLaunchChecklist,
@@ -41,6 +43,7 @@ import {
   AppSelect,
   AppStatusBadge,
   AppStepList,
+  AppSkeleton,
   AppTextarea,
   appEase,
 } from '@/components/app/CustomerAppPrimitives';
@@ -54,9 +57,28 @@ import {
   phoneRoles,
   researchPreviewSteps,
   testScenarios,
+  type LifecycleTone,
 } from '@/components/app/customerPortalModel';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCustomerPortalPersistence } from '@/hooks/useCustomerPortalPersistence';
 import { useOrganizations } from '@/hooks/useOrganizations';
+import {
+  type OnboardingDraft,
+  type OnboardingGoal,
+  type PhoneDraft,
+  type ReceptionistDraft,
+  type ReceptionistTone,
+  type SupportedLanguage,
+  makeOnboardingDraft,
+  makePhoneDraft,
+  makeReceptionistDraft,
+  onboardingGoalOptions,
+  receptionistAllowedActionOptions,
+  receptionistProhibitedActionOptions,
+  receptionistResponsibilityOptions,
+  receptionistToneLabels,
+  supportedLanguages,
+} from '@/lib/customerPortalPersistence';
 import { cn } from '@/lib/utils';
 
 export type CustomerSection =
@@ -133,26 +155,55 @@ const sectionConfig: Record<CustomerSection, {
 };
 
 export function CustomerSectionPage({ section }: { section: CustomerSection }) {
-  const config = sectionConfig[section];
-  const Icon = config.icon;
-  const lifecycle = lifecycleDisplays[defaultLifecycleState];
-
   return (
     <CustomerAppShell>
+      <CustomerSectionContent section={section} />
+    </CustomerAppShell>
+  );
+}
+
+function CustomerSectionContent({ section }: { section: CustomerSection }) {
+  const config = sectionConfig[section];
+  const Icon = config.icon;
+  const { snapshot, loadStatus } = useCustomerPortalPersistence();
+  const lifecycle = lifecycleDisplays[getLifecycleState(snapshot.onboardingSession?.status, Boolean(snapshot.business))];
+  const isPersistedSection = section === 'onboarding' || section === 'receptionist' || section === 'phone';
+
+  return (
+    <>
       <AppPageHeader
         eyebrow={config.eyebrow}
         title={config.title}
         description={config.description}
         meta={
           <div className="flex flex-wrap gap-2">
-            <AppStatusBadge label={lifecycle.label} tone={lifecycle.tone} />
-            <AppStatusBadge label="UI-only Phase" tone="neutral" icon={Icon} />
+            <AppStatusBadge label={loadStatus === 'loading' ? 'Daten werden geladen' : lifecycle.label} tone={loadStatus === 'error' ? 'danger' : lifecycle.tone} />
+            <AppStatusBadge label={isPersistedSection ? 'Persistenz aktiv' : 'UI-only Phase'} tone={isPersistedSection ? 'success' : 'neutral'} icon={Icon} />
           </div>
         }
       />
       {renderSection(section)}
-    </CustomerAppShell>
+    </>
   );
+}
+
+function getLifecycleState(status: string | null | undefined, hasBusiness: boolean): keyof typeof lifecycleDisplays {
+  switch (status) {
+    case 'in_progress':
+      return 'setup_in_progress';
+    case 'research_queued':
+    case 'research_running':
+      return 'research_in_progress';
+    case 'review_required':
+    case 'ready_for_test':
+    case 'ready_for_launch':
+    case 'live':
+    case 'paused':
+    case 'error':
+      return status;
+    default:
+      return hasBusiness ? 'setup_in_progress' : defaultLifecycleState;
+  }
 }
 
 function renderSection(section: CustomerSection) {
@@ -179,29 +230,105 @@ function renderSection(section: CustomerSection) {
 }
 
 function OnboardingExperience() {
-  const [stageIndex, setStageIndex] = useState(0);
-  const [form, setForm] = useState({
-    companyName: '',
-    website: '',
-    industry: '',
-    address: '',
-    contactEmail: '',
-    contactPerson: '',
-    businessNumber: '',
-    preferredBehavior: '',
-  });
-  const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
+  const {
+    canEdit,
+    loadError,
+    loadStatus,
+    retry,
+    saveOnboarding,
+    saveStates,
+    snapshot,
+  } = useCustomerPortalPersistence();
+  const loadedDraft = useMemo(
+    () => makeOnboardingDraft(snapshot.business, snapshot.onboardingSession),
+    [snapshot.business, snapshot.onboardingSession]
+  );
+  const loadedDraftKey = useMemo(() => JSON.stringify(loadedDraft), [loadedDraft]);
+  const [draft, setDraft] = useState<OnboardingDraft>(loadedDraft);
+  const [baseline, setBaseline] = useState<OnboardingDraft>(loadedDraft);
+  const [stageIndex, setStageIndex] = useState(getOnboardingStageIndex(loadedDraft.currentStep));
   const activeStage = onboardingStages[stageIndex];
   const progress = Math.round(((stageIndex + 1) / onboardingStages.length) * 100);
+  const saveState = saveStates.onboarding;
+  const fieldErrors = saveState.error?.fieldErrors ?? {};
+  const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(baseline), [baseline, draft]);
+  const saveFeedback = getSaveFeedback(saveState, dirty, canEdit);
 
-  const updateField = (key: keyof typeof form, value: string) => {
-    setForm((current) => ({ ...current, [key]: value }));
+  useEffect(() => {
+    setDraft(loadedDraft);
+    setBaseline(loadedDraft);
+    setStageIndex(getOnboardingStageIndex(loadedDraft.currentStep));
+  }, [loadedDraftKey, loadedDraft]);
+
+  useUnsavedChangesWarning(dirty && saveState.status !== 'saving');
+
+  if (loadStatus === 'loading') {
+    return <AppSkeleton label="Onboardingdaten werden geladen" />;
+  }
+
+  if (loadStatus === 'error' && loadError) {
+    return <AppErrorState message={loadError.message} onRetry={() => void retry()} />;
+  }
+
+  if (loadStatus === 'no-organization') {
+    return (
+      <AppEmptyState
+        icon={Building2}
+        title="Keine Organisation verbunden"
+        description="Onboarding-Daten koennen erst gespeichert werden, wenn dieses Konto Mitglied einer Organisation ist."
+      />
+    );
+  }
+
+  const updateBusinessField = (key: Exclude<keyof OnboardingDraft['business'], 'primaryLanguage'>, value: string) => {
+    setDraft((current) => ({
+      ...current,
+      business: {
+        ...current.business,
+        [key]: value,
+      },
+    }));
   };
 
-  const toggleGoal = (goal: string) => {
-    setSelectedGoals((current) =>
-      current.includes(goal) ? current.filter((item) => item !== goal) : [...current, goal]
-    );
+  const updatePreferredBehavior = (value: string) => {
+    setDraft((current) => ({
+      ...current,
+      preferredBehavior: value,
+    }));
+  };
+
+  const toggleGoal = (goal: OnboardingGoal) => {
+    setDraft((current) => ({
+      ...current,
+      selectedGoals: toggleValue(current.selectedGoals, goal),
+    }));
+  };
+
+  const goToStage = (nextIndex: number) => {
+    const boundedIndex = Math.max(0, Math.min(onboardingStages.length - 1, nextIndex));
+    const nextStep = getOnboardingStepFromIndex(boundedIndex);
+    setStageIndex(boundedIndex);
+    setDraft((current) => ({
+      ...current,
+      currentStep: nextStep,
+    }));
+  };
+
+  const goNext = () => {
+    const activeStep = getOnboardingStepFromIndex(stageIndex);
+    const nextIndex = Math.min(onboardingStages.length - 1, stageIndex + 1);
+    const nextStep = getOnboardingStepFromIndex(nextIndex);
+    setStageIndex(nextIndex);
+    setDraft((current) => ({
+      ...current,
+      currentStep: nextStep,
+      completedSteps: addUnique(current.completedSteps, activeStep),
+    }));
+  };
+
+  const handleSave = async () => {
+    const error = await saveOnboarding(draft);
+    if (!error) setBaseline(draft);
   };
 
   return (
@@ -217,7 +344,7 @@ function OnboardingExperience() {
               <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">{activeStage.title}</p>
               <h2 className="text-2xl font-bold tracking-tight text-gray-950">{activeStage.description}</h2>
             </div>
-            <AppStatusBadge label="nicht gespeichert" tone="attention" />
+            <AppStatusBadge label={saveFeedback.badgeLabel} tone={saveFeedback.badgeTone} />
           </div>
 
           <AnimatePresence mode="wait">
@@ -230,35 +357,29 @@ function OnboardingExperience() {
             >
           {stageIndex === 0 ? (
             <div className="grid gap-4 sm:grid-cols-2">
-              <AppField id="company-name" label="Unternehmensname" value={form.companyName} onChange={(event) => updateField('companyName', event.target.value)} placeholder="z. B. Cogniiq GmbH" />
-              <AppField id="company-website" label="Website" value={form.website} onChange={(event) => updateField('website', event.target.value)} placeholder="https://..." />
-              <AppField id="company-industry" label="Branche" value={form.industry} onChange={(event) => updateField('industry', event.target.value)} placeholder="Praxis, Restaurant, Dienstleister ..." />
-              <AppField id="company-address" label="Adresse" value={form.address} onChange={(event) => updateField('address', event.target.value)} placeholder="Strasse, PLZ, Ort" />
-              <AppField id="company-contact-email" label="Kontakt-E-Mail" value={form.contactEmail} onChange={(event) => updateField('contactEmail', event.target.value)} placeholder="name@unternehmen.de" />
-              <AppField id="company-contact-person" label="Ansprechpartner" value={form.contactPerson} onChange={(event) => updateField('contactPerson', event.target.value)} placeholder="Vorname Nachname" />
-              <AppField id="company-business-number" label="Bestehende Geschaeftsnummer" value={form.businessNumber} onChange={(event) => updateField('businessNumber', event.target.value)} placeholder="+49 ..." />
+              <AppField id="company-name" label="Unternehmensname" value={draft.business.name} disabled={!canEdit} error={fieldErrors.name} onChange={(event) => updateBusinessField('name', event.target.value)} placeholder="z. B. Cogniiq GmbH" />
+              <AppField id="company-website" label="Website" value={draft.business.website} disabled={!canEdit} error={fieldErrors.website} onChange={(event) => updateBusinessField('website', event.target.value)} placeholder="https://..." />
+              <AppField id="company-industry" label="Branche" value={draft.business.industry} disabled={!canEdit} onChange={(event) => updateBusinessField('industry', event.target.value)} placeholder="Praxis, Restaurant, Dienstleister ..." />
+              <AppField id="company-address" label="Adresse" value={draft.business.address} disabled={!canEdit} onChange={(event) => updateBusinessField('address', event.target.value)} placeholder="Strasse, PLZ, Ort" />
+              <AppField id="company-contact-email" label="Kontakt-E-Mail" value={draft.business.contactEmail} disabled={!canEdit} error={fieldErrors.contactEmail} onChange={(event) => updateBusinessField('contactEmail', event.target.value)} placeholder="name@unternehmen.de" />
+              <AppField id="company-contact-person" label="Ansprechpartner" value={draft.business.primaryContactName} disabled={!canEdit} onChange={(event) => updateBusinessField('primaryContactName', event.target.value)} placeholder="Vorname Nachname" />
+              <AppField id="company-business-number" label="Bestehende Geschaeftsnummer" value={draft.business.existingBusinessPhone} disabled={!canEdit} error={fieldErrors.existingBusinessPhone} onChange={(event) => updateBusinessField('existingBusinessPhone', event.target.value)} placeholder="+49 ..." />
             </div>
           ) : null}
 
           {stageIndex === 1 ? (
             <div className="space-y-6">
               <div className="grid gap-3 sm:grid-cols-2">
-                {[
-                  'Hauefige Fragen beantworten',
-                  'Leads erfassen',
-                  'Anrufe weiterleiten',
-                  'Terminwuensche aufnehmen',
-                  'After-hours beantworten',
-                  'Mehrsprachige Anfragen vorbereiten',
-                ].map((goal) => {
-                  const active = selectedGoals.includes(goal);
+                {onboardingGoalOptions.map((goal) => {
+                  const active = draft.selectedGoals.includes(goal);
                   return (
                     <button
                       key={goal}
                       type="button"
+                      disabled={!canEdit}
                       onClick={() => toggleGoal(goal)}
                       className={cn(
-                        'flex min-h-14 items-center gap-3 rounded-xl border px-4 text-left text-sm font-semibold transition-colors',
+                        'flex min-h-14 items-center gap-3 rounded-xl border px-4 text-left text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60',
                         active ? 'border-gray-400 bg-gray-900 text-white' : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
                       )}
                       aria-pressed={active}
@@ -272,8 +393,9 @@ function OnboardingExperience() {
               <AppTextarea
                 id="preferred-behavior"
                 label="Gewuenschtes Verhalten"
-                value={form.preferredBehavior}
-                onChange={(event) => updateField('preferredBehavior', event.target.value)}
+                value={draft.preferredBehavior}
+                disabled={!canEdit}
+                onChange={(event) => updatePreferredBehavior(event.target.value)}
                 placeholder="Kurz, freundlich, formell, mit klarer Weiterleitung bei Unsicherheit ..."
               />
             </div>
@@ -308,7 +430,7 @@ function OnboardingExperience() {
               <AppEmptyState
                 icon={Wand2}
                 title="Weiter in die Detailseiten"
-                description="Wissen, Rezeptionist, Telefon und Test sind vorbereitet. Dauerhafte Speicherung und Provisionierung werden erst mit Backend-Anbindung aktiv."
+                description="Unternehmen und Fortschritt koennen gespeichert werden. Wissen, Test und Launch bleiben bis zu spaeteren Backend-Phasen ohne echte Funktion."
                 action={
                   <>
                     <AppButton to="/app/knowledge" variant="secondary">Wissen oeffnen</AppButton>
@@ -322,28 +444,33 @@ function OnboardingExperience() {
             </motion.div>
           </AnimatePresence>
 
-          {stageIndex === 0 && !form.companyName ? (
+          {stageIndex === 0 && !draft.business.name ? (
             <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
               <p className="text-[12.5px] font-medium leading-5 text-amber-800">
-                Empfohlen: Unternehmensname und Website zuerst ausfuellen, damit spaetere Recherche und Wissenspruefung sinnvoll starten koennen.
+                Der Unternehmensname ist erforderlich, bevor ein Business-Datensatz gespeichert wird.
               </p>
             </div>
           ) : null}
 
           <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <AppButton variant="secondary" disabled={stageIndex === 0} onClick={() => setStageIndex((index) => Math.max(0, index - 1))}>
+            <AppButton variant="secondary" disabled={stageIndex === 0} onClick={() => goToStage(stageIndex - 1)}>
               Zurueck
             </AppButton>
-            <AppButton disabled={stageIndex === onboardingStages.length - 1} onClick={() => setStageIndex((index) => Math.min(onboardingStages.length - 1, index + 1))}>
+            <AppButton disabled={stageIndex === onboardingStages.length - 1} onClick={goNext}>
               Weiter
             </AppButton>
           </div>
           </div>
         </div>
 
-        <AppPreviewNotice>
-          Diese Eingaben werden in dieser Vorschau noch nicht dauerhaft gespeichert. Ein Neuladen der Seite kann sie zuruecksetzen.
-        </AppPreviewNotice>
+        <AppSaveBar
+          message={saveFeedback.message}
+          actionLabel={saveFeedback.actionLabel}
+          onAction={() => void handleSave()}
+          disabled={!saveFeedback.canSubmit}
+          loading={saveState.status === 'saving'}
+          tone={saveFeedback.tone}
+        />
       </div>
 
       <aside className="space-y-6">
@@ -354,7 +481,7 @@ function OnboardingExperience() {
               <button
                 key={stage.id}
                 type="button"
-                onClick={() => setStageIndex(index)}
+                onClick={() => goToStage(index)}
                 className={cn(
                   'w-full rounded-xl border px-4 py-3 text-left transition-colors',
                   stageIndex === index ? 'border-gray-300 bg-white shadow-sm' : 'border-gray-100 bg-gray-50 hover:border-gray-200'
@@ -372,48 +499,112 @@ function OnboardingExperience() {
 }
 
 function ReceptionistExperience() {
-  const [style, setStyle] = useState('professional');
-  const [identity, setIdentity] = useState({
-    name: '',
-    language: 'de',
-    secondLanguage: 'none',
-    pronunciation: '',
-    greeting: '',
-  });
-  const updateIdentity = (key: keyof typeof identity, value: string) => {
-    setIdentity((current) => ({ ...current, [key]: value }));
+  const {
+    canEdit,
+    loadError,
+    loadStatus,
+    retry,
+    saveReceptionist,
+    saveStates,
+    snapshot,
+  } = useCustomerPortalPersistence();
+  const loadedDraft = useMemo(
+    () => makeReceptionistDraft(snapshot.receptionistConfig),
+    [snapshot.receptionistConfig]
+  );
+  const loadedDraftKey = useMemo(() => JSON.stringify(loadedDraft), [loadedDraft]);
+  const [draft, setDraft] = useState<ReceptionistDraft>(loadedDraft);
+  const [baseline, setBaseline] = useState<ReceptionistDraft>(loadedDraft);
+  const saveState = saveStates.receptionist;
+  const fieldErrors = saveState.error?.fieldErrors ?? {};
+  const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(baseline), [baseline, draft]);
+  const saveFeedback = getSaveFeedback(saveState, dirty, canEdit && Boolean(snapshot.business));
+
+  useEffect(() => {
+    setDraft(loadedDraft);
+    setBaseline(loadedDraft);
+  }, [loadedDraftKey, loadedDraft]);
+
+  useUnsavedChangesWarning(dirty && saveState.status !== 'saving');
+
+  if (loadStatus === 'loading') {
+    return <AppSkeleton label="Rezeptionistenkonfiguration wird geladen" />;
+  }
+
+  if (loadStatus === 'error' && loadError) {
+    return <AppErrorState message={loadError.message} onRetry={() => void retry()} />;
+  }
+
+  if (loadStatus === 'no-organization') {
+    return (
+      <AppEmptyState
+        icon={Building2}
+        title="Keine Organisation verbunden"
+        description="Rezeptionistenkonfigurationen koennen erst gespeichert werden, wenn dieses Konto Mitglied einer Organisation ist."
+      />
+    );
+  }
+
+  const updateField = <Key extends keyof ReceptionistDraft>(key: Key, value: ReceptionistDraft[Key]) => {
+    setDraft((current) => ({ ...current, [key]: value }));
+  };
+
+  const toggleRule = (
+    key: 'responsibilities' | 'allowedActions' | 'prohibitedActions',
+    value: string
+  ) => {
+    setDraft((current) => ({
+      ...current,
+      [key]: toggleValue(current[key], value),
+    }));
+  };
+
+  const handleSave = async () => {
+    const error = await saveReceptionist(draft);
+    if (!error) setBaseline(draft);
   };
 
   return (
     <div className="space-y-8">
+      {!snapshot.business ? (
+        <AppEmptyState
+          compact
+          icon={Building2}
+          title="Unternehmensdaten zuerst speichern"
+          description="Der Rezeptionist wird einem Business-Datensatz zugeordnet. Speichern Sie zuerst die Basisdaten im Onboarding."
+          action={<AppButton to="/app/onboarding" variant="secondary">Zum Onboarding</AppButton>}
+        />
+      ) : null}
+
       <AppSection eyebrow="Identitaet" title="Wie der Rezeptionist spaeter auftreten soll">
         <AppCard className="rounded-3xl">
           <div className="grid gap-4 md:grid-cols-2">
-            <AppField id="receptionist-name" label="Rezeptionistenname" value={identity.name} onChange={(event) => updateIdentity('name', event.target.value)} placeholder="Noch nicht festgelegt" />
+            <AppField id="receptionist-name" label="Rezeptionistenname" value={draft.receptionistName} disabled={!canEdit || !snapshot.business} onChange={(event) => updateField('receptionistName', event.target.value)} placeholder="Noch nicht festgelegt" />
             <AppField id="voice-placeholder" label="Voice placeholder" placeholder="Noch nicht verbunden" disabled />
             <AppSelect
               id="primary-language"
               label="Hauptsprache"
-              value={identity.language}
-              onChange={(value) => updateIdentity('language', value)}
-              options={[
-                { value: 'de', label: 'Deutsch' },
-                { value: 'en', label: 'Englisch' },
-              ]}
+              value={draft.primaryLanguage}
+              onChange={(value) => updateField('primaryLanguage', value as SupportedLanguage)}
+              error={fieldErrors.primaryLanguage}
+              disabled={!canEdit || !snapshot.business}
+              options={supportedLanguages.map((language) => ({ value: language, label: language === 'de' ? 'Deutsch' : 'Englisch' }))}
             />
             <AppSelect
               id="second-language"
               label="Optionale weitere Sprache"
-              value={identity.secondLanguage}
-              onChange={(value) => updateIdentity('secondLanguage', value)}
+              value={draft.additionalLanguages[0] ?? 'none'}
+              onChange={(value) => updateField('additionalLanguages', value === 'none' ? [] : [value as SupportedLanguage])}
+              disabled={!canEdit || !snapshot.business}
               options={[
                 { value: 'none', label: 'Keine weitere Sprache' },
                 { value: 'en', label: 'Englisch' },
                 { value: 'de', label: 'Deutsch' },
               ]}
             />
-            <AppField id="pronunciation" label="Aussprache des Unternehmensnamens" value={identity.pronunciation} onChange={(event) => updateIdentity('pronunciation', event.target.value)} placeholder="Optional" />
-            <AppTextarea id="greeting" label="Begruessung" value={identity.greeting} onChange={(event) => updateIdentity('greeting', event.target.value)} placeholder="Guten Tag, Sie sprechen mit ..." className="md:col-span-2" />
+            <AppTextarea id="greeting" label="Begruessung" value={draft.greeting} disabled={!canEdit || !snapshot.business} onChange={(event) => updateField('greeting', event.target.value)} placeholder="Guten Tag, Sie sprechen mit ..." className="md:col-span-2" />
+            <AppTextarea id="after-hours-behavior" label="After-hours Verhalten" value={draft.afterHoursInstruction} disabled={!canEdit || !snapshot.business} onChange={(event) => updateField('afterHoursInstruction', event.target.value)} placeholder="Ausserhalb der Oeffnungszeiten Nachricht aufnehmen, keine Termine bestaetigen ..." />
+            <AppTextarea id="transfer-behavior" label="Transfer Verhalten" value={draft.transferInstruction} disabled={!canEdit || !snapshot.business} onChange={(event) => updateField('transferInstruction', event.target.value)} placeholder="Bei Unsicherheit oder dringenden Anliegen an die Transfernummer uebergeben ..." />
           </div>
         </AppCard>
       </AppSection>
@@ -423,15 +614,16 @@ function ReceptionistExperience() {
           <AppCard className="rounded-3xl">
             <AppSegmentedControl
               label="Kommunikationsstil"
-              value={style}
-              onChange={setStyle}
-              options={[
-                { value: 'professional', label: 'Professionell', description: 'Ruhig, klar und verbindlich.' },
-                { value: 'warm', label: 'Warm', description: 'Freundlich und nahbar.' },
-                { value: 'concise', label: 'Knapp', description: 'Direkt, ohne lange Erklaerungen.' },
-                { value: 'formal', label: 'Formell', description: 'Sehr hoeflich und distanziert.' },
-              ]}
+              value={draft.tone}
+              onChange={(value) => updateField('tone', value as ReceptionistTone)}
+              disabled={!canEdit || !snapshot.business}
+              options={(Object.keys(receptionistToneLabels) as ReceptionistTone[]).map((tone) => ({
+                value: tone,
+                label: receptionistToneLabels[tone],
+                description: getToneDescription(tone),
+              }))}
             />
+            {fieldErrors.tone ? <p className="mt-3 text-sm text-red-600">{fieldErrors.tone}</p> : null}
           </AppCard>
           <AppCard className="rounded-3xl">
             <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Status</p>
@@ -449,18 +641,36 @@ function ReceptionistExperience() {
         <div className="grid gap-4 lg:grid-cols-3">
           <RuleColumn
             title="Verantwortlichkeiten"
-            items={['FAQs beantworten', 'Leads erfassen', 'Nachrichten aufnehmen', 'Anrufe weiterleiten', 'Terminwuensche sammeln', 'After-hours behandeln']}
+            items={[...receptionistResponsibilityOptions]}
+            selectedItems={draft.responsibilities}
+            disabled={!canEdit || !snapshot.business}
+            onToggle={(item) => toggleRule('responsibilities', item)}
           />
           <RuleColumn
             title="Verhalten"
-            items={['Nur bestaetigte Fakten nennen', 'Bei Unsicherheit transparent bleiben', 'Bei Bedarf uebergeben', 'Keine technischen Details erfinden', 'Nach Geschaeftszeiten Regeln beachten']}
+            items={[...receptionistAllowedActionOptions]}
+            selectedItems={draft.allowedActions}
+            disabled={!canEdit || !snapshot.business}
+            onToggle={(item) => toggleRule('allowedActions', item)}
           />
           <RuleColumn
             title="Einschraenkungen"
-            items={['Keine Preise erfinden', 'Keine Termine verbindlich zusagen', 'Keine Erstattungen bestaetigen', 'Keine regulierte Beratung geben', 'Keine nicht bestaetigten Leistungen nennen']}
+            items={[...receptionistProhibitedActionOptions]}
+            selectedItems={draft.prohibitedActions}
+            disabled={!canEdit || !snapshot.business}
+            onToggle={(item) => toggleRule('prohibitedActions', item)}
           />
         </div>
       </AppSection>
+
+      <AppSaveBar
+        message={saveFeedback.message}
+        actionLabel={saveFeedback.actionLabel}
+        onAction={() => void handleSave()}
+        disabled={!saveFeedback.canSubmit}
+        loading={saveState.status === 'saving'}
+        tone={saveFeedback.tone}
+      />
     </div>
   );
 }
@@ -544,77 +754,143 @@ function KnowledgeExperience() {
 }
 
 function PhoneExperience() {
-  const [method, setMethod] = useState('ai-number');
-  const [countryCode, setCountryCode] = useState('+49');
+  const {
+    canEdit,
+    loadError,
+    loadStatus,
+    retry,
+    savePhone,
+    saveStates,
+    snapshot,
+  } = useCustomerPortalPersistence();
+  const loadedDraft = useMemo(() => makePhoneDraft(snapshot.phoneConfig), [snapshot.phoneConfig]);
+  const loadedDraftKey = useMemo(() => JSON.stringify(loadedDraft), [loadedDraft]);
+  const [draft, setDraft] = useState<PhoneDraft>(loadedDraft);
+  const [baseline, setBaseline] = useState<PhoneDraft>(loadedDraft);
+  const saveState = saveStates.phone;
+  const fieldErrors = saveState.error?.fieldErrors ?? {};
+  const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(baseline), [baseline, draft]);
+  const saveFeedback = getSaveFeedback(saveState, dirty, canEdit && Boolean(snapshot.business));
+
+  useEffect(() => {
+    setDraft(loadedDraft);
+    setBaseline(loadedDraft);
+  }, [loadedDraftKey, loadedDraft]);
+
+  useUnsavedChangesWarning(dirty && saveState.status !== 'saving');
+
+  if (loadStatus === 'loading') {
+    return <AppSkeleton label="Telefonkonfiguration wird geladen" />;
+  }
+
+  if (loadStatus === 'error' && loadError) {
+    return <AppErrorState message={loadError.message} onRetry={() => void retry()} />;
+  }
+
+  if (loadStatus === 'no-organization') {
+    return (
+      <AppEmptyState
+        icon={Building2}
+        title="Keine Organisation verbunden"
+        description="Telefonkonfigurationen koennen erst gespeichert werden, wenn dieses Konto Mitglied einer Organisation ist."
+      />
+    );
+  }
+
+  const updateField = <Key extends keyof PhoneDraft>(key: Key, value: PhoneDraft[Key]) => {
+    setDraft((current) => ({ ...current, [key]: value }));
+  };
+
+  const handleSave = async () => {
+    const error = await savePhone(draft);
+    if (!error) setBaseline(draft);
+  };
 
   return (
     <div className="space-y-8">
+      {!snapshot.business ? (
+        <AppEmptyState
+          compact
+          icon={Building2}
+          title="Unternehmensdaten zuerst speichern"
+          description="Die Telefonkonfiguration wird einem Business-Datensatz zugeordnet. Speichern Sie zuerst die Basisdaten im Onboarding."
+          action={<AppButton to="/app/onboarding" variant="secondary">Zum Onboarding</AppButton>}
+        />
+      ) : null}
+
       <AppSection eyebrow="Methode" title="Nummern sauber trennen">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
           <AppCard>
             <AppSegmentedControl
               label="Zukuenftige Einrichtung"
-              value={method}
-              onChange={setMethod}
+              value={draft.setupMode}
+              onChange={(value) => updateField('setupMode', value as PhoneDraft['setupMode'])}
+              disabled={!canEdit || !snapshot.business}
               options={[
                 { value: 'ai-number', label: 'Option A: Neue KI-Telefonnummer verwenden', description: 'Provisionierung ist in dieser Phase nicht aktiv.' },
                 { value: 'forwarding', label: 'Option B: Bestehende Geschaeftsnummer weiterleiten', description: 'Weiterleitungshinweise, keine Portierung.' },
               ]}
             />
+            {fieldErrors.setupMode ? <p className="mt-3 text-sm text-red-600">{fieldErrors.setupMode}</p> : null}
           </AppCard>
           <AppCard>
             <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Aktivierung</p>
             <AppEmptyState
               compact
               icon={Lock}
-              title="Nicht verbunden"
-              description="Es wird keine Nummer gekauft, provisioniert oder verbunden."
+              title={snapshot.phoneConfig?.assignedAiNumber ? 'Systemnummer vorhanden' : 'Nicht verbunden'}
+              description={snapshot.phoneConfig?.assignedAiNumber ? `Systemseitig zugewiesen: ${snapshot.phoneConfig.assignedAiNumber}` : 'Es wird keine Nummer gekauft, provisioniert oder verbunden.'}
             />
           </AppCard>
         </div>
         <div className="mt-4">
           <AppPreviewNotice>
-            Diese Telefonansicht konfiguriert nur die Vorschau. Es wird keine Nummer gekauft, weitergeleitet oder aktiviert.
+            Kundenwerte werden gespeichert. KI-Nummer, Teststatus, Provisionierung und Live-Schaltung bleiben systemkontrolliert und koennen hier nicht gesetzt werden.
           </AppPreviewNotice>
         </div>
       </AppSection>
 
       <AppSection eyebrow="Telefonrollen" title="Jede Nummer hat eine klare Aufgabe">
         <AppCard>
-          <div className="mb-5 max-w-sm">
-            <AppSelect
-              id="country-code"
-              label="Landesvorwahl"
-              value={countryCode}
-              onChange={setCountryCode}
-              options={[
-                { value: '+49', label: 'Deutschland (+49)' },
-                { value: '+43', label: 'Oesterreich (+43)' },
-                { value: '+41', label: 'Schweiz (+41)' },
-              ]}
-            />
-          </div>
           <div className="grid gap-4 md:grid-cols-2">
             {phoneRoles.map((role) => (
               <AppField
                 key={role.id}
                 id={`phone-${role.id}`}
                 label={role.label}
-                description={`${role.description} Landesvorwahl: ${countryCode}`}
+                description={role.id === 'ai' ? 'Systemkontrolliertes Feld.' : role.description}
                 placeholder={role.placeholder}
-                disabled={role.id === 'ai'}
+                value={getPhoneRoleValue(role.id, draft, snapshot.phoneConfig?.assignedAiNumber ?? '')}
+                error={getPhoneRoleError(role.id, fieldErrors)}
+                disabled={role.id === 'ai' || !canEdit || !snapshot.business}
+                onChange={(event) => updatePhoneRole(role.id, event.target.value, updateField)}
               />
             ))}
           </div>
+          <label className="mt-5 flex items-start gap-3 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
+            <input
+              type="checkbox"
+              className="mt-1 h-4 w-4 rounded border-gray-300 text-gray-900"
+              checked={draft.forwardingConfirmed}
+              disabled={!canEdit || !snapshot.business}
+              onChange={(event) => updateField('forwardingConfirmed', event.target.checked)}
+            />
+            <span>
+              <span className="block text-sm font-semibold text-gray-900">Weiterleitung kundenseitig bestaetigt</span>
+              <span className="mt-1 block text-[12.5px] leading-5 text-gray-500">
+                Diese Bestaetigung speichert nur Ihren aktuellen Stand. Sie loest keine technische Aktivierung aus.
+              </span>
+            </span>
+          </label>
         </AppCard>
       </AppSection>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <AppCard>
-          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Weiterleitung</p>
-          <h2 className="text-xl font-bold tracking-tight text-gray-950">Anleitung wird spaeter generiert</h2>
+          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Systemstatus</p>
+          <h2 className="text-xl font-bold tracking-tight text-gray-950">Teststatus: {formatPhoneTestStatus(snapshot.phoneConfig?.testStatus)}</h2>
           <p className="mt-3 text-sm leading-6 text-gray-500">
-            Fuer Weiterleitung werden spaeter konkrete Provider-Schritte angezeigt. Aktuell bleibt dies ein Platzhalter ohne technische Ausfuehrung.
+            Der Teststatus ist ein geschuetztes Systemfeld. Kundinnen und Kunden koennen keinen erfolgreichen Test oder Live-Zustand setzen.
           </p>
         </AppCard>
         <AppCard>
@@ -625,6 +901,15 @@ function PhoneExperience() {
           </p>
         </AppCard>
       </div>
+
+      <AppSaveBar
+        message={saveFeedback.message}
+        actionLabel={saveFeedback.actionLabel}
+        onAction={() => void handleSave()}
+        disabled={!saveFeedback.canSubmit}
+        loading={saveState.status === 'saving'}
+        tone={saveFeedback.tone}
+      />
     </div>
   );
 }
@@ -824,17 +1109,241 @@ function SettingsExperience() {
   );
 }
 
-function RuleColumn({ title, items }: { title: string; items: string[] }) {
+type SaveStateView = ReturnType<typeof useCustomerPortalPersistence>['saveStates']['onboarding'];
+
+function getSaveFeedback(saveState: SaveStateView, dirty: boolean, canSubmitBase: boolean): {
+  message: string;
+  actionLabel: string;
+  canSubmit: boolean;
+  tone: LifecycleTone;
+  badgeLabel: string;
+  badgeTone: LifecycleTone;
+} {
+  if (!canSubmitBase) {
+    return {
+      message: 'Nur Organisations-Owner und Admins koennen diese Daten speichern.',
+      actionLabel: 'Speichern',
+      canSubmit: false,
+      tone: 'neutral',
+      badgeLabel: 'nur lesen',
+      badgeTone: 'neutral',
+    };
+  }
+
+  if (saveState.status === 'saving') {
+    return {
+      message: 'Speichern laeuft. Der gespeicherte Zustand wird erst nach Supabase-Bestaetigung aktualisiert.',
+      actionLabel: 'Speichern',
+      canSubmit: false,
+      tone: 'working',
+      badgeLabel: 'speichert',
+      badgeTone: 'working',
+    };
+  }
+
+  if (saveState.status === 'error' && saveState.error) {
+    return {
+      message: saveState.error.message,
+      actionLabel: 'Erneut speichern',
+      canSubmit: true,
+      tone: saveState.error.kind === 'authorization' ? 'danger' : 'attention',
+      badgeLabel: saveState.error.kind === 'validation' ? 'Validierung' : 'Fehler',
+      badgeTone: saveState.error.kind === 'validation' ? 'attention' : 'danger',
+    };
+  }
+
+  if (dirty) {
+    return {
+      message: 'Ungespeicherte Aenderungen vorhanden. Sie werden erst nach erfolgreichem Speichern dauerhaft geladen.',
+      actionLabel: 'Speichern',
+      canSubmit: true,
+      tone: 'attention',
+      badgeLabel: 'ungespeichert',
+      badgeTone: 'attention',
+    };
+  }
+
+  if (saveState.status === 'saved') {
+    return {
+      message: saveState.savedAt ? `Gespeichert um ${saveState.savedAt.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}.` : 'Gespeichert.',
+      actionLabel: 'Gespeichert',
+      canSubmit: false,
+      tone: 'success',
+      badgeLabel: 'gespeichert',
+      badgeTone: 'success',
+    };
+  }
+
+  return {
+    message: 'Geladene Werte entsprechen dem zuletzt gespeicherten Stand.',
+    actionLabel: 'Speichern',
+    canSubmit: false,
+    tone: 'neutral',
+    badgeLabel: 'geladen',
+    badgeTone: 'neutral',
+  };
+}
+
+function useUnsavedChangesWarning(enabled: boolean) {
+  useEffect(() => {
+    if (!enabled) return undefined;
+
+    const handler = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [enabled]);
+}
+
+function getOnboardingStageIndex(stepId: OnboardingDraft['currentStep']) {
+  const index = onboardingStages.findIndex((stage) => stage.id === stepId);
+  return index >= 0 ? index : 0;
+}
+
+function getOnboardingStepFromIndex(index: number): OnboardingDraft['currentStep'] {
+  return (onboardingStages[index]?.id ?? 'company') as OnboardingDraft['currentStep'];
+}
+
+function toggleValue<T extends string>(values: T[], value: T): T[] {
+  return values.includes(value)
+    ? values.filter((item) => item !== value)
+    : [...values, value];
+}
+
+function addUnique<T extends string>(values: T[], value: T): T[] {
+  return values.includes(value) ? values : [...values, value];
+}
+
+function getToneDescription(tone: ReceptionistTone) {
+  switch (tone) {
+    case 'warm':
+      return 'Freundlich und nahbar.';
+    case 'concise':
+      return 'Direkt, ohne lange Erklaerungen.';
+    case 'formal':
+      return 'Sehr hoeflich und distanziert.';
+    case 'professional':
+    default:
+      return 'Ruhig, klar und verbindlich.';
+  }
+}
+
+function getPhoneRoleValue(roleId: string, draft: PhoneDraft, assignedAiNumber: string) {
+  switch (roleId) {
+    case 'public':
+      return draft.existingPublicNumber;
+    case 'ai':
+      return assignedAiNumber;
+    case 'transfer':
+      return draft.humanTransferNumber;
+    case 'urgent':
+      return draft.urgentEscalationNumber;
+    case 'after_hours':
+      return draft.afterHoursNumber;
+    case 'sms':
+      return draft.smsNotificationNumber;
+    default:
+      return '';
+  }
+}
+
+function updatePhoneRole(
+  roleId: string,
+  value: string,
+  updateField: <Key extends keyof PhoneDraft>(key: Key, nextValue: PhoneDraft[Key]) => void
+) {
+  switch (roleId) {
+    case 'public':
+      updateField('existingPublicNumber', value);
+      break;
+    case 'transfer':
+      updateField('humanTransferNumber', value);
+      break;
+    case 'urgent':
+      updateField('urgentEscalationNumber', value);
+      break;
+    case 'after_hours':
+      updateField('afterHoursNumber', value);
+      break;
+    case 'sms':
+      updateField('smsNotificationNumber', value);
+      break;
+  }
+}
+
+function getPhoneRoleError(roleId: string, fieldErrors: Record<string, string>) {
+  switch (roleId) {
+    case 'public':
+      return fieldErrors.existingPublicNumber;
+    case 'transfer':
+      return fieldErrors.humanTransferNumber;
+    case 'urgent':
+      return fieldErrors.urgentEscalationNumber;
+    case 'after_hours':
+      return fieldErrors.afterHoursNumber;
+    case 'sms':
+      return fieldErrors.smsNotificationNumber;
+    default:
+      return undefined;
+  }
+}
+
+function formatPhoneTestStatus(status: string | null | undefined) {
+  switch (status) {
+    case 'queued':
+      return 'wartet';
+    case 'running':
+      return 'laeuft';
+    case 'failed':
+      return 'fehlgeschlagen';
+    case 'passed':
+      return 'bestanden';
+    case 'not_started':
+    default:
+      return 'nicht gestartet';
+  }
+}
+
+function RuleColumn({
+  title,
+  items,
+  selectedItems,
+  disabled,
+  onToggle,
+}: {
+  title: string;
+  items: string[];
+  selectedItems: string[];
+  disabled: boolean;
+  onToggle: (item: string) => void;
+}) {
   return (
     <div className="rounded-3xl border border-gray-100 bg-white/75 p-6 transition-colors duration-200 hover:border-gray-200">
       <h3 className="text-sm font-semibold text-gray-950">{title}</h3>
       <ul className="mt-4 space-y-3">
-        {items.map((item) => (
-          <li key={item} className="flex gap-3 text-[13px] leading-relaxed text-gray-500">
-            <CheckCircle2 size={15} className="mt-0.5 flex-shrink-0 text-gray-400" aria-hidden="true" />
-            <span>{item}</span>
-          </li>
-        ))}
+        {items.map((item) => {
+          const active = selectedItems.includes(item);
+          return (
+            <li key={item}>
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={() => onToggle(item)}
+                aria-pressed={active}
+                className={cn(
+                  'flex w-full gap-3 rounded-xl px-2 py-2 text-left text-[13px] leading-relaxed transition-colors disabled:cursor-not-allowed disabled:opacity-60',
+                  active ? 'bg-gray-50 text-gray-800' : 'text-gray-500 hover:bg-gray-50'
+                )}
+              >
+                <CheckCircle2 size={15} className={cn('mt-0.5 flex-shrink-0', active ? 'text-emerald-500' : 'text-gray-300')} aria-hidden="true" />
+                <span>{item}</span>
+              </button>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

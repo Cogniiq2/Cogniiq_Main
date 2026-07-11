@@ -23,8 +23,13 @@ import {
 import type { LucideIcon } from 'lucide-react';
 
 import { AppRouteTransition, AppStatusBadge, appEase } from '@/components/app/CustomerAppPrimitives';
-import { defaultLifecycleState, lifecycleDisplays } from '@/components/app/customerPortalModel';
+import { lifecycleDisplays } from '@/components/app/customerPortalModel';
+import type { LifecycleDisplay } from '@/components/app/customerPortalModel';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  CustomerPortalPersistenceProvider,
+  useCustomerPortalPersistenceValue,
+} from '@/hooks/useCustomerPortalPersistence';
 import { useOrganizations } from '@/hooks/useOrganizations';
 import { cn } from '@/lib/utils';
 
@@ -62,6 +67,7 @@ function isActivePath(pathname: string, href: string) {
 }
 
 export function CustomerAppShell({ children }: { children: ReactNode }) {
+  const portalPersistence = useCustomerPortalPersistenceValue();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const location = useLocation();
@@ -69,7 +75,11 @@ export function CustomerAppShell({ children }: { children: ReactNode }) {
   const { memberships, activeOrganization, activeOrganizationId, setActiveOrganizationId } = useOrganizations();
   const hasMultipleOrganizations = memberships.length > 1;
   const displayName = profile?.full_name || profile?.email || user?.email || 'Konto';
-  const lifecycle = lifecycleDisplays[defaultLifecycleState];
+  const lifecycle = getPortalLifecycleDisplay(
+    portalPersistence.loadStatus,
+    portalPersistence.snapshot.onboardingSession?.status,
+    Boolean(portalPersistence.snapshot.business)
+  );
 
   const handleSignOut = async () => {
     setUserMenuOpen(false);
@@ -78,6 +88,7 @@ export function CustomerAppShell({ children }: { children: ReactNode }) {
   };
 
   return (
+    <CustomerPortalPersistenceProvider value={portalPersistence}>
     <div className="min-h-screen bg-[#f7f7f4] text-gray-950">
       <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/95 backdrop-blur-xl">
         <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
@@ -278,7 +289,62 @@ export function CustomerAppShell({ children }: { children: ReactNode }) {
         <AppRouteTransition routeKey={location.pathname}>{children}</AppRouteTransition>
       </main>
     </div>
+    </CustomerPortalPersistenceProvider>
   );
+}
+
+function getPortalLifecycleDisplay(
+  loadStatus: 'loading' | 'ready' | 'no-organization' | 'error',
+  onboardingStatus: string | null | undefined,
+  hasBusiness: boolean
+): LifecycleDisplay {
+  if (loadStatus === 'loading') {
+    return {
+      label: 'Daten werden geladen',
+      description: 'Persistente Produktdaten werden geladen.',
+      tone: 'working',
+    };
+  }
+
+  if (loadStatus === 'error') {
+    return {
+      label: 'Datenfehler',
+      description: 'Die Produktdaten konnten nicht geladen werden.',
+      tone: 'danger',
+    };
+  }
+
+  if (loadStatus === 'no-organization') {
+    return {
+      label: 'Keine Organisation',
+      description: 'Fuer dieses Konto ist noch keine Organisation verbunden.',
+      tone: 'neutral',
+    };
+  }
+
+  switch (onboardingStatus) {
+    case 'in_progress':
+      return lifecycleDisplays.setup_in_progress;
+    case 'research_queued':
+    case 'research_running':
+      return lifecycleDisplays.research_in_progress;
+    case 'review_required':
+      return lifecycleDisplays.review_required;
+    case 'ready_for_test':
+      return lifecycleDisplays.ready_for_test;
+    case 'ready_for_launch':
+      return lifecycleDisplays.ready_for_launch;
+    case 'live':
+      return lifecycleDisplays.live;
+    case 'paused':
+      return lifecycleDisplays.paused;
+    case 'error':
+      return lifecycleDisplays.error;
+    case 'not_started':
+      return hasBusiness ? lifecycleDisplays.setup_in_progress : lifecycleDisplays.not_started;
+    default:
+      return hasBusiness ? lifecycleDisplays.setup_in_progress : lifecycleDisplays.not_started;
+  }
 }
 
 function AppNavLink({ item, active }: { item: CustomerNavItem; active: boolean }) {
