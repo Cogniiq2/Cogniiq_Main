@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, TextareaHTML
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
-import { AlertCircle, Check, Circle, Info, Plus } from 'lucide-react';
+import { AlertCircle, Check, Circle, Info, Plus, RefreshCw } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import type { LaunchChecklistItem, LifecycleTone, SetupStep } from './customerPortalModel';
@@ -293,12 +293,14 @@ export function AppStepList({
 export function AppField({
   label,
   description,
+  error,
   id,
   className,
   ...props
 }: InputHTMLAttributes<HTMLInputElement> & {
   label: string;
   description?: string;
+  error?: string;
   id: string;
 }) {
   return (
@@ -306,10 +308,15 @@ export function AppField({
       <span className="mb-1.5 block text-xs font-semibold text-gray-700">{label}</span>
       <input
         id={id}
-        className="h-11 w-full rounded-lg border border-gray-200 bg-white px-3.5 text-sm text-gray-900 outline-none transition-all duration-200 placeholder:text-gray-300 focus:border-gray-400 focus:shadow-[0_0_0_3px_rgba(156,163,175,0.12)] disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
+        aria-invalid={Boolean(error)}
+        className={cn(
+          'h-11 w-full rounded-lg border bg-white px-3.5 text-sm text-gray-900 outline-none transition-all duration-200 placeholder:text-gray-300 focus:shadow-[0_0_0_3px_rgba(156,163,175,0.12)] disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400',
+          error ? 'border-red-300 focus:border-red-400' : 'border-gray-200 focus:border-gray-400'
+        )}
         {...props}
       />
-      {description ? <span className="mt-1.5 block text-[12px] leading-5 text-gray-400">{description}</span> : null}
+      {error ? <span className="mt-1.5 block text-[12px] leading-5 text-red-600">{error}</span> : null}
+      {!error && description ? <span className="mt-1.5 block text-[12px] leading-5 text-gray-400">{description}</span> : null}
     </label>
   );
 }
@@ -317,12 +324,14 @@ export function AppField({
 export function AppTextarea({
   label,
   description,
+  error,
   id,
   className,
   ...props
 }: TextareaHTMLAttributes<HTMLTextAreaElement> & {
   label: string;
   description?: string;
+  error?: string;
   id: string;
 }) {
   return (
@@ -330,10 +339,15 @@ export function AppTextarea({
       <span className="mb-1.5 block text-xs font-semibold text-gray-700">{label}</span>
       <textarea
         id={id}
-        className="min-h-[112px] w-full resize-none rounded-lg border border-gray-200 bg-white px-3.5 py-3 text-sm leading-relaxed text-gray-900 outline-none transition-all duration-200 placeholder:text-gray-300 focus:border-gray-400 focus:shadow-[0_0_0_3px_rgba(156,163,175,0.12)] disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
+        aria-invalid={Boolean(error)}
+        className={cn(
+          'min-h-[112px] w-full resize-none rounded-lg border bg-white px-3.5 py-3 text-sm leading-relaxed text-gray-900 outline-none transition-all duration-200 placeholder:text-gray-300 focus:shadow-[0_0_0_3px_rgba(156,163,175,0.12)] disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400',
+          error ? 'border-red-300 focus:border-red-400' : 'border-gray-200 focus:border-gray-400'
+        )}
         {...props}
       />
-      {description ? <span className="mt-1.5 block text-[12px] leading-5 text-gray-400">{description}</span> : null}
+      {error ? <span className="mt-1.5 block text-[12px] leading-5 text-red-600">{error}</span> : null}
+      {!error && description ? <span className="mt-1.5 block text-[12px] leading-5 text-gray-400">{description}</span> : null}
     </label>
   );
 }
@@ -341,19 +355,23 @@ export function AppTextarea({
 export function AppSelect({
   label,
   description,
+  error,
   id,
   value,
   onChange,
   options,
   className,
+  disabled = false,
 }: {
   label: string;
   description?: string;
+  error?: string;
   id: string;
   value: string;
   onChange: (value: string) => void;
   options: Array<{ value: string; label: string }>;
   className?: string;
+  disabled?: boolean;
 }) {
   return (
     <label className={cn('block', className)} htmlFor={id}>
@@ -362,7 +380,12 @@ export function AppSelect({
         id={id}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-11 w-full rounded-lg border border-gray-200 bg-white px-3.5 text-sm text-gray-900 outline-none transition-all duration-200 focus:border-gray-400 focus:shadow-[0_0_0_3px_rgba(156,163,175,0.12)]"
+        aria-invalid={Boolean(error)}
+        disabled={disabled}
+        className={cn(
+          'h-11 w-full rounded-lg border bg-white px-3.5 text-sm text-gray-900 outline-none transition-all duration-200 focus:shadow-[0_0_0_3px_rgba(156,163,175,0.12)] disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400',
+          error ? 'border-red-300 focus:border-red-400' : 'border-gray-200 focus:border-gray-400'
+        )}
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -370,7 +393,8 @@ export function AppSelect({
           </option>
         ))}
       </select>
-      {description ? <span className="mt-1.5 block text-[12px] leading-5 text-gray-400">{description}</span> : null}
+      {error ? <span className="mt-1.5 block text-[12px] leading-5 text-red-600">{error}</span> : null}
+      {!error && description ? <span className="mt-1.5 block text-[12px] leading-5 text-gray-400">{description}</span> : null}
     </label>
   );
 }
@@ -380,11 +404,13 @@ export function AppSegmentedControl({
   options,
   value,
   onChange,
+  disabled = false,
 }: {
   label: string;
   options: Array<{ value: string; label: string; description?: string }>;
   value: string;
   onChange: (value: string) => void;
+  disabled?: boolean;
 }) {
   return (
     <fieldset>
@@ -396,9 +422,10 @@ export function AppSegmentedControl({
             <button
               type="button"
               key={option.value}
+              disabled={disabled}
               onClick={() => onChange(option.value)}
               className={cn(
-                'group relative overflow-hidden rounded-xl border px-4 py-3 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 active:scale-[0.99]',
+                'group relative overflow-hidden rounded-xl border px-4 py-3 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60',
                 active ? 'border-gray-400 bg-gray-900 text-white shadow-sm' : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
               )}
               aria-pressed={active}
@@ -490,25 +517,44 @@ export function AppLaunchChecklist({ items }: { items: LaunchChecklistItem[] }) 
 export function AppSaveBar({
   message,
   actionLabel,
+  onAction,
+  disabled = false,
+  loading = false,
+  tone = 'neutral',
 }: {
   message: string;
   actionLabel?: string;
+  onAction?: () => void;
+  disabled?: boolean;
+  loading?: boolean;
+  tone?: LifecycleTone;
 }) {
+  const actionDisabled = disabled || loading || !onAction;
+
   return (
     <motion.div
       initial={{ opacity: 0.9, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.28, ease: appEase }}
-      className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white/90 px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between"
+      className={cn(
+        'flex flex-col gap-3 rounded-2xl border bg-white/90 px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between',
+        toneClasses[tone]
+      )}
     >
-      <p className="text-[13px] leading-5 text-gray-500">{message}</p>
+      <p className="text-[13px] font-medium leading-5">{message}</p>
       {actionLabel ? (
         <button
           type="button"
-          disabled
-          className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm font-semibold text-gray-400"
+          disabled={actionDisabled}
+          onClick={onAction}
+          className={cn(
+            'inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2',
+            actionDisabled
+              ? 'cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400'
+              : 'border-gray-900 bg-gray-900 text-white hover:bg-gray-700'
+          )}
         >
-          {actionLabel}
+          {loading ? 'Speichert...' : actionLabel}
         </button>
       ) : null}
     </motion.div>
@@ -527,7 +573,7 @@ export function AppSkeleton({ label }: { label: string }) {
   );
 }
 
-export function AppErrorState({ message }: { message: string }) {
+export function AppErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
     <div className="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm leading-6 text-red-700">
       <div className="mb-2 flex items-center gap-2 font-semibold">
@@ -535,6 +581,13 @@ export function AppErrorState({ message }: { message: string }) {
         Fehlerzustand
       </div>
       {message}
+      {onRetry ? (
+        <div className="mt-4">
+          <AppButton variant="secondary" icon={RefreshCw} onClick={onRetry}>
+            Erneut laden
+          </AppButton>
+        </div>
+      ) : null}
     </div>
   );
 }
