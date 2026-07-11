@@ -526,42 +526,6 @@ $$;
 revoke execute on function public.generate_daily_execution_plan(date) from anon;
 grant execute on function public.generate_daily_execution_plan(date) to authenticated;
 
--- Oura admin data contains sensitive health data and tokens. Tokens remain service-role only.
-alter table if exists public.oura_connections enable row level security;
-revoke all on table public.oura_connections from anon, authenticated;
-
-do $$
-declare
-  table_name text;
-  policy_name text;
-begin
-  foreach table_name in array array[
-    'oura_daily_sleep',
-    'oura_daily_readiness',
-    'oura_daily_activity',
-    'oura_heart_rate',
-    'oura_sleep_sessions',
-    'oura_workouts',
-    'oura_sessions',
-    'oura_tags',
-    'oura_spo2',
-    'oura_daily_stress',
-    'oura_daily_resilience'
-  ]
-  loop
-    execute format('alter table if exists public.%I enable row level security', table_name);
-    execute format('revoke all on table public.%I from anon', table_name);
-    execute format('grant select on table public.%I to authenticated', table_name);
-    policy_name := table_name || '_platform_admin_select';
-    execute format('drop policy if exists %I on public.%I', policy_name, table_name);
-    execute format(
-      'create policy %I on public.%I for select to authenticated using (public.is_platform_admin())',
-      policy_name,
-      table_name
-    );
-  end loop;
-end $$;
-
 comment on table public.profiles is 'One profile per Supabase Auth user. platform_role is database-owned and never frontend-writable.';
 comment on table public.organizations is 'Tenant root for future AI receptionist product data. Slug is display/routing metadata, not a security boundary.';
 comment on table public.organization_members is 'Membership and tenant role assignments. Protected by RLS plus guard trigger against self-promotion.';

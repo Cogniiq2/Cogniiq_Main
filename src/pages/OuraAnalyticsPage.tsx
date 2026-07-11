@@ -1183,17 +1183,9 @@ export function OuraAnalyticsPage() {
     setIsSyncing(true);
 
     try {
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !sessionData.session?.access_token) {
-        throw new Error('Please sign in as a Cogniiq admin before syncing Oura.');
-      }
-
       const response = await fetch(OURA_SYNC_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${sessionData.session.access_token}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ connection_id: storedConnectionId }),
       });
 

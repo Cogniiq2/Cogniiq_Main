@@ -26,8 +26,6 @@ Phase 0 introduces Auth, platform roles, tenant tables, and admin RLS. Phase 0.1
 | `tasks` | no anon access | CRUD only when `is_platform_admin()` passes | backend bypass only |
 | `execution_days` | no anon access | CRUD only when `is_platform_admin()` passes | backend bypass only |
 | `execution_tasks` | no anon access | CRUD only when `is_platform_admin()` passes | backend bypass only |
-| `oura_connections` | no anon/auth access | no browser table access | server-side token access only |
-| Oura metric tables | no anon access | `select` only for platform admins | sync function writes server-side |
 
 ## Security-Definer Functions
 
@@ -55,14 +53,9 @@ Trigger guard functions are not browser-callable and have execute revoked from `
 
 Centralization is not a security fix. The URLs remain public and need bot protection, rate limits, payload schemas, and safe backend-only forwarding.
 
-## Oura Audit
+## Oura Scope
 
-- Browser clients do not read `oura_connections` and therefore do not receive Oura access or refresh tokens.
-- `sync-oura` uses `SUPABASE_SERVICE_ROLE_KEY` only inside the Edge Function.
-- The function requires a signed-in Supabase user token and checks `profiles.platform_role` server-side before syncing.
-- Each Oura endpoint sync fails independently and returns per-endpoint counts/errors.
-- The external `oura-callback` function is not present in this repository and remains unverified here.
-- `supabase/config.toml` keeps gateway JWT verification off for `sync-oura`; the function performs its own admin JWT verification so CORS preflight and browser calls are not broken by the gateway.
+Oura code and database behavior are intentionally outside this Phase 0 correction. The Phase 0 and Phase 0.1 migrations do not alter Oura tables, policies, grants, or Edge Function behavior.
 
 ## Environment Matrix
 
@@ -70,9 +63,7 @@ Centralization is not a security fix. The URLs remain public and need bot protec
 | --- | --- | --- | --- |
 | `VITE_SUPABASE_URL` | browser | no | Required to initialize Supabase client |
 | `VITE_SUPABASE_ANON_KEY` | browser | no | Public anon key; RLS remains the boundary |
-| `VITE_OURA_CLIENT_ID` | browser | no | OAuth client id metadata |
 | `SUPABASE_SERVICE_ROLE_KEY` | Edge/server only | yes | Never expose to browser |
-| Oura client secret | Edge/server only | yes | Expected in callback function, not present here |
 | n8n auth tokens | Edge/server only | yes | Not implemented yet |
 
-No service-role key, Stripe secret, Vapi private key, or Oura refresh/access token should appear in frontend source.
+No service-role key, Stripe secret, Vapi private key, or backend-only workflow token should appear in frontend source.

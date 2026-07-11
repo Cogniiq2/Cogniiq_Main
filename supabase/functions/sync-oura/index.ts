@@ -161,40 +161,6 @@ function dateRange(body: SyncRequest): { startDate: string; endDate: string; sta
   };
 }
 
-async function requirePlatformAdmin(
-  supabase: ReturnType<typeof createClient>,
-  request: Request,
-): Promise<{ ok: true } | { ok: false; status: number; error: string }> {
-  const authorization = request.headers.get("Authorization") ?? "";
-  const token = authorization.replace(/^Bearer\s+/i, "").trim();
-
-  if (!token) {
-    return { ok: false, status: 401, error: "Missing authorization token" };
-  }
-
-  const { data: userResult, error: userError } = await supabase.auth.getUser(token);
-  if (userError || !userResult.user) {
-    return { ok: false, status: 401, error: "Invalid authorization token" };
-  }
-
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("platform_role")
-    .eq("id", userResult.user.id)
-    .maybeSingle();
-
-  if (profileError) {
-    return { ok: false, status: 500, error: "Unable to verify admin role" };
-  }
-
-  const role = isRecord(profile) ? profile.platform_role : null;
-  if (role !== "cogniiq_admin" && role !== "cogniiq_owner") {
-    return { ok: false, status: 403, error: "Cogniiq admin access required" };
-  }
-
-  return { ok: true };
-}
-
 function endpointUrl(config: EndpointConfig, range: ReturnType<typeof dateRange>): string {
   const url = new URL(`${OURA_API_BASE}${config.path}`);
 
@@ -493,11 +459,6 @@ serve(async (request) => {
   const supabase = createClient(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
-
-  const adminCheck = await requirePlatformAdmin(supabase, request);
-  if (!adminCheck.ok) {
-    return jsonResponse({ error: adminCheck.error }, adminCheck.status);
-  }
 
   let body: SyncRequest;
   try {
