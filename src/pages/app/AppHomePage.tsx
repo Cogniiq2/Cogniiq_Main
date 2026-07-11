@@ -14,19 +14,19 @@ export function AppHomePage() {
     <CustomerAppShell>
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.05)] sm:p-8">
-          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.22em] text-gray-400">Phase 0 Foundation</p>
+          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.22em] text-gray-400">Kundenbereich</p>
           <h1 className="max-w-3xl text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl">
-            Your secure Cogniiq account is active.
+            Ihr sicherer Cogniiq Zugang ist aktiv.
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-6 text-gray-500">
-            This area currently validates authentication, profile provisioning, organization tenancy, and secure route
-            protection. The AI receptionist workspace will be provisioned later through the controlled commercial flow.
+            Hier entstehen die geschuetzten Werkzeuge fuer Onboarding, KI-Rezeptionist, Wissensbasis und Konto.
+            Inhalte erscheinen erst, wenn echte Kundendaten und echte Systeme verbunden sind.
           </p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
-            <StatusTile icon={UserRound} label="Identity" value={profile ? 'Profile ready' : 'Provisioning'} />
-            <StatusTile icon={Building2} label="Organizations" value={memberships.length ? `${memberships.length} active` : 'None yet'} />
-            <StatusTile icon={ShieldCheck} label="Role" value={profile?.platform_role ?? 'Loading'} />
+            <StatusTile icon={UserRound} label="Profil" value={profile ? 'Bereit' : 'Wird geladen'} />
+            <StatusTile icon={Building2} label="Organisation" value={memberships.length ? `${memberships.length} aktiv` : 'Keine'} />
+            <StatusTile icon={ShieldCheck} label="Rolle" value={profile?.platform_role ?? 'Wird geladen'} />
           </div>
 
           {memberships.length === 0 && (
@@ -34,16 +34,16 @@ export function AppHomePage() {
               <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500">
                 <Sparkles size={17} />
               </div>
-              <h2 className="text-lg font-bold tracking-tight text-gray-950">No AI receptionist workspace yet</h2>
+              <h2 className="text-lg font-bold tracking-tight text-gray-950">Noch kein KI-Rezeptionisten Workspace</h2>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">
-                Ordinary signup does not create an organization or product workspace. That will happen later after
-                Stripe checkout or explicit Cogniiq provisioning, which keeps tenant creation controlled.
+                Eine normale Anmeldung erstellt noch keine Organisation und keine Produktdaten. Der Workspace wird
+                erst nach ausdruecklicher Cogniiq Provisionierung aktiviert.
               </p>
               <Link
-                to="/ki-telefonassistent"
+                to="/app/onboarding"
                 className="mt-5 inline-flex rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-800 transition-colors hover:border-gray-300 hover:bg-gray-100"
               >
-                View AI receptionist offer
+                Onboarding ansehen
               </Link>
             </div>
           )}
@@ -51,30 +51,30 @@ export function AppHomePage() {
 
         <aside className="space-y-6">
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.05)]">
-            <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Profile</p>
+            <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Profil</p>
             <dl className="space-y-4 text-sm">
               <div>
                 <dt className="text-xs font-semibold text-gray-400">Name</dt>
-                <dd className="mt-1 font-medium text-gray-900">{profile?.full_name || 'Not set'}</dd>
+                <dd className="mt-1 font-medium text-gray-900">{profile?.full_name || 'Nicht gesetzt'}</dd>
               </div>
               <div>
-                <dt className="text-xs font-semibold text-gray-400">Email</dt>
+                <dt className="text-xs font-semibold text-gray-400">E-Mail</dt>
                 <dd className="mt-1 break-words font-medium text-gray-900">{profile?.email ?? user?.email}</dd>
               </div>
               <div>
-                <dt className="text-xs font-semibold text-gray-400">Platform role</dt>
-                <dd className="mt-1 font-medium text-gray-900">{profile?.platform_role ?? 'Loading'}</dd>
+                <dt className="text-xs font-semibold text-gray-400">Rolle</dt>
+                <dd className="mt-1 font-medium text-gray-900">{profile?.platform_role ?? 'Wird geladen'}</dd>
               </div>
             </dl>
           </div>
 
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.05)]">
-            <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Memberships</p>
+            <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Organisationen</p>
             {memberships.length ? (
               <div className="space-y-3">
                 {memberships.map((membership) => (
                   <div key={membership.id} className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
-                    <p className="text-sm font-semibold text-gray-900">{membership.organization?.name ?? 'Unnamed organization'}</p>
+                    <p className="text-sm font-semibold text-gray-900">{membership.organization?.name ?? 'Unbenannte Organisation'}</p>
                     <p className="mt-1 text-xs text-gray-500">
                       {membership.role} - {membership.status}
                     </p>
@@ -82,7 +82,7 @@ export function AppHomePage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm leading-6 text-gray-500">No organization membership has been provisioned yet.</p>
+              <p className="text-sm leading-6 text-gray-500">Noch keine Organisationsmitgliedschaft provisioniert.</p>
             )}
           </div>
         </aside>

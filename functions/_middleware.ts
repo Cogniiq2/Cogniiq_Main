@@ -23,6 +23,12 @@ export async function onRequest(context: any) {
     pathname = pathname.slice(0, -1);
   }
 
+  const isPrivateSurface =
+    pathname === '/app' ||
+    pathname.startsWith('/app/') ||
+    pathname === '/admin' ||
+    pathname.startsWith('/admin/');
+
   const seoConfig: Record<string, { title: string; description: string; canonical: string; keywords?: string }> = {
     '/': {
       title: 'Cogniiq – KI-Telefonassistent, Webdesign & Automatisierung für Unternehmen in Bayern',
@@ -503,6 +509,20 @@ export async function onRequest(context: any) {
   const headers = new Headers(response.headers);
   headers.set('Content-Type', 'text/html; charset=utf-8');
   headers.set('Cache-Control', 'no-cache');
+
+  if (isPrivateSurface) {
+    headers.set('X-Robots-Tag', 'noindex, nofollow');
+    html = html.replace(
+      /<title>[^<]*<\/title>/,
+      pathname.startsWith('/admin') ? '<title>Cogniiq Admin</title>' : '<title>Cogniiq Kundenbereich</title>'
+    );
+    html = html.replace(/(<meta\s+name="robots"\s+content=")[^"]*/i, '$1noindex, nofollow');
+
+    return new Response(html, {
+      status: 200,
+      headers,
+    });
+  }
 
   if (!config) {
     return new Response(html, {
