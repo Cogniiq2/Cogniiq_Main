@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import type { Variants } from "framer-motion";
 import { CircleCheck as CheckCircle2, ArrowRight, MapPin, ChevronRight, Info, Phone, Building2, Lightbulb } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -12,12 +13,14 @@ import { RelatedPages } from "@/components/RelatedPages";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 import type { CityServiceConfig } from "@/lib/standorte-data";
 
-const fadeUp = {
+const smoothEase = [0.22, 1, 0.36, 1] as const;
+
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 24 },
   visible: (delay = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.55, delay, ease: smoothEase },
   }),
 };
 
