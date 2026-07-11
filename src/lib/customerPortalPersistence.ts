@@ -23,14 +23,23 @@ export const onboardingStatusValues = [
 export type OnboardingStatus = (typeof onboardingStatusValues)[number];
 
 export const onboardingGoalOptions = [
-  'Hauefige Fragen beantworten',
-  'Leads erfassen',
-  'Anrufe weiterleiten',
-  'Terminwuensche aufnehmen',
-  'After-hours beantworten',
-  'Mehrsprachige Anfragen vorbereiten',
+  'answer_faqs',
+  'capture_leads',
+  'transfer_calls',
+  'capture_appointments',
+  'after_hours',
+  'multilingual',
 ] as const;
 export type OnboardingGoal = (typeof onboardingGoalOptions)[number];
+
+export const onboardingGoalLabels: Record<OnboardingGoal, string> = {
+  answer_faqs: 'Hauefige Fragen beantworten',
+  capture_leads: 'Leads erfassen',
+  transfer_calls: 'Anrufe weiterleiten',
+  capture_appointments: 'Terminwuensche aufnehmen',
+  after_hours: 'After-hours beantworten',
+  multilingual: 'Mehrsprachige Anfragen vorbereiten',
+};
 
 export const receptionistToneOptions = ['professional', 'warm', 'concise', 'formal'] as const;
 export type ReceptionistTone = (typeof receptionistToneOptions)[number];

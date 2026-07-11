@@ -105,12 +105,12 @@ create table public.onboarding_sessions (
   ),
   constraint onboarding_sessions_selected_goals_check check (
     selected_goals <@ array[
-      'Hauefige Fragen beantworten',
-      'Leads erfassen',
-      'Anrufe weiterleiten',
-      'Terminwuensche aufnehmen',
-      'After-hours beantworten',
-      'Mehrsprachige Anfragen vorbereiten'
+      'answer_faqs',
+      'capture_leads',
+      'transfer_calls',
+      'capture_appointments',
+      'after_hours',
+      'multilingual'
     ]::text[]
   )
 );
@@ -242,6 +242,66 @@ $$;
 comment on function public.set_onboarding_session_lifecycle_timestamps() is
   'Maintains onboarding lifecycle timestamps without frontend-controlled timestamp writes.';
 
+create or replace function public.guard_onboarding_session_system_fields()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+begin
+  if public.is_database_admin() or public.request_is_service_role() then
+    return new;
+  end if;
+
+  if new.status not in ('not_started', 'in_progress') then
+    raise exception 'onboarding status is system-controlled';
+  end if;
+
+  if tg_op = 'INSERT' then
+    if new.last_error is not null then
+      raise exception 'onboarding last_error is system-controlled';
+    end if;
+
+    if new.started_at is not null then
+      raise exception 'onboarding started_at is system-controlled';
+    end if;
+
+    if new.completed_at is not null then
+      raise exception 'onboarding completed_at is system-controlled';
+    end if;
+
+    return new;
+  end if;
+
+  if new.organization_id is distinct from old.organization_id
+    or new.business_id is distinct from old.business_id
+    or new.id is distinct from old.id then
+    raise exception 'onboarding tenant and identity fields cannot be changed';
+  end if;
+
+  if new.last_error is distinct from old.last_error then
+    raise exception 'onboarding last_error is system-controlled';
+  end if;
+
+  if new.started_at is distinct from old.started_at then
+    raise exception 'onboarding started_at is system-controlled';
+  end if;
+
+  if new.completed_at is distinct from old.completed_at then
+    raise exception 'onboarding completed_at is system-controlled';
+  end if;
+
+  if new.created_at is distinct from old.created_at
+    or new.updated_at is distinct from old.updated_at then
+    raise exception 'onboarding timestamps are system-controlled';
+  end if;
+
+  return new;
+end;
+$$;
+
+comment on function public.guard_onboarding_session_system_fields() is
+  'Blocks browser customers from claiming backend-controlled onboarding lifecycle states or system fields.';
+
 create or replace function public.guard_phone_config_system_fields()
 returns trigger
 language plpgsql
@@ -286,6 +346,10 @@ for each row execute function public.set_customer_product_timestamps();
 create trigger onboarding_sessions_set_customer_product_timestamps
 before insert or update on public.onboarding_sessions
 for each row execute function public.set_customer_product_timestamps();
+
+create trigger onboarding_sessions_guard_system_fields
+before insert or update on public.onboarding_sessions
+for each row execute function public.guard_onboarding_session_system_fields();
 
 create trigger onboarding_sessions_set_lifecycle_timestamps
 before insert or update on public.onboarding_sessions
@@ -501,8 +565,10 @@ grant select, insert, update, delete on table public.phone_configs to service_ro
 
 revoke execute on function public.set_customer_product_timestamps() from public, anon, authenticated;
 revoke execute on function public.set_onboarding_session_lifecycle_timestamps() from public, anon, authenticated;
+revoke execute on function public.guard_onboarding_session_system_fields() from public, anon, authenticated;
 revoke execute on function public.guard_phone_config_system_fields() from public, anon, authenticated;
 
 grant execute on function public.set_customer_product_timestamps() to service_role;
 grant execute on function public.set_onboarding_session_lifecycle_timestamps() to service_role;
+grant execute on function public.guard_onboarding_session_system_fields() to service_role;
 grant execute on function public.guard_phone_config_system_fields() to service_role;

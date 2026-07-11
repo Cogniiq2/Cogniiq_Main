@@ -143,6 +143,23 @@ begin
     raise exception 'Cross-tenant onboarding composite foreign key missing';
   end if;
 
+  if to_regprocedure('public.guard_onboarding_session_system_fields()') is null then
+    raise exception 'Onboarding system-field guard function missing';
+  end if;
+
+  if not exists (
+    select 1
+    from pg_trigger tr
+    join pg_class c on c.oid = tr.tgrelid
+    join pg_namespace n on n.oid = c.relnamespace
+    where n.nspname = 'public'
+      and c.relname = 'onboarding_sessions'
+      and tr.tgname = 'onboarding_sessions_guard_system_fields'
+      and not tr.tgisinternal
+  ) then
+    raise exception 'Onboarding system-field guard trigger missing';
+  end if;
+
   if not exists (
     select 1
     from pg_indexes
@@ -250,7 +267,7 @@ begin
     'in_progress',
     'goals',
     array['company']::text[],
-    array['Leads erfassen']::text[],
+    array['capture_leads']::text[],
     'Freundlich und kurz'
   )
   returning id into inserted_session_id;
@@ -405,6 +422,248 @@ begin
     raise exception 'TEST FAILED: cross-tenant child insertion unexpectedly succeeded';
   end if;
 end $$;
+
+do $$
+declare
+  row_count integer;
+  blocked boolean;
+  protected_status text;
+begin
+  update public.onboarding_sessions
+  set status = 'not_started'
+  where id = current_setting('rp.onboarding_a')::uuid;
+
+  get diagnostics row_count = ROW_COUNT;
+  if row_count <> 1 then
+    raise exception 'TEST FAILED: owner should set not_started, affected % rows', row_count;
+  end if;
+
+  update public.onboarding_sessions
+  set status = 'in_progress'
+  where id = current_setting('rp.onboarding_a')::uuid;
+
+  get diagnostics row_count = ROW_COUNT;
+  if row_count <> 1 then
+    raise exception 'TEST FAILED: owner should set in_progress, affected % rows', row_count;
+  end if;
+
+  blocked := false;
+  begin
+    insert into public.onboarding_sessions (
+      organization_id,
+      business_id,
+      status,
+      current_step,
+      completed_steps,
+      selected_goals,
+      preferred_behavior
+    )
+    values (
+      current_setting('rp.org_a')::uuid,
+      current_setting('rp.business_a')::uuid,
+      'research_running',
+      'company',
+      array[]::text[],
+      array[]::text[],
+      null
+    );
+  exception
+    when raise_exception then
+      blocked := true;
+  end;
+
+  if not blocked then
+    raise exception 'TEST FAILED: owner inserted protected onboarding status research_running';
+  end if;
+
+  foreach protected_status in array array[
+    'research_queued',
+    'research_running',
+    'review_required',
+    'ready_for_test',
+    'ready_for_launch',
+    'live',
+    'paused',
+    'error'
+  ] loop
+    blocked := false;
+
+    begin
+      update public.onboarding_sessions
+      set status = protected_status
+      where id = current_setting('rp.onboarding_a')::uuid;
+    exception
+      when insufficient_privilege or raise_exception or check_violation then
+        blocked := true;
+    end;
+
+    if not blocked then
+      raise exception 'TEST FAILED: owner set protected onboarding status %', protected_status;
+    end if;
+  end loop;
+end $$;
+
+do $$
+declare
+  blocked boolean := false;
+begin
+  begin
+    update public.onboarding_sessions
+    set last_error = 'customer-controlled error'
+    where id = current_setting('rp.onboarding_a')::uuid;
+  exception
+    when insufficient_privilege or raise_exception then
+      blocked := true;
+  end;
+
+  if not blocked then
+    raise exception 'TEST FAILED: customer manipulated onboarding last_error';
+  end if;
+end $$;
+
+do $$
+declare
+  blocked boolean := false;
+begin
+  begin
+    update public.onboarding_sessions
+    set started_at = '2000-01-01 00:00:00+00'::timestamptz
+    where id = current_setting('rp.onboarding_a')::uuid;
+  exception
+    when insufficient_privilege or raise_exception then
+      blocked := true;
+  end;
+
+  if not blocked then
+    raise exception 'TEST FAILED: customer manipulated onboarding started_at';
+  end if;
+end $$;
+
+do $$
+declare
+  blocked boolean := false;
+begin
+  begin
+    update public.onboarding_sessions
+    set completed_at = '2000-01-01 00:00:00+00'::timestamptz
+    where id = current_setting('rp.onboarding_a')::uuid;
+  exception
+    when insufficient_privilege or raise_exception then
+      blocked := true;
+  end;
+
+  if not blocked then
+    raise exception 'TEST FAILED: customer manipulated onboarding completed_at';
+  end if;
+end $$;
+
+do $$
+declare
+  row_count integer;
+  tested_value text;
+begin
+  update public.onboarding_sessions
+  set current_step = 'continue',
+      completed_steps = array['company', 'goals', 'research', 'review', 'continue']::text[],
+      selected_goals = array[
+        'answer_faqs',
+        'capture_leads',
+        'transfer_calls',
+        'capture_appointments',
+        'after_hours',
+        'multilingual'
+      ]::text[],
+      preferred_behavior = 'Frontend value compatibility test'
+  where id = current_setting('rp.onboarding_a')::uuid;
+
+  get diagnostics row_count = ROW_COUNT;
+  if row_count <> 1 then
+    raise exception 'TEST FAILED: frontend onboarding values should satisfy SQL constraints';
+  end if;
+
+  foreach tested_value in array array['professional', 'warm', 'concise', 'formal'] loop
+    update public.receptionist_configs
+    set tone = tested_value
+    where business_id = current_setting('rp.business_a')::uuid;
+
+    get diagnostics row_count = ROW_COUNT;
+    if row_count <> 1 then
+      raise exception 'TEST FAILED: receptionist tone % should satisfy SQL constraints', tested_value;
+    end if;
+  end loop;
+
+  update public.receptionist_configs
+  set primary_language = 'en',
+      additional_languages = array['de']::text[]
+  where business_id = current_setting('rp.business_a')::uuid;
+
+  get diagnostics row_count = ROW_COUNT;
+  if row_count <> 1 then
+    raise exception 'TEST FAILED: frontend language values should satisfy SQL constraints';
+  end if;
+
+  foreach tested_value in array array['ai-number', 'forwarding'] loop
+    update public.phone_configs
+    set setup_mode = tested_value
+    where id = current_setting('rp.phone_a')::uuid;
+
+    get diagnostics row_count = ROW_COUNT;
+    if row_count <> 1 then
+      raise exception 'TEST FAILED: phone setup mode % should satisfy SQL constraints', tested_value;
+    end if;
+  end loop;
+end $$;
+
+reset role;
+set local role service_role;
+select set_config('request.jwt.claim.role', 'service_role', true);
+select set_config('request.jwt.claim.sub', current_setting('rp.platform_admin'), true);
+
+do $$
+declare
+  row_count integer;
+  backend_status text;
+begin
+  foreach backend_status in array array[
+    'research_queued',
+    'research_running',
+    'review_required',
+    'ready_for_test',
+    'ready_for_launch',
+    'live',
+    'paused',
+    'error'
+  ] loop
+    update public.onboarding_sessions
+    set status = backend_status,
+        last_error = case when backend_status = 'error' then 'Trusted backend error' else last_error end
+    where id = current_setting('rp.onboarding_a')::uuid;
+
+    get diagnostics row_count = ROW_COUNT;
+    if row_count <> 1 then
+      raise exception 'TEST FAILED: service role should set backend onboarding status %', backend_status;
+    end if;
+  end loop;
+
+  update public.onboarding_sessions
+  set status = 'live'
+  where id = current_setting('rp.onboarding_a')::uuid;
+
+  select count(*) into row_count
+  from public.onboarding_sessions
+  where id = current_setting('rp.onboarding_a')::uuid
+    and status = 'live'
+    and completed_at is not null;
+
+  if row_count <> 1 then
+    raise exception 'TEST FAILED: service role live status should keep lifecycle timestamps server-controlled';
+  end if;
+end $$;
+
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claim.role', 'authenticated', true);
+select set_config('request.jwt.claim.sub', current_setting('rp.customer_a'), true);
 
 do $$
 declare
