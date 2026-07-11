@@ -1,5 +1,5 @@
-import { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
+import { BrowserRouter as Router, Navigate, Routes, Route, useLocation } from 'react-router-dom';
 
 import { PageReveal } from './components/PageReveal';
 import { Navigation } from './components/Navigation';
@@ -25,6 +25,44 @@ function lazyNamed<T extends Record<string, any>, K extends keyof T>(
 
 function PageFallback() {
   return null;
+}
+
+const DEFAULT_ROBOTS = 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
+
+function setMeta(name: string, content: string) {
+  let el = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
+  if (!el) {
+    el = document.createElement('meta');
+    el.setAttribute('name', name);
+    document.head.appendChild(el);
+  }
+  el.setAttribute('content', content);
+}
+
+function isPrivateSurface(pathname: string) {
+  return pathname === '/app' || pathname.startsWith('/app/') || pathname === '/admin' || pathname.startsWith('/admin/');
+}
+
+function RouteIndexabilityManager() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    if (isPrivateSurface(pathname)) {
+      setMeta('robots', 'noindex, nofollow');
+      document.title = pathname.startsWith('/admin') ? 'Cogniiq Admin' : 'Cogniiq Kundenbereich';
+      return;
+    }
+
+    setMeta('robots', DEFAULT_ROBOTS);
+  }, [pathname]);
+
+  return null;
+}
+
+function PublicStructuredData() {
+  const { pathname } = useLocation();
+  if (isPrivateSurface(pathname)) return null;
+  return <LocalBusinessSchema />;
 }
 
 // Core pages
@@ -276,7 +314,9 @@ const ScanPage = lazyNamed(() => import('./pages/ScanPage'), 'ScanPage');
 const AdminPage = lazyNamed(() => import('./pages/AdminPage'), 'AdminPage');
 const ExecutionPage = lazyNamed(() => import('./pages/ExecutionPage'), 'ExecutionPage');
 const OuraAnalyticsPage = lazyNamed(() => import('./pages/OuraAnalyticsPage'), 'OuraAnalyticsPage');
+const AdminLoginPage = lazyNamed(() => import('./pages/admin/AdminLoginPage'), 'AdminLoginPage');
 const AppHomePage = lazyNamed(() => import('./pages/app/AppHomePage'), 'AppHomePage');
+const CustomerSectionPage = lazyNamed(() => import('./pages/app/CustomerSectionPage'), 'CustomerSectionPage');
 const LoginPage = lazyNamed(() => import('./pages/app/LoginPage'), 'LoginPage');
 const SignupPage = lazyNamed(() => import('./pages/app/SignupPage'), 'SignupPage');
 const ForgotPasswordPage = lazyNamed(() => import('./pages/app/ForgotPasswordPage'), 'ForgotPasswordPage');
@@ -287,6 +327,13 @@ function AppInner() {
   const adminHashPath = location.hash.split('?')[0];
 
   if (location.pathname.startsWith('/admin')) {
+    if (location.pathname === '/admin/login') {
+      return (
+        <Suspense fallback={<PageFallback />}>
+          <AdminLoginPage />
+        </Suspense>
+      );
+    }
     if (location.pathname === '/admin/execution') {
       return (
         <Suspense fallback={<PageFallback />}>
@@ -325,10 +372,82 @@ function AppInner() {
             }
           />
           <Route
+            path="/app/onboarding"
+            element={
+              <ProtectedRoute>
+                <CustomerSectionPage section="onboarding" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/receptionist"
+            element={
+              <ProtectedRoute>
+                <CustomerSectionPage section="receptionist" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/knowledge"
+            element={
+              <ProtectedRoute>
+                <CustomerSectionPage section="knowledge" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/phone"
+            element={
+              <ProtectedRoute>
+                <CustomerSectionPage section="phone" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/test"
+            element={
+              <ProtectedRoute>
+                <CustomerSectionPage section="test" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/calls"
+            element={
+              <ProtectedRoute>
+                <CustomerSectionPage section="calls" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/leads"
+            element={
+              <ProtectedRoute>
+                <CustomerSectionPage section="leads" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/billing"
+            element={
+              <ProtectedRoute>
+                <CustomerSectionPage section="billing" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/settings"
+            element={
+              <ProtectedRoute>
+                <CustomerSectionPage section="settings" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/app/*"
             element={
               <ProtectedRoute>
-                <AppHomePage />
+                <Navigate to="/app" replace />
               </ProtectedRoute>
             }
           />
@@ -459,8 +578,9 @@ function App() {
   return (
     <Router>
       <AuthProvider>
+        <RouteIndexabilityManager />
         <CanonicalManager />
-        <LocalBusinessSchema />
+        <PublicStructuredData />
         <AppInner />
       </AuthProvider>
     </Router>

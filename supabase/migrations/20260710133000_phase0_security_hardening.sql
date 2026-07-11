@@ -340,6 +340,3 @@ grant execute on function public.is_platform_admin() to service_role;
 grant execute on function public.is_organization_member(uuid) to service_role;
 grant execute on function public.has_organization_role(uuid, public.organization_role[]) to service_role;
 grant execute on function public.current_user_organization_ids() to service_role;
-
-revoke execute on function public.generate_daily_execution_plan(date) from public, anon;
-grant execute on function public.generate_daily_execution_plan(date) to authenticated;

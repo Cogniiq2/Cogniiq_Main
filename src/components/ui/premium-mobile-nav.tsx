@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Chrome as Home, Briefcase, Users, CircleHelp as HelpCircle, Mail, MapPin, ChevronDown, X, ArrowRight, ArrowUpRight, Star, BookOpen } from 'lucide-react';
+import { Chrome as Home, Briefcase, Users, CircleHelp as HelpCircle, Mail, MapPin, ChevronDown, X, ArrowRight, ArrowUpRight, Star, BookOpen, UserRound } from 'lucide-react';
 import { CITY_LINKS } from '@/lib/standorte-data';
 import { Logo } from '@/components/Logo';
+import { useAuth } from '@/contexts/AuthContext';
 
 const leistungenItems = [
   {
@@ -88,10 +89,15 @@ export function PremiumMobileNav() {
   const [showStandorte, setShowStandorte] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, isLoading } = useAuth();
   const touchStartY = useRef(0);
   const touchEndY = useRef(0);
 
   const activeSection = getActiveSection(location.pathname);
+  const customerNav = {
+    label: !isLoading && user ? 'Dashboard' : 'Kundenlogin',
+    href: !isLoading && user ? '/app' : '/app/login',
+  };
 
   useEffect(() => {
     setIsOpen(false);
@@ -355,12 +361,20 @@ export function PremiumMobileNav() {
                       onClick={() => go('/blog')}
                     />
 
+                    <NavRow
+                      icon={UserRound}
+                      label={customerNav.label}
+                      isActive={false}
+                      delay={0.24}
+                      onClick={() => go(customerNav.href)}
+                    />
+
                     {/* KONTAKT */}
                     <NavRow
                       icon={Mail}
                       label="Kontakt"
                       isActive={activeSection === 'kontakt'}
-                      delay={0.26}
+                      delay={0.28}
                       onClick={() => go('/kontakt')}
                     />
 

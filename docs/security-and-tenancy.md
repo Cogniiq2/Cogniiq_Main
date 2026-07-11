@@ -158,7 +158,7 @@ create policy "example_select_org_members"
 
 ## Backend Automation
 
-Stripe, Vapi, n8n, Oura, and research workflows must write protected tenant data through one of:
+Stripe, Vapi, n8n, and research workflows must write protected tenant data through one of:
 
 - verified Supabase Edge Function using the service role key server-side only
 - fixed-destination workflow webhook called by backend code, not the browser
@@ -184,7 +184,7 @@ Each future Edge Function needs fixed destination, schema validation, method res
 4. Verify `public.profiles` has exactly one row for each intended Auth user.
 5. Assign the first `cogniiq_owner` using the UUID procedure above.
 6. Run `supabase/tests/phase0_rls_verification.sql` with real staging Auth user UUIDs.
-7. Confirm `/admin`, `/admin/execution`, and `/admin/#/oura-analytics` work for the owner.
+7. Confirm `/admin` and `/admin/execution` work for the owner.
 8. Deploy frontend authentication/admin changes.
 9. Test public pages, `/app`, `/app/login`, `/app/reset-password`, and `/admin` direct navigation.
 10. Monitor Supabase database, Auth, and Edge Function logs.

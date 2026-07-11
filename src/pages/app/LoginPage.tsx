@@ -8,7 +8,7 @@ import { supabase } from '@/lib/supabase';
 function getSafeRedirectPath(value: string | null): string {
   if (!value) return '/app';
   if (!value.startsWith('/') || value.startsWith('//')) return '/app';
-  if (!value.startsWith('/app') && !value.startsWith('/admin')) return '/app';
+  if (!value.startsWith('/app')) return '/app';
   return value;
 }
 
@@ -44,21 +44,21 @@ export function LoginPage() {
 
   return (
     <AuthPageLayout
-      eyebrow="Customer Access"
-      title="Sign in"
-      description="Access the secure Cogniiq customer area."
+      eyebrow="Kundenbereich"
+      title="Kundenlogin"
+      description="Melden Sie sich im sicheren Cogniiq Kundenbereich an."
       footer={
         <p className="text-sm text-gray-500">
-          No account yet?{' '}
+          Noch kein Konto?{' '}
           <Link to="/app/signup" className="font-semibold text-gray-900 hover:text-gray-600">
-            Create one
+            Konto erstellen
           </Link>
         </p>
       }
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <label className="block">
-          <span className="mb-1.5 block text-xs font-semibold text-gray-700">Email</span>
+          <span className="mb-1.5 block text-xs font-semibold text-gray-700">E-Mail</span>
           <input
             type="email"
             required
@@ -66,11 +66,11 @@ export function LoginPage() {
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-400"
-            placeholder="you@company.com"
+            placeholder="sie@unternehmen.de"
           />
         </label>
         <label className="block">
-          <span className="mb-1.5 block text-xs font-semibold text-gray-700">Password</span>
+          <span className="mb-1.5 block text-xs font-semibold text-gray-700">Passwort</span>
           <input
             type="password"
             required
@@ -78,13 +78,13 @@ export function LoginPage() {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-400"
-            placeholder="Your password"
+            placeholder="Ihr Passwort"
           />
         </label>
 
         <div className="flex items-center justify-between">
           <Link to="/app/forgot-password" className="text-xs font-semibold text-gray-500 transition-colors hover:text-gray-900">
-            Forgot password?
+            Passwort vergessen?
           </Link>
         </div>
 
@@ -99,7 +99,7 @@ export function LoginPage() {
           disabled={loading}
           className="group inline-flex w-full items-center justify-between rounded-xl bg-gray-950 px-5 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-300"
         >
-          {loading ? 'Signing in...' : 'Sign in'}
+          {loading ? 'Anmeldung...' : 'Einloggen'}
           <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
         </button>
       </form>

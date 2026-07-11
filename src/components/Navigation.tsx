@@ -5,14 +5,20 @@ import { ChevronDown, ArrowUpRight } from 'lucide-react';
 import { Logo } from './Logo';
 import { PremiumMobileNav } from './ui/premium-mobile-nav';
 import { ScrollProgress } from './ScrollProgress';
+import { useAuth } from '@/contexts/AuthContext';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const { user, isLoading } = useAuth();
   const location = useLocation();
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const customerNav = {
+    label: !isLoading && user ? 'Dashboard' : 'Kundenlogin',
+    href: !isLoading && user ? '/app' : '/app/login',
+  };
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 40);
@@ -137,6 +143,12 @@ export function Navigation() {
                 href="/blog"
                 isActive={location.pathname.startsWith('/blog')}
               />
+              <SimpleNavItem
+                label={customerNav.label}
+                href={customerNav.href}
+                isActive={location.pathname.startsWith('/app')}
+                className="min-w-[96px] text-center"
+              />
               <Link
                 to="/kontakt"
                 className="group relative flex items-center gap-1.5 px-5 py-2.5 bg-gray-950 dark:bg-white text-white dark:text-gray-950 text-[13px] font-semibold tracking-wide rounded-full overflow-hidden transition-all duration-300 hover:shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:scale-[1.02] active:scale-[0.99]"
@@ -176,14 +188,24 @@ export function Navigation() {
 }
 
 /* ─── Simple nav item ─────────────────────────────────────────────────── */
-function SimpleNavItem({ label, href, isActive }: { label: string; href: string; isActive: boolean }) {
+function SimpleNavItem({
+  label,
+  href,
+  isActive,
+  className = '',
+}: {
+  label: string;
+  href: string;
+  isActive: boolean;
+  className?: string;
+}) {
   const [hovered, setHovered] = useState(false);
   return (
     <Link
       to={href}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="relative px-4 py-2 group"
+      className={`relative px-4 py-2 group ${className}`}
     >
       <span className={`text-[13px] font-medium tracking-wide transition-colors duration-200 ${
         isActive ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
