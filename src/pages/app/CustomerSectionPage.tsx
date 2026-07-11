@@ -72,6 +72,7 @@ import {
   makeOnboardingDraft,
   makePhoneDraft,
   makeReceptionistDraft,
+  onboardingGoalLabels,
   onboardingGoalOptions,
   receptionistAllowedActionOptions,
   receptionistProhibitedActionOptions,
@@ -385,7 +386,7 @@ function OnboardingExperience() {
                       aria-pressed={active}
                     >
                       {active ? <CheckCircle2 size={16} aria-hidden="true" /> : <Circle size={16} className="text-gray-300" aria-hidden="true" />}
-                      {goal}
+                      {onboardingGoalLabels[goal]}
                     </button>
                   );
                 })}
