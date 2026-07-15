@@ -296,9 +296,9 @@ begin
     array['en']::text[],
     'Guten Tag',
     'professional',
-    '["FAQs beantworten"]'::jsonb,
-    '["Nachrichten aufnehmen"]'::jsonb,
-    '["Keine Preise erfinden"]'::jsonb,
+    '["answer_faqs"]'::jsonb,
+    '["take_messages"]'::jsonb,
+    '["no_invented_prices"]'::jsonb,
     '{"instruction":"Nachricht aufnehmen"}'::jsonb,
     '{"instruction":"Bei Unsicherheit uebergeben"}'::jsonb
   );
@@ -340,10 +340,11 @@ begin
   select count(*) into row_count
   from public.onboarding_sessions
   where id = inserted_session_id
+    and status = 'in_progress'
     and started_at is not null;
 
   if row_count <> 1 then
-    raise exception 'TEST FAILED: onboarding started_at should be maintained by trigger';
+    raise exception 'TEST FAILED: owner should insert initial in_progress onboarding status with server started_at';
   end if;
 end $$;
 
@@ -352,6 +353,7 @@ select set_config('request.jwt.claim.sub', current_setting('rp.customer_b'), tru
 do $$
 declare
   inserted_business_id uuid;
+  inserted_session_id uuid;
   row_count integer;
 begin
   insert into public.businesses (organization_id, name)
@@ -359,6 +361,37 @@ begin
   returning id into inserted_business_id;
 
   perform set_config('rp.business_b', inserted_business_id::text, true);
+
+  insert into public.onboarding_sessions (
+    organization_id,
+    business_id,
+    status,
+    current_step,
+    completed_steps,
+    selected_goals,
+    preferred_behavior
+  )
+  values (
+    current_setting('rp.org_b')::uuid,
+    inserted_business_id,
+    'not_started',
+    'company',
+    array[]::text[],
+    array[]::text[],
+    null
+  )
+  returning id into inserted_session_id;
+
+  perform set_config('rp.onboarding_b', inserted_session_id::text, true);
+
+  select count(*) into row_count
+  from public.onboarding_sessions
+  where id = inserted_session_id
+    and status = 'not_started';
+
+  if row_count <> 1 then
+    raise exception 'TEST FAILED: owner should insert initial not_started onboarding status';
+  end if;
 
   select count(*) into row_count
   from public.businesses
@@ -430,21 +463,38 @@ declare
   protected_status text;
 begin
   update public.onboarding_sessions
-  set status = 'not_started'
+  set current_step = 'review',
+      completed_steps = array['company', 'goals']::text[],
+      selected_goals = array['capture_leads']::text[],
+      preferred_behavior = 'Customer-editable onboarding update'
   where id = current_setting('rp.onboarding_a')::uuid;
 
   get diagnostics row_count = ROW_COUNT;
   if row_count <> 1 then
-    raise exception 'TEST FAILED: owner should set not_started, affected % rows', row_count;
+    raise exception 'TEST FAILED: owner should edit customer-controlled onboarding fields, affected % rows', row_count;
   end if;
 
-  update public.onboarding_sessions
-  set status = 'in_progress'
-  where id = current_setting('rp.onboarding_a')::uuid;
+  select count(*) into row_count
+  from public.onboarding_sessions
+  where id = current_setting('rp.onboarding_a')::uuid
+    and status = 'in_progress';
 
-  get diagnostics row_count = ROW_COUNT;
   if row_count <> 1 then
-    raise exception 'TEST FAILED: owner should set in_progress, affected % rows', row_count;
+    raise exception 'TEST FAILED: customer-controlled onboarding edit changed status';
+  end if;
+
+  blocked := false;
+  begin
+    update public.onboarding_sessions
+    set status = 'not_started'
+    where id = current_setting('rp.onboarding_a')::uuid;
+  exception
+    when insufficient_privilege or raise_exception then
+      blocked := true;
+  end;
+
+  if not blocked then
+    raise exception 'TEST FAILED: owner changed onboarding status on update';
   end if;
 
   blocked := false;
@@ -593,6 +643,47 @@ begin
   end loop;
 
   update public.receptionist_configs
+  set responsibilities = '[
+        "answer_faqs",
+        "capture_leads",
+        "take_messages",
+        "transfer_calls",
+        "capture_appointments",
+        "after_hours"
+      ]'::jsonb,
+      allowed_actions = '[
+        "use_confirmed_facts_only",
+        "be_transparent_when_unsure",
+        "transfer_when_needed",
+        "take_messages",
+        "collect_contact_details"
+      ]'::jsonb,
+      prohibited_actions = '[
+        "no_invented_prices",
+        "no_binding_appointments",
+        "no_refund_promises",
+        "no_regulated_advice",
+        "no_unconfirmed_services"
+      ]'::jsonb
+  where business_id = current_setting('rp.business_a')::uuid;
+
+  get diagnostics row_count = ROW_COUNT;
+  if row_count <> 1 then
+    raise exception 'TEST FAILED: stable receptionist rule keys should satisfy SQL constraints';
+  end if;
+
+  begin
+    update public.receptionist_configs
+    set responsibilities = '["FAQs beantworten"]'::jsonb
+    where business_id = current_setting('rp.business_a')::uuid;
+
+    raise exception 'TEST FAILED: translated receptionist responsibility labels should not satisfy SQL constraints';
+  exception
+    when check_violation then
+      null;
+  end;
+
+  update public.receptionist_configs
   set primary_language = 'en',
       additional_languages = array['de']::text[]
   where business_id = current_setting('rp.business_a')::uuid;
@@ -623,6 +714,7 @@ do $$
 declare
   row_count integer;
   backend_status text;
+  blocked boolean := false;
 begin
   foreach backend_status in array array[
     'research_queued',
@@ -645,18 +737,26 @@ begin
     end if;
   end loop;
 
-  update public.onboarding_sessions
-  set status = 'live'
-  where id = current_setting('rp.onboarding_a')::uuid;
-
   select count(*) into row_count
   from public.onboarding_sessions
   where id = current_setting('rp.onboarding_a')::uuid
-    and status = 'live'
     and completed_at is not null;
 
   if row_count <> 1 then
-    raise exception 'TEST FAILED: service role live status should keep lifecycle timestamps server-controlled';
+    raise exception 'TEST FAILED: service role live transition should keep lifecycle timestamps server-controlled';
+  end if;
+
+  begin
+    update public.onboarding_sessions
+    set status = 'live'
+    where id = current_setting('rp.onboarding_a')::uuid;
+  exception
+    when raise_exception then
+      blocked := true;
+  end;
+
+  if not blocked then
+    raise exception 'TEST FAILED: service role performed disallowed error-to-live transition';
   end if;
 end $$;
 
@@ -664,6 +764,147 @@ reset role;
 set local role authenticated;
 select set_config('request.jwt.claim.role', 'authenticated', true);
 select set_config('request.jwt.claim.sub', current_setting('rp.customer_a'), true);
+
+create or replace function pg_temp.assert_owner_edit_preserves_onboarding_status(expected_status text)
+returns void
+language plpgsql
+as $$
+declare
+  row_count integer;
+  blocked boolean := false;
+begin
+  update public.onboarding_sessions
+  set current_step = 'continue',
+      completed_steps = array['company', 'goals', 'research', 'review']::text[],
+      selected_goals = array['answer_faqs', 'capture_leads']::text[],
+      preferred_behavior = 'Browser edit while status is ' || expected_status
+  where id = current_setting('rp.onboarding_a')::uuid;
+
+  get diagnostics row_count = ROW_COUNT;
+  if row_count <> 1 then
+    raise exception 'TEST FAILED: owner should edit onboarding fields while status is %, affected % rows', expected_status, row_count;
+  end if;
+
+  select count(*) into row_count
+  from public.onboarding_sessions
+  where id = current_setting('rp.onboarding_a')::uuid
+    and status = expected_status
+    and preferred_behavior = 'Browser edit while status is ' || expected_status;
+
+  if row_count <> 1 then
+    raise exception 'TEST FAILED: owner edit did not preserve onboarding status %', expected_status;
+  end if;
+
+  begin
+    update public.onboarding_sessions
+    set status = 'in_progress'
+    where id = current_setting('rp.onboarding_a')::uuid;
+  exception
+    when insufficient_privilege or raise_exception then
+      blocked := true;
+  end;
+
+  if not blocked then
+    raise exception 'TEST FAILED: owner downgraded protected onboarding status % to in_progress', expected_status;
+  end if;
+end;
+$$;
+
+reset role;
+set local role service_role;
+select set_config('request.jwt.claim.role', 'service_role', true);
+select set_config('request.jwt.claim.sub', current_setting('rp.platform_admin'), true);
+update public.onboarding_sessions set status = 'research_queued' where id = current_setting('rp.onboarding_a')::uuid;
+
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claim.role', 'authenticated', true);
+select set_config('request.jwt.claim.sub', current_setting('rp.customer_a'), true);
+select pg_temp.assert_owner_edit_preserves_onboarding_status('research_queued');
+
+reset role;
+set local role service_role;
+select set_config('request.jwt.claim.role', 'service_role', true);
+select set_config('request.jwt.claim.sub', current_setting('rp.platform_admin'), true);
+update public.onboarding_sessions set status = 'research_running' where id = current_setting('rp.onboarding_a')::uuid;
+
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claim.role', 'authenticated', true);
+select set_config('request.jwt.claim.sub', current_setting('rp.customer_a'), true);
+select pg_temp.assert_owner_edit_preserves_onboarding_status('research_running');
+
+reset role;
+set local role service_role;
+select set_config('request.jwt.claim.role', 'service_role', true);
+select set_config('request.jwt.claim.sub', current_setting('rp.platform_admin'), true);
+update public.onboarding_sessions set status = 'review_required' where id = current_setting('rp.onboarding_a')::uuid;
+
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claim.role', 'authenticated', true);
+select set_config('request.jwt.claim.sub', current_setting('rp.customer_a'), true);
+select pg_temp.assert_owner_edit_preserves_onboarding_status('review_required');
+
+reset role;
+set local role service_role;
+select set_config('request.jwt.claim.role', 'service_role', true);
+select set_config('request.jwt.claim.sub', current_setting('rp.platform_admin'), true);
+update public.onboarding_sessions set status = 'ready_for_test' where id = current_setting('rp.onboarding_a')::uuid;
+
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claim.role', 'authenticated', true);
+select set_config('request.jwt.claim.sub', current_setting('rp.customer_a'), true);
+select pg_temp.assert_owner_edit_preserves_onboarding_status('ready_for_test');
+
+reset role;
+set local role service_role;
+select set_config('request.jwt.claim.role', 'service_role', true);
+select set_config('request.jwt.claim.sub', current_setting('rp.platform_admin'), true);
+update public.onboarding_sessions set status = 'ready_for_launch' where id = current_setting('rp.onboarding_a')::uuid;
+
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claim.role', 'authenticated', true);
+select set_config('request.jwt.claim.sub', current_setting('rp.customer_a'), true);
+select pg_temp.assert_owner_edit_preserves_onboarding_status('ready_for_launch');
+
+reset role;
+set local role service_role;
+select set_config('request.jwt.claim.role', 'service_role', true);
+select set_config('request.jwt.claim.sub', current_setting('rp.platform_admin'), true);
+update public.onboarding_sessions set status = 'live' where id = current_setting('rp.onboarding_a')::uuid;
+
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claim.role', 'authenticated', true);
+select set_config('request.jwt.claim.sub', current_setting('rp.customer_a'), true);
+select pg_temp.assert_owner_edit_preserves_onboarding_status('live');
+
+reset role;
+set local role service_role;
+select set_config('request.jwt.claim.role', 'service_role', true);
+select set_config('request.jwt.claim.sub', current_setting('rp.platform_admin'), true);
+update public.onboarding_sessions set status = 'paused' where id = current_setting('rp.onboarding_a')::uuid;
+
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claim.role', 'authenticated', true);
+select set_config('request.jwt.claim.sub', current_setting('rp.customer_a'), true);
+select pg_temp.assert_owner_edit_preserves_onboarding_status('paused');
+
+reset role;
+set local role service_role;
+select set_config('request.jwt.claim.role', 'service_role', true);
+select set_config('request.jwt.claim.sub', current_setting('rp.platform_admin'), true);
+update public.onboarding_sessions set status = 'error' where id = current_setting('rp.onboarding_a')::uuid;
+
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claim.role', 'authenticated', true);
+select set_config('request.jwt.claim.sub', current_setting('rp.customer_a'), true);
+select pg_temp.assert_owner_edit_preserves_onboarding_status('error');
 
 do $$
 declare
