@@ -52,29 +52,57 @@ export const receptionistToneLabels: Record<ReceptionistTone, string> = {
 };
 
 export const receptionistResponsibilityOptions = [
-  'FAQs beantworten',
-  'Leads erfassen',
-  'Nachrichten aufnehmen',
-  'Anrufe weiterleiten',
-  'Terminwuensche sammeln',
-  'After-hours behandeln',
+  'answer_faqs',
+  'capture_leads',
+  'take_messages',
+  'transfer_calls',
+  'capture_appointments',
+  'after_hours',
 ] as const;
+export type ReceptionistResponsibility = (typeof receptionistResponsibilityOptions)[number];
+
+export const receptionistResponsibilityLabels: Record<ReceptionistResponsibility, string> = {
+  answer_faqs: 'FAQs beantworten',
+  capture_leads: 'Leads erfassen',
+  take_messages: 'Nachrichten aufnehmen',
+  transfer_calls: 'Anrufe weiterleiten',
+  capture_appointments: 'Terminwuensche sammeln',
+  after_hours: 'After-hours behandeln',
+};
 
 export const receptionistAllowedActionOptions = [
-  'Nur bestaetigte Fakten nennen',
-  'Bei Unsicherheit transparent bleiben',
-  'Bei Bedarf uebergeben',
-  'Nachrichten aufnehmen',
-  'Kontaktdaten erfassen',
+  'use_confirmed_facts_only',
+  'be_transparent_when_unsure',
+  'transfer_when_needed',
+  'take_messages',
+  'collect_contact_details',
 ] as const;
+export type ReceptionistAllowedAction = (typeof receptionistAllowedActionOptions)[number];
+
+export const receptionistAllowedActionLabels: Record<ReceptionistAllowedAction, string> = {
+  use_confirmed_facts_only: 'Nur bestaetigte Fakten nennen',
+  be_transparent_when_unsure: 'Bei Unsicherheit transparent bleiben',
+  transfer_when_needed: 'Bei Bedarf uebergeben',
+  take_messages: 'Nachrichten aufnehmen',
+  collect_contact_details: 'Kontaktdaten erfassen',
+};
 
 export const receptionistProhibitedActionOptions = [
-  'Keine Preise erfinden',
-  'Keine Termine verbindlich zusagen',
-  'Keine Erstattungen bestaetigen',
-  'Keine regulierte Beratung geben',
-  'Keine nicht bestaetigten Leistungen nennen',
+  'no_invented_prices',
+  'no_binding_appointments',
+  'no_refund_promises',
+  'no_regulated_advice',
+  'no_unconfirmed_services',
 ] as const;
+export type ReceptionistProhibitedAction = (typeof receptionistProhibitedActionOptions)[number];
+
+export const receptionistProhibitedActionLabels: Record<ReceptionistProhibitedAction, string> = {
+  no_invented_prices: 'Keine Preise erfinden',
+  no_binding_appointments: 'Keine Termine verbindlich zusagen',
+  no_refund_promises: 'Keine Erstattungen bestaetigen',
+  no_regulated_advice: 'Keine regulierte Beratung geben',
+  no_unconfirmed_services: 'Keine nicht bestaetigten Leistungen nennen',
+};
 
 export const phoneSetupModes = ['ai-number', 'forwarding'] as const;
 export type PhoneSetupMode = (typeof phoneSetupModes)[number];
@@ -142,9 +170,9 @@ export interface ReceptionistConfig {
   additionalLanguages: SupportedLanguage[];
   greeting: string | null;
   tone: ReceptionistTone | null;
-  responsibilities: string[];
-  allowedActions: string[];
-  prohibitedActions: string[];
+  responsibilities: ReceptionistResponsibility[];
+  allowedActions: ReceptionistAllowedAction[];
+  prohibitedActions: ReceptionistProhibitedAction[];
   afterHoursBehavior: { instruction?: string };
   transferBehavior: { instruction?: string };
   createdAt: string;
@@ -201,9 +229,9 @@ export interface ReceptionistDraft {
   additionalLanguages: SupportedLanguage[];
   greeting: string;
   tone: ReceptionistTone;
-  responsibilities: string[];
-  allowedActions: string[];
-  prohibitedActions: string[];
+  responsibilities: ReceptionistResponsibility[];
+  allowedActions: ReceptionistAllowedAction[];
+  prohibitedActions: ReceptionistProhibitedAction[];
   afterHoursInstruction: string;
   transferInstruction: string;
 }
@@ -260,9 +288,9 @@ interface ReceptionistConfigRow {
   additional_languages: SupportedLanguage[];
   greeting: string | null;
   tone: ReceptionistTone | null;
-  responsibilities: string[];
-  allowed_actions: string[];
-  prohibited_actions: string[];
+  responsibilities: ReceptionistResponsibility[];
+  allowed_actions: ReceptionistAllowedAction[];
+  prohibited_actions: ReceptionistProhibitedAction[];
   after_hours_behavior: { instruction?: string } | null;
   transfer_behavior: { instruction?: string } | null;
   created_at: string;
@@ -300,9 +328,14 @@ type BusinessWrite = Pick<
   | 'timezone'
 >;
 
-type OnboardingWrite = Pick<
+type OnboardingInsertWrite = Pick<
   OnboardingSessionRow,
   'organization_id' | 'business_id' | 'status' | 'current_step' | 'completed_steps' | 'selected_goals' | 'preferred_behavior'
+>;
+
+type OnboardingUpdateWrite = Pick<
+  OnboardingSessionRow,
+  'current_step' | 'completed_steps' | 'selected_goals' | 'preferred_behavior'
 >;
 
 type ReceptionistWrite = Pick<
@@ -479,7 +512,14 @@ export async function saveOnboardingDraft(
   const businessPayload = buildBusinessWrite(organizationId, draft.business);
   const business = await saveBusiness(organizationId, currentBusiness?.id ?? null, businessPayload);
 
-  const onboardingPayload: OnboardingWrite = {
+  const onboardingPayload: OnboardingUpdateWrite = {
+    current_step: draft.currentStep,
+    completed_steps: uniqueOnboardingSteps(draft.completedSteps),
+    selected_goals: uniqueOnboardingGoals(draft.selectedGoals),
+    preferred_behavior: nullableText(draft.preferredBehavior),
+  };
+
+  const onboardingInsertPayload: OnboardingInsertWrite = {
     organization_id: organizationId,
     business_id: business.id,
     status: 'in_progress',
@@ -492,6 +532,7 @@ export async function saveOnboardingDraft(
   const onboardingSession = await saveOnboardingSession(
     business.id,
     currentSession?.id ?? null,
+    onboardingInsertPayload,
     onboardingPayload
   );
 
@@ -719,12 +760,13 @@ async function saveBusiness(
 async function saveOnboardingSession(
   businessId: string,
   sessionId: string | null,
-  payload: OnboardingWrite
+  insertPayload: OnboardingInsertWrite,
+  updatePayload: OnboardingUpdateWrite
 ): Promise<OnboardingSession> {
   if (sessionId) {
     const result = await supabase
       .from('onboarding_sessions')
-      .update(payload)
+      .update(updatePayload)
       .eq('business_id', businessId)
       .eq('id', sessionId)
       .select('*')
@@ -736,14 +778,14 @@ async function saveOnboardingSession(
 
   const insertResult = await supabase
     .from('onboarding_sessions')
-    .insert(payload)
+    .insert(insertPayload)
     .select('*')
     .single();
 
   if (insertResult.error && insertResult.error.code === '23505') {
     const existing = await loadOnboardingByBusiness(businessId);
     if (!existing) throw insertResult.error;
-    return saveOnboardingSession(businessId, existing.id, payload);
+    return saveOnboardingSession(businessId, existing.id, insertPayload, updatePayload);
   }
 
   if (insertResult.error) throw insertResult.error;
@@ -909,9 +951,9 @@ function mapReceptionistRow(row: ReceptionistConfigRow): ReceptionistConfig {
     additionalLanguages: uniqueLanguages(row.additional_languages),
     greeting: row.greeting,
     tone: row.tone,
-    responsibilities: Array.isArray(row.responsibilities) ? row.responsibilities : [],
-    allowedActions: Array.isArray(row.allowed_actions) ? row.allowed_actions : [],
-    prohibitedActions: Array.isArray(row.prohibited_actions) ? row.prohibited_actions : [],
+    responsibilities: uniqueReceptionistResponsibilities(Array.isArray(row.responsibilities) ? row.responsibilities : []),
+    allowedActions: uniqueReceptionistAllowedActions(Array.isArray(row.allowed_actions) ? row.allowed_actions : []),
+    prohibitedActions: uniqueReceptionistProhibitedActions(Array.isArray(row.prohibited_actions) ? row.prohibited_actions : []),
     afterHoursBehavior: row.after_hours_behavior ?? {},
     transferBehavior: row.transfer_behavior ?? {},
     createdAt: row.created_at,
@@ -996,6 +1038,18 @@ function uniqueOnboardingGoals(values: OnboardingGoal[]): OnboardingGoal[] {
 
 function uniqueLanguages(values: SupportedLanguage[]): SupportedLanguage[] {
   return uniqueAllowedStrings(values, supportedLanguages);
+}
+
+function uniqueReceptionistResponsibilities(values: string[]): ReceptionistResponsibility[] {
+  return uniqueAllowedStrings(values, receptionistResponsibilityOptions);
+}
+
+function uniqueReceptionistAllowedActions(values: string[]): ReceptionistAllowedAction[] {
+  return uniqueAllowedStrings(values, receptionistAllowedActionOptions);
+}
+
+function uniqueReceptionistProhibitedActions(values: string[]): ReceptionistProhibitedAction[] {
+  return uniqueAllowedStrings(values, receptionistProhibitedActionOptions);
 }
 
 function uniqueAllowedStrings<T extends string>(values: string[], allowed: readonly T[]): T[] {

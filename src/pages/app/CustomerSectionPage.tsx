@@ -66,7 +66,10 @@ import {
   type OnboardingDraft,
   type OnboardingGoal,
   type PhoneDraft,
+  type ReceptionistAllowedAction,
   type ReceptionistDraft,
+  type ReceptionistProhibitedAction,
+  type ReceptionistResponsibility,
   type ReceptionistTone,
   type SupportedLanguage,
   makeOnboardingDraft,
@@ -74,8 +77,11 @@ import {
   makeReceptionistDraft,
   onboardingGoalLabels,
   onboardingGoalOptions,
+  receptionistAllowedActionLabels,
   receptionistAllowedActionOptions,
+  receptionistProhibitedActionLabels,
   receptionistProhibitedActionOptions,
+  receptionistResponsibilityLabels,
   receptionistResponsibilityOptions,
   receptionistToneLabels,
   supportedLanguages,
@@ -550,13 +556,24 @@ function ReceptionistExperience() {
     setDraft((current) => ({ ...current, [key]: value }));
   };
 
-  const toggleRule = (
-    key: 'responsibilities' | 'allowedActions' | 'prohibitedActions',
-    value: string
-  ) => {
+  const toggleResponsibility = (value: ReceptionistResponsibility) => {
     setDraft((current) => ({
       ...current,
-      [key]: toggleValue(current[key], value),
+      responsibilities: toggleValue(current.responsibilities, value),
+    }));
+  };
+
+  const toggleAllowedAction = (value: ReceptionistAllowedAction) => {
+    setDraft((current) => ({
+      ...current,
+      allowedActions: toggleValue(current.allowedActions, value),
+    }));
+  };
+
+  const toggleProhibitedAction = (value: ReceptionistProhibitedAction) => {
+    setDraft((current) => ({
+      ...current,
+      prohibitedActions: toggleValue(current.prohibitedActions, value),
     }));
   };
 
@@ -643,23 +660,26 @@ function ReceptionistExperience() {
           <RuleColumn
             title="Verantwortlichkeiten"
             items={[...receptionistResponsibilityOptions]}
+            labels={receptionistResponsibilityLabels}
             selectedItems={draft.responsibilities}
             disabled={!canEdit || !snapshot.business}
-            onToggle={(item) => toggleRule('responsibilities', item)}
+            onToggle={toggleResponsibility}
           />
           <RuleColumn
             title="Verhalten"
             items={[...receptionistAllowedActionOptions]}
+            labels={receptionistAllowedActionLabels}
             selectedItems={draft.allowedActions}
             disabled={!canEdit || !snapshot.business}
-            onToggle={(item) => toggleRule('allowedActions', item)}
+            onToggle={toggleAllowedAction}
           />
           <RuleColumn
             title="Einschraenkungen"
             items={[...receptionistProhibitedActionOptions]}
+            labels={receptionistProhibitedActionLabels}
             selectedItems={draft.prohibitedActions}
             disabled={!canEdit || !snapshot.business}
-            onToggle={(item) => toggleRule('prohibitedActions', item)}
+            onToggle={toggleProhibitedAction}
           />
         </div>
       </AppSection>
@@ -1308,18 +1328,20 @@ function formatPhoneTestStatus(status: string | null | undefined) {
   }
 }
 
-function RuleColumn({
+function RuleColumn<T extends ReceptionistResponsibility | ReceptionistAllowedAction | ReceptionistProhibitedAction>({
   title,
   items,
+  labels,
   selectedItems,
   disabled,
   onToggle,
 }: {
   title: string;
-  items: string[];
-  selectedItems: string[];
+  items: T[];
+  labels: Record<T, string>;
+  selectedItems: T[];
   disabled: boolean;
-  onToggle: (item: string) => void;
+  onToggle: (item: T) => void;
 }) {
   return (
     <div className="rounded-3xl border border-gray-100 bg-white/75 p-6 transition-colors duration-200 hover:border-gray-200">
@@ -1340,7 +1362,7 @@ function RuleColumn({
                 )}
               >
                 <CheckCircle2 size={15} className={cn('mt-0.5 flex-shrink-0', active ? 'text-emerald-500' : 'text-gray-300')} aria-hidden="true" />
-                <span>{item}</span>
+                <span>{labels[item]}</span>
               </button>
             </li>
           );
