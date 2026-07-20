@@ -77,7 +77,7 @@ export function PageReveal({ children }: PageRevealProps) {
         <motion.div
           initial={{ opacity: 1 }}
           animate={{ opacity: 0 }}
-          transition={{ duration: 1.1, delay: 0.2, ease: [0.19, 1, 0.22, 1] }}
+          transition={{ duration: 1.1, delay: 0.2, ease: [0.19, 1, 0.22, 1] as [number, number, number, number] }}
           style={{
             position: "fixed",
             inset: 0,

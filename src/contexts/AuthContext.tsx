@@ -2,11 +2,22 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { ReactNode } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 
+import { clearClientHubLocalState } from '@/lib/pwa';
 import { supabase } from '@/lib/supabase';
 
 export type PlatformRole = 'customer' | 'cogniiq_admin' | 'cogniiq_owner';
-export type OrganizationRole = 'owner' | 'admin' | 'member' | 'viewer';
+export type OrganizationRole =
+  | 'owner'
+  | 'admin'
+  | 'management'
+  | 'dispatcher'
+  | 'technician'
+  | 'warehouse'
+  | 'accounting'
+  | 'member'
+  | 'viewer';
 export type MembershipStatus = 'invited' | 'active' | 'suspended';
+export type AuthenticationAssuranceLevel = 'aal1' | 'aal2' | (string & {});
 
 export interface Profile {
   id: string;
@@ -49,9 +60,12 @@ interface AuthContextValue {
   setActiveOrganizationId: (organizationId: string | null) => void;
   isLoading: boolean;
   authError: string | null;
+  aal: AuthenticationAssuranceLevel | null;
+  nextAal: AuthenticationAssuranceLevel | null;
   isPlatformAdmin: boolean;
   isPlatformOwner: boolean;
   refreshAccount: () => Promise<void>;
+  refreshMfaLevel: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -85,6 +99,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [activeOrganizationId, setActiveOrganizationId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [aal, setAal] = useState<AuthenticationAssuranceLevel | null>(null);
+  const [nextAal, setNextAal] = useState<AuthenticationAssuranceLevel | null>(null);
+
+  const refreshMfaLevel = useCallback(async () => {
+    const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+
+    if (error) {
+      setAal('aal1');
+      setNextAal(null);
+      setAuthError((current) => current ?? error.message);
+      return;
+    }
+
+    setAal((data.currentLevel ?? 'aal1') as AuthenticationAssuranceLevel);
+    setNextAal((data.nextLevel ?? data.currentLevel ?? 'aal1') as AuthenticationAssuranceLevel);
+  }, []);
 
   const loadAccount = useCallback(async (nextSession: Session | null) => {
     setAuthError(null);
@@ -93,6 +123,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(null);
       setMemberships([]);
       setActiveOrganizationId(null);
+      setAal(null);
+      setNextAal(null);
       return;
     }
 
@@ -126,6 +158,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('user_id', userId)
         .eq('status', 'active')
         .order('created_at', { ascending: true }),
+      refreshMfaLevel(),
     ]);
 
     if (profileResult.error) {
@@ -146,7 +179,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return normalized[0]?.organization_id ?? null;
       });
     }
-  }, []);
+  }, [refreshMfaLevel]);
 
   const refreshAccount = useCallback(async () => {
     const { data, error } = await supabase.auth.getSession();
@@ -202,6 +235,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null);
     setMemberships([]);
     setActiveOrganizationId(null);
+    setAal(null);
+    setNextAal(null);
+    await clearClientHubLocalState();
   }, []);
 
   const value = useMemo<AuthContextValue>(() => {
@@ -217,12 +253,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setActiveOrganizationId,
       isLoading,
       authError,
+      aal,
+      nextAal,
       isPlatformAdmin,
       isPlatformOwner,
       refreshAccount,
+      refreshMfaLevel,
       signOut,
     };
-  }, [activeOrganizationId, authError, isLoading, memberships, profile, refreshAccount, session, signOut]);
+  }, [aal, activeOrganizationId, authError, isLoading, memberships, nextAal, profile, refreshAccount, refreshMfaLevel, session, signOut]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

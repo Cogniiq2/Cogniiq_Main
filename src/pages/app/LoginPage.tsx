@@ -48,11 +48,8 @@ export function LoginPage() {
       title="Kundenlogin"
       description="Melden Sie sich im sicheren Cogniiq Kundenbereich an."
       footer={
-        <p className="text-sm text-gray-500">
-          Noch kein Konto?{' '}
-          <Link to="/app/signup" className="font-semibold text-gray-900 hover:text-gray-600">
-            Konto erstellen
-          </Link>
+        <p className="text-sm leading-6 text-gray-500">
+          Der Kundenbereich ist ein eingeladener Workspace. Neue Konten werden durch Cogniiq provisioniert.
         </p>
       }
     >

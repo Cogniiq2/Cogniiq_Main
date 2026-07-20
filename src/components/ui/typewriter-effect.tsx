@@ -35,7 +35,7 @@ export const TypewriterEffectSmooth = ({
           {
             duration: 0.25,
             delay: stagger(0.045),
-            ease: [0.19, 1, 0.22, 1],
+            ease: [0.19, 1, 0.22, 1] as [number, number, number, number],
           }
         );
       }, 1200);

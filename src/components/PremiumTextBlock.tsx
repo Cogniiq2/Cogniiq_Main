@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 export function PremiumTextBlock() {
@@ -168,7 +168,7 @@ export function PremiumTextBlock() {
                 transition={{
                   duration: 0.8,
                   delay: wordIndex * 0.1,
-                  ease: [0.645, 0.045, 0.355, 1],
+                  ease: [0.645, 0.045, 0.355, 1] as [number, number, number, number],
                 }}
                 whileHover={{
                   scale: 1.05,

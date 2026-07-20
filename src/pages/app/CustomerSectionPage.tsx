@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
+  Activity,
   AlertCircle,
   BookOpen,
   Building2,
@@ -12,6 +13,7 @@ import {
   Info,
   Lock,
   LogOut,
+  MessageSquarePlus,
   Mic2,
   Phone,
   Search,
@@ -62,6 +64,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useCustomerPortalPersistence } from '@/hooks/useCustomerPortalPersistence';
 import { useOrganizations } from '@/hooks/useOrganizations';
+import { supabase } from '@/lib/supabase';
 import {
   type OnboardingDraft,
   type OnboardingGoal,
@@ -89,6 +92,12 @@ import {
 import { cn } from '@/lib/utils';
 
 export type CustomerSection =
+  | 'systems'
+  | 'activity'
+  | 'documents'
+  | 'change-requests'
+  | 'support'
+  | 'security'
   | 'onboarding'
   | 'receptionist'
   | 'knowledge'
@@ -110,6 +119,42 @@ const sectionConfig: Record<CustomerSection, {
     eyebrow: 'Onboarding',
     description: 'Ein ruhiger, gefuehrter Start fuer Unternehmensdaten, Ziele und die spaetere Recherche.',
     icon: Wand2,
+  },
+  systems: {
+    title: 'Ihre Systeme',
+    eyebrow: 'Managed Service',
+    description: 'Provisionierte Systeme, Status und kundenrelevante Konfigurationen als ruhige Betriebsansicht.',
+    icon: Headphones,
+  },
+  activity: {
+    title: 'Aktivität',
+    eyebrow: 'Betrieb',
+    description: 'Aktuelle Ereignisse, Anrufe und Leads erscheinen erst, wenn echte Backend-Daten verbunden sind.',
+    icon: Activity,
+  },
+  documents: {
+    title: 'Dokumente',
+    eyebrow: 'Ablage',
+    description: 'Kundenrelevante Dokumente, Freigaben und Quellen ohne lokale oder simulierte Dateien.',
+    icon: FileText,
+  },
+  'change-requests': {
+    title: 'Änderungsanfragen',
+    eyebrow: 'Service',
+    description: 'Strukturierte Wünsche an Cogniiq statt direkter Änderungen an technischer Produktkonfiguration.',
+    icon: MessageSquarePlus,
+  },
+  support: {
+    title: 'Support',
+    eyebrow: 'Hilfe',
+    description: 'Direkter Kontakt für laufende Betreuung, Störungen und sichere operative Abstimmung.',
+    icon: Headphones,
+  },
+  security: {
+    title: 'Team & Sicherheit',
+    eyebrow: 'Zugriff',
+    description: 'Account, Organisation, Rollenfundament und Zwei-Faktor-Sicherheit.',
+    icon: ShieldCheck,
   },
   receptionist: {
     title: 'Rezeptionist',
@@ -174,7 +219,7 @@ function CustomerSectionContent({ section }: { section: CustomerSection }) {
   const Icon = config.icon;
   const { snapshot, loadStatus } = useCustomerPortalPersistence();
   const lifecycle = lifecycleDisplays[getLifecycleState(snapshot.onboardingSession?.status, Boolean(snapshot.business))];
-  const isPersistedSection = section === 'onboarding' || section === 'receptionist' || section === 'phone';
+  const isPersistedSection = ['onboarding', 'systems', 'receptionist', 'phone', 'change-requests'].includes(section);
 
   return (
     <>
@@ -215,6 +260,18 @@ function getLifecycleState(status: string | null | undefined, hasBusiness: boole
 
 function renderSection(section: CustomerSection) {
   switch (section) {
+    case 'systems':
+      return <SystemsExperience />;
+    case 'activity':
+      return <ActivityExperience />;
+    case 'documents':
+      return <DocumentsExperience />;
+    case 'change-requests':
+      return <ChangeRequestsExperience />;
+    case 'support':
+      return <SupportExperience />;
+    case 'security':
+      return <SettingsExperience />;
     case 'onboarding':
       return <OnboardingExperience />;
     case 'receptionist':
@@ -505,6 +562,334 @@ function OnboardingExperience() {
   );
 }
 
+function SystemsExperience() {
+  const { loadError, loadStatus, retry, snapshot } = useCustomerPortalPersistence();
+  const lifecycle = lifecycleDisplays[getLifecycleState(snapshot.onboardingSession?.status, Boolean(snapshot.business))];
+
+  if (loadStatus === 'loading') {
+    return <AppSkeleton label="Systemdaten werden geladen" />;
+  }
+
+  if (loadStatus === 'error' && loadError) {
+    return <AppErrorState message={loadError.message} onRetry={() => void retry()} />;
+  }
+
+  if (loadStatus === 'no-organization') {
+    return (
+      <AppEmptyState
+        icon={Building2}
+        title="Keine Organisation verbunden"
+        description="Systeme werden erst nach kontrollierter Provisionierung sichtbar."
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      <AppSection
+        eyebrow="Client Hub"
+        title="Aktiver Managed-Service Stand"
+        description="Diese Ansicht zeigt gespeicherte Konfigurationen und Backend-Status, ohne technische Felder direkt änderbar zu machen."
+        action={<AppButton to="/app/onboarding" variant="secondary" icon={Wand2}>Onboarding bearbeiten</AppButton>}
+      >
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <AppCard>
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Unternehmen</p>
+            <h2 className="text-xl font-bold tracking-tight text-gray-950">{snapshot.business?.name ?? 'Noch nicht gespeichert'}</h2>
+            <p className="mt-3 text-sm leading-6 text-gray-500">
+              {snapshot.business?.website ?? 'Website und Stammdaten werden im Onboarding gepflegt.'}
+            </p>
+          </AppCard>
+          <AppCard>
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Lebenszyklus</p>
+            <h2 className="text-xl font-bold tracking-tight text-gray-950">{lifecycle.label}</h2>
+            <p className="mt-3 text-sm leading-6 text-gray-500">{lifecycle.description}</p>
+          </AppCard>
+          <AppCard>
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Telefonie</p>
+            <h2 className="text-xl font-bold tracking-tight text-gray-950">{formatPhoneTestStatus(snapshot.phoneConfig?.testStatus)}</h2>
+            <p className="mt-3 text-sm leading-6 text-gray-500">
+              KI-Nummer, Teststatus und Provider-Anbindung bleiben systemkontrolliert.
+            </p>
+          </AppCard>
+        </div>
+      </AppSection>
+
+      <AppSection eyebrow="Konfiguration" title="Kundenrelevante Systemdetails">
+        <div className="grid gap-4 lg:grid-cols-2">
+          <AppCard>
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">KI-Rezeptionist</p>
+                <h3 className="text-lg font-bold tracking-tight text-gray-950">
+                  {snapshot.receptionistConfig?.receptionistName ?? 'Noch nicht provisioniert'}
+                </h3>
+              </div>
+              <AppStatusBadge label="nur lesen" tone="neutral" />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <ReadOnlyField label="Sprache" value={snapshot.receptionistConfig?.primaryLanguage ?? 'Nicht gesetzt'} />
+              <ReadOnlyField label="Ton" value={snapshot.receptionistConfig?.tone ? receptionistToneLabels[snapshot.receptionistConfig.tone] : 'Nicht gesetzt'} />
+            </div>
+            <div className="mt-5">
+              <AppButton to="/app/receptionist" variant="secondary">Details ansehen</AppButton>
+            </div>
+          </AppCard>
+
+          <AppCard>
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Telefon</p>
+                <h3 className="text-lg font-bold tracking-tight text-gray-950">
+                  {snapshot.phoneConfig?.setupMode === 'forwarding' ? 'Weiterleitung' : 'KI-Nummer'}
+                </h3>
+              </div>
+              <AppStatusBadge label="nur lesen" tone="neutral" />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <ReadOnlyField label="Geschäftsnummer" value={snapshot.phoneConfig?.existingPublicNumber ?? 'Nicht gesetzt'} />
+              <ReadOnlyField label="KI-Nummer" value={snapshot.phoneConfig?.assignedAiNumber ?? 'Noch nicht provisioniert'} />
+            </div>
+            <div className="mt-5">
+              <AppButton to="/app/phone" variant="secondary">Telefon ansehen</AppButton>
+            </div>
+          </AppCard>
+        </div>
+      </AppSection>
+
+      <AppPreviewNotice>
+        Änderungen an Rezeptionist, Telefonie, Provider-IDs, Prompts, Webhooks und Lifecycle laufen über Cogniiq oder über Änderungsanfragen.
+      </AppPreviewNotice>
+    </div>
+  );
+}
+
+function ActivityExperience() {
+  return (
+    <div className="space-y-8">
+      <AppEmptyState
+        icon={Activity}
+        title="Noch keine echte Aktivität"
+        description="Anrufe, Leads, Statuswechsel und Betriebsereignisse erscheinen hier erst, wenn die angebundenen Systeme Daten liefern."
+      />
+      <div className="grid gap-6 lg:grid-cols-2">
+        <OperationalExperience type="calls" />
+        <OperationalExperience type="leads" />
+      </div>
+    </div>
+  );
+}
+
+function DocumentsExperience() {
+  return (
+    <div className="space-y-8">
+      <AppEmptyState
+        icon={FileText}
+        title="Noch keine Dokumente hinterlegt"
+        description="Verträge, Freigaben, Quellen und Exporte werden erst angezeigt, wenn echte Dokumentdatensätze verbunden sind."
+      />
+      <AppPreviewNotice>
+        Der Service Worker speichert nur die statische App-Shell. Supabase-Antworten und Kundendokumente werden nicht offline gecacht.
+      </AppPreviewNotice>
+    </div>
+  );
+}
+
+interface ChangeRequestRow {
+  id: string;
+  organization_id: string;
+  requested_by: string;
+  category: string;
+  subject: string;
+  description: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
+function ChangeRequestsExperience() {
+  const { activeOrganizationId } = useOrganizations();
+  const [rows, setRows] = useState<ChangeRequestRow[]>([]);
+  const [category, setCategory] = useState('Receptionist');
+  const [subject, setSubject] = useState('');
+  const [description, setDescription] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadRequests = useCallback(async () => {
+    if (!activeOrganizationId) {
+      setRows([]);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    const result = await supabase
+      .from('change_requests')
+      .select('*')
+      .eq('organization_id', activeOrganizationId)
+      .order('created_at', { ascending: false });
+
+    if (result.error) {
+      setRows([]);
+      setError(result.error.message);
+    } else {
+      setRows((result.data ?? []) as ChangeRequestRow[]);
+    }
+
+    setIsLoading(false);
+  }, [activeOrganizationId]);
+
+  useEffect(() => {
+    void loadRequests();
+  }, [loadRequests]);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!activeOrganizationId) return;
+
+    const trimmedCategory = category.trim();
+    const trimmedSubject = subject.trim();
+    const trimmedDescription = description.trim();
+
+    if (!trimmedCategory || !trimmedSubject || !trimmedDescription) {
+      setError('Bitte Kategorie, Betreff und Beschreibung ausfüllen.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+
+    const result = await supabase
+      .from('change_requests')
+      .insert({
+        organization_id: activeOrganizationId,
+        category: trimmedCategory,
+        subject: trimmedSubject,
+        description: trimmedDescription,
+      })
+      .select('*')
+      .single();
+
+    setIsSubmitting(false);
+
+    if (result.error) {
+      setError(result.error.message);
+      return;
+    }
+
+    setRows((current) => [result.data as ChangeRequestRow, ...current]);
+    setSubject('');
+    setDescription('');
+  };
+
+  if (isLoading) {
+    return <AppSkeleton label="Änderungsanfragen werden geladen" />;
+  }
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+      <div className="space-y-4">
+        {rows.length ? (
+          rows.map((request) => (
+            <AppCard key={request.id}>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">{request.category}</p>
+                  <h2 className="text-lg font-bold tracking-tight text-gray-950">{request.subject}</h2>
+                  <p className="mt-3 text-sm leading-6 text-gray-500">{request.description}</p>
+                </div>
+                <AppStatusBadge label={formatChangeRequestStatus(request.status)} tone={getChangeRequestTone(request.status)} />
+              </div>
+              <p className="mt-5 text-[12px] font-medium text-gray-400">
+                Erstellt am {formatDateTime(request.created_at)}
+              </p>
+            </AppCard>
+          ))
+        ) : (
+          <AppEmptyState
+            icon={MessageSquarePlus}
+            title="Noch keine Änderungsanfragen"
+            description="Neue Wünsche werden als echte Datensätze gespeichert und anschließend durch Cogniiq bearbeitet."
+          />
+        )}
+      </div>
+
+      <aside>
+        <AppCard>
+          <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Neue Anfrage</p>
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-semibold text-gray-700">Kategorie</span>
+              <select
+                value={category}
+                onChange={(event) => setCategory(event.target.value)}
+                className="h-11 w-full rounded-lg border border-gray-200 bg-white px-3.5 text-sm text-gray-900 outline-none transition-colors focus:border-gray-400"
+              >
+                <option>Receptionist</option>
+                <option>Telefon</option>
+                <option>Dokumente</option>
+                <option>Team</option>
+                <option>Abrechnung</option>
+                <option>Support</option>
+              </select>
+            </label>
+            <AppField
+              id="change-request-subject"
+              label="Betreff"
+              value={subject}
+              onChange={(event) => setSubject(event.target.value)}
+              placeholder="Was soll geändert werden?"
+            />
+            <AppTextarea
+              id="change-request-description"
+              label="Beschreibung"
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+              placeholder="Bitte beschreiben Sie den gewünschten Zustand so konkret wie möglich."
+            />
+            {error ? <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
+            <AppButton type="submit" disabled={isSubmitting} icon={MessageSquarePlus}>
+              {isSubmitting ? 'Wird gesendet...' : 'Anfrage senden'}
+            </AppButton>
+          </form>
+        </AppCard>
+      </aside>
+    </div>
+  );
+}
+
+function SupportExperience() {
+  return (
+    <div className="space-y-8">
+      <AppSection eyebrow="Kontakt" title="Direkter Cogniiq Support">
+        <div className="grid gap-4 md:grid-cols-2">
+          <AppCard>
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">E-Mail</p>
+            <a className="text-lg font-bold tracking-tight text-gray-950 hover:text-gray-600" href="mailto:info@cogniiq.de">
+              info@cogniiq.de
+            </a>
+            <p className="mt-3 text-sm leading-6 text-gray-500">Für Änderungen bitte bevorzugt eine strukturierte Anfrage erstellen.</p>
+          </AppCard>
+          <AppCard>
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Änderungen</p>
+            <h2 className="text-lg font-bold tracking-tight text-gray-950">Service statt Direktkonfiguration</h2>
+            <p className="mt-3 text-sm leading-6 text-gray-500">
+              Technische Prompts, Telefonnummern, Providerdaten und Lifecycle-Status werden durch Cogniiq gepflegt.
+            </p>
+            <div className="mt-5">
+              <AppButton to="/app/change-requests" variant="secondary" icon={MessageSquarePlus}>Anfrage erstellen</AppButton>
+            </div>
+          </AppCard>
+        </div>
+      </AppSection>
+    </div>
+  );
+}
+
 function ReceptionistExperience() {
   const {
     canEdit,
@@ -525,7 +910,8 @@ function ReceptionistExperience() {
   const saveState = saveStates.receptionist;
   const fieldErrors = saveState.error?.fieldErrors ?? {};
   const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(baseline), [baseline, draft]);
-  const saveFeedback = getSaveFeedback(saveState, dirty, canEdit && Boolean(snapshot.business));
+  const managedReadOnly = true;
+  const saveFeedback = getSaveFeedback(saveState, dirty, canEdit && Boolean(snapshot.business) && !managedReadOnly);
 
   useEffect(() => {
     setDraft(loadedDraft);
@@ -597,7 +983,7 @@ function ReceptionistExperience() {
       <AppSection eyebrow="Identitaet" title="Wie der Rezeptionist spaeter auftreten soll">
         <AppCard className="rounded-3xl">
           <div className="grid gap-4 md:grid-cols-2">
-            <AppField id="receptionist-name" label="Rezeptionistenname" value={draft.receptionistName} disabled={!canEdit || !snapshot.business} onChange={(event) => updateField('receptionistName', event.target.value)} placeholder="Noch nicht festgelegt" />
+            <AppField id="receptionist-name" label="Rezeptionistenname" value={draft.receptionistName} disabled={managedReadOnly || !canEdit || !snapshot.business} onChange={(event) => updateField('receptionistName', event.target.value)} placeholder="Noch nicht festgelegt" />
             <AppField id="voice-placeholder" label="Voice placeholder" placeholder="Noch nicht verbunden" disabled />
             <AppSelect
               id="primary-language"
@@ -605,7 +991,7 @@ function ReceptionistExperience() {
               value={draft.primaryLanguage}
               onChange={(value) => updateField('primaryLanguage', value as SupportedLanguage)}
               error={fieldErrors.primaryLanguage}
-              disabled={!canEdit || !snapshot.business}
+              disabled={managedReadOnly || !canEdit || !snapshot.business}
               options={supportedLanguages.map((language) => ({ value: language, label: language === 'de' ? 'Deutsch' : 'Englisch' }))}
             />
             <AppSelect
@@ -613,16 +999,16 @@ function ReceptionistExperience() {
               label="Optionale weitere Sprache"
               value={draft.additionalLanguages[0] ?? 'none'}
               onChange={(value) => updateField('additionalLanguages', value === 'none' ? [] : [value as SupportedLanguage])}
-              disabled={!canEdit || !snapshot.business}
+              disabled={managedReadOnly || !canEdit || !snapshot.business}
               options={[
                 { value: 'none', label: 'Keine weitere Sprache' },
                 { value: 'en', label: 'Englisch' },
                 { value: 'de', label: 'Deutsch' },
               ]}
             />
-            <AppTextarea id="greeting" label="Begruessung" value={draft.greeting} disabled={!canEdit || !snapshot.business} onChange={(event) => updateField('greeting', event.target.value)} placeholder="Guten Tag, Sie sprechen mit ..." className="md:col-span-2" />
-            <AppTextarea id="after-hours-behavior" label="After-hours Verhalten" value={draft.afterHoursInstruction} disabled={!canEdit || !snapshot.business} onChange={(event) => updateField('afterHoursInstruction', event.target.value)} placeholder="Ausserhalb der Oeffnungszeiten Nachricht aufnehmen, keine Termine bestaetigen ..." />
-            <AppTextarea id="transfer-behavior" label="Transfer Verhalten" value={draft.transferInstruction} disabled={!canEdit || !snapshot.business} onChange={(event) => updateField('transferInstruction', event.target.value)} placeholder="Bei Unsicherheit oder dringenden Anliegen an die Transfernummer uebergeben ..." />
+            <AppTextarea id="greeting" label="Begrüßung" value={draft.greeting} disabled={managedReadOnly || !canEdit || !snapshot.business} onChange={(event) => updateField('greeting', event.target.value)} placeholder="Guten Tag, Sie sprechen mit ..." className="md:col-span-2" />
+            <AppTextarea id="after-hours-behavior" label="After-hours Verhalten" value={draft.afterHoursInstruction} disabled={managedReadOnly || !canEdit || !snapshot.business} onChange={(event) => updateField('afterHoursInstruction', event.target.value)} placeholder="Außerhalb der Öffnungszeiten Nachricht aufnehmen, keine Termine bestätigen ..." />
+            <AppTextarea id="transfer-behavior" label="Transfer Verhalten" value={draft.transferInstruction} disabled={managedReadOnly || !canEdit || !snapshot.business} onChange={(event) => updateField('transferInstruction', event.target.value)} placeholder="Bei Unsicherheit oder dringenden Anliegen an die Transfernummer übergeben ..." />
           </div>
         </AppCard>
       </AppSection>
@@ -634,7 +1020,7 @@ function ReceptionistExperience() {
               label="Kommunikationsstil"
               value={draft.tone}
               onChange={(value) => updateField('tone', value as ReceptionistTone)}
-              disabled={!canEdit || !snapshot.business}
+              disabled={managedReadOnly || !canEdit || !snapshot.business}
               options={(Object.keys(receptionistToneLabels) as ReceptionistTone[]).map((tone) => ({
                 value: tone,
                 label: receptionistToneLabels[tone],
@@ -662,7 +1048,7 @@ function ReceptionistExperience() {
             items={[...receptionistResponsibilityOptions]}
             labels={receptionistResponsibilityLabels}
             selectedItems={draft.responsibilities}
-            disabled={!canEdit || !snapshot.business}
+            disabled={managedReadOnly || !canEdit || !snapshot.business}
             onToggle={toggleResponsibility}
           />
           <RuleColumn
@@ -670,7 +1056,7 @@ function ReceptionistExperience() {
             items={[...receptionistAllowedActionOptions]}
             labels={receptionistAllowedActionLabels}
             selectedItems={draft.allowedActions}
-            disabled={!canEdit || !snapshot.business}
+            disabled={managedReadOnly || !canEdit || !snapshot.business}
             onToggle={toggleAllowedAction}
           />
           <RuleColumn
@@ -678,19 +1064,19 @@ function ReceptionistExperience() {
             items={[...receptionistProhibitedActionOptions]}
             labels={receptionistProhibitedActionLabels}
             selectedItems={draft.prohibitedActions}
-            disabled={!canEdit || !snapshot.business}
+            disabled={managedReadOnly || !canEdit || !snapshot.business}
             onToggle={toggleProhibitedAction}
           />
         </div>
       </AppSection>
 
       <AppSaveBar
-        message={saveFeedback.message}
+        message="Diese Konfiguration ist im Kundenbereich nur lesbar. Bitte reichen Sie Änderungen als Änderungsanfrage ein."
         actionLabel={saveFeedback.actionLabel}
         onAction={() => void handleSave()}
-        disabled={!saveFeedback.canSubmit}
+        disabled
         loading={saveState.status === 'saving'}
-        tone={saveFeedback.tone}
+        tone="neutral"
       />
     </div>
   );
@@ -791,7 +1177,8 @@ function PhoneExperience() {
   const saveState = saveStates.phone;
   const fieldErrors = saveState.error?.fieldErrors ?? {};
   const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(baseline), [baseline, draft]);
-  const saveFeedback = getSaveFeedback(saveState, dirty, canEdit && Boolean(snapshot.business));
+  const managedReadOnly = true;
+  const saveFeedback = getSaveFeedback(saveState, dirty, canEdit && Boolean(snapshot.business) && !managedReadOnly);
 
   useEffect(() => {
     setDraft(loadedDraft);
@@ -846,7 +1233,7 @@ function PhoneExperience() {
               label="Zukuenftige Einrichtung"
               value={draft.setupMode}
               onChange={(value) => updateField('setupMode', value as PhoneDraft['setupMode'])}
-              disabled={!canEdit || !snapshot.business}
+              disabled={managedReadOnly || !canEdit || !snapshot.business}
               options={[
                 { value: 'ai-number', label: 'Option A: Neue KI-Telefonnummer verwenden', description: 'Provisionierung ist in dieser Phase nicht aktiv.' },
                 { value: 'forwarding', label: 'Option B: Bestehende Geschaeftsnummer weiterleiten', description: 'Weiterleitungshinweise, keine Portierung.' },
@@ -883,7 +1270,7 @@ function PhoneExperience() {
                 placeholder={role.placeholder}
                 value={getPhoneRoleValue(role.id, draft, snapshot.phoneConfig?.assignedAiNumber ?? '')}
                 error={getPhoneRoleError(role.id, fieldErrors)}
-                disabled={role.id === 'ai' || !canEdit || !snapshot.business}
+                disabled={managedReadOnly || role.id === 'ai' || !canEdit || !snapshot.business}
                 onChange={(event) => updatePhoneRole(role.id, event.target.value, updateField)}
               />
             ))}
@@ -893,7 +1280,7 @@ function PhoneExperience() {
               type="checkbox"
               className="mt-1 h-4 w-4 rounded border-gray-300 text-gray-900"
               checked={draft.forwardingConfirmed}
-              disabled={!canEdit || !snapshot.business}
+              disabled={managedReadOnly || !canEdit || !snapshot.business}
               onChange={(event) => updateField('forwardingConfirmed', event.target.checked)}
             />
             <span>
@@ -924,12 +1311,12 @@ function PhoneExperience() {
       </div>
 
       <AppSaveBar
-        message={saveFeedback.message}
+        message="Telefonie ist im Kundenbereich nur lesbar. KI-Nummer, Teststatus, Routing und Providerdaten bleiben Cogniiq-kontrolliert."
         actionLabel={saveFeedback.actionLabel}
         onAction={() => void handleSave()}
-        disabled={!saveFeedback.canSubmit}
+        disabled
         loading={saveState.status === 'saving'}
-        tone={saveFeedback.tone}
+        tone="neutral"
       />
     </div>
   );
@@ -1326,6 +1713,54 @@ function formatPhoneTestStatus(status: string | null | undefined) {
     default:
       return 'nicht gestartet';
   }
+}
+
+function formatChangeRequestStatus(status: string) {
+  switch (status) {
+    case 'in_review':
+      return 'in Prüfung';
+    case 'planned':
+      return 'geplant';
+    case 'completed':
+      return 'abgeschlossen';
+    case 'declined':
+      return 'abgelehnt';
+    case 'cancelled':
+      return 'storniert';
+    case 'open':
+    default:
+      return 'offen';
+  }
+}
+
+function getChangeRequestTone(status: string): LifecycleTone {
+  switch (status) {
+    case 'completed':
+      return 'success';
+    case 'planned':
+      return 'ready';
+    case 'declined':
+    case 'cancelled':
+      return 'paused';
+    case 'in_review':
+      return 'working';
+    case 'open':
+    default:
+      return 'attention';
+  }
+}
+
+function formatDateTime(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'unbekannt';
+
+  return new Intl.DateTimeFormat('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
 }
 
 function RuleColumn<T extends ReceptionistResponsibility | ReceptionistAllowedAction | ReceptionistProhibitedAction>({

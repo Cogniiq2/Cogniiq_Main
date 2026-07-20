@@ -1,4 +1,9 @@
-export async function onRequest(context: any) {
+type PagesSeoContext = {
+  request: Request;
+  next: () => Promise<Response>;
+};
+
+export async function onRequest(context: PagesSeoContext) {
   const url = new URL(context.request.url);
   let pathname = url.pathname;
 

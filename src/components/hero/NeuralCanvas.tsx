@@ -87,7 +87,7 @@ export function NeuralCanvas({ mousePos, isReady }: NeuralCanvasProps) {
   ];
 
   return (
-    <div className="relative w-full aspect-square max-w-[600px]">
+    <div className="relative w-full aspect-square max-w-[600px]" data-ready={isReady ? 'true' : 'false'}>
       <svg
         viewBox="0 0 680 600"
         className="w-full h-full"

@@ -1,4 +1,14 @@
-export async function onRequest(context: any) {
+type PagesMiddlewareContext = {
+  request: Request;
+  next: () => Promise<Response>;
+  env: {
+    ASSETS: {
+      fetch: (request: Request) => Promise<Response>;
+    };
+  };
+};
+
+export async function onRequest(context: PagesMiddlewareContext) {
   const url = new URL(context.request.url);
   let pathname = url.pathname;
 

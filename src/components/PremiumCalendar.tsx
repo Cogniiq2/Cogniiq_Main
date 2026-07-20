@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PremiumCalendarProps {
@@ -19,10 +19,30 @@ const TIME_SLOTS = [
   '13:00', '14:00', '15:00', '16:00', '17:00',
 ];
 
+function parseSelectedDateTime(value?: string): { date: Date | null; time: string } {
+  if (!value) return { date: null, time: '' };
+
+  const match = value.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})(?:\s*(?:um|·)\s*(\d{2}:\d{2}))?/);
+  if (!match) return { date: null, time: '' };
+
+  const [, day, month, year, time = ''] = match;
+  const date = new Date(Number(year), Number(month) - 1, Number(day));
+  return Number.isNaN(date.getTime()) ? { date: null, time: '' } : { date, time };
+}
+
 export function PremiumCalendar({ onSelect, selectedDateTime }: PremiumCalendarProps) {
+  const initialSelection = useMemo(() => parseSelectedDateTime(selectedDateTime), [selectedDateTime]);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedTime, setSelectedTime] = useState('');
+  const [selectedDate, setSelectedDate] = useState<Date | null>(initialSelection.date);
+  const [selectedTime, setSelectedTime] = useState(initialSelection.time);
+
+  useEffect(() => {
+    setSelectedDate(initialSelection.date);
+    setSelectedTime(initialSelection.time);
+    if (initialSelection.date) {
+      setCurrentDate(new Date(initialSelection.date.getFullYear(), initialSelection.date.getMonth(), 1));
+    }
+  }, [initialSelection]);
 
   const days = useMemo(() => {
     const year = currentDate.getFullYear();
@@ -161,7 +181,7 @@ export function PremiumCalendar({ onSelect, selectedDateTime }: PremiumCalendarP
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
           className="border border-gray-200 rounded-xl overflow-hidden"
           style={{ background: '#fafafa' }}
         >

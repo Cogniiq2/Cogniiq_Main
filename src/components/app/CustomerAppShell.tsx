@@ -3,21 +3,22 @@ import type { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
+  Activity,
   BookOpen,
   ChevronDown,
   CreditCard,
+  Download,
   ExternalLink,
+  FileText,
   Headphones,
   Home,
   LogOut,
   Menu,
-  Mic2,
-  Phone,
+  MessageSquarePlus,
+  RefreshCw,
   Settings,
-  TestTube2,
+  ShieldCheck,
   UserRound,
-  UserPlus,
-  Wand2,
   X,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -31,9 +32,10 @@ import {
   useCustomerPortalPersistenceValue,
 } from '@/hooks/useCustomerPortalPersistence';
 import { useOrganizations } from '@/hooks/useOrganizations';
+import { usePwaInstallControls } from '@/lib/pwa';
 import { cn } from '@/lib/utils';
 
-type CustomerNavGroup = 'setup' | 'operate' | 'account';
+type CustomerNavGroup = 'hub' | 'service' | 'account';
 
 interface CustomerNavItem {
   label: string;
@@ -43,21 +45,19 @@ interface CustomerNavItem {
 }
 
 const navItems: CustomerNavItem[] = [
-  { label: 'Uebersicht', href: '/app', icon: Home, group: 'setup' },
-  { label: 'Einrichtung', href: '/app/onboarding', icon: Wand2, group: 'setup' },
-  { label: 'Rezeptionist', href: '/app/receptionist', icon: Headphones, group: 'setup' },
-  { label: 'Wissen', href: '/app/knowledge', icon: BookOpen, group: 'setup' },
-  { label: 'Telefon', href: '/app/phone', icon: Phone, group: 'setup' },
-  { label: 'Test & Start', href: '/app/test', icon: TestTube2, group: 'setup' },
-  { label: 'Anrufe', href: '/app/calls', icon: Mic2, group: 'operate' },
-  { label: 'Leads', href: '/app/leads', icon: UserPlus, group: 'operate' },
+  { label: 'Übersicht', href: '/app', icon: Home, group: 'hub' },
+  { label: 'Ihre Systeme', href: '/app/systems', icon: Headphones, group: 'hub' },
+  { label: 'Aktivität', href: '/app/activity', icon: Activity, group: 'hub' },
+  { label: 'Dokumente', href: '/app/documents', icon: FileText, group: 'service' },
+  { label: 'Änderungsanfragen', href: '/app/change-requests', icon: MessageSquarePlus, group: 'service' },
+  { label: 'Support', href: '/app/support', icon: BookOpen, group: 'service' },
+  { label: 'Team & Sicherheit', href: '/app/security', icon: ShieldCheck, group: 'account' },
   { label: 'Abrechnung', href: '/app/billing', icon: CreditCard, group: 'account' },
-  { label: 'Einstellungen', href: '/app/settings', icon: Settings, group: 'account' },
 ];
 
 const navGroupLabels: Record<CustomerNavGroup, string> = {
-  setup: 'Setup',
-  operate: 'Betrieb',
+  hub: 'Hub',
+  service: 'Service',
   account: 'Konto',
 };
 
@@ -73,6 +73,7 @@ export function CustomerAppShell({ children }: { children: ReactNode }) {
   const location = useLocation();
   const { profile, user, signOut } = useAuth();
   const { memberships, activeOrganization, activeOrganizationId, setActiveOrganizationId } = useOrganizations();
+  const pwaControls = usePwaInstallControls();
   const hasMultipleOrganizations = memberships.length > 1;
   const displayName = profile?.full_name || profile?.email || user?.email || 'Konto';
   const lifecycle = getPortalLifecycleDisplay(
@@ -143,6 +144,28 @@ export function CustomerAppShell({ children }: { children: ReactNode }) {
               <ExternalLink size={13} aria-hidden="true" />
             </Link>
 
+            {pwaControls.updateAvailable ? (
+              <button
+                type="button"
+                onClick={pwaControls.applyUpdate}
+                className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3.5 text-sm font-semibold text-gray-600 transition-colors hover:border-gray-300 hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
+              >
+                <RefreshCw size={13} aria-hidden="true" />
+                Update laden
+              </button>
+            ) : null}
+
+            {!pwaControls.updateAvailable && pwaControls.canInstall ? (
+              <button
+                type="button"
+                onClick={() => void pwaControls.installApp()}
+                className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3.5 text-sm font-semibold text-gray-600 transition-colors hover:border-gray-300 hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
+              >
+                <Download size={13} aria-hidden="true" />
+                App installieren
+              </button>
+            ) : null}
+
             <div className="relative">
               <button
                 type="button"
@@ -205,7 +228,7 @@ export function CustomerAppShell({ children }: { children: ReactNode }) {
 
         <div className="hidden border-t border-gray-100 bg-white/80 lg:block">
           <nav className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-4 py-3 sm:px-6 lg:px-8" aria-label="Kundenbereich Navigation">
-            {(['setup', 'operate', 'account'] as CustomerNavGroup[]).map((group) => (
+            {(['hub', 'service', 'account'] as CustomerNavGroup[]).map((group) => (
               <div key={group} className="flex items-center gap-1">
                 <span className="px-2 text-[10px] font-bold uppercase tracking-[0.18em] text-gray-300">
                   {navGroupLabels[group]}
@@ -238,7 +261,7 @@ export function CustomerAppShell({ children }: { children: ReactNode }) {
               <p className="mt-2 text-[12px] leading-5 text-gray-500">{lifecycle.description}</p>
             </div>
             <nav className="space-y-5" aria-label="Mobile Kundenbereich Navigation">
-              {(['setup', 'operate', 'account'] as CustomerNavGroup[]).map((group) => (
+              {(['hub', 'service', 'account'] as CustomerNavGroup[]).map((group) => (
                 <div key={group}>
                   <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">
                     {navGroupLabels[group]}
@@ -263,6 +286,26 @@ export function CustomerAppShell({ children }: { children: ReactNode }) {
               <p className="mt-1 truncate text-xs text-gray-500">{profile?.email ?? user?.email}</p>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
+              {pwaControls.updateAvailable ? (
+                <button
+                  type="button"
+                  onClick={pwaControls.applyUpdate}
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 text-sm font-semibold text-gray-700"
+                >
+                  <RefreshCw size={14} aria-hidden="true" />
+                  Update
+                </button>
+              ) : null}
+              {!pwaControls.updateAvailable && pwaControls.canInstall ? (
+                <button
+                  type="button"
+                  onClick={() => void pwaControls.installApp()}
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 text-sm font-semibold text-gray-700"
+                >
+                  <Download size={14} aria-hidden="true" />
+                  Installieren
+                </button>
+              ) : null}
               <Link
                 to="/"
                 onClick={() => setMobileOpen(false)}

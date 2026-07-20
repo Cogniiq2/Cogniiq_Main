@@ -7,7 +7,6 @@ import {
   Building2,
   Dumbbell,
   PhoneCall,
-  Clock,
   Calendar,
   MessageSquare,
   X,

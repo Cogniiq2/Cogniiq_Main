@@ -795,11 +795,10 @@ export function MobilePremiumHero() {
       )}
 
       <div
-        className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none"
+        className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none dark:[--mobile-hero-fade:rgb(3_7_18)]"
         style={{
           background: 'linear-gradient(to bottom, transparent, var(--mobile-hero-fade, white))',
         }}
-        className="dark:[--mobile-hero-fade:rgb(3_7_18)]"
       />
 
       <motion.div

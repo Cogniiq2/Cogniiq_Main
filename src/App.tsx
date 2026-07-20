@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, type ComponentType, type LazyExoticComponent } from 'react';
 import { BrowserRouter as Router, Navigate, Routes, Route, useLocation } from 'react-router-dom';
 
 import { PageReveal } from './components/PageReveal';
@@ -11,14 +11,16 @@ import { CityServicePage } from './components/CityServicePage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { CITY_SERVICE_CONFIGS } from './lib/standorte-data';
+import type { CitySlug } from './lib/standorte-data';
+import type { CustomerSection } from './pages/app/CustomerSectionPage';
 
-function lazyNamed<T extends Record<string, any>, K extends keyof T>(
-  importer: () => Promise<T>,
-  exportName: K
-) {
+function lazyNamed<TProps extends object = Record<string, never>>(
+  importer: () => Promise<unknown>,
+  exportName: string
+): LazyExoticComponent<ComponentType<TProps>> {
   return lazy(() =>
     importer().then((module) => ({
-      default: module[exportName] as React.ComponentType<any>,
+      default: (module as Record<string, unknown>)[exportName] as ComponentType<TProps>,
     }))
   );
 }
@@ -76,7 +78,7 @@ const AnfrageErhaltenPage = lazyNamed(() => import('./pages/AnfrageErhaltenPage'
 // Location / hub pages
 const BayernPage = lazyNamed(() => import('./pages/BayernPage'), 'BayernPage');
 const DeutschlandPage = lazyNamed(() => import('./pages/DeutschlandPage'), 'DeutschlandPage');
-const CityLandingPage = lazyNamed(() => import('./pages/CityLandingPage'), 'CityLandingPage');
+const CityLandingPage = lazyNamed<{ citySlug: CitySlug }>(() => import('./pages/CityLandingPage'), 'CityLandingPage');
 const WebdesignHub = lazyNamed(() => import('./pages/WebdesignHub'), 'WebdesignHub');
 const ProzessautomatisierungHub = lazyNamed(
   () => import('./pages/ProzessautomatisierungHub'),
@@ -316,9 +318,11 @@ const ExecutionPage = lazyNamed(() => import('./pages/ExecutionPage'), 'Executio
 const OuraAnalyticsPage = lazyNamed(() => import('./pages/OuraAnalyticsPage'), 'OuraAnalyticsPage');
 const AdminLoginPage = lazyNamed(() => import('./pages/admin/AdminLoginPage'), 'AdminLoginPage');
 const AppHomePage = lazyNamed(() => import('./pages/app/AppHomePage'), 'AppHomePage');
-const CustomerSectionPage = lazyNamed(() => import('./pages/app/CustomerSectionPage'), 'CustomerSectionPage');
+const CustomerSectionPage = lazyNamed<{ section: CustomerSection }>(
+  () => import('./pages/app/CustomerSectionPage'),
+  'CustomerSectionPage'
+);
 const LoginPage = lazyNamed(() => import('./pages/app/LoginPage'), 'LoginPage');
-const SignupPage = lazyNamed(() => import('./pages/app/SignupPage'), 'SignupPage');
 const ForgotPasswordPage = lazyNamed(() => import('./pages/app/ForgotPasswordPage'), 'ForgotPasswordPage');
 const ResetPasswordPage = lazyNamed(() => import('./pages/app/ResetPasswordPage'), 'ResetPasswordPage');
 
@@ -360,7 +364,6 @@ function AppInner() {
       <Suspense fallback={<PageFallback />}>
         <Routes>
           <Route path="/app/login" element={<LoginPage />} />
-          <Route path="/app/signup" element={<SignupPage />} />
           <Route path="/app/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/app/reset-password" element={<ResetPasswordPage />} />
           <Route
@@ -368,6 +371,54 @@ function AppInner() {
             element={
               <ProtectedRoute>
                 <AppHomePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/systems"
+            element={
+              <ProtectedRoute>
+                <CustomerSectionPage section="systems" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/activity"
+            element={
+              <ProtectedRoute>
+                <CustomerSectionPage section="activity" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/documents"
+            element={
+              <ProtectedRoute>
+                <CustomerSectionPage section="documents" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/change-requests"
+            element={
+              <ProtectedRoute>
+                <CustomerSectionPage section="change-requests" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/support"
+            element={
+              <ProtectedRoute>
+                <CustomerSectionPage section="support" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/security"
+            element={
+              <ProtectedRoute>
+                <CustomerSectionPage section="security" />
               </ProtectedRoute>
             }
           />

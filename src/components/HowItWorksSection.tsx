@@ -287,6 +287,7 @@ export function HowItWorksSection() {
 
         {/* Steps grid */}
         <div className="relative grid lg:grid-cols-3 gap-5">
+          <AnimatedTimeline activeStep={activeStep} />
           {STEPS.map((step, i) => (
             <StepCard
               key={i}

@@ -3,6 +3,7 @@ import { createRoot, hydrateRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import { ThemeProvider } from './components/theme-provider';
+import { registerClientHubServiceWorker } from './lib/pwa';
 
 window.addEventListener('vite:preloadError', () => {
   window.location.reload();
@@ -27,3 +28,5 @@ if (rootElement.hasChildNodes()) {
 } else {
   createRoot(rootElement).render(app);
 }
+
+registerClientHubServiceWorker();

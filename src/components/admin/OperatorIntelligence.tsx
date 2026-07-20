@@ -104,7 +104,7 @@ function Panel({ children, accent, delay }: { children: React.ReactNode; accent:
     <motion.div
       initial={{ opacity: 0, x: 12 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.45, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.45, delay, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
       className="rounded-xl p-4 relative overflow-hidden"
       style={{ background: 'var(--admin-surface-elevated)', border: '1px solid var(--admin-border)' }}
     >

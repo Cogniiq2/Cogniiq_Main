@@ -41,7 +41,7 @@ export function GlossaryWord({ word, explanation }: { word: string; explanation:
             initial={{ opacity: 0, scale: 0.85, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 10 }}
-            transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
+            transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] as [number, number, number, number] }}
             className="absolute left-1/2 top-8 z-50 w-64 -translate-x-1/2 rounded-2xl bg-white/80 backdrop-blur-xl p-4 shadow-xl border border-gray-200"
           >
             <p className="text-sm text-gray-700 leading-relaxed">{explanation}</p>

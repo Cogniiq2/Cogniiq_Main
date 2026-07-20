@@ -42,7 +42,7 @@ function AnimatedNumber({ value, prefix = '', suffix = '' }: { value: number; pr
   useEffect(() => {
     const controls = animate(prevValue.current, value, {
       duration: 0.65,
-      ease: [0.22, 1, 0.36, 1],
+      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
       onUpdate: (v) => setDisplay(Math.round(v)),
       onComplete: () => { prevValue.current = value; },
     });

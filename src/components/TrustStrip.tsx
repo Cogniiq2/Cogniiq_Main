@@ -1,6 +1,6 @@
 import { motion, useInView } from 'framer-motion';
-import { useRef, useEffect, useState } from 'react';
-import { Shield, Clock, Users, Award, Lock, TrendingUp } from 'lucide-react';
+import { useRef } from 'react';
+import { Shield, Clock, Users, Award, Lock } from 'lucide-react';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -11,40 +11,6 @@ const ITEMS = [
   { icon: Award, label: 'Keine Templates', sub: 'Gebaut für Ihren Prozess' },
   { icon: Lock, label: 'Festpreis', sub: 'Kein verstecktes Scope-Creep' },
 ];
-
-function LiveCounter() {
-  const [count, setCount] = useState(247);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (Math.random() > 0.7) {
-        setCount(c => c + 1);
-      }
-    }, 8000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-emerald-50 border border-emerald-100">
-      <motion.div
-        className="w-1.5 h-1.5 rounded-full bg-emerald-500"
-        animate={{ opacity: [1, 0.3, 1], scale: [1, 1.4, 1] }}
-        transition={{ duration: 1.8, repeat: Infinity }}
-      />
-      <motion.span
-        key={count}
-        className="text-[10.5px] font-bold text-emerald-700 tabular-nums"
-        initial={{ y: -6, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.3 }}
-      >
-        {count}
-      </motion.span>
-      <span className="text-[10.5px] font-medium text-emerald-600">Anrufe heute beantwortet</span>
-      <TrendingUp size={10} className="text-emerald-500" />
-    </div>
-  );
-}
 
 export function TrustStrip() {
   const ref = useRef(null);
