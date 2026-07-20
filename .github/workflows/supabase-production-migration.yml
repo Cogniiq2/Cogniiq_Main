@@ -35,6 +35,7 @@ jobs:
     env:
       TARGET_MIGRATION: 20260711120000_receptionist_persistence.sql
       TARGET_MIGRATION_PATH: supabase/migrations/20260711120000_receptionist_persistence.sql
+      TARGET_MIGRATION_VERSION: 20260711120000
       ISOLATED_SOURCE_DIR: isolated-migration-source
 
     steps:
@@ -220,8 +221,49 @@ jobs:
         run: |
           set -o pipefail
           supabase migration list 2>&1 | tee ../supabase-migration-list-after-apply.txt
-          if ! grep -Eq '(^|[^0-9])20260711120000([^0-9]|$)' ../supabase-migration-list-after-apply.txt; then
-            echo "Applied receptionist migration version 20260711120000 was not found in migration history."
+          if ! awk -F '|' -v target="$TARGET_MIGRATION_VERSION" '
+            function normalize(value) {
+              gsub(/[^0-9]/, "", value)
+              return value
+            }
+
+            {
+              local_version = normalize($1)
+              remote_version = normalize($2)
+
+              if (NF >= 3 && local_version == "") {
+                local_version = normalize($2)
+                remote_version = normalize($3)
+              }
+
+              if (local_version == target) {
+                found_local = 1
+                target_remote_version = remote_version
+                if (remote_version == target) {
+                  found_synced = 1
+                }
+              }
+            }
+
+            END {
+              if (found_synced) {
+                exit 0
+              }
+
+              if (found_local) {
+                if (target_remote_version == "") {
+                  print "Target migration was found in the Local column, but the Remote column was blank or missing." > "/dev/stderr"
+                } else {
+                  print "Target migration was found in the Local column, but the Remote column was " target_remote_version "." > "/dev/stderr"
+                }
+                exit 2
+              }
+
+              print "Target migration was not found in the Local column." > "/dev/stderr"
+              exit 1
+            }
+          ' ../supabase-migration-list-after-apply.txt; then
+            echo "Applied receptionist migration version $TARGET_MIGRATION_VERSION was not found with matching Local and Remote columns."
             exit 1
           fi
 

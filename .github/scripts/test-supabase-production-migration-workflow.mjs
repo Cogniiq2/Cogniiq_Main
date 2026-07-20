@@ -19,19 +19,22 @@ function assertNotIncludes(value, unexpected, message) {
   assert(!String(value ?? '').includes(unexpected), message);
 }
 
-function escapeRegex(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function assertMatches(value, pattern, message) {
+  assert(pattern.test(String(value ?? '')), message);
 }
 
 function stepBlock(name) {
-  const pattern = new RegExp(`^      - name: ${escapeRegex(name)}\\n([\\s\\S]*?)(?=^      - name: |\\z)`, 'm');
-  const match = workflowText.match(pattern);
+  const marker = `      - name: ${name}\n`;
+  const start = workflowText.indexOf(marker);
 
-  if (!match) {
+  if (start === -1) {
     fail(`Missing workflow step: ${name}`);
   }
 
-  return match[1];
+  const rest = workflowText.slice(start + marker.length);
+  const nextStep = rest.search(/\n      - name: /);
+
+  return nextStep === -1 ? rest : rest.slice(0, nextStep);
 }
 
 function assertStepIncludes(name, expected, message) {
@@ -51,6 +54,7 @@ assertIncludes(
   'TARGET_MIGRATION_PATH: supabase/migrations/20260711120000_receptionist_persistence.sql',
   'Target migration path drifted'
 );
+assertIncludes(workflowText, 'TARGET_MIGRATION_VERSION: 20260711120000', 'Target migration version drifted');
 assertIncludes(workflowText, 'ISOLATED_SOURCE_DIR: isolated-migration-source', 'Isolated source directory drifted');
 
 assertStepIncludes('Checkout selected migration branch', 'path: migration-source', 'Selected migration branch must be checked out into migration-source');
@@ -97,15 +101,106 @@ assertIncludes(applyBlock, "if: ${{ inputs.mode == 'apply' }}", 'Final push must
 assertIncludes(applyBlock, 'working-directory: isolated-migration-source', 'Final push must use the isolated workspace');
 assertIncludes(applyBlock, 'run: supabase db push', 'Final push command must remain supabase db push without extra flags');
 
-assertStepIncludes('Verify applied migration history', "if: ${{ inputs.mode == 'apply' }}", 'Post-apply verification must run only in apply mode');
-assertStepWorkingDirectory('Verify applied migration history', 'isolated-migration-source');
-assertStepIncludes('Verify applied migration history', 'supabase migration list', 'Post-apply verification must list migration history again');
-assertStepIncludes('Verify applied migration history', '20260711120000', 'Post-apply verification must check the receptionist migration version');
+const verifyAppliedBlock = stepBlock('Verify applied migration history');
+assertIncludes(verifyAppliedBlock, "if: ${{ inputs.mode == 'apply' }}", 'Post-apply verification must run only in apply mode');
+assertIncludes(verifyAppliedBlock, 'working-directory: isolated-migration-source', 'Post-apply verification must use the isolated workspace');
+assertIncludes(verifyAppliedBlock, 'supabase migration list', 'Post-apply verification must list migration history again');
+assertIncludes(verifyAppliedBlock, `awk -F '|' -v target="$TARGET_MIGRATION_VERSION"`, 'Post-apply verification must parse Local and Remote columns with awk');
+assertMatches(verifyAppliedBlock, /local_version\s*=\s*normalize\(\$1\)/, 'Post-apply verification must normalize the Local column independently');
+assertMatches(verifyAppliedBlock, /remote_version\s*=\s*normalize\(\$2\)/, 'Post-apply verification must normalize the Remote column independently');
+assertMatches(verifyAppliedBlock, /remote_version\s*==\s*target/, 'Post-apply verification must require the Remote column to match the target');
+assertIncludes(verifyAppliedBlock, 'found_synced', 'Post-apply verification must succeed only when Local and Remote are both present');
+assertIncludes(verifyAppliedBlock, '$TARGET_MIGRATION_VERSION', 'Post-apply verification must use the target migration version env var');
+assertIncludes(verifyAppliedBlock, 'Remote column was blank or missing', 'Post-apply verification must explain local-only or blank-remote failures');
+assertIncludes(verifyAppliedBlock, 'Target migration was not found in the Local column', 'Post-apply verification must explain missing target-row failures');
+assertNotIncludes(verifyAppliedBlock, 'grep -Eq', 'Post-apply verification must not grep for the version anywhere in the output');
 
 assertNotIncludes(workflowText, '--include-all', 'Workflow must not use --include-all');
 assertNotIncludes(workflowText, '--include-seed', 'Workflow must not use --include-seed');
 assertNotIncludes(workflowText, '--include-roles', 'Workflow must not use --include-roles');
 assertNotIncludes(workflowText, 'migration repair', 'Workflow must not run migration repair');
 assertNotIncludes(workflowText, 'db reset', 'Workflow must not run db reset');
+
+function normalizeMigrationVersion(value) {
+  return String(value ?? '').replace(/[^0-9]/g, '');
+}
+
+function migrationHistoryHasSyncedTarget(output, target) {
+  let foundLocal = false;
+  let foundSynced = false;
+
+  for (const row of output.split(/\r?\n/)) {
+    const fields = row.split('|');
+    let localVersion = normalizeMigrationVersion(fields[0]);
+    let remoteVersion = normalizeMigrationVersion(fields[1]);
+
+    if (fields.length >= 3 && localVersion === '') {
+      localVersion = normalizeMigrationVersion(fields[1]);
+      remoteVersion = normalizeMigrationVersion(fields[2]);
+    }
+
+    if (localVersion === target) {
+      foundLocal = true;
+
+      if (remoteVersion === target) {
+        foundSynced = true;
+      }
+    }
+  }
+
+  return { foundLocal, foundSynced, ok: foundSynced };
+}
+
+function assertMigrationHistoryParser(name, output, expectedOk) {
+  const result = migrationHistoryHasSyncedTarget(output, '20260711120000');
+
+  if (result.ok !== expectedOk) {
+    fail(`${name} expected ok=${expectedOk}, received ${JSON.stringify(result)}`);
+  }
+}
+
+assertMigrationHistoryParser(
+  'local and remote both populated',
+  `
+  | Local          | Remote         | Time (UTC) |
+  |----------------|----------------|------------|
+  | \`20260711120000\` | \`20260711120000\` | 2026-07-20 |
+  `,
+  true
+);
+assertMigrationHistoryParser(
+  'local populated and remote blank',
+  `
+  | Local          | Remote | Time (UTC) |
+  |----------------|--------|------------|
+  | 20260711120000 |        |            |
+  `,
+  false
+);
+assertMigrationHistoryParser(
+  'unrelated remote migration only',
+  `
+  | Local          | Remote         | Time (UTC) |
+  |----------------|----------------|------------|
+  | 20260710133000 | 20260711120000 | 2026-07-20 |
+  `,
+  false
+);
+assertMigrationHistoryParser(
+  'local and remote differ',
+  `
+  Local | Remote | Time (UTC)
+  20260711120000 | 20260710133000 | 2026-07-20
+  `,
+  false
+);
+assertMigrationHistoryParser(
+  'malformed or missing target row',
+  `
+  Local | Remote | Time (UTC)
+  malformed output without the target local row
+  `,
+  false
+);
 
 console.log('supabase production migration workflow static checks passed');
