@@ -70,6 +70,66 @@ function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+function identifier(name) {
+  return `(?:"${escapeRegex(name)}"|${escapeRegex(name)})`;
+}
+
+function qualifiedIdentifier(schemaName, objectName) {
+  return `${identifier(schemaName)}\\s*\\.\\s*${identifier(objectName)}`;
+}
+
+function publicIdentifier(objectName) {
+  return qualifiedIdentifier('public', objectName);
+}
+
+function tableReference(tableName) {
+  return `(?:only\\s+)?${publicIdentifier(tableName)}`;
+}
+
+function roleIdentifier(roleName) {
+  return identifier(roleName);
+}
+
+function roleList(roleNames) {
+  return roleNames.map((roleName) => roleIdentifier(roleName)).join('[\\s\\S]*');
+}
+
+function quotedOrBareList(values) {
+  return values.map((value) => identifier(value)).join('[^)]*');
+}
+
+function functionGrantPattern(functionName, roleName) {
+  return new RegExp(
+    `grant\\s+(?:all|execute)\\s+on\\s+function\\s+${publicIdentifier(functionName)}\\([^;\\n]*\\)\\s+to\\s+${roleIdentifier(roleName)}`
+  );
+}
+
+function tableGrantPattern(tableName, roleName, privilegePattern) {
+  return new RegExp(`grant\\s+${privilegePattern}\\s+on\\s+table\\s+${publicIdentifier(tableName)}\\s+to\\s+${roleIdentifier(roleName)}`);
+}
+
+function columnGrantPattern(tableName, roleName, privilege, columnNames) {
+  return new RegExp(
+    `grant\\s+${privilege}\\s*\\([^)]*${quotedOrBareList(columnNames)}[^)]*\\)\\s+on\\s+table\\s+${publicIdentifier(tableName)}\\s+to\\s+${roleIdentifier(roleName)}`
+  );
+}
+
+function tableConstraintPattern(tableName, bodyPattern) {
+  return new RegExp(`alter\\s+table\\s+${tableReference(tableName)}[\\s\\S]*${bodyPattern}`);
+}
+
+function checkValuesPattern(tableName, values) {
+  const valuePattern = values.map((value) => escapeRegex(value)).join('[\\s\\S]*');
+  return tableConstraintPattern(tableName, `check[\\s\\S]*${valuePattern}`);
+}
+
+function foreignKeyPattern(tableName, columnName, targetTableName, targetColumnName) {
+  return tableConstraintPattern(
+    tableName,
+    `foreign\\s+key\\s*\\(${identifier(columnName)}\\)\\s+references\\s+${publicIdentifier(targetTableName)}\\s*\\(${identifier(targetColumnName)}\\)\\s+on\\s+delete\\s+cascade`
+  );
+}
+
 function has(pattern) {
   return pattern.test(schema);
 }
@@ -97,20 +157,19 @@ function ambiguous(label, reason) {
 }
 
 function table(tableName) {
-  return missing(`table public.${tableName}`, new RegExp(`create\\s+table\\s+public\\.${escapeRegex(tableName)}\\s*\\(`));
+  return missing(`table public.${tableName}`, new RegExp(`create\\s+table\\s+${publicIdentifier(tableName)}\\s*\\(`));
 }
 
 function tableBlock(tableName) {
-  const match = schema.match(new RegExp(`create\\s+table\\s+public\\.${escapeRegex(tableName)}\\s*\\(([\\s\\S]*?)\\n\\);`));
+  const match = schema.match(new RegExp(`create\\s+table\\s+${publicIdentifier(tableName)}\\s*\\(([\\s\\S]*?)\\n\\);`));
   return match?.[1] ?? '';
 }
 
 function column(tableName, columnName) {
   const block = tableBlock(tableName);
-  const quotedOrBare = `(?:"${escapeRegex(columnName)}"|${escapeRegex(columnName)})`;
   return {
     label: `column public.${tableName}.${columnName}`,
-    state: new RegExp(`\\n\\s*${quotedOrBare}\\s+`).test(block) ? 'PASS' : 'FAIL',
+    state: new RegExp(`\\n\\s*${identifier(columnName)}\\s+`).test(block) ? 'PASS' : 'FAIL',
   };
 }
 
@@ -120,24 +179,24 @@ function columns(tableName, columnNames) {
 
 function typeEnum(typeName, values) {
   const valuePattern = values.map((value) => `'${escapeRegex(value)}'`).join('[\\s\\S]*');
-  return missing(`type public.${typeName} enum values`, new RegExp(`create\\s+type\\s+public\\.${escapeRegex(typeName)}\\s+as\\s+enum[\\s\\S]*${valuePattern}`));
+  return missing(`type public.${typeName} enum values`, new RegExp(`create\\s+type\\s+${publicIdentifier(typeName)}\\s+as\\s+enum[\\s\\S]*${valuePattern}`));
 }
 
 function index(indexName, tableName) {
-  return missing(`index ${indexName} on public.${tableName}`, new RegExp(`create\\s+(?:unique\\s+)?index\\s+${escapeRegex(indexName)}\\s+on\\s+public\\.${escapeRegex(tableName)}\\b`));
+  return missing(`index ${indexName} on public.${tableName}`, new RegExp(`create\\s+(?:unique\\s+)?index\\s+${identifier(indexName)}\\s+on\\s+${publicIdentifier(tableName)}(?=\\s|;)`));
 }
 
 function constraint(constraintName, tableName) {
-  return missing(`constraint ${constraintName} on public.${tableName}`, new RegExp(`alter\\s+table\\s+(?:only\\s+)?public\\.${escapeRegex(tableName)}[\\s\\S]*constraint\\s+${escapeRegex(constraintName)}\\b`));
+  return missing(`constraint ${constraintName} on public.${tableName}`, tableConstraintPattern(tableName, `constraint\\s+${identifier(constraintName)}(?=\\s|;)`));
 }
 
 function rls(tableName) {
-  return missing(`RLS enabled on public.${tableName}`, new RegExp(`alter\\s+table\\s+public\\.${escapeRegex(tableName)}\\s+enable\\s+row\\s+level\\s+security`));
+  return missing(`RLS enabled on public.${tableName}`, new RegExp(`alter\\s+table\\s+${publicIdentifier(tableName)}\\s+enable\\s+row\\s+level\\s+security`));
 }
 
 function policy(policyName, tableName, details = '') {
   const block = schema.match(
-    new RegExp(`create\\s+policy\\s+"?${escapeRegex(policyName)}"?\\s+on\\s+public\\.${escapeRegex(tableName)}[\\s\\S]*?;`)
+    new RegExp(`create\\s+policy\\s+${identifier(policyName)}\\s+on\\s+${publicIdentifier(tableName)}[\\s\\S]*?;`)
   )?.[0];
   return {
     label: `policy ${policyName} on public.${tableName}`,
@@ -146,13 +205,13 @@ function policy(policyName, tableName, details = '') {
 }
 
 function functionExists(functionName) {
-  return missing(`function public.${functionName}`, new RegExp(`create\\s+function\\s+public\\.${escapeRegex(functionName)}\\s*\\(`));
+  return missing(`function public.${functionName}`, new RegExp(`create\\s+function\\s+${publicIdentifier(functionName)}\\s*\\(`));
 }
 
 function trigger(triggerName, tableName) {
   return missing(
     `trigger ${triggerName} on public.${tableName}`,
-    new RegExp(`create\\s+trigger\\s+${escapeRegex(triggerName)}[\\s\\S]*on\\s+public\\.${escapeRegex(tableName)}\\b`)
+    new RegExp(`create\\s+trigger\\s+${identifier(triggerName)}[\\s\\S]*on\\s+${publicIdentifier(tableName)}(?=\\s|;)`)
   );
 }
 
@@ -163,7 +222,7 @@ function grant(label, pattern) {
 function fkToOuraConnections(tableName) {
   return missing(
     `foreign key public.${tableName}.connection_id -> public.oura_connections(id)`,
-    new RegExp(`alter\\s+table\\s+(?:only\\s+)?public\\.${escapeRegex(tableName)}[\\s\\S]*foreign\\s+key\\s*\\(connection_id\\)\\s+references\\s+public\\.oura_connections\\(id\\)\\s+on\\s+delete\\s+cascade`)
+    foreignKeyPattern(tableName, 'connection_id', 'oura_connections', 'id')
   );
 }
 
@@ -291,17 +350,17 @@ const checksByMigration = {
     table('tasks'),
     ...columns('tasks', taskColumns),
     rls('tasks'),
-    policy('select_tasks', 'tasks', '[\\s\\S]*for\\s+select[\\s\\S]*to[\\s\\S]*anon[\\s\\S]*authenticated'),
-    policy('insert_tasks', 'tasks', '[\\s\\S]*for\\s+insert[\\s\\S]*to[\\s\\S]*anon[\\s\\S]*authenticated'),
-    policy('update_tasks', 'tasks', '[\\s\\S]*for\\s+update[\\s\\S]*to[\\s\\S]*anon[\\s\\S]*authenticated'),
-    policy('delete_tasks', 'tasks', '[\\s\\S]*for\\s+delete[\\s\\S]*to[\\s\\S]*anon[\\s\\S]*authenticated'),
+    policy('select_tasks', 'tasks', `[\\s\\S]*for\\s+select[\\s\\S]*to[\\s\\S]*${roleList(['anon', 'authenticated'])}`),
+    policy('insert_tasks', 'tasks', `[\\s\\S]*for\\s+insert[\\s\\S]*to[\\s\\S]*${roleList(['anon', 'authenticated'])}`),
+    policy('update_tasks', 'tasks', `[\\s\\S]*for\\s+update[\\s\\S]*to[\\s\\S]*${roleList(['anon', 'authenticated'])}`),
+    policy('delete_tasks', 'tasks', `[\\s\\S]*for\\s+delete[\\s\\S]*to[\\s\\S]*${roleList(['anon', 'authenticated'])}`),
   ],
   '20260607200426': [
     rls('tasks'),
-    policy('select_tasks', 'tasks', '[\\s\\S]*for\\s+select[\\s\\S]*to[\\s\\S]*anon[\\s\\S]*authenticated'),
-    policy('insert_tasks', 'tasks', '[\\s\\S]*for\\s+insert[\\s\\S]*to[\\s\\S]*anon[\\s\\S]*authenticated'),
-    policy('update_tasks', 'tasks', '[\\s\\S]*for\\s+update[\\s\\S]*to[\\s\\S]*anon[\\s\\S]*authenticated'),
-    policy('delete_tasks', 'tasks', '[\\s\\S]*for\\s+delete[\\s\\S]*to[\\s\\S]*anon[\\s\\S]*authenticated'),
+    policy('select_tasks', 'tasks', `[\\s\\S]*for\\s+select[\\s\\S]*to[\\s\\S]*${roleList(['anon', 'authenticated'])}`),
+    policy('insert_tasks', 'tasks', `[\\s\\S]*for\\s+insert[\\s\\S]*to[\\s\\S]*${roleList(['anon', 'authenticated'])}`),
+    policy('update_tasks', 'tasks', `[\\s\\S]*for\\s+update[\\s\\S]*to[\\s\\S]*${roleList(['anon', 'authenticated'])}`),
+    policy('delete_tasks', 'tasks', `[\\s\\S]*for\\s+delete[\\s\\S]*to[\\s\\S]*${roleList(['anon', 'authenticated'])}`),
   ],
   '20260706121415': [
     table('execution_days'),
@@ -311,15 +370,15 @@ const checksByMigration = {
     constraint('execution_days_plan_date_key', 'execution_days'),
     missing(
       'execution_days.status check allows pending/in_progress/completed',
-      /alter\s+table\s+(?:only\s+)?public\.execution_days[\s\S]*check[\s\S]*pending[\s\S]*in_progress[\s\S]*completed/
+      checkValuesPattern('execution_days', ['pending', 'in_progress', 'completed'])
     ),
     missing(
       'execution_tasks.priority check allows critical/high/medium/low',
-      /alter\s+table\s+(?:only\s+)?public\.execution_tasks[\s\S]*check[\s\S]*critical[\s\S]*high[\s\S]*medium[\s\S]*low/
+      checkValuesPattern('execution_tasks', ['critical', 'high', 'medium', 'low'])
     ),
     missing(
       'foreign key execution_tasks.execution_day_id -> execution_days(id)',
-      /alter\s+table\s+(?:only\s+)?public\.execution_tasks[\s\S]*foreign\s+key\s*\(execution_day_id\)\s+references\s+public\.execution_days\(id\)\s+on\s+delete\s+cascade/
+      foreignKeyPattern('execution_tasks', 'execution_day_id', 'execution_days', 'id')
     ),
     index('idx_execution_tasks_day', 'execution_tasks'),
     index('idx_execution_tasks_sort', 'execution_tasks'),
@@ -334,8 +393,8 @@ const checksByMigration = {
     trigger('trg_execution_tasks_recalc', 'execution_tasks'),
   ],
   '20260706122833': [
-    policy('execution_days_all', 'execution_days', '[\\s\\S]*to[\\s\\S]*anon[\\s\\S]*authenticated'),
-    policy('execution_tasks_all', 'execution_tasks', '[\\s\\S]*to[\\s\\S]*anon[\\s\\S]*authenticated'),
+    policy('execution_days_all', 'execution_days', `[\\s\\S]*to[\\s\\S]*${roleList(['anon', 'authenticated'])}`),
+    policy('execution_tasks_all', 'execution_tasks', `[\\s\\S]*to[\\s\\S]*${roleList(['anon', 'authenticated'])}`),
   ],
   '20260709120000': [
     ...Object.entries(ouraTables).flatMap(([tableName, columnNames]) => [table(tableName), ...columns(tableName, columnNames)]),
@@ -399,11 +458,11 @@ const checksByMigration = {
     policy('organization_members_insert_admins', 'organization_members'),
     policy('organization_members_update_admins', 'organization_members'),
     policy('organization_members_delete_admins', 'organization_members'),
-    grant('grant select public.profiles to authenticated', /grant\s+select\s+on\s+table\s+public\.profiles\s+to\s+authenticated/),
-    grant('grant select public.organizations to authenticated', /grant\s+select\s+on\s+table\s+public\.organizations\s+to\s+authenticated/),
+    grant('grant select public.profiles to authenticated', tableGrantPattern('profiles', 'authenticated', 'select')),
+    grant('grant select public.organizations to authenticated', tableGrantPattern('organizations', 'authenticated', 'select')),
     grant(
       'grant organization_members table access to authenticated',
-      /grant\s+(?:select,\s*)?insert[\s\S]*delete\s+on\s+table\s+public\.organization_members\s+to\s+authenticated/
+      tableGrantPattern('organization_members', 'authenticated', '(?:select,\\s*)?insert[\\s\\S]*delete')
     ),
   ],
   '20260710133000': [
@@ -419,39 +478,39 @@ const checksByMigration = {
     trigger('organization_members_guard_write', 'organization_members'),
     grant(
       'grant update(full_name, avatar_url, phone) on profiles to authenticated',
-      /grant\s+update\s*\([^)]*full_name[^)]*avatar_url[^)]*phone[^)]*\)\s+on\s+table\s+public\.profiles\s+to\s+authenticated/
+      columnGrantPattern('profiles', 'authenticated', 'update', ['full_name', 'avatar_url', 'phone'])
     ),
     grant(
       'grant update(name, slug) on organizations to authenticated',
-      /grant\s+update\s*\([^)]*name[^)]*slug[^)]*\)\s+on\s+table\s+public\.organizations\s+to\s+authenticated/
+      columnGrantPattern('organizations', 'authenticated', 'update', ['name', 'slug'])
     ),
     grant(
       'grant update(role, status) on organization_members to authenticated',
-      /grant\s+update\s*\([^)]*role[^)]*status[^)]*\)\s+on\s+table\s+public\.organization_members\s+to\s+authenticated/
+      columnGrantPattern('organization_members', 'authenticated', 'update', ['role', 'status'])
     ),
     grant(
       'grant execute create_organization_for_user to service_role',
-      /grant\s+(?:all|execute)\s+on\s+function\s+public\.create_organization_for_user\([^;\n]*\)\s+to\s+service_role/
+      functionGrantPattern('create_organization_for_user', 'service_role')
     ),
     absent(
       'no execute grant for create_organization_for_user to authenticated',
-      /grant\s+(?:all|execute)\s+on\s+function\s+public\.create_organization_for_user\([^;\n]*\)\s+to\s+authenticated/
+      functionGrantPattern('create_organization_for_user', 'authenticated')
     ),
-    grant('grant execute sync_auth_user_profile to service_role', /grant\s+(?:all|execute)\s+on\s+function\s+public\.sync_auth_user_profile\([^;\n]*\)\s+to\s+service_role/),
+    grant('grant execute sync_auth_user_profile to service_role', functionGrantPattern('sync_auth_user_profile', 'service_role')),
     grant(
       'grant execute guard_profile_protected_columns to service_role',
-      /grant\s+(?:all|execute)\s+on\s+function\s+public\.guard_profile_protected_columns\([^;\n]*\)\s+to\s+service_role/
+      functionGrantPattern('guard_profile_protected_columns', 'service_role')
     ),
-    grant('grant execute guard_profile_delete to service_role', /grant\s+(?:all|execute)\s+on\s+function\s+public\.guard_profile_delete\([^;\n]*\)\s+to\s+service_role/),
+    grant('grant execute guard_profile_delete to service_role', functionGrantPattern('guard_profile_delete', 'service_role')),
     grant(
       'grant execute guard_organization_protected_columns to service_role',
-      /grant\s+(?:all|execute)\s+on\s+function\s+public\.guard_organization_protected_columns\([^;\n]*\)\s+to\s+service_role/
+      functionGrantPattern('guard_organization_protected_columns', 'service_role')
     ),
     grant(
       'grant execute guard_organization_membership_change to service_role',
-      /grant\s+(?:all|execute)\s+on\s+function\s+public\.guard_organization_membership_change\([^;\n]*\)\s+to\s+service_role/
+      functionGrantPattern('guard_organization_membership_change', 'service_role')
     ),
-    grant('grant execute set_updated_at to service_role', /grant\s+(?:all|execute)\s+on\s+function\s+public\.set_updated_at\([^;\n]*\)\s+to\s+service_role/),
+    grant('grant execute set_updated_at to service_role', functionGrantPattern('set_updated_at', 'service_role')),
     ambiguous(
       'trigger on_auth_user_profile_sync on auth.users',
       'The audit intentionally dumps only --schema public, so auth.users triggers are not visible in remote-public-schema.sql.'
