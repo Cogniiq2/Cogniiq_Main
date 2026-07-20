@@ -106,8 +106,11 @@ assertIncludes(verifyAppliedBlock, "if: ${{ inputs.mode == 'apply' }}", 'Post-ap
 assertIncludes(verifyAppliedBlock, 'working-directory: isolated-migration-source', 'Post-apply verification must use the isolated workspace');
 assertIncludes(verifyAppliedBlock, 'supabase migration list', 'Post-apply verification must list migration history again');
 assertIncludes(verifyAppliedBlock, `awk -F '|' -v target="$TARGET_MIGRATION_VERSION"`, 'Post-apply verification must parse Local and Remote columns with awk');
-assertMatches(verifyAppliedBlock, /local_version\s*=\s*normalize\(\$1\)/, 'Post-apply verification must normalize the Local column independently');
-assertMatches(verifyAppliedBlock, /remote_version\s*=\s*normalize\(\$2\)/, 'Post-apply verification must normalize the Remote column independently');
+assertMatches(verifyAppliedBlock, /raw_row\s*=\s*\$0/, 'Post-apply verification must determine column layout from the raw row');
+assertMatches(verifyAppliedBlock, /raw_row\s*~\s*\/\^\[\[:space:\]\]\*\\\|\//, 'Post-apply verification must detect leading-pipe table rows');
+assertMatches(verifyAppliedBlock, /local_version\s*=\s*normalize\(\$2\)[\s\S]*remote_version\s*=\s*normalize\(\$3\)/, 'Leading-pipe rows must parse Local from field $2 and Remote from field $3');
+assertMatches(verifyAppliedBlock, /local_version\s*=\s*normalize\(\$1\)[\s\S]*remote_version\s*=\s*normalize\(\$2\)/, 'Rows without a leading pipe must parse Local from field $1 and Remote from field $2');
+assertNotIncludes(verifyAppliedBlock, 'local_version == ""', 'Post-apply verification must not shift columns merely because Local is blank');
 assertMatches(verifyAppliedBlock, /remote_version\s*==\s*target/, 'Post-apply verification must require the Remote column to match the target');
 assertIncludes(verifyAppliedBlock, 'found_synced', 'Post-apply verification must succeed only when Local and Remote are both present');
 assertIncludes(verifyAppliedBlock, '$TARGET_MIGRATION_VERSION', 'Post-apply verification must use the target migration version env var');
@@ -131,12 +134,15 @@ function migrationHistoryHasSyncedTarget(output, target) {
 
   for (const row of output.split(/\r?\n/)) {
     const fields = row.split('|');
-    let localVersion = normalizeMigrationVersion(fields[0]);
-    let remoteVersion = normalizeMigrationVersion(fields[1]);
+    let localVersion;
+    let remoteVersion;
 
-    if (fields.length >= 3 && localVersion === '') {
+    if (/^[ \t]*\|/.test(row)) {
       localVersion = normalizeMigrationVersion(fields[1]);
       remoteVersion = normalizeMigrationVersion(fields[2]);
+    } else {
+      localVersion = normalizeMigrationVersion(fields[0]);
+      remoteVersion = normalizeMigrationVersion(fields[1]);
     }
 
     if (localVersion === target) {
@@ -160,7 +166,15 @@ function assertMigrationHistoryParser(name, output, expectedOk) {
 }
 
 assertMigrationHistoryParser(
-  'local and remote both populated',
+  'no-leading-pipe local and remote both populated',
+  `
+  Local | Remote | Time (UTC)
+  20260711120000 | 20260711120000 | 2026-07-20
+  `,
+  true
+);
+assertMigrationHistoryParser(
+  'leading-pipe local and remote both populated',
   `
   | Local          | Remote         | Time (UTC) |
   |----------------|----------------|------------|
@@ -169,20 +183,28 @@ assertMigrationHistoryParser(
   true
 );
 assertMigrationHistoryParser(
-  'local populated and remote blank',
+  'no-leading-pipe local populated and remote blank',
   `
-  | Local          | Remote | Time (UTC) |
-  |----------------|--------|------------|
-  | 20260711120000 |        |            |
+  Local | Remote | Time (UTC)
+  20260711120000 |        | 2026-07-20
   `,
   false
 );
 assertMigrationHistoryParser(
-  'unrelated remote migration only',
+  'leading-pipe local blank remote target time normalizes to target',
+  `
+  | Local          | Remote | Time (UTC) |
+  |----------------|--------|------------|
+  |                | 20260711120000 | 2026-07-11 12:00:00 |
+  `,
+  false
+);
+assertMigrationHistoryParser(
+  'remote target only',
   `
   | Local          | Remote         | Time (UTC) |
   |----------------|----------------|------------|
-  | 20260710133000 | 20260711120000 | 2026-07-20 |
+  |                | 20260711120000 | 2026-07-20 |
   `,
   false
 );

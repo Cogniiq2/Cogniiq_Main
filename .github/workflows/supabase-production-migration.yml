@@ -228,12 +228,14 @@ jobs:
             }
 
             {
-              local_version = normalize($1)
-              remote_version = normalize($2)
+              raw_row = $0
 
-              if (NF >= 3 && local_version == "") {
+              if (raw_row ~ /^[[:space:]]*\|/) {
                 local_version = normalize($2)
                 remote_version = normalize($3)
+              } else {
+                local_version = normalize($1)
+                remote_version = normalize($2)
               }
 
               if (local_version == target) {
