@@ -7,7 +7,7 @@ import { PremiumMobileNav } from './ui/premium-mobile-nav';
 import { ScrollProgress } from './ScrollProgress';
 import { useAuth } from '@/contexts/AuthContext';
 
-const ease = [0.22, 1, 0.36, 1] as const;
+const ease = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);

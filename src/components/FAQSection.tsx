@@ -68,7 +68,7 @@ const FAQ_SCHEMA = {
   })),
 };
 
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 export function FAQSection() {
   const ref = useRef(null);

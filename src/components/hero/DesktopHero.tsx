@@ -18,7 +18,7 @@ const LazySplineScene = lazy(() =>
   }))
 );
 
-const E: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const E: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 const AVATAR_INITIALS = ['MK', 'SR', 'TH', 'AB', 'LP'];
 const AVATAR_COLORS = ['#0ea5e9', '#22c55e', '#f59e0b', '#ef4444', '#64748b'];

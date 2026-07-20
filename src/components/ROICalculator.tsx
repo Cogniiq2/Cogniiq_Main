@@ -3,7 +3,7 @@ import { useRef, useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Info, TrendingDown, Phone, ChevronDown } from 'lucide-react';
 
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 export type Industry = 'Arztpraxis' | 'Gastronomie' | 'Dienstleistung' | 'Immobilien';
 
@@ -42,7 +42,7 @@ function AnimatedNumber({ value, prefix = '', suffix = '' }: { value: number; pr
   useEffect(() => {
     const controls = animate(prevValue.current, value, {
       duration: 0.65,
-      ease: [0.22, 1, 0.36, 1],
+      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
       onUpdate: (v) => setDisplay(Math.round(v)),
       onComplete: () => { prevValue.current = value; },
     });

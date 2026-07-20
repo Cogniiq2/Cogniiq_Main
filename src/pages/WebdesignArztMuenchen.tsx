@@ -8,6 +8,9 @@ const config: IndustryPageConfig = {
   route: "/webdesign-arzt-muenchen",
   industry: "Arzt & Praxis",
   industrySlug: "arzt-praxis",
+  city: "München",
+  citySlug: "muenchen",
+  cityHub: "/muenchen",
   seo: {
     title: "Webdesign & KI-Telefonassistent für Arztpraxen in München | Cogniiq",
     description:

@@ -126,7 +126,7 @@ export function CreateTaskPanel({ open, onClose, onCreated, today }: Props) {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 40 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
             className="fixed right-0 top-0 bottom-0 z-[201] w-full sm:w-[480px] overflow-y-auto flex flex-col"
             style={{ background: 'var(--admin-bg)', borderLeft: '1px solid var(--admin-border)', boxShadow: '-20px 0 60px rgba(0,0,0,0.3)' }}
           >

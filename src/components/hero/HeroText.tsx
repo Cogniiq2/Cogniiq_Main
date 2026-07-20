@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 
-const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 export function HeroText() {
   const line1 = 'CogniIQ';

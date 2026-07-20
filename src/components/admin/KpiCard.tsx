@@ -81,7 +81,7 @@ function KpiCard({ label, value, sub, accent, icon, delay = 0 }: KpiCardProps) {
     <motion.div
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
       className="group relative rounded-2xl overflow-hidden cursor-default"
       style={{ background: 'var(--admin-surface-elevated)', border: '1px solid var(--admin-border)', boxShadow: 'var(--admin-card-shadow)' }}
       whileHover={{ scale: 1.01 }}

@@ -15,7 +15,7 @@ const fadeUp = {
   visible: (delay = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
   }),
 };
 
@@ -75,10 +75,10 @@ export interface IndustryPageConfig {
     h1: string;
     lead: string;
   };
-  engpaesse: string[];
-  solutionSteps: IndustrySolutionStep[];
-  workflow: IndustryWorkflow;
-  pakete: IndustryPaket[];
+  engpaesse?: string[];
+  solutionSteps?: IndustrySolutionStep[];
+  workflow?: IndustryWorkflow;
+  pakete?: IndustryPaket[];
   problems: string[];
   services: IndustryServiceBlock[];
   useCases: IndustryUseCase[];
@@ -150,10 +150,16 @@ export function IndustryPage({ config }: IndustryPageProps) {
       <main className="min-h-screen">
         <HeroSection config={config} breadcrumbs={breadcrumbs} />
         <TrustStripSection config={config} />
-        <EngpaesseSection config={config} />
-        <SolutionSection config={config} />
-        <WorkflowSection config={config} />
-        <PaketeSection config={config} />
+        {config.engpaesse && config.engpaesse.length > 0 && (
+          <EngpaesseSection config={config} items={config.engpaesse} />
+        )}
+        {config.solutionSteps && config.solutionSteps.length > 0 && (
+          <SolutionSection config={config} steps={config.solutionSteps} />
+        )}
+        {config.workflow && <WorkflowSection config={config} workflow={config.workflow} />}
+        {config.pakete && config.pakete.length > 0 && (
+          <PaketeSection config={config} pakete={config.pakete} />
+        )}
         <ServicesSection config={config} />
         <UseCasesSection config={config} />
         <BenefitsSection config={config} />
@@ -268,7 +274,7 @@ function TrustStripSection({ config }: { config: IndustryPageConfig }) {
   );
 }
 
-function EngpaesseSection({ config }: { config: IndustryPageConfig }) {
+function EngpaesseSection({ config, items }: { config: IndustryPageConfig; items: string[] }) {
   return (
     <section
       className="py-20 bg-white dark:bg-gray-950 transition-colors duration-300"
@@ -295,7 +301,7 @@ function EngpaesseSection({ config }: { config: IndustryPageConfig }) {
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-4">
-          {config.engpaesse.map((item, i) => (
+          {items.map((item, i) => (
             <motion.div
               key={i}
               initial="hidden"
@@ -318,7 +324,13 @@ function EngpaesseSection({ config }: { config: IndustryPageConfig }) {
   );
 }
 
-function SolutionSection({ config }: { config: IndustryPageConfig }) {
+function SolutionSection({
+  config,
+  steps,
+}: {
+  config: IndustryPageConfig;
+  steps: IndustrySolutionStep[];
+}) {
   return (
     <section
       className="py-20 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300"
@@ -345,7 +357,7 @@ function SolutionSection({ config }: { config: IndustryPageConfig }) {
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-6">
-          {config.solutionSteps.map((step, i) => (
+          {steps.map((step, i) => (
             <motion.div
               key={i}
               initial="hidden"
@@ -372,7 +384,13 @@ function SolutionSection({ config }: { config: IndustryPageConfig }) {
   );
 }
 
-function WorkflowSection({ config }: { config: IndustryPageConfig }) {
+function WorkflowSection({
+  config,
+  workflow,
+}: {
+  config: IndustryPageConfig;
+  workflow: IndustryWorkflow;
+}) {
   return (
     <section
       className="py-20 bg-white dark:bg-gray-950 transition-colors duration-300"
@@ -408,15 +426,15 @@ function WorkflowSection({ config }: { config: IndustryPageConfig }) {
         >
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">Ausgangslage</p>
-            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{config.workflow.trigger}</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{workflow.trigger}</p>
           </div>
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">Vorgehen</p>
-            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{config.workflow.process}</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{workflow.process}</p>
           </div>
           <div className="p-6">
             <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">Ergebnis</p>
-            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{config.workflow.result}</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{workflow.result}</p>
           </div>
         </motion.div>
       </div>
@@ -424,7 +442,13 @@ function WorkflowSection({ config }: { config: IndustryPageConfig }) {
   );
 }
 
-function PaketeSection({ config }: { config: IndustryPageConfig }) {
+function PaketeSection({
+  config,
+  pakete,
+}: {
+  config: IndustryPageConfig;
+  pakete: IndustryPaket[];
+}) {
   return (
     <section
       className="py-20 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300"
@@ -451,7 +475,7 @@ function PaketeSection({ config }: { config: IndustryPageConfig }) {
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-6">
-          {config.pakete.map((paket, i) => (
+          {pakete.map((paket, i) => (
             <motion.div
               key={i}
               initial="hidden"

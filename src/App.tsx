@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, type ComponentType, type LazyExoticComponent } from 'react';
 import { BrowserRouter as Router, Navigate, Routes, Route, useLocation } from 'react-router-dom';
 
 import { PageReveal } from './components/PageReveal';
@@ -12,13 +12,15 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { CITY_SERVICE_CONFIGS } from './lib/standorte-data';
 
-function lazyNamed<T extends Record<string, any>, K extends keyof T>(
+type LazyPageComponent = ComponentType<Record<string, unknown>>;
+
+function lazyNamed<T extends Record<string, unknown>, K extends keyof T>(
   importer: () => Promise<T>,
   exportName: K
-) {
+): LazyExoticComponent<LazyPageComponent> {
   return lazy(() =>
     importer().then((module) => ({
-      default: module[exportName] as React.ComponentType<any>,
+      default: module[exportName] as LazyPageComponent,
     }))
   );
 }

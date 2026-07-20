@@ -24,7 +24,7 @@ import {
 import { PremiumCalendar } from './PremiumCalendar';
 import { N8N_ENDPOINTS } from '@/config/externalEndpoints';
 
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 const INTEREST_OPTIONS = [
   { id: 'Webdesign', label: 'Webdesign', desc: 'Neue Website oder Relaunch' },

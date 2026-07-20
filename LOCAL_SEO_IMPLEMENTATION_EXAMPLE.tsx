@@ -13,7 +13,7 @@ import { NAP } from './components/NAP';
 // EXAMPLE 1: Add to App.tsx (Main Component)
 // ============================================
 
-function App() {
+export function App() {
   return (
     <>
       {/* Add this at the top of your app to inject structured data */}
@@ -72,7 +72,7 @@ function ContactSection() {
 }
 
 // In Header (compact version)
-function Header() {
+export function Header() {
   return (
     <header>
       <nav>
@@ -91,7 +91,7 @@ function Header() {
 
 import { BUSINESS_INFO, getGoogleMapsUrl, formatAddress } from '@/lib/seo-data';
 
-function CustomSection() {
+export function CustomSection() {
   return (
     <div>
       {/* Display business name */}
@@ -137,13 +137,13 @@ console.log(homepageMetadata.title);
 console.log(homepageMetadata.description);
 
 // For service page
-const serviceMetadata = generateServiceMetadata(
+export const serviceMetadata = generateServiceMetadata(
   'AI Automationen',
   'Automatisieren Sie wiederkehrende Aufgaben'
 );
 
 // Get geo meta tags
-const geoTags = generateGeoMetaTags();
+export const geoTags = generateGeoMetaTags();
 
 // ============================================
 // EXAMPLE 5: Google Business Integration
@@ -156,7 +156,7 @@ import {
 } from '@/lib/google-business-integration';
 
 // Access setup guide
-function AdminPanel() {
+export function AdminPanel() {
   return (
     <div>
       <h2>Google Business Setup Guide</h2>
@@ -189,7 +189,7 @@ console.log('Submit business to:', citations);
 // EXAMPLE 6: Location-Specific Landing Page
 // ============================================
 
-function LocationPage() {
+export function LocationPage() {
   return (
     <div>
       <section>

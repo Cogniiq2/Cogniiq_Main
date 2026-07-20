@@ -679,7 +679,7 @@ function ExecutiveHero({
                 className="h-full rounded-full"
                 initial={{ width: 0 }}
                 animate={{ width: `${clampPct(completedPercent)}%` }}
-                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
                 style={{
                   background: 'linear-gradient(90deg, var(--admin-accent), var(--admin-success))',
                 }}
@@ -772,7 +772,7 @@ function ScoreOrb({ score, color }: { score: number; color: string }) {
           strokeDasharray={circumference}
           initial={{ strokeDashoffset: circumference }}
           animate={{ strokeDashoffset: offset }}
-          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
           style={{ filter: `drop-shadow(0 0 8px ${color})` }}
         />
       </svg>
@@ -826,7 +826,7 @@ function TaskTimeline({
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, x: -16 }}
-              transition={{ duration: 0.24, delay: i * 0.018, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.24, delay: i * 0.018, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
             >
               <TaskCard task={task} onToggle={onToggle} updating={!!updating[task.id]} index={i + 1} />
             </motion.div>
@@ -1110,7 +1110,7 @@ function CategoryBreakdown({
                   className="h-full rounded-full"
                   initial={{ width: 0 }}
                   animate={{ width: `${pct}%` }}
-                  transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
                   style={{ background: pct >= 100 ? 'var(--admin-success)' : meta.accent }}
                 />
               </div>

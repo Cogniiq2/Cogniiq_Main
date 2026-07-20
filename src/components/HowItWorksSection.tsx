@@ -3,7 +3,7 @@ import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { PhoneCall, Globe, Zap, ArrowRight, CircleCheck as CheckCircle } from 'lucide-react';
 
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 const STEPS = [
   {
@@ -184,36 +184,6 @@ function StepCard({ step, index, isActive, onClick }: {
         </div>
       </motion.div>
     </motion.div>
-  );
-}
-
-function AnimatedTimeline({ activeStep }: { activeStep: number }) {
-  return (
-    <div className="hidden lg:flex flex-col items-center gap-0 absolute left-1/2 -translate-x-1/2 top-0 bottom-0 pointer-events-none z-10">
-      {STEPS.map((step, i) => (
-        <div key={i} className="flex flex-col items-center flex-1">
-          <motion.div
-            className="w-3 h-3 rounded-full border-2 flex-shrink-0 mt-8"
-            animate={{
-              borderColor: i <= activeStep ? step.color : '#e5e7eb',
-              background: i <= activeStep ? step.color : '#ffffff',
-              scale: i === activeStep ? 1.3 : 1,
-            }}
-            transition={{ duration: 0.3 }}
-          />
-          {i < STEPS.length - 1 && (
-            <div className="flex-1 w-[1px] bg-gray-100 my-1 overflow-hidden">
-              <motion.div
-                className="w-full"
-                style={{ background: STEPS[i].color }}
-                animate={{ height: i < activeStep ? '100%' : '0%' }}
-                transition={{ duration: 0.5, ease: EASE }}
-              />
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
   );
 }
 

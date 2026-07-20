@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useMemo } from 'react';
 
-const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 interface NeuralCanvasProps {
   mousePos: { x: number; y: number };
@@ -77,7 +77,7 @@ function generateNetwork(): { nodes: Node[]; connections: Connection[] } {
   return { nodes, connections };
 }
 
-export function NeuralCanvas({ mousePos, isReady }: NeuralCanvasProps) {
+export function NeuralCanvas({ mousePos }: NeuralCanvasProps) {
   const { nodes, connections } = useMemo(() => generateNetwork(), []);
 
   const orbitalRings = [

@@ -197,7 +197,7 @@ export function AdminPage() {
                     <div className="space-y-2.5">
                       <AnimatePresence>
                         {filtered.map((task, i) => (
-                          <motion.div key={task.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -20, transition: { duration: 0.18 } }} transition={{ duration: 0.28, delay: i * 0.025, ease: [0.22, 1, 0.36, 1] }}>
+                          <motion.div key={task.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -20, transition: { duration: 0.18 } }} transition={{ duration: 0.28, delay: i * 0.025, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}>
                             <TaskCard task={task} onComplete={handleComplete} completing={!!completing[task.id]} />
                           </motion.div>
                         ))}
@@ -216,7 +216,7 @@ export function AdminPage() {
                     <div className="space-y-2.5 rounded-[1.65rem] border p-3 sm:p-4" style={{ borderColor: 'var(--admin-warning-border)', background: 'var(--admin-warning-bg)' }}>
                       <AnimatePresence>
                         {overdueOpen.map((task, i) => (
-                          <motion.div key={task.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.28, delay: i * 0.03, ease: [0.22, 1, 0.36, 1] }}>
+                          <motion.div key={task.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.28, delay: i * 0.03, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}>
                             <TaskCard task={task} onComplete={handleComplete} completing={!!completing[task.id]} overdue />
                           </motion.div>
                         ))}
@@ -249,7 +249,7 @@ export function AdminPage() {
                   ) : (
                     <div className="space-y-2.5">
                       {revenueTasks.map((task, i) => (
-                        <motion.div key={task.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.26, delay: i * 0.025, ease: [0.22, 1, 0.36, 1] }}>
+                        <motion.div key={task.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.26, delay: i * 0.025, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}>
                           <TaskCard task={task} onComplete={handleComplete} completing={!!completing[task.id]} />
                         </motion.div>
                       ))}
@@ -393,7 +393,7 @@ function CommandOverview({
                 className="h-full rounded-full"
                 initial={{ width: 0 }}
                 animate={{ width: `${completion}%` }}
-                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
                 style={{ background: 'linear-gradient(90deg, var(--admin-accent), var(--admin-success))' }}
               />
             </div>
@@ -452,7 +452,7 @@ function Toast({ toast }: { toast: { msg: string; ok: boolean } }) {
       initial={{ opacity: 0, y: 16, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 8 }}
-      transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
       className="fixed bottom-6 right-6 z-[500] flex items-center gap-2.5 rounded-2xl border px-4 py-3 font-mono text-sm"
       style={{
         background: 'var(--admin-surface-elevated)',
