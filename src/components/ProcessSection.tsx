@@ -3,7 +3,7 @@ import { motion, useInView } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { MessageSquare, FileText, Cog, Rocket, ArrowRight } from 'lucide-react';
 
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },

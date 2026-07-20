@@ -7,7 +7,7 @@ import { AlertCircle, Check, Circle, Info, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { LaunchChecklistItem, LifecycleTone, SetupStep } from './customerPortalModel';
 
-export const appEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
+export const appEase: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 export const appFadeUp = {
   hidden: { opacity: 0, y: 10 },

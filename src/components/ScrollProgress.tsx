@@ -170,7 +170,7 @@ function PercentChip({
       className="absolute top-[6px] pointer-events-none"
       style={{ left }}
       animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : -4 }}
-      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
     >
       {/* Offset chip so it doesn't overflow viewport edges */}
       <div

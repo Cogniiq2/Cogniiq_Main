@@ -19,7 +19,7 @@ const TIME_SLOTS = [
   '13:00', '14:00', '15:00', '16:00', '17:00',
 ];
 
-export function PremiumCalendar({ onSelect, selectedDateTime }: PremiumCalendarProps) {
+export function PremiumCalendar({ onSelect }: PremiumCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState('');
@@ -161,7 +161,7 @@ export function PremiumCalendar({ onSelect, selectedDateTime }: PremiumCalendarP
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
           className="border border-gray-200 rounded-xl overflow-hidden"
           style={{ background: '#fafafa' }}
         >

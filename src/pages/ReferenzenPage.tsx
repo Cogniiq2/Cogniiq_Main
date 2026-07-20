@@ -4,10 +4,7 @@ import { Link } from "react-router-dom";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 import {
-  TestimonialBlock,
   REAL_TESTIMONIAL,
-  PLACEHOLDER_TESTIMONIAL,
-  PLACEHOLDER_TESTIMONIAL_2,
 } from "@/components/TestimonialBlock";
 
 const fadeUp = {
@@ -15,7 +12,7 @@ const fadeUp = {
   visible: (delay = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
   }),
 };
 

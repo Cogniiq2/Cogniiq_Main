@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 const ROBOT_OUTLINE =
   'M36 12 L64 12 L68 16 L72 16 L72 24 L68 24 L68 20 L66 18 L34 18 L32 20 L32 24 L28 24 L28 16 L32 16 Z ' +
@@ -795,11 +795,10 @@ export function MobilePremiumHero() {
       )}
 
       <div
-        className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none"
+        className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none dark:[--mobile-hero-fade:rgb(3_7_18)]"
         style={{
           background: 'linear-gradient(to bottom, transparent, var(--mobile-hero-fade, white))',
         }}
-        className="dark:[--mobile-hero-fade:rgb(3_7_18)]"
       />
 
       <motion.div

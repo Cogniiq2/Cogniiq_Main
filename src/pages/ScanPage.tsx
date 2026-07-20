@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 import { Phone, CirclePlay as PlayCircle, Zap, MessageSquare, ArrowRight, ChevronRight } from 'lucide-react';
 
-const E: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const E: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 24 },

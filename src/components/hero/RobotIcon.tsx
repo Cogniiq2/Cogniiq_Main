@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 
-const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 const ROBOT_OUTLINE =
   'M36 12 L64 12 L68 16 L72 16 L72 24 L68 24 L68 20 L66 18 L34 18 L32 20 L32 24 L28 24 L28 16 L32 16 Z ' +

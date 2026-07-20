@@ -7,7 +7,6 @@ import {
   Building2,
   Dumbbell,
   PhoneCall,
-  Clock,
   Calendar,
   MessageSquare,
   X,
@@ -17,7 +16,7 @@ import {
   Zap,
 } from 'lucide-react';
 
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 type Industry = 'Arztpraxis' | 'Restaurant' | 'Immobilien' | 'Sport & Fitness';
 

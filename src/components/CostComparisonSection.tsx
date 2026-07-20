@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { type Industry, INDUSTRY_PRESETS } from './ROICalculator';
 
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 const INDUSTRY_ICONS: Record<Industry, string> = {
   Arztpraxis:     '🏥',
@@ -24,7 +24,7 @@ function AnimatedNumber({ value, prefix = '', suffix = '', decimals = 0 }: { val
   useEffect(() => {
     const controls = animate(prevValue.current, value, {
       duration: 0.7,
-      ease: [0.22, 1, 0.36, 1],
+      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
       onUpdate: (v) => setDisplay(parseFloat(v.toFixed(decimals))),
       onComplete: () => { prevValue.current = value; },
     });

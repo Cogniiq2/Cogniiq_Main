@@ -145,7 +145,7 @@ export function PremiumMobileNav() {
                     backgroundColor: activeSection === item.id ? '#ffffff' : '#4b5563',
                     height: 4,
                   }}
-                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
                 />
               ))}
             </div>
@@ -511,7 +511,7 @@ function ExpandableRow({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
             className="overflow-hidden"
           >
             {children}

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Logo } from "./Logo";
 import { BUSINESS_INFO, getGoogleMapsUrl } from "@/lib/seo-data";
 
-const ease = [0.22, 1, 0.36, 1] as const;
+const ease = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 const fadeUp = {
   hidden: { opacity: 0, y: 14 },

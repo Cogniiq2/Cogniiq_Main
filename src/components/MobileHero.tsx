@@ -1,8 +1,8 @@
-import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
-import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useMemo, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 const EASE_CIRC: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 function useParticles(count: number) {
