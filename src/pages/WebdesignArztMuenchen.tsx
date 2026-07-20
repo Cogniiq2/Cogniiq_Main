@@ -8,7 +8,7 @@ const config: IndustryPageConfig = {
   route: "/webdesign-arzt-muenchen",
   industry: "Arzt & Praxis",
   industrySlug: "arzt-praxis",
-  city: "Muenchen",
+  city: "München",
   citySlug: "muenchen",
   cityHub: "/muenchen",
   seo: {
@@ -27,75 +27,6 @@ const config: IndustryPageConfig = {
     h1: "Webdesign & KI-Telefonassistent für Arztpraxen in München",
     lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Arztpraxen in München – für mehr Patientenanfragen, bessere Erreichbarkeit und automatisierte Terminprozesse. DSGVO-konform, schnell eingerichtet.",
   },
-  engpaesse: [
-    "Hohe Telefonlast blockiert das Empfangsteam und verlaengert Wartezeiten fuer Patienten",
-    "Anfragen ausserhalb der Oeffnungszeiten bleiben zu lange unbeantwortet",
-    "Veraltete Praxis-Websites verlieren neue Patienten an digital staerkere Wettbewerber",
-    "Manuelle Terminbestaetigungen und Erinnerungen kosten taeglich wertvolle Teamzeit",
-    "Fehlende Online-Terminwege erschweren planbare Auslastung und schnelle Rueckmeldung",
-    "Unstrukturierte Kontaktanfragen fuehren zu Rueckfragen, Doppelarbeit und Medienbruechen",
-  ],
-  solutionSteps: [
-    {
-      step: "Schritt 1",
-      title: "Praxisprozesse analysieren",
-      description:
-        "Cogniiq prueft Telefonaufkommen, Terminwege, Website-Struktur und interne Engpaesse, bevor Website, KI-Telefonassistent und Automatisierungen abgestimmt werden.",
-    },
-    {
-      step: "Schritt 2",
-      title: "Systeme einrichten",
-      description:
-        "Website, Kontaktstrecken, Telefonannahme und Erinnerungsprozesse werden schluesselfertig aufgebaut und mit den vorhandenen Praxisablaeufen abgestimmt.",
-    },
-    {
-      step: "Schritt 3",
-      title: "Betrieb begleiten",
-      description:
-        "Nach dem Go-live bleibt Cogniiq Ansprechpartner fuer Anpassungen, Monitoring, Inhalte und technische Optimierung im laufenden Praxisbetrieb.",
-    },
-  ],
-  workflow: {
-    title: "Praxisbeispiel: Muenchner Praxis mit digitaler Rezeption",
-    trigger:
-      "Eine Praxis erhaelt zu Stosszeiten mehr Anrufe, als das Team parallel bearbeiten kann. Terminwuensche, Rueckfragen und Standardinformationen konkurrieren mit der Betreuung vor Ort.",
-    process:
-      "Cogniiq strukturiert die Website, richtet klare Kontaktwege ein und konfiguriert den KI-Telefonassistenten fuer haeufige Fragen, Terminwuensche und sichere Weiterleitung.",
-    result:
-      "Routineanliegen laufen planbarer ein, Patienten erhalten schneller Rueckmeldung und das Praxisteam gewinnt Zeit fuer persoenliche Anliegen.",
-  },
-  pakete: [
-    {
-      name: "Start",
-      tagline: "Moderne Praxis-Website fuer lokale Sichtbarkeit",
-      deliverables: [
-        "Responsive Praxis-Website",
-        "Kontakt- und Anfrageformular",
-        "Lokale SEO-Grundlage",
-        "DSGVO-Basisdokumentation",
-      ],
-    },
-    {
-      name: "Growth",
-      tagline: "Website plus KI-Telefonannahme",
-      deliverables: [
-        "Alles aus Start",
-        "KI-Telefonassistent fuer Routineanfragen",
-        "Terminwunsch-Erfassung",
-        "Strukturierte Weiterleitung an das Team",
-      ],
-    },
-    {
-      name: "Premium",
-      tagline: "Betreutes Praxissystem mit Automatisierung",
-      deliverables: [
-        "Alles aus Growth",
-        "Automatische Erinnerungen",
-        "Integrationsplanung fuer bestehende Tools",
-        "Laufende Betreuung und Optimierung",
-      ],
-    },
-  ],
   problems: [
     "In einer Millionenstadt wie München ist die Konkurrenz unter Praxen hoch – eine veraltete Website kostet täglich neue Patienten",
     "Hohe Anrufvolumen in Münchner Praxen belasten die Rezeption und unterbrechen laufende Behandlungen",
