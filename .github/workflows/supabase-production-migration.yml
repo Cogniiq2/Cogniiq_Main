@@ -32,6 +32,11 @@ jobs:
   migrate:
     name: Supabase production migration
     runs-on: ubuntu-latest
+    env:
+      TARGET_MIGRATION: 20260711120000_receptionist_persistence.sql
+      TARGET_MIGRATION_PATH: supabase/migrations/20260711120000_receptionist_persistence.sql
+      TARGET_MIGRATION_VERSION: 20260711120000
+      ISOLATED_SOURCE_DIR: isolated-migration-source
 
     steps:
       - name: Checkout workflow tools
@@ -52,7 +57,73 @@ jobs:
       # persistence migration and fails before linking if the selected branch
       # does not contain the expected migration file.
       - name: Verify expected migration exists
-        run: test -f migration-source/supabase/migrations/20260711120000_receptionist_persistence.sql
+        run: test -f "migration-source/$TARGET_MIGRATION_PATH"
+
+      # Safety gate: audit-history intentionally inspects the complete selected
+      # source branch, but dry-run/apply must never include legacy migrations
+      # from a production history that is known to be empty.
+      - name: Create isolated receptionist migration workspace
+        if: ${{ inputs.mode != 'audit-history' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          source_migration="migration-source/$TARGET_MIGRATION_PATH"
+          isolated_root="$ISOLATED_SOURCE_DIR"
+          isolated_migrations="$isolated_root/supabase/migrations"
+          isolated_migration="$isolated_root/$TARGET_MIGRATION_PATH"
+
+          test -f "$source_migration"
+          source_sha_before="$(sha256sum "$source_migration" | awk '{print $1}')"
+
+          rm -rf "$isolated_root"
+          mkdir -p "$isolated_root"
+          tar -C migration-source --exclude=.git -cf - . | tar -C "$isolated_root" -xf -
+
+          test -f "$isolated_migration"
+          isolated_sha_before="$(sha256sum "$isolated_migration" | awk '{print $1}')"
+          if [ "$source_sha_before" != "$isolated_sha_before" ]; then
+            echo "Isolated receptionist migration does not match the selected source file."
+            exit 1
+          fi
+
+          find "$isolated_migrations" -mindepth 1 -maxdepth 1 ! -name "$TARGET_MIGRATION" -exec rm -rf {} +
+
+          mapfile -t remaining_entries < <(find "$isolated_migrations" -mindepth 1 -maxdepth 1 -printf '%f\n' | sort)
+          if [ "${#remaining_entries[@]}" -ne 1 ]; then
+            echo "Expected exactly one entry in the isolated migrations directory, found ${#remaining_entries[@]}."
+            printf '%s\n' "${remaining_entries[@]}"
+            exit 1
+          fi
+
+          if [ "${remaining_entries[0]}" != "$TARGET_MIGRATION" ]; then
+            echo "Unexpected entry remained in the isolated migrations directory: ${remaining_entries[0]}"
+            exit 1
+          fi
+
+          mapfile -t remaining_migrations < <(find "$isolated_migrations" -maxdepth 1 -type f -name '*.sql' -printf '%f\n' | sort)
+          if [ "${#remaining_migrations[@]}" -ne 1 ]; then
+            echo "Expected exactly one SQL migration in the isolated workspace, found ${#remaining_migrations[@]}."
+            printf '%s\n' "${remaining_migrations[@]}"
+            exit 1
+          fi
+
+          if [ "${remaining_migrations[0]}" != "$TARGET_MIGRATION" ]; then
+            echo "Unexpected migration remained in the isolated workspace: ${remaining_migrations[0]}"
+            exit 1
+          fi
+
+          source_sha_after="$(sha256sum "$source_migration" | awk '{print $1}')"
+          isolated_sha_after="$(sha256sum "$isolated_migration" | awk '{print $1}')"
+          if [ "$source_sha_before" != "$source_sha_after" ] || [ "$source_sha_before" != "$isolated_sha_after" ]; then
+            echo "Receptionist migration changed while creating the isolated workspace."
+            exit 1
+          fi
+
+          if find "$isolated_migrations" -mindepth 1 -maxdepth 1 ! -name "$TARGET_MIGRATION" | grep -q .; then
+            echo "Legacy migrations remain in the isolated workspace."
+            exit 1
+          fi
 
       # Safety gate: fail closed if any required secret is missing, without
       # printing secret values.
@@ -78,7 +149,8 @@ jobs:
             exit 1
           fi
 
-      - name: Link Supabase project
+      - name: Link Supabase project for audit
+        if: ${{ inputs.mode == 'audit-history' }}
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
@@ -86,10 +158,29 @@ jobs:
         working-directory: migration-source
         run: supabase link --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD"
 
-      - name: List migration history
+      - name: Link Supabase project for isolated migration
+        if: ${{ inputs.mode != 'audit-history' }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        working-directory: isolated-migration-source
+        run: supabase link --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD"
+
+      - name: List migration history for audit
+        if: ${{ inputs.mode == 'audit-history' }}
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         working-directory: migration-source
+        run: |
+          set -o pipefail
+          supabase migration list 2>&1 | tee ../supabase-migration-list.txt
+
+      - name: List migration history for isolated migration
+        if: ${{ inputs.mode != 'audit-history' }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        working-directory: isolated-migration-source
         run: |
           set -o pipefail
           supabase migration list 2>&1 | tee ../supabase-migration-list.txt
@@ -100,7 +191,7 @@ jobs:
         if: ${{ inputs.mode != 'audit-history' }}
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-        working-directory: migration-source
+        working-directory: isolated-migration-source
         run: |
           set -o pipefail
           supabase db push --dry-run 2>&1 | tee ../supabase-dry-run.txt
@@ -119,8 +210,64 @@ jobs:
         if: ${{ inputs.mode == 'apply' }}
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-        working-directory: migration-source
+        working-directory: isolated-migration-source
         run: supabase db push
+
+      - name: Verify applied migration history
+        if: ${{ inputs.mode == 'apply' }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        working-directory: isolated-migration-source
+        run: |
+          set -o pipefail
+          supabase migration list 2>&1 | tee ../supabase-migration-list-after-apply.txt
+          if ! awk -F '|' -v target="$TARGET_MIGRATION_VERSION" '
+            function normalize(value) {
+              gsub(/[^0-9]/, "", value)
+              return value
+            }
+
+            {
+              raw_row = $0
+
+              if (raw_row ~ /^[[:space:]]*\|/) {
+                local_version = normalize($2)
+                remote_version = normalize($3)
+              } else {
+                local_version = normalize($1)
+                remote_version = normalize($2)
+              }
+
+              if (local_version == target) {
+                found_local = 1
+                target_remote_version = remote_version
+                if (remote_version == target) {
+                  found_synced = 1
+                }
+              }
+            }
+
+            END {
+              if (found_synced) {
+                exit 0
+              }
+
+              if (found_local) {
+                if (target_remote_version == "") {
+                  print "Target migration was found in the Local column, but the Remote column was blank or missing." > "/dev/stderr"
+                } else {
+                  print "Target migration was found in the Local column, but the Remote column was " target_remote_version "." > "/dev/stderr"
+                }
+                exit 2
+              }
+
+              print "Target migration was not found in the Local column." > "/dev/stderr"
+              exit 1
+            }
+          ' ../supabase-migration-list-after-apply.txt; then
+            echo "Applied receptionist migration version $TARGET_MIGRATION_VERSION was not found with matching Local and Remote columns."
+            exit 1
+          fi
 
       # Read-only audit path: dump only public schema DDL so operators can
       # compare empty remote history with existing objects.
