@@ -8,10 +8,11 @@ on:
         required: true
         default: codex/receptionist-persistence
       mode:
-        description: Run a dry run or apply the migration
+        description: Audit history, run a dry run, or apply the migration
         required: true
         type: choice
         options:
+          - audit-history
           - dry-run
           - apply
         default: dry-run
@@ -33,10 +34,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout workflow tools
+        uses: actions/checkout@v4
+
       - name: Checkout selected migration branch
         uses: actions/checkout@v4
         with:
           ref: ${{ inputs.source_ref }}
+          path: migration-source
 
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
@@ -47,7 +52,7 @@ jobs:
       # persistence migration and fails before linking if the selected branch
       # does not contain the expected migration file.
       - name: Verify expected migration exists
-        run: test -f supabase/migrations/20260711120000_receptionist_persistence.sql
+        run: test -f migration-source/supabase/migrations/20260711120000_receptionist_persistence.sql
 
       # Safety gate: fail closed if any required secret is missing, without
       # printing secret values.
@@ -78,26 +83,68 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        working-directory: migration-source
         run: supabase link --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD"
 
       - name: List migration history
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-        run: supabase migration list
+        working-directory: migration-source
+        run: |
+          set -o pipefail
+          supabase migration list 2>&1 | tee ../supabase-migration-list.txt
 
       # Safety gate: every run performs the dry run first so reviewers can see
       # the exact migration plan before apply mode reaches the write step.
       - name: Dry run migration push
+        if: ${{ inputs.mode != 'audit-history' }}
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-        run: supabase db push --dry-run
+        working-directory: migration-source
+        run: |
+          set -o pipefail
+          supabase db push --dry-run 2>&1 | tee ../supabase-dry-run.txt
 
       - name: Stop after dry run
         if: ${{ inputs.mode == 'dry-run' }}
         run: echo "Dry run completed. No migration was applied."
 
+      # Safety gate: apply mode is allowed only when the dry run shows exactly
+      # one pending migration, and that migration is the receptionist migration.
+      - name: Verify apply migration scope
+        if: ${{ inputs.mode == 'apply' }}
+        run: node .github/scripts/verify-supabase-dry-run.mjs supabase-dry-run.txt
+
       - name: Apply migration push
         if: ${{ inputs.mode == 'apply' }}
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        working-directory: migration-source
         run: supabase db push
+
+      # Read-only audit path: dump only public schema DDL so operators can
+      # compare empty remote history with existing objects.
+      - name: Dump remote public schema for audit
+        if: ${{ inputs.mode == 'audit-history' }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        working-directory: migration-source
+        run: supabase db dump --linked --schema public --file ../remote-public-schema.sql
+
+      - name: Audit prior migration history
+        if: ${{ inputs.mode == 'audit-history' }}
+        run: node .github/scripts/audit-supabase-history.mjs migration-source
+
+      - name: Remove raw schema dump
+        if: ${{ inputs.mode == 'audit-history' && always() }}
+        run: rm -f remote-public-schema.sql
+
+      - name: Upload audit artifacts
+        if: ${{ inputs.mode == 'audit-history' && always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: supabase-history-audit
+          path: |
+            supabase-history-audit.txt
+            supabase-migration-list.txt
+          retention-days: 7
