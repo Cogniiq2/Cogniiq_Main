@@ -1,6 +1,68 @@
 -- First persistent customer portal product configuration layer.
 -- Additive only: depends on Phase 0 auth, organizations, memberships, roles and RLS helpers.
 
+begin;
+
+do $$
+declare
+  target_table regclass;
+  target_table_name text;
+  target_row_count bigint;
+begin
+  if to_regclass('public.organizations') is null then
+    raise exception 'Receptionist persistence migration requires public.organizations';
+  end if;
+
+  if to_regclass('public.organization_members') is null then
+    raise exception 'Receptionist persistence migration requires public.organization_members';
+  end if;
+
+  if to_regtype('public.organization_role') is null then
+    raise exception 'Receptionist persistence migration requires public.organization_role';
+  end if;
+
+  if to_regprocedure('public.is_database_admin()') is null then
+    raise exception 'Receptionist persistence migration requires public.is_database_admin()';
+  end if;
+
+  if to_regprocedure('public.request_is_service_role()') is null then
+    raise exception 'Receptionist persistence migration requires public.request_is_service_role()';
+  end if;
+
+  if to_regprocedure('public.is_platform_admin()') is null then
+    raise exception 'Receptionist persistence migration requires public.is_platform_admin()';
+  end if;
+
+  if to_regprocedure('public.is_organization_member(uuid)') is null then
+    raise exception 'Receptionist persistence migration requires public.is_organization_member(uuid)';
+  end if;
+
+  if to_regprocedure('public.has_organization_role(uuid, public.organization_role[])') is null then
+    raise exception 'Receptionist persistence migration requires public.has_organization_role(uuid, public.organization_role[])';
+  end if;
+
+  foreach target_table_name in array array[
+    'public.businesses',
+    'public.onboarding_sessions',
+    'public.receptionist_configs',
+    'public.phone_configs'
+  ]
+  loop
+    target_table := to_regclass(target_table_name);
+
+    if target_table is not null then
+      execute format('select count(*) from %s', target_table) into target_row_count;
+
+      if target_row_count <> 0 then
+        raise exception 'Receptionist persistence migration requires % to contain zero rows before reconciliation; found %',
+          target_table_name,
+          target_row_count;
+      end if;
+    end if;
+  end loop;
+end;
+$$;
+
 create or replace function public.set_customer_product_timestamps()
 returns trigger
 language plpgsql
@@ -92,7 +154,7 @@ $$;
 comment on function public.onboarding_status_transition_is_allowed(text, text) is
   'Explicit service-role lifecycle transition allow-list for onboarding_sessions.status.';
 
-create table public.businesses (
+create table if not exists public.businesses (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null references public.organizations(id) on delete cascade,
   name text not null,
@@ -134,7 +196,7 @@ comment on column public.businesses.organization_id is
 comment on column public.businesses.environment is
   'System-owned environment marker. Browser clients use the production default in this phase.';
 
-create table public.onboarding_sessions (
+create table if not exists public.onboarding_sessions (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null references public.organizations(id) on delete cascade,
   business_id uuid not null,
@@ -190,7 +252,7 @@ comment on table public.onboarding_sessions is
 comment on column public.onboarding_sessions.last_error is
   'Backend-controlled error detail for future recoverable onboarding jobs.';
 
-create table public.receptionist_configs (
+create table if not exists public.receptionist_configs (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null references public.organizations(id) on delete cascade,
   business_id uuid not null,
@@ -265,7 +327,7 @@ create table public.receptionist_configs (
 comment on table public.receptionist_configs is
   'Customer-editable receptionist identity and behavior. Does not store generated Vapi prompts or assistants.';
 
-create table public.phone_configs (
+create table if not exists public.phone_configs (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null references public.organizations(id) on delete cascade,
   business_id uuid not null,
@@ -313,6 +375,109 @@ create table public.phone_configs (
   )
 );
 
+do $$
+declare
+  mismatch text;
+begin
+  with expected(table_name, column_name, data_type, is_not_null, column_default) as (
+    values
+      ('businesses', 'id', 'uuid', true, 'gen_random_uuid()'),
+      ('businesses', 'organization_id', 'uuid', true, null),
+      ('businesses', 'name', 'text', true, null),
+      ('businesses', 'website', 'text', false, null),
+      ('businesses', 'industry', 'text', false, null),
+      ('businesses', 'address', 'text', false, null),
+      ('businesses', 'contact_email', 'text', false, null),
+      ('businesses', 'primary_contact_name', 'text', false, null),
+      ('businesses', 'existing_business_phone', 'text', false, null),
+      ('businesses', 'primary_language', 'text', true, '''de''::text'),
+      ('businesses', 'timezone', 'text', true, '''Europe/Berlin''::text'),
+      ('businesses', 'environment', 'text', true, '''production''::text'),
+      ('businesses', 'created_at', 'timestamp with time zone', true, 'now()'),
+      ('businesses', 'updated_at', 'timestamp with time zone', true, 'now()'),
+      ('onboarding_sessions', 'id', 'uuid', true, 'gen_random_uuid()'),
+      ('onboarding_sessions', 'organization_id', 'uuid', true, null),
+      ('onboarding_sessions', 'business_id', 'uuid', true, null),
+      ('onboarding_sessions', 'status', 'text', true, '''not_started''::text'),
+      ('onboarding_sessions', 'current_step', 'text', false, null),
+      ('onboarding_sessions', 'completed_steps', 'text[]', true, '''{}''::text[]'),
+      ('onboarding_sessions', 'selected_goals', 'text[]', true, '''{}''::text[]'),
+      ('onboarding_sessions', 'preferred_behavior', 'text', false, null),
+      ('onboarding_sessions', 'last_error', 'text', false, null),
+      ('onboarding_sessions', 'started_at', 'timestamp with time zone', false, null),
+      ('onboarding_sessions', 'completed_at', 'timestamp with time zone', false, null),
+      ('onboarding_sessions', 'created_at', 'timestamp with time zone', true, 'now()'),
+      ('onboarding_sessions', 'updated_at', 'timestamp with time zone', true, 'now()'),
+      ('receptionist_configs', 'id', 'uuid', true, 'gen_random_uuid()'),
+      ('receptionist_configs', 'organization_id', 'uuid', true, null),
+      ('receptionist_configs', 'business_id', 'uuid', true, null),
+      ('receptionist_configs', 'receptionist_name', 'text', false, null),
+      ('receptionist_configs', 'primary_language', 'text', true, '''de''::text'),
+      ('receptionist_configs', 'additional_languages', 'text[]', true, '''{}''::text[]'),
+      ('receptionist_configs', 'greeting', 'text', false, null),
+      ('receptionist_configs', 'tone', 'text', false, null),
+      ('receptionist_configs', 'responsibilities', 'jsonb', true, '''[]''::jsonb'),
+      ('receptionist_configs', 'allowed_actions', 'jsonb', true, '''[]''::jsonb'),
+      ('receptionist_configs', 'prohibited_actions', 'jsonb', true, '''[]''::jsonb'),
+      ('receptionist_configs', 'after_hours_behavior', 'jsonb', true, '''{}''::jsonb'),
+      ('receptionist_configs', 'transfer_behavior', 'jsonb', true, '''{}''::jsonb'),
+      ('receptionist_configs', 'created_at', 'timestamp with time zone', true, 'now()'),
+      ('receptionist_configs', 'updated_at', 'timestamp with time zone', true, 'now()'),
+      ('phone_configs', 'id', 'uuid', true, 'gen_random_uuid()'),
+      ('phone_configs', 'organization_id', 'uuid', true, null),
+      ('phone_configs', 'business_id', 'uuid', true, null),
+      ('phone_configs', 'setup_mode', 'text', false, null),
+      ('phone_configs', 'existing_public_number', 'text', false, null),
+      ('phone_configs', 'assigned_ai_number', 'text', false, null),
+      ('phone_configs', 'human_transfer_number', 'text', false, null),
+      ('phone_configs', 'urgent_escalation_number', 'text', false, null),
+      ('phone_configs', 'after_hours_number', 'text', false, null),
+      ('phone_configs', 'sms_notification_number', 'text', false, null),
+      ('phone_configs', 'forwarding_confirmed', 'boolean', true, 'false'),
+      ('phone_configs', 'test_status', 'text', true, '''not_started''::text'),
+      ('phone_configs', 'created_at', 'timestamp with time zone', true, 'now()'),
+      ('phone_configs', 'updated_at', 'timestamp with time zone', true, 'now()')
+  ),
+  actual as (
+    select
+      c.relname as table_name,
+      a.attname as column_name,
+      format_type(a.atttypid, a.atttypmod) as data_type,
+      a.attnotnull as is_not_null,
+      pg_get_expr(d.adbin, d.adrelid) as column_default
+    from pg_class c
+    join pg_namespace n on n.oid = c.relnamespace
+    join pg_attribute a on a.attrelid = c.oid
+    left join pg_attrdef d on d.adrelid = c.oid and d.adnum = a.attnum
+    where n.nspname = 'public'
+      and c.relname in ('businesses', 'onboarding_sessions', 'receptionist_configs', 'phone_configs')
+      and a.attnum > 0
+      and not a.attisdropped
+  ),
+  problems as (
+    select
+      coalesce(e.table_name, a.table_name) || '.' || coalesce(e.column_name, a.column_name) || ' expected ' ||
+      coalesce(e.data_type || '/' || e.is_not_null::text || '/' || coalesce(e.column_default, '<null>'), '<missing>') ||
+      ' but found ' ||
+      coalesce(a.data_type || '/' || a.is_not_null::text || '/' || coalesce(a.column_default, '<null>'), '<missing>') as problem
+    from expected e
+    full join actual a using (table_name, column_name)
+    where e.table_name is null
+      or a.table_name is null
+      or e.data_type is distinct from a.data_type
+      or e.is_not_null is distinct from a.is_not_null
+      or e.column_default is distinct from a.column_default
+  )
+  select string_agg(problem, '; ' order by problem)
+  into mismatch
+  from problems;
+
+  if mismatch is not null then
+    raise exception 'Receptionist persistence table column structure mismatch: %', mismatch;
+  end if;
+end;
+$$;
+
 comment on table public.phone_configs is
   'Customer-editable phone-routing setup plus system-controlled future phone state.';
 comment on column public.phone_configs.assigned_ai_number is
@@ -320,13 +485,227 @@ comment on column public.phone_configs.assigned_ai_number is
 comment on column public.phone_configs.test_status is
   'System-controlled future test state. Browser customers cannot claim success.';
 
-create index businesses_organization_id_idx on public.businesses(organization_id);
-create index onboarding_sessions_organization_id_idx on public.onboarding_sessions(organization_id);
-create index onboarding_sessions_business_id_idx on public.onboarding_sessions(business_id);
-create index receptionist_configs_organization_id_idx on public.receptionist_configs(organization_id);
-create index receptionist_configs_business_id_idx on public.receptionist_configs(business_id);
-create index phone_configs_organization_id_idx on public.phone_configs(organization_id);
-create index phone_configs_business_id_idx on public.phone_configs(business_id);
+do $$
+declare
+  missing_constraint text;
+  json_constraint record;
+  normalized_definition text;
+begin
+  for json_constraint in
+    select *
+    from (
+      values
+        (
+          'receptionist_configs_responsibilities_keys_check',
+          $constraint$
+            alter table public.receptionist_configs
+            add constraint receptionist_configs_responsibilities_keys_check check (
+              public.jsonb_text_array_is_subset(
+                responsibilities,
+                array[
+                  'answer_faqs',
+                  'capture_leads',
+                  'take_messages',
+                  'transfer_calls',
+                  'capture_appointments',
+                  'after_hours'
+                ]::text[]
+              )
+            )
+          $constraint$,
+          $pattern$jsonb_text_array_is_subset\(responsibilities.*answer_faqs.*capture_leads.*take_messages.*transfer_calls.*capture_appointments.*after_hours$pattern$
+        ),
+        (
+          'receptionist_configs_allowed_actions_keys_check',
+          $constraint$
+            alter table public.receptionist_configs
+            add constraint receptionist_configs_allowed_actions_keys_check check (
+              public.jsonb_text_array_is_subset(
+                allowed_actions,
+                array[
+                  'use_confirmed_facts_only',
+                  'be_transparent_when_unsure',
+                  'transfer_when_needed',
+                  'take_messages',
+                  'collect_contact_details'
+                ]::text[]
+              )
+            )
+          $constraint$,
+          $pattern$jsonb_text_array_is_subset\(allowed_actions.*use_confirmed_facts_only.*be_transparent_when_unsure.*transfer_when_needed.*take_messages.*collect_contact_details$pattern$
+        ),
+        (
+          'receptionist_configs_prohibited_actions_keys_check',
+          $constraint$
+            alter table public.receptionist_configs
+            add constraint receptionist_configs_prohibited_actions_keys_check check (
+              public.jsonb_text_array_is_subset(
+                prohibited_actions,
+                array[
+                  'no_invented_prices',
+                  'no_binding_appointments',
+                  'no_refund_promises',
+                  'no_regulated_advice',
+                  'no_unconfirmed_services'
+                ]::text[]
+              )
+            )
+          $constraint$,
+          $pattern$jsonb_text_array_is_subset\(prohibited_actions.*no_invented_prices.*no_binding_appointments.*no_refund_promises.*no_regulated_advice.*no_unconfirmed_services$pattern$
+        )
+    ) as expected_constraint(constraint_name, add_sql, expected_pattern)
+  loop
+    if not exists (
+      select 1
+      from pg_constraint con
+      join pg_class rel on rel.oid = con.conrelid
+      join pg_namespace nsp on nsp.oid = rel.relnamespace
+      where nsp.nspname = 'public'
+        and rel.relname = 'receptionist_configs'
+        and con.conname = json_constraint.constraint_name
+    ) then
+      execute json_constraint.add_sql;
+    end if;
+
+    select regexp_replace(lower(pg_get_constraintdef(con.oid)), '\s+', ' ', 'g')
+    into normalized_definition
+    from pg_constraint con
+    join pg_class rel on rel.oid = con.conrelid
+    join pg_namespace nsp on nsp.oid = rel.relnamespace
+    where nsp.nspname = 'public'
+      and rel.relname = 'receptionist_configs'
+      and con.conname = json_constraint.constraint_name;
+
+    if normalized_definition !~ json_constraint.expected_pattern then
+      raise exception 'Constraint % has unexpected definition: %',
+        json_constraint.constraint_name,
+        normalized_definition;
+    end if;
+  end loop;
+
+  select string_agg(expected_constraint.constraint_name, ', ' order by expected_constraint.constraint_name)
+  into missing_constraint
+  from (
+    values
+      ('businesses_pkey'),
+      ('businesses_organization_id_fkey'),
+      ('businesses_organization_id_key'),
+      ('businesses_organization_id_id_key'),
+      ('businesses_name_not_blank'),
+      ('businesses_website_url_check'),
+      ('businesses_contact_email_check'),
+      ('businesses_existing_phone_check'),
+      ('businesses_primary_language_check'),
+      ('businesses_timezone_not_blank'),
+      ('businesses_environment_check'),
+      ('onboarding_sessions_pkey'),
+      ('onboarding_sessions_organization_id_fkey'),
+      ('onboarding_sessions_business_id_key'),
+      ('onboarding_sessions_organization_business_fk'),
+      ('onboarding_sessions_status_check'),
+      ('onboarding_sessions_current_step_check'),
+      ('onboarding_sessions_completed_steps_check'),
+      ('onboarding_sessions_selected_goals_check'),
+      ('receptionist_configs_pkey'),
+      ('receptionist_configs_organization_id_fkey'),
+      ('receptionist_configs_business_id_key'),
+      ('receptionist_configs_organization_business_fk'),
+      ('receptionist_configs_primary_language_check'),
+      ('receptionist_configs_additional_languages_check'),
+      ('receptionist_configs_tone_check'),
+      ('receptionist_configs_responsibilities_array_check'),
+      ('receptionist_configs_allowed_actions_array_check'),
+      ('receptionist_configs_prohibited_actions_array_check'),
+      ('receptionist_configs_responsibilities_keys_check'),
+      ('receptionist_configs_allowed_actions_keys_check'),
+      ('receptionist_configs_prohibited_actions_keys_check'),
+      ('receptionist_configs_after_hours_object_check'),
+      ('receptionist_configs_transfer_object_check'),
+      ('phone_configs_pkey'),
+      ('phone_configs_organization_id_fkey'),
+      ('phone_configs_business_id_key'),
+      ('phone_configs_organization_business_fk'),
+      ('phone_configs_setup_mode_check'),
+      ('phone_configs_existing_public_number_check'),
+      ('phone_configs_human_transfer_number_check'),
+      ('phone_configs_urgent_escalation_number_check'),
+      ('phone_configs_after_hours_number_check'),
+      ('phone_configs_sms_notification_number_check'),
+      ('phone_configs_test_status_check')
+  ) as expected_constraint(constraint_name)
+  where not exists (
+    select 1
+    from pg_constraint con
+    where con.conname = expected_constraint.constraint_name
+      and con.conrelid in (
+        'public.businesses'::regclass,
+        'public.onboarding_sessions'::regclass,
+        'public.receptionist_configs'::regclass,
+        'public.phone_configs'::regclass
+      )
+  );
+
+  if missing_constraint is not null then
+    raise exception 'Receptionist persistence constraints are missing: %', missing_constraint;
+  end if;
+end;
+$$;
+
+create index if not exists businesses_organization_id_idx on public.businesses(organization_id);
+create index if not exists onboarding_sessions_organization_id_idx on public.onboarding_sessions(organization_id);
+create index if not exists onboarding_sessions_business_id_idx on public.onboarding_sessions(business_id);
+create index if not exists receptionist_configs_organization_id_idx on public.receptionist_configs(organization_id);
+create index if not exists receptionist_configs_business_id_idx on public.receptionist_configs(business_id);
+create index if not exists phone_configs_organization_id_idx on public.phone_configs(organization_id);
+create index if not exists phone_configs_business_id_idx on public.phone_configs(business_id);
+
+do $$
+declare
+  bad_index text;
+begin
+  with expected(index_name, table_name, column_name) as (
+    values
+      ('businesses_organization_id_idx', 'businesses', 'organization_id'),
+      ('onboarding_sessions_organization_id_idx', 'onboarding_sessions', 'organization_id'),
+      ('onboarding_sessions_business_id_idx', 'onboarding_sessions', 'business_id'),
+      ('receptionist_configs_organization_id_idx', 'receptionist_configs', 'organization_id'),
+      ('receptionist_configs_business_id_idx', 'receptionist_configs', 'business_id'),
+      ('phone_configs_organization_id_idx', 'phone_configs', 'organization_id'),
+      ('phone_configs_business_id_idx', 'phone_configs', 'business_id')
+  ),
+  actual as (
+    select
+      idx.relname as index_name,
+      tbl.relname as table_name,
+      att.attname as column_name
+    from pg_class idx
+    join pg_index ind on ind.indexrelid = idx.oid
+    join pg_class tbl on tbl.oid = ind.indrelid
+    join pg_namespace nsp on nsp.oid = tbl.relnamespace
+    join pg_attribute att on att.attrelid = tbl.oid and att.attnum = ind.indkey[0]
+    where nsp.nspname = 'public'
+      and idx.relname in (
+        'businesses_organization_id_idx',
+        'onboarding_sessions_organization_id_idx',
+        'onboarding_sessions_business_id_idx',
+        'receptionist_configs_organization_id_idx',
+        'receptionist_configs_business_id_idx',
+        'phone_configs_organization_id_idx',
+        'phone_configs_business_id_idx'
+      )
+      and ind.indnatts = 1
+  )
+  select string_agg(expected.index_name, ', ' order by expected.index_name)
+  into bad_index
+  from expected
+  left join actual using (index_name, table_name, column_name)
+  where actual.index_name is null;
+
+  if bad_index is not null then
+    raise exception 'Receptionist persistence indexes are missing or incompatible: %', bad_index;
+  end if;
+end;
+$$;
 
 create or replace function public.set_onboarding_session_lifecycle_timestamps()
 returns trigger
@@ -472,30 +851,37 @@ $$;
 comment on function public.guard_phone_config_system_fields() is
   'Blocks browser clients from setting future AI numbers or successful test states.';
 
+drop trigger if exists businesses_set_customer_product_timestamps on public.businesses;
 create trigger businesses_set_customer_product_timestamps
 before insert or update on public.businesses
 for each row execute function public.set_customer_product_timestamps();
 
+drop trigger if exists onboarding_sessions_set_customer_product_timestamps on public.onboarding_sessions;
 create trigger onboarding_sessions_set_customer_product_timestamps
 before insert or update on public.onboarding_sessions
 for each row execute function public.set_customer_product_timestamps();
 
+drop trigger if exists onboarding_sessions_guard_system_fields on public.onboarding_sessions;
 create trigger onboarding_sessions_guard_system_fields
 before insert or update on public.onboarding_sessions
 for each row execute function public.guard_onboarding_session_system_fields();
 
+drop trigger if exists onboarding_sessions_set_lifecycle_timestamps on public.onboarding_sessions;
 create trigger onboarding_sessions_set_lifecycle_timestamps
 before insert or update on public.onboarding_sessions
 for each row execute function public.set_onboarding_session_lifecycle_timestamps();
 
+drop trigger if exists receptionist_configs_set_customer_product_timestamps on public.receptionist_configs;
 create trigger receptionist_configs_set_customer_product_timestamps
 before insert or update on public.receptionist_configs
 for each row execute function public.set_customer_product_timestamps();
 
+drop trigger if exists phone_configs_guard_system_fields on public.phone_configs;
 create trigger phone_configs_guard_system_fields
 before insert or update on public.phone_configs
 for each row execute function public.guard_phone_config_system_fields();
 
+drop trigger if exists phone_configs_set_customer_product_timestamps on public.phone_configs;
 create trigger phone_configs_set_customer_product_timestamps
 before insert or update on public.phone_configs
 for each row execute function public.set_customer_product_timestamps();
@@ -505,10 +891,12 @@ alter table public.onboarding_sessions enable row level security;
 alter table public.receptionist_configs enable row level security;
 alter table public.phone_configs enable row level security;
 
+drop policy if exists "businesses_select_org_or_platform_admin" on public.businesses;
 create policy "businesses_select_org_or_platform_admin"
   on public.businesses for select to authenticated
   using (public.is_platform_admin() or public.is_organization_member(organization_id));
 
+drop policy if exists "businesses_insert_owner_admin_or_platform_admin" on public.businesses;
 create policy "businesses_insert_owner_admin_or_platform_admin"
   on public.businesses for insert to authenticated
   with check (
@@ -516,6 +904,7 @@ create policy "businesses_insert_owner_admin_or_platform_admin"
     or public.has_organization_role(organization_id, array['owner'::public.organization_role, 'admin'::public.organization_role])
   );
 
+drop policy if exists "businesses_update_owner_admin_or_platform_admin" on public.businesses;
 create policy "businesses_update_owner_admin_or_platform_admin"
   on public.businesses for update to authenticated
   using (
@@ -527,10 +916,12 @@ create policy "businesses_update_owner_admin_or_platform_admin"
     or public.has_organization_role(organization_id, array['owner'::public.organization_role, 'admin'::public.organization_role])
   );
 
+drop policy if exists "onboarding_sessions_select_org_or_platform_admin" on public.onboarding_sessions;
 create policy "onboarding_sessions_select_org_or_platform_admin"
   on public.onboarding_sessions for select to authenticated
   using (public.is_platform_admin() or public.is_organization_member(organization_id));
 
+drop policy if exists "onboarding_sessions_insert_owner_admin_or_platform_admin" on public.onboarding_sessions;
 create policy "onboarding_sessions_insert_owner_admin_or_platform_admin"
   on public.onboarding_sessions for insert to authenticated
   with check (
@@ -538,6 +929,7 @@ create policy "onboarding_sessions_insert_owner_admin_or_platform_admin"
     or public.has_organization_role(organization_id, array['owner'::public.organization_role, 'admin'::public.organization_role])
   );
 
+drop policy if exists "onboarding_sessions_update_owner_admin_or_platform_admin" on public.onboarding_sessions;
 create policy "onboarding_sessions_update_owner_admin_or_platform_admin"
   on public.onboarding_sessions for update to authenticated
   using (
@@ -549,10 +941,12 @@ create policy "onboarding_sessions_update_owner_admin_or_platform_admin"
     or public.has_organization_role(organization_id, array['owner'::public.organization_role, 'admin'::public.organization_role])
   );
 
+drop policy if exists "receptionist_configs_select_org_or_platform_admin" on public.receptionist_configs;
 create policy "receptionist_configs_select_org_or_platform_admin"
   on public.receptionist_configs for select to authenticated
   using (public.is_platform_admin() or public.is_organization_member(organization_id));
 
+drop policy if exists "receptionist_configs_insert_owner_admin_or_platform_admin" on public.receptionist_configs;
 create policy "receptionist_configs_insert_owner_admin_or_platform_admin"
   on public.receptionist_configs for insert to authenticated
   with check (
@@ -560,6 +954,7 @@ create policy "receptionist_configs_insert_owner_admin_or_platform_admin"
     or public.has_organization_role(organization_id, array['owner'::public.organization_role, 'admin'::public.organization_role])
   );
 
+drop policy if exists "receptionist_configs_update_owner_admin_or_platform_admin" on public.receptionist_configs;
 create policy "receptionist_configs_update_owner_admin_or_platform_admin"
   on public.receptionist_configs for update to authenticated
   using (
@@ -571,10 +966,12 @@ create policy "receptionist_configs_update_owner_admin_or_platform_admin"
     or public.has_organization_role(organization_id, array['owner'::public.organization_role, 'admin'::public.organization_role])
   );
 
+drop policy if exists "phone_configs_select_org_or_platform_admin" on public.phone_configs;
 create policy "phone_configs_select_org_or_platform_admin"
   on public.phone_configs for select to authenticated
   using (public.is_platform_admin() or public.is_organization_member(organization_id));
 
+drop policy if exists "phone_configs_insert_owner_admin_or_platform_admin" on public.phone_configs;
 create policy "phone_configs_insert_owner_admin_or_platform_admin"
   on public.phone_configs for insert to authenticated
   with check (
@@ -582,6 +979,7 @@ create policy "phone_configs_insert_owner_admin_or_platform_admin"
     or public.has_organization_role(organization_id, array['owner'::public.organization_role, 'admin'::public.organization_role])
   );
 
+drop policy if exists "phone_configs_update_owner_admin_or_platform_admin" on public.phone_configs;
 create policy "phone_configs_update_owner_admin_or_platform_admin"
   on public.phone_configs for update to authenticated
   using (
@@ -597,6 +995,20 @@ revoke all on table public.businesses from public, anon, authenticated;
 revoke all on table public.onboarding_sessions from public, anon, authenticated;
 revoke all on table public.receptionist_configs from public, anon, authenticated;
 revoke all on table public.phone_configs from public, anon, authenticated;
+revoke update (
+  status,
+  last_error,
+  started_at,
+  completed_at,
+  created_at,
+  updated_at
+) on table public.onboarding_sessions from authenticated;
+revoke update (
+  assigned_ai_number,
+  test_status,
+  created_at,
+  updated_at
+) on table public.phone_configs from authenticated;
 
 grant select on table public.businesses to authenticated;
 grant insert (
@@ -708,3 +1120,214 @@ grant execute on function public.onboarding_status_transition_is_allowed(text, t
 grant execute on function public.set_onboarding_session_lifecycle_timestamps() to service_role;
 grant execute on function public.guard_onboarding_session_system_fields() to service_role;
 grant execute on function public.guard_phone_config_system_fields() to service_role;
+
+do $$
+declare
+  target_table_name text;
+  target_row_count bigint;
+  expected_count integer;
+begin
+  foreach target_table_name in array array[
+    'public.businesses',
+    'public.onboarding_sessions',
+    'public.receptionist_configs',
+    'public.phone_configs'
+  ]
+  loop
+    if to_regclass(target_table_name) is null then
+      raise exception 'Final verification failed: % does not exist', target_table_name;
+    end if;
+
+    execute format('select count(*) from %s', target_table_name::regclass) into target_row_count;
+    if target_row_count <> 0 then
+      raise exception 'Final verification failed: % contains % rows', target_table_name, target_row_count;
+    end if;
+  end loop;
+
+  select count(*)
+  into expected_count
+  from pg_attribute
+  where attrelid in (
+      'public.businesses'::regclass,
+      'public.onboarding_sessions'::regclass,
+      'public.receptionist_configs'::regclass,
+      'public.phone_configs'::regclass
+    )
+    and attnum > 0
+    and not attisdropped;
+
+  if expected_count <> 56 then
+    raise exception 'Final verification failed: expected 56 receptionist columns, found %', expected_count;
+  end if;
+
+  if exists (
+    select 1
+    from pg_class
+    where oid in (
+        'public.businesses'::regclass,
+        'public.onboarding_sessions'::regclass,
+        'public.receptionist_configs'::regclass,
+        'public.phone_configs'::regclass
+      )
+      and not relrowsecurity
+  ) then
+    raise exception 'Final verification failed: RLS is not enabled on every receptionist table';
+  end if;
+
+  select count(*)
+  into expected_count
+  from pg_constraint
+  where conrelid in (
+      'public.businesses'::regclass,
+      'public.onboarding_sessions'::regclass,
+      'public.receptionist_configs'::regclass,
+      'public.phone_configs'::regclass
+    )
+    and conname in (
+      'businesses_pkey',
+      'businesses_organization_id_fkey',
+      'businesses_organization_id_key',
+      'businesses_organization_id_id_key',
+      'businesses_name_not_blank',
+      'businesses_website_url_check',
+      'businesses_contact_email_check',
+      'businesses_existing_phone_check',
+      'businesses_primary_language_check',
+      'businesses_timezone_not_blank',
+      'businesses_environment_check',
+      'onboarding_sessions_pkey',
+      'onboarding_sessions_organization_id_fkey',
+      'onboarding_sessions_business_id_key',
+      'onboarding_sessions_organization_business_fk',
+      'onboarding_sessions_status_check',
+      'onboarding_sessions_current_step_check',
+      'onboarding_sessions_completed_steps_check',
+      'onboarding_sessions_selected_goals_check',
+      'receptionist_configs_pkey',
+      'receptionist_configs_organization_id_fkey',
+      'receptionist_configs_business_id_key',
+      'receptionist_configs_organization_business_fk',
+      'receptionist_configs_primary_language_check',
+      'receptionist_configs_additional_languages_check',
+      'receptionist_configs_tone_check',
+      'receptionist_configs_responsibilities_array_check',
+      'receptionist_configs_allowed_actions_array_check',
+      'receptionist_configs_prohibited_actions_array_check',
+      'receptionist_configs_responsibilities_keys_check',
+      'receptionist_configs_allowed_actions_keys_check',
+      'receptionist_configs_prohibited_actions_keys_check',
+      'receptionist_configs_after_hours_object_check',
+      'receptionist_configs_transfer_object_check',
+      'phone_configs_pkey',
+      'phone_configs_organization_id_fkey',
+      'phone_configs_business_id_key',
+      'phone_configs_organization_business_fk',
+      'phone_configs_setup_mode_check',
+      'phone_configs_existing_public_number_check',
+      'phone_configs_human_transfer_number_check',
+      'phone_configs_urgent_escalation_number_check',
+      'phone_configs_after_hours_number_check',
+      'phone_configs_sms_notification_number_check',
+      'phone_configs_test_status_check'
+    );
+
+  if expected_count <> 45 then
+    raise exception 'Final verification failed: expected 45 receptionist constraints, found %', expected_count;
+  end if;
+
+  select count(*)
+  into expected_count
+  from pg_indexes
+  where schemaname = 'public'
+    and indexname in (
+      'businesses_organization_id_idx',
+      'onboarding_sessions_organization_id_idx',
+      'onboarding_sessions_business_id_idx',
+      'receptionist_configs_organization_id_idx',
+      'receptionist_configs_business_id_idx',
+      'phone_configs_organization_id_idx',
+      'phone_configs_business_id_idx'
+    );
+
+  if expected_count <> 7 then
+    raise exception 'Final verification failed: expected 7 receptionist indexes, found %', expected_count;
+  end if;
+
+  select count(*)
+  into expected_count
+  from pg_trigger tr
+  join pg_class rel on rel.oid = tr.tgrelid
+  join pg_namespace nsp on nsp.oid = rel.relnamespace
+  where nsp.nspname = 'public'
+    and rel.relname in ('businesses', 'onboarding_sessions', 'receptionist_configs', 'phone_configs')
+    and not tr.tgisinternal
+    and tr.tgname in (
+      'businesses_set_customer_product_timestamps',
+      'onboarding_sessions_set_customer_product_timestamps',
+      'onboarding_sessions_guard_system_fields',
+      'onboarding_sessions_set_lifecycle_timestamps',
+      'receptionist_configs_set_customer_product_timestamps',
+      'phone_configs_guard_system_fields',
+      'phone_configs_set_customer_product_timestamps'
+    );
+
+  if expected_count <> 7 then
+    raise exception 'Final verification failed: expected 7 receptionist triggers, found %', expected_count;
+  end if;
+
+  select count(*)
+  into expected_count
+  from pg_policies
+  where schemaname = 'public'
+    and tablename in ('businesses', 'onboarding_sessions', 'receptionist_configs', 'phone_configs')
+    and policyname in (
+      'businesses_select_org_or_platform_admin',
+      'businesses_insert_owner_admin_or_platform_admin',
+      'businesses_update_owner_admin_or_platform_admin',
+      'onboarding_sessions_select_org_or_platform_admin',
+      'onboarding_sessions_insert_owner_admin_or_platform_admin',
+      'onboarding_sessions_update_owner_admin_or_platform_admin',
+      'receptionist_configs_select_org_or_platform_admin',
+      'receptionist_configs_insert_owner_admin_or_platform_admin',
+      'receptionist_configs_update_owner_admin_or_platform_admin',
+      'phone_configs_select_org_or_platform_admin',
+      'phone_configs_insert_owner_admin_or_platform_admin',
+      'phone_configs_update_owner_admin_or_platform_admin'
+    );
+
+  if expected_count <> 12 then
+    raise exception 'Final verification failed: expected 12 receptionist policies, found %', expected_count;
+  end if;
+
+  if to_regprocedure('public.jsonb_text_array_is_subset(jsonb, text[])') is null then
+    raise exception 'Final verification failed: jsonb_text_array_is_subset(jsonb,text[]) is missing';
+  end if;
+
+  if to_regprocedure('public.onboarding_status_transition_is_allowed(text, text)') is null then
+    raise exception 'Final verification failed: onboarding_status_transition_is_allowed(text,text) is missing';
+  end if;
+
+  if pg_get_functiondef('public.guard_onboarding_session_system_fields()'::regprocedure)
+    not like '%onboarding_status_transition_is_allowed(old.status, new.status)%' then
+    raise exception 'Final verification failed: onboarding guard does not call onboarding_status_transition_is_allowed(old.status, new.status)';
+  end if;
+
+  if has_column_privilege('authenticated', 'public.onboarding_sessions', 'status', 'UPDATE') then
+    raise exception 'Final verification failed: authenticated can still update onboarding_sessions.status';
+  end if;
+
+  if not has_column_privilege('authenticated', 'public.onboarding_sessions', 'current_step', 'UPDATE')
+    or not has_column_privilege('authenticated', 'public.onboarding_sessions', 'completed_steps', 'UPDATE')
+    or not has_column_privilege('authenticated', 'public.onboarding_sessions', 'selected_goals', 'UPDATE')
+    or not has_column_privilege('authenticated', 'public.onboarding_sessions', 'preferred_behavior', 'UPDATE') then
+    raise exception 'Final verification failed: authenticated is missing intended onboarding_sessions customer column grants';
+  end if;
+
+  if has_column_privilege('authenticated', 'public.phone_configs', 'assigned_ai_number', 'UPDATE')
+    or has_column_privilege('authenticated', 'public.phone_configs', 'test_status', 'UPDATE') then
+    raise exception 'Final verification failed: authenticated can update phone_configs system fields';
+  end if;
+end;
+$$;
+
+commit;
