@@ -1,43 +1,46 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 const schemaPath = 'remote-public-schema.sql';
 const migrationListPath = 'supabase-migration-list.txt';
 const reportPath = 'supabase-history-audit.txt';
+const sourceDir = process.argv[2] ?? '.';
+const migrationRoot = join(sourceDir, 'supabase', 'migrations');
 
 const migrations = [
   {
     id: '20260607194622',
-    file: 'supabase/migrations/20260607194622_create_tasks_table.sql',
+    filename: '20260607194622_create_tasks_table.sql',
     description: 'Create tasks table and task RLS policies',
   },
   {
     id: '20260607200426',
-    file: 'supabase/migrations/20260607200426_fix_tasks_rls_policies.sql',
+    filename: '20260607200426_fix_tasks_rls_policies.sql',
     description: 'Repair final task RLS policies',
   },
   {
     id: '20260706121415',
-    file: 'supabase/migrations/20260706121415_20260706120000_create_execution_tables.sql',
+    filename: '20260706121415_20260706120000_create_execution_tables.sql',
     description: 'Create execution planning tables, indexes, functions, trigger and RLS',
   },
   {
     id: '20260706122833',
-    file: 'supabase/migrations/20260706122833_fix_execution_rls_for_anon.sql',
+    filename: '20260706122833_fix_execution_rls_for_anon.sql',
     description: 'Allow anon and authenticated roles through execution RLS policies',
   },
   {
     id: '20260709120000',
-    file: 'supabase/migrations/20260709120000_create_richer_oura_tables.sql',
+    filename: '20260709120000_create_richer_oura_tables.sql',
     description: 'Create richer Oura public schema tables and unique indexes',
   },
   {
     id: '20260710120000',
-    file: 'supabase/migrations/20260710120000_phase0_auth_tenancy_rls.sql',
+    filename: '20260710120000_phase0_auth_tenancy_rls.sql',
     description: 'Create Phase 0 auth tenancy schema, helpers and RLS',
   },
   {
     id: '20260710133000',
-    file: 'supabase/migrations/20260710133000_phase0_security_hardening.sql',
+    filename: '20260710133000_phase0_security_hardening.sql',
     description: 'Harden Phase 0 profile, organization and membership protections',
   },
 ];
@@ -51,9 +54,13 @@ if (!existsSync(migrationListPath)) {
 }
 
 for (const migration of migrations) {
+  migration.file = join(migrationRoot, migration.filename);
+
   if (!existsSync(migration.file)) {
     throw new Error(`Missing local migration file: ${migration.file}`);
   }
+
+  migration.sql = readFileSync(migration.file, 'utf8');
 }
 
 const schema = readFileSync(schemaPath, 'utf8').replace(/\r\n/g, '\n').toLowerCase();
@@ -467,11 +474,13 @@ const lines = [
   `Generated at: ${new Date().toISOString()}`,
   '',
   'Inputs:',
+  `- Selected source directory: ${sourceDir}`,
+  `- Migration source directory: ${migrationRoot}`,
   `- Public schema dump: ${schemaPath}`,
   `- Migration list output: ${migrationListPath}`,
   '',
   'Read-only guarantee:',
-  '- This audit script reads local migration files and the saved public schema dump only.',
+  '- This audit script reads migration files from the selected source directory and the saved public schema dump only.',
   '- It does not connect to Supabase and does not execute SQL.',
   '- The workflow audit mode uses supabase migration list and supabase db dump --linked --schema public only.',
   '',
