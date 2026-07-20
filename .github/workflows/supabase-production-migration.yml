@@ -1,0 +1,103 @@
+name: Supabase Production Migration
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: Git branch containing the migration
+        required: true
+        default: codex/receptionist-persistence
+      mode:
+        description: Run a dry run or apply the migration
+        required: true
+        type: choice
+        options:
+          - dry-run
+          - apply
+        default: dry-run
+      confirmation:
+        description: Required for apply mode. Must equal APPLY_RECEPTIONIST_PERSISTENCE.
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-production-migration
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    name: Supabase production migration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout selected migration branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref }}
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      # Safety gate: this workflow is intentionally scoped to the receptionist
+      # persistence migration and fails before linking if the selected branch
+      # does not contain the expected migration file.
+      - name: Verify expected migration exists
+        run: test -f supabase/migrations/20260711120000_receptionist_persistence.sql
+
+      # Safety gate: fail closed if any required secret is missing, without
+      # printing secret values.
+      - name: Verify required Supabase secrets are configured
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN"
+          test -n "$SUPABASE_PROJECT_ID"
+          test -n "$SUPABASE_DB_PASSWORD"
+
+      # Safety gate: apply mode requires an exact human-entered confirmation
+      # string before the workflow can run the production migration push.
+      - name: Verify apply confirmation
+        if: ${{ inputs.mode == 'apply' }}
+        env:
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          if [ "$CONFIRMATION" != "APPLY_RECEPTIONIST_PERSISTENCE" ]; then
+            echo "Apply mode requires the exact confirmation string."
+            exit 1
+          fi
+
+      - name: Link Supabase project
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: supabase link --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD"
+
+      - name: List migration history
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase migration list
+
+      # Safety gate: every run performs the dry run first so reviewers can see
+      # the exact migration plan before apply mode reaches the write step.
+      - name: Dry run migration push
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase db push --dry-run
+
+      - name: Stop after dry run
+        if: ${{ inputs.mode == 'dry-run' }}
+        run: echo "Dry run completed. No migration was applied."
+
+      - name: Apply migration push
+        if: ${{ inputs.mode == 'apply' }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase db push
