@@ -81,22 +81,27 @@ declare
   result jsonb;
 begin
   result := public.provision_client_workspace(
+    'idem-acme-1',
     'Acme GmbH', 'Acme Legal GmbH', 'Owner A', 'invited@example.test', '+4915100000001',
     'https://acme.example.test', 'Healthcare', 'Acme Street 1', 'referral', 'active',
     'VIP client', 'Operator A', 'EUR', 500000, 50000,
     'ai_receptionist', 'Acme Receptionist Rollout', 'active', 500000, 100000, 20000,
-    current_date + 30, 'Acme Rezeptionist', 'ai_receptionist', 'acme_receptionist',
+    current_date + 30, 'Acme Rezeptionist', 'ai_receptionist', null,
     'invited@example.test', 'owner'
   );
   perform set_config('cp.org_a', result->>'organization_id', true);
+  perform set_config('cp.instance_a', result->>'instance_key', true);
 
   if (result->>'organization_id') is null or (result->>'invitation_id') is null then
     raise exception 'TEST FAILED: provision did not return created ids';
   end if;
+  if (result->>'instance_key') is null then
+    raise exception 'TEST FAILED: provision did not return a server-generated instance_key';
+  end if;
   if not exists (select 1 from public.client_accounts where organization_id = (result->>'organization_id')::uuid) then
     raise exception 'TEST FAILED: client account not created';
   end if;
-  if not exists (select 1 from public.organization_solutions where instance_key = 'acme_receptionist' and status = 'active') then
+  if not exists (select 1 from public.organization_solutions where instance_key = (result->>'instance_key') and status = 'active') then
     raise exception 'TEST FAILED: solution instance not created';
   end if;
 end $$;
@@ -106,12 +111,77 @@ do $$
 declare result jsonb;
 begin
   result := public.provision_client_workspace(
+    'idem-beta-1',
     'Beta AG', null, 'Owner B', 'owner-b@example.test', null, null, null, null, null, 'lead',
     null, null, 'EUR', null, null,
     'automation_workspace', 'Beta Automation', 'active', null, null, null, null,
-    'Beta Automation', 'automation_workspace', 'beta_automation', 'owner-b@example.test', 'owner'
+    'Beta Automation', 'automation_workspace', null, 'owner-b@example.test', 'owner'
   );
   perform set_config('cp.org_b', result->>'organization_id', true);
+end $$;
+
+-- ============ Finding 4: provisioning is idempotent ============
+do $$
+declare
+  first_result jsonb;
+  second_result jsonb;
+  org_count integer;
+begin
+  first_result := public.provision_client_workspace(
+    'idem-dup-1',
+    'Dup GmbH', null, 'Owner Dup', 'dup@example.test', null, null, null, null, null, 'active',
+    null, null, 'EUR', null, null,
+    'ai_receptionist', 'Dup Rollout', 'active', null, null, null, null,
+    'Dup Rezeptionist', 'ai_receptionist', null, 'dup@example.test', 'owner'
+  );
+  -- Same idempotency key => replay, no new workspace.
+  second_result := public.provision_client_workspace(
+    'idem-dup-1',
+    'Dup GmbH RETRY', null, 'Different', 'other@example.test', null, null, null, null, null, 'active',
+    null, null, 'EUR', null, null,
+    'ai_receptionist', 'Different Rollout', 'active', null, null, null, null,
+    'Different Rezeptionist', 'ai_receptionist', null, 'other@example.test', 'owner'
+  );
+  if (first_result->>'organization_id') <> (second_result->>'organization_id')
+    or (first_result->>'instance_key') <> (second_result->>'instance_key')
+    or (first_result->>'invitation_id') <> (second_result->>'invitation_id') then
+    raise exception 'TEST FAILED: idempotent retry returned different ids';
+  end if;
+  select count(*) into org_count from public.organizations where name = 'Dup GmbH';
+  if org_count <> 1 then
+    raise exception 'TEST FAILED: idempotent provisioning created % organizations', org_count;
+  end if;
+  if exists (select 1 from public.organizations where name = 'Dup GmbH RETRY') then
+    raise exception 'TEST FAILED: idempotent retry created a second organization';
+  end if;
+end $$;
+
+-- ============ Finding 5: repeated display names produce distinct instance keys / routes ============
+do $$
+declare
+  r1 jsonb;
+  r2 jsonb;
+begin
+  r1 := public.provision_client_workspace(
+    'idem-same-1',
+    'Same Name Org 1', null, 'C1', 'same1@example.test', null, null, null, null, null, 'active',
+    null, null, 'EUR', null, null,
+    'ai_receptionist', 'KI-Rezeptionist', 'active', null, null, null, null,
+    'KI-Rezeptionist', 'ai_receptionist', null, 'same1@example.test', 'owner'
+  );
+  r2 := public.provision_client_workspace(
+    'idem-same-2',
+    'Same Name Org 2', null, 'C2', 'same2@example.test', null, null, null, null, null, 'active',
+    null, null, 'EUR', null, null,
+    'ai_receptionist', 'KI-Rezeptionist', 'active', null, null, null, null,
+    'KI-Rezeptionist', 'ai_receptionist', null, 'same2@example.test', 'owner'
+  );
+  if (r1->>'instance_key') = (r2->>'instance_key') then
+    raise exception 'TEST FAILED: identical display names produced identical instance keys';
+  end if;
+  if (r1->>'instance_key') !~ '^[a-z0-9][a-z0-9_-]{2,}$' or (r2->>'instance_key') !~ '^[a-z0-9][a-z0-9_-]{2,}$' then
+    raise exception 'TEST FAILED: generated instance key has an invalid route-unsafe format';
+  end if;
 end $$;
 
 -- ============ Scenario 14: platform admin can view all organizations and solutions ============

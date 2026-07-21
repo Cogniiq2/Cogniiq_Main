@@ -371,6 +371,65 @@ grant select, insert, update, delete on table public.organization_portal_setting
 grant select, insert, update, delete on table public.client_invitations to service_role;
 
 -- ---------------------------------------------------------------------------
+-- Internal admin-only idempotency ledger for client provisioning.
+-- ---------------------------------------------------------------------------
+create table if not exists public.client_provisioning_requests (
+  idempotency_key text primary key,
+  organization_id uuid references public.organizations(id) on delete set null,
+  result jsonb,
+  created_by uuid references public.profiles(id) on delete set null,
+  created_at timestamptz not null default now(),
+  constraint client_provisioning_requests_key_not_blank check (length(trim(idempotency_key)) > 0)
+);
+
+comment on table public.client_provisioning_requests is
+  'Internal admin-only idempotency ledger. One row per intended client provisioning submission; result holds the created workspace IDs so retries replay instead of duplicating.';
+
+alter table public.client_provisioning_requests enable row level security;
+
+drop policy if exists "client_provisioning_requests_admin_all" on public.client_provisioning_requests;
+create policy "client_provisioning_requests_admin_all"
+  on public.client_provisioning_requests for all to authenticated
+  using (public.is_platform_admin())
+  with check (public.is_platform_admin());
+
+revoke all on table public.client_provisioning_requests from public, anon, authenticated;
+grant select, insert, update, delete on table public.client_provisioning_requests to authenticated;
+grant select, insert, update, delete on table public.client_provisioning_requests to service_role;
+
+-- ---------------------------------------------------------------------------
+-- Entitlement helper: does an organization own an accessible (non-disabled)
+-- solution of a controlled catalog key? SECURITY DEFINER + fixed safe search_path.
+-- The membership/admin floor prevents enumeration of other organizations.
+-- ---------------------------------------------------------------------------
+create or replace function public.organization_has_accessible_solution(
+  target_organization_id uuid,
+  target_catalog_key text
+)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public, pg_temp
+as $$
+  select
+    (public.is_platform_admin() or public.is_organization_member(target_organization_id))
+    and exists (
+      select 1
+      from public.organization_solutions os
+      where os.organization_id = target_organization_id
+        and os.catalog_key = target_catalog_key
+        and os.status <> 'disabled'
+    );
+$$;
+
+comment on function public.organization_has_accessible_solution(uuid, text) is
+  'RLS helper. True only when the caller is a platform admin or active member of the organization AND that organization owns a non-disabled solution of the given controlled catalog key. Not exploitable to enumerate other organizations.';
+
+revoke execute on function public.organization_has_accessible_solution(uuid, text) from public, anon;
+grant execute on function public.organization_has_accessible_solution(uuid, text) to authenticated, service_role;
+
+-- ---------------------------------------------------------------------------
 -- RPC: claim_my_client_invitations()  (no client arguments)
 -- ---------------------------------------------------------------------------
 create or replace function public.claim_my_client_invitations()
@@ -454,6 +513,7 @@ comment on function public.claim_my_client_invitations() is
 -- RPC: provision_client_workspace(...)  atomic admin provisioning
 -- ---------------------------------------------------------------------------
 create or replace function public.provision_client_workspace(
+  p_idempotency_key text,
   p_display_name text,
   p_legal_name text,
   p_primary_contact_name text,
@@ -492,7 +552,11 @@ declare
   v_lifecycle text := coalesce(nullif(trim(p_lifecycle_status), ''), 'lead');
   v_engagement_status text := coalesce(nullif(trim(p_engagement_status), ''), 'active');
   v_invite_email text := lower(trim(coalesce(p_invitation_email, '')));
-  v_instance_key text := lower(trim(coalesce(p_instance_key, '')));
+  v_idem text := nullif(trim(coalesce(p_idempotency_key, '')), '');
+  v_slug text;
+  v_instance_key text;
+  v_existing_result jsonb;
+  v_result jsonb;
   v_role public.organization_role := coalesce(p_organization_role, 'owner');
   v_org_id uuid;
   v_account_id uuid;
@@ -503,6 +567,26 @@ declare
 begin
   if not public.is_platform_admin() then
     raise exception 'Only Cogniiq platform admins may provision client workspaces';
+  end if;
+
+  -- Idempotency: claim the key first. If another (committed) call already produced a result for
+  -- this key, replay it. Concurrent callers with the same key serialize on the row lock: the first
+  -- holds it until commit, the second then reads the committed result. A retry after a committed
+  -- transaction returns the original workspace IDs and creates nothing new.
+  if v_idem is not null then
+    insert into public.client_provisioning_requests (idempotency_key, created_by)
+    values (v_idem, auth.uid())
+    on conflict (idempotency_key) do nothing;
+
+    select cpr.result
+      into v_existing_result
+    from public.client_provisioning_requests cpr
+    where cpr.idempotency_key = v_idem
+    for update;
+
+    if v_existing_result is not null then
+      return v_existing_result;
+    end if;
   end if;
 
   -- Validation
@@ -541,13 +625,24 @@ begin
     raise exception 'monetary amounts must be non-negative';
   end if;
 
-  if v_instance_key = '' then
-    v_instance_key := replace(gen_random_uuid()::text, '-', '');
-    v_instance_key := 'sol_' || substr(v_instance_key, 1, 16);
+  -- Canonical instance key is generated server-side: a readable slug plus a random,
+  -- collision-resistant suffix from gen_random_uuid(). Frontend-supplied keys are never trusted
+  -- for database identity, so repeated display names ("KI-Rezeptionist", "Automatisierung", ...)
+  -- never collide across clients.
+  v_slug := lower(trim(coalesce(p_solution_display_name, '')));
+  v_slug := regexp_replace(v_slug, '[^a-z0-9]+', '-', 'g');
+  v_slug := trim(both '-' from v_slug);
+  if length(v_slug) < 3 then
+    v_slug := 'loesung';
   end if;
-  if v_instance_key !~ '^[a-z0-9][a-z0-9_-]{2,}$' then
-    raise exception 'invalid instance_key';
-  end if;
+  v_slug := substr(v_slug, 1, 40);
+
+  loop
+    v_instance_key := v_slug || '-' || substr(replace(gen_random_uuid()::text, '-', ''), 1, 8);
+    exit when not exists (
+      select 1 from public.organization_solutions os where os.instance_key = v_instance_key
+    );
+  end loop;
 
   -- 1. Organization (pending until invitation claimed)
   insert into public.organizations (name, status, created_by)
@@ -612,7 +707,7 @@ begin
   values (v_org_id, v_invite_email, v_role, 'pending', auth.uid(), now() + interval '14 days')
   returning id into v_invitation_id;
 
-  return jsonb_build_object(
+  v_result := jsonb_build_object(
     'organization_id', v_org_id,
     'client_account_id', v_account_id,
     'client_contact_id', v_contact_id,
@@ -622,6 +717,15 @@ begin
     'invitation_id', v_invitation_id,
     'invitation_email', v_invite_email
   );
+
+  -- Persist the result against the idempotency key so retries replay it.
+  if v_idem is not null then
+    update public.client_provisioning_requests
+      set result = v_result, organization_id = v_org_id
+    where idempotency_key = v_idem;
+  end if;
+
+  return v_result;
 end;
 $$;
 
@@ -635,13 +739,102 @@ revoke execute on function public.claim_my_client_invitations() from public, ano
 grant execute on function public.claim_my_client_invitations() to authenticated, service_role;
 
 revoke execute on function public.provision_client_workspace(
-  text, text, text, text, text, text, text, text, text, text, text, text, text,
+  text, text, text, text, text, text, text, text, text, text, text, text, text, text,
   bigint, bigint, text, text, text, bigint, bigint, bigint, date, text, text, text, text, public.organization_role
 ) from public, anon;
 grant execute on function public.provision_client_workspace(
-  text, text, text, text, text, text, text, text, text, text, text, text, text,
+  text, text, text, text, text, text, text, text, text, text, text, text, text, text,
   bigint, bigint, text, text, text, bigint, bigint, bigint, date, text, text, text, text, public.organization_role
 ) to authenticated, service_role;
+
+-- ---------------------------------------------------------------------------
+-- Receptionist entitlement reconciliation.
+--
+-- The receptionist persistence layer predates organization_solutions, so its policies authorized
+-- organization owners/admins without checking that the organization owns the AI receptionist
+-- solution. First backfill an ai_receptionist solution instance (and portal settings) for every
+-- organization that already has receptionist data, then tighten the policies to require the
+-- entitlement. This keeps existing receptionist clients working while blocking automation-only
+-- organizations from receptionist product tables.
+-- ---------------------------------------------------------------------------
+do $$
+begin
+  if to_regclass('public.businesses') is null then
+    return; -- receptionist persistence layer not present; nothing to reconcile.
+  end if;
+
+  -- Idempotent, collision-safe backfill. instance_key derives from the (unique) organization id,
+  -- so re-running never creates duplicates and no client CRM account/engagement is required.
+  insert into public.organization_solutions (
+    organization_id, catalog_key, instance_key, display_name, implementation_key, status
+  )
+  select
+    b.organization_id,
+    'ai_receptionist',
+    'ai-receptionist-' || replace(b.organization_id::text, '-', ''),
+    coalesce(nullif(trim(b.name), ''), 'KI-Rezeptionist'),
+    'ai_receptionist',
+    'active'
+  from public.businesses b
+  where not exists (
+    select 1 from public.organization_solutions os
+    where os.organization_id = b.organization_id
+      and os.catalog_key = 'ai_receptionist'
+  )
+  on conflict (instance_key) do nothing;
+
+  -- Portal settings for those organizations, without overwriting existing settings.
+  insert into public.organization_portal_settings (organization_id, portal_title)
+  select b.organization_id, coalesce(nullif(trim(b.name), ''), 'Cogniiq')
+  from public.businesses b
+  on conflict (organization_id) do nothing;
+end;
+$$;
+
+-- Reconcile the receptionist-table policies to require the ai_receptionist entitlement.
+-- Platform admins retain access. service_role bypasses RLS and is unaffected.
+do $$
+declare
+  t text;
+begin
+  if to_regclass('public.businesses') is null then
+    return;
+  end if;
+
+  foreach t in array array['businesses', 'onboarding_sessions', 'receptionist_configs', 'phone_configs']
+  loop
+    execute format('drop policy if exists %I on public.%I', t || '_select_org_or_platform_admin', t);
+    execute format(
+      'create policy %I on public.%I for select to authenticated using ('
+      || 'public.is_platform_admin() '
+      || 'or public.organization_has_accessible_solution(organization_id, ''ai_receptionist''))',
+      t || '_select_org_or_platform_admin', t
+    );
+
+    execute format('drop policy if exists %I on public.%I', t || '_insert_owner_admin_or_platform_admin', t);
+    execute format(
+      'create policy %I on public.%I for insert to authenticated with check ('
+      || 'public.is_platform_admin() '
+      || 'or (public.has_organization_role(organization_id, array[''owner''::public.organization_role, ''admin''::public.organization_role]) '
+      || 'and public.organization_has_accessible_solution(organization_id, ''ai_receptionist'')))',
+      t || '_insert_owner_admin_or_platform_admin', t
+    );
+
+    execute format('drop policy if exists %I on public.%I', t || '_update_owner_admin_or_platform_admin', t);
+    execute format(
+      'create policy %I on public.%I for update to authenticated using ('
+      || 'public.is_platform_admin() '
+      || 'or (public.has_organization_role(organization_id, array[''owner''::public.organization_role, ''admin''::public.organization_role]) '
+      || 'and public.organization_has_accessible_solution(organization_id, ''ai_receptionist''))) '
+      || 'with check ('
+      || 'public.is_platform_admin() '
+      || 'or (public.has_organization_role(organization_id, array[''owner''::public.organization_role, ''admin''::public.organization_role]) '
+      || 'and public.organization_has_accessible_solution(organization_id, ''ai_receptionist'')))',
+      t || '_update_owner_admin_or_platform_admin', t
+    );
+  end loop;
+end;
+$$;
 
 -- ---------------------------------------------------------------------------
 -- Post-conditions: verify RLS is enabled on every new table.
@@ -652,7 +845,8 @@ declare
 begin
   foreach t in array array[
     'solution_catalog', 'client_accounts', 'client_contacts', 'client_engagements',
-    'organization_solutions', 'organization_portal_settings', 'client_invitations'
+    'organization_solutions', 'organization_portal_settings', 'client_invitations',
+    'client_provisioning_requests'
   ]
   loop
     if not exists (

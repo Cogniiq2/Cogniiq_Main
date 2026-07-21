@@ -98,14 +98,56 @@ serve(async (req: Request): Promise<Response> => {
   });
 
   // ---- Resend path ----
+  // Resend is scoped to a controlled invitation record. The recipient email always comes from the
+  // stored invitation, never from a browser-supplied address.
   if (action === "resend") {
-    const email = asString(body.email)?.toLowerCase() ?? null;
-    if (!email || !EMAIL_RE.test(email)) return json({ error: "A valid email is required" }, 400);
-    const invite = await sendInvite(adminClient, email);
-    return json({ ok: true, action: "resend", email, invitation: invite });
+    const invitationId = asString(body.invitationId);
+    const renewExpired = body.renewExpired === true;
+    if (!invitationId) return json({ error: "invitationId is required" }, 400);
+
+    const { data: inv, error: invError } = await callerClient
+      .from("client_invitations")
+      .select("id, email, status, expires_at")
+      .eq("id", invitationId)
+      .maybeSingle();
+
+    const invitation = inv as
+      | { id: string; email: string; status: string; expires_at: string | null }
+      | null;
+    if (invError || !invitation) {
+      return json({ error: "Invitation not found" }, 404);
+    }
+    if (invitation.status === "revoked" || invitation.status === "accepted") {
+      return json({ error: `Cannot resend a ${invitation.status} invitation`, status: invitation.status }, 409);
+    }
+
+    const isExpired =
+      invitation.status === "expired" ||
+      (invitation.expires_at != null && new Date(invitation.expires_at).getTime() < Date.now());
+
+    if (isExpired) {
+      if (!renewExpired) {
+        return json(
+          { error: "Invitation is expired. Renew it explicitly to resend.", status: "expired" },
+          409,
+        );
+      }
+      const { error: renewError } = await callerClient
+        .from("client_invitations")
+        .update({
+          status: "pending",
+          expires_at: new Date(Date.now() + 14 * 24 * 3600 * 1000).toISOString(),
+        })
+        .eq("id", invitationId);
+      if (renewError) return json({ error: renewError.message }, 400);
+    }
+
+    const result = await sendInvite(adminClient, invitation.email);
+    return json({ ok: true, action: "resend", email: invitation.email, invitation: result });
   }
 
   // ---- Provision path ----
+  const idempotencyKey = asString(body.idempotencyKey);
   const displayName = asString(body.displayName);
   const projectName = asString(body.projectName);
   const solutionDisplayName = asString(body.solutionDisplayName);
@@ -113,6 +155,7 @@ serve(async (req: Request): Promise<Response> => {
   const implementationKey = asString(body.implementationKey);
   const invitationEmail = asString(body.invitationEmail)?.toLowerCase() ?? null;
 
+  if (!idempotencyKey) return json({ error: "idempotencyKey is required" }, 400);
   if (!displayName) return json({ error: "displayName is required" }, 400);
   if (!projectName) return json({ error: "projectName is required" }, 400);
   if (!solutionDisplayName) return json({ error: "solutionDisplayName is required" }, 400);
@@ -126,6 +169,7 @@ serve(async (req: Request): Promise<Response> => {
   const { data: provisionResult, error: provisionError } = await callerClient.rpc(
     "provision_client_workspace",
     {
+      p_idempotency_key: idempotencyKey,
       p_display_name: displayName,
       p_legal_name: asString(body.legalName),
       p_primary_contact_name: asString(body.primaryContactName),
@@ -150,7 +194,7 @@ serve(async (req: Request): Promise<Response> => {
       p_target_go_live_date: asString(body.targetGoLiveDate),
       p_solution_display_name: solutionDisplayName,
       p_implementation_key: implementationKey,
-      p_instance_key: asString(body.instanceKey),
+      p_instance_key: null, // canonical instance key is generated server-side by the RPC
       p_invitation_email: invitationEmail,
       p_organization_role: asString(body.organizationRole) ?? "owner",
     },
