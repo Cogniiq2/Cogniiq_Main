@@ -664,8 +664,8 @@ begin
       refrel.relname as referenced_table,
       array_agg(refatt.attname::text order by referenced_key.ordinality)
         filter (where refatt.attname is not null) as referenced_columns,
-      con.confdeltype::text as delete_action,
-con.confupdtype::text as update_action,
+      nullif(con.confdeltype::text, ' ') as delete_action,
+      nullif(con.confupdtype::text, ' ') as update_action,
       regexp_replace(lower(pg_get_constraintdef(con.oid)), '\s+', ' ', 'g') as constraint_definition,
       con.convalidated as is_validated
     from pg_constraint con
