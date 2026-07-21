@@ -481,12 +481,12 @@ $$;
 create temporary table receptionist_expected_constraints (
   table_name text not null,
   constraint_name text not null,
-  constraint_type "char" not null,
+  constraint_type text not null,
   constrained_columns text[] not null,
   referenced_table text,
   referenced_columns text[],
-  delete_action "char",
-  update_action "char",
+  delete_action text,
+update_action text,
   check_pattern text,
   expected_validated boolean not null default true,
   primary key (table_name, constraint_name)
