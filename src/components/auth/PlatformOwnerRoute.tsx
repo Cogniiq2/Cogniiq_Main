@@ -22,27 +22,27 @@ export function PlatformOwnerRoute({ children }: { children: ReactNode }) {
 
   if (!isPlatformOwner) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0b1220] px-6 text-slate-100">
-        <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#111a2e] p-7 shadow-[0_24px_80px_rgba(0,0,0,0.5)]">
-          <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl border border-amber-400/30 bg-amber-400/10 text-amber-300">
+      <div className="flex min-h-screen items-center justify-center bg-[#f7f7f4] px-6 text-gray-950">
+        <div className="w-full max-w-md rounded-[20px] border border-gray-100 bg-white p-7 shadow-[0_24px_80px_rgba(15,23,42,0.08)]">
+          <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-600">
             <ShieldAlert size={19} />
           </div>
-          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Restricted</p>
+          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400">Restricted</p>
           <h1 className="mb-3 text-2xl font-bold tracking-tight">Kein Zugriff</h1>
-          <p className="mb-6 text-sm leading-6 text-slate-400">
+          <p className="mb-6 text-sm leading-6 text-gray-500">
             Dieser Bereich ist ausschließlich dem Cogniiq-Inhaber vorbehalten.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link
               to="/admin/clients"
-              className="inline-flex items-center justify-center rounded-xl bg-cyan-500 px-4 py-2.5 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-400"
+              className="inline-flex items-center justify-center rounded-xl bg-gray-950 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800"
             >
               Zur Administration
             </Link>
             <button
               type="button"
               onClick={() => void signOut()}
-              className="inline-flex items-center justify-center rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-slate-200 transition-colors hover:bg-white/5"
+              className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:border-gray-300 hover:text-gray-950"
             >
               Abmelden
             </button>

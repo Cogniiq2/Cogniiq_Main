@@ -16,6 +16,51 @@ import type {
   PeriodSummary,
 } from './types';
 
+// The additive migration that provisions the entire owner-finance backend (tables + RPCs + RLS).
+// Surfaced to the owner when the schema is absent in the target environment.
+export const OWNER_FINANCE_MIGRATION = '20260722120000_owner_finance_cockpit.sql';
+
+export type FinanceBackendStatus = 'ready' | 'missing' | 'error';
+
+interface PostgrestLikeError {
+  code?: string | null;
+  message?: string | null;
+  details?: string | null;
+  hint?: string | null;
+}
+
+// Distinguishes "the finance backend has not been installed in this environment" from an ordinary
+// transient/auth error. Missing tables surface as Postgres 42P01 or PostgREST schema-cache misses
+// (PGRST205); missing RPCs as PGRST202. We never treat an RLS denial as "missing".
+export function isMissingBackendError(err: unknown): boolean {
+  const e = err as PostgrestLikeError | null;
+  if (!e) return false;
+  const code = (e.code ?? '').toUpperCase();
+  if (code === '42P01' || code === 'PGRST205' || code === 'PGRST202') return true;
+  const text = `${e.message ?? ''} ${e.details ?? ''} ${e.hint ?? ''}`.toLowerCase();
+  if (!text.trim()) return false;
+  return (
+    (text.includes('does not exist') && (text.includes('relation') || text.includes('table') || text.includes('function'))) ||
+    text.includes('could not find the table') ||
+    text.includes('could not find the function') ||
+    text.includes('schema cache')
+  );
+}
+
+export function classifyBackendError(err: unknown): FinanceBackendStatus {
+  return isMissingBackendError(err) ? 'missing' : 'error';
+}
+
+// Lightweight probe used at cockpit boot: resolves whether the finance schema is installed without
+// leaking SQL detail to the UI. A missing backend resolves to a clean 'missing' status; an existing
+// backend (even with zero rows or an RLS denial that still hits a real table) resolves to 'ready'.
+export async function probeFinanceBackend(): Promise<{ status: FinanceBackendStatus; detail: string | null }> {
+  const { error } = await supabase.from('owner_business_entities').select('id').limit(1);
+  if (!error) return { status: 'ready', detail: null };
+  if (isMissingBackendError(error)) return { status: 'missing', detail: error.message ?? 'relation not found' };
+  return { status: 'error', detail: error.message ?? 'unknown error' };
+}
+
 export function secureUuid(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
   const b = new Uint8Array(16);
@@ -130,9 +175,26 @@ export async function setInvoiceStatus(invoiceId: string, status: OwnerInvoice['
   return { error: error?.message ?? null };
 }
 
-export async function recordInvoicePayment(invoiceId: string, amountCents: number, paymentDate: string): Promise<{ error: string | null }> {
-  const { error } = await supabase.rpc('record_owner_invoice_payment', { p_idempotency_key: secureUuid(), p_invoice_id: invoiceId, p_amount_cents: amountCents, p_payment_date: paymentDate });
-  return { error: error?.message ?? null };
+export interface PaymentMeta { method?: string | null; reference?: string | null; note?: string | null }
+
+// Best-effort enrichment of the payment row that the atomic RPC created. The amount+date are always
+// recorded server-authoritatively by the RPC; method/reference/note are optional metadata columns
+// updated afterwards, so a failure here never affects the recorded payment.
+async function enrichPayment(paymentId: string | null | undefined, meta?: PaymentMeta): Promise<void> {
+  if (!paymentId || !meta) return;
+  const patch: Record<string, string> = {};
+  if (meta.method) patch.payment_method = meta.method;
+  if (meta.reference) patch.reference = meta.reference;
+  if (meta.note) patch.notes = meta.note;
+  if (Object.keys(patch).length === 0) return;
+  await supabase.from('owner_payments').update(patch).eq('id', paymentId);
+}
+
+export async function recordInvoicePayment(invoiceId: string, amountCents: number, paymentDate: string, meta?: PaymentMeta): Promise<{ error: string | null }> {
+  const { data, error } = await supabase.rpc('record_owner_invoice_payment', { p_idempotency_key: secureUuid(), p_invoice_id: invoiceId, p_amount_cents: amountCents, p_payment_date: paymentDate });
+  if (error) return { error: error.message };
+  await enrichPayment((data as { payment_id?: string })?.payment_id, meta);
+  return { error: null };
 }
 
 export async function deleteDraftInvoice(invoiceId: string): Promise<{ error: string | null }> {
@@ -159,6 +221,23 @@ export async function createOwnerExpense(header: Record<string, unknown>, lines:
 export async function markExpenseReviewed(expenseId: string): Promise<{ error: string | null }> {
   const { error } = await supabase.from('owner_expenses').update({ review_status: 'reviewed' }).eq('id', expenseId);
   return { error: error?.message ?? null };
+}
+
+export async function recordExpensePayment(expenseId: string, amountCents: number, paymentDate: string, meta?: PaymentMeta): Promise<{ error: string | null }> {
+  const { data, error } = await supabase.rpc('record_owner_expense_payment', { p_idempotency_key: secureUuid(), p_expense_id: expenseId, p_amount_cents: amountCents, p_payment_date: paymentDate });
+  if (error) return { error: error.message };
+  await enrichPayment((data as { payment_id?: string })?.payment_id, meta);
+  return { error: null };
+}
+
+// CRM customers for the invoice/expense composers (organization + account, owner-readable).
+export interface CrmCustomerOption {
+  organizationId: string;
+  clientAccountId: string | null;
+  name: string;
+  email: string | null;
+  legalName: string | null;
+  address: string | null;
 }
 
 export async function loadSubscriptions(entityId: string): Promise<OwnerSubscription[]> {

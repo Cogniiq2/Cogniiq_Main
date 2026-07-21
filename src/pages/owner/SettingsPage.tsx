@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { OwnerButton, OwnerCard, OwnerError, OwnerField, OwnerLoading, OwnerPageHeader, OwnerPill, OwnerSelect } from '@/pages/owner/ownerUi';
+import {
+  Button, Card, Checkbox, ErrorState, Field, KpiSkeletonGrid, PageHeader, SectionHeader, Select,
+  StatusBadge, useToast,
+} from '@/components/dashboard';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import { loadTaxSettings, upsertTaxSettings } from '@/lib/ownerFinance/api';
-import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
+import { parseAmountToCents } from '@/lib/clientPlatform/validation';
 import type { OwnerTaxSettings } from '@/lib/ownerFinance/types';
 
 function bpToPercent(bp: number | null): string { return bp == null ? '' : (bp / 100).toString(); }
@@ -15,12 +18,11 @@ function percentToBp(v: string): number | null {
 }
 
 export function SettingsPage() {
-  const { entity, taxYear } = useOwnerEntity();
-  const [settings, setSettings] = useState<OwnerTaxSettings | null>(null);
+  const { entity, taxYear, reload: reloadEntity } = useOwnerEntity();
+  const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
 
   const [hebesatz, setHebesatz] = useState('');
   const [vatTiming, setVatTiming] = useState('');
@@ -40,7 +42,6 @@ export function SettingsPage() {
     setLoading(true);
     try {
       const s = await loadTaxSettings(entity.id, taxYear);
-      setSettings(s);
       if (s) {
         setHebesatz(bpToPercent(s.trade_tax_hebesatz_bp));
         setVatTiming(s.vat_timing ?? '');
@@ -87,23 +88,27 @@ export function SettingsPage() {
       setup_complete: setupComplete,
     });
     setSaving(false);
-    if (err) { setFormError(err); return; }
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    if (err) { setFormError(err); toast.error('Speichern fehlgeschlagen', err); return; }
+    toast.success('Einstellungen gespeichert', 'Steuerannahmen aktualisiert.');
     void load();
+    void reloadEntity();
   };
 
-  if (!entity) return <OwnerLoading label="Wird geladen" />;
+  if (!entity) return <KpiSkeletonGrid />;
 
   return (
     <>
-      <OwnerPageHeader title="Einstellungen" description={`Geschäftseinheit und steuerliche Annahmen für ${taxYear}. Es werden keine ELSTER-Passwörter oder Zertifikate gespeichert.`} />
-      {error ? <OwnerError message={error} /> : null}
-      {loading ? <OwnerLoading label="Einstellungen werden geladen" /> : (
+      <PageHeader title="Einstellungen" description={`Geschäftseinheit und steuerliche Annahmen für ${taxYear}. Es werden keine ELSTER-Passwörter oder Zertifikate gespeichert.`} />
+
+      {error ? <div className="mb-6"><ErrorState message={error} onRetry={() => void load()} /></div> : null}
+
+      {loading ? (
+        <div className="space-y-6"><KpiSkeletonGrid /><KpiSkeletonGrid count={3} /></div>
+      ) : (
         <div className="space-y-6">
-          <OwnerCard>
-            <p className="mb-4 text-sm font-semibold text-white">Geschäftseinheit</p>
-            <div className="grid gap-3 sm:grid-cols-3 text-sm">
+          <Card>
+            <SectionHeader title="Geschäftseinheit" description="Feste Rahmendaten dieses Einzelunternehmens." />
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               <ReadOnly label="Name" value={entity.display_name} />
               <ReadOnly label="Rechtsform" value="Einzelunternehmen" />
               <ReadOnly label="Tätigkeit" value="Gewerbebetrieb" />
@@ -111,36 +116,34 @@ export function SettingsPage() {
               <ReadOnly label="USt" value="Regelbesteuerung" />
               <ReadOnly label="Bundesland" value={entity.federal_state ?? '—'} />
             </div>
-          </OwnerCard>
+          </Card>
 
-          <OwnerCard>
-            <div className="mb-4 flex items-center justify-between">
-              <p className="text-sm font-semibold text-white">Steuerliche Annahmen {taxYear}</p>
-              <OwnerPill label={setupComplete ? 'Setup vollständig' : 'Setup unvollständig'} tone={setupComplete ? 'success' : 'warning'} />
-            </div>
+          <Card>
+            <SectionHeader
+              title={`Steuerliche Annahmen ${taxYear}`}
+              description="Diese Eingaben steuern die Steuerschätzungen im Kontrollzentrum."
+              action={<StatusBadge label={setupComplete ? 'Setup vollständig' : 'Setup unvollständig'} tone={setupComplete ? 'success' : 'warning'} />}
+            />
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <OwnerField id="hebesatz" label="Gewerbesteuer-Hebesatz (%)" value={hebesatz} onChange={setHebesatz} placeholder="z. B. 490" hint="Gemeindespezifisch, min. 200 %" />
-              <OwnerSelect id="vatTiming" label="USt-Modus" value={vatTiming} onChange={setVatTiming} options={[{ value: '', label: 'Unbekannt' }, { value: 'ist', label: 'Ist-Versteuerung' }, { value: 'soll', label: 'Soll-Versteuerung' }]} />
-              <OwnerSelect id="vatFreq" label="USt-Voranmeldung" value={vatFrequency} onChange={setVatFrequency} options={[{ value: '', label: 'Unbekannt' }, { value: 'monthly', label: 'Monatlich' }, { value: 'quarterly', label: 'Vierteljährlich' }, { value: 'annual', label: 'Jährlich' }]} />
-              <OwnerSelect id="assessment" label="Veranlagung" value={assessmentMode} onChange={setAssessmentMode} options={[{ value: 'single', label: 'Einzelveranlagung' }, { value: 'joint', label: 'Zusammenveranlagung' }]} />
-              <OwnerSelect id="church" label="Kirchensteuer" value={churchEnabled} onChange={setChurchEnabled} options={[{ value: 'false', label: 'Deaktiviert' }, { value: 'true', label: 'Aktiviert' }]} />
-              <OwnerField id="churchRate" label="Kirchensteuersatz (%)" value={churchRate} onChange={setChurchRate} hint="Bayern 8 %" />
-              <OwnerField id="otherIncome" label="Anderes zu verst. Einkommen (€)" value={otherIncome} onChange={setOtherIncome} placeholder="ohne Cogniiq, nach Abzügen" hint="Bestimmt die ESt-Schätzung" />
-              <OwnerField id="incomePrepay" label="ESt-Vorauszahlungen (€)" value={incomePrepay} onChange={setIncomePrepay} />
-              <OwnerField id="tradePrepay" label="GewSt-Vorauszahlungen (€)" value={tradePrepay} onChange={setTradePrepay} />
-              <OwnerField id="reserveHorizon" label="Rücklage-Horizont (Tage)" value={reserveHorizon} onChange={setReserveHorizon} />
+              <Field id="hebesatz" label="Gewerbesteuer-Hebesatz (%)" value={hebesatz} onChange={setHebesatz} placeholder="z. B. 490" hint="Gemeindespezifisch, min. 200 %" inputMode="decimal" />
+              <Select id="vatTiming" label="USt-Modus" value={vatTiming} onChange={setVatTiming} options={[{ value: '', label: 'Unbekannt' }, { value: 'ist', label: 'Ist-Versteuerung' }, { value: 'soll', label: 'Soll-Versteuerung' }]} />
+              <Select id="vatFreq" label="USt-Voranmeldung" value={vatFrequency} onChange={setVatFrequency} options={[{ value: '', label: 'Unbekannt' }, { value: 'monthly', label: 'Monatlich' }, { value: 'quarterly', label: 'Vierteljährlich' }, { value: 'annual', label: 'Jährlich' }]} />
+              <Select id="assessment" label="Veranlagung" value={assessmentMode} onChange={setAssessmentMode} options={[{ value: 'single', label: 'Einzelveranlagung' }, { value: 'joint', label: 'Zusammenveranlagung' }]} />
+              <Select id="church" label="Kirchensteuer" value={churchEnabled} onChange={setChurchEnabled} options={[{ value: 'false', label: 'Deaktiviert' }, { value: 'true', label: 'Aktiviert' }]} />
+              <Field id="churchRate" label="Kirchensteuersatz (%)" value={churchRate} onChange={setChurchRate} hint="Bayern 8 %" inputMode="decimal" disabled={churchEnabled !== 'true'} />
+              <Field id="otherIncome" label="Anderes zu verst. Einkommen (€)" value={otherIncome} onChange={setOtherIncome} placeholder="ohne Cogniiq, nach Abzügen" hint="Bestimmt die ESt-Schätzung" inputMode="decimal" />
+              <Field id="incomePrepay" label="ESt-Vorauszahlungen (€)" value={incomePrepay} onChange={setIncomePrepay} inputMode="decimal" />
+              <Field id="tradePrepay" label="GewSt-Vorauszahlungen (€)" value={tradePrepay} onChange={setTradePrepay} inputMode="decimal" />
+              <Field id="reserveHorizon" label="Rücklage-Horizont (Tage)" value={reserveHorizon} onChange={setReserveHorizon} inputMode="numeric" />
             </div>
-            <label className="mt-4 flex items-center gap-3 text-sm text-slate-300">
-              <input type="checkbox" checked={setupComplete} onChange={(e) => setSetupComplete(e.target.checked)} className="h-4 w-4 rounded border-white/20 bg-transparent" />
-              Setup als vollständig markieren (schaltet die vollständige Steuerschätzung frei)
-            </label>
-            {formError ? <p className="mt-3 text-sm text-rose-400">{formError}</p> : null}
-            <div className="mt-5 flex items-center gap-3">
-              <OwnerButton onClick={() => void save()} disabled={saving}>{saving ? 'Speichern…' : 'Speichern'}</OwnerButton>
-              {saved ? <span className="text-sm text-emerald-300">Gespeichert.</span> : null}
-              {settings ? <span className="text-[12px] text-slate-500">Zuletzt: {settings.income_tax_prepayments_cents != null ? formatCents(settings.income_tax_prepayments_cents) : '—'} ESt-VZ</span> : null}
+            <div className="mt-4">
+              <Checkbox id="setupComplete" checked={setupComplete} onChange={setSetupComplete} label="Setup als vollständig markieren" hint="Schaltet die vollständige Steuerschätzung frei." />
             </div>
-          </OwnerCard>
+            {formError ? <p className="mt-3 text-[13px] text-red-600">{formError}</p> : null}
+            <div className="mt-5">
+              <Button onClick={() => void save()} loading={saving}>Speichern</Button>
+            </div>
+          </Card>
         </div>
       )}
     </>
@@ -149,9 +152,9 @@ export function SettingsPage() {
 
 function ReadOnly({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-white/5 bg-white/5 px-3 py-2.5">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">{label}</p>
-      <p className="mt-1 text-sm font-medium text-slate-100">{value}</p>
+    <div className="rounded-xl border border-gray-100 bg-gray-50/70 px-3.5 py-2.5">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-400">{label}</p>
+      <p className="mt-1 text-sm font-medium text-gray-950">{value}</p>
     </div>
   );
 }

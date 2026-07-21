@@ -34,10 +34,10 @@ export function AdminClientShell({ children }: { children: ReactNode }) {
             <div className="flex items-center gap-2">
               {isPlatformOwner ? (
                 <Link
-                  to="/owner"
+                  to="/owner/overview"
                   className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-gray-950 px-3 text-[13px] font-semibold text-white transition-colors hover:bg-gray-800"
                 >
-                  <Wallet size={14} aria-hidden="true" /> Owner Cockpit
+                  <Wallet size={14} aria-hidden="true" /> Finance &amp; Steuern
                 </Link>
               ) : null}
               <Link

@@ -2,23 +2,24 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Building2, Plus, Search } from 'lucide-react';
 
-import { OwnerButton, OwnerCard, OwnerEmpty, OwnerError, OwnerField, OwnerLoading, OwnerPageHeader, OwnerPill, OwnerSelect } from '@/pages/owner/ownerUi';
+import {
+  Button, DataTable, EmptyState, ErrorState, Field, Modal, PageHeader, Select, StatusBadge,
+  TableSkeleton, useToast, type Column,
+} from '@/components/dashboard';
+import { lifecycleTone } from '@/pages/owner/ownerUi';
 import { createCrmOnlyClient } from '@/lib/ownerFinance/api';
 import { loadAdminClients, type AdminClientRow } from '@/lib/clientPlatform/adminApi';
 import { formatCents, isValidEmail } from '@/lib/clientPlatform/validation';
 import { clientLifecycleStatuses } from '@/lib/clientPlatform/types';
 
-const lifecycleTone: Record<string, 'neutral' | 'info' | 'success' | 'warning' | 'danger'> = {
-  lead: 'neutral', qualified: 'info', active: 'success', paused: 'warning', churned: 'danger', archived: 'neutral',
-};
-
 export function ClientsPage() {
+  const toast = useToast();
   const [rows, setRows] = useState<AdminClientRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [lifecycle, setLifecycle] = useState('all');
-  const [showCreate, setShowCreate] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -38,58 +39,52 @@ export function ClientsPage() {
     return true;
   }), [rows, lifecycle, search]);
 
+  const columns: Column<AdminClientRow>[] = [
+    {
+      key: 'name', header: 'Kunde', render: (r) => (
+        <div><p className="font-semibold text-gray-950">{r.organizationName}</p><p className="text-[12px] text-gray-500">{r.account?.primary_email ?? '—'}</p></div>
+      ),
+    },
+    { key: 'status', header: 'Status', render: (r) => (r.account ? <StatusBadge label={r.account.lifecycle_status} tone={lifecycleTone[r.account.lifecycle_status]} /> : <span className="text-gray-400">—</span>) },
+    { key: 'budget', header: 'Budget', align: 'right', render: (r) => <span className="tabular-nums">{formatCents(r.account?.estimated_total_budget_cents ?? null, r.account?.currency)}</span> },
+    { key: 'monthly', header: 'Monatswert', align: 'right', render: (r) => <span className="tabular-nums">{formatCents(r.account?.estimated_monthly_value_cents ?? null, r.account?.currency)}</span> },
+    { key: 'solutions', header: 'Lösungen', render: (r) => <span className="text-gray-500">{r.solutions.length || '—'}</span> },
+    { key: 'action', header: '', align: 'right', render: (r) => <Link to={`/admin/clients/${r.organizationId}`} onClick={(e) => e.stopPropagation()} className="text-[13px] font-semibold text-gray-950 hover:underline">Admin öffnen</Link> },
+  ];
+
   return (
     <>
-      <OwnerPageHeader
-        title="Kunden"
+      <PageHeader
+        title="Kunden (CRM)"
         description="Interne CRM-Kunden mit Umsatz-, Budget- und Margeninformationen. CRM-only-Kunden ohne Kundenportal können hier angelegt werden."
-        actions={<OwnerButton onClick={() => setShowCreate((s) => !s)}><Plus size={15} /> CRM-Kunde</OwnerButton>}
+        actions={<Button icon={Plus} onClick={() => setCreateOpen(true)}>CRM-Kunde</Button>}
       />
-      {showCreate ? <CreateCrmClient onDone={() => { setShowCreate(false); void load(); }} /> : null}
-      {error ? <OwnerError message={error} /> : null}
 
-      <OwnerCard className="mb-4 p-3">
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <label className="relative block flex-1">
-            <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-600" aria-hidden="true" />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Suche nach Firma, E-Mail, Branche" className="h-10 w-full rounded-xl border border-white/10 bg-[#0c1526] pl-9 pr-3 text-sm text-slate-100 outline-none focus:border-cyan-500/50" />
-          </label>
-          <div className="sm:w-56"><OwnerSelect id="lc" label="" value={lifecycle} onChange={setLifecycle} options={[{ value: 'all', label: 'Alle Status' }, ...clientLifecycleStatuses.map((s) => ({ value: s, label: s }))]} /></div>
+      {error ? <div className="mb-6"><ErrorState message={error} onRetry={() => void load()} /></div> : null}
+
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row">
+        <label className="relative block flex-1">
+          <span className="sr-only">Suche</span>
+          <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Suche nach Firma, E-Mail, Branche" className="h-11 w-full rounded-xl border border-gray-200 bg-white pl-9 pr-3 text-sm text-gray-900 outline-none transition-colors focus:border-gray-400" />
+        </label>
+        <div className="sm:w-56">
+          <Select id="lc" value={lifecycle} onChange={setLifecycle} options={[{ value: 'all', label: 'Alle Status' }, ...clientLifecycleStatuses.map((s) => ({ value: s, label: s }))]} />
         </div>
-      </OwnerCard>
+      </div>
 
-      {loading ? <OwnerLoading label="Kunden werden geladen" /> : filtered.length === 0 ? (
-        <OwnerEmpty icon={Building2} title="Keine Kunden" description="Legen Sie einen CRM-Kunden an oder passen Sie die Filter an." />
+      {loading ? <TableSkeleton rows={5} cols={5} /> : filtered.length === 0 ? (
+        <EmptyState icon={Building2} title="Keine Kunden" description="Legen Sie einen CRM-Kunden an oder passen Sie die Filter an." action={<Button icon={Plus} onClick={() => setCreateOpen(true)}>CRM-Kunde</Button>} />
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-white/8 bg-[#111a2e]">
-          <table className="w-full min-w-[820px] text-left text-sm">
-            <thead><tr className="border-b border-white/8 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-500">
-              <th className="px-4 py-3">Kunde</th><th className="px-4 py-3">Status</th><th className="px-4 py-3 text-right">Budget</th>
-              <th className="px-4 py-3 text-right">Monatswert</th><th className="px-4 py-3">Lösungen</th><th className="px-4 py-3"></th>
-            </tr></thead>
-            <tbody>
-              {filtered.map((r) => (
-                <tr key={r.organizationId} className="border-b border-white/5 last:border-0">
-                  <td className="px-4 py-3">
-                    <p className="font-medium text-slate-100">{r.organizationName}</p>
-                    <p className="text-[12px] text-slate-500">{r.account?.primary_email ?? '—'}</p>
-                  </td>
-                  <td className="px-4 py-3">{r.account ? <OwnerPill label={r.account.lifecycle_status} tone={lifecycleTone[r.account.lifecycle_status]} /> : '—'}</td>
-                  <td className="px-4 py-3 text-right tabular-nums text-slate-300">{formatCents(r.account?.estimated_total_budget_cents ?? null, r.account?.currency)}</td>
-                  <td className="px-4 py-3 text-right tabular-nums text-slate-300">{formatCents(r.account?.estimated_monthly_value_cents ?? null, r.account?.currency)}</td>
-                  <td className="px-4 py-3 text-slate-400">{r.solutions.length || '—'}</td>
-                  <td className="px-4 py-3 text-right"><Link to={`/admin/clients/${r.organizationId}`} className="text-[13px] font-semibold text-cyan-300 hover:underline">Admin öffnen</Link></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DataTable columns={columns} rows={filtered} getRowKey={(r) => r.organizationId} minWidth={840} mobileTitle={(r) => r.organizationName} mobileSubtitle={(r) => r.account?.primary_email ?? '—'} />
       )}
+
+      <CreateCrmClient open={createOpen} onClose={() => setCreateOpen(false)} onDone={() => { setCreateOpen(false); toast.success('CRM-Kunde angelegt'); void load(); }} onError={(m) => toast.error('Anlegen fehlgeschlagen', m)} />
     </>
   );
 }
 
-function CreateCrmClient({ onDone }: { onDone: () => void }) {
+function CreateCrmClient({ open, onClose, onDone, onError }: { open: boolean; onClose: () => void; onDone: () => void; onError: (m: string) => void }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -106,27 +101,28 @@ function CreateCrmClient({ onDone }: { onDone: () => void }) {
     setBusy(true);
     const { ok, error } = await createCrmOnlyClient({ displayName: name.trim(), primaryEmail: email.trim() || null, phone: phone.trim() || null, industry: industry.trim() || null, lifecycleStatus: status, primaryContactName: contact.trim() || null });
     setBusy(false);
-    if (!ok) { setErr(error ?? 'Fehler'); return; }
+    if (!ok) { setErr(error ?? 'Fehler'); onError(error ?? 'Fehler'); return; }
+    setName(''); setEmail(''); setPhone(''); setIndustry(''); setContact(''); setStatus('lead');
     onDone();
   };
 
   return (
-    <OwnerCard className="mb-4">
-      <p className="mb-1 text-sm font-semibold text-white">CRM-Kunde anlegen</p>
-      <p className="mb-4 text-[12px] text-slate-500">Legt Organisation + CRM-Konto an. Keine Lösung, keine Mitgliedschaft, keine Einladung, kein Kundenportal.</p>
-      <div className="grid gap-3 sm:grid-cols-3">
-        <OwnerField id="cn" label="Firma" value={name} onChange={setName} required />
-        <OwnerField id="ce" label="E-Mail" value={email} onChange={setEmail} />
-        <OwnerField id="cp" label="Telefon" value={phone} onChange={setPhone} />
-        <OwnerField id="ci" label="Branche" value={industry} onChange={setIndustry} />
-        <OwnerField id="cc" label="Ansprechpartner" value={contact} onChange={setContact} />
-        <OwnerSelect id="cs" label="Status" value={status} onChange={setStatus} options={clientLifecycleStatuses.map((s) => ({ value: s, label: s }))} />
+    <Modal
+      open={open}
+      onClose={busy ? () => {} : onClose}
+      title="CRM-Kunde anlegen"
+      description="Legt Organisation + CRM-Konto an. Keine Lösung, keine Mitgliedschaft, keine Einladung, kein Kundenportal."
+      footer={<><Button variant="secondary" onClick={onClose} disabled={busy}>Abbrechen</Button><Button onClick={() => void submit()} loading={busy}>Anlegen</Button></>}
+    >
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="sm:col-span-2"><Field id="cn" label="Firma" value={name} onChange={setName} required autoFocus /></div>
+        <Field id="ce" label="E-Mail" value={email} onChange={setEmail} type="email" />
+        <Field id="cp" label="Telefon" value={phone} onChange={setPhone} />
+        <Field id="ci" label="Branche" value={industry} onChange={setIndustry} />
+        <Field id="cc" label="Ansprechpartner" value={contact} onChange={setContact} />
+        <Select id="cs" label="Status" value={status} onChange={setStatus} options={clientLifecycleStatuses.map((s) => ({ value: s, label: s }))} />
       </div>
-      {err ? <p className="mt-2 text-sm text-rose-400">{err}</p> : null}
-      <div className="mt-4 flex gap-2">
-        <OwnerButton onClick={() => void submit()} disabled={busy}>{busy ? 'Anlegen…' : 'Anlegen'}</OwnerButton>
-        <OwnerButton variant="ghost" onClick={onDone}>Abbrechen</OwnerButton>
-      </div>
-    </OwnerCard>
+      {err ? <p className="mt-3 text-[13px] text-red-600">{err}</p> : null}
+    </Modal>
   );
 }
