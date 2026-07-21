@@ -9,6 +9,12 @@ import {
   revokeInvitation,
   type AdminClientRow,
 } from '@/lib/clientPlatform/adminApi';
+import {
+  canRenewInvitation,
+  canResendInvitation,
+  effectiveInvitationStatus,
+  resendOutcomeMessage,
+} from '@/lib/clientPlatform/invitationStatus';
 
 export function AdminInvitationsPage() {
   const [rows, setRows] = useState<AdminClientRow[]>([]);
@@ -29,15 +35,15 @@ export function AdminInvitationsPage() {
   const flash = (m: string) => { setNotice(m); setTimeout(() => setNotice(null), 2500); };
 
   const invitations = useMemo(
-    () => rows.flatMap((r) => r.invitations.map((i) => ({ ...i, orgName: r.organizationName })))
-      .filter((i) => statusFilter === 'all' || i.status === statusFilter)
+    () => rows.flatMap((r) => r.invitations.map((i) => ({ ...i, orgName: r.organizationName, effective: effectiveInvitationStatus(i) })))
+      .filter((i) => statusFilter === 'all' || i.effective === statusFilter)
       .sort((a, b) => b.created_at.localeCompare(a.created_at)),
     [rows, statusFilter],
   );
 
   const resend = async (invitationId: string, renewExpired = false) => {
-    const { ok, error: err } = await resendInvitationViaEdge(invitationId, renewExpired);
-    flash(ok ? (renewExpired ? 'Einladung erneuert und gesendet.' : 'Einladung erneut gesendet.') : `Fehler: ${err ?? 'unbekannt'}`);
+    const { ok, outcome, error: err } = await resendInvitationViaEdge(invitationId, renewExpired);
+    flash(outcome ? resendOutcomeMessage(outcome, renewExpired) : ok ? 'Einladung gesendet.' : `Fehler: ${err ?? 'unbekannt'}`);
     if (ok) void reload();
   };
   const revoke = async (id: string) => {
@@ -71,20 +77,20 @@ export function AdminInvitationsPage() {
           {invitations.map((inv) => (
             <AdminCard key={inv.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm font-semibold text-gray-900">{inv.email} <Pill label={inv.status} tone={invitationTone[inv.status]} /></p>
+                <p className="text-sm font-semibold text-gray-900">{inv.email} <Pill label={inv.effective} tone={invitationTone[inv.effective]} /></p>
                 <p className="text-[12px] text-gray-500">
                   <Link to={`/admin/clients/${inv.organization_id}`} className="hover:underline">{inv.orgName}</Link>
                   {' · '}Rolle: {inv.organization_role}
                 </p>
               </div>
               <div className="flex gap-2">
-                {inv.status === 'pending' ? (
+                {canResendInvitation(inv.effective) ? (
                   <button type="button" onClick={() => void resend(inv.id)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-[13px] font-semibold text-gray-700 hover:border-gray-300"><RefreshCw size={14} /> Erneut senden</button>
                 ) : null}
-                {inv.status === 'expired' ? (
+                {canRenewInvitation(inv.effective) ? (
                   <button type="button" onClick={() => void resend(inv.id, true)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 text-[13px] font-semibold text-amber-700 hover:bg-amber-100"><RefreshCw size={14} /> Erneuern & senden</button>
                 ) : null}
-                {inv.status === 'pending' ? (
+                {canResendInvitation(inv.effective) ? (
                   <button type="button" onClick={() => void revoke(inv.id)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 text-[13px] font-semibold text-red-700 hover:bg-red-100"><XCircle size={14} /> Widerrufen</button>
                 ) : null}
               </div>

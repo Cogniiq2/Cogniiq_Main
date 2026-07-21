@@ -8,19 +8,23 @@ import {
   type ProvisionClientPayload,
   type ProvisionClientResult,
 } from '@/lib/clientPlatform/adminApi';
-import {
-  clientLifecycleStatuses,
-  implementationKeys,
-  solutionCatalogKeys,
-} from '@/lib/clientPlatform/types';
+import { clientLifecycleStatuses, solutionCatalogKeys } from '@/lib/clientPlatform/types';
 import { isValidEmail, isValidUrl, parseAmountToCents } from '@/lib/clientPlatform/validation';
 
 // One stable idempotency key per intended submission (per wizard mount). Retries of the same
 // submission reuse it so the server replays instead of creating a duplicate workspace; a brand new
-// client is a fresh mount and therefore a fresh key.
+// client is a fresh mount and therefore a fresh key. Uses only cryptographically secure browser
+// APIs — never Math.random — since this is a database identity.
 function newIdempotencyKey(): string {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID();
-  return `idem-${Date.now()}-${Math.floor(Math.random() * 1e9)}`;
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  bytes[6] = (bytes[6] & 0x0f) | 0x40; // version 4
+  bytes[8] = (bytes[8] & 0x3f) | 0x80; // variant
+  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
 const steps = ['Unternehmen', 'Ansprechpartner', 'Vertrag & Budget', 'Lösung & Zugang'];
@@ -45,7 +49,6 @@ interface FormState {
   internalNotes: string;
   catalogKey: string;
   solutionDisplayName: string;
-  implementationKey: string;
   sendInvitation: boolean;
 }
 
@@ -69,7 +72,6 @@ const initialForm: FormState = {
   internalNotes: '',
   catalogKey: 'ai_receptionist',
   solutionDisplayName: '',
-  implementationKey: 'ai_receptionist',
   sendInvitation: true,
 };
 
@@ -147,7 +149,6 @@ export function NewClientWizard() {
       recurringFeeCents: monthly.cents,
       targetGoLiveDate: form.targetGoLiveDate || null,
       solutionDisplayName: form.solutionDisplayName.trim(),
-      implementationKey: form.implementationKey,
       invitationEmail: form.email.trim().toLowerCase(),
       organizationRole: 'owner',
       sendInvitation: form.sendInvitation,
@@ -256,9 +257,8 @@ export function NewClientWizard() {
           <div className="grid gap-4 sm:grid-cols-2">
             <AdminSelect id="catalogKey" label="Lösungstyp" value={form.catalogKey} onChange={(v) => set('catalogKey', v)} options={solutionCatalogKeys.map((s) => ({ value: s, label: s.replace(/_/g, ' ') }))} />
             <AdminField id="solutionDisplayName" label="Anzeigename der Lösung" value={form.solutionDisplayName} onChange={(v) => set('solutionDisplayName', v)} error={errors.solutionDisplayName} required />
-            <AdminSelect id="implementationKey" label="Implementierung" value={form.implementationKey} onChange={(v) => set('implementationKey', v)} options={implementationKeys.map((s) => ({ value: s, label: s.replace(/_/g, ' ') }))} />
             <div className="sm:col-span-2 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
-              <p className="text-[12px] text-gray-500">Der Instanz-Schlüssel wird serverseitig kollisionssicher erzeugt und nach dem Anlegen angezeigt.</p>
+              <p className="text-[12px] text-gray-500">Implementierung und Instanz-Schlüssel werden serverseitig aus dem kontrollierten Lösungskatalog abgeleitet und nach dem Anlegen angezeigt.</p>
             </div>
             <label className="sm:col-span-2 flex items-start gap-3 rounded-xl border border-gray-100 bg-white px-4 py-3">
               <input type="checkbox" checked={form.sendInvitation} onChange={(e) => set('sendInvitation', e.target.checked)} className="mt-1 h-4 w-4 rounded border-gray-300" />

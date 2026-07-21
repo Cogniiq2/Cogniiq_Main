@@ -13,6 +13,12 @@ import {
   type AdminClientDetail,
 } from '@/lib/clientPlatform/adminApi';
 import { formatCents } from '@/lib/clientPlatform/validation';
+import {
+  canRenewInvitation,
+  canResendInvitation,
+  effectiveInvitationStatus,
+  resendOutcomeMessage,
+} from '@/lib/clientPlatform/invitationStatus';
 
 const tabs = ['Übersicht', 'Kontakte', 'Lösungen', 'Vertrag & Budget', 'Zugang', 'Aktivität'] as const;
 type Tab = (typeof tabs)[number];
@@ -232,8 +238,8 @@ function BudgetTab({ detail }: { detail: AdminClientDetail }) {
 
 function AccessTab({ detail, onChanged, flash }: { detail: AdminClientDetail; onChanged: () => void; flash: (m: string) => void }) {
   const resend = async (invitationId: string, renewExpired = false) => {
-    const { ok, error } = await resendInvitationViaEdge(invitationId, renewExpired);
-    flash(ok ? (renewExpired ? 'Einladung erneuert und gesendet.' : 'Einladung erneut gesendet.') : `Fehler: ${error ?? 'unbekannt'}`);
+    const { ok, outcome, error } = await resendInvitationViaEdge(invitationId, renewExpired);
+    flash(outcome ? resendOutcomeMessage(outcome, renewExpired) : ok ? 'Einladung gesendet.' : `Fehler: ${error ?? 'unbekannt'}`);
     if (ok) onChanged();
   };
   const revoke = async (id: string) => {
@@ -243,25 +249,28 @@ function AccessTab({ detail, onChanged, flash }: { detail: AdminClientDetail; on
   };
   return (
     <div className="space-y-2">
-      {detail.invitations.length === 0 ? <AdminCard><p className="text-sm text-gray-500">Keine Einladungen.</p></AdminCard> : detail.invitations.map((inv) => (
-        <AdminCard key={inv.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-semibold text-gray-900">{inv.email} <Pill label={inv.status} tone={invitationTone[inv.status]} /></p>
-            <p className="text-[12px] text-gray-500">Rolle: {inv.organization_role}{inv.expires_at ? ` · läuft ab ${new Date(inv.expires_at).toLocaleDateString('de-DE')}` : ''}</p>
-          </div>
-          <div className="flex gap-2">
-            {inv.status === 'pending' ? (
-              <button type="button" onClick={() => void resend(inv.id)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-[13px] font-semibold text-gray-700 hover:border-gray-300"><RefreshCw size={14} /> Erneut senden</button>
-            ) : null}
-            {inv.status === 'expired' ? (
-              <button type="button" onClick={() => void resend(inv.id, true)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 text-[13px] font-semibold text-amber-700 hover:bg-amber-100"><RefreshCw size={14} /> Erneuern & senden</button>
-            ) : null}
-            {inv.status === 'pending' ? (
-              <button type="button" onClick={() => void revoke(inv.id)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 text-[13px] font-semibold text-red-700 hover:bg-red-100"><XCircle size={14} /> Widerrufen</button>
-            ) : null}
-          </div>
-        </AdminCard>
-      ))}
+      {detail.invitations.length === 0 ? <AdminCard><p className="text-sm text-gray-500">Keine Einladungen.</p></AdminCard> : detail.invitations.map((inv) => {
+        const eff = effectiveInvitationStatus(inv);
+        return (
+          <AdminCard key={inv.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-gray-900">{inv.email} <Pill label={eff} tone={invitationTone[eff]} /></p>
+              <p className="text-[12px] text-gray-500">Rolle: {inv.organization_role}{inv.expires_at ? ` · läuft ab ${new Date(inv.expires_at).toLocaleDateString('de-DE')}` : ''}</p>
+            </div>
+            <div className="flex gap-2">
+              {canResendInvitation(eff) ? (
+                <button type="button" onClick={() => void resend(inv.id)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-[13px] font-semibold text-gray-700 hover:border-gray-300"><RefreshCw size={14} /> Erneut senden</button>
+              ) : null}
+              {canRenewInvitation(eff) ? (
+                <button type="button" onClick={() => void resend(inv.id, true)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 text-[13px] font-semibold text-amber-700 hover:bg-amber-100"><RefreshCw size={14} /> Erneuern & senden</button>
+              ) : null}
+              {canResendInvitation(eff) ? (
+                <button type="button" onClick={() => void revoke(inv.id)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 text-[13px] font-semibold text-red-700 hover:bg-red-100"><XCircle size={14} /> Widerrufen</button>
+              ) : null}
+            </div>
+          </AdminCard>
+        );
+      })}
     </div>
   );
 }

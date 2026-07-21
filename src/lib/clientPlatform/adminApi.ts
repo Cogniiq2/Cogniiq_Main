@@ -126,7 +126,6 @@ export interface ProvisionClientPayload {
   recurringFeeCents?: number | null;
   targetGoLiveDate?: string | null;
   solutionDisplayName: string;
-  implementationKey: string;
   invitationEmail: string;
   organizationRole: string;
   sendInvitation: boolean;
@@ -150,17 +149,22 @@ export async function provisionClientViaEdge(payload: ProvisionClientPayload): P
 }
 
 // Resend is scoped to a controlled invitation record (never a free-form email). Expired
-// invitations require an explicit renewExpired flag so renewal is a deliberate action.
+// invitations require an explicit renewExpired flag so renewal is a deliberate action. The email
+// outcome ('sent' | 'existing_user' | 'email_error') is surfaced so the UI can report accurately.
 export async function resendInvitationViaEdge(
   invitationId: string,
   renewExpired = false,
-): Promise<{ ok: boolean; error?: string }> {
+): Promise<{ ok: boolean; outcome?: string; error?: string }> {
   const { data, error } = await supabase.functions.invoke('admin-provision-client', {
     body: { action: 'resend', invitationId, renewExpired },
   });
-  if (error) return { ok: false, error: error.message };
-  const result = data as { ok?: boolean; error?: string };
-  return { ok: Boolean(result?.ok), error: result?.error };
+  const result = data as { ok?: boolean; error?: string; invitation?: { status?: string } } | null;
+  const outcome = result?.invitation?.status;
+  if (error) {
+    // A non-2xx (e.g. email_error → 502) still carries a structured body via functions.invoke.
+    return { ok: false, outcome, error: result?.error ?? error.message };
+  }
+  return { ok: Boolean(result?.ok), outcome, error: result?.error };
 }
 
 export async function setSolutionStatus(

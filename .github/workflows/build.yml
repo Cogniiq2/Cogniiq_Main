@@ -30,6 +30,9 @@ jobs:
       - name: Static receptionist migration convergence checks
         run: node .github/scripts/test-receptionist-migration-convergence.mjs
 
+      - name: Invitation status helper unit tests
+        run: node .github/scripts/test-invitation-status.mjs
+
       - name: Typecheck
         run: npm run typecheck
 
