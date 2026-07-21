@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 
@@ -85,6 +85,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [activeOrganizationId, setActiveOrganizationId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
+  // Tracks the user id we have already attempted an invitation claim for, so token
+  // refreshes and repeated auth events do not re-run the claim (prevents loops/flicker).
+  const claimedForUserRef = useRef<string | null>(null);
 
   const loadAccount = useCallback(async (nextSession: Session | null) => {
     setAuthError(null);
@@ -93,10 +96,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(null);
       setMemberships([]);
       setActiveOrganizationId(null);
+      claimedForUserRef.current = null;
       return;
     }
 
     const userId = nextSession.user.id;
+
+    // Automatic membership claim: attempted once per authenticated user, before loading
+    // memberships. The RPC is idempotent and enforces confirmed-email / matching-email rules
+    // server-side, so a successful call that claims nothing still counts as processed. Only a
+    // successful result marks the user done; a failed call leaves the flag unset so a later auth
+    // event (sign-in, token refresh) can retry, without a tight loop and without blocking login.
+    if (claimedForUserRef.current !== userId) {
+      try {
+        const { error } = await supabase.rpc('claim_my_client_invitations');
+        if (!error) {
+          claimedForUserRef.current = userId;
+        }
+      } catch {
+        // Unexpected/network failure: leave the flag unset for a later retry; never block login.
+      }
+    }
+
     const [profileResult, membershipsResult] = await Promise.all([
       supabase
         .from('profiles')
