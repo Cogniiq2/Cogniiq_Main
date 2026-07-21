@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Building2, LayoutGrid, Mail } from 'lucide-react';
+import { Building2, LayoutGrid, Mail, Wallet } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 const tabs = [
   { href: '/admin/clients', label: 'Kunden', icon: Building2 },
@@ -17,6 +18,7 @@ function isActive(pathname: string, href: string) {
 
 export function AdminClientShell({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
+  const { isPlatformOwner } = useAuth();
   return (
     <div className="min-h-screen bg-[#f7f7f4] text-gray-950">
       <header className="sticky top-0 z-30 border-b border-gray-100 bg-white/95 backdrop-blur-xl">
@@ -29,12 +31,22 @@ export function AdminClientShell({ children }: { children: ReactNode }) {
                 <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">Client Platform</p>
               </div>
             </div>
-            <Link
-              to="/admin"
-              className="inline-flex h-9 items-center rounded-xl border border-gray-200 bg-white px-3 text-[13px] font-semibold text-gray-600 transition-colors hover:border-gray-300 hover:text-gray-950"
-            >
-              Task-Dashboard
-            </Link>
+            <div className="flex items-center gap-2">
+              {isPlatformOwner ? (
+                <Link
+                  to="/owner"
+                  className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-gray-950 px-3 text-[13px] font-semibold text-white transition-colors hover:bg-gray-800"
+                >
+                  <Wallet size={14} aria-hidden="true" /> Owner Cockpit
+                </Link>
+              ) : null}
+              <Link
+                to="/admin"
+                className="inline-flex h-9 items-center rounded-xl border border-gray-200 bg-white px-3 text-[13px] font-semibold text-gray-600 transition-colors hover:border-gray-300 hover:text-gray-950"
+              >
+                Task-Dashboard
+              </Link>
+            </div>
           </div>
           <nav className="flex items-center gap-1 overflow-x-auto" aria-label="Admin Client Platform">
             {tabs.map((tab) => {

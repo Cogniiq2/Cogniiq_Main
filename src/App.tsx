@@ -43,7 +43,8 @@ function setMeta(name: string, content: string) {
 }
 
 function isPrivateSurface(pathname: string) {
-  return pathname === '/app' || pathname.startsWith('/app/') || pathname === '/admin' || pathname.startsWith('/admin/');
+  return pathname === '/app' || pathname.startsWith('/app/') || pathname === '/admin' || pathname.startsWith('/admin/')
+    || pathname === '/owner' || pathname.startsWith('/owner/');
 }
 
 function RouteIndexabilityManager() {
@@ -52,7 +53,11 @@ function RouteIndexabilityManager() {
   useEffect(() => {
     if (isPrivateSurface(pathname)) {
       setMeta('robots', 'noindex, nofollow');
-      document.title = pathname.startsWith('/admin') ? 'Cogniiq Admin' : 'Cogniiq Kundenbereich';
+      document.title = pathname.startsWith('/admin')
+        ? 'Cogniiq Admin'
+        : pathname.startsWith('/owner')
+          ? 'Cogniiq Owner'
+          : 'Cogniiq Kundenbereich';
       return;
     }
 
@@ -319,6 +324,7 @@ const ExecutionPage = lazyNamed(() => import('./pages/ExecutionPage'), 'Executio
 const OuraAnalyticsPage = lazyNamed(() => import('./pages/OuraAnalyticsPage'), 'OuraAnalyticsPage');
 const AdminLoginPage = lazyNamed(() => import('./pages/admin/AdminLoginPage'), 'AdminLoginPage');
 const AdminClientPlatform = lazyNamed(() => import('./pages/admin/clients/AdminClientPlatform'), 'AdminClientPlatform');
+const OwnerCockpit = lazyNamed(() => import('./pages/owner/OwnerCockpit'), 'OwnerCockpit');
 const AppHomePage = lazyNamed(() => import('./pages/app/AppHomePage'), 'AppHomePage');
 const CustomerSectionPage = lazyNamed(() => import('./pages/app/CustomerSectionPage'), 'CustomerSectionPage');
 const SolutionPage = lazyNamed(() => import('./pages/app/SolutionPage'), 'SolutionPage');
@@ -370,6 +376,14 @@ function AppInner() {
     return (
       <Suspense fallback={<PageFallback />}>
         <AdminPage />
+      </Suspense>
+    );
+  }
+
+  if (location.pathname.startsWith('/owner')) {
+    return (
+      <Suspense fallback={<PageFallback />}>
+        <OwnerCockpit />
       </Suspense>
     );
   }
