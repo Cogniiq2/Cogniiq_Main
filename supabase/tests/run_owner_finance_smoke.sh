@@ -128,12 +128,12 @@ end $$;
 do $$
 declare v_inv uuid; blocked boolean;
 begin
-  insert into public.owner_invoices (business_entity_id, status, issue_date, due_date, invoice_number, created_by)
-  values (current_setting('of.entity')::uuid, 'issued', current_date, current_date + 14, 'RE-2026-001', current_setting('of.owner')::uuid)
+  insert into public.owner_invoices (business_entity_id, status, issue_date, service_date, due_date, invoice_number, created_by)
+  values (current_setting('of.entity')::uuid, 'draft', current_date, current_date, current_date + 14, 'RE-2026-001', current_setting('of.owner')::uuid)
   returning id into v_inv;
   perform set_config('of.inv', v_inv::text, true);
 
-  -- 2 units at 100.00 EUR net, 19% VAT => net 20000, vat 3800, gross 23800.
+  -- 2 units at 100.00 EUR net, 19% VAT => net 20000, vat 3800, gross 23800 (draft; lines allowed).
   insert into public.owner_invoice_lines (invoice_id, description, quantity_milli, unit_price_cents, vat_rate_bp, vat_treatment)
   values (v_inv, 'Beratung', 2000, 10000, 1900, 'standard');
 
@@ -149,6 +149,9 @@ begin
     update public.owner_invoices set net_total_cents = 1 where id = v_inv;
   exception when insufficient_privilege then blocked := true; end;
   if not blocked then raise exception 'TEST FAILED: owner forged invoice header totals directly'; end if;
+
+  -- Issue it so the payment-transition scenario can drive status changes.
+  update public.owner_invoices set status = 'issued' where id = v_inv;
 end $$;
 
 -- ===== Scenario: partial-payment status transitions =====
@@ -173,7 +176,7 @@ begin
   blocked := false;
   begin
     delete from public.owner_invoices where id = current_setting('of.inv')::uuid;
-  exception when raise_exception then blocked := true; end;
+  exception when raise_exception or insufficient_privilege then blocked := true; end;
   if not blocked then raise exception 'TEST FAILED: an issued invoice was hard-deleted'; end if;
 
   blocked := false;
@@ -209,21 +212,176 @@ begin
   values (current_setting('of.entity2')::uuid, 'issued', 'RE-2026-001', current_setting('of.owner')::uuid);
 end $$;
 
--- ===== Scenario: append-only audit log =====
+-- ===== Scenario: DB-authoritative, append-only, unforgeable audit =====
 do $$
-declare v_audit uuid; blocked boolean;
+declare c integer; blocked boolean; v_audit uuid;
 begin
-  insert into public.owner_audit_log (business_entity_id, actor_user_id, action, resource_type, resource_id, after_summary)
-  values (current_setting('of.entity')::uuid, current_setting('of.owner')::uuid, 'invoice.issued', 'owner_invoices', current_setting('of.inv')::uuid, '{"status":"issued"}'::jsonb)
-  returning id into v_audit;
+  -- Material mutations (the invoice + payments above) auto-created audit rows via DB triggers.
+  select count(*) into c from public.owner_audit_log where resource_id = current_setting('of.inv')::uuid;
+  if c < 1 then raise exception 'TEST FAILED: material invoice mutation did not create an audit record'; end if;
+  -- Actor is the authenticated user, not a browser-supplied id.
+  if not exists (select 1 from public.owner_audit_log where resource_id = current_setting('of.inv')::uuid and actor_user_id = current_setting('of.owner')::uuid) then
+    raise exception 'TEST FAILED: audit actor was not auth.uid()';
+  end if;
 
+  -- Browser clients cannot fabricate audit history.
+  blocked := false;
+  begin insert into public.owner_audit_log (actor_user_id, action, resource_type) values (current_setting('of.owner')::uuid, 'forged', 'x'); exception when insufficient_privilege then blocked := true; end;
+  if not blocked then raise exception 'TEST FAILED: owner directly inserted an audit event'; end if;
+
+  select id into v_audit from public.owner_audit_log where resource_id = current_setting('of.inv')::uuid limit 1;
   blocked := false;
   begin update public.owner_audit_log set action = 'tampered' where id = v_audit; exception when insufficient_privilege then blocked := true; end;
   if not blocked then raise exception 'TEST FAILED: audit event was updated'; end if;
-
   blocked := false;
   begin delete from public.owner_audit_log where id = v_audit; exception when insufficient_privilege then blocked := true; end;
   if not blocked then raise exception 'TEST FAILED: audit event was deleted'; end if;
+end $$;
+
+-- ===== Scenario: no hard delete on tax-relevant tables =====
+do $$
+declare blocked boolean := false;
+begin
+  begin delete from public.owner_expenses where business_entity_id = current_setting('of.entity')::uuid; exception when insufficient_privilege then blocked := true; end;
+  if not blocked then raise exception 'TEST FAILED: owner hard-deleted an expense'; end if;
+  blocked := false;
+  begin delete from public.owner_payments where business_entity_id = current_setting('of.entity')::uuid; exception when insufficient_privilege then blocked := true; end;
+  if not blocked then raise exception 'TEST FAILED: owner hard-deleted a payment'; end if;
+end $$;
+
+-- ===== Scenario: cross-entity links are rejected =====
+do $$
+declare blocked boolean; v_inv2 uuid;
+begin
+  -- An invoice in entity2, then a payment claiming entity1 but linking that invoice -> rejected.
+  insert into public.owner_invoices (business_entity_id, status, invoice_number, created_by)
+  values (current_setting('of.entity2')::uuid, 'issued', 'RE-X-1', current_setting('of.owner')::uuid) returning id into v_inv2;
+  blocked := false;
+  begin
+    insert into public.owner_payments (business_entity_id, kind, direction, payment_date, amount_cents, invoice_id, created_by)
+    values (current_setting('of.entity')::uuid, 'income', 'inflow', current_date, 100, v_inv2, current_setting('of.owner')::uuid);
+  exception when raise_exception then blocked := true; end;
+  if not blocked then raise exception 'TEST FAILED: cross-entity payment/invoice link accepted'; end if;
+
+  blocked := false;
+  begin
+    insert into public.owner_finance_documents (business_entity_id, storage_object_path, invoice_id)
+    values (current_setting('of.entity')::uuid, 'p/'||gen_random_uuid(), v_inv2);
+  exception when raise_exception then blocked := true; end;
+  if not blocked then raise exception 'TEST FAILED: cross-entity document/invoice link accepted'; end if;
+end $$;
+
+-- ===== Scenario: atomic idempotent expense RPC (rollback + replay + kind reuse) =====
+do $$
+declare r1 jsonb; r2 jsonb; c integer; blocked boolean;
+begin
+  r1 := public.create_owner_expense('cccccccc-cccc-cccc-cccc-cccccccccccc',
+    jsonb_build_object('business_entity_id', current_setting('of.entity'), 'invoice_date', current_date::text, 'review_status', 'pending'),
+    jsonb_build_array(jsonb_build_object('description', 'API', 'net_cents', 5000, 'vat_treatment', 'domestic_standard')));
+  r2 := public.create_owner_expense('cccccccc-cccc-cccc-cccc-cccccccccccc',
+    jsonb_build_object('business_entity_id', current_setting('of.entity'), 'invoice_date', current_date::text),
+    jsonb_build_array(jsonb_build_object('description', 'DIFFERENT', 'net_cents', 9999, 'vat_treatment', 'domestic_standard')));
+  if (r1->>'expense_id') <> (r2->>'expense_id') then raise exception 'TEST FAILED: expense RPC not idempotent'; end if;
+  select count(*) into c from public.owner_expense_lines where expense_id = (r1->>'expense_id')::uuid;
+  if c <> 1 then raise exception 'TEST FAILED: idempotent replay duplicated lines (%)', c; end if;
+
+  -- Reusing the key for a different operation is rejected.
+  blocked := false;
+  begin perform public.issue_owner_invoice('cccccccc-cccc-cccc-cccc-cccccccccccc', current_setting('of.inv')::uuid); exception when raise_exception then blocked := true; end;
+  if not blocked then raise exception 'TEST FAILED: idempotency key reused across operation kinds'; end if;
+
+  -- A failing line rolls back the header (null net violates not-null).
+  blocked := false;
+  begin
+    perform public.create_owner_expense('dddddddd-dddd-dddd-dddd-dddddddddddd',
+      jsonb_build_object('business_entity_id', current_setting('of.entity')),
+      jsonb_build_array(jsonb_build_object('description', 'bad', 'net_cents', null)));
+  exception when not_null_violation or raise_exception then blocked := true; end;
+  if not blocked then raise exception 'TEST FAILED: bad line did not fail the RPC'; end if;
+  select count(*) into c from public.owner_finance_requests where idempotency_key = 'dddddddd-dddd-dddd-dddd-dddddddddddd' and result is not null;
+  if c <> 0 then raise exception 'TEST FAILED: failed RPC left a committed result'; end if;
+end $$;
+
+-- ===== Scenario: safe invoice issuance boundary + concurrency-safe numbering =====
+do $$
+declare draft jsonb; res jsonb; blocked boolean; draft2 jsonb; res2 jsonb;
+begin
+  draft := public.create_owner_invoice('11110000-0000-0000-0000-000000000001',
+    jsonb_build_object('business_entity_id', current_setting('of.entity'), 'issue_date', current_date::text, 'service_date', current_date::text, 'due_date', (current_date + 14)::text, 'currency', 'EUR'),
+    jsonb_build_array(jsonb_build_object('description', 'Leistung', 'quantity_milli', 1000, 'unit_price_cents', 100000, 'vat_rate_bp', 1900, 'vat_treatment', 'standard')));
+  res := public.issue_owner_invoice('11110000-0000-0000-0000-000000000002', (draft->>'invoice_id')::uuid);
+  if (res->>'status') <> 'issued' or (res->>'invoice_number') is null then raise exception 'TEST FAILED: issuance did not assign number/status'; end if;
+
+  -- Re-issue is idempotent (same number).
+  if (public.issue_owner_invoice('11110000-0000-0000-0000-000000000002', (draft->>'invoice_id')::uuid)->>'invoice_number') <> (res->>'invoice_number') then
+    raise exception 'TEST FAILED: re-issue changed the number';
+  end if;
+
+  -- Second invoice gets a distinct auto number.
+  draft2 := public.create_owner_invoice('11110000-0000-0000-0000-000000000003',
+    jsonb_build_object('business_entity_id', current_setting('of.entity'), 'issue_date', current_date::text, 'service_date', current_date::text, 'due_date', (current_date + 14)::text, 'currency', 'EUR'),
+    jsonb_build_array(jsonb_build_object('description', 'Leistung 2', 'unit_price_cents', 50000, 'vat_rate_bp', 1900, 'vat_treatment', 'standard')));
+  res2 := public.issue_owner_invoice('11110000-0000-0000-0000-000000000004', (draft2->>'invoice_id')::uuid);
+  if (res2->>'invoice_number') = (res->>'invoice_number') then raise exception 'TEST FAILED: numbering collision'; end if;
+
+  -- Issuing a draft with an unknown VAT treatment is blocked.
+  draft2 := public.create_owner_invoice('11110000-0000-0000-0000-000000000005',
+    jsonb_build_object('business_entity_id', current_setting('of.entity'), 'issue_date', current_date::text, 'service_date', current_date::text, 'due_date', (current_date + 14)::text, 'currency', 'EUR'),
+    jsonb_build_array(jsonb_build_object('description', 'unklar', 'unit_price_cents', 1000, 'vat_treatment', 'unknown')));
+  blocked := false;
+  begin perform public.issue_owner_invoice('11110000-0000-0000-0000-000000000006', (draft2->>'invoice_id')::uuid); exception when raise_exception then blocked := true; end;
+  if not blocked then raise exception 'TEST FAILED: issued an invoice with unresolved VAT treatment'; end if;
+
+  -- Lines are immutable after issuance.
+  blocked := false;
+  begin update public.owner_invoice_lines set unit_price_cents = 1 where invoice_id = (draft->>'invoice_id')::uuid; exception when raise_exception then blocked := true; end;
+  if not blocked then raise exception 'TEST FAILED: issued invoice line was modified'; end if;
+end $$;
+
+-- ===== Scenario: draft delete RPC (allowed for pristine drafts, blocked after issuance) =====
+do $$
+declare draft jsonb; blocked boolean;
+begin
+  draft := public.create_owner_invoice('22220000-0000-0000-0000-000000000001',
+    jsonb_build_object('business_entity_id', current_setting('of.entity')),
+    jsonb_build_array(jsonb_build_object('description', 'tmp', 'unit_price_cents', 100, 'vat_treatment', 'standard')));
+  perform public.delete_owner_draft_invoice((draft->>'invoice_id')::uuid);
+  if exists (select 1 from public.owner_invoices where id = (draft->>'invoice_id')::uuid) then raise exception 'TEST FAILED: draft invoice not deleted'; end if;
+
+  blocked := false;
+  begin perform public.delete_owner_draft_invoice(current_setting('of.inv')::uuid); exception when raise_exception then blocked := true; end;
+  if not blocked then raise exception 'TEST FAILED: issued invoice deleted via draft-delete RPC'; end if;
+end $$;
+
+-- ===== Scenario: payment-based EÜR cash timing (cross-year) + VAT Ist/Soll =====
+-- Uses the clean second entity so prior scenarios' invoices/payments do not perturb the assertions.
+do $$
+declare e text := current_setting('of.entity2'); inv_a jsonb; inputs_2026 jsonb; inputs_2027 jsonb; soll jsonb; ee jsonb;
+begin
+  ee := jsonb_build_object('business_entity_id', e, 'issue_date', '2026-12-20', 'service_date', '2026-12-15', 'due_date', '2027-01-10', 'currency', 'EUR');
+  inv_a := public.create_owner_invoice('33330000-0000-0000-0000-000000000001', ee,
+    jsonb_build_array(jsonb_build_object('description', 'X', 'unit_price_cents', 100000, 'vat_rate_bp', 1900, 'vat_treatment', 'standard')));
+  perform public.issue_owner_invoice('33330000-0000-0000-0000-000000000002', (inv_a->>'invoice_id')::uuid);
+  -- Partial payment in 2026, remainder in 2027 (cross-year).
+  perform public.record_owner_invoice_payment('33330000-0000-0000-0000-000000000003', (inv_a->>'invoice_id')::uuid, 59500, '2026-12-28');
+  perform public.record_owner_invoice_payment('33330000-0000-0000-0000-000000000004', (inv_a->>'invoice_id')::uuid, 59500, '2027-01-05');
+  -- Owner contribution + tax payment in 2026 must NOT count as operating revenue/expense.
+  insert into public.owner_payments (business_entity_id, kind, direction, payment_date, amount_cents, created_by)
+  values (e::uuid, 'owner_contribution', 'inflow', '2026-06-01', 500000, current_setting('of.owner')::uuid),
+         (e::uuid, 'tax_payment', 'outflow', '2026-06-01', 200000, current_setting('of.owner')::uuid);
+
+  inputs_2026 := public.owner_tax_period_inputs(e::uuid, '2026-01-01', '2026-12-31', 'ist');
+  inputs_2027 := public.owner_tax_period_inputs(e::uuid, '2027-01-01', '2027-12-31', 'ist');
+
+  -- 2026 ist: half the invoice paid -> net 50000, output VAT 9500 (proportional). Owner contribution excluded.
+  if (inputs_2026->>'paid_revenue_net_cents')::bigint <> 50000 then raise exception 'TEST FAILED: 2026 EÜR net revenue wrong: %', inputs_2026->>'paid_revenue_net_cents'; end if;
+  if (inputs_2026->>'vat_output_cents')::bigint <> 9500 then raise exception 'TEST FAILED: 2026 Ist output VAT wrong: %', inputs_2026->>'vat_output_cents'; end if;
+  -- 2027 ist: remaining half.
+  if (inputs_2027->>'paid_revenue_net_cents')::bigint <> 50000 then raise exception 'TEST FAILED: 2027 EÜR net revenue wrong: %', inputs_2027->>'paid_revenue_net_cents'; end if;
+
+  -- Soll: full VAT recognized in the service period (2026), independent of payment timing.
+  soll := public.owner_tax_period_inputs(e::uuid, '2026-01-01', '2026-12-31', 'soll');
+  if (soll->>'vat_output_cents')::bigint <> 19000 then raise exception 'TEST FAILED: Soll output VAT wrong: %', soll->>'vat_output_cents'; end if;
 end $$;
 
 -- ===== Scenario: tax-estimate snapshots are immutable =====

@@ -79,8 +79,16 @@ migration has been applied by this PR.
 
 ## Storage & environment
 
-- Private bucket `owner-finance-documents` (not public); owner-only `storage.objects` policies; signed
-  URLs only; randomized object paths (`<entity>/<uuid>-<safe-name>`); MIME/size validation (≤25 MB).
+- Private bucket `owner-finance-documents` (not public); owner-only `storage.objects` policies (gated
+  on `is_platform_owner()`); signed URLs only; randomized object paths (`<entity>/<uuid>-<safe-name>`);
+  MIME/size validation (≤25 MB) in the client; the metadata `owner_finance_documents` row is
+  entity-validated in the database and audited.
+- **Storage caveat:** object paths begin with the owning entity id by convention, but a
+  storage-object-level check that the path prefix matches the metadata entity, and blocking hard
+  deletion of objects linked to reviewed/paid/issued/snapshotted records, requires a real Supabase
+  Storage integration test (the bare CI DB has no `storage` schema). The metadata table already
+  prevents cross-entity linking and is delete-restricted; tighten the object-level path policy during
+  a real-Supabase integration pass.
 - No new frontend env vars. The service-role key is never used in the browser.
 
 ## Manual test checklist
@@ -95,6 +103,38 @@ migration has been applied by this PR.
 - Taxes: sections separate exact vs estimate; save an immutable snapshot; export UStVA CSV /
   Steuerübersicht JSON (banner states unsubmitted + rules version).
 - Existing `/app` customer portal and `/admin/clients` CRM still work.
+
+## Integrity model (server-authoritative)
+
+- **EÜR is payment-based.** `owner_tax_period_inputs(entity, from, to, vat_timing)` derives revenue and
+  deductible expenses from `owner_payments.payment_date` (proportional net allocation to the linked
+  invoice/expense), excluding owner contributions/withdrawals, transfers and tax payments/refunds.
+  Cross-year and partial payments land in the correct period; unpaid invoices are excluded from cash
+  revenue. §11 ±10-day recurring payments are flagged for review, not auto-reassigned.
+- **VAT timing.** `ist` recognizes output VAT on received payments proportionally to each invoice's
+  VAT ratio (handles mixed rates via the invoice's actual VAT total; unlinked income blocks
+  filing-ready). `soll` recognizes output VAT by the service date/period (missing service dates block
+  filing-ready). Input VAT is determined independently of the output-timing mode.
+- **No hard deletes.** `authenticated` has no `DELETE` on any owner-finance table; history is
+  preserved via void/archive. Draft-only `delete_owner_draft_invoice`/`delete_owner_draft_expense`
+  RPCs enforce (in the database) that the object was never issued/paid/reviewed/linked. Disaster
+  recovery stays with `service_role`, separate from the owner browser.
+- **DB-authoritative audit.** A `SECURITY DEFINER` trigger writes every material insert/update/delete
+  into the append-only `owner_audit_log` inside the same transaction, with `auth.uid()` as actor and
+  safe field summaries (no secrets/document contents). Browser clients cannot insert/update/delete
+  audit rows.
+- **Relational/entity consistency.** Triggers reject payments, documents, expense→subscription,
+  asset→source-line and invoice/expense→CRM links whose entities/organizations differ.
+- **Atomic idempotent RPCs.** `create_owner_invoice`, `create_owner_expense`,
+  `record_owner_invoice_payment`, `record_owner_expense_payment`, `record_owner_tax_payment` and
+  `issue_owner_invoice` are single-transaction and UUID-idempotent (a key is bound to one operation
+  kind); a failed line rolls back the header.
+- **Invoice issuance boundary.** `issue_owner_invoice` validates draft state, ≥1 line, positive
+  server-derived totals, issue/service/due dates, supported currency, resolved VAT, and assigns a
+  concurrency-safe per-entity number from `owner_invoice_counters` (locked row, never `MAX()+1`).
+  After issuance, number/metadata and lines are immutable; corrections use void/credit.
+- **Depreciation timing.** Straight-line AfA reduces the first year pro rata by the start month;
+  cumulative rounding keeps cents reproducible and accumulated depreciation never exceeds the base.
 
 ## Rollback considerations
 

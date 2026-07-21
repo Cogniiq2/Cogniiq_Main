@@ -3,7 +3,7 @@ import { FileText, Plus } from 'lucide-react';
 
 import { OwnerButton, OwnerCard, OwnerEmpty, OwnerError, OwnerField, OwnerLoading, OwnerPageHeader, OwnerPill, OwnerSelect, invoiceStatusTone } from '@/pages/owner/ownerUi';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
-import { addInvoiceLine, createDraftInvoice, loadInvoices, recordInvoicePayment, setInvoiceStatus } from '@/lib/ownerFinance/api';
+import { createOwnerInvoice, deleteDraftInvoice, issueOwnerInvoice, loadInvoices, recordInvoicePayment, setInvoiceStatus } from '@/lib/ownerFinance/api';
 import { computeInvoiceLine } from '@/lib/ownerFinance/tax';
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
 import type { OwnerInvoice } from '@/lib/ownerFinance/types';
@@ -41,15 +41,15 @@ export function InvoicesPage() {
     [invoices, statusFilter],
   );
 
-  const issue = async (inv: OwnerInvoice) => { if (entity) { await setInvoiceStatus(entity.id, inv.id, 'issued'); void load(); } };
-  const voidInvoice = async (inv: OwnerInvoice) => { if (entity && confirm('Rechnung stornieren (void)? Sie bleibt zur Historie erhalten.')) { await setInvoiceStatus(entity.id, inv.id, 'void'); void load(); } };
+  const issue = async (inv: OwnerInvoice) => { const { error: err } = await issueOwnerInvoice(inv.id); if (err) alert(err); else void load(); };
+  const voidInvoice = async (inv: OwnerInvoice) => { if (confirm('Rechnung stornieren (void)? Sie bleibt zur Historie erhalten.')) { await setInvoiceStatus(inv.id, 'void'); void load(); } };
+  const removeDraft = async (inv: OwnerInvoice) => { if (confirm('Entwurf löschen?')) { const { error: err } = await deleteDraftInvoice(inv.id); if (err) alert(err); else void load(); } };
   const pay = async (inv: OwnerInvoice) => {
-    if (!entity) return;
     const input = prompt('Zahlungsbetrag (€):', ((inv.gross_total_cents - inv.amount_paid_cents) / 100).toFixed(2));
     if (!input) return;
     const parsed = parseAmountToCents(input);
     if ('error' in parsed || parsed.cents == null || parsed.cents <= 0) { alert('Ungültiger Betrag'); return; }
-    const { error: err } = await recordInvoicePayment(entity.id, inv.id, parsed.cents, new Date().toISOString().slice(0, 10));
+    const { error: err } = await recordInvoicePayment(inv.id, parsed.cents, new Date().toISOString().slice(0, 10));
     if (err) alert(err); else void load();
   };
 
@@ -92,8 +92,9 @@ export function InvoicesPage() {
                   <td className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-2">
                       {inv.status === 'draft' ? <button type="button" onClick={() => void issue(inv)} className="rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-2.5 py-1 text-[12px] font-semibold text-cyan-200">Stellen</button> : null}
+                      {inv.status === 'draft' ? <button type="button" onClick={() => void removeDraft(inv)} className="rounded-lg border border-white/10 px-2.5 py-1 text-[12px] font-semibold text-slate-300">Löschen</button> : null}
                       {['issued', 'partially_paid', 'overdue'].includes(inv.status) ? <button type="button" onClick={() => void pay(inv)} className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 text-[12px] font-semibold text-emerald-200">Zahlung</button> : null}
-                      {inv.status !== 'void' && inv.status !== 'paid' ? <button type="button" onClick={() => void voidInvoice(inv)} className="rounded-lg border border-white/10 px-2.5 py-1 text-[12px] font-semibold text-slate-300">Storno</button> : null}
+                      {inv.status !== 'void' && inv.status !== 'paid' && inv.status !== 'draft' ? <button type="button" onClick={() => void voidInvoice(inv)} className="rounded-lg border border-white/10 px-2.5 py-1 text-[12px] font-semibold text-slate-300">Storno</button> : null}
                     </div>
                   </td>
                 </tr>
@@ -133,14 +134,13 @@ function CreateInvoice({ entityId, onDone }: { entityId: string; onDone: () => v
     const q = Math.round((Number(qty.replace(',', '.')) || 0) * 1000);
     if (q <= 0) { setErr('Ungültige Menge.'); return; }
     setBusy(true);
-    const { id, error } = await createDraftInvoice(entityId, {
-      invoice_number: number.trim() || null, issue_date: issueDate || null, due_date: dueDate || null, status: 'draft',
-    });
-    if (error || !id) { setBusy(false); setErr(error ?? 'Fehler'); return; }
     const rate = treatment === 'reduced' ? 700 : treatment === 'standard' ? 1900 : 0;
-    const { error: lineErr } = await addInvoiceLine({ invoice_id: id, description: desc.trim(), quantity_milli: q, unit_price_cents: price.cents, vat_rate_bp: rate, vat_treatment: treatment });
+    const { error } = await createOwnerInvoice(
+      { business_entity_id: entityId, invoice_number: number.trim() || null, issue_date: issueDate || null, service_date: issueDate || null, due_date: dueDate || null, currency: 'EUR' },
+      [{ description: desc.trim(), quantity_milli: q, unit_price_cents: price.cents, vat_rate_bp: rate, vat_treatment: treatment }],
+    );
     setBusy(false);
-    if (lineErr) { setErr(lineErr); return; }
+    if (error) { setErr(error); return; }
     onDone();
   };
 

@@ -750,7 +750,8 @@ begin
       'create policy %I on public.%I for all to authenticated using (public.is_platform_owner()) with check (public.is_platform_owner())',
       t || '_owner_all', t);
     execute format('revoke all on table public.%I from public, anon, authenticated', t);
-    execute format('grant select, insert, update, delete on table public.%I to authenticated', t);
+    -- No hard DELETE for authenticated owners: accounting history is preserved via void/archive/RPCs.
+    execute format('grant select, insert, update on table public.%I to authenticated', t);
     execute format('grant select, insert, update, delete on table public.%I to service_role', t);
   end loop;
 end;
@@ -772,7 +773,9 @@ create policy owner_audit_log_owner_select on public.owner_audit_log for select 
 drop policy if exists owner_audit_log_owner_insert on public.owner_audit_log;
 create policy owner_audit_log_owner_insert on public.owner_audit_log for insert to authenticated with check (public.is_platform_owner());
 revoke all on table public.owner_audit_log from public, anon, authenticated;
-grant select, insert on table public.owner_audit_log to authenticated;
+-- Owners may read audit history but NEVER write it directly; only the database audit trigger
+-- (security definer) inserts, so browser clients cannot fabricate or alter audit entries.
+grant select on table public.owner_audit_log to authenticated;
 grant select, insert on table public.owner_audit_log to service_role;
 
 -- Computed money columns are trigger-owned. A table-wide UPDATE grant would let a client forge
@@ -1016,5 +1019,523 @@ begin
   end loop;
 end;
 $$;
+
+commit;
+
+-- ===========================================================================
+-- Integrity hardening: DB-authoritative audit, relational validation, atomic
+-- idempotent RPCs, a safe invoice-issuance boundary, and payment-based tax inputs.
+-- ===========================================================================
+begin;
+
+-- Concurrency-safe per-entity invoice numbering (never MAX()+1).
+create table if not exists public.owner_invoice_counters (
+  business_entity_id uuid primary key references public.owner_business_entities(id) on delete cascade,
+  next_number bigint not null default 1 check (next_number > 0),
+  updated_at timestamptz not null default now()
+);
+alter table public.owner_invoice_counters enable row level security;
+drop policy if exists owner_invoice_counters_owner_all on public.owner_invoice_counters;
+create policy owner_invoice_counters_owner_all on public.owner_invoice_counters for all to authenticated
+  using (public.is_platform_owner()) with check (public.is_platform_owner());
+revoke all on table public.owner_invoice_counters from public, anon, authenticated;
+grant select on table public.owner_invoice_counters to authenticated;
+grant select, insert, update, delete on table public.owner_invoice_counters to service_role;
+
+-- ---------------------------------------------------------------------------
+-- DB-authoritative, append-only audit. actor = auth.uid(); browser cannot forge.
+-- ---------------------------------------------------------------------------
+create or replace function public.owner_write_audit_row()
+returns trigger language plpgsql security definer set search_path = public, pg_temp as $$
+declare
+  strip text[] := array['notes', 'breakdown', 'before_summary', 'after_summary', 'depreciation_snapshot',
+    'validation_result', 'file_metadata', 'record_counts', 'assumptions_notes', 'review_reason', 'metadata'];
+  v_new jsonb;
+  v_old jsonb;
+  v_entity uuid;
+  v_rid uuid;
+begin
+  if tg_op <> 'DELETE' then v_new := to_jsonb(new) - strip; end if;
+  if tg_op <> 'INSERT' then v_old := to_jsonb(old) - strip; end if;
+  v_entity := coalesce((coalesce(v_new, v_old)->>'business_entity_id')::uuid, (coalesce(v_new, v_old)->>'id')::uuid);
+  v_rid := (coalesce(v_new, v_old)->>'id')::uuid;
+  insert into public.owner_audit_log (business_entity_id, actor_user_id, action, resource_type, resource_id, before_summary, after_summary)
+  values (v_entity, auth.uid(), tg_argv[0] || '.' || lower(tg_op), tg_argv[0], v_rid, v_old, v_new);
+  return coalesce(new, old);
+end;
+$$;
+revoke execute on function public.owner_write_audit_row() from public, anon, authenticated;
+grant execute on function public.owner_write_audit_row() to service_role;
+
+do $$
+declare t text;
+begin
+  foreach t in array array['owner_invoices', 'owner_expenses', 'owner_payments', 'owner_tax_settings',
+    'owner_tax_payments', 'owner_tax_estimates', 'owner_assets', 'owner_subscriptions',
+    'owner_finance_documents', 'owner_exports', 'owner_business_entities']
+  loop
+    execute format('drop trigger if exists %I on public.%I', t || '_audit', t);
+    execute format('create trigger %I after insert or update or delete on public.%I for each row execute function public.owner_write_audit_row(%L)', t || '_audit', t, t);
+  end loop;
+end;
+$$;
+
+-- ---------------------------------------------------------------------------
+-- Relational / same-entity validation (frontend is never trusted for these).
+-- ---------------------------------------------------------------------------
+create or replace function public.owner_validate_payment()
+returns trigger language plpgsql set search_path = public, pg_temp as $$
+declare inv record; exp record; txp record;
+begin
+  if new.kind in ('income', 'owner_contribution', 'tax_refund') and new.direction <> 'inflow' then
+    raise exception 'payment kind % must be an inflow', new.kind;
+  end if;
+  if new.kind in ('expense', 'owner_withdrawal', 'tax_payment') and new.direction <> 'outflow' then
+    raise exception 'payment kind % must be an outflow', new.kind;
+  end if;
+  if new.invoice_id is not null then
+    select business_entity_id, status into inv from public.owner_invoices where id = new.invoice_id;
+    if inv.business_entity_id <> new.business_entity_id then raise exception 'payment entity differs from linked invoice entity'; end if;
+    if new.direction <> 'inflow' then raise exception 'invoice payments must be inflows'; end if;
+    if inv.status in ('void', 'cancelled') then raise exception 'cannot record a payment against a % invoice', inv.status; end if;
+  end if;
+  if new.expense_id is not null then
+    select business_entity_id, payment_status into exp from public.owner_expenses where id = new.expense_id;
+    if exp.business_entity_id <> new.business_entity_id then raise exception 'payment entity differs from linked expense entity'; end if;
+    if new.direction <> 'outflow' then raise exception 'expense payments must be outflows'; end if;
+    if exp.payment_status = 'void' then raise exception 'cannot record a payment against a void expense'; end if;
+  end if;
+  if new.tax_payment_id is not null then
+    select business_entity_id into txp from public.owner_tax_payments where id = new.tax_payment_id;
+    if txp.business_entity_id <> new.business_entity_id then raise exception 'payment entity differs from linked tax payment entity'; end if;
+  end if;
+  return new;
+end;
+$$;
+
+create or replace function public.owner_validate_document()
+returns trigger language plpgsql set search_path = public, pg_temp as $$
+declare e uuid;
+begin
+  if new.invoice_id is not null then select business_entity_id into e from public.owner_invoices where id = new.invoice_id;
+    if e <> new.business_entity_id then raise exception 'document entity differs from linked invoice'; end if; end if;
+  if new.expense_id is not null then select business_entity_id into e from public.owner_expenses where id = new.expense_id;
+    if e <> new.business_entity_id then raise exception 'document entity differs from linked expense'; end if; end if;
+  if new.asset_id is not null then select business_entity_id into e from public.owner_assets where id = new.asset_id;
+    if e <> new.business_entity_id then raise exception 'document entity differs from linked asset'; end if; end if;
+  if new.tax_estimate_id is not null then select business_entity_id into e from public.owner_tax_estimates where id = new.tax_estimate_id;
+    if e <> new.business_entity_id then raise exception 'document entity differs from linked tax estimate'; end if; end if;
+  return new;
+end;
+$$;
+
+create or replace function public.owner_validate_expense_links()
+returns trigger language plpgsql set search_path = public, pg_temp as $$
+declare e uuid; org uuid;
+begin
+  if new.subscription_id is not null then select business_entity_id into e from public.owner_subscriptions where id = new.subscription_id;
+    if e <> new.business_entity_id then raise exception 'expense subscription belongs to a different entity'; end if; end if;
+  if new.client_account_id is not null then
+    select organization_id into org from public.client_accounts where id = new.client_account_id;
+    if new.organization_id is not null and org is distinct from new.organization_id then raise exception 'expense client account/organization mismatch'; end if;
+  end if;
+  if new.engagement_id is not null then
+    select organization_id into org from public.client_engagements where id = new.engagement_id;
+    if new.organization_id is not null and org is distinct from new.organization_id then raise exception 'expense engagement/organization mismatch'; end if;
+  end if;
+  return new;
+end;
+$$;
+
+create or replace function public.owner_validate_invoice_links()
+returns trigger language plpgsql set search_path = public, pg_temp as $$
+declare org uuid;
+begin
+  if new.client_account_id is not null then
+    select organization_id into org from public.client_accounts where id = new.client_account_id;
+    if new.organization_id is not null and org is distinct from new.organization_id then raise exception 'invoice client account/organization mismatch'; end if;
+  end if;
+  if new.engagement_id is not null then
+    select organization_id into org from public.client_engagements where id = new.engagement_id;
+    if new.organization_id is not null and org is distinct from new.organization_id then raise exception 'invoice engagement/organization mismatch'; end if;
+  end if;
+  return new;
+end;
+$$;
+
+create or replace function public.owner_validate_asset_link()
+returns trigger language plpgsql set search_path = public, pg_temp as $$
+declare e uuid;
+begin
+  if new.source_expense_line_id is not null then
+    select ex.business_entity_id into e from public.owner_expense_lines l join public.owner_expenses ex on ex.id = l.expense_id where l.id = new.source_expense_line_id;
+    if e is not null and e <> new.business_entity_id then raise exception 'asset source expense line belongs to a different entity'; end if;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists owner_documents_validate on public.owner_finance_documents;
+create trigger owner_documents_validate before insert or update on public.owner_finance_documents for each row execute function public.owner_validate_document();
+drop trigger if exists owner_expenses_validate_links on public.owner_expenses;
+create trigger owner_expenses_validate_links before insert or update on public.owner_expenses for each row execute function public.owner_validate_expense_links();
+drop trigger if exists owner_invoices_validate_links on public.owner_invoices;
+create trigger owner_invoices_validate_links before insert or update on public.owner_invoices for each row execute function public.owner_validate_invoice_links();
+drop trigger if exists owner_assets_validate_link on public.owner_assets;
+create trigger owner_assets_validate_link before insert or update on public.owner_assets for each row execute function public.owner_validate_asset_link();
+
+-- Invoice lines are immutable once the invoice leaves draft.
+create or replace function public.owner_guard_invoice_line()
+returns trigger language plpgsql set search_path = public, pg_temp as $$
+declare parent_status text;
+begin
+  if public.is_database_admin() or public.request_is_service_role() then return coalesce(new, old); end if;
+  select status into parent_status from public.owner_invoices where id = coalesce(new.invoice_id, old.invoice_id);
+  if parent_status is not null and parent_status <> 'draft' then
+    raise exception 'invoice lines cannot be changed after issuance; use cancellation or a credit note';
+  end if;
+  return coalesce(new, old);
+end;
+$$;
+drop trigger if exists owner_invoice_lines_guard on public.owner_invoice_lines;
+create trigger owner_invoice_lines_guard before insert or update or delete on public.owner_invoice_lines for each row execute function public.owner_guard_invoice_line();
+
+commit;
+
+-- ===========================================================================
+-- Atomic, UUID-idempotent RPCs (owner-only). A failed line rolls back the header.
+-- ===========================================================================
+begin;
+
+create or replace function public.owner_claim_idempotency(p_key uuid, p_kind text)
+returns jsonb language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_kind text; v_result jsonb;
+begin
+  if p_key is null then raise exception 'an idempotency key is required'; end if;
+  insert into public.owner_finance_requests (idempotency_key, kind, created_by)
+  values (p_key, p_kind, auth.uid()) on conflict (idempotency_key) do nothing;
+  select kind, result into v_kind, v_result from public.owner_finance_requests where idempotency_key = p_key for update;
+  if v_kind is distinct from p_kind then raise exception 'idempotency key already used for a different operation (%)', v_kind; end if;
+  return v_result; -- null when this call owns the key; non-null replays the stored result
+end;
+$$;
+
+create or replace function public.create_owner_expense(p_idempotency_key uuid, p_header jsonb, p_lines jsonb)
+returns jsonb language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_existing jsonb; v_id uuid; v_entity uuid; v_line jsonb; v_result jsonb;
+begin
+  if not public.is_platform_owner() then raise exception 'Owner access required'; end if;
+  v_existing := public.owner_claim_idempotency(p_idempotency_key, 'create_owner_expense');
+  if v_existing is not null then return v_existing; end if;
+  v_entity := (p_header->>'business_entity_id')::uuid;
+  if v_entity is null then raise exception 'business_entity_id is required'; end if;
+  if p_lines is null or jsonb_array_length(p_lines) < 1 then raise exception 'at least one expense line is required'; end if;
+
+  insert into public.owner_expenses (business_entity_id, vendor_id, organization_id, client_account_id, engagement_id,
+    category_id, subscription_id, supplier_invoice_number, invoice_date, service_date, due_date, currency,
+    review_status, review_reason, notes, created_by)
+  values (v_entity, nullif(p_header->>'vendor_id','')::uuid, nullif(p_header->>'organization_id','')::uuid,
+    nullif(p_header->>'client_account_id','')::uuid, nullif(p_header->>'engagement_id','')::uuid,
+    nullif(p_header->>'category_id','')::uuid, nullif(p_header->>'subscription_id','')::uuid,
+    p_header->>'supplier_invoice_number', nullif(p_header->>'invoice_date','')::date, nullif(p_header->>'service_date','')::date,
+    nullif(p_header->>'due_date','')::date, coalesce(p_header->>'currency','EUR'),
+    coalesce(p_header->>'review_status','pending'), p_header->>'review_reason', p_header->>'notes', auth.uid())
+  returning id into v_id;
+
+  for v_line in select * from jsonb_array_elements(p_lines) loop
+    insert into public.owner_expense_lines (expense_id, category_id, description, net_cents, vat_rate_bp, vat_treatment,
+      input_vat_eligibility_bp, deductibility_bp, asset_candidate, euer_classification)
+    values (v_id, nullif(v_line->>'category_id','')::uuid, v_line->>'description', (v_line->>'net_cents')::bigint,
+      coalesce((v_line->>'vat_rate_bp')::int, 1900), coalesce(v_line->>'vat_treatment','domestic_standard'),
+      coalesce((v_line->>'input_vat_eligibility_bp')::int, 10000), coalesce((v_line->>'deductibility_bp')::int, 10000),
+      coalesce((v_line->>'asset_candidate')::boolean, false), v_line->>'euer_classification');
+  end loop;
+
+  v_result := jsonb_build_object('expense_id', v_id);
+  update public.owner_finance_requests set result = v_result where idempotency_key = p_idempotency_key;
+  return v_result;
+end;
+$$;
+
+create or replace function public.create_owner_invoice(p_idempotency_key uuid, p_header jsonb, p_lines jsonb)
+returns jsonb language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_existing jsonb; v_id uuid; v_entity uuid; v_line jsonb; v_result jsonb;
+begin
+  if not public.is_platform_owner() then raise exception 'Owner access required'; end if;
+  v_existing := public.owner_claim_idempotency(p_idempotency_key, 'create_owner_invoice');
+  if v_existing is not null then return v_existing; end if;
+  v_entity := (p_header->>'business_entity_id')::uuid;
+  if v_entity is null then raise exception 'business_entity_id is required'; end if;
+  if p_lines is null or jsonb_array_length(p_lines) < 1 then raise exception 'at least one invoice line is required'; end if;
+
+  insert into public.owner_invoices (business_entity_id, organization_id, client_account_id, engagement_id,
+    invoice_number, status, issue_date, service_date, service_period_start, service_period_end, due_date,
+    currency, notes, external_reference, created_by)
+  values (v_entity, nullif(p_header->>'organization_id','')::uuid, nullif(p_header->>'client_account_id','')::uuid,
+    nullif(p_header->>'engagement_id','')::uuid, nullif(p_header->>'invoice_number',''), 'draft',
+    nullif(p_header->>'issue_date','')::date, nullif(p_header->>'service_date','')::date,
+    nullif(p_header->>'service_period_start','')::date, nullif(p_header->>'service_period_end','')::date,
+    nullif(p_header->>'due_date','')::date, coalesce(p_header->>'currency','EUR'),
+    p_header->>'notes', p_header->>'external_reference', auth.uid())
+  returning id into v_id;
+
+  for v_line in select * from jsonb_array_elements(p_lines) loop
+    insert into public.owner_invoice_lines (invoice_id, description, quantity_milli, unit_price_cents, vat_rate_bp, vat_treatment, sort_order)
+    values (v_id, v_line->>'description', coalesce((v_line->>'quantity_milli')::bigint, 1000), (v_line->>'unit_price_cents')::bigint,
+      coalesce((v_line->>'vat_rate_bp')::int, 1900), coalesce(v_line->>'vat_treatment','standard'), coalesce((v_line->>'sort_order')::int, 0));
+  end loop;
+
+  v_result := jsonb_build_object('invoice_id', v_id);
+  update public.owner_finance_requests set result = v_result where idempotency_key = p_idempotency_key;
+  return v_result;
+end;
+$$;
+
+create or replace function public.record_owner_invoice_payment(p_idempotency_key uuid, p_invoice_id uuid, p_amount_cents bigint, p_payment_date date)
+returns jsonb language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_existing jsonb; v_entity uuid; v_pid uuid; v_result jsonb;
+begin
+  if not public.is_platform_owner() then raise exception 'Owner access required'; end if;
+  v_existing := public.owner_claim_idempotency(p_idempotency_key, 'record_owner_invoice_payment');
+  if v_existing is not null then return v_existing; end if;
+  select business_entity_id into v_entity from public.owner_invoices where id = p_invoice_id;
+  if v_entity is null then raise exception 'invoice not found'; end if;
+  insert into public.owner_payments (business_entity_id, kind, direction, payment_date, amount_cents, invoice_id, created_by)
+  values (v_entity, 'income', 'inflow', p_payment_date, p_amount_cents, p_invoice_id, auth.uid())
+  returning id into v_pid;
+  v_result := jsonb_build_object('payment_id', v_pid);
+  update public.owner_finance_requests set result = v_result where idempotency_key = p_idempotency_key;
+  return v_result;
+end;
+$$;
+
+create or replace function public.record_owner_expense_payment(p_idempotency_key uuid, p_expense_id uuid, p_amount_cents bigint, p_payment_date date)
+returns jsonb language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_existing jsonb; v_entity uuid; v_pid uuid; v_result jsonb;
+begin
+  if not public.is_platform_owner() then raise exception 'Owner access required'; end if;
+  v_existing := public.owner_claim_idempotency(p_idempotency_key, 'record_owner_expense_payment');
+  if v_existing is not null then return v_existing; end if;
+  select business_entity_id into v_entity from public.owner_expenses where id = p_expense_id;
+  if v_entity is null then raise exception 'expense not found'; end if;
+  insert into public.owner_payments (business_entity_id, kind, direction, payment_date, amount_cents, expense_id, created_by)
+  values (v_entity, 'expense', 'outflow', p_payment_date, p_amount_cents, p_expense_id, auth.uid())
+  returning id into v_pid;
+  v_result := jsonb_build_object('payment_id', v_pid);
+  update public.owner_finance_requests set result = v_result where idempotency_key = p_idempotency_key;
+  return v_result;
+end;
+$$;
+
+create or replace function public.record_owner_tax_payment(p_idempotency_key uuid, p_entity uuid, p_tax_type text, p_tax_year int, p_period text, p_amount_cents bigint, p_payment_date date, p_direction text)
+returns jsonb language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_existing jsonb; v_id uuid; v_result jsonb;
+begin
+  if not public.is_platform_owner() then raise exception 'Owner access required'; end if;
+  v_existing := public.owner_claim_idempotency(p_idempotency_key, 'record_owner_tax_payment');
+  if v_existing is not null then return v_existing; end if;
+  insert into public.owner_tax_payments (business_entity_id, tax_type, tax_year, period, direction, amount_cents, payment_date, created_by)
+  values (p_entity, p_tax_type, p_tax_year, p_period, coalesce(p_direction, 'outflow'), p_amount_cents, p_payment_date, auth.uid())
+  returning id into v_id;
+  v_result := jsonb_build_object('tax_payment_id', v_id);
+  update public.owner_finance_requests set result = v_result where idempotency_key = p_idempotency_key;
+  return v_result;
+end;
+$$;
+
+-- Safe invoice-issuance boundary with concurrency-safe per-entity numbering.
+create or replace function public.issue_owner_invoice(p_idempotency_key uuid, p_invoice_id uuid)
+returns jsonb language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_existing jsonb; inv record; v_lines int; v_unknown int; v_number text; v_next bigint; v_result jsonb;
+begin
+  if not public.is_platform_owner() then raise exception 'Owner access required'; end if;
+  v_existing := public.owner_claim_idempotency(p_idempotency_key, 'issue_owner_invoice');
+  if v_existing is not null then return v_existing; end if;
+
+  select * into inv from public.owner_invoices where id = p_invoice_id for update;
+  if inv.id is null then raise exception 'invoice not found'; end if;
+  if inv.status <> 'draft' then raise exception 'invoice is not a draft'; end if;
+  if inv.issue_date is null then raise exception 'issue_date is required'; end if;
+  if inv.service_date is null and inv.service_period_start is null then raise exception 'service date or period is required'; end if;
+  if inv.due_date is null then raise exception 'due_date is required'; end if;
+  if inv.currency not in ('EUR', 'CHF', 'USD') then raise exception 'unsupported currency %', inv.currency; end if;
+
+  select count(*), count(*) filter (where vat_treatment = 'unknown') into v_lines, v_unknown
+  from public.owner_invoice_lines where invoice_id = p_invoice_id;
+  if v_lines < 1 then raise exception 'invoice has no lines'; end if;
+  if v_unknown > 0 then raise exception 'invoice has unresolved VAT treatments'; end if;
+  if inv.net_total_cents <= 0 or inv.gross_total_cents <= 0 then raise exception 'invoice totals must be positive'; end if;
+
+  v_number := inv.invoice_number;
+  if v_number is null or trim(v_number) = '' then
+    insert into public.owner_invoice_counters (business_entity_id) values (inv.business_entity_id) on conflict (business_entity_id) do nothing;
+    select next_number into v_next from public.owner_invoice_counters where business_entity_id = inv.business_entity_id for update;
+    v_number := 'RE-' || to_char(inv.issue_date, 'YYYY') || '-' || lpad(v_next::text, 4, '0');
+    update public.owner_invoice_counters set next_number = v_next + 1, updated_at = now() where business_entity_id = inv.business_entity_id;
+  end if;
+
+  update public.owner_invoices set invoice_number = v_number, status = 'issued', issued_at = now() where id = p_invoice_id;
+
+  v_result := jsonb_build_object('invoice_id', p_invoice_id, 'invoice_number', v_number, 'status', 'issued');
+  update public.owner_finance_requests set result = v_result where idempotency_key = p_idempotency_key;
+  return v_result;
+end;
+$$;
+
+-- Draft-only deletion, database-enforced (never issued/paid/reviewed/exported/snapshotted).
+create or replace function public.delete_owner_draft_invoice(p_invoice_id uuid)
+returns void language plpgsql security definer set search_path = public, pg_temp as $$
+declare inv record;
+begin
+  if not public.is_platform_owner() then raise exception 'Owner access required'; end if;
+  select * into inv from public.owner_invoices where id = p_invoice_id for update;
+  if inv.id is null then raise exception 'invoice not found'; end if;
+  if inv.status <> 'draft' or inv.issued_at is not null then raise exception 'only never-issued draft invoices may be deleted'; end if;
+  if exists (select 1 from public.owner_payments where invoice_id = p_invoice_id) then raise exception 'invoice has payments'; end if;
+  if exists (select 1 from public.owner_finance_documents where invoice_id = p_invoice_id) then raise exception 'invoice has linked documents'; end if;
+  delete from public.owner_invoices where id = p_invoice_id;
+end;
+$$;
+
+create or replace function public.delete_owner_draft_expense(p_expense_id uuid)
+returns void language plpgsql security definer set search_path = public, pg_temp as $$
+declare exp record;
+begin
+  if not public.is_platform_owner() then raise exception 'Owner access required'; end if;
+  select * into exp from public.owner_expenses where id = p_expense_id for update;
+  if exp.id is null then raise exception 'expense not found'; end if;
+  if exp.review_status = 'reviewed' or exp.amount_paid_cents > 0 then raise exception 'reviewed or paid expenses cannot be deleted'; end if;
+  if exists (select 1 from public.owner_payments where expense_id = p_expense_id) then raise exception 'expense has payments'; end if;
+  if exists (select 1 from public.owner_finance_documents where expense_id = p_expense_id) then raise exception 'expense has linked documents'; end if;
+  delete from public.owner_expenses where id = p_expense_id;
+end;
+$$;
+
+-- ---------------------------------------------------------------------------
+-- Payment-based tax-period inputs (EÜR cash basis + VAT Ist/Soll). Owner-only.
+-- ---------------------------------------------------------------------------
+create or replace function public.owner_tax_period_inputs(p_entity uuid, p_from date, p_to date, p_vat_timing text)
+returns jsonb language plpgsql security definer stable set search_path = public, pg_temp as $$
+declare
+  v_paid_rev_net bigint;
+  v_paid_exp_net bigint;
+  v_vat_output bigint;
+  v_vat_rc_output bigint;
+  v_vat_input bigint;
+  v_has_unlinked_income boolean;
+  v_has_unresolved boolean;
+  v_missing_service boolean;
+  v_recurring_flag int;
+  v_timing text := coalesce(p_vat_timing, 'ist');
+  v_filing_ready boolean;
+  v_warnings jsonb := '[]'::jsonb;
+begin
+  if not public.is_platform_owner() then raise exception 'Owner access required'; end if;
+  if p_entity is null or p_from is null or p_to is null or p_from > p_to then raise exception 'valid entity and range required'; end if;
+
+  -- EÜR cash: qualifying operating inflows/outflows by payment_date, proportional net allocation.
+  select coalesce(sum(case when p.invoice_id is not null and i.gross_total_cents > 0
+      then round(p.amount_cents::numeric * i.net_total_cents / i.gross_total_cents) else p.amount_cents end), 0)
+    into v_paid_rev_net
+  from public.owner_payments p left join public.owner_invoices i on i.id = p.invoice_id
+  where p.business_entity_id = p_entity and p.kind = 'income' and p.direction = 'inflow' and p.payment_date between p_from and p_to;
+
+  select coalesce(sum(case when p.expense_id is not null and e.gross_total_cents > 0
+      then round(p.amount_cents::numeric * e.deductible_net_cents / e.gross_total_cents) else p.amount_cents end), 0)
+    into v_paid_exp_net
+  from public.owner_payments p left join public.owner_expenses e on e.id = p.expense_id
+  where p.business_entity_id = p_entity and p.kind = 'expense' and p.direction = 'outflow' and p.payment_date between p_from and p_to;
+
+  -- Output VAT.
+  if v_timing = 'soll' then
+    select coalesce(sum(i.vat_total_cents), 0),
+           bool_or(coalesce(i.service_date, i.service_period_end, i.service_period_start) is null)
+      into v_vat_output, v_missing_service
+    from public.owner_invoices i
+    where i.business_entity_id = p_entity and i.status in ('issued', 'partially_paid', 'paid', 'overdue')
+      and coalesce(i.service_date, i.service_period_end, i.service_period_start) between p_from and p_to;
+    v_missing_service := coalesce(v_missing_service, false)
+      or exists (select 1 from public.owner_invoices i where i.business_entity_id = p_entity
+        and i.status in ('issued', 'partially_paid', 'paid', 'overdue')
+        and coalesce(i.service_date, i.service_period_end, i.service_period_start) is null
+        and coalesce(i.issue_date, current_date) between p_from and p_to);
+    v_has_unlinked_income := false;
+  else
+    -- ist: output VAT recognized on payments received, proportional to the invoice VAT ratio.
+    select coalesce(sum(case when p.invoice_id is not null and i.gross_total_cents > 0
+        then round(p.amount_cents::numeric * i.vat_total_cents / i.gross_total_cents) else 0 end), 0),
+        bool_or(p.invoice_id is null)
+      into v_vat_output, v_has_unlinked_income
+    from public.owner_payments p left join public.owner_invoices i on i.id = p.invoice_id
+    where p.business_entity_id = p_entity and p.kind = 'income' and p.direction = 'inflow' and p.payment_date between p_from and p_to;
+    v_has_unlinked_income := coalesce(v_has_unlinked_income, false);
+    v_missing_service := false;
+  end if;
+
+  -- Reverse-charge output liability and eligible input VAT are determined independently of the
+  -- output-VAT timing mode (both by the expense document period).
+  select coalesce(sum(reverse_charge_vat_cents), 0), coalesce(sum(input_vat_cents), 0),
+      bool_or(review_status <> 'reviewed')
+    into v_vat_rc_output, v_vat_input, v_has_unresolved
+  from public.owner_expenses where business_entity_id = p_entity and payment_status <> 'void'
+    and invoice_date between p_from and p_to;
+  v_has_unresolved := coalesce(v_has_unresolved, false)
+    or exists (select 1 from public.owner_invoice_lines l join public.owner_invoices i on i.id = l.invoice_id
+      where i.business_entity_id = p_entity and l.vat_treatment = 'unknown'
+        and coalesce(i.issue_date, current_date) between p_from and p_to);
+
+  -- ±10-day recurring-payment flag (review-required; not auto-applied).
+  select count(*) into v_recurring_flag from public.owner_payments
+  where business_entity_id = p_entity and kind in ('income', 'expense')
+    and (payment_date <= p_from + 10 or payment_date >= p_to - 10)
+    and payment_date between p_from - 10 and p_to + 10;
+
+  v_filing_ready := (not v_has_unresolved)
+    and (case when v_timing = 'soll' then not v_missing_service else not v_has_unlinked_income end);
+  if v_has_unresolved then v_warnings := v_warnings || to_jsonb('Nicht geprüfte USt-Behandlungen im Zeitraum.'::text); end if;
+  if v_timing = 'ist' and v_has_unlinked_income then v_warnings := v_warnings || to_jsonb('Zahlungseingänge ohne Rechnungszuordnung – USt-Zuordnung unklar (Ist).'::text); end if;
+  if v_timing = 'soll' and v_missing_service then v_warnings := v_warnings || to_jsonb('Rechnungen ohne Leistungsdatum – Soll-Versteuerung nicht abgabebereit.'::text); end if;
+  if v_recurring_flag > 0 then v_warnings := v_warnings || to_jsonb((v_recurring_flag || ' Zahlung(en) nahe Jahreswechsel (§11 10-Tage-Regel) – manuell prüfen.')::text); end if;
+
+  return jsonb_build_object(
+    'vat_timing', v_timing,
+    'paid_revenue_net_cents', v_paid_rev_net,
+    'paid_expense_deductible_net_cents', v_paid_exp_net,
+    'vat_output_cents', v_vat_output,
+    'vat_reverse_charge_output_cents', v_vat_rc_output,
+    'vat_input_cents', v_vat_input,
+    'has_unlinked_income', v_has_unlinked_income,
+    'has_unresolved_treatment', v_has_unresolved,
+    'missing_service_date', v_missing_service,
+    'recurring_flag_count', v_recurring_flag,
+    'filing_ready', v_filing_ready,
+    'warnings', v_warnings
+  );
+end;
+$$;
+
+-- Function grants
+do $$
+declare fn text;
+begin
+  foreach fn in array array[
+    'public.create_owner_expense(uuid, jsonb, jsonb)',
+    'public.create_owner_invoice(uuid, jsonb, jsonb)',
+    'public.record_owner_invoice_payment(uuid, uuid, bigint, date)',
+    'public.record_owner_expense_payment(uuid, uuid, bigint, date)',
+    'public.record_owner_tax_payment(uuid, uuid, text, integer, text, bigint, date, text)',
+    'public.issue_owner_invoice(uuid, uuid)',
+    'public.delete_owner_draft_invoice(uuid)',
+    'public.delete_owner_draft_expense(uuid)',
+    'public.owner_tax_period_inputs(uuid, date, date, text)'
+  ]
+  loop
+    execute format('revoke execute on function %s from public, anon', fn);
+    execute format('grant execute on function %s to authenticated, service_role', fn);
+  end loop;
+end;
+$$;
+revoke execute on function public.owner_claim_idempotency(uuid, text) from public, anon, authenticated;
+grant execute on function public.owner_claim_idempotency(uuid, text) to service_role;
 
 commit;

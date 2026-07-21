@@ -3,7 +3,7 @@ import { Plus, Receipt } from 'lucide-react';
 
 import { OwnerButton, OwnerCard, OwnerEmpty, OwnerError, OwnerField, OwnerLoading, OwnerPageHeader, OwnerPill, OwnerSelect } from '@/pages/owner/ownerUi';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
-import { createExpenseWithLine, loadCategories, loadExpenses, markExpenseReviewed } from '@/lib/ownerFinance/api';
+import { createOwnerExpense, loadCategories, loadExpenses, markExpenseReviewed } from '@/lib/ownerFinance/api';
 import { computeExpenseLine } from '@/lib/ownerFinance/tax';
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
 import type { OwnerExpense, OwnerExpenseCategory } from '@/lib/ownerFinance/types';
@@ -80,7 +80,7 @@ export function ExpensesPage() {
                   <td className="px-4 py-3 text-right tabular-nums text-slate-300">{formatCents(ex.input_vat_cents, ex.currency)}</td>
                   <td className="px-4 py-3"><OwnerPill label={ex.review_status} tone={reviewTone[ex.review_status]} /></td>
                   <td className="px-4 py-3 text-right">
-                    {ex.review_status !== 'reviewed' ? <button type="button" onClick={() => { if (entity) { void markExpenseReviewed(entity.id, ex.id).then(load); } }} className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 text-[12px] font-semibold text-emerald-200">Geprüft</button> : null}
+                    {ex.review_status !== 'reviewed' ? <button type="button" onClick={() => { void markExpenseReviewed(ex.id).then(load); }} className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 text-[12px] font-semibold text-emerald-200">Geprüft</button> : null}
                   </td>
                 </tr>
               ))}
@@ -119,14 +119,17 @@ function CreateExpense({ entityId, categories, onDone }: { entityId: string; cat
     const rate = treatment === 'domestic_reduced' ? 700 : ['domestic_standard', 'reverse_charge_13b', 'intra_community'].includes(treatment) ? 1900 : 0;
     setBusy(true);
     const cat = categories.find((c) => c.id === categoryId);
-    const { error } = await createExpenseWithLine(entityId, {
-      supplier_invoice_number: vendor.trim() || null, invoice_date: invoiceDate || null, category_id: categoryId || null,
-      review_status: treatment === 'unknown' ? 'needs_info' : 'pending',
-    }, {
-      description: desc.trim(), net_cents: n.cents, vat_rate_bp: rate, vat_treatment: treatment, category_id: categoryId || null,
-      input_vat_eligibility_bp: Math.round((Number(eligibility) || 0) * 100), deductibility_bp: Math.round((Number(deductibility) || 0) * 100),
-      asset_candidate: cat?.asset_review_default ?? false,
-    });
+    const { error } = await createOwnerExpense(
+      {
+        business_entity_id: entityId, supplier_invoice_number: vendor.trim() || null, invoice_date: invoiceDate || null,
+        category_id: categoryId || null, review_status: treatment === 'unknown' ? 'needs_info' : 'pending',
+      },
+      [{
+        description: desc.trim(), net_cents: n.cents, vat_rate_bp: rate, vat_treatment: treatment, category_id: categoryId || null,
+        input_vat_eligibility_bp: Math.round((Number(eligibility) || 0) * 100), deductibility_bp: Math.round((Number(deductibility) || 0) * 100),
+        asset_candidate: cat?.asset_review_default ?? false,
+      }],
+    );
     setBusy(false);
     if (error) { setErr(error); return; }
     onDone();

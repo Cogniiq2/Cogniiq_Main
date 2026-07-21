@@ -3,7 +3,7 @@ import { Download, FileWarning } from 'lucide-react';
 
 import { OwnerButton, OwnerCard, OwnerError, OwnerKpi, OwnerLoading, OwnerPageHeader, OwnerPill } from '@/pages/owner/ownerUi';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
-import { loadExpenses, loadInvoices, loadTaxSettings, saveTaxEstimate, recordExportRun, loadAssets } from '@/lib/ownerFinance/api';
+import { loadTaxPeriodInputs, loadTaxSettings, saveTaxEstimate, recordExportRun, loadAssets, type TaxPeriodInputs } from '@/lib/ownerFinance/api';
 import {
   RULES_VERSION, combinedReserve, churchTax, depreciationSchedule, euerResult, incomeTaxReserve,
   sec35Credit, solidaritySurcharge, tradeTax, vatPeriodSummary,
@@ -23,10 +23,13 @@ export function TaxesPage() {
     if (!entity) return;
     setLoading(true);
     try {
-      const [invoices, expenses, assets, settings] = await Promise.all([
-        loadInvoices(entity.id), loadExpenses(entity.id), loadAssets(entity.id), loadTaxSettings(entity.id, taxYear),
+      const settings = await loadTaxSettings(entity.id, taxYear);
+      const timing = settings?.vat_timing ?? 'ist';
+      const [inputs, assets] = await Promise.all([
+        loadTaxPeriodInputs(entity.id, `${taxYear}-01-01`, `${taxYear}-12-31`, timing),
+        loadAssets(entity.id),
       ]);
-      setData({ settings, calc: computeTax({ invoices, expenses, assets, settings, taxYear }) });
+      setData({ settings, calc: computeTax({ inputs, assets, settings, taxYear }) });
       setError(null);
     } catch (e: unknown) { setError(e instanceof Error ? e.message : String(e)); }
     finally { setLoading(false); }
@@ -151,36 +154,38 @@ function Section({ title, confidence, rows }: { title: string; confidence: 'comp
   );
 }
 
-// Pure aggregation over loaded rows + tax engine. Kept out of the render tree.
+// Pure tax-engine aggregation driven by the payment-based owner_tax_period_inputs RPC (EÜR cash
+// basis + VAT Ist/Soll). Depreciation is computed from asset rows (honoring the start month). Kept
+// out of the render tree.
 function computeTax(input: {
-  invoices: { status: string; issue_date: string | null; net_total_cents: number; vat_total_cents: number; gross_total_cents: number; amount_paid_cents: number }[];
-  expenses: { invoice_date: string | null; payment_status: string; net_total_cents: number; gross_total_cents: number; input_vat_cents: number; reverse_charge_vat_cents: number; deductible_net_cents: number; amount_paid_cents: number; review_status: string }[];
+  inputs: TaxPeriodInputs | null;
   assets: { purchase_date: string | null; acquisition_cost_cents: number | null; business_use_bp: number; depreciation_method: 'immediate' | 'straight_line' | 'pool' | 'manual'; useful_life_months: number | null; depreciation_start_date: string | null }[];
   settings: OwnerTaxSettings | null;
   taxYear: number;
 }) {
-  const inYear = (d: string | null) => d != null && d.slice(0, 4) === String(input.taxYear);
-  const yearInvoices = input.invoices.filter((i) => inYear(i.issue_date) && ['issued', 'partially_paid', 'paid', 'overdue'].includes(i.status));
-  const yearExpenses = input.expenses.filter((e) => inYear(e.invoice_date) && e.payment_status !== 'void');
-
-  const ratio = (paid: number, gross: number) => (gross > 0 ? paid / gross : 0);
-  const paidRevenueNet = yearInvoices.reduce((s, i) => s + Math.round(i.net_total_cents * ratio(i.amount_paid_cents, i.gross_total_cents)), 0);
-  const paidDeductibleExpense = yearExpenses.reduce((s, e) => s + Math.round(e.deductible_net_cents * ratio(e.amount_paid_cents, e.gross_total_cents)), 0);
+  const src = input.inputs;
+  const paidRevenueNet = src?.paid_revenue_net_cents ?? 0;
+  const paidDeductibleExpense = src?.paid_expense_deductible_net_cents ?? 0;
 
   const depreciation = input.assets.reduce((s, a) => {
     if (!a.acquisition_cost_cents) return s;
-    const startYear = Number((a.depreciation_start_date ?? a.purchase_date ?? `${input.taxYear}-01-01`).slice(0, 4));
-    const sched = depreciationSchedule({ acquisitionCostCents: a.acquisition_cost_cents, businessUseBp: a.business_use_bp, method: a.depreciation_method, usefulLifeMonths: a.useful_life_months, startYear, years: 20 });
+    const startDate = a.depreciation_start_date ?? a.purchase_date ?? `${input.taxYear}-01-01`;
+    const startYear = Number(startDate.slice(0, 4));
+    const startMonth = Number(startDate.slice(5, 7)) || 1;
+    const sched = depreciationSchedule({ acquisitionCostCents: a.acquisition_cost_cents, businessUseBp: a.business_use_bp, method: a.depreciation_method, usefulLifeMonths: a.useful_life_months, startYear, startMonth, years: 30 });
     return s + (sched.years.find((y) => y.year === input.taxYear)?.depreciationCents ?? 0);
   }, 0);
 
   const euer = euerResult({ paidRevenueNetCents: paidRevenueNet, paidDeductibleExpenseCents: paidDeductibleExpense, depreciationCents: depreciation, manualAdjustmentsCents: input.settings?.manual_personal_adjustments_cents ?? 0 });
 
-  const outputVat = yearInvoices.reduce((s, i) => s + i.vat_total_cents, 0);
-  const rcOutput = yearExpenses.reduce((s, e) => s + e.reverse_charge_vat_cents, 0);
-  const inputVat = yearExpenses.reduce((s, e) => s + e.input_vat_cents, 0);
-  const hasUnresolved = yearExpenses.some((e) => e.review_status !== 'reviewed');
-  const vat = vatPeriodSummary({ outputVatCents: outputVat, reverseChargeOutputCents: rcOutput, eligibleInputVatCents: inputVat, eligibleReverseChargeInputCents: 0, prepaymentsCents: input.settings?.vat_prepayments_cents ?? 0, hasUnresolvedTreatments: hasUnresolved });
+  const vat = vatPeriodSummary({
+    outputVatCents: src?.vat_output_cents ?? 0,
+    reverseChargeOutputCents: src?.vat_reverse_charge_output_cents ?? 0,
+    eligibleInputVatCents: src?.vat_input_cents ?? 0,
+    eligibleReverseChargeInputCents: 0,
+    prepaymentsCents: input.settings?.vat_prepayments_cents ?? 0,
+    hasUnresolvedTreatments: src ? !src.filing_ready : true,
+  });
 
   const hebesatzBp = input.settings?.trade_tax_hebesatz_bp ?? null;
   const trade = tradeTax({ profitCents: euer.taxableProfitCents, hebesatzBp });
@@ -202,9 +207,10 @@ function computeTax(input: {
 
   const reserve = combinedReserve({ vatReserveCents: vat.reserveCents, businessIncomeTaxReserveCents: income.remainingReserveCents, tradeTaxRemainingCents: tradeRemaining, soliRemainingCents: soliRemaining, churchTaxRemainingCents: churchRemaining });
 
-  const warnings = [...vat.warnings, ...trade.warnings, ...income.warnings, ...sec35.warnings];
+  const filingReady = src ? src.filing_ready : false;
+  const warnings = [...(src?.warnings ?? []), ...vat.warnings, ...trade.warnings, ...income.warnings, ...sec35.warnings];
   if (!input.settings?.setup_complete) warnings.unshift('Steuer-Setup ist unvollständig – die Gesamtschätzung ist vorläufig.');
-  const confidence: 'complete' | 'estimate' | 'incomplete' = !input.settings?.setup_complete || !income.hasPersonalInputs || hebesatzBp == null || hasUnresolved ? 'incomplete' : 'estimate';
+  const confidence: 'complete' | 'estimate' | 'incomplete' = !input.settings?.setup_complete || !income.hasPersonalInputs || hebesatzBp == null || !filingReady ? 'incomplete' : 'estimate';
 
   return { euer, vat, trade, sec35, income, soliRemainingCents: soliRemaining, churchRemainingCents: churchRemaining, reserve, warnings, confidence };
 }

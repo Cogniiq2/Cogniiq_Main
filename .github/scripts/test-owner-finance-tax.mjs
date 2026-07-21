@@ -103,5 +103,30 @@ eq(t.churchTax(5000000, 800, true), 400000, 'church tax 8% enabled');
   ok(cash.availableCents === null && cash.exact === false, 'safely available cash not exact without bank balance');
 }
 
+// ---- Depreciation timing (start month, reproducible cents, accumulated ≤ base) ----
+{
+  const sum = (s) => s.years.reduce((a, y) => a + y.depreciationCents, 0);
+  const jan = t.depreciationSchedule({ acquisitionCostCents: 360000, businessUseBp: 10000, method: 'straight_line', usefulLifeMonths: 36, startYear: 2026, startMonth: 1, years: 6 });
+  eq(jan.years[0].depreciationCents, 120000, 'Jan: full first year');
+  eq(sum(jan), 360000, 'Jan: accumulated equals base');
+  eq(jan.years[jan.years.length - 1].bookValueEndCents, 0, 'Jan: final book value 0');
+
+  const jul = t.depreciationSchedule({ acquisitionCostCents: 360000, businessUseBp: 10000, method: 'straight_line', usefulLifeMonths: 36, startYear: 2026, startMonth: 7, years: 6 });
+  eq(jul.years[0].depreciationCents, 60000, 'Jul: 6/12 first year');
+  eq(sum(jul), 360000, 'Jul: accumulated equals base');
+  ok(jul.years.length === 4, 'Jul: completes over 4 calendar years');
+
+  const dec = t.depreciationSchedule({ acquisitionCostCents: 360000, businessUseBp: 10000, method: 'straight_line', usefulLifeMonths: 36, startYear: 2026, startMonth: 12, years: 6 });
+  eq(dec.years[0].depreciationCents, 10000, 'Dec: 1/12 first year');
+  eq(sum(dec), 360000, 'Dec: accumulated equals base');
+
+  const rem = t.depreciationSchedule({ acquisitionCostCents: 100000, businessUseBp: 10000, method: 'straight_line', usefulLifeMonths: 36, startYear: 2026, startMonth: 1, years: 6 });
+  eq(sum(rem), 100000, 'Rounding remainder: accumulated equals base');
+  ok(rem.years.every((y) => y.bookValueEndCents >= 0), 'book value never negative (never exceeds base)');
+
+  const businessUse = t.depreciationSchedule({ acquisitionCostCents: 200000, businessUseBp: 5000, method: 'straight_line', usefulLifeMonths: 24, startYear: 2026, startMonth: 1, years: 4 });
+  eq(businessUse.base, 100000, 'business-use fraction applied to base');
+}
+
 if (failures) { console.error(`owner-finance tax engine tests: ${failures} FAILED`); process.exit(1); }
 console.log('owner-finance tax engine tests: ALL PASSED');

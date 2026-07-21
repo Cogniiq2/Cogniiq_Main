@@ -6,7 +6,7 @@ import { OwnerButton, OwnerCard, OwnerEmpty, OwnerError, OwnerField, OwnerKpi, O
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import {
   createAsset, createSubscription, loadAssets, loadAudit, loadDocuments, loadPeriodSummary,
-  loadSubscriptions, logAudit, secureUuid, setSubscriptionStatus,
+  loadSubscriptions, secureUuid, setSubscriptionStatus,
 } from '@/lib/ownerFinance/api';
 import { supabase } from '@/lib/supabase';
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
@@ -114,8 +114,8 @@ export function SubscriptionsPage() {
                 <p className="text-[12px] text-slate-500">{s.billing_frequency} · {formatCents(s.expected_gross_cents ?? null)} · nächste: {s.next_billing_date ?? '—'} · {formatCents(normalizedMonthly(s))}/Monat</p>
               </div>
               <div className="flex gap-2">
-                {s.status === 'active' ? <button type="button" onClick={() => { if (entity) void setSubscriptionStatus(entity.id, s.id, 'paused').then(load); }} className="rounded-lg border border-white/10 px-2.5 py-1 text-[12px] font-semibold text-slate-300">Pausieren</button>
-                  : <button type="button" onClick={() => { if (entity) void setSubscriptionStatus(entity.id, s.id, 'active').then(load); }} className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 text-[12px] font-semibold text-emerald-200">Aktivieren</button>}
+                {s.status === 'active' ? <button type="button" onClick={() => { void setSubscriptionStatus(s.id, 'paused').then(load); }} className="rounded-lg border border-white/10 px-2.5 py-1 text-[12px] font-semibold text-slate-300">Pausieren</button>
+                  : <button type="button" onClick={() => { void setSubscriptionStatus(s.id, 'active').then(load); }} className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 text-[12px] font-semibold text-emerald-200">Aktivieren</button>}
               </div>
             </OwnerCard>
           ))}
@@ -232,7 +232,7 @@ export function DocumentsPage() {
     });
     setUploading(false);
     if (metaErr) { setUploadError(metaErr.message); return; }
-    await logAudit({ businessEntityId: entity.id, action: 'document.uploaded', resourceType: 'owner_finance_documents', after: { filename: file.name } });
+    // The document metadata insert generates its audit record database-side.
     void load();
   };
 

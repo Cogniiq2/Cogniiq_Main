@@ -30,15 +30,18 @@ export function euerResult(input: EuerInput): EuerResult {
   };
 }
 
-// Straight-line depreciation schedule (§7(1)) as reproducible monthly entries. `immediate` writes
-// off the full business-use cost in the first period; `manual`/`pool` return a single-line summary
-// and require owner review. Business-use fraction is applied to the base.
+// Straight-line depreciation schedule (§7(1)) honoring the actual depreciation start MONTH: the
+// first calendar year is reduced pro rata temporis (one twelfth per complete month before the start
+// month). `immediate` writes off the full business-use cost in the start year; `manual`/`pool`
+// require owner review (no auto schedule). German law may permit other methods in specific
+// acquisition windows; those are intentionally not applied silently.
 export interface DepreciationInput {
   acquisitionCostCents: number;
   businessUseBp: number;
   method: 'immediate' | 'straight_line' | 'pool' | 'manual';
   usefulLifeMonths: number | null;
   startYear: number;
+  startMonth?: number; // 1-12; defaults to January
   years: number; // how many calendar years of schedule to produce
 }
 
@@ -52,6 +55,7 @@ export function depreciationSchedule(input: DepreciationInput): { base: number; 
   const base = Math.round((input.acquisitionCostCents * input.businessUseBp) / 10000);
   const warnings: string[] = ['Abschreibung ist eine Schätzung bis zur Prüfung; Nutzungsdauer laut amtlicher AfA-Tabelle.'];
   const years: DepreciationYear[] = [];
+  const startMonth = Math.min(12, Math.max(1, input.startMonth ?? 1));
 
   if (input.method === 'immediate') {
     years.push({ year: input.startYear, depreciationCents: base, bookValueEndCents: 0 });
@@ -62,15 +66,19 @@ export function depreciationSchedule(input: DepreciationInput): { base: number; 
     return { base, years, warnings };
   }
 
-  const perMonth = base / input.usefulLifeMonths;
-  let remaining = base;
+  const life = input.usefulLifeMonths;
+  // Cumulative rounding keeps cents reproducible and guarantees the final accumulated total equals
+  // the base exactly (and never exceeds it): dep(Y) = round(monthsElapsed·base/life) − prevCum.
+  let prevCum = 0;
   for (let i = 0; i < input.years; i += 1) {
-    const monthsThisYear = 12;
-    let dep = Math.round(perMonth * monthsThisYear);
-    if (dep > remaining) dep = remaining;
-    remaining -= dep;
-    years.push({ year: input.startYear + i, depreciationCents: dep, bookValueEndCents: remaining });
-    if (remaining <= 0) break;
+    const year = input.startYear + i;
+    // Complete depreciation months by the end of this calendar year (first year = 13 − startMonth).
+    const monthsElapsed = Math.min(life, Math.max(0, (year - input.startYear) * 12 + (13 - startMonth)));
+    const cumEnd = Math.round((monthsElapsed * base) / life);
+    const dep = cumEnd - prevCum;
+    years.push({ year, depreciationCents: dep, bookValueEndCents: base - cumEnd });
+    prevCum = cumEnd;
+    if (cumEnd >= base) break;
   }
   return { base, years, warnings };
 }
