@@ -81,13 +81,12 @@ declare
   result jsonb;
 begin
   result := public.provision_client_workspace(
-    'idem-acme-1',
+    '11111111-1111-1111-1111-111111111111',
     'Acme GmbH', 'Acme Legal GmbH', 'Owner A', 'invited@example.test', '+4915100000001',
     'https://acme.example.test', 'Healthcare', 'Acme Street 1', 'referral', 'active',
     'VIP client', 'Operator A', 'EUR', 500000, 50000,
     'ai_receptionist', 'Acme Receptionist Rollout', 'active', 500000, 100000, 20000,
-    current_date + 30, 'Acme Rezeptionist', 'ai_receptionist', null,
-    'invited@example.test', 'owner'
+    current_date + 30, 'Acme Rezeptionist', 'invited@example.test', 'owner'
   );
   perform set_config('cp.org_a', result->>'organization_id', true);
   perform set_config('cp.instance_a', result->>'instance_key', true);
@@ -101,8 +100,12 @@ begin
   if not exists (select 1 from public.client_accounts where organization_id = (result->>'organization_id')::uuid) then
     raise exception 'TEST FAILED: client account not created';
   end if;
-  if not exists (select 1 from public.organization_solutions where instance_key = (result->>'instance_key') and status = 'active') then
-    raise exception 'TEST FAILED: solution instance not created';
+  -- implementation is derived from the catalog: ai_receptionist -> ai_receptionist.
+  if not exists (
+    select 1 from public.organization_solutions
+    where instance_key = (result->>'instance_key') and status = 'active' and implementation_key = 'ai_receptionist'
+  ) then
+    raise exception 'TEST FAILED: solution instance not created with the catalog-derived implementation';
   end if;
 end $$;
 
@@ -111,13 +114,20 @@ do $$
 declare result jsonb;
 begin
   result := public.provision_client_workspace(
-    'idem-beta-1',
+    '22222222-2222-2222-2222-222222222222',
     'Beta AG', null, 'Owner B', 'owner-b@example.test', null, null, null, null, null, 'lead',
     null, null, 'EUR', null, null,
     'automation_workspace', 'Beta Automation', 'active', null, null, null, null,
-    'Beta Automation', 'automation_workspace', null, 'owner-b@example.test', 'owner'
+    'Beta Automation', 'owner-b@example.test', 'owner'
   );
   perform set_config('cp.org_b', result->>'organization_id', true);
+  -- automation_workspace -> automation_workspace (never the receptionist implementation).
+  if not exists (
+    select 1 from public.organization_solutions
+    where organization_id = (result->>'organization_id')::uuid and implementation_key = 'automation_workspace'
+  ) then
+    raise exception 'TEST FAILED: automation catalog did not derive the automation implementation';
+  end if;
 end $$;
 
 -- ============ Finding 4: provisioning is idempotent ============
@@ -128,19 +138,19 @@ declare
   org_count integer;
 begin
   first_result := public.provision_client_workspace(
-    'idem-dup-1',
+    '33333333-3333-3333-3333-333333333333',
     'Dup GmbH', null, 'Owner Dup', 'dup@example.test', null, null, null, null, null, 'active',
     null, null, 'EUR', null, null,
     'ai_receptionist', 'Dup Rollout', 'active', null, null, null, null,
-    'Dup Rezeptionist', 'ai_receptionist', null, 'dup@example.test', 'owner'
+    'Dup Rezeptionist', 'dup@example.test', 'owner'
   );
   -- Same idempotency key => replay, no new workspace.
   second_result := public.provision_client_workspace(
-    'idem-dup-1',
+    '33333333-3333-3333-3333-333333333333',
     'Dup GmbH RETRY', null, 'Different', 'other@example.test', null, null, null, null, null, 'active',
     null, null, 'EUR', null, null,
     'ai_receptionist', 'Different Rollout', 'active', null, null, null, null,
-    'Different Rezeptionist', 'ai_receptionist', null, 'other@example.test', 'owner'
+    'Different Rezeptionist', 'other@example.test', 'owner'
   );
   if (first_result->>'organization_id') <> (second_result->>'organization_id')
     or (first_result->>'instance_key') <> (second_result->>'instance_key')
@@ -156,31 +166,104 @@ begin
   end if;
 end $$;
 
--- ============ Finding 5: repeated display names produce distinct instance keys / routes ============
+-- ============ Finding 1: idempotency is mandatory (null/blank/malformed keys rejected) ============
+do $$
+declare blocked boolean;
+begin
+  -- Null key rejected in the function body.
+  blocked := false;
+  begin
+    perform public.provision_client_workspace(
+      null::uuid,
+      'NoKey GmbH', null, null, 'nokey@example.test', null, null, null, null, null, 'active',
+      null, null, 'EUR', null, null,
+      'ai_receptionist', 'NoKey Rollout', 'active', null, null, null, null,
+      'NoKey Rezeptionist', 'nokey@example.test', 'owner'
+    );
+  exception when raise_exception then blocked := true;
+  end;
+  if not blocked then raise exception 'TEST FAILED: provisioning without an idempotency key was allowed'; end if;
+
+  -- Blank / malformed keys rejected at the uuid type boundary.
+  blocked := false;
+  begin
+    perform public.provision_client_workspace(
+      'not-a-uuid',
+      'Bad GmbH', null, null, 'bad@example.test', null, null, null, null, null, 'active',
+      null, null, 'EUR', null, null,
+      'ai_receptionist', 'Bad Rollout', 'active', null, null, null, null,
+      'Bad Rezeptionist', 'bad@example.test', 'owner'
+    );
+  exception when invalid_text_representation or raise_exception then blocked := true;
+  end;
+  if not blocked then raise exception 'TEST FAILED: malformed idempotency key was accepted'; end if;
+end $$;
+
+-- ============ Finding 2: mismatched / inactive catalog provisioning cannot occur ============
+do $$
+declare r jsonb; blocked boolean;
+begin
+  -- custom_client_portal -> unavailable (browser cannot force a different implementation).
+  r := public.provision_client_workspace(
+    '66666666-6666-6666-6666-666666666666',
+    'Portal GmbH', null, null, 'portal@example.test', null, null, null, null, null, 'active',
+    null, null, 'EUR', null, null,
+    'custom_client_portal', 'Portal Projekt', 'active', null, null, null, null,
+    'Kundenportal', 'portal@example.test', 'owner'
+  );
+  if not exists (
+    select 1 from public.organization_solutions
+    where organization_id = (r->>'organization_id')::uuid and implementation_key = 'unavailable'
+  ) then
+    raise exception 'TEST FAILED: custom_client_portal did not derive the unavailable implementation';
+  end if;
+
+  -- Inactive catalog entries cannot be provisioned.
+  insert into public.solution_catalog (key, label, description, default_implementation_key, is_active, sort_order)
+  values ('retired_product', 'Retired', null, 'unavailable', false, 999);
+  blocked := false;
+  begin
+    perform public.provision_client_workspace(
+      '77777777-7777-7777-7777-777777777777',
+      'Retired GmbH', null, null, 'retired@example.test', null, null, null, null, null, 'active',
+      null, null, 'EUR', null, null,
+      'retired_product', 'Retired Rollout', 'active', null, null, null, null,
+      'Retired Solution', 'retired@example.test', 'owner'
+    );
+  exception when raise_exception then blocked := true;
+  end;
+  if not blocked then raise exception 'TEST FAILED: inactive catalog entry was provisioned'; end if;
+end $$;
+
+-- ============ Finding 5: repeated display names produce distinct high-entropy instance keys ============
 do $$
 declare
   r1 jsonb;
   r2 jsonb;
 begin
   r1 := public.provision_client_workspace(
-    'idem-same-1',
+    '44444444-4444-4444-4444-444444444444',
     'Same Name Org 1', null, 'C1', 'same1@example.test', null, null, null, null, null, 'active',
     null, null, 'EUR', null, null,
     'ai_receptionist', 'KI-Rezeptionist', 'active', null, null, null, null,
-    'KI-Rezeptionist', 'ai_receptionist', null, 'same1@example.test', 'owner'
+    'KI-Rezeptionist', 'same1@example.test', 'owner'
   );
   r2 := public.provision_client_workspace(
-    'idem-same-2',
+    '55555555-5555-5555-5555-555555555555',
     'Same Name Org 2', null, 'C2', 'same2@example.test', null, null, null, null, null, 'active',
     null, null, 'EUR', null, null,
     'ai_receptionist', 'KI-Rezeptionist', 'active', null, null, null, null,
-    'KI-Rezeptionist', 'ai_receptionist', null, 'same2@example.test', 'owner'
+    'KI-Rezeptionist', 'same2@example.test', 'owner'
   );
   if (r1->>'instance_key') = (r2->>'instance_key') then
     raise exception 'TEST FAILED: identical display names produced identical instance keys';
   end if;
   if (r1->>'instance_key') !~ '^[a-z0-9][a-z0-9_-]{2,}$' or (r2->>'instance_key') !~ '^[a-z0-9][a-z0-9_-]{2,}$' then
     raise exception 'TEST FAILED: generated instance key has an invalid route-unsafe format';
+  end if;
+  -- At least 16 hex characters of entropy in the suffix.
+  if (r1->>'instance_key') !~ '-[0-9a-f]{16,}$' or (r2->>'instance_key') !~ '-[0-9a-f]{16,}$' then
+    raise exception 'TEST FAILED: instance key suffix does not carry at least 16 hex characters of entropy';
   end if;
 end $$;
 

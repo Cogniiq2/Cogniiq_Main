@@ -41,7 +41,10 @@ create table if not exists public.solution_catalog (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint solution_catalog_key_format check (key ~ '^[a-z][a-z0-9_]+$'),
-  constraint solution_catalog_label_not_blank check (length(trim(label)) > 0)
+  constraint solution_catalog_label_not_blank check (length(trim(label)) > 0),
+  constraint solution_catalog_default_impl_check check (
+    default_implementation_key in ('ai_receptionist', 'automation_workspace', 'pankofer_operations', 'unavailable')
+  )
 );
 
 comment on table public.solution_catalog is
@@ -374,12 +377,11 @@ grant select, insert, update, delete on table public.client_invitations to servi
 -- Internal admin-only idempotency ledger for client provisioning.
 -- ---------------------------------------------------------------------------
 create table if not exists public.client_provisioning_requests (
-  idempotency_key text primary key,
+  idempotency_key uuid primary key,
   organization_id uuid references public.organizations(id) on delete set null,
   result jsonb,
   created_by uuid references public.profiles(id) on delete set null,
-  created_at timestamptz not null default now(),
-  constraint client_provisioning_requests_key_not_blank check (length(trim(idempotency_key)) > 0)
+  created_at timestamptz not null default now()
 );
 
 comment on table public.client_provisioning_requests is
@@ -436,7 +438,7 @@ create or replace function public.claim_my_client_invitations()
 returns table (organization_id uuid, membership_id uuid)
 language plpgsql
 security definer
-set search_path = public, auth
+set search_path = public, auth, pg_temp
 as $$
 #variable_conflict use_column
 declare
@@ -513,7 +515,7 @@ comment on function public.claim_my_client_invitations() is
 -- RPC: provision_client_workspace(...)  atomic admin provisioning
 -- ---------------------------------------------------------------------------
 create or replace function public.provision_client_workspace(
-  p_idempotency_key text,
+  p_idempotency_key uuid,
   p_display_name text,
   p_legal_name text,
   p_primary_contact_name text,
@@ -537,22 +539,20 @@ create or replace function public.provision_client_workspace(
   p_recurring_fee_cents bigint,
   p_target_go_live_date date,
   p_solution_display_name text,
-  p_implementation_key text,
-  p_instance_key text,
   p_invitation_email text,
   p_organization_role public.organization_role
 )
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, auth
+set search_path = public, auth, pg_temp
 as $$
 declare
   v_currency text := upper(coalesce(nullif(trim(p_currency), ''), 'EUR'));
   v_lifecycle text := coalesce(nullif(trim(p_lifecycle_status), ''), 'lead');
   v_engagement_status text := coalesce(nullif(trim(p_engagement_status), ''), 'active');
   v_invite_email text := lower(trim(coalesce(p_invitation_email, '')));
-  v_idem text := nullif(trim(coalesce(p_idempotency_key, '')), '');
+  v_impl_key text;
   v_slug text;
   v_instance_key text;
   v_existing_result jsonb;
@@ -569,24 +569,28 @@ begin
     raise exception 'Only Cogniiq platform admins may provision client workspaces';
   end if;
 
-  -- Idempotency: claim the key first. If another (committed) call already produced a result for
-  -- this key, replay it. Concurrent callers with the same key serialize on the row lock: the first
-  -- holds it until commit, the second then reads the committed result. A retry after a committed
-  -- transaction returns the original workspace IDs and creates nothing new.
-  if v_idem is not null then
-    insert into public.client_provisioning_requests (idempotency_key, created_by)
-    values (v_idem, auth.uid())
-    on conflict (idempotency_key) do nothing;
+  -- Idempotency is mandatory. A UUID parameter rejects blank/oversized/malformed keys at the type
+  -- boundary; a null key is refused here, so there is no provisioning path without idempotency.
+  if p_idempotency_key is null then
+    raise exception 'an idempotency key is required';
+  end if;
 
-    select cpr.result
-      into v_existing_result
-    from public.client_provisioning_requests cpr
-    where cpr.idempotency_key = v_idem
-    for update;
+  -- Claim the key first. If another (committed) call already produced a result for this key, replay
+  -- it. Concurrent callers with the same key serialize on the row lock: the first holds it until
+  -- commit, the second then reads the committed result. A retry after a committed transaction
+  -- returns the original workspace IDs and creates nothing new.
+  insert into public.client_provisioning_requests (idempotency_key, created_by)
+  values (p_idempotency_key, auth.uid())
+  on conflict (idempotency_key) do nothing;
 
-    if v_existing_result is not null then
-      return v_existing_result;
-    end if;
+  select cpr.result
+    into v_existing_result
+  from public.client_provisioning_requests cpr
+  where cpr.idempotency_key = p_idempotency_key
+  for update;
+
+  if v_existing_result is not null then
+    return v_existing_result;
   end if;
 
   -- Validation
@@ -608,11 +612,19 @@ begin
   if v_engagement_status not in ('draft', 'active', 'paused', 'completed', 'cancelled') then
     raise exception 'invalid engagement status';
   end if;
-  if p_implementation_key not in ('ai_receptionist', 'automation_workspace', 'pankofer_operations', 'unavailable') then
-    raise exception 'invalid implementation_key';
+  -- The implementation is derived from the controlled catalog, never trusted from the browser. Only
+  -- active catalog entries may be provisioned. This makes solution/implementation mismatches
+  -- impossible (e.g. automation_workspace can never resolve to the receptionist implementation).
+  select sc.default_implementation_key
+    into v_impl_key
+  from public.solution_catalog sc
+  where sc.key = p_catalog_key
+    and sc.is_active;
+  if v_impl_key is null then
+    raise exception 'unknown or inactive catalog_key';
   end if;
-  if not exists (select 1 from public.solution_catalog c where c.key = p_catalog_key) then
-    raise exception 'unknown catalog_key';
+  if v_impl_key not in ('ai_receptionist', 'automation_workspace', 'pankofer_operations', 'unavailable') then
+    raise exception 'catalog default implementation is not an allowed implementation key';
   end if;
   if v_invite_email = '' or v_invite_email !~* '^[^@\s]+@[^@\s]+\.[^@\s]+$' then
     raise exception 'a valid invitation email is required';
@@ -625,10 +637,10 @@ begin
     raise exception 'monetary amounts must be non-negative';
   end if;
 
-  -- Canonical instance key is generated server-side: a readable slug plus a random,
-  -- collision-resistant suffix from gen_random_uuid(). Frontend-supplied keys are never trusted
-  -- for database identity, so repeated display names ("KI-Rezeptionist", "Automatisierung", ...)
-  -- never collide across clients.
+  -- Canonical instance key is generated server-side: a readable slug plus the full 32-hex-character
+  -- gen_random_uuid() (128 bits of entropy), so repeated display names never collide across clients.
+  -- The unique constraint remains the source of truth; with 128-bit suffixes a real collision is
+  -- negligible, and the retry loop handles the astronomically unlikely case safely.
   v_slug := lower(trim(coalesce(p_solution_display_name, '')));
   v_slug := regexp_replace(v_slug, '[^a-z0-9]+', '-', 'g');
   v_slug := trim(both '-' from v_slug);
@@ -638,7 +650,7 @@ begin
   v_slug := substr(v_slug, 1, 40);
 
   loop
-    v_instance_key := v_slug || '-' || substr(replace(gen_random_uuid()::text, '-', ''), 1, 8);
+    v_instance_key := v_slug || '-' || replace(gen_random_uuid()::text, '-', '');
     exit when not exists (
       select 1 from public.organization_solutions os where os.instance_key = v_instance_key
     );
@@ -693,7 +705,7 @@ begin
   )
   values (
     v_org_id, v_engagement_id, p_catalog_key, v_instance_key, trim(p_solution_display_name),
-    p_implementation_key, 'active'
+    v_impl_key, 'active'
   )
   returning id into v_solution_id;
 
@@ -719,11 +731,9 @@ begin
   );
 
   -- Persist the result against the idempotency key so retries replay it.
-  if v_idem is not null then
-    update public.client_provisioning_requests
-      set result = v_result, organization_id = v_org_id
-    where idempotency_key = v_idem;
-  end if;
+  update public.client_provisioning_requests
+    set result = v_result, organization_id = v_org_id
+  where idempotency_key = p_idempotency_key;
 
   return v_result;
 end;
@@ -739,12 +749,12 @@ revoke execute on function public.claim_my_client_invitations() from public, ano
 grant execute on function public.claim_my_client_invitations() to authenticated, service_role;
 
 revoke execute on function public.provision_client_workspace(
-  text, text, text, text, text, text, text, text, text, text, text, text, text, text,
-  bigint, bigint, text, text, text, bigint, bigint, bigint, date, text, text, text, text, public.organization_role
+  uuid, text, text, text, text, text, text, text, text, text, text, text, text, text,
+  bigint, bigint, text, text, text, bigint, bigint, bigint, date, text, text, public.organization_role
 ) from public, anon;
 grant execute on function public.provision_client_workspace(
-  text, text, text, text, text, text, text, text, text, text, text, text, text, text,
-  bigint, bigint, text, text, text, bigint, bigint, bigint, date, text, text, text, text, public.organization_role
+  uuid, text, text, text, text, text, text, text, text, text, text, text, text, text,
+  bigint, bigint, text, text, text, bigint, bigint, bigint, date, text, text, public.organization_role
 ) to authenticated, service_role;
 
 -- ---------------------------------------------------------------------------

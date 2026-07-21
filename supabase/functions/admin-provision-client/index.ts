@@ -48,6 +48,7 @@ function asInt(value: unknown): number | null {
 }
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 serve(async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -143,7 +144,11 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     const result = await sendInvite(adminClient, invitation.email);
-    return json({ ok: true, action: "resend", email: invitation.email, invitation: result });
+    // ok reflects the actual email outcome: 'sent'/'existing_user' succeed, 'email_error' does not.
+    // Returned as HTTP 200 with a structured body so the admin UI can report the precise outcome
+    // (it must never claim success when the email actually failed).
+    const emailOk = result.status !== "email_error";
+    return json({ ok: emailOk, action: "resend", email: invitation.email, invitation: result });
   }
 
   // ---- Provision path ----
@@ -152,15 +157,17 @@ serve(async (req: Request): Promise<Response> => {
   const projectName = asString(body.projectName);
   const solutionDisplayName = asString(body.solutionDisplayName);
   const catalogKey = asString(body.catalogKey);
-  const implementationKey = asString(body.implementationKey);
   const invitationEmail = asString(body.invitationEmail)?.toLowerCase() ?? null;
 
-  if (!idempotencyKey) return json({ error: "idempotencyKey is required" }, 400);
+  // Idempotency is mandatory and must be a UUID (matches the RPC's uuid parameter).
+  if (!idempotencyKey || !UUID_RE.test(idempotencyKey)) {
+    return json({ error: "a valid UUID idempotencyKey is required" }, 400);
+  }
   if (!displayName) return json({ error: "displayName is required" }, 400);
   if (!projectName) return json({ error: "projectName is required" }, 400);
   if (!solutionDisplayName) return json({ error: "solutionDisplayName is required" }, 400);
   if (!catalogKey) return json({ error: "catalogKey is required" }, 400);
-  if (!implementationKey) return json({ error: "implementationKey is required" }, 400);
+  // implementation is derived server-side from the controlled catalog; the browser never supplies it.
   if (!invitationEmail || !EMAIL_RE.test(invitationEmail)) {
     return json({ error: "A valid invitationEmail is required" }, 400);
   }
@@ -193,8 +200,6 @@ serve(async (req: Request): Promise<Response> => {
       p_recurring_fee_cents: asInt(body.recurringFeeCents),
       p_target_go_live_date: asString(body.targetGoLiveDate),
       p_solution_display_name: solutionDisplayName,
-      p_implementation_key: implementationKey,
-      p_instance_key: null, // canonical instance key is generated server-side by the RPC
       p_invitation_email: invitationEmail,
       p_organization_role: asString(body.organizationRole) ?? "owner",
     },
