@@ -509,7 +509,7 @@ values
   ('businesses', 'businesses_organization_id_key', 'u', array['organization_id'], null, null, null, null, null),
   ('businesses', 'businesses_organization_id_id_key', 'u', array['organization_id', 'id'], null, null, null, null, null),
   ('businesses', 'businesses_name_not_blank', 'c', array['name'], null, null, null, null, 'check .*length.*trim.*name.*> 0'),
-  ('businesses', 'businesses_website_url_check', 'c', array['website'], null, null, null, null, 'check .*website is null.*https\\?://'),
+  ('businesses', 'businesses_website_url_check', 'c', array['website'], null, null, null, null, 'check .*website is null.*https[?]://'),
   ('businesses', 'businesses_contact_email_check', 'c', array['contact_email'], null, null, null, null, 'check .*contact_email is null.*@'),
   ('businesses', 'businesses_existing_phone_check', 'c', array['existing_business_phone'], null, null, null, null, 'check .*existing_business_phone is null.*0-9'),
   ('businesses', 'businesses_primary_language_check', 'c', array['primary_language'], null, null, null, null, 'check .*primary_language.*de.*en'),
