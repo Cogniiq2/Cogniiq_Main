@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
 
@@ -13,12 +13,15 @@ import {
   implementationKeys,
   solutionCatalogKeys,
 } from '@/lib/clientPlatform/types';
-import {
-  isValidEmail,
-  isValidUrl,
-  parseAmountToCents,
-  toInstanceKeySuggestion,
-} from '@/lib/clientPlatform/validation';
+import { isValidEmail, isValidUrl, parseAmountToCents } from '@/lib/clientPlatform/validation';
+
+// One stable idempotency key per intended submission (per wizard mount). Retries of the same
+// submission reuse it so the server replays instead of creating a duplicate workspace; a brand new
+// client is a fresh mount and therefore a fresh key.
+function newIdempotencyKey(): string {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID();
+  return `idem-${Date.now()}-${Math.floor(Math.random() * 1e9)}`;
+}
 
 const steps = ['Unternehmen', 'Ansprechpartner', 'Vertrag & Budget', 'Lösung & Zugang'];
 
@@ -77,14 +80,10 @@ export function NewClientWizard() {
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<ProvisionClientResult | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [idempotencyKey] = useState(newIdempotencyKey);
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((current) => ({ ...current, [key]: value }));
-
-  const instanceSuggestion = useMemo(
-    () => toInstanceKeySuggestion(form.solutionDisplayName || form.displayName || 'solution'),
-    [form.solutionDisplayName, form.displayName],
-  );
 
   function validateStep(current: number): boolean {
     const next: Record<string, string> = {};
@@ -124,6 +123,7 @@ export function NewClientWizard() {
     }
 
     const payload: ProvisionClientPayload = {
+      idempotencyKey,
       displayName: form.displayName.trim(),
       legalName: form.legalName.trim() || null,
       primaryContactName: form.contactName.trim() || null,
@@ -148,7 +148,6 @@ export function NewClientWizard() {
       targetGoLiveDate: form.targetGoLiveDate || null,
       solutionDisplayName: form.solutionDisplayName.trim(),
       implementationKey: form.implementationKey,
-      instanceKey: instanceSuggestion,
       invitationEmail: form.email.trim().toLowerCase(),
       organizationRole: 'owner',
       sendInvitation: form.sendInvitation,
@@ -259,7 +258,7 @@ export function NewClientWizard() {
             <AdminField id="solutionDisplayName" label="Anzeigename der Lösung" value={form.solutionDisplayName} onChange={(v) => set('solutionDisplayName', v)} error={errors.solutionDisplayName} required />
             <AdminSelect id="implementationKey" label="Implementierung" value={form.implementationKey} onChange={(v) => set('implementationKey', v)} options={implementationKeys.map((s) => ({ value: s, label: s.replace(/_/g, ' ') }))} />
             <div className="sm:col-span-2 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
-              <p className="text-[12px] text-gray-500">Instanz-Schlüssel (automatisch): <span className="font-mono text-gray-800">{instanceSuggestion}</span></p>
+              <p className="text-[12px] text-gray-500">Der Instanz-Schlüssel wird serverseitig kollisionssicher erzeugt und nach dem Anlegen angezeigt.</p>
             </div>
             <label className="sm:col-span-2 flex items-start gap-3 rounded-xl border border-gray-100 bg-white px-4 py-3">
               <input type="checkbox" checked={form.sendInvitation} onChange={(e) => set('sendInvitation', e.target.checked)} className="mt-1 h-4 w-4 rounded border-gray-300" />

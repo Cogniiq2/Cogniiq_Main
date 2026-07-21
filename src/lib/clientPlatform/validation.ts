@@ -87,15 +87,3 @@ export function formatCents(cents: number | null | undefined, currency = 'EUR'):
 export interface FieldErrors {
   [field: string]: string;
 }
-
-// Slugify a display name into a valid instance_key candidate (matches DB check ^[a-z0-9][a-z0-9_-]{2,}$).
-export function toInstanceKeySuggestion(displayName: string): string {
-  const base = displayName
-    .toLowerCase()
-    .normalize('NFKD')
-    .replace(/[^a-z0-9]+/g, '_')
-    .replace(/^_+|_+$/g, '')
-    .slice(0, 40);
-  if (base.length >= 3) return base;
-  return `sol_${Math.random().toString(36).slice(2, 10)}`;
-}

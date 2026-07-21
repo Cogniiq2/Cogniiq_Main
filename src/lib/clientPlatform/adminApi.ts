@@ -102,6 +102,7 @@ export async function loadClientDetail(organizationId: string): Promise<AdminCli
 }
 
 export interface ProvisionClientPayload {
+  idempotencyKey: string;
   displayName: string;
   legalName?: string | null;
   primaryContactName?: string | null;
@@ -126,7 +127,6 @@ export interface ProvisionClientPayload {
   targetGoLiveDate?: string | null;
   solutionDisplayName: string;
   implementationKey: string;
-  instanceKey?: string | null;
   invitationEmail: string;
   organizationRole: string;
   sendInvitation: boolean;
@@ -149,12 +149,18 @@ export async function provisionClientViaEdge(payload: ProvisionClientPayload): P
   return data as ProvisionClientResult;
 }
 
-export async function resendInvitationViaEdge(email: string): Promise<{ ok: boolean; error?: string }> {
+// Resend is scoped to a controlled invitation record (never a free-form email). Expired
+// invitations require an explicit renewExpired flag so renewal is a deliberate action.
+export async function resendInvitationViaEdge(
+  invitationId: string,
+  renewExpired = false,
+): Promise<{ ok: boolean; error?: string }> {
   const { data, error } = await supabase.functions.invoke('admin-provision-client', {
-    body: { action: 'resend', email },
+    body: { action: 'resend', invitationId, renewExpired },
   });
   if (error) return { ok: false, error: error.message };
-  return { ok: Boolean((data as { ok?: boolean })?.ok) };
+  const result = data as { ok?: boolean; error?: string };
+  return { ok: Boolean(result?.ok), error: result?.error };
 }
 
 export async function setSolutionStatus(

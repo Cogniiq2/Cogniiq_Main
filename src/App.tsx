@@ -9,6 +9,7 @@ import { LocalBusinessSchema } from './components/LocalBusinessSchema';
 import { CanonicalManager } from './components/CanonicalManager';
 import { CityServicePage } from './components/CityServicePage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { ReceptionistEntitlementRoute } from './components/app/ReceptionistEntitlementRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { CITY_SERVICE_CONFIGS } from './lib/standorte-data';
 
@@ -417,7 +418,9 @@ function AppInner() {
             path="/app/onboarding"
             element={
               <ProtectedRoute>
-                <CustomerSectionPage section="onboarding" />
+                <ReceptionistEntitlementRoute>
+                  <CustomerSectionPage section="onboarding" />
+                </ReceptionistEntitlementRoute>
               </ProtectedRoute>
             }
           />
@@ -425,7 +428,9 @@ function AppInner() {
             path="/app/receptionist"
             element={
               <ProtectedRoute>
-                <CustomerSectionPage section="receptionist" />
+                <ReceptionistEntitlementRoute>
+                  <CustomerSectionPage section="receptionist" />
+                </ReceptionistEntitlementRoute>
               </ProtectedRoute>
             }
           />
@@ -433,7 +438,9 @@ function AppInner() {
             path="/app/knowledge"
             element={
               <ProtectedRoute>
-                <CustomerSectionPage section="knowledge" />
+                <ReceptionistEntitlementRoute>
+                  <CustomerSectionPage section="knowledge" />
+                </ReceptionistEntitlementRoute>
               </ProtectedRoute>
             }
           />
@@ -441,7 +448,9 @@ function AppInner() {
             path="/app/phone"
             element={
               <ProtectedRoute>
-                <CustomerSectionPage section="phone" />
+                <ReceptionistEntitlementRoute>
+                  <CustomerSectionPage section="phone" />
+                </ReceptionistEntitlementRoute>
               </ProtectedRoute>
             }
           />
@@ -449,7 +458,9 @@ function AppInner() {
             path="/app/test"
             element={
               <ProtectedRoute>
-                <CustomerSectionPage section="test" />
+                <ReceptionistEntitlementRoute>
+                  <CustomerSectionPage section="test" />
+                </ReceptionistEntitlementRoute>
               </ProtectedRoute>
             }
           />
@@ -457,7 +468,9 @@ function AppInner() {
             path="/app/calls"
             element={
               <ProtectedRoute>
-                <CustomerSectionPage section="calls" />
+                <ReceptionistEntitlementRoute>
+                  <CustomerSectionPage section="calls" />
+                </ReceptionistEntitlementRoute>
               </ProtectedRoute>
             }
           />
@@ -465,7 +478,9 @@ function AppInner() {
             path="/app/leads"
             element={
               <ProtectedRoute>
-                <CustomerSectionPage section="leads" />
+                <ReceptionistEntitlementRoute>
+                  <CustomerSectionPage section="leads" />
+                </ReceptionistEntitlementRoute>
               </ProtectedRoute>
             }
           />

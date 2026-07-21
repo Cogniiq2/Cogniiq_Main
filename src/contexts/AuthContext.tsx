@@ -102,15 +102,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const userId = nextSession.user.id;
 
-    // Automatic membership claim: once per authenticated user, before loading memberships.
-    // The RPC is idempotent and enforces confirmed-email / matching-email rules server-side.
-    // A user who registered with a different (or unconfirmed) email simply claims nothing.
+    // Automatic membership claim: attempted once per authenticated user, before loading
+    // memberships. The RPC is idempotent and enforces confirmed-email / matching-email rules
+    // server-side, so a successful call that claims nothing still counts as processed. Only a
+    // successful result marks the user done; a failed call leaves the flag unset so a later auth
+    // event (sign-in, token refresh) can retry, without a tight loop and without blocking login.
     if (claimedForUserRef.current !== userId) {
-      claimedForUserRef.current = userId;
       try {
-        await supabase.rpc('claim_my_client_invitations');
+        const { error } = await supabase.rpc('claim_my_client_invitations');
+        if (!error) {
+          claimedForUserRef.current = userId;
+        }
       } catch {
-        // Best-effort: an empty or failed claim must not block login, logout or refresh.
+        // Unexpected/network failure: leave the flag unset for a later retry; never block login.
       }
     }
 

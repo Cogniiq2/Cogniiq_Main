@@ -35,9 +35,10 @@ export function AdminInvitationsPage() {
     [rows, statusFilter],
   );
 
-  const resend = async (email: string) => {
-    const { ok, error: err } = await resendInvitationViaEdge(email);
-    flash(ok ? 'Einladung erneut gesendet.' : `Fehler: ${err ?? 'unbekannt'}`);
+  const resend = async (invitationId: string, renewExpired = false) => {
+    const { ok, error: err } = await resendInvitationViaEdge(invitationId, renewExpired);
+    flash(ok ? (renewExpired ? 'Einladung erneuert und gesendet.' : 'Einladung erneut gesendet.') : `Fehler: ${err ?? 'unbekannt'}`);
+    if (ok) void reload();
   };
   const revoke = async (id: string) => {
     const { error: err } = await revokeInvitation(id);
@@ -77,7 +78,12 @@ export function AdminInvitationsPage() {
                 </p>
               </div>
               <div className="flex gap-2">
-                <button type="button" onClick={() => void resend(inv.email)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-[13px] font-semibold text-gray-700 hover:border-gray-300"><RefreshCw size={14} /> Erneut senden</button>
+                {inv.status === 'pending' ? (
+                  <button type="button" onClick={() => void resend(inv.id)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-[13px] font-semibold text-gray-700 hover:border-gray-300"><RefreshCw size={14} /> Erneut senden</button>
+                ) : null}
+                {inv.status === 'expired' ? (
+                  <button type="button" onClick={() => void resend(inv.id, true)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 text-[13px] font-semibold text-amber-700 hover:bg-amber-100"><RefreshCw size={14} /> Erneuern & senden</button>
+                ) : null}
                 {inv.status === 'pending' ? (
                   <button type="button" onClick={() => void revoke(inv.id)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 text-[13px] font-semibold text-red-700 hover:bg-red-100"><XCircle size={14} /> Widerrufen</button>
                 ) : null}
