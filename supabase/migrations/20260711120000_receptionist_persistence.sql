@@ -657,12 +657,12 @@ begin
       con.conname as constraint_name,
       con.contype::text as constraint_type,
       coalesce(
-        array_agg(att.attname order by constrained_key.ordinality)
+        array_agg(att.attname::text order by constrained_key.ordinality)
           filter (where att.attname is not null),
         '{}'::text[]
       ) as constrained_columns,
       refrel.relname as referenced_table,
-      array_agg(refatt.attname order by referenced_key.ordinality)
+      array_agg(refatt.attname::text order by referenced_key.ordinality)
         filter (where refatt.attname is not null) as referenced_columns,
       con.confdeltype::text as delete_action,
 con.confupdtype::text as update_action,
