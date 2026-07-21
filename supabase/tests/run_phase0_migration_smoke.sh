@@ -33,6 +33,8 @@ exception
   when duplicate_object then null;
 end $$;
 
+alter role service_role bypassrls;
+
 do $$
 begin
   create role supabase_admin nologin;
