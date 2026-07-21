@@ -655,7 +655,7 @@ begin
     select
       rel.relname as table_name,
       con.conname as constraint_name,
-      con.contype as constraint_type,
+      con.contype::text as constraint_type,
       coalesce(
         array_agg(att.attname order by constrained_key.ordinality)
           filter (where att.attname is not null),
@@ -664,8 +664,8 @@ begin
       refrel.relname as referenced_table,
       array_agg(refatt.attname order by referenced_key.ordinality)
         filter (where refatt.attname is not null) as referenced_columns,
-      con.confdeltype as delete_action,
-      con.confupdtype as update_action,
+      con.confdeltype::text as delete_action,
+con.confupdtype::text as update_action,
       regexp_replace(lower(pg_get_constraintdef(con.oid)), '\s+', ' ', 'g') as constraint_definition,
       con.convalidated as is_validated
     from pg_constraint con
