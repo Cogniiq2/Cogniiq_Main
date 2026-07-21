@@ -317,8 +317,12 @@ const AdminPage = lazyNamed(() => import('./pages/AdminPage'), 'AdminPage');
 const ExecutionPage = lazyNamed(() => import('./pages/ExecutionPage'), 'ExecutionPage');
 const OuraAnalyticsPage = lazyNamed(() => import('./pages/OuraAnalyticsPage'), 'OuraAnalyticsPage');
 const AdminLoginPage = lazyNamed(() => import('./pages/admin/AdminLoginPage'), 'AdminLoginPage');
+const AdminClientPlatform = lazyNamed(() => import('./pages/admin/clients/AdminClientPlatform'), 'AdminClientPlatform');
 const AppHomePage = lazyNamed(() => import('./pages/app/AppHomePage'), 'AppHomePage');
 const CustomerSectionPage = lazyNamed(() => import('./pages/app/CustomerSectionPage'), 'CustomerSectionPage');
+const SolutionPage = lazyNamed(() => import('./pages/app/SolutionPage'), 'SolutionPage');
+const SolutionsIndexPage = lazyNamed(() => import('./pages/app/SolutionsIndexPage'), 'SolutionsIndexPage');
+const SupportPage = lazyNamed(() => import('./pages/app/SupportPage'), 'SupportPage');
 const LoginPage = lazyNamed(() => import('./pages/app/LoginPage'), 'LoginPage');
 const SignupPage = lazyNamed(() => import('./pages/app/SignupPage'), 'SignupPage');
 const ForgotPasswordPage = lazyNamed(() => import('./pages/app/ForgotPasswordPage'), 'ForgotPasswordPage');
@@ -350,6 +354,18 @@ function AppInner() {
         </Suspense>
       );
     }
+    if (
+      location.pathname === '/admin/clients' ||
+      location.pathname.startsWith('/admin/clients/') ||
+      location.pathname === '/admin/solutions' ||
+      location.pathname === '/admin/invitations'
+    ) {
+      return (
+        <Suspense fallback={<PageFallback />}>
+          <AdminClientPlatform />
+        </Suspense>
+      );
+    }
     return (
       <Suspense fallback={<PageFallback />}>
         <AdminPage />
@@ -370,6 +386,30 @@ function AppInner() {
             element={
               <ProtectedRoute>
                 <AppHomePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/solutions"
+            element={
+              <ProtectedRoute>
+                <SolutionsIndexPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/solutions/:instanceKey/*"
+            element={
+              <ProtectedRoute>
+                <SolutionPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/app/support"
+            element={
+              <ProtectedRoute>
+                <SupportPage />
               </ProtectedRoute>
             }
           />
