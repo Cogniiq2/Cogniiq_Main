@@ -9,6 +9,7 @@ import { secureUuid } from '@/lib/ownerFinance/api';
 import type {
   OwnerOffer, OwnerOfferLine, OwnerDocumentSettings, OwnerGeneratedDocument,
   OwnerFinanceNotification, OwnerOfferAcceptanceEvent, OwnerInvoice, OwnerInvoiceLine,
+  OwnerOfferVersion,
 } from '@/lib/ownerFinance/types';
 
 /* ----------------------------------------------------------------- Document settings */
@@ -44,14 +45,53 @@ export async function loadOffer(offerId: string): Promise<{ offer: OwnerOffer; l
 }
 
 export interface OfferLineInput {
-  description: string; quantity_milli: number; unit: string; unit_price_cents: number;
+  description: string; details?: string | null; deliverables?: string[];
+  phase_label?: string | null; duration_label?: string | null;
+  quantity_milli: number; unit: string; unit_price_cents: number;
   vat_rate_bp: number; vat_treatment: string; is_optional?: boolean; sort_order?: number;
 }
 
-export async function createOffer(header: Record<string, unknown>, lines: OfferLineInput[]): Promise<{ id: string | null; error: string | null }> {
-  const { data, error } = await supabase.rpc('create_owner_offer', { p_idempotency_key: secureUuid(), p_header: header, p_lines: lines });
+/** Structured offer-level content (JSONB arrays). */
+export interface OfferSectionsInput {
+  desired_outcomes?: string[];
+  timeline?: Array<Record<string, unknown>>;
+  payment_schedule?: Array<Record<string, unknown>>;
+}
+
+export async function createOffer(header: Record<string, unknown>, lines: OfferLineInput[], sections: OfferSectionsInput = {}): Promise<{ id: string | null; error: string | null }> {
+  const { data, error } = await supabase.rpc('create_owner_offer', { p_idempotency_key: secureUuid(), p_header: header, p_lines: lines, p_sections: sections });
   if (error) return { id: null, error: error.message };
   return { id: (data as { offer_id?: string })?.offer_id ?? null, error: null };
+}
+
+/**
+ * Atomically edit a draft offer in place (same offer id, still a draft, no number assigned).
+ * Uses optimistic concurrency: pass the offer's current `updated_at`; a stale value is rejected.
+ * Returns the new `updated_at` for the next optimistic check.
+ */
+export async function updateOfferDraft(input: {
+  offerId: string; expectedUpdatedAt: string; header: Record<string, unknown>;
+  lines: OfferLineInput[]; sections?: OfferSectionsInput;
+}): Promise<{ updatedAt: string | null; error: string | null }> {
+  const { data, error } = await supabase.rpc('update_owner_offer_draft', {
+    p_idempotency_key: secureUuid(), p_offer_id: input.offerId, p_expected_updated_at: input.expectedUpdatedAt,
+    p_header: input.header, p_lines: input.lines, p_sections: input.sections ?? {},
+  });
+  if (error) return { updatedAt: null, error: error.message };
+  return { updatedAt: (data as { updated_at?: string })?.updated_at ?? null, error: null };
+}
+
+/** Delete a pristine draft offer (never finalized/converted, no document/token/acceptance). */
+export async function deleteOfferDraft(offerId: string): Promise<{ error: string | null }> {
+  const { error } = await supabase.rpc('delete_owner_offer_draft', { p_idempotency_key: secureUuid(), p_offer_id: offerId });
+  return { error: error?.message ?? null };
+}
+
+/** Load the latest immutable finalized version snapshot for an offer (final PDFs render from this). */
+export async function loadLatestOfferVersion(offerId: string): Promise<OwnerOfferVersion | null> {
+  const { data, error } = await supabase.from('owner_offer_versions').select('*').eq('offer_id', offerId).order('version', { ascending: false }).limit(1).maybeSingle();
+  if (error) throw error;
+  return (data as OwnerOfferVersion | null) ?? null;
 }
 
 export async function finalizeOffer(offerId: string): Promise<{ error: string | null; offerNumber?: string }> {

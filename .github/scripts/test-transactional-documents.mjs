@@ -26,6 +26,8 @@ const [model, validation, hash, txpdf, pdf] = await Promise.all([
 const fname = await bundle('lib/ownerFinance/documents/documentFilename.ts');
 const structured = await bundle('lib/ownerFinance/documents/structuredInvoice.ts');
 const sig = await bundle('lib/ownerFinance/documents/signatureProvider.ts');
+const premium = await bundle('lib/ownerFinance/documents/premium/premiumSource.ts');
+const buildDoc = await bundle('lib/ownerFinance/buildTransactionalDoc.ts');
 
 let failures = 0;
 const eq = (a, b, m) => { if (a !== b) { console.error(`FAIL: ${m} — expected ${JSON.stringify(b)}, got ${JSON.stringify(a)}`); failures++; } };
@@ -135,6 +137,68 @@ ok(!sig.levelSupported(cfg, 'advanced_provider_signature'), 'native does NOT cla
 ok(!sig.levelSupported(cfg, 'qualified_provider_signature'), 'native does NOT claim qualified signature');
 ok(!sig.levelSupported({ mode: 'disabled', maxLevel: 'qualified_provider_signature' }, 'electronic_acceptance'), 'disabled mode supports nothing');
 eq(sig.EXTERNAL_PROVIDER_NOT_CONFIGURED, 'Externer Signaturdienst nicht konfiguriert', 'unconfigured provider message');
+
+/* ---- Validation profiles: offer must NOT require a service date; invoice must ---- */
+const offerNoService = { ...baseOffer, serviceDate: null, servicePeriodStart: null, servicePeriodEnd: null, paymentTerms: '14 Tage netto' };
+ok(validation.validateOfferForFinalization(offerNoService).canFinalize, 'offer finalizes WITHOUT a service date');
+ok(!validation.validateOfferForFinalization(offerNoService).items.some((i) => i.key === 'service'), 'offer profile has no service-date item');
+ok(!validation.validateOfferForFinalization({ ...offerNoService, paymentTerms: null }).canFinalize, 'offer requires payment terms');
+ok(!validation.validateOfferForFinalization({ ...offerNoService, validUntil: null }).canFinalize, 'offer requires validity date');
+const invNoService = { ...baseOffer, kind: 'invoice', documentNumber: 'RE-1', dueDate: '2026-04-01', bank: { iban: 'DE89370400440532013000' }, serviceDate: null, servicePeriodStart: null, servicePeriodEnd: null };
+ok(!validation.validateInvoiceForIssuance(invNoService).canFinalize, 'invoice REQUIRES a service date/period');
+ok(validation.validateInvoiceForIssuance({ ...invNoService, serviceDate: '2026-03-15' }).canFinalize, 'invoice issues with a service date');
+// Payment schedule must sum to 100%.
+ok(!validation.validateOfferForFinalization({ ...offerNoService, paymentSchedule: [{ label: 'A', percentageBp: 3000 }, { label: 'B', percentageBp: 3000 }] }).canFinalize, 'unbalanced payment schedule blocks finalization');
+ok(validation.validateOfferForFinalization({ ...offerNoService, paymentSchedule: [{ label: 'A', percentageBp: 3000 }, { label: 'B', percentageBp: 7000 }] }).canFinalize, 'balanced payment schedule (100%) finalizes');
+// Draft profile is light.
+ok(validation.validateOfferDraft(offerNoService).canFinalize, 'a complete-enough draft passes the draft profile');
+
+/* ---- Premium source model (shared by PDF + HTML preview) ---- */
+const premiumLines = [
+  line({ description: 'Modul A', unitPriceCents: 4000000 }),
+  line({ description: 'Modul B', unitPriceCents: 4000000 }),
+  line({ description: 'Optional', isOptional: true, unitPriceCents: 1000000 }),
+];
+const premiumNet = premiumLines.filter((l) => !l.isOptional).reduce((s, l) => s + l.netCents, 0);
+const premiumVat = premiumLines.filter((l) => !l.isOptional).reduce((s, l) => s + l.vatCents, 0);
+const premiumDoc = {
+  ...baseOffer, lines: premiumLines, netTotalCents: premiumNet, vatTotalCents: premiumVat, grossTotalCents: premiumNet + premiumVat,
+  subtitle: 'Untertitel', desiredOutcomes: ['Ziel A', 'Ziel B'], executiveSummary: 'Kurz',
+  timeline: [{ phase: 'Phase 1', title: 'Analyse', duration: '3 Wochen' }],
+  paymentSchedule: [{ label: 'Anzahlung', percentageBp: 3000 }, { label: 'Rest', percentageBp: 7000 }],
+  brandAccent: '#0F766E',
+};
+const psrc = premium.buildPremiumSource(premiumDoc);
+eq(psrc.modules.length, 2, 'premium source: base modules exclude optional');
+eq(psrc.optionalModules.length, 1, 'premium source: optional modules separated');
+ok(/80\.000,00/.test(psrc.investment.netLabel), 'premium source: net total formatted');
+ok(/95\.200,00/.test(psrc.investment.grossLabel), 'premium source: gross total formatted');
+eq(psrc.payment.rows.length, 2, 'premium source: payment rows');
+ok(psrc.payment.rows[0].amountLabel && /24\.000,00/.test(psrc.payment.rows[0].amountLabel), 'premium source: milestone amount computed against net');
+ok(psrc.payment.balanced, 'premium source: balanced payment schedule');
+eq(psrc.desiredOutcomes.length, 2, 'premium source: desired outcomes carried');
+ok(psrc.accent === '#0F766E', 'premium source: brand accent honoured');
+ok(!/vat_treatment|standard/.test(JSON.stringify(psrc.investment.vatRows)), 'premium source: no technical VAT labels');
+
+/* ---- snapshotToDocument: finalized offers render from the frozen snapshot ---- */
+const snapshot = {
+  offer: { title: 'Snap Titel', subtitle: 'Sub', issue_date: '2026-05-01', valid_until: '2026-06-01', currency: 'EUR',
+    introduction: 'Intro', desired_outcomes: ['O1'], net_total_cents: 8000000, vat_total_cents: 1520000, gross_total_cents: 9520000 },
+  lines: [{ description: 'Modul', unit: 'Pauschal', quantity_milli: 1000, unit_price_cents: 8000000, vat_rate_bp: 1900, vat_treatment: 'standard', net_cents: 8000000, vat_cents: 1520000, gross_cents: 9520000, is_optional: false }],
+  seller: { legal_name: 'Frozen Seller GmbH', street: 'Alt 1', postal_code: '10115', city: 'Berlin', vat_id: 'DE1' },
+  recipient: { company: 'Frozen Kunde', contact_name: 'Herr X', street: 'Weg 2', postal_code: '80331', city: 'München' },
+  document_settings: { document_language: 'de', default_offer_footer: 'Fuß', default_offer_closing: 'Gruß' },
+  template_key: 'cogniiq-premium-offer-v2', template_version: 'cogniiq-premium-offer-v2', offer_number: 'AN-2026-0001', version: 1,
+};
+const snapDoc = buildDoc.snapshotToDocument(snapshot);
+eq(snapDoc.seller.name, 'Frozen Seller GmbH', 'snapshot doc: seller from snapshot');
+eq(snapDoc.recipient.name, 'Frozen Kunde', 'snapshot doc: recipient company from snapshot');
+eq(snapDoc.documentNumber, 'AN-2026-0001', 'snapshot doc: offer number from snapshot');
+eq(snapDoc.isDraft, false, 'snapshot doc: not a draft');
+eq(snapDoc.grossTotalCents, 9520000, 'snapshot doc: totals from snapshot');
+ok(snapDoc.footer === 'Fuß' && snapDoc.closing === 'Gruß', 'snapshot doc: footer + closing from frozen settings');
+const psnap = premium.buildPremiumSource(snapDoc);
+eq(psnap.seller.legalName, 'Frozen Seller GmbH', 'snapshot premium source stable seller');
 
 if (failures > 0) { console.error(`\ntransactional document tests: ${failures} FAILED`); process.exit(1); }
 console.log('transactional document tests: ALL PASSED');

@@ -258,6 +258,33 @@ export interface OwnerDocumentSettings {
 export type OwnerOfferStatus =
   | 'draft' | 'finalized' | 'sent' | 'viewed' | 'accepted' | 'rejected' | 'expired' | 'cancelled' | 'converted';
 
+export interface OfferTimelinePhase {
+  phase?: string | null;
+  title?: string | null;
+  duration?: string | null;
+  description?: string | null;
+}
+
+export interface OfferPaymentMilestone {
+  label: string;
+  percentage_bp?: number | null;
+  amount_cents?: number | null;
+  note?: string | null;
+}
+
+/** Immutable finalized-version snapshot row. */
+export interface OwnerOfferVersion {
+  id: string;
+  offer_id: string;
+  version: number;
+  offer_number: string | null;
+  snapshot: Record<string, unknown>;
+  source_hash: string;
+  template_key: string | null;
+  template_version: string | null;
+  finalized_at: string;
+}
+
 export interface OwnerOffer {
   id: string;
   business_entity_id: string;
@@ -277,6 +304,27 @@ export interface OwnerOffer {
   payment_terms: string | null;
   delivery_terms: string | null;
   internal_notes: string | null;
+  // Structured premium content (migration 20260723123000).
+  subtitle: string | null;
+  executive_summary: string | null;
+  project_approach: string | null;
+  next_steps: string | null;
+  desired_outcomes: string[];
+  timeline: OfferTimelinePhase[];
+  payment_schedule: OfferPaymentMilestone[];
+  template_key: string;
+  // Offer-specific recipient snapshot/override (never written back to CRM).
+  recipient_source: 'crm' | 'manual';
+  recipient_company: string | null;
+  recipient_contact_name: string | null;
+  recipient_department: string | null;
+  recipient_street: string | null;
+  recipient_postal_code: string | null;
+  recipient_city: string | null;
+  recipient_country_code: string | null;
+  recipient_email: string | null;
+  recipient_phone: string | null;
+  recipient_vat_id: string | null;
   net_total_cents: number;
   vat_total_cents: number;
   gross_total_cents: number;
@@ -295,6 +343,10 @@ export interface OwnerOfferLine {
   id: string;
   offer_id: string;
   description: string;
+  details: string | null;
+  deliverables: string[];
+  phase_label: string | null;
+  duration_label: string | null;
   quantity_milli: number;
   unit: string;
   unit_price_cents: number;

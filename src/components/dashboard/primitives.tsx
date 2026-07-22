@@ -87,9 +87,9 @@ export function Spinner({ className }: { className?: string }) {
 
 /* ------------------------------------------------------------------ Surfaces */
 
-export function Card({ children, className, as: As = 'div' }: { children: ReactNode; className?: string; as?: 'div' | 'section' }) {
+export function Card({ children, className, as: As = 'div', id }: { children: ReactNode; className?: string; as?: 'div' | 'section'; id?: string }) {
   return (
-    <As className={cn('rounded-[20px] border border-gray-100 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.04)]', className)}>
+    <As id={id} className={cn('rounded-[20px] border border-gray-100 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.04)]', className)}>
       {children}
     </As>
   );

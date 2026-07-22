@@ -30,7 +30,7 @@ export async function generateAndStoreDocument(
   entityId: string,
   sourceResourceId: string,
   doc: TransactionalDocument,
-  opts: { requireValid?: boolean } = {},
+  opts: { requireValid?: boolean; render?: (doc: TransactionalDocument) => Promise<Uint8Array> } = {},
 ): Promise<GenerateResult> {
   const hash = documentHash(doc);
   const validation = validateTransactionalDocument(doc);
@@ -38,7 +38,7 @@ export async function generateAndStoreDocument(
     return { documentId: null, version: null, sourceHash: hash, storagePath: null, error: 'Pflichtangaben fehlen', blocked: validation.missing };
   }
 
-  const bytes = await renderTransactionalPdf(doc);
+  const bytes = await (opts.render ?? renderTransactionalPdf)(doc);
   const rand = secureUuid().replace(/-/g, '');
   const path = documentStoragePath(entityId, doc.kind, 1, rand);
 

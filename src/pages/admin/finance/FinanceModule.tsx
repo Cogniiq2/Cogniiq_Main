@@ -9,6 +9,7 @@ import { InvoicesPage } from '@/pages/owner/InvoicesPage';
 import { InvoiceDetailPage } from '@/pages/owner/InvoiceDetailPage';
 import { OffersPage } from '@/pages/owner/OffersPage';
 import { OfferDetailPage } from '@/pages/owner/OfferDetailPage';
+import { OfferEditor } from '@/pages/owner/OfferEditor';
 import { ExpensesPage } from '@/pages/owner/ExpensesPage';
 import { TaxesPage } from '@/pages/owner/TaxesPage';
 import { SettingsPage } from '@/pages/owner/SettingsPage';
@@ -39,6 +40,8 @@ function FinanceRoutes() {
       <Route index element={<Navigate to="overview" replace />} />
       <Route path="overview" element={<OverviewPage />} />
       <Route path="offers" element={<OffersPage />} />
+      <Route path="offers/new" element={<OfferEditor />} />
+      <Route path="offers/:offerId/edit" element={<OfferEditor />} />
       <Route path="offers/:offerId" element={<OfferDetailPage />} />
       <Route path="invoices" element={<InvoicesPage />} />
       <Route path="invoices/:invoiceId" element={<InvoiceDetailPage />} />
