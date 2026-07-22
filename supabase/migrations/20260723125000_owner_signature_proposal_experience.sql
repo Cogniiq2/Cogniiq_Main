@@ -80,6 +80,81 @@ alter table public.owner_document_settings
 commit;
 
 -- ---------------------------------------------------------------------------
+-- 3b. upsert_owner_document_settings — re-created to ALSO persist the automation
+--     settings. Body is the 20260723120000 version plus the six automation columns on
+--     both INSERT and the ON CONFLICT update. Owner-only; unchanged security.
+-- ---------------------------------------------------------------------------
+begin;
+
+create or replace function public.upsert_owner_document_settings(p_entity uuid, p_settings jsonb)
+returns jsonb language plpgsql security definer set search_path = public, pg_temp as $$
+declare v_row public.owner_document_settings;
+begin
+  if not public.is_platform_owner() then raise exception 'Owner access required'; end if;
+  if p_entity is null then raise exception 'business_entity_id is required'; end if;
+  if not exists (select 1 from public.owner_business_entities where id = p_entity) then
+    raise exception 'unknown business entity';
+  end if;
+
+  insert into public.owner_document_settings as s (
+    business_entity_id, legal_name, owner_name, street, postal_code, city, country_code,
+    business_email, business_phone, website, tax_number, vat_id,
+    bank_account_holder, iban, bic, bank_name,
+    default_payment_terms_days, default_offer_validity_days, default_invoice_footer, default_offer_footer,
+    default_offer_intro, default_offer_closing, invoice_number_prefix, offer_number_prefix,
+    document_language, logo_storage_path, brand_accent,
+    auto_create_invoice_on_acceptance, auto_issue_invoice_on_acceptance, auto_send_invoice_on_acceptance,
+    default_invoice_due_days, invoice_email_subject_template, invoice_email_body_template, created_by)
+  values (
+    p_entity, p_settings->>'legal_name', p_settings->>'owner_name', p_settings->>'street',
+    p_settings->>'postal_code', p_settings->>'city', coalesce(p_settings->>'country_code', 'DE'),
+    nullif(p_settings->>'business_email', ''), p_settings->>'business_phone', p_settings->>'website',
+    p_settings->>'tax_number', p_settings->>'vat_id',
+    p_settings->>'bank_account_holder', nullif(p_settings->>'iban', ''), nullif(p_settings->>'bic', ''), p_settings->>'bank_name',
+    coalesce((p_settings->>'default_payment_terms_days')::int, 14),
+    coalesce((p_settings->>'default_offer_validity_days')::int, 30),
+    p_settings->>'default_invoice_footer', p_settings->>'default_offer_footer',
+    p_settings->>'default_offer_intro', p_settings->>'default_offer_closing',
+    coalesce(p_settings->>'invoice_number_prefix', 'RE'), coalesce(p_settings->>'offer_number_prefix', 'AN'),
+    coalesce(p_settings->>'document_language', 'de'), p_settings->>'logo_storage_path',
+    nullif(p_settings->>'brand_accent', ''),
+    coalesce((p_settings->>'auto_create_invoice_on_acceptance')::boolean, true),
+    coalesce((p_settings->>'auto_issue_invoice_on_acceptance')::boolean, false),
+    coalesce((p_settings->>'auto_send_invoice_on_acceptance')::boolean, false),
+    coalesce((p_settings->>'default_invoice_due_days')::int, 14),
+    nullif(p_settings->>'invoice_email_subject_template',''), nullif(p_settings->>'invoice_email_body_template',''),
+    auth.uid())
+  on conflict (business_entity_id) do update set
+    legal_name = excluded.legal_name, owner_name = excluded.owner_name, street = excluded.street,
+    postal_code = excluded.postal_code, city = excluded.city, country_code = excluded.country_code,
+    business_email = excluded.business_email, business_phone = excluded.business_phone, website = excluded.website,
+    tax_number = excluded.tax_number, vat_id = excluded.vat_id,
+    bank_account_holder = excluded.bank_account_holder, iban = excluded.iban, bic = excluded.bic, bank_name = excluded.bank_name,
+    default_payment_terms_days = excluded.default_payment_terms_days,
+    default_offer_validity_days = excluded.default_offer_validity_days,
+    default_invoice_footer = excluded.default_invoice_footer, default_offer_footer = excluded.default_offer_footer,
+    default_offer_intro = excluded.default_offer_intro, default_offer_closing = excluded.default_offer_closing,
+    invoice_number_prefix = excluded.invoice_number_prefix, offer_number_prefix = excluded.offer_number_prefix,
+    document_language = excluded.document_language, logo_storage_path = excluded.logo_storage_path,
+    brand_accent = excluded.brand_accent,
+    auto_create_invoice_on_acceptance = excluded.auto_create_invoice_on_acceptance,
+    auto_issue_invoice_on_acceptance = excluded.auto_issue_invoice_on_acceptance,
+    auto_send_invoice_on_acceptance = excluded.auto_send_invoice_on_acceptance,
+    default_invoice_due_days = excluded.default_invoice_due_days,
+    invoice_email_subject_template = excluded.invoice_email_subject_template,
+    invoice_email_body_template = excluded.invoice_email_body_template
+  returning s.* into v_row;
+
+  return to_jsonb(v_row);
+end;
+$$;
+
+revoke execute on function public.upsert_owner_document_settings(uuid, jsonb) from public, anon;
+grant execute on function public.upsert_owner_document_settings(uuid, jsonb) to authenticated, service_role;
+
+commit;
+
+-- ---------------------------------------------------------------------------
 -- 4. Durable automation-job / email-outbox table. One row per (offer, job_type)
 --    is enforced by a unique dedupe key, so repeated acceptance never enqueues a
 --    second invoice/email job. Bounded retries; owner-visible last error summary.
@@ -732,7 +807,7 @@ begin
   select * into inv from public.owner_invoices where id = o.converted_invoice_id;
 
   select coalesce(jsonb_agg(jsonb_build_object(
-    'job_type', j.job_type, 'status', j.status, 'attempt_count', j.attempt_count,
+    'id', j.id, 'job_type', j.job_type, 'status', j.status, 'attempt_count', j.attempt_count,
     'last_error', j.last_error, 'provider_message_id', j.provider_message_id,
     'sent_at', j.sent_at, 'updated_at', j.updated_at) order by j.created_at), '[]'::jsonb)
   into v_jobs from public.owner_automation_jobs j where j.offer_id = p_offer_id;

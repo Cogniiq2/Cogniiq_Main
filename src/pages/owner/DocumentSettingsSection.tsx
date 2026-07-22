@@ -59,6 +59,10 @@ export function DocumentSettingsSection({ entityId, entityName }: { entityId: st
     (Object.keys(draft) as Array<keyof OwnerDocumentSettings>).forEach((k) => { patch[k] = draft[k] ?? null; });
     if (draft.default_payment_terms_days) patch.default_payment_terms_days = Number(draft.default_payment_terms_days);
     if (draft.default_offer_validity_days) patch.default_offer_validity_days = Number(draft.default_offer_validity_days);
+    if (draft.default_invoice_due_days) patch.default_invoice_due_days = Number(draft.default_invoice_due_days);
+    // Automation toggles are stored as real booleans (checkbox drafts are 'true'/'false' strings).
+    (['auto_create_invoice_on_acceptance', 'auto_issue_invoice_on_acceptance', 'auto_send_invoice_on_acceptance'] as const)
+      .forEach((k) => { if (draft[k] != null) patch[k] = draft[k] === 'true'; });
     const { error } = await upsertDocumentSettings(entityId, patch);
     setSaving(false);
     if (error) { toast.error('Speichern fehlgeschlagen', error); return; }
@@ -97,6 +101,30 @@ export function DocumentSettingsSection({ entityId, entityName }: { entityId: st
           <div className="mt-4 grid gap-4">
             <Textarea id="default_offer_intro" label="Standard-Einleitung (Angebot)" value={draft.default_offer_intro ?? ''} onChange={(v) => set('default_offer_intro', v)} rows={2} />
             <Textarea id="default_invoice_footer" label="Standard-Fußzeile (Rechnung)" value={draft.default_invoice_footer ?? ''} onChange={(v) => set('default_invoice_footer', v)} rows={2} />
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-gray-100 p-5">
+          <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Automatik bei Annahme</p>
+          <p className="mb-3 text-[12px] text-gray-500">Steuern Sie, was nach einer verbindlichen Kundenannahme automatisch geschieht. Ausstellen und Versand sind aus Sicherheitsgründen erst nach bewusster Aktivierung aktiv.</p>
+          <div className="space-y-2.5">
+            {([
+              { key: 'auto_create_invoice_on_acceptance', label: 'Rechnungsentwurf automatisch erstellen', def: true },
+              { key: 'auto_issue_invoice_on_acceptance', label: 'Rechnung automatisch ausstellen', def: false },
+              { key: 'auto_send_invoice_on_acceptance', label: 'Rechnung automatisch versenden', def: false },
+            ] as const).map((row) => (
+              <label key={row.key} className="flex items-center gap-3 text-[13px] text-gray-700">
+                <input type="checkbox"
+                  checked={(draft[row.key] ?? String(row.def)) === 'true'}
+                  onChange={(e) => set(row.key, String(e.target.checked))}
+                  className="h-4 w-4 rounded border-gray-300" />
+                {row.label}
+              </label>
+            ))}
+          </div>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <Field id="default_invoice_due_days" label="Rechnungs-Fälligkeit (Tage)" value={draft.default_invoice_due_days ?? '14'} onChange={(v) => set('default_invoice_due_days', v)} inputMode="numeric" />
+            <Field id="invoice_email_subject_template" label="Rechnungs-E-Mail Betreff (optional)" value={draft.invoice_email_subject_template ?? ''} onChange={(v) => set('invoice_email_subject_template', v)} />
           </div>
         </div>
 

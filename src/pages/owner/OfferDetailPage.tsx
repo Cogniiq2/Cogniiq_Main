@@ -10,10 +10,12 @@ import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import { offerStatusTone } from '@/pages/owner/OffersPage';
 import { PremiumOfferPreview } from '@/pages/owner/PremiumOfferPreview';
 import { PremiumPdfPreviewDialog } from '@/components/finance/PremiumPdfPreviewDialog';
+import { SendOfferDialog } from '@/components/finance/SendOfferDialog';
 import {
   loadOffer, finalizeOffer, createOfferRevision, setOfferStatus, convertOfferToInvoiceDraft,
   createOfferAccessToken, loadOfferAcceptanceEvents, loadGeneratedDocuments, signedDocumentUrl,
   deleteOfferDraft, loadLatestOfferVersion, loadDocumentSettings,
+  loadAcceptanceSummary, signedSignatureUrl, retryAutomationJob,
 } from '@/lib/ownerFinance/offersApi';
 import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
 import { offerToDocument, snapshotToDocument } from '@/lib/ownerFinance/buildTransactionalDoc';
@@ -23,12 +25,17 @@ import { renderPremiumPdf } from '@/lib/ownerFinance/documents/premium';
 import { generateAndStoreDocument } from '@/lib/ownerFinance/generateDocument';
 import { formatCents } from '@/lib/clientPlatform/validation';
 import { formatDateDe } from '@/lib/ownerFinance/exports';
-import type { OwnerOffer, OwnerOfferLine, OwnerDocumentSettings, OwnerOfferAcceptanceEvent, OwnerGeneratedDocument, OwnerOfferVersion } from '@/lib/ownerFinance/types';
+import type { OwnerOffer, OwnerOfferLine, OwnerDocumentSettings, OwnerOfferAcceptanceEvent, OwnerGeneratedDocument, OwnerOfferVersion, OwnerOfferAcceptanceSummary } from '@/lib/ownerFinance/types';
 
 const statusLabel: Record<string, string> = {
   draft: 'Entwurf', finalized: 'Finalisiert', sent: 'Versendet', viewed: 'Angesehen',
   accepted: 'Angenommen', rejected: 'Abgelehnt', expired: 'Abgelaufen', cancelled: 'Storniert', converted: 'Umgewandelt',
 };
+
+const jobLabel = (t: string): string => ({
+  invoice_create: 'Rechnung erstellen', invoice_issue: 'Rechnung ausstellen',
+  invoice_send: 'Rechnung senden', invoice_email: 'Rechnungs-E-Mail', offer_email: 'Angebots-E-Mail',
+}[t] ?? t);
 
 export function OfferDetailPage() {
   const { offerId } = useParams<{ offerId: string }>();
@@ -43,6 +50,7 @@ export function OfferDetailPage() {
   const [events, setEvents] = useState<OwnerOfferAcceptanceEvent[]>([]);
   const [docs, setDocs] = useState<OwnerGeneratedDocument[]>([]);
   const [version, setVersion] = useState<OwnerOfferVersion | null>(null);
+  const [summary, setSummary] = useState<OwnerOfferAcceptanceSummary | null>(null);
   const [recipient, setRecipient] = useState<{ name: string; addressLines: string[]; email: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,6 +59,7 @@ export function OfferDetailPage() {
   const [confirmReject, setConfirmReject] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [sendOpen, setSendOpen] = useState(false);
 
   const load = useCallback(async () => {
     if (!offerId || !entity) return;
@@ -65,6 +74,9 @@ export function OfferDetailPage() {
       ]);
       if (!res) { setError('Angebot nicht gefunden'); return; }
       setOffer(res.offer); setLines(res.lines); setSettings(settingsRow); setEvents(evts); setDocs(generated); setVersion(ver);
+      if (['accepted', 'converted'].includes(res.offer.status)) {
+        loadAcceptanceSummary(offerId).then(setSummary).catch(() => setSummary(null));
+      } else setSummary(null);
       const c = clients.find((x) => x.organizationId === res.offer.organization_id);
       setRecipient(c ? { name: c.account?.legal_name ?? c.organizationName, addressLines: (c.account?.address ?? '').split('\n').filter(Boolean), email: c.account?.primary_email ?? null } : null);
       setError(null);
@@ -73,6 +85,17 @@ export function OfferDetailPage() {
   }, [offerId, entity]);
 
   useEffect(() => { void load(); }, [load]);
+
+  const openSignature = useCallback(async (path: string) => {
+    const { url } = await signedSignatureUrl(path);
+    if (url) window.open(url, '_blank', 'noopener,noreferrer');
+    else toast.error('Unterschrift konnte nicht geladen werden.');
+  }, [toast]);
+
+  const retryJob = useCallback(async (job: { id: string }) => {
+    const { error } = await retryAutomationJob(job.id);
+    if (error) toast.error('Erneuter Versuch fehlgeschlagen.'); else { toast.success('Wird erneut versucht.'); void load(); }
+  }, [toast, load]);
 
   const isDraft = offer?.status === 'draft';
 
@@ -184,7 +207,8 @@ export function OfferDetailPage() {
                 <Button size="sm" variant="secondary" icon={Eye} onClick={() => setPreviewOpen(true)}>Vorschau</Button>
                 <Button size="sm" variant="secondary" icon={Download} onClick={downloadPdf} loading={busy === 'download'}>PDF herunterladen</Button>
                 <Button size="sm" variant="secondary" icon={Save} onClick={generateStore} loading={busy === 'generate'}>PDF speichern</Button>
-                {offer.status !== 'converted' && offer.status !== 'cancelled' ? <Button size="sm" variant="secondary" icon={Link2} onClick={createLink} loading={busy === 'link'}>Sicheren Link erstellen</Button> : null}
+                {['finalized', 'sent', 'viewed'].includes(offer.status) ? <Button size="sm" icon={Link2} onClick={() => setSendOpen(true)}>Angebot versenden</Button> : null}
+                {offer.status !== 'converted' && offer.status !== 'cancelled' ? <Button size="sm" variant="ghost" icon={Copy} onClick={createLink} loading={busy === 'link'}>Nur Link kopieren</Button> : null}
                 {offer.status !== 'converted' && offer.status !== 'cancelled' ? <Button size="sm" variant="secondary" icon={GitBranch} onClick={revision} loading={busy === 'revision'}>Revision erstellen</Button> : null}
                 {canConvert ? <Button size="sm" icon={Copy} onClick={convert} loading={busy === 'convert'}>Rechnungsentwurf erstellen</Button> : null}
               </>
@@ -207,6 +231,53 @@ export function OfferDetailPage() {
       <div className="grid gap-5 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-5">
           <PremiumOfferPreview doc={doc} />
+
+          {summary?.accepted ? (
+            <Card className="p-6">
+              <div className="mb-4 flex items-center justify-between">
+                <SectionHeader title="Angenommen" description="Online-Annahme mit einfacher elektronischer Signatur." />
+                <StatusBadge label="Angenommen" tone="success" />
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <dl className="space-y-1.5 text-[13px]">
+                  <div className="flex justify-between gap-4"><dt className="text-gray-400">Unterschrieben von</dt><dd className="text-gray-800">{summary.signer_name ?? '—'}</dd></div>
+                  {summary.signer_company ? <div className="flex justify-between gap-4"><dt className="text-gray-400">Unternehmen</dt><dd className="text-gray-800">{summary.signer_company}</dd></div> : null}
+                  {summary.signer_role ? <div className="flex justify-between gap-4"><dt className="text-gray-400">Rolle</dt><dd className="text-gray-800">{summary.signer_role}</dd></div> : null}
+                  {summary.signer_email ? <div className="flex justify-between gap-4"><dt className="text-gray-400">E-Mail</dt><dd className="text-gray-800">{summary.signer_email}</dd></div> : null}
+                  <div className="flex justify-between gap-4"><dt className="text-gray-400">Zeitpunkt</dt><dd className="text-gray-800">{formatDateDe(summary.accepted_at ?? undefined)}</dd></div>
+                  <div className="flex justify-between gap-4"><dt className="text-gray-400">Betrag</dt><dd className="tabular-nums font-semibold text-gray-900">{formatCents(summary.accepted_gross_cents ?? 0, summary.currency ?? 'EUR')}</dd></div>
+                  <div className="flex justify-between gap-4"><dt className="text-gray-400">Version / Hash</dt><dd className="text-gray-600">v{summary.document_version ?? '—'} · {summary.source_hash ? summary.source_hash.slice(0, 12) + '…' : '—'}</dd></div>
+                </dl>
+                <div>
+                  {summary.signature_storage_path ? (
+                    <button onClick={() => void openSignature(summary.signature_storage_path!)} className="mb-3 rounded-xl border border-gray-200 px-3 py-2 text-[13px] font-medium text-gray-700 hover:border-gray-300">Unterschrift anzeigen</button>
+                  ) : null}
+                  {summary.invoice ? (
+                    <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3 text-[13px]">
+                      <div className="flex items-center justify-between"><span className="text-gray-500">Rechnung</span><StatusBadge label={summary.invoice.status} tone={summary.invoice.status === 'draft' ? 'warning' : 'success'} /></div>
+                      <p className="mt-1 text-gray-700">{summary.invoice.invoice_number ?? 'Entwurf'} · {formatCents(summary.invoice.gross_total_cents, summary.currency ?? 'EUR')}</p>
+                      <button onClick={() => navigate(`/admin/finance/invoices/${summary.invoice!.id}`)} className="mt-1 text-[12px] text-gray-700 underline">Rechnung öffnen</button>
+                    </div>
+                  ) : (
+                    <p className="text-[12px] text-gray-400">Noch keine Rechnung erstellt.</p>
+                  )}
+                  {summary.automation_jobs.length ? (
+                    <ul className="mt-3 space-y-1.5 text-[12px]">
+                      {summary.automation_jobs.map((j, i) => (
+                        <li key={i} className="flex items-center justify-between gap-2">
+                          <span className="text-gray-500">{jobLabel(j.job_type)}</span>
+                          <span className="flex items-center gap-2">
+                            <StatusBadge label={j.status} tone={j.status === 'sent' ? 'success' : j.status === 'failed' ? 'danger' : 'neutral'} />
+                            {j.status === 'failed' ? <button onClick={() => void retryJob(j)} className="text-[11px] text-gray-700 underline">Erneut versuchen</button> : null}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              </div>
+            </Card>
+          ) : null}
 
           {events.length > 0 ? (
             <Card className="p-6">
@@ -275,6 +346,17 @@ export function OfferDetailPage() {
         title={isDraft ? 'Vorschau (Entwurf)' : `Vorschau · ${offer.offer_number ?? ''}`}
         description={isDraft ? 'Entwurf — noch nicht finalisiert.' : 'Finalisiertes Angebot aus dem unveränderlichen Snapshot.'}
       />
+
+      {sendOpen ? (
+        <SendOfferDialog
+          offer={offer}
+          documentId={docs[0]?.id ?? null}
+          validDays={settings?.default_offer_validity_days ?? 30}
+          sellerName={settings?.legal_name ?? entity?.display_name ?? 'Cogniiq'}
+          onClose={() => setSendOpen(false)}
+          onSent={() => { void load(); }}
+        />
+      ) : null}
     </>
   );
 }

@@ -138,6 +138,20 @@ begin
   raise notice 'PASS acceptance is idempotent (one invoice, one issue+send job, no duplicates)';
 end $$;
 
+-- automation settings round-trip through the owner upsert RPC (booleans persisted).
+select set_config('app.role','owner',false);
+do $$
+declare v_entity uuid := '22222222-2222-2222-2222-222222222222'; r jsonb; v_send boolean;
+begin
+  r := public.upsert_owner_document_settings(v_entity, jsonb_build_object(
+    'legal_name','Cogniiq UG','street','Beispielstr. 1','city','Berlin','business_email','info@cogniiq.de',
+    'auto_send_invoice_on_acceptance', true, 'default_invoice_due_days', 21));
+  select auto_send_invoice_on_acceptance into v_send from public.owner_document_settings where business_entity_id = v_entity;
+  if v_send is not true then raise exception 'TEST settings: auto_send not persisted'; end if;
+  if (r->>'default_invoice_due_days')::int <> 21 then raise exception 'TEST settings: due days not persisted'; end if;
+  raise notice 'PASS automation settings persist through the owner upsert RPC';
+end $$;
+
 -- (16) a REJECTED offer creates no invoice and no automation job.
 select set_config('app.role','owner',false);
 do $$

@@ -180,6 +180,26 @@ export async function loadOfferAcceptanceEvents(offerId: string): Promise<OwnerO
   return (data ?? []) as OwnerOfferAcceptanceEvent[];
 }
 
+/** Owner-only curated acceptance summary (signer, amount, signature path, invoice + automation status). */
+export async function loadAcceptanceSummary(offerId: string): Promise<import('@/lib/ownerFinance/types').OwnerOfferAcceptanceSummary | null> {
+  const { data, error } = await supabase.rpc('owner_offer_acceptance_summary', { p_offer_id: offerId });
+  if (error) return null;
+  return (data as import('@/lib/ownerFinance/types').OwnerOfferAcceptanceSummary) ?? null;
+}
+
+/** Short-lived signed URL for a private drawn signature (owner context only). */
+export async function signedSignatureUrl(storagePath: string, expiresIn = 120): Promise<{ url: string | null; error: string | null }> {
+  const { data, error } = await supabase.storage.from('owner-offer-signatures').createSignedUrl(storagePath, expiresIn);
+  if (error) return { url: null, error: error.message };
+  return { url: data?.signedUrl ?? null, error: null };
+}
+
+/** Manually re-arm a failed automation job from the owner dashboard. */
+export async function retryAutomationJob(jobId: string): Promise<{ error: string | null }> {
+  const { error } = await supabase.from('owner_automation_jobs').update({ status: 'retrying', last_error: null }).eq('id', jobId);
+  return { error: error?.message ?? null };
+}
+
 /* ----------------------------------------------------------------- Invoice detail */
 
 export async function loadInvoiceDetail(invoiceId: string): Promise<{

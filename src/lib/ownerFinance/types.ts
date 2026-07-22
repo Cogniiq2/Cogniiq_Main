@@ -252,6 +252,13 @@ export interface OwnerDocumentSettings {
   document_language: string;
   logo_storage_path: string | null;
   brand_accent: string | null;
+  // Invoice automation on acceptance (create default on; issue/send default off).
+  auto_create_invoice_on_acceptance?: boolean;
+  auto_issue_invoice_on_acceptance?: boolean;
+  auto_send_invoice_on_acceptance?: boolean;
+  default_invoice_due_days?: number;
+  invoice_email_subject_template?: string | null;
+  invoice_email_body_template?: string | null;
   updated_at?: string;
 }
 
@@ -325,6 +332,12 @@ export interface OwnerOffer {
   recipient_email: string | null;
   recipient_phone: string | null;
   recipient_vat_id: string | null;
+  // Explicit recipient personalization (greeting). Gender is never inferred.
+  recipient_salutation: 'herr' | 'frau' | 'neutral' | null;
+  recipient_title: string | null;
+  recipient_first_name: string | null;
+  recipient_last_name: string | null;
+  recipient_greeting_name: string | null;
   net_total_cents: number;
   vat_total_cents: number;
   gross_total_cents: number;
@@ -405,10 +418,49 @@ export interface OwnerOfferAcceptanceEvent {
   signer_name: string | null;
   signer_company: string | null;
   signer_email: string | null;
+  signer_role: string | null;
+  signature_storage_path: string | null;
+  signature_sha256: string | null;
+  accepted_gross_cents: number | null;
+  currency: string | null;
   accepted_terms_version: string | null;
   comment: string | null;
   event_order: number;
   created_at: string;
+}
+
+export interface OwnerAutomationJobStatus {
+  id: string;
+  job_type: string;
+  status: string;
+  attempt_count: number;
+  last_error: string | null;
+  provider_message_id: string | null;
+  sent_at: string | null;
+  updated_at: string | null;
+}
+
+export interface OwnerOfferAcceptanceSummary {
+  offer_id: string;
+  offer_number: string | null;
+  title: string | null;
+  status: string;
+  accepted: boolean;
+  accepted_at: string | null;
+  signer_name: string | null;
+  signer_company: string | null;
+  signer_email: string | null;
+  signer_role: string | null;
+  accepted_gross_cents: number | null;
+  currency: string | null;
+  terms_version: string | null;
+  signature_level: string | null;
+  signature_storage_path: string | null;
+  signature_sha256: string | null;
+  document_version: number | null;
+  source_hash: string | null;
+  invoice: { id: string; invoice_number: string | null; status: string; gross_total_cents: number; due_date: string | null } | null;
+  automation_jobs: OwnerAutomationJobStatus[];
 }
 
 export interface PeriodSummary {

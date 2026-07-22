@@ -20,6 +20,7 @@ import {
   type OfferLineInput, type OfferSectionsInput,
 } from '@/lib/ownerFinance/offersApi';
 import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
+import { buildRecipientName, buildGreetingLine } from '@/lib/ownerFinance/greeting';
 import { computeInvoiceLine } from '@/lib/ownerFinance/tax';
 import { offerToDocument } from '@/lib/ownerFinance/buildTransactionalDoc';
 import { validateOfferForFinalization, documentFilename, type EditorSection } from '@/lib/ownerFinance/documents';
@@ -49,6 +50,7 @@ interface EditorState {
   customerId: string;
   recipientSource: 'crm' | 'manual';
   rcompany: string; rcontact: string; rdepartment: string; rstreet: string; rpostal: string; rcity: string; rcountry: string; remail: string; rphone: string; rvat: string;
+  rsalutation: '' | 'herr' | 'frau' | 'neutral'; rtitle: string; rfirstname: string; rlastname: string; rgreeting: string;
   title: string; subtitle: string; issueDate: string; validUntil: string;
   introduction: string; executiveSummary: string; projectApproach: string; scope: string;
   assumptions: string; exclusions: string; deliveryTerms: string; paymentTerms: string; nextSteps: string; internalNotes: string;
@@ -68,6 +70,7 @@ function emptyState(validityDays: number): EditorState {
   return {
     customerId: '', recipientSource: 'manual',
     rcompany: '', rcontact: '', rdepartment: '', rstreet: '', rpostal: '', rcity: '', rcountry: 'DE', remail: '', rphone: '', rvat: '',
+    rsalutation: '', rtitle: '', rfirstname: '', rlastname: '', rgreeting: '',
     title: '', subtitle: '', issueDate: today(), validUntil: plusDays(validityDays || 30),
     introduction: '', executiveSummary: '', projectApproach: '', scope: '',
     assumptions: '', exclusions: '', deliveryTerms: '', paymentTerms: '14 Tage netto', nextSteps: '', internalNotes: '',
@@ -93,6 +96,8 @@ function stateFromOffer(offer: OwnerOffer, offerLines: OwnerOfferLine[]): Editor
     rcompany: offer.recipient_company ?? '', rcontact: offer.recipient_contact_name ?? '', rdepartment: offer.recipient_department ?? '',
     rstreet: offer.recipient_street ?? '', rpostal: offer.recipient_postal_code ?? '', rcity: offer.recipient_city ?? '',
     rcountry: offer.recipient_country_code ?? 'DE', remail: offer.recipient_email ?? '', rphone: offer.recipient_phone ?? '', rvat: offer.recipient_vat_id ?? '',
+    rsalutation: offer.recipient_salutation ?? '', rtitle: offer.recipient_title ?? '', rfirstname: offer.recipient_first_name ?? '',
+    rlastname: offer.recipient_last_name ?? '', rgreeting: offer.recipient_greeting_name ?? '',
     title: offer.title ?? '', subtitle: offer.subtitle ?? '', issueDate: offer.issue_date ?? today(), validUntil: offer.valid_until ?? plusDays(30),
     introduction: offer.introduction ?? '', executiveSummary: offer.executive_summary ?? '', projectApproach: offer.project_approach ?? '', scope: offer.scope ?? '',
     assumptions: offer.assumptions ?? '', exclusions: offer.exclusions ?? '', deliveryTerms: offer.delivery_terms ?? '',
@@ -105,6 +110,14 @@ function stateFromOffer(offer: OwnerOffer, offerLines: OwnerOfferLine[]): Editor
 }
 
 function splitLines(text: string): string[] { return text.split(/\n+/).map((s) => s.trim()).filter(Boolean); }
+
+/** Auto-derived recipient display name from the greeting fields (gender never inferred). */
+function derivedGreetingName(state: EditorState): string {
+  return buildRecipientName({
+    salutation: state.rsalutation, title: state.rtitle,
+    firstName: state.rfirstname, lastName: state.rlastname,
+  });
+}
 
 /** Synthesize the shared TransactionalDocument from editor state for preview + validation. */
 function stateToDoc(state: EditorState, settings: OwnerDocumentSettings | null, entityName: string, isDraft: boolean): { doc: ReturnType<typeof offerToDocument>; net: number; vat: number; gross: number } {
@@ -135,6 +148,8 @@ function stateToDoc(state: EditorState, settings: OwnerDocumentSettings | null, 
     recipient_company: state.rcompany || null, recipient_contact_name: state.rcontact || null, recipient_department: state.rdepartment || null,
     recipient_street: state.rstreet || null, recipient_postal_code: state.rpostal || null, recipient_city: state.rcity || null,
     recipient_country_code: state.rcountry || null, recipient_email: state.remail || null, recipient_phone: state.rphone || null, recipient_vat_id: state.rvat || null,
+    recipient_salutation: (state.rsalutation || null) as OwnerOffer['recipient_salutation'], recipient_title: state.rtitle || null,
+    recipient_first_name: state.rfirstname || null, recipient_last_name: state.rlastname || null, recipient_greeting_name: state.rgreeting || null,
     net_total_cents: net, vat_total_cents: vat, gross_total_cents: net + vat, finalized_version: null,
     accepted_at: null, rejected_at: null, rejection_reason: null, expired_at: null, converted_invoice_id: null, converted_at: null,
     created_at: '', updated_at: '',
@@ -154,6 +169,10 @@ function buildPayload(state: EditorState, entityId: string): { header: Record<st
     recipient_company: state.rcompany.trim() || null, recipient_contact_name: state.rcontact.trim() || null, recipient_department: state.rdepartment.trim() || null,
     recipient_street: state.rstreet.trim() || null, recipient_postal_code: state.rpostal.trim() || null, recipient_city: state.rcity.trim() || null,
     recipient_country_code: state.rcountry.trim() || null, recipient_email: state.remail.trim() || null, recipient_phone: state.rphone.trim() || null, recipient_vat_id: state.rvat.trim() || null,
+    recipient_salutation: state.rsalutation || null, recipient_title: state.rtitle.trim() || null,
+    recipient_first_name: state.rfirstname.trim() || null, recipient_last_name: state.rlastname.trim() || null,
+    // Freeze an explicit greeting name; fall back to the auto-derived one so the snapshot always has it.
+    recipient_greeting_name: state.rgreeting.trim() || derivedGreetingName(state) || null,
   };
   const lines: OfferLineInput[] = state.lines
     .map((l, i) => ({
@@ -326,6 +345,11 @@ export function OfferEditor() {
           <Select id="customer" label="CRM-Kunde" value={state.customerId} onChange={applyCustomer}
             options={[{ value: '', label: '— Kein CRM-Kunde —' }, ...customers.map((c) => ({ value: c.organizationId, label: c.name }))]} />
           <Field id="rcompany" label="Firma (rechtlich)" value={state.rcompany} onChange={(v) => patch({ rcompany: v, recipientSource: 'manual' })} required />
+          <Select id="rsalutation" label="Anrede" value={state.rsalutation} onChange={(v) => patch({ rsalutation: v as EditorState['rsalutation'], recipientSource: 'manual' })}
+            options={[{ value: '', label: '— Neutral —' }, { value: 'herr', label: 'Herr' }, { value: 'frau', label: 'Frau' }, { value: 'neutral', label: 'Neutral' }]} />
+          <Field id="rtitle" label="Titel (optional, z. B. Dr.)" value={state.rtitle} onChange={(v) => patch({ rtitle: v, recipientSource: 'manual' })} />
+          <Field id="rfirstname" label="Vorname" value={state.rfirstname} onChange={(v) => patch({ rfirstname: v, recipientSource: 'manual' })} />
+          <Field id="rlastname" label="Nachname" value={state.rlastname} onChange={(v) => patch({ rlastname: v, recipientSource: 'manual' })} />
           <Field id="rcontact" label="Ansprechpartner" value={state.rcontact} onChange={(v) => patch({ rcontact: v, recipientSource: 'manual' })} />
           <Field id="rdept" label="Abteilung" value={state.rdepartment} onChange={(v) => patch({ rdepartment: v, recipientSource: 'manual' })} />
           <Field id="rstreet" label="Straße" value={state.rstreet} onChange={(v) => patch({ rstreet: v, recipientSource: 'manual' })} />
@@ -338,7 +362,8 @@ export function OfferEditor() {
           <Field id="rvat" label="USt-IdNr. (optional)" value={state.rvat} onChange={(v) => patch({ rvat: v, recipientSource: 'manual' })} />
           <Field id="rcountry" label="Land" value={state.rcountry} onChange={(v) => patch({ rcountry: v, recipientSource: 'manual' })} />
         </div>
-        {(!state.rstreet || !state.rcity) ? <p className="mt-3 text-[12px] text-amber-600">Postanschrift unvollständig — für die Finalisierung erforderlich.</p> : null}
+        <p className="mt-3 text-[12px] text-slate-500">Begrüßung im Kundenportal: <span className="font-medium text-slate-700">„{buildGreetingLine({ salutation: state.rsalutation, title: state.rtitle, firstName: state.rfirstname, lastName: state.rlastname, greetingName: state.rgreeting })}“</span></p>
+        {(!state.rstreet || !state.rcity) ? <p className="mt-1 text-[12px] text-amber-600">Postanschrift unvollständig — für die Finalisierung erforderlich.</p> : null}
       </Card>
 
       <Card className="p-5" id={sectionAnchor.summary}>
