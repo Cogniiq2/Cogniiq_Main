@@ -37,7 +37,7 @@ const fonts = {
 
 for (const [name, isDraft] of [['premium-offer', false], ['premium-offer-draft', true]]) {
   const doc = buildFixtureDoc({ isDraft });
-  const bytes = await mod.renderPremiumOfferPdf(doc, { fonts });
+  const bytes = await mod.renderPremiumOfferPdfNode(doc, { fonts });
   const path = resolve(outDir, `${name}.pdf`);
   writeFileSync(path, Buffer.from(bytes));
   console.log(`wrote ${path} (${bytes.length} bytes)`);

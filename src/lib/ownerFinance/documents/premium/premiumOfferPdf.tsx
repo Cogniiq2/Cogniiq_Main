@@ -5,9 +5,17 @@
 // It consumes the deterministic PremiumSource model, so preview and print never diverge.
 //
 // The engine and its fonts are loaded lazily (dynamic import) so react-pdf stays out of the
-// main bundle. `renderPremiumOfferPdf` accepts font sources appropriate to the caller's
-// environment (Vite asset URLs in the browser; file paths in the node test harness). When no
-// fonts are supplied it falls back to the built-in Helvetica (still WinAnsi/euro-correct).
+// main bundle. The JSX tree (buildDocument) is shared, but the final render call is environment-
+// specific and split into two explicit, non-overlapping exports:
+//   - renderPremiumOfferPdfBrowser: pdf(element).toBlob() — the ONLY API @react-pdf/renderer's
+//     browser build actually supports. Imported by browser code (via ./index.ts) only.
+//   - renderPremiumOfferPdfNode: renderToBuffer(element) — Node-only, used by the local fixture
+//     renderer and PDF test scripts. Never imported by browser code.
+// There is deliberately no combined function that feature-detects which API to call: the browser
+// build exposes `renderToBuffer` as a function-shaped stub, so `typeof renderToBuffer ===
+// 'function'` is true there too and used to wrongly pick the Node path, throwing
+// "renderToBuffer is a Node specific API" at runtime. Structural separation (two call sites,
+// each importing only what it needs) prevents that class of bug entirely.
 
 import type { PremiumSource, PremiumModule } from './premiumSource';
 import { buildPremiumSource } from './premiumSource';
@@ -29,7 +37,10 @@ const MUTED = '#6B7280';
 const HAIR = '#E5E7EB';
 const SOFT = '#F7F8F9';
 
-let fontsRegistered = false;
+// Registered independently per environment: fonts registered while rendering in Node (the
+// fixture/test harness, using on-disk file paths) must not be assumed valid for a later browser
+// render (Vite asset URLs), and vice versa.
+const fontsRegistered = { browser: false, node: false };
 
 /**
  * Build the React tree. `RP` is the loaded @react-pdf/renderer module. Kept as a factory so the
@@ -286,33 +297,50 @@ function buildDocument(RP: typeof import('@react-pdf/renderer'), src: PremiumSou
   );
 }
 
-async function ensureFonts(RP: typeof import('@react-pdf/renderer'), fonts?: PremiumFontSources): Promise<string> {
+async function ensureFonts(
+  RP: typeof import('@react-pdf/renderer'),
+  fonts: PremiumFontSources | undefined,
+  env: 'browser' | 'node',
+): Promise<string> {
   if (!fonts) return 'Helvetica';
-  if (!fontsRegistered) {
+  if (!fontsRegistered[env]) {
     RP.Font.register({ family: 'Cogniiq', fonts: [
       { src: fonts.regular, fontWeight: 400 },
       { src: fonts.bold, fontWeight: 700 },
     ] });
     // No hyphenation — avoids odd mid-word breaks in German compounds.
     RP.Font.registerHyphenationCallback((word: string) => [word]);
-    fontsRegistered = true;
+    fontsRegistered[env] = true;
   }
   return 'Cogniiq';
 }
 
-/** Render the premium PDF to bytes. Loads @react-pdf/renderer lazily. */
-export async function renderPremiumOfferPdf(doc: TransactionalDocument, opts: PremiumRenderOptions = {}): Promise<Uint8Array> {
+/**
+ * Render the premium PDF to bytes — BROWSER ONLY. Uses `pdf(element).toBlob()`, the only
+ * rendering entry point @react-pdf/renderer's browser build actually implements. Must never call
+ * `renderToBuffer`/`renderToFile`/`renderToStream` (Node-only; throws "renderToBuffer is a Node
+ * specific API" if invoked in a browser). Import this from browser code only (via ./index.ts).
+ */
+export async function renderPremiumOfferPdfBrowser(doc: TransactionalDocument, opts: PremiumRenderOptions = {}): Promise<Uint8Array> {
   const RP = await import('@react-pdf/renderer');
-  const family = await ensureFonts(RP, opts.fonts);
+  const family = await ensureFonts(RP, opts.fonts, 'browser');
   const src = buildPremiumSource(doc);
   const element = buildDocument(RP, src, family);
-  // renderToBuffer (node) or pdf().toBlob() (browser). Prefer the buffer path where available.
-  const anyRP = RP as unknown as { renderToBuffer?: (el: unknown) => Promise<Uint8Array>; pdf: (el: unknown) => { toBlob: () => Promise<Blob> } };
-  if (typeof anyRP.renderToBuffer === 'function') {
-    return new Uint8Array(await anyRP.renderToBuffer(element));
-  }
-  const blob = await anyRP.pdf(element).toBlob();
+  const instance = RP.pdf(element);
+  const blob = await instance.toBlob();
   return new Uint8Array(await blob.arrayBuffer());
+}
+
+/**
+ * Render the premium PDF to bytes — NODE ONLY. Uses `renderToBuffer(element)`. Import this from
+ * Node fixtures/test scripts only; never from browser code.
+ */
+export async function renderPremiumOfferPdfNode(doc: TransactionalDocument, opts: PremiumRenderOptions = {}): Promise<Uint8Array> {
+  const RP = await import('@react-pdf/renderer');
+  const family = await ensureFonts(RP, opts.fonts, 'node');
+  const src = buildPremiumSource(doc);
+  const element = buildDocument(RP, src, family);
+  return new Uint8Array(await RP.renderToBuffer(element));
 }
 
 export { PREMIUM_OFFER_TEMPLATE_KEY };

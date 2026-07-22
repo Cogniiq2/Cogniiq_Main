@@ -1,5 +1,6 @@
 // Premium offer PDF test. Renders the complex 8-module fixture through the real @react-pdf
-// engine (node), then asserts on the extracted text + structure: paragraph/bullet
+// engine (node, via the Node-only renderPremiumOfferPdfNode entry point — renderToBuffer), then
+// asserts on the extracted text + structure: paragraph/bullet
 // preservation, all eight modules, long descriptions, no broken "?" glyph, correct VAT +
 // totals, optional module separated, payment plan, assumptions/exclusions, footer, page
 // numbers, no large generic legal disclaimer, and the draft watermark only in draft.
@@ -48,8 +49,8 @@ function extract(bytes, extraArgs = []) {
 const finalDoc = buildFixtureDoc({ isDraft: false });
 const draftDoc = buildFixtureDoc({ isDraft: true });
 
-const finalBytes = await mod.renderPremiumOfferPdf(finalDoc, { fonts });
-const draftBytes = await mod.renderPremiumOfferPdf(draftDoc, { fonts });
+const finalBytes = await mod.renderPremiumOfferPdfNode(finalDoc, { fonts });
+const draftBytes = await mod.renderPremiumOfferPdfNode(draftDoc, { fonts });
 
 ok(finalBytes.length > 4000, 'final PDF has content');
 const head = Buffer.from(finalBytes.slice(0, 8)).toString('latin1');
