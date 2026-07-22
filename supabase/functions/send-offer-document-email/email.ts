@@ -1,0 +1,118 @@
+// Email content builder: gender-safe greeting, HTML-escaped placeholder templating, a
+// professional Cogniiq HTML layout, and a plain-text alternative. Pure + import-free, so it
+// runs unchanged under Deno (worker) and Node (tests). ALL customer-controlled values are
+// escaped before insertion into HTML.
+
+export function escapeHtml(value: unknown): string {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// Gender-safe greeting: "Herr"/"Frau" only when explicitly selected; never inferred.
+export function recipientName(r: {
+  greeting_name?: string | null; salutation?: string | null; title?: string | null;
+  first_name?: string | null; last_name?: string | null;
+}): string {
+  const g = (r.greeting_name ?? '').trim();
+  if (g) return g;
+  const sal = (r.salutation ?? '').trim().toLowerCase();
+  const title = (r.title ?? '').trim();
+  const first = (r.first_name ?? '').trim();
+  const last = (r.last_name ?? '').trim();
+  const person = last || first;
+  if ((sal === 'herr' || sal === 'frau') && person) {
+    return [sal === 'herr' ? 'Herr' : 'Frau', title, person].filter(Boolean).join(' ');
+  }
+  return [title, first, last].filter(Boolean).join(' ');
+}
+
+export function fmtCentsDe(cents: number, currency = 'EUR'): string {
+  const abs = Math.abs(cents);
+  const euros = Math.floor(abs / 100).toLocaleString('de-DE');
+  const frac = (abs % 100).toString().padStart(2, '0');
+  return `${cents < 0 ? '-' : ''}${euros},${frac} ${currency === 'EUR' ? '€' : currency}`;
+}
+export function fmtDateDe(iso: string | null | undefined): string {
+  if (!iso) return '';
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  return m ? `${m[3]}.${m[2]}.${m[1]}` : iso;
+}
+
+/** Substitute {{placeholders}} with HTML-escaped values (unknown placeholders -> ''). */
+export function renderTemplate(tpl: string, vars: Record<string, string>): string {
+  return tpl.replace(/\{\{\s*([a-z_]+)\s*\}\}/gi, (_, k: string) => escapeHtml(vars[k] ?? ''));
+}
+
+function layout(bodyHtml: string, sellerName: string): string {
+  return `<!doctype html><html lang="de"><body style="margin:0;background:#f5f5f2;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#0f172a">
+  <div style="max-width:560px;margin:0 auto;padding:32px 24px">
+    <div style="background:#ffffff;border:1px solid #ececeb;border-radius:16px;padding:28px 26px">
+      <div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#94a3b8;font-weight:700">${escapeHtml(sellerName || 'Cogniiq')}</div>
+      <div style="height:14px"></div>
+      ${bodyHtml}
+    </div>
+    <div style="text-align:center;color:#94a3b8;font-size:11px;padding-top:16px">Bereitgestellt über Cogniiq</div>
+  </div></body></html>`;
+}
+
+export interface BuiltEmail { subject: string; html: string; text: string; }
+
+export interface InvoiceEmailContext {
+  invoice: { invoice_number: string | null; currency: string; due_date: string | null; gross_total_cents: number };
+  recipient: { company?: string | null; contact_name?: string | null; greeting_name?: string | null;
+    salutation?: string | null; title?: string | null; first_name?: string | null; last_name?: string | null };
+  seller: { legal_name?: string | null };
+  templates?: { subject?: string | null; body?: string | null };
+}
+export interface OfferEmailContext {
+  offer_number?: string | null; valid_until?: string | null;
+  recipient: { greeting_name?: string | null; salutation?: string | null; title?: string | null;
+    first_name?: string | null; last_name?: string | null };
+  seller?: { legal_name?: string | null };
+}
+
+export function buildInvoiceEmail(ctx: InvoiceEmailContext, opts: { link?: string } = {}): BuiltEmail {
+  const inv = ctx.invoice; const r = ctx.recipient; const seller = ctx.seller;
+  const name = recipientName(r);
+  const gross = fmtCentsDe(inv.gross_total_cents, inv.currency);
+  const vars: Record<string, string> = {
+    recipient_name: name, company: r.company ?? '', invoice_number: inv.invoice_number ?? '',
+    gross_total: gross, due_date: fmtDateDe(inv.due_date), document_link: opts.link ?? '',
+    seller_name: seller.legal_name ?? '', offer_number: '', valid_until: '',
+  };
+  const subject = (ctx.templates?.subject && String(ctx.templates.subject).trim())
+    ? String(ctx.templates.subject).replace(/\{\{\s*([a-z_]+)\s*\}\}/gi, (_: string, k: string) => vars[k] ?? '')
+    : `Ihre Rechnung ${inv.invoice_number ?? ''} von ${seller.legal_name ?? 'Cogniiq'}`.trim();
+
+  const greetLine = name ? `Guten Tag ${escapeHtml(name)},` : 'Guten Tag,';
+  const bodyTemplate = ctx.templates?.body && String(ctx.templates.body).trim()
+    ? `<p style="font-size:15px;line-height:1.6;color:#334155">${renderTemplate(String(ctx.templates.body), vars).replace(/\n/g, '<br>')}</p>`
+    : `<p style="font-size:15px;line-height:1.6;color:#334155">${greetLine}</p>
+       <p style="font-size:15px;line-height:1.6;color:#334155">anbei erhalten Sie Ihre Rechnung <strong>${escapeHtml(inv.invoice_number ?? '')}</strong> über <strong>${escapeHtml(gross)}</strong>, fällig bis ${escapeHtml(fmtDateDe(inv.due_date))}. Die Rechnung finden Sie als PDF im Anhang.</p>
+       <p style="font-size:15px;line-height:1.6;color:#334155">Beste Grüße<br>${escapeHtml(seller.legal_name ?? 'Cogniiq')}</p>`;
+  const html = layout(bodyTemplate, seller.legal_name ?? 'Cogniiq');
+  const text = `${name ? `Guten Tag ${name},` : 'Guten Tag,'}\n\n` +
+    `anbei Ihre Rechnung ${inv.invoice_number ?? ''} über ${gross}, fällig bis ${fmtDateDe(inv.due_date)}.\n` +
+    `Die Rechnung ist als PDF angehängt.\n\nBeste Grüße\n${seller.legal_name ?? 'Cogniiq'}`;
+  return { subject, html, text };
+}
+
+export function buildOfferEmail(ctx: OfferEmailContext, link: string): BuiltEmail {
+  const r = ctx.recipient; const name = recipientName(r);
+  const seller = ctx.seller ?? {}; const sellerName = seller.legal_name ?? 'Cogniiq';
+  const subject = `Ihr persönliches Angebot ${ctx.offer_number ?? ''} von ${sellerName}`.trim();
+  const greetLine = name ? `Guten Tag ${escapeHtml(name)},` : 'Guten Tag,';
+  const validUntil = fmtDateDe(ctx.valid_until);
+  const body = `<p style="font-size:15px;line-height:1.6;color:#334155">${greetLine}</p>
+    <p style="font-size:15px;line-height:1.6;color:#334155">unter dem folgenden sicheren Link können Sie Ihr persönliches Angebot einsehen, als PDF herunterladen und direkt online annehmen:</p>
+    <p style="margin:20px 0"><a href="${escapeHtml(link)}" style="display:inline-block;background:#0f172a;color:#fff;text-decoration:none;padding:12px 22px;border-radius:12px;font-weight:600;font-size:14px">Angebot ansehen</a></p>
+    ${validUntil ? `<p style="font-size:13px;color:#64748b">Das Angebot ist bis zum ${escapeHtml(validUntil)} gültig.</p>` : ''}
+    <p style="font-size:15px;line-height:1.6;color:#334155">Beste Grüße<br>${escapeHtml(sellerName)}</p>`;
+  const html = layout(body, sellerName);
+  const text = `${name ? `Guten Tag ${name},` : 'Guten Tag,'}\n\n` +
+    `Ihr persönliches Angebot ${ctx.offer_number ?? ''} können Sie hier einsehen und online annehmen:\n${link}\n` +
+    (validUntil ? `\nGültig bis ${validUntil}.\n` : '') +
+    `\nBeste Grüße\n${sellerName}`;
+  return { subject, html, text };
+}

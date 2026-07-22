@@ -70,8 +70,9 @@ ok(/SERVICE_ROLE = Deno\.env\.get/.test(accept), 'service role read from env onl
 
 const email = read('supabase/functions/send-offer-document-email/index.ts');
 ok(/EMAIL_PROVIDER/.test(email) && /RESEND_API_KEY = Deno\.env\.get/.test(email), 'email provider abstraction reads secrets from env');
-ok(/attempt_count/.test(email) && /max_attempts/.test(email) && /retrying/.test(email), 'bounded retries with retrying/failed states');
-ok(!/console\.(log|error)\([^)]*token/i.test(email), 'email worker never logs the token');
+ok(/owner_complete_automation_job/.test(email) && /'retrying'/.test(email), 'worker records retrying/failed via the completion RPC (bounded retries + backoff in SQL)');
+ok(/WORKER_SECRET/.test(email) && /safeEqual/.test(email), 'worker requires a constant-time WORKER_SECRET');
+ok(!/console\.(log|error|info)/.test(email), 'email worker logs nothing (no token/secret leakage)');
 
 if (failures) { console.error(`\noffer acceptance automation tests: ${failures} FAILED`); process.exit(1); }
 console.log('\noffer acceptance automation tests: ALL PASSED');
