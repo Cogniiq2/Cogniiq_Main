@@ -75,7 +75,7 @@ Deno.serve(async (req: Request) => {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
   if (rateLimited(`accept:${ip}`, 8, 60_000)) return json({ ok: false, error: 'rate limited' }, 429);
 
-  const body = await req.json().catch(() => ({} as any));
+  const body = await req.json().catch(() => ({}));
   const token: string | undefined = body?.token;
   if (!token || token.length < 32) return json({ ok: false, error: 'invalid token' }, 400);
   const signerName: string = (body?.signer_name ?? '').toString().trim();
@@ -92,8 +92,8 @@ Deno.serve(async (req: Request) => {
   // Resolve the verified token's offer to build a SERVER-GENERATED storage path (never client-chosen).
   const { data: tok, error: tokErr } = await svc.rpc('owner_verify_offer_token', { p_token: token });
   if (tokErr || !tok) return json({ ok: false, error: 'link is not valid' }, 400);
-  const businessEntityId = (tok as any).business_entity_id;
-  const offerId = (tok as any).offer_id;
+  const businessEntityId = tok.business_entity_id;
+  const offerId = tok.offer_id;
   const path = `${businessEntityId}/${offerId}/${crypto.randomUUID()}.png`;
 
   const up = await svc.storage.from(SIGNATURE_BUCKET).upload(path, png, { contentType: 'image/png', upsert: false });
@@ -124,5 +124,5 @@ Deno.serve(async (req: Request) => {
 
   // Enqueue the signed-offer PDF + confirmation email generation is handled by the DB pipeline
   // (owner_process_offer_acceptance) and the automation-job worker; nothing sensitive is returned.
-  return json({ ok: true, offer_number: (data as any)?.offer_number ?? null });
+  return json({ ok: true, offer_number: data?.offer_number ?? null });
 });

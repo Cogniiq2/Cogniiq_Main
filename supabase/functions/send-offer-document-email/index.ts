@@ -52,7 +52,7 @@ async function sendEmail(msg: EmailMessage): Promise<{ id: string | null; error:
     });
     if (!res.ok) return { id: null, error: `provider ${res.status}` };
     const data = await res.json().catch(() => ({}));
-    return { id: (data as any)?.id ?? null, error: null };
+    return { id: data?.id ?? null, error: null };
   }
   return { id: null, error: `unsupported provider ${EMAIL_PROVIDER}` };
 }
@@ -75,14 +75,14 @@ Deno.serve(async (req: Request) => {
 
   const results: Array<{ id: string; status: string }> = [];
   for (const job of jobs ?? []) {
-    await svc.from('owner_automation_jobs').update({ status: 'processing', attempt_count: (job as any).attempt_count + 1 }).eq('id', (job as any).id);
+    await svc.from('owner_automation_jobs').update({ status: 'processing', attempt_count: job.attempt_count + 1 }).eq('id', job.id);
     try {
       let providerId: string | null = null;
-      if ((job as any).job_type === 'invoice_email' || (job as any).job_type === 'invoice_send' || (job as any).job_type === 'offer_email') {
+      if (job.job_type === 'invoice_email' || job.job_type === 'invoice_send' || job.job_type === 'offer_email') {
         const link = PUBLIC_APP_URL ? `${PUBLIC_APP_URL.replace(/\/$/, '')}/` : '';
         const sent = await sendEmail({
-          to: (job as any).recipient_email ?? '',
-          subject: (job as any).subject ?? 'Cogniiq',
+          to: job.recipient_email ?? '',
+          subject: job.subject ?? 'Cogniiq',
           html: `<p>Guten Tag,</p><p>Ihre Unterlagen liegen bereit.</p>${link ? `<p><a href="${link}">${link}</a></p>` : ''}<p>Beste Grüße<br/>Cogniiq</p>`,
         });
         if (sent.error) throw new Error(sent.error);
@@ -90,12 +90,12 @@ Deno.serve(async (req: Request) => {
       }
       // invoice_issue is delegated to the owner's server-authoritative issue routine (not shown);
       // this worker records the job outcome so the dashboard reflects delivery state.
-      await svc.from('owner_automation_jobs').update({ status: 'sent', sent_at: new Date().toISOString(), provider_message_id: providerId, last_error: null }).eq('id', (job as any).id);
-      results.push({ id: (job as any).id, status: 'sent' });
+      await svc.from('owner_automation_jobs').update({ status: 'sent', sent_at: new Date().toISOString(), provider_message_id: providerId, last_error: null }).eq('id', job.id);
+      results.push({ id: job.id, status: 'sent' });
     } catch (e) {
-      const retry = (job as any).attempt_count + 1 < (job as any).max_attempts;
-      await svc.from('owner_automation_jobs').update({ status: retry ? 'retrying' : 'failed', last_error: String((e as Error).message).slice(0, 300) }).eq('id', (job as any).id);
-      results.push({ id: (job as any).id, status: retry ? 'retrying' : 'failed' });
+      const retry = job.attempt_count + 1 < job.max_attempts;
+      await svc.from('owner_automation_jobs').update({ status: retry ? 'retrying' : 'failed', last_error: String((e as Error).message).slice(0, 300) }).eq('id', job.id);
+      results.push({ id: job.id, status: retry ? 'retrying' : 'failed' });
     }
   }
   return json({ ok: true, processed: results.length, results });

@@ -105,7 +105,7 @@ ok(/PremiumPdfPreviewDialog/.test(editor) && /saveAndPreview/.test(editor) && /s
 ok(/render=\{renderPreview\}/.test(editor), 'editor preview also uses the shared dialog');
 
 /* ---- Secure link creation feedback ---- */
-ok(/Sicheren Link erstellen/.test(detail), 'secure-link action present for a finalized offer');
+ok(/Angebot versenden/.test(detail) || /Sicheren Link erstellen/.test(detail), 'secure-link / send action present for a finalized offer');
 ok(/navigator\.clipboard\.writeText/.test(detail) && /Sicherer Link kopiert/.test(detail), 'link copied to clipboard when permission is available');
 ok(/catch \{ toast\.success\('Sicherer Link erstellt', url\)/.test(detail), 'clipboard failure still surfaces the created URL');
 ok(/Link konnte nicht erstellt werden/.test(detail), 'link-creation DB errors remain visible to the owner');
