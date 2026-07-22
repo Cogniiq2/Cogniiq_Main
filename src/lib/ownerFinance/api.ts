@@ -307,13 +307,18 @@ export async function loadExports(entityId: string): Promise<OwnerExportRun[]> {
 
 export async function recordExportRun(
   entityId: string,
-  run: { export_type: string; period_start?: string | null; period_end?: string | null; rules_version?: string | null; record_counts?: Record<string, number>; warnings?: string[] },
+  run: {
+    export_type: string; period_start?: string | null; period_end?: string | null;
+    rules_version?: string | null; record_counts?: Record<string, number>; warnings?: string[];
+    source_hash?: string | null; file_metadata?: Record<string, unknown>;
+  },
 ): Promise<{ error: string | null }> {
   const createdBy = await currentUserId();
   const { error } = await supabase.from('owner_exports').insert({
     business_entity_id: entityId, status: 'ready', generated_by: createdBy,
     export_type: run.export_type, period_start: run.period_start ?? null, period_end: run.period_end ?? null,
     rules_version: run.rules_version ?? null, record_counts: run.record_counts ?? {}, warnings: run.warnings ?? [],
+    source_hash: run.source_hash ?? null, file_metadata: run.file_metadata ?? {},
   });
   return { error: error?.message ?? null };
 }

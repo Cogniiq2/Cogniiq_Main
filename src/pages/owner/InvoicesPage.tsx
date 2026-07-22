@@ -16,6 +16,12 @@ import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
 import { computeInvoiceLine } from '@/lib/ownerFinance/tax';
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
 import type { OwnerInvoice } from '@/lib/ownerFinance/types';
+import { ExportMenu } from '@/components/finance/ExportMenu';
+import { runFinanceExport } from '@/lib/ownerFinance/financeExportRunner';
+import {
+  invoiceExportTable, invoiceReportModel, invoiceMetadataSheet,
+} from '@/lib/ownerFinance/exports/datasets';
+import type { ExportFormat, ExportMode, ExportMeta } from '@/lib/ownerFinance/exports';
 
 const invoiceTreatments = [
   { value: 'standard', label: 'Standard 19 %' },
@@ -54,6 +60,7 @@ export function InvoicesPage() {
   const [payFor, setPayFor] = useState<OwnerInvoice | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<OwnerInvoice | null>(null);
   const [confirmVoid, setConfirmVoid] = useState<OwnerInvoice | null>(null);
+  const [includeIds, setIncludeIds] = useState(false);
 
   const load = useCallback(async () => {
     if (!entity) return;
@@ -79,6 +86,46 @@ export function InvoicesPage() {
     () => invoices.filter((i) => statusFilter === 'all' || i.status === statusFilter),
     [invoices, statusFilter],
   );
+
+  const customerName = useCallback((inv: OwnerInvoice): string => {
+    const c = customers.find((x) => x.organizationId === inv.organization_id);
+    return c ? (c.legalName ?? c.name) : inv.organization_id ? 'CRM-Kunde' : '—';
+  }, [customers]);
+
+  const statusFilterLabel = statusFilter === 'all' ? 'Alle Status' : (statusLabel[statusFilter] ?? statusFilter);
+
+  const runExport = async (format: ExportFormat, mode: ExportMode) => {
+    if (!entity) return;
+    // 'current' respects the active status filter; 'all' exports every invoice.
+    const rows = mode === 'all' ? invoices : filtered;
+    const meta: ExportMeta = {
+      entityName: entity.display_name,
+      valueBasis: 'actual',
+      filtersLabel: mode === 'all' ? 'Alle' : statusFilterLabel,
+      mode,
+    };
+    const table = invoiceExportTable(rows, customerName) as never;
+    const spec = {
+      entityId: entity.id,
+      exportType: 'invoices',
+      baseFilename: 'Rechnungen',
+      meta,
+      table,
+      metadataSheet: invoiceMetadataSheet(rows, meta),
+      reportModel: invoiceReportModel(rows, meta, customerName),
+      jsonPayload: { invoices: rows },
+      snapshot: rows.map((r) => ({ id: r.id, status: r.status, gross: r.gross_total_cents, paid: r.amount_paid_cents })),
+      counts: { invoices: rows.length },
+      includeIds,
+    };
+    try {
+      const { warning } = await runFinanceExport(format, mode, spec);
+      if (warning) toast.error('Hinweis zum Export', warning);
+      else toast.success('Export erstellt', `${format.toUpperCase()} · ${rows.length} Rechnungen`);
+    } catch (e: unknown) {
+      toast.error('Export fehlgeschlagen', e instanceof Error ? e.message : String(e));
+    }
+  };
 
   const issue = async (inv: OwnerInvoice) => {
     const { error: err } = await issueOwnerInvoice(inv.id);
@@ -118,7 +165,21 @@ export function InvoicesPage() {
       <PageHeader
         title="Rechnungen"
         description="Rechnungen mit serverseitig berechneten Beträgen und server-autoritativer Nummernvergabe. Gebuchte Rechnungen werden storniert, nicht gelöscht."
-        actions={<Button icon={Plus} onClick={() => setComposerOpen(true)} disabled={!entity}>Neue Rechnung</Button>}
+        actions={
+          <div className="flex items-center gap-2">
+            <ExportMenu
+              onExport={runExport}
+              disabled={!entity || invoices.length === 0}
+              includeIds={includeIds}
+              onIncludeIdsChange={setIncludeIds}
+              modes={[
+                { value: 'current', label: 'Aktuelle Ansicht', count: filtered.length },
+                { value: 'all', label: 'Alle Rechnungen', count: invoices.length },
+              ]}
+            />
+            <Button icon={Plus} onClick={() => setComposerOpen(true)} disabled={!entity}>Neue Rechnung</Button>
+          </div>
+        }
       />
 
       {error ? <div className="mb-6"><ErrorState message={error} onRetry={() => void load()} /></div> : null}

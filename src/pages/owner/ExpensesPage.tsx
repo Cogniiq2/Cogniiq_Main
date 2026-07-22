@@ -16,6 +16,12 @@ import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
 import { computeExpenseLine, eligibleInputVat } from '@/lib/ownerFinance/tax';
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
 import type { OwnerExpense, OwnerExpenseCategory, OwnerVendor } from '@/lib/ownerFinance/types';
+import { ExportMenu } from '@/components/finance/ExportMenu';
+import { runFinanceExport } from '@/lib/ownerFinance/financeExportRunner';
+import {
+  expenseExportTable, expenseReportModel, expenseMetadataSheet,
+} from '@/lib/ownerFinance/exports/datasets';
+import type { ExportFormat, ExportMode, ExportMeta } from '@/lib/ownerFinance/exports';
 
 const expenseTreatments = [
   { value: 'domestic_standard', label: 'Inland Vorsteuer 19 %' },
@@ -54,6 +60,7 @@ export function ExpensesPage() {
   const [composerOpen, setComposerOpen] = useState(false);
   const [payFor, setPayFor] = useState<OwnerExpense | null>(null);
   const [filter, setFilter] = useState('all');
+  const [includeIds, setIncludeIds] = useState(false);
 
   const load = useCallback(async () => {
     if (!entity) return;
@@ -92,6 +99,38 @@ export function ExpensesPage() {
   }), [expenses]);
 
   const catLabel = (id: string | null) => categories.find((c) => c.id === id)?.label ?? '—';
+  const vendorName = useCallback((e: OwnerExpense): string => vendors.find((v) => v.id === e.vendor_id)?.name ?? '—', [vendors]);
+
+  const filterLabel = filter === 'all' ? 'Alle' : filter === 'review' ? 'Prüfung offen' : filter === 'unpaid' ? 'Offen' : 'Bezahlt';
+
+  const runExport = async (format: ExportFormat, mode: ExportMode) => {
+    if (!entity) return;
+    const rows = mode === 'all' ? expenses : filtered;
+    const meta: ExportMeta = {
+      entityName: entity.display_name, valueBasis: 'actual',
+      filtersLabel: mode === 'all' ? 'Alle' : filterLabel, mode,
+    };
+    const spec = {
+      entityId: entity.id,
+      exportType: 'expenses',
+      baseFilename: 'Ausgaben',
+      meta,
+      table: expenseExportTable(rows, vendorName) as never,
+      metadataSheet: expenseMetadataSheet(rows, meta),
+      reportModel: expenseReportModel(rows, meta, vendorName),
+      jsonPayload: { expenses: rows },
+      snapshot: rows.map((r) => ({ id: r.id, status: r.payment_status, net: r.net_total_cents, gross: r.gross_total_cents })),
+      counts: { expenses: rows.length },
+      includeIds,
+    };
+    try {
+      const { warning } = await runFinanceExport(format, mode, spec);
+      if (warning) toast.error('Hinweis zum Export', warning);
+      else toast.success('Export erstellt', `${format.toUpperCase()} · ${rows.length} Ausgaben`);
+    } catch (e: unknown) {
+      toast.error('Export fehlgeschlagen', e instanceof Error ? e.message : String(e));
+    }
+  };
 
   const columns: Column<OwnerExpense>[] = [
     { key: 'date', header: 'Datum', render: (e) => <span className="text-gray-500">{e.invoice_date ?? '—'}</span> },
@@ -122,7 +161,21 @@ export function ExpensesPage() {
       <PageHeader
         title="Ausgaben"
         description="Betriebsausgaben mit USt-Behandlung, Vorsteuer-Abzugsfähigkeit und Betriebsanteil. Ausländische SaaS-Rechnungen werden nicht automatisch als voll abziehbar klassifiziert."
-        actions={<Button icon={Plus} onClick={() => setComposerOpen(true)} disabled={!entity}>Ausgabe erfassen</Button>}
+        actions={
+          <div className="flex items-center gap-2">
+            <ExportMenu
+              onExport={runExport}
+              disabled={!entity || expenses.length === 0}
+              includeIds={includeIds}
+              onIncludeIdsChange={setIncludeIds}
+              modes={[
+                { value: 'current', label: 'Aktuelle Ansicht', count: filtered.length },
+                { value: 'all', label: 'Alle Ausgaben', count: expenses.length },
+              ]}
+            />
+            <Button icon={Plus} onClick={() => setComposerOpen(true)} disabled={!entity}>Ausgabe erfassen</Button>
+          </div>
+        }
       />
 
       {error ? <div className="mb-6"><ErrorState message={error} onRetry={() => void load()} /></div> : null}

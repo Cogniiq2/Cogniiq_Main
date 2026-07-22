@@ -10,7 +10,7 @@ import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import { loadAssets, loadTaxPeriodInputs, loadTaxSettings, recordExportRun, saveTaxEstimate } from '@/lib/ownerFinance/api';
 import { computeTaxSnapshot, type TaxSnapshot } from '@/lib/ownerFinance/taxSnapshot';
 import { RULES_VERSION } from '@/lib/ownerFinance/tax';
-import { exportCsv, exportJson } from '@/lib/ownerFinance/exports';
+import { exportCsv, exportJson, exportReportPdf, pdfMetaLines, EXPORT_DISCLAIMER, formatCentsCurrencyDe } from '@/lib/ownerFinance/exports';
 import { formatCents } from '@/lib/clientPlatform/validation';
 import type { OwnerTaxSettings } from '@/lib/ownerFinance/types';
 
@@ -85,6 +85,46 @@ export function TaxesPage() {
     await recordExportRun(entity.id, { export_type: 'ustva_preparation', period_start: `${taxYear}-01-01`, period_end: `${taxYear}-12-31`, rules_version: RULES_VERSION, warnings: data.calc.warnings });
     toast.success('UStVA-Paket erstellt', 'Als Vorbereitung markiert — nicht übermittelt.');
   };
+  const exportTaxPdf = async () => {
+    if (!entity || !data) return;
+    const v = data.calc.vat;
+    const meta = { entityName: entity.display_name, periodStart: `${taxYear}-01-01`, periodEnd: `${taxYear}-12-31`, valueBasis: 'estimated' as const };
+    try {
+      await exportReportPdf(`Steuerübersicht-${taxYear}.pdf`, {
+        brand: 'Cogniiq',
+        documentTitle: `Steuerübersicht ${taxYear} — Schätzung`,
+        entityName: entity.display_name,
+        metaLines: pdfMetaLines(meta),
+        sections: [
+          {
+            kind: 'keyvalue', heading: 'Umsatzsteuer (Vorbereitung)',
+            rows: [
+              ['Umsatzsteuer 19 %', formatCentsCurrencyDe(v.outputVatCents)],
+              ['Reverse-Charge USt', formatCentsCurrencyDe(v.reverseChargeOutputCents)],
+              ['Abziehbare Vorsteuer', formatCentsCurrencyDe(v.eligibleInputVatCents)],
+              ['Zahllast / Erstattung', formatCentsCurrencyDe(v.payableCents)],
+            ],
+          },
+          {
+            kind: 'keyvalue', heading: 'Rücklage',
+            rows: [
+              ['Empfohlene Steuer-Rücklage', formatCentsCurrencyDe(data.calc.reserve.totalReserveCents)],
+              ['Konfidenz', data.calc.confidence],
+            ],
+          },
+          ...(data.calc.warnings.length > 0
+            ? [{ kind: 'paragraph' as const, heading: 'Hinweise', text: data.calc.warnings.join(' · ') }]
+            : []),
+          { kind: 'note', text: `Steuerschätzung nach ${RULES_VERSION}. ${EXPORT_DISCLAIMER}` },
+        ],
+        disclaimer: `Cogniiq · Steuerschätzung — ${EXPORT_DISCLAIMER}`,
+      });
+      await recordExportRun(entity.id, { export_type: 'tax_overview:pdf', period_start: `${taxYear}-01-01`, period_end: `${taxYear}-12-31`, rules_version: RULES_VERSION, warnings: data.calc.warnings });
+      toast.success('Steuerübersicht als PDF erstellt', 'Als Schätzung/Vorbereitung markiert.');
+    } catch (e: unknown) {
+      toast.error('PDF-Export fehlgeschlagen', e instanceof Error ? e.message : String(e));
+    }
+  };
   const exportSummary = async () => {
     if (!entity || !data) return;
     exportJson(`Steuerübersicht-${taxYear}.json`, { entityName: entity.display_name, periodStart: `${taxYear}-01-01`, periodEnd: `${taxYear}-12-31`, valueBasis: 'estimated' }, data.calc as unknown as Record<string, unknown>);
@@ -105,6 +145,7 @@ export function TaxesPage() {
         actions={
           <div className="flex flex-wrap gap-2">
             <Button variant="secondary" icon={Download} onClick={() => void exportUstva()} disabled={!data}>UStVA-Paket</Button>
+            <Button variant="secondary" icon={Download} onClick={() => void exportTaxPdf()} disabled={!data}>PDF-Übersicht</Button>
             <Button variant="secondary" icon={Download} onClick={() => void exportSummary()} disabled={!data}>Steuerübersicht</Button>
             <Button onClick={() => void saveSnapshot()} loading={saving} disabled={!data}>Snapshot speichern</Button>
           </div>
