@@ -4,6 +4,8 @@ export * from './documentModel';
 export * from './documentValidation';
 export * from './documentHash';
 export * from './documentFilename';
+export * from './structuredInvoice';
+export * from './signatureProvider';
 export { buildTransactionalReportModel, renderTransactionalPdf } from './transactionalPdf';
 
 import { downloadBytes } from '@/lib/ownerFinance/exports';

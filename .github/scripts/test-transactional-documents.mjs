@@ -24,6 +24,8 @@ const [model, validation, hash, txpdf, pdf] = await Promise.all([
   bundle('lib/ownerFinance/exports/pdf.ts'),
 ]);
 const fname = await bundle('lib/ownerFinance/documents/documentFilename.ts');
+const structured = await bundle('lib/ownerFinance/documents/structuredInvoice.ts');
+const sig = await bundle('lib/ownerFinance/documents/signatureProvider.ts');
 
 let failures = 0;
 const eq = (a, b, m) => { if (a !== b) { console.error(`FAIL: ${m} — expected ${JSON.stringify(b)}, got ${JSON.stringify(a)}`); failures++; } };
@@ -110,6 +112,29 @@ const bigStr = Buffer.from(pdf.renderReportPdf(bigModel)).toString('latin1');
 const pages = (bigStr.match(/\/Type \/Page[^s]/g) || []).length;
 ok(pages >= 2, `long invoice paginates (pages=${pages})`);
 ok(bigStr.includes('Seite 1 von ' + pages), 'page total matches');
+
+/* ---- Structured e-invoice (experimental, never certified) ---- */
+const invForStructured = { ...baseOffer, kind: 'invoice', documentNumber: 'RE-2026-9', dueDate: '2026-04-01', recipient };
+const sv = structured.validateStructuredSource(invForStructured);
+ok(typeof sv.ok === 'boolean', 'structured source validation returns ok flag');
+ok(sv.notes.some((n) => /KEINE EN-16931/.test(n)), 'structured validation disclaims EN 16931 conformance');
+// disabled by default -> throws (no silent fake XRechnung)
+let threw = false;
+try { structured.buildStructuredIntermediate(invForStructured, 'xrechnung'); } catch { threw = true; }
+ok(threw, 'structured generation blocked when flag disabled (no fake XRechnung)');
+const inter = structured.buildStructuredIntermediate(invForStructured, 'xrechnung', { xrechnung: 'experimental', zugferd: 'disabled' });
+eq(inter.status, 'not_certified', 'structured intermediate is never certified');
+ok(/experimentell/.test(inter.disclaimer), 'structured intermediate carries experimental disclaimer');
+
+/* ---- Signature levels ---- */
+const cfg = sig.DEFAULT_SIGNATURE_CONFIG;
+eq(cfg.maxLevel, 'simple_electronic_signature', 'native config caps at simple e-signature');
+ok(sig.levelSupported(cfg, 'electronic_acceptance'), 'native supports online acceptance');
+ok(sig.levelSupported(cfg, 'simple_electronic_signature'), 'native supports simple e-signature');
+ok(!sig.levelSupported(cfg, 'advanced_provider_signature'), 'native does NOT claim advanced signature');
+ok(!sig.levelSupported(cfg, 'qualified_provider_signature'), 'native does NOT claim qualified signature');
+ok(!sig.levelSupported({ mode: 'disabled', maxLevel: 'qualified_provider_signature' }, 'electronic_acceptance'), 'disabled mode supports nothing');
+eq(sig.EXTERNAL_PROVIDER_NOT_CONFIGURED, 'Externer Signaturdienst nicht konfiguriert', 'unconfigured provider message');
 
 if (failures > 0) { console.error(`\ntransactional document tests: ${failures} FAILED`); process.exit(1); }
 console.log('transactional document tests: ALL PASSED');
