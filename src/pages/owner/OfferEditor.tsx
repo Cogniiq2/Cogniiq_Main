@@ -14,6 +14,7 @@ import {
 } from '@/components/dashboard';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import { PremiumOfferPreview } from '@/pages/owner/PremiumOfferPreview';
+import { PremiumPdfPreviewDialog } from '@/components/finance/PremiumPdfPreviewDialog';
 import {
   loadOffer, createOffer, updateOfferDraft, loadDocumentSettings,
   type OfferLineInput, type OfferSectionsInput,
@@ -21,7 +22,8 @@ import {
 import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
 import { computeInvoiceLine } from '@/lib/ownerFinance/tax';
 import { offerToDocument } from '@/lib/ownerFinance/buildTransactionalDoc';
-import { validateOfferForFinalization, type EditorSection } from '@/lib/ownerFinance/documents';
+import { validateOfferForFinalization, documentFilename, type EditorSection } from '@/lib/ownerFinance/documents';
+import { renderPremiumPdf } from '@/lib/ownerFinance/documents/premium';
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
 import type { OwnerOffer, OwnerOfferLine, OwnerDocumentSettings } from '@/lib/ownerFinance/types';
 
@@ -190,6 +192,7 @@ export function OfferEditor() {
   const [dirty, setDirty] = useState(false);
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [mobileTab, setMobileTab] = useState('edit');
+  const [previewOpen, setPreviewOpen] = useState(false);
   const currentOfferId = useRef<string | null>(offerId ?? null);
   const expectedUpdatedAt = useRef<string | null>(null);
 
@@ -238,6 +241,7 @@ export function OfferEditor() {
 
   const doc = useMemo(() => (state ? stateToDoc(state, settings, entity?.display_name ?? 'Cogniiq', true) : null), [state, settings, entity]);
   const validation = useMemo(() => (doc ? validateOfferForFinalization(doc.doc) : null), [doc]);
+  const renderPreview = useCallback(() => renderPremiumPdf(doc!.doc), [doc]);
 
   const applyCustomer = (organizationId: string) => {
     const c = customers.find((x) => x.organizationId === organizationId);
@@ -280,7 +284,8 @@ export function OfferEditor() {
   };
 
   const save = async () => { const id = await persist(); if (id) toast.success('Gespeichert'); };
-  const saveAndPreview = async () => { const id = await persist(); if (id) { toast.success('Gespeichert'); setMobileTab('preview'); } };
+  // Save, then open the reliable in-app PDF preview dialog (same component as the detail page).
+  const saveAndPreview = async () => { const id = await persist(); if (id) { toast.success('Gespeichert'); setPreviewOpen(true); } };
   const finalize = async () => {
     const id = await persist();
     if (!id) return;
@@ -465,6 +470,15 @@ export function OfferEditor() {
         <div className={mobileTab === 'edit' ? '' : 'hidden lg:block'}>{editor}</div>
         <div className={mobileTab === 'preview' ? '' : 'hidden lg:block'}>{preview}</div>
       </div>
+
+      <PremiumPdfPreviewDialog
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        render={renderPreview}
+        filename={documentFilename(doc.doc)}
+        title="Vorschau (Entwurf)"
+        description="Gespeicherter Entwurf — Premium-PDF-Vorschau."
+      />
     </>
   );
 }

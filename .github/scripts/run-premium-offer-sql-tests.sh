@@ -34,7 +34,15 @@ PSQL() { as "$PGBIN/psql" -h "$SOCK" -U postgres -v ON_ERROR_STOP=1 "$@"; }
 PSQL -c "create database prem;" >/dev/null
 PSQL -d prem -q -f "$SQLDIR/premium-offer-bootstrap.sql" >/dev/null
 for f in 20260723120000_owner_document_settings 20260723121000_owner_offers \
-         20260723122000_owner_commercial_documents 20260723123000_owner_premium_offer_editor; do
+         20260723122000_owner_commercial_documents 20260723123000_owner_premium_offer_editor \
+         20260723124000_owner_premium_offer_runtime_hotfix; do
   PSQL -d prem -q -f "$MIG/$f.sql" >/dev/null
 done
 PSQL -d prem -f "$SQLDIR/premium-offer-tests.sql"
+PSQL -d prem -f "$SQLDIR/premium-offer-pgcrypto-tests.sql"
+
+# Migration convergence: re-applying the hotfix must be idempotent (create-or-replace /
+# create-extension-if-not-exists), and the pgcrypto regression must still pass afterwards.
+PSQL -d prem -q -f "$MIG/20260723124000_owner_premium_offer_runtime_hotfix.sql" >/dev/null
+PSQL -d prem -f "$SQLDIR/premium-offer-pgcrypto-tests.sql" >/dev/null
+echo "migration convergence: hotfix re-applied cleanly and pgcrypto regression still passes"

@@ -9,6 +9,7 @@ import {
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import { offerStatusTone } from '@/pages/owner/OffersPage';
 import { PremiumOfferPreview } from '@/pages/owner/PremiumOfferPreview';
+import { PremiumPdfPreviewDialog } from '@/components/finance/PremiumPdfPreviewDialog';
 import {
   loadOffer, finalizeOffer, createOfferRevision, setOfferStatus, convertOfferToInvoiceDraft,
   createOfferAccessToken, loadOfferAcceptanceEvents, loadGeneratedDocuments, signedDocumentUrl,
@@ -49,6 +50,7 @@ export function OfferDetailPage() {
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [confirmReject, setConfirmReject] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const load = useCallback(async () => {
     if (!offerId || !entity) return;
@@ -84,15 +86,19 @@ export function OfferDetailPage() {
 
   const validation = useMemo(() => (doc ? validateOfferForFinalization(doc) : null), [doc]);
 
-  const run = async (key: string, fn: () => Promise<void>) => { setBusy(key); try { await fn(); } finally { setBusy(null); } };
+  // Hardened async wrapper: unexpected errors surface as a toast + full console log, never silently.
+  const run = async (key: string, fn: () => Promise<void>) => {
+    setBusy(key);
+    try { await fn(); }
+    catch (e: unknown) {
+      console.error(`[OfferDetailPage] action "${key}" failed:`, e);
+      toast.error('Aktion fehlgeschlagen', e instanceof Error ? e.message : String(e));
+    } finally { setBusy(null); }
+  };
 
-  const previewPdf = () => run('preview', async () => {
-    if (!doc) return;
-    const bytes = await renderPremiumPdf(doc);
-    const url = URL.createObjectURL(new Blob([bytes.slice()], { type: 'application/pdf' }));
-    window.open(url, '_blank', 'noopener');
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
-  });
+  // The preview PDF producer (stable per doc). For finalized offers `doc` is built from the
+  // immutable snapshot, so the preview never uses current CRM / current document settings.
+  const renderPreview = useCallback(() => renderPremiumPdf(doc!), [doc]);
 
   const downloadPdf = () => run('download', async () => { if (doc) { const bytes = await renderPremiumPdf(doc); downloadBytes(documentFilename(doc), bytes, 'application/pdf'); } });
 
@@ -168,14 +174,14 @@ export function OfferDetailPage() {
             {isDraft ? (
               <>
                 <Button size="sm" icon={Pencil} onClick={() => navigate(`/admin/finance/offers/${offer.id}/edit`)}>Bearbeiten</Button>
-                <Button size="sm" variant="secondary" icon={Eye} onClick={previewPdf} loading={busy === 'preview'}>Vorschau</Button>
+                <Button size="sm" variant="secondary" icon={Eye} onClick={() => setPreviewOpen(true)}>Vorschau</Button>
                 <Button size="sm" variant="secondary" icon={Download} onClick={downloadPdf} loading={busy === 'download'}>Entwurf herunterladen</Button>
                 <Button size="sm" icon={FileCheck2} onClick={finalize} loading={busy === 'finalize'} disabled={!validation?.canFinalize} title={validation?.canFinalize ? undefined : 'Pflichtangaben fehlen'}>Finalisieren</Button>
                 <Button size="sm" variant="ghost" icon={Trash2} onClick={() => setConfirmDelete(true)}>Entwurf löschen</Button>
               </>
             ) : (
               <>
-                <Button size="sm" variant="secondary" icon={Eye} onClick={previewPdf} loading={busy === 'preview'}>Vorschau</Button>
+                <Button size="sm" variant="secondary" icon={Eye} onClick={() => setPreviewOpen(true)}>Vorschau</Button>
                 <Button size="sm" variant="secondary" icon={Download} onClick={downloadPdf} loading={busy === 'download'}>PDF herunterladen</Button>
                 <Button size="sm" variant="secondary" icon={Save} onClick={generateStore} loading={busy === 'generate'}>PDF speichern</Button>
                 {offer.status !== 'converted' && offer.status !== 'cancelled' ? <Button size="sm" variant="secondary" icon={Link2} onClick={createLink} loading={busy === 'link'}>Sicheren Link erstellen</Button> : null}
@@ -260,6 +266,15 @@ export function OfferDetailPage() {
       <ConfirmDialog open={confirmDelete} onClose={() => setConfirmDelete(false)} tone="danger" title="Entwurf löschen?"
         message="Dieser Angebotsentwurf wird unwiderruflich gelöscht. Nur möglich, solange keine Version finalisiert und kein Link erstellt wurde." confirmLabel="Löschen"
         onConfirm={async () => { setConfirmDelete(false); const { error: e } = await deleteOfferDraft(offer.id); if (e) toast.error('Löschen fehlgeschlagen', e); else { toast.success('Entwurf gelöscht'); navigate('/admin/finance/offers'); } }} />
+
+      <PremiumPdfPreviewDialog
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        render={renderPreview}
+        filename={documentFilename(doc)}
+        title={isDraft ? 'Vorschau (Entwurf)' : `Vorschau · ${offer.offer_number ?? ''}`}
+        description={isDraft ? 'Entwurf — noch nicht finalisiert.' : 'Finalisiertes Angebot aus dem unveränderlichen Snapshot.'}
+      />
     </>
   );
 }

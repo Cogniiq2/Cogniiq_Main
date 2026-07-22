@@ -7,14 +7,20 @@
 -- is_platform_owner()/is_database_admin()/request_is_service_role()/auth.uid() read a
 -- GUC (app.role / app.uid) so a test can simulate owner vs admin vs anon vs service.
 
-create extension if not exists pgcrypto;
-
 -- Supabase-style roles.
 do $$ begin
   if not exists (select 1 from pg_roles where rolname='authenticated') then create role authenticated nologin; end if;
   if not exists (select 1 from pg_roles where rolname='anon') then create role anon nologin; end if;
   if not exists (select 1 from pg_roles where rolname='service_role') then create role service_role nologin; end if;
 end $$;
+
+-- Mirror Supabase: pgcrypto lives in the `extensions` schema, NOT `public`. This makes
+-- unqualified gen_random_bytes()/digest() calls fail at runtime exactly as in production,
+-- so the runtime hotfix migration (schema-qualified extensions.*) is genuinely exercised.
+-- gen_random_uuid() is a built-in (pg_catalog) in PG13+, so table defaults still resolve.
+create schema if not exists extensions;
+create extension if not exists pgcrypto with schema extensions;
+grant usage on schema extensions to authenticated, anon, service_role;
 
 create schema if not exists auth;
 create or replace function auth.uid() returns uuid language sql stable as $$
