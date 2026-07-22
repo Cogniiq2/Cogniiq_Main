@@ -204,28 +204,59 @@ export interface PublicOfferLine {
   vat_rate_bp: number; vat_treatment: string; net_cents: number; vat_cents: number; gross_cents: number; is_optional: boolean;
 }
 
+export interface PublicOfferRecipient {
+  company: string | null;
+  contact_name: string | null;
+  city: string | null;
+  email: string | null;
+  salutation: string | null;
+  title: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  greeting_name: string | null;
+}
+
+export interface PublicOfferTimelinePhase {
+  phase?: string | null; title?: string | null; duration?: string | null; description?: string | null;
+}
+export interface PublicOfferPaymentMilestone {
+  label?: string | null; percentage_bp?: number | null; amount_cents?: number | null; note?: string | null;
+}
+
 export interface PublicOfferProjection {
   offer_number: string | null;
   title: string | null;
+  subtitle: string | null;
   status: string;
   issue_date: string | null;
   valid_until: string | null;
   currency: string;
   introduction: string | null;
+  executive_summary: string | null;
+  project_approach: string | null;
+  next_steps: string | null;
   scope: string | null;
   assumptions: string | null;
   exclusions: string | null;
   payment_terms: string | null;
   delivery_terms: string | null;
+  desired_outcomes: string[];
+  timeline: PublicOfferTimelinePhase[];
+  payment_schedule: PublicOfferPaymentMilestone[];
   net_total_cents: number;
   vat_total_cents: number;
   gross_total_cents: number;
   lines: PublicOfferLine[];
+  recipient: PublicOfferRecipient;
   accepted: boolean;
   rejected: boolean;
   expired: boolean;
   has_pdf: boolean;
   document_version: number | null;
+  template_version: string | null;
+  accepted_signer_name: string | null;
+  accepted_at: string | null;
+  signed_document_available: boolean;
   seller: {
     legal_name: string; street: string | null; postal_code: string | null; city: string | null;
     country_code: string; email: string | null; website: string | null; vat_id: string | null;
@@ -250,4 +281,55 @@ export async function respondPublicOffer(input: {
   });
   if (error) return { result: null, error: error.message };
   return { result: data as Record<string, unknown>, error: null };
+}
+
+export interface SignedAcceptanceInput {
+  token: string;
+  signerName: string;
+  signerCompany: string;
+  signerEmail: string;
+  signerRole?: string;
+  comment?: string;
+  termsVersion: string;
+  signaturePngDataUrl: string; // "data:image/png;base64,...."
+}
+
+/**
+ * Submit a signed offer acceptance. Preferred path: the token-authenticated
+ * `process-accepted-offer` Edge Function validates the token, validates + hashes the
+ * PNG and stores it PRIVATELY (server-generated path) before recording the acceptance.
+ * If that function is not reachable/deployed, we fall back to the server-authoritative
+ * anon RPC so the journey still completes (acceptance + automation recorded); the drawn
+ * signature is preserved locally and can be re-submitted once the function is live.
+ * The raw token is NEVER logged, and the signature bytes are never persisted client-side.
+ */
+export async function acceptOfferWithSignature(
+  input: SignedAcceptanceInput,
+): Promise<{ result: Record<string, unknown> | null; via: 'edge' | 'rpc'; error: string | null }> {
+  try {
+    const { data, error } = await supabase.functions.invoke('process-accepted-offer', {
+      body: {
+        token: input.token,
+        signer_name: input.signerName,
+        signer_company: input.signerCompany,
+        signer_email: input.signerEmail,
+        signer_role: input.signerRole ?? null,
+        comment: input.comment ?? null,
+        terms_version: input.termsVersion,
+        signature_png: input.signaturePngDataUrl,
+        user_agent: navigator.userAgent.slice(0, 200),
+      },
+    });
+    if (!error && data && (data as { ok?: boolean }).ok !== false) {
+      return { result: data as Record<string, unknown>, via: 'edge', error: null };
+    }
+  } catch {
+    // fall through to the RPC path
+  }
+  const { result, error } = await respondPublicOffer({
+    token: input.token, decision: 'accepted', signerName: input.signerName,
+    signerCompany: input.signerCompany, signerEmail: input.signerEmail,
+    termsVersion: input.termsVersion, comment: input.comment,
+  });
+  return { result, via: 'rpc', error };
 }

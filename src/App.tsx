@@ -50,10 +50,27 @@ function isPrivateSurface(pathname: string) {
     || pathname === '/owner' || pathname.startsWith('/owner/');
 }
 
+// Tokenized customer document portal (/d/:token). A private, sensitive surface that
+// must never be indexed, archived, snippeted or referrer-leaked, and must render no
+// marketing structured data or canonical URL. The portal itself sets the document
+// title to the offer number after it loads.
+function isDocumentSurface(pathname: string) {
+  return pathname === '/d' || pathname.startsWith('/d/');
+}
+
 function RouteIndexabilityManager() {
   const { pathname } = useLocation();
 
   useEffect(() => {
+    if (isDocumentSurface(pathname)) {
+      setMeta('robots', 'noindex, nofollow, noarchive, nosnippet');
+      setMeta('referrer', 'no-referrer');
+      return; // title is set by PublicDocumentPortal once the offer is known.
+    }
+
+    // Leaving a document surface: restore the default referrer policy.
+    setMeta('referrer', 'strict-origin-when-cross-origin');
+
     if (isPrivateSurface(pathname)) {
       setMeta('robots', 'noindex, nofollow');
       document.title = pathname.startsWith('/admin')
@@ -72,7 +89,7 @@ function RouteIndexabilityManager() {
 
 function PublicStructuredData() {
   const { pathname } = useLocation();
-  if (isPrivateSurface(pathname)) return null;
+  if (isPrivateSurface(pathname) || isDocumentSurface(pathname)) return null;
   return <LocalBusinessSchema />;
 }
 
@@ -368,6 +385,14 @@ function AppInner() {
   return (
     <Suspense fallback={<PageFallback />}>
       <Routes>
+        {/* Standalone, tokenized customer document portal. Completely OUTSIDE every
+            marketing, dashboard and authenticated layout — no Navigation, no marketing
+            header/footer, no dashboard chrome, no ProtectedRoute. Access is governed
+            entirely by the secure token, never by a raw resource id. It owns the full
+            viewport (min-height:100dvh; width:100%; overflow-x:hidden) with no inherited
+            top offset. */}
+        <Route path="/d/:token" element={<PublicDocumentPortal />} />
+
         {/* Post-login role resolution — waits for the DB-backed role, then routes safely. */}
         <Route path="/auth/continue" element={<RoleLandingPage />} />
 
@@ -513,9 +538,6 @@ function AppInner() {
       <Route path="/blog" element={<BlogIndexPage />} />
       <Route path="/blog/:slug" element={<BlogPostPage />} />
       <Route path="/scan" element={<ScanPage />} />
-      {/* Public, tokenized document portal (offer acceptance). Outside the auth shell; access is
-          governed entirely by the secure token, never by a raw resource id. */}
-      <Route path="/d/:token" element={<PublicDocumentPortal />} />
       <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

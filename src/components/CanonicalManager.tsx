@@ -15,9 +15,17 @@ export function CanonicalManager() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const canonical = buildCanonical(pathname);
+    const existing = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
 
-    let el = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    // The tokenized customer document portal (/d/:token) is a private surface: it must
+    // never advertise a canonical marketing URL. Remove any canonical link while there.
+    if (pathname === "/d" || pathname.startsWith("/d/")) {
+      if (existing) existing.remove();
+      return;
+    }
+
+    const canonical = buildCanonical(pathname);
+    let el = existing;
     if (!el) {
       el = document.createElement("link");
       el.setAttribute("rel", "canonical");
