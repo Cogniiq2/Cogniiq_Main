@@ -34,6 +34,9 @@ export function TaxesPage() {
     setLoading(true);
     try {
       const settings = await loadTaxSettings(entity.id, taxYear);
+      // The RPC needs a timing to aggregate cash-basis figures. When the USt mode is still unknown we
+      // pass a provisional 'ist' ONLY to gather numbers — computeTaxSnapshot flags the mode as
+      // unconfigured so the VAT is never presented as confirmed Istversteuerung / abgabebereit.
       const timing = settings?.vat_timing ?? 'ist';
       const [inputs, assets] = await Promise.all([
         loadTaxPeriodInputs(entity.id, `${taxYear}-01-01`, `${taxYear}-12-31`, timing),
@@ -131,7 +134,7 @@ export function TaxesPage() {
                 ))}
               </ul>
               {openItems.length ? (
-                <Link to="/owner/settings" className="mt-4 inline-flex h-9 items-center rounded-xl border border-gray-200 bg-white px-3 text-[13px] font-semibold text-gray-700 transition-colors hover:border-gray-300 hover:text-gray-950">
+                <Link to="/admin/finance/settings" className="mt-4 inline-flex h-9 items-center rounded-xl border border-gray-200 bg-white px-3 text-[13px] font-semibold text-gray-700 transition-colors hover:border-gray-300 hover:text-gray-950">
                   {openItems.length} offene Eingabe(n) ergänzen
                 </Link>
               ) : null}
@@ -153,7 +156,7 @@ export function TaxesPage() {
           {/* KPIs */}
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <KpiCard label="EÜR-Gewinn" valueCents={data.calc.euer.taxableProfitCents} basis="estimate" />
-            <KpiCard label="USt-Zahllast" valueCents={data.calc.vat.payableCents} basis="estimate" hint={data.calc.vat.filingReady ? 'abgabebereit' : 'Prüfung offen'} />
+            <KpiCard label="USt-Zahllast" valueCents={data.calc.vat.payableCents} basis="estimate" hint={data.calc.vat.filingReady ? 'abgabebereit' : data.calc.vat.vatModeConfigured ? 'Prüfung offen' : 'USt-Modus fehlt'} />
             <KpiCard label="Gewerbesteuer" valueCents={data.calc.trade.tradeTaxCents} basis="estimate" hint={data.calc.trade.tradeTaxCents == null ? 'Hebesatz fehlt' : undefined} />
             <KpiCard label="Steuerrücklage gesamt" valueCents={data.calc.reserve.totalReserveCents} basis="estimate" />
           </div>

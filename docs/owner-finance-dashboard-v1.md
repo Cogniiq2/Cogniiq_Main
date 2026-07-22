@@ -5,9 +5,12 @@ Not a customer product and not a general admin dashboard.
 
 ## Architecture
 
-- **Frontend:** lazy-loaded `/owner/*` area (`src/pages/owner/*`) behind `PlatformOwnerRoute`, with a
-  dedicated premium dark shell (`ownerUi.tsx`). Routes are dispatched from `src/App.tsx`
-  (`location.pathname.startsWith('/owner')`), separate from `/app` (customer) and `/admin` (CRM).
+- **Frontend:** the Finance & Steuern module now lives inside the one unified internal workspace at
+  `/admin/finance/*` (`src/pages/admin/finance/FinanceModule.tsx`), rendered inside the shared
+  premium light `DashboardShell` provided by `InternalWorkspaceLayout`. It keeps its own owner-only
+  boundary (`PlatformOwnerRoute`) and backend-readiness gate; the page components still live in
+  `src/pages/owner/*`. The legacy `/owner/*` paths are permanent redirects to `/admin/finance/*`
+  (`/owner/clients` → the shared CRM at `/admin/clients`). See `docs/unified-workspace.md`.
 - **Data layer:** `src/lib/ownerFinance/api.ts` (Supabase queries + owner-only RPCs + audit logging),
   `types.ts`, `exports.ts` (CSV/JSON with metadata banner).
 - **Tax engine:** `src/lib/ownerFinance/tax/*` — pure, deterministic, versioned `de-2026-v1`. No tax
@@ -21,7 +24,18 @@ Not a customer product and not a general admin dashboard.
   or client state. `info@cogniiq.de` is never hardcoded.
 - `PlatformOwnerRoute` uses `isPlatformOwner`. Every finance table/policy and both mutation RPCs
   enforce `is_platform_owner()`. RLS is the final boundary; the denied UI never reveals whether
-  records exist. The "Owner Cockpit" link in the admin shell renders only for owners.
+  records exist. The "Finance & Steuern" top-level navigation item renders only for owners, and the
+  finance sub-navigation is withheld from non-owners even on a typed URL.
+
+## USt (VAT) readiness — corrected
+
+When no `owner_tax_settings` row exists, or `vat_timing` is `null`, the Ist/Soll USt mode is unknown.
+The tax engine no longer silently falls back to Istversteuerung and presents the VAT as filing-ready
+("abgabebereit"). `vatPeriodSummary`/`computeTaxSnapshot` now surface `vatModeConfigured`: while it is
+false the VAT is never `filingReady`, the KPI reads "USt-Modus fehlt", the Umsatzsteuer section stays
+"unvollständig", the whole estimate stays `incomplete`, and a warning is emitted. This is a
+frontend/engine fix only — the applied migration `20260722120000_owner_finance_cockpit.sql` is
+untouched. Covered by `.github/scripts/test-owner-finance-tax.mjs`.
 
 ## Schema overview (all owner-only RLS, money = bigint cents, % = basis points)
 

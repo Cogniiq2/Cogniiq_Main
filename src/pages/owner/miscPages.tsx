@@ -39,7 +39,7 @@ export function RevenuePage() {
   return (
     <>
       <PageHeader title="Umsatz" description={`Umsatz- und Forderungsübersicht ${taxYear}. Details und Rechnungserfassung im Bereich Rechnungen.`}
-        actions={<Link to="/owner/invoices" className="inline-flex h-11 items-center gap-2 rounded-xl bg-gray-950 px-4 text-[13.5px] font-semibold text-white transition-colors hover:bg-gray-800">Rechnungen verwalten</Link>} />
+        actions={<Link to="/admin/finance/invoices" className="inline-flex h-11 items-center gap-2 rounded-xl bg-gray-950 px-4 text-[13.5px] font-semibold text-white transition-colors hover:bg-gray-800">Rechnungen verwalten</Link>} />
       {error ? <ErrorState message={error} /> : loading || !summary ? <KpiSkeletonGrid /> : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <KpiCard label="Fakturiert (netto)" valueCents={summary.invoiced_net_cents} basis="actual" />

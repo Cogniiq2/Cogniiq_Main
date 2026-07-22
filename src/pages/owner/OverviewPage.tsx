@@ -114,7 +114,7 @@ export function OverviewPage() {
           <InfoBanner
             tone="warning"
             title="Steuer-Setup unvollständig"
-            action={<Link to="/owner/settings" className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-amber-500 px-3 text-[13px] font-semibold text-white hover:bg-amber-600">Einstellungen <ArrowUpRight size={14} /></Link>}
+            action={<Link to="/admin/finance/settings" className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-amber-500 px-3 text-[13px] font-semibold text-white hover:bg-amber-600">Einstellungen <ArrowUpRight size={14} /></Link>}
           >
             Vervollständigen Sie Hebesatz, USt-Modus und persönliche Angaben, damit vollständige Steuerschätzungen möglich sind.
           </InfoBanner>
@@ -141,10 +141,10 @@ export function OverviewPage() {
 
           {/* Receivables & reserves */}
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <KpiCard label="Offene Forderungen" valueCents={s.outstanding_cents} basis="actual" to="/owner/invoices" />
-            <KpiCard label="Überfällige Forderungen" valueCents={s.overdue_cents} basis="actual" tone={s.overdue_cents > 0 ? 'negative' : 'neutral'} hint={s.overdue_count ? `${s.overdue_count} Rechnung(en)` : 'keine'} to="/owner/invoices" />
-            <KpiCard label="Wiederkehrende Kosten / Monat" valueCents={s.recurring_monthly_cost_cents} basis="forecast" to="/owner/subscriptions" />
-            <KpiCard label="Empfohlene Steuerrücklage" valueCents={totalReserve} basis="estimate" to="/owner/taxes" hint="Gesamt (USt + ESt + GewSt + …)" />
+            <KpiCard label="Offene Forderungen" valueCents={s.outstanding_cents} basis="actual" to="/admin/finance/invoices" />
+            <KpiCard label="Überfällige Forderungen" valueCents={s.overdue_cents} basis="actual" tone={s.overdue_cents > 0 ? 'negative' : 'neutral'} hint={s.overdue_count ? `${s.overdue_count} Rechnung(en)` : 'keine'} to="/admin/finance/invoices" />
+            <KpiCard label="Wiederkehrende Kosten / Monat" valueCents={s.recurring_monthly_cost_cents} basis="forecast" to="/admin/finance/subscriptions" />
+            <KpiCard label="Empfohlene Steuerrücklage" valueCents={totalReserve} basis="estimate" to="/admin/finance/taxes" hint="Gesamt (USt + ESt + GewSt + …)" />
           </div>
 
           {/* Charts */}
@@ -194,7 +194,7 @@ export function OverviewPage() {
           {/* Reserve composition + obligations */}
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
             <Card>
-              <SectionHeader title="Zusammensetzung der Steuerrücklage" description="Reale Schätzung auf Basis gebuchter Zahlungen und Ihrer Einstellungen" action={<Link to="/owner/taxes" className="text-[13px] font-semibold text-gray-950 hover:underline">Details</Link>} />
+              <SectionHeader title="Zusammensetzung der Steuerrücklage" description="Reale Schätzung auf Basis gebuchter Zahlungen und Ihrer Einstellungen" action={<Link to="/admin/finance/taxes" className="text-[13px] font-semibold text-gray-950 hover:underline">Details</Link>} />
               {totalReserve > 0 ? (
                 <ReserveComposition snapshot={snap} />
               ) : (
@@ -205,8 +205,8 @@ export function OverviewPage() {
             <Card>
               <SectionHeader title="Prüf-Warteschlange" />
               <div className="space-y-2.5">
-                <AlertRow label="Überfällige Rechnungen" value={s.overdue_count} to="/owner/invoices" />
-                <AlertRow label="Ausgaben zur Prüfung" value={s.review_expense_count} to="/owner/expenses" />
+                <AlertRow label="Überfällige Rechnungen" value={s.overdue_count} to="/admin/finance/invoices" />
+                <AlertRow label="Ausgaben zur Prüfung" value={s.review_expense_count} to="/admin/finance/expenses" />
                 <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50/70 px-3.5 py-2.5">
                   <span className="text-[13px] text-gray-600">Steuer-Setup</span>
                   <StatusBadge label={data.setupComplete ? 'vollständig' : 'unvollständig'} tone={data.setupComplete ? 'success' : 'warning'} />
@@ -236,7 +236,7 @@ export function OverviewPage() {
             </Card>
 
             <Card>
-              <SectionHeader title="Ausgaben nach Kategorie" description="Netto, laufendes Jahr" action={<Link to="/owner/expenses" className="text-[13px] font-semibold text-gray-950 hover:underline">Alle</Link>} />
+              <SectionHeader title="Ausgaben nach Kategorie" description="Netto, laufendes Jahr" action={<Link to="/admin/finance/expenses" className="text-[13px] font-semibold text-gray-950 hover:underline">Alle</Link>} />
               {data.categoryBreakdown.length ? (
                 <CategoryBars items={data.categoryBreakdown} />
               ) : (

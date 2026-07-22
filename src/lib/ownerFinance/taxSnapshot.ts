@@ -33,6 +33,10 @@ export function computeTaxSnapshot(input: TaxSnapshotInput) {
 
   const euer = euerResult({ paidRevenueNetCents: paidRevenueNet, paidDeductibleExpenseCents: paidDeductibleExpense, depreciationCents: depreciation, manualAdjustmentsCents: input.settings?.manual_personal_adjustments_cents ?? 0 });
 
+  // The Ist/Soll USt mode is only known once owner_tax_settings.vat_timing is set. When it is null we
+  // must NOT silently fall back to Istversteuerung and present the VAT as filing-ready — the VAT stays
+  // "not abgabebereit" and the whole estimate remains incomplete until the owner chooses a mode.
+  const vatModeConfigured = !!input.settings?.vat_timing;
   const vat = vatPeriodSummary({
     outputVatCents: src?.vat_output_cents ?? 0,
     reverseChargeOutputCents: src?.vat_reverse_charge_output_cents ?? 0,
@@ -40,6 +44,7 @@ export function computeTaxSnapshot(input: TaxSnapshotInput) {
     eligibleReverseChargeInputCents: 0,
     prepaymentsCents: input.settings?.vat_prepayments_cents ?? 0,
     hasUnresolvedTreatments: src ? !src.filing_ready : true,
+    vatModeConfigured,
   });
 
   const hebesatzBp = input.settings?.trade_tax_hebesatz_bp ?? null;
@@ -62,13 +67,18 @@ export function computeTaxSnapshot(input: TaxSnapshotInput) {
 
   const reserve = combinedReserve({ vatReserveCents: vat.reserveCents, businessIncomeTaxReserveCents: income.remainingReserveCents, tradeTaxRemainingCents: tradeRemaining, soliRemainingCents: soliRemaining, churchTaxRemainingCents: churchRemaining });
 
-  const filingReady = src ? src.filing_ready : false;
+  // Filing readiness requires BOTH resolved treatments AND a chosen USt mode.
+  const filingReady = (src ? src.filing_ready : false) && vatModeConfigured;
   const warnings = [...(src?.warnings ?? []), ...vat.warnings, ...trade.warnings, ...income.warnings, ...sec35.warnings];
   if (!input.settings?.setup_complete) warnings.unshift('Steuer-Setup ist unvollständig – die Gesamtschätzung ist vorläufig.');
-  const confidence: 'complete' | 'estimate' | 'incomplete' = !input.settings?.setup_complete || !income.hasPersonalInputs || hebesatzBp == null || !filingReady ? 'incomplete' : 'estimate';
+  const confidence: 'complete' | 'estimate' | 'incomplete' =
+    !input.settings?.setup_complete || !income.hasPersonalInputs || hebesatzBp == null || !vatModeConfigured || !filingReady
+      ? 'incomplete'
+      : 'estimate';
 
   return {
     euer, vat, trade, sec35, income,
+    vatModeConfigured,
     soliRemainingCents: soliRemaining,
     churchRemainingCents: churchRemaining,
     tradeRemainingCents: tradeRemaining,

@@ -36,6 +36,9 @@ jobs:
       - name: Owner finance tax engine unit tests
         run: node .github/scripts/test-owner-finance-tax.mjs
 
+      - name: Auth routing / redirect unit tests
+        run: node .github/scripts/test-auth-routing.mjs
+
       - name: Typecheck
         run: npm run typecheck
 

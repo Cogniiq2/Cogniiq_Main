@@ -50,6 +50,14 @@ for (const [a, b] of [[17799, 17800], [69878, 69879], [277825, 277826]]) {
   eq(sum.payableCents, 2300, 'vat payable'); eq(sum.reserveCents, 2300, 'vat reserve'); ok(sum.filingReady, 'filing ready when resolved');
   const sum2 = t.vatPeriodSummary({ outputVatCents: 100, reverseChargeOutputCents: 0, eligibleInputVatCents: 0, eligibleReverseChargeInputCents: 0, prepaymentsCents: 0, hasUnresolvedTreatments: true });
   ok(!sum2.filingReady && sum2.warnings.length > 0, 'unknown classification blocks filing-ready');
+  // Default (no vatModeConfigured field) stays back-compatible: filing-ready when treatments resolved.
+  ok(t.vatPeriodSummary({ outputVatCents: 0, reverseChargeOutputCents: 0, eligibleInputVatCents: 0, eligibleReverseChargeInputCents: 0, prepaymentsCents: 0, hasUnresolvedTreatments: false }).filingReady, 'default vat mode => filing-ready when resolved');
+  // USt readiness bug: an unknown Ist/Soll mode must NEVER be filing-ready, even with resolved treatments.
+  const noMode = t.vatPeriodSummary({ outputVatCents: 0, reverseChargeOutputCents: 0, eligibleInputVatCents: 0, eligibleReverseChargeInputCents: 0, prepaymentsCents: 0, hasUnresolvedTreatments: false, vatModeConfigured: false });
+  ok(!noMode.filingReady, 'missing USt mode is never filing-ready');
+  ok(noMode.vatModeConfigured === false, 'missing USt mode surfaced on result');
+  ok(noMode.warnings.some((w) => /USt-Modus/.test(w)), 'missing USt mode warns');
+  ok(t.vatPeriodSummary({ outputVatCents: 0, reverseChargeOutputCents: 0, eligibleInputVatCents: 0, eligibleReverseChargeInputCents: 0, prepaymentsCents: 0, hasUnresolvedTreatments: false, vatModeConfigured: true }).filingReady, 'configured USt mode + resolved => filing-ready');
 }
 
 // ---- Trade tax ----
@@ -126,6 +134,47 @@ eq(t.churchTax(5000000, 800, true), 400000, 'church tax 8% enabled');
 
   const businessUse = t.depreciationSchedule({ acquisitionCostCents: 200000, businessUseBp: 5000, method: 'straight_line', usefulLifeMonths: 24, startYear: 2026, startMonth: 1, years: 4 });
   eq(businessUse.base, 100000, 'business-use fraction applied to base');
+}
+
+// ---- taxSnapshot USt readiness (computeTaxSnapshot) ----
+// Bundle the aggregation layer separately. Its imports from ./api and ./types are type-only and are
+// erased by esbuild, so no Supabase client or DB is pulled in.
+{
+  const snapEntry = resolve(here, '../../src/lib/ownerFinance/taxSnapshot.ts');
+  const snapBuild = await build({ entryPoints: [snapEntry], bundle: true, format: 'esm', write: false, platform: 'neutral', logLevel: 'silent' });
+  const s = await import('data:text/javascript;base64,' + Buffer.from(snapBuild.outputFiles[0].text).toString('base64'));
+
+  const readyInputs = {
+    vat_timing: 'ist', paid_revenue_net_cents: 1000000, paid_expense_deductible_net_cents: 200000,
+    vat_output_cents: 190000, vat_reverse_charge_output_cents: 0, vat_input_cents: 38000,
+    has_unlinked_income: false, has_unresolved_treatment: false, missing_service_date: false,
+    recurring_flag_count: 0, filing_ready: true, warnings: [],
+  };
+  const completeSettings = {
+    business_entity_id: 'x', tax_year: 2026, vat_timing: 'ist', vat_filing_frequency: 'monthly',
+    trade_tax_hebesatz_bp: 49000, assessment_mode: 'single', church_tax_enabled: false, church_tax_rate_bp: null,
+    estimated_other_taxable_income_cents: 5000000, income_tax_prepayments_cents: 0, trade_tax_prepayments_cents: 0,
+    soli_prepayments_cents: 0, church_tax_prepayments_cents: 0, vat_prepayments_cents: 0,
+    manual_personal_adjustments_cents: 0, reserve_horizon_days: 90, setup_complete: true,
+  };
+
+  // Null tax settings: incomplete, VAT never filing-ready, mode unconfigured.
+  const nullCalc = s.computeTaxSnapshot({ inputs: null, assets: [], settings: null, taxYear: 2026 });
+  eq(nullCalc.confidence, 'incomplete', 'null settings => incomplete');
+  ok(!nullCalc.vat.filingReady, 'null settings => VAT not filing-ready');
+  ok(nullCalc.vatModeConfigured === false, 'null settings => USt mode unconfigured');
+
+  // The core bug: settings present & RPC filing_ready=true, but vat_timing is null.
+  const noModeCalc = s.computeTaxSnapshot({ inputs: readyInputs, assets: [], settings: { ...completeSettings, vat_timing: null }, taxYear: 2026 });
+  ok(!noModeCalc.vat.filingReady, 'missing USt mode never appears filing-ready (never abgabebereit)');
+  eq(noModeCalc.confidence, 'incomplete', 'missing USt mode => estimate stays incomplete');
+  ok(noModeCalc.warnings.some((w) => /USt-Modus/.test(w)), 'missing USt mode produces a warning');
+
+  // Configured USt mode with complete inputs behaves as expected (estimate + VAT filing-ready).
+  const okCalc = s.computeTaxSnapshot({ inputs: readyInputs, assets: [], settings: completeSettings, taxYear: 2026 });
+  ok(okCalc.vat.filingReady, 'configured USt mode + resolved => VAT filing-ready');
+  ok(okCalc.vatModeConfigured === true, 'configured USt mode surfaced');
+  eq(okCalc.confidence, 'estimate', 'complete setup => estimate');
 }
 
 if (failures) { console.error(`owner-finance tax engine tests: ${failures} FAILED`); process.exit(1); }

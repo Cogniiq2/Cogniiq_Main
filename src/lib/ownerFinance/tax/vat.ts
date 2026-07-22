@@ -46,6 +46,10 @@ export interface VatPeriodInputs {
   eligibleReverseChargeInputCents: number; // eligible input VAT corresponding to reverse charge
   prepaymentsCents: number;      // VAT already prepaid for the period
   hasUnresolvedTreatments: boolean;
+  // false when the owner has not yet chosen an Ist/Soll USt mode (owner_tax_settings.vat_timing is
+  // null). An unknown USt mode must NEVER be presented as confirmed Istversteuerung, so it blocks
+  // filing readiness independently of treatment classification. Defaults to true for back-compat.
+  vatModeConfigured?: boolean;
 }
 
 export interface VatPeriodResult {
@@ -55,15 +59,21 @@ export interface VatPeriodResult {
   payableCents: number;          // positive = owed to tax office, negative = refund
   reserveCents: number;          // amount to set aside (never below 0)
   filingReady: boolean;
+  /** false when the Ist/Soll USt mode is still unknown; surfaced so the UI can label it precisely */
+  vatModeConfigured: boolean;
   warnings: string[];
 }
 
 // VAT reserve = output + reverse-charge liability − eligible input − prepayments.
 export function vatPeriodSummary(input: VatPeriodInputs): VatPeriodResult {
+  const vatModeConfigured = input.vatModeConfigured !== false;
   const totalInput = input.eligibleInputVatCents + input.eligibleReverseChargeInputCents;
   const payableCents =
     input.outputVatCents + input.reverseChargeOutputCents - totalInput - input.prepaymentsCents;
   const warnings: string[] = [];
+  if (!vatModeConfigured) {
+    warnings.push('USt-Modus (Ist/Soll) ist nicht gewählt – die USt ist nicht abgabebereit.');
+  }
   if (input.hasUnresolvedTreatments) {
     warnings.push('Nicht klassifizierte USt-Behandlungen vorhanden – nicht abgabebereit.');
   }
@@ -73,7 +83,9 @@ export function vatPeriodSummary(input: VatPeriodInputs): VatPeriodResult {
     eligibleInputVatCents: totalInput,
     payableCents,
     reserveCents: Math.max(0, payableCents),
-    filingReady: !input.hasUnresolvedTreatments,
+    // An unknown USt mode is never filing-ready — do not silently treat it as Istversteuerung.
+    filingReady: vatModeConfigured && !input.hasUnresolvedTreatments,
+    vatModeConfigured,
     warnings,
   };
 }

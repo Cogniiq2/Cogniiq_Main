@@ -1,46 +1,8 @@
-import type { ReactNode } from 'react';
-import { useLocation } from 'react-router-dom';
-import {
-  Building2, FileText, Gauge, HardDrive, LayoutDashboard, LayoutGrid, HeartPulse, Receipt,
-  Repeat, ScrollText, Settings, ShieldCheck, Wallet,
-} from 'lucide-react';
+import { type BadgeTone } from '@/components/dashboard';
 
-import { DashboardShell, type ShellSection, type ShellSubNavItem, type BadgeTone } from '@/components/dashboard';
-
-// Owner-scoped façade over the shared light dashboard design system. The finance module renders
-// inside the SAME visual shell as the rest of the Cogniiq admin dashboard — no second dark sidebar,
-// no duplicate logout, no separate application feeling. All primitives come from the shared system.
-export * from '@/components/dashboard';
-
-const financeSubNav: ShellSubNavItem[] = [
-  { key: 'overview', label: 'Übersicht', href: '/owner/overview', icon: LayoutDashboard },
-  { key: 'invoices', label: 'Rechnungen', href: '/owner/invoices', icon: FileText },
-  { key: 'expenses', label: 'Ausgaben', href: '/owner/expenses', icon: Receipt },
-  { key: 'subscriptions', label: 'Abos', href: '/owner/subscriptions', icon: Repeat },
-  { key: 'assets', label: 'Anlagen', href: '/owner/assets', icon: HardDrive },
-  { key: 'taxes', label: 'Steuern', href: '/owner/taxes', icon: Gauge },
-  { key: 'clients', label: 'Kunden (CRM)', href: '/owner/clients', icon: Building2 },
-  { key: 'revenue', label: 'Umsatz', href: '/owner/revenue', icon: Wallet },
-  { key: 'documents', label: 'Dokumente', href: '/owner/documents', icon: ScrollText },
-  { key: 'audit', label: 'Audit', href: '/owner/audit', icon: ShieldCheck },
-  { key: 'settings', label: 'Einstellungen', href: '/owner/settings', icon: Settings },
-];
-
-export function OwnerShell({ children }: { children: ReactNode }) {
-  const { pathname } = useLocation();
-  const inOwner = pathname.startsWith('/owner');
-  const sections: ShellSection[] = [
-    { key: 'tasks', label: 'Task-Dashboard', href: '/admin', icon: LayoutGrid, active: false },
-    { key: 'oura', label: 'Oura Analytics', href: '/admin/oura-analytics', icon: HeartPulse, active: false },
-    { key: 'crm', label: 'Client CRM', href: '/admin/clients', icon: Building2, active: false },
-    { key: 'finance', label: 'Finance & Steuern', href: '/owner/overview', icon: Wallet, active: inOwner, ownerOnly: true },
-  ];
-  return (
-    <DashboardShell sections={sections} subNav={financeSubNav} subNavLabel="Finance & Steuern" title="Finance & Steuern">
-      {children}
-    </DashboardShell>
-  );
-}
+// Owner-finance status-tone maps over the shared badge palette. The finance pages render inside the
+// unified InternalWorkspaceLayout shell (at /admin/finance/*), so this module no longer owns a shell,
+// header or navigation — only these domain tone maps remain.
 
 // Owner-domain status tones mapped onto the shared badge palette.
 export const invoiceStatusTone: Record<string, BadgeTone> = {

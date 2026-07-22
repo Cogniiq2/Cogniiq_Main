@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, type ComponentType, type LazyExoticComponent } from 'react';
-import { BrowserRouter as Router, Navigate, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Navigate, Outlet, Routes, Route, useLocation } from 'react-router-dom';
 
 import { PageReveal } from './components/PageReveal';
 import { Navigation } from './components/Navigation';
@@ -9,6 +9,9 @@ import { LocalBusinessSchema } from './components/LocalBusinessSchema';
 import { CanonicalManager } from './components/CanonicalManager';
 import { CityServicePage } from './components/CityServicePage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { RoleLandingPage } from './components/auth/RoleLandingPage';
+import { LegacyLoginRedirect, LegacyOwnerRedirect } from './components/auth/LegacyRedirects';
+import { InternalWorkspaceLayout } from './pages/admin/InternalWorkspace';
 import { ReceptionistEntitlementRoute } from './components/app/ReceptionistEntitlementRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { CITY_SERVICE_CONFIGS } from './lib/standorte-data';
@@ -319,12 +322,16 @@ const LogoShowcasePage = lazyNamed(() => import('./pages/LogoShowcasePage'), 'Lo
 const BlogIndexPage = lazyNamed(() => import('./pages/blog/BlogIndexPage'), 'BlogIndexPage');
 const BlogPostPage = lazyNamed(() => import('./pages/blog/BlogPostPage'), 'BlogPostPage');
 const ScanPage = lazyNamed(() => import('./pages/ScanPage'), 'ScanPage');
-const AdminPage = lazyNamed(() => import('./pages/AdminPage'), 'AdminPage');
-const ExecutionPage = lazyNamed(() => import('./pages/ExecutionPage'), 'ExecutionPage');
-const OuraAnalyticsPage = lazyNamed(() => import('./pages/OuraAnalyticsPage'), 'OuraAnalyticsPage');
-const AdminLoginPage = lazyNamed(() => import('./pages/admin/AdminLoginPage'), 'AdminLoginPage');
-const AdminClientPlatform = lazyNamed(() => import('./pages/admin/clients/AdminClientPlatform'), 'AdminClientPlatform');
-const OwnerCockpit = lazyNamed(() => import('./pages/owner/OwnerCockpit'), 'OwnerCockpit');
+// Unified internal workspace content (all rendered inside InternalWorkspaceLayout's shared shell).
+const TaskDashboardContent = lazyNamed(() => import('./pages/admin/tasks/TaskDashboardContent'), 'TaskDashboardContent');
+const ExecutionContent = lazyNamed(() => import('./pages/ExecutionPage'), 'ExecutionContent');
+const OuraAnalyticsContent = lazyNamed(() => import('./pages/OuraAnalyticsPage'), 'OuraAnalyticsContent');
+const FinanceModule = lazyNamed(() => import('./pages/admin/finance/FinanceModule'), 'FinanceModule');
+const ClientsListPage = lazyNamed(() => import('./pages/admin/clients/ClientsListPage'), 'ClientsListPage');
+const NewClientWizard = lazyNamed(() => import('./pages/admin/clients/NewClientWizard'), 'NewClientWizard');
+const ClientDetailPage = lazyNamed(() => import('./pages/admin/clients/ClientDetailPage'), 'ClientDetailPage');
+const AdminSolutionsPage = lazyNamed(() => import('./pages/admin/clients/AdminSolutionsPage'), 'AdminSolutionsPage');
+const AdminInvitationsPage = lazyNamed(() => import('./pages/admin/clients/AdminInvitationsPage'), 'AdminInvitationsPage');
 const AppHomePage = lazyNamed(() => import('./pages/app/AppHomePage'), 'AppHomePage');
 const CustomerSectionPage = lazyNamed(() => import('./pages/app/CustomerSectionPage'), 'CustomerSectionPage');
 const SolutionPage = lazyNamed(() => import('./pages/app/SolutionPage'), 'SolutionPage');
@@ -335,206 +342,79 @@ const SignupPage = lazyNamed(() => import('./pages/app/SignupPage'), 'SignupPage
 const ForgotPasswordPage = lazyNamed(() => import('./pages/app/ForgotPasswordPage'), 'ForgotPasswordPage');
 const ResetPasswordPage = lazyNamed(() => import('./pages/app/ResetPasswordPage'), 'ResetPasswordPage');
 
-function AppInner() {
-  const location = useLocation();
-  const adminHashPath = location.hash.split('?')[0];
-
-  if (location.pathname.startsWith('/admin')) {
-    if (location.pathname === '/admin/login') {
-      return (
-        <Suspense fallback={<PageFallback />}>
-          <AdminLoginPage />
-        </Suspense>
-      );
-    }
-    if (location.pathname === '/admin/execution') {
-      return (
-        <Suspense fallback={<PageFallback />}>
-          <ExecutionPage />
-        </Suspense>
-      );
-    }
-    if (location.pathname === '/admin/oura-analytics' || adminHashPath === '#/oura-analytics') {
-      return (
-        <Suspense fallback={<PageFallback />}>
-          <OuraAnalyticsPage />
-        </Suspense>
-      );
-    }
-    if (
-      location.pathname === '/admin/clients' ||
-      location.pathname.startsWith('/admin/clients/') ||
-      location.pathname === '/admin/solutions' ||
-      location.pathname === '/admin/invitations'
-    ) {
-      return (
-        <Suspense fallback={<PageFallback />}>
-          <AdminClientPlatform />
-        </Suspense>
-      );
-    }
-    return (
-      <Suspense fallback={<PageFallback />}>
-        <AdminPage />
-      </Suspense>
-    );
-  }
-
-  if (location.pathname.startsWith('/owner')) {
-    return (
-      <Suspense fallback={<PageFallback />}>
-        <OwnerCockpit />
-      </Suspense>
-    );
-  }
-
-  if (location.pathname.startsWith('/app')) {
-    return (
-      <Suspense fallback={<PageFallback />}>
-        <Routes>
-          <Route path="/app/login" element={<LoginPage />} />
-          <Route path="/app/signup" element={<SignupPage />} />
-          <Route path="/app/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/app/reset-password" element={<ResetPasswordPage />} />
-          <Route
-            path="/app"
-            element={
-              <ProtectedRoute>
-                <AppHomePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/solutions"
-            element={
-              <ProtectedRoute>
-                <SolutionsIndexPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/solutions/:instanceKey/*"
-            element={
-              <ProtectedRoute>
-                <SolutionPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/support"
-            element={
-              <ProtectedRoute>
-                <SupportPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/onboarding"
-            element={
-              <ProtectedRoute>
-                <ReceptionistEntitlementRoute>
-                  <CustomerSectionPage section="onboarding" />
-                </ReceptionistEntitlementRoute>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/receptionist"
-            element={
-              <ProtectedRoute>
-                <ReceptionistEntitlementRoute>
-                  <CustomerSectionPage section="receptionist" />
-                </ReceptionistEntitlementRoute>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/knowledge"
-            element={
-              <ProtectedRoute>
-                <ReceptionistEntitlementRoute>
-                  <CustomerSectionPage section="knowledge" />
-                </ReceptionistEntitlementRoute>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/phone"
-            element={
-              <ProtectedRoute>
-                <ReceptionistEntitlementRoute>
-                  <CustomerSectionPage section="phone" />
-                </ReceptionistEntitlementRoute>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/test"
-            element={
-              <ProtectedRoute>
-                <ReceptionistEntitlementRoute>
-                  <CustomerSectionPage section="test" />
-                </ReceptionistEntitlementRoute>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/calls"
-            element={
-              <ProtectedRoute>
-                <ReceptionistEntitlementRoute>
-                  <CustomerSectionPage section="calls" />
-                </ReceptionistEntitlementRoute>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/leads"
-            element={
-              <ProtectedRoute>
-                <ReceptionistEntitlementRoute>
-                  <CustomerSectionPage section="leads" />
-                </ReceptionistEntitlementRoute>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/billing"
-            element={
-              <ProtectedRoute>
-                <CustomerSectionPage section="billing" />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/settings"
-            element={
-              <ProtectedRoute>
-                <CustomerSectionPage section="settings" />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/app/*"
-            element={
-              <ProtectedRoute>
-                <Navigate to="/app" replace />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </Suspense>
-    );
-  }
-
+function PublicLayout() {
   return (
     <PageReveal>
       <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-       <Navigation />
+        <Navigation />
+        <main id="main-content">
+          <Suspense fallback={<PageFallback />}>
+            <Outlet />
+          </Suspense>
+        </main>
+        <PremiumFooterReveal>
+          <Footer />
+        </PremiumFooterReveal>
+      </div>
+    </PageReveal>
+  );
+}
 
-<main id="main-content">
-  <Suspense fallback={<PageFallback />}>
-    <Routes>
+// One top-level route table. Auth/private surfaces and the customer portal are matched first; the
+// public marketing site is a pathless layout route so its chrome wraps every marketing page without
+// changing any public path. Route guards live inside their own layout/module (no duplicated guards).
+function AppInner() {
+  return (
+    <Suspense fallback={<PageFallback />}>
+      <Routes>
+        {/* Post-login role resolution — waits for the DB-backed role, then routes safely. */}
+        <Route path="/auth/continue" element={<RoleLandingPage />} />
+
+        {/* Legacy redirects preserve old links/bookmarks. */}
+        <Route path="/admin/login" element={<LegacyLoginRedirect />} />
+        <Route path="/owner" element={<LegacyOwnerRedirect />} />
+        <Route path="/owner/*" element={<LegacyOwnerRedirect />} />
+
+        {/* Canonical login + customer portal (/app/*). */}
+        <Route path="/app/login" element={<LoginPage />} />
+        <Route path="/app/signup" element={<SignupPage />} />
+        <Route path="/app/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/app/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/app" element={<ProtectedRoute><AppHomePage /></ProtectedRoute>} />
+        <Route path="/app/solutions" element={<ProtectedRoute><SolutionsIndexPage /></ProtectedRoute>} />
+        <Route path="/app/solutions/:instanceKey/*" element={<ProtectedRoute><SolutionPage /></ProtectedRoute>} />
+        <Route path="/app/support" element={<ProtectedRoute><SupportPage /></ProtectedRoute>} />
+        <Route path="/app/onboarding" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="onboarding" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
+        <Route path="/app/receptionist" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="receptionist" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
+        <Route path="/app/knowledge" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="knowledge" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
+        <Route path="/app/phone" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="phone" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
+        <Route path="/app/test" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="test" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
+        <Route path="/app/calls" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="calls" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
+        <Route path="/app/leads" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="leads" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
+        <Route path="/app/billing" element={<ProtectedRoute><CustomerSectionPage section="billing" /></ProtectedRoute>} />
+        <Route path="/app/settings" element={<ProtectedRoute><CustomerSectionPage section="settings" /></ProtectedRoute>} />
+        <Route path="/app/*" element={<ProtectedRoute><Navigate to="/app" replace /></ProtectedRoute>} />
+
+        {/* Unified internal workspace (/admin/*) — one shell, role-aware nav, owner-only finance. */}
+        <Route element={<InternalWorkspaceLayout />}>
+          <Route path="/admin" element={<TaskDashboardContent />} />
+          <Route path="/admin/tasks/today" element={<TaskDashboardContent view="today" />} />
+          <Route path="/admin/tasks/overdue" element={<TaskDashboardContent view="overdue" />} />
+          <Route path="/admin/tasks/completed" element={<TaskDashboardContent view="completed" />} />
+          <Route path="/admin/tasks/revenue" element={<TaskDashboardContent view="revenue" />} />
+          <Route path="/admin/execution" element={<ExecutionContent />} />
+          <Route path="/admin/oura-analytics" element={<OuraAnalyticsContent />} />
+          <Route path="/admin/clients" element={<ClientsListPage />} />
+          <Route path="/admin/clients/new" element={<NewClientWizard />} />
+          <Route path="/admin/clients/:organizationId" element={<ClientDetailPage />} />
+          <Route path="/admin/solutions" element={<AdminSolutionsPage />} />
+          <Route path="/admin/invitations" element={<AdminInvitationsPage />} />
+          <Route path="/admin/finance/*" element={<FinanceModule />} />
+          <Route path="/admin/*" element={<Navigate to="/admin" replace />} />
+        </Route>
+
+        {/* Public marketing site. */}
+        <Route element={<PublicLayout />}>
       <Route path="/" element={<HomePage />} />
       <Route path="/leistungen" element={<LeistungenPage />} />
       <Route path="/ueber-uns" element={<UeberUnsPage />} />
@@ -633,15 +513,9 @@ function AppInner() {
       <Route path="/blog/:slug" element={<BlogPostPage />} />
       <Route path="/scan" element={<ScanPage />} />
       <Route path="*" element={<NotFoundPage />} />
-    </Routes>
-  </Suspense>
-</main>
-
-<PremiumFooterReveal>
-  <Footer />
-</PremiumFooterReveal>
-      </div>
-    </PageReveal>
+        </Route>
+      </Routes>
+    </Suspense>
   );
 }
 

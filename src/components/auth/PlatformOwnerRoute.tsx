@@ -17,7 +17,7 @@ export function PlatformOwnerRoute({ children }: { children: ReactNode }) {
 
   if (!user) {
     const redirectTo = encodeURIComponent(`${location.pathname}${location.search}${location.hash}`);
-    return <Navigate to={`/admin/login?redirectTo=${redirectTo}`} replace />;
+    return <Navigate to={`/app/login?redirectTo=${redirectTo}`} replace />;
   }
 
   if (!isPlatformOwner) {
@@ -34,7 +34,7 @@ export function PlatformOwnerRoute({ children }: { children: ReactNode }) {
           </p>
           <div className="flex flex-wrap gap-3">
             <Link
-              to="/admin/clients"
+              to="/admin"
               className="inline-flex items-center justify-center rounded-xl bg-gray-950 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800"
             >
               Zur Administration
