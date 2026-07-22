@@ -327,6 +327,7 @@ const TaskDashboardContent = lazyNamed(() => import('./pages/admin/tasks/TaskDas
 const ExecutionContent = lazyNamed(() => import('./pages/ExecutionPage'), 'ExecutionContent');
 const OuraAnalyticsContent = lazyNamed(() => import('./pages/OuraAnalyticsPage'), 'OuraAnalyticsContent');
 const FinanceModule = lazyNamed(() => import('./pages/admin/finance/FinanceModule'), 'FinanceModule');
+const PublicDocumentPortal = lazyNamed(() => import('./pages/public/PublicDocumentPortal'), 'PublicDocumentPortal');
 const ClientsListPage = lazyNamed(() => import('./pages/admin/clients/ClientsListPage'), 'ClientsListPage');
 const NewClientWizard = lazyNamed(() => import('./pages/admin/clients/NewClientWizard'), 'NewClientWizard');
 const ClientDetailPage = lazyNamed(() => import('./pages/admin/clients/ClientDetailPage'), 'ClientDetailPage');
@@ -512,6 +513,9 @@ function AppInner() {
       <Route path="/blog" element={<BlogIndexPage />} />
       <Route path="/blog/:slug" element={<BlogPostPage />} />
       <Route path="/scan" element={<ScanPage />} />
+      {/* Public, tokenized document portal (offer acceptance). Outside the auth shell; access is
+          governed entirely by the secure token, never by a raw resource id. */}
+      <Route path="/d/:token" element={<PublicDocumentPortal />} />
       <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

@@ -6,6 +6,9 @@ import { OwnerEntityProvider, useOwnerEntity } from '@/pages/owner/ownerContext'
 import { BackendErrorScreen, BackendSetupScreen } from '@/pages/owner/BackendStates';
 import { OverviewPage } from '@/pages/owner/OverviewPage';
 import { InvoicesPage } from '@/pages/owner/InvoicesPage';
+import { InvoiceDetailPage } from '@/pages/owner/InvoiceDetailPage';
+import { OffersPage } from '@/pages/owner/OffersPage';
+import { OfferDetailPage } from '@/pages/owner/OfferDetailPage';
 import { ExpensesPage } from '@/pages/owner/ExpensesPage';
 import { TaxesPage } from '@/pages/owner/TaxesPage';
 import { SettingsPage } from '@/pages/owner/SettingsPage';
@@ -35,7 +38,10 @@ function FinanceRoutes() {
     <Routes>
       <Route index element={<Navigate to="overview" replace />} />
       <Route path="overview" element={<OverviewPage />} />
+      <Route path="offers" element={<OffersPage />} />
+      <Route path="offers/:offerId" element={<OfferDetailPage />} />
       <Route path="invoices" element={<InvoicesPage />} />
+      <Route path="invoices/:invoiceId" element={<InvoiceDetailPage />} />
       <Route path="expenses" element={<ExpensesPage />} />
       <Route path="subscriptions" element={<SubscriptionsPage />} />
       <Route path="assets" element={<AssetsPage />} />

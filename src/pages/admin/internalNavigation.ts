@@ -1,5 +1,5 @@
 import {
-  AlertTriangle, Building2, CalendarCheck, CheckCircle2, Cpu, FileText, Gauge, HardDrive, HeartPulse,
+  AlertTriangle, Building2, CalendarCheck, CheckCircle2, Cpu, FileSignature, FileText, Gauge, HardDrive, HeartPulse,
   LayoutDashboard, LayoutGrid, Mail, Receipt, Repeat, ScrollText, Settings, ShieldCheck, TrendingUp,
   Wallet, type LucideIcon,
 } from 'lucide-react';
@@ -37,6 +37,7 @@ const MODULES: ModuleConfig[] = [
     matches: (p) => p === '/admin/finance' || p.startsWith('/admin/finance/'),
     subNav: [
       { key: 'overview', label: 'Übersicht', href: '/admin/finance/overview', icon: LayoutDashboard },
+      { key: 'offers', label: 'Angebote', href: '/admin/finance/offers', icon: FileSignature },
       { key: 'invoices', label: 'Rechnungen', href: '/admin/finance/invoices', icon: FileText },
       { key: 'expenses', label: 'Ausgaben', href: '/admin/finance/expenses', icon: Receipt },
       { key: 'subscriptions', label: 'Abos', href: '/admin/finance/subscriptions', icon: Repeat },

@@ -5,6 +5,7 @@ import {
   StatusBadge, useToast,
 } from '@/components/dashboard';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
+import { DocumentSettingsSection } from '@/pages/owner/DocumentSettingsSection';
 import { loadTaxSettings, upsertTaxSettings } from '@/lib/ownerFinance/api';
 import { parseAmountToCents } from '@/lib/clientPlatform/validation';
 import type { OwnerTaxSettings } from '@/lib/ownerFinance/types';
@@ -106,6 +107,7 @@ export function SettingsPage() {
         <div className="space-y-6"><KpiSkeletonGrid /><KpiSkeletonGrid count={3} /></div>
       ) : (
         <div className="space-y-6">
+          {entity ? <DocumentSettingsSection entityId={entity.id} entityName={entity.display_name} /> : null}
           <Card>
             <SectionHeader title="Geschäftseinheit" description="Feste Rahmendaten dieses Einzelunternehmens." />
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FileText, Plus, Trash2 } from 'lucide-react';
 
 import {
@@ -51,6 +52,7 @@ interface CustomerOption { organizationId: string; clientAccountId: string | nul
 export function InvoicesPage() {
   const { entity } = useOwnerEntity();
   const toast = useToast();
+  const navigate = useNavigate();
   const [invoices, setInvoices] = useState<OwnerInvoice[]>([]);
   const [customers, setCustomers] = useState<CustomerOption[]>([]);
   const [loading, setLoading] = useState(true);
@@ -219,6 +221,7 @@ export function InvoicesPage() {
           columns={columns}
           rows={filtered}
           getRowKey={(inv) => inv.id}
+          onRowClick={(inv) => navigate(`/admin/finance/invoices/${inv.id}`)}
           minWidth={820}
           mobileTitle={(inv) => (
             <div className="flex items-center gap-2">

@@ -224,6 +224,141 @@ export interface OwnerExportRun {
   generated_at: string;
 }
 
+export interface OwnerDocumentSettings {
+  business_entity_id: string;
+  legal_name: string | null;
+  owner_name: string | null;
+  street: string | null;
+  postal_code: string | null;
+  city: string | null;
+  country_code: string;
+  business_email: string | null;
+  business_phone: string | null;
+  website: string | null;
+  tax_number: string | null;
+  vat_id: string | null;
+  bank_account_holder: string | null;
+  iban: string | null;
+  bic: string | null;
+  bank_name: string | null;
+  default_payment_terms_days: number;
+  default_offer_validity_days: number;
+  default_invoice_footer: string | null;
+  default_offer_footer: string | null;
+  default_offer_intro: string | null;
+  default_offer_closing: string | null;
+  invoice_number_prefix: string;
+  offer_number_prefix: string;
+  document_language: string;
+  logo_storage_path: string | null;
+  brand_accent: string | null;
+  updated_at?: string;
+}
+
+export type OwnerOfferStatus =
+  | 'draft' | 'finalized' | 'sent' | 'viewed' | 'accepted' | 'rejected' | 'expired' | 'cancelled' | 'converted';
+
+export interface OwnerOffer {
+  id: string;
+  business_entity_id: string;
+  organization_id: string | null;
+  client_account_id: string | null;
+  engagement_id: string | null;
+  offer_number: string | null;
+  status: OwnerOfferStatus;
+  title: string | null;
+  issue_date: string | null;
+  valid_until: string | null;
+  currency: string;
+  introduction: string | null;
+  scope: string | null;
+  assumptions: string | null;
+  exclusions: string | null;
+  payment_terms: string | null;
+  delivery_terms: string | null;
+  internal_notes: string | null;
+  net_total_cents: number;
+  vat_total_cents: number;
+  gross_total_cents: number;
+  finalized_version: number | null;
+  accepted_at: string | null;
+  rejected_at: string | null;
+  rejection_reason: string | null;
+  expired_at: string | null;
+  converted_invoice_id: string | null;
+  converted_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OwnerOfferLine {
+  id: string;
+  offer_id: string;
+  description: string;
+  quantity_milli: number;
+  unit: string;
+  unit_price_cents: number;
+  net_cents: number;
+  vat_rate_bp: number;
+  vat_treatment: string;
+  vat_cents: number;
+  gross_cents: number;
+  is_optional: boolean;
+  sort_order: number;
+}
+
+export interface OwnerGeneratedDocument {
+  id: string;
+  business_entity_id: string;
+  document_type: string;
+  source_resource_type: string;
+  source_resource_id: string;
+  document_number: string | null;
+  version: number;
+  status: string;
+  language: string;
+  currency: string;
+  template_version: string;
+  source_hash: string;
+  pdf_storage_path: string | null;
+  render_metadata: Record<string, unknown>;
+  generated_at: string;
+  finalized_at: string | null;
+  archived_at: string | null;
+}
+
+export interface OwnerFinanceNotification {
+  id: string;
+  business_entity_id: string;
+  category: string;
+  title: string;
+  body: string | null;
+  resource_type: string | null;
+  resource_id: string | null;
+  amount_cents: number | null;
+  priority: 'low' | 'normal' | 'high';
+  read_at: string | null;
+  dismissed_at: string | null;
+  created_at: string;
+}
+
+export interface OwnerOfferAcceptanceEvent {
+  id: string;
+  offer_id: string;
+  document_id: string | null;
+  document_version: number | null;
+  source_hash: string | null;
+  decision: 'accepted' | 'rejected';
+  signature_level: string;
+  signer_name: string | null;
+  signer_company: string | null;
+  signer_email: string | null;
+  accepted_terms_version: string | null;
+  comment: string | null;
+  event_order: number;
+  created_at: string;
+}
+
 export interface PeriodSummary {
   entity: string;
   from: string;

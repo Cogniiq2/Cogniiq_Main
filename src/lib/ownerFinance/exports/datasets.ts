@@ -2,7 +2,7 @@
 // (consumed by CSV + XLSX) and into PDF report models. Centralized here so Invoices/Expenses/Taxes
 // pages describe their data once and get every format with identical columns, ordering and typing.
 
-import type { OwnerInvoice, OwnerExpense } from '@/lib/ownerFinance/types';
+import type { OwnerInvoice, OwnerExpense, OwnerOffer } from '@/lib/ownerFinance/types';
 import type { ExportColumn, ExportTable } from './columns';
 import type { PdfReportModel, PdfSection } from './pdf';
 import type { ExportMeta } from './index';
@@ -183,4 +183,70 @@ export function expenseMetadataSheet(expenses: OwnerExpense[], meta: ExportMeta)
     name: 'Metadaten',
     rows: metadataRows(meta, [['Datensätze (Ausgaben)', String(expenses.length)]]),
   };
+}
+
+/* ----------------------------------------------------------------- Offers */
+
+const OFFER_STATUS_LABEL: Record<string, string> = {
+  draft: 'Entwurf', finalized: 'Finalisiert', sent: 'Versendet', viewed: 'Angesehen',
+  accepted: 'Angenommen', rejected: 'Abgelehnt', expired: 'Abgelaufen', cancelled: 'Storniert', converted: 'Umgewandelt',
+};
+
+export interface OfferCustomerLookup { (offer: OwnerOffer): string }
+
+export function offerExportTable(offers: OwnerOffer[], customerName: OfferCustomerLookup): ExportTable<OwnerOffer> {
+  const columns: ExportColumn<OwnerOffer>[] = [
+    { key: 'id', header: 'ID', type: 'text', value: (o) => o.id, id: true, width: 38 },
+    { key: 'number', header: 'Nummer', type: 'text', value: (o) => o.offer_number ?? 'Entwurf', width: 16 },
+    { key: 'status', header: 'Status', type: 'text', value: (o) => OFFER_STATUS_LABEL[o.status] ?? o.status, width: 14 },
+    { key: 'customer', header: 'Kunde', type: 'text', value: (o) => customerName(o), width: 24 },
+    { key: 'title', header: 'Titel', type: 'text', value: (o) => o.title, width: 26 },
+    { key: 'issue_date', header: 'Angebotsdatum', type: 'date', value: (o) => o.issue_date, width: 15 },
+    { key: 'valid_until', header: 'Gültig bis', type: 'date', value: (o) => o.valid_until, width: 13 },
+    { key: 'net', header: 'Netto', type: 'currency', value: (o) => o.net_total_cents, width: 14 },
+    { key: 'vat', header: 'USt', type: 'currency', value: (o) => o.vat_total_cents, width: 12 },
+    { key: 'gross', header: 'Brutto', type: 'currency', value: (o) => o.gross_total_cents, width: 14 },
+    { key: 'currency', header: 'Währung', type: 'text', value: (o) => o.currency, width: 10 },
+  ];
+  return { name: 'Angebote', columns, rows: offers };
+}
+
+export function offerReportModel(offers: OwnerOffer[], meta: ExportMeta, customerName: OfferCustomerLookup): PdfReportModel {
+  const sum = (f: (o: OwnerOffer) => number) => offers.reduce((s, o) => s + f(o), 0);
+  const open = offers.filter((o) => ['finalized', 'sent', 'viewed'].includes(o.status)).reduce((s, o) => s + o.gross_total_cents, 0);
+  const accepted = offers.filter((o) => o.status === 'accepted' || o.status === 'converted').reduce((s, o) => s + o.gross_total_cents, 0);
+  const sections: PdfSection[] = [
+    {
+      kind: 'keyvalue', heading: 'Kennzahlen',
+      rows: [
+        ['Anzahl Angebote', String(offers.length)],
+        ['Brutto gesamt', formatCentsCurrencyDe(sum((o) => o.gross_total_cents))],
+        ['Offen (versendet)', formatCentsCurrencyDe(open)],
+        ['Angenommen', formatCentsCurrencyDe(accepted)],
+      ],
+    },
+    {
+      kind: 'table', heading: 'Angebote',
+      columns: [
+        { header: 'Nummer', align: 'left', width: 3 },
+        { header: 'Kunde', align: 'left', width: 4 },
+        { header: 'Titel', align: 'left', width: 4 },
+        { header: 'Status', align: 'left', width: 2.4 },
+        { header: 'Brutto', align: 'right', width: 2.6 },
+      ],
+      rows: offers.map((o) => [
+        o.offer_number ?? 'Entwurf', customerName(o), o.title ?? '—',
+        OFFER_STATUS_LABEL[o.status] ?? o.status, formatCentsCurrencyDe(o.gross_total_cents, o.currency),
+      ]),
+    },
+    { kind: 'note', text: `Angebotsübersicht. ${EXPORT_DISCLAIMER}` },
+  ];
+  return {
+    brand: 'Cogniiq', documentTitle: 'Angebote — Bericht', entityName: meta.entityName,
+    metaLines: pdfMetaLines(meta), sections, disclaimer: `Cogniiq · ${EXPORT_DISCLAIMER}`,
+  };
+}
+
+export function offerMetadataSheet(offers: OwnerOffer[], meta: ExportMeta) {
+  return { name: 'Metadaten', rows: metadataRows(meta, [['Datensätze (Angebote)', String(offers.length)]]) };
 }
