@@ -490,6 +490,69 @@ export async function onRequest(context: CloudflarePagesContext) {
       canonical: 'https://cogniiq.de/blog',
       keywords: 'Cogniiq Blog, KI Unternehmen Blog, Webdesign Tipps, Automatisierung Blog',
     },
+    // Legal pages (crawlable, indexable).
+    '/impressum': {
+      title: 'Impressum | Cogniiq',
+      description: 'Impressum von Cogniiq – Anbieterkennzeichnung gemäß § 5 DDG, Kontaktangaben und rechtliche Hinweise.',
+      canonical: 'https://cogniiq.de/impressum',
+    },
+    '/datenschutz': {
+      title: 'Datenschutzerklärung | Cogniiq',
+      description: 'Datenschutzerklärung von Cogniiq: Welche Daten wir verarbeiten, Hosting, Kontaktanfragen, Google Ads mit Einwilligung (Consent Mode v2) und Ihre Rechte.',
+      canonical: 'https://cogniiq.de/datenschutz',
+    },
+    // Blog posts. Metadata mirrors src/lib/blog-data.ts; consistency is enforced
+    // by .github/scripts/test-seo-consistency.mjs (blog slugs ⇄ sitemap ⇄ middleware).
+    '/blog/ki-automatisierung-kleine-unternehmen': {
+      title: 'KI-Automatisierung für kleine Unternehmen 2025 | Leitfaden',
+      description: 'KI-Automatisierung für kleine Unternehmen: Welche Prozesse sich lohnen, was es kostet und wie der Einstieg gelingt. Mit konkreten Beispielen aus der Praxis.',
+      canonical: 'https://cogniiq.de/blog/ki-automatisierung-kleine-unternehmen',
+    },
+    '/blog/ki-telefonassistent-arztpraxis': {
+      title: 'KI-Telefonassistent Arztpraxis 2025 | Vorteile & Kosten',
+      description: 'Wie ein KI-Telefonassistent Arztpraxen dabei hilft, verpasste Anrufe zu eliminieren, Termine automatisch zu buchen und das Praxisteam zu entlasten.',
+      canonical: 'https://cogniiq.de/blog/ki-telefonassistent-arztpraxis',
+    },
+    '/blog/webdesign-konversion-tipps': {
+      title: 'Webdesign für mehr Anfragen & Konversion 2025 | 8 Tipps',
+      description: 'Warum viele Unternehmenswebsites keine Anfragen generieren – und wie Sie mit gezielten Webdesign-Entscheidungen die Konversionsrate verdoppeln können.',
+      canonical: 'https://cogniiq.de/blog/webdesign-konversion-tipps',
+    },
+    '/blog/lokales-seo-unternehmen': {
+      title: 'Lokales SEO für Unternehmen 2025 | Google Maps & lokale Suche',
+      description: 'Lokales SEO erklärt: Wie Unternehmen in Google Maps sichtbar werden, welche Faktoren wirklich zählen und welche Fehler die meisten Betriebe machen.',
+      canonical: 'https://cogniiq.de/blog/lokales-seo-unternehmen',
+    },
+    '/blog/prozessautomatisierung-roi': {
+      title: 'Prozessautomatisierung ROI berechnen 2025 | Leitfaden',
+      description: 'Wie Sie den Return on Investment einer Prozessautomatisierung korrekt berechnen – mit Formel, konkreten Beispielen und typischen Kostenfallen.',
+      canonical: 'https://cogniiq.de/blog/prozessautomatisierung-roi',
+    },
+    '/blog/verpasste-anrufe-kosten': {
+      title: 'Verpasste Anrufe Kosten berechnen | KI-Telefonassistent',
+      description: 'Wie teuer sind verpasste Anrufe wirklich? Eine ehrliche Kalkulation mit Durchschnittswerten aus deutschen KMU – und wie ein KI-Telefonassistent den Verlust stoppt.',
+      canonical: 'https://cogniiq.de/blog/verpasste-anrufe-kosten',
+    },
+    '/blog/ki-telefonassistent-restaurant': {
+      title: 'KI-Telefonassistent Restaurant 2025 | Reservierungen automatisieren',
+      description: 'Wie Restaurants mit einem KI-Telefonassistenten Reservierungen automatisch annehmen, Wartelisten führen und Gäste nachqualifizieren – ohne Personal.',
+      canonical: 'https://cogniiq.de/blog/ki-telefonassistent-restaurant',
+    },
+    '/blog/website-ohne-anfragen': {
+      title: 'Website bringt keine Anfragen? Ursachen & Lösungen 2025',
+      description: 'Die häufigsten Gründe, warum Unternehmenswebsites keine Anfragen generieren – und konkrete Schritte, um das in wenigen Wochen zu ändern.',
+      canonical: 'https://cogniiq.de/blog/website-ohne-anfragen',
+    },
+    '/blog/digitalisierung-mittelstand': {
+      title: 'Digitalisierung Mittelstand 2025 | Wo anfangen & was vermeiden',
+      description: 'Digitalisierung im deutschen Mittelstand: Ein praxisorientierter Einstiegsleitfaden, der zeigt, welche Maßnahmen wirklich Wirkung haben – und welche Fallen es zu vermeiden gilt.',
+      canonical: 'https://cogniiq.de/blog/digitalisierung-mittelstand',
+    },
+    '/blog/webdesign-agentur-auswahl': {
+      title: 'Webdesign Agentur auswählen 2025 | 7 entscheidende Kriterien',
+      description: 'Wie finden Sie die richtige Webdesign-Agentur für Ihr Unternehmen? 7 konkrete Auswahlkriterien, die vor überteuerten Projekten und schlechten Ergebnissen schützen.',
+      canonical: 'https://cogniiq.de/blog/webdesign-agentur-auswahl',
+    },
   };
 
   const config = seoConfig[pathname];

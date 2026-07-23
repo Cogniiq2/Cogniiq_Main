@@ -162,15 +162,11 @@ export const LOCATION_PAGES: LocationPage[] = [
     keywords: ["AI Agentur München", "Webdesign München", "KI Telefonassistent München", "Automatisierung München", "KI Agentur Bayern"],
     canonical: "https://cogniiq.de/muenchen",
   },
-  {
-    city: "Nürnberg",
-    region: "Bayern",
-    slug: "nuernberg",
-    title: "AI Agentur & Webdesign Nürnberg | KI-Telefonassistent & Automatisierung – Cogniiq",
-    description: "KI-Telefonassistent, Webdesign und Automatisierung für Unternehmen in Nürnberg. Cogniiq entwickelt operative Systeme, die Anrufe annehmen, Leads konvertieren und Zeit sparen.",
-    keywords: ["AI Agentur Nürnberg", "Webdesign Nürnberg", "KI Telefonassistent Nürnberg", "Automatisierung Nürnberg"],
-    canonical: "https://cogniiq.de/nuernberg",
-  },
+  // NOTE: Nürnberg is intentionally NOT a landing page. There is no /nuernberg
+  // route and no unique Nürnberg content, so no page config is declared here
+  // (avoids a dangling canonical to a non-existent, thin/doorway page). Nürnberg
+  // remains a truthful service-area reference in BUSINESS_INFO.serviceAreas and
+  // in the Organization "areaServed" structured data.
   {
     city: "Regensburg",
     region: "Bayern",

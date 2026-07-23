@@ -643,4 +643,114 @@
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/digitale-automatisierung-unternehmen"/>
   </url>
 
+  <!-- ══════════════════════════════════════════════
+       BLOG
+  ══════════════════════════════════════════════ -->
+  <url>
+    <loc>https://cogniiq.de/blog</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.70</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/blog"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/blog/ki-automatisierung-kleine-unternehmen</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.60</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/blog/ki-automatisierung-kleine-unternehmen"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/blog/ki-telefonassistent-arztpraxis</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.60</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/blog/ki-telefonassistent-arztpraxis"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/blog/webdesign-konversion-tipps</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.60</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/blog/webdesign-konversion-tipps"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/blog/lokales-seo-unternehmen</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.60</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/blog/lokales-seo-unternehmen"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/blog/prozessautomatisierung-roi</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.60</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/blog/prozessautomatisierung-roi"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/blog/verpasste-anrufe-kosten</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.60</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/blog/verpasste-anrufe-kosten"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/blog/ki-telefonassistent-restaurant</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.60</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/blog/ki-telefonassistent-restaurant"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/blog/website-ohne-anfragen</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.60</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/blog/website-ohne-anfragen"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/blog/digitalisierung-mittelstand</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.60</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/blog/digitalisierung-mittelstand"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/blog/webdesign-agentur-auswahl</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.60</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/blog/webdesign-agentur-auswahl"/>
+  </url>
+
+  <!-- ══════════════════════════════════════════════
+       LEGAL
+  ══════════════════════════════════════════════ -->
+  <url>
+    <loc>https://cogniiq.de/impressum</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.30</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/impressum"/>
+  </url>
+
+  <url>
+    <loc>https://cogniiq.de/datenschutz</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.30</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/datenschutz"/>
+  </url>
+
 </urlset>
