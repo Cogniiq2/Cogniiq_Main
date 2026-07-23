@@ -39,6 +39,14 @@
   </url>
 
   <url>
+    <loc>https://cogniiq.de/zertifizierungen</loc>
+    <lastmod>2026-07-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/zertifizierungen"/>
+  </url>
+
+  <url>
     <loc>https://cogniiq.de/faq</loc>
     <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>

@@ -333,6 +333,7 @@ export function Footer() {
                     links: [
                       { text: "Startseite", to: "/" },
                       { text: "Über uns", to: "/ueber-uns" },
+                      { text: "Zertifizierungen", to: "/zertifizierungen" },
                       { text: "Leistungen", to: "/leistungen" },
                       { text: "Referenzen", to: "/referenzen" },
                       { text: "Bewertungen", to: "/bewertungen" },

@@ -97,6 +97,7 @@ function PublicStructuredData() {
 const HomePage = lazyNamed(() => import('./pages/HomePage'), 'HomePage');
 const LeistungenPage = lazyNamed(() => import('./pages/LeistungenPage'), 'LeistungenPage');
 const UeberUnsPage = lazyNamed(() => import('./pages/UeberUnsPage'), 'UeberUnsPage');
+const ZertifizierungenPage = lazyNamed(() => import('./pages/ZertifizierungenPage'), 'ZertifizierungenPage');
 const FAQPage = lazyNamed(() => import('./pages/FAQPage'), 'FAQPage');
 const KontaktPage = lazyNamed(() => import('./pages/KontaktPage'), 'KontaktPage');
 const AnfrageErhaltenPage = lazyNamed(() => import('./pages/AnfrageErhaltenPage'), 'AnfrageErhaltenPage');
@@ -444,6 +445,7 @@ function AppInner() {
       <Route path="/" element={<HomePage />} />
       <Route path="/leistungen" element={<LeistungenPage />} />
       <Route path="/ueber-uns" element={<UeberUnsPage />} />
+      <Route path="/zertifizierungen" element={<ZertifizierungenPage />} />
       <Route path="/faq" element={<FAQPage />} />
       <Route path="/kontakt" element={<KontaktPage />} />
       <Route path="/anfrage-erhalten" element={<AnfrageErhaltenPage />} />

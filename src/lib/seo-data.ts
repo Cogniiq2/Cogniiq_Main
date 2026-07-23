@@ -198,6 +198,11 @@ export const PAGE_META = {
     description: "Cogniiq wurde von Lazar und Djordje Popovic in Bayreuth gegründet. Wir bauen operative KI-Systeme – keine Beratungsfolien, keine generischen Pakete. Direkter Kontakt, messbare Ergebnisse.",
     canonical: "https://cogniiq.de/ueber-uns",
   },
+  zertifizierungen: {
+    title: "Zertifizierungen – Offiziell zertifiziert von Anthropic | Cogniiq",
+    description: "Cogniiq-Gründer Lazar Popovic ist offiziell von Anthropic – den Machern von Claude – zertifiziert. Fünf verifizierte Zertifikate, im Original einsehbar. Belegte KI-Kompetenz statt leerer Versprechen.",
+    canonical: "https://cogniiq.de/zertifizierungen",
+  },
   faq: {
     title: "FAQ – Kosten, Ablauf & KI-Systeme | Cogniiq Bayreuth",
     description: "Antworten zu KI-Telefonassistent, Webdesign-Kosten, Projektstart und Automatisierung. Was kostet ein Projekt? Wie schnell geht es? Was ist realistisch? Hier, konkret.",

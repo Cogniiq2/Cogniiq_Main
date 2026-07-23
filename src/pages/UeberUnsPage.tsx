@@ -13,6 +13,7 @@ import {
   Clock,
   MapPin,
   Users,
+  BadgeCheck,
 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { PAGE_META, BUSINESS_INFO } from "@/lib/seo-data";
@@ -30,6 +31,7 @@ const SUBNAV_ITEMS = [
   { label: "Über uns", anchor: "ueber-uns" },
   { label: "Expertise", anchor: "expertise" },
   { label: "Gründer", anchor: "gruender" },
+  { label: "Zertifiziert", anchor: "zertifizierung" },
   { label: "Ablauf", anchor: "ablauf" },
   { label: "Standorte", anchor: "standorte" },
   { label: "Branchen", anchor: "branchen" },
@@ -717,6 +719,88 @@ export function UeberUnsPage() {
                   </div>
                 </motion.div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── ZERTIFIZIERUNG ────────────────────────────────────────────── */}
+        <section
+          id="zertifizierung"
+          aria-labelledby="zertifizierung-heading"
+          className="border-t border-gray-100 dark:border-gray-800 scroll-mt-16"
+        >
+          <div className="max-w-[1100px] mx-auto px-6 lg:px-8 py-20 lg:py-28">
+            <div className="grid lg:grid-cols-[380px_1fr] gap-12 lg:gap-20 items-start">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                custom={0}
+              >
+                <div className="flex items-center gap-2.5 mb-6">
+                  <Shield size={13} className="text-gray-400 dark:text-gray-600" />
+                  <p className="text-[10px] font-semibold tracking-[0.22em] uppercase text-gray-300 dark:text-gray-700">
+                    Zertifiziert von Anthropic
+                  </p>
+                </div>
+                <h2
+                  id="zertifizierung-heading"
+                  className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 tracking-tight leading-tight mb-5"
+                >
+                  Belegte KI-Kompetenz — nicht behauptete.
+                </h2>
+                <p className="text-[15px] text-gray-500 dark:text-gray-400 leading-relaxed mb-8">
+                  Lazar Popovic ist offiziell von Anthropic zertifiziert — dem Labor
+                  hinter Claude, einem der weltweit führenden KI-Systeme. Fünf
+                  Nachweise, im Original einsehbar. Von der Quelle, nicht von einem
+                  Wiederverkäufer.
+                </p>
+                <Link
+                  to="/zertifizierungen"
+                  className="inline-flex items-center gap-2.5 px-6 py-3 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-semibold text-sm tracking-wide hover:bg-gray-700 dark:hover:bg-white transition-colors"
+                >
+                  Alle Zertifikate ansehen
+                  <ArrowRight size={14} />
+                </Link>
+              </motion.div>
+
+              <div className="grid sm:grid-cols-2 gap-3">
+                {[
+                  { title: "Claude 101", issuer: "Anthropic" },
+                  { title: "Claude Platform 101", issuer: "Anthropic" },
+                  { title: "Claude Code in Action", issuer: "Anthropic" },
+                  { title: "Model Context Protocol: Advanced Topics", issuer: "Anthropic" },
+                  { title: "AI Fluency for Builders", issuer: "CodePath.org × Anthropic" },
+                ].map((cert, i) => (
+                  <motion.div
+                    key={cert.title}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-40px" }}
+                    variants={fadeUp}
+                    custom={i * 0.06}
+                    className="border border-gray-200 dark:border-gray-800 p-5 flex items-start gap-3.5"
+                  >
+                    <BadgeCheck size={16} className="text-gray-400 dark:text-gray-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-snug mb-1">
+                        {cert.title}
+                      </p>
+                      <p className="text-[11px] font-medium tracking-wide text-gray-400 dark:text-gray-600 uppercase">
+                        {cert.issuer}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+                <Link
+                  to="/zertifizierungen"
+                  className="border border-dashed border-gray-200 dark:border-gray-800 p-5 flex items-center justify-center gap-2 text-xs font-medium text-gray-400 dark:text-gray-600 hover:text-gray-800 dark:hover:text-gray-300 hover:border-gray-400 dark:hover:border-gray-600 transition-colors group"
+                >
+                  Originale ansehen
+                  <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              </div>
             </div>
           </div>
         </section>

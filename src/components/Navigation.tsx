@@ -350,6 +350,7 @@ function LeistungenMega({ onMouseEnter, onMouseLeave, currentPath }: { onMouseEn
                 {[
                   { label: 'Leistungen', href: '/leistungen' },
                   { label: 'Über uns', href: '/ueber-uns' },
+                  { label: 'Zertifizierungen', href: '/zertifizierungen' },
                   { label: 'Referenzen', href: '/referenzen' },
                   { label: 'Bewertungen', href: '/bewertungen' },
                 ].map((item) => (
