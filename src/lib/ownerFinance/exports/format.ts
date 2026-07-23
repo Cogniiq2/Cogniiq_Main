@@ -43,6 +43,37 @@ export function formatBpPercentDe(bp: number): string {
   return `${s} %`;
 }
 
+// Customer-facing dates and times are displayed in Germany's civil time zone. Raw values stay in
+// UTC in the database (timestamptz); only the *display* is converted. `Intl` applies the correct
+// CET/CEST (MEZ/MESZ) offset for the given instant, so daylight-saving transitions are handled
+// automatically and a near-midnight UTC timestamp shows the right Berlin calendar day.
+export const BERLIN_TIME_ZONE = 'Europe/Berlin';
+
+interface BerlinParts { day: string; month: string; year: string; hour: string; minute: string; zone: string }
+
+function berlinParts(value: string | Date): BerlinParts | null {
+  const d = typeof value === 'string' ? new Date(value) : value;
+  if (Number.isNaN(d.getTime())) return null;
+  const parts = new Intl.DateTimeFormat('de-DE', {
+    timeZone: BERLIN_TIME_ZONE, day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZoneName: 'short',
+  }).formatToParts(d);
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? '';
+  return { day: get('day'), month: get('month'), year: get('year'), hour: get('hour'), minute: get('minute'), zone: get('timeZoneName') };
+}
+
+/**
+ * Berlin-local calendar date of an INSTANT (a UTC timestamp / timestamptz). Use this for
+ * timestamp values whose civil date matters to the customer — e.g. the acceptance date — because
+ * a late-evening UTC timestamp belongs to the next day in Berlin. A pure date column (no time)
+ * has no instant and must use `formatDateDe` instead.
+ */
+export function formatDateDeFromInstant(value: string | Date | null | undefined): string {
+  if (!value) return '';
+  const p = berlinParts(value);
+  return p ? `${p.day}.${p.month}.${p.year}` : String(value);
+}
+
 /**
  * Machine-readable ISO date (YYYY-MM-DD) passthrough. Exports must use machine-readable dates in
  * data columns; German display formatting is reserved for rendered documents, not CSV/XLSX values.
@@ -62,10 +93,14 @@ export function formatDateDe(value: string | null | undefined): string {
   return `${d}.${m}.${y}`;
 }
 
-/** German timestamp for document footers, e.g. "31.12.2026 14:05". */
+/**
+ * German date + time in Germany's civil time zone for document footers, e.g.
+ * "31.12.2026, 14:05 Uhr (MEZ)". The zone label (MEZ/MESZ) is included because a bare wall-clock
+ * time on a dated artifact is otherwise ambiguous; the correct label for the instant is chosen
+ * automatically across the daylight-saving boundary.
+ */
 export function formatTimestampDe(value: string | Date): string {
-  const d = typeof value === 'string' ? new Date(value) : value;
-  if (Number.isNaN(d.getTime())) return String(value);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${pad(d.getUTCDate())}.${pad(d.getUTCMonth() + 1)}.${d.getUTCFullYear()} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
+  const p = berlinParts(value);
+  if (!p) return String(value);
+  return `${p.day}.${p.month}.${p.year}, ${p.hour}:${p.minute} Uhr (${p.zone})`;
 }

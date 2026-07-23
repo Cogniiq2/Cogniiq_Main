@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { fetchPublicOffer, respondPublicOffer, acceptOfferWithSignature, type PublicOfferProjection } from '@/lib/ownerFinance/offersApi';
-import { formatCentsCurrencyDe, formatDateDe } from '@/lib/ownerFinance/exports';
+import { formatCentsCurrencyDe, formatDateDe, formatDateDeFromInstant } from '@/lib/ownerFinance/exports';
 import { buildGreetingLine, buildThanksLine } from '@/lib/ownerFinance/greeting';
 import { WelcomeSequence } from '@/components/finance/WelcomeSequence';
 import { PremiumOfferWebView } from '@/components/finance/PremiumOfferWebView';
@@ -250,7 +250,7 @@ function SuccessPanel({ offer, thanks, onDownload, via }: { offer: PublicOfferPr
 
       <dl className="mt-6 grid max-w-md gap-3 rounded-2xl border border-slate-100 bg-white p-5 text-[14px]">
         <div className="flex justify-between"><dt className="text-slate-400">Angebot</dt><dd className="font-semibold text-slate-800">{offer.offer_number}</dd></div>
-        <div className="flex justify-between"><dt className="text-slate-400">Angenommen am</dt><dd className="text-slate-700">{formatDateDe(offer.accepted_at ?? new Date().toISOString())}</dd></div>
+        <div className="flex justify-between"><dt className="text-slate-400">Angenommen am</dt><dd className="text-slate-700">{formatDateDeFromInstant(offer.accepted_at ?? new Date().toISOString())}</dd></div>
         {offer.accepted_signer_name ? <div className="flex justify-between"><dt className="text-slate-400">Unterschrieben von</dt><dd className="text-slate-700">{offer.accepted_signer_name}</dd></div> : null}
         <div className="flex justify-between"><dt className="text-slate-400">Betrag</dt><dd className="tabular-nums font-semibold text-slate-900">{formatCentsCurrencyDe(offer.gross_total_cents, offer.currency)}</dd></div>
       </dl>

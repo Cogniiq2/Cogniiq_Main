@@ -33,10 +33,26 @@ export function fmtCentsDe(cents: number, currency = 'EUR'): string {
   const frac = (abs % 100).toString().padStart(2, '0');
   return `${cents < 0 ? '-' : ''}${euros},${frac} ${currency === 'EUR' ? '€' : currency}`;
 }
+// A pure DATE column (no time-of-day, e.g. `valid_until`, `due_date`) is a calendar date with no
+// instant — it is formatted by string reshaping, never time-zone-converted.
 export function fmtDateDe(iso: string | null | undefined): string {
   if (!iso) return '';
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
   return m ? `${m[3]}.${m[2]}.${m[1]}` : iso;
+}
+
+// A timestamp (timestamptz) is an INSTANT: its Berlin calendar day is derived in Germany's civil
+// time zone, so a late-evening UTC acceptance shows the correct local date. Raw value stays UTC in
+// the database; only the display is converted. `Intl` applies the right CET/CEST offset per instant.
+export function fmtDateDeFromInstant(iso: string | null | undefined): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return fmtDateDe(iso);
+  const parts = new Intl.DateTimeFormat('de-DE', {
+    timeZone: 'Europe/Berlin', day: '2-digit', month: '2-digit', year: 'numeric',
+  }).formatToParts(d);
+  const g = (t: string) => parts.find((p) => p.type === t)?.value ?? '';
+  return `${g('day')}.${g('month')}.${g('year')}`;
 }
 
 /** Substitute {{placeholders}} with HTML-escaped values (unknown placeholders -> ''). */
@@ -127,7 +143,7 @@ export function buildConfirmationEmail(ctx: ConfirmationEmailContext): BuiltEmai
   const sellerName = ctx.seller.legal_name ?? 'Cogniiq';
   const offerNo = ctx.offer.offer_number ?? '';
   const gross = fmtCentsDe(ctx.offer.gross_total_cents, ctx.offer.currency);
-  const acceptedAt = fmtDateDe(ctx.signature.accepted_at);
+  const acceptedAt = fmtDateDeFromInstant(ctx.signature.accepted_at);
   const vars: Record<string, string> = {
     recipient_name: name, recipient_company: r.company ?? '', offer_number: offerNo,
     gross_total: gross, currency: ctx.offer.currency, accepted_at: acceptedAt,

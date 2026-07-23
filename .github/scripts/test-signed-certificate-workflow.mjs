@@ -83,6 +83,16 @@ ok(cert.certificatePdfFilename('AN 2026/0001; rm -rf') === 'Annahmebestaetigung-
 const pdfNoImg = await cert.renderAcceptanceCertificatePdf(ctx, null);
 ok(new TextDecoder().decode(pdfNoImg.slice(0, 8)).startsWith('%PDF'), 'certificate still renders (graceful) without an embeddable image');
 
+// Customer-facing acceptance timestamp is Berlin civil time (CEST here), with the German zone
+// label and no raw UTC. accepted_at 10:15Z on 23.07. is 12:15 in Berlin summer time (MESZ).
+ok(bytesStr.includes('12:15 Uhr') && bytesStr.includes('MESZ'), 'acceptance time is shown in Berlin civil time with the MESZ zone label');
+ok(!bytesStr.includes(' UTC'), 'certificate no longer shows a raw UTC timestamp');
+// Daylight-saving correctness: a winter instant crossing midnight in UTC rolls to the next Berlin
+// day and is labelled MEZ (CET), proving the offset is chosen per-instant, not hard-coded.
+const winterCtx = { ...ctx, signature: { ...ctx.signature, accepted_at: '2026-01-15T23:40:00Z' } };
+const winterStr = new TextDecoder('latin1').decode(await cert.renderAcceptanceCertificatePdf(winterCtx, null));
+ok(winterStr.includes('16.01.2026') && winterStr.includes('00:40 Uhr') && winterStr.includes('MEZ'), 'winter acceptance uses MEZ and the correct next-day Berlin date (DST-aware)');
+
 // ---------------------------------------------------------------- (A) confirmation email
 const email = await loadTs('supabase/functions/send-offer-document-email/email.ts');
 const confCtx = {
@@ -105,6 +115,10 @@ const conf2 = email.buildConfirmationEmail({ ...confCtx, recipient: { company: '
   templates: { subject: 'Annahme {{offer_number}} bestätigt', body: 'Hallo {{recipient_name}}, Betrag {{gross_total}}.' } });
 ok(conf2.subject === 'Annahme AN-2026-0001 bestätigt', 'confirmation subject template placeholders substituted');
 ok(/Herr Pensel/.test(conf2.html) && /95\.200,00/.test(conf2.html), 'confirmation body template placeholders substituted');
+// The acceptance date is the Berlin calendar day of the instant: a 22:30Z acceptance already
+// belongs to the next day in Germany, so the confirmation must show the 24th, not the 23rd.
+const confLate = email.buildConfirmationEmail({ ...confCtx, signature: { accepted_at: '2026-07-23T22:30:00Z' } });
+ok(confLate.html.includes('24.07.2026') && !confLate.html.includes('23.07.2026'), 'confirmation acceptance date uses the Berlin calendar day, not the UTC day');
 
 // ---------------------------------------------------------------- (B) worker structural
 const idx = read('supabase/functions/send-offer-document-email/index.ts');

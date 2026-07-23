@@ -64,12 +64,21 @@ function fmtDateDe(iso: string | null | undefined): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
   return m ? `${m[3]}.${m[2]}.${m[1]}` : iso;
 }
+// Customer-facing acceptance/creation timestamps are shown in Germany's civil time zone. The raw
+// value remains UTC (timestamptz) in the database — only the display is converted. `Intl` applies
+// the correct CET/CEST offset for the given instant, so daylight saving is handled automatically,
+// and the zone label (MEZ/MESZ) is included because the exact moment of a binding acceptance is
+// legally relevant and a bare wall-clock time would otherwise be ambiguous.
 function fmtDateTimeDe(iso: string | null | undefined): string {
   if (!iso) return '—';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return fmtDateDe(iso);
-  const p = (n: number) => n.toString().padStart(2, '0');
-  return `${p(d.getUTCDate())}.${p(d.getUTCMonth() + 1)}.${d.getUTCFullYear()} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())} UTC`;
+  const parts = new Intl.DateTimeFormat('de-DE', {
+    timeZone: 'Europe/Berlin', day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZoneName: 'short',
+  }).formatToParts(d);
+  const g = (t: string) => parts.find((p) => p.type === t)?.value ?? '';
+  return `${g('day')}.${g('month')}.${g('year')}, ${g('hour')}:${g('minute')} Uhr (${g('timeZoneName')})`;
 }
 function clip(s: string, n: number): string { return s.length > n ? s.slice(0, n - 1) + '…' : s; }
 
