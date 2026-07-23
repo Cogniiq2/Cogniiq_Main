@@ -20,6 +20,10 @@ import {
   type OfferLineInput, type OfferSectionsInput,
 } from '@/lib/ownerFinance/offersApi';
 import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
+import { loadCustomers, linkOfferCustomer } from '@/lib/ownerFinance/customersApi';
+import { customerDisplayName } from '@/lib/ownerFinance/customerLabels';
+import { CustomerFormDialog } from '@/components/finance/CustomerFormDialog';
+import type { OwnerCustomerListRow } from '@/lib/ownerFinance/types';
 import { buildRecipientName, buildGreetingLine } from '@/lib/ownerFinance/greeting';
 import { computeInvoiceLine } from '@/lib/ownerFinance/tax';
 import { offerToDocument } from '@/lib/ownerFinance/buildTransactionalDoc';
@@ -48,6 +52,7 @@ interface PaymentRow { id: string; label: string; percentage: string }
 
 interface EditorState {
   customerId: string;
+  ownerCustomerId: string;
   recipientSource: 'crm' | 'manual';
   rcompany: string; rcontact: string; rdepartment: string; rstreet: string; rpostal: string; rcity: string; rcountry: string; remail: string; rphone: string; rvat: string;
   rsalutation: '' | 'herr' | 'frau' | 'neutral'; rtitle: string; rfirstname: string; rlastname: string; rgreeting: string;
@@ -68,7 +73,7 @@ function newLine(): EditorLine {
 }
 function emptyState(validityDays: number): EditorState {
   return {
-    customerId: '', recipientSource: 'manual',
+    customerId: '', ownerCustomerId: '', recipientSource: 'manual',
     rcompany: '', rcontact: '', rdepartment: '', rstreet: '', rpostal: '', rcity: '', rcountry: 'DE', remail: '', rphone: '', rvat: '',
     rsalutation: '', rtitle: '', rfirstname: '', rlastname: '', rgreeting: '',
     title: '', subtitle: '', issueDate: today(), validUntil: plusDays(validityDays || 30),
@@ -92,6 +97,7 @@ function linesFrom(offerLines: OwnerOfferLine[]): EditorLine[] {
 function stateFromOffer(offer: OwnerOffer, offerLines: OwnerOfferLine[]): EditorState {
   return {
     customerId: offer.organization_id ?? '',
+    ownerCustomerId: offer.owner_customer_id ?? '',
     recipientSource: offer.recipient_source ?? 'manual',
     rcompany: offer.recipient_company ?? '', rcontact: offer.recipient_contact_name ?? '', rdepartment: offer.recipient_department ?? '',
     rstreet: offer.recipient_street ?? '', rpostal: offer.recipient_postal_code ?? '', rcity: offer.recipient_city ?? '',
@@ -152,6 +158,7 @@ function stateToDoc(state: EditorState, settings: OwnerDocumentSettings | null, 
     recipient_first_name: state.rfirstname || null, recipient_last_name: state.rlastname || null, recipient_greeting_name: state.rgreeting || null,
     net_total_cents: net, vat_total_cents: vat, gross_total_cents: net + vat, finalized_version: null,
     accepted_at: null, rejected_at: null, rejection_reason: null, expired_at: null, converted_invoice_id: null, converted_at: null,
+    owner_customer_id: state.ownerCustomerId || null, archived_at: null, archived_by: null,
     created_at: '', updated_at: '',
   };
   return { doc: offerToDocument(offer, lines, settings, null, entityName), net, vat, gross: net + vat };
@@ -206,6 +213,8 @@ export function OfferEditor() {
   const [state, setState] = useState<EditorState | null>(null);
   const [settings, setSettings] = useState<OwnerDocumentSettings | null>(null);
   const [customers, setCustomers] = useState<Array<{ organizationId: string; legalName: string | null; name: string; contact: string | null; email: string | null; phone: string | null; address: string | null }>>([]);
+  const [ownerCustomers, setOwnerCustomers] = useState<OwnerCustomerListRow[]>([]);
+  const [customerDialogOpen, setCustomerDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
@@ -219,11 +228,13 @@ export function OfferEditor() {
     if (!entity) return;
     setLoading(true);
     try {
-      const [settingsRow, clients] = await Promise.all([
+      const [settingsRow, clients, ownerCusts] = await Promise.all([
         loadDocumentSettings(entity.id).catch(() => null),
         loadAdminClients().catch(() => []),
+        loadCustomers(entity.id).catch(() => [] as OwnerCustomerListRow[]),
       ]);
       setSettings(settingsRow);
+      setOwnerCustomers(ownerCusts);
       setCustomers(clients.map((c) => ({
         organizationId: c.organizationId, legalName: c.account?.legal_name ?? null, name: c.organizationName,
         contact: c.account?.primary_contact_name ?? null, email: c.account?.primary_email ?? null,
@@ -286,6 +297,7 @@ export function OfferEditor() {
       // Re-read to capture updated_at for subsequent optimistic edits.
       const res = await loadOffer(id);
       expectedUpdatedAt.current = res?.offer.updated_at ?? null;
+      await maybeLinkOwnerCustomer(id);
       setSaveState('saved'); setDirty(false);
       return id;
     }
@@ -298,8 +310,16 @@ export function OfferEditor() {
       return null;
     }
     expectedUpdatedAt.current = updatedAt;
+    await maybeLinkOwnerCustomer(oid);
     setSaveState('saved'); setDirty(false);
     return oid;
+  };
+
+  // Best-effort link of the offer to the chosen owner customer. A link failure never blocks saving
+  // the offer itself; the owner can re-link from the customer workspace.
+  const maybeLinkOwnerCustomer = async (offerId: string) => {
+    if (!state?.ownerCustomerId) return;
+    await linkOfferCustomer(offerId, state.ownerCustomerId);
   };
 
   const save = async () => { const id = await persist(); if (id) toast.success('Gespeichert'); };
@@ -341,6 +361,15 @@ export function OfferEditor() {
 
       <Card className="p-5" id={sectionAnchor.recipient}>
         <SectionHeader title="Empfänger" description="CRM-Kunde übernehmen oder angebotsspezifisch überschreiben. CRM-Daten werden nie überschrieben." />
+        <div className="mb-4 rounded-2xl border border-gray-100 bg-gray-50/60 p-4">
+          <div className="grid items-end gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+            <Select id="owner-customer" label="Kunde (Kundenverwaltung)" value={state.ownerCustomerId}
+              onChange={(v) => patch({ ownerCustomerId: v })}
+              hint={'Ordnet das Angebot einem Kunden in „Kunden & Aufgaben“ zu.'}
+              options={[{ value: '', label: '— Kein Kunde zugeordnet —' }, ...ownerCustomers.map((c) => ({ value: c.id, label: customerDisplayName(c) }))]} />
+            <Button variant="secondary" icon={Plus} onClick={() => setCustomerDialogOpen(true)}>Neuen Kunden anlegen</Button>
+          </div>
+        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Select id="customer" label="CRM-Kunde" value={state.customerId} onChange={applyCustomer}
             options={[{ value: '', label: '— Kein CRM-Kunde —' }, ...customers.map((c) => ({ value: c.organizationId, label: c.name }))]} />
@@ -504,6 +533,19 @@ export function OfferEditor() {
         title="Vorschau (Entwurf)"
         description="Gespeicherter Entwurf — Premium-PDF-Vorschau."
       />
+
+      {entity ? (
+        <CustomerFormDialog
+          open={customerDialogOpen}
+          onClose={() => setCustomerDialogOpen(false)}
+          entityId={entity.id}
+          defaults={{
+            company: state.rcompany, contact_name: state.rcontact, email: state.remail, phone: state.rphone,
+            street: state.rstreet, postal_code: state.rpostal, city: state.rcity,
+          }}
+          onSaved={(id) => { patch({ ownerCustomerId: id }); if (entity) void loadCustomers(entity.id).then(setOwnerCustomers).catch(() => {}); }}
+        />
+      ) : null}
     </>
   );
 }

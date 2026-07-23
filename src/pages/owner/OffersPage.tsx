@@ -1,51 +1,63 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileSignature, Plus } from 'lucide-react';
+import { FileSignature, Plus, Search, Archive, Trash2, RotateCcw } from 'lucide-react';
 
 import {
-  Button, DataTable, EmptyState, ErrorState, KpiCard, PageHeader,
-  StatusBadge, Tabs, TableSkeleton, useToast,
-  type BadgeTone, type Column,
+  Button, DataTable, EmptyState, ErrorState, IconButton, KpiCard, PageHeader,
+  Field, Select, StatusBadge, Tabs, TableSkeleton, useToast,
+  type Column,
 } from '@/components/dashboard';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
-import { loadOffers } from '@/lib/ownerFinance/offersApi';
+import { loadOffers, loadPendingSendOfferIds } from '@/lib/ownerFinance/offersApi';
+import { unarchiveOffer } from '@/lib/ownerFinance/customersApi';
 import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
 import { formatCents } from '@/lib/clientPlatform/validation';
+import { formatDateDe } from '@/lib/ownerFinance/exports';
+import { offerStatusLabel, offerStatusTone, offerDisplayState, offerDisplayStateLabel, offerDisplayStateTone } from '@/lib/ownerFinance/customerLabels';
+import { OfferArchiveDialog } from '@/components/finance/OfferArchiveDialog';
 import type { OwnerOffer } from '@/lib/ownerFinance/types';
 import { ExportMenu } from '@/components/finance/ExportMenu';
 import { runFinanceExport } from '@/lib/ownerFinance/financeExportRunner';
 import { offerExportTable, offerReportModel, offerMetadataSheet } from '@/lib/ownerFinance/exports/datasets';
 import type { ExportFormat, ExportMode, ExportMeta } from '@/lib/ownerFinance/exports';
 
-const statusLabel: Record<string, string> = {
-  draft: 'Entwurf', finalized: 'Finalisiert', sent: 'Versendet', viewed: 'Angesehen',
-  accepted: 'Angenommen', rejected: 'Abgelehnt', expired: 'Abgelaufen', cancelled: 'Storniert', converted: 'Umgewandelt',
-};
-export const offerStatusTone: Record<string, BadgeTone> = {
-  draft: 'neutral', finalized: 'info', sent: 'info', viewed: 'warning',
-  accepted: 'success', rejected: 'danger', expired: 'warning', cancelled: 'neutral', converted: 'success',
-};
+// Re-exported for other owner views that render an offer status badge.
+export { offerStatusTone };
 
-interface CustomerOption { organizationId: string; clientAccountId: string | null; name: string; email: string | null; legalName: string | null }
+interface CustomerOption { organizationId: string; name: string; legalName: string | null }
+type SortKey = 'newest' | 'oldest' | 'amount' | 'customer' | 'status';
 
 export function OffersPage() {
   const { entity } = useOwnerEntity();
   const toast = useToast();
   const navigate = useNavigate();
   const [offers, setOffers] = useState<OwnerOffer[]>([]);
+  const [pendingSend, setPendingSend] = useState<Set<string>>(new Set());
   const [customers, setCustomers] = useState<CustomerOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState<SortKey>('newest');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [minAmount, setMinAmount] = useState('');
+  const [maxAmount, setMaxAmount] = useState('');
   const [includeIds, setIncludeIds] = useState(false);
+  const [archiveTarget, setArchiveTarget] = useState<OwnerOffer | null>(null);
 
   const load = useCallback(async () => {
     if (!entity) return;
     setLoading(true);
     try {
-      const [off, clients] = await Promise.all([loadOffers(entity.id), loadAdminClients().catch(() => [])]);
+      const [off, pending, clients] = await Promise.all([
+        loadOffers(entity.id),
+        loadPendingSendOfferIds(entity.id).catch(() => new Set<string>()),
+        loadAdminClients().catch(() => []),
+      ]);
       setOffers(off);
-      setCustomers(clients.map((c) => ({ organizationId: c.organizationId, clientAccountId: c.account?.id ?? null, name: c.organizationName, email: c.account?.primary_email ?? null, legalName: c.account?.legal_name ?? null })));
+      setPendingSend(pending);
+      setCustomers(clients.map((c) => ({ organizationId: c.organizationId, name: c.organizationName, legalName: c.account?.legal_name ?? null })));
       setError(null);
     } catch (e: unknown) { setError(e instanceof Error ? e.message : String(e)); }
     finally { setLoading(false); }
@@ -53,32 +65,77 @@ export function OffersPage() {
 
   useEffect(() => { void load(); }, [load]);
 
-  const counts = useMemo(() => {
-    const c: Record<string, number> = { all: offers.length };
-    for (const o of offers) c[o.status] = (c[o.status] ?? 0) + 1;
-    return c;
-  }, [offers]);
-
-  const filterGroups: Record<string, (o: OwnerOffer) => boolean> = {
-    all: () => true,
-    draft: (o) => o.status === 'draft',
-    open: (o) => ['finalized', 'sent', 'viewed'].includes(o.status),
-    accepted: (o) => o.status === 'accepted' || o.status === 'converted',
-    rejected: (o) => o.status === 'rejected',
-    expired: (o) => o.status === 'expired',
-  };
-  const filtered = useMemo(() => offers.filter(filterGroups[statusFilter] ?? (() => true)), [offers, statusFilter]);
-
   const customerName = useCallback((o: OwnerOffer): string => {
+    if (o.recipient_company?.trim()) return o.recipient_company.trim();
     const c = customers.find((x) => x.organizationId === o.organization_id);
-    return c ? (c.legalName ?? c.name) : o.organization_id ? 'CRM-Kunde' : '—';
+    return c ? (c.legalName ?? c.name) : '—';
   }, [customers]);
 
+  // A single predicate per status tab. Archived is orthogonal to status: every non-archived tab
+  // hides archived offers; the "archived" tab shows only archived ones.
+  const isArchived = (o: OwnerOffer) => o.archived_at != null;
+  const statusMatchers: Record<string, (o: OwnerOffer) => boolean> = useMemo(() => ({
+    all: (o) => !isArchived(o),
+    draft: (o) => o.status === 'draft',
+    finalized: (o) => o.status === 'finalized' && !pendingSend.has(o.id),
+    pending_send: (o) => pendingSend.has(o.id) && o.status !== 'sent',
+    sent: (o) => o.status === 'sent',
+    viewed: (o) => o.status === 'viewed',
+    accepted: (o) => o.status === 'accepted' || o.status === 'converted',
+    expired: (o) => o.status === 'expired',
+    cancelled: (o) => o.status === 'cancelled',
+    archived: () => true, // handled by the archived branch below
+  }), [pendingSend]);
+
+  const counts = useMemo(() => {
+    const c: Record<string, number> = {};
+    for (const key of Object.keys(statusMatchers)) {
+      c[key] = key === 'archived'
+        ? offers.filter(isArchived).length
+        : offers.filter((o) => !isArchived(o) && statusMatchers[key](o)).length;
+    }
+    return c;
+  }, [offers, statusMatchers]);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const min = minAmount ? Math.round(parseFloat(minAmount.replace(',', '.')) * 100) : null;
+    const max = maxAmount ? Math.round(parseFloat(maxAmount.replace(',', '.')) * 100) : null;
+    let list = statusFilter === 'archived'
+      ? offers.filter(isArchived)
+      : offers.filter((o) => !isArchived(o) && (statusMatchers[statusFilter] ?? (() => true))(o));
+
+    if (q) list = list.filter((o) => [o.offer_number, o.title, customerName(o), o.recipient_contact_name, o.recipient_email].some((v) => (v ?? '').toLowerCase().includes(q)));
+    if (dateFrom) list = list.filter((o) => (o.issue_date ?? o.created_at.slice(0, 10)) >= dateFrom);
+    if (dateTo) list = list.filter((o) => (o.issue_date ?? o.created_at.slice(0, 10)) <= dateTo);
+    if (min != null) list = list.filter((o) => o.gross_total_cents >= min);
+    if (max != null) list = list.filter((o) => o.gross_total_cents <= max);
+
+    const sorted = [...list];
+    sorted.sort((a, b) => {
+      switch (sort) {
+        case 'oldest': return a.created_at.localeCompare(b.created_at);
+        case 'amount': return b.gross_total_cents - a.gross_total_cents;
+        case 'customer': return customerName(a).localeCompare(customerName(b), 'de');
+        case 'status': return a.status.localeCompare(b.status);
+        case 'newest': default: return b.created_at.localeCompare(a.created_at);
+      }
+    });
+    return sorted;
+  }, [offers, statusFilter, statusMatchers, query, dateFrom, dateTo, minAmount, maxAmount, sort, customerName]);
+
   const totals = useMemo(() => ({
-    open: offers.filter((o) => ['finalized', 'sent', 'viewed'].includes(o.status)).reduce((s, o) => s + o.gross_total_cents, 0),
+    open: offers.filter((o) => !isArchived(o) && ['finalized', 'sent', 'viewed'].includes(o.status)).reduce((s, o) => s + o.gross_total_cents, 0),
     accepted: offers.filter((o) => o.status === 'accepted' || o.status === 'converted').reduce((s, o) => s + o.gross_total_cents, 0),
     drafts: offers.filter((o) => o.status === 'draft').length,
   }), [offers]);
+
+  const unarchive = async (o: OwnerOffer) => {
+    const { error: err } = await unarchiveOffer(o.id);
+    if (err) { toast.error('Wiederherstellen fehlgeschlagen', 'Bitte erneut versuchen.'); return; }
+    toast.success('Angebot wiederhergestellt', 'Das Angebot ist wieder aktiv.');
+    void load();
+  };
 
   const runExport = async (format: ExportFormat, mode: ExportMode) => {
     if (!entity) return;
@@ -101,12 +158,40 @@ export function OffersPage() {
   };
 
   const columns: Column<OwnerOffer>[] = [
-    { key: 'number', header: 'Nummer', render: (o) => <span className="font-semibold text-gray-950">{o.offer_number ?? 'Entwurf'}</span>, hideOnMobile: true },
-    { key: 'status', header: 'Status', render: (o) => <StatusBadge label={statusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} /> },
-    { key: 'customer', header: 'Kunde', render: (o) => <span className="text-gray-600">{customerName(o)}</span>, hideOnMobile: true },
-    { key: 'title', header: 'Titel', render: (o) => <span className="text-gray-600">{o.title ?? '—'}</span> },
-    { key: 'valid', header: 'Gültig bis', render: (o) => <span className="text-gray-500">{o.valid_until ?? '—'}</span>, hideOnMobile: true },
+    { key: 'number', header: 'Nummer', render: (o) => <span className="font-semibold text-gray-950">{o.offer_number ?? 'Entwurf'}</span> },
+    { key: 'status', header: 'Status', render: (o) => (
+      <div className="flex flex-wrap items-center gap-1.5">
+        <StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} />
+        {pendingSend.has(o.id) && o.status !== 'sent' ? <StatusBadge label="Versand ausstehend" tone="info" /> : null}
+        {o.archived_at ? <StatusBadge label={offerDisplayStateLabel[offerDisplayState(o)]} tone={offerDisplayStateTone.archived} /> : null}
+      </div>
+    ) },
+    { key: 'customer', header: 'Kunde', render: (o) => <span className="text-gray-600">{customerName(o)}</span> },
+    { key: 'title', header: 'Titel', render: (o) => <span className="text-gray-600">{o.title ?? '—'}</span>, hideOnMobile: true },
+    { key: 'valid', header: 'Gültig bis', render: (o) => <span className="text-gray-500">{o.valid_until ? formatDateDe(o.valid_until) : '—'}</span>, hideOnMobile: true },
     { key: 'gross', header: 'Brutto', align: 'right', render: (o) => <span className="tabular-nums font-medium text-gray-900">{formatCents(o.gross_total_cents, o.currency)}</span> },
+    { key: 'actions', header: '', align: 'right', render: (o) => (
+      <div className="flex items-center justify-end gap-0.5" onClick={(e) => e.stopPropagation()}>
+        {o.archived_at ? (
+          <IconButton icon={RotateCcw} label="Wiederherstellen" variant="ghost" onClick={() => void unarchive(o)} />
+        ) : (
+          <IconButton icon={o.status === 'draft' ? Trash2 : Archive} label={o.status === 'draft' ? 'Löschen' : 'Archivieren'} variant="ghost" onClick={() => setArchiveTarget(o)} />
+        )}
+      </div>
+    ) },
+  ];
+
+  const tabs = [
+    { value: 'all', label: 'Alle', count: counts.all },
+    { value: 'draft', label: 'Entwürfe', count: counts.draft },
+    { value: 'finalized', label: 'Finalisiert', count: counts.finalized },
+    { value: 'pending_send', label: 'Versand ausstehend', count: counts.pending_send },
+    { value: 'sent', label: 'Versendet', count: counts.sent },
+    { value: 'viewed', label: 'Angesehen', count: counts.viewed },
+    { value: 'accepted', label: 'Angenommen', count: counts.accepted },
+    { value: 'expired', label: 'Abgelaufen', count: counts.expired },
+    { value: 'cancelled', label: 'Storniert', count: counts.cancelled },
+    { value: 'archived', label: 'Archiviert', count: counts.archived },
   ];
 
   return (
@@ -133,29 +218,48 @@ export function OffersPage() {
         </div>
       ) : null}
 
-      <div className="mb-4">
-        <Tabs value={statusFilter} onChange={setStatusFilter} tabs={[
-          { value: 'all', label: 'Alle', count: counts.all },
-          { value: 'draft', label: 'Entwürfe', count: counts.draft },
-          { value: 'open', label: 'Offen', count: (counts.finalized ?? 0) + (counts.sent ?? 0) + (counts.viewed ?? 0) },
-          { value: 'accepted', label: 'Angenommen', count: (counts.accepted ?? 0) + (counts.converted ?? 0) },
-          { value: 'rejected', label: 'Abgelehnt', count: counts.rejected },
-          { value: 'expired', label: 'Abgelaufen', count: counts.expired },
-        ]} />
-      </div>
+      {!loading && offers.length > 0 ? (
+        <div className="mb-4 space-y-3">
+          <Tabs value={statusFilter} onChange={setStatusFilter} tabs={tabs} />
+          <div className="grid gap-2 rounded-2xl border border-gray-100 bg-white p-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="relative sm:col-span-2 lg:col-span-1">
+              <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
+              <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Nummer, Kunde, Titel …" aria-label="Angebote durchsuchen"
+                className="h-11 w-full rounded-xl border border-gray-200 bg-white pl-9 pr-3 text-sm text-gray-900 outline-none focus:border-gray-400" />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Field id="date-from" label="Von" type="date" value={dateFrom} onChange={setDateFrom} />
+              <Field id="date-to" label="Bis" type="date" value={dateTo} onChange={setDateTo} />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Field id="min-amount" label="Betrag min." value={minAmount} onChange={setMinAmount} inputMode="decimal" prefix="€" />
+              <Field id="max-amount" label="Betrag max." value={maxAmount} onChange={setMaxAmount} inputMode="decimal" prefix="€" />
+            </div>
+            <Select id="offer-sort" label="Sortierung" value={sort} onChange={(v) => setSort(v as SortKey)}
+              options={[
+                { value: 'newest', label: 'Neueste zuerst' },
+                { value: 'oldest', label: 'Älteste zuerst' },
+                { value: 'amount', label: 'Betrag (absteigend)' },
+                { value: 'customer', label: 'Kunde (A–Z)' },
+                { value: 'status', label: 'Status' },
+              ]} />
+          </div>
+        </div>
+      ) : null}
 
       {loading ? <TableSkeleton rows={5} cols={5} /> : filtered.length === 0 ? (
         <EmptyState icon={FileSignature}
-          title={offers.length === 0 ? 'Noch keine Angebote' : 'Keine Angebote in diesem Status'}
-          description={offers.length === 0 ? 'Erstellen Sie Ihr erstes Angebot. Es werden keine Beispieldaten angezeigt.' : 'Passen Sie den Filter an.'}
+          title={offers.length === 0 ? 'Noch keine Angebote' : 'Keine Angebote in dieser Ansicht'}
+          description={offers.length === 0 ? 'Erstellen Sie Ihr erstes Angebot. Es werden keine Beispieldaten angezeigt.' : 'Passen Sie Filter oder Suche an.'}
           action={offers.length === 0 ? <Button icon={Plus} onClick={() => navigate('/admin/finance/offers/new')} disabled={!entity}>Neues Angebot</Button> : undefined} />
       ) : (
-        <DataTable columns={columns} rows={filtered} getRowKey={(o) => o.id} minWidth={820}
+        <DataTable columns={columns} rows={filtered} getRowKey={(o) => o.id} minWidth={900}
           onRowClick={(o) => navigate(`/admin/finance/offers/${o.id}`)}
-          mobileTitle={(o) => <div className="flex items-center gap-2"><span>{o.offer_number ?? 'Entwurf'}</span><StatusBadge label={statusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} /></div>}
+          mobileTitle={(o) => <div className="flex items-center gap-2"><span>{o.offer_number ?? 'Entwurf'}</span><StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} /></div>}
           mobileSubtitle={(o) => o.title ?? 'ohne Titel'} />
       )}
 
+      <OfferArchiveDialog open={!!archiveTarget} offer={archiveTarget} onClose={() => setArchiveTarget(null)} onDone={() => void load()} />
     </>
   );
 }

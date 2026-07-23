@@ -353,8 +353,106 @@ export interface OwnerOffer {
   expired_at: string | null;
   converted_invoice_id: string | null;
   converted_at: string | null;
+  // Owner customer management (migration 20260724120000). Archiving is a flag that never
+  // changes the legal `status`; linking associates the offer with an owner customer.
+  owner_customer_id: string | null;
+  archived_at: string | null;
+  archived_by: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export type OwnerCustomerStatus = 'active' | 'waiting' | 'completed' | 'archived';
+export type OwnerCustomerTaskStatus = 'open' | 'in_progress' | 'completed' | 'cancelled';
+export type OwnerCustomerTaskPriority = 'low' | 'normal' | 'high' | 'urgent';
+
+export interface OwnerCustomer {
+  id: string;
+  business_entity_id: string;
+  client_account_id: string | null;
+  organization_id: string | null;
+  company: string | null;
+  contact_name: string | null;
+  email: string | null;
+  phone: string | null;
+  street: string | null;
+  postal_code: string | null;
+  city: string | null;
+  country_code: string | null;
+  status: OwnerCustomerStatus;
+  notes: string | null;
+  last_activity_at: string;
+  completed_at: string | null;
+  completed_by: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Enriched overview row from owner_list_customers (customer + aggregate counts). */
+export interface OwnerCustomerListRow {
+  id: string;
+  company: string | null;
+  contact_name: string | null;
+  email: string | null;
+  phone: string | null;
+  status: OwnerCustomerStatus;
+  notes: string | null;
+  client_account_id: string | null;
+  last_activity_at: string;
+  created_at: string;
+  completed_at: string | null;
+  offer_count: number;
+  open_task_count: number;
+  completed_task_count: number;
+}
+
+export interface OwnerCustomerTask {
+  id: string;
+  business_entity_id: string;
+  customer_id: string;
+  title: string;
+  description: string | null;
+  status: OwnerCustomerTaskStatus;
+  priority: OwnerCustomerTaskPriority;
+  due_date: string | null;
+  sort_order: number;
+  notes: string | null;
+  completed_at: string | null;
+  completed_by: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OwnerCustomerActivity {
+  id: string;
+  event_type: string;
+  summary: string;
+  created_at: string;
+  related_offer_id: string | null;
+  related_task_id: string | null;
+}
+
+export interface OwnerCustomerOfferRef {
+  id: string;
+  offer_number: string | null;
+  title: string | null;
+  status: OwnerOfferStatus;
+  currency: string;
+  gross_total_cents: number;
+  created_at: string;
+  valid_until: string | null;
+  accepted_at: string | null;
+  archived_at: string | null;
+  sent_at: string | null;
+}
+
+export interface OwnerCustomerDetail {
+  customer: OwnerCustomer;
+  offers: OwnerCustomerOfferRef[];
+  tasks: OwnerCustomerTask[];
+  activity: OwnerCustomerActivity[];
 }
 
 export interface OwnerOfferLine {

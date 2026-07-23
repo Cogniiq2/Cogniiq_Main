@@ -33,6 +33,22 @@ export async function loadOffers(entityId: string): Promise<OwnerOffer[]> {
   return (data ?? []) as OwnerOffer[];
 }
 
+/**
+ * Offer ids that currently have an in-flight `offer_email` job (queued/processing/retrying) — i.e.
+ * a send has been initiated but the provider has not yet confirmed delivery. Used to distinguish
+ * "Versand ausstehend" from a plain finalized offer without changing the offer's own status.
+ */
+export async function loadPendingSendOfferIds(entityId: string): Promise<Set<string>> {
+  const { data, error } = await supabase
+    .from('owner_automation_jobs')
+    .select('offer_id')
+    .eq('business_entity_id', entityId)
+    .eq('job_type', 'offer_email')
+    .in('status', ['pending', 'retrying', 'processing']);
+  if (error) throw error;
+  return new Set((data ?? []).map((r) => (r as { offer_id: string }).offer_id).filter(Boolean));
+}
+
 export async function loadOffer(offerId: string): Promise<{ offer: OwnerOffer; lines: OwnerOfferLine[] } | null> {
   const [{ data: offer, error: e1 }, { data: lines, error: e2 }] = await Promise.all([
     supabase.from('owner_offers').select('*').eq('id', offerId).maybeSingle(),
