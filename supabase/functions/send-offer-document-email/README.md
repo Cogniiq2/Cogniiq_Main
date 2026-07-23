@@ -10,12 +10,53 @@ after an offer is accepted. Invoked every minute by a secure Supabase Cron / pg_
 | `invoice_create` | idempotent server-authoritative invoice draft (`owner_ensure_offer_invoice_internal`) |
 | `invoice_issue` | server-authoritative issue — final number + status, full preflight (`owner_issue_invoice_internal`); **never marked sent unless the issue succeeded** |
 | `invoice_send` / `invoice_email` | issue if needed → render the invoice PDF from **trusted** server context (`owner_worker_invoice_context`) → store it privately in `owner-finance-documents` → register it (`owner_worker_register_document`) → email it as a **Base64 attachment** (`Rechnung-RE-2026-0001-Cogniiq.pdf`) |
+| `invoice_pdf_generate` | issue if needed → render + privately store + register the invoice PDF only (no email); terminates as `completed` |
 | `offer_email` | mint a **fresh** secure token (hash-only stored, raw returned once) → email the **exact** `PUBLIC_APP_URL/d/<token>` portal link (never the app root, never fabricated from a hash) |
+| `signed_offer_certificate_generate` | fetch the drawn signature PNG from the **private** `owner-offer-signatures` bucket → render the signed **acceptance certificate** from trusted context (`owner_worker_certificate_context`) with the signature embedded → store it privately in `owner-finance-documents` → register it as a signed offer document (`owner_worker_register_certificate`); terminates as `completed` |
+| `signed_offer_confirmation_email` | ensure the certificate exists (generate it if missing) → email a premium German confirmation (`Ihre Annahme des Angebots … wurde bestätigt`) with the certificate attached (`Annahmebestaetigung-…-Cogniiq.pdf`) |
 
-Outcomes are recorded via `owner_complete_automation_job`: `sent` (terminal/idempotent),
-`retrying` (bounded exponential backoff), or `failed` (attempt cap reached). A failed email
-never rolls back the accepted offer or deletes the invoice; the owner dashboard shows the
-failure and offers manual retry.
+Outcomes are recorded via `owner_complete_automation_job`:
+- `sent` — an email left the building (terminal/idempotent);
+- `completed` — a generation-only job finished (certificate / invoice PDF), **never** falsely marked `sent`;
+- `retrying` — bounded exponential backoff (1m → 5m → 15m → 1h → capped);
+- `failed` — attempt cap reached.
+
+A failed job never rolls back the accepted offer, deletes the invoice, or removes signature
+evidence; the owner dashboard shows the failure and offers a secure retry.
+
+## Signed acceptance certificate
+
+Generated **server-side** from `owner_worker_certificate_context` (the immutable offer
+snapshot + the acceptance event's signature evidence) — the browser never produces the
+authoritative certificate. The customer's drawn signature PNG is decoded (inflate → unfilter →
+flattened onto white) and embedded as a real image XObject, so the certificate shows the actual
+signature. It proves which offer + immutable version was accepted, by whom, when, for what
+amount, under which terms version, bound by the SHA-256 values, with the original PNG privately
+stored. It is explicitly a **simple** electronic signature (eIDAS) — never qualified/advanced.
+
+Registering it (dedupe on the `signed` flag, so it never collides with the finalized offer PDF)
+flips `signed_document_available` to `true`, making the dashboard show
+`Signierter Nachweis: Verfügbar` with preview + download. No private storage path appears in the
+customer-facing PDF.
+
+## Automation settings (owner-controlled, `owner_document_settings`)
+
+| setting | default | effect |
+|---|---|---|
+| `auto_generate_signed_certificate_on_acceptance` | **on** | generate the certificate after a signed acceptance |
+| `auto_send_signed_confirmation_on_acceptance` | **on** | email the customer the confirmation + certificate |
+| `auto_create_invoice_on_acceptance` | **on** | create the invoice draft |
+| `auto_issue_invoice_on_acceptance` | **off** | finalize + number the invoice (opt-in) |
+| `auto_send_invoice_on_acceptance` | **off** | email the finalized invoice (opt-in) |
+
+Certificate + confirmation default **on** (non-destructive, customer-positive). Invoice
+issue/send stay **off** until the owner deliberately enables them.
+
+## Manual retry (owner dashboard)
+
+Each retry action calls the owner-only `owner_retry_automation_job(offer_id, job_type)` RPC,
+which re-arms an exhausted job or enqueues a missing one and resets its attempt budget. The
+sensitive work still runs only in the worker — nothing is executed in the browser.
 
 ## Worker authentication
 
@@ -64,7 +105,7 @@ select vault.create_secret('<the-hex-WORKER_SECRET>', 'automation_worker_secret'
 create extension if not exists pg_cron;
 create extension if not exists pg_net;
 
-select cron.schedule('automation-worker', '* * * * *', $$
+select cron.schedule('cogniiq-automation-worker', '* * * * *', $$
   select net.http_post(
     url     := (select decrypted_secret from vault.decrypted_secrets where name = 'automation_worker_url'),
     headers := jsonb_build_object(
@@ -82,27 +123,83 @@ into `cron.job.command` in plaintext.
 ### 3. Inspect
 
 ```sql
-select jobid, jobname, schedule, active from cron.job where jobname = 'automation-worker';
+select jobid, jobname, schedule, active from cron.job where jobname = 'cogniiq-automation-worker';
 select jobid, status, return_message, start_time, end_time
   from cron.job_run_details
-  where jobid = (select jobid from cron.job where jobname = 'automation-worker')
+  where jobid = (select jobid from cron.job where jobname = 'cogniiq-automation-worker')
   order by start_time desc limit 20;
 ```
 
 ### 4. Remove
 
 ```sql
-select cron.unschedule('automation-worker');
+select cron.unschedule('cogniiq-automation-worker');
 -- optional: also drop the stored secrets
 delete from vault.secrets where name in ('automation_worker_url','automation_worker_secret');
 ```
+
+## Dashboard-only deployment (no local terminal required)
+
+The owner does not use a local terminal. Everything below is done in the Supabase Dashboard.
+
+1. **Copy the function code.** Dashboard → *Edge Functions* → *Deploy a new function* →
+   name it `send-offer-document-email`. Paste `index.ts` and add the sibling files
+   `email.ts`, `invoicePdf.ts`, `certificatePdf.ts` in the in-browser editor. Repeat for
+   `process-accepted-offer` (its own folder).
+2. **JWT verification.** For `send-offer-document-email` turn **Verify JWT off** (it
+   authenticates with `x-worker-secret`). For `process-accepted-offer` also **off** (it is a
+   public, token-authenticated customer endpoint).
+3. **Set the secrets.** Dashboard → *Edge Functions* → *Secrets* (or *Project Settings →
+   Functions*): set `WORKER_SECRET`, `EMAIL_PROVIDER=resend`, `RESEND_API_KEY`, `EMAIL_FROM`,
+   `PUBLIC_APP_URL`. `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` are provided automatically.
+4. **Deploy** with the *Deploy* button.
+5. **Create the Cron job** in *SQL Editor* using the Vault + `cron.schedule` SQL above.
+6. **Test with a disposable offer.** Create a throwaway offer, send yourself the portal link,
+   accept it with a drawn signature, and watch the jobs drain (see verification below).
+
+## Production verification
+
+```sql
+-- Jobs for a given offer and their live state:
+select job_type, status, attempt_count, provider_message_id, last_error, scheduled_at
+  from public.owner_automation_jobs where offer_id = '<offer-uuid>' order by created_at;
+
+-- The signed certificate document (private path; download via a signed URL in the dashboard):
+select document_number, version, pdf_storage_path, render_metadata->>'signed' as signed, finalized_at
+  from public.owner_generated_documents
+  where source_resource_type = 'owner_offers' and source_resource_id = '<offer-uuid>'
+    and render_metadata->>'signed' = 'true';
+
+-- Verify the signature bucket stays PRIVATE (must return false):
+select public from storage.buckets where id = 'owner-offer-signatures';
+```
+
+- **Disable auto-send:** owner dashboard → *Dokumente & Rechnungsangaben* → *Automatik bei
+  Annahme* → uncheck the relevant toggles (or set the booleans in `owner_document_settings`).
+- **Stop the Cron job:** `select cron.unschedule('cogniiq-automation-worker');`
+- **Inspect logs:** Dashboard → *Edge Functions* → `send-offer-document-email` → *Logs*.
+
+## Rollback
+
+- **Pause automation** without code changes: unschedule the Cron job (above). No new jobs run;
+  accepted offers and evidence are untouched.
+- **Roll back the migration** effect: the `20260723127000` migration is additive — its columns
+  and functions are safe to leave in place. To revert behaviour, set the four new settings off,
+  or `drop function` the added RPCs (the earlier `owner_process_offer_acceptance` from
+  `20260723125000` can be re-applied to stop enqueuing certificate/confirmation jobs).
+- **Nothing is destructive:** buckets stay private, signature evidence and finalized documents
+  are never deleted.
 
 ## Guarantees
 
 - Provider/service/worker secrets are read from `Deno.env` only; never returned or logged.
 - Raw customer tokens, signatures and document bytes are never logged and never stored in the
-  job table; private storage paths are never exposed to callers.
-- Resend `Idempotency-Key = <jobId>:<documentVersion>` so retries never send duplicates.
+  job table; private storage paths are never exposed to callers or rendered in customer PDFs.
+- Resend `Idempotency-Key = <jobId>:<documentVersion>` (invoices) / `<jobId>:confirmation`
+  (confirmation email) so retries never send duplicates.
+- The certificate register dedupes on the `signed` flag, so retries never create a second
+  certificate and it never collides with the finalized offer PDF.
 - Concurrent worker runs never process the same job (`owner_claim_automation_jobs` uses
   `FOR UPDATE SKIP LOCKED`).
 - An incomplete invoice is never issued or emailed (preflight enforced server-side).
+- Generation-only jobs terminate as `completed`, never falsely as `sent`.

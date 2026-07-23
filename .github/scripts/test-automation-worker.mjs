@@ -85,9 +85,15 @@ ok(/if \(error\) throw new Error\('invoice issue failed'\); \/\/ NOT marked sent
 ok(/owner_ensure_offer_invoice_internal/.test(idx), 'invoice_create uses idempotent conversion');
 ok(/renderInvoicePdf\(ctx\)/.test(idx) && /FINANCE_BUCKET/.test(idx) && /upsert: true/.test(idx), 'invoice PDF generated + stored privately');
 ok(/owner_worker_register_document/.test(idx), 'generated invoice document is registered');
-ok(/attachment: \{ filename, contentBase64: toBase64\(pdf\) \}/.test(idx), 'PDF attached as Base64 bytes');
+ok(/contentBase64: toBase64\(gen\.pdf\)/.test(idx), 'invoice PDF attached as Base64 bytes');
 ok(/'Idempotency-Key': opts\.idempotencyKey/.test(idx), 'Resend Idempotency-Key header set');
-ok(/idempotencyKey: `\$\{job\.id\}:\$\{version\}`/.test(idx), 'idempotency key is deterministic (jobId:version)');
+ok(/idempotencyKey: `\$\{job\.id\}:\$\{gen\.version\}`/.test(idx), 'invoice idempotency key is deterministic (jobId:version)');
+// New: signed certificate + confirmation email + explicit generation-only completion.
+ok(/renderAcceptanceCertificatePdf/.test(idx) && /SIGNATURE_BUCKET/.test(idx), 'certificate rendered from the private signature PNG');
+ok(/owner_worker_register_certificate/.test(idx), 'certificate registered as a signed document');
+ok(/terminal: 'completed'/.test(idx), "generation-only jobs terminate as 'completed', not 'sent'");
+ok(/idempotencyKey: `\$\{job\.id\}:confirmation`/.test(idx), 'confirmation email idempotency key is deterministic');
+ok(/unknown job type/.test(idx), 'unknown job types fail safely');
 ok(/owner_worker_mint_offer_link/.test(idx) && /\$\{PUBLIC_APP_URL\}\/d\/\$\{minted\.token\}/.test(idx), 'offer_email mints a fresh token + exact /d/ link');
 ok(/owner_complete_automation_job/.test(idx), 'outcomes recorded via complete RPC');
 ok(!/console\.(log|error|info)/.test(idx), 'worker logs nothing (no token/secret/byte leakage)');

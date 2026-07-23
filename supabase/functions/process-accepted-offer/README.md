@@ -5,7 +5,16 @@ signature as a `data:image/png;base64,…` payload plus signer details; this fun
 validates + hashes the PNG server-side, stores it PRIVATELY at a server-generated path in
 the `owner-offer-signatures` bucket, and calls the service-role RPC
 `record_offer_acceptance`, which binds the evidence to the immutable offer version + source
-hash, is idempotent, and queues the configured invoice automation.
+hash, is idempotent, and queues the configured automation.
+
+## Downstream (server-authoritative pipeline)
+
+`record_offer_acceptance` → `owner_process_offer_acceptance` idempotently enqueues durable
+jobs in `owner_automation_jobs` (per the owner's settings): the **signed acceptance
+certificate** (`signed_offer_certificate_generate`, default on), the **confirmation email**
+(`signed_offer_confirmation_email`, default on), and the invoice draft/issue/send jobs. The
+`send-offer-document-email` worker drains them (see that function's README). This function does
+not send email, generate PDFs, or expose any secret — it only records the signed acceptance.
 
 ## Request
 
