@@ -13,7 +13,7 @@ export function PlatformAdminRoute({ children }: { children: ReactNode }) {
 
   if (!user) {
     const redirectTo = encodeURIComponent(`${location.pathname}${location.search}${location.hash}`);
-    return <Navigate to={`/admin/login?redirectTo=${redirectTo}`} replace />;
+    return <Navigate to={`/app/login?redirectTo=${redirectTo}`} replace />;
   }
 
   if (!isPlatformAdmin) {

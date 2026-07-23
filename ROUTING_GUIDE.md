@@ -254,3 +254,10 @@ location / {
 
 **Created:** 2024-12-04
 **Status:** ✅ Fully Implemented and Tested
+
+## Private surfaces (auth, internal workspace, finance)
+
+The customer portal (`/app/*`), the unified internal workspace (`/admin/*`: Tasks, Oura, CRM,
+Finance & Steuern), the canonical login (`/app/login`), role-aware post-login routing
+(`/auth/continue`) and the legacy `/owner/*` and `/admin/login` redirects are documented in
+[`docs/unified-workspace.md`](docs/unified-workspace.md).

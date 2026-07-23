@@ -33,6 +33,18 @@ jobs:
       - name: Invitation status helper unit tests
         run: node .github/scripts/test-invitation-status.mjs
 
+      - name: Owner finance tax engine unit tests
+        run: node .github/scripts/test-owner-finance-tax.mjs
+
+      - name: Auth routing / redirect unit tests
+        run: node .github/scripts/test-auth-routing.mjs
+
+      - name: Owner offer signed-state derivation tests
+        run: node .github/scripts/test-offer-signature-state.mjs
+
+      - name: Automated offer-email send-workflow tests
+        run: node .github/scripts/test-automated-offer-email.mjs
+
       - name: Typecheck
         run: npm run typecheck
 
@@ -93,3 +105,8 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
         run: bash supabase/tests/run_receptionist_entitlement_smoke.sh
+
+      - name: Run owner finance smoke test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+        run: bash supabase/tests/run_owner_finance_smoke.sh

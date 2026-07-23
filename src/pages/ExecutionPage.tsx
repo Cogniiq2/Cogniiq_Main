@@ -2,9 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
-import { AdminGate } from '../components/admin/AdminGate';
-import { AdminHeader } from '../components/admin/AdminHeader';
-import { useAdminTheme } from '../hooks/useAdminTheme';
 import {
   Activity,
   BarChart3,
@@ -278,8 +275,10 @@ const PRIORITY_LABEL: Record<ExecutionTask['priority'], string> = {
 // MAIN PAGE
 // =============================================================================
 
-export function ExecutionPage() {
-  const { theme, toggleTheme } = useAdminTheme();
+// Execution OS content, rendered inside the shared internal workspace shell. All data logic and the
+// operational layout are preserved; the legacy admin chrome (gate, header, ambient layer, theme
+// toggle) was removed.
+export function ExecutionContent() {
   const today = getBerlinDateString();
 
   const [loading, setLoading] = useState(true);
@@ -441,41 +440,18 @@ export function ExecutionPage() {
   }, {} as Record<string, { total: number; completed: number; count: number; completedCount: number }>);
 
   return (
-    <AdminGate>
-      <div
-        className="min-h-screen overflow-hidden font-sans"
-        style={{
-          background: 'var(--admin-bg)',
-          color: 'var(--admin-text-primary)',
-        }}
-      >
-        <AmbientLayer />
-
-        <AdminHeader
-          activeTab="execution"
-          todayCount={remainingTaskCount}
-          overdueCount={0}
-          theme={theme}
-          onThemeToggle={toggleTheme}
-          utilityAction={
-            <button
-              type="button"
-              onClick={fetchData}
-              disabled={loading}
-              className="inline-flex h-10 items-center gap-2 rounded-2xl px-3 text-xs font-bold transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
-              style={{
-                background: 'var(--admin-surface)',
-                border: '1px solid var(--admin-border)',
-                color: 'var(--admin-text-secondary)',
-              }}
-            >
-              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-              Refresh
-            </button>
-          }
-        />
-
-        <main className="relative z-10 mx-auto max-w-[1720px] px-4 py-5 sm:px-6 lg:px-8 lg:py-7">
+    <div className="space-y-5">
+        <div className="flex items-center justify-end">
+          <button
+            type="button"
+            onClick={fetchData}
+            disabled={loading}
+            className="inline-flex h-9 items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 text-[13px] font-semibold text-gray-600 transition-colors hover:border-gray-300 hover:text-gray-950 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} aria-hidden="true" />
+            Aktualisieren
+          </button>
+        </div>
           <DiagnosticsToggle
             today={today}
             day={day}
@@ -518,39 +494,13 @@ export function ExecutionPage() {
               </aside>
             </div>
           )}
-        </main>
-      </div>
-    </AdminGate>
+    </div>
   );
 }
 
 // =============================================================================
 // LAYOUT COMPONENTS
 // =============================================================================
-
-function AmbientLayer() {
-  return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            'radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--admin-accent) 10%, transparent), transparent 34%), radial-gradient(circle at 82% 10%, color-mix(in srgb, var(--admin-success) 7%, transparent), transparent 28%), linear-gradient(180deg, color-mix(in srgb, var(--admin-surface) 20%, transparent), transparent 42%)',
-        }}
-      />
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundImage:
-            'linear-gradient(var(--admin-grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--admin-grid-line) 1px, transparent 1px)',
-          backgroundSize: '56px 56px',
-          maskImage: 'linear-gradient(to bottom, black, transparent 70%)',
-          opacity: 0.34,
-        }}
-      />
-    </div>
-  );
-}
 
 function DiagnosticsToggle({
   today,
@@ -1408,4 +1358,4 @@ function MiniInfo({ label, value }: { label: string; value: string }) {
   );
 }
 
-export default ExecutionPage;
+export default ExecutionContent;

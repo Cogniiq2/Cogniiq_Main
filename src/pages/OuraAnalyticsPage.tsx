@@ -36,9 +36,6 @@ import {
   YAxis,
 } from 'recharts';
 import { supabase } from '../lib/supabase';
-import { AdminGate } from '../components/admin/AdminGate';
-import { AdminHeader } from '../components/admin/AdminHeader';
-import { useAdminTheme } from '../hooks/useAdminTheme';
 
 const OURA_CALLBACK_URL = 'https://lqgtmoulqzmrhglabrms.supabase.co/functions/v1/oura-callback';
 const OURA_SYNC_URL = 'https://lqgtmoulqzmrhglabrms.supabase.co/functions/v1/sync-oura';
@@ -815,34 +812,6 @@ function toneColor(tone: StatusTone): string {
   return COLORS.faint;
 }
 
-function AmbientLayer() {
-  return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            'radial-gradient(circle at 15% -8%, color-mix(in srgb, var(--oura-accent) 16%, transparent), transparent 32%), radial-gradient(circle at 84% 8%, color-mix(in srgb, var(--oura-recovery) 12%, transparent), transparent 28%), linear-gradient(180deg, var(--admin-bg) 0%, var(--admin-bg-subtle) 48%, var(--admin-bg) 100%)',
-        }}
-      />
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundImage: 'linear-gradient(var(--admin-grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--admin-grid-line) 1px, transparent 1px)',
-          backgroundSize: '58px 58px',
-          maskImage: 'linear-gradient(to bottom, black, transparent 78%)',
-        }}
-      />
-      <motion.div
-        className="absolute left-0 right-0 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--oura-accent) 45%, transparent), transparent)' }}
-        animate={{ top: ['0%', '100%'] }}
-        transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
-      />
-    </div>
-  );
-}
-
 function ChartShell({ title, eyebrow, children, action }: { title: string; eyebrow: string; children: ReactNode; action?: ReactNode }) {
   return (
     <section className="rounded-[1.75rem] p-4 sm:p-5" style={glassPanelStyle}>
@@ -1071,8 +1040,10 @@ function InlineError({ message, onRetry }: { message: string; onRetry: () => voi
   );
 }
 
-export function OuraAnalyticsPage() {
-  const { theme, toggleTheme } = useAdminTheme();
+// Executive health-analytics content, rendered inside the shared internal workspace shell. All Oura
+// connection logic, Supabase queries, analytics, charts, tables and states are preserved; only the
+// legacy admin chrome (gate, header, ambient/scan-line layer, theme toggle) was removed.
+export function OuraAnalyticsContent() {
   const [connectionId, setConnectionId] = useState<string | null>(() => getStoredConnectionId());
   const [dailyRows, setDailyRows] = useState<OuraDailySummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -1157,7 +1128,7 @@ export function OuraAnalyticsPage() {
     const clientId = import.meta.env.VITE_OURA_CLIENT_ID;
 
     if (!clientId) {
-      alert('Missing VITE_OURA_CLIENT_ID');
+      showNotice({ type: 'error', message: 'VITE_OURA_CLIENT_ID fehlt – Oura-Verbindung nicht konfiguriert.' });
       return;
     }
 
@@ -1212,19 +1183,7 @@ export function OuraAnalyticsPage() {
   };
 
   return (
-    <AdminGate>
-      <div className="admin-root min-h-screen overflow-hidden font-sans" style={{ background: 'var(--admin-bg)', color: COLORS.text }}>
-        <AmbientLayer />
-
-        <AdminHeader
-          activeTab="oura-analytics"
-          todayCount={0}
-          overdueCount={0}
-          theme={theme}
-          onThemeToggle={toggleTheme}
-        />
-
-        <main className="relative z-10 mx-auto max-w-[1760px] px-4 py-5 sm:px-6 lg:px-8 xl:px-10">
+    <div className="space-y-6">
           <section className="relative overflow-hidden rounded-[2rem] border p-5 sm:p-6 lg:p-8" style={glassPanelStyle}>
             <div className="absolute inset-x-0 top-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${COLORS.cyan}, ${COLORS.emerald}, transparent)` }} />
             <div className="relative grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(320px,460px)] xl:items-end">
@@ -1491,14 +1450,12 @@ export function OuraAnalyticsPage() {
               </table>
             </div>
           </ChartShell>
-        </main>
 
-        <AnimatePresence>
-          {notice && <NoticeToast notice={notice} onClose={() => setNotice(null)} />}
-        </AnimatePresence>
-      </div>
-    </AdminGate>
+      <AnimatePresence>
+        {notice && <NoticeToast notice={notice} onClose={() => setNotice(null)} />}
+      </AnimatePresence>
+    </div>
   );
 }
 
-export default OuraAnalyticsPage;
+export default OuraAnalyticsContent;
