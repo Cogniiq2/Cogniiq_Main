@@ -108,3 +108,63 @@ export function isSignedCertificateDocument(doc: {
   const signed = doc.render_metadata?.signed;
   return signed === true || signed === 'true';
 }
+
+// ---------------------------------------------------------------------------
+// Certificate + confirmation-email status derivation for the owner dashboard.
+// These combine the generated certificate document with the automation-job state so the
+// dashboard shows Verfügbar / Wird vorbereitet / Fehler with the correct tone and retry.
+// ---------------------------------------------------------------------------
+export type AutomationDisplayState = 'available' | 'sent' | 'processing' | 'pending' | 'failed' | 'none';
+
+export interface AutomationStatusView {
+  state: AutomationDisplayState;
+  label: string;
+  tone: SignaturePrimaryTone | 'danger';
+  /** True when the owner should be offered a retry action. */
+  canRetry: boolean;
+}
+
+interface JobLike { job_type: string; status: string }
+
+/** Find the newest job of a given type (jobs arrive oldest-first from the summary). */
+export function findJob<T extends JobLike>(jobs: T[] | null | undefined, jobType: string): T | null {
+  if (!jobs?.length) return null;
+  for (let i = jobs.length - 1; i >= 0; i--) if (jobs[i].job_type === jobType) return jobs[i];
+  return null;
+}
+
+const PENDING_JOB_STATUSES: ReadonlySet<string> = new Set(['pending', 'retrying']);
+const PROCESSING_JOB_STATUSES: ReadonlySet<string> = new Set(['processing']);
+
+/**
+ * Signed-certificate status: a generated certificate document wins (Verfügbar); otherwise the
+ * certificate job state drives Wird vorbereitet / Wird erstellt / Fehler. `signatureCaptured`
+ * gates whether "in preparation" is even meaningful (no signature ⇒ no certificate expected).
+ */
+export function deriveCertificateStatus(input: {
+  hasCertificateDocument: boolean;
+  signatureCaptured: boolean;
+  job?: { status: string } | null;
+}): AutomationStatusView {
+  if (input.hasCertificateDocument) {
+    return { state: 'available', label: 'Verfügbar', tone: 'success', canRetry: false };
+  }
+  const s = input.job?.status ?? null;
+  if (s === 'failed') return { state: 'failed', label: 'Fehler bei der Erstellung', tone: 'danger', canRetry: true };
+  if (s && PROCESSING_JOB_STATUSES.has(s)) return { state: 'processing', label: 'Wird erstellt', tone: 'neutral', canRetry: false };
+  if (s && PENDING_JOB_STATUSES.has(s)) return { state: 'pending', label: 'Wird vorbereitet', tone: 'neutral', canRetry: false };
+  // No job yet. If a signature exists the certificate is still expected; otherwise it is not applicable.
+  return input.signatureCaptured
+    ? { state: 'pending', label: 'Wird vorbereitet', tone: 'neutral', canRetry: true }
+    : { state: 'none', label: 'Nicht zutreffend', tone: 'neutral', canRetry: false };
+}
+
+/** Confirmation-email status for the owner dashboard. */
+export function deriveConfirmationEmailStatus(job?: { status: string } | null): AutomationStatusView {
+  const s = job?.status ?? null;
+  if (s === 'sent') return { state: 'sent', label: 'Versendet', tone: 'success', canRetry: false };
+  if (s === 'failed') return { state: 'failed', label: 'Fehler', tone: 'danger', canRetry: true };
+  if (s && PROCESSING_JOB_STATUSES.has(s)) return { state: 'processing', label: 'Wird versendet', tone: 'neutral', canRetry: false };
+  if (s && PENDING_JOB_STATUSES.has(s)) return { state: 'pending', label: 'Wartet', tone: 'neutral', canRetry: false };
+  return { state: 'none', label: 'Nicht geplant', tone: 'neutral', canRetry: false };
+}

@@ -61,7 +61,10 @@ export function DocumentSettingsSection({ entityId, entityName }: { entityId: st
     if (draft.default_offer_validity_days) patch.default_offer_validity_days = Number(draft.default_offer_validity_days);
     if (draft.default_invoice_due_days) patch.default_invoice_due_days = Number(draft.default_invoice_due_days);
     // Automation toggles are stored as real booleans (checkbox drafts are 'true'/'false' strings).
-    (['auto_create_invoice_on_acceptance', 'auto_issue_invoice_on_acceptance', 'auto_send_invoice_on_acceptance'] as const)
+    ([
+      'auto_create_invoice_on_acceptance', 'auto_issue_invoice_on_acceptance', 'auto_send_invoice_on_acceptance',
+      'auto_generate_signed_certificate_on_acceptance', 'auto_send_signed_confirmation_on_acceptance',
+    ] as const)
       .forEach((k) => { if (draft[k] != null) patch[k] = draft[k] === 'true'; });
     const { error } = await upsertDocumentSettings(entityId, patch);
     setSaving(false);
@@ -109,22 +112,28 @@ export function DocumentSettingsSection({ entityId, entityName }: { entityId: st
           <p className="mb-3 text-[12px] text-gray-500">Steuern Sie, was nach einer verbindlichen Kundenannahme automatisch geschieht. Ausstellen und Versand sind aus Sicherheitsgründen erst nach bewusster Aktivierung aktiv.</p>
           <div className="space-y-2.5">
             {([
-              { key: 'auto_create_invoice_on_acceptance', label: 'Rechnungsentwurf automatisch erstellen', def: true },
-              { key: 'auto_issue_invoice_on_acceptance', label: 'Rechnung automatisch ausstellen', def: false },
-              { key: 'auto_send_invoice_on_acceptance', label: 'Rechnung automatisch versenden', def: false },
+              { key: 'auto_generate_signed_certificate_on_acceptance', label: 'Unterschriebene Annahmebestätigung automatisch erzeugen', def: true, hint: 'Empfohlen — erstellt einen dauerhaften, rechtssicheren PDF-Nachweis der Annahme mit der erfassten Unterschrift.' },
+              { key: 'auto_send_signed_confirmation_on_acceptance', label: 'Bestätigungs-E-Mail automatisch an den Kunden senden', def: true, hint: 'Empfohlen — sendet dem Kunden eine professionelle Bestätigung mit angehängter Annahmebestätigung.' },
+              { key: 'auto_create_invoice_on_acceptance', label: 'Rechnungsentwurf automatisch erstellen', def: true, hint: null },
+              { key: 'auto_issue_invoice_on_acceptance', label: 'Rechnung automatisch ausstellen', def: false, hint: 'Aus Sicherheitsgründen standardmäßig deaktiviert.' },
+              { key: 'auto_send_invoice_on_acceptance', label: 'Rechnung automatisch versenden', def: false, hint: 'Aus Sicherheitsgründen standardmäßig deaktiviert. Nur nach bewusster Aktivierung.' },
             ] as const).map((row) => (
-              <label key={row.key} className="flex items-center gap-3 text-[13px] text-gray-700">
+              <label key={row.key} className="flex items-start gap-3 text-[13px] text-gray-700">
                 <input type="checkbox"
                   checked={(draft[row.key] ?? String(row.def)) === 'true'}
                   onChange={(e) => set(row.key, String(e.target.checked))}
-                  className="h-4 w-4 rounded border-gray-300" />
-                {row.label}
+                  className="mt-0.5 h-4 w-4 rounded border-gray-300" />
+                <span>
+                  {row.label}
+                  {row.hint ? <span className="block text-[11px] text-gray-400">{row.hint}</span> : null}
+                </span>
               </label>
             ))}
           </div>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <Field id="default_invoice_due_days" label="Rechnungs-Fälligkeit (Tage)" value={draft.default_invoice_due_days ?? '14'} onChange={(v) => set('default_invoice_due_days', v)} inputMode="numeric" />
             <Field id="invoice_email_subject_template" label="Rechnungs-E-Mail Betreff (optional)" value={draft.invoice_email_subject_template ?? ''} onChange={(v) => set('invoice_email_subject_template', v)} />
+            <Field id="confirmation_email_subject_template" label="Bestätigungs-E-Mail Betreff (optional)" value={draft.confirmation_email_subject_template ?? ''} onChange={(v) => set('confirmation_email_subject_template', v)} hint="Platzhalter: {{offer_number}}, {{recipient_name}}, {{gross_total}}" />
           </div>
         </div>
 

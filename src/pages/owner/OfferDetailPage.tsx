@@ -15,7 +15,7 @@ import {
   loadOffer, finalizeOffer, createOfferRevision, setOfferStatus, convertOfferToInvoiceDraft,
   createOfferAccessToken, loadOfferAcceptanceEvents, loadGeneratedDocuments, signedDocumentUrl,
   deleteOfferDraft, loadLatestOfferVersion, loadDocumentSettings,
-  loadAcceptanceSummary, signedSignatureUrl, retryAutomationJob,
+  loadAcceptanceSummary, signedSignatureUrl, retryAutomationJob, retryOfferAutomation,
 } from '@/lib/ownerFinance/offersApi';
 import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
 import { offerToDocument, snapshotToDocument } from '@/lib/ownerFinance/buildTransactionalDoc';
@@ -25,7 +25,7 @@ import { renderPremiumPdf } from '@/lib/ownerFinance/documents/premium';
 import { generateAndStoreDocument } from '@/lib/ownerFinance/generateDocument';
 import { formatCents } from '@/lib/clientPlatform/validation';
 import { formatDateDe } from '@/lib/ownerFinance/exports';
-import { deriveOfferSignatureState, isSignedCertificateDocument } from '@/lib/ownerFinance/offerSignatureState';
+import { deriveOfferSignatureState, isSignedCertificateDocument, deriveCertificateStatus, deriveConfirmationEmailStatus, findJob } from '@/lib/ownerFinance/offerSignatureState';
 import { SIGNATURE_LEVEL_LABEL_DE, type SignatureLevel } from '@/lib/ownerFinance/documents/signatureProvider';
 import type { OwnerOffer, OwnerOfferLine, OwnerDocumentSettings, OwnerOfferAcceptanceEvent, OwnerGeneratedDocument, OwnerOfferVersion, OwnerOfferAcceptanceSummary } from '@/lib/ownerFinance/types';
 
@@ -36,8 +36,14 @@ const statusLabel: Record<string, string> = {
 
 const jobLabel = (t: string): string => ({
   invoice_create: 'Rechnung erstellen', invoice_issue: 'Rechnung ausstellen',
+  invoice_pdf_generate: 'Rechnungs-PDF erzeugen',
   invoice_send: 'Rechnung senden', invoice_email: 'Rechnungs-E-Mail', offer_email: 'Angebots-E-Mail',
+  signed_offer_certificate_generate: 'Annahmebestätigung erzeugen',
+  signed_offer_confirmation_email: 'Bestätigungs-E-Mail',
 }[t] ?? t);
+
+const jobTone = (status: string): 'success' | 'danger' | 'neutral' =>
+  status === 'sent' || status === 'completed' ? 'success' : status === 'failed' ? 'danger' : 'neutral';
 
 /** German label for a stored signature level; falls back to the raw value for unknown levels. */
 const signatureLevelLabel = (level: string | null | undefined): string =>
@@ -133,6 +139,13 @@ export function OfferDetailPage() {
     if (error) toast.error('Erneuter Versuch fehlgeschlagen.'); else { toast.success('Wird erneut versucht.'); void load(); }
   }, [toast, load]);
 
+  // Secure owner retry/enqueue by (offer, job type). The sensitive work runs only in the worker.
+  const retryOffer = useCallback(async (jobType: Parameters<typeof retryOfferAutomation>[1]) => {
+    if (!offer) return;
+    const { error } = await retryOfferAutomation(offer.id, jobType);
+    if (error) toast.error('Aktion fehlgeschlagen', error); else { toast.success('Wird verarbeitet', 'Die Automatisierung wurde neu eingeplant.'); void load(); }
+  }, [offer, toast, load]);
+
   const isDraft = offer?.status === 'draft';
 
   // The document model: for a finalized offer, ALWAYS build from the immutable version snapshot
@@ -154,6 +167,15 @@ export function OfferDetailPage() {
     () => deriveOfferSignatureState({ status: offer?.status, acceptance: summary, signedDocumentAvailable }),
     [offer?.status, summary, signedDocumentAvailable],
   );
+
+  // Certificate + confirmation-email display states (available/pending/failed + retry).
+  const certJob = useMemo(() => findJob(summary?.automation_jobs, 'signed_offer_certificate_generate'), [summary]);
+  const confirmJob = useMemo(() => findJob(summary?.automation_jobs, 'signed_offer_confirmation_email'), [summary]);
+  const certState = useMemo(
+    () => deriveCertificateStatus({ hasCertificateDocument: Boolean(summary?.certificate) || signedDocumentAvailable, signatureCaptured: sigState.signatureCaptured, job: certJob }),
+    [summary?.certificate, signedDocumentAvailable, sigState.signatureCaptured, certJob],
+  );
+  const confirmState = useMemo(() => deriveConfirmationEmailStatus(confirmJob), [confirmJob]);
 
   // Hardened async wrapper: unexpected errors surface as a toast + full console log, never silently.
   const run = async (key: string, fn: () => Promise<void>) => {
@@ -288,17 +310,48 @@ export function OfferDetailPage() {
                 <StatusBadge label={sigState.primaryLabel} tone={sigState.primaryTone} />
               </div>
 
-              {/* Two independent, explicitly separated statuses: signature capture vs signed certificate. */}
-              <div className="mb-4 grid gap-2 rounded-xl border border-gray-100 bg-gray-50/60 p-3 text-[13px] sm:grid-cols-2">
+              {/* Independent, explicitly separated statuses: signature · certificate · confirmation email. */}
+              <div className="mb-4 grid gap-2 rounded-xl border border-gray-100 bg-gray-50/60 p-3 text-[13px] sm:grid-cols-3">
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-gray-500">Unterschrift</span>
                   <StatusBadge label={sigState.signatureStatusLabel} tone={sigState.signatureCaptured ? 'success' : 'warning'} />
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-gray-500">Signierter Nachweis</span>
-                  <StatusBadge label={sigState.certificateStatusLabel} tone={sigState.signedDocumentGenerated ? 'success' : 'neutral'} />
+                  <span className="flex items-center gap-1.5">
+                    <StatusBadge label={certState.label} tone={certState.tone} />
+                    {certState.canRetry ? <button onClick={() => void retryOffer('signed_offer_certificate_generate')} className="text-[11px] text-gray-700 underline">Erneut</button> : null}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-gray-500">Bestätigung</span>
+                  <span className="flex items-center gap-1.5">
+                    <StatusBadge label={confirmState.label} tone={confirmState.tone} />
+                    {confirmState.canRetry ? <button onClick={() => void retryOffer('signed_offer_confirmation_email')} className="text-[11px] text-gray-700 underline">Erneut</button> : null}
+                  </span>
                 </div>
               </div>
+
+              {/* Signed certificate document: preview / download / metadata once generated. */}
+              {summary.certificate ? (
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-100 bg-emerald-50/50 p-3 text-[13px]">
+                  <div>
+                    <p className="font-medium text-emerald-900">Annahmebestätigung verfügbar</p>
+                    <p className="text-[12px] text-emerald-700/80">
+                      {summary.certificate.document_number ?? '—'} · v{summary.certificate.version ?? '—'}
+                      {summary.certificate.generated_at ? ` · ${formatDateDe(summary.certificate.generated_at)}` : ''}
+                    </p>
+                  </div>
+                  {summary.certificate.storage_path ? (
+                    <Button size="sm" variant="secondary" icon={Download} onClick={() => downloadStored(summary.certificate!.storage_path!)} loading={busy === 'stored'}>Nachweis öffnen</Button>
+                  ) : null}
+                </div>
+              ) : certState.state === 'failed' ? (
+                <div className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-red-100 bg-red-50/50 p-3 text-[13px]">
+                  <span className="text-red-800">Die Annahmebestätigung konnte nicht erzeugt werden.</span>
+                  <button onClick={() => void retryOffer('signed_offer_certificate_generate')} className="text-[12px] font-medium text-red-800 underline">Erneut versuchen</button>
+                </div>
+              ) : null}
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <dl className="space-y-1.5 text-[13px]">
@@ -348,9 +401,13 @@ export function OfferDetailPage() {
                     <ul className="mt-3 space-y-1.5 text-[12px]">
                       {summary.automation_jobs.map((j, i) => (
                         <li key={i} className="flex items-center justify-between gap-2">
-                          <span className="text-gray-500">{jobLabel(j.job_type)}</span>
+                          <span className="text-gray-500">
+                            {jobLabel(j.job_type)}
+                            {/* Provider message id lives in a subtle technical-detail area, never prominent. */}
+                            {j.provider_message_id ? <span className="ml-1.5 font-mono text-[10px] text-gray-300" title={j.provider_message_id}>#{j.provider_message_id.slice(0, 6)}</span> : null}
+                          </span>
                           <span className="flex items-center gap-2">
-                            <StatusBadge label={j.status} tone={j.status === 'sent' ? 'success' : j.status === 'failed' ? 'danger' : 'neutral'} />
+                            <StatusBadge label={j.status} tone={jobTone(j.status)} />
                             {j.status === 'failed' ? <button onClick={() => void retryJob(j)} className="text-[11px] text-gray-700 underline">Erneut versuchen</button> : null}
                           </span>
                         </li>

@@ -259,6 +259,11 @@ export interface OwnerDocumentSettings {
   default_invoice_due_days?: number;
   invoice_email_subject_template?: string | null;
   invoice_email_body_template?: string | null;
+  // Signed acceptance certificate + confirmation email automation (both default on).
+  auto_generate_signed_certificate_on_acceptance?: boolean;
+  auto_send_signed_confirmation_on_acceptance?: boolean;
+  confirmation_email_subject_template?: string | null;
+  confirmation_email_body_template?: string | null;
   updated_at?: string;
 }
 
@@ -434,10 +439,22 @@ export interface OwnerAutomationJobStatus {
   job_type: string;
   status: string;
   attempt_count: number;
+  max_attempts?: number | null;
   last_error: string | null;
+  last_error_at?: string | null;
   provider_message_id: string | null;
+  scheduled_at?: string | null;
   sent_at: string | null;
+  completed_at?: string | null;
   updated_at: string | null;
+}
+
+export interface OwnerAcceptanceCertificate {
+  document_id: string;
+  version: number | null;
+  storage_path: string | null;
+  document_number: string | null;
+  generated_at: string | null;
 }
 
 export interface OwnerOfferAcceptanceSummary {
@@ -460,6 +477,7 @@ export interface OwnerOfferAcceptanceSummary {
   document_version: number | null;
   source_hash: string | null;
   invoice: { id: string; invoice_number: string | null; status: string; gross_total_cents: number; due_date: string | null } | null;
+  certificate: OwnerAcceptanceCertificate | null;
   automation_jobs: OwnerAutomationJobStatus[];
 }
 

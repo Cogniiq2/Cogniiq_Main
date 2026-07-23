@@ -194,9 +194,24 @@ export async function signedSignatureUrl(storagePath: string, expiresIn = 120): 
   return { url: data?.signedUrl ?? null, error: null };
 }
 
-/** Manually re-arm a failed automation job from the owner dashboard. */
+/** Manually re-arm a failed automation job from the owner dashboard (secure owner RPC). */
 export async function retryAutomationJob(jobId: string): Promise<{ error: string | null }> {
   const { error } = await supabase.from('owner_automation_jobs').update({ status: 'retrying', last_error: null }).eq('id', jobId);
+  return { error: error?.message ?? null };
+}
+
+/**
+ * Re-arm OR enqueue an automation job for an offer by job type (secure owner RPC).
+ * Used by the dashboard retry actions — the sensitive work runs only in the worker, never
+ * in the browser. Re-arms an exhausted job or creates it if it was never queued.
+ */
+export async function retryOfferAutomation(
+  offerId: string,
+  jobType:
+    | 'invoice_create' | 'invoice_issue' | 'invoice_pdf_generate' | 'invoice_send' | 'invoice_email'
+    | 'signed_offer_certificate_generate' | 'signed_offer_confirmation_email',
+): Promise<{ error: string | null }> {
+  const { error } = await supabase.rpc('owner_retry_automation_job', { p_offer_id: offerId, p_job_type: jobType });
   return { error: error?.message ?? null };
 }
 
