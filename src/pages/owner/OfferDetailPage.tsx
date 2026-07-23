@@ -25,6 +25,8 @@ import { renderPremiumPdf } from '@/lib/ownerFinance/documents/premium';
 import { generateAndStoreDocument } from '@/lib/ownerFinance/generateDocument';
 import { formatCents } from '@/lib/clientPlatform/validation';
 import { formatDateDe } from '@/lib/ownerFinance/exports';
+import { deriveOfferSignatureState, isSignedCertificateDocument } from '@/lib/ownerFinance/offerSignatureState';
+import { SIGNATURE_LEVEL_LABEL_DE, type SignatureLevel } from '@/lib/ownerFinance/documents/signatureProvider';
 import type { OwnerOffer, OwnerOfferLine, OwnerDocumentSettings, OwnerOfferAcceptanceEvent, OwnerGeneratedDocument, OwnerOfferVersion, OwnerOfferAcceptanceSummary } from '@/lib/ownerFinance/types';
 
 const statusLabel: Record<string, string> = {
@@ -36,6 +38,13 @@ const jobLabel = (t: string): string => ({
   invoice_create: 'Rechnung erstellen', invoice_issue: 'Rechnung ausstellen',
   invoice_send: 'Rechnung senden', invoice_email: 'Rechnungs-E-Mail', offer_email: 'Angebots-E-Mail',
 }[t] ?? t);
+
+/** German label for a stored signature level; falls back to the raw value for unknown levels. */
+const signatureLevelLabel = (level: string | null | undefined): string =>
+  (level && SIGNATURE_LEVEL_LABEL_DE[level as SignatureLevel]) || 'Einfache elektronische Signatur';
+
+// Short lifetime for the private-bucket signature preview URL (owner context only). 60–300s.
+const SIGNATURE_PREVIEW_TTL_SECONDS = 180;
 
 export function OfferDetailPage() {
   const { offerId } = useParams<{ offerId: string }>();
@@ -60,10 +69,12 @@ export function OfferDetailPage() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
+  // Inline signature preview via a short-lived signed URL from the PRIVATE owner-offer-signatures bucket.
+  const [sigPreview, setSigPreview] = useState<{ url: string | null; loading: boolean; error: boolean }>({ url: null, loading: false, error: false });
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (opts?: { silent?: boolean }) => {
     if (!offerId || !entity) return;
-    setLoading(true);
+    if (!opts?.silent) setLoading(true);
     try {
       const [res, settingsRow, evts, generated, clients, ver] = await Promise.all([
         loadOffer(offerId), loadDocumentSettings(entity.id).catch(() => null),
@@ -81,13 +92,38 @@ export function OfferDetailPage() {
       setRecipient(c ? { name: c.account?.legal_name ?? c.organizationName, addressLines: (c.account?.address ?? '').split('\n').filter(Boolean), email: c.account?.primary_email ?? null } : null);
       setError(null);
     } catch (e: unknown) { setError(e instanceof Error ? e.message : String(e)); }
-    finally { setLoading(false); }
+    finally { if (!opts?.silent) setLoading(false); }
   }, [offerId, entity]);
 
   useEffect(() => { void load(); }, [load]);
 
+  // Refetch offer + acceptance summary when the tab regains focus, so an acceptance that happened
+  // in another window (the customer portal) is reflected WITHOUT a hard refresh — no stale
+  // "not signed" value lingers in React state.
+  useEffect(() => {
+    const onVisible = () => { if (document.visibilityState === 'visible') void load({ silent: true }); };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
+    return () => { document.removeEventListener('visibilitychange', onVisible); window.removeEventListener('focus', onVisible); };
+  }, [load]);
+
+  // Fetch a fresh short-lived signed URL for the private signature PNG. Never builds a public URL.
+  const loadSignaturePreview = useCallback(async (path: string) => {
+    setSigPreview({ url: null, loading: true, error: false });
+    const { url } = await signedSignatureUrl(path, SIGNATURE_PREVIEW_TTL_SECONDS);
+    setSigPreview({ url: url ?? null, loading: false, error: !url });
+  }, []);
+
+  // Auto-load the inline preview whenever a stored signature path becomes available. The signed URL
+  // expires after SIGNATURE_PREVIEW_TTL_SECONDS; an expired <img> load triggers an on-demand refresh.
+  const signaturePath = summary?.signature_storage_path ?? null;
+  useEffect(() => {
+    if (signaturePath) void loadSignaturePreview(signaturePath);
+    else setSigPreview({ url: null, loading: false, error: false });
+  }, [signaturePath, loadSignaturePreview]);
+
   const openSignature = useCallback(async (path: string) => {
-    const { url } = await signedSignatureUrl(path);
+    const { url } = await signedSignatureUrl(path, SIGNATURE_PREVIEW_TTL_SECONDS);
     if (url) window.open(url, '_blank', 'noopener,noreferrer');
     else toast.error('Unterschrift konnte nicht geladen werden.');
   }, [toast]);
@@ -108,6 +144,16 @@ export function OfferDetailPage() {
   }, [offer, lines, settings, recipient, entity, isDraft, version]);
 
   const validation = useMemo(() => (doc ? validateOfferForFinalization(doc) : null), [doc]);
+
+  // Downstream signed-certificate availability, derived from the generated-documents list (never
+  // from the acceptance summary). This is a SEPARATE state and must not gate "signatureCaptured".
+  const signedDocumentAvailable = useMemo(() => docs.some(isSignedCertificateDocument), [docs]);
+
+  // The three independent signed states (accepted / signatureCaptured / signedDocumentGenerated).
+  const sigState = useMemo(
+    () => deriveOfferSignatureState({ status: offer?.status, acceptance: summary, signedDocumentAvailable }),
+    [offer?.status, summary, signedDocumentAvailable],
+  );
 
   // Hardened async wrapper: unexpected errors surface as a toast + full console log, never silently.
   const run = async (key: string, fn: () => Promise<void>) => {
@@ -235,9 +281,25 @@ export function OfferDetailPage() {
           {summary?.accepted ? (
             <Card className="p-6">
               <div className="mb-4 flex items-center justify-between">
-                <SectionHeader title="Angenommen" description="Online-Annahme mit einfacher elektronischer Signatur." />
-                <StatusBadge label="Angenommen" tone="success" />
+                <SectionHeader
+                  title={sigState.primaryLabel}
+                  description={sigState.signatureCaptured ? 'Online-Annahme mit erfasster einfacher elektronischer Signatur.' : 'Online-Annahme ohne erfasste Unterschrift.'}
+                />
+                <StatusBadge label={sigState.primaryLabel} tone={sigState.primaryTone} />
               </div>
+
+              {/* Two independent, explicitly separated statuses: signature capture vs signed certificate. */}
+              <div className="mb-4 grid gap-2 rounded-xl border border-gray-100 bg-gray-50/60 p-3 text-[13px] sm:grid-cols-2">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-gray-500">Unterschrift</span>
+                  <StatusBadge label={sigState.signatureStatusLabel} tone={sigState.signatureCaptured ? 'success' : 'warning'} />
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-gray-500">Signierter Nachweis</span>
+                  <StatusBadge label={sigState.certificateStatusLabel} tone={sigState.signedDocumentGenerated ? 'success' : 'neutral'} />
+                </div>
+              </div>
+
               <div className="grid gap-4 sm:grid-cols-2">
                 <dl className="space-y-1.5 text-[13px]">
                   <div className="flex justify-between gap-4"><dt className="text-gray-400">Unterschrieben von</dt><dd className="text-gray-800">{summary.signer_name ?? '—'}</dd></div>
@@ -245,12 +307,33 @@ export function OfferDetailPage() {
                   {summary.signer_role ? <div className="flex justify-between gap-4"><dt className="text-gray-400">Rolle</dt><dd className="text-gray-800">{summary.signer_role}</dd></div> : null}
                   {summary.signer_email ? <div className="flex justify-between gap-4"><dt className="text-gray-400">E-Mail</dt><dd className="text-gray-800">{summary.signer_email}</dd></div> : null}
                   <div className="flex justify-between gap-4"><dt className="text-gray-400">Zeitpunkt</dt><dd className="text-gray-800">{formatDateDe(summary.accepted_at ?? undefined)}</dd></div>
+                  <div className="flex justify-between gap-4"><dt className="text-gray-400">Signaturniveau</dt><dd className="text-gray-800">{signatureLevelLabel(summary.signature_level)}</dd></div>
                   <div className="flex justify-between gap-4"><dt className="text-gray-400">Betrag</dt><dd className="tabular-nums font-semibold text-gray-900">{formatCents(summary.accepted_gross_cents ?? 0, summary.currency ?? 'EUR')}</dd></div>
                   <div className="flex justify-between gap-4"><dt className="text-gray-400">Version / Hash</dt><dd className="text-gray-600">v{summary.document_version ?? '—'} · {summary.source_hash ? summary.source_hash.slice(0, 12) + '…' : '—'}</dd></div>
+                  {summary.signature_sha256 ? <div className="flex justify-between gap-4"><dt className="text-gray-400">Signatur-SHA-256</dt><dd className="font-mono text-[11px] text-gray-600">{summary.signature_sha256.slice(0, 16)}…</dd></div> : null}
                 </dl>
                 <div>
                   {summary.signature_storage_path ? (
-                    <button onClick={() => void openSignature(summary.signature_storage_path!)} className="mb-3 rounded-xl border border-gray-200 px-3 py-2 text-[13px] font-medium text-gray-700 hover:border-gray-300">Unterschrift anzeigen</button>
+                    <div className="mb-3">
+                      <p className="mb-1.5 text-[12px] font-medium text-gray-500">Erfasste Unterschrift</p>
+                      <div className="flex min-h-[96px] items-center justify-center rounded-xl border border-gray-200 bg-white p-3">
+                        {sigPreview.loading ? (
+                          <span className="text-[12px] text-gray-400">Wird geladen…</span>
+                        ) : sigPreview.url ? (
+                          <img
+                            src={sigPreview.url}
+                            alt="Erfasste Unterschrift"
+                            className="max-h-32 w-auto max-w-full object-contain"
+                            onError={() => setSigPreview({ url: null, loading: false, error: true })}
+                          />
+                        ) : (
+                          <button onClick={() => summary.signature_storage_path && void loadSignaturePreview(summary.signature_storage_path)} className="text-[12px] text-gray-500 underline">
+                            {sigPreview.error ? 'Vorschau abgelaufen — erneut laden' : 'Unterschrift laden'}
+                          </button>
+                        )}
+                      </div>
+                      <button onClick={() => void openSignature(summary.signature_storage_path!)} className="mt-2 text-[12px] text-gray-500 underline">In neuem Tab öffnen</button>
+                    </div>
                   ) : null}
                   {summary.invoice ? (
                     <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3 text-[13px]">

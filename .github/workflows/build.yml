@@ -39,6 +39,9 @@ jobs:
       - name: Auth routing / redirect unit tests
         run: node .github/scripts/test-auth-routing.mjs
 
+      - name: Owner offer signed-state derivation tests
+        run: node .github/scripts/test-offer-signature-state.mjs
+
       - name: Typecheck
         run: npm run typecheck
 
