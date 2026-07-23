@@ -16,6 +16,7 @@ import {
   createOfferAccessToken, loadOfferAcceptanceEvents, loadGeneratedDocuments, signedDocumentUrl,
   deleteOfferDraft, loadLatestOfferVersion, loadDocumentSettings,
   loadAcceptanceSummary, signedSignatureUrl, retryAutomationJob, retryOfferAutomation,
+  loadOfferAutomationJobs,
 } from '@/lib/ownerFinance/offersApi';
 import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
 import { offerToDocument, snapshotToDocument } from '@/lib/ownerFinance/buildTransactionalDoc';
@@ -25,9 +26,9 @@ import { renderPremiumPdf } from '@/lib/ownerFinance/documents/premium';
 import { generateAndStoreDocument } from '@/lib/ownerFinance/generateDocument';
 import { formatCents } from '@/lib/clientPlatform/validation';
 import { formatDateDe } from '@/lib/ownerFinance/exports';
-import { deriveOfferSignatureState, isSignedCertificateDocument, deriveCertificateStatus, deriveConfirmationEmailStatus, findJob } from '@/lib/ownerFinance/offerSignatureState';
+import { deriveOfferSignatureState, isSignedCertificateDocument, deriveCertificateStatus, deriveConfirmationEmailStatus, deriveOfferEmailStatus, findJob } from '@/lib/ownerFinance/offerSignatureState';
 import { SIGNATURE_LEVEL_LABEL_DE, type SignatureLevel } from '@/lib/ownerFinance/documents/signatureProvider';
-import type { OwnerOffer, OwnerOfferLine, OwnerDocumentSettings, OwnerOfferAcceptanceEvent, OwnerGeneratedDocument, OwnerOfferVersion, OwnerOfferAcceptanceSummary } from '@/lib/ownerFinance/types';
+import type { OwnerOffer, OwnerOfferLine, OwnerDocumentSettings, OwnerOfferAcceptanceEvent, OwnerGeneratedDocument, OwnerOfferVersion, OwnerOfferAcceptanceSummary, OwnerAutomationJobStatus } from '@/lib/ownerFinance/types';
 
 const statusLabel: Record<string, string> = {
   draft: 'Entwurf', finalized: 'Finalisiert', sent: 'Versendet', viewed: 'Angesehen',
@@ -66,6 +67,7 @@ export function OfferDetailPage() {
   const [docs, setDocs] = useState<OwnerGeneratedDocument[]>([]);
   const [version, setVersion] = useState<OwnerOfferVersion | null>(null);
   const [summary, setSummary] = useState<OwnerOfferAcceptanceSummary | null>(null);
+  const [automationJobs, setAutomationJobs] = useState<OwnerAutomationJobStatus[]>([]);
   const [recipient, setRecipient] = useState<{ name: string; addressLines: string[]; email: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -82,15 +84,16 @@ export function OfferDetailPage() {
     if (!offerId || !entity) return;
     if (!opts?.silent) setLoading(true);
     try {
-      const [res, settingsRow, evts, generated, clients, ver] = await Promise.all([
+      const [res, settingsRow, evts, generated, clients, ver, jobs] = await Promise.all([
         loadOffer(offerId), loadDocumentSettings(entity.id).catch(() => null),
         loadOfferAcceptanceEvents(offerId).catch(() => []),
         loadGeneratedDocuments(entity.id, { type: 'owner_offers', id: offerId }).catch(() => []),
         loadAdminClients().catch(() => []),
         loadLatestOfferVersion(offerId).catch(() => null),
+        loadOfferAutomationJobs(offerId).catch(() => []),
       ]);
       if (!res) { setError('Angebot nicht gefunden'); return; }
-      setOffer(res.offer); setLines(res.lines); setSettings(settingsRow); setEvents(evts); setDocs(generated); setVersion(ver);
+      setOffer(res.offer); setLines(res.lines); setSettings(settingsRow); setEvents(evts); setDocs(generated); setVersion(ver); setAutomationJobs(jobs);
       if (['accepted', 'converted'].includes(res.offer.status)) {
         loadAcceptanceSummary(offerId).then(setSummary).catch(() => setSummary(null));
       } else setSummary(null);
@@ -176,6 +179,11 @@ export function OfferDetailPage() {
     [summary?.certificate, signedDocumentAvailable, sigState.signatureCaptured, certJob],
   );
   const confirmState = useMemo(() => deriveConfirmationEmailStatus(confirmJob), [confirmJob]);
+
+  // Owner-triggered offer-email job (newest first from loadOfferAutomationJobs) + its display state.
+  const offerEmailJob = useMemo(() => automationJobs.find((j) => j.job_type === 'offer_email') ?? null, [automationJobs]);
+  const offerEmailState = useMemo(() => deriveOfferEmailStatus(offerEmailJob), [offerEmailJob]);
+  const canSend = ['finalized', 'sent', 'viewed'].includes(offer?.status ?? '');
 
   // Hardened async wrapper: unexpected errors surface as a toast + full console log, never silently.
   const run = async (key: string, fn: () => Promise<void>) => {
@@ -287,6 +295,13 @@ export function OfferDetailPage() {
 
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <StatusBadge label={statusLabel[offer.status] ?? offer.status} tone={offerStatusTone[offer.status]} />
+        {canSend ? (
+          <span className="flex items-center gap-1.5">
+            <span className="text-[13px] text-gray-500">E-Mail:</span>
+            <StatusBadge label={offerEmailState.label} tone={offerEmailState.tone} />
+            {offerEmailState.canRetry ? <button onClick={() => setSendOpen(true)} className="text-[12px] text-gray-700 underline">Erneut versuchen</button> : null}
+          </span>
+        ) : null}
         <span className="text-[13px] text-gray-500">Gültig bis {formatDateDe(offer.valid_until)}</span>
         {!isDraft && version ? <span className="text-[12px] text-gray-400">Version {version.version} · Quell-Hash {version.source_hash.slice(0, 12)}…</span> : null}
         {offer.converted_invoice_id ? <button className="text-[13px] text-gray-700 underline" onClick={() => navigate(`/admin/finance/invoices/${offer.converted_invoice_id}`)}>Zur Rechnung</button> : null}
@@ -493,8 +508,9 @@ export function OfferDetailPage() {
           documentId={docs[0]?.id ?? null}
           validDays={settings?.default_offer_validity_days ?? 30}
           sellerName={settings?.legal_name ?? entity?.display_name ?? 'Cogniiq'}
+          emailJob={offerEmailJob}
           onClose={() => setSendOpen(false)}
-          onSent={() => { void load(); }}
+          onSent={() => { void load({ silent: true }); }}
         />
       ) : null}
     </>

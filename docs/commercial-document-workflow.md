@@ -21,6 +21,8 @@ No production migration, Edge Function, or deployment is performed by this work.
 | `20260723120000_owner_document_settings.sql` | `owner_document_settings` + upsert RPC |
 | `20260723121000_owner_offers.sql` | `owner_offers`, `owner_offer_lines`, `owner_offer_versions`, `owner_offer_counters` + offer RPCs |
 | `20260723122000_owner_commercial_documents.sql` | `owner_generated_documents`, `owner_document_access_tokens`, `owner_document_access_events`, `owner_offer_acceptance_events`, `owner_finance_notifications` + generated-doc/token/public RPCs |
+| `20260723125000`–`20260723127000` | signature/proposal experience, durable automation worker, signed-certificate + confirmation workflow (see the worker README) |
+| `20260723128000_owner_offer_email_workflow.sql` | owner-triggered **offer email** send: `owner_enqueue_offer_email` (owner-only enqueue), `owner_worker_mark_offer_sent` + `owner_worker_revoke_offer_token` (service-role worker helpers) |
 
 The applied `20260722120000_owner_finance_cockpit.sql` is **not modified**. All three new migrations
 are idempotent/convergent (verified by double-apply). Apply order is by timestamp, after the cockpit.
@@ -65,6 +67,14 @@ Internal helper (not granted to anon): `owner_verify_offer_token`.
 branches). Finalization assigns the concurrency-safe number, freezes content + lines
 (guard triggers), and snapshots an immutable version + source hash. Finalized offers are edited only
 via **revision** (clones into a new draft). Acceptance is customer-driven through the token RPC.
+
+The `sent` transition is now driven by the **automated offer email**: the owner dashboard's
+*Angebot versenden* dialog primary action (**E-Mail jetzt senden**) enqueues one durable
+`offer_email` job via `owner_enqueue_offer_email`; the worker mints a fresh secure token and sends
+through Resend, then advances the offer to `sent` **only after** the provider confirms the send
+(`owner_worker_mark_offer_sent`). Opening the dialog mints no token and changes no status. The
+manual **Link kopieren / WhatsApp / Teilen** options mint a secure link on explicit click only and
+never mark the offer email-sent. Full detail: `supabase/functions/send-offer-document-email/README.md`.
 
 ## Invoice-document lifecycle
 

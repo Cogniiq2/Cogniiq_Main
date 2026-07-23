@@ -159,6 +159,20 @@ export function deriveCertificateStatus(input: {
     : { state: 'none', label: 'Nicht zutreffend', tone: 'neutral', canRetry: false };
 }
 
+/**
+ * Owner-triggered offer-email (`offer_email`) status for the "Angebot versenden" dialog + detail
+ * page. Distinct German labels for each lifecycle stage. `sent` reflects a SUCCESSFUL automated
+ * Resend send (never a manual link copy / WhatsApp / share). A failed send offers a retry.
+ */
+export function deriveOfferEmailStatus(job?: { status: string } | null): AutomationStatusView {
+  const s = job?.status ?? null;
+  if (s === 'sent') return { state: 'sent', label: 'Versendet', tone: 'success', canRetry: false };
+  if (s === 'failed') return { state: 'failed', label: 'Fehler beim Versand', tone: 'danger', canRetry: true };
+  if (s && PROCESSING_JOB_STATUSES.has(s)) return { state: 'processing', label: 'Wird versendet', tone: 'neutral', canRetry: false };
+  if (s && PENDING_JOB_STATUSES.has(s)) return { state: 'pending', label: 'Wartet auf Versand', tone: 'neutral', canRetry: false };
+  return { state: 'none', label: 'Noch nicht versendet', tone: 'neutral', canRetry: false };
+}
+
 /** Confirmation-email status for the owner dashboard. */
 export function deriveConfirmationEmailStatus(job?: { status: string } | null): AutomationStatusView {
   const s = job?.status ?? null;

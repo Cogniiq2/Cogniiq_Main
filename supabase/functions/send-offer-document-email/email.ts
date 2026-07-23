@@ -72,6 +72,15 @@ export interface OfferEmailContext {
   seller?: { legal_name?: string | null };
 }
 
+/**
+ * Owner-authored overrides from the "Angebot versenden" dialog. Both are OPTIONAL — when a
+ * value is blank the premium German default is used instead. The subject is plain text (never
+ * rendered as HTML); the message body is HTML-ESCAPED here before insertion, so unsafe raw
+ * HTML from the dialog can never reach the recipient. The secure link is NEVER taken from the
+ * dialog — it is always the worker-minted `${PUBLIC_APP_URL}/d/<token>` value passed as `link`.
+ */
+export interface OfferEmailOverrides { subject?: string | null; message?: string | null; }
+
 export function buildInvoiceEmail(ctx: InvoiceEmailContext, opts: { link?: string } = {}): BuiltEmail {
   const inv = ctx.invoice; const r = ctx.recipient; const seller = ctx.seller;
   const name = recipientName(r);
@@ -152,21 +161,38 @@ function renderTemplateRaw(tpl: string, vars: Record<string, string>): string {
   return tpl.replace(/\{\{\s*([a-z_]+)\s*\}\}/gi, (_, k: string) => vars[k] ?? '');
 }
 
-export function buildOfferEmail(ctx: OfferEmailContext, link: string): BuiltEmail {
+export function buildOfferEmail(ctx: OfferEmailContext, link: string, overrides: OfferEmailOverrides = {}): BuiltEmail {
   const r = ctx.recipient; const name = recipientName(r);
   const seller = ctx.seller ?? {}; const sellerName = seller.legal_name ?? 'Cogniiq';
-  const subject = `Ihr persönliches Angebot ${ctx.offer_number ?? ''} von ${sellerName}`.trim();
-  const greetLine = name ? `Guten Tag ${escapeHtml(name)},` : 'Guten Tag,';
   const validUntil = fmtDateDe(ctx.valid_until);
-  const body = `<p style="font-size:15px;line-height:1.6;color:#334155">${greetLine}</p>
+
+  // Owner-authored subject wins when present (plain text — a subject is never HTML).
+  const customSubject = (overrides.subject ?? '').trim();
+  const subject = customSubject || `Ihr persönliches Angebot ${ctx.offer_number ?? ''} von ${sellerName}`.trim();
+
+  const greetLine = name ? `Guten Tag ${escapeHtml(name)},` : 'Guten Tag,';
+  // The secure link button is ALWAYS the worker-minted portal URL, appended after the body
+  // (the dialog never carries the token). The CTA button + validity line frame every variant.
+  const linkBlock =
+    `<p style="margin:20px 0"><a href="${escapeHtml(link)}" style="display:inline-block;background:#0f172a;color:#fff;text-decoration:none;padding:12px 22px;border-radius:12px;font-weight:600;font-size:14px">Angebot ansehen</a></p>
+    ${validUntil ? `<p style="font-size:13px;color:#64748b">Das Angebot ist bis zum ${escapeHtml(validUntil)} gültig.</p>` : ''}`;
+
+  // Owner-authored body wins when present — HTML-ESCAPED, newlines → <br> (no raw HTML leaks).
+  const customMessage = (overrides.message ?? '').trim();
+  const body = customMessage
+    ? `<p style="font-size:15px;line-height:1.6;color:#334155">${escapeHtml(overrides.message).replace(/\n/g, '<br>')}</p>
+    ${linkBlock}`
+    : `<p style="font-size:15px;line-height:1.6;color:#334155">${greetLine}</p>
     <p style="font-size:15px;line-height:1.6;color:#334155">unter dem folgenden sicheren Link können Sie Ihr persönliches Angebot einsehen, als PDF herunterladen und direkt online annehmen:</p>
-    <p style="margin:20px 0"><a href="${escapeHtml(link)}" style="display:inline-block;background:#0f172a;color:#fff;text-decoration:none;padding:12px 22px;border-radius:12px;font-weight:600;font-size:14px">Angebot ansehen</a></p>
-    ${validUntil ? `<p style="font-size:13px;color:#64748b">Das Angebot ist bis zum ${escapeHtml(validUntil)} gültig.</p>` : ''}
+    ${linkBlock}
     <p style="font-size:15px;line-height:1.6;color:#334155">Beste Grüße<br>${escapeHtml(sellerName)}</p>`;
   const html = layout(body, sellerName);
-  const text = `${name ? `Guten Tag ${name},` : 'Guten Tag,'}\n\n` +
-    `Ihr persönliches Angebot ${ctx.offer_number ?? ''} können Sie hier einsehen und online annehmen:\n${link}\n` +
-    (validUntil ? `\nGültig bis ${validUntil}.\n` : '') +
-    `\nBeste Grüße\n${sellerName}`;
+
+  const text = customMessage
+    ? `${overrides.message!.trim()}\n\n${link}\n` + (validUntil ? `\nGültig bis ${validUntil}.\n` : '')
+    : `${name ? `Guten Tag ${name},` : 'Guten Tag,'}\n\n` +
+      `Ihr persönliches Angebot ${ctx.offer_number ?? ''} können Sie hier einsehen und online annehmen:\n${link}\n` +
+      (validUntil ? `\nGültig bis ${validUntil}.\n` : '') +
+      `\nBeste Grüße\n${sellerName}`;
   return { subject, html, text };
 }

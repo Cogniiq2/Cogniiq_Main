@@ -218,20 +218,33 @@ async function processJob(svc: Sb, job: ClaimedJob): Promise<JobOutcome> {
   if (type === 'offer_email') {
     if (!job.offer_id) throw new Error('missing offer');
     if (!PUBLIC_APP_URL) throw new Error('app url not configured');
-    // Mint a FRESH secure token (hash-only stored); use its raw value in memory only.
+    // Editable subject/message authored in the owner dialog (safe payload; escaped in the builder).
+    const payload = (job.payload ?? {}) as { subject?: string | null; message?: string | null };
+    // Prefer the server-authoritative recipient email over the free-text one on the job. The RPC
+    // already validated + normalized the recipient into recipient_email; the context resolves the
+    // trusted address again so we never send to an unvalidated string.
+    const { data: ctx, error: ctxErr } = await svc.rpc('owner_worker_offer_context', { p_offer_id: job.offer_id });
+    if (ctxErr || !ctx) throw new Error('offer context failed');
+    const to = ctx.recipient?.email ?? job.recipient_email;
+    if (!to) throw new Error('no recipient email');
+    // Mint a FRESH secure token (hash-only stored); use its raw value in memory only. Minted here
+    // in the worker — NEVER when the dialog opens — so no active token is created on UI renders.
     const { data: minted, error: mintErr } = await svc.rpc('owner_worker_mint_offer_link', { p_offer_id: job.offer_id, p_valid_days: 30 });
     if (mintErr || !minted?.token) throw new Error('link mint failed');
     const link = `${PUBLIC_APP_URL}/d/${minted.token}`; // EXACT portal URL, never the app root
-    const { data: ctx, error: ctxErr } = await svc.rpc('owner_worker_offer_context', { p_offer_id: job.offer_id });
-    if (ctxErr || !ctx) throw new Error('offer context failed');
-    const to = ctx.recipient?.email;
-    if (!to) throw new Error('no recipient email');
-    const mail = buildOfferEmail(ctx, link);
+    const mail = buildOfferEmail(ctx, link, { subject: job.subject ?? payload.subject, message: payload.message });
     const sent = await sendEmail(
       { to, subject: mail.subject, html: mail.html, text: mail.text },
       { idempotencyKey: `${job.id}:offer` },
     );
-    if (sent.error) throw new Error(`email ${sent.error}`);
+    if (sent.error) {
+      // Send failed → revoke the just-minted token so no active token is orphaned; a retry mints
+      // a fresh one. Best-effort; never throws over the original failure.
+      if (minted.token_id) await svc.rpc('owner_worker_revoke_offer_token', { p_token_id: minted.token_id }).catch(() => {});
+      throw new Error(`email ${sent.error}`);
+    }
+    // Provider confirmed acceptance → advance the offer to 'sent' (finalized/viewed only; idempotent).
+    await svc.rpc('owner_worker_mark_offer_sent', { p_offer_id: job.offer_id });
     return { providerId: sent.id };
   }
 

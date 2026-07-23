@@ -42,6 +42,9 @@ jobs:
       - name: Owner offer signed-state derivation tests
         run: node .github/scripts/test-offer-signature-state.mjs
 
+      - name: Automated offer-email send-workflow tests
+        run: node .github/scripts/test-automated-offer-email.mjs
+
       - name: Typecheck
         run: npm run typecheck
 

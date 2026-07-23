@@ -215,6 +215,38 @@ export async function retryOfferAutomation(
   return { error: error?.message ?? null };
 }
 
+/**
+ * Enqueue (or safely re-arm) exactly one durable `offer_email` job for a sendable offer via the
+ * secure OWNER-only RPC. The sensitive work — minting the fresh secure portal token and sending
+ * through Resend — happens ONLY in the worker; the browser never contacts Resend, never sees the
+ * raw token, and never sends any worker secret. The offer status is NOT set to 'sent' here; it
+ * advances only after the worker confirms a successful provider send.
+ */
+export async function enqueueOfferEmail(input: {
+  offerId: string; recipientEmail?: string | null; subject?: string | null; message?: string | null;
+}): Promise<{ jobId: string | null; status: string | null; error: string | null }> {
+  const { data, error } = await supabase.rpc('owner_enqueue_offer_email', {
+    p_offer_id: input.offerId,
+    p_recipient_email: input.recipientEmail ?? null,
+    p_subject: input.subject ?? null,
+    p_message: input.message ?? null,
+  });
+  if (error) return { jobId: null, status: null, error: error.message };
+  const r = data as { job_id?: string; status?: string };
+  return { jobId: r?.job_id ?? null, status: r?.status ?? null, error: null };
+}
+
+/** Load the automation jobs for an offer (owner RLS), newest first. Used to show live send status. */
+export async function loadOfferAutomationJobs(offerId: string): Promise<import('@/lib/ownerFinance/types').OwnerAutomationJobStatus[]> {
+  const { data, error } = await supabase
+    .from('owner_automation_jobs')
+    .select('id, job_type, status, attempt_count, max_attempts, last_error, last_error_at, provider_message_id, scheduled_at, sent_at, completed_at, updated_at')
+    .eq('offer_id', offerId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as import('@/lib/ownerFinance/types').OwnerAutomationJobStatus[];
+}
+
 /* ----------------------------------------------------------------- Invoice detail */
 
 export async function loadInvoiceDetail(invoiceId: string): Promise<{
