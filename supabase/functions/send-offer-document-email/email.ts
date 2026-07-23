@@ -98,6 +98,60 @@ export function buildInvoiceEmail(ctx: InvoiceEmailContext, opts: { link?: strin
   return { subject, html, text };
 }
 
+export interface ConfirmationEmailContext {
+  offer: { offer_number: string | null; currency: string; gross_total_cents: number };
+  signature: { accepted_at?: string | null };
+  signer: { name?: string | null };
+  recipient: { company?: string | null; greeting_name?: string | null; salutation?: string | null;
+    title?: string | null; first_name?: string | null; last_name?: string | null };
+  seller: { legal_name?: string | null; email?: string | null; phone?: string | null; website?: string | null };
+  templates?: { subject?: string | null; body?: string | null };
+}
+
+/**
+ * Premium signed-acceptance confirmation email. Sent AFTER a signed acceptance, with the
+ * signed acceptance certificate attached. All customer-controlled values are HTML-escaped;
+ * a plain-text alternative is always included. No portal token is exposed after acceptance.
+ */
+export function buildConfirmationEmail(ctx: ConfirmationEmailContext): BuiltEmail {
+  const r = ctx.recipient; const name = recipientName(r);
+  const sellerName = ctx.seller.legal_name ?? 'Cogniiq';
+  const offerNo = ctx.offer.offer_number ?? '';
+  const gross = fmtCentsDe(ctx.offer.gross_total_cents, ctx.offer.currency);
+  const acceptedAt = fmtDateDe(ctx.signature.accepted_at);
+  const vars: Record<string, string> = {
+    recipient_name: name, recipient_company: r.company ?? '', offer_number: offerNo,
+    gross_total: gross, currency: ctx.offer.currency, accepted_at: acceptedAt,
+    signer_name: ctx.signer.name ?? name, seller_name: sellerName, seller_email: ctx.seller.email ?? '',
+    invoice_number: '', due_date: '', document_link: '',
+  };
+  const subject = (ctx.templates?.subject && String(ctx.templates.subject).trim())
+    ? renderTemplateRaw(String(ctx.templates.subject), vars)
+    : `Ihre Annahme des Angebots ${offerNo} wurde bestätigt`.trim();
+
+  const greetLine = name ? `Guten Tag ${escapeHtml(name)},` : 'Guten Tag,';
+  const contactBits = [ctx.seller.email, ctx.seller.phone, ctx.seller.website].filter(Boolean).map((b) => escapeHtml(String(b))).join('  ·  ');
+  const bodyHtml = ctx.templates?.body && String(ctx.templates.body).trim()
+    ? `<p style="font-size:15px;line-height:1.6;color:#334155">${renderTemplate(String(ctx.templates.body), vars).replace(/\n/g, '<br>')}</p>`
+    : `<p style="font-size:15px;line-height:1.6;color:#334155">${greetLine}</p>
+       <p style="font-size:15px;line-height:1.6;color:#334155">vielen Dank — Ihre Annahme des Angebots <strong>${escapeHtml(offerNo)}</strong> über <strong>${escapeHtml(gross)}</strong> haben wir am ${escapeHtml(acceptedAt)} verbindlich erfasst.</p>
+       <p style="font-size:15px;line-height:1.6;color:#334155">Ihre unterschriebene Annahmebestätigung finden Sie als PDF im Anhang dieser E-Mail. Wir bereiten nun die nächsten Schritte vor und melden uns in Kürze mit den weiteren Details bei Ihnen.</p>
+       ${contactBits ? `<p style="font-size:13px;line-height:1.6;color:#64748b">Bei Fragen erreichen Sie uns unter ${contactBits}.</p>` : ''}
+       <p style="font-size:15px;line-height:1.6;color:#334155">Herzliche Grüße<br>${escapeHtml(sellerName)}</p>`;
+  const html = layout(bodyHtml, sellerName);
+  const text = `${name ? `Guten Tag ${name},` : 'Guten Tag,'}\n\n` +
+    `vielen Dank — Ihre Annahme des Angebots ${offerNo} über ${gross} haben wir am ${acceptedAt} verbindlich erfasst.\n` +
+    `Ihre unterschriebene Annahmebestätigung ist als PDF angehängt. Wir melden uns in Kürze mit den nächsten Schritten.\n` +
+    (contactBits ? `\nKontakt: ${[ctx.seller.email, ctx.seller.phone, ctx.seller.website].filter(Boolean).join(' · ')}\n` : '') +
+    `\nHerzliche Grüße\n${sellerName}`;
+  return { subject, html, text };
+}
+
+/** Subject-line templating (plain text, no HTML escaping — a subject is never rendered as HTML). */
+function renderTemplateRaw(tpl: string, vars: Record<string, string>): string {
+  return tpl.replace(/\{\{\s*([a-z_]+)\s*\}\}/gi, (_, k: string) => vars[k] ?? '');
+}
+
 export function buildOfferEmail(ctx: OfferEmailContext, link: string): BuiltEmail {
   const r = ctx.recipient; const name = recipientName(r);
   const seller = ctx.seller ?? {}; const sellerName = seller.legal_name ?? 'Cogniiq';

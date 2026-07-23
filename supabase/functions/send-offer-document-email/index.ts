@@ -21,8 +21,15 @@
 
 // deno-lint-ignore-file no-explicit-any
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { renderInvoicePdf, invoicePdfFilename } from './invoicePdf.ts';
-import { buildInvoiceEmail, buildOfferEmail } from './email.ts';
+import { renderInvoicePdf, invoicePdfFilename, type InvoicePdfContext } from './invoicePdf.ts';
+import { renderAcceptanceCertificatePdf, certificatePdfFilename, type CertificateContext } from './certificatePdf.ts';
+import { buildInvoiceEmail, buildOfferEmail, buildConfirmationEmail, type InvoiceEmailContext } from './email.ts';
+
+// The trusted invoice context returned by owner_worker_invoice_context — satisfies both the
+// PDF renderer and the email builder, plus the entity id + resolved recipient email.
+type InvoiceWorkerCtx = InvoicePdfContext & InvoiceEmailContext & {
+  business_entity_id: string; recipient: { email: string | null };
+};
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
@@ -32,6 +39,7 @@ const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? '';
 const PUBLIC_APP_URL = (Deno.env.get('PUBLIC_APP_URL') ?? '').replace(/\/$/, '');
 const FINANCE_BUCKET = 'owner-finance-documents';
+const SIGNATURE_BUCKET = 'owner-offer-signatures';
 const BATCH = 10;
 
 type Sb = ReturnType<typeof createClient>;
@@ -111,11 +119,14 @@ Deno.serve(async (req: Request) => {
   for (const job of (claimed ?? []) as ClaimedJob[]) {
     const jobId: string = job.id;
     try {
-      const status = await processJob(svc, job);
+      const outcome = await processJob(svc, job);
+      // Generation-only jobs (certificate/PDF) terminate as 'completed', never 'sent'.
+      const terminal = outcome.terminal ?? 'sent';
       await svc.rpc('owner_complete_automation_job', {
-        p_job_id: jobId, p_status: 'sent', p_provider_message_id: status.providerId ?? null, p_error: null, p_retry_delay_seconds: 60,
+        p_job_id: jobId, p_status: terminal, p_provider_message_id: outcome.providerId ?? null,
+        p_error: null, p_retry_delay_seconds: 60, p_output_document_id: outcome.outputDocumentId ?? null,
       });
-      results.push({ id: jobId, status: 'sent' });
+      results.push({ id: jobId, status: terminal });
     } catch (e) {
       // Map to a SAFE summary; never leak provider errors, tokens or bytes.
       const summary = String((e as Error).message ?? 'error').slice(0, 200);
@@ -128,9 +139,49 @@ Deno.serve(async (req: Request) => {
   return json({ ok: true, processed: results.length, results });
 });
 
+interface JobOutcome { providerId: string | null; terminal?: 'sent' | 'completed'; outputDocumentId?: string | null; }
+
 // Performs the real operation. Throws on failure (worker records retrying/failed).
-async function processJob(svc: Sb, job: ClaimedJob): Promise<{ providerId: string | null }> {
+async function processJob(svc: Sb, job: ClaimedJob): Promise<JobOutcome> {
   const type: string = job.job_type;
+
+  // ---- Signed acceptance certificate: server-authoritative generation (no send). ----
+  if (type === 'signed_offer_certificate_generate') {
+    if (!job.offer_id) throw new Error('missing offer');
+    const cert = await ensureCertificate(svc, job.offer_id, job.acceptance_event_id);
+    return { providerId: null, terminal: 'completed', outputDocumentId: cert.documentId };
+  }
+
+  // ---- Premium signed-acceptance confirmation email (certificate attached). ----
+  if (type === 'signed_offer_confirmation_email') {
+    if (!job.offer_id) throw new Error('missing offer');
+    const cert = await ensureCertificate(svc, job.offer_id, job.acceptance_event_id);
+    const to = cert.ctx.recipient.email;
+    if (!to) throw new Error('no recipient email');
+    const mail = buildConfirmationEmail({
+      offer: { offer_number: cert.ctx.offer.offer_number, currency: cert.ctx.offer.currency, gross_total_cents: cert.ctx.offer.gross_total_cents },
+      signature: { accepted_at: cert.ctx.signature.accepted_at },
+      signer: { name: cert.ctx.signer.name },
+      recipient: cert.ctx.recipient,
+      seller: cert.ctx.seller,
+      templates: cert.ctx.templates,
+    });
+    const sent = await sendEmail(
+      { to, subject: mail.subject, html: mail.html, text: mail.text },
+      { attachment: { filename: cert.filename, contentBase64: toBase64(cert.pdf) }, idempotencyKey: `${job.id}:confirmation` },
+    );
+    if (sent.error) throw new Error(`email ${sent.error}`);
+    return { providerId: sent.id, terminal: 'sent' };
+  }
+
+  // ---- Explicit, separately-retryable invoice PDF generation (no send). ----
+  if (type === 'invoice_pdf_generate') {
+    const invoiceId = await resolveInvoiceId(svc, job);
+    const { error: issueErr } = await svc.rpc('owner_issue_invoice_internal', { p_invoice_id: invoiceId });
+    if (issueErr) throw new Error('invoice issue failed');
+    const reg = await generateAndStoreInvoicePdf(svc, invoiceId);
+    return { providerId: null, terminal: 'completed', outputDocumentId: reg.documentId };
+  }
 
   if (type === 'invoice_create') {
     if (!job.offer_id) throw new Error('missing offer');
@@ -152,33 +203,16 @@ async function processJob(svc: Sb, job: ClaimedJob): Promise<{ providerId: strin
     const { error: issueErr } = await svc.rpc('owner_issue_invoice_internal', { p_invoice_id: invoiceId });
     if (issueErr) throw new Error('invoice issue failed');
 
-    const { data: ctx, error: ctxErr } = await svc.rpc('owner_worker_invoice_context', { p_invoice_id: invoiceId });
-    if (ctxErr || !ctx) throw new Error('invoice context failed');
-    const to = ctx.recipient?.email;
+    const gen = await generateAndStoreInvoicePdf(svc, invoiceId);
+    const to = gen.ctx.recipient?.email;
     if (!to) throw new Error('no recipient email');
-
-    // Render the invoice PDF from TRUSTED server context and store it privately.
-    const pdf = renderInvoicePdf(ctx);
-    const filename = invoicePdfFilename(ctx.invoice?.invoice_number ?? null);
-    const path = `${ctx.business_entity_id}/invoices/${invoiceId}/${filename}`;
-    const up = await svc.storage.from(FINANCE_BUCKET).upload(path, pdf, { contentType: 'application/pdf', upsert: true });
-    if (up.error) throw new Error('pdf storage failed');
-    const sourceHash = await sha256Hex(`${invoiceId}:${ctx.invoice?.invoice_number ?? ''}:${ctx.invoice?.gross_total_cents ?? 0}`);
-    const { data: reg } = await svc.rpc('owner_worker_register_document', {
-      p_entity: ctx.business_entity_id, p_document_type: 'invoice', p_source_resource_type: 'owner_invoices',
-      p_source_resource_id: invoiceId, p_document_number: ctx.invoice?.invoice_number ?? null,
-      p_currency: ctx.invoice?.currency ?? 'EUR', p_template_version: 'invoice-worker-v1', p_source_hash: sourceHash,
-      p_storage_path: path, p_metadata: { via: 'automation-worker' },
-    });
-    const version = reg?.version ?? 1;
-
-    const mail = buildInvoiceEmail(ctx);
+    const mail = buildInvoiceEmail(gen.ctx);
     const sent = await sendEmail(
       { to, subject: mail.subject, html: mail.html, text: mail.text },
-      { attachment: { filename, contentBase64: toBase64(pdf) }, idempotencyKey: `${job.id}:${version}` },
+      { attachment: { filename: gen.filename, contentBase64: toBase64(gen.pdf) }, idempotencyKey: `${job.id}:${gen.version}` },
     );
     if (sent.error) throw new Error(`email ${sent.error}`);
-    return { providerId: sent.id };
+    return { providerId: sent.id, terminal: 'sent', outputDocumentId: gen.documentId };
   }
 
   if (type === 'offer_email') {
@@ -210,4 +244,59 @@ async function resolveInvoiceId(svc: Sb, job: ClaimedJob): Promise<string> {
   const { data, error } = await svc.rpc('owner_ensure_offer_invoice_internal', { p_offer_id: job.offer_id });
   if (error || !data?.invoice_id) throw new Error('invoice resolve failed');
   return data.invoice_id;
+}
+
+// Render + privately store the invoice PDF from TRUSTED server context; register it (idempotent).
+// Deterministic storage path per invoice → retries overwrite the same object (no orphans).
+async function generateAndStoreInvoicePdf(svc: Sb, invoiceId: string): Promise<{ ctx: InvoiceWorkerCtx; pdf: Uint8Array; filename: string; version: number; documentId: string | null }> {
+  const { data, error: ctxErr } = await svc.rpc('owner_worker_invoice_context', { p_invoice_id: invoiceId });
+  if (ctxErr || !data) throw new Error('invoice context failed');
+  const ctx = data as InvoiceWorkerCtx;
+  const pdf = renderInvoicePdf(ctx);
+  const filename = invoicePdfFilename(ctx.invoice?.invoice_number ?? null);
+  const path = `${ctx.business_entity_id}/invoices/${invoiceId}/${filename}`;
+  const up = await svc.storage.from(FINANCE_BUCKET).upload(path, pdf, { contentType: 'application/pdf', upsert: true });
+  if (up.error) throw new Error('pdf storage failed');
+  const sourceHash = await sha256Hex(`${invoiceId}:${ctx.invoice?.invoice_number ?? ''}:${ctx.invoice?.gross_total_cents ?? 0}`);
+  const { data: reg } = await svc.rpc('owner_worker_register_document', {
+    p_entity: ctx.business_entity_id, p_document_type: 'invoice', p_source_resource_type: 'owner_invoices',
+    p_source_resource_id: invoiceId, p_document_number: ctx.invoice?.invoice_number ?? null,
+    p_currency: ctx.invoice?.currency ?? 'EUR', p_template_version: 'invoice-worker-v1', p_source_hash: sourceHash,
+    p_storage_path: path, p_metadata: { via: 'automation-worker' },
+  });
+  return { ctx, pdf, filename, version: reg?.version ?? 1, documentId: reg?.document_id ?? null };
+}
+
+// Server-authoritative signed-acceptance certificate: fetch the private signature PNG, render the
+// certificate from TRUSTED context, store it privately (deterministic path → retry-safe), and
+// register it as a SIGNED offer document (idempotent). Returns the PDF bytes so the confirmation
+// email can attach them. The private storage path is used only here (worker) — never surfaced.
+async function ensureCertificate(
+  svc: Sb, offerId: string, acceptanceEventId: string | null,
+): Promise<{ ctx: CertificateContext & { recipient: { email: string | null } }; pdf: Uint8Array; filename: string; documentId: string | null }> {
+  const { data: ctx, error: ctxErr } = await svc.rpc('owner_worker_certificate_context', {
+    p_offer_id: offerId, p_accept_event: acceptanceEventId,
+  });
+  if (ctxErr || !ctx) throw new Error('certificate context failed');
+
+  // Fetch the drawn signature PNG from the PRIVATE bucket (worker-only) to embed it.
+  let signaturePng: Uint8Array | null = null;
+  const sigPath: string | null = ctx.signature?.storage_path ?? null;
+  if (sigPath) {
+    const dl = await svc.storage.from(SIGNATURE_BUCKET).download(sigPath);
+    if (!dl.error && dl.data) signaturePng = new Uint8Array(await dl.data.arrayBuffer());
+  }
+  if (!signaturePng) throw new Error('signature unavailable');
+
+  const pdf = await renderAcceptanceCertificatePdf(ctx as CertificateContext, signaturePng);
+  const filename = certificatePdfFilename(ctx.offer?.offer_number ?? null);
+  const path = `${ctx.business_entity_id}/certificates/${offerId}/${filename}`;
+  const up = await svc.storage.from(FINANCE_BUCKET).upload(path, pdf, { contentType: 'application/pdf', upsert: true });
+  if (up.error) throw new Error('certificate storage failed');
+  const { data: reg } = await svc.rpc('owner_worker_register_certificate', {
+    p_entity: ctx.business_entity_id, p_offer_id: offerId, p_acceptance_event_id: ctx.acceptance_event_id ?? acceptanceEventId,
+    p_document_number: ctx.offer?.offer_number ?? null, p_currency: ctx.offer?.currency ?? 'EUR',
+    p_source_hash: ctx.offer?.source_hash ?? null, p_signature_sha256: ctx.signature?.sha256 ?? null, p_storage_path: path,
+  });
+  return { ctx, pdf, filename, documentId: reg?.document_id ?? null };
 }
