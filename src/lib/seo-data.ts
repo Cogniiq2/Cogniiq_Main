@@ -1,11 +1,11 @@
 export const BUSINESS_INFO = {
   name: "Cogniiq",
-  legalName: "Cogniiq – Lazar & Djordje Popovic",
+  legalName: "Cogniiq, Inhaber Lazar Popovic",
   description: "AI Agentur und Webdesign Agentur in Bayreuth. Spezialisiert auf KI Automationen, AI Rezeptionistin und hochkonvertierende Websites für Unternehmen in Deutschland.",
   foundingDate: "2023",
 
   address: {
-    streetAddress: "Am Main Straße 3",
+    streetAddress: "Am Main 3",
     addressLocality: "Bayreuth",
     addressRegion: "Bayern",
     postalCode: "95444",

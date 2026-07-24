@@ -132,6 +132,51 @@ const srcRefs = [];
 if (srcRefs.length) fail(`Lingering imports of config/seoConfig in: ${srcRefs.join(', ')}`);
 else ok('no source file imports config/seoConfig');
 
+// ─── 8. Legal invariants (address + tax details) ────────────────────────────
+// Scan the WHOLE repository (text files) so a forbidden value cannot reappear
+// anywhere. Excludes vendor/build dirs and this script itself (it necessarily
+// contains the forbidden patterns as guards). Forbidden patterns are also built
+// from fragments so the script does not self-match.
+const SELF = fileURLToPath(import.meta.url);
+const SKIP_DIRS = new Set(['node_modules', 'dist', 'dist-ssr', '.git']);
+const legalFiles = [];
+(function collect(dir) {
+  for (const entry of readdirSync(dir)) {
+    if (SKIP_DIRS.has(entry)) continue;
+    const p = join(dir, entry);
+    const s = statSync(p);
+    if (s.isDirectory()) collect(p);
+    else if (
+      /\.(ts|tsx|html|xml|txt|js|mjs|md|json)$/.test(entry) &&
+      entry !== 'package-lock.json' &&
+      p !== SELF
+    )
+      legalFiles.push(p.replace(ROOT + '/', ''));
+  }
+})(ROOT);
+
+const forbidden = [
+  [new RegExp('Am\\s+Main\\s+Stra(?:ß|ss)e', 'i'), 'obsolete address "Am Main Straße" (use "Am Main 3")'],
+  [new RegExp('Klein' + 'unternehmer', 'i'), 'small-business VAT label (business is VAT-liable)'],
+  [new RegExp('96\\s*045\\s*817\\s*336'), 'personal Steuer-ID (must never be published)'],
+];
+for (const [re, label] of forbidden) {
+  const hits = legalFiles.filter((f) => re.test(read(f)));
+  if (hits.length) fail(`Forbidden ${label} found in: ${hits.join(', ')}`);
+  else ok(`no ${label}`);
+}
+
+const legalContent = read('src/lib/legal-content.tsx');
+for (const [re, label] of [
+  [/DE460292419/, 'USt-IdNr. DE460292419 present in Impressum'],
+  [/Inhaber: Lazar Popovic/, 'operator "Inhaber: Lazar Popovic" present'],
+  [/Am Main 3/, 'corrected address "Am Main 3" referenced'],
+]) {
+  if (!re.test(legalContent) && !(label.includes('address') && /Am Main 3/.test(read('src/lib/seo-data.ts'))))
+    fail(`Legal content: expected ${label}`);
+  else ok(label);
+}
+
 // ─── Result ──────────────────────────────────────────────────────────────────
 if (failures.length) {
   console.error('\n✗ SEO/consent consistency FAILED:');

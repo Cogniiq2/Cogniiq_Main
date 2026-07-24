@@ -144,7 +144,7 @@ const phone = BUSINESS_INFO.contact.phoneDisplay;
 ### Current NAP:
 ```
 Name: Cogniiq
-Address: Am Main Straße 3, 95444 Bayreuth, Deutschland
+Address: Am Main 3, 95444 Bayreuth, Deutschland
 Phone: 0160 1832917
 Email: info@cogniiq.de
 ```

@@ -243,7 +243,7 @@ const geoTags = generateGeoMetaTags();
 ### Current NAP Data:
 ```
 Name: Cogniiq
-Address: Am Main Straße 3, 95444 Bayreuth, Deutschland
+Address: Am Main 3, 95444 Bayreuth, Deutschland
 Phone: +49 160 1832917 (or 0160 1832917)
 Email: info@cogniiq.de
 ```
@@ -268,7 +268,7 @@ Email: info@cogniiq.de
 2. Sign in with Google account
 3. Enter business name: **Cogniiq**
 4. Choose category: **Web Design Agency** or **Marketing Agency**
-5. Add location: **Am Main Straße 3, 95444 Bayreuth**
+5. Add location: **Am Main 3, 95444 Bayreuth**
 6. Add phone: **0160 1832917**
 7. Add website: **https://cogniiq.com**
 8. Verify (postcard or phone)

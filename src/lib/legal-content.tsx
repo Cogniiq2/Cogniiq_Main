@@ -3,8 +3,11 @@
 // Rendered by the crawlable routes /impressum and /datenschutz.
 //
 // Legal accuracy rules applied here (see docs/PHASE0_LEGAL_OPEN_ITEMS.md):
-//   • Only verified company data from src/lib/seo-data.ts is used. No legal
-//     form, representative title, tax id or register entry is invented.
+//   • Verified operator record: sole proprietorship "Cogniiq, Inhaber Lazar
+//     Popovic", Am Main 3, 95444 Bayreuth, USt-IdNr. gemäß § 27a UStG
+//     DE460292419. VAT-liable; the reduced-VAT small-business scheme (§ 19 UStG)
+//     is not used. The personal Steuer-ID is confidential and is NEVER shown.
+//     No legal detail is invented.
 //   • § 5 DDG is cited (not the obsolete § 5 TMG).
 //   • The discontinued EU Online-Dispute-Resolution link is intentionally absent.
 //   • The privacy text describes only services that actually process personal
@@ -28,7 +31,9 @@ export function ImpressumContent() {
     <div className="prose prose-sm prose-gray dark:prose-invert max-w-none">
       <h2>Angaben gemäß § 5 DDG</h2>
       <p>
-        {BUSINESS_INFO.legalName}
+        Cogniiq
+        <br />
+        Inhaber: Lazar Popovic
         <br />
         {A.streetAddress}
         <br />
@@ -44,11 +49,16 @@ export function ImpressumContent() {
         E-Mail: {C.email}
       </p>
 
+      <h2>Umsatzsteuer-Identifikationsnummer</h2>
+      <p>USt-IdNr. gemäß § 27a UStG: DE460292419</p>
+
       <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
       <p>
-        Lazar Popovic, Djordje Popovic
+        Lazar Popovic
         <br />
-        Anschrift wie oben.
+        {A.streetAddress}
+        <br />
+        {A.postalCode} {A.addressLocality}
       </p>
 
       <h2>Verbraucherstreitbeilegung</h2>
@@ -98,7 +108,9 @@ export function DatenschutzContent() {
 
       <h2>2. Verantwortliche Stelle</h2>
       <p>
-        {BUSINESS_INFO.legalName}
+        Cogniiq
+        <br />
+        Inhaber: Lazar Popovic
         <br />
         {A.streetAddress}, {A.postalCode} {A.addressLocality}
         <br />
