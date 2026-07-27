@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { X, ChevronDown, Mail, Phone, MapPin, ArrowRight } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown, Mail, Phone, MapPin, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 import { Logo } from "./Logo";
 import { BUSINESS_INFO, getGoogleMapsUrl } from "@/lib/seo-data";
+import { openConsentSettings } from "@/lib/consent";
 
 const ease = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
@@ -81,7 +82,6 @@ function FooterCol({ title, sections, delay = 0 }: FooterColProps) {
 
 export function Footer() {
   const year = new Date().getFullYear();
-  const [panel, setPanel] = useState<"impressum" | "datenschutz" | null>(null);
 
   return (
     <>
@@ -414,18 +414,25 @@ export function Footer() {
             <p className="text-[12px] text-gray-400 dark:text-white/20">
               © {year} {BUSINESS_INFO.name} · Alle Rechte vorbehalten
             </p>
-            <div className="flex items-center gap-6">
-              <button
-                onClick={() => setPanel("impressum")}
+            <div className="flex flex-wrap items-center gap-6">
+              <Link
+                to="/impressum"
                 className="text-[12px] text-gray-400 dark:text-white/25 hover:text-gray-700 dark:hover:text-white/55 transition-colors"
               >
                 Impressum
-              </button>
-              <button
-                onClick={() => setPanel("datenschutz")}
+              </Link>
+              <Link
+                to="/datenschutz"
                 className="text-[12px] text-gray-400 dark:text-white/25 hover:text-gray-700 dark:hover:text-white/55 transition-colors"
               >
                 Datenschutz
+              </Link>
+              <button
+                type="button"
+                onClick={openConsentSettings}
+                className="text-[12px] text-gray-400 dark:text-white/25 hover:text-gray-700 dark:hover:text-white/55 transition-colors"
+              >
+                Cookie-Einstellungen
               </button>
               <Link
                 to="/kontakt"
@@ -439,91 +446,6 @@ export function Footer() {
         </div>
 
       </footer>
-
-      {/* ─── LEGAL SLIDE-UP PANELS ─── */}
-      <AnimatePresence>
-        {panel && (
-          <>
-            <motion.div
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setPanel(null)}
-            />
-            <motion.div
-              className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-950 rounded-t-3xl shadow-2xl z-50 max-h-[80vh] overflow-y-auto"
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            >
-              <div className="sticky top-0 bg-white dark:bg-gray-950 flex justify-between items-center px-8 pt-7 pb-5 border-b border-gray-100 dark:border-gray-800">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 tracking-tight">
-                  {panel === "impressum" ? "Impressum" : "Datenschutzerklärung"}
-                </h3>
-                <button
-                  onClick={() => setPanel(null)}
-                  className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                  aria-label="Schließen"
-                >
-                  <X size={14} />
-                </button>
-              </div>
-
-              <div className="px-8 py-7">
-                {panel === "impressum" ? (
-                  <div className="prose prose-sm prose-gray dark:prose-invert max-w-none">
-                    <h4>Angaben gemäß § 5 TMG</h4>
-                    <p>
-                      {BUSINESS_INFO.legalName}<br />
-                      {BUSINESS_INFO.address.streetAddress}<br />
-                      {BUSINESS_INFO.address.postalCode} {BUSINESS_INFO.address.addressLocality}<br />
-                      Deutschland
-                    </p>
-                    <h4>Kontakt</h4>
-                    <p>
-                      Telefon: {BUSINESS_INFO.contact.phoneDisplay}<br />
-                      E-Mail: {BUSINESS_INFO.contact.email}
-                    </p>
-                    <h4>Haftung für Inhalte</h4>
-                    <p>Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen.</p>
-                    <h4>Haftung für Links</h4>
-                    <p>Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen.</p>
-                    <h4>Urheberrecht</h4>
-                    <p>Die durch uns erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.</p>
-                  </div>
-                ) : (
-                  <div className="prose prose-sm prose-gray dark:prose-invert max-w-none">
-                    <h4>1. Datenschutz auf einen Blick</h4>
-                    <p>Der Schutz Ihrer persönlichen Daten ist uns ein wichtiges Anliegen. Wir verarbeiten Ihre Daten daher ausschließlich auf Grundlage der gesetzlichen Bestimmungen (DSGVO, TKG 2003).</p>
-                    <h4>2. Verantwortliche Stelle</h4>
-                    <p>
-                      {BUSINESS_INFO.legalName}<br />
-                      {BUSINESS_INFO.address.streetAddress}, {BUSINESS_INFO.address.postalCode} {BUSINESS_INFO.address.addressLocality}<br />
-                      {BUSINESS_INFO.contact.email}
-                    </p>
-                    <h4>3. Erhebung und Verarbeitung personenbezogener Daten</h4>
-                    <p>Wir verarbeiten personenbezogene Daten nur, soweit dies zur Erfüllung eines Vertrages oder auf Basis einer gesetzlichen Grundlage erforderlich ist.</p>
-                    <h4>4. Ihre Rechte</h4>
-                    <ul>
-                      <li>Recht auf Auskunft (Art. 15 DSGVO)</li>
-                      <li>Recht auf Berichtigung (Art. 16 DSGVO)</li>
-                      <li>Recht auf Löschung (Art. 17 DSGVO)</li>
-                      <li>Recht auf Einschränkung der Verarbeitung (Art. 18 DSGVO)</li>
-                      <li>Recht auf Datenübertragbarkeit (Art. 20 DSGVO)</li>
-                    </ul>
-                    <h4>5. Cookies & Tracking</h4>
-                    <p>Wir verwenden ausschließlich technisch notwendige Cookies, die für den Betrieb der Website erforderlich sind. Es werden keine Tracking- oder Analyse-Cookies eingesetzt.</p>
-                    <h4>6. Kontakt</h4>
-                    <p>Bei Fragen zum Datenschutz können Sie uns jederzeit unter {BUSINESS_INFO.contact.email} kontaktieren.</p>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
     </>
   );
 }

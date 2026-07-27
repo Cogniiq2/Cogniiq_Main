@@ -45,6 +45,9 @@ jobs:
       - name: Automated offer-email send-workflow tests
         run: node .github/scripts/test-automated-offer-email.mjs
 
+      - name: SEO + consent consistency checks
+        run: node .github/scripts/test-seo-consistency.mjs
+
       - name: Typecheck
         run: npm run typecheck
 

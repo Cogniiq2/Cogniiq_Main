@@ -14,6 +14,8 @@ import { LegacyLoginRedirect, LegacyOwnerRedirect } from './components/auth/Lega
 import { InternalWorkspaceLayout } from './pages/admin/InternalWorkspace';
 import { ReceptionistEntitlementRoute } from './components/app/ReceptionistEntitlementRoute';
 import { AuthProvider } from './contexts/AuthContext';
+import { ConsentBanner } from './components/ConsentBanner';
+import { initConsent } from './lib/consent';
 import { CITY_SERVICE_CONFIGS } from './lib/standorte-data';
 
 type LazyPageComponent = ComponentType<Record<string, unknown>>;
@@ -333,6 +335,10 @@ const AutomatisierungUnternehmen = lazyNamed(
   'AutomatisierungUnternehmen'
 );
 
+// Legal pages
+const ImpressumPage = lazyNamed(() => import('./pages/legal/ImpressumPage'), 'ImpressumPage');
+const DatenschutzPage = lazyNamed(() => import('./pages/legal/DatenschutzPage'), 'DatenschutzPage');
+
 // Misc pages
 const NotFoundPage = lazyNamed(() => import('./pages/NotFoundPage'), 'NotFoundPage');
 const LogoShowcasePage = lazyNamed(() => import('./pages/LogoShowcasePage'), 'LogoShowcasePage');
@@ -534,6 +540,9 @@ function AppInner() {
       <Route path="/ki-agentur-deutschland" element={<KiAgenturDeutschland />} />
       <Route path="/automatisierung-unternehmen" element={<AutomatisierungUnternehmen />} />
 
+      <Route path="/impressum" element={<ImpressumPage />} />
+      <Route path="/datenschutz" element={<DatenschutzPage />} />
+
       <Route path="/logo-preview" element={<LogoShowcasePage />} />
       <Route path="/blog" element={<BlogIndexPage />} />
       <Route path="/blog/:slug" element={<BlogPostPage />} />
@@ -546,6 +555,12 @@ function AppInner() {
 }
 
 function App() {
+  useEffect(() => {
+    // Google Consent Mode v2 (Basic): sets denied defaults and restores a
+    // previously granted choice. Never loads the Google tag without consent.
+    initConsent();
+  }, []);
+
   return (
     <Router>
       <AuthProvider>
@@ -553,6 +568,7 @@ function App() {
         <CanonicalManager />
         <PublicStructuredData />
         <AppInner />
+        <ConsentBanner />
       </AuthProvider>
     </Router>
   );
