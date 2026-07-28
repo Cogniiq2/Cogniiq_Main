@@ -6,6 +6,7 @@ import {
   ChevronDown,
   CreditCard,
   ExternalLink,
+  FileText,
   Headphones,
   LayoutGrid,
   LogOut,
@@ -52,9 +53,10 @@ const universalNav: CustomerNavGroup = {
   label: 'Portal',
   items: [
     { label: 'Übersicht', href: '/app', icon: LayoutGrid },
+    { label: 'Dokumente', href: '/app/documents', icon: FileText },
+    { label: 'Abrechnung', href: '/app/billing', icon: CreditCard },
     { label: 'Meine Lösungen', href: '/app/solutions', icon: Headphones },
     { label: 'Support', href: '/app/support', icon: UserRound },
-    { label: 'Abrechnung', href: '/app/billing', icon: CreditCard },
     { label: 'Einstellungen', href: '/app/settings', icon: Settings },
   ],
 };

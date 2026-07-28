@@ -86,5 +86,96 @@ ok(/saveOnboarding\(draft\)/.test(sectionPage), 'onboarding save path intact');
 ok(/saveReceptionist\(draft\)/.test(sectionPage), 'receptionist save path intact');
 ok(/savePhone\(draft\)/.test(sectionPage), 'phone save path intact');
 
+// ---------------------------------------------------------------- 5) customer workspace surfaces
+const app = read('src/App.tsx');
+const home = read('src/pages/app/AppHomePage.tsx');
+const projectDetail = read('src/pages/app/ProjectDetailPage.tsx');
+const documentsPage = read('src/pages/app/DocumentsPage.tsx');
+const billingPage = read('src/pages/app/BillingPage.tsx');
+const customerApi = read('src/lib/customerPlatform/customerApi.ts');
+const customerTypes = read('src/lib/customerPlatform/types.ts');
+const platformPrimitives = read('src/components/app/CustomerPlatformPrimitives.tsx');
+
+/* Routes exist and are protected. */
+for (const route of ['/app/projects/:projectId', '/app/documents', '/app/billing']) {
+  const pattern = new RegExp(`path="${route.replace(/[/:]/g, (c) => '\\' + c)}"[^>]*element=\\{<ProtectedRoute>`);
+  ok(pattern.test(app), `${route} is registered behind ProtectedRoute`);
+}
+ok(/BillingPage \/><\/ProtectedRoute>/.test(app), '/app/billing renders the real BillingPage, not the old stub');
+
+/* The billing stub is gone entirely. */
+ok(!/BillingExperience/.test(sectionPage), 'the placeholder BillingExperience is removed');
+ok(!/billingAreas/.test(sectionPage), 'the placeholder billingAreas list is no longer rendered');
+ok(!/billingAreas/.test(read('src/components/app/customerPortalModel.ts')), 'billingAreas is deleted from the model');
+ok(!/\| 'billing'/.test(sectionPage), "'billing' is removed from the CustomerSection union");
+
+/* Every customer read goes through an RPC — never a direct table select.
+   Comments are stripped first so prose ABOUT the rule cannot satisfy or break it. */
+const customerApiCode = customerApi.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+ok(!/\.from\(/.test(customerApiCode), 'customerApi never selects from a table directly (RPC only)');
+for (const rpc of ['list_customer_projects', 'get_customer_project', 'list_customer_project_milestones',
+                   'list_customer_documents', 'list_customer_invoices']) {
+  ok(new RegExp(`'${rpc}'`).test(customerApi), `customerApi calls the ${rpc} RPC`);
+}
+ok(/customer-document-download/.test(customerApi), 'downloads go through the Edge Function');
+ok(!/storage\.from\(/.test(customerApi), 'the browser never calls Storage directly for customer documents');
+ok(!/organization_id/.test(customerApi),
+  'no organization id is sent from the client (tenancy is derived server-side from auth.uid())');
+
+/* Home page: "active" excludes completed/paused, and archived never arrives. */
+// Parse the actual array literal rather than pattern-matching nearby text, so the
+// assertion cannot be satisfied (or broken) by unrelated occurrences elsewhere in the file.
+const activeArray = /activeCustomerProjectStatuses: CustomerProjectStatus\[\] = \[([\s\S]*?)\]/.exec(customerTypes);
+ok(activeArray !== null, 'the active-status allow-list is declared');
+const activeStatuses = (activeArray?.[1] ?? '').match(/'[a-z_]+'/g)?.map((s) => s.replace(/'/g, '')) ?? [];
+ok(JSON.stringify(activeStatuses) === JSON.stringify(['on_track', 'attention_needed', 'blocked']),
+  `active statuses are exactly on_track, attention_needed, blocked (got ${JSON.stringify(activeStatuses)})`);
+ok(!activeStatuses.includes('completed'), 'completed is NOT an active status');
+ok(!activeStatuses.includes('paused'), 'paused is NOT an active status');
+ok(/projects\.filter\(isActiveCustomerProject\)/.test(home), 'the home page filters to active projects only');
+
+/* Home page cards are conditional on real data — no decorative empties. */
+ok(/customerActions\.length \? <NextActionCard/.test(home), '"Ihre nächste Aktion" renders only when one exists');
+ok(/next_action_owner === 'customer'/.test(home), 'the next-action card is limited to actions the CUSTOMER owns');
+ok(/recentDocuments\.length \? \(/.test(home), 'recent documents render only when documents exist');
+ok(/openInvoices\.length \? \(/.test(home), 'open invoices render only when invoices are open');
+ok(/contactProject \? <ContactCard/.test(home), 'the contact card renders only when a verified contact exists');
+ok(/activeProjects\.length \? \(/.test(home) && /<NoProjectState/.test(home),
+  'with no project the home page shows the real onboarding state instead of empty cards');
+ok(!/Letzte Aktivität/.test(home), 'the permanently-empty "Letzte Aktivität" section is gone');
+
+/* Project detail answers the required questions. */
+for (const tab of ['Übersicht', 'Meilensteine', 'Dokumente', 'Abrechnung']) {
+  ok(new RegExp(`label: '${tab}'`).test(projectDetail), `project detail has a ${tab} section`);
+}
+ok(/Ihre nächste Aktion/.test(projectDetail) && /Nächster Schritt bei Cogniiq/.test(projectDetail),
+  'project detail states explicitly whether the customer or Cogniiq must act');
+ok(/Nächster Meilenstein/.test(projectDetail), 'project detail surfaces the next milestone');
+ok(/customer_safe_blocker_summary/.test(projectDetail), 'project detail shows the customer-safe blocker summary');
+ok(/Projekt nicht verfügbar/.test(projectDetail),
+  'an unavailable project renders one generic state (no existence oracle)');
+
+/* Documents page covers organization-level documents. */
+ok(/useCustomerDocuments\(null\)/.test(documentsPage), '/app/documents requests ALL organization documents');
+
+/* Signed URLs are treated as short-lived credentials, not links. */
+ok(/requestCustomerDocumentUrl/.test(platformPrimitives), 'downloads request a fresh signed URL at click time');
+ok(/window\.open\(url/.test(platformPrimitives), 'the signed URL is opened immediately, never rendered into the DOM');
+ok(!/href=\{url\}/.test(platformPrimitives), 'the signed URL is never bound to an href');
+
+/* German formatting helpers are reused, not reimplemented. */
+ok(/formatCentsCurrencyDe/.test(platformPrimitives) && /formatDateDe/.test(platformPrimitives),
+  'existing de-DE currency and date helpers are reused');
+ok(!/toLocaleString\('de/.test(billingPage), 'the billing page does not hand-roll German formatting');
+
+/* No payment processing in this release. */
+ok(!/stripe|Stripe/.test(billingPage), 'no payment provider is wired into the billing page');
+ok(/Online-Zahlungsfunktion ist in dieser Version bewusst nicht enthalten/.test(billingPage),
+  'the billing page states plainly that online payment is not included');
+
+/* Navigation exposes the new surfaces. */
+ok(/label: 'Dokumente', href: '\/app\/documents'/.test(shell), 'Dokumente is in the primary navigation');
+ok(/label: 'Abrechnung', href: '\/app\/billing'/.test(shell), 'Abrechnung is in the primary navigation');
+
 if (failures) { console.error(`\ncustomer dashboard UX tests: ${failures} FAILED`); process.exit(1); }
 console.log('\ncustomer dashboard UX tests: ALL PASSED');

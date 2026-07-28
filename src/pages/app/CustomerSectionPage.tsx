@@ -6,7 +6,6 @@ import {
   Building2,
   CheckCircle2,
   Circle,
-  CreditCard,
   FileText,
   Headphones,
   Info,
@@ -50,7 +49,6 @@ import {
   appEase,
 } from '@/components/app/CustomerAppPrimitives';
 import {
-  billingAreas,
   defaultLifecycleState,
   knowledgeSections,
   launchChecklist,
@@ -98,7 +96,6 @@ export type CustomerSection =
   | 'test'
   | 'calls'
   | 'leads'
-  | 'billing'
   | 'settings';
 
 const sectionConfig: Record<CustomerSection, {
@@ -148,12 +145,6 @@ const sectionConfig: Record<CustomerSection, {
     eyebrow: 'Kontakte',
     description: 'Leere, aber vorbereitete Architektur fuer spaetere echte Leads.',
     icon: UserPlus,
-  },
-  billing: {
-    title: 'Abrechnung',
-    eyebrow: 'Konto',
-    description: 'Billing-Struktur ohne Stripe-Verbindung, Preise oder erfundene Tarife.',
-    icon: CreditCard,
   },
   settings: {
     title: 'Einstellungen',
@@ -249,8 +240,6 @@ function renderSection(section: CustomerSection) {
       return <OperationalExperience type="calls" />;
     case 'leads':
       return <OperationalExperience type="leads" />;
-    case 'billing':
-      return <BillingExperience />;
     case 'settings':
       return <SettingsExperience />;
   }
@@ -1118,26 +1107,6 @@ function OperationalExperience({ type }: { type: 'calls' | 'leads' }) {
             ))}
           </div>
         </AppCard>
-      </div>
-    </div>
-  );
-}
-
-function BillingExperience() {
-  return (
-    <div className="space-y-8">
-      <AppEmptyState
-        icon={CreditCard}
-        title="Noch kein aktiver Tarif zugewiesen"
-        description="Stripe, Zahlungsdaten, Preise und Rechnungen sind in dieser Phase nicht verbunden. Es werden keine Paketpreise hart codiert."
-      />
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {billingAreas.map((area) => (
-          <AppCard key={area.id} className="shadow-none">
-            <p className="text-sm font-semibold text-gray-950">{area.title}</p>
-            <p className="mt-2 text-[13px] leading-relaxed text-gray-500">{area.description}</p>
-          </AppCard>
-        ))}
       </div>
     </div>
   );

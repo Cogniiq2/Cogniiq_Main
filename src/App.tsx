@@ -358,6 +358,9 @@ const AdminSolutionsPage = lazyNamed(() => import('./pages/admin/clients/AdminSo
 const AdminInvitationsPage = lazyNamed(() => import('./pages/admin/clients/AdminInvitationsPage'), 'AdminInvitationsPage');
 const AppHomePage = lazyNamed(() => import('./pages/app/AppHomePage'), 'AppHomePage');
 const CustomerSectionPage = lazyNamed(() => import('./pages/app/CustomerSectionPage'), 'CustomerSectionPage');
+const ProjectDetailPage = lazyNamed(() => import('./pages/app/ProjectDetailPage'), 'ProjectDetailPage');
+const DocumentsPage = lazyNamed(() => import('./pages/app/DocumentsPage'), 'DocumentsPage');
+const BillingPage = lazyNamed(() => import('./pages/app/BillingPage'), 'BillingPage');
 const SolutionPage = lazyNamed(() => import('./pages/app/SolutionPage'), 'SolutionPage');
 const SolutionsIndexPage = lazyNamed(() => import('./pages/app/SolutionsIndexPage'), 'SolutionsIndexPage');
 const SupportPage = lazyNamed(() => import('./pages/app/SupportPage'), 'SupportPage');
@@ -423,7 +426,9 @@ function AppInner() {
         <Route path="/app/test" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="test" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
         <Route path="/app/calls" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="calls" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
         <Route path="/app/leads" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="leads" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
-        <Route path="/app/billing" element={<ProtectedRoute><CustomerSectionPage section="billing" /></ProtectedRoute>} />
+        <Route path="/app/projects/:projectId" element={<ProtectedRoute><ProjectDetailPage /></ProtectedRoute>} />
+        <Route path="/app/documents" element={<ProtectedRoute><DocumentsPage /></ProtectedRoute>} />
+        <Route path="/app/billing" element={<ProtectedRoute><BillingPage /></ProtectedRoute>} />
         <Route path="/app/settings" element={<ProtectedRoute><CustomerSectionPage section="settings" /></ProtectedRoute>} />
         <Route path="/app/*" element={<ProtectedRoute><Navigate to="/app" replace /></ProtectedRoute>} />
 
