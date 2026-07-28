@@ -59,7 +59,8 @@ done
 NEW_MIGRATIONS=()
 for f in 20260728120000_customer_project_core \
          20260728121000_customer_documents \
-         20260728122000_customer_billing_link; do
+         20260728122000_customer_billing_link \
+         20260728123000_owner_invoice_organization_assignment; do
   [ -f "$MIG/$f.sql" ] || continue
   PSQL -d cust -q -f "$MIG/$f.sql" >/dev/null
   NEW_MIGRATIONS+=("$f")
@@ -67,7 +68,7 @@ for f in 20260728120000_customer_project_core \
 done
 [ ${#NEW_MIGRATIONS[@]} -gt 0 ] || { echo "no customer-platform migrations found"; exit 1; }
 
-for t in customer-projects-tests customer-documents-tests customer-billing-tests; do
+for t in customer-projects-tests customer-documents-tests customer-billing-tests customer-invoice-organization-tests; do
   [ -f "$SQLDIR/$t.sql" ] || continue
   echo "--- $t"
   PSQL -d cust -f "$SQLDIR/$t.sql"
@@ -77,6 +78,15 @@ done
 # must FAIL (and roll back), proving it would surface schema drift loudly in production
 # rather than silently no-opping.
 for f in "${NEW_MIGRATIONS[@]}"; do
+  # Migrations containing only `create or replace function`/grant/revoke statements
+  # are legitimately re-appliable: there is no structural state to drift, replacing
+  # a function with an identical body is deterministic by definition. Only
+  # migrations with structural DDL (create table/type, alter table) are required
+  # to fail loudly on a second apply.
+  if ! grep -qiE '^\s*(create table|create type|alter table)' "$MIG/$f.sql"; then
+    echo "skip: $f has no structural DDL (function-only migration; re-apply is expected to succeed)"
+    continue
+  fi
   if as "$PGBIN/psql" -h "$SOCK" -U postgres -v ON_ERROR_STOP=1 -d cust -q -f "$MIG/$f.sql" >/dev/null 2>&1; then
     echo "FAIL: $f re-applied silently; migrations must fail loudly on drift"; exit 1
   fi

@@ -251,7 +251,8 @@ for (const [label, patch] of [
   ok(/handleUploadRequest/.test(index) && /handleRetireRequest/.test(index), 'the entrypoint delegates to tested handlers');
   ok(/is_platform_admin_as/.test(index), 'admin status is checked through the service_role RPC');
   ok(/register_customer_document_from_upload/.test(index), 'registration uses the service_role RPC');
-  ok(/Deno\.env\.get\('SUPABASE_SERVICE_ROLE_KEY'\)/.test(index), 'the service role key is read from function secrets only');
+  ok(/getSupabaseSecretKey\(\)/.test(index), 'the service role key is read via the shared getSupabaseSecretKey() helper');
+  ok(!/Deno\.env\.get\('SUPABASE_/.test(index), 'no reserved SUPABASE_ env var is read directly (that prefix is rejected by supabase secrets set)');
   ok(/crypto\.randomUUID\(\)/.test(index), 'storage paths use a server-generated random id');
 }
 

@@ -273,6 +273,94 @@ export async function archiveCustomerDocument(documentId: string): Promise<{ err
   return { error: error ? toMessage(error) : null };
 }
 
+export interface OwnerInvoiceCandidate {
+  id: string;
+  invoice_number: string | null;
+  status: string;
+  /**
+   * Null means the invoice has no organization yet — linking/publishing is refused
+   * by the database until `assignInvoiceOrganization` fixes it. A non-null value
+   * that differs from the project's organization means the invoice belongs to a
+   * DIFFERENT customer and can never be assigned here.
+   */
+  organization_id: string | null;
+}
+
+/**
+ * Invoices that could plausibly belong to this customer: already scoped to their
+ * organization, or matched via the CRM client account (covers invoices created
+ * before portal provisioning, which is exactly the case that needs the
+ * organization-assignment fix below).
+ */
+export async function loadCustomerInvoiceCandidates(input: {
+  clientAccountId: string | null;
+  organizationId: string;
+}): Promise<Result<OwnerInvoiceCandidate[]>> {
+  let query = supabase
+    .from('owner_invoices')
+    .select('id, invoice_number, status, organization_id')
+    .order('issue_date', { ascending: false });
+
+  query = input.clientAccountId
+    ? query.or(`organization_id.eq.${input.organizationId},client_account_id.eq.${input.clientAccountId}`)
+    : query.eq('organization_id', input.organizationId);
+
+  const { data, error } = await query;
+  if (error) return { data: [], error: toMessage(error) };
+  return { data: (data ?? []) as OwnerInvoiceCandidate[], error: null };
+}
+
+export interface OwnerLinkedInvoice {
+  invoice_id: string;
+  invoice_number: string | null;
+  status: string;
+}
+
+export async function loadLinkedProjectInvoices(
+  projectId: string,
+): Promise<Result<OwnerLinkedInvoice[]>> {
+  const { data: links, error: linkError } = await supabase
+    .from('customer_project_invoices')
+    .select('invoice_id')
+    .eq('project_id', projectId);
+  if (linkError) return { data: [], error: toMessage(linkError) };
+
+  const ids = (links ?? []).map((row) => row.invoice_id as string);
+  if (ids.length === 0) return { data: [], error: null };
+
+  const { data: invoiceRows, error: invoiceError } = await supabase
+    .from('owner_invoices')
+    .select('id, invoice_number, status')
+    .in('id', ids);
+  if (invoiceError) return { data: [], error: toMessage(invoiceError) };
+
+  return {
+    data: (invoiceRows ?? []).map((row) => ({
+      invoice_id: row.id as string,
+      invoice_number: row.invoice_number as string | null,
+      status: row.status as string,
+    })),
+    error: null,
+  };
+}
+
+/**
+ * Assigns an organization to an invoice that does not have one yet — the actual
+ * fix path for the null-organization gap. Refuses (server-side) to reassign an
+ * invoice that already belongs to a different organization: this is a one-way,
+ * null-to-set operation only, never a retroactive move between customers.
+ */
+export async function assignInvoiceOrganization(
+  invoiceId: string,
+  organizationId: string,
+): Promise<{ error: string | null }> {
+  const { error } = await supabase.rpc('assign_invoice_organization', {
+    p_invoice_id: invoiceId,
+    p_organization_id: organizationId,
+  });
+  return { error: error ? toMessage(error) : null };
+}
+
 export async function linkProjectInvoice(
   projectId: string,
   invoiceId: string,

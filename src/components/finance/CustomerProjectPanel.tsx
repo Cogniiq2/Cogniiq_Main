@@ -8,19 +8,26 @@ import {
 import {
   archiveCustomerDocument,
   archiveCustomerProject,
+  assignInvoiceOrganization,
   createCustomerMilestone,
   createCustomerProject,
   deleteCustomerMilestone,
+  linkProjectInvoice,
+  loadCustomerInvoiceCandidates,
+  loadLinkedProjectInvoices,
   loadOwnerCustomerProjects,
   loadOwnerProjectDocuments,
   loadOwnerProjectMilestones,
   setCustomerDocumentVisibility,
   setCustomerProjectNextAction,
+  unlinkProjectInvoice,
   updateCustomerMilestone,
   updateCustomerProject,
   type OwnerCustomerDocument,
   type OwnerCustomerMilestone,
   type OwnerCustomerProject,
+  type OwnerInvoiceCandidate,
+  type OwnerLinkedInvoice,
 } from '@/lib/customerPlatform/ownerProjectsApi';
 import {
   customerDocumentCategoryLabels,
@@ -55,10 +62,13 @@ const MILESTONE_TONE: Record<CustomerMilestoneStatus, 'success' | 'warning' | 'd
 export function CustomerProjectPanel({
   ownerCustomerId,
   organizationId,
+  clientAccountId,
 }: {
   ownerCustomerId: string;
   /** Null when the CRM customer has not been provisioned into a portal organization yet. */
   organizationId: string | null;
+  /** Used to find invoices created before portal provisioning (organization_id still null). */
+  clientAccountId: string | null;
 }) {
   const toast = useToast();
   const [projects, setProjects] = useState<OwnerCustomerProject[]>([]);
@@ -124,6 +134,7 @@ export function CustomerProjectPanel({
               key={project.id}
               project={project}
               documents={documents.filter((doc) => doc.project_id === project.id)}
+              clientAccountId={clientAccountId}
               onEdit={() => setEditing(project)}
               onChanged={() => void load()}
             />
@@ -154,11 +165,13 @@ export function CustomerProjectPanel({
 function ProjectRow({
   project,
   documents,
+  clientAccountId,
   onEdit,
   onChanged,
 }: {
   project: OwnerCustomerProject;
   documents: OwnerCustomerDocument[];
+  clientAccountId: string | null;
   onEdit: () => void;
   onChanged: () => void;
 }) {
@@ -212,6 +225,11 @@ function ProjectRow({
         <div className="mt-4 space-y-5 border-t border-gray-100 pt-4">
           <MilestoneEditor projectId={project.id} />
           <DocumentVisibilityList documents={documents} onChanged={onChanged} />
+          <InvoiceLinkingSection
+            projectId={project.id}
+            organizationId={project.organization_id}
+            clientAccountId={clientAccountId}
+          />
           <div>
             <Button variant="ghost" onClick={() => setArchiveOpen(true)}>Projekt archivieren</Button>
           </div>
@@ -289,24 +307,30 @@ function MilestoneEditor({ projectId }: { projectId: string }) {
       ) : (
         <ul className="mb-3 space-y-2">
           {milestones.map((milestone) => (
-            <li key={milestone.id} className="flex flex-wrap items-center gap-2 rounded-xl border border-gray-100 px-3 py-2">
-              <span className="min-w-0 flex-1 text-[13px] text-gray-800 [overflow-wrap:anywhere]">
+            <li key={milestone.id} className="flex flex-col gap-2 rounded-xl border border-gray-100 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+              {/* flex-1 only applies from sm: up — at narrow widths this stacks in its own
+                  row instead of sharing a flex-wrap line with the controls below, which
+                  previously squeezed a flex-basis:0% item to a near-zero width column
+                  (one character per line) whenever the controls alone exceeded the row. */}
+              <span className="min-w-0 text-[13px] text-gray-800 [overflow-wrap:anywhere] sm:flex-1">
                 {milestone.title}
                 {milestone.target_date ? (
                   <span className="text-gray-400"> · {formatDateDe(milestone.target_date)}</span>
                 ) : null}
               </span>
-              <StatusBadge
-                label={customerMilestoneStatusLabels[milestone.status]}
-                tone={MILESTONE_TONE[milestone.status]}
-              />
-              <Select
-                id={`milestone-status-${milestone.id}`}
-                value={milestone.status}
-                onChange={(value) => void changeStatus(milestone, value as CustomerMilestoneStatus)}
-                options={Object.entries(customerMilestoneStatusLabels).map(([value, label]) => ({ value, label }))}
-              />
-              <Button variant="ghost" icon={Trash2} onClick={() => void remove(milestone.id)}>Löschen</Button>
+              <div className="flex flex-wrap items-center gap-2">
+                <StatusBadge
+                  label={customerMilestoneStatusLabels[milestone.status]}
+                  tone={MILESTONE_TONE[milestone.status]}
+                />
+                <Select
+                  id={`milestone-status-${milestone.id}`}
+                  value={milestone.status}
+                  onChange={(value) => void changeStatus(milestone, value as CustomerMilestoneStatus)}
+                  options={Object.entries(customerMilestoneStatusLabels).map(([value, label]) => ({ value, label }))}
+                />
+                <Button variant="ghost" icon={Trash2} onClick={() => void remove(milestone.id)}>Löschen</Button>
+              </div>
             </li>
           ))}
         </ul>
@@ -361,28 +385,210 @@ function DocumentVisibilityList({
       ) : (
         <ul className="space-y-2">
           {active.map((doc) => (
-            <li key={doc.id} className="flex flex-wrap items-center gap-2 rounded-xl border border-gray-100 px-3 py-2">
-              <span className="min-w-0 flex-1 text-[13px] text-gray-800 [overflow-wrap:anywhere]">
+            <li key={doc.id} className="flex flex-col gap-2 rounded-xl border border-gray-100 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+              <span className="min-w-0 text-[13px] text-gray-800 [overflow-wrap:anywhere] sm:flex-1">
                 {doc.title}
                 <span className="text-gray-400"> · {customerDocumentCategoryLabels[doc.category]}</span>
               </span>
-              <StatusBadge
-                label={doc.customer_visible ? 'Sichtbar' : 'Nicht freigegeben'}
-                tone={doc.customer_visible ? 'success' : 'neutral'}
-              />
-              <Button
-                variant="ghost"
-                icon={doc.customer_visible ? EyeOff : Eye}
-                onClick={() => void toggle(doc)}
-              >
-                {doc.customer_visible ? 'Verbergen' : 'Freigeben'}
-              </Button>
-              <Button variant="ghost" onClick={() => void archive(doc)}>Archivieren</Button>
+              <div className="flex flex-wrap items-center gap-2">
+                <StatusBadge
+                  label={doc.customer_visible ? 'Sichtbar' : 'Nicht freigegeben'}
+                  tone={doc.customer_visible ? 'success' : 'neutral'}
+                />
+                <Button
+                  variant="ghost"
+                  icon={doc.customer_visible ? EyeOff : Eye}
+                  onClick={() => void toggle(doc)}
+                >
+                  {doc.customer_visible ? 'Verbergen' : 'Freigeben'}
+                </Button>
+                <Button variant="ghost" onClick={() => void archive(doc)}>Archivieren</Button>
+              </div>
             </li>
           ))}
         </ul>
       )}
     </div>
+  );
+}
+
+// ---------------------------------------------------------------- invoices
+function InvoiceLinkingSection({
+  projectId,
+  organizationId,
+  clientAccountId,
+}: {
+  projectId: string;
+  organizationId: string;
+  clientAccountId: string | null;
+}) {
+  const toast = useToast();
+  const [linked, setLinked] = useState<OwnerLinkedInvoice[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [candidates, setCandidates] = useState<OwnerInvoiceCandidate[] | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  const loadLinked = useCallback(async () => {
+    const { data } = await loadLinkedProjectInvoices(projectId);
+    setLinked(data);
+  }, [projectId]);
+
+  useEffect(() => { void loadLinked(); }, [loadLinked]);
+
+  const openSearch = async () => {
+    setSearching(true);
+    const { data, error } = await loadCustomerInvoiceCandidates({ clientAccountId, organizationId });
+    if (error) { toast.error('Rechnungen konnten nicht geladen werden', error); setSearching(false); return; }
+    const linkedIds = new Set(linked.map((invoice) => invoice.invoice_id));
+    setCandidates(data.filter((candidate) => !linkedIds.has(candidate.id)));
+  };
+
+  const link = async (invoiceId: string) => {
+    setBusyId(invoiceId);
+    const { error } = await linkProjectInvoice(projectId, invoiceId);
+    setBusyId(null);
+    if (error) { toast.error('Verknüpfen fehlgeschlagen', error); return; }
+    toast.success('Rechnung verknüpft', 'Die Rechnung ist jetzt Teil dieses Projekts.');
+    setCandidates(null);
+    setSearching(false);
+    await loadLinked();
+  };
+
+  // The real fix path for the null-organization gap: assign the missing
+  // organization, then link in the same step. Never offered for an invoice that
+  // already belongs to a DIFFERENT organization — that path has no fix button at
+  // all, only an explanation, because reassigning it would be a data hazard.
+  const assignAndLink = async (invoiceId: string) => {
+    setBusyId(invoiceId);
+    const { error: assignError } = await assignInvoiceOrganization(invoiceId, organizationId);
+    if (assignError) { setBusyId(null); toast.error('Organisation konnte nicht zugewiesen werden', assignError); return; }
+    const { error: linkError } = await linkProjectInvoice(projectId, invoiceId);
+    setBusyId(null);
+    if (linkError) { toast.error('Verknüpfen fehlgeschlagen', linkError); return; }
+    toast.success('Organisation zugewiesen und verknüpft', 'Die Rechnung ist jetzt Teil dieses Projekts.');
+    setCandidates(null);
+    setSearching(false);
+    await loadLinked();
+  };
+
+  const unlink = async (invoiceId: string) => {
+    setBusyId(invoiceId);
+    const { error } = await unlinkProjectInvoice(projectId, invoiceId);
+    setBusyId(null);
+    if (error) { toast.error('Trennen fehlgeschlagen', error); return; }
+    await loadLinked();
+  };
+
+  return (
+    <div>
+      <h5 className="mb-3 text-[13px] font-semibold text-gray-950">Rechnungen</h5>
+
+      {linked.length === 0 ? (
+        <p className="mb-3 text-[12.5px] text-gray-400">Noch keine Rechnung mit diesem Projekt verknüpft.</p>
+      ) : (
+        <ul className="mb-3 space-y-2">
+          {linked.map((invoice) => (
+            <li key={invoice.invoice_id} className="flex flex-col gap-2 rounded-xl border border-gray-100 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+              <span className="min-w-0 text-[13px] text-gray-800 sm:flex-1">
+                {invoice.invoice_number ?? 'Ohne Nummer'}
+              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <StatusBadge label={invoice.status} tone="neutral" />
+                <Button
+                  variant="ghost"
+                  disabled={busyId === invoice.invoice_id}
+                  onClick={() => void unlink(invoice.invoice_id)}
+                >
+                  Trennen
+                </Button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {!searching ? (
+        <Button variant="secondary" icon={Plus} onClick={() => void openSearch()}>Rechnung verknüpfen</Button>
+      ) : (
+        <div className="rounded-xl border border-gray-200 p-3">
+          {candidates === null ? (
+            <p className="text-[12.5px] text-gray-400">Rechnungen werden geladen …</p>
+          ) : candidates.length === 0 ? (
+            <p className="text-[12.5px] text-gray-400">Keine weiteren Rechnungen für diesen Kunden gefunden.</p>
+          ) : (
+            <ul className="space-y-2">
+              {candidates.map((candidate) => (
+                <InvoiceCandidateRow
+                  key={candidate.id}
+                  candidate={candidate}
+                  organizationId={organizationId}
+                  busy={busyId === candidate.id}
+                  onLink={() => void link(candidate.id)}
+                  onAssignAndLink={() => void assignAndLink(candidate.id)}
+                />
+              ))}
+            </ul>
+          )}
+          <div className="mt-3">
+            <Button variant="ghost" onClick={() => { setSearching(false); setCandidates(null); }}>Schließen</Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function InvoiceCandidateRow({
+  candidate,
+  organizationId,
+  busy,
+  onLink,
+  onAssignAndLink,
+}: {
+  candidate: OwnerInvoiceCandidate;
+  organizationId: string;
+  busy: boolean;
+  onLink: () => void;
+  onAssignAndLink: () => void;
+}) {
+  const label = candidate.invoice_number ?? 'Ohne Nummer';
+
+  // Case 1: already this project's organization — a normal link.
+  if (candidate.organization_id === organizationId) {
+    return (
+      <li className="flex flex-col gap-2 rounded-xl border border-gray-100 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+        <span className="min-w-0 text-[13px] text-gray-800 sm:flex-1">{label} · {candidate.status}</span>
+        <Button variant="secondary" disabled={busy} onClick={onLink}>Verknüpfen</Button>
+      </li>
+    );
+  }
+
+  // Case 2: no organization yet — the real, guarded fix path.
+  if (candidate.organization_id === null) {
+    return (
+      <li className="rounded-xl border border-amber-200 bg-amber-50/60 px-3 py-2">
+        <p className="text-[13px] text-gray-800">{label} · {candidate.status}</p>
+        <p className="mt-1 text-[12px] leading-5 text-amber-800">
+          Diese Rechnung ist keiner Organisation zugeordnet und kann daher nicht verknüpft oder für den
+          Kunden freigegeben werden. Weisen Sie sie zuerst dieser Organisation zu.
+        </p>
+        <div className="mt-2">
+          <Button variant="secondary" disabled={busy} onClick={onAssignAndLink}>
+            Organisation zuweisen und verknüpfen
+          </Button>
+        </div>
+      </li>
+    );
+  }
+
+  // Case 3: belongs to a DIFFERENT organization — blocked, no fix offered here.
+  return (
+    <li className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 opacity-80">
+      <p className="text-[13px] text-gray-600">{label} · {candidate.status}</p>
+      <p className="mt-1 text-[12px] leading-5 text-gray-500">
+        Diese Rechnung gehört zu einer anderen Organisation und kann diesem Kunden nicht zugewiesen werden.
+      </p>
+    </li>
   );
 }
 

@@ -128,7 +128,11 @@ export function CustomerDetailPage() {
 
           {/* Customer-VISIBLE project projection. Deliberately separate from the internal
               task checklist above: nothing edited there ever reaches the portal. */}
-          <CustomerProjectPanel ownerCustomerId={c.id} organizationId={c.organization_id} />
+          <CustomerProjectPanel
+            ownerCustomerId={c.id}
+            organizationId={c.organization_id}
+            clientAccountId={c.client_account_id}
+          />
         </div>
 
         {/* Side column: info + status + activity */}

@@ -7,7 +7,9 @@
 // can never half-succeed.
 //
 // SECURITY
-// - SUPABASE_SERVICE_ROLE_KEY is a FUNCTION SECRET, read via Deno.env only.
+// - The service-role (secret) key is read from the environment the Edge Function
+//   runtime already provides automatically at deploy time — see ../_shared/env.ts.
+//   It is never logged, never returned in any response, and never ships to the browser.
 // - The caller is identified by verifying THEIR JWT, then checked with
 //   is_platform_admin_as (service_role only). No role claim is read from the request.
 // - The storage path is generated server-side from the organization/project ids plus
@@ -21,6 +23,7 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
+import { getSupabasePublishableKey, getSupabaseSecretKey, getSupabaseUrl } from '../_shared/env.ts';
 import { handleUploadRequest, handleRetireRequest } from './handler.ts';
 
 interface StorageListEntry {
@@ -39,9 +42,9 @@ interface RegisterDocumentInput {
   sizeBytes: number;
 }
 
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
-const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
-const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+const SUPABASE_URL = getSupabaseUrl();
+const SERVICE_ROLE = getSupabaseSecretKey();
+const ANON_KEY = getSupabasePublishableKey();
 const BUCKET = 'customer-documents';
 
 const CORS = {

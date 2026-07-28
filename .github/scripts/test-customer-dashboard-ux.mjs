@@ -212,13 +212,35 @@ ok(/Kein Portalzugang vorhanden/.test(ownerPanel),
 ok(/Einladung/.test(ownerPanel), 'the explanation points at the real prerequisite (invitation)');
 
 /* The panel is wired into the CRM customer detail page and passes the real org id. */
-ok(/<CustomerProjectPanel ownerCustomerId=\{c\.id\} organizationId=\{c\.organization_id\} \/>/.test(ownerCustomerDetail),
-  'the project panel is mounted on the CRM customer detail page with the real organization id');
+ok(/<CustomerProjectPanel[\s\S]{0,200}ownerCustomerId=\{c\.id\}[\s\S]{0,200}organizationId=\{c\.organization_id\}[\s\S]{0,200}clientAccountId=\{c\.client_account_id\}/.test(ownerCustomerDetail),
+  'the project panel is mounted on the CRM customer detail page with the real organization and client-account ids');
 
 /* Internal task tooling and the customer projection stay separate. */
 ok(/CustomerTaskChecklist/.test(ownerCustomerDetail) && /CustomerProjectPanel/.test(ownerCustomerDetail),
   'internal task checklist and customer-visible project panel coexist as separate surfaces');
 ok(!/owner_customer_tasks/.test(ownerApi), 'the customer project API never touches internal owner tasks');
+
+/* Document retirement/deletion is server-controlled only. No owner browser code
+   may call Storage.remove directly — archiving never touches storage at all, and
+   permanent deletion of a never-published upload goes through the Edge Function. */
+ok(!/\.storage\.from\(/.test(ownerApiCode), 'the owner API never references Storage at all');
+ok(!/\.storage\./.test(ownerPanel.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')),
+  'the owner project panel never references Storage directly');
+ok(/customer-document-upload/.test(ownerApi), 'uploads route through the controlled Edge Function');
+ok(!/customer-document-upload.*retire|retire.*customer-document-upload/.test(ownerApi),
+  'no separate ad hoc retire call bypasses the Edge Function');
+
+/* Invoice-organization dependency: warned, blocked, and given a real fix path. */
+ok(/organization_id: string \| null/.test(ownerApi), 'invoice candidates carry a nullable organization_id for the owner UI to branch on');
+ok(/assign_invoice_organization/.test(ownerApi), 'the owner API exposes the organization-assignment RPC');
+ok(/keiner Organisation zugeordnet/.test(ownerPanel), 'the panel warns explicitly when an invoice has no organization');
+ok(/Organisation zuweisen und verknüpfen/.test(ownerPanel), 'the panel offers a real one-click fix, not just a warning');
+ok(/gehört zu einer anderen Organisation/.test(ownerPanel), 'a mismatched-organization invoice is explained, not silently hidden');
+// The mismatch case must NOT offer a fix button — reassigning across organizations is never allowed.
+const case3Match = /\/\/ Case 3:[\s\S]*?<\/li>\s*\);/.exec(ownerPanel);
+ok(case3Match !== null, 'the cross-organization (Case 3) branch is present');
+ok(!/Button|onAssignAndLink|onLink/.test(case3Match?.[0] ?? 'Button'),
+  'the cross-organization case renders no action button of any kind');
 
 /* Owner-facing copy makes the customer-visible boundary explicit. */
 ok(/Interne Notizen, Budgets und Aufgaben bleiben hier außen vor/.test(ownerPanel),
@@ -227,6 +249,28 @@ ok(/Nur kundensichere Formulierungen/.test(ownerPanel),
   'the blocker field warns that only customer-safe wording belongs there');
 ok(/private Profil-E-Mail wird nie automatisch angezeigt/.test(ownerPanel),
   'the contact email field states the private profile address is never auto-exposed');
+
+// ---------------------------------------------------------------- 7) Edge Function env handling
+const envHelper = read('supabase/functions/_shared/env.ts');
+const downloadIndex = read('supabase/functions/customer-document-download/index.ts');
+const uploadIndex = read('supabase/functions/customer-document-upload/index.ts');
+
+ok(/getSupabasePublishableKey|getSupabaseSecretKey|getSupabaseUrl/.test(envHelper),
+  'a shared env helper exists for the modern/legacy key lookup');
+ok(/SUPABASE_PUBLISHABLE_KEYS.*SUPABASE_PUBLISHABLE_KEY.*SUPABASE_ANON_KEY/.test(envHelper.replace(/\n/g, ' ')),
+  'publishable key lookup prefers the modern name with a legacy fallback');
+ok(/SUPABASE_SECRET_KEYS.*SUPABASE_SECRET_KEY.*SUPABASE_SERVICE_ROLE_KEY/.test(envHelper.replace(/\n/g, ' ')),
+  'secret key lookup prefers the modern name with a legacy fallback');
+ok(!/console\.(log|error|warn)\([^)]*(SECRET|SERVICE_ROLE|PUBLISHABLE|ANON_KEY|getSupabase\w+\(\))/i.test(envHelper),
+  'the env helper never logs a key value');
+
+for (const [name, index] of [['download', downloadIndex], ['upload', uploadIndex]]) {
+  ok(!/Deno\.env\.get\('SUPABASE_/.test(index),
+    `${name}: no reserved SUPABASE_ env var is read directly (supabase secrets set rejects that prefix)`);
+  ok(/from '\.\.\/_shared\/env\.ts'/.test(index), `${name}: uses the shared env helper`);
+  ok(!/console\.(log|error|warn)\([^)]*(SERVICE_ROLE|SECRET_KEY|ANON_KEY|PUBLISHABLE)/i.test(index),
+    `${name}: never logs a key value`);
+}
 
 if (failures) { console.error(`\ncustomer dashboard UX tests: ${failures} FAILED`); process.exit(1); }
 console.log('\ncustomer dashboard UX tests: ALL PASSED');

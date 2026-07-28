@@ -5,8 +5,9 @@
 // function is the sole path — there is no parallel client-side download.
 //
 // SECURITY
-// - SUPABASE_SERVICE_ROLE_KEY is a FUNCTION SECRET, read via Deno.env only. It never
-//   ships to the browser.
+// - The service-role (secret) key is read from the environment the Edge Function
+//   runtime already provides automatically at deploy time — see ../_shared/env.ts.
+//   It is never logged, never returned in any response, and never ships to the browser.
 // - The caller's identity comes from verifying THEIR JWT (auth.getUser with the anon
 //   client), never from a request field. The verified id is then passed explicitly to
 //   authorize_customer_document_download, which is granted to service_role only —
@@ -25,11 +26,12 @@
 // deno-lint-ignore-file no-explicit-any
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
+import { getSupabasePublishableKey, getSupabaseSecretKey, getSupabaseUrl } from '../_shared/env.ts';
 import { handleDownloadRequest, type DownloadDeps } from './handler.ts';
 
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
-const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
-const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+const SUPABASE_URL = getSupabaseUrl();
+const SERVICE_ROLE = getSupabaseSecretKey();
+const ANON_KEY = getSupabasePublishableKey();
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',

@@ -176,7 +176,8 @@ for (const [label, header] of [
   ok(/handleDownloadRequest/.test(index), 'the entrypoint delegates to the tested handler');
   ok(/anon\.auth\.getUser\(token\)/.test(index), 'identity comes from verifying the caller JWT');
   ok(/authorize_customer_document_download/.test(index), 'authorization goes through the service_role RPC');
-  ok(/Deno\.env\.get\('SUPABASE_SERVICE_ROLE_KEY'\)/.test(index), 'the service role key is read from function secrets only');
+  ok(/getSupabaseSecretKey\(\)/.test(index), 'the service role key is read via the shared getSupabaseSecretKey() helper');
+  ok(!/Deno\.env\.get\('SUPABASE_/.test(index), 'no reserved SUPABASE_ env var is read directly (that prefix is rejected by supabase secrets set)');
   ok(!/document_id.*caller|p_caller_id:\s*body/.test(index), 'the caller id is never taken from the request body');
 }
 

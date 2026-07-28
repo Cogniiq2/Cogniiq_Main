@@ -559,6 +559,17 @@ function AppInner() {
   );
 }
 
+// The marketing consent banner belongs to the public site. On /app, /admin, /owner
+// and /d it previously rendered unconditionally and could overlap authenticated
+// dashboard content mid-page (found via responsive QA on the customer portal) —
+// those surfaces are gated the same way isPrivateSurface/isDocumentSurface already
+// gate SEO metadata and structured data above.
+function ConsentBannerGate() {
+  const { pathname } = useLocation();
+  if (isPrivateSurface(pathname) || isDocumentSurface(pathname)) return null;
+  return <ConsentBanner />;
+}
+
 function App() {
   useEffect(() => {
     // Google Consent Mode v2 (Basic): sets denied defaults and restores a
@@ -573,7 +584,7 @@ function App() {
         <CanonicalManager />
         <PublicStructuredData />
         <AppInner />
-        <ConsentBanner />
+        <ConsentBannerGate />
       </AuthProvider>
     </Router>
   );
