@@ -41,6 +41,30 @@ ok(g.buildThanksLine({}) === 'Vielen Dank.', 'thanks line neutral fallback');
 // missing first name still greets by last name
 ok(g.buildGreetingLine({ salutation: 'herr', firstName: '', lastName: 'Pensel' }) === 'Guten Tag, Herr Pensel', 'missing first name handled');
 
+// ---- personalized public-offer greeting: additional rules -----------------------------
+// Explicit Herr/Frau with a full contact name (structured fields win over contactName).
+ok(g.buildGreetingLine({ salutation: 'herr', firstName: 'Milan', lastName: 'Popovic', contactName: 'Milan Popovic' }) === 'Guten Tag, Herr Popovic', 'Herr with full contact name uses surname only, no duplication');
+ok(g.buildGreetingLine({ salutation: 'frau', firstName: 'Sandra', lastName: 'Graus', contactName: 'Sandra Graus' }) === 'Guten Tag, Frau Graus', 'Frau with full contact name uses surname only, no duplication');
+// No structured name AND no explicit salutation: fall back to the free-text contact name.
+ok(g.buildGreetingLine({ contactName: 'Vanessa Graus' }) === 'Guten Tag, Vanessa Graus', 'contact name without salutation is used verbatim');
+// Neutral/unspecified salutation with no structured name still uses contact name.
+ok(g.buildGreetingLine({ salutation: 'neutral', contactName: 'Vanessa Graus' }) === 'Guten Tag, Vanessa Graus', 'neutral salutation + contact name only');
+// Leading/repeated whitespace is normalized in every input field.
+ok(g.buildGreetingLine({ contactName: '  Vanessa   Graus  ' }) === 'Guten Tag, Vanessa Graus', 'whitespace in contact name is normalized');
+ok(g.buildGreetingLine({ salutation: '  herr  ', lastName: '  Popovic  ' }) === 'Guten Tag, Herr Popovic', 'whitespace in salutation/surname is normalized');
+// Company alone (no person) must never be used as a surname or greeted name.
+ok(g.buildGreetingLine({ salutation: 'herr' }) === 'Willkommen', 'salutation with only a company (no person fields) never fabricates a name');
+ok(!/Cogniiq|GmbH/.test(g.buildGreetingLine({})), 'company name is never substituted for a person');
+// No "undefined"/"null" ever renders, and no duplicated punctuation.
+for (const input of [{}, { salutation: 'herr' }, { contactName: '' }, { firstName: null, lastName: undefined }]) {
+  const line = g.buildGreetingLine(input);
+  ok(!/undefined|null/.test(line), `no literal undefined/null rendered for ${JSON.stringify(input)}`);
+  ok(!/,,|,\s*,/.test(line), `no duplicated punctuation for ${JSON.stringify(input)}`);
+}
+// Public-page fallback (explicit option) yields the required copy exactly.
+ok(g.buildGreetingLine({}, { fallback: 'Guten Tag' }) === 'Guten Tag', 'public-page fallback renders "Guten Tag"');
+ok(`${g.buildGreetingLine({}, { fallback: 'Guten Tag' })},` === 'Guten Tag,', 'public-page fallback composes to the exact required "Guten Tag," greeting');
+
 // ---------------------------------------------------------------- (B) structural
 const app = read('src/App.tsx');
 const canonical = read('src/components/CanonicalManager.tsx');
@@ -111,6 +135,29 @@ for (const [name, src] of [['portal', portal], ['api', api], ['pad', pad], ['wel
 }
 ok(/acceptOfferWithSignature/.test(api) && /process-accepted-offer/.test(api), 'signed acceptance prefers the Edge Function');
 ok(/respondPublicOffer\(/.test(api), 'server-authoritative RPC fallback exists');
+
+/* Personalized greeting: recipient snapshot (snake_case, from the secure token RPC) is
+   explicitly mapped to the greeting helper's camelCase input — never spread as-is, and
+   never sourced from the URL/route params. */
+ok(/firstName:\s*r\.first_name/.test(portal) && /lastName:\s*r\.last_name/.test(portal), 'first/last name explicitly mapped from the recipient snapshot');
+ok(/contactName:\s*r\.contact_name/.test(portal), 'contact name explicitly mapped from the recipient snapshot');
+ok(/greetingName:\s*r\.greeting_name/.test(portal), 'explicit greeting name mapped from the recipient snapshot');
+ok(!/buildGreetingLine\(offer\?\.recipient/.test(portal), 'greeting is never built from the raw (snake_case) recipient object directly');
+ok(/fallback:\s*'Guten Tag'/.test(portal), "public page uses the 'Guten Tag' fallback");
+// Both the emailed link and a manually copied link land on this same component/route,
+// backed by the same fetchPublicOffer(token) call — so they always resolve to the same
+// greeting for a given offer. There is no separate code path per link-origin.
+ok(/fetchPublicOffer\(token\)/.test(portal), 'single fetch path for the public offer regardless of how the link was obtained');
+ok((portal.match(/fetchPublicOffer\(/g) ?? []).length === 1, 'only one fetchPublicOffer call site — no email-specific vs. copied-link branching');
+// The greeting is not read from route/query params — only from `token`, which is itself
+// only used to fetch the server-verified projection.
+ok(!/useSearchParams|recipientName|name=.*searchParams/.test(portal), 'recipient name is never trusted from URL parameters');
+
+/* Greeting renders once, before the introductory/offer text, using the premium design. */
+const heroIdx = webview.indexOf('{greeting}');
+const introIdx = webview.indexOf('offer.introduction');
+ok(heroIdx >= 0 && introIdx > heroIdx, 'greeting renders before the introduction section');
+ok((webview.match(/\{greeting\}/g) ?? []).length === 1, 'greeting is rendered exactly once in the web view (not per-section)');
 
 if (failures) { console.error(`\nsignature offer portal tests: ${failures} FAILED`); process.exit(1); }
 console.log('\nsignature offer portal tests: ALL PASSED');

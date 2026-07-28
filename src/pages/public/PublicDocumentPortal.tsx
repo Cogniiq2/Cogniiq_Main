@@ -70,8 +70,24 @@ export function PublicDocumentPortal() {
     if (offer?.offer_number) document.title = `Angebot ${offer.offer_number} · Cogniiq`;
   }, [offer?.offer_number]);
 
-  const greeting = useMemo(() => buildGreetingLine(offer?.recipient ?? {}), [offer?.recipient]);
-  const thanks = useMemo(() => buildThanksLine(offer?.recipient ?? {}), [offer?.recipient]);
+  // Recipient snapshot from the secure token RPC uses snake_case (mirrors the DB
+  // columns); buildGreetingLine expects camelCase — map explicitly rather than
+  // spreading, so no field is silently dropped.
+  const greetingInput = useMemo(() => {
+    const r = offer?.recipient;
+    if (!r) return {};
+    return {
+      salutation: r.salutation,
+      title: r.title,
+      firstName: r.first_name,
+      lastName: r.last_name,
+      greetingName: r.greeting_name,
+      contactName: r.contact_name,
+    };
+  }, [offer?.recipient]);
+
+  const greeting = useMemo(() => buildGreetingLine(greetingInput, { fallback: 'Guten Tag' }), [greetingInput]);
+  const thanks = useMemo(() => buildThanksLine(greetingInput), [greetingInput]);
 
   const downloadPdf = async () => {
     if (!offer) return;
