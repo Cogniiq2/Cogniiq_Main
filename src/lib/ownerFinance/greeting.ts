@@ -7,6 +7,7 @@
 //   { salutation: 'herr',    lastName: 'Pensel' }                    -> "Herr Pensel"
 //   { salutation: 'frau', title: 'Dr.', lastName: 'Schneider' }      -> "Frau Dr. Schneider"
 //   { salutation: 'neutral', firstName: 'Anna', lastName: 'Schneider'} -> "Anna Schneider"
+//   { contactName: 'Vanessa Graus' }                                 -> "Vanessa Graus"
 //   { }                                                              -> "" (=> "Willkommen")
 
 export type Salutation = 'herr' | 'frau' | 'neutral';
@@ -18,6 +19,8 @@ export interface GreetingInput {
   lastName?: string | null;
   /** Explicit owner-authored display name; when present it wins verbatim. */
   greetingName?: string | null;
+  /** Free-text contact name (e.g. "Ansprechpartner"); used only when no salutation/name parts apply. */
+  contactName?: string | null;
 }
 
 const SALUTATION_WORD: Record<string, string> = { herr: 'Herr', frau: 'Frau' };
@@ -48,7 +51,10 @@ export function buildRecipientName(input: GreetingInput): string {
 
   // Neutral / unspecified: never a gendered word. Prefer full name, then any part.
   const neutral = [title, first, last].filter(Boolean).join(' ');
-  return neutral;
+  if (neutral) return neutral;
+
+  // No structured name parts: fall back to a free-text contact name, if any.
+  return clean(input.contactName);
 }
 
 export interface GreetingOptions {
