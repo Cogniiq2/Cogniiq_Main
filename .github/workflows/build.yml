@@ -51,6 +51,12 @@ jobs:
       - name: Customer dashboard UX foundation tests
         run: node .github/scripts/test-customer-dashboard-ux.mjs
 
+      - name: Customer document download handler tests
+        run: node .github/scripts/test-customer-document-download-handler.mjs
+
+      - name: Customer document upload handler tests
+        run: node .github/scripts/test-customer-document-upload-handler.mjs
+
       - name: Typecheck
         run: npm run typecheck
 
