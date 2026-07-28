@@ -1,0 +1,326 @@
+import { supabase } from '@/lib/supabase';
+
+import type {
+  CustomerDocumentCategory,
+  CustomerMilestoneStatus,
+  CustomerProjectStatus,
+} from './types';
+
+// Owner-side management of customer-visible projects, milestones and documents.
+// Every mutation goes through an is_platform_admin()-gated SECURITY DEFINER RPC —
+// there is no direct table write from the browser.
+
+export interface OwnerCustomerProject {
+  id: string;
+  organization_id: string;
+  engagement_id: string | null;
+  title: string;
+  business_objective: string;
+  status: CustomerProjectStatus;
+  phase: string;
+  progress_percent: number;
+  start_date: string | null;
+  target_date: string | null;
+  next_action_summary: string | null;
+  next_action_owner: 'customer' | 'cogniiq' | null;
+  next_action_due_date: string | null;
+  customer_safe_blocker_summary: string | null;
+  contact_profile_id: string | null;
+  contact_role_label: string | null;
+  contact_business_email: string | null;
+  is_archived: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OwnerCustomerMilestone {
+  id: string;
+  project_id: string;
+  title: string;
+  description: string | null;
+  status: CustomerMilestoneStatus;
+  target_date: string | null;
+  completed_at: string | null;
+  sort_order: number;
+}
+
+export interface OwnerCustomerDocument {
+  id: string;
+  project_id: string | null;
+  category: CustomerDocumentCategory;
+  title: string;
+  version: number;
+  customer_visible: boolean;
+  published_at: string | null;
+  archived_at: string | null;
+  content_type: string | null;
+  size_bytes: number | null;
+  uploaded_at: string;
+  owner_generated_document_id: string | null;
+}
+
+type Result<T> = { data: T; error: string | null };
+
+function toMessage(error: unknown): string {
+  if (error && typeof error === 'object' && 'message' in error) {
+    return String((error as { message: unknown }).message);
+  }
+  return String(error ?? 'Unbekannter Fehler');
+}
+
+/**
+ * Projects for one organization. Internal staff read the table directly (their RLS
+ * policy permits it) because the owner view legitimately includes internal columns
+ * such as engagement_id and the archived flag.
+ */
+export async function loadOwnerCustomerProjects(
+  organizationId: string,
+): Promise<Result<OwnerCustomerProject[]>> {
+  const { data, error } = await supabase
+    .from('customer_projects')
+    .select('*')
+    .eq('organization_id', organizationId)
+    .order('created_at', { ascending: false });
+  if (error) return { data: [], error: toMessage(error) };
+  return { data: (data ?? []) as OwnerCustomerProject[], error: null };
+}
+
+export async function loadOwnerProjectMilestones(
+  projectId: string,
+): Promise<Result<OwnerCustomerMilestone[]>> {
+  const { data, error } = await supabase
+    .from('customer_project_milestones')
+    .select('*')
+    .eq('project_id', projectId)
+    .order('sort_order', { ascending: true });
+  if (error) return { data: [], error: toMessage(error) };
+  return { data: (data ?? []) as OwnerCustomerMilestone[], error: null };
+}
+
+export async function loadOwnerProjectDocuments(
+  organizationId: string,
+): Promise<Result<OwnerCustomerDocument[]>> {
+  const { data, error } = await supabase
+    .from('customer_documents')
+    .select('id, project_id, category, title, version, customer_visible, published_at, archived_at, content_type, size_bytes, uploaded_at, owner_generated_document_id')
+    .eq('organization_id', organizationId)
+    .order('uploaded_at', { ascending: false });
+  if (error) return { data: [], error: toMessage(error) };
+  return { data: (data ?? []) as OwnerCustomerDocument[], error: null };
+}
+
+/**
+ * Create a customer-visible project for a CRM customer.
+ *
+ * Fails when the CRM customer has no linked organization — a project cannot be
+ * tenant-scoped without one, and creating an unreachable row would be worse than
+ * an explicit error. The caller should disable the action in that case.
+ */
+export async function createCustomerProject(input: {
+  ownerCustomerId: string;
+  title: string;
+  businessObjective: string;
+  phase: string;
+}): Promise<Result<string | null>> {
+  const { data, error } = await supabase.rpc('create_customer_project_for_owner_customer', {
+    p_owner_customer_id: input.ownerCustomerId,
+    p_title: input.title,
+    p_business_objective: input.businessObjective,
+    p_phase: input.phase,
+  });
+  if (error) return { data: null, error: toMessage(error) };
+  return { data: data as string, error: null };
+}
+
+export async function updateCustomerProject(input: {
+  projectId: string;
+  title: string;
+  businessObjective: string;
+  phase: string;
+  status: CustomerProjectStatus;
+  progressPercent: number;
+  startDate: string | null;
+  targetDate: string | null;
+  blockerSummary: string | null;
+  contactProfileId: string | null;
+  contactRoleLabel: string | null;
+  contactBusinessEmail: string | null;
+}): Promise<{ error: string | null }> {
+  const { error } = await supabase.rpc('update_customer_project', {
+    p_project_id: input.projectId,
+    p_title: input.title,
+    p_business_objective: input.businessObjective,
+    p_phase: input.phase,
+    p_status: input.status,
+    p_progress_percent: input.progressPercent,
+    p_start_date: input.startDate,
+    p_target_date: input.targetDate,
+    p_customer_safe_blocker_summary: input.blockerSummary,
+    p_contact_profile_id: input.contactProfileId,
+    p_contact_role_label: input.contactRoleLabel,
+    p_contact_business_email: input.contactBusinessEmail,
+  });
+  return { error: error ? toMessage(error) : null };
+}
+
+/**
+ * Next action. Summary, owner and due date are all-or-nothing: clearing the summary
+ * clears the other two. The RPC enforces this and returns a clear message.
+ */
+export async function setCustomerProjectNextAction(input: {
+  projectId: string;
+  summary: string | null;
+  owner: 'customer' | 'cogniiq' | null;
+  dueDate: string | null;
+}): Promise<{ error: string | null }> {
+  const { error } = await supabase.rpc('set_customer_project_next_action', {
+    p_project_id: input.projectId,
+    p_summary: input.summary,
+    p_owner: input.owner,
+    p_due_date: input.dueDate,
+  });
+  return { error: error ? toMessage(error) : null };
+}
+
+export async function archiveCustomerProject(projectId: string): Promise<{ error: string | null }> {
+  const { error } = await supabase.rpc('archive_customer_project', { p_project_id: projectId });
+  return { error: error ? toMessage(error) : null };
+}
+
+export async function createCustomerMilestone(input: {
+  projectId: string;
+  title: string;
+  description: string | null;
+  targetDate: string | null;
+  sortOrder: number;
+}): Promise<Result<string | null>> {
+  const { data, error } = await supabase.rpc('create_customer_project_milestone', {
+    p_project_id: input.projectId,
+    p_title: input.title,
+    p_description: input.description,
+    p_target_date: input.targetDate,
+    p_sort_order: input.sortOrder,
+  });
+  if (error) return { data: null, error: toMessage(error) };
+  return { data: data as string, error: null };
+}
+
+/** completed_at is derived from status server-side and is never supplied here. */
+export async function updateCustomerMilestone(input: {
+  milestoneId: string;
+  title: string;
+  description: string | null;
+  status: CustomerMilestoneStatus;
+  targetDate: string | null;
+  sortOrder: number;
+}): Promise<{ error: string | null }> {
+  const { error } = await supabase.rpc('update_customer_project_milestone', {
+    p_milestone_id: input.milestoneId,
+    p_title: input.title,
+    p_description: input.description,
+    p_status: input.status,
+    p_target_date: input.targetDate,
+    p_sort_order: input.sortOrder,
+  });
+  return { error: error ? toMessage(error) : null };
+}
+
+export async function deleteCustomerMilestone(milestoneId: string): Promise<{ error: string | null }> {
+  const { error } = await supabase.rpc('delete_customer_project_milestone', {
+    p_milestone_id: milestoneId,
+  });
+  return { error: error ? toMessage(error) : null };
+}
+
+/**
+ * Publish a canonical owner PDF (offer / signed acceptance certificate / invoice) to
+ * a customer. The database validates that the source document belongs to the same
+ * organization, is finalized, and that the category matches the document type — an
+ * ordinary offer can never be published as an acceptance.
+ */
+export async function publishOwnerDocumentToCustomer(input: {
+  organizationId: string;
+  projectId: string | null;
+  category: CustomerDocumentCategory;
+  title: string;
+  ownerGeneratedDocumentId: string;
+}): Promise<Result<string | null>> {
+  const { data, error } = await supabase.rpc('register_customer_document_from_owner_source', {
+    p_organization_id: input.organizationId,
+    p_project_id: input.projectId,
+    p_category: input.category,
+    p_title: input.title,
+    p_owner_generated_document_id: input.ownerGeneratedDocumentId,
+  });
+  if (error) return { data: null, error: toMessage(error) };
+  return { data: data as string, error: null };
+}
+
+export async function setCustomerDocumentVisibility(
+  documentId: string,
+  visible: boolean,
+): Promise<{ error: string | null }> {
+  const { error } = await supabase.rpc('set_customer_document_visibility', {
+    p_document_id: documentId,
+    p_visible: visible,
+  });
+  return { error: error ? toMessage(error) : null };
+}
+
+/** Permanent retirement. Published documents are archived, never hard-deleted. */
+export async function archiveCustomerDocument(documentId: string): Promise<{ error: string | null }> {
+  const { error } = await supabase.rpc('archive_customer_document', { p_document_id: documentId });
+  return { error: error ? toMessage(error) : null };
+}
+
+export async function linkProjectInvoice(
+  projectId: string,
+  invoiceId: string,
+): Promise<{ error: string | null }> {
+  const { error } = await supabase.rpc('link_customer_project_invoice', {
+    p_project_id: projectId,
+    p_invoice_id: invoiceId,
+  });
+  return { error: error ? toMessage(error) : null };
+}
+
+export async function unlinkProjectInvoice(
+  projectId: string,
+  invoiceId: string,
+): Promise<{ error: string | null }> {
+  const { error } = await supabase.rpc('unlink_customer_project_invoice', {
+    p_project_id: projectId,
+    p_invoice_id: invoiceId,
+  });
+  return { error: error ? toMessage(error) : null };
+}
+
+/**
+ * Upload a customer document through the controlled server-side flow.
+ *
+ * The browser deliberately does NOT touch Storage: the Edge Function generates the
+ * path, enforces the MIME allow-list and size cap, verifies the stored object and
+ * compensates on partial failure. Uploaded documents start unpublished.
+ */
+export async function uploadCustomerDocument(input: {
+  organizationId: string;
+  projectId: string | null;
+  category: CustomerDocumentCategory;
+  title: string;
+  file: File;
+}): Promise<Result<string | null>> {
+  const form = new FormData();
+  form.append('organization_id', input.organizationId);
+  if (input.projectId) form.append('project_id', input.projectId);
+  form.append('category', input.category);
+  form.append('title', input.title);
+  form.append('file', input.file);
+
+  const { data, error } = await supabase.functions.invoke('customer-document-upload', {
+    body: form,
+  });
+  if (error) return { data: null, error: toMessage(error) };
+  const documentId = (data as { document_id?: string } | null)?.document_id ?? null;
+  if (!documentId) return { data: null, error: 'Der Upload konnte nicht registriert werden.' };
+  return { data: documentId, error: null };
+}

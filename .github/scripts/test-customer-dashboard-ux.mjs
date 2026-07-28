@@ -177,5 +177,56 @@ ok(/Online-Zahlungsfunktion ist in dieser Version bewusst nicht enthalten/.test(
 ok(/label: 'Dokumente', href: '\/app\/documents'/.test(shell), 'Dokumente is in the primary navigation');
 ok(/label: 'Abrechnung', href: '\/app\/billing'/.test(shell), 'Abrechnung is in the primary navigation');
 
+// ---------------------------------------------------------------- 6) owner-side management
+const ownerApi = read('src/lib/customerPlatform/ownerProjectsApi.ts');
+const ownerPanel = read('src/components/finance/CustomerProjectPanel.tsx');
+const ownerCustomerDetail = read('src/pages/owner/CustomerDetailPage.tsx');
+
+/* Every owner mutation goes through a guarded RPC, never a direct table write. */
+const ownerApiCode = ownerApi.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+for (const forbidden of ['.insert(', '.update(', '.delete(', '.upsert(']) {
+  ok(!ownerApiCode.includes(forbidden), `owner API performs no direct ${forbidden.slice(1, -1)} on a table`);
+}
+for (const rpc of ['create_customer_project_for_owner_customer', 'update_customer_project',
+                   'set_customer_project_next_action', 'archive_customer_project',
+                   'create_customer_project_milestone', 'update_customer_project_milestone',
+                   'delete_customer_project_milestone', 'register_customer_document_from_owner_source',
+                   'set_customer_document_visibility', 'archive_customer_document',
+                   'link_customer_project_invoice', 'unlink_customer_project_invoice']) {
+  ok(new RegExp(`'${rpc}'`).test(ownerApi), `owner API exposes the ${rpc} RPC`);
+}
+
+/* Uploads never touch Storage from the browser. */
+ok(!/storage\.from\(/.test(ownerApi), 'the owner API never calls Storage directly');
+ok(/functions\.invoke\('customer-document-upload'/.test(ownerApi),
+  'uploads go through the controlled server-side Edge Function');
+
+/* completed_at is never sent by the client — it is derived from status server-side. */
+ok(!/p_completed_at/.test(ownerApi), 'completed_at is never supplied by the client');
+
+/* The panel refuses to create a project without a linked organization. */
+ok(/organizationId: string \| null/.test(ownerPanel), 'the panel accepts a nullable organization id');
+ok(/if \(!organizationId\)/.test(ownerPanel), 'the panel branches on a missing organization');
+ok(/Kein Portalzugang vorhanden/.test(ownerPanel),
+  'a customer without portal provisioning gets an explicit explanation, not a failing save');
+ok(/Einladung/.test(ownerPanel), 'the explanation points at the real prerequisite (invitation)');
+
+/* The panel is wired into the CRM customer detail page and passes the real org id. */
+ok(/<CustomerProjectPanel ownerCustomerId=\{c\.id\} organizationId=\{c\.organization_id\} \/>/.test(ownerCustomerDetail),
+  'the project panel is mounted on the CRM customer detail page with the real organization id');
+
+/* Internal task tooling and the customer projection stay separate. */
+ok(/CustomerTaskChecklist/.test(ownerCustomerDetail) && /CustomerProjectPanel/.test(ownerCustomerDetail),
+  'internal task checklist and customer-visible project panel coexist as separate surfaces');
+ok(!/owner_customer_tasks/.test(ownerApi), 'the customer project API never touches internal owner tasks');
+
+/* Owner-facing copy makes the customer-visible boundary explicit. */
+ok(/Interne Notizen, Budgets und Aufgaben bleiben hier außen vor/.test(ownerPanel),
+  'the panel states that internal notes, budgets and tasks are excluded');
+ok(/Nur kundensichere Formulierungen/.test(ownerPanel),
+  'the blocker field warns that only customer-safe wording belongs there');
+ok(/private Profil-E-Mail wird nie automatisch angezeigt/.test(ownerPanel),
+  'the contact email field states the private profile address is never auto-exposed');
+
 if (failures) { console.error(`\ncustomer dashboard UX tests: ${failures} FAILED`); process.exit(1); }
 console.log('\ncustomer dashboard UX tests: ALL PASSED');
