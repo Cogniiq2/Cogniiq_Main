@@ -48,6 +48,9 @@ jobs:
       - name: SEO + consent consistency checks
         run: node .github/scripts/test-seo-consistency.mjs
 
+      - name: Customer dashboard UX foundation tests
+        run: node .github/scripts/test-customer-dashboard-ux.mjs
+
       - name: Typecheck
         run: npm run typecheck
 

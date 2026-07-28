@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthLoadingScreen } from '@/components/auth/AuthLoadingScreen';
+import { EntitlementUnavailablePage } from '@/components/app/EntitlementUnavailablePage';
 import { useOrganizationSolutionsValue } from '@/hooks/useOrganizationSolutions';
 import type { OrganizationSolutionStatus } from '@/lib/clientPlatform/types';
 
@@ -15,7 +15,7 @@ const ALLOWED_STATUSES: OrganizationSolutionStatus[] = ['provisioning', 'active'
 // It complements the RLS entitlement enforced in the database — both must pass.
 export function ReceptionistEntitlementRoute({ children }: { children: ReactNode }) {
   const { isPlatformAdmin } = useAuth();
-  const { solutions, status, error, reload } = useOrganizationSolutionsValue();
+  const { solutions, portalSettings, status, error, reload } = useOrganizationSolutionsValue();
 
   if (isPlatformAdmin) {
     return <>{children}</>;
@@ -48,9 +48,16 @@ export function ReceptionistEntitlementRoute({ children }: { children: ReactNode
   );
 
   if (!entitled) {
-    // Automation-only clients (and anyone without the receptionist entitlement) are sent back to
-    // the product-neutral overview. Direct URL access is denied, not merely hidden.
-    return <Navigate to="/app" replace />;
+    // Automation-only clients (and anyone without the receptionist entitlement) are denied here —
+    // direct URL access is refused, not merely hidden. The denial is EXPLAINED rather than being a
+    // silent redirect, which previously made a bookmarked link look broken.
+    return (
+      <EntitlementUnavailablePage
+        title="Der Rezeptionist ist für Sie noch nicht freigeschaltet"
+        description="Ihre Organisation hat aktuell keine aktive Rezeptionisten-Lösung. Sobald Cogniiq den Rezeptionisten für Sie eingerichtet hat, erscheint dieser Bereich automatisch in Ihrer Navigation."
+        supportEmail={portalSettings?.support_contact ?? null}
+      />
+    );
   }
 
   return <>{children}</>;

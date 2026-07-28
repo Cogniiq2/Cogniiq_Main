@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, TextareaHTML
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
-import { AlertCircle, Check, Circle, Info, Plus, RefreshCw } from 'lucide-react';
+import { AlertCircle, Check, Circle, Clock3, Info, Plus, RefreshCw } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import type { LaunchChecklistItem, LifecycleTone, SetupStep } from './customerPortalModel';
@@ -123,6 +123,7 @@ export function AppButton({
   variant = 'primary',
   className,
   disabled,
+  disabledReason,
   type = 'button',
   onClick,
 }: {
@@ -132,6 +133,12 @@ export function AppButton({
   variant?: 'primary' | 'secondary' | 'text';
   className?: string;
   disabled?: boolean;
+  /**
+   * Why this control cannot be used right now. Rendered as visible copy next to the
+   * control AND wired up via title/aria-describedby, so a disabled button never looks
+   * broken or merely unresponsive.
+   */
+  disabledReason?: string;
   type?: ButtonHTMLAttributes<HTMLButtonElement>['type'];
   onClick?: ButtonHTMLAttributes<HTMLButtonElement>['onClick'];
 }) {
@@ -166,10 +173,55 @@ export function AppButton({
     );
   }
 
-  return (
-    <button type={type} className={baseClass} disabled={disabled} onClick={onClick}>
+  const hintId = disabled && disabledReason ? `disabled-hint-${slugify(String(children))}` : undefined;
+  const button = (
+    <button
+      type={type}
+      className={baseClass}
+      disabled={disabled}
+      onClick={onClick}
+      title={disabled ? disabledReason : undefined}
+      aria-describedby={hintId}
+    >
       {content}
     </button>
+  );
+
+  if (!hintId) return button;
+
+  return (
+    <span className="inline-flex max-w-sm flex-col items-start gap-1.5">
+      {button}
+      <span id={hintId} className="text-[11.5px] leading-[1.45] text-gray-400">
+        {disabledReason}
+      </span>
+    </span>
+  );
+}
+
+/**
+ * Honest marker for a surface that is intentionally not built yet. Used instead of
+ * leaving inert controls that read as broken functionality.
+ */
+export function AppInPreparationBadge({ label = 'In Vorbereitung' }: { label?: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-gray-500">
+      <Clock3 size={12} aria-hidden="true" />
+      {label}
+    </span>
+  );
+}
+
+/**
+ * Explains, once and prominently, why a whole group of inputs is currently read-only —
+ * clearer than repeating the same hint on fifteen individual fields.
+ */
+export function AppReadOnlyNotice({ children }: { children: ReactNode }) {
+  return (
+    <div className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
+      <Info size={15} className="mt-0.5 flex-shrink-0 text-amber-700" aria-hidden="true" />
+      <p className="text-[12.5px] leading-5 text-amber-800">{children}</p>
+    </div>
   );
 }
 
@@ -592,9 +644,15 @@ export function AppErrorState({ message, onRetry }: { message: string; onRetry?:
   );
 }
 
-export function AppAddButton({ children }: { children: ReactNode }) {
+export function AppAddButton({
+  children,
+  disabledReason = 'Diese Funktion ist noch in Vorbereitung. Sobald die Datenquelle verbunden ist, können Sie hier Einträge ergänzen.',
+}: {
+  children: ReactNode;
+  disabledReason?: string;
+}) {
   return (
-    <AppButton variant="secondary" disabled icon={Plus}>
+    <AppButton variant="secondary" disabled icon={Plus} disabledReason={disabledReason}>
       {children}
     </AppButton>
   );
