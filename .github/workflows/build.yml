@@ -51,6 +51,9 @@ jobs:
       - name: Customer dashboard UX foundation tests
         run: node .github/scripts/test-customer-dashboard-ux.mjs
 
+      - name: Authentication boot timeout tests
+        run: node .github/scripts/test-auth-boot-timeout.mjs
+
       - name: Customer error-surface and stale-query tests
         run: node .github/scripts/test-customer-error-surface.mjs
 

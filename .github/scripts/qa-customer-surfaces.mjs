@@ -135,6 +135,19 @@ function makeRouter(scenario) {
     }
 
     // --- auth ---
+    // `authHang` stalls the calls the AUTHENTICATION BOOTSTRAP awaits, without
+    // answering them. Note it is not enough to stall /auth/v1: getSession()
+    // reads an unexpired session straight out of localStorage and never touches
+    // the network. What AuthContext.loadAccount() actually awaits is the
+    // invitation-claim RPC plus the profile and membership reads — stalling
+    // those is the real reproduction of the hang.
+    if (scenario.authHang && (
+      url.includes('/rest/v1/rpc/claim_my_client_invitations')
+      || url.includes('/rest/v1/profiles')
+      || url.includes('/rest/v1/organization_members')
+    )) {
+      return new Promise(() => {});
+    }
     if (url.includes('/auth/v1/user')) {
       return json({ id: USER_ID, aud: 'authenticated', email: 'kunde@example.invalid', user_metadata: {}, app_metadata: {} });
     }
@@ -462,6 +475,78 @@ try {
     await assertVisibleText(page, 'Der Download konnte nicht gestartet werden', 'download failure @375');
     await assertNoInternalTextOnScreen(page, 'download failure @375');
     await assertNoHorizontalOverflow(page, 'download failure @375');
+    await context.close();
+  }
+
+  // ---- 8b) the authentication bootstrap must never hang forever ----------
+  // A backend that accepts the connection and then never answers used to strand
+  // every guarded route on an English spinner with no retry and no sign out.
+  {
+    const { context, page } = await newPage(browser, { authHang: true }, 375);
+    await page.goto(`${ORIGIN}/app`, { waitUntil: 'domcontentloaded' });
+
+    // Before the deadline it is still legitimately loading.
+    await settle(page, 2000);
+    const early = await page.evaluate(() => document.body.innerText);
+    if (/Checking secure session/.test(early)) {
+      ok('auth hang: still shows the loading screen before the deadline');
+    } else {
+      bad('auth hang: still shows the loading screen before the deadline',
+        `expected the bootstrap to be pending; got: ${early.replace(/\s+/g, ' ').slice(0, 120)}`);
+    }
+
+    // After the deadline it must have recovered into an actionable German state.
+    await page.waitForFunction(
+      () => /Anmeldung dauert zu lange/.test(document.body.innerText),
+      { timeout: 30000 },
+    ).then(
+      () => ok('auth hang: the recovery state appears after the deadline, not an endless spinner'),
+      () => bad('auth hang: the recovery state appears after the deadline, not an endless spinner',
+        'the deadline passed and the app was still spinning'),
+    );
+
+    const text = await page.evaluate(() => document.body.innerText);
+    if (!/Checking secure session/.test(text)) ok('auth hang: the endless spinner is gone');
+    else bad('auth hang: the endless spinner is gone', 'the loading screen is still rendered');
+
+    for (const needle of ['Anmeldung dauert zu lange', 'Erneut versuchen', 'Abmelden']) {
+      if (text.includes(needle)) ok(`auth hang: offers "${needle}"`);
+      else bad(`auth hang: offers "${needle}"`, text.replace(/\s+/g, ' ').slice(0, 160));
+    }
+
+    // It must not have bounced a possibly-valid session to the login form.
+    const path = await page.evaluate(() => window.location.pathname);
+    if (path === '/app') ok('auth hang: does not redirect to login on a request that never answered');
+    else bad('auth hang: does not redirect to login on a request that never answered', `landed on ${path}`);
+
+    await assertNoInternalTextOnScreen(page, 'auth hang @375');
+    await assertNoHorizontalOverflow(page, 'auth hang @375');
+    await assertTapTargets(page, 'auth hang @375');
+    await context.close();
+  }
+
+  // ---- 8c) retry after a hang must recover once the backend answers -------
+  {
+    const scenario = { authHang: true };
+    const contextAndPage = await newPage(browser, scenario, 1440);
+    const { context, page } = contextAndPage;
+    await page.goto(`${ORIGIN}/app`, { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(
+      () => /Anmeldung dauert zu lange/.test(document.body.innerText),
+      { timeout: 30000 },
+    ).catch(() => {});
+
+    // The backend comes back; the user presses "Erneut versuchen".
+    scenario.authHang = false;
+    await page.click('button:has-text("Erneut versuchen")');
+    await page.waitForFunction(
+      () => !/Anmeldung dauert zu lange/.test(document.body.innerText),
+      { timeout: 30000 },
+    ).then(
+      () => ok('auth hang: retry recovers the session once the backend answers again'),
+      () => bad('auth hang: retry recovers the session once the backend answers again',
+        'the recovery screen never cleared after a successful retry'),
+    );
     await context.close();
   }
 

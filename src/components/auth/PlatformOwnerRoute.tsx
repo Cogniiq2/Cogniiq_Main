@@ -4,14 +4,20 @@ import { ShieldAlert } from 'lucide-react';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthLoadingScreen } from './AuthLoadingScreen';
+import { AuthRecoveryScreen } from './AuthRecoveryScreen';
 
 // Owner-only route guard. Authorization requires the database-backed platform role cogniiq_owner
 // (isPlatformOwner), never cogniiq_admin, email, organization ownership or client-side state. RLS
 // remains the final boundary; this only controls whether owner UI renders. The denied state never
 // reveals whether any financial records exist.
 export function PlatformOwnerRoute({ children }: { children: ReactNode }) {
-  const { user, isLoading, isPlatformOwner, signOut } = useAuth();
+  const { user, isLoading, authTimedOut, isPlatformOwner, signOut } = useAuth();
   const location = useLocation();
+
+  // A bootstrap that never answered must not read as "signed out": the session
+  // may well be valid. Offer retry and sign out instead of redirecting to login
+  // on the strength of a request that never came back.
+  if (authTimedOut) return <AuthRecoveryScreen />;
 
   if (isLoading) return <AuthLoadingScreen />;
 
