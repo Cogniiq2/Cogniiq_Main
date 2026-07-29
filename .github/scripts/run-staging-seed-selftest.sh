@@ -67,20 +67,69 @@ expect_refusal "a DATABASE_URL for a DIFFERENT project than declared" \
   ALLOW_STAGING_SEED=true STAGING_PROJECT_REF="$GOOD_REF" \
   DATABASE_URL='postgresql://postgres:x@db.zzzzzzzzzzzzzzzz.supabase.co:5432/postgres'
 
-# CI must be refused even when every other interlock is satisfied.
-for ci_var in CI GITHUB_ACTIONS GITLAB_CI; do
+# --- the CI interlock, one variable at a time --------------------------------
+# The list is read out of the seeder itself rather than duplicated here, so a
+# variable added to the guard is automatically covered and the test cannot
+# silently drift away from the thing it is testing.
+CI_VARS="$(sed -n 's/^for var in \(.*\); do$/\1/p' "$SEEDER" | head -1)"
+if [ -z "$CI_VARS" ]; then
+  note_fail "the CI-variable list could not be read out of the seeder"
+else
+  note_ok "the CI-variable list is read from the seeder itself ($CI_VARS)"
+fi
+
+# Every supported CI variable must be UNSET before exactly one is set again.
+# This test runs ON a CI runner, which already exports CI=true (and
+# GITHUB_ACTIONS=true). The seeder refuses on the FIRST variable it finds set,
+# and correctly names that one — so without this isolation, asking it about
+# GITHUB_ACTIONS gets an answer about CI and the assertion fails even though the
+# guard behaved perfectly. The guard is right; the test has to ask cleanly.
+CI_UNSET_ARGS=()
+for var in $CI_VARS; do CI_UNSET_ARGS+=(-u "$var"); done
+
+SATISFIED_ENV=(
+  ALLOW_STAGING_SEED=true
+  STAGING_PROJECT_REF="$GOOD_REF"
+  DATABASE_URL="postgresql://postgres:x@db.$GOOD_REF.supabase.co:5432/postgres"
+  # Client-side only, so the seeder itself is untouched: the host above does not
+  # exist, and this keeps a slow DNS or connect attempt from stalling the test.
+  PGCONNECT_TIMEOUT=5
+)
+
+for ci_var in $CI_VARS; do
   set +e
-  out="$(env "$ci_var=true" ALLOW_STAGING_SEED=true STAGING_PROJECT_REF="$GOOD_REF" \
-        DATABASE_URL="postgresql://postgres:x@db.$GOOD_REF.supabase.co:5432/postgres" \
-        bash "$SEEDER" 2>&1)"
+  out="$(env "${CI_UNSET_ARGS[@]}" "$ci_var=true" "${SATISFIED_ENV[@]}" bash "$SEEDER" 2>&1)"
   status=$?
   set -e
-  if [ "$status" -eq 2 ] && printf '%s' "$out" | grep -q "$ci_var is set"; then
+  if [ "$status" -eq 2 ] && printf '%s' "$out" | grep -q "the environment variable $ci_var is set"; then
     note_ok "seeder refuses to run when $ci_var is set, even with every other interlock satisfied"
   else
-    note_fail "seeder ran (or failed differently) with $ci_var set (exit $status)"
+    note_fail "seeder ran (or failed differently) with only $ci_var set (exit $status)"
+    printf '%s\n' "$out" | head -5
   fi
 done
+
+# Falsification: with NO CI variable set the seeder must get PAST the CI
+# interlock. Without this, the loop above would still pass against a seeder that
+# simply refused everything unconditionally.
+set +e
+out="$(env "${CI_UNSET_ARGS[@]}" "${SATISFIED_ENV[@]}" bash "$SEEDER" 2>&1)"
+status=$?
+set -e
+if printf '%s' "$out" | grep -q 'This seeder never runs automatically in CI'; then
+  note_fail "with no CI variable set, the seeder still refused on the CI interlock"
+else
+  note_ok "with no CI variable set, the seeder gets past the CI interlock (the loop above is meaningful)"
+fi
+# It must still refuse — the host in SATISFIED_ENV does not resolve — just for a
+# different, later reason. Reaching this point without a refusal would mean the
+# seeder had tried to write somewhere.
+if [ "$status" -eq 2 ] && printf '%s' "$out" | grep -q 'REFUSING TO SEED'; then
+  note_ok "with no CI variable set, an unreachable target is still refused (later interlock)"
+else
+  note_fail "an unreachable target was not refused with exit 2 (exit $status)"
+  printf '%s\n' "$out" | head -5
+fi
 
 # The repository must not carry a credential for any of this.
 if grep -REqi "postgres://[^ '\"]*:[^ '\"@]{6,}@|service_role_key *=|sb_secret_" "$ROOT/scripts/staging"; then
