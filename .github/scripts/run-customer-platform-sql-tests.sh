@@ -60,7 +60,8 @@ NEW_MIGRATIONS=()
 for f in 20260728120000_customer_project_core \
          20260728121000_customer_documents \
          20260728122000_customer_billing_link \
-         20260728123000_owner_invoice_organization_assignment; do
+         20260728123000_owner_invoice_organization_assignment \
+         20260728124000_customer_document_archive_service_role; do
   [ -f "$MIG/$f.sql" ] || continue
   PSQL -d cust -q -f "$MIG/$f.sql" >/dev/null
   NEW_MIGRATIONS+=("$f")

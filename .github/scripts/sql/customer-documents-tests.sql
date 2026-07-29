@@ -499,9 +499,67 @@ begin
   if exists (select 1 from storage.buckets where id = 'customer-documents' and public) then
     raise exception 'TEST FAILED: the customer-documents bucket is public';
   end if;
+
+  if (select file_size_limit from storage.buckets where id = 'customer-documents') <> 26214400 then
+    raise exception 'TEST FAILED: the customer-documents bucket does not carry the intended 25MB size limit';
+  end if;
+  if not (select allowed_mime_types from storage.buckets where id = 'customer-documents') @> array['application/pdf']::text[] then
+    raise exception 'TEST FAILED: the customer-documents bucket does not carry the intended MIME allow-list';
+  end if;
 end;
 $$;
-\echo 'ok: customer-documents bucket is private with admin-only policies'
+\echo 'ok: customer-documents bucket is private with admin-only policies and size/MIME restrictions'
+
+-- ---------------------------------------------------------------------------
+-- TEST: an EXISTING bucket is FORCED private, not left unchanged.
+--
+-- Simulates the exact scenario the migration must be safe against: the bucket
+-- row already exists (created out-of-band, or left over from a prior partial
+-- deployment) and is misconfigured as PUBLIC with no restrictions. Re-running
+-- the migration's bucket upsert (the same statement, verbatim) must correct it,
+-- not leave it alone -- proving `on conflict do update` behavior rather than
+-- the `on conflict do nothing` this replaced.
+-- ---------------------------------------------------------------------------
+do $$
+declare v_public boolean; v_limit bigint; v_mimes text[];
+begin
+  -- Corrupt the already-provisioned bucket to look like a pre-existing, misconfigured one.
+  update storage.buckets
+  set public = true, file_size_limit = null, allowed_mime_types = null
+  where id = 'customer-documents';
+
+  if not (select public from storage.buckets where id = 'customer-documents') then
+    raise exception 'TEST SETUP FAILED: could not corrupt the bucket to public for this test';
+  end if;
+
+  -- Re-apply the exact upsert statement from the migration.
+  insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+  values (
+    'customer-documents', 'customer-documents', false, 26214400,
+    array['application/pdf','image/png','image/jpeg','text/plain',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+  )
+  on conflict (id) do update set
+    public = false,
+    file_size_limit = excluded.file_size_limit,
+    allowed_mime_types = excluded.allowed_mime_types;
+
+  select public, file_size_limit, allowed_mime_types
+    into v_public, v_limit, v_mimes
+  from storage.buckets where id = 'customer-documents';
+
+  if v_public then
+    raise exception 'TEST FAILED: a pre-existing PUBLIC bucket was left public (on conflict do nothing behavior)';
+  end if;
+  if v_limit <> 26214400 then
+    raise exception 'TEST FAILED: the size limit was not re-asserted on an existing bucket row';
+  end if;
+  if not (v_mimes @> array['application/pdf']::text[]) then
+    raise exception 'TEST FAILED: the MIME allow-list was not re-asserted on an existing bucket row';
+  end if;
+end;
+$$;
+\echo 'ok: an existing PUBLIC bucket is forced private (with restrictions) by the migrations bucket upsert, never left unchanged'
 
 -- ---------------------------------------------------------------------------
 -- TEST: non-admin cannot invoke document write RPCs
@@ -535,3 +593,94 @@ begin
 end;
 $$;
 \echo 'ok: document write RPCs reject non-admin callers'
+
+-- ---------------------------------------------------------------------------
+-- TEST: archive_customer_document_as (service_role path used by the retire
+-- Edge Function) -- success, non-admin denial, and spoofing resistance.
+-- ---------------------------------------------------------------------------
+-- All ids are resolved to plain values WHILE STILL SUPERUSER, before any role
+-- switch. Role-switched statements below reference only these plain uuid values --
+-- never test_id()/test_become(), which are ordinary (non-superuser-safe) helpers
+-- that may not be selectable once the session role changes.
+do $$
+declare
+  v_doc_success uuid;
+  v_doc_denied uuid;
+  v_admin uuid := test_id('admin');
+  v_user_a uuid := test_id('user_a');
+  v_org_a uuid := test_id('org_a');
+  v_project_a uuid := test_id('project_a');
+  v_actor uuid;
+  v_visible boolean;
+  v_archived timestamptz;
+  v_threw boolean;
+begin
+  perform public.test_become(v_admin);
+
+  insert into public.customer_documents (organization_id, project_id, category, title, storage_path,
+                                         content_type, size_bytes, uploaded_by)
+  values (v_org_a, v_project_a, 'meeting_notes', 'Archiv-Test-RPC', 'org-a/p/archive-test.pdf',
+          'application/pdf', 512, v_admin)
+  returning id into v_doc_success;
+  perform public.set_customer_document_visibility(v_doc_success, true);
+
+  insert into public.customer_documents (organization_id, project_id, category, title, storage_path,
+                                         content_type, size_bytes, uploaded_by)
+  values (v_org_a, v_project_a, 'meeting_notes', 'Nicht-Admin-Versuch', 'org-a/p/non-admin-attempt.pdf',
+          'application/pdf', 256, v_admin)
+  returning id into v_doc_denied;
+  perform public.set_customer_document_visibility(v_doc_denied, true);
+
+  -- (a) success: called AS SERVICE_ROLE (no session auth.uid()) with an explicit,
+  -- verified caller id -- must succeed where the auth.uid()-based RPC would not.
+  set local role service_role;
+  perform public.archive_customer_document_as(v_admin, v_doc_success);
+  reset role;
+
+  select customer_visible, archived_at into v_visible, v_archived
+  from public.customer_documents where id = v_doc_success;
+  if v_visible or v_archived is null then
+    raise exception 'TEST FAILED: archive_customer_document_as did not archive the document';
+  end if;
+
+  -- The VERIFIED caller (admin), not a null/service-role actor, is the recorded actor.
+  select user_id into v_actor
+  from public.customer_document_access_events
+  where document_id = v_doc_success and event_type = 'archived'
+  order by occurred_at desc limit 1;
+  if v_actor is distinct from v_admin then
+    raise exception 'TEST FAILED: audit event actor is %, expected the verified caller %', v_actor, v_admin;
+  end if;
+
+  -- (b) non-admin denial: service_role calls with a CUSTOMER's id as p_caller_id.
+  set local role service_role;
+  v_threw := false;
+  begin
+    perform public.archive_customer_document_as(v_user_a, v_doc_denied);
+  exception when others then v_threw := true;
+  end;
+  reset role;
+  if not v_threw then
+    raise exception 'TEST FAILED: archive_customer_document_as accepted a non-admin caller id';
+  end if;
+  if exists (select 1 from public.customer_documents where id = v_doc_denied and archived_at is not null) then
+    raise exception 'TEST FAILED: document was archived despite the non-admin denial';
+  end if;
+
+  -- (c) spoofing resistance: an ordinary authenticated session (not service_role) --
+  -- even the admin's own -- cannot call this function at all; it is revoked from
+  -- authenticated entirely. A browser can never claim an arbitrary p_caller_id
+  -- because it can never reach this function in the first place.
+  set local role authenticated;
+  v_threw := false;
+  begin
+    perform public.archive_customer_document_as(v_admin, v_doc_denied);
+  exception when others then v_threw := true;
+  end;
+  reset role;
+  if not v_threw then
+    raise exception 'TEST FAILED: an authenticated (non-service-role) session could call archive_customer_document_as';
+  end if;
+end;
+$$;
+\echo 'ok: archive_customer_document_as: succeeds via service_role with a verified caller (audited correctly), rejects a non-admin caller id, and is unreachable from any non-service-role session'

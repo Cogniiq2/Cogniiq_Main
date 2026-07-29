@@ -82,6 +82,33 @@ function buildDeps() {
       return !error && data === true;
     },
 
+    // Server-side resolution of the AUTHORITATIVE organization for a given project id,
+    // rather than trusting the client-supplied organization id. Returns null when the
+    // project does not exist so the handler can reject before touching Storage.
+    resolveProjectOrganization: async (projectId: string) => {
+      const { data, error } = await service
+        .from('customer_projects')
+        .select('organization_id')
+        .eq('id', projectId)
+        .maybeSingle();
+      if (error || !data) return null;
+      return data.organization_id as string;
+    },
+
+    organizationExists: async (organizationId: string) => {
+      const { data, error } = await service
+        .from('organizations')
+        .select('id')
+        .eq('id', organizationId)
+        .maybeSingle();
+      return !error && !!data;
+    },
+
+    // Full error detail is logged server-side only; the browser never sees it.
+    logError: (context: string, error: unknown) => {
+      console.error(`customer-document-upload: ${context}`, error instanceof Error ? error.message : error);
+    },
+
     uploadObject: async (path: string, file: Blob, contentType: string) => {
       const { error } = await service.storage.from(BUCKET).upload(path, file, {
         contentType,
@@ -126,8 +153,16 @@ function buildDeps() {
       return data as string;
     },
 
-    archiveDocument: async (_callerId: string, documentId: string) => {
-      const { error } = await service.rpc('archive_customer_document', { p_document_id: documentId });
+    // Uses the caller-id-explicit, service_role-only RPC: `archive_customer_document()`
+    // (authenticated, auth.uid()-based) would always reject a service-role call, since
+    // a service-role connection has no session auth.uid(). This variant re-checks
+    // is_platform_admin_as(callerId) in the database and records the VERIFIED caller
+    // as the actor in the audit event, never a null/service-role actor.
+    archiveDocument: async (callerId: string, documentId: string) => {
+      const { error } = await service.rpc('archive_customer_document_as', {
+        p_caller_id: callerId,
+        p_document_id: documentId,
+      });
       return !error;
     },
 

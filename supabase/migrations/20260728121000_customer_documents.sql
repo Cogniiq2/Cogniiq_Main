@@ -308,12 +308,33 @@ grant select on public.customer_document_access_events to authenticated;
 -- Private storage bucket. NO customer policy exists: an ordinary authenticated
 -- customer has zero operations on this bucket. Only internal staff (direct) and
 -- the service-role Edge Function (which bypasses RLS) touch it.
--- The bucket row itself is a global singleton config row, so an idempotent upsert
--- is correct here — this is not structural DDL.
+--
+-- FAIL-SAFE, not fail-silent: this is an UPSERT that FORCES public = false and the
+-- intended size/MIME restrictions on every apply, including when the bucket row
+-- already exists (e.g. it was created out-of-band, left over from a prior partial
+-- deployment, or someone manually flipped it public). `on conflict do nothing`
+-- would leave a pre-existing public bucket public — the bucket row itself is a
+-- global singleton config row, so re-asserting its intended state on every apply
+-- is correct here; this is not structural DDL and is safely re-runnable.
 -- ---------------------------------------------------------------------------
-insert into storage.buckets (id, name, public)
-values ('customer-documents', 'customer-documents', false)
-on conflict (id) do nothing;
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'customer-documents',
+  'customer-documents',
+  false,
+  26214400,
+  array[
+    'application/pdf',
+    'image/png',
+    'image/jpeg',
+    'text/plain',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ]
+)
+on conflict (id) do update set
+  public = false,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
 
 do $$
 begin

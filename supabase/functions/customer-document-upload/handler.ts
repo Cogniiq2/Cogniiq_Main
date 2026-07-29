@@ -22,6 +22,16 @@ export const ALLOWED_CONTENT_TYPES = [
 // claim one — the database enforces this too, this is the friendly early rejection.
 const OWNER_RESERVED_CATEGORIES = ['offer', 'acceptance', 'invoice'];
 
+// Standard UUID shape only. This alone rules out path traversal, empty strings,
+// and arbitrary garbage reaching a storage path or a database lookup — a
+// malformed id fails HERE, before any organization/project lookup, storage
+// write, or database call is attempted.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isUuid(value) {
+  return typeof value === 'string' && UUID_RE.test(value);
+}
+
 const EXTENSION_BY_CONTENT_TYPE = {
   'application/pdf': 'pdf',
   'image/png': 'png',
@@ -71,8 +81,12 @@ export async function handleUploadRequest(deps, request) {
 
   const { organizationId, projectId, category, title, filename, contentType, file } = request;
 
-  if (!organizationId || typeof organizationId !== 'string') {
-    return { status: 400, body: { error: 'organization_id_required' } };
+  // ---- shape/format validation: no lookup, no storage call yet -------------
+  if (!organizationId || !isUuid(organizationId)) {
+    return { status: 400, body: { error: 'invalid_organization_id' } };
+  }
+  if (projectId !== null && projectId !== undefined && !isUuid(projectId)) {
+    return { status: 400, body: { error: 'invalid_project_id' } };
   }
   if (!category || typeof category !== 'string') {
     return { status: 400, body: { error: 'category_required' } };
@@ -93,8 +107,29 @@ export async function handleUploadRequest(deps, request) {
     return { status: 413, body: { error: 'file_too_large', max_bytes: MAX_UPLOAD_BYTES } };
   }
 
+  // ---- server-side existence/consistency validation, BEFORE any storage call.
+  // A project, when supplied, is the AUTHORITATIVE source of the organization —
+  // never the client-supplied organizationId — which eliminates an entire class of
+  // "upload targets project X but is filed under organization Y" bugs rather than
+  // merely detecting them after the fact.
+  let authoritativeOrganizationId = organizationId;
+  if (projectId) {
+    const projectOrganizationId = await deps.resolveProjectOrganization(projectId);
+    if (!projectOrganizationId) {
+      return { status: 400, body: { error: 'project_not_found' } };
+    }
+    if (projectOrganizationId !== organizationId) {
+      return { status: 400, body: { error: 'project_organization_mismatch' } };
+    }
+    authoritativeOrganizationId = projectOrganizationId;
+  } else {
+    if (!(await deps.organizationExists(organizationId))) {
+      return { status: 400, body: { error: 'organization_not_found' } };
+    }
+  }
+
   const safeName = sanitizeFilename(filename, contentType);
-  const storagePath = buildStoragePath(deps, organizationId, projectId ?? null, safeName);
+  const storagePath = buildStoragePath(deps, authoritativeOrganizationId, projectId ?? null, safeName);
 
   const uploaded = await deps.uploadObject(storagePath, file, contentType);
   if (!uploaded) return { status: 502, body: { error: 'upload_failed' } };
@@ -115,7 +150,7 @@ export async function handleUploadRequest(deps, request) {
   try {
     const documentId = await deps.registerDocument({
       callerId,
-      organizationId,
+      organizationId: authoritativeOrganizationId,
       projectId: projectId ?? null,
       category,
       title: title.trim(),
@@ -129,7 +164,10 @@ export async function handleUploadRequest(deps, request) {
   } catch (error) {
     // Compensation: never leave bytes behind without owning metadata.
     await deps.removeObject(storagePath);
-    return { status: 500, body: { error: 'registration_failed', detail: String(error?.message ?? error) } };
+    // The real error (which may contain raw DB/constraint text) is logged server-side
+    // only; the browser gets a stable, generic code and nothing else.
+    deps.logError?.('registration_failed', error);
+    return { status: 500, body: { error: 'registration_failed' } };
   }
 }
 
@@ -161,7 +199,10 @@ export async function handleRetireRequest(deps, request) {
     try {
       storagePath = await deps.deleteUnpublishedDocument(callerId, documentId);
     } catch (error) {
-      return { status: 409, body: { error: 'delete_rejected', detail: String(error?.message ?? error) } };
+      // The real error (which may contain raw DB/constraint text) is logged server-side
+      // only; the browser gets a stable, generic code and nothing else.
+      deps.logError?.('delete_rejected', error);
+      return { status: 409, body: { error: 'delete_rejected' } };
     }
     // Metadata is gone; remove the bytes it owned. A failure here leaves an orphaned
     // object rather than a dangling row — the strictly less harmful direction.

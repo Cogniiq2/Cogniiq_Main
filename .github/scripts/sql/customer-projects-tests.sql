@@ -480,7 +480,7 @@ insert into new_secdef_functions values
   ('list_customer_documents'),('list_customer_invoices'),
   ('authorize_customer_document_download'),('is_organization_member_as'),('is_platform_admin_as'),
   ('register_customer_document_from_owner_source'),('register_customer_document_from_upload'),
-  ('set_customer_document_visibility'),('archive_customer_document'),
+  ('set_customer_document_visibility'),('archive_customer_document'),('archive_customer_document_as'),
   ('delete_unpublished_customer_document'),('record_customer_document_access'),
   ('link_customer_project_invoice'),('unlink_customer_project_invoice'),
   ('guard_customer_document_source_consistency'),('guard_customer_document_no_hard_delete_if_published');
@@ -501,7 +501,7 @@ begin
       'list_customer_documents','list_customer_invoices',
       'authorize_customer_document_download','is_organization_member_as','is_platform_admin_as',
       'register_customer_document_from_owner_source','register_customer_document_from_upload',
-      'set_customer_document_visibility','archive_customer_document',
+      'set_customer_document_visibility','archive_customer_document','archive_customer_document_as',
       'delete_unpublished_customer_document','record_customer_document_access',
       'link_customer_project_invoice','unlink_customer_project_invoice',
       'guard_customer_document_source_consistency','guard_customer_document_no_hard_delete_if_published'
@@ -533,7 +533,7 @@ declare v_fn text;
 begin
   foreach v_fn in array array['is_organization_member_as','is_platform_admin_as','authorize_customer_document_download',
                              'register_customer_document_from_upload','delete_unpublished_customer_document',
-                             'record_customer_document_access']
+                             'record_customer_document_access','archive_customer_document_as']
   loop
     if exists (
       select 1 from pg_proc p

@@ -45,10 +45,15 @@ $$;
 
 -- Minimal Storage surface so the customer-documents migration can register its
 -- bucket and its storage.objects policies exactly as it would in production.
+-- Mirrors the columns real Supabase Storage's storage.buckets carries (public,
+-- file_size_limit, allowed_mime_types) so a migration's bucket-hardening logic can
+-- be exercised the same way it will run in production.
 create table if not exists storage.buckets (
   id text primary key,
   name text not null,
   public boolean not null default false,
+  file_size_limit bigint,
+  allowed_mime_types text[],
   created_at timestamptz not null default now()
 );
 

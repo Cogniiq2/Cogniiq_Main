@@ -30,18 +30,26 @@ const {
 const AUTH = 'Bearer real-jwt';
 const PDF = 'application/pdf';
 
+const ORG_A = '11111111-1111-1111-1111-111111111111';
+const ORG_B = '33333333-3333-3333-3333-333333333333';
+const PROJ_A = '22222222-2222-2222-2222-222222222222';
+
 function makeDeps(overrides = {}) {
-  const calls = { upload: [], stat: [], remove: [], register: [], archive: [], delete: [] };
+  const calls = { upload: [], stat: [], remove: [], register: [], archive: [], delete: [], logError: [] };
   const deps = {
     randomId: () => 'fixed-random-id',
     verifyJwt: async () => 'admin-1',
     isPlatformAdmin: async () => true,
+    // Defaults model a consistent, existing org/project pair: project PROJ_A belongs to ORG_A.
+    resolveProjectOrganization: async (projectId) => (projectId === PROJ_A ? ORG_A : null),
+    organizationExists: async (organizationId) => organizationId === ORG_A,
     uploadObject: async (path, file, contentType) => { calls.upload.push([path, file, contentType]); return true; },
     statObject: async (path) => { calls.stat.push([path]); return { size: 1024, contentType: PDF }; },
     removeObject: async (path) => { calls.remove.push([path]); return true; },
     registerDocument: async (input) => { calls.register.push([input]); return 'doc-new'; },
     archiveDocument: async (callerId, id) => { calls.archive.push([callerId, id]); return true; },
     deleteUnpublishedDocument: async (callerId, id) => { calls.delete.push([callerId, id]); return 'org/p/file.pdf'; },
+    logError: (context, error) => { calls.logError.push([context, error]); },
     ...overrides,
   };
   return { deps, calls };
@@ -50,8 +58,8 @@ function makeDeps(overrides = {}) {
 function uploadRequest(overrides = {}) {
   return {
     authorizationHeader: AUTH,
-    organizationId: 'org-a',
-    projectId: 'proj-1',
+    organizationId: ORG_A,
+    projectId: PROJ_A,
     category: 'concept',
     title: 'Konzept',
     filename: 'Mein Konzept.pdf',
@@ -82,7 +90,7 @@ ok(sanitizeFilename('x.png', 'image/png') === 'x.png', 'png keeps its correct ex
     'uploads start UNPUBLISHED so nothing reaches a customer by accident');
 
   const [path] = calls.upload[0];
-  ok(path === 'org-a/proj-1/fixed-random-id-mein-konzept.pdf',
+  ok(path === `${ORG_A}/${PROJ_A}/fixed-random-id-mein-konzept.pdf`,
     `path is server-generated from org/project/random/slug (got ${path})`);
   ok(calls.remove.length === 0, 'no cleanup on a successful upload');
 }
@@ -90,7 +98,7 @@ ok(sanitizeFilename('x.png', 'image/png') === 'x.png', 'png keeps its correct ex
   // Organization-level upload (no project) lands in the _org folder.
   const { deps, calls } = makeDeps();
   await handleUploadRequest(deps, uploadRequest({ projectId: null }));
-  ok(calls.upload[0][0] === 'org-a/_org/fixed-random-id-mein-konzept.pdf',
+  ok(calls.upload[0][0] === `${ORG_A}/_org/fixed-random-id-mein-konzept.pdf`,
     'project-less uploads use the _org folder');
 }
 
@@ -141,6 +149,61 @@ for (const [label, patch] of [
   ok(res.status === 400, `${label} -> 400`);
 }
 
+// ---------------------------------------------------------------- upload target validation
+{
+  const { deps, calls } = makeDeps();
+  const res = await handleUploadRequest(deps, uploadRequest({ organizationId: 'not-a-uuid' }));
+  ok(res.status === 400 && res.body.error === 'invalid_organization_id',
+    'a malformed organization id is rejected before any lookup or storage call');
+  ok(calls.upload.length === 0, 'malformed organization id: nothing uploaded');
+}
+{
+  const { deps, calls } = makeDeps();
+  const res = await handleUploadRequest(deps, uploadRequest({ organizationId: '../../../etc/passwd' }));
+  ok(res.status === 400 && res.body.error === 'invalid_organization_id',
+    'a path-traversal organization id is rejected before any storage call');
+  ok(calls.upload.length === 0, 'traversal attempt: nothing uploaded');
+}
+{
+  const { deps, calls } = makeDeps();
+  const res = await handleUploadRequest(deps, uploadRequest({ projectId: 'not-a-uuid' }));
+  ok(res.status === 400 && res.body.error === 'invalid_project_id', 'a malformed project id is rejected');
+  ok(calls.upload.length === 0, 'malformed project id: nothing uploaded');
+}
+{
+  // Project id is well-formed but does not exist.
+  const { deps, calls } = makeDeps({ resolveProjectOrganization: async () => null });
+  const res = await handleUploadRequest(deps, uploadRequest());
+  ok(res.status === 400 && res.body.error === 'project_not_found',
+    'a project id that does not resolve to any project is rejected');
+  ok(calls.upload.length === 0, 'unresolvable project: nothing uploaded');
+}
+{
+  // Project exists but belongs to a DIFFERENT organization than the client claimed.
+  const { deps, calls } = makeDeps({ resolveProjectOrganization: async () => ORG_B });
+  const res = await handleUploadRequest(deps, uploadRequest({ organizationId: ORG_A, projectId: PROJ_A }));
+  ok(res.status === 400 && res.body.error === 'project_organization_mismatch',
+    'a project/organization mismatch is rejected rather than silently filed under the wrong tenant');
+  ok(calls.upload.length === 0, 'mismatched project/organization: nothing uploaded');
+}
+{
+  // No project supplied: the organization itself must exist.
+  const { deps, calls } = makeDeps({ organizationExists: async () => false });
+  const res = await handleUploadRequest(deps, uploadRequest({ projectId: null }));
+  ok(res.status === 400 && res.body.error === 'organization_not_found',
+    'an organization-level upload against a nonexistent organization is rejected');
+  ok(calls.upload.length === 0, 'nonexistent organization: nothing uploaded');
+}
+{
+  // The project's resolved organization is what gets used server-side -- never the
+  // raw client value -- even though in this case they happen to agree.
+  const { deps, calls } = makeDeps();
+  await handleUploadRequest(deps, uploadRequest());
+  const [input] = calls.register[0];
+  ok(input.organizationId === ORG_A,
+    'the SERVER-RESOLVED (project-authoritative) organization id is what gets registered');
+}
+
 // ---------------------------------------------------------------- stored object is the source of truth
 {
   // Client claims 1 KB but the stored object is oversized: reject AND clean up.
@@ -179,12 +242,17 @@ for (const [label, patch] of [
 // ---------------------------------------------------------------- compensation on partial failure
 {
   const { deps, calls } = makeDeps({
-    registerDocument: async () => { throw new Error('db down'); },
+    registerDocument: async () => { throw new Error('duplicate key value violates constraint customer_documents_pkey'); },
   });
   const res = await handleUploadRequest(deps, uploadRequest());
   ok(res.status === 500, 'a failed registration -> 500');
   ok(calls.remove.length === 1 && calls.remove[0][0] === calls.upload[0][0],
     'the orphaned object is removed when registration fails (no bytes without metadata)');
+  ok(res.body.error === 'registration_failed' && !('detail' in res.body) && !JSON.stringify(res.body).includes('constraint'),
+    'the browser gets only a stable generic code, never the raw DB error text');
+  ok(calls.logError.length === 1 && calls.logError[0][0] === 'registration_failed'
+    && /constraint/.test(String(calls.logError[0][1]?.message ?? calls.logError[0][1])),
+    'the real error is captured server-side via logError so it is not silently lost');
 }
 {
   const { deps, calls } = makeDeps({ uploadObject: async () => false });
@@ -215,11 +283,15 @@ for (const [label, patch] of [
 {
   // A published document: the RPC refuses, so no storage removal may happen.
   const { deps, calls } = makeDeps({
-    deleteUnpublishedDocument: async () => { throw new Error('document has been published'); },
+    deleteUnpublishedDocument: async () => { throw new Error('document has been published: constraint violated'); },
   });
   const res = await handleRetireRequest(deps, { authorizationHeader: AUTH, documentId: 'doc-1', mode: 'delete' });
   ok(res.status === 409, 'deleting a published document -> 409');
   ok(calls.remove.length === 0, 'a refused deletion never removes the stored bytes');
+  ok(res.body.error === 'delete_rejected' && !('detail' in res.body) && !JSON.stringify(res.body).includes('constraint'),
+    'the browser gets only a stable generic code, never the raw RPC error text');
+  ok(calls.logError.length === 1 && calls.logError[0][0] === 'delete_rejected',
+    'the real deletion-rejection error is captured server-side via logError');
 }
 {
   // Pointer rows own no bytes: nothing to clean up.
@@ -254,6 +326,12 @@ for (const [label, patch] of [
   ok(/getSupabaseSecretKey\(\)/.test(index), 'the service role key is read via the shared getSupabaseSecretKey() helper');
   ok(!/Deno\.env\.get\('SUPABASE_/.test(index), 'no reserved SUPABASE_ env var is read directly (that prefix is rejected by supabase secrets set)');
   ok(/crypto\.randomUUID\(\)/.test(index), 'storage paths use a server-generated random id');
+  ok(/resolveProjectOrganization/.test(index) && /customer_projects/.test(index),
+    'the authoritative organization is resolved server-side from the project');
+  ok(/organizationExists/.test(index) && /from\('organizations'\)/.test(index),
+    'organization existence is checked server-side');
+  ok(/logError/.test(index) && /console\.error/.test(index),
+    'errors are logged server-side rather than returned to the browser');
 }
 
 if (failures) { console.error(`\ncustomer document upload handler tests: ${failures} FAILED`); process.exit(1); }
