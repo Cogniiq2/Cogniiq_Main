@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 
+import { toCustomerFacingError } from './customerErrors';
 import type {
   CustomerDocument,
   CustomerInvoice,
@@ -17,14 +18,21 @@ export interface CustomerApiResult<T> {
   error: string | null;
 }
 
-function fail<T>(fallback: T, error: unknown): CustomerApiResult<T> {
-  const message = error instanceof Error ? error.message : String(error ?? 'Unbekannter Fehler');
-  return { data: fallback, error: message };
+/**
+ * Build a failed result.
+ *
+ * The raw backend error is NEVER placed in `error`: it is translated to safe
+ * German customer copy (and logged to the console) by `toCustomerFacingError`.
+ * Every customer surface renders this string directly, so anything internal —
+ * schema names, function signatures, constraint text — must not reach it.
+ */
+function fail<T>(fallback: T, error: unknown, message: string): CustomerApiResult<T> {
+  return { data: fallback, error: toCustomerFacingError(error, message) };
 }
 
 export async function fetchCustomerProjects(): Promise<CustomerApiResult<CustomerProject[]>> {
   const { data, error } = await supabase.rpc('list_customer_projects');
-  if (error) return fail<CustomerProject[]>([], error);
+  if (error) return fail<CustomerProject[]>([], error, 'Ihre Projekte konnten nicht geladen werden.');
   return { data: (data ?? []) as CustomerProject[], error: null };
 }
 
@@ -32,7 +40,7 @@ export async function fetchCustomerProject(
   projectId: string,
 ): Promise<CustomerApiResult<CustomerProject | null>> {
   const { data, error } = await supabase.rpc('get_customer_project', { p_project_id: projectId });
-  if (error) return fail<CustomerProject | null>(null, error);
+  if (error) return fail<CustomerProject | null>(null, error, 'Das Projekt konnte nicht geladen werden.');
   const rows = (data ?? []) as CustomerProject[];
   // Zero rows is the single, indistinguishable answer for "not yours", "archived"
   // and "does not exist" — the UI must not try to tell them apart either.
@@ -45,7 +53,7 @@ export async function fetchCustomerMilestones(
   const { data, error } = await supabase.rpc('list_customer_project_milestones', {
     p_project_id: projectId,
   });
-  if (error) return fail<CustomerMilestone[]>([], error);
+  if (error) return fail<CustomerMilestone[]>([], error, 'Die Meilensteine konnten nicht geladen werden.');
   return { data: (data ?? []) as CustomerMilestone[], error: null };
 }
 
@@ -56,7 +64,7 @@ export async function fetchCustomerDocuments(
   const { data, error } = await supabase.rpc('list_customer_documents', {
     p_project_id: projectId,
   });
-  if (error) return fail<CustomerDocument[]>([], error);
+  if (error) return fail<CustomerDocument[]>([], error, 'Die Dokumente konnten nicht geladen werden.');
   return { data: (data ?? []) as CustomerDocument[], error: null };
 }
 
@@ -67,7 +75,7 @@ export async function fetchCustomerInvoices(
   const { data, error } = await supabase.rpc('list_customer_invoices', {
     p_project_id: projectId,
   });
-  if (error) return fail<CustomerInvoice[]>([], error);
+  if (error) return fail<CustomerInvoice[]>([], error, 'Die Rechnungen konnten nicht geladen werden.');
   return { data: (data ?? []) as CustomerInvoice[], error: null };
 }
 
@@ -84,7 +92,7 @@ export async function requestCustomerDocumentUrl(
   const { data, error } = await supabase.functions.invoke('customer-document-download', {
     body: { document_id: documentId },
   });
-  if (error) return fail<string | null>(null, error);
+  if (error) return fail<string | null>(null, error, 'Der Download konnte nicht gestartet werden. Bitte versuchen Sie es erneut.');
   const url = (data as { url?: string } | null)?.url ?? null;
   if (!url) return { data: null, error: 'Der Download-Link konnte nicht erstellt werden.' };
   return { data: url, error: null };

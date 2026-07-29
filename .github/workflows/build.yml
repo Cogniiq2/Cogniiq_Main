@@ -51,6 +51,9 @@ jobs:
       - name: Customer dashboard UX foundation tests
         run: node .github/scripts/test-customer-dashboard-ux.mjs
 
+      - name: Customer error-surface and stale-query tests
+        run: node .github/scripts/test-customer-error-surface.mjs
+
       - name: Customer document download handler tests
         run: node .github/scripts/test-customer-document-download-handler.mjs
 

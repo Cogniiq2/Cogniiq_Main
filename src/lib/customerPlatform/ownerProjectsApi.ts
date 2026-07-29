@@ -61,6 +61,12 @@ export interface OwnerCustomerDocument {
 
 type Result<T> = { data: T; error: string | null };
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isUuid(value: string | null | undefined): value is string {
+  return typeof value === 'string' && UUID_RE.test(value);
+}
+
 function toMessage(error: unknown): string {
   if (error && typeof error === 'object' && 'message' in error) {
     return String((error as { message: unknown }).message);
@@ -301,7 +307,12 @@ export async function loadCustomerInvoiceCandidates(input: {
     .select('id, invoice_number, status, organization_id')
     .order('issue_date', { ascending: false });
 
-  query = input.clientAccountId
+  // `.or()` takes a raw PostgREST filter EXPRESSION, not bound parameters: anything
+  // interpolated here is grammar, not a value. Both ids are UUIDs from server-side
+  // records, so this is defence in depth rather than a known hole — but a value that
+  // is not UUID-shaped must never be spliced into the expression at all.
+  const canUseOrFilter = isUuid(input.organizationId) && isUuid(input.clientAccountId);
+  query = canUseOrFilter
     ? query.or(`organization_id.eq.${input.organizationId},client_account_id.eq.${input.clientAccountId}`)
     : query.eq('organization_id', input.organizationId);
 
