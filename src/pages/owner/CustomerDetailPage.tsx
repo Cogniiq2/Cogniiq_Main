@@ -14,6 +14,7 @@ import {
 } from '@/lib/ownerFinance/customerLabels';
 import { CustomerFormDialog } from '@/components/finance/CustomerFormDialog';
 import { CustomerTaskChecklist } from '@/components/finance/CustomerTaskChecklist';
+import { CustomerProjectPanel } from '@/components/finance/CustomerProjectPanel';
 import type { OwnerCustomerDetail, OwnerCustomerOfferRef, OwnerCustomerStatus } from '@/lib/ownerFinance/types';
 
 // Dedicated customer detail workspace: customer information, related offers, the task checklist and
@@ -124,6 +125,14 @@ export function CustomerDetailPage() {
           <Card className="p-5">
             <CustomerTaskChecklist customerId={c.id} tasks={detail.tasks} onChanged={() => void load()} />
           </Card>
+
+          {/* Customer-VISIBLE project projection. Deliberately separate from the internal
+              task checklist above: nothing edited there ever reaches the portal. */}
+          <CustomerProjectPanel
+            ownerCustomerId={c.id}
+            organizationId={c.organization_id}
+            clientAccountId={c.client_account_id}
+          />
         </div>
 
         {/* Side column: info + status + activity */}

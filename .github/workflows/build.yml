@@ -48,6 +48,15 @@ jobs:
       - name: SEO + consent consistency checks
         run: node .github/scripts/test-seo-consistency.mjs
 
+      - name: Customer dashboard UX foundation tests
+        run: node .github/scripts/test-customer-dashboard-ux.mjs
+
+      - name: Customer document download handler tests
+        run: node .github/scripts/test-customer-document-download-handler.mjs
+
+      - name: Customer document upload handler tests
+        run: node .github/scripts/test-customer-document-upload-handler.mjs
+
       - name: Typecheck
         run: npm run typecheck
 
@@ -113,3 +122,23 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
         run: bash supabase/tests/run_owner_finance_smoke.sh
+
+  customer-platform-sql-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure PostgreSQL server binaries
+        run: |
+          if [ -z "$(ls -d /usr/lib/postgresql/*/bin 2>/dev/null)" ]; then
+            sudo apt-get update
+            sudo apt-get install --yes postgresql
+          fi
+
+      # Boots a throwaway local cluster, applies the real migration chain plus the new
+      # customer-platform migrations, and asserts the customer authorization boundary
+      # (cross-organization denial, suspended members, invisible documents, invoice
+      # isolation, internal-field non-exposure, signed-URL authorization).
+      - name: Customer platform SQL authorization tests
+        run: bash .github/scripts/run-customer-platform-sql-tests.sh

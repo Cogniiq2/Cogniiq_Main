@@ -358,6 +358,9 @@ const AdminSolutionsPage = lazyNamed(() => import('./pages/admin/clients/AdminSo
 const AdminInvitationsPage = lazyNamed(() => import('./pages/admin/clients/AdminInvitationsPage'), 'AdminInvitationsPage');
 const AppHomePage = lazyNamed(() => import('./pages/app/AppHomePage'), 'AppHomePage');
 const CustomerSectionPage = lazyNamed(() => import('./pages/app/CustomerSectionPage'), 'CustomerSectionPage');
+const ProjectDetailPage = lazyNamed(() => import('./pages/app/ProjectDetailPage'), 'ProjectDetailPage');
+const DocumentsPage = lazyNamed(() => import('./pages/app/DocumentsPage'), 'DocumentsPage');
+const BillingPage = lazyNamed(() => import('./pages/app/BillingPage'), 'BillingPage');
 const SolutionPage = lazyNamed(() => import('./pages/app/SolutionPage'), 'SolutionPage');
 const SolutionsIndexPage = lazyNamed(() => import('./pages/app/SolutionsIndexPage'), 'SolutionsIndexPage');
 const SupportPage = lazyNamed(() => import('./pages/app/SupportPage'), 'SupportPage');
@@ -423,7 +426,9 @@ function AppInner() {
         <Route path="/app/test" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="test" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
         <Route path="/app/calls" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="calls" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
         <Route path="/app/leads" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="leads" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
-        <Route path="/app/billing" element={<ProtectedRoute><CustomerSectionPage section="billing" /></ProtectedRoute>} />
+        <Route path="/app/projects/:projectId" element={<ProtectedRoute><ProjectDetailPage /></ProtectedRoute>} />
+        <Route path="/app/documents" element={<ProtectedRoute><DocumentsPage /></ProtectedRoute>} />
+        <Route path="/app/billing" element={<ProtectedRoute><BillingPage /></ProtectedRoute>} />
         <Route path="/app/settings" element={<ProtectedRoute><CustomerSectionPage section="settings" /></ProtectedRoute>} />
         <Route path="/app/*" element={<ProtectedRoute><Navigate to="/app" replace /></ProtectedRoute>} />
 
@@ -554,6 +559,17 @@ function AppInner() {
   );
 }
 
+// The marketing consent banner belongs to the public site. On /app, /admin, /owner
+// and /d it previously rendered unconditionally and could overlap authenticated
+// dashboard content mid-page (found via responsive QA on the customer portal) —
+// those surfaces are gated the same way isPrivateSurface/isDocumentSurface already
+// gate SEO metadata and structured data above.
+function ConsentBannerGate() {
+  const { pathname } = useLocation();
+  if (isPrivateSurface(pathname) || isDocumentSurface(pathname)) return null;
+  return <ConsentBanner />;
+}
+
 function App() {
   useEffect(() => {
     // Google Consent Mode v2 (Basic): sets denied defaults and restores a
@@ -568,7 +584,7 @@ function App() {
         <CanonicalManager />
         <PublicStructuredData />
         <AppInner />
-        <ConsentBanner />
+        <ConsentBannerGate />
       </AuthProvider>
     </Router>
   );

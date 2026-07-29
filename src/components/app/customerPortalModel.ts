@@ -381,30 +381,3 @@ export const launchChecklist: LaunchChecklistItem[] = [
   },
 ];
 
-export const billingAreas: SetupStep[] = [
-  {
-    id: 'plan',
-    title: 'Aktueller Tarif',
-    description: 'Noch kein aktiver Tarif zugewiesen.',
-  },
-  {
-    id: 'setup-fee',
-    title: 'Setup-Fee',
-    description: 'Noch keine echte Abrechnung verbunden.',
-  },
-  {
-    id: 'subscription',
-    title: 'Subscription',
-    description: 'Stripe ist in dieser Phase nicht angeschlossen.',
-  },
-  {
-    id: 'invoices',
-    title: 'Rechnungen',
-    description: 'Keine echten Rechnungen vorhanden.',
-  },
-  {
-    id: 'payment',
-    title: 'Zahlungsmethode',
-    description: 'Keine Zahlungsmethode hinterlegt.',
-  },
-];

@@ -6,6 +6,7 @@ import {
   ChevronDown,
   CreditCard,
   ExternalLink,
+  FileText,
   Headphones,
   LayoutGrid,
   LogOut,
@@ -52,9 +53,10 @@ const universalNav: CustomerNavGroup = {
   label: 'Portal',
   items: [
     { label: 'Übersicht', href: '/app', icon: LayoutGrid },
+    { label: 'Dokumente', href: '/app/documents', icon: FileText },
+    { label: 'Abrechnung', href: '/app/billing', icon: CreditCard },
     { label: 'Meine Lösungen', href: '/app/solutions', icon: Headphones },
     { label: 'Support', href: '/app/support', icon: UserRound },
-    { label: 'Abrechnung', href: '/app/billing', icon: CreditCard },
     { label: 'Einstellungen', href: '/app/settings', icon: Settings },
   ],
 };
@@ -141,7 +143,10 @@ function CustomerAppShellInner({ children }: { children: ReactNode }) {
             <AppStatusBadge label={lifecycle.label} tone={lifecycle.tone} />
           </div>
 
-          <div className="hidden items-center gap-2 md:flex">
+          {/* Desktop cluster and the mobile trigger below share ONE breakpoint (lg). Splitting
+              them (md here, lg on the nav row) previously left 768–1023px with no navigation
+              at all: the hamburger was already hidden while the nav row had not appeared yet. */}
+          <div className="hidden items-center gap-2 lg:flex">
             {hasMultipleOrganizations ? (
               <label className="sr-only" htmlFor="customer-organization-select">
                 Organisation auswählen
@@ -222,7 +227,7 @@ function CustomerAppShellInner({ children }: { children: ReactNode }) {
           <button
             type="button"
             onClick={() => setMobileOpen((open) => !open)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-700 md:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-700 lg:hidden"
             aria-label="Kundenbereich Navigation"
             aria-expanded={mobileOpen}
           >
@@ -252,7 +257,7 @@ function CustomerAppShellInner({ children }: { children: ReactNode }) {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.22, ease: appEase }}
-              className="overflow-hidden border-t border-gray-100 bg-white md:hidden"
+              className="overflow-hidden border-t border-gray-100 bg-white lg:hidden"
             >
               <div className="px-4 py-4">
                 <div className="mb-4 rounded-2xl border border-gray-100 bg-gray-50 p-4">
@@ -261,6 +266,28 @@ function CustomerAppShellInner({ children }: { children: ReactNode }) {
                     {activeOrganization?.name ?? 'Noch nicht provisioniert'}
                   </p>
                   <p className="mt-2 text-[12px] leading-5 text-gray-500">{lifecycle.description}</p>
+                  {hasMultipleOrganizations ? (
+                    <>
+                      <label
+                        className="mt-3 block text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400"
+                        htmlFor="customer-organization-select-mobile"
+                      >
+                        Organisation
+                      </label>
+                      <select
+                        id="customer-organization-select-mobile"
+                        value={activeOrganizationId ?? ''}
+                        onChange={(event) => setActiveOrganizationId(event.target.value || null)}
+                        className="mt-1.5 h-11 w-full rounded-xl border border-gray-200 bg-white px-3 text-sm font-medium text-gray-700 outline-none focus:border-gray-400"
+                      >
+                        {memberships.map((membership) => (
+                          <option key={membership.id} value={membership.organization_id}>
+                            {membership.organization?.name ?? 'Unbenannte Organisation'}
+                          </option>
+                        ))}
+                      </select>
+                    </>
+                  ) : null}
                 </div>
                 <nav className="space-y-5" aria-label="Mobile Kundenbereich Navigation">
                   {navGroups.map((group) => (

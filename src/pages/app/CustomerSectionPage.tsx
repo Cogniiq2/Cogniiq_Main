@@ -6,7 +6,6 @@ import {
   Building2,
   CheckCircle2,
   Circle,
-  CreditCard,
   FileText,
   Headphones,
   Info,
@@ -32,11 +31,13 @@ import {
   AppEmptyState,
   AppErrorState,
   AppField,
+  AppInPreparationBadge,
   AppInlineEditor,
   AppLaunchChecklist,
   AppPageHeader,
   AppPreviewNotice,
   AppProgress,
+  AppReadOnlyNotice,
   AppSaveBar,
   AppSection,
   AppSegmentedControl,
@@ -48,7 +49,6 @@ import {
   appEase,
 } from '@/components/app/CustomerAppPrimitives';
 import {
-  billingAreas,
   defaultLifecycleState,
   knowledgeSections,
   launchChecklist,
@@ -96,7 +96,6 @@ export type CustomerSection =
   | 'test'
   | 'calls'
   | 'leads'
-  | 'billing'
   | 'settings';
 
 const sectionConfig: Record<CustomerSection, {
@@ -147,12 +146,6 @@ const sectionConfig: Record<CustomerSection, {
     description: 'Leere, aber vorbereitete Architektur fuer spaetere echte Leads.',
     icon: UserPlus,
   },
-  billing: {
-    title: 'Abrechnung',
-    eyebrow: 'Konto',
-    description: 'Billing-Struktur ohne Stripe-Verbindung, Preise oder erfundene Tarife.',
-    icon: CreditCard,
-  },
   settings: {
     title: 'Einstellungen',
     eyebrow: 'Profil',
@@ -175,6 +168,9 @@ function CustomerSectionContent({ section }: { section: CustomerSection }) {
   const { snapshot, loadStatus } = useCustomerPortalPersistence();
   const lifecycle = lifecycleDisplays[getLifecycleState(snapshot.onboardingSession?.status, Boolean(snapshot.business))];
   const isPersistedSection = section === 'onboarding' || section === 'receptionist' || section === 'phone';
+  // Sections that intentionally have no backing data yet. They are labelled honestly as
+  // "In Vorbereitung" rather than shown as if they were broken or merely empty.
+  const isInPreparation = inPreparationSections.has(section);
 
   return (
     <>
@@ -183,16 +179,31 @@ function CustomerSectionContent({ section }: { section: CustomerSection }) {
         title={config.title}
         description={config.description}
         meta={
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <AppStatusBadge label={loadStatus === 'loading' ? 'Daten werden geladen' : lifecycle.label} tone={loadStatus === 'error' ? 'danger' : lifecycle.tone} />
-            <AppStatusBadge label={isPersistedSection ? 'Persistenz aktiv' : 'UI-only Phase'} tone={isPersistedSection ? 'success' : 'neutral'} icon={Icon} />
+            {isPersistedSection ? (
+              <AppStatusBadge label="Persistenz aktiv" tone="success" icon={Icon} />
+            ) : isInPreparation ? (
+              <AppInPreparationBadge />
+            ) : null}
           </div>
         }
       />
+      {isInPreparation ? (
+        <div className="mb-8">
+          <AppPreviewNotice>
+            Dieser Bereich ist bewusst noch nicht aktiv. Die Struktur ist bereits vorbereitet, es werden
+            jedoch keine Beispiel- oder Platzhalterdaten angezeigt. Sobald die echte Datenquelle verbunden
+            ist, erscheinen Ihre Inhalte hier automatisch.
+          </AppPreviewNotice>
+        </div>
+      ) : null}
       {renderSection(section)}
     </>
   );
 }
+
+const inPreparationSections = new Set<CustomerSection>(['knowledge', 'test', 'calls', 'leads']);
 
 function getLifecycleState(status: string | null | undefined, hasBusiness: boolean): keyof typeof lifecycleDisplays {
   switch (status) {
@@ -229,8 +240,6 @@ function renderSection(section: CustomerSection) {
       return <OperationalExperience type="calls" />;
     case 'leads':
       return <OperationalExperience type="leads" />;
-    case 'billing':
-      return <BillingExperience />;
     case 'settings':
       return <SettingsExperience />;
   }
@@ -343,6 +352,12 @@ function OnboardingExperience() {
       <div className="space-y-6">
         <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.045)]">
           <div className="p-6 sm:p-8">
+          {!canEdit ? (
+            <AppReadOnlyNotice>
+              Sie sehen diese Angaben schreibgeschützt. Nur Owner und Admins Ihrer Organisation können
+              Onboarding-Daten ändern — deshalb sind die Felder unten deaktiviert.
+            </AppReadOnlyNotice>
+          ) : null}
           <div className="mb-6">
             <AppProgress value={progress} label={`Schritt ${stageIndex + 1} von ${onboardingStages.length}`} />
           </div>
@@ -593,12 +608,24 @@ function ReceptionistExperience() {
           action={<AppButton to="/app/onboarding" variant="secondary">Zum Onboarding</AppButton>}
         />
       ) : null}
+      {!canEdit && snapshot.business ? (
+        <AppReadOnlyNotice>
+          Sie sehen diese Einstellungen schreibgeschützt. Nur Owner und Admins Ihrer Organisation können
+          das Verhalten des Rezeptionisten ändern — deshalb sind die Felder unten deaktiviert.
+        </AppReadOnlyNotice>
+      ) : null}
 
       <AppSection eyebrow="Identitaet" title="Wie der Rezeptionist spaeter auftreten soll">
         <AppCard className="rounded-3xl">
           <div className="grid gap-4 md:grid-cols-2">
             <AppField id="receptionist-name" label="Rezeptionistenname" value={draft.receptionistName} disabled={!canEdit || !snapshot.business} onChange={(event) => updateField('receptionistName', event.target.value)} placeholder="Noch nicht festgelegt" />
-            <AppField id="voice-placeholder" label="Voice placeholder" placeholder="Noch nicht verbunden" disabled />
+            <AppField
+              id="voice-placeholder"
+              label="Stimme"
+              placeholder="Noch nicht verbunden"
+              disabled
+              description="Die Stimmauswahl wird freigeschaltet, sobald Cogniiq Ihren Rezeptionisten mit dem Sprachsystem verbunden hat."
+            />
             <AppSelect
               id="primary-language"
               label="Hauptsprache"
@@ -708,7 +735,11 @@ function KnowledgeExperience() {
         eyebrow="Review"
         title="Geschaeftswissen fuer sichere Antworten"
         description="Jeder Bereich ist fuer Wert, Quelle, Vertrauen, Bestaetigung und manuelle Korrektur vorbereitet. Aktuell gibt es keine recherchierten Datensaetze."
-        action={<AppAddButton>Information hinzufuegen</AppAddButton>}
+        action={
+          <AppAddButton disabledReason="Eigene Einträge sind möglich, sobald die Wissensbasis mit echten Geschäftsdaten verbunden ist. Bis dahin werden hier bewusst keine Beispieldaten angezeigt.">
+            Information hinzufuegen
+          </AppAddButton>
+        }
       >
         <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
           <div className="rounded-3xl border border-gray-100 bg-white p-3 shadow-[0_18px_60px_rgba(15,23,42,0.035)]">
@@ -838,6 +869,12 @@ function PhoneExperience() {
           action={<AppButton to="/app/onboarding" variant="secondary">Zum Onboarding</AppButton>}
         />
       ) : null}
+      {!canEdit && snapshot.business ? (
+        <AppReadOnlyNotice>
+          Sie sehen diese Einstellungen schreibgeschützt. Nur Owner und Admins Ihrer Organisation können
+          die Telefonkonfiguration ändern — deshalb sind die Felder unten deaktiviert.
+        </AppReadOnlyNotice>
+      ) : null}
 
       <AppSection eyebrow="Methode" title="Nummern sauber trennen">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
@@ -946,7 +983,13 @@ function TestExperience() {
             Browser-Call und Telefonnummer bleiben Platzhalter, bis ein echter Rezeptionist provisioniert ist.
           </p>
           <div className="mt-6">
-            <AppButton disabled icon={Phone}>Testanruf starten</AppButton>
+            <AppButton
+              disabled
+              icon={Phone}
+              disabledReason="Testanrufe sind erst möglich, sobald Ihr Rezeptionist provisioniert und eine Telefonnummer verbunden ist. Cogniiq schaltet diesen Schritt für Sie frei."
+            >
+              Testanruf starten
+            </AppButton>
           </div>
         </AppCard>
         <AppCard>
@@ -982,7 +1025,14 @@ function TestExperience() {
               icon={Lock}
               title="Go-live nicht verfuegbar"
               description="Aktivierung wird erst nach Setup, Test, Zahlung und Backend-Provisionierung moeglich."
-              action={<AppButton disabled>Live schalten</AppButton>}
+              action={
+                <AppButton
+                  disabled
+                  disabledReason="Die Freigabe erfolgt durch Cogniiq, sobald Setup, Test, Abrechnung und Provisionierung abgeschlossen sind."
+                >
+                  Live schalten
+                </AppButton>
+              }
             />
           </AppCard>
         </div>
@@ -993,6 +1043,9 @@ function TestExperience() {
     </div>
   );
 }
+
+const searchDisabledReason =
+  'Suche und Filter werden aktiv, sobald echte Daten aus dem Telefoniesystem eintreffen. Es werden keine Beispieldaten angezeigt.';
 
 function OperationalExperience({ type }: { type: 'calls' | 'leads' }) {
   const isCalls = type === 'calls';
@@ -1021,10 +1074,17 @@ function OperationalExperience({ type }: { type: 'calls' | 'leads' }) {
               <input
                 disabled
                 placeholder="Suche folgt"
+                title={searchDisabledReason}
+                aria-describedby="operational-search-hint"
                 className="h-11 rounded-xl border border-gray-200 bg-gray-50 pl-9 pr-3 text-sm text-gray-400 outline-none"
               />
+              <span id="operational-search-hint" className="mt-1.5 block max-w-xs text-[11.5px] leading-[1.45] text-gray-400">
+                {searchDisabledReason}
+              </span>
             </label>
-            <AppButton variant="secondary" disabled icon={SlidersHorizontal}>Filter</AppButton>
+            <AppButton variant="secondary" disabled icon={SlidersHorizontal} disabledReason={searchDisabledReason}>
+              Filter
+            </AppButton>
           </div>
         </div>
       </AppCard>
@@ -1047,26 +1107,6 @@ function OperationalExperience({ type }: { type: 'calls' | 'leads' }) {
             ))}
           </div>
         </AppCard>
-      </div>
-    </div>
-  );
-}
-
-function BillingExperience() {
-  return (
-    <div className="space-y-8">
-      <AppEmptyState
-        icon={CreditCard}
-        title="Noch kein aktiver Tarif zugewiesen"
-        description="Stripe, Zahlungsdaten, Preise und Rechnungen sind in dieser Phase nicht verbunden. Es werden keine Paketpreise hart codiert."
-      />
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {billingAreas.map((area) => (
-          <AppCard key={area.id} className="shadow-none">
-            <p className="text-sm font-semibold text-gray-950">{area.title}</p>
-            <p className="mt-2 text-[13px] leading-relaxed text-gray-500">{area.description}</p>
-          </AppCard>
-        ))}
       </div>
     </div>
   );
