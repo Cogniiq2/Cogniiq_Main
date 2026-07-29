@@ -145,3 +145,15 @@ jobs:
       # isolation, internal-field non-exposure, signed-URL authorization).
       - name: Customer platform SQL authorization tests
         run: bash .github/scripts/run-customer-platform-sql-tests.sh
+
+      # Proves the staging preflight actually catches drift: it must pass against
+      # a correctly migrated database AND fail, with the right check, against each
+      # of thirteen deliberately broken states.
+      - name: Staging preflight self-test
+        run: bash .github/scripts/run-staging-preflight-selftest.sh
+
+      # Proves every seeder interlock refuses (including the CI interlock, which is
+      # exercised here precisely because this IS CI) and that the fixtures produce
+      # the tenancy they promise and are removed completely.
+      - name: Staging seed guard + fixture self-test
+        run: bash .github/scripts/run-staging-seed-selftest.sh
