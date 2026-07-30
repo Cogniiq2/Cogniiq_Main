@@ -159,6 +159,24 @@ serve(async (req: Request): Promise<Response> => {
   const catalogKey = asString(body.catalogKey);
   const invitationEmail = asString(body.invitationEmail)?.toLowerCase() ?? null;
 
+  // Identity decision. Absent on a first submission; supplied only after the owner has
+  // been shown the candidate organizations and has explicitly chosen. The server never
+  // defaults this to a value — an absent decision means "refuse an ambiguous match",
+  // which is the whole point of the duplicate-organization fix.
+  const identityDecision = asString(body.identityDecision);
+  const targetOrganizationId = asString(body.targetOrganizationId);
+  if (identityDecision !== null && identityDecision !== "reuse" && identityDecision !== "create_separate") {
+    return json({ error: "identityDecision must be reuse or create_separate" }, 400);
+  }
+  if (identityDecision === "reuse" && (!targetOrganizationId || !UUID_RE.test(targetOrganizationId))) {
+    return json({ error: "reuse requires a valid targetOrganizationId" }, 400);
+  }
+  // A target is meaningless without a reuse decision; accepting it silently would
+  // suggest it had an effect.
+  if (identityDecision !== "reuse" && targetOrganizationId) {
+    return json({ error: "targetOrganizationId is only valid with identityDecision=reuse" }, 400);
+  }
+
   // Idempotency is mandatory and must be a UUID (matches the RPC's uuid parameter).
   if (!idempotencyKey || !UUID_RE.test(idempotencyKey)) {
     return json({ error: "a valid UUID idempotencyKey is required" }, 400);
@@ -173,9 +191,17 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   // Atomic DB provisioning under the caller's identity (RPC re-checks is_platform_admin()).
+  //
+  // provision_client_workspace_with_identity resolves the CUSTOMER's identity before
+  // creating anything: a strong match converges on the existing organization, a
+  // name-only match raises organization_identity_conflict and requires the owner to
+  // choose. Repeating a request with a fresh idempotency key can therefore no longer
+  // create a second organization for a customer that already exists.
   const { data: provisionResult, error: provisionError } = await callerClient.rpc(
-    "provision_client_workspace",
+    "provision_client_workspace_with_identity",
     {
+      p_identity_decision: identityDecision,
+      p_target_organization_id: identityDecision === "reuse" ? targetOrganizationId : null,
       p_idempotency_key: idempotencyKey,
       p_display_name: displayName,
       p_legal_name: asString(body.legalName),
@@ -206,22 +232,57 @@ serve(async (req: Request): Promise<Response> => {
   );
 
   if (provisionError || !provisionResult) {
+    // An identity conflict is not a failure — it is a decision the owner has to make.
+    // It is returned as 409 with the candidate list so the wizard can present the two
+    // options, rather than as an opaque 400 the owner can do nothing about.
+    if (provisionError?.message === "organization_identity_conflict") {
+      return json(
+        {
+          error: "organization_identity_conflict",
+          candidates: parseCandidates(provisionError.details),
+          hint: provisionError.hint ?? null,
+        },
+        409,
+      );
+    }
     return json({ error: provisionError?.message ?? "Provisioning failed" }, 400);
   }
 
+  const workspace = provisionResult as JsonRecord;
+
   // Send the invitation only if requested. Existing users are preserved, not recreated.
+  //
+  // When the database skipped creating an invitation because this address is ALREADY an
+  // active member, no email is sent either: mailing a "you have been invited" link to
+  // someone who already has access is how the second Pankofer invitation came to be
+  // accepted into the wrong organization.
   let invite: JsonRecord | null = null;
-  if (body.sendInvitation !== false) {
+  if (workspace.invitation_outcome === "skipped_existing_member") {
+    invite = { status: "skipped_existing_member", email: invitationEmail };
+  } else if (body.sendInvitation !== false) {
     invite = await sendInvite(adminClient, invitationEmail);
   }
 
   return json({
     ok: true,
     action: "provision",
-    workspace: provisionResult as JsonRecord,
+    workspace,
     invitation: invite ?? { skipped: true },
   });
 });
+
+// The candidate list travels in PostgREST's `details` field as a JSON string. It is
+// parsed here rather than forwarded raw so a malformed value degrades to an empty list
+// instead of reaching the browser as something it cannot render.
+function parseCandidates(details: unknown): JsonRecord[] {
+  if (typeof details !== "string" || details.trim() === "") return [];
+  try {
+    const parsed = JSON.parse(details);
+    return Array.isArray(parsed) ? (parsed as JsonRecord[]) : [];
+  } catch {
+    return [];
+  }
+}
 
 // Issue an Auth invite. Handles the case where the user already exists without deleting or
 // recreating them: the pending database invitation remains, so they gain access on next login.

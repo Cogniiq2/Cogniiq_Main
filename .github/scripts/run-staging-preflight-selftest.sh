@@ -66,7 +66,10 @@ NEW=(20260728120000_customer_project_core
      20260728121000_customer_documents
      20260728122000_customer_billing_link
      20260728123000_owner_invoice_organization_assignment
-     20260728124000_customer_document_archive_service_role)
+     20260728124000_customer_document_archive_service_role
+     20260730120000_customer_project_organization_scope
+     20260731120000_customer_document_publish_guard
+     20260731121000_client_provisioning_identity)
 
 FAILURES=0
 note_ok()   { echo "ok: $1"; }

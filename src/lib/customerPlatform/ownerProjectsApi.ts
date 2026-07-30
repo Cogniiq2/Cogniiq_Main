@@ -263,10 +263,76 @@ export async function deleteCustomerMilestone(milestoneId: string): Promise<{ er
 }
 
 /**
+ * The customer-portal category a canonical owner PDF may be published under, or null
+ * when the document is not publishable at all.
+ *
+ * Mirrors public.customer_document_category_matches_owner_source() and the
+ * customer_documents_source_consistency_guard trigger. The database is the
+ * enforcement point; this exists so the UI can PRESELECT the right category and never
+ * offer an impossible one — a signed acceptance certificate is stored as
+ * document_type='offer' with render_metadata.signed = true, so the two are told apart
+ * by that flag alone, exactly as the database does it.
+ */
+export function customerCategoryForOwnerDocument(doc: {
+  document_type: string;
+  render_metadata?: Record<string, unknown> | null;
+}): CustomerDocumentCategory | null {
+  const signed = doc.render_metadata?.signed;
+  const isSigned = signed === true || signed === 'true';
+  if (doc.document_type === 'offer') return isSigned ? 'acceptance' : 'offer';
+  if (['invoice', 'credit_note', 'payment_confirmation', 'cancellation_invoice'].includes(doc.document_type)) {
+    return 'invoice';
+  }
+  return null;
+}
+
+export const customerDocumentCategoryLabels: Record<string, string> = {
+  invoice: 'Rechnung',
+  offer: 'Angebot',
+  acceptance: 'Annahmebestätigung',
+};
+
+/**
+ * German, owner-facing translation of the publish RPC's stable machine codes
+ * (migration 20260731120000). The raw message IS the code; it is never shown.
+ */
+function describePublishErrorCode(code: string): string | null {
+  switch (code) {
+    case 'organization_required': return 'Diesem Beleg ist keine Organisation zugeordnet.';
+    case 'source_document_required': return 'Es wurde kein erzeugtes PDF ausgewählt.';
+    case 'title_required': return 'Bitte geben Sie einen Titel ein.';
+    case 'source_document_not_found': return 'Das erzeugte PDF wurde nicht gefunden. Bitte laden Sie die Seite neu.';
+    case 'source_document_not_finalized':
+      return 'Nur finalisierte PDFs können für das Kundenportal registriert werden. Bitte zuerst „PDF speichern“.';
+    case 'source_document_has_no_pdf':
+      return 'Für dieses Dokument ist keine PDF-Datei gespeichert. Bitte erneut „PDF speichern“.';
+    case 'source_organization_unassigned':
+      return 'Der Beleg ist noch keiner Organisation zugeordnet. Bitte zuerst die Organisation zuweisen.';
+    case 'source_organization_mismatch':
+      return 'Der Beleg gehört zu einem anderen Kunden und kann hier nicht veröffentlicht werden.';
+    case 'category_source_mismatch':
+      return 'Die Kategorie passt nicht zum Dokumenttyp. Rechnungsbelege gehören zu „Rechnung“, finalisierte Angebote zu „Angebot“, und „Annahmebestätigung“ ist signierten Annahmebestätigungen vorbehalten.';
+    case 'acceptance_offer_not_accepted':
+      return 'Das zugehörige Angebot ist nicht als angenommen erfasst. Eine Annahmebestätigung kann erst danach veröffentlicht werden.';
+    case 'project_not_available':
+      return 'Das ausgewählte Projekt gehört nicht zu diesem Kunden oder ist archiviert.';
+    case 'not authorized': return 'Für diese Aktion fehlt Ihrem Konto die Berechtigung.';
+    default: return null;
+  }
+}
+
+/**
  * Publish a canonical owner PDF (offer / signed acceptance certificate / invoice) to
- * a customer. The database validates that the source document belongs to the same
- * organization, is finalized, and that the category matches the document type — an
- * ordinary offer can never be published as an acceptance.
+ * a customer as a POINTER. The bytes are never copied or re-uploaded: the row
+ * references the one canonical object in the owner-only bucket.
+ *
+ * The database validates that the source belongs to the same organization, is
+ * finalized, actually has a stored PDF, and that the category matches the document
+ * type — an ordinary offer can never be published as an acceptance.
+ *
+ * IDEMPOTENT: calling this for an already-registered document returns the existing
+ * pointer id and creates nothing, so a double-click cannot produce two customer
+ * documents. It never changes visibility — releasing is a separate, deliberate act.
  */
 export async function publishOwnerDocumentToCustomer(input: {
   organizationId: string;
@@ -282,7 +348,10 @@ export async function publishOwnerDocumentToCustomer(input: {
     p_title: input.title,
     p_owner_generated_document_id: input.ownerGeneratedDocumentId,
   });
-  if (error) return { data: null, error: toMessage(error) };
+  if (error) {
+    const raw = toMessage(error);
+    return { data: null, error: describePublishErrorCode(raw) ?? raw };
+  }
   return { data: data as string, error: null };
 }
 

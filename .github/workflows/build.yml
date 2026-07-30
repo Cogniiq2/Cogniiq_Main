@@ -66,6 +66,9 @@ jobs:
       - name: Owner customer-portal integration tests (upload UI + Kundenportal tab)
         run: node .github/scripts/test-owner-customer-portal-integration.mjs
 
+      - name: Commercial publishing UI + duplicate-prevention integration tests
+        run: node .github/scripts/test-commercial-publishing-ui.mjs
+
       - name: Typecheck
         run: npm run typecheck
 
@@ -151,6 +154,12 @@ jobs:
       # isolation, internal-field non-exposure, signed-URL authorization).
       - name: Customer platform SQL authorization tests
         run: bash .github/scripts/run-customer-platform-sql-tests.sh
+
+      # Proves the duplicate-organization defect was real (it is reproduced against the
+      # PRE-FIX schema first), that the identity fix stops it, and that two genuinely
+      # concurrent provisioning sessions converge on ONE organization.
+      - name: Provisioning identity + concurrency SQL tests
+        run: bash .github/scripts/run-provisioning-identity-sql-tests.sh
 
       # Proves the staging preflight actually catches drift: it must pass against
       # a correctly migrated database AND fail, with the right check, against each

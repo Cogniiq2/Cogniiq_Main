@@ -170,6 +170,42 @@ checks(section, ord, label, passed) as (
                  and fn.args = 'p_caller_id uuid, p_document_id uuid')
 
   union all
+  select '3 migration', 105,
+         '20260730120000_customer_project_organization_scope is applied (create_customer_project_for_organization)',
+         exists (select 1 from fn where fn.name = 'create_customer_project_for_organization'
+                 and fn.args = 'p_organization_id uuid, p_title text, p_business_objective text, p_phase text')
+
+  union all
+  select '3 migration', 106,
+         '20260731120000_customer_document_publish_guard is applied (pointer uniqueness + category helper)',
+         exists (select 1 from pg_class c join pg_index i on i.indexrelid = c.oid
+                 where c.relname = 'customer_documents_owner_source_live_unique' and i.indisunique)
+         and exists (select 1 from fn where fn.name = 'customer_document_category_matches_owner_source')
+
+  union all
+  select '3 migration', 107,
+         '20260731121000_client_provisioning_identity is applied (identity helpers + candidate discovery)',
+         exists (select 1 from fn where fn.name = 'normalize_client_identity_name' and fn.args = 'p_name text')
+         and exists (select 1 from fn where fn.name = 'client_identity_email_domain' and fn.args = 'p_email text')
+         and exists (select 1 from fn where fn.name = 'client_identity_website_host' and fn.args = 'p_website text')
+         and exists (select 1 from fn where fn.name = 'find_client_organization_candidates')
+         and exists (select 1 from fn where fn.name = 'provision_client_workspace_with_identity')
+
+  union all
+  -- The identity fix must NOT make the normalized name unique: once an owner has
+  -- deliberately chosen to keep two same-named companies separate, uniqueness here
+  -- would make that decision un-representable and break provisioning outright.
+  select '3 migration', 108,
+         'normalized company name is indexed for lookup but NOT unique (a deliberate split stays possible)',
+         exists (select 1 from pg_class c where c.relname = 'client_accounts_identity_name_idx')
+         and not exists (
+           select 1 from pg_class c join pg_index i on i.indexrelid = c.oid
+           where c.relname in ('client_accounts_identity_name_idx',
+                               'client_accounts_identity_legal_name_idx',
+                               'organizations_identity_name_idx')
+             and i.indisunique)
+
+  union all
   select '3 migration', 110,
          'composite tenant-integrity FKs are present (milestones, documents, supersedes chain, invoice link)',
          (select count(*) from pg_constraint

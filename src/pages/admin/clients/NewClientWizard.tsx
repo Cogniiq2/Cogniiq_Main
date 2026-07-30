@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
 
 import { AdminCard, AdminField, AdminSelect } from '@/pages/admin/clients/adminUi';
 import {
+  identityMatchLabels,
   provisionClientViaEdge,
+  type OrganizationIdentityCandidate,
   type ProvisionClientPayload,
   type ProvisionClientResult,
 } from '@/lib/clientPlatform/adminApi';
@@ -82,6 +84,9 @@ export function NewClientWizard() {
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<ProvisionClientResult | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  // Non-null once the server has stopped provisioning because an existing organization
+  // might already be this customer. Holds the candidates the owner has to decide between.
+  const [conflict, setConflict] = useState<OrganizationIdentityCandidate[] | null>(null);
   const [idempotencyKey] = useState(newIdempotencyKey);
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
@@ -113,7 +118,10 @@ export function NewClientWizard() {
     if (validateStep(step)) setStep((s) => Math.min(steps.length - 1, s + 1));
   }
 
-  async function handleSubmit() {
+  async function handleSubmit(decision?: {
+    identityDecision: 'reuse' | 'create_separate';
+    targetOrganizationId?: string;
+  }) {
     if (!validateStep(3)) return;
     // Validate all money fields once more for the payload.
     const total = parseAmountToCents(form.totalBudget);
@@ -152,33 +160,59 @@ export function NewClientWizard() {
       invitationEmail: form.email.trim().toLowerCase(),
       organizationRole: 'owner',
       sendInvitation: form.sendInvitation,
+      identityDecision: decision?.identityDecision ?? null,
+      targetOrganizationId: decision?.targetOrganizationId ?? null,
     };
 
     setSubmitting(true);
     setSubmitError(null);
     const res = await provisionClientViaEdge(payload);
     setSubmitting(false);
+
     if (!res.ok) {
+      // An identity conflict is a decision, not a failure: show the matching
+      // organizations and let the owner choose. Deliberately NOT an error banner with
+      // a retry button — retrying the identical request would only stop again.
+      if (res.error === 'organization_identity_conflict') {
+        setConflict(res.identityConflict ?? []);
+        setSubmitError(null);
+        return;
+      }
+      setConflict(null);
       setSubmitError(res.error ?? 'Provisionierung fehlgeschlagen.');
       return;
     }
+    setConflict(null);
     setResult(res);
   }
 
   if (result?.ok) {
     const workspace = (result.workspace ?? {}) as Record<string, string>;
     const invitation = (result.invitation ?? {}) as Record<string, string>;
+    // The server reports whether it converged on an existing organization. Saying
+    // "erstellt" when nothing was created would be a plain untruth.
+    const reused = String(workspace.reused_existing_organization) === 'true';
     return (
       <div className="mx-auto max-w-2xl">
         <AdminCard>
           <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700">
             <CheckCircle2 size={20} aria-hidden="true" />
           </div>
-          <h1 className="text-xl font-semibold text-gray-950">Client-Workspace erstellt</h1>
+          <h1 className="text-xl font-semibold text-gray-950">
+            {reused ? 'Bestehender Kunde erweitert' : 'Client-Workspace erstellt'}
+          </h1>
+          {reused ? (
+            <p className="mt-2 text-[13px] leading-relaxed text-gray-600">
+              Es wurde keine zweite Organisation angelegt. Die bestehende Organisation wurde
+              weiterverwendet{workspace.identity_match === 'strong'
+                ? ' (eindeutige Übereinstimmung von Firmenname und Kontaktmerkmal)'
+                : ' (von Ihnen ausdrücklich gewählt)'}.
+            </p>
+          ) : null}
           <ul className="mt-5 space-y-2 text-sm text-gray-700">
-            <ResultRow label="Organisation" ok value="angelegt" />
-            <ResultRow label="CRM-Konto" ok value="angelegt" />
-            <ResultRow label="Engagement" ok value="angelegt" />
+            <ResultRow label="Organisation" ok value={reused ? 'weiterverwendet' : 'angelegt'} />
+            <ResultRow label="CRM-Konto" ok value={reused ? 'weiterverwendet' : 'angelegt'} />
+            <ResultRow label="Engagement" ok value={reused ? 'weiterverwendet oder ergänzt' : 'angelegt'} />
             <ResultRow label="Lösung zugewiesen" ok value={(workspace.instance_key as string) ?? 'zugewiesen'} />
             <ResultRow
               label="Einladung"
@@ -271,6 +305,17 @@ export function NewClientWizard() {
         ) : null}
 
         {submitError ? <p className="mt-4 text-sm text-red-600">{submitError}</p> : null}
+
+        {conflict ? (
+          <IdentityConflictPanel
+            candidates={conflict}
+            busy={submitting}
+            onReuse={(organizationId) =>
+              void handleSubmit({ identityDecision: 'reuse', targetOrganizationId: organizationId })}
+            onCreateSeparate={() => void handleSubmit({ identityDecision: 'create_separate' })}
+            onCancel={() => setConflict(null)}
+          />
+        ) : null}
       </AdminCard>
 
       <div className="flex items-center justify-between">
@@ -287,10 +332,115 @@ export function NewClientWizard() {
             Weiter <ArrowRight size={16} aria-hidden="true" />
           </button>
         ) : (
-          <button type="button" onClick={() => void handleSubmit()} disabled={submitting} className="inline-flex h-11 items-center gap-2 rounded-xl bg-gray-950 px-4 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-60">
+          <button
+            type="button"
+            onClick={() => void handleSubmit()}
+            /* Disabled while a decision is pending: pressing it again would send the
+               identical request and stop at the same place. The decision buttons in the
+               panel above are the only way forward. */
+            disabled={submitting || conflict !== null}
+            className="inline-flex h-11 items-center gap-2 rounded-xl bg-gray-950 px-4 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-60"
+          >
             {submitting ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Erstelle…</> : 'Kunde anlegen'}
           </button>
         )}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The explicit owner decision for a name-only organization match.
+ *
+ * Both options are presented as equally legitimate and neither is preselected: reusing
+ * the wrong organization mixes two customers' commercial records together, and creating
+ * a separate one when it IS the same customer is exactly how the two Pankofer
+ * organizations came about. Only the owner knows which is true, so the UI asks rather
+ * than recommending.
+ */
+function IdentityConflictPanel({
+  candidates, busy, onReuse, onCreateSeparate, onCancel,
+}: {
+  candidates: OrganizationIdentityCandidate[];
+  busy: boolean;
+  onReuse: (organizationId: string) => void;
+  onCreateSeparate: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div role="alert" className="mt-5 rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
+      <div className="flex items-start gap-3">
+        <AlertTriangle size={18} className="mt-0.5 shrink-0 text-amber-700" aria-hidden="true" />
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-amber-900">
+            {candidates.length === 1
+              ? 'Es existiert bereits eine Organisation mit diesem Namen'
+              : 'Es existieren bereits mehrere passende Organisationen'}
+          </p>
+          <p className="mt-1 text-[13px] leading-relaxed text-amber-800">
+            Es wurde noch nichts angelegt. Bitte entscheiden Sie ausdrücklich, ob es sich um
+            denselben Kunden handelt — ein Firmenname allein ist dafür kein Beweis.
+          </p>
+        </div>
+      </div>
+
+      <ul className="mt-4 space-y-2">
+        {candidates.map((c) => (
+          <li key={c.organization_id} className="rounded-xl border border-amber-200 bg-white p-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-gray-900">{c.organization_name}</p>
+                <p className="mt-0.5 text-[12px] text-gray-500">
+                  Status: {c.organization_status}
+                  {c.created_at ? ` · angelegt ${new Date(c.created_at).toLocaleDateString('de-DE')}` : ''}
+                </p>
+                <p className="mt-1 text-[12px] text-gray-500">
+                  Übereinstimmung: {c.matched_on.map((m) => identityMatchLabels[m] ?? m).join(', ')}
+                </p>
+              </div>
+              <div className="flex shrink-0 flex-wrap gap-2">
+                <Link
+                  to={`/admin/clients/${c.organization_id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex h-10 items-center rounded-xl border border-gray-200 bg-white px-3 text-[13px] font-semibold text-gray-700 hover:border-gray-300"
+                >
+                  Ansehen
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => onReuse(c.organization_id)}
+                  disabled={busy}
+                  /* Same visual weight as "separate anlegen" below: presenting one as
+                     the primary action would be a recommendation this code cannot
+                     justify — only the owner knows whether it is the same company. */
+                  className="inline-flex h-10 items-center rounded-xl border border-amber-300 bg-white px-3 text-[13px] font-semibold text-amber-800 hover:bg-amber-100 disabled:opacity-60"
+                >
+                  Diese weiterverwenden
+                </button>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-4 flex flex-wrap gap-2 border-t border-amber-200 pt-3">
+        <button
+          type="button"
+          onClick={onCreateSeparate}
+          disabled={busy}
+          className="inline-flex h-10 items-center rounded-xl border border-amber-300 bg-white px-3 text-[13px] font-semibold text-amber-800 hover:bg-amber-100 disabled:opacity-60"
+        >
+          {busy ? 'Wird verarbeitet…' : 'Bewusst separate Organisation anlegen'}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={busy}
+          className="inline-flex h-10 items-center rounded-xl px-3 text-[13px] font-semibold text-gray-600 hover:text-gray-950 disabled:opacity-60"
+        >
+          Abbrechen und Angaben prüfen
+        </button>
       </div>
     </div>
   );
@@ -310,6 +460,7 @@ function describeInvite(invitation: Record<string, string>): string {
     case 'sent': return 'gesendet';
     case 'existing_user': return 'bestehender Nutzer – Zugang beim nächsten Login';
     case 'email_error': return 'E-Mail-Fehler (Einladung bleibt offen)';
+    case 'skipped_existing_member': return 'nicht gesendet – bereits Mitglied dieser Organisation';
     case undefined: return 'ausstehend';
     default: return invitation.skipped ? 'nicht gesendet' : 'ausstehend';
   }

@@ -11,6 +11,7 @@ import { offerStatusTone } from '@/pages/owner/OffersPage';
 import { PremiumOfferPreview } from '@/pages/owner/PremiumOfferPreview';
 import { PremiumPdfPreviewDialog } from '@/components/finance/PremiumPdfPreviewDialog';
 import { SendOfferDialog } from '@/components/finance/SendOfferDialog';
+import { CustomerPortalPublishCard } from '@/components/finance/CustomerPortalPublishCard';
 import {
   loadOffer, finalizeOffer, createOfferRevision, setOfferStatus, convertOfferToInvoiceDraft,
   createOfferAccessToken, loadOfferAcceptanceEvents, loadGeneratedDocuments, signedDocumentUrl,
@@ -468,6 +469,17 @@ export function OfferDetailPage() {
             ) : null}
             <p className="mt-4 text-[12px] leading-relaxed text-gray-400">Angenommene Angebote werden zu einem Rechnungsentwurf. Rechnungen werden nie automatisch gestellt.</p>
           </Card>
+
+          <CustomerPortalPublishCard
+            organizationId={offer.organization_id}
+            sourceType="owner_offers"
+            sourceLabel={offer.offer_number ?? ''}
+            documentTitle="Angebot"
+            generatedDocuments={docs}
+            /* A finalized offer can produce a PDF via "PDF speichern"; a draft cannot be
+               published at all, so it is not offered that instruction. */
+            hasUnsavedFinalizable={!isDraft}
+          />
 
           {docs.length > 0 ? (
             <Card className="p-6">
