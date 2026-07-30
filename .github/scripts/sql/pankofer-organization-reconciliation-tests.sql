@@ -1,8 +1,9 @@
 -- =============================================================================
 -- Pankofer duplicate-organization reconciliation — regression test
 -- =============================================================================
--- Reproduces the EXACT production duplicate topology (same hard-coded uuids the
--- migration asserts on), executes the REAL migration file against it, and then
+-- Covers the migration's four database states (see the PORTABILITY block below),
+-- then reproduces the EXACT production duplicate topology (same hard-coded uuids
+-- the migration asserts on), executes the REAL migration file against it, and
 -- proves the outcome: every commercial document and every portal row survives,
 -- the duplicate org is gone, and nothing is duplicated.
 --
@@ -12,6 +13,121 @@
 -- =============================================================================
 
 \set ON_ERROR_STOP on
+
+-- ===========================================================================
+-- PORTABILITY: the migration must classify all FOUR possible database states.
+-- ===========================================================================
+--   canonical  duplicate  expected
+--   ---------  ---------  --------------------------------------
+--   absent     absent     succeed as a verified no-op   (state 1)
+--   present    present    perform the reconciliation    (state 2)
+--   present    absent     succeed as a verified no-op   (state 3)
+--   absent     present    ABORT                         (state 4)
+--
+-- States 1, 3 and 4 are checked HERE, before the production fixture exists —
+-- at this point in the suite neither Pankofer organization is present, which is
+-- exactly state 1. State 2 is the full reconciliation further down.
+--
+-- HOW "aborted" IS DISTINGUISHED FROM "silently did nothing": both leave the
+-- same rows behind, so an outcome check alone cannot tell them apart. Each
+-- scenario below therefore opens a transaction and writes a MARKER row before
+-- including the migration. The migration ends with `commit;`, so:
+--   * marker present afterwards  => the migration ran to completion
+--   * marker absent afterwards   => the migration raised, and the whole
+--                                   transaction (marker included) rolled back
+-- ===========================================================================
+
+\set MARKER '''ffffffff-0000-0000-0000-0000000000f4'''
+
+-- ---------------------------------------------------------------------------
+-- STATE 1: neither organization present (fresh clone / CI cluster).
+-- The migration history must replay here, so this must SUCCEED as a no-op.
+-- ---------------------------------------------------------------------------
+do $$
+begin
+  if exists (select 1 from public.organizations
+             where id in ('2b2d106d-1755-4601-b797-1ebe8fb8a88e',
+                          '61ced4ee-ab22-4d4f-8517-d7e5341be19f')) then
+    raise exception 'TEST FIXTURE INVALID: state-1 check requires neither Pankofer organization to exist yet';
+  end if;
+end $$;
+
+begin;
+insert into public.organizations (id, name, status) values (:MARKER, 'ZZ MIGRATION MARKER', 'pending');
+\ir ../../../supabase/migrations/20260730130000_pankofer_organization_reconciliation.sql
+
+do $$
+begin
+  if not exists (select 1 from public.organizations where id = 'ffffffff-0000-0000-0000-0000000000f4') then
+    raise exception 'TEST FAILED (state 1): migration did not run to completion on a database holding neither organization — a clean database cannot replay the migration history';
+  end if;
+  if exists (select 1 from public.organizations
+             where id in ('2b2d106d-1755-4601-b797-1ebe8fb8a88e',
+                          '61ced4ee-ab22-4d4f-8517-d7e5341be19f')) then
+    raise exception 'TEST FAILED (state 1): migration created organization rows on a clean database';
+  end if;
+  raise notice 'state 1 (neither present): verified no-op, migration succeeded';
+end $$;
+
+delete from public.organizations where id = 'ffffffff-0000-0000-0000-0000000000f4';
+
+-- ---------------------------------------------------------------------------
+-- STATE 4: duplicate present, canonical absent. There is no survivor to merge
+-- into, so the migration must ABORT rather than guess.
+-- ---------------------------------------------------------------------------
+begin;
+insert into public.organizations (id, name, status)
+values ('61ced4ee-ab22-4d4f-8517-d7e5341be19f', 'Pankofer', 'pending');
+insert into public.organizations (id, name, status) values (:MARKER, 'ZZ MIGRATION MARKER', 'pending');
+
+\set ON_ERROR_STOP off
+\ir ../../../supabase/migrations/20260730130000_pankofer_organization_reconciliation.sql
+\set ON_ERROR_STOP on
+rollback;
+
+do $$
+begin
+  if exists (select 1 from public.organizations where id = 'ffffffff-0000-0000-0000-0000000000f4') then
+    raise exception 'TEST FAILED (state 4): migration ran to completion with the duplicate present and no canonical survivor — it must abort instead';
+  end if;
+  if exists (select 1 from public.organizations where id = '61ced4ee-ab22-4d4f-8517-d7e5341be19f') then
+    raise exception 'TEST FAILED (state 4): the aborted transaction did not roll back';
+  end if;
+  raise notice 'state 4 (duplicate only): migration aborted and rolled back, as required';
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- STATE 3: canonical present, duplicate absent (already reconciled).
+-- Must SUCCEED as a verified no-op without touching the canonical org.
+-- ---------------------------------------------------------------------------
+begin;
+insert into public.organizations (id, name, status)
+values ('2b2d106d-1755-4601-b797-1ebe8fb8a88e', 'Pankofer', 'active');
+insert into public.organizations (id, name, status) values (:MARKER, 'ZZ MIGRATION MARKER', 'pending');
+\ir ../../../supabase/migrations/20260730130000_pankofer_organization_reconciliation.sql
+
+do $$
+begin
+  if not exists (select 1 from public.organizations where id = 'ffffffff-0000-0000-0000-0000000000f4') then
+    raise exception 'TEST FAILED (state 3): migration did not run to completion on an already-reconciled database';
+  end if;
+  if not exists (select 1 from public.organizations
+                 where id = '2b2d106d-1755-4601-b797-1ebe8fb8a88e' and status = 'active') then
+    raise exception 'TEST FAILED (state 3): migration disturbed the canonical organization';
+  end if;
+  if exists (select 1 from public.organizations where id = '61ced4ee-ab22-4d4f-8517-d7e5341be19f') then
+    raise exception 'TEST FAILED (state 3): migration created the duplicate organization';
+  end if;
+  raise notice 'state 3 (canonical only): verified no-op, migration succeeded';
+end $$;
+
+-- Clear the scaffolding so the production fixture below starts from a clean slate.
+delete from public.organizations
+ where id in ('ffffffff-0000-0000-0000-0000000000f4', '2b2d106d-1755-4601-b797-1ebe8fb8a88e');
+
+-- ---------------------------------------------------------------------------
+-- STATE 2 follows: the real production duplicate topology and reconciliation.
+-- ---------------------------------------------------------------------------
 
 -- ---------------------------------------------------------------------------
 -- FIXTURE: the duplicate topology, exactly as it exists in production.

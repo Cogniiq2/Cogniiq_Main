@@ -90,6 +90,14 @@
 -- zero residual rows before the duplicate org row is dropped. Any deviation raises
 -- and rolls the whole thing back. Re-running after a successful apply is a
 -- verified no-op, not a second mutation.
+--
+-- PORTABILITY: this is a data migration that ships inside a migration history,
+-- so it must also replay on databases that never held either organization
+-- (fresh clones, CI clusters, new environments). Phase 0 classifies the database
+-- into one of four states and only reconciles in the one that needs it; see the
+-- table there. It aborts in exactly one state — duplicate present with no
+-- canonical survivor — because that is the only one where proceeding would mean
+-- guessing which rows are authoritative.
 -- =============================================================================
 
 begin;
@@ -132,19 +140,40 @@ declare
   v_rec       record;
   v_residual  bigint;
   v_total_residual bigint := 0;
+  v_has_canonical  boolean;
+  v_has_source     boolean;
 begin
   -- =========================================================================
-  -- PHASE 0 — identify the database state; refuse to guess.
+  -- PHASE 0 — classify the database state; refuse to guess.
   -- =========================================================================
-  if not exists (select 1 from public.organizations where id = c_canonical) then
+  -- Four possible states, because this data migration ships in a history that
+  -- must also replay on databases that have never seen either organization
+  -- (fresh clones, CI clusters, new environments):
+  --
+  --   canonical  duplicate  meaning                       action
+  --   ---------  ---------  ----------------------------  ----------------------
+  --   absent     absent     clean database, no Pankofer   verified no-op
+  --   present    present    the production defect         reconcile (phases 1-4)
+  --   present    absent     already reconciled            verified no-op
+  --   absent     present    duplicate without a survivor  ABORT
+  --
+  -- The last state is the only one that aborts, and it must: there is no
+  -- canonical org to merge into, so anything this migration could do would be a
+  -- guess about which rows are authoritative.
+  v_has_canonical := exists (select 1 from public.organizations where id = c_canonical);
+  v_has_source    := exists (select 1 from public.organizations where id = c_source);
+
+  if v_has_source and not v_has_canonical then
     raise exception
-      'ABORT: canonical organization % not present. This migration is bound to one specific database; refusing to run.',
-      c_canonical;
+      'ABORT: duplicate organization % is present but canonical organization % is absent. There is no survivor to reconcile into; refusing to guess.',
+      c_source, c_canonical;
   end if;
 
-  if not exists (select 1 from public.organizations where id = c_source) then
-    -- Already reconciled (or a database that never had the duplicate). Verify
-    -- there is genuinely no residue, then no-op instead of mutating anything.
+  if not v_has_source then
+    -- Nothing to reconcile. Still VERIFY rather than assume: no FK anywhere may
+    -- resolve to the duplicate id, whether because it was already reconciled or
+    -- because this database never had it. A stray reference here would mean a
+    -- half-finished merge, which must surface loudly instead of passing silently.
     for v_rec in
       select cl.relname as tbl, att.attname as col
       from pg_constraint con
@@ -159,11 +188,20 @@ begin
         into v_residual using c_source;
       if v_residual <> 0 then
         raise exception
-          'ABORT: duplicate organization % is gone but %.% still holds % row(s) referencing it. Manual review required.',
+          'ABORT: duplicate organization % has no organizations row but %.% still holds % row(s) referencing it. Manual review required.',
           c_source, v_rec.tbl, v_rec.col, v_residual;
       end if;
     end loop;
-    raise notice 'Pankofer reconciliation: duplicate organization % already absent and no residual references found — no-op.', c_source;
+
+    if v_has_canonical then
+      raise notice
+        'Pankofer reconciliation: duplicate organization % already absent and no residual references found — verified no-op.',
+        c_source;
+    else
+      raise notice
+        'Pankofer reconciliation: neither organization % nor % present (database never held the Pankofer duplicate) — verified no-op.',
+        c_canonical, c_source;
+    end if;
     return;
   end if;
 
