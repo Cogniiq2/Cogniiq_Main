@@ -19,8 +19,9 @@ import {
   effectiveInvitationStatus,
   resendOutcomeMessage,
 } from '@/lib/clientPlatform/invitationStatus';
+import { CustomerProjectPanel } from '@/components/finance/CustomerProjectPanel';
 
-const tabs = ['Übersicht', 'Kontakte', 'Lösungen', 'Vertrag & Budget', 'Zugang', 'Aktivität'] as const;
+const tabs = ['Übersicht', 'Kontakte', 'Lösungen', 'Vertrag & Budget', 'Zugang', 'Kundenportal', 'Aktivität'] as const;
 type Tab = (typeof tabs)[number];
 
 export function ClientDetailPage() {
@@ -89,6 +90,7 @@ export function ClientDetailPage() {
       {tab === 'Lösungen' ? <SolutionsTab detail={detail} onChanged={() => void reload()} flash={flash} /> : null}
       {tab === 'Vertrag & Budget' ? <BudgetTab detail={detail} /> : null}
       {tab === 'Zugang' ? <AccessTab detail={detail} onChanged={() => void reload()} flash={flash} /> : null}
+      {tab === 'Kundenportal' ? <PortalTab detail={detail} /> : null}
       {tab === 'Aktivität' ? <ActivityTab /> : null}
     </div>
   );
@@ -272,6 +274,19 @@ function AccessTab({ detail, onChanged, flash }: { detail: AdminClientDetail; on
         );
       })}
     </div>
+  );
+}
+
+// Canonical customer-portal project management, scoped directly by organizationId —
+// this is the actual integration point: the CRM-side owner_customers row that the
+// Owner Finance panel usage relies on does not exist for most real portal customers
+// (e.g. Pankofer) and is never required, created, backfilled or merged here.
+function PortalTab({ detail }: { detail: AdminClientDetail }) {
+  return (
+    <CustomerProjectPanel
+      organizationId={detail.organizationId}
+      clientAccountId={detail.account?.id ?? null}
+    />
   );
 }
 

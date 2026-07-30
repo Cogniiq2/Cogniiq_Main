@@ -63,6 +63,9 @@ jobs:
       - name: Customer document upload handler tests
         run: node .github/scripts/test-customer-document-upload-handler.mjs
 
+      - name: Owner customer-portal integration tests (upload UI + Kundenportal tab)
+        run: node .github/scripts/test-owner-customer-portal-integration.mjs
+
       - name: Typecheck
         run: npm run typecheck
 
