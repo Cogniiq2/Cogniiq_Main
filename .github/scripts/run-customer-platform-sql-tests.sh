@@ -70,7 +70,13 @@ for f in 20260728120000_customer_project_core \
 done
 [ ${#NEW_MIGRATIONS[@]} -gt 0 ] || { echo "no customer-platform migrations found"; exit 1; }
 
-for t in customer-projects-tests customer-documents-tests customer-billing-tests customer-invoice-organization-tests customer-project-organization-scope-tests; do
+# pankofer-organization-reconciliation-tests runs LAST: it seeds the production
+# duplicate-organization topology and then executes the real forward-only data
+# migration (20260730130000) itself via \ir, so that migration is deliberately
+# absent from the schema chain above — on a database without the duplicate it is
+# designed to abort rather than guess.
+for t in customer-projects-tests customer-documents-tests customer-billing-tests customer-invoice-organization-tests customer-project-organization-scope-tests \
+         pankofer-organization-reconciliation-tests; do
   [ -f "$SQLDIR/$t.sql" ] || continue
   echo "--- $t"
   PSQL -d cust -f "$SQLDIR/$t.sql"
