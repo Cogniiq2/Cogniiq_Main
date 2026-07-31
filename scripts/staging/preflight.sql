@@ -21,6 +21,14 @@
 --   6. Are the customer tables inaccessible directly (RLS on, no customer policy)?
 --   7. Is the bucket private with the intended size and MIME restrictions?
 --   8. Does every new SECURITY DEFINER function pin an empty search_path?
+--   9. Case D (tasks/execution_*/oura_* legacy convergence, migration
+--      20260731122000_case_d_legacy_convergence): do the 17 touched tables exist
+--      with their required columns, RLS enabled, zero anon privileges,
+--      authenticated access gated by is_platform_admin(), and service_role
+--      access intact? Do the recalc trigger/functions exist with pinned
+--      search_path? Does the migration ledger name exactly the five legacy
+--      versions plus the convergence version, with no future-dated or
+--      unrecognized (shadow) version present?
 --
 -- Deliberately NOT checked here (they are not database state): Edge Function
 -- deployment/health and frontend↔backend project agreement. Those live in
@@ -99,6 +107,51 @@ resolved_fn as (
   select e.name, e.args, e.audience, f.oid, f.security_definer, f.config
   from expected_fn e
   left join fn f on f.name = e.name and f.args = e.args
+),
+
+-- Every table migration 20260731122000_case_d_legacy_convergence.sql touches,
+-- with the key columns its precondition checks (or, for freshly-created tables,
+-- its CREATE TABLE) require to exist.
+case_d_table(name, key_columns) as (
+  values
+    ('tasks', array['id','title','status','priority','created_at']),
+    ('execution_days', array['id','user_id','date','weekday','status','total_points','completed_points','score_percent']),
+    ('execution_tasks', array['id','execution_day_id','title','category','points','is_completed']),
+    ('execution_templates', array['id','weekday','plan_type','title','is_active']),
+    ('execution_template_tasks', array['id','template_id','title','category','points']),
+    ('oura_connections', array['id','access_token','refresh_token']),
+    ('oura_daily_sleep', array['id','connection_id','day','score','raw','synced_at']),
+    ('oura_daily_readiness', array['id','connection_id','day','score','raw','synced_at']),
+    ('oura_daily_activity', array['id','connection_id','day','score','steps','raw','synced_at']),
+    ('oura_heart_rate', array['id','connection_id','timestamp','bpm','source','raw','synced_at']),
+    ('oura_sleep_sessions', array['id','connection_id','oura_id','day','raw','synced_at']),
+    ('oura_workouts', array['id','connection_id','oura_id','day','raw','synced_at']),
+    ('oura_sessions', array['id','connection_id','oura_id','day','raw','synced_at']),
+    ('oura_tags', array['id','connection_id','oura_id','day','raw','synced_at']),
+    ('oura_spo2', array['id','connection_id','day','spo2_percentage','raw','synced_at']),
+    ('oura_daily_stress', array['id','connection_id','day','raw','synced_at']),
+    ('oura_daily_resilience', array['id','connection_id','day','raw','synced_at'])
+),
+
+-- Every repository migration version, as of this migration's rename to
+-- 20260731122000. Used to detect a remote-only, generated-shadow, or
+-- future-dated ledger row -- one that names no repository file at all.
+case_d_known_version(version) as (
+  values
+    ('20260607194622'), ('20260607200426'), ('20260706121415'), ('20260706122833'),
+    ('20260709120000'), ('20260710120000'), ('20260710133000'), ('20260711120000'),
+    ('20260721120000'), ('20260722120000'), ('20260723120000'), ('20260723121000'),
+    ('20260723122000'), ('20260723123000'), ('20260723124000'), ('20260723125000'),
+    ('20260723126000'), ('20260723127000'), ('20260723128000'), ('20260724120000'),
+    ('20260728120000'), ('20260728121000'), ('20260728122000'), ('20260728123000'),
+    ('20260728124000'), ('20260730031350'), ('20260730120000'), ('20260730130000'),
+    ('20260731120000'), ('20260731121000'), ('20260731122000')
+),
+
+case_d_legacy_version(version) as (
+  values
+    ('20260607194622'), ('20260607200426'), ('20260706121415'),
+    ('20260706122833'), ('20260709120000')
 ),
 
 checks(section, ord, label, passed) as (
@@ -340,6 +393,125 @@ checks(section, ord, label, passed) as (
          coalesce((select c.relrowsecurity from pg_class c
                    join pg_namespace n on n.oid = c.relnamespace
                    where n.nspname = 'storage' and c.relname = 'objects'), false)
+
+  -- --------------------------- 9) Case D: tasks/execution_*/oura_* convergence
+  union all
+  select '9 case-d', 900, format('required table public.%s exists', t.name),
+         to_regclass('public.' || t.name) is not null
+  from case_d_table t
+
+  union all
+  select '9 case-d', 901, format('public.%s has all required columns', t.name),
+         not exists (
+           select 1 from unnest(t.key_columns) as col
+           where not exists (
+             select 1 from information_schema.columns c
+             where c.table_schema = 'public' and c.table_name = t.name and c.column_name = col
+           )
+         )
+  from case_d_table t
+  where to_regclass('public.' || t.name) is not null
+
+  union all
+  select '9 case-d', 902, format('RLS is enabled on public.%s', t.name),
+         coalesce((select c.relrowsecurity from pg_class c
+                   join pg_namespace n on n.oid = c.relnamespace
+                   where n.nspname = 'public' and c.relname = t.name), false)
+  from case_d_table t
+  where to_regclass('public.' || t.name) is not null
+
+  union all
+  select '9 case-d', 903, format('anon holds NO table privilege on public.%s', t.name),
+         not coalesce((select bool_or(has_table_privilege((select anon from roles), 'public.' || t.name, priv))
+                       from (values ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE')) as p(priv)), true)
+  from case_d_table t
+  where to_regclass('public.' || t.name) is not null
+
+  union all
+  select '9 case-d', 904, format('public.%s has NO policy reachable without is_platform_admin()', t.name),
+         not exists (
+           select 1 from pg_policies p
+           where p.schemaname = 'public' and p.tablename = t.name
+             and coalesce(p.qual, '') not like '%is_platform_admin%'
+         )
+  from case_d_table t
+  where to_regclass('public.' || t.name) is not null
+
+  union all
+  select '9 case-d', 905, format('service_role holds full SELECT/INSERT/UPDATE/DELETE on public.%s', t.name),
+         coalesce((select bool_and(has_table_privilege((select service_role from roles), 'public.' || t.name, priv))
+                   from (values ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE')) as p(priv)), false)
+  from case_d_table t
+  where to_regclass('public.' || t.name) is not null
+
+  union all
+  select '9 case-d', 910, 'public.recalc_execution_day_stats(uuid) exists',
+         exists (select 1 from fn where fn.name = 'recalc_execution_day_stats' and fn.args = 'day_id uuid')
+
+  union all
+  select '9 case-d', 911, 'public.recalc_execution_day_stats(uuid) pins search_path (SECURITY DEFINER)',
+         coalesce((select f.security_definer and f.config like '%search_path=%'
+                   from fn f where f.name = 'recalc_execution_day_stats' and f.args = 'day_id uuid'), false)
+
+  union all
+  select '9 case-d', 912, 'public.trigger_recalc_execution_day() exists',
+         exists (select 1 from fn where fn.name = 'trigger_recalc_execution_day' and fn.args = '')
+
+  union all
+  select '9 case-d', 913, 'public.trigger_recalc_execution_day() pins search_path (SECURITY DEFINER)',
+         coalesce((select f.security_definer and f.config like '%search_path=%'
+                   from fn f where f.name = 'trigger_recalc_execution_day' and f.args = ''), false)
+
+  union all
+  select '9 case-d', 914, 'trigger trg_execution_tasks_recalc is installed on public.execution_tasks',
+         exists (select 1 from pg_trigger where tgname = 'trg_execution_tasks_recalc' and not tgisinternal)
+         and to_regclass('public.execution_tasks') is not null
+
+  union all
+  select '9 case-d', 915, 'neither recalc function is executable by anon',
+         not coalesce((select bool_or(has_function_privilege((select anon from roles), f.oid, 'EXECUTE'))
+                       from fn f where f.name in ('recalc_execution_day_stats', 'trigger_recalc_execution_day')), true)
+
+  -- Ledger checks: the migration ledger this always ships with on a real
+  -- Supabase project (hosted or `supabase start`), never created by this
+  -- read-only script.
+  union all
+  select '9 case-d', 920, 'migration ledger table supabase_migrations.schema_migrations exists',
+         to_regclass('supabase_migrations.schema_migrations') is not null
+
+  union all
+  select '9 case-d', 921, format('ledger names legacy migration %s as applied', v.version),
+         exists (select 1 from supabase_migrations.schema_migrations m where m.version = v.version)
+  from case_d_legacy_version v
+  where to_regclass('supabase_migrations.schema_migrations') is not null
+
+  union all
+  select '9 case-d', 922, 'ledger names the convergence migration 20260731122000 as applied',
+         exists (select 1 from supabase_migrations.schema_migrations m where m.version = '20260731122000')
+  from (select 1) as _dummy
+  where to_regclass('supabase_migrations.schema_migrations') is not null
+
+  -- "Future-dated" is judged against the newest version this repository
+  -- actually knows about, not live wall-clock time: comparing to clock_timestamp()
+  -- would make this check racy across time zones and same-day migrations
+  -- (exactly the class of bug that produced the original 20260801120000 shadow).
+  union all
+  select '9 case-d', 923, 'ledger has no version dated after the newest repository migration',
+         not exists (
+           select 1 from supabase_migrations.schema_migrations m
+           where m.version > (select max(version) from case_d_known_version)
+         )
+  from (select 1) as _dummy
+  where to_regclass('supabase_migrations.schema_migrations') is not null
+
+  union all
+  select '9 case-d', 924, 'ledger has no generated-shadow or otherwise unrecognized version',
+         not exists (
+           select 1 from supabase_migrations.schema_migrations m
+           where m.version not in (select version from case_d_known_version)
+         )
+  from (select 1) as _dummy
+  where to_regclass('supabase_migrations.schema_migrations') is not null
 )
 
 select case when passed then 'PASS' else 'FAIL' end || ': [' || section || '] ' || label

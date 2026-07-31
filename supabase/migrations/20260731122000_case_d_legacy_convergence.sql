@@ -45,11 +45,23 @@
 --     can already SELECT every row of these three tables. (oura_connections and
 --     oura_heart_rate have RLS enabled with zero policies, so those two are
 --     currently deny-all and are not part of this specific exposure.)
+--   * public.execution_templates (7 rows) / public.execution_template_tasks (94
+--     rows): relrowsecurity = FALSE on both (same as execution_days/execution_tasks)
+--     AND anon/authenticated/service_role all hold full INSERT/SELECT/UPDATE/DELETE
+--     grants on both. These two tables have NO migration file anywhere in this
+--     repository (confirmed by grep across supabase/migrations) -- they were
+--     created directly against hosted and are read (never written) by
+--     generate_daily_execution_plan, which this migration still does not touch.
+--     Originally flagged in PR #18 as separate follow-up drift; verified anew
+--     read-only for this migration and folded in here rather than left open,
+--     because they are anonymously exposed today exactly like execution_days/
+--     execution_tasks and there is no reason to ship one fix and not the other.
 --   Neither exposure is justified by any shipped code path: every frontend surface
 --   that reads these tables (TaskDashboardContent, ExecutionPage, OuraAnalyticsPage)
 --   is mounted behind PlatformAdminRoute (authenticated + is_platform_admin()) and
 --   sync-oura writes via the service_role key, which always bypasses RLS regardless
---   of policy contents.
+--   of policy contents. execution_templates/execution_template_tasks are read-only
+--   inputs to generate_daily_execution_plan and have no frontend reader at all.
 --
 -- WHAT THIS MIGRATION DOES NOT DO
 -- --------------------------------
@@ -60,16 +72,17 @@
 --     ground truth because the shipped frontend (ExecutionPage.tsx) and the RPC
 --     generate_daily_execution_plan already read/write that real shape, not the
 --     legacy file's.
---   * Does not touch generate_daily_execution_plan. Reading its live definition
---     (read-only, via pg_get_functiondef) during the audit for this migration
---     surfaced that it depends on public.execution_templates and
---     public.execution_template_tasks -- two tables that exist on hosted but have
---     NO migration file anywhere in this repository (confirmed by grep across
---     supabase/migrations). That is a genuine, separate piece of unmanaged drift,
---     outside the five migrations this convergence reconciles, and is called out
---     in PR #18 as a new finding for follow-up rather than guessed at here.
+--   * Does not touch generate_daily_execution_plan itself (its live definition was
+--     read read-only via pg_get_functiondef; it is SECURITY INVOKER, not DEFINER,
+--     with no explicit search_path -- outside this migration's scope, which is
+--     table-level RLS/grants only). It is not marked SECURITY DEFINER so pinning a
+--     search_path on it is not one of this migration's invariants.
 --   * Does not force-upgrade the 5 existing oura_* tables to the "richer" columns
 --     the legacy oura migration adds -- nothing shipped reads them.
+--   * Does not force-upgrade execution_templates/execution_template_tasks to any
+--     different shape -- their existing hosted columns are preserved exactly;
+--     only RLS/policies/grants change, plus a bookkeeping `create table if not
+--     exists` so a fresh database can reproduce hosted's exact schema.
 --   * Does not widen access anywhere. anon ends this migration with zero grants
 --     and zero policies on every table this migration touches.
 --
@@ -78,8 +91,10 @@
 --   (a) a completely empty database (fresh full migration-chain replay)
 --   (b) hosted's exact current partial state (tasks missing; execution_days/
 --       execution_tasks present with the real shape, RLS disabled, no policies;
---       5 oura tables present bare-shape with RLS enabled and the policies
---       described above; 7 oura tables + tasks missing)
+--       execution_templates/execution_template_tasks present with RLS disabled,
+--       anon/authenticated/service_role full grants; 5 oura tables present
+--       bare-shape with RLS enabled and the policies described above; 7 oura
+--       tables + tasks missing)
 --   (c) a second run of this exact migration against the state it just produced
 --       (idempotent: IF NOT EXISTS / DROP ... IF EXISTS + recreate throughout)
 --
@@ -106,6 +121,7 @@ declare
 begin
   foreach t in array array[
     'execution_days', 'execution_tasks',
+    'execution_templates', 'execution_template_tasks',
     'oura_connections', 'oura_daily_sleep', 'oura_daily_readiness',
     'oura_daily_activity', 'oura_heart_rate'
   ] loop
@@ -364,6 +380,116 @@ revoke all on function public.recalc_execution_day_stats(uuid) from public, anon
 grant execute on function public.recalc_execution_day_stats(uuid) to authenticated, service_role;
 revoke all on function public.trigger_recalc_execution_day() from public, anon;
 grant execute on function public.trigger_recalc_execution_day() to authenticated, service_role;
+
+-- ---------------------------------------------------------------------------
+-- 2b. execution_templates / execution_template_tasks.
+--
+-- Read-only inputs to generate_daily_execution_plan (never written by any shipped
+-- surface). Exist hosted with no migration file anywhere in this repository. Same
+-- exposure pattern as execution_days/execution_tasks (RLS disabled, anon full
+-- CRUD grants) discovered while auditing this migration, so it is fixed here
+-- rather than left as follow-up. `create table if not exists` reproduces hosted's
+-- exact verified schema for a fresh database; on hosted's partial state (tables
+-- already present) the precondition check below fails loudly instead of
+-- silently doing nothing if the columns this depends on are missing.
+-- ---------------------------------------------------------------------------
+do $$
+declare
+  v_missing text;
+begin
+  if to_regclass('public.execution_templates') is null then
+    create table public.execution_templates (
+      id uuid primary key default gen_random_uuid(),
+      weekday integer not null,
+      plan_type text not null,
+      title text not null,
+      is_active boolean not null default true,
+      created_at timestamptz not null default now()
+    );
+  else
+    select string_agg(col, ', ')
+      into v_missing
+    from unnest(array[
+      'weekday','plan_type','title','is_active','created_at'
+    ]) as col
+    where not exists (
+      select 1 from information_schema.columns
+      where table_schema = 'public' and table_name = 'execution_templates' and column_name = col
+    );
+
+    if v_missing is not null then
+      raise exception 'public.execution_templates exists but is missing expected hosted-shape column(s): %. Refusing to converge -- hosted schema has drifted further than this migration accounts for.', v_missing;
+    end if;
+  end if;
+end;
+$$;
+
+do $$
+declare
+  v_missing text;
+begin
+  if to_regclass('public.execution_template_tasks') is null then
+    create table public.execution_template_tasks (
+      id uuid primary key default gen_random_uuid(),
+      template_id uuid not null references public.execution_templates(id) on delete cascade,
+      title text not null,
+      description text,
+      category text not null,
+      priority text not null default 'medium',
+      planned_start time,
+      planned_end time,
+      points integer not null default 1,
+      is_non_negotiable boolean not null default false,
+      sort_order integer not null default 0,
+      created_at timestamptz not null default now()
+    );
+  else
+    select string_agg(col, ', ')
+      into v_missing
+    from unnest(array[
+      'template_id','title','description','category','priority','planned_start',
+      'planned_end','points','is_non_negotiable','sort_order','created_at'
+    ]) as col
+    where not exists (
+      select 1 from information_schema.columns
+      where table_schema = 'public' and table_name = 'execution_template_tasks' and column_name = col
+    );
+
+    if v_missing is not null then
+      raise exception 'public.execution_template_tasks exists but is missing expected hosted-shape column(s): %. Refusing to converge -- hosted schema has drifted further than this migration accounts for.', v_missing;
+    end if;
+  end if;
+end;
+$$;
+
+create index if not exists idx_execution_template_tasks_template on public.execution_template_tasks (template_id);
+
+-- Read-only for authenticated admins (generate_daily_execution_plan runs as the
+-- caller, SECURITY INVOKER, so an authenticated admin calling it needs SELECT
+-- here); write access stays admin-only for parity with every other table this
+-- migration touches, even though nothing shipped currently writes to these two.
+alter table public.execution_templates enable row level security;
+alter table public.execution_template_tasks enable row level security;
+
+drop policy if exists execution_templates_admin_all on public.execution_templates;
+drop policy if exists execution_template_tasks_admin_all on public.execution_template_tasks;
+
+create policy execution_templates_admin_all on public.execution_templates
+  for all to authenticated
+  using (public.is_platform_admin())
+  with check (public.is_platform_admin());
+
+create policy execution_template_tasks_admin_all on public.execution_template_tasks
+  for all to authenticated
+  using (public.is_platform_admin())
+  with check (public.is_platform_admin());
+
+revoke all on table public.execution_templates from public, anon, authenticated;
+revoke all on table public.execution_template_tasks from public, anon, authenticated;
+grant select, insert, update, delete on table public.execution_templates to authenticated;
+grant select, insert, update, delete on table public.execution_template_tasks to authenticated;
+grant select, insert, update, delete on table public.execution_templates to service_role;
+grant select, insert, update, delete on table public.execution_template_tasks to service_role;
 
 -- ---------------------------------------------------------------------------
 -- 3. oura_* tables.

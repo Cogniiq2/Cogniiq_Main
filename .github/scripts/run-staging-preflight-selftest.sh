@@ -97,11 +97,52 @@ fi
 
 # --- 2) A fully migrated database must pass cleanly ---------------------------
 for f in "${NEW[@]:1}"; do PSQL -d pre -q -f "$MIG/$f.sql" >/dev/null; done
+
+# Case D: apply the convergence migration, then repair the ledger exactly as
+# the real hosted deployment plan does -- mark the five superseded legacy
+# versions and the convergence migration's own version applied, tracking-only
+# (no legacy migration SQL is ever executed here either).
+PSQL -d pre -q -f "$MIG/20260731122000_case_d_legacy_convergence.sql" >/dev/null
+PSQL -d pre -c "
+  insert into supabase_migrations.schema_migrations (version, name) values
+    ('20260607194622', 'create_tasks_table'),
+    ('20260607200426', 'fix_tasks_rls_policies'),
+    ('20260706121415', 'create_execution_tables'),
+    ('20260706122833', 'fix_execution_rls_for_anon'),
+    ('20260709120000', 'create_richer_oura_tables'),
+    ('20260710120000', 'phase0_auth_tenancy_rls'),
+    ('20260710133000', 'phase0_security_hardening'),
+    ('20260711120000', 'receptionist_persistence'),
+    ('20260721120000', 'product_aware_client_platform'),
+    ('20260722120000', 'owner_finance_cockpit'),
+    ('20260723120000', 'owner_document_settings'),
+    ('20260723121000', 'owner_offers'),
+    ('20260723122000', 'owner_commercial_documents'),
+    ('20260723123000', 'owner_premium_offer_editor'),
+    ('20260723124000', 'owner_premium_offer_runtime_hotfix'),
+    ('20260723125000', 'owner_signature_proposal_experience'),
+    ('20260723126000', 'owner_automation_worker'),
+    ('20260723127000', 'owner_signed_certificate_workflow'),
+    ('20260723128000', 'owner_offer_email_workflow'),
+    ('20260724120000', 'owner_customer_task_management'),
+    ('20260728120000', 'customer_project_core'),
+    ('20260728121000', 'customer_documents'),
+    ('20260728122000', 'customer_billing_link'),
+    ('20260728123000', 'owner_invoice_organization_assignment'),
+    ('20260728124000', 'customer_document_archive_service_role'),
+    ('20260730031350', 'create_cogniiq_receptionist_leads'),
+    ('20260730120000', 'customer_project_organization_scope'),
+    ('20260730130000', 'pankofer_organization_reconciliation'),
+    ('20260731120000', 'customer_document_publish_guard'),
+    ('20260731121000', 'client_provisioning_identity'),
+    ('20260731122000', 'case_d_legacy_convergence');
+" >/dev/null
+
 OUT="$(run_preflight)"
 FAILED_LINES="$(printf '%s\n' "$OUT" | grep '^FAIL: ' || true)"
 PASS_COUNT="$(printf '%s\n' "$OUT" | grep -c '^PASS: ' || true)"
 if [ -z "$FAILED_LINES" ] && [ "$PASS_COUNT" -gt 60 ]; then
-  note_ok "preflight passes cleanly against the fully migrated chain ($PASS_COUNT checks)"
+  note_ok "preflight passes cleanly against the fully migrated chain, case D converged, and ledger repaired ($PASS_COUNT checks)"
 else
   note_fail "preflight reported failures against a correct database:"
   printf '%s\n' "$FAILED_LINES"
@@ -181,6 +222,47 @@ assert_break "a composite tenant-integrity FK dropped" \
 assert_break "the published-document delete guard removed" \
   "drop trigger customer_documents_no_hard_delete_if_published on public.customer_documents;" \
   "hard-delete guard trigger is installed"
+
+# --- Case D falsifications -----------------------------------------------
+assert_break "case-d table execution_days granted to anon" \
+  "grant select on public.execution_days to anon;" \
+  "anon holds NO table privilege on public.execution_days"
+
+assert_break "case-d table execution_templates granted to anon" \
+  "grant select on public.execution_templates to anon;" \
+  "anon holds NO table privilege on public.execution_templates"
+
+assert_break "RLS switched off on execution_templates" \
+  "alter table public.execution_templates disable row level security;" \
+  "RLS is enabled on public.execution_templates"
+
+assert_break "a customer-reachable policy added to execution_tasks" \
+  "create policy leak on public.execution_tasks for select to authenticated using (true);" \
+  "execution_tasks has NO policy reachable without is_platform_admin"
+
+assert_break "recalc_execution_day_stats loses its pinned search_path" \
+  "alter function public.recalc_execution_day_stats(uuid) reset search_path;" \
+  "recalc_execution_day_stats.*pins search_path"
+
+assert_break "the execution_tasks recalc trigger removed" \
+  "drop trigger trg_execution_tasks_recalc on public.execution_tasks;" \
+  "trg_execution_tasks_recalc is installed"
+
+assert_break "a legacy migration missing from the ledger" \
+  "delete from supabase_migrations.schema_migrations where version = '20260607194622';" \
+  "ledger names legacy migration 20260607194622 as applied"
+
+assert_break "the convergence migration missing from the ledger" \
+  "delete from supabase_migrations.schema_migrations where version = '20260731122000';" \
+  "ledger names the convergence migration 20260731122000 as applied"
+
+assert_break "a future-dated shadow version in the ledger" \
+  "insert into supabase_migrations.schema_migrations (version, name) values ('99999999999999', 'shadow');" \
+  "no version dated after the newest repository migration"
+
+assert_break "a generated-shadow version in the ledger (Class A pattern, no repository file)" \
+  "insert into supabase_migrations.schema_migrations (version, name) values ('20260730183911', 'shadow');" \
+  "no generated-shadow or otherwise unrecognized version"
 
 echo
 if [ "$FAILURES" = "0" ]; then

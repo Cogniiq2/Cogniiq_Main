@@ -3,7 +3,7 @@
 -- =============================================================================
 -- Runs against a throwaway database that has had the REAL phase-0 tenancy chain
 -- applied and nothing else. This file itself builds hosted's exact verified
--- partial topology (see 20260801120000_case_d_legacy_convergence.sql's header
+-- partial topology (see 20260731122000_case_d_legacy_convergence.sql's header
 -- for the citations), proves the real exposure hosted currently has, applies the
 -- convergence migration via \ir, then proves: every pre-existing row survived
 -- exactly, the exposure is gone, admin access still works, and a second
@@ -41,6 +41,10 @@ language sql stable as $$ select v from test_ids where k = p_key $$;
 --   * execution_days / execution_tasks: present, real shape, RLS DISABLED,
 --     anon/authenticated/service_role all hold full grants, real FK, no CHECK
 --     on status. Seeded at hosted's real order of magnitude: 26 / 349 rows.
+--   * execution_templates / execution_template_tasks: present, real shape, RLS
+--     DISABLED, anon/authenticated/service_role all hold full grants, real FK.
+--     No migration file anywhere in this repository. Seeded at hosted's real
+--     order of magnitude: 7 / 94 rows.
 --   * 5 oura_* tables: present, bare shape, RLS ENABLED. oura_daily_activity /
 --     oura_daily_readiness / oura_daily_sleep each carry a PERMISSIVE
 --     `roles={public}, qual=true` SELECT policy (verified live on hosted --
@@ -92,6 +96,33 @@ create table public.execution_tasks (
 
 grant insert, select, update, delete, truncate, references, trigger on table public.execution_days to anon, authenticated, service_role;
 grant insert, select, update, delete, truncate, references, trigger on table public.execution_tasks to anon, authenticated, service_role;
+
+create table public.execution_templates (
+  id uuid primary key default gen_random_uuid(),
+  weekday integer not null,
+  plan_type text not null,
+  title text not null,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create table public.execution_template_tasks (
+  id uuid primary key default gen_random_uuid(),
+  template_id uuid not null references public.execution_templates(id) on delete cascade,
+  title text not null,
+  description text,
+  category text not null,
+  priority text not null default 'medium',
+  planned_start time,
+  planned_end time,
+  points integer not null default 1,
+  is_non_negotiable boolean not null default false,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now()
+);
+
+grant insert, select, update, delete, truncate, references, trigger on table public.execution_templates to anon, authenticated, service_role;
+grant insert, select, update, delete, truncate, references, trigger on table public.execution_template_tasks to anon, authenticated, service_role;
 
 create table public.oura_connections (
   id uuid primary key default gen_random_uuid(),
@@ -196,6 +227,31 @@ begin
     );
   end if;
 
+  for i in 1..7 loop
+    declare
+      v_template uuid;
+    begin
+      insert into public.execution_templates (weekday, plan_type, title)
+      values (i % 7, 'standard', 'Template ' || i)
+      returning id into v_template;
+
+      for j in 1..(94 / 7 + 1) loop
+        exit when (select count(*) from public.execution_template_tasks) >= 94;
+        insert into public.execution_template_tasks (template_id, title, category, sort_order)
+        values (v_template, 'Template Task ' || i || '-' || j, 'focus', j);
+      end loop;
+    end;
+  end loop;
+
+  if (select count(*) from public.execution_template_tasks) > 94 then
+    delete from public.execution_template_tasks
+    where id in (
+      select id from public.execution_template_tasks
+      order by id
+      limit (select count(*) from public.execution_template_tasks) - 94
+    );
+  end if;
+
   for i in 1..6 loop
     insert into public.oura_connections (access_token, refresh_token)
     values ('token-' || i, 'refresh-' || i)
@@ -222,6 +278,8 @@ begin
   select
     (select count(*) from public.execution_days) as execution_days,
     (select count(*) from public.execution_tasks) as execution_tasks,
+    (select count(*) from public.execution_templates) as execution_templates,
+    (select count(*) from public.execution_template_tasks) as execution_template_tasks,
     (select count(*) from public.oura_connections) as oura_connections,
     (select count(*) from public.oura_daily_sleep) as oura_daily_sleep,
     (select count(*) from public.oura_daily_readiness) as oura_daily_readiness,
@@ -230,6 +288,7 @@ begin
   into v_counts;
 
   if v_counts.execution_days <> 26 or v_counts.execution_tasks <> 349
+     or v_counts.execution_templates <> 7 or v_counts.execution_template_tasks <> 94
      or v_counts.oura_connections <> 6 or v_counts.oura_daily_sleep <> 18
      or v_counts.oura_daily_readiness <> 18 or v_counts.oura_daily_activity <> 18
      or v_counts.oura_heart_rate <> 0 then
@@ -243,6 +302,8 @@ $$;
 create table _case_d_pk_snapshot_before as
 select 'execution_days'::text as table_name, id::text as pk from public.execution_days
 union all select 'execution_tasks', id::text from public.execution_tasks
+union all select 'execution_templates', id::text from public.execution_templates
+union all select 'execution_template_tasks', id::text from public.execution_template_tasks
 union all select 'oura_connections', id::text from public.oura_connections
 union all select 'oura_daily_sleep', id::text from public.oura_daily_sleep
 union all select 'oura_daily_readiness', id::text from public.oura_daily_readiness
@@ -288,16 +349,35 @@ begin
     raise exception 'TEST SETUP FAILED: anon cannot see oura_daily_sleep pre-convergence (count=%)', v_count;
   end if;
 
+  -- anon can already read AND write execution_templates/execution_template_tasks.
+  select count(*) into v_count from public.execution_templates;
+  if v_count <> 7 then
+    raise exception 'TEST SETUP FAILED: anon cannot see execution_templates pre-convergence (count=%), fixture does not reproduce the real exposure', v_count;
+  end if;
+
+  select count(*) into v_count from public.execution_template_tasks;
+  if v_count <> 94 then
+    raise exception 'TEST SETUP FAILED: anon cannot see execution_template_tasks pre-convergence (count=%), fixture does not reproduce the real exposure', v_count;
+  end if;
+
+  insert into public.execution_templates (weekday, plan_type, title)
+  values (9, 'standard', 'anon-write-proof')
+  returning id into v_id;
+  if v_id is null then
+    raise exception 'TEST SETUP FAILED: anon insert into execution_templates pre-convergence did not succeed as expected';
+  end if;
+  delete from public.execution_templates where id = v_id;
+
   reset role;
 end;
 $$;
 
-\echo 'BEFORE-convergence exposure proven: anon could read+write execution_days/execution_tasks and read oura_daily_sleep/readiness/activity.'
+\echo 'BEFORE-convergence exposure proven: anon could read+write execution_days/execution_tasks/execution_templates/execution_template_tasks and read oura_daily_sleep/readiness/activity.'
 
 -- ---------------------------------------------------------------------------
 -- Apply the convergence migration.
 -- ---------------------------------------------------------------------------
-\ir ../../../supabase/migrations/20260801120000_case_d_legacy_convergence.sql
+\ir ../../../supabase/migrations/20260731122000_case_d_legacy_convergence.sql
 
 -- ---------------------------------------------------------------------------
 -- AFTER assertions: data preservation (counts + exact PK sets), full lockout
@@ -318,6 +398,8 @@ begin
     select 1 from (
       select 'execution_days'::text as table_name, id::text as pk from public.execution_days
       union all select 'execution_tasks', id::text from public.execution_tasks
+      union all select 'execution_templates', id::text from public.execution_templates
+      union all select 'execution_template_tasks', id::text from public.execution_template_tasks
       union all select 'oura_connections', id::text from public.oura_connections
       union all select 'oura_daily_sleep', id::text from public.oura_daily_sleep
       union all select 'oura_daily_readiness', id::text from public.oura_daily_readiness
@@ -332,6 +414,7 @@ begin
 
   select
     (select count(*) from public.execution_days) + (select count(*) from public.execution_tasks)
+    + (select count(*) from public.execution_templates) + (select count(*) from public.execution_template_tasks)
     + (select count(*) from public.oura_connections) + (select count(*) from public.oura_daily_sleep)
     + (select count(*) from public.oura_daily_readiness) + (select count(*) from public.oura_daily_activity)
   into v_after;
@@ -342,7 +425,7 @@ begin
 end;
 $$;
 
-\echo 'Data preservation proven: exact primary-key sets and row counts unchanged across execution_days/execution_tasks/oura_connections/oura_daily_sleep/oura_daily_readiness/oura_daily_activity.'
+\echo 'Data preservation proven: exact primary-key sets and row counts unchanged across execution_days/execution_tasks/execution_templates/execution_template_tasks/oura_connections/oura_daily_sleep/oura_daily_readiness/oura_daily_activity.'
 
 do $$
 declare
@@ -352,6 +435,7 @@ declare
 begin
   foreach t in array array[
     'tasks', 'execution_days', 'execution_tasks',
+    'execution_templates', 'execution_template_tasks',
     'oura_connections', 'oura_daily_sleep', 'oura_daily_readiness', 'oura_daily_activity',
     'oura_heart_rate', 'oura_sleep_sessions', 'oura_workouts', 'oura_sessions', 'oura_tags',
     'oura_spo2', 'oura_daily_stress', 'oura_daily_resilience'
@@ -392,7 +476,7 @@ begin
 end;
 $$;
 
-\echo 'Anon + non-admin lockout proven on all 15 tables after convergence.'
+\echo 'Anon + non-admin lockout proven on all 17 tables after convergence.'
 
 do $$
 declare
@@ -410,6 +494,16 @@ begin
   select count(*) into v_count from public.oura_daily_sleep;
   if v_count <> 18 then
     raise exception 'TEST FAILED: admin cannot see all 18 oura_daily_sleep rows after convergence (count=%)', v_count;
+  end if;
+
+  select count(*) into v_count from public.execution_templates;
+  if v_count <> 7 then
+    raise exception 'TEST FAILED: admin cannot see all 7 execution_templates rows after convergence (count=%)', v_count;
+  end if;
+
+  select count(*) into v_count from public.execution_template_tasks;
+  if v_count <> 94 then
+    raise exception 'TEST FAILED: admin cannot see all 94 execution_template_tasks rows after convergence (count=%)', v_count;
   end if;
 
   insert into public.tasks (title) values ('Admin can create tasks post-convergence');
@@ -430,6 +524,10 @@ begin
   if v_count <> 1 then
     raise exception 'TEST FAILED: service_role cannot see tasks after convergence (count=%)', v_count;
   end if;
+  select count(*) into v_count from public.execution_templates;
+  if v_count <> 7 then
+    raise exception 'TEST FAILED: service_role cannot see execution_templates after convergence (count=%)', v_count;
+  end if;
   reset role;
 end;
 $$;
@@ -440,7 +538,7 @@ $$;
 -- Idempotent replay: this exact migration must apply a second time, on the
 -- state it just produced, without error and without changing anything further.
 -- ---------------------------------------------------------------------------
-\ir ../../../supabase/migrations/20260801120000_case_d_legacy_convergence.sql
+\ir ../../../supabase/migrations/20260731122000_case_d_legacy_convergence.sql
 
 do $$
 declare
@@ -454,6 +552,14 @@ begin
   if v_count <> 1 then
     raise exception 'TEST FAILED: idempotent replay changed tasks row count to %', v_count;
   end if;
+  select count(*) into v_count from public.execution_templates;
+  if v_count <> 7 then
+    raise exception 'TEST FAILED: idempotent replay changed execution_templates row count to %', v_count;
+  end if;
+  select count(*) into v_count from public.execution_template_tasks;
+  if v_count <> 94 then
+    raise exception 'TEST FAILED: idempotent replay changed execution_template_tasks row count to %', v_count;
+  end if;
 
   perform public.test_become(null);
   set local role anon;
@@ -464,6 +570,14 @@ begin
   end;
   if v_count <> 0 then
     raise exception 'TEST FAILED: idempotent replay reopened anon access to execution_days (count=%)', v_count;
+  end if;
+  v_count := -1;
+  begin
+    select count(*) into v_count from public.execution_templates;
+  exception when others then v_count := 0;
+  end;
+  if v_count <> 0 then
+    raise exception 'TEST FAILED: idempotent replay reopened anon access to execution_templates (count=%)', v_count;
   end if;
   reset role;
 end;

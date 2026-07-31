@@ -3,7 +3,7 @@
 -- =============================================================================
 -- Runs against a throwaway database that has had the REAL phase-0 tenancy chain
 -- applied and NOTHING else -- tasks/execution_*/oura_* have never existed. The
--- runner then applies 20260801120000_case_d_legacy_convergence.sql on top before
+-- runner then applies 20260731122000_case_d_legacy_convergence.sql on top before
 -- this file runs. This file only asserts the end state: everything the migration
 -- is supposed to create exists, with the right shape, RLS and access boundary --
 -- proving the "empty database" starting state converges correctly, matching
@@ -43,6 +43,7 @@ begin
     into v_missing
   from unnest(array[
     'tasks', 'execution_days', 'execution_tasks',
+    'execution_templates', 'execution_template_tasks',
     'oura_connections', 'oura_daily_sleep', 'oura_daily_readiness', 'oura_daily_activity',
     'oura_heart_rate', 'oura_sleep_sessions', 'oura_workouts', 'oura_sessions', 'oura_tags',
     'oura_spo2', 'oura_daily_stress', 'oura_daily_resilience'
@@ -57,6 +58,7 @@ begin
     into v_missing
   from unnest(array[
     'tasks', 'execution_days', 'execution_tasks',
+    'execution_templates', 'execution_template_tasks',
     'oura_connections', 'oura_daily_sleep', 'oura_daily_readiness', 'oura_daily_activity',
     'oura_heart_rate', 'oura_sleep_sessions', 'oura_workouts', 'oura_sessions', 'oura_tags',
     'oura_spo2', 'oura_daily_stress', 'oura_daily_resilience'
@@ -119,6 +121,39 @@ begin
 end;
 $$;
 
+-- execution_templates/execution_template_tasks: generate_daily_execution_plan
+-- (untouched by this migration, SECURITY INVOKER) reads these as whichever role
+-- calls it, so an admin must retain full read/write access to both -- proven
+-- directly here since the RPC itself has no migration file in this repository
+-- (see this migration's header) and so cannot be called in this fresh-chain test.
+do $$
+declare
+  v_template uuid;
+  v_task_count bigint;
+begin
+  perform public.test_become(test_id('admin'));
+  set local role authenticated;
+
+  insert into public.execution_templates (weekday, plan_type, title, is_active)
+  values (3, 'standard', 'Admin Template', true)
+  returning id into v_template;
+
+  insert into public.execution_template_tasks (template_id, title, category, sort_order)
+  values (v_template, 'Admin Template Task', 'focus', 1);
+
+  select count(*) into v_task_count
+  from public.execution_template_tasks
+  where template_id = v_template;
+  if v_task_count <> 1 then
+    raise exception 'TEST FAILED (fresh chain): admin cannot read the execution_template_tasks row it just created (count=%)', v_task_count;
+  end if;
+
+  reset role;
+end;
+$$;
+
+\echo 'Admin full read/write on execution_templates/execution_template_tasks proven.'
+
 -- ---------------------------------------------------------------------------
 -- Access boundary on a fresh database: anon gets nothing anywhere; a non-admin
 -- authenticated user gets nothing; the admin gets everything; service_role
@@ -132,6 +167,7 @@ declare
 begin
   foreach t in array array[
     'tasks', 'execution_days', 'execution_tasks',
+    'execution_templates', 'execution_template_tasks',
     'oura_connections', 'oura_daily_sleep', 'oura_daily_readiness', 'oura_daily_activity',
     'oura_heart_rate', 'oura_sleep_sessions', 'oura_workouts', 'oura_sessions', 'oura_tags',
     'oura_spo2', 'oura_daily_stress', 'oura_daily_resilience'
@@ -183,6 +219,10 @@ begin
   if v_count <> 1 then
     raise exception 'TEST FAILED (fresh chain): admin cannot see the execution_days row it created (count=%)', v_count;
   end if;
+  select count(*) into v_count from public.execution_templates;
+  if v_count <> 1 then
+    raise exception 'TEST FAILED (fresh chain): admin cannot see the execution_templates row it created (count=%)', v_count;
+  end if;
   reset role;
 
   -- service_role bypasses RLS regardless of policy contents.
@@ -197,7 +237,7 @@ $$;
 
 -- Idempotent replay: re-applying the migration on this now-populated database
 -- must succeed without error and must not touch the row this suite just created.
-\ir ../../../supabase/migrations/20260801120000_case_d_legacy_convergence.sql
+\ir ../../../supabase/migrations/20260731122000_case_d_legacy_convergence.sql
 
 do $$
 declare
@@ -206,6 +246,10 @@ begin
   select count(*) into v_count from public.execution_days;
   if v_count <> 1 then
     raise exception 'TEST FAILED (fresh chain): idempotent replay changed execution_days row count to %', v_count;
+  end if;
+  select count(*) into v_count from public.execution_templates;
+  if v_count <> 1 then
+    raise exception 'TEST FAILED (fresh chain): idempotent replay changed execution_templates row count to %', v_count;
   end if;
 end;
 $$;

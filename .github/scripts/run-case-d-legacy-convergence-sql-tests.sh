@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Boot a THROWAWAY local PostgreSQL cluster and prove that
-# 20260801120000_case_d_legacy_convergence.sql safely reconciles the five
+# 20260731122000_case_d_legacy_convergence.sql safely reconciles the five
 # unreconciled legacy migrations (20260607194622, 20260607200426, 20260706121415,
 # 20260706122833, 20260709120000) against hosted Supabase's ACTUAL verified state,
 # on three starting states:
@@ -52,8 +52,8 @@ bootstrap() {
 
 echo "--- scenario (a): fresh migration chain"
 bootstrap case_d_fresh
-PSQL -d case_d_fresh -q -f "$MIG/20260801120000_case_d_legacy_convergence.sql"
-echo "applied: 20260801120000_case_d_legacy_convergence (fresh chain)"
+PSQL -d case_d_fresh -q -f "$MIG/20260731122000_case_d_legacy_convergence.sql"
+echo "applied: 20260731122000_case_d_legacy_convergence (fresh chain)"
 PSQL -d case_d_fresh -f "$SQLDIR/case-d-legacy-convergence-fresh-tests.sql"
 
 echo "--- scenario (b): hosted's exact partial state, converged, then replayed idempotently"

@@ -186,7 +186,7 @@ jobs:
             sudo apt-get install --yes postgresql
           fi
 
-      # Proves 20260801120000_case_d_legacy_convergence.sql safely reconciles the
+      # Proves 20260731122000_case_d_legacy_convergence.sql safely reconciles the
       # five legacy migrations (tasks / execution_* / oura_*) against hosted
       # Supabase's actual verified state, on a fresh migration chain AND on
       # hosted's exact reproduced partial topology, including proving the real

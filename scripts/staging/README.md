@@ -20,7 +20,7 @@ nothing here runs automatically.
 
 | File | What it does | Writes? |
 |---|---|---|
-| `preflight.sql` | 184 read-only assertions about database state | no |
+| `preflight.sql` | 300+ read-only assertions about database state (184 release-9 assertions + Case D tasks/execution_*/oura_* convergence invariants) | no |
 | `preflight.sh` | Runs the above, exits non-zero on any mismatch | no |
 | `verify-endpoints.mjs` | Edge Function health, frontend↔backend agreement, bucket privacy | no |
 | `seed-staging-fixtures.sh` | Guarded entry point for the fixture loader | **yes** |
