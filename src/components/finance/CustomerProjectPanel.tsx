@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Eye, EyeOff, FolderKanban, Plus, Trash2 } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Eye, EyeOff, FolderKanban, Plus, Trash2, Upload } from 'lucide-react';
 
 import {
   Button, Card, ConfirmDialog, EmptyState, Field, InfoBanner, Modal, SectionHeader,
@@ -11,6 +11,11 @@ import {
   assignInvoiceOrganization,
   createCustomerMilestone,
   createCustomerProject,
+  createCustomerProjectForOrganization,
+  CUSTOMER_UPLOAD_ALLOWED_CONTENT_TYPES,
+  CUSTOMER_UPLOAD_CATEGORIES,
+  CUSTOMER_UPLOAD_MAX_BYTES,
+  customerUploadContentTypeLabels,
   deleteCustomerMilestone,
   linkProjectInvoice,
   loadCustomerInvoiceCandidates,
@@ -23,6 +28,7 @@ import {
   unlinkProjectInvoice,
   updateCustomerMilestone,
   updateCustomerProject,
+  uploadCustomerDocument,
   type OwnerCustomerDocument,
   type OwnerCustomerMilestone,
   type OwnerCustomerProject,
@@ -33,6 +39,7 @@ import {
   customerDocumentCategoryLabels,
   customerMilestoneStatusLabels,
   customerProjectStatusLabels,
+  type CustomerDocumentCategory,
   type CustomerMilestoneStatus,
   type CustomerProjectStatus,
 } from '@/lib/customerPlatform/types';
@@ -42,6 +49,12 @@ import { formatDateDe } from '@/lib/ownerFinance/exports';
 // minimum needed to run the customer portal — deliberately NOT a second project
 // management system. Internal planning stays in the CRM and the task checklist;
 // everything edited here is what the customer will actually read.
+//
+// Two callers wire this in: the Owner Finance customer detail page (ownerCustomerId
+// set, a CRM/owner_customers row exists) and the canonical /admin/clients Kundenportal
+// tab (ownerCustomerId omitted — organizationId is the only tenant key, no CRM row
+// required). Project creation picks the matching RPC; everything else is org-scoped
+// already and needs no branching.
 
 const STATUS_TONE: Record<CustomerProjectStatus, 'success' | 'warning' | 'danger' | 'neutral'> = {
   on_track: 'success',
@@ -64,7 +77,13 @@ export function CustomerProjectPanel({
   organizationId,
   clientAccountId,
 }: {
-  ownerCustomerId: string;
+  /**
+   * Present only when this panel is reached via the Owner Finance CRM customer
+   * detail page. Absent from the canonical /admin/clients Kundenportal tab, which
+   * has no owner_customers row and must never gain one as a side effect of this
+   * panel — project creation there goes through the organization-scoped RPC instead.
+   */
+  ownerCustomerId?: string | null;
   /** Null when the CRM customer has not been provisioned into a portal organization yet. */
   organizationId: string | null;
   /** Used to find invoices created before portal provisioning (organization_id still null). */
@@ -75,11 +94,18 @@ export function CustomerProjectPanel({
   const [documents, setDocuments] = useState<OwnerCustomerDocument[]>([]);
   const [loading, setLoading] = useState(true);
   const [createOpen, setCreateOpen] = useState(false);
+  const [uploadOpen, setUploadOpen] = useState(false);
   const [editing, setEditing] = useState<OwnerCustomerProject | null>(null);
+
+  // The full-list loading skeleton replaces every ProjectRow, which would silently
+  // collapse any row the owner had expanded (e.g. right after uploading into it, just
+  // before they need to click "Freigeben"). Only the INITIAL load shows the skeleton;
+  // a reload after a mutation swaps the data in place and keeps rows expanded.
+  const hasLoadedOnce = useRef(false);
 
   const load = useCallback(async () => {
     if (!organizationId) { setLoading(false); return; }
-    setLoading(true);
+    if (!hasLoadedOnce.current) setLoading(true);
     const [projectResult, documentResult] = await Promise.all([
       loadOwnerCustomerProjects(organizationId),
       loadOwnerProjectDocuments(organizationId),
@@ -87,6 +113,7 @@ export function CustomerProjectPanel({
     setProjects(projectResult.data.filter((project) => !project.is_archived));
     setDocuments(documentResult.data);
     setLoading(false);
+    hasLoadedOnce.current = true;
   }, [organizationId]);
 
   useEffect(() => { void load(); }, [load]);
@@ -115,7 +142,17 @@ export function CustomerProjectPanel({
         title="Kundenprojekt"
         description="Wird dem Kunden im Portal angezeigt. Interne Notizen, Budgets und Aufgaben bleiben hier außen vor."
         action={
-          <Button icon={Plus} onClick={() => setCreateOpen(true)}>Projekt anlegen</Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="secondary"
+              icon={Upload}
+              onClick={() => setUploadOpen(true)}
+              disabled={projects.length === 0}
+            >
+              Dokument hochladen
+            </Button>
+            <Button icon={Plus} onClick={() => setCreateOpen(true)}>Projekt anlegen</Button>
+          </div>
         }
       />
 
@@ -125,7 +162,7 @@ export function CustomerProjectPanel({
         <EmptyState
           icon={FolderKanban}
           title="Noch kein kundensichtbares Projekt"
-          description="Legen Sie ein Projekt an, damit der Kunde Status, nächste Schritte und Meilensteine im Portal sieht."
+          description="Legen Sie ein Projekt an, damit der Kunde Status, nächste Schritte und Meilensteine im Portal sieht. Ein Dokumenten-Upload setzt ein Projekt voraus."
         />
       ) : (
         <div className="space-y-4">
@@ -144,7 +181,8 @@ export function CustomerProjectPanel({
 
       {createOpen ? (
         <CreateProjectDialog
-          ownerCustomerId={ownerCustomerId}
+          ownerCustomerId={ownerCustomerId ?? null}
+          organizationId={organizationId}
           onClose={() => setCreateOpen(false)}
           onCreated={() => { setCreateOpen(false); void load(); toast.success('Projekt angelegt', 'Der Kunde sieht das Projekt jetzt im Portal.'); }}
         />
@@ -155,6 +193,22 @@ export function CustomerProjectPanel({
           project={editing}
           onClose={() => setEditing(null)}
           onSaved={() => { setEditing(null); void load(); toast.success('Projekt aktualisiert', 'Die Änderungen sind im Kundenportal sichtbar.'); }}
+        />
+      ) : null}
+
+      {uploadOpen ? (
+        <UploadDocumentDialog
+          organizationId={organizationId}
+          projects={projects}
+          onClose={() => setUploadOpen(false)}
+          onUploaded={() => {
+            setUploadOpen(false);
+            void load();
+            toast.success(
+              'Dokument hochgeladen',
+              'Das Dokument ist noch nicht für den Kunden sichtbar. Geben Sie es über „Freigeben“ frei.',
+            );
+          }}
         />
       ) : null}
     </Card>
@@ -595,10 +649,14 @@ function InvoiceCandidateRow({
 // ---------------------------------------------------------------- dialogs
 function CreateProjectDialog({
   ownerCustomerId,
+  organizationId,
   onClose,
   onCreated,
 }: {
-  ownerCustomerId: string;
+  /** When set, creates through the owner_customers-scoped RPC (Owner Finance page). */
+  ownerCustomerId: string | null;
+  /** Always required as a fallback: the organization-scoped RPC (Kundenportal tab). */
+  organizationId: string;
   onClose: () => void;
   onCreated: () => void;
 }) {
@@ -611,12 +669,19 @@ function CreateProjectDialog({
   const submit = async () => {
     if (!title.trim() || !objective.trim() || !phase.trim()) return;
     setBusy(true);
-    const { error } = await createCustomerProject({
-      ownerCustomerId,
-      title: title.trim(),
-      businessObjective: objective.trim(),
-      phase: phase.trim(),
-    });
+    const { error } = ownerCustomerId
+      ? await createCustomerProject({
+        ownerCustomerId,
+        title: title.trim(),
+        businessObjective: objective.trim(),
+        phase: phase.trim(),
+      })
+      : await createCustomerProjectForOrganization({
+        organizationId,
+        title: title.trim(),
+        businessObjective: objective.trim(),
+        phase: phase.trim(),
+      });
     setBusy(false);
     if (error) { toast.error('Projekt konnte nicht angelegt werden', error); return; }
     onCreated();
@@ -765,6 +830,156 @@ function EditProjectDialog({
             value={contactEmail} onChange={setContactEmail}
             hint="Bewusst separat gepflegt — die private Profil-E-Mail wird nie automatisch angezeigt." />
         </div>
+      </div>
+    </Modal>
+  );
+}
+
+// ---------------------------------------------------------------- upload
+const ALLOWED_TYPES_HINT = CUSTOMER_UPLOAD_ALLOWED_CONTENT_TYPES
+  .map((type) => customerUploadContentTypeLabels[type] ?? type)
+  .join(', ');
+const MAX_SIZE_MIB = Math.round(CUSTOMER_UPLOAD_MAX_BYTES / (1024 * 1024));
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024 * 1024) return `${Math.ceil(bytes / 1024)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/**
+ * Upload a customer document through the ONE controlled server-side flow
+ * (uploadCustomerDocument -> Edge Function). This dialog never touches Storage
+ * directly. Project, category, title and file are all required; the uploaded
+ * document always starts unpublished — making it visible to the customer is the
+ * separate, explicit "Freigeben" action in the document list below.
+ */
+function UploadDocumentDialog({
+  organizationId,
+  projects,
+  onClose,
+  onUploaded,
+}: {
+  organizationId: string;
+  projects: OwnerCustomerProject[];
+  onClose: () => void;
+  onUploaded: () => void;
+}) {
+  const [projectId, setProjectId] = useState(projects[0]?.id ?? '');
+  const [category, setCategory] = useState<CustomerDocumentCategory>(CUSTOMER_UPLOAD_CATEGORIES[0]);
+  const [title, setTitle] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [fileInputKey, setFileInputKey] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const typeAllowed = !file || (CUSTOMER_UPLOAD_ALLOWED_CONTENT_TYPES as readonly string[]).includes(file.type);
+  const sizeAllowed = !file || file.size <= CUSTOMER_UPLOAD_MAX_BYTES;
+  const fileError = file && !typeAllowed
+    ? `Dateityp „${file.type || 'unbekannt'}“ wird nicht unterstützt. Erlaubt: ${ALLOWED_TYPES_HINT}.`
+    : file && !sizeAllowed
+      ? `Die Datei ist ${formatBytes(file.size)} groß. Erlaubt sind maximal ${MAX_SIZE_MIB} MB.`
+      : null;
+
+  const canSubmit = Boolean(projectId) && Boolean(category) && title.trim().length > 0
+    && Boolean(file) && typeAllowed && sizeAllowed && !busy;
+
+  const submit = async () => {
+    if (!file || !projectId) return;
+    setBusy(true);
+    setError(null);
+    const { error: uploadError } = await uploadCustomerDocument({
+      organizationId,
+      projectId,
+      category,
+      title: title.trim(),
+      file,
+    });
+    setBusy(false);
+    if (uploadError) { setError(uploadError); return; }
+    onUploaded();
+  };
+
+  const clearFile = () => { setFile(null); setFileInputKey((k) => k + 1); };
+
+  return (
+    <Modal
+      open
+      onClose={onClose}
+      title="Dokument hochladen"
+      description="Der Upload läuft ausschließlich über den kontrollierten Server-Prozess. Das Dokument ist danach noch NICHT für den Kunden sichtbar."
+      footer={
+        <div className="flex justify-end gap-2">
+          <Button variant="secondary" onClick={onClose}>Abbrechen</Button>
+          <Button onClick={() => void submit()} disabled={!canSubmit}>
+            {busy ? 'Wird hochgeladen …' : error ? 'Erneut versuchen' : 'Hochladen'}
+          </Button>
+        </div>
+      }
+    >
+      <div className="space-y-4">
+        {error ? (
+          <InfoBanner tone="danger" title="Upload fehlgeschlagen">
+            {error}
+          </InfoBanner>
+        ) : null}
+
+        <Select
+          id="doc-project"
+          label="Projekt"
+          required
+          value={projectId}
+          onChange={setProjectId}
+          disabled={busy}
+          options={projects.map((project) => ({ value: project.id, label: project.title }))}
+        />
+        <Select
+          id="doc-category"
+          label="Kategorie"
+          required
+          value={category}
+          onChange={(value) => setCategory(value as CustomerDocumentCategory)}
+          disabled={busy}
+          options={CUSTOMER_UPLOAD_CATEGORIES.map((value) => ({
+            value,
+            label: customerDocumentCategoryLabels[value],
+          }))}
+          hint="Angebote, Annahmebestätigungen und Rechnungen werden nicht hier hochgeladen, sondern aus dem jeweiligen Beleg veröffentlicht."
+        />
+        <Field id="doc-title" label="Titel" required value={title} onChange={setTitle} disabled={busy}
+          placeholder="z. B. Projektkonzept v1" />
+
+        <div>
+          <label htmlFor="doc-file" className="mb-1.5 block text-[12px] font-semibold text-gray-600">
+            Datei <span className="text-red-500">*</span>
+          </label>
+          <input
+            key={fileInputKey}
+            id="doc-file"
+            type="file"
+            disabled={busy}
+            accept={CUSTOMER_UPLOAD_ALLOWED_CONTENT_TYPES.join(',')}
+            onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+            className="block w-full text-[13px] text-gray-700 file:mr-3 file:rounded-lg file:border-0 file:bg-gray-950 file:px-3 file:py-2 file:text-[12.5px] file:font-semibold file:text-white hover:file:bg-gray-800"
+          />
+          {file ? (
+            <p className="mt-1 flex items-center gap-2 text-[11.5px] text-gray-500">
+              {file.name} · {formatBytes(file.size)}
+              <button type="button" onClick={clearFile} className="font-semibold text-gray-600 underline">Entfernen</button>
+            </p>
+          ) : null}
+          {fileError ? (
+            <p className="mt-1 text-[12px] text-red-600">{fileError}</p>
+          ) : (
+            <p className="mt-1 text-[11.5px] text-gray-400">
+              Erlaubte Dateitypen: {ALLOWED_TYPES_HINT}. Maximale Größe: {MAX_SIZE_MIB} MB.
+            </p>
+          )}
+        </div>
+
+        <InfoBanner tone="info" title="Noch nicht sichtbar für den Kunden">
+          Hochgeladene Dokumente starten unveröffentlicht. Geben Sie das Dokument danach in der Liste
+          explizit über „Freigeben“ frei.
+        </InfoBanner>
       </div>
     </Modal>
   );

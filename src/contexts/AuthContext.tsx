@@ -3,6 +3,18 @@ import type { ReactNode } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 
 import { supabase } from '@/lib/supabase';
+import {
+  AUTH_BOOT_TIMEOUT_MS,
+  AUTH_SIGN_OUT_TIMEOUT_MS,
+  withTimeout,
+} from '@/lib/auth/withTimeout';
+
+/**
+ * Shown when a sign-out request never came back. The local session is cleared
+ * regardless, so the user is never trapped inside a shell they asked to leave.
+ */
+export const AUTH_SIGN_OUT_OFFLINE_MESSAGE =
+  'Sie wurden auf diesem Gerät abgemeldet. Die Verbindung zum Server war unterbrochen, daher konnte die Sitzung dort nicht zusätzlich beendet werden.';
 
 export type PlatformRole = 'customer' | 'cogniiq_admin' | 'cogniiq_owner';
 export type OrganizationRole = 'owner' | 'admin' | 'member' | 'viewer';
@@ -49,9 +61,18 @@ interface AuthContextValue {
   setActiveOrganizationId: (organizationId: string | null) => void;
   isLoading: boolean;
   authError: string | null;
+  /**
+   * The authentication bootstrap did not answer within its deadline. Distinct
+   * from `authError` (which means it answered, with a failure) and from
+   * `isLoading` (still waiting). Route guards render a recovery screen for this
+   * rather than a spinner or a redirect to login.
+   */
+  authTimedOut: boolean;
   isPlatformAdmin: boolean;
   isPlatformOwner: boolean;
   refreshAccount: () => Promise<void>;
+  /** Re-run the bootstrap after a timeout. Safe to call repeatedly. */
+  retryAuth: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -85,6 +106,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [activeOrganizationId, setActiveOrganizationId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [authTimedOut, setAuthTimedOut] = useState(false);
+  // Distinguishes a superseded bootstrap (an earlier attempt still in flight when
+  // the user pressed "Erneut versuchen") from the current one, so a late arrival
+  // can never overwrite a newer result.
+  const bootGenerationRef = useRef(0);
+  const mountedRef = useRef(true);
   // Tracks the user id we have already attempted an invitation claim for, so token
   // refreshes and repeated auth events do not re-run the claim (prevents loops/flicker).
   const claimedForUserRef = useRef<string | null>(null);
@@ -179,51 +206,131 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await loadAccount(data.session);
   }, [loadAccount]);
 
-  useEffect(() => {
-    let mounted = true;
+  /**
+   * The authentication bootstrap, bounded by a deadline.
+   *
+   * The success path is byte-for-byte what it was: getSession, adopt the
+   * session, load the account, stop loading. Two things are added around it.
+   *
+   *  1. If it has not finished within AUTH_BOOT_TIMEOUT_MS, `authTimedOut` is
+   *     raised and `isLoading` drops, so the guards can offer retry and sign
+   *     out instead of spinning forever. The in-flight request is NOT abandoned.
+   *  2. Whenever the work does finish — before or long after the deadline — its
+   *     result is adopted and the timed-out state clears itself. A merely slow
+   *     connection therefore heals without the user doing anything.
+   */
+  const runBoot = useCallback(async () => {
+    const generation = bootGenerationRef.current + 1;
+    bootGenerationRef.current = generation;
 
-    const boot = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (!mounted) return;
+    const isCurrent = () => mountedRef.current && bootGenerationRef.current === generation;
 
-      if (error) {
-        setAuthError(error.message);
+    setAuthTimedOut(false);
+    setIsLoading(true);
+
+    // Never rejects: an unexpected failure must not take the bootstrap down with
+    // an unhandled rejection, it must land in the same reporting path as any
+    // other failure.
+    const work = (async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) return { failure: error.message };
+        setSession(data.session);
+        await loadAccount(data.session);
+        return {};
+      } catch (error) {
+        return { failure: error instanceof Error ? error.message : String(error) };
       }
+    })();
 
-      setSession(data.session);
-      await loadAccount(data.session);
+    // Self-heal: adopt the result whenever it arrives, including after the
+    // deadline has already shown the recovery screen.
+    void work.then((outcome) => {
+      if (!isCurrent()) return;
+      if (outcome.failure) setAuthError(outcome.failure);
+      setAuthTimedOut(false);
+      setIsLoading(false);
+    });
 
-      if (mounted) setIsLoading(false);
-    };
+    const raced = await withTimeout(work, AUTH_BOOT_TIMEOUT_MS);
+    if (!isCurrent()) return;
+    if (raced.timedOut) {
+      setAuthTimedOut(true);
+      setIsLoading(false);
+    }
+  }, [loadAccount]);
 
-    void boot();
+  const retryAuth = useCallback(async () => {
+    await runBoot();
+  }, [runBoot]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+
+    void runBoot();
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession);
       setIsLoading(true);
-      void loadAccount(nextSession).finally(() => setIsLoading(false));
+
+      // Bounded for the same reason as the boot: a stalled reload on a token
+      // refresh would otherwise strand isLoading at true with no way out.
+      const reload = loadAccount(nextSession).catch(() => undefined);
+      void reload.then(() => {
+        if (mountedRef.current) {
+          setAuthTimedOut(false);
+          setIsLoading(false);
+        }
+      });
+      void withTimeout(reload, AUTH_BOOT_TIMEOUT_MS).then((raced) => {
+        if (raced.timedOut && mountedRef.current) {
+          setAuthTimedOut(true);
+          setIsLoading(false);
+        }
+      });
     });
 
     return () => {
-      mounted = false;
+      mountedRef.current = false;
       subscription.unsubscribe();
     };
-  }, [loadAccount]);
+  }, [loadAccount, runBoot]);
 
-  const signOut = useCallback(async () => {
-    setAuthError(null);
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      setAuthError(error.message);
-      return;
-    }
+  const clearLocalAccountState = useCallback(() => {
     setSession(null);
     setProfile(null);
     setMemberships([]);
     setActiveOrganizationId(null);
+    setAuthTimedOut(false);
+    claimedForUserRef.current = null;
   }, []);
+
+  const signOut = useCallback(async () => {
+    setAuthError(null);
+
+    // Bounded: a sign-out that hangs is worse than no sign-out button at all,
+    // because the user has already decided to leave.
+    const raced = await withTimeout(supabase.auth.signOut(), AUTH_SIGN_OUT_TIMEOUT_MS);
+
+    if (raced.timedOut) {
+      // The request is stuck. Clear the local session anyway — being unable to
+      // reach the server must not keep someone signed in on their own device.
+      clearLocalAccountState();
+      setAuthError(AUTH_SIGN_OUT_OFFLINE_MESSAGE);
+      return;
+    }
+
+    // Unchanged behaviour for a server that DID answer, with or without an error.
+    const error = raced.error ?? raced.value?.error;
+    if (error) {
+      setAuthError(error instanceof Error ? error.message : String(error));
+      return;
+    }
+
+    clearLocalAccountState();
+  }, [clearLocalAccountState]);
 
   const value = useMemo<AuthContextValue>(() => {
     const isPlatformOwner = profile?.platform_role === 'cogniiq_owner';
@@ -238,12 +345,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setActiveOrganizationId,
       isLoading,
       authError,
+      authTimedOut,
       isPlatformAdmin,
       isPlatformOwner,
       refreshAccount,
+      retryAuth,
       signOut,
     };
-  }, [activeOrganizationId, authError, isLoading, memberships, profile, refreshAccount, session, signOut]);
+  }, [
+    activeOrganizationId, authError, authTimedOut, isLoading, memberships, profile,
+    refreshAccount, retryAuth, session, signOut,
+  ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

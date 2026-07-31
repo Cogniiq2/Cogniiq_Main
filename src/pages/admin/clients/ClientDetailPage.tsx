@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Copy, Pause, Play, Plus, RefreshCw, XCircle } from 'lucide-react';
+import { ArrowLeft, Copy, ExternalLink, Pause, Play, Plus, RefreshCw, XCircle } from 'lucide-react';
 
 import { AdminCard, AdminField, Pill, invitationTone, lifecycleTone, solutionTone } from '@/pages/admin/clients/adminUi';
 import {
@@ -19,8 +19,14 @@ import {
   effectiveInvitationStatus,
   resendOutcomeMessage,
 } from '@/lib/clientPlatform/invitationStatus';
+import { CustomerProjectPanel } from '@/components/finance/CustomerProjectPanel';
+import {
+  loadOrganizationCommercialOverview,
+  type OrganizationCommercialOverview,
+} from '@/lib/ownerFinance/organizationCommercial';
+import { offerStatusLabel } from '@/lib/ownerFinance/customerLabels';
 
-const tabs = ['Übersicht', 'Kontakte', 'Lösungen', 'Vertrag & Budget', 'Zugang', 'Aktivität'] as const;
+const tabs = ['Übersicht', 'Kontakte', 'Lösungen', 'Vertrag & Budget', 'Kommerziell', 'Zugang', 'Kundenportal', 'Aktivität'] as const;
 type Tab = (typeof tabs)[number];
 
 export function ClientDetailPage() {
@@ -88,7 +94,9 @@ export function ClientDetailPage() {
       {tab === 'Kontakte' ? <ContactsTab detail={detail} onChanged={() => void reload()} flash={flash} /> : null}
       {tab === 'Lösungen' ? <SolutionsTab detail={detail} onChanged={() => void reload()} flash={flash} /> : null}
       {tab === 'Vertrag & Budget' ? <BudgetTab detail={detail} /> : null}
+      {tab === 'Kommerziell' ? <CommercialTab organizationId={detail.organizationId} /> : null}
       {tab === 'Zugang' ? <AccessTab detail={detail} onChanged={() => void reload()} flash={flash} /> : null}
+      {tab === 'Kundenportal' ? <PortalTab detail={detail} /> : null}
       {tab === 'Aktivität' ? <ActivityTab /> : null}
     </div>
   );
@@ -272,6 +280,202 @@ function AccessTab({ detail, onChanged, flash }: { detail: AdminClientDetail; on
         );
       })}
     </div>
+  );
+}
+
+// Canonical customer-portal project management, scoped directly by organizationId —
+// this is the actual integration point: the CRM-side owner_customers row that the
+// Owner Finance panel usage relies on does not exist for most real portal customers
+// (e.g. Pankofer) and is never required, created, backfilled or merged here.
+function PortalTab({ detail }: { detail: AdminClientDetail }) {
+  return (
+    <CustomerProjectPanel
+      organizationId={detail.organizationId}
+      clientAccountId={detail.account?.id ?? null}
+    />
+  );
+}
+
+const invoiceStatusLabel: Record<string, string> = {
+  draft: 'Entwurf', issued: 'Gestellt', partially_paid: 'Teilbezahlt', paid: 'Bezahlt',
+  overdue: 'Überfällig', void: 'Storniert', cancelled: 'Storniert', credited: 'Gutgeschrieben',
+};
+
+const invoicePillTone: Record<string, 'neutral' | 'success' | 'warning' | 'danger' | 'info'> = {
+  draft: 'neutral', issued: 'info', partially_paid: 'warning', paid: 'success',
+  overdue: 'danger', void: 'neutral', cancelled: 'neutral', credited: 'neutral',
+};
+
+const offerPillTone: Record<string, 'neutral' | 'success' | 'warning' | 'danger' | 'info'> = {
+  draft: 'neutral', finalized: 'info', sent: 'info', viewed: 'warning',
+  accepted: 'success', rejected: 'danger', expired: 'warning', cancelled: 'neutral', converted: 'success',
+};
+
+/**
+ * Organization-scoped commercial overview.
+ *
+ * This is the missing half of the canonical customer page: offers and invoices are
+ * scoped by organization_id, but every existing surface for them hung off the Finance
+ * CRM's owner_customers table — which most real portal customers, Pankofer included, do
+ * not have a row in. So a customer with five offers and an invoice showed nothing here.
+ * Nothing below requires, creates, backfills or merges an owner_customers row.
+ */
+function CommercialTab({ organizationId }: { organizationId: string }) {
+  const [data, setData] = useState<OrganizationCommercialOverview | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const { data: overview, error: err } = await loadOrganizationCommercialOverview(organizationId);
+    if (err) { setError(err); setLoading(false); return; }
+    setError(null);
+    setData(overview);
+    setLoading(false);
+  }, [organizationId]);
+
+  useEffect(() => { void load(); }, [load]);
+
+  if (loading) {
+    return (
+      <div aria-label="Kommerzielle Daten werden geladen" className="space-y-3">
+        <div className="h-24 animate-pulse rounded-2xl border border-gray-100 bg-white" />
+        <div className="h-40 animate-pulse rounded-2xl border border-gray-100 bg-white" />
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <AdminCard>
+        <div role="alert">
+          <p className="text-sm font-semibold text-gray-900">Kommerzielle Daten konnten nicht geladen werden</p>
+          <p className="mt-1 text-[13px] text-gray-500">
+            Angebote und Rechnungen sind nur für Plattform-Administratoren sichtbar.
+          </p>
+          <button
+            type="button"
+            onClick={() => void load()}
+            className="mt-3 inline-flex h-10 items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 text-[13px] font-semibold text-gray-700 hover:border-gray-300"
+          >
+            <RefreshCw size={14} /> Erneut versuchen
+          </button>
+        </div>
+      </AdminCard>
+    );
+  }
+
+  const outstanding = Object.entries(data.outstandingCentsByCurrency);
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <CountCard label="Angebote" count={data.offers.length} />
+        <CountCard label="Rechnungen" count={data.invoices.length} />
+        <AdminCard className="p-4">
+          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400">Offen</p>
+          <p className="mt-1 text-2xl font-semibold tabular-nums text-gray-950">
+            {outstanding.length === 0
+              ? '—'
+              : outstanding.map(([currency, cents]) => formatCents(cents, currency)).join(' · ')}
+          </p>
+        </AdminCard>
+      </div>
+
+      <AdminCard>
+        <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400">
+          Angebote ({data.offers.length})
+        </p>
+        {data.offers.length === 0 ? (
+          <p className="text-sm text-gray-500">Für diesen Kunden sind keine Angebote erfasst.</p>
+        ) : (
+          <ul className="space-y-2">
+            {data.offers.map((o) => (
+              <li key={o.id}>
+                <Link
+                  to={`/admin/finance/offers/${o.id}`}
+                  className="flex flex-col gap-2 rounded-xl border border-gray-100 px-3 py-2.5 hover:border-gray-300 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-semibold text-gray-900">
+                      {o.offer_number ?? 'Entwurf'}
+                      {o.title ? <span className="font-normal text-gray-500"> · {o.title}</span> : null}
+                    </span>
+                    <span className="mt-0.5 block text-[12px] text-gray-500">
+                      {o.issue_date ? new Date(o.issue_date).toLocaleDateString('de-DE') : 'ohne Datum'}
+                      {o.valid_until ? ` · gültig bis ${new Date(o.valid_until).toLocaleDateString('de-DE')}` : ''}
+                    </span>
+                  </span>
+                  <span className="flex shrink-0 items-center gap-3">
+                    <Pill label={offerStatusLabel[o.status] ?? o.status} tone={offerPillTone[o.status] ?? 'neutral'} />
+                    <span className="text-sm font-semibold tabular-nums text-gray-900">
+                      {formatCents(o.gross_total_cents, o.currency)}
+                    </span>
+                    <ExternalLink size={14} className="text-gray-400" aria-hidden="true" />
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </AdminCard>
+
+      <AdminCard>
+        <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400">
+          Rechnungen ({data.invoices.length})
+        </p>
+        {data.invoices.length === 0 ? (
+          <p className="text-sm text-gray-500">Für diesen Kunden sind keine Rechnungen erfasst.</p>
+        ) : (
+          <ul className="space-y-2">
+            {data.invoices.map((i) => {
+              const open = Math.max(i.gross_total_cents - i.amount_paid_cents, 0);
+              return (
+                <li key={i.id}>
+                  <Link
+                    to={`/admin/finance/invoices/${i.id}`}
+                    className="flex flex-col gap-2 rounded-xl border border-gray-100 px-3 py-2.5 hover:border-gray-300 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-semibold text-gray-900">
+                        {i.invoice_number ?? 'Entwurf'}
+                      </span>
+                      <span className="mt-0.5 block text-[12px] text-gray-500">
+                        {i.issue_date ? new Date(i.issue_date).toLocaleDateString('de-DE') : 'ohne Datum'}
+                        {i.due_date ? ` · fällig ${new Date(i.due_date).toLocaleDateString('de-DE')}` : ''}
+                        {open > 0 ? ` · offen ${formatCents(open, i.currency)}` : ''}
+                      </span>
+                    </span>
+                    <span className="flex shrink-0 items-center gap-3">
+                      <Pill label={invoiceStatusLabel[i.status] ?? i.status} tone={invoicePillTone[i.status] ?? 'neutral'} />
+                      <span className="text-sm font-semibold tabular-nums text-gray-900">
+                        {formatCents(i.gross_total_cents, i.currency)}
+                      </span>
+                      <ExternalLink size={14} className="text-gray-400" aria-hidden="true" />
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </AdminCard>
+
+      <p className="text-[12px] leading-relaxed text-gray-400">
+        Angebote und Rechnungen werden ausschließlich über die Organisation zugeordnet. Für die
+        Freigabe eines PDFs im Kundenportal öffnen Sie den jeweiligen Beleg und nutzen dort den
+        Abschnitt „Kundenportal“.
+      </p>
+    </div>
+  );
+}
+
+function CountCard({ label, count }: { label: string; count: number }) {
+  return (
+    <AdminCard className="p-4">
+      <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400">{label}</p>
+      <p className="mt-1 text-2xl font-semibold tabular-nums text-gray-950">{count}</p>
+    </AdminCard>
   );
 }
 

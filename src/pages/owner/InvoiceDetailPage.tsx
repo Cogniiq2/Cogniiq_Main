@@ -19,6 +19,7 @@ import { invoiceExportTable, invoiceMetadataSheet, invoiceReportModel } from '@/
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
 import { formatDateDe, formatCentsCurrencyDe, formatBpPercentDe, type ExportFormat, type ExportMode, type ExportMeta } from '@/lib/ownerFinance/exports';
 import { ExportMenu } from '@/components/finance/ExportMenu';
+import { CustomerPortalPublishCard } from '@/components/finance/CustomerPortalPublishCard';
 import type { OwnerInvoice, OwnerInvoiceLine, OwnerDocumentSettings, OwnerGeneratedDocument } from '@/lib/ownerFinance/types';
 
 const statusLabel: Record<string, string> = {
@@ -185,6 +186,18 @@ export function InvoiceDetailPage() {
             </div>
             <Button className="mt-3" size="sm" variant="secondary" icon={Copy} onClick={copyPaymentInfo}>Kopieren</Button>
           </Card>
+
+          <CustomerPortalPublishCard
+            organizationId={invoice.organization_id}
+            sourceType="owner_invoices"
+            sourceLabel={invoice.invoice_number ?? ''}
+            documentTitle="Rechnung"
+            generatedDocuments={docs}
+            /* An issued invoice can always produce a finalized PDF via "PDF speichern";
+               a draft cannot, so the copy must not tell the owner to press a button
+               that is not there. */
+            hasUnsavedFinalizable={!isDraft}
+          />
 
           {docs.length > 0 ? (
             <Card className="p-6">

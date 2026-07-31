@@ -81,7 +81,10 @@ export function DocumentDownloadButton({
         disabled={busy}
         className={
           compact
-            ? 'inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[12px] font-semibold text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-950 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400'
+            // min-h-8: "Öffnen" is the primary action of a document row, so it
+            // must stay comfortably tappable on a phone. Measured at 26px before
+            // this, which is below a usable touch target at 375px.
+            ? 'inline-flex min-h-8 items-center gap-1.5 rounded-lg px-2.5 py-1 text-[12px] font-semibold text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-950 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400'
             : 'inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-[13px] font-semibold text-gray-700 transition-colors hover:border-gray-300 hover:text-gray-950 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2'
         }
       >

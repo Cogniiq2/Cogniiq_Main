@@ -14,6 +14,16 @@ create extension if not exists pgcrypto;
 create schema if not exists auth;
 create schema if not exists extensions;
 create schema if not exists storage;
+create schema if not exists supabase_migrations;
+
+-- Mirrors the migration-ledger table every real Supabase project (hosted or
+-- `supabase start`) provisions automatically -- never created by preflight.sql
+-- itself, which only ever reads it.
+create table if not exists supabase_migrations.schema_migrations (
+  version text primary key,
+  statements text[],
+  name text
+);
 
 -- Minimal auth.users: phase0 references it for the profiles FK and its signup trigger.
 create table if not exists auth.users (

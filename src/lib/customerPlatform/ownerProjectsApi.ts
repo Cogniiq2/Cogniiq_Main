@@ -1,3 +1,5 @@
+import { FunctionsHttpError } from '@supabase/supabase-js';
+
 import { supabase } from '@/lib/supabase';
 
 import type {
@@ -60,6 +62,12 @@ export interface OwnerCustomerDocument {
 }
 
 type Result<T> = { data: T; error: string | null };
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isUuid(value: string | null | undefined): value is string {
+  return typeof value === 'string' && UUID_RE.test(value);
+}
 
 function toMessage(error: unknown): string {
   if (error && typeof error === 'object' && 'message' in error) {
@@ -124,6 +132,28 @@ export async function createCustomerProject(input: {
 }): Promise<Result<string | null>> {
   const { data, error } = await supabase.rpc('create_customer_project_for_owner_customer', {
     p_owner_customer_id: input.ownerCustomerId,
+    p_title: input.title,
+    p_business_objective: input.businessObjective,
+    p_phase: input.phase,
+  });
+  if (error) return { data: null, error: toMessage(error) };
+  return { data: data as string, error: null };
+}
+
+/**
+ * Create a customer-visible project directly from an organization id — the path
+ * used by the canonical /admin/clients/:organizationId "Kundenportal" tab, which
+ * has no owner_customers (Finance CRM) row at all. Never creates, backfills or
+ * merges an owner_customers row as a side effect.
+ */
+export async function createCustomerProjectForOrganization(input: {
+  organizationId: string;
+  title: string;
+  businessObjective: string;
+  phase: string;
+}): Promise<Result<string | null>> {
+  const { data, error } = await supabase.rpc('create_customer_project_for_organization', {
+    p_organization_id: input.organizationId,
     p_title: input.title,
     p_business_objective: input.businessObjective,
     p_phase: input.phase,
@@ -233,10 +263,76 @@ export async function deleteCustomerMilestone(milestoneId: string): Promise<{ er
 }
 
 /**
+ * The customer-portal category a canonical owner PDF may be published under, or null
+ * when the document is not publishable at all.
+ *
+ * Mirrors public.customer_document_category_matches_owner_source() and the
+ * customer_documents_source_consistency_guard trigger. The database is the
+ * enforcement point; this exists so the UI can PRESELECT the right category and never
+ * offer an impossible one — a signed acceptance certificate is stored as
+ * document_type='offer' with render_metadata.signed = true, so the two are told apart
+ * by that flag alone, exactly as the database does it.
+ */
+export function customerCategoryForOwnerDocument(doc: {
+  document_type: string;
+  render_metadata?: Record<string, unknown> | null;
+}): CustomerDocumentCategory | null {
+  const signed = doc.render_metadata?.signed;
+  const isSigned = signed === true || signed === 'true';
+  if (doc.document_type === 'offer') return isSigned ? 'acceptance' : 'offer';
+  if (['invoice', 'credit_note', 'payment_confirmation', 'cancellation_invoice'].includes(doc.document_type)) {
+    return 'invoice';
+  }
+  return null;
+}
+
+export const customerDocumentCategoryLabels: Record<string, string> = {
+  invoice: 'Rechnung',
+  offer: 'Angebot',
+  acceptance: 'Annahmebestätigung',
+};
+
+/**
+ * German, owner-facing translation of the publish RPC's stable machine codes
+ * (migration 20260731120000). The raw message IS the code; it is never shown.
+ */
+function describePublishErrorCode(code: string): string | null {
+  switch (code) {
+    case 'organization_required': return 'Diesem Beleg ist keine Organisation zugeordnet.';
+    case 'source_document_required': return 'Es wurde kein erzeugtes PDF ausgewählt.';
+    case 'title_required': return 'Bitte geben Sie einen Titel ein.';
+    case 'source_document_not_found': return 'Das erzeugte PDF wurde nicht gefunden. Bitte laden Sie die Seite neu.';
+    case 'source_document_not_finalized':
+      return 'Nur finalisierte PDFs können für das Kundenportal registriert werden. Bitte zuerst „PDF speichern“.';
+    case 'source_document_has_no_pdf':
+      return 'Für dieses Dokument ist keine PDF-Datei gespeichert. Bitte erneut „PDF speichern“.';
+    case 'source_organization_unassigned':
+      return 'Der Beleg ist noch keiner Organisation zugeordnet. Bitte zuerst die Organisation zuweisen.';
+    case 'source_organization_mismatch':
+      return 'Der Beleg gehört zu einem anderen Kunden und kann hier nicht veröffentlicht werden.';
+    case 'category_source_mismatch':
+      return 'Die Kategorie passt nicht zum Dokumenttyp. Rechnungsbelege gehören zu „Rechnung“, finalisierte Angebote zu „Angebot“, und „Annahmebestätigung“ ist signierten Annahmebestätigungen vorbehalten.';
+    case 'acceptance_offer_not_accepted':
+      return 'Das zugehörige Angebot ist nicht als angenommen erfasst. Eine Annahmebestätigung kann erst danach veröffentlicht werden.';
+    case 'project_not_available':
+      return 'Das ausgewählte Projekt gehört nicht zu diesem Kunden oder ist archiviert.';
+    case 'not authorized': return 'Für diese Aktion fehlt Ihrem Konto die Berechtigung.';
+    default: return null;
+  }
+}
+
+/**
  * Publish a canonical owner PDF (offer / signed acceptance certificate / invoice) to
- * a customer. The database validates that the source document belongs to the same
- * organization, is finalized, and that the category matches the document type — an
- * ordinary offer can never be published as an acceptance.
+ * a customer as a POINTER. The bytes are never copied or re-uploaded: the row
+ * references the one canonical object in the owner-only bucket.
+ *
+ * The database validates that the source belongs to the same organization, is
+ * finalized, actually has a stored PDF, and that the category matches the document
+ * type — an ordinary offer can never be published as an acceptance.
+ *
+ * IDEMPOTENT: calling this for an already-registered document returns the existing
+ * pointer id and creates nothing, so a double-click cannot produce two customer
+ * documents. It never changes visibility — releasing is a separate, deliberate act.
  */
 export async function publishOwnerDocumentToCustomer(input: {
   organizationId: string;
@@ -252,7 +348,10 @@ export async function publishOwnerDocumentToCustomer(input: {
     p_title: input.title,
     p_owner_generated_document_id: input.ownerGeneratedDocumentId,
   });
-  if (error) return { data: null, error: toMessage(error) };
+  if (error) {
+    const raw = toMessage(error);
+    return { data: null, error: describePublishErrorCode(raw) ?? raw };
+  }
   return { data: data as string, error: null };
 }
 
@@ -301,7 +400,12 @@ export async function loadCustomerInvoiceCandidates(input: {
     .select('id, invoice_number, status, organization_id')
     .order('issue_date', { ascending: false });
 
-  query = input.clientAccountId
+  // `.or()` takes a raw PostgREST filter EXPRESSION, not bound parameters: anything
+  // interpolated here is grammar, not a value. Both ids are UUIDs from server-side
+  // records, so this is defence in depth rather than a known hole — but a value that
+  // is not UUID-shaped must never be spliced into the expression at all.
+  const canUseOrFilter = isUuid(input.organizationId) && isUuid(input.clientAccountId);
+  query = canUseOrFilter
     ? query.or(`organization_id.eq.${input.organizationId},client_account_id.eq.${input.clientAccountId}`)
     : query.eq('organization_id', input.organizationId);
 
@@ -383,6 +487,77 @@ export async function unlinkProjectInvoice(
   return { error: error ? toMessage(error) : null };
 }
 
+// Mirrors supabase/functions/customer-document-upload/handler.ts exactly (MAX_UPLOAD_BYTES,
+// ALLOWED_CONTENT_TYPES). Kept here so the upload dialog can show the real limits and
+// reject obviously-invalid files before spending a round trip — the Edge Function remains
+// the actual enforcement point either way.
+export const CUSTOMER_UPLOAD_MAX_BYTES = 25 * 1024 * 1024;
+
+export const CUSTOMER_UPLOAD_ALLOWED_CONTENT_TYPES = [
+  'application/pdf',
+  'image/png',
+  'image/jpeg',
+  'text/plain',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+] as const;
+
+export const customerUploadContentTypeLabels: Record<string, string> = {
+  'application/pdf': 'PDF',
+  'image/png': 'PNG',
+  'image/jpeg': 'JPEG',
+  'text/plain': 'TXT',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
+};
+
+// Categories reserved for the canonical owner registry (offer / acceptance / invoice) can
+// only be populated by publishOwnerDocumentToCustomer, never by a raw upload — the Edge
+// Function enforces this too; this list keeps the upload dialog from even offering them.
+export const CUSTOMER_UPLOAD_CATEGORIES: CustomerDocumentCategory[] = [
+  'contract',
+  'concept',
+  'project_document',
+  'meeting_notes',
+  'handover',
+  'manual',
+  'dpa',
+  'customer_upload',
+];
+
+/** German, owner-facing translation of the Edge Function's stable error codes. */
+function describeUploadErrorCode(code: string | null): string | null {
+  switch (code) {
+    case 'authentication_required': return 'Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.';
+    case 'not_authorized': return 'Für den Dokumenten-Upload fehlt Ihrem Konto die Berechtigung.';
+    case 'invalid_organization_id': return 'Ungültige Organisation.';
+    case 'invalid_project_id': return 'Ungültiges Projekt.';
+    case 'category_required': return 'Bitte wählen Sie eine Kategorie.';
+    case 'category_requires_canonical_document':
+      return 'Diese Kategorie ist Angeboten, Annahmebestätigungen und Rechnungen aus dem jeweiligen Beleg vorbehalten und kann nicht direkt hochgeladen werden.';
+    case 'title_required': return 'Bitte geben Sie einen Titel ein.';
+    case 'unsupported_content_type': return 'Dieser Dateityp wird nicht unterstützt. Erlaubt sind PDF, PNG, JPEG, TXT und DOCX.';
+    case 'file_required': return 'Bitte wählen Sie eine Datei aus.';
+    case 'file_too_large': return 'Die Datei überschreitet das Limit von 25 MB.';
+    case 'project_not_found': return 'Das ausgewählte Projekt wurde nicht gefunden.';
+    case 'project_organization_mismatch': return 'Das ausgewählte Projekt gehört zu einer anderen Organisation.';
+    case 'organization_not_found': return 'Die Organisation wurde nicht gefunden.';
+    case 'upload_failed': return 'Der Upload ist fehlgeschlagen. Bitte versuchen Sie es erneut.';
+    case 'upload_verification_failed': return 'Der Upload konnte nicht verifiziert werden. Bitte versuchen Sie es erneut.';
+    case 'stored_object_rejected': return 'Die gespeicherte Datei entspricht nicht den Vorgaben und wurde verworfen.';
+    case 'registration_failed': return 'Das Dokument konnte nicht registriert werden. Bitte versuchen Sie es erneut.';
+    default: return null;
+  }
+}
+
+async function extractFunctionErrorCode(error: unknown): Promise<string | null> {
+  if (!(error instanceof FunctionsHttpError)) return null;
+  try {
+    const body = await error.context.clone().json();
+    return typeof body?.error === 'string' ? body.error : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Upload a customer document through the controlled server-side flow.
  *
@@ -407,7 +582,10 @@ export async function uploadCustomerDocument(input: {
   const { data, error } = await supabase.functions.invoke('customer-document-upload', {
     body: form,
   });
-  if (error) return { data: null, error: toMessage(error) };
+  if (error) {
+    const code = await extractFunctionErrorCode(error);
+    return { data: null, error: describeUploadErrorCode(code) ?? toMessage(error) };
+  }
   const documentId = (data as { document_id?: string } | null)?.document_id ?? null;
   if (!documentId) return { data: null, error: 'Der Upload konnte nicht registriert werden.' };
   return { data: documentId, error: null };

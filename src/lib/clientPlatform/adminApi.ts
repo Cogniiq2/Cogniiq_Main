@@ -1,3 +1,5 @@
+import { FunctionsHttpError } from '@supabase/supabase-js';
+
 import { supabase } from '@/lib/supabase';
 import type {
   ClientAccount,
@@ -129,6 +131,30 @@ export interface ProvisionClientPayload {
   invitationEmail: string;
   organizationRole: string;
   sendInvitation: boolean;
+  /**
+   * Only sent on a SECOND submission, after the owner has been shown the matching
+   * organizations and has explicitly chosen. Never defaulted client-side: an absent
+   * decision is what makes the server refuse an ambiguous match instead of guessing.
+   */
+  identityDecision?: 'reuse' | 'create_separate' | null;
+  /** Required when identityDecision is 'reuse'. */
+  targetOrganizationId?: string | null;
+}
+
+/**
+ * An organization that may already be this customer, as reported by the server when
+ * provisioning stops for a decision.
+ *
+ * `match_strength` is 'name_only' when nothing beyond the normalized company name
+ * matched — which is exactly the case that must never be resolved automatically.
+ */
+export interface OrganizationIdentityCandidate {
+  organization_id: string;
+  organization_name: string;
+  organization_status: string;
+  match_strength: 'strong' | 'name_only';
+  matched_on: string[];
+  created_at: string | null;
 }
 
 export interface ProvisionClientResult {
@@ -136,16 +162,58 @@ export interface ProvisionClientResult {
   workspace?: Record<string, unknown>;
   invitation?: Record<string, unknown>;
   error?: string;
+  /**
+   * Present only when provisioning stopped because an existing organization might be
+   * this same customer. Not an error to retry — a choice to make.
+   */
+  identityConflict?: OrganizationIdentityCandidate[];
 }
+
+/** German copy for the identity signals the server reports, for the decision UI. */
+export const identityMatchLabels: Record<string, string> = {
+  normalized_name: 'Firmenname',
+  contact_email: 'Kontakt-E-Mail',
+  corporate_email_domain: 'Firmen-E-Mail-Domain',
+  website_host: 'Website',
+  website_matches_email_domain: 'Website entspricht E-Mail-Domain',
+};
 
 export async function provisionClientViaEdge(payload: ProvisionClientPayload): Promise<ProvisionClientResult> {
   const { data, error } = await supabase.functions.invoke('admin-provision-client', {
     body: { action: 'provision', ...payload },
   });
+
+  // A 409 identity conflict arrives as a FunctionsHttpError: `data` is null and the
+  // structured body lives on error.context, so it has to be read from the response
+  // rather than from `data`.
   if (error) {
-    return { ok: false, error: error.message };
+    const body = await readFunctionErrorBody(error);
+    if (body?.error === 'organization_identity_conflict') {
+      return {
+        ok: false,
+        error: 'organization_identity_conflict',
+        identityConflict: Array.isArray(body.candidates) ? body.candidates : [],
+      };
+    }
+    return { ok: false, error: typeof body?.error === 'string' ? body.error : error.message };
   }
   return data as ProvisionClientResult;
+}
+
+interface ProvisionErrorBody {
+  error?: string;
+  candidates?: OrganizationIdentityCandidate[];
+  hint?: string | null;
+}
+
+/** Reads a non-2xx Edge Function body without consuming the caller's response. */
+async function readFunctionErrorBody(error: unknown): Promise<ProvisionErrorBody | null> {
+  if (!(error instanceof FunctionsHttpError)) return null;
+  try {
+    return (await error.context.clone().json()) as ProvisionErrorBody;
+  } catch {
+    return null;
+  }
 }
 
 // Resend is scoped to a controlled invitation record (never a free-form email). Expired

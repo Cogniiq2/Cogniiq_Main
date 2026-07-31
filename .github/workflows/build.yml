@@ -51,11 +51,23 @@ jobs:
       - name: Customer dashboard UX foundation tests
         run: node .github/scripts/test-customer-dashboard-ux.mjs
 
+      - name: Authentication boot timeout tests
+        run: node .github/scripts/test-auth-boot-timeout.mjs
+
+      - name: Customer error-surface and stale-query tests
+        run: node .github/scripts/test-customer-error-surface.mjs
+
       - name: Customer document download handler tests
         run: node .github/scripts/test-customer-document-download-handler.mjs
 
       - name: Customer document upload handler tests
         run: node .github/scripts/test-customer-document-upload-handler.mjs
+
+      - name: Owner customer-portal integration tests (upload UI + Kundenportal tab)
+        run: node .github/scripts/test-owner-customer-portal-integration.mjs
+
+      - name: Commercial publishing UI + duplicate-prevention integration tests
+        run: node .github/scripts/test-commercial-publishing-ui.mjs
 
       - name: Typecheck
         run: npm run typecheck
@@ -142,3 +154,42 @@ jobs:
       # isolation, internal-field non-exposure, signed-URL authorization).
       - name: Customer platform SQL authorization tests
         run: bash .github/scripts/run-customer-platform-sql-tests.sh
+
+      # Proves the duplicate-organization defect was real (it is reproduced against the
+      # PRE-FIX schema first), that the identity fix stops it, and that two genuinely
+      # concurrent provisioning sessions converge on ONE organization.
+      - name: Provisioning identity + concurrency SQL tests
+        run: bash .github/scripts/run-provisioning-identity-sql-tests.sh
+
+      # Proves the staging preflight actually catches drift: it must pass against
+      # a correctly migrated database AND fail, with the right check, against each
+      # of thirteen deliberately broken states.
+      - name: Staging preflight self-test
+        run: bash .github/scripts/run-staging-preflight-selftest.sh
+
+      # Proves every seeder interlock refuses (including the CI interlock, which is
+      # exercised here precisely because this IS CI) and that the fixtures produce
+      # the tenancy they promise and are removed completely.
+      - name: Staging seed guard + fixture self-test
+        run: bash .github/scripts/run-staging-seed-selftest.sh
+
+  case-d-legacy-convergence-sql-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure PostgreSQL server binaries
+        run: |
+          if [ -z "$(ls -d /usr/lib/postgresql/*/bin 2>/dev/null)" ]; then
+            sudo apt-get update
+            sudo apt-get install --yes postgresql
+          fi
+
+      # Proves 20260731122000_case_d_legacy_convergence.sql safely reconciles the
+      # five legacy migrations (tasks / execution_* / oura_*) against hosted
+      # Supabase's actual verified state, on a fresh migration chain AND on
+      # hosted's exact reproduced partial topology, including proving the real
+      # pre-convergence anon exposure, data preservation, and idempotent replay.
+      - name: Case D legacy convergence SQL tests
+        run: bash .github/scripts/run-case-d-legacy-convergence-sql-tests.sh

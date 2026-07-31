@@ -4,10 +4,16 @@ import { ShieldAlert } from 'lucide-react';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthLoadingScreen } from './AuthLoadingScreen';
+import { AuthRecoveryScreen } from './AuthRecoveryScreen';
 
 export function PlatformAdminRoute({ children }: { children: ReactNode }) {
-  const { user, profile, isLoading, isPlatformAdmin, signOut } = useAuth();
+  const { user, profile, isLoading, authTimedOut, isPlatformAdmin, signOut } = useAuth();
   const location = useLocation();
+
+  // A bootstrap that never answered must not read as "signed out": the session
+  // may well be valid. Offer retry and sign out instead of redirecting to login
+  // on the strength of a request that never came back.
+  if (authTimedOut) return <AuthRecoveryScreen />;
 
   if (isLoading) return <AuthLoadingScreen />;
 

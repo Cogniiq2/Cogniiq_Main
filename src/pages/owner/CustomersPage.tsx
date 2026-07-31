@@ -144,9 +144,19 @@ export function CustomersPage() {
 
       {loading ? <TableSkeleton rows={6} cols={6} /> : rows.length === 0 ? (
         <EmptyState icon={Users}
-          title="Noch keine Kunden"
-          description="Legen Sie Ihren ersten Kunden an. Kunden aus bestehenden Angeboten wurden automatisch übernommen."
-          action={<Button icon={Plus} onClick={() => setCreateOpen(true)} disabled={!entity}>Neuer Kunde</Button>} />
+          title="Noch keine Kunden im internen Finance-Aufgabensystem"
+          description={
+            'Dies ist NICHT die Liste Ihrer Portalkunden — „Kunden & Aufgaben“ ist ein separates, '
+            + 'internes Finance-System für Angebote und Aufgaben. Kunden aus bestehenden Angeboten '
+            + 'werden automatisch übernommen. Die tatsächlichen Portalkunden (Organisationen, '
+            + 'Kundenportal-Projekte, Dokumente) verwalten Sie unter „Kunden“.'
+          }
+          action={
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <Button icon={Plus} onClick={() => setCreateOpen(true)} disabled={!entity}>Neuer Kunde</Button>
+              <Button variant="secondary" onClick={() => navigate('/admin/clients')}>Zur Kundenliste (Kunden)</Button>
+            </div>
+          } />
       ) : visible.length === 0 ? (
         <EmptyState icon={Search} title="Keine Treffer" description="Passen Sie Filter oder Suche an." />
       ) : (

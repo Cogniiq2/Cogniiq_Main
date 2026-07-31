@@ -79,7 +79,12 @@ function AppHomeContent() {
   const { profile, user } = useAuth();
   const { activeOrganization } = useOrganizations();
   const { solutions, portalSettings, status, error, reload } = useOrganizationSolutions();
-  const { projects, status: projectsStatus } = useCustomerProjects();
+  const {
+    projects,
+    status: projectsStatus,
+    error: projectsError,
+    reload: reloadProjects,
+  } = useCustomerProjects();
   const { documents } = useCustomerDocuments(null);
   const { invoices } = useCustomerInvoices(null);
 
@@ -142,6 +147,17 @@ function AppHomeContent() {
         />
       ) : null}
 
+      {/* A failed project request must be reported as a failure. Without this the
+          page fell through to NoProjectState and told the customer their portal
+          was still being set up — a factual claim about their account made on the
+          strength of a request that never succeeded. */}
+      {projectsStatus === 'error' && !workspaceLoading ? (
+        <AppErrorState
+          message={projectsError ?? 'Ihre Projekte konnten nicht geladen werden.'}
+          onRetry={() => void reloadProjects()}
+        />
+      ) : null}
+
       {status === 'no-organization' ? (
         <AppEmptyState
           icon={Building2}
@@ -167,9 +183,10 @@ function AppHomeContent() {
                 ))}
               </div>
             </AppSection>
-          ) : (
+          ) : projectsStatus === 'ready' ? (
+            // Only claim "no project yet" when the project list actually loaded.
             <NoProjectState solutions={solutions} />
-          )}
+          ) : null}
 
           {/* ---- Recently delivered documents ---- */}
           {recentDocuments.length ? (

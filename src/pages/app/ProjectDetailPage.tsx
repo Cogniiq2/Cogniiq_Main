@@ -156,10 +156,21 @@ function ProjectDetailContent() {
 
 // ---------------------------------------------------------------- Übersicht
 function OverviewTab({ project }: { project: CustomerProject }) {
-  const { milestones } = useCustomerMilestones(project.id);
+  const { milestones, status: milestonesStatus } = useCustomerMilestones(project.id);
   const nextMilestone = milestones.find(
     (milestone) => milestone.status === 'in_progress' || milestone.status === 'upcoming',
   );
+
+  // "Kein offener Meilenstein" is a factual claim about the project. It may only be
+  // made once the milestones actually loaded — a failed or still-running request
+  // must read as unknown, never as an answer.
+  const nextMilestoneLabel = nextMilestone
+    ? nextMilestone.title
+    : milestonesStatus === 'ready'
+      ? 'Kein offener Meilenstein'
+      : milestonesStatus === 'error'
+        ? 'Konnte nicht geladen werden'
+        : 'Wird geladen …';
 
   return (
     <div className="space-y-6">
@@ -186,7 +197,7 @@ function OverviewTab({ project }: { project: CustomerProject }) {
           <div>
             <dt className="text-gray-400">Nächster Meilenstein</dt>
             <dd className="mt-1 font-semibold text-gray-900">
-              {nextMilestone ? nextMilestone.title : 'Kein offener Meilenstein'}
+              {nextMilestoneLabel}
             </dd>
           </div>
         </dl>

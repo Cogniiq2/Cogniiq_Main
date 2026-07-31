@@ -61,7 +61,9 @@ for f in 20260728120000_customer_project_core \
          20260728121000_customer_documents \
          20260728122000_customer_billing_link \
          20260728123000_owner_invoice_organization_assignment \
-         20260728124000_customer_document_archive_service_role; do
+         20260728124000_customer_document_archive_service_role \
+         20260730120000_customer_project_organization_scope \
+         20260731120000_customer_document_publish_guard; do
   [ -f "$MIG/$f.sql" ] || continue
   PSQL -d cust -q -f "$MIG/$f.sql" >/dev/null
   NEW_MIGRATIONS+=("$f")
@@ -69,7 +71,14 @@ for f in 20260728120000_customer_project_core \
 done
 [ ${#NEW_MIGRATIONS[@]} -gt 0 ] || { echo "no customer-platform migrations found"; exit 1; }
 
-for t in customer-projects-tests customer-documents-tests customer-billing-tests customer-invoice-organization-tests; do
+# pankofer-organization-reconciliation-tests runs LAST: it seeds the production
+# duplicate-organization topology and then executes the real forward-only data
+# migration (20260730130000) itself via \ir, so that migration is deliberately
+# absent from the schema chain above — on a database without the duplicate it is
+# designed to abort rather than guess.
+for t in customer-projects-tests customer-documents-tests customer-billing-tests customer-invoice-organization-tests customer-project-organization-scope-tests \
+         customer-document-publish-guard-tests \
+         pankofer-organization-reconciliation-tests; do
   [ -f "$SQLDIR/$t.sql" ] || continue
   echo "--- $t"
   PSQL -d cust -f "$SQLDIR/$t.sql"
@@ -82,9 +91,10 @@ for f in "${NEW_MIGRATIONS[@]}"; do
   # Migrations containing only `create or replace function`/grant/revoke statements
   # are legitimately re-appliable: there is no structural state to drift, replacing
   # a function with an identical body is deterministic by definition. Only
-  # migrations with structural DDL (create table/type, alter table) are required
-  # to fail loudly on a second apply.
-  if ! grep -qiE '^\s*(create table|create type|alter table)' "$MIG/$f.sql"; then
+  # migrations with structural DDL are required to fail loudly on a second apply.
+  # An unguarded CREATE INDEX counts: the index name is structural state, so a
+  # second apply must collide rather than silently no-op.
+  if ! grep -qiE '^\s*(create table|create type|alter table|create (unique )?index)' "$MIG/$f.sql"; then
     echo "skip: $f has no structural DDL (function-only migration; re-apply is expected to succeed)"
     continue
   fi
