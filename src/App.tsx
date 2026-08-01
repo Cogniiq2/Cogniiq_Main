@@ -17,6 +17,14 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ConsentBanner } from './components/ConsentBanner';
 import { initConsent } from './lib/consent';
 import { CITY_SERVICE_CONFIGS } from './lib/standorte-data';
+import {
+  DEFAULT_ROBOTS,
+  DOCUMENT_ROBOTS,
+  PRIVATE_ROBOTS,
+  isDocumentSurface,
+  isPrivateSurface,
+  privateDocumentTitle,
+} from './lib/routing/indexability';
 
 type LazyPageComponent = ComponentType<Record<string, unknown>>;
 
@@ -35,8 +43,6 @@ function PageFallback() {
   return null;
 }
 
-const DEFAULT_ROBOTS = 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
-
 function setMeta(name: string, content: string) {
   let el = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
   if (!el) {
@@ -47,25 +53,16 @@ function setMeta(name: string, content: string) {
   el.setAttribute('content', content);
 }
 
-function isPrivateSurface(pathname: string) {
-  return pathname === '/app' || pathname.startsWith('/app/') || pathname === '/admin' || pathname.startsWith('/admin/')
-    || pathname === '/owner' || pathname.startsWith('/owner/');
-}
-
-// Tokenized customer document portal (/d/:token). A private, sensitive surface that
-// must never be indexed, archived, snippeted or referrer-leaked, and must render no
-// marketing structured data or canonical URL. The portal itself sets the document
-// title to the offer number after it loads.
-function isDocumentSurface(pathname: string) {
-  return pathname === '/d' || pathname.startsWith('/d/');
-}
+// isPrivateSurface / isDocumentSurface live in lib/routing/indexability so the robots meta manager,
+// the structured-data gate and the consent banner cannot drift apart. /auth/* (the confirmation and
+// post-login resolution surfaces) counts as private.
 
 function RouteIndexabilityManager() {
   const { pathname } = useLocation();
 
   useEffect(() => {
     if (isDocumentSurface(pathname)) {
-      setMeta('robots', 'noindex, nofollow, noarchive, nosnippet');
+      setMeta('robots', DOCUMENT_ROBOTS);
       setMeta('referrer', 'no-referrer');
       return; // title is set by PublicDocumentPortal once the offer is known.
     }
@@ -74,12 +71,8 @@ function RouteIndexabilityManager() {
     setMeta('referrer', 'strict-origin-when-cross-origin');
 
     if (isPrivateSurface(pathname)) {
-      setMeta('robots', 'noindex, nofollow');
-      document.title = pathname.startsWith('/admin')
-        ? 'Cogniiq Admin'
-        : pathname.startsWith('/owner')
-          ? 'Cogniiq Owner'
-          : 'Cogniiq Kundenbereich';
+      setMeta('robots', PRIVATE_ROBOTS);
+      document.title = privateDocumentTitle(pathname);
       return;
     }
 
@@ -368,6 +361,10 @@ const LoginPage = lazyNamed(() => import('./pages/app/LoginPage'), 'LoginPage');
 const SignupPage = lazyNamed(() => import('./pages/app/SignupPage'), 'SignupPage');
 const ForgotPasswordPage = lazyNamed(() => import('./pages/app/ForgotPasswordPage'), 'ForgotPasswordPage');
 const ResetPasswordPage = lazyNamed(() => import('./pages/app/ResetPasswordPage'), 'ResetPasswordPage');
+const AuthConfirmationPage = lazyNamed(
+  () => import('./pages/app/AuthConfirmationPage'),
+  'AuthConfirmationPage'
+);
 
 function PublicLayout() {
   return (
@@ -390,7 +387,7 @@ function PublicLayout() {
 // One top-level route table. Auth/private surfaces and the customer portal are matched first; the
 // public marketing site is a pathless layout route so its chrome wraps every marketing page without
 // changing any public path. Route guards live inside their own layout/module (no duplicated guards).
-function AppInner() {
+export function AppInner() {
   return (
     <Suspense fallback={<PageFallback />}>
       <Routes>
@@ -401,6 +398,12 @@ function AppInner() {
             viewport (min-height:100dvh; width:100%; overflow-x:hidden) with no inherited
             top offset. */}
         <Route path="/d/:token" element={<PublicDocumentPortal />} />
+
+        {/* Standalone authentication completion surface. Like /d/:token it lives entirely OUTSIDE
+            the marketing and dashboard layouts — no Navigation, no Footer, no dashboard shell, no
+            ProtectedRoute (the Supabase link itself is the credential). Marked noindex by
+            RouteIndexabilityManager, which treats every /auth/* path as private. */}
+        <Route path="/auth/confirmed" element={<AuthConfirmationPage />} />
 
         {/* Post-login role resolution — waits for the DB-backed role, then routes safely. */}
         <Route path="/auth/continue" element={<RoleLandingPage />} />

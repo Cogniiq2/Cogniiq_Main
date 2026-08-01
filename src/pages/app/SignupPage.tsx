@@ -36,7 +36,9 @@ export function SignupPage() {
       password,
       options: {
         data: { full_name: fullName.trim() },
-        emailRedirectTo: `${window.location.origin}/app`,
+        // Explicit confirmation surface, not the portal: the user must be told that activation
+        // actually succeeded before being handed off through /auth/continue.
+        emailRedirectTo: `${window.location.origin}/auth/confirmed?flow=signup`,
       },
     });
     setLoading(false);

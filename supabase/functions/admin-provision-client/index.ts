@@ -23,8 +23,11 @@ const corsHeaders = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+// Invited owners land on the explicit confirmation surface, which tells them the invitation was
+// accepted and takes their own password, instead of dropping them on a bare login form. Overridable
+// per environment (staging/preview) via CUSTOMER_PORTAL_INVITE_REDIRECT.
 const INVITE_REDIRECT =
-  Deno.env.get("CUSTOMER_PORTAL_INVITE_REDIRECT") ?? "https://cogniiq.de/app/login";
+  Deno.env.get("CUSTOMER_PORTAL_INVITE_REDIRECT") ?? "https://cogniiq.de/auth/confirmed?flow=invite";
 
 type JsonRecord = Record<string, unknown>;
 
