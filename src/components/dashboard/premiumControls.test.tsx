@@ -22,21 +22,24 @@ const statuses = [
   { value: 'paused', label: 'Pausiert', disabled: true },
 ];
 
-function ControlledSelect(props: Partial<React.ComponentProps<typeof PremiumSelect>> = {}) {
-  const [value, setValue] = useState(props.value ?? 'lead');
+// `value` is an initial seed here, not a controlled prop: the harness owns the state so the
+// tests exercise the same controlled pattern every call site in the product uses.
+function ControlledSelect({
+  value: initialValue = 'lead',
+  onValueChange,
+  ...props
+}: Partial<React.ComponentProps<typeof PremiumSelect>> = {}) {
+  const [value, setValue] = useState(initialValue);
   return (
     <PremiumSelect
       label="Lifecycle-Status"
+      options={statuses}
+      {...props}
       value={value}
       onValueChange={(next) => {
         setValue(next);
-        props.onValueChange?.(next);
+        onValueChange?.(next);
       }}
-      options={statuses}
-      {...props}
-      // The local state must win over a `value` passed only as an initial seed.
-      // eslint-disable-next-line react/jsx-props-no-spreading
-      {...{ value }}
     />
   );
 }
@@ -227,21 +230,24 @@ const customers = [
   { value: 'c3', label: 'Südwind Solar GmbH', description: 'Freiburg', keywords: ['K-1003'] },
 ];
 
-function ControlledCombobox(props: Partial<React.ComponentProps<typeof PremiumCombobox>> = {}) {
-  const [value, setValue] = useState('');
+function ControlledCombobox({
+  value: initialValue = '',
+  onValueChange,
+  ...props
+}: Partial<React.ComponentProps<typeof PremiumCombobox>> = {}) {
+  const [value, setValue] = useState(initialValue);
   return (
     <PremiumCombobox
       label="Kunde"
       placeholder="Kunde wählen"
       emptyMessage="Kein Kunde gefunden."
+      options={customers}
+      {...props}
       value={value}
       onValueChange={(next) => {
         setValue(next);
-        props.onValueChange?.(next);
+        onValueChange?.(next);
       }}
-      options={customers}
-      {...props}
-      {...{ value }}
     />
   );
 }

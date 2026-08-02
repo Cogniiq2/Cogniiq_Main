@@ -188,20 +188,23 @@ function CustomerAppShellInner({ children }: { children: ReactNode }) {
             </span>
           </Link>
 
-          {/* Workspace context, centred on wide screens so the customer's own name is the
-              anchor of the page rather than an afterthought in a corner. */}
+          {/* Workspace context. A customer with several organizations gets the switcher as the
+              anchor instead — printing the same organization name twice in one 64px row is
+              what squeezed a long German company name down to "Noch nicht pr…" at 1440px. */}
           <div className="hidden min-w-0 flex-1 items-center justify-center gap-2.5 lg:flex">
-            <span className="min-w-0 truncate text-[15px] font-semibold tracking-tight text-gray-950">
-              {activeOrganization?.name ?? 'Noch nicht provisioniert'}
-            </span>
+            {hasMultipleOrganizations ? null : (
+              <span className="min-w-0 truncate text-[15px] font-semibold tracking-tight text-gray-950">
+                {activeOrganization?.name ?? 'Noch nicht provisioniert'}
+              </span>
+            )}
             <AppStatusBadge label={lifecycle.label} tone={lifecycle.tone} />
           </div>
 
           {/* Desktop cluster and the mobile trigger below share ONE breakpoint (lg). Splitting
               them (md here, lg on the nav row) previously left 768–1023px with no navigation
               at all: the hamburger was already hidden while the nav row had not appeared yet. */}
-          <div className="hidden items-center gap-2 lg:flex">
-            {organizationSelect('', 'h-9 w-[200px] text-[13px] font-medium text-gray-700')}
+          <div className="hidden min-w-0 items-center gap-2 lg:flex">
+            {organizationSelect('', 'h-9 w-[220px] text-[13px] font-semibold text-gray-950')}
 
             <Link
               to="/"

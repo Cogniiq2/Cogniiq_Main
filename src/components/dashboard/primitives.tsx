@@ -613,45 +613,74 @@ export interface Column<T> {
  * another one. Rows that navigate must therefore still contain a real <Link> (normally the first
  * cell) — that link is the keyboard and screen-reader path, and clicking the row is the shortcut.
  */
-export function DataTable<T>({ columns, rows, getRowKey, mobileTitle, mobileSubtitle, onRowClick, minWidth = 720 }: {
+export function DataTable<T>({ columns, rows, getRowKey, mobileTitle, mobileSubtitle, onRowClick, isRowSelected, caption, minWidth = 720 }: {
   columns: Column<T>[];
   rows: T[];
   getRowKey: (row: T) => string;
   mobileTitle: (row: T) => ReactNode;
   mobileSubtitle?: (row: T) => ReactNode;
   onRowClick?: (row: T) => void;
+  /** Marks a row as the current/acted-on one. Renders a tint plus a left marker, never colour alone. */
+  isRowSelected?: (row: T) => boolean;
+  /** Visually hidden table caption. A screen-reader user otherwise meets an unnamed grid. */
+  caption?: string;
   minWidth?: number;
 }) {
   const alignClass = (a?: 'left' | 'right' | 'center') => (a === 'right' ? 'text-right' : a === 'center' ? 'text-center' : 'text-left');
+  // Right-aligned columns in this product are money, counts and percentages. Proportional
+  // digits make a column of amounts ragged even when it is flush right, so they get
+  // tabular figures — the single change that makes a financial table read professionally.
+  const numericClass = (a?: 'left' | 'right' | 'center') => (a === 'right' ? 'tabular-nums' : undefined);
   const interactiveProps = (row: T) => (onRowClick ? { onClick: () => onRowClick(row) } : {});
 
   return (
     <div className={cn(cardSurface, 'overflow-hidden')}>
       {/* Desktop / tablet */}
-      <div className="hidden overflow-x-auto md:block">
+      <div className="hidden max-h-[70vh] overflow-auto md:block">
         <table className="w-full text-left text-sm" style={{ minWidth }}>
-          <thead>
-            <tr className="border-b border-hairline bg-gray-50/60 text-[10.5px] font-semibold uppercase tracking-[0.09em] text-gray-500">
+          {caption ? <caption className="sr-only">{caption}</caption> : null}
+          {/* Sticky so the column meaning survives a long invoice or expense list. The
+              background is opaque, not a tint, or the scrolled rows show through it. */}
+          <thead className="sticky top-0 z-10">
+            <tr className="border-b border-hairline bg-gray-50 text-[10.5px] font-semibold uppercase tracking-[0.09em] text-gray-500 [&>th]:bg-gray-50">
               {columns.map((c) => (
                 <th key={c.key} scope="col" className={cn('px-5 py-3 font-semibold', alignClass(c.align))}>{c.header}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
-              <tr
-                key={getRowKey(row)}
-                {...interactiveProps(row)}
-                className={cn(
-                  'border-b border-gray-50 last:border-0',
-                  onRowClick && 'cursor-pointer transition-colors duration-fast ease-premium hover:bg-gray-50/80 focus-within:bg-gray-50/80',
-                )}
-              >
-                {columns.map((c) => (
-                  <td key={c.key} className={cn('px-5 py-3.5 align-middle text-[13px] text-gray-700', alignClass(c.align), c.className)}>{c.render(row)}</td>
-                ))}
-              </tr>
-            ))}
+            {rows.map((row) => {
+              const selected = isRowSelected?.(row) ?? false;
+              return (
+                <tr
+                  key={getRowKey(row)}
+                  {...interactiveProps(row)}
+                  aria-current={selected ? 'true' : undefined}
+                  className={cn(
+                    'relative border-b border-gray-50 last:border-0',
+                    onRowClick && 'cursor-pointer transition-colors duration-fast ease-premium hover:bg-gray-50/80 focus-within:bg-gray-50/80',
+                    selected && 'bg-gray-950/[0.035] hover:bg-gray-950/[0.045]',
+                  )}
+                >
+                  {columns.map((c, columnIndex) => (
+                    <td
+                      key={c.key}
+                      className={cn(
+                        'relative px-5 py-3.5 align-middle text-[13px] text-gray-700',
+                        alignClass(c.align),
+                        numericClass(c.align),
+                        c.className,
+                      )}
+                    >
+                      {selected && columnIndex === 0 ? (
+                        <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-gray-950" aria-hidden="true" />
+                      ) : null}
+                      {c.render(row)}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -661,7 +690,11 @@ export function DataTable<T>({ columns, rows, getRowKey, mobileTitle, mobileSubt
           <div
             key={getRowKey(row)}
             {...interactiveProps(row)}
-            className={cn('p-4', onRowClick && 'cursor-pointer transition-colors duration-fast ease-premium focus-within:bg-gray-50/80 active:bg-gray-50')}
+            className={cn(
+              'p-4',
+              onRowClick && 'cursor-pointer transition-colors duration-fast ease-premium focus-within:bg-gray-50/80 active:bg-gray-50',
+              isRowSelected?.(row) && 'bg-gray-950/[0.035]',
+            )}
           >
             <div className="mb-2 flex items-center justify-between gap-3">
               <div className="min-w-0 text-sm font-semibold text-gray-950">{mobileTitle(row)}</div>
