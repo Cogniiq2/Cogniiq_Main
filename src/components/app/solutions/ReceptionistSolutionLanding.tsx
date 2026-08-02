@@ -11,7 +11,7 @@ export default function ReceptionistSolutionLanding({ solution }: SolutionLandin
 
   return (
     <div className="space-y-8">
-      <div className="overflow-hidden rounded-panel border border-hairline bg-white shadow-[0_24px_80px_rgba(15,23,42,0.045)]">
+      <div className="overflow-hidden rounded-panel border border-hairline bg-white shadow-card">
         <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-start lg:justify-between lg:p-10">
           <div className="max-w-2xl">
             <div className="mb-4 flex items-center gap-3">

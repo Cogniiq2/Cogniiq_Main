@@ -9,7 +9,7 @@ export default function AutomationSolutionLanding({ solution }: SolutionLandingP
 
   return (
     <div className="space-y-8">
-      <div className="overflow-hidden rounded-panel border border-hairline bg-white shadow-[0_24px_80px_rgba(15,23,42,0.045)]">
+      <div className="overflow-hidden rounded-panel border border-hairline bg-white shadow-card">
         <div className="p-6 sm:p-8 lg:p-10">
           <div className="mb-4 flex items-center gap-3">
             <span className="flex h-11 w-11 items-center justify-center rounded-card border border-gray-200 bg-gray-50 text-gray-700">

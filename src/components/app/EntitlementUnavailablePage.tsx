@@ -17,7 +17,7 @@ export function EntitlementUnavailablePage({
 }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-canvas px-6 py-16">
-      <div className="w-full max-w-md rounded-card border border-gray-200 bg-white p-7 text-center shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+      <div className="w-full max-w-md rounded-card border border-gray-200 bg-white p-7 text-center shadow-panel">
         <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-500">
           <Lock size={18} aria-hidden="true" />
         </div>

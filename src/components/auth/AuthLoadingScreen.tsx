@@ -1,8 +1,11 @@
 export function AuthLoadingScreen() {
   return (
-    <div className="min-h-screen bg-white text-gray-900 flex items-center justify-center px-6">
-      <div className="flex items-center gap-3 text-sm text-gray-500">
-        <span className="h-4 w-4 rounded-full border border-gray-300 border-t-gray-900 animate-spin" />
+    <div data-cq-surface="auth" className="flex min-h-screen items-center justify-center bg-white px-6 text-gray-900">
+      <div role="status" className="flex items-center gap-3 text-sm text-gray-600">
+        <span
+          className="h-4 w-4 animate-spin rounded-full border-2 border-gray-200 border-t-gray-900 motion-reduce:animate-none"
+          aria-hidden="true"
+        />
         Checking secure session
       </div>
     </div>

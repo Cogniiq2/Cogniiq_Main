@@ -103,7 +103,7 @@ export function ExportMenu({
         <div
           role="menu"
           className={cn(
-            'absolute z-40 mt-2 w-72 overflow-hidden rounded-card border border-hairline bg-white p-1.5 shadow-[0_24px_70px_rgba(15,23,42,0.14)]',
+            'absolute z-40 mt-2 w-72 overflow-hidden rounded-card border border-hairline bg-white p-1.5 shadow-panel',
             align === 'right' ? 'right-0' : 'left-0',
           )}
         >

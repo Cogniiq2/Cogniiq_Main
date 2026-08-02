@@ -110,7 +110,7 @@ export function CustomerTaskChecklist({ customerId, tasks, onChanged }: {
       ) : (
         <ul className="space-y-2">
           {active.map((task, i) => (
-            <li key={task.id} className="flex items-start gap-3 rounded-card border border-hairline bg-white p-3 shadow-[0_1px_0_rgba(15,23,42,0.02)]">
+            <li key={task.id} className="flex items-start gap-3 rounded-card border border-hairline bg-white p-3 shadow-none">
               <input
                 type="checkbox" checked={false} disabled={busy.has(task.id)} aria-label="Als erledigt markieren"
                 onChange={() => void toggleComplete(task, true)}

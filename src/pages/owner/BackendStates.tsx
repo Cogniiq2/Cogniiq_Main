@@ -43,7 +43,7 @@ export function BackendSetupScreen() {
           </ul>
         </Card>
 
-        <Card className="bg-gray-950 text-gray-100 shadow-[0_18px_60px_rgba(15,23,42,0.18)]">
+        <Card className="bg-gray-950 text-gray-100 shadow-panel">
           <div className="mb-3 flex items-center gap-2 text-gray-300">
             <TerminalSquare size={16} aria-hidden="true" />
             <p className="text-[11px] font-bold uppercase tracking-[0.16em]">Technische Diagnose · nur Inhaber</p>

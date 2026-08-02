@@ -350,7 +350,7 @@ function OnboardingExperience() {
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
       <div className="space-y-6">
-        <div className="overflow-hidden rounded-panel border border-hairline bg-white shadow-[0_24px_80px_rgba(15,23,42,0.045)]">
+        <div className="overflow-hidden rounded-panel border border-hairline bg-white shadow-card">
           <div className="p-6 sm:p-8">
           {!canEdit ? (
             <AppReadOnlyNotice>
@@ -767,7 +767,7 @@ function KnowledgeExperience() {
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-panel border border-hairline bg-white shadow-[0_24px_80px_rgba(15,23,42,0.045)]">
+          <div className="overflow-hidden rounded-panel border border-hairline bg-white shadow-card">
             <div className="border-b border-hairline px-6 py-6 sm:px-8">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>

@@ -28,27 +28,27 @@ export function PlatformOwnerRoute({ children }: { children: ReactNode }) {
 
   if (!isPlatformOwner) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-canvas px-6 text-gray-950">
-        <div className="w-full max-w-md rounded-card border border-hairline bg-white p-7 shadow-panel">
-          <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-600">
-            <ShieldAlert size={19} />
+      <div data-cq-surface="auth" className="flex min-h-screen items-center justify-center bg-canvas px-6 text-gray-950">
+        <div className="w-full max-w-md rounded-panel border border-hairline bg-white p-7 shadow-panel">
+          <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-control border border-amber-200 bg-amber-50 text-amber-700">
+            <ShieldAlert size={19} aria-hidden="true" />
           </div>
-          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400">Restricted</p>
-          <h1 className="mb-3 text-2xl font-bold tracking-tight">Kein Zugriff</h1>
-          <p className="mb-6 text-sm leading-6 text-gray-500">
+          <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-gray-500">Restricted</p>
+          <h1 className="mb-3 text-[24px] font-semibold leading-tight tracking-[-0.02em]">Kein Zugriff</h1>
+          <p className="mb-6 text-[13.5px] leading-6 text-gray-600">
             Dieser Bereich ist ausschließlich dem Cogniiq-Inhaber vorbehalten.
           </p>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2.5">
             <Link
               to="/admin"
-              className="inline-flex items-center justify-center rounded-xl bg-gray-950 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800"
+              className="inline-flex min-h-11 items-center justify-center rounded-control bg-gray-950 px-4 text-[13.5px] font-semibold text-white transition-colors duration-fast ease-premium hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
             >
               Zur Administration
             </Link>
             <button
               type="button"
               onClick={() => void signOut()}
-              className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:border-gray-300 hover:text-gray-950"
+              className="inline-flex min-h-11 items-center justify-center rounded-control border border-gray-200 bg-white px-4 text-[13.5px] font-semibold text-gray-700 transition-colors duration-fast ease-premium hover:border-gray-300 hover:bg-gray-50 hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
             >
               Abmelden
             </button>

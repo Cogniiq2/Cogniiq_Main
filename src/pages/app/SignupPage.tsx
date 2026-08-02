@@ -1,8 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
-
-import { AuthPageLayout } from '@/components/auth/AuthPageLayout';
+import { AuthAlert, AuthField, AuthPageLayout, AuthSubmitButton } from '@/components/auth/AuthPageLayout';
 import { supabase } from '@/lib/supabase';
 
 export function SignupPage() {
@@ -62,85 +60,60 @@ export function SignupPage() {
       title="Create your account"
       description="Start with identity only. Workspace provisioning happens later through a controlled Cogniiq flow."
       footer={
-        <p className="text-sm text-gray-500">
+        <p className="text-[13.5px] text-gray-600">
           Already have an account?{' '}
-          <Link to="/app/login" className="font-semibold text-gray-900 hover:text-gray-600">
+          <Link to="/app/login" className="font-semibold text-gray-950 underline-offset-2 hover:underline">
             Sign in
           </Link>
         </p>
       }
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <label className="block">
-          <span className="mb-1.5 block text-xs font-semibold text-gray-700">Full name</span>
-          <input
-            type="text"
-            required
-            autoComplete="name"
-            value={fullName}
-            onChange={(event) => setFullName(event.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-400"
-            placeholder="Your name"
-          />
-        </label>
-        <label className="block">
-          <span className="mb-1.5 block text-xs font-semibold text-gray-700">Email</span>
-          <input
-            type="email"
-            required
-            autoComplete="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-400"
-            placeholder="you@company.com"
-          />
-        </label>
-        <label className="block">
-          <span className="mb-1.5 block text-xs font-semibold text-gray-700">Password</span>
-          <input
-            type="password"
-            required
-            autoComplete="new-password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-400"
-            placeholder="Minimum 8 characters"
-          />
-        </label>
-        <label className="block">
-          <span className="mb-1.5 block text-xs font-semibold text-gray-700">Confirm password</span>
-          <input
-            type="password"
-            required
-            autoComplete="new-password"
-            value={confirmPassword}
-            onChange={(event) => setConfirmPassword(event.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-400"
-            placeholder="Repeat password"
-          />
-        </label>
+        <AuthField
+          id="signup-name"
+          label="Full name"
+          type="text"
+          required
+          autoComplete="name"
+          value={fullName}
+          onChange={(event) => setFullName(event.target.value)}
+          placeholder="Your name"
+        />
+        <AuthField
+          id="signup-email"
+          label="Email"
+          type="email"
+          required
+          autoComplete="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="you@company.com"
+        />
+        <AuthField
+          id="signup-password"
+          label="Password"
+          type="password"
+          required
+          autoComplete="new-password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          placeholder="Minimum 8 characters"
+        />
+        <AuthField
+          id="signup-confirm-password"
+          label="Confirm password"
+          type="password"
+          required
+          autoComplete="new-password"
+          value={confirmPassword}
+          onChange={(event) => setConfirmPassword(event.target.value)}
+          placeholder="Repeat password"
+        />
 
-        {message && (
-          <div className="flex items-start gap-2 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-            <CheckCircle2 size={16} className="mt-0.5 flex-shrink-0" />
-            {message}
-          </div>
-        )}
+        {message && <AuthAlert tone="success">{message}</AuthAlert>}
+        {error && <AuthAlert tone="error">{error}</AuthAlert>}
 
-        {error && (
-          <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
-          </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="group inline-flex w-full items-center justify-between rounded-xl bg-gray-950 px-5 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-300"
-        >
-          {loading ? 'Creating account...' : 'Create account'}
-          <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
-        </button>
+        <AuthSubmitButton loading={loading} loadingLabel="Creating account...">Create account</AuthSubmitButton>
       </form>
     </AuthPageLayout>
   );
