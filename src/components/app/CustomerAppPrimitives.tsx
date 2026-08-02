@@ -6,6 +6,7 @@ import { AlertCircle, Check, Circle, Clock3, Info, Plus, RefreshCw } from 'lucid
 
 import { cn } from '@/lib/utils';
 import { easePremium, useMotionPresets } from '@/lib/motion';
+import { PremiumSelect } from '@/components/dashboard/premiumControls';
 import type { LaunchChecklistItem, LifecycleTone, SetupStep } from './customerPortalModel';
 
 // Customer Portal primitives. Same design tokens as the owner dashboard (rounded-card /
@@ -448,29 +449,21 @@ export function AppSelect({
   className?: string;
   disabled?: boolean;
 }) {
+  // Same props and same onChange contract as the previous native-<select> version; the
+  // portal keeps its own quieter label treatment while the control itself is now the
+  // shared premium primitive, so a select looks identical on both authenticated surfaces.
   return (
-    <label className={cn('block', className)} htmlFor={id}>
-      <span className="mb-1.5 block text-xs font-semibold text-gray-700">{label}</span>
-      <select
-        id={id}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        aria-invalid={Boolean(error)}
-        disabled={disabled}
-        className={cn(
-          'h-11 w-full rounded-control border bg-white px-3.5 text-sm text-gray-900 outline-none transition-colors duration-fast ease-premium disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500',
-          error ? 'border-red-300 focus:border-red-400' : 'border-gray-200 hover:border-gray-300 focus:border-gray-400'
-        )}
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      {error ? <span className="mt-1.5 block text-[12px] leading-5 text-red-600">{error}</span> : null}
-      {!error && description ? <span className="mt-1.5 block text-[12px] leading-5 text-gray-400">{description}</span> : null}
-    </label>
+    <PremiumSelect
+      id={id}
+      label={label}
+      value={value}
+      onValueChange={onChange}
+      options={options}
+      description={description}
+      error={error}
+      disabled={disabled}
+      className={className}
+    />
   );
 }
 

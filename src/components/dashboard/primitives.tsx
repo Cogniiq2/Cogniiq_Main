@@ -6,6 +6,7 @@ import { Search, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMotionPresets } from '@/lib/motion';
 import { formatCents } from '@/lib/clientPlatform/validation';
+import { PremiumSelect } from './premiumControls';
 
 // Shared light-mode dashboard primitives — the single visual vocabulary of the Cogniiq
 // Owner Dashboard. Every radius, border, shadow, focus ring and motion duration below comes
@@ -373,41 +374,46 @@ export function Field({
   );
 }
 
+/**
+ * The dashboard's select field.
+ *
+ * The signature is unchanged from the native-<select> version — same props, same option
+ * shape, same order, same disabled semantics, same `onChange(value)` contract — so all
+ * ~43 call sites across the finance module, the CRM and the task dashboard were upgraded
+ * without touching a single one. Only the rendered control changed: PremiumSelect draws
+ * the list itself instead of handing the job to the browser, which is what makes a
+ * checkmark, a 44px option row and a consistent radius possible at all.
+ */
 export function Select({
-  id, label, value, onChange, options, hint, disabled, required, error,
+  id, label, value, onChange, options, hint, disabled, required, error, ariaLabel, className,
 }: {
   id: string;
   label?: string;
   value: string;
   onChange: (value: string) => void;
-  options: { value: string; label: string }[];
+  options: { value: string; label: string; disabled?: boolean }[];
   hint?: string;
   disabled?: boolean;
   required?: boolean;
   error?: string;
+  /** Accessible name for the toolbar/filter case, where no visible label is rendered. */
+  ariaLabel?: string;
+  className?: string;
 }) {
   return (
-    <div>
-      {label ? (
-        <label htmlFor={id} className={labelClass}>
-          {label} {required ? <span className="text-red-500">*</span> : null}
-        </label>
-      ) : null}
-      <select
-        id={id}
-        value={value}
-        disabled={disabled}
-        onChange={(event) => onChange(event.target.value)}
-        aria-invalid={error ? true : undefined}
-        className={cn(controlBase, error ? controlError : controlIdle, 'h-11 px-3')}
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>{option.label}</option>
-        ))}
-      </select>
-      {hint && !error ? <p className={hintClass}>{hint}</p> : null}
-      {error ? <p className={errorClass}>{error}</p> : null}
-    </div>
+    <PremiumSelect
+      id={id}
+      label={label}
+      value={value}
+      onValueChange={onChange}
+      options={options}
+      description={hint}
+      error={error}
+      disabled={disabled}
+      required={required}
+      ariaLabel={ariaLabel}
+      className={className}
+    />
   );
 }
 

@@ -107,6 +107,7 @@
      the portal it makes every hover read as laggy, so both shells mark themselves
      with data-cq-surface and inherit the short product easing instead. Marketing
      pages are untouched. */
+  [data-cq-surface],
   [data-cq-surface] *,
   [data-cq-surface] *::before,
   [data-cq-surface] *::after {
@@ -122,6 +123,11 @@
     scroll-behavior: auto;
   }
 
+  /* The element itself is included, not just its descendants: Radix portals the select
+     list, the combobox popover and the action menu to document.body and tags the portalled
+     root with data-cq-surface="overlay". Without the bare selector the overlay's own
+     entrance animation would survive prefers-reduced-motion. */
+  [data-cq-surface],
   [data-cq-surface] *,
   [data-cq-surface] *::before,
   [data-cq-surface] *::after {

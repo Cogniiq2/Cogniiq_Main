@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { RefreshCw, XCircle } from 'lucide-react';
 
 import { AdminCard, Pill, invitationTone } from '@/pages/admin/clients/adminUi';
+import { PremiumSelect } from '@/components/dashboard';
 import {
   loadAdminClients,
   resendInvitationViaEdge,
@@ -59,13 +60,19 @@ export function AdminInvitationsPage() {
           <h1 className="text-2xl font-semibold tracking-tight text-gray-950">Einladungen</h1>
           <p className="mt-1 text-sm text-gray-500">Status aller Client-Einladungen.</p>
         </div>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400">
-          <option value="all">Alle</option>
-          <option value="pending">pending</option>
-          <option value="accepted">accepted</option>
-          <option value="revoked">revoked</option>
-          <option value="expired">expired</option>
-        </select>
+        <PremiumSelect
+          ariaLabel="Nach Einladungsstatus filtern"
+          value={statusFilter}
+          onValueChange={setStatusFilter}
+          className="w-[180px] shrink-0"
+          options={[
+            { value: 'all', label: 'Alle' },
+            { value: 'pending', label: 'pending' },
+            { value: 'accepted', label: 'accepted' },
+            { value: 'revoked', label: 'revoked' },
+            { value: 'expired', label: 'expired' },
+          ]}
+        />
       </div>
       {notice ? <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-800">{notice}</div> : null}
       {loading ? <div className="h-40 animate-pulse rounded-card border border-hairline bg-white" /> : error ? (

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, LogOut, Menu, X, type LucideIcon } from 'lucide-react';
@@ -6,6 +6,7 @@ import { ChevronDown, LogOut, Menu, X, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMotionPresets } from '@/lib/motion';
 import { focusRing } from './primitives';
+import { PremiumDropdownMenu } from './premiumControls';
 import { useAuth } from '@/contexts/AuthContext';
 
 // The one Owner/Admin application shell.
@@ -40,65 +41,48 @@ export interface ShellSubNavItem {
 
 function AccountMenu() {
   const { profile, user, signOut } = useAuth();
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const motionPresets = useMotionPresets();
-  const email = profile?.email ?? user?.email ?? '—';
-
-  useEffect(() => {
-    if (!open) return;
-    const onDoc = (event: MouseEvent) => { if (ref.current && !ref.current.contains(event.target as Node)) setOpen(false); };
-    const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') setOpen(false); };
-    document.addEventListener('mousedown', onDoc);
-    document.addEventListener('keydown', onKey);
-    return () => { document.removeEventListener('mousedown', onDoc); document.removeEventListener('keydown', onKey); };
-  }, [open]);
-
+  const email = profile?.email ?? user?.email ?? '\u2014';
   const initials = (email[0] ?? 'C').toUpperCase();
 
+  // Radix owns focus return, Escape and outside-click. The previous hand-rolled menu
+  // listened on the document and dropped focus to <body> when it closed.
   return (
-    <div className="relative" ref={ref}>
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        className={cn(
-          'inline-flex h-9 items-center gap-2 rounded-control border border-gray-200 bg-white pl-1.5 pr-2.5 text-[13px] font-semibold text-gray-700',
-          'transition-colors duration-fast ease-premium hover:border-gray-300 hover:text-gray-950',
-          focusRing,
-        )}
-      >
-        <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-gray-950 text-[11px] font-bold text-white">{initials}</span>
-        <span className="hidden max-w-[160px] truncate sm:inline">{email}</span>
-        <ChevronDown size={14} className={cn('text-gray-400 transition-transform duration-fast ease-premium', open && 'rotate-180')} aria-hidden="true" />
-      </button>
-      <AnimatePresence>
-        {open ? (
-          <motion.div
-            role="menu"
-            variants={motionPresets.popIn}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="absolute right-0 z-40 mt-2 w-64 origin-top-right overflow-hidden rounded-card border border-hairline bg-white shadow-panel"
-          >
-            <div className="border-b border-hairline px-4 py-3">
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gray-500">Angemeldet als</p>
-              <p className="mt-1 truncate text-[13px] font-semibold text-gray-950">{email}</p>
-            </div>
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => { setOpen(false); void signOut(); }}
-              className="flex w-full items-center gap-2.5 px-4 py-3 text-left text-[13px] font-semibold text-gray-700 transition-colors duration-fast ease-premium hover:bg-gray-50 hover:text-gray-950"
-            >
-              <LogOut size={15} className="text-gray-400" aria-hidden="true" /> Abmelden
-            </button>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
-    </div>
+    <PremiumDropdownMenu
+      align="end"
+      className="w-64"
+      trigger={
+        <button
+          type="button"
+          className={cn(
+            'group inline-flex h-9 items-center gap-2 rounded-control border border-gray-200 bg-white pl-1.5 pr-2.5 text-[13px] font-semibold text-gray-700',
+            'transition-colors duration-fast ease-premium hover:border-gray-300 hover:text-gray-950',
+            focusRing,
+          )}
+        >
+          <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-gray-950 text-[11px] font-bold text-white">{initials}</span>
+          <span className="hidden max-w-[160px] truncate sm:inline">{email}</span>
+          <ChevronDown
+            size={14}
+            aria-hidden="true"
+            className="text-gray-400 transition-transform duration-fast ease-premium group-data-[state=open]:rotate-180 motion-reduce:transition-none"
+          />
+        </button>
+      }
+      groups={[
+        {
+          label: 'Angemeldet als',
+          items: [
+            {
+              key: 'signout',
+              label: 'Abmelden',
+              description: email,
+              icon: LogOut,
+              onSelect: () => void signOut(),
+            },
+          ],
+        },
+      ]}
+    />
   );
 }
 

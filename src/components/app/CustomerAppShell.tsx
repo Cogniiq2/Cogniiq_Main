@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ChevronDown,
@@ -18,6 +18,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 
 import { AppRouteTransition, AppStatusBadge } from '@/components/app/CustomerAppPrimitives';
+import { PremiumDropdownMenu, PremiumSelect } from '@/components/dashboard/premiumControls';
 import { lifecycleDisplays } from '@/components/app/customerPortalModel';
 import type { LifecycleDisplay } from '@/components/app/customerPortalModel';
 import { useAuth } from '@/contexts/AuthContext';
@@ -113,6 +114,7 @@ function CustomerAppShellInner({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const motionPresets = useMotionPresets();
   const { profile, user, signOut } = useAuth();
   const { memberships, activeOrganization, activeOrganizationId, setActiveOrganizationId } = useOrganizations();
@@ -141,25 +143,24 @@ function CustomerAppShellInner({ children }: { children: ReactNode }) {
     await signOut();
   };
 
-  const organizationSelect = (idSuffix: string, className: string) =>
+  // Organization switching is unchanged: same membership order, same
+  // `setActiveOrganizationId(value || null)` contract, same scoping. Only the control is
+  // different — a customer with several organizations now sees their real workspace names
+  // in a list the product draws, instead of an OS-drawn menu that truncated them.
+  const organizationSelect = (idSuffix: string, triggerClassName: string, wrapperClassName?: string) =>
     hasMultipleOrganizations ? (
-      <>
-        <label className="sr-only" htmlFor={`customer-organization-select${idSuffix}`}>
-          Organisation auswählen
-        </label>
-        <select
-          id={`customer-organization-select${idSuffix}`}
-          value={activeOrganizationId ?? ''}
-          onChange={(event) => setActiveOrganizationId(event.target.value || null)}
-          className={className}
-        >
-          {memberships.map((membership) => (
-            <option key={membership.id} value={membership.organization_id}>
-              {membership.organization?.name ?? 'Unbenannte Organisation'}
-            </option>
-          ))}
-        </select>
-      </>
+      <PremiumSelect
+        className={wrapperClassName}
+        id={`customer-organization-select${idSuffix}`}
+        ariaLabel="Organisation auswählen"
+        value={activeOrganizationId ?? ''}
+        onValueChange={(value) => setActiveOrganizationId(value || null)}
+        options={memberships.map((membership) => ({
+          value: membership.organization_id,
+          label: membership.organization?.name ?? 'Unbenannte Organisation',
+        }))}
+        triggerClassName={triggerClassName}
+      />
     ) : null;
 
   return (
@@ -200,13 +201,7 @@ function CustomerAppShellInner({ children }: { children: ReactNode }) {
               them (md here, lg on the nav row) previously left 768–1023px with no navigation
               at all: the hamburger was already hidden while the nav row had not appeared yet. */}
           <div className="hidden items-center gap-2 lg:flex">
-            {organizationSelect(
-              '',
-              cn(
-                'h-9 max-w-[200px] rounded-control border border-gray-200 bg-white px-3 text-[13px] font-medium text-gray-700 outline-none transition-colors duration-fast ease-premium hover:border-gray-300 focus:border-gray-400',
-                portalFocusRing,
-              ),
-            )}
+            {organizationSelect('', 'h-9 w-[200px] text-[13px] font-medium text-gray-700')}
 
             <Link
               to="/"
@@ -220,61 +215,62 @@ function CustomerAppShellInner({ children }: { children: ReactNode }) {
               <ExternalLink size={13} aria-hidden="true" />
             </Link>
 
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setUserMenuOpen((open) => !open)}
-                className={cn(
-                  'inline-flex h-9 items-center gap-2 rounded-control border border-gray-200 bg-white px-3 text-gray-700',
-                  'transition-colors duration-fast ease-premium hover:border-gray-300 hover:text-gray-950',
-                  portalFocusRing,
-                )}
-                aria-haspopup="menu"
-                aria-expanded={userMenuOpen}
-              >
-                <UserRound size={14} className="text-gray-400" aria-hidden="true" />
-                <span className="max-w-[150px] truncate text-[13px] font-semibold">{displayName}</span>
-                <ChevronDown size={13} className={cn('text-gray-400 transition-transform duration-fast ease-premium', userMenuOpen && 'rotate-180')} aria-hidden="true" />
-              </button>
-
-              <AnimatePresence>
-                {userMenuOpen ? (
-                  <motion.div
-                    role="menu"
-                    variants={motionPresets.popIn}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    className="absolute right-0 mt-2 w-72 origin-top-right overflow-hidden rounded-card border border-hairline bg-white shadow-panel"
-                  >
-                    <div className="border-b border-hairline px-4 py-3">
-                      <p className="truncate text-sm font-semibold text-gray-950">{displayName}</p>
-                      <p className="mt-1 truncate text-xs text-gray-500">{profile?.email ?? user?.email}</p>
-                      <p className="mt-2 truncate text-[11px] font-medium text-gray-500">
-                        {activeOrganization?.name ?? 'Keine Organisation verbunden'}
-                      </p>
-                    </div>
-                    <div className="p-2">
-                      <MenuLink to="/app/settings" icon={Settings} label="Profil & Konto" onClick={() => setUserMenuOpen(false)} />
-                      <MenuLink to="/" icon={ExternalLink} label="Zur Website" onClick={() => setUserMenuOpen(false)} />
-                      <button
-                        type="button"
-                        onClick={() => void handleSignOut()}
-                        className={cn(
-                          'flex w-full items-center gap-3 rounded-control px-3 py-2.5 text-left text-sm font-semibold text-gray-600',
-                          'transition-colors duration-fast ease-premium hover:bg-gray-50 hover:text-gray-950',
-                          portalFocusRing,
-                        )}
-                        role="menuitem"
-                      >
-                        <LogOut size={15} className="text-gray-400" aria-hidden="true" />
-                        Abmelden
-                      </button>
-                    </div>
-                  </motion.div>
-                ) : null}
-              </AnimatePresence>
-            </div>
+            {/* Radix now owns focus return, Escape and outside-click; the previous
+                hand-rolled menu returned focus to the document body on close. */}
+            <PremiumDropdownMenu
+              open={userMenuOpen}
+              onOpenChange={setUserMenuOpen}
+              align="end"
+              className="w-72"
+              trigger={
+                <button
+                  type="button"
+                  className={cn(
+                    'group inline-flex h-9 items-center gap-2 rounded-control border border-gray-200 bg-white px-3 text-gray-700',
+                    'transition-colors duration-fast ease-premium hover:border-gray-300 hover:text-gray-950',
+                    portalFocusRing,
+                  )}
+                >
+                  <UserRound size={14} className="text-gray-400" aria-hidden="true" />
+                  <span className="max-w-[150px] truncate text-[13px] font-semibold">{displayName}</span>
+                  <ChevronDown
+                    size={13}
+                    aria-hidden="true"
+                    className="text-gray-400 transition-transform duration-fast ease-premium group-data-[state=open]:rotate-180 motion-reduce:transition-none"
+                  />
+                </button>
+              }
+              groups={[
+                {
+                  label: activeOrganization?.name ?? 'Keine Organisation verbunden',
+                  items: [
+                    {
+                      key: 'settings',
+                      label: 'Profil & Konto',
+                      description: profile?.email ?? user?.email ?? undefined,
+                      icon: Settings,
+                      onSelect: () => navigate('/app/settings'),
+                    },
+                    {
+                      key: 'website',
+                      label: 'Zur Website',
+                      icon: ExternalLink,
+                      onSelect: () => navigate('/'),
+                    },
+                  ],
+                },
+                {
+                  items: [
+                    {
+                      key: 'signout',
+                      label: 'Abmelden',
+                      icon: LogOut,
+                      onSelect: () => void handleSignOut(),
+                    },
+                  ],
+                },
+              ]}
+            />
           </div>
 
           <button
@@ -361,15 +357,7 @@ function CustomerAppShellInner({ children }: { children: ReactNode }) {
                     {activeOrganization?.name ?? 'Noch nicht provisioniert'}
                   </p>
                   <p className="mt-2 text-[12px] leading-5 text-gray-600">{lifecycle.description}</p>
-                  {hasMultipleOrganizations
-                    ? organizationSelect(
-                        '-mobile',
-                        cn(
-                          'mt-3 h-11 w-full rounded-control border border-gray-200 bg-white px-3 text-sm font-medium text-gray-700 outline-none focus:border-gray-400',
-                          portalFocusRing,
-                        ),
-                      )
-                    : null}
+                  {organizationSelect('-mobile', 'h-11 text-sm font-medium text-gray-700', 'mt-3')}
                 </div>
 
                 <nav className="mt-5 space-y-5" aria-label="Mobile Kundenbereich Navigation">
@@ -515,34 +503,6 @@ function MobileNavLink({
       {active ? <span className="absolute inset-0 rounded-control bg-gray-950" /> : null}
       <Icon size={16} className={cn('relative z-10', active ? 'text-white' : 'text-gray-400')} aria-hidden="true" />
       <span className="relative z-10">{item.label}</span>
-    </Link>
-  );
-}
-
-function MenuLink({
-  to,
-  icon: Icon,
-  label,
-  onClick,
-}: {
-  to: string;
-  icon: LucideIcon;
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <Link
-      to={to}
-      onClick={onClick}
-      className={cn(
-        'flex items-center gap-3 rounded-control px-3 py-2.5 text-sm font-semibold text-gray-600',
-        'transition-colors duration-fast ease-premium hover:bg-gray-50 hover:text-gray-950',
-        portalFocusRing,
-      )}
-      role="menuitem"
-    >
-      <Icon size={15} className="text-gray-400" aria-hidden="true" />
-      {label}
     </Link>
   );
 }
