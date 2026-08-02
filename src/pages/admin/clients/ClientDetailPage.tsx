@@ -54,7 +54,7 @@ export function ClientDetailPage() {
 
   const flash = (message: string) => { setNotice(message); setTimeout(() => setNotice(null), 3000); };
 
-  if (loading) return <div className="h-40 animate-pulse rounded-2xl border border-gray-100 bg-white" />;
+  if (loading) return <div className="h-40 animate-pulse rounded-card border border-hairline bg-white" />;
   if (error) return <AdminCard><p className="text-sm text-red-600">Fehler: {error}</p></AdminCard>;
   if (!detail || !detail.account) {
     return (
@@ -84,7 +84,7 @@ export function ClientDetailPage() {
 
       {notice ? <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-800">{notice}</div> : null}
 
-      <div className="flex flex-wrap gap-1 border-b border-gray-100">
+      <div className="flex flex-wrap gap-1 border-b border-hairline">
         {tabs.map((t) => (
           <button key={t} type="button" onClick={() => setTab(t)} className={`h-10 rounded-t-lg px-3 text-[13px] font-semibold transition-colors ${tab === t ? 'border-b-2 border-gray-950 text-gray-950' : 'text-gray-500 hover:text-gray-950'}`}>{t}</button>
         ))}
@@ -134,7 +134,7 @@ function OverviewTab({ detail }: { detail: AdminClientDetail }) {
           <MoneyRow label="Monatswert" cents={a.estimated_monthly_value_cents} currency={a.currency} />
         </div>
         {a.internal_notes ? (
-          <div className="mt-4 rounded-xl border border-gray-100 bg-gray-50 p-3">
+          <div className="mt-4 rounded-xl border border-hairline bg-gray-50 p-3">
             <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400">Notizen</p>
             <p className="mt-1 whitespace-pre-wrap text-[13px] text-gray-600">{a.internal_notes}</p>
           </div>
@@ -339,8 +339,8 @@ function CommercialTab({ organizationId }: { organizationId: string }) {
   if (loading) {
     return (
       <div aria-label="Kommerzielle Daten werden geladen" className="space-y-3">
-        <div className="h-24 animate-pulse rounded-2xl border border-gray-100 bg-white" />
-        <div className="h-40 animate-pulse rounded-2xl border border-gray-100 bg-white" />
+        <div className="h-24 animate-pulse rounded-card border border-hairline bg-white" />
+        <div className="h-40 animate-pulse rounded-card border border-hairline bg-white" />
       </div>
     );
   }
@@ -394,7 +394,7 @@ function CommercialTab({ organizationId }: { organizationId: string }) {
               <li key={o.id}>
                 <Link
                   to={`/admin/finance/offers/${o.id}`}
-                  className="flex flex-col gap-2 rounded-xl border border-gray-100 px-3 py-2.5 hover:border-gray-300 sm:flex-row sm:items-center sm:justify-between"
+                  className="flex flex-col gap-2 rounded-xl border border-hairline px-3 py-2.5 hover:border-gray-300 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <span className="min-w-0">
                     <span className="block truncate text-sm font-semibold text-gray-900">
@@ -434,7 +434,7 @@ function CommercialTab({ organizationId }: { organizationId: string }) {
                 <li key={i.id}>
                   <Link
                     to={`/admin/finance/invoices/${i.id}`}
-                    className="flex flex-col gap-2 rounded-xl border border-gray-100 px-3 py-2.5 hover:border-gray-300 sm:flex-row sm:items-center sm:justify-between"
+                    className="flex flex-col gap-2 rounded-xl border border-hairline px-3 py-2.5 hover:border-gray-300 sm:flex-row sm:items-center sm:justify-between"
                   >
                     <span className="min-w-0">
                       <span className="block truncate text-sm font-semibold text-gray-900">
@@ -485,7 +485,7 @@ function ActivityTab() {
 
 function MoneyRow({ label, cents, currency }: { label: string; cents: number | null; currency: string }) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 px-4 py-2.5">
+    <div className="flex items-center justify-between rounded-xl border border-hairline bg-gray-50 px-4 py-2.5">
       <span className="text-[13px] font-medium text-gray-600">{label}</span>
       <span className="text-sm font-semibold text-gray-900">{formatCents(cents, currency)}</span>
     </div>

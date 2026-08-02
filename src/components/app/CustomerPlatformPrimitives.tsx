@@ -84,8 +84,8 @@ export function DocumentDownloadButton({
             // min-h-8: "Öffnen" is the primary action of a document row, so it
             // must stay comfortably tappable on a phone. Measured at 26px before
             // this, which is below a usable touch target at 375px.
-            ? 'inline-flex min-h-8 items-center gap-1.5 rounded-lg px-2.5 py-1 text-[12px] font-semibold text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-950 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400'
-            : 'inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-[13px] font-semibold text-gray-700 transition-colors hover:border-gray-300 hover:text-gray-950 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2'
+            ? 'inline-flex min-h-8 items-center gap-1.5 rounded-lg px-2.5 py-1 text-[12px] font-semibold text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-950 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25'
+            : 'inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-[13px] font-semibold text-gray-700 transition-colors hover:border-gray-300 hover:text-gray-950 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2'
         }
       >
         <Download size={compact ? 13 : 14} aria-hidden="true" />
@@ -99,7 +99,7 @@ export function DocumentDownloadButton({
 export function DocumentRow({ document }: { document: CustomerDocument }) {
   const size = formatFileSize(document.size_bytes);
   return (
-    <div className="flex items-center justify-between gap-4 rounded-2xl border border-gray-100 bg-white px-4 py-3.5">
+    <div className="flex items-center justify-between gap-4 rounded-card border border-hairline bg-white px-4 py-3.5">
       <div className="flex min-w-0 items-center gap-3">
         <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gray-50 text-gray-400">
           <FileText size={16} aria-hidden="true" />
@@ -121,7 +121,7 @@ export function DocumentRow({ document }: { document: CustomerDocument }) {
 
 export function InvoiceRow({ invoice }: { invoice: CustomerInvoice }) {
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white px-4 py-4">
+    <div className="rounded-card border border-hairline bg-white px-4 py-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -148,7 +148,7 @@ export function InvoiceRow({ invoice }: { invoice: CustomerInvoice }) {
           )}
         </div>
       </div>
-      <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-gray-100 pt-3 text-[12px] text-gray-500">
+      <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-hairline pt-3 text-[12px] text-gray-500">
         <span className="tabular-nums">
           Netto {formatCentsCurrencyDe(invoice.net_total_cents, invoice.currency)}
         </span>

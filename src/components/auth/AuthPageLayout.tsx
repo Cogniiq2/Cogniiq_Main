@@ -35,9 +35,9 @@ export function AuthPageLayout({ eyebrow, title, description, children, footer }
               <p className="mt-6 max-w-xl text-base leading-7 text-gray-500">
                 The customer account area is private, tenant-scoped, and prepared for the future AI receptionist product.
               </p>
-              <div className="mt-10 grid max-w-xl grid-cols-3 overflow-hidden rounded-2xl border border-gray-100">
+              <div className="mt-10 grid max-w-xl grid-cols-3 overflow-hidden rounded-card border border-hairline">
                 {['Auth', 'Tenant', 'RLS'].map((item) => (
-                  <div key={item} className="border-r border-gray-100 px-5 py-4 last:border-r-0">
+                  <div key={item} className="border-r border-hairline px-5 py-4 last:border-r-0">
                     <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">{item}</p>
                     <p className="mt-1 text-xs text-gray-500">Active</p>
                   </div>
@@ -45,12 +45,12 @@ export function AuthPageLayout({ eyebrow, title, description, children, footer }
               </div>
             </section>
 
-            <section className="w-full rounded-2xl border border-gray-200 bg-white p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] sm:p-8">
+            <section className="w-full rounded-card border border-gray-200 bg-white p-6 shadow-panel sm:p-8">
               <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">{eyebrow}</p>
               <h2 className="text-2xl font-bold tracking-tight text-gray-950">{title}</h2>
               <p className="mt-3 text-sm leading-6 text-gray-500">{description}</p>
               <div className="mt-7">{children}</div>
-              {footer && <div className="mt-6 border-t border-gray-100 pt-5">{footer}</div>}
+              {footer && <div className="mt-6 border-t border-hairline pt-5">{footer}</div>}
             </section>
           </div>
         </main>

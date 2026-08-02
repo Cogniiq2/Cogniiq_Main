@@ -259,7 +259,7 @@ function AppHomeContent() {
 // ---------------------------------------------------------------- next action
 function NextActionCard({ projects }: { projects: CustomerProject[] }) {
   return (
-    <section className="overflow-hidden rounded-3xl border border-amber-200 bg-amber-50/70 p-6 sm:p-7">
+    <section className="overflow-hidden rounded-panel border border-amber-200 bg-amber-50/70 p-6 sm:p-7">
       <div className="mb-4 flex items-center gap-2">
         <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
           <CalendarClock size={16} aria-hidden="true" />
@@ -277,7 +277,7 @@ function NextActionCard({ projects }: { projects: CustomerProject[] }) {
           return (
             <li
               key={project.id}
-              className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-amber-200/70 bg-white px-4 py-3.5"
+              className="flex flex-wrap items-start justify-between gap-3 rounded-card border border-amber-200/70 bg-white px-4 py-3.5"
             >
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-gray-950">{project.next_action_summary}</p>
@@ -310,7 +310,7 @@ function ProjectCard({ project }: { project: CustomerProject }) {
   return (
     <Link
       to={`/app/projects/${project.id}`}
-      className="group flex flex-col rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.035)] transition-colors hover:border-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
+      className="group flex flex-col rounded-panel border border-hairline bg-white p-6 shadow-card transition-colors hover:border-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2"
     >
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">{project.phase}</p>
@@ -323,7 +323,7 @@ function ProjectCard({ project }: { project: CustomerProject }) {
         <AppProgress value={project.progress_percent} label={`${project.progress_percent}% abgeschlossen`} />
       </div>
 
-      <dl className="mt-5 grid gap-3 border-t border-gray-100 pt-4 text-[12.5px] sm:grid-cols-2">
+      <dl className="mt-5 grid gap-3 border-t border-hairline pt-4 text-[12.5px] sm:grid-cols-2">
         {project.target_date ? (
           <div>
             <dt className="text-gray-400">Zieltermin</dt>
@@ -365,7 +365,7 @@ function ContactCard({ project }: { project: CustomerProject }) {
       <AppCard>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 text-gray-600">
+            <span className="flex h-11 w-11 items-center justify-center rounded-card border border-gray-200 bg-gray-50 text-gray-600">
               <UserRound size={18} aria-hidden="true" />
             </span>
             <div>
@@ -378,7 +378,7 @@ function ContactCard({ project }: { project: CustomerProject }) {
           {project.contact_business_email ? (
             <a
               href={`mailto:${project.contact_business_email}`}
-              className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-[13px] font-semibold text-gray-700 transition-colors hover:border-gray-300 hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
+              className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-[13px] font-semibold text-gray-700 transition-colors hover:border-gray-300 hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2"
             >
               <Mail size={14} aria-hidden="true" />
               Nachricht schreiben
@@ -419,7 +419,7 @@ function SolutionGridCard({ solution }: { solution: OrganizationSolution }) {
   return (
     <Link
       to={`/app/solutions/${solution.instance_key}`}
-      className="group flex flex-col rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.035)] transition-colors hover:border-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
+      className="group flex flex-col rounded-panel border border-hairline bg-white p-6 shadow-card transition-colors hover:border-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2"
     >
       <div className="mb-4 flex items-center justify-between">
         <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-gray-50 text-gray-600">
@@ -458,7 +458,7 @@ function ShortcutCard({
   return (
     <Link
       to={to}
-      className="group rounded-3xl border border-gray-100 bg-white p-6 shadow-none transition-colors hover:border-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
+      className="group rounded-panel border border-hairline bg-white p-6 shadow-none transition-colors hover:border-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2"
     >
       <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 bg-gray-50 text-gray-500">
         <Icon size={16} aria-hidden="true" />

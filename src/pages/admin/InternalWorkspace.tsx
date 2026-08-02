@@ -40,7 +40,7 @@ export function InternalWorkspaceLayout() {
           title={moduleAllowed ? activeModule.title : 'Cogniiq'}
         >
           {/* Inner boundary so lazy module chunks suspend the content area only — never the shell. */}
-          <Suspense fallback={<div className="h-40 animate-pulse rounded-[20px] bg-gray-100" aria-hidden="true" />}>
+          <Suspense fallback={<div className="h-40 animate-pulse rounded-card bg-gray-100" aria-hidden="true" />}>
             <Outlet />
           </Suspense>
         </DashboardShell>

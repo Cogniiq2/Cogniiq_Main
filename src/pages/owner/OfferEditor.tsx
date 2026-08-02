@@ -336,7 +336,7 @@ export function OfferEditor() {
     navigate(currentOfferId.current ? `/admin/finance/offers/${currentOfferId.current}` : '/admin/finance/offers');
   };
 
-  if (loading) return <div className="space-y-4"><div className="h-8 w-64 animate-pulse rounded-lg bg-gray-100" /><div className="h-64 animate-pulse rounded-2xl bg-gray-100" /></div>;
+  if (loading) return <div className="space-y-4"><div className="h-8 w-64 animate-pulse rounded-lg bg-gray-100" /><div className="h-64 animate-pulse rounded-card bg-gray-100" /></div>;
   if (error) return <InfoBanner tone="warning" title="Angebot kann nicht bearbeitet werden">{error}</InfoBanner>;
   if (!state || !doc || !validation) return null;
 
@@ -361,7 +361,7 @@ export function OfferEditor() {
 
       <Card className="p-5" id={sectionAnchor.recipient}>
         <SectionHeader title="Empfänger" description="CRM-Kunde übernehmen oder angebotsspezifisch überschreiben. CRM-Daten werden nie überschrieben." />
-        <div className="mb-4 rounded-2xl border border-gray-100 bg-gray-50/60 p-4">
+        <div className="mb-4 rounded-card border border-hairline bg-gray-50/60 p-4">
           <div className="grid items-end gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
             <Select id="owner-customer" label="Kunde (Kundenverwaltung)" value={state.ownerCustomerId}
               onChange={(v) => patch({ ownerCustomerId: v })}
@@ -412,7 +412,7 @@ export function OfferEditor() {
             const price = toCents(l.unitPrice); const q = Number(l.quantity.replace(',', '.')) || 0;
             const calc = price != null ? computeInvoiceLine(Math.round(q * 1000), price, rateFor(l.treatment), l.treatment as never) : null;
             return (
-              <div key={l.id} className="rounded-xl border border-gray-100 p-4">
+              <div key={l.id} className="rounded-xl border border-hairline p-4">
                 <div className="mb-3 flex items-center justify-between">
                   <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Modul {idx + 1}{l.optional ? ' · optional' : ''}</span>
                   {state.lines.length > 1 ? <IconButton icon={Trash2} label="Entfernen" variant="ghost" onClick={() => patch({ lines: state.lines.filter((x) => x.id !== l.id) })} /> : null}
@@ -440,10 +440,10 @@ export function OfferEditor() {
             );
           })}
         </div>
-        <dl className="mt-4 space-y-1.5 border-t border-gray-100 pt-4 text-sm">
+        <dl className="mt-4 space-y-1.5 border-t border-hairline pt-4 text-sm">
           <div className="flex justify-between"><dt className="text-gray-500">Netto (ohne optionale)</dt><dd className="tabular-nums">{formatCents(doc.net)}</dd></div>
           <div className="flex justify-between"><dt className="text-gray-500">Umsatzsteuer</dt><dd className="tabular-nums">{formatCents(doc.vat)}</dd></div>
-          <div className="flex justify-between border-t border-gray-100 pt-1.5"><dt className="font-semibold text-gray-950">Gesamt brutto</dt><dd className="tabular-nums text-base font-semibold text-gray-950">{formatCents(doc.gross)}</dd></div>
+          <div className="flex justify-between border-t border-hairline pt-1.5"><dt className="font-semibold text-gray-950">Gesamt brutto</dt><dd className="tabular-nums text-base font-semibold text-gray-950">{formatCents(doc.gross)}</dd></div>
         </dl>
       </Card>
 

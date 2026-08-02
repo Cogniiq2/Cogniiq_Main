@@ -39,7 +39,7 @@ export function AdminSolutionsPage() {
         <p className="mt-1 text-sm text-gray-500">Alle kundensichtbaren Lösungsinstanzen über alle Organisationen.</p>
       </div>
       {notice ? <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-800">{notice}</div> : null}
-      {loading ? <div className="h-40 animate-pulse rounded-2xl border border-gray-100 bg-white" /> : error ? (
+      {loading ? <div className="h-40 animate-pulse rounded-card border border-hairline bg-white" /> : error ? (
         <AdminCard><p className="text-sm text-red-600">Fehler: {error}</p></AdminCard>
       ) : flat.length === 0 ? (
         <AdminCard><p className="text-sm text-gray-500">Noch keine Lösungen provisioniert.</p></AdminCard>

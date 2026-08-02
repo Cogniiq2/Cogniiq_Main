@@ -90,7 +90,7 @@ function ProjectDetailContent() {
         action={
           <Link
             to="/app"
-            className="inline-flex items-center gap-2 rounded-xl bg-gray-950 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
+            className="inline-flex items-center gap-2 rounded-xl bg-gray-950 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2"
           >
             <ArrowLeft size={15} aria-hidden="true" />
             Zur Übersicht
@@ -105,7 +105,7 @@ function ProjectDetailContent() {
       <div className="mb-6">
         <Link
           to="/app"
-          className="inline-flex items-center gap-1.5 rounded-lg text-[13px] font-semibold text-gray-500 transition-colors hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
+          className="inline-flex items-center gap-1.5 rounded-lg text-[13px] font-semibold text-gray-500 transition-colors hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2"
         >
           <ArrowLeft size={14} aria-hidden="true" />
           Übersicht
@@ -126,7 +126,7 @@ function ProjectDetailContent() {
         }
       />
 
-      <div className="mb-8 flex flex-wrap gap-1 border-b border-gray-100" role="tablist">
+      <div className="mb-8 flex flex-wrap gap-1 border-b border-hairline" role="tablist">
         {TABS.map((entry) => (
           <button
             key={entry.id}
@@ -135,7 +135,7 @@ function ProjectDetailContent() {
             aria-selected={tab === entry.id}
             onClick={() => setTab(entry.id)}
             className={cn(
-              'relative -mb-px min-h-11 rounded-t-lg px-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400',
+              'relative -mb-px min-h-11 rounded-t-lg px-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25',
               tab === entry.id
                 ? 'border-b-2 border-gray-950 text-gray-950'
                 : 'border-b-2 border-transparent text-gray-500 hover:text-gray-950',
@@ -177,7 +177,7 @@ function OverviewTab({ project }: { project: CustomerProject }) {
       <AppCard>
         <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Fortschritt</p>
         <AppProgress value={project.progress_percent} label={`${project.progress_percent}% abgeschlossen`} />
-        <dl className="mt-6 grid gap-5 border-t border-gray-100 pt-5 text-[13px] sm:grid-cols-2 lg:grid-cols-4">
+        <dl className="mt-6 grid gap-5 border-t border-hairline pt-5 text-[13px] sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <dt className="text-gray-400">Phase</dt>
             <dd className="mt-1 font-semibold text-gray-900">{project.phase}</dd>
@@ -207,10 +207,10 @@ function OverviewTab({ project }: { project: CustomerProject }) {
       {project.next_action_summary ? (
         <div
           className={cn(
-            'rounded-3xl border p-6',
+            'rounded-panel border p-6',
             project.next_action_owner === 'customer'
               ? 'border-amber-200 bg-amber-50/70'
-              : 'border-gray-100 bg-white',
+              : 'border-hairline bg-white',
           )}
         >
           <div className="mb-3 flex items-center gap-2">
@@ -254,7 +254,7 @@ function OverviewTab({ project }: { project: CustomerProject }) {
           <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Ihr Ansprechpartner</p>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 text-gray-600">
+              <span className="flex h-11 w-11 items-center justify-center rounded-card border border-gray-200 bg-gray-50 text-gray-600">
                 <UserRound size={18} aria-hidden="true" />
               </span>
               <div>
@@ -267,7 +267,7 @@ function OverviewTab({ project }: { project: CustomerProject }) {
             {project.contact_business_email ? (
               <a
                 href={`mailto:${project.contact_business_email}`}
-                className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-[13px] font-semibold text-gray-700 transition-colors hover:border-gray-300 hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
+                className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-[13px] font-semibold text-gray-700 transition-colors hover:border-gray-300 hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2"
               >
                 <Mail size={14} aria-hidden="true" />
                 Nachricht schreiben
@@ -321,7 +321,7 @@ function MilestoneRow({ milestone }: { milestone: CustomerMilestone }) {
             : 'neutral';
 
   return (
-    <li className="flex items-start gap-4 rounded-2xl border border-gray-100 bg-white px-4 py-4">
+    <li className="flex items-start gap-4 rounded-card border border-hairline bg-white px-4 py-4">
       <span
         className={cn(
           'mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border',

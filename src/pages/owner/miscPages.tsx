@@ -326,7 +326,7 @@ export function AuditPage() {
         <EmptyState icon={ShieldCheck} title="Noch keine Audit-Einträge" description="Sobald Rechnungen, Ausgaben, Zahlungen oder Steuer-Snapshots erstellt werden, erscheinen sie hier." />
       ) : (
         <Card className="p-0">
-          <SectionHeader title="Ereignisprotokoll" className="border-b border-gray-100 px-5 py-4 mb-0" />
+          <SectionHeader title="Ereignisprotokoll" className="border-b border-hairline px-5 py-4 mb-0" />
           <div className="divide-y divide-gray-50">
             {rows.map((r) => (
               <div key={r.id} className="flex items-center justify-between px-5 py-3 text-sm">

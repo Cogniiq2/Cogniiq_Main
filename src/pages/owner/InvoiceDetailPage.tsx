@@ -147,20 +147,20 @@ export function InvoiceDetailPage() {
           <Card className="p-6">
             <SectionHeader title="Positionen" />
             <div className="overflow-x-auto"><table className="w-full text-sm">
-              <thead><tr className="border-b border-gray-100 text-left text-[11px] font-bold uppercase tracking-wide text-gray-400"><th className="py-2">Beschreibung</th><th className="py-2 text-right">Menge</th><th className="py-2 text-right">Einzelpreis</th><th className="py-2 text-right">USt</th><th className="py-2 text-right">Netto</th></tr></thead>
+              <thead><tr className="border-b border-hairline text-left text-[11px] font-bold uppercase tracking-wide text-gray-400"><th className="py-2">Beschreibung</th><th className="py-2 text-right">Menge</th><th className="py-2 text-right">Einzelpreis</th><th className="py-2 text-right">USt</th><th className="py-2 text-right">Netto</th></tr></thead>
               <tbody>{lines.map((l) => (
                 <tr key={l.id} className="border-b border-gray-50"><td className="py-2 text-gray-800">{l.description}</td><td className="py-2 text-right tabular-nums text-gray-500">{(l.quantity_milli / 1000).toLocaleString('de-DE')}</td><td className="py-2 text-right tabular-nums text-gray-600">{formatCents(l.unit_price_cents, invoice.currency)}</td><td className="py-2 text-right tabular-nums text-gray-500">{formatBpPercentDe(l.vat_rate_bp)}</td><td className="py-2 text-right tabular-nums font-medium text-gray-900">{formatCents(l.net_cents, invoice.currency)}</td></tr>
               ))}</tbody>
             </table></div>
             {breakdown.length > 0 ? (
-              <div className="mt-4 border-t border-gray-100 pt-3 text-[13px] text-gray-500">
+              <div className="mt-4 border-t border-hairline pt-3 text-[13px] text-gray-500">
                 {breakdown.map((b) => <div key={`${b.rateBp}-${b.vatTreatment}`} className="flex justify-between"><span>USt {formatBpPercentDe(b.rateBp)} auf {formatCentsCurrencyDe(b.netCents, invoice.currency)}</span><span className="tabular-nums">{formatCentsCurrencyDe(b.vatCents, invoice.currency)}</span></div>)}
               </div>
             ) : null}
-            <dl className="mt-4 space-y-1.5 border-t border-gray-100 pt-4 text-sm">
+            <dl className="mt-4 space-y-1.5 border-t border-hairline pt-4 text-sm">
               <div className="flex justify-between"><dt className="text-gray-500">Netto</dt><dd className="tabular-nums">{formatCents(invoice.net_total_cents, invoice.currency)}</dd></div>
               <div className="flex justify-between"><dt className="text-gray-500">Umsatzsteuer</dt><dd className="tabular-nums">{formatCents(invoice.vat_total_cents, invoice.currency)}</dd></div>
-              <div className="flex justify-between border-t border-gray-100 pt-1.5"><dt className="font-semibold text-gray-950">Gesamt brutto</dt><dd className="tabular-nums text-base font-semibold text-gray-950">{formatCents(invoice.gross_total_cents, invoice.currency)}</dd></div>
+              <div className="flex justify-between border-t border-hairline pt-1.5"><dt className="font-semibold text-gray-950">Gesamt brutto</dt><dd className="tabular-nums text-base font-semibold text-gray-950">{formatCents(invoice.gross_total_cents, invoice.currency)}</dd></div>
               <div className="flex justify-between"><dt className="text-gray-500">Bezahlt</dt><dd className="tabular-nums text-gray-600">{formatCents(invoice.amount_paid_cents, invoice.currency)}</dd></div>
               <div className="flex justify-between"><dt className="font-medium text-gray-700">Offen</dt><dd className="tabular-nums font-semibold text-gray-950">{formatCents(open, invoice.currency)}</dd></div>
             </dl>
@@ -170,7 +170,7 @@ export function InvoiceDetailPage() {
             <SectionHeader title="Zahlungen" action={['issued', 'partially_paid', 'overdue'].includes(invoice.status) ? <Button size="sm" variant="secondary" onClick={() => setPayOpen(true)}>Zahlung erfassen</Button> : undefined} />
             {payments.length === 0 ? <p className="text-[13px] text-gray-400">Noch keine Zahlungen erfasst.</p> : (
               <ul className="space-y-2">{payments.map((p) => (
-                <li key={String(p.id)} className="flex items-center justify-between rounded-lg border border-gray-100 px-3 py-2 text-[13px]"><span className="text-gray-600">{formatDateDe(String(p.payment_date ?? ''))} · {String(p.method ?? '')}</span><span className="tabular-nums font-medium text-gray-900">{formatCents(Number(p.amount_cents ?? 0), invoice.currency)}</span></li>
+                <li key={String(p.id)} className="flex items-center justify-between rounded-lg border border-hairline px-3 py-2 text-[13px]"><span className="text-gray-600">{formatDateDe(String(p.payment_date ?? ''))} · {String(p.method ?? '')}</span><span className="tabular-nums font-medium text-gray-900">{formatCents(Number(p.amount_cents ?? 0), invoice.currency)}</span></li>
               ))}</ul>
             )}
           </Card>
@@ -203,7 +203,7 @@ export function InvoiceDetailPage() {
             <Card className="p-6">
               <SectionHeader title="Erzeugte Dokumente" />
               <ul className="space-y-2">{docs.map((d) => (
-                <li key={d.id} className="flex items-center justify-between rounded-lg border border-gray-100 px-3 py-2 text-[13px]"><span className="text-gray-700">v{d.version} · {formatDateDe(d.generated_at)} {d.status === 'finalized' ? <span className="ml-1 text-[11px] text-emerald-600">final</span> : null}</span>{d.pdf_storage_path ? <button className="text-gray-500 hover:text-gray-950" onClick={() => downloadStored(d.pdf_storage_path as string)} disabled={busy === 'stored'}><Download size={15} /></button> : null}</li>
+                <li key={d.id} className="flex items-center justify-between rounded-lg border border-hairline px-3 py-2 text-[13px]"><span className="text-gray-700">v{d.version} · {formatDateDe(d.generated_at)} {d.status === 'finalized' ? <span className="ml-1 text-[11px] text-emerald-600">final</span> : null}</span>{d.pdf_storage_path ? <button className="text-gray-500 hover:text-gray-950" onClick={() => downloadStored(d.pdf_storage_path as string)} disabled={busy === 'stored'}><Download size={15} /></button> : null}</li>
               ))}</ul>
             </Card>
           ) : null}
@@ -242,7 +242,7 @@ function PaymentModal({ open, invoice, onClose, onDone, onError }: { open: boole
 
   return (
     <Modal open={open} onClose={busy ? () => {} : onClose} title="Zahlung erfassen" footer={<><Button variant="secondary" onClick={onClose} disabled={busy}>Abbrechen</Button><Button onClick={() => void submit()} loading={busy}>Buchen</Button></>}>
-      <div className="mb-4 flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50/70 px-4 py-3"><span className="text-[13px] text-gray-500">Offener Betrag</span><span className="text-base font-semibold tabular-nums text-gray-950">{formatCents(outstanding)}</span></div>
+      <div className="mb-4 flex items-center justify-between rounded-xl border border-hairline bg-gray-50/70 px-4 py-3"><span className="text-[13px] text-gray-500">Offener Betrag</span><span className="text-base font-semibold tabular-nums text-gray-950">{formatCents(outstanding)}</span></div>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field id="amt" label="Betrag" prefix="€" value={amount} onChange={setAmount} inputMode="decimal" autoFocus />
         <Field id="dt" label="Datum" type="date" value={date} onChange={setDate} />

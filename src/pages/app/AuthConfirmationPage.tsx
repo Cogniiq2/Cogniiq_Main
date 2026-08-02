@@ -64,7 +64,7 @@ function StatusPanel({
       ? 'border-emerald-100 bg-emerald-50 text-emerald-800'
       : tone === 'error'
         ? 'border-amber-100 bg-amber-50 text-amber-900'
-        : 'border-gray-100 bg-gray-50 text-gray-700';
+        : 'border-hairline bg-gray-50 text-gray-700';
 
   return (
     <div className="space-y-5">

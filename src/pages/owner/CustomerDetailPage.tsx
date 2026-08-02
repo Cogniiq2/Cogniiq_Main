@@ -113,7 +113,7 @@ export function CustomerDetailPage() {
               <span className="text-[12px] text-gray-400">{detail.offers.length} gesamt</span>
             </div>
             {detail.offers.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-gray-200 px-4 py-8 text-center text-[13px] text-gray-500">Noch keine Angebote für diesen Kunden.</div>
+              <div className="rounded-card border border-dashed border-gray-200 px-4 py-8 text-center text-[13px] text-gray-500">Noch keine Angebote für diesen Kunden.</div>
             ) : (
               <DataTable columns={offerColumns} rows={detail.offers} getRowKey={(o) => o.id} minWidth={760}
                 onRowClick={(o) => navigate(`/admin/finance/offers/${o.id}`)}

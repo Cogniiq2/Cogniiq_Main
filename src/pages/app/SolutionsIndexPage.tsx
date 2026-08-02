@@ -49,7 +49,7 @@ function SolutionsIndexContent() {
                 <Link
                   key={solution.id}
                   to={`/app/solutions/${solution.instance_key}`}
-                  className="group flex flex-col rounded-3xl border border-gray-100 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.035)] transition-colors hover:border-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
+                  className="group flex flex-col rounded-panel border border-hairline bg-white p-6 shadow-card transition-colors hover:border-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2"
                 >
                   <div className="mb-4 flex items-center justify-between">
                     <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-gray-50 text-gray-600">

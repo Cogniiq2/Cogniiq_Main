@@ -221,7 +221,7 @@ export function OffersPage() {
       {!loading && offers.length > 0 ? (
         <div className="mb-4 space-y-3">
           <Tabs value={statusFilter} onChange={setStatusFilter} tabs={tabs} />
-          <div className="grid gap-2 rounded-2xl border border-gray-100 bg-white p-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-2 rounded-card border border-hairline bg-white p-3 sm:grid-cols-2 lg:grid-cols-4">
             <div className="relative sm:col-span-2 lg:col-span-1">
               <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
               <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Nummer, Kunde, Titel …" aria-label="Angebote durchsuchen"

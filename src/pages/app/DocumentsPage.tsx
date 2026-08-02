@@ -131,7 +131,7 @@ function FilterChip({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        'min-h-9 rounded-xl border px-3.5 text-[12.5px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2',
+        'min-h-9 rounded-xl border px-3.5 text-[12.5px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2',
         active
           ? 'border-gray-950 bg-gray-950 text-white'
           : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:text-gray-950',

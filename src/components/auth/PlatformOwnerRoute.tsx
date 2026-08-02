@@ -28,8 +28,8 @@ export function PlatformOwnerRoute({ children }: { children: ReactNode }) {
 
   if (!isPlatformOwner) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f7f7f4] px-6 text-gray-950">
-        <div className="w-full max-w-md rounded-[20px] border border-gray-100 bg-white p-7 shadow-[0_24px_80px_rgba(15,23,42,0.08)]">
+      <div className="flex min-h-screen items-center justify-center bg-canvas px-6 text-gray-950">
+        <div className="w-full max-w-md rounded-card border border-hairline bg-white p-7 shadow-panel">
           <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-600">
             <ShieldAlert size={19} />
           </div>

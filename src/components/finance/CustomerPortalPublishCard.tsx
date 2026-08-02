@@ -269,7 +269,7 @@ export function CustomerPortalPublishCard({
               const revokeKey = pointer ? `revoke-${pointer.id}` : '';
 
               return (
-                <li key={doc.id} className="rounded-xl border border-gray-100 p-3">
+                <li key={doc.id} className="rounded-xl border border-hairline p-3">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
                       <p className="text-[13px] font-medium text-gray-800">

@@ -9,10 +9,10 @@ export default function AutomationSolutionLanding({ solution }: SolutionLandingP
 
   return (
     <div className="space-y-8">
-      <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.045)]">
+      <div className="overflow-hidden rounded-panel border border-hairline bg-white shadow-[0_24px_80px_rgba(15,23,42,0.045)]">
         <div className="p-6 sm:p-8 lg:p-10">
           <div className="mb-4 flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 text-gray-700">
+            <span className="flex h-11 w-11 items-center justify-center rounded-card border border-gray-200 bg-gray-50 text-gray-700">
               <Cpu size={20} aria-hidden="true" />
             </span>
             <AppStatusBadge label={status.label} tone={status.tone} />
@@ -39,7 +39,7 @@ export default function AutomationSolutionLanding({ solution }: SolutionLandingP
             <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Spätere Detailansicht</p>
             <div className="grid gap-2 sm:grid-cols-2">
               {['Auslöser', 'Aktion', 'Status', 'Letzte Ausführung', 'Fehler', 'Verlauf'].map((field) => (
-                <div key={field} className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
+                <div key={field} className="rounded-xl border border-hairline bg-gray-50 px-4 py-3">
                   <p className="flex items-center gap-2 text-[12px] font-semibold text-gray-700">
                     <Bot size={13} aria-hidden="true" /> {field}
                   </p>

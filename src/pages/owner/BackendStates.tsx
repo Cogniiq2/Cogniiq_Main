@@ -20,7 +20,7 @@ export function BackendSetupScreen() {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <Card>
-          <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 text-gray-500">
+          <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-card border border-gray-200 bg-gray-50 text-gray-500">
             <Database size={22} aria-hidden="true" />
           </div>
           <h2 className="text-lg font-semibold tracking-tight text-gray-950">Backend-Einrichtung erforderlich</h2>

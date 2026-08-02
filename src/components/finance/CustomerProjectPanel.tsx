@@ -242,7 +242,7 @@ function ProjectRow({
   };
 
   return (
-    <div className="rounded-2xl border border-gray-200 p-4">
+    <div className="rounded-card border border-gray-200 p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -276,7 +276,7 @@ function ProjectRow({
       </div>
 
       {expanded ? (
-        <div className="mt-4 space-y-5 border-t border-gray-100 pt-4">
+        <div className="mt-4 space-y-5 border-t border-hairline pt-4">
           <MilestoneEditor projectId={project.id} />
           <DocumentVisibilityList documents={documents} onChanged={onChanged} />
           <InvoiceLinkingSection
@@ -361,7 +361,7 @@ function MilestoneEditor({ projectId }: { projectId: string }) {
       ) : (
         <ul className="mb-3 space-y-2">
           {milestones.map((milestone) => (
-            <li key={milestone.id} className="flex flex-col gap-2 rounded-xl border border-gray-100 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+            <li key={milestone.id} className="flex flex-col gap-2 rounded-xl border border-hairline px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
               {/* flex-1 only applies from sm: up — at narrow widths this stacks in its own
                   row instead of sharing a flex-wrap line with the controls below, which
                   previously squeezed a flex-basis:0% item to a near-zero width column
@@ -439,7 +439,7 @@ function DocumentVisibilityList({
       ) : (
         <ul className="space-y-2">
           {active.map((doc) => (
-            <li key={doc.id} className="flex flex-col gap-2 rounded-xl border border-gray-100 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+            <li key={doc.id} className="flex flex-col gap-2 rounded-xl border border-hairline px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
               <span className="min-w-0 text-[13px] text-gray-800 [overflow-wrap:anywhere] sm:flex-1">
                 {doc.title}
                 <span className="text-gray-400"> · {customerDocumentCategoryLabels[doc.category]}</span>
@@ -542,7 +542,7 @@ function InvoiceLinkingSection({
       ) : (
         <ul className="mb-3 space-y-2">
           {linked.map((invoice) => (
-            <li key={invoice.invoice_id} className="flex flex-col gap-2 rounded-xl border border-gray-100 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+            <li key={invoice.invoice_id} className="flex flex-col gap-2 rounded-xl border border-hairline px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
               <span className="min-w-0 text-[13px] text-gray-800 sm:flex-1">
                 {invoice.invoice_number ?? 'Ohne Nummer'}
               </span>
@@ -610,7 +610,7 @@ function InvoiceCandidateRow({
   // Case 1: already this project's organization — a normal link.
   if (candidate.organization_id === organizationId) {
     return (
-      <li className="flex flex-col gap-2 rounded-xl border border-gray-100 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+      <li className="flex flex-col gap-2 rounded-xl border border-hairline px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
         <span className="min-w-0 text-[13px] text-gray-800 sm:flex-1">{label} · {candidate.status}</span>
         <Button variant="secondary" disabled={busy} onClick={onLink}>Verknüpfen</Button>
       </li>
@@ -803,7 +803,7 @@ function EditProjectDialog({
         <Textarea id="ep-blocker" label="Blockade (kundensicher)" value={blocker} onChange={setBlocker}
           hint="Nur kundensichere Formulierungen. Interne Ursachen, Namen oder Kosten gehören nicht hierher." />
 
-        <div className="rounded-2xl border border-gray-200 p-4">
+        <div className="rounded-card border border-gray-200 p-4">
           <h5 className="mb-3 text-[13px] font-semibold text-gray-950">Nächste Aktion</h5>
           <div className="space-y-3">
             <Field id="ep-action" label="Beschreibung" value={actionSummary} onChange={setActionSummary}

@@ -327,7 +327,7 @@ export function OfferDetailPage() {
               </div>
 
               {/* Independent, explicitly separated statuses: signature · certificate · confirmation email. */}
-              <div className="mb-4 grid gap-2 rounded-xl border border-gray-100 bg-gray-50/60 p-3 text-[13px] sm:grid-cols-3">
+              <div className="mb-4 grid gap-2 rounded-xl border border-hairline bg-gray-50/60 p-3 text-[13px] sm:grid-cols-3">
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-gray-500">Unterschrift</span>
                   <StatusBadge label={sigState.signatureStatusLabel} tone={sigState.signatureCaptured ? 'success' : 'warning'} />
@@ -405,7 +405,7 @@ export function OfferDetailPage() {
                     </div>
                   ) : null}
                   {summary.invoice ? (
-                    <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3 text-[13px]">
+                    <div className="rounded-xl border border-hairline bg-gray-50/60 p-3 text-[13px]">
                       <div className="flex items-center justify-between"><span className="text-gray-500">Rechnung</span><StatusBadge label={summary.invoice.status} tone={summary.invoice.status === 'draft' ? 'warning' : 'success'} /></div>
                       <p className="mt-1 text-gray-700">{summary.invoice.invoice_number ?? 'Entwurf'} · {formatCents(summary.invoice.gross_total_cents, summary.currency ?? 'EUR')}</p>
                       <button onClick={() => navigate(`/admin/finance/invoices/${summary.invoice!.id}`)} className="mt-1 text-[12px] text-gray-700 underline">Rechnung öffnen</button>
@@ -439,7 +439,7 @@ export function OfferDetailPage() {
             <Card className="p-6">
               <SectionHeader title="Annahme-Historie" description="Online-Annahme / einfache elektronische Signatur — keine qualifizierte Signatur." />
               <ul className="space-y-3">{events.map((e) => (
-                <li key={e.id} className="rounded-xl border border-gray-100 p-3 text-[13px]">
+                <li key={e.id} className="rounded-xl border border-hairline p-3 text-[13px]">
                   <div className="flex items-center justify-between">
                     <StatusBadge label={e.decision === 'accepted' ? 'Angenommen' : 'Abgelehnt'} tone={e.decision === 'accepted' ? 'success' : 'danger'} />
                     <span className="text-gray-400">{formatDateDe(e.created_at)}</span>
@@ -459,10 +459,10 @@ export function OfferDetailPage() {
             <dl className="space-y-1.5 text-sm">
               <div className="flex justify-between"><dt className="text-gray-500">Netto</dt><dd className="tabular-nums">{formatCents(offer.net_total_cents, offer.currency)}</dd></div>
               <div className="flex justify-between"><dt className="text-gray-500">Umsatzsteuer</dt><dd className="tabular-nums">{formatCents(offer.vat_total_cents, offer.currency)}</dd></div>
-              <div className="flex justify-between border-t border-gray-100 pt-1.5"><dt className="font-semibold text-gray-950">Gesamt brutto</dt><dd className="tabular-nums text-base font-semibold text-gray-950">{formatCents(offer.gross_total_cents, offer.currency)}</dd></div>
+              <div className="flex justify-between border-t border-hairline pt-1.5"><dt className="font-semibold text-gray-950">Gesamt brutto</dt><dd className="tabular-nums text-base font-semibold text-gray-950">{formatCents(offer.gross_total_cents, offer.currency)}</dd></div>
             </dl>
             {!isDraft && offer.status !== 'converted' && offer.status !== 'cancelled' ? (
-              <div className="mt-4 flex flex-col gap-2 border-t border-gray-100 pt-4">
+              <div className="mt-4 flex flex-col gap-2 border-t border-hairline pt-4">
                 {['finalized', 'sent', 'viewed'].includes(offer.status) ? <Button variant="ghost" icon={XCircle} onClick={() => setConfirmReject(true)}>Als abgelehnt markieren</Button> : null}
                 <Button variant="ghost" onClick={() => setConfirmCancel(true)}>Angebot stornieren</Button>
               </div>
@@ -485,7 +485,7 @@ export function OfferDetailPage() {
             <Card className="p-6">
               <SectionHeader title="Erzeugte Dokumente" />
               <ul className="space-y-2">{docs.map((d) => (
-                <li key={d.id} className="flex items-center justify-between rounded-lg border border-gray-100 px-3 py-2 text-[13px]">
+                <li key={d.id} className="flex items-center justify-between rounded-lg border border-hairline px-3 py-2 text-[13px]">
                   <span className="text-gray-700">v{d.version} · {formatDateDe(d.generated_at)} {d.status === 'finalized' ? <span className="ml-1 text-[11px] text-emerald-600">final</span> : null}</span>
                   {d.pdf_storage_path ? <button className="text-gray-500 hover:text-gray-950" onClick={() => downloadStored(d.pdf_storage_path as string)} disabled={busy === 'stored'}><Download size={15} /></button> : null}
                 </li>

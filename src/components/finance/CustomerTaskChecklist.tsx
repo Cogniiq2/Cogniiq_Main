@@ -104,13 +104,13 @@ export function CustomerTaskChecklist({ customerId, tasks, onChanged }: {
       </div>
 
       {active.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-gray-200 bg-white px-4 py-8 text-center text-[13px] text-gray-500">
+        <div className="rounded-card border border-dashed border-gray-200 bg-white px-4 py-8 text-center text-[13px] text-gray-500">
           Keine offenen Aufgaben. Legen Sie eine neue Aufgabe an.
         </div>
       ) : (
         <ul className="space-y-2">
           {active.map((task, i) => (
-            <li key={task.id} className="flex items-start gap-3 rounded-2xl border border-gray-100 bg-white p-3 shadow-[0_1px_0_rgba(15,23,42,0.02)]">
+            <li key={task.id} className="flex items-start gap-3 rounded-card border border-hairline bg-white p-3 shadow-[0_1px_0_rgba(15,23,42,0.02)]">
               <input
                 type="checkbox" checked={false} disabled={busy.has(task.id)} aria-label="Als erledigt markieren"
                 onChange={() => void toggleComplete(task, true)}
@@ -154,7 +154,7 @@ export function CustomerTaskChecklist({ customerId, tasks, onChanged }: {
           {showDone ? (
             <ul className="mt-2 space-y-1.5">
               {done.map((task) => (
-                <li key={task.id} className="flex items-start gap-3 rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                <li key={task.id} className="flex items-start gap-3 rounded-xl border border-hairline bg-gray-50/60 p-3">
                   <input
                     type="checkbox" checked={task.status === 'completed'} disabled={busy.has(task.id) || task.status === 'cancelled'}
                     aria-label="Wieder öffnen" onChange={() => void toggleComplete(task, false)}

@@ -154,7 +154,7 @@ export function SettingsPage() {
 
 function ReadOnly({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-gray-100 bg-gray-50/70 px-3.5 py-2.5">
+    <div className="rounded-xl border border-hairline bg-gray-50/70 px-3.5 py-2.5">
       <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-400">{label}</p>
       <p className="mt-1 text-sm font-medium text-gray-950">{value}</p>
     </div>

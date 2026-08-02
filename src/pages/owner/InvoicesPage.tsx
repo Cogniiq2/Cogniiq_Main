@@ -450,7 +450,7 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError 
             <Field id="due" label="Fällig am" type="date" value={dueDate} onChange={() => {}} disabled hint="Aus Rechnungsdatum + Zahlungsziel" />
           </div>
           {customer ? (
-            <div className="mt-4 rounded-xl border border-gray-100 bg-gray-50/70 p-4 text-[13px] text-gray-600">
+            <div className="mt-4 rounded-xl border border-hairline bg-gray-50/70 p-4 text-[13px] text-gray-600">
               <p className="font-semibold text-gray-950">{customer.legalName ?? customer.name}</p>
               {customer.email ? <p className="mt-0.5">{customer.email}</p> : null}
             </div>
@@ -461,7 +461,7 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError 
           <SectionHeader title="Positionen" action={<Button size="sm" variant="secondary" icon={Plus} onClick={() => setLines((c) => [...c, newLine()])}>Position</Button>} />
           <div className="space-y-3">
             {computedLines.map(({ line, calc }, idx) => (
-              <div key={line.id} className="rounded-xl border border-gray-100 bg-white p-4">
+              <div key={line.id} className="rounded-xl border border-hairline bg-white p-4">
                 <div className="mb-3 flex items-center justify-between">
                   <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Position {idx + 1}</span>
                   {lines.length > 1 ? <IconButton icon={Trash2} label="Position entfernen" variant="ghost" onClick={() => removeLine(line.id)} /> : null}
@@ -488,7 +488,7 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError 
         <Card className="p-5">
           <SectionHeader title="Notizen & Vorschau" />
           <Textarea id="notes" label="Interne Notizen (optional)" value={notes} onChange={setNotes} rows={2} />
-          <div className="mt-4 rounded-xl border border-gray-100 bg-gray-50/70 p-4">
+          <div className="mt-4 rounded-xl border border-hairline bg-gray-50/70 p-4">
             <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Vorschau der Summen</p>
             <dl className="space-y-2 text-sm">
               <div className="flex justify-between"><dt className="text-gray-500">Zwischensumme netto</dt><dd className="tabular-nums font-medium text-gray-900">{formatCents(totals.net)}</dd></div>
@@ -557,7 +557,7 @@ function PaymentDialog({ invoice, onClose, onDone, onError }: {
       description={invoice?.invoice_number ? `Rechnung ${invoice.invoice_number}` : undefined}
       footer={<><Button variant="secondary" onClick={onClose} disabled={busy}>Abbrechen</Button><Button onClick={() => void submit()} loading={busy}>Zahlung buchen</Button></>}
     >
-      <div className="mb-4 flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50/70 px-4 py-3">
+      <div className="mb-4 flex items-center justify-between rounded-xl border border-hairline bg-gray-50/70 px-4 py-3">
         <span className="text-[13px] text-gray-500">Offener Betrag</span>
         <span className="text-base font-semibold tabular-nums text-gray-950">{formatCents(outstanding)}</span>
       </div>
