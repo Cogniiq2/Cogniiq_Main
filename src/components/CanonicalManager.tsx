@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { BUSINESS_INFO } from "@/lib/seo-data";
+import { shouldSuppressCanonical } from "@/lib/routing/indexability";
 
 const BASE_URL = BUSINESS_INFO.website.replace(/\/$/, "");
 
@@ -17,9 +18,10 @@ export function CanonicalManager() {
   useEffect(() => {
     const existing = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
 
-    // The tokenized customer document portal (/d/:token) is a private surface: it must
-    // never advertise a canonical marketing URL. Remove any canonical link while there.
-    if (pathname === "/d" || pathname.startsWith("/d/")) {
+    // Surfaces reachable only through a token (/d/:token) or a one-time email link (/auth/*) have
+    // no public address: they must never advertise a canonical marketing URL. Remove any existing
+    // canonical link while there.
+    if (shouldSuppressCanonical(pathname)) {
       if (existing) existing.remove();
       return;
     }
