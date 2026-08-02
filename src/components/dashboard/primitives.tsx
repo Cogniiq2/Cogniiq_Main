@@ -227,7 +227,7 @@ export function SearchInput({
         value={value}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
-        className={cn(controlBase, controlIdle, 'h-10 pl-9 pr-3')}
+        className={cn(controlBase, controlIdle, 'h-11 pl-9 pr-3')}
       />
     </div>
   );
@@ -467,7 +467,7 @@ export function EmptyState({ icon: Icon, title, description, action, className }
   icon: LucideIcon; title: string; description: string; action?: ReactNode; className?: string;
 }) {
   return (
-    <div className={cn('flex flex-col items-center rounded-card border border-dashed border-gray-200 bg-white/60 px-6 py-14 text-center', className)}>
+    <div className={cn('flex flex-col items-center rounded-card border border-dashed border-gray-200 bg-white/60 px-6 py-12 text-center', className)}>
       <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-control border border-gray-200 bg-gray-50 text-gray-400">
         <Icon size={20} aria-hidden="true" />
       </span>

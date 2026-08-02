@@ -256,6 +256,14 @@ export function DashboardShell({
 
   return (
     <div data-cq-surface="owner" className="min-h-screen bg-canvas text-gray-950">
+      {/* With a 16-item rail, a keyboard user would otherwise re-traverse the whole
+          navigation on every page. */}
+      <a
+        href="#dashboard-main"
+        className="sr-only left-4 top-4 z-[60] rounded-control bg-gray-950 px-4 py-2.5 text-[13px] font-semibold text-white focus:not-sr-only focus:fixed focus:outline-none focus:ring-2 focus:ring-gray-950/25 focus:ring-offset-2"
+      >
+        Zum Inhalt springen
+      </a>
       {/* Desktop rail */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-[268px] flex-col border-r border-hairline bg-white lg:flex">
         <div className="flex h-16 shrink-0 items-center border-b border-hairline px-5">
@@ -309,7 +317,7 @@ export function DashboardShell({
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-[1360px] px-4 py-7 sm:px-6 sm:py-8 lg:px-8">{children}</main>
+        <main id="dashboard-main" tabIndex={-1} className="mx-auto w-full max-w-[1360px] px-4 py-7 focus:outline-none sm:px-6 sm:py-8 lg:px-8">{children}</main>
       </div>
 
       {/* Mobile drawer */}

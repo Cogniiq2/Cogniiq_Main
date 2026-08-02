@@ -164,6 +164,14 @@ function CustomerAppShellInner({ children }: { children: ReactNode }) {
 
   return (
     <div data-cq-surface="customer" className="min-h-screen bg-canvas text-gray-950">
+      {/* With a 16-item rail, a keyboard user would otherwise re-traverse the whole
+          navigation on every page. */}
+      <a
+        href="#portal-main"
+        className="sr-only left-4 top-4 z-[60] rounded-control bg-gray-950 px-4 py-2.5 text-[13px] font-semibold text-white focus:not-sr-only focus:fixed focus:outline-none focus:ring-2 focus:ring-gray-950/25 focus:ring-offset-2"
+      >
+        Zum Inhalt springen
+      </a>
       <header className="sticky top-0 z-40 border-b border-hairline bg-white/85 backdrop-blur-xl supports-[backdrop-filter]:bg-white/70">
         {/* Row 1 — identity: who you are, whose workspace this is, and how to leave. */}
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
@@ -419,7 +427,7 @@ function CustomerAppShellInner({ children }: { children: ReactNode }) {
         ) : null}
       </AnimatePresence>
 
-      <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <main id="portal-main" tabIndex={-1} className="mx-auto w-full max-w-6xl px-4 py-8 focus:outline-none sm:px-6 sm:py-10 lg:px-8">
         <AppRouteTransition routeKey={location.pathname}>{children}</AppRouteTransition>
       </main>
     </div>

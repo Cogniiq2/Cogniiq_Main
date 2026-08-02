@@ -14,6 +14,7 @@ import { Link } from 'react-router-dom';
 
 import { CustomerAppShell } from '@/components/app/CustomerAppShell';
 import {
+  appFocusRing,
   AppButton,
   AppCard,
   AppEmptyState,
@@ -43,8 +44,17 @@ import {
   type CustomerProject,
 } from '@/lib/customerPlatform/types';
 import { formatDateDe } from '@/lib/ownerFinance/exports/format';
+import { cn } from '@/lib/utils';
 import { resolveImplementation } from '@/lib/solutions/registry';
 import type { OrganizationSolution } from '@/lib/clientPlatform/types';
+
+// One recipe for every clickable tile on the home page, so a project card, a solution card
+// and a shortcut tile read as members of the same family rather than three near-misses.
+const appCardLink = cn(
+  'group rounded-card border border-hairline bg-white shadow-card',
+  'transition-[border-color,box-shadow] duration-base ease-premium hover:border-gray-200 hover:shadow-card-hover',
+  appFocusRing,
+);
 
 // Customer home page. Every card below is CONDITIONAL on real data existing — there
 // are no decorative placeholders and nothing is simulated. When an organization has
@@ -259,7 +269,7 @@ function AppHomeContent() {
 // ---------------------------------------------------------------- next action
 function NextActionCard({ projects }: { projects: CustomerProject[] }) {
   return (
-    <section className="overflow-hidden rounded-panel border border-amber-200 bg-amber-50/70 p-6 sm:p-7">
+    <section className="overflow-hidden rounded-card border border-amber-200 bg-amber-50/70 p-5 sm:p-6">
       <div className="mb-4 flex items-center gap-2">
         <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
           <CalendarClock size={16} aria-hidden="true" />
@@ -277,7 +287,7 @@ function NextActionCard({ projects }: { projects: CustomerProject[] }) {
           return (
             <li
               key={project.id}
-              className="flex flex-wrap items-start justify-between gap-3 rounded-card border border-amber-200/70 bg-white px-4 py-3.5"
+              className="flex flex-wrap items-start justify-between gap-3 rounded-control border border-amber-200/70 bg-white px-4 py-3.5"
             >
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-gray-950">{project.next_action_summary}</p>
@@ -310,7 +320,7 @@ function ProjectCard({ project }: { project: CustomerProject }) {
   return (
     <Link
       to={`/app/projects/${project.id}`}
-      className="group flex flex-col rounded-panel border border-hairline bg-white p-6 shadow-card transition-colors hover:border-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2"
+      className={cn(appCardLink, 'flex flex-col p-6')}
     >
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">{project.phase}</p>
@@ -378,7 +388,7 @@ function ContactCard({ project }: { project: CustomerProject }) {
           {project.contact_business_email ? (
             <a
               href={`mailto:${project.contact_business_email}`}
-              className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-[13px] font-semibold text-gray-700 transition-colors hover:border-gray-300 hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2"
+              className={cn('inline-flex min-h-11 items-center gap-2 rounded-control border border-gray-200 bg-white px-4 text-[13px] font-semibold text-gray-700 transition-colors duration-fast ease-premium hover:border-gray-300 hover:bg-gray-50 hover:text-gray-950', appFocusRing)}
             >
               <Mail size={14} aria-hidden="true" />
               Nachricht schreiben
@@ -419,7 +429,7 @@ function SolutionGridCard({ solution }: { solution: OrganizationSolution }) {
   return (
     <Link
       to={`/app/solutions/${solution.instance_key}`}
-      className="group flex flex-col rounded-panel border border-hairline bg-white p-6 shadow-card transition-colors hover:border-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2"
+      className={cn(appCardLink, 'flex flex-col p-6')}
     >
       <div className="mb-4 flex items-center justify-between">
         <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-gray-50 text-gray-600">
@@ -458,7 +468,7 @@ function ShortcutCard({
   return (
     <Link
       to={to}
-      className="group rounded-panel border border-hairline bg-white p-6 shadow-none transition-colors hover:border-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2"
+      className={cn(appCardLink, 'block p-5')}
     >
       <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 bg-gray-50 text-gray-500">
         <Icon size={16} aria-hidden="true" />
