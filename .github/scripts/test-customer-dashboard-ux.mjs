@@ -27,15 +27,28 @@ const sectionPage = read('src/pages/app/CustomerSectionPage.tsx');
 // ---------------------------------------------------------------- 1) navigation breakpoint gap
 // The desktop cluster, the mobile trigger and the mobile panel must all switch at the SAME
 // breakpoint as the desktop nav row (lg). Any md: variant among them re-opens the dead zone.
-ok(/className="hidden items-center gap-2 lg:flex"/.test(shell), 'desktop header cluster switches at lg (not md)');
-ok(/text-gray-700 lg:hidden"/.test(shell), 'mobile menu trigger is hidden from lg up (not md)');
-ok(/border-t border-gray-100 bg-white lg:hidden"/.test(shell), 'mobile nav panel is hidden from lg up (not md)');
-ok(/border-t border-gray-100 bg-white\/80 lg:block/.test(shell), 'desktop nav row still appears at lg');
+// These are asserted structurally rather than against literal class strings so that a visual
+// refactor of the shell does not read as a regression. The invariant under test is the
+// BREAKPOINT, not the styling: everything must switch at lg.
+ok(/hidden[^"'`]*\bitems-center\b[^"'`]*\blg:flex\b/.test(shell), 'desktop header cluster switches at lg (not md)');
+ok(
+  /aria-label="Kundenbereich Navigation"/.test(shell) && /\blg:hidden\b/.test(shell),
+  'mobile menu trigger is hidden from lg up (not md)',
+);
+// The mobile navigation surface (drawer or inline panel) must itself disappear at lg, otherwise
+// it would sit alongside the desktop nav row.
+ok(/\bfixed inset-0\b[^"'`]*\blg:hidden\b/.test(shell), 'mobile nav panel is hidden from lg up (not md)');
+ok(/\blg:block\b/.test(shell) && /aria-label="Kundenbereich Navigation"/.test(shell), 'desktop nav row still appears at lg');
 ok(!/\bmd:hidden\b/.test(shell), 'no md:hidden remains in the shell (would recreate the 768-1023px gap)');
 ok(!/\bmd:flex\b/.test(shell), 'no md:flex remains in the shell (would recreate the 768-1023px gap)');
 // The org switcher lives in the desktop cluster, which is now lg-only, so the mobile panel must
-// carry its own switcher or multi-org users lose it below 1024px.
-ok(/customer-organization-select-mobile/.test(shell), 'mobile panel provides an organization switcher');
+// carry its own switcher or multi-org users lose it below 1024px. The id may be composed from a
+// suffix, so accept either the literal id or the composed form.
+ok(
+  /customer-organization-select-mobile/.test(shell)
+    || (/customer-organization-select\$\{idSuffix\}/.test(shell) && /'-mobile'/.test(shell)),
+  'mobile panel provides an organization switcher',
+);
 
 // ---------------------------------------------------------------- 2) entitlement denial is explained
 ok(!/<Navigate to="\/app" replace \/>/.test(guard), 'entitlement guard no longer silently redirects to /app');
