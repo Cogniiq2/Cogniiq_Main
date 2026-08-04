@@ -131,8 +131,14 @@ export function resolve({ url, method = 'GET', headers = {}, scenario = 'populat
   // failing them turns every scenario into "Kein Zugriff" and the page under test never
   // renders. The realistic failure being modelled is "the page loads, its data query
   // fails" — not "the user lost their role".
+  // `claim_my_client_invitations` belongs here too: AuthContext AWAITS it during
+  // bootstrap, so hanging it under the `loading` scenario froze every route on the auth
+  // spinner and no page ever reached its own skeleton — the scenario proved only that the
+  // auth guard works, which was not what it was for.
   const isIdentityRead =
-    path.startsWith('/rest/v1/profiles') || path.startsWith('/rest/v1/organization_members');
+    path.startsWith('/rest/v1/profiles')
+    || path.startsWith('/rest/v1/organization_members')
+    || path === '/rest/v1/rpc/claim_my_client_invitations';
 
   if (!isIdentityRead) {
     // `loading` never resolves — it is how the harness proves a skeleton is a real

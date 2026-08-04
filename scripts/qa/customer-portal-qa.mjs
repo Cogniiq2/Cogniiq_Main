@@ -57,10 +57,13 @@ const CUSTOMER_ROUTES = [
   { key: 'c07-billing', label: 'Abrechnung', path: '/app/billing' },
   { key: 'c08-solutions', label: 'Lösungen', path: '/app/solutions' },
   { key: 'c09-solution-detail', label: 'Lösung (Instanz)', path: '/app/solutions/ai-receptionist-musterbau' },
-  // Static surfaces: they issue no query of their own, so there is no error state to
-  // reach. Recorded as n/a rather than silently passed or falsely failed.
-  { key: 'c10-support', label: 'Support', path: '/app/support', errorState: 'n/a' },
-  { key: 'c11-settings', label: 'Einstellungen', path: '/app/settings', errorState: 'n/a' },
+  // Static surfaces. They render their content unconditionally rather than gating on a
+  // request, so they have neither an error state nor a loading state to reach — and that
+  // is the desired behaviour: with the backend down a customer still gets the support
+  // address and their own account page. Recorded as n/a rather than silently passed or
+  // falsely failed.
+  { key: 'c10-support', label: 'Support', path: '/app/support', errorState: 'n/a', loadingState: 'n/a' },
+  { key: 'c11-settings', label: 'Einstellungen', path: '/app/settings', errorState: 'n/a', loadingState: 'n/a' },
   // Entitlement-gated receptionist sections.
   { key: 'c12-onboarding', label: 'Einrichtung', path: '/app/onboarding' },
   { key: 'c13-receptionist', label: 'Rezeptionist', path: '/app/receptionist' },
@@ -397,6 +400,10 @@ async function captureRoute(page, route, scenario, vp) {
 
   if (scenario === 'error' && route.errorState === 'n/a') {
     record.error = 'n/a';
+    return;
+  }
+  if (scenario === 'loading' && route.loadingState === 'n/a') {
+    record.loading = 'n/a';
     return;
   }
 
