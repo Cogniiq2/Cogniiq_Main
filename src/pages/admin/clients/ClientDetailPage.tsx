@@ -19,6 +19,7 @@ import {
   effectiveInvitationStatus,
   resendOutcomeMessage,
 } from '@/lib/clientPlatform/invitationStatus';
+import { AccessRolesSection } from '@/pages/admin/clients/AccessRolesSection';
 import { CustomerProjectPanel } from '@/components/finance/CustomerProjectPanel';
 import {
   loadOrganizationCommercialOverview,
@@ -26,7 +27,7 @@ import {
 } from '@/lib/ownerFinance/organizationCommercial';
 import { offerStatusLabel } from '@/lib/ownerFinance/customerLabels';
 
-const tabs = ['Übersicht', 'Kontakte', 'Lösungen', 'Vertrag & Budget', 'Kommerziell', 'Zugang', 'Kundenportal', 'Aktivität'] as const;
+const tabs = ['Übersicht', 'Kontakte', 'Lösungen', 'Vertrag & Budget', 'Kommerziell', 'Zugang', 'Zugriff & Rollen', 'Kundenportal', 'Aktivität'] as const;
 type Tab = (typeof tabs)[number];
 
 export function ClientDetailPage() {
@@ -96,6 +97,7 @@ export function ClientDetailPage() {
       {tab === 'Vertrag & Budget' ? <BudgetTab detail={detail} /> : null}
       {tab === 'Kommerziell' ? <CommercialTab organizationId={detail.organizationId} /> : null}
       {tab === 'Zugang' ? <AccessTab detail={detail} onChanged={() => void reload()} flash={flash} /> : null}
+      {tab === 'Zugriff & Rollen' ? <AccessRolesSection organizationId={detail.organizationId} /> : null}
       {tab === 'Kundenportal' ? <PortalTab detail={detail} /> : null}
       {tab === 'Aktivität' ? <ActivityTab /> : null}
     </div>

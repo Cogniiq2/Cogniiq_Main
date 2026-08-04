@@ -2,19 +2,7 @@ import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-  ChevronDown,
-  CreditCard,
-  ExternalLink,
-  FileText,
-  Headphones,
-  LayoutGrid,
-  LogOut,
-  Menu,
-  Settings,
-  UserRound,
-  X,
-} from 'lucide-react';
+import { ChevronDown, ExternalLink, LogOut, Menu, Settings, UserRound, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 import { AppRouteTransition, AppStatusBadge, appEase } from '@/components/app/CustomerAppPrimitives';
@@ -31,57 +19,17 @@ import {
   useOrganizationSolutionsValue,
 } from '@/hooks/useOrganizationSolutions';
 import { useOrganizations } from '@/hooks/useOrganizations';
-import { buildSolutionNavHref, resolveImplementation } from '@/lib/solutions/registry';
-import type { OrganizationSolution } from '@/lib/clientPlatform/types';
+import { usePortalAccess } from '@/contexts/PortalAccessContext';
+import { buildPortalNavigation } from '@/lib/portalAccess/navigation';
+import type { PortalNavGroup, PortalNavItem } from '@/lib/portalAccess/navigation';
 import { cn } from '@/lib/utils';
 
-interface CustomerNavItem {
-  label: string;
-  href: string;
-  icon: LucideIcon;
-}
-
-interface CustomerNavGroup {
-  id: string;
-  label: string;
-  items: CustomerNavItem[];
-}
-
-// Universal, product-neutral navigation shown to every customer.
-const universalNav: CustomerNavGroup = {
-  id: 'portal',
-  label: 'Portal',
-  items: [
-    { label: 'Übersicht', href: '/app', icon: LayoutGrid },
-    { label: 'Dokumente', href: '/app/documents', icon: FileText },
-    { label: 'Abrechnung', href: '/app/billing', icon: CreditCard },
-    { label: 'Meine Lösungen', href: '/app/solutions', icon: Headphones },
-    { label: 'Support', href: '/app/support', icon: UserRound },
-    { label: 'Einstellungen', href: '/app/settings', icon: Settings },
-  ],
-};
+type CustomerNavItem = PortalNavItem;
+type CustomerNavGroup = PortalNavGroup;
 
 function isActivePath(pathname: string, href: string) {
   if (href === '/app') return pathname === '/app';
   return pathname === href || pathname.startsWith(`${href}/`);
-}
-
-// Product navigation is generated from the active organization's accessible solution modules.
-function buildProductNavGroups(solutions: OrganizationSolution[]): CustomerNavGroup[] {
-  return solutions
-    .filter((solution) => solution.status !== 'disabled')
-    .flatMap((solution) => {
-      const implementation = resolveImplementation(solution.implementation_key);
-      return implementation.navGroups.map((group) => ({
-        id: `${solution.id}-${group.id}`,
-        label: solution.display_name,
-        items: group.items.map((item) => ({
-          label: item.label,
-          href: buildSolutionNavHref(solution.instance_key, item),
-          icon: item.icon,
-        })),
-      }));
-    });
 }
 
 export function CustomerAppShell({ children }: { children: ReactNode }) {
@@ -104,12 +52,21 @@ function CustomerAppShellInner({ children }: { children: ReactNode }) {
   const { profile, user, signOut } = useAuth();
   const { memberships, activeOrganization, activeOrganizationId, setActiveOrganizationId } = useOrganizations();
   const { solutions } = useOrganizationSolutions();
+  const { organization: accessOrganization, hasEveryCapability, status: accessStatus } = usePortalAccess();
   const hasMultipleOrganizations = memberships.length > 1;
   const displayName = profile?.full_name || profile?.email || user?.email || 'Konto';
 
-  const productNav = useMemo(() => buildProductNavGroups(solutions), [solutions]);
-  const navGroups = useMemo(() => [universalNav, ...productNav], [productNav]);
-  const lifecycle = getWorkspaceLifecycleDisplay(Boolean(activeOrganizationId), solutions.length);
+  // Navigation is derived from the ACCESS CONTEXT's solutions plus the effective capabilities.
+  // While the context is loading, hasEveryCapability is false for everything, so a restricted item
+  // is never briefly rendered and then withdrawn.
+  const navGroups = useMemo<CustomerNavGroup[]>(
+    () => buildPortalNavigation({ solutions: accessOrganization?.solutions ?? [], hasEveryCapability }),
+    [accessOrganization, hasEveryCapability]
+  );
+  const lifecycle = getWorkspaceLifecycleDisplay(
+    Boolean(activeOrganizationId),
+    accessStatus === 'ready' ? (accessOrganization?.solutions.length ?? 0) : solutions.length
+  );
 
   const handleSignOut = async () => {
     setUserMenuOpen(false);
