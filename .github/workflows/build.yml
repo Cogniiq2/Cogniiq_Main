@@ -51,6 +51,9 @@ jobs:
       - name: Customer dashboard UX foundation tests
         run: node .github/scripts/test-customer-dashboard-ux.mjs
 
+      - name: Customer portal experience + boundary tests
+        run: node .github/scripts/test-customer-portal-experience.mjs
+
       - name: Authentication boot timeout tests
         run: node .github/scripts/test-auth-boot-timeout.mjs
 

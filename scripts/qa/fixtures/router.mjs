@@ -108,9 +108,14 @@ const ERROR_BODY = {
  * @param {Record<string,string>} input.headers  lower-cased request headers
  * @param {'populated'|'empty'|'loading'|'error'} input.scenario
  * @param {object} input.session  the synthetic session to answer /auth/v1 with
+ * @param {{rpc?:Record<string,unknown>, tables?:Record<string,unknown[]>, functions?:Record<string,{status:number,body:unknown}>}} [input.overrides]
+ *   Per-run replacements for individual RPC responses, table row sets or Edge Function
+ *   answers. This is how a single named case ("Cogniiq owns the next action", "the
+ *   download fails") is exercised WITHOUT forking the fixture layer: the shapes stay the
+ *   ones declared in `rpc.mjs`/`tables.mjs`, only the values differ.
  * @returns {{status:number, body:unknown, delayMs?:number}}
  */
-export function resolve({ url, method = 'GET', headers = {}, scenario = 'populated', session }) {
+export function resolve({ url, method = 'GET', headers = {}, scenario = 'populated', session, overrides = {} }) {
   const parsed = new URL(url);
   const path = parsed.pathname;
 
@@ -136,9 +141,24 @@ export function resolve({ url, method = 'GET', headers = {}, scenario = 'populat
     if (scenario === 'error') return { status: 500, body: ERROR_BODY };
   }
 
+  /* ---- Edge Functions ---- */
+  // Only reachable when a case explicitly overrides one; otherwise the caller's own
+  // handling applies. Used to exercise the document-download failure path.
+  if (path.startsWith('/functions/v1/')) {
+    const fn = path.slice('/functions/v1/'.length);
+    const override = overrides.functions?.[fn];
+    if (override) return { status: override.status, body: override.body };
+    return { status: 200, body: { url: `${parsed.origin}/qa-fixture-signed-object` } };
+  }
+
   /* ---- RPC ---- */
   if (path.startsWith('/rest/v1/rpc/')) {
     const name = path.slice('/rest/v1/rpc/'.length);
+    if (overrides.rpc && name in overrides.rpc) {
+      const overridden = overrides.rpc[name];
+      if (scenario === 'empty') return { status: 200, body: Array.isArray(overridden) ? [] : null };
+      return { status: 200, body: overridden };
+    }
     if (!(name in rpc)) {
       // An unknown RPC is a fixture gap, not an empty result. Surfacing it as a
       // PostgREST "function not found" makes the gap visible in the QA report instead
@@ -159,21 +179,24 @@ export function resolve({ url, method = 'GET', headers = {}, scenario = 'populat
   if (!path.startsWith('/rest/v1/')) return { status: 200, body: {} };
 
   const table = path.slice('/rest/v1/'.length).split('?')[0];
-  if (!(table in tables)) {
+  const overriddenTable = overrides.tables?.[table];
+  if (!overriddenTable && !(table in tables)) {
     return {
       status: 404,
       body: { code: 'PGRST205', message: `Could not find the table 'public.${table}' in the schema cache`, details: 'qa fixture gap', hint: null },
     };
   }
 
+  const source = overriddenTable ?? tables[table];
+
   // Writes never mutate the fixtures — a QA run must be repeatable, and the constraint
   // is that no business record is created anywhere, including in memory.
   if (method !== 'GET' && method !== 'HEAD') {
-    const echo = tables[table][0] ?? {};
+    const echo = source[0] ?? {};
     return { status: method === 'DELETE' ? 204 : 201, body: method === 'DELETE' ? null : [echo] };
   }
 
-  let rows = scenario === 'empty' ? [] : tables[table];
+  let rows = scenario === 'empty' ? [] : source;
 
   for (const [key, value] of parsed.searchParams.entries()) {
     if (RESERVED.has(key)) continue;

@@ -17,9 +17,16 @@
  * @param {number} snapshot.contentTextLength visible text length outside nav/skeletons
  * @param {boolean} snapshot.hasEmptyState    an intentional empty state is rendered
  * @param {boolean} snapshot.hasErrorState    an intentional error state is rendered
+ * @param {number} [snapshot.loadingIndicatorCount] spinner-style busy indicators
+ *   (`[role="status"]`, `.animate-spin`). Some loading states are NOT skeletons — the
+ *   auth bootstrap and the entitlement guard render a labelled spinner above `<main>` —
+ *   and treating those as "blank" reported a correct, accessible loading state as a defect.
  */
 export function classifyRouteState(snapshot) {
-  const { skeletonCount, contentTextLength, hasEmptyState, hasErrorState } = snapshot;
+  const {
+    skeletonCount, contentTextLength, hasEmptyState, hasErrorState,
+    loadingIndicatorCount = 0,
+  } = snapshot;
 
   if (hasErrorState) return 'error';
 
@@ -31,8 +38,9 @@ export function classifyRouteState(snapshot) {
   if (contentTextLength >= MIN_CONTENT_CHARS) return 'populated';
   if (hasEmptyState) return 'empty';
 
-  // A skeleton with no content behind it is the permanent-skeleton failure.
-  if (skeletonCount > 0) return 'skeleton';
+  // A skeleton (or spinner) with no content behind it. Under the `loading` scenario this
+  // is the CORRECT answer; under `populated` it is the permanent-skeleton failure.
+  if (skeletonCount > 0 || loadingIndicatorCount > 0) return 'skeleton';
   return 'blank';
 }
 
@@ -54,6 +62,9 @@ export function isAcceptable(scenario, state) {
     case 'populated': return state === 'populated';
     case 'empty': return state === 'empty' || state === 'populated';
     case 'error': return state === 'error';
+    // Under a backend that never answers, a route must show a loading affordance —
+    // never a blank page and never a fully-rendered page it cannot have data for.
+    case 'loading': return state === 'skeleton';
     default: return false;
   }
 }

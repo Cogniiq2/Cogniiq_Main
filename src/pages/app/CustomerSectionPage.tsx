@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
-  AlertCircle,
   BookOpen,
   Building2,
   CheckCircle2,
@@ -24,6 +23,12 @@ import {
 import type { LucideIcon } from 'lucide-react';
 
 import { CustomerAppShell } from '@/components/app/CustomerAppShell';
+import {
+  customerMembershipStatusLabel,
+  customerOrganizationRoleLabel,
+  customerOrganizationStatusLabel,
+  customerPlatformRoleLabel,
+} from '@/lib/customerPlatform/customerLabels';
 import {
   AppAddButton,
   AppButton,
@@ -148,8 +153,10 @@ const sectionConfig: Record<CustomerSection, {
   },
   settings: {
     title: 'Einstellungen',
-    eyebrow: 'Profil',
-    description: 'Echte Profilinformationen plus UI-only Bereiche fuer spaetere Konto- und Firmeneinstellungen.',
+    eyebrow: 'Profil & Konto',
+    // Proper German orthography rather than the ae/oe/ue transliteration used elsewhere
+    // in this file: this is a customer-facing page in the redesign's scope.
+    description: 'Ihre Profil- und Organisationsdaten sowie der Zustand Ihres Zugangs — übersichtlich an einer Stelle.',
     icon: Settings,
   },
 };
@@ -180,7 +187,16 @@ function CustomerSectionContent({ section }: { section: CustomerSection }) {
         description={config.description}
         meta={
           <div className="flex flex-wrap items-center gap-2">
-            <AppStatusBadge label={loadStatus === 'loading' ? 'Daten werden geladen' : lifecycle.label} tone={loadStatus === 'error' ? 'danger' : lifecycle.tone} />
+            {/* The lifecycle badge describes the RECEPTIONIST onboarding, so it is
+                suppressed on /app/settings — an account page that showed
+                "Einrichtung noch nicht begonnen" told the customer something true about a
+                different product and nothing about their profile. */}
+            {section === 'settings' ? null : (
+              <AppStatusBadge
+                label={loadStatus === 'loading' ? 'Daten werden geladen' : lifecycle.label}
+                tone={loadStatus === 'error' ? 'danger' : lifecycle.tone}
+              />
+            )}
             {isPersistedSection ? (
               <AppStatusBadge label="Persistenz aktiv" tone="success" icon={Icon} />
             ) : isInPreparation ? (
@@ -246,6 +262,7 @@ function renderSection(section: CustomerSection) {
 }
 
 function OnboardingExperience() {
+  const reduceMotion = useReducedMotion();
   const {
     canEdit,
     loadError,
@@ -369,13 +386,17 @@ function OnboardingExperience() {
             <AppStatusBadge label={saveFeedback.badgeLabel} tone={saveFeedback.badgeTone} />
           </div>
 
+          {/* The only Framer Motion animation in this file. It was unconditional, so the
+              onboarding step transition kept moving for a customer who had asked the
+              system not to animate — the CSS-level prefers-reduced-motion block in
+              index.css cannot reach a JS-driven transform. */}
           <AnimatePresence mode="wait">
             <motion.div
               key={activeStage.id}
-              initial={{ opacity: 0, y: 8 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.22, ease: appEase }}
+              exit={reduceMotion ? { opacity: 1 } : { opacity: 0, y: -6 }}
+              transition={reduceMotion ? { duration: 0 } : { duration: 0.22, ease: appEase }}
             >
           {stageIndex === 0 ? (
             <div className="grid gap-4 sm:grid-cols-2">
@@ -1114,56 +1135,132 @@ function OperationalExperience({ type }: { type: 'calls' | 'leads' }) {
 
 function SettingsExperience() {
   const { profile, user, signOut } = useAuth();
-  const { activeOrganization } = useOrganizations();
+  const { activeOrganization, activeMembership, memberships } = useOrganizations();
 
+  // Everything on this page is READ-ONLY, and it says so once at group level rather than
+  // repeating a hint on each field. No mutation path is added here: the customer profile
+  // and organization records are owner-provisioned in this release, and a form that
+  // silently discards a save would be worse than an honest read-only surface.
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <div className="space-y-6">
-        <AppSection eyebrow="Account" title="Profil">
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="space-y-8">
+        <AppSection
+          eyebrow="Account"
+          title="Ihr Profil"
+          description="Diese Angaben stammen aus Ihrem Cogniiq-Zugang."
+        >
+          <AppReadOnlyNotice>
+            Ihre Profil- und Organisationsdaten werden von Cogniiq gepflegt. Möchten Sie einen
+            Eintrag ändern, genügt eine kurze Nachricht über den Support — die Änderung wird
+            dann kontrolliert übernommen.
+          </AppReadOnlyNotice>
           <AppCard>
-            <div className="grid gap-4 md:grid-cols-2">
-              <ReadOnlyField label="Name" value={profile?.full_name || 'Nicht gesetzt'} />
-              <ReadOnlyField label="E-Mail" value={profile?.email ?? user?.email ?? 'Nicht verfuegbar'} />
-              <ReadOnlyField label="Telefon" value={profile?.phone || 'Nicht gesetzt'} />
-              <ReadOnlyField label="Rolle" value={profile?.platform_role ?? 'Wird geladen'} />
-            </div>
+            <dl className="grid gap-4 md:grid-cols-2">
+              <ReadOnlyField label="Name" value={profile?.full_name || 'Nicht hinterlegt'} />
+              <ReadOnlyField label="E-Mail" value={profile?.email ?? user?.email ?? 'Nicht verfügbar'} />
+              <ReadOnlyField label="Telefon" value={profile?.phone || 'Nicht hinterlegt'} />
+              {/* Humanised, never the stored token: a customer must not read
+                  `cogniiq_admin` or `customer` off their own settings page. */}
+              <ReadOnlyField
+                label="Zugangsart"
+                value={profile ? customerPlatformRoleLabel(profile.platform_role) : 'Wird geladen …'}
+                description="Bestimmt, welche Bereiche des Portals Ihnen angezeigt werden."
+              />
+            </dl>
           </AppCard>
         </AppSection>
 
-        <AppSection eyebrow="Organisation" title="Unternehmen">
+        <AppSection
+          eyebrow="Organisation"
+          title="Ihr Unternehmen"
+          description={
+            memberships.length > 1
+              ? 'Sie gehören mehreren Organisationen an. Angezeigt wird die aktuell ausgewählte — wechseln können Sie oben links in der Navigation.'
+              : 'Der Workspace, für den dieses Portal geführt wird.'
+          }
+        >
           <AppCard>
-            <div className="grid gap-4 md:grid-cols-2">
-              <ReadOnlyField label="Organisation" value={activeOrganization?.name ?? 'Keine Organisation verbunden'} />
-              <ReadOnlyField label="Status" value={activeOrganization?.status ?? 'Nicht provisioniert'} />
-            </div>
+            <dl className="grid gap-4 md:grid-cols-2">
+              <ReadOnlyField
+                label="Organisation"
+                value={activeOrganization?.name ?? 'Keine Organisation verbunden'}
+              />
+              <ReadOnlyField
+                label="Status"
+                value={
+                  activeOrganization
+                    ? customerOrganizationStatusLabel(activeOrganization.status)
+                    : 'Noch nicht provisioniert'
+                }
+              />
+              <ReadOnlyField
+                label="Ihre Rolle"
+                value={activeMembership ? customerOrganizationRoleLabel(activeMembership.role) : '—'}
+                description="Legt fest, was Sie innerhalb dieser Organisation sehen und tun können."
+              />
+              <ReadOnlyField
+                label="Zugang"
+                value={activeMembership ? customerMembershipStatusLabel(activeMembership.status) : '—'}
+              />
+            </dl>
           </AppCard>
         </AppSection>
 
-        <AppSection eyebrow="Optionen" title="Weitere Einstellungen">
-          <div className="grid gap-4 md:grid-cols-2">
-            <SettingsTile icon={Info} title="Benachrichtigungen" text="UI vorbereitet, noch keine Mutation." />
-            <SettingsTile icon={ShieldCheck} title="Sicherheit" text="Auth ist aktiv, weitere Einstellungen folgen." />
-            <SettingsTile icon={FileText} title="Datenschutz und Daten" text="Export und Loeschung sind noch nicht verbunden." />
-            <SettingsTile icon={Settings} title="Sprache" text="Sprachwechsel ist noch UI-only." />
+        <AppSection
+          eyebrow="Optionen"
+          title="In Vorbereitung"
+          description="Diese Bereiche sind geplant, aber noch nicht aktiv. Sie sind hier aufgeführt, damit Sie wissen, was kommt — nicht als bedienbare Schalter."
+        >
+          <div className="grid gap-3 md:grid-cols-2">
+            <SettingsTile
+              icon={Info}
+              title="Benachrichtigungen"
+              text="Später können Sie hier festlegen, worüber Cogniiq Sie per E-Mail informiert."
+            />
+            <SettingsTile
+              icon={ShieldCheck}
+              title="Sicherheit"
+              text="Ihr Zugang ist bereits durch Anmeldung und Rechteprüfung geschützt. Zusätzliche Optionen folgen."
+            />
+            <SettingsTile
+              icon={FileText}
+              title="Datenschutz und Daten"
+              text="Datenexport und Löschung werden als geprüfter Prozess umgesetzt, nicht als Schalter."
+            />
+            <SettingsTile
+              icon={Settings}
+              title="Sprache"
+              text="Das Portal ist derzeit vollständig auf Deutsch geführt."
+            />
           </div>
         </AppSection>
       </div>
 
-      <aside className="space-y-6">
+      <aside className="space-y-5">
         <AppCard>
-          <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Sitzung</p>
-          <AppButton variant="secondary" icon={LogOut} onClick={() => void signOut()}>
-            Abmelden
-          </AppButton>
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-500">Sitzung</p>
+          <p className="mt-2 text-[13px] leading-6 text-gray-600">
+            Sie sind auf diesem Gerät angemeldet
+            {profile?.email || user?.email ? ` als ${profile?.email ?? user?.email}` : ''}.
+          </p>
+          <div className="mt-4">
+            <AppButton variant="secondary" icon={LogOut} onClick={() => void signOut()}>
+              Abmelden
+            </AppButton>
+          </div>
         </AppCard>
         <AppCard>
-          <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Account-Loeschung</p>
-          <AppEmptyState
-            compact
-            icon={AlertCircle}
-            title="Nicht direkt ausfuehrbar"
-            description="Eine Loeschanfrage muss spaeter als gesicherter Prozess umgesetzt werden."
-          />
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-500">Konto schließen</p>
+          <p className="mt-2 text-[13px] leading-6 text-gray-600">
+            Eine Löschung Ihres Zugangs führen wir als geprüften Prozess durch — unter anderem,
+            weil Rechnungen gesetzlichen Aufbewahrungsfristen unterliegen. Schreiben Sie uns
+            dazu über den Support.
+          </p>
+          <div className="mt-4">
+            <AppButton variant="secondary" to="/app/support">
+              Support kontaktieren
+            </AppButton>
+          </div>
         </AppCard>
       </aside>
     </div>
@@ -1412,11 +1509,24 @@ function RuleColumn<T extends ReceptionistResponsibility | ReceptionistAllowedAc
   );
 }
 
-function ReadOnlyField({ label, value }: { label: string; value: string }) {
+function ReadOnlyField({
+  label,
+  value,
+  description,
+}: {
+  label: string;
+  value: string;
+  description?: string;
+}) {
+  // <dt>/<dd> rather than two <p>s: a read-only field IS a term and its value, and a
+  // screen reader should read it as one.
   return (
-    <div className="rounded-xl border border-hairline bg-gray-50 px-4 py-3">
-      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">{label}</p>
-      <p className="mt-1 break-words text-sm font-semibold text-gray-900">{value}</p>
+    <div className="rounded-control border border-hairline bg-gray-50/80 px-4 py-3">
+      <dt className="text-[10px] font-bold uppercase tracking-[0.16em] text-gray-500">{label}</dt>
+      <dd className="mt-1 break-words text-[13.5px] font-semibold leading-snug text-gray-900">{value}</dd>
+      {description ? (
+        <dd className="mt-1.5 text-[11.5px] leading-5 text-gray-500">{description}</dd>
+      ) : null}
     </div>
   );
 }

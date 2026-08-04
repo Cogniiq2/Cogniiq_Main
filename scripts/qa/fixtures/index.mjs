@@ -49,8 +49,11 @@ export const ROLES = {
  * Every request to the Supabase host is answered locally; none leaves the machine.
  * `scenario` selects which of the four states the whole surface is in, so a route can be
  * captured populated, empty, permanently-loading and errored without touching the app.
+ * `overrides` replaces individual RPC/table/function answers for one named case (a
+ * Cogniiq-owned action, a blocked project, a failing download) without forking the
+ * fixture layer — see `resolve()`.
  */
-export async function installFixtures(context, { role, scenario = 'populated', supabaseUrl }) {
+export async function installFixtures(context, { role, scenario = 'populated', supabaseUrl, overrides = {} }) {
   const { userId, email } = ROLES[role];
   const session = syntheticSession(userId, email);
   const host = new URL(supabaseUrl).origin;
@@ -67,6 +70,7 @@ export async function installFixtures(context, { role, scenario = 'populated', s
       headers,
       scenario,
       session,
+      overrides,
     });
 
     if (result.delayMs === Number.POSITIVE_INFINITY) {

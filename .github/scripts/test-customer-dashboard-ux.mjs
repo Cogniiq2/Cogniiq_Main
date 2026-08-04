@@ -24,31 +24,45 @@ const unavailable = read('src/components/app/EntitlementUnavailablePage.tsx');
 const primitives = read('src/components/app/CustomerAppPrimitives.tsx');
 const sectionPage = read('src/pages/app/CustomerSectionPage.tsx');
 
-// ---------------------------------------------------------------- 1) navigation breakpoint gap
-// The desktop cluster, the mobile trigger and the mobile panel must all switch at the SAME
-// breakpoint as the desktop nav row (lg). Any md: variant among them re-opens the dead zone.
-// These are asserted structurally rather than against literal class strings so that a visual
-// refactor of the shell does not read as a regression. The invariant under test is the
-// BREAKPOINT, not the styling: everything must switch at lg.
-ok(/hidden[^"'`]*\bitems-center\b[^"'`]*\blg:flex\b/.test(shell), 'desktop header cluster switches at lg (not md)');
-ok(
-  /aria-label="Kundenbereich Navigation"/.test(shell) && /\blg:hidden\b/.test(shell),
-  'mobile menu trigger is hidden from lg up (not md)',
-);
-// The mobile navigation surface (drawer or inline panel) must itself disappear at lg, otherwise
-// it would sit alongside the desktop nav row.
-ok(/\bfixed inset-0\b[^"'`]*\blg:hidden\b/.test(shell), 'mobile nav panel is hidden from lg up (not md)');
-ok(/\blg:block\b/.test(shell) && /aria-label="Kundenbereich Navigation"/.test(shell), 'desktop nav row still appears at lg');
+// ---------------------------------------------------------------- 1) navigation shape + breakpoint gap
+// The Customer Portal navigates from a VERTICAL LEFT RAIL on desktop. The previous
+// horizontal navigation row under the header is gone. Asserted structurally rather than
+// against literal class strings so a visual refactor is not read as a regression: the
+// invariants are the SHAPE (a sticky/fixed left aside) and the BREAKPOINT (everything
+// switches at lg, never md).
+ok(/<aside\b[\s\S]{0,400}data-qa="customer-sidebar"/.test(shell), 'desktop navigation is an <aside> rail');
+ok(/data-qa="customer-sidebar"[\s\S]{0,400}\bfixed inset-y-0 left-0\b/.test(shell),
+  'the rail is a fixed full-height left rail');
+ok(/data-qa="customer-sidebar"[\s\S]{0,400}\bhidden\b[\s\S]{0,80}\blg:flex\b/.test(shell),
+  'the rail appears from lg up and is hidden below it');
+ok(/aria-label="Kundenportal Navigation"/.test(shell), 'the rail exposes a named navigation landmark');
+// The rail must be a vertical stack of links, not a horizontal row.
+ok(/<nav[\s\S]{0,240}aria-label="Kundenportal Navigation"[\s\S]{0,900}<ul/.test(shell),
+  'rail navigation is a list, rendered vertically');
+// The OLD horizontal desktop nav row must not come back.
+ok(!/aria-label="Kundenbereich Navigation"/.test(shell),
+  'the old horizontal "Kundenbereich Navigation" row is gone');
+ok(!/\blg:block\b/.test(shell), 'no lg-only horizontal nav row remains in the header');
+ok(/<header[^>]*className="[^"]*\blg:hidden\b/.test(shell),
+  'the compact header exists only below lg (desktop navigates from the rail)');
+
+// Mobile: the trigger and the drawer must both switch at lg, or 768–1023px loses navigation.
+ok(/aria-label="Navigation öffnen"[\s\S]{0,120}aria-expanded=\{mobileOpen\}/.test(shell),
+  'a mobile navigation trigger exists and reports its expanded state');
+ok(/\bfixed inset-0\b[^"'`]*\blg:hidden\b/.test(shell), 'the mobile drawer is hidden from lg up (not md)');
 ok(!/\bmd:hidden\b/.test(shell), 'no md:hidden remains in the shell (would recreate the 768-1023px gap)');
 ok(!/\bmd:flex\b/.test(shell), 'no md:flex remains in the shell (would recreate the 768-1023px gap)');
-// The org switcher lives in the desktop cluster, which is now lg-only, so the mobile panel must
-// carry its own switcher or multi-org users lose it below 1024px. The id may be composed from a
-// suffix, so accept either the literal id or the composed form.
+// The drawer must carry its own organization switcher, or multi-org users lose it below 1024px.
 ok(
   /customer-organization-select-mobile/.test(shell)
     || (/customer-organization-select\$\{idSuffix\}/.test(shell) && /'-mobile'/.test(shell)),
-  'mobile panel provides an organization switcher',
+  'the mobile drawer provides an organization switcher',
 );
+// Drawer accessibility: scroll lock, Escape, and focus RETURN to the trigger.
+ok(/document\.body\.style\.overflow = 'hidden'/.test(shell), 'the drawer locks background scroll');
+ok(/event\.key === 'Escape'/.test(shell), 'Escape closes the drawer');
+ok(/mobileTriggerRef\.current\?\.focus\(\)/.test(shell), 'focus returns to the trigger when the drawer closes');
+ok(/Zum Inhalt springen/.test(shell), 'the skip link is preserved');
 
 // ---------------------------------------------------------------- 2) entitlement denial is explained
 ok(!/<Navigate to="\/app" replace \/>/.test(guard), 'entitlement guard no longer silently redirects to /app');
@@ -148,12 +162,18 @@ ok(!activeStatuses.includes('paused'), 'paused is NOT an active status');
 ok(/projects\.filter\(isActiveCustomerProject\)/.test(home), 'the home page filters to active projects only');
 
 /* Home page cards are conditional on real data — no decorative empties. */
-ok(/customerActions\.length \? <NextActionCard/.test(home), '"Ihre nächste Aktion" renders only when one exists');
-ok(/next_action_owner === 'customer'/.test(home), 'the next-action card is limited to actions the CUSTOMER owns');
+ok(/customerAction \? <NextActionBanner/.test(home), '"Ihre nächste Aktion" renders only when one exists');
+// The ownership rule itself lives in the tested model module; the page must delegate to
+// it rather than re-deriving the condition inline.
+const portalModel = read('src/lib/customerPlatform/customerPortalModel.ts');
+ok(/next_action_owner === 'customer'/.test(portalModel),
+  'the next-action rule is gated on CUSTOMER ownership');
+ok(/pickCustomerNextAction\(activeProjects, primaryProject\)/.test(home),
+  'the home page delegates next-action selection to that rule');
 ok(/recentDocuments\.length \? \(/.test(home), 'recent documents render only when documents exist');
-ok(/openInvoices\.length \? \(/.test(home), 'open invoices render only when invoices are open');
-ok(/contactProject \? <ContactCard/.test(home), 'the contact card renders only when a verified contact exists');
-ok(/activeProjects\.length \? \(/.test(home) && /<NoProjectState/.test(home),
+ok(/contactProject\?\.contact_display_name \? \(/.test(home),
+  'the contact card renders only when a verified contact exists');
+ok(/primaryProject \? \(/.test(home) && /<NoProjectState/.test(home),
   'with no project the home page shows the real onboarding state instead of empty cards');
 ok(!/Letzte Aktivität/.test(home), 'the permanently-empty "Letzte Aktivität" section is gone');
 
@@ -161,7 +181,7 @@ ok(!/Letzte Aktivität/.test(home), 'the permanently-empty "Letzte Aktivität" s
 for (const tab of ['Übersicht', 'Meilensteine', 'Dokumente', 'Abrechnung']) {
   ok(new RegExp(`label: '${tab}'`).test(projectDetail), `project detail has a ${tab} section`);
 }
-ok(/Ihre nächste Aktion/.test(projectDetail) && /Nächster Schritt bei Cogniiq/.test(projectDetail),
+ok(/Ihre nächste Aktion/.test(projectDetail) && /Cogniiq arbeitet aktuell an/.test(projectDetail),
   'project detail states explicitly whether the customer or Cogniiq must act');
 ok(/Nächster Meilenstein/.test(projectDetail), 'project detail surfaces the next milestone');
 ok(/customer_safe_blocker_summary/.test(projectDetail), 'project detail shows the customer-safe blocker summary');
