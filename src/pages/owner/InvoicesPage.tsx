@@ -4,8 +4,8 @@ import { FileText, Plus, Trash2 } from 'lucide-react';
 
 import {
   Button, Card, ConfirmDialog, DataTable, EmptyState, ErrorState, IconButton, InfoBanner, KpiCard,
-  Modal, PageHeader, SlideOver, StatusBadge, Tabs, TableSkeleton, Field, Select, Textarea, SectionHeader,
-  useToast, type Column,
+  Modal, PageHeader, PremiumCombobox, SlideOver, StatusBadge, Tabs, TableSkeleton, Field, Select,
+  Textarea, SectionHeader, useToast, type Column,
 } from '@/components/dashboard';
 import { invoiceStatusTone } from '@/pages/owner/ownerUi';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
@@ -23,6 +23,7 @@ import {
   invoiceExportTable, invoiceReportModel, invoiceMetadataSheet,
 } from '@/lib/ownerFinance/exports/datasets';
 import type { ExportFormat, ExportMode, ExportMeta } from '@/lib/ownerFinance/exports';
+import { invoiceStatusText } from '@/lib/ownerFinance/customerLabels';
 
 const invoiceTreatments = [
   { value: 'standard', label: 'Standard 19 %' },
@@ -34,10 +35,6 @@ const invoiceTreatments = [
   { value: 'unknown', label: 'Prüfung erforderlich' },
 ];
 
-const statusLabel: Record<string, string> = {
-  draft: 'Entwurf', issued: 'Gestellt', partially_paid: 'Teilbezahlt', paid: 'Bezahlt',
-  overdue: 'Überfällig', void: 'Storniert', cancelled: 'Storniert', credited: 'Gutgeschrieben',
-};
 
 function rateForTreatment(t: string): number {
   return t === 'reduced' ? 700 : t === 'standard' ? 1900 : 0;
@@ -94,7 +91,7 @@ export function InvoicesPage() {
     return c ? (c.legalName ?? c.name) : inv.organization_id ? 'CRM-Kunde' : '—';
   }, [customers]);
 
-  const statusFilterLabel = statusFilter === 'all' ? 'Alle Status' : (statusLabel[statusFilter] ?? statusFilter);
+  const statusFilterLabel = statusFilter === 'all' ? 'Alle Status' : invoiceStatusText(statusFilter);
 
   const runExport = async (format: ExportFormat, mode: ExportMode) => {
     if (!entity) return;
@@ -145,7 +142,7 @@ export function InvoicesPage() {
 
   const columns: Column<OwnerInvoice>[] = [
     { key: 'number', header: 'Nummer', render: (inv) => <span className="font-semibold text-gray-950">{inv.invoice_number ?? 'Entwurf'}</span>, hideOnMobile: true },
-    { key: 'status', header: 'Status', render: (inv) => <StatusBadge label={statusLabel[inv.status] ?? inv.status} tone={invoiceStatusTone[inv.status]} /> },
+    { key: 'status', header: 'Status', render: (inv) => <StatusBadge label={invoiceStatusText(inv.status)} tone={invoiceStatusTone[inv.status]} /> },
     { key: 'date', header: 'Datum', render: (inv) => <span className="text-gray-500">{inv.issue_date ?? '—'}</span> },
     { key: 'net', header: 'Netto', align: 'right', render: (inv) => <span className="tabular-nums">{formatCents(inv.net_total_cents, inv.currency)}</span> },
     { key: 'gross', header: 'Brutto', align: 'right', render: (inv) => <span className="tabular-nums font-medium text-gray-900">{formatCents(inv.gross_total_cents, inv.currency)}</span> },
@@ -226,7 +223,7 @@ export function InvoicesPage() {
           mobileTitle={(inv) => (
             <div className="flex items-center gap-2">
               <span>{inv.invoice_number ?? 'Entwurf'}</span>
-              <StatusBadge label={statusLabel[inv.status] ?? inv.status} tone={invoiceStatusTone[inv.status]} />
+              <StatusBadge label={invoiceStatusText(inv.status)} tone={invoiceStatusTone[inv.status]} />
             </div>
           )}
           mobileSubtitle={(inv) => `${inv.issue_date ?? 'ohne Datum'}`}
@@ -428,13 +425,31 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError 
         <Card className="p-5">
           <SectionHeader title="Empfänger & Rahmendaten" />
           <div className="grid gap-4 sm:grid-cols-2">
-            <Select
+            {/*
+              Searchable: the invoice drawer is opened against the full CRM customer list,
+              which is the longest selector in the finance module. `setCustomerId` still
+              receives the organizationId or '' exactly as before, so the optional-link
+              payload is unchanged.
+            */}
+            <PremiumCombobox
               id="customer"
               label="CRM-Kunde"
               value={customerId}
-              onChange={setCustomerId}
-              options={[{ value: '', label: '— Kein CRM-Kunde —' }, ...customers.map((c) => ({ value: c.organizationId, label: c.name }))]}
-              hint="Optional. Verknüpft die Rechnung mit dem CRM-Konto."
+              onValueChange={setCustomerId}
+              placeholder="— Kein CRM-Kunde —"
+              searchPlaceholder="CRM-Kunde suchen …"
+              emptyMessage="Kein CRM-Kunde gefunden."
+              clearable
+              options={[
+                { value: '', label: '— Kein CRM-Kunde —' },
+                ...customers.map((c) => ({
+                  value: c.organizationId,
+                  label: c.name,
+                  description: c.email ?? c.legalName ?? undefined,
+                  keywords: [c.email ?? '', c.legalName ?? ''].filter(Boolean),
+                })),
+              ]}
+              description="Optional. Verknüpft die Rechnung mit dem CRM-Konto."
             />
             <Field id="issueDate" label="Rechnungsdatum" type="date" value={issueDate} onChange={setIssueDate} />
             <Select id="serviceMode" label="Leistung" value={serviceMode} onChange={(v) => setServiceMode(v as 'date' | 'period')} options={[{ value: 'date', label: 'Leistungsdatum' }, { value: 'period', label: 'Leistungszeitraum' }]} />
@@ -450,7 +465,7 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError 
             <Field id="due" label="Fällig am" type="date" value={dueDate} onChange={() => {}} disabled hint="Aus Rechnungsdatum + Zahlungsziel" />
           </div>
           {customer ? (
-            <div className="mt-4 rounded-xl border border-gray-100 bg-gray-50/70 p-4 text-[13px] text-gray-600">
+            <div className="mt-4 rounded-xl border border-hairline bg-gray-50/70 p-4 text-[13px] text-gray-600">
               <p className="font-semibold text-gray-950">{customer.legalName ?? customer.name}</p>
               {customer.email ? <p className="mt-0.5">{customer.email}</p> : null}
             </div>
@@ -461,7 +476,7 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError 
           <SectionHeader title="Positionen" action={<Button size="sm" variant="secondary" icon={Plus} onClick={() => setLines((c) => [...c, newLine()])}>Position</Button>} />
           <div className="space-y-3">
             {computedLines.map(({ line, calc }, idx) => (
-              <div key={line.id} className="rounded-xl border border-gray-100 bg-white p-4">
+              <div key={line.id} className="rounded-xl border border-hairline bg-white p-4">
                 <div className="mb-3 flex items-center justify-between">
                   <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Position {idx + 1}</span>
                   {lines.length > 1 ? <IconButton icon={Trash2} label="Position entfernen" variant="ghost" onClick={() => removeLine(line.id)} /> : null}
@@ -488,7 +503,7 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError 
         <Card className="p-5">
           <SectionHeader title="Notizen & Vorschau" />
           <Textarea id="notes" label="Interne Notizen (optional)" value={notes} onChange={setNotes} rows={2} />
-          <div className="mt-4 rounded-xl border border-gray-100 bg-gray-50/70 p-4">
+          <div className="mt-4 rounded-xl border border-hairline bg-gray-50/70 p-4">
             <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Vorschau der Summen</p>
             <dl className="space-y-2 text-sm">
               <div className="flex justify-between"><dt className="text-gray-500">Zwischensumme netto</dt><dd className="tabular-nums font-medium text-gray-900">{formatCents(totals.net)}</dd></div>
@@ -557,7 +572,7 @@ function PaymentDialog({ invoice, onClose, onDone, onError }: {
       description={invoice?.invoice_number ? `Rechnung ${invoice.invoice_number}` : undefined}
       footer={<><Button variant="secondary" onClick={onClose} disabled={busy}>Abbrechen</Button><Button onClick={() => void submit()} loading={busy}>Zahlung buchen</Button></>}
     >
-      <div className="mb-4 flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50/70 px-4 py-3">
+      <div className="mb-4 flex items-center justify-between rounded-xl border border-hairline bg-gray-50/70 px-4 py-3">
         <span className="text-[13px] text-gray-500">Offener Betrag</span>
         <span className="text-base font-semibold tabular-nums text-gray-950">{formatCents(outstanding)}</span>
       </div>

@@ -98,8 +98,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               role="status"
               aria-live="polite"
               className={cn(
-                'pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-2xl border bg-white p-4 shadow-[0_18px_60px_rgba(15,23,42,0.14)]',
-                'animate-in slide-in-from-bottom-4 fade-in duration-200',
+                'pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-card border bg-white p-4 shadow-panel',
+                'animate-in slide-in-from-bottom-3 fade-in duration-200 motion-reduce:animate-none',
                 ring,
               )}
             >
@@ -120,7 +120,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={() => dismiss(t.id)}
-                className="shrink-0 rounded-lg p-1 text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-700"
+                className="shrink-0 rounded-lg p-1 text-gray-400 transition-colors duration-fast ease-premium hover:bg-gray-100 hover:text-gray-950"
                 aria-label="Schließen"
               >
                 <X size={14} />

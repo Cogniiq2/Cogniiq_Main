@@ -20,7 +20,7 @@ export function BackendSetupScreen() {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <Card>
-          <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 text-gray-500">
+          <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-card border border-gray-200 bg-gray-50 text-gray-500">
             <Database size={22} aria-hidden="true" />
           </div>
           <h2 className="text-lg font-semibold tracking-tight text-gray-950">Backend-Einrichtung erforderlich</h2>
@@ -43,7 +43,7 @@ export function BackendSetupScreen() {
           </ul>
         </Card>
 
-        <Card className="bg-gray-950 text-gray-100 shadow-[0_18px_60px_rgba(15,23,42,0.18)]">
+        <Card className="bg-gray-950 text-gray-100 shadow-panel">
           <div className="mb-3 flex items-center gap-2 text-gray-300">
             <TerminalSquare size={16} aria-hidden="true" />
             <p className="text-[11px] font-bold uppercase tracking-[0.16em]">Technische Diagnose · nur Inhaber</p>
@@ -79,9 +79,14 @@ export function BackendErrorScreen() {
         description="Beim Verbinden mit dem Finanz-Backend ist ein Fehler aufgetreten."
         actions={<Button variant="secondary" icon={RefreshCw} onClick={() => void reload()}>Erneut versuchen</Button>}
       />
+      {/* role="alert" + data-qa: this is a page-level error surface and must announce
+          itself like the inline ErrorState does. Previously it was a plain card, so
+          neither screen readers nor route QA could tell it apart from ordinary content. */}
       <Card className="border-red-100 bg-red-50/60">
+        <div role="alert" data-qa="error-state">
         <p className="text-sm font-semibold text-red-700">Verbindungsfehler</p>
         <p className="mt-1 break-words text-[13px] leading-6 text-red-600">{error ?? backendDetail ?? 'Unbekannter Fehler.'}</p>
+        </div>
       </Card>
     </>
   );

@@ -355,7 +355,7 @@ function ExpenseComposer({ open, entityId, categories, vendors, customers, onClo
           <SectionHeader title="Positionen" action={<Button size="sm" variant="secondary" icon={Plus} onClick={() => setLines((c) => [...c, newLine()])}>Position</Button>} />
           <div className="space-y-3">
             {computed.map(({ line, calc }, idx) => (
-              <div key={line.id} className="rounded-xl border border-gray-100 bg-white p-4">
+              <div key={line.id} className="rounded-xl border border-hairline bg-white p-4">
                 <div className="mb-3 flex items-center justify-between">
                   <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Position {idx + 1}</span>
                   {lines.length > 1 ? <IconButton icon={Trash2} label="Position entfernen" variant="ghost" onClick={() => setLines((c) => c.filter((x) => x.id !== line.id))} /> : null}
@@ -384,9 +384,9 @@ function ExpenseComposer({ open, entityId, categories, vendors, customers, onClo
         <Card className="p-5">
           <SectionHeader title="Steuerliche Wirkung & Notizen" />
           <div className="mb-4 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3"><p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400">Netto gesamt</p><p className="mt-1 text-lg font-semibold tabular-nums text-gray-950">{formatCents(totals.net)}</p></div>
-            <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3"><p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400">Abziehbare Vorsteuer</p><p className="mt-1 text-lg font-semibold tabular-nums text-gray-950">{formatCents(totals.eligibleVat)}</p></div>
-            <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3"><p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400">Betriebsausgabe (netto)</p><p className="mt-1 text-lg font-semibold tabular-nums text-gray-950">{formatCents(totals.deductibleNet)}</p></div>
+            <div className="rounded-xl border border-hairline bg-gray-50/70 p-3"><p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400">Netto gesamt</p><p className="mt-1 text-lg font-semibold tabular-nums text-gray-950">{formatCents(totals.net)}</p></div>
+            <div className="rounded-xl border border-hairline bg-gray-50/70 p-3"><p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400">Abziehbare Vorsteuer</p><p className="mt-1 text-lg font-semibold tabular-nums text-gray-950">{formatCents(totals.eligibleVat)}</p></div>
+            <div className="rounded-xl border border-hairline bg-gray-50/70 p-3"><p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-gray-400">Betriebsausgabe (netto)</p><p className="mt-1 text-lg font-semibold tabular-nums text-gray-950">{formatCents(totals.deductibleNet)}</p></div>
           </div>
           <div className="mb-4 flex flex-wrap gap-2">
             {hasUnknown ? <StatusBadge label="Prüfung erforderlich" tone="warning" /> : null}
@@ -444,7 +444,7 @@ function ExpensePaymentDialog({ expense, onClose, onDone, onError }: {
       description={expense?.supplier_invoice_number ? `Beleg ${expense.supplier_invoice_number}` : undefined}
       footer={<><Button variant="secondary" onClick={onClose} disabled={busy}>Abbrechen</Button><Button onClick={() => void submit()} loading={busy}>Zahlung buchen</Button></>}
     >
-      <div className="mb-4 flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50/70 px-4 py-3">
+      <div className="mb-4 flex items-center justify-between rounded-xl border border-hairline bg-gray-50/70 px-4 py-3">
         <span className="text-[13px] text-gray-500">Offener Betrag</span>
         <span className="text-base font-semibold tabular-nums text-gray-950">{formatCents(outstanding)}</span>
       </div>

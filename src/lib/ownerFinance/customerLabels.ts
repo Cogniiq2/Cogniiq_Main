@@ -37,6 +37,51 @@ export const offerStatusTone: Record<string, BadgeTone> = {
   accepted: 'success', rejected: 'danger', expired: 'warning', cancelled: 'neutral', converted: 'success',
 };
 
+export const invoiceStatusLabel: Record<string, string> = {
+  draft: 'Entwurf', issued: 'Gestellt', partially_paid: 'Teilbezahlt', paid: 'Bezahlt',
+  overdue: 'Überfällig', void: 'Storniert', cancelled: 'Storniert', credited: 'Gutgeschrieben',
+};
+export const invoiceStatusTone: Record<string, BadgeTone> = {
+  draft: 'neutral', issued: 'info', partially_paid: 'warning', paid: 'success',
+  overdue: 'danger', void: 'neutral', cancelled: 'neutral', credited: 'neutral',
+};
+
+export const automationJobStatusLabel: Record<string, string> = {
+  queued: 'In Warteschlange', scheduled: 'Geplant', running: 'Wird ausgeführt',
+  sent: 'Versendet', succeeded: 'Erfolgreich', completed: 'Abgeschlossen',
+  failed: 'Fehlgeschlagen', cancelled: 'Abgebrochen',
+};
+
+export const assetStatusLabel: Record<string, string> = {
+  active: 'Aktiv', disposed: 'Veräußert', written_off: 'Abgeschrieben',
+};
+
+export const expensePaymentStatusLabel: Record<string, string> = {
+  unpaid: 'Offen', partially_paid: 'Teilbezahlt', paid: 'Bezahlt', void: 'Storniert',
+};
+
+export const expenseReviewStatusLabel: Record<string, string> = {
+  pending: 'Prüfung offen', reviewed: 'Geprüft', needs_info: 'Rückfrage offen',
+};
+
+/**
+ * Resolve a stored status to its German label.
+ *
+ * Deliberately does NOT fall back to the raw value. `?? status` was the exact hole through
+ * which `partially_paid` and `needs_info` reached the screen: a value missing from the map
+ * is a gap in this file, and an em dash makes that gap visible without showing a database
+ * token to the user. The stored value itself is never touched.
+ */
+export function statusText(map: Record<string, string>, status: string | null | undefined): string {
+  if (!status) return '—';
+  return map[status] ?? '—';
+}
+
+export const offerStatusText = (status: string | null | undefined) => statusText(offerStatusLabel, status);
+export const invoiceStatusText = (status: string | null | undefined) => statusText(invoiceStatusLabel, status);
+export const automationJobStatusText = (status: string | null | undefined) => statusText(automationJobStatusLabel, status);
+export const assetStatusText = (status: string | null | undefined) => statusText(assetStatusLabel, status);
+
 export type OfferDisplayState = 'active' | 'archived' | 'cancelled';
 
 /** Derived, customer-facing offer state. Archiving is a flag layered over the legal status. */

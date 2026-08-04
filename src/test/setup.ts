@@ -1,5 +1,8 @@
 import { afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
+// Registers toBeInTheDocument / toHaveFocus / toHaveAttribute and friends. The dependency was
+// already declared; it had simply never been wired into the setup file.
+import '@testing-library/jest-dom/vitest';
 
 // jsdom has no layout engine; a few components observe element size on mount.
 class ResizeObserverStub {
@@ -36,6 +39,23 @@ if (typeof win.matchMedia !== 'function') {
     removeEventListener: () => {},
     dispatchEvent: () => false,
   });
+}
+
+// Radix's Select and DropdownMenu drive their open/close and typeahead behaviour through
+// Pointer Events and scroll an item into view on open. jsdom implements neither, so without
+// these the primitives throw the moment a menu opens. These are jsdom gaps, not product
+// behaviour — nothing here changes what the components do in a browser.
+const elementProto = window.HTMLElement.prototype as unknown as Record<string, unknown>;
+if (typeof elementProto.hasPointerCapture !== 'function') {
+  elementProto.hasPointerCapture = () => false;
+  elementProto.setPointerCapture = () => {};
+  elementProto.releasePointerCapture = () => {};
+}
+if (typeof elementProto.scrollIntoView !== 'function') {
+  elementProto.scrollIntoView = () => {};
+}
+if (!('PointerEvent' in globalThis)) {
+  stubs.PointerEvent = window.MouseEvent;
 }
 
 afterEach(() => {

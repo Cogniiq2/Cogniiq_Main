@@ -14,6 +14,7 @@ import {
 import { supabase } from '@/lib/supabase';
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
 import type { OwnerAsset, OwnerAuditEntry, OwnerFinanceDocument, OwnerSubscription, PeriodSummary } from '@/lib/ownerFinance/types';
+import { assetStatusText } from '@/lib/ownerFinance/customerLabels';
 
 function toCents(input: string): number | null {
   const p = parseAmountToCents(input);
@@ -186,7 +187,7 @@ export function AssetsPage() {
           {assets.map((a) => (
             <Card key={a.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="flex items-center gap-2 text-sm font-semibold text-gray-950">{a.name} <StatusBadge label={a.status === 'active' ? 'aktiv' : a.status} tone={a.status === 'active' ? 'success' : 'neutral'} /></p>
+                <p className="flex items-center gap-2 text-sm font-semibold text-gray-950">{a.name} <StatusBadge label={assetStatusText(a.status)} tone={a.status === 'active' ? 'success' : 'neutral'} /></p>
                 <p className="mt-0.5 text-[12px] text-gray-500">{formatCents(a.acquisition_cost_cents ?? null)} · {a.depreciation_method} · {a.useful_life_months ? `${a.useful_life_months} Mon.` : '—'} · Kauf {a.purchase_date ?? '—'}</p>
               </div>
               <StatusBadge label="Abschreibung: Schätzung" tone="warning" />
@@ -326,7 +327,7 @@ export function AuditPage() {
         <EmptyState icon={ShieldCheck} title="Noch keine Audit-Einträge" description="Sobald Rechnungen, Ausgaben, Zahlungen oder Steuer-Snapshots erstellt werden, erscheinen sie hier." />
       ) : (
         <Card className="p-0">
-          <SectionHeader title="Ereignisprotokoll" className="border-b border-gray-100 px-5 py-4 mb-0" />
+          <SectionHeader title="Ereignisprotokoll" className="border-b border-hairline px-5 py-4 mb-0" />
           <div className="divide-y divide-gray-50">
             {rows.map((r) => (
               <div key={r.id} className="flex items-center justify-between px-5 py-3 text-sm">

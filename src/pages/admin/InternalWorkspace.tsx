@@ -40,12 +40,30 @@ export function InternalWorkspaceLayout() {
           title={moduleAllowed ? activeModule.title : 'Cogniiq'}
         >
           {/* Inner boundary so lazy module chunks suspend the content area only — never the shell. */}
-          <Suspense fallback={<div className="h-40 animate-pulse rounded-[20px] bg-gray-100" aria-hidden="true" />}>
+          <Suspense fallback={<ModuleFallback />}>
             <Outlet />
           </Suspense>
         </DashboardShell>
       </ToastProvider>
     </PlatformAdminRoute>
+  );
+}
+
+/** Shape-matched placeholder for a lazily loaded module: page header, then content. */
+function ModuleFallback() {
+  return (
+    <div className="animate-pulse space-y-6 motion-reduce:animate-none" aria-hidden="true">
+      <div className="border-b border-hairline pb-6">
+        <div className="h-6 w-56 rounded-md bg-gray-200/70" />
+        <div className="mt-3 h-3.5 w-80 max-w-full rounded-md bg-gray-100" />
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="h-[104px] rounded-card border border-hairline bg-white" />
+        ))}
+      </div>
+      <div className="h-64 rounded-card border border-hairline bg-white" />
+    </div>
   );
 }
 

@@ -207,7 +207,7 @@ export function OverviewPage() {
               <div className="space-y-2.5">
                 <AlertRow label="Überfällige Rechnungen" value={s.overdue_count} to="/admin/finance/invoices" />
                 <AlertRow label="Ausgaben zur Prüfung" value={s.review_expense_count} to="/admin/finance/expenses" />
-                <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50/70 px-3.5 py-2.5">
+                <div className="flex items-center justify-between rounded-xl border border-hairline bg-gray-50/70 px-3.5 py-2.5">
                   <span className="text-[13px] text-gray-600">Steuer-Setup</span>
                   <StatusBadge label={data.setupComplete ? 'vollständig' : 'unvollständig'} tone={data.setupComplete ? 'success' : 'warning'} />
                 </div>
@@ -223,7 +223,7 @@ export function OverviewPage() {
               {data.aging.some((a) => a.cents > 0) ? (
                 <div className="space-y-2.5">
                   {data.aging.map((a) => (
-                    <div key={a.label} className="flex items-center justify-between rounded-xl border border-gray-100 px-3.5 py-2.5">
+                    <div key={a.label} className="flex items-center justify-between rounded-xl border border-hairline px-3.5 py-2.5">
                       <div className="flex items-center gap-2">
                         {a.tone !== 'neutral' ? <span className={`h-2 w-2 rounded-full ${a.tone === 'danger' ? 'bg-red-500' : 'bg-amber-500'}`} /> : <span className="h-2 w-2 rounded-full bg-gray-300" />}
                         <span className="text-[13px] text-gray-600">{a.label}</span>
@@ -260,7 +260,7 @@ export function OverviewPage() {
             </Card>
           ) : null}
 
-          <div className="rounded-2xl border border-gray-100 bg-white p-5">
+          <div className="rounded-card border border-hairline bg-white p-5">
             <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Verfügbares Cash nach Rücklagen</p>
             <p className={`mt-1.5 text-2xl font-semibold tabular-nums ${availableAfterReserve >= 0 ? 'text-gray-950' : 'text-red-600'}`}>{formatCents(availableAfterReserve)}</p>
             <p className="mt-1 text-[12px] text-gray-500">Operatives Cash ({formatCents(cashProfit)}) abzüglich empfohlener Steuerrücklage ({formatCents(totalReserve)}). Kein Bankkontostand — nur gebuchte Zahlungsflüsse.</p>
@@ -279,7 +279,7 @@ function ChartEmpty() {
 
 function AlertRow({ label, value, to }: { label: string; value: number; to: string }) {
   return (
-    <Link to={to} className="flex items-center justify-between rounded-xl border border-gray-100 px-3.5 py-2.5 transition-colors hover:bg-gray-50">
+    <Link to={to} className="flex items-center justify-between rounded-xl border border-hairline px-3.5 py-2.5 transition-colors hover:bg-gray-50">
       <span className="text-[13px] text-gray-600">{label}</span>
       <StatusBadge label={String(value)} tone={value ? 'warning' : 'success'} />
     </Link>
@@ -302,7 +302,7 @@ function ReserveComposition({ snapshot }: { snapshot: TaxSnapshot }) {
       </div>
       <div className="grid gap-2 sm:grid-cols-2">
         {items.map((i) => (
-          <div key={i.label} className="flex items-center justify-between rounded-xl border border-gray-100 px-3.5 py-2.5">
+          <div key={i.label} className="flex items-center justify-between rounded-xl border border-hairline px-3.5 py-2.5">
             <span className="flex items-center gap-2 text-[13px] text-gray-600"><span className={`h-2.5 w-2.5 rounded-sm ${i.color}`} /> {i.label}</span>
             <span className="text-[13px] font-semibold tabular-nums text-gray-900">{formatCents(i.cents)}</span>
           </div>

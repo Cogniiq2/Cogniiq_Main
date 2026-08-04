@@ -27,8 +27,16 @@ export function ReceptionistEntitlementRoute({ children }: { children: ReactNode
 
   if (status === 'error') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f7f7f4] px-6">
-        <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-7 text-center shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+      <div className="flex min-h-screen items-center justify-center bg-canvas px-6">
+        {/* role="alert" + data-qa: every other customer-facing error state in the portal
+            announces itself to assistive technology and is detectable by the route
+            harness. This one did neither, so a failed entitlement check was silent to a
+            screen reader and read as a normal page to QA. */}
+        <div
+          role="alert"
+          data-qa="error-state"
+          className="w-full max-w-md rounded-card border border-gray-200 bg-white p-7 text-center shadow-panel"
+        >
           <h1 className="mb-2 text-lg font-semibold text-gray-950">Zugriff konnte nicht geprüft werden</h1>
           <p className="mb-5 text-sm text-gray-600">{error ?? 'Die Lösungsberechtigungen konnten nicht geladen werden.'}</p>
           <button

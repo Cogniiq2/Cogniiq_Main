@@ -136,7 +136,7 @@ export function SendOfferDialog({ offer, documentId, validDays, sellerName, emai
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-0 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true">
-      <div className="flex max-h-[100dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:max-h-[92vh] sm:rounded-3xl">
+      <div className="flex max-h-[100dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-panel bg-white shadow-2xl sm:max-h-[92vh] sm:rounded-panel">
         <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
           <h2 className="text-base font-semibold text-slate-900">Angebot versenden</h2>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-900" aria-label="Schließen">✕</button>
@@ -144,7 +144,7 @@ export function SendOfferDialog({ offer, documentId, validDays, sellerName, emai
 
         <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
           <div className="space-y-4">
-            <div className="rounded-2xl bg-slate-50 p-4 text-[13px]">
+            <div className="rounded-card bg-slate-50 p-4 text-[13px]">
               <div className="flex justify-between"><span className="text-slate-400">Angebot</span><span className="font-semibold text-slate-800">{offer.offer_number}</span></div>
               <div className="mt-1 flex justify-between"><span className="text-slate-400">Gültig bis</span><span className="text-slate-700">{formatDateDe(validUntil)}</span></div>
               <div className="mt-1 flex items-center justify-between"><span className="text-slate-400">E-Mail-Versand</span>
@@ -157,7 +157,7 @@ export function SendOfferDialog({ offer, documentId, validDays, sellerName, emai
             ) : null}
 
             {result ? (
-              <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4 text-[13px]">
+              <div className="rounded-card border border-emerald-100 bg-emerald-50/60 p-4 text-[13px]">
                 <p className="font-semibold text-emerald-800">E-Mail wurde zur sicheren Verarbeitung eingeplant</p>
                 <p className="mt-1 text-emerald-700/90">Die E-Mail wird automatisch über den Server versendet. Aktueller Status: <span className="font-medium">{liveStatus.label}</span>.</p>
               </div>
@@ -184,7 +184,7 @@ export function SendOfferDialog({ offer, documentId, validDays, sellerName, emai
             {enqueueError ? <p className="text-[13px] text-red-600">{enqueueError}</p> : null}
 
             {/* Manual alternatives — clearly separated from the automated send. */}
-            <div className="rounded-2xl border border-slate-100 p-4">
+            <div className="rounded-card border border-slate-100 p-4">
               <p className="text-[12px] font-semibold uppercase tracking-wide text-slate-400">Manuelle Alternativen</p>
               <p className="mt-1 text-[12px] text-slate-500">Erstellt bei Klick einen sicheren Link. Diese Optionen versenden keine E-Mail und ändern den Versandstatus nicht.</p>
               <div className="mt-3 grid grid-cols-3 gap-2">

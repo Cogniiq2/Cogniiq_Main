@@ -107,7 +107,7 @@ export function DocumentSettingsSection({ entityId, entityName }: { entityId: st
           </div>
         </div>
 
-        <div className="rounded-2xl border border-gray-100 p-5">
+        <div className="rounded-card border border-hairline p-5">
           <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Automatik bei Annahme</p>
           <p className="mb-3 text-[12px] text-gray-500">Steuern Sie, was nach einer verbindlichen Kundenannahme automatisch geschieht. Ausstellen und Versand sind aus Sicherheitsgründen erst nach bewusster Aktivierung aktiv.</p>
           <div className="space-y-2.5">
@@ -137,7 +137,7 @@ export function DocumentSettingsSection({ entityId, entityName }: { entityId: st
           </div>
         </div>
 
-        <div className="rounded-2xl border border-gray-100 bg-gray-50/60 p-5">
+        <div className="rounded-card border border-hairline bg-gray-50/60 p-5">
           <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Dokumentvorschau (Absender)</p>
           <div className="text-[13px] leading-relaxed text-gray-700">
             {previewSeller.map((l, i) => <p key={i} className={i === 0 ? 'font-semibold text-gray-950' : ''}>{l}</p>)}

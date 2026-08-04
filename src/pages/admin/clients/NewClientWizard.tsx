@@ -11,6 +11,7 @@ import {
   type ProvisionClientResult,
 } from '@/lib/clientPlatform/adminApi';
 import { clientLifecycleStatuses, solutionCatalogKeys } from '@/lib/clientPlatform/types';
+import { clientLifecycleStatusLabel } from '@/lib/clientPlatform/labels';
 import { isValidEmail, isValidUrl, parseAmountToCents } from '@/lib/clientPlatform/validation';
 
 // One stable idempotency key per intended submission (per wizard mount). Retries of the same
@@ -260,7 +261,7 @@ export function NewClientWizard() {
               <AdminField id="address" label="Adresse" value={form.address} onChange={(v) => set('address', v)} />
             </div>
             <AdminField id="leadSource" label="Lead-Quelle" value={form.leadSource} onChange={(v) => set('leadSource', v)} />
-            <AdminSelect id="lifecycleStatus" label="Lifecycle-Status" value={form.lifecycleStatus} onChange={(v) => set('lifecycleStatus', v)} options={clientLifecycleStatuses.map((s) => ({ value: s, label: s }))} />
+            <AdminSelect id="lifecycleStatus" label="Lifecycle-Status" value={form.lifecycleStatus} onChange={(v) => set('lifecycleStatus', v)} options={clientLifecycleStatuses.map((s) => ({ value: s, label: clientLifecycleStatusLabel(s) }))} />
           </div>
         ) : null}
 
@@ -291,10 +292,10 @@ export function NewClientWizard() {
           <div className="grid gap-4 sm:grid-cols-2">
             <AdminSelect id="catalogKey" label="Lösungstyp" value={form.catalogKey} onChange={(v) => set('catalogKey', v)} options={solutionCatalogKeys.map((s) => ({ value: s, label: s.replace(/_/g, ' ') }))} />
             <AdminField id="solutionDisplayName" label="Anzeigename der Lösung" value={form.solutionDisplayName} onChange={(v) => set('solutionDisplayName', v)} error={errors.solutionDisplayName} required />
-            <div className="sm:col-span-2 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
+            <div className="sm:col-span-2 rounded-xl border border-hairline bg-gray-50 px-4 py-3">
               <p className="text-[12px] text-gray-500">Implementierung und Instanz-Schlüssel werden serverseitig aus dem kontrollierten Lösungskatalog abgeleitet und nach dem Anlegen angezeigt.</p>
             </div>
-            <label className="sm:col-span-2 flex items-start gap-3 rounded-xl border border-gray-100 bg-white px-4 py-3">
+            <label className="sm:col-span-2 flex items-start gap-3 rounded-xl border border-hairline bg-white px-4 py-3">
               <input type="checkbox" checked={form.sendInvitation} onChange={(e) => set('sendInvitation', e.target.checked)} className="mt-1 h-4 w-4 rounded border-gray-300" />
               <span>
                 <span className="block text-sm font-semibold text-gray-900">Einladung jetzt senden</span>
@@ -368,7 +369,7 @@ function IdentityConflictPanel({
   onCancel: () => void;
 }) {
   return (
-    <div role="alert" className="mt-5 rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
+    <div role="alert" className="mt-5 rounded-card border border-amber-200 bg-amber-50/70 p-4">
       <div className="flex items-start gap-3">
         <AlertTriangle size={18} className="mt-0.5 shrink-0 text-amber-700" aria-hidden="true" />
         <div className="min-w-0">
@@ -448,7 +449,7 @@ function IdentityConflictPanel({
 
 function ResultRow({ label, value, ok }: { label: string; value: string; ok: boolean }) {
   return (
-    <li className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 px-4 py-2.5">
+    <li className="flex items-center justify-between rounded-xl border border-hairline bg-gray-50 px-4 py-2.5">
       <span className="font-medium text-gray-700">{label}</span>
       <span className={ok ? 'text-emerald-700' : 'text-amber-700'}>{value}</span>
     </li>

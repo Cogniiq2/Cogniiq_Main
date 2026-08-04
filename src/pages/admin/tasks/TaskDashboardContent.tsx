@@ -196,7 +196,7 @@ export function TaskDashboardContent({ view = 'overview' }: { view?: TaskView })
 
       {loading ? (
         <div className="space-y-3">
-          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-20 w-full rounded-[20px]" />)}
+          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-20 w-full rounded-card" />)}
         </div>
       ) : (
         <div className="space-y-8">
@@ -216,7 +216,7 @@ export function TaskDashboardContent({ view = 'overview' }: { view?: TaskView })
           {showOverdue ? (
             <TaskSection title="Überfällig — zuerst erledigen" count={overdueOpen.length} tone="danger">
               {overdueOpen.length === 0 ? (
-                <div className="flex items-center gap-2.5 rounded-[20px] border border-emerald-100 bg-emerald-50/60 px-5 py-4 text-sm font-medium text-emerald-700">
+                <div className="flex items-center gap-2.5 rounded-card border border-emerald-100 bg-emerald-50/60 px-5 py-4 text-sm font-medium text-emerald-700">
                   <CheckCircle2 size={17} aria-hidden="true" /> Keine überfälligen Aufgaben.
                 </div>
               ) : (
@@ -279,7 +279,7 @@ function TaskRow({ task, completing, onComplete, overdue, muted }: {
   task: Task; completing?: boolean; onComplete?: (id: string) => void; overdue?: boolean; muted?: boolean;
 }) {
   return (
-    <div className={`flex items-center gap-4 rounded-[20px] border bg-white p-4 shadow-[0_18px_60px_rgba(15,23,42,0.04)] ${overdue ? 'border-red-100' : 'border-gray-100'}`}>
+    <div className={`flex items-center gap-4 rounded-card border bg-white p-4 shadow-card ${overdue ? 'border-red-100' : 'border-hairline'}`}>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <p className={`truncate text-[14px] font-semibold ${muted ? 'text-gray-400 line-through' : 'text-gray-950'}`}>{task.title}</p>

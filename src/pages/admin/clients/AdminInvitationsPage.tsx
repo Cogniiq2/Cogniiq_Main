@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { RefreshCw, XCircle } from 'lucide-react';
 
 import { AdminCard, Pill, invitationTone } from '@/pages/admin/clients/adminUi';
+import { ErrorState, PremiumSelect, TableSkeleton } from '@/components/dashboard';
+import { invitationStatusLabel, organizationRoleLabel } from '@/lib/clientPlatform/labels';
 import {
   loadAdminClients,
   resendInvitationViaEdge,
@@ -59,17 +61,23 @@ export function AdminInvitationsPage() {
           <h1 className="text-2xl font-semibold tracking-tight text-gray-950">Einladungen</h1>
           <p className="mt-1 text-sm text-gray-500">Status aller Client-Einladungen.</p>
         </div>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400">
-          <option value="all">Alle</option>
-          <option value="pending">pending</option>
-          <option value="accepted">accepted</option>
-          <option value="revoked">revoked</option>
-          <option value="expired">expired</option>
-        </select>
+        <PremiumSelect
+          ariaLabel="Nach Einladungsstatus filtern"
+          value={statusFilter}
+          onValueChange={setStatusFilter}
+          className="w-[180px] shrink-0"
+          options={[
+            { value: 'all', label: 'Alle' },
+            { value: 'pending', label: invitationStatusLabel('pending') },
+            { value: 'accepted', label: invitationStatusLabel('accepted') },
+            { value: 'revoked', label: invitationStatusLabel('revoked') },
+            { value: 'expired', label: invitationStatusLabel('expired') },
+          ]}
+        />
       </div>
       {notice ? <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-800">{notice}</div> : null}
-      {loading ? <div className="h-40 animate-pulse rounded-2xl border border-gray-100 bg-white" /> : error ? (
-        <AdminCard><p className="text-sm text-red-600">Fehler: {error}</p></AdminCard>
+      {loading ? <TableSkeleton rows={5} cols={3} /> : error ? (
+        <ErrorState message={error} onRetry={() => void reload()} title="Einladungen konnten nicht geladen werden" />
       ) : invitations.length === 0 ? (
         <AdminCard><p className="text-sm text-gray-500">Keine Einladungen für diesen Filter.</p></AdminCard>
       ) : (
@@ -77,10 +85,10 @@ export function AdminInvitationsPage() {
           {invitations.map((inv) => (
             <AdminCard key={inv.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm font-semibold text-gray-900">{inv.email} <Pill label={inv.effective} tone={invitationTone[inv.effective]} /></p>
+                <p className="text-sm font-semibold text-gray-900">{inv.email} <Pill label={invitationStatusLabel(inv.effective)} tone={invitationTone[inv.effective]} /></p>
                 <p className="text-[12px] text-gray-500">
                   <Link to={`/admin/clients/${inv.organization_id}`} className="hover:underline">{inv.orgName}</Link>
-                  {' · '}Rolle: {inv.organization_role}
+                  {' · '}Rolle: {organizationRoleLabel(inv.organization_role)}
                 </p>
               </div>
               <div className="flex gap-2">

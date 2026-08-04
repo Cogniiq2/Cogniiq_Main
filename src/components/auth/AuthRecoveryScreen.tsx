@@ -35,7 +35,7 @@ export function AuthRecoveryScreen() {
     <div className="flex min-h-screen items-center justify-center bg-white px-6 text-gray-950">
       <div
         role="alert"
-        className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-7 shadow-[0_18px_60px_rgba(15,23,42,0.08)]"
+        className="w-full max-w-md rounded-card border border-gray-200 bg-white p-7 shadow-panel"
       >
         <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-amber-700">
           <WifiOff size={19} aria-hidden="true" />
@@ -56,7 +56,7 @@ export function AuthRecoveryScreen() {
             type="button"
             onClick={() => void retry()}
             disabled={busy !== null}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gray-950 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gray-950 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2"
           >
             <RefreshCw size={15} aria-hidden="true" />
             {busy === 'retry' ? 'Wird erneut geprüft …' : 'Erneut versuchen'}
@@ -66,7 +66,7 @@ export function AuthRecoveryScreen() {
             type="button"
             onClick={() => void leave()}
             disabled={busy !== null}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:border-gray-300 hover:text-gray-950 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:border-gray-300 hover:text-gray-950 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2"
           >
             <LogOut size={15} aria-hidden="true" />
             {busy === 'signout' ? 'Wird abgemeldet …' : 'Abmelden'}

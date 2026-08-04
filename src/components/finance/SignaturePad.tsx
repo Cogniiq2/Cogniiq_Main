@@ -203,7 +203,7 @@ export const SignaturePad = forwardRef<SignaturePadHandle, SignaturePadProps>(fu
     <div>
       <div
         ref={wrapRef}
-        className={`relative w-full ${heightClass} overflow-hidden rounded-2xl border border-slate-200 bg-white`}
+        className={`relative w-full ${heightClass} overflow-hidden rounded-card border border-slate-200 bg-white`}
       >
         {mode === 'draw' ? (
           <>

@@ -9,9 +9,7 @@ import {
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import { loadCustomerDetail, setCustomerStatus } from '@/lib/ownerFinance/customersApi';
 import { formatCentsCurrencyDe, formatDateDe } from '@/lib/ownerFinance/exports';
-import {
-  customerStatusLabel, customerStatusTone, customerDisplayName, offerStatusLabel, offerStatusTone,
-} from '@/lib/ownerFinance/customerLabels';
+import { customerDisplayName, customerStatusLabel, customerStatusTone, offerStatusText, offerStatusTone } from '@/lib/ownerFinance/customerLabels';
 import { CustomerFormDialog } from '@/components/finance/CustomerFormDialog';
 import { CustomerTaskChecklist } from '@/components/finance/CustomerTaskChecklist';
 import { CustomerProjectPanel } from '@/components/finance/CustomerProjectPanel';
@@ -72,7 +70,7 @@ export function CustomerDetailPage() {
     { key: 'amount', header: 'Betrag', align: 'right', render: (o) => <span className="tabular-nums font-medium text-gray-900">{formatCentsCurrencyDe(o.gross_total_cents, o.currency)}</span> },
     { key: 'status', header: 'Status', render: (o) => (
       <div className="flex items-center gap-1.5">
-        <StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} />
+        <StatusBadge label={offerStatusText(o.status)} tone={offerStatusTone[o.status]} />
         {o.archived_at ? <StatusBadge label="Archiviert" tone="neutral" /> : null}
       </div>
     ) },
@@ -113,11 +111,11 @@ export function CustomerDetailPage() {
               <span className="text-[12px] text-gray-400">{detail.offers.length} gesamt</span>
             </div>
             {detail.offers.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-gray-200 px-4 py-8 text-center text-[13px] text-gray-500">Noch keine Angebote für diesen Kunden.</div>
+              <div className="rounded-card border border-dashed border-gray-200 px-4 py-8 text-center text-[13px] text-gray-500">Noch keine Angebote für diesen Kunden.</div>
             ) : (
               <DataTable columns={offerColumns} rows={detail.offers} getRowKey={(o) => o.id} minWidth={760}
                 onRowClick={(o) => navigate(`/admin/finance/offers/${o.id}`)}
-                mobileTitle={(o) => <div className="flex items-center gap-2"><span>{o.offer_number ?? 'Entwurf'}</span><StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} /></div>}
+                mobileTitle={(o) => <div className="flex items-center gap-2"><span>{o.offer_number ?? 'Entwurf'}</span><StatusBadge label={offerStatusText(o.status)} tone={offerStatusTone[o.status]} /></div>}
                 mobileSubtitle={(o) => formatCentsCurrencyDe(o.gross_total_cents, o.currency)} />
             )}
           </Card>

@@ -24,6 +24,37 @@
     --input: 0 0% 89.8%;
     --ring: 0 0% 3.9%;
     --radius: 0.5rem;
+
+    /* ---------------------------------------------------------------------
+       Cogniiq product design foundation.
+
+       One set of tokens shared by the Owner Dashboard (/admin/*) and the
+       Customer Portal (/app/*). Everything authenticated reads from here, so
+       radii, depth, motion and focus never drift between the two shells.
+       Purely presentational — no colour here carries meaning on its own.
+       --------------------------------------------------------------------- */
+
+    /* Canvas & hairline */
+    --cq-canvas: #f6f6f3;
+    --cq-hairline: #ececea;
+
+    /* Radii — controls, cards, floating panels */
+    --cq-radius-control: 0.75rem;
+    --cq-radius-card: 1.125rem;
+    --cq-radius-panel: 1.5rem;
+
+    /* Surface hierarchy. Depth is carried by a hairline plus a very low-opacity
+       lift, never by a heavy drop shadow. */
+    --cq-shadow-card: 0 1px 2px rgba(15, 23, 42, 0.03), 0 12px 32px -20px rgba(15, 23, 42, 0.18);
+    --cq-shadow-card-hover: 0 1px 2px rgba(15, 23, 42, 0.04), 0 22px 48px -24px rgba(15, 23, 42, 0.26);
+    --cq-shadow-panel: 0 2px 6px rgba(15, 23, 42, 0.04), 0 32px 72px -32px rgba(15, 23, 42, 0.3);
+    --cq-shadow-overlay: 0 48px 120px -36px rgba(15, 23, 42, 0.45);
+
+    /* Motion. Short, functional, transform/opacity only. */
+    --cq-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --cq-duration-fast: 120ms;
+    --cq-duration-base: 180ms;
+    --cq-duration-slow: 260ms;
   }
 
   .dark {
@@ -69,6 +100,41 @@
     transition-property: background-color, border-color, color;
     transition-duration: 0.3s;
     transition-timing-function: ease;
+  }
+
+  /* Authenticated product surfaces opt into the product motion tokens. The 300ms
+     global colour fade above is a marketing-site default; inside the dashboard and
+     the portal it makes every hover read as laggy, so both shells mark themselves
+     with data-cq-surface and inherit the short product easing instead. Marketing
+     pages are untouched. */
+  [data-cq-surface],
+  [data-cq-surface] *,
+  [data-cq-surface] *::before,
+  [data-cq-surface] *::after {
+    transition-duration: var(--cq-duration-base);
+    transition-timing-function: var(--cq-ease);
+  }
+}
+
+/* Reduced motion. Framer Motion is handled per-component via useReducedMotion();
+   this covers CSS transitions, keyframe animations and smooth scrolling. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* The element itself is included, not just its descendants: Radix portals the select
+     list, the combobox popover and the action menu to document.body and tags the portalled
+     root with data-cq-surface="overlay". Without the bare selector the overlay's own
+     entrance animation would survive prefers-reduced-motion. */
+  [data-cq-surface],
+  [data-cq-surface] *,
+  [data-cq-surface] *::before,
+  [data-cq-surface] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
