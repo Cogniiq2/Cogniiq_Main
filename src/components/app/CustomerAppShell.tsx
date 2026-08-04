@@ -203,8 +203,11 @@ function CustomerAppShellInner({ children }: { children: ReactNode }) {
           {/* Desktop cluster and the mobile trigger below share ONE breakpoint (lg). Splitting
               them (md here, lg on the nav row) previously left 768–1023px with no navigation
               at all: the hamburger was already hidden while the nav row had not appeared yet. */}
-          <div className="hidden min-w-0 items-center gap-2 lg:flex">
-            {organizationSelect('', 'h-9 w-[220px] text-[13px] font-semibold text-gray-950')}
+          {/* shrink-0 on the right cluster + a max-width (not a fixed width) on the switcher:
+              the organisation name is user data of unbounded length, so it gets a ceiling and
+              truncates, while the two controls beside it keep their intrinsic size. */}
+          <div className="hidden min-w-0 shrink-0 items-center gap-2 lg:flex">
+            {organizationSelect('', 'h-9 w-[220px] max-w-[220px] text-[13px] font-semibold text-gray-950')}
 
             <Link
               to="/"

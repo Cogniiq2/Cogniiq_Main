@@ -33,7 +33,7 @@ export function PlatformOwnerRoute({ children }: { children: ReactNode }) {
           <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-control border border-amber-200 bg-amber-50 text-amber-700">
             <ShieldAlert size={19} aria-hidden="true" />
           </div>
-          <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-gray-500">Restricted</p>
+          <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-gray-500">Geschützter Bereich</p>
           <h1 className="mb-3 text-[24px] font-semibold leading-tight tracking-[-0.02em]">Kein Zugriff</h1>
           <p className="mb-6 text-[13.5px] leading-6 text-gray-600">
             Dieser Bereich ist ausschließlich dem Cogniiq-Inhaber vorbehalten.

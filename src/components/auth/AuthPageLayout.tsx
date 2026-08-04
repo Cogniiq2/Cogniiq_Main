@@ -12,6 +12,26 @@ import { cn } from '@/lib/utils';
 const authFocusRing =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 
+/**
+ * The German assurances shown beside the form. Deliberately plain statements of fact
+ * about the account, in the same register as `/auth/confirmed`, rather than marketing
+ * claims or invented statistics.
+ */
+const AUTH_ASSURANCES = [
+  {
+    title: 'Persönlicher Zugang',
+    description: 'Jeder Zugang gehört genau einer Person und einem Unternehmen.',
+  },
+  {
+    title: 'Getrennte Unternehmensdaten',
+    description: 'Sie sehen ausschließlich die Projekte und Unterlagen Ihres Unternehmens.',
+  },
+  {
+    title: 'Freigabe durch Cogniiq',
+    description: 'Dokumente erscheinen erst im Portal, wenn wir sie ausdrücklich freigeben.',
+  },
+] as const;
+
 interface AuthPageLayoutProps {
   eyebrow: string;
   title: string;
@@ -42,21 +62,27 @@ export function AuthPageLayout({ eyebrow, title, description, children, footer }
         <main className="flex flex-1 items-center justify-center py-12 sm:py-16">
           <div className="grid w-full items-center gap-12 lg:grid-cols-[1fr_440px]">
             <section className="hidden lg:block">
-              <p className="mb-5 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500">{eyebrow}</p>
+              <p className="mb-5 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500">Cogniiq Kundenportal</p>
               <h1 className="max-w-2xl text-[44px] font-semibold leading-[1.06] tracking-[-0.025em] text-gray-950">
-                Secure foundation for premium AI operations.
+                Ihr Projekt, Ihre Unterlagen, Ihre Rechnungen — an einer Stelle.
               </h1>
               <p className="mt-6 max-w-xl text-[15px] leading-7 text-gray-600">
-                The customer account area is private, tenant-scoped, and prepared for the future AI receptionist product.
+                Im Kundenportal sehen Sie jederzeit den Stand Ihrer Projekte, die nächsten Schritte und alle
+                freigegebenen Dokumente. Der Zugang ist persönlich und ausschließlich Ihrem Unternehmen zugeordnet.
               </p>
-              <div className="mt-10 grid max-w-xl grid-cols-3 overflow-hidden rounded-card border border-hairline">
-                {['Auth', 'Tenant', 'RLS'].map((item) => (
-                  <div key={item} className="border-r border-hairline px-5 py-4 last:border-r-0">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gray-500">{item}</p>
-                    <p className="mt-1 text-xs text-gray-600">Active</p>
-                  </div>
+              {/*
+                Three factual statements about what the account actually is — not metrics.
+                The previous panel showed "Auth / Tenant / RLS → Active", which named
+                internal implementation details in English to a German customer.
+              */}
+              <ul className="mt-10 max-w-xl divide-y divide-hairline overflow-hidden rounded-card border border-hairline">
+                {AUTH_ASSURANCES.map((item) => (
+                  <li key={item.title} className="px-5 py-4">
+                    <p className="text-[13px] font-semibold text-gray-950">{item.title}</p>
+                    <p className="mt-1 text-[13px] leading-6 text-gray-600">{item.description}</p>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </section>
 
             <section className="w-full rounded-panel border border-hairline bg-white p-6 shadow-panel sm:p-8">

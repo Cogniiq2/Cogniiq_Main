@@ -1019,6 +1019,8 @@ function InlineError({ message, onRetry }: { message: string; onRetry: () => voi
     <motion.div
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
+      role="alert"
+      data-qa="error-state"
       className="mb-5 rounded-[1.4rem] border px-5 py-4"
       style={{ borderColor: 'var(--admin-danger-border)', background: 'var(--admin-danger-bg)' }}
     >

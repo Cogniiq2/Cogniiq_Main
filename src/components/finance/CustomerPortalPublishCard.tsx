@@ -2,7 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle2, EyeOff, Link2, RefreshCw, Share2 } from 'lucide-react';
 
-import { Button, Card, InfoBanner, SectionHeader, Select, StatusBadge } from '@/components/dashboard';
+import {
+  Button, Card, InfoBanner, PremiumCombobox, SectionHeader, StatusBadge,
+} from '@/components/dashboard';
 import {
   customerCategoryForOwnerDocument,
   customerDocumentCategoryLabels,
@@ -243,19 +245,30 @@ export function CustomerPortalPublishCard({
             </InfoBanner>
           ) : (
             <div className="mb-4">
-              <Select
+              {/*
+                Searchable, and the status moves out of the label into the muted second
+                line: project titles are long enough that appending "(Aufmerksamkeit
+                erforderlich)" pushed the actual title out of the trigger. The option
+                values and the '' sentinel are unchanged, so the register payload is too.
+              */}
+              <PremiumCombobox
                 id="publish-project"
                 label="Kundenprojekt"
                 value={projectId}
-                onChange={setProjectId}
+                onValueChange={setProjectId}
+                placeholder="Ohne Projektzuordnung"
+                searchPlaceholder="Projekt suchen …"
+                emptyMessage="Kein Projekt gefunden."
                 options={[
                   { value: '', label: 'Ohne Projektzuordnung' },
                   ...activeProjects.map((p) => ({
                     value: p.id,
-                    label: `${p.title} (${customerProjectStatusLabels[p.status] ?? p.status})`,
+                    label: p.title,
+                    description: customerProjectStatusLabels[p.status] ?? undefined,
+                    keywords: [p.status],
                   })),
                 ]}
-                hint="Bestimmt, unter welchem Projekt der Kunde das Dokument sieht. Nach der Freigabe kann das Projekt nicht mehr gewechselt werden."
+                description="Bestimmt, unter welchem Projekt der Kunde das Dokument sieht. Nach der Freigabe kann das Projekt nicht mehr gewechselt werden."
               />
             </div>
           )}

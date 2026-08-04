@@ -252,7 +252,10 @@ export function AppStatusBadge({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg border px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.12em]',
+        // max-w-full + truncate: this badge also carries the organisation NAME on the
+        // portal home, and a long German company name at 390px was 435px wide on its own
+        // — 45px past the viewport. Short status labels are unaffected.
+        'inline-flex max-w-full items-center gap-1.5 truncate whitespace-nowrap rounded-lg border px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.12em]',
         toneClasses[tone]
       )}
     >
@@ -276,7 +279,8 @@ export function AppEmptyState({
   compact?: boolean;
 }) {
   return (
-    <div className={cn('rounded-card border border-dashed border-gray-200 bg-white/60 p-7', compact && 'p-5')}>
+    // data-qa marks the intentional state for the route harness; inert in the browser.
+    <div data-qa="empty-state" className={cn('rounded-card border border-dashed border-gray-200 bg-white/60 p-7', compact && 'p-5')}>
       <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-control border border-gray-200 bg-gray-50 text-gray-400">
         <Icon size={18} aria-hidden="true" />
       </div>
@@ -633,7 +637,7 @@ export function AppSaveBar({
 
 export function AppSkeleton({ label }: { label: string }) {
   return (
-    <div role="status" aria-label={label} className="rounded-card border border-hairline bg-white p-5 shadow-card">
+    <div role="status" data-qa="skeleton" aria-label={label} className="rounded-card border border-hairline bg-white p-5 shadow-card">
       <span className="sr-only">{label}</span>
       <div className="animate-pulse motion-reduce:animate-none" aria-hidden="true">
         <div className="h-3 w-24 rounded-full bg-gray-100" />
@@ -648,7 +652,7 @@ export function AppSkeleton({ label }: { label: string }) {
 
 export function AppErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div role="alert" className="rounded-card border border-red-200/80 bg-red-50/70 p-5 text-[13.5px] leading-6 text-red-800">
+    <div role="alert" data-qa="error-state" className="rounded-card border border-red-200/80 bg-red-50/70 p-5 text-[13.5px] leading-6 text-red-800">
       <div className="mb-2 flex items-center gap-2 font-semibold">
         <AlertCircle size={16} aria-hidden="true" />
         Fehlerzustand

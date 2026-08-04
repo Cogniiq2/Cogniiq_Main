@@ -173,7 +173,10 @@ export function SectionHeader({ title, description, action, className }: { title
         <h3 className="text-[13.5px] font-semibold tracking-tight text-gray-950">{title}</h3>
         {description ? <p className="mt-1 text-[12.5px] leading-5 text-gray-500">{description}</p> : null}
       </div>
-      {action ? <div className="flex shrink-0 flex-wrap gap-2">{action}</div> : null}
+      {/* Not shrink-0: a section action can be a full-width German button ("Kundenprojekt
+          anlegen"), and refusing to shrink pushed the Kundenportal tab 28px past a 390px
+          viewport. It wraps instead. */}
+      {action ? <div className="flex min-w-0 flex-wrap gap-2">{action}</div> : null}
     </div>
   );
 }
@@ -187,7 +190,13 @@ export function PageHeader({ title, description, actions, breadcrumb }: { title:
           <h1 className="text-[22px] font-semibold leading-tight tracking-[-0.015em] text-gray-950 sm:text-[26px]">{title}</h1>
           {description ? <p className="mt-2 max-w-2xl text-[13.5px] leading-6 text-gray-500">{description}</p> : null}
         </div>
-        {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
+        {/*
+          `shrink-0` here meant an action-heavy header (the offer detail page carries six
+          controls) could not give up width, so it pushed the document 398px past the
+          viewport at 1024px. The row now wraps and shrinks; `lg:justify-end` keeps the
+          single-action case visually identical to before.
+        */}
+        {actions ? <div className="flex min-w-0 flex-wrap items-center gap-2 lg:justify-end">{actions}</div> : null}
       </div>
     </div>
   );
@@ -272,7 +281,11 @@ export function KpiCard({
       {hint ? <p className="mt-2 text-[12px] leading-5 text-gray-500">{hint}</p> : null}
     </>
   );
-  const cls = cn(cardSurface, 'p-5');
+  // min-w-0: as a grid item the card defaults to min-width:auto, so its widest
+  // unbreakable child (a long German KPI label plus its basis badge) sized the whole
+  // track and pushed the dashboard 8px past a 390px viewport. The label already
+  // truncates; this lets the truncation actually take effect.
+  const cls = cn(cardSurface, 'min-w-0 p-5');
   if (to) {
     return (
       <Link
@@ -473,7 +486,10 @@ export function EmptyState({ icon: Icon, title, description, action, className }
   icon: LucideIcon; title: string; description: string; action?: ReactNode; className?: string;
 }) {
   return (
-    <div className={cn('flex flex-col items-center rounded-card border border-dashed border-gray-200 bg-white/60 px-6 py-12 text-center', className)}>
+    // data-qa marks the intentional states for the route harness. It is inert in the
+    // browser: no styling, no behaviour, no accessibility surface — it exists so QA can
+    // tell "deliberately empty" apart from "never finished loading".
+    <div data-qa="empty-state" className={cn('flex flex-col items-center rounded-card border border-dashed border-gray-200 bg-white/60 px-6 py-12 text-center', className)}>
       <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-control border border-gray-200 bg-gray-50 text-gray-400">
         <Icon size={20} aria-hidden="true" />
       </span>
@@ -486,7 +502,7 @@ export function EmptyState({ icon: Icon, title, description, action, className }
 
 export function ErrorState({ message, onRetry, title = 'Etwas ist schiefgelaufen' }: { message: string; onRetry?: () => void; title?: string }) {
   return (
-    <div role="alert" className="rounded-card border border-red-200/80 bg-red-50/70 p-5">
+    <div role="alert" data-qa="error-state" className="rounded-card border border-red-200/80 bg-red-50/70 p-5">
       <p className="text-[13.5px] font-semibold text-red-800">{title}</p>
       <p className="mt-1.5 break-words text-[13px] leading-6 text-red-700">{message}</p>
       {onRetry ? (
@@ -508,14 +524,14 @@ export function ErrorState({ message, onRetry, title = 'Etwas ist schiefgelaufen
 
 export function LoadingState({ label }: { label?: string }) {
   return (
-    <div role="status" className={cn(cardSurface, 'flex items-center gap-3 px-5 py-4 text-sm text-gray-500')}>
+    <div role="status" data-qa="loading-state" className={cn(cardSurface, 'flex items-center gap-3 px-5 py-4 text-sm text-gray-500')}>
       <Spinner className="text-gray-400" /> {label ?? 'Wird geladen…'}
     </div>
   );
 }
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn('animate-pulse rounded-md bg-gray-100', className)} aria-hidden="true" />;
+  return <div data-qa="skeleton" className={cn('animate-pulse rounded-md bg-gray-100', className)} aria-hidden="true" />;
 }
 
 export function KpiSkeletonGrid({ count = 4 }: { count?: number }) {

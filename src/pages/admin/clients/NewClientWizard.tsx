@@ -11,6 +11,7 @@ import {
   type ProvisionClientResult,
 } from '@/lib/clientPlatform/adminApi';
 import { clientLifecycleStatuses, solutionCatalogKeys } from '@/lib/clientPlatform/types';
+import { clientLifecycleStatusLabel } from '@/lib/clientPlatform/labels';
 import { isValidEmail, isValidUrl, parseAmountToCents } from '@/lib/clientPlatform/validation';
 
 // One stable idempotency key per intended submission (per wizard mount). Retries of the same
@@ -260,7 +261,7 @@ export function NewClientWizard() {
               <AdminField id="address" label="Adresse" value={form.address} onChange={(v) => set('address', v)} />
             </div>
             <AdminField id="leadSource" label="Lead-Quelle" value={form.leadSource} onChange={(v) => set('leadSource', v)} />
-            <AdminSelect id="lifecycleStatus" label="Lifecycle-Status" value={form.lifecycleStatus} onChange={(v) => set('lifecycleStatus', v)} options={clientLifecycleStatuses.map((s) => ({ value: s, label: s }))} />
+            <AdminSelect id="lifecycleStatus" label="Lifecycle-Status" value={form.lifecycleStatus} onChange={(v) => set('lifecycleStatus', v)} options={clientLifecycleStatuses.map((s) => ({ value: s, label: clientLifecycleStatusLabel(s) }))} />
           </div>
         ) : null}
 

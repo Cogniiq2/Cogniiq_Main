@@ -13,7 +13,7 @@ import { unarchiveOffer } from '@/lib/ownerFinance/customersApi';
 import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
 import { formatCents } from '@/lib/clientPlatform/validation';
 import { formatDateDe } from '@/lib/ownerFinance/exports';
-import { offerStatusLabel, offerStatusTone, offerDisplayState, offerDisplayStateLabel, offerDisplayStateTone } from '@/lib/ownerFinance/customerLabels';
+import { offerDisplayState, offerDisplayStateLabel, offerDisplayStateTone, offerStatusText, offerStatusTone } from '@/lib/ownerFinance/customerLabels';
 import { OfferArchiveDialog } from '@/components/finance/OfferArchiveDialog';
 import type { OwnerOffer } from '@/lib/ownerFinance/types';
 import { ExportMenu } from '@/components/finance/ExportMenu';
@@ -161,7 +161,7 @@ export function OffersPage() {
     { key: 'number', header: 'Nummer', render: (o) => <span className="font-semibold text-gray-950">{o.offer_number ?? 'Entwurf'}</span> },
     { key: 'status', header: 'Status', render: (o) => (
       <div className="flex flex-wrap items-center gap-1.5">
-        <StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} />
+        <StatusBadge label={offerStatusText(o.status)} tone={offerStatusTone[o.status]} />
         {pendingSend.has(o.id) && o.status !== 'sent' ? <StatusBadge label="Versand ausstehend" tone="info" /> : null}
         {o.archived_at ? <StatusBadge label={offerDisplayStateLabel[offerDisplayState(o)]} tone={offerDisplayStateTone.archived} /> : null}
       </div>
@@ -255,7 +255,7 @@ export function OffersPage() {
       ) : (
         <DataTable columns={columns} rows={filtered} getRowKey={(o) => o.id} minWidth={900}
           onRowClick={(o) => navigate(`/admin/finance/offers/${o.id}`)}
-          mobileTitle={(o) => <div className="flex items-center gap-2"><span>{o.offer_number ?? 'Entwurf'}</span><StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} /></div>}
+          mobileTitle={(o) => <div className="flex items-center gap-2"><span>{o.offer_number ?? 'Entwurf'}</span><StatusBadge label={offerStatusText(o.status)} tone={offerStatusTone[o.status]} /></div>}
           mobileSubtitle={(o) => o.title ?? 'ohne Titel'} />
       )}
 

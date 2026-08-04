@@ -191,12 +191,19 @@ export function PremiumSelect({
             triggerClassName,
           )}
         >
-          {/* min-w-0 + truncate is what stops a long German customer name from pushing the
-              chevron out of the control. The accessible name is unaffected. */}
-          <SelectPrimitive.Value
-            placeholder={<span className="text-gray-400">{placeholder ?? 'Bitte wählen'}</span>}
-            className="min-w-0 truncate"
-          />
+          {/*
+            The truncation lives on a wrapper, not on Select.Value. Radix renders Value as a
+            bare span whose parent is the trigger's flex row; `truncate` on the Value itself
+            has no flex basis to shrink against, so a long German organisation name (the
+            kind with a legal form and a place name in it) escaped the control and painted
+            over the control beside it in the portal topbar. The accessible name is
+            unaffected — this is purely a box for the text to be clipped inside.
+          */}
+          <span className="min-w-0 flex-1 overflow-hidden truncate whitespace-nowrap">
+            <SelectPrimitive.Value
+              placeholder={<span className="text-gray-400">{placeholder ?? 'Bitte wählen'}</span>}
+            />
+          </span>
           <SelectPrimitive.Icon asChild>
             <ChevronDown
               size={15}

@@ -1171,6 +1171,8 @@ function ErrorCard({ error, onClose, onRetry }: { error: string; onClose: () => 
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
+      role="alert"
+      data-qa="error-state"
       className="mb-5 overflow-hidden rounded-3xl border p-4"
       style={{ borderColor: 'var(--admin-danger-border)', background: 'var(--admin-danger-bg)' }}
     >

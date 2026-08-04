@@ -18,6 +18,11 @@ import { Pill, invitationTone, lifecycleTone, solutionTone } from '@/pages/admin
 import { loadAdminClients, type AdminClientRow } from '@/lib/clientPlatform/adminApi';
 import { formatCents } from '@/lib/clientPlatform/validation';
 import { clientLifecycleStatuses, solutionCatalogKeys } from '@/lib/clientPlatform/types';
+import {
+  clientLifecycleStatusLabel,
+  invitationStatusLabel,
+  solutionCatalogKeyLabel,
+} from '@/lib/clientPlatform/labels';
 
 type SortKey = 'name' | 'updated' | 'monthly';
 
@@ -96,7 +101,7 @@ export function ClientsListPage() {
     {
       key: 'status',
       header: 'Status',
-      render: (row) => (row.account ? <Pill label={row.account.lifecycle_status} tone={lifecycleTone[row.account.lifecycle_status]} /> : '—'),
+      render: (row) => (row.account ? <Pill label={clientLifecycleStatusLabel(row.account.lifecycle_status)} tone={lifecycleTone[row.account.lifecycle_status]} /> : '—'),
     },
     {
       key: 'solutions',
@@ -105,7 +110,7 @@ export function ClientsListPage() {
         <div className="flex flex-wrap gap-1">
           {row.solutions.length === 0
             ? <span className="text-gray-400">—</span>
-            : row.solutions.map((s) => <Pill key={s.id} label={s.catalog_key.replace(/_/g, ' ')} tone={solutionTone[s.status]} />)}
+            : row.solutions.map((s) => <Pill key={s.id} label={solutionCatalogKeyLabel(s.catalog_key)} tone={solutionTone[s.status]} />)}
         </div>
       ),
     },
@@ -121,7 +126,7 @@ export function ClientsListPage() {
       header: 'Zugang',
       render: (row) => {
         const invitation = row.invitations.find((i) => i.status === 'pending') ?? row.invitations[0];
-        return invitation ? <Pill label={invitation.status} tone={invitationTone[invitation.status]} /> : '—';
+        return invitation ? <Pill label={invitationStatusLabel(invitation.status)} tone={invitationTone[invitation.status]} /> : '—';
       },
     },
     { key: 'owner', header: 'Owner', hideOnMobile: true, render: (row) => row.account?.internal_owner ?? '—' },
@@ -150,13 +155,13 @@ export function ClientsListPage() {
               id="client-status-filter"
               value={statusFilter}
               onChange={setStatusFilter}
-              options={[{ value: 'all', label: 'Alle Status' }, ...clientLifecycleStatuses.map((s) => ({ value: s, label: s }))]}
+              options={[{ value: 'all', label: 'Alle Status' }, ...clientLifecycleStatuses.map((s) => ({ value: s, label: clientLifecycleStatusLabel(s) }))]}
             />
             <Select
               id="client-solution-filter"
               value={solutionFilter}
               onChange={setSolutionFilter}
-              options={[{ value: 'all', label: 'Alle Lösungen' }, ...solutionCatalogKeys.map((s) => ({ value: s, label: s }))]}
+              options={[{ value: 'all', label: 'Alle Lösungen' }, ...solutionCatalogKeys.map((s) => ({ value: s, label: solutionCatalogKeyLabel(s) }))]}
             />
             <Select
               id="client-sort"

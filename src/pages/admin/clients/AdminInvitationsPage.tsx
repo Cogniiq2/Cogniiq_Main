@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { RefreshCw, XCircle } from 'lucide-react';
 
 import { AdminCard, Pill, invitationTone } from '@/pages/admin/clients/adminUi';
-import { PremiumSelect } from '@/components/dashboard';
+import { ErrorState, PremiumSelect, TableSkeleton } from '@/components/dashboard';
+import { invitationStatusLabel, organizationRoleLabel } from '@/lib/clientPlatform/labels';
 import {
   loadAdminClients,
   resendInvitationViaEdge,
@@ -67,16 +68,16 @@ export function AdminInvitationsPage() {
           className="w-[180px] shrink-0"
           options={[
             { value: 'all', label: 'Alle' },
-            { value: 'pending', label: 'pending' },
-            { value: 'accepted', label: 'accepted' },
-            { value: 'revoked', label: 'revoked' },
-            { value: 'expired', label: 'expired' },
+            { value: 'pending', label: invitationStatusLabel('pending') },
+            { value: 'accepted', label: invitationStatusLabel('accepted') },
+            { value: 'revoked', label: invitationStatusLabel('revoked') },
+            { value: 'expired', label: invitationStatusLabel('expired') },
           ]}
         />
       </div>
       {notice ? <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-800">{notice}</div> : null}
-      {loading ? <div className="h-40 animate-pulse rounded-card border border-hairline bg-white" /> : error ? (
-        <AdminCard><p className="text-sm text-red-600">Fehler: {error}</p></AdminCard>
+      {loading ? <TableSkeleton rows={5} cols={3} /> : error ? (
+        <ErrorState message={error} onRetry={() => void reload()} title="Einladungen konnten nicht geladen werden" />
       ) : invitations.length === 0 ? (
         <AdminCard><p className="text-sm text-gray-500">Keine Einladungen für diesen Filter.</p></AdminCard>
       ) : (
@@ -84,10 +85,10 @@ export function AdminInvitationsPage() {
           {invitations.map((inv) => (
             <AdminCard key={inv.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm font-semibold text-gray-900">{inv.email} <Pill label={inv.effective} tone={invitationTone[inv.effective]} /></p>
+                <p className="text-sm font-semibold text-gray-900">{inv.email} <Pill label={invitationStatusLabel(inv.effective)} tone={invitationTone[inv.effective]} /></p>
                 <p className="text-[12px] text-gray-500">
                   <Link to={`/admin/clients/${inv.organization_id}`} className="hover:underline">{inv.orgName}</Link>
-                  {' · '}Rolle: {inv.organization_role}
+                  {' · '}Rolle: {organizationRoleLabel(inv.organization_role)}
                 </p>
               </div>
               <div className="flex gap-2">

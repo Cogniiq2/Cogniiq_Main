@@ -29,27 +29,30 @@ export function PlatformAdminRoute({ children }: { children: ReactNode }) {
           <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-control border border-amber-200 bg-amber-50 text-amber-700">
             <ShieldAlert size={19} aria-hidden="true" />
           </div>
+          {/* German throughout, matching PlatformOwnerRoute and /auth/confirmed. This
+              screen was the last English surface a signed-in German customer could hit.
+              Copy only — the guard's behaviour is unchanged. */}
           <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-gray-500">
-            Restricted Area
+            Geschützter Bereich
           </p>
-          <h1 className="mb-3 text-[24px] font-semibold leading-tight tracking-[-0.02em] text-gray-950">Admin access required</h1>
+          <h1 className="mb-3 text-[24px] font-semibold leading-tight tracking-[-0.02em] text-gray-950">Kein Zugriff auf die Administration</h1>
           <p className="mb-6 text-[13.5px] leading-6 text-gray-600">
-            You are signed in as {profile?.email ?? user.email ?? 'a customer account'}, but this area is limited to
-            Cogniiq platform administrators.
+            Sie sind als {profile?.email ?? user.email ?? 'Kundenkonto'} angemeldet. Dieser Bereich ist
+            ausschließlich Cogniiq-Administratoren vorbehalten.
           </p>
           <div className="flex flex-wrap gap-2.5">
             <Link
               to="/app"
               className="inline-flex min-h-11 items-center justify-center rounded-control bg-gray-950 px-4 text-[13.5px] font-semibold text-white transition-colors duration-fast ease-premium hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
             >
-              Go to app
+              Zum Kundenportal
             </Link>
             <button
               type="button"
               onClick={() => void signOut()}
               className="inline-flex min-h-11 items-center justify-center rounded-control border border-gray-200 bg-white px-4 text-[13.5px] font-semibold text-gray-700 transition-colors duration-fast ease-premium hover:border-gray-300 hover:bg-gray-50 hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
             >
-              Sign out
+              Abmelden
             </button>
           </div>
         </div>

@@ -44,6 +44,7 @@ import {
   type CustomerProjectStatus,
 } from '@/lib/customerPlatform/types';
 import { formatDateDe } from '@/lib/ownerFinance/exports';
+import { invoiceStatusText } from '@/lib/ownerFinance/customerLabels';
 
 // Owner-side management of the CUSTOMER-VISIBLE project projection. This is the
 // minimum needed to run the customer portal — deliberately NOT a second project
@@ -267,7 +268,9 @@ function ProjectRow({
             </p>
           ) : null}
         </div>
-        <div className="flex flex-shrink-0 gap-2">
+        {/* "Meilensteine & Dokumente" is 238px on its own; refusing to shrink pushed the
+            Kundenportal tab 28px past a 390px viewport. Wraps instead of overflowing. */}
+        <div className="flex min-w-0 flex-wrap gap-2">
           <Button variant="secondary" onClick={onEdit}>Bearbeiten</Button>
           <Button variant="ghost" onClick={() => setExpanded((open) => !open)}>
             {expanded ? 'Weniger' : 'Meilensteine & Dokumente'}
@@ -547,7 +550,7 @@ function InvoiceLinkingSection({
                 {invoice.invoice_number ?? 'Ohne Nummer'}
               </span>
               <div className="flex flex-wrap items-center gap-2">
-                <StatusBadge label={invoice.status} tone="neutral" />
+                <StatusBadge label={invoiceStatusText(invoice.status)} tone="neutral" />
                 <Button
                   variant="ghost"
                   disabled={busyId === invoice.invoice_id}

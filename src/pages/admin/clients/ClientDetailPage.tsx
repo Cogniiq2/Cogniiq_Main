@@ -24,7 +24,17 @@ import {
   loadOrganizationCommercialOverview,
   type OrganizationCommercialOverview,
 } from '@/lib/ownerFinance/organizationCommercial';
-import { offerStatusLabel } from '@/lib/ownerFinance/customerLabels';
+import { invoiceStatusText, offerStatusText } from '@/lib/ownerFinance/customerLabels';
+import { ErrorState, TableSkeleton } from '@/components/dashboard';
+import {
+  clientLifecycleStatusLabel,
+  engagementStatusLabel,
+  implementationKeyLabel,
+  invitationStatusLabel,
+  organizationRoleLabel,
+  organizationSolutionStatusLabel,
+  solutionCatalogKeyLabel,
+} from '@/lib/clientPlatform/labels';
 
 const tabs = ['Übersicht', 'Kontakte', 'Lösungen', 'Vertrag & Budget', 'Kommerziell', 'Zugang', 'Kundenportal', 'Aktivität'] as const;
 type Tab = (typeof tabs)[number];
@@ -54,8 +64,11 @@ export function ClientDetailPage() {
 
   const flash = (message: string) => { setNotice(message); setTimeout(() => setNotice(null), 3000); };
 
-  if (loading) return <div className="h-40 animate-pulse rounded-card border border-hairline bg-white" />;
-  if (error) return <AdminCard><p className="text-sm text-red-600">Fehler: {error}</p></AdminCard>;
+  // Was a bare red line inside a card: no title, no retry, no alert role — the one page in
+  // the CRM whose failure the user could not act on or have announced. Now the same
+  // ErrorState every other list and detail page uses.
+  if (loading) return <TableSkeleton rows={6} cols={4} />;
+  if (error) return <ErrorState message={error} onRetry={() => void reload()} title="Kunde konnte nicht geladen werden" />;
   if (!detail || !detail.account) {
     return (
       <AdminCard>
@@ -75,7 +88,7 @@ export function ClientDetailPage() {
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-gray-950">{detail.organizationName}</h1>
             <div className="mt-1 flex items-center gap-2">
-              <Pill label={account.lifecycle_status} tone={lifecycleTone[account.lifecycle_status]} />
+              <Pill label={clientLifecycleStatusLabel(account.lifecycle_status)} tone={lifecycleTone[account.lifecycle_status]} />
               <span className="text-[12px] text-gray-400">Org-Status: {detail.organizationStatus}</span>
             </div>
           </div>
@@ -200,8 +213,8 @@ function SolutionsTab({ detail, onChanged, flash }: { detail: AdminClientDetail;
       {detail.solutions.length === 0 ? <AdminCard><p className="text-sm text-gray-500">Keine Lösungen zugewiesen. Nutzen Sie den Assistenten „Neuer Kunde“, um eine Lösung zu provisionieren.</p></AdminCard> : detail.solutions.map((s) => (
         <AdminCard key={s.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold text-gray-900">{s.display_name} <Pill label={s.status} tone={solutionTone[s.status]} /></p>
-            <p className="text-[12px] text-gray-500">{s.catalog_key} · {s.implementation_key} · <span className="font-mono">{s.instance_key}</span></p>
+            <p className="text-sm font-semibold text-gray-900">{s.display_name} <Pill label={organizationSolutionStatusLabel(s.status)} tone={solutionTone[s.status]} /></p>
+            <p className="text-[12px] text-gray-500">{solutionCatalogKeyLabel(s.catalog_key)} · {implementationKeyLabel(s.implementation_key)} · <span className="font-mono">{s.instance_key}</span></p>
           </div>
           <div className="flex gap-2">
             <button type="button" onClick={() => void copyLink(s.instance_key)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-[13px] font-semibold text-gray-700 hover:border-gray-300"><Copy size={14} /> Link</button>
@@ -231,7 +244,7 @@ function BudgetTab({ detail }: { detail: AdminClientDetail }) {
       <div className="space-y-2">
         {detail.engagements.map((e) => (
           <AdminCard key={e.id} className="p-4">
-            <p className="text-sm font-semibold text-gray-900">{e.project_name} <Pill label={e.status} tone={e.status === 'active' ? 'success' : 'neutral'} /></p>
+            <p className="text-sm font-semibold text-gray-900">{e.project_name} <Pill label={engagementStatusLabel(e.status)} tone={e.status === 'active' ? 'success' : 'neutral'} /></p>
             <div className="mt-2 grid gap-2 sm:grid-cols-3 text-[13px] text-gray-600">
               <span>Budget: {formatCents(e.total_budget_cents, e.currency)}</span>
               <span>Setup: {formatCents(e.setup_fee_cents, e.currency)}</span>
@@ -262,8 +275,8 @@ function AccessTab({ detail, onChanged, flash }: { detail: AdminClientDetail; on
         return (
           <AdminCard key={inv.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-semibold text-gray-900">{inv.email} <Pill label={eff} tone={invitationTone[eff]} /></p>
-              <p className="text-[12px] text-gray-500">Rolle: {inv.organization_role}{inv.expires_at ? ` · läuft ab ${new Date(inv.expires_at).toLocaleDateString('de-DE')}` : ''}</p>
+              <p className="text-sm font-semibold text-gray-900">{inv.email} <Pill label={invitationStatusLabel(eff)} tone={invitationTone[eff]} /></p>
+              <p className="text-[12px] text-gray-500">Rolle: {organizationRoleLabel(inv.organization_role)}{inv.expires_at ? ` · läuft ab ${new Date(inv.expires_at).toLocaleDateString('de-DE')}` : ''}</p>
             </div>
             <div className="flex gap-2">
               {canResendInvitation(eff) ? (
@@ -295,11 +308,6 @@ function PortalTab({ detail }: { detail: AdminClientDetail }) {
     />
   );
 }
-
-const invoiceStatusLabel: Record<string, string> = {
-  draft: 'Entwurf', issued: 'Gestellt', partially_paid: 'Teilbezahlt', paid: 'Bezahlt',
-  overdue: 'Überfällig', void: 'Storniert', cancelled: 'Storniert', credited: 'Gutgeschrieben',
-};
 
 const invoicePillTone: Record<string, 'neutral' | 'success' | 'warning' | 'danger' | 'info'> = {
   draft: 'neutral', issued: 'info', partially_paid: 'warning', paid: 'success',
@@ -407,7 +415,7 @@ function CommercialTab({ organizationId }: { organizationId: string }) {
                     </span>
                   </span>
                   <span className="flex shrink-0 items-center gap-3">
-                    <Pill label={offerStatusLabel[o.status] ?? o.status} tone={offerPillTone[o.status] ?? 'neutral'} />
+                    <Pill label={offerStatusText(o.status)} tone={offerPillTone[o.status] ?? 'neutral'} />
                     <span className="text-sm font-semibold tabular-nums text-gray-900">
                       {formatCents(o.gross_total_cents, o.currency)}
                     </span>
@@ -447,7 +455,7 @@ function CommercialTab({ organizationId }: { organizationId: string }) {
                       </span>
                     </span>
                     <span className="flex shrink-0 items-center gap-3">
-                      <Pill label={invoiceStatusLabel[i.status] ?? i.status} tone={invoicePillTone[i.status] ?? 'neutral'} />
+                      <Pill label={invoiceStatusText(i.status)} tone={invoicePillTone[i.status] ?? 'neutral'} />
                       <span className="text-sm font-semibold tabular-nums text-gray-900">
                         {formatCents(i.gross_total_cents, i.currency)}
                       </span>

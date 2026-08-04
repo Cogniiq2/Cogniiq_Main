@@ -4,8 +4,8 @@ import { FileText, Plus, Trash2 } from 'lucide-react';
 
 import {
   Button, Card, ConfirmDialog, DataTable, EmptyState, ErrorState, IconButton, InfoBanner, KpiCard,
-  Modal, PageHeader, SlideOver, StatusBadge, Tabs, TableSkeleton, Field, Select, Textarea, SectionHeader,
-  useToast, type Column,
+  Modal, PageHeader, PremiumCombobox, SlideOver, StatusBadge, Tabs, TableSkeleton, Field, Select,
+  Textarea, SectionHeader, useToast, type Column,
 } from '@/components/dashboard';
 import { invoiceStatusTone } from '@/pages/owner/ownerUi';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
@@ -23,6 +23,7 @@ import {
   invoiceExportTable, invoiceReportModel, invoiceMetadataSheet,
 } from '@/lib/ownerFinance/exports/datasets';
 import type { ExportFormat, ExportMode, ExportMeta } from '@/lib/ownerFinance/exports';
+import { invoiceStatusText } from '@/lib/ownerFinance/customerLabels';
 
 const invoiceTreatments = [
   { value: 'standard', label: 'Standard 19 %' },
@@ -34,10 +35,6 @@ const invoiceTreatments = [
   { value: 'unknown', label: 'Prüfung erforderlich' },
 ];
 
-const statusLabel: Record<string, string> = {
-  draft: 'Entwurf', issued: 'Gestellt', partially_paid: 'Teilbezahlt', paid: 'Bezahlt',
-  overdue: 'Überfällig', void: 'Storniert', cancelled: 'Storniert', credited: 'Gutgeschrieben',
-};
 
 function rateForTreatment(t: string): number {
   return t === 'reduced' ? 700 : t === 'standard' ? 1900 : 0;
@@ -94,7 +91,7 @@ export function InvoicesPage() {
     return c ? (c.legalName ?? c.name) : inv.organization_id ? 'CRM-Kunde' : '—';
   }, [customers]);
 
-  const statusFilterLabel = statusFilter === 'all' ? 'Alle Status' : (statusLabel[statusFilter] ?? statusFilter);
+  const statusFilterLabel = statusFilter === 'all' ? 'Alle Status' : invoiceStatusText(statusFilter);
 
   const runExport = async (format: ExportFormat, mode: ExportMode) => {
     if (!entity) return;
@@ -145,7 +142,7 @@ export function InvoicesPage() {
 
   const columns: Column<OwnerInvoice>[] = [
     { key: 'number', header: 'Nummer', render: (inv) => <span className="font-semibold text-gray-950">{inv.invoice_number ?? 'Entwurf'}</span>, hideOnMobile: true },
-    { key: 'status', header: 'Status', render: (inv) => <StatusBadge label={statusLabel[inv.status] ?? inv.status} tone={invoiceStatusTone[inv.status]} /> },
+    { key: 'status', header: 'Status', render: (inv) => <StatusBadge label={invoiceStatusText(inv.status)} tone={invoiceStatusTone[inv.status]} /> },
     { key: 'date', header: 'Datum', render: (inv) => <span className="text-gray-500">{inv.issue_date ?? '—'}</span> },
     { key: 'net', header: 'Netto', align: 'right', render: (inv) => <span className="tabular-nums">{formatCents(inv.net_total_cents, inv.currency)}</span> },
     { key: 'gross', header: 'Brutto', align: 'right', render: (inv) => <span className="tabular-nums font-medium text-gray-900">{formatCents(inv.gross_total_cents, inv.currency)}</span> },
@@ -226,7 +223,7 @@ export function InvoicesPage() {
           mobileTitle={(inv) => (
             <div className="flex items-center gap-2">
               <span>{inv.invoice_number ?? 'Entwurf'}</span>
-              <StatusBadge label={statusLabel[inv.status] ?? inv.status} tone={invoiceStatusTone[inv.status]} />
+              <StatusBadge label={invoiceStatusText(inv.status)} tone={invoiceStatusTone[inv.status]} />
             </div>
           )}
           mobileSubtitle={(inv) => `${inv.issue_date ?? 'ohne Datum'}`}
@@ -428,13 +425,31 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError 
         <Card className="p-5">
           <SectionHeader title="Empfänger & Rahmendaten" />
           <div className="grid gap-4 sm:grid-cols-2">
-            <Select
+            {/*
+              Searchable: the invoice drawer is opened against the full CRM customer list,
+              which is the longest selector in the finance module. `setCustomerId` still
+              receives the organizationId or '' exactly as before, so the optional-link
+              payload is unchanged.
+            */}
+            <PremiumCombobox
               id="customer"
               label="CRM-Kunde"
               value={customerId}
-              onChange={setCustomerId}
-              options={[{ value: '', label: '— Kein CRM-Kunde —' }, ...customers.map((c) => ({ value: c.organizationId, label: c.name }))]}
-              hint="Optional. Verknüpft die Rechnung mit dem CRM-Konto."
+              onValueChange={setCustomerId}
+              placeholder="— Kein CRM-Kunde —"
+              searchPlaceholder="CRM-Kunde suchen …"
+              emptyMessage="Kein CRM-Kunde gefunden."
+              clearable
+              options={[
+                { value: '', label: '— Kein CRM-Kunde —' },
+                ...customers.map((c) => ({
+                  value: c.organizationId,
+                  label: c.name,
+                  description: c.email ?? c.legalName ?? undefined,
+                  keywords: [c.email ?? '', c.legalName ?? ''].filter(Boolean),
+                })),
+              ]}
+              description="Optional. Verknüpft die Rechnung mit dem CRM-Konto."
             />
             <Field id="issueDate" label="Rechnungsdatum" type="date" value={issueDate} onChange={setIssueDate} />
             <Select id="serviceMode" label="Leistung" value={serviceMode} onChange={(v) => setServiceMode(v as 'date' | 'period')} options={[{ value: 'date', label: 'Leistungsdatum' }, { value: 'period', label: 'Leistungszeitraum' }]} />

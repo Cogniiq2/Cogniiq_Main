@@ -9,8 +9,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Check, Eye, FileCheck2, Loader2, Plus, Save, Trash2 } from 'lucide-react';
 
 import {
-  Button, Card, Checkbox, Field, IconButton, InfoBanner, PageHeader, Select, SectionHeader, Tabs,
-  Textarea, useToast,
+  Button, Card, Checkbox, Field, IconButton, InfoBanner, PageHeader, PremiumCombobox, Select,
+  SectionHeader, Tabs, Textarea, useToast,
 } from '@/components/dashboard';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import { PremiumOfferPreview } from '@/pages/owner/PremiumOfferPreview';
@@ -363,16 +363,51 @@ export function OfferEditor() {
         <SectionHeader title="Empfänger" description="CRM-Kunde übernehmen oder angebotsspezifisch überschreiben. CRM-Daten werden nie überschrieben." />
         <div className="mb-4 rounded-card border border-hairline bg-gray-50/60 p-4">
           <div className="grid items-end gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
-            <Select id="owner-customer" label="Kunde (Kundenverwaltung)" value={state.ownerCustomerId}
-              onChange={(v) => patch({ ownerCustomerId: v })}
-              hint={'Ordnet das Angebot einem Kunden in „Kunden & Aufgaben“ zu.'}
-              options={[{ value: '', label: '— Kein Kunde zugeordnet —' }, ...ownerCustomers.map((c) => ({ value: c.id, label: customerDisplayName(c) }))]} />
+            {/*
+              Searchable rather than a plain listbox: the owner customer list grows without
+              bound, and scrolling it to find one company is the single slowest step in
+              writing an offer. Values, the empty sentinel and the payload are unchanged —
+              only the way the list is filtered is new.
+            */}
+            <PremiumCombobox id="owner-customer" label="Kunde (Kundenverwaltung)" value={state.ownerCustomerId}
+              onValueChange={(v) => patch({ ownerCustomerId: v })}
+              description={'Ordnet das Angebot einem Kunden in „Kunden & Aufgaben“ zu.'}
+              placeholder="— Kein Kunde zugeordnet —"
+              searchPlaceholder="Kunde suchen …"
+              emptyMessage="Kein Kunde gefunden. Legen Sie rechts einen neuen Kunden an."
+              clearable
+              options={[
+                { value: '', label: '— Kein Kunde zugeordnet —' },
+                ...ownerCustomers.map((c) => ({
+                  value: c.id,
+                  label: customerDisplayName(c),
+                  description: c.email ?? c.contact_name ?? undefined,
+                  keywords: [c.contact_name ?? '', c.email ?? '', c.company ?? ''].filter(Boolean),
+                })),
+              ]} />
             <Button variant="secondary" icon={Plus} onClick={() => setCustomerDialogOpen(true)}>Neuen Kunden anlegen</Button>
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Select id="customer" label="CRM-Kunde" value={state.customerId} onChange={applyCustomer}
-            options={[{ value: '', label: '— Kein CRM-Kunde —' }, ...customers.map((c) => ({ value: c.organizationId, label: c.name }))]} />
+          {/*
+            `applyCustomer` still receives exactly the organizationId (or '') it received
+            from the native select, so the recipient-snapshot copy and the
+            recipientSource: 'crm' transition are untouched.
+          */}
+          <PremiumCombobox id="customer" label="CRM-Kunde" value={state.customerId} onValueChange={applyCustomer}
+            placeholder="— Kein CRM-Kunde —"
+            searchPlaceholder="CRM-Kunde suchen …"
+            emptyMessage="Kein CRM-Kunde gefunden."
+            clearable
+            options={[
+              { value: '', label: '— Kein CRM-Kunde —' },
+              ...customers.map((c) => ({
+                value: c.organizationId,
+                label: c.name,
+                description: c.email ?? c.legalName ?? undefined,
+                keywords: [c.contact ?? '', c.email ?? '', c.legalName ?? ''].filter(Boolean),
+              })),
+            ]} />
           <Field id="rcompany" label="Firma (rechtlich)" value={state.rcompany} onChange={(v) => patch({ rcompany: v, recipientSource: 'manual' })} required />
           <Select id="rsalutation" label="Anrede" value={state.rsalutation} onChange={(v) => patch({ rsalutation: v as EditorState['rsalutation'], recipientSource: 'manual' })}
             options={[{ value: '', label: '— Neutral —' }, { value: 'herr', label: 'Herr' }, { value: 'frau', label: 'Frau' }, { value: 'neutral', label: 'Neutral' }]} />

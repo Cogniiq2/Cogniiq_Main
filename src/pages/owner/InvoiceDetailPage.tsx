@@ -21,11 +21,8 @@ import { formatDateDe, formatCentsCurrencyDe, formatBpPercentDe, type ExportForm
 import { ExportMenu } from '@/components/finance/ExportMenu';
 import { CustomerPortalPublishCard } from '@/components/finance/CustomerPortalPublishCard';
 import type { OwnerInvoice, OwnerInvoiceLine, OwnerDocumentSettings, OwnerGeneratedDocument } from '@/lib/ownerFinance/types';
+import { invoiceStatusText } from '@/lib/ownerFinance/customerLabels';
 
-const statusLabel: Record<string, string> = {
-  draft: 'Entwurf', issued: 'Gestellt', partially_paid: 'Teilbezahlt', paid: 'Bezahlt',
-  overdue: 'Überfällig', void: 'Storniert', cancelled: 'Storniert', credited: 'Gutgeschrieben',
-};
 
 export function InvoiceDetailPage() {
   const { invoiceId } = useParams<{ invoiceId: string }>();
@@ -133,7 +130,7 @@ export function InvoiceDetailPage() {
       />
 
       <div className="mb-5 flex flex-wrap items-center gap-3">
-        <StatusBadge label={statusLabel[invoice.status] ?? invoice.status} tone={invoiceStatusTone[invoice.status]} />
+        <StatusBadge label={invoiceStatusText(invoice.status)} tone={invoiceStatusTone[invoice.status]} />
         <span className="text-[13px] text-gray-500">Datum {formatDateDe(invoice.issue_date)} · Fällig {formatDateDe(invoice.due_date)}</span>
         {invoice.external_reference?.startsWith('Angebot') ? <span className="text-[13px] text-gray-400">aus {invoice.external_reference}</span> : null}
       </div>
@@ -143,10 +140,13 @@ export function InvoiceDetailPage() {
       ) : null}
 
       <div className="grid gap-5 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-5">
+        {/* min-w-0: a grid item defaults to min-width:auto, so the positions table's
+            min-content width pushed the whole document past the viewport on mobile.
+            The table scrolls inside its own container instead. */}
+        <div className="min-w-0 lg:col-span-2 space-y-5">
           <Card className="p-6">
             <SectionHeader title="Positionen" />
-            <div className="overflow-x-auto"><table className="w-full text-sm">
+            <div className="-mx-1 overflow-x-auto px-1"><table className="w-full min-w-[34rem] text-sm">
               <thead><tr className="border-b border-hairline text-left text-[11px] font-bold uppercase tracking-wide text-gray-400"><th className="py-2">Beschreibung</th><th className="py-2 text-right">Menge</th><th className="py-2 text-right">Einzelpreis</th><th className="py-2 text-right">USt</th><th className="py-2 text-right">Netto</th></tr></thead>
               <tbody>{lines.map((l) => (
                 <tr key={l.id} className="border-b border-gray-50"><td className="py-2 text-gray-800">{l.description}</td><td className="py-2 text-right tabular-nums text-gray-500">{(l.quantity_milli / 1000).toLocaleString('de-DE')}</td><td className="py-2 text-right tabular-nums text-gray-600">{formatCents(l.unit_price_cents, invoice.currency)}</td><td className="py-2 text-right tabular-nums text-gray-500">{formatBpPercentDe(l.vat_rate_bp)}</td><td className="py-2 text-right tabular-nums font-medium text-gray-900">{formatCents(l.net_cents, invoice.currency)}</td></tr>
@@ -176,7 +176,7 @@ export function InvoiceDetailPage() {
           </Card>
         </div>
 
-        <div className="space-y-5">
+        <div className="min-w-0 space-y-5">
           <Card className="p-6">
             <SectionHeader title="Zahlungsinformationen" />
             <div className="space-y-1 text-[13px] text-gray-600">

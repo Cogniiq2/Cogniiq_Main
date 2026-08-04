@@ -79,9 +79,14 @@ export function BackendErrorScreen() {
         description="Beim Verbinden mit dem Finanz-Backend ist ein Fehler aufgetreten."
         actions={<Button variant="secondary" icon={RefreshCw} onClick={() => void reload()}>Erneut versuchen</Button>}
       />
+      {/* role="alert" + data-qa: this is a page-level error surface and must announce
+          itself like the inline ErrorState does. Previously it was a plain card, so
+          neither screen readers nor route QA could tell it apart from ordinary content. */}
       <Card className="border-red-100 bg-red-50/60">
+        <div role="alert" data-qa="error-state">
         <p className="text-sm font-semibold text-red-700">Verbindungsfehler</p>
         <p className="mt-1 break-words text-[13px] leading-6 text-red-600">{error ?? backendDetail ?? 'Unbekannter Fehler.'}</p>
+        </div>
       </Card>
     </>
   );
