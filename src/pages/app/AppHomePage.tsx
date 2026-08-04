@@ -235,7 +235,12 @@ function AppHomeContent() {
                   title="Projektverlauf"
                   description={`Alle Meilensteine von „${primaryProject.title}" — abgeschlossen, in Arbeit und geplant.`}
                   action={
-                    <AppButton to={`/app/projects/${primaryProject.id}`} variant="text" icon={ArrowRight}>
+                    <AppButton
+                      to={`/app/projects/${primaryProject.id}`}
+                      variant="text"
+                      icon={ArrowRight}
+                      className="whitespace-nowrap"
+                    >
                       Zum Projekt
                     </AppButton>
                   }
