@@ -280,6 +280,19 @@ const PROBE = `(() => {
     bodyText: visibleText(document.body),
     sidebarCount: document.querySelectorAll('[data-qa="customer-sidebar"]').length,
     horizontalNavCount: document.querySelectorAll('header nav').length,
+    // Any rail link whose text colour matches its own background is unreadable. This
+    // caught a real defect: two entries matched the same route, the single shared
+    // layoutId indicator flew to one of them, and the other rendered white on white.
+    invisibleNavLabels: Array.from(
+      document.querySelectorAll('[data-qa="customer-sidebar"] a'),
+    ).filter((el) => {
+      const cs = window.getComputedStyle(el);
+      const bg = cs.backgroundColor;
+      const fg = cs.color;
+      const transparent = bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent';
+      const light = /^rgba?\\((2[0-4]\\d|25[0-5]), ?(2[0-4]\\d|25[0-5]), ?(2[0-4]\\d|25[0-5])/.test(fg);
+      return transparent && light;
+    }).map((el) => (el.textContent ?? '').trim().slice(0, 30)),
   };
 })()`;
 
@@ -376,6 +389,9 @@ async function captureRoute(page, route, scenario, vp) {
     }
     if (vp.name === 'desktop' && snapshot.horizontalNavCount > 0) {
       findings.push(`SHELL ${route.key} @ ${vp.id}: a horizontal <header><nav> is still rendered on desktop`);
+    }
+    if (snapshot.invisibleNavLabels?.length) {
+      findings.push(`SHELL ${route.key} @ ${vp.id}: rail label(s) unreadable (light text on transparent background): ${snapshot.invisibleNavLabels.join(', ')}`);
     }
   }
 

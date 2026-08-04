@@ -77,6 +77,8 @@ interface CustomerNavItem {
    * whichever rendered last.
    */
   activePrefix?: string;
+  /** Match the path exactly instead of by prefix. */
+  exact?: boolean;
   /** Real child destinations (projects). Never invented — see buildRailProjectChildren. */
   children?: Array<{ label: string; href: string; tone?: 'attention' | 'danger' }>;
 }
@@ -87,9 +89,9 @@ interface CustomerNavGroup {
   items: CustomerNavItem[];
 }
 
-function isActiveItem(pathname: string, item: { href: string; activePrefix?: string }) {
+function isActiveItem(pathname: string, item: { href: string; activePrefix?: string; exact?: boolean }) {
   const match = item.activePrefix ?? item.href;
-  if (match === '/app') return pathname === '/app';
+  if (match === '/app' || item.exact) return pathname === match;
   return pathname === match || pathname.startsWith(`${match}/`);
 }
 
@@ -577,7 +579,10 @@ function buildPortalNav(projects: Array<{ id: string; title: string; status: str
       },
       { label: 'Dokumente', href: '/app/documents', icon: FileText },
       { label: 'Abrechnung', href: '/app/billing', icon: CreditCard },
-      { label: 'Lösungen', href: '/app/solutions', icon: Headphones },
+      // `exact`: inside a specific solution the product group below carries the active
+      // state, so this entry must NOT also match — two active entries would fight over the
+      // single shared `layoutId` indicator.
+      { label: 'Lösungen', href: '/app/solutions', icon: Headphones, exact: true },
       { label: 'Support', href: '/app/support', icon: LifeBuoy },
     ],
   };
@@ -649,7 +654,10 @@ function RailNavLink({
       className={cn(
         'relative flex min-h-10 items-center gap-2.5 overflow-hidden rounded-control px-2.5 text-[13px] font-semibold',
         'transition-colors duration-fast ease-premium',
-        active ? 'text-white' : 'text-gray-600 hover:bg-gray-100/80 hover:text-gray-950',
+        // The solid background is on the LINK, not only on the motion span. The span is
+        // shared via layoutId, so if two entries were ever active at once it would fly to
+        // one of them and leave the other rendering white text on white.
+        active ? 'bg-gray-950 text-white' : 'text-gray-600 hover:bg-gray-100/80 hover:text-gray-950',
         portalFocusRing,
       )}
     >
