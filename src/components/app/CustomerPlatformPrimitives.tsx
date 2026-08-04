@@ -150,16 +150,19 @@ export function DocumentRow({
               </span>
             ) : null}
           </div>
-          {/* Metadata as separate spans rather than one long "·"-joined string: it wraps
-              instead of overflowing at 390px. */}
-          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11.5px] text-gray-500">
-            <span>{customerDocumentCategoryLabels[document.category] ?? '—'}</span>
-            {projectTitle ? <><Dot />{projectTitle}</> : null}
-            <Dot />
-            <span className="tabular-nums">{formatDateDe(document.uploaded_at)}</span>
-            {document.version > 1 ? <><Dot /><span>Version {document.version}</span></> : null}
-            {size ? <><Dot /><span className="tabular-nums">{size}</span></> : null}
-          </div>
+          {/* Metadata as wrapping items rather than one long "·"-joined string, so it
+              never overflows at 390px. `MetaList` keeps each separator glued to the item
+              that follows it — interleaved dots could otherwise wrap onto a line of their
+              own and read as a stray bullet. */}
+          <MetaList
+            items={[
+              customerDocumentCategoryLabels[document.category] ?? '—',
+              projectTitle || null,
+              formatDateDe(document.uploaded_at),
+              document.version > 1 ? `Version ${document.version}` : null,
+              size,
+            ]}
+          />
         </div>
       </div>
       <div className="shrink-0 sm:pl-3">
@@ -169,8 +172,33 @@ export function DocumentRow({
   );
 }
 
-function Dot() {
-  return <span aria-hidden="true" className="text-gray-300">·</span>;
+/**
+ * A separated metadata line that wraps safely at 390px.
+ *
+ * Two failure modes have to be avoided at once. Interleaved "·" elements are flex items
+ * of their own, so a separator can wrap onto a line and read as a stray bullet. Marking
+ * each entry `whitespace-nowrap` fixes that but stops a long German project title from
+ * wrapping at all, which pushed the document 10px past the viewport.
+ *
+ * A left border on every entry after the first solves both: it is painted on the entry's
+ * own box, so it can never be orphaned, and the entry's text still wraps freely.
+ * Null/empty entries are dropped, so an absent field leaves no dangling divider.
+ */
+function MetaList({ items, className }: { items: Array<string | null | undefined>; className?: string }) {
+  const present = items.filter((item): item is string => Boolean(item));
+  if (!present.length) return null;
+  return (
+    <div className={cn('mt-1 flex flex-wrap items-center gap-y-0.5 text-[11.5px] text-gray-500', className)}>
+      {present.map((item, index) => (
+        <span
+          key={`${index}-${item}`}
+          className={cn('min-w-0 tabular-nums', index > 0 && 'ml-2 border-l border-gray-200 pl-2')}
+        >
+          {item}
+        </span>
+      ))}
+    </div>
+  );
 }
 
 /* ------------------------------------------------------------------- invoices */
@@ -193,15 +221,13 @@ export function InvoiceRow({
             </p>
             <InvoiceStatusBadge status={invoice.status} />
           </div>
-          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11.5px] text-gray-500">
-            {projectTitle ? <><span>{projectTitle}</span><Dot /></> : null}
-            <span className="tabular-nums">
-              {invoice.issue_date ? `Ausgestellt ${formatDateDe(invoice.issue_date)}` : 'Ohne Rechnungsdatum'}
-            </span>
-            {invoice.due_date ? (
-              <><Dot /><span className="tabular-nums">Fällig {formatDateDe(invoice.due_date)}</span></>
-            ) : null}
-          </div>
+          <MetaList
+            items={[
+              projectTitle || null,
+              invoice.issue_date ? `Ausgestellt ${formatDateDe(invoice.issue_date)}` : 'Ohne Rechnungsdatum',
+              invoice.due_date ? `Fällig ${formatDateDe(invoice.due_date)}` : null,
+            ]}
+          />
         </div>
         {/* Right-aligned, tabular, one decimal rhythm: invoice amounts should scan as a
             column even when the rows around them differ in height. */}
@@ -371,10 +397,7 @@ export function CustomerActivityList({ entries }: { entries: CustomerActivityEnt
               <span className="block break-words text-[13px] font-medium leading-snug text-gray-950">
                 {entry.title}
               </span>
-              <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[11.5px] text-gray-500">
-                <span className="tabular-nums">{formatDateDe(entry.timestamp)}</span>
-                {entry.detail ? <><Dot />{entry.detail}</> : null}
-              </span>
+              <MetaList items={[formatDateDe(entry.timestamp), entry.detail]} className="mt-0.5" />
             </span>
           </>
         );
