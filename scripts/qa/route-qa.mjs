@@ -78,6 +78,17 @@ const CUSTOMER_ROUTES = [
   // as n/a rather than silently passed or falsely failed.
   { key: 'customer-07-support', label: 'Support', path: '/app/support', errorState: 'n/a' },
   { key: 'customer-08-settings', label: 'Settings', path: '/app/settings', errorState: 'n/a' },
+  // The seven receptionist surfaces. They read and write the portal-persistence tables
+  // rather than the customer RPCs, and four of them are deliberately "In Vorbereitung" —
+  // so their honest state is a labelled surface, never a spinner or a fake table.
+  { key: 'customer-09-onboarding', label: 'Receptionist onboarding', path: '/app/onboarding', errorState: 'n/a' },
+  { key: 'customer-10-receptionist', label: 'Receptionist profile', path: '/app/receptionist', errorState: 'n/a' },
+  { key: 'customer-11-knowledge', label: 'Knowledge base', path: '/app/knowledge', errorState: 'n/a' },
+  { key: 'customer-12-phone', label: 'Phone setup', path: '/app/phone', errorState: 'n/a' },
+  { key: 'customer-13-test', label: 'Test call', path: '/app/test', errorState: 'n/a' },
+  { key: 'customer-14-calls', label: 'Calls', path: '/app/calls', errorState: 'n/a' },
+  { key: 'customer-15-leads', label: 'Leads', path: '/app/leads', errorState: 'n/a' },
+  { key: 'customer-16-solution', label: 'Solution instance', path: '/app/solutions/ai-receptionist-musterbau', errorState: 'n/a' },
 ];
 
 // The five viewports the portal is signed off at. `name` is the matrix column, so the
