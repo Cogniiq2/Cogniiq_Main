@@ -89,13 +89,13 @@ run_preflight() { as "$PGBIN/psql" -h "$SOCK" -U postgres -q -d pre -f "$PREFLIG
 PSQL -d pre -q -f "$MIG/${NEW[0]}.sql" >/dev/null
 OUT="$(run_preflight)"
 for missing in "${NEW[@]:1}"; do
-  if printf '%s\n' "$OUT" | grep -q "^FAIL:.*${missing} is applied"; then
+  if grep -q "^FAIL:.*${missing} is applied" <<<"$OUT"; then
     note_ok "preflight reports $missing as NOT applied while it is missing"
   else
     note_fail "preflight did not detect that $missing is missing"
   fi
 done
-if printf '%s\n' "$OUT" | grep -q "^PASS:.*${NEW[0]} is applied"; then
+if grep -q "^PASS:.*${NEW[0]} is applied" <<<"$OUT"; then
   note_ok "preflight reports ${NEW[0]} as applied once it is"
 else
   note_fail "preflight did not detect ${NEW[0]} as applied"
@@ -181,7 +181,10 @@ $break_sql
 rollback;
 SQL
 )"
-  if printf '%s\n' "$out" | grep -q "^FAIL:.*${expect}"; then
+  # A here-string, not a pipe: `grep -q` exits on its first match, and with `pipefail`
+  # a `printf | grep -q` pipeline reports the writer's EPIPE as a pipeline failure — a
+  # caught break would intermittently be reported as NOT caught.
+  if grep -q "^FAIL:.*${expect}" <<<"$out"; then
     note_ok "preflight catches: $label"
   else
     note_fail "preflight did NOT catch: $label (expected a FAIL matching '${expect}')"
