@@ -1005,16 +1005,22 @@ grant select, insert, update, delete on table public.organization_role_capabilit
 grant select, insert, update, delete on table public.organization_member_roles to service_role;
 grant select, insert, update, delete on table public.client_invitation_roles to service_role;
 
-revoke execute on function public.portal_baseline_capability_keys() from public, anon;
-revoke execute on function public.solution_status_entitles_capabilities(text) from public, anon;
-revoke execute on function public.membership_effective_capability_keys(uuid) from public, anon;
-revoke execute on function public.current_user_portal_context() from public, anon;
-revoke execute on function public.admin_organization_access_overview(uuid) from public, anon;
-revoke execute on function public.assign_organization_member_role(uuid, uuid) from public, anon;
-revoke execute on function public.remove_organization_member_role(uuid, uuid) from public, anon;
-revoke execute on function public.set_client_invitation_roles(uuid, uuid[]) from public, anon;
-revoke execute on function public.upsert_organization_role(uuid, text, text, text, text[], integer) from public, anon;
-revoke execute on function public.apply_sports_club_role_presets(uuid) from public, anon;
+-- Revoke from authenticated as well, not only from public and anon. A hosted Supabase project
+-- ships ALTER DEFAULT PRIVILEGES granting EXECUTE on new public functions to anon, authenticated
+-- and service_role, so a function that is merely "never granted" to authenticated is still
+-- reachable by every signed-in user there. Revoking first and granting back below makes the
+-- intended audience explicit and independent of the target project's default privileges — which
+-- is what actually keeps membership_effective_capability_keys(uuid) unreachable from the browser.
+revoke execute on function public.portal_baseline_capability_keys() from public, anon, authenticated;
+revoke execute on function public.solution_status_entitles_capabilities(text) from public, anon, authenticated;
+revoke execute on function public.membership_effective_capability_keys(uuid) from public, anon, authenticated;
+revoke execute on function public.current_user_portal_context() from public, anon, authenticated;
+revoke execute on function public.admin_organization_access_overview(uuid) from public, anon, authenticated;
+revoke execute on function public.assign_organization_member_role(uuid, uuid) from public, anon, authenticated;
+revoke execute on function public.remove_organization_member_role(uuid, uuid) from public, anon, authenticated;
+revoke execute on function public.set_client_invitation_roles(uuid, uuid[]) from public, anon, authenticated;
+revoke execute on function public.upsert_organization_role(uuid, text, text, text, text[], integer) from public, anon, authenticated;
+revoke execute on function public.apply_sports_club_role_presets(uuid) from public, anon, authenticated;
 
 -- Minimal authenticated surface. membership_effective_capability_keys is intentionally NOT granted
 -- to authenticated: it takes a membership id and would otherwise let any signed-in user probe

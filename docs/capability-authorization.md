@@ -1,8 +1,23 @@
 # Reusable multi-tenant capability authorization
 
-Status: implemented, **not deployed**. The migration
-`supabase/migrations/20260804120000_reusable_capability_authorization.sql` has not been applied to
-any hosted Supabase project.
+Status: **migration applied to the hosted Cogniiq Supabase project** (`lqgtmoulqzmrhglabrms`) at
+its own ledger version `20260804120000`, verified by the hosted preflight at 456 checks / 0
+failures. **Not merged and not deployed** — the frontend is still only on the pull-request branch.
+Steps 6–8 of the deployment order below are outstanding.
+
+### Hosted apply, and one defect it exposed
+
+A hosted Supabase project ships `ALTER DEFAULT PRIVILEGES` granting `EXECUTE` on new `public`
+functions to `anon`, `authenticated` and `service_role`. The migration originally revoked only from
+`public` and `anon`, relying on *never granting* `membership_effective_capability_keys(uuid)` to
+`authenticated` — which is enough on a plain PostgreSQL database but **not** on Supabase, where the
+default privilege granted it anyway. On the hosted project the function was therefore briefly
+executable by any signed-in user, the exact membership-id probe its own comment forbids.
+
+The hosted preflight caught it, it was revoked immediately, and the migration now revokes from
+`public, anon, authenticated` before granting the intended audience back, so the result no longer
+depends on the target project's default privileges. Anyone applying this migration to another
+Supabase project must use the current file.
 
 ## Why a second role concept exists
 
@@ -224,5 +239,11 @@ Only after all eight steps, and per customer: create the solution instance, call
 `apply_sports_club_role_presets(organization_id)`, and assign roles through
 **Kunden → Zugriff & Rollen**.
 
-Steps 2–8 have **not** been performed. Nothing was applied, seeded, merged or deployed. Cloudflare
-is the relevant host for steps 6 and 8.
+Steps 1–5 are **done**: CI green, the migration applied to `lqgtmoulqzmrhglabrms` at ledger version
+`20260804120000` with no replacement timestamp, schema and ledger verified, the hosted preflight at
+456 checks / 0 failures, and both existing customers (Cogniiq and Pankofer) confirmed to receive
+exactly the six baseline capabilities with `ai_receptionist` still active.
+
+Steps 6–8 have **not** been performed: nothing is merged, nothing is deployed, no customer data was
+seeded, no functional role was created and no role was assigned to anybody. The SV Heinersreuth
+Supabase project was not touched. Cloudflare is the relevant host for steps 6 and 8.

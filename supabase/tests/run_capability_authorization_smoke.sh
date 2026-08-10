@@ -41,6 +41,15 @@ alter table auth.users add column if not exists email_confirmed_at timestamptz;
 grant usage on schema auth to anon, authenticated, service_role, supabase_auth_admin;
 grant execute on function auth.uid() to public, anon, authenticated, service_role, supabase_auth_admin;
 
+-- Mirror the hosted project's default privileges. A real Supabase project ships
+-- ALTER DEFAULT PRIVILEGES granting EXECUTE on every newly created public function to anon,
+-- authenticated and service_role. Without this line the suite runs on a plain PostgreSQL
+-- database, where a function that is simply never granted to authenticated is unreachable by
+-- it -- so a migration relying on "never granted" passes locally and still leaves the function
+-- callable by every signed-in user in production. That is exactly what happened to
+-- membership_effective_capability_keys(uuid). CI now runs under the hosted condition.
+alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
+
 insert into auth.users (id, email, email_confirmed_at, raw_user_meta_data)
 values
   ('00000000-0000-0000-0000-000000000401', 'cap-admin@example.test',     now(), '{"full_name":"Platform Admin"}'::jsonb),
@@ -827,6 +836,49 @@ begin
                       'organization_member_roles','client_invitation_roles')
     and not c.relrowsecurity;
   if bad is not null then raise exception 'TEST FAILED: tables without RLS: %', bad; end if;
+end $$;
+
+-- ============ The authenticated grant surface is exactly the intended minimum ============
+-- membership_effective_capability_keys takes a MEMBERSHIP ID and does not re-scope to auth.uid().
+-- If authenticated can execute it, any signed-in user can probe another organization's
+-- membership. Asserted here rather than left to "we never granted it", because the bootstrap
+-- above reproduces the hosted default privilege that grants it automatically.
+do $$
+declare
+  probe_reachable boolean;
+  context_reachable boolean;
+  anon_reachable text;
+begin
+  select has_function_privilege('authenticated', p.oid, 'EXECUTE') into probe_reachable
+  from pg_proc p
+  where p.pronamespace = 'public'::regnamespace
+    and p.proname = 'membership_effective_capability_keys';
+  if probe_reachable is not false then
+    raise exception 'TEST FAILED: membership_effective_capability_keys is executable by authenticated (membership-id probe)';
+  end if;
+
+  select has_function_privilege('authenticated', p.oid, 'EXECUTE') into context_reachable
+  from pg_proc p
+  where p.pronamespace = 'public'::regnamespace
+    and p.proname = 'current_user_portal_context';
+  if context_reachable is not true then
+    raise exception 'TEST FAILED: current_user_portal_context is NOT executable by authenticated -- the portal cannot boot';
+  end if;
+
+  select string_agg(p.proname, ', ' order by p.proname) into anon_reachable
+  from pg_proc p
+  where p.pronamespace = 'public'::regnamespace
+    and p.proname in ('portal_baseline_capability_keys','solution_status_entitles_capabilities',
+                      'membership_effective_capability_keys','current_user_portal_context',
+                      'admin_organization_access_overview','assign_organization_member_role',
+                      'remove_organization_member_role','set_client_invitation_roles',
+                      'upsert_organization_role','apply_sports_club_role_presets',
+                      'claim_my_client_invitations')
+    and (has_function_privilege('anon', p.oid, 'EXECUTE')
+         or has_function_privilege('public', p.oid, 'EXECUTE'));
+  if anon_reachable is not null then
+    raise exception 'TEST FAILED: reachable by anon or PUBLIC: %', anon_reachable;
+  end if;
 end $$;
 
 rollback;
