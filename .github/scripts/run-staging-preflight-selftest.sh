@@ -5,11 +5,17 @@
 # A preflight that cannot fail is worthless. This boots a THROWAWAY local
 # PostgreSQL cluster, applies the real migration chain, and asserts the preflight:
 #
-#   1. passes cleanly against a correctly migrated database, and
-#   2. FAILS, with the right check, against each of four deliberately broken
-#      states — a public bucket, a service-role-only function granted to
-#      authenticated, a customer table left readable by anon, and a missing
-#      migration.
+#   1. passes cleanly against a correctly migrated database — with an EXACT
+#      expected assertion count, so a check that silently stops being emitted
+#      is caught just as loudly as a check that fails, and
+#   2. FAILS, with the right check, against every deliberately broken state
+#      below — a public bucket, a service-role-only function granted to
+#      authenticated, a customer table left readable by anon, a missing
+#      migration, and (for the reusable capability authorization migration
+#      20260804120000) a missing table, RLS switched off, a dropped composite
+#      foreign key, a wrong authenticated grant, an accidental anon grant, a
+#      missing capability, a wrong solution binding, and claim-function drift
+#      that loses the functional-role transfer.
 #
 # Never touches Supabase. Each break is applied inside a transaction that is
 # rolled back, so the checks are independent.
@@ -83,13 +89,13 @@ run_preflight() { as "$PGBIN/psql" -h "$SOCK" -U postgres -q -d pre -f "$PREFLIG
 PSQL -d pre -q -f "$MIG/${NEW[0]}.sql" >/dev/null
 OUT="$(run_preflight)"
 for missing in "${NEW[@]:1}"; do
-  if printf '%s\n' "$OUT" | grep -q "^FAIL:.*${missing} is applied"; then
+  if grep -q "^FAIL:.*${missing} is applied" <<<"$OUT"; then
     note_ok "preflight reports $missing as NOT applied while it is missing"
   else
     note_fail "preflight did not detect that $missing is missing"
   fi
 done
-if printf '%s\n' "$OUT" | grep -q "^PASS:.*${NEW[0]} is applied"; then
+if grep -q "^PASS:.*${NEW[0]} is applied" <<<"$OUT"; then
   note_ok "preflight reports ${NEW[0]} as applied once it is"
 else
   note_fail "preflight did not detect ${NEW[0]} as applied"
@@ -103,6 +109,12 @@ for f in "${NEW[@]:1}"; do PSQL -d pre -q -f "$MIG/$f.sql" >/dev/null; done
 # versions and the convergence migration's own version applied, tracking-only
 # (no legacy migration SQL is ever executed here either).
 PSQL -d pre -q -f "$MIG/20260731122000_case_d_legacy_convergence.sql" >/dev/null
+
+# Reusable capability authorization. Applied at its REAL version — the preflight asserts the
+# hosted ledger names 20260804120000 itself, precisely because this project has already been
+# burned once by a generated replacement timestamp.
+PSQL -d pre -q -f "$MIG/20260804120000_reusable_capability_authorization.sql" >/dev/null
+
 PSQL -d pre -c "
   insert into supabase_migrations.schema_migrations (version, name) values
     ('20260607194622', 'create_tasks_table'),
@@ -135,17 +147,26 @@ PSQL -d pre -c "
     ('20260730130000', 'pankofer_organization_reconciliation'),
     ('20260731120000', 'customer_document_publish_guard'),
     ('20260731121000', 'client_provisioning_identity'),
-    ('20260731122000', 'case_d_legacy_convergence');
+    ('20260731122000', 'case_d_legacy_convergence'),
+    ('20260804120000', 'reusable_capability_authorization');
 " >/dev/null
+
+# The EXACT number of assertions the preflight must emit against a correct database.
+# A lower bound would let a whole guarded section stop being emitted — a check that never
+# runs cannot fail, and would look identical to a clean run. Raise this deliberately when
+# checks are added, never to make a red run go green.
+EXPECTED_PASS_COUNT="${EXPECTED_PASS_COUNT:-456}"
 
 OUT="$(run_preflight)"
 FAILED_LINES="$(printf '%s\n' "$OUT" | grep '^FAIL: ' || true)"
 PASS_COUNT="$(printf '%s\n' "$OUT" | grep -c '^PASS: ' || true)"
-if [ -z "$FAILED_LINES" ] && [ "$PASS_COUNT" -gt 60 ]; then
-  note_ok "preflight passes cleanly against the fully migrated chain, case D converged, and ledger repaired ($PASS_COUNT checks)"
-else
+if [ -n "$FAILED_LINES" ]; then
   note_fail "preflight reported failures against a correct database:"
   printf '%s\n' "$FAILED_LINES"
+elif [ "$PASS_COUNT" != "$EXPECTED_PASS_COUNT" ]; then
+  note_fail "preflight emitted $PASS_COUNT passing checks, expected exactly $EXPECTED_PASS_COUNT (a check was added or silently stopped being emitted)"
+else
+  note_ok "preflight passes cleanly against the fully migrated chain, case D converged, capability authorization applied and ledger repaired (exactly $PASS_COUNT checks)"
 fi
 
 # --- 3) Each deliberate break must be CAUGHT ----------------------------------
@@ -160,7 +181,10 @@ $break_sql
 rollback;
 SQL
 )"
-  if printf '%s\n' "$out" | grep -q "^FAIL:.*${expect}"; then
+  # A here-string, not a pipe: `grep -q` exits on its first match, and with `pipefail`
+  # a `printf | grep -q` pipeline reports the writer's EPIPE as a pipeline failure — a
+  # caught break would intermittently be reported as NOT caught.
+  if grep -q "^FAIL:.*${expect}" <<<"$out"; then
     note_ok "preflight catches: $label"
   else
     note_fail "preflight did NOT catch: $label (expected a FAIL matching '${expect}')"
@@ -263,6 +287,172 @@ assert_break "a future-dated shadow version in the ledger" \
 assert_break "a generated-shadow version in the ledger (Class A pattern, no repository file)" \
   "insert into supabase_migrations.schema_migrations (version, name) values ('20260730183911', 'shadow');" \
   "no generated-shadow or otherwise unrecognized version"
+
+# --- Capability authorization falsifications (20260804120000) ----------------
+# Each of these breaks a representative object of the reusable authorization layer and
+# proves the preflight refuses the database afterwards. Without them, adding checks and
+# raising EXPECTED_PASS_COUNT would prove nothing at all.
+
+# Structure -------------------------------------------------------------------
+assert_break "an authorization table missing entirely" \
+  "drop table public.client_invitation_roles cascade;" \
+  "required table public.client_invitation_roles exists"
+
+assert_break "RLS switched off on public.capabilities" \
+  "alter table public.capabilities disable row level security;" \
+  "RLS is enabled on public.capabilities"
+
+assert_break "RLS switched off on public.organization_member_roles" \
+  "alter table public.organization_member_roles disable row level security;" \
+  "RLS is enabled on public.organization_member_roles"
+
+assert_break "the composite member foreign key dropped (cross-tenant assignment becomes possible)" \
+  "alter table public.organization_member_roles drop constraint organization_member_roles_member_fk;" \
+  "COMPOSITE foreign key organization_member_roles_member_fk"
+
+assert_break "the composite invitation foreign key dropped" \
+  "alter table public.client_invitation_roles drop constraint client_invitation_roles_invitation_fk;" \
+  "COMPOSITE foreign key client_invitation_roles_invitation_fk"
+
+assert_break "the composite key the assignment FKs depend on dropped" \
+  "alter table public.organization_members drop constraint organization_members_id_organization_id_key cascade;" \
+  "unique constraint organization_members_id_organization_id_key exists"
+
+assert_break "the invitation role uniqueness constraint dropped" \
+  "alter table public.client_invitation_roles drop constraint client_invitation_roles_unique;" \
+  "unique constraint client_invitation_roles_unique exists"
+
+assert_break "the namespaced capability-key format check dropped" \
+  "alter table public.capabilities drop constraint capabilities_key_format;" \
+  "check constraint capabilities_key_format exists"
+
+assert_break "a required authorization index dropped" \
+  "drop index public.organization_member_roles_member_idx;" \
+  "index public.organization_member_roles_member_idx exists"
+
+assert_break "the invitation-roles admin policy dropped" \
+  "drop policy client_invitation_roles_platform_admin_all on public.client_invitation_roles;" \
+  "RLS policy client_invitation_roles_platform_admin_all exists"
+
+assert_break "a self-service write policy added to organization_member_roles" \
+  "create policy leak_assign on public.organization_member_roles for update to authenticated using (true) with check (true);" \
+  "organization_member_roles has NO write policy reachable without is_platform_admin"
+
+# Grants ----------------------------------------------------------------------
+assert_break "membership_effective_capability_keys granted to authenticated (membership-id probe)" \
+  "grant execute on function public.membership_effective_capability_keys(uuid) to authenticated;" \
+  "membership_effective_capability_keys.*NOT executable by authenticated"
+
+assert_break "current_user_portal_context revoked from authenticated (portal cannot boot)" \
+  "revoke execute on function public.current_user_portal_context() from authenticated;" \
+  "current_user_portal_context() IS executable by authenticated"
+
+assert_break "an authorization RPC exposed to anon" \
+  "grant execute on function public.current_user_portal_context() to anon;" \
+  "current_user_portal_context.*NOT executable by anon"
+
+assert_break "an authorization table exposed to anon" \
+  "grant select on public.organization_member_roles to anon;" \
+  "anon holds NO table privilege on public.organization_member_roles"
+
+assert_break "the capability catalog exposed to anon" \
+  "grant select on public.capabilities to anon;" \
+  "anon holds NO table privilege on public.capabilities"
+
+assert_break "a browser write path opened on an authorization table" \
+  "grant insert on public.organization_member_roles to authenticated;" \
+  "authenticated holds NO INSERT/UPDATE/DELETE on public.organization_member_roles"
+
+assert_break "internal invitation-role CRM data exposed to authenticated" \
+  "grant select on public.client_invitation_roles to authenticated;" \
+  "authenticated holds NO privilege at all on public.client_invitation_roles"
+
+assert_break "authenticated losing SELECT on the capability catalog" \
+  "revoke select on public.capabilities from authenticated;" \
+  "authenticated holds SELECT on public.capabilities"
+
+assert_break "an authorization helper exposed to anon" \
+  "grant execute on function public.portal_baseline_capability_keys() to anon;" \
+  "helper portal_baseline_capability_keys.*NOT executable by anon"
+
+# Function identity ------------------------------------------------------------
+assert_break "an authorization RPC signature drifting" \
+  "drop function public.set_client_invitation_roles(uuid, uuid[]);" \
+  "RPC public.set_client_invitation_roles"
+
+assert_break "a capability RPC losing its pinned search_path" \
+  "alter function public.current_user_portal_context() reset search_path;" \
+  "current_user_portal_context.*pins search_path"
+
+# The claim function keeps its exact signature here — only the additive role-transfer step
+# is lost. That is the drift that looks like a working login and silently strands every
+# invited user on the baseline, so it must be detected by content, not by signature.
+assert_break "claim_my_client_invitations drifting back to a version without the role transfer" \
+  "create or replace function public.claim_my_client_invitations() returns table (organization_id uuid, membership_id uuid) language plpgsql security definer set search_path = public, auth, pg_temp as 'begin return; end';" \
+  "transfers the invitation"
+
+# Catalog content ---------------------------------------------------------------
+assert_break "a capability missing from the catalog" \
+  "delete from public.capabilities where key = 'svh.finance.manage';" \
+  "capability svh.finance.manage exists"
+
+assert_break "a baseline portal capability missing from the catalog" \
+  "delete from public.capabilities where key = 'portal.billing.view';" \
+  "capability portal.billing.view exists"
+
+assert_break "a capability bound to the wrong solution (product gate removed)" \
+  "update public.capabilities set solution_catalog_key = null where key = 'svh.devices.manage';" \
+  "capability svh.devices.manage exists, is active and is bound to sports_club_operations"
+
+assert_break "a general-portal capability wrongly bound to a solution (existing customers lose access)" \
+  "update public.capabilities set solution_catalog_key = 'sports_club_operations' where key = 'portal.projects.view';" \
+  "capability portal.projects.view exists, is active and is bound to the general portal"
+
+assert_break "a capability deactivated in the catalog" \
+  "update public.capabilities set is_active = false where key = 'svh.members.manage';" \
+  "capability svh.members.manage exists"
+
+assert_break "an unrecognized capability key appearing in the catalog" \
+  "insert into public.capabilities (key, label) values ('rogue.capability.view', 'Rogue');" \
+  "no unrecognized capability key"
+
+assert_break "the backward-compatibility baseline changing" \
+  "create or replace function public.portal_baseline_capability_keys() returns text[] language sql immutable set search_path = public as 'select array[''portal.overview.view'']::text[];';" \
+  "returns exactly the six general-portal capabilities"
+
+# Live data ---------------------------------------------------------------------
+assert_break "a cross-organization invitation role assignment present in the data" \
+  "insert into public.organizations (id, name, slug, status) values
+     ('aaaaaaaa-0000-4000-8000-000000000001', 'Falsify A', 'falsify-a', 'active'),
+     ('bbbbbbbb-0000-4000-8000-000000000002', 'Falsify B', 'falsify-b', 'active');
+   insert into public.organization_roles (id, organization_id, role_key, label)
+     values ('cccccccc-0000-4000-8000-000000000003', 'bbbbbbbb-0000-4000-8000-000000000002', 'kassenwart', 'Kassenwart');
+   insert into public.client_invitations (id, organization_id, email)
+     values ('dddddddd-0000-4000-8000-000000000004', 'aaaaaaaa-0000-4000-8000-000000000001', 'falsify@example.test');
+   alter table public.client_invitation_roles drop constraint client_invitation_roles_role_fk;
+   insert into public.client_invitation_roles (organization_id, client_invitation_id, organization_role_id)
+     values ('aaaaaaaa-0000-4000-8000-000000000001', 'dddddddd-0000-4000-8000-000000000004', 'cccccccc-0000-4000-8000-000000000003');" \
+  "no invitation role assignment crosses organizations"
+
+assert_break "a duplicate functional role key inside one organization" \
+  "alter table public.organization_roles drop constraint organization_roles_org_key_unique;
+   insert into public.organizations (id, name, slug, status)
+     values ('aaaaaaaa-0000-4000-8000-000000000011', 'Falsify C', 'falsify-c', 'active');
+   insert into public.organization_roles (organization_id, role_key, label) values
+     ('aaaaaaaa-0000-4000-8000-000000000011', 'kassenwart', 'Kassenwart'),
+     ('aaaaaaaa-0000-4000-8000-000000000011', 'kassenwart', 'Kassenwart (Duplikat)');" \
+  "no duplicate functional role key exists inside one organization"
+
+# Migration ledger ---------------------------------------------------------------
+assert_break "the capability authorization migration missing from the ledger" \
+  "delete from supabase_migrations.schema_migrations where version = '20260804120000';" \
+  "ledger names the capability authorization migration 20260804120000 as applied"
+
+# The exact defect this project has already suffered once: the CLI generating a fresh
+# timestamp instead of applying the repository's own version.
+assert_break "a generated replacement timestamp for the capability authorization migration" \
+  "insert into supabase_migrations.schema_migrations (version, name) values ('20260806094512', 'reusable_capability_authorization');" \
+  "NO generated replacement timestamp"
 
 echo
 if [ "$FAILURES" = "0" ]; then

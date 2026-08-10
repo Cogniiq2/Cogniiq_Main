@@ -53,7 +53,7 @@ export const lifecycleDisplays: Record<ReceptionistLifecycleState, LifecycleDisp
     tone: 'neutral',
   },
   setup_in_progress: {
-    label: 'Einrichtung laeuft',
+    label: 'Einrichtung läuft',
     description: 'Die Basisdaten werden vorbereitet.',
     tone: 'working',
   },
@@ -63,17 +63,17 @@ export const lifecycleDisplays: Record<ReceptionistLifecycleState, LifecycleDisp
     tone: 'working',
   },
   review_required: {
-    label: 'Pruefung erforderlich',
-    description: 'Gefundene Informationen muessen spaeter bestaetigt werden.',
+    label: 'Prüfung erforderlich',
+    description: 'Gefundene Informationen müssen später bestätigt werden.',
     tone: 'attention',
   },
   ready_for_test: {
-    label: 'Bereit fuer Test',
+    label: 'Bereit für Test',
     description: 'Der Testmodus wird freigeschaltet, sobald echte Provisionierung existiert.',
     tone: 'ready',
   },
   ready_for_launch: {
-    label: 'Bereit fuer Start',
+    label: 'Bereit für Start',
     description: 'Go-live bleibt gesperrt, bis Setup, Test, Zahlung und Backend verbunden sind.',
     tone: 'ready',
   },
@@ -89,7 +89,7 @@ export const lifecycleDisplays: Record<ReceptionistLifecycleState, LifecycleDisp
   },
   error: {
     label: 'Fehler',
-    description: 'Eine technische Pruefung waere erforderlich.',
+    description: 'Eine technische Prüfung wäre erforderlich.',
     tone: 'danger',
   },
 };
@@ -102,13 +102,13 @@ export const setupJourney: SetupStep[] = [
   },
   {
     id: 'facts',
-    title: 'Geschaeftsinfos pruefen',
-    description: 'Services, Zeiten, Preise, Regeln und Quellen spaeter bestaetigen.',
+    title: 'Geschäftsinfos prüfen',
+    description: 'Services, Zeiten, Preise, Regeln und Quellen später bestätigen.',
   },
   {
     id: 'receptionist',
     title: 'Rezeptionist konfigurieren',
-    description: 'Rolle, Sprache, Tonalitaet, Grenzen und Eskalation definieren.',
+    description: 'Rolle, Sprache, Tonalität, Grenzen und Eskalation definieren.',
   },
   {
     id: 'phone',
@@ -118,12 +118,12 @@ export const setupJourney: SetupStep[] = [
   {
     id: 'test',
     title: 'Testanruf',
-    description: 'Typische Szenarien pruefen, bevor der Rezeptionist live geht.',
+    description: 'Typische Szenarien prüfen, bevor der Rezeptionist live geht.',
   },
   {
     id: 'launch',
     title: 'Freigabe und Start',
-    description: 'Aktivierung erst nach bestaetigtem Setup, Test, Abrechnung und Provisionierung.',
+    description: 'Aktivierung erst nach bestätigtem Setup, Test, Abrechnung und Provisionierung.',
   },
 ];
 
@@ -131,22 +131,22 @@ export const onboardingStages: SetupStep[] = [
   {
     id: 'company',
     title: 'Unternehmen',
-    description: 'Die wichtigsten Stammdaten fuer die spaetere Recherche und Einrichtung.',
+    description: 'Die wichtigsten Stammdaten für die spätere Recherche und Einrichtung.',
   },
   {
     id: 'goals',
     title: 'Ziele',
-    description: 'Was der KI-Rezeptionist spaeter am Telefon uebernehmen soll.',
+    description: 'Was der KI-Rezeptionist später am Telefon übernehmen soll.',
   },
   {
     id: 'research',
     title: 'Research preview',
-    description: 'Ein ehrlicher Platzhalter fuer die spaetere Website-Analyse.',
+    description: 'Ein ehrlicher Platzhalter für die spätere Website-Analyse.',
   },
   {
     id: 'review',
     title: 'Review preparation',
-    description: 'Welche Informationen spaeter geprueft und korrigiert werden.',
+    description: 'Welche Informationen später geprüft und korrigiert werden.',
   },
   {
     id: 'continue',
@@ -164,7 +164,7 @@ export const researchPreviewSteps: SetupStep[] = [
   {
     id: 'pages',
     title: 'Seiten identifizieren',
-    description: 'Wird verfuegbar, wenn ein Research-Backend angeschlossen ist.',
+    description: 'Wird verfügbar, wenn ein Research-Backend angeschlossen ist.',
   },
   {
     id: 'services',
@@ -173,13 +173,13 @@ export const researchPreviewSteps: SetupStep[] = [
   },
   {
     id: 'facts',
-    title: 'Geschaeftsfakten strukturieren',
+    title: 'Geschäftsfakten strukturieren',
     description: 'Keine Daten werden simuliert.',
   },
   {
     id: 'draft',
     title: 'Rezeptionisten-Entwurf vorbereiten',
-    description: 'Der Entwurf entsteht erst aus echten, bestaetigten Informationen.',
+    description: 'Der Entwurf entsteht erst aus echten, bestätigten Informationen.',
   },
 ];
 
@@ -198,9 +198,9 @@ export const knowledgeSections: KnowledgeSectionConfig[] = [
   },
   {
     id: 'hours',
-    title: 'Oeffnungszeiten',
-    description: 'Regulaere Zeiten, Feiertage, Pausen und Ausnahmen.',
-    emptyLabel: 'Noch keine Oeffnungszeiten hinterlegt',
+    title: 'Öffnungszeiten',
+    description: 'Reguläre Zeiten, Feiertage, Pausen und Ausnahmen.',
+    emptyLabel: 'Noch keine Öffnungszeiten hinterlegt',
   },
   {
     id: 'services',
@@ -211,7 +211,7 @@ export const knowledgeSections: KnowledgeSectionConfig[] = [
   {
     id: 'prices',
     title: 'Preise',
-    description: 'Nur bestaetigte Preise oder klare Weiterleitungsregeln.',
+    description: 'Nur bestätigte Preise oder klare Weiterleitungsregeln.',
     emptyLabel: 'Noch keine Preise hinterlegt',
   },
   {
@@ -223,7 +223,7 @@ export const knowledgeSections: KnowledgeSectionConfig[] = [
   {
     id: 'faqs',
     title: 'FAQs',
-    description: 'Haefige Fragen, sichere Antworten und Grenzen.',
+    description: 'Häufige Fragen, sichere Antworten und Grenzen.',
     emptyLabel: 'Noch keine FAQs hinterlegt',
   },
   {
@@ -247,7 +247,7 @@ export const knowledgeSections: KnowledgeSectionConfig[] = [
   {
     id: 'sources',
     title: 'Quellen',
-    description: 'Website, Dokumente und manuell bestaetigte Informationen.',
+    description: 'Website, Dokumente und manuell bestätigte Informationen.',
     emptyLabel: 'Noch keine Quellen hinterlegt',
   },
 ];
@@ -255,38 +255,38 @@ export const knowledgeSections: KnowledgeSectionConfig[] = [
 export const phoneRoles: PhoneRoleConfig[] = [
   {
     id: 'public',
-    label: 'Bestehende Geschaeftsnummer',
+    label: 'Bestehende Geschäftsnummer',
     description: 'Die Nummer, die Kundinnen und Kunden heute anrufen.',
     placeholder: '+49 ...',
   },
   {
     id: 'ai',
-    label: 'Zukuenftige KI-Nummer',
-    description: 'Die spaeter zugewiesene Nummer fuer den KI-Rezeptionisten.',
+    label: 'Zukünftige KI-Nummer',
+    description: 'Die später zugewiesene Nummer für den KI-Rezeptionisten.',
     placeholder: 'Noch nicht provisioniert',
   },
   {
     id: 'transfer',
     label: 'Human transfer number',
-    description: 'Zielnummer, wenn die KI an einen Menschen uebergibt.',
+    description: 'Zielnummer, wenn die KI an einen Menschen übergibt.',
     placeholder: '+49 ...',
   },
   {
     id: 'urgent',
     label: 'Urgent escalation number',
-    description: 'Optionale Zielnummer fuer dringende Faelle.',
+    description: 'Optionale Zielnummer für dringende Fälle.',
     placeholder: '+49 ...',
   },
   {
     id: 'after_hours',
     label: 'After-hours number',
-    description: 'Optionales Ziel ausserhalb der Oeffnungszeiten.',
+    description: 'Optionales Ziel ausserhalb der Öffnungszeiten.',
     placeholder: '+49 ...',
   },
   {
     id: 'sms',
     label: 'SMS notification number',
-    description: 'Optionale Nummer fuer spaetere Benachrichtigungen.',
+    description: 'Optionale Nummer für spätere Benachrichtigungen.',
     placeholder: '+49 ...',
   },
 ];
@@ -294,64 +294,64 @@ export const phoneRoles: PhoneRoleConfig[] = [
 export const testScenarios: SetupStep[] = [
   {
     id: 'hours',
-    title: 'Oeffnungszeiten-Frage',
-    description: 'Prueft, ob der Rezeptionist nur bestaetigte Zeiten nennt.',
+    title: 'Öffnungszeiten-Frage',
+    description: 'Prüft, ob der Rezeptionist nur bestätigte Zeiten nennt.',
   },
   {
     id: 'service-price',
     title: 'Leistungs- und Preisfrage',
-    description: 'Prueft, ob Preise nicht erfunden werden.',
+    description: 'Prüft, ob Preise nicht erfunden werden.',
   },
   {
     id: 'lead',
     title: 'Neue Kundenanfrage',
-    description: 'Prueft, welche Kontaktdaten spaeter erfasst werden sollen.',
+    description: 'Prüft, welche Kontaktdaten später erfasst werden sollen.',
   },
   {
     id: 'transfer',
     title: 'Menschliche Uebergabe',
-    description: 'Prueft die Transfer-Regel, ohne aktuell einen Anruf auszufuehren.',
+    description: 'Prüft die Transfer-Regel, ohne aktuell einen Anruf auszuführen.',
   },
   {
     id: 'after-hours',
     title: 'After-hours Frage',
-    description: 'Prueft Verhalten ausserhalb der Oeffnungszeiten.',
+    description: 'Prüft Verhalten ausserhalb der Öffnungszeiten.',
   },
   {
     id: 'unknown',
     title: 'Unbekannte Frage',
-    description: 'Prueft, ob Unsicherheit korrekt behandelt wird.',
+    description: 'Prüft, ob Unsicherheit korrekt behandelt wird.',
   },
 ];
 
 export const launchChecklist: LaunchChecklistItem[] = [
   {
     id: 'company',
-    label: 'Unternehmensdetails bestaetigt',
-    description: 'Stammdaten und Kontaktwege muessen geprueft sein.',
+    label: 'Unternehmensdetails bestätigt',
+    description: 'Stammdaten und Kontaktwege müssen geprüft sein.',
     complete: false,
   },
   {
     id: 'hours',
-    label: 'Oeffnungszeiten bestaetigt',
-    description: 'Regulaere Zeiten und Ausnahmen muessen vorliegen.',
+    label: 'Öffnungszeiten bestätigt',
+    description: 'Reguläre Zeiten und Ausnahmen müssen vorliegen.',
     complete: false,
   },
   {
     id: 'services',
-    label: 'Leistungen bestaetigt',
-    description: 'Der Rezeptionist darf nur bestaetigte Leistungen nennen.',
+    label: 'Leistungen bestätigt',
+    description: 'Der Rezeptionist darf nur bestätigte Leistungen nennen.',
     complete: false,
   },
   {
     id: 'behavior',
     label: 'Verhalten konfiguriert',
-    description: 'Tonalitaet, Grenzen und Eskalationsregeln muessen feststehen.',
+    description: 'Tonalität, Grenzen und Eskalationsregeln müssen feststehen.',
     complete: false,
   },
   {
     id: 'phone',
-    label: 'Telefonsetup gewaehlt',
+    label: 'Telefonsetup gewählt',
     description: 'KI-Nummer oder Weiterleitung muss technisch vorbereitet sein.',
     complete: false,
   },
@@ -370,7 +370,7 @@ export const launchChecklist: LaunchChecklistItem[] = [
   {
     id: 'consent',
     label: 'Rechtliche Freigabe akzeptiert',
-    description: 'Einwilligung und Hinweise muessen spaeter eingebunden werden.',
+    description: 'Einwilligung und Hinweise müssen später eingebunden werden.',
     complete: false,
   },
   {

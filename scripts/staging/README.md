@@ -20,7 +20,7 @@ nothing here runs automatically.
 
 | File | What it does | Writes? |
 |---|---|---|
-| `preflight.sql` | 300+ read-only assertions about database state (184 release-9 assertions + Case D tasks/execution_*/oura_* convergence invariants) | no |
+| `preflight.sql` | 456 read-only assertions about database state (release-9 assertions + Case D tasks/execution_*/oura_* convergence invariants + the reusable capability authorization layer of migration 20260804120000) | no |
 | `preflight.sh` | Runs the above, exits non-zero on any mismatch | no |
 | `verify-endpoints.mjs` | Edge Function health, frontend↔backend agreement, bucket privacy | no |
 | `seed-staging-fixtures.sh` | Guarded entry point for the fixture loader | **yes** |
@@ -30,6 +30,17 @@ nothing here runs automatically.
 `preflight.sql` now also fingerprints migrations 6–9 and asserts that the normalized
 company-name indexes are **not** unique — uniqueness there would make a deliberate
 same-name split un-representable and break provisioning outright.
+
+It additionally fingerprints `20260804120000_reusable_capability_authorization`: the five
+authorization tables with RLS, their primary/unique/composite-foreign/check constraints and
+indexes, the complete capability catalog with its expected solution bindings, every new RPC
+signature with `SECURITY DEFINER` and a pinned `search_path`, the exact grant posture (`anon`
+gets nothing; `authenticated` gets the intended minimum, which excludes
+`membership_effective_capability_keys` and includes `current_user_portal_context`), the
+additive functional-role transfer inside `claim_my_client_invitations()`, the required RLS
+policies, the absence of cross-organization assignment rows and duplicate capability or
+organization-role keys, and a migration ledger that names **exactly** version `20260804120000`
+with no generated replacement timestamp.
 
 No credentials live in this directory or anywhere else in the repository. Every
 connection string comes from the environment at run time.
@@ -295,7 +306,7 @@ and unused by the previous build.
 The tooling here is itself tested, in CI, against throwaway local PostgreSQL clusters:
 
 ```bash
-bash .github/scripts/run-staging-preflight-selftest.sh   # preflight catches 13 deliberate breaks
+bash .github/scripts/run-staging-preflight-selftest.sh   # exactly 456 checks pass; 58 deliberate breaks are caught
 bash .github/scripts/run-staging-seed-selftest.sh        # every seeder interlock refuses; fixtures + cleanup work
 ```
 

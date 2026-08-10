@@ -2,7 +2,6 @@ import { Suspense } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { ShieldAlert } from 'lucide-react';
 
-import { CustomerAppShell } from '@/components/app/CustomerAppShell';
 import {
   AppButton,
   AppEmptyState,
@@ -15,9 +14,7 @@ import { resolveImplementation } from '@/lib/solutions/registry';
 
 export function SolutionPage() {
   return (
-    <CustomerAppShell>
-      <SolutionGuardedContent />
-    </CustomerAppShell>
+    <SolutionGuardedContent />
   );
 }
 

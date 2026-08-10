@@ -69,6 +69,12 @@ jobs:
       - name: Commercial publishing UI + duplicate-prevention integration tests
         run: node .github/scripts/test-commercial-publishing-ui.mjs
 
+      # Behavioural component/hook tests (vitest + jsdom). The .mjs scripts above are STRUCTURAL
+      # source assertions; these actually render the guards and the access context, so a guard that
+      # failed open at runtime while still looking correct in source is caught here.
+      - name: Frontend unit tests (vitest)
+        run: npm test
+
       - name: Typecheck
         run: npm run typecheck
 
@@ -134,6 +140,45 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
         run: bash supabase/tests/run_owner_finance_smoke.sh
+
+  capability-authorization-sql-tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure PostgreSQL client
+        run: |
+          if ! command -v psql >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes postgresql-client
+          fi
+
+      # Applies the real migration chain plus the reusable capability authorization migration to a
+      # clean database and asserts the authorization boundary: anon isolation, cross-organization
+      # denial, own-context-only reads, platform-admin management, ordinary-member refusal,
+      # cross-organization assignment blocked BOTH through the RPC and with RLS bypassed,
+      # invitation role transfer exactly once, claim idempotency, capability unions, suspended
+      # memberships, immediate revocation, inactive-solution suppression, the role-free invitation
+      # flow, existing-customer compatibility, and direct-table bypass attempts.
+      - name: Capability authorization SQL security tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+        run: bash supabase/tests/run_capability_authorization_smoke.sh
 
   customer-platform-sql-tests:
     runs-on: ubuntu-latest

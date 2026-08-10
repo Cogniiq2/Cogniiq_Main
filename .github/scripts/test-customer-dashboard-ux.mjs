@@ -24,18 +24,48 @@ const unavailable = read('src/components/app/EntitlementUnavailablePage.tsx');
 const primitives = read('src/components/app/CustomerAppPrimitives.tsx');
 const sectionPage = read('src/pages/app/CustomerSectionPage.tsx');
 
-// ---------------------------------------------------------------- 1) navigation breakpoint gap
-// The desktop cluster, the mobile trigger and the mobile panel must all switch at the SAME
-// breakpoint as the desktop nav row (lg). Any md: variant among them re-opens the dead zone.
-ok(/className="hidden items-center gap-2 lg:flex"/.test(shell), 'desktop header cluster switches at lg (not md)');
-ok(/text-gray-700 lg:hidden"/.test(shell), 'mobile menu trigger is hidden from lg up (not md)');
-ok(/border-t border-gray-100 bg-white lg:hidden"/.test(shell), 'mobile nav panel is hidden from lg up (not md)');
-ok(/border-t border-gray-100 bg-white\/80 lg:block/.test(shell), 'desktop nav row still appears at lg');
-ok(!/\bmd:hidden\b/.test(shell), 'no md:hidden remains in the shell (would recreate the 768-1023px gap)');
-ok(!/\bmd:flex\b/.test(shell), 'no md:flex remains in the shell (would recreate the 768-1023px gap)');
-// The org switcher lives in the desktop cluster, which is now lg-only, so the mobile panel must
-// carry its own switcher or multi-org users lose it below 1024px.
-ok(/customer-organization-select-mobile/.test(shell), 'mobile panel provides an organization switcher');
+// ---------------------------------------------------------------- 1) navigation breakpoint contract
+// Both authenticated surfaces render ONE premium vertical sidebar shell. The responsive contract
+// has three states and no gap between them:
+//   ≥1024px (lg) full 272px sidebar · 768–1023px (md) 80px rail · <768px top bar + drawer.
+// The historic 768–1023px dead zone (no navigation at all) is impossible here by construction:
+// the persistent sidebar appears at md, and the drawer trigger is hidden from exactly the same
+// breakpoint — so the two ranges abut rather than overlap or leave a hole.
+const premiumShell = read('src/components/shell/PremiumShell.tsx');
+
+ok(/<aside\b/.test(premiumShell), 'the shell renders a real <aside> sidebar element');
+ok(/data-shell-nav="primary-desktop"/.test(premiumShell), 'the persistent sidebar is tagged as the primary desktop navigation');
+ok(/hidden w-20 flex-col border-r[^"]*md:flex/.test(premiumShell), 'the sidebar is a vertical 80px rail from md up');
+ok(/collapsed \? '' : 'lg:w-\[272px\]'/.test(premiumShell), 'the sidebar expands to 272px at lg unless the user collapsed it');
+ok(/md:pl-20/.test(premiumShell), 'content is offset by the rail width at md (no overlap)');
+ok(/collapsed \? '' : 'lg:pl-\[272px\]'/.test(premiumShell), 'content is offset by the full sidebar width at lg');
+ok(/backdrop-blur-xl md:hidden/.test(premiumShell), 'the slim top bar exists only below md');
+ok(/fixed inset-0 z-50 md:hidden/.test(premiumShell), 'the drawer exists only below md — it never overlays tablet or desktop content');
+// The two ranges must switch at the SAME breakpoint. The drawer and the top bar are `md:hidden`
+// and the sidebar is `md:flex`, so 768px is one clean handover; an `lg:hidden` on either of those
+// two elements would re-open a range with no navigation at all.
+ok(!/(top bar|drawer)[^\n]*lg:hidden/.test(premiumShell), 'neither the top bar nor the drawer switches at lg');
+ok((premiumShell.match(/md:hidden/g) ?? []).length >= 2, 'top bar and drawer both hand over at md');
+
+// The customer shell must render THROUGH that one shell — never its own header/nav markup.
+ok(/<PremiumShell/.test(shell), 'the customer shell renders the premium sidebar shell');
+ok(!/<header/.test(shell), 'the customer shell no longer builds its own horizontal header');
+ok(!/<nav/.test(shell), 'the customer shell no longer builds its own navigation element');
+// A multi-organization member must keep the switcher at EVERY width: inline in the expanded
+// sidebar, inside the profile menu at rail widths, and inside the mobile drawer.
+ok(/data-testid="customer-organization-select"/.test(shell), 'the customer shell provides an organization switcher');
+ok(/contextSlot=\{organizationSwitcher\}/.test(shell), 'the switcher is handed to the shell as the context slot');
+// Three placements, mutually exclusive by breakpoint: inline (lg expanded), profile menu (rail),
+// drawer (<md). Losing the middle one is exactly how the old 768–1023px gap was born.
+ok((premiumShell.match(/>\{contextSlot\}</g) ?? []).length === 3,
+  'the context slot is placed for all three responsive states (sidebar, rail menu, drawer)');
+ok(/contextSlot \?[\s\S]{0,200}collapsed \? '' : 'lg:hidden'/.test(premiumShell),
+  'rail widths surface the context slot in the profile menu, so it is never lost between 768 and 1023px');
+
+// The owner shell must render through the SAME component — one shell system, two nav models.
+const ownerShell = read('src/components/dashboard/DashboardShell.tsx');
+ok(/<PremiumShell/.test(ownerShell), 'the owner shell renders the premium sidebar shell');
+ok(!/<header/.test(ownerShell), 'the owner shell no longer builds its own horizontal header');
 
 // ---------------------------------------------------------------- 2) entitlement denial is explained
 ok(!/<Navigate to="\/app" replace \/>/.test(guard), 'entitlement guard no longer silently redirects to /app');
@@ -96,12 +126,51 @@ const customerApi = read('src/lib/customerPlatform/customerApi.ts');
 const customerTypes = read('src/lib/customerPlatform/types.ts');
 const platformPrimitives = read('src/components/app/CustomerPlatformPrimitives.tsx');
 
-/* Routes exist and are protected. */
-for (const route of ['/app/projects/:projectId', '/app/documents', '/app/billing']) {
-  const pattern = new RegExp(`path="${route.replace(/[/:]/g, (c) => '\\' + c)}"[^>]*element=\\{<ProtectedRoute>`);
-  ok(pattern.test(app), `${route} is registered behind ProtectedRoute`);
+/* Routes exist and are protected.
+   Authentication is no longer applied per route: the whole /app subtree sits inside
+   CustomerPortalBoundary, which applies the SAME ProtectedRoute and then bootstraps the
+   portal-access context once. Each route additionally declares the capability it requires.
+   Both halves are asserted — losing either one would silently open a customer surface. */
+const boundary = read('src/components/app/CapabilityRoute.tsx');
+
+/* (a) The boundary still authenticates, and still does so with ProtectedRoute. */
+ok(/export function CustomerPortalBoundary/.test(boundary), 'the /app subtree has a portal boundary');
+ok(/<ProtectedRoute>[\s\S]*<\/ProtectedRoute>/.test(boundary),
+  'CustomerPortalBoundary still applies ProtectedRoute (authentication is unchanged)');
+ok(/PortalAccessProvider/.test(boundary), 'the boundary bootstraps the portal-access context');
+
+/* (b) Every customer route is inside that boundary's element subtree. Isolate the boundary's
+       <Route element={<CustomerPortalBoundary />}> ... </Route> block so a route accidentally
+       moved outside it cannot satisfy the per-route checks below. */
+const boundaryBlock =
+  /<Route element=\{<CustomerPortalBoundary \/>\}>([\s\S]*?)\n\s*<\/Route>/.exec(app);
+ok(boundaryBlock !== null, 'App.tsx nests the customer routes inside CustomerPortalBoundary');
+const guardedRoutes = boundaryBlock?.[1] ?? '';
+
+/* (c) Each protected route is wrapped in CapabilityRoute AND requires the right capability. */
+const routeCapabilities = {
+  '/app/projects/:projectId': 'portal.projects.view',
+  '/app/documents': 'portal.documents.view',
+  '/app/billing': 'portal.billing.view',
+};
+for (const [route, capability] of Object.entries(routeCapabilities)) {
+  const escaped = route.replace(/[/:]/g, (c) => '\\' + c);
+  const pattern = new RegExp(
+    `path="${escaped}"[^>]*element=\\{<CapabilityRoute requires=\\{\\['${capability}'\\]\\}>`
+  );
+  ok(pattern.test(guardedRoutes),
+    `${route} is registered inside CustomerPortalBoundary behind CapabilityRoute requires ${capability}`);
 }
-ok(/BillingPage \/><\/ProtectedRoute>/.test(app), '/app/billing renders the real BillingPage, not the old stub');
+ok(/<CapabilityRoute requires=\{\['portal\.billing\.view'\]\}><BillingPage \/><\/CapabilityRoute>/.test(app),
+  '/app/billing renders the real BillingPage, not the old stub');
+
+/* (d) The guard fails CLOSED. A guard that rendered children while the context was still
+       loading, or that dropped the requirement, would flash unauthorized content. */
+ok(/if \(status === 'loading'\) return <AuthLoadingScreen \/>;/.test(boundary),
+  'CapabilityRoute renders a loading screen, never the page, while access is unknown');
+ok(/hasEveryCapability\(requires\)/.test(boundary), 'CapabilityRoute enforces the required capabilities');
+ok(/status === 'unauthenticated'/.test(boundary) && /\/app\/login\?redirectTo=/.test(boundary),
+  'an expired session is redirected to login instead of rendering the page');
 
 /* The billing stub is gone entirely. */
 ok(!/BillingExperience/.test(sectionPage), 'the placeholder BillingExperience is removed');
@@ -135,12 +204,21 @@ ok(!activeStatuses.includes('paused'), 'paused is NOT an active status');
 ok(/projects\.filter\(isActiveCustomerProject\)/.test(home), 'the home page filters to active projects only');
 
 /* Home page cards are conditional on real data — no decorative empties. */
-ok(/customerActions\.length \? <NextActionCard/.test(home), '"Ihre nächste Aktion" renders only when one exists');
-ok(/next_action_owner === 'customer'/.test(home), 'the next-action card is limited to actions the CUSTOMER owns');
+ok(/customerAction \? <NextActionBanner/.test(home), '"Ihre nächste Aktion" renders only when one exists');
+// The ownership rule itself now lives in the tested model module; the page must delegate to
+// it rather than re-deriving the condition inline.
+const portalModel = read('src/lib/customerPlatform/customerPortalModel.ts');
+ok(/next_action_owner === 'customer'/.test(portalModel),
+  'the next-action rule is gated on CUSTOMER ownership');
+ok(/pickCustomerNextAction\(activeProjects, primaryProject\)/.test(home),
+  'the home page delegates next-action selection to that rule');
 ok(/recentDocuments\.length \? \(/.test(home), 'recent documents render only when documents exist');
-ok(/openInvoices\.length \? \(/.test(home), 'open invoices render only when invoices are open');
-ok(/contactProject \? <ContactCard/.test(home), 'the contact card renders only when a verified contact exists');
-ok(/activeProjects\.length \? \(/.test(home) && /<NoProjectState/.test(home),
+// Billing is a summary panel now: it renders for an organization that HAS been invoiced and
+// says "alles ausgeglichen" otherwise, rather than disappearing.
+ok(/if \(!totalInvoices\) return null;/.test(home), 'the billing panel is absent only when nothing was ever invoiced');
+ok(/contactProject\?\.contact_display_name \? \(/.test(home),
+  'the contact card renders only when a verified contact exists');
+ok(/primaryProject \? \(/.test(home) && /<NoProjectState/.test(home),
   'with no project the home page shows the real onboarding state instead of empty cards');
 ok(!/Letzte Aktivität/.test(home), 'the permanently-empty "Letzte Aktivität" section is gone');
 
@@ -148,7 +226,7 @@ ok(!/Letzte Aktivität/.test(home), 'the permanently-empty "Letzte Aktivität" s
 for (const tab of ['Übersicht', 'Meilensteine', 'Dokumente', 'Abrechnung']) {
   ok(new RegExp(`label: '${tab}'`).test(projectDetail), `project detail has a ${tab} section`);
 }
-ok(/Ihre nächste Aktion/.test(projectDetail) && /Nächster Schritt bei Cogniiq/.test(projectDetail),
+ok(/Ihre nächste Aktion/.test(projectDetail) && /Cogniiq arbeitet aktuell an/.test(projectDetail),
   'project detail states explicitly whether the customer or Cogniiq must act');
 ok(/Nächster Meilenstein/.test(projectDetail), 'project detail surfaces the next milestone');
 ok(/customer_safe_blocker_summary/.test(projectDetail), 'project detail shows the customer-safe blocker summary');
@@ -173,9 +251,47 @@ ok(!/stripe|Stripe/.test(billingPage), 'no payment provider is wired into the bi
 ok(/Online-Zahlungsfunktion ist in dieser Version bewusst nicht enthalten/.test(billingPage),
   'the billing page states plainly that online payment is not included');
 
-/* Navigation exposes the new surfaces. */
-ok(/label: 'Dokumente', href: '\/app\/documents'/.test(shell), 'Dokumente is in the primary navigation');
-ok(/label: 'Abrechnung', href: '\/app\/billing'/.test(shell), 'Abrechnung is in the primary navigation');
+/* Navigation exposes the new surfaces.
+   The static list moved out of the shell into the capability-derived navigation model. Each entry
+   must still exist, must still point at the same href, and must now declare the capability that
+   gates it — a nav entry whose requiredCapabilities drifted from its route guard would either
+   dead-end the user or advertise a surface they cannot open. */
+const navigation = read('src/lib/portalAccess/navigation.ts');
+for (const [label, href, capability] of [
+  ['Dokumente', '/app/documents', 'portal.documents.view'],
+  ['Abrechnung', '/app/billing', 'portal.billing.view'],
+  ['Übersicht', '/app', 'portal.overview.view'],
+]) {
+  const pattern = new RegExp(
+    `label: '${label}', href: '${href.replace(/\//g, '\\/')}',[^}]*requiredCapabilities: \\['${capability}'\\]`
+  );
+  ok(pattern.test(navigation),
+    `${label} is in the primary navigation, gated on ${capability}`);
+}
+
+/* The nav entry and the route guard must agree, or navigation lies about what is reachable. */
+for (const [href, capability] of [['/app/documents', 'portal.documents.view'],
+                                  ['/app/billing', 'portal.billing.view']]) {
+  const navEntry = new RegExp(
+    `href: '${href.replace(/\//g, '\\/')}',[^}]*requiredCapabilities: \\['${capability}'\\]`
+  );
+  const routeEntry = new RegExp(
+    `path="${href.replace(/\//g, '\\/')}"[^>]*requires=\\{\\['${capability}'\\]\\}`
+  );
+  ok(navEntry.test(navigation) && routeEntry.test(app),
+    `${href} requires the same capability in navigation and in its route guard`);
+}
+
+/* The shell must DERIVE navigation rather than hard-code it, or capabilities cannot affect it. */
+ok(/buildPortalNavigation/.test(shell), 'the shell derives navigation from capabilities + solutions');
+ok(!/label: 'Dokumente', href: '\/app\/documents'/.test(shell),
+  'the shell no longer hard-codes the navigation list');
+
+/* Access must never be decided per customer. */
+for (const source of [navigation, boundary, read('src/contexts/PortalAccessContext.tsx')]) {
+  ok(!/organization(\w*)\.name\s*===/i.test(source), 'no navigation or guard branches on an organization name');
+  ok(!/[\w.+-]+@[\w-]+\.[a-z]{2,}/i.test(source), 'no hard-coded email address decides access');
+}
 
 // ---------------------------------------------------------------- 6) owner-side management
 const ownerApi = read('src/lib/customerPlatform/ownerProjectsApi.ts');

@@ -13,8 +13,31 @@ export default {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+        // Cogniiq product radii. One scale for every authenticated surface so cards, controls
+        // and overlays never drift between the owner dashboard and the customer portal.
+        control: 'var(--cq-radius-control)',
+        card: 'var(--cq-radius-card)',
+        panel: 'var(--cq-radius-panel)',
+      },
+      boxShadow: {
+        // Surface hierarchy: resting card → hovered/clickable card → floating panel → overlay.
+        card: 'var(--cq-shadow-card)',
+        'card-hover': 'var(--cq-shadow-card-hover)',
+        panel: 'var(--cq-shadow-panel)',
+        overlay: 'var(--cq-shadow-overlay)',
+      },
+      transitionTimingFunction: {
+        premium: 'var(--cq-ease)',
+      },
+      transitionDuration: {
+        fast: 'var(--cq-duration-fast)',
+        base: 'var(--cq-duration-base)',
+        slow: 'var(--cq-duration-slow)',
       },
       colors: {
+        // Product canvas + hairline used by both authenticated shells.
+        canvas: 'var(--cq-canvas)',
+        hairline: 'var(--cq-hairline)',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

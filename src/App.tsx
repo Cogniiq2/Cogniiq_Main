@@ -8,7 +8,8 @@ import { PremiumFooterReveal } from './components/PremiumFooterReveal';
 import { LocalBusinessSchema } from './components/LocalBusinessSchema';
 import { CanonicalManager } from './components/CanonicalManager';
 import { CityServicePage } from './components/CityServicePage';
-import { ProtectedRoute } from './components/auth/ProtectedRoute';
+// Authentication is applied inside CustomerPortalBoundary, which wraps the whole /app subtree.
+import { CapabilityRoute, CustomerPortalBoundary } from './components/app/CapabilityRoute';
 import { RoleLandingPage } from './components/auth/RoleLandingPage';
 import { LegacyLoginRedirect, LegacyOwnerRedirect } from './components/auth/LegacyRedirects';
 import { InternalWorkspaceLayout } from './pages/admin/InternalWorkspace';
@@ -418,22 +419,30 @@ export function AppInner() {
         <Route path="/app/signup" element={<SignupPage />} />
         <Route path="/app/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/app/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/app" element={<ProtectedRoute><AppHomePage /></ProtectedRoute>} />
-        <Route path="/app/solutions" element={<ProtectedRoute><SolutionsIndexPage /></ProtectedRoute>} />
-        <Route path="/app/solutions/:instanceKey/*" element={<ProtectedRoute><SolutionPage /></ProtectedRoute>} />
-        <Route path="/app/support" element={<ProtectedRoute><SupportPage /></ProtectedRoute>} />
-        <Route path="/app/onboarding" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="onboarding" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
-        <Route path="/app/receptionist" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="receptionist" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
-        <Route path="/app/knowledge" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="knowledge" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
-        <Route path="/app/phone" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="phone" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
-        <Route path="/app/test" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="test" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
-        <Route path="/app/calls" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="calls" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
-        <Route path="/app/leads" element={<ProtectedRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="leads" /></ReceptionistEntitlementRoute></ProtectedRoute>} />
-        <Route path="/app/projects/:projectId" element={<ProtectedRoute><ProjectDetailPage /></ProtectedRoute>} />
-        <Route path="/app/documents" element={<ProtectedRoute><DocumentsPage /></ProtectedRoute>} />
-        <Route path="/app/billing" element={<ProtectedRoute><BillingPage /></ProtectedRoute>} />
-        <Route path="/app/settings" element={<ProtectedRoute><CustomerSectionPage section="settings" /></ProtectedRoute>} />
-        <Route path="/app/*" element={<ProtectedRoute><Navigate to="/app" replace /></ProtectedRoute>} />
+        {/* Customer portal. CustomerPortalBoundary authenticates (unchanged ProtectedRoute) and
+            then bootstraps the portal-access context ONCE for the whole subtree. Individual routes
+            declare the capabilities they need; CapabilityRoute fails closed while loading, on
+            error and on a missing capability. The database enforces the same boundaries
+            independently — none of this is the security control. */}
+        <Route element={<CustomerPortalBoundary />}>
+          <Route path="/app" element={<CapabilityRoute requires={['portal.overview.view']}><AppHomePage /></CapabilityRoute>} />
+          <Route path="/app/solutions" element={<CapabilityRoute><SolutionsIndexPage /></CapabilityRoute>} />
+          <Route path="/app/solutions/:instanceKey/*" element={<CapabilityRoute><SolutionPage /></CapabilityRoute>} />
+          <Route path="/app/support" element={<CapabilityRoute requires={['portal.support.view_own']}><SupportPage /></CapabilityRoute>} />
+          <Route path="/app/onboarding" element={<CapabilityRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="onboarding" /></ReceptionistEntitlementRoute></CapabilityRoute>} />
+          <Route path="/app/receptionist" element={<CapabilityRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="receptionist" /></ReceptionistEntitlementRoute></CapabilityRoute>} />
+          <Route path="/app/knowledge" element={<CapabilityRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="knowledge" /></ReceptionistEntitlementRoute></CapabilityRoute>} />
+          <Route path="/app/phone" element={<CapabilityRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="phone" /></ReceptionistEntitlementRoute></CapabilityRoute>} />
+          <Route path="/app/test" element={<CapabilityRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="test" /></ReceptionistEntitlementRoute></CapabilityRoute>} />
+          <Route path="/app/calls" element={<CapabilityRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="calls" /></ReceptionistEntitlementRoute></CapabilityRoute>} />
+          <Route path="/app/leads" element={<CapabilityRoute><ReceptionistEntitlementRoute><CustomerSectionPage section="leads" /></ReceptionistEntitlementRoute></CapabilityRoute>} />
+          <Route path="/app/projects/:projectId" element={<CapabilityRoute requires={['portal.projects.view']}><ProjectDetailPage /></CapabilityRoute>} />
+          <Route path="/app/documents" element={<CapabilityRoute requires={['portal.documents.view']}><DocumentsPage /></CapabilityRoute>} />
+          <Route path="/app/billing" element={<CapabilityRoute requires={['portal.billing.view']}><BillingPage /></CapabilityRoute>} />
+          {/* Own profile and account: not an organization permission, so not capability-gated. */}
+          <Route path="/app/settings" element={<CustomerSectionPage section="settings" />} />
+          <Route path="/app/*" element={<Navigate to="/app" replace />} />
+        </Route>
 
         {/* Unified internal workspace (/admin/*) — one shell, role-aware nav, owner-only finance. */}
         <Route element={<InternalWorkspaceLayout />}>
