@@ -134,14 +134,35 @@ platform admin.
 
 ## Deployment order (later, deliberately not performed here)
 
-1. Review and merge the pull request.
-2. Apply `20260804120000_reusable_capability_authorization.sql` to the hosted Cogniiq Supabase
-   project. It is additive and forward-only; existing customers are unaffected on application
-   because every existing member has zero functional roles and therefore receives the baseline.
-3. Verify: existing customers still reach `/app`, `/app/documents` and `/app/billing`.
-4. Deploy the frontend.
-5. Only then, per customer: create the solution instance, call
-   `apply_sports_club_role_presets(organization_id)`, and assign roles through
-   **Kunden → Zugriff & Rollen**.
+The database must lead the frontend, and the migration must be verified against real Pankofer data
+**before** the branch is merged. The order below is not interchangeable: merging first would put a
+capability-gated frontend in front of a database that cannot answer `current_user_portal_context()`,
+and every existing customer would fail closed.
 
-Steps 2–5 have **not** been performed. Nothing was applied, seeded or deployed.
+1. **CI green.** Every job on PR #21 passes — including the capability authorization SQL security
+   job, which applies this migration to a clean database and asserts the whole boundary.
+2. **Apply the hosted migration.** Apply
+   `20260804120000_reusable_capability_authorization.sql` to the hosted Cogniiq Supabase project.
+   It is additive and forward-only. Existing customers are unaffected the moment it lands, because
+   every existing member holds zero functional roles and therefore receives the baseline.
+3. **Verify Pankofer.** Against hosted data, confirm the existing customer is intact *before*
+   anything ships:
+   - `current_user_portal_context()` returns their organization with `membership_status = 'active'`;
+   - their effective capabilities contain the six baseline keys;
+   - their `ai_receptionist` solution is still listed;
+   - `organization_has_accessible_solution(<org>, 'ai_receptionist')` is still true.
+   If any of these is wrong, stop — do not merge.
+4. **Test the Cloudflare PR preview.** With the hosted migration applied, exercise the preview
+   deployment for PR #21: sign in as an existing customer and confirm `/app`, `/app/documents` and
+   `/app/billing` still render, and that **Kunden → Zugriff & Rollen** loads for a platform admin.
+   This is the first point at which the new frontend meets the migrated database.
+5. **Merge** the pull request.
+6. **Verify Cloudflare production.** After the production deployment, repeat the step 4 checks on
+   the production URL.
+
+Only after all six steps, and per customer: create the solution instance, call
+`apply_sports_club_role_presets(organization_id)`, and assign roles through
+**Kunden → Zugriff & Rollen**.
+
+Steps 2–6 have **not** been performed. Nothing was applied, seeded, merged or deployed. Cloudflare
+is the relevant host for steps 4 and 6.

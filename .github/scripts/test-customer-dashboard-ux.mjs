@@ -96,12 +96,51 @@ const customerApi = read('src/lib/customerPlatform/customerApi.ts');
 const customerTypes = read('src/lib/customerPlatform/types.ts');
 const platformPrimitives = read('src/components/app/CustomerPlatformPrimitives.tsx');
 
-/* Routes exist and are protected. */
-for (const route of ['/app/projects/:projectId', '/app/documents', '/app/billing']) {
-  const pattern = new RegExp(`path="${route.replace(/[/:]/g, (c) => '\\' + c)}"[^>]*element=\\{<ProtectedRoute>`);
-  ok(pattern.test(app), `${route} is registered behind ProtectedRoute`);
+/* Routes exist and are protected.
+   Authentication is no longer applied per route: the whole /app subtree sits inside
+   CustomerPortalBoundary, which applies the SAME ProtectedRoute and then bootstraps the
+   portal-access context once. Each route additionally declares the capability it requires.
+   Both halves are asserted — losing either one would silently open a customer surface. */
+const boundary = read('src/components/app/CapabilityRoute.tsx');
+
+/* (a) The boundary still authenticates, and still does so with ProtectedRoute. */
+ok(/export function CustomerPortalBoundary/.test(boundary), 'the /app subtree has a portal boundary');
+ok(/<ProtectedRoute>[\s\S]*<\/ProtectedRoute>/.test(boundary),
+  'CustomerPortalBoundary still applies ProtectedRoute (authentication is unchanged)');
+ok(/PortalAccessProvider/.test(boundary), 'the boundary bootstraps the portal-access context');
+
+/* (b) Every customer route is inside that boundary's element subtree. Isolate the boundary's
+       <Route element={<CustomerPortalBoundary />}> ... </Route> block so a route accidentally
+       moved outside it cannot satisfy the per-route checks below. */
+const boundaryBlock =
+  /<Route element=\{<CustomerPortalBoundary \/>\}>([\s\S]*?)\n\s*<\/Route>/.exec(app);
+ok(boundaryBlock !== null, 'App.tsx nests the customer routes inside CustomerPortalBoundary');
+const guardedRoutes = boundaryBlock?.[1] ?? '';
+
+/* (c) Each protected route is wrapped in CapabilityRoute AND requires the right capability. */
+const routeCapabilities = {
+  '/app/projects/:projectId': 'portal.projects.view',
+  '/app/documents': 'portal.documents.view',
+  '/app/billing': 'portal.billing.view',
+};
+for (const [route, capability] of Object.entries(routeCapabilities)) {
+  const escaped = route.replace(/[/:]/g, (c) => '\\' + c);
+  const pattern = new RegExp(
+    `path="${escaped}"[^>]*element=\\{<CapabilityRoute requires=\\{\\['${capability}'\\]\\}>`
+  );
+  ok(pattern.test(guardedRoutes),
+    `${route} is registered inside CustomerPortalBoundary behind CapabilityRoute requires ${capability}`);
 }
-ok(/BillingPage \/><\/ProtectedRoute>/.test(app), '/app/billing renders the real BillingPage, not the old stub');
+ok(/<CapabilityRoute requires=\{\['portal\.billing\.view'\]\}><BillingPage \/><\/CapabilityRoute>/.test(app),
+  '/app/billing renders the real BillingPage, not the old stub');
+
+/* (d) The guard fails CLOSED. A guard that rendered children while the context was still
+       loading, or that dropped the requirement, would flash unauthorized content. */
+ok(/if \(status === 'loading'\) return <AuthLoadingScreen \/>;/.test(boundary),
+  'CapabilityRoute renders a loading screen, never the page, while access is unknown');
+ok(/hasEveryCapability\(requires\)/.test(boundary), 'CapabilityRoute enforces the required capabilities');
+ok(/status === 'unauthenticated'/.test(boundary) && /\/app\/login\?redirectTo=/.test(boundary),
+  'an expired session is redirected to login instead of rendering the page');
 
 /* The billing stub is gone entirely. */
 ok(!/BillingExperience/.test(sectionPage), 'the placeholder BillingExperience is removed');
@@ -173,9 +212,47 @@ ok(!/stripe|Stripe/.test(billingPage), 'no payment provider is wired into the bi
 ok(/Online-Zahlungsfunktion ist in dieser Version bewusst nicht enthalten/.test(billingPage),
   'the billing page states plainly that online payment is not included');
 
-/* Navigation exposes the new surfaces. */
-ok(/label: 'Dokumente', href: '\/app\/documents'/.test(shell), 'Dokumente is in the primary navigation');
-ok(/label: 'Abrechnung', href: '\/app\/billing'/.test(shell), 'Abrechnung is in the primary navigation');
+/* Navigation exposes the new surfaces.
+   The static list moved out of the shell into the capability-derived navigation model. Each entry
+   must still exist, must still point at the same href, and must now declare the capability that
+   gates it — a nav entry whose requiredCapabilities drifted from its route guard would either
+   dead-end the user or advertise a surface they cannot open. */
+const navigation = read('src/lib/portalAccess/navigation.ts');
+for (const [label, href, capability] of [
+  ['Dokumente', '/app/documents', 'portal.documents.view'],
+  ['Abrechnung', '/app/billing', 'portal.billing.view'],
+  ['Übersicht', '/app', 'portal.overview.view'],
+]) {
+  const pattern = new RegExp(
+    `label: '${label}', href: '${href.replace(/\//g, '\\/')}',[^}]*requiredCapabilities: \\['${capability}'\\]`
+  );
+  ok(pattern.test(navigation),
+    `${label} is in the primary navigation, gated on ${capability}`);
+}
+
+/* The nav entry and the route guard must agree, or navigation lies about what is reachable. */
+for (const [href, capability] of [['/app/documents', 'portal.documents.view'],
+                                  ['/app/billing', 'portal.billing.view']]) {
+  const navEntry = new RegExp(
+    `href: '${href.replace(/\//g, '\\/')}',[^}]*requiredCapabilities: \\['${capability}'\\]`
+  );
+  const routeEntry = new RegExp(
+    `path="${href.replace(/\//g, '\\/')}"[^>]*requires=\\{\\['${capability}'\\]\\}`
+  );
+  ok(navEntry.test(navigation) && routeEntry.test(app),
+    `${href} requires the same capability in navigation and in its route guard`);
+}
+
+/* The shell must DERIVE navigation rather than hard-code it, or capabilities cannot affect it. */
+ok(/buildPortalNavigation/.test(shell), 'the shell derives navigation from capabilities + solutions');
+ok(!/label: 'Dokumente', href: '\/app\/documents'/.test(shell),
+  'the shell no longer hard-codes the navigation list');
+
+/* Access must never be decided per customer. */
+for (const source of [navigation, boundary, read('src/contexts/PortalAccessContext.tsx')]) {
+  ok(!/organization(\w*)\.name\s*===/i.test(source), 'no navigation or guard branches on an organization name');
+  ok(!/[\w.+-]+@[\w-]+\.[a-z]{2,}/i.test(source), 'no hard-coded email address decides access');
+}
 
 // ---------------------------------------------------------------- 6) owner-side management
 const ownerApi = read('src/lib/customerPlatform/ownerProjectsApi.ts');
