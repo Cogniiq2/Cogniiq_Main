@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { FileText } from 'lucide-react';
 
-import { CustomerAppShell } from '@/components/app/CustomerAppShell';
 import {
   AppEmptyState,
   AppErrorState,
@@ -22,9 +21,7 @@ import { cn } from '@/lib/utils';
 
 export function DocumentsPage() {
   return (
-    <CustomerAppShell>
-      <DocumentsContent />
-    </CustomerAppShell>
+    <DocumentsContent />
   );
 }
 

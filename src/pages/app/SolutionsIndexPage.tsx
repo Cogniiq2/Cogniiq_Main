@@ -1,7 +1,6 @@
 import { ArrowUpRight, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-import { CustomerAppShell } from '@/components/app/CustomerAppShell';
 import {
   AppEmptyState,
   AppErrorState,
@@ -15,9 +14,7 @@ import { resolveImplementation } from '@/lib/solutions/registry';
 
 export function SolutionsIndexPage() {
   return (
-    <CustomerAppShell>
-      <SolutionsIndexContent />
-    </CustomerAppShell>
+    <SolutionsIndexContent />
   );
 }
 

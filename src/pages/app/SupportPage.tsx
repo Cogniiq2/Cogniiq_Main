@@ -1,14 +1,11 @@
 import { LifeBuoy, Mail } from 'lucide-react';
 
-import { CustomerAppShell } from '@/components/app/CustomerAppShell';
 import { AppCard, AppPageHeader, AppSection } from '@/components/app/CustomerAppPrimitives';
 import { useOrganizationSolutions } from '@/hooks/useOrganizationSolutions';
 
 export function SupportPage() {
   return (
-    <CustomerAppShell>
-      <SupportContent />
-    </CustomerAppShell>
+    <SupportContent />
   );
 }
 

@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { CreditCard } from 'lucide-react';
 
-import { CustomerAppShell } from '@/components/app/CustomerAppShell';
 import {
   AppCard,
   AppEmptyState,
@@ -22,9 +21,7 @@ import { formatCentsCurrencyDe } from '@/lib/ownerFinance/exports/format';
 
 export function BillingPage() {
   return (
-    <CustomerAppShell>
-      <BillingContent />
-    </CustomerAppShell>
+    <BillingContent />
   );
 }
 

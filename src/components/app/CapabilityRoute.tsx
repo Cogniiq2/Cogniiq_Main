@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react';
+import { Suspense, type ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 
 import { AuthLoadingScreen } from '@/components/auth/AuthLoadingScreen';
+import { CustomerAppShell } from '@/components/app/CustomerAppShell';
 import { EntitlementUnavailablePage } from '@/components/app/EntitlementUnavailablePage';
 import { PortalAccessProvider, usePortalAccess, usePortalAccessValue } from '@/contexts/PortalAccessContext';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
@@ -11,8 +12,14 @@ import { Outlet } from 'react-router-dom';
  * The customer portal boundary.
  *
  * Authentication first (unchanged ProtectedRoute), then ONE portal-access bootstrap for the whole
- * /app subtree. Every /app route renders inside this, so the access context is loaded once per
- * authenticated session rather than once per page.
+ * /app subtree, then ONE premium shell for the whole /app subtree. Every /app route renders inside
+ * this, so the access context is loaded once per authenticated session rather than once per page,
+ * and the sidebar is genuinely persistent: navigating between customer routes swaps only the
+ * content area, so the sidebar never remounts and its active indicator can animate between routes.
+ *
+ * Mounting the shell here — rather than inside each page, as it used to be — is also what makes
+ * "every protected /app route renders the premium shell" a structural property of the route table
+ * instead of a convention every new page has to remember.
  */
 export function CustomerPortalBoundary() {
   return (
@@ -26,7 +33,12 @@ function PortalAccessBoundaryInner() {
   const value = usePortalAccessValue();
   return (
     <PortalAccessProvider value={value}>
-      <Outlet />
+      <CustomerAppShell>
+        {/* Inner boundary so a lazy page chunk suspends the content area only — never the shell. */}
+        <Suspense fallback={<div className="h-40 animate-pulse rounded-[20px] bg-gray-100" aria-hidden="true" />}>
+          <Outlet />
+        </Suspense>
+      </CustomerAppShell>
     </PortalAccessProvider>
   );
 }

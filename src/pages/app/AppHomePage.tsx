@@ -12,7 +12,6 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-import { CustomerAppShell } from '@/components/app/CustomerAppShell';
 import {
   AppButton,
   AppCard,
@@ -53,9 +52,7 @@ import type { OrganizationSolution } from '@/lib/clientPlatform/types';
 
 export function AppHomePage() {
   return (
-    <CustomerAppShell>
-      <AppHomeContent />
-    </CustomerAppShell>
+    <AppHomeContent />
   );
 }
 

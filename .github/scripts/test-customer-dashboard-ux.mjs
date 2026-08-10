@@ -24,18 +24,48 @@ const unavailable = read('src/components/app/EntitlementUnavailablePage.tsx');
 const primitives = read('src/components/app/CustomerAppPrimitives.tsx');
 const sectionPage = read('src/pages/app/CustomerSectionPage.tsx');
 
-// ---------------------------------------------------------------- 1) navigation breakpoint gap
-// The desktop cluster, the mobile trigger and the mobile panel must all switch at the SAME
-// breakpoint as the desktop nav row (lg). Any md: variant among them re-opens the dead zone.
-ok(/className="hidden items-center gap-2 lg:flex"/.test(shell), 'desktop header cluster switches at lg (not md)');
-ok(/text-gray-700 lg:hidden"/.test(shell), 'mobile menu trigger is hidden from lg up (not md)');
-ok(/border-t border-gray-100 bg-white lg:hidden"/.test(shell), 'mobile nav panel is hidden from lg up (not md)');
-ok(/border-t border-gray-100 bg-white\/80 lg:block/.test(shell), 'desktop nav row still appears at lg');
-ok(!/\bmd:hidden\b/.test(shell), 'no md:hidden remains in the shell (would recreate the 768-1023px gap)');
-ok(!/\bmd:flex\b/.test(shell), 'no md:flex remains in the shell (would recreate the 768-1023px gap)');
-// The org switcher lives in the desktop cluster, which is now lg-only, so the mobile panel must
-// carry its own switcher or multi-org users lose it below 1024px.
-ok(/customer-organization-select-mobile/.test(shell), 'mobile panel provides an organization switcher');
+// ---------------------------------------------------------------- 1) navigation breakpoint contract
+// Both authenticated surfaces render ONE premium vertical sidebar shell. The responsive contract
+// has three states and no gap between them:
+//   ≥1024px (lg) full 272px sidebar · 768–1023px (md) 80px rail · <768px top bar + drawer.
+// The historic 768–1023px dead zone (no navigation at all) is impossible here by construction:
+// the persistent sidebar appears at md, and the drawer trigger is hidden from exactly the same
+// breakpoint — so the two ranges abut rather than overlap or leave a hole.
+const premiumShell = read('src/components/shell/PremiumShell.tsx');
+
+ok(/<aside\b/.test(premiumShell), 'the shell renders a real <aside> sidebar element');
+ok(/data-shell-nav="primary-desktop"/.test(premiumShell), 'the persistent sidebar is tagged as the primary desktop navigation');
+ok(/hidden w-20 flex-col border-r[^"]*md:flex/.test(premiumShell), 'the sidebar is a vertical 80px rail from md up');
+ok(/collapsed \? '' : 'lg:w-\[272px\]'/.test(premiumShell), 'the sidebar expands to 272px at lg unless the user collapsed it');
+ok(/md:pl-20/.test(premiumShell), 'content is offset by the rail width at md (no overlap)');
+ok(/collapsed \? '' : 'lg:pl-\[272px\]'/.test(premiumShell), 'content is offset by the full sidebar width at lg');
+ok(/backdrop-blur-xl md:hidden/.test(premiumShell), 'the slim top bar exists only below md');
+ok(/fixed inset-0 z-50 md:hidden/.test(premiumShell), 'the drawer exists only below md — it never overlays tablet or desktop content');
+// The two ranges must switch at the SAME breakpoint. The drawer and the top bar are `md:hidden`
+// and the sidebar is `md:flex`, so 768px is one clean handover; an `lg:hidden` on either of those
+// two elements would re-open a range with no navigation at all.
+ok(!/(top bar|drawer)[^\n]*lg:hidden/.test(premiumShell), 'neither the top bar nor the drawer switches at lg');
+ok((premiumShell.match(/md:hidden/g) ?? []).length >= 2, 'top bar and drawer both hand over at md');
+
+// The customer shell must render THROUGH that one shell — never its own header/nav markup.
+ok(/<PremiumShell/.test(shell), 'the customer shell renders the premium sidebar shell');
+ok(!/<header/.test(shell), 'the customer shell no longer builds its own horizontal header');
+ok(!/<nav/.test(shell), 'the customer shell no longer builds its own navigation element');
+// A multi-organization member must keep the switcher at EVERY width: inline in the expanded
+// sidebar, inside the profile menu at rail widths, and inside the mobile drawer.
+ok(/data-testid="customer-organization-select"/.test(shell), 'the customer shell provides an organization switcher');
+ok(/contextSlot=\{organizationSwitcher\}/.test(shell), 'the switcher is handed to the shell as the context slot');
+// Three placements, mutually exclusive by breakpoint: inline (lg expanded), profile menu (rail),
+// drawer (<md). Losing the middle one is exactly how the old 768–1023px gap was born.
+ok((premiumShell.match(/>\{contextSlot\}</g) ?? []).length === 3,
+  'the context slot is placed for all three responsive states (sidebar, rail menu, drawer)');
+ok(/contextSlot \?[\s\S]{0,200}collapsed \? '' : 'lg:hidden'/.test(premiumShell),
+  'rail widths surface the context slot in the profile menu, so it is never lost between 768 and 1023px');
+
+// The owner shell must render through the SAME component — one shell system, two nav models.
+const ownerShell = read('src/components/dashboard/DashboardShell.tsx');
+ok(/<PremiumShell/.test(ownerShell), 'the owner shell renders the premium sidebar shell');
+ok(!/<header/.test(ownerShell), 'the owner shell no longer builds its own horizontal header');
 
 // ---------------------------------------------------------------- 2) entitlement denial is explained
 ok(!/<Navigate to="\/app" replace \/>/.test(guard), 'entitlement guard no longer silently redirects to /app');

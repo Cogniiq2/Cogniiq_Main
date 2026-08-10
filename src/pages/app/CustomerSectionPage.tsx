@@ -23,7 +23,6 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
-import { CustomerAppShell } from '@/components/app/CustomerAppShell';
 import {
   AppAddButton,
   AppButton,
@@ -156,9 +155,7 @@ const sectionConfig: Record<CustomerSection, {
 
 export function CustomerSectionPage({ section }: { section: CustomerSection }) {
   return (
-    <CustomerAppShell>
-      <CustomerSectionContent section={section} />
-    </CustomerAppShell>
+    <CustomerSectionContent section={section} />
   );
 }
 

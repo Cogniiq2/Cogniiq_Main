@@ -11,7 +11,6 @@ import {
   UserRound,
 } from 'lucide-react';
 
-import { CustomerAppShell } from '@/components/app/CustomerAppShell';
 import {
   AppCard,
   AppEmptyState,
@@ -55,9 +54,7 @@ const TABS: { id: ProjectTab; label: string }[] = [
 
 export function ProjectDetailPage() {
   return (
-    <CustomerAppShell>
-      <ProjectDetailContent />
-    </CustomerAppShell>
+    <ProjectDetailContent />
   );
 }
 
