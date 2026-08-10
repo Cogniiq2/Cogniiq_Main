@@ -250,7 +250,10 @@ export function PremiumShell({
   const railOnly = (base: string, expanded: string) => (collapsed ? base : cn(base, expanded));
 
   return (
-    <div className="min-h-screen bg-[#f7f7f4] text-gray-950">
+    // data-cq-surface opts this whole subtree — sidebar, topbar, drawer and content —
+    // into the product motion tokens and the reduced-motion collapse defined in index.css.
+    // The marketing tree never carries the attribute, so the public site is unaffected.
+    <div data-cq-surface="shell" className="min-h-screen bg-canvas text-gray-950">
       <a
         href="#shell-main"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-xl focus:bg-gray-950 focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-white"

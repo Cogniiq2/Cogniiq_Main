@@ -5,16 +5,26 @@ import type { LucideIcon } from 'lucide-react';
 import { AlertCircle, Check, Circle, Clock3, Info, Plus, RefreshCw } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { easePremium, useMotionPresets } from '@/lib/motion';
 import type { LaunchChecklistItem, LifecycleTone, SetupStep } from './customerPortalModel';
 
-export const appEase: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
+// Customer Portal primitives. Same design tokens as the owner dashboard (rounded-card /
+// border-hairline / shadow-card / ease-premium) with a calmer rhythm: larger type, more air,
+// fewer competing surfaces. Everything here animates opacity and transform only and degrades
+// to no movement under prefers-reduced-motion.
+
+export const appEase: [number, number, number, number] = easePremium;
+
+/** One focus ring for every interactive element in the portal. */
+export const appFocusRing =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas';
 
 export const appFadeUp = {
-  hidden: { opacity: 0, y: 10 },
+  hidden: { opacity: 0, y: 8 },
   visible: (delay = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.42, delay, ease: appEase },
+    transition: { duration: 0.3, delay, ease: appEase },
   }),
 };
 
@@ -41,17 +51,23 @@ export function AppPageHeader({
   action?: ReactNode;
   meta?: ReactNode;
 }) {
+  const motionPresets = useMotionPresets();
   return (
-    <motion.div initial="hidden" animate="visible" variants={appFadeUp} className="mb-10">
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={motionPresets.reduce ? undefined : appFadeUp}
+      className="mb-9 border-b border-hairline pb-7"
+    >
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-3xl">
-          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.22em] text-gray-400">{eyebrow}</p>
-          <h1 className="text-3xl font-bold leading-[1.06] tracking-tight text-gray-950 sm:text-4xl lg:text-[2.75rem]">
+          <p className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">{eyebrow}</p>
+          <h1 className="text-[28px] font-semibold leading-[1.12] tracking-[-0.02em] text-gray-950 sm:text-[34px]">
             {title}
           </h1>
-          <p className="mt-4 max-w-2xl text-[15px] leading-[1.75] text-gray-500">{description}</p>
+          <p className="mt-3.5 max-w-2xl text-[15px] leading-[1.65] text-gray-600">{description}</p>
         </div>
-        {action ? <div className="flex flex-wrap items-center gap-3">{action}</div> : null}
+        {action ? <div className="flex shrink-0 flex-wrap items-center gap-3">{action}</div> : null}
       </div>
       {meta ? <div className="mt-6">{meta}</div> : null}
     </motion.div>
@@ -67,18 +83,14 @@ export function AppCard({
   className?: string;
   interactive?: boolean;
 }) {
+  // A plain <div> unless the card is genuinely clickable — a motion node per card costs
+  // render work on every list, and a resting card has nothing to animate.
+  const base = cn('rounded-card border border-hairline bg-white p-5 shadow-card sm:p-6', className);
+  if (!interactive) return <div className={base}>{children}</div>;
   return (
-    <motion.div
-      whileHover={interactive ? { y: -2 } : undefined}
-      transition={{ duration: 0.2, ease: appEase }}
-      className={cn(
-        'rounded-2xl border border-gray-100 bg-white p-5 shadow-[0_18px_60px_rgba(15,23,42,0.035)] sm:p-6',
-        interactive && 'transition-colors duration-200 hover:border-gray-200 hover:shadow-[0_20px_70px_rgba(15,23,42,0.06)]',
-        className
-      )}
-    >
+    <div className={cn(base, 'transition-[border-color,box-shadow] duration-base ease-premium hover:border-gray-200 hover:shadow-card-hover')}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
@@ -102,12 +114,12 @@ export function AppSection({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="max-w-2xl">
           {eyebrow ? (
-            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">{eyebrow}</p>
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-gray-500">{eyebrow}</p>
           ) : null}
-          <h2 id={`${slugify(title)}-heading`} className="text-2xl font-bold leading-tight tracking-tight text-gray-950">
+          <h2 id={`${slugify(title)}-heading`} className="text-[19px] font-semibold leading-tight tracking-[-0.015em] text-gray-950">
             {title}
           </h2>
-          {description ? <p className="mt-2 text-sm leading-6 text-gray-500">{description}</p> : null}
+          {description ? <p className="mt-2 text-[13.5px] leading-6 text-gray-600">{description}</p> : null}
         </div>
         {action ? <div className="flex flex-wrap gap-2">{action}</div> : null}
       </div>
@@ -143,13 +155,15 @@ export function AppButton({
   onClick?: ButtonHTMLAttributes<HTMLButtonElement>['onClick'];
 }) {
   const baseClass = cn(
-    'group inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 active:scale-[0.99]',
-    variant === 'primary' &&
-      'bg-gray-900 px-6 py-3.5 text-white shadow-sm hover:-translate-y-0.5 hover:bg-gray-700 hover:shadow-md',
+    'group inline-flex select-none items-center justify-center gap-2 rounded-control text-[13.5px] font-semibold',
+    'transition-[background-color,border-color,color,box-shadow,transform] duration-fast ease-premium',
+    'active:scale-[0.985] motion-reduce:active:scale-100',
+    appFocusRing,
+    variant === 'primary' && 'min-h-11 bg-gray-950 px-5 text-white shadow-sm hover:bg-gray-800',
     variant === 'secondary' &&
-      'border border-gray-200 bg-white px-5 py-3 text-gray-700 hover:border-gray-400 hover:bg-gray-50',
-    variant === 'text' && 'px-1 py-1 text-gray-500 hover:text-gray-950',
-    disabled && 'pointer-events-none cursor-not-allowed opacity-45 hover:translate-y-0 hover:shadow-sm',
+      'min-h-11 border border-gray-200 bg-white px-4 text-gray-700 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-950',
+    variant === 'text' && 'px-1 py-1 text-gray-600 hover:text-gray-950',
+    disabled && 'pointer-events-none cursor-not-allowed opacity-45',
     className
   );
   const content = (
@@ -218,7 +232,7 @@ export function AppInPreparationBadge({ label = 'In Vorbereitung' }: { label?: s
  */
 export function AppReadOnlyNotice({ children }: { children: ReactNode }) {
   return (
-    <div className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
+    <div className="mb-6 flex items-start gap-3 rounded-card border border-amber-200 bg-amber-50 px-4 py-3">
       <Info size={15} className="mt-0.5 flex-shrink-0 text-amber-700" aria-hidden="true" />
       <p className="text-[12.5px] leading-5 text-amber-800">{children}</p>
     </div>
@@ -237,7 +251,10 @@ export function AppStatusBadge({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.14em]',
+        // max-w-full + truncate: this badge also carries the organisation NAME on the
+        // portal home, and a long German company name at 390px was 435px wide on its own
+        // — 45px past the viewport. Short status labels are unaffected.
+        'inline-flex max-w-full items-center gap-1.5 truncate whitespace-nowrap rounded-lg border px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.12em]',
         toneClasses[tone]
       )}
     >
@@ -261,12 +278,13 @@ export function AppEmptyState({
   compact?: boolean;
 }) {
   return (
-    <div className={cn('rounded-2xl border border-gray-100 bg-gray-50/80 p-6', compact && 'p-4')}>
-      <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500 shadow-sm">
-        <Icon size={17} aria-hidden="true" />
+    // data-qa marks the intentional state for the route harness; inert in the browser.
+    <div data-qa="empty-state" className={cn('rounded-card border border-dashed border-gray-200 bg-white/60 p-7', compact && 'p-5')}>
+      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-control border border-gray-200 bg-gray-50 text-gray-400">
+        <Icon size={18} aria-hidden="true" />
       </div>
-      <h3 className="text-base font-semibold tracking-tight text-gray-950">{title}</h3>
-      <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">{description}</p>
+      <h3 className="text-[15px] font-semibold tracking-tight text-gray-950">{title}</h3>
+      <p className="mt-2 max-w-2xl text-[13.5px] leading-6 text-gray-600">{description}</p>
       {action ? <div className="mt-5 flex flex-wrap gap-2">{action}</div> : null}
     </div>
   );
@@ -283,17 +301,26 @@ export function AppProgress({
   return (
     <div>
       {label ? (
-        <div className="mb-2 flex items-center justify-between gap-3 text-[11px] font-semibold text-gray-400">
+        <div className="mb-2 flex items-center justify-between gap-3 text-[11px] font-semibold text-gray-500">
           <span>{label}</span>
-          <span>{normalized}%</span>
+          <span className="tabular-nums text-gray-950">{normalized}%</span>
         </div>
       ) : null}
-      <div className="h-1.5 overflow-hidden rounded-full bg-gray-100">
+      <div
+        className="h-1.5 overflow-hidden rounded-full bg-gray-100"
+        role="progressbar"
+        aria-valuenow={normalized}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={label}
+      >
+        {/* scaleX rather than width: the bar animates on the compositor and never
+            reflows the card around it. */}
         <motion.div
-          className="h-full rounded-full bg-gray-900"
+          className="h-full w-full origin-left rounded-full bg-gray-950"
           initial={false}
-          animate={{ width: `${normalized}%` }}
-          transition={{ duration: 0.45, ease: appEase }}
+          animate={{ scaleX: normalized / 100 }}
+          transition={{ duration: 0.4, ease: appEase }}
         />
       </div>
     </div>
@@ -318,8 +345,8 @@ export function AppStepList({
             layout
             transition={{ duration: 0.24, ease: appEase }}
             className={cn(
-              'relative overflow-hidden rounded-2xl border p-4 transition-colors duration-200',
-              isActive ? 'border-gray-300 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.045)]' : 'border-gray-100 bg-gray-50/80',
+              'relative overflow-hidden rounded-card border p-4 transition-colors duration-base ease-premium',
+              isActive ? 'border-gray-300 bg-white shadow-card' : 'border-hairline bg-gray-50/80',
               isPast && 'border-emerald-100 bg-emerald-50/40'
             )}
           >
@@ -334,7 +361,7 @@ export function AppStepList({
               />
             </div>
             <h3 className="text-sm font-semibold leading-snug text-gray-950">{step.title}</h3>
-            <p className="mt-2 text-[13px] leading-relaxed text-gray-500">{step.description}</p>
+            <p className="mt-2 text-[13px] leading-relaxed text-gray-600">{step.description}</p>
           </motion.li>
         );
       })}
@@ -357,18 +384,18 @@ export function AppField({
 }) {
   return (
     <label className={cn('block', className)} htmlFor={id}>
-      <span className="mb-1.5 block text-xs font-semibold text-gray-700">{label}</span>
+      <span className="mb-1.5 block text-[12px] font-semibold text-gray-700">{label}</span>
       <input
         id={id}
         aria-invalid={Boolean(error)}
         className={cn(
-          'h-11 w-full rounded-lg border bg-white px-3.5 text-sm text-gray-900 outline-none transition-all duration-200 placeholder:text-gray-300 focus:shadow-[0_0_0_3px_rgba(156,163,175,0.12)] disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400',
-          error ? 'border-red-300 focus:border-red-400' : 'border-gray-200 focus:border-gray-400'
+          'h-11 w-full rounded-control border bg-white px-3.5 text-sm text-gray-900 outline-none transition-colors duration-fast ease-premium placeholder:text-gray-400 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500',
+          error ? 'border-red-300 focus:border-red-400' : 'border-gray-200 hover:border-gray-300 focus:border-gray-400'
         )}
         {...props}
       />
       {error ? <span className="mt-1.5 block text-[12px] leading-5 text-red-600">{error}</span> : null}
-      {!error && description ? <span className="mt-1.5 block text-[12px] leading-5 text-gray-400">{description}</span> : null}
+      {!error && description ? <span className="mt-1.5 block text-[12px] leading-5 text-gray-500">{description}</span> : null}
     </label>
   );
 }
@@ -393,8 +420,8 @@ export function AppTextarea({
         id={id}
         aria-invalid={Boolean(error)}
         className={cn(
-          'min-h-[112px] w-full resize-none rounded-lg border bg-white px-3.5 py-3 text-sm leading-relaxed text-gray-900 outline-none transition-all duration-200 placeholder:text-gray-300 focus:shadow-[0_0_0_3px_rgba(156,163,175,0.12)] disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400',
-          error ? 'border-red-300 focus:border-red-400' : 'border-gray-200 focus:border-gray-400'
+          'min-h-[112px] w-full resize-none rounded-control border bg-white px-3.5 py-3 text-sm leading-relaxed text-gray-900 outline-none transition-colors duration-fast ease-premium placeholder:text-gray-400 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500',
+          error ? 'border-red-300 focus:border-red-400' : 'border-gray-200 hover:border-gray-300 focus:border-gray-400'
         )}
         {...props}
       />
@@ -406,6 +433,7 @@ export function AppTextarea({
 
 export function AppSelect({
   label,
+  labelHidden = false,
   description,
   error,
   id,
@@ -416,6 +444,8 @@ export function AppSelect({
   disabled = false,
 }: {
   label: string;
+  /** Renders the label for assistive technology only — for compact filter rows. */
+  labelHidden?: boolean;
   description?: string;
   error?: string;
   id: string;
@@ -425,9 +455,15 @@ export function AppSelect({
   className?: string;
   disabled?: boolean;
 }) {
+  // Deliberately still a native <select>. The portal has exactly one select system, and a
+  // native listbox is rendered by the platform rather than by the page, so it can never be
+  // clipped by an ancestor's overflow and needs no portal, no focus trap and no
+  // reduced-motion handling of its own.
   return (
     <label className={cn('block', className)} htmlFor={id}>
-      <span className="mb-1.5 block text-xs font-semibold text-gray-700">{label}</span>
+      <span className={cn('mb-1.5 block text-[12px] font-semibold text-gray-700', labelHidden && 'sr-only')}>
+        {label}
+      </span>
       <select
         id={id}
         value={value}
@@ -435,8 +471,10 @@ export function AppSelect({
         aria-invalid={Boolean(error)}
         disabled={disabled}
         className={cn(
-          'h-11 w-full rounded-lg border bg-white px-3.5 text-sm text-gray-900 outline-none transition-all duration-200 focus:shadow-[0_0_0_3px_rgba(156,163,175,0.12)] disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400',
-          error ? 'border-red-300 focus:border-red-400' : 'border-gray-200 focus:border-gray-400'
+          'h-11 w-full rounded-control border bg-white px-3.5 text-sm text-gray-900 outline-none',
+          'transition-colors duration-fast ease-premium disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500',
+          appFocusRing,
+          error ? 'border-red-300 focus:border-red-400' : 'border-gray-200 hover:border-gray-300 focus:border-gray-400'
         )}
       >
         {options.map((option) => (
@@ -446,7 +484,7 @@ export function AppSelect({
         ))}
       </select>
       {error ? <span className="mt-1.5 block text-[12px] leading-5 text-red-600">{error}</span> : null}
-      {!error && description ? <span className="mt-1.5 block text-[12px] leading-5 text-gray-400">{description}</span> : null}
+      {!error && description ? <span className="mt-1.5 block text-[12px] leading-5 text-gray-500">{description}</span> : null}
     </label>
   );
 }
@@ -477,15 +515,16 @@ export function AppSegmentedControl({
               disabled={disabled}
               onClick={() => onChange(option.value)}
               className={cn(
-                'group relative overflow-hidden rounded-xl border px-4 py-3 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60',
-                active ? 'border-gray-400 bg-gray-900 text-white shadow-sm' : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                'group relative overflow-hidden rounded-control border px-4 py-3 text-left transition-[background-color,border-color,color,transform] duration-fast ease-premium active:scale-[0.985] motion-reduce:active:scale-100 disabled:cursor-not-allowed disabled:opacity-60',
+                appFocusRing,
+                active ? 'border-gray-950 bg-gray-950 text-white shadow-sm' : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
               )}
               aria-pressed={active}
             >
               {active ? <motion.span layoutId={`segmented-${label}`} className="absolute inset-x-0 top-0 h-0.5 bg-white/70" /> : null}
               <span className="block text-sm font-semibold">{option.label}</span>
               {option.description ? (
-                <span className={cn('mt-1 block text-[12px] leading-5', active ? 'text-white/65' : 'text-gray-400')}>
+                <span className={cn('mt-1 block text-[12px] leading-5', active ? 'text-white/70' : 'text-gray-500')}>
                   {option.description}
                 </span>
               ) : null}
@@ -509,7 +548,7 @@ export function AppInlineEditor({
   status?: string;
 }) {
   return (
-    <div className="grid gap-4 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3 sm:grid-cols-[1fr_auto] sm:items-center">
+    <div className="grid gap-4 rounded-control border border-hairline bg-gray-50 px-4 py-3 sm:grid-cols-[1fr_auto] sm:items-center">
       <div>
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-400">{label}</p>
         <p className="mt-1 text-sm font-semibold text-gray-900">{value}</p>
@@ -547,7 +586,7 @@ export function AppLaunchChecklist({ items }: { items: LaunchChecklistItem[] }) 
   return (
     <div className="space-y-3">
       {items.map((item) => (
-        <div key={item.id} className="flex gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4">
+        <div key={item.id} className="flex gap-3 rounded-control border border-hairline bg-gray-50 p-4">
           <span
             className={cn(
               'mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border',
@@ -589,7 +628,7 @@ export function AppSaveBar({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.28, ease: appEase }}
       className={cn(
-        'flex flex-col gap-3 rounded-2xl border bg-white/90 px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between',
+        'flex flex-col gap-3 rounded-card border bg-white/95 px-4 py-3 shadow-card sm:flex-row sm:items-center sm:justify-between',
         toneClasses[tone]
       )}
     >
@@ -600,10 +639,11 @@ export function AppSaveBar({
           disabled={actionDisabled}
           onClick={onAction}
           className={cn(
-            'inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2',
+            'inline-flex min-h-11 items-center justify-center gap-2 rounded-control border px-4 text-[13.5px] font-semibold transition-colors duration-fast ease-premium',
+            appFocusRing,
             actionDisabled
               ? 'cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400'
-              : 'border-gray-900 bg-gray-900 text-white hover:bg-gray-700'
+              : 'border-gray-950 bg-gray-950 text-white hover:bg-gray-800'
           )}
         >
           {loading ? 'Speichert...' : actionLabel}
@@ -615,11 +655,14 @@ export function AppSaveBar({
 
 export function AppSkeleton({ label }: { label: string }) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="h-3 w-24 rounded-full bg-gray-100" />
-      <div className="mt-5 space-y-3" aria-label={label}>
-        <div className="h-3 rounded-full bg-gray-100" />
-        <div className="h-3 w-2/3 rounded-full bg-gray-100" />
+    <div role="status" data-qa="skeleton" aria-label={label} className="rounded-card border border-hairline bg-white p-5 shadow-card">
+      <span className="sr-only">{label}</span>
+      <div className="animate-pulse motion-reduce:animate-none" aria-hidden="true">
+        <div className="h-3 w-24 rounded-full bg-gray-100" />
+        <div className="mt-5 space-y-3">
+          <div className="h-3 rounded-full bg-gray-100" />
+          <div className="h-3 w-2/3 rounded-full bg-gray-100" />
+        </div>
       </div>
     </div>
   );
@@ -627,7 +670,7 @@ export function AppSkeleton({ label }: { label: string }) {
 
 export function AppErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div className="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm leading-6 text-red-700">
+    <div role="alert" data-qa="error-state" className="rounded-card border border-red-200/80 bg-red-50/70 p-5 text-[13.5px] leading-6 text-red-800">
       <div className="mb-2 flex items-center gap-2 font-semibold">
         <AlertCircle size={16} aria-hidden="true" />
         Fehlerzustand
@@ -666,8 +709,7 @@ export function AppRouteTransition({ children, routeKey }: { children: ReactNode
       key={routeKey}
       initial={reduceMotion ? false : { opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={reduceMotion ? undefined : { opacity: 0, y: -4 }}
-      transition={{ duration: 0.24, ease: appEase }}
+      transition={reduceMotion ? { duration: 0 } : { duration: 0.24, ease: appEase }}
     >
       {children}
     </motion.div>
@@ -676,8 +718,8 @@ export function AppRouteTransition({ children, routeKey }: { children: ReactNode
 
 export function AppPreviewNotice({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white/75 px-4 py-3">
-      <p className="text-[12.5px] leading-5 text-gray-500">{children}</p>
+    <div className="rounded-card border border-hairline bg-white/75 px-4 py-3">
+      <p className="text-[12.5px] leading-5 text-gray-600">{children}</p>
     </div>
   );
 }
