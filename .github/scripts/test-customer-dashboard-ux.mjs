@@ -204,12 +204,21 @@ ok(!activeStatuses.includes('paused'), 'paused is NOT an active status');
 ok(/projects\.filter\(isActiveCustomerProject\)/.test(home), 'the home page filters to active projects only');
 
 /* Home page cards are conditional on real data — no decorative empties. */
-ok(/customerActions\.length \? <NextActionCard/.test(home), '"Ihre nächste Aktion" renders only when one exists');
-ok(/next_action_owner === 'customer'/.test(home), 'the next-action card is limited to actions the CUSTOMER owns');
+ok(/customerAction \? <NextActionBanner/.test(home), '"Ihre nächste Aktion" renders only when one exists');
+// The ownership rule itself now lives in the tested model module; the page must delegate to
+// it rather than re-deriving the condition inline.
+const portalModel = read('src/lib/customerPlatform/customerPortalModel.ts');
+ok(/next_action_owner === 'customer'/.test(portalModel),
+  'the next-action rule is gated on CUSTOMER ownership');
+ok(/pickCustomerNextAction\(activeProjects, primaryProject\)/.test(home),
+  'the home page delegates next-action selection to that rule');
 ok(/recentDocuments\.length \? \(/.test(home), 'recent documents render only when documents exist');
-ok(/openInvoices\.length \? \(/.test(home), 'open invoices render only when invoices are open');
-ok(/contactProject \? <ContactCard/.test(home), 'the contact card renders only when a verified contact exists');
-ok(/activeProjects\.length \? \(/.test(home) && /<NoProjectState/.test(home),
+// Billing is a summary panel now: it renders for an organization that HAS been invoiced and
+// says "alles ausgeglichen" otherwise, rather than disappearing.
+ok(/if \(!totalInvoices\) return null;/.test(home), 'the billing panel is absent only when nothing was ever invoiced');
+ok(/contactProject\?\.contact_display_name \? \(/.test(home),
+  'the contact card renders only when a verified contact exists');
+ok(/primaryProject \? \(/.test(home) && /<NoProjectState/.test(home),
   'with no project the home page shows the real onboarding state instead of empty cards');
 ok(!/Letzte Aktivität/.test(home), 'the permanently-empty "Letzte Aktivität" section is gone');
 
@@ -217,7 +226,7 @@ ok(!/Letzte Aktivität/.test(home), 'the permanently-empty "Letzte Aktivität" s
 for (const tab of ['Übersicht', 'Meilensteine', 'Dokumente', 'Abrechnung']) {
   ok(new RegExp(`label: '${tab}'`).test(projectDetail), `project detail has a ${tab} section`);
 }
-ok(/Ihre nächste Aktion/.test(projectDetail) && /Nächster Schritt bei Cogniiq/.test(projectDetail),
+ok(/Ihre nächste Aktion/.test(projectDetail) && /Cogniiq arbeitet aktuell an/.test(projectDetail),
   'project detail states explicitly whether the customer or Cogniiq must act');
 ok(/Nächster Meilenstein/.test(projectDetail), 'project detail surfaces the next milestone');
 ok(/customer_safe_blocker_summary/.test(projectDetail), 'project detail shows the customer-safe blocker summary');

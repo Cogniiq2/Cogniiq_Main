@@ -111,19 +111,19 @@ const sectionConfig: Record<CustomerSection, {
   onboarding: {
     title: 'Einrichtung',
     eyebrow: 'Onboarding',
-    description: 'Ein ruhiger, gefuehrter Start fuer Unternehmensdaten, Ziele und die spaetere Recherche.',
+    description: 'Ein ruhiger, geführter Start für Unternehmensdaten, Ziele und die spätere Recherche.',
     icon: Wand2,
   },
   receptionist: {
     title: 'Rezeptionist',
     eyebrow: 'Verhalten',
-    description: 'Identitaet, Sprache, Tonalitaet, Aufgaben und Grenzen des spaeteren KI-Rezeptionisten.',
+    description: 'Identität, Sprache, Tonalität, Aufgaben und Grenzen des späteren KI-Rezeptionisten.',
     icon: Headphones,
   },
   knowledge: {
     title: 'Wissen',
     eyebrow: 'Antwortgrundlage',
-    description: 'Die spaetere Review-Flaeche fuer bestaetigte Geschaeftsdaten, Quellen und manuelle Korrekturen.',
+    description: 'Die spätere Review-Fläche für bestätigte Geschäftsdaten, Quellen und manuelle Korrekturen.',
     icon: BookOpen,
   },
   phone: {
@@ -134,20 +134,20 @@ const sectionConfig: Record<CustomerSection, {
   },
   test: {
     title: 'Test & Start',
-    eyebrow: 'Qualitaet',
-    description: 'Test-Szenarien und Launch-Checkliste, ohne echte Anrufe oder Go-live auszufuehren.',
+    eyebrow: 'Qualität',
+    description: 'Test-Szenarien und Launch-Checkliste, ohne echte Anrufe oder Go-live auszuführen.',
     icon: TestTube2,
   },
   calls: {
     title: 'Anrufe',
     eyebrow: 'Betrieb',
-    description: 'Leere, aber vorbereitete Architektur fuer spaetere echte Anrufdaten.',
+    description: 'Leere, aber vorbereitete Architektur für spätere echte Anrufdaten.',
     icon: Mic2,
   },
   leads: {
     title: 'Leads',
     eyebrow: 'Kontakte',
-    description: 'Leere, aber vorbereitete Architektur fuer spaetere echte Leads.',
+    description: 'Leere, aber vorbereitete Architektur für spätere echte Leads.',
     icon: UserPlus,
   },
   settings: {
@@ -305,7 +305,7 @@ function OnboardingExperience() {
       <AppEmptyState
         icon={Building2}
         title="Keine Organisation verbunden"
-        description="Onboarding-Daten koennen erst gespeichert werden, wenn dieses Konto Mitglied einer Organisation ist."
+        description="Onboarding-Daten können erst gespeichert werden, wenn dieses Konto Mitglied einer Organisation ist."
       />
     );
   }
@@ -403,7 +403,7 @@ function OnboardingExperience() {
               <AppField id="company-address" label="Adresse" value={draft.business.address} disabled={!canEdit} onChange={(event) => updateBusinessField('address', event.target.value)} placeholder="Strasse, PLZ, Ort" />
               <AppField id="company-contact-email" label="Kontakt-E-Mail" value={draft.business.contactEmail} disabled={!canEdit} error={fieldErrors.contactEmail} onChange={(event) => updateBusinessField('contactEmail', event.target.value)} placeholder="name@unternehmen.de" />
               <AppField id="company-contact-person" label="Ansprechpartner" value={draft.business.primaryContactName} disabled={!canEdit} onChange={(event) => updateBusinessField('primaryContactName', event.target.value)} placeholder="Vorname Nachname" />
-              <AppField id="company-business-number" label="Bestehende Geschaeftsnummer" value={draft.business.existingBusinessPhone} disabled={!canEdit} error={fieldErrors.existingBusinessPhone} onChange={(event) => updateBusinessField('existingBusinessPhone', event.target.value)} placeholder="+49 ..." />
+              <AppField id="company-business-number" label="Bestehende Geschäftsnummer" value={draft.business.existingBusinessPhone} disabled={!canEdit} error={fieldErrors.existingBusinessPhone} onChange={(event) => updateBusinessField('existingBusinessPhone', event.target.value)} placeholder="+49 ..." />
             </div>
           ) : null}
 
@@ -432,7 +432,7 @@ function OnboardingExperience() {
               </div>
               <AppTextarea
                 id="preferred-behavior"
-                label="Gewuenschtes Verhalten"
+                label="Gewünschtes Verhalten"
                 value={draft.preferredBehavior}
                 disabled={!canEdit}
                 onChange={(event) => updatePreferredBehavior(event.target.value)}
@@ -446,7 +446,7 @@ function OnboardingExperience() {
               <AppEmptyState
                 icon={Search}
                 title="Research ist noch nicht gestartet"
-                description="Diese Phase zeigt spaeter echte Website-Analyse und strukturierte Geschaeftsfakten. Aktuell wird kein Timer simuliert und kein Backend-Job gestartet."
+                description="Diese Phase zeigt später echte Website-Analyse und strukturierte Geschäftsfakten. Aktuell wird kein Timer simuliert und kein Backend-Job gestartet."
               />
               <AppStepList steps={researchPreviewSteps} currentIndex={-1} />
             </div>
@@ -454,11 +454,11 @@ function OnboardingExperience() {
 
           {stageIndex === 3 ? (
             <div className="grid gap-3 sm:grid-cols-2">
-              {['Leistungen', 'Preise', 'Oeffnungszeiten', 'Team', 'FAQs', 'Richtlinien', 'Kontaktdaten', 'Buchungslinks'].map((item) => (
+              {['Leistungen', 'Preise', 'Öffnungszeiten', 'Team', 'FAQs', 'Richtlinien', 'Kontaktdaten', 'Buchungslinks'].map((item) => (
                 <div key={item} className="rounded-xl border border-hairline bg-gray-50 p-4">
                   <p className="text-sm font-semibold text-gray-900">{item}</p>
                   <p className="mt-2 text-[13px] leading-relaxed text-gray-500">
-                    Wird spaeter aus echten Quellen vorgeschlagen und muss bestaetigt werden.
+                    Wird später aus echten Quellen vorgeschlagen und muss bestätigt werden.
                   </p>
                 </div>
               ))}
@@ -470,12 +470,12 @@ function OnboardingExperience() {
               <AppEmptyState
                 icon={Wand2}
                 title="Weiter in die Detailseiten"
-                description="Unternehmen und Fortschritt koennen gespeichert werden. Wissen, Test und Launch bleiben bis zu spaeteren Backend-Phasen ohne echte Funktion."
+                description="Unternehmen und Fortschritt können gespeichert werden. Wissen, Test und Launch bleiben bis zu späteren Backend-Phasen ohne echte Funktion."
                 action={
                   <>
-                    <AppButton to="/app/knowledge" variant="secondary">Wissen oeffnen</AppButton>
-                    <AppButton to="/app/receptionist" variant="secondary">Rezeptionist oeffnen</AppButton>
-                    <AppButton to="/app/phone" variant="secondary">Telefon oeffnen</AppButton>
+                    <AppButton to="/app/knowledge" variant="secondary">Wissen öffnen</AppButton>
+                    <AppButton to="/app/receptionist" variant="secondary">Rezeptionist öffnen</AppButton>
+                    <AppButton to="/app/phone" variant="secondary">Telefon öffnen</AppButton>
                   </>
                 }
               />
@@ -494,7 +494,7 @@ function OnboardingExperience() {
 
           <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
             <AppButton variant="secondary" disabled={stageIndex === 0} onClick={() => goToStage(stageIndex - 1)}>
-              Zurueck
+              Zurück
             </AppButton>
             <AppButton disabled={stageIndex === onboardingStages.length - 1} onClick={goNext}>
               Weiter
@@ -580,7 +580,7 @@ function ReceptionistExperience() {
       <AppEmptyState
         icon={Building2}
         title="Keine Organisation verbunden"
-        description="Rezeptionistenkonfigurationen koennen erst gespeichert werden, wenn dieses Konto Mitglied einer Organisation ist."
+        description="Rezeptionistenkonfigurationen können erst gespeichert werden, wenn dieses Konto Mitglied einer Organisation ist."
       />
     );
   }
@@ -633,7 +633,7 @@ function ReceptionistExperience() {
         </AppReadOnlyNotice>
       ) : null}
 
-      <AppSection eyebrow="Identitaet" title="Wie der Rezeptionist spaeter auftreten soll">
+      <AppSection eyebrow="Identität" title="Wie der Rezeptionist später auftreten soll">
         <AppCard className="rounded-panel">
           <div className="grid gap-4 md:grid-cols-2">
             <AppField id="receptionist-name" label="Rezeptionistenname" value={draft.receptionistName} disabled={!canEdit || !snapshot.business} onChange={(event) => updateField('receptionistName', event.target.value)} placeholder="Noch nicht festgelegt" />
@@ -665,14 +665,14 @@ function ReceptionistExperience() {
                 { value: 'de', label: 'Deutsch' },
               ]}
             />
-            <AppTextarea id="greeting" label="Begruessung" value={draft.greeting} disabled={!canEdit || !snapshot.business} onChange={(event) => updateField('greeting', event.target.value)} placeholder="Guten Tag, Sie sprechen mit ..." className="md:col-span-2" />
-            <AppTextarea id="after-hours-behavior" label="After-hours Verhalten" value={draft.afterHoursInstruction} disabled={!canEdit || !snapshot.business} onChange={(event) => updateField('afterHoursInstruction', event.target.value)} placeholder="Ausserhalb der Oeffnungszeiten Nachricht aufnehmen, keine Termine bestaetigen ..." />
-            <AppTextarea id="transfer-behavior" label="Transfer Verhalten" value={draft.transferInstruction} disabled={!canEdit || !snapshot.business} onChange={(event) => updateField('transferInstruction', event.target.value)} placeholder="Bei Unsicherheit oder dringenden Anliegen an die Transfernummer uebergeben ..." />
+            <AppTextarea id="greeting" label="Begrüßung" value={draft.greeting} disabled={!canEdit || !snapshot.business} onChange={(event) => updateField('greeting', event.target.value)} placeholder="Guten Tag, Sie sprechen mit ..." className="md:col-span-2" />
+            <AppTextarea id="after-hours-behavior" label="After-hours Verhalten" value={draft.afterHoursInstruction} disabled={!canEdit || !snapshot.business} onChange={(event) => updateField('afterHoursInstruction', event.target.value)} placeholder="Ausserhalb der Öffnungszeiten Nachricht aufnehmen, keine Termine bestätigen ..." />
+            <AppTextarea id="transfer-behavior" label="Transfer Verhalten" value={draft.transferInstruction} disabled={!canEdit || !snapshot.business} onChange={(event) => updateField('transferInstruction', event.target.value)} placeholder="Bei Unsicherheit oder dringenden Anliegen an die Transfernummer übergeben ..." />
           </div>
         </AppCard>
       </AppSection>
 
-      <AppSection eyebrow="Kommunikation" title="Tonalitaet und Aufgaben">
+      <AppSection eyebrow="Kommunikation" title="Tonalität und Aufgaben">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
           <AppCard className="rounded-panel">
             <AppSegmentedControl
@@ -694,7 +694,7 @@ function ReceptionistExperience() {
               compact
               icon={Headphones}
               title="Kein echter Assistent vorhanden"
-              description="Diese Konfiguration wird noch nicht an Vapi oder ein Telefoniesystem uebergeben."
+              description="Diese Konfiguration wird noch nicht an Vapi oder ein Telefoniesystem übergeben."
             />
           </AppCard>
         </div>
@@ -719,7 +719,7 @@ function ReceptionistExperience() {
             onToggle={toggleAllowedAction}
           />
           <RuleColumn
-            title="Einschraenkungen"
+            title="Einschränkungen"
             items={[...receptionistProhibitedActionOptions]}
             labels={receptionistProhibitedActionLabels}
             selectedItems={draft.prohibitedActions}
@@ -751,11 +751,11 @@ function KnowledgeExperience() {
     <div className="space-y-8">
       <AppSection
         eyebrow="Review"
-        title="Geschaeftswissen fuer sichere Antworten"
-        description="Jeder Bereich ist fuer Wert, Quelle, Vertrauen, Bestaetigung und manuelle Korrektur vorbereitet. Aktuell gibt es keine recherchierten Datensaetze."
+        title="Geschäftswissen für sichere Antworten"
+        description="Jeder Bereich ist für Wert, Quelle, Vertrauen, Bestätigung und manuelle Korrektur vorbereitet. Aktuell gibt es keine recherchierten Datensätze."
         action={
           <AppAddButton disabledReason="Eigene Einträge sind möglich, sobald die Wissensbasis mit echten Geschäftsdaten verbunden ist. Bis dahin werden hier bewusst keine Beispieldaten angezeigt.">
-            Information hinzufuegen
+            Information hinzufügen
           </AppAddButton>
         }
       >
@@ -804,10 +804,10 @@ function KnowledgeExperience() {
                 status="Wartet auf Daten"
               />
               <div className="grid gap-3 md:grid-cols-3">
-                {['Quelle', 'Bestaetigung', 'Manuelle Korrektur'].map((label) => (
+                {['Quelle', 'Bestätigung', 'Manuelle Korrektur'].map((label) => (
                   <div key={label} className="rounded-card border border-hairline bg-white p-4">
                     <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">{label}</p>
-                    <p className="mt-2 text-[13px] leading-relaxed text-gray-500">Wird verfuegbar, sobald echte Daten existieren.</p>
+                    <p className="mt-2 text-[13px] leading-relaxed text-gray-500">Wird verfügbar, sobald echte Daten existieren.</p>
                   </div>
                 ))}
               </div>
@@ -816,7 +816,7 @@ function KnowledgeExperience() {
         </div>
       </AppSection>
       <AppSaveBar
-        message="Bearbeiten, Loeschen, Freigeben und Speichern sind als UI-Muster vorbereitet, aber noch nicht mit einer Datenquelle verbunden."
+        message="Bearbeiten, Löschen, Freigeben und Speichern sind als UI-Muster vorbereitet, aber noch nicht mit einer Datenquelle verbunden."
         actionLabel="Speichern folgt"
       />
     </div>
@@ -862,7 +862,7 @@ function PhoneExperience() {
       <AppEmptyState
         icon={Building2}
         title="Keine Organisation verbunden"
-        description="Telefonkonfigurationen koennen erst gespeichert werden, wenn dieses Konto Mitglied einer Organisation ist."
+        description="Telefonkonfigurationen können erst gespeichert werden, wenn dieses Konto Mitglied einer Organisation ist."
       />
     );
   }
@@ -898,13 +898,13 @@ function PhoneExperience() {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
           <AppCard>
             <AppSegmentedControl
-              label="Zukuenftige Einrichtung"
+              label="Zukünftige Einrichtung"
               value={draft.setupMode}
               onChange={(value) => updateField('setupMode', value as PhoneDraft['setupMode'])}
               disabled={!canEdit || !snapshot.business}
               options={[
                 { value: 'ai-number', label: 'Option A: Neue KI-Telefonnummer verwenden', description: 'Provisionierung ist in dieser Phase nicht aktiv.' },
-                { value: 'forwarding', label: 'Option B: Bestehende Geschaeftsnummer weiterleiten', description: 'Weiterleitungshinweise, keine Portierung.' },
+                { value: 'forwarding', label: 'Option B: Bestehende Geschäftsnummer weiterleiten', description: 'Weiterleitungshinweise, keine Portierung.' },
               ]}
             />
             {fieldErrors.setupMode ? <p className="mt-3 text-sm text-red-600">{fieldErrors.setupMode}</p> : null}
@@ -921,7 +921,7 @@ function PhoneExperience() {
         </div>
         <div className="mt-4">
           <AppPreviewNotice>
-            Kundenwerte werden gespeichert. KI-Nummer, Teststatus, Provisionierung und Live-Schaltung bleiben systemkontrolliert und koennen hier nicht gesetzt werden.
+            Kundenwerte werden gespeichert. KI-Nummer, Teststatus, Provisionierung und Live-Schaltung bleiben systemkontrolliert und können hier nicht gesetzt werden.
           </AppPreviewNotice>
         </div>
       </AppSection>
@@ -952,9 +952,9 @@ function PhoneExperience() {
               onChange={(event) => updateField('forwardingConfirmed', event.target.checked)}
             />
             <span>
-              <span className="block text-sm font-semibold text-gray-900">Weiterleitung kundenseitig bestaetigt</span>
+              <span className="block text-sm font-semibold text-gray-900">Weiterleitung kundenseitig bestätigt</span>
               <span className="mt-1 block text-[12.5px] leading-5 text-gray-500">
-                Diese Bestaetigung speichert nur Ihren aktuellen Stand. Sie loest keine technische Aktivierung aus.
+                Diese Bestätigung speichert nur Ihren aktuellen Stand. Sie loest keine technische Aktivierung aus.
               </span>
             </span>
           </label>
@@ -966,14 +966,14 @@ function PhoneExperience() {
           <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Systemstatus</p>
           <h2 className="text-xl font-bold tracking-tight text-gray-950">Teststatus: {formatPhoneTestStatus(snapshot.phoneConfig?.testStatus)}</h2>
           <p className="mt-3 text-sm leading-6 text-gray-500">
-            Der Teststatus ist ein geschuetztes Systemfeld. Kundinnen und Kunden koennen keinen erfolgreichen Test oder Live-Zustand setzen.
+            Der Teststatus ist ein geschütztes Systemfeld. Kundinnen und Kunden können keinen erfolgreichen Test oder Live-Zustand setzen.
           </p>
         </AppCard>
         <AppCard>
           <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Warnung</p>
           <h2 className="text-xl font-bold tracking-tight text-gray-950">Transfer-loop vermeiden</h2>
           <p className="mt-3 text-sm leading-6 text-gray-500">
-            Die menschliche Transfernummer darf nicht wieder auf die KI-Nummer zeigen. Diese Pruefung wird spaeter technisch erzwungen.
+            Die menschliche Transfernummer darf nicht wieder auf die KI-Nummer zeigen. Diese Prüfung wird später technisch erzwungen.
           </p>
         </AppCard>
       </div>
@@ -996,7 +996,7 @@ function TestExperience() {
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <AppCard>
           <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Testen</p>
-          <h2 className="text-2xl font-bold tracking-tight text-gray-950">Testnummer noch nicht verfuegbar</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-gray-950">Testnummer noch nicht verfügbar</h2>
           <p className="mt-3 text-sm leading-6 text-gray-500">
             Browser-Call und Telefonnummer bleiben Platzhalter, bis ein echter Rezeptionist provisioniert ist.
           </p>
@@ -1041,8 +1041,8 @@ function TestExperience() {
             <AppEmptyState
               compact
               icon={Lock}
-              title="Go-live nicht verfuegbar"
-              description="Aktivierung wird erst nach Setup, Test, Zahlung und Backend-Provisionierung moeglich."
+              title="Go-live nicht verfügbar"
+              description="Aktivierung wird erst nach Setup, Test, Zahlung und Backend-Provisionierung möglich."
               action={
                 <AppButton
                   disabled
@@ -1115,7 +1115,7 @@ function OperationalExperience({ type }: { type: 'calls' | 'leads' }) {
           <AppEmptyState icon={isCalls ? Mic2 : UserPlus} title={emptyTitle} description={emptyDescription} compact />
         </AppCard>
         <AppCard>
-          <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Spaetere Detailansicht</p>
+          <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Spätere Detailansicht</p>
           <div className="grid gap-2 sm:grid-cols-2">
             {futureFields.map((field) => (
               <div key={field} className="rounded-xl border border-hairline bg-gray-50 px-4 py-3">
@@ -1276,7 +1276,7 @@ function getSaveFeedback(saveState: SaveStateView, dirty: boolean, canSubmitBase
 } {
   if (!canSubmitBase) {
     return {
-      message: 'Nur Organisations-Owner und Admins koennen diese Daten speichern.',
+      message: 'Nur Organisations-Owner und Admins können diese Daten speichern.',
       actionLabel: 'Speichern',
       canSubmit: false,
       tone: 'neutral',
@@ -1287,7 +1287,7 @@ function getSaveFeedback(saveState: SaveStateView, dirty: boolean, canSubmitBase
 
   if (saveState.status === 'saving') {
     return {
-      message: 'Speichern laeuft. Der gespeicherte Zustand wird erst nach Supabase-Bestaetigung aktualisiert.',
+      message: 'Speichern läuft. Der gespeicherte Zustand wird erst nach Supabase-Bestätigung aktualisiert.',
       actionLabel: 'Speichern',
       canSubmit: false,
       tone: 'working',
@@ -1377,9 +1377,9 @@ function getToneDescription(tone: ReceptionistTone) {
     case 'warm':
       return 'Freundlich und nahbar.';
     case 'concise':
-      return 'Direkt, ohne lange Erklaerungen.';
+      return 'Direkt, ohne lange Erklärungen.';
     case 'formal':
-      return 'Sehr hoeflich und distanziert.';
+      return 'Sehr höflich und distanziert.';
     case 'professional':
     default:
       return 'Ruhig, klar und verbindlich.';
@@ -1451,7 +1451,7 @@ function formatPhoneTestStatus(status: string | null | undefined) {
     case 'queued':
       return 'wartet';
     case 'running':
-      return 'laeuft';
+      return 'läuft';
     case 'failed':
       return 'fehlgeschlagen';
     case 'passed':

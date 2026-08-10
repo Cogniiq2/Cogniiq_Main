@@ -33,10 +33,10 @@ export const onboardingGoalOptions = [
 export type OnboardingGoal = (typeof onboardingGoalOptions)[number];
 
 export const onboardingGoalLabels: Record<OnboardingGoal, string> = {
-  answer_faqs: 'Hauefige Fragen beantworten',
+  answer_faqs: 'Häufige Fragen beantworten',
   capture_leads: 'Leads erfassen',
   transfer_calls: 'Anrufe weiterleiten',
-  capture_appointments: 'Terminwuensche aufnehmen',
+  capture_appointments: 'Terminwünsche aufnehmen',
   after_hours: 'After-hours beantworten',
   multilingual: 'Mehrsprachige Anfragen vorbereiten',
 };
@@ -66,7 +66,7 @@ export const receptionistResponsibilityLabels: Record<ReceptionistResponsibility
   capture_leads: 'Leads erfassen',
   take_messages: 'Nachrichten aufnehmen',
   transfer_calls: 'Anrufe weiterleiten',
-  capture_appointments: 'Terminwuensche sammeln',
+  capture_appointments: 'Terminwünsche sammeln',
   after_hours: 'After-hours behandeln',
 };
 
@@ -80,9 +80,9 @@ export const receptionistAllowedActionOptions = [
 export type ReceptionistAllowedAction = (typeof receptionistAllowedActionOptions)[number];
 
 export const receptionistAllowedActionLabels: Record<ReceptionistAllowedAction, string> = {
-  use_confirmed_facts_only: 'Nur bestaetigte Fakten nennen',
+  use_confirmed_facts_only: 'Nur bestätigte Fakten nennen',
   be_transparent_when_unsure: 'Bei Unsicherheit transparent bleiben',
-  transfer_when_needed: 'Bei Bedarf uebergeben',
+  transfer_when_needed: 'Bei Bedarf übergeben',
   take_messages: 'Nachrichten aufnehmen',
   collect_contact_details: 'Kontaktdaten erfassen',
 };
@@ -99,9 +99,9 @@ export type ReceptionistProhibitedAction = (typeof receptionistProhibitedActionO
 export const receptionistProhibitedActionLabels: Record<ReceptionistProhibitedAction, string> = {
   no_invented_prices: 'Keine Preise erfinden',
   no_binding_appointments: 'Keine Termine verbindlich zusagen',
-  no_refund_promises: 'Keine Erstattungen bestaetigen',
+  no_refund_promises: 'Keine Erstattungen bestätigen',
   no_regulated_advice: 'Keine regulierte Beratung geben',
-  no_unconfirmed_services: 'Keine nicht bestaetigten Leistungen nennen',
+  no_unconfirmed_services: 'Keine nicht bestätigten Leistungen nennen',
 };
 
 export const phoneSetupModes = ['ai-number', 'forwarding'] as const;
@@ -121,7 +121,7 @@ export interface CustomerPortalError {
 export class CustomerPortalValidationError extends Error {
   readonly fieldErrors: Record<string, string>;
 
-  constructor(fieldErrors: Record<string, string>, message = 'Bitte pruefen Sie die markierten Felder.') {
+  constructor(fieldErrors: Record<string, string>, message = 'Bitte prüfen Sie die markierten Felder.') {
     super(message);
     this.name = 'CustomerPortalValidationError';
     this.fieldErrors = fieldErrors;
@@ -638,10 +638,10 @@ function buildBusinessWrite(organizationId: string, draft: BusinessDraft): Busin
   const timezone = draft.timezone.trim() || 'Europe/Berlin';
 
   if (!name) fieldErrors.name = 'Der Unternehmensname ist erforderlich.';
-  if (website && !websitePattern.test(website)) fieldErrors.website = 'Bitte eine gueltige URL mit https:// oder http:// eingeben.';
-  if (contactEmail && !emailPattern.test(contactEmail)) fieldErrors.contactEmail = 'Bitte eine gueltige E-Mail-Adresse eingeben.';
-  if (existingBusinessPhone && !phonePattern.test(existingBusinessPhone)) fieldErrors.existingBusinessPhone = 'Bitte eine gueltige Telefonnummer eingeben.';
-  if (!supportedLanguages.includes(draft.primaryLanguage)) fieldErrors.primaryLanguage = 'Diese Sprache wird noch nicht unterstuetzt.';
+  if (website && !websitePattern.test(website)) fieldErrors.website = 'Bitte eine gültige URL mit https:// oder http:// eingeben.';
+  if (contactEmail && !emailPattern.test(contactEmail)) fieldErrors.contactEmail = 'Bitte eine gültige E-Mail-Adresse eingeben.';
+  if (existingBusinessPhone && !phonePattern.test(existingBusinessPhone)) fieldErrors.existingBusinessPhone = 'Bitte eine gültige Telefonnummer eingeben.';
+  if (!supportedLanguages.includes(draft.primaryLanguage)) fieldErrors.primaryLanguage = 'Diese Sprache wird noch nicht unterstützt.';
 
   if (Object.keys(fieldErrors).length > 0) throw new CustomerPortalValidationError(fieldErrors);
 
@@ -668,8 +668,8 @@ function buildReceptionistWrite(
   const additionalLanguages = uniqueLanguages(draft.additionalLanguages)
     .filter((language) => language !== draft.primaryLanguage);
 
-  if (!supportedLanguages.includes(draft.primaryLanguage)) fieldErrors.primaryLanguage = 'Diese Sprache wird noch nicht unterstuetzt.';
-  if (!receptionistToneOptions.includes(draft.tone)) fieldErrors.tone = 'Dieser Kommunikationsstil wird nicht unterstuetzt.';
+  if (!supportedLanguages.includes(draft.primaryLanguage)) fieldErrors.primaryLanguage = 'Diese Sprache wird noch nicht unterstützt.';
+  if (!receptionistToneOptions.includes(draft.tone)) fieldErrors.tone = 'Dieser Kommunikationsstil wird nicht unterstützt.';
 
   validateStringArray('responsibilities', draft.responsibilities, receptionistResponsibilityOptions, fieldErrors);
   validateStringArray('allowedActions', draft.allowedActions, receptionistAllowedActionOptions, fieldErrors);
@@ -701,7 +701,7 @@ function buildPhoneWrite(organizationId: string, businessId: string, draft: Phon
   const afterHoursNumber = nullableText(draft.afterHoursNumber);
   const smsNotificationNumber = nullableText(draft.smsNotificationNumber);
 
-  if (!phoneSetupModes.includes(draft.setupMode)) fieldErrors.setupMode = 'Diese Telefonmethode wird nicht unterstuetzt.';
+  if (!phoneSetupModes.includes(draft.setupMode)) fieldErrors.setupMode = 'Diese Telefonmethode wird nicht unterstützt.';
   validateOptionalPhone('existingPublicNumber', existingPublicNumber, fieldErrors);
   validateOptionalPhone('humanTransferNumber', humanTransferNumber, fieldErrors);
   validateOptionalPhone('urgentEscalationNumber', urgentEscalationNumber, fieldErrors);
@@ -1011,7 +1011,7 @@ function validateOptionalPhone(
   fieldErrors: Record<string, string>
 ) {
   if (value && !phonePattern.test(value)) {
-    fieldErrors[key] = 'Bitte eine gueltige Telefonnummer eingeben.';
+    fieldErrors[key] = 'Bitte eine gültige Telefonnummer eingeben.';
   }
 }
 
@@ -1024,7 +1024,7 @@ function validateStringArray<T extends readonly string[]>(
   const allowedSet = new Set<string>(allowed);
   const unsupported = values.find((value) => !allowedSet.has(value));
   if (unsupported) {
-    fieldErrors[key] = 'Diese Auswahl wird nicht unterstuetzt.';
+    fieldErrors[key] = 'Diese Auswahl wird nicht unterstützt.';
   }
 }
 

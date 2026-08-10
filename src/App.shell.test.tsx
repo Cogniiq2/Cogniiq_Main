@@ -136,6 +136,7 @@ const ADMIN_ROUTES = [
 const APP_ROUTES = [
   '/app',
   '/app/solutions',
+  '/app/solutions/receptionist-1',
   '/app/documents',
   '/app/billing',
   '/app/support',
