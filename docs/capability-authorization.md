@@ -140,29 +140,89 @@ capability-gated frontend in front of a database that cannot answer `current_use
 and every existing customer would fail closed.
 
 1. **CI green.** Every job on PR #21 passes — including the capability authorization SQL security
-   job, which applies this migration to a clean database and asserts the whole boundary.
-2. **Apply the hosted migration.** Apply
+   job, which applies this migration to a clean database and asserts the whole boundary, and the
+   staging preflight self-test, which proves the preflight actually catches drift in this
+   migration's objects rather than merely counting checks.
+2. **Apply the hosted migration — at its own version, 20260804120000.** Apply
    `20260804120000_reusable_capability_authorization.sql` to the hosted Cogniiq Supabase project.
    It is additive and forward-only. Existing customers are unaffected the moment it lands, because
    every existing member holds zero functional roles and therefore receives the baseline.
-3. **Verify Pankofer.** Against hosted data, confirm the existing customer is intact *before*
+
+   **This project has already suffered migration-ledger drift once** (the `20260801120000` shadow
+   that Case D had to converge). The rules below are not optional:
+
+   * The row in `supabase_migrations.schema_migrations` must be **exactly** `20260804120000`. Not
+     `20260804120001`, not a same-day variant, not a fresh timestamp generated at apply time.
+   * **No generated replacement timestamp.** Do not run anything that re-stamps the migration
+     (`supabase migration new`, a copy-pasted file with a new name, a dashboard-pasted script
+     recorded under a CLI-generated version). Apply the repository file under its own name, or
+     apply its SQL and then record the ledger row explicitly as `20260804120000`.
+   * Ledger and schema drift in either direction is a stop condition: a ledger row without the
+     schema, or the schema without the ledger row, both fail the preflight and both must be
+     resolved before anything else proceeds.
+
+3. **Verify the schema and the migration ledger immediately after applying.** Before touching any
+   customer data or any frontend:
+
+   ```sql
+   -- exactly one row, exactly this version
+   select version, name
+   from supabase_migrations.schema_migrations
+   where version >= '20260801000000'
+   order by version;
+
+   -- the five authorization tables, all with RLS enabled
+   select c.relname, c.relrowsecurity
+   from pg_class c join pg_namespace n on n.oid = c.relnamespace
+   where n.nspname = 'public'
+     and c.relname in ('capabilities', 'organization_roles', 'organization_role_capabilities',
+                       'organization_member_roles', 'client_invitation_roles')
+   order by c.relname;
+   ```
+
+   The first query must return **one** row, `20260804120000`. Any additional or differently-stamped
+   version is the drift this project has already been burned by — stop and reconcile the ledger
+   before continuing. The second must return all five tables with `relrowsecurity = true`.
+
+4. **Run the hosted staging preflight, and require ZERO failures.**
+
+   ```sh
+   DATABASE_URL='postgresql://...' bash scripts/staging/preflight.sh
+   ```
+
+   It is strictly read-only. It fingerprints this migration explicitly: the five tables, RLS,
+   primary/unique/composite-foreign/check constraints, indexes, the complete capability catalog
+   with its expected solution bindings, every new RPC signature, `SECURITY DEFINER` with a pinned
+   `search_path`, the fact that `anon` can neither execute nor read anything, the exact
+   `authenticated` minimum (including that `membership_effective_capability_keys` is *not*
+   executable by `authenticated` while `current_user_portal_context` is), the additive
+   functional-role transfer inside `claim_my_client_invitations()`, the required RLS policies, and
+   the absence of cross-organization assignment rows, invalid invitation-role rows and duplicate
+   capability or organization-role keys. It also re-asserts the ledger rules from step 2.
+
+   **The Cloudflare production merge does not happen while a single preflight check is failing.**
+   A partially applied or re-stamped migration is exactly the state this gate exists to refuse.
+
+5. **Verify Pankofer.** Against hosted data, confirm the existing customer is intact *before*
    anything ships:
    - `current_user_portal_context()` returns their organization with `membership_status = 'active'`;
    - their effective capabilities contain the six baseline keys;
    - their `ai_receptionist` solution is still listed;
    - `organization_has_accessible_solution(<org>, 'ai_receptionist')` is still true.
    If any of these is wrong, stop — do not merge.
-4. **Test the Cloudflare PR preview.** With the hosted migration applied, exercise the preview
+6. **Test the Cloudflare PR preview.** With the hosted migration applied, exercise the preview
    deployment for PR #21: sign in as an existing customer and confirm `/app`, `/app/documents` and
    `/app/billing` still render, and that **Kunden → Zugriff & Rollen** loads for a platform admin.
    This is the first point at which the new frontend meets the migrated database.
-5. **Merge** the pull request.
-6. **Verify Cloudflare production.** After the production deployment, repeat the step 4 checks on
-   the production URL.
+7. **Merge** the pull request into `main` (this is the Cloudflare production merge). Permitted only
+   with step 4 reporting **zero** preflight failures and steps 5–6 clean.
+8. **Verify Cloudflare production.** After the production deployment, repeat the step 6 checks on
+   the production URL, then re-run the preflight (step 4) against the hosted database once more and
+   confirm it is still at zero failures.
 
-Only after all six steps, and per customer: create the solution instance, call
+Only after all eight steps, and per customer: create the solution instance, call
 `apply_sports_club_role_presets(organization_id)`, and assign roles through
 **Kunden → Zugriff & Rollen**.
 
-Steps 2–6 have **not** been performed. Nothing was applied, seeded, merged or deployed. Cloudflare
-is the relevant host for steps 4 and 6.
+Steps 2–8 have **not** been performed. Nothing was applied, seeded, merged or deployed. Cloudflare
+is the relevant host for steps 6 and 8.
