@@ -30,6 +30,26 @@ import { offerStatusLabel } from '@/lib/ownerFinance/customerLabels';
 const tabs = ['Übersicht', 'Kontakte', 'Lösungen', 'Vertrag & Budget', 'Kommerziell', 'Zugang', 'Zugriff & Rollen', 'Kundenportal', 'Aktivität'] as const;
 type Tab = (typeof tabs)[number];
 
+/**
+ * A readable message from whatever was thrown.
+ *
+ * `String(e)` was used here, and PostgREST rejects with a PLAIN OBJECT rather than an Error
+ * — so a failed load rendered the literal text "Fehler: [object Object]" at the operator.
+ * Every shape the client can throw is unwrapped before falling back to a German sentence.
+ */
+function errorMessageOf(value: unknown): string {
+  if (value instanceof Error && value.message) return value.message;
+  if (typeof value === 'string' && value.trim()) return value;
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    for (const key of ['message', 'error_description', 'error', 'details', 'hint']) {
+      const candidate = record[key];
+      if (typeof candidate === 'string' && candidate.trim()) return candidate;
+    }
+  }
+  return 'Unbekannter Fehler.';
+}
+
 export function ClientDetailPage() {
   const { organizationId } = useParams<{ organizationId: string }>();
   const [detail, setDetail] = useState<AdminClientDetail | null>(null);
@@ -45,7 +65,7 @@ export function ClientDetailPage() {
       setDetail(await loadClientDetail(organizationId));
       setError(null);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorMessageOf(e));
     } finally {
       setLoading(false);
     }
@@ -56,7 +76,23 @@ export function ClientDetailPage() {
   const flash = (message: string) => { setNotice(message); setTimeout(() => setNotice(null), 3000); };
 
   if (loading) return <div className="h-40 animate-pulse rounded-2xl border border-gray-100 bg-white" />;
-  if (error) return <AdminCard><p className="text-sm text-red-600">Fehler: {error}</p></AdminCard>;
+  if (error) {
+    return (
+      <AdminCard>
+        <div role="alert" data-qa="error-state">
+          <p className="text-sm font-semibold text-gray-950">Der Kunde konnte nicht geladen werden.</p>
+          <p className="mt-1.5 text-sm text-red-600">{error}</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => void reload()}
+          className="mt-4 inline-flex min-h-11 items-center justify-center rounded-control border border-gray-200 bg-white px-4 text-[13.5px] font-semibold text-gray-700 transition-colors duration-fast ease-premium hover:border-gray-300 hover:bg-gray-50 hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2"
+        >
+          Erneut laden
+        </button>
+      </AdminCard>
+    );
+  }
   if (!detail || !detail.account) {
     return (
       <AdminCard>

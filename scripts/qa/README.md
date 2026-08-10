@@ -1,43 +1,48 @@
-# Dashboard shell browser QA
+# Route QA
 
-`shell-qa.html` + `shell-qa-entry.tsx` are a **dev-only** harness for `src/components/shell/PremiumShell.tsx`.
-They are not referenced by `index.html`, not part of any route, and not included in `npm run build`
-(Vite builds the single `index.html` entry) — they exist purely so a real browser can be pointed at
-the shell without a Supabase session.
+Browser QA for the two authenticated surfaces, run against the **production build** and a
+deterministic in-memory fixture layer. Nothing here reads from or writes to hosted Supabase:
+every request to the Supabase origin is intercepted and answered from literals, and the
+session is synthetic (its token is not a JWT and authenticates nothing).
 
-## Why it exists
+## What runs
 
-`jsdom` has no layout engine and does not evaluate Tailwind's media queries, so the vitest suites in
-`src/components/shell/PremiumShell.test.tsx` and `src/App.shell.test.tsx` can only assert structure
-and the class contract. The question that actually regressed — *at 1440px, is the primary navigation
-a vertical sidebar on the left, and does the content sit beside it rather than under it?* — can only
-be answered by measuring real geometry.
+| Harness | What it answers |
+| --- | --- |
+| `.github/scripts/qa-dashboard-shell.mjs` | Is the primary navigation a persistent vertical sidebar at 1440/1280/1024/834/390, for both roles, with a working mobile drawer and reduced-motion support? |
+| `scripts/qa/route-qa.mjs` | Does every listed route render **populated**, **empty** and **error** without console errors, horizontal overflow or sub-44px option rows? |
 
 ## Running it
 
 ```bash
-npm ci
-node .github/scripts/qa-dashboard-shell.mjs
+# The build must carry the QA Supabase placeholders, or the app throws at boot.
+VITE_SUPABASE_URL=https://example.supabase.co VITE_SUPABASE_ANON_KEY=qa-placeholder npm run build
+npx vite preview --port 4173 --strictPort &
+
+node scripts/qa/route-qa.mjs --out qa-screenshots            # everything
+node scripts/qa/route-qa.mjs --out qa-screenshots --only app # one route subset
 ```
 
-Requires a Chromium and the `playwright` package. The script auto-detects a browser under
-`$PLAYWRIGHT_BROWSERS_PATH` (default `/opt/pw-browsers`); override with `PW_CHROMIUM=/path/to/chrome`,
-and point `PW_MODULE` at a Playwright installation if it is not resolvable from the repo.
+Playwright is deliberately **not** a `package.json` dependency and CI does not invoke these:
+they are development tools. Set `PW_CHROMIUM`, or `PLAYWRIGHT_BROWSERS_PATH`, to point at a
+Chromium.
 
-It starts the project's own dev server, then drives both shells (`?surface=owner` and
-`?surface=customer`) at 1440×900, 1280×800, 1024×768, 834×1194 and 390×844, asserting:
+Output lands in `--out` (git-ignored): one screenshot per route × scenario × viewport, plus
+`route-qa-report.md` and `route-qa-report.json`. The run exits non-zero on any finding.
 
-- the sidebar is vertical, pinned left, and 260–280px (rail: 76–88px);
-- no horizontal primary navigation bar is present at desktop or tablet widths;
-- content starts after the sidebar — never underneath it;
-- the document never scrolls horizontally, before or after navigating;
-- the profile dropdown opens fully inside the viewport;
-- keyboard focus reaches the sidebar navigation;
-- the mobile drawer opens, locks body scroll, traps focus, and closes on Escape, an outside click
-  and route selection, with ≥44×44px touch targets;
-- reduced motion removes the shared-layout indicator animation and the navigation transitions;
-- the console stays clean.
+## Scenarios
 
-It is not wired into `.github/workflows/build.yml`: CI would have to install Playwright and a
-browser, and the invariants that can be checked without a layout engine are already covered by
-`npm test`.
+`populated`, `empty`, `loading` and `error` are selected per run and applied to the whole
+surface, so a route can be photographed in each state without touching the app.
+
+One RPC is **scenario-invariant**: `current_user_portal_context`. "Empty" means the
+organization holds no projects, documents or invoices — not that the caller has no access
+context. Blanking it would make every capability guard fail closed and the harness would
+photograph the guard instead of the empty state.
+
+## Isolation
+
+`src/test/qaFixtureIsolation.test.ts` fails the test suite if anything under `src/` imports
+`scripts/qa/fixtures/`. That is what keeps "test-only" a checked property rather than a
+comment — the fixtures invent customers, invoices and German company names, and none of it
+may ever reach a production bundle.
