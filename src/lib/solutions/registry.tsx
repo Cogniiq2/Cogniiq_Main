@@ -109,6 +109,12 @@ const unavailableImplementation: SolutionImplementation = {
 const registry: Record<ImplementationKey, SolutionImplementation> = {
   ai_receptionist: receptionistImplementation,
   automation_workspace: automationImplementation,
+  // club_operations (Vereinsbetrieb) is declared but intentionally not implemented. It resolves to
+  // the safe fallback, so the key existing grants no surface and no data access. Its UI, and the
+  // authenticated server-side gateway that will feed it, arrive in later phases. No club-specific
+  // host, project reference or credential belongs in this module or in any browser-readable
+  // configuration.
+  club_operations: unavailableImplementation,
   // pankofer_operations is intentionally not yet implemented; it resolves to the safe fallback
   // until its module is added here, without modifying the receptionist implementation.
   pankofer_operations: unavailableImplementation,
