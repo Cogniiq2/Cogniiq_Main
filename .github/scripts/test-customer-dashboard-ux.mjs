@@ -19,23 +19,37 @@ let failures = 0;
 const ok = (cond, msg) => { if (!cond) { console.error(`FAIL: ${msg}`); failures += 1; } else console.log(`ok: ${msg}`); };
 
 const shell = read('src/components/app/CustomerAppShell.tsx');
+const sidebar = read('src/components/navigation/SidebarShell.tsx');
 const guard = read('src/components/app/ReceptionistEntitlementRoute.tsx');
 const unavailable = read('src/components/app/EntitlementUnavailablePage.tsx');
 const primitives = read('src/components/app/CustomerAppPrimitives.tsx');
 const sectionPage = read('src/pages/app/CustomerSectionPage.tsx');
 
 // ---------------------------------------------------------------- 1) navigation breakpoint gap
-// The desktop cluster, the mobile trigger and the mobile panel must all switch at the SAME
-// breakpoint as the desktop nav row (lg). Any md: variant among them re-opens the dead zone.
-ok(/className="hidden items-center gap-2 lg:flex"/.test(shell), 'desktop header cluster switches at lg (not md)');
-ok(/text-gray-700 lg:hidden"/.test(shell), 'mobile menu trigger is hidden from lg up (not md)');
-ok(/border-t border-gray-100 bg-white lg:hidden"/.test(shell), 'mobile nav panel is hidden from lg up (not md)');
-ok(/border-t border-gray-100 bg-white\/80 lg:block/.test(shell), 'desktop nav row still appears at lg');
+// The customer portal now renders the shared premium sidebar (SidebarShell). The desktop rail, the
+// mobile header and the mobile drawer must all switch at the SAME breakpoint (lg). Any md: variant
+// among them re-opens the 768-1023px dead zone where NO navigation was reachable.
+ok(/hidden .*\blg:flex\b/.test(sidebar), 'desktop rail appears at lg (not md)');
+ok(/<header[\s\S]*?\blg:hidden\b/.test(sidebar), 'mobile header is hidden from lg up (not md)');
+ok(/Dialog\.Content[\s\S]*?\blg:hidden\b/.test(sidebar), 'mobile drawer is hidden from lg up (not md)');
+ok(/lg:pl-\[var\(--nav-w\)\]/.test(sidebar), 'content is offset by the rail width from lg up');
+ok(!/\bmd:hidden\b/.test(sidebar), 'no md:hidden in the sidebar shell (would recreate the 768-1023px gap)');
+ok(!/\bmd:flex\b/.test(sidebar), 'no md:flex in the sidebar shell (would recreate the 768-1023px gap)');
 ok(!/\bmd:hidden\b/.test(shell), 'no md:hidden remains in the shell (would recreate the 768-1023px gap)');
 ok(!/\bmd:flex\b/.test(shell), 'no md:flex remains in the shell (would recreate the 768-1023px gap)');
-// The org switcher lives in the desktop cluster, which is now lg-only, so the mobile panel must
-// carry its own switcher or multi-org users lose it below 1024px.
-ok(/customer-organization-select-mobile/.test(shell), 'mobile panel provides an organization switcher');
+// The desktop rail and the mobile drawer are both mounted, so the org switcher must carry a unique
+// id per variant — otherwise multi-org users below 1024px lose it (or get a duplicate DOM id).
+ok(/customer-organization-select-mobile/.test(shell), 'mobile drawer provides an organization switcher');
+
+// The collapsed rail is icon-only, so every item needs an accessible name and a tooltip.
+ok(/TooltipContent/.test(sidebar), 'collapsed rail items expose tooltips');
+ok(/sr-only">\{item\.label\}/.test(sidebar), 'collapsed rail items keep a screen-reader label');
+// Active items announce aria-current; the value is the caller's ('page' for a leaf destination,
+// 'true' for a section that merely contains the current page) so one rail never has two 'page's.
+ok(/aria-current=\{item\.active \? item\.current \?\? 'page' : undefined\}/.test(sidebar),
+  'active rail item is exposed via aria-current with a caller-controlled value');
+ok(/current: 'page',/.test(shell), 'customer leaf items declare aria-current="page"');
+ok(/resolveAriaCurrent/.test(shell), 'customer rail collapses nested matches to a single current page');
 
 // ---------------------------------------------------------------- 2) entitlement denial is explained
 ok(!/<Navigate to="\/app" replace \/>/.test(guard), 'entitlement guard no longer silently redirects to /app');
