@@ -4,6 +4,7 @@ import { AlertTriangle, X } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Button } from './primitives';
+import { border, radius, surface, text, zIndex } from './tokens';
 
 // Accessible overlay primitives for the light dashboard: keyboard-dismissable, focus-trapped, with
 // a visible backdrop. Replaces window.alert/confirm/prompt and one-off dialogs across pages.
@@ -27,7 +28,15 @@ function useFocusTrap(active: boolean, onClose: () => void) {
     const raf = requestAnimationFrame(focusFirst);
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') { event.stopPropagation(); onClose(); return; }
+      if (event.key === 'Escape') {
+        // A Radix popper (select/combobox/dropdown menu) open inside this dialog owns Escape
+        // first — closing the whole dialog because the user dismissed a dropdown would be wrong.
+        // Radix portals its content into a popper wrapper, so its presence is the reliable signal.
+        if (document.querySelector('[data-radix-popper-content-wrapper]')) return;
+        event.stopPropagation();
+        onClose();
+        return;
+      }
       if (event.key !== 'Tab' || !node) return;
       const focusables = Array.from(
         node.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), textarea, input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'),
@@ -72,36 +81,37 @@ export function Modal({ open, onClose, title, description, children, footer, siz
   const trapRef = useFocusTrap(open, onClose);
   if (!open) return null;
   return createPortal(
-    <div className="fixed inset-0 z-[90] flex items-end justify-center sm:items-center" role="presentation">
-      <div className="absolute inset-0 bg-gray-950/40 backdrop-blur-sm animate-in fade-in duration-150" onClick={onClose} aria-hidden="true" />
+    <div data-cq-portal="dashboard" className={cn('fixed inset-0 flex items-end justify-center sm:items-center', zIndex.dialog)} role="presentation">
+      <div className="absolute inset-0 bg-[rgba(13,17,23,0.32)] animate-in fade-in duration-fast" onClick={onClose} aria-hidden="true" />
       <div
         ref={trapRef}
         role="dialog"
         aria-modal="true"
         aria-label={title}
         className={cn(
-          'relative w-full rounded-t-3xl bg-white shadow-[0_30px_90px_rgba(15,23,42,0.25)] sm:rounded-3xl',
-          'animate-in fade-in slide-in-from-bottom-4 duration-200 sm:zoom-in-95',
+          'relative w-full rounded-t-[14px] sm:rounded-[12px]',
+          surface.overlay,
+          'animate-in fade-in slide-in-from-bottom-2 duration-base ease-premium sm:zoom-in-[0.98] sm:slide-in-from-bottom-0',
           'flex max-h-[92vh] flex-col',
           modalWidth[size],
         )}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-gray-100 px-6 py-4">
+        <div className={cn('flex items-start justify-between gap-4 px-5 py-3.5', border.hairlineB)}>
           <div className="min-w-0">
-            <h2 className="text-base font-semibold tracking-tight text-gray-950">{title}</h2>
-            {description ? <p className="mt-1 text-[13px] leading-5 text-gray-500">{description}</p> : null}
+            <h2 className={text.cardTitle}>{title}</h2>
+            {description ? <p className={cn('mt-0.5', text.body)}>{description}</p> : null}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-700"
+            className={cn('shrink-0 p-1.5 text-[var(--cq-fg-subtle)] transition-colors duration-fast hover:bg-[var(--cq-hover)] hover:text-[var(--cq-fg)]', radius.sm)}
             aria-label="Schließen"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">{children}</div>
-        {footer ? <div className="flex flex-wrap items-center justify-end gap-2 border-t border-gray-100 px-6 py-4">{footer}</div> : null}
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">{children}</div>
+        {footer ? <div className={cn('flex flex-wrap items-center justify-end gap-2 px-5 py-3.5', border.hairlineT)}>{footer}</div> : null}
       </div>
     </div>,
     document.body,
@@ -126,35 +136,35 @@ export function SlideOver({ open, onClose, title, description, children, footer,
   const trapRef = useFocusTrap(open, onClose);
   if (!open) return null;
   return createPortal(
-    <div className="fixed inset-0 z-[90] flex justify-end" role="presentation">
-      <div className="absolute inset-0 bg-gray-950/40 backdrop-blur-sm animate-in fade-in duration-150" onClick={onClose} aria-hidden="true" />
+    <div data-cq-portal="dashboard" className={cn('fixed inset-0 flex justify-end', zIndex.dialog)} role="presentation">
+      <div className="absolute inset-0 bg-[rgba(13,17,23,0.32)] animate-in fade-in duration-fast" onClick={onClose} aria-hidden="true" />
       <div
         ref={trapRef}
         role="dialog"
         aria-modal="true"
         aria-label={title}
         className={cn(
-          'relative flex h-full w-full flex-col bg-[#f7f7f4] shadow-[0_0_90px_rgba(15,23,42,0.25)]',
-          'animate-in slide-in-from-right duration-200',
+          'relative flex h-full w-full flex-col bg-[var(--cq-canvas)] shadow-[var(--cq-elev-3)]',
+          'animate-in slide-in-from-right duration-base ease-premium',
           slideWidth[width],
         )}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-gray-200 bg-white px-6 py-4">
+        <div className={cn('flex items-start justify-between gap-4 bg-[var(--cq-surface)] px-5 py-3.5', border.hairlineB)}>
           <div className="min-w-0">
-            <h2 className="text-lg font-semibold tracking-tight text-gray-950">{title}</h2>
-            {description ? <p className="mt-1 text-[13px] leading-5 text-gray-500">{description}</p> : null}
+            <h2 className={text.cardTitle}>{title}</h2>
+            {description ? <p className={cn('mt-0.5', text.body)}>{description}</p> : null}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
+            className={cn('shrink-0 p-1.5 text-[var(--cq-fg-subtle)] transition-colors duration-fast hover:bg-[var(--cq-hover)] hover:text-[var(--cq-fg)]', radius.sm)}
             aria-label="Schließen"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6">{children}</div>
-        {footer ? <div className="flex flex-wrap items-center justify-end gap-2 border-t border-gray-200 bg-white px-6 py-4">{footer}</div> : null}
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">{children}</div>
+        {footer ? <div className={cn('flex flex-wrap items-center justify-end gap-2 bg-[var(--cq-surface)] px-5 py-3.5', border.hairlineT)}>{footer}</div> : null}
       </div>
     </div>,
     document.body,
@@ -196,11 +206,11 @@ export function ConfirmDialog({
     >
       <div className="flex gap-3">
         {tone === 'danger' ? (
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
-            <AlertTriangle size={17} aria-hidden="true" />
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
+            <AlertTriangle size={16} aria-hidden="true" />
           </span>
         ) : null}
-        <div className="text-[13.5px] leading-6 text-gray-600">{message}</div>
+        <div className={text.body}>{message}</div>
       </div>
     </Modal>
   );

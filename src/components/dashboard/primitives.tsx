@@ -4,30 +4,42 @@ import type { LucideIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { formatCents } from '@/lib/clientPlatform/validation';
+import {
+  border, control, elevation, focusRing, focusRingOnSurface, interactive,
+  radius, skeleton as skeletonClass, space, statusTone, surface, text,
+} from './tokens';
+import { PremiumSelect, type SelectOption } from './PremiumSelect';
 
-// Shared light-mode dashboard primitives. Premium, restrained, native to the Cogniiq admin
-// visual language: warm off-white page, white surfaces, graphite type, near-black primary actions,
-// soft shadows, 16–20px radii. Reusable by the admin and owner areas.
+// Shared dashboard primitives for the authenticated Cogniiq surfaces.
+//
+// Every visual decision here comes from ./tokens — nothing hard-codes a colour, radius, shadow or
+// duration. Public component APIs are unchanged from the pre-P1 versions so the owner finance
+// pages, the finance module and the internal tasks module keep working untouched.
 
 /* ------------------------------------------------------------------ Buttons */
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
 type ButtonSize = 'sm' | 'md';
 
-const buttonBase =
-  'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f7f7f4]';
+const buttonBase = cn(
+  'inline-flex items-center justify-center gap-1.5 font-medium whitespace-nowrap',
+  radius.md,
+  interactive.transition,
+  interactive.disabled,
+  focusRing,
+);
 
 const buttonVariants: Record<ButtonVariant, string> = {
-  primary: 'bg-gray-950 text-white hover:bg-gray-800',
-  secondary: 'border border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:text-gray-950',
-  ghost: 'text-gray-600 hover:bg-gray-100 hover:text-gray-950',
-  danger: 'bg-red-600 text-white hover:bg-red-500',
-  success: 'bg-emerald-600 text-white hover:bg-emerald-500',
+  primary: 'bg-[var(--cq-fg)] text-white hover:bg-[#22272f]',
+  secondary: cn('bg-[var(--cq-surface)] text-[var(--cq-fg)]', border.hairline, 'hover:bg-[var(--cq-hover)] hover:border-[var(--cq-border-strong)]'),
+  ghost: 'text-[var(--cq-fg-muted)] hover:bg-[var(--cq-hover)] hover:text-[var(--cq-fg)]',
+  danger: 'bg-red-600 text-white hover:bg-red-700',
+  success: 'bg-emerald-600 text-white hover:bg-emerald-700',
 };
 
 const buttonSizes: Record<ButtonSize, string> = {
-  sm: 'h-9 px-3 text-[13px]',
-  md: 'h-11 px-4 text-[13.5px]',
+  sm: control.sm,
+  md: control.md,
 };
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -45,10 +57,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       ref={ref}
       type={type}
       disabled={disabled || loading}
+      aria-busy={loading || undefined}
       className={cn(buttonBase, buttonVariants[variant], buttonSizes[size], className)}
       {...rest}
     >
-      {loading ? <Spinner /> : Icon ? <Icon size={size === 'sm' ? 14 : 15} aria-hidden="true" /> : null}
+      {loading ? <Spinner /> : Icon ? <Icon size={14} aria-hidden="true" /> : null}
       {children}
     </button>
   );
@@ -70,26 +83,35 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
       aria-label={label}
       title={label}
       className={cn(
-        'inline-flex h-9 w-9 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/40 focus-visible:ring-offset-2',
-        variant === 'secondary' ? 'border border-gray-200 bg-white text-gray-500 hover:border-gray-300 hover:text-gray-950' : 'text-gray-400 hover:bg-gray-100 hover:text-gray-950',
+        // 36px square keeps icon-only actions inside the minimum touch target.
+        'inline-flex h-9 w-9 items-center justify-center',
+        radius.md, interactive.transition, interactive.disabled, focusRing,
+        variant === 'secondary'
+          ? cn('bg-[var(--cq-surface)] text-[var(--cq-fg-muted)]', border.hairline, 'hover:text-[var(--cq-fg)] hover:border-[var(--cq-border-strong)]')
+          : 'text-[var(--cq-fg-subtle)] hover:bg-[var(--cq-hover)] hover:text-[var(--cq-fg)]',
         className,
       )}
       {...rest}
     >
-      <Icon size={16} aria-hidden="true" />
+      <Icon size={15} aria-hidden="true" />
     </button>
   );
 });
 
 export function Spinner({ className }: { className?: string }) {
-  return <span className={cn('h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent opacity-70', className)} aria-hidden="true" />;
+  return (
+    <span
+      className={cn('h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent opacity-70', className)}
+      aria-hidden="true"
+    />
+  );
 }
 
 /* ------------------------------------------------------------------ Surfaces */
 
 export function Card({ children, className, as: As = 'div', id }: { children: ReactNode; className?: string; as?: 'div' | 'section'; id?: string }) {
   return (
-    <As id={id} className={cn('rounded-[20px] border border-gray-100 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.04)]', className)}>
+    <As id={id} className={cn(surface.card, space.cardPadding, className)}>
       {children}
     </As>
   );
@@ -97,10 +119,10 @@ export function Card({ children, className, as: As = 'div', id }: { children: Re
 
 export function SectionHeader({ title, description, action, className }: { title: string; description?: string; action?: ReactNode; className?: string }) {
   return (
-    <div className={cn('mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between', className)}>
-      <div>
-        <h3 className="text-sm font-semibold tracking-tight text-gray-950">{title}</h3>
-        {description ? <p className="mt-0.5 text-[12.5px] leading-5 text-gray-500">{description}</p> : null}
+    <div className={cn('mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between', className)}>
+      <div className="min-w-0">
+        <h3 className={text.sectionTitle}>{title}</h3>
+        {description ? <p className={cn('mt-0.5', text.hint)}>{description}</p> : null}
       </div>
       {action ? <div className="flex flex-wrap gap-2">{action}</div> : null}
     </div>
@@ -109,14 +131,14 @@ export function SectionHeader({ title, description, action, className }: { title
 
 export function PageHeader({ title, description, actions, breadcrumb }: { title: string; description?: string; actions?: ReactNode; breadcrumb?: ReactNode }) {
   return (
-    <div className="mb-6">
+    <div className="mb-5">
       {breadcrumb ? <div className="mb-2">{breadcrumb}</div> : null}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <h1 className="text-2xl font-semibold tracking-tight text-gray-950 sm:text-[26px]">{title}</h1>
-          {description ? <p className="mt-2 max-w-2xl text-[13.5px] leading-6 text-gray-500">{description}</p> : null}
+          <h1 className={text.pageTitle}>{title}</h1>
+          {description ? <p className={cn('mt-1 max-w-2xl', text.body)}>{description}</p> : null}
         </div>
-        {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
+        {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
       </div>
     </div>
   );
@@ -127,9 +149,9 @@ export function PageHeader({ title, description, actions, breadcrumb }: { title:
 export type KpiBasis = 'actual' | 'estimate' | 'forecast';
 const basisLabel: Record<KpiBasis, string> = { actual: 'Ist', estimate: 'Schätzung', forecast: 'Prognose' };
 const basisTone: Record<KpiBasis, string> = {
-  actual: 'border-emerald-200 bg-emerald-50 text-emerald-700',
-  estimate: 'border-amber-200 bg-amber-50 text-amber-700',
-  forecast: 'border-sky-200 bg-sky-50 text-sky-700',
+  actual: statusTone.success,
+  estimate: statusTone.warning,
+  forecast: statusTone.info,
 };
 
 export function KpiCard({
@@ -146,47 +168,54 @@ export function KpiCard({
   icon?: LucideIcon;
 }) {
   const display = value ?? (valueCents == null ? '—' : formatCents(valueCents, currency));
-  const valueColor = tone === 'positive' ? 'text-emerald-700' : tone === 'negative' ? 'text-red-600' : 'text-gray-950';
+  const valueColor = tone === 'positive' ? 'text-emerald-700' : tone === 'negative' ? 'text-red-600' : '';
   const inner = (
     <>
       <div className="mb-2 flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2">
-          {Icon ? <Icon size={15} className="text-gray-400" aria-hidden="true" /> : null}
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-400">{label}</p>
+        <div className="flex min-w-0 items-center gap-1.5">
+          {Icon ? <Icon size={13} className="shrink-0 text-[var(--cq-fg-subtle)]" aria-hidden="true" /> : null}
+          <p className={cn('truncate', text.eyebrow)}>{label}</p>
         </div>
-        {basis ? <span className={cn('rounded-full border px-2 py-0.5 text-[10px] font-semibold', basisTone[basis])}>{basisLabel[basis]}</span> : null}
+        {basis ? (
+          <span className={cn('shrink-0 border px-1.5 py-0.5 text-[10px] font-medium', radius.sm, basisTone[basis])}>
+            {basisLabel[basis]}
+          </span>
+        ) : null}
       </div>
-      <p className={cn('text-[24px] font-semibold tracking-tight tabular-nums', valueColor)}>{display}</p>
-      {hint ? <p className="mt-1.5 text-[12px] leading-5 text-gray-500">{hint}</p> : null}
+      <p className={cn(text.metric, valueColor)}>{display}</p>
+      {hint ? <p className={cn('mt-1', text.hint)}>{hint}</p> : null}
     </>
   );
-  const cls = 'rounded-[20px] border border-gray-100 bg-white p-5 shadow-[0_18px_60px_rgba(15,23,42,0.04)]';
+  const cls = cn(surface.card, space.cardPaddingTight);
   if (to) {
-    return <Link to={to} className={cn(cls, 'block transition-colors hover:border-gray-200')}>{inner}</Link>;
+    return (
+      <Link to={to} className={cn(cls, 'block', interactive.transition, focusRing, 'hover:border-[var(--cq-border-strong)] hover:bg-[var(--cq-hover)]')}>
+        {inner}
+      </Link>
+    );
   }
   return <div className={cls}>{inner}</div>;
 }
 
 /* ------------------------------------------------------------------ Badges */
 
-const badgeTones: Record<string, string> = {
-  neutral: 'border-gray-200 bg-gray-50 text-gray-600',
-  success: 'border-emerald-200 bg-emerald-50 text-emerald-700',
-  warning: 'border-amber-200 bg-amber-50 text-amber-700',
-  danger: 'border-red-200 bg-red-50 text-red-700',
-  info: 'border-sky-200 bg-sky-50 text-sky-700',
-};
-export type BadgeTone = keyof typeof badgeTones;
+export type BadgeTone = keyof typeof statusTone;
 
 export function StatusBadge({ label, tone = 'neutral', className }: { label: string; tone?: BadgeTone; className?: string }) {
   return (
-    <span className={cn('inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold', badgeTones[tone], className)}>
+    <span className={cn('inline-flex items-center gap-1 border px-2 py-0.5 text-[11px] font-medium leading-4', radius.sm, statusTone[tone], className)}>
       {label}
     </span>
   );
 }
 
 /* ------------------------------------------------------------------ Form fields */
+
+const fieldShell = cn(
+  'flex items-center bg-[var(--cq-surface)]',
+  border.hairline, radius.md, interactive.transition,
+  'focus-within:ring-2 focus-within:ring-[var(--cq-focus)] focus-within:ring-offset-2 focus-within:ring-offset-[var(--cq-canvas)]',
+);
 
 export function Field({
   id, label, value, onChange, placeholder, type = 'text', error, required, hint, disabled, prefix, min, step, inputMode, autoFocus,
@@ -210,12 +239,12 @@ export function Field({
   return (
     <div>
       {label ? (
-        <label htmlFor={id} className="mb-1.5 block text-[12px] font-semibold text-gray-600">
-          {label} {required ? <span className="text-red-500">*</span> : null}
+        <label htmlFor={id} className={cn('mb-1.5 block', text.label)}>
+          {label} {required ? <span className="text-red-500" aria-hidden="true">*</span> : null}
         </label>
       ) : null}
-      <div className={cn('flex items-center rounded-xl border bg-white transition-colors focus-within:border-gray-400', error ? 'border-red-300' : 'border-gray-200', disabled && 'bg-gray-50')}>
-        {prefix ? <span className="pl-3 text-sm text-gray-400" aria-hidden="true">{prefix}</span> : null}
+      <div className={cn(fieldShell, error && 'border-red-300', disabled && 'bg-[var(--cq-sunken)]')}>
+        {prefix ? <span className={cn('pl-3', text.hint)} aria-hidden="true">{prefix}</span> : null}
         <input
           id={id}
           type={type}
@@ -230,15 +259,25 @@ export function Field({
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
           onChange={(event) => onChange(event.target.value)}
-          className="h-11 w-full rounded-xl bg-transparent px-3 text-sm text-gray-900 outline-none placeholder:text-gray-400 disabled:text-gray-500"
+          className={cn(
+            'h-10 w-full bg-transparent px-3 text-[13px] text-[var(--cq-fg)] outline-none',
+            radius.md,
+            'placeholder:text-[var(--cq-fg-subtle)] disabled:cursor-not-allowed disabled:text-[var(--cq-fg-subtle)]',
+          )}
         />
       </div>
-      {hint && !error ? <p id={`${id}-hint`} className="mt-1 text-[11.5px] text-gray-400">{hint}</p> : null}
-      {error ? <p id={`${id}-error`} className="mt-1 text-[12px] text-red-600">{error}</p> : null}
+      {hint && !error ? <p id={`${id}-hint`} className={cn('mt-1', text.hint)}>{hint}</p> : null}
+      {error ? <p id={`${id}-error`} className="mt-1 text-[12px] leading-4 text-red-600">{error}</p> : null}
     </div>
   );
 }
 
+/**
+ * Constrained single choice. Backed by the Radix-based PremiumSelect: portalled menu, typeahead,
+ * keyboard navigation, selected checkmark and full ARIA. The prop contract is unchanged from the
+ * previous native <select> implementation, so all existing call sites work untouched — including
+ * options that use "" as a real value (mapped internally, see PremiumSelect).
+ */
 export function Select({
   id, label, value, onChange, options, hint, disabled, required, error,
 }: {
@@ -246,37 +285,24 @@ export function Select({
   label?: string;
   value: string;
   onChange: (value: string) => void;
-  options: { value: string; label: string }[];
+  options: SelectOption[];
   hint?: string;
   disabled?: boolean;
   required?: boolean;
   error?: string;
 }) {
   return (
-    <div>
-      {label ? (
-        <label htmlFor={id} className="mb-1.5 block text-[12px] font-semibold text-gray-600">
-          {label} {required ? <span className="text-red-500">*</span> : null}
-        </label>
-      ) : null}
-      <select
-        id={id}
-        value={value}
-        disabled={disabled}
-        onChange={(event) => onChange(event.target.value)}
-        aria-invalid={error ? true : undefined}
-        className={cn(
-          'h-11 w-full rounded-xl border bg-white px-3 text-sm text-gray-900 outline-none transition-colors focus:border-gray-400 disabled:bg-gray-50 disabled:text-gray-500',
-          error ? 'border-red-300' : 'border-gray-200',
-        )}
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>{option.label}</option>
-        ))}
-      </select>
-      {hint && !error ? <p className="mt-1 text-[11.5px] text-gray-400">{hint}</p> : null}
-      {error ? <p className="mt-1 text-[12px] text-red-600">{error}</p> : null}
-    </div>
+    <PremiumSelect
+      id={id}
+      label={label}
+      value={value}
+      onChange={onChange}
+      options={options}
+      hint={hint}
+      disabled={disabled}
+      required={required}
+      error={error}
+    />
   );
 }
 
@@ -294,17 +320,22 @@ export function Textarea({
 }) {
   return (
     <div>
-      {label ? <label htmlFor={id} className="mb-1.5 block text-[12px] font-semibold text-gray-600">{label}</label> : null}
+      {label ? <label htmlFor={id} className={cn('mb-1.5 block', text.label)}>{label}</label> : null}
       <textarea
         id={id}
         value={value}
         rows={rows}
         placeholder={placeholder}
         disabled={disabled}
+        aria-describedby={hint ? `${id}-hint` : undefined}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-gray-400 placeholder:text-gray-400 disabled:bg-gray-50"
+        className={cn(
+          'w-full bg-[var(--cq-surface)] px-3 py-2.5 text-[13px] leading-5 text-[var(--cq-fg)] outline-none',
+          border.hairline, radius.md, interactive.transition, focusRing,
+          'placeholder:text-[var(--cq-fg-subtle)] disabled:cursor-not-allowed disabled:bg-[var(--cq-sunken)]',
+        )}
       />
-      {hint ? <p className="mt-1 text-[11.5px] text-gray-400">{hint}</p> : null}
+      {hint ? <p id={`${id}-hint`} className={cn('mt-1', text.hint)}>{hint}</p> : null}
     </div>
   );
 }
@@ -313,18 +344,22 @@ export function Checkbox({ id, label, checked, onChange, hint, disabled }: {
   id: string; label: ReactNode; checked: boolean; onChange: (checked: boolean) => void; hint?: string; disabled?: boolean;
 }) {
   return (
-    <label htmlFor={id} className={cn('flex items-start gap-3 text-[13px]', disabled ? 'text-gray-400' : 'text-gray-700')}>
+    <label
+      htmlFor={id}
+      className={cn('flex items-start gap-2.5 text-[13px] leading-5', disabled ? 'cursor-not-allowed text-[var(--cq-fg-subtle)]' : 'cursor-pointer text-[var(--cq-fg)]')}
+    >
       <input
         id={id}
         type="checkbox"
         checked={checked}
         disabled={disabled}
+        aria-describedby={hint ? `${id}-hint` : undefined}
         onChange={(event) => onChange(event.target.checked)}
-        className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-gray-950 focus:ring-gray-950/40"
+        className={cn('mt-px h-4 w-4 shrink-0 border-[var(--cq-border-strong)] text-[var(--cq-fg)]', radius.sm, focusRingOnSurface)}
       />
-      <span>
+      <span className="min-w-0">
         {label}
-        {hint ? <span className="mt-0.5 block text-[11.5px] text-gray-400">{hint}</span> : null}
+        {hint ? <span id={`${id}-hint`} className={cn('mt-0.5 block', text.hint)}>{hint}</span> : null}
       </span>
     </label>
   );
@@ -336,24 +371,28 @@ export function EmptyState({ icon: Icon, title, description, action, className }
   icon: LucideIcon; title: string; description: string; action?: ReactNode; className?: string;
 }) {
   return (
-    <div className={cn('flex flex-col items-center rounded-[20px] border border-dashed border-gray-200 bg-white py-14 text-center', className)}>
-      <span className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 text-gray-400">
-        <Icon size={22} aria-hidden="true" />
+    <div className={cn('flex flex-col items-center border border-dashed border-[var(--cq-border-strong)] bg-[var(--cq-sunken)] px-6 py-12 text-center', radius.xl, className)}>
+      <span className={cn('mb-3 flex h-10 w-10 items-center justify-center bg-[var(--cq-surface)] text-[var(--cq-fg-subtle)]', border.hairline, radius.lg)}>
+        <Icon size={18} aria-hidden="true" />
       </span>
-      <p className="text-base font-semibold text-gray-950">{title}</p>
-      <p className="mt-2 max-w-md px-6 text-[13.5px] leading-6 text-gray-500">{description}</p>
-      {action ? <div className="mt-5">{action}</div> : null}
+      <p className={text.cardTitle}>{title}</p>
+      <p className={cn('mt-1.5 max-w-md', text.body)}>{description}</p>
+      {action ? <div className="mt-4">{action}</div> : null}
     </div>
   );
 }
 
 export function ErrorState({ message, onRetry, title = 'Etwas ist schiefgelaufen' }: { message: string; onRetry?: () => void; title?: string }) {
   return (
-    <div className="rounded-[20px] border border-red-100 bg-red-50/60 p-5">
-      <p className="text-sm font-semibold text-red-700">{title}</p>
-      <p className="mt-1 break-words text-[13px] leading-6 text-red-600">{message}</p>
+    <div className={cn('border border-red-200 bg-red-50 p-4', radius.xl)} role="alert">
+      <p className="text-[13px] font-semibold leading-5 text-red-800">{title}</p>
+      <p className="mt-1 break-words text-[13px] leading-5 text-red-700">{message}</p>
       {onRetry ? (
-        <button type="button" onClick={onRetry} className="mt-3 inline-flex h-9 items-center rounded-xl border border-red-200 bg-white px-3 text-[13px] font-semibold text-red-700 transition-colors hover:bg-red-50">
+        <button
+          type="button"
+          onClick={onRetry}
+          className={cn('mt-3 inline-flex h-9 items-center border border-red-200 bg-white px-3 text-[13px] font-medium text-red-700', radius.md, interactive.transition, focusRing, 'hover:bg-red-50')}
+        >
           Erneut versuchen
         </button>
       ) : null}
@@ -363,24 +402,24 @@ export function ErrorState({ message, onRetry, title = 'Etwas ist schiefgelaufen
 
 export function LoadingState({ label }: { label?: string }) {
   return (
-    <div className="flex items-center gap-3 rounded-[20px] border border-gray-100 bg-white px-5 py-4 text-sm text-gray-500 shadow-[0_18px_60px_rgba(15,23,42,0.04)]">
-      <Spinner className="text-gray-400" /> {label ?? 'Wird geladen…'}
+    <div className={cn('flex items-center gap-2.5 px-4 py-3', surface.card, text.body)} role="status">
+      <Spinner className="text-[var(--cq-fg-subtle)]" /> {label ?? 'Wird geladen…'}
     </div>
   );
 }
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn('animate-pulse rounded-lg bg-gray-100', className)} aria-hidden="true" />;
+  return <div className={cn(skeletonClass, className)} aria-hidden="true" />;
 }
 
 export function KpiSkeletonGrid({ count = 4 }: { count?: number }) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-hidden="true">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="rounded-[20px] border border-gray-100 bg-white p-5 shadow-[0_18px_60px_rgba(15,23,42,0.04)]">
+        <div key={i} className={cn(surface.card, space.cardPaddingTight)}>
           <Skeleton className="h-3 w-24" />
-          <Skeleton className="mt-4 h-7 w-32" />
-          <Skeleton className="mt-3 h-3 w-20" />
+          <Skeleton className="mt-3 h-6 w-32" />
+          <Skeleton className="mt-2 h-3 w-20" />
         </div>
       ))}
     </div>
@@ -389,12 +428,12 @@ export function KpiSkeletonGrid({ count = 4 }: { count?: number }) {
 
 export function TableSkeleton({ rows = 5, cols = 5 }: { rows?: number; cols?: number }) {
   return (
-    <div className="overflow-hidden rounded-[20px] border border-gray-100 bg-white shadow-[0_18px_60px_rgba(15,23,42,0.04)]">
-      <div className="border-b border-gray-100 px-5 py-3.5"><Skeleton className="h-3 w-40" /></div>
+    <div className={cn('overflow-hidden', surface.card, 'p-0')} aria-hidden="true">
+      <div className={cn('px-4 py-3', border.hairlineB)}><Skeleton className="h-3 w-40" /></div>
       {Array.from({ length: rows }).map((_, r) => (
-        <div key={r} className="flex items-center gap-4 border-b border-gray-50 px-5 py-4 last:border-0">
+        <div key={r} className={cn('flex items-center gap-4 px-4 py-3 last:border-0', border.hairlineB, border.subtle)}>
           {Array.from({ length: cols }).map((_, c) => (
-            <Skeleton key={c} className={cn('h-3.5', c === 0 ? 'w-32' : 'flex-1')} />
+            <Skeleton key={c} className={cn('h-3', c === 0 ? 'w-32' : 'flex-1')} />
           ))}
         </div>
       ))}
@@ -411,7 +450,10 @@ export function Tabs({ tabs, value, onChange, className }: {
   className?: string;
 }) {
   return (
-    <div className={cn('flex items-center gap-1 overflow-x-auto rounded-xl border border-gray-100 bg-white p-1', className)} role="tablist">
+    <div
+      className={cn('flex items-center gap-0.5 overflow-x-auto bg-[var(--cq-sunken)] p-0.5', border.hairline, radius.md, className)}
+      role="tablist"
+    >
       {tabs.map((tab) => {
         const active = tab.value === value;
         return (
@@ -420,15 +462,21 @@ export function Tabs({ tabs, value, onChange, className }: {
             type="button"
             role="tab"
             aria-selected={active}
+            tabIndex={active ? 0 : -1}
             onClick={() => onChange(tab.value)}
             className={cn(
-              'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-3 text-[13px] font-semibold transition-colors',
-              active ? 'bg-gray-950 text-white' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-950',
+              'inline-flex h-8 shrink-0 items-center gap-1.5 px-2.5 text-[12.5px] font-medium',
+              radius.sm, interactive.transition, focusRingOnSurface,
+              active
+                ? cn('bg-[var(--cq-surface)] text-[var(--cq-fg)]', elevation.e1)
+                : 'text-[var(--cq-fg-muted)] hover:text-[var(--cq-fg)]',
             )}
           >
             {tab.label}
             {tab.count != null ? (
-              <span className={cn('rounded-full px-1.5 text-[10px] font-bold tabular-nums', active ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500')}>{tab.count}</span>
+              <span className={cn('px-1 text-[10.5px] font-semibold tabular-nums', radius.sm, active ? 'text-[var(--cq-fg-muted)]' : 'text-[var(--cq-fg-subtle)]')}>
+                {tab.count}
+              </span>
             ) : null}
           </button>
         );
@@ -464,14 +512,20 @@ export function DataTable<T>({ columns, rows, getRowKey, mobileTitle, mobileSubt
 }) {
   const alignClass = (a?: 'left' | 'right' | 'center') => (a === 'right' ? 'text-right' : a === 'center' ? 'text-center' : 'text-left');
   return (
-    <div className="rounded-[20px] border border-gray-100 bg-white shadow-[0_18px_60px_rgba(15,23,42,0.04)]">
+    <div className={cn(surface.card, 'p-0')}>
       {/* Desktop / tablet */}
       <div className="hidden overflow-x-auto md:block">
-        <table className="w-full text-left text-sm" style={{ minWidth }}>
+        <table className="w-full text-left" style={{ minWidth }}>
           <thead>
-            <tr className="border-b border-gray-100 text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-400">
+            <tr className={border.hairlineB}>
               {columns.map((c) => (
-                <th key={c.key} scope="col" className={cn('px-5 py-3.5', alignClass(c.align))}>{c.header}</th>
+                <th
+                  key={c.key}
+                  scope="col"
+                  className={cn(space.cellX, 'py-2.5', text.eyebrow, alignClass(c.align))}
+                >
+                  {c.header}
+                </th>
               ))}
             </tr>
           </thead>
@@ -480,10 +534,18 @@ export function DataTable<T>({ columns, rows, getRowKey, mobileTitle, mobileSubt
               <tr
                 key={getRowKey(row)}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
-                className={cn('border-b border-gray-50 last:border-0', onRowClick && 'cursor-pointer transition-colors hover:bg-gray-50/70')}
+                className={cn(
+                  'border-b border-[var(--cq-border-subtle)] last:border-0',
+                  onRowClick && cn('cursor-pointer', interactive.transition, interactive.hoverRow),
+                )}
               >
                 {columns.map((c) => (
-                  <td key={c.key} className={cn('px-5 py-3.5 text-gray-700', alignClass(c.align), c.className)}>{c.render(row)}</td>
+                  <td
+                    key={c.key}
+                    className={cn(space.cellX, 'py-2.5 text-[13px] leading-5 text-[var(--cq-fg)]', alignClass(c.align), c.align === 'right' && text.numeric, c.className)}
+                  >
+                    {c.render(row)}
+                  </td>
                 ))}
               </tr>
             ))}
@@ -491,18 +553,18 @@ export function DataTable<T>({ columns, rows, getRowKey, mobileTitle, mobileSubt
         </table>
       </div>
       {/* Mobile */}
-      <div className="divide-y divide-gray-50 md:hidden">
+      <div className="divide-y divide-[var(--cq-border-subtle)] md:hidden">
         {rows.map((row) => (
           <div key={getRowKey(row)} onClick={onRowClick ? () => onRowClick(row) : undefined} className={cn('p-4', onRowClick && 'cursor-pointer')}>
             <div className="mb-2 flex items-center justify-between gap-3">
-              <div className="min-w-0 text-sm font-semibold text-gray-950">{mobileTitle(row)}</div>
+              <div className={cn('min-w-0', text.bodyStrong)}>{mobileTitle(row)}</div>
             </div>
-            {mobileSubtitle ? <div className="mb-3 text-[12px] text-gray-500">{mobileSubtitle(row)}</div> : null}
+            {mobileSubtitle ? <div className={cn('mb-3', text.hint)}>{mobileSubtitle(row)}</div> : null}
             <dl className="grid grid-cols-2 gap-x-4 gap-y-2">
               {columns.filter((c) => !c.hideOnMobile).map((c) => (
                 <div key={c.key} className="min-w-0">
-                  <dt className="text-[10px] font-semibold uppercase tracking-[0.08em] text-gray-400">{c.header}</dt>
-                  <dd className={cn('mt-0.5 text-[13px] text-gray-700', c.align === 'right' && 'tabular-nums')}>{c.render(row)}</dd>
+                  <dt className={text.eyebrow}>{c.header}</dt>
+                  <dd className={cn('mt-0.5 text-[13px] leading-5 text-[var(--cq-fg)]', c.align === 'right' && text.numeric)}>{c.render(row)}</dd>
                 </div>
               ))}
             </dl>
@@ -521,16 +583,11 @@ export function InfoBanner({ tone = 'warning', title, children, action }: {
   children?: ReactNode;
   action?: ReactNode;
 }) {
-  const tones = {
-    warning: 'border-amber-200 bg-amber-50 text-amber-800',
-    info: 'border-sky-200 bg-sky-50 text-sky-800',
-    danger: 'border-red-200 bg-red-50 text-red-800',
-  } as const;
   return (
-    <div className={cn('flex flex-col gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between', tones[tone])}>
+    <div className={cn('flex flex-col gap-2.5 border p-3.5 sm:flex-row sm:items-center sm:justify-between', radius.lg, statusTone[tone])}>
       <div className="min-w-0">
-        <p className="text-[13px] font-semibold">{title}</p>
-        {children ? <div className="mt-1 text-[12.5px] leading-5 opacity-90">{children}</div> : null}
+        <p className="text-[13px] font-semibold leading-5">{title}</p>
+        {children ? <div className="mt-0.5 text-[12.5px] leading-5 opacity-90">{children}</div> : null}
       </div>
       {action ? <div className="shrink-0">{action}</div> : null}
     </div>

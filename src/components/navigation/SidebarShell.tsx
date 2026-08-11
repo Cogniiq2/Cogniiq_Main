@@ -98,7 +98,12 @@ export function SidebarShell({
   return (
     <TooltipProvider delayDuration={120} skipDelayDuration={300}>
       <div
-        className="min-h-screen bg-[#f7f7f4] text-gray-950"
+        // Scopes the authenticated dashboard design tokens (see index.css + dashboard/tokens.ts).
+        // This root is shared by the customer portal shell and the internal workspace shell, so it
+        // is the single place both surfaces opt in — and public pages never mount it.
+        // The canvas value is unchanged (#f7f7f4), so the approved sidebar renders identically.
+        data-cq-surface="dashboard"
+        className="min-h-screen bg-[var(--cq-canvas)] text-[var(--cq-fg)]"
         style={{ '--nav-w': `${width}px` } as CSSProperties}
       >
         {/* ---------------------------------------------------------------- desktop rail */}

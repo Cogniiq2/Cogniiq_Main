@@ -5,26 +5,34 @@ import type { LucideIcon } from 'lucide-react';
 import { AlertCircle, Check, Circle, Clock3, Info, Plus, RefreshCw } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import {
+  border, control, dashDuration, dashEase, focusRing, focusRingOnSurface,
+  interactive as interactiveTokens, radius, skeleton as skeletonClass,
+  space, surface, text as dashText,
+} from '@/components/dashboard/tokens';
+import { PremiumSelect } from '@/components/dashboard/PremiumSelect';
 import type { LaunchChecklistItem, LifecycleTone, SetupStep } from './customerPortalModel';
 
-export const appEase: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
+/**
+ * Customer portal primitives.
+ *
+ * P2 brought these onto the shared authenticated design foundation (@/components/dashboard/tokens).
+ * The portal previously ran the *public site's* type scale (page titles up to 2.75rem, 0.22em
+ * eyebrows) and animated every page header and step card on mount. It now uses the application
+ * scale and reserves motion for genuine interactions, so the customer and owner surfaces read as
+ * two views of one product. Component APIs are unchanged — no page recomposition happens here.
+ */
 
-export const appFadeUp = {
-  hidden: { opacity: 0, y: 10 },
-  visible: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.42, delay, ease: appEase },
-  }),
-};
+/** Shared dashboard easing. Re-exported under the original name for existing consumers. */
+export const appEase = dashEase;
 
 const toneClasses: Record<LifecycleTone, string> = {
-  neutral: 'border-gray-200 bg-gray-50 text-gray-600',
-  working: 'border-gray-200 bg-white text-gray-700',
+  neutral: 'border-[var(--cq-border)] bg-[var(--cq-sunken)] text-[var(--cq-fg-muted)]',
+  working: 'border-[var(--cq-border)] bg-[var(--cq-surface)] text-[var(--cq-fg)]',
   attention: 'border-amber-200 bg-amber-50 text-amber-800',
-  ready: 'border-gray-300 bg-gray-100 text-gray-800',
+  ready: 'border-[var(--cq-border-strong)] bg-[var(--cq-hover)] text-[var(--cq-fg)]',
   success: 'border-emerald-200 bg-emerald-50 text-emerald-700',
-  paused: 'border-gray-200 bg-gray-50 text-gray-500',
+  paused: 'border-[var(--cq-border)] bg-[var(--cq-sunken)] text-[var(--cq-fg-subtle)]',
   danger: 'border-red-200 bg-red-50 text-red-700',
 };
 
@@ -41,20 +49,20 @@ export function AppPageHeader({
   action?: ReactNode;
   meta?: ReactNode;
 }) {
+  // No mount animation: a page header that fades up on every navigation is page-load spectacle,
+  // and it delays the first readable paint of the most important text on the screen.
   return (
-    <motion.div initial="hidden" animate="visible" variants={appFadeUp} className="mb-10">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-        <div className="max-w-3xl">
-          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.22em] text-gray-400">{eyebrow}</p>
-          <h1 className="text-3xl font-bold leading-[1.06] tracking-tight text-gray-950 sm:text-4xl lg:text-[2.75rem]">
-            {title}
-          </h1>
-          <p className="mt-4 max-w-2xl text-[15px] leading-[1.75] text-gray-500">{description}</p>
+    <div className="mb-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <p className={cn('mb-1', dashText.eyebrow)}>{eyebrow}</p>
+          <h1 className={dashText.pageTitle}>{title}</h1>
+          <p className={cn('mt-1 max-w-2xl', dashText.body)}>{description}</p>
         </div>
-        {action ? <div className="flex flex-wrap items-center gap-3">{action}</div> : null}
+        {action ? <div className="flex flex-wrap items-center gap-2">{action}</div> : null}
       </div>
-      {meta ? <div className="mt-6">{meta}</div> : null}
-    </motion.div>
+      {meta ? <div className="mt-4">{meta}</div> : null}
+    </div>
   );
 }
 
@@ -67,18 +75,19 @@ export function AppCard({
   className?: string;
   interactive?: boolean;
 }) {
+  // Interactive cards get colour feedback only. Lifting a card on hover is a floating effect that
+  // moves content under the pointer; the border/background shift reads as responsive without it.
   return (
-    <motion.div
-      whileHover={interactive ? { y: -2 } : undefined}
-      transition={{ duration: 0.2, ease: appEase }}
+    <div
       className={cn(
-        'rounded-2xl border border-gray-100 bg-white p-5 shadow-[0_18px_60px_rgba(15,23,42,0.035)] sm:p-6',
-        interactive && 'transition-colors duration-200 hover:border-gray-200 hover:shadow-[0_20px_70px_rgba(15,23,42,0.06)]',
+        surface.card,
+        space.cardPadding,
+        interactive && cn(interactiveTokens.transition, 'hover:border-[var(--cq-border-strong)] hover:bg-[var(--cq-hover)]'),
         className
       )}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
 
@@ -98,16 +107,14 @@ export function AppSection({
   action?: ReactNode;
 }) {
   return (
-    <section className={cn('space-y-5', className)} aria-labelledby={`${slugify(title)}-heading`}>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="max-w-2xl">
-          {eyebrow ? (
-            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">{eyebrow}</p>
-          ) : null}
-          <h2 id={`${slugify(title)}-heading`} className="text-2xl font-bold leading-tight tracking-tight text-gray-950">
+    <section className={cn(space.sectionGap, className)} aria-labelledby={`${slugify(title)}-heading`}>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          {eyebrow ? <p className={cn('mb-1', dashText.eyebrow)}>{eyebrow}</p> : null}
+          <h2 id={`${slugify(title)}-heading`} className={dashText.cardTitle}>
             {title}
           </h2>
-          {description ? <p className="mt-2 text-sm leading-6 text-gray-500">{description}</p> : null}
+          {description ? <p className={cn('mt-1 max-w-2xl', dashText.body)}>{description}</p> : null}
         </div>
         {action ? <div className="flex flex-wrap gap-2">{action}</div> : null}
       </div>
@@ -142,25 +149,21 @@ export function AppButton({
   type?: ButtonHTMLAttributes<HTMLButtonElement>['type'];
   onClick?: ButtonHTMLAttributes<HTMLButtonElement>['onClick'];
 }) {
+  // Matches the owner Button: colour-only feedback, no lift, no shadow growth, no icon drift.
   const baseClass = cn(
-    'group inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 active:scale-[0.99]',
-    variant === 'primary' &&
-      'bg-gray-900 px-6 py-3.5 text-white shadow-sm hover:-translate-y-0.5 hover:bg-gray-700 hover:shadow-md',
-    variant === 'secondary' &&
-      'border border-gray-200 bg-white px-5 py-3 text-gray-700 hover:border-gray-400 hover:bg-gray-50',
-    variant === 'text' && 'px-1 py-1 text-gray-500 hover:text-gray-950',
-    disabled && 'pointer-events-none cursor-not-allowed opacity-45 hover:translate-y-0 hover:shadow-sm',
+    'inline-flex items-center justify-center gap-1.5 font-medium whitespace-nowrap',
+    radius.md,
+    interactiveTokens.transition,
+    focusRing,
+    variant === 'primary' && cn(control.lg, 'bg-[var(--cq-fg)] text-white hover:bg-[#22272f]'),
+    variant === 'secondary' && cn(control.lg, border.hairline, 'bg-[var(--cq-surface)] text-[var(--cq-fg)] hover:border-[var(--cq-border-strong)] hover:bg-[var(--cq-hover)]'),
+    variant === 'text' && 'px-1 py-1 text-[13px] text-[var(--cq-fg-muted)] hover:text-[var(--cq-fg)]',
+    disabled && 'pointer-events-none cursor-not-allowed opacity-50',
     className
   );
   const content = (
     <>
-      {Icon ? (
-        <Icon
-          size={15}
-          className={cn('transition-transform duration-200', !disabled && variant !== 'text' && 'group-hover:translate-x-0.5')}
-          aria-hidden="true"
-        />
-      ) : null}
+      {Icon ? <Icon size={14} aria-hidden="true" /> : null}
       {children}
     </>
   );
@@ -237,11 +240,14 @@ export function AppStatusBadge({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.14em]',
+        // Sentence case at 11px, matching the owner StatusBadge — uppercase + wide tracking was
+        // marketing chrome that made short German status words hard to scan.
+        'inline-flex items-center gap-1 border px-2 py-0.5 text-[11px] font-medium leading-4',
+        radius.sm,
         toneClasses[tone]
       )}
     >
-      {Icon ? <Icon size={12} aria-hidden="true" /> : null}
+      {Icon ? <Icon size={11} aria-hidden="true" /> : null}
       {label}
     </span>
   );
@@ -261,13 +267,13 @@ export function AppEmptyState({
   compact?: boolean;
 }) {
   return (
-    <div className={cn('rounded-2xl border border-gray-100 bg-gray-50/80 p-6', compact && 'p-4')}>
-      <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500 shadow-sm">
-        <Icon size={17} aria-hidden="true" />
+    <div className={cn(surface.sunken, 'p-5', compact && 'p-4')}>
+      <div className={cn('mb-3 flex h-9 w-9 items-center justify-center bg-[var(--cq-surface)] text-[var(--cq-fg-subtle)]', border.hairline, radius.md)}>
+        <Icon size={16} aria-hidden="true" />
       </div>
-      <h3 className="text-base font-semibold tracking-tight text-gray-950">{title}</h3>
-      <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">{description}</p>
-      {action ? <div className="mt-5 flex flex-wrap gap-2">{action}</div> : null}
+      <h3 className={dashText.cardTitle}>{title}</h3>
+      <p className={cn('mt-1 max-w-2xl', dashText.body)}>{description}</p>
+      {action ? <div className="mt-4 flex flex-wrap gap-2">{action}</div> : null}
     </div>
   );
 }
@@ -280,20 +286,29 @@ export function AppProgress({
   label?: string;
 }) {
   const normalized = Math.max(0, Math.min(100, value));
+  const reduceMotion = useReducedMotion();
   return (
     <div>
       {label ? (
-        <div className="mb-2 flex items-center justify-between gap-3 text-[11px] font-semibold text-gray-400">
+        <div className={cn('mb-1.5 flex items-center justify-between gap-3', dashText.hint)}>
           <span>{label}</span>
-          <span>{normalized}%</span>
+          <span className="tabular-nums">{normalized}%</span>
         </div>
       ) : null}
-      <div className="h-1.5 overflow-hidden rounded-full bg-gray-100">
+      <div
+        className="h-1.5 overflow-hidden rounded-full bg-[var(--cq-hover)]"
+        role="progressbar"
+        aria-valuenow={normalized}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={label}
+      >
+        {/* Width is the value itself, so this animates on data change only — never on mount. */}
         <motion.div
-          className="h-full rounded-full bg-gray-900"
+          className="h-full rounded-full bg-[var(--cq-fg)]"
           initial={false}
           animate={{ width: `${normalized}%` }}
-          transition={{ duration: 0.45, ease: appEase }}
+          transition={{ duration: reduceMotion ? 0 : dashDuration.slow / 1000, ease: dashEase }}
         />
       </div>
     </div>
@@ -312,30 +327,35 @@ export function AppStepList({
       {steps.map((step, index) => {
         const isActive = index === currentIndex;
         const isPast = index < currentIndex;
+        // Static list: layout animation here re-flows every sibling card whenever the step
+        // advances, which is expensive and moves text the reader may be part-way through.
         return (
-          <motion.li
+          <li
             key={step.id}
-            layout
-            transition={{ duration: 0.24, ease: appEase }}
             className={cn(
-              'relative overflow-hidden rounded-2xl border p-4 transition-colors duration-200',
-              isActive ? 'border-gray-300 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.045)]' : 'border-gray-100 bg-gray-50/80',
-              isPast && 'border-emerald-100 bg-emerald-50/40'
+              'relative overflow-hidden border p-4',
+              radius.xl,
+              interactiveTokens.transition,
+              isActive
+                ? 'border-[var(--cq-border-strong)] bg-[var(--cq-surface)]'
+                : 'border-[var(--cq-border)] bg-[var(--cq-sunken)]',
+              isPast && 'border-emerald-200 bg-emerald-50/40'
             )}
+            aria-current={isActive ? 'step' : undefined}
           >
-            {isActive ? <motion.div layoutId="app-step-active" className="absolute inset-x-0 top-0 h-0.5 bg-gray-900" /> : null}
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <span className="flex h-8 w-8 items-center justify-center rounded-xl border border-gray-200 bg-white text-xs font-bold text-gray-600">
-                {isPast ? <Check size={14} aria-label="Abgeschlossen" /> : index + 1}
+            {isActive ? <span className="absolute inset-x-0 top-0 h-0.5 bg-[var(--cq-fg)]" aria-hidden="true" /> : null}
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <span className={cn('flex h-7 w-7 items-center justify-center bg-[var(--cq-surface)] text-[11px] font-semibold text-[var(--cq-fg-muted)]', border.hairline, radius.md)}>
+                {isPast ? <Check size={13} aria-label="Abgeschlossen" /> : index + 1}
               </span>
               <AppStatusBadge
                 label={isPast ? 'bereit' : isActive ? 'aktuell' : 'wartet'}
                 tone={isPast ? 'success' : isActive ? 'working' : 'neutral'}
               />
             </div>
-            <h3 className="text-sm font-semibold leading-snug text-gray-950">{step.title}</h3>
-            <p className="mt-2 text-[13px] leading-relaxed text-gray-500">{step.description}</p>
-          </motion.li>
+            <h3 className={dashText.cardTitle}>{step.title}</h3>
+            <p className={cn('mt-1', dashText.body)}>{step.description}</p>
+          </li>
         );
       })}
     </ol>
@@ -357,18 +377,21 @@ export function AppField({
 }) {
   return (
     <label className={cn('block', className)} htmlFor={id}>
-      <span className="mb-1.5 block text-xs font-semibold text-gray-700">{label}</span>
+      <span className={cn('mb-1.5 block', dashText.label)}>{label}</span>
       <input
         id={id}
         aria-invalid={Boolean(error)}
+        aria-describedby={error ? `${id}-error` : description ? `${id}-hint` : undefined}
         className={cn(
-          'h-11 w-full rounded-lg border bg-white px-3.5 text-sm text-gray-900 outline-none transition-all duration-200 placeholder:text-gray-300 focus:shadow-[0_0_0_3px_rgba(156,163,175,0.12)] disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400',
-          error ? 'border-red-300 focus:border-red-400' : 'border-gray-200 focus:border-gray-400'
+          'w-full bg-[var(--cq-surface)] px-3 text-[13px] text-[var(--cq-fg)] outline-none',
+          'h-10', radius.md, interactiveTokens.transition, focusRing,
+          'placeholder:text-[var(--cq-fg-subtle)] disabled:cursor-not-allowed disabled:bg-[var(--cq-sunken)] disabled:text-[var(--cq-fg-subtle)]',
+          error ? 'border border-red-300' : border.hairline
         )}
         {...props}
       />
-      {error ? <span className="mt-1.5 block text-[12px] leading-5 text-red-600">{error}</span> : null}
-      {!error && description ? <span className="mt-1.5 block text-[12px] leading-5 text-gray-400">{description}</span> : null}
+      {error ? <span id={`${id}-error`} className="mt-1 block text-[12px] leading-4 text-red-600">{error}</span> : null}
+      {!error && description ? <span id={`${id}-hint`} className={cn('mt-1 block', dashText.hint)}>{description}</span> : null}
     </label>
   );
 }
@@ -388,18 +411,21 @@ export function AppTextarea({
 }) {
   return (
     <label className={cn('block', className)} htmlFor={id}>
-      <span className="mb-1.5 block text-xs font-semibold text-gray-700">{label}</span>
+      <span className={cn('mb-1.5 block', dashText.label)}>{label}</span>
       <textarea
         id={id}
         aria-invalid={Boolean(error)}
+        aria-describedby={error ? `${id}-error` : description ? `${id}-hint` : undefined}
         className={cn(
-          'min-h-[112px] w-full resize-none rounded-lg border bg-white px-3.5 py-3 text-sm leading-relaxed text-gray-900 outline-none transition-all duration-200 placeholder:text-gray-300 focus:shadow-[0_0_0_3px_rgba(156,163,175,0.12)] disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400',
-          error ? 'border-red-300 focus:border-red-400' : 'border-gray-200 focus:border-gray-400'
+          'min-h-[104px] w-full resize-y bg-[var(--cq-surface)] px-3 py-2.5 text-[13px] leading-5 text-[var(--cq-fg)] outline-none',
+          radius.md, interactiveTokens.transition, focusRing,
+          'placeholder:text-[var(--cq-fg-subtle)] disabled:cursor-not-allowed disabled:bg-[var(--cq-sunken)] disabled:text-[var(--cq-fg-subtle)]',
+          error ? 'border border-red-300' : border.hairline
         )}
         {...props}
       />
-      {error ? <span className="mt-1.5 block text-[12px] leading-5 text-red-600">{error}</span> : null}
-      {!error && description ? <span className="mt-1.5 block text-[12px] leading-5 text-gray-400">{description}</span> : null}
+      {error ? <span id={`${id}-error`} className="mt-1 block text-[12px] leading-4 text-red-600">{error}</span> : null}
+      {!error && description ? <span id={`${id}-hint`} className={cn('mt-1 block', dashText.hint)}>{description}</span> : null}
     </label>
   );
 }
@@ -425,29 +451,22 @@ export function AppSelect({
   className?: string;
   disabled?: boolean;
 }) {
+  // Constrained single choice → Radix Select. Same props, same values, same onChange contract;
+  // the customer portal and the owner area now share one dropdown implementation.
   return (
-    <label className={cn('block', className)} htmlFor={id}>
-      <span className="mb-1.5 block text-xs font-semibold text-gray-700">{label}</span>
-      <select
+    // `className` stays on the wrapper: callers use it for grid placement, not to style the control.
+    <div className={className}>
+      <PremiumSelect
         id={id}
+        label={label}
         value={value}
-        onChange={(event) => onChange(event.target.value)}
-        aria-invalid={Boolean(error)}
+        onChange={onChange}
+        options={options}
+        hint={description}
+        error={error}
         disabled={disabled}
-        className={cn(
-          'h-11 w-full rounded-lg border bg-white px-3.5 text-sm text-gray-900 outline-none transition-all duration-200 focus:shadow-[0_0_0_3px_rgba(156,163,175,0.12)] disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400',
-          error ? 'border-red-300 focus:border-red-400' : 'border-gray-200 focus:border-gray-400'
-        )}
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      {error ? <span className="mt-1.5 block text-[12px] leading-5 text-red-600">{error}</span> : null}
-      {!error && description ? <span className="mt-1.5 block text-[12px] leading-5 text-gray-400">{description}</span> : null}
-    </label>
+      />
+    </div>
   );
 }
 
@@ -477,15 +496,18 @@ export function AppSegmentedControl({
               disabled={disabled}
               onClick={() => onChange(option.value)}
               className={cn(
-                'group relative overflow-hidden rounded-xl border px-4 py-3 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60',
-                active ? 'border-gray-400 bg-gray-900 text-white shadow-sm' : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                'relative overflow-hidden border px-3.5 py-2.5 text-left',
+                radius.md, interactiveTokens.transition, focusRing,
+                'disabled:cursor-not-allowed disabled:opacity-50',
+                active
+                  ? 'border-[var(--cq-fg)] bg-[var(--cq-fg)] text-white'
+                  : cn(border.hairline, 'bg-[var(--cq-surface)] text-[var(--cq-fg)] hover:border-[var(--cq-border-strong)] hover:bg-[var(--cq-hover)]')
               )}
               aria-pressed={active}
             >
-              {active ? <motion.span layoutId={`segmented-${label}`} className="absolute inset-x-0 top-0 h-0.5 bg-white/70" /> : null}
-              <span className="block text-sm font-semibold">{option.label}</span>
+              <span className="block text-[13px] font-medium leading-5">{option.label}</span>
               {option.description ? (
-                <span className={cn('mt-1 block text-[12px] leading-5', active ? 'text-white/65' : 'text-gray-400')}>
+                <span className={cn('mt-0.5 block text-[11.5px] leading-4', active ? 'text-white/70' : 'text-[var(--cq-fg-subtle)]')}>
                   {option.description}
                 </span>
               ) : null}
@@ -583,43 +605,46 @@ export function AppSaveBar({
 }) {
   const actionDisabled = disabled || loading || !onAction;
 
+  // Static mount: the save bar appears in response to a user edit, so animating it in adds
+  // latency to feedback the user is already waiting for.
   return (
-    <motion.div
-      initial={{ opacity: 0.9, y: 4 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.28, ease: appEase }}
+    <div
       className={cn(
-        'flex flex-col gap-3 rounded-2xl border bg-white/90 px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between',
+        'flex flex-col gap-2.5 border px-3.5 py-2.5 sm:flex-row sm:items-center sm:justify-between',
+        radius.lg,
         toneClasses[tone]
       )}
+      role="status"
     >
       <p className="text-[13px] font-medium leading-5">{message}</p>
       {actionLabel ? (
         <button
           type="button"
           disabled={actionDisabled}
+          aria-busy={loading || undefined}
           onClick={onAction}
           className={cn(
-            'inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2',
+            'inline-flex items-center justify-center gap-1.5 border text-[13px] font-medium',
+            control.md, radius.md, interactiveTokens.transition, focusRingOnSurface,
             actionDisabled
-              ? 'cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400'
-              : 'border-gray-900 bg-gray-900 text-white hover:bg-gray-700'
+              ? 'cursor-not-allowed border-[var(--cq-border)] bg-[var(--cq-sunken)] text-[var(--cq-fg-subtle)]'
+              : 'border-[var(--cq-fg)] bg-[var(--cq-fg)] text-white hover:bg-[#22272f]'
           )}
         >
           {loading ? 'Speichert...' : actionLabel}
         </button>
       ) : null}
-    </motion.div>
+    </div>
   );
 }
 
 export function AppSkeleton({ label }: { label: string }) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5">
-      <div className="h-3 w-24 rounded-full bg-gray-100" />
-      <div className="mt-5 space-y-3" aria-label={label}>
-        <div className="h-3 rounded-full bg-gray-100" />
-        <div className="h-3 w-2/3 rounded-full bg-gray-100" />
+    <div className={cn(surface.card, space.cardPadding)} role="status" aria-label={label}>
+      <div className={cn(skeletonClass, 'h-3 w-24')} />
+      <div className="mt-4 space-y-2.5" aria-hidden="true">
+        <div className={cn(skeletonClass, 'h-3')} />
+        <div className={cn(skeletonClass, 'h-3 w-2/3')} />
       </div>
     </div>
   );
@@ -627,14 +652,14 @@ export function AppSkeleton({ label }: { label: string }) {
 
 export function AppErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div className="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm leading-6 text-red-700">
-      <div className="mb-2 flex items-center gap-2 font-semibold">
-        <AlertCircle size={16} aria-hidden="true" />
+    <div className={cn('border border-red-200 bg-red-50 p-4 text-[13px] leading-5 text-red-700', radius.xl)} role="alert">
+      <div className="mb-1 flex items-center gap-1.5 font-semibold text-red-800">
+        <AlertCircle size={15} aria-hidden="true" />
         Fehlerzustand
       </div>
       {message}
       {onRetry ? (
-        <div className="mt-4">
+        <div className="mt-3">
           <AppButton variant="secondary" icon={RefreshCw} onClick={onRetry}>
             Erneut laden
           </AppButton>
@@ -658,16 +683,19 @@ export function AppAddButton({
   );
 }
 
+/**
+ * Route continuity. Opacity-only and short: a 4px slide on every navigation reads as movement
+ * for its own sake, and any y-offset shifts the first paint of the page heading.
+ */
 export function AppRouteTransition({ children, routeKey }: { children: ReactNode; routeKey: string }) {
   const reduceMotion = useReducedMotion();
 
   return (
     <motion.div
       key={routeKey}
-      initial={reduceMotion ? false : { opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={reduceMotion ? undefined : { opacity: 0, y: -4 }}
-      transition={{ duration: 0.24, ease: appEase }}
+      initial={reduceMotion ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: reduceMotion ? 0 : dashDuration.fast / 1000, ease: dashEase }}
     >
       {children}
     </motion.div>
