@@ -9,6 +9,21 @@ export default {
   ],
   theme: {
     extend: {
+      // Authenticated dashboard motion scale (see src/components/dashboard/tokens.ts).
+      // Named utilities rather than arbitrary `duration-[var(--x)]` values, which Tailwind
+      // reports as ambiguous (transition-duration vs animation-duration) and may not emit.
+      transitionDuration: {
+        fast: '140ms',
+        base: '180ms',
+        slow: '240ms',
+      },
+      transitionTimingFunction: {
+        premium: 'cubic-bezier(0.2, 0, 0, 1)',
+      },
+      animationDuration: {
+        fast: '140ms',
+        base: '180ms',
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',

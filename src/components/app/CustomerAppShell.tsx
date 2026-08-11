@@ -5,6 +5,8 @@ import { CreditCard, ExternalLink, FileText, Headphones, LayoutGrid, Settings, U
 import type { LucideIcon } from 'lucide-react';
 
 import { AppRouteTransition, AppStatusBadge } from '@/components/app/CustomerAppPrimitives';
+import { PremiumSelect } from '@/components/dashboard/PremiumSelect';
+import { radius, text as dashText } from '@/components/dashboard/tokens';
 import { lifecycleDisplays } from '@/components/app/customerPortalModel';
 import type { LifecycleDisplay } from '@/components/app/customerPortalModel';
 import { RailAccount } from '@/components/navigation/RailAccount';
@@ -196,10 +198,10 @@ function WorkspaceSlot({
   const selectId = variant === 'mobile' ? 'customer-organization-select-mobile' : 'customer-organization-select';
 
   return (
-    <div className="border-b border-gray-100 px-3 py-3">
-      <div className={cn('rounded-xl border border-gray-100 bg-gray-50/80 px-3 py-2.5')}>
-        <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-gray-400">Workspace</p>
-        <p className="mt-1 truncate text-[12.5px] font-semibold text-gray-900">
+    <div className="border-b border-[var(--cq-border)] px-3 py-3">
+      <div className={cn('border border-[var(--cq-border)] bg-[var(--cq-sunken)] px-3 py-2.5', radius.lg)}>
+        <p className={dashText.eyebrow}>Workspace</p>
+        <p className="mt-1 truncate text-[12.5px] font-medium text-[var(--cq-fg)]">
           {organizationName ?? 'Noch nicht provisioniert'}
         </p>
         <div className="mt-2">
@@ -207,23 +209,20 @@ function WorkspaceSlot({
         </div>
 
         {hasMultipleOrganizations ? (
-          <>
-            <label className="sr-only" htmlFor={selectId}>
-              Organisation auswählen
-            </label>
-            <select
+          // A constrained single choice that changes application state → Select, not DropdownMenu.
+          // The menu portals to the body, so it is never clipped by the rail's overflow-hidden.
+          <div className="mt-2.5">
+            <PremiumSelect
               id={selectId}
+              aria-label="Organisation auswählen"
               value={activeOrganizationId ?? ''}
-              onChange={(event) => onChangeOrganization(event.target.value || null)}
-              className="mt-2.5 h-9 w-full rounded-lg border border-gray-200 bg-white px-2 text-[12.5px] font-medium text-gray-700 outline-none transition-colors duration-150 focus:border-gray-400 focus-visible:ring-2 focus-visible:ring-gray-950/20"
-            >
-              {memberships.map((membership) => (
-                <option key={membership.id} value={membership.organization_id}>
-                  {membership.organization?.name ?? 'Unbenannte Organisation'}
-                </option>
-              ))}
-            </select>
-          </>
+              onChange={(value) => onChangeOrganization(value || null)}
+              options={memberships.map((membership) => ({
+                value: membership.organization_id,
+                label: membership.organization?.name ?? 'Unbenannte Organisation',
+              }))}
+            />
+          </div>
         ) : null}
       </div>
     </div>
