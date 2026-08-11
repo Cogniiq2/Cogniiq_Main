@@ -3,6 +3,7 @@
 export const solutionCatalogKeys = [
   'ai_receptionist',
   'automation_workspace',
+  'club_operations',
   'custom_client_portal',
   'website_management',
 ] as const;
@@ -11,6 +12,7 @@ export type SolutionCatalogKey = (typeof solutionCatalogKeys)[number];
 export const implementationKeys = [
   'ai_receptionist',
   'automation_workspace',
+  'club_operations',
   'pankofer_operations',
   'unavailable',
 ] as const;
