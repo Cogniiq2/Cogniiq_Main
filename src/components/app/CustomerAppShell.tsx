@@ -9,6 +9,7 @@ import { lifecycleDisplays } from '@/components/app/customerPortalModel';
 import type { LifecycleDisplay } from '@/components/app/customerPortalModel';
 import { RailAccount } from '@/components/navigation/RailAccount';
 import { SidebarShell } from '@/components/navigation/SidebarShell';
+import { resolveAriaCurrent } from '@/components/navigation/navModel';
 import type { SidebarNavGroup } from '@/components/navigation/navModel';
 import { useNavCollapse } from '@/components/navigation/useNavCollapse';
 import { useAuth } from '@/contexts/AuthContext';
@@ -102,21 +103,27 @@ function CustomerAppShellInner({ children }: { children: ReactNode }) {
   const navGroups = useMemo(() => [universalNav, ...productNav], [productNav]);
   const lifecycle = getWorkspaceLifecycleDisplay(Boolean(activeOrganizationId), solutions.length);
 
-  const groups: SidebarNavGroup[] = useMemo(
-    () =>
-      navGroups.map((group) => ({
-        id: group.id,
-        label: group.label,
-        items: group.items.map((item) => ({
-          key: item.href,
-          label: item.label,
-          href: item.href,
-          icon: item.icon,
-          active: isActivePath(location.pathname, item.href),
-        })),
+  const groups: SidebarNavGroup[] = useMemo(() => {
+    const built: SidebarNavGroup[] = navGroups.map((group) => ({
+      id: group.id,
+      label: group.label,
+      items: group.items.map((item) => ({
+        key: item.href,
+        label: item.label,
+        href: item.href,
+        icon: item.icon,
+        active: isActivePath(location.pathname, item.href),
+        // Every customer entry is a leaf destination; nesting is reconciled just below.
+        current: 'page',
       })),
-    [navGroups, location.pathname],
-  );
+    }));
+
+    // A solution's items live under /app/solutions/<key>/..., so the universal "Meine Lösungen"
+    // entry matches those routes too and both light up. The highlighting is intended; the duplicate
+    // aria-current="page" is not. resolveAriaCurrent keeps the deepest match as the page and
+    // downgrades the containing entry to 'true'.
+    return resolveAriaCurrent(built);
+  }, [navGroups, location.pathname]);
 
   return (
     <SidebarShell

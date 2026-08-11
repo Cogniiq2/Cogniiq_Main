@@ -69,6 +69,32 @@ describe('SidebarShell', () => {
     expect(within(nav).getByRole('link', { name: 'Übersicht' }).getAttribute('aria-current')).toBeNull();
   });
 
+  it('honours an explicit aria-current value so containing sections announce "true"', () => {
+    renderShell({
+      groups: [
+        {
+          id: 'sections',
+          label: 'Bereiche',
+          items: [
+            { key: 'fin', label: 'Finance', href: '/admin/finance', icon: Wallet, active: true, current: 'true' },
+          ],
+        },
+        {
+          id: 'module',
+          label: 'Finance',
+          items: [
+            { key: 'ov', label: 'Übersicht', href: '/admin/finance/overview', icon: LayoutGrid, active: true, current: 'page' },
+          ],
+        },
+      ],
+    });
+    const nav = desktopNav();
+    expect(within(nav).getByRole('link', { name: 'Finance' }).getAttribute('aria-current')).toBe('true');
+    expect(within(nav).getByRole('link', { name: 'Übersicht' }).getAttribute('aria-current')).toBe('page');
+    // The whole point: exactly one 'page' per rendered landmark.
+    expect(nav.querySelectorAll('[aria-current="page"]').length).toBe(1);
+  });
+
   it('keeps every item reachable by name when the rail is collapsed', () => {
     renderShell({ collapsed: true });
     const nav = desktopNav();

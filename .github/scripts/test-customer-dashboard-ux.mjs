@@ -44,7 +44,12 @@ ok(/customer-organization-select-mobile/.test(shell), 'mobile drawer provides an
 // The collapsed rail is icon-only, so every item needs an accessible name and a tooltip.
 ok(/TooltipContent/.test(sidebar), 'collapsed rail items expose tooltips');
 ok(/sr-only">\{item\.label\}/.test(sidebar), 'collapsed rail items keep a screen-reader label');
-ok(/aria-current=\{item\.active \? 'page' : undefined\}/.test(sidebar), 'active rail item is exposed via aria-current');
+// Active items announce aria-current; the value is the caller's ('page' for a leaf destination,
+// 'true' for a section that merely contains the current page) so one rail never has two 'page's.
+ok(/aria-current=\{item\.active \? item\.current \?\? 'page' : undefined\}/.test(sidebar),
+  'active rail item is exposed via aria-current with a caller-controlled value');
+ok(/current: 'page',/.test(shell), 'customer leaf items declare aria-current="page"');
+ok(/resolveAriaCurrent/.test(shell), 'customer rail collapses nested matches to a single current page');
 
 // ---------------------------------------------------------------- 2) entitlement denial is explained
 ok(!/<Navigate to="\/app" replace \/>/.test(guard), 'entitlement guard no longer silently redirects to /app');

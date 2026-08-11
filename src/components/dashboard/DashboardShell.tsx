@@ -52,6 +52,8 @@ export function DashboardShell({
     const isSubActive = (href: string) =>
       activeSubKey ? activeSubKey(pathname, href) : pathname === href || pathname.startsWith(`${href}/`);
 
+    const hasSubNav = Boolean(subNav && subNav.length);
+
     const result: SidebarNavGroup[] = [
       {
         id: 'sections',
@@ -62,20 +64,26 @@ export function DashboardShell({
           href: section.href,
           icon: section.icon,
           active: section.active,
+          // The active module only *contains* the current page once its sub-navigation is on
+          // screen, so it announces 'true' and leaves the single 'page' to the active sub-item.
+          // A module without sub-navigation (Oura, or any module whose sub-nav is withheld from a
+          // non-owner) is itself the destination and keeps 'page'.
+          current: hasSubNav ? ('true' as const) : ('page' as const),
         })),
       },
     ];
 
-    if (subNav && subNav.length) {
+    if (hasSubNav) {
       result.push({
         id: 'module',
         label: subNavLabel ?? 'Navigation',
-        items: subNav.map((item) => ({
+        items: subNav!.map((item) => ({
           key: item.key,
           label: item.label,
           href: item.href,
           icon: item.icon,
           active: isSubActive(item.href),
+          current: 'page' as const,
         })),
       });
     }

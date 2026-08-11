@@ -360,7 +360,8 @@ function NavRow({
   const link = (
     <Link
       to={item.href}
-      aria-current={item.active ? 'page' : undefined}
+      // A leaf destination defaults to 'page'; callers downgrade containing sections to 'true'.
+      aria-current={item.active ? item.current ?? 'page' : undefined}
       className={cn(
         // 44px touch targets below lg (the drawer); the denser 38px rail applies from lg up.
         'group relative flex min-h-[44px] items-center rounded-lg text-[13.5px] font-medium outline-none lg:min-h-[38px] lg:text-[13px]',
