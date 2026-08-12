@@ -14,10 +14,61 @@
 //
 // `latencyMs` defaults to 0 so tests resolve on the microtask queue rather than on timers.
 
-import { filterBookings } from '../filtering';
+import { buildInvoiceCounts } from '../aggregation';
+import {
+  filterActivity,
+  filterAlerts,
+  filterBookings,
+  filterInvoices,
+  filterMembers,
+  filterPayments,
+  filterReconciliation,
+  filterVouchers,
+  isAlertOpen,
+} from '../filtering';
+import { fixtureActivityRecords } from '../fixtures/activity';
+import { fixtureAlerts } from '../fixtures/alerts';
 import { fixtureBookings } from '../fixtures/bookings';
+import { fixtureInvoices } from '../fixtures/invoices';
+import { fixtureMembers } from '../fixtures/members';
+import { monthlyReportComparison } from '../fixtures/monthlyReports';
 import { buildOverview } from '../fixtures/overview';
-import type { BookingPage, BookingQuery, OverviewQuery, OverviewSnapshot } from '../types';
+import { fixturePayments } from '../fixtures/payments';
+import { fixtureReconciliation, reconciliationCounts } from '../fixtures/reconciliation';
+import { buildReport } from '../fixtures/reports';
+import { fixtureSettings } from '../fixtures/settings';
+import { FIXTURE_TODAY, fixtureVouchers } from '../fixtures/vouchers';
+import {
+  alertSeverities,
+  paymentProviders,
+  paymentStatuses,
+  type ActivityPage,
+  type ActivityQuery,
+  type AlertPage,
+  type AlertQuery,
+  type BookingPage,
+  type BookingQuery,
+  type InvoicePage,
+  type InvoiceQuery,
+  type MemberPage,
+  type MemberQuery,
+  type MonthlyReportComparison,
+  type MonthlyReportQuery,
+  type OverviewQuery,
+  type OverviewSnapshot,
+  type Payment,
+  type PaymentPage,
+  type PaymentQuery,
+  type PaymentTotals,
+  type ReconciliationPage,
+  type ReconciliationQuery,
+  type ReportQuery,
+  type ReportSnapshot,
+  type SettingsSnapshot,
+  type VoucherPage,
+  type VoucherQuery,
+  type VoucherTotals,
+} from '../types';
 import {
   ClubOperationsError,
   type ClubOperationsAdapter,
@@ -39,8 +90,47 @@ function settle<T>(value: T, latencyMs: number): Promise<T> {
   return new Promise((resolve) => setTimeout(() => resolve(value), latencyMs));
 }
 
+function paymentTotals(payments: Payment[]): PaymentTotals {
+  const grossCents = payments
+    .filter((p) => p.status === 'paid' || p.status === 'refunded')
+    .reduce((sum, p) => sum + p.grossCents, 0);
+  const refundedCents = payments.reduce((sum, p) => sum + p.refundedCents, 0);
+  return {
+    grossCents,
+    refundedCents,
+    netCents: grossCents - refundedCents,
+    pendingCents: payments.filter((p) => p.status === 'pending').reduce((sum, p) => sum + p.grossCents, 0),
+    succeededCount: payments.filter((p) => p.status === 'paid').length,
+    pendingCount: payments.filter((p) => p.status === 'pending').length,
+    refundedCount: payments.filter((p) => p.refundedCents > 0).length,
+    doubleBookingCount: payments.filter((p) => p.metaClass === 'double_booking').length,
+    customerCancelledCount: payments.filter((p) => p.metaClass === 'customer_cancelled').length,
+  };
+}
+
+function voucherTotals(vouchers: VoucherPage['vouchers']): VoucherTotals {
+  return {
+    count: vouchers.length,
+    issuedValueCents: vouchers.reduce((sum, v) => sum + v.originalValueCents, 0),
+    redeemedValueCents: vouchers.reduce(
+      (sum, v) => sum + (v.originalValueCents - v.remainingCents),
+      0,
+    ),
+    outstandingValueCents: vouchers
+      .filter((v) => v.status !== 'expired')
+      .reduce((sum, v) => sum + v.remainingCents, 0),
+    expiredCount: vouchers.filter((v) => v.status === 'expired').length,
+  };
+}
+
+/** An overview shaped correctly but with every figure at zero, for the empty scenario. */
+function emptySnapshot(query: OverviewQuery): OverviewSnapshot {
+  return buildOverview(query.period);
+}
+
 export function createFixtureAdapter(options: FixtureAdapterOptions = {}): ClubOperationsAdapter {
   const { scenario = 'populated', latencyMs = 0, errorCode = 'unavailable' } = options;
+  const isEmpty = scenario === 'empty';
 
   function guard<T>(produce: () => T): Promise<T> {
     if (scenario === 'loading') return new Promise<T>(() => {});
@@ -49,23 +139,170 @@ export function createFixtureAdapter(options: FixtureAdapterOptions = {}): ClubO
         new ClubOperationsError(errorCode, `Fixture-Szenario "${scenario}" (${errorCode})`),
       );
     }
-    return settle(produce(), latencyMs);
+    // A failure inside `produce` must surface as a rejected promise, never as a synchronous throw:
+    // callers await these methods, and a synchronous throw would bypass the resource hook's error
+    // handling entirely and escape as an unhandled exception during render.
+    try {
+      return settle(produce(), latencyMs);
+    } catch (cause) {
+      return Promise.reject(cause);
+    }
   }
 
-  const source = () => (scenario === 'empty' ? [] : fixtureBookings);
+  const bookings = () => (isEmpty ? [] : fixtureBookings);
+  const payments = () => (isEmpty ? [] : fixturePayments);
+  const invoices = () => (isEmpty ? [] : fixtureInvoices);
+  const reconciliation = () => (isEmpty ? [] : fixtureReconciliation);
+  const vouchers = () => (isEmpty ? [] : fixtureVouchers);
+  const members = () => (isEmpty ? [] : fixtureMembers);
+  const activity = () => (isEmpty ? [] : fixtureActivityRecords);
+  const alerts = () => (isEmpty ? [] : fixtureAlerts);
 
   return {
     id: `fixture:${scenario}`,
 
     getOverview(query: OverviewQuery): Promise<OverviewSnapshot> {
-      return guard(() => buildOverview(source(), query.period));
+      return guard(() =>
+        isEmpty
+          ? emptySnapshot(query)
+          : buildOverview(query.period, {
+              bookings: bookings(),
+              payments: payments(),
+              invoices: invoices(),
+              reconciliation: reconciliation(),
+              vouchers: vouchers(),
+              alerts: alerts(),
+              asOf: FIXTURE_TODAY,
+            }),
+      );
     },
 
     listBookings(query: BookingQuery): Promise<BookingPage> {
       return guard(() => {
-        const bookings = filterBookings(source(), query);
-        return { bookings, total: bookings.length };
+        const result = filterBookings(bookings(), query);
+        return { bookings: result, total: result.length };
       });
+    },
+
+    listPayments(query: PaymentQuery): Promise<PaymentPage> {
+      return guard(() => {
+        const result = filterPayments(payments(), query);
+        return {
+          payments: result,
+          total: result.length,
+          totals: paymentTotals(result),
+          byProvider: paymentProviders
+            .map((provider) => {
+              const slice = result.filter((p) => p.provider === provider);
+              return {
+                provider,
+                count: slice.length,
+                amountCents: slice.reduce((sum, p) => sum + p.grossCents, 0),
+              };
+            })
+            .filter((slice) => slice.count > 0),
+          byStatus: paymentStatuses
+            .map((status) => {
+              const slice = result.filter((p) => p.status === status);
+              return {
+                status,
+                count: slice.length,
+                amountCents: slice.reduce((sum, p) => sum + p.grossCents, 0),
+              };
+            })
+            .filter((slice) => slice.count > 0),
+        };
+      });
+    },
+
+    listInvoices(query: InvoiceQuery): Promise<InvoicePage> {
+      return guard(() => {
+        const result = filterInvoices(invoices(), query);
+        return {
+          invoices: result,
+          total: result.length,
+          counts: buildInvoiceCounts(result, FIXTURE_TODAY),
+        };
+      });
+    },
+
+    listReconciliation(query: ReconciliationQuery): Promise<ReconciliationPage> {
+      return guard(() => {
+        const result = filterReconciliation(reconciliation(), query);
+        return { entries: result, total: result.length, counts: reconciliationCounts(result) };
+      });
+    },
+
+    getMonthlyReport(query: MonthlyReportQuery): Promise<MonthlyReportComparison> {
+      return guard(() => {
+        if (isEmpty) {
+          throw new ClubOperationsError('unavailable', 'Keine Monatsberichte vorhanden.');
+        }
+        const comparison = monthlyReportComparison(query.month);
+        if (!comparison) {
+          throw new ClubOperationsError('invalid_query', 'Unbekannter Berichtsmonat.');
+        }
+        return comparison;
+      });
+    },
+
+    getReport(query: ReportQuery): Promise<ReportSnapshot> {
+      return guard(() => buildReport(bookings(), query.range));
+    },
+
+    listVouchers(query: VoucherQuery): Promise<VoucherPage> {
+      return guard(() => {
+        const result = filterVouchers(vouchers(), query);
+        return { vouchers: result, total: result.length, totals: voucherTotals(result) };
+      });
+    },
+
+    listMembers(query: MemberQuery): Promise<MemberPage> {
+      return guard(() => {
+        const result = filterMembers(members(), query);
+        return {
+          members: result,
+          total: result.length,
+          totals: {
+            total: result.length,
+            active: result.filter((m) => m.status === 'active').length,
+            padel: result.filter((m) => m.membershipType === 'padel').length,
+            tennis: result.filter((m) => m.membershipType === 'tennis').length,
+            combination: result.filter((m) => m.membershipType === 'combination').length,
+          },
+        };
+      });
+    },
+
+    listActivity(query: ActivityQuery): Promise<ActivityPage> {
+      return guard(() => {
+        const result = filterActivity(activity(), query);
+        return { records: result, total: result.length };
+      });
+    },
+
+    listAlerts(query: AlertQuery): Promise<AlertPage> {
+      return guard(() => {
+        const result = filterAlerts(alerts(), query);
+        const open = result.filter(isAlertOpen);
+        return {
+          alerts: result,
+          total: result.length,
+          openCount: open.length,
+          openBySeverity: alertSeverities
+            .map((severity) => ({
+              severity,
+              count: open.filter((alert) => alert.severity === severity).length,
+            }))
+            .filter((entry) => entry.count > 0),
+        };
+      });
+    },
+
+    getSettings(): Promise<SettingsSnapshot> {
+      return guard(() =>
+        isEmpty ? { groups: [], roles: [], permissionGroups: [] } : fixtureSettings,
+      );
     },
   };
 }

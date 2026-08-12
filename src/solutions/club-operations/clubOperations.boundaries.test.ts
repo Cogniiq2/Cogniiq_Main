@@ -4,6 +4,7 @@
 // name the forbidden patterns in order to forbid them, and scanning itself would be self-defeating.
 // Comments are stripped before scanning so a comment recording a rule cannot trip the rule.
 
+import { execSync } from 'node:child_process';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 
@@ -21,9 +22,18 @@ function walk(dir: string): string[] {
 
 const allFiles = walk(moduleRoot);
 
-/** Source files: everything except tests. */
+/**
+ * Product source files: everything except tests and `__`-prefixed local scratch files.
+ *
+ * Tests are excluded because this file has to name the forbidden patterns in order to forbid them.
+ * `__`-prefixed files are temporary, local-only review harnesses that are never committed — the
+ * separate "no uncommitted harness ships" guard below is what keeps that honest.
+ */
 const sourceFiles = allFiles.filter(
-  (file) => /\.(ts|tsx)$/.test(file) && !/\.test\.tsx?$/.test(file),
+  (file) =>
+    /\.(ts|tsx)$/.test(file) &&
+    !/\.test\.tsx?$/.test(file) &&
+    !/[\\/]__/.test(file),
 );
 
 function stripComments(source: string): string {
@@ -40,10 +50,25 @@ const sources = sourceFiles.map((file) => ({
 describe('the module has source files to scan', () => {
   it('found the expected module tree', () => {
     // Guards against the scan silently passing because it globbed nothing.
-    expect(sourceFiles.length).toBeGreaterThanOrEqual(12);
+    expect(sourceFiles.length).toBeGreaterThanOrEqual(25);
     const names = sources.map((s) => s.path);
     expect(names).toContain('src/solutions/club-operations/ClubOperationsModule.tsx');
     expect(names).toContain('src/solutions/club-operations/adapter/fixtureAdapter.ts');
+    // One section file per navigation entry — a section cannot be listed without existing.
+    const sectionFiles = names.filter((name) => name.includes('/sections/'));
+    expect(sectionFiles).toHaveLength(12);
+  });
+
+  it('no temporary harness file is tracked by git', () => {
+    // The review harness is local-only. If one is ever committed it would ship an unguarded entry
+    // point into the bundle, so its absence from the index is asserted rather than assumed.
+    const tracked = execSync('git ls-files src/solutions/club-operations', {
+      cwd: repoRoot,
+      encoding: 'utf8',
+    })
+      .split('\n')
+      .filter((line) => /(^|\/)__/.test(line.trim()) && line.trim().length > 0);
+    expect(tracked).toEqual([]);
   });
 });
 
@@ -78,9 +103,28 @@ describe('no credential, connection target or network client', () => {
 });
 
 describe('no copied authorization logic from the reference dashboard', () => {
-  it('does not reintroduce a hardcoded superadmin role', () => {
-    const offenders = sources.filter((s) => /CURRENT_ROLE|superadmin/i.test(s.code)).map((s) => s.path);
+  it('does not reintroduce a hardcoded current role', () => {
+    // The hazard in the reference system is `CURRENT_ROLE = 'superadmin'` — a constant standing in
+    // for an authorization decision. The *word* superadmin is fine as a permission-matrix row label;
+    // what must never exist is a value claiming to be the caller's own role.
+    const offenders = sources
+      .filter((s) => /CURRENT_ROLE|currentRole|effectiveRole|isSuperAdmin|hasPermission\s*\(/i.test(s.code))
+      .map((s) => s.path);
     expect(offenders).toEqual([]);
+  });
+
+  it('never assigns a role to the viewer', () => {
+    // Roles appear in this module only as displayed data — a permission-matrix row, an audit-trail
+    // actor. What must not exist is a variable holding *the caller's* role, or a role literal being
+    // assigned to one. (`role=` as a JSX ARIA attribute is unrelated and deliberately not matched.)
+    for (const { path, code } of sources) {
+      expect(code, `${path}: names a viewer role`).not.toMatch(
+        /\b(currentRole|viewerRole|userRole|activeRole|myRole)\b/i,
+      );
+      expect(code, `${path}: assigns a role literal`).not.toMatch(
+        /=\s*['"](superadmin|vorstand|finanzadmin|buchungsadmin|readonly)['"]/i,
+      );
+    }
   });
 
   it('contains no organization-, email- or tenant-specific authorization', () => {

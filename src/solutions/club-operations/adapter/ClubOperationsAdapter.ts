@@ -11,7 +11,31 @@
 //   * Mutations. This phase is read-only; writes arrive only once each one has its own
 //     server-side permission check, audit trail and tests.
 
-import type { BookingPage, BookingQuery, OverviewQuery, OverviewSnapshot } from '../types';
+import type {
+  ActivityPage,
+  ActivityQuery,
+  AlertPage,
+  AlertQuery,
+  BookingPage,
+  BookingQuery,
+  InvoicePage,
+  InvoiceQuery,
+  MemberPage,
+  MemberQuery,
+  MonthlyReportComparison,
+  MonthlyReportQuery,
+  OverviewQuery,
+  OverviewSnapshot,
+  PaymentPage,
+  PaymentQuery,
+  ReconciliationPage,
+  ReconciliationQuery,
+  ReportQuery,
+  ReportSnapshot,
+  SettingsSnapshot,
+  VoucherPage,
+  VoucherQuery,
+} from '../types';
 
 /**
  * Failure modes the UI must distinguish. Modelled explicitly rather than as loose strings so the
@@ -56,9 +80,27 @@ export function errorMessageFor(error: unknown): string {
   return clubOperationsErrorMessages.unknown;
 }
 
+/**
+ * Every read the module performs. One method per section, each taking a domain query and returning
+ * a domain result.
+ *
+ * There is no mutating method, and adding one is a deliberate act: writes arrive only once each has
+ * its own server-side permission check, audit trail and tests.
+ */
 export interface ClubOperationsAdapter {
   /** Identifies the implementation in diagnostics. Not a connection target. */
   readonly id: string;
+
   getOverview(query: OverviewQuery): Promise<OverviewSnapshot>;
   listBookings(query: BookingQuery): Promise<BookingPage>;
+  listPayments(query: PaymentQuery): Promise<PaymentPage>;
+  listInvoices(query: InvoiceQuery): Promise<InvoicePage>;
+  listReconciliation(query: ReconciliationQuery): Promise<ReconciliationPage>;
+  getMonthlyReport(query: MonthlyReportQuery): Promise<MonthlyReportComparison>;
+  getReport(query: ReportQuery): Promise<ReportSnapshot>;
+  listVouchers(query: VoucherQuery): Promise<VoucherPage>;
+  listMembers(query: MemberQuery): Promise<MemberPage>;
+  listActivity(query: ActivityQuery): Promise<ActivityPage>;
+  listAlerts(query: AlertQuery): Promise<AlertPage>;
+  getSettings(): Promise<SettingsSnapshot>;
 }
