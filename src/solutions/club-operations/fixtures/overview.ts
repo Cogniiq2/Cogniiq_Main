@@ -1,140 +1,150 @@
-// Overview fixture.
+// Overview snapshot.
 //
-// Derived from the booking fixtures rather than hand-written, so the headline figures always agree
-// with the booking list a user can scroll through. Hand-typed totals drift the moment a fixture row
-// changes, and a dashboard whose KPIs contradict its own table teaches the reader to distrust it.
+// Derived from the other fixtures rather than hand-written, so the headline figures always agree
+// with the lists a user can scroll through. Hand-typed totals drift the moment a fixture row
+// changes, and a dashboard whose KPIs contradict its own tables teaches the reader to distrust it.
 //
-// All arithmetic is in integer cents. VAT is computed out of a gross amount, which is how the club
-// actually prices: the displayed price includes tax.
+// The snapshot is genuinely period-scoped. Until this phase `period` was accepted and ignored, so
+// every choice in the Zeitraum control produced the same figures — a visible control that changed
+// nothing. Bookings, VAT, court utilisation, the trend series and the comparison window are now all
+// sliced by the resolved window; invoices, reconciliation and alerts stay whole-dataset, because a
+// receivable and an unresolved discrepancy do not stop being open when the reader narrows to a week.
 
-import { percentOf } from '../formatting';
+import {
+  bookingsWithin,
+  buildCounts,
+  buildCourts,
+  buildInvoiceCounts,
+  buildPaymentStatus,
+  buildPeriodTotals,
+  buildRevenue,
+  buildTrend,
+  buildVat,
+} from '../aggregation';
+import { buildAttention, summariseAttention } from '../attention';
+import { resolvePeriod } from '../periods';
+import { toLocalDateKey } from '../formatting';
+import { isWithin } from '../periods';
 import type {
   ActivityEntry,
+  AlertSeverityCount,
   Booking,
-  BookingCounts,
-  CourtKey,
-  CourtUtilization,
+  Invoice,
+  OperationalAlert,
   OverviewPeriod,
   OverviewSnapshot,
-  PaymentProvider,
-  PaymentStatus,
-  PaymentStatusSlice,
-  RevenueSummary,
-  TaxCategory,
-  VatCategoryStat,
-  VatSummary,
+  Payment,
+  ReconciliationEntry,
+  Voucher,
 } from '../types';
-import { courtKeys, paymentProviders, paymentStatuses, taxCategories } from '../types';
+import { alertSeverities } from '../types';
 import { fixtureBookings } from './bookings';
-
-/** Revenue only counts money actually collected. */
-function isRevenue(booking: Booking): boolean {
-  return booking.paymentStatus === 'paid';
-}
-
-/** Net and VAT split out of a gross amount at the given percent rate. */
-function splitGross(grossCents: number, ratePercent: number | null): { netCents: number; vatCents: number } {
-  if (!ratePercent) return { netCents: grossCents, vatCents: 0 };
-  const netCents = Math.round(grossCents / (1 + ratePercent / 100));
-  return { netCents, vatCents: grossCents - netCents };
-}
-
-function buildRevenue(bookings: Booking[]): RevenueSummary {
-  const paid = bookings.filter(isRevenue);
-  const totalCents = paid.reduce((sum, b) => sum + b.amountCents, 0);
-  const earning = paid.filter((b) => b.amountCents > 0);
-  return {
-    totalCents,
-    averageBookingValueCents: earning.length ? Math.round(totalCents / earning.length) : 0,
-    byProvider: paymentProviders
-      .map((provider: PaymentProvider) => ({
-        provider,
-        amountCents: paid.filter((b) => b.provider === provider).reduce((s, b) => s + b.amountCents, 0),
-      }))
-      .filter((entry) => entry.amountCents > 0),
-  };
-}
-
-function buildCounts(bookings: Booking[]): BookingCounts {
-  return {
-    total: bookings.length,
-    paid: bookings.filter(isRevenue).length,
-    free: bookings.filter((b) => b.paymentStatus === 'not_required').length,
-    cancelled: bookings.filter((b) => b.status === 'cancelled').length,
-  };
-}
-
-function buildPaymentStatus(bookings: Booking[]): PaymentStatusSlice[] {
-  return paymentStatuses
-    .map((status: PaymentStatus) => {
-      const slice = bookings.filter((b) => b.paymentStatus === status);
-      return {
-        status,
-        count: slice.length,
-        amountCents: slice.reduce((sum, b) => sum + b.amountCents, 0),
-      };
-    })
-    .filter((slice) => slice.count > 0);
-}
-
-function buildVat(bookings: Booking[]): VatSummary {
-  const categories: VatCategoryStat[] = taxCategories
-    .map((category: TaxCategory) => {
-      const slice = bookings.filter((b) => b.taxCategory === category && isRevenue(b));
-      const grossCents = slice.reduce((sum, b) => sum + b.amountCents, 0);
-      const rate = slice[0]?.taxRatePercent ?? null;
-      const { netCents, vatCents } = splitGross(grossCents, rate);
-      return { category, bookingCount: slice.length, netCents, vatCents, grossCents };
-    })
-    .filter((stat) => stat.bookingCount > 0);
-
-  return {
-    totalVatCents: categories.reduce((sum, c) => sum + c.vatCents, 0),
-    categories,
-    unresolvedCount: bookings.filter((b) => b.taxCategory === 'padel_unresolved').length,
-  };
-}
-
-/** Bookable slots per court in the fixture window, used to express utilisation as a share. */
-const FIXTURE_SLOTS_PER_COURT = 14;
-
-function buildCourts(bookings: Booking[]): CourtUtilization[] {
-  return courtKeys.map((court: CourtKey) => {
-    const slice = bookings.filter((b) => b.court === court);
-    return {
-      court,
-      bookingCount: slice.length,
-      revenueCents: slice.filter(isRevenue).reduce((sum, b) => sum + b.amountCents, 0),
-      utilizationPercent: Math.round(percentOf(slice.length, FIXTURE_SLOTS_PER_COURT)),
-    };
-  });
-}
+import { fixtureInvoices } from './invoices';
+import { fixtureAlerts } from './alerts';
+import { fixturePayments } from './payments';
+import { fixtureReconciliation, reconciliationCounts } from './reconciliation';
+import { FIXTURE_TODAY, fixtureVouchers } from './vouchers';
 
 const fixtureActivity: ActivityEntry[] = [
-  { id: 'act-01', occurredAt: '2026-03-08T14:12:00+01:00', kind: 'booking', summary: 'Neue Buchung BU-2054 für Tennis 3' },
-  { id: 'act-02', occurredAt: '2026-03-07T20:04:00+01:00', kind: 'payment', summary: 'Zahlung zu BU-2053 bestätigt' },
-  { id: 'act-03', occurredAt: '2026-03-05T18:33:00+01:00', kind: 'voucher', summary: 'Gutschein für BU-2049 eingelöst' },
-  { id: 'act-04', occurredAt: '2026-03-05T08:02:00+01:00', kind: 'cancellation', summary: 'Buchung BU-2048 storniert' },
-  { id: 'act-05', occurredAt: '2026-03-04T21:35:00+01:00', kind: 'refund', summary: 'Erstattung zu BU-2047 ausgelöst' },
+  { id: 'act-01', occurredAt: '2026-03-31T09:20:00+02:00', kind: 'booking', summary: 'Neue Buchung BU-2129 für Padel 2' },
+  { id: 'act-02', occurredAt: '2026-03-30T17:35:00+02:00', kind: 'booking', summary: 'Neue Buchung BU-2126 für Tennis 3' },
+  { id: 'act-03', occurredAt: '2026-03-27T18:05:00+01:00', kind: 'refund', summary: 'Erstattung zu BU-2127 ausgelöst — Buchung weiterhin aktiv' },
+  { id: 'act-04', occurredAt: '2026-03-26T09:12:00+01:00', kind: 'payment', summary: 'Rechnung RE-2026-0038 versendet' },
+  { id: 'act-05', occurredAt: '2026-03-20T19:05:00+01:00', kind: 'voucher', summary: 'Gutschein GS-2026-0002 für BU-2123 eingelöst' },
+  { id: 'act-06', occurredAt: '2026-03-14T15:05:00+01:00', kind: 'cancellation', summary: 'Buchung BU-2120 storniert' },
 ];
 
-export function buildOverview(bookings: Booking[], period: OverviewPeriod): OverviewSnapshot {
+function openAlertsBySeverity(alerts: OperationalAlert[]): AlertSeverityCount[] {
+  return alertSeverities
+    .map((severity) => ({
+      severity,
+      count: alerts.filter((alert) => alert.severity === severity && alert.status !== 'resolved' && alert.status !== 'ignored').length,
+    }))
+    .filter((entry) => entry.count > 0);
+}
+
+export interface OverviewInput {
+  bookings: Booking[];
+  payments: Payment[];
+  invoices: Invoice[];
+  reconciliation: ReconciliationEntry[];
+  vouchers: Voucher[];
+  alerts: OperationalAlert[];
+  /** The date the dataset is current as of. Never the wall clock. */
+  asOf: string;
+}
+
+const emptyInput = (asOf: string): OverviewInput => ({
+  bookings: [],
+  payments: [],
+  invoices: [],
+  reconciliation: [],
+  vouchers: [],
+  alerts: [],
+  asOf,
+});
+
+export function buildOverview(
+  period: OverviewPeriod,
+  input: OverviewInput = emptyInput(FIXTURE_TODAY),
+): OverviewSnapshot {
+  const { bookings, payments, invoices, reconciliation, vouchers, alerts, asOf } = input;
+  const window = resolvePeriod(period, asOf);
+
+  const inPeriod = bookingsWithin(bookings, window.current);
+  const inPrevious = bookingsWithin(bookings, window.previous);
+
+  const attention = buildAttention({
+    bookings,
+    payments,
+    invoices,
+    reconciliation,
+    vouchers,
+    alerts,
+    asOf,
+  });
+
   return {
     period,
-    revenue: buildRevenue(bookings),
-    bookings: buildCounts(bookings),
-    paymentStatus: buildPaymentStatus(bookings),
-    vat: buildVat(bookings),
-    courts: buildCourts(bookings),
-    activity: fixtureActivity,
+    bounds: window.current,
+    previousBounds: window.previous,
+    comparisonLabel: window.comparisonLabel,
+    revenue: buildRevenue(inPeriod),
+    bookings: buildCounts(inPeriod),
+    paymentStatus: buildPaymentStatus(inPeriod),
+    vat: buildVat(inPeriod),
+    courts: buildCourts(inPeriod),
+    // Recent activity is scoped to the window too, so "Letzte Aktivität" is the activity of the
+    // period being read rather than of the dataset as a whole.
+    activity: fixtureActivity.filter((entry) =>
+      isWithin(toLocalDateKey(entry.occurredAt), window.current),
+    ),
+    invoices: buildInvoiceCounts(invoices, asOf),
+    reconciliation: reconciliationCounts(reconciliation),
+    openAlerts: openAlertsBySeverity(alerts),
+    totals: buildPeriodTotals(inPeriod),
+    previous: buildPeriodTotals(inPrevious),
+    trend: buildTrend(bookings, window.current, window.granularity),
+    attention,
+    health: summariseAttention(attention),
+    dataAsOf: asOf,
   };
 }
 
+/** The whole fixture dataset, sliced to the requested period. */
 export function fixtureOverview(period: OverviewPeriod): OverviewSnapshot {
-  return buildOverview(fixtureBookings, period);
+  return buildOverview(period, {
+    bookings: fixtureBookings,
+    payments: fixturePayments,
+    invoices: fixtureInvoices,
+    reconciliation: fixtureReconciliation,
+    vouchers: fixtureVouchers,
+    alerts: fixtureAlerts,
+    asOf: FIXTURE_TODAY,
+  });
 }
 
 /** A structurally valid but entirely empty snapshot, for the "no data yet" state. */
 export function emptyOverview(period: OverviewPeriod): OverviewSnapshot {
-  return buildOverview([], period);
+  return buildOverview(period, emptyInput(FIXTURE_TODAY));
 }

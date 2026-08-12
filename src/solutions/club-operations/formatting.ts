@@ -92,6 +92,45 @@ export function toLocalDateKey(iso: string | null | undefined): string {
   return `${date.getFullYear()}-${month}-${day}`;
 }
 
+/**
+ * "2026-03-02" -> "02.03." — a chart axis tick.
+ *
+ * Built from the string parts rather than a Date, because a chart bucket key is already a calendar
+ * date and parsing it back into a Date would reintroduce the timezone shift the key exists to avoid.
+ */
+export function formatDayTick(dayKey: string): string {
+  const [, month, day] = dayKey.split('-');
+  return month && day ? `${day}.${month}.` : dayKey;
+}
+
+/** "2026-03-02" -> "02.03.2026". Same reasoning as `formatDayTick`. */
+export function formatDayKey(dayKey: string): string {
+  const [year, month, day] = dayKey.split('-');
+  return year && month && day ? `${day}.${month}.${year}` : dayKey;
+}
+
+/** Inclusive window as "01.03.2026 – 31.03.2026". */
+export function formatDayRange(start: string, end: string): string {
+  return start === end ? formatDayKey(start) : `${formatDayKey(start)} – ${formatDayKey(end)}`;
+}
+
+/**
+ * Signed percentage change, or null when the baseline is zero.
+ *
+ * Null rather than Infinity or 100: growth from nothing has no meaningful rate, and rendering one
+ * invites the reader to compare it against rates that do.
+ */
+export function percentChange(current: number, previous: number): number | null {
+  if (!Number.isFinite(current) || !Number.isFinite(previous) || previous === 0) return null;
+  return ((current - previous) / Math.abs(previous)) * 100;
+}
+
+/** "+12,4 %" / "−8,0 %". Uses a real minus sign, not a hyphen. */
+export function formatSignedPercent(value: number, fractionDigits = 1): string {
+  const sign = value > 0 ? '+' : value < 0 ? '−' : '';
+  return `${sign}${Math.abs(value).toFixed(fractionDigits).replace('.', ',')} %`;
+}
+
 /** Share of `part` in `total`, 0–100, guarding division by zero. */
 export function percentOf(part: number, total: number): number {
   if (!Number.isFinite(part) || !Number.isFinite(total) || total <= 0) return 0;
