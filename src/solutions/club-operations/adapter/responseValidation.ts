@@ -80,7 +80,7 @@ import {
   type Voucher,
   type VoucherPage,
   type VoucherTotals,
-} from '../types';
+} from '../types.ts';
 
 /** A structural mismatch. Carries a path, never a value: a value here could be personal or financial. */
 export class MalformedResponseError extends Error {

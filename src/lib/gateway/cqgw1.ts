@@ -36,7 +36,7 @@
 // unforgeable: without it, moving a character from the end of one field to the start of the next
 // produces the same concatenation and therefore the same signature.
 
-import { base64urlDecode, base64urlEncode, sha256Hex, utf8ByteLength, utf8Bytes } from './encoding';
+import { base64urlDecode, base64urlEncode, sha256Hex, utf8ByteLength, utf8Bytes } from './encoding.ts';
 
 export const CQGW1_VERSION = 'CQGW1';
 
