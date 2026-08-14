@@ -7,6 +7,22 @@
 // Money is ALWAYS an integer number of cents, matching the Cogniiq convention (see
 // `formatCents` in src/lib/clientPlatform/validation.ts). The reference system stores euro
 // floats; converting at the adapter boundary is a mapping concern and must never leak into the UI.
+//
+// ─── Source-absent fields are `null` (Phase D3b step 0, owner decision 4) ────────────────────────
+//
+// Some fields of this model have no authorised upstream column. The gateway role's grant is
+// column-scoped and deliberately narrow, so a value that no granted column can supply is simply not
+// knowable. Every such field is typed `| null` and carries a `SOURCE-ABSENT` note naming the reason.
+//
+// The rule, and it is absolute: **a source-absent value is `null`, never a substitute.** Not an
+// empty string, not `0`, not an empty array, not a placeholder. `0` bookings and "we cannot link
+// bookings to members" are different statements, and a dashboard that renders the second as the
+// first is lying to the reader in the direction that looks reassuring.
+//
+// Aggregates follow their inputs: a total computed over an unavailable field is itself unavailable.
+//
+// Fixtures may carry rich values for these fields — they are declared fiction. The *types* admit
+// null because the gateway will have to emit it.
 
 /* ------------------------------------------------------------------ Sections */
 
@@ -305,6 +321,11 @@ export type PaymentReferenceType = 'booking' | 'voucher';
 /**
  * Why a payment exists in its current shape. The reference dashboard derives this from payment
  * metadata to drive its "Doppelbuchungen" and "Kundenstornierungen" facets.
+ *
+ * SOURCE-ABSENT upstream: the classification lives in `payments.metadata`, a jsonb column that
+ * cannot be column-scoped and that carries personal data, so it is excluded from the gateway grant
+ * and must never be queried. A payment whose class cannot be determined is `null` — which is *not*
+ * the same as `standard`, and no consumer may treat it as such.
  */
 export const paymentMetaClasses = ['standard', 'double_booking', 'customer_cancelled'] as const;
 export type PaymentMetaClass = (typeof paymentMetaClasses)[number];
@@ -323,13 +344,31 @@ export interface Payment {
   provider: PaymentProvider;
   status: PaymentStatus;
   grossCents: number;
-  refundedCents: number;
+  /**
+   * SOURCE-ABSENT: `public.payments` has **no refund-amount column of any kind**. Its complete
+   * definition is `id, created_at, provider, status, amount_eur, currency, reference_type,
+   * reference_id, stripe_session_id, stripe_payment_intent_id, customer_email, metadata`, and
+   * `amount_eur` is the amount charged (`CHECK (amount_eur > 0)`), never an amount returned.
+   *
+   * It may not be reconstructed from `amount_eur`, from `status`, from the excluded `metadata`
+   * jsonb, or through the unproven `reference_id` → booking join. A partial refund is not derivable
+   * from a binary status, and `0` would assert that nothing was refunded.
+   */
+  refundedCents: number | null;
   currency: string;
   referenceType: PaymentReferenceType;
   /** Booking reference or voucher code this payment settles. */
   referenceLabel: string;
-  customerName: string;
-  metaClass: PaymentMetaClass;
+  /**
+   * SOURCE-ABSENT: `public.payments` has no name column; the buyer's name sits inside the excluded
+   * `metadata` jsonb alongside their e-mail. Deriving it through the booking would require the
+   * `reference_id` → booking join key, which is *not* proven and is deliberately not implemented
+   * here. Null until that key is established by a separately approved read-only verification.
+   */
+  customerName: string | null;
+  /** SOURCE-ABSENT when the payment's class cannot be determined — see `paymentMetaClasses`. */
+  metaClass: PaymentMetaClass | null;
+  /** SOURCE-ABSENT: notes live in the excluded `metadata` jsonb. No permitted source exists. */
   note: string | null;
 }
 
@@ -353,15 +392,36 @@ export const emptyPaymentQuery: PaymentQuery = {
 
 export interface PaymentTotals {
   grossCents: number;
-  refundedCents: number;
-  /** gross - refunded: what the club actually keeps. */
-  netCents: number;
+  /** SOURCE-ABSENT: sums the unavailable `Payment.refundedCents`. */
+  refundedCents: number | null;
+  /**
+   * gross − refunded: what the club actually keeps.
+   *
+   * SOURCE-ABSENT whenever the subtrahend is: printing gross as though it were net would overstate
+   * the retained amount, and in the flattering direction.
+   */
+  netCents: number | null;
   pendingCents: number;
   succeededCount: number;
   pendingCount: number;
-  refundedCount: number;
-  doubleBookingCount: number;
-  customerCancelledCount: number;
+  /**
+   * SOURCE-ABSENT. The count cannot be derived reliably from a granted column.
+   *
+   * `payments.status` is granted, but `status = 'refunded'` is written by exactly one code path
+   * upstream — the Stripe webhook's `charge.refunded` handler. No path writes it for PayPal, which
+   * `PaymentProvider` models, so a status-based count is correct for Stripe and systematically low
+   * for PayPal. A count that is wrong for one provider, in the flattering direction, is a wrong
+   * number rather than a partial one. Evidence and the conditions that would change this are
+   * recorded in the D3b plan §7.1b.
+   */
+  refundedCount: number | null;
+  /**
+   * SOURCE-ABSENT whenever any payment in the set has an undeterminable `metaClass`: counting only
+   * the rows that *are* classified would report a confident total over an incomplete basis.
+   */
+  doubleBookingCount: number | null;
+  /** SOURCE-ABSENT on the same basis as `doubleBookingCount`. */
+  customerCancelledCount: number | null;
 }
 
 export interface ProviderSlice {
@@ -469,15 +529,30 @@ export interface ReconciliationEntry {
   issue: ReconciliationIssue;
   severity: ReconciliationSeverity;
   occurredAt: string;
-  customerName: string;
+  /**
+   * From the booking (`bookings.customer_name`). SOURCE-ABSENT for an orphaned payment — the row
+   * with no booking behind it is precisely the one with no authorised name source either.
+   */
+  customerName: string | null;
   bookingReference: string | null;
   paymentReference: string | null;
   court: CourtKey | null;
   provider: PaymentProvider;
   bookingAmountCents: number;
   paymentAmountCents: number;
-  refundAmountCents: number;
-  /** Amount the club could still reclaim. Zero for healthy rows. */
+  /**
+   * SOURCE-ABSENT: this is `Payment.refundedCents` at the only site that builds a reconciliation
+   * entry. D3a maps `bookings.refund_amount` here, but reaching it from a payment needs the unproven
+   * `reference_id` join, and the `Booking` domain type carries no refund field to route it through.
+   */
+  refundAmountCents: number | null;
+  /**
+   * Amount the club could still reclaim. Zero for healthy rows.
+   *
+   * Stays non-null: the one branch that reads a refund amount (`active_booking_refunded`) cannot be
+   * reached when that amount is unknown, and the branches that remain read `grossCents` and
+   * `booking.amountCents`, both of which are sourced.
+   */
   moneyToRecoverCents: number;
   bookingStatus: BookingStatus | null;
   invoiceStatus: InvoiceStatus | null;
@@ -503,9 +578,17 @@ export interface ReconciliationCounts {
   openReview: number;
   falseRefunds: number;
   moneyToRecoverCents: number;
-  refundedTotalCents: number;
-  cancellationRefundsCents: number;
-  doubleBookingRefundsCents: number;
+  /** SOURCE-ABSENT: sums the unavailable `ReconciliationEntry.refundAmountCents`. */
+  refundedTotalCents: number | null;
+  /**
+   * SOURCE-ABSENT when any payment's `metaClass` is undeterminable: a customer cancellation is only
+   * recognisable through that classification, so the split cannot be computed without it. Reporting
+   * `0` would assert that nothing was refunded for cancellations, which is a different claim from
+   * "we cannot tell which refunds were cancellations".
+   */
+  cancellationRefundsCents: number | null;
+  /** SOURCE-ABSENT on the same basis as `cancellationRefundsCents`. */
+  doubleBookingRefundsCents: number | null;
 }
 
 export interface ReconciliationPage {
@@ -565,10 +648,23 @@ export interface MonthlyReportComparison {
 
 /* ==================================================================== Reports */
 
+/**
+ * Refunds in a reporting window.
+ *
+ * The total is sourced; the two reasons are not. Splitting a refund into "cancellation" and
+ * "double booking" requires the payment's `metaClass`, which is excluded upstream. This is the
+ * *live-derived* breakdown — `MonthlyReport.refundedCancellationCents` and
+ * `.refundedDoubleBookingCents` stay non-null precisely because they have real stored columns
+ * (`admin_monthly_reports.refunded_cancellation_amount` / `.refunded_double_booking_amount`) and
+ * are therefore a different, authoritative fact.
+ */
 export interface RefundBreakdown {
-  totalCents: number;
-  cancellationCents: number;
-  doubleBookingCents: number;
+  /** SOURCE-ABSENT: sums the unavailable `Payment.refundedCents`. */
+  totalCents: number | null;
+  /** SOURCE-ABSENT when any refunded payment's `metaClass` is undeterminable, or any amount is. */
+  cancellationCents: number | null;
+  /** SOURCE-ABSENT on the same basis as `cancellationCents`. */
+  doubleBookingCents: number | null;
 }
 
 export const reportRanges = ['week', 'month', 'last_month', 'quarter'] as const;
@@ -614,6 +710,12 @@ export interface VoucherUsage {
  *
  * The reference model is binary — redeemed or not. A remaining balance is modelled here instead, so
  * partial redemption is representable; `redeemed` is simply the case where the balance reaches zero.
+ *
+ * Upstream tracks neither expiry nor usage history (D2 contract §3: both are recorded as "not
+ * tracked upstream", and no value may be invented). Two consequences the reader should know:
+ * `partially_redeemed` and `expired` are **not reachable** from upstream data, because the only
+ * granted signal is the boolean `is_redeemed`. They remain in the union because the UI renders them
+ * and a fixture may exercise them; the gateway will never produce either.
  */
 export interface Voucher {
   id: string;
@@ -623,9 +725,16 @@ export interface Voucher {
   status: VoucherStatus;
   issuedAt: string;
   soldAt: string | null;
-  expiresAt: string;
+  /** SOURCE-ABSENT: voucher expiry is not tracked upstream. No column, and none may be invented. */
+  expiresAt: string | null;
   buyerName: string | null;
-  usages: VoucherUsage[];
+  /**
+   * SOURCE-ABSENT: redemption history is not tracked upstream.
+   *
+   * `null` ("not tracked") and `[]` ("tracked, and there were none") are different statements.
+   * Collapsing the first into the second is exactly the fabrication this contract forbids.
+   */
+  usages: VoucherUsage[] | null;
 }
 
 export interface VoucherQuery {
@@ -640,7 +749,11 @@ export interface VoucherTotals {
   issuedValueCents: number;
   redeemedValueCents: number;
   outstandingValueCents: number;
-  expiredCount: number;
+  /**
+   * SOURCE-ABSENT when any voucher's `expiresAt` is unavailable: with no expiry data no voucher can
+   * be classified expired, and a hard `0` would claim that none is.
+   */
+  expiredCount: number | null;
 }
 
 export interface VoucherPage {
@@ -670,14 +783,24 @@ export interface Member {
   lastName: string;
   membershipType: MembershipType;
   status: MemberStatus;
+  /** Free text upstream (`"Eintritt"`), surfaced verbatim. Never parsed, never fuzzy-matched. */
   joinedAt: string;
+  /** SOURCE-ABSENT: no upstream column for the end of a membership term. */
   validUntil: string | null;
   /** VAT treatment this membership confers on padel bookings. */
   vatClassification: MembershipClassification;
-  city: string;
-  postalCode: string;
-  bookingCount: number;
-  bookingRevenueCents: number;
+  /** SOURCE-ABSENT: no address column is granted, and none may be inferred. */
+  city: string | null;
+  /** SOURCE-ABSENT on the same basis as `city`. */
+  postalCode: string | null;
+  /**
+   * SOURCE-ABSENT: member-to-booking association is **none** until a real stable key exists
+   * (D2 contract §3), and fuzzy matching on the membership free-text field is never permitted.
+   * `0` would assert that this member has booked nothing; `null` says the two cannot be linked.
+   */
+  bookingCount: number | null;
+  /** SOURCE-ABSENT on the same basis as `bookingCount`. */
+  bookingRevenueCents: number | null;
 }
 
 export interface MemberQuery {

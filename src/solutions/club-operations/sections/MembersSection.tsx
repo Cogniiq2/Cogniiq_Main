@@ -138,7 +138,13 @@ export function MembersSection({
         align: 'right',
         width: '112px',
         render: (row) => (
-          <span className={row.bookingRevenueCents > 0 ? text.bodyStrong : undefined}>
+          <span
+            className={
+              row.bookingRevenueCents !== null && row.bookingRevenueCents > 0
+                ? text.bodyStrong
+                : undefined
+            }
+          >
             {formatCents(row.bookingRevenueCents)}
           </span>
         ),
@@ -183,7 +189,24 @@ export function MembersSection({
         }
 
         const reducedRate = page.members.filter((member) => member.vatClassification === 'member');
-        const withBookings = page.members.filter((member) => member.bookingCount > 0);
+        // A member whose bookings cannot be linked is not a member with zero bookings — they are
+        // simply absent from any statement about booking activity. The narrowed type below is what
+        // keeps the revenue ranking from ever ranking an unknown as if it were a nil.
+        const withBookings = page.members.filter(
+          (member): member is Member & { bookingCount: number; bookingRevenueCents: number } =>
+            member.bookingCount !== null &&
+            member.bookingCount > 0 &&
+            member.bookingRevenueCents !== null,
+        );
+
+        // Whether a members-wide revenue statement can be made at all. If even one member's bookings
+        // cannot be attributed, the sum over the rest is a floor — and summing an all-unlinkable
+        // register would print "0,00 €", which reads as "members generated no revenue" rather than
+        // "members cannot be linked to bookings". Same whole-or-nothing rule as every other
+        // aggregate over a source-absent field.
+        const bookingsAttributable = page.members.every(
+          (member) => member.bookingRevenueCents !== null,
+        );
 
         const typeSlices: CompositionSlice[] = membershipTypes
           .map((value, index) => ({
@@ -225,8 +248,17 @@ export function MembersSection({
               />
               <PrimaryMetric
                 label="Umsatz aus Mitgliederbuchungen"
-                value={formatCents(page.members.reduce((total, member) => total + member.bookingRevenueCents, 0))}
-                footnote={`${formatCount(withBookings.length)} Mitglieder mit Buchungen`}
+                value={formatCents(
+                  // Only linkable members contribute, and only when every member is linkable at all.
+                  bookingsAttributable
+                    ? withBookings.reduce((total, member) => total + member.bookingRevenueCents, 0)
+                    : null,
+                )}
+                footnote={
+                  bookingsAttributable
+                    ? `${formatCount(withBookings.length)} Mitglieder mit Buchungen`
+                    : 'Buchungen nicht zuordenbar'
+                }
               />
             </MetricRow>
 
@@ -295,7 +327,13 @@ export function MembersSection({
                           { label: 'Steuerliche Einstufung', value: membershipLabels[selected.vatClassification] },
                           { label: 'Eintritt', value: <span className={text.numeric}>{formatDate(selected.joinedAt)}</span> },
                           { label: 'Gültig bis', value: <span className={text.numeric}>{selected.validUntil ? formatDate(selected.validUntil) : '—'}</span> },
-                          { label: 'Ort', value: `${selected.postalCode} ${selected.city}` },
+                          {
+                            label: 'Ort',
+                            // Either part may be unavailable; an em dash beats a stray space or a
+                            // postcode standing on its own next to a blank.
+                            value:
+                              [selected.postalCode, selected.city].filter(Boolean).join(' ') || '—',
+                          },
                         ],
                       },
                       {

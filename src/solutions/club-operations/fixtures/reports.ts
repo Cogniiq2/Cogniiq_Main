@@ -14,7 +14,7 @@ import {
   buildVat,
 } from '../aggregation';
 import { toLocalDateKey } from '../formatting';
-import type { Booking, ReportRange, ReportSnapshot } from '../types';
+import type { Booking, Payment, ReportRange, ReportSnapshot } from '../types';
 import { fixtureBookings } from './bookings';
 import { fixturePayments } from './payments';
 import { FIXTURE_TODAY } from './vouchers';
@@ -41,11 +41,20 @@ function withinRange(booking: Booking, periodStart: string, periodEnd: string): 
   return day >= periodStart && day <= periodEnd;
 }
 
-export function buildReport(bookings: Booking[], range: ReportRange): ReportSnapshot {
+/**
+ * @param ledger The payments the refund figures are computed from. Defaults to the populated
+ *   fixtures; the source-absent scenario supplies its own so the report's refund block reflects the
+ *   same missing data as the rest of that dataset instead of quietly reading richer rows.
+ */
+export function buildReport(
+  bookings: Booking[],
+  range: ReportRange,
+  ledger: Payment[] = fixturePayments,
+): ReportSnapshot {
   const { periodStart, periodEnd } = resolveRange(range);
   const inRange = bookings.filter((booking) => withinRange(booking, periodStart, periodEnd));
   const references = new Set(inRange.map((booking) => booking.reference));
-  const payments = fixturePayments.filter(
+  const payments = ledger.filter(
     (payment) => payment.referenceType === 'booking' && references.has(payment.referenceLabel),
   );
 

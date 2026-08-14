@@ -38,8 +38,12 @@ export interface RecordColumn<T> {
   /**
    * Makes the column sortable. Must return a value comparable with < and >.
    * Columns without it render a plain header — no inert sort arrow.
+   *
+   * `null` is permitted, and means the underlying value is unavailable. Such rows sort to the end in
+   * both directions rather than being coerced to `''` or `0`, which would file them among the
+   * genuine empties and the genuine zeroes.
    */
-  sortValue?: (row: T) => string | number;
+  sortValue?: (row: T) => string | number | null;
   /**
    * Placement in the phone layout.
    *   primary   — shown in the card's field grid (keep to three at most)
@@ -94,6 +98,12 @@ export function RecordTable<T>({
     return [...rows].sort((a, b) => {
       const left = column.sortValue!(a);
       const right = column.sortValue!(b);
+      // Unavailable values are not small values. They sink to the bottom whichever way the column is
+      // sorted, so reversing the order never parades them at the top as if they were results.
+      if (left === null || right === null) {
+        if (left === right) return 0;
+        return left === null ? 1 : -1;
+      }
       if (left === right) return 0;
       return (left < right ? -1 : 1) * direction;
     });

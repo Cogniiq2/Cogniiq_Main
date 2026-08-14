@@ -142,16 +142,41 @@ export function buildMembership(bookings: Booking[]): MembershipSlice[] {
     .filter((slice) => slice.bookingCount > 0);
 }
 
+/**
+ * Refunds, split by reason where both the amount and the reason are knowable.
+ *
+ * Two independent things can be missing, and either one makes a figure unavailable:
+ *
+ *   * the **amount** — `payments` has no refund column at all, so `Payment.refundedCents` may be
+ *     null. With even one null the total is unknowable, because the missing addend could be any
+ *     value; summing the rest would present a floor as a total.
+ *   * the **reason** — the split reads `metaClass`, which lives in the excluded `metadata` jsonb.
+ *
+ * Whole-or-nothing in both directions. A partial sum presented as a complete one is the specific
+ * failure this rule exists to prevent, and the reader has no way to detect it from the number alone.
+ */
 export function buildRefunds(payments: Payment[]): RefundBreakdown {
-  const refunded = payments.filter((payment) => payment.refundedCents > 0);
+  // A payment whose refund amount is unknown might or might not have been refunded; it can neither
+  // be included in the refunded set nor safely excluded from it.
+  const amountUnknown = payments.some((payment) => payment.refundedCents === null);
+  const refunded = payments.filter(
+    (payment) => payment.refundedCents !== null && payment.refundedCents > 0,
+  );
+  const reasonUnknown = refunded.some((payment) => payment.metaClass === null);
+
+  const sumOf = (rows: Payment[]): number =>
+    rows.reduce((sum, p) => sum + (p.refundedCents as number), 0);
+
   return {
-    totalCents: refunded.reduce((sum, p) => sum + p.refundedCents, 0),
-    cancellationCents: refunded
-      .filter((p) => p.metaClass === 'customer_cancelled')
-      .reduce((sum, p) => sum + p.refundedCents, 0),
-    doubleBookingCents: refunded
-      .filter((p) => p.metaClass === 'double_booking')
-      .reduce((sum, p) => sum + p.refundedCents, 0),
+    totalCents: amountUnknown ? null : sumOf(refunded),
+    cancellationCents:
+      amountUnknown || reasonUnknown
+        ? null
+        : sumOf(refunded.filter((p) => p.metaClass === 'customer_cancelled')),
+    doubleBookingCents:
+      amountUnknown || reasonUnknown
+        ? null
+        : sumOf(refunded.filter((p) => p.metaClass === 'double_booking')),
   };
 }
 

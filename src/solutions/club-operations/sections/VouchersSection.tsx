@@ -128,7 +128,9 @@ export function VouchersSection({
           <span
             className={cn(
               'whitespace-nowrap tabular-nums',
-              row.expiresAt < FIXTURE_TODAY && 'text-red-600',
+              // Only a known date can be past. An unknown one is not overdue, and must not be
+              // coloured as though it were.
+              row.expiresAt !== null && row.expiresAt < FIXTURE_TODAY && 'text-red-600',
             )}
           >
             {formatDate(row.expiresAt)}
@@ -142,8 +144,10 @@ export function VouchersSection({
         header: 'Einlösungen',
         align: 'right',
         width: '110px',
-        render: (row) => formatCount(row.usages.length),
-        sortValue: (row) => row.usages.length,
+        // `null` means redemption history is not tracked upstream, so there is no count to show —
+        // as opposed to a tracked history that happens to be empty, which is a legitimate 0.
+        render: (row) => formatCount(row.usages?.length ?? null),
+        sortValue: (row) => row.usages?.length ?? null,
         mobile: 'secondary',
       },
       {
@@ -204,8 +208,15 @@ export function VouchersSection({
           );
         }
 
+        // "Expired holding a balance" is only answerable where the expiry date is. With it absent no
+        // voucher can be shown to have expired, so a count of none would assert that the club has no
+        // stranded value — a claim about money customers paid and may never redeem. Unknown, not nil.
+        const expiryKnown = page.vouchers.every((voucher) => voucher.expiresAt !== null);
         const stranded = page.vouchers.filter(isStranded);
-        const strandedValue = stranded.reduce((total, voucher) => total + voucher.remainingCents, 0);
+        const strandedCount = expiryKnown ? stranded.length : null;
+        const strandedValue = expiryKnown
+          ? stranded.reduce((total, voucher) => total + voucher.remainingCents, 0)
+          : null;
 
         const statusSlices: CompositionSlice[] = voucherStatuses
           .map((value, index) => ({
@@ -242,7 +253,7 @@ export function VouchersSection({
                 <MetricStrip
                   items={[
                     { label: 'Verfallen', value: formatCount(page.totals.expiredCount), hint: 'Gültigkeit abgelaufen' },
-                    { label: 'Verfallen mit Restwert', value: formatCount(stranded.length), hint: formatCents(strandedValue) },
+                    { label: 'Verfallen mit Restwert', value: formatCount(strandedCount), hint: formatCents(strandedValue) },
                     { label: 'Vollständig eingelöst', value: formatCount(page.vouchers.filter((voucher) => voucher.status === 'redeemed').length), hint: 'kein Restguthaben' },
                     { label: 'Noch nicht verkauft', value: formatCount(page.vouchers.filter((voucher) => voucher.status === 'open').length), hint: 'ausgestellt, offen' },
                   ]}
@@ -329,7 +340,14 @@ export function VouchersSection({
                   >
                     <div className="mt-4">
                       <p className={text.eyebrow}>Einlösungen</p>
-                      {selected.usages.length === 0 ? (
+                      {selected.usages === null ? (
+                        // Not the same sentence as "hasn't been redeemed yet": the club's system does
+                        // not record redemption history at all, so claiming the voucher is unused
+                        // would be asserting something nobody can know.
+                        <p className={cn('mt-2', text.hint)}>
+                          Einlösungen werden im Vereinssystem nicht erfasst.
+                        </p>
+                      ) : selected.usages.length === 0 ? (
                         <p className={cn('mt-2', text.hint)}>Dieser Gutschein wurde noch nicht eingelöst.</p>
                       ) : (
                         <ol className="mt-2 space-y-2.5">

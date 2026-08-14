@@ -128,7 +128,13 @@ export function ReportsSection({ adapter }: { adapter: ClubOperationsAdapter }) 
             leading: court.court === busiest?.court && court.bookingCount > 0,
           }));
 
-        const refundShare = percentOf(report.refunds.totalCents, report.revenue.totalCents);
+        // A share of an unknown amount is unknown. `percentOf` guards division by zero, not absence,
+        // and feeding it a substituted 0 would report "0,0 % des Umsatzes" — a confident claim that
+        // nothing was refunded.
+        const refundShare =
+          report.refunds.totalCents === null
+            ? null
+            : percentOf(report.refunds.totalCents, report.revenue.totalCents);
 
         return (
           <div className={space.pageGap}>
@@ -169,7 +175,7 @@ export function ReportsSection({ adapter }: { adapter: ClubOperationsAdapter }) 
 
             <MetricStrip
               items={[
-                { label: 'Erstattet gesamt', value: formatCents(report.refunds.totalCents), hint: `${formatPercent(refundShare, 1)} des Umsatzes` },
+                { label: 'Erstattet gesamt', value: formatCents(report.refunds.totalCents), hint: refundShare === null ? 'Anteil nicht verfügbar' : `${formatPercent(refundShare, 1)} des Umsatzes` },
                 { label: 'Davon Stornierungen', value: formatCents(report.refunds.cancellationCents), hint: 'durch Kunden' },
                 { label: 'Davon Doppelbuchungen', value: formatCents(report.refunds.doubleBookingCents), hint: 'Korrektur' },
                 { label: 'Stornierte Buchungen', value: formatCount(report.bookings.cancelled), hint: 'im Zeitraum' },

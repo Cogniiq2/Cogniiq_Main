@@ -10,6 +10,18 @@
 //
 // Money is checked as a safe integer. A float amount is malformed by definition here, because the
 // whole cents convention exists so that no component ever divides one.
+//
+// ─── Nullable does not mean lenient ──────────────────────────────────────────────────────────────
+//
+// A field that `types.ts` marks SOURCE-ABSENT is read with a `nullable*` reader here. Those readers
+// accept exactly two things: a value of the field's own type, or an explicit `null`. They do **not**
+// accept `undefined`, and they do **not** accept a missing property — both fail, because `undefined`
+// reaching this boundary means the producer forgot the field rather than deciding it was
+// unavailable, and silently converting that to `null` would erase the difference between "no source
+// exists" and "the mapping is broken".
+//
+// The only exceptions are the two properties the existing protocol declares genuinely optional
+// (`AttentionTarget.filter` and `SettingsEntry.hint`), which keep their `undefined` handling.
 
 import {
   activityActorTypes,
@@ -140,6 +152,21 @@ function mapArray<T>(value: unknown, path: string, read: (item: unknown, path: s
   return arr(value, path).map((item, index) => read(item, `${path}[${index}]`));
 }
 
+/**
+ * As `mapArray`, but an explicit `null` means "this collection is not tracked upstream".
+ *
+ * Distinct from `[]`, which means "tracked, and empty". `undefined` and a missing property are still
+ * rejected — see the header note.
+ */
+function nullableMapArray<T>(
+  value: unknown,
+  path: string,
+  read: (item: unknown, path: string) => T,
+): T[] | null {
+  if (value === null) return null;
+  return mapArray(value, path, read);
+}
+
 const membershipClassifications = [
   'member',
   'non_member',
@@ -179,12 +206,16 @@ function readPayment(value: unknown, path: string): Payment {
     provider: oneOf(paymentProviders, row.provider, `${path}.provider`),
     status: oneOf(paymentStatuses, row.status, `${path}.status`),
     grossCents: int(row.grossCents, `${path}.grossCents`),
-    refundedCents: int(row.refundedCents, `${path}.refundedCents`),
+    // SOURCE-ABSENT: `payments` has no refund-amount column.
+    refundedCents: nullableInt(row.refundedCents, `${path}.refundedCents`),
     currency: str(row.currency, `${path}.currency`),
     referenceType: oneOf(['booking', 'voucher'] as const, row.referenceType, `${path}.referenceType`),
     referenceLabel: str(row.referenceLabel, `${path}.referenceLabel`),
-    customerName: str(row.customerName, `${path}.customerName`),
-    metaClass: oneOf(paymentMetaClasses, row.metaClass, `${path}.metaClass`),
+    // SOURCE-ABSENT: no name column on `payments`; the unproven booking join is not used.
+    customerName: nullableStr(row.customerName, `${path}.customerName`),
+    // SOURCE-ABSENT: the classification lives in the excluded `metadata` jsonb.
+    metaClass: nullableOneOf(paymentMetaClasses, row.metaClass, `${path}.metaClass`),
+    // SOURCE-ABSENT: notes live in the excluded `metadata` jsonb.
     note: nullableStr(row.note, `${path}.note`),
   };
 }
@@ -233,14 +264,16 @@ function readReconciliationEntry(value: unknown, path: string): ReconciliationEn
     issue: oneOf(reconciliationIssues, row.issue, `${path}.issue`),
     severity: oneOf(reconciliationSeverities, row.severity, `${path}.severity`),
     occurredAt: str(row.occurredAt, `${path}.occurredAt`),
-    customerName: str(row.customerName, `${path}.customerName`),
+    // SOURCE-ABSENT for an orphaned payment: no booking, therefore no authorised name.
+    customerName: nullableStr(row.customerName, `${path}.customerName`),
     bookingReference: nullableStr(row.bookingReference, `${path}.bookingReference`),
     paymentReference: nullableStr(row.paymentReference, `${path}.paymentReference`),
     court: nullableOneOf(courtKeys, row.court, `${path}.court`),
     provider: oneOf(paymentProviders, row.provider, `${path}.provider`),
     bookingAmountCents: int(row.bookingAmountCents, `${path}.bookingAmountCents`),
     paymentAmountCents: int(row.paymentAmountCents, `${path}.paymentAmountCents`),
-    refundAmountCents: int(row.refundAmountCents, `${path}.refundAmountCents`),
+    // SOURCE-ABSENT: this is the payment's refund amount, which has no upstream column.
+    refundAmountCents: nullableInt(row.refundAmountCents, `${path}.refundAmountCents`),
     moneyToRecoverCents: int(row.moneyToRecoverCents, `${path}.moneyToRecoverCents`),
     bookingStatus: nullableOneOf(bookingStatuses, row.bookingStatus, `${path}.bookingStatus`),
     invoiceStatus: nullableOneOf(invoiceStatuses, row.invoiceStatus, `${path}.invoiceStatus`),
@@ -256,9 +289,17 @@ function readReconciliationCounts(value: unknown, path: string): ReconciliationC
     openReview: int(row.openReview, `${path}.openReview`),
     falseRefunds: int(row.falseRefunds, `${path}.falseRefunds`),
     moneyToRecoverCents: int(row.moneyToRecoverCents, `${path}.moneyToRecoverCents`),
-    refundedTotalCents: int(row.refundedTotalCents, `${path}.refundedTotalCents`),
-    cancellationRefundsCents: int(row.cancellationRefundsCents, `${path}.cancellationRefundsCents`),
-    doubleBookingRefundsCents: int(row.doubleBookingRefundsCents, `${path}.doubleBookingRefundsCents`),
+    // SOURCE-ABSENT: sums the unavailable per-entry refund amount.
+    refundedTotalCents: nullableInt(row.refundedTotalCents, `${path}.refundedTotalCents`),
+    // SOURCE-ABSENT: the cancellation/double-booking split needs the excluded payment `metaClass`.
+    cancellationRefundsCents: nullableInt(
+      row.cancellationRefundsCents,
+      `${path}.cancellationRefundsCents`,
+    ),
+    doubleBookingRefundsCents: nullableInt(
+      row.doubleBookingRefundsCents,
+      `${path}.doubleBookingRefundsCents`,
+    ),
   };
 }
 
@@ -272,9 +313,11 @@ function readVoucher(value: unknown, path: string): Voucher {
     status: oneOf(voucherStatuses, row.status, `${path}.status`),
     issuedAt: str(row.issuedAt, `${path}.issuedAt`),
     soldAt: nullableStr(row.soldAt, `${path}.soldAt`),
-    expiresAt: str(row.expiresAt, `${path}.expiresAt`),
+    // SOURCE-ABSENT: voucher expiry is not tracked upstream.
+    expiresAt: nullableStr(row.expiresAt, `${path}.expiresAt`),
     buyerName: nullableStr(row.buyerName, `${path}.buyerName`),
-    usages: mapArray(row.usages, `${path}.usages`, (usage, usagePath) => {
+    // SOURCE-ABSENT: redemption history is not tracked upstream. `null` ≠ `[]`.
+    usages: nullableMapArray(row.usages, `${path}.usages`, (usage, usagePath) => {
       const entry = obj(usage, usagePath);
       return {
         id: str(entry.id, `${usagePath}.id`),
@@ -302,10 +345,12 @@ function readMember(value: unknown, path: string): Member {
       row.vatClassification,
       `${path}.vatClassification`,
     ),
-    city: str(row.city, `${path}.city`),
-    postalCode: str(row.postalCode, `${path}.postalCode`),
-    bookingCount: int(row.bookingCount, `${path}.bookingCount`),
-    bookingRevenueCents: int(row.bookingRevenueCents, `${path}.bookingRevenueCents`),
+    // SOURCE-ABSENT: no address columns are granted.
+    city: nullableStr(row.city, `${path}.city`),
+    postalCode: nullableStr(row.postalCode, `${path}.postalCode`),
+    // SOURCE-ABSENT: member-to-booking association is none until a stable key exists.
+    bookingCount: nullableInt(row.bookingCount, `${path}.bookingCount`),
+    bookingRevenueCents: nullableInt(row.bookingRevenueCents, `${path}.bookingRevenueCents`),
   };
 }
 
@@ -565,14 +610,20 @@ export function validatePaymentPage(value: unknown): PaymentPage {
   const totals = obj(root.totals, '$.totals');
   const paymentTotals: PaymentTotals = {
     grossCents: int(totals.grossCents, '$.totals.grossCents'),
-    refundedCents: int(totals.refundedCents, '$.totals.refundedCents'),
-    netCents: int(totals.netCents, '$.totals.netCents'),
+    // SOURCE-ABSENT: all three depend on the unavailable per-payment refund amount, and
+    // `refundedCount` additionally on a status whose refund semantics hold only for Stripe.
+    refundedCents: nullableInt(totals.refundedCents, '$.totals.refundedCents'),
+    netCents: nullableInt(totals.netCents, '$.totals.netCents'),
     pendingCents: int(totals.pendingCents, '$.totals.pendingCents'),
     succeededCount: int(totals.succeededCount, '$.totals.succeededCount'),
     pendingCount: int(totals.pendingCount, '$.totals.pendingCount'),
-    refundedCount: int(totals.refundedCount, '$.totals.refundedCount'),
-    doubleBookingCount: int(totals.doubleBookingCount, '$.totals.doubleBookingCount'),
-    customerCancelledCount: int(totals.customerCancelledCount, '$.totals.customerCancelledCount'),
+    refundedCount: nullableInt(totals.refundedCount, '$.totals.refundedCount'),
+    // SOURCE-ABSENT: both aggregate the excluded payment `metaClass`.
+    doubleBookingCount: nullableInt(totals.doubleBookingCount, '$.totals.doubleBookingCount'),
+    customerCancelledCount: nullableInt(
+      totals.customerCancelledCount,
+      '$.totals.customerCancelledCount',
+    ),
   };
   const byProvider: ProviderSlice[] = mapArray(root.byProvider, '$.byProvider', (slice, slicePath) => {
     const entry = obj(slice, slicePath);
@@ -661,9 +712,12 @@ export function validateReportSnapshot(value: unknown): ReportSnapshot {
     vat: readVatSummary(root.vat, '$.vat'),
     courts: readCourtUtilization(root.courts, '$.courts'),
     refunds: {
-      totalCents: int(refunds.totalCents, '$.refunds.totalCents'),
-      cancellationCents: int(refunds.cancellationCents, '$.refunds.cancellationCents'),
-      doubleBookingCents: int(refunds.doubleBookingCents, '$.refunds.doubleBookingCents'),
+      // SOURCE-ABSENT: sums the unavailable per-payment refund amount.
+      totalCents: nullableInt(refunds.totalCents, '$.refunds.totalCents'),
+      // SOURCE-ABSENT: the live split by reason needs the excluded payment `metaClass`. The stored
+      // monthly equivalents stay non-null — they have their own authoritative columns.
+      cancellationCents: nullableInt(refunds.cancellationCents, '$.refunds.cancellationCents'),
+      doubleBookingCents: nullableInt(refunds.doubleBookingCents, '$.refunds.doubleBookingCents'),
     },
     membership: readMembershipSlices(root.membership, '$.membership'),
   };
@@ -677,7 +731,8 @@ export function validateVoucherPage(value: unknown): VoucherPage {
     issuedValueCents: int(totals.issuedValueCents, '$.totals.issuedValueCents'),
     redeemedValueCents: int(totals.redeemedValueCents, '$.totals.redeemedValueCents'),
     outstandingValueCents: int(totals.outstandingValueCents, '$.totals.outstandingValueCents'),
-    expiredCount: int(totals.expiredCount, '$.totals.expiredCount'),
+    // SOURCE-ABSENT: expiry is not tracked upstream, so nothing can be counted as expired.
+    expiredCount: nullableInt(totals.expiredCount, '$.totals.expiredCount'),
   };
   return {
     vouchers: mapArray(root.vouchers, '$.vouchers', readVoucher),
