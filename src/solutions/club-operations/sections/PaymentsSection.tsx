@@ -25,10 +25,10 @@ import { MetricRow, MetricStrip, PrimaryMetric } from '../components/MetricCard'
 import { RecordTable, type RecordColumn } from '../components/RecordTable';
 import { Panel, SectionShell } from '../components/SectionShell';
 import { hasNoActiveFacets, withSeed } from '../filtering';
-import { formatCents, formatCount, formatDate, formatDateTime, formatTime } from '../formatting';
+import { formatCents, formatCount, formatDate, formatDateTime, formatText, formatTime } from '../formatting';
 import {
-  paymentMetaClassLabels,
-  paymentMetaClassTones,
+  paymentMetaClassLabel,
+  paymentMetaClassTone,
   paymentProviderLabels,
   paymentReferenceTypeLabels,
   paymentStatusLabels,
@@ -38,6 +38,16 @@ import { paymentMetaClassOptions, paymentProviderOptions, paymentStatusOptions }
 import type { Payment, PaymentPage, PaymentQuery } from '../types';
 import { emptyPaymentQuery } from '../types';
 import { useClubOperationsResource } from '../useClubOperationsResource';
+
+/**
+ * What the club kept on one payment: gross minus refunds.
+ *
+ * Unavailable when the refund amount is. Falling back to the gross would present the full charge as
+ * retained income, overstating it by exactly the amount nobody can see.
+ */
+function netCentsOf(payment: Payment): number | null {
+  return payment.refundedCents === null ? null : payment.grossCents - payment.refundedCents;
+}
 
 /** Fixed palette index per status, matching the overview so a status never changes colour. */
 const statusTone: Record<string, number> = {
@@ -98,7 +108,7 @@ export function PaymentsSection({
       {
         key: 'customer',
         header: 'Kunde',
-        render: (row) => <span className="break-words">{row.customerName}</span>,
+        render: (row) => <span className="break-words">{formatText(row.customerName)}</span>,
         sortValue: (row) => row.customerName,
         mobile: 'hidden',
       },
@@ -145,8 +155,11 @@ export function PaymentsSection({
         header: 'Erstattet',
         align: 'right',
         width: '112px',
+        // Three distinct states, and the middle one is the point: a known refund, a known absence of
+        // one, and no information at all. The last renders as an em dash like every other
+        // unavailable figure — never as €0,00, which would claim nothing was refunded.
         render: (row) =>
-          row.refundedCents > 0 ? (
+          row.refundedCents !== null && row.refundedCents > 0 ? (
             <span className="text-red-600">{formatCents(row.refundedCents, row.currency)}</span>
           ) : (
             <span className="text-[var(--cq-fg-subtle)]">—</span>
@@ -161,10 +174,10 @@ export function PaymentsSection({
         width: '112px',
         render: (row) => (
           <span className={text.bodyStrong}>
-            {formatCents(row.grossCents - row.refundedCents, row.currency)}
+            {formatCents(netCentsOf(row), row.currency)}
           </span>
         ),
-        sortValue: (row) => row.grossCents - row.refundedCents,
+        sortValue: (row) => netCentsOf(row),
         mobile: 'secondary',
       },
     ],
@@ -281,8 +294,8 @@ export function PaymentsSection({
                   getRowKey={(row) => row.id}
                   selectedKey={selectedId}
                   onSelect={(row) => setSelectedId(row.id)}
-                  rowLabel={(row) => `Zahlung ${row.reference} von ${row.customerName}`}
-                  mobileTitle={(row) => row.customerName}
+                  rowLabel={(row) => `Zahlung ${row.reference} von ${formatText(row.customerName)}`}
+                  mobileTitle={(row) => formatText(row.customerName)}
                   mobileSubtitle={(row) => row.reference}
                   mobileBadge={(row) => (
                     <StatusBadge
@@ -307,8 +320,8 @@ export function PaymentsSection({
                           tone={paymentStatusTones[selected.status]}
                         />
                         <StatusBadge
-                          label={paymentMetaClassLabels[selected.metaClass]}
-                          tone={paymentMetaClassTones[selected.metaClass]}
+                          label={paymentMetaClassLabel(selected.metaClass)}
+                          tone={paymentMetaClassTone(selected.metaClass)}
                         />
                       </>
                     }
@@ -316,7 +329,7 @@ export function PaymentsSection({
                       {
                         label: 'Vorgang',
                         rows: [
-                          { label: 'Kunde', value: <span className="break-words">{selected.customerName}</span> },
+                          { label: 'Kunde', value: <span className="break-words">{formatText(selected.customerName)}</span> },
                           { label: 'Zeitpunkt', value: <span className={text.numeric}>{formatDateTime(selected.occurredAt)}</span> },
                           { label: 'Zahlungsweg', value: paymentProviderLabels[selected.provider] },
                           { label: 'Bezug', value: `${paymentReferenceTypeLabels[selected.referenceType]} ${selected.referenceLabel}` },
@@ -326,8 +339,8 @@ export function PaymentsSection({
                         label: 'Beträge',
                         rows: [
                           { label: 'Brutto', value: <span className={text.numeric}>{formatCents(selected.grossCents, selected.currency)}</span> },
-                          { label: 'Erstattet', value: <span className={text.numeric}>{selected.refundedCents > 0 ? formatCents(selected.refundedCents, selected.currency) : '—'}</span> },
-                          { label: 'Verbleibt', value: <span className={cn(text.numeric, text.bodyStrong)}>{formatCents(selected.grossCents - selected.refundedCents, selected.currency)}</span> },
+                          { label: 'Erstattet', value: <span className={text.numeric}>{selected.refundedCents !== null && selected.refundedCents > 0 ? formatCents(selected.refundedCents, selected.currency) : '—'}</span> },
+                          { label: 'Verbleibt', value: <span className={cn(text.numeric, text.bodyStrong)}>{formatCents(netCentsOf(selected), selected.currency)}</span> },
                         ],
                       },
                     ]}

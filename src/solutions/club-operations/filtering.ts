@@ -143,6 +143,22 @@ export function matchesFacet<T extends string>(value: T, facet: T | 'all' | unde
   return !facet || facet === 'all' || value === facet;
 }
 
+/**
+ * As `matchesFacet`, but for a value whose source may be absent.
+ *
+ * A `null` value matches only the unfiltered view. Letting it fall into any *named* bucket would
+ * claim a classification the data does not support — a payment whose class is unknown is not
+ * thereby a "Regulär" payment, and filtering for "Doppelbuchung" must not return rows that merely
+ * failed to be classified.
+ */
+export function matchesNullableFacet<T extends string>(
+  value: T | null,
+  facet: T | 'all' | undefined,
+): boolean {
+  if (!facet || facet === 'all') return true;
+  return value !== null && value === facet;
+}
+
 /* ------------------------------------------------------------------ Payments */
 
 export function filterPayments(payments: Payment[], query: PaymentQuery): Payment[] {
@@ -151,7 +167,7 @@ export function filterPayments(payments: Payment[], query: PaymentQuery): Paymen
       matchesText(query.search, payment.customerName, payment.reference, payment.referenceLabel) &&
       matchesFacet(payment.provider, query.provider) &&
       matchesFacet(payment.status, query.status) &&
-      matchesFacet(payment.metaClass, query.metaClass) &&
+      matchesNullableFacet(payment.metaClass, query.metaClass) &&
       withinDateRange(payment.occurredAt, query.dateFrom, query.dateTo),
   );
 }

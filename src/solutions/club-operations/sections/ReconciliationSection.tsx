@@ -24,7 +24,7 @@ import { MetricRow, MetricStrip, PrimaryMetric } from '../components/MetricCard'
 import { RecordTable, type RecordColumn } from '../components/RecordTable';
 import { Panel, SectionShell } from '../components/SectionShell';
 import { hasNoActiveFacets, withSeed } from '../filtering';
-import { formatCents, formatCount, formatDate, formatDateTime, formatTime } from '../formatting';
+import { formatCents, formatCount, formatDate, formatDateTime, formatText, formatTime } from '../formatting';
 import {
   bookingStatusLabels,
   courtLabel,
@@ -114,7 +114,7 @@ export function ReconciliationSection({
       {
         key: 'customer',
         header: 'Kunde',
-        render: (row) => <span className="break-words">{row.customerName}</span>,
+        render: (row) => <span className="break-words">{formatText(row.customerName)}</span>,
         sortValue: (row) => row.customerName,
         mobile: 'hidden',
       },
@@ -314,9 +314,11 @@ export function ReconciliationSection({
                   getRowKey={(row) => row.id}
                   selectedKey={selectedId}
                   onSelect={(row) => setSelectedId(row.id)}
-                  rowLabel={(row) => `Befund ${reconciliationIssueLabels[row.issue]} bei ${row.customerName}`}
+                  rowLabel={(row) =>
+                    `Befund ${reconciliationIssueLabels[row.issue]} bei ${formatText(row.customerName)}`
+                  }
                   mobileTitle={(row) => reconciliationIssueLabels[row.issue]}
-                  mobileSubtitle={(row) => row.customerName}
+                  mobileSubtitle={(row) => formatText(row.customerName)}
                   mobileBadge={(row) => (
                     <StatusBadge
                       label={reconciliationSeverityLabels[row.severity]}
@@ -343,7 +345,7 @@ export function ReconciliationSection({
                       {
                         label: 'Beteiligte Sätze',
                         rows: [
-                          { label: 'Kunde', value: <span className="break-words">{selected.customerName}</span> },
+                          { label: 'Kunde', value: <span className="break-words">{formatText(selected.customerName)}</span> },
                           { label: 'Zeitpunkt', value: <span className={text.numeric}>{formatDateTime(selected.occurredAt)}</span> },
                           { label: 'Buchung', value: selected.bookingReference ?? '—' },
                           { label: 'Zahlung', value: selected.paymentReference ?? '—' },
@@ -363,15 +365,17 @@ export function ReconciliationSection({
                     {/* The finding itself: the three amounts, adjacent, so the gap is visible
                         rather than something the reader has to subtract mentally. */}
                     <div className={cn('mt-4 grid grid-cols-3 divide-x', border.subtle, border.hairline, radius.lg, surface.card)}>
-                      {[
+                      {([
                         { label: 'Gebucht', value: selected.bookingAmountCents },
                         { label: 'Gezahlt', value: selected.paymentAmountCents },
                         { label: 'Erstattet', value: selected.refundAmountCents },
-                      ].map((cell) => (
+                      ] as Array<{ label: string; value: number | null }>).map((cell) => (
                         <div key={cell.label} className="min-w-0 px-3 py-2.5">
                           <p className={cn('truncate', text.eyebrow)}>{cell.label}</p>
                           <p className="mt-1 text-[14px] font-semibold leading-5 tabular-nums text-[var(--cq-fg)]">
-                            {cell.value > 0 ? formatCents(cell.value) : '—'}
+                            {/* An unknown refund amount and a zero one both read as an em dash here;
+                                what must not happen is an unknown one reading as €0,00. */}
+                            {cell.value !== null && cell.value > 0 ? formatCents(cell.value) : '—'}
                           </p>
                         </div>
                       ))}

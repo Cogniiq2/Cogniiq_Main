@@ -37,6 +37,12 @@ import { fixturePayments } from '../fixtures/payments';
 import { fixtureReconciliation, reconciliationCounts } from '../fixtures/reconciliation';
 import { buildReport } from '../fixtures/reports';
 import { fixtureSettings } from '../fixtures/settings';
+import {
+  sourceAbsentMembers,
+  sourceAbsentPayments,
+  sourceAbsentReconciliation,
+  sourceAbsentVouchers,
+} from '../fixtures/sourceAbsent';
 import { FIXTURE_TODAY, fixtureVouchers } from '../fixtures/vouchers';
 import {
   alertSeverities,
@@ -57,6 +63,7 @@ import {
   type OverviewQuery,
   type OverviewSnapshot,
   type Payment,
+  type PaymentMetaClass,
   type PaymentPage,
   type PaymentQuery,
   type PaymentTotals,
@@ -75,7 +82,21 @@ import {
   type ClubOperationsErrorCode,
 } from './ClubOperationsAdapter';
 
-export type FixtureScenario = 'populated' | 'empty' | 'error' | 'loading';
+/**
+ * Scenarios, and what each one is for.
+ *
+ *   populated      the full fixture set
+ *   empty          a successful response that happens to contain nothing
+ *   error          a typed failure, for the error state
+ *   loading        never settles, for inspecting the loading state
+ *   source-absent  a successful response carrying `null` for every field the gateway will have no
+ *                  authorised source for — the shape a live read actually returns
+ *
+ * `empty` and `source-absent` are different claims and must not be confused: `empty` says the club
+ * has no payments, `source-absent` says the club has payments whose refunded amount nobody can see.
+ * The second is the one that catches a UI rendering an unknown as `€0,00`.
+ */
+export type FixtureScenario = 'populated' | 'empty' | 'error' | 'loading' | 'source-absent';
 
 export interface FixtureAdapterOptions {
   scenario?: FixtureScenario;
@@ -94,21 +115,42 @@ function paymentTotals(payments: Payment[]): PaymentTotals {
   const grossCents = payments
     .filter((p) => p.status === 'paid' || p.status === 'refunded')
     .reduce((sum, p) => sum + p.grossCents, 0);
-  const refundedCents = payments.reduce((sum, p) => sum + p.refundedCents, 0);
+
+  // An aggregate over an unavailable input is itself unavailable: tallying only the rows that happen
+  // to carry the value would present a partial figure as a complete one.
+  const anyUnclassified = payments.some((p) => p.metaClass === null);
+  const anyRefundUnknown = payments.some((p) => p.refundedCents === null);
+  const countWhere = (metaClass: PaymentMetaClass): number | null =>
+    anyUnclassified ? null : payments.filter((p) => p.metaClass === metaClass).length;
+
+  const refundedCents = anyRefundUnknown
+    ? null
+    : payments.reduce((sum, p) => sum + (p.refundedCents as number), 0);
+
   return {
     grossCents,
     refundedCents,
-    netCents: grossCents - refundedCents,
+    netCents: refundedCents === null ? null : grossCents - refundedCents,
     pendingCents: payments.filter((p) => p.status === 'pending').reduce((sum, p) => sum + p.grossCents, 0),
     succeededCount: payments.filter((p) => p.status === 'paid').length,
     pendingCount: payments.filter((p) => p.status === 'pending').length,
-    refundedCount: payments.filter((p) => p.refundedCents > 0).length,
-    doubleBookingCount: payments.filter((p) => p.metaClass === 'double_booking').length,
-    customerCancelledCount: payments.filter((p) => p.metaClass === 'customer_cancelled').length,
+    // Not derived from `status === 'refunded'`: that status is written by one Stripe-only code path
+    // upstream, so counting it would be right for Stripe and silently low for PayPal. See the D3b
+    // plan §7.1b for the evidence and for what would let this become a number.
+    refundedCount: anyRefundUnknown
+      ? null
+      : payments.filter((p) => (p.refundedCents as number) > 0).length,
+    doubleBookingCount: countWhere('double_booking'),
+    customerCancelledCount: countWhere('customer_cancelled'),
   };
 }
 
 function voucherTotals(vouchers: VoucherPage['vouchers']): VoucherTotals {
+  // Without an expiry date a voucher cannot be judged expired, so the tally is unavailable rather
+  // than zero. `outstandingValueCents` is unaffected: it excludes vouchers *known* to be expired,
+  // and one that cannot be shown to have expired is correctly still counted as outstanding.
+  const anyExpiryUnknown = vouchers.some((v) => v.expiresAt === null);
+
   return {
     count: vouchers.length,
     issuedValueCents: vouchers.reduce((sum, v) => sum + v.originalValueCents, 0),
@@ -119,7 +161,7 @@ function voucherTotals(vouchers: VoucherPage['vouchers']): VoucherTotals {
     outstandingValueCents: vouchers
       .filter((v) => v.status !== 'expired')
       .reduce((sum, v) => sum + v.remainingCents, 0),
-    expiredCount: vouchers.filter((v) => v.status === 'expired').length,
+    expiredCount: anyExpiryUnknown ? null : vouchers.filter((v) => v.status === 'expired').length,
   };
 }
 
@@ -131,6 +173,7 @@ function emptySnapshot(query: OverviewQuery): OverviewSnapshot {
 export function createFixtureAdapter(options: FixtureAdapterOptions = {}): ClubOperationsAdapter {
   const { scenario = 'populated', latencyMs = 0, errorCode = 'unavailable' } = options;
   const isEmpty = scenario === 'empty';
+  const isSourceAbsent = scenario === 'source-absent';
 
   function guard<T>(produce: () => T): Promise<T> {
     if (scenario === 'loading') return new Promise<T>(() => {});
@@ -149,12 +192,19 @@ export function createFixtureAdapter(options: FixtureAdapterOptions = {}): ClubO
     }
   }
 
+  // The source-absent variants are swapped in at the data source rather than patched into each
+  // response, so every aggregate downstream — payment totals, voucher totals, reconciliation counts,
+  // the report's refund block, the overview — computes from the incomplete rows exactly as the
+  // gateway would. That propagation is the property worth testing; hand-nulling each response would
+  // have proved only that the test can write `null`.
   const bookings = () => (isEmpty ? [] : fixtureBookings);
-  const payments = () => (isEmpty ? [] : fixturePayments);
+  const payments = () =>
+    isEmpty ? [] : isSourceAbsent ? sourceAbsentPayments : fixturePayments;
   const invoices = () => (isEmpty ? [] : fixtureInvoices);
-  const reconciliation = () => (isEmpty ? [] : fixtureReconciliation);
-  const vouchers = () => (isEmpty ? [] : fixtureVouchers);
-  const members = () => (isEmpty ? [] : fixtureMembers);
+  const reconciliation = () =>
+    isEmpty ? [] : isSourceAbsent ? sourceAbsentReconciliation : fixtureReconciliation;
+  const vouchers = () => (isEmpty ? [] : isSourceAbsent ? sourceAbsentVouchers : fixtureVouchers);
+  const members = () => (isEmpty ? [] : isSourceAbsent ? sourceAbsentMembers : fixtureMembers);
   const activity = () => (isEmpty ? [] : fixtureActivityRecords);
   const alerts = () => (isEmpty ? [] : fixtureAlerts);
 
@@ -247,7 +297,8 @@ export function createFixtureAdapter(options: FixtureAdapterOptions = {}): ClubO
     },
 
     getReport(query: ReportQuery): Promise<ReportSnapshot> {
-      return guard(() => buildReport(bookings(), query.range));
+      // The ledger is passed explicitly so the refund block reflects the scenario's own payments.
+      return guard(() => buildReport(bookings(), query.range, payments()));
     },
 
     listVouchers(query: VoucherQuery): Promise<VoucherPage> {

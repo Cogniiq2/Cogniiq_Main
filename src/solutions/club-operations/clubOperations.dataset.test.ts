@@ -10,6 +10,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildCounts,
   buildInvoiceCounts,
+  buildRefunds,
   buildRevenue,
   buildVat,
   isOverdue,
@@ -49,6 +50,19 @@ import {
   emptyVoucherQuery,
 } from './types';
 
+/**
+ * Assert that a fixture value is present, then narrow it.
+ *
+ * Several domain fields are `| null` because the gateway will have no authorised source for them
+ * (see the SOURCE-ABSENT notes in `types.ts`). The *fixtures* are declared fiction and are expected
+ * to be complete, so a null here is a broken fixture rather than an absent source — which makes this
+ * a stronger assertion than the non-null access it replaces, not a way around the type.
+ */
+function present<T>(value: T | null, label: string): T {
+  expect(value, `fixture value missing: ${label}`).not.toBeNull();
+  return value as T;
+}
+
 /* ================================================ Cross-fixture consistency */
 
 describe('the fixtures form one consistent dataset', () => {
@@ -65,7 +79,7 @@ describe('the fixtures form one consistent dataset', () => {
 
   it('every voucher usage names a booking that exists and was paid by voucher', () => {
     for (const voucher of fixtureVouchers) {
-      for (const usage of voucher.usages) {
+      for (const usage of present(voucher.usages, `${voucher.code}.usages`)) {
         const booking = findBookingByReference(usage.bookingReference);
         expect(booking, `${voucher.code} -> ${usage.bookingReference}`).not.toBeNull();
         expect(booking!.provider).toBe('voucher');
@@ -75,7 +89,7 @@ describe('the fixtures form one consistent dataset', () => {
 
   it('every voucher usage amount matches its booking amount', () => {
     for (const voucher of fixtureVouchers) {
-      for (const usage of voucher.usages) {
+      for (const usage of present(voucher.usages, `${voucher.code}.usages`)) {
         expect(findBookingByReference(usage.bookingReference)!.amountCents).toBe(usage.amountCents);
       }
     }
@@ -123,7 +137,9 @@ describe('the fixtures form one consistent dataset', () => {
     const reducedCustomers = new Set(
       fixtureBookings.filter((b) => b.taxCategory === 'padel_member_reduced').map((b) => b.customerName),
     );
-    const withBookings = fixtureMembers.filter((m) => m.bookingCount > 0 && m.vatClassification === 'member');
+    const withBookings = fixtureMembers.filter(
+      (m) => present(m.bookingCount, `${m.id}.bookingCount`) > 0 && m.vatClassification === 'member',
+    );
     expect(withBookings.length).toBeGreaterThan(0);
     for (const member of withBookings) {
       expect(reducedCustomers.has(memberFullName(member)), memberFullName(member)).toBe(true);
@@ -319,7 +335,10 @@ describe('invoice totals', () => {
 describe('voucher balances', () => {
   it('derives the remaining balance from the usage history', () => {
     for (const voucher of fixtureVouchers) {
-      const used = voucher.usages.reduce((sum, usage) => sum + usage.amountCents, 0);
+      const used = present(voucher.usages, `${voucher.code}.usages`).reduce(
+        (sum, usage) => sum + usage.amountCents,
+        0,
+      );
       expect(voucher.remainingCents, voucher.code).toBe(voucher.originalValueCents - used);
     }
   });
@@ -337,7 +356,10 @@ describe('voucher balances', () => {
     for (const voucher of redeemed) expect(voucher.status).toBe('redeemed');
 
     const partial = fixtureVouchers.filter(
-      (v) => v.usages.length > 0 && v.remainingCents > 0 && v.expiresAt >= FIXTURE_TODAY,
+      (v) =>
+        present(v.usages, `${v.code}.usages`).length > 0 &&
+        v.remainingCents > 0 &&
+        present(v.expiresAt, `${v.code}.expiresAt`) >= FIXTURE_TODAY,
     );
     expect(partial.length).toBeGreaterThan(0);
     for (const voucher of partial) expect(voucher.status).toBe('partially_redeemed');
@@ -428,9 +450,24 @@ describe('report calculations', () => {
 
   it('splits refunds into cancellations and double bookings', () => {
     const report = fixtureReport('quarter');
-    expect(report.refunds.totalCents).toBeGreaterThanOrEqual(
-      report.refunds.cancellationCents + report.refunds.doubleBookingCents,
-    );
+    // Every fixture payment is classified, so the split is computable here. The gateway will emit
+    // null for both — that path is covered by the response-validation tests.
+    const cancellation = present(report.refunds.cancellationCents, 'refunds.cancellationCents');
+    const doubleBooking = present(report.refunds.doubleBookingCents, 'refunds.doubleBookingCents');
+    expect(report.refunds.totalCents).toBeGreaterThanOrEqual(cancellation + doubleBooking);
+  });
+
+  it('reports both refund reasons as unavailable when any payment is unclassified', () => {
+    // The whole-or-nothing rule: one unclassifiable payment makes the by-reason split unknowable,
+    // and summing only the classified rows would present a partial figure as a complete one.
+    const payments = [
+      { ...fixturePayments[0], refundedCents: 500, metaClass: 'customer_cancelled' as const },
+      { ...fixturePayments[1], refundedCents: 300, metaClass: null },
+    ];
+    const refunds = buildRefunds(payments);
+    expect(refunds.totalCents).toBe(800);
+    expect(refunds.cancellationCents).toBeNull();
+    expect(refunds.doubleBookingCents).toBeNull();
   });
 });
 
@@ -607,9 +644,15 @@ describe('adapter read methods', () => {
 
   it('reports payment totals consistent with the rows it returns', async () => {
     const page = await adapter.listPayments(emptyPaymentQuery);
-    const expectedRefunded = page.payments.reduce((sum, p) => sum + p.refundedCents, 0);
-    expect(page.totals.refundedCents).toBe(expectedRefunded);
-    expect(page.totals.netCents).toBe(page.totals.grossCents - page.totals.refundedCents);
+    // Every fixture payment carries a refund amount, so the totals are real numbers here. The
+    // gateway path, where the amount is unavailable, is covered in nullableContract.test.ts.
+    const expectedRefunded = page.payments.reduce(
+      (sum, p) => sum + present(p.refundedCents, `${p.id}.refundedCents`),
+      0,
+    );
+    const refundedCents = present(page.totals.refundedCents, 'totals.refundedCents');
+    expect(refundedCents).toBe(expectedRefunded);
+    expect(page.totals.netCents).toBe(page.totals.grossCents - refundedCents);
     expect(page.byProvider.reduce((sum, s) => sum + s.count, 0)).toBe(page.total);
   });
 

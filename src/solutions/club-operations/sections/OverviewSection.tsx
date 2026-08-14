@@ -369,11 +369,15 @@ function OverviewContent({
           onSelect={() => onOpenTarget({ section: 'invoices', filter: { status: 'open' } })}
           selectLabel="Überfällige Rechnungen in Rechnungen öffnen"
         />
+        {/* "identifizierte Nachforderung", not "nachzufordern": the figure sums what the classifier
+            could *find*, and a row it could not examine — an unknown refund amount, an unavailable
+            payment class — contributes nothing to it. Naming it a plain amount to reclaim would
+            present a floor as the complete exposure. */}
         <Metric
           label="Offene Prüfungen"
           value={formatCount(reconciliation.openReview)}
           tone={reconciliation.openReview > 0 ? 'negative' : 'neutral'}
-          hint={`${formatCents(reconciliation.moneyToRecoverCents)} nachzufordern`}
+          hint={`${formatCents(reconciliation.moneyToRecoverCents)} identifizierte Nachforderung`}
           onSelect={() => onOpenTarget({ section: 'reconciliation', filter: {} })}
           selectLabel="Offene Prüfungen im Zahlungsabgleich öffnen"
         />

@@ -39,6 +39,24 @@ export const suggestedActionForIssue: Record<ReconciliationIssue, string> = {
 };
 
 /**
+ * Whether a "nothing is wrong" verdict is supportable at all.
+ *
+ * `matched` is the only outcome that asserts the *absence* of a problem, and it rests on checks that
+ * cannot run without the payment's class and its refund amount. Neither has an authorised upstream
+ * source, so both may be `null` — and when they are, a clean verdict would be a bill of health
+ * issued without the examination.
+ *
+ * This gates every clean verdict, whatever the reference type. It deliberately does **not** gate the
+ * findings above them: `paid_no_booking` and `amount_mismatch` are decided entirely from sourced
+ * values (`grossCents`, the booking's absence, `booking.amountCents`), and demoting them to
+ * `needs_review` would discard a critical finding and the recoverable money it identifies — trading
+ * one falsehood for a worse one.
+ */
+function cleanVerdictIsSupportable(payment: Payment): boolean {
+  return payment.metaClass !== null && payment.refundedCents !== null;
+}
+
+/**
  * Classify one payment against its booking.
  *
  * Order matters: the checks run from most to least serious, so a row that is both orphaned and
@@ -50,9 +68,18 @@ export function classifyReconciliation(
 ): { issue: ReconciliationIssue; moneyToRecoverCents: number } {
   // A voucher purchase legitimately has no booking behind it.
   if (payment.referenceType === 'voucher') {
-    return payment.status === 'failed'
-      ? { issue: 'needs_review', moneyToRecoverCents: 0 }
-      : { issue: 'matched', moneyToRecoverCents: 0 };
+    if (payment.status === 'failed') {
+      return { issue: 'needs_review', moneyToRecoverCents: 0 };
+    }
+    // The incomplete-data guard runs before this shortcut may call anything reconciled. Being a
+    // voucher purchase is not itself evidence of health: a refunded one is indistinguishable from an
+    // untouched one without a refund amount, and `matched` would be asserting exactly that
+    // difference. Voucher payments have no authorised refund-amount source at all, so under a live
+    // gateway this branch is expected to yield `needs_review` — fail-closed, not a fault.
+    if (!cleanVerdictIsSupportable(payment)) {
+      return { issue: 'needs_review', moneyToRecoverCents: 0 };
+    }
+    return { issue: 'matched', moneyToRecoverCents: 0 };
   }
 
   if (booking === null) {
@@ -60,7 +87,8 @@ export function classifyReconciliation(
   }
 
   // Money went back but the slot is still held: the club is out both the court and the fee.
-  if (payment.refundedCents > 0 && booking.status === 'confirmed') {
+  // An unknown refund amount cannot satisfy this test — `null > 0` is not a refund, it is silence.
+  if (payment.refundedCents !== null && payment.refundedCents > 0 && booking.status === 'confirmed') {
     return { issue: 'active_booking_refunded', moneyToRecoverCents: payment.refundedCents };
   }
 
@@ -87,6 +115,14 @@ export function classifyReconciliation(
     return { issue: 'customer_cancellation', moneyToRecoverCents: 0 };
   }
 
+  // Everything above is decidable without the payment's class or its refund amount. `matched` is
+  // not — the same guard the voucher shortcut answers to, applied to the booking path's own clean
+  // verdict. `moneyToRecoverCents: 0` here means nothing recoverable was *identified*, not that
+  // nothing is recoverable: the checks that would have found an amount could not run.
+  if (!cleanVerdictIsSupportable(payment)) {
+    return { issue: 'needs_review', moneyToRecoverCents: 0 };
+  }
+
   return { issue: 'matched', moneyToRecoverCents: 0 };
 }
 
@@ -101,7 +137,10 @@ export function buildReconciliationEntry(
     issue,
     severity: severityForIssue[issue],
     occurredAt: payment.occurredAt,
-    customerName: payment.customerName,
+    // The booking is the authoritative source for the name (`bookings.customer_name`); the payment
+    // carries one only in fixtures. An orphaned payment has neither, and stays null rather than
+    // borrowing a name from somewhere it does not belong to.
+    customerName: booking?.customerName ?? payment.customerName,
     bookingReference: payment.referenceType === 'booking' ? payment.referenceLabel : null,
     paymentReference: payment.reference,
     court: booking?.court ?? null,

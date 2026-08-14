@@ -26,6 +26,18 @@ export function formatCents(cents: number | null | undefined, currency = 'EUR'):
   return currencyFormatter(currency).format(cents / 100);
 }
 
+/**
+ * A text value that may have no authorised upstream source.
+ *
+ * Renders the em dash the rest of this module already uses for "no value", so an unavailable name
+ * looks the same as an unavailable amount instead of appearing as an empty cell — which the reader
+ * would take for a blank field rather than for an absent source. A whitespace-only string is treated
+ * as absent too: it carries no information and would render as an invisible gap.
+ */
+export function formatText(value: string | null | undefined): string {
+  return value == null || value.trim() === '' ? '—' : value;
+}
+
 const numberFormatter = new Intl.NumberFormat('de-DE');
 
 export function formatCount(value: number | null | undefined): string {

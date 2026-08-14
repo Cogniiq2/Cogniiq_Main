@@ -10,13 +10,18 @@ import {
   buildCounts,
   buildCourts,
   buildMembership,
-  buildRefunds,
   buildRevenue,
   buildVat,
   isRevenue,
   topCourt,
 } from '../aggregation';
-import type { MonthlyReport, MonthlyReportComparison, PaymentProvider } from '../types';
+import type {
+  MonthlyReport,
+  MonthlyReportComparison,
+  Payment,
+  PaymentMetaClass,
+  PaymentProvider,
+} from '../types';
 import { bookingsInMonth, fixtureMonths } from './bookings';
 import { fixturePayments } from './payments';
 
@@ -26,12 +31,53 @@ function revenueByProvider(month: string, provider: PaymentProvider): number {
     .reduce((sum, booking) => sum + booking.amountCents, 0);
 }
 
+/**
+ * The stored refund figures of a monthly report.
+ *
+ * `MonthlyReport.refundedCents`, `.refundedCancellationCents` and `.refundedDoubleBookingCents` all
+ * stay non-null because upstream persists them as their own granted columns
+ * (`admin_monthly_reports.refunded_amount`, `.refunded_cancellation_amount`,
+ * `.refunded_double_booking_amount`). They are a stored fact, not the live derivation that
+ * `RefundBreakdown` computes from per-payment amounts and `metaClass` — which is exactly why the
+ * live figures may be null while these are not. These fixtures stand in for those columns, so they
+ * must produce a number.
+ *
+ * If a fixture payment lacks the amount or the class, that number cannot be derived, and this raises
+ * rather than substituting a zero: a fixture standing in for a stored column must either be right or
+ * be visibly broken. This is fixture-construction code and runs at module load, never in the app.
+ *
+ * `metaClass === null` selects every refunded payment regardless of reason, which is the stand-in for
+ * `refunded_amount`.
+ */
+function storedRefunds(
+  payments: Payment[],
+  metaClass: PaymentMetaClass | null,
+  month: string,
+): number {
+  return payments.reduce((sum, payment) => {
+    if (payment.refundedCents === null) {
+      throw new Error(
+        `monthly report fixture ${month}: payment ${payment.id} has no refund amount, so the ` +
+          'stored refund columns cannot be derived',
+      );
+    }
+    if (payment.refundedCents === 0) return sum;
+    if (metaClass === null) return sum + payment.refundedCents;
+    if (payment.metaClass === null) {
+      throw new Error(
+        `monthly report fixture ${month}: payment ${payment.id} has no metaClass, so the stored ` +
+          'by-reason refund columns cannot be derived',
+      );
+    }
+    return payment.metaClass === metaClass ? sum + payment.refundedCents : sum;
+  }, 0);
+}
+
 function buildMonthlyReport(month: string): MonthlyReport {
   const bookings = bookingsInMonth(month);
   const payments = fixturePayments.filter((payment) => payment.occurredAt.slice(0, 7) === month);
   const revenue = buildRevenue(bookings);
   const counts = buildCounts(bookings);
-  const refunds = buildRefunds(payments);
 
   const [year, monthIndex] = month.split('-').map(Number);
   const periodStart = `${month}-01`;
@@ -46,9 +92,9 @@ function buildMonthlyReport(month: string): MonthlyReport {
     stripeRevenueCents: revenueByProvider(month, 'stripe'),
     paypalRevenueCents: revenueByProvider(month, 'paypal'),
     voucherRevenueCents: revenueByProvider(month, 'voucher'),
-    refundedCents: refunds.totalCents,
-    refundedCancellationCents: refunds.cancellationCents,
-    refundedDoubleBookingCents: refunds.doubleBookingCents,
+    refundedCents: storedRefunds(payments, null, month),
+    refundedCancellationCents: storedRefunds(payments, 'customer_cancelled', month),
+    refundedDoubleBookingCents: storedRefunds(payments, 'double_booking', month),
     bookingCount: counts.total,
     successfulCount: counts.paid,
     pendingCount: bookings.filter((booking) => booking.paymentStatus === 'pending').length,

@@ -151,6 +151,23 @@ export const paymentMetaClassTones: Record<PaymentMetaClass, StatusToneKey> = {
   customer_cancelled: 'warning',
 };
 
+/**
+ * How an unclassifiable payment is described to staff.
+ *
+ * "Nicht klassifiziert" says the classification is missing. It is deliberately not "Regulär": an
+ * unclassified payment has not been found to be ordinary, it has not been examined at all, and the
+ * neutral tone keeps it from reading as either a problem or an all-clear.
+ */
+export const paymentMetaClassUnavailableLabel = 'Nicht klassifiziert';
+
+export function paymentMetaClassLabel(metaClass: PaymentMetaClass | null): string {
+  return metaClass === null ? paymentMetaClassUnavailableLabel : paymentMetaClassLabels[metaClass];
+}
+
+export function paymentMetaClassTone(metaClass: PaymentMetaClass | null): StatusToneKey {
+  return metaClass === null ? 'neutral' : paymentMetaClassTones[metaClass];
+}
+
 /* ------------------------------------------------------------------ Invoices */
 
 export const invoiceStatusLabels: Record<InvoiceStatus, string> = {
