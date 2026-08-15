@@ -216,6 +216,40 @@ function validate(page, route, canonical, homeCanonical) {
   if (page.includes(ROOT_MARKER)) fail('the empty root marker survived — nothing was injected');
 }
 
+/**
+ * Node must be new enough for `module.registerHooks` to be safe here.
+ *
+ * On Node 22.16.0 a load hook that does nothing but call next() still corrupts
+ * the ESM->CJS translator path: `require('react')` from react/jsx-runtime.js
+ * returns a partially initialised module, and the very first JSX render dies
+ * with "Cannot read properties of undefined (reading 'ReactCurrentDispatcher')"
+ * — an error that points at React and says nothing about the real cause. That
+ * cost a full deploy cycle to identify, so the requirement is asserted up front
+ * with a message that names it.
+ *
+ * Verified by experiment on this exact lockfile: 22.16.0 fails with a
+ * pass-through hook and succeeds without one; 22.22.2 succeeds either way.
+ * 22.22.2 is also the minimum that satisfies jsdom@30 and undici@8's own engine
+ * ranges, so it is the version pinned in .node-version and package.json engines.
+ */
+const MIN_NODE = [22, 22, 2];
+function assertHookableNodeVersion() {
+  const current = process.versions.node.split('.').map(Number);
+  const isOlder = MIN_NODE.some((min, i) => {
+    const part = current[i] ?? 0;
+    if (part === min) return false;
+    return part < min;
+  });
+  if (isOlder) {
+    throw new Error(
+      `This repository's prerender requires Node ${MIN_NODE.join('.')} or newer ` +
+        `(running ${process.versions.node}). Node 22.16.0 is known to fail when the module ` +
+        `load hook imports React's CommonJS runtime, and the locked jsdom dependency ` +
+        `requires Node ${MIN_NODE.join('.')} or newer. Use the version pinned in .node-version.`
+    );
+  }
+}
+
 // ─── main ────────────────────────────────────────────────────────────────────
 async function main() {
   if (!existsSync(SSR_ENTRY)) {
@@ -228,6 +262,7 @@ async function main() {
   // Installed BEFORE the SSR bundle is imported: it records which chunks the
   // server actually pulls in while rendering, which is how the preload set below
   // stays limited to code the prerendered HTML really contains.
+  assertHookableNodeVersion();
   const ssrLoads = trackSsrModuleLoads(registerHooks);
 
   const { PUBLIC_ROUTES, canonicalFor, render } = await import(pathToFileURL(SSR_ENTRY).href);
@@ -447,7 +482,36 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error(`\n✗ Prerender failed: ${error.message}`);
+  // The FULL stack, plus every nested cause. This step runs inside a hosting
+  // provider's build container where the only diagnostic available afterwards is
+  // this log — a bare `error.message` cost a full deploy cycle to work out that
+  // "Cannot read properties of undefined (reading 'ReactCurrentDispatcher')"
+  // came from React's server renderer and not from this script's own logic.
+  console.error('\n✗ Prerender failed.');
+  console.error(`  node: ${process.version}  platform: ${process.platform}/${process.arch}`);
+  console.error(
+    `  provider env: NETLIFY=${process.env.NETLIFY ?? '<unset>'} CF_PAGES=${process.env.CF_PAGES ?? '<unset>'}`
+  );
+  console.error('');
+
+  let current = error;
+  let depth = 0;
+  while (current && depth < 5) {
+    const label = depth === 0 ? 'error' : `caused by (${depth})`;
+    console.error(`  ${label}: ${current.stack || `${current.name}: ${current.message}`}`);
+    if (current.errors?.length) {
+      // AggregateError — surface each member, not just the summary line.
+      current.errors.forEach((inner, i) => {
+        console.error(`    [${i}] ${inner?.stack || inner}`);
+      });
+    }
+    current = current.cause;
+    depth += 1;
+    if (current) console.error('');
+  }
+
+  console.error('');
   console.error('  dist/ was not modified by this step. The build must not be deployed.');
+  // Fail closed: a non-zero exit is what stops the provider from publishing.
   process.exit(1);
 });
