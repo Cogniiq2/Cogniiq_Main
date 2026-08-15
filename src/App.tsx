@@ -592,22 +592,34 @@ function ConsentBannerGate() {
   return <ConsentBanner />;
 }
 
-function App() {
+// Everything BELOW the router, so the exact same tree can be mounted under a
+// BrowserRouter in the browser and under a StaticRouter during build-time
+// prerendering (src/entry-server.tsx). The two must stay identical: the browser
+// hydrates the prerendered markup, and any component rendered on only one side
+// would be a hydration mismatch. Route table, guards and layouts are untouched.
+export function AppShell() {
   useEffect(() => {
     // Google Consent Mode v2 (Basic): sets denied defaults and restores a
     // previously granted choice. Never loads the Google tag without consent.
+    // Effect-only, so prerendering never runs it and never emits a Google tag.
     initConsent();
   }, []);
 
   return (
+    <AuthProvider>
+      <RouteIndexabilityManager />
+      <CanonicalManager />
+      <PublicStructuredData />
+      <AppInner />
+      <ConsentBannerGate />
+    </AuthProvider>
+  );
+}
+
+function App() {
+  return (
     <Router>
-      <AuthProvider>
-        <RouteIndexabilityManager />
-        <CanonicalManager />
-        <PublicStructuredData />
-        <AppInner />
-        <ConsentBannerGate />
-      </AuthProvider>
+      <AppShell />
     </Router>
   );
 }

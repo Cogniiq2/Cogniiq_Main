@@ -8,9 +8,15 @@ const DesktopHero = lazy(() =>
 );
 
 function useIsDesktop() {
-  const [isDesktop, setIsDesktop] = useState(() =>
-    typeof window !== 'undefined' ? window.innerWidth >= 1024 : false
-  );
+  // Starts `false` unconditionally — NOT from window.innerWidth. The homepage is
+  // prerendered at build time (scripts/prerender.mjs), where there is no window, so
+  // the server markup is always MobileHero. Seeding this from innerWidth would make
+  // the first client render disagree with that markup on every desktop viewport,
+  // which is a hydration mismatch on the single most important page of the site.
+  // The effect below immediately promotes desktop viewports via matchMedia, and the
+  // Suspense fallback for the lazy DesktopHero chunk is already MobileHero, so what
+  // a desktop visitor sees is unchanged.
+  const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)');

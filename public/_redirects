@@ -1,1 +1,37 @@
-/* /index.html 200
+# Netlify routing. First matching rule wins, and a rule is only consulted when no
+# static file matches the request — so the prerendered public pages written by
+# scripts/prerender.mjs (dist/<route>/index.html) are served directly and never
+# reach these rules.
+#
+# What is left for the rules to decide:
+#
+#   1. Private application surfaces -> the SPA shell, 200. They are client-routed
+#      and guarded by ProtectedRoute / PlatformAdminRoute / PlatformOwnerRoute, so
+#      the shell must still be served for deep links and page reloads.
+#
+#      The target is /app-shell.html, NOT /index.html: index.html is now the
+#      prerendered HOMEPAGE, so falling back to it would serve marketing markup
+#      (with the homepage canonical and an indexable robots tag) on the customer
+#      portal and then discard it all on hydration. /app-shell.html is the
+#      untouched client template with an empty #root, marked noindex.
+#
+#      Both the exact prefix root AND its deep paths are listed: on Netlify
+#      "/app/*" does NOT match "/app", and relying on the splat alone would 404
+#      every portal root. Server-level noindex for these lives in public/_headers.
+#
+#   2. Everything else -> a real 404. Previously "/* /index.html 200" answered
+#      every unknown URL with the homepage shell at HTTP 200, which turned the
+#      entire unknown URL space into a soft 404.
+
+/app                /app-shell.html   200
+/app/*              /app-shell.html   200
+/admin              /app-shell.html   200
+/admin/*            /app-shell.html   200
+/owner              /app-shell.html   200
+/owner/*            /app-shell.html   200
+/auth               /app-shell.html   200
+/auth/*             /app-shell.html   200
+/d                  /app-shell.html   200
+/d/*                /app-shell.html   200
+
+/*                  /404.html         404

@@ -6,7 +6,17 @@ Disallow: /_debug/
 Disallow: /preview/
 Disallow: /__/
 Disallow: /anfrage-erhalten
-Disallow: /admin
+
+# /admin is deliberately NOT disallowed. It — like /app, /owner, /auth and /d —
+# is served the noindex application shell (public/_headers sets
+# "X-Robots-Tag: noindex, nofollow, noarchive"; the shell's HTML carries a
+# noindex robots meta and no canonical). A crawler must be ALLOWED to fetch a URL
+# in order to see that instruction: blocking it here would suppress the noindex
+# and can leave URL-only listings in search results.
+#
+# robots.txt is not access control. The actual protection is authentication
+# (ProtectedRoute / PlatformAdminRoute / PlatformOwnerRoute) plus Supabase RLS —
+# the shell served to an anonymous visitor contains no private data at all.
 
 User-agent: Googlebot
 Allow: /

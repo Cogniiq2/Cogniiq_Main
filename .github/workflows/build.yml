@@ -75,8 +75,30 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Build
+      # Builds the client, prerenders every public route and regenerates
+      # public/sitemap.xml from src/lib/routing/publicRoutes.ts.
+      - name: Build (client + SSR + prerender)
         run: npm run build
+
+      # The build regenerates the committed sitemap. If it differs from what is
+      # checked in, the manifest and the sitemap have drifted apart — or some
+      # other tracked file was modified as a build side effect.
+      - name: No tracked file was modified by the build
+        run: |
+          if ! git diff --quiet; then
+            echo "::error::The build modified tracked files. Regenerate and commit them:"
+            git --no-pager diff --stat
+            git --no-pager diff
+            exit 1
+          fi
+          echo "Working tree clean after build."
+
+      - name: Prerender output verification
+        run: node .github/scripts/test-prerender-output.mjs
+
+      # Runs after the build so the hydration tests can check the real dist/ output.
+      - name: Unit and component tests
+        run: npm test
 
   phase0-sql-smoke:
     runs-on: ubuntu-latest
