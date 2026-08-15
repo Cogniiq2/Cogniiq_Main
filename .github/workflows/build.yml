@@ -96,6 +96,15 @@ jobs:
       - name: Prerender output verification
         run: node .github/scripts/test-prerender-output.mjs
 
+      # Resolves every public URL (and its trailing-slash / unknown variants)
+      # through Netlify's documented resolution order and fails on redirect
+      # loops, extra hops or directory/file namespace collisions. A previous
+      # deployment shipped a <path>/index.html artifact whose cold requests all
+      # died with ERR_TOO_MANY_REDIRECTS; client-side navigation hid it because
+      # the SPA never touches the static layer.
+      - name: Netlify static routing verification
+        run: node .github/scripts/test-netlify-routing.mjs
+
       # Loads the built site in a real headless Chromium and fails on React
       # hydration errors or wrong post-hydration metadata. jsdom cannot catch
       # these: there every lazy chunk is already resolved, so the Suspense

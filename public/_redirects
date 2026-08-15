@@ -34,4 +34,20 @@
 /d                  /app-shell.html   200
 /d/*                /app-shell.html   200
 
+# @generated-public-routes
+# scripts/prerender.mjs splices one forced rule pair per public route in at this
+# marker when it writes dist/_redirects. They are generated rather than written
+# by hand so they can never drift from the manifest, and they are FORCED so that
+# a canonical URL is resolved before Netlify's pretty-URL normalisation runs.
+#
+# That normalisation is what broke the previous deployment: with a
+# <path>/index.html artifact, Netlify redirected "/leistungen" -> "/leistungen/"
+# because the path named a directory, while trailing-slash normalisation
+# redirected "/leistungen/" -> "/leistungen". The two pointed at each other and
+# every public URL died with ERR_TOO_MANY_REDIRECTS on a cold request, while
+# client-side navigation kept working and hid it.
+#
+# The output is now <path>.html and each canonical URL has an explicit forced
+# rewrite, so resolution never reaches normalisation and cannot loop.
+
 /*                  /404.html         404

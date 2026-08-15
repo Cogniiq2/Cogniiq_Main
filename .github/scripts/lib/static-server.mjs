@@ -1,22 +1,17 @@
-// Static file server that reproduces Netlify's documented serving order for the
-// generated dist/ directory:
+// Static file server for the generated dist/ directory.
 //
-//   1. an exact static file
-//   2. <path>.html            (pretty URL, no trailing slash — what we emit)
-//   3. <path>/index.html      (directory index; Netlify serves these at a
-//                              trailing slash, which is why we do NOT emit them)
-//   4. public/_redirects rules, in order, first match wins
-//   5. 404.html with status 404
+// Resolution is delegated to scripts/lib/netlify-routing.mjs — the same model
+// the routing guard uses — so the browser test exercises exactly the semantics
+// that .github/scripts/test-netlify-routing.mjs verifies, and neither can drift
+// from the other. This is still an imitation for local/CI use; the authoritative
+// check is always the real Netlify preview.
 //
 // public/_headers blocks are applied to the response.
-//
-// Shared by .github/scripts/test-browser-hydration.mjs so the browser test
-// exercises the same routing semantics the deployment uses. This is an
-// imitation for local/CI verification — the authoritative check is always the
-// real Netlify preview.
 import { createServer } from 'node:http';
-import { readFileSync, existsSync, statSync } from 'node:fs';
-import { join, extname, normalize } from 'node:path';
+import { readFileSync, existsSync } from 'node:fs';
+import { join, extname } from 'node:path';
+
+import { parseRedirects, resolveOnce } from '../../../scripts/lib/netlify-routing.mjs';
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -33,17 +28,6 @@ const MIME = {
   '.ico': 'image/x-icon',
   '.woff2': 'font/woff2',
 };
-
-function parseRedirects(dist) {
-  const file = join(dist, '_redirects');
-  if (!existsSync(file)) return [];
-  return readFileSync(file, 'utf8')
-    .split('\n')
-    .map((l) => l.trim())
-    .filter((l) => l && !l.startsWith('#'))
-    .map((l) => l.split(/\s+/))
-    .filter((parts) => parts.length >= 2);
-}
 
 function parseHeaders(dist) {
   const file = join(dist, '_headers');
@@ -72,7 +56,8 @@ const matchesPattern = (pattern, path) =>
  * @returns {Promise<{ origin: string, close: () => Promise<void> }>}
  */
 export function startStaticServer(dist) {
-  const redirects = parseRedirects(dist);
+  const redirectsFile = join(dist, '_redirects');
+  const redirects = existsSync(redirectsFile) ? parseRedirects(readFileSync(redirectsFile, 'utf8')) : [];
   const headerBlocks = parseHeaders(dist);
 
   // Test-only knob. Netlify serves JS chunks over a real network, so a route's
@@ -109,38 +94,19 @@ export function startStaticServer(dist) {
       res.end('bad request');
       return;
     }
-    // Contain the resolved path inside dist.
-    const safe = normalize(path).replace(/^(\.\.[/\\])+/, '');
-    const target = join(dist, safe);
-    if (!target.startsWith(dist)) {
-      res.writeHead(403);
-      res.end('forbidden');
+
+    const step = resolveOnce(dist, path, redirects);
+    if (step.kind === 'redirect') {
+      res.writeHead(step.status, { Location: step.location });
+      res.end();
       return;
     }
-
-    if (existsSync(target) && statSync(target).isFile()) return send(res, target, 200, path);
-
-    // Pretty URL: "/leistungen" is served by "leistungen.html" with no trailing
-    // slash. This is why the prerenderer emits <path>.html rather than
-    // <path>/index.html — a directory index would make Netlify canonicalise the
-    // URL to "/leistungen/" and contradict the published canonical.
-    const pretty = `${target}.html`;
-    if (existsSync(pretty) && statSync(pretty).isFile()) return send(res, pretty, 200, path);
-
-    const index = join(target, 'index.html');
-    if (existsSync(index) && statSync(index).isFile()) return send(res, index, 200, path);
-
-    for (const [pattern, to, status] of redirects) {
-      if (matchesPattern(pattern, path)) {
-        const file = join(dist, to.replace(/^\//, ''));
-        if (existsSync(file)) return send(res, file, Number(status) || 200, path);
-      }
+    if (step.kind !== 'file') {
+      res.writeHead(step.status);
+      res.end('not found');
+      return;
     }
-
-    const notFound = join(dist, '404.html');
-    if (existsSync(notFound)) return send(res, notFound, 404, path);
-    res.writeHead(404);
-    res.end('not found');
+    send(res, step.file, step.status, path);
   });
 
   return new Promise((resolve, reject) => {
