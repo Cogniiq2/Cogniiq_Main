@@ -80,12 +80,12 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     route: "/bayreuth/ki-telefonassistent",
     seo: {
       title: "KI Telefonassistent Bayreuth – AI Rezeption & Anrufannahme | Cogniiq",
-      description: "KI Telefonassistent Bayreuth: Automatische Anrufannahme, Terminbuchung & Weiterleitung für lokale Unternehmen. DSGVO-konform, 24/7 erreichbar, Einrichtung in 7–14 Tagen.",
+      description: "KI Telefonassistent Bayreuth: Automatische Anrufannahme, Terminbuchung & Weiterleitung für lokale Unternehmen. DSGVO-konform, auch außerhalb der Öffnungszeiten, Einrichtung in 7–14 Tagen.",
       canonical: `${base}/bayreuth/ki-telefonassistent`,
     },
     intro: {
       h1: "KI Telefonassistent in Bayreuth",
-      lead: "Für Praxen, Restaurants und lokale Dienstleister in Bayreuth, die keine Anrufe mehr verpassen wollen. Der KI Telefonassistent übernimmt Terminannahme, Auskunft und Weiterleitung – rund um die Uhr, ohne Warteschleife, ohne zusätzliches Personal.",
+      lead: "Für Praxen, Restaurants und lokale Dienstleister in Bayreuth, die keine Anrufe mehr verpassen wollen. Der KI Telefonassistent übernimmt Terminannahme, Auskunft und Weiterleitung – auch außerhalb der Öffnungszeiten, ohne Warteschleife, ohne zusätzliches Personal.",
     },
     localIntro: {
       paragraphs: [
@@ -151,7 +151,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         name: "Arztpraxen & Zahnarztpraxen",
         problem: "Praxen in Bayreuth sind montags und nach Feiertagen mit Anrufspitzen konfrontiert, die das Praxispersonal erheblich belasten. Patienten, die nicht durchkommen, rufen beim nächsten Arzt an.",
-        solution: "Der KI Telefonassistent nimmt Terminanfragen sofort entgegen, prüft Verfügbarkeiten und bucht direkt – rund um die Uhr, ohne Warteschleife. Das Praxisteam wird dauerhaft entlastet.",
+        solution: "Der KI Telefonassistent nimmt Terminanfragen sofort entgegen, prüft Verfügbarkeiten und bucht direkt – auch außerhalb der Öffnungszeiten, ohne Warteschleife. Das Praxisteam wird dauerhaft entlastet.",
       },
       {
         name: "Physiotherapie & Heilpraktiker",
@@ -182,7 +182,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     localScenarios: [
       {
         title: "Hausarztpraxis nahe dem Stadtpark",
-        description: "Eine Allgemeinmedizin-Praxis in der Bayreuth Innenstadt erhält montags über 80 Anrufe vor 9 Uhr. Die Anmeldung ist chronisch überlastet. Nach Einführung des KI Telefonassistenten werden Termine automatisch gebucht, Standardfragen sofort beantwortet – das Praxisteam konzentriert sich auf die Patienten im Wartezimmer.",
+        description: "Eine Allgemeinmedizin-Praxis in der Bayreuth Innenstadt erhält montags über 80 Anrufe vor 9 Uhr. Die Anmeldung ist chronisch überlastet. Mit einem KI Telefonassistenten könnten Termine automatisch gebucht und Standardfragen sofort beantwortet werden – das Praxisteam könnte sich auf die Patienten im Wartezimmer konzentrieren.",
       },
       {
         title: "Restaurant im Festspielviertel",
@@ -317,11 +317,11 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       },
       {
         title: "Restaurant mit Online-Reservierung",
-        description: "Ein Restaurant in der Bayreuth Innenstadt erhält Reservierungen über drei verschiedene Kanäle – Website, Google, Telefonassistent – die manuell im Kalender eingetragen werden. Nach der Automatisierung laufen alle Buchungen zentral zusammen, Erinnerungen gehen automatisch raus, und Stornierungen werden sofort im Kalender aktualisiert.",
+        description: "Ein Restaurant in der Bayreuth Innenstadt erhält Reservierungen über drei verschiedene Kanäle – Website, Google, Telefonassistent – die manuell im Kalender eingetragen werden. Mit einer passenden Automatisierung laufen alle Buchungen zentral zusammen, Erinnerungen gehen automatisch raus, und Stornierungen werden sofort im Kalender aktualisiert.",
       },
       {
         title: "Physiotherapiepraxis mit Abrechnungsworkflow",
-        description: "Eine Physiotherapiepraxis mit 4 Therapeuten führt Patientenakten in einem System und Abrechnungen in einem anderen. Monatlich werden Daten per Hand übertragen. Nach der Automatisierung wird die Abrechnung aus dem Praxisverwaltungssystem direkt in die Buchhaltung überführt – ohne manuelle Dateneingabe.",
+        description: "Eine Physiotherapiepraxis mit 4 Therapeuten führt Patientenakten in einem System und Abrechnungen in einem anderen. Monatlich werden Daten per Hand übertragen. Mit einer passenden Automatisierung wird die Abrechnung aus dem Praxisverwaltungssystem direkt in die Buchhaltung überführt – ohne manuelle Dateneingabe.",
       },
     ],
     sameServiceOtherCities: [
@@ -355,7 +355,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
         "Bayreuth hat eine aktive, vielfältige lokale Wirtschaft: Handwerksbetriebe, medizinische Praxen, Gastronomie, Sport- und Freizeitanlagen sowie eine wachsende Zahl digitaler Dienstleister. Was viele dieser Unternehmen gemeinsam haben: Ihre Website entspricht nicht mehr dem Stand, den potenzielle Kunden erwarten. Veraltete Designs, langsame Ladezeiten auf mobilen Geräten, schwache lokale Sichtbarkeit in Google – das sind täglich verlorene Kunden.",
         "Cogniiq entwickelt Websites für Unternehmen in Bayreuth, die anders sind. Jede Website entsteht von Grund auf neu – keine Vorlage, kein Baukastensystem. Wir beginnen mit dem Briefing: Was soll die Website leisten? Wer ist die Zielgruppe? Welche lokalen Suchbegriffe in Bayreuth sind relevant? Daraus entsteht eine Website, die technisch einwandfrei, schnell und für lokale Suchanfragen optimiert ist.",
         "Als Webdesign-Agentur mit Sitz in Bayreuth kennen wir die lokalen Wettbewerbsverhältnisse, die Suchgewohnheiten der Region und die spezifischen Erwartungen Ihrer Kunden in Oberfranken. Wir optimieren Websites nicht nur für generische Keywords, sondern gezielt für Suchanfragen wie 'Webdesign Agentur Bayreuth', 'Website erstellen Bayreuth' und branchenspezifische lokale Kombinationen.",
-        "Jede Website, die wir bauen, ist Mobile-First: Über 70% der Suchanfragen in Deutschland erfolgen inzwischen vom Smartphone. Ladezeiten unter 2 Sekunden, bestandene Core Web Vitals und ein sauberes technisches Fundament sind kein optionales Extra – sondern der Standard, den wir für jedes Projekt liefern. SEO ist von Anfang an eingebaut, nicht nachträglich als Patch hinzugefügt.",
+        "Jede Website, die wir bauen, ist Mobile-First: Der überwiegende Teil der Suchanfragen in Deutschland erfolgt inzwischen vom Smartphone. Ladezeiten unter 2 Sekunden, bestandene Core Web Vitals und ein sauberes technisches Fundament sind kein optionales Extra – sondern der Standard, den wir für jedes Projekt liefern. SEO ist von Anfang an eingebaut, nicht nachträglich als Patch hinzugefügt.",
         "Als Ergänzung zum Webdesign bieten wir in Bayreuth auch den [KI Telefonassistenten für Bayreuth](/bayreuth/ki-telefonassistent) und [Prozessautomatisierung](/bayreuth/automatisierung) an. Diese drei Bereiche ergänzen sich ideal: Eine sichtbare, schnelle Website generiert Anfragen – der KI Assistent nimmt sie entgegen – Automatisierungen verarbeiten sie effizient. Alles aus einer Hand, persönlich betreut in Bayreuth.",
       ],
     },
@@ -393,7 +393,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     faq: [
       { question: "Auf welcher Technologie baut Cogniiq Websites in Bayreuth?", answer: "Je nach Anforderung: React/Next.js für dynamische Projekte mit höchsten Performance-Anforderungen, Webflow für content-lastige Sites, WordPress für einfache Unternehmenswebsites, die Ihr Team selbst pflegen soll." },
       { question: "Wie lange dauert ein Webdesign-Projekt in Bayreuth?", answer: "Einfache Unternehmenswebsites in 4–6 Wochen, komplexere Projekte in 8–12 Wochen. Nach dem Briefing erhalten Sie immer eine realistische Zeitschätzung." },
-      { question: "Was kostet eine Website für ein Unternehmen in Bayreuth?", answer: "Einfache Unternehmenswebsites ab ca. 2.500–5.000 €, komplexere Projekte nach Aufwand. Erstgespräch und grobe Einschätzung sind kostenlos." },
+      { question: "Was kostet eine Website für ein Unternehmen in Bayreuth?", answer: "Websites starten ab ca. 1.500 €. Individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei ca. 2.500–5.000 €, komplexere Projekte nach Aufwand. Erstgespräch und grobe Einschätzung sind kostenlos." },
       { question: "Kann ich die Website nach dem Launch selbst pflegen?", answer: "Ja. Wir richten bei Bedarf ein CMS ein und schulen Ihr Team. Alternativ übernehmen wir die laufende Pflege – je nach Ihren Wünschen." },
       { question: "Macht Cogniiq auch lokales SEO für Bayreuth?", answer: "On-Page SEO ist in jedem Projekt enthalten: technische Grundlagen, saubere Struktur, lokale Keyword-Integration für Bayreuth, Core Web Vitals. Für umfangreichere SEO-Kampagnen bieten wir separate Pakete an." },
       { question: "Habt ihr Erfahrung mit dem Bayreuth-Markt?", answer: "Ja. Wir kennen die lokale Wettbewerbssituation in Bayreuth und Oberfranken und positionieren Websites so, dass sie bei lokalen Suchanfragen sichtbar sind." },
@@ -470,19 +470,19 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     route: "/regensburg/ki-telefonassistent",
     seo: {
       title: "KI Telefonassistent Regensburg – AI Rezeption & Anrufannahme | Cogniiq",
-      description: "KI Telefonassistent Regensburg: Automatische Anrufannahme, Terminbuchung & Weiterleitung für Praxen, Gastronomie und Dienstleister. 24/7, DSGVO-konform, Einrichtung in 7–14 Tagen.",
+      description: "KI Telefonassistent Regensburg: Automatische Anrufannahme, Terminbuchung & Weiterleitung für Praxen, Gastronomie und Dienstleister. Auch außerhalb der Öffnungszeiten, DSGVO-konform, Einrichtung in 7–14 Tagen.",
       canonical: `${base}/regensburg/ki-telefonassistent`,
     },
     intro: {
       h1: "KI Telefonassistent in Regensburg",
-      lead: "Regensburg wächst – und mit ihm der Bedarf nach effizientem Kundenkontakt. Der KI Telefonassistent von Cogniiq übernimmt die Telefonkommunikation für Praxen, Betriebe und Dienstleister in Regensburg: automatisch, zuverlässig, rund um die Uhr.",
+      lead: "Regensburg wächst – und mit ihm der Bedarf nach effizientem Kundenkontakt. Der KI Telefonassistent von Cogniiq übernimmt die Telefonkommunikation für Praxen, Betriebe und Dienstleister in Regensburg: automatisch, zuverlässig, auch außerhalb der Öffnungszeiten.",
     },
     localIntro: {
       paragraphs: [
         "Regensburg ist eine der am schnellsten wachsenden Städte Bayerns – mit einer Universität, einer wachsenden Start-up-Szene, einem starken industriellen Mittelstand und einer der dichtesten Gastronomie- und Tourismuslandschaften in Ostbayern. Diese Dynamik schlägt sich direkt in der Telefonkommunikation nieder: Anfragen kommen zu jeder Tages- und Abendzeit, besonders in der Tourismussaison und während der Semesterzeiten ist das Volumen erheblich.",
-        "Der KI Telefonassistent von Cogniiq ist die passende Antwort auf diese Herausforderung: Er nimmt Anrufe rund um die Uhr entgegen, beantwortet Standardfragen zu Öffnungszeiten, Preisen und Verfügbarkeit sofort, bucht Termine direkt ins System und leitet komplexe Anliegen strukturiert weiter. Für Arztpraxen rund ums Klinikum: keine überfüllte Telefonleitung am Montagmorgen. Für Restaurants in der Altstadt: keine verpassten Reservierungen am Wochenende. Für Handwerksbetriebe im Umland: keine Anfragen, die abends ins Leere laufen.",
+        "Der KI Telefonassistent von Cogniiq ist die passende Antwort auf diese Herausforderung: Er nimmt Anrufe auch außerhalb der Öffnungszeiten entgegen, beantwortet Standardfragen zu Öffnungszeiten, Preisen und Verfügbarkeit sofort, bucht Termine direkt ins System und leitet komplexe Anliegen strukturiert weiter. Für Arztpraxen rund ums Klinikum: keine überfüllte Telefonleitung am Montagmorgen. Für Restaurants in der Altstadt: keine verpassten Reservierungen am Wochenende. Für Handwerksbetriebe im Umland: keine Anfragen, die abends ins Leere laufen.",
         "Was den Regensburger Markt besonders macht: die Kombination aus studentischem Publikum, internationalem Tourismus und etabliertem Mittelstand stellt besondere Anforderungen an die telefonische Erreichbarkeit. Regensburg ist UNESCO-Weltkulturerbe und einer der meistbesuchten Städte Deutschlands – der Tourismus bringt Anfragen auch in Sprachen und zu Zeiten, die für klassischen Telefondienst schwer abzudecken sind.",
-        "Der KI Telefonassistent wird speziell auf Ihr Regensburger Unternehmen konfiguriert – von der Begrüßungssprache bis zu den Weiterleitungsregeln. Die technische Einrichtung dauert 7–14 Tage und läuft vollständig im Hintergrund: Ihre bestehende Rufnummer bleibt, Ihr Team muss nichts Neues lernen, und der Assistent ist vollständig DSGVO-konform auf europäischen Servern betrieben.",
+        "Der KI Telefonassistent wird speziell auf Ihr Regensburger Unternehmen konfiguriert – von der Begrüßungssprache bis zu den Weiterleitungsregeln. Die technische Einrichtung dauert 7–14 Tage und läuft vollständig im Hintergrund: Ihre bestehende Rufnummer bleibt, Ihr Team muss nichts Neues lernen, und der Assistent wird datenschutzorientiert auf europäischen Servern betrieben.",
         "Für Regensburger Unternehmen, die ihre digitale Infrastruktur weiter ausbauen möchten, ergänzt der KI Telefonassistent die [Automatisierung für Regensburg](/regensburg/automatisierung) und das [Webdesign für Regensburg](/regensburg/webdesign) ideal. Wer Anfragen professionell entgegennimmt, sie automatisch verarbeitet und online sichtbar ist, hat in einem wachsenden Markt wie Regensburg einen deutlichen Wettbewerbsvorteil.",
       ],
     },
@@ -502,7 +502,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       },
       {
         industry: "Gastronomie & Tourismus",
-        title: "Reservierungen rund um die Uhr",
+        title: "Reservierungen außerhalb der Öffnungszeiten",
         description: "Regensburg als eines der beliebtesten Touristenziele Deutschlands hat ganzjährig hohe Nachfrage nach Restaurantreservierungen – besonders abends und am Wochenende, wenn das Serviceteam voll ausgelastet ist.",
       },
       {
@@ -545,12 +545,12 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         name: "Gastronomie & Altstadtgastronomie",
         problem: "Restaurants in der Regensburger Altstadt und rund um den Dom sind für internationale Gäste attraktiv – aber telefonisch oft schwer erreichbar, wenn das Serviceteam im Einsatz ist.",
-        solution: "Reservierungen werden rund um die Uhr entgegengenommen, auf Englisch oder Deutsch beantwortet und automatisch im Reservierungssystem eingetragen.",
+        solution: "Reservierungen werden auch außerhalb der Öffnungszeiten entgegengenommen, auf Englisch oder Deutsch beantwortet und automatisch im Reservierungssystem eingetragen.",
       },
       {
         name: "Tourismus & Stadtführungen",
         problem: "Anbieter von Stadtführungen und touristischen Erlebnissen in Regensburg erhalten viele internationale Anfragen außerhalb der Bürozeiten – und verpassen sie oft.",
-        solution: "Der Assistent beantwortet Buchungsanfragen auf Deutsch und Englisch rund um die Uhr und leitet Buchungen direkt in das Buchungssystem ein.",
+        solution: "Der Assistent beantwortet Buchungsanfragen auf Deutsch und Englisch auch außerhalb der Öffnungszeiten und leitet Buchungen direkt in das Buchungssystem ein.",
       },
       {
         name: "Handwerk & Betriebe",
@@ -566,11 +566,11 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     localScenarios: [
       {
         title: "Hausarztpraxis nahe dem Regensburg Klinikum",
-        description: "Eine internistische Praxis nahe dem Klinikum erhält montags 60–80 Anrufe vor 8:30 Uhr. Die Anmeldung ist dauerhaft überlastet. Nach Einführung des KI Telefonassistenten werden Standardtermine automatisch gebucht – das Team kümmert sich nur noch um komplexe Anfragen und akute Fälle.",
+        description: "Eine internistische Praxis nahe dem Klinikum erhält montags 60–80 Anrufe vor 8:30 Uhr. Die Anmeldung ist dauerhaft überlastet. Mit einem KI Telefonassistenten könnten Standardtermine automatisch gebucht werden – das Team könnte sich auf komplexe Anfragen und akute Fälle konzentrieren.",
       },
       {
         title: "Restaurant in der Regensburger Altstadt",
-        description: "Ein Restaurant direkt an der Steinernen Brücke erhält täglich Reservierungsanfragen von Touristen aus aller Welt – auch abends nach Küchenschluss. Mit dem KI Telefonassistenten werden Reservierungen auf Deutsch und Englisch rund um die Uhr entgegengenommen und automatisch im Kalender eingetragen.",
+        description: "Ein Restaurant direkt an der Steinernen Brücke erhält täglich Reservierungsanfragen von Touristen aus aller Welt – auch abends nach Küchenschluss. Mit dem KI Telefonassistenten werden Reservierungen auf Deutsch und Englisch auch außerhalb der Öffnungszeiten entgegengenommen und automatisch im Kalender eingetragen.",
       },
       {
         title: "Physio-Praxis im Stadtgebiet Regensburg",
@@ -690,7 +690,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     localScenarios: [
       {
         title: "Mittelständischer Dienstleister im Regensburg Stadtgebiet",
-        description: "Ein B2B-Dienstleister mit 20 Mitarbeitern erhält Anfragen über Website, E-Mail und Telefon. Jede Anfrage wird manuell im CRM erfasst, ein Angebot erstellt und per E-Mail versandt. Nach der Automatisierung läuft der gesamte Prozess – von Anfrageneingang über Qualifikation bis zur Angebotserstellung – automatisch in unter 5 Minuten.",
+        description: "Ein B2B-Dienstleister mit 20 Mitarbeitern erhält Anfragen über Website, E-Mail und Telefon. Jede Anfrage wird manuell im CRM erfasst, ein Angebot erstellt und per E-Mail versandt. Mit einer passenden Automatisierung läuft der gesamte Prozess – von Anfrageneingang über Qualifikation bis zur Angebotserstellung – automatisch in unter 5 Minuten.",
       },
       {
         title: "Hotel in der Regensburger Altstadt",
@@ -698,7 +698,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       },
       {
         title: "Handwerksbetrieb im Landkreis Regensburg",
-        description: "Ein Malerbetrieb aus dem Landkreis erstellt Angebote per Hand, bestätigt Aufträge per Telefon und verschickt Rechnungen mit Verzögerung. Nach der Automatisierung werden Angebote per Klick generiert, Auftragsbestätigungen automatisch versandt und Rechnungen nach Projektabschluss direkt erstellt.",
+        description: "Ein Malerbetrieb aus dem Landkreis erstellt Angebote per Hand, bestätigt Aufträge per Telefon und verschickt Rechnungen mit Verzögerung. Mit einer passenden Automatisierung könnten Angebote per Klick generiert, Auftragsbestätigungen automatisch versandt und Rechnungen nach Projektabschluss direkt erstellt werden.",
       },
     ],
     sameServiceOtherCities: [
@@ -730,7 +730,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     localIntro: {
       paragraphs: [
         "Regensburg ist eine Stadt, in der sich digitales Suchverhalten besonders stark ausgeprägt zeigt: Studenten, Touristen und Geschäftsreisende recherchieren Restaurants, Dienstleister und Praxen fast ausschließlich online. Lokale Regensburger suchen Handwerksbetriebe, Praxen und Beratungsdienstleister über Google – und entscheiden auf Basis des ersten digitalen Eindrucks, wen sie kontaktieren. Wer online nicht sichtbar oder nicht überzeugend ist, verliert täglich Kunden.",
-        "Cogniiq entwickelt Websites für Regensburg, die in dieser Entscheidung gewinnen. Jede Website wird individuell konzipiert – keine Vorlagen, kein Baukastensystem. Sie ist schnell (unter 2 Sekunden Ladezeit), für Smartphones optimiert (über 70% der Suchanfragen kommen vom Handy), lokal für Regensburg SEO-optimiert und auf Conversion ausgerichtet: Klare Struktur, überzeugende Inhalte, ein Kontaktweg, der wirklich genutzt wird.",
+        "Cogniiq entwickelt Websites für Regensburg, die in dieser Entscheidung gewinnen. Jede Website wird individuell konzipiert – keine Vorlagen, kein Baukastensystem. Sie ist schnell (unter 2 Sekunden Ladezeit), für Smartphones optimiert (der überwiegende Teil der Suchanfragen kommt vom Handy), lokal für Regensburg SEO-optimiert und auf Conversion ausgerichtet: Klare Struktur, überzeugende Inhalte, ein Kontaktweg, der wirklich genutzt wird.",
         "Als Webdesign-Agentur mit Bayern-Verwurzelung verstehen wir die Anforderungen des Regensburger Markts: die Mischung aus Tourismus, Universitätspublikum, internationalem Mittelstand und der historischen Altstadt als Markenidentität der Stadt. Websites für Regensburger Unternehmen müssen sowohl lokal verwurzelt als auch international ansprechend sein – und technisch einwandfrei.",
         "Lokales SEO ist dabei kein Add-on, sondern Grundlage: Wir optimieren jede Website gezielt für Suchanfragen wie 'Webdesign Agentur Regensburg', 'Website erstellen Regensburg' und branchenspezifische lokale Kombinationen. Strukturierte Daten, Google My Business Optimierung und regionale Linkbuilding-Grundlagen sind fester Bestandteil jedes Projekts.",
         "Neben dem Webdesign bieten wir in Regensburg auch den [KI Telefonassistenten für Regensburg](/regensburg/ki-telefonassistent) und [Prozessautomatisierung für Regensburg](/regensburg/automatisierung) an. Wer eine professionelle Website hat, die Anfragen generiert, braucht auch das richtige System, um diese Anfragen effizient zu verarbeiten. Alle Leistungen aus einer Hand, von Cogniiq für den Regensburg-Markt.",
@@ -738,7 +738,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     },
     warumCogniiq: [
       "Keine Templates – jede Website für Regensburg wird individuell konzipiert und entwickelt",
-      "Mobile-First: über 70% der Besucher kommen vom Smartphone – wir optimieren zuerst dafür",
+      "Mobile-First: der überwiegende Teil der Besucher kommt vom Smartphone – wir optimieren zuerst dafür",
       "Technische Präzision: Core Web Vitals, schnelle Ladezeiten, sauber strukturierter Code",
       "Lokaler SEO-Fokus: Sichtbarkeit für Suchanfragen in Regensburg und Umgebung",
       "Klare Kommunikation: Sie wissen immer, woran wir sind und was als nächstes kommt",
@@ -770,7 +770,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     faq: [
       { question: "Könnt ihr auch bestehende Regensburger Websites übernehmen?", answer: "Ja. Wir analysieren was vorhanden ist und schlagen den optimalen Weg vor: Redesign, vollständiger Relaunch oder gezielte Optimierung einzelner Seiten." },
       { question: "Wie lange dauert ein Webdesign-Projekt in Regensburg?", answer: "4–6 Wochen für einfachere Projekte, 8–12 Wochen für komplexere. Nach dem Briefing erhalten Sie immer einen realistischen Zeitplan." },
-      { question: "Was kostet eine Website für ein Regensburger Unternehmen?", answer: "Ab ca. 2.500 € für einfache Unternehmenswebsites, komplexere Projekte nach Aufwand. Erstgespräch kostenlos." },
+      { question: "Was kostet eine Website für ein Regensburger Unternehmen?", answer: "Websites starten ab ca. 1.500 €. Individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei ca. 2.500–5.000 €, komplexere Projekte nach Aufwand. Erstgespräch kostenlos." },
       { question: "Baut ihr auf WordPress oder individuellem Code?", answer: "Beides – je nach Anforderung. WordPress für pflegeleichte Inhalte, React/Next.js für Performance und Komplexität." },
       { question: "Macht ihr auch Texte?", answer: "Ja. Texte erstellen wir gemeinsam oder mit KI-Unterstützung – immer auf Ihre Zielgruppe und lokale Suchanfragen in Regensburg ausgerichtet." },
       { question: "Bietet ihr auch Wartung an?", answer: "Ja. Auf Wunsch übernehmen wir laufende Updates, Sicherheitsupdates und Inhaltsänderungen." },
@@ -841,19 +841,19 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     locationNote: "Cogniiq betreut Projekte für Unternehmen in München vollständig remote – persönliche Termine im Raum München auf Anfrage möglich.",
     seo: {
       title: "KI Telefonassistent München – AI Rezeption & Telefonservice | Cogniiq",
-      description: "KI Telefonassistent München: Automatische Anrufannahme, Terminbuchung & Weiterleitung für Unternehmen. 24/7, mehrsprachig, DSGVO-konform. Ohne Münchner Agentur-Overhead.",
+      description: "KI Telefonassistent München: Automatische Anrufannahme, Terminbuchung & Weiterleitung für Unternehmen. Auch außerhalb der Öffnungszeiten, mehrsprachig, DSGVO-konform. Ohne Münchner Agentur-Overhead.",
       canonical: `${base}/muenchen/ki-telefonassistent`,
     },
     intro: {
       h1: "KI Telefonassistent für Unternehmen in München",
-      lead: "München ist ein Wettbewerbsmarkt, in dem ein nicht beantworteter Anruf ein verlorener Kunde ist. Der KI Telefonassistent von Cogniiq übernimmt die telefonische Kommunikation präzise, rund um die Uhr, mehrsprachig – ohne Personalkosten, ohne Agentur-Overhead.",
+      lead: "München ist ein Wettbewerbsmarkt, in dem ein nicht beantworteter Anruf ein verlorener Kunde ist. Der KI Telefonassistent von Cogniiq übernimmt die telefonische Kommunikation präzise, auch außerhalb der Öffnungszeiten, mehrsprachig – ohne Personalkosten, ohne Agentur-Overhead.",
     },
     localIntro: {
       paragraphs: [
         "München ist einer der dynamischsten Dienstleistungsmärkte Deutschlands – und einer der wettbewerbsintensivsten. Privatpraxen, Restaurants, Beratungsunternehmen, Immobilienbüros, Kanzleien und Premium-Dienstleister konkurrieren täglich um dieselben Kunden. In diesem Umfeld ist ein nicht beantworteter Anruf nicht nur ein verpasster Kontakt – es ist ein verlorener Kunde, der in wenigen Sekunden beim nächsten Anbieter anruft, der sofort abnimmt.",
         "Der KI Telefonassistent von Cogniiq ist für genau dieses Wettbewerbsumfeld entwickelt: Er beantwortet jeden eingehenden Anruf sofort – egal ob 8 Uhr morgens, 21 Uhr abends, am Wochenende oder während der Urlaubszeit. Häufige Fragen werden präzise beantwortet, Termine werden direkt ins Buchungssystem eingetragen, komplexe Anliegen werden strukturiert und vollständig an das zuständige Teammitglied weitergeleitet. Mehrsprachige Konfiguration ist auf Anfrage möglich – Deutsch und Englisch als Standard, weitere Sprachen auf Anfrage.",
         "Was Münchner Unternehmen von anderen Märkten unterscheidet: hohe Erwartungen an Reaktionsgeschwindigkeit, ein erheblicher Anteil internationaler Kunden und Patienten, ein Preisniveau, das jeden verlorenen Kunden teuer macht. Der KI Telefonassistent ist für diese Anforderungen konfiguriert – nicht als generisches Produkt, sondern als individuell angepasste Lösung für Ihren Münchner Betrieb.",
-        "Cogniiq betreut Münchner Projekte vollständig remote – transparent, effizient und ohne die hohen Kosten lokaler Münchner Agenturen. Einrichtung in 7–14 Tagen, vollständig DSGVO-konform mit Verarbeitung auf deutschen Servern. Sie zahlen für das Ergebnis – nicht für Büroräume in der Maximilianstraße.",
+        "Cogniiq betreut Münchner Projekte vollständig remote – transparent, effizient und ohne die hohen Kosten lokaler Münchner Agenturen. Einrichtung in 7–14 Tagen, datenschutzorientiert umgesetzt mit Verarbeitung auf europäischen Servern. Sie zahlen für das Ergebnis – nicht für Büroräume in der Maximilianstraße.",
         "Als Teil einer umfassenden digitalen Strategie für München lässt sich der KI Telefonassistent ideal mit [Prozessautomatisierung für München](/muenchen/automatisierung) und professionellem [Webdesign für München](/muenchen/webdesign) kombinieren. Unternehmen, die online sichtbar sind, Anfragen professionell entgegennehmen und effizient verarbeiten, sind im Münchner Markt klar im Vorteil.",
       ],
     },
@@ -861,15 +861,15 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       "Keine Münchner Agenturpreise – transparente Kosten ohne Overhead für teure Bürolagen",
       "Mehrsprachige Konfiguration: Deutsch, Englisch und weitere Sprachen auf Anfrage",
       "Vollständige Remote-Einrichtung – kein Vor-Ort-Termin nötig, kein Zeitverlust",
-      "Datenschutz nach DSGVO, Verarbeitung ausschließlich auf deutschen Servern",
+      "Datenschutz nach DSGVO, Verarbeitung auf europäischen Servern",
       "Persönliche Betreuung – kein anonymes Callcenter, keine Ticket-Warteschlangen",
       "Erfahrung aus vergleichbaren bayerischen Projekten – keine unkalkulierbaren Risiken",
     ],
     useCases: [
       {
         industry: "Privatpraxen & Spezialisten",
-        title: "24/7 Terminannahme für Privatpatienten",
-        description: "Privatpatienten in München erwarten schnellste Reaktionszeiten. Der Assistent nimmt rund um die Uhr Terminanfragen entgegen, bucht direkt ins System und sendet Bestätigungen – ohne Mehrkosten für Nachtbereitschaft.",
+        title: "Terminannahme außerhalb der Sprechzeiten",
+        description: "Privatpatienten in München erwarten schnellste Reaktionszeiten. Der Assistent nimmt auch außerhalb der Sprechzeiten Terminanfragen entgegen, bucht direkt ins System und sendet Bestätigungen – ohne Mehrkosten für Nachtbereitschaft.",
       },
       {
         industry: "Gastronomie & Premium Dining",
@@ -897,7 +897,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { question: "Wie schnell ist die Einrichtung?", answer: "7–14 Tage nach dem ersten Gespräch – vollständig remote, ohne Vor-Ort-Termin." },
       { question: "Kann der Assistent für mehrere Standorte konfiguriert werden?", answer: "Ja. Für Unternehmen mit mehreren Standorten in München oder im Großraum können separate Konfigurationen pro Standort eingerichtet werden." },
       { question: "Unterstützt der Assistent auch Premium-Branchen wie Privatmedizin oder Luxus-Gastronomie?", answer: "Ja. Ton, Sprache und Gesprächsführung werden auf das Niveau Ihrer Marke angepasst – auch für das gehobene Münchner Premiumsegment." },
-      { question: "Was passiert mit sensiblen Patientendaten oder Geschäftsinformationen?", answer: "Alle Daten werden DSGVO-konform auf deutschen Servern verarbeitet. Wir erstellen die notwendigen AVV-Dokumente und Datenschutznachweise." },
+      { question: "Was passiert mit sensiblen Patientendaten oder Geschäftsinformationen?", answer: "Alle Daten werden DSGVO-konform auf europäischen Servern verarbeitet. Wir erstellen die notwendigen AVV-Dokumente und Datenschutznachweise." },
       { question: "Kann der Assistent mit meinem bestehenden Münchner Buchungssystem kommunizieren?", answer: "In den meisten Fällen ja. Wir prüfen die API-Verfügbarkeit Ihres Systems vorab und integrieren entsprechend." },
       { question: "Wie unterscheidet sich Cogniiq von Münchner Agenturen, die ähnliche Lösungen anbieten?", answer: "Wir haben keinen Münchner Overhead. Direkte Zusammenarbeit, faire Preise, schnelle Umsetzung – ohne mehrere Hierarchieebenen zwischen Ihnen und dem Ergebnis." },
     ],
@@ -911,7 +911,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         name: "Privatpraxen & Spezialisten",
         problem: "Privatpraxen in München haben eine zahlungskräftige Patientenschaft, die sofortige Reaktionszeiten erwartet. Ein besetztes Telefon oder eine nicht beantwortete Anfrage führt direkt zum Wechsel.",
-        solution: "Der KI Telefonassistent nimmt Anfragen sofort an – mehrsprachig, auf dem Niveau der Praxis, rund um die Uhr. Terminbuchung und Bestätigung vollautomatisch.",
+        solution: "Der KI Telefonassistent nimmt Anfragen sofort an – mehrsprachig, auf dem Niveau der Praxis, auch außerhalb der Sprechzeiten. Terminbuchung und Bestätigung vollautomatisch.",
       },
       {
         name: "Gastronomie & Premium Dining",
@@ -937,7 +937,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     localScenarios: [
       {
         title: "Privatarztpraxis in Schwabing",
-        description: "Eine internistische Privatpraxis in Schwabing hat eine internationale Patientenschaft, die häufig auf Englisch anruft. Nach Einführung des KI Telefonassistenten werden Anfragen sofort auf Deutsch und Englisch angenommen und Termine direkt in das Praxissystem gebucht – ohne Belastung des Praxisteams.",
+        description: "Eine internistische Privatpraxis in Schwabing hat eine internationale Patientenschaft, die häufig auf Englisch anruft. Mit einem KI Telefonassistenten könnten Anfragen sofort auf Deutsch und Englisch angenommen und Termine direkt in das Praxissystem gebucht werden – ohne zusätzliche Belastung des Praxisteams.",
       },
       {
         title: "Gehobenes Restaurant in der Altstadt",
@@ -1062,15 +1062,15 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     localScenarios: [
       {
         title: "B2B-SaaS-Startup in Schwabing",
-        description: "Ein SaaS-Startup in Schwabing erhält täglich neue Trial-Anmeldungen, die manuell im CRM erfasst, mit Welcome-E-Mails begrüßt und dem Vertriebsteam zugewiesen werden. Nach der Automatisierung läuft der gesamte Prozess in unter 2 Minuten – von der Anmeldung bis zur personalisierten Begrüßungssequenz.",
+        description: "Ein SaaS-Startup in Schwabing erhält täglich neue Trial-Anmeldungen, die manuell im CRM erfasst, mit Welcome-E-Mails begrüßt und dem Vertriebsteam zugewiesen werden. Mit einer passenden Automatisierung läuft der gesamte Prozess in unter 2 Minuten – von der Anmeldung bis zur personalisierten Begrüßungssequenz.",
       },
       {
         title: "E-Commerce-Unternehmen in der Maxvorstadt",
-        description: "Ein D2C-Brand aus der Maxvorstadt verwaltet 100 Bestellungen pro Tag manuell in drei Systemen. Bestellabwicklung, Lagerabzug und Versandbenachrichtigung sind fehleranfällig und zeitintensiv. Nach der Automatisierung läuft der gesamte Prozess vollautomatisch – mit messbarer Fehlerreduktion.",
+        description: "Ein D2C-Brand aus der Maxvorstadt verwaltet 100 Bestellungen pro Tag manuell in drei Systemen. Bestellabwicklung, Lagerabzug und Versandbenachrichtigung sind fehleranfällig und zeitintensiv. Mit einer passenden Automatisierung läuft der gesamte Prozess vollautomatisch – mit messbarer Fehlerreduktion.",
       },
       {
         title: "Unternehmensberatung im Münchner Stadtgebiet",
-        description: "Eine mittelgroße Unternehmensberatung in München verliert wöchentlich Stunden mit dem manuellen Onboarding neuer Mandanten – Verträge versenden, Zugänge einrichten, erste Termine koordinieren. Nach der Automatisierung läuft Onboarding innerhalb von Minuten nach Vertragsunterzeichnung vollständig automatisch ab.",
+        description: "Eine mittelgroße Unternehmensberatung in München verliert wöchentlich Stunden mit dem manuellen Onboarding neuer Mandanten – Verträge versenden, Zugänge einrichten, erste Termine koordinieren. Mit einer passenden Automatisierung läuft Onboarding innerhalb von Minuten nach Vertragsunterzeichnung vollständig automatisch ab.",
       },
     ],
     sameServiceOtherCities: [
@@ -1104,7 +1104,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       paragraphs: [
         "München ist ein digitaler Wettbewerbsmarkt, in dem Websites sowohl visuell als auch technisch auf höchstem Niveau sein müssen. Startups positionieren sich für internationale Investoren. Mittelständler brauchen Websites, die qualifizierte B2B-Anfragen generieren. Premium-Dienstleister müssen online dasselbe Niveau darstellen, das ihre Marke offline lebt. Und alle konkurrieren in einem Markt, in dem Google täglich entscheidet, wer gesehen wird – und wer nicht.",
         "Cogniiq bietet Münchner Unternehmen eine echte Alternative zu lokalen Agenturen: Entwicklung auf Enterprise-Niveau, direkte Zusammenarbeit mit dem Entwickler Ihrer Website – ohne drei Hierarchieebenen zwischen Ihrem Feedback und der Umsetzung. Individuelle Konzeption, technische Präzision, SEO von Anfang an integriert, mehrsprachige Entwicklung auf Wunsch – für ein Budget, das bei einer lokalen Münchner Agentur oft nicht einmal für das erste Designkonzept reicht.",
-        "Was technisch Standard für uns ist: Ladezeiten unter 1,5 Sekunden, Core Web Vitals im grünen Bereich, Mobile-First-Design (über 70% der Münchner Suchanfragen kommen vom Smartphone), strukturierte Daten für Google und DSGVO-konforme Implementierung aller Tools. Diese technischen Grundlagen sind keine Optional-Features – sie sind die Basis, auf der jede Website für den Münchner Markt gebaut sein muss.",
+        "Was technisch Standard für uns ist: Ladezeiten unter 1,5 Sekunden, Core Web Vitals im grünen Bereich, Mobile-First-Design (der überwiegende Teil der Münchner Suchanfragen kommt vom Smartphone), strukturierte Daten für Google und DSGVO-konforme Implementierung aller Tools. Diese technischen Grundlagen sind keine Optional-Features – sie sind die Basis, auf der jede Website für den Münchner Markt gebaut sein muss.",
         "Für internationale Unternehmen und Münchner Firmen mit globalen Kunden: Mehrsprachige Website-Entwicklung auf Deutsch und Englisch ist Standard, weitere Sprachen auf Anfrage. Wir kennen die Anforderungen an internationale SEO-Strukturen und setzen sie technisch korrekt um.",
         "Als Ergänzung zum Webdesign bieten wir in München auch den [KI Telefonassistenten für München](/muenchen/ki-telefonassistent) und [Prozessautomatisierung für München](/muenchen/automatisierung) an. Alle drei Bereiche aus einer Hand – für eine konsistente, leistungsstarke digitale Infrastruktur ohne Schnittstellenprobleme zwischen verschiedenen Agenturen.",
       ],
@@ -1142,7 +1142,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     ],
     faq: [
       { question: "Arbeitet ihr auch für größere Münchner Unternehmen?", answer: "Ja. Wir skalieren den Prozess entsprechend – von der einfachen Unternehmenswebsite bis zum komplexen mehrsprachigen Web-Projekt." },
-      { question: "Was kostet eine Website für ein Münchner Unternehmen?", answer: "Ab ca. 2.500 € für einfachere Projekte, komplexere nach Aufwand. Kein Münchner Aufpreis – faire Preise für jeden Markt." },
+      { question: "Was kostet eine Website für ein Münchner Unternehmen?", answer: "Websites starten ab ca. 1.500 €. Individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei ca. 2.500–5.000 €, komplexere Projekte nach Aufwand. Kein Münchner Aufpreis – faire Preise für jeden Markt." },
       { question: "Könnt ihr mit Münchner Markenagenturen zusammenarbeiten?", answer: "Ja. Wir übernehmen gerne die technische Umsetzung von Designs, die von anderen Agenturen erstellt wurden." },
       { question: "Habt ihr Erfahrung mit SEO für den Münchner Markt?", answer: "Ja. Lokaler SEO für den Münchner Markt erfordert Strategie – wir kennen den Wettbewerb und setzen gezielte Maßnahmen um." },
       { question: "Wie funktioniert die Remote-Zusammenarbeit?", answer: "Video-Calls, Figma-Boards, Staging-Umgebungen – genauso wie bei lokalen Agenturen, ohne Pendelzeit und ohne Overhead." },

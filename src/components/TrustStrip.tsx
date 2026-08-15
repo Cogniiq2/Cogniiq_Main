@@ -5,7 +5,7 @@ import { Shield, Clock, Users, Award, Lock } from 'lucide-react';
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 const ITEMS = [
-  { icon: Shield, label: 'DSGVO-konform', sub: 'Daten bleiben in Deutschland' },
+  { icon: Shield, label: 'DSGVO-konform', sub: 'Verarbeitung auf europäischen Servern' },
   { icon: Clock, label: 'Go-Live in 7–14 Tagen', sub: 'Nicht Monate – Wochen' },
   { icon: Users, label: 'Direkter Ansprechpartner', sub: 'Kein Ticket-System' },
   { icon: Award, label: 'Keine Templates', sub: 'Gebaut für Ihren Prozess' },

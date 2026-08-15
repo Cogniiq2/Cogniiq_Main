@@ -19,7 +19,7 @@ const config: NationalIndustryPageConfig = {
   problems: [
     {
       title: "Leads werden zu spät kontaktiert – und gehen verloren",
-      description: "Studien zeigen: Leads, die innerhalb von 5 Minuten kontaktiert werden, konvertieren 21-mal häufiger als solche, die nach einer Stunde kontaktiert werden. Manuelle Bearbeitung kann das nicht leisten.",
+      description: "Wer Anfragen sofort beantwortet, hat deutlich bessere Chancen auf den Abschluss als jemand, der sich erst nach einer Stunde kontaktiert werden. Manuelle Bearbeitung kann das nicht leisten.",
     },
     {
       title: "Exposé-Versand kostet täglich wertvolle Makler-Zeit",

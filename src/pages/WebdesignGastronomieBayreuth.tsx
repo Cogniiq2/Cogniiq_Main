@@ -55,13 +55,13 @@ const config: IndustryPageConfig = {
     },
   ],
   workflow: {
-    title: "Beispiel-Workflow: Restaurant Bayreuth Innenstadt",
+    title: "Beispielszenario: Restaurant Bayreuth Innenstadt",
     trigger:
-      "Ein Restaurant in der Bayreuther Innenstadt erhielt täglich viele Reservierungsanrufe und hatte während des Servicebetriebs regelmäßig keine Kapazität, ans Telefon zu gehen. Anfragen nach Öffnungszeiten, Menü und Veranstaltungen banden denselben Kanal.",
+      "Angenommen, ein Restaurant in der Bayreuther Innenstadt erhält täglich viele Reservierungsanrufe und hat während des Servicebetriebs keine Kapazität, ans Telefon zu gehen. Anfragen nach Öffnungszeiten, Menü und Veranstaltungen binden denselben Kanal.",
     process:
-      "Cogniiq baute eine neue Restaurant-Website mit integriertem Online-Reservierungssystem und implementierte einen KI-Telefonassistenten für Standardanfragen. Reservierungen werden automatisch erfasst und bestätigt, das Personal nur bei komplexen Gruppenanfragen informiert.",
+      "Vorgehen: Cogniiq entwickelt eine Restaurant-Website mit integriertem Online-Reservierungssystem und richtet einen KI-Telefonassistenten für Standardanfragen ein. Reservierungen werden automatisch erfasst und bestätigt, das Personal nur bei komplexen Gruppenanfragen informiert.",
     result:
-      "Reservierungen laufen rund um die Uhr vollautomatisch ein. Das Servicepersonal konzentriert sich auf den Gast. Anfragen zu Öffnungszeiten und Menü werden ohne Personalaufwand beantwortet.",
+      "So könnten Reservierungen auch außerhalb der Öffnungszeiten automatisch eingehen, das Servicepersonal sich auf den Gast konzentrieren und Anfragen zu Öffnungszeiten und Menü ohne Personalaufwand beantwortet werden.",
   },
   pakete: [
     {
@@ -77,7 +77,7 @@ const config: IndustryPageConfig = {
     },
     {
       name: "Growth",
-      tagline: "Website + KI-Telefonassistent für 24/7-Erreichbarkeit",
+      tagline: "Website + KI-Telefonassistent für Erreichbarkeit außerhalb der Öffnungszeiten",
       deliverables: [
         "Alles aus Start",
         "KI-Telefonassistent (Reservierungen & FAQ)",
@@ -129,7 +129,7 @@ const config: IndustryPageConfig = {
   ],
   useCases: [
     {
-      title: "Tischreservierungen rund um die Uhr",
+      title: "Tischreservierungen außerhalb der Öffnungszeiten",
       description:
         "Gäste können über die Restaurant-Website oder per KI-Telefonassistent jederzeit einen Tisch reservieren – auch wenn das Restaurant geschlossen oder das Personal im Service gebunden ist.",
     },
@@ -141,7 +141,7 @@ const config: IndustryPageConfig = {
     {
       title: "Öffnungszeitenanfragen automatisch beantworten",
       description:
-        "Der KI-Telefonassistent beantwortet wiederkehrende Fragen zu Öffnungszeiten, Parkmöglichkeiten, Speisekarte und Sonderveranstaltungen – ohne Personalaufwand, rund um die Uhr.",
+        "Der KI-Telefonassistent beantwortet wiederkehrende Fragen zu Öffnungszeiten, Parkmöglichkeiten, Speisekarte und Sonderveranstaltungen – ohne Personalaufwand, auch außerhalb der Öffnungszeiten.",
     },
     {
       title: "Gruppenreservierungen und Events in Bayreuth",
@@ -163,15 +163,15 @@ const config: IndustryPageConfig = {
     "Weniger verpasste Reservierungsanrufe – auch im laufenden Service und außerhalb der Öffnungszeiten",
     "Automatisierte Reservierungsprozesse entlasten das Serviceteam spürbar",
     "Mehr qualifizierte Tischbuchungen durch eine suchmaschinenoptimierte Restaurant-Website in Bayreuth",
-    "Höhere Erreichbarkeit für Gäste – rund um die Uhr, auf jedem Kanal",
+    "Höhere Erreichbarkeit für Gäste – auch außerhalb der Öffnungszeiten, auf jedem Kanal",
     "Zeitersparnis durch automatisierte Bestätigungen, Erinnerungen und Gästekommunikation",
     "Professioneller erster Eindruck durch moderne Website und sofortige Gesprächsannahme",
-    "Vollständige DSGVO-Konformität – alle Gästedaten sicher auf europäischen Servern verarbeitet",
+    "Datenschutzorientierte Umsetzung – alle Gästedaten sicher auf europäischen Servern verarbeitet",
   ],
   localContext: [
     "Die Bayreuther Gastronomie ist vielfältig und wettbewerbsintensiv – von der klassischen Gaststätte über das moderne Restaurant bis hin zu Event-Locations rund um die Festspiele. Gleichzeitig stehen viele Betriebe vor denselben Herausforderungen: zu viele Telefonanrufe, knappe Personalressourcen und eine veraltete Online-Präsenz.",
     "Cogniiq entwickelt für Gastronomiebetriebe in Bayreuth passgenaue Digitallösungen: eine moderne Restaurant-Website mit integriertem Reservierungssystem, einen KI-Telefonassistenten, der Reservierungen entgegennimmt und Fragen beantwortet, sowie Automatisierungen, die Bestätigungen, Erinnerungen und Feedback-Prozesse ohne manuellen Aufwand steuern.",
-    "Als Bayreuther Unternehmen kennen wir den lokalen Markt, die saisonalen Besonderheiten rund um die Festspiele und die Erwartungen der regionalen Gäste. Die Einrichtung aller Systeme dauert 7–14 Tage. Alle Lösungen sind vollständig DSGVO-konform.",
+    "Als Bayreuther Unternehmen kennen wir den lokalen Markt, die saisonalen Besonderheiten rund um die Festspiele und die Erwartungen der regionalen Gäste. Die Einrichtung aller Systeme dauert 7–14 Tage. Alle Lösungen werden datenschutzorientiert umgesetzt; technische und organisatorische Maßnahmen werden projektbezogen abgestimmt.",
   ],
   internalLinks: [
     { label: "Webdesign Bayreuth", href: "/bayreuth/webdesign" },

@@ -412,7 +412,7 @@ function WorkflowSection({
             Beispiel-Workflow
           </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Anonymisiertes Praxisbeispiel aus dem Bereich {config.industry} – so läuft ein typisches Projekt ab.
+            Beispielszenario aus dem Bereich {config.industry} – so könnte ein typisches Projekt ablaufen.
           </p>
         </motion.div>
 
@@ -605,7 +605,7 @@ function UseCasesSection({ config }: { config: IndustryPageConfig }) {
             Wie das in der Praxis aussieht
           </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Reale Ausgangssituationen aus dem {config.industry}-Bereich – anonymisiert, konkret.
+            Typische Ausgangssituationen aus dem {config.industry}-Bereich – als Beispielszenarien beschrieben.
           </p>
         </motion.div>
 

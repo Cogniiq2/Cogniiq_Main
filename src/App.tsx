@@ -11,7 +11,6 @@ import { CityServicePage } from './components/CityServicePage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { RoleLandingPage } from './components/auth/RoleLandingPage';
 import { LegacyLoginRedirect, LegacyOwnerRedirect } from './components/auth/LegacyRedirects';
-import { InternalWorkspaceLayout } from './pages/admin/InternalWorkspace';
 import { ReceptionistEntitlementRoute } from './components/app/ReceptionistEntitlementRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { ConsentBanner } from './components/ConsentBanner';
@@ -121,9 +120,6 @@ const BayernKiTelefonassistentPage = lazyNamed(
 );
 
 // Webdesign city pages
-const WebdesignBayreuth = lazyNamed(() => import('./pages/WebdesignBayreuth'), 'WebdesignBayreuth');
-const WebdesignRegensburg = lazyNamed(() => import('./pages/WebdesignRegensburg'), 'WebdesignRegensburg');
-const WebdesignMuenchen = lazyNamed(() => import('./pages/WebdesignMuenchen'), 'WebdesignMuenchen');
 
 const WebdesignArztBayreuth = lazyNamed(
   () => import('./pages/WebdesignArztBayreuth'),
@@ -338,6 +334,16 @@ const LogoShowcasePage = lazyNamed(() => import('./pages/LogoShowcasePage'), 'Lo
 const BlogIndexPage = lazyNamed(() => import('./pages/blog/BlogIndexPage'), 'BlogIndexPage');
 const BlogPostPage = lazyNamed(() => import('./pages/blog/BlogPostPage'), 'BlogPostPage');
 const ScanPage = lazyNamed(() => import('./pages/ScanPage'), 'ScanPage');
+// Admin workspace shell. Lazy so the admin dashboard design system (dashboard tokens,
+// primitives, overlays, SidebarShell, RailAccount, internalNavigation) is not part of the
+// entry chunk that every anonymous marketing visitor downloads. It is a layout-route
+// element rendered inside the existing top-level <Suspense>, so authorization is
+// unchanged: PlatformAdminRoute still wraps the whole /admin subtree inside it.
+const InternalWorkspaceLayout = lazyNamed(
+  () => import('./pages/admin/InternalWorkspace'),
+  'InternalWorkspaceLayout'
+);
+
 // Unified internal workspace content (all rendered inside InternalWorkspaceLayout's shared shell).
 const TaskDashboardContent = lazyNamed(() => import('./pages/admin/tasks/TaskDashboardContent'), 'TaskDashboardContent');
 const ExecutionContent = lazyNamed(() => import('./pages/ExecutionPage'), 'ExecutionContent');
@@ -475,9 +481,11 @@ export function AppInner() {
       <Route path="/muenchen" element={<CityLandingPage citySlug="muenchen" />} />
       <Route path="/regensburg" element={<CityLandingPage citySlug="regensburg" />} />
 
-      <Route path="/bayreuth/webdesign" element={<WebdesignBayreuth />} />
-      <Route path="/regensburg/webdesign" element={<WebdesignRegensburg />} />
-      <Route path="/muenchen/webdesign" element={<WebdesignMuenchen />} />
+      {/* /{city}/webdesign is registered from CITY_SERVICE_CONFIGS below, together with
+          the other city x service routes. It previously had duplicate explicit routes here
+          pointing at IndustryPage-based components; those shadowed the CityServiceConfig
+          entries and rendered industry wording ("Webdesign-Betriebe in <Stadt>") on pages
+          that address a city audience, not the webdesign trade. */}
 
       <Route path="/referenzen" element={<ReferenzenPage />} />
       <Route path="/bewertungen" element={<BewertungenPage />} />
@@ -551,10 +559,21 @@ export function AppInner() {
       <Route path="/impressum" element={<ImpressumPage />} />
       <Route path="/datenschutz" element={<DatenschutzPage />} />
 
-      <Route path="/logo-preview" element={<LogoShowcasePage />} />
+      {/* Internal-only surfaces. /logo-preview is a brand reference sheet and /scan is an
+          internal tool; neither is in the sitemap, neither is linked from the site, and
+          neither has page metadata. They are registered in development only, so in a
+          production build they are not part of the public route surface at all and fall
+          through to the catch-all. A robots noindex would not be enough — the routes
+          would still resolve and be reachable by anyone with the URL. */}
+      {import.meta.env.DEV && (
+        <>
+          <Route path="/logo-preview" element={<LogoShowcasePage />} />
+          <Route path="/scan" element={<ScanPage />} />
+        </>
+      )}
+
       <Route path="/blog" element={<BlogIndexPage />} />
       <Route path="/blog/:slug" element={<BlogPostPage />} />
-      <Route path="/scan" element={<ScanPage />} />
       <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

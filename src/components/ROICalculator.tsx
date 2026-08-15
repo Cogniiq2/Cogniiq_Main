@@ -23,9 +23,9 @@ export const INDUSTRY_PRESETS: Record<Industry, Preset> = {
 };
 
 const INDUSTRY_CONTEXT: Record<Industry, string> = {
-  Arztpraxis:     'Praxen verlieren im Schnitt 38 Neupatienten pro Monat durch verpasste Anrufe.',
-  Gastronomie:    'Restaurants entgehen täglich 4–8 Reservierungen, die nie zurückrufen.',
-  Dienstleistung: 'Jeder verpasste Anruf entspricht im Schnitt einem abgesprungenen Auftrag.',
+  Arztpraxis:     'Verpasste Anrufe kosten Praxen regelmäßig Neupatienten, die sich anderswo melden.',
+  Gastronomie:    'Reservierungsanrufe, die niemand annimmt, werden selten wiederholt.',
+  Dienstleistung: 'Ein verpasster Anruf ist oft ein verlorener Auftrag.',
   Immobilien:     'Ein unbeantworteter Anruf kann eine Provision von mehreren tausend Euro kosten.',
 };
 
@@ -254,8 +254,8 @@ export function ROICalculator() {
                 />
                 <Slider
                   label="Davon verpasst oder unbeantwortet"
-                  hint="branchenüblich: 25–40%"
-                  tooltip="Wie viel Prozent Ihrer Anrufe werden nicht beantwortet? Bei Stoßzeiten, Urlaub oder Mittagspause schnell 30–40%."
+                  hint="Beispielwert – bitte anpassen"
+                  tooltip="Wie viel Prozent Ihrer Anrufe werden nicht beantwortet? Der Startwert ist ein frei änderbares Beispiel, keine Branchenstatistik."
                   value={missedPercent}
                   min={5} max={60} step={1} unit="%"
                   onChange={setMissedPercent}

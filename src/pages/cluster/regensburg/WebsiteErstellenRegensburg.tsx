@@ -28,7 +28,7 @@ const config: ClusterPageConfig = {
     heading: "Kurzüberblick: Website erstellen in Regensburg",
     items: [
       { label: "Für wen", value: "Gastronomie, Dienstleister, KMU, Praxen" },
-      { label: "Typische Ergebnisse", value: "Mehr organische Anfragen, bessere Sichtbarkeit" },
+      { label: "Typische Ziele", value: "Mehr organische Anfragen, bessere Sichtbarkeit" },
       { label: "Projektdauer", value: "1–6 Wochen" },
       { label: "Preisrahmen", value: "ab ca. 1.500 €" },
     ],

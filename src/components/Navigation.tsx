@@ -288,7 +288,7 @@ function LeistungenMega({ onMouseEnter, onMouseLeave, currentPath }: { onMouseEn
           <MegaColumn
             label="KI-Telefonassistent"
             href="/ki-telefonassistent"
-            description="24/7 automatisch erreichbar"
+            description="Auch außerhalb der Öffnungszeiten erreichbar"
             currentPath={currentPath}
             items={[
               { label: 'KI-Agentur Deutschland', href: '/ki-agentur-deutschland', featured: true },

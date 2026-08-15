@@ -54,21 +54,9 @@ const HowItWorksSection = lazy(() =>
   }))
 );
 
-const CasesSection = lazy(() =>
-  import('@/components/CasesSection').then((module) => ({
-    default: module.CasesSection,
-  }))
-);
-
 const KiCTASection = lazy(() =>
   import('@/components/KiCTASection').then((module) => ({
     default: module.KiCTASection,
-  }))
-);
-
-const TestimonialsSection = lazy(() =>
-  import('@/components/TestimonialsSection').then((module) => ({
-    default: module.TestimonialsSection,
   }))
 );
 
@@ -117,9 +105,7 @@ export function HomePage() {
         <HowItWorksSection />
         <TrustSection />
         <ProcessSection />
-        <CasesSection />
         <KiCTASection />
-        <TestimonialsSection />
         <FAQSection />
         <FinalCTASection />
         <LocationContent />

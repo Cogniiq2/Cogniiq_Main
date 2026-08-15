@@ -28,7 +28,7 @@ const config: ClusterPageConfig = {
     heading: "Kurzüberblick: Website erstellen in Bayreuth",
     items: [
       { label: "Für wen", value: "KMU, Praxen, Handwerk, Dienstleister" },
-      { label: "Typische Ergebnisse", value: "Mehr organische Anfragen, besseres Ranking" },
+      { label: "Typische Ziele", value: "Mehr organische Anfragen, bessere Sichtbarkeit" },
       { label: "Projektdauer", value: "1–6 Wochen" },
       { label: "Preisrahmen", value: "ab ca. 1.500 €" },
     ],
@@ -94,7 +94,7 @@ const config: ClusterPageConfig = {
     {
       question: "Funktioniert die Website auf dem Smartphone?",
       answer:
-        "Ja. Alle Websites werden Mobile-First entwickelt – das Design ist auf Smartphone-Nutzung optimiert, da über 65 % der Nutzer in Bayreuth mobil surfen.",
+        "Ja. Alle Websites werden Mobile-First entwickelt – das Design ist auf Smartphone-Nutzung optimiert, da die meisten Nutzer in Bayreuth mobil surfen.",
     },
     {
       question: "Ist die neue Website direkt bei Google gefunden?",

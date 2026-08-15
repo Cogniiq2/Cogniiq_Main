@@ -139,7 +139,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         question: "Ist KI-Automatisierung DSGVO-konform?",
         answer:
-          "Das hängt vom Anbieter und der Umsetzung ab. Systeme mit deutschen Servern und DSGVO-konformen Tools sind verfügbar und sollten bevorzugt werden.",
+          "Das hängt vom Anbieter und der Umsetzung ab. Systeme mit europäischen Servern und DSGVO-konformen Tools sind verfügbar und sollten bevorzugt werden.",
       },
     ],
     relatedSlugs: [
@@ -196,7 +196,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "callout",
         calloutType: "info",
         content:
-          "Wichtig: Ein DSGVO-konformer KI-Telefonassistent verarbeitet Patientendaten ausschließlich auf deutschen Servern und protokolliert Datenflüsse vollständig.",
+          "Wichtig: Ein DSGVO-konformer KI-Telefonassistent verarbeitet Patientendaten auf europäischen Servern und protokolliert Datenflüsse nachvollziehbar.",
       },
       {
         type: "h2",

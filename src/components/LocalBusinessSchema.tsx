@@ -1,4 +1,4 @@
-import { BUSINESS_INFO, SERVICES, getGoogleMapsUrl } from "@/lib/seo-data";
+import { BUSINESS_INFO, getGoogleMapsUrl } from "@/lib/seo-data";
 
 export function LocalBusinessSchema() {
   const sameAsUrls = Object.values(BUSINESS_INFO.socialMedia).filter(Boolean);
@@ -21,7 +21,7 @@ export function LocalBusinessSchema() {
           height: 512,
           caption: BUSINESS_INFO.name,
         },
-        image: `${BUSINESS_INFO.website}/og-image.jpg`,
+        image: `${BUSINESS_INFO.website}/og-image.png`,
         description: BUSINESS_INFO.description,
         foundingDate: BUSINESS_INFO.foundingDate,
         address: {
@@ -77,7 +77,7 @@ export function LocalBusinessSchema() {
         "@id": `${BUSINESS_INFO.website}/#localbusiness`,
         name: BUSINESS_INFO.name,
         image: [
-          `${BUSINESS_INFO.website}/og-image.jpg`,
+          `${BUSINESS_INFO.website}/og-image.png`,
           `${BUSINESS_INFO.website}/logo.png`,
         ],
         description: BUSINESS_INFO.description,
@@ -130,72 +130,18 @@ export function LocalBusinessSchema() {
         publisher: {
           "@id": `${BUSINESS_INFO.website}/#organization`,
         },
-        potentialAction: {
-          "@type": "SearchAction",
-          target: {
-            "@type": "EntryPoint",
-            urlTemplate: `${BUSINESS_INFO.website}/?s={search_term_string}`,
-          },
-          "query-input": "required name=search_term_string",
-        },
       },
 
-      ...SERVICES.map((service) => ({
-        "@type": "Service",
-        "@id": `${BUSINESS_INFO.website}/#${service.id}`,
-        serviceType: service.category,
-        name: service.name,
-        description: service.description,
-        url: service.url,
-        provider: {
-          "@id": `${BUSINESS_INFO.website}/#organization`,
-        },
-        areaServed: {
-          "@type": "Country",
-          name: "Deutschland",
-        },
-        availableLanguage: {
-          "@type": "Language",
-          name: "German",
-        },
-      })),
-
-      {
-        "@type": "BreadcrumbList",
-        "@id": `${BUSINESS_INFO.website}/#breadcrumb`,
-        itemListElement: [
-          {
-            "@type": "ListItem",
-            position: 1,
-            name: "Home",
-            item: BUSINESS_INFO.website,
-          },
-          {
-            "@type": "ListItem",
-            position: 2,
-            name: "Leistungen",
-            item: `${BUSINESS_INFO.website}/leistungen`,
-          },
-          {
-            "@type": "ListItem",
-            position: 3,
-            name: "Über Uns",
-            item: `${BUSINESS_INFO.website}/ueber-uns`,
-          },
-          {
-            "@type": "ListItem",
-            position: 4,
-            name: "FAQ",
-            item: `${BUSINESS_INFO.website}/faq`,
-          },
-          {
-            "@type": "ListItem",
-            position: 5,
-            name: "Kontakt",
-            item: `${BUSINESS_INFO.website}/kontakt`,
-          },
-        ],
-      },
+      // No site-wide Service nodes and no site-wide BreadcrumbList are emitted here.
+      //
+      // This component renders on every public route, so the four Service entities were
+      // asserted on pages that do not describe those services at all (/impressum,
+      // /datenschutz, /blog, the 404). Pages that genuinely describe a service emit their
+      // own Service node via PageSEO's additionalSchema, which is the correct scope.
+      //
+      // The BreadcrumbList was a fixed Home > Leistungen > Ueber Uns > FAQ > Kontakt chain
+      // that matched no actual page hierarchy and contradicted the real, per-page
+      // BreadcrumbList that PageSEO emits from each page's own breadcrumbs.
     ],
   };
 

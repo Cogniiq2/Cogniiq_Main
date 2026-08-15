@@ -48,7 +48,7 @@ const afterSteps = [
 
 const DSGVO_BADGES = [
   { icon: Lock, label: 'DSGVO-konform' },
-  { icon: Server, label: 'Deutsche Server' },
+  { icon: Server, label: 'Europäische Server' },
   { icon: ShieldCheck, label: 'SSL-verschlüsselt' },
   { icon: BadgeCheck, label: 'Keine Weitergabe' },
 ];
@@ -306,7 +306,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       <div>
         <FormLabel optional>Bevorzugter Gesprächstermin</FormLabel>
         <p className="text-[12px] text-gray-400 mb-3 leading-relaxed">
-          Wählen Sie optional einen Wunschtermin. Wir bestätigen Ihnen den Termin innerhalb von 24 h.
+          Wählen Sie optional einen Wunschtermin. Wir bestätigen Ihnen den Termin in der Regel innerhalb von 24 Stunden.
         </p>
         <div className="mt-1">
           <PremiumCalendar
@@ -476,8 +476,8 @@ export function ContactSection() {
             <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-emerald-50/60 border border-emerald-100">
               <CheckCircle size={13} className="text-emerald-600 flex-shrink-0 mt-0.5" />
               <p className="text-[12px] text-emerald-700 leading-relaxed">
-                Antwort garantiert innerhalb von{' '}
-                <span className="font-semibold">24–48 Stunden</span>
+                Antwort in der Regel innerhalb von{' '}
+                <span className="font-semibold">24 Stunden</span>
               </p>
             </div>
 

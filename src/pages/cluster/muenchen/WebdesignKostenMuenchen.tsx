@@ -100,7 +100,7 @@ const config: ClusterPageConfig = {
       { criterion: "SEO München", pro: "Lokale Dominanz-Strategie, Strukturdaten", con: "Minimal, kein lokales Setup" },
       { criterion: "Ladezeit", pro: "Unter 1,5s, Core Web Vitals grün", con: "4–8s, schlechte Google-Bewertung" },
       { criterion: "Erweiterbarkeit", pro: "Skalierbar ohne Relaunch", con: "Schnell an Grenzen" },
-      { criterion: "DSGVO", pro: "Vollständig, rechtssicher", con: "Lückenhaft, Abmahnrisiko" },
+      { criterion: "DSGVO", pro: "Datenschutzorientiert umgesetzt", con: "Lückenhaft, Abmahnrisiko" },
       { criterion: "Support", pro: "Persönlicher Ansprechpartner", con: "Ticket-System" },
     ],
   },

@@ -27,11 +27,11 @@ const config: ProblemPageConfig = {
     points: [
       {
         title: "Verlorene Abendtermine",
-        description: "40–60 % der Terminbuchungsabsichten passieren nach 18 Uhr. Ohne Online-Buchung gehen diese Kunden zur Konkurrenz.",
+        description: "Ein großer Teil der Terminbuchungsabsichten entsteht abends nach Feierabend. Ohne Online-Buchung gehen diese Kunden zur Konkurrenz.",
       },
       {
         title: "Höhere No-Show-Rate",
-        description: "Ohne automatische Erinnerungen erscheinen 20–30 % der Kunden nicht zum Termin. Das kostet direkt Umsatz und blockiert den Kalender.",
+        description: "Ohne automatische Erinnerungen erscheint ein spürbarer Teil der Kunden nicht zum Termin. Das kostet direkt Umsatz und blockiert den Kalender.",
       },
       {
         title: "Personalzeit für Terminkoordination",
@@ -47,7 +47,7 @@ const config: ProblemPageConfig = {
     headline: "Online-Terminbuchung, die sich in Ihr System integriert.",
     text: "Cogniiq richtet Online-Terminbuchung ein, die sich nahtlos mit Ihrem Kalender synchronisiert, automatische Bestätigungen versendet und No-Shows durch Erinnerungen reduziert. Optional mit KI-Telefonassistenten für telefonische Buchungen.",
     bullets: [
-      "Online-Buchung 24/7 – auch abends und am Wochenende",
+      "Online-Buchung auch abends und am Wochenende",
       "Automatische Bestätigung und Erinnerungen",
       "Kalender-Integration (Google Calendar, Outlook)",
       "No-Show-Reduzierung durch SMS/E-Mail-Erinnerungen",

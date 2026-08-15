@@ -259,9 +259,9 @@ export function ScanPage() {
       {/* ── TRUST STRIP ───────────────────────────────────────── */}
       <section className="pb-20 px-6">
         <div className="max-w-2xl mx-auto grid grid-cols-3 gap-3">
-          <StatCard value="48h" label="bis zum ersten System" delay={0} />
-          <StatCard value="100%" label="operative Systeme" delay={0.08} />
-          <StatCard value="3×" label="mehr Anfragen" delay={0.16} />
+          <StatCard value="7–14 Tage" label="typischer Go-Live" delay={0} />
+          <StatCard value="Auch nachts" label="Anrufannahme" delay={0.08} />
+          <StatCard value="Individuell" label="statt Baukasten" delay={0.16} />
         </div>
       </section>
 

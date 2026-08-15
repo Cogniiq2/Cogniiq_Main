@@ -55,13 +55,13 @@ const config: IndustryPageConfig = {
     },
   ],
   workflow: {
-    title: "Beispiel-Workflow: Immobilienmakler München",
+    title: "Beispielszenario: Immobilienmakler München",
     trigger:
-      "Ein Immobilienmakler in München betreute mehrere hochpreisige Objekte gleichzeitig. Eingehende Anfragen über Website und Telefon kamen ungefiltert und ohne Vorqualifizierung – jede Anfrage bedeutete potenziell unverhältnismäßig hohen Zeitaufwand.",
+      "Angenommen, ein Immobilienmakler in München betreut mehrere hochpreisige Objekte gleichzeitig. Eingehende Anfragen über Website und Telefon kommen ungefiltert und ohne Vorqualifizierung – jede Anfrage bedeutet potenziell hohen Zeitaufwand.",
     process:
-      "Cogniiq baute eine neue hochwertige Makler-Website mit strukturierten Objektseiten und automatischer Lead-Qualifizierung. Ein KI-Telefonassistent beantwortet Fragen zu Objekten und nimmt Besichtigungswünsche auf. Qualifizierte Leads werden mit vollständigen Angaben ans Büro weitergeleitet.",
+      "Vorgehen: Cogniiq entwickelt eine hochwertige Makler-Website mit strukturierten Objektseiten und automatischer Vorqualifizierung. Ein KI-Telefonassistent beantwortet Fragen zu Objekten und nimmt Besichtigungswünsche auf. Qualifizierte Anfragen werden mit vollständigen Angaben ans Büro weitergeleitet.",
     result:
-      "Das Maklerbüro erhält strukturierte, vorqualifizierte Leads. Besichtigungstermine werden automatisch koordiniert. Follow-ups nach Besichtigungen laufen automatisiert – ohne manuelle Nacharbeit.",
+      "So könnte das Maklerbüro strukturierte, vorqualifizierte Anfragen erhalten, Besichtigungstermine automatisch koordiniert und Follow-ups ohne manuelle Nacharbeit ausgelöst werden.",
   },
   pakete: [
     {
@@ -141,7 +141,7 @@ const config: IndustryPageConfig = {
     {
       title: "Objektanfragen außerhalb der Bürozeiten",
       description:
-        "Der KI-Telefonassistent beantwortet Fragen zu Lage, Ausstattung, Preis und Verfügbarkeit rund um die Uhr – gerade in München, wo Interessenten oft abends und am Wochenende recherchieren.",
+        "Der KI-Telefonassistent beantwortet Fragen zu Lage, Ausstattung, Preis und Verfügbarkeit auch außerhalb der Bürozeiten – gerade in München, wo Interessenten oft abends und am Wochenende recherchieren.",
     },
     {
       title: "Follow-up nach Besichtigung automatisieren",
@@ -166,12 +166,12 @@ const config: IndustryPageConfig = {
     "Keine verpassten Anfragen – KI-Assistent beantwortet auch abends und am Wochenende",
     "Follow-up-Automatisierung erhöht die Abschlussrate im wettbewerbsintensiven Münchner Markt",
     "Bessere Sichtbarkeit bei lokalen Suchanfragen – mehr organische Anfragen aus dem Raum München",
-    "Vollständige DSGVO-Konformität – alle Kundendaten sicher auf europäischen Servern",
+    "Datenschutzorientierte Umsetzung – alle Kundendaten sicher auf europäischen Servern",
   ],
   localContext: [
     "München ist mit Abstand der teuerste Immobilienmarkt Deutschlands. Kaufinteressenten und Mieter sind im Schnitt besser informiert und haben höhere Ansprüche an den gesamten Prozess – von der Website-Recherche bis zur Besichtigungsorganisation.",
     "Cogniiq entwickelt für Immobilienmakler in München maßgeschneiderte Digitallösungen: eine hochwertige Makler-Website mit strukturierten Objektseiten, einen KI-Telefonassistenten für Interessentenanfragen sowie Automatisierungssysteme für Lead-Qualifizierung, Besichtigungsplanung und Follow-up-Prozesse.",
-    "Alle Systeme sind vollständig DSGVO-konform, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut alle Systeme langfristig remote.",
+    "Alle Systeme werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut alle Systeme langfristig remote.",
   ],
   internalLinks: [
     { label: "Webdesign München", href: "/muenchen/webdesign" },
@@ -187,7 +187,7 @@ const config: IndustryPageConfig = {
     {
       question: "Kann Cogniiq eine DSGVO-konforme Makler-Website in München erstellen?",
       answer:
-        "Ja. Alle Websites und Systeme sind vollständig DSGVO-konform – mit korrekten Datenschutzdokumentationen, Cookie-Einwilligungen und sicherer Verarbeitung aller Interessentendaten auf europäischen Servern.",
+        "Ja. Alle Websites und Systeme werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse – mit korrekten Datenschutzdokumentationen, Cookie-Einwilligungen und sicherer Verarbeitung aller Interessentendaten auf europäischen Servern.",
     },
     {
       question: "Wie werden Interessentenanfragen über die Website automatisch vorqualifiziert?",

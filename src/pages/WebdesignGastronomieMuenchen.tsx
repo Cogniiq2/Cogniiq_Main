@@ -55,13 +55,13 @@ const config: IndustryPageConfig = {
     },
   ],
   workflow: {
-    title: "Beispiel-Workflow: Restaurant München Innenstadt",
+    title: "Beispielszenario: Restaurant München Innenstadt",
     trigger:
-      "Ein Restaurant in der Münchner Innenstadt erhielt täglich viele Reservierungsanrufe – vor allem abends und am Wochenende. Das Personal war im Service gebunden, Anrufe gingen ins Leere, Reservierungen wurden verpasst.",
+      "Angenommen, ein Restaurant in der Münchner Innenstadt erhält täglich viele Reservierungsanrufe – vor allem abends und am Wochenende. Das Personal ist im Service gebunden, Anrufe gehen ins Leere, Reservierungen werden verpasst.",
     process:
-      "Cogniiq baute eine neue Restaurant-Website mit Online-Reservierungssystem und implementierte einen KI-Telefonassistenten für Reservierungen und FAQ. Tischbuchungen werden automatisch erfasst und bestätigt. Gruppenanfragen werden strukturiert ans Team weitergeleitet.",
+      "Vorgehen: Cogniiq entwickelt eine Restaurant-Website mit Online-Reservierungssystem und richtet einen KI-Telefonassistenten für Reservierungen und häufige Fragen ein. Tischbuchungen werden automatisch erfasst und bestätigt, Gruppenanfragen strukturiert ans Team weitergeleitet.",
     result:
-      "Reservierungen laufen vollautomatisch ein – auch wenn kein Personal ans Telefon geht. Das Serviceteam konzentriert sich auf den Gast. Die Website bringt kontinuierlich neue Buchungen über organische Suchanfragen.",
+      "So könnten Reservierungen auch dann eingehen, wenn niemand ans Telefon geht, das Serviceteam sich auf den Gast konzentrieren und die Website über die organische Suche auffindbar sein.",
   },
   pakete: [
     {
@@ -77,7 +77,7 @@ const config: IndustryPageConfig = {
     },
     {
       name: "Growth",
-      tagline: "Website + KI-Telefonassistent für 24/7-Erreichbarkeit",
+      tagline: "Website + KI-Telefonassistent für Erreichbarkeit außerhalb der Öffnungszeiten",
       deliverables: [
         "Alles aus Start",
         "KI-Telefonassistent (Reservierungen & FAQ)",
@@ -129,9 +129,9 @@ const config: IndustryPageConfig = {
   ],
   useCases: [
     {
-      title: "Tischreservierungen rund um die Uhr in München",
+      title: "Tischreservierungen außerhalb der Öffnungszeiten in München",
       description:
-        "Gäste reservieren über die Website oder per KI-Assistent jederzeit – auch wenn das Restaurant im Vollbetrieb ist oder geschlossen hat. In einer Stadt wie München ist 24/7-Verfügbarkeit selbstverständlich.",
+        "Gäste reservieren über die Website oder per KI-Assistent jederzeit – auch wenn das Restaurant im Vollbetrieb ist oder geschlossen hat. In einer Stadt wie München ist Erreichbarkeit außerhalb der Öffnungszeiten selbstverständlich.",
     },
     {
       title: "Automatische Reservierungsbestätigung und Erinnerung",
@@ -141,7 +141,7 @@ const config: IndustryPageConfig = {
     {
       title: "Öffnungszeitenanfragen automatisch beantworten",
       description:
-        "Der KI-Telefonassistent beantwortet wiederkehrende Fragen zu Öffnungszeiten, Parkplätzen, Menü und Sonderaktionen – ohne Personalaufwand, rund um die Uhr, auch in Stoßzeiten.",
+        "Der KI-Telefonassistent beantwortet wiederkehrende Fragen zu Öffnungszeiten, Parkplätzen, Menü und Sonderaktionen – ohne Personalaufwand, auch außerhalb der Öffnungszeiten und in Stoßzeiten.",
     },
     {
       title: "Gruppenreservierungen und Events in München",
@@ -163,15 +163,15 @@ const config: IndustryPageConfig = {
     "Weniger verpasste Reservierungsanrufe – auch im laufenden Betrieb und außerhalb der Öffnungszeiten",
     "Automatisierte Reservierungsprozesse entlasten das Serviceteam in einem der busiest Gastronomiestandorte",
     "Mehr qualifizierte Tischbuchungen durch eine suchmaschinenoptimierte Restaurant-Website in München",
-    "Höhere Erreichbarkeit für Gäste – rund um die Uhr, in einer Stadt, die nie schläft",
+    "Höhere Erreichbarkeit für Gäste – auch außerhalb der Öffnungszeiten, in einer Stadt, die nie schläft",
     "Zeitersparnis durch automatisierte Bestätigungen, Erinnerungen und Gästekommunikation",
     "Professioneller erster Eindruck im wettbewerbsintensivsten Gastronomiemarkt Bayerns",
-    "Vollständige DSGVO-Konformität – alle Gästedaten sicher auf europäischen Servern",
+    "Datenschutzorientierte Umsetzung – alle Gästedaten sicher auf europäischen Servern",
   ],
   localContext: [
     "München hat eine der dichtesten und wettbewerbsintensivsten Gastronomieszenen in Deutschland. Restaurants konkurrieren nicht nur um lokale Stammgäste, sondern auch um Touristen, Geschäftsreisende und den überregionalen Markt. Eine professionelle Online-Präsenz ist keine Option, sondern Grundvoraussetzung.",
     "Cogniiq entwickelt für Gastronomiebetriebe in München passgenaue Digitallösungen: eine moderne Restaurant-Website mit integriertem Reservierungssystem, einen KI-Telefonassistenten sowie Automatisierungen für Bestätigungen, Erinnerungen und Feedback-Prozesse.",
-    "Alle Systeme sind vollständig DSGVO-konform, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut das Setup langfristig remote – saisonale Anpassungen und neue Menükarten inklusive.",
+    "Alle Systeme werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut das Setup langfristig remote – saisonale Anpassungen und neue Menükarten inklusive.",
   ],
   internalLinks: [
     { label: "Webdesign München", href: "/muenchen/webdesign" },

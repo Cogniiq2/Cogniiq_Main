@@ -52,7 +52,7 @@ const config: ProblemPageConfig = {
       "Terminbestätigung und Erinnerungen automatisch",
       "Rechnungsstellung und Mahnwesen automatisiert",
       "Daten zwischen Systemen automatisch synchronisiert",
-      "DSGVO-konform auf deutschen Servern",
+      "DSGVO-konform auf europäischen Servern",
       "Vollständige Dokumentation und Team-Schulung",
     ],
   },

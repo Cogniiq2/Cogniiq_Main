@@ -48,7 +48,7 @@ const schema = {
       url: `${base}/referenzen`,
       name: "Referenzen – Digitale Systeme im Livebetrieb | Cogniiq",
       description:
-        "Dokumentierte Kundenprojekte von Cogniiq aus Webentwicklung, Buchungs- und Zahlungssystemen, Verwaltungssoftware und Prozessautomatisierung.",
+        "Dokumentiertes Kundenprojekt von Cogniiq aus Webentwicklung, Buchungs- und Zahlungssystemen, Verwaltungssoftware und Prozessautomatisierung.",
       isPartOf: {
         "@id": `${base}/#website`,
       },
@@ -103,7 +103,7 @@ export function ReferenzenPage() {
                 Digitale Systeme, die im Alltag funktionieren.
               </h1>
               <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed max-w-2xl mb-4">
-                Dokumentierte Kundenprojekte aus Webentwicklung, Buchung, Zahlung, Verwaltung und Automatisierung – produktiv eingesetzt und langfristig betreut.
+                Dokumentiertes Kundenprojekt aus Webentwicklung, Buchung, Zahlung, Verwaltung und Automatisierung – produktiv eingesetzt und langfristig betreut.
               </p>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium mt-2">
                 <CheckCircle2 size={12} aria-hidden="true" />
@@ -247,7 +247,7 @@ export function ReferenzenPage() {
                     Verbindung mit der Anlage
                   </p>
                   <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                    Die Lösung endet nicht bei einer Buchungsbestätigung. Digitale Abläufe wurden mit Zugangs- und Flutlichtfunktionen der Padelanlage verbunden; ergänzend wurde die technische Infrastruktur der Videoüberwachung integriert. Sicherheitsrelevante Details bleiben bewusst nicht öffentlich dokumentiert.
+                    Die Lösung endet nicht bei einer Buchungsbestätigung. Digitale Buchungsabläufe wurden mit der Flutlichtsteuerung der Padelanlage verbunden: Eine bestätigte Buchung schaltet das Flutlicht für den gebuchten Zeitraum, ohne manuelles Zutun.
                   </p>
                 </div>
 

@@ -17,7 +17,7 @@ const SERVICES = [
   {
     icon: Phone,
     title: "KI-Telefonassistent",
-    description: "Automatische Anrufannahme, Terminbuchung und Weiterleitung – 24/7, mehrsprachig, DSGVO-konform. Kein verpasster Anruf, keine Warteschleife.",
+    description: "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, mehrsprachig, DSGVO-konform. Kein verpasster Anruf, keine Warteschleife.",
     benefits: [
       "Einrichtung in 7–14 Tagen",
       "Integration in bestehende Kalender",
@@ -81,7 +81,7 @@ const CHALLENGES = [
 
 const INDUSTRIES = [
   { name: "Arztpraxen & Therapeuten", href: "/ki-telefonassistent-arzt", description: "DSGVO-konforme Terminautomatisierung für Praxen." },
-  { name: "Gastronomie & Restaurants", href: "/ki-telefonassistent-restaurant", description: "24/7-Reservierungen, mehrsprachig." },
+  { name: "Gastronomie & Restaurants", href: "/ki-telefonassistent-restaurant", description: "Reservierungen außerhalb der Öffnungszeiten, mehrsprachig." },
   { name: "Hotels & Pensionen", href: "/ki-telefonassistent-hotel", description: "Rund-um-die-Uhr-Rezeption, PMS-Integration." },
   { name: "Therapiepraxen", href: "/ki-telefonassistent-praxis", description: "Terminbuchung, Folgetermine, No-Show-Reduktion." },
   { name: "Automatisierung Restaurant", href: "/automatisierung-restaurant", description: "Reservierungen, Lieferanten, Kommunikation." },
@@ -116,7 +116,7 @@ const USE_CASES = [
     description: "Eine allgemeinmedizinische Praxis mit drei Ärzten erhält montags Anrufspitzen, die das Team überlasten. Der KI-Telefonassistent übernimmt Standardtermine, beantwortet Fragen zu Öffnungszeiten und qualifiziert Notfallanfragen – DSGVO-konform, vollautomatisch.",
   },
   {
-    title: "Restaurant – 24/7-Reservierungen ohne Mitarbeiter",
+    title: "Restaurant – Reservierungen außerhalb der Öffnungszeiten ohne Mitarbeiter",
     description: "Ein inhabergeführtes Restaurant erhält Reservierungsanfragen auch nach 22 Uhr. KI-Telefonassistent nimmt Reservierungen entgegen, sendet Bestätigungen und Erinnerungen – ohne dass jemand zum Telefon greifen muss.",
   },
   {
@@ -140,7 +140,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "Ist KI DSGVO-konform für deutsche Unternehmen?",
-    answer: "Ja, wenn sie richtig konfiguriert ist. Cogniiq arbeitet ausschließlich mit Lösungen, die Daten auf europäischen Servern verarbeiten, vollständig DSGVO-konform sind und mit den notwendigen Auftragsverarbeitungsverträgen geliefert werden.",
+    answer: "Ja, wenn sie richtig konfiguriert ist. Cogniiq arbeitet ausschließlich mit Lösungen, die Daten auf europäischen Servern verarbeiten, DSGVO-konforme Prozesse unterstützen und mit den notwendigen Auftragsverarbeitungsverträgen geliefert werden.",
   },
   {
     question: "Für welche Unternehmensgröße ist ein KI-Telefonassistent geeignet?",

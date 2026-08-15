@@ -21,28 +21,6 @@ const fadeUp = {
   }),
 };
 
-const CITY_COORDINATES: Record<string, {
-  lat: string;
-  lng: string;
-  postalCodes: string[];
-}> = {
-  bayreuth: {
-    lat: "49.9483",
-    lng: "11.5783",
-    postalCodes: ["95444", "95445", "95447", "95448"],
-  },
-  muenchen: {
-    lat: "48.1372",
-    lng: "11.5761",
-    postalCodes: ["80331", "80333", "80335", "80336", "80337"],
-  },
-  regensburg: {
-    lat: "49.0134",
-    lng: "12.1016",
-    postalCodes: ["93047", "93049", "93051", "93053", "93055"],
-  },
-};
-
 function renderWithLinks(text: string) {
   const parts = text.split(/(\[[^\]]+\]\([^)]+\))/g);
   return (
@@ -78,7 +56,6 @@ export function CityServicePage({ config }: CityServicePageProps) {
     { name: config.service, url: `${BUSINESS_INFO.website}${config.route}` },
   ];
 
-  const coords = CITY_COORDINATES[config.citySlug] ?? CITY_COORDINATES.bayreuth;
 
   const localBusinessSchema = {
     "@context": "https://schema.org",
@@ -97,20 +74,24 @@ export function CityServicePage({ config }: CityServicePageProps) {
           "postalCode": BUSINESS_INFO.address.postalCode,
           "addressCountry": BUSINESS_INFO.address.addressCountry,
         },
+        // Geo describes the business itself, which has one location (Bayreuth). It must
+        // not be rewritten to the page's target city: doing so made the same @id claim
+        // Munich/Regensburg coordinates against a Bayreuth postal address, contradicting
+        // the identical @id emitted by index.html and LocalBusinessSchema on the same page.
+        // The city relationship is expressed by areaServed below, which is what it means.
         "geo": {
           "@type": "GeoCoordinates",
-          "latitude": coords.lat,
-          "longitude": coords.lng,
+          "latitude": BUSINESS_INFO.geo.latitude,
+          "longitude": BUSINESS_INFO.geo.longitude,
         },
-        "hasMap": `https://www.google.com/maps/search/${encodeURIComponent(config.city)}+${encodeURIComponent(config.service)}`,
         "areaServed": [
           {
+            // No Wikidata @id: the previous mapping could not be verified (the Regensburg
+            // entry in particular appeared to reference a different city). A wrong entity
+            // reference is worse than none, so the city is identified by name only until
+            // the IDs are confirmed.
             "@type": "City",
             "name": config.city,
-            "@id": `https://www.wikidata.org/wiki/${
-              config.citySlug === "muenchen" ? "Q1726" :
-              config.citySlug === "regensburg" ? "Q2749" : "Q3506"
-            }`,
           },
           {
             "@type": "State",
@@ -609,10 +590,10 @@ function LocalSzenarienSection({ config }: { config: CityServiceConfig }) {
           className="mb-12"
         >
           <h2 id="szenarien-heading" className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Reale Situationen, in denen {config.service} greift
+            Beispielszenarien, in denen {config.service} greift
           </h2>
           <p className="text-gray-500 dark:text-gray-400">
-            Ausgangssituationen aus der Praxis – anonymisiert, aus {config.city} und Umgebung.
+            Typische Ausgangssituationen in {config.city} und Umgebung – als Beispielszenarien beschrieben.
           </p>
         </motion.div>
 

@@ -17,7 +17,7 @@ const config: ProblemPageConfig = {
       "Kein Google-Ranking: Niemand findet die Website, weil kein SEO gemacht wurde",
       "Langsame Ladezeit: Besucher springen sofort ab, bevor sie die Seite sehen",
       "Kein klares Call-to-Action: Besucher wissen nicht, was sie tun sollen",
-      "Schlechte mobile Optimierung: 65 % aller Suchen kommen vom Smartphone",
+      "Schlechte mobile Optimierung: Suchanfragen kommen überwiegend vom Smartphone",
       "Keine lokale SEO-Sichtbarkeit bei stadtspezifischen Suchanfragen",
       "Veraltetes Design: Besucher vertrauen der Website nicht und verlassen sie",
       "Kein Tracking: Unklar, wo Besucher abspringen und warum keine Anfragen kommen",

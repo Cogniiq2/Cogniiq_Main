@@ -1,13 +1,9 @@
 import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle2, Star, ChevronRight } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
-import {
-  REAL_TESTIMONIAL,
-  PLACEHOLDER_TESTIMONIAL,
-  PLACEHOLDER_TESTIMONIAL_2,
-} from "@/components/TestimonialBlock";
+import { REAL_TESTIMONIAL } from "@/components/TestimonialBlock";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -25,62 +21,20 @@ const breadcrumbs = [
   { name: "Bewertungen", url: `${base}/bewertungen` },
 ];
 
-const schema = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "LocalBusiness",
-      "@id": `${base}/#localbusiness`,
-      name: BUSINESS_INFO.name,
-      url: base,
-      telephone: BUSINESS_INFO.contact.phone,
-      email: BUSINESS_INFO.contact.email,
-      address: {
-        "@type": "PostalAddress",
-        streetAddress: BUSINESS_INFO.address.streetAddress,
-        addressLocality: BUSINESS_INFO.address.addressLocality,
-        addressRegion: BUSINESS_INFO.address.addressRegion,
-        postalCode: BUSINESS_INFO.address.postalCode,
-        addressCountry: BUSINESS_INFO.address.addressCountry,
-      },
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "5",
-        reviewCount: "1",
-        bestRating: "5",
-      },
-    },
-    {
-      "@type": "Review",
-      itemReviewed: {
-        "@type": "LocalBusiness",
-        "@id": `${base}/#localbusiness`,
-      },
-      reviewRating: {
-        "@type": "Rating",
-        ratingValue: "5",
-        bestRating: "5",
-      },
-      author: {
-        "@type": "Person",
-        name: "Betreiber, Sportanlage Region Bayreuth",
-      },
-      reviewBody: REAL_TESTIMONIAL.quote,
-    },
-  ],
-};
+// No Review/AggregateRating markup is emitted here. The single verified customer
+// statement is prose feedback and carries no star rating from its author, so any
+// ratingValue would be invented. The quote is shown as visible text only.
 
-const allTestimonials = [REAL_TESTIMONIAL, PLACEHOLDER_TESTIMONIAL, PLACEHOLDER_TESTIMONIAL_2];
+const allTestimonials = [REAL_TESTIMONIAL];
 
 export function BewertungenPage() {
   return (
     <>
       <PageSEO
         title="Bewertungen – Kundenmeinungen zu Cogniiq | Webdesign Bayreuth"
-        description="Bewertungen und Kundenmeinungen zu Cogniiq. Transparente Darstellung: 1 reale Bewertung, klar gekennzeichnete Vorlagen für weitere. Webdesign & Automatisierung aus Bayreuth."
+        description="Bewertungen und Kundenmeinungen zu Cogniiq. Transparente Darstellung: veröffentlicht wird ausschließlich verifiziertes Kundenfeedback. Webdesign & Automatisierung aus Bayreuth."
         canonical={`${base}/bewertungen`}
         breadcrumbs={breadcrumbs}
-        additionalSchema={schema}
       />
 
       <main className="min-h-screen">
@@ -110,9 +64,6 @@ export function BewertungenPage() {
                   <CheckCircle2 size={12} />
                   1 verifizierte Kundenstimme
                 </div>
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs font-medium">
-                  Vorlagen klar gekennzeichnet
-                </div>
               </div>
             </motion.div>
           </div>
@@ -132,11 +83,11 @@ export function BewertungenPage() {
                 Kundenstimmen
               </h2>
               <p className="text-gray-500 dark:text-gray-400">
-                Reale Bewertungen sind mit "Verifiziert" gekennzeichnet. Vorlagen für zukünftige Bewertungen sind als solche klar markiert.
+                Veröffentlicht wird ausschließlich Feedback aus real umgesetzten Projekten.
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid gap-6 max-w-2xl">
               {allTestimonials.map((t, i) => (
                 <motion.div
                   key={i}
@@ -145,52 +96,24 @@ export function BewertungenPage() {
                   viewport={{ once: true }}
                   variants={fadeUp}
                   custom={i * 0.1}
-                  className={`relative bg-white dark:bg-gray-800/60 border rounded-2xl p-7 flex flex-col gap-5 ${
-                    t.isReal
-                      ? "border-gray-200 dark:border-gray-700"
-                      : "border-gray-100 dark:border-gray-800 opacity-65"
-                  }`}
+                  className="relative bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-7 flex flex-col gap-5"
                 >
-                  {t.isReal && (
-                    <div className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-xs font-medium">
-                      <CheckCircle2 size={10} />
-                      Verifiziert
-                    </div>
-                  )}
-
-                  <div className="flex gap-0.5">
-                    {[...Array(5)].map((_, j) => (
-                      <Star
-                        key={j}
-                        size={14}
-                        className={t.isReal ? "text-amber-400 fill-amber-400" : "text-gray-300 dark:text-gray-600 fill-gray-300 dark:fill-gray-600"}
-                      />
-                    ))}
+                  <div className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-xs font-medium">
+                    <CheckCircle2 size={10} />
+                    Verifiziert
                   </div>
 
-                  <p
-                    className={`text-sm leading-relaxed flex-1 ${
-                      t.isReal
-                        ? "text-gray-700 dark:text-gray-300"
-                        : "text-gray-400 dark:text-gray-500 italic"
-                    }`}
-                  >
+                  <p className="text-sm leading-relaxed flex-1 text-gray-700 dark:text-gray-300 pt-6">
                     "{t.quote}"
                   </p>
 
-                  <div className="flex items-center justify-between gap-3 mt-auto">
-                    <span
-                      className={`text-xs font-medium ${
-                        t.isReal
-                          ? "text-gray-600 dark:text-gray-400"
-                          : "text-gray-400 dark:text-gray-600"
-                      }`}
-                    >
+                  <div className="flex flex-col gap-1 mt-auto">
+                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
                       — {t.attribution}
                     </span>
-                    {!t.isReal && (
-                      <span className="text-xs text-gray-400 dark:text-gray-600 border border-gray-200 dark:border-gray-700 rounded-full px-2 py-0.5 flex-shrink-0">
-                        Vorlage
+                    {t.project && (
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
+                        {t.project}
                       </span>
                     )}
                   </div>
@@ -207,7 +130,7 @@ export function BewertungenPage() {
               className="mt-8 p-5 rounded-xl bg-white dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50"
             >
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                <strong className="text-gray-700 dark:text-gray-300">Hinweis zur Transparenz:</strong> Cogniiq befindet sich im frühen Aufbau des öffentlichen Kundenstimmen-Portfolios. Die verifizierte Kundenstimme stammt aus einem realen Projekt (SV Heinersreuth). Als "Vorlage" gekennzeichnete Inhalte sind stilistische Beispiele und repräsentieren keine realen Kunden.
+                <strong className="text-gray-700 dark:text-gray-300">Hinweis zur Transparenz:</strong> Cogniiq befindet sich im frühen Aufbau des öffentlichen Kundenstimmen-Portfolios. Die hier gezeigte Kundenstimme stammt aus einem real umgesetzten Projekt (SV Heinersreuth). Weitere Stimmen werden erst veröffentlicht, wenn sie vorliegen und freigegeben sind – wir zeigen keine Beispiel- oder Mustertexte.
               </p>
             </motion.div>
           </div>
@@ -233,7 +156,7 @@ export function BewertungenPage() {
                 "Reale Projektumsetzung: Systeme im Livebetrieb, nicht nur Konzepte",
                 "Direkte Erreichbarkeit während des gesamten Projekts",
                 "Keine Fantasiezahlen, keine aufgebauschten Case Studies",
-                "Vollständige DSGVO-Konformität bei jeder Website-Auslieferung",
+                "Datenschutzfreundliche Umsetzung: Cookie-Consent, Datenschutzerklärung und Impressum gehören zu jedem Launch",
                 "Faire, transparente Preisgestaltung ohne Stundensatz-Überraschungen",
               ].map((item, i) => (
                 <motion.div

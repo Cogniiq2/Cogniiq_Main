@@ -11,15 +11,15 @@ const config: NationalIndustryPageConfig = {
   },
   h1: "Webdesign für Hotels & Pensionen",
   tagline: "Hotellerie · Direktbuchungen · weniger OTA-Abhängigkeit",
-  intro: "Reisende vergleichen abends auf dem Sofa – oft zwischen Ihrer Website und dem Booking.com-Eintrag nebenan. Wer in diesem Moment nicht überzeugt, verliert die Buchung an die OTA. Mitsamt 18–25 % Provision. Eine starke Hotel-Website ist keine Ergänzung zum OTA-Auftritt – sie ist das Instrument, mit dem Direktbuchungen zurückgewonnen werden.",
+  intro: "Reisende vergleichen abends auf dem Sofa – oft zwischen Ihrer Website und dem Booking.com-Eintrag nebenan. Wer in diesem Moment nicht überzeugt, verliert die Buchung an die OTA – inklusive der fälligen Provision. Eine starke Hotel-Website ist keine Ergänzung zum OTA-Auftritt – sie ist das Instrument, mit dem Direktbuchungen zurückgewonnen werden.",
   serviceSlug: "leistungen",
   serviceLabel: "Webdesign Leistungen",
   costLink: "/kosten-webdesign",
   costLinkLabel: "Webdesign Kosten",
   problems: [
     {
-      title: "Jede OTA-Buchung kostet 18–25 % Provision",
-      description: "Was wie ein Vertriebskanal aussieht, ist ein teurer Dauerzustand. Ein Hotel mit 25 Zimmern, das 60 % seiner Buchungen über OTAs abwickelt, zahlt auf Jahressicht oft fünfstellige Provisionen – für Buchungen, die ohne eigenen Webauftritt auch direkt hätten kommen können.",
+      title: "Jede OTA-Buchung kostet Provision",
+      description: "Was wie ein Vertriebskanal aussieht, ist ein teurer Dauerzustand. Wer einen Großteil seiner Buchungen über Portale abwickelt, zahlt auf Jahressicht erhebliche Provisionen – für Buchungen, die über einen starken eigenen Webauftritt auch direkt hätten kommen können.",
     },
     {
       title: "Bei lokalen Suchanfragen erscheint die OTA-Seite, nicht das Hotel",
@@ -92,7 +92,7 @@ const config: NationalIndustryPageConfig = {
   faq: [
     {
       question: "Wie viel Provision kann durch mehr Direktbuchungen eingespart werden?",
-      answer: "OTAs nehmen 18–25 % Provision pro Buchung. Ein Hotel mit 25 Zimmern, das seine Direktbuchungsquote von 20 % auf 35 % steigert, spart bei durchschnittlichem Zimmerpreis von 100 € und 250 Belegungstagen jährlich über 9.000 € an Provision – ohne zusätzliche Marketingkosten. Die Website amortisiert sich in der Regel innerhalb von 6–12 Monaten.",
+      answer: "Buchungsportale nehmen pro Buchung eine Provision, die je nach Plattform und Vertrag deutlich ins Gewicht fällt. Jede Buchung, die stattdessen direkt über Ihre eigene Website eingeht, spart diese Provision vollständig ein. Wie stark sich das rechnet, hängt von Zimmerpreis, Belegung und Ihrem heutigen Direktbuchungsanteil ab – das rechnen wir im Erstgespräch gemeinsam für Ihr Haus durch. Die Website amortisiert sich in der Regel innerhalb von 6–12 Monaten.",
     },
     {
       question: "Welches Buchungssystem integriert Cogniiq?",
@@ -108,7 +108,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Ist die Hotel-Website mobiloptimiert?",
-      answer: "Ja, und das ist nicht optional: Über 65 % aller Hotel-Buchungsrecherchen beginnen auf mobilen Geräten. Die Buchungsstrecke wird speziell auf mobile Nutzung optimiert – damit der Weg von 'Hotel gefunden' zu 'Buchung bestätigt' so kurz und reibungslos wie möglich ist.",
+      answer: "Ja, und das ist nicht optional: Ein Großteil der Hotel-Buchungsrecherchen beginnt auf mobilen Geräten. Die Buchungsstrecke wird speziell auf mobile Nutzung optimiert – damit der Weg von 'Hotel gefunden' zu 'Buchung bestätigt' so kurz und reibungslos wie möglich ist.",
     },
   ],
 };

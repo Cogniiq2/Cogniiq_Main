@@ -48,7 +48,7 @@ const config: NationalIndustryPageConfig = {
   },
   benefits: [
     "Automatische Reservierungsbestätigung und Tischzuweisung",
-    "Erinnerungs-SMS/-E-Mail reduziert No-Shows um bis zu 40 %",
+    "Erinnerungs-SMS/-E-Mail hilft, No-Shows spürbar zu reduzieren",
     "Bewertungsanfrage automatisch nach jedem Besuch",
     "Lieferantenbestellungen strukturiert und automatisch koordiniert",
     "Kassendaten automatisch in Buchhaltungssoftware übertragen",

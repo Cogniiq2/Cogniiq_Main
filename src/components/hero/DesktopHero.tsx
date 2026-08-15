@@ -7,10 +7,11 @@ import {
   Globe,
   Zap,
   CircleCheck as CheckCircle,
-  Star,
   ShieldCheck,
   Clock,
 } from 'lucide-react';
+
+import { ErrorBoundary } from '../ErrorBoundary';
 
 const LazySplineScene = lazy(() =>
   import('../ui/splite').then((module) => ({
@@ -20,8 +21,6 @@ const LazySplineScene = lazy(() =>
 
 const E: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
-const AVATAR_INITIALS = ['MK', 'SR', 'TH', 'AB', 'LP'];
-const AVATAR_COLORS = ['#0ea5e9', '#22c55e', '#f59e0b', '#ef4444', '#64748b'];
 
 function Particles() {
   const pts = useMemo(
@@ -61,10 +60,40 @@ function SplineFallback() {
   );
 }
 
+/**
+ * True only when the browser can actually create a WebGL context.
+ *
+ * Probed once, on demand, with a throwaway canvas. Without this the ~2 MB Spline
+ * runtime is downloaded even on machines that cannot render it, and the failure
+ * then surfaces as a render-phase throw rather than a graceful skip.
+ */
+function supportsWebGL(): boolean {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return false;
+  try {
+    const canvas = document.createElement('canvas');
+    return Boolean(
+      canvas.getContext('webgl2') ||
+        canvas.getContext('webgl') ||
+        canvas.getContext('experimental-webgl')
+    );
+  } catch {
+    return false;
+  }
+}
+
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 function DeferredSplineScene() {
   const [shouldLoad, setShouldLoad] = useState(false);
 
   useEffect(() => {
+    // Never fetch the 3D runtime when the user asked for reduced motion, or when the
+    // device cannot render it. Both keep the static fallback instead.
+    if (prefersReducedMotion() || !supportsWebGL()) return;
+
     const timeout = window.setTimeout(() => {
       setShouldLoad(true);
     }, 1800);
@@ -78,13 +107,18 @@ function DeferredSplineScene() {
     return <SplineFallback />;
   }
 
+  // ErrorBoundary is required, not defensive styling: react-spline re-throws load
+  // failures during render, which Suspense does not catch. Without it a failed scene
+  // or WebGL context tears down the whole React root and blanks the painted page.
   return (
-    <Suspense fallback={<SplineFallback />}>
-      <LazySplineScene
-        scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-        className="w-full h-full"
-      />
-    </Suspense>
+    <ErrorBoundary fallback={<SplineFallback />} label="SplineScene">
+      <Suspense fallback={<SplineFallback />}>
+        <LazySplineScene
+          scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+          className="w-full h-full"
+        />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 
@@ -95,9 +129,8 @@ const services = [
 ];
 
 const proof = [
-  { value: '24/7', label: 'Erreichbarkeit', sub: 'Kein Anruf verpasst' },
-  { value: '14 Tage', label: 'Go-Live', sub: 'Garantiert oder Geld zurück' },
-  { value: '40+', label: 'Unternehmen', sub: 'Vertrauen Cogniiq' },
+  { value: 'Auch nachts', label: 'Erreichbarkeit', sub: 'Kein Anruf verpasst' },
+  { value: '7–14 Tage', label: 'Go-Live', sub: 'Typischer Projektzeitraum' },
 ];
 
 export function DesktopHero() {
@@ -202,7 +235,7 @@ export function DesktopHero() {
           >
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" aria-hidden="true" />
             <span className="text-[12px] font-semibold text-gray-700">
-              Go-Live in 14 Tagen — oder volle Rückerstattung
+              Go-Live typischerweise in 7–14 Tagen
             </span>
           </motion.div>
 
@@ -276,35 +309,11 @@ export function DesktopHero() {
               </button>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="flex -space-x-1.5" aria-hidden="true">
-                {AVATAR_COLORS.map((c, i) => (
-                  <div
-                    key={i}
-                    className="w-6 h-6 rounded-full border-[1.5px] border-white flex items-center justify-center text-[7px] font-bold"
-                    style={{ background: c + '22', borderColor: c + '66', color: c }}
-                  >
-                    {AVATAR_INITIALS[i]}
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex items-center gap-0.5" aria-label="5 Sterne Bewertung">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <Star key={s} size={9} className="text-amber-400 fill-amber-400" aria-hidden="true" />
-                ))}
-              </div>
-
-              <span className="text-[11px] text-gray-400">
-                <span className="font-semibold text-gray-600">40+</span> Unternehmen vertrauen Cogniiq
-              </span>
-            </div>
-
             <div className="flex items-center gap-4 pt-0.5">
               {[
                 { icon: ShieldCheck, text: 'DSGVO-konform' },
-                { icon: Clock, text: 'Live in < 14 Tagen' },
-                { icon: CheckCircle, text: 'Deutsche Server' },
+                { icon: Clock, text: 'Go-Live typischerweise in 7–14 Tagen' },
+                { icon: CheckCircle, text: 'Europäische Server' },
               ].map(({ icon: Icon, text }) => (
                 <div key={text} className="flex items-center gap-1.5">
                   <Icon size={10} className="text-emerald-500 flex-shrink-0" aria-hidden="true" />

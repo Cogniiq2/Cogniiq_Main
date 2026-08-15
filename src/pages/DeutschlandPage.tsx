@@ -32,7 +32,7 @@ const SERVICES = [
     title: "KI-Telefonassistent Deutschland",
     slug: "ki-telefonassistent",
     description:
-      "Automatische Anrufannahme, Terminbuchung und Weiterleitung – 24/7, mehrsprachig, DSGVO-konform. Für Praxen, Gastronomie, Dienstleister und Handwerk in ganz Deutschland.",
+      "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, mehrsprachig, DSGVO-konform. Für Praxen, Gastronomie, Dienstleister und Handwerk in ganz Deutschland.",
     benefits: [
       "Einrichtung in 7–14 Tagen",
       "Kein verpasster Anruf, keine Warteschleife",
@@ -58,7 +58,7 @@ const CHALLENGES = [
     icon: Users,
     title: "Fachkräftemangel in deutschen KMU",
     description:
-      "Kleinen und mittelständischen Unternehmen in Deutschland fehlen Fachkräfte für administrative Tätigkeiten. KI übernimmt Telefonannahme, Datenpflege und Kundenkommunikation – zuverlässig und rund um die Uhr.",
+      "Kleinen und mittelständischen Unternehmen in Deutschland fehlen Fachkräfte für administrative Tätigkeiten. KI übernimmt Telefonannahme, Datenpflege und Kundenkommunikation – zuverlässig, auch außerhalb regulärer Geschäftszeiten.",
   },
   {
     icon: TrendingUp,
@@ -70,7 +70,7 @@ const CHALLENGES = [
     icon: Globe,
     title: "Online-Sichtbarkeit entscheidet",
     description:
-      "Über 90 % aller Kaufentscheidungen beginnen mit einer Google-Suche. Unternehmen, die lokal und national nicht sichtbar sind, verlieren täglich Kunden – unabhängig von ihrer tatsächlichen Qualität.",
+      "Sehr viele Kaufentscheidungen beginnen mit einer Google-Suche. Unternehmen, die lokal und national nicht sichtbar sind, verlieren täglich Kunden – unabhängig von ihrer tatsächlichen Qualität.",
   },
   {
     icon: Phone,
@@ -88,7 +88,7 @@ const CHALLENGES = [
     icon: Shield,
     title: "DSGVO-konforme KI-Nutzung",
     description:
-      "Viele deutsche Unternehmen scheuen KI-Einsatz aus Datenschutzgründen. Cogniiq arbeitet ausschließlich mit DSGVO-konformen Lösungen auf europäischen Servern – volle Rechtssicherheit, keine Kompromisse.",
+      "Viele deutsche Unternehmen scheuen KI-Einsatz aus Datenschutzgründen. Cogniiq arbeitet ausschließlich mit DSGVO-konformen Lösungen auf europäischen Servern, inklusive Auftragsverarbeitungsverträgen und dokumentierten Datenflüssen.",
   },
 ];
 
@@ -96,7 +96,7 @@ const REGIONS = [
   {
     name: "Bayern",
     href: "/bayern",
-    description: "Schwerpunktregion mit Standorten in Bayreuth, München und Regensburg.",
+    description: "Schwerpunktregion. Sitz in Bayreuth, Vor-Ort-Termine in München und Regensburg auf Anfrage.",
     highlight: true,
   },
   {
@@ -142,7 +142,7 @@ const INDUSTRIES = [
   },
   {
     name: "Gastronomie & Restaurants",
-    description: "Restaurants und Gastronomiebetriebe nehmen Reservierungen rund um die Uhr entgegen und automatisieren Gästekommunikation vollständig.",
+    description: "Restaurants und Gastronomiebetriebe nehmen Reservierungen auch außerhalb der Öffnungszeiten entgegen und automatisieren Gästekommunikation vollständig.",
   },
   {
     name: "Arztpraxen & Therapeuten",
@@ -181,7 +181,7 @@ const USE_CASE_SCENARIOS = [
   {
     title: "Dienstleister mit nationaler Reichweite",
     description:
-      "Ein Beratungsunternehmen mit mehreren Standorten nutzt verschiedene Tools für Leads, CRM, Termine und Abrechnung – ohne automatische Verbindung. Nach der Automatisierung fließen alle Anfragen zentral zusammen, Onboarding läuft in Minuten, Rechnungen entstehen automatisch.",
+      "Ein Beratungsunternehmen mit mehreren Standorten nutzt verschiedene Tools für Leads, CRM, Termine und Abrechnung – ohne automatische Verbindung. Mit einer passenden Automatisierung fließen alle Anfragen zentral zusammen, Onboarding läuft in Minuten, Rechnungen entstehen automatisch.",
   },
 ];
 
@@ -216,7 +216,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Was kostet ein Projekt mit Cogniiq in Deutschland?",
-    a: "Ohne Münchner oder Berliner Agenturoverhead. KI-Telefonassistenten nach Anrufvolumen, Automatisierungen ab ca. 500–1.500 €, Websites ab ca. 2.500 €. Erstgespräch immer kostenlos.",
+    a: "Ohne Münchner oder Berliner Agenturoverhead. KI-Telefonassistenten nach Anrufvolumen, Automatisierungen ab ca. 500–1.500 €. Websites starten ab 1.500 €; individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei etwa 2.500–5.000 €. Erstgespräch immer kostenlos.",
   },
 ];
 
@@ -290,7 +290,7 @@ export function DeutschlandPage() {
               </h1>
 
               <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl leading-relaxed mb-8">
-                Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Unternehmen in ganz Deutschland – mit Schwerpunkt Bayern und Standorten in Bayreuth, München und Regensburg. Remote betreut, persönlich begleitet, DSGVO-konform.
+                Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Unternehmen in ganz Deutschland – mit Sitz in Bayreuth und Schwerpunkt Bayern. Vor-Ort-Termine in München und Regensburg auf Anfrage. Remote betreut, persönlich begleitet.
               </p>
 
               <div className="flex flex-wrap gap-4">
@@ -649,7 +649,7 @@ export function DeutschlandPage() {
                 Einsatz von KI & Automatisierung in Deutschland
               </h2>
               <p className="text-gray-500 dark:text-gray-400">
-                Konkrete Szenarien, wie Cogniiq-Lösungen Unternehmen deutschlandweit entlasten.
+                Beispielszenarien, wie Cogniiq-Lösungen Unternehmen deutschlandweit entlasten können.
               </p>
             </motion.div>
 

@@ -1,14 +1,14 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Calendar, Shield, Clock, Star, CircleCheck as CheckCircle, Quote, TrendingUp, PhoneCall, Zap } from 'lucide-react';
+import { ArrowRight, Calendar, Shield, Clock, CircleCheck as CheckCircle, TrendingUp, PhoneCall, Zap } from 'lucide-react';
 import { useAvailability } from '@/hooks/useAvailability';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 const guarantees = [
   { icon: Shield, text: 'Keine Verpflichtung — kündbar jederzeit' },
-  { icon: Clock, text: 'Antwort innerhalb 24h garantiert' },
+  { icon: Clock, text: 'Antwort in der Regel innerhalb von 24 Stunden' },
   { icon: Calendar, text: 'Persönliches Gespräch — kein Formular-Loop' },
 ];
 
@@ -18,19 +18,12 @@ const outcomes = [
   'Sie erhalten ein realistisches Konzept — kein Pitch',
 ];
 
-const TESTIMONIAL = {
-  quote: 'In der ersten Woche nach dem Go-Live haben wir 11 Terminbuchungen über den KI-Assistenten erhalten — ohne einen einzigen Anruf selbst annehmen zu müssen.',
-  name: 'Dr. Michael K.',
-  role: 'Allgemeinarzt, München',
-  result: '+11 Buchungen Woche 1',
-  initials: 'MK',
-  color: '#0ea5e9',
-};
-
+// Outcome tiles carry no invented performance figures. Any number here would need a
+// real, attributable measurement; none exists in the repository.
 const microResults = [
-  { icon: PhoneCall, stat: '+28%', label: 'mehr Terminbuchungen' },
-  { icon: TrendingUp, stat: '3×', label: 'mehr qualifizierte Leads' },
-  { icon: Zap, stat: '< 14d', label: 'bis Go-Live' },
+  { icon: PhoneCall, stat: 'Auch nachts', label: 'Anrufannahme' },
+  { icon: TrendingUp, stat: 'Strukturiert', label: 'qualifizierte Anfragen' },
+  { icon: Zap, stat: '7–14 Tage', label: 'bis Go-Live' },
 ];
 
 export function FinalCTASection() {
@@ -104,67 +97,6 @@ export function FinalCTASection() {
               ))}
             </div>
 
-            {/* Testimonial */}
-            <motion.div
-              className="relative bg-gray-50 border border-gray-100 rounded-2xl p-6 mb-8"
-              initial={{ opacity: 0, y: 16 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.65, delay: 0.2, ease: EASE }}
-            >
-              <Quote size={18} className="text-gray-200 mb-4" />
-              <p className="text-[14px] text-gray-700 leading-[1.72] mb-4 italic">
-                "{TESTIMONIAL.quote}"
-              </p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div
-                    className="w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-bold border-2"
-                    style={{ background: TESTIMONIAL.color + '18', borderColor: TESTIMONIAL.color + '40', color: TESTIMONIAL.color }}
-                  >
-                    {TESTIMONIAL.initials}
-                  </div>
-                  <div>
-                    <p className="text-[12.5px] font-semibold text-gray-900">{TESTIMONIAL.name}</p>
-                    <p className="text-[11px] text-gray-400">{TESTIMONIAL.role}</p>
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-1">
-                  <div className="flex items-center gap-0.5">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <Star key={s} size={10} className="text-amber-400 fill-amber-400" />
-                    ))}
-                  </div>
-                  <span className="text-[10.5px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-                    {TESTIMONIAL.result}
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Social proof footer */}
-            <div className="flex items-center gap-3 pt-6 border-t border-gray-100">
-              <div className="flex -space-x-2">
-                {['#0ea5e9', '#22c55e', '#f59e0b', '#ef4444', '#64748b'].map((c, i) => (
-                  <div
-                    key={i}
-                    className="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-bold"
-                    style={{ background: `${c}20`, borderColor: c + '50', color: c }}
-                  >
-                    {['MK', 'SR', 'TH', 'AB', 'LP'][i]}
-                  </div>
-                ))}
-              </div>
-              <div>
-                <div className="flex items-center gap-0.5 mb-0.5">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} size={10} className="text-amber-400 fill-amber-400" />
-                  ))}
-                </div>
-                <p className="text-[11.5px] text-gray-400">
-                  <span className="font-semibold text-gray-700">40+</span> Unternehmen vertrauen auf Cogniiq-Systeme
-                </p>
-              </div>
-            </div>
           </motion.div>
 
           {/* ─── Right: CTA card ─── */}
@@ -248,11 +180,11 @@ export function FinalCTASection() {
                   ))}
                 </div>
 
-                {/* Money-back guarantee */}
+                {/* Project timeline */}
                 <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl p-4 text-center">
                   <p className="text-[11.5px] text-gray-600 leading-relaxed">
-                    Go-Live in 14 Tagen —{' '}
-                    <span className="text-gray-400 font-medium">oder volle Rückerstattung.</span>
+                    Go-Live typischerweise in{' '}
+                    <span className="text-gray-400 font-medium">7–14 Tagen.</span>
                   </p>
                 </div>
               </div>
@@ -261,7 +193,7 @@ export function FinalCTASection() {
             {/* Below card: quick contact note */}
             <div className="mt-4 flex items-center justify-center gap-2 text-[11.5px] text-gray-400">
               <div className="w-1 h-1 rounded-full bg-emerald-500" />
-              Durchschnittliche Antwortzeit: unter 2 Stunden
+              Antwort in der Regel innerhalb von 24 Stunden
             </div>
           </motion.div>
 
