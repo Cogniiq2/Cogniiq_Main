@@ -27,7 +27,7 @@ Der Fortschritt liegt in `localStorage` — kein Server, kein Konto, keine Netzw
 src/app.html        Gerüst, Design-Tokens, CSS
 src/app.js          Zustand, Auswahllogik, Prüfungsmodus, Ansichten
 src/data/*.js       Aufgabenbestand und Crashkurs-Inhalte
-build.js            baut die eigenständige Einzeldatei dist/index.html
+build.js            baut die eigenständige Einzeldatei annahmetest.html
 check.js            prüft den Bestand (IDs, Optionen, Erklärungen, Abdeckung)
 ```
 
@@ -35,10 +35,10 @@ check.js            prüft den Bestand (IDs, Optionen, Erklärungen, Abdeckung)
 
 ```bash
 node check.js      # Bestand prüfen
-node build.js      # dist/index.html erzeugen
+node build.js      # annahmetest.html erzeugen
 ```
 
-`dist/index.html` ist vollständig eigenständig: eine Datei, keine externen Abhängigkeiten.
+`annahmetest.html` ist vollständig eigenständig: eine Datei, keine externen Abhängigkeiten.
 Sie lässt sich direkt im Browser öffnen oder auf beliebigem Static Hosting ablegen.
 
 ## Aufgaben ergänzen

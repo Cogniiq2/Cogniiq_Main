@@ -1,0 +1,2002 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Annahmetest Garching</title>
+<style>
+:root{
+  --paper:#FAFAFB; --card:#FFFFFF; --raise:#F2F4F7;
+  --ink:#14171C; --ink-2:#5A6270; --ink-3:#878E9B;
+  --line:#E2E5EA; --line-2:#CFD5DE;
+  --accent:#1E5FA8; --accent-ink:#1E5FA8; --accent-soft:#EBF2FA; --accent-line:#B9D2EC;
+  --good:#14804A; --good-soft:#E8F4ED; --good-line:#A7D5BC;
+  --bad:#AF261E; --bad-soft:#FBECEA; --bad-line:#EBB7B2;
+  --warn:#8A5A00;
+  --on-accent:#FFFFFF;
+  --shadow:0 1px 2px rgba(20,23,28,.05), 0 6px 18px -10px rgba(20,23,28,.18);
+  --display:"Iowan Old Style",Georgia,ui-serif,serif;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F1216; --card:#161A20; --raise:#1D222A;
+    --ink:#E9EBEF; --ink-2:#98A1AF; --ink-3:#79828F;
+    --line:#262C35; --line-2:#333B46;
+    --accent:#7FB3EE; --accent-ink:#9CC6F5; --accent-soft:#15263A; --accent-line:#2C4666;
+    --good:#5FD096; --good-soft:#10261C; --good-line:#265C41;
+    --bad:#F08A82; --bad-soft:#2A1614; --bad-line:#5E2A25;
+    --warn:#D9A441;
+    --on-accent:#0F1216;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px -10px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F1216; --card:#161A20; --raise:#1D222A;
+  --ink:#E9EBEF; --ink-2:#98A1AF; --ink-3:#79828F;
+  --line:#262C35; --line-2:#333B46;
+  --accent:#7FB3EE; --accent-ink:#9CC6F5; --accent-soft:#15263A; --accent-line:#2C4666;
+  --good:#5FD096; --good-soft:#10261C; --good-line:#265C41;
+  --bad:#F08A82; --bad-soft:#2A1614; --bad-line:#5E2A25;
+  --warn:#D9A441;
+  --on-accent:#0F1216;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px -10px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--body); font-size:16px; line-height:1.6;
+  -webkit-text-size-adjust:100%;
+}
+h1,h2,h3{font-family:var(--display); font-weight:600; text-wrap:balance; margin:0; letter-spacing:-.01em}
+code,kbd,.mono{font-family:var(--mono)}
+code{font-size:.94em; background:var(--raise); padding:.08em .34em; border-radius:4px}
+pre.code{
+  font-family:var(--mono); font-size:.86rem; line-height:1.55; background:var(--raise);
+  border:1px solid var(--line); border-radius:var(--r); padding:.7rem .85rem; margin:.7rem 0 0;
+  overflow-x:auto; white-space:pre; color:var(--ink);
+}
+button{font:inherit; color:inherit; background:none; border:none; cursor:pointer}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
+
+/* ── chrome ─────────────────────────────────────────── */
+header.bar{
+  position:sticky; top:0; z-index:30; background:var(--paper);
+  border-bottom:1px solid var(--line);
+}
+.bar-in{
+  max-width:52rem; margin:0 auto; padding:.55rem 1.1rem;
+  display:flex; align-items:center; gap:.9rem;
+}
+.brand{font-family:var(--display); font-size:1.02rem; font-weight:600; white-space:nowrap}
+.brand span{color:var(--ink-3); font-family:var(--mono); font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; margin-left:.5rem}
+.count{
+  margin-left:auto; font-family:var(--mono); font-size:.75rem; letter-spacing:.02em;
+  color:var(--ink-2); text-align:right; min-width:0; line-height:1.35;
+}
+.count b{color:var(--accent-ink); font-weight:600; white-space:nowrap}
+nav.tabs{
+  max-width:52rem; margin:0 auto; padding:0 1.1rem; display:flex; gap:.15rem; overflow-x:auto;
+  scrollbar-width:none;
+}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{
+  padding:.5rem .62rem .62rem; font-size:.86rem; color:var(--ink-2);
+  border-bottom:2px solid transparent; white-space:nowrap;
+}
+nav.tabs button:hover{color:var(--ink)}
+nav.tabs button[aria-current="true"]{color:var(--ink); border-bottom-color:var(--accent); font-weight:500}
+nav.tabs .pill{
+  font-family:var(--mono); font-size:.68rem; background:var(--bad-soft); color:var(--bad);
+  border:1px solid var(--bad-line); border-radius:20px; padding:0 .32rem; margin-left:.3rem;
+}
+main{max-width:52rem; margin:0 auto; padding:1.6rem 1.1rem 5rem}
+
+/* ── building blocks ────────────────────────────────── */
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:1.1rem 1.15rem}
+.stack{display:flex; flex-direction:column; gap:1rem}
+.row{display:flex; align-items:center; gap:.6rem; flex-wrap:wrap}
+.eyebrow{
+  font-family:var(--mono); font-size:.7rem; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--ink-3);
+}
+.lead{color:var(--ink-2); margin:.35rem 0 0; max-width:60ch}
+.btn{
+  display:inline-flex; align-items:center; gap:.4rem; padding:.55rem .95rem; border-radius:8px;
+  background:var(--accent); color:var(--on-accent); font-size:.9rem; font-weight:500;
+  border:1px solid var(--accent);
+}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent; color:var(--ink); border-color:var(--line-2)}
+.btn.ghost:hover{background:var(--raise); filter:none}
+.btn.quiet{background:transparent; color:var(--ink-2); border-color:transparent; padding-inline:.4rem}
+.btn.quiet:hover{color:var(--ink); background:var(--raise)}
+.btn[disabled]{opacity:.45; cursor:not-allowed; filter:none}
+
+.meter{height:5px; background:var(--line); border-radius:3px; overflow:hidden}
+.meter i{display:block; height:100%; background:var(--accent); border-radius:3px; transition:width .35s ease}
+.meter.good i{background:var(--good)}
+
+/* ── dashboard ──────────────────────────────────────── */
+.hero{
+  border:1px solid var(--line); border-radius:var(--r); background:var(--card);
+  padding:1.35rem 1.25rem; box-shadow:var(--shadow);
+}
+.hero h1{font-size:1.75rem; line-height:1.2}
+.dday{
+  display:flex; align-items:baseline; gap:.55rem; font-family:var(--mono);
+  margin-top:.9rem; padding-top:.9rem; border-top:1px solid var(--line);
+}
+.dday b{font-size:2.1rem; font-weight:600; color:var(--accent-ink); line-height:1; font-variant-numeric:tabular-nums}
+.dday span{font-size:.8rem; color:var(--ink-2)}
+.facts{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr)); gap:.1rem;
+  margin-top:1rem; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--line);
+}
+.fact{background:var(--card); padding:.65rem .8rem}
+.fact dt{font-family:var(--mono); font-size:.66rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3)}
+.fact dd{margin:.15rem 0 0; font-size:.92rem; font-weight:500}
+
+.tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(13rem,1fr)); gap:.75rem}
+.tile{
+  text-align:left; background:var(--card); border:1px solid var(--line); border-radius:var(--r);
+  padding:.9rem 1rem; display:flex; flex-direction:column; gap:.25rem; transition:border-color .15s;
+}
+.tile:hover{border-color:var(--accent-line)}
+.tile strong{font-size:1rem; font-weight:600}
+.tile em{font-style:normal; color:var(--ink-2); font-size:.83rem}
+.tile .big{font-family:var(--mono); font-size:1.45rem; color:var(--accent-ink); font-variant-numeric:tabular-nums}
+
+/* topic + plan lists */
+.list{display:flex; flex-direction:column; border:1px solid var(--line); border-radius:var(--r); overflow:hidden; background:var(--card)}
+.item{
+  display:grid; grid-template-columns:1fr auto; gap:.2rem .8rem; align-items:center;
+  padding:.7rem .9rem; border-top:1px solid var(--line); text-align:left; width:100%;
+}
+.item:first-child{border-top:none}
+.item:hover{background:var(--raise)}
+.item .nm{font-weight:500; font-size:.94rem}
+.item .sub{grid-column:1/2; font-size:.78rem; color:var(--ink-3); font-family:var(--mono)}
+.item .pct{font-family:var(--mono); font-size:.82rem; color:var(--ink-2); font-variant-numeric:tabular-nums}
+.item .bar{grid-column:1/-1; margin-top:.3rem}
+
+.plan{list-style:none; margin:0; padding:0}
+.plan li{display:flex; gap:.75rem; padding:.75rem .9rem; border-top:1px solid var(--line); align-items:flex-start}
+.plan li:first-child{border-top:none}
+.plan .day{
+  font-family:var(--mono); font-size:.68rem; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--ink-3); min-width:4.4rem; padding-top:.15rem;
+}
+.plan .what{font-size:.9rem}
+.plan .what b{font-weight:600}
+.plan .what p{margin:.15rem 0 0; color:var(--ink-2); font-size:.83rem}
+.plan li.now{background:var(--accent-soft)}
+.plan li.now .day{color:var(--accent-ink)}
+.plan li.ok .what b,.plan li.ok .what p{color:var(--ink-3)}
+.plan .tick{
+  margin-left:auto; align-self:center; flex:none; width:1.5rem; height:1.5rem; border-radius:50%;
+  border:1px solid var(--line-2); color:var(--good); font-size:.8rem; line-height:1;
+  display:grid; place-items:center; background:var(--card);
+}
+.plan .tick:hover{border-color:var(--good)}
+.plan .tick[aria-pressed="true"]{background:var(--good-soft); border-color:var(--good-line)}
+
+/* ── question view ──────────────────────────────────── */
+.qhead{
+  display:flex; align-items:center; gap:.7rem; margin-bottom:.9rem;
+  font-family:var(--mono); font-size:.74rem; color:var(--ink-3); letter-spacing:.04em;
+}
+.qhead .prog{margin-left:auto; font-variant-numeric:tabular-nums}
+.qhead .timer{color:var(--ink-2); font-variant-numeric:tabular-nums}
+.qhead .timer.low{color:var(--bad); font-weight:600}
+.passage{
+  background:var(--raise); border:1px solid var(--line); border-radius:var(--r);
+  padding:1rem 1.1rem; margin-bottom:.9rem; max-height:19rem; overflow-y:auto;
+}
+.passage h3{font-size:.98rem; margin-bottom:.5rem}
+.passage p{margin:0 0 .7rem; font-size:.9rem; line-height:1.65; color:var(--ink)}
+.passage p:last-child{margin-bottom:0}
+.qtext{font-size:1.08rem; line-height:1.5; margin:0 0 1rem; font-weight:500; text-wrap:pretty}
+.opts{display:flex; flex-direction:column; gap:.45rem}
+.opt{
+  display:grid; grid-template-columns:1.55rem 1fr; gap:.6rem; align-items:start; text-align:left;
+  padding:.68rem .8rem; border:1px solid var(--line); border-radius:8px; background:var(--card);
+  font-size:.94rem; line-height:1.45; transition:border-color .12s, background .12s;
+}
+.opt:hover:not([disabled]){border-color:var(--accent-line); background:var(--accent-soft)}
+.opt .k{
+  font-family:var(--mono); font-size:.78rem; color:var(--ink-3); border:1px solid var(--line-2);
+  border-radius:4px; width:1.45rem; height:1.45rem; display:grid; place-items:center; margin-top:.02rem;
+}
+.opt[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft)}
+.opt[aria-pressed="true"] .k{border-color:var(--accent); color:var(--accent-ink)}
+.opt.right{border-color:var(--good-line); background:var(--good-soft)}
+.opt.right .k{border-color:var(--good); color:var(--good)}
+.opt.wrong{border-color:var(--bad-line); background:var(--bad-soft)}
+.opt.wrong .k{border-color:var(--bad); color:var(--bad)}
+.opt[disabled]{cursor:default}
+
+.verdict{margin-top:1rem; border-left:3px solid var(--line-2); padding:.15rem 0 .15rem .9rem}
+.verdict.ok{border-left-color:var(--good)}
+.verdict.no{border-left-color:var(--bad)}
+.verdict .tag{font-family:var(--mono); font-size:.72rem; letter-spacing:.08em; text-transform:uppercase}
+.verdict.ok .tag{color:var(--good)}
+.verdict.no .tag{color:var(--bad)}
+.verdict p{margin:.25rem 0 0; font-size:.9rem; color:var(--ink-2); line-height:1.6}
+.qfoot{display:flex; align-items:center; gap:.6rem; margin-top:1.2rem; flex-wrap:wrap}
+.hint{font-family:var(--mono); font-size:.72rem; color:var(--ink-3); margin-left:auto}
+.hint kbd{border:1px solid var(--line-2); border-radius:3px; padding:0 .25rem; font-size:.95em}
+
+/* ── results ────────────────────────────────────────── */
+.score{display:flex; align-items:baseline; gap:.6rem; font-family:var(--mono)}
+.score b{font-size:2.6rem; font-weight:600; line-height:1; font-variant-numeric:tabular-nums}
+.score span{color:var(--ink-2); font-size:.85rem}
+.rev{border-top:1px solid var(--line); padding:.7rem 0; display:grid; grid-template-columns:1.4rem 1fr; gap:.6rem}
+.rev .mk{font-family:var(--mono); font-size:.8rem}
+.rev .mk.ok{color:var(--good)} .rev .mk.no{color:var(--bad)}
+.rev .q{font-size:.9rem; font-weight:500}
+.rev .a{font-size:.83rem; color:var(--ink-2); margin-top:.15rem}
+.rev .a i{font-style:normal; color:var(--good)}
+.rev .a s{color:var(--bad); text-decoration-color:var(--bad-line)}
+
+/* ── theory ─────────────────────────────────────────── */
+details.th{border:1px solid var(--line); border-radius:var(--r); background:var(--card); overflow:hidden}
+details.th+details.th{margin-top:.5rem}
+details.th summary{
+  padding:.75rem .95rem; cursor:pointer; font-weight:500; font-size:.96rem;
+  display:flex; align-items:center; gap:.6rem; list-style:none;
+}
+details.th summary::-webkit-details-marker{display:none}
+details.th summary::after{content:"+"; margin-left:auto; font-family:var(--mono); color:var(--ink-3)}
+details.th[open] summary::after{content:"−"}
+details.th[open] summary{border-bottom:1px solid var(--line)}
+.thbody{padding:.3rem .95rem 1rem}
+.thbody dl{margin:0}
+.thbody dt{font-weight:600; font-size:.9rem; margin-top:.9rem}
+.thbody dd{margin:.15rem 0 0; font-size:.89rem; color:var(--ink-2); line-height:1.62}
+.thbody dd code{color:var(--ink)}
+
+.empty{text-align:center; padding:2.5rem 1rem; color:var(--ink-2)}
+.empty p{max-width:34ch; margin:.4rem auto 0; font-size:.9rem}
+.foot{margin-top:2.5rem; padding-top:1rem; border-top:1px solid var(--line); font-size:.78rem; color:var(--ink-3); display:flex; gap:.8rem; flex-wrap:wrap; align-items:center}
+.foot a{color:var(--ink-2)}
+
+@media (max-width:430px){
+  .count .upto{display:none}
+  .brand span{display:none}
+}
+@media (max-width:560px){
+  .hero h1{font-size:1.45rem}
+  main{padding-top:1.1rem}
+  .qtext{font-size:1rem}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
+</style>
+
+<header class="bar">
+  <div class="bar-in">
+    <div class="brand">Annahmetest <span>Garching</span></div>
+    <div class="count" id="hcount"></div>
+  </div>
+  <nav class="tabs" id="tabs"></nav>
+</header>
+<main id="view"></main>
+
+<script>
+var QUESTIONS=[], PASSAGES={}, THEORIE=[];
+function q(id,topic,diff,text,opts,ans,exp,pid){
+  QUESTIONS.push({id:id,topic:topic,diff:diff,text:text,opts:opts,ans:ans,exp:exp,pid:pid||null});
+}
+function passage(id,title,text){ PASSAGES[id]={id:id,title:title,text:text}; }
+function theorie(topic,title,items){ THEORIE.push({topic:topic,title:title,items:items}); }
+// Algebra, Gleichungen, Ungleichungen | Potenzen, Wurzeln, Logarithmen
+q("alg-01","algebra",1,"Welche Lösungsmenge hat <code>x² − 5x + 6 = 0</code>?",
+ ["{2; 3}","{−2; −3}","{1; 6}","{−1; −6}","{2; −3}"],0,
+ "Vieta: gesucht sind zwei Zahlen mit Summe 5 und Produkt 6 → 2 und 3. Kein Umweg über die p-q-Formel nötig.");
+
+q("alg-02","algebra",1,"Welche Lösungen hat <code>x² + 4x − 12 = 0</code>?",
+ ["x = 2 und x = −6","x = −2 und x = 6","x = 3 und x = −4","x = 4 und x = −3","x = 1 und x = −12"],0,
+ "Summe der Lösungen = −4, Produkt = −12 → 2 und −6. Probe: 2 + (−6) = −4 ✓, 2 · (−6) = −12 ✓.");
+
+q("alg-03","algebra",1,"<code>(3a − 2b)²</code> ist gleich",
+ ["9a² − 12ab + 4b²","9a² − 6ab + 4b²","9a² − 12ab − 4b²","3a² − 12ab + 2b²","9a² + 4b²"],0,
+ "Binomische Formel: (u−v)² = u² − 2uv + v² mit u = 3a, v = 2b. Der Mischterm ist 2 · 3a · 2b = 12ab.");
+
+q("alg-04","algebra",1,"Für <code>x ≠ 3</code> lässt sich <code>(x² − 9)/(x − 3)</code> vereinfachen zu",
+ ["x + 3","x − 3","x² + 3","3x","1"],0,
+ "Zähler ist die dritte binomische Formel: (x−3)(x+3). Der Faktor (x−3) kürzt sich.");
+
+q("alg-05","algebra",2,"Das Gleichungssystem <code>2x + 3y = 12</code> und <code>x − y = 1</code> hat die Lösung",
+ ["x = 3, y = 2","x = 2, y = 3","x = 4, y = 3","x = 5, y = 4","x = 1, y = 0"],0,
+ "Aus der zweiten Gleichung x = y + 1, eingesetzt: 2(y+1) + 3y = 12 → 5y = 10 → y = 2, x = 3.");
+
+q("alg-06","algebra",1,"Die Ungleichung <code>3 − 2x > 7</code> ist erfüllt für",
+ ["x < −2","x > −2","x < 2","x > 2","x < −5"],0,
+ "−2x > 4, dann durch −2 teilen — dabei dreht sich das Ungleichheitszeichen: x < −2.");
+
+q("alg-07","algebra",2,"Wie groß ist die Summe aller Lösungen von <code>|2x − 6| = 4</code>?",
+ ["6","4","10","2","0"],0,
+ "2x − 6 = 4 → x = 5; 2x − 6 = −4 → x = 1. Summe 6. (Kurz: die Lösungen liegen symmetrisch um x = 3.)");
+
+q("alg-08","algebra",2,"Welchen Wert hat x in <code>1/x + 1/(2x) = 3</code>?",
+ ["1/2","1/3","2","3","2/3"],0,
+ "Linke Seite zusammenfassen: 2/(2x) + 1/(2x) = 3/(2x). Also 3/(2x) = 3 → 2x = 1 → x = 1/2.");
+
+q("alg-09","algebra",3,"Wie viele reelle Lösungen hat <code>√(x + 7) = x − 5</code>?",
+ ["genau eine","genau zwei","keine","unendlich viele","genau drei"],0,
+ "Quadrieren: x + 7 = x² − 10x + 25 → x² − 11x + 18 = 0 → x = 9 oder x = 2. Probe: x = 2 liefert √9 = 3 ≠ −3, ist also Scheinlösung. Nur x = 9 bleibt.");
+
+q("alg-10","algebra",2,"<code>x³ − x</code> vollständig faktorisiert ergibt",
+ ["x(x − 1)(x + 1)","x(x² + 1)","(x − 1)(x + 1)","x²(x − 1)","x(x − 1)²"],0,
+ "Erst x ausklammern: x(x² − 1), dann dritte binomische Formel auf x² − 1 anwenden.");
+
+q("alg-11","algebra",2,"Der Scheitelpunkt der Parabel <code>y = x² − 6x + 5</code> liegt bei",
+ ["(3 | −4)","(−3 | −4)","(3 | 4)","(6 | 5)","(−3 | 14)"],0,
+ "Quadratische Ergänzung: x² − 6x + 9 − 9 + 5 = (x−3)² − 4. Oder: x_S = −b/(2a) = 6/2 = 3, dann y einsetzen.");
+
+q("alg-12","algebra",2,"Für welche Werte von k hat <code>x² + kx + 9 = 0</code> genau eine reelle Lösung?",
+ ["k = 6 oder k = −6","k = 3 oder k = −3","k = 9","k = 0","k = 18"],0,
+ "Genau eine Lösung ⇔ Diskriminante null: k² − 4·1·9 = 0 → k² = 36 → k = ±6.");
+
+q("alg-13","algebra",3,"Wenn <code>x + 1/x = 3</code>, welchen Wert hat dann <code>x² + 1/x²</code>?",
+ ["7","9","6","11","3"],0,
+ "Quadrieren: (x + 1/x)² = x² + 2 + 1/x² = 9. Also x² + 1/x² = 9 − 2 = 7.");
+
+q("alg-14","algebra",1,"Die Summe der Lösungen von <code>2x² − 8x + 6 = 0</code> beträgt",
+ ["4","8","3","−4","6"],0,
+ "Vieta: Summe = −b/a = 8/2 = 4. (Die Lösungen sind 1 und 3.)");
+
+q("alg-15","algebra",1,"<code>(2/3) : (4/9)</code> ergibt",
+ ["3/2","8/27","2/3","4/9","1/6"],0,
+ "Division durch einen Bruch = Multiplikation mit dem Kehrwert: (2/3)·(9/4) = 18/12 = 3/2.");
+
+q("alg-16","algebra",2,"Löst man <code>A = P · (1 + r)</code> nach r auf, erhält man",
+ ["r = A/P − 1","r = A/P + 1","r = (A − 1)/P","r = P/A − 1","r = A − P"],0,
+ "Durch P teilen: A/P = 1 + r, dann 1 subtrahieren.");
+
+q("alg-17","algebra",3,"Löst man <code>1/f = 1/a + 1/b</code> nach b auf, ergibt sich",
+ ["b = a·f/(a − f)","b = a·f/(a + f)","b = (a − f)/(a·f)","b = f − a","b = a/f − 1"],0,
+ "1/b = 1/f − 1/a = (a − f)/(a·f). Kehrwert bilden: b = a·f/(a − f).");
+
+q("alg-18","algebra",1,"Die Ungleichung <code>x² − 4 < 0</code> gilt genau für",
+ ["−2 < x < 2","x < −2 oder x > 2","x < 2","x > −2","x < 4"],0,
+ "x² < 4 bedeutet |x| < 2. Zwischen den Nullstellen ist die nach oben geöffnete Parabel negativ.");
+
+q("alg-19","algebra",2,"Zwei Zahlen haben die Summe 30 und die Differenz 6. Ihr Produkt beträgt",
+ ["216","180","240","144","196"],0,
+ "Die Zahlen sind 18 und 12 (Mittelwert 15, jeweils ±3). Produkt: 18 · 12 = 216. Kurz: 15² − 3² = 225 − 9.");
+
+q("alg-20","algebra",2,"<code>(x + 2)² − (x − 2)²</code> ist gleich",
+ ["8x","0","2x²","4x","8"],0,
+ "Dritte binomische Formel auf die Differenz zweier Quadrate: [(x+2)+(x−2)]·[(x+2)−(x−2)] = 2x · 4 = 8x.");
+
+q("alg-21","algebra",3,"<code>1/(√5 − 2)</code> lässt sich schreiben als",
+ ["√5 + 2","√5 − 2","(√5 + 2)/9","1/9","√5/2"],0,
+ "Mit (√5 + 2) erweitern. Nenner: (√5)² − 2² = 5 − 4 = 1. Es bleibt √5 + 2.");
+
+q("alg-22","algebra",3,"<code>(x³ − 8) : (x − 2)</code> ergibt",
+ ["x² + 2x + 4","x² − 2x + 4","x² + 4","x² − 4","x² + 2x − 4"],0,
+ "Formel a³ − b³ = (a − b)(a² + ab + b²) mit a = x, b = 2. Probe mit x = 0: −8 : −2 = 4 ✓.");
+
+q("alg-23","algebra",2,"Wie lang ist das Lösungsintervall von <code>|x − 3| ≤ 5</code>?",
+ ["10","5","8","3","6"],0,
+ "−5 ≤ x − 3 ≤ 5 → −2 ≤ x ≤ 8. Die Länge ist 8 − (−2) = 10, also immer das Doppelte der Schranke.");
+
+q("alg-24","algebra",2,"Wie lautet die Lösungsmenge von <code>(x − 1)(x + 4) = 0</code>?",
+ ["{1; −4}","{−1; 4}","{1; 4}","{−1; −4}","{0}"],0,
+ "Ein Produkt ist null, sobald ein Faktor null ist: x − 1 = 0 oder x + 4 = 0. Vorzeichen umdrehen, nicht abschreiben.");
+
+q("pot-01","potenz",1,"<code>2¹⁰</code> ist gleich",
+ ["1024","512","2048","100","256"],0,
+ "Zweierpotenzen auswendig: 2⁸ = 256, 2⁹ = 512, 2¹⁰ = 1024. Diese Reihe spart im Test viel Zeit.");
+
+q("pot-02","potenz",1,"<code>(2³)⁴</code> ist gleich",
+ ["4096","128","512","2401","64"],0,
+ "Potenz einer Potenz: Exponenten multiplizieren → 2¹² = 4096 (= 4 · 1024).");
+
+q("pot-03","potenz",1,"<code>a⁵ · a⁻³</code> ist gleich",
+ ["a²","a⁻¹⁵","a⁸","a⁻²","a"],0,
+ "Gleiche Basis, Multiplikation: Exponenten addieren → 5 + (−3) = 2.");
+
+q("pot-04","potenz",2,"<code>8^(2/3)</code> ist gleich",
+ ["4","16","2","6","64"],0,
+ "Erst die dritte Wurzel (∛8 = 2), dann quadrieren: 2² = 4. Immer zuerst wurzeln, dann potenzieren — die Zahlen bleiben klein.");
+
+q("pot-05","potenz",2,"<code>27^(−1/3)</code> ist gleich",
+ ["1/3","−3","3","−1/3","1/9"],0,
+ "Negativer Exponent = Kehrwert, Nenner 3 = dritte Wurzel: 1/∛27 = 1/3.");
+
+q("pot-06","potenz",1,"<code>log₂(32)</code> ist gleich",
+ ["5","6","4","16","2"],0,
+ "Frage: 2 hoch was ergibt 32? 2⁵ = 32.");
+
+q("pot-07","potenz",2,"<code>log₃(1/9)</code> ist gleich",
+ ["−2","2","−3","1/2","−1/9"],0,
+ "1/9 = 3⁻², also ist der Logarithmus −2. Logarithmen von Zahlen unter 1 sind negativ.");
+
+q("pot-08","potenz",1,"<code>log(a) + log(b)</code> ist gleich",
+ ["log(a·b)","log(a + b)","log(a/b)","log(a)·log(b)","log(aᵇ)"],0,
+ "Erstes Logarithmusgesetz: Aus Produkt wird Summe. Entsprechend log(a) − log(b) = log(a/b).");
+
+q("pot-09","potenz",3,"Welches x löst <code>2ˣ = 8^(x − 2)</code>?",
+ ["3","2","6","4","1"],0,
+ "Beide Seiten auf Basis 2: 8^(x−2) = 2^(3x−6). Exponenten gleichsetzen: x = 3x − 6 → 2x = 6 → x = 3.");
+
+q("pot-10","potenz",2,"Welches x löst <code>3^(2x) = 81</code>?",
+ ["2","4","3","1/2","9"],0,
+ "81 = 3⁴, also 2x = 4 → x = 2.");
+
+q("pot-11","potenz",2,"<code>log₅(125) − log₅(5)</code> ist gleich",
+ ["2","3","1","25","5"],0,
+ "3 − 1 = 2. Alternativ: log₅(125/5) = log₅(25) = 2.");
+
+q("pot-12","potenz",1,"<code>ln(e³)</code> ist gleich",
+ ["3","e³","1/3","e","0"],0,
+ "ln ist der Logarithmus zur Basis e, also hebt ln(eˣ) = x sich gegenseitig auf.");
+
+q("pot-13","potenz",2,"<code>10^(log₁₀ 7)</code> ist gleich",
+ ["7","10","70","log 7","1"],0,
+ "Potenz und Logarithmus zur selben Basis sind Umkehrfunktionen und heben sich auf.");
+
+q("pot-14","potenz",1,"<code>√50</code> ist gleich",
+ ["5√2","2√5","25√2","10√5","√5 · √20"],0,
+ "50 = 25 · 2, und √25 = 5. Quadratzahlen immer aus der Wurzel ziehen.");
+
+q("pot-15","potenz",2,"<code>(√2)⁸</code> ist gleich",
+ ["16","8","4","64","2√2"],0,
+ "(2^(1/2))⁸ = 2⁴ = 16.");
+
+q("pot-16","potenz",2,"Welches x löst <code>4ˣ = 1/64</code>?",
+ ["−3","3","−4","−1/3","−16"],0,
+ "64 = 4³, also 1/64 = 4⁻³ → x = −3.");
+
+q("pot-17","potenz",1,"Wenn <code>log₂ x = 5</code>, dann ist x gleich",
+ ["32","10","25","64","16"],0,
+ "Definition des Logarithmus: x = 2⁵ = 32.");
+
+q("pot-18","potenz",2,"<code>2⁴⁰ : 2³⁷</code> ist gleich",
+ ["8","3","2⁷⁷","1,08","16"],0,
+ "Division bei gleicher Basis: Exponenten subtrahieren → 2³ = 8. Nicht dividieren, sondern subtrahieren — 2⁷⁷ wäre die Multiplikation.");
+
+q("pot-19","potenz",2,"<code>(0,5)⁻²</code> ist gleich",
+ ["4","−0,25","0,25","2","−4"],0,
+ "0,5 = 1/2, negativer Exponent kehrt um: (2)² = 4.");
+
+q("pot-20","potenz",3,"Welche Aussage über <code>log₂ 6</code> ist richtig?",
+ ["2 < log₂ 6 < 3","1 < log₂ 6 < 2","3 < log₂ 6 < 4","log₂ 6 = 3","log₂ 6 > 4"],0,
+ "2² = 4 < 6 < 8 = 2³, also liegt der Logarithmus zwischen 2 und 3. Einschachteln statt rechnen — ohne Taschenrechner der Standardtrick.");
+
+q("pot-21","potenz",2,"<code>x^(1/2) · x^(1/3)</code> ist gleich",
+ ["x^(5/6)","x^(1/6)","x^(2/3)","x^(1/5)","x^(3/2)"],0,
+ "Exponenten addieren: 1/2 + 1/3 = 3/6 + 2/6 = 5/6.");
+
+q("pot-22","potenz",2,"Wie viele Nullen hat <code>10⁵ · 10³</code> am Ende?",
+ ["8","15","5","3","2"],0,
+ "10⁵ · 10³ = 10⁸ — der Exponent zählt direkt die Nullen.");
+
+// Prozent, Zins, Dreisatz, Wachstum | Analysis
+q("pro-01","prozent",1,"35 % von 240 sind",
+ ["84","74","96","68","120"],0,
+ "10 % = 24, also 30 % = 72; 5 % = 12. Zusammen 84. Prozente immer über 10 %- und 5 %-Bausteine zerlegen.");
+
+q("pro-02","prozent",1,"Ein Artikel kostet 80 €. Nach einer Erhöhung um 25 % kostet er",
+ ["100 €","105 €","96 €","110 €","85 €"],0,
+ "25 % von 80 = 20. Neuer Preis 100 €. Faktor: 80 · 1,25.");
+
+q("pro-03","prozent",2,"Ein Preis wird zuerst um 20 %, danach um weitere 10 % gesenkt. Die Gesamtsenkung beträgt",
+ ["28 %","30 %","25 %","32 %","18 %"],0,
+ "Faktoren multiplizieren: 0,8 · 0,9 = 0,72, also bleiben 72 % übrig. Prozentsätze niemals addieren.");
+
+q("pro-04","prozent",1,"Eine Größe steigt von 250 auf 300. Das ist eine Zunahme um",
+ ["20 %","16,7 %","50 %","25 %","30 %"],0,
+ "Zunahme 50, bezogen auf den Ausgangswert 250: 50/250 = 1/5 = 20 %. Grundwert ist immer der <em>alte</em> Wert.");
+
+q("pro-05","prozent",2,"Eine Größe sinkt von 300 auf 250. Das ist eine Abnahme um",
+ ["16,7 %","20 %","50 %","25 %","83,3 %"],0,
+ "50/300 = 1/6 ≈ 16,7 %. Beachte: derselbe absolute Unterschied wie in der Aufgabe davor, aber anderer Grundwert.");
+
+q("pro-06","prozent",2,"Nach 20 % Rabatt kostet ein Artikel 96 €. Der ursprüngliche Preis war",
+ ["120 €","116 €","115,20 €","124 €","112 €"],0,
+ "96 € entsprechen 80 %. 1 % = 1,20 €, also 100 % = 120 €. Rückwärtsrechnen heißt dividieren (96 : 0,8), nicht 20 % aufschlagen.");
+
+q("pro-07","prozent",2,"Ein Bruttopreis beträgt 119 € bei 19 % Mehrwertsteuer. Der Nettopreis ist",
+ ["100,00 €","96,39 €","99,00 €","101,00 €","95,20 €"],0,
+ "Brutto = Netto · 1,19 → Netto = 119 : 1,19 = 100 €.");
+
+q("pro-08","prozent",2,"1.000 € werden zwei Jahre lang mit 10 % p. a. verzinst (Zinseszins). Das Endkapital beträgt",
+ ["1.210 €","1.200 €","1.100 €","1.221 €","1.230 €"],0,
+ "1000 · 1,1² = 1000 · 1,21. Im zweiten Jahr werden auch die Zinsen des ersten Jahres verzinst.");
+
+q("pro-09","prozent",2,"Bei 8 % Verzinsung pro Jahr verdoppelt sich ein Kapital ungefähr nach",
+ ["9 Jahren","12,5 Jahren","8 Jahren","16 Jahren","6 Jahren"],0,
+ "72er-Regel: Verdopplungszeit ≈ 72 : Zinssatz = 72 : 8 = 9. Ohne Taschenrechner die schnellste Näherung.");
+
+q("pro-10","prozent",2,"6 gleich schnelle Maschinen brauchen für einen Auftrag 12 Tage. Wie lange brauchen 8 Maschinen?",
+ ["9 Tage","16 Tage","10 Tage","8 Tage","6 Tage"],0,
+ "Umgekehrt proportional: 6 · 12 = 72 Maschinentage. 72 : 8 = 9. Mehr Maschinen → weniger Zeit.");
+
+q("pro-11","prozent",2,"4 Maler streichen eine Halle in 6 Stunden. Wie lange brauchen 3 Maler?",
+ ["8 Stunden","4,5 Stunden","7 Stunden","9 Stunden","6 Stunden"],0,
+ "4 · 6 = 24 Arbeitsstunden, geteilt durch 3 Maler = 8 Stunden.");
+
+q("pro-12","prozent",3,"200 g einer 10-prozentigen Lösung werden mit 300 g einer 20-prozentigen Lösung gemischt. Die Mischung hat",
+ ["16 %","15 %","17,5 %","14 %","30 %"],0,
+ "Reine Substanz: 20 g + 60 g = 80 g auf 500 g Gesamtmasse = 16 %. Nie die Prozentsätze mitteln, immer die Mengen addieren.");
+
+q("pro-13","prozent",3,"Ein Auto fährt 60 km mit 60 km/h hin und dieselbe Strecke mit 30 km/h zurück. Die Durchschnittsgeschwindigkeit beträgt",
+ ["40 km/h","45 km/h","50 km/h","35 km/h","30 km/h"],0,
+ "Gesamtstrecke 120 km, Gesamtzeit 1 h + 2 h = 3 h → 40 km/h. Geschwindigkeiten darf man nicht mitteln.");
+
+q("pro-14","prozent",1,"400 € werden im Verhältnis 3 : 5 aufgeteilt. Der größere Anteil beträgt",
+ ["250 €","240 €","260 €","300 €","225 €"],0,
+ "8 Teile insgesamt, ein Teil = 50 €. Der größere Anteil hat 5 Teile = 250 €.");
+
+q("pro-15","prozent",2,"Ein Kurs steigt um 10 % und fällt anschließend um 10 %. Gegenüber dem Startwert steht er nun",
+ ["1 % tiefer","genau gleich","1 % höher","2 % tiefer","10 % tiefer"],0,
+ "1,1 · 0,9 = 0,99. Eine Erhöhung und eine gleich große Senkung heben sich nie exakt auf.");
+
+q("pro-16","prozent",2,"Ein Unternehmen hat 12.000 € Fixkosten und erzielt pro verkauftem Stück 30 € Deckungsbeitrag. Der Break-even liegt bei",
+ ["400 Stück","360 Stück","300 Stück","450 Stück","1.200 Stück"],0,
+ "Break-even = Fixkosten : Deckungsbeitrag pro Stück = 12.000 : 30 = 400. Ab dem 401. Stück entsteht Gewinn.");
+
+q("pro-17","prozent",3,"Ein Umsatz wächst drei Jahre lang um jeweils 5 %. Insgesamt ist er gewachsen um etwa",
+ ["16 %","15 %","5 %","20 %","18 %"],0,
+ "1,05³ ≈ 1,158. Faustregel: etwas mehr als 3 · 5 % wegen des Zinseszinseffekts.");
+
+q("pro-18","prozent",2,"Von 800 Bewerbern bestehen 12,5 % den Test. Das sind",
+ ["100","125","80","96","64"],0,
+ "12,5 % = 1/8. 800 : 8 = 100. Häufige Brüche kennen: 12,5 % = 1/8, 25 % = 1/4, 33⅓ % = 1/3, 6,25 % = 1/16.");
+
+q("ana-01","analysis",1,"Die Ableitung von <code>f(x) = x³</code> ist",
+ ["3x²","x²/3","3x","x⁴/4","3x³"],0,
+ "Potenzregel: Exponent nach vorn, Exponent um 1 verringern.");
+
+q("ana-02","analysis",1,"Die Ableitung von <code>f(x) = 5x² − 3x + 7</code> ist",
+ ["10x − 3","10x − 3 + 7","5x − 3","10x + 7","10x"],0,
+ "Summandenweise ableiten; die Konstante 7 fällt weg.");
+
+q("ana-03","analysis",2,"Die Ableitung von <code>f(x) = 1/x</code> ist",
+ ["−1/x²","1/x²","ln x","−x²","−1/(2x)"],0,
+ "1/x = x⁻¹, Potenzregel: −1 · x⁻² = −1/x².");
+
+q("ana-04","analysis",2,"Die Ableitung von <code>f(x) = √x</code> ist",
+ ["1/(2√x)","2√x","√x/2","1/√x","x^(3/2)"],0,
+ "√x = x^(1/2), abgeleitet ½ · x^(−1/2) = 1/(2√x).");
+
+q("ana-05","analysis",2,"Die Ableitung von <code>f(x) = (2x + 1)³</code> ist",
+ ["6(2x + 1)²","3(2x + 1)²","2(2x + 1)²","6(2x + 1)","(2x + 1)²"],0,
+ "Kettenregel: äußere Ableitung 3(2x+1)² mal innere Ableitung 2.");
+
+q("ana-06","analysis",3,"Die Ableitung von <code>f(x) = x · eˣ</code> ist",
+ ["eˣ(x + 1)","eˣ","x · eˣ","eˣ(x − 1)","x² · eˣ/2"],0,
+ "Produktregel: 1 · eˣ + x · eˣ = eˣ(x + 1).");
+
+q("ana-07","analysis",2,"Die Ableitung von <code>f(x) = e^(2x)</code> ist",
+ ["2e^(2x)","e^(2x)","2xe^(2x−1)","e²","2e^x"],0,
+ "Kettenregel: e-Funktion bleibt stehen, mal innere Ableitung 2.");
+
+q("ana-08","analysis",3,"Die Ableitung von <code>f(x) = ln(3x)</code> ist",
+ ["1/x","3/x","1/(3x)","ln 3","3 ln x"],0,
+ "Kettenregel: (1/(3x)) · 3 = 1/x. Der konstante Faktor im Logarithmus verschwindet beim Ableiten.");
+
+q("ana-09","analysis",2,"<code>f(x) = x² − 6x + 1</code> hat ein Minimum bei",
+ ["x = 3","x = −3","x = 6","x = 0","x = 1"],0,
+ "f'(x) = 2x − 6 = 0 → x = 3. f''(x) = 2 > 0, also Minimum.");
+
+q("ana-10","analysis",3,"<code>f(x) = x³ − 3x</code> hat lokale Extremstellen bei",
+ ["x = 1 und x = −1","x = 0 und x = 3","x = 3 und x = −3","nur x = 0","gar keinen"],0,
+ "f'(x) = 3x² − 3 = 0 → x² = 1 → x = ±1.");
+
+q("ana-11","analysis",3,"Der Wendepunkt von <code>f(x) = x³ − 3x²</code> liegt bei",
+ ["x = 1","x = 0","x = 2","x = 3","x = −1"],0,
+ "f''(x) = 6x − 6 = 0 → x = 1. Wendepunkt = Nullstelle der zweiten Ableitung mit Vorzeichenwechsel.");
+
+q("ana-12","analysis",1,"<code>∫ x² dx</code> ist gleich",
+ ["x³/3 + C","2x + C","x³ + C","3x³ + C","x²/2 + C"],0,
+ "Stammfunktion: Exponent um 1 erhöhen, durch den neuen Exponenten teilen.");
+
+q("ana-13","analysis",2,"<code>∫₀¹ 2x dx</code> ist gleich",
+ ["1","2","1/2","0","4"],0,
+ "Stammfunktion x², eingesetzt: 1² − 0² = 1. Anschaulich: Dreiecksfläche mit Grundseite 1 und Höhe 2.");
+
+q("ana-14","analysis",2,"<code>∫ (1/x) dx</code> ist gleich",
+ ["ln|x| + C","−1/x² + C","x⁰ + C","1/(2x²) + C","x · ln x + C"],0,
+ "Die einzige Ausnahme der Potenzregel — Exponent −1 lässt sich nicht um 1 erhöhen.");
+
+q("ana-15","analysis",3,"<code>lim (x→∞) (3x² + 2)/(x² − 5)</code> ist gleich",
+ ["3","0","∞","−3","1"],0,
+ "Bei gleichem Grad in Zähler und Nenner entscheidet das Verhältnis der Leitkoeffizienten: 3/1.");
+
+q("ana-16","analysis",2,"<code>lim (x→∞) (2x + 1)/x²</code> ist gleich",
+ ["0","2","∞","1","1/2"],0,
+ "Der Nenner wächst schneller (Grad 2 > Grad 1), der Bruch geht gegen null.");
+
+q("ana-17","analysis",3,"<code>lim (x→2) (x² − 4)/(x − 2)</code> ist gleich",
+ ["4","0","2","existiert nicht","∞"],0,
+ "Kürzen statt einsetzen: (x−2)(x+2)/(x−2) = x + 2 → 4.");
+
+q("ana-18","analysis",2,"Die Tangente an <code>f(x) = x²</code> an der Stelle x = 3 hat die Steigung",
+ ["6","9","3","1/6","12"],0,
+ "Steigung = f'(3) = 2 · 3 = 6.");
+
+q("ana-19","analysis",1,"Wenn <code>f'(x) > 0</code> auf einem Intervall gilt, dann ist f dort",
+ ["streng monoton steigend","streng monoton fallend","konstant","linksgekrümmt","ohne Extremstelle nicht bestimmbar"],0,
+ "Positive Steigung heißt: Die Funktionswerte nehmen zu. Über die Krümmung sagt f' nichts aus.");
+
+q("ana-20","analysis",2,"Die Fläche zwischen <code>f(x) = x</code>, der x-Achse und x = 0 bis x = 4 beträgt",
+ ["8","16","4","2","12"],0,
+ "Dreieck mit Grundseite 4 und Höhe 4: ½ · 4 · 4 = 8. Deckt sich mit ∫₀⁴ x dx = x²/2.");
+
+q("ana-21","analysis",3,"Wie viele reelle Nullstellen hat <code>f(x) = x⁴ − 2x²</code>?",
+ ["3","2","4","1","0"],0,
+ "x²(x² − 2) = 0 → x = 0 (doppelt) sowie x = ±√2. Verschiedene Stellen: drei.");
+
+q("ana-22","analysis",1,"Notwendige Bedingung für eine Extremstelle von f ist",
+ ["f'(x) = 0","f''(x) = 0","f(x) = 0","f'(x) > 0","f''(x) < 0"],0,
+ "f'(x) = 0 ist notwendig, aber nicht hinreichend — siehe x³ an der Stelle 0 (Sattelpunkt).");
+
+// Geometrie & Trigonometrie | Stochastik & Kombinatorik | Folgen & Reihen
+q("geo-01","geo",1,"Ein Kreis hat den Radius 5. Sein Flächeninhalt beträgt",
+ ["25π","10π","5π","100π","25"],0,
+ "A = πr² = π · 25. Nicht mit dem Umfang U = 2πr = 10π verwechseln.");
+
+q("geo-02","geo",1,"Ein Kreis hat den Durchmesser 10. Sein Umfang beträgt",
+ ["10π","20π","5π","25π","100π"],0,
+ "U = π · d. Wer mit dem Radius rechnet: U = 2π · 5 = 10π.");
+
+q("geo-03","geo",1,"Ein rechtwinkliges Dreieck hat die Katheten 6 und 8. Die Hypotenuse ist",
+ ["10","14","12","√14","48"],0,
+ "6-8-10 ist das klassische pythagoreische Tripel (Vielfaches von 3-4-5). Solche Tripel auswendig kennen: 3-4-5, 5-12-13, 8-15-17.");
+
+q("geo-04","geo",1,"Ein Würfel hat die Kantenlänge 3. Seine Oberfläche beträgt",
+ ["54","27","36","18","9"],0,
+ "6 Quadrate à 3² = 9, also 6 · 9 = 54. Das Volumen wäre 27.");
+
+q("geo-05","geo",2,"Verdoppelt man die Kantenlänge eines Würfels, so wird sein Volumen",
+ ["8-mal so groß","doppelt so groß","4-mal so groß","6-mal so groß","3-mal so groß"],0,
+ "Volumen skaliert mit der dritten Potenz: 2³ = 8. Flächen skalieren mit 2² = 4.");
+
+q("geo-06","geo",2,"Verdoppelt man den Radius eines Kreises, so wird sein Flächeninhalt",
+ ["4-mal so groß","doppelt so groß","8-mal so groß","gleich groß","π-mal so groß"],0,
+ "A = πr², also geht ein Faktor 2 beim Radius quadratisch ein.");
+
+q("geo-07","geo",1,"Ein Dreieck mit Grundseite 12 und zugehöriger Höhe 5 hat den Flächeninhalt",
+ ["30","60","17","24","120"],0,
+ "A = ½ · g · h = ½ · 12 · 5.");
+
+q("geo-08","geo",2,"Die Summe der Innenwinkel eines Fünfecks beträgt",
+ ["540°","360°","720°","450°","900°"],0,
+ "Formel (n − 2) · 180° = 3 · 180°. Ein n-Eck zerfällt in n − 2 Dreiecke.");
+
+q("geo-09","geo",1,"<code>sin(30°)</code> ist gleich",
+ ["1/2","√3/2","√2/2","1","√3/3"],0,
+ "Die drei Standardwerte merken: sin 30° = 1/2, sin 45° = √2/2, sin 60° = √3/2.");
+
+q("geo-10","geo",2,"<code>cos(60°)</code> ist gleich",
+ ["1/2","√3/2","√2/2","0","1"],0,
+ "cos 60° = sin 30° = 1/2. Cosinus ist der gespiegelte Sinus: cos α = sin(90° − α).");
+
+q("geo-11","geo",1,"<code>tan(45°)</code> ist gleich",
+ ["1","0","√2","1/2","∞"],0,
+ "tan = sin/cos, und bei 45° sind beide gleich groß.");
+
+q("geo-12","geo",3,"Wenn für einen spitzen Winkel <code>sin α = 3/5</code> gilt, dann ist <code>cos α</code>",
+ ["4/5","5/3","3/4","2/5","−4/5"],0,
+ "Trigonometrischer Pythagoras sin²α + cos²α = 1: cos²α = 1 − 9/25 = 16/25. Bei einem spitzen Winkel ist der Cosinus positiv.");
+
+q("geo-13","geo",2,"Ein Zylinder hat den Radius 2 und die Höhe 5. Sein Volumen beträgt",
+ ["20π","10π","40π","25π","20"],0,
+ "V = Grundfläche · Höhe = πr² · h = π · 4 · 5.");
+
+q("geo-14","geo",2,"Die Diagonale eines Quadrats mit der Seitenlänge 4 ist",
+ ["4√2","8","4√3","2√2","16"],0,
+ "Diagonale = Seite · √2 (Pythagoras im halben Quadrat).");
+
+q("geo-15","geo",2,"Eine Kugel mit Radius 3 hat das Volumen",
+ ["36π","27π","12π","108π","9π"],0,
+ "V = (4/3)πr³ = (4/3) · π · 27 = 36π.");
+
+q("geo-16","geo",2,"Die Gerade durch die Punkte (1 | 2) und (4 | 11) hat die Steigung",
+ ["3","9","1/3","13/5","2"],0,
+ "m = Δy/Δx = (11 − 2)/(4 − 1) = 9/3.");
+
+q("geo-17","geo",2,"Die Gerade <code>y = 2x + 3</code> schneidet die x-Achse bei",
+ ["x = −1,5","x = 3","x = 1,5","x = −3","x = 0"],0,
+ "x-Achse heißt y = 0: 0 = 2x + 3 → x = −1,5.");
+
+q("geo-18","geo",1,"Der Abstand der Punkte (0 | 0) und (3 | 4) beträgt",
+ ["5","7","√7","12","25"],0,
+ "Pythagoras: √(3² + 4²) = √25.");
+
+q("geo-19","geo",3,"Ein Trapez hat die parallelen Seiten 6 und 10 und die Höhe 4. Sein Flächeninhalt ist",
+ ["32","40","60","24","16"],0,
+ "A = ½ · (a + c) · h = ½ · 16 · 4. Anschaulich: mittlere Breite 8 mal Höhe 4.");
+
+q("geo-20","geo",3,"Zwei ähnliche Dreiecke verhalten sich in ihren Seitenlängen wie 2 : 3. Ihre Flächen verhalten sich wie",
+ ["4 : 9","2 : 3","8 : 27","3 : 2","16 : 81"],0,
+ "Längenverhältnis k → Flächenverhältnis k², Volumenverhältnis k³.");
+
+q("sto-01","stoch",1,"Mit welcher Wahrscheinlichkeit zeigt ein fairer Würfel eine gerade Zahl?",
+ ["1/2","1/3","1/6","2/3","5/6"],0,
+ "Drei günstige (2, 4, 6) von sechs möglichen Ergebnissen.");
+
+q("sto-02","stoch",2,"Zwei faire Würfel werden geworfen. Wie wahrscheinlich ist die Augensumme 7?",
+ ["1/6","1/12","7/36","1/36","5/36"],0,
+ "6 der 36 Kombinationen ergeben 7 (1+6, 2+5, 3+4 und jeweils vertauscht). 7 ist die häufigste Augensumme.");
+
+q("sto-03","stoch",1,"Wie wahrscheinlich ist es, mit zwei Würfeln zweimal eine Sechs zu werfen?",
+ ["1/36","1/12","1/6","2/6","1/18"],0,
+ "Unabhängige Ereignisse: Wahrscheinlichkeiten multiplizieren, 1/6 · 1/6.");
+
+q("sto-04","stoch",2,"Eine faire Münze wird dreimal geworfen. Wie wahrscheinlich ist genau zweimal Kopf?",
+ ["3/8","1/2","1/4","1/8","2/3"],0,
+ "8 gleich wahrscheinliche Verläufe, davon 3 mit genau zweimal Kopf (KKZ, KZK, ZKK).");
+
+q("sto-05","stoch",2,"Eine faire Münze wird dreimal geworfen. Wie wahrscheinlich ist mindestens einmal Kopf?",
+ ["7/8","1/2","3/8","1/8","5/8"],0,
+ "Gegenereignis „nie Kopf“ hat die Wahrscheinlichkeit (1/2)³ = 1/8. Bei „mindestens“ immer über das Gegenereignis rechnen.");
+
+q("sto-06","stoch",1,"In einer Urne liegen 3 rote und 5 blaue Kugeln. Wie wahrscheinlich ist eine rote Kugel bei einem Zug?",
+ ["3/8","3/5","5/8","1/3","1/8"],0,
+ "3 günstige von 8 Kugeln insgesamt.");
+
+q("sto-07","stoch",3,"Aus einer Urne mit 3 roten und 5 blauen Kugeln werden zwei Kugeln ohne Zurücklegen gezogen. Wie wahrscheinlich sind beide rot?",
+ ["3/28","9/64","1/8","3/64","6/8"],0,
+ "3/8 · 2/7 = 6/56 = 3/28. Ohne Zurücklegen sinken Zähler und Nenner im zweiten Zug.");
+
+q("sto-08","stoch",1,"Auf wie viele verschiedene Arten können sich 5 Personen in eine Reihe stellen?",
+ ["120","25","60","20","3125"],0,
+ "5! = 5 · 4 · 3 · 2 · 1. Fakultäten bis 6! kennen: 1, 2, 6, 24, 120, 720.");
+
+q("sto-09","stoch",2,"Wie viele verschiedene 3-elementige Teams lassen sich aus 10 Personen bilden?",
+ ["120","720","1000","30","210"],0,
+ "Binomialkoeffizient (10 über 3) = (10·9·8)/(3·2·1) = 720/6 = 120. Reihenfolge spielt keine Rolle.");
+
+q("sto-10","stoch",2,"Wie viele Möglichkeiten gibt es, aus 10 Personen einen Vorsitzenden und einen Stellvertreter zu wählen?",
+ ["90","45","100","20","120"],0,
+ "Hier zählt die Reihenfolge: 10 · 9 = 90.");
+
+q("sto-11","stoch",1,"Wie viele vierstellige PINs gibt es, wenn jede Stelle eine Ziffer von 0 bis 9 sein darf?",
+ ["10.000","5.040","4.000","40","9.000"],0,
+ "10 Möglichkeiten pro Stelle, viermal unabhängig: 10⁴.");
+
+q("sto-12","stoch",3,"Wie viele verschiedene Buchstabenfolgen lassen sich aus den Buchstaben von OTTO bilden?",
+ ["6","24","12","4","16"],0,
+ "4! = 24, geteilt durch die Wiederholungen 2! (zwei O) und 2! (zwei T) → 24/4 = 6.");
+
+q("sto-13","stoch",2,"Der Erwartungswert der Augenzahl eines fairen Würfels beträgt",
+ ["3,5","3","4","3,0","6"],0,
+ "(1+2+3+4+5+6)/6 = 21/6. Bei symmetrischer Verteilung liegt der Erwartungswert in der Mitte.");
+
+q("sto-14","stoch",3,"Ein Spiel kostet 2 € Einsatz. Mit Wahrscheinlichkeit 1/4 gewinnt man 6 €, sonst nichts. Der erwartete Gewinn pro Spiel beträgt",
+ ["−0,50 €","+1,50 €","+0,50 €","−1,00 €","0 €"],0,
+ "Erwarteter Auszahlungsbetrag 1/4 · 6 = 1,50 €, abzüglich 2 € Einsatz → −0,50 €. Das Spiel ist unfair.");
+
+q("sto-15","stoch",3,"Wie wahrscheinlich ist mindestens eine Sechs bei drei Würfen?",
+ ["91/216","1/2","3/6","125/216","1/216"],0,
+ "1 − (5/6)³ = 1 − 125/216 = 91/216, also knapp 42 %.");
+
+q("sto-16","stoch",2,"Für zwei beliebige Ereignisse A und B gilt",
+ ["P(A∪B) = P(A) + P(B) − P(A∩B)","P(A∪B) = P(A) + P(B)","P(A∩B) = P(A) + P(B)","P(A∪B) = P(A) · P(B)","P(A∪B) = 1 − P(A∩B)"],0,
+ "Additionssatz: Der Überschneidungsbereich würde sonst doppelt gezählt. Nur bei unvereinbaren Ereignissen entfällt er.");
+
+q("sto-17","stoch",2,"Zwei Ereignisse A und B heißen (stochastisch) unabhängig, wenn gilt",
+ ["P(A∩B) = P(A) · P(B)","P(A∩B) = 0","P(A∪B) = 1","P(A) = P(B)","P(A|B) = 0"],0,
+ "Unabhängig heißt: Das Eintreten von B ändert die Wahrscheinlichkeit von A nicht. Nicht mit „unvereinbar“ (P(A∩B) = 0) verwechseln.");
+
+q("sto-18","stoch",2,"Auf einer Feier begrüßt jede der 8 Personen jede andere mit Handschlag. Wie viele Handschläge gibt es?",
+ ["28","64","56","16","36"],0,
+ "(8 über 2) = 8 · 7 / 2 = 28. Durch 2, weil ein Handschlag zwei Personen zugleich betrifft.");
+
+q("sto-19","stoch",3,"In einer Gruppe sind 60 % Frauen. 20 % der Frauen und 50 % der Männer tragen eine Brille. Wie hoch ist der Brillenanteil insgesamt?",
+ ["32 %","35 %","28 %","40 %","30 %"],0,
+ "0,6 · 0,2 + 0,4 · 0,5 = 0,12 + 0,20 = 0,32. Satz von der totalen Wahrscheinlichkeit.");
+
+q("sto-20","stoch",3,"Ein Test erkennt eine Krankheit mit 90 % Sicherheit. Er wird zweimal unabhängig durchgeführt. Wie wahrscheinlich schlägt er mindestens einmal an?",
+ ["99 %","81 %","90 %","95 %","100 %"],0,
+ "Gegenereignis: zweimal versagen = 0,1 · 0,1 = 1 %. Also 99 %.");
+
+q("fol-01","folgen",1,"Eine arithmetische Folge beginnt mit 3 und hat die Differenz 4. Das 10. Glied ist",
+ ["39","43","40","37","30"],0,
+ "aₙ = a₁ + (n − 1)·d = 3 + 9 · 4. Häufiger Fehler: 10 statt 9 Schritte rechnen.");
+
+q("fol-02","folgen",1,"Die Summe <code>1 + 2 + 3 + … + 100</code> beträgt",
+ ["5.050","5.000","10.100","4.950","5.500"],0,
+ "Gauß: n(n+1)/2 = 100 · 101/2.");
+
+q("fol-03","folgen",2,"Die Summe der ersten 20 geraden Zahlen (2 + 4 + … + 40) beträgt",
+ ["420","400","380","800","210"],0,
+ "2 · (1 + 2 + … + 20) = 2 · 210 = 420. Oder: 20 Paare-Mittelwert 21 mal 20.");
+
+q("fol-04","folgen",2,"Eine geometrische Folge beginnt mit 2 und hat den Quotienten 3. Das 5. Glied ist",
+ ["162","486","96","54","243"],0,
+ "aₙ = a₁ · qⁿ⁻¹ = 2 · 3⁴ = 2 · 81.");
+
+q("fol-05","folgen",2,"Welche Zahl setzt die Folge 2, 6, 18, 54, … fort?",
+ ["162","108","216","72","144"],0,
+ "Jedes Glied ist das Dreifache des vorherigen.");
+
+q("fol-06","folgen",3,"Die unendliche Reihe <code>1 + 1/2 + 1/4 + 1/8 + …</code> hat den Wert",
+ ["2","1","∞","1,5","e"],0,
+ "Geometrische Reihe mit q = 1/2: Summe = a₁/(1 − q) = 1/(1/2) = 2. Konvergiert nur für |q| < 1.");
+
+q("fol-07","folgen",3,"Die unendliche Reihe <code>1/3 + 1/9 + 1/27 + …</code> hat den Wert",
+ ["1/2","1/3","2/3","1","3"],0,
+ "a₁ = 1/3, q = 1/3: (1/3)/(1 − 1/3) = (1/3)/(2/3) = 1/2.");
+
+q("fol-08","folgen",3,"Die Summe <code>5 + 8 + 11 + … + 50</code> beträgt",
+ ["440","445","430","495","400"],0,
+ "Anzahl der Glieder: (50 − 5)/3 + 1 = 16. Summe = 16 · (5 + 50)/2 = 16 · 27,5.");
+
+q("fol-09","folgen",1,"Für <code>aₙ = 3n − 1</code> ist das 7. Glied",
+ ["20","21","17","22","19"],0,
+ "n = 7 einsetzen: 3 · 7 − 1 = 20. Bei einer expliziten Formel wird direkt eingesetzt — im Gegensatz zur rekursiven Darstellung muss man sich nicht hocharbeiten.");
+
+q("fol-10","folgen",2,"Welche Zahl fehlt: 1, 1, 2, 3, 5, 8, __, 21",
+ ["13","11","12","16","14"],0,
+ "Fibonacci: Jedes Glied ist die Summe der beiden vorherigen (5 + 8 = 13).");
+
+// Aussagenlogik & Mengen | Schlussfolgerndes Denken | Zahlenreihen & Muster | Algorithmisches Denken
+q("log-01","logik",1,"Wie lautet die Verneinung von „Alle Bewerber bestehen den Test“?",
+ ["Mindestens ein Bewerber besteht den Test nicht.","Kein Bewerber besteht den Test.","Alle Bewerber bestehen den Test nicht.","Die meisten Bewerber bestehen den Test nicht.","Genau ein Bewerber besteht den Test nicht."],0,
+ "Die Verneinung eines „alle“-Satzes ist ein „mindestens einer nicht“-Satz — nicht „keiner“. Das ist die mit Abstand häufigste Falle im Logikteil.");
+
+q("log-02","logik",2,"Welche Aussage ist gleichbedeutend mit „Wenn es regnet, ist die Straße nass“?",
+ ["Wenn die Straße nicht nass ist, regnet es nicht.","Wenn die Straße nass ist, regnet es.","Wenn es nicht regnet, ist die Straße nicht nass.","Es regnet genau dann, wenn die Straße nass ist.","Die Straße ist immer nass."],0,
+ "Nur die Kontraposition (¬B → ¬A) ist logisch äquivalent zu A → B. Umkehrung und Negation sind es nicht.");
+
+q("log-03","logik",2,"Die Implikation <code>A → B</code> ist genau dann falsch, wenn",
+ ["A wahr und B falsch ist","A falsch und B wahr ist","beide falsch sind","beide wahr sind","A falsch ist"],0,
+ "Ein Versprechen wird nur gebrochen, wenn die Bedingung eintritt und die Folge ausbleibt. Bei falscher Prämisse ist die Implikation immer wahr.");
+
+q("log-04","logik",2,"<code>¬(A ∧ B)</code> ist gleichbedeutend mit",
+ ["¬A ∨ ¬B","¬A ∧ ¬B","A ∨ B","¬A → B","A ∧ ¬B"],0,
+ "De Morgan: Bei der Verneinung wird aus „und“ ein „oder“ und jeder Teil wird negiert.");
+
+q("log-05","logik",2,"<code>¬(A ∨ B)</code> ist gleichbedeutend mit",
+ ["¬A ∧ ¬B","¬A ∨ ¬B","A ∧ B","¬A → ¬B","A ∨ ¬B"],0,
+ "Zweite De-Morgan-Regel: „weder A noch B“ heißt „nicht A und nicht B“.");
+
+q("log-06","logik",1,"Welcher Ausdruck ist eine Tautologie (immer wahr)?",
+ ["A ∨ ¬A","A ∧ ¬A","A → ¬A","A ↔ ¬A","¬A"],0,
+ "Satz vom ausgeschlossenen Dritten. Das Gegenstück A ∧ ¬A ist eine Kontradiktion (immer falsch).");
+
+q("log-07","logik",2,"Gegeben: „Wenn es regnet, ist die Straße nass.“ Die Straße ist nicht nass. Was folgt?",
+ ["Es regnet nicht.","Es regnet.","Es hat geregnet.","Nichts Sicheres.","Die Straße ist trocken, weil es nie regnet."],0,
+ "Modus tollens: ¬B erzwingt ¬A. Das ist der gültige Schluss, den die Kontraposition liefert.");
+
+q("log-08","logik",2,"Gegeben: „Wenn es regnet, ist die Straße nass.“ Die Straße ist nass. Was folgt?",
+ ["Nichts Sicheres.","Es regnet.","Es regnet nicht.","Es wird regnen.","Die Straße war vorher trocken."],0,
+ "Die Straße kann auch durch einen Wagen der Stadtreinigung nass sein. Aus B folgt nicht A — dieser Fehlschluss heißt Bejahung der Konklusion.");
+
+q("log-09","logik",2,"Wie lautet die Verneinung von „Einige Module sind schwierig“?",
+ ["Kein Modul ist schwierig.","Alle Module sind schwierig.","Einige Module sind nicht schwierig.","Die meisten Module sind leicht.","Genau ein Modul ist schwierig."],0,
+ "„Es gibt mindestens eines“ wird verneint zu „es gibt keines“. Merkschema: ∀ ↔ ∃¬ und ∃ ↔ ∀¬.");
+
+q("log-10","logik",3,"Von 30 Studierenden belegen 18 Mathematik, 15 Informatik und 8 beides. Wie viele belegen keines der beiden Fächer?",
+ ["5","3","7","2","12"],0,
+ "|A ∪ B| = 18 + 15 − 8 = 25. Rest: 30 − 25 = 5. Die Schnittmenge wird sonst doppelt gezählt.");
+
+q("log-11","logik",2,"Wie viele Teilmengen hat eine Menge mit 3 Elementen?",
+ ["8","6","3","9","7"],0,
+ "2³ = 8, inklusive leerer Menge und der Menge selbst. Jedes Element ist drin oder nicht.");
+
+q("log-12","logik",2,"Wie viele zweielementige Teilmengen hat eine Menge mit 4 Elementen?",
+ ["6","8","12","4","16"],0,
+ "(4 über 2) = 4 · 3/2 = 6.");
+
+q("log-13","logik",1,"Welche Aussage über die leere Menge ist richtig?",
+ ["Sie ist Teilmenge jeder Menge.","Sie ist Element jeder Menge.","Sie hat eine Teilmenge weniger als jede andere Menge.","Sie ist mit keiner Menge vergleichbar.","Sie hat keine Teilmengen."],0,
+ "Die Bedingung „jedes Element von ∅ liegt auch in M“ ist leer erfüllt. Teilmenge (⊆) und Element (∈) sind verschiedene Beziehungen.");
+
+q("log-14","logik",2,"Für <code>A = {1,2,3,4}</code> und <code>B = {3,4,5}</code> ist <code>A \\ B</code> gleich",
+ ["{1, 2}","{3, 4}","{5}","{1, 2, 5}","{1,2,3,4,5}"],0,
+ "Differenzmenge: alles aus A, was nicht in B liegt.");
+
+q("log-15","logik",3,"Die Aussage <code>A ↔ B</code> („genau dann, wenn“) ist wahr, wenn",
+ ["A und B denselben Wahrheitswert haben","beide wahr sind","mindestens eine wahr ist","genau eine wahr ist","beide falsch sind"],0,
+ "Äquivalenz heißt Gleichheit der Wahrheitswerte — beide wahr oder beide falsch. „Genau eine wahr“ wäre das exklusive Oder.");
+
+q("log-16","logik",3,"Wie viele Zeilen hat die Wahrheitstafel einer Formel mit 4 Variablen?",
+ ["16","8","4","32","24"],0,
+ "2⁴ — pro Variable verdoppelt sich die Zeilenzahl.");
+
+q("log-17","logik",2,"„Nur wer die Klausur besteht, erhält den Schein.“ Was folgt daraus für jemanden mit Schein?",
+ ["Er hat die Klausur bestanden.","Er hat die Klausur nicht bestanden.","Nichts Sicheres.","Er hat auch die Übung bestanden.","Er hat mindestens 50 Punkte."],0,
+ "„Nur wenn B, dann A“ bedeutet A → B, nicht B → A. Bestehen ist notwendig, aber vielleicht nicht hinreichend.");
+
+q("log-18","logik",3,"<code>A → B</code> ist gleichbedeutend mit",
+ ["¬A ∨ B","A ∨ ¬B","¬A ∧ B","A ∧ B","B → A"],0,
+ "Entweder die Prämisse trifft nicht zu, oder die Folge tritt ein. Diese Umformung macht Implikationen in Wahrheitstafeln schnell prüfbar.");
+
+q("log-19","logik",2,"Welche Aussage ist mit „Kein Informatiker mag Excel“ gleichbedeutend?",
+ ["Alle Informatiker mögen Excel nicht.","Einige Informatiker mögen Excel nicht.","Nicht alle Informatiker mögen Excel.","Alle, die Excel mögen, sind Informatiker.","Manche Excel-Nutzer sind keine Informatiker."],0,
+ "„Kein X ist Y“ und „alle X sind nicht-Y“ sind dieselbe Aussage.");
+
+q("log-20","logik",3,"Gegeben sind A → B und B → C. Was folgt sicher?",
+ ["A → C","C → A","¬A → ¬C","B → A","A ↔ C"],0,
+ "Kettenschluss (Transitivität). Die Umkehrungen folgen nicht.");
+
+q("sch-01","schluss",2,"Alle Rosen sind Blumen. Einige Blumen verwelken schnell. Was folgt zwingend?",
+ ["Keine der genannten Aussagen folgt zwingend.","Einige Rosen verwelken schnell.","Alle Rosen verwelken schnell.","Keine Rose verwelkt schnell.","Alle Blumen sind Rosen."],0,
+ "Die „einigen“ Blumen müssen nicht die Rosen sein. Bei Syllogismen zählt nur, was in <em>jedem</em> denkbaren Fall gilt.");
+
+q("sch-02","schluss",1,"Alle A sind B. Alle B sind C. Was folgt?",
+ ["Alle A sind C.","Alle C sind A.","Einige C sind keine A.","Kein A ist C.","Nichts folgt."],0,
+ "Kreise ineinander: A liegt in B, B liegt in C, also liegt A in C.");
+
+q("sch-03","schluss",2,"Kein A ist B. Alle C sind A. Was folgt?",
+ ["Kein C ist B.","Alle C sind B.","Einige C sind B.","Alle B sind C.","Nichts folgt."],0,
+ "C steckt vollständig in A, und A ist von B getrennt — also ist auch C von B getrennt.");
+
+q("sch-04","schluss",3,"Anna ist älter als Ben. Clara ist jünger als Ben, aber älter als David. Wer ist am jüngsten?",
+ ["David","Clara","Ben","Anna","Nicht bestimmbar"],0,
+ "Reihenfolge aufschreiben: Anna > Ben > Clara > David. Bei Rangordnungen immer sofort eine Kette bilden.");
+
+q("sch-05","schluss",3,"Drei Kisten sind falsch beschriftet: „Äpfel“, „Birnen“, „Gemischt“. Du darfst aus genau einer Kiste eine Frucht ziehen. Aus welcher ziehst du, um alle Kisten korrekt zuzuordnen?",
+ ["Aus der Kiste mit der Aufschrift „Gemischt“","Aus der Kiste mit der Aufschrift „Äpfel“","Aus der Kiste mit der Aufschrift „Birnen“","Aus einer beliebigen Kiste","Das ist mit einem Zug unmöglich"],0,
+ "Da alle Etiketten falsch sind, ist die als „Gemischt“ beschriftete Kiste sortenrein — die gezogene Frucht bestimmt sie eindeutig, und der Rest folgt zwingend.");
+
+q("sch-06","schluss",3,"A sagt: „B lügt.“ B sagt: „A und ich lügen beide.“ Wer sagt die Wahrheit?",
+ ["Nur A","Nur B","Beide","Keiner","Nicht entscheidbar"],0,
+ "Wäre B ehrlich, würde er zugeben zu lügen — Widerspruch. Also lügt B, damit ist As Aussage wahr.");
+
+q("sch-07","schluss",2,"Wenn Tom Zeit hat, geht er schwimmen. Tom geht nicht schwimmen. Was folgt?",
+ ["Tom hat keine Zeit.","Tom hat Zeit.","Tom kann nicht schwimmen.","Tom geht stattdessen laufen.","Nichts folgt."],0,
+ "Modus tollens auf „Zeit → Schwimmen“.");
+
+q("sch-08","schluss",3,"In einer Reihe sitzen fünf Personen. Eva sitzt genau in der Mitte. Frank sitzt links von Eva, aber nicht am Rand. Wie viele Plätze kommen für Frank in Frage?",
+ ["1","2","3","4","0"],0,
+ "Von den Plätzen 1–5 ist Eva auf 3. Links davon liegen 1 und 2, Platz 1 ist Rand — bleibt nur Platz 2.");
+
+q("sch-09","schluss",3,"Ein Vater ist heute viermal so alt wie sein Sohn. In 10 Jahren ist er doppelt so alt. Wie alt ist der Sohn heute?",
+ ["5","10","8","12","6"],0,
+ "4s + 10 = 2(s + 10) → 4s + 10 = 2s + 20 → 2s = 10 → s = 5 (Vater 20).");
+
+q("sch-10","schluss",2,"Heute ist Dienstag. Welcher Wochentag ist in 100 Tagen?",
+ ["Donnerstag","Mittwoch","Freitag","Dienstag","Samstag"],0,
+ "100 : 7 = 14 Rest 2. Zwei Tage nach Dienstag ist Donnerstag. Bei Wochentagsaufgaben immer den Rest modulo 7 bilden.");
+
+q("sch-11","schluss",3,"Alle Manager sind Angestellte. Einige Angestellte arbeiten in Teilzeit. Welche Aussage ist sicher falsch?",
+ ["Kein Angestellter ist Manager.","Einige Manager arbeiten in Teilzeit.","Kein Manager arbeitet in Teilzeit.","Alle Teilzeitkräfte sind Manager.","Einige Angestellte sind keine Manager."],0,
+ "Aus „alle Manager sind Angestellte“ folgt, dass es Angestellte gibt, die Manager sind (sofern es Manager gibt). Die übrigen Aussagen sind bloß ungewiss, nicht falsch.");
+
+q("sch-12","schluss",3,"Fünf Läufer: C läuft vor B. A läuft nach B, aber vor D. E läuft zuletzt. Wer gewinnt?",
+ ["C","A","B","D","E"],0,
+ "Kette: C > B > A > D, und E ist Letzter. C führt.");
+
+q("sch-13","schluss",2,"Ein Wort kostet 3 €, ein Satz 12 €. Ein Kunde zahlt 45 € für 5 Sätze und einige Wörter. Wie viele Wörter?",
+ ["Keine – die Angaben widersprechen sich","5","3","2","15"],0,
+ "5 Sätze kosten bereits 60 € > 45 €. Erst überschlagen, dann rechnen — Aufgaben mit unmöglichen Angaben kommen vor.");
+
+q("sch-14","schluss",3,"Nur wenn ein Projekt profitabel <em>und</em> strategisch relevant ist, wird es fortgeführt. Projekt X wurde eingestellt. Was folgt?",
+ ["Es war nicht profitabel oder nicht strategisch relevant.","Es war nicht profitabel.","Es war nicht strategisch relevant.","Es war weder profitabel noch relevant.","Nichts folgt."],0,
+ "Fortführung → (profitabel ∧ relevant). Kontraposition plus De Morgan ergibt die Oder-Verknüpfung der Negationen.");
+
+q("rei-01","reihen",1,"Setze fort: 2, 4, 8, 16, __",
+ ["32","24","20","18","64"],0,
+ "Verdopplung. Erst multiplikative, dann additive Muster prüfen.");
+
+q("rei-02","reihen",2,"Setze fort: 3, 7, 15, 31, __",
+ ["63","47","62","55","64"],0,
+ "Regel ×2 + 1. Erkennbar an den Differenzen 4, 8, 16 — sie verdoppeln sich.");
+
+q("rei-03","reihen",1,"Setze fort: 1, 4, 9, 16, __",
+ ["25","20","24","32","36"],0,
+ "Quadratzahlen. Die Differenzen sind die ungeraden Zahlen 3, 5, 7, 9.");
+
+q("rei-04","reihen",2,"Setze fort: 1, 8, 27, 64, __",
+ ["125","100","81","128","216"],0,
+ "Kubikzahlen 1³, 2³, 3³, 4³, 5³.");
+
+q("rei-05","reihen",2,"Setze fort: 2, 3, 5, 7, 11, __",
+ ["13","12","14","15","17"],0,
+ "Primzahlen. Wenn keine Rechenregel greift, an Zahlenfamilien denken.");
+
+q("rei-06","reihen",3,"Setze fort: 1, 2, 6, 24, __",
+ ["120","48","72","96","144"],0,
+ "Fakultäten: jeweils mal 2, mal 3, mal 4, mal 5.");
+
+q("rei-07","reihen",3,"Setze fort: 5, 10, 9, 18, 17, __",
+ ["34","16","33","35","26"],0,
+ "Zwei abwechselnde Regeln: ×2, dann −1. Bei „Zickzack“-Reihen immer nach einem Zweierrhythmus suchen.");
+
+q("rei-08","reihen",2,"Setze fort: 100, 50, 25, __",
+ ["12,5","20","15","10","5"],0,
+ "Halbierung — auch wenn es keine ganze Zahl mehr ergibt.");
+
+q("rei-09","reihen",2,"Setze fort: 4, 9, 19, 39, __",
+ ["79","78","59","69","80"],0,
+ "Regel ×2 + 1: 4 → 9 → 19 → 39 → 79. Zu erkennen an den Differenzen 5, 10, 20, die sich verdoppeln.");
+
+q("rei-10","reihen",3,"Setze fort: 2, 5, 10, 17, 26, __",
+ ["37","35","36","38","40"],0,
+ "Differenzen 3, 5, 7, 9, 11. Gleichwertig: n² + 1.");
+
+q("rei-11","reihen",3,"Setze fort: A, C, F, J, __",
+ ["O","N","M","P","K"],0,
+ "Positionen 1, 3, 6, 10 — Abstände +2, +3, +4, also +5 → Position 15 = O.");
+
+q("rei-12","reihen",2,"Setze fort: 81, 27, 9, 3, __",
+ ["1","0","2","1,5","3"],0,
+ "Fortlaufende Division durch 3 — die Reihe besteht aus den Dreierpotenzen 3⁴, 3³, 3², 3¹, 3⁰. Bei fallenden Reihen immer zuerst den Quotienten prüfen.");
+
+q("rei-13","reihen",3,"Setze fort: 7, 14, 10, 20, 16, __",
+ ["32","22","30","12","24"],0,
+ "Abwechselnd ×2 und −4.");
+
+q("rei-14","reihen",3,"Welche Zahl passt nicht in die Reihe: 4, 9, 16, 24, 36",
+ ["24","9","16","36","4"],0,
+ "Alle anderen sind Quadratzahlen (2², 3², 4², 6²); 24 ist keine.");
+
+q("rei-15","reihen",2,"Setze fort: 1, 3, 6, 10, 15, __",
+ ["21","20","18","25","22"],0,
+ "Dreieckszahlen: die Differenzen wachsen um jeweils 1. Formel n(n+1)/2.");
+
+q("alg2-01","algo",1,"Die Binärzahl <code>1011</code> entspricht dezimal",
+ ["11","13","9","7","15"],0,
+ "8 + 0 + 2 + 1. Stellenwerte von rechts: 1, 2, 4, 8, 16, 32 …");
+
+q("alg2-02","algo",2,"Die Dezimalzahl 25 lautet binär",
+ ["11001","10101","11011","10011","11101"],0,
+ "25 = 16 + 8 + 1. Immer die größte passende Zweierpotenz abziehen.");
+
+q("alg2-03","algo",2,"Wie viele verschiedene Werte lassen sich mit 8 Bit darstellen?",
+ ["256","128","64","512","255"],0,
+ "2⁸ = 256 Werte (0 bis 255). Anzahl der Werte und größter Wert unterscheiden sich um 1.");
+
+q("alg2-04","algo",2,"Fügt man einer Binärzahl ein Bit hinzu, so verändert sich die Anzahl darstellbarer Werte",
+ ["Sie verdoppelt sich.","Sie erhöht sich um 1.","Sie vervierfacht sich.","Sie bleibt gleich.","Sie erhöht sich um 2."],0,
+ "Jedes zusätzliche Bit multipliziert die Anzahl mit 2.");
+
+q("alg2-05","algo",2,"Welchen Wert hat <code>s</code> am Ende?<pre class=\"code\">s = 0\nfür i von 1 bis 5:\n    s = s + i</pre>",
+ ["15","5","10","14","25"],0,
+ "1 + 2 + 3 + 4 + 5 = 15. Bei Schleifen die ersten zwei Durchläufe von Hand mitschreiben, dann das Muster erkennen.");
+
+q("alg2-06","algo",3,"Wie oft wird die innere Zeile ausgeführt?<pre class=\"code\">für i von 1 bis 4:\n    für j von 1 bis 3:\n        drucke i, j</pre>",
+ ["12","7","4","3","16"],0,
+ "Verschachtelte Schleifen multiplizieren sich: 4 · 3.");
+
+q("alg2-07","algo",3,"Welchen Wert hat <code>a</code> am Ende?<pre class=\"code\">a = 3\nb = 5\na = a + b\nb = a − b\na = a − b</pre>",
+ ["5","3","8","0","2"],0,
+ "Das ist der Tausch ohne Hilfsvariable: a = 8, b = 3, a = 5. Die Werte werden vertauscht.");
+
+q("alg2-08","algo",3,"<code>f(1) = 1</code> und <code>f(n) = f(n−1) + n</code>. Welchen Wert hat <code>f(5)</code>?",
+ ["15","10","20","12","25"],0,
+ "1, 3, 6, 10, 15 — die Dreieckszahlen. Rekursionen von unten nach oben ausrechnen.");
+
+q("alg2-09","algo",3,"Wie viele Schritte braucht eine binäre Suche in einer sortierten Liste mit 1.000 Einträgen höchstens?",
+ ["10","100","500","20","1.000"],0,
+ "Jeder Schritt halbiert: 2¹⁰ = 1024 ≥ 1000. Deshalb ist die binäre Suche der Standardtrick bei „Zahlenraten“-Aufgaben.");
+
+q("alg2-10","algo",2,"<code>17 mod 5</code> ist gleich",
+ ["2","3","3,4","12","5"],0,
+ "Rest bei ganzzahliger Division: 17 = 3 · 5 + 2.");
+
+q("alg2-11","algo",2,"Bei ganzzahliger Division ergibt <code>17 : 5</code>",
+ ["3","3,4","4","2","3,5"],0,
+ "Ganzzahldivision schneidet den Rest ab. Zusammen mit mod: 17 = 3 · 5 + 2.");
+
+q("alg2-12","algo",3,"Welchen Wert hat <code>x</code> am Ende?<pre class=\"code\">x = 20\nsolange x > 5:\n    x = x − 4</pre>",
+ ["4","5","0","8","1"],0,
+ "20 → 16 → 12 → 8 → 4. Bei 4 ist die Bedingung verletzt, die Schleife endet. Auf das letzte Unterschreiten achten.");
+
+q("alg2-13","algo",3,"Ein Algorithmus vergleicht jedes Element einer Liste mit jedem anderen. Bei 100 Elementen sind das etwa",
+ ["5.000 Vergleiche","100 Vergleiche","200 Vergleiche","10.000 Vergleiche","1.000 Vergleiche"],0,
+ "(100 über 2) = 100 · 99/2 = 4.950 ≈ 5.000. Wächst quadratisch mit der Länge.");
+
+q("alg2-14","algo",2,"Welche Aussage über den Algorithmus stimmt?<pre class=\"code\">solange n > 1:\n    n = n / 2</pre>",
+ ["Die Anzahl der Durchläufe wächst logarithmisch mit n.","Die Anzahl der Durchläufe wächst linear mit n.","Die Schleife endet nie.","Die Anzahl der Durchläufe ist konstant.","Die Anzahl der Durchläufe wächst quadratisch."],0,
+ "Halbieren bis 1 entspricht log₂ n Schritten — bei n = 1.000.000 nur rund 20.");
+
+q("alg2-15","algo",2,"Ein Passwort besteht aus 3 Zeichen, jedes aus einem Alphabet von 26 Buchstaben. Wie viele Passwörter gibt es?",
+ ["26³","3²⁶","26 · 3","26!","3 · 26³"],0,
+ "Pro Stelle 26 unabhängige Möglichkeiten. 26³ = 17.576.");
+
+q("alg2-16","algo",3,"Welchen Wert hat <code>z</code> am Ende?<pre class=\"code\">z = 0\nfür i von 1 bis 10:\n    wenn i mod 3 == 0:\n        z = z + 1</pre>",
+ ["3","4","10","2","1"],0,
+ "Vielfache von 3 bis 10: 3, 6, 9 — also drei Treffer.");
+
+// English Reading Comprehension — Texte im Stil des Testteils "Textverständnis"
+passage("p1","Platform Economics",
+`Two decades ago, the most valuable companies in the world owned factories, pipelines and fleets. Today many of them own almost nothing physical at all. What they own is a platform: a piece of infrastructure that lets other people transact with each other, and a set of rules governing how those transactions happen.
+
+The economics of platforms are unusual because of network effects. A telephone is useless if nobody else has one, mildly useful if a hundred people do, and indispensable once everybody does. Value grows with the number of participants rather than with the number of units produced. This creates a striking asymmetry: the first years of a platform are brutally difficult, because there is nothing to attract users except the promise of users who have not yet arrived. Economists call this the cold-start problem, and most platforms die of it.
+
+Those that survive tend to enjoy a period of extraordinary returns, since each additional user makes the service more attractive to the next one. But the same dynamic that builds a platform can trap it. Because users cluster where other users already are, markets tip toward a single dominant provider, and dominance invites regulatory attention. The very network effects that once looked like a defensible advantage become, in the language of competition authorities, a barrier to entry.
+
+A further complication is that platform operators are not neutral. They set fees, rank results and decide which sellers are visible. Increasingly they also compete with the very sellers who depend on them — a conflict that regulators in Brussels and Washington have begun to treat as structural rather than incidental.`);
+
+q("eng-01","english",2,"What is the main idea of the passage?",
+ ["Platforms follow an economic logic in which network effects drive both their success and their regulatory problems.","Physical assets have become worthless in the modern economy.","Most start-ups fail because they lack sufficient funding.","Regulators in Brussels and Washington disagree about competition policy.","Telephones are the earliest example of a successful platform."],0,
+ "Hauptgedanken erkennt man daran, dass sie den <em>gesamten</em> Text abdecken. Netzwerkeffekte tauchen in jedem Absatz auf — Aufstieg wie Regulierung. Die anderen Optionen greifen jeweils nur ein Detail heraus.",
+ "p1");
+
+q("eng-02","english",2,"According to the passage, the \"cold-start problem\" refers to the difficulty of",
+ ["attracting the first users when the platform's value still depends on users who are not there yet","raising capital during an economic downturn","building physical infrastructure before demand exists","complying with regulation in several countries at once","persuading sellers to lower their prices"],0,
+ "Der Text definiert den Begriff direkt im Satz davor. Bei Vokabelfragen im Kontext immer den unmittelbar umgebenden Satz lesen, nicht raten.",
+ "p1");
+
+q("eng-03","english",3,"The author implies that dominance in platform markets is",
+ ["a natural outcome of network effects rather than necessarily a result of misconduct","always the result of illegal behaviour by the operator","impossible to achieve without owning physical assets","temporary and self-correcting without intervention","less common than in traditional industries"],0,
+ "„Markets tip toward a single dominant provider“ beschreibt einen Mechanismus, kein Fehlverhalten. Achte auf Wörter wie <em>implies</em> — gesucht ist der begründbare Schluss, nicht das wörtliche Zitat.",
+ "p1");
+
+q("eng-04","english",3,"In the final paragraph, the word \"structural\" is closest in meaning to",
+ ["built into the way the system works","related to the construction industry","temporary and easily corrected","legally ambiguous","financially significant"],0,
+ "Der Gegensatz im selben Satz („rather than incidental“ — zufällig) liefert die Bedeutung. Gegensatzwörter sind der schnellste Weg zu Kontextvokabeln.",
+ "p1");
+
+passage("p2","The Limits of Measurement",
+`In 1975 the British economist Charles Goodhart made an observation about monetary policy that has since escaped its original field entirely. When a measure becomes a target, he noted, it ceases to be a good measure. The principle now bears his name, and examples of it are easy to find wherever institutions try to manage what they cannot directly observe.
+
+Consider a hospital judged by the length of time patients wait in the emergency department. The metric is a reasonable proxy for quality of care: shorter waits generally mean better staffing and smoother processes. But once funding depends on it, administrators acquire an interest in the number itself rather than in what the number was meant to represent. Patients may be admitted to a ward prematurely to stop the clock, or triaged in ways that improve the average while leaving the sickest no better off.
+
+None of this requires dishonesty. Goodhart's law operates through ordinary, rational responses to incentives, which is precisely what makes it so difficult to design around. Adding more metrics rarely helps, since each new target invites its own distortions, and a dashboard of twenty numbers is no more faithful than a dashboard of one.
+
+The uncomfortable conclusion is that measurement and management stand in unavoidable tension. Numbers are indispensable for running large organisations, yet the act of relying on them changes the behaviour they were meant to describe. The practical response is not to abandon measurement but to hold it loosely: to treat metrics as evidence requiring interpretation rather than as verdicts requiring compliance.`);
+
+q("eng-05","english",2,"The main purpose of the passage is to",
+ ["explain a principle about metrics and describe why it is hard to avoid","criticise the British health service for falsifying its statistics","argue that organisations should stop measuring performance","summarise Goodhart's contribution to monetary policy","compare hospitals in different countries"],0,
+ "Der Text erklärt Goodharts Gesetz, illustriert es und diskutiert Gegenmaßnahmen. Extreme Formulierungen wie „stop measuring“ widersprechen dem letzten Absatz.",
+ "p2");
+
+q("eng-06","english",2,"The hospital example is used primarily to",
+ ["illustrate how a useful measure degrades once it becomes a target","prove that emergency departments are underfunded","show that doctors frequently act dishonestly","suggest that waiting times should never be recorded","compare private and public health care"],0,
+ "Beispiele im Textverständnis dienen fast immer der Illustration einer These. Frage dich: Welchen Satz davor stützt das Beispiel?",
+ "p2");
+
+q("eng-07","english",3,"According to the passage, adding more metrics is ineffective because",
+ ["each additional target creates distortions of its own","most organisations lack the data to compute them","managers find large dashboards difficult to read","regulators forbid the use of multiple indicators","the metrics tend to contradict one another"],0,
+ "Direkt im dritten Absatz genannt. Optionen, die plausibel klingen, aber nicht im Text stehen, sind die typischen Ablenker.",
+ "p2");
+
+q("eng-08","english",3,"The phrase \"to hold it loosely\" suggests that metrics should be",
+ ["used as evidence that still requires judgement","collected less frequently than at present","kept confidential within the organisation","replaced by qualitative descriptions","reported only to external regulators"],0,
+ "Der Doppelpunkt im selben Satz erklärt die Metapher: „evidence requiring interpretation rather than verdicts requiring compliance“.",
+ "p2");
+
+passage("p3","Why Software Projects Run Late",
+`Frederick Brooks, who managed the development of IBM's OS/360 operating system, drew a conclusion from that troubled project which has proved remarkably durable: adding manpower to a late software project makes it later. The reasoning is straightforward. New members must be trained, which consumes the time of the people who are already productive, and the number of communication channels within a team grows faster than the team itself. A group of three people has three pairs to coordinate; a group of twelve has sixty-six.
+
+Brooks was careful about the scope of his claim. Work that can be cleanly partitioned — harvesting a field, say — does scale with the number of workers. Software rarely partitions cleanly, because the components interact and the interactions must be negotiated between the people who own them. Where coordination dominates, extra hands add more cost than capacity.
+
+Later research complicated the picture without overturning it. Studies of open-source projects found that some very large teams remain productive, but they tend to be organised into small, loosely coupled units with stable interfaces between them, so that most work requires no negotiation at all. In other words, the projects that scale are those that have engineered their communication requirements downward rather than simply accepting them.
+
+That reframing matters. Brooks's law is often quoted as an argument against hiring, which was never the point. It is an argument about architecture: the structure of a system and the structure of the organisation that builds it are two descriptions of the same thing.`);
+
+q("eng-09","english",2,"Brooks's law states that adding people to a late software project",
+ ["delays it further","has no measurable effect","helps only if the new members are experienced","reduces overall cost","improves quality but not speed"],0,
+ "Steht wörtlich im ersten Satz. Solche Detailfragen zuerst beantworten — sie kosten am wenigsten Zeit.",
+ "p3");
+
+q("eng-10","english",3,"The comparison between three people and twelve people is intended to show that",
+ ["coordination effort grows faster than team size","larger teams produce more code","training takes longer in big organisations","small teams are always more skilled","communication is unnecessary in small teams"],0,
+ "Von 3 auf 12 Personen vervierfacht sich das Team, die Paare steigen aber von 3 auf 66 — überproportional. Zahlenbeispiele im Text belegen fast immer eine Wachstumsaussage.",
+ "p3");
+
+q("eng-11","english",3,"The passage suggests that large open-source teams stay productive mainly because they",
+ ["reduce the amount of coordination their work requires","hire only highly experienced developers","work without deadlines","use a single shared codebase without interfaces","avoid dividing work into components"],0,
+ "„Engineered their communication requirements downward“ ist der Kern. Der Text nennt kleine, lose gekoppelte Einheiten als Mittel dazu.",
+ "p3");
+
+q("eng-12","english",3,"The author's attitude toward the common use of Brooks's law is best described as",
+ ["corrective — the law is real but often cited for the wrong conclusion","dismissive — the law has been disproved by later research","enthusiastic — the law justifies smaller teams in all cases","neutral — the author reports without evaluating","hostile — the law reflects outdated management thinking"],0,
+ "Der letzte Absatz sagt ausdrücklich, das Gesetz werde häufig falsch zitiert („which was never the point“), bestreitet es aber nicht. Bei Haltungsfragen auf wertende Wörter achten.",
+ "p3");
+
+passage("p4","Data and Consent",
+`The standard mechanism for protecting personal data online is notice and consent: a service explains what it collects, and the user agrees. The arrangement has an appealing logic. It respects autonomy, it is cheap to implement, and it places the decision with the person whose data is at stake.
+
+It also fails in practice, for reasons that are now well documented. One study estimated that reading the privacy policies encountered by an average user in a single year would take roughly 200 hours. Consent obtained under those conditions is formally valid and substantively empty. Worse, the disclosures that matter least — the boilerplate about cookies — are the ones users see most often, while genuinely consequential transfers happen further down a supply chain the user never encounters.
+
+There is also a structural problem that no amount of clearer wording can solve. Data about one person is frequently informative about others. A user who discloses their own genome discloses a great deal about their siblings, who were never asked. Consent is individual; the consequences are collective.
+
+Some regulators have accordingly shifted emphasis from consent to obligation: rules about what organisations may do with data regardless of what users have agreed to, including purpose limitation and data minimisation. The change is subtle but important. It moves the burden from the person least able to evaluate the risk to the party best positioned to manage it.`);
+
+q("eng-13","english",2,"According to the passage, the main weakness of notice and consent is that",
+ ["consent is technically valid but not meaningfully informed","users are legally prohibited from refusing","it is expensive for companies to implement","it applies only to genetic data","regulators have never endorsed it"],0,
+ "Der zweite Absatz formuliert es direkt: „formally valid and substantively empty“.",
+ "p4");
+
+q("eng-14","english",2,"The figure of 200 hours is cited in order to",
+ ["show that reading privacy policies is impractical for ordinary users","estimate the cost of regulatory compliance","demonstrate that policies have grown longer over time","compare different legal systems","criticise the length of genetic testing forms"],0,
+ "Statistiken im Text stützen die unmittelbar vorangehende Behauptung — hier das Scheitern in der Praxis.",
+ "p4");
+
+q("eng-15","english",3,"The example of the genome is used to illustrate that",
+ ["one person's disclosure can affect people who never consented","genetic data is more valuable than other data","medical records are poorly protected","families rarely discuss privacy","consent forms should be longer"],0,
+ "Der Absatz endet mit „Consent is individual; the consequences are collective“ — genau die Pointe des Beispiels.",
+ "p4");
+
+q("eng-16","english",3,"The shift described in the final paragraph moves responsibility toward",
+ ["the organisations that process the data","individual users","national parliaments","the courts","data subjects' families"],0,
+ "„The party best positioned to manage it“ meint die datenverarbeitenden Organisationen — im Gegensatz zur Person, die das Risiko am schlechtesten einschätzen kann.",
+ "p4");
+
+passage("p5","The Productivity Paradox",
+`In 1987 Robert Solow remarked that the computer age could be seen everywhere except in the productivity statistics. At the time, American firms had been investing heavily in information technology for more than a decade, yet measured productivity growth had slowed rather than accelerated. The observation became known as the productivity paradox, and it has resurfaced with every subsequent wave of technology.
+
+Three explanations compete. The first is mismeasurement: national accounts were designed for an economy of physical goods and capture improvements in quality, variety and convenience poorly. If a service becomes free but better, statistics may record a decline. The second is redistribution: some investment buys competitive position rather than output, as when two firms spend heavily to take customers from each other and the sector as a whole gains nothing.
+
+The third, and the one that has aged best, is lag. General-purpose technologies deliver their gains only after complementary investments have been made — in skills, in processes, and above all in reorganisation. Electricity illustrates the pattern. Factories initially installed electric motors in buildings designed around a central steam engine, and saw modest returns. Only when plants were redesigned around distributed power, roughly forty years later, did productivity jump.
+
+The lesson is not that technology fails to deliver, but that the delivery depends on organisational change that is slow, costly and easy to postpone. The bottleneck is rarely the machine.`);
+
+q("eng-17","english",2,"The productivity paradox refers to the observation that",
+ ["heavy investment in technology was not reflected in measured productivity growth","computers became cheaper faster than expected","productivity statistics were never collected before 1987","American firms invested less in IT than European firms","technology reduced employment in manufacturing"],0,
+ "Solows Bemerkung wird im ersten Absatz erklärt. Titelbegriffe werden fast immer im ersten Absatz definiert.",
+ "p5");
+
+q("eng-18","english",3,"Which explanation does the author regard as most persuasive?",
+ ["Lag: gains arrive only after complementary organisational change","Mismeasurement of quality and variety","Redistribution of customers between competing firms","A combination of all three in equal measure","None — the author rejects all three"],0,
+ "„The one that has aged best“ signalisiert die Präferenz des Autors. Solche Wertungen sind der Schlüssel zu „which does the author regard“-Fragen.",
+ "p5");
+
+q("eng-19","english",3,"The example of electricity is included to show that",
+ ["the benefits of a general-purpose technology require redesigning how work is organised","electric motors were less efficient than steam engines","forty years is the standard delay for any new technology","factories resisted electrification for political reasons","energy costs determine productivity growth"],0,
+ "Nicht die Zahl 40 ist der Punkt, sondern die Neugestaltung der Fabriken. Vorsicht bei Antworten, die eine Beispielzahl zu einer allgemeinen Regel erheben.",
+ "p5");
+
+q("eng-20","english",2,"The phrase \"The bottleneck is rarely the machine\" means that",
+ ["the limiting factor is organisational rather than technical","machines are usually broken","hardware costs are negligible","technology should be purchased in larger quantities","factories should employ fewer workers"],0,
+ "Der Satz fasst den Absatz zusammen: langsame, teure organisatorische Veränderung ist der begrenzende Faktor.",
+ "p5");
+
+// Wahlbereich Wirtschaftsinformatik — Wirtschaft, Kennzahlen, Datenverständnis
+q("wi-01","wi",2,"Ein Unternehmen verkauft ein Produkt für 50 € bei variablen Kosten von 30 € pro Stück. Der Deckungsbeitrag je Stück beträgt",
+ ["20 €","50 €","30 €","80 €","1.500 €"],0,
+ "Deckungsbeitrag = Preis − variable Kosten. Er dient dazu, die Fixkosten zu decken; erst darüber entsteht Gewinn.");
+
+q("wi-02","wi",2,"Fixkosten 40.000 €, Preis 50 €, variable Kosten 30 €. Die Gewinnschwelle liegt bei",
+ ["2.000 Stück","800 Stück","1.333 Stück","4.000 Stück","1.000 Stück"],0,
+ "40.000 : 20 € Deckungsbeitrag = 2.000 Stück.");
+
+q("wi-03","wi",2,"Ein Unternehmen erzielt 500.000 € Umsatz und 40.000 € Gewinn. Die Umsatzrendite beträgt",
+ ["8 %","12,5 %","4 %","40 %","0,8 %"],0,
+ "Gewinn : Umsatz = 40.000/500.000 = 0,08.");
+
+q("wi-04","wi",3,"Ein Betrieb senkt seine variablen Stückkosten von 30 € auf 24 €, Preis und Fixkosten bleiben gleich. Der Deckungsbeitrag je Stück steigt damit um",
+ ["30 %","6 %","20 %","24 %","25 %"],0,
+ "Von 20 € auf 26 €, also +6 € auf 20 € Basis = 30 %. Der Grundwert ist der alte Deckungsbeitrag, nicht der Preis.");
+
+q("wi-05","wi",2,"Welche Aussage über Fixkosten trifft zu?",
+ ["Sie fallen unabhängig von der Produktionsmenge an.","Sie steigen proportional zur Produktionsmenge.","Sie sind pro Stück immer konstant.","Sie entfallen bei Produktionsmenge null.","Sie entsprechen den Materialkosten."],0,
+ "Fixkosten sind mengenunabhängig — je Stück sinken sie deshalb mit steigender Menge (Fixkostendegression).");
+
+q("wi-06","wi",3,"Umsatz 2023: 800.000 €. Umsatz 2024: 920.000 €. Das Wachstum beträgt",
+ ["15 %","12 %","13 %","20 %","8,7 %"],0,
+ "120.000/800.000 = 0,15. Zunahme immer durch den Ausgangswert teilen.");
+
+q("wi-07","wi",2,"Ein IT-Projekt kostet 240.000 € und spart jährlich 60.000 €. Die statische Amortisationszeit beträgt",
+ ["4 Jahre","3 Jahre","5 Jahre","2 Jahre","6 Jahre"],0,
+ "Investition : jährlicher Rückfluss = 240.000 : 60.000.");
+
+q("wi-08","wi",3,"Vier Abteilungen melden Kosten von 120, 180, 60 und 240 Tsd. €. Wie hoch ist der Anteil der größten Abteilung?",
+ ["40 %","24 %","30 %","25 %","60 %"],0,
+ "Summe 600, davon 240 → 240/600 = 0,4. Bei Tabellenaufgaben zuerst die Gesamtsumme bilden.");
+
+q("wi-09","wi",2,"Ein Onlineshop hat 20.000 Besucher und 600 Bestellungen. Die Konversionsrate beträgt",
+ ["3 %","0,3 %","30 %","6 %","33 %"],0,
+ "600/20.000 = 0,03. Die Kommastelle ist hier die eigentliche Falle: 600/20.000 = 3/100.");
+
+q("wi-10","wi",3,"Ein Server kostet 6.000 € und wird linear über 5 Jahre abgeschrieben. Der Buchwert nach 2 Jahren beträgt",
+ ["3.600 €","2.400 €","4.800 €","1.200 €","3.000 €"],0,
+ "Lineare Abschreibung: 1.200 € pro Jahr, nach 2 Jahren 6.000 − 2.400 = 3.600 €.");
+
+q("wi-11","wi",2,"Zwei Produkte tragen 60 % bzw. 40 % zum Umsatz bei. Produkt A wächst um 10 %, Produkt B schrumpft um 10 %. Der Gesamtumsatz",
+ ["steigt um 2 %","bleibt gleich","sinkt um 2 %","steigt um 10 %","sinkt um 5 %"],0,
+ "0,6 · 1,1 + 0,4 · 0,9 = 0,66 + 0,36 = 1,02. Gewichtete Veränderungen immer mit den Anteilen multiplizieren.");
+
+q("wi-12","wi",3,"Ein Prozess besteht aus vier hintereinander geschalteten Stationen mit Kapazitäten von 100, 80, 120 und 90 Stück pro Stunde. Der Gesamtdurchsatz beträgt",
+ ["80 Stück/h","90 Stück/h","97,5 Stück/h","120 Stück/h","390 Stück/h"],0,
+ "Bei einer Kette bestimmt der Engpass den Durchsatz — die langsamste Station. Mitteln wäre hier falsch.");
+
+// Crashkurs: kompakte Theorie und Technik je Themenblock
+theorie("algebra","Algebra & Gleichungen",[
+ ["Binomische Formeln","(a+b)² = a² + 2ab + b² · (a−b)² = a² − 2ab + b² · (a+b)(a−b) = a² − b². Die dritte ist im Test die wertvollste — sie verwandelt jede Differenz von Quadraten in ein Produkt und kürzt Brüche sofort."],
+ ["Quadratische Gleichungen","Für x² + px + q = 0: x = −p/2 ± √((p/2)² − q). Schneller ist fast immer Vieta: Summe der Lösungen = −p, Produkt = q. Bei ganzzahligen Aufgaben zwei Zahlen suchen, die passen — das geht in Sekunden statt in einer Minute."],
+ ["Diskriminante","D = b² − 4ac. D > 0: zwei Lösungen · D = 0: eine · D < 0: keine reelle. Fragen nach „genau eine Lösung“ sind immer Diskriminanten-Fragen."],
+ ["Scheitelpunkt","x_S = −b/(2a), y_S durch Einsetzen. a > 0 → Minimum, a < 0 → Maximum."],
+ ["Ungleichungen","Multiplikation oder Division mit einer negativen Zahl dreht das Zeichen um. Bei quadratischen Ungleichungen Nullstellen bestimmen und das Vorzeichen zwischen ihnen prüfen."],
+ ["Beträge","|x − a| ≤ r bedeutet a − r ≤ x ≤ a + r: alle Punkte mit Abstand höchstens r von a. So gelesen braucht man keine Fallunterscheidung."],
+ ["Wurzelgleichungen","Nach dem Quadrieren zwingend die Probe machen — Quadrieren erzeugt Scheinlösungen."]
+]);
+
+theorie("potenz","Potenzen, Wurzeln, Logarithmen",[
+ ["Potenzgesetze","aᵐ · aⁿ = aᵐ⁺ⁿ · aᵐ : aⁿ = aᵐ⁻ⁿ · (aᵐ)ⁿ = aᵐⁿ · a⁻ⁿ = 1/aⁿ · a⁰ = 1."],
+ ["Wurzeln als Potenzen","ⁿ√(aᵐ) = a^(m/n). Bei Zahlen wie 8^(2/3) immer zuerst die Wurzel ziehen, dann potenzieren — die Zwischenwerte bleiben klein."],
+ ["Logarithmusgesetze","log(ab) = log a + log b · log(a/b) = log a − log b · log(aⁿ) = n · log a. log_b(x) beantwortet die Frage „b hoch was ergibt x?“."],
+ ["Exponentialgleichungen","Beide Seiten auf dieselbe Basis bringen, dann Exponenten gleichsetzen. Geht das nicht, logarithmieren."],
+ ["Einschachteln statt rechnen","Ohne Taschenrechner: log₂ 6 liegt zwischen 2 und 3, weil 4 < 6 < 8. Für Auswahlaufgaben reicht das fast immer."],
+ ["Auswendig","2¹ bis 2¹⁰ = 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024. Dazu 3² bis 3⁵ = 9, 27, 81, 243 und die Quadratzahlen bis 20² = 400."]
+]);
+
+theorie("prozent","Prozent, Zins & Dreisatz",[
+ ["Grundformel","Prozentwert = Grundwert · Prozentsatz. Der Grundwert ist immer der Wert, auf den sich die Angabe bezieht — bei Veränderungen der <em>alte</em> Wert."],
+ ["Mit Faktoren rechnen","+25 % ist · 1,25, −20 % ist · 0,8. Mehrere Änderungen werden multipliziert, niemals addiert: −20 % und −10 % ergeben zusammen −28 %."],
+ ["Rückwärtsrechnen","Wenn 96 € der Preis nach 20 % Rabatt ist, gilt 96 : 0,8 = 120 €. Der häufigste Fehler ist, stattdessen 20 % auf 96 € aufzuschlagen."],
+ ["Zinseszins","K_n = K₀ · (1 + p)ⁿ. 72er-Regel: Verdopplungszeit ≈ 72 : Zinssatz in Prozent."],
+ ["Proportional oder umgekehrt","Mehr Arbeiter → weniger Zeit (umgekehrt proportional): Produkt konstant. Mehr Ware → mehr Preis (proportional): Quotient konstant. Vor jedem Dreisatz kurz prüfen, welcher Fall vorliegt."],
+ ["Kopfrechen-Bausteine","10 %, 5 % und 1 % bilden und addieren. Brüche kennen: 12,5 % = 1/8 · 16⅔ % = 1/6 · 33⅓ % = 1/3."],
+ ["Mischungen und Mittelwerte","Nie Prozentsätze mitteln — immer absolute Mengen addieren und durch die Gesamtmenge teilen. Dasselbe gilt für Geschwindigkeiten."]
+]);
+
+theorie("analysis","Analysis",[
+ ["Ableitungsregeln","xⁿ → n·xⁿ⁻¹ · eˣ → eˣ · ln x → 1/x · sin x → cos x · cos x → −sin x."],
+ ["Produkt- und Kettenregel","(u·v)' = u'v + uv'. Kettenregel: äußere mal innere Ableitung, z. B. e^(2x) → 2e^(2x)."],
+ ["Kurvendiskussion","f'(x) = 0 → Kandidat für Extremstelle. f''(x) > 0 → Minimum, f''(x) < 0 → Maximum. f''(x) = 0 mit Vorzeichenwechsel → Wendepunkt."],
+ ["Integrale","∫xⁿ dx = xⁿ⁺¹/(n+1) + C, außer n = −1: dort ∫(1/x)dx = ln|x| + C. Bestimmtes Integral: Stammfunktion an der oberen minus an der unteren Grenze."],
+ ["Grenzwerte bei Brüchen","Gleicher Grad → Verhältnis der Leitkoeffizienten. Nennergrad größer → 0. Zählergrad größer → ±∞."],
+ ["0/0-Situationen","Faktorisieren und kürzen, nicht einsetzen: (x²−4)/(x−2) = x + 2."],
+ ["Anschaulich prüfen","Ableitung = Steigung, Integral = Fläche. Bei einfachen Funktionen ist eine Skizze schneller als die Rechnung."]
+]);
+
+theorie("geo","Geometrie & Trigonometrie",[
+ ["Flächen","Dreieck ½·g·h · Trapez ½·(a+c)·h · Kreis πr² · Parallelogramm g·h."],
+ ["Körper","Quader a·b·c · Zylinder πr²h · Kugel (4/3)πr³ · Würfeloberfläche 6a²."],
+ ["Pythagoras","a² + b² = c². Tripel auswendig: 3-4-5, 5-12-13, 8-15-17 und alle Vielfachen davon."],
+ ["Skalierung","Längen mal k → Flächen mal k², Volumina mal k³. Eine der häufigsten Testfragen überhaupt."],
+ ["Trigonometrie","sin = Gegenkathete/Hypotenuse, cos = Ankathete/Hypotenuse, tan = Gegen/Ankathete. Werte: sin 30° = 1/2, sin 45° = √2/2, sin 60° = √3/2, tan 45° = 1."],
+ ["Trigonometrischer Pythagoras","sin²α + cos²α = 1 — damit lässt sich aus einem Wert der andere bestimmen."],
+ ["Geraden","m = Δy/Δx. Schnitt mit der x-Achse: y = 0 setzen. Winkelsumme im n-Eck: (n−2)·180°."]
+]);
+
+theorie("stoch","Stochastik & Kombinatorik",[
+ ["Laplace","P = günstige Fälle / mögliche Fälle, wenn alle Ergebnisse gleich wahrscheinlich sind."],
+ ["Und / Oder","„Und“ bei Unabhängigkeit → multiplizieren. „Oder“ → addieren, dabei die Schnittmenge einmal abziehen: P(A∪B) = P(A) + P(B) − P(A∩B)."],
+ ["Gegenereignis","Bei „mindestens ein …“ immer über 1 − P(keines) rechnen. Beispiel: mindestens eine Sechs bei 3 Würfen = 1 − (5/6)³."],
+ ["Ohne Zurücklegen","Im zweiten Zug sinken Zähler und Nenner: 3/8 · 2/7."],
+ ["Zählprinzipien","Reihenfolge wichtig, ohne Wiederholung → n·(n−1)·… Reihenfolge egal → Binomialkoeffizient (n über k) = n!/(k!(n−k)!). Mit Wiederholung → nᵏ."],
+ ["Binomialkoeffizient im Kopf","(n über 2) = n(n−1)/2, (n über 3) = n(n−1)(n−2)/6. Damit sind Handschlag- und Team-Aufgaben Sekundensache."],
+ ["Erwartungswert","E = Σ Wert · Wahrscheinlichkeit. Fairer Würfel: 3,5. Bei Spielen den Einsatz abziehen."],
+ ["Totale Wahrscheinlichkeit","Anteile mal Teilwahrscheinlichkeiten addieren: 0,6·0,2 + 0,4·0,5 = 0,32."]
+]);
+
+theorie("folgen","Folgen & Reihen",[
+ ["Arithmetisch","aₙ = a₁ + (n−1)·d. Achtung: n−1 Schritte, nicht n. Summe = n·(a₁ + aₙ)/2."],
+ ["Geometrisch","aₙ = a₁ · qⁿ⁻¹. Summe der ersten n Glieder = a₁·(qⁿ − 1)/(q − 1)."],
+ ["Unendliche geometrische Reihe","Nur für |q| < 1: Summe = a₁/(1 − q). Beispiel 1 + ½ + ¼ + … = 2."],
+ ["Gauß","1 + 2 + … + n = n(n+1)/2. Damit auch 2 + 4 + … + 2n = n(n+1)."],
+ ["Anzahl der Glieder","(letztes − erstes)/Schrittweite + 1. Das vergessene „+1“ ist ein Klassiker."]
+]);
+
+theorie("logik","Aussagenlogik & Mengen",[
+ ["Implikation","A → B ist nur falsch, wenn A wahr und B falsch ist. Gleichwertig: ¬A ∨ B."],
+ ["Kontraposition","A → B ist äquivalent zu ¬B → ¬A. Umkehrung (B → A) und Negation (¬A → ¬B) sind es <em>nicht</em> — hier entstehen die meisten Fehler."],
+ ["De Morgan","¬(A ∧ B) = ¬A ∨ ¬B · ¬(A ∨ B) = ¬A ∧ ¬B. Beim Verneinen kippt „und“ zu „oder“."],
+ ["Quantoren verneinen","„alle sind“ → „mindestens einer ist nicht“. „einige sind“ → „keiner ist“."],
+ ["Notwendig vs. hinreichend","„Nur wenn B, dann A“ heißt A → B (B ist notwendig). „Wenn B, dann A“ heißt B → A (B ist hinreichend). Das Wörtchen „nur“ dreht die Richtung um."],
+ ["Mengen","|A ∪ B| = |A| + |B| − |A ∩ B|. Bei drei Mengen ein Venn-Diagramm zeichnen und von innen nach außen füllen."],
+ ["Teilmengen zählen","Eine n-elementige Menge hat 2ⁿ Teilmengen, davon (n über k) mit genau k Elementen."]
+]);
+
+theorie("schluss","Schlussfolgerndes Denken",[
+ ["Gültige Schlüsse","Modus ponens: A → B, A, also B. Modus tollens: A → B, ¬B, also ¬A. Kettenschluss: A → B, B → C, also A → C."],
+ ["Ungültige Schlüsse","Aus B folgt nicht A. Aus ¬A folgt nicht ¬B. Diese beiden Fehlschlüsse sind die Standardablenker im Test."],
+ ["Syllogismen","Kreise zeichnen. Gültig ist nur, was in <em>jeder</em> möglichen Anordnung stimmt. Aus zwei „einige“-Sätzen folgt nie etwas Sicheres."],
+ ["Rangordnungen","Sofort eine Kette bilden (A > B > C) statt jede Aussage einzeln zu prüfen."],
+ ["Wahrheit und Lüge","Eine Annahme treffen, konsequent durchziehen, auf Widerspruch prüfen. Selbstbezügliche Aussagen wie „ich lüge“ sind der Schlüssel."],
+ ["Modulo-Aufgaben","Wochentage und Zyklen über den Rest der Division durch 7 (bzw. die Zykluslänge)."]
+]);
+
+theorie("reihen","Zahlenreihen & Muster",[
+ ["Prüfreihenfolge","1. Differenzen bilden. 2. Sind die Differenzen konstant? 3. Sind die Differenzen selbst eine Reihe? 4. Quotienten prüfen. 5. An Zahlenfamilien denken."],
+ ["Zahlenfamilien","Quadrate 1, 4, 9, 16, 25 · Kuben 1, 8, 27, 64 · Primzahlen 2, 3, 5, 7, 11 · Fakultäten 1, 2, 6, 24, 120 · Fibonacci 1, 1, 2, 3, 5, 8 · Dreieckszahlen 1, 3, 6, 10, 15."],
+ ["Zwei verschränkte Regeln","Steigt und fällt die Reihe abwechselnd, liegen meist zwei Regeln im Wechsel vor (z. B. ×2, dann −1). Dann jedes zweite Glied getrennt betrachten."],
+ ["Kombinierte Regeln","Sehr häufig ist ×2 + 1 oder ×3 − 2. Erkennbar daran, dass die Differenzen sich verdoppeln bzw. verdreifachen."],
+ ["Buchstabenreihen","Buchstaben in Positionszahlen umschreiben (A = 1 … Z = 26) und wie eine Zahlenreihe behandeln."],
+ ["Zeitmanagement","Wenn nach 45 Sekunden kein Muster erkennbar ist: markieren, weitergehen, später zurückkommen."]
+]);
+
+theorie("algo","Algorithmisches Denken",[
+ ["Binärzahlen","Stellenwerte von rechts: 1, 2, 4, 8, 16, 32, 64, 128. Umrechnen dezimal → binär: immer die größte passende Zweierpotenz abziehen."],
+ ["Bits und Werte","n Bit ergeben 2ⁿ verschiedene Werte, größter Wert 2ⁿ − 1. Jedes zusätzliche Bit verdoppelt den Bereich."],
+ ["Pseudocode lesen","Eine kleine Wertetabelle anlegen und die ersten zwei bis drei Durchläufe von Hand mitschreiben. Danach ist das Muster fast immer sichtbar."],
+ ["Schleifen zählen","Verschachtelte Schleifen multiplizieren ihre Durchläufe. Bei „solange“-Schleifen genau auf die Abbruchbedingung achten — der letzte Durchlauf wird oft übersehen."],
+ ["mod und Ganzzahldivision","17 mod 5 = 2 (Rest), 17 : 5 = 3 (abgeschnitten). „mod 2 == 0“ testet auf gerade Zahlen, „mod k == 0“ auf Vielfache."],
+ ["Wachstum einschätzen","Halbieren bis 1 → log₂ n Schritte (bei 1000 rund 10). Jeder mit jedem → n²/2 Vergleiche. Alle Anordnungen → n!."],
+ ["Rekursion","Von unten aufbauen: f(1), f(2), f(3) … statt von oben einzusetzen."]
+]);
+
+theorie("english","English Reading Comprehension",[
+ ["Vorgehen","Erst die Fragen überfliegen, dann den Text einmal zügig lesen und pro Absatz drei Wörter als Randnotiz denken. Danach gezielt zurückspringen. Wer den Text zweimal vollständig liest, verliert im 90-Minuten-Takt zu viel Zeit."],
+ ["Hauptaussage","Die richtige Antwort deckt den <em>ganzen</em> Text ab. Antworten, die nur einen Absatz oder ein Beispiel beschreiben, sind falsch — auch wenn sie stimmen."],
+ ["Detailfragen","Die Antwort steht wörtlich im Text, meist umformuliert. Die Stelle wirklich aufsuchen, statt aus der Erinnerung zu antworten."],
+ ["Inferenzfragen","Gesucht ist der kleinste Schritt über den Text hinaus, der zwingend folgt — nicht die interessanteste Interpretation."],
+ ["Vokabel im Kontext","Das umgebende Satzgefüge liefert die Bedeutung, besonders Gegensatzwörter wie <em>rather than</em>, <em>whereas</em>, <em>yet</em>."],
+ ["Ablenker erkennen","Typisch sind: extreme Wörter (always, never, all, must), inhaltlich richtige Aussagen, die aber nicht im Text stehen, und Antworten, die eine Beispielzahl zur allgemeinen Regel machen."],
+ ["Haltung des Autors","Auf wertende Formulierungen achten („has aged best“, „was never the point“). Sie beantworten Tonfall-Fragen fast im Alleingang."]
+]);
+
+theorie("wi","Wahlbereich Wirtschaftsinformatik",[
+ ["Deckungsbeitrag","DB je Stück = Preis − variable Stückkosten. Gesamt-DB = DB je Stück · Menge. Er deckt zuerst die Fixkosten."],
+ ["Break-even","Gewinnschwelle = Fixkosten : Deckungsbeitrag je Stück. Darunter Verlust, darüber Gewinn."],
+ ["Kostenarten","Fixkosten sind mengenunabhängig, variable Kosten steigen mit der Menge. Pro Stück sinken Fixkosten mit wachsender Menge (Fixkostendegression)."],
+ ["Kennzahlen","Umsatzrendite = Gewinn/Umsatz · Konversionsrate = Abschlüsse/Besucher · Amortisationszeit = Investition/jährlicher Rückfluss."],
+ ["Abschreibung","Linear: Anschaffungswert : Nutzungsdauer pro Jahr. Buchwert = Anschaffungswert − bisherige Abschreibungen."],
+ ["Gewichtete Veränderungen","Anteile mit ihren Wachstumsfaktoren multiplizieren und addieren: 0,6·1,1 + 0,4·0,9 = 1,02."],
+ ["Engpassdenken","In einer Prozesskette bestimmt die langsamste Station den Durchsatz. Mitteln ist hier immer falsch."],
+ ["Tabellen lesen","Zuerst die Gesamtsumme bilden, dann Anteile. Auf Einheiten achten (Tsd. €, Mio. €) — Einheitenfehler kosten mehr Punkte als Rechenfehler."]
+]);
+
+/* ══ Annahmetest Garching — Lern- und Prüfungstrainer ══════════════════ */
+
+var TEST_AT = new Date("2026-08-21T09:00:00+02:00");
+
+var TOPICS = [
+  {id:"algebra", n:"Algebra & Gleichungen",        g:"Mathematik"},
+  {id:"potenz",  n:"Potenzen, Wurzeln, Logarithmen", g:"Mathematik"},
+  {id:"prozent", n:"Prozent, Zins & Dreisatz",     g:"Mathematik"},
+  {id:"analysis",n:"Analysis",                     g:"Mathematik"},
+  {id:"geo",     n:"Geometrie & Trigonometrie",    g:"Mathematik"},
+  {id:"stoch",   n:"Stochastik & Kombinatorik",    g:"Mathematik"},
+  {id:"folgen",  n:"Folgen & Reihen",              g:"Mathematik"},
+  {id:"logik",   n:"Aussagenlogik & Mengen",       g:"Logik"},
+  {id:"schluss", n:"Schlussfolgerndes Denken",     g:"Logik"},
+  {id:"reihen",  n:"Zahlenreihen & Muster",        g:"Logik"},
+  {id:"algo",    n:"Algorithmisches Denken",       g:"Logik"},
+  {id:"english", n:"English Reading Comprehension",g:"Textverständnis"},
+  {id:"wi",      n:"Wahlbereich Wirtschaftsinformatik", g:"Wahlbereich"}
+];
+var TOPIC_BY = {}; TOPICS.forEach(function(t){ TOPIC_BY[t.id] = t; });
+
+var MATH  = ["algebra","potenz","prozent","analysis","geo","stoch","folgen"];
+var LOGIC = ["logik","schluss","reihen","algo"];
+
+var PLAN = [
+  {d:"2026-08-15", t:"Standort bestimmen",
+   p:"Eine vollständige Prüfungssimulation — kalt, ohne Vorbereitung. Danach Crashkurs Algebra und Potenzen und beide Blöcke üben."},
+  {d:"2026-08-16", t:"Prozentrechnung & Reihen",
+   p:"Prozent, Zins, Dreisatz und Folgen & Reihen. Alles im Kopf rechnen, konsequent ohne Taschenrechner."},
+  {d:"2026-08-17", t:"Analysis & Geometrie",
+   p:"Ableitungen, Kurvendiskussion, Integrale. Dann Flächen, Körper, Pythagoras und die Standardwerte der Trigonometrie."},
+  {d:"2026-08-18", t:"Stochastik & Wahlbereich",
+   p:"Laplace, Gegenereignis, Binomialkoeffizient. Anschließend der Wirtschaftsinformatik-Block: Deckungsbeitrag, Break-even, Kennzahlen."},
+  {d:"2026-08-19", t:"Logik komplett",
+   p:"Aussagenlogik, Schlussfolgern, Zahlenreihen, algorithmisches Denken — die vier Blöcke am Stück. Hier liegen die schnellsten Punkte."},
+  {d:"2026-08-20", t:"Simulation & Fehlerarchiv",
+   p:"English Reading, dann die zweite Prüfungssimulation unter Zeitdruck. Zum Schluss das Fehlerarchiv leeren. Früh schlafen."},
+  {d:"2026-08-21", t:"Testtag in Garching",
+   p:"Nichts Neues mehr lernen. Ausweis, Einladung, Stifte. 90 Minuten, 100 Punkte, keine Hilfsmittel — im Zweifel raten und weitergehen."}
+];
+
+/* ── Zustand ─────────────────────────────────────────────────────────── */
+var KEY = "tum-annahmetest-v1";
+var S = load();
+
+function load(){
+  try{
+    var raw = localStorage.getItem(KEY);
+    if(raw){
+      var o = JSON.parse(raw);
+      if(o && o.seen){ o.exams = o.exams||[]; o.plan = o.plan||{}; return o; }
+    }
+  }catch(e){}
+  return {seen:{}, exams:[], plan:{}, live:null};
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function rec(id){
+  if(!S.seen[id]) S.seen[id] = {n:0, ok:0, streak:0, wrong:0};
+  return S.seen[id];
+}
+
+/* ── Hilfsfunktionen ─────────────────────────────────────────────────── */
+function byId(id){ for(var i=0;i<QUESTIONS.length;i++) if(QUESTIONS[i].id===id) return QUESTIONS[i]; return null; }
+function inTopic(t){ return QUESTIONS.filter(function(x){ return x.topic===t; }); }
+function hash(s){ var h=2166136261; for(var i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=(h*16777619)>>>0; } return h; }
+function rng(seed){ var s=seed>>>0||1; return function(){ s^=s<<13; s^=s>>>17; s^=s<<5; s>>>=0; return s/4294967296; }; }
+function shuffle(arr, rand){
+  var a = arr.slice();
+  for(var i=a.length-1;i>0;i--){ var j=Math.floor((rand?rand():Math.random())*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; }
+  return a;
+}
+var PIN = /^(keine der genannten|nichts folgt|nicht bestimmbar|nicht entscheidbar|none —)/i;
+
+/* Antwortreihenfolge: pro Frage stabil gemischt, "keine der genannten" bleibt hinten. */
+function arrange(qq){
+  var idx = qq.opts.map(function(_,i){ return i; });
+  var free = idx.filter(function(i){ return !PIN.test(qq.opts[i]); });
+  var pinned = idx.filter(function(i){ return PIN.test(qq.opts[i]); });
+  return shuffle(free, rng(hash(qq.id))).concat(pinned);
+}
+
+function pad(n){ return (n<10?"0":"")+n; }
+/* Kalendertage bis zum Testtag — überall dieselbe Zahl. */
+function daysLeft(){
+  var a = new Date(), b = TEST_AT;
+  var d0 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+  var d1 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+  return Math.round((d1 - d0)/86400000);
+}
+function mmss(sec){ sec=Math.max(0,sec); return pad(Math.floor(sec/60))+":"+pad(sec%60); }
+function today(){ var d=new Date(); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+function deDate(iso){
+  var p = iso.split("-"), d = new Date(+p[0], +p[1]-1, +p[2]);
+  var wd = ["So","Mo","Di","Mi","Do","Fr","Sa"][d.getDay()];
+  return wd+" "+p[2]+"."+p[1]+".";
+}
+
+/* ── Statistik ───────────────────────────────────────────────────────── */
+function statOf(list){
+  var mastered=0, seen=0, ok=0, tries=0;
+  list.forEach(function(x){
+    var r = S.seen[x.id];
+    if(!r) return;
+    seen++; ok += r.ok; tries += r.n;
+    if(r.streak >= 2) mastered++;
+  });
+  return {total:list.length, seen:seen, mastered:mastered,
+          pct:list.length? Math.round(mastered/list.length*100):0,
+          acc: tries? Math.round(ok/tries*100):null};
+}
+function wrongPool(){
+  return QUESTIONS.filter(function(x){
+    var r = S.seen[x.id];
+    return r && r.wrong>0 && r.streak<2;
+  });
+}
+function priority(x){
+  var r = S.seen[x.id];
+  if(!r) return 2;                    // noch nie gesehen
+  if(r.streak === 0) return 3;         // zuletzt falsch
+  if(r.streak === 1) return 1.2;       // einmal richtig, noch nicht sitzend
+  return 0.15;                         // beherrscht, nur zur Auffrischung
+}
+function pick(pool, n){
+  var scored = pool.map(function(x){ return {x:x, s:priority(x)+Math.random()*0.6}; });
+  scored.sort(function(a,b){ return b.s - a.s; });
+  return scored.slice(0,n).map(function(o){ return o.x; });
+}
+
+/* ── Sitzung ─────────────────────────────────────────────────────────── */
+var SES = null, TICK = null;
+
+function startPractice(topic){
+  var pool = topic==="alle" ? QUESTIONS.slice() : inTopic(topic);
+  var chosen = pick(pool, Math.min(10, pool.length));
+  chosen = groupPassages(shuffle(chosen));
+  SES = {mode:"practice", topic:topic, ids:chosen.map(function(x){return x.id;}), i:0, ans:{}, done:false};
+  go("run");
+}
+function startReview(){
+  var pool = wrongPool();
+  if(!pool.length) return;
+  var chosen = groupPassages(shuffle(pool).slice(0, Math.min(15, pool.length)));
+  SES = {mode:"review", topic:"fehler", ids:chosen.map(function(x){return x.id;}), i:0, ans:{}, done:false};
+  go("run");
+}
+/* Fragen zum selben Text bleiben beieinander. */
+function groupPassages(list){
+  var out=[], byP={}, order=[];
+  list.forEach(function(x){
+    if(!x.pid){ out.push(x); return; }
+    if(!byP[x.pid]){ byP[x.pid]=[]; order.push(x.pid); }
+    byP[x.pid].push(x);
+  });
+  order.forEach(function(p){ out = out.concat(byP[p]); });
+  return out;
+}
+
+function buildExam(){
+  var out = [];
+  /* 18 Mathematik, gleichmäßig über die sieben Blöcke */
+  var mathPool = [];
+  MATH.forEach(function(t){ mathPool = mathPool.concat(shuffle(inTopic(t)).slice(0,3)); });
+  out = out.concat(shuffle(mathPool).slice(0,18));
+  /* 10 Logik */
+  var logicPool = [];
+  LOGIC.forEach(function(t){ logicPool = logicPool.concat(shuffle(inTopic(t)).slice(0,3)); });
+  out = out.concat(shuffle(logicPool).slice(0,10));
+  /* 8 Textverständnis: zwei vollständige Texte */
+  var pids = shuffle(Object.keys(PASSAGES)).slice(0,2);
+  pids.forEach(function(p){
+    out = out.concat(QUESTIONS.filter(function(x){ return x.pid===p; }));
+  });
+  /* 4 Wahlbereich */
+  out = out.concat(shuffle(inTopic("wi")).slice(0,4));
+  return groupPassages(out);
+}
+function startExam(){
+  var qs = buildExam();
+  SES = {mode:"exam", ids:qs.map(function(x){return x.id;}), i:0, ans:{},
+         ends:Date.now()+90*60*1000, done:false};
+  S.live = SES; save();
+  go("run");
+}
+function resumeExam(){ SES = S.live; go("run"); }
+
+function answer(pos){
+  var qq = byId(SES.ids[SES.i]);
+  /* In der Übung zählt die erste Antwort; in der Simulation darf man sie ändern. */
+  if(SES.mode !== "exam" && SES.ans[qq.id] !== undefined) return;
+  SES.ans[qq.id] = pos;
+  if(SES.mode !== "exam"){
+    var r = rec(qq.id);
+    r.n++;
+    if(pos === qq.ans){ r.ok++; r.streak++; } else { r.streak = 0; r.wrong++; }
+    save();
+  } else { S.live = SES; save(); }
+  render();
+}
+function next(){
+  if(SES.i < SES.ids.length-1){ SES.i++; render(); }
+  else finish();
+}
+function prev(){ if(SES.i>0){ SES.i--; render(); } }
+
+function finish(){
+  SES.done = true;
+  if(SES.mode === "exam"){
+    var right = 0;
+    SES.ids.forEach(function(id){
+      var qq = byId(id), given = SES.ans[id], r = rec(id);
+      r.n++;
+      if(given === qq.ans){ right++; r.ok++; r.streak++; } else { r.streak = 0; r.wrong++; }
+    });
+    SES.points = Math.round(right / SES.ids.length * 100);
+    SES.right = right;
+    S.exams.push({at:Date.now(), points:SES.points, right:right, of:SES.ids.length});
+    S.live = null;
+  }
+  save();
+  render();
+}
+
+/* ── Router ──────────────────────────────────────────────────────────── */
+var VIEW = "start";
+function go(v){ VIEW = v; window.scrollTo(0,0); render(); }
+
+var TABS = [
+  {id:"start",   n:"Start"},
+  {id:"ueben",   n:"Üben"},
+  {id:"pruefung",n:"Prüfung"},
+  {id:"fehler",  n:"Fehler"},
+  {id:"wissen",  n:"Wissen"}
+];
+
+function renderChrome(){
+  var d = daysLeft();
+  document.getElementById("hcount").innerHTML =
+      d > 1  ? "<b>noch "+d+" Tage</b><span class=\"upto\"> bis zum Test</span>"
+    : d === 1? "<b>morgen</b><span class=\"upto\"> ist der Test</span>"
+    : d === 0? "<b>heute</b><span class=\"upto\"> ist der Test</span>"
+    :          "<b>Viel Erfolg.</b>";
+
+  var nw = wrongPool().length;
+  document.getElementById("tabs").innerHTML = TABS.map(function(t){
+    var cur = (VIEW===t.id || (VIEW==="run" && t.id==="ueben"));
+    return '<button onclick="go(\''+t.id+'\')" aria-current="'+(cur?"true":"false")+'">'+t.n+
+      (t.id==="fehler" && nw ? '<span class="pill">'+nw+'</span>' : '')+'</button>';
+  }).join("");
+}
+
+function render(){
+  renderChrome();
+  var v = document.getElementById("view");
+  if(TICK){ clearInterval(TICK); TICK = null; }
+  if(VIEW==="run" && SES && !SES.done) v.innerHTML = viewRun();
+  else if(VIEW==="run" && SES && SES.done) v.innerHTML = viewResult();
+  else if(VIEW==="ueben")    v.innerHTML = viewUeben();
+  else if(VIEW==="pruefung") v.innerHTML = viewPruefung();
+  else if(VIEW==="fehler")   v.innerHTML = viewFehler();
+  else if(VIEW==="wissen")   v.innerHTML = viewWissen();
+  else                       v.innerHTML = viewStart();
+
+  if(VIEW==="run" && SES && !SES.done && SES.mode==="exam") TICK = setInterval(tickExam, 1000);
+}
+
+function tickExam(){
+  var el = document.getElementById("timer");
+  if(!el || !SES || SES.done){ clearInterval(TICK); TICK=null; return; }
+  var left = Math.round((SES.ends - Date.now())/1000);
+  if(left <= 0){ clearInterval(TICK); TICK=null; finish(); return; }
+  el.textContent = mmss(left);
+  el.className = "timer" + (left < 300 ? " low" : "");
+}
+
+/* ── Ansicht: Start ──────────────────────────────────────────────────── */
+function viewStart(){
+  var all = statOf(QUESTIONS);
+  var nw = wrongPool().length;
+  var last = S.exams.length ? S.exams[S.exams.length-1] : null;
+  var td = today();
+
+  var planHtml = PLAN.map(function(p){
+    var done = !!S.plan[p.d];
+    return '<li class="'+(p.d===td?"now":"")+(done?" ok":"")+'">'+
+      '<span class="day">'+deDate(p.d)+'</span>'+
+      '<span class="what"><b>'+p.t+'</b><p>'+p.p+'</p></span>'+
+      '<button class="tick" onclick="togglePlan(\''+p.d+'\')" aria-pressed="'+done+'" '+
+        'title="'+(done?"Als offen markieren":"Als erledigt markieren")+'">'+(done?"✓":"")+'</button>'+
+    '</li>';
+  }).join("");
+
+  return '<div class="stack">'+
+    '<section class="hero">'+
+      '<p class="eyebrow">Eignungsfeststellungstest · B.Sc. Wirtschaftsinformatik</p>'+
+      '<h1>Sechs Tage, drei Testteile, keine Hilfsmittel.</h1>'+
+      '<p class="lead">Der Test dauert 90 Minuten, bringt maximal 100 Punkte und besteht ausschließlich aus Single-Choice-Aufgaben — genau eine Antwort ist richtig. Geprüft werden Schulmathematik, logisches Denken und englisches Textverständnis. Taschenrechner und Formelsammlungen sind nicht zugelassen.</p>'+
+      '<div class="dday"><b>'+Math.max(0,daysLeft())+'</b><span>Tage bis Freitag, 21.08.2026 · Forschungscampus Garching</span></div>'+
+      '<dl class="facts">'+
+        fact("Dauer","90 Minuten")+
+        fact("Punkte","max. 100")+
+        fact("Format","Single Choice")+
+        fact("Hilfsmittel","keine")+
+      '</dl>'+
+    '</section>'+
+
+    '<div class="tiles">'+
+      tile("Weiterlernen", all.mastered+" / "+all.total, "Aufgaben sitzen sicher", "startPractice('alle')")+
+      tile("Prüfungssimulation", last? last.points+" P." : "90 min", last? "letztes Ergebnis" : "40 Aufgaben, volle Zeit", "go('pruefung')")+
+      tile("Fehlerarchiv", String(nw), nw? "Aufgaben warten auf dich" : "nichts offen", nw? "startReview()" : "go('fehler')")+
+    '</div>'+
+
+    '<section>'+
+      '<p class="eyebrow" style="margin-bottom:.5rem">Lernplan bis zum Testtag</p>'+
+      '<div class="list"><ul class="plan">'+planHtml+'</ul></div>'+
+    '</section>'+
+
+    '<section>'+
+      '<p class="eyebrow" style="margin-bottom:.5rem">Fortschritt nach Themenblock</p>'+
+      topicList()+
+    '</section>'+
+    footer();
+}
+function fact(k,v){ return '<div class="fact"><dt>'+k+'</dt><dd>'+v+'</dd></div>'; }
+function tile(t,big,sub,act){
+  return '<button class="tile" onclick="'+act+'"><strong>'+t+'</strong>'+
+    '<span class="big">'+big+'</span><em>'+sub+'</em></button>';
+}
+function togglePlan(d){ S.plan[d] = !S.plan[d]; save(); render(); }
+
+function topicList(){
+  var out = '', group = '';
+  TOPICS.forEach(function(t){
+    var st = statOf(inTopic(t.id));
+    if(t.g !== group){
+      group = t.g;
+      out += '<div class="item" style="pointer-events:none;background:var(--raise)"><span class="eyebrow">'+group+'</span></div>';
+    }
+    out += '<button class="item" onclick="startPractice(\''+t.id+'\')">'+
+      '<span class="nm">'+t.n+'</span>'+
+      '<span class="pct">'+st.pct+' %</span>'+
+      '<span class="sub">'+st.total+' Aufgaben'+(st.acc!==null?' · '+st.acc+' % richtig':'')+'</span>'+
+      '<span class="bar meter'+(st.pct>=80?' good':'')+'"><i style="width:'+st.pct+'%"></i></span>'+
+    '</button>';
+  });
+  return '<div class="list">'+out+'</div>';
+}
+
+/* ── Ansicht: Üben ───────────────────────────────────────────────────── */
+function viewUeben(){
+  return '<div class="stack">'+
+    '<section><h2>Üben</h2>'+
+      '<p class="lead">Zehn Aufgaben je Runde. Die Auswahl bevorzugt automatisch das, was du noch nicht kannst: zuletzt falsch beantwortete Aufgaben zuerst, dann unbekannte, zuletzt bereits sitzende zur Auffrischung.</p>'+
+      '<div class="row" style="margin-top:.9rem">'+
+        '<button class="btn" onclick="startPractice(\'alle\')">Gemischte Runde</button>'+
+        '<button class="btn ghost" onclick="startReview()"'+(wrongPool().length?'':' disabled')+'>Nur Fehler wiederholen</button>'+
+      '</div>'+
+    '</section>'+
+    '<section><p class="eyebrow" style="margin-bottom:.5rem">Nach Themenblock</p>'+topicList()+'</section>'+
+    footer();
+}
+
+/* ── Ansicht: Prüfung ────────────────────────────────────────────────── */
+function viewPruefung(){
+  var hist = S.exams.slice().reverse().map(function(e){
+    var d = new Date(e.at);
+    return '<div class="rev"><span class="mk '+(e.points>=60?'ok':'no')+'">'+e.points+'</span>'+
+      '<span><span class="q">'+e.right+' von '+e.of+' richtig</span>'+
+      '<span class="a">'+pad(d.getDate())+"."+pad(d.getMonth()+1)+"."+d.getFullYear()+' · '+pad(d.getHours())+':'+pad(d.getMinutes())+'</span></span></div>';
+  }).join("");
+
+  var live = S.live ? '<div class="card" style="border-color:var(--accent-line);background:var(--accent-soft)">'+
+      '<strong>Laufende Simulation</strong><p class="lead">Eine Simulation wurde unterbrochen. Die verbleibende Zeit läuft weiter.</p>'+
+      '<div class="row" style="margin-top:.7rem"><button class="btn" onclick="resumeExam()">Fortsetzen</button>'+
+      '<button class="btn ghost" onclick="dropLive()">Verwerfen</button></div></div>' : '';
+
+  return '<div class="stack">'+ live +
+    '<section><h2>Prüfungssimulation</h2>'+
+      '<p class="lead">40 Aufgaben in 90 Minuten, gewichtet wie im echten Test: 18 Mathematik, 10 Logik, 8 englisches Textverständnis, 4 aus dem Wahlbereich Wirtschaftsinformatik. Jede Aufgabe zählt 2,5 Punkte. Rückmeldung gibt es erst am Ende — genau wie in Garching.</p>'+
+      '<div class="card" style="margin-top:.9rem">'+
+        '<p class="eyebrow">So läuft es ab</p>'+
+        '<ul style="margin:.5rem 0 0;padding-left:1.1rem;color:var(--ink-2);font-size:.9rem;line-height:1.7">'+
+          '<li>Kein Taschenrechner, kein Papier außer dem, was du dir selbst hinlegst.</li>'+
+          '<li>Falsche Antworten kosten keine Punkte — nichts unbeantwortet lassen.</li>'+
+          '<li>Rund 2 Minuten pro Aufgabe. Wer hängen bleibt, geht weiter und kommt zurück.</li>'+
+        '</ul>'+
+      '</div>'+
+      '<div class="row" style="margin-top:1rem"><button class="btn" onclick="startExam()">Simulation starten</button></div>'+
+    '</section>'+
+    (hist? '<section><p class="eyebrow" style="margin-bottom:.3rem">Bisherige Ergebnisse</p><div class="card" style="padding-top:.2rem">'+hist+'</div></section>':'')+
+    footer();
+}
+function dropLive(){ S.live = null; save(); render(); }
+
+/* ── Ansicht: Fehler ─────────────────────────────────────────────────── */
+function viewFehler(){
+  var pool = wrongPool();
+  if(!pool.length){
+    return '<div class="stack"><section><h2>Fehlerarchiv</h2>'+
+      '<div class="card"><div class="empty"><strong>Nichts offen.</strong>'+
+      '<p>Jede Aufgabe, die du falsch beantwortest, landet hier — und verschwindet erst, wenn du sie zweimal hintereinander richtig hast.</p></div></div>'+
+      '</section>'+footer();
+  }
+  var byT = {};
+  pool.forEach(function(x){ (byT[x.topic] = byT[x.topic]||[]).push(x); });
+  var rows = Object.keys(byT).map(function(t){
+    return '<button class="item" onclick="startPractice(\''+t+'\')">'+
+      '<span class="nm">'+TOPIC_BY[t].n+'</span><span class="pct">'+byT[t].length+'</span>'+
+      '<span class="sub">offene Aufgaben</span></button>';
+  }).join("");
+
+  return '<div class="stack"><section><h2>Fehlerarchiv</h2>'+
+    '<p class="lead">'+pool.length+' Aufgaben warten auf die Wiederholung. Eine Aufgabe verlässt das Archiv erst, wenn sie zweimal hintereinander richtig beantwortet wurde — einmaliges Raten reicht nicht.</p>'+
+    '<div class="row" style="margin-top:.9rem"><button class="btn" onclick="startReview()">Wiederholung starten</button></div></section>'+
+    '<section><p class="eyebrow" style="margin-bottom:.5rem">Verteilung</p><div class="list">'+rows+'</div></section>'+
+    footer();
+}
+
+/* ── Ansicht: Wissen ─────────────────────────────────────────────────── */
+function viewWissen(){
+  var body = THEORIE.map(function(t){
+    var items = t.items.map(function(it){
+      return '<dt>'+it[0]+'</dt><dd>'+it[1]+'</dd>';
+    }).join("");
+    return '<details class="th"><summary>'+t.title+'</summary>'+
+      '<div class="thbody"><dl>'+items+'</dl>'+
+      '<div class="row" style="margin-top:1rem"><button class="btn ghost" onclick="startPractice(\''+t.topic+'\')">Dazu üben</button></div>'+
+      '</div></details>';
+  }).join("");
+
+  return '<div class="stack"><section><h2>Crashkurs</h2>'+
+    '<p class="lead">Alles, was ohne Taschenrechner im Kopf verfügbar sein muss — Formeln, Rechenwege und die Fallen, die im Test regelmäßig Punkte kosten.</p>'+
+    '<div style="margin-top:1rem">'+body+'</div></section>'+footer();
+}
+
+/* ── Ansicht: laufende Sitzung ───────────────────────────────────────── */
+function viewRun(){
+  var qq = byId(SES.ids[SES.i]);
+  var order = arrange(qq);
+  var given = SES.ans[qq.id];
+  var revealed = (SES.mode !== "exam") && given !== undefined;
+
+  var opts = order.map(function(orig, k){
+    var letter = "ABCDE".charAt(k), cls = "opt";
+    if(revealed){
+      if(orig === qq.ans) cls += " right";
+      else if(orig === given) cls += " wrong";
+    }
+    var pressed = (given === orig) ? "true" : "false";
+    return '<button class="'+cls+'" aria-pressed="'+pressed+'" onclick="answer('+orig+')"'+
+      (revealed?' disabled':'')+'>'+
+      '<span class="k">'+letter+'</span><span>'+qq.opts[orig]+'</span></button>';
+  }).join("");
+
+  var pas = qq.pid && PASSAGES[qq.pid] ? '<div class="passage"><h3>'+PASSAGES[qq.pid].title+'</h3>'+
+      PASSAGES[qq.pid].text.split("\n\n").map(function(p){ return '<p>'+p+'</p>'; }).join("")+'</div>' : '';
+
+  var verdict = "";
+  if(revealed){
+    var ok = given === qq.ans;
+    verdict = '<div class="verdict '+(ok?"ok":"no")+'">'+
+      '<span class="tag">'+(ok?"Richtig":"Falsch — richtig ist "+ "ABCDE".charAt(order.indexOf(qq.ans)))+'</span>'+
+      '<p>'+qq.exp+'</p></div>';
+  }
+
+  var label = SES.mode==="exam" ? "Prüfungssimulation"
+            : SES.mode==="review" ? "Fehlerarchiv"
+            : TOPIC_BY[qq.topic].n;
+
+  var timer = SES.mode==="exam"
+    ? '<span id="timer" class="timer">'+mmss(Math.round((SES.ends-Date.now())/1000))+'</span>' : '';
+
+  var lastQ = SES.i === SES.ids.length-1;
+  var nextBtn = SES.mode==="exam"
+    ? (lastQ ? '<button class="btn" onclick="confirmFinish()">Abgeben</button>'
+             : '<button class="btn'+(given===undefined?' ghost':'')+'" onclick="next()">Weiter</button>')
+    : '<button class="btn" onclick="next()"'+(given===undefined?' disabled':'')+'>'+(lastQ?"Auswerten":"Weiter")+'</button>';
+
+  var answered = Object.keys(SES.ans).length;
+
+  return '<div class="stack">'+
+    '<div class="qhead"><span>'+label+'</span>'+timer+
+      '<span class="prog">'+(SES.i+1)+' / '+SES.ids.length+
+      (SES.mode==="exam"? ' · '+answered+' beantwortet':'')+'</span></div>'+
+    '<div class="card">'+ pas +
+      '<p class="qtext">'+qq.text+'</p>'+
+      '<div class="opts">'+opts+'</div>'+
+      verdict+
+      '<div class="qfoot">'+
+        (SES.i>0? '<button class="btn quiet" onclick="prev()">← Zurück</button>':'')+
+        nextBtn+
+        (SES.mode!=="exam"? '<button class="btn quiet" onclick="quit()">Beenden</button>':'')+
+        '<span class="hint"><kbd>A</kbd>–<kbd>E</kbd> antworten · <kbd>Enter</kbd> weiter</span>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+function quit(){ if(SES) SES.done = true; render(); }
+function confirmFinish(){
+  var open = SES.ids.length - Object.keys(SES.ans).length;
+  if(open && !confirm(open+" Aufgaben sind noch unbeantwortet. Trotzdem abgeben?")) return;
+  finish();
+}
+
+/* ── Ansicht: Auswertung ─────────────────────────────────────────────── */
+function viewResult(){
+  var ids = SES.ids.filter(function(id){ return SES.ans[id]!==undefined || SES.mode==="exam"; });
+  var right = ids.filter(function(id){ return SES.ans[id] === byId(id).ans; }).length;
+  var pts = SES.mode==="exam" ? SES.points : Math.round(right/Math.max(1,ids.length)*100);
+
+  var rows = ids.map(function(id){
+    var qq = byId(id), given = SES.ans[id], ok = given === qq.ans;
+    var order = arrange(qq);
+    var line = ok ? '<i>'+qq.opts[qq.ans]+'</i>'
+      : (given===undefined ? '<s>nicht beantwortet</s> → <i>'+qq.opts[qq.ans]+'</i>'
+         : '<s>'+qq.opts[given]+'</s> → <i>'+qq.opts[qq.ans]+'</i>');
+    return '<div class="rev"><span class="mk '+(ok?"ok":"no")+'">'+(ok?"✓":"✗")+'</span>'+
+      '<span><span class="q">'+qq.text.replace(/<pre[\s\S]*?<\/pre>/g," …")+'</span>'+
+      '<span class="a">'+line+'</span>'+
+      (!ok? '<span class="a" style="color:var(--ink-3);margin-top:.25rem">'+qq.exp+'</span>':'')+
+      '</span></div>';
+  }).join("");
+
+  var verdictText = SES.mode==="exam"
+    ? (pts>=75 ? "Das ist ein sicheres Ergebnis. Halte das Niveau und arbeite gezielt das Fehlerarchiv ab."
+      : pts>=55 ? "Solide Basis. Die Punkte liegen jetzt in den Blöcken mit den meisten Fehlern — genau dort weitermachen."
+      : "Noch Luft nach oben. Nimm dir die schwächsten zwei Themenblöcke im Crashkurs vor und übe sie am Stück.")
+    : "Alles Falsche liegt jetzt im Fehlerarchiv und kommt automatisch wieder.";
+
+  return '<div class="stack">'+
+    '<section class="hero">'+
+      '<p class="eyebrow">'+(SES.mode==="exam"?"Simulation abgeschlossen":"Runde abgeschlossen")+'</p>'+
+      '<div class="score" style="margin-top:.5rem"><b>'+pts+'</b><span>'+(SES.mode==="exam"?"von 100 Punkten":"% richtig")+' · '+right+' von '+ids.length+'</span></div>'+
+      '<div class="meter'+(pts>=60?' good':'')+'" style="margin-top:.9rem"><i style="width:'+pts+'%"></i></div>'+
+      '<p class="lead">'+verdictText+'</p>'+
+      '<div class="row" style="margin-top:1rem">'+
+        '<button class="btn" onclick="go(\'start\')">Zur Übersicht</button>'+
+        (wrongPool().length? '<button class="btn ghost" onclick="startReview()">Fehler wiederholen</button>':'')+
+      '</div>'+
+    '</section>'+
+    '<section><p class="eyebrow" style="margin-bottom:.3rem">Durchsicht</p>'+
+      '<div class="card" style="padding-top:.2rem">'+rows+'</div></section>'+
+    footer();
+}
+
+/* ── Fuß ─────────────────────────────────────────────────────────────── */
+function footer(){
+  var st = statOf(QUESTIONS);
+  return '<div class="foot"><span>'+QUESTIONS.length+' Aufgaben · '+Object.keys(PASSAGES).length+' englische Texte · Fortschritt lokal im Browser gespeichert</span>'+
+    '<span style="margin-left:auto">'+st.seen+' bearbeitet</span>'+
+    '<button class="btn quiet" onclick="resetAll()">Zurücksetzen</button></div>';
+}
+function resetAll(){
+  if(!confirm("Gesamten Fortschritt löschen?")) return;
+  S = {seen:{}, exams:[], plan:{}, live:null}; save(); go("start");
+}
+
+/* ── Tastatur ────────────────────────────────────────────────────────── */
+document.addEventListener("keydown", function(e){
+  if(VIEW!=="run" || !SES || SES.done) return;
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  var qq = byId(SES.ids[SES.i]);
+  var k = e.key.toUpperCase();
+  var pos = "ABCDE".indexOf(k);
+  if(pos<0 && /^[1-5]$/.test(k)) pos = +k - 1;
+  if(pos >= 0 && pos < qq.opts.length){
+    e.preventDefault();
+    answer(arrange(qq)[pos]);
+  } else if(e.key === "Enter"){
+    e.preventDefault();
+    if(SES.mode==="exam" || SES.ans[qq.id]!==undefined) next();
+  } else if(e.key === "ArrowLeft"){ prev(); }
+});
+
+/* ── Start ───────────────────────────────────────────────────────────── */
+if(S.live && S.live.ends > Date.now()){ /* laufende Simulation bleibt in der Prüfungsansicht abrufbar */ }
+else if(S.live){ S.live = null; save(); }
+render();
+
+</script>

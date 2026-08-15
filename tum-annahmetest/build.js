@@ -1,4 +1,4 @@
-/* Baut die eigenständige Einzeldatei dist/index.html aus src/. */
+/* Baut die eigenständige Einzeldatei annahmetest.html aus src/. */
 import { readFileSync, writeFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -17,6 +17,6 @@ const html = readFileSync(join(src, "app.html"), "utf8")
   .replace("/*__DATA__*/", () => data)
   .replace("/*__APP__*/", () => app);
 
-const out = join(root, "dist", "index.html");
+const out = join(root, "annahmetest.html");
 writeFileSync(out, html);
-console.log(`dist/index.html — ${(html.length / 1024).toFixed(1)} kB`);
+console.log(`annahmetest.html — ${(html.length / 1024).toFixed(1)} kB`);
