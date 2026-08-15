@@ -55,13 +55,13 @@ const config: IndustryPageConfig = {
     },
   ],
   workflow: {
-    title: "Beispiel-Workflow: Restaurant Regensburg Altstadt",
+    title: "Beispielszenario: Restaurant Regensburg Altstadt",
     trigger:
-      "Ein Restaurant in der Regensburger Altstadt hatte täglich Reservierungsanrufe – vor allem am Wochenende und von Touristen, die kurzfristig einen Tisch suchten. Das Personal war im Service gebunden, Anrufe gingen ins Leere.",
+      "Angenommen, ein Restaurant in der Regensburger Altstadt erhält täglich Reservierungsanrufe – vor allem am Wochenende und von Touristen, die kurzfristig einen Tisch suchen. Das Personal ist im Service gebunden, Anrufe gehen ins Leere.",
     process:
-      "Cogniiq baute eine neue Restaurant-Website mit Online-Reservierungssystem und implementierte einen KI-Telefonassistenten für Reservierungen und häufige Fragen. Tischbuchungen werden automatisch erfasst und sofort bestätigt.",
+      "Vorgehen: Cogniiq entwickelt eine Restaurant-Website mit Online-Reservierungssystem und richtet einen KI-Telefonassistenten für Reservierungen und häufige Fragen ein. Tischbuchungen werden automatisch erfasst und sofort bestätigt.",
     result:
-      "Reservierungen laufen rund um die Uhr vollautomatisch ein – auch für Touristen ohne Sprachkenntnisse. Das Serviceteam konzentriert sich auf den Gast. Die Website bringt kontinuierlich neue Buchungen.",
+      "So könnten Reservierungen auch außerhalb der Öffnungszeiten eingehen – auch mehrsprachig – und das Serviceteam sich auf den Gast konzentrieren.",
   },
   pakete: [
     {
@@ -129,7 +129,7 @@ const config: IndustryPageConfig = {
   ],
   useCases: [
     {
-      title: "Tischreservierungen für lokale und touristische Gäste rund um die Uhr",
+      title: "Tischreservierungen für lokale und touristische Gäste außerhalb der Öffnungszeiten",
       description:
         "Gäste reservieren über die Website oder per KI-Assistent jederzeit – auch wenn das Restaurant geschlossen hat oder im vollen Betrieb ist. Für internationale Touristen besonders wichtig.",
     },
@@ -141,7 +141,7 @@ const config: IndustryPageConfig = {
     {
       title: "Öffnungszeitenanfragen für Touristen automatisch beantworten",
       description:
-        "Der KI-Telefonassistent beantwortet wiederkehrende Fragen zu Öffnungszeiten, Parkmöglichkeiten, Speisekarte und Besonderheiten in der Regensburger Altstadt – ohne Personalaufwand, rund um die Uhr.",
+        "Der KI-Telefonassistent beantwortet wiederkehrende Fragen zu Öffnungszeiten, Parkmöglichkeiten, Speisekarte und Besonderheiten in der Regensburger Altstadt – ohne Personalaufwand, auch außerhalb der Öffnungszeiten.",
     },
     {
       title: "Gruppenreservierungen und Events in Regensburg",
@@ -163,15 +163,15 @@ const config: IndustryPageConfig = {
     "Weniger verpasste Reservierungsanrufe – auch im laufenden Service und außerhalb der Öffnungszeiten",
     "Automatisierte Reservierungsprozesse entlasten das Serviceteam in einem touristisch stark frequentierten Standort",
     "Mehr qualifizierte Tischbuchungen durch eine suchmaschinenoptimierte Restaurant-Website in Regensburg",
-    "Höhere Erreichbarkeit für lokale und touristische Gäste – rund um die Uhr, in jeder Sprache",
+    "Höhere Erreichbarkeit für lokale und touristische Gäste – auch außerhalb der Öffnungszeiten, in jeder Sprache",
     "Zeitersparnis durch automatisierte Bestätigungen, Erinnerungen und Gästekommunikation",
     "Professioneller erster Eindruck in einer UNESCO-Welterbestadt mit hohen Gästeansprüchen",
-    "Vollständige DSGVO-Konformität – alle Gästedaten sicher auf europäischen Servern",
+    "Datenschutzorientierte Umsetzung – alle Gästedaten sicher auf europäischen Servern",
   ],
   localContext: [
     "Regensburg zieht jährlich Millionen Touristen an und beheimatet eine der ältesten Universitäten Deutschlands. Die Gastronomie der Stadt profitiert von dieser Mischung aus lokalem Stammpublikum, Studenten und internationalem Tourismus – steht aber gleichzeitig vor der Herausforderung, digital präsent und buchbar zu sein.",
     "Cogniiq entwickelt für Gastronomiebetriebe in Regensburg passgenaue Digitallösungen: eine moderne Restaurant-Website mit integriertem Reservierungssystem, einen KI-Telefonassistenten sowie Automatisierungen für Bestätigungen, Erinnerungen und Feedback-Prozesse.",
-    "Alle Systeme sind vollständig DSGVO-konform, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut das Setup langfristig remote.",
+    "Alle Systeme werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut das Setup langfristig remote.",
   ],
   internalLinks: [
     { label: "Webdesign Regensburg", href: "/regensburg/webdesign" },

@@ -57,7 +57,7 @@ const faqItems = [
   {
     question: "Ist der KI Telefonassistent DSGVO-konform?",
     answer:
-      "Ja. Alle Daten werden auf deutschen Servern verarbeitet. Der Assistent ist vollständig DSGVO-konform und wurde für den Einsatz im deutschen Mittelstand entwickelt.",
+      "Ja. Alle Daten werden auf europäischen Servern verarbeitet. Der Assistent unterstützt DSGVO-konforme Prozesse und wurde für den Einsatz im deutschen Mittelstand entwickelt.",
   },
   {
     question: "Kann die KI individuell angepasst werden?",
@@ -90,7 +90,7 @@ const PROBLEMS = [
   {
     icon: TrendingUp,
     title: "Kunden springen zur Konkurrenz",
-    desc: "Über 60 % der Anrufer, die niemanden erreichen, versuchen es bei einem anderen Anbieter – und kehren nicht zurück.",
+    desc: "Wer niemanden erreicht, versucht es häufig beim nächsten Anbieter – und kehrt oft nicht zurück.",
   },
   {
     icon: Building2,
@@ -168,7 +168,7 @@ export function KiTelefonassistentPage() {
         "@type": "Service",
         name: "KI Telefonassistent für Unternehmen",
         description:
-          "Automatischer KI Telefonassistent der Anrufe beantwortet, Fragen klärt und Termine bucht – 24/7.",
+          "Automatischer KI Telefonassistent der Anrufe beantwortet, Fragen klärt und Termine bucht – auch außerhalb regulärer Geschäftszeiten.",
         url: `${BUSINESS_INFO.website}/ki-telefonassistent`,
         provider: {
           "@type": "Organization",
@@ -177,7 +177,6 @@ export function KiTelefonassistentPage() {
         },
       },
       {
-        "@context": "https://schema.org",
         "@type": "FAQPage",
         mainEntity: faqItems.map((f) => ({
           "@type": "Question",
@@ -190,12 +189,8 @@ export function KiTelefonassistentPage() {
         "name": "KI-Telefonassistent einrichten – in 4 Schritten",
         "description": "So wird der KI-Telefonassistent von Cogniiq für Ihr Unternehmen eingerichtet – von der Analyse bis zum Live-Betrieb.",
         "totalTime": "P14D",
-        "estimatedCost": {
-          "@type": "MonetaryAmount",
-          "currency": "EUR",
-          "value": "0",
-          "minValue": "0",
-        },
+        // No estimatedCost: the previous value of 0 EUR asserted a free setup that the page
+        // does not state. Pricing is individual, so no figure may be published here.
         "step": [
           {
             "@type": "HowToStep",
@@ -234,7 +229,7 @@ export function KiTelefonassistentPage() {
     <>
       <PageSEO
         title="KI Telefonassistent für Unternehmen | Cogniiq"
-        description="KI Telefonassistent für Ihr Unternehmen: Beantwortet Anrufe automatisch, versteht Kundenanfragen und bucht Termine rund um die Uhr. Jetzt kostenlose Demo buchen."
+        description="KI Telefonassistent für Ihr Unternehmen: Beantwortet Anrufe automatisch, versteht Kundenanfragen und bucht Termine auch außerhalb regulärer Geschäftszeiten. Jetzt kostenlose Demo buchen."
         canonical={`${BUSINESS_INFO.website}/ki-telefonassistent`}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
@@ -250,7 +245,6 @@ export function KiTelefonassistentPage() {
         <CallSummarySection />
         <ObjectionsSection />
         <UseCasesSection />
-        <SocialProofSection />
         <SetupSection />
         <DemoCtaSection />
         <FAQSectionBlock />
@@ -286,11 +280,11 @@ function HeroSection() {
             <p className="text-lg text-gray-600 dark:text-gray-400 leading-[1.7] max-w-xl mb-3">
               Der KI Telefonassistent von Cogniiq übernimmt eingehende Anrufe, führt
               natürliche Gespräche und bucht Termine direkt in Ihren Kalender –
-              rund um die Uhr, ohne zusätzliches Personal.
+              auch außerhalb regulärer Geschäftszeiten, ohne zusätzliches Personal.
             </p>
             <p className="text-sm text-gray-400 dark:text-gray-500 mb-10 max-w-lg leading-relaxed">
               Individuell konfiguriert für Ihre Branche. Eingerichtet in wenigen Tagen.
-              Betrieben auf deutschen Servern.
+              Betrieben auf europäischen Servern.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 mb-10">
@@ -312,7 +306,7 @@ function HeroSection() {
 
             <div className="flex flex-wrap gap-x-7 gap-y-2.5">
               {[
-                "DSGVO-konform · Deutsche Server",
+                "DSGVO-konform · Europäische Server",
                 "Einrichtung in wenigen Tagen",
                 "Individuelle Konfiguration",
                 "CRM & Kalender-Integration",
@@ -391,7 +385,7 @@ function HeroSection() {
             <div className="mt-3 flex items-center gap-2 px-1">
               <Lock size={11} className="text-gray-300 dark:text-gray-600 flex-shrink-0" />
               <span className="text-[11px] text-gray-400 dark:text-gray-500">
-                DSGVO-konform · Verarbeitung auf deutschen Servern
+                DSGVO-konform · Verarbeitung auf europäischen Servern
               </span>
             </div>
           </motion.div>
@@ -403,9 +397,9 @@ function HeroSection() {
 
 function CredentialStrip() {
   const items = [
-    { label: "Deutsche Server", detail: "DSGVO-konform" },
+    { label: "Europäische Server", detail: "DSGVO-konform" },
     { label: "Einrichtung in Tagen", detail: "Kein IT-Aufwand" },
-    { label: "24/7 Erreichbarkeit", detail: "365 Tage im Jahr" },
+    { label: "Erreichbarkeit außerhalb der Öffnungszeiten", detail: "Auch abends und am Wochenende" },
     { label: "Individuelle Konfiguration", detail: "Für Ihre Branche" },
     { label: "CRM & Kalender-Integration", detail: "Google, Outlook & mehr" },
   ];
@@ -464,10 +458,10 @@ function ProblemSection() {
           custom={0.1}
           className="inline-flex items-center gap-4 px-6 py-4 rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800 mb-14"
         >
-          <span className="text-3xl font-bold text-gray-900 dark:text-gray-100 tabular-nums">40 %</span>
+          <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">Viele</span>
           <div className="h-8 w-px bg-gray-200 dark:bg-gray-700" />
           <span className="text-sm text-gray-500 dark:text-gray-400 max-w-xs">
-            aller eingehenden Unternehmensanrufe bleiben unbeantwortet – laut Branchenerhebungen.
+            eingehende Unternehmensanrufe bleiben unbeantwortet – besonders in Stoßzeiten und außerhalb der Öffnungszeiten.
           </span>
         </motion.div>
 
@@ -505,7 +499,7 @@ function SolutionSection() {
     { icon: MessageSquare, label: "Führt natürliche, kompetente Gespräche" },
     { icon: CheckCircle2, label: "Beantwortet Fragen nach Ihren Vorgaben" },
     { icon: Calendar, label: "Bucht Termine direkt in Ihren Kalender" },
-    { icon: Clock, label: "Erreichbar 24/7, auch an Feiertagen" },
+    { icon: Clock, label: "Erreichbar auch abends, am Wochenende und an Feiertagen" },
     { icon: Shield, label: "Integriert in CRM, Outlook, Google und mehr" },
   ];
 
@@ -883,78 +877,6 @@ function UseCasesSection() {
                 <p className="text-[13px] text-gray-500 dark:text-gray-400 leading-relaxed">
                   {item.desc}
                 </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function SocialProofSection() {
-  const testimonials = [
-    {
-      quote:
-        "Wir verpassen keinen einzigen Anruf mehr – der Assistent funktioniert zuverlässiger als erwartet und hat unsere Terminquote spürbar erhöht.",
-      author: "Geschäftsführer",
-      company: "Handwerksbetrieb, Bayern",
-    },
-    {
-      quote:
-        "Der Assistent übernimmt täglich viele Anfragen, die vorher bei uns hängengeblieben sind. Das Team hat wieder Luft für die eigentliche Arbeit.",
-      author: "Inhaberin",
-      company: "Dienstleistungsunternehmen, NRW",
-    },
-    {
-      quote:
-        "Patienten können jetzt rund um die Uhr Termine buchen. Die Entlastung für unser Praxisteam ist messbar – weniger Unterbrechungen, weniger Rückrufe.",
-      author: "Praxismanagerin",
-      company: "Arztpraxis, Hamburg",
-    },
-  ];
-
-  return (
-    <section className="py-24 bg-white dark:bg-gray-950">
-      <div className="max-w-6xl mx-auto px-6 lg:px-8">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-60px" }}
-          variants={fadeUp}
-          custom={0}
-          className="max-w-2xl mb-14"
-        >
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
-            Kundenstimmen
-          </p>
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15]">
-            Unternehmen berichten
-          </h2>
-        </motion.div>
-
-        <div className="grid sm:grid-cols-3 gap-5">
-          {testimonials.map((t, i) => (
-            <motion.div
-              key={i}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-30px" }}
-              variants={fadeUp}
-              custom={i * 0.08}
-              className="flex flex-col p-7 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800"
-            >
-              <div className="flex gap-0.5 mb-5">
-                {[...Array(5)].map((_, s) => (
-                  <span key={s} className="text-amber-400 text-[13px]">★</span>
-                ))}
-              </div>
-              <p className="text-[14px] text-gray-700 dark:text-gray-300 leading-relaxed flex-1 mb-6">
-                "{t.quote}"
-              </p>
-              <div className="pt-4 border-t border-gray-100 dark:border-gray-700/60">
-                <p className="text-[13px] font-semibold text-gray-800 dark:text-gray-200">{t.author}</p>
-                <p className="text-[12px] text-gray-400 dark:text-gray-500 mt-0.5">{t.company}</p>
               </div>
             </motion.div>
           ))}

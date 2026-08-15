@@ -195,6 +195,7 @@ export function BlogPostPage() {
   const related = getRelatedArticles(article.relatedSlugs);
 
   const articleSchema = {
+    "@context": "https://schema.org",
     "@type": "Article",
     headline: article.title,
     description: article.metaDescription,

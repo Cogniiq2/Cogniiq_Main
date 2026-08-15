@@ -10,7 +10,7 @@
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <!-- Viewport -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -42,7 +42,7 @@
     <meta property="og:url" content="https://cogniiq.de/" />
     <meta property="og:title" content="Cogniiq | AI Agentur &amp; Webdesign Agentur Bayreuth" />
     <meta property="og:description" content="KI Automationen, AI Rezeptionistin und Webdesign für Unternehmen in Deutschland. Spezialisiert auf Automationen und hochkonvertierende Websites." />
-    <meta property="og:image" content="https://cogniiq.de/og-image.jpg" />
+    <meta property="og:image" content="https://cogniiq.de/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Cogniiq – AI Agentur und Webdesign Agentur Bayreuth" />
@@ -54,7 +54,7 @@
     <meta name="twitter:url" content="https://cogniiq.de/" />
     <meta name="twitter:title" content="Cogniiq | AI Agentur &amp; Webdesign Agentur Bayreuth" />
     <meta name="twitter:description" content="KI Automationen, AI Rezeptionistin und Webdesign für Unternehmen in Deutschland." />
-    <meta name="twitter:image" content="https://cogniiq.de/og-image.jpg" />
+    <meta name="twitter:image" content="https://cogniiq.de/og-image.png" />
     <meta name="twitter:image:alt" content="Cogniiq – AI Agentur und Webdesign Agentur Bayreuth" />
 
     <!-- hreflang -->
@@ -67,11 +67,11 @@
     <!-- Sitemap -->
     <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
 
-    <!-- DNS Prefetch & Preconnect for performance -->
     <!-- No Google-domain prefetch: Google Ads is contacted only after consent
-         (see src/lib/consent.ts), so no DNS/preconnect hint is emitted here. -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+         (see src/lib/consent.ts), so no DNS/preconnect hint is emitted here.
+         No font preconnects either: the site renders in the system font stack and
+         never requests a webfont, so preconnecting to fonts.googleapis.com /
+         fonts.gstatic.com opened two TLS connections that were never used. -->
 
     <!-- Global Structured Data: Organization + WebSite + LocalBusiness -->
     <script type="application/ld+json">
@@ -86,12 +86,12 @@
           "url": "https://cogniiq.de",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://cogniiq.de/favicon.png",
+            "url": "https://cogniiq.de/logo.png",
             "width": 512,
             "height": 512
           },
           "description": "AI Agentur und Webdesign Agentur in Bayreuth. Spezialisiert auf KI Automationen, AI Rezeptionistin und hochkonvertierende Websites für Unternehmen in Deutschland.",
-          "foundingDate": "2023",
+          "foundingDate": "2025-10-15",
           "address": {
             "@type": "PostalAddress",
             "streetAddress": "Am Main 3",
@@ -142,14 +142,14 @@
               "@type": "Person",
               "@id": "https://cogniiq.de/#lazar-popovic",
               "name": "Lazar Popovic",
-              "jobTitle": "Co-Founder, Webdesign & System Architecture",
+              "jobTitle": "Gründer",
               "worksFor": {"@id": "https://cogniiq.de/#organization"}
             },
             {
               "@type": "Person",
               "@id": "https://cogniiq.de/#djordje-popovic",
               "name": "Djordje Popovic",
-              "jobTitle": "Co-Founder, AI & Automation Specialist",
+              "jobTitle": "Gründer",
               "worksFor": {"@id": "https://cogniiq.de/#organization"}
             }
           ],
@@ -171,7 +171,7 @@
                 "itemOffered": {
                   "@type": "Service",
                   "name": "KI-Telefonassistent",
-                  "description": "24/7 automatische Anrufannahme mit KI",
+                  "description": "Automatische Anrufannahme mit KI, auch außerhalb der Öffnungszeiten",
                   "url": "https://cogniiq.de/ki-telefonassistent"
                 }
               },
@@ -194,7 +194,7 @@
           "url": "https://cogniiq.de",
           "telephone": "+49 160 1832917",
           "email": "info@cogniiq.de",
-          "image": "https://cogniiq.de/og-image.jpg",
+          "image": "https://cogniiq.de/og-image.png",
           "priceRange": "€€€",
           "address": {
             "@type": "PostalAddress",
@@ -228,15 +228,7 @@
           "name": "Cogniiq",
           "description": "AI Agentur und Webdesign Agentur in Bayreuth",
           "publisher": {"@id": "https://cogniiq.de/#organization"},
-          "inLanguage": "de-DE",
-          "potentialAction": {
-            "@type": "SearchAction",
-            "target": {
-              "@type": "EntryPoint",
-              "urlTemplate": "https://cogniiq.de/?s={search_term_string}"
-            },
-            "query-input": "required name=search_term_string"
-          }
+          "inLanguage": "de-DE"
         }
       ]
     }

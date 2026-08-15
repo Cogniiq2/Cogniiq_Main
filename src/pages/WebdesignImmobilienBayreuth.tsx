@@ -55,13 +55,13 @@ const config: IndustryPageConfig = {
     },
   ],
   workflow: {
-    title: "Beispiel-Workflow: Immobilienmakler Bayreuth",
+    title: "Beispielszenario: Immobilienmakler Bayreuth",
     trigger:
-      "Ein Immobilienmakler in Bayreuth hatte täglich mehrere eingehende Anfragen zu Objekten – per Telefon und über ein einfaches Kontaktformular. Ohne Vorqualifizierung war jede Anfrage ein potentieller Zeitaufwand ohne Abschlussgarantie.",
+      "Angenommen, ein Immobilienmakler in Bayreuth erhält täglich mehrere Anfragen zu Objekten – per Telefon und über ein einfaches Kontaktformular. Ohne Vorqualifizierung ist jede Anfrage ein potenzieller Zeitaufwand ohne Abschluss.",
     process:
-      "Cogniiq baute eine neue Makler-Website mit strukturierten Objektseiten und einem Anfrage-Workflow, der Interessenten automatisch vorqualifiziert. Ein KI-Telefonassistent beantwortet häufige Fragen zu Objekten und nimmt Besichtigungswünsche auf. Qualifizierte Leads werden mit vollständigen Angaben ans Maklerbüro weitergeleitet.",
+      "Vorgehen: Cogniiq entwickelt eine Makler-Website mit strukturierten Objektseiten und einem Anfrage-Workflow, der Interessenten automatisch vorqualifiziert. Ein KI-Telefonassistent beantwortet häufige Fragen zu Objekten und nimmt Besichtigungswünsche auf. Qualifizierte Anfragen werden mit vollständigen Angaben ans Maklerbüro weitergeleitet.",
     result:
-      "Der Makler erhält strukturierte, vorqualifizierte Leads statt ungefilterter Anrufe. Besichtigungstermine werden automatisch koordiniert, Follow-ups laufen ohne manuelle Nacharbeit.",
+      "So könnte der Makler strukturierte, vorqualifizierte Anfragen statt ungefilterter Anrufe erhalten, Besichtigungstermine automatisch koordiniert und Follow-ups ohne manuelle Nacharbeit ausgelöst werden.",
   },
   pakete: [
     {
@@ -141,7 +141,7 @@ const config: IndustryPageConfig = {
     {
       title: "Objektanfragen außerhalb der Bürozeiten",
       description:
-        "Der KI-Telefonassistent beantwortet Fragen zu Lage, Ausstattung, Preis und Verfügbarkeit rund um die Uhr – potenzielle Käufer erhalten sofort eine relevante Rückmeldung.",
+        "Der KI-Telefonassistent beantwortet Fragen zu Lage, Ausstattung, Preis und Verfügbarkeit auch außerhalb der Bürozeiten – potenzielle Käufer erhalten sofort eine relevante Rückmeldung.",
     },
     {
       title: "Follow-up nach Besichtigung automatisieren",
@@ -166,12 +166,12 @@ const config: IndustryPageConfig = {
     "Keine verpassten Anfragen – KI-Assistent beantwortet auch abends und am Wochenende",
     "Follow-up-Automatisierung erhöht die Abschlussrate ohne zusätzlichen Aufwand",
     "Bessere Sichtbarkeit bei lokalen Suchanfragen in Bayreuth – mehr organische Anfragen",
-    "Vollständige DSGVO-Konformität – alle Kundendaten sicher auf europäischen Servern",
+    "Datenschutzorientierte Umsetzung – alle Kundendaten sicher auf europäischen Servern",
   ],
   localContext: [
     "Der Bayreuther Immobilienmarkt ist von einer stabilen Nachfrage geprägt – sowohl im Kauf- als auch im Mietbereich. Makler stehen vor der Herausforderung, qualifizierte Interessenten schnell zu erreichen und gleichzeitig die eigene Effizienz bei der Lead-Bearbeitung zu steigern.",
     "Cogniiq entwickelt für Immobilienmakler in Bayreuth maßgeschneiderte Digitallösungen: eine hochwertige Makler-Website mit strukturierten Objektseiten, einen KI-Telefonassistenten für Interessentenanfragen sowie Automatisierungssysteme für Lead-Qualifizierung, Besichtigungsplanung und Follow-up-Prozesse.",
-    "Als Bayreuther Unternehmen mit direktem Ortsbezug verstehen wir den lokalen Markt und sind persönlich erreichbar. Die Einrichtung dauert 7–14 Tage. Alle Systeme sind vollständig DSGVO-konform und werden auf europäischen Servern betrieben.",
+    "Als Bayreuther Unternehmen mit direktem Ortsbezug verstehen wir den lokalen Markt und sind persönlich erreichbar. Die Einrichtung dauert 7–14 Tage. Alle Systeme werden datenschutzorientiert umgesetzt und auf europäischen Servern betrieben.",
   ],
   internalLinks: [
     { label: "Webdesign Bayreuth", href: "/bayreuth/webdesign" },
@@ -187,7 +187,7 @@ const config: IndustryPageConfig = {
     {
       question: "Kann Cogniiq eine DSGVO-konforme Makler-Website in Bayreuth erstellen?",
       answer:
-        "Ja. Alle Websites und Systeme sind vollständig DSGVO-konform – mit korrekten Datenschutzdokumentationen, Cookie-Einwilligungen und sicherer Verarbeitung aller Interessentendaten auf europäischen Servern.",
+        "Ja. Alle Websites und Systeme werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse – mit korrekten Datenschutzdokumentationen, Cookie-Einwilligungen und sicherer Verarbeitung aller Interessentendaten auf europäischen Servern.",
     },
     {
       question: "Wie werden Interessentenanfragen über die Website automatisch vorqualifiziert?",

@@ -53,7 +53,7 @@ const config: NationalIndustryPageConfig = {
     "Re-Engagement-Sequenz für inaktive Mitglieder",
     "Kurs- und Event-Kommunikation automatisch an alle Mitglieder",
     "Bewertungsanfragen nach positiven Erlebnissen",
-    "DSGVO-konforme Mitgliederdatenverarbeitung auf deutschen Servern",
+    "DSGVO-konforme Mitgliederdatenverarbeitung auf europäischen Servern",
   ],
   workflow: {
     title: "So funktioniert automatisiertes Mitglieder-Management",

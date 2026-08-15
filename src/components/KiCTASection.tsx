@@ -3,23 +3,26 @@ import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   PhoneCall, ArrowRight, CircleCheck as CheckCircle, PhoneMissed,
-  Mic, Calendar, TrendingUp, Stethoscope, UtensilsCrossed, Dumbbell, Building2,
+  Mic, Calendar, Stethoscope, UtensilsCrossed, Dumbbell, Building2,
   Play,
 } from 'lucide-react';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 const trust = [
-  { icon: CheckCircle, text: 'Einrichtung in unter 14 Tagen' },
+  { icon: CheckCircle, text: 'Einrichtung typischerweise in 7–14 Tagen' },
   { icon: CheckCircle, text: 'Integration mit Kalender & CRM' },
-  { icon: CheckCircle, text: 'DSGVO-konform & Made in Germany' },
-  { icon: CheckCircle, text: 'Kein Ausfall, kein Urlaub — 24/7' },
+  { icon: CheckCircle, text: 'DSGVO-konform & europäische Server' },
+  { icon: CheckCircle, text: 'Auch außerhalb der Öffnungszeiten erreichbar' },
 ];
 
+// Capability properties of the system — deliberately not industry statistics. The two
+// previous tiles ("30% aller Anrufe gehen unbeantwortet", "67% rufen nicht zurück") had no
+// source and were removed rather than re-sourced.
 const facts = [
-  { stat: '30%', label: 'aller Anrufe gehen unbeantwortet', icon: PhoneMissed, color: '#ef4444' },
-  { stat: '67%', label: 'dieser Anrufer rufen nicht zurück', icon: PhoneCall, color: '#f59e0b' },
-  { stat: '< 3s', label: 'Reaktionszeit des KI-Assistenten', icon: Mic, color: '#22c55e' },
+  { stat: 'Auch nachts', label: 'Anrufannahme außerhalb der Öffnungszeiten', icon: PhoneMissed, color: '#ef4444' },
+  { stat: 'Jeder', label: 'Anruf wird entgegengenommen statt abgewiesen', icon: PhoneCall, color: '#f59e0b' },
+  { stat: 'Sofort', label: 'Annahme statt Warteschleife oder Anrufbeantworter', icon: Mic, color: '#22c55e' },
 ];
 
 const industries = [
@@ -85,7 +88,7 @@ export function KiCTASection() {
                     animate={{ opacity: [1, 0.3, 1] }}
                     transition={{ duration: 1.8, repeat: Infinity }}
                   />
-                  <span className="text-[10px] text-emerald-400/70 font-medium">Live in 14 Tagen</span>
+                  <span className="text-[10px] text-emerald-400/70 font-medium">Live in 7–14 Tagen</span>
                 </span>
               </div>
 
@@ -104,16 +107,6 @@ export function KiCTASection() {
                 vollautomatisch, in natürlicher Sprache.
               </p>
 
-              {/* ROI callout */}
-              <div className="flex items-start gap-3 mb-8 px-4 py-3.5 rounded-xl bg-emerald-500/[0.07] border border-emerald-500/[0.14]">
-                <TrendingUp size={13} className="text-emerald-400 flex-shrink-0 mt-0.5" />
-                <p className="text-[12.5px] text-emerald-300/80 leading-relaxed">
-                  Kunden berichten im Schnitt{' '}
-                  <strong className="text-emerald-300 font-semibold">+28% mehr Terminbuchungen</strong>{' '}
-                  in den ersten 30 Tagen nach Go-Live
-                </p>
-              </div>
-
               {/* Trust checkmarks */}
               <div className="grid sm:grid-cols-2 gap-2.5 mb-8 max-w-[420px]">
                 {trust.map((item) => (
@@ -127,7 +120,7 @@ export function KiCTASection() {
               {/* Industry pills */}
               <div className="mb-9">
                 <p className="text-[9.5px] font-semibold uppercase tracking-[0.18em] text-gray-700 mb-3">
-                  Bewährt in diesen Branchen
+                  Geeignet für diese Branchen
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {industries.map((ind) => (

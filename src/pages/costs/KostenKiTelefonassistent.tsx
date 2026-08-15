@@ -73,7 +73,7 @@ const config: CostPageConfig = {
     },
     {
       title: "Physiotherapiepraxis, Bayern",
-      description: "Terminbuchung, Terminverschiebungen und Stornierungen vollautomatisch. DSGVO-konforme Verarbeitung aller Patientendaten auf deutschen Servern.",
+      description: "Terminbuchung, Terminverschiebungen und Stornierungen vollautomatisch. DSGVO-konforme Verarbeitung aller Patientendaten auf europäischen Servern.",
       investment: "299 €/Monat",
     },
   ],
@@ -105,7 +105,7 @@ const config: CostPageConfig = {
     },
     {
       question: "Ist der KI Telefonassistent teurer als ein Mensch am Telefon?",
-      answer: "Im Vergleich zu einer Teilzeitmitarbeiterin (ca. 1.500–2.000 €/Monat) ist der KI Assistent deutlich günstiger – und ist 24/7 verfügbar, nie krank und nie im Urlaub. Der ROI zeigt sich meist innerhalb weniger Wochen.",
+      answer: "Im Vergleich zu einer Teilzeitmitarbeiterin (ca. 1.500–2.000 €/Monat) ist der KI Assistent deutlich günstiger – und ist auch außerhalb regulärer Geschäftszeiten verfügbar. Der ROI zeigt sich meist innerhalb weniger Wochen.",
     },
     {
       question: "Was passiert, wenn der KI Assistent eine Frage nicht beantworten kann?",

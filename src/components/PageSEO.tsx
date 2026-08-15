@@ -65,7 +65,7 @@ export function PageSEO({
   canonical,
   breadcrumbs,
   faqItems,
-  ogImage = `${BUSINESS_INFO.website}/og-image.jpg`,
+  ogImage = `${BUSINESS_INFO.website}/og-image.png`,
   additionalSchema,
   noIndex = false,
 }: PageSEOProps) {

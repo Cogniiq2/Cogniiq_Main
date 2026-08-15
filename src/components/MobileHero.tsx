@@ -456,9 +456,9 @@ export function MobileHero() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 2.5 }}
         >
-          <MetricCard value="48h" label="bis zum ersten System" delay={2.6} accent="rgba(15,23,42,0.5)" />
-          <MetricCard value="100%" label="operative Systeme" delay={2.75} accent="#2e6f8f" />
-          <MetricCard value="3×" label="mehr Anfragen" delay={2.9} accent="rgba(15,23,42,0.3)" />
+          <MetricCard value="7–14 Tage" label="typischer Go-Live" delay={2.6} accent="rgba(15,23,42,0.5)" />
+          <MetricCard value="Auch nachts" label="Anrufannahme" delay={2.75} accent="#2e6f8f" />
+          <MetricCard value="Individuell" label="statt Baukasten" delay={2.9} accent="rgba(15,23,42,0.3)" />
         </motion.div>
 
         <motion.div
@@ -524,43 +524,6 @@ export function MobileHero() {
           </motion.button>
         </motion.div>
 
-        {/* Social proof row */}
-        <motion.div
-          className="flex items-center justify-center gap-2 mt-5"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 3.5, duration: 0.7 }}
-        >
-          <div style={{ display: 'flex', marginRight: 2 }}>
-            {['#0ea5e9', '#22c55e', '#f59e0b', '#ef4444'].map((c, i) => (
-              <div
-                key={i}
-                style={{
-                  width: 22, height: 22, borderRadius: '50%',
-                  border: '1.5px solid white',
-                  background: c + '22',
-                  borderColor: c + '66',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '7px', fontWeight: 700, color: c,
-                  marginLeft: i > 0 ? -6 : 0,
-                }}
-              >
-                {['MK','SR','TH','AB'][i]}
-              </div>
-            ))}
-          </div>
-          <div style={{ display: 'flex', gap: 1 }}>
-            {[1,2,3,4,5].map(s => (
-              <svg key={s} width="9" height="9" viewBox="0 0 9 9" fill="#f59e0b">
-                <polygon points="4.5,0.5 5.5,3.5 8.5,3.5 6.1,5.5 7,8.5 4.5,6.8 2,8.5 2.9,5.5 0.5,3.5 3.5,3.5" />
-              </svg>
-            ))}
-          </div>
-          <span style={{ fontSize: '11px', color: '#6b7280', fontWeight: 400 }}>
-            <strong style={{ color: '#374151' }}>40+</strong> Unternehmen
-          </span>
-        </motion.div>
-
         {/* Guarantee strip */}
         <motion.div
           className="flex items-center justify-center gap-1.5 mt-3"
@@ -579,7 +542,7 @@ export function MobileHero() {
             <path d="M4 6l1.5 1.5L8 4" stroke="#16a34a" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <span style={{ fontSize: '11.5px', fontWeight: 600, color: '#15803d' }}>
-            Go-Live in 14 Tagen — oder Geld zurück
+            Go-Live typischerweise in 7–14 Tagen
           </span>
         </motion.div>
 

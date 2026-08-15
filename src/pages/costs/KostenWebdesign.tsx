@@ -20,12 +20,12 @@ const config: CostPageConfig = {
     },
     {
       label: "Mittelstand",
-      range: "2.500 – 6.000 €",
+      range: "2.500 – 5.000 €",
       description: "Unternehmenswebsite mit erweiterter Seitenstruktur, Conversion-Optimierung, Local SEO, strukturierten Daten und Google Analytics. Für wachsende Unternehmen.",
     },
     {
       label: "Premium",
-      range: "ab 6.000 €",
+      range: "ab 5.000 €",
       description: "Komplexe Website mit umfassender SEO-Strategie, KI-Integration, Automatisierung, Content-Strategie und laufender Betreuung. Für Marktführer und ambitionierte Unternehmen.",
     },
   ],

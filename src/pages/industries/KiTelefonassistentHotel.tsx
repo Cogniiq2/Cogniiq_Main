@@ -4,14 +4,14 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 
 const config: NationalIndustryPageConfig = {
   seo: {
-    title: "KI Telefonassistent für Hotels & Pensionen | 24/7 Rezeption | Cogniiq",
-    description: "KI Telefonassistent für Hotels: 24/7 Rezeptionsdienst, automatische Zimmerbuchungen und Gästeanfragen. Keine verpassten Direktbuchungen mehr – auch außerhalb der Rezeptionszeiten.",
+    title: "KI Telefonassistent für Hotels & Pensionen | Rezeption auch nachts | Cogniiq",
+    description: "KI Telefonassistent für Hotels: Rezeptionsdienst auch außerhalb der Rezeptionszeiten, automatische Zimmerbuchungen und Gästeanfragen. Keine verpassten Direktbuchungen mehr.",
     canonical: `${BUSINESS_INFO.website}/ki-telefonassistent-hotel`,
-    keywords: "KI Telefonassistent Hotel, 24/7 Rezeption, automatische Zimmerbuchung, KI Rezeptionistin Hotel, Telefonservice Hotellerie",
+    keywords: "KI Telefonassistent Hotel, Rezeption außerhalb der Öffnungszeiten, automatische Zimmerbuchung, KI Rezeptionistin Hotel, Telefonservice Hotellerie",
   },
   h1: "KI Telefonassistent für Hotels & Pensionen",
-  tagline: "Hotellerie · 24/7 Rezeption · Direktbuchungen stärken",
-  intro: "Reisende buchen spät abends – um 22 Uhr, nach dem Feierabend, wenn die Rezeption längst geschlossen ist. Wer in diesem Moment nicht erreichbar ist, verliert die Buchung an Booking.com – inklusive 18 % Provision. Der KI Telefonassistent ist 24 Stunden besetzt, nimmt Buchungsanfragen in natürlicher Sprache entgegen und bucht den Gast direkt ins PMS.",
+  tagline: "Hotellerie · Rezeption auch nachts · Direktbuchungen stärken",
+  intro: "Reisende buchen spät abends – um 22 Uhr, nach dem Feierabend, wenn die Rezeption längst geschlossen ist. Wer in diesem Moment nicht erreichbar ist, verliert die Buchung an Booking.com – inklusive der fälligen Provision. Der KI Telefonassistent ist 24 Stunden besetzt, nimmt Buchungsanfragen in natürlicher Sprache entgegen und bucht den Gast direkt ins PMS.",
   serviceSlug: "ki-telefonassistent",
   serviceLabel: "KI Telefonassistent",
   costLink: "/kosten-ki-telefonassistent",
@@ -22,7 +22,7 @@ const config: NationalIndustryPageConfig = {
       description: "Die Buchungsentscheidung fällt selten zwischen 9 und 17 Uhr. Reisende entscheiden sich abends, nach dem Urlaubs-Browsing. Wer da nicht telefonisch erreichbar ist, verliert die Direktbuchung an ein OTA.",
     },
     {
-      title: "Jede OTA-Buchung kostet 15–25 % Provision",
+      title: "Jede OTA-Buchung kostet Provision",
       description: "Booking.com, Expedia und HRS nehmen einen erheblichen Anteil vom Zimmerpreis. Eine direkt gebuchte Nacht, die über den Assistenten reinkäme, läge bei 100 % Marge. Der Unterschied summiert sich auf Jahressicht schnell in fünfstellige Beträge.",
     },
     {
@@ -44,10 +44,10 @@ const config: NationalIndustryPageConfig = {
   ],
   solution: {
     headline: "Eine Rezeption, die nie schließt – und jede Direktbuchung hält.",
-    text: "Der KI Telefonassistent übernimmt telefonische Buchungsanfragen, Zimmerverfügbarkeiten und Gästeanfragen rund um die Uhr. Direktbuchungen werden nicht mehr an OTAs verloren. Das Rezeptionsteam kann sich auf persönlichen Service konzentrieren – beim Check-in und im Gespräch vor Ort.",
+    text: "Der KI Telefonassistent übernimmt telefonische Buchungsanfragen, Zimmerverfügbarkeiten und Gästeanfragen auch außerhalb der Rezeptionszeiten. Direktbuchungen werden nicht mehr an OTAs verloren. Das Rezeptionsteam kann sich auf persönlichen Service konzentrieren – beim Check-in und im Gespräch vor Ort.",
   },
   benefits: [
-    "24/7 erreichbar – Buchungsanfragen auch nachts und am Wochenende",
+    "Erreichbar auch nachts und am Wochenende – Buchungsanfragen gehen nicht verloren",
     "Direktbuchung statt OTA-Provision – jede Nacht mehr Marge",
     "Automatische Bestätigung und Buchungsdokumentation im PMS",
     "Mehrsprachig: Deutsch und Englisch standard, weitere auf Anfrage",

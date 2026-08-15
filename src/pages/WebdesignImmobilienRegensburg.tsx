@@ -55,13 +55,13 @@ const config: IndustryPageConfig = {
     },
   ],
   workflow: {
-    title: "Beispiel-Workflow: Immobilienmakler Regensburg",
+    title: "Beispielszenario: Immobilienmakler Regensburg",
     trigger:
-      "Ein Immobilienmakler in Regensburg hatte täglich mehrere Anfragen zu Objekten – sowohl von lokalen Interessenten als auch von Zugezogenen aus München und dem Großraum. Ohne Vorqualifizierung war jede Anfrage ein potentieller Zeitaufwand.",
+      "Angenommen, ein Immobilienmakler in Regensburg erhält täglich mehrere Anfragen zu Objekten – von lokalen Interessenten ebenso wie von Zugezogenen aus München und dem Großraum. Ohne Vorqualifizierung ist jede Anfrage ein potenzieller Zeitaufwand.",
     process:
-      "Cogniiq baute eine neue Makler-Website mit strukturierten Objektseiten und einem Anfrage-Workflow, der Interessenten automatisch vorqualifiziert. Ein KI-Telefonassistent beantwortet häufige Fragen und nimmt Besichtigungswünsche auf. Qualifizierte Leads werden mit vollständigen Angaben weitergeleitet.",
+      "Vorgehen: Cogniiq entwickelt eine Makler-Website mit strukturierten Objektseiten und einem Anfrage-Workflow, der Interessenten automatisch vorqualifiziert. Ein KI-Telefonassistent beantwortet häufige Fragen und nimmt Besichtigungswünsche auf. Qualifizierte Anfragen werden mit vollständigen Angaben weitergeleitet.",
     result:
-      "Das Maklerbüro erhält strukturierte, vorqualifizierte Leads statt ungefilterter Anrufe. Besichtigungstermine werden automatisch koordiniert. Follow-ups laufen ohne manuelle Nacharbeit.",
+      "So könnte das Maklerbüro strukturierte, vorqualifizierte Anfragen statt ungefilterter Anrufe erhalten, Besichtigungstermine automatisch koordiniert und Follow-ups ohne manuelle Nacharbeit ausgelöst werden.",
   },
   pakete: [
     {
@@ -141,7 +141,7 @@ const config: IndustryPageConfig = {
     {
       title: "Objektanfragen außerhalb der Bürozeiten",
       description:
-        "Der KI-Telefonassistent beantwortet Fragen zu Lage, Ausstattung, Preis und Verfügbarkeit rund um die Uhr – potenzielle Käufer erhalten sofort eine relevante Rückmeldung.",
+        "Der KI-Telefonassistent beantwortet Fragen zu Lage, Ausstattung, Preis und Verfügbarkeit auch außerhalb der Bürozeiten – potenzielle Käufer erhalten sofort eine relevante Rückmeldung.",
     },
     {
       title: "Follow-up nach Besichtigung automatisieren",
@@ -166,12 +166,12 @@ const config: IndustryPageConfig = {
     "Keine verpassten Anfragen – KI-Assistent beantwortet auch abends und am Wochenende",
     "Follow-up-Automatisierung erhöht die Abschlussrate ohne zusätzlichen Aufwand",
     "Bessere Sichtbarkeit bei lokalen und überregionalen Suchanfragen – mehr organische Anfragen",
-    "Vollständige DSGVO-Konformität – alle Kundendaten sicher auf europäischen Servern",
+    "Datenschutzorientierte Umsetzung – alle Kundendaten sicher auf europäischen Servern",
   ],
   localContext: [
     "Regensburg ist eine der am stärksten wachsenden Städte Bayerns. Der Immobilienmarkt ist geprägt von stabiler bis steigender Nachfrage – sowohl lokal als auch von Zugezogenen aus dem Großraum München. Makler profitieren von der dynamischen Marktlage, stehen aber vor der Herausforderung, qualifizierte Leads effizient zu bearbeiten.",
     "Cogniiq entwickelt für Immobilienmakler in Regensburg maßgeschneiderte Digitallösungen: eine hochwertige Makler-Website mit strukturierten Objektseiten, einen KI-Telefonassistenten für Interessentenanfragen sowie Automatisierungssysteme für Lead-Qualifizierung, Besichtigungsplanung und Follow-up-Prozesse.",
-    "Cogniiq betreut Projekte in Regensburg remote und ist für persönliche Abstimmungen direkt erreichbar. Die Einrichtung dauert 7–14 Tage. Alle Systeme sind vollständig DSGVO-konform und werden auf europäischen Servern betrieben.",
+    "Cogniiq betreut Projekte in Regensburg remote und ist für persönliche Abstimmungen direkt erreichbar. Die Einrichtung dauert 7–14 Tage. Alle Systeme werden datenschutzorientiert umgesetzt und auf europäischen Servern betrieben.",
   ],
   internalLinks: [
     { label: "Webdesign Regensburg", href: "/regensburg/webdesign" },
@@ -187,7 +187,7 @@ const config: IndustryPageConfig = {
     {
       question: "Kann Cogniiq eine DSGVO-konforme Makler-Website in Regensburg erstellen?",
       answer:
-        "Ja. Alle Websites und Systeme sind vollständig DSGVO-konform – mit korrekten Datenschutzdokumentationen, Cookie-Einwilligungen und sicherer Verarbeitung aller Interessentendaten auf europäischen Servern.",
+        "Ja. Alle Websites und Systeme werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse – mit korrekten Datenschutzdokumentationen, Cookie-Einwilligungen und sicherer Verarbeitung aller Interessentendaten auf europäischen Servern.",
     },
     {
       question: "Wie werden Interessentenanfragen über die Website automatisch vorqualifiziert?",

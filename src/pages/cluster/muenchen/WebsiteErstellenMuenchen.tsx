@@ -28,7 +28,7 @@ const config: ClusterPageConfig = {
     heading: "Kurzüberblick: Website erstellen in München",
     items: [
       { label: "Für wen", value: "Unternehmen mit Wachstumsambitionen in München" },
-      { label: "Typische Ergebnisse", value: "Top-Rankings, mehr qualifizierte Anfragen" },
+      { label: "Typische Ziele", value: "Bessere Sichtbarkeit, mehr qualifizierte Anfragen" },
       { label: "Projektdauer", value: "1–8 Wochen" },
       { label: "Preisrahmen", value: "ab ca. 1.500 €" },
     ],

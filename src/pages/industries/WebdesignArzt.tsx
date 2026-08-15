@@ -96,7 +96,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Welche Online-Terminbuchungssysteme integriert Cogniiq?",
-      answer: "Wir integrieren Terminbuchungssysteme, die direkt mit Ihrem Praxiskalender synchronisiert sind – von einfachen Buchungsformularen bis zu vollständig integrierten Systemen mit Kalenderabgleich. Patienten können Termine rund um die Uhr buchen, Sie sehen alles in Ihrer gewohnten Praxissoftware.",
+      answer: "Wir integrieren Terminbuchungssysteme, die direkt mit Ihrem Praxiskalender synchronisiert sind – von einfachen Buchungsformularen bis zu vollständig integrierten Systemen mit Kalenderabgleich. Patienten können Termine auch außerhalb der Sprechzeiten buchen, Sie sehen alles in Ihrer gewohnten Praxissoftware.",
     },
     {
       question: "Wie lange dauert die Entwicklung einer Praxis-Website?",

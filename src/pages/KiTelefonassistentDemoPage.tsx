@@ -294,7 +294,7 @@ export function KiTelefonassistentDemoPage() {
                   <ol className="space-y-2.5">
                     {[
                       "Formular ausfüllen und Demo-Termin anfragen",
-                      "Wir melden uns innerhalb von 24 Stunden",
+                      "Wir melden uns in der Regel innerhalb von 24 Stunden",
                       "Live-Demo per Video: KI-Assistent in Aktion",
                       "Individuelle Konfiguration für Ihr Unternehmen besprechen",
                     ].map((step, i) => (
@@ -331,7 +331,7 @@ export function KiTelefonassistentDemoPage() {
                         Demo-Anfrage eingegangen
                       </h2>
                       <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-6">
-                        Wir melden uns innerhalb von 24 Stunden, um Ihren Demo-Termin zu bestätigen.
+                        Wir melden uns in der Regel innerhalb von 24 Stunden, um Ihren Demo-Termin zu bestätigen.
                       </p>
                       <Link
                         to="/ki-telefonassistent"

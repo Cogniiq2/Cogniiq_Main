@@ -10,7 +10,7 @@ const config: ProblemPageConfig = {
   },
   h1: "Verpasste Anrufe kosten Ihr Unternehmen täglich Aufträge",
   tagline: "Problem · Verpasste Anrufe · Umsatzverlust",
-  intro: "Über 40 % aller Anrufe bei deutschen Unternehmen bleiben unbeantwortet. Das sind keine Statistiken – das sind Kunden, die zum Wettbewerber gegangen sind.",
+  intro: "Ein erheblicher Teil der Anrufe bei kleinen und mittleren Unternehmen bleibt unbeantwortet. Dahinter stehen keine abstrakten Zahlen – das sind Kunden, die zum Wettbewerber gegangen sind.",
   problem: {
     headline: "Warum Unternehmen so viele Anrufe verpassen",
     points: [
@@ -31,7 +31,7 @@ const config: ProblemPageConfig = {
       },
       {
         title: "Kunden wechseln zur Konkurrenz",
-        description: "Über 60 % der Anrufer, die niemanden erreichen, rufen einen anderen Anbieter an – und kehren nicht zurück. Der Schaden ist dauerhaft.",
+        description: "Wer niemanden erreicht, ruft häufig beim nächsten Anbieter an – und kehrt oft nicht zurück. Der Schaden ist dauerhaft.",
       },
       {
         title: "Ruf und Bewertungen leiden",
@@ -45,12 +45,12 @@ const config: ProblemPageConfig = {
   },
   solution: {
     headline: "Der KI Telefonassistent: Kein Anruf geht mehr verloren.",
-    text: "Ein KI Telefonassistent nimmt jeden eingehenden Anruf sofort entgegen – 24/7, ohne Warteschleife, ohne Personalaufwand. Er versteht Kundenanliegen, beantwortet Fragen und bucht Termine automatisch.",
+    text: "Ein KI Telefonassistent nimmt jeden eingehenden Anruf sofort entgegen – auch außerhalb regulärer Geschäftszeiten, ohne Warteschleife, ohne Personalaufwand. Er versteht Kundenanliegen, beantwortet Fragen und bucht Termine automatisch.",
     bullets: [
       "Jeder Anruf wird sofort und professionell entgegengenommen",
-      "24/7 erreichbar – auch abends, am Wochenende und an Feiertagen",
+      "Erreichbar auch abends, am Wochenende und an Feiertagen",
       "Termine automatisch in den Kalender eingetragen",
-      "DSGVO-konform auf deutschen Servern",
+      "DSGVO-konform auf europäischen Servern",
       "Einrichtung in 7–14 Tagen",
       "Skaliert mit Ihrem Unternehmen ohne Mehrkosten",
     ],

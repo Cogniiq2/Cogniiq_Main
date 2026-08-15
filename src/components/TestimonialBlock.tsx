@@ -1,11 +1,13 @@
 import { motion } from "framer-motion";
 import { Quote } from "lucide-react";
 
+// Only verified, real customer feedback may be represented by this type. There is
+// deliberately no "example"/"template" variant: placeholder testimonials must never
+// be published, not even when visually marked as such.
 export interface Testimonial {
   quote: string;
   attribution: string;
   project?: string;
-  isReal: boolean;
 }
 
 export const REAL_TESTIMONIAL: Testimonial = {
@@ -13,21 +15,6 @@ export const REAL_TESTIMONIAL: Testimonial = {
     "Die neue Website und das Buchungssystem funktionieren deutlich zuverlässiger als vorher. Besucher finden schneller, was sie suchen, und Reservierungen laufen jetzt ohne manuelle Abstimmung. Insgesamt wirkt der Auftritt deutlich moderner und professioneller.",
   attribution: "Betreiber, Sportanlage Region Bayreuth",
   project: "SV Heinersreuth – Website + Buchungsautomatisierung",
-  isReal: true,
-};
-
-export const PLACEHOLDER_TESTIMONIAL: Testimonial = {
-  quote:
-    "Seit dem Relaunch kommen deutlich mehr Anfragen über die Website. Die Ladezeit ist erheblich schneller geworden, und das Design wirkt jetzt so, wie wir uns nach außen präsentieren wollen.",
-  attribution: "Beispiel-Feedback (Vorlage)",
-  isReal: false,
-};
-
-export const PLACEHOLDER_TESTIMONIAL_2: Testimonial = {
-  quote:
-    "Cogniiq hat unsere Anforderungen direkt verstanden und pragmatisch umgesetzt. Keine langen Abstimmungsrunden – das System läuft stabil und hat unsere Erwartungen erfüllt.",
-  attribution: "Beispiel-Feedback (Vorlage)",
-  isReal: false,
 };
 
 const fadeUp = {
@@ -84,40 +71,19 @@ export function TestimonialBlock({
               viewport={{ once: true }}
               variants={fadeUp}
               custom={i * 0.1}
-              className={`relative bg-white dark:bg-gray-800/60 border rounded-2xl p-7 flex flex-col gap-5 ${
-                t.isReal
-                  ? "border-gray-200 dark:border-gray-700"
-                  : "border-gray-100 dark:border-gray-800 opacity-70"
-              }`}
+              className="relative bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-7 flex flex-col gap-5"
             >
               <Quote
                 size={20}
                 className="text-gray-300 dark:text-gray-600 flex-shrink-0"
               />
-              <p
-                className={`text-base leading-relaxed ${
-                  t.isReal
-                    ? "text-gray-700 dark:text-gray-300"
-                    : "text-gray-500 dark:text-gray-500 italic"
-                }`}
-              >
+              <p className="text-base leading-relaxed text-gray-700 dark:text-gray-300">
                 "{t.quote}"
               </p>
               <div className="mt-auto flex items-center justify-between gap-4">
-                <span
-                  className={`text-sm font-medium ${
-                    t.isReal
-                      ? "text-gray-600 dark:text-gray-400"
-                      : "text-gray-400 dark:text-gray-600"
-                  }`}
-                >
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
                   — {t.attribution}
                 </span>
-                {!t.isReal && (
-                  <span className="text-xs text-gray-400 dark:text-gray-600 border border-gray-200 dark:border-gray-700 rounded-full px-2.5 py-0.5 flex-shrink-0">
-                    Vorlage
-                  </span>
-                )}
               </div>
             </motion.div>
           ))}

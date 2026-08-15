@@ -27,7 +27,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       title: "Mobile Website schreckt ab, statt einzuladen",
-      description: "Über 70 % der Restaurant-Suchanfragen kommen vom Smartphone. Wenn die Speisekarte nicht lädt, der Text zu klein ist oder das Reservierungsformular nicht funktioniert, ist der Gast weg – in Sekunden.",
+      description: "Ein Großteil der Restaurant-Suchanfragen kommt vom Smartphone. Wenn die Speisekarte nicht lädt, der Text zu klein ist oder das Reservierungsformular nicht funktioniert, ist der Gast weg – in Sekunden.",
     },
     {
       title: "Speisekarte veraltet oder gar nicht digital verfügbar",
@@ -47,7 +47,7 @@ const config: NationalIndustryPageConfig = {
     text: "Cogniiq entwickelt Restaurant-Websites mit Online-Reservierung, aktueller Speisekarte und Local SEO-Setup – sodass Ihre Qualität digital sichtbar wird und Gäste direkt buchen, wann immer sie den Impuls haben.",
   },
   benefits: [
-    "Online-Reservierung rund um die Uhr – auch abends und am Wochenende",
+    "Online-Reservierung auch abends und am Wochenende",
     "Local SEO: sichtbar bei 'Restaurant [Stadt]' und verwandten Suchen",
     "Mobile-first: perfekte Darstellung auf jedem Smartphone",
     "Digitale Speisekarte mit einfacher Eigenaktualisierung",

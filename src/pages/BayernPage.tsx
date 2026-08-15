@@ -20,7 +20,7 @@ const SERVICES_OVERVIEW = [
     title: "KI-Telefonassistent Bayern",
     slug: "ki-telefonassistent",
     description:
-      "Automatische Anrufannahme, Terminbuchung und Weiterleitung – 24/7, für Praxen, Gastronomie und Dienstleister in ganz Bayern. Einrichtung in 7–14 Tagen.",
+      "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, für Praxen, Gastronomie und Dienstleister in ganz Bayern. Einrichtung in 7–14 Tagen.",
     benefits: [
       "Kein Anruf mehr verpasst",
       "Entlastung von Routinegesprächen",
@@ -73,13 +73,13 @@ const CHALLENGES = [
     icon: Phone,
     title: "Telefonische Erreichbarkeit als Wettbewerbsfaktor",
     description:
-      "Studien zeigen: Über 60 % aller Anrufversuche bei kleinen Unternehmen in Bayern landen auf einem Anrufbeantworter oder werden gar nicht angenommen. Ein nicht beantworteter Anruf ist ein verlorener Kunde – besonders in wettbewerbsintensiven Märkten.",
+      "Bei kleinen Unternehmen landen Anrufversuche häufig auf dem Anrufbeantworter oder werden gar nicht angenommen. Ein nicht beantworteter Anruf ist ein verlorener Kunde – besonders in wettbewerbsintensiven Märkten.",
   },
   {
     icon: Globe,
     title: "Lokale Sichtbarkeit bei Google",
     description:
-      "Über 80 % aller lokalen Suchanfragen in Bayern erfolgen mobil. Wer auf Google Maps und in der organischen Suche nicht sichtbar ist, verliert täglich potenzielle Kunden an besser positionierte Mitbewerber.",
+      "Lokale Suchanfragen erfolgen überwiegend mobil. Wer auf Google Maps und in der organischen Suche nicht sichtbar ist, verliert täglich potenzielle Kunden an besser positionierte Mitbewerber.",
   },
   {
     icon: Zap,
@@ -97,7 +97,7 @@ const CHALLENGES = [
     icon: Shield,
     title: "DSGVO-konforme KI-Nutzung",
     description:
-      "Viele bayerische Unternehmer zögern beim KI-Einsatz aus Datenschutzgründen zu Recht. Cogniiq setzt ausschließlich auf europäische Server und DSGVO-konforme Prozesse – kein Datenschutzrisiko, volle Rechtssicherheit.",
+      "Viele bayerische Unternehmer zögern beim KI-Einsatz aus Datenschutzgründen zu Recht. Cogniiq setzt auf europäische Server und unterstützt DSGVO-konforme Prozesse; technische und organisatorische Maßnahmen werden projektbezogen abgestimmt.",
   },
 ];
 
@@ -115,7 +115,7 @@ const INDUSTRIES = [
   {
     name: "Gastronomie & Restaurants",
     description:
-      "Restaurants und Cafés in Bayern nehmen Reservierungen rund um die Uhr entgegen, automatisieren Erinnerungen und haben eine Website, die Gäste direkt zur Buchung führt.",
+      "Restaurants und Cafés in Bayern nehmen Reservierungen auch außerhalb der Öffnungszeiten entgegen, automatisieren Erinnerungen und haben eine Website, die Gäste direkt zur Buchung führt.",
   },
   {
     name: "Arztpraxen & Therapeuten",
@@ -149,7 +149,7 @@ const USE_CASE_SCENARIOS = [
     icon: "🏥",
     title: "Hausarztpraxis in Bayern",
     description:
-      "Eine Allgemeinmedizin-Praxis mit sechs Behandlungszimmern erhält montags über 100 Anrufe vor 9 Uhr. Das Praxisteam ist überlastet. Nach Einführung des KI-Telefonassistenten werden Standardtermine automatisch vergeben, Rezeptanfragen strukturiert entgegengenommen und Rückrufe priorisiert. Das Team konzentriert sich auf die Patienten im Raum.",
+      "Eine Allgemeinmedizin-Praxis mit sechs Behandlungszimmern erhält montags über 100 Anrufe vor 9 Uhr. Das Praxisteam ist überlastet. Mit einem KI-Telefonassistenten könnten Standardtermine automatisch vergeben, Rezeptanfragen strukturiert entgegengenommen und Rückrufe priorisiert werden. Das Team könnte sich auf die Patienten im Raum konzentrieren.",
   },
   {
     icon: "🍽️",
@@ -167,7 +167,7 @@ const USE_CASE_SCENARIOS = [
     icon: "💼",
     title: "Lokaler Dienstleister mit mehreren Standorten",
     description:
-      "Ein Beratungsunternehmen in Bayern mit drei Standorten nutzt vier verschiedene Tools für Leads, CRM, Termine und Abrechnung – ohne automatische Verbindung. Nach der Automatisierung fließen alle Anfragen zentral zusammen, Kunden-Onboarding läuft in Minuten, Rechnungen werden automatisch erstellt.",
+      "Ein Beratungsunternehmen in Bayern mit drei Standorten nutzt vier verschiedene Tools für Leads, CRM, Termine und Abrechnung – ohne automatische Verbindung. Mit einer passenden Automatisierung fließen alle Anfragen zentral zusammen, Kunden-Onboarding läuft in Minuten, Rechnungen werden automatisch erstellt.",
   },
 ];
 
@@ -198,7 +198,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Was kostet eine Website für ein bayerisches Unternehmen?",
-    a: "Einfache Unternehmenswebsites ab ca. 2.500 €, komplexere Projekte nach Aufwand. Kein versteckter Overhead – faire Preise ohne Agenturaufschläge für teure Bürolagen.",
+    a: "Websites starten ab ca. 1.500 €. Individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei ca. 2.500–5.000 €, komplexere Projekte nach Aufwand. Kein versteckter Overhead – faire Preise ohne Agenturaufschläge für teure Bürolagen.",
   },
   {
     q: "Wie unterscheidet sich Cogniiq von anderen Agenturen in Bayern?",
@@ -559,7 +559,7 @@ export function BayernPage() {
                 KI & Automatisierung in Bayern – Einsatzbeispiele
               </h2>
               <p className="text-gray-500 dark:text-gray-400">
-                Wie Cogniiq-Lösungen bayerische Unternehmen konkret entlasten.
+                Beispielszenarien, wie Cogniiq-Lösungen bayerische Unternehmen entlasten können.
               </p>
             </motion.div>
 

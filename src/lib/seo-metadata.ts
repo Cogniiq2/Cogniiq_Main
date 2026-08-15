@@ -24,7 +24,7 @@ export function generateLocationMetadata(
     description,
     keywords: BUSINESS_INFO.keywords,
     canonical: BUSINESS_INFO.website,
-    ogImage: `${BUSINESS_INFO.website}/og-image.jpg`,
+    ogImage: `${BUSINESS_INFO.website}/og-image.png`,
   };
 }
 
@@ -40,7 +40,7 @@ export function generateServiceMetadata(
     description,
     keywords: [...BUSINESS_INFO.keywords, serviceName.toLowerCase()],
     canonical: BUSINESS_INFO.website,
-    ogImage: `${BUSINESS_INFO.website}/og-image.jpg`,
+    ogImage: `${BUSINESS_INFO.website}/og-image.png`,
   };
 }
 
@@ -59,7 +59,7 @@ export function generateOpenGraphTags(metadata: PageMetadata) {
     "og:url": metadata.canonical || BUSINESS_INFO.website,
     "og:title": metadata.title,
     "og:description": metadata.description,
-    "og:image": metadata.ogImage || `${BUSINESS_INFO.website}/og-image.jpg`,
+    "og:image": metadata.ogImage || `${BUSINESS_INFO.website}/og-image.png`,
     "og:locale": "de_DE",
     "og:site_name": BUSINESS_INFO.name,
   };
@@ -71,7 +71,7 @@ export function generateTwitterTags(metadata: PageMetadata) {
     "twitter:url": metadata.canonical || BUSINESS_INFO.website,
     "twitter:title": metadata.title,
     "twitter:description": metadata.description,
-    "twitter:image": metadata.ogImage || `${BUSINESS_INFO.website}/og-image.jpg`,
+    "twitter:image": metadata.ogImage || `${BUSINESS_INFO.website}/og-image.png`,
   };
 }
 

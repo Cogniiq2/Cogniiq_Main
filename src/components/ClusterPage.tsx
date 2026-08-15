@@ -103,8 +103,9 @@ export function ClusterPage({ config }: ClusterPageProps) {
     { name: config.topic, url: `${BUSINESS_INFO.website}${config.route}` },
   ];
 
+  // No "@context" here: this object is embedded as a node inside the @graph of `schema`
+  // below, and a nested @context inside @graph is invalid JSON-LD.
   const faqSchema = {
-    "@context": "https://schema.org",
     "@type": "FAQPage",
     mainEntity: config.faq.map((item) => ({
       "@type": "Question",

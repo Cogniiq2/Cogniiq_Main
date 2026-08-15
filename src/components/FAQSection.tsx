@@ -131,7 +131,7 @@ export function FAQSection() {
               {[
                 { count: String(faqs.length), label: 'Antworten' },
                 { count: '7–14', label: 'Tage bis Start' },
-                { count: '100%', label: 'Remote-fähig' },
+                { count: 'Remote', label: 'umsetzbar' },
               ].map((stat) => (
                 <div
                   key={stat.label}

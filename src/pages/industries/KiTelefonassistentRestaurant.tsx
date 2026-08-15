@@ -10,7 +10,7 @@ const config: NationalIndustryPageConfig = {
     keywords: "KI Telefonassistent Restaurant, automatische Reservierung, KI Rezeptionistin Gastronomie, Telefonservice Restaurant",
   },
   h1: "KI Telefonassistent für Restaurants & Gastronomie",
-  tagline: "Gastronomie · Tischreservierung · 24/7",
+  tagline: "Gastronomie · Tischreservierung · auch außerhalb der Öffnungszeiten",
   intro: "Freitagabend, 19:30 Uhr: Die Küche läuft auf Hochtouren, jeder Tisch ist besetzt – und das Telefon klingelt. Niemand kann abnehmen. Der Anrufer will für Samstag reservieren. Er legt auf und ruft das Restaurant nebenan an. Mit dem KI Telefonassistenten hätte er in 90 Sekunden seinen Tisch gehabt, eine Bestätigung erhalten – und wäre am Samstagabend als Gast bei Ihnen.",
   serviceSlug: "ki-telefonassistent",
   serviceLabel: "KI Telefonassistent",
@@ -49,7 +49,7 @@ const config: NationalIndustryPageConfig = {
   benefits: [
     "Tischreservierungen automatisch entgegennehmen – auch während des Service",
     "Sofortige Bestätigung per SMS oder E-Mail an den Gast",
-    "24/7 erreichbar – auch abends, nachts und am Wochenende",
+    "Erreichbar auch abends, nachts und am Wochenende",
     "Automatische Erinnerung 24h vorher reduziert No-Shows messbar",
     "Mehrsprachig konfigurierbar: Deutsch und Englisch",
     "Integration mit OpenTable, ResDiary und anderen Systemen",
@@ -104,7 +104,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Wie wirksam sind die automatischen Erinnerungen gegen No-Shows?",
-      answer: "Automatische Erinnerungen per SMS oder E-Mail 24 Stunden vor dem Besuch reduzieren No-Shows bei Restaurants im Schnitt um 30–45 %. Der genaue Zeitpunkt und der Inhalt werden für Ihr Restaurant individuell konfiguriert.",
+      answer: "Automatische Erinnerungen per SMS oder E-Mail 24 Stunden vor dem Besuch helfen dabei, No-Shows spürbar zu reduzieren. Der genaue Zeitpunkt und der Inhalt werden für Ihr Restaurant individuell konfiguriert.",
     },
     {
       question: "Lässt sich der Assistent auch auf Festspiel- und Eventzeiten vorbereiten?",

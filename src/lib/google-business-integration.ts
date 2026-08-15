@@ -41,7 +41,7 @@ export function generateGooglePostsContent() {
       {
         title: "AI Rezeptionistin",
         description:
-          "24/7 Kundenservice mit unserer AI Rezeptionistin. Perfekt für Kliniken, Restaurants und Dienstleister.",
+          "Kundenservice auch außerhalb regulärer Geschäftszeiten mit unserer AI Rezeptionistin. Perfekt für Kliniken, Restaurants und Dienstleister.",
         callToAction: "Demo anfragen",
         link: `${BUSINESS_INFO.website}#kontakt`,
       },

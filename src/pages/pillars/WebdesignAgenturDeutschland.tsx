@@ -70,7 +70,7 @@ const CHALLENGES = [
   {
     icon: Monitor,
     title: "Schlechte Mobile-Erfahrung",
-    description: "Über 65 % aller Suchanfragen in Deutschland kommen von Mobilgeräten. Websites, die auf dem Smartphone nicht funktionieren, verlieren die Mehrheit ihrer potenziellen Kunden.",
+    description: "Der überwiegende Teil der Suchanfragen in Deutschland kommt von Mobilgeräten. Websites, die auf dem Smartphone nicht funktionieren, verlieren die Mehrheit ihrer potenziellen Kunden.",
   },
   {
     icon: Star,
@@ -112,26 +112,26 @@ const RELATED_LINKS = [
 const USE_CASES = [
   {
     title: "Arztpraxis mit schlechtem Online-Auftritt",
-    description: "Eine Praxis mit drei Ärzten erscheint bei Google auf Seite 4. Keine Terminbuchung online, keine Bewertungen, veraltetes Design. Nach Website-Neugestaltung und lokaler SEO-Optimierung: Platz 1 für die wichtigsten Suchbegriffe, 40 % mehr Online-Anfragen.",
+    description: "Beispielszenario: Eine Praxis mit drei Ärzten erscheint bei Google weit hinten. Keine Online-Terminbuchung, keine Bewertungen, veraltetes Design. Vorgehen: Neugestaltung mit Online-Terminbuchung, strukturierten Daten und lokaler SEO-Optimierung für die relevanten Suchbegriffe.",
   },
   {
     title: "Restaurant ohne Direktbuchungen",
-    description: "Ein Restaurant zahlt 20–30 % Provision an Reservierungsplattformen. Nach Website-Relaunch mit eigenem Buchungssystem: 60 % der Reservierungen direkt – keine Provision mehr.",
+    description: "Beispielszenario: Reservierungen laufen ausschließlich über Plattformen mit Provision. Vorgehen: Eigenes Buchungssystem auf der Website, damit Reservierungen direkt und ohne Vermittlungsgebühr eingehen können.",
   },
   {
     title: "Handwerksbetrieb ohne digitale Sichtbarkeit",
-    description: "Ein Elektriker in Bayern erhält alle Anfragen über Empfehlungen. Nach Website-Launch mit lokalem SEO: erste Google-Anfragen innerhalb von 8 Wochen, Auftragskalender voll.",
+    description: "Beispielszenario: Ein Elektrobetrieb erhält Anfragen ausschließlich über Empfehlungen. Vorgehen: Website mit lokalem SEO-Setup und klarer Anfragestrecke, damit der Betrieb auch über die Google-Suche gefunden werden kann.",
   },
   {
     title: "Immobilienmakler ohne Premium-Präsenz",
-    description: "Ein Maklerbüro tritt mit einer Vorlage-Website gegen große Portale an. Nach Neugestaltung mit professioneller Exposé-Darstellung und Local SEO: deutlich mehr direkte Anfragen ohne Portalgebühren.",
+    description: "Beispielszenario: Ein Maklerbüro tritt mit einer Vorlage-Website gegen große Portale an. Vorgehen: Neugestaltung mit professioneller Exposé-Darstellung und Local SEO, um direkte Anfragen unabhängig von Portalen zu ermöglichen.",
   },
 ];
 
 const FAQ_ITEMS = [
   {
     question: "Was kostet eine professionelle Website bei Cogniiq?",
-    answer: "Einfachere Websites beginnen ab ca. 1.500–2.500 €, professionelle Unternehmenswebsites mit SEO und Conversion-Optimierung liegen typischerweise bei 2.500–6.000 €. Komplexere Projekte mit Buchungssystem, mehrsprachigkeit oder E-Commerce darüber. Genaue Preise auf der Kosten-Seite oder nach kostenlosem Erstgespräch.",
+    answer: "Websites starten ab 1.500 €. Individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei etwa 2.500–5.000 €. Komplexere Projekte mit Buchungssystem, Mehrsprachigkeit oder E-Commerce darüber. Genaue Preise auf der Kosten-Seite oder nach kostenlosem Erstgespräch.",
   },
   {
     question: "Wie lange dauert die Entwicklung einer Website?",

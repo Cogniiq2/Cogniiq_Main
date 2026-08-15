@@ -178,7 +178,7 @@ export function CostPage({ config }: CostPageProps) {
         <div className="border-y border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
-              {["Individuelles Angebot", "Kostenlos Erstgespräch", "DSGVO-konform", "Made in Germany", "Faire Preise"].map((item, i) => (
+              {["Individuelles Angebot", "Kostenlos Erstgespräch", "DSGVO-konform", "Europäische Server", "Faire Preise"].map((item, i) => (
                 <span key={i} className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   {i > 0 && <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" aria-hidden="true" />}
                   {item}
@@ -300,7 +300,7 @@ export function CostPage({ config }: CostPageProps) {
                 Beispielprojekte
               </h2>
               <p className="text-gray-500 dark:text-gray-400">
-                Anonymisierte Praxisbeispiele aus der Zusammenarbeit mit deutschen Unternehmen.
+                Beispielhafte Projektzuschnitte zur Orientierung – keine abgerechneten Kundenprojekte.
               </p>
             </motion.div>
 

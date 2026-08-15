@@ -5,7 +5,7 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 const config: NationalIndustryPageConfig = {
   seo: {
     title: "KI Telefonassistent für Arztpraxen | Automatische Terminbuchung | Cogniiq",
-    description: "KI Telefonassistent für Arztpraxen: Automatische Terminbuchung, Patientenanfragen und Standardauskünfte. DSGVO-konform mit AVV, 24/7 erreichbar – Entlastung für das Praxisteam ab Tag 1.",
+    description: "KI Telefonassistent für Arztpraxen: Automatische Terminbuchung, Patientenanfragen und Standardauskünfte. DSGVO-konform mit AVV, auch außerhalb der Sprechzeiten erreichbar – Entlastung für das Praxisteam ab Tag 1.",
     canonical: `${BUSINESS_INFO.website}/ki-telefonassistent-arzt`,
     keywords: "KI Telefonassistent Arztpraxis, Praxis Telefonservice, automatische Terminbuchung Arzt, KI Rezeptionistin Praxis",
   },
@@ -48,8 +48,8 @@ const config: NationalIndustryPageConfig = {
   },
   benefits: [
     "Terminbuchung direkt in den Praxiskalender – kein Rückruf nötig",
-    "Vollständig DSGVO-konform mit AVV auf deutschen Servern",
-    "24/7 erreichbar – auch zwischen Sprechzeiten und im Urlaub",
+    "DSGVO-konform mit AVV, Verarbeitung auf europäischen Servern",
+    "Erreichbar auch zwischen den Sprechzeiten und in Urlaubswochen",
     "Notfall-Eskalation konfigurierbar für Ihren Bereitschaftsdienst",
     "Integriert mit Tomedo, Medistar, Dampsoft und anderen Systemen",
     "Ein Assistent für mehrere Ärzte und Behandlungsräume",
@@ -92,7 +92,7 @@ const config: NationalIndustryPageConfig = {
   faq: [
     {
       question: "Ist der KI Telefonassistent für Arztpraxen wirklich DSGVO-konform?",
-      answer: "Ja – und das ist keine Fußnote. Arztpraxen unterliegen besonders strengen Datenschutzanforderungen. Der Assistent verarbeitet alle Daten ausschließlich auf deutschen Servern, wird mit einem Auftragsverarbeitungsvertrag (AVV) geliefert und lässt sich so konfigurieren, dass medizinisch sensible Informationen nicht unverschlüsselt übertragen werden.",
+      answer: "Ja – und das ist keine Fußnote. Arztpraxen unterliegen besonders strengen Datenschutzanforderungen. Der Assistent verarbeitet alle Daten auf europäischen Servern, wird mit einem Auftragsverarbeitungsvertrag (AVV) geliefert und lässt sich so konfigurieren, dass medizinisch sensible Informationen nicht unverschlüsselt übertragen werden.",
     },
     {
       question: "Kann der Assistent in unser Praxisverwaltungssystem integriert werden?",

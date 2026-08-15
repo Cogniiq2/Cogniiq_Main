@@ -49,8 +49,8 @@ const config: NationalIndustryPageConfig = {
   benefits: [
     "Terminbuchung während der Behandlung – kein Anruf geht verloren",
     "Automatische Terminerinnerungen reduzieren No-Shows messbar",
-    "DSGVO-konform – Patientendaten auf deutschen Servern mit AVV",
-    "24/7 erreichbar für Terminwünsche und Standardfragen",
+    "DSGVO-konform – Patientendaten auf europäischen Servern mit AVV",
+    "Erreichbar für Terminwünsche und Standardfragen – auch außerhalb der Sprechzeiten",
     "Folgetermine automatisch angeboten und eingetragen",
     "Integration mit Praxisverwaltungssystemen",
     "Eingerichtet in 7–14 Tagen – keine Unterbrechung des Betriebs",
@@ -96,7 +96,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Ist der Assistent DSGVO-konform für Patientendaten in Therapiepraxen?",
-      answer: "Ja. Alle Daten werden auf deutschen Servern verarbeitet. Der Assistent wird mit einem Auftragsverarbeitungsvertrag (AVV) geliefert – vollständig rechtssicher für Therapiepraxen, die sensible Gesundheitsdaten verarbeiten.",
+      answer: "Ja. Alle Daten werden auf europäischen Servern verarbeitet. Der Assistent wird mit einem Auftragsverarbeitungsvertrag (AVV) geliefert – technische und organisatorische Maßnahmen werden projektbezogen abgestimmt, auch für Therapiepraxen, die sensible Gesundheitsdaten verarbeiten.",
     },
     {
       question: "Kann der Assistent automatisch Folgetermine einplanen?",

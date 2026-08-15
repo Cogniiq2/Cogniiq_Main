@@ -2,7 +2,9 @@ export const BUSINESS_INFO = {
   name: "Cogniiq",
   legalName: "Cogniiq, Inhaber Lazar Popovic",
   description: "AI Agentur und Webdesign Agentur in Bayreuth. Spezialisiert auf KI Automationen, AI Rezeptionistin und hochkonvertierende Websites für Unternehmen in Deutschland.",
-  foundingDate: "2023",
+  // Business start date confirmed by the operator. The previously published "2023"
+  // had no supporting record anywhere in the repository.
+  foundingDate: "2025-10-15",
 
   address: {
     streetAddress: "Am Main 3",
@@ -25,14 +27,19 @@ export const BUSINESS_INFO = {
 
   website: "https://cogniiq.de",
 
+  // jobTitle intentionally carries no specialisation. The visible copy on /ueber-uns
+  // and the structured data previously asserted mutually inverted specialisations for
+  // the two founders (Webdesign vs. KI-Automatisierung). Publishing either as fact
+  // about a named real person without confirmation would be a false attribution, so
+  // the neutral, verifiable role is used. Pending owner confirmation.
   founders: [
     {
       name: "Lazar Popovic",
-      jobTitle: "Co-Founder, Webdesign & System Architecture",
+      jobTitle: "Gründer",
     },
     {
       name: "Djordje Popovic",
-      jobTitle: "Co-Founder, AI & Automation Specialist",
+      jobTitle: "Gründer",
     },
   ],
 
@@ -95,7 +102,7 @@ export const SERVICES = [
   {
     id: "ai-receptionist",
     name: "KI-Telefonassistent",
-    description: "KI-Telefonassistent für Praxen, Restaurants und Dienstleister – antwortet in unter 3 Sekunden, bucht Termine direkt ins System.",
+    description: "KI-Telefonassistent für Praxen, Restaurants und Dienstleister – nimmt Anrufe ohne Warteschleife entgegen und bucht Termine direkt ins System.",
     category: "AI Receptionist",
     url: `${BUSINESS_INFO.website}/ki-telefonassistent`,
   },

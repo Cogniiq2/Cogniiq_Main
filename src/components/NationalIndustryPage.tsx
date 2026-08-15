@@ -196,7 +196,7 @@ export function NationalIndustryPage({ config }: Props) {
                 </div>
 
                 <div className="flex flex-wrap gap-x-6 gap-y-2">
-                  {["DSGVO-konform · Deutsche Server", "Einrichtung in wenigen Tagen", "Individuelle Konfiguration"].map((item, i) => (
+                  {["DSGVO-konform · Europäische Server", "Einrichtung in wenigen Tagen", "Individuelle Konfiguration"].map((item, i) => (
                     <motion.div
                       key={i}
                       initial="hidden"
@@ -237,7 +237,7 @@ export function NationalIndustryPage({ config }: Props) {
                   </div>
                   <div className="px-5 py-3.5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-800/30 flex items-center gap-2">
                     <Lock size={11} className="text-gray-300 dark:text-gray-600 flex-shrink-0" />
-                    <span className="text-[11px] text-gray-400 dark:text-gray-500">DSGVO-konform · Verarbeitung auf deutschen Servern</span>
+                    <span className="text-[11px] text-gray-400 dark:text-gray-500">DSGVO-konform · Verarbeitung auf europäischen Servern</span>
                   </div>
                 </div>
               </motion.div>

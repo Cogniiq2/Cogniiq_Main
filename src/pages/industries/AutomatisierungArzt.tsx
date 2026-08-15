@@ -51,7 +51,7 @@ const config: NationalIndustryPageConfig = {
     "Warteliste wird bei Absagen sofort automatisch kontaktiert",
     "Rezeptanfragen digital strukturiert und weitergeleitet",
     "Patientendaten systemübergreifend synchronisiert",
-    "DSGVO-konforme Verarbeitung mit AVV auf deutschen Servern",
+    "DSGVO-konforme Verarbeitung mit AVV auf europäischen Servern",
     "Bewertungsanfragen nach jedem Termin automatisch versandt",
     "Einrichtung in 2–4 Wochen, ohne Praxisunterbrechung",
   ],

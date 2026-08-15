@@ -28,7 +28,7 @@ const config: ClusterPageConfig = {
     heading: "Kurzüberblick: Website Relaunch in München",
     items: [
       { label: "Für wen", value: "Münchner Unternehmen mit veralteter oder schwacher Website" },
-      { label: "Typische Ziele", value: "Top-Rankings, Ladezeit unter 1,5s, mehr Anfragen" },
+      { label: "Typische Ziele", value: "Mehr Anfragen, bessere Rankings, schnellere Ladezeit" },
       { label: "Projektdauer", value: "4–10 Wochen" },
       { label: "Preisrahmen", value: "ab ca. 2.500 €" },
     ],

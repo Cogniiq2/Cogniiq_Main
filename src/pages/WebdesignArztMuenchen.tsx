@@ -47,7 +47,7 @@ const config: IndustryPageConfig = {
       icon: "phone",
       title: "KI-Telefonassistent für Münchner Praxen",
       description:
-        "Der KI-Telefonassistent nimmt Patientenanrufe automatisch an, beantwortet Fragen zu Öffnungszeiten, Fachrichtungen und Formalitäten, bucht Termine direkt ins System ein und leitet komplexe Anliegen strukturiert an Ihr Team weiter – 24/7, ohne Warteschleife, auch bei hohem Anrufaufkommen.",
+        "Der KI-Telefonassistent nimmt Patientenanrufe automatisch an, beantwortet Fragen zu Öffnungszeiten, Fachrichtungen und Formalitäten, bucht Termine direkt ins System ein und leitet komplexe Anliegen strukturiert an Ihr Team weiter – auch außerhalb der Sprechzeiten, ohne Warteschleife, auch bei hohem Anrufaufkommen.",
     },
     {
       icon: "zap",
@@ -58,9 +58,9 @@ const config: IndustryPageConfig = {
   ],
   useCases: [
     {
-      title: "Online-Terminbuchung rund um die Uhr",
+      title: "Online-Terminbuchung außerhalb der Sprechzeiten",
       description:
-        "Münchner Patienten buchen Termine direkt über die Praxis-Website oder per KI-Telefonassistent – abends, am Wochenende und an Feiertagen. In einer Stadt mit hohem Lebenstempo ist 24/7-Erreichbarkeit kein Bonus, sondern Erwartung.",
+        "Münchner Patienten buchen Termine direkt über die Praxis-Website oder per KI-Telefonassistent – abends, am Wochenende und an Feiertagen. In einer Stadt mit hohem Lebenstempo ist Erreichbarkeit außerhalb der Sprechzeiten kein Bonus, sondern Erwartung.",
     },
     {
       title: "Automatische Terminerinnerungen",
@@ -92,15 +92,15 @@ const config: IndustryPageConfig = {
     "Keine verpassten Anrufe mehr – der KI-Assistent nimmt auch bei vollem Betrieb alle Anrufe entgegen",
     "Automatisierte Terminprozesse entlasten das Praxisteam in einer Großstadt mit hohem Anfragevolumen",
     "Mehr qualifizierte Patientenanfragen durch eine suchmaschinenoptimierte Praxis-Website für München",
-    "24/7-Erreichbarkeit – in München eine Grundvoraussetzung für Patientenzufriedenheit",
+    "Erreichbarkeit außerhalb der Sprechzeiten – in München eine Grundvoraussetzung für Patientenzufriedenheit",
     "Zeitersparnis durch automatisierte Erinnerungen, Bestätigungen und Kommunikationsabläufe",
     "Professioneller erster Eindruck durch moderne Website – besonders wichtig im Münchner Wettbewerb",
-    "Vollständige DSGVO-Konformität – alle Daten werden ausschließlich auf europäischen Servern verarbeitet",
+    "Datenschutzorientierte Umsetzung – alle Daten werden ausschließlich auf europäischen Servern verarbeitet",
   ],
   localContext: [
     "München ist einer der dichtesten Gesundheitsmärkte Deutschlands. Arztpraxen konkurrieren in der Millionenstadt nicht nur um Kassenpatienten, sondern auch um Privatpatienten und Selbstzahler. Gleichzeitig sind die Erwartungen an Digitalität und Service in München überdurchschnittlich hoch – Patienten erwarten Online-Terminbuchung, schnelle Reaktionszeiten und eine moderne Praxis-Website als Selbstverständlichkeit.",
-    "Cogniiq entwickelt für Arztpraxen in München maßgeschneiderte Digitallösungen: eine hochperformante Praxis-Website mit integrierter Terminbuchung, einen KI-Telefonassistenten, der die Rezeption rund um die Uhr entlastet, sowie Automatisierungssysteme, die Terminerinnerungen, Patientenkommunikation und interne Abläufe ohne manuellen Aufwand steuern.",
-    "Alle Systeme sind vollständig DSGVO-konform, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Die Betreuung erfolgt durch Cogniiq persönlich – transparent, direkt und ohne unnötige Zwischenstellen.",
+    "Cogniiq entwickelt für Arztpraxen in München maßgeschneiderte Digitallösungen: eine hochperformante Praxis-Website mit integrierter Terminbuchung, einen KI-Telefonassistenten, der die Rezeption auch außerhalb der Sprechzeiten entlastet, sowie Automatisierungssysteme, die Terminerinnerungen, Patientenkommunikation und interne Abläufe ohne manuellen Aufwand steuern.",
+    "Alle Systeme werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Die Betreuung erfolgt durch Cogniiq persönlich – transparent, direkt und ohne unnötige Zwischenstellen.",
   ],
   internalLinks: [
     { label: "Webdesign München", href: "/muenchen/webdesign" },
@@ -117,7 +117,7 @@ const config: IndustryPageConfig = {
     {
       question: "Kann Cogniiq eine DSGVO-konforme Praxis-Website in München erstellen?",
       answer:
-        "Ja. Alle Websites und Systeme von Cogniiq sind vollständig DSGVO-konform. Formulare, Datenschutzerklärungen, Cookie-Einwilligungen und die Datenverarbeitung entsprechen den geltenden Datenschutzanforderungen für Arztpraxen.",
+        "Ja. Alle Websites und Systeme von Cogniiq werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse. Formulare, Datenschutzerklärungen, Cookie-Einwilligungen und die Datenverarbeitung entsprechen den geltenden Datenschutzanforderungen für Arztpraxen.",
     },
     {
       question: "Funktioniert der KI-Telefonassistent mit meiner bestehenden Praxissoftware?",
@@ -137,7 +137,7 @@ const config: IndustryPageConfig = {
     {
       question: "Was passiert mit Anrufen außerhalb meiner Öffnungszeiten?",
       answer:
-        "Der KI-Telefonassistent ist rund um die Uhr aktiv. Er beantwortet häufige Fragen, notiert Terminwünsche und leitet dringende Anliegen entsprechend weiter – ohne Warteschleife, ohne Anrufbeantworter.",
+        "Der KI-Telefonassistent ist auch außerhalb der Sprechzeiten aktiv. Er beantwortet häufige Fragen, notiert Terminwünsche und leitet dringende Anliegen entsprechend weiter – ohne Warteschleife, ohne Anrufbeantworter.",
     },
   ],
 };

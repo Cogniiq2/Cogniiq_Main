@@ -55,13 +55,13 @@ const config: IndustryPageConfig = {
     },
   ],
   workflow: {
-    title: "Beispiel-Workflow: Arztpraxis Regensburg",
+    title: "Beispielszenario: Arztpraxis Regensburg",
     trigger:
-      "Eine Arztpraxis in Regensburg mit Nähe zur Universität hatte ein überdurchschnittlich junges Patientenprofil. Diese Patientengruppe erwartete Online-Terminbuchung und digitale Kommunikation. Die veraltete Website und ausschließliche Telefonbuchung führten zu messbarem Patientenverlust.",
+      "Angenommen, eine Arztpraxis in Regensburg in Universitätsnähe hat ein überdurchschnittlich junges Patientenprofil. Diese Patientengruppe erwartet Online-Terminbuchung und digitale Kommunikation. Eine veraltete Website und ausschließliche Telefonbuchung passen dazu nicht.",
     process:
-      "Cogniiq baute eine neue Praxis-Website mit Online-Terminbuchung und implementierte einen KI-Telefonassistenten. Die Website wurde gezielt für Suchbegriffe wie 'Arzt Regensburg' und 'Hausarzt Regensburg' optimiert.",
+      "Vorgehen: Cogniiq entwickelt eine Praxis-Website mit Online-Terminbuchung und richtet einen KI-Telefonassistenten ein. Die Website wird gezielt für Suchbegriffe wie 'Arzt Regensburg' und 'Hausarzt Regensburg' optimiert.",
     result:
-      "Die Praxis erhält kontinuierlich neue Patientenanfragen über organische Suchanfragen. Online-Terminbuchung entlastet die Rezeption. Der KI-Assistent deckt alle Anfragen außerhalb der Öffnungszeiten ab.",
+      "So könnte die Praxis über die organische Suche auffindbar sein, die Online-Terminbuchung die Rezeption entlasten und der KI-Assistent Anfragen außerhalb der Öffnungszeiten abdecken.",
   },
   pakete: [
     {
@@ -77,10 +77,10 @@ const config: IndustryPageConfig = {
     },
     {
       name: "Growth",
-      tagline: "Website + KI-Telefonassistent für 24/7-Erreichbarkeit",
+      tagline: "Website + KI-Telefonassistent für Erreichbarkeit außerhalb der Sprechzeiten",
       deliverables: [
         "Alles aus Start",
-        "KI-Telefonassistent (24/7 Anrufannahme)",
+        "KI-Telefonassistent (Anrufannahme außerhalb der Sprechzeiten)",
         "Automatische Terminverwaltung & Kalenderintegration",
         "Erinnerungs-SMS / E-Mail für Patienten",
         "Monatliches Reporting & Optimierungsgespräch",
@@ -118,7 +118,7 @@ const config: IndustryPageConfig = {
       icon: "phone",
       title: "KI-Telefonassistent für Arztpraxen in Regensburg",
       description:
-        "Der KI-Telefonassistent nimmt Patientenanrufe automatisch an, beantwortet Fragen zu Öffnungszeiten, Fachrichtungen und Formalitäten, bucht Termine direkt ins System ein und leitet komplexe Anliegen strukturiert weiter – 24/7, ohne Warteschleife.",
+        "Der KI-Telefonassistent nimmt Patientenanrufe automatisch an, beantwortet Fragen zu Öffnungszeiten, Fachrichtungen und Formalitäten, bucht Termine direkt ins System ein und leitet komplexe Anliegen strukturiert weiter – auch außerhalb der Sprechzeiten, ohne Warteschleife.",
     },
     {
       icon: "zap",
@@ -163,15 +163,15 @@ const config: IndustryPageConfig = {
     "Weniger verpasste Anrufe – der KI-Assistent nimmt auch bei vollem Betrieb alle Anrufe entgegen",
     "Automatisierte Terminprozesse entlasten das Praxisteam in einer wachsenden Mittelstadt",
     "Mehr qualifizierte Patientenanfragen durch eine suchmaschinenoptimierte Praxis-Website in Regensburg",
-    "Höhere Erreichbarkeit für Patienten – rund um die Uhr, auch außerhalb der Öffnungszeiten",
+    "Höhere Erreichbarkeit für Patienten – auch außerhalb der Öffnungszeiten",
     "Zeitersparnis durch automatisierte Erinnerungen, Bestätigungen und Kommunikationsabläufe",
     "Bessere Ansprache des jungen Patientenprofils der Unistadt durch digitale Kanäle",
-    "Vollständige DSGVO-Konformität – alle Daten auf europäischen Servern verarbeitet",
+    "Datenschutzorientierte Umsetzung – alle Daten auf europäischen Servern verarbeitet",
   ],
   localContext: [
     "Regensburg ist eine wachsende Mittelstadt mit einem breiten Praxisnetz und einem jungen Patientenprofil, das durch die Universität und das Uniklinikum geprägt wird. Gleichzeitig versorgen viele Praxen auch Patienten aus dem Landkreis – mit entsprechend hohem Anfragevolumen.",
-    "Cogniiq entwickelt für Arztpraxen in Regensburg maßgeschneiderte Digitallösungen: eine hochperformante Praxis-Website mit integrierter Terminbuchung, einen KI-Telefonassistenten, der die Rezeption rund um die Uhr entlastet, sowie Automatisierungssysteme für Terminerinnerungen und Patientenkommunikation.",
-    "Cogniiq betreut Projekte in Regensburg remote und ist für persönliche Abstimmungen direkt erreichbar. Die Einrichtung aller Lösungen dauert 7–14 Tage. Alle Systeme sind vollständig DSGVO-konform.",
+    "Cogniiq entwickelt für Arztpraxen in Regensburg maßgeschneiderte Digitallösungen: eine hochperformante Praxis-Website mit integrierter Terminbuchung, einen KI-Telefonassistenten, der die Rezeption auch außerhalb der Sprechzeiten entlastet, sowie Automatisierungssysteme für Terminerinnerungen und Patientenkommunikation.",
+    "Cogniiq betreut Projekte in Regensburg remote und ist für persönliche Abstimmungen direkt erreichbar. Die Einrichtung aller Lösungen dauert 7–14 Tage. Alle Systeme werden datenschutzorientiert umgesetzt; technische und organisatorische Maßnahmen werden projektbezogen abgestimmt.",
   ],
   internalLinks: [
     { label: "Webdesign Regensburg", href: "/regensburg/webdesign" },
@@ -187,7 +187,7 @@ const config: IndustryPageConfig = {
     {
       question: "Kann Cogniiq eine DSGVO-konforme Praxis-Website in Regensburg erstellen?",
       answer:
-        "Ja. Alle Websites und Systeme von Cogniiq sind vollständig DSGVO-konform. Formulare, Datenschutzerklärungen, Cookie-Einwilligungen und die Datenverarbeitung entsprechen den Datenschutzanforderungen für Arztpraxen in Bayern.",
+        "Ja. Alle Websites und Systeme von Cogniiq werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse. Formulare, Datenschutzerklärungen, Cookie-Einwilligungen und die Datenverarbeitung entsprechen den Datenschutzanforderungen für Arztpraxen in Bayern.",
     },
     {
       question: "Funktioniert der KI-Telefonassistent mit meiner bestehenden Praxissoftware in Regensburg?",
@@ -207,7 +207,7 @@ const config: IndustryPageConfig = {
     {
       question: "Was passiert mit Anrufen außerhalb meiner Öffnungszeiten?",
       answer:
-        "Der KI-Telefonassistent ist rund um die Uhr aktiv. Er beantwortet häufige Fragen, notiert Terminwünsche und leitet dringende Anliegen entsprechend weiter – ohne Warteschleife, ohne Anrufbeantworter.",
+        "Der KI-Telefonassistent ist auch außerhalb der Sprechzeiten aktiv. Er beantwortet häufige Fragen, notiert Terminwünsche und leitet dringende Anliegen entsprechend weiter – ohne Warteschleife, ohne Anrufbeantworter.",
     },
     {
       question: "Betreut Cogniiq die Systeme auch nach dem Go-live in Regensburg?",

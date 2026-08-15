@@ -32,7 +32,7 @@ const principles = [
   {
     icon: Target,
     title: "Präzise. Ohne Overhead.",
-    text: "Keine Software-Lizenzen für Tools, die 80% der Funktionen nicht brauchen. Keine Generalist-Agenturen mit 12-köpfigen Teams. Fokus auf das, was wirkt.",
+    text: "Keine Software-Lizenzen für Tools, deren Funktionsumfang zum größten Teil ungenutzt bleibt. Keine Generalist-Agenturen mit 12-köpfigen Teams. Fokus auf das, was wirkt.",
     link: "/leistungen",
     linkLabel: "Unsere Methode",
     highlight: false,

@@ -56,9 +56,9 @@ const SERVICES = [
     index: "02",
     icon: Phone,
     name: "KI-Telefonassistent",
-    tagline: "24/7 Anrufannahme in natürlicher Sprache — kein verpasster Termin, kein verpasster Umsatz.",
+    tagline: "Anrufannahme in natürlicher Sprache — auch außerhalb regulärer Geschäftszeiten.",
     benefits: [
-      "Anrufannahme rund um die Uhr in natürlicher Sprache",
+      "Anrufannahme in natürlicher Sprache, auch außerhalb der Öffnungszeiten",
       "Automatische Terminbuchung, Bestätigung und Erinnerung",
       "Intelligente Weiterleitung bei komplexen Anfragen",
       "Vollständige Synchronisation mit Kalender und CRM",
@@ -104,9 +104,9 @@ const SERVICES = [
 ];
 
 const OUTCOMES = [
-  { metric: "Keine verpassten Anrufe mehr", context: "KI-Assistent nimmt 24/7 ab — auch nachts, am Wochenende und bei Stoßzeiten" },
+  { metric: "Keine verpassten Anrufe mehr", context: "Der KI-Assistent nimmt ab — auch nachts, am Wochenende und bei Stoßzeiten" },
   { metric: "Terminbuchung ohne Rückruf", context: "Patienten, Gäste und Kunden buchen direkt — ohne auf eine Antwort zu warten" },
-  { metric: "No-Shows messbar reduziert", context: "Automatische Erinnerungen mit Bestätigungslink bis zu 48 Stunden vorher" },
+  { metric: "Automatische Terminerinnerungen", context: "Automatische Erinnerungen mit Bestätigungslink bis zu 48 Stunden vorher" },
   { metric: "Mehr qualifizierte Anfragen", context: "SEO-optimierte Websites, die gefunden werden — und Besucher in Kunden verwandeln" },
   { metric: "Stunden Verwaltung eingespart", context: "Bestätigungen, Erinnerungen, Follow-ups und CRM-Pflege laufen ohne manuellen Aufwand" },
 ];
@@ -140,7 +140,7 @@ const SYSTEM_PANELS = [
     label: "Immobilien-System",
     stack: ["Website", "Lead-Qualifizierung", "Besichtigungslogik", "Automatisierung"],
     outcomes: [
-      "Anfragen 24/7 qualifiziert und sortiert",
+      "Anfragen qualifiziert und sortiert — auch außerhalb der Öffnungszeiten",
       "Besichtigungstermine ohne Rückrufaufwand",
       "Automatische Nachverfolgung von Interessenten",
       "Mehr Kapazität für echte Verkaufsgespräche",
@@ -627,13 +627,13 @@ export function LeistungenPage() {
               className="mb-14"
             >
               <p className="text-[10px] font-semibold tracking-[0.22em] uppercase text-gray-300 dark:text-gray-700 mb-6">
-                Typische Ergebnisse
+                Wofür die Systeme gebaut sind
               </p>
               <h2
                 id="outcomes-heading"
                 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 tracking-tight max-w-lg"
               >
-                Was unsere Kunden typischerweise erreichen
+                Was die Systeme im laufenden Betrieb übernehmen
               </h2>
             </motion.div>
 

@@ -261,11 +261,11 @@ export function KontaktPage() {
                         transition={{ duration: 1.8, repeat: Infinity }}
                       />
                       <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-500">
-                        Garantien
+                        Ablauf
                       </span>
                     </div>
                     <p className="text-[11.5px] text-gray-600 leading-relaxed">
-                      Antwort innerhalb 24h · Go-Live in 14 Tagen oder Geld zurück ·
+                      Antwort in der Regel innerhalb von 24 Stunden · Go-Live typischerweise in 7–14 Tagen ·
                       kein Formular-Loop — persönliches Gespräch
                     </p>
                   </div>

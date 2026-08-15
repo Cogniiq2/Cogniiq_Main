@@ -56,7 +56,7 @@ const COMPETENCIES = [
     name: "KI-Telefonassistenten",
     tagline: "Kein Anruf geht verloren. Kein Termin bleibt ungebucht.",
     points: [
-      "24/7-Anrufannahme in natürlicher Sprache",
+      "Anrufannahme in natürlicher Sprache, auch außerhalb der Öffnungszeiten",
       "Automatische Terminbuchung und Bestätigung",
       "Intelligente Weiterleitung und Eskalationslogik",
       "Synchronisation mit Kalender und CRM-Systemen",
@@ -103,33 +103,41 @@ const PRINCIPLES = [
   },
 ];
 
+// Founder specialisations are deliberately NOT assigned to an individual.
+//
+// The visible copy here and the page's own JSON-LD previously asserted mutually inverted
+// specialisations for the two founders (one said Lazar = KI-Automatisierung, the other said
+// Lazar = Webdesign). Publishing either version as fact about a named real person without
+// confirmation would be a false professional attribution, so both are described by the role
+// that is verifiable — "Gründer" — and the shared capability areas are listed jointly.
+// Restore individual focus areas only once the owner confirms who does what.
 const FOUNDERS = [
   {
     initial: "L",
     name: "Lazar Popovic",
     role: "Gründer",
-    focus: "KI-Automatisierung & Technische Integrationen",
+    focus: "Gründer",
     description:
-      "Spezialisierung auf KI-Automatisierung, Prozesssysteme und technische Integrationen für effiziente Geschäftsabläufe. Konzipiert und implementiert Systemarchitekturen, die operative Abläufe dauerhaft entlasten — präzise, skalierbar und ohne unnötige Komplexität.",
+      "Gründer von Cogniiq. Arbeitet gemeinsam mit Djordje Popovic an Konzeption, Umsetzung und Betrieb der Kundenprojekte — von der Website über den KI-Telefonassistenten bis zur Prozessautomatisierung.",
     expertise: [
-      "KI-Workflow-Architekturen & Automatisierung",
-      "API-Integrationen & System-Orchestrierung",
+      "Websites & Conversion-Architektur",
       "KI-Telefonassistenten & Voice-Systeme",
-      "Prozessanalyse & Automatisierungsstrategie",
+      "Prozessautomatisierung & API-Integrationen",
+      "Technisches SEO & Performance",
     ],
   },
   {
     initial: "D",
     name: "Djordje Popovic",
     role: "Gründer",
-    focus: "Webdesign-Architektur & Digitale Plattformen",
+    focus: "Gründer",
     description:
-      "Fokus auf Webdesign-Architektur, Performance-Optimierung und digitale Plattformen mit hoher Conversion-Qualität. Entwickelt hochmoderne Websites und digitale Systeme, die klar strukturiert sind und messbaren geschäftlichen Mehrwert liefern.",
+      "Gründer von Cogniiq. Arbeitet gemeinsam mit Lazar Popovic an Konzeption, Umsetzung und Betrieb der Kundenprojekte — von der Website über den KI-Telefonassistenten bis zur Prozessautomatisierung.",
     expertise: [
-      "Conversion-Architektur & UX-Design",
-      "Technisches SEO & Performance-Optimierung",
-      "Frontend-Entwicklung & Systemintegration",
-      "Digitale Plattformstrategie",
+      "Websites & Conversion-Architektur",
+      "KI-Telefonassistenten & Voice-Systeme",
+      "Prozessautomatisierung & API-Integrationen",
+      "Technisches SEO & Performance",
     ],
   },
 ];
@@ -387,29 +395,27 @@ const ueberUnsSchema = {
       "@type": "Person",
       "@id": `${BUSINESS_INFO.website}/#lazar-popovic`,
       name: "Lazar Popovic",
-      jobTitle: "Co-Founder, Webdesign & System Architecture",
-      description: "Lazar Popovic ist Co-Gründer von Cogniiq und verantwortet Webdesign und System-Architektur. Spezialist für hochkonvertierende Websites und digitale Systemarchitektur.",
+      jobTitle: "Gründer",
+      description: "Lazar Popovic ist Gründer von Cogniiq.",
       worksFor: {
         "@type": "Organization",
         "@id": `${BUSINESS_INFO.website}/#organization`,
         name: BUSINESS_INFO.name,
       },
       url: `${BUSINESS_INFO.website}/ueber-uns`,
-      knowsAbout: ["Webdesign", "Conversion Optimierung", "System Architecture", "Frontend Development", "SEO"],
     },
     {
       "@type": "Person",
       "@id": `${BUSINESS_INFO.website}/#djordje-popovic`,
       name: "Djordje Popovic",
-      jobTitle: "Co-Founder, AI & Automation Specialist",
-      description: "Djordje Popovic ist Co-Gründer von Cogniiq und Spezialist für KI-Automatisierung, KI-Telefonassistenten und Make.com Prozessautomatisierung.",
+      jobTitle: "Gründer",
+      description: "Djordje Popovic ist Gründer von Cogniiq.",
       worksFor: {
         "@type": "Organization",
         "@id": `${BUSINESS_INFO.website}/#organization`,
         name: BUSINESS_INFO.name,
       },
       url: `${BUSINESS_INFO.website}/ueber-uns`,
-      knowsAbout: ["KI-Automatisierung", "Make.com", "AI Telefonassistent", "Prozessautomatisierung", "n8n"],
     },
   ],
 };

@@ -3,7 +3,7 @@ import { useRef, useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight, CircleCheck as CheckCircle, X, Info,
-  User, Bot, TrendingDown, Star,
+  User, Bot, TrendingDown,
 } from 'lucide-react';
 import { type Industry, INDUSTRY_PRESETS } from './ROICalculator';
 
@@ -103,7 +103,7 @@ function MiniSlider({ label, hint, tooltip, value, min, max, step, unit, onChang
 
 const HUMAN_CAPABILITIES = [
   { label: 'Anrufe annehmen', human: true, ki: true },
-  { label: 'Terminbuchung (24/7)', human: false, ki: true },
+  { label: 'Terminbuchung außerhalb der Öffnungszeiten', human: false, ki: true },
   { label: 'Gleichzeitige Anrufe', human: false, ki: true },
   { label: 'Kein Urlaub, kein Ausfall', human: false, ki: true },
   { label: 'Empathische Sonderfälle', human: true, ki: false },
@@ -234,7 +234,7 @@ export function CostComparisonSection() {
               <MiniSlider
                 label="Ausfallquote"
                 hint="Urlaub, Krankheit, Pausen"
-                tooltip="Wie viel Prozent der Arbeitszeit ist Ihr Assistent durch Urlaub, Krankheit oder Pausen nicht erreichbar? Durchschnitt: 15–25%."
+                tooltip="Wie viel Prozent der Arbeitszeit ist Ihr Assistent durch Urlaub, Krankheit oder Pausen nicht erreichbar? Der Startwert ist ein frei änderbares Beispiel, keine Branchenstatistik."
                 value={humanAbsence}
                 min={0} max={40} step={1} unit="%"
                 onChange={setHumanAbsence}
@@ -329,12 +329,12 @@ export function CostComparisonSection() {
                   Was enthalten ist
                 </p>
                 {[
-                  '24/7 Anrufannahme — kein Besetztzeichen',
+                  'Anrufannahme außerhalb der Öffnungszeiten — kein Besetztzeichen',
                   'Automatische Terminbuchung',
                   'Integration Kalender & CRM',
                   'Sofortbestätigung per SMS oder Mail',
                   'Unbegrenzte gleichzeitige Anrufe',
-                  'DSGVO-konform · deutsche Server',
+                  'DSGVO-konform · europäische Server',
                   'Laufende Optimierung inklusive',
                 ].map((feature) => (
                   <div key={feature} className="flex items-center gap-2.5">
@@ -454,14 +454,8 @@ export function CostComparisonSection() {
                 style={{ background: 'radial-gradient(ellipse at 70% 20%, rgba(2,132,199,0.08) 0%, transparent 55%)' }}
               />
               <div className="relative">
-                <div className="flex items-center gap-1 mb-3">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} size={10} className="text-amber-400 fill-amber-400" />
-                  ))}
-                  <span className="text-[11px] text-gray-500 ml-1">40+ Kunden</span>
-                </div>
                 <p className="text-[14px] font-bold text-white mb-1.5">
-                  KI-Assistent live in 14 Tagen
+                  KI-Assistent live in 7–14 Tagen
                 </p>
                 <p className="text-[12px] text-gray-500 mb-5 leading-relaxed">
                   Kündbar monatlich · DSGVO-konform · persönliche Einrichtung

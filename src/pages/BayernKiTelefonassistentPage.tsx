@@ -38,7 +38,7 @@ const faqItems = [
   },
   {
     question: "Ist das System DSGVO-konform für den Einsatz in Deutschland?",
-    answer: "Ja. Der KI Telefonassistent ist vollständig DSGVO-konform. Alle Daten werden auf europäischen Servern verarbeitet und gespeichert.",
+    answer: "Ja. Der KI Telefonassistent unterstützt DSGVO-konforme Prozesse. Alle Daten werden auf europäischen Servern verarbeitet und gespeichert.",
   },
   {
     question: "Wie erhalte ich eine Demo für mein Unternehmen in Bayern?",
@@ -70,7 +70,7 @@ const USE_CASES = [
   {
     icon: Home,
     industry: "Immobilien",
-    desc: "Besichtigungstermine für Objekte in ganz Bayern buchen – vollautomatisch, rund um die Uhr.",
+    desc: "Besichtigungstermine für Objekte in ganz Bayern buchen – vollautomatisch, auch außerhalb der Bürozeiten.",
   },
   {
     icon: Building2,
@@ -110,13 +110,12 @@ export function BayernKiTelefonassistentPage() {
       {
         "@type": "Service",
         name: "KI Telefonassistent für Unternehmen in Bayern",
-        description: "KI Telefonassistent für bayerische Unternehmen: Anrufe automatisch beantworten, Termine buchen, 24/7 erreichbar.",
+        description: "KI Telefonassistent für bayerische Unternehmen: Anrufe automatisch beantworten, Termine buchen, auch außerhalb regulärer Geschäftszeiten erreichbar.",
         url: `${BUSINESS_INFO.website}/bayern/ki-telefonassistent`,
         provider: { "@id": `${BUSINESS_INFO.website}/#localbusiness` },
         areaServed: { "@type": "State", name: "Bayern" },
       },
       {
-        "@context": "https://schema.org",
         "@type": "FAQPage",
         mainEntity: faqItems.map((f) => ({
           "@type": "Question",
@@ -131,7 +130,7 @@ export function BayernKiTelefonassistentPage() {
     <>
       <PageSEO
         title="KI Telefonassistent für Unternehmen in Bayern | Cogniiq"
-        description="KI Telefonassistent für bayerische Unternehmen: Beantwortet Anrufe automatisch, bucht Termine und entlastet Ihr Team – 24/7, DSGVO-konform, Made for Mittelstand."
+        description="KI Telefonassistent für bayerische Unternehmen: Beantwortet Anrufe automatisch, bucht Termine und entlastet Ihr Team – auch außerhalb regulärer Geschäftszeiten, DSGVO-konform, Made for Mittelstand."
         canonical={`${BUSINESS_INFO.website}/bayern/ki-telefonassistent`}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
@@ -207,7 +206,7 @@ function HeroSection() {
 
           <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed max-w-2xl mb-10">
             Beantwortet Anrufe automatisch, spricht mit Ihren Kunden und bucht Termine
-            direkt in Ihren Kalender – für bayerische Unternehmen, rund um die Uhr.
+            direkt in Ihren Kalender – für bayerische Unternehmen, auch außerhalb der Öffnungszeiten.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 mb-12">
@@ -230,7 +229,7 @@ function HeroSection() {
           <div className="flex flex-wrap gap-6">
             {[
               { icon: MapPin, label: "Bayernweit verfügbar" },
-              { icon: Clock, label: "24/7 erreichbar" },
+              { icon: Clock, label: "Auch außerhalb der Öffnungszeiten erreichbar" },
               { icon: Calendar, label: "Termine automatisch" },
               { icon: Shield, label: "DSGVO-konform" },
             ].map((item, i) => (
@@ -260,8 +259,7 @@ function TrustSection() {
         <div className="flex flex-wrap items-center justify-between gap-6">
           {[
             "Spezialisiert auf den bayerischen Mittelstand",
-            "DSGVO-konform · EU-Server",
-            "Made in Germany",
+            "DSGVO-konform · Europäische Server",
             "Individuelle Konfiguration",
             "Schnelle Implementierung",
           ].map((item, i) => (
@@ -328,7 +326,7 @@ function IntroSection() {
               { icon: Zap, label: "Versteht Kundenanfragen auf Hochdeutsch" },
               { icon: CheckCircle2, label: "Beantwortet Fragen und gibt Informationen weiter" },
               { icon: Calendar, label: "Bucht Termine direkt in Ihren Kalender" },
-              { icon: Clock, label: "24/7 erreichbar – auch Feiertage in Bayern" },
+              { icon: Clock, label: "Erreichbar auch an Feiertagen in Bayern" },
               { icon: Shield, label: "DSGVO-konform – Daten auf EU-Servern" },
               { icon: Zap, label: "Integration mit CRM und Automationen" },
             ].map((feat, i) => (
@@ -441,7 +439,7 @@ function BenefitsSection() {
             },
             {
               icon: Clock,
-              title: "24/7 – auch bayerische Feiertage",
+              title: "Auch an bayerischen Feiertagen",
               desc: "An Feiertagen wie Fronleichnam oder dem bayerischen Nationalfeiertag bleibt Ihr Telefonservice aktiv.",
             },
             {
@@ -451,7 +449,7 @@ function BenefitsSection() {
             },
             {
               icon: Shield,
-              title: "Rechtssicher und DSGVO-konform",
+              title: "Datenschutzorientiert umgesetzt",
               desc: "Alle Daten werden auf europäischen Servern verarbeitet – vollständig konform mit deutschem Datenschutzrecht.",
             },
             {
