@@ -18,10 +18,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # .node-version is the single source of truth for the build Node version,
+      # shared with Cloudflare Pages and Netlify. scripts/prerender.mjs uses
+      # module.registerHooks, which requires Node >= 22.15.
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .node-version
           cache: npm
 
       - name: Install dependencies
@@ -96,15 +99,6 @@ jobs:
       - name: Prerender output verification
         run: node .github/scripts/test-prerender-output.mjs
 
-      # Resolves every public URL (and its trailing-slash / unknown variants)
-      # through Netlify's documented resolution order and fails on redirect
-      # loops, extra hops or directory/file namespace collisions. A previous
-      # deployment shipped a <path>/index.html artifact whose cold requests all
-      # died with ERR_TOO_MANY_REDIRECTS; client-side navigation hid it because
-      # the SPA never touches the static layer.
-      - name: Netlify static routing verification
-        run: node .github/scripts/test-netlify-routing.mjs
-
       # Loads the built site in a real headless Chromium and fails on React
       # hydration errors or wrong post-hydration metadata. jsdom cannot catch
       # these: there every lazy chunk is already resolved, so the Suspense
@@ -122,6 +116,23 @@ jobs:
       # Runs after the build so the hydration tests can check the real dist/ output.
       - name: Unit and component tests
         run: npm test
+
+      # The Netlify deployment gets one forced canonical rewrite per public
+      # route; every other build (Cloudflare, local) must stay portable. Both
+      # contracts are asserted against a real artifact rather than by modelling
+      # either host's request handling.
+      - name: Build in Netlify provider mode
+        env:
+          NETLIFY: 'true'
+        run: npm run build
+
+      - name: Prerender output verification (Netlify mode)
+        run: node .github/scripts/test-prerender-output.mjs
+
+      - name: Real-browser hydration verification (Netlify mode)
+        env:
+          STATIC_SERVER_ASSET_DELAY_MS: '600'
+        run: node .github/scripts/test-browser-hydration.mjs
 
   phase0-sql-smoke:
     runs-on: ubuntu-latest

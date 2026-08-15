@@ -55,6 +55,13 @@ const ROUTES = [
   },
   { path: '/gibt-es-nicht-xyz', expect: { indexable: false, canonical: null, status: 404, notFoundCopy: true } },
   { path: '/blog/kein-artikel', expect: { indexable: false, canonical: null, status: 404, notFoundCopy: true } },
+  // 404 variants served at URLs the prerendered 404 document cannot predict.
+  // A ".html" URL is one of these: it is not a canonical route, so returning the
+  // 404 document is correct — but that document still has to HYDRATE cleanly
+  // there, which is where React #421/#425 showed up on the live preview.
+  { path: '/gibt-es-nicht.html', expect: { indexable: false, canonical: null, status: 404, notFoundCopy: true } },
+  { path: '/leistungen/nicht-da', expect: { indexable: false, canonical: null, status: 404, notFoundCopy: true } },
+  { path: '/blog/kein-artikel.html', expect: { indexable: false, canonical: null, status: 404, notFoundCopy: true } },
 ];
 
 function describeConsole(entry) {

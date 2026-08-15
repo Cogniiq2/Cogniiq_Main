@@ -49,15 +49,26 @@ function prerenderedRoot(path: string): string | null {
 
 let errors: string[] = [];
 let errorSpy: ReturnType<typeof vi.spyOn>;
+// Roots must be unmounted before the environment is torn down. A root left
+// mounted keeps React's scheduler working after jsdom is gone, which surfaces as
+// "window is not defined" / "Should not already be working" unhandled errors —
+// and vitest warns those can produce false positives, which is the last thing
+// this particular test should risk.
+let roots: Array<{ unmount: () => void }> = [];
 
 beforeEach(() => {
   errors = [];
+  roots = [];
   errorSpy = vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
     errors.push(args.map((a) => String(a)).join(' '));
   });
 });
 
 afterEach(() => {
+  act(() => {
+    for (const root of roots) root.unmount();
+  });
+  roots = [];
   errorSpy.mockRestore();
   window.history.replaceState(null, '', '/');
   document.body.innerHTML = '';
@@ -81,13 +92,15 @@ async function hydrateFromBuild(path: string) {
   document.body.appendChild(container);
 
   await act(async () => {
-    hydrateRoot(
-      container,
-      <StrictMode>
-        <ThemeProvider>
-          <App />
-        </ThemeProvider>
-      </StrictMode>
+    roots.push(
+      hydrateRoot(
+        container,
+        <StrictMode>
+          <ThemeProvider>
+            <App />
+          </ThemeProvider>
+        </StrictMode>
+      )
     );
   });
 

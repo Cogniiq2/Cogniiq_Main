@@ -34,20 +34,23 @@
 /d                  /app-shell.html   200
 /d/*                /app-shell.html   200
 
-# @generated-public-routes
-# scripts/prerender.mjs splices one forced rule pair per public route in at this
-# marker when it writes dist/_redirects. They are generated rather than written
-# by hand so they can never drift from the manifest, and they are FORCED so that
-# a canonical URL is resolved before Netlify's pretty-URL normalisation runs.
+# @netlify-canonical-rewrites
+# NETLIFY ONLY. When the build runs on Netlify (NETLIFY=true),
+# scripts/prerender.mjs splices one rule per non-root public route in at this
+# marker: "/route  /route.html  200!".
 #
-# That normalisation is what broke the previous deployment: with a
-# <path>/index.html artifact, Netlify redirected "/leistungen" -> "/leistungen/"
-# because the path named a directory, while trailing-slash normalisation
-# redirected "/leistungen/" -> "/leistungen". The two pointed at each other and
-# every public URL died with ERR_TOO_MANY_REDIRECTS on a cold request, while
-# client-side navigation kept working and hid it.
+# Why forced, and why only there: a Netlify deployment of the <path>.html
+# artifact answered cold requests to canonical URLs with ERR_TOO_MANY_REDIRECTS
+# until those rewrites were added. The "!" makes the rewrite win over Netlify's
+# own path normalisation. That syntax is Netlify-specific, so it is NEVER
+# written into this committed file and never generated on Cloudflare or in a
+# local build — Cloudflare's shared _redirects format takes numeric statuses
+# only.
 #
-# The output is now <path>.html and each canonical URL has an explicit forced
-# rewrite, so resolution never reaches normalisation and cannot loop.
+# No trailing-slash rules are generated. Netlify's documentation is explicit
+# that redirects cannot reliably add or remove a trailing slash, and a forced
+# "/route/ -> /route" rule can itself loop. "/route/" is therefore treated as a
+# duplicate variant that carries the canonical "/route" in its <link rel=
+# "canonical">, which is what consolidates it.
 
 /*                  /404.html         404

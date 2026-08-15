@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=22.16.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "npm run build:ssr && npm run sitemap && npm run build:client && npm run prerender && npm run clean:ssr",

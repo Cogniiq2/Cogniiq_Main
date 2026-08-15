@@ -58,9 +58,28 @@ function mount() {
   }
 }
 
-const routeChunks = window.__COGNIIQ_ROUTE_CHUNKS__;
+/**
+ * The chunk list, with a DOM fallback.
+ *
+ * The list is normally read from the inline script the prerenderer injects. A
+ * host that post-processes HTML (asset optimisation, minification, injected
+ * scripts) could drop or alter that inline script while leaving the
+ * <link rel="modulepreload"> tags intact — and if the list is lost, hydration
+ * starts with the route's boundary still dehydrated and React discards the
+ * prerendered DOM (React #421). Reading the links back out of the document is a
+ * second, independent source for the same information.
+ */
+function routeChunksToLoad(): string[] {
+  const declared = window.__COGNIIQ_ROUTE_CHUNKS__;
+  if (declared?.length) return declared;
+  return Array.from(document.querySelectorAll<HTMLLinkElement>('link[rel="modulepreload"][href]'))
+    .map((link) => link.getAttribute('href'))
+    .filter((href): href is string => Boolean(href));
+}
 
-if (routeChunks?.length && rootElement.hasChildNodes()) {
+const routeChunks = routeChunksToLoad();
+
+if (routeChunks.length && rootElement.hasChildNodes()) {
   // A failed chunk must never block the app: mount regardless, which is exactly
   // the previous behaviour (and vite:preloadError above still recovers).
   Promise.all(routeChunks.map((url) => import(/* @vite-ignore */ url).catch(() => undefined))).then(

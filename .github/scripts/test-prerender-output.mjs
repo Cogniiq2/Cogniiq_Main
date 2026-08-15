@@ -223,17 +223,23 @@ else if (!/^\/app-shell\.html\s*\n\s*X-Robots-Tag:\s*noindex/m.test(headers)) {
   fail('_headers is missing noindex for /app-shell.html');
 } else ok('/404.html and /app-shell.html carry server-level noindex headers');
 
-// ─── 7b. one consistent URL policy ──────────────────────────────────────────
-// The browser URL, the canonical and the sitemap must all agree. Emitting
-// <path>/index.html would make Netlify canonicalise requests to a trailing
-// slash (/leistungen -> /leistungen/) while the canonical and sitemap publish
-// the non-trailing-slash form — three sources, two answers. Pretty <path>.html
-// files keep all three identical.
+// ─── 7b. artifact shape ─────────────────────────────────────────────────────
+// The build must emit "<path>.html" for every public route and must NOT emit
+// "<path>/index.html".
+//
+// This is an OBSERVED constraint, not a theory about any host's rule ordering:
+// the deployment that shipped directory indexes answered a cold request to every
+// public URL with ERR_TOO_MANY_REDIRECTS, while the .html artifact serves them
+// correctly. Client-side navigation never touches the static layer, so an SPA
+// hides this completely — hence a guard on the artifact itself.
+//
+// The canonical and sitemap URLs carry no trailing slash, so the emitted file
+// names must match that form.
 for (const route of report.routes) {
   if (route.path === '/') continue;
   const dirIndex = join(DIST, route.path, 'index.html');
   if (existsSync(dirIndex)) {
-    fail(`${route.path}: emitted as a directory index, which Netlify serves at a trailing slash`);
+    fail(`${route.path}: emitted as a directory index — the shape that produced ERR_TOO_MANY_REDIRECTS`);
   }
   if (!existsSync(join(ROOT, route.file))) fail(`${route.path}: expected pretty file ${route.file}`);
   if (route.canonical.endsWith('/')) fail(`${route.path}: canonical must not end with a trailing slash`);
@@ -280,6 +286,76 @@ for (const route of report.routes) {
   else if (!/BlogPostPage/.test(fallbackChunks[1])) {
     fail('404.html must also preload the dynamic blog route chunk — it is served for /blog/<unknown> too');
   } else ok('404.html preloads the catch-all page and the dynamic blog route');
+}
+
+// ─── 7d. provider-specific routing contract ─────────────────────────────────
+// The generated CONTRACT is asserted here, not the host's behaviour — this file
+// deliberately does not model or emulate Netlify or Cloudflare.
+{
+  const redirectsText = read(join(DIST, '_redirects'));
+  const ruleLines = redirectsText
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => l && !l.startsWith('#'));
+  const rules = ruleLines.map((l) => l.split(/\s+/));
+  const provider = report.provider;
+
+  if (provider !== 'netlify' && provider !== 'portable') {
+    fail(`prerender-report.json has no recognised provider mode (got ${JSON.stringify(provider)})`);
+  }
+
+  if (provider === 'netlify') {
+    // One forced canonical rewrite per non-root public route.
+    const nonRoot = report.routes.filter((r) => r.path !== '/');
+    const missing = [];
+    const duplicated = [];
+    for (const route of nonRoot) {
+      const matching = rules.filter((r) => r[0] === route.path && r[2] === '200!');
+      if (matching.length === 0) missing.push(route.path);
+      else if (matching.length > 1) duplicated.push(route.path);
+      else if (matching[0][1] !== `${route.path}.html`) {
+        fail(`${route.path}: rewrite targets ${matching[0][1]}, expected ${route.path}.html`);
+      }
+    }
+    if (missing.length) fail(`Netlify build is missing canonical rewrites for: ${missing.slice(0, 5).join(', ')}`);
+    if (duplicated.length) fail(`Netlify build has duplicate rewrites for: ${duplicated.slice(0, 5).join(', ')}`);
+    if (!missing.length && !duplicated.length) {
+      ok(`Netlify mode: exactly one forced 200 rewrite for each of ${nonRoot.length} non-root public routes`);
+    }
+
+    // No trailing-slash canonicalisation may be generated: Netlify states
+    // redirects cannot reliably add or remove a trailing slash, and a forced
+    // "/route/ -> /route" rule can loop.
+    const slashRules = rules.filter((r) => r[0].endsWith('/') && r[0] !== '/' && r[0] !== '/*');
+    const forcedRedirects = rules.filter((r) => /^30[128]!$/.test(r[2] || ''));
+    if (slashRules.length) fail(`generated trailing-slash rules must not exist: ${slashRules.map((r) => r[0]).join(', ')}`);
+    else if (forcedRedirects.length) fail(`forced redirect rules must not exist: ${forcedRedirects.map((r) => r[0]).join(', ')}`);
+    else ok('Netlify mode: no trailing-slash rules and no forced redirects generated');
+
+    if (report.generatedNetlifyRules !== nonRoot.length) {
+      fail(`report says ${report.generatedNetlifyRules} generated rules, expected ${nonRoot.length}`);
+    }
+  } else {
+    // Cloudflare / local: the shared _redirects format takes numeric statuses
+    // only, so no Netlify-specific syntax may reach the artifact.
+    const forced = ruleLines.filter((l) => l.includes('!'));
+    if (forced.length) fail(`portable build emitted Netlify-only "!" syntax: ${forced.slice(0, 3).join(' | ')}`);
+    else ok('portable mode: dist/_redirects contains no Netlify-only "!" syntax');
+
+    if (report.generatedNetlifyRules) {
+      fail(`portable build generated ${report.generatedNetlifyRules} Netlify rules — it must generate none`);
+    } else ok('portable mode: no provider-specific rules generated');
+  }
+
+  // Both modes: the committed source file must stay portable.
+  const committed = read(join(ROOT, 'public', '_redirects'))
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => l && !l.startsWith('#'));
+  const committedForced = committed.filter((l) => l.includes('!'));
+  if (committedForced.length) {
+    fail(`public/_redirects must stay portable, found: ${committedForced.join(' | ')}`);
+  } else ok('committed public/_redirects is portable (numeric statuses only)');
 }
 
 // ─── 8. sitemap sanity ───────────────────────────────────────────────────────
