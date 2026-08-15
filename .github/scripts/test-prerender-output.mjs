@@ -127,7 +127,7 @@ const anfrage = report.routes.find((r) => r.path === '/anfrage-erhalten');
 if (!anfrage) fail('/anfrage-erhalten missing from the prerender report');
 else {
   if (anfrage.indexable) fail('/anfrage-erhalten must not be indexable');
-  const file = join(DIST, 'anfrage-erhalten', 'index.html');
+  const file = join(DIST, 'anfrage-erhalten.html');
   if (!existsSync(file)) fail('/anfrage-erhalten was not prerendered');
   else if (!/<meta name="robots" content="noindex/.test(read(file))) {
     fail('/anfrage-erhalten is not served noindex');
@@ -222,6 +222,65 @@ if (!/^\/404\.html\s*\n\s*X-Robots-Tag:\s*noindex/m.test(headers)) fail('_header
 else if (!/^\/app-shell\.html\s*\n\s*X-Robots-Tag:\s*noindex/m.test(headers)) {
   fail('_headers is missing noindex for /app-shell.html');
 } else ok('/404.html and /app-shell.html carry server-level noindex headers');
+
+// ─── 7b. one consistent URL policy ──────────────────────────────────────────
+// The browser URL, the canonical and the sitemap must all agree. Emitting
+// <path>/index.html would make Netlify canonicalise requests to a trailing
+// slash (/leistungen -> /leistungen/) while the canonical and sitemap publish
+// the non-trailing-slash form — three sources, two answers. Pretty <path>.html
+// files keep all three identical.
+for (const route of report.routes) {
+  if (route.path === '/') continue;
+  const dirIndex = join(DIST, route.path, 'index.html');
+  if (existsSync(dirIndex)) {
+    fail(`${route.path}: emitted as a directory index, which Netlify serves at a trailing slash`);
+  }
+  if (!existsSync(join(ROOT, route.file))) fail(`${route.path}: expected pretty file ${route.file}`);
+  if (route.canonical.endsWith('/')) fail(`${route.path}: canonical must not end with a trailing slash`);
+}
+{
+  const sitemapXml = read(join(DIST, 'sitemap.xml'));
+  const trailing = [...sitemapXml.matchAll(/<loc>([^<]+)<\/loc>/g)]
+    .map((m) => m[1])
+    .filter((u) => u !== 'https://cogniiq.de/' && u.endsWith('/'));
+  if (trailing.length) fail(`sitemap URLs with a trailing slash: ${trailing.slice(0, 3).join(', ')}`);
+  else ok('URL policy consistent: pretty .html output, no trailing slash in canonicals or sitemap');
+}
+
+// ─── 7c. every page preloads the chunks its markup needs ────────────────────
+// Without this the route's lazy chunks arrive after hydration starts, its
+// Suspense boundary is still dehydrated when the auth context publishes its
+// first update, and React discards the prerendered DOM (React #421).
+{
+  let missingPreload = 0;
+  for (const route of report.routes) {
+    const html = read(join(ROOT, route.file));
+    const declared = html.match(/__COGNIIQ_ROUTE_CHUNKS__=(\[[^<]*\])/);
+    if (!declared) {
+      missingPreload++;
+      continue;
+    }
+    const chunks = JSON.parse(declared[1]);
+    if (!chunks.length) missingPreload++;
+    for (const chunk of chunks) {
+      if (!existsSync(join(DIST, chunk.replace(/^\//, '')))) {
+        fail(`${route.path}: preloads a chunk that does not exist (${chunk})`);
+      }
+      if (!html.includes(`rel="modulepreload" crossorigin href="${chunk}"`)) {
+        fail(`${route.path}: chunk ${chunk} is awaited but not modulepreloaded`);
+      }
+    }
+  }
+  if (missingPreload) fail(`${missingPreload} prerendered page(s) declare no route chunks to preload`);
+  else ok(`all ${report.routes.length} pages declare and preload their route chunks`);
+
+  const notFoundHtml = read(join(DIST, '404.html'));
+  const fallbackChunks = notFoundHtml.match(/__COGNIIQ_ROUTE_CHUNKS__=(\[[^<]*\])/);
+  if (!fallbackChunks) fail('404.html declares no route chunks');
+  else if (!/BlogPostPage/.test(fallbackChunks[1])) {
+    fail('404.html must also preload the dynamic blog route chunk — it is served for /blog/<unknown> too');
+  } else ok('404.html preloads the catch-all page and the dynamic blog route');
+}
 
 // ─── 8. sitemap sanity ───────────────────────────────────────────────────────
 const sitemap = read(join(DIST, 'sitemap.xml'));

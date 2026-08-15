@@ -24,6 +24,10 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname, join } from 'node:path';
 
+import { registerHooks } from 'node:module';
+
+import { createRouteChunkResolver, trackSsrModuleLoads } from './lib/route-chunks.mjs';
+
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = join(ROOT, 'dist');
 const SSR_ENTRY = join(ROOT, 'dist-ssr', 'entry-server.js');
@@ -156,6 +160,24 @@ function buildHead(html, route, canonical) {
   return out;
 }
 
+// Preloads the route's own JS chunk and hands its URL to src/main.tsx, which
+// waits for it before hydrating. Without this the chunk is only requested after
+// hydration begins, so the route's Suspense boundary is still dehydrated when
+// the auth context publishes its first update and React discards the entire
+// prerendered subtree (React #421). See scripts/lib/route-chunks.mjs.
+function injectRouteChunk(html, routeChunk, routePath) {
+  if (!routeChunk) return html;
+  const links = routeChunk.preload
+    .map((file) => `    <link rel="modulepreload" crossorigin href="${escapeAttr(file)}" />`)
+    .join('\n');
+  const bootstrap = `    <script>window.__COGNIIQ_ROUTE_CHUNKS__=${JSON.stringify(routeChunk.preload)}</script>`;
+  const marker = '</head>';
+  if (!html.includes(marker)) {
+    throw new Error(`Prerender ${routePath}: no </head> to inject the route chunk preload into`);
+  }
+  return html.replace(marker, () => `${links}\n${bootstrap}\n  ${marker}`);
+}
+
 // ─── per-route validation ────────────────────────────────────────────────────
 function validate(page, route, canonical, homeCanonical) {
   const p = route.path;
@@ -203,6 +225,11 @@ async function main() {
     throw new Error(`Client build not found at ${TEMPLATE_PATH}. Run "vite build" first.`);
   }
 
+  // Installed BEFORE the SSR bundle is imported: it records which chunks the
+  // server actually pulls in while rendering, which is how the preload set below
+  // stays limited to code the prerendered HTML really contains.
+  const ssrLoads = trackSsrModuleLoads(registerHooks);
+
   const { PUBLIC_ROUTES, canonicalFor, render } = await import(pathToFileURL(SSR_ENTRY).href);
 
   // Immutable template. Read exactly once, never mutated; every route starts
@@ -230,22 +257,14 @@ async function main() {
 
   const homeCanonical = escapeAttr(canonicalFor('/'));
 
-  // ── phase 1: render everything into memory (nothing written yet) ──
-  const rendered = [];
+  // ── phase 1: render every body into memory (nothing written yet) ──
+  const bodies = [];
   for (const route of PUBLIC_ROUTES) {
     const { html: body } = await render(route.path, PER_ROUTE_TIMEOUT_MS);
     if (!body || !body.trim()) {
       throw new Error(`Prerender ${route.path}: renderer returned an empty document`);
     }
-
-    const canonical = canonicalFor(route.path);
-    let page = buildHead(TEMPLATE.html, route, canonical);
-    page = page.replace(ROOT_MARKER, () => `<div id="root">${body}</div>`);
-
-    validate(page, route, canonical, homeCanonical);
-
-    const outDir = route.path === '/' ? DIST : join(DIST, route.path);
-    rendered.push({ path: route.path, outDir, file: join(outDir, 'index.html'), page });
+    bodies.push({ route, body });
   }
 
   // ── phase 1b: the 404 document ──
@@ -261,6 +280,30 @@ async function main() {
   if (!notFoundBody.includes('404')) {
     throw new Error('Prerender 404: rendered document does not contain the 404 page content');
   }
+
+  // ── phase 1c: resolve preload sets ──
+  // Only now, with every render finished, is the set of SSR-loaded chunks
+  // complete — so the observed dynamic-import edges are known and each route's
+  // preload set can be computed without guessing.
+  const routeChunks = createRouteChunkResolver(ROOT, ssrLoads.loaded);
+
+  const rendered = [];
+  for (const { route, body } of bodies) {
+    const canonical = canonicalFor(route.path);
+    let page = buildHead(TEMPLATE.html, route, canonical);
+    page = injectRouteChunk(page, routeChunks.resolve(route.path), route.path);
+    page = page.replace(ROOT_MARKER, () => `<div id="root">${body}</div>`);
+    validate(page, route, canonical, homeCanonical);
+    // Emitted as "<path>.html", NOT "<path>/index.html". A directory index makes
+    // Netlify canonicalise the URL to a trailing slash (/leistungen ->
+    // /leistungen/), which would contradict the non-trailing-slash canonical and
+    // sitemap URLs this site has always published. A pretty .html file is served
+    // at the extensionless path with no trailing slash, so the browser URL, the
+    // canonical and the sitemap all agree.
+    const file = route.path === '/' ? join(DIST, 'index.html') : `${join(DIST, route.path)}.html`;
+    rendered.push({ path: route.path, outDir: dirname(file), file, page });
+  }
+
   let notFound = buildHead(
     TEMPLATE.html,
     {
@@ -274,6 +317,7 @@ async function main() {
     // below; this placeholder only satisfies the shared head builder.
     'about:blank'
   );
+  notFound = injectRouteChunk(notFound, routeChunks.fallbackPreload(NOT_FOUND_PATH), '/404');
   notFound = notFound
     .replace(/\s*<link rel="canonical" href="[^"]*" \/>/, '')
     .replace(/\s*<link rel="alternate" hreflang="de-DE" href="[^"]*" \/>/g, '')
@@ -328,7 +372,7 @@ async function main() {
           indexable: r.indexable,
           canonical: canonicalFor(r.path),
           title: r.title,
-          file: join('dist', r.path === '/' ? '' : r.path, 'index.html'),
+          file: r.path === '/' ? 'dist/index.html' : `dist${r.path}.html`,
         })),
         notFound: 'dist/404.html',
       privateShell: `dist/${SHELL_FILE}`,
@@ -343,7 +387,9 @@ async function main() {
   console.log(
     `✓ Prerendered ${PUBLIC_ROUTES.length} public routes ` +
       `(${indexable} indexable, ${PUBLIC_ROUTES.length - indexable} noindex) ` +
-      `+ dist/404.html + dist/${SHELL_FILE} (private SPA fallback)`
+      `+ dist/404.html + dist/${SHELL_FILE} (private SPA fallback)\n` +
+      `  route chunks preloaded: ${routeChunks.stats.lazyRoutes} lazy, ` +
+      `${routeChunks.stats.staticRoutes} already in the entry chunk`
   );
 }
 

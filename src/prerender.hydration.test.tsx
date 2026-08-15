@@ -39,7 +39,8 @@ const DIST = join(process.cwd(), 'dist');
 const hasBuild = existsSync(join(DIST, 'index.html'));
 
 function prerenderedRoot(path: string): string | null {
-  const file = path === '/' ? join(DIST, 'index.html') : join(DIST, path, 'index.html');
+  // <path>.html, matching the pretty-URL output of scripts/prerender.mjs.
+  const file = path === '/' ? join(DIST, 'index.html') : `${join(DIST, path)}.html`;
   if (!existsSync(file)) return null;
   const html = readFileSync(file, 'utf8');
   const match = html.match(/<div id="root">([\s\S]*)<\/div>\s*<\/body>/);

@@ -15,6 +15,14 @@ interface PageSEOProps {
   ogImage?: string;
   additionalSchema?: object;
   noIndex?: boolean;
+  /**
+   * The page has no public address of its own — the 404 document is the case
+   * that matters: one file answers every unknown URL, so any canonical it
+   * emitted would be a claim about a page that does not exist. Suppresses the
+   * canonical, the hreflang alternates and the og:/twitter: URL claims, and
+   * removes them if an earlier page left them behind.
+   */
+  noCanonical?: boolean;
 }
 
 function setMeta(name: string, content: string, attr: "name" | "property" = "name") {
@@ -54,6 +62,10 @@ function injectScript(id: string, content: string) {
   el.textContent = content;
 }
 
+function removeElements(selector: string) {
+  document.querySelectorAll(selector).forEach((el) => el.remove());
+}
+
 function removeScript(id: string) {
   const el = document.getElementById(id);
   if (el) el.remove();
@@ -68,6 +80,7 @@ export function PageSEO({
   ogImage = `${BUSINESS_INFO.website}/og-image.png`,
   additionalSchema,
   noIndex = false,
+  noCanonical = false,
 }: PageSEOProps) {
   useEffect(() => {
     document.title = title;
@@ -75,14 +88,20 @@ export function PageSEO({
     setMeta("description", description);
     setMeta("robots", noIndex ? "noindex, nofollow" : "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1");
 
-    setLink("canonical", canonical);
-
-    setLink("alternate", canonical, { hreflang: "de-DE" });
-    setLink("alternate", canonical, { hreflang: "x-default" });
+    if (noCanonical) {
+      removeElements('link[rel="canonical"]');
+      removeElements('link[rel="alternate"][hreflang]');
+      removeElements('meta[property="og:url"]');
+      removeElements('meta[name="twitter:url"]');
+    } else {
+      setLink("canonical", canonical);
+      setLink("alternate", canonical, { hreflang: "de-DE" });
+      setLink("alternate", canonical, { hreflang: "x-default" });
+    }
 
     setMeta("og:title", title, "property");
     setMeta("og:description", description, "property");
-    setMeta("og:url", canonical, "property");
+    if (!noCanonical) setMeta("og:url", canonical, "property");
     setMeta("og:image", ogImage, "property");
     setMeta("og:image:width", "1200", "property");
     setMeta("og:image:height", "630", "property");
@@ -94,7 +113,7 @@ export function PageSEO({
     setMeta("twitter:card", "summary_large_image", "name");
     setMeta("twitter:title", title, "name");
     setMeta("twitter:description", description, "name");
-    setMeta("twitter:url", canonical, "name");
+    if (!noCanonical) setMeta("twitter:url", canonical, "name");
     setMeta("twitter:image", ogImage, "name");
     setMeta("twitter:image:alt", title, "name");
 
@@ -177,7 +196,7 @@ export function PageSEO({
       removeScript("page-faq-schema");
       removeScript("page-additional-schema");
     };
-  }, [title, description, canonical, breadcrumbs, faqItems, ogImage, additionalSchema, noIndex]);
+  }, [title, description, canonical, breadcrumbs, faqItems, ogImage, additionalSchema, noIndex, noCanonical]);
 
   return null;
 }

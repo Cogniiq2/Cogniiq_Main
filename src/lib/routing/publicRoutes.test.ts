@@ -6,6 +6,8 @@ import {
   PUBLIC_ROUTES,
   SITE_ORIGIN,
   canonicalFor,
+  isKnownPublicRoute,
+  normalizePath,
   routeFor,
 } from './publicRoutes';
 import { isPrivateSurface, isDocumentSurface } from './indexability';
@@ -88,6 +90,36 @@ describe('canonicalFor', () => {
     const canonicals = PUBLIC_ROUTES.map((r) => canonicalFor(r.path));
     expect(new Set(canonicals).size).toBe(canonicals.length);
     expect(canonicals.filter((c) => c === home)).toHaveLength(1);
+  });
+});
+
+describe('isKnownPublicRoute', () => {
+  it('recognises every route in the manifest', () => {
+    for (const route of PUBLIC_ROUTES) {
+      expect(isKnownPublicRoute(route.path)).toBe(true);
+    }
+  });
+
+  it('tolerates a trailing slash, which is not part of a route identity', () => {
+    expect(isKnownPublicRoute('/leistungen/')).toBe(true);
+    expect(isKnownPublicRoute('/')).toBe(true);
+    expect(normalizePath('/leistungen/')).toBe('/leistungen');
+    expect(normalizePath('/')).toBe('/');
+    expect(normalizePath('')).toBe('/');
+  });
+
+  it('rejects unknown URLs, which Netlify answers with the 404 document', () => {
+    // These must stay noindex and canonical-free after hydration too — search
+    // engines execute JavaScript, so a server-only noindex is not enough.
+    for (const path of ['/gibt-es-nicht', '/blog/kein-artikel', '/leistungen/extra', '/404']) {
+      expect(isKnownPublicRoute(path)).toBe(false);
+    }
+  });
+
+  it('rejects private surfaces, which are never public routes', () => {
+    for (const path of ['/app', '/app/billing', '/admin', '/owner', '/auth/confirmed', '/d/token']) {
+      expect(isKnownPublicRoute(path)).toBe(false);
+    }
   });
 });
 

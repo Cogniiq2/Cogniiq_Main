@@ -20,6 +20,21 @@ export function Navigation() {
     href: !isLoading && user ? '/app' : '/app/login',
   };
 
+  // Active-link styling is derived AFTER mount, never during the first render.
+  //
+  // dist/404.html is ONE prerendered document that Netlify serves under every
+  // unknown URL, so the pathname the browser hydrates at is not the pathname the
+  // server rendered. Highlighting from `location.pathname` during hydration
+  // therefore disagreed with the served markup on any 404 under a highlighted
+  // section — /blog/kein-artikel marked the Blog link active against markup that
+  // had it inactive, which is React #418/#425 on every unknown blog URL. Both
+  // sides now start unhighlighted and the effect highlights immediately after.
+  const [activePath, setActivePath] = useState('');
+
+  useEffect(() => {
+    setActivePath(location.pathname);
+  }, [location.pathname]);
+
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 40);
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -91,10 +106,10 @@ export function Navigation() {
               <NavDropdownTrigger
                 label="Leistungen"
                 isActive={
-                  location.pathname.startsWith('/webdesign') ||
-                  location.pathname.startsWith('/ki-') ||
-                  location.pathname.startsWith('/automatisierung') ||
-                  location.pathname === '/leistungen'
+                  activePath.startsWith('/webdesign') ||
+                  activePath.startsWith('/ki-') ||
+                  activePath.startsWith('/automatisierung') ||
+                  activePath === '/leistungen'
                 }
                 isOpen={activeMenu === 'leistungen'}
                 onOpen={() => openMenu('leistungen')}
@@ -105,11 +120,11 @@ export function Navigation() {
               <NavDropdownTrigger
                 label="Standorte"
                 isActive={
-                  location.pathname.startsWith('/bayreuth') ||
-                  location.pathname.startsWith('/muenchen') ||
-                  location.pathname.startsWith('/regensburg') ||
-                  location.pathname === '/bayern' ||
-                  location.pathname === '/deutschland'
+                  activePath.startsWith('/bayreuth') ||
+                  activePath.startsWith('/muenchen') ||
+                  activePath.startsWith('/regensburg') ||
+                  activePath === '/bayern' ||
+                  activePath === '/deutschland'
                 }
                 isOpen={activeMenu === 'standorte'}
                 onOpen={() => openMenu('standorte')}
@@ -121,7 +136,7 @@ export function Navigation() {
                   key={item.href}
                   label={item.label}
                   href={item.href}
-                  isActive={location.pathname === item.href}
+                  isActive={activePath === item.href}
                 />
               ))}
             </motion.div>
@@ -136,17 +151,17 @@ export function Navigation() {
               <SimpleNavItem
                 label="Referenzen"
                 href="/referenzen"
-                isActive={location.pathname === '/referenzen'}
+                isActive={activePath === '/referenzen'}
               />
               <SimpleNavItem
                 label="Blog"
                 href="/blog"
-                isActive={location.pathname.startsWith('/blog')}
+                isActive={activePath.startsWith('/blog')}
               />
               <SimpleNavItem
                 label={customerNav.label}
                 href={customerNav.href}
-                isActive={location.pathname.startsWith('/app')}
+                isActive={activePath.startsWith('/app')}
                 className="min-w-[96px] text-center"
               />
               <Link

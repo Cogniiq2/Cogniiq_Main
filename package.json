@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "npm run build:ssr && npm run sitemap && npm run build:client && npm run prerender && npm run clean:ssr",
-    "build:ssr": "vite build --ssr src/entry-server.tsx --outDir dist-ssr --emptyOutDir",
+    "build:ssr": "vite build --ssr src/entry-server.tsx --outDir dist-ssr --emptyOutDir --manifest",
     "build:client": "vite build",
     "sitemap": "node scripts/generate-sitemap.mjs",
     "sitemap:check": "node scripts/generate-sitemap.mjs --check",

@@ -24,6 +24,7 @@ import {
   isPrivateSurface,
   privateDocumentTitle,
 } from './lib/routing/indexability';
+import { isKnownPublicRoute } from './lib/routing/publicRoutes';
 
 type LazyPageComponent = ComponentType<Record<string, unknown>>;
 
@@ -72,6 +73,14 @@ function RouteIndexabilityManager() {
     if (isPrivateSurface(pathname)) {
       setMeta('robots', PRIVATE_ROBOTS);
       document.title = privateDocumentTitle(pathname);
+      return;
+    }
+
+    // An unknown URL is answered by Netlify with the 404 document. Search engines
+    // execute JavaScript, so the *hydrated* head has to agree with that: keep it
+    // noindex rather than letting the public default make a 404 look indexable.
+    if (!isKnownPublicRoute(pathname)) {
+      setMeta('robots', PRIVATE_ROBOTS);
       return;
     }
 

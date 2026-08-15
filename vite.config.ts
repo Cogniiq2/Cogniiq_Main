@@ -16,6 +16,17 @@ export default defineConfig(({ isSsrBuild }) => ({
   // of _redirects, _headers, robots.txt and sitemap.xml. The client build is
   // unaffected: publicDir keeps its default there.
   publicDir: isSsrBuild ? false : 'public',
+  build: {
+    // Both builds emit .vite/manifest.json. The client manifest maps source
+    // modules to their chunks; the SSR manifest lets the prerenderer work out
+    // which dynamic imports the server actually took. Together they give each
+    // prerendered page the exact preload set it needs before hydration —
+    // without it, lazy chunks are only requested AFTER hydration starts, the
+    // route's Suspense boundary is still dehydrated when the auth context
+    // publishes its first update, and React discards the prerendered DOM
+    // (React #421). See scripts/lib/route-chunks.mjs.
+    manifest: true,
+  },
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
