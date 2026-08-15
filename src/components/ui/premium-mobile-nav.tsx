@@ -93,7 +93,21 @@ export function PremiumMobileNav() {
   const touchStartY = useRef(0);
   const touchEndY = useRef(0);
 
-  const activeSection = getActiveSection(location.pathname);
+  // Derived AFTER mount, never during the first render.
+  //
+  // dist/404.html is ONE prerendered document that Netlify serves under every
+  // unknown URL, so the pathname the browser hydrates at is not the pathname the
+  // server rendered. Deriving the section during hydration made this label read
+  // "Home" in the served markup and "Blog" in the browser on /blog/kein-artikel —
+  // a text mismatch (React #425) that tore down the hydration of every unknown
+  // blog URL. Both sides now start from the same value.
+  const [hydratedPath, setHydratedPath] = useState<string | null>(null);
+
+  useEffect(() => {
+    setHydratedPath(location.pathname);
+  }, [location.pathname]);
+
+  const activeSection = getActiveSection(hydratedPath ?? '');
   const customerNav = {
     label: !isLoading && user ? 'Dashboard' : 'Kundenlogin',
     href: !isLoading && user ? '/app' : '/app/login',

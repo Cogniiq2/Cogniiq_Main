@@ -1,7 +1,8 @@
-import { useParams, Link, Navigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Clock, Calendar, ChevronRight, ArrowLeft, Lightbulb, TriangleAlert as AlertTriangle, Info } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
+import { NotFoundPage } from "@/pages/NotFoundPage";
 import {
   getArticleBySlug,
   getRelatedArticles,
@@ -190,7 +191,13 @@ export function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
   const article = slug ? getArticleBySlug(slug) : undefined;
 
-  if (!article) return <Navigate to="/blog" replace />;
+  // An unknown slug is a 404, not a redirect. Redirecting to /blog replaced the
+  // requested URL in the address bar and served the blog index — with the blog
+  // index's canonical and an indexable robots tag — under a URL that does not
+  // exist. Rendering the 404 page keeps the URL, the German 404 copy and the
+  // noindex/no-canonical head in agreement with the HTTP 404 Netlify already
+  // returns for a direct request to the same URL.
+  if (!article) return <NotFoundPage />;
 
   const related = getRelatedArticles(article.relatedSlugs);
 

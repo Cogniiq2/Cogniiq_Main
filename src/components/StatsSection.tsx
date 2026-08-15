@@ -1,22 +1,33 @@
-import { motion, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { useRef, useEffect } from 'react';
+import { motion, useInView } from 'framer-motion';
+import { useRef } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
+/**
+ * Renders the real figure, always.
+ *
+ * This used to animate up from 0, which meant the prerendered HTML and the first
+ * paint both carried "< 0 Tage bis zum Go-Live" — not an unfinished number but a
+ * false one, and the claim a crawler reads as the page's own statement about its
+ * delivery time. A viewport-gated count-up cannot fix that either: on a page
+ * whose stats sit below the fold, the DOM holds the fabricated 0 for as long as
+ * the visitor has not scrolled, which is exactly when a crawler snapshots it.
+ *
+ * The value is therefore stable and truthful from the first byte. The section
+ * still animates: StatsSection fades and lifts each tile into view (see the
+ * motion.div below), which is the enhancement — the number itself is not
+ * something to animate away from the truth.
+ */
 function CountUp({ to, suffix = '', prefix = '' }: { to: number; suffix?: string; prefix?: string }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-  const motionValue = useMotionValue(0);
-  const spring = useSpring(motionValue, { duration: 1800, bounce: 0 });
-  const display = useTransform(spring, (v) => `${prefix}${Math.round(v)}${suffix}`);
-
-  useEffect(() => {
-    if (isInView) motionValue.set(to);
-  }, [isInView, motionValue, to]);
-
-  return <motion.span ref={ref}>{display}</motion.span>;
+  return (
+    <span className="tabular-nums">
+      {prefix}
+      {to}
+      {suffix}
+    </span>
+  );
 }
 
 const stats = [

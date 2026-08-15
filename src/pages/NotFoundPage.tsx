@@ -1,8 +1,8 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ArrowRight, Chrome as Home, Search } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
-import { BUSINESS_INFO } from "@/lib/seo-data";
 
 const suggestions = [
   { label: "Leistungen", href: "/leistungen" },
@@ -13,14 +13,28 @@ const suggestions = [
 ];
 
 export function NotFoundPage() {
-  const location = useLocation();
+  // The requested path is shown only AFTER mount, never in the initial markup.
+  // dist/404.html is one prerendered document that Netlify serves for every
+  // unknown URL, so anything URL-specific baked into it would be wrong for
+  // almost every visitor — and would disagree with what the browser renders,
+  // which is a hydration mismatch (React #425) on every 404.
+  const [requestedPath, setRequestedPath] = useState("");
+
+  useEffect(() => {
+    setRequestedPath(window.location.pathname);
+  }, []);
 
   return (
     <>
       <PageSEO
-        title="Seite nicht gefunden – Cogniiq"
-        description="Die gesuchte Seite existiert nicht. Kehren Sie zur Startseite zurück oder erkunden Sie unsere Leistungen."
-        canonical={`${BUSINESS_INFO.website}/404`}
+        title="Seite nicht gefunden (404) | Cogniiq"
+        description="Diese Seite existiert nicht. Die URL wurde möglicherweise geändert oder entfernt. Zurück zur Startseite oder direkt zu unseren Leistungen."
+        // A 404 is served under countless URLs and none of them is a page. It
+        // must claim no canonical, no hreflang and no og:url — before or after
+        // hydration, because search engines run JavaScript.
+        canonical=""
+        noIndex
+        noCanonical
       />
 
       <main className="min-h-screen flex items-center justify-center px-6 py-32">
@@ -34,7 +48,7 @@ export function NotFoundPage() {
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/[0.03] mb-8">
               <Search size={13} className="text-gray-400 dark:text-gray-600" />
               <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400 tracking-wide font-mono">
-                {location.pathname}
+                {requestedPath || "404"}
               </span>
             </div>
 

@@ -1,0 +1,52 @@
+# Netlify response headers.
+#
+# Server-level noindex for every private application surface. This is the
+# production replacement for the X-Robots-Tag that functions/_middleware.ts sets:
+# that file is a Cloudflare Pages Function and does not execute on Netlify, so
+# until now the only protection on these routes was client-side useEffect
+# metadata — which a crawler that does not run JavaScript never sees.
+#
+# Exact prefix roots are listed alongside their splats because Netlify's "/app/*"
+# does not match "/app" itself, and the portal roots are the most linkable URLs
+# of the set.
+#
+# Route families verified against src/App.tsx and src/lib/routing/indexability.ts:
+#   /app     customer portal (+ /app/login, /app/signup, /app/reset-password, ...)
+#   /admin   unified internal workspace (admin + owner finance)
+#   /owner   legacy owner redirects
+#   /auth    Supabase confirmation / post-login role resolution
+#   /d       tokenized customer document portal
+#
+# noarchive is included so no cached copy of an authenticated shell can be served
+# from a search engine's cache.
+
+/app
+  X-Robots-Tag: noindex, nofollow, noarchive
+/app/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+/admin
+  X-Robots-Tag: noindex, nofollow, noarchive
+/admin/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+/owner
+  X-Robots-Tag: noindex, nofollow, noarchive
+/owner/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+/auth
+  X-Robots-Tag: noindex, nofollow, noarchive
+/auth/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+/d
+  X-Robots-Tag: noindex, nofollow, noarchive
+/d/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+
+# The 404 document is served for every unknown public URL. It must never be
+# indexed under any of those URLs.
+/404.html
+  X-Robots-Tag: noindex, nofollow
+
+# The private SPA fallback document (see public/_redirects). Reachable directly
+# as a static file, so it carries the same protection as the routes it serves.
+/app-shell.html
+  X-Robots-Tag: noindex, nofollow, noarchive

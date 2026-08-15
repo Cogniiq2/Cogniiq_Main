@@ -27,5 +27,8 @@ dist-ssr
 # Local-only render/inspection output
 scratch/
 
+# Build artifact written by scripts/prerender.mjs for the output verifier
+prerender-report.json
+
 # Graphify local generated output
 graphify-out/

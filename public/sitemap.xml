@@ -2,9 +2,6 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
-  <!-- ══════════════════════════════════════════════
-       CORE PAGES
-  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/</loc>
     <lastmod>2026-03-14</lastmod>
@@ -62,9 +59,6 @@
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/bewertungen"/>
   </url>
 
-  <!-- ══════════════════════════════════════════════
-       PILLAR SERVICE PAGES
-  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/ki-telefonassistent</loc>
     <lastmod>2026-06-30</lastmod>
@@ -121,9 +115,6 @@
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/ki-telefonassistent/demo"/>
   </url>
 
-  <!-- ══════════════════════════════════════════════
-       GEO HUBS
-  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/deutschland</loc>
     <lastmod>2026-03-14</lastmod>
@@ -148,9 +139,6 @@
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/bayern/ki-telefonassistent"/>
   </url>
 
-  <!-- ══════════════════════════════════════════════
-       CITY LANDING PAGES
-  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/bayreuth</loc>
     <lastmod>2026-03-14</lastmod>
@@ -175,9 +163,6 @@
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/regensburg"/>
   </url>
 
-  <!-- ══════════════════════════════════════════════
-       BAYREUTH — CITY SERVICES
-  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/bayreuth/webdesign</loc>
     <lastmod>2026-03-14</lastmod>
@@ -202,9 +187,6 @@
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/bayreuth/automatisierung"/>
   </url>
 
-  <!-- ══════════════════════════════════════════════
-       BAYREUTH — CLUSTER PAGES
-  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/bayreuth/webdesign-kosten</loc>
     <lastmod>2026-03-14</lastmod>
@@ -245,9 +227,6 @@
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/bayreuth/lokales-seo"/>
   </url>
 
-  <!-- ══════════════════════════════════════════════
-       MÜNCHEN — CITY SERVICES
-  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/muenchen/webdesign</loc>
     <lastmod>2026-03-14</lastmod>
@@ -272,9 +251,6 @@
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/muenchen/automatisierung"/>
   </url>
 
-  <!-- ══════════════════════════════════════════════
-       MÜNCHEN — CLUSTER PAGES
-  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/muenchen/webdesign-kosten</loc>
     <lastmod>2026-03-14</lastmod>
@@ -315,9 +291,6 @@
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/muenchen/lokales-seo"/>
   </url>
 
-  <!-- ══════════════════════════════════════════════
-       REGENSBURG — CITY SERVICES
-  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/regensburg/webdesign</loc>
     <lastmod>2026-03-14</lastmod>
@@ -342,9 +315,6 @@
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/regensburg/automatisierung"/>
   </url>
 
-  <!-- ══════════════════════════════════════════════
-       REGENSBURG — CLUSTER PAGES
-  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/regensburg/webdesign-kosten</loc>
     <lastmod>2026-03-14</lastmod>
@@ -385,9 +355,6 @@
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/regensburg/lokales-seo"/>
   </url>
 
-  <!-- ══════════════════════════════════════════════
-       INDUSTRY × LOCATION — WEBDESIGN
-  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/webdesign-arzt-bayreuth</loc>
     <lastmod>2026-03-14</lastmod>
@@ -460,9 +427,6 @@
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/webdesign-immobilien-regensburg"/>
   </url>
 
-  <!-- ══════════════════════════════════════════════
-       INDUSTRY-SPECIFIC SERVICE PAGES — WEBDESIGN
-  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/webdesign-gastronomie</loc>
     <lastmod>2026-03-14</lastmod>
@@ -503,9 +467,6 @@
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/webdesign-sport"/>
   </url>
 
-  <!-- ══════════════════════════════════════════════
-       INDUSTRY-SPECIFIC SERVICE PAGES — KI-TELEFONASSISTENT
-  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/ki-telefonassistent-arzt</loc>
     <lastmod>2026-03-14</lastmod>
@@ -538,9 +499,6 @@
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/ki-telefonassistent-praxis"/>
   </url>
 
-  <!-- ══════════════════════════════════════════════
-       INDUSTRY-SPECIFIC SERVICE PAGES — AUTOMATISIERUNG
-  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/automatisierung-restaurant</loc>
     <lastmod>2026-03-14</lastmod>
@@ -573,9 +531,6 @@
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/automatisierung-sport"/>
   </url>
 
-  <!-- ══════════════════════════════════════════════
-       COST / PRICING PAGES
-  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/kosten-webdesign</loc>
     <lastmod>2026-03-14</lastmod>
@@ -600,9 +555,6 @@
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/kosten-automatisierung"/>
   </url>
 
-  <!-- ══════════════════════════════════════════════
-       PROBLEM-BASED LANDING PAGES
-  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/verpasste-anrufe-verlust</loc>
     <lastmod>2026-03-14</lastmod>
@@ -643,9 +595,6 @@
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/digitale-automatisierung-unternehmen"/>
   </url>
 
-  <!-- ══════════════════════════════════════════════
-       BLOG
-  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/blog</loc>
     <lastmod>2026-07-23</lastmod>
@@ -734,9 +683,6 @@
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/blog/webdesign-agentur-auswahl"/>
   </url>
 
-  <!-- ══════════════════════════════════════════════
-       LEGAL
-  ══════════════════════════════════════════════ -->
   <url>
     <loc>https://cogniiq.de/impressum</loc>
     <lastmod>2026-07-23</lastmod>
