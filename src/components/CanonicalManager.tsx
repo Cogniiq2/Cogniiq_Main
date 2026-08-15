@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 import { shouldSuppressCanonical } from "@/lib/routing/indexability";
-import { isKnownPublicRoute } from "@/lib/routing/publicRoutes";
+import { isKnownPublicRoute } from "@/lib/routing/publicRoutePaths";
 
 const BASE_URL = BUSINESS_INFO.website.replace(/\/$/, "");
 

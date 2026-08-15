@@ -23,9 +23,17 @@ const ok = (msg) => console.log(`  ✓ ${msg}`);
 const appTsx = read('src/App.tsx');
 const literalRoutes = [...appTsx.matchAll(/path="([^"]+)"/g)].map((m) => m[1]);
 
-// City × service routes are registered dynamically from CITY_SERVICE_CONFIGS.
-const standorte = read('src/lib/standorte-data.ts');
+// City × service routes are registered dynamically from CITY_SERVICE_ROUTES in
+// src/lib/standorte-data.ts. The page CONTENT moved to standorte-service-configs.ts
+// (it is lazy — it must not sit in the entry chunk), so the authoritative
+// `route:` declarations are read from there. src/lib/standorte-data.test.ts
+// asserts the two lists agree, so either file answers this question; reading the
+// configs keeps this check on the same declarations it has always used.
+const standorte = read('src/lib/standorte-service-configs.ts');
 const cityRoutes = [...standorte.matchAll(/route:\s*"([^"]+)"/g)].map((m) => m[1]);
+if (cityRoutes.length !== 9) {
+  fail(`Expected 9 city × service routes in standorte-service-configs.ts, found ${cityRoutes.length}`);
+}
 
 const allRoutePatterns = [...new Set([...literalRoutes, ...cityRoutes])]
   // Drop the bare catch-all so it cannot mask a genuinely missing route.
