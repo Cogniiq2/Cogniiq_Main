@@ -181,7 +181,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       paragraphs: [
         "In Bayreuth arbeiten viele kleine und mittelständische Unternehmen – Handwerksbetriebe, Dienstleister, Arztpraxen, Gastronomie – mit gewachsenen Software-Landschaften, die über die Jahre entstanden sind. Das Ergebnis sind Systeme, die nicht miteinander kommunizieren: Daten werden manuell von einer Anwendung in die nächste übertragen, Buchungsbestätigungen per Hand verschickt, CRM-Einträge nach jedem Telefonat neu angelegt. Diese Prozesse kosten täglich Stunden, die für Kernaufgaben fehlen.",
         "Cogniiq analysiert, welche Abläufe in Ihrem Betrieb in Bayreuth automatisiert werden können – und setzt die Lösungen mit marktführenden Automatisierungsplattformen und direkten API-Integrationen um. Das Ergebnis sind zuverlässige Workflows, die vollständig im Hintergrund laufen: Buchungsbestätigungen, die automatisch ausgehen. Leads, die direkt qualifiziert ins CRM wandern. Rechnungen, die sich selbst erstellen. Fehlerbenachrichtigungen, die sofort informieren, wenn etwas schiefläuft.",
-        "Ein entscheidender Vorteil gegenüber anonymen Online-Agenturen: Als Anbieter mit Hauptsitz in Bayreuth kennen wir die lokalen Betriebsrealitäten. Wir verstehen, wie ein Handwerksbetrieb in Oberfranken tickt, was eine Arztpraxis im Stadtgebiet täglich belastet und wo der Einzelhandel seine Zeitverluste hat. Diese lokale Perspektive fließt direkt in die Konzeption der Automatisierungen ein.",
+        "Als Anbieter mit Hauptsitz in Bayreuth kennen wir die lokalen Betriebsrealitäten – und betreuen Sie mit festem Ansprechpartner. Wir verstehen, wie ein Handwerksbetrieb in Oberfranken tickt, was eine Arztpraxis im Stadtgebiet täglich belastet und wo der Einzelhandel seine Zeitverluste hat. Diese lokale Perspektive fließt direkt in die Konzeption der Automatisierungen ein.",
         "Schrittweise Umsetzung ist unser Standard: Wir beginnen mit dem Prozess, der die meiste Zeit kostet, setzen ihn sauber um und zeigen das Ergebnis, bevor wir weitermachen. Keine Black Boxes, keine Systeme, die nur wir verstehen. Jede Automatisierung wird vollständig dokumentiert, sodass Ihr Team bei Bedarf einfache Anpassungen selbst vornehmen kann.",
         "Neben der Automatisierung bieten wir in Bayreuth auch den [KI Telefonassistenten](/bayreuth/ki-telefonassistent) sowie professionelles [Webdesign für Bayreuth](/bayreuth/webdesign) an – drei Bausteine, die sich ideal ergänzen und zusammen die digitale Basis eines modernen lokalen Unternehmens bilden. Alle Lösungen sind DSGVO-konform und werden ausschließlich auf europäischen Servern betrieben.",
       ],
@@ -246,7 +246,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         name: "Gastronomie & Restaurants",
         problem: "Restaurants managen Reservierungen, Tagesmenüs und Personaleinteilung in getrennten Tools ohne automatische Synchronisation.",
-        solution: "Buchungsbestätigungen, Erinnerungen an Gäste und interne Benachrichtigungen werden vollautomatisch ausgelöst – ohne manuelle Eingriffe im laufenden Betrieb.",
+        solution: "Buchungsbestätigungen, Erinnerungen an Gäste und interne Benachrichtigungen werden automatisch ausgelöst – ohne manuelle Eingriffe im laufenden Betrieb.",
       },
       {
         name: "Arztpraxen & Gesundheit",
@@ -261,7 +261,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         name: "Einzelhandel & E-Commerce",
         problem: "Kleine Online-Shops in Bayreuth verwalten Bestellungen, Lager und Kundenkommunikation noch manuell – was bei Wachstum sofort zum Engpass wird.",
-        solution: "Bestelleingang, Lagerabzug, Versandbenachrichtigung und Rechnungsversand werden vollautomatisiert – skalierbar ohne Mehrpersonal.",
+        solution: "Bestelleingang, Lagerabzug, Versandbenachrichtigung und Rechnungsversand werden automatisiert – skalierbar ohne Mehrpersonal.",
       },
     ],
     localScenarios: [
@@ -318,7 +318,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       "Technischer Fokus: Ladezeiten unter 2 Sekunden, Mobile-First, Core Web Vitals bestanden",
       "SEO von Anfang an eingebaut – lokale Sichtbarkeit für Bayreuth und Umgebung",
       "Klare Conversion-Struktur: Besucher wissen sofort, was Sie anbieten und wie sie Kontakt aufnehmen",
-      "Persönliche Zusammenarbeit direkt in Bayreuth – kein anonymes Projektportal",
+      "Persönliche Zusammenarbeit direkt in Bayreuth – mit festem Ansprechpartner",
       "Support und Änderungen nach dem Launch – kein Wartungsvertrag für Kleinigkeiten nötig",
     ],
     useCases: [
@@ -353,7 +353,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { question: "Habt ihr Erfahrung mit dem Bayreuth-Markt?", answer: "Ja. Wir kennen die lokale Wettbewerbssituation in Bayreuth und Oberfranken und positionieren Websites so, dass sie bei lokalen Suchanfragen sichtbar sind." },
       { question: "Könnt ihr eine bestehende Website modernisieren?", answer: "Ja. Ob Redesign, Relaunch oder gezielte Optimierung einzelner Seiten – wir analysieren was vorhanden ist und schlagen den sinnvollsten Weg vor." },
       { question: "Bietet ihr auch Hosting an?", answer: "Auf Wunsch organisieren wir das Hosting bei einem deutschen oder europäischen Anbieter. Alternativ nutzen wir Ihren bestehenden Hosting-Vertrag." },
-      { question: "Wie unterscheidet sich eine professionelle Website von einem Baukastensystem?", answer: "Baukastensysteme wie Wix oder Jimdo liefern akzeptable Ergebnisse für einfache Visitenkarten-Websites. Für Unternehmen in Bayreuth, die Neukunden über Google gewinnen wollen, sind individuelle, technisch optimierte Websites deutlich effektiver." },
+      { question: "Wie unterscheidet sich eine professionelle Website von einem Baukastensystem?", answer: "Baukastensysteme liefern akzeptable Ergebnisse für einfache Visitenkarten-Websites. Für Unternehmen in Bayreuth, die Neukunden über Google gewinnen wollen, sind individuelle, technisch optimierte Websites deutlich effektiver." },
       { question: "Wird die Website auch für Google My Business optimiert?", answer: "Ja. Google My Business Optimierung und die Verknüpfung mit der Website sind fester Bestandteil unserer lokalen SEO-Arbeit für Bayreuth." },
       { question: "Können auch mehrsprachige Websites erstellt werden?", answer: "Ja. Für Unternehmen in Bayreuth, die internationale Gäste oder Kunden ansprechen – z. B. in der Festspielzeit – bieten wir mehrsprachige Website-Entwicklung an." },
       { question: "Was passiert nach dem Launch?", answer: "Wir analysieren die ersten Wochen, identifizieren Optimierungspotenzial und setzen es um. Auf Wunsch übernehmen wir laufende Betreuung, Updates und SEO-Optimierungen." },
@@ -402,7 +402,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       },
       {
         title: "Sanitär-Handwerksbetrieb im Umland",
-        description: "Ein Sanitärbetrieb aus dem Umland von Bayreuth hat keine suchmaschinenoptimierte Website. Auftragsanfragen kommen ausschließlich über Empfehlungen. Nach dem Website-Launch mit lokaler SEO-Optimierung für 'Sanitär Bayreuth' und 'Heizung Bayreuth' kommen erste organische Anfragen über Google innerhalb von 6–8 Wochen.",
+        description: "Ein Sanitärbetrieb aus dem Umland von Bayreuth hat keine suchmaschinenoptimierte Website. Auftragsanfragen kommen ausschließlich über Empfehlungen. Nach dem Website-Launch mit lokaler SEO-Optimierung für 'Sanitär Bayreuth' und 'Heizung Bayreuth' kommen erste organische Anfragen über Google nach einigen Wochen.",
       },
     ],
     sameServiceOtherCities: [
@@ -623,7 +623,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         name: "Gastronomie & Tourismus",
         problem: "Regensburger Restaurants und Hotels erhalten Buchungen über verschiedene Kanäle, die manuell zusammengeführt werden müssen – fehleranfällig und zeitintensiv.",
-        solution: "Alle Buchungskanäle fließen automatisch in ein zentrales System. Bestätigungen, Erinnerungen und Stornierungen laufen vollautomatisch.",
+        solution: "Alle Buchungskanäle fließen automatisch in ein zentrales System. Bestätigungen, Erinnerungen und Stornierungen laufen automatisch.",
       },
       {
         name: "Mittelstand & Beratung",
@@ -639,7 +639,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     localScenarios: [
       {
         title: "Mittelständischer Dienstleister im Regensburg Stadtgebiet",
-        description: "Ein B2B-Dienstleister mit 20 Mitarbeitern erhält Anfragen über Website, E-Mail und Telefon. Jede Anfrage wird manuell im CRM erfasst, ein Angebot erstellt und per E-Mail versandt. Mit einer passenden Automatisierung läuft der gesamte Prozess – von Anfrageneingang über Qualifikation bis zur Angebotserstellung – automatisch in unter 5 Minuten.",
+        description: "Ein B2B-Dienstleister mit 20 Mitarbeitern erhält Anfragen über Website, E-Mail und Telefon. Jede Anfrage wird manuell im CRM erfasst, ein Angebot erstellt und per E-Mail versandt. Mit einer passenden Automatisierung läuft der gesamte Prozess – von Anfrageneingang über Qualifikation bis zur Angebotserstellung – automatisch in wenigen Minuten.",
       },
       {
         title: "Hotel in der Regensburger Altstadt",
@@ -726,7 +726,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { question: "Kann die Website mehrsprachig sein?", answer: "Ja. Für Regensburger Unternehmen mit internationalem Publikum aus Tourismus oder Universität sind mehrsprachige Websites kein Problem." },
       { question: "Wie optimiert ihr für Google in Regensburg?", answer: "On-Page SEO, strukturierte Daten, Google My Business Optimierung und lokale Keyword-Strategie für Regensburg sind fester Bestandteil – nicht optionales Extra." },
       { question: "Könnt ihr auch Fotografie und Videoproduktion koordinieren?", answer: "Auf Wunsch koordinieren wir Fotografie über lokale Partnernetzwerke in der Regensburg-Region." },
-      { question: "Was ist der Unterschied zu einer Webagentur in Regensburg?", answer: "Wir sind auf leistungsstarke, konversionsorientierte Websites spezialisiert – ohne den Overhead großer Agenturen. Direkter Kontakt mit dem Entwickler, kürzere Wege, schnellere Ergebnisse." },
+      { question: "Was ist der Unterschied zu einer Webagentur in Regensburg?", answer: "Wir sind auf leistungsstarke, konversionsorientierte Websites spezialisiert – mit direktem Kontakt zum Entwickler, kurzen Wegen und schnellen Ergebnissen." },
     ],
     localChallenges: [
       "Viele Regensburger Unternehmen verlieren Kunden durch veraltete oder schlecht funktionierende Websites, die mobile Nutzer abschrecken",
@@ -763,7 +763,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       },
       {
         title: "Zahnarztpraxis im Stadtgebiet",
-        description: "Eine Zahnarztpraxis in Regensburg West findet sich bei Google-Suchen nach 'Zahnarzt Regensburg' erst auf Seite 3. Durch eine neue Website mit strukturierten Daten, Google My Business Optimierung und lokalem On-Page-SEO erscheint sie innerhalb von 8 Wochen auf den ersten Positionen.",
+        description: "Eine Zahnarztpraxis in Regensburg West findet sich bei Google-Suchen nach 'Zahnarzt Regensburg' erst auf Seite 3. Durch eine neue Website mit strukturierten Daten, Google My Business Optimierung und lokalem On-Page-SEO verbessert sie ihre Sichtbarkeit deutlich.",
       },
       {
         title: "Mittelständisches B2B-Unternehmen im Gewerbegebiet",
@@ -916,7 +916,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     locationNote: "Cogniiq betreut Automatisierungsprojekte für Unternehmen in München vollständig remote – transparent, effizient, ohne Qualitätseinbußen.",
     seo: {
       title: "Automatisierung München – Prozessautomatisierung & Workflows | Cogniiq",
-      description: "Prozessautomatisierung für Unternehmen in München: Workflows & ERP-Integration, Leadverarbeitung. Remote betreut, skalierbar, DSGVO-konform. Kein Münchner Overhead.",
+      description: "Prozessautomatisierung für Unternehmen in München: Workflows & ERP-Integration, Leadverarbeitung. Remote betreut, skalierbar, DSGVO-konform. Transparente Festpreise.",
       canonical: `${base}/muenchen/automatisierung`,
     },
     intro: {
@@ -926,14 +926,14 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     localIntro: {
       paragraphs: [
         "München ist ein Ausnahmestandort für Prozessautomatisierung: Schnell wachsende Startups brauchen von Anfang an skalierbare Prozesse. Mittelständler kämpfen mit gewachsenen Tool-Landschaften und manuellen Brücken zwischen Systemen. Konzerne digitalisieren einzelne Abteilungen ohne das große IT-Projekt anzufassen. Und Premium-Dienstleister wollen Effizienz, ohne Qualität und Markenwahrnehmung zu kompromittieren. Cogniiq liefert für alle diese Szenarien präzise Automatisierungslösungen.",
-        "Als Automatisierungs-Agentur, die Münchner Unternehmen vollständig remote betreut, kombinieren wir das technische Know-how einer spezialisierten Agentur mit den Preisstrukturen, die großen Münchner Agenturen mit teurer Büromiete fehlen. Die Zusammenarbeit läuft über Video-Calls, geteilte Boards und vollständig dokumentierte Konzepte – genauso professionell wie vor Ort, ohne Fahrtzeiten und ohne Overhead-Kosten.",
+        "Als Automatisierungs-Agentur, die Münchner Unternehmen vollständig remote betreut, kombinieren wir das technische Know-how einer spezialisierten Agentur mit schlanken, transparenten Festpreisen. Die Zusammenarbeit läuft über Video-Calls, geteilte Boards und vollständig dokumentierte Konzepte – genauso professionell wie vor Ort, ohne Fahrtzeiten.",
         "Für Workflow-Automatisierung in München setzen wir auf professionelle, skalierbare Plattformen – je nach Ihren Anforderungen an Datenschutz, Skalierbarkeit und Kosten empfehlen wir die passende Lösung. Bei komplexen ERP-Integrationen oder spezifischen API-Anforderungen entwickeln wir auch direkte Schnittstellen. Alle Lösungen sind vollständig dokumentiert und so gebaut, dass sie Ihr Team versteht und selbst warten kann.",
-        "Was den Münchner Markt besonders macht: Personalkosten sind die höchsten in Deutschland – jede Stunde, die durch Automatisierung eingespart wird, hat hier den höchsten ROI. Ein Workflow, der täglich 2 Stunden Arbeit ersetzt, amortisiert sich in München schneller als in jeder anderen deutschen Stadt. Das macht Automatisierungsinvestitions in München besonders attraktiv.",
+        "Was den Münchner Markt besonders macht: Personalkosten sind die höchsten in Deutschland – jede Stunde, die durch Automatisierung eingespart wird, hat hier den höchsten ROI. Ein Workflow, der täglich 2 Stunden Arbeit ersetzt, amortisiert sich bei Münchner Lohnniveau schnell. Das macht Automatisierungsinvestitions in München besonders attraktiv.",
         "Neben der Automatisierung bieten wir für München auch den [KI Telefonassistenten für München](/muenchen/ki-telefonassistent) und professionelles [Webdesign für München](/muenchen/webdesign) an. Unternehmen, die alle drei Bereiche kombinieren, haben im Münchner Wettbewerbsmarkt einen messbaren operativen Vorteil.",
       ],
     },
     warumCogniiq: [
-      "Kein Münchner Agentur-Overhead – direkte Zusammenarbeit, faire Preise",
+      "Vollständig remote betreut – direkte Zusammenarbeit, transparente Festpreise",
       "Technologieoffene Beratung: professionelle Plattformen und direkte APIs – je nach Bedarf",
       "Saubere Dokumentation, die Ihr Team versteht und nutzen kann",
       "DSGVO-konforme Verarbeitung auf europäischen Servern – kein Datenschutz-Risiko",
@@ -943,7 +943,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     useCases: [
       {
         industry: "Startups & Scale-ups",
-        title: "Lead-Nurturing vollautomatisch",
+        title: "Lead-Nurturing automatisch",
         description: "Neue Leads aus allen Quellen landen qualifiziert im CRM, erhalten automatisierte Follow-ups und werden den richtigen Vertriebsmitarbeitern zugewiesen – ohne manuelle Eingriffe, skalierbar mit dem Unternehmen.",
       },
       {
@@ -954,7 +954,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         industry: "E-Commerce & Retail",
         title: "Bestell- und Lagermanagement automatisieren",
-        description: "Bestellungen triggern Lager-Updates, Versandmeldungen und Kundenkommunikation vollautomatisch – ohne manuelle Eingriffe, skalierbar für hohes Transaktionsvolumen im Münchner Markt.",
+        description: "Bestellungen triggern Lager-Updates, Versandmeldungen und Kundenkommunikation automatisch – ohne manuelle Eingriffe, skalierbar für hohes Transaktionsvolumen im Münchner Markt.",
       },
     ],
     processSteps: [
@@ -965,14 +965,14 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     ],
     faq: [
       { question: "Kann die gesamte Zusammenarbeit remote stattfinden?", answer: "Ja, vollständig. Alle Projektphasen laufen remote via Video-Calls und geteilten Boards – genauso professionell wie vor Ort." },
-      { question: "Wie unterscheiden sich eure Preise von Münchner Agenturen?", answer: "Wir haben keinen Münchner Overhead – faire Preise, direkte Zusammenarbeit ohne viele Hierarchieebenen." },
+      { question: "Wie unterscheiden sich eure Preise von Münchner Agenturen?", answer: "Wir arbeiten vollständig remote mit transparenten Festpreisen und direkter Zusammenarbeit – Sie sehen vor dem Start, was das Projekt kostet." },
       { question: "Habt ihr Erfahrung mit Skalierung für Münchner Unternehmen?", answer: "Ja. Wir bauen Automatisierungen von Anfang an skalierbar – damit sie mit Ihrem Unternehmen wachsen können." },
       { question: "Können komplexe ERP-Systeme integriert werden?", answer: "In den meisten Fällen ja. Wir prüfen vorab welche APIs verfügbar sind und was technisch machbar ist." },
       { question: "Was wenn sich unsere Prozesse ändern?", answer: "Wir passen die Automatisierungen an. Durch vollständige Dokumentation können einfache Änderungen auch intern vorgenommen werden." },
       { question: "Wie lange dauert ein Automatisierungsprojekt in München?", answer: "Einfache Workflows: 1–2 Wochen. Komplexe Integrationen: 4–8 Wochen. Realistischer Zeitplan nach der Analyse." },
       { question: "Welche Branchen in München betreut ihr?", answer: "Startups, Scaleups, E-Commerce, Beratung, Finanzdienstleistung, Mittelstand, Medizintechnik und SaaS – wir passen uns Ihrer Branche an." },
       { question: "Welche Automatisierungsplattform ist die richtige für mein Unternehmen in München?", answer: "Das hängt von Ihren Anforderungen ab: Datenschutzbedürfnisse, Skalierbarkeit und technische Komplexität. Wir beraten unabhängig und empfehlen die Lösung, die langfristig am besten zu Ihrem Unternehmen passt." },
-      { question: "Wie hoch ist der ROI von Automatisierungen in München?", answer: "Durch die hohen Personalkosten in München amortisieren sich Automatisierungen schneller als in anderen Städten. Ein Workflow, der täglich 2 Stunden Arbeit ersetzt, zahlt sich bei Münchner Lohnniveau oft in wenigen Monaten." },
+      { question: "Wie hoch ist der ROI von Automatisierungen in München?", answer: "Durch die hohen Personalkosten in München amortisieren sich Automatisierungen oft schnell. Ein Workflow, der täglich 2 Stunden Arbeit ersetzt, zahlt sich bei Münchner Lohnniveau oft in wenigen Monaten." },
       { question: "Bietet Cogniiq auch laufende Wartung an?", answer: "Ja. Auf Wunsch übernehmen wir laufenden Support, Updates und Erweiterungen – mit definierten Reaktionszeiten." },
     ],
     localChallenges: [
@@ -990,7 +990,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         name: "E-Commerce & D2C",
         problem: "E-Commerce-Unternehmen in München haben bei Wachstum sofort Engpässe bei Bestellabwicklung, Lagerhaltung und Kundenkommunikation – weil alles noch manuell läuft.",
-        solution: "Vollautomatisierte Bestellverarbeitung, Lagerabgleich, Versandmeldungen und Kundenkommunikation – ohne manuelle Eingriffe, skalierbar für hohes Volumen.",
+        solution: "Automatisierte Bestellverarbeitung, Lagerabgleich, Versandmeldungen und Kundenkommunikation – ohne manuelle Eingriffe, skalierbar für hohes Volumen.",
       },
       {
         name: "Finanzdienstleistung & Beratung",
@@ -1006,11 +1006,11 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     localScenarios: [
       {
         title: "B2B-SaaS-Startup in Schwabing",
-        description: "Ein SaaS-Startup in Schwabing erhält täglich neue Trial-Anmeldungen, die manuell im CRM erfasst, mit Welcome-E-Mails begrüßt und dem Vertriebsteam zugewiesen werden. Mit einer passenden Automatisierung läuft der gesamte Prozess in unter 2 Minuten – von der Anmeldung bis zur personalisierten Begrüßungssequenz.",
+        description: "Ein SaaS-Startup in Schwabing erhält täglich neue Trial-Anmeldungen, die manuell im CRM erfasst, mit Welcome-E-Mails begrüßt und dem Vertriebsteam zugewiesen werden. Mit einer passenden Automatisierung läuft der gesamte Prozess in wenigen Minuten – von der Anmeldung bis zur personalisierten Begrüßungssequenz.",
       },
       {
         title: "E-Commerce-Unternehmen in der Maxvorstadt",
-        description: "Ein D2C-Brand aus der Maxvorstadt verwaltet 100 Bestellungen pro Tag manuell in drei Systemen. Bestellabwicklung, Lagerabzug und Versandbenachrichtigung sind fehleranfällig und zeitintensiv. Mit einer passenden Automatisierung läuft der gesamte Prozess vollautomatisch – mit messbarer Fehlerreduktion.",
+        description: "Ein D2C-Brand aus der Maxvorstadt verwaltet einen wachsenden Bestellbestand manuell in drei Systemen. Bestellabwicklung, Lagerabzug und Versandbenachrichtigung sind fehleranfällig und zeitintensiv. Mit einer passenden Automatisierung läuft der gesamte Prozess automatisch – mit deutlich weniger Fehlerquellen.",
       },
       {
         title: "Unternehmensberatung im Münchner Stadtgebiet",
@@ -1036,25 +1036,25 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     route: "/muenchen/webdesign",
     locationNote: "Cogniiq entwickelt Websites für Unternehmen in München vollständig remote – persönliche Termine im Raum München auf Anfrage möglich.",
     seo: {
-      title: "Webdesign Agentur München – Website erstellen ohne Agentur-Overhead | Cogniiq",
-      description: "Webdesign München: Individuelle Websites für Startups, Mittelstand und Premium-Segment. Enterprise-Qualität ohne Münchner Agenturpreise. SEO-optimiert, schnell, mehrsprachig.",
+      title: "Webdesign Agentur München – Website erstellen & SEO | Cogniiq",
+      description: "Webdesign München: Individuelle Websites für Startups, Mittelstand und Premium-Segment. Enterprise-Qualität, remote betreut, transparente Festpreise. SEO-optimiert, schnell, mehrsprachig.",
       canonical: `${base}/muenchen/webdesign`,
     },
     intro: {
       h1: "Webdesign für Unternehmen in München",
-      lead: "München hat viele Webdesign-Agenturen mit entsprechenden Preisen. Cogniiq bietet dasselbe technische Niveau und dieselbe gestalterische Qualität – ohne Münchner Overhead: individuelle Entwicklung, Enterprise-Performance, faire Preise.",
+      lead: "Cogniiq entwickelt Websites für Münchner Unternehmen auf hohem technischem und gestalterischem Niveau – vollständig remote betreut, mit transparenten Festpreisen: individuelle Entwicklung, Enterprise-Performance, klare Abläufe.",
     },
     localIntro: {
       paragraphs: [
         "München ist ein digitaler Wettbewerbsmarkt, in dem Websites sowohl visuell als auch technisch auf höchstem Niveau sein müssen. Startups positionieren sich für internationale Investoren. Mittelständler brauchen Websites, die qualifizierte B2B-Anfragen generieren. Premium-Dienstleister müssen online dasselbe Niveau darstellen, das ihre Marke offline lebt. Und alle konkurrieren in einem Markt, in dem Google täglich entscheidet, wer gesehen wird – und wer nicht.",
-        "Cogniiq bietet Münchner Unternehmen eine echte Alternative zu lokalen Agenturen: Entwicklung auf Enterprise-Niveau, direkte Zusammenarbeit mit dem Entwickler Ihrer Website – ohne drei Hierarchieebenen zwischen Ihrem Feedback und der Umsetzung. Individuelle Konzeption, technische Präzision, SEO von Anfang an integriert, mehrsprachige Entwicklung auf Wunsch – für ein Budget, das bei einer lokalen Münchner Agentur oft nicht einmal für das erste Designkonzept reicht.",
+        "Cogniiq bietet Münchner Unternehmen Entwicklung auf Enterprise-Niveau und direkte Zusammenarbeit mit dem Entwickler Ihrer Website – vollständig remote betreut, mit transparenten Festpreisen. Individuelle Konzeption, technische Präzision, SEO von Anfang an integriert, mehrsprachige Entwicklung auf Wunsch.",
         "Was technisch Standard für uns ist: Ladezeiten unter 1,5 Sekunden, Core Web Vitals im grünen Bereich, Mobile-First-Design (der überwiegende Teil der Münchner Suchanfragen kommt vom Smartphone), strukturierte Daten für Google und DSGVO-konforme Implementierung aller Tools. Diese technischen Grundlagen sind keine Optional-Features – sie sind die Basis, auf der jede Website für den Münchner Markt gebaut sein muss.",
         "Für internationale Unternehmen und Münchner Firmen mit globalen Kunden: Mehrsprachige Website-Entwicklung auf Deutsch und Englisch ist Standard, weitere Sprachen auf Anfrage. Wir kennen die Anforderungen an internationale SEO-Strukturen und setzen sie technisch korrekt um.",
         "Als Ergänzung zum Webdesign bieten wir in München auch den [KI Telefonassistenten für München](/muenchen/ki-telefonassistent) und [Prozessautomatisierung für München](/muenchen/automatisierung) an. Alle drei Bereiche aus einer Hand – für eine konsistente, leistungsstarke digitale Infrastruktur ohne Schnittstellenprobleme zwischen verschiedenen Agenturen.",
       ],
     },
     warumCogniiq: [
-      "Enterprise-Qualität ohne Münchner Agenturpreis – kein Overhead für teure Bürolagen",
+      "Enterprise-Qualität – vollständig remote betreut, mit transparenten Festpreisen",
       "Individuelle Entwicklung – kein Template, kein Einheitslook, keine Copy-Paste-Arbeit",
       "Technische Spitzenklasse: Performance, Core Web Vitals, sauberer Code",
       "SEO für den Münchner Markt von Anfang an – lokal und international",
@@ -1089,16 +1089,16 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { question: "Was kostet eine Website für ein Münchner Unternehmen?", answer: "Websites starten ab ca. 1.500 €. Individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei ca. 2.500–5.000 €, komplexere Projekte nach Aufwand. Kein Münchner Aufpreis – faire Preise für jeden Markt." },
       { question: "Könnt ihr mit Münchner Markenagenturen zusammenarbeiten?", answer: "Ja. Wir übernehmen gerne die technische Umsetzung von Designs, die von anderen Agenturen erstellt wurden." },
       { question: "Habt ihr Erfahrung mit SEO für den Münchner Markt?", answer: "Ja. Lokaler SEO für den Münchner Markt erfordert Strategie – wir kennen den Wettbewerb und setzen gezielte Maßnahmen um." },
-      { question: "Wie funktioniert die Remote-Zusammenarbeit?", answer: "Video-Calls, Figma-Boards, Staging-Umgebungen – genauso wie bei lokalen Agenturen, ohne Pendelzeit und ohne Overhead." },
+      { question: "Wie funktioniert die Remote-Zusammenarbeit?", answer: "Video-Calls, Figma-Boards, Staging-Umgebungen – genauso wie bei lokalen Agenturen, ohne Pendelzeit." },
       { question: "Wie schnell kann eine Website live gehen?", answer: "Einfachere Projekte in 4–6 Wochen, komplexere in 8–12 Wochen. Immer mit realistischem Zeitplan nach dem Briefing." },
       { question: "Könnt ihr Websites auf Englisch und Deutsch gleichzeitig entwickeln?", answer: "Ja. Mehrsprachige Websites mit korrekter hreflang-Implementierung und internationaler SEO-Struktur sind unser Standard für Münchner Kunden mit globalem Publikum." },
-      { question: "Was unterscheidet Cogniiq von einer Münchner Agentur?", answer: "Kein Overhead für teure Büroräume, direkte Zusammenarbeit mit dem Entwickler, schnellere Umsetzung, faire Preise. Dasselbe Ergebnis – ohne die Kosten der Münchner Innenstadt." },
+      { question: "Was unterscheidet Cogniiq von einer Münchner Agentur?", answer: "Wir arbeiten vollständig remote – mit direkter Zusammenarbeit mit dem Entwickler, schneller Umsetzung und transparenten Festpreisen." },
       { question: "Habt ihr Erfahrung mit dem Münchner Premium-Segment?", answer: "Ja. Ton, Ästhetik und technisches Niveau werden auf das Premiumsegment angepasst – für Unternehmen, bei denen der erste digitale Eindruck entscheidend ist." },
       { question: "Was passiert nach dem Launch?", answer: "Wir analysieren Nutzungsdaten, identifizieren Optimierungspotenzial und setzen Verbesserungen um. Laufende Betreuung auf Wunsch." },
       { question: "Kann ich die Website selbst pflegen?", answer: "Ja. Wir richten auf Wunsch ein CMS ein und schulen Ihr Team. Alternativ übernehmen wir die Pflege." },
     ],
     localChallenges: [
-      "Münchner Agenturen verlangen Premium-Preise, die für viele Unternehmen nicht gerechtfertigt sind – der Overhead übersteigt oft die eigentliche Entwicklungsleistung",
+      "Webdesign-Budgets sind im Münchner Markt schnell gebunden – transparente Festpreise und effiziente Remote-Zusammenarbeit schaffen Planbarkeit",
       "Der Münchner Markt ist international geprägt – eine Website ohne Englisch verliert relevante Zielgruppen",
       "Die Konkurrenz in München ist technisch oft sehr stark aufgestellt – langsame oder veraltete Websites kosten sofort sichtbar Kunden",
     ],
@@ -1128,7 +1128,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     localScenarios: [
       {
         title: "Tech-Startup in Schwabing",
-        description: "Ein B2B-SaaS-Startup in Schwabing hat eine intern gebaute Website, die technisch schwach und nicht für internationale Nutzer optimiert ist. Nach dem Website-Relaunch in Deutsch und Englisch mit klarer Produktpositionierung und SEO-Struktur steigen qualifizierte Demo-Anfragen messbar.",
+        description: "Ein B2B-SaaS-Startup in Schwabing hat eine intern gebaute Website, die technisch schwach und nicht für internationale Nutzer optimiert ist. Nach dem Website-Relaunch in Deutsch und Englisch mit klarer Produktpositionierung und SEO-Struktur steigen qualifizierte Demo-Anfragen deutlich.",
       },
       {
         title: "Privatarztpraxis in der Maxvorstadt",
