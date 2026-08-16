@@ -34,6 +34,8 @@ vi.mock('@/lib/supabase', () => ({
 
 const { ThemeProvider } = await import('./components/theme-provider');
 const App = (await import('./App')).default;
+const { PUBLIC_ROUTES, isKnownPublicRoute } = await import('./lib/routing/publicRoutes');
+const { publicLinkTargets, problemLinkTargets } = await import('./test/internalLinks');
 
 const DIST = join(process.cwd(), 'dist');
 const hasBuild = existsSync(join(DIST, 'index.html'));
@@ -140,6 +142,40 @@ describe.skipIf(!hasBuild)('prerendered HTML is meaningful without JavaScript', 
     expect(html).toMatch(/<meta name="robots" content="noindex/);
     expect(html).not.toMatch(/rel="canonical"/);
   });
+});
+
+// Link integrity across the whole portfolio, checked against the shipped bytes rather than a
+// sample. src/entry-server.test.tsx guards the same invariant on two representative pages without
+// needing a build; this is the exhaustive pass, and the only one that can catch a broken href
+// hard-coded in a single page component.
+describe.skipIf(!hasBuild)('prerendered pages link only to published routes', () => {
+  it('points every internal link at a route in the manifest', () => {
+    const offenders: string[] = [];
+    for (const route of PUBLIC_ROUTES) {
+      const html = prerenderedRoot(route.path);
+      expect(html, `no prerendered output for ${route.path}`).not.toBeNull();
+      for (const target of publicLinkTargets(html!)) {
+        if (!isKnownPublicRoute(target)) offenders.push(`${route.path} -> ${target}`);
+      }
+    }
+    expect(offenders).toEqual([]);
+  }, 60_000);
+
+  it('keeps the booking problem page linked from every related-page list that renders one', () => {
+    const pagesWithList = PUBLIC_ROUTES.map((route) => ({
+      path: route.path,
+      links: problemLinkTargets(prerenderedRoot(route.path) ?? ''),
+    })).filter((page) => page.links.length > 0);
+
+    // The nine city service pages (RelatedPages) plus the nine industry-city pages (IndustryPage).
+    // A change to that set is a content-architecture decision, not something to absorb silently.
+    expect(pagesWithList.map((page) => page.path)).toHaveLength(18);
+
+    for (const page of pagesWithList) {
+      expect(page.links, page.path).toContain('/keine-terminbuchung-online');
+      expect(page.links, page.path).not.toContain('/keine-terminbuchung');
+    }
+  }, 60_000);
 });
 
 if (!hasBuild) {

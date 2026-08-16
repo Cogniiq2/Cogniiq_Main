@@ -29,7 +29,7 @@ const PROBLEM_LINKS = [
   { label: "Verpasste Anrufe & Umsatzverlust", href: "/verpasste-anrufe-verlust" },
   { label: "Website bringt keine Anfragen", href: "/keine-anfragen-website" },
   { label: "Zu viel manuelle Arbeit", href: "/zu-viel-manuelle-arbeit" },
-  { label: "Keine automatische Terminbuchung", href: "/keine-terminbuchung" },
+  { label: "Keine automatische Terminbuchung", href: "/keine-terminbuchung-online" },
 ];
 
 const INDUSTRY_LINKS: Record<string, Array<{ label: string; href: string }>> = {
