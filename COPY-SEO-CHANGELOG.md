@@ -95,6 +95,28 @@ Schema-Typen und Routing wurden nicht verändert.
 - Mehrsprachigkeits-Aussage vereinheitlicht: "möglich, üblicherweise Deutsch und Englisch" (vorher widersprüchlich "Standard" vs. "auf Anfrage").
 - Lokale Substanz erhalten: Schwabing, Maxvorstadt, Oktoberfest/Messen, internationales Publikum, Remote-Betreuungshinweis (locationNote) unverändert.
 
+## Pass 2 — Metadaten-Änderungen (Ehrlichkeits-Audit & Vertrauensebene)
+
+Vorher-Werte aller Zeilen: siehe `SEO-BASELINE.md`. H1s und Canonicals blieben
+in Pass 2 unverändert, außer wo genannt.
+
+| Route | Element | Änderung |
+|---|---|---|
+| `/` | Description (PAGE_META → OG + JSON-LD) | „Kein Anruf geht verloren. Go-Live in 7–14 Tagen." → „…Erreichbar auch außerhalb der Öffnungszeiten." |
+| `/` | Hero-H1 (sichtbar) | „Kein Anruf mehr verpasst. Kein Lead verloren." → „Erreichbar, wenn niemand frei ist. Auch nachts. Auch samstags." |
+| `/leistungen` | Description | „…jeden Anruf beantwortet … eliminiert" → begrenzte Formulierung |
+| `/ki-telefonassistent-hotel` | Description | Absolutversprechen entfernt („Keine verpassten Direktbuchungen mehr") |
+| `/ki-telefonassistent-restaurant` | Description | Absolutversprechen entfernt („Kein verpasster Tisch mehr") |
+| `/bayern/ki-telefonassistent` | Description | „Made for Mittelstand" (engl.) und Automatik-Absolutheit entfernt |
+| `/ki-telefonassistent/demo` | Description | Verknappungsmuster „Jetzt Demo-Termin sichern" entfernt |
+| `/muenchen/webdesign` | Title + Description | „ohne Agentur-Overhead"-Jab entfernt (UWG) |
+| `/automatisierung-immobilien` | Description + H1-nahe Zeile | „Kein Lead geht mehr verloren – vollautomatisch" begrenzt |
+| `/ki-telefonassistent`, Segment- & Stadtseiten | Sichtbare Struktur | Neue Sektionen M15/M16/M20/M21; M13-Slot asset-gated (kein DOM-Knoten ohne Audio) — kein Schema-Markup für verborgene Slots |
+
+Schema-Hinweis: Es wurde **kein** Schema für unsichtbare oder asset-gated
+Inhalte ergänzt (Brief II §7.1). FAQPage-Schemata folgen automatisch den
+korrigierten sichtbaren FAQ-Texten (FAQSection, CostPage, Seiten-Configs).
+
 ## Gesamtbilanz
 
 - 7 Seiten umgeschrieben, 0 URLs/Canonicals/Slugs verändert, 0 Schema-Typen entfernt.

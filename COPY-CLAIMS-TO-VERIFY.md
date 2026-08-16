@@ -1,6 +1,9 @@
 # COPY-CLAIMS-TO-VERIFY — Aussagen, die der Inhaber bestätigen muss
 
-Stand: 2026-08-16 · Branch `claude/cogniiq-copy-overhaul-mjkdf4`
+Stand: 2026-08-16 (Pass 2) · Branch `claude/cogniiq-copy-overhaul-mjkdf4`
+Das Beantwortungsformular zu dieser Liste ist `OWNER-INPUT.md` — die
+Gruppen A–D unten entsprechen den dortigen Gruppen. Abschnitt F ergänzt
+die im Pass-2-Audit neu gefundenen Punkte.
 
 Regel aus dem Brief (§2.1): Produktaussagen, die weder im Repo belegt noch vom
 Inhaber bestätigt sind, dürfen nicht behauptet werden. Die folgenden Aussagen
@@ -53,6 +56,20 @@ zu entfernen**. Marker stehen als Code-Kommentare neben der jeweiligen Stelle
 | D2 | AVV nach Art. 28 DSGVO gehört zur Einrichtung ("inklusive") | alle Seiten | bereits publiziert ("auf Anfrage" → jetzt "inklusive") — bestätigen, sonst zurück zu "auf Anfrage" |
 | D3 | Unterstützung bei Dokumentation für den DSB (ohne DSFA-Aussage) | Arzt, Praxis, Stadtseiten | NEU formuliert — Leistungszusage bestätigen |
 | D4 | Kein Training auf Patientendaten | **nirgends behauptet** | Brief §5.4 wünscht die Aussage — erst nach Bestätigung ergänzen |
+
+## F. Pass-2-Ergänzungen (Audit repo-weit)
+
+| # | Aussage | Wo | Status |
+|---|---|---|---|
+| F1 | 297 €/Monat im Kostenvergleichs-Rechner — weicht von den Staffeln (99/199–399/499 €) ab | `CostComparisonSection.tsx` | als Beispielwert gekennzeichnet — vereinheitlichen (OWNER-INPUT A1) |
+| F2 | Reaktionszeit „in der Regel 24 h" (Kontakt, Demo, FAQ-Modal, Final-CTA, HowItWorks) | mehrere Komponenten | bereits publiziert — bestätigen (D3) |
+| F3 | Testimonial `REAL_TESTIMONIAL` nennt real existierenden Verein (SV Heinersreuth) | `TestimonialBlock.tsx`, `/referenzen`, `/bewertungen` | schriftliche Einwilligung nachweisen oder entfernen (F3 im OWNER-INPUT) |
+| F4 | Gründer-Spezialisierungen (wer macht KI, wer Webdesign) | AboutSection (jetzt neutral „Gründer") | erst nach Bestätigung wieder personenbezogen ausweisen |
+| F5 | JSON-LD: `areaServed` (10+ Städte), `priceRange "€€€"`, `foundingDate 2025-10-15`, `availableLanguage German/English` | `index.html`, `LocalBusinessSchema.tsx` | bestätigen |
+| F6 | Review-Lenkung „Positives Feedback wird in Richtung Google-Bewertung gelenkt" | Webdesign-Gastronomie-Stadtseiten | rechtlich riskantes Muster (Review-Gating) — Empfehlung: entfernen; Entscheidung Inhaber |
+| F7 | „Mehrere Anrufe gleichzeitig, ohne Warteschleife" | mehrere Seiten | Parallelitätsgrenzen bestätigen (B11) |
+| F8 | Blog-Orientierungspreise (150–500 €, 200–450 €, 300 € u. a.) | `blog-data.ts` | bestätigen oder entfernen |
+| F9 | PMS-/Systemnamen Hotel/Restaurant (protel, Apaleo, Lodgit, OpenTable, ResDiary, Resmio) | Hotel-/Restaurant-Segmentseiten | Anbindungstiefe bestätigen |
 
 ## E. Nicht mehr behauptet (bewusst entfernt, kein Handlungsbedarf)
 

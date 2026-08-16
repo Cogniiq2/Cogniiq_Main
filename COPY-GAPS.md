@@ -1,6 +1,30 @@
 # COPY-GAPS — Offene Punkte und Inhaberentscheidungen
 
-Stand: 2026-08-16 · Branch `claude/cogniiq-copy-overhaul-mjkdf4`
+Stand: 2026-08-16 (nach Pass 2 Phase 1–2) · Branch `claude/cogniiq-copy-overhaul-mjkdf4`
+
+## 0. Aktueller Stand nach Pass 2 (Teilfreigabe)
+
+**Erledigt:** repo-weites Ehrlichkeits-Audit + Fixes (HONESTY-AUDIT.md),
+SEO-Baseline, Review-Banner (`VITE_REVIEW_MODE`, default aus), Option-B-
+Trennung der Healthcare-Journey (Routing-Vorschlag wartet auf Freigabe:
+ROUTING-PROPOSAL.md), Module M15/M16/M20/M21 live, M13-Komponente gebaut
+(unsichtbar bis Audiodatei, Pflicht-Label fest verdrahtet).
+
+**Blockiert bis OWNER-INPUT A–F beantwortet ist:** M14 (Übergabe-Visual),
+M17 (Onboarding mit echten Schritten und Dauern), M18 (Betreuung mit Person),
+M19 (Umkehrbarkeit), M22 (Referenz), Preisseite, Integrationen-Seite,
+Datenschutz-Sicherheit-Seite.
+
+**Entscheidungen, die nur Sie treffen können:**
+1. **C1 (Art.-50-Ansage)** — steht als Produktfakt auf allen Telefonassistent-
+   Seiten; bei „NEIN" fliegt die Aussage sofort raus.
+2. **ROUTING-PROPOSAL.md** — `/praxen`, `/integrationen`,
+   `/datenschutz-sicherheit` freigeben oder Namen korrigieren.
+3. **Review-Gating** („Positives Feedback wird in Richtung Google-Bewertung
+   gelenkt", Gastronomie-Webdesign-Seiten) — rechtlich riskant, Empfehlung:
+   Funktionsbeschreibung entfernen oder auf neutrale Bewertungsbitte umstellen.
+4. **Testimonial SV Heinersreuth** — Einwilligung nachweisen oder entfernen.
+
 
 ## 1. Seiten außerhalb dieses Durchlaufs (Entscheidung / Folgerunde)
 
