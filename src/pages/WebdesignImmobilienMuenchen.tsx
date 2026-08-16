@@ -124,7 +124,7 @@ const config: IndustryPageConfig = {
       icon: "zap",
       title: "Lead-Automatisierung München",
       description:
-        "Eingehende Anfragen werden automatisch qualifiziert, Besichtigungen koordiniert und Follow-ups nach Terminen strukturiert versandt. Keine Anfrage geht verloren, kein Interessent bleibt ohne Reaktion – besonders wichtig im Münchner Premiumsegment.",
+        "Eingehende Anfragen werden automatisch qualifiziert, Besichtigungen koordiniert und Follow-ups nach Terminen strukturiert versandt. Anfragen werden erfasst und beantwortet – auch abends und am Wochenende, was im Münchner Premiumsegment besonders zählt.",
     },
   ],
   useCases: [
@@ -136,7 +136,7 @@ const config: IndustryPageConfig = {
     {
       title: "Besichtigungstermine ohne manuelle Koordination",
       description:
-        "Interessenten buchen Besichtigungstermine direkt über die Website oder per KI-Assistent. Bestätigungen, Erinnerungen und Nachfassaktionen laufen vollautomatisch – auch bei parallelen Objekten.",
+        "Interessenten buchen Besichtigungstermine direkt über die Website oder per KI-Assistent. Bestätigungen, Erinnerungen und Nachfassaktionen laufen automatisch – auch bei parallelen Objekten.",
     },
     {
       title: "Objektanfragen außerhalb der Bürozeiten",
@@ -163,7 +163,7 @@ const config: IndustryPageConfig = {
     "Mehr qualifizierte Leads durch strukturierte Vorqualifizierung im Anfrage-Prozess",
     "Automatisierte Besichtigungskoordination spart Maklerzeit – besonders bei mehreren hochpreisigen Objekten",
     "Premium-Webauftritt stärkt Vertrauen bei anspruchsvollen Käufern und Verkäufern in München",
-    "Keine verpassten Anfragen – KI-Assistent beantwortet auch abends und am Wochenende",
+    "Anfragen werden erfasst und beantwortet – der KI-Assistent antwortet auch abends und am Wochenende",
     "Follow-up-Automatisierung erhöht die Abschlussrate im wettbewerbsintensiven Münchner Markt",
     "Bessere Sichtbarkeit bei lokalen Suchanfragen – mehr organische Anfragen aus dem Raum München",
     "Datenschutzorientierte Umsetzung – alle Kundendaten sicher auf europäischen Servern",

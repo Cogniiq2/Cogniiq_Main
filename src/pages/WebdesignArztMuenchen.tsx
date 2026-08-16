@@ -53,7 +53,7 @@ const config: IndustryPageConfig = {
       icon: "zap",
       title: "Praxis-Automatisierung München",
       description:
-        "Terminbestätigungen, Erinnerungs-SMS, Recall-Kampagnen und Patientenkommunikation laufen automatisiert ab. Besonders in großstädtischen Praxen mit hohem Durchsatz reduziert das den administrativen Aufwand messbar und senkt die No-Show-Rate.",
+        "Terminbestätigungen, Erinnerungs-SMS, Recall-Kampagnen und Patientenkommunikation laufen automatisiert ab. Besonders in großstädtischen Praxen mit hohem Durchsatz reduziert das den administrativen Aufwand, und Erinnerungen wirken No-Shows entgegen.",
     },
   ],
   useCases: [
@@ -65,12 +65,12 @@ const config: IndustryPageConfig = {
     {
       title: "Automatische Terminerinnerungen",
       description:
-        "Patienten erhalten kurz vor dem Termin automatisch eine Erinnerung per SMS oder E-Mail. Die No-Show-Rate sinkt messbar – gerade in gut ausgelasteten Münchner Praxen ein entscheidender Effizienzgewinn.",
+        "Patienten erhalten kurz vor dem Termin automatisch eine Erinnerung per SMS oder E-Mail. Erinnerungen wirken No-Shows entgegen – gerade in gut ausgelasteten Münchner Praxen ein spürbarer Effizienzgewinn.",
     },
     {
       title: "Rezeption entlasten bei Stoßzeiten",
       description:
-        "Montags früh und während der Mittagspause ist die Rezeption in Münchner Praxen chronisch überlastet. Der KI-Telefonassistent nimmt parallel Anrufe entgegen, ohne Warteschleife – alle Anfragen werden zuverlässig erfasst.",
+        "Montags früh und während der Mittagspause ist die Rezeption in Münchner Praxen chronisch überlastet. Der KI-Telefonassistent nimmt parallel Anrufe entgegen, ohne Warteschleife – Anfragen werden strukturiert erfasst.",
     },
     {
       title: "Patientenanfragen über die Website qualifizieren",
@@ -85,11 +85,11 @@ const config: IndustryPageConfig = {
     {
       title: "Suchmaschinenoptimierung für lokale Suchanfragen",
       description:
-        "Die Praxis-Website wird technisch und inhaltlich so optimiert, dass sie bei Suchanfragen wie 'Arzt München', 'Hausarzt München' oder '[Fachrichtung] München' sichtbar erscheint – für messbaren Zustrom neuer Patienten.",
+        "Die Praxis-Website wird technisch und inhaltlich so optimiert, dass sie bei Suchanfragen wie 'Arzt München', 'Hausarzt München' oder '[Fachrichtung] München' sichtbar erscheint – und so neue Patienten erreicht.",
     },
   ],
   benefits: [
-    "Keine verpassten Anrufe mehr – der KI-Assistent nimmt auch bei vollem Betrieb alle Anrufe entgegen",
+    "Erreichbar auch dann, wenn niemand abnehmen kann – der KI-Assistent nimmt auch bei vollem Betrieb Anrufe entgegen",
     "Automatisierte Terminprozesse entlasten das Praxisteam in einer Großstadt mit hohem Anfragevolumen",
     "Mehr qualifizierte Patientenanfragen durch eine suchmaschinenoptimierte Praxis-Website für München",
     "Erreichbarkeit außerhalb der Sprechzeiten – in München eine Grundvoraussetzung für Patientenzufriedenheit",

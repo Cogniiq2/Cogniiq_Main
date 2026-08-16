@@ -5,7 +5,7 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 const config: NationalIndustryPageConfig = {
   seo: {
     title: "Automatisierung für Fitnessstudios & Sportanlagen | Cogniiq",
-    description: "Fitness-Automatisierung: Kursanmeldungen, Mitglieder-Onboarding, Zahlungserinnerungen und Re-Engagement vollautomatisch. Mehr Mitglieder, weniger Verwaltung – für Fitnessstudios, Yogastudios und Sportvereine.",
+    description: "Fitness-Automatisierung: Kursanmeldungen, Mitglieder-Onboarding, Zahlungserinnerungen und Re-Engagement automatisch. Mehr Mitglieder, weniger Verwaltung – für Fitnessstudios, Yogastudios und Sportvereine.",
     canonical: `${BUSINESS_INFO.website}/automatisierung-sport`,
     keywords: "Automatisierung Fitnessstudio, Sport Digitalisierung, Mitgliederverwaltung automatisieren, Kursanmeldung automatisch",
   },
@@ -23,7 +23,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       title: "Neue Mitglieder werden nicht systematisch eingeführt",
-      description: "Wer als neues Mitglied kein strukturiertes Onboarding erlebt, kommt nach dem ersten Besuch oft nicht wieder. Automatisiertes Onboarding mit Willkommenssequenz, Trainingshinweisen und erstem Buchungsangebot erhöht die Bindung messbar.",
+      description: "Wer als neues Mitglied kein strukturiertes Onboarding erlebt, kommt nach dem ersten Besuch oft nicht wieder. Automatisiertes Onboarding mit Willkommenssequenz, Trainingshinweisen und erstem Buchungsangebot stärkt die Bindung von Anfang an.",
     },
     {
       title: "Zahlungsausfälle werden spät oder gar nicht bearbeitet",
@@ -39,17 +39,17 @@ const config: NationalIndustryPageConfig = {
     },
     {
       title: "Bewertungen und Empfehlungen werden nicht aktiv angefragt",
-      description: "Die meisten zufriedenen Mitglieder empfehlen das Studio nicht aktiv und hinterlassen keine Bewertung – solange man sie nicht darum bittet. Automatisierte Anfragen nach positiven Erlebnissen erhöhen Bewertungsrate und Weiterempfehlungen.",
+      description: "Die meisten zufriedenen Mitglieder empfehlen das Studio nicht aktiv und hinterlassen keine Bewertung – solange man sie nicht darum bittet. Automatisierte Anfragen nach positiven Erlebnissen machen es zufriedenen Mitgliedern leichter, eine Bewertung zu hinterlassen und das Studio weiterzuempfehlen.",
     },
   ],
   solution: {
-    headline: "Mitglieder gewinnen, halten und begeistern – vollautomatisch.",
+    headline: "Mitglieder gewinnen, halten und begeistern – automatisch.",
     text: "Cogniiq automatisiert die Kern-Workflows Ihres Studios: Kursanmeldung, Mitglieder-Onboarding, Zahlungsverfolgung, Re-Engagement und Bewertungsanfragen laufen ohne manuellen Aufwand. Das Ergebnis: weniger Verwaltung, mehr Mitgliederzufriedenheit und geringere Kündigungsrate.",
   },
   benefits: [
     "Online-Kursanmeldung mit automatischer Bestätigung und Warteliste",
     "Automatisches Onboarding für neue Mitglieder",
-    "Zahlungserinnerungen und Mahnprozess vollautomatisch",
+    "Zahlungserinnerungen und Mahnprozess automatisch",
     "Re-Engagement-Sequenz für inaktive Mitglieder",
     "Kurs- und Event-Kommunikation automatisch an alle Mitglieder",
     "Bewertungsanfragen nach positiven Erlebnissen",
@@ -104,7 +104,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Wie hilft Re-Engagement-Automatisierung konkret bei der Mitgliederbindung?",
-      answer: "Mitglieder, die 2–3 Wochen nicht eingecheckt haben, erhalten eine automatische, persönliche Nachricht – mit einem konkreten Angebot oder einer Einladung. Diese Sequenzen reduzieren Kündigungen nachweisbar, weil sie zum richtigen Zeitpunkt und ohne manuellen Aufwand greifen.",
+      answer: "Mitglieder, die 2–3 Wochen nicht eingecheckt haben, erhalten eine automatische, persönliche Nachricht – mit einem konkreten Angebot oder einer Einladung. Diese Sequenzen wirken Kündigungen entgegen, weil sie zum richtigen Zeitpunkt und ohne manuellen Aufwand greifen.",
     },
     {
       question: "Ist die Verarbeitung von Mitgliederdaten DSGVO-konform?",

@@ -124,7 +124,7 @@ const config: IndustryPageConfig = {
       icon: "zap",
       title: "Lead-Automatisierung Bayreuth",
       description:
-        "Eingehende Anfragen werden automatisch qualifiziert, Besichtigungen koordiniert und Follow-ups nach Terminen strukturiert versandt. Keine Anfrage geht verloren, kein Interessent bleibt ohne Reaktion.",
+        "Eingehende Anfragen werden automatisch qualifiziert, Besichtigungen koordiniert und Follow-ups nach Terminen strukturiert versandt. Anfragen werden erfasst und beantwortet – auch abends und am Wochenende.",
     },
   ],
   useCases: [
@@ -136,7 +136,7 @@ const config: IndustryPageConfig = {
     {
       title: "Besichtigungstermine ohne manuelle Koordination",
       description:
-        "Interessenten buchen Besichtigungstermine direkt über die Website oder per KI-Assistent. Bestätigungen, Erinnerungen und Nachfassaktionen laufen vollautomatisch.",
+        "Interessenten buchen Besichtigungstermine direkt über die Website oder per KI-Assistent. Bestätigungen, Erinnerungen und Nachfassaktionen laufen automatisch.",
     },
     {
       title: "Objektanfragen außerhalb der Bürozeiten",
@@ -146,7 +146,7 @@ const config: IndustryPageConfig = {
     {
       title: "Follow-up nach Besichtigung automatisieren",
       description:
-        "Nach jeder Besichtigung wird automatisch eine strukturierte Nachfass-Sequenz ausgelöst. Kein Interessent wird vergessen, kein Kaufentscheidungsmoment verpasst.",
+        "Nach jeder Besichtigung wird automatisch eine strukturierte Nachfass-Sequenz ausgelöst. Interessenten bleiben strukturiert im Blick – auch nach dem Termin.",
     },
     {
       title: "Verkäufer-Akquise über digitale Kanäle",
@@ -163,7 +163,7 @@ const config: IndustryPageConfig = {
     "Mehr qualifizierte Leads durch strukturierte Vorqualifizierung im Anfrage-Prozess",
     "Automatisierte Besichtigungskoordination spart Maklerzeit bei jedem Objekt",
     "Professionelle Objektpräsentation und Makler-Website stärkt Vertrauen bei Käufern und Verkäufern",
-    "Keine verpassten Anfragen – KI-Assistent beantwortet auch abends und am Wochenende",
+    "Anfragen werden erfasst und beantwortet – der KI-Assistent antwortet auch abends und am Wochenende",
     "Follow-up-Automatisierung erhöht die Abschlussrate ohne zusätzlichen Aufwand",
     "Bessere Sichtbarkeit bei lokalen Suchanfragen in Bayreuth – mehr organische Anfragen",
     "Datenschutzorientierte Umsetzung – alle Kundendaten sicher auf europäischen Servern",

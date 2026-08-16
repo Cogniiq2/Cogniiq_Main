@@ -35,7 +35,7 @@ const SERVICES = [
       "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, mehrsprachig, DSGVO-konform. Für Praxen, Gastronomie, Dienstleister und Handwerk in ganz Deutschland.",
     benefits: [
       "Einrichtung in 7–14 Tagen",
-      "Kein verpasster Anruf, keine Warteschleife",
+      "Erreichbar auch dann, wenn niemand abnehmen kann",
       "Mehrsprachig auf Anfrage",
     ],
   },
@@ -204,7 +204,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Was unterscheidet Cogniiq von großen deutschen Agenturen?",
-    a: "Kein Overhead einer Großagentur – direkter Ansprechpartner, faire Preise, schnelle Umsetzung. Wir sind auf drei Kernbereiche spezialisiert und kennen deren Zusammenspiel präzise.",
+    a: "Direkter Ansprechpartner, faire Preise, schnelle Umsetzung – vollständig remote betreut. Wir sind auf drei Kernbereiche spezialisiert und kennen deren Zusammenspiel präzise.",
   },
   {
     q: "Welche Technologien nutzt Cogniiq für Automatisierungen?",
@@ -216,7 +216,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Was kostet ein Projekt mit Cogniiq in Deutschland?",
-    a: "Ohne Münchner oder Berliner Agenturoverhead. KI-Telefonassistenten nach Anrufvolumen, Automatisierungen ab ca. 500–1.500 €. Websites starten ab 1.500 €; individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei etwa 2.500–5.000 €. Erstgespräch immer kostenlos.",
+    a: "Transparente Festpreise, vollständig remote betreut. KI-Telefonassistenten nach Anrufvolumen, Automatisierungen ab ca. 500–1.500 €. Websites starten ab 1.500 €; individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei etwa 2.500–5.000 €. Erstgespräch immer kostenlos.",
   },
 ];
 
@@ -344,7 +344,7 @@ export function DeutschlandPage() {
                   Deutschland hat einen der dichtesten Mittelstandsmärkte der Welt – und gleichzeitig einen der größten Nachholbedarfe bei der Digitalisierung. Viele Unternehmen haben in den letzten Jahren Tools angesammelt, die nicht miteinander kommunizieren, Prozesse, die noch manuell laufen, und eine digitale Präsenz, die nicht dem Standard entspricht, den Kunden heute erwarten.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Cogniiq ist eine spezialisierte KI-Agentur, die genau dort ansetzt: Wir automatisieren Abläufe, die täglich Zeit kosten. Wir setzen KI-Telefonassistenten ein, die kein Unternehmen mehr unerreichbar machen. Und wir entwickeln Websites, die in deutschen Suchmaschinen sichtbar sind und Besucher in qualifizierte Anfragen verwandeln. Alles DSGVO-konform, alles auf europäischen Servern, alles mit persönlicher Betreuung.
+                  Cogniiq ist eine spezialisierte KI-Agentur, die genau dort ansetzt: Wir automatisieren Abläufe, die täglich Zeit kosten. Wir setzen KI-Telefonassistenten ein, die Unternehmen auch außerhalb der Öffnungszeiten erreichbar machen. Und wir entwickeln Websites, die in deutschen Suchmaschinen sichtbar sind und Besucher in qualifizierte Anfragen verwandeln. Alles DSGVO-konform, alles auf europäischen Servern, alles mit persönlicher Betreuung.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                   Mit Hauptsitz in Bayern betreuen wir Projekte in ganz Deutschland – vollständig remote, transparent und ohne Qualitätseinbußen gegenüber lokalen Agenturen. Unser Schwerpunkt liegt auf <Link to="/bayern" className="text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">Bayern</Link>, aber unsere Leistungen kennen keine Grenzen im Bundesgebiet.

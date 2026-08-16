@@ -31,7 +31,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       title: "Neue Anfragen kommen ohne System – und gehen unter",
-      description: "Telefon, E-Mail, Kontaktformular: Anfragen kommen von überall, werden manuell bearbeitet und gehen in ruhigen Phasen unter. Die ersten 60 Minuten nach einer Anfrage entscheiden über Abschluss oder Verlust.",
+      description: "Telefon, E-Mail, Kontaktformular: Anfragen kommen von überall, werden manuell bearbeitet und gehen in ruhigen Phasen unter. Schnelle Reaktion nach einer Anfrage entscheidet oft über Abschluss oder Verlust.",
     },
     {
       title: "Eigentümer-Akquise läuft ausschließlich offline",
@@ -92,7 +92,7 @@ const config: NationalIndustryPageConfig = {
   faq: [
     {
       question: "Was muss eine Makler-Website leisten, um Eigentümer-Anfragen zu gewinnen?",
-      answer: "Eigentümer, die über Verkauf nachdenken, suchen nach Belegen für lokale Kompetenz: abgeschlossene Transaktionen in ihrer Preisklasse, Bewertungen, ein klar kommuniziertes Vorgehen und einen vertrauenswürdigen Gesamteindruck. Eine Eigentümer-Landingpage mit spezifischem Mehrwert – z. B. Marktwerteinschätzung oder Verkaufsratgeber – verstärkt die Konversionsrate messbar.",
+      answer: "Eigentümer, die über Verkauf nachdenken, suchen nach Belegen für lokale Kompetenz: abgeschlossene Transaktionen in ihrer Preisklasse, Bewertungen, ein klar kommuniziertes Vorgehen und einen vertrauenswürdigen Gesamteindruck. Eine Eigentümer-Landingpage mit spezifischem Mehrwert – z. B. Marktwerteinschätzung oder Verkaufsratgeber – stärkt die Konversionsrate zusätzlich.",
     },
     {
       question: "Kann die Website Exposés automatisch anzeigen und aktualisieren?",
@@ -104,7 +104,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Kann die Website mit einem CRM verbunden werden?",
-      answer: "Ja. Wir integrieren Anfragen direkt in OnOffice, Propstack, Flowfact oder andere Systeme. Jede Website-Anfrage landet automatisch als Kontakt im CRM – mit allen Feldern befüllt und einer automatischen Erstnachricht an den Interessenten. Kein Lead geht verloren, keine manuelle Übertragung nötig.",
+      answer: "Ja. Wir integrieren Anfragen direkt in OnOffice, Propstack, Flowfact oder andere Systeme. Jede Website-Anfrage landet automatisch als Kontakt im CRM – mit allen Feldern befüllt und einer automatischen Erstnachricht an den Interessenten. Anfragen werden automatisch erfasst – keine manuelle Übertragung nötig.",
     },
     {
       question: "Was kostet eine Immobilien-Website mit Lead-System?",

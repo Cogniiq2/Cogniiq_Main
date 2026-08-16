@@ -212,7 +212,7 @@ const config: IndustryPageConfig = {
     {
       question: "Kann der KI-Telefonassistent auch Gruppenreservierungen und Eventanfragen bearbeiten?",
       answer:
-        "Für Standardreservierungen ja – vollautomatisch. Größere Gruppenanfragen oder Eventbuchungen werden durch den KI-Assistenten qualifiziert erfasst und mit allen relevanten Angaben strukturiert an Ihr Team weitergeleitet.",
+        "Für Standardreservierungen ja – automatisch nach Ihren Vorgaben. Größere Gruppenanfragen oder Eventbuchungen werden durch den KI-Assistenten qualifiziert erfasst und mit allen relevanten Angaben strukturiert an Ihr Team weitergeleitet.",
     },
     {
       question: "Kann Cogniiq auch bei bestehenden Websites Reservierungsfunktionen nachrüsten?",

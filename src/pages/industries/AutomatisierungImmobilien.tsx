@@ -5,13 +5,13 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 const config: NationalIndustryPageConfig = {
   seo: {
     title: "Automatisierung für Immobilienmakler | Lead-Management & CRM | Cogniiq",
-    description: "Lead-Automatisierung für Immobilienmakler: Sofortige Kontaktaufnahme, automatischer Exposé-Versand, Besichtigungstermine und CRM-Synchronisation. Kein qualifizierter Lead geht mehr verloren.",
+    description: "Lead-Automatisierung für Immobilienmakler: Sofortige Kontaktaufnahme, automatischer Exposé-Versand, Besichtigungstermine und CRM-Synchronisation. Anfragen werden erfasst und beantwortet – auch abends und am Wochenende.",
     canonical: `${BUSINESS_INFO.website}/automatisierung-immobilien`,
     keywords: "Automatisierung Immobilien, Makler Digitalisierung, Lead-Management Makler, Immobilien Prozessautomatisierung",
   },
   h1: "Automatisierung für Immobilienmakler & Immobilienbüros",
   tagline: "Immobilien · Lead-Automatisierung · CRM-Integration",
-  intro: "Ein Interessent fragt abends über Immobilienscout an. Morgen früh ruft er auch beim Wettbewerber an – und entscheidet sich für den, der schneller war. Immobilienmakler verlieren täglich qualifizierte Leads nicht durch schlechtes Angebot, sondern durch zu langsame Reaktion. Automatisierung stellt sicher, dass jeder Lead in Sekunden kontaktiert, qualifiziert und im CRM erfasst wird.",
+  intro: "Ein Interessent fragt abends über Immobilienscout an. Morgen früh ruft er auch beim Wettbewerber an – und entscheidet sich für den, der schneller war. Immobilienmakler verlieren täglich qualifizierte Leads nicht durch schlechtes Angebot, sondern durch zu langsame Reaktion. Automatisierung sorgt dafür, dass Leads sofort nach Eingang kontaktiert, qualifiziert und im CRM erfasst werden.",
   serviceSlug: "leistungen",
   serviceLabel: "Automatisierung Leistungen",
   costLink: "/kosten-automatisierung",
@@ -43,11 +43,11 @@ const config: NationalIndustryPageConfig = {
     },
   ],
   solution: {
-    headline: "Kein Lead geht mehr verloren – vollautomatisch.",
+    headline: "Anfragen werden erfasst und beantwortet – auch abends und am Wochenende.",
     text: "Cogniiq automatisiert das gesamte Lead-Management: Von der ersten Portalanfrage bis zur Unterschrift läuft jede Kommunikation automatisch, strukturiert und nachvollziehbar – im CRM Ihrer Wahl, ohne manuellen Aufwand.",
   },
   benefits: [
-    "Sofortige automatische Kontaktaufnahme nach Anfrage (< 60 Sekunden)",
+    "Automatische Kontaktaufnahme sofort nach Eingang der Anfrage",
     "Automatischer Exposé-Versand nach Interessentenprofil",
     "Online-Besichtigungsbuchung mit automatischem Kalenderabgleich",
     "Lead-Qualifizierung per automatischem Fragebogen",
@@ -56,12 +56,12 @@ const config: NationalIndustryPageConfig = {
     "DSGVO-konforme Interessentendatenverarbeitung",
   ],
   workflow: {
-    title: "Von der Anfrage zum Termin – vollautomatisch",
+    title: "Von der Anfrage zum Termin – automatisch",
     steps: [
       {
         step: "01",
         title: "Lead geht ein",
-        description: "Anfrage über Website, Immobilienportal oder Telefon – der Lead wird innerhalb von Sekunden ins CRM eingetragen, automatisch begrüßt und qualifiziert.",
+        description: "Anfrage über Website, Immobilienportal oder Telefon – der Lead wird sofort nach Eingang ins CRM eingetragen, automatisch begrüßt und qualifiziert.",
       },
       {
         step: "02",
@@ -71,7 +71,7 @@ const config: NationalIndustryPageConfig = {
       {
         step: "03",
         title: "Nachverfolgen bis zum Abschluss",
-        description: "Automatische Follow-up-Sequenzen in der richtigen Frequenz und zum richtigen Zeitpunkt. Kein Interessent fällt durch das Raster – auch Monate später nicht.",
+        description: "Automatische Follow-up-Sequenzen in der richtigen Frequenz und zum richtigen Zeitpunkt. Interessenten bleiben strukturiert im Blick – auch Monate später.",
       },
     ],
   },
@@ -96,7 +96,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Können auch Leads aus Immobilienportalen automatisch erfasst werden?",
-      answer: "Ja. Anfragen von Immobilienscout24, Immowelt, eBay Kleinanzeigen und anderen Portalen laufen direkt in das Automatisierungssystem ein – je nach API-Verfügbarkeit des jeweiligen Portals. Die Kontaktaufnahme erfolgt innerhalb von Sekunden.",
+      answer: "Ja. Anfragen von Immobilienscout24, Immowelt, eBay Kleinanzeigen und anderen Portalen laufen direkt in das Automatisierungssystem ein – je nach API-Verfügbarkeit des jeweiligen Portals. Die Kontaktaufnahme erfolgt sofort nach Eingang der Anfrage.",
     },
     {
       question: "Was kostet Lead-Automatisierung für Immobilienmakler?",
@@ -104,7 +104,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Wie schnell kontaktiert das System einen neuen Lead?",
-      answer: "Innerhalb von unter 60 Sekunden nach der Anfrage. Das ist der entscheidende Unterschied zu manueller Bearbeitung: In der Zeit, in der ein Makler morgens seine E-Mails öffnet, hat das System bereits drei Interessenten kontaktiert, qualifiziert und Exposés verschickt.",
+      answer: "Sofort nach Eingang der Anfrage. Das ist der entscheidende Unterschied zu manueller Bearbeitung: Während ein Makler morgens seine E-Mails öffnet, hat das System eingegangene Anfragen bereits kontaktiert, qualifiziert und Exposés verschickt.",
     },
     {
       question: "Ist die Verarbeitung von Interessentendaten DSGVO-konform?",

@@ -5,7 +5,7 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 const config: NationalIndustryPageConfig = {
   seo: {
     title: "Automatisierung für Arztpraxen & Praxisverwaltung | Cogniiq",
-    description: "Praxisautomatisierung: Terminbestätigungen, Patientenerinnerungen und Rezeptanfragen laufen vollautomatisch – DSGVO-konform, ohne zusätzliches Personal. Mehr Zeit für Ihre Patienten.",
+    description: "Praxisautomatisierung: Terminbestätigungen, Patientenerinnerungen und Rezeptanfragen laufen automatisch – DSGVO-konform, ohne zusätzliches Personal. Mehr Zeit für Ihre Patienten.",
     canonical: `${BUSINESS_INFO.website}/automatisierung-arzt`,
     keywords: "Automatisierung Arztpraxis, Praxis Digitalisierung, Patientenkommunikation automatisieren, Praxisverwaltung Automatisierung",
   },
@@ -19,7 +19,7 @@ const config: NationalIndustryPageConfig = {
   problems: [
     {
       title: "Terminbestätigungen binden täglich Stunden",
-      description: "Jeden Termin einzeln bestätigen, erinnern und bei Absagen nachfassen: In einer mittelgroßen Praxis kostet das 1–2 Stunden pro Tag – ohne jeden medizinischen Mehrwert.",
+      description: "Jeden Termin einzeln bestätigen, erinnern und bei Absagen nachfassen: In einer mittelgroßen Praxis kostet das täglich spürbar Zeit – ohne jeden medizinischen Mehrwert.",
     },
     {
       title: "Rezeptanfragen kommen per Telefon, gehen im Alltag unter",
@@ -39,7 +39,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       title: "Bewertungen entstehen nicht von selbst",
-      description: "Zufriedene Patienten denken nicht automatisch daran, eine Google-Bewertung zu hinterlassen. Ein automatisierter, freundlicher Follow-up nach dem Termin erhöht die Bewertungsrate messbar – ohne aktives Zutun.",
+      description: "Zufriedene Patienten denken nicht automatisch daran, eine Google-Bewertung zu hinterlassen. Ein automatisierter, freundlicher Follow-up nach dem Termin macht es zufriedenen Patienten leichter, eine Bewertung zu hinterlassen – ohne aktives Zutun.",
     },
   ],
   solution: {
@@ -47,7 +47,7 @@ const config: NationalIndustryPageConfig = {
     text: "Cogniiq automatisiert die Routineprozesse Ihrer Praxis vollständig: Terminbestätigungen, Erinnerungen, Rezeptanfragen, Wartelistenkontakt und Follow-ups laufen ohne manuellen Aufwand. Das Ergebnis: ein entlastetes Team, weniger Fehler und Patienten, die besser informiert sind.",
   },
   benefits: [
-    "Terminbestätigung und Erinnerung vollautomatisch",
+    "Terminbestätigung und Erinnerung automatisch",
     "Warteliste wird bei Absagen sofort automatisch kontaktiert",
     "Rezeptanfragen digital strukturiert und weitergeleitet",
     "Patientendaten systemübergreifend synchronisiert",

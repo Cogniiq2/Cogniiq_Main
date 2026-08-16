@@ -39,7 +39,7 @@ const config: ProblemPageConfig = {
       },
       {
         title: "Kundenerwartungen steigen ständig",
-        description: "Kunden erwarten schnelle Reaktionszeiten, 24/7-Erreichbarkeit und nahtlose digitale Prozesse. Ohne Automatisierung können diese Erwartungen nicht erfüllt werden.",
+        description: "Kunden erwarten schnelle Reaktionszeiten, 24/7-Erreichbarkeit und durchgängige digitale Prozesse. Ohne Automatisierung können diese Erwartungen nicht erfüllt werden.",
       },
     ],
   },

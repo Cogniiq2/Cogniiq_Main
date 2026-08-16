@@ -124,7 +124,7 @@ const config: IndustryPageConfig = {
       icon: "zap",
       title: "Lead-Automatisierung Regensburg",
       description:
-        "Eingehende Anfragen werden automatisch qualifiziert, Besichtigungen koordiniert und Follow-ups nach Terminen strukturiert versandt. Keine Anfrage geht verloren, kein Interessent bleibt ohne Reaktion.",
+        "Eingehende Anfragen werden automatisch qualifiziert, Besichtigungen koordiniert und Follow-ups nach Terminen strukturiert versandt. Anfragen werden erfasst und beantwortet – auch abends und am Wochenende.",
     },
   ],
   useCases: [
@@ -136,7 +136,7 @@ const config: IndustryPageConfig = {
     {
       title: "Besichtigungstermine ohne manuelle Koordination",
       description:
-        "Interessenten buchen Besichtigungstermine direkt über die Website oder per KI-Assistent. Bestätigungen, Erinnerungen und Nachfassaktionen laufen vollautomatisch.",
+        "Interessenten buchen Besichtigungstermine direkt über die Website oder per KI-Assistent. Bestätigungen, Erinnerungen und Nachfassaktionen laufen automatisch.",
     },
     {
       title: "Objektanfragen außerhalb der Bürozeiten",
@@ -163,7 +163,7 @@ const config: IndustryPageConfig = {
     "Mehr qualifizierte Leads durch strukturierte Vorqualifizierung im Anfrage-Prozess",
     "Automatisierte Besichtigungskoordination spart Maklerzeit in einem Markt mit hohem Anfragevolumen",
     "Professionelle Objektpräsentation stärkt Vertrauen bei Käufern und Verkäufern in Regensburg",
-    "Keine verpassten Anfragen – KI-Assistent beantwortet auch abends und am Wochenende",
+    "Anfragen werden erfasst und beantwortet – der KI-Assistent antwortet auch abends und am Wochenende",
     "Follow-up-Automatisierung erhöht die Abschlussrate ohne zusätzlichen Aufwand",
     "Bessere Sichtbarkeit bei lokalen und überregionalen Suchanfragen – mehr organische Anfragen",
     "Datenschutzorientierte Umsetzung – alle Kundendaten sicher auf europäischen Servern",

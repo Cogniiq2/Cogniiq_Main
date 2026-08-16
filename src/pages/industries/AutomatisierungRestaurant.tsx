@@ -5,7 +5,7 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 const config: NationalIndustryPageConfig = {
   seo: {
     title: "Automatisierung für Restaurants & Gastronomie | Cogniiq",
-    description: "Gastronomie-Automatisierung: Reservierungsbestätigungen, No-Show-Reduktion, Bewertungsanfragen und Kassendatenabgleich vollautomatisch. Weniger Verwaltung, mehr Zeit für Ihre Gäste.",
+    description: "Gastronomie-Automatisierung: Reservierungsbestätigungen, No-Show-Reduktion, Bewertungsanfragen und Kassendatenabgleich automatisch. Weniger Verwaltung, mehr Zeit für Ihre Gäste.",
     canonical: `${BUSINESS_INFO.website}/automatisierung-restaurant`,
     keywords: "Automatisierung Restaurant, Gastronomie Automatisierung, Reservierung automatisieren, Gastronomie Digitalisierung",
   },
@@ -19,11 +19,11 @@ const config: NationalIndustryPageConfig = {
   problems: [
     {
       title: "Reservierungsbestätigungen laufen manuell – und kosten täglich Zeit",
-      description: "Jede Reservierung einzeln bestätigen, Tisch zuweisen, erinnern und bei Bedarf nachfassen: Das bindet in einem mittelgroßen Restaurant täglich ein bis zwei Stunden, die für den Gästeempfang fehlen.",
+      description: "Jede Reservierung einzeln bestätigen, Tisch zuweisen, erinnern und bei Bedarf nachfassen: Das bindet in einem mittelgroßen Restaurant täglich spürbar Zeit, die für den Gästeempfang fehlt.",
     },
     {
       title: "No-Shows kosten direkt Umsatz",
-      description: "Ein reservierter Tisch, der leer bleibt, weil kein Gast abgesagt hat und kein anderer nachrücken konnte: In einem Restaurant mit 60 Plätzen können das wöchentlich mehrere hundert Euro sein. Automatisierte Erinnerungen mit Bestätigungslink reduzieren No-Shows messbar.",
+      description: "Ein reservierter Tisch, der leer bleibt, weil kein Gast abgesagt hat und kein anderer nachrücken konnte: In einem inhabergeführten Restaurant können das wöchentlich mehrere hundert Euro sein. Automatisierte Erinnerungen mit Bestätigungslink wirken No-Shows entgegen.",
     },
     {
       title: "Lieferantenkommunikation läuft per Telefon und E-Mail",
@@ -35,7 +35,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       title: "Gäste werden nach dem Besuch nicht kontaktiert",
-      description: "Zufriedene Gäste empfehlen weiter – aber nur, wenn man sie aktiv darum bittet. Ein automatischer Follow-up nach dem Besuch mit Bewertungslink erhöht Google-Bewertungen ohne manuellen Aufwand.",
+      description: "Zufriedene Gäste empfehlen weiter – aber nur, wenn man sie aktiv darum bittet. Ein automatischer Follow-up nach dem Besuch mit Bewertungslink macht es zufriedenen Gästen leichter, eine Bewertung zu hinterlassen.",
     },
     {
       title: "Kassendaten werden manuell in die Buchhaltung übertragen",
@@ -56,7 +56,7 @@ const config: NationalIndustryPageConfig = {
     "DSGVO-konforme Gästedatenverarbeitung",
   ],
   workflow: {
-    title: "Vom Tisch bis zur Bewertung – vollautomatisch",
+    title: "Vom Tisch bis zur Bewertung – automatisch",
     steps: [
       {
         step: "01",

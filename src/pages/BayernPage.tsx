@@ -22,7 +22,7 @@ const SERVICES_OVERVIEW = [
     description:
       "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, für Praxen, Gastronomie und Dienstleister in ganz Bayern. Einrichtung in 7–14 Tagen.",
     benefits: [
-      "Kein Anruf mehr verpasst",
+      "Erreichbar auch dann, wenn niemand abnehmen kann",
       "Entlastung von Routinegesprächen",
       "DSGVO-konforme Sprachverarbeitung",
     ],
@@ -58,8 +58,8 @@ const TRUST_POINTS = [
   "Projekte in ganz Bayern – auch remote vollständig betreut",
   "Einrichtung in 7–14 Tagen – keine monatelangen Projekte",
   "DSGVO-konform – alle Daten bleiben in Europa",
-  "Keine anonymen Ticket-Systeme – direkter Ansprechpartner",
-  "Faire Preise – kein Agentur-Overhead, keine versteckten Kosten",
+  "Fester Ansprechpartner – direkter Kontakt für Ihr Projekt",
+  "Faire Preise – transparent kalkuliert, keine versteckten Kosten",
 ];
 
 const CHALLENGES = [
@@ -140,7 +140,7 @@ const INDUSTRIES = [
   {
     name: "Sport, Wellness & Beauty",
     description:
-      "Studios und Salons in Bayern nehmen Buchungen vollautomatisch entgegen, senden Erinnerungen und sind mobil optimal auffindbar.",
+      "Studios und Salons in Bayern nehmen Buchungen automatisch entgegen, senden Erinnerungen und sind mobil optimal auffindbar.",
   },
 ];
 
@@ -149,19 +149,19 @@ const USE_CASE_SCENARIOS = [
     icon: "🏥",
     title: "Hausarztpraxis in Bayern",
     description:
-      "Eine Allgemeinmedizin-Praxis mit sechs Behandlungszimmern erhält montags über 100 Anrufe vor 9 Uhr. Das Praxisteam ist überlastet. Mit einem KI-Telefonassistenten könnten Standardtermine automatisch vergeben, Rezeptanfragen strukturiert entgegengenommen und Rückrufe priorisiert werden. Das Team könnte sich auf die Patienten im Raum konzentrieren.",
+      "Eine Allgemeinmedizin-Praxis erhält montags eine Anrufspitze, die die Anmeldung nicht bewältigen kann. Das Praxisteam ist überlastet. Mit einem KI-Telefonassistenten könnten Standardtermine automatisch vergeben, Rezeptanfragen strukturiert entgegengenommen und Rückrufe priorisiert werden. Das Team könnte sich auf die Patienten im Raum konzentrieren.",
   },
   {
     icon: "🍽️",
     title: "Restaurant in der bayerischen Innenstadt",
     description:
-      "Ein inhabergeführtes Restaurant mit 60 Plätzen erhält täglich Reservierungsanfragen per Telefon – viele abends nach Küchenschluss. Durch Automatisierung laufen Reservierungen, Bestätigungen und Erinnerungen vollautomatisch. Die Website generiert dank lokalem SEO messbar mehr direkte Buchungen.",
+      "Ein inhabergeführtes Restaurant erhält täglich Reservierungsanfragen per Telefon – viele abends nach Küchenschluss. Durch Automatisierung laufen Reservierungen, Bestätigungen und Erinnerungen automatisch. Die Website generiert dank lokalem SEO mehr direkte Buchungen, die sonst am unbesetzten Telefon gescheitert wären.",
   },
   {
     icon: "🔨",
     title: "Handwerksbetrieb im Umland",
     description:
-      "Ein Elektriker mit sieben Mitarbeitern verpasst täglich Auftragsanfragen, weil die Mitarbeiter auf der Baustelle sind. Der KI-Telefonassistent nimmt Anfragen entgegen, qualifiziert das Anliegen und leitet strukturierte Nachrichten weiter. Gleichzeitig läuft die Angebotserstellung und Rechnungsstellung über automatisierte Workflows.",
+      "Ein Elektrobetrieb verpasst täglich Auftragsanfragen, weil die Mitarbeiter auf der Baustelle sind. Der KI-Telefonassistent nimmt Anfragen entgegen, qualifiziert das Anliegen und leitet strukturierte Nachrichten weiter. Gleichzeitig läuft die Angebotserstellung und Rechnungsstellung über automatisierte Workflows.",
   },
   {
     icon: "💼",
@@ -198,11 +198,11 @@ const FAQ_ITEMS = [
   },
   {
     q: "Was kostet eine Website für ein bayerisches Unternehmen?",
-    a: "Websites starten ab ca. 1.500 €. Individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei ca. 2.500–5.000 €, komplexere Projekte nach Aufwand. Kein versteckter Overhead – faire Preise ohne Agenturaufschläge für teure Bürolagen.",
+    a: "Websites starten ab ca. 1.500 €. Individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei ca. 2.500–5.000 €, komplexere Projekte nach Aufwand. Transparente Festpreise ohne versteckte Kosten.",
   },
   {
     q: "Wie unterscheidet sich Cogniiq von anderen Agenturen in Bayern?",
-    a: "Wir sind auf drei Kernbereiche spezialisiert – KI-Telefonie, Automatisierung und Webdesign – und kennen deren Zusammenspiel. Kein Overhead einer Großagentur, direkter Ansprechpartner, persönliche Betreuung und faire Preise.",
+    a: "Wir sind auf drei Kernbereiche spezialisiert – KI-Telefonie, Automatisierung und Webdesign – und kennen deren Zusammenspiel. Direkter Ansprechpartner, persönliche Betreuung und faire, transparente Preise – vollständig remote betreut.",
   },
 ];
 
@@ -340,10 +340,10 @@ export function BayernPage() {
               </h2>
               <div className="space-y-5">
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Bayern ist ein starker Wirtschaftsstandort – mit einem dichten Netz aus mittelständischen Unternehmen, Handwerksbetrieben, Praxen, Gastronomie und wachsenden Start-ups. Was viele dieser Unternehmen verbindet: Sie wollen digital effizienter werden, haben aber keine Ressourcen für große IT-Projekte, keine eigene Tech-Abteilung und kein Budget für teure Beratungsagenturen.
+                  Bayern ist ein starker Wirtschaftsstandort – mit einem dichten Netz aus mittelständischen Unternehmen, Handwerksbetrieben, Praxen, Gastronomie und wachsenden Start-ups. Was viele dieser Unternehmen verbindet: Sie wollen digital effizienter werden, haben aber keine Ressourcen für große IT-Projekte, keine eigene Tech-Abteilung und kein Budget für langwierige Beratungsprojekte.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Cogniiq ist als regionale KI-Agentur genau für diese Unternehmen gemacht. Wir automatisieren Prozesse, die täglich Zeit kosten. Wir setzen KI-Telefonassistenten ein, die keine Anrufe mehr verpassen lassen. Wir entwickeln Websites, die Besucher in Kunden verwandeln. Und wir tun das mit persönlicher Betreuung, klarer Kommunikation und fairen Preisen – ohne Agentur-Overhead, ohne versteckte Kosten.
+                  Cogniiq ist als regionale KI-Agentur genau für diese Unternehmen gemacht. Wir automatisieren Prozesse, die täglich Zeit kosten. Wir setzen KI-Telefonassistenten ein, die Anrufe auch dann annehmen, wenn niemand abnehmen kann. Wir entwickeln Websites, die Besucher in Kunden verwandeln. Und wir tun das mit persönlicher Betreuung, klarer Kommunikation und fairen, transparenten Preisen – ohne versteckte Kosten.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                   Mit Hauptsitz in Bayreuth kennen wir den bayerischen Mittelstand aus erster Hand. Projekte in Regensburg, München und dem gesamten Freistaat betreuen wir remote – vollständig, transparent und ohne Qualitätseinbußen. Unsere Lösungen sind auch <Link to="/deutschland" className="text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">deutschlandweit verfügbar</Link>.

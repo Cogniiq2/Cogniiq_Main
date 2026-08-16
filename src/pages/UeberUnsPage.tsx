@@ -54,7 +54,7 @@ const COMPETENCIES = [
     index: "02",
     icon: Phone,
     name: "KI-Telefonassistenten",
-    tagline: "Kein Anruf geht verloren. Kein Termin bleibt ungebucht.",
+    tagline: "Anrufe werden angenommen statt verpasst. Terminwünsche kommen strukturiert an.",
     points: [
       "Anrufannahme in natürlicher Sprache, auch außerhalb der Öffnungszeiten",
       "Automatische Terminbuchung und Bestätigung",

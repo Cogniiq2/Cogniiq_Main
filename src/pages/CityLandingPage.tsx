@@ -44,7 +44,7 @@ const CITY_CONFIGS: Record<CitySlug, CityConfig> = {
     canonical: `${BUSINESS_INFO.website}/muenchen`,
     title: "AI-Systeme & Webdesign in München | Cogniiq",
     description: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungslösungen für Unternehmen in München. Hochwertige digitale Systeme für den Münchner Markt.",
-    intro: "Cogniiq entwickelt digitale Systeme für Unternehmen in München – von hochkonvertierenden Websites über KI-Telefonassistenten bis zu vollautomatisierten Prozessen.",
+    intro: "Cogniiq entwickelt digitale Systeme für Unternehmen in München – von hochkonvertierenden Websites über KI-Telefonassistenten bis zu automatisierten Prozessen.",
     tagline: "Webdesign München · KI-Telefonassistent München · Automatisierung München",
   },
   regensburg: {

@@ -17,7 +17,7 @@ const SERVICES = [
   {
     icon: Phone,
     title: "KI-Telefonassistent",
-    description: "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, mehrsprachig, DSGVO-konform. Kein verpasster Anruf, keine Warteschleife.",
+    description: "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, mehrsprachig, DSGVO-konform. Erreichbar auch dann, wenn niemand abnehmen kann – ohne Warteschleife.",
     benefits: [
       "Einrichtung in 7–14 Tagen",
       "Integration in bestehende Kalender",
@@ -113,15 +113,15 @@ const RELATED_LINKS = [
 const USE_CASES = [
   {
     title: "Arztpraxis – keine Anrufspitzen mehr",
-    description: "Eine allgemeinmedizinische Praxis mit drei Ärzten erhält montags Anrufspitzen, die das Team überlasten. Der KI-Telefonassistent übernimmt Standardtermine, beantwortet Fragen zu Öffnungszeiten und qualifiziert Notfallanfragen – DSGVO-konform, vollautomatisch.",
+    description: "Eine allgemeinmedizinische Praxis mit drei Ärzten erhält montags Anrufspitzen, die das Team überlasten. Der KI-Telefonassistent übernimmt Standardtermine, beantwortet Fragen zu Öffnungszeiten und qualifiziert Notfallanfragen – DSGVO-konform, automatisch nach Ihren Vorgaben.",
   },
   {
     title: "Restaurant – Reservierungen außerhalb der Öffnungszeiten ohne Mitarbeiter",
     description: "Ein inhabergeführtes Restaurant erhält Reservierungsanfragen auch nach 22 Uhr. KI-Telefonassistent nimmt Reservierungen entgegen, sendet Bestätigungen und Erinnerungen – ohne dass jemand zum Telefon greifen muss.",
   },
   {
-    title: "Handwerksbetrieb – keine verpassten Auftragsanfragen",
-    description: "Ein Elektriker verpasst täglich Anfragen, weil die Mitarbeiter auf der Baustelle sind. Der KI-Assistent nimmt Anrufe an, qualifiziert das Anliegen und leitet strukturierte Nachrichten weiter. Kein Auftrag geht verloren.",
+    title: "Handwerksbetrieb – Auftragsanfragen werden angenommen statt verpasst",
+    description: "Ein Elektriker verpasst täglich Anfragen, weil die Mitarbeiter auf der Baustelle sind. Der KI-Assistent nimmt Anrufe an, qualifiziert das Anliegen und leitet strukturierte Nachrichten weiter. Anfragen werden erfasst – auch wenn niemand abheben kann.",
   },
   {
     title: "Beratungsunternehmen – Systemintegration",
@@ -132,7 +132,7 @@ const USE_CASES = [
 const FAQ_ITEMS = [
   {
     question: "Was ist eine KI Agentur und was unterscheidet Cogniiq?",
-    answer: "Eine KI Agentur hilft Unternehmen, künstliche Intelligenz und Automatisierung in ihre Prozesse zu integrieren. Cogniiq ist auf drei Kernbereiche spezialisiert: KI-Telefonassistenten, Prozessautomatisierung und Webdesign – ohne Großagentur-Overhead, mit direkten Ansprechpartnern und fairen Preisen.",
+    answer: "Eine KI Agentur hilft Unternehmen, künstliche Intelligenz und Automatisierung in ihre Prozesse zu integrieren. Cogniiq ist auf drei Kernbereiche spezialisiert: KI-Telefonassistenten, Prozessautomatisierung und Webdesign – vollständig remote betreut, mit direkten Ansprechpartnern und fairen Preisen.",
   },
   {
     question: "Wie schnell kann ein KI-Telefonassistent eingerichtet werden?",
@@ -144,7 +144,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "Für welche Unternehmensgröße ist ein KI-Telefonassistent geeignet?",
-    answer: "Ab ca. 20–30 Anrufen pro Tag rentiert sich ein KI-Telefonassistent deutlich. Besonders für Solo-Unternehmer, kleine Praxen, Restaurants und Handwerksbetriebe ist es ein unmittelbarer ROI-Gewinn.",
+    answer: "Ob sich der Assistent rechnet, hängt von Anrufaufkommen und Auftragswert ab – das rechnen wir im Erstgespräch mit Ihren Zahlen. Geeignet ist er besonders für Solo-Unternehmer, kleine Praxen, Restaurants und Handwerksbetriebe.",
   },
   {
     question: "Was kostet ein KI-Telefonassistent monatlich?",
@@ -229,7 +229,7 @@ export function KiAgenturDeutschland() {
               </h1>
 
               <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl leading-relaxed mb-8">
-                Cogniiq ist Ihre spezialisierte KI Agentur in Deutschland. Wir implementieren KI-Telefonassistenten, automatisieren Geschäftsprozesse und verbinden Ihre Systeme – DSGVO-konform, schnell und ohne Großagentur-Overhead.
+                Cogniiq ist Ihre spezialisierte KI Agentur in Deutschland. Wir implementieren KI-Telefonassistenten, automatisieren Geschäftsprozesse und verbinden Ihre Systeme – DSGVO-konform, schnell und vollständig remote betreut.
               </p>
 
               <div className="flex flex-wrap gap-4">
@@ -277,7 +277,7 @@ export function KiAgenturDeutschland() {
                   KI wird in Deutschland viel diskutiert, aber selten konkret umgesetzt. Viele Unternehmen wissen, dass sie KI einsetzen sollten – aber nicht wie, wo sie anfangen sollen und was es wirklich kostet. Cogniiq macht KI für den deutschen Mittelstand greifbar und einsatzfähig, ohne Beratungsoverhead und ohne monatelange Implementierungsprojekte.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Unser Fokus liegt auf zwei Bereichen, die sofort ROI erzeugen: KI-Telefonassistenten, die kein Unternehmen mehr unerreichbar machen – und Automatisierungen, die manuelle Abläufe ein für allemal lösen. Beides DSGVO-konform, beides auf europäischen Servern, beides in Wochen statt Monaten umgesetzt.
+                  Unser Fokus liegt auf zwei Bereichen, die sofort ROI erzeugen: KI-Telefonassistenten, die Unternehmen auch außerhalb der Öffnungszeiten erreichbar machen – und Automatisierungen, die manuelle Abläufe ein für allemal lösen. Beides DSGVO-konform, beides auf europäischen Servern, beides in Wochen statt Monaten umgesetzt.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                   Mit Hauptsitz in{" "}

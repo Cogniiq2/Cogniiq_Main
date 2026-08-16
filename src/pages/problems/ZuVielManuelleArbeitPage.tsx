@@ -28,7 +28,7 @@ const config: ProblemPageConfig = {
     points: [
       {
         title: "Direkte Personalkosten",
-        description: "Eine Arbeitsstunde kostet inkl. Lohnnebenkosten ca. 30–60 €. Bei 3 Stunden täglich manueller Arbeit sind das 25.000–50.000 € pro Jahr – für vermeidbare Aufgaben.",
+        description: "Beispielrechnung mit frei gewählten Werten – setzen Sie Ihre eigenen ein: Bei ca. 30–60 € pro Arbeitsstunde inkl. Lohnnebenkosten und 3 Stunden täglich manueller Arbeit ergeben sich 25.000–50.000 € pro Jahr – für vermeidbare Aufgaben.",
       },
       {
         title: "Fehleranfälligkeit und Qualitätskosten",

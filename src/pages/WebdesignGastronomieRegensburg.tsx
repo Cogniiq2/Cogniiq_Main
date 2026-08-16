@@ -212,7 +212,7 @@ const config: IndustryPageConfig = {
     {
       question: "Kann der KI-Assistent auch Gruppenreservierungen und Eventanfragen bearbeiten?",
       answer:
-        "Für Standardreservierungen ja – vollautomatisch. Größere Gruppen oder Events werden durch den KI-Assistenten qualifiziert erfasst und mit allen relevanten Angaben strukturiert an Ihr Team weitergeleitet.",
+        "Für Standardreservierungen ja – automatisch nach Ihren Vorgaben. Größere Gruppen oder Events werden durch den KI-Assistenten qualifiziert erfasst und mit allen relevanten Angaben strukturiert an Ihr Team weitergeleitet.",
     },
     {
       question: "Wie wichtig ist lokale SEO für Restaurants in Regensburg?",

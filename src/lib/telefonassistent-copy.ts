@@ -103,7 +103,10 @@ export const EINRICHTUNG_SCHRITTE: Array<{
   },
 ];
 
-/** M6 · Für Ihr Team — an MFA/Empfang gerichtet, ohne Jobverlust-Abwehrrhetorik. */
+/**
+ * M6/M21 · Für Ihr Praxisteam — an MFA/Empfang gerichtet, ohne
+ * Jobverlust-Abwehrrhetorik: Entlastung konkret zeigen, nicht verteidigen.
+ */
 export const TEAM_BLOCK = {
   headline: "Was sich für Ihr Team am ersten Tag ändert",
   text: "Das Telefon klingelt nicht mehr in dem Moment, in dem eine Patientin am Tresen steht. Wiederkehrende Anliegen — Terminwunsch, Stornierung, Rezeptbestellung — kommen als strukturierte Einträge an, nicht als Klingeln zwischen zwei Handgriffen. Ihr Team entscheidet weiterhin über jeden Termin und jede Rückmeldung; es wird nur seltener dabei unterbrochen.",
@@ -112,6 +115,9 @@ export const TEAM_BLOCK = {
     "Keine doppelte Erfassung: Anliegen kommen strukturiert an, nicht als Notizzettel",
     "Rückrufliste statt Daueralarm: abarbeiten, wenn es in den Ablauf passt",
     "Ihr Team behält die Kontrolle — Regeln und Ansagen lassen sich jederzeit ändern",
+    // [[CLAIM: verify — Einweisung des Teams: wer, wie lange (OWNER-INPUT D/E)]]
+    "Die Einweisung gehört zur Einrichtung: Ihr Team sieht vor dem Start, wo Einträge ankommen und wie Ansagen geändert werden",
+    "Öffnungszeiten und Urlaubsansagen ändert Ihr Team selbst über ein Dashboard — ohne Anruf beim Support",
   ],
 };
 
@@ -143,6 +149,57 @@ export const ANLIEGEN_IMMER_MENSCH: string[] = [
 export const PLANBARE_KOSTEN = {
   headline: "Feste monatliche Kosten, keine Abrechnung pro Anruf",
   text: "Sie zahlen einen festen Monatsbetrag für einen definierten Leistungsumfang. Ein starker Montagmorgen oder eine Grippewelle verändert Ihre Rechnung nicht. Was einmalig anfällt — etwa die Einrichtung — steht vor Vertragsschluss schriftlich im Angebot.",
+};
+
+/**
+ * M15 · Was unser Empfang nicht macht — benannte Grenzen als normaler
+ * Abschnitt, nicht im FAQ versteckt. Bewusst unbequem; nicht abschwächen.
+ */
+export const GRENZEN = {
+  headline: "Was unser Empfang nicht macht",
+  intro:
+    "Ein Telefonassistent, der alles verspricht, hat entweder keine Grenzen definiert oder verschweigt sie. Unsere stehen hier.",
+  points: [
+    "Keine medizinische Einschätzung, keine Triage, keine Beratung. Der Assistent beurteilt niemals, wie dringend ein gesundheitliches Anliegen ist – zu keinem Zeitpunkt, in keiner Konfiguration.",
+    "Kein Ersatz für Ihr Team. Der Assistent nimmt Anrufe an, die sonst verloren gingen – die Entscheidungen über Termine, Rückmeldungen und Ausnahmen bleiben bei Ihren Mitarbeiterinnen und Mitarbeitern.",
+    "Notfälle werden erkannt und sofort weitergeleitet – an Ihr Team, den Bereitschaftsdienst oder mit der klaren Ansage, den Notruf 112 zu wählen. Eine Bewertung des Notfalls findet nicht statt.",
+    "Beschwerden, emotionale Gespräche und alles, was Sie im Anliegen-Katalog als Chefsache markieren, landen immer bei einem Menschen.",
+    // [[CLAIM: verify — Liste der heute noch nicht angebundenen Systeme (OWNER-INPUT B1–B3) ergänzen, sobald sie vorliegt]]
+    "Nicht jedes System ist heute anbindbar. Was für Ihre Software möglich ist, prüfen wir vor dem Angebot – und sagen Ihnen auch, was (noch) nicht geht.",
+    "Der Assistent übernimmt nicht alle Anrufe. Realistisch ist Entlastung zu Stoßzeiten und außerhalb der Öffnungszeiten – nicht die vollständige Übernahme Ihrer Telefonie.",
+  ],
+};
+
+/**
+ * M16 · Wenn wir nicht zu Ihnen passen — konkrete Konstellationen,
+ * sachlich, ohne verstecktes Eigenlob.
+ */
+export const NICHT_PASSEND = {
+  headline: "Wann wir nicht die richtige Lösung sind",
+  intro:
+    "Ein Erstgespräch lohnt sich nicht für jeden Betrieb. In diesen Konstellationen raten wir ab:",
+  points: [
+    "Sie erwarten, dass die Telefonie vollständig ohne Ihr Team läuft. Der Assistent entlastet – er ersetzt keine Anmeldung und keine fachliche Entscheidung.",
+    "Ihr Anrufaufkommen ist sehr gering und Ihr Team gut erreichbar. Dann löst der Assistent kein Problem, das Sie haben – und ein System ohne Problem ist nur ein Kostenpunkt.",
+    "Sie möchten, dass Anrufer nicht erfahren, dass ein Sprachassistent spricht. Diese Transparenz ist für uns nicht verhandelbar – rechtlich wie inhaltlich.",
+  ],
+};
+
+/**
+ * M20 · Was Ihre Patientinnen und Patienten gerade erleben — Patientensicht
+ * aus Praxisperspektive, eigene Sätze, keine Zitate, max. eine Statistik.
+ */
+export const PATIENTEN_SICHT = {
+  headline: "Was Ihre Patientinnen und Patienten gerade erleben",
+  paragraphs: [
+    "Aus Sicht Ihrer Patienten sieht ein überlasteter Montag so aus: immer besetzt, niemand geht ans Telefon, beim dritten Versuch die Warteschleife. Wer absagen wollte, kommt nicht durch – und sorgt sich, den Termin trotzdem in Rechnung gestellt zu bekommen. Manche schließen daraus, die Praxis sei absichtlich nicht erreichbar. Und ein Teil ruft gar nicht erst an, weil ihm Telefonieren schwerfällt.",
+    "Nichts davon hat mit der Qualität Ihrer Medizin zu tun. Aber genau das steht später in der Online-Bewertung – und genau diese Gespräche fängt Ihr Team am Tresen auf, jeden Tag.",
+  ],
+  stat: {
+    value: "39 %",
+    text: "der Versicherten bewerten die Erreichbarkeit von Praxen außerhalb der Öffnungszeiten als schwierig.",
+    source: "GKV-Spitzenverband, Versichertenbefragung 2025",
+  },
 };
 
 /** M12 · Abschluss-CTA — klein, konkret, umkehrbar. */

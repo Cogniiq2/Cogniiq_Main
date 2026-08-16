@@ -17,7 +17,7 @@ const SERVICES = [
   {
     icon: Settings,
     title: "Workflow-Automatisierung",
-    description: "Wiederkehrende Prozesse vollautomatisch abwickeln – Leadverarbeitung, Terminbestätigung, Rechnungsstellung, Kundenkommunikation.",
+    description: "Wiederkehrende Prozesse automatisch nach Ihren Vorgaben abwickeln – Leadverarbeitung, Terminbestätigung, Rechnungsstellung, Kundenkommunikation.",
     benefits: [
       "Quick-Wins in 1–3 Wochen live",
       "Skalierbar ohne Mehrpersonal",
@@ -65,7 +65,7 @@ const CHALLENGES = [
   {
     icon: Shield,
     title: "Fehler durch manuelle Prozesse",
-    description: "Manuelle Eingaben produzieren Fehler: falsche Termine, verlorene Leads, vergessene Rechnungen. Automatisierung macht Fehler strukturell unmöglich.",
+    description: "Manuelle Eingaben produzieren Fehler: falsche Termine, verlorene Leads, vergessene Rechnungen. Automatisierung reduziert diese Fehlerquellen strukturell.",
   },
   {
     icon: Zap,
@@ -110,7 +110,7 @@ const RELATED_LINKS = [
 
 const USE_CASES = [
   {
-    title: "E-Mail-Eingang → CRM → Aufgabe: vollautomatisch",
+    title: "E-Mail-Eingang → CRM → Aufgabe: automatisch",
     description: "Eine neue Kundenanfrage per E-Mail wird automatisch im CRM als Lead angelegt, dem zuständigen Mitarbeiter zugewiesen und eine Aufgabe mit Deadline erstellt. Antwort-E-Mail geht automatisch raus. Ohne dass jemand eingreift.",
   },
   {

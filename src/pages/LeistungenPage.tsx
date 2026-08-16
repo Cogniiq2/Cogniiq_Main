@@ -81,9 +81,9 @@ const SERVICES = [
     index: "03",
     icon: Zap,
     name: "Automatisierung",
-    tagline: "Routineaufgaben laufen vollautomatisch — ohne tägliches Eingreifen, ohne zusätzliches Personal.",
+    tagline: "Routineaufgaben laufen automatisch nach Ihren Vorgaben — ohne tägliches Eingreifen, ohne zusätzliches Personal.",
     benefits: [
-      "Nahtlose Systemintegration: CRM, Kalender, Buchung, Kasse",
+      "Direkte Systemintegration: CRM, Kalender, Buchung, Kasse",
       "Automatische Benachrichtigungen, Erinnerungen und Follow-ups",
       "Prozess-Workflows mit Eskalations- und Ausfall-Logik",
       "Monitoring und Logging für zuverlässigen Dauerbetrieb",
@@ -104,7 +104,7 @@ const SERVICES = [
 ];
 
 const OUTCOMES = [
-  { metric: "Keine verpassten Anrufe mehr", context: "Der KI-Assistent nimmt ab — auch nachts, am Wochenende und bei Stoßzeiten" },
+  { metric: "Erreichbar auch dann, wenn niemand abnehmen kann", context: "Der KI-Assistent nimmt ab — auch nachts, am Wochenende und bei Stoßzeiten" },
   { metric: "Terminbuchung ohne Rückruf", context: "Patienten, Gäste und Kunden buchen direkt — ohne auf eine Antwort zu warten" },
   { metric: "Automatische Terminerinnerungen", context: "Automatische Erinnerungen mit Bestätigungslink bis zu 48 Stunden vorher" },
   { metric: "Mehr qualifizierte Anfragen", context: "SEO-optimierte Websites, die gefunden werden — und Besucher in Kunden verwandeln" },
@@ -116,7 +116,7 @@ const SYSTEM_PANELS = [
     label: "Praxis-System",
     stack: ["Website", "KI-Telefonrezeption", "Terminlogik", "Automatisierung"],
     outcomes: [
-      "Kein verpasster Anruf mehr",
+      "Anrufe werden angenommen statt verpasst",
       "Terminbuchung ohne Empfangsaufwand",
       "Automatische Erinnerungen für Patienten",
       "Entlastung des gesamten Praxisteams",
