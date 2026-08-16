@@ -348,6 +348,7 @@ function SuccessView() {
         className="text-gray-500"
         style={{ fontSize: '14px', lineHeight: 1.65, maxWidth: '30ch' }}
       >
+        {/* [[CLAIM: verify — Reaktionszeit 24 h (OWNER-INPUT D3)]] */}
         Wir melden uns persönlich — in der Regel innerhalb von 24 Stunden.
       </motion.p>
 

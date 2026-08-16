@@ -13,8 +13,9 @@ const faqs = [
   },
   {
     question: 'Wie schnell könnt ihr starten?',
+    // [[CLAIM: verify — Startzeitraum 7–14 Tage (OWNER-INPUT E1)]]
     answer:
-      'In der Regel innerhalb von 7–14 Tagen nach dem Analysegespräch. Je nach Auslastung und Projektumfang kann das auch schneller möglich sein – sprechen Sie uns direkt an.',
+      'In der Regel innerhalb von 7–14 Tagen nach dem Analysegespräch. Je nach Auslastung und Projektumfang kann es auch anders liegen – wir nennen Ihnen im Erstgespräch einen konkreten Termin.',
     category: 'Ablauf',
   },
   {
@@ -44,13 +45,13 @@ const faqs = [
   {
     question: 'Was unterscheidet euch von einer klassischen Webdesign-Agentur?',
     answer:
-      'Wir bauen keine Websites – wir bauen Systeme. Jedes Projekt ist darauf ausgelegt, operative Kosten zu senken, Prozesse zu automatisieren und messbar mehr Umsatz zu erzeugen. Design ist Mittel, nicht Zweck.',
+      'Wir bauen keine Websites – wir bauen Systeme. Jedes Projekt ist darauf ausgelegt, operative Kosten zu senken, Prozesse zu automatisieren und mehr Anfragen zu bringen. Design ist Mittel, nicht Zweck.',
     category: 'Positionierung',
   },
   {
     question: 'Wie läuft ein Projekt typischerweise ab?',
     answer:
-      'Erstgespräch und Analyse, dann ein maßgeschneidertes Systemkonzept, danach Umsetzung in klar definierten Phasen. Kein Agentur-Chaos – klare Verantwortlichkeiten und direkte Kommunikation.',
+      'Erstgespräch und Analyse, dann ein maßgeschneidertes Systemkonzept, danach Umsetzung in klar definierten Phasen – mit klaren Verantwortlichkeiten und direkter Kommunikation.',
     category: 'Ablauf',
   },
 ];

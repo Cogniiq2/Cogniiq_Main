@@ -15,6 +15,10 @@ interface Preset {
   hourlyRate: number;
 }
 
+// Frei gewählte Startwerte, keine Branchenstatistik — der Rechner arbeitet
+// ausschließlich mit den Eingaben des Besuchers.
+// [[CLAIM: eigene gemessene Übernahmequote (OWNER-INPUT F4) nachliefern, bevor
+// der Rechner mit Cogniiq-Werten wirbt]]
 export const INDUSTRY_PRESETS: Record<Industry, Preset> = {
   Arztpraxis:     { callsPerWeek: 120, missedPercent: 32, avgValue: 180,  adminHours: 15, hourlyRate: 28 },
   Gastronomie:    { callsPerWeek: 80,  missedPercent: 35, avgValue: 65,   adminHours: 10, hourlyRate: 18 },
@@ -179,7 +183,7 @@ export function ROICalculator() {
             Stellen Sie die Regler auf Ihre Situation ein — die Kalkulation zeigt Ihnen in
             Echtzeit, wie viel durch verpasste Anrufe und manuelle Verwaltung jeden Monat
             verloren geht.{' '}
-            <span className="font-medium text-gray-700">Konservativ gerechnet.</span>
+            <span className="font-medium text-gray-700">Gerechnet wird nur mit Ihren Eingaben.</span>
           </p>
         </motion.div>
 
@@ -279,7 +283,7 @@ export function ROICalculator() {
                 <Slider
                   label="Effektiver Stundensatz Ihres Personals"
                   hint="inkl. Arbeitgeberkosten"
-                  tooltip="Bruttogehalt + Sozialabgaben + Arbeitgeberbeiträge pro Stunde. Typisch: 25–50 €/h."
+                  tooltip="Bruttogehalt + Sozialabgaben + Arbeitgeberbeiträge pro Stunde – schätzen Sie mit Ihren eigenen Werten."
                   value={hourlyRate}
                   min={12} max={80} step={1} unit="€/h"
                   onChange={setHourlyRate}
@@ -295,7 +299,7 @@ export function ROICalculator() {
                 </div>
                 <p className="text-[11.5px] text-gray-400 leading-relaxed">
                   Verpasste Anrufe × Wochen × Ø-Umsatz + Admin-Stunden × Wochen × Stundensatz.
-                  Alle Zahlen konservativ angesetzt — die Realität ist oft höher.
+                  Die Startwerte sind frei gewählte Beispiele — maßgeblich sind Ihre eigenen Eingaben.
                 </p>
               </div>
             </div>
@@ -364,7 +368,7 @@ export function ROICalculator() {
                         <AnimatedNumber value={lostRevenueMonth} prefix="−" suffix=" €" />
                       </span>
                     </div>
-                    <p className="text-[10.5px] text-gray-700">Anrufe × Ø-Umsatz, konservativ gerechnet</p>
+                    <p className="text-[10.5px] text-gray-700">Anrufe × Ø-Umsatz, aus Ihren Eingaben</p>
                   </div>
                   <div>
                     <div className="flex items-baseline justify-between mb-0.5">
@@ -385,13 +389,13 @@ export function ROICalculator() {
 
                 <div className="bg-white/[0.04] border border-white/[0.07] rounded-xl p-5">
                   <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-gray-600 mb-2">
-                    Wiedergewinnbares Jahrespotenzial
+                    Rechnerisches Jahrespotenzial
                   </p>
                   <p className="text-[34px] font-bold text-white tabular-nums leading-none mb-1">
                     <AnimatedNumber value={annualPotential} suffix=" €" />
                   </p>
                   <p className="text-[11px] text-gray-600 mt-1.5">
-                    durch vollständige Automatisierung zurückgewinnbar
+                    rein rechnerisch, auf Basis Ihrer Eingaben — welcher Anteil realistisch ist, klären wir im Gespräch
                   </p>
                 </div>
               </div>
@@ -412,8 +416,9 @@ export function ROICalculator() {
                 Kostenloses Erstgespräch
                 <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
               </Link>
+              {/* [[CLAIM: verify — Reaktionszeit 24 h (OWNER-INPUT D3)]] */}
               <p className="text-[11px] text-gray-400 text-center mt-3">
-                Kostenlos & unverbindlich · Antwort innerhalb 24 h
+                Kostenlos & unverbindlich · Antwort in der Regel innerhalb 24 h
               </p>
             </div>
 

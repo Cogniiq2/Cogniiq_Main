@@ -40,6 +40,7 @@ const STEPS = [
     color: '#10b981',
     bgLight: 'rgba(16,185,129,0.06)',
     borderLight: 'rgba(16,185,129,0.12)',
+    // [[CLAIM: verify — Reaktionszeit 24 h (OWNER-INPUT D3)]]
     tag: 'Innerhalb 24 h',
     tagColor: '#10b981',
     tagBg: 'rgba(16,185,129,0.08)',

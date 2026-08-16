@@ -16,6 +16,8 @@ const INDUSTRY_ICONS: Record<Industry, string> = {
   Immobilien:     '🏢',
 };
 
+// [[CLAIM: verify — 297 € ist ein Beispielwert und weicht von den publizierten
+// Preisstaffeln (99/199–399/499 €) ab; vom Inhaber vereinheitlichen (OWNER-INPUT A1)]]
 const KI_PRICE_MONTHLY = 297;
 
 function AnimatedNumber({ value, prefix = '', suffix = '', decimals = 0 }: { value: number; prefix?: string; suffix?: string; decimals?: number }) {
@@ -105,7 +107,7 @@ const HUMAN_CAPABILITIES = [
   { label: 'Anrufe annehmen', human: true, ki: true },
   { label: 'Terminbuchung außerhalb der Öffnungszeiten', human: false, ki: true },
   { label: 'Gleichzeitige Anrufe', human: false, ki: true },
-  { label: 'Kein Urlaub, kein Ausfall', human: false, ki: true },
+  { label: 'Kein Urlaub, keine Krankheit', human: false, ki: true },
   { label: 'Empathische Sonderfälle', human: true, ki: false },
   { label: 'Kalender-/CRM-Integration', human: false, ki: true },
   { label: 'Sofortige Bestätigung (SMS/Mail)', human: false, ki: true },
@@ -303,7 +305,7 @@ export function CostComparisonSection() {
                   Empfohlen
                 </span>
               </div>
-              <p className="text-[11.5px] text-gray-500">Fixpreis. Transparent. Sofort einsetzbar.</p>
+              <p className="text-[11.5px] text-gray-500">Beispielwert. Fester Monatsbetrag, im Angebot verbindlich.</p>
             </div>
 
             <div className="relative px-8 py-6">
@@ -318,8 +320,9 @@ export function CostComparisonSection() {
                   </span>
                   <span className="text-[13px] text-gray-500">/ Monat</span>
                 </div>
+                {/* [[CLAIM: verify — Vertragskonditionen (kündbar monatlich) OWNER-INPUT A4/A5]] */}
                 <p className="text-[11.5px] text-gray-600 mt-2">
-                  Einmalige Einrichtung · kündbar monatlich · kein verstecktes
+                  Einmalige Einrichtung wird im Angebot ausgewiesen · Laufzeit und Kündigung stehen im Vertrag
                 </p>
               </div>
 
@@ -333,7 +336,7 @@ export function CostComparisonSection() {
                   'Automatische Terminbuchung',
                   'Integration Kalender & CRM',
                   'Sofortbestätigung per SMS oder Mail',
-                  'Unbegrenzte gleichzeitige Anrufe',
+                  'Mehrere Anrufe gleichzeitig, ohne Warteschleife',
                   'DSGVO-konform · europäische Server',
                   'Laufende Optimierung inklusive',
                 ].map((feature) => (
@@ -458,7 +461,7 @@ export function CostComparisonSection() {
                   KI-Assistent live in 7–14 Tagen
                 </p>
                 <p className="text-[12px] text-gray-500 mb-5 leading-relaxed">
-                  Kündbar monatlich · DSGVO-konform · persönliche Einrichtung
+                  Klare Vertragskonditionen · DSGVO-konform · persönliche Einrichtung
                 </p>
                 <Link
                   to="/kontakt"
