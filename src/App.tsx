@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, type ComponentType, type LazyExoticComponent } from 'react';
+import { lazy, Suspense, useEffect, useLayoutEffect, type ComponentType, type LazyExoticComponent } from 'react';
 import { BrowserRouter as Router, Navigate, Outlet, Routes, Route, useLocation } from 'react-router-dom';
 
 import { PageReveal } from './components/PageReveal';
@@ -26,6 +26,11 @@ import {
 // Path-only module by design: the hydrated app asks set membership, not metadata.
 // See src/lib/routing/publicRoutePaths.ts.
 import { isKnownPublicRoute } from './lib/routing/publicRoutePaths';
+import {
+  PUBLIC_LIGHT_CLASS,
+  setThemePathname,
+  usesPublicLightTheme,
+} from './lib/routing/publicTheme';
 
 type LazyPageComponent = ComponentType<Record<string, unknown>>;
 
@@ -86,6 +91,36 @@ function RouteIndexabilityManager() {
     }
 
     setMeta('robots', DEFAULT_ROBOTS);
+  }, [pathname]);
+
+  return null;
+}
+
+/**
+ * Publishes the current pathname to the theme provider and pins the public light
+ * class on <html>.
+ *
+ * The provider (outside the Router) turns the pathname into `forcedTheme`, which
+ * is what actually keeps `dark` off public pages. This component additionally
+ * carries PUBLIC_LIGHT_CLASS, which the stylesheet uses to pin the light tokens
+ * during the window before hydration, matching the inline script in index.html.
+ *
+ * useLayoutEffect so the update lands before the browser paints the new route.
+ */
+function PublicThemeManager() {
+  const { pathname } = useLocation();
+
+  useLayoutEffect(() => {
+    setThemePathname(pathname);
+
+    const root = document.documentElement;
+    if (usesPublicLightTheme(pathname)) {
+      root.classList.add(PUBLIC_LIGHT_CLASS);
+      root.style.colorScheme = 'light';
+    } else {
+      root.classList.remove(PUBLIC_LIGHT_CLASS);
+      root.style.removeProperty('color-scheme');
+    }
   }, [pathname]);
 
   return null;
@@ -619,6 +654,7 @@ export function AppShell() {
 
   return (
     <AuthProvider>
+      <PublicThemeManager />
       <RouteIndexabilityManager />
       <CanonicalManager />
       <PublicStructuredData />
