@@ -188,12 +188,13 @@ export const LOCATION_PAGES: LocationPage[] = [
 export const PAGE_META = {
   home: {
     title: "Cogniiq – KI-Telefonassistent, Webdesign & Automatisierung für Unternehmen in Bayern",
-    description: "Cogniiq entwickelt operative KI-Systeme für Unternehmen in Bayern: KI-Telefonassistent, hochkonvertierende Websites und Prozessautomatisierung. Kein Anruf geht verloren. Go-Live in 7–14 Tagen.",
+    // [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1)]]
+    description: "Cogniiq entwickelt operative KI-Systeme für Unternehmen in Bayern: KI-Telefonassistent, Websites und Prozessautomatisierung. Erreichbar auch außerhalb der Öffnungszeiten.",
     canonical: "https://cogniiq.de",
   },
   leistungen: {
     title: "Leistungen | KI-Telefonassistent, Webdesign & Automatisierung – Cogniiq",
-    description: "Drei operative Systeme, die täglich für Ihr Unternehmen arbeiten: KI-Telefonassistent, der jeden Anruf beantwortet – Webdesign, das konvertiert – Automatisierung, die manuelle Arbeit eliminiert.",
+    description: "Drei operative Systeme für Ihr Unternehmen: KI-Telefonassistent für die Anrufannahme, Webdesign für mehr Anfragen, Automatisierung gegen manuelle Handarbeit.",
     canonical: "https://cogniiq.de/leistungen",
   },
   ueberUns: {

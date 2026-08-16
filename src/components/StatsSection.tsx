@@ -30,13 +30,14 @@ function CountUp({ to, suffix = '', prefix = '' }: { to: number; suffix?: string
   );
 }
 
+// [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1) bestätigen]]
 const stats = [
   {
     display: 'Auch nachts',
     numeric: null,
-    label: 'Kein Anruf geht verloren',
-    sub: 'Der KI-Assistent nimmt den Anruf entgegen',
-    context: 'Während Wettbewerber schlafen',
+    label: 'Anrufannahme außerhalb der Öffnungszeiten',
+    sub: 'Der Assistent nimmt ab, wenn niemand frei ist',
+    context: 'Abends, am Wochenende, zu Stoßzeiten',
     href: '/ki-telefonassistent',
     accent: false,
   },
@@ -44,26 +45,26 @@ const stats = [
     display: null,
     numeric: { to: 14, prefix: '< ', suffix: '' },
     label: 'Tage bis zum Go-Live',
-    sub: 'Kein monatelanger Vorlauf',
-    context: 'Statt monatelanger Projektlaufzeiten',
+    sub: 'Typischer Projektzeitraum',
+    context: 'Live erst nach Ihrer Freigabe',
     href: '/kontakt',
     accent: true,
   },
   {
-    display: 'Jeder',
+    display: 'Strukturiert',
     numeric: null,
-    label: 'Anruf wird angenommen',
-    sub: 'Auch außerhalb der Öffnungszeiten',
-    context: 'Verpasste Anrufe kosten Umsatz',
+    label: 'Anliegen kommen bei Ihrem Team an',
+    sub: 'Mit Rückrufnummer und nächstem Schritt',
+    context: 'Statt Mailbox und Zettelnotizen',
     href: '/verpasste-anrufe-verlust',
     accent: false,
   },
   {
     display: 'DSGVO',
     numeric: null,
-    label: 'Konforme Umsetzung',
+    label: 'Datenschutz mitgedacht',
     sub: 'Verarbeitung auf europäischen Servern',
-    context: 'Consent-Management ab Tag 1',
+    context: 'AVV nach Art. 28 DSGVO inklusive',
     href: '/ki-telefonassistent',
     accent: false,
   },

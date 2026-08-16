@@ -160,7 +160,8 @@ export function Footer() {
               </div>
 
               <div className="flex flex-wrap gap-1.5">
-                {["DSGVO", "Festpreis", "7–14 Tage", "Made in Bavaria"].map((t) => (
+                {/* [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1)]] */}
+                {["DSGVO", "Festpreis", "7–14 Tage", "Aus Bayreuth"].map((t) => (
                   <span
                     key={t}
                     className="px-2.5 py-1 rounded-md text-[10px] font-medium bg-gray-100 dark:bg-white/[0.06] text-gray-500 dark:text-white/35 border border-gray-200 dark:border-white/[0.06]"

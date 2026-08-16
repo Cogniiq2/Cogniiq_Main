@@ -9,9 +9,10 @@ import {
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
+// [[CLAIM: verify — Einrichtungsdauer 7–14 Tage (OWNER-INPUT E1) bestätigen]]
 const trust = [
   { icon: CheckCircle, text: 'Einrichtung typischerweise in 7–14 Tagen' },
-  { icon: CheckCircle, text: 'Integration mit Kalender & CRM' },
+  { icon: CheckCircle, text: 'Anbindung an Kalender & CRM wird vorab geprüft' },
   { icon: CheckCircle, text: 'DSGVO-konform & europäische Server' },
   { icon: CheckCircle, text: 'Auch außerhalb der Öffnungszeiten erreichbar' },
 ];
@@ -21,8 +22,8 @@ const trust = [
 // source and were removed rather than re-sourced.
 const facts = [
   { stat: 'Auch nachts', label: 'Anrufannahme außerhalb der Öffnungszeiten', icon: PhoneMissed, color: '#ef4444' },
-  { stat: 'Jeder', label: 'Anruf wird entgegengenommen statt abgewiesen', icon: PhoneCall, color: '#f59e0b' },
-  { stat: 'Sofort', label: 'Annahme statt Warteschleife oder Anrufbeantworter', icon: Mic, color: '#22c55e' },
+  { stat: 'Parallel', label: 'Mehrere Anrufe gleichzeitig, ohne Warteschleife', icon: PhoneCall, color: '#f59e0b' },
+  { stat: 'Strukturiert', label: 'Anliegen kommen mit Rückrufnummer bei Ihrem Team an', icon: Mic, color: '#22c55e' },
 ];
 
 const industries = [
@@ -96,15 +97,15 @@ export function KiCTASection() {
                 id="ki-cta-heading"
                 className="text-3xl lg:text-[2.4rem] font-bold text-white leading-[1.08] tracking-[-0.02em] mb-5 max-w-lg"
               >
-                Jeder Anruf beantwortet.
+                Erreichbar, wenn niemand frei ist.
                 <br />
-                <span className="text-gray-500">Jeder Termin gebucht. Automatisch.</span>
+                <span className="text-gray-500">Termine gebucht, Anliegen erfasst.</span>
               </h2>
 
               <p className="text-[14.5px] text-gray-400 leading-[1.72] max-w-[420px] mb-7">
-                Die meisten Unternehmen verlieren täglich Kunden ans Besetztzeichen. Unser
-                KI-Telefonassistent übernimmt jeden Anruf, bucht Termine und beantwortet Fragen —
-                vollautomatisch, in natürlicher Sprache.
+                Anrufe kommen, wenn Ihr Team gebunden ist — und landen im Besetztzeichen.
+                Der KI-Telefonassistent nimmt diese Anrufe an, bucht Termine nach Ihren
+                Regeln und übergibt Anliegen strukturiert an Ihr Team.
               </p>
 
               {/* Trust checkmarks */}
@@ -201,13 +202,9 @@ export function KiCTASection() {
               className="hidden lg:flex flex-col justify-center px-8 py-14 bg-white/[0.015] border-l border-white/[0.04]"
             >
               <div className="flex items-center gap-2 mb-6">
-                <motion.div
-                  className="w-1.5 h-1.5 rounded-full bg-red-500"
-                  animate={{ opacity: [1, 0.4, 1] }}
-                  transition={{ duration: 1.2, repeat: Infinity }}
-                />
+                <div className="w-1.5 h-1.5 rounded-full bg-sky-500/70" />
                 <p className="text-[9.5px] font-semibold uppercase tracking-[0.2em] text-gray-600">
-                  Live Gespräch
+                  Beispielgespräch
                 </p>
               </div>
               <div className="space-y-2.5">

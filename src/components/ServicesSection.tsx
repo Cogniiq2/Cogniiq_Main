@@ -43,7 +43,7 @@ const services = [
     number: '02',
     title: 'KI-Telefonassistent',
     description:
-      'Nimmt jeden Anruf entgegen, bucht Termine und beantwortet Fragen – vollautomatisch, in natürlicher Sprache, auch außerhalb der Öffnungszeiten. Kein Anruf geht verloren.',
+      'Nimmt Anrufe entgegen, wenn Ihr Team gebunden ist – bucht Termine nach Ihren Regeln und beantwortet Fragen in natürlicher Sprache, auch außerhalb der Öffnungszeiten.',
     icon: PhoneCall,
     link: '/ki-telefonassistent',
     cityLinks: [
@@ -54,7 +54,7 @@ const services = [
     features: [
       'Anrufannahme in natürlicher Sprache',
       'Terminbuchung & -änderung in Echtzeit',
-      'Nahtlose Anbindung an Kalender & CRM',
+      'Anbindung an Kalender & CRM – vorab geprüft',
       'DSGVO-konform · Europäische Server · auch außerhalb der Öffnungszeiten',
     ],
     roi: { value: 'Auch nachts', label: 'Anrufannahme' },
@@ -178,7 +178,7 @@ export function ServicesSection() {
               >
                 {service.featured && (
                   <span className="absolute top-8 right-8 text-[9px] font-semibold uppercase tracking-[0.15em] px-2.5 py-1 rounded-full bg-sky-500/10 border border-sky-400/20 text-sky-300">
-                    Meistgebucht
+                    Im Fokus
                   </span>
                 )}
 

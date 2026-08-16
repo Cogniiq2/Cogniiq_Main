@@ -8,8 +8,8 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, nu
 const problems = [
   {
     icon: PhoneMissed,
-    title: 'Jeder verpasste Anruf ist ein verlorener Kunde.',
-    body: 'Unbeantwortete Anrufe sind täglicher Umsatzverlust. Wer nicht abhebt, verliert an den Mitbewerber, der es tut.',
+    title: 'Verpasste Anrufe sind verlorene Aufträge.',
+    body: 'Wer mehrfach niemanden erreicht, versucht es oft beim nächsten Anbieter — und die Anfrage taucht in keiner Liste auf.',
     stat: 'Täglich',
     statLabel: 'gehen Anrufe unbeantwortet verloren',
     accent: true,

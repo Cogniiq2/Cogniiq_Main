@@ -247,8 +247,9 @@ const services = [
   { icon: Zap, label: 'Automatisierung', href: '/automatisierung-unternehmen' },
 ];
 
+// [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1) bestätigen]]
 const proof = [
-  { value: 'Auch nachts', label: 'Erreichbarkeit', sub: 'Kein Anruf verpasst' },
+  { value: 'Auch nachts', label: 'Erreichbarkeit', sub: 'Anrufannahme außerhalb der Öffnungszeiten' },
   { value: '7–14 Tage', label: 'Go-Live', sub: 'Typischer Projektzeitraum' },
 ];
 
@@ -331,9 +332,9 @@ export function DesktopHero() {
 
           <h1 className="mb-6">
             {[
-              { text: 'Kein Anruf', color: 'text-gray-950', delay: 0.55 },
-              { text: 'mehr verpasst.', color: 'text-gray-950', delay: 0.68 },
-              { text: 'Kein Lead verloren.', color: 'text-gray-200', delay: 0.81 },
+              { text: 'Erreichbar,', color: 'text-gray-950', delay: 0.55 },
+              { text: 'wenn niemand frei ist.', color: 'text-gray-950', delay: 0.68 },
+              { text: 'Auch nachts. Auch samstags.', color: 'text-gray-200', delay: 0.81 },
             ].map(({ text, color, delay }) => (
               <div key={text} className="overflow-hidden">
                 <motion.div
@@ -354,8 +355,9 @@ export function DesktopHero() {
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.75, delay: 1.05, ease: E }}
           >
-            Ihr KI-Telefonassistent nimmt jeden Anruf an — auch um 2 Uhr nachts, am Wochenende, bei Stoßzeiten.
-            Kein Rückruf nötig. Kein Kunde verloren.
+            Ihr KI-Telefonassistent nimmt Anrufe an, wenn Ihr Team gebunden ist —
+            abends, am Wochenende, zu Stoßzeiten. Anliegen kommen strukturiert
+            bei Ihnen an, statt auf der Mailbox zu enden.
           </motion.p>
 
           <motion.div
@@ -369,6 +371,7 @@ export function DesktopHero() {
             transition={{ duration: 0.6, delay: 1.18, ease: E }}
           >
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" aria-hidden="true" />
+            {/* [[CLAIM: verify — Go-Live-Zeitraum (OWNER-INPUT E1)]] */}
             <span className="text-[12px] font-semibold text-gray-700">
               Go-Live typischerweise in 7–14 Tagen
             </span>

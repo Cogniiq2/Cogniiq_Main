@@ -62,7 +62,7 @@ const highlights = [
   {
     icon: Wrench,
     text:
-      "Technische Exzellenz: Moderne, skalierbare digitale Systeme, die nahtlos ineinandergreifen und zuverlässig im Hintergrund arbeiten – präzise, robust und zukunftssicher.",
+      "Moderne, skalierbare digitale Systeme, die ineinandergreifen und zuverlässig im Hintergrund arbeiten – gebaut für den täglichen Betrieb, nicht für die Präsentation.",
   },
   {
     icon: Award,
@@ -72,16 +72,20 @@ const highlights = [
 ];
 
 // FOUNDERS BLOCK --------------------------------------------------------------
+// Neutral roles only: the previously published specialisations contradicted the
+// structured data (seo-data.ts documents the same decision) and were never
+// confirmed. [[CLAIM: Gründer-Spezialisierungen vom Inhaber bestätigen, bevor
+// sie wieder personenbezogen ausgewiesen werden]]
 const founders = [
   {
     name: "Lazar Popovic",
     role:
-      "Founder: AI-Automationen, KI-Workflows & technische Integrationen. Fokus auf präzise Prozessautomatisierung, effiziente Abläufe und skalierbare digitale Systeme – ohne unnötige Komplexität.",
+      "Gründer. Gemeinsame Verantwortung für Automatisierung, Websites und KI-Systeme – von der Konzeption bis zum laufenden Betrieb.",
   },
   {
     name: "Djordje Popovic",
     role:
-      "Founder: Webdesign, System-Architektur & Performance-Optimierung. Entwickelt hochmoderne Websites und digitale Erlebnisse, die klar strukturiert sind und echten geschäftlichen Mehrwert liefern.",
+      "Gründer. Gemeinsame Verantwortung für Automatisierung, Websites und KI-Systeme – von der Konzeption bis zum laufenden Betrieb.",
   },
 ];
 
@@ -131,7 +135,7 @@ export function AboutSection() {
 
               <GlossaryWord
                 word="Komplexität"
-                explanation="Unsere Systeme sind extrem komplex im Hintergrund – vollautomatisierte Logik, Integrationen und KI-Modelle. Für Sie bleibt alles radikal einfach: klar, intuitiv und komplett alltagstauglich – ohne technischen Aufwand."
+                explanation="Unsere Systeme sind im Hintergrund komplex – automatisierte Logik, Integrationen und KI-Modelle. Für Sie bleibt die tägliche Arbeit einfach: klar, intuitiv und alltagstauglich."
               />
               .
               <br />
@@ -145,9 +149,9 @@ export function AboutSection() {
               mit modernster {" "}
               <GlossaryWord
                 word="AI-Automatisierung"
-                explanation="Vollautomatisierte Prozesse mit KI, die Aufgaben übernehmen, Entscheidungen treffen und Abläufe selbstständig ausführen. Ergebnis: weniger manuelle Arbeit, weniger Fehler, mehr Skalierungsmöglichkeiten."
+                explanation="Automatisierte Prozesse mit KI, die wiederkehrende Aufgaben nach Ihren Regeln übernehmen. Ergebnis: weniger manuelle Arbeit, weniger Übertragungsfehler, mehr Zeit für das Eigentliche."
               />
-              . Unternehmen in ganz Deutschland profitieren von Websites, die verkaufen – und Systemen, die Arbeit automatisieren.
+              . Für Unternehmen in ganz Deutschland – mit Websites, die Anfragen bringen, und Systemen, die Handarbeit reduzieren.
             </p>
 
             {/* HIGHLIGHTS */}

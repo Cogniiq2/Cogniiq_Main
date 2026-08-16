@@ -69,18 +69,18 @@ const SCENARIOS: Scenario[] = [
       serviceIcon: PhoneCall,
       title: 'Mit KI-Rezeptionistin',
       points: [
-        'Jeder Anruf wird sofort entgegengenommen — auch außerhalb der Öffnungszeiten',
+        'Anrufe werden angenommen, wenn die Anmeldung gebunden ist — auch außerhalb der Öffnungszeiten',
         'Terminbuchung direkt in den Kalender eingetragen',
         'Erinnerungs-SMS automatisch versendet',
         'Rezeptionistin konzentriert sich auf Patienten',
-        'Alle Anrufe protokolliert & analysierbar',
+        'Angenommene Gespräche protokolliert & nachvollziehbar',
       ],
       stat: 'Auch nachts',
       statLabel: 'Anrufannahme außerhalb der Öffnungszeiten',
     },
     chat: [
       { role: 'caller', text: 'Hallo, ich würde gerne einen Termin vereinbaren.' },
-      { role: 'ai', text: 'Guten Tag! Ich bin die digitale Assistenz der Praxis Dr. Müller. Welchen Arzt möchten Sie besuchen — Allgemein oder Spezialsprechstunde?' },
+      { role: 'ai', text: 'Guten Tag! Hier ist die digitale Assistenz der Praxis. Welchen Arzt möchten Sie besuchen — Allgemein- oder Spezialsprechstunde?' },
       { role: 'caller', text: 'Allgemeinmedizin bitte, möglichst diese Woche.' },
       { role: 'ai', text: 'Kein Problem. Ich sehe freie Termine: Donnerstag 10:15 Uhr oder Freitag 14:30 Uhr. Welcher passt Ihnen besser?' },
       { role: 'caller', text: 'Donnerstag 10:15, perfekt.' },
@@ -112,14 +112,14 @@ const SCENARIOS: Scenario[] = [
         'Automatische Erinnerungs-SMS 24h vorher',
         'Warteliste bei vollen Zeiten automatisch verwaltet',
         'Service-Team fokussiert auf Gäste vor Ort',
-        'No-Show-Rate drastisch reduziert',
+        'Erinnerungen am Vortag wirken No-Shows entgegen',
       ],
       stat: 'Weniger',
       statLabel: 'No-Shows durch automatische Erinnerungen',
     },
     chat: [
       { role: 'caller', text: 'Guten Abend, kann ich für Samstag einen Tisch reservieren?' },
-      { role: 'ai', text: 'Guten Abend! Herzlich willkommen beim Ristorante Bella Vista. Für wie viele Personen darf ich reservieren?' },
+      { role: 'ai', text: 'Guten Abend, herzlich willkommen! Für wie viele Personen darf ich reservieren?' },
       { role: 'caller', text: 'Für 4 Personen, am liebsten 19:30 Uhr.' },
       { role: 'ai', text: 'Samstag 19:30 Uhr für 4 Personen ist verfügbar. Haben Sie besondere Wünsche — Fenstertisch oder Allergieinformationen?' },
       { role: 'caller', text: 'Einen Fenstertisch wäre toll.' },
@@ -147,17 +147,17 @@ const SCENARIOS: Scenario[] = [
       serviceIcon: Zap,
       title: 'Mit KI-Automatisierung',
       points: [
-        'Sofortantwort auf jede Anfrage — in Sekunden',
+        'Automatische Erstantwort auf eingehende Anfragen',
         'Automatische Lead-Qualifizierung per Fragebogen',
         'Besichtigungstermine selbst buchbar im Kalender',
-        'Follow-up-Sequenzen vollautomatisch',
-        'Nur qualifizierte Leads landen beim Makler',
+        'Follow-up-Sequenzen laufen automatisiert',
+        'Qualifizierte Leads landen sortiert beim Makler',
       ],
       stat: 'Mehr',
       statLabel: 'qualifizierte Besichtigungen durch automatische Vorqualifizierung',
     },
     chat: [
-      { role: 'caller', text: 'Ich habe Interesse an der Wohnung in der Hauptstraße 12.' },
+      { role: 'caller', text: 'Ich habe Interesse an der inserierten 3-Zimmer-Wohnung.' },
       { role: 'ai', text: 'Hallo! Danke für Ihr Interesse. Darf ich Ihnen kurz ein paar Fragen stellen, damit wir den Termin optimal vorbereiten können?' },
       { role: 'caller', text: 'Ja, natürlich.' },
       { role: 'ai', text: 'Suchen Sie zur Eigennutzung oder als Kapitalanlage? Und haben Sie bereits eine Finanzierungszusage?' },
@@ -396,9 +396,9 @@ export function SolutionShowcase() {
             <div className="bg-gray-950 rounded-2xl border border-white/[0.05] p-6 flex flex-col">
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <div className="w-2 h-2 rounded-full bg-emerald-500/70" />
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-500">
-                    Live-Demo
+                    Beispielgespräch
                   </p>
                 </div>
                 <div className="flex gap-1">

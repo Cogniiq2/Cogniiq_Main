@@ -24,7 +24,8 @@ const principles = [
   {
     icon: Zap,
     title: "Wochen, nicht Monate.",
-    text: "Go-Live in 7–14 Tagen. Keine endlosen Abstimmungsrunden, keine Wasserfall-Projektphasen. Das System läuft, bevor andere noch Angebote verschicken.",
+    // [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1)]]
+    text: "Go-Live typischerweise in 7–14 Tagen. Keine endlosen Abstimmungsrunden, keine Wasserfall-Projektphasen. Live geht das System erst nach Ihrer Freigabe.",
     link: "/kontakt",
     linkLabel: "Jetzt starten",
     highlight: false,
@@ -32,7 +33,7 @@ const principles = [
   {
     icon: Target,
     title: "Präzise. Ohne Overhead.",
-    text: "Keine Software-Lizenzen für Tools, deren Funktionsumfang zum größten Teil ungenutzt bleibt. Keine Generalist-Agenturen mit 12-köpfigen Teams. Fokus auf das, was wirkt.",
+    text: "Keine Software-Lizenzen für Tools, deren Funktionsumfang zum größten Teil ungenutzt bleibt. Direkte Zusammenarbeit mit festem Ansprechpartner. Fokus auf das, was wirkt.",
     link: "/leistungen",
     linkLabel: "Unsere Methode",
     highlight: false,
@@ -47,16 +48,16 @@ const principles = [
   },
   {
     icon: TrendingUp,
-    title: "Wer heute nicht automatisiert, verliert morgen.",
-    text: "Der Wettbewerbsvorteil liegt nicht in mehr Budget oder mehr Personal. Er liegt im System. Wir bauen das Fundament, bevor andere noch darüber nachdenken.",
+    title: "Automatisierung als Fundament.",
+    text: "Der Vorteil liegt selten in mehr Budget oder mehr Personal, sondern im System dahinter. Wir bauen dieses Fundament – Schritt für Schritt, beginnend beim größten Hebel.",
     link: "/leistungen",
     linkLabel: "Mehr erfahren",
     highlight: false,
   },
   {
     icon: Clock,
-    title: "Ergebnisse, die sich messen lassen.",
-    text: "Mehr Anfragen. Mehr Buchungen. Weniger Zeitaufwand. Jedes Projekt startet mit einem klaren Ziel – und endet mit einer messbaren Veränderung.",
+    title: "Ziele, die sich überprüfen lassen.",
+    text: "Jedes Projekt startet mit einem klaren Ziel: mehr Anfragen, weniger Unterbrechungen, weniger Handarbeit. Woran der Erfolg gemessen wird, legen wir vorher gemeinsam fest.",
     link: "/kontakt",
     linkLabel: "Demo anfragen",
     highlight: false,
@@ -92,9 +93,9 @@ export function TrustSection() {
               id="trust-heading"
               className="text-4xl lg:text-5xl font-bold text-gray-900 leading-[1.08] tracking-tight"
             >
-              Was uns von
+              Wie wir arbeiten —
               <br />
-              <span className="text-gray-300">anderen Agenturen trennt.</span>
+              <span className="text-gray-300">und woran Sie uns messen können.</span>
             </h2>
           </motion.div>
 

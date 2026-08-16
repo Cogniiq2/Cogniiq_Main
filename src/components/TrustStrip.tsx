@@ -1,15 +1,17 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { Shield, Clock, Users, Award, Lock } from 'lucide-react';
+import { Shield, Clock, Users, Wrench, Lock } from 'lucide-react';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
+// Kein Siegel-Charakter: neutrale Icons, Aussagen als Arbeitsweise formuliert.
+// [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1)]]
 const ITEMS = [
   { icon: Shield, label: 'DSGVO-konform', sub: 'Verarbeitung auf europäischen Servern' },
-  { icon: Clock, label: 'Go-Live in 7–14 Tagen', sub: 'Nicht Monate – Wochen' },
+  { icon: Clock, label: 'Go-Live typisch in 7–14 Tagen', sub: 'Live erst nach Ihrer Freigabe' },
   { icon: Users, label: 'Direkter Ansprechpartner', sub: 'Kein Ticket-System' },
-  { icon: Award, label: 'Keine Templates', sub: 'Gebaut für Ihren Prozess' },
-  { icon: Lock, label: 'Festpreis', sub: 'Kein verstecktes Scope-Creep' },
+  { icon: Wrench, label: 'Keine Templates', sub: 'Gebaut für Ihren Prozess' },
+  { icon: Lock, label: 'Festpreis', sub: 'Einmalposten stehen im Angebot' },
 ];
 
 export function TrustStrip() {
