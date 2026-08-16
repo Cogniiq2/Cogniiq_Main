@@ -8,6 +8,13 @@
          Mode v2, Basic). Before consent there is no Google tag request, no
          advertising cookie and no cookieless ping. -->
 
+    <!-- Public light theme.
+         Runs while the document is parsing, before the first paint, so a public
+         page never shows a dark frame for a visitor whose generic `cogniiq-theme`
+         preference (shared with /app) is dark. Kept in sync with
+         src/lib/routing/publicTheme.ts by publicTheme.test.ts. -->
+    <script>(function(){try{var p=location.pathname;var q=["/app","/admin","/owner","/auth","/d"];for(var i=0;i<q.length;i++){if(p===q[i]||p.indexOf(q[i]+"/")===0)return;}var d=document.documentElement;d.classList.remove("dark");d.classList.add("cq-public-light");d.style.colorScheme="light";}catch(e){}})();</script>
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
