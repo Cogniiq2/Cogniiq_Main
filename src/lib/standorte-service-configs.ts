@@ -15,8 +15,18 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import { BUSINESS_INFO } from "./seo-data";
 import type { CityServiceConfig } from "./standorte-data";
+import { EINRICHTUNG_SCHRITTE } from "./telefonassistent-copy";
 
 const base = BUSINESS_INFO.website;
+
+// Gemeinsamer Einrichtungsprozess für die drei Telefonassistent-Stadtseiten.
+// Bewusst identisch (Brief §7.3: Prozess-Schritte sind zulässige geteilte
+// Blöcke) — die stadtspezifischen Inhalte liegen in Intro, Szenarien und FAQ.
+const TELEFONASSISTENT_PROZESS = EINRICHTUNG_SCHRITTE.map((s) => ({
+  number: s.step,
+  title: s.title,
+  description: s.description,
+}));
 
 export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
 
@@ -28,122 +38,117 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     serviceSlug: "ki-telefonassistent",
     route: "/bayreuth/ki-telefonassistent",
     seo: {
-      title: "KI Telefonassistent Bayreuth – AI Rezeption & Anrufannahme | Cogniiq",
-      description: "KI Telefonassistent Bayreuth: Automatische Anrufannahme, Terminbuchung & Weiterleitung für lokale Unternehmen. DSGVO-konform, auch außerhalb der Öffnungszeiten, Einrichtung in 7–14 Tagen.",
+      title: "KI Telefonassistent Bayreuth – Anrufannahme | Cogniiq",
+      description: "KI Telefonassistent für Betriebe in Bayreuth: Anrufannahme mit Ihren Ansagen und Regeln, strukturierte Übergabe an Ihr Team, Betreuung vor Ort. DSGVO-konform.",
       canonical: `${base}/bayreuth/ki-telefonassistent`,
     },
     intro: {
       h1: "KI Telefonassistent in Bayreuth",
-      lead: "Für Praxen, Restaurants und lokale Dienstleister in Bayreuth, die keine Anrufe mehr verpassen wollen. Der KI Telefonassistent übernimmt Terminannahme, Auskunft und Weiterleitung – auch außerhalb der Öffnungszeiten, ohne Warteschleife, ohne zusätzliches Personal.",
+      lead: "Das Telefon klingelt, während Patient oder Gast vor Ihnen steht – in Praxen, Gastronomie und Betrieben in Bayreuth gehört dieser Moment zum Alltag. Der KI Telefonassistent von Cogniiq nimmt diese Anrufe an: mit Ihren Ansagen, nach Ihren Regeln und mit einer Übergabe, die bei Ihrem Team ankommt.",
     },
     localIntro: {
       paragraphs: [
-        "Bayreuth ist eine lebendige Mittelstadt im Herzen Oberfrankens – geprägt von einem dichten Netz an Arztpraxen, Zahnarztpraxen, Physiotherapeuten, Gastronomie, Sport- und Freizeiteinrichtungen sowie einem breiten Spektrum lokaler Handwerksbetriebe und Dienstleister. Der gemeinsame Nenner dieser Branchen: täglich eingehende Anrufe, die wertvolle Arbeitszeit binden und oft unbeantwortet bleiben, sobald das Personal in Behandlungen, im Service oder im Kundengespräch ist.",
-        "Genau für diese Lücke ist der KI Telefonassistent von Cogniiq entwickelt worden. Er übernimmt die telefonische Kommunikation vollständig oder ergänzt Ihr Team gezielt in den Zeiten, in denen kein Personal verfügbar ist – Montagmorgen, Mittagspause, nach Feierabend, am Wochenende. Anrufe werden professionell angenommen, häufige Fragen zu Öffnungszeiten, Preisen oder Verfügbarkeit werden sofort beantwortet, Termine werden direkt in Ihr Buchungssystem eingetragen, und komplexere Anliegen werden strukturiert an Ihr Team weitergeleitet.",
-        "Für Unternehmen in Bayreuth bedeutet das konkret: kein verpasster Anruf mehr außerhalb der Öffnungszeiten, deutlich weniger Unterbrechungen des laufenden Betriebs und ein professioneller, konsistenter erster Eindruck für jeden Anrufer. Der Assistent klingt nicht wie ein Telefonmenü – er führt echte Gespräche, versteht Kontext und reagiert situationsangemessen.",
-        "Die Einrichtung des KI Telefonassistenten in Bayreuth dauert 7–14 Tage und wird vollständig von Cogniiq übernommen. Es sind keine technischen Vorkenntnisse, keine neue Telefonanlage und keine dauerhaften Softwarelizenzen erforderlich. Sie arbeiten weiterhin mit Ihrer bestehenden Telefonnummer. Als Anbieter mit Hauptsitz in Bayreuth stehen wir für persönliche Betreuung und direkte Erreichbarkeit – kein Ticket-System, kein anonymes Support-Center.",
-        "Ob Sie eine Arztpraxis in der Innenstadt führen, ein Restaurant rund um den Festspielpark betreiben oder einen Handwerksbetrieb im Umland von Bayreuth haben – der KI Telefonassistent ist auf Ihre spezifischen Anforderungen konfigurierbar. Die Lösung wächst mit Ihrem Betrieb und kann jederzeit angepasst werden, wenn sich Ihr Angebot, Ihre Öffnungszeiten oder Ihre Prozesse ändern. Auch unser Leistungsangebot für [Automatisierung in Bayreuth](/bayreuth/automatisierung) und [Webdesign in Bayreuth](/bayreuth/webdesign) kann nahtlos ergänzt werden.",
+        "Bayreuth ist eine Mittelstadt in Oberfranken mit einem dichten Besatz an Arzt- und Zahnarztpraxen, Therapiepraxen, Gastronomie, Sportanlagen und Handwerksbetrieben. So unterschiedlich diese Betriebe sind – am Telefon teilen sie dasselbe Problem: Die Anrufe kommen gebündelt zu Stoßzeiten, genau dann, wenn das Personal in Behandlung, Service oder Kundengespräch gebunden ist.",
+        "Der Telefonassistent nimmt die Anrufe an, die sonst ins Leere laufen: morgens vor Öffnung, in der Mittagspause, nach Feierabend, am Wochenende. Wiederkehrende Fragen zu Zeiten, Anfahrt oder Verfügbarkeit beantwortet er nach Ihren Vorgaben. Terminwünsche trägt er nach Ihren Regeln ein oder legt sie zur Bestätigung vor. Alles andere übergibt er strukturiert an Ihr Team – mit Rückrufnummer, Anliegen und nächstem Schritt.",
+        "Ehrlich betrachtet: Viele Betriebe haben Telefonassistenten schon ausprobiert und wieder abgeschafft. Selten lag es daran, dass die Technik den Anrufer nicht verstand. Gescheitert ist meist, was danach kam – das Ergebnis landete nirgends, die Stimme klang nach Automat, und niemand passte das System an den Betrieb an. Um genau diese drei Punkte herum ist unser Assistent gebaut: Übergabe zuerst, Ansagen mit Ihrem Ton, laufende Anpassung als Teil des Betriebs.",
+        "Die Einrichtung dauert in der Regel 7–14 Tage und wird vollständig von Cogniiq übernommen. Ihre Rufnummer bleibt, Ihre Telefonanlage bleibt, ein Systemwechsel ist nicht Voraussetzung. Als Anbieter mit Hauptsitz in Bayreuth sind wir direkt erreichbar – mit festem Ansprechpartner statt Ticketsystem, auf Wunsch auch mit Terminen vor Ort.",
+        "Ob Hausarztpraxis in der Innenstadt, Restaurant zur Festspielzeit oder Handwerksbetrieb im Umland: Der Anliegen-Katalog wird auf Ihren Betrieb zugeschnitten und wächst mit, wenn sich Zeiten oder Abläufe ändern. Ergänzend unterstützen wir mit [Automatisierung in Bayreuth](/bayreuth/automatisierung) und [Webdesign in Bayreuth](/bayreuth/webdesign).",
       ],
     },
     warumCogniiq: [
-      "Einrichtung in 7–14 Tagen – kein monatelanger Einführungsprozess, kein Projektstress",
-      "Konfiguration exakt auf Ihre Branche, Ihr Angebot und Ihren Betriebsablauf in Bayreuth",
-      "Alle Gespräche werden protokolliert und als strukturierte Daten an Ihr Team weitergeleitet",
-      "Keine teuren Telefonanlagen, keine neuen Nummern, keine dauerhaften Softwarelizenzen",
-      "Persönlicher Ansprechpartner aus Bayreuth – direkter Kontakt, keine anonymen Tickets",
-      "Vollständig DSGVO-konform – Verarbeitung ausschließlich auf europäischen Servern",
+      "Feste monatliche Kosten – keine Abrechnung pro Anruf, Einmalposten stehen vor Vertragsschluss im Angebot",
+      "Ihre Ansagen und Ihr Ton, auf Wunsch selbst aufgesprochen – Anrufer werden transparent über den Sprachassistenten informiert",
+      "Jedes Gespräch endet als strukturierter Eintrag bei Ihrem Team – kein Abhören, kein Abtippen",
+      "Ihre Rufnummer und Ihre Telefonanlage bleiben – ein Systemwechsel ist nicht Voraussetzung",
+      "Hauptsitz in Bayreuth: fester Ansprechpartner, direkte Erreichbarkeit, Termine vor Ort möglich",
+      "DSGVO-konform: Verarbeitung auf europäischen Servern, Auftragsverarbeitungsvertrag nach Art. 28 DSGVO inklusive",
     ],
     useCases: [
       {
-        industry: "Arztpraxis & Klinik",
-        title: "Terminbuchung ohne Warteschleife",
-        description: "Patienten rufen an, der Assistent prüft freie Termine, bucht direkt ins System und sendet eine Bestätigung. Das Praxisteam wird dauerhaft entlastet – besonders in Stoßzeiten morgens und mittags, wenn die Anmeldung ohnehin überlastet ist.",
+        industry: "Arztpraxis & Therapiepraxis",
+        title: "Entlastung für die Anmeldung zu Stoßzeiten",
+        description: "Der Assistent nimmt Terminwünsche, Stornierungen und Rezeptbestellungen an, wenn die Anmeldung gebunden ist, und übergibt sie als strukturierte Einträge. Medizinische Auskünfte gibt er nicht; Notfall-Hinweise gehen sofort an einen Menschen.",
       },
       {
         industry: "Sport & Padel",
         title: "Platzbuchungen & Kursanfragen",
-        description: "Sportanlagen und Padel-Center in Bayreuth beantworten täglich dieselben Fragen zu Öffnungszeiten, freien Plätzen und Kursangeboten. Der Assistent übernimmt das vollautomatisch – auch abends und am Wochenende, wenn kein Personal vor Ort ist.",
+        description: "Sportanlagen beantworten täglich dieselben Fragen zu Öffnungszeiten, freien Plätzen und Kursen. Der Assistent übernimmt diese Standardanfragen nach Ihren Vorgaben – auch abends und am Wochenende, wenn niemand am Empfang sitzt.",
       },
       {
         industry: "Gastronomie",
         title: "Reservierungen & Sonderanfragen",
-        description: "Tischreservierungen entgegennehmen, Sondermenüs und Allergien kommunizieren, Stornierungen bearbeiten – ohne Ablenkung für das Serviceteam. Besonders in der Festspielzeit mit erhöhtem Besucheraufkommen in Bayreuth unverzichtbar.",
+        description: "Tischreservierungen annehmen, Fragen zu Sondermenüs beantworten, Stornierungen erfassen – ohne das Serviceteam zu unterbrechen. Gerade zur Festspielzeit, wenn das Anrufaufkommen deutlich steigt, eine spürbare Entlastung.",
       },
     ],
-    processSteps: [
-      { number: "01", title: "Kennenlernen & Zieldefinition", description: "Wir besprechen Ihre typischen Anrufszenarien in Bayreuth: Welche Fragen kommen täglich? Welche Termine, welche Weiterleitungen brauchen Sie? Was soll der Assistent können – und was definitiv nicht?" },
-      { number: "02", title: "Konzept & Angebot", description: "Gesprächsführung, Antwortinhalte und Eskalationsregeln werden gemeinsam entwickelt – passend zu Ihrem Betrieb in Bayreuth. Sie erhalten ein schriftliches Festpreisangebot ohne Überraschungen." },
-      { number: "03", title: "Umsetzung & Feinschliff", description: "Einbindung in Ihre bestehende Telefonnummer, vollständige Konfiguration und Testläufe mit echten Szenarien. Sie hören den Assistenten selbst und geben Feedback vor dem Live-Gang." },
-      { number: "04", title: "Go-Live & Optimierung", description: "Der Assistent ist aktiv. Wir begleiten die ersten Wochen aktiv, analysieren Gesprächsverläufe und optimieren, wo nötig. Sie haben jederzeit die volle Kontrolle über Konfiguration und Inhalte." },
-    ],
+    processSteps: TELEFONASSISTENT_PROZESS,
     faq: [
-      { question: "Klingt der KI Telefonassistent natürlich?", answer: "Ja. Aktuelle Sprachmodelle sind für die meisten Anrufer kaum von einem menschlichen Mitarbeiter zu unterscheiden. Stimme, Sprechgeschwindigkeit und Gesprächsstil werden individuell auf Ihren Betrieb in Bayreuth abgestimmt." },
-      { question: "Was passiert, wenn der Assistent eine Frage nicht beantworten kann?", answer: "Er leitet den Anruf weiter oder nimmt eine strukturierte Nachricht entgegen. Sie legen im Vorfeld exakt fest, was in welchem Fall passiert – und wir konfigurieren das entsprechend." },
-      { question: "Kann ich die Inhalte des Assistenten selbst anpassen?", answer: "Ja. Über ein einfaches Dashboard können Sie Antworten, Verfügbarkeiten und Weiterleitungsregeln selbst ändern. Für tiefere Anpassungen sind wir als Ihr Ansprechpartner in Bayreuth direkt erreichbar." },
-      { question: "Ist der KI Telefonassistent DSGVO-konform?", answer: "Ja. Alle Gespräche werden ausschließlich auf europäischen Servern verarbeitet. Auf Wunsch erstellen wir die notwendigen AVV-Dokumente und unterstützen bei der Dokumentation für Ihren Datenschutzbeauftragten." },
-      { question: "Welche Branchen in Bayreuth eignen sich am besten?", answer: "Besonders geeignet: Arztpraxen, Zahnarztpraxen, Physiotherapiepraxen, Gastronomie, Padel- und Sportanlagen, Handwerksbetriebe, Friseure, Kosmetikstudios und alle lokalen Dienstleister mit regelmäßigem Telefonaufkommen." },
-      { question: "Was kostet der KI Telefonassistent in Bayreuth?", answer: "Die Kosten hängen von Anrufvolumen und Konfigurationskomplexität ab. Nach dem Erstgespräch erhalten Sie ein transparentes Festpreisangebot – ohne versteckte Kosten oder Lizenzgebühren für nicht genutzte Features." },
-      { question: "Wie schnell ist der Assistent live?", answer: "In der Regel 7–14 Tage nach Projektstart. Bei einfachen Setups – z. B. nur Terminannahme und Weiterleitung – ist ein früherer Start möglich." },
-      { question: "Was unterscheidet den KI Telefonassistenten von einem Chatbot?", answer: "Der KI Telefonassistent arbeitet mit gesprochener Sprache, versteht Kontext und führt natürliche Dialoge – kein starres Menüsystem, keine Tastennavigation. Er klingt und verhält sich wie ein echter Mitarbeiter am Telefon." },
-      { question: "Können mehrere Standorte oder Leitungen gleichzeitig bedient werden?", answer: "Ja. Der Assistent skaliert automatisch – auch wenn mehrere Anrufe gleichzeitig eingehen, gibt es keine Warteschleife und keinen Qualitätsverlust." },
-      { question: "Was passiert mit den aufgezeichneten Gesprächen?", answer: "Gespräche werden protokolliert und als strukturierte Zusammenfassung weitergeleitet – nicht als Rohaudio, falls nicht explizit gewünscht. Datenschutzkonform, löschbar, vollständig dokumentiert." },
-      { question: "Kann der Assistent in bestehende Buchungssysteme integriert werden?", answer: "Ja. Wir integrieren gängige Buchungs- und Kalender-Tools. Welches System Sie nutzen, besprechen wir im Erstgespräch – und prüfen die Integrationsmöglichkeit vorab." },
-      { question: "Wie unterscheidet sich Cogniiq von anderen Anbietern?", answer: "Als Anbieter mit Sitz in Bayreuth bieten wir persönliche Vor-Ort-Betreuung, schnelle Reaktionszeiten und Konfigurationen, die auf den lokalen Bayreuth-Kontext abgestimmt sind – nicht auf ein generisches Produkt für anonyme Massenanbieter." },
+      { question: "Klingt der KI Telefonassistent natürlich?", answer: "Er klingt gut – aber ehrlich gesagt: Nicht jeder Anrufer mag Sprachassistenten, und das respektieren wir. Stimme, Sprechtempo und Ansagen werden auf Ihren Betrieb abgestimmt, auf Wunsch mit Ihren eigenen Aufnahmen. Anrufer erfahren zu Beginn, dass ein Sprachassistent sie betreut, und können jederzeit zu einem Menschen wechseln." },
+      { question: "Was passiert, wenn der Assistent eine Frage nicht beantworten kann?", answer: "Er leitet den Anruf weiter oder nimmt eine strukturierte Nachricht mit Rückrufnummer und Anliegen auf. Was in welchem Fall passiert, legen Sie vor dem Start im Anliegen-Katalog fest – und können es später ändern." },
+      { question: "Kann ich die Inhalte des Assistenten selbst anpassen?", answer: "Ja. Öffnungszeiten, Urlaubsansagen und aktuelle Hinweise ändern Sie selbst über ein Dashboard – auch kurzfristig vor Feiertagen. Für Änderungen an Gesprächslogik und Regeln haben Sie einen festen Ansprechpartner." },
+      { question: "Ist der KI Telefonassistent DSGVO-konform?", answer: "Die Verarbeitung läuft auf europäischen Servern, ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört zur Einrichtung. Gespräche werden als strukturierte Zusammenfassung übergeben, nicht als Rohaudio gespeichert, sofern Sie das nicht wünschen. Bei der Dokumentation für Ihren Datenschutzbeauftragten unterstützen wir." },
+      { question: "Welche Betriebe profitieren am meisten?", answer: "Betriebe, bei denen Telefon und eigentliche Arbeit um dieselben Hände konkurrieren: Arzt- und Zahnarztpraxen, Therapiepraxen, Gastronomie, Sportanlagen, Handwerk und lokale Dienstleister mit regelmäßigem Anrufaufkommen." },
+      { question: "Was kostet der KI Telefonassistent?", answer: "Sie zahlen einen festen Monatsbetrag für einen definierten Leistungsumfang – keine Abrechnung pro Anruf. Nach dem Erstgespräch erhalten Sie ein schriftliches Festpreisangebot, in dem auch Einmalposten wie die Einrichtung offen ausgewiesen sind." },
+      { question: "Wie schnell ist der Assistent live?", answer: "In der Regel 7–14 Tage nach Projektstart – inklusive Aufnahmegespräch, Ansagen und Testphase mit echten Szenarien. Live geht der Assistent erst, wenn Sie ihn gehört und freigegeben haben." },
+      { question: "Was unterscheidet den Assistenten von einem Telefonmenü oder Chatbot?", answer: "Ein Telefonmenü zwingt Anrufer in starre Optionen und Tastennavigation. Der Assistent arbeitet mit gesprochener Sprache: Er erfragt das Anliegen, beantwortet freigegebene Fragen und nimmt alles andere strukturiert auf – ohne dass sich jemand durch ein Menü drücken muss." },
+      { question: "Können mehrere Anrufe gleichzeitig ankommen?", answer: "Ja. Auch wenn mehrere Anrufe gleichzeitig eingehen, wird jeder angenommen – ohne Warteschleife. Das ist gerade zu Stoßzeiten der eigentliche Unterschied zum klassischen Empfang mit einer Leitung." },
+      { question: "Was passiert bei einem technischen Ausfall?", answer: "Für den Störungsfall wird ein Fallback eingerichtet: Anrufe laufen dann auf eine von Ihnen benannte Nummer oder auf eine klare Ansage mit dem nächsten Schritt. Diesen Weg legen wir gemeinsam bei der Einrichtung fest." },
+      { question: "Kann der Assistent in bestehende Buchungssysteme integriert werden?", answer: "Gängige Buchungs- und Kalender-Tools binden wir an; welches System Sie nutzen, klären wir im Erstgespräch und prüfen die Anbindung vor dem Angebot. Ein Wechsel Ihres Systems ist nicht Voraussetzung." },
+      { question: "Wer betreut uns nach dem Start?", answer: "Ein fester Ansprechpartner in Bayreuth – kein anonymes Ticketsystem. In den ersten Wochen werten wir Gesprächsverläufe gemeinsam aus und passen Regeln und Ansagen an; danach bleibt der Draht derselbe." },
     ],
     localChallenges: [
-      "Viele Betriebe in Bayreuth können Anrufe nicht durchgehend annehmen – besonders vor und nach Öffnungszeiten sowie in Stoßzeiten, wenn das Personal vollständig ausgelastet ist",
-      "Der anhaltende Fachkräftemangel in Oberfranken erhöht den Druck auf bestehendes Personal: Jede Minute, die mit Standardanfragen verbracht wird, fehlt bei der eigentlichen Arbeit",
-      "Gäste, Patienten und Kunden erwarten heute sofortige Antworten – eine nicht abgehobene Leitung oder eine lange Warteschleife wird direkt als Serviceproblem wahrgenommen und führt zu verlorenen Kunden",
+      "Viele Betriebe in Bayreuth können Anrufe nicht durchgehend annehmen – besonders vor und nach den Öffnungszeiten sowie zu Stoßzeiten, wenn das Personal vollständig ausgelastet ist",
+      "Der Fachkräftemangel in Oberfranken erhöht den Druck auf bestehendes Personal: Jede Minute für Standardanfragen fehlt bei der eigentlichen Arbeit",
+      "Wer mehrfach niemanden erreicht, versucht es oft beim nächsten Anbieter – und bewertet die Erreichbarkeit mitunter öffentlich",
     ],
     industries: ["Arztpraxen & Kliniken", "Zahnarztpraxen", "Physiotherapie & Heilpraktiker", "Gastronomie & Restaurants", "Padel & Sportanlagen", "Handwerk & Betriebe", "Lokale Dienstleister", "Wellness & Beauty"],
     industriesExpanded: [
       {
         name: "Arztpraxen & Zahnarztpraxen",
-        problem: "Praxen in Bayreuth sind montags und nach Feiertagen mit Anrufspitzen konfrontiert, die das Praxispersonal erheblich belasten. Patienten, die nicht durchkommen, rufen beim nächsten Arzt an.",
-        solution: "Der KI Telefonassistent nimmt Terminanfragen sofort entgegen, prüft Verfügbarkeiten und bucht direkt – auch außerhalb der Öffnungszeiten, ohne Warteschleife. Das Praxisteam wird dauerhaft entlastet.",
+        problem: "Montags und nach Feiertagen trifft die Anrufflut die Anmeldung, während dort bereits Patienten stehen. Wer nicht durchkommt, versucht es oft bei der nächsten Praxis.",
+        solution: "Der Assistent nimmt Terminwünsche und Stornierungen an, wenn die Anmeldung gebunden ist, und übergibt sie als strukturierte Einträge. Medizinische Auskünfte gibt er nicht; Notfall-Hinweise gehen sofort an einen Menschen.",
       },
       {
         name: "Physiotherapie & Heilpraktiker",
-        problem: "Praxen mit kleinen Teams haben oft niemanden, der dauerhaft ans Telefon gehen kann. Anfragen nach Feierabend oder zwischen Behandlungen gehen verloren.",
-        solution: "Der Assistent übernimmt die Anrufannahme in therapiefreien Zeiten, nimmt Terminwünsche entgegen und sendet automatische Bestätigungen.",
+        problem: "Praxen mit kleinen Teams haben niemanden, der dauerhaft ans Telefon gehen kann. Anrufe zwischen Behandlungen und nach Feierabend landen auf der Mailbox – oder nirgends.",
+        solution: "Der Assistent nimmt Terminwünsche und Absagen während der Behandlungszeiten an und legt sie als sortierte Liste vor – der Rückruf-Marathon am Abend entfällt weitgehend.",
       },
       {
         name: "Gastronomie & Restaurants",
-        problem: "Restaurants in Bayreuth – besonders rund um die Festspielzeit – erhalten täglich viele Anfragen zu Reservierungen, Sondermenüs und Events. Das Serviceteam ist während des Betriebs nicht erreichbar.",
-        solution: "Der Assistent nimmt Reservierungen entgegen, kommuniziert Menüoptionen und bearbeitet Stornierungen – ohne das Serviceteam zu unterbrechen.",
+        problem: "Rund um die Festspielzeit erhalten Restaurants täglich viele Anfragen zu Reservierungen, Sondermenüs und Events – das Serviceteam ist währenddessen im Einsatz und nicht erreichbar.",
+        solution: "Der Assistent nimmt Reservierungen entgegen, beantwortet Fragen zu Menüs nach Ihren Vorgaben und erfasst Stornierungen – ohne das Serviceteam zu unterbrechen.",
       },
       {
         name: "Padel & Sportanlagen",
-        problem: "Sportanlagen beantworten täglich dieselben Fragen zu Platzverfügbarkeit, Öffnungszeiten und Kursbuchungen – eine monotone Aufgabe, die Personal bindet.",
-        solution: "Der KI Telefonassistent beantwortet alle Standardanfragen vollautomatisch und bucht Plätze direkt ins System – auch am Abend und Wochenende.",
+        problem: "Sportanlagen beantworten täglich dieselben Fragen zu Platzverfügbarkeit, Öffnungszeiten und Kursbuchungen – eine wiederkehrende Aufgabe, die Personal bindet.",
+        solution: "Der Assistent beantwortet Standardanfragen nach Ihren Vorgaben und trägt Platzbuchungen nach Ihren Regeln ein – auch am Abend und am Wochenende.",
       },
       {
         name: "Handwerk & lokale Betriebe",
-        problem: "Handwerksbetriebe in Bayreuth und dem Umland sind tagsüber auf der Baustelle oder beim Kunden – und verpassen dadurch Auftragsanfragen, die abends einfach an den Mitbewerber gehen.",
-        solution: "Der Assistent nimmt Anfragen entgegen, qualifiziert das Anliegen und leitet strukturierte Nachrichten an den Betriebsinhaber weiter – kein verpasster Auftrag mehr.",
+        problem: "Handwerksbetriebe im Raum Bayreuth sind tagsüber auf der Baustelle oder beim Kunden – Auftragsanfragen erreichen niemanden und gehen mitunter an Mitbewerber.",
+        solution: "Der Assistent nimmt Anfragen an, erfasst Anliegen und Rückrufnummer strukturiert und legt sie dem Inhaber als sortierte Liste vor.",
       },
       {
         name: "Wellness & Beauty",
-        problem: "Kosmetikstudios und Friseursalons in Bayreuth erhalten Buchungsanfragen zu jeder Tageszeit, haben aber während der Behandlung keine Möglichkeit, ans Telefon zu gehen.",
-        solution: "Der KI Telefonassistent bucht Termine automatisch in den Kalender ein und sendet Bestätigungen – ohne Unterbrechung der laufenden Behandlung.",
+        problem: "Kosmetikstudios und Friseursalons erhalten Buchungsanfragen zu jeder Tageszeit, haben aber während der Behandlung keine Hand frei für das Telefon.",
+        solution: "Der Assistent nimmt Terminwünsche an und trägt sie nach Ihren Regeln in den Kalender ein – ohne die laufende Behandlung zu unterbrechen.",
       },
     ],
     localScenarios: [
       {
-        title: "Hausarztpraxis nahe dem Stadtpark",
-        description: "Eine Allgemeinmedizin-Praxis in der Bayreuth Innenstadt erhält montags über 80 Anrufe vor 9 Uhr. Die Anmeldung ist chronisch überlastet. Mit einem KI Telefonassistenten könnten Termine automatisch gebucht und Standardfragen sofort beantwortet werden – das Praxisteam könnte sich auf die Patienten im Wartezimmer konzentrieren.",
+        title: "Hausarztpraxis in der Innenstadt",
+        description: "Montagmorgen: Am Tresen stehen Patienten, das Telefon klingelt ohne Pause, die Anmeldung entscheidet im Sekundentakt, wer warten muss. Mit dem Telefonassistenten würden Terminwünsche und Rezeptbestellungen strukturiert aufgenommen – und das Team könnte sich den Patienten im Wartezimmer widmen.",
       },
       {
         title: "Restaurant im Festspielviertel",
-        description: "Ein Restaurant nahe dem Festspielhaus erhält in der Bayreuther Festspielzeit täglich Dutzende Reservierungsanfragen per Telefon – viele außerhalb der Öffnungszeiten. Der Assistent nimmt Reservierungen auch nachts entgegen und sendet automatische Bestätigungen, ohne dass Personal außerhalb der Betriebszeiten erreichbar sein muss.",
+        description: "Zur Festspielzeit steigt das Reservierungsaufkommen deutlich – viele Anfragen kommen abends nach Küchenschluss. Der Assistent nimmt Reservierungen auch außerhalb der Servicezeiten an und bestätigt sie, ohne dass jemand erreichbar sein muss.",
       },
       {
         title: "Physiotherapiepraxis im Gewerbegebiet",
-        description: "Eine Physiotherapiepraxis mit drei Therapeuten hat niemanden, der dauerhaft Telefon abnimmt. Patienten erreichen die Praxis oft nicht und gehen zur Konkurrenz. Mit dem KI Telefonassistenten werden Anfragen auch während laufender Behandlungen professionell entgegengenommen und Termine direkt vergeben.",
+        description: "Drei Therapeuten, kein besetzter Empfang: Während der Behandlungen nimmt niemand ab, abends arbeitet die Inhaberin die Mailbox ab. Mit dem Assistenten kämen Terminwünsche und Absagen als sortierte Liste an – und frei werdende Termine könnten neu vergeben werden.",
       },
       {
         title: "Padel-Anlage am Stadtrand",
-        description: "Eine Padel-Anlage erhält täglich viele Anrufe zu Platzbuchungen und Kursen. Statt einen Mitarbeiter dauerhaft ans Telefon zu binden, übernimmt der Assistent alle Standardkommunikation – und meldet sich nur bei komplexen Anfragen beim Team.",
+        description: "Täglich ähnliche Anrufe zu Platzbuchungen und Kursen. Statt einen Mitarbeiter ans Telefon zu binden, übernimmt der Assistent die Standardanfragen nach Vorgabe – und meldet sich nur bei besonderen Anliegen beim Team.",
       },
     ],
     sameServiceOtherCities: [
