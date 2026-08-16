@@ -206,7 +206,7 @@ export function CostPage({ config }: CostPageProps) {
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-3 gap-6">
+            <div data-review-claim="preisstaffeln" className="grid md:grid-cols-3 gap-6">
               {config.priceRanges.map((range, i) => (
                 <motion.div
                   key={i}

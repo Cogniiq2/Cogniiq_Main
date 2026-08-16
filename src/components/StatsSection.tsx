@@ -75,7 +75,7 @@ export function StatsSection() {
   const isInView = useInView(ref, { once: true, amount: 0.3 });
 
   return (
-    <section ref={ref} aria-label="Kennzahlen" className="bg-white border-b border-gray-100">
+    <section ref={ref} aria-label="Kennzahlen" data-review-claim="go-live-zeitraum" className="bg-white border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, i) => (

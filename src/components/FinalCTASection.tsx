@@ -84,7 +84,7 @@ export function FinalCTASection() {
             </div>
 
             {/* Micro results strip */}
-            <div className="flex items-stretch gap-0 mb-10 border border-gray-100 rounded-2xl overflow-hidden">
+            <div data-review-claim="go-live-und-reaktionszeit" className="flex items-stretch gap-0 mb-10 border border-gray-100 rounded-2xl overflow-hidden">
               {microResults.map(({ icon: Icon, stat, label }, i) => (
                 <div
                   key={stat}

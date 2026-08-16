@@ -295,7 +295,7 @@ export function CostComparisonSection() {
               style={{ background: 'linear-gradient(90deg, transparent, rgba(2,132,199,0.4), rgba(16,185,129,0.2), transparent)' }}
             />
 
-            <div className="relative px-8 py-6 border-b border-white/[0.06]">
+            <div data-review-claim="preis-beispielwert" className="relative px-8 py-6 border-b border-white/[0.06]">
               <div className="flex items-center gap-3 mb-1">
                 <div className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
                   <Bot size={14} className="text-sky-400" />

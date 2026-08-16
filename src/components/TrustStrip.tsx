@@ -19,7 +19,7 @@ export function TrustStrip() {
   const isInView = useInView(ref, { once: true, amount: 0.4 });
 
   return (
-    <div ref={ref} className="w-full bg-white border-t border-b border-gray-100/80">
+    <div ref={ref} data-review-claim="go-live-zeitraum" className="w-full bg-white border-t border-b border-gray-100/80">
       <motion.div
         className="max-w-7xl mx-auto px-6 lg:px-8 py-4"
         initial={{ opacity: 0, y: 10 }}

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Navigate, Outlet, Routes, Route, useLocation }
 
 import { PageReveal } from './components/PageReveal';
 import { Navigation } from './components/Navigation';
+import { ReviewModeBanner } from './components/ReviewModeBanner';
 import { Footer } from './components/Footer';
 import { PremiumFooterReveal } from './components/PremiumFooterReveal';
 import { LocalBusinessSchema } from './components/LocalBusinessSchema';
@@ -436,6 +437,7 @@ function PublicLayout() {
         <PremiumFooterReveal>
           <Footer />
         </PremiumFooterReveal>
+        <ReviewModeBanner />
       </div>
     </PageReveal>
   );

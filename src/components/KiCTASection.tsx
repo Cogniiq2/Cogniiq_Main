@@ -72,7 +72,7 @@ export function KiCTASection() {
             style={{ background: 'linear-gradient(90deg, transparent 5%, rgba(2,132,199,0.35) 35%, rgba(16,185,129,0.2) 65%, transparent 95%)' }}
           />
 
-          <div className="relative grid lg:grid-cols-[1fr_300px_290px] gap-0">
+          <div data-review-claim="einrichtungsdauer" className="relative grid lg:grid-cols-[1fr_300px_290px] gap-0">
 
             {/* ─── Main content ─── */}
             <div className="px-10 py-12 lg:px-14 lg:py-14">

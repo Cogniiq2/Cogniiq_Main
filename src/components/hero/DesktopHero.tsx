@@ -461,7 +461,7 @@ export function DesktopHero() {
             </div>
           </motion.div>
 
-          <motion.div
+          <motion.div data-review-claim="go-live-zeitraum"
             className="mt-10 pt-8 border-t border-gray-100 grid grid-cols-3 gap-6"
             initial={{ opacity: 0 }}
             animate={inView ? { opacity: 1 } : {}}
