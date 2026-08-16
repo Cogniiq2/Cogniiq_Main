@@ -4,56 +4,65 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 
 const config: NationalIndustryPageConfig = {
   seo: {
-    title: "KI Telefonassistent für Arztpraxen | Automatische Terminbuchung | Cogniiq",
-    description: "KI Telefonassistent für Arztpraxen: Automatische Terminbuchung, Patientenanfragen und Standardauskünfte. DSGVO-konform mit AVV, auch außerhalb der Sprechzeiten erreichbar – Entlastung für das Praxisteam ab Tag 1.",
+    title: "KI Telefonassistent Arztpraxis – Terminannahme | Cogniiq",
+    description:
+      "KI Telefonassistent für Arztpraxen: Terminwünsche, Stornierungen und Rezeptbestellungen strukturiert aufnehmen – zugeschnitten auf Ihre Praxis, DSGVO-konform.",
     canonical: `${BUSINESS_INFO.website}/ki-telefonassistent-arzt`,
-    keywords: "KI Telefonassistent Arztpraxis, Praxis Telefonservice, automatische Terminbuchung Arzt, KI Rezeptionistin Praxis",
+    keywords: "KI Telefonassistent Arztpraxis, Praxis Telefonservice, Telefonannahme Arztpraxis, telefonische Erreichbarkeit Praxis",
   },
   h1: "KI Telefonassistent für Arztpraxen",
-  tagline: "Arztpraxis · Terminbuchung · DSGVO-konform",
-  intro: "Montagmorgen, sieben Minuten nach acht: Die Praxis öffnet, und sofort klingelt das Telefon im Dauerbetrieb. Ihr Team sitzt gleichzeitig am Empfang, an der Kasse und im Behandlungsraum. Anrufe, die ins Leere laufen, landen beim nächsten Arzt in der Liste. Der KI Telefonassistent nimmt ab – sofort, in natürlicher Sprache, DSGVO-konform – und bucht den Termin direkt in Ihren Kalender.",
+  tagline: "Arztpraxis · Anmeldung entlasten · DSGVO-konform",
+  intro:
+    "Montagmorgen, kurz nach acht: Am Tresen steht eine Patientin, dahinter wartet die nächste, und das Telefon klingelt ohne Pause. Ihre MFA entscheidet im Sekundentakt, wer warten muss – und jemand verliert immer. Der KI Telefonassistent nimmt in solchen Momenten die Anrufe an, die sonst ins Leere laufen. Er erfasst das Anliegen strukturiert und übergibt es dorthin, wo Ihr Team arbeitet – mit Ihren Ansagen, nach Ihren Regeln.",
   serviceSlug: "ki-telefonassistent",
   serviceLabel: "KI Telefonassistent",
   costLink: "/kosten-ki-telefonassistent",
   costLinkLabel: "Kosten KI Telefonassistent",
   problems: [
     {
-      title: "Montagmorgen-Stoßzeit überfordert jede Praxis",
-      description: "Nach dem Wochenende stapeln sich Terminanfragen, Rezeptnachrichten und Rückrufe. Selbst gut organisierte Praxen kommen in dieser Stunde nicht mit – und Patienten, die nicht durchkommen, wählen die nächste erreichbare Praxis.",
+      title: "Die Montagsflut trifft die Anmeldung mit voller Wucht",
+      description:
+        "Nach dem Wochenende kommen Terminwünsche, Rezeptbestellungen und Rückrufbitten gebündelt. Ihre MFA springt zwischen Tresen, Telefon und Behandlungszimmer hin und her – und wer nicht durchkommt, versucht es oft bei der nächsten Praxis.",
     },
     {
-      title: "Medizinisch ausgebildetes Personal beantwortet Öffnungszeiten-Fragen",
-      description: "Wann öffnet die Praxis? Welche Kasse wird akzeptiert? Gibt es Parkplätze? Diese Fragen stellen Patienten täglich und binden qualifiziertes Personal, das gerade im Behandlungsraum gebraucht wird.",
+      title: "Ständige Unterbrechungen erzeugen Fehler unter Druck",
+      description:
+        "Wer im Minutentakt unterbrochen wird, verhört Namen, notiert Nummern falsch und vergisst Rückrufe – nicht aus Nachlässigkeit, sondern weil niemand drei Dinge gleichzeitig fehlerfrei erledigt.",
     },
     {
-      title: "Abends und zwischen den Sprechzeiten ist niemand erreichbar",
-      description: "Ein Patient mit einer dringenden Frage um 18 Uhr landet auf der Mailbox. Beim nächsten Termin ist er nicht mehr Ihr Patient. Erreichbarkeit außerhalb der Sprechzeiten ist heute kein Luxus mehr – es ist der Mindeststandard.",
+      title: "Das Beschwerdegespräch dauert länger als das Anliegen",
+      description:
+        "Wer dreimal in der Warteschleife hing, beginnt das Gespräch mit seinem Ärger. Ihre MFA verbringt dann mehr Zeit mit Beschwichtigen als mit dem eigentlichen Terminwunsch.",
     },
     {
-      title: "Jeder verpasste Anruf ist eine leere Stelle im Kalender",
-      description: "In einer Praxis mit 40 Terminen täglich entspricht ein einziger verpasster Anruf direktem Umsatzverlust. Der Assistent stellt sicher, dass keine Anfrage unbeantwortet bleibt – auch nicht in der Mittagspause.",
+      title: "Außerhalb der Sprechzeiten ist niemand erreichbar",
+      description:
+        "39 % der Versicherten bewerten die Erreichbarkeit von Praxen außerhalb der Öffnungszeiten als schwierig (GKV-Spitzenverband, Versichertenbefragung 2025). Wer abends absagen oder einen Termin anfragen will, landet auf der Mailbox – und die hört selten jemand vollständig ab.",
     },
     {
-      title: "Patientendaten ohne dokumentiertes System – rechtlich riskant",
-      description: "Wer Patientendaten am Telefon entgegennimmt und in einem Notizblock festhält, bewegt sich datenschutzrechtlich auf unsicherem Terrain. Der KI Telefonassistent dokumentiert jede Interaktion strukturiert und DSGVO-konform.",
+      title: "Stornierungen kommen nicht an – Termine verfallen ungenutzt",
+      description:
+        "Patienten, die telefonisch nicht absagen können, erscheinen als Ausfall im Kalender. Der Termin hätte neu vergeben werden können – wenn die Absage rechtzeitig jemanden erreicht hätte.",
     },
     {
-      title: "Gemeinschaftspraxen: mehrere Ärzte, ein überfordertes Team",
-      description: "In Gemeinschaftspraxen und MVZ multipliziert sich das Koordinationsproblem: mehrere Kalender, verschiedene Behandlungsräume, unterschiedliche Verfügbarkeiten. Der Assistent kennt sie alle und vergibt Termine korrekt – ohne Rückfragen.",
+      title: "Unerreichbarkeit landet in den Online-Bewertungen",
+      description:
+        "Über die medizinische Qualität schreiben zufriedene Patienten selten – über besetzte Leitungen und Warteschleifen umso häufiger. Die Erreichbarkeit am Telefon prägt den öffentlichen Eindruck Ihrer Praxis mit.",
     },
   ],
   solution: {
-    headline: "Ihr Team behandelt Patienten. Der Assistent erledigt den Rest.",
-    text: "Der KI Telefonassistent übernimmt eingehende Anrufe vollautomatisch: Er bucht Termine direkt in den Praxiskalender, beantwortet Standardfragen präzise nach Ihren Vorgaben und leitet medizinisch komplexe Anfragen mit vollständiger Gesprächszusammenfassung ans Team weiter. DSGVO-konform eingerichtet – ohne IT-Aufwand Ihrer Seite.",
+    headline: "Gebaut für Ihre Anmeldung – nicht als Ersatz, sondern als Entlastung",
+    text: "Der Assistent übernimmt die Anrufe, die Ihr Team gerade nicht annehmen kann: Terminwünsche, Stornierungen, Rezeptbestellungen, wiederkehrende Fragen. Medizinische Auskünfte gibt er grundsätzlich nicht; Notfall-Hinweise leitet er sofort an einen Menschen oder zur Notrufansage weiter. Jedes Gespräch endet als strukturierter Eintrag bei Ihrem Team – nicht als Zettel und nicht als Mailbox-Nachricht.",
   },
   benefits: [
-    "Terminbuchung direkt in den Praxiskalender – kein Rückruf nötig",
-    "DSGVO-konform mit AVV, Verarbeitung auf europäischen Servern",
-    "Erreichbar auch zwischen den Sprechzeiten und in Urlaubswochen",
-    "Notfall-Eskalation konfigurierbar für Ihren Bereitschaftsdienst",
-    "Integriert mit Tomedo, Medistar, Dampsoft und anderen Systemen",
-    "Ein Assistent für mehrere Ärzte und Behandlungsräume",
-    "Eingerichtet in 7–14 Tagen, laufender Betrieb bleibt unberührt",
+    "Terminwünsche und Stornierungen werden nach Ihren Regeln gebucht oder zur Bestätigung vorgelegt",
+    "Rezept- und Überweisungswünsche kommen als strukturierte Liste an – kein Abhören, kein Abtippen",
+    "Notfall-Hinweise führen sofort zu Ihrem Team, zum Bereitschaftsdienst oder zur Ansage, den Notruf 112 zu wählen",
+    "Ihre eigenen Ansagen, auf Wunsch selbst aufgesprochen – Anrufer erfahren transparent, dass ein Sprachassistent sie betreut",
+    "Auftragsverarbeitungsvertrag nach Art. 28 DSGVO, Verarbeitung auf europäischen Servern",
+    // [[CLAIM: verify — konkrete PVS-Anbindungen (Tomedo, Medistar, Dampsoft, CGM) je Praxis bestätigen]]
+    "Anbindung an Ihre Praxissoftware wird vor dem Angebot geprüft – ein Systemwechsel ist nicht Voraussetzung",
+    "Feste monatliche Kosten – keine Abrechnung pro Anruf, keine Überraschung nach einer Grippewelle",
   ],
   workflow: {
     title: "So läuft ein Patientenanruf ab",
@@ -61,17 +70,20 @@ const config: NationalIndustryPageConfig = {
       {
         step: "01",
         title: "Patient ruft an",
-        description: "Der Assistent nimmt innerhalb von zwei Sekunden ab – kein Besetztzeichen, keine Warteschleife. Er begrüßt den Patienten professionell und erfragt das Anliegen in natürlicher Sprache.",
+        description:
+          "Der Assistent nimmt ab, wenn die Anmeldung gebunden ist – ohne Besetztzeichen, ohne Warteschleife. Der Anrufer erfährt zu Beginn, dass ein Sprachassistent ihn betreut, und kann jederzeit einen Menschen verlangen.",
       },
       {
         step: "02",
         title: "Anliegen erkennen und bearbeiten",
-        description: "Terminwunsch, Rezeptanfrage, Frage zu Öffnungszeiten oder Kassenakzeptanz – jedes Anliegen wird korrekt erkannt und nach Ihren Vorgaben direkt bearbeitet.",
+        description:
+          "Terminwunsch, Stornierung, Rezeptbestellung oder Frage zu Sprechzeiten: Der Assistent bearbeitet, was Sie im Anliegen-Katalog freigegeben haben. Alles andere – und jeder Notfall-Hinweis – geht sofort an einen Menschen.",
       },
       {
         step: "03",
-        title: "Termin eingetragen, Patient informiert",
-        description: "Der Termin wird in Echtzeit in den Kalender eingetragen. Der Patient bekommt sofortige Bestätigung – und 24 Stunden vorher eine automatische Erinnerung.",
+        title: "Übergabe an Ihr Team",
+        description:
+          "Der Termin steht im Kalender, das Anliegen als strukturierter Eintrag bei Ihrem Team – mit Rückrufnummer, Kontext und nächstem Schritt. Ihre MFA arbeitet die Liste ab, wenn es in den Ablauf passt.",
       },
     ],
   },
@@ -91,24 +103,35 @@ const config: NationalIndustryPageConfig = {
   ],
   faq: [
     {
-      question: "Ist der KI Telefonassistent für Arztpraxen wirklich DSGVO-konform?",
-      answer: "Ja – und das ist keine Fußnote. Arztpraxen unterliegen besonders strengen Datenschutzanforderungen. Der Assistent verarbeitet alle Daten auf europäischen Servern, wird mit einem Auftragsverarbeitungsvertrag (AVV) geliefert und lässt sich so konfigurieren, dass medizinisch sensible Informationen nicht unverschlüsselt übertragen werden.",
+      question: "Kommen meine Patienten mit einer Computerstimme klar?",
+      answer:
+        "Ehrliche Antwort: nicht alle sofort. Manche Anrufer reagieren skeptisch auf synthetische Stimmen – andere gewöhnen sich schnell daran, wenn die Ansagen nach der eigenen Praxis klingen. Deshalb stimmen wir Begrüßung und Ansagen auf Ihre Praxis ab, auf Wunsch mit Ihren selbst aufgesprochenen Aufnahmen. Wer lieber mit einem Menschen sprechen möchte, wird jederzeit weitergeleitet. Die Eingewöhnungsphase begleiten wir aktiv und passen an, was nicht ankommt.",
     },
     {
-      question: "Kann der Assistent in unser Praxisverwaltungssystem integriert werden?",
-      answer: "In den meisten Fällen ja. Wir integrieren direkt in Tomedo, Medistar, Dampsoft, CGM und andere gängige Systeme. Die technische Integration übernimmt Cogniiq vollständig – Ihre Praxis muss dafür nichts einrichten oder umstellen.",
+      question: "Lässt sich der Assistent an unsere Praxissoftware anbinden?",
+      // [[CLAIM: verify — PVS-Integrationsliste (Tomedo, Medistar, Dampsoft, CGM) und Anbindungstiefe bestätigen]]
+      answer:
+        "Das prüfen wir vor dem Angebot – nicht danach. Für gängige Systeme wie Tomedo, Medistar, Dampsoft oder CGM klären wir konkret, in welcher Form die Übergabe ankommt: als Termin im Kalender, als strukturierter Eintrag oder als Nachricht an Ihr Team. Wichtig für Ihre Entscheidung: Ein Wechsel Ihrer Praxissoftware ist nicht Voraussetzung.",
     },
     {
-      question: "Was passiert, wenn ein Patient einen medizinischen Notfall schildert?",
-      answer: "Der Assistent erkennt Notfallsituationen zuverlässig und leitet sofort an den Notruf (112) oder den konfigurierten Bereitschaftsarzt weiter. Die Eskalationslogik wird individuell für Ihre Praxis definiert – inklusive klarer Sprachausgabe mit Handlungsanweisungen für den Patienten.",
+      question: "Was passiert, wenn ein Patient einen Notfall schildert?",
+      answer:
+        "Der Assistent beurteilt niemals selbst, wie ernst ein Anliegen ist. Bei Hinweisen auf einen Notfall leitet er sofort weiter – an Ihr Team, an den von Ihnen benannten Bereitschaftsdienst oder mit der klaren Ansage, den Notruf 112 zu wählen. Welcher Weg gilt, legen Sie bei der Einrichtung fest, inklusive der genauen Formulierungen.",
     },
     {
-      question: "Wie viele Anrufe übernimmt der Assistent pro Tag?",
-      answer: "In einer durchschnittlichen Allgemeinpraxis zwischen 30 und 80 Anrufe täglich – in Gemeinschaftspraxen oder nach Feiertagen deutlich mehr. Jeder dieser Anrufe würde sonst Ihre MFA für 3–5 Minuten aus dem direkten Patientenkontakt herausnehmen.",
+      question: "Was ändert sich für unsere MFA im Alltag?",
+      answer:
+        "Das Telefon klingelt nicht mehr in dem Moment, in dem eine Patientin am Tresen steht. Terminwünsche, Stornierungen und Rezeptbestellungen kommen als strukturierte Einträge an, die Ihr Team abarbeitet, wenn es in den Ablauf passt. Ihre MFA entscheidet weiterhin über jeden Termin und jede Rückmeldung – sie wird nur seltener dabei unterbrochen.",
     },
     {
-      question: "Können wir Öffnungszeiten und Urlaubszeiten selbst anpassen?",
-      answer: "Ja. Öffnungszeiten, Urlaubsblockierungen und aktuelle Praxisinfos pflegen Sie selbst in einem einfachen Dashboard – ohne technische Kenntnisse. Komplexere Anpassungen an Gesprächslogik oder Kalenderregeln übernehmen wir.",
+      question: "Wie steht es um Datenschutz und Schweigepflicht?",
+      answer:
+        "Ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört zur Einrichtung. Die Verarbeitung läuft auf europäischen Servern; Gespräche werden als strukturierte Zusammenfassung übergeben und nicht als Rohaudio gespeichert, sofern Sie das nicht ausdrücklich wünschen. Anrufer werden zu Gesprächsbeginn über den Sprachassistenten informiert. Ob Ihre Praxis eine Datenschutz-Folgenabschätzung benötigt, entscheidet Ihr Datenschutzbeauftragter – wir liefern die Dokumentation dafür zu.",
+    },
+    {
+      question: "Können wir Ansagen und Öffnungszeiten selbst anpassen?",
+      answer:
+        "Ja. Sprechzeiten, Urlaubsansagen und aktuelle Hinweise pflegen Sie selbst über ein Dashboard – ohne Anruf beim Support, auch kurzfristig vor Feiertagen. Änderungen an Gesprächslogik und Regeln übernehmen wir; dafür haben Sie einen festen Ansprechpartner.",
     },
   ],
 };
