@@ -2,12 +2,12 @@ import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Calendar, Shield, Clock, CircleCheck as CheckCircle, TrendingUp, PhoneCall, Zap } from 'lucide-react';
-import { useAvailability } from '@/hooks/useAvailability';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 const guarantees = [
-  { icon: Shield, text: 'Keine Verpflichtung — kündbar jederzeit' },
+  { icon: Shield, text: 'Unverbindlich — Sie entscheiden nach dem Gespräch' },
+  // [[CLAIM: verify — Reaktionszeit 24 Stunden (OWNER-INPUT D3) bestätigen]]
   { icon: Clock, text: 'Antwort in der Regel innerhalb von 24 Stunden' },
   { icon: Calendar, text: 'Persönliches Gespräch — kein Formular-Loop' },
 ];
@@ -20,6 +20,7 @@ const outcomes = [
 
 // Outcome tiles carry no invented performance figures. Any number here would need a
 // real, attributable measurement; none exists in the repository.
+// [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1) bestätigen]]
 const microResults = [
   { icon: PhoneCall, stat: 'Auch nachts', label: 'Anrufannahme' },
   { icon: TrendingUp, stat: 'Strukturiert', label: 'qualifizierte Anfragen' },
@@ -29,7 +30,6 @@ const microResults = [
 export function FinalCTASection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
-  const { label: availLabel } = useAvailability();
 
   return (
     <section
@@ -130,9 +130,6 @@ export function FinalCTASection() {
                   />
                   <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-gray-500">
                     Kostenloses Erstgespräch
-                  </span>
-                  <span className="ml-auto text-[10px] font-semibold text-amber-400/80 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full">
-                    {availLabel}
                   </span>
                 </div>
 
