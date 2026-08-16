@@ -2,78 +2,95 @@ import { CostPage } from "@/components/CostPage";
 import type { CostPageConfig } from "@/components/CostPage";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 
+// [[CLAIM: verify — alle Preisangaben auf dieser Seite (Staffeln, Beispielwerte)
+// sind vor Veröffentlichung vom Inhaber zu bestätigen]]
 const config: CostPageConfig = {
   seo: {
-    title: "Was kostet ein KI Telefonassistent? Preise & Kosten | Cogniiq",
-    description: "Was kostet ein KI Telefonassistent für Unternehmen? Transparente Preisübersicht, Einflussfaktoren und Beispielprojekte. KI Anrufbeantworter Kosten für Arztpraxen, Gastronomie und Mittelstand.",
+    title: "Was kostet ein KI Telefonassistent? Preise | Cogniiq",
+    description:
+      "Was kostet ein KI Telefonassistent? Feste monatliche Kosten statt Abrechnung pro Anruf: Preisstaffeln, Einflussfaktoren und Beispielkonfigurationen im Überblick.",
     canonical: `${BUSINESS_INFO.website}/kosten-ki-telefonassistent`,
   },
   h1: "Was kostet ein KI Telefonassistent?",
-  intro: "Der KI Telefonassistent ist eine der kosteneffizientesten Investitionen für Unternehmen, die täglich Anrufe verpassen. Hier erfahren Sie, welche Faktoren den Preis bestimmen und was typische Projekte kosten – transparent und ohne Überraschungen.",
+  intro:
+    "Die wichtigste Antwort zuerst: Sie zahlen einen festen Monatsbetrag für einen definierten Leistungsumfang – keine Abrechnung pro Anruf, keine Staffel, die nach einem starken Montag überrascht. Was einmalig anfällt, etwa die Einrichtung, steht vor Vertragsschluss schriftlich im Angebot. Hier finden Sie die Preisstaffeln, die Faktoren dahinter und Beispielkonfigurationen zur Orientierung.",
   serviceLink: "/ki-telefonassistent",
   serviceLinkLabel: "KI Telefonassistent entdecken",
   priceRanges: [
     {
       label: "Basis",
       range: "ab 99 €/Monat",
-      description: "Einfacher KI Telefonassistent für Standardanfragen, Öffnungszeiten und Weiterleitung. Ideal für kleinere Betriebe mit wenigen Anrufen täglich.",
+      description:
+        "Anrufannahme mit Ihren Ansagen, Beantwortung wiederkehrender Fragen und strukturierte Aufnahme von Anliegen mit Weiterleitung an Ihr Team. Für kleinere Betriebe mit überschaubarem Anrufaufkommen.",
     },
     {
       label: "Professionell",
       range: "199 – 399 €/Monat",
-      description: "Vollständige Terminbuchung, CRM-Integration, individuelle Konfiguration für Ihre Branche und unbegrenzte Anrufe. Für wachsende Unternehmen.",
+      description:
+        "Zusätzlich Terminbuchung nach Ihren Regeln, Anbindung an Kalender oder CRM und ein individuell erarbeiteter Anliegen-Katalog für Ihren Betrieb. Der übliche Zuschnitt für Praxen und Betriebe mit täglichem Telefonaufkommen.",
     },
     {
       label: "Enterprise",
       range: "ab 499 €/Monat",
-      description: "Mehrsprachig, Multi-Standort, erweiterte Automationsintegration, dedizierter Support und Custom-Integrationen. Für Unternehmen mit hohem Anrufvolumen.",
+      description:
+        "Für mehrere Standorte, mehrsprachige Konfigurationen und individuelle Anbindungen an bestehende Systeme – mit eigenem Ansprechpartner für laufende Anpassungen.",
     },
   ],
   priceFactors: [
     {
-      title: "Anrufvolumen",
-      description: "Die Anzahl der monatlichen Anrufe beeinflusst den Preis. Günstige Basismodelle decken wenige Anrufe ab, Enterprise-Lösungen skalieren ohne Mehrkosten.",
+      title: "Umfang des Anliegen-Katalogs",
+      description:
+        "Ein Assistent, der Anliegen aufnimmt und weiterleitet, ist einfacher zu konfigurieren als einer, der Termine nach komplexen Regeln vergibt. Der Umfang dessen, was er erledigen soll, ist der größte Preisfaktor.",
     },
     {
-      title: "Komplexität der Konfiguration",
-      description: "Ein einfacher Anrufbeantworter mit Standard-Antworten ist günstiger als ein Assistent, der individuelle Fragen, Terminbuchung und CRM-Integration abdeckt.",
+      title: "Anbindung an Kalender, CRM oder Praxissoftware",
+      description:
+        "Die Übergabe in Ihr System ist der Kern des Produkts. Welche Anbindung möglich ist und was sie kostet, prüfen wir vor dem Angebot – nicht danach.",
     },
     {
-      title: "Kalender- und CRM-Integration",
-      description: "Die Anbindung an Google Calendar, Outlook oder ein CRM-System erfordert einmaligen Konfigurationsaufwand, der separat berechnet werden kann.",
+      title: "Eigene Ansagen und Stimme",
+      description:
+        "Abgestimmte Ansagen gehören zur Einrichtung. Aufwendigere Varianten – etwa selbst aufgesprochene Ansagen für mehrere Szenarien – erhöhen den einmaligen Einrichtungsaufwand.",
     },
     {
-      title: "Branchenspezifische Anpassung",
-      description: "Praxen, Anwaltskanzleien oder spezialisierte Betriebe benötigen spezifisches Fachwissen und Kommunikationsmuster – das schlägt sich im Setup nieder.",
+      title: "Branchenspezifische Regeln",
+      description:
+        "Praxen brauchen andere Regeln als Restaurants: Notfall-Weiterleitung, Umgang mit Gesundheitsdaten, Rezeptbestellungen. Diese Abstimmung fließt in die Einrichtung ein.",
     },
     {
       title: "Mehrsprachigkeit",
-      description: "Ein Assistent, der Deutsch und Englisch (oder weitere Sprachen) spricht, erfordert zusätzliche Konfiguration und ist entsprechend teurer.",
+      description:
+        "Konfigurationen für mehrere Sprachen – etwa Deutsch und Englisch – erfordern zusätzliche Abstimmung und wirken sich auf den Monatsbetrag aus.",
     },
     {
-      title: "Einmalige Einrichtungsgebühr",
-      description: "Neben der monatlichen Gebühr fällt bei manchen Konfigurationen eine einmalige Einrichtungsgebühr an, die die individuelle Konfiguration und das Onboarding abdeckt.",
+      title: "Einmalige Einrichtung",
+      description:
+        "Je nach Umfang fällt eine einmalige Einrichtungsgebühr an. Sie steht im Angebot, bevor Sie unterschreiben – wir halten es für ehrlicher, sie zu nennen, als sie im Monatspreis zu verstecken.",
     },
   ],
   exampleProjects: [
     {
-      title: "Allgemeinmedizin Praxis, München",
-      description: "KI Telefonassistent für Terminbuchungen, Überweisungsanfragen und Standardauskünfte. Integration mit Kalender-Software. Entlastet das Praxisteam täglich um mehrere Stunden.",
+      title: "Beispielkonfiguration: Hausarztpraxis",
+      description:
+        "Terminwünsche und Stornierungen nach Praxisregeln, strukturierte Aufnahme von Rezeptbestellungen, Notfall-Weiterleitung an den Bereitschaftsdienst, Anbindung an den Praxiskalender.",
       investment: "249 €/Monat",
     },
     {
-      title: "Restaurant, Bayreuth",
-      description: "Automatische Reservierungsannahme, Tischbestätigung und Erinnerungs-SMS. Auch abends und am Wochenende erreichbar – keine verpassten Reservierungen mehr.",
+      title: "Beispielkonfiguration: Restaurant",
+      description:
+        "Reservierungsannahme mit Bestätigung, Beantwortung wiederkehrender Fragen zu Küche und Zeiten, Erreichbarkeit auch außerhalb der Servicezeiten.",
       investment: "149 €/Monat",
     },
     {
-      title: "Handwerksbetrieb, Regensburg",
-      description: "Anrufannahme während Außeneinsatz, Auftragsanfragen qualifizieren, Rückruf organisieren. Integration mit CRM für automatische Lead-Erfassung.",
+      title: "Beispielkonfiguration: Handwerksbetrieb",
+      description:
+        "Anrufannahme während der Außeneinsätze, strukturierte Erfassung von Auftragsanfragen mit Rückrufnummer, Übergabe als sortierte Liste an den Inhaber.",
       investment: "199 €/Monat",
     },
     {
-      title: "Physiotherapiepraxis, Bayern",
-      description: "Terminbuchung, Terminverschiebungen und Stornierungen vollautomatisch. DSGVO-konforme Verarbeitung aller Patientendaten auf europäischen Servern.",
+      title: "Beispielkonfiguration: Therapiepraxis",
+      description:
+        "Terminwünsche und Absagen während der Behandlungszeiten, Warteliste für frei werdende Termine, Auftragsverarbeitungsvertrag und Verarbeitung auf europäischen Servern.",
       investment: "299 €/Monat",
     },
   ],
@@ -92,36 +109,45 @@ const config: CostPageConfig = {
   ],
   faq: [
     {
+      question: "Sind die Kosten wirklich planbar – auch bei vielen Anrufen?",
+      answer:
+        "Ja, das ist der Kern des Modells: ein fester Monatsbetrag für einen definierten Leistungsumfang statt Abrechnung pro Anruf. Ein starker Montagmorgen oder eine Grippewelle verändert Ihre Rechnung nicht. Sollte Ihr Bedarf dauerhaft über den vereinbarten Umfang hinauswachsen, besprechen wir das offen – bevor sich am Preis etwas ändert.",
+    },
+    {
       question: "Was kostet ein KI Telefonassistent pro Monat?",
-      answer: "Die monatlichen Kosten beginnen bei ca. 99 €/Monat für einfache Konfigurationen. Professionelle Lösungen mit Terminbuchung und CRM-Integration kosten typischerweise 199–399 €/Monat. Das genaue Angebot hängt von Ihrem Anrufvolumen und den benötigten Funktionen ab.",
+      answer:
+        "Die monatlichen Kosten beginnen bei etwa 99 €/Monat für einfache Konfigurationen. Der übliche Zuschnitt mit Terminbuchung und Systemanbindung liegt bei 199–399 €/Monat. Das konkrete Angebot hängt vom Umfang Ihres Anliegen-Katalogs und den benötigten Anbindungen ab – es steht schriftlich fest, bevor Sie sich entscheiden.",
     },
     {
-      question: "Gibt es eine Einrichtungsgebühr für den KI Telefonassistenten?",
-      answer: "Je nach Komplexität der Konfiguration kann eine einmalige Einrichtungsgebühr anfallen. Diese deckt die individuelle Konfiguration, das Training auf Ihre Branche und das Onboarding ab. Im Erstgespräch wird geklärt, ob und in welcher Höhe dies anfällt.",
+      question: "Gibt es eine Einrichtungsgebühr?",
+      answer:
+        "Je nach Umfang der Konfiguration ja. Sie deckt das Aufnahmegespräch, den Anliegen-Katalog, die Ansagen und die Testphase ab. Die Höhe steht im Angebot, bevor Sie unterschreiben – versteckte Einmalkosten gibt es nicht.",
     },
     {
-      question: "Wie lange muss ich den Vertrag laufen lassen?",
-      answer: "Wir bieten flexible Laufzeiten. Monatliche Kündigung ist möglich – auch wenn wir aus Erfahrung sagen können, dass Kunden den Service nach einmaliger Einrichtung selten wieder abbestellen.",
+      question: "Wie lange bin ich vertraglich gebunden?",
+      // [[CLAIM: verify — Vertragslaufzeiten und Kündigungsfristen vom Inhaber bestätigen]]
+      answer:
+        "Wir bieten flexible Laufzeiten mit klar benannter Kündigungsfrist. Die konkreten Konditionen stehen im Angebot – vor Vertragsschluss, nicht im Kleingedruckten danach.",
     },
     {
-      question: "Ist der KI Telefonassistent teurer als ein Mensch am Telefon?",
-      answer: "Im Vergleich zu einer Teilzeitmitarbeiterin (ca. 1.500–2.000 €/Monat) ist der KI Assistent deutlich günstiger – und ist auch außerhalb regulärer Geschäftszeiten verfügbar. Der ROI zeigt sich meist innerhalb weniger Wochen.",
+      question: "Muss ich für den Assistenten mein System oder meine Rufnummer wechseln?",
+      answer:
+        "Nein. Ihre Rufnummer bleibt, Ihr Kalender bleibt, Ihre Software bleibt. Der Assistent wird an Ihre bestehende Arbeitsweise angebunden; was für Ihr System möglich ist, prüfen wir vor dem Angebot.",
     },
     {
-      question: "Was passiert, wenn der KI Assistent eine Frage nicht beantworten kann?",
-      answer: "Wenn der Assistent eine Anfrage nicht bearbeiten kann, leitet er automatisch an einen Mitarbeiter weiter oder nimmt eine Rückrufbitte auf. Kein Anruf geht verloren.",
+      question: "Was kostet die Anbindung an bestehende Systeme?",
+      answer:
+        "Verbreitete Anbindungen wie Google Calendar oder Outlook sind in vielen Konfigurationen enthalten oder kosten eine geringe einmalige Gebühr. Individuelle Anbindungen kalkulieren wir separat und weisen sie im Angebot einzeln aus.",
     },
     {
-      question: "Wie viel kostet die Integration in bestehende Systeme?",
-      answer: "Standardintegrationen (Google Calendar, Outlook, gängige CRM-Systeme) sind in vielen Paketen inklusive oder kosten eine geringe einmalige Gebühr. Individuelle API-Integrationen werden separat kalkuliert.",
-    },
-    {
-      question: "Kann ich den KI Assistenten später erweitern?",
-      answer: "Ja. Der Assistent kann jederzeit um neue Funktionen, Sprachen oder Integrationen erweitert werden. Cogniiq begleitet Sie dabei laufend.",
+      question: "Kann ich den Umfang später erweitern oder verkleinern?",
+      answer:
+        "Ja. Der Anliegen-Katalog lässt sich erweitern, Regeln und Ansagen lassen sich anpassen. Preisliche Auswirkungen besprechen wir vorher – eine Änderung am Preis ohne Ihre Zustimmung gibt es nicht.",
     },
   ],
-  ctaHeadline: "Individuelles Angebot für Ihren KI Telefonassistenten",
-  ctaText: "Im kostenlosen Erstgespräch konfigurieren wir gemeinsam den idealen Assistenten für Ihr Unternehmen und erstellen ein transparentes Preisangebot.",
+  ctaHeadline: "Ihr Angebot: schriftlich, aufgeschlüsselt, ohne Überraschungen",
+  ctaText:
+    "Im unverbindlichen Erstgespräch gehen wir Ihre typischen Anrufe durch und klären, welcher Umfang zu Ihrem Betrieb passt. Danach erhalten Sie ein schriftliches Angebot mit allen Posten – und entscheiden in Ruhe.",
 };
 
 export function KostenKiTelefonassistent() {
