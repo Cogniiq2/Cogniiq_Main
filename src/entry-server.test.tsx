@@ -27,7 +27,8 @@ vi.mock('@/lib/supabase', () => ({
 }));
 
 const { render, renderElement } = await import('./entry-server');
-const { PUBLIC_ROUTES } = await import('./lib/routing/publicRoutes');
+const { PUBLIC_ROUTES, isKnownPublicRoute } = await import('./lib/routing/publicRoutes');
+const { publicLinkTargets, problemLinkTargets } = await import('./test/internalLinks');
 
 function visibleText(html: string): string {
   return html
@@ -75,6 +76,31 @@ describe('the manifest matches what the renderer can serve', () => {
       expect(visibleText(html).length).toBeGreaterThan(200);
     }
   }, 120_000);
+});
+
+// A link to a path the manifest does not publish renders the 404 document: the reader's journey
+// dead-ends and a crawler follows the edge into nothing, while every title, canonical and schema
+// check still passes. That is how the defect this guards shipped — the problem-link lists in
+// RelatedPages and IndustryPage pointed at /keine-terminbuchung, which has never been a route
+// (the page is published at /keine-terminbuchung-online) — so it went unnoticed across 18 pages.
+describe('internal links address routes the site publishes', () => {
+  // One page per component owning a hard-coded problem-link list: /bayreuth/webdesign renders
+  // RelatedPages, shared by the nine city service pages, and /webdesign-arzt-muenchen renders
+  // IndustryPage, shared by the nine industry-city pages. Between them they cover all 18.
+  // src/prerender.hydration.test.tsx re-checks all 88 against the real build output.
+  for (const path of ['/bayreuth/webdesign', '/webdesign-arzt-muenchen']) {
+    it(`links only to published routes from ${path}`, async () => {
+      const { html } = await render(path, 30_000);
+
+      const targets = publicLinkTargets(html);
+      expect(targets.length).toBeGreaterThan(10);
+      expect(targets.filter((target) => !isKnownPublicRoute(target))).toEqual([]);
+
+      const problemLinks = problemLinkTargets(html);
+      expect(problemLinks).toContain('/keine-terminbuchung-online');
+      expect(problemLinks).not.toContain('/keine-terminbuchung');
+    }, 60_000);
+  }
 });
 
 describe('renderElement failure behaviour', () => {

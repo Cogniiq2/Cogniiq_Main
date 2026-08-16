@@ -725,7 +725,7 @@ const PROBLEM_LINKS = [
   { label: "Verpasste Anrufe & Umsatzverlust", href: "/verpasste-anrufe-verlust" },
   { label: "Keine Anfragen über die Website", href: "/keine-anfragen-website" },
   { label: "Zu viel manuelle Arbeit", href: "/zu-viel-manuelle-arbeit" },
-  { label: "Keine automatische Terminbuchung", href: "/keine-terminbuchung" },
+  { label: "Keine automatische Terminbuchung", href: "/keine-terminbuchung-online" },
 ];
 
 function InternalLinksSection({ config }: { config: IndustryPageConfig }) {
