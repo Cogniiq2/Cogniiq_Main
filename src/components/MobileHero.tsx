@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useMemo, useRef, useCallback } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
@@ -161,16 +161,44 @@ function TouchRipple({ x, y }: { x: number; y: number }) {
   );
 }
 
+/**
+ * The beam sweeps the full height of the hero.
+ *
+ * It travels by TRANSFORM rather than by `top`. `top` is a layout property, so
+ * every animation frame moved a positioned, painted element and the browser
+ * counted each frame as a layout shift — 45 of them per homepage load, which was
+ * the entire measured CLS of 0.0587 on mobile (and 0.0014 on desktop, from the
+ * same pattern in DesktopHero). Translating instead keeps the motion on the
+ * compositor, where it costs no layout and produces no shift.
+ *
+ * The travel distance is measured rather than expressed as a percentage: `y:
+ * '100%'` resolves against the element's OWN height (1px), and the section is
+ * taller than the viewport (its `minHeight: 100svh` is a floor, not the height),
+ * so `100svh` would stop the beam short. The line itself stays 1px — an earlier
+ * revision translated a full-size `inset-0` carrier instead, which promoted the
+ * hero paragraph into a composited layer and silently switched its text from
+ * subpixel to grayscale antialiasing.
+ */
 function ScanBeam() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [travel, setTravel] = useState(0);
+
+  useEffect(() => {
+    const section = ref.current?.parentElement;
+    if (section) setTravel(section.getBoundingClientRect().height);
+  }, []);
+
   return (
     <motion.div
-      className="absolute left-0 right-0 h-px pointer-events-none z-10"
+      ref={ref}
+      className="absolute top-0 left-0 right-0 h-px pointer-events-none z-10"
+      aria-hidden="true"
       style={{
         background: 'linear-gradient(90deg, transparent 0%, rgba(15,23,42,0.12) 30%, rgba(15,23,42,0.2) 50%, rgba(15,23,42,0.12) 70%, transparent 100%)',
         boxShadow: '0 0 8px 2px rgba(15,23,42,0.04)',
       }}
-      initial={{ top: '0%', opacity: 0 }}
-      animate={{ top: ['0%', '100%'], opacity: [0, 1, 1, 0] }}
+      initial={{ y: 0, opacity: 0 }}
+      animate={travel ? { y: [0, travel], opacity: [0, 1, 1, 0] } : { opacity: 0 }}
       transition={{ duration: 2.2, delay: 0.2, ease: EASE_OUT, times: [0, 0.05, 0.9, 1] }}
     />
   );

@@ -799,25 +799,15 @@ export function routeFor(path: string): PublicRoute | undefined {
   return PUBLIC_ROUTES.find((r) => r.path === path);
 }
 
-const PUBLIC_PATHS: ReadonlySet<string> = new Set(PUBLIC_ROUTES.map((r) => r.path));
-
-/** Trailing slashes are not part of a route's identity; only "/" keeps one. */
-export function normalizePath(pathname: string): string {
-  const trimmed = pathname.replace(/\/+$/, '');
-  return trimmed === '' ? '/' : trimmed;
-}
-
-/**
- * True only for a URL this site actually publishes.
- *
- * Netlify serves dist/404.html for everything else, and the SEO managers use
- * this to keep the client in agreement with that: an unknown URL must stay
- * noindex and must never claim a canonical, before OR after hydration. Search
- * engines execute JavaScript, so a server-only noindex is not enough.
- */
-export function isKnownPublicRoute(pathname: string): boolean {
-  return PUBLIC_PATHS.has(normalizePath(pathname));
-}
+// normalizePath / isKnownPublicRoute now live in ./publicRoutePaths, which holds
+// the paths WITHOUT the per-route title, description and keyword strings. The
+// browser only ever needed set membership, and importing this module to get it
+// pulled ~39 KiB of unread marketing prose into the entry chunk of every route.
+// They are re-exported here so every existing build-time consumer of this module
+// keeps working unchanged; the two client callers (src/App.tsx and
+// CanonicalManager) import from ./publicRoutePaths directly so this file stays
+// out of the client bundle entirely.
+export { normalizePath, isKnownPublicRoute, PUBLIC_ROUTE_PATHS } from './publicRoutePaths';
 
 export const DEFAULT_ROUTE_ROBOTS =
   'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';

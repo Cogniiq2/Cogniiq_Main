@@ -86,39 +86,158 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
+/**
+ * True when the visitor has told the browser to economise on data.
+ *
+ * The scene is decorative (the whole panel is aria-hidden). Spending ~560 KiB of
+ * compressed JavaScript plus the scene file on a metered or 2G connection to
+ * paint a decoration is not a trade-off the visitor asked for, and Save-Data is
+ * exactly how they say so.
+ */
+function prefersReducedData(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const connection = (
+    navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string };
+    }
+  ).connection;
+  if (!connection) return false;
+  if (connection.saveData) return true;
+  return connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g';
+}
+
+const SPLINE_ORIGIN = 'https://prod.spline.design';
+const SPLINE_SCENE = `${SPLINE_ORIGIN}/kZDDjO5HuC9GJUM2/scene.splinecode`;
+
+/**
+ * Open the connection to the scene host at the moment we commit to loading it.
+ *
+ * Measured: the runtime chunk is requested first and the scene fetch then pays a
+ * cold DNS + TLS handshake behind it. A preconnect in index.html would fix that
+ * ordering but would also open a connection on every page of the site — including
+ * mobile, where the 3D hero never renders at all — which is the same waste the
+ * removed font preconnects caused. Emitting it here costs nothing to anyone who
+ * never reaches this branch.
+ */
+function preconnectToSceneHost() {
+  if (typeof document === 'undefined') return;
+  if (document.querySelector(`link[rel="preconnect"][href="${SPLINE_ORIGIN}"]`)) return;
+  const link = document.createElement('link');
+  link.rel = 'preconnect';
+  link.href = SPLINE_ORIGIN;
+  link.crossOrigin = '';
+  document.head.appendChild(link);
+}
+
+/** requestIdleCallback where it exists, a short timeout where it does not. */
+function whenIdle(callback: () => void): () => void {
+  const ric = (window as Window & typeof globalThis & {
+    requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    cancelIdleCallback?: (handle: number) => void;
+  }).requestIdleCallback;
+
+  if (typeof ric === 'function') {
+    const handle = ric(callback, { timeout: 2000 });
+    return () => {
+      const cancel = (window as Window & typeof globalThis & {
+        cancelIdleCallback?: (handle: number) => void;
+      }).cancelIdleCallback;
+      cancel?.(handle);
+    };
+  }
+
+  const handle = window.setTimeout(callback, 200);
+  return () => window.clearTimeout(handle);
+}
+
 function DeferredSplineScene() {
   const [shouldLoad, setShouldLoad] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Never fetch the 3D runtime when the user asked for reduced motion, or when the
-    // device cannot render it. Both keep the static fallback instead.
-    if (prefersReducedMotion() || !supportsWebGL()) return;
+    // Never fetch the 3D runtime when the user asked for reduced motion, when they
+    // asked the browser to save data, or when the device cannot render it at all.
+    // Each keeps the static fallback instead.
+    if (prefersReducedMotion() || prefersReducedData() || !supportsWebGL()) return;
 
-    const timeout = window.setTimeout(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let cancelled = false;
+    let cancelIdle: (() => void) | undefined;
+    let onLoad: (() => void) | undefined;
+
+    const begin = () => {
+      if (cancelled) return;
+      preconnectToSceneHost();
       setShouldLoad(true);
-    }, 1800);
+    };
+
+    // Previously this was a bare setTimeout(1800): every desktop visit with WebGL
+    // fetched ~2 MB of runtime at a fixed offset, in the middle of the page still
+    // settling, whether or not the panel was ever on screen. Now the download waits
+    // for the page to finish loading AND for a genuinely idle main thread, so it
+    // competes with nothing, and it only starts once the panel is actually near the
+    // viewport.
+    const schedule = () => {
+      if (cancelled) return;
+      if (document.readyState === 'complete') {
+        cancelIdle = whenIdle(begin);
+        return;
+      }
+      onLoad = () => {
+        if (!cancelled) cancelIdle = whenIdle(begin);
+      };
+      window.addEventListener('load', onLoad, { once: true });
+    };
+
+    if (typeof IntersectionObserver !== 'function') {
+      schedule();
+      return () => {
+        cancelled = true;
+        cancelIdle?.();
+        if (onLoad) window.removeEventListener('load', onLoad);
+      };
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          observer.disconnect();
+          schedule();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    observer.observe(container);
 
     return () => {
-      window.clearTimeout(timeout);
+      cancelled = true;
+      observer.disconnect();
+      cancelIdle?.();
+      if (onLoad) window.removeEventListener('load', onLoad);
     };
   }, []);
 
   if (!shouldLoad) {
-    return <SplineFallback />;
+    return (
+      <div ref={containerRef} className="w-full h-full">
+        <SplineFallback />
+      </div>
+    );
   }
 
   // ErrorBoundary is required, not defensive styling: react-spline re-throws load
   // failures during render, which Suspense does not catch. Without it a failed scene
   // or WebGL context tears down the whole React root and blanks the painted page.
   return (
-    <ErrorBoundary fallback={<SplineFallback />} label="SplineScene">
-      <Suspense fallback={<SplineFallback />}>
-        <LazySplineScene
-          scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-          className="w-full h-full"
-        />
-      </Suspense>
-    </ErrorBoundary>
+    <div ref={containerRef} className="w-full h-full">
+      <ErrorBoundary fallback={<SplineFallback />} label="SplineScene">
+        <Suspense fallback={<SplineFallback />}>
+          <LazySplineScene scene={SPLINE_SCENE} className="w-full h-full" />
+        </Suspense>
+      </ErrorBoundary>
+    </div>
   );
 }
 
@@ -137,6 +256,16 @@ export function DesktopHero() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true });
   const navigate = useNavigate();
+
+  // Travel distance for the sweep line below — measured, not a percentage; see
+  // the comment at its motion.div.
+  const sweepRef = useRef<HTMLDivElement>(null);
+  const [sweepTravel, setSweepTravel] = useState(0);
+
+  useEffect(() => {
+    const section = sweepRef.current?.parentElement;
+    if (section) setSweepTravel(section.getBoundingClientRect().height);
+  }, []);
 
   return (
     <section
@@ -159,15 +288,21 @@ export function DesktopHero() {
         style={{ background: 'linear-gradient(90deg, transparent, rgba(2,132,199,0.15), transparent)' }}
       />
 
+      {/* Transform-driven sweep, not `top`: animating `top` moved a painted,
+          positioned element every frame, which the browser records as a layout
+          shift. Distance is measured because `y: '100%'` would resolve against
+          the line's own 1px height, and the line stays 1px so it never promotes
+          the hero content into a composited layer. Mirrors ScanBeam in MobileHero. */}
       <motion.div
-        className="absolute left-0 right-0 h-px z-30 pointer-events-none"
+        ref={sweepRef}
+        className="absolute top-0 left-0 right-0 h-px z-30 pointer-events-none"
         aria-hidden="true"
         style={{
           background:
             'linear-gradient(90deg, transparent 5%, rgba(3,105,161,0.12) 30%, rgba(2,132,199,0.22) 50%, rgba(3,105,161,0.12) 70%, transparent 95%)',
         }}
-        initial={{ top: 0, opacity: 0 }}
-        animate={{ top: ['0%', '100%'], opacity: [0, 1, 1, 0] }}
+        initial={{ y: 0, opacity: 0 }}
+        animate={sweepTravel ? { y: [0, sweepTravel], opacity: [0, 1, 1, 0] } : { opacity: 0 }}
         transition={{ duration: 2.8, delay: 0.3, ease: E }}
       />
 

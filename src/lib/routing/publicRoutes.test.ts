@@ -10,7 +10,31 @@ import {
   normalizePath,
   routeFor,
 } from './publicRoutes';
+import { PUBLIC_ROUTE_PATHS } from './publicRoutePaths';
 import { isPrivateSurface, isDocumentSurface } from './indexability';
+
+// The browser gets PUBLIC_ROUTE_PATHS (paths only, ~4 KiB) instead of the full
+// manifest (~39 KiB of titles, descriptions and keywords it never reads). That
+// is two files naming the same URL surface, so the agreement is asserted, not
+// assumed: a route added to the manifest but not the path list would hydrate as
+// noindex with no canonical — a real indexing regression, silently.
+describe('client path list mirrors the manifest', () => {
+  it('lists exactly the manifest paths, in the same order', () => {
+    expect(PUBLIC_ROUTE_PATHS).toEqual(PUBLIC_ROUTES.map((r) => r.path));
+  });
+
+  it('recognises every manifest route, trailing slash or not', () => {
+    for (const route of PUBLIC_ROUTES) {
+      expect(isKnownPublicRoute(route.path)).toBe(true);
+      expect(isKnownPublicRoute(`${route.path}/`)).toBe(true);
+    }
+  });
+
+  it('rejects URLs the site does not publish', () => {
+    expect(isKnownPublicRoute('/gibt-es-nicht-xyz')).toBe(false);
+    expect(isKnownPublicRoute('/blog/kein-artikel')).toBe(false);
+  });
+});
 
 describe('manifest invariants', () => {
   it('has no duplicate paths', () => {

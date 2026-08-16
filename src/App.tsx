@@ -7,7 +7,6 @@ import { Footer } from './components/Footer';
 import { PremiumFooterReveal } from './components/PremiumFooterReveal';
 import { LocalBusinessSchema } from './components/LocalBusinessSchema';
 import { CanonicalManager } from './components/CanonicalManager';
-import { CityServicePage } from './components/CityServicePage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { RoleLandingPage } from './components/auth/RoleLandingPage';
 import { LegacyLoginRedirect, LegacyOwnerRedirect } from './components/auth/LegacyRedirects';
@@ -15,7 +14,7 @@ import { ReceptionistEntitlementRoute } from './components/app/ReceptionistEntit
 import { AuthProvider } from './contexts/AuthContext';
 import { ConsentBanner } from './components/ConsentBanner';
 import { initConsent } from './lib/consent';
-import { CITY_SERVICE_CONFIGS } from './lib/standorte-data';
+import { CITY_SERVICE_ROUTES } from './lib/standorte-data';
 import {
   DEFAULT_ROBOTS,
   DOCUMENT_ROBOTS,
@@ -24,7 +23,9 @@ import {
   isPrivateSurface,
   privateDocumentTitle,
 } from './lib/routing/indexability';
-import { isKnownPublicRoute } from './lib/routing/publicRoutes';
+// Path-only module by design: the hydrated app asks set membership, not metadata.
+// See src/lib/routing/publicRoutePaths.ts.
+import { isKnownPublicRoute } from './lib/routing/publicRoutePaths';
 
 type LazyPageComponent = ComponentType<Record<string, unknown>>;
 
@@ -108,6 +109,12 @@ const AnfrageErhaltenPage = lazyNamed(() => import('./pages/AnfrageErhaltenPage'
 const BayernPage = lazyNamed(() => import('./pages/BayernPage'), 'BayernPage');
 const DeutschlandPage = lazyNamed(() => import('./pages/DeutschlandPage'), 'DeutschlandPage');
 const CityLandingPage = lazyNamed(() => import('./pages/CityLandingPage'), 'CityLandingPage');
+// Lazy so the ~102 KiB CITY_SERVICE_CONFIGS literal and CityServicePage stay out
+// of the entry chunk; only the nine city × service URLs pay for them.
+const CityServiceRoute = lazyNamed(
+  () => import('./components/CityServiceRoute'),
+  'CityServiceRoute'
+);
 const WebdesignHub = lazyNamed(() => import('./pages/WebdesignHub'), 'WebdesignHub');
 const ProzessautomatisierungHub = lazyNamed(
   () => import('./pages/ProzessautomatisierungHub'),
@@ -490,7 +497,7 @@ export function AppInner() {
       <Route path="/muenchen" element={<CityLandingPage citySlug="muenchen" />} />
       <Route path="/regensburg" element={<CityLandingPage citySlug="regensburg" />} />
 
-      {/* /{city}/webdesign is registered from CITY_SERVICE_CONFIGS below, together with
+      {/* /{city}/webdesign is registered from CITY_SERVICE_ROUTES below, together with
           the other city x service routes. It previously had duplicate explicit routes here
           pointing at IndustryPage-based components; those shadowed the CityServiceConfig
           entries and rendered industry wording ("Webdesign-Betriebe in <Stadt>") on pages
@@ -527,12 +534,8 @@ export function AppInner() {
       <Route path="/webdesign-gastronomie-regensburg" element={<WebdesignGastronomieRegensburg />} />
       <Route path="/webdesign-immobilien-regensburg" element={<WebdesignImmobilienRegensburg />} />
 
-      {Object.values(CITY_SERVICE_CONFIGS).map((config) => (
-        <Route
-          key={config.route}
-          path={config.route}
-          element={<CityServicePage config={config} />}
-        />
+      {CITY_SERVICE_ROUTES.map((route) => (
+        <Route key={route} path={route} element={<CityServiceRoute route={route} />} />
       ))}
 
       <Route path="/kosten-webdesign" element={<KostenWebdesign />} />
