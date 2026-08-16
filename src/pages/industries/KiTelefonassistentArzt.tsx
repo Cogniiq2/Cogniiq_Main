@@ -94,12 +94,14 @@ const config: NationalIndustryPageConfig = {
     { label: "KI Telefonassistent Bayern", href: "/bayern/ki-telefonassistent" },
     { label: "KI Agentur Deutschland", href: "/ki-agentur-deutschland" },
   ],
+  // Option B (Positionierung): Healthcare-Journey bleibt geschlossen —
+  // keine Links in Hotel-/Restaurant-Inhalte.
   relatedLinks: [
     { label: "Webdesign Arzt", href: "/webdesign-arzt" },
     { label: "KI Telefonassistent Praxis", href: "/ki-telefonassistent-praxis" },
     { label: "Automatisierung Arzt", href: "/automatisierung-arzt" },
     { label: "Kosten KI Telefonassistent", href: "/kosten-ki-telefonassistent" },
-    { label: "KI Telefonassistent Restaurant", href: "/ki-telefonassistent-restaurant" },
+    { label: "KI Telefonassistent im Überblick", href: "/ki-telefonassistent" },
   ],
   faq: [
     {
