@@ -44,7 +44,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     publishedAt: "2025-01-20",
     updatedAt: "2025-03-01",
     excerpt:
-      "Viele Inhaber kleiner Unternehmen verbringen bis zu 30 % ihrer Arbeitszeit mit Aufgaben, die eine KI in Sekunden erledigen könnte. Dieser Leitfaden zeigt, wo der Hebel am größten ist.",
+      "Viele Inhaber kleiner Unternehmen verbringen einen erheblichen Teil ihrer Arbeitszeit mit Aufgaben, die eine KI in Sekunden erledigen könnte. Dieser Leitfaden zeigt, wo der Hebel am größten ist.",
     heroKeyword: "KI-Automatisierung kleine Unternehmen",
     sections: [
       {
@@ -56,13 +56,13 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Warum KI-Automatisierung jetzt für kleine Unternehmen relevant ist",
         content:
-          "Die Kosten für KI-Tools sind in den letzten drei Jahren um über 60 % gesunken. Was früher nur Konzernen vorbehalten war, ist heute für Unternehmen ab fünf Mitarbeitenden wirtschaftlich sinnvoll. Gleichzeitig steigen Lohnkosten, Fachkräftemangel wächst, und Kunden erwarten rund-um-die-Uhr-Erreichbarkeit.",
+          "Die Kosten für KI-Tools sind in den letzten Jahren deutlich gesunken. Was früher nur Konzernen vorbehalten war, ist heute für Unternehmen ab fünf Mitarbeitenden wirtschaftlich sinnvoll. Gleichzeitig steigen Lohnkosten, Fachkräftemangel wächst, und Kunden erwarten rund-um-die-Uhr-Erreichbarkeit.",
       },
       {
         type: "ul",
         heading: "Die fünf häufigsten automatisierbaren Prozesse",
         items: [
-          "Terminvereinbarung und Erinnerungen (spart im Schnitt 4–8 Stunden pro Woche)",
+          "Terminvereinbarung und Erinnerungen",
           "Eingehende Kundenanfragen per E-Mail oder Telefon qualifizieren",
           "Rechnungsstellung und Zahlungserinnerungen",
           "Lead-Nurturing und Follow-up-Sequenzen",
@@ -82,7 +82,6 @@ export const BLOG_ARTICLES: BlogArticle[] = [
           { label: "Terminbuchung (30 Anfragen/Monat)", value: "Manuell: ~6 Std. | Automatisiert: <5 Min." },
           { label: "E-Mail-Erstkontakt beantworten", value: "Manuell: 2–5 Min. pro Mail | Automatisiert: sofort" },
           { label: "Rechnungsversand", value: "Manuell: 15 Min./Rechnung | Automatisiert: <1 Min." },
-          { label: "Monatliche Kosten", value: "Mitarbeiter: 2.500–4.500 € | KI-System: 150–500 €" },
         ],
       },
       {
@@ -105,7 +104,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Was KI-Automatisierung realistisch kostet",
         content:
-          "Ein einfaches Automatisierungssystem (z. B. automatische Terminbestätigung + CRM-Eintrag) ist ab 150 € monatlich umsetzbar. Komplexere Lösungen mit mehreren verbundenen Systemen liegen bei 300–800 € pro Monat. Der ROI ist in den meisten Fällen nach vier bis acht Wochen erreicht.",
+          "Ein einfaches Automatisierungssystem (z. B. automatische Terminbestätigung + CRM-Eintrag) ist ab 150 € monatlich umsetzbar. Komplexere Lösungen mit mehreren verbundenen Systemen liegen bei 300–800 € pro Monat. Wann sich das rechnet, hängt vom Betrieb ab – rechnen Sie mit Ihren eigenen Zahlen.",
       },
       {
         type: "callout",
@@ -154,31 +153,31 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     title: "KI-Telefonassistent für Arztpraxen: Weniger Stress, mehr freie Leitungen",
     metaTitle: "KI-Telefonassistent Arztpraxis 2025 | Vorteile & Kosten",
     metaDescription:
-      "Wie ein KI-Telefonassistent Arztpraxen dabei hilft, verpasste Anrufe zu eliminieren, Termine automatisch zu buchen und das Praxisteam zu entlasten.",
+      "Wie ein KI-Telefonassistent Arztpraxen dabei hilft, verpasste Anrufe zu reduzieren, Termine automatisch zu buchen und das Praxisteam zu entlasten.",
     category: "KI-Telefonassistent",
     readingTime: 7,
     publishedAt: "2025-01-28",
     updatedAt: "2025-02-20",
     excerpt:
-      "Eine Arztpraxis mit 40 Anrufen pro Tag verliert ohne funktionierendes Telefonmanagement täglich Patienten. Der KI-Telefonassistent übernimmt Annahme, Triage und Buchung – rund um die Uhr.",
+      "Eine Arztpraxis mit hohem Anrufaufkommen verliert ohne funktionierendes Telefonmanagement Patienten. Der KI-Telefonassistent übernimmt Annahme, strukturierte Aufnahme und Terminbuchung – auch außerhalb der Öffnungszeiten.",
     heroKeyword: "KI-Telefonassistent Arztpraxis",
     sections: [
       {
         type: "p",
         content:
-          "Das Telefon in einer Arztpraxis klingelt im Schnitt 35 bis 60 Mal täglich. Davon sind etwa 60 % Terminanfragen – Aufgaben, die eine gut konfigurierte KI vollständig übernehmen kann. Der Rest, also Notfälle, komplexe Fragen oder spezifische Anliegen, bleibt beim Team.",
+          "Das Telefon in einer Arztpraxis steht selten still. Ein großer Teil der Anrufe sind Terminanfragen – Aufgaben, die eine gut konfigurierte KI vollständig übernehmen kann. Der Rest, also Notfälle, komplexe Fragen oder spezifische Anliegen, bleibt beim Team.",
       },
       {
         type: "h2",
         heading: "Das Problem: Überlastete Leitungen und verpasste Patienten",
         content:
-          "Wenn Patienten morgens um 8 Uhr nicht durchkommen, rufen sie bei einer anderen Praxis an. Dieser stille Verlust ist schwer messbar, hat aber direkte Auswirkungen auf Patientenbindung und Praxisumsatz. Eine Studie des Kassenärztlichen Bundesverbands zeigt: 28 % der Patienten haben schon mindestens einmal die Praxis gewechselt, weil sie telefonisch nicht erreichbar waren.",
+          "Wenn Patienten morgens um 8 Uhr nicht durchkommen, rufen sie bei einer anderen Praxis an. Dieser stille Verlust ist schwer messbar, hat aber direkte Auswirkungen auf Patientenbindung und Praxisumsatz. Wie groß das Problem ist, zeigt der vzbv (2025): Über ein Drittel der Befragten scheiterte bereits an der telefonischen Terminbuchung.",
       },
       {
         type: "ul",
         heading: "Was ein KI-Telefonassistent für Arztpraxen übernimmt",
         items: [
-          "Anrufannahme in unter 3 Sekunden – auch bei parallelen Anrufen",
+          "Anrufannahme ohne Warteschleife – auch bei parallelen Anrufen",
           "Terminbuchung direkt in das Praxisverwaltungssystem (z. B. Samedi, Doctolib, Medistar)",
           "Terminbestätigung und -erinnerung per SMS oder E-Mail",
           "Beantwortung häufiger Fragen (Öffnungszeiten, Parkplatz, Zuzahlung, Impftermine)",
@@ -190,7 +189,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Integration in bestehende Praxissoftware",
         content:
-          "Ein gut entwickelter KI-Telefonassistent muss sich nahtlos in das bestehende Ökosystem einfügen. Die gängigen deutschen Praxisverwaltungssysteme wie Medistar, Turbomed oder Samedi bieten APIs, über die Terminslots abgerufen und Buchungen eingetragen werden können. DSGVO-Konformität ist dabei nicht optional, sondern Pflicht.",
+          "Ein gut entwickelter KI-Telefonassistent muss sich direkt in das bestehende Ökosystem einfügen. Die gängigen deutschen Praxisverwaltungssysteme wie Medistar, Turbomed oder Samedi bieten APIs, über die Terminslots abgerufen und Buchungen eingetragen werden können. DSGVO-Konformität ist dabei nicht optional, sondern Pflicht.",
       },
       {
         type: "callout",
@@ -202,16 +201,15 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Kosten und ROI in der Praxis",
         content:
-          "Die monatlichen Kosten eines KI-Telefonassistenten für eine mittelgroße Praxis liegen zwischen 200 und 450 €. Demgegenüber stehen eingesparte Personalstunden von 15–25 Stunden pro Woche sowie die Rückgewinnung von Patienten, die sonst zur Konkurrenz wechseln. Der Break-even ist in den meisten Fällen nach sechs bis zehn Wochen erreicht.",
+          "Die monatlichen Kosten eines KI-Telefonassistenten für eine mittelgroße Praxis liegen zwischen 200 und 450 €. Demgegenüber stehen entlastete Personalstunden sowie Patienten, die sonst zur Konkurrenz wechseln würden. Wann sich das rechnet, hängt von Anrufaufkommen und Praxisstruktur ab – rechnen Sie mit Ihren eigenen Zahlen.",
       },
       {
         type: "table",
         heading: "Vergleich: Rezeptionskraft vs. KI-Telefonassistent",
         rows: [
-          { label: "Erreichbarkeit", value: "Rezeption: Mo–Fr 8–17 Uhr | KI: 24/7/365" },
-          { label: "Reaktionszeit", value: "Rezeption: 20–90 Sek. Warteschleife | KI: <3 Sek." },
-          { label: "Parallelgespräche", value: "Rezeption: 1 | KI: unbegrenzt" },
-          { label: "Monatliche Kosten", value: "Rezeption: 2.500–3.500 € | KI: 200–450 €" },
+          { label: "Erreichbarkeit", value: "Rezeption: Mo–Fr 8–17 Uhr | KI: auch außerhalb der Öffnungszeiten" },
+          { label: "Reaktionszeit", value: "Rezeption: je nach Auslastung Warteschleife | KI: ohne Warteschleife" },
+          { label: "Parallelgespräche", value: "Rezeption: 1 | KI: mehrere gleichzeitig" },
           { label: "DSGVO-Protokoll", value: "Manuell | Automatisch" },
         ],
       },
@@ -219,7 +217,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Fazit: Wann lohnt sich der KI-Telefonassistent für Arztpraxen?",
         content:
-          "Wenn Ihre Praxis täglich mehr als 20 Anrufe erhält und Ihre Rezeptionskraft regelmäßig überlastet ist, zahlt sich ein KI-Telefonassistent bereits im ersten Monat aus. Besonders in der Hochsaison – Grippezeit, Impfkampagnen – ist die Entlastung messbar.",
+          "Wenn in Ihrer Praxis regelmäßig Anrufe unbeantwortet bleiben und Ihre Rezeptionskraft überlastet ist, kann ein KI-Telefonassistent spürbar entlasten. Besonders in der Hochsaison – Grippezeit, Impfkampagnen – ist die Entlastung messbar.",
       },
     ],
     faqItems: [
@@ -236,7 +234,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         question: "Sprechen Patienten lieber mit einem Menschen?",
         answer:
-          "Studien zeigen: Wenn das System schnell reagiert und korrekte Informationen liefert, akzeptieren über 80 % der Patienten KI-Telefonassistenten für Standardanliegen.",
+          "Das ist unterschiedlich. Die Akzeptanz steigt deutlich, wenn die Praxis den Assistenten selbst ankündigt, das System schnell und korrekt reagiert und jederzeit ein klarer Weg zu einem Menschen offensteht.",
       },
     ],
     relatedSlugs: [
@@ -251,7 +249,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     title: "Webdesign für mehr Anfragen: 8 Konversionsfaktoren, die wirklich zählen",
     metaTitle: "Webdesign für mehr Anfragen & Konversion 2025 | 8 Tipps",
     metaDescription:
-      "Warum viele Unternehmenswebsites keine Anfragen generieren – und wie Sie mit gezielten Webdesign-Entscheidungen die Konversionsrate verdoppeln können.",
+      "Warum viele Unternehmenswebsites keine Anfragen generieren – und wie Sie mit gezielten Webdesign-Entscheidungen die Konversionsrate deutlich steigern können.",
     category: "Webdesign",
     readingTime: 8,
     publishedAt: "2025-02-03",
@@ -263,19 +261,19 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         type: "p",
         content:
-          "Eine Website, die schön aussieht, aber keine Anfragen generiert, ist ein Kostenfaktor – keine Ressource. Die durchschnittliche Konversionsrate von B2B-Unternehmenswebsites liegt bei 1,5 %. Top-Performer erreichen 4–8 %. Die Unterschiede liegen selten im Design, sondern in strategischen Entscheidungen zu Struktur, Text und Vertrauen.",
+          "Eine Website, die schön aussieht, aber keine Anfragen generiert, ist ein Kostenfaktor – keine Ressource. Viele B2B-Unternehmenswebsites machen aus ihren Besuchern nur selten Anfragen – gut optimierte Seiten erreichen deutlich mehr. Die Unterschiede liegen selten im Design, sondern in strategischen Entscheidungen zu Struktur, Text und Vertrauen.",
       },
       {
         type: "h2",
         heading: "1. Der Held-Abschnitt muss eine einzige Frage beantworten",
         content:
-          "Der erste Bildschirm Ihrer Website hat sieben Sekunden, um den Besucher zu halten. Diese Zeit reicht für genau eine Botschaft: Was bieten Sie an, und warum ist das für mich relevant? Allgemeine Slogans wie 'Ihr Partner für Erfolg' schaffen keine Verbindung. Spezifische Versprechen wie 'Mehr Patienten durch eine Website, die in Google sichtbar ist' – schon.",
+          "Der erste Bildschirm Ihrer Website hat nur wenige Sekunden, um den Besucher zu halten. Diese Zeit reicht für genau eine Botschaft: Was bieten Sie an, und warum ist das für mich relevant? Allgemeine Slogans wie 'Ihr Partner für Erfolg' schaffen keine Verbindung. Spezifische Versprechen wie 'Mehr Patienten durch eine Website, die in Google sichtbar ist' – schon.",
       },
       {
         type: "h2",
         heading: "2. Social Proof muss konkret und früh kommen",
         content:
-          "Allgemeine Aussagen wie 'Seit Jahren vertrauen uns Unternehmen' wirken nicht. Konkrete Zahlen, Kundenzitate mit Name und Unternehmen sowie Logos bekannter Kunden steigern das Vertrauen messbar. Am wirkungsvollsten: ein Kundenzitat direkt unter der Hauptaussage – nicht erst nach drei Scroll-Ebenen.",
+          "Allgemeine Aussagen wie 'Seit Jahren vertrauen uns Unternehmen' wirken nicht. Konkrete Zahlen und Kundenzitate mit Name und Unternehmen wirken: Echte, belegbare Referenzen schaffen Vertrauen – erfundene zerstören es. Am wirkungsvollsten: ein Kundenzitat direkt unter der Hauptaussage – nicht erst nach drei Scroll-Ebenen.",
       },
       {
         type: "h2",
@@ -287,7 +285,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "4. Ladezeit ist ein Konversionsfaktor",
         content:
-          "Google und Amazon haben es gemessen: Jede Sekunde zusätzliche Ladezeit kostet rund 7 % Konversionsrate. Eine Website, die auf dem Desktop schnell lädt, aber auf dem Smartphone drei Sekunden braucht, verliert die Hälfte ihrer mobilen Besucher. Core Web Vitals sind kein technischer Luxus – sie sind Umsatz.",
+          "Jede Sekunde zusätzliche Ladezeit kostet Besucher und Anfragen. Eine Website, die auf dem Desktop schnell lädt, aber auf dem Smartphone spürbar länger braucht, verliert einen großen Teil ihrer mobilen Besucher. Core Web Vitals sind kein technischer Luxus – sie sind Umsatz.",
       },
       {
         type: "h2",
@@ -299,19 +297,19 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "6. Mobile First ist keine Option",
         content:
-          "Über 60 % des Web-Traffics kommt heute von mobilen Geräten. Wer sein Webdesign noch von Desktop auf Mobile anpasst, denkt rückwärts. Konversionsorientiertes Design startet mit dem Smartphone-Erlebnis und erweitert es für größere Bildschirme.",
+          "Ein großer Teil des Web-Traffics kommt heute von mobilen Geräten. Wer sein Webdesign noch von Desktop auf Mobile anpasst, denkt rückwärts. Konversionsorientiertes Design startet mit dem Smartphone-Erlebnis und erweitert es für größere Bildschirme.",
       },
       {
         type: "h2",
         heading: "7. Navigationskomplexität tötet Anfragen",
         content:
-          "Jede unnötige Navigationsoption ist eine Ablenkung von der einen Handlung, die Sie vom Besucher wollen. Landing Pages mit einer einzigen klaren Handlungsaufforderung konvertieren in der Regel 30–50 % besser als vollständige Unternehmenswebsites.",
+          "Jede unnötige Navigationsoption ist eine Ablenkung von der einen Handlung, die Sie vom Besucher wollen. Landing Pages mit einer einzigen klaren Handlungsaufforderung konvertieren in der Regel deutlich besser als vollständige Unternehmenswebsites.",
       },
       {
         type: "h2",
         heading: "8. Formulare müssen kurz und eindeutig sein",
         content:
-          "Jedes zusätzliche Pflichtfeld in einem Kontaktformular senkt die Ausfüllrate um etwa 10–15 %. Name, E-Mail und ein offenes Feld für das Anliegen sind in den meisten Fällen ausreichend für eine erste Kontaktaufnahme. Alle weiteren Informationen können im Gespräch geklärt werden.",
+          "Jedes zusätzliche Pflichtfeld in einem Kontaktformular senkt die Ausfüllrate spürbar. Name, E-Mail und ein offenes Feld für das Anliegen sind in den meisten Fällen ausreichend für eine erste Kontaktaufnahme. Alle weiteren Informationen können im Gespräch geklärt werden.",
       },
       {
         type: "callout",
@@ -356,7 +354,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         type: "p",
         content:
-          "Über 46 % aller Google-Suchen haben einen lokalen Bezug. Und 78 % der lokalen Suchanfragen auf dem Smartphone führen innerhalb von 24 Stunden zu einem Besuch oder Kontakt. Lokales SEO ist für ortsgebundene Unternehmen damit wichtiger als jede andere Marketingmaßnahme.",
+          "Ein erheblicher Teil aller Google-Suchen hat einen lokalen Bezug. Und lokale Suchanfragen auf dem Smartphone führen oft schon kurz darauf zu einem Besuch oder Kontakt. Lokales SEO ist für ortsgebundene Unternehmen damit wichtiger als jede andere Marketingmaßnahme.",
       },
       {
         type: "h2",
@@ -381,7 +379,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Google Business Profile: Die wichtigste Stellschraube",
         content:
-          "Das Google Business Profile (früher: Google My Business) ist der wichtigste Hebel im lokalen SEO. Ein vollständig ausgefülltes Profil mit korrekter Kategorie, aktuellen Öffnungszeiten, hochwertigen Fotos und regelmäßigen Posts erhält im Schnitt drei Mal so viele Interaktionen wie ein unvollständiges Profil.",
+          "Das Google Business Profile (früher: Google My Business) ist der wichtigste Hebel im lokalen SEO. Ein vollständig ausgefülltes Profil mit korrekter Kategorie, aktuellen Öffnungszeiten, hochwertigen Fotos und regelmäßigen Posts erhält deutlich mehr Interaktionen als ein unvollständiges Profil.",
       },
       {
         type: "ol",
@@ -406,7 +404,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Bewertungsmanagement: Quantität und Qualität",
         content:
-          "Unternehmen mit mehr als 50 Google-Bewertungen und einer Bewertung von 4,3 oder höher erscheinen signifikant häufiger in der Local Pack als Konkurrenten mit weniger Bewertungen. Automatisierte Bewertungsanfragen (per SMS oder E-Mail nach einem Kauf oder Termin) sind erlaubt und effektiv.",
+          "Unternehmen mit einer soliden Zahl authentischer Google-Bewertungen und einem guten Durchschnittswert erscheinen häufiger in der Local Pack als Konkurrenten mit wenigen Bewertungen. Automatisierte Bewertungsanfragen (per SMS oder E-Mail nach einem Kauf oder Termin) sind erlaubt und effektiv.",
       },
       {
         type: "callout",
@@ -474,23 +472,23 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Schritt 1: Zeitersparnis messen",
         content:
-          "Starten Sie mit einer Zeiterfassung: Wie viele Minuten pro Vorgang × wie viele Vorgänge pro Woche. Multiplizieren Sie das mit 52 (Wochen/Jahr) und mit dem internen Stundensatz der betroffenen Person. Beispiel: 15 Minuten pro Rechnungsversand × 60 Rechnungen/Monat × 12 Monate × 35 €/Stunde = 6.300 € Jahresersparnis.",
+          "Starten Sie mit einer Zeiterfassung: Wie viele Minuten pro Vorgang × wie viele Vorgänge pro Woche. Multiplizieren Sie das mit 52 (Wochen/Jahr) und mit dem internen Stundensatz der betroffenen Person. Ein frei erfundenes Rechenbeispiel – setzen Sie Ihre eigenen Werte ein: 15 Minuten pro Rechnungsversand × 60 Rechnungen/Monat × 12 Monate × 35 €/Stunde = 6.300 € Jahresersparnis.",
       },
       {
         type: "h2",
         heading: "Schritt 2: Fehlerkosten einrechnen",
         content:
-          "Manuelle Prozesse haben eine durchschnittliche Fehlerrate von 1–4 %. Jeder Fehler kostet Zeit zur Korrektur, manchmal Kundenvertrauen und gelegentlich direkte Kosten (z. B. falsch versandte Rechnungen, doppelte Buchungen). Diese Kosten werden bei der ROI-Berechnung oft vergessen.",
+          "Manuelle Prozesse sind fehleranfällig. Jeder Fehler kostet Zeit zur Korrektur, manchmal Kundenvertrauen und gelegentlich direkte Kosten (z. B. falsch versandte Rechnungen, doppelte Buchungen). Diese Kosten werden bei der ROI-Berechnung oft vergessen.",
       },
       {
         type: "h2",
         heading: "Schritt 3: Indirekte Nutzen bewerten",
         content:
-          "Schnellere Prozesse bedeuten schnellere Reaktion auf Kundenanfragen, was die Abschlusswahrscheinlichkeit erhöht. Wer auf eine Anfrage in unter einer Stunde antwortet, hat laut Harvard Business Review eine 7× höhere Abschlusswahrscheinlichkeit als wer nach 24 Stunden antwortet.",
+          "Schnellere Prozesse bedeuten schnellere Reaktion auf Kundenanfragen, was die Abschlusswahrscheinlichkeit erhöht. Wer auf eine Anfrage schnell antwortet, hat deutlich bessere Chancen auf den Abschluss als wer erst nach 24 Stunden reagiert.",
       },
       {
         type: "table",
-        heading: "Beispiel-ROI-Berechnung: Terminautomatisierung",
+        heading: "Frei erfundenes Rechenbeispiel Terminautomatisierung – setzen Sie Ihre eigenen Werte ein",
         rows: [
           { label: "Manueller Aufwand vorher", value: "8 Std./Woche × 40 €/Std. = 320 €/Woche" },
           { label: "Jahreskosten manuell", value: "16.640 €" },
@@ -517,7 +515,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         question: "Was ist ein guter ROI für ein Automatisierungsprojekt?",
         answer:
-          "Alles über 150 % im ersten Jahr gilt als sehr gut. Die meisten Prozessautomatisierungen liegen zwischen 200 und 500 % ROI über zwei Jahre.",
+          "Das lässt sich nicht pauschal beziffern – der erreichbare ROI hängt von Prozess, Volumen und Stundensätzen ab. Rechnen Sie mit Ihren eigenen Zahlen über 12 und 24 Monate.",
       },
       {
         question: "Wie berechne ich den internen Stundensatz?",
@@ -537,19 +535,19 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     title: "Was verpasste Anrufe Ihr Unternehmen wirklich kosten – eine Kalkulation",
     metaTitle: "Verpasste Anrufe Kosten berechnen | KI-Telefonassistent",
     metaDescription:
-      "Wie teuer sind verpasste Anrufe wirklich? Eine ehrliche Kalkulation mit Durchschnittswerten aus deutschen KMU – und wie ein KI-Telefonassistent den Verlust stoppt.",
+      "Wie teuer sind verpasste Anrufe wirklich? Eine ehrliche Kalkulation zum Nachrechnen mit eigenen Zahlen – und wie ein KI-Telefonassistent dagegen hilft.",
     category: "KI-Telefonassistent",
     readingTime: 6,
     publishedAt: "2025-02-24",
     updatedAt: "2025-03-12",
     excerpt:
-      "Ein nicht angenommener Anruf kostet im Schnitt zwischen 50 und 300 €. Bei 10 verpassten Anrufen pro Woche summiert sich das auf bis zu 150.000 € Jahresumsatzverlust.",
+      "Was ein verpasster Anruf kostet, hängt vom Auftragswert ab – rechnen Sie mit Ihren eigenen Zahlen. Dieser Artikel zeigt, wie die Kalkulation funktioniert.",
     heroKeyword: "verpasste Anrufe Kosten",
     sections: [
       {
         type: "p",
         content:
-          "Die meisten Unternehmen wissen nicht, wie viele Anrufe sie täglich verpassen. Ein Anrufbeantworter gibt keine Statistiken. Ein KI-System hingegen protokolliert jeden Anruf – und zeigt damit oft einen erschreckenden Verlust auf.",
+          "Die meisten Unternehmen wissen nicht, wie viele Anrufe sie täglich verpassen. Ein Anrufbeantworter gibt keine Statistiken. Ein KI-System hingegen protokolliert die angenommenen Gespräche – und macht damit sichtbar, wie viele Anrufe sonst verloren gingen.",
       },
       {
         type: "h2",
@@ -559,7 +557,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       },
       {
         type: "table",
-        heading: "Kalkulationsbeispiel nach Branche",
+        heading: "Beispielrechnung mit frei gewählten Werten – setzen Sie Ihre eigenen ein",
         rows: [
           { label: "Arztpraxis (Neupatienten)", value: "60 € × 12 Monate Ø-Umsatz = 720 € pro verlorenem Patient" },
           { label: "Handwerk (Neukunde)", value: "Ø-Auftrag 1.200 € × 40% Abschlussrate = 480 € pro Anruf" },
@@ -571,32 +569,32 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Warum Unternehmen Anrufe verpassen",
         content:
-          "Die häufigsten Gründe: Stoßzeiten morgens und über Mittagspause, Urlaubszeiten, Meetings, parallele Anrufe und schlicht zu wenig Personal für die Anrufmenge. Besonders kritisch: In vielen Branchen ruft ein potenzieller Neukunde zwei oder drei Mitbewerber an – wer zuerst antwortet, bekommt den Auftrag.",
+          "Die häufigsten Gründe: Stoßzeiten morgens und über Mittagspause, Urlaubszeiten, Meetings, parallele Anrufe und schlicht zu wenig Personal für die Anrufmenge. Besonders kritisch: In vielen Branchen ruft ein potenzieller Neukunde zwei oder drei Mitbewerber an – wer zuerst antwortet, bekommt oft den Auftrag.",
       },
       {
         type: "callout",
         calloutType: "warning",
         content:
-          "Laut einer Studie von Lead Response Management rufen 78 % der potenziellen Kunden bei ausbleibendem Rückruf innerhalb einer Stunde beim nächsten Anbieter an.",
+          "Wer nicht zeitnah zurückgerufen wird, ruft oft schon kurz darauf beim nächsten Anbieter an – der erste erreichbare Betrieb ist klar im Vorteil.",
       },
       {
         type: "h2",
         heading: "Wie ein KI-Telefonassistent den Verlust stoppt",
         content:
-          "Ein KI-Telefonassistent nimmt jeden Anruf in unter drei Sekunden an – unabhängig von Tageszeit, Auslastung oder parallelen Gesprächen. Er qualifiziert den Anruf, bucht Termine direkt und gibt kritische Informationen sofort weiter. Das Ergebnis: Kein Anruf geht verloren.",
+          "Ein KI-Telefonassistent nimmt Anrufe ohne Warteschleife an – auch zu Stoßzeiten und bei parallelen Gesprächen. Er qualifiziert den Anruf, bucht Termine direkt und gibt kritische Informationen sofort weiter. Das Ergebnis: Anrufe werden angenommen statt verpasst.",
       },
       {
         type: "h2",
         heading: "Die Schwellenwertberechnung",
         content:
-          "Ab wie vielen verpassten Anrufen pro Monat rechnet sich ein KI-Telefonassistent? Bei einem monatlichen Systempreis von 300 € und einem Anrufwert von 150 € (Beispiel Handwerk) amortisiert sich die Investition schon bei zwei zusätzlichen gewonnenen Aufträgen pro Monat.",
+          "Ab wie vielen verpassten Anrufen pro Monat rechnet sich ein KI-Telefonassistent? Ein frei erfundenes Rechenbeispiel – setzen Sie Ihre eigenen Werte ein: Bei einem monatlichen Systempreis von 300 € und einem angenommenen Anrufwert von 150 € würde sich die Investition bei zwei zusätzlich gewonnenen Aufträgen pro Monat rechnen.",
       },
     ],
     faqItems: [
       {
         question: "Wie finde ich heraus, wie viele Anrufe ich verpasse?",
         answer:
-          "Die meisten Telefonanlagen zeigen verpasste Anrufstatistiken. Alternativ können auch Mobilfunkanbieter Gesprächsstatistiken liefern. Ein KI-System protokolliert jeden Anruf mit Zeitstempel.",
+          "Die meisten Telefonanlagen zeigen verpasste Anrufstatistiken. Alternativ können auch Mobilfunkanbieter Gesprächsstatistiken liefern. Ein KI-System protokolliert die angenommenen Gespräche mit Zeitstempel.",
       },
       {
         question: "Gilt die Kalkulation auch für Bestandskunden?",
@@ -616,19 +614,19 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     title: "KI-Telefonassistent für Restaurants: Mehr Reservierungen, weniger Arbeit",
     metaTitle: "KI-Telefonassistent Restaurant 2025 | Reservierungen automatisieren",
     metaDescription:
-      "Wie Restaurants mit einem KI-Telefonassistenten Reservierungen automatisch annehmen, Wartelisten führen und Gäste nachqualifizieren – ohne Personal.",
+      "Wie Restaurants mit einem KI-Telefonassistenten Reservierungen automatisch annehmen, Wartelisten führen und Gäste nachqualifizieren – ohne zusätzliches Personal.",
     category: "KI-Telefonassistent",
     readingTime: 6,
     publishedAt: "2025-03-03",
     updatedAt: "2025-03-14",
     excerpt:
-      "Freitagabend, 19 Uhr: Das Restaurant ist voll, das Telefon klingelt, aber das Team hat beide Hände voll. Ein KI-Telefonassistent nimmt jeden Anruf an – auch in der Stoßzeit.",
+      "Freitagabend, 19 Uhr: Das Restaurant ist voll, das Telefon klingelt, aber das Team hat beide Hände voll. Ein KI-Telefonassistent nimmt die Anrufe an, die sonst verloren gingen – auch in der Stoßzeit.",
     heroKeyword: "KI-Telefonassistent Restaurant",
     sections: [
       {
         type: "p",
         content:
-          "In der Gastronomie ist das Telefon noch immer der bevorzugte Reservierungskanal für rund 55 % der Gäste. Gleichzeitig ist es in Stoßzeiten das am schwersten zu managende Medium. Ein KI-Telefonassistent schließt diese Lücke ohne zusätzliches Personal.",
+          "In der Gastronomie ist das Telefon für viele Gäste noch immer der bevorzugte Reservierungskanal. Gleichzeitig ist es in Stoßzeiten das am schwersten zu managende Medium. Ein KI-Telefonassistent schließt diese Lücke ohne zusätzliches Personal.",
       },
       {
         type: "h2",
@@ -640,11 +638,11 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "ul",
         heading: "Typische Anrufgründe im Restaurant (und KI-Abdeckung)",
         items: [
-          "Reservierung anfragen → 100% automatisierbar",
-          "Tisch für größere Gruppe anfragen → 85% automatisierbar",
-          "Öffnungszeiten erfragen → 100% automatisierbar",
-          "Menü erfragen → 100% automatisierbar (mit Menülink oder Vorlesen)",
-          "Reservierung stornieren → 100% automatisierbar",
+          "Reservierung anfragen → in der Regel automatisierbar",
+          "Tisch für größere Gruppe anfragen → meist automatisierbar",
+          "Öffnungszeiten erfragen → in der Regel automatisierbar",
+          "Menü erfragen → in der Regel automatisierbar (mit Menülink oder Vorlesen)",
+          "Reservierung stornieren → in der Regel automatisierbar",
           "Besondere Wünsche (z. B. Geburtstagsdeko) → Weiterleitung ans Team",
           "Catering-Anfrage → Weiterleitung ans Team",
         ],
@@ -659,16 +657,16 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "No-Show-Prävention durch automatische Erinnerungen",
         content:
-          "No-Shows kosten Restaurants in Deutschland jährlich Milliarden Euro Umsatz. Der KI-Assistent sendet automatisch 24 Stunden vor der Reservierung eine Erinnerung per SMS oder WhatsApp und ermöglicht die einfache Stornierung – was die No-Show-Rate nachweislich um 30–50 % senkt.",
+          "No-Shows kosten Restaurants bares Geld. Der KI-Assistent sendet automatisch 24 Stunden vor der Reservierung eine Erinnerung per SMS oder WhatsApp und ermöglicht die einfache Stornierung – Erinnerungen am Vortag wirken No-Shows entgegen.",
       },
       {
         type: "table",
         heading: "Vergleich: Ohne vs. mit KI-Telefonassistent",
         rows: [
           { label: "Anrufannahme Stoßzeiten", value: "Ohne: Warteschleife/Beantworter | Mit KI: sofort" },
-          { label: "Reservierungen außerhalb Öffnungszeit", value: "Ohne: nicht möglich | Mit KI: 24/7" },
-          { label: "No-Show-Rate", value: "Ohne: 15–25% | Mit KI: 8–15%" },
-          { label: "Personalaufwand Telefon", value: "Ohne: 2–4 Std./Tag | Mit KI: <30 Min./Tag" },
+          { label: "Reservierungen außerhalb Öffnungszeit", value: "Ohne: nicht möglich | Mit KI: möglich" },
+          { label: "No-Show-Prävention", value: "Ohne: keine systematische Erinnerung | Mit KI: automatische Erinnerung am Vortag" },
+          { label: "Personalaufwand Telefon", value: "Ohne: hoch, besonders in Stoßzeiten | Mit KI: deutlich reduziert" },
         ],
       },
       {
@@ -687,7 +685,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         question: "Was passiert, wenn ein Tisch nicht verfügbar ist?",
         answer:
-          "Das System bietet alternative Zeiten an, trägt den Gast auf eine Warteliste ein oder empfiehlt einen Folgetermin – alles vollautomatisch.",
+          "Das System bietet alternative Zeiten an, trägt den Gast auf eine Warteliste ein oder empfiehlt einen Folgetermin – automatisch nach Ihren Vorgaben.",
       },
     ],
     relatedSlugs: [
@@ -714,19 +712,19 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         type: "p",
         content:
-          "Nach einer aktuellen Analyse generieren über 65 % aller deutschen KMU-Websites keine messbaren Leads. Sie sind online präsent, aber unsichtbar für potenzielle Kunden – entweder weil niemand die Seite findet oder weil niemand, der sie findet, eine Anfrage stellt.",
+          "Viele deutsche KMU-Websites generieren keine messbaren Leads. Sie sind online präsent, aber unsichtbar für potenzielle Kunden – entweder weil niemand die Seite findet oder weil niemand, der sie findet, eine Anfrage stellt.",
       },
       {
         type: "h2",
         heading: "Problem 1: Die Website wird nicht gefunden",
         content:
-          "Ohne SEO ist eine Website in Google auf Seite 5 oder schlechter. Auf Seite 1 landen 92 % aller Klicks, auf Seite 2 nur noch 6 %. Wenn Ihre Website für relevante Suchbegriffe nicht auf Seite 1 erscheint, existiert sie für die meisten potenziellen Kunden nicht.",
+          "Ohne SEO ist eine Website in Google auf Seite 5 oder schlechter. Die große Mehrheit der Klicks entfällt auf die erste Seite. Wenn Ihre Website für relevante Suchbegriffe nicht auf Seite 1 erscheint, existiert sie für die meisten potenziellen Kunden nicht.",
       },
       {
         type: "h2",
         heading: "Problem 2: Die Botschaft trifft nicht",
         content:
-          "Viele Unternehmenswebsites kommunizieren primär, was das Unternehmen tut – nicht, was es für den Kunden löst. Die entscheidende Frage, die ein Besucher innerhalb der ersten 7 Sekunden beantwortet haben möchte: 'Bin ich hier richtig für mein Problem?' Wer diese Frage nicht sofort klar beantwortet, verliert den Besucher.",
+          "Viele Unternehmenswebsites kommunizieren primär, was das Unternehmen tut – nicht, was es für den Kunden löst. Die entscheidende Frage, die ein Besucher in den ersten Sekunden beantwortet haben möchte: 'Bin ich hier richtig für mein Problem?' Wer diese Frage nicht sofort klar beantwortet, verliert den Besucher.",
       },
       {
         type: "h2",
@@ -744,7 +742,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Problem 5: Das Formular ist zu umständlich",
         content:
-          "Formulare mit mehr als 4 Feldern verlieren die Hälfte ihrer potenziellen Ausfüller. Dazu kommen technische Hürden: CAPTCHA, mehrstufige Bestätigungen, Pflichtfelder ohne erkennbaren Nutzen. Ein gut gestaltetes Formular hat maximal drei Felder und erscheint auf jeder relevanten Unterseite.",
+          "Formulare mit vielen Feldern verlieren einen großen Teil ihrer potenziellen Ausfüller. Dazu kommen technische Hürden: CAPTCHA, mehrstufige Bestätigungen, Pflichtfelder ohne erkennbaren Nutzen. Ein gut gestaltetes Formular hat maximal drei Felder und erscheint auf jeder relevanten Unterseite.",
       },
       {
         type: "h2",
@@ -763,7 +761,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         question: "Wie viele Anfragen sollte eine gute Unternehmenswebsite bringen?",
         answer:
-          "Das hängt vom Traffic ab. Eine realistische Zielmarke: 1–3 % der Besucher sollten eine Anfrage stellen. Bei 300 Besuchern/Monat sind das 3–9 Anfragen.",
+          "Das hängt vom Traffic ab. Als grobe Faustregel: 1–3 % der Besucher stellen eine Anfrage. Bei 300 Besuchern/Monat wären das 3–9 Anfragen.",
       },
       {
         question: "Kann ich das selbst verbessern oder brauche ich eine Agentur?",
@@ -811,7 +809,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
           "CRM-System einführen (Kundenkontakte strukturiert verwalten)",
           "Automatisierte Kommunikation (Terminbestätigung, Follow-up, Bewertungsanfragen)",
           "Website mit lokalem SEO (Neukunden über Suchmaschinen gewinnen)",
-          "Digitale Terminbuchung (rund um die Uhr, ohne Anruf)",
+          "Digitale Terminbuchung (auch außerhalb der Öffnungszeiten, ohne Anruf)",
         ],
       },
       {
@@ -824,7 +822,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Der pragmatische Einstieg: Das 90-Tage-Modell",
         content:
-          "In 90 Tagen können die meisten Mittelständler drei messbare Digitalisierungsschritte umsetzen, wenn sie sich auf Impact-First konzentrieren: Was hat den größten Effekt bei geringstem Aufwand? Monat 1: Digitale Kommunikation automatisieren. Monat 2: Online-Sichtbarkeit verbessern. Monat 3: Ersten internen Prozess automatisieren.",
+          "In wenigen Monaten können viele Mittelständler drei messbare Digitalisierungsschritte umsetzen, wenn sie sich auf Impact-First konzentrieren: Was hat den größten Effekt bei geringstem Aufwand? Monat 1: Digitale Kommunikation automatisieren. Monat 2: Online-Sichtbarkeit verbessern. Monat 3: Ersten internen Prozess automatisieren.",
       },
       {
         type: "h2",
@@ -842,14 +840,14 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "callout",
         calloutType: "info",
         content:
-          "Laut einer KfW-Studie hat die Hälfte der deutschen KMU noch kein CRM-System und abwickelt Kundenkommunikation ausschließlich per E-Mail und Telefon ohne strukturierte Nachverfolgung.",
+          "Viele deutsche KMU arbeiten noch ohne CRM-System und wickeln Kundenkommunikation ausschließlich per E-Mail und Telefon ohne strukturierte Nachverfolgung ab.",
       },
     ],
     faqItems: [
       {
         question: "Wie viel Budget sollte ein Mittelständler für Digitalisierung einplanen?",
         answer:
-          "Als Faustregel gilt: 1–3 % des Jahresumsatzes für Digitalisierung. Für KMU mit 500.000 € Umsatz sind das 5.000–15.000 €/Jahr – meist deutlich weniger als die eingesparten Kosten.",
+          "Als grobe Faustregel werden oft 1–3 % des Jahresumsatzes genannt. Entscheidend ist weniger die Quote als der messbare Nutzen jeder einzelnen Maßnahme – rechnen Sie mit Ihren eigenen Zahlen.",
       },
       {
   question: "Welche Tools sind für den Einstieg empfehlenswert?",
@@ -886,7 +884,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         type: "p",
         content:
-          "In Deutschland gibt es über 15.000 Webdesign-Agenturen und Freelancer. Die Qualitätsunterschiede sind enorm: Von professionellen Agenturen mit klar definierten Prozessen bis zu Einzelpersonen mit WordPress-Template-Kenntnissen. Wer die falsche wählt, zahlt doppelt – für das erste Projekt und für die Überarbeitung.",
+          "In Deutschland gibt es tausende Webdesign-Agenturen und Freelancer. Die Qualitätsunterschiede sind enorm: Von professionellen Agenturen mit klar definierten Prozessen bis zu Einzelpersonen mit WordPress-Template-Kenntnissen. Wer die falsche wählt, zahlt doppelt – für das erste Projekt und für die Überarbeitung.",
       },
       {
         type: "h2",
@@ -951,7 +949,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         question: "Wie lange dauert eine neue Website?",
         answer:
-          "Mit klarem Briefing und schnellen Feedbackprozessen: 4–8 Wochen. Komplexere Projekte: 8–16 Wochen. Vorsicht bei Agenturen, die unter 3 Wochen versprechen.",
+          "Mit klarem Briefing und schnellen Feedbackprozessen: 4–8 Wochen. Komplexere Projekte: 8–16 Wochen.",
       },
     ],
     relatedSlugs: [
