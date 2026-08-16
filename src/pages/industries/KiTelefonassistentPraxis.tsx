@@ -1,6 +1,7 @@
 import { NationalIndustryPage } from "@/components/NationalIndustryPage";
 import type { NationalIndustryPageConfig } from "@/components/NationalIndustryPage";
 import { BUSINESS_INFO } from "@/lib/seo-data";
+import { GRENZEN } from "@/lib/telefonassistent-copy";
 
 const config: NationalIndustryPageConfig = {
   seo: {
@@ -129,6 +130,8 @@ const config: NationalIndustryPageConfig = {
         "Ja. Im unverbindlichen Erstgespräch gehen wir Ihre typischen Anrufe durch und zeigen an einer Beispielkonfiguration, wie der Assistent für Ihre Praxis klingt und was er übernimmt. Vor dem Start testen Sie mit echten Szenarien – erst wenn es sitzt, geht er live.",
     },
   ],
+  grenzen: GRENZEN,
+  stimmprobe: true,
 };
 
 export function KiTelefonassistentPraxis() {

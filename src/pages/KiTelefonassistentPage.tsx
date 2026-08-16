@@ -32,9 +32,14 @@ import {
   ANLIEGEN_IMMER_MENSCH,
   ANLIEGEN_UEBERNIMMT,
   EINRICHTUNG_SCHRITTE,
+  GRENZEN,
+  NICHT_PASSEND,
+  PATIENTEN_SICHT,
   SCHEITERN_INTRO,
   SCHEITERN_MUSTER,
+  TEAM_BLOCK,
 } from "@/lib/telefonassistent-copy";
+import { StimmprobeSection } from "@/components/StimmprobeSection";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -229,14 +234,19 @@ export function KiTelefonassistentPage() {
 
       <main className="min-h-screen">
         <HeroSection />
+        <StimmprobeSection />
         <CredentialStrip />
         <ProblemSection />
+        <PatientenSichtSection />
         <FailurePatternsSection />
         <SolutionSection />
         <CallFlowSection />
         <CallSummarySection />
         <AnliegenKatalogSection />
+        <GrenzenSection />
+        <TeamSection />
         <ObjectionsSection />
+        <NichtPassendSection />
         <UseCasesSection />
         <SetupSection />
         <DemoCtaSection />
@@ -612,6 +622,126 @@ function AnliegenKatalogSection() {
             </ul>
           </motion.div>
         </div>
+      </div>
+    </section>
+  );
+}
+
+function PatientenSichtSection() {
+  return (
+    <section className="py-24 bg-white dark:bg-gray-950">
+      <div className="max-w-3xl mx-auto px-6 lg:px-8">
+        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+          Die andere Seite der Leitung
+        </p>
+        <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-6">
+          {PATIENTEN_SICHT.headline}
+        </h2>
+        {PATIENTEN_SICHT.paragraphs.map((p, i) => (
+          <p key={i} className="text-gray-500 dark:text-gray-400 leading-[1.75] mb-4">
+            {p}
+          </p>
+        ))}
+        <div className="mt-6 inline-flex items-center gap-4 px-6 py-4 rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800">
+          <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            {PATIENTEN_SICHT.stat.value}
+          </span>
+          <div className="h-8 w-px bg-gray-200 dark:bg-gray-700" />
+          <span className="text-sm text-gray-500 dark:text-gray-400 max-w-xs">
+            {PATIENTEN_SICHT.stat.text}
+            <span className="block text-[11px] text-gray-400 dark:text-gray-500 mt-1">
+              Quelle: {PATIENTEN_SICHT.stat.source}
+            </span>
+          </span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function GrenzenSection() {
+  return (
+    <section className="py-24 bg-gray-50 dark:bg-gray-900/40" aria-labelledby="grenzen-heading">
+      <div className="max-w-3xl mx-auto px-6 lg:px-8">
+        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+          Klare Grenzen
+        </p>
+        <h2
+          id="grenzen-heading"
+          className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4"
+        >
+          {GRENZEN.headline}
+        </h2>
+        <p className="text-gray-500 dark:text-gray-400 leading-[1.7] mb-8">{GRENZEN.intro}</p>
+        <ul className="space-y-4">
+          {GRENZEN.points.map((point, i) => (
+            <li
+              key={i}
+              className="flex items-start gap-3 text-[14px] text-gray-600 dark:text-gray-400 leading-relaxed"
+            >
+              <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0" />
+              {point}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+function TeamSection() {
+  return (
+    <section className="py-24 bg-white dark:bg-gray-950">
+      <div className="max-w-6xl mx-auto px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-16 items-start">
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+              Für Ihr Praxisteam
+            </p>
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-5">
+              {TEAM_BLOCK.headline}
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400 leading-[1.7]">{TEAM_BLOCK.text}</p>
+          </div>
+          <ul className="space-y-3">
+            {TEAM_BLOCK.points.map((point, i) => (
+              <li
+                key={i}
+                className="flex items-start gap-2.5 p-4 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 text-[13px] text-gray-600 dark:text-gray-400 leading-relaxed"
+              >
+                <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0 mt-0.5" />
+                {point}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function NichtPassendSection() {
+  return (
+    <section className="py-20 bg-white dark:bg-gray-950">
+      <div className="max-w-3xl mx-auto px-6 lg:px-8">
+        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+          Ehrliche Beratung
+        </p>
+        <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-4">
+          {NICHT_PASSEND.headline}
+        </h2>
+        <p className="text-gray-500 dark:text-gray-400 leading-[1.7] mb-6">{NICHT_PASSEND.intro}</p>
+        <ul className="space-y-3">
+          {NICHT_PASSEND.points.map((point, i) => (
+            <li
+              key={i}
+              className="flex items-start gap-3 text-[14px] text-gray-600 dark:text-gray-400 leading-relaxed"
+            >
+              <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0" />
+              {point}
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

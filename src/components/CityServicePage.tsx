@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/accordion";
 import { PageSEO } from "@/components/PageSEO";
 import { RelatedPages } from "@/components/RelatedPages";
+import { StimmprobeSection } from "@/components/StimmprobeSection";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 import type { CityServiceConfig } from "@/lib/standorte-data";
 
@@ -129,6 +130,9 @@ export function CityServicePage({ config }: CityServicePageProps) {
 
       <main className="min-h-screen">
         <HeroSection config={config} breadcrumbs={breadcrumbs} />
+        {/* M13 · Stimmprobe — nur Telefonassistent-Stadtseiten; asset-gated,
+            rendert ohne Audiodatei nichts. */}
+        {config.serviceSlug === "ki-telefonassistent" && <StimmprobeSection />}
         <TrustStrip config={config} />
         <LocalIntroSection config={config} />
         <WarumCogniiq config={config} />

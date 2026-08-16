@@ -1,6 +1,7 @@
 import { NationalIndustryPage } from "@/components/NationalIndustryPage";
 import type { NationalIndustryPageConfig } from "@/components/NationalIndustryPage";
 import { BUSINESS_INFO } from "@/lib/seo-data";
+import { GRENZEN } from "@/lib/telefonassistent-copy";
 
 const config: NationalIndustryPageConfig = {
   seo: {
@@ -136,6 +137,8 @@ const config: NationalIndustryPageConfig = {
         "Ja. Sprechzeiten, Urlaubsansagen und aktuelle Hinweise pflegen Sie selbst über ein Dashboard – ohne Anruf beim Support, auch kurzfristig vor Feiertagen. Änderungen an Gesprächslogik und Regeln übernehmen wir; dafür haben Sie einen festen Ansprechpartner.",
     },
   ],
+  grenzen: GRENZEN,
+  stimmprobe: true,
 };
 
 export function KiTelefonassistentArzt() {

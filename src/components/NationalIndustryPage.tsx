@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
+import { StimmprobeSection } from "@/components/StimmprobeSection";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 22 },
@@ -49,6 +50,14 @@ export interface NationalIndustryPageConfig {
   cityLinks: Array<{ label: string; href: string }>;
   relatedLinks: Array<{ label: string; href: string }>;
   faq: Array<{ question: string; answer: string }>;
+  /**
+   * M15 · Benannte Grenzen (Brief II §4.3). Optional, damit Nicht-Healthcare-
+   * Seiten unverändert bleiben; Healthcare-Configs liefern das geteilte
+   * GRENZEN-Modul aus telefonassistent-copy.ts.
+   */
+  grenzen?: { headline: string; intro: string; points: string[] };
+  /** M13 · Stimmprobe-Slot (asset-gated; rendert ohne Audiodatei nichts). */
+  stimmprobe?: boolean;
 }
 
 interface Props {
@@ -415,6 +424,48 @@ export function NationalIndustryPage({ config }: Props) {
             </div>
           </div>
         </section>
+
+        {/* ── M13 · STIMMPROBE (asset-gated, rendert ohne Audio nichts) ── */}
+        {config.stimmprobe && <StimmprobeSection />}
+
+        {/* ── M15 · GRENZEN ── */}
+        {config.grenzen && (
+          <section className="py-24 bg-white dark:bg-gray-950" aria-labelledby="grenzen-heading">
+            <div className="max-w-3xl mx-auto px-6 lg:px-8">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-60px" }}
+                variants={fadeUp}
+                custom={0}
+              >
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+                  Klare Grenzen
+                </p>
+                <h2
+                  id="grenzen-heading"
+                  className="text-3xl lg:text-[2.1rem] font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4"
+                >
+                  {config.grenzen.headline}
+                </h2>
+                <p className="text-gray-500 dark:text-gray-400 leading-[1.7] mb-8">
+                  {config.grenzen.intro}
+                </p>
+                <ul className="space-y-4">
+                  {config.grenzen.points.map((point, i) => (
+                    <li
+                      key={i}
+                      className="flex items-start gap-3 text-[14px] text-gray-600 dark:text-gray-400 leading-relaxed"
+                    >
+                      <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0" />
+                      {point}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            </div>
+          </section>
+        )}
 
         {/* ── DEMO CTA ── */}
         <section className="py-20 bg-gray-50 dark:bg-gray-900/40 border-y border-gray-100 dark:border-gray-800">
