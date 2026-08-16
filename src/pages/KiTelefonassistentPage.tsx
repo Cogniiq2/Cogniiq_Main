@@ -28,6 +28,13 @@ import {
 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
+import {
+  ANLIEGEN_IMMER_MENSCH,
+  ANLIEGEN_UEBERNIMMT,
+  EINRICHTUNG_SCHRITTE,
+  SCHEITERN_INTRO,
+  SCHEITERN_MUSTER,
+} from "@/lib/telefonassistent-copy";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -45,57 +52,64 @@ const breadcrumbs = [
 
 const faqItems = [
   {
-    question: "Wie schnell ist der KI Telefonassistent eingerichtet?",
+    question: "Kommen Anrufer mit der Stimme eines Sprachassistenten zurecht?",
     answer:
-      "In den meisten Fällen ist der Assistent innerhalb weniger Tage einsatzbereit. Wir konfigurieren ihn individuell für Ihr Unternehmen – inklusive Branchensprache, häufigen Anfragen und Kalenderintegration.",
+      "Nicht jeder Anrufer mag synthetische Stimmen — das nehmen wir ernst. Begrüßung und Ansagen werden auf Ihren Betrieb abgestimmt, auf Wunsch mit Ihren eigenen Aufnahmen. Anrufer erfahren zu Beginn, dass ein Sprachassistent sie betreut, und können jederzeit zu einem Menschen wechseln. In der Startphase werten wir Gespräche mit Ihnen aus und passen an, was nicht sitzt.",
   },
   {
-    question: "Welche Systeme können integriert werden?",
+    question: "Muss ich dafür mein System oder meine Rufnummer wechseln?",
+    // [[CLAIM: verify — keine Systemumstellung nötig / bestehende Rufnummer bleibt (bereits publizierte Aussage, vom Inhaber bestätigen)]]
     answer:
-      "Der Assistent verbindet sich mit Google Calendar, Outlook, gängigen CRM-Systemen sowie bestehenden Automatisierungs-Workflows. Die Integration erfolgt ohne technischen Aufwand für Ihr Team.",
+      "Nein. Ihre Rufnummer bleibt, Ihre Telefonanlage bleibt, Ihr Kalender bleibt. Der Assistent wird an Ihre bestehende Arbeitsweise angebunden. Welche Anbindung für Ihr System möglich ist, prüfen wir vor dem Angebot — nicht danach.",
+  },
+  {
+    question: "Was übernimmt der Assistent — und was bewusst nicht?",
+    answer:
+      "Er nimmt Terminwünsche, Stornierungen und Rückrufbitten auf, beantwortet wiederkehrende Fragen und erfasst Anliegen strukturiert. Medizinische oder fachliche Beratung gibt er grundsätzlich nicht. Dringende Anliegen und alles, was Sie festlegen, gehen sofort an einen Menschen. Diese Grenzen definieren Sie im Anliegen-Katalog — vor dem Start.",
+  },
+  {
+    question: "Wie kommt das Gesprächsergebnis bei meinem Team an?",
+    answer:
+      "Jedes Gespräch endet in einer strukturierten Zusammenfassung: Anliegen, Rückrufnummer, gewünschter Termin, nächster Schritt. Ihr Team liest das Ergebnis dort, wo es ohnehin arbeitet — statt Sprachnachrichten abzuhören und von Hand zu übertragen.",
   },
   {
     question: "Ist der KI Telefonassistent DSGVO-konform?",
     answer:
-      "Ja. Alle Daten werden auf europäischen Servern verarbeitet. Der Assistent unterstützt DSGVO-konforme Prozesse und wurde für den Einsatz im deutschen Mittelstand entwickelt.",
+      "Die Verarbeitung läuft auf europäischen Servern, ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört zur Einrichtung. Gespräche werden als strukturierte Zusammenfassung übergeben, nicht als Rohaudio gespeichert, sofern Sie das nicht wünschen. Anrufer werden zu Gesprächsbeginn über den Sprachassistenten informiert.",
   },
   {
-    question: "Kann die KI individuell angepasst werden?",
+    question: "Was passiert bei einem technischen Ausfall?",
+    // [[CLAIM: verify — Fallback-Mechanik (Weiterleitung auf Backup-Nummer / Ansage) technisch bestätigen]]
     answer:
-      "Ja. Wir trainieren den Assistenten auf Ihre Branche, Ihre Unternehmenssprache und Ihre häufigsten Anfragen. Er klingt professionell und wie ein Teil Ihres Teams.",
-  },
-  {
-    question: "Wie funktioniert die automatische Terminbuchung?",
-    answer:
-      "Der Assistent prüft in Echtzeit Ihre Kalenderverfügbarkeit, schlägt freie Zeiten vor und trägt Termine nach Bestätigung automatisch ein – ohne manuelle Nacharbeit.",
+      "Für den Störungsfall wird ein Fallback eingerichtet: Anrufe laufen dann auf eine von Ihnen benannte Nummer oder auf eine klare Ansage mit dem nächsten Schritt. Wie dieser Weg aussieht, legen wir gemeinsam bei der Einrichtung fest.",
   },
   {
     question: "Was kostet der KI Telefonassistent?",
     answer:
-      "Die Kosten hängen von Umfang und Integrationen ab. In einer kostenlosen Demo erstellen wir ein individuelles Angebot für Ihr Unternehmen.",
+      "Sie zahlen einen festen Monatsbetrag für einen definierten Leistungsumfang — keine Abrechnung pro Anruf, keine Überraschung nach einem starken Monat. Einmalige Posten wie die Einrichtung stehen vor Vertragsschluss schriftlich im Angebot. Details finden Sie auf der Kostenseite.",
   },
 ];
 
 const PROBLEMS = [
   {
     icon: Phone,
-    title: "Anrufe außerhalb der Öffnungszeiten",
-    desc: "Ein Großteil der Anrufe kommt abends, am Wochenende oder in Stoßzeiten – genau dann, wenn niemand erreichbar ist.",
+    title: "Die Anrufe kommen gebündelt",
+    desc: "Montagmorgen, Mittagszeit, nach Feiertagen: Die Flut an Anrufen trifft Ihr Team genau dann, wenn es ohnehin ausgelastet ist.",
   },
   {
     icon: Users,
-    title: "Mitarbeiter sind im Gespräch",
-    desc: "Wenn alle besetzt sind, klingelt das Telefon ins Leere. Kunden warten nicht – sie rufen beim Wettbewerber an.",
+    title: "Ständige Unterbrechungen erzeugen Fehler",
+    desc: "Wer zwischen Tresen und Telefon hin- und herspringt, macht unter Druck Fehler: verhörte Nummern, doppelte Termine, vergessene Rückrufe.",
   },
   {
     icon: TrendingUp,
-    title: "Kunden springen zur Konkurrenz",
-    desc: "Wer niemanden erreicht, versucht es häufig beim nächsten Anbieter – und kehrt oft nicht zurück.",
+    title: "Unerreichbarkeit wird öffentlich bewertet",
+    desc: "Wer mehrfach nicht durchkommt, versucht es oft woanders — und schreibt seine Erfahrung mit der Erreichbarkeit in die Online-Bewertung.",
   },
   {
     icon: Building2,
-    title: "Wichtige Anfragen gehen verloren",
-    desc: "Ohne systematische Erfassung verschwinden Anfragen im Alltag. Aufträge bleiben liegen, Kunden werden enttäuscht.",
+    title: "Anliegen ohne festen Weg bleiben liegen",
+    desc: "Zettelnotizen und Mailbox-Nachrichten haben keinen verlässlichen Weg zu Ihrem Team. Was nicht erfasst wird, wird vergessen.",
   },
 ];
 
@@ -108,7 +122,7 @@ const USE_CASES = [
   {
     icon: Stethoscope,
     industry: "Arztpraxen",
-    desc: "Patientenanfragen, Terminbuchungen und Standardauskünfte automatisieren – Entlastung für das Praxisteam.",
+    desc: "Terminwünsche, Stornierungen und Rezeptbestellungen strukturiert aufnehmen – spürbare Entlastung für die Anmeldung zu Stoßzeiten.",
   },
   {
     icon: Briefcase,
@@ -118,7 +132,7 @@ const USE_CASES = [
   {
     icon: Home,
     industry: "Immobilien",
-    desc: "Besichtigungstermine buchen und Exposé-Anfragen entgegennehmen – vollautomatisch.",
+    desc: "Besichtigungstermine buchen und Exposé-Anfragen entgegennehmen – auch außerhalb der Bürozeiten.",
   },
   {
     icon: Building2,
@@ -130,33 +144,33 @@ const USE_CASES = [
 const OBJECTIONS = [
   {
     icon: MessageSquare,
-    q: "Klingt es natürlich?",
-    a: "Ja. Der Assistent spricht in flüssiger, natürlicher Sprache und klingt nicht roboterhaft. Auf Wunsch sprechen wir mit Ihnen gemeinsam die Stimme, Tonalität und Formulierungen ab.",
+    q: "Kommen meine Kunden mit der Stimme klar?",
+    a: "Manche Anrufer sind skeptisch gegenüber synthetischen Stimmen — das ist berechtigt. Deshalb stimmen wir Stimme und Ansagen auf Ihren Betrieb ab, auf Wunsch mit Ihren eigenen Aufnahmen. Wer lieber mit einem Menschen spricht, wird jederzeit weitergeleitet.",
   },
   {
     icon: GitMerge,
     q: "Was passiert bei komplexen Anfragen?",
-    a: "Der Assistent erfasst Anliegen strukturiert und leitet komplexe Fälle gezielt an Ihr Team weiter – mit vollständiger Gesprächszusammenfassung, damit kein Kontext verloren geht.",
+    a: "Der Assistent erfasst das Anliegen strukturiert und übergibt es an Ihr Team – mit Rückrufnummer, Kontext und nächstem Schritt. Er versucht nicht, Fälle zu lösen, die in menschliche Hände gehören.",
   },
   {
     icon: Calendar,
     q: "Kann er Termine buchen?",
-    a: "Ja. Die KI prüft in Echtzeit Ihren Kalender und trägt bestätigte Termine direkt ein – kompatibel mit Google Calendar, Outlook und weiteren Systemen.",
+    a: "Ja, nach Ihren Regeln: Er prüft Ihren Kalender und trägt Termine direkt ein oder legt sie zur Bestätigung vor – kompatibel mit Google Calendar, Outlook und weiteren Systemen.",
   },
   {
     icon: BellRing,
-    q: "Was bei dringenden Anrufen?",
-    a: "Dringende Anrufe – z. B. Notfälle in Praxen – werden sofort eskaliert: per Weiterleitung, SMS oder E-Mail an den richtigen Ansprechpartner in Ihrem Team.",
+    q: "Was ist bei dringenden Anrufen?",
+    a: "Dringende Anliegen erkennt der Assistent an klaren Signalwörtern und leitet sofort weiter – an Ihr Team, den Bereitschaftsdienst oder mit der Ansage, den Notruf 112 zu wählen. Er bewertet niemals selbst, wie ernst ein Anliegen ist.",
   },
   {
     icon: SlidersHorizontal,
-    q: "Wie aufwändig ist die Einrichtung?",
-    a: "Kein technischer Aufwand auf Ihrer Seite. Wir übernehmen Konfiguration, Integration und Einrichtung komplett. Die meisten Kunden sind in weniger als einer Woche live.",
+    q: "Wie aufwändig ist die Einrichtung für mich?",
+    a: "Ihr Aufwand konzentriert sich auf das Aufnahmegespräch: Sie beschreiben Ihre Anrufe, wir bauen daraus Regeln und Ansagen. Konfiguration, Anbindung und Tests übernehmen wir – Sie hören das Ergebnis vor dem Start.",
   },
   {
     icon: RotateCcw,
-    q: "Kann man es anpassen?",
-    a: "Vollständig. Sprache, Themen, Prozesse und Weiterleitungsregeln werden individuell für Ihr Unternehmen konfiguriert – und können jederzeit angepasst werden.",
+    q: "Wer passt das System später an?",
+    a: "Öffnungszeiten, Urlaubsansagen und aktuelle Hinweise ändern Sie selbst über ein Dashboard. Für Änderungen an Gesprächslogik und Regeln haben Sie einen festen Ansprechpartner – kein anonymes Ticketsystem.",
   },
 ];
 
@@ -186,41 +200,18 @@ export function KiTelefonassistentPage() {
       },
       {
         "@type": "HowTo",
-        "name": "KI-Telefonassistent einrichten – in 4 Schritten",
-        "description": "So wird der KI-Telefonassistent von Cogniiq für Ihr Unternehmen eingerichtet – von der Analyse bis zum Live-Betrieb.",
+        "name": "So wird Ihr Empfang am Telefon gebaut – in 5 Schritten",
+        "description": "So richtet Cogniiq den KI-Telefonassistenten für Ihren Betrieb ein – vom Aufnahmegespräch über den Anliegen-Katalog bis zur laufenden Anpassung.",
         "totalTime": "P14D",
         // No estimatedCost: the previous value of 0 EUR asserted a free setup that the page
         // does not state. Pricing is individual, so no figure may be published here.
-        "step": [
-          {
-            "@type": "HowToStep",
-            "position": 1,
-            "name": "Analyse",
-            "text": "Wir verstehen Ihre Branche, häufigsten Anrufthemen und bestehenden Systeme.",
-            "url": "https://cogniiq.de/ki-telefonassistent#einrichtung",
-          },
-          {
-            "@type": "HowToStep",
-            "position": 2,
-            "name": "Konfiguration",
-            "text": "Der Assistent wird auf Ihre Sprache, Prozesse und Weiterleitungsregeln eingestellt.",
-            "url": "https://cogniiq.de/ki-telefonassistent#einrichtung",
-          },
-          {
-            "@type": "HowToStep",
-            "position": 3,
-            "name": "Integration",
-            "text": "Anbindung an Kalender, CRM oder Ihre bestehende Rufnummer – ohne IT-Aufwand.",
-            "url": "https://cogniiq.de/ki-telefonassistent#einrichtung",
-          },
-          {
-            "@type": "HowToStep",
-            "position": 4,
-            "name": "Live-Betrieb",
-            "text": "Der Assistent übernimmt Anrufe. Bei Bedarf passen wir ihn laufend an.",
-            "url": "https://cogniiq.de/ki-telefonassistent#einrichtung",
-          },
-        ],
+        "step": EINRICHTUNG_SCHRITTE.map((s, i) => ({
+          "@type": "HowToStep",
+          "position": i + 1,
+          "name": s.title,
+          "text": s.description,
+          "url": "https://cogniiq.de/ki-telefonassistent#einrichtung",
+        })),
       },
     ],
   };
@@ -228,8 +219,8 @@ export function KiTelefonassistentPage() {
   return (
     <>
       <PageSEO
-        title="KI Telefonassistent für Unternehmen | Cogniiq"
-        description="KI Telefonassistent für Ihr Unternehmen: Beantwortet Anrufe automatisch, versteht Kundenanfragen und bucht Termine auch außerhalb regulärer Geschäftszeiten. Jetzt kostenlose Demo buchen."
+        title="KI Telefonassistent – individuell konfiguriert | Cogniiq"
+        description="KI Telefonassistent mit Ihren Ansagen, Ihren Regeln und strukturierter Übergabe an Ihr Team. Feste monatliche Kosten, kein Systemwechsel, DSGVO-konform."
         canonical={`${BUSINESS_INFO.website}/ki-telefonassistent`}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
@@ -240,9 +231,11 @@ export function KiTelefonassistentPage() {
         <HeroSection />
         <CredentialStrip />
         <ProblemSection />
+        <FailurePatternsSection />
         <SolutionSection />
         <CallFlowSection />
         <CallSummarySection />
+        <AnliegenKatalogSection />
         <ObjectionsSection />
         <UseCasesSection />
         <SetupSection />
@@ -272,19 +265,23 @@ function HeroSection() {
             </div>
 
             <h1 className="text-[2.75rem] sm:text-5xl lg:text-[3.5rem] font-bold text-gray-900 dark:text-gray-100 leading-[1.06] tracking-tight mb-6">
-              Jeder Anruf beantwortet.
+              Erreichbar, wenn niemand
               <br />
-              <span className="text-gray-400 dark:text-gray-500 font-light">Kein Kunde verloren.</span>
+              abnehmen kann.{" "}
+              <span className="text-gray-400 dark:text-gray-500 font-light">
+                Ein KI Telefonassistent, zugeschnitten auf Ihren Betrieb.
+              </span>
             </h1>
 
             <p className="text-lg text-gray-600 dark:text-gray-400 leading-[1.7] max-w-xl mb-3">
-              Der KI Telefonassistent von Cogniiq übernimmt eingehende Anrufe, führt
-              natürliche Gespräche und bucht Termine direkt in Ihren Kalender –
-              auch außerhalb regulärer Geschäftszeiten, ohne zusätzliches Personal.
+              Das Telefon klingelt, während vor Ihnen ein Kunde steht. Für diesen
+              Moment ist der Telefonassistent von Cogniiq gebaut: Er nimmt Anrufe
+              zu Stoßzeiten und außerhalb der Öffnungszeiten entgegen, erfasst
+              Anliegen strukturiert und übergibt sie dorthin, wo Ihr Team arbeitet.
             </p>
             <p className="text-sm text-gray-400 dark:text-gray-500 mb-10 max-w-lg leading-relaxed">
-              Individuell konfiguriert für Ihre Branche. Eingerichtet in wenigen Tagen.
-              Betrieben auf europäischen Servern.
+              Mit Ihren Ansagen, Ihren Regeln und einer Übergabe, die im System
+              ankommt. Betrieben auf europäischen Servern.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 mb-10">
@@ -299,7 +296,7 @@ function HeroSection() {
                 to="/kontakt"
                 className="inline-flex items-center justify-center gap-2.5 px-7 py-4 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-900"
               >
-                Termin vereinbaren
+                Unverbindliches Erstgespräch vereinbaren
                 <ArrowRight size={14} />
               </Link>
             </div>
@@ -307,9 +304,9 @@ function HeroSection() {
             <div className="flex flex-wrap gap-x-7 gap-y-2.5">
               {[
                 "DSGVO-konform · Europäische Server",
-                "Einrichtung in wenigen Tagen",
-                "Individuelle Konfiguration",
-                "CRM & Kalender-Integration",
+                "Ihre Rufnummer bleibt",
+                "Ihre Ansagen, Ihre Regeln",
+                "Feste monatliche Kosten",
               ].map((item, i) => (
                 <motion.div
                   key={i}
@@ -397,11 +394,11 @@ function HeroSection() {
 
 function CredentialStrip() {
   const items = [
-    { label: "Europäische Server", detail: "DSGVO-konform" },
-    { label: "Einrichtung in Tagen", detail: "Kein IT-Aufwand" },
-    { label: "Erreichbarkeit außerhalb der Öffnungszeiten", detail: "Auch abends und am Wochenende" },
-    { label: "Individuelle Konfiguration", detail: "Für Ihre Branche" },
-    { label: "CRM & Kalender-Integration", detail: "Google, Outlook & mehr" },
+    { label: "Feste monatliche Kosten", detail: "Keine Abrechnung pro Anruf" },
+    { label: "Ihre Rufnummer bleibt", detail: "Kein Systemwechsel nötig" },
+    { label: "Strukturierte Übergabe", detail: "Anliegen landen bei Ihrem Team" },
+    { label: "Europäische Server", detail: "AVV nach Art. 28 DSGVO" },
+    { label: "Erreichbar zu Stoßzeiten", detail: "Und außerhalb der Öffnungszeiten" },
   ];
 
   return (
@@ -441,12 +438,14 @@ function ProblemSection() {
             Das Problem
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4">
-            Täglich verlieren Unternehmen
-            <br className="hidden sm:block" /> Aufträge durch unbeantwortete Anrufe.
+            Der Anruf kommt immer dann,
+            <br className="hidden sm:block" /> wenn gerade niemand frei ist.
           </h2>
           <p className="text-gray-500 dark:text-gray-400 leading-[1.7]">
-            Nicht wegen schlechtem Service – sondern weil niemand abnimmt. Kunden warten
-            nicht. Sie rufen beim nächsten Anbieter an.
+            Am Tresen steht ein Kunde, am Telefon wartet der nächste. Egal wie Ihr
+            Team entscheidet — einer von beiden verliert. Das kostet mehr als den
+            einzelnen Anruf: unterbrochene Arbeit, Fehler unter Druck und Gespräche
+            über verpasste Erreichbarkeit, die länger dauern als das Anliegen selbst.
           </p>
         </motion.div>
 
@@ -458,10 +457,14 @@ function ProblemSection() {
           custom={0.1}
           className="inline-flex items-center gap-4 px-6 py-4 rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800 mb-14"
         >
-          <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">Viele</span>
+          <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">39&nbsp;%</span>
           <div className="h-8 w-px bg-gray-200 dark:bg-gray-700" />
           <span className="text-sm text-gray-500 dark:text-gray-400 max-w-xs">
-            eingehende Unternehmensanrufe bleiben unbeantwortet – besonders in Stoßzeiten und außerhalb der Öffnungszeiten.
+            der Versicherten bewerten die Erreichbarkeit von Praxen außerhalb der
+            Öffnungszeiten als schwierig.
+            <span className="block text-[11px] text-gray-400 dark:text-gray-500 mt-1">
+              Quelle: GKV-Spitzenverband, Versichertenbefragung 2025
+            </span>
           </span>
         </motion.div>
 
@@ -493,14 +496,135 @@ function ProblemSection() {
   );
 }
 
+function FailurePatternsSection() {
+  return (
+    <section className="py-24 bg-gray-50 dark:bg-gray-900/40">
+      <div className="max-w-6xl mx-auto px-6 lg:px-8">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          variants={fadeUp}
+          custom={0}
+          className="max-w-2xl mb-12"
+        >
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+            Ehrlich betrachtet
+          </p>
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4">
+            Warum bisherige Versuche
+            <br className="hidden sm:block" /> oft gescheitert sind
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 leading-[1.7]">{SCHEITERN_INTRO}</p>
+        </motion.div>
+
+        <div className="grid sm:grid-cols-3 gap-5">
+          {SCHEITERN_MUSTER.map((item, i) => (
+            <motion.div
+              key={i}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-30px" }}
+              variants={fadeUp}
+              custom={i * 0.08}
+              className="p-6 rounded-2xl bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50"
+            >
+              <h3 className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 mb-2.5 leading-snug">
+                {item.title}
+              </h3>
+              <p className="text-[13px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                {item.description}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function AnliegenKatalogSection() {
+  return (
+    <section className="py-24 bg-white dark:bg-gray-950">
+      <div className="max-w-6xl mx-auto px-6 lg:px-8">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          variants={fadeUp}
+          custom={0}
+          className="max-w-2xl mb-12"
+        >
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+            Anliegen-Katalog
+          </p>
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4">
+            Was der Assistent übernimmt –
+            <br className="hidden sm:block" /> und was immer ein Mensch macht
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 leading-[1.7]">
+            Für jeden Anrufanlass legen Sie vor dem Start fest, was passiert.
+            Diese Grenzen offen zu benennen, schafft mehr Vertrauen als jedes
+            Leistungsversprechen.
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-30px" }}
+            variants={fadeUp}
+            custom={0}
+            className="p-7 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800"
+          >
+            <h3 className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              Übernimmt der Assistent
+            </h3>
+            <ul className="space-y-3">
+              {ANLIEGEN_UEBERNIMMT.map((item, i) => (
+                <li key={i} className="flex items-start gap-2.5 text-[13px] text-gray-600 dark:text-gray-400 leading-relaxed">
+                  <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0 mt-0.5" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-30px" }}
+            variants={fadeUp}
+            custom={0.1}
+            className="p-7 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800"
+          >
+            <h3 className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              Geht immer an einen Menschen
+            </h3>
+            <ul className="space-y-3">
+              {ANLIEGEN_IMMER_MENSCH.map((item, i) => (
+                <li key={i} className="flex items-start gap-2.5 text-[13px] text-gray-600 dark:text-gray-400 leading-relaxed">
+                  <Users size={13} className="text-gray-400 flex-shrink-0 mt-0.5" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function SolutionSection() {
   const capabilities = [
-    { icon: PhoneCall, label: "Nimmt eingehende Anrufe sofort entgegen" },
-    { icon: MessageSquare, label: "Führt natürliche, kompetente Gespräche" },
-    { icon: CheckCircle2, label: "Beantwortet Fragen nach Ihren Vorgaben" },
-    { icon: Calendar, label: "Bucht Termine direkt in Ihren Kalender" },
+    { icon: PhoneCall, label: "Nimmt Anrufe entgegen, wenn Ihr Team gebunden ist" },
+    { icon: MessageSquare, label: "Beantwortet wiederkehrende Fragen nach Ihren Vorgaben" },
+    { icon: Calendar, label: "Bucht Termine nach Ihren Regeln in Ihren Kalender" },
+    { icon: CheckCircle2, label: "Erfasst Anliegen strukturiert – mit Rückrufnummer und nächstem Schritt" },
+    { icon: Shield, label: "Leitet dringende Anrufe sofort an einen Menschen weiter" },
     { icon: Clock, label: "Erreichbar auch abends, am Wochenende und an Feiertagen" },
-    { icon: Shield, label: "Integriert in CRM, Outlook, Google und mehr" },
   ];
 
   return (
@@ -518,13 +642,14 @@ function SolutionSection() {
               Die Lösung
             </p>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-5">
-              Der KI Telefonassistent –
-              <br className="hidden sm:block" /> immer erreichbar, immer kompetent.
+              Ein Empfang am Telefon,
+              <br className="hidden sm:block" /> der sich nach Ihrem Betrieb richtet.
             </h2>
             <p className="text-gray-500 dark:text-gray-400 leading-[1.7] mb-8 max-w-lg">
-              Die KI übernimmt eingehende Anrufe vollautomatisch. Sie führt echte
-              Gespräche in natürlicher Sprache, erfasst Anliegen strukturiert und
-              erledigt häufige Aufgaben ohne manuellen Aufwand.
+              Der Telefonassistent übernimmt die Anrufe, die Ihr Team gerade nicht
+              annehmen kann. Er spricht mit Ihren Ansagen, folgt Ihren Regeln und
+              übergibt jedes Anliegen strukturiert – statt es auf der Mailbox
+              liegen zu lassen. Was er übernimmt und was nicht, legen Sie fest.
             </p>
             <Link
               to="/ki-telefonassistent/demo"
@@ -578,29 +703,29 @@ function CallFlowSection() {
       number: "01",
       icon: PhoneCall,
       title: "Anruf eingehend",
-      desc: "Die KI nimmt sofort ab. Kein Klingeln ins Leere – auch nicht in Stoßzeiten, abends oder am Wochenende.",
-      detail: "Reaktionszeit: unter 2 Sekunden",
+      desc: "Der Assistent nimmt ab, wenn Ihr Team gebunden ist – auch in Stoßzeiten, abends oder am Wochenende. Der Anrufer erfährt zu Beginn, dass ein Sprachassistent ihn betreut.",
+      detail: "Kein Besetztzeichen, keine Warteschleife",
     },
     {
       number: "02",
       icon: MessageSquare,
       title: "Gespräch & Anliegen erfassen",
-      desc: "Der Assistent führt ein natürliches Gespräch, versteht das Anliegen und beantwortet Fragen nach Ihren Vorgaben.",
-      detail: "Branchenspezifisch trainiert",
+      desc: "Der Assistent erfragt das Anliegen in natürlicher Sprache und beantwortet wiederkehrende Fragen nach Ihren Vorgaben.",
+      detail: "Auf Ihren Betrieb konfiguriert",
     },
     {
       number: "03",
       icon: Calendar,
       title: "Termin buchen oder weiterleiten",
-      desc: "Termine werden direkt geprüft und eingetragen. Komplexe Anliegen werden mit Zusammenfassung weitergeleitet.",
-      detail: "Kalender & CRM-Integration",
+      desc: "Termine werden nach Ihren Regeln geprüft und eingetragen. Dringende und komplexe Anliegen gehen sofort an einen Menschen.",
+      detail: "Ihre Regeln entscheiden",
     },
     {
       number: "04",
       icon: FileText,
       title: "Zusammenfassung & Protokoll",
-      desc: "Jedes Gespräch wird strukturiert dokumentiert. Ihr Team erhält eine klare Zusammenfassung – ohne Nacharbeit.",
-      detail: "Automatisch · Sofort verfügbar",
+      desc: "Jedes Gespräch endet in einer strukturierten Zusammenfassung: Anliegen, Rückrufnummer, nächster Schritt – lesbar dort, wo Ihr Team arbeitet.",
+      detail: "Kein Abtippen, kein Zettel",
     },
   ];
 
@@ -682,13 +807,14 @@ function CallSummarySection() {
               Nach jedem Gespräch
             </p>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-5">
-              Strukturiert dokumentiert.
-              <br className="hidden sm:block" /> Sofort handlungsfähig.
+              Die Übergabe entscheidet.
+              <br className="hidden sm:block" /> Deshalb ist sie der Kern.
             </h2>
             <p className="text-gray-500 dark:text-gray-400 leading-[1.7] mb-8 max-w-lg">
-              Jedes Gespräch wird automatisch erfasst und als klares Protokoll bereitgestellt –
-              mit Anliegen, vereinbartem Termin und empfohlener nächster Maßnahme. Kein
-              manuelles Nacharbeiten, kein Informationsverlust.
+              Ein angenommener Anruf ist erst dann Entlastung, wenn das Ergebnis
+              ohne Abtippen bei Ihrem Team ankommt. Jedes Gespräch endet deshalb
+              in einem klaren Protokoll – mit Anliegen, vereinbartem Termin und
+              nächstem Schritt.
             </p>
             <div className="space-y-3">
               {[
@@ -887,24 +1013,10 @@ function UseCasesSection() {
 }
 
 function SetupSection() {
-  const phases = [
-    {
-      step: "Analyse",
-      desc: "Wir verstehen Ihre Branche, häufigsten Anrufthemen und bestehenden Systeme.",
-    },
-    {
-      step: "Konfiguration",
-      desc: "Der Assistent wird auf Ihre Sprache, Prozesse und Weiterleitungsregeln eingestellt.",
-    },
-    {
-      step: "Integration",
-      desc: "Anbindung an Kalender, CRM oder Ihre bestehende Rufnummer – ohne IT-Aufwand.",
-    },
-    {
-      step: "Live-Betrieb",
-      desc: "Der Assistent übernimmt Anrufe. Bei Bedarf passen wir ihn laufend an.",
-    },
-  ];
+  const phases = EINRICHTUNG_SCHRITTE.map((s) => ({
+    step: s.title,
+    desc: s.description,
+  }));
 
   return (
     <section id="einrichtung" className="py-20 bg-gray-50 dark:bg-gray-900/40 border-y border-gray-100 dark:border-gray-800">
@@ -921,12 +1033,13 @@ function SetupSection() {
               Implementierung
             </p>
             <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-4">
-              Von der Anfrage bis zum Live-Betrieb –
-              <br className="hidden sm:block" /> in wenigen Tagen.
+              So wird Ihr Empfang
+              <br className="hidden sm:block" /> am Telefon gebaut.
             </h2>
             <p className="text-[14px] text-gray-500 dark:text-gray-400 leading-[1.7] max-w-md">
-              Kein technischer Aufwand auf Ihrer Seite. Wir übernehmen Analyse,
-              Konfiguration und Integration vollständig.
+              Individuell heißt bei uns nicht Adjektiv, sondern Ablauf: Sie
+              beschreiben Ihre Anrufe, wir bauen daraus Regeln, Ansagen und die
+              Übergabe. Vor dem Start hören Sie das Ergebnis selbst.
             </p>
           </motion.div>
 
@@ -996,7 +1109,7 @@ function DemoCtaSection() {
                   to="/kontakt"
                   className="inline-flex items-center justify-center gap-2.5 px-8 py-4 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-[14px] hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 hover:bg-gray-50/80"
                 >
-                  Termin vereinbaren
+                  Unverbindliches Erstgespräch vereinbaren
                   <ArrowRight size={14} />
                 </Link>
               </div>
@@ -1184,11 +1297,12 @@ function FinalCtaSection() {
           custom={0}
         >
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4">
-            Bereit, jeden Anruf zu beantworten?
+            Gehen wir Ihre Anrufe gemeinsam durch.
           </h2>
           <p className="text-[15px] text-gray-500 dark:text-gray-400 max-w-lg mx-auto mb-10 leading-[1.7]">
-            Sprechen Sie mit uns. Wir zeigen Ihnen in einer kurzen Demo, wie der
-            KI Telefonassistent in Ihrem Unternehmen eingesetzt werden kann.
+            Im unverbindlichen Erstgespräch skizzieren wir, wie Ihr Empfang am
+            Telefon aussehen könnte – mit Ihren Anrufanlässen, Ihren Regeln und
+            Ihrer Übergabe. Danach entscheiden Sie in Ruhe.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-5">
             <Link
@@ -1202,7 +1316,7 @@ function FinalCtaSection() {
               to="/kontakt"
               className="inline-flex items-center justify-center gap-2.5 px-7 py-4 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-[14px] hover:border-gray-400 transition-all duration-200"
             >
-              Termin vereinbaren
+              Unverbindliches Erstgespräch vereinbaren
               <ArrowRight size={14} />
             </Link>
           </div>
