@@ -31,7 +31,42 @@ freischaltet und wie es beschaffen sein muss.
 |---|---|
 | Was | Eine reale Referenz: Praxistyp, Größe, Region, echtes Zitat, **schriftliche Einwilligung**. Anonymisiert zulässig („Hausarztpraxis mit drei Behandlern, Oberfranken") |
 | Schaltet frei | M22-Referenzbaustein (noch nicht gebaut — wird mit dem Asset gebaut, damit kein leerer Slot im DOM existiert) |
-| Zusatz | Bestandsfall prüfen: `REAL_TESTIMONIAL` (SV Heinersreuth) auf `/referenzen` und `/bewertungen` — Einwilligung nachweisen oder entfernen |
+
+### A3.1 · Entfernte Bestandsinhalte — Wiederherstellung nur nach schriftlicher Einwilligung
+
+Am 16.08.2026 wurden alle benannten Kundeninhalte aus dem Rendering entfernt
+(Commit siehe `HONESTY-AUDIT.md`). Grund: keine dokumentierte schriftliche
+Einwilligung des benannten Dritten im Repository. **Wiederherstellung nur nach
+schriftlicher Einwilligung** des Kunden — dann als neuer, freigegebener Inhalt.
+
+**Entferntes Zitat** (war auf `/referenzen`, `/bewertungen` und allen
+Cluster-Seiten):
+
+> „Die neue Website und das Buchungssystem funktionieren deutlich zuverlässiger
+> als vorher. Besucher finden schneller, was sie suchen, und Reservierungen
+> laufen jetzt ohne manuelle Abstimmung. Insgesamt wirkt der Auftritt deutlich
+> moderner und professioneller."
+>
+> — Betreiber, Sportanlage Region Bayreuth
+> Projekt: SV Heinersreuth – Website + Buchungsautomatisierung
+
+**Entfernte Fallstudie** (war auf `/referenzen`, inkl. JSON-LD `mainEntity` und
+Meta-Description): Vollständige Projektbeschreibung „Digitale Infrastruktur für
+den SV Heinersreuth e.V." mit Ausgangslage, Zielbild, Leistungsumfang (Website-
+Relaunch, Buchungs- und Zahlungssystem, Admin-Center, Mitglieder- und
+Gutscheinverwaltung, Finanz-/Steuerfunktionen, Hosting/Monitoring), der
+Flutlicht-Kopplung der Padelanlage und dem Ergebnisabschnitt. Der volle Wortlaut
+steht in der Git-Historie (Datei `src/pages/ReferenzenPage.tsx` vor dem
+Entfernungs-Commit).
+
+**Warum nicht anonymisiert weiterverwendet:** Sportverein + Padelanlage +
+Flutlichtsteuerung + Region Bayreuth identifizieren den Kunden auch ohne Namen.
+Eine „anonymisierte" Fassung wäre eine Scheinlösung.
+
+**Was für eine Wiederveröffentlichung nötig ist:** schriftliche Einwilligung des
+Vereins, die ausdrücklich Namensnennung, Projektbeschreibung und (falls
+gewünscht) das Zitat abdeckt — mit Datum und benannter zeichnungsberechtigter
+Person.
 
 ## A4 · Ansprechpartner (M18)
 

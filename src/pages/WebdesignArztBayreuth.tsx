@@ -103,7 +103,8 @@ const config: IndustryPageConfig = {
     title: "Beispielszenario: Allgemeinpraxis Bayreuth mit KI-Telefonassistent",
 
     // Hypothetical scenario only. It must never be phrased as a delivered or anonymized
-    // customer project: the only real reference project is SV Heinersreuth (/referenzen).
+    // customer project. No named customer project may be published anywhere on the site
+    // without written consent on file (see ASSETS-REQUIRED.md).
     trigger:
       "Angenommen, eine Allgemeinpraxis in Bayreuth mit drei Mitarbeitern an der Rezeption verzeichnet täglich eine hohe Zahl eingehender Anrufe. In den Stoßzeiten zwischen 8 und 10 Uhr sowie nach der Mittagspause können Anrufe nicht zeitnah angenommen werden. Außerhalb der Öffnungszeiten landen alle Anfragen auf dem Anrufbeantworter – mit der Folge, dass Patienten die nächste erreichbare Praxis in Bayreuth anrufen.",
 

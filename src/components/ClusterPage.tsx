@@ -16,10 +16,6 @@ import {
 } from "@/components/ui/accordion";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
-import {
-  TestimonialBlock,
-  REAL_TESTIMONIAL,
-} from "@/components/TestimonialBlock";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -174,12 +170,10 @@ export function ClusterPage({ config }: ClusterPageProps) {
         {config.deliverables && <DeliverablesSection config={config} />}
         {config.comparison && <ComparisonSection config={config} />}
         <LocalRelevanceSection config={config} />
-        <TestimonialBlock
-          testimonials={[REAL_TESTIMONIAL]}
-          heading="Aus der Praxis"
-          subheading="Reale Projektumsetzung – Systeme im Livebetrieb."
-          compact
-        />
+        {/* Kundenstimmen-Block entfernt: das bisher gezeigte Zitat benannte einen
+            realen Dritten ohne dokumentierte schriftliche Einwilligung. Kein
+            Platzhalter — der Block kehrt erst mit einer freigegebenen Referenz
+            zurück (siehe ASSETS-REQUIRED.md). */}
         <FAQSection config={config} />
         <InternalLinksSection config={config} />
         <CTASection config={config} />
