@@ -448,3 +448,47 @@ export const PERSONALKOSTEN_ANKER = {
   text: "Zum Vergleich, ohne daraus eine Ersparnis abzuleiten: Das Tarifgehalt für Medizinische Fachangestellte beginnt 2026 bei 2.939,59 € monatlich, zuzüglich Arbeitgeberkosten.",
   source: "Gehaltstarifvertrag MFA (Virchowbund), 2026",
 };
+
+/**
+ * Was nicht extra kostet — ausdrücklich benennen. 46 % nennen versteckte
+ * Preissteigerungen als Wechselgrund (Zi 2026), also wird die Gegenliste
+ * genauso konkret wie die Preisliste (Brief III §5.7).
+ */
+export const NICHT_EXTRA = {
+  headline: "Was nicht extra kostet",
+  intro:
+    "Diese Posten tauchen auf keiner Rechnung auf, weil sie im Monatsbetrag enthalten sind:",
+  punkte: [
+    "Änderungen an Ansagen, Anliegen und Regeln — unbegrenzt, umgesetzt innerhalb von 3 Tagen",
+    "Ihr fester Ansprechpartner, erreichbar täglich 6–20 Uhr, Antwort spätestens in 24 Stunden",
+    "Zehn gleichzeitige Anrufe in jedem Tarif — auch im kleinsten",
+    "Deutsch als Sprache",
+    "Der Auftragsverarbeitungsvertrag nach Art. 28 DSGVO",
+    "Die zwei Tage Testphase, sie sind Teil der Einrichtung",
+    "Das Kundendashboard mit Vertrag, Leistungsumfang und Kündigung",
+    "Jede weitere behandelnde Person in Ihrer Praxis",
+  ],
+};
+
+/** Vertragsrahmen als kompakter Faktenblock für die Preisseite. */
+export const VERTRAG = {
+  headline: "Laufzeit, Kündigung und Preisgarantie",
+  fakten: [
+    {
+      label: "Laufzeit",
+      wert: "12 Monate. Wer monatlich kündbar bleiben möchte, zahlt 20 % Aufschlag auf den Monatsbetrag.",
+    },
+    {
+      label: "Kündigung",
+      wert: "Mit einem Klick im Kundendashboard, zum Laufzeitende. Kein Anruf, keine E-Mail, keine Fristfalle.",
+    },
+    {
+      label: "Preisgarantie",
+      wert: "24 Monate, schriftlich. Innerhalb dieser Zeit ändert sich Ihr Monatsbetrag nicht.",
+    },
+    {
+      label: "Zahlung der Einrichtung",
+      wert: "50 % bei Vertragsabschluss, 50 % nach dem Go-live.",
+    },
+  ],
+};

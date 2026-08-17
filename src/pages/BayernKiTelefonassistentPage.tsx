@@ -38,7 +38,7 @@ const faqItems = [
     answer: "Besonders für Betriebe, bei denen Telefon und eigentliche Arbeit um dieselben Hände konkurrieren: Handwerksbetriebe, Arztpraxen, Immobilienmakler, Dienstleister und mittelständische Unternehmen – in den Städten wie im ländlichen Bayern.",
   },
   {
-    question: "Ist das System DSGVO-konform für den Einsatz in Deutschland?",
+    question: "Worauf müssen Sie bei DSGVO und KI-Telefonie in Deutschland achten?",
     answer: "Ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört zur Einrichtung. Gespräche werden nicht aufgezeichnet – gespeichert wird ausschließlich das strukturierte Ergebnis. Ihre Daten werden nicht zum Training von Modellen verwendet.",
   },
   {

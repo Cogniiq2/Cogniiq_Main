@@ -115,9 +115,9 @@ const config: NationalIndustryPageConfig = {
         "Nicht jeder Anrufer mag synthetische Stimmen – das nehmen wir ernst. Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihre Praxis am Telefon spricht. Wer nicht mit dem Assistenten sprechen möchte, kann jederzeit einen Rückruf hinterlassen und wird nicht in ein Menü gezwungen. In der Anfangszeit werten wir die Gespräche mit Ihnen aus und passen an, was nicht ankommt.",
     },
     {
-      question: "Ist das für Gesundheitsdaten in Therapiepraxen DSGVO-konform?",
+      question: "Worauf müssen Sie bei DSGVO und Gesundheitsdaten in Therapiepraxen achten?",
       answer:
-        "Ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört zur Einrichtung. Gespräche werden nicht aufgezeichnet – gespeichert wird ausschließlich das strukturierte Ergebnis: Anliegen, Name, Rückrufnummer, Terminwunsch. Ihre Daten werden nicht zum Training von Modellen verwendet. Anrufer erfahren zu Gesprächsbeginn, dass ein KI-System spricht. Ob Ihre Praxis eine Datenschutz-Folgenabschätzung benötigt, entscheidet Ihr Datenschutzbeauftragter – wir liefern die Unterlagen dafür zu.",
+        "Vier Punkte entscheiden, und Sie sollten sie bei jedem Anbieter abfragen: Wird das Gespräch aufgezeichnet und wie lange gespeichert. Werden Ihre Daten zum Training von Modellen verwendet. Gibt es einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO. Und wie wird die Schweigepflicht nach § 203 StGB vertraglich abgebildet. Bei uns: Gespräche werden nicht aufgezeichnet – gespeichert wird ausschließlich das strukturierte Ergebnis. Ihre Daten werden nicht zum Training von Modellen verwendet. Einen AVV nach Art. 28 DSGVO stellen wir jedem Kunden bereit. Cogniiq und alle Mitarbeitenden werden vertraglich auf das Berufsgeheimnis nach § 203 StGB verpflichtet. Der Assistent gibt sich zu Beginn jedes Anrufs als KI-System zu erkennen. Ob Ihre Praxis eine Datenschutz-Folgenabschätzung benötigt, entscheidet Ihr Datenschutzbeauftragter – wir liefern die Unterlagen dafür zu.",
     },
     {
       question: "Was passiert mit Anliegen, die der Assistent nicht klären kann?",

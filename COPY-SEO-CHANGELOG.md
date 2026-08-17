@@ -124,3 +124,77 @@ korrigierten sichtbaren FAQ-Texten (FAQSection, CostPage, Seiten-Configs).
 - Interne Verlinkung vollständig erhalten; jede Seite ≥ 3 interne Links mit beschreibenden Ankern.
 - Semantische Keyword-Varianten ergänzt: Telefonannahme, telefonische Erreichbarkeit, Anrufannahme, Praxisempfang.
 - Statistiken: ausschließlich aus der freigegebenen Liste, je Seite max. 1, immer mit Quelle und Jahr sichtbar.
+
+---
+
+# Pass 3 — Beweiskette, Preise, Keyword-Erhalt (ab 17.08.2026)
+
+Stehende Regel dieses Passes: **Das Suchwort bleibt, die Behauptung geht.**
+Vor jeder Änderung an H1, Title, Description oder H2 wird geprüft, welches
+Suchwort dort steht; verloren gehen darf keines.
+
+## Stufe 1 · `/praxen`
+
+| Element | Vorher | Nachher | Keyword erhalten |
+|---|---|---|---|
+| H1 | „Am Tresen steht eine Patientin. Und das Telefon klingelt trotzdem." | unverändert | — (bewusst keywordfrei, Wiedererkennung geht vor) |
+| Title | „KI Telefonassistent für Praxen – Ihr Empfang \| Cogniiq" (55) | unverändert | ja |
+| Description | „…mit Ihren Ansagen, Ihren Regeln … Keine Triage, feste monatliche Kosten." | „…Ihre Stimmauswahl, Ihre Regeln, strukturierte Übergabe. Keine Triage, Kontingent mit Obergrenze, Go-live in 7 Tagen." (156) | ja |
+| Manifest | `publicRoutes.ts` synchron nachgezogen | | |
+
+Neue H2 als echte Suchfragen (SEO-Regel 2): „Was es kostet, wenn niemand
+abnehmen kann" (M2) · „Und wer tippt das dann bei Ihnen ein?" (M14) ·
+„Einrichtung Ihres Empfangs" (M17) · „Wer sich kümmert, wenn Sie etwas ändern
+wollen" (M18) · „Zuerst die Obergrenze, dann der Preis" (M10) · „Wie Sie wieder
+herauskommen" (M19) · „Was Ihr Datenschutzbeauftragter wissen will" (M7).
+
+Interne Links: 4 ausgehend (Kosten, Arzt, Therapie, Service) plus drei
+Stadtseiten. Schema: `Service` + `FAQPage` (7 Fragen statt 4) +
+`BreadcrumbList`. Kein Markup für den ungerenderten Stimmproben-Slot.
+
+## Stufe 2 · `/kosten-ki-telefonassistent`
+
+| Element | Vorher | Nachher | Keyword erhalten |
+|---|---|---|---|
+| H1 | „Was kostet ein KI Telefonassistent?" | unverändert | ja |
+| Title | „KI-Telefonassistent Kosten – Was kostet ein AI Rezeptionist? \| Cogniiq" (70) | „Was kostet ein KI Telefonassistent? Preise \| Cogniiq" (52) | ja — „KI Telefonassistent Kosten/Preise" bleibt; „AI Rezeptionist" entfällt (siehe unten) |
+| Description | „Transparente Preisübersicht … ROI-Berechnung … für Praxen, Restaurants und Dienstleister?" | „Was kostet ein KI Telefonassistent für Praxen? Tarife ab 300 € im Monat mit festem Minutenkontingent, gedeckelter Rechnung, Einrichtung und Go-live-Garantie." (157) | ja |
+
+**Gemeldeter Keyword-Verlust (SEO-Regel 1):** Der alte Title enthielt „AI
+Rezeptionist". Der Begriff fällt aus Title und Description, weil der Title
+sonst über 60 Zeichen läge und weil die Seite nach Positionierung Option B auf
+Praxen zugeschnitten ist. „AI Rezeptionist" bleibt im `keywords`-Feld des
+Manifests und im `BUSINESS_INFO`-Text erhalten. **Zur Entscheidung des
+Inhabers:** Soll der Begriff im Title bleiben, geht dafür „Preise" verloren.
+
+Zweiter, kleinerer Verlust: Die Seite adressiert jetzt Praxen statt
+„Praxen, Restaurants und Dienstleister". Restaurant- und Hotel-Suchanfragen
+laufen weiterhin über `/ki-telefonassistent-restaurant` und
+`/ki-telefonassistent-hotel`, die in den Industrie-Links verlinkt bleiben.
+
+Neue H2 als Suchfragen: „Welcher Tarif passt zu wie vielen Anrufen?" ·
+„Wofür zahlen Sie die Einrichtung?" · „Können Sie den Empfang vorher testen?" ·
+„Was kostet eine weitere Sprache?" · „Was nicht extra kostet".
+
+Interne Links: 4 ausgehend, `/praxen` als Hub im Breadcrumb und im
+Weiterlesen-Block. Schema: `Service` mit **6 Offers** (3 Tarife als
+`UnitPriceSpecification` monatlich, 3 Einrichtungen als einmalige
+`PriceSpecification`) + `FAQPage` (7 Fragen) + `BreadcrumbList`.
+Die Deckelung steht bewusst **nicht** im Schema — sie ist bedingt und wäre dort
+nur als nackter Preis darstellbar, also unehrlicher als der sichtbare Text.
+
+## FAQ-Fragen: Keyword erhalten, Behauptung entfernt
+
+| Vorher | Nachher | Orte |
+|---|---|---|
+| „Ist der KI Telefonassistent DSGVO-konform?" | „Worauf müssen Sie bei DSGVO und KI Telefonassistent achten?" | Serviceseite, 3 Stadt-Configs |
+| „Ist das für Gesundheitsdaten in Therapiepraxen DSGVO-konform?" | „Worauf müssen Sie bei DSGVO und Gesundheitsdaten in Therapiepraxen achten?" | Therapieseite |
+| „Ist das System DSGVO-konform für den Einsatz in Deutschland?" | „Worauf müssen Sie bei DSGVO und KI-Telefonie in Deutschland achten?" | Bayern-Seite |
+
+Die Antworten nennen zuerst die vier Punkte, die der Leser bei **jedem**
+Anbieter abfragen sollte, danach die fünf freigegebenen Aussagen über Cogniiq.
+
+## Entfernt
+
+`src/lib/seo-metadata.ts` — toter Code ohne Importeure, erzeugte ungeprüfte
+Title- und Description-Vorlagen. Siehe `HONESTY-AUDIT.md` §7.2 Nr. 7.

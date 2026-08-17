@@ -196,7 +196,7 @@ in `e060c94` und den Nachbesserungen vom 17.08.2026 zugrunde.
 | 4 | `src/components/PageSEO.tsx` | Laufzeit-Head, erzeugt keinen eigenen Text | — | geprüft |
 | 5 | `src/lib/seo-data.ts` → `PAGE_META` | Zentrale Meta für 5 Seiten (`/`, `/leistungen`, `/ueber-uns`, `/faq`, `/kontakt`) | 5 Einträge | geprüft |
 | 6 | `src/lib/seo-data.ts` → `BUSINESS_INFO.description` | Speist `LocalBusinessSchema` und JSON-LD | 1 Eintrag | geprüft |
-| 7 | `src/lib/seo-metadata.ts` | **Toter Code — keine Importeure.** Erzeugt Title/Description-Vorlagen, die nirgends verwendet werden | 3 Generatoren | geprüft; Entfernung empfohlen |
+| 7 | ~~`src/lib/seo-metadata.ts`~~ | **Gelöscht am 17.08.2026.** War toter Code ohne Importeure, erzeugte ungeprüfte Title/Description-Vorlagen | — | entfernt |
 | 8 | `src/lib/standorte-service-configs.ts` → `seo:{}` | Stadt-Service-Seiten, eigene Title/Description **zusätzlich** zum Manifest | 9 Konfigurationen | geprüft, korrigiert |
 | 9 | `src/pages/industries/*.tsx` | Config-Objekte für `IndustryPage` (9) und `NationalIndustryPage` (13) | 22 Seiten | geprüft |
 | 10 | `src/pages/cluster/**/*.tsx` | Config-Objekte für `ClusterPage` | 15 Seiten | geprüft |
@@ -207,10 +207,38 @@ in `e060c94` und den Nachbesserungen vom 17.08.2026 zugrunde.
 | 15 | `src/components/LocalBusinessSchema.tsx` | JSON-LD-Descriptions aus `BUSINESS_INFO` | 3 Stellen | geprüft |
 | 16 | JSON-LD-Blöcke in Seitenkomponenten (`additionalSchema`) | `Service`/`FAQPage`-Descriptions, unabhängig von der Meta-Description | u. a. `/praxen`, Cluster-Seiten | geprüft |
 
-**Nebenbefund:** `src/lib/seo-metadata.ts` (#7) ist eine vierte, schlafende
-Quelle — sie erzeugt Marketing-Text („AI Rezeptionistin", „hochkonvertierende
-Websites"), wird aber von keiner Datei importiert. Sie richtet heute keinen
-Schaden an, würde aber bei künftiger Verwendung ungeprüften Text ausliefern.
+**Nebenbefund, erledigt:** `src/lib/seo-metadata.ts` (#7) war eine vierte,
+schlafende Quelle — sie erzeugte Marketing-Text („AI Rezeptionistin",
+„hochkonvertierende Websites"), wurde aber von keiner Datei importiert. Auf
+Anweisung des Inhabers am 17.08.2026 gelöscht.
+
+### 7.5 Dritter Befund: JSON-LD erreicht das statische HTML nicht
+
+Bei der Verifikation der Preisseite festgestellt und noch **nicht behoben**:
+
+`PageSEO` schreibt sämtliches Seiten-Schema (`Service`, `FAQPage`,
+`BreadcrumbList`, `additionalSchema`) in einem `useEffect` in den DOM und gibt
+selbst `null` zurück. `useEffect` läuft im SSR nicht — das vorgerenderte HTML
+enthält deshalb **nur** die beiden global in `index.html` eingebetteten Blöcke
+(`Organization`, `LocalBusiness`, `WebSite`). Geprüft an `dist/praxen.html` und
+`dist/kosten-ki-telefonassistent.html`: In beiden fehlen `Service`, `FAQPage`
+und `BreadcrumbList` im ausgelieferten Dokument; sie entstehen erst nach der
+Hydration.
+
+Google rendert JavaScript und liest solches Schema in der Regel trotzdem, aber
+später, unzuverlässiger und ohne Garantie — für Rich Results ist das die
+schwächere Grundlage. Betroffen ist **jede** Seite des Projekts, nicht nur die
+in diesem Pass geänderten.
+
+Zwei mögliche Wege, beide außerhalb des Copy-Auftrags:
+1. `PageSEO` gibt die JSON-LD-Blöcke als echte `<script>`-Elemente im JSX
+   zurück, statt sie per Effekt einzufügen. Dann rendert sie der SSR mit.
+2. `scripts/prerender.mjs` injiziert das Schema analog zu Title und
+   Description aus einer Manifest-Quelle.
+
+Weg 1 ist der kleinere Eingriff und hält Schema und sichtbaren Inhalt in
+derselben Komponente. Empfehlung: vor weiteren Seiten umstellen, sonst
+entsteht in jeder Stufe zusätzliches Schema, das im statischen HTML fehlt.
 
 ### 7.3 Prüfung gegen die bisherigen Korrekturen
 
