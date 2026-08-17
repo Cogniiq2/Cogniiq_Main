@@ -1,7 +1,7 @@
 # MASTER PROMPT III — Premium-Wirkung, Konversion & Verkaufspsychologie
 
 > **Zusatz zu `.claude/COPY-BRIEF.md`, `.claude/COPY-BRIEF-2.md` und den Owner-Antworten.**
-> Alle bisherigen Regeln bleiben vollständig bindend — insbesondere: nichts erfinden, keine unbelegten Zahlen, keine Kundenandeutung, keine Hosting-Aussagen, kein Wettbewerber negativ benannt.
+> Speichern als `.claude/COPY-BRIEF-3.md`. Alle bisherigen Regeln bleiben vollständig bindend — insbesondere: nichts erfinden, keine unbelegten Zahlen, keine Kundenandeutung, keine Hosting-Aussagen, kein Wettbewerber negativ benannt.
 > Dieser Zusatz regelt **Wirkung, Aufbau und Konversion**, nicht Faktenlage.
 
 ---
