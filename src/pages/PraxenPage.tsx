@@ -5,39 +5,55 @@
 // Gesundheits-Inhalte (Segmente, Kosten, Stadtseiten, Service) — keine Links
 // in Hotel- oder Restaurant-Inhalte.
 //
-// Der Text stammt vollständig aus bereits geprüften, geteilten Modulen
-// (telefonassistent-copy.ts). Es werden keine unbestätigten Fachaussagen
-// ergänzt; die Stimmprobe bleibt asset-gated und rendert ohne Audiodatei nichts.
+// Aufbau: die Beweiskette aus COPY-BRIEF-3 §2, 18 Abschnitte in fester
+// Reihenfolge. Jeder Abschnitt beantwortet die Frage, die der vorherige
+// ausgelöst hat; kein Abschnitt darf ausgelassen oder vorgezogen werden.
+// M15 (Grenzen) steht vor dem Preis, M13 bleibt asset-gated, M22 existiert
+// nicht — es gibt keine Referenzpraxis.
+//
+// Gestaltung nach COPY-BRIEF-3 §1: Fließtext ≥ 17 px, ein Akzent nur für
+// Handlung, Bewegung höchstens 180 ms und nur Deckkraft plus kleine
+// Verschiebung, Tarife als Karten (kein horizontales Scrollen auf dem Handy).
 // ─────────────────────────────────────────────────────────────────────────────
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowRight, ChevronRight, CircleCheck as CheckCircle2, Users } from "lucide-react";
+import { ArrowRight, ChevronRight } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { StimmprobeSection } from "@/components/StimmprobeSection";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 import {
   ANLIEGEN_IMMER_MENSCH,
   ANLIEGEN_UEBERNIMMT,
+  BETREUUNG,
   CTA,
-  EINRICHTUNG_SCHRITTE,
+  DATENSCHUTZ_PUNKTE,
+  DECKELUNG,
+  EINRICHTUNG_PROJEKT,
+  GO_LIVE_GARANTIE,
   GRENZEN,
   NICHT_PASSEND,
   PATIENTEN_SICHT,
+  PERSONALKOSTEN_ANKER,
   SAEULEN,
   SCHEITERN_INTRO,
   SCHEITERN_MUSTER,
+  TARIFE,
+  TARIF_ENTERPRISE,
   TEAM_BLOCK,
+  UEBERGABE,
+  UMKEHRBARKEIT,
 } from "@/lib/telefonassistent-copy";
 
 const base = BUSINESS_INFO.website;
 
+/** Bewegung nach §1.4: nur Deckkraft und kleine Verschiebung, ≤ 180 ms. */
 const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (delay = 0) => ({
+  hidden: { opacity: 0, y: 8 },
+  visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
-  }),
+    transition: { duration: 0.18, ease: "easeOut" as const },
+  },
 };
 
 const breadcrumbs = [
@@ -49,13 +65,12 @@ const faqItems = [
   {
     question: "Kommen meine Patientinnen und Patienten mit einer Computerstimme klar?",
     answer:
-      "Nicht alle sofort — das nehmen wir ernst. Begrüßung und Ansagen werden auf Ihre Praxis abgestimmt, auf Wunsch mit Ihren eigenen Aufnahmen. Anrufer erfahren zu Beginn, dass ein Sprachassistent sie betreut, und können jederzeit zu einem Menschen wechseln. Die Eingewöhnungsphase begleiten wir aktiv.",
+      "Nicht alle sofort — das nehmen wir ernst. Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihre Praxis am Telefon spricht. Anrufer erfahren im ersten Satz, dass ein KI-System spricht, und können jederzeit zu einem Menschen wechseln. Die ersten Wochen begleiten wir aktiv und ändern, was nicht ankommt.",
   },
   {
-    question: "Muss ich dafür meine Praxissoftware wechseln?",
-    // [[CLAIM: verify — kein Systemwechsel nötig (OWNER-INPUT B1–B4)]]
+    question: "Landet der Termin automatisch in meiner Praxissoftware?",
     answer:
-      "Nein. Ihre Rufnummer bleibt, Ihre Telefonanlage bleibt, Ihre Praxissoftware bleibt. Welche Anbindung für Ihr System möglich ist, prüfen wir vor dem Angebot — nicht danach.",
+      "Heute in der Regel nicht. Eine fertige Standardanbindung an Praxisverwaltungssysteme gibt es nicht. Das Ergebnis jedes Anrufs steht strukturiert im Cogniiq-Dashboard, und Ihr Team überträgt es ins Praxissystem. Welche Schnittstelle Ihr System bietet, prüfen wir vor der Einrichtung — und sagen es Ihnen vor der Unterschrift, nicht danach.",
   },
   {
     question: "Beurteilt der Assistent, wie dringend ein Anliegen ist?",
@@ -63,9 +78,24 @@ const faqItems = [
       "Nein, unter keinen Umständen. Er gibt keine medizinische Einschätzung ab und stellt keine Triage. Hinweise auf einen Notfall führen sofort zu einem Menschen, zum Bereitschaftsdienst oder zur Ansage, den Notruf 112 zu wählen.",
   },
   {
-    question: "Was kostet der Assistent?",
+    question: "Was passiert, wenn der Empfang nicht in 7 Tagen läuft?",
     answer:
-      "Sie zahlen einen festen Monatsbetrag für ein Minutenkontingent. Wird es überschritten, kostet jede weitere Minute 0,39 € – und die Rechnung übersteigt nie den nächsthöheren Tarif. Abgerechnet wird pro Praxis, nicht pro Behandler. Einmalig kommt die Einrichtung dazu; sie steht vor Vertragsschluss im Angebot. Details finden Sie auf der Kostenseite.",
+      "Dann entfällt die zweite Hälfte der Einrichtungsgebühr. Der Go-live erfolgt spätestens 7 Tage nach Zahlungseingang; halten wir das nicht ein, tragen wir die Folge. Das steht so im Vertrag.",
+  },
+  {
+    question: "Kann die Rechnung teurer werden als geplant?",
+    answer:
+      "Nur begrenzt. Jeder Tarif enthält ein Minutenkontingent; darüber kostet jede weitere Minute 0,39 €. Nach oben ist gedeckelt: Mehr als der nächsthöhere Tarif kostet es nie. Der Preis ist für 24 Monate garantiert, und abgerechnet wird pro Praxis, nicht pro Behandler.",
+  },
+  {
+    question: "Wie komme ich wieder aus dem Vertrag heraus?",
+    answer:
+      "Über einen Klick im Kundendashboard, zum Laufzeitende. Die Laufzeit beträgt 12 Monate; wer monatlich kündbar bleiben möchte, zahlt 20 % Aufschlag. Kein Anruf, keine E-Mail, keine Fristfalle.",
+  },
+  {
+    question: "Werden Gespräche aufgezeichnet?",
+    answer:
+      "Nein. Gespeichert wird ausschließlich das strukturierte Ergebnis: Anliegen, Name, Rückrufnummer, Terminwunsch. Ihre Daten werden nicht zum Training von Modellen verwendet. Das bedeutet auch: Wenn Sie später den genauen Wortlaut eines Anrufs brauchen, gibt es ihn nicht.",
   },
 ];
 
@@ -76,7 +106,7 @@ const schema = {
       "@type": "Service",
       name: "KI Telefonassistent für Praxen",
       description:
-        "Telefonische Anrufannahme für Arzt-, Zahnarzt- und Therapiepraxen: mit eigenen Ansagen, praxiseigenen Regeln und strukturierter Übergabe an das Praxisteam.",
+        "Telefonische Anrufannahme für Arzt-, Zahnarzt- und Therapiepraxen: mit eigener Stimmauswahl, praxiseigenen Regeln und strukturierter Übergabe an das Praxisteam.",
       url: `${base}/praxen`,
       provider: { "@type": "Organization", name: BUSINESS_INFO.name, url: base },
     },
@@ -110,12 +140,29 @@ const cityLinks = [
   { label: "Praxen im Raum München", href: "/muenchen/ki-telefonassistent" },
 ];
 
+/** Gleichmäßiger vertikaler Rhythmus (§1.3) — überall derselbe Abstand. */
+const SECTION = "py-24";
+const SECTION_ALT = "py-24 bg-gray-50 dark:bg-gray-900/40";
+const PROSE = "text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7]";
+const H2 = "text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6";
+const H3 = "text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-2.5";
+const CARD =
+  "p-7 rounded-2xl bg-white dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800";
+const CARD_ALT =
+  "p-7 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800";
+/** Neutraler Listenpunkt — Farbe bleibt der Handlung vorbehalten (§1.1). */
+const DOT =
+  "mt-[10px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0";
+/** Primärer CTA, ≥ 44 px Tap-Ziel (§1.6). */
+const CTA_PRIMARY =
+  "inline-flex items-center gap-2 px-7 py-4 min-h-[44px] bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[16px] hover:bg-gray-700 dark:hover:bg-white transition-colors";
+
 export function PraxenPage() {
   return (
     <>
       <PageSEO
         title="KI Telefonassistent für Praxen – Ihr Empfang | Cogniiq"
-        description="Ein Empfang am Telefon für Ihre Praxis: mit Ihren Ansagen, Ihren Regeln und strukturierter Übergabe an Ihr Team. Keine Triage, feste monatliche Kosten."
+        description="Ein Empfang am Telefon für Ihre Praxis: Ihre Stimmauswahl, Ihre Regeln, strukturierte Übergabe. Keine Triage, Kontingent mit Obergrenze, Go-live in 7 Tagen."
         canonical={`${base}/praxen`}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
@@ -123,169 +170,204 @@ export function PraxenPage() {
       />
 
       <main className="min-h-screen bg-white dark:bg-gray-950">
-        {/* ── Hero: Realität zuerst ── */}
-        <section className="pt-32 pb-20">
-          <div className="max-w-4xl mx-auto px-6 lg:px-8">
+        {/* ── 1 · M1 Wiedererkennung ── */}
+        <section className="pt-32 pb-24">
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <nav
               aria-label="Breadcrumb"
-              className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8"
+              className="flex items-center gap-1.5 text-[14px] text-gray-400 dark:text-gray-500 mb-10"
             >
               <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                 Home
               </Link>
-              <ChevronRight size={12} aria-hidden="true" />
+              <ChevronRight size={13} aria-hidden="true" />
               <span className="text-gray-600 dark:text-gray-300" aria-current="page">
                 Für Praxen
               </span>
             </nav>
 
-            <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.1}>
-              <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-[1.1] tracking-tight mb-6">
+            <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+              <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-[1.12] tracking-tight mb-7">
                 Am Tresen steht eine Patientin.
                 <br />
                 <span className="text-gray-400 dark:text-gray-500 font-light">
                   Und das Telefon klingelt trotzdem.
                 </span>
               </h1>
-              <p className="text-lg text-gray-600 dark:text-gray-400 leading-[1.75] max-w-2xl mb-8">
-                In diesem Moment verliert immer jemand: die Patientin vor Ihnen oder
-                die am Telefon. Der Praxis-Empfang von Cogniiq nimmt die Anrufe an,
-                die sonst ins Leere laufen — mit Ihren Ansagen, nach Ihren Regeln
-                und mit einer Übergabe, die bei Ihrem Team ankommt.
-              </p>
+              <div className={`${PROSE} space-y-5 mb-9`}>
+                <p>
+                  In diesem Moment verliert immer jemand. Nehmen Sie ab, wartet die
+                  Patientin vor Ihnen. Nehmen Sie nicht ab, versucht es die andere
+                  ein zweites Mal, ein drittes Mal — und irgendwann nicht mehr.
+                </p>
+                <p>
+                  Zu Stoßzeiten wird daraus ein Dauerzustand: Die Anmeldung
+                  arbeitet unter ständiger Unterbrechung, die Telefonzeiten werden
+                  weiter eingeschränkt, weil es anders nicht geht, und die Rückrufe
+                  bleiben für den Abend liegen.
+                </p>
+                <p>
+                  Der Praxis-Empfang von Cogniiq nimmt die Anrufe an, die sonst ins
+                  Leere laufen — mit Ihrer Stimmauswahl, nach Ihren Regeln, mit
+                  einer Übergabe, die wir vor der Unterschrift mit Ihnen klären.
+                </p>
+              </div>
               <div className="flex flex-wrap gap-3">
-                <Link
-                  to="/kontakt"
-                  className="inline-flex items-center gap-2 px-7 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors"
-                >
+                <Link to="/kontakt" className={CTA_PRIMARY}>
                   {CTA.primaryLabel}
-                  <ArrowRight size={15} aria-hidden="true" />
+                  <ArrowRight size={16} aria-hidden="true" />
                 </Link>
                 <Link
                   to="/ki-telefonassistent"
-                  className="inline-flex items-center gap-2 px-7 py-3.5 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm hover:border-gray-400 transition-colors"
+                  className="inline-flex items-center gap-2 px-7 py-4 min-h-[44px] border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-[16px] hover:border-gray-400 transition-colors"
                 >
                   Wie der Empfang arbeitet
                 </Link>
               </div>
+              <p className="mt-4 text-[15px] text-gray-500 dark:text-gray-500">
+                {CTA.microcopy}
+              </p>
             </motion.div>
           </div>
         </section>
 
-        {/* ── M13 · Stimmprobe (asset-gated) ── */}
+        {/* ── 2 · M2 Was es kostet, nicht erreichbar zu sein ── */}
+        <section className={SECTION_ALT}>
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>Was es kostet, wenn niemand abnehmen kann</h2>
+            <div className={`${PROSE} space-y-5`}>
+              <p>
+                Der offensichtliche Teil sind die Anrufe, die nicht ankommen. Der
+                teurere Teil ist der Rest: Arbeit, die unter Unterbrechung
+                passiert, und Fehler, die dabei entstehen. Ein Name, der falsch
+                notiert wird. Ein Termin, der doppelt vergeben ist. Eine
+                Rezeptbestellung, die auf einem Zettel liegen bleibt.
+              </p>
+              <p>
+                Dazu kommen die Gespräche über die Erreichbarkeit selbst. Sie
+                dauern regelmäßig länger als das medizinische Anliegen, das
+                dahintersteht — und sie führt Ihr Team, nicht Sie. Was am Ende
+                öffentlich sichtbar wird, ist die Bewertung, in der nicht die
+                Behandlung steht, sondern dass niemand ans Telefon geht.
+              </p>
+            </div>
+            <div className={`${CARD} mt-8`}>
+              <p className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.6]">
+                Mehr als ein Drittel der Befragten ist beim Versuch der
+                telefonischen Terminbuchung gescheitert.
+              </p>
+              <p className="text-[14px] text-gray-500 dark:text-gray-500 mt-2">
+                Quelle: vzbv, Marktcheck Arztterminportale, 2025
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 3 · M20 Patientensicht ── */}
+        <section className={SECTION}>
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>{PATIENTEN_SICHT.headline}</h2>
+            <div className={`${PROSE} space-y-5`}>
+              {PATIENTEN_SICHT.paragraphs.map((p, i) => (
+                <p key={i}>{p}</p>
+              ))}
+            </div>
+            <div className={`${CARD_ALT} mt-8`}>
+              <p className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.6]">
+                <span className="font-semibold tabular-nums">
+                  {PATIENTEN_SICHT.stat.value}
+                </span>{" "}
+                {PATIENTEN_SICHT.stat.text}
+              </p>
+              <p className="text-[14px] text-gray-500 dark:text-gray-500 mt-2">
+                Quelle: {PATIENTEN_SICHT.stat.source}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 4 · M3 Warum bisherige Versuche gescheitert sind ── */}
+        <section className={SECTION_ALT}>
+          <div className="max-w-4xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>Warum bisherige Versuche oft gescheitert sind</h2>
+            <p className={`${PROSE} mb-10`}>{SCHEITERN_INTRO}</p>
+            <div className="space-y-4">
+              {SCHEITERN_MUSTER.map((item, i) => (
+                <div key={i} className={CARD}>
+                  <h3 className={H3}>{item.title}</h3>
+                  <p className={PROSE}>{item.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── 5 · M13 Stimmprobe (asset-gated, rendert ohne Audiodatei nichts) ── */}
         <StimmprobeSection />
 
-        {/* ── M20 · Patientensicht ── */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/40">
-          <div className="max-w-3xl mx-auto px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-6">
-              {PATIENTEN_SICHT.headline}
-            </h2>
-            {PATIENTEN_SICHT.paragraphs.map((p, i) => (
-              <p key={i} className="text-gray-500 dark:text-gray-400 leading-[1.75] mb-4">
-                {p}
-              </p>
-            ))}
-            <div className="mt-6 inline-flex items-center gap-4 px-6 py-4 rounded-2xl bg-white dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800">
-              <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                {PATIENTEN_SICHT.stat.value}
-              </span>
-              <div className="h-8 w-px bg-gray-200 dark:bg-gray-700" />
-              <span className="text-sm text-gray-500 dark:text-gray-400 max-w-xs">
-                {PATIENTEN_SICHT.stat.text}
-                <span className="block text-[11px] text-gray-400 dark:text-gray-500 mt-1">
-                  Quelle: {PATIENTEN_SICHT.stat.source}
-                </span>
-              </span>
-            </div>
-          </div>
-        </section>
-
-        {/* ── M3 · Warum bisherige Versuche gescheitert sind ── */}
-        <section className="py-20">
-          <div className="max-w-5xl mx-auto px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4">
-              Warum bisherige Versuche oft gescheitert sind
-            </h2>
-            <p className="text-gray-500 dark:text-gray-400 leading-[1.7] mb-10 max-w-2xl">
-              {SCHEITERN_INTRO}
-            </p>
-            <div className="grid sm:grid-cols-3 gap-5">
-              {SCHEITERN_MUSTER.map((item, i) => (
-                <div
-                  key={i}
-                  className="p-6 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800"
-                >
-                  <h3 className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 mb-2.5 leading-snug">
-                    {item.title}
-                  </h3>
-                  <p className="text-[13px] text-gray-500 dark:text-gray-400 leading-relaxed">
-                    {item.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── M4 · Die vier Säulen ── */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/40">
-          <div className="max-w-5xl mx-auto px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-10">
-              Was „für Ihre Praxis gebaut" konkret heißt
-            </h2>
-            <div className="grid md:grid-cols-2 gap-5">
+        {/* ── 6 · M4 Die vier Säulen ── */}
+        <section className={SECTION}>
+          <div className="max-w-4xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>Was „für Ihre Praxis gebaut“ konkret heißt</h2>
+            <div className="space-y-4">
               {SAEULEN.map((s, i) => (
-                <div
-                  key={i}
-                  className="p-6 rounded-2xl bg-white dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800"
-                >
-                  <h3 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100 mb-2.5">
-                    {s.title}
-                  </h3>
-                  <p className="text-[13px] text-gray-500 dark:text-gray-400 leading-relaxed">
-                    {s.description}
-                  </p>
+                <div key={i} className={CARD_ALT}>
+                  <h3 className={H3}>{s.title}</h3>
+                  <p className={PROSE}>{s.description}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ── M8 · Anliegen-Katalog ── */}
-        <section className="py-20">
-          <div className="max-w-5xl mx-auto px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-10">
-              Was der Assistent übernimmt — und was immer ein Mensch macht
-            </h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="p-7 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800">
-                <h3 className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                  Übernimmt der Assistent
-                </h3>
+        {/* ── 7 · M14 Die Übergabe ── */}
+        <section className={SECTION_ALT}>
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>{UEBERGABE.headline}</h2>
+            <div className={`${PROSE} space-y-5`}>
+              {UEBERGABE.paragraphs.map((p, i) => (
+                <p key={i}>{p}</p>
+              ))}
+            </div>
+            <div className={`${CARD} mt-8`}>
+              <h3 className={H3}>{UEBERGABE.wasAnkommt.headline}</h3>
+              <ul className="space-y-2.5 mb-4">
+                {UEBERGABE.wasAnkommt.items.map((item) => (
+                  <li key={item} className={`flex items-start gap-3 ${PROSE}`}>
+                    <span className={DOT} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-[15px] text-gray-500 dark:text-gray-500 leading-[1.6]">
+                {UEBERGABE.wasAnkommt.hinweis}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 8 · M8 Anliegen-Katalog ── */}
+        <section className={SECTION}>
+          <div className="max-w-4xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>Was der Assistent übernimmt — und was immer ein Mensch macht</h2>
+            <div className="grid md:grid-cols-2 gap-5">
+              <div className={CARD_ALT}>
+                <h3 className={H3}>Übernimmt der Assistent</h3>
                 <ul className="space-y-3">
                   {ANLIEGEN_UEBERNIMMT.map((item, i) => (
-                    <li
-                      key={i}
-                      className="flex items-start gap-2.5 text-[13px] text-gray-600 dark:text-gray-400 leading-relaxed"
-                    >
-                      <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0 mt-0.5" />
+                    <li key={i} className={`flex items-start gap-3 ${PROSE}`}>
+                      <span className={DOT} />
                       {item}
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="p-7 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800">
-                <h3 className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                  Geht immer an einen Menschen
-                </h3>
+              <div className={CARD_ALT}>
+                <h3 className={H3}>Geht immer an einen Menschen</h3>
                 <ul className="space-y-3">
                   {ANLIEGEN_IMMER_MENSCH.map((item, i) => (
-                    <li
-                      key={i}
-                      className="flex items-start gap-2.5 text-[13px] text-gray-600 dark:text-gray-400 leading-relaxed"
-                    >
-                      <Users size={13} className="text-gray-400 flex-shrink-0 mt-0.5" />
+                    <li key={i} className={`flex items-start gap-3 ${PROSE}`}>
+                      <span className={DOT} />
                       {item}
                     </li>
                   ))}
@@ -295,23 +377,17 @@ export function PraxenPage() {
           </div>
         </section>
 
-        {/* ── M15 · Grenzen ── */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/40" aria-labelledby="grenzen-heading">
+        {/* ── 9 · M15 Grenzen — steht vor dem Preis, nie abschwächen ── */}
+        <section className={SECTION_ALT} aria-labelledby="grenzen-heading">
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
-            <h2
-              id="grenzen-heading"
-              className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4"
-            >
+            <h2 id="grenzen-heading" className={H2}>
               {GRENZEN.headline}
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 leading-[1.7] mb-8">{GRENZEN.intro}</p>
-            <ul className="space-y-4">
+            <p className={`${PROSE} mb-8`}>{GRENZEN.intro}</p>
+            <ul className="space-y-5">
               {GRENZEN.points.map((point, i) => (
-                <li
-                  key={i}
-                  className="flex items-start gap-3 text-[14px] text-gray-600 dark:text-gray-400 leading-relaxed"
-                >
-                  <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0" />
+                <li key={i} className={`flex items-start gap-3 ${PROSE}`}>
+                  <span className={DOT} />
                   {point}
                 </li>
               ))}
@@ -319,63 +395,249 @@ export function PraxenPage() {
           </div>
         </section>
 
-        {/* ── M5 · So wird Ihr Empfang gebaut ── */}
-        <section className="py-20">
-          <div className="max-w-4xl mx-auto px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-10">
-              So wird Ihr Empfang gebaut
-            </h2>
-            <div className="space-y-3">
-              {EINRICHTUNG_SCHRITTE.map((s) => (
-                <div
-                  key={s.step}
-                  className="flex items-start gap-4 p-5 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800"
-                >
-                  <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500 tabular-nums mt-0.5">
-                    {s.step}
+        {/* ── 10 · M21 Für Ihr Praxisteam ── */}
+        <section className={SECTION}>
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>{TEAM_BLOCK.headline}</h2>
+            <p className={`${PROSE} mb-8`}>{TEAM_BLOCK.text}</p>
+            <ul className="space-y-4">
+              {TEAM_BLOCK.points.map((point, i) => (
+                <li key={i} className={`flex items-start gap-3 ${PROSE}`}>
+                  <span className={DOT} />
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* ── 11 · M17 Einrichtung Ihres Empfangs + Go-live-Garantie ── */}
+        <section className={SECTION_ALT}>
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>{EINRICHTUNG_PROJEKT.headline}</h2>
+            <p className={`${PROSE} mb-10`}>{EINRICHTUNG_PROJEKT.intro}</p>
+            <ol className="space-y-4">
+              {EINRICHTUNG_PROJEKT.schritte.map((s) => (
+                <li key={s.nummer} className={`${CARD} flex items-start gap-5`}>
+                  <span className="text-[15px] font-bold text-gray-400 dark:text-gray-500 tabular-nums mt-1 flex-shrink-0">
+                    {s.nummer}
                   </span>
                   <div>
-                    <h3 className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                    <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-1.5">
                       {s.title}
+                      {s.dauer && (
+                        <span className="ml-2 text-[15px] font-normal text-gray-500 dark:text-gray-500">
+                          · {s.dauer}
+                        </span>
+                      )}
                     </h3>
-                    <p className="text-[13px] text-gray-500 dark:text-gray-400 leading-relaxed">
-                      {s.description}
-                    </p>
+                    <p className={PROSE}>{s.text}</p>
                   </div>
+                </li>
+              ))}
+            </ol>
+
+            {/* Go-live-Garantie: eigener Block, kein Aufzählungspunkt (§3.3) */}
+            <div className="mt-10 p-8 rounded-2xl border border-gray-300 dark:border-gray-600">
+              <h3 className="text-[22px] font-bold text-gray-900 dark:text-gray-100 mb-3">
+                {GO_LIVE_GARANTIE.headline}
+              </h3>
+              <p className={PROSE}>{GO_LIVE_GARANTIE.text}</p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 12 · M18 Betreuung ── */}
+        <section className={SECTION}>
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>{BETREUUNG.headline}</h2>
+            <p className={`${PROSE} mb-8`}>{BETREUUNG.text}</p>
+            <div className={CARD_ALT}>
+              <p className="text-[19px] font-semibold text-gray-900 dark:text-gray-100">
+                {BETREUUNG.person.name}
+              </p>
+              <p className="text-[15px] text-gray-500 dark:text-gray-500 mb-6">
+                {BETREUUNG.person.rolle}
+              </p>
+              <dl className="space-y-4">
+                {BETREUUNG.fakten.map((f) => (
+                  <div key={f.label}>
+                    <dt className="text-[15px] font-semibold text-gray-700 dark:text-gray-300">
+                      {f.label}
+                    </dt>
+                    <dd className={PROSE}>{f.wert}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+            <p className={`${PROSE} mt-6`}>
+              52 % der Praxen nennen unzureichenden Kundensupport als Grund, ihr
+              System zu wechseln. Deshalb steht hier eine Frist und kein
+              Versprechen.
+            </p>
+            <p className="text-[14px] text-gray-500 dark:text-gray-500 mt-2">
+              Quelle: Zi, PVS-Monitoring, 2026
+            </p>
+          </div>
+        </section>
+
+        {/* ── 13 · M10 Preis und Deckelung — Obergrenze zuerst (§5.1) ── */}
+        <section className={SECTION_ALT}>
+          <div className="max-w-4xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>{DECKELUNG.headline}</h2>
+            <p className={`${PROSE} mb-4`}>{DECKELUNG.text}</p>
+            <p className={`${PROSE} mb-10`}>{DECKELUNG.nichtProBehandler}</p>
+
+            {/* Tarife als Karten — auf dem Handy kein horizontales Scrollen */}
+            <div className="grid md:grid-cols-3 gap-5">
+              {TARIFE.map((t) => (
+                <div key={t.name} className={CARD}>
+                  <p className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                    {t.name}
+                  </p>
+                  <p className="text-[28px] font-bold text-gray-900 dark:text-gray-100 tabular-nums leading-none mb-1">
+                    {t.monatlich}
+                  </p>
+                  <p className="text-[15px] text-gray-500 dark:text-gray-500 mb-6">
+                    im Monat
+                  </p>
+                  <dl className="space-y-2.5 text-[16px]">
+                    <div className="flex justify-between gap-3">
+                      <dt className="text-gray-500 dark:text-gray-500">Kontingent</dt>
+                      <dd className="text-gray-700 dark:text-gray-300 tabular-nums text-right">
+                        {t.minuten.toLocaleString("de-DE")} Min.
+                      </dd>
+                    </div>
+                    <div className="flex justify-between gap-3">
+                      <dt className="text-gray-500 dark:text-gray-500">entspricht</dt>
+                      <dd className="text-gray-700 dark:text-gray-300 tabular-nums text-right">
+                        ca. {t.anrufeCa.toLocaleString("de-DE")} Anrufe
+                      </dd>
+                    </div>
+                    <div className="flex justify-between gap-3">
+                      <dt className="text-gray-500 dark:text-gray-500">Obergrenze</dt>
+                      <dd className="text-gray-700 dark:text-gray-300 tabular-nums text-right">
+                        {t.obergrenze}
+                      </dd>
+                    </div>
+                    <div className="flex justify-between gap-3">
+                      <dt className="text-gray-500 dark:text-gray-500">Einrichtung</dt>
+                      <dd className="text-gray-700 dark:text-gray-300 tabular-nums text-right">
+                        {t.einrichtung}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+              ))}
+            </div>
+            <p className={`${PROSE} mt-6`}>{TARIF_ENTERPRISE}</p>
+
+            <div className={`${CARD} mt-8`}>
+              <p className={PROSE}>{PERSONALKOSTEN_ANKER.text}</p>
+              <p className="text-[14px] text-gray-500 dark:text-gray-500 mt-2">
+                Quelle: {PERSONALKOSTEN_ANKER.source}
+              </p>
+            </div>
+
+            <Link
+              to="/kosten-ki-telefonassistent"
+              className="inline-flex items-center gap-2 mt-8 min-h-[44px] py-3 text-[16px] font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+            >
+              Alle Preisangaben im Detail
+              <ArrowRight size={15} aria-hidden="true" />
+            </Link>
+          </div>
+        </section>
+
+        {/* ── 14 · M19 Umkehrbarkeit ── */}
+        <section className={SECTION}>
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>{UMKEHRBARKEIT.headline}</h2>
+            <dl className="space-y-5 mb-8">
+              {UMKEHRBARKEIT.fakten.map((f) => (
+                <div key={f.label} className={CARD_ALT}>
+                  <dt className="text-[15px] font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    {f.label}
+                  </dt>
+                  <dd className={PROSE}>{f.wert}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className={PROSE}>{UMKEHRBARKEIT.vetorecht}</p>
+          </div>
+        </section>
+
+        {/* ── 15 · M16 Wann wir nicht passen ── */}
+        <section className={SECTION_ALT}>
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>{NICHT_PASSEND.headline}</h2>
+            <p className={`${PROSE} mb-8`}>{NICHT_PASSEND.intro}</p>
+            <ul className="space-y-5">
+              {NICHT_PASSEND.points.map((point, i) => (
+                <li key={i} className={`flex items-start gap-3 ${PROSE}`}>
+                  <span className={DOT} />
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* ── 16 · M7 Datenschutz kurz ── */}
+        <section className={SECTION}>
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>Was Ihr Datenschutzbeauftragter wissen will</h2>
+            <ul className="space-y-5">
+              {DATENSCHUTZ_PUNKTE.map((punkt, i) => (
+                <li key={i} className={`flex items-start gap-3 ${PROSE}`}>
+                  <span className={DOT} />
+                  {punkt}
+                </li>
+              ))}
+            </ul>
+            <Link
+              to="/datenschutz-sicherheit"
+              className="inline-flex items-center gap-2 mt-8 min-h-[44px] py-3 text-[16px] font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+            >
+              Datenschutz und Sicherheit im Detail
+              <ArrowRight size={15} aria-hidden="true" />
+            </Link>
+          </div>
+        </section>
+
+        {/* ── 17 · M11 FAQ ── */}
+        <section className={SECTION_ALT}>
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>Häufige Fragen</h2>
+            <div className="space-y-4">
+              {faqItems.map((item, i) => (
+                <div key={i} className={CARD}>
+                  <h3 className={H3}>{item.question}</h3>
+                  <p className={PROSE}>{item.answer}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ── M21 · Für Ihr Praxisteam ── */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/40">
-          <div className="max-w-5xl mx-auto px-6 lg:px-8">
-            <div className="grid lg:grid-cols-2 gap-14 items-start">
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-5">
-                  {TEAM_BLOCK.headline}
-                </h2>
-                <p className="text-gray-500 dark:text-gray-400 leading-[1.7]">{TEAM_BLOCK.text}</p>
-              </div>
-              <ul className="space-y-3">
-                {TEAM_BLOCK.points.map((point, i) => (
-                  <li
-                    key={i}
-                    className="flex items-start gap-2.5 p-4 rounded-xl bg-white dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 text-[13px] text-gray-600 dark:text-gray-400 leading-relaxed"
-                  >
-                    <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0 mt-0.5" />
-                    {point}
-                  </li>
-                ))}
-              </ul>
-            </div>
+        {/* ── 18 · M12 Nächster Schritt ── */}
+        <section className={SECTION}>
+          <div className="max-w-2xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>Gehen wir Ihre Anrufe gemeinsam durch.</h2>
+            <p className={`${PROSE} mb-8`}>{CTA.nextStep}</p>
+            <Link to="/kontakt" className={CTA_PRIMARY}>
+              {CTA.primaryLabel}
+              <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+            <p className="mt-4 text-[15px] text-gray-500 dark:text-gray-500">
+              {CTA.microcopy}
+            </p>
           </div>
         </section>
 
-        {/* ── Segment- und Stadtlinks (nur Healthcare) ── */}
-        <section className="py-20">
-          <div className="max-w-5xl mx-auto px-6 lg:px-8">
+        {/* ── Wegweiser: nur Gesundheitsinhalte (Positionierung Option B) ── */}
+        <section className={`${SECTION_ALT} border-t border-gray-100 dark:border-gray-800`}>
+          <div className="max-w-4xl mx-auto px-6 lg:px-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">
               Für Ihre Praxisform
             </h2>
@@ -384,19 +646,13 @@ export function PraxenPage() {
                 <Link
                   key={s.href}
                   to={s.href}
-                  className="group p-6 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
+                  className={`${CARD} block hover:border-gray-300 dark:hover:border-gray-600 transition-colors`}
                 >
-                  <h3 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100 mb-1.5 flex items-center gap-2">
+                  <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
                     {s.label}
-                    <ArrowRight
-                      size={13}
-                      className="text-gray-300 group-hover:text-gray-600 transition-colors"
-                      aria-hidden="true"
-                    />
+                    <ArrowRight size={15} className="text-gray-400" aria-hidden="true" />
                   </h3>
-                  <p className="text-[13px] text-gray-500 dark:text-gray-400 leading-relaxed">
-                    {s.text}
-                  </p>
+                  <p className={PROSE}>{s.text}</p>
                 </Link>
               ))}
             </div>
@@ -409,89 +665,14 @@ export function PraxenPage() {
                 <li key={c.href}>
                   <Link
                     to={c.href}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-[13px] font-medium text-gray-700 dark:text-gray-300 hover:border-gray-400 transition-colors"
+                    className="inline-flex items-center gap-2 px-5 py-3 min-h-[44px] rounded-xl border border-gray-200 dark:border-gray-700 text-[16px] font-medium text-gray-700 dark:text-gray-300 hover:border-gray-400 transition-colors"
                   >
                     {c.label}
-                    <ArrowRight size={12} aria-hidden="true" />
+                    <ArrowRight size={14} aria-hidden="true" />
                   </Link>
                 </li>
               ))}
-              <li>
-                <Link
-                  to="/kosten-ki-telefonassistent"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-[13px] font-medium text-gray-700 dark:text-gray-300 hover:border-gray-400 transition-colors"
-                >
-                  Was der Empfang kostet
-                  <ArrowRight size={12} aria-hidden="true" />
-                </Link>
-              </li>
             </ul>
-          </div>
-        </section>
-
-        {/* ── M11 · FAQ ── */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/40">
-          <div className="max-w-3xl mx-auto px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-10">
-              Häufige Fragen
-            </h2>
-            <div className="space-y-5">
-              {faqItems.map((item, i) => (
-                <div
-                  key={i}
-                  className="p-6 rounded-2xl bg-white dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800"
-                >
-                  <h3 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100 mb-2.5">
-                    {item.question}
-                  </h3>
-                  <p className="text-[14px] text-gray-600 dark:text-gray-400 leading-[1.7]">
-                    {item.answer}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── M16 · Wenn wir nicht passen ── */}
-        <section className="py-20">
-          <div className="max-w-3xl mx-auto px-6 lg:px-8">
-            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-4">
-              {NICHT_PASSEND.headline}
-            </h2>
-            <p className="text-gray-500 dark:text-gray-400 leading-[1.7] mb-6">
-              {NICHT_PASSEND.intro}
-            </p>
-            <ul className="space-y-3">
-              {NICHT_PASSEND.points.map((point, i) => (
-                <li
-                  key={i}
-                  className="flex items-start gap-3 text-[14px] text-gray-600 dark:text-gray-400 leading-relaxed"
-                >
-                  <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0" />
-                  {point}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        {/* ── M12 · Abschluss-CTA ── */}
-        <section className="py-24 bg-gray-50 dark:bg-gray-900/40">
-          <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4">
-              Gehen wir Ihre Anrufe gemeinsam durch.
-            </h2>
-            <p className="text-[15px] text-gray-500 dark:text-gray-400 max-w-lg mx-auto mb-8 leading-[1.7]">
-              {CTA.nextStep}
-            </p>
-            <Link
-              to="/kontakt"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors"
-            >
-              {CTA.primaryLabel}
-              <ArrowRight size={15} aria-hidden="true" />
-            </Link>
           </div>
         </section>
       </main>

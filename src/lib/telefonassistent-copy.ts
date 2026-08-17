@@ -240,7 +240,7 @@ export const CTA = {
 // Beträge, Kontingente, Fristen und Prozessschritte. Seiten importieren von
 // hier — eine Zahl darf nie zweimal getippt werden.
 //
-// Typografie: geschütztes Leerzeichen ( ) vor jeder Einheit.
+// Typografie: geschuetztes Leerzeichen (U+00A0) vor jeder Einheit.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface Tarif {

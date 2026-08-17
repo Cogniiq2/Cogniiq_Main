@@ -119,7 +119,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/praxen",
     title: "KI Telefonassistent für Praxen – Ihr Empfang | Cogniiq",
-    description: "Ein Empfang am Telefon für Ihre Praxis: mit Ihren Ansagen, Ihren Regeln und strukturierter Übergabe an Ihr Team. Keine Triage, feste monatliche Kosten.",
+    description: "Ein Empfang am Telefon für Ihre Praxis: Ihre Stimmauswahl, Ihre Regeln, strukturierte Übergabe. Keine Triage, Kontingent mit Obergrenze, Go-live in 7 Tagen.",
     keywords: "KI Telefonassistent Praxis, Praxisempfang Telefon, telefonische Erreichbarkeit Praxis, Anrufannahme Arztpraxis",
     indexable: true,
     sitemap: { lastmod: "2026-08-16", changefreq: "monthly", priority: "0.90" },
