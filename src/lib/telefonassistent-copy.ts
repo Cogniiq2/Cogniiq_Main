@@ -233,3 +233,218 @@ export const CTA = {
   // [[CLAIM: Dauer des Erstgesprächs bestätigen — bis dahin ohne Minutenangabe]]
   microcopy: "Kein Verkaufsgespräch, keine Präsentation.",
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Preis-, Vertrags- und Prozessdaten aus den finalen Inhaber-Antworten
+// (A/B/D/E/F, 17.08.2026). Diese Konstanten sind die EINZIGE Quelle für
+// Beträge, Kontingente, Fristen und Prozessschritte. Seiten importieren von
+// hier — eine Zahl darf nie zweimal getippt werden.
+//
+// Typografie: geschütztes Leerzeichen ( ) vor jeder Einheit.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface Tarif {
+  name: string;
+  minuten: number;
+  /** Ungefähre Anrufzahl — Praxen denken nicht in Minuten (Brief III §5.2). */
+  anrufeCa: number;
+  monatlich: string;
+  /** Obergrenze inklusive Mehrverbrauch. */
+  obergrenze: string;
+  einrichtung: string;
+}
+
+export const TARIFE: Tarif[] = [
+  {
+    name: "Basis",
+    minuten: 500,
+    anrufeCa: 250,
+    monatlich: "300 €",
+    obergrenze: "500 €",
+    einrichtung: "1.490 €",
+  },
+  {
+    name: "Praxis",
+    minuten: 1000,
+    anrufeCa: 500,
+    monatlich: "500 €",
+    obergrenze: "800 €",
+    einrichtung: "2.490 €",
+  },
+  {
+    name: "MVZ",
+    minuten: 2000,
+    anrufeCa: 1000,
+    monatlich: "800 €",
+    obergrenze: "1.400 €",
+    einrichtung: "3.490 €",
+  },
+];
+
+/** Vierter Tarif ohne Kachel — bewusst als Fließtextzeile (Inhaber-Entscheidung). */
+export const TARIF_ENTERPRISE =
+  "Für Verbünde und Mehrstandort-MVZ: Kontingent nach Bedarf, ab 5.000 € im Monat.";
+
+/**
+ * M10 · Die Deckelung — steht auf der Preisseite VOR der ersten Zahl
+ * (Brief III §5.1).
+ */
+export const DECKELUNG = {
+  headline: "Zuerst die Obergrenze, dann der Preis",
+  text: "Jeder Tarif enthält ein festes Minutenkontingent. Wird es überschritten, kostet jede weitere Minute 0,39 €. Nach oben ist die Rechnung gedeckelt: Mehr als der nächsthöhere Tarif kostet es nie. Eine Grippewelle kann Ihre Rechnung also bewegen, aber nicht sprengen.",
+  hinweis: "Mehr als der nächsthöhere Tarif kostet es nie.",
+  nichtProBehandler:
+    "Abgerechnet wird pro Praxis, nicht pro Behandler. Ob bei Ihnen zwei oder sieben Personen behandeln, ändert am Monatsbetrag nichts.",
+};
+
+export const SPRACHEN = {
+  headline: "Weitere Sprachen",
+  text: "Deutsch ist enthalten. Jede weitere Sprache kostet 79 € im Monat; ab drei Sprachen sind es 230 € im Monat für bis zu fünf Sprachen gleichzeitig. Der Assistent kann die Sprache mitten im Gespräch wechseln.",
+};
+
+/**
+ * M17 · Einrichtung Ihres Empfangs — die acht realen Schritte.
+ * Dauerangaben liegen nur für Testphase und Go-live vor; erfundene Dauern
+ * sind ausgeschlossen (Inhaber-Antwort E).
+ */
+export const EINRICHTUNG_PROJEKT = {
+  headline: "Einrichtung Ihres Empfangs",
+  intro:
+    "Die Einrichtung ist kein Gebührenposten, sondern ein Projekt mit acht Schritten. Sie zahlen die Hälfte bei Vertragsabschluss und die zweite Hälfte nach dem Go-live.",
+  schritte: [
+    {
+      nummer: "1",
+      title: "Erstgespräch",
+      dauer: null as string | null,
+      text: "Persönlich oder im Videocall. Wir gehen Ihre Praxissituation durch und zeigen an konkreten Beispielen, was der Empfang kann.",
+    },
+    {
+      nummer: "2",
+      title: "Angebot",
+      dauer: null,
+      text: "Sie erhalten ein individuell erstelltes Angebot per E-Mail.",
+    },
+    {
+      nummer: "3",
+      title: "Unterschrift",
+      dauer: null,
+      text: "Online per E-Signatur, ohne App und ohne Zusatzsoftware. Am Handy mit dem Finger, am Rechner mit der Maus.",
+    },
+    {
+      nummer: "4",
+      title: "Rechnung und Zugang",
+      dauer: null,
+      text: "Nach Zahlungseingang erhalten Sie Zugang zum geschützten Kundendashboard: alle Daten, der Vertrag, der Leistungsumfang und die Kündigung mit einem Klick.",
+    },
+    {
+      nummer: "5",
+      title: "Ihre Vorgaben",
+      dauer: null,
+      text: "Ein geführter Ablauf im Dashboard: Stimme, Begrüßungssatz, Anliegen, Regeln, Weiterleitungen. Ihre Angaben gehen direkt an uns.",
+    },
+    {
+      nummer: "6",
+      title: "Aufbau",
+      dauer: null,
+      text: "Ihr Assistent wird auf Basis dieser Angaben gebaut. Nicht ausgewählt, nicht aus einer Vorlage kopiert.",
+    },
+    {
+      nummer: "7",
+      title: "Testphase",
+      dauer: "2 Tage",
+      text: "Zwei Tage testen wir gemeinsam. Live geht der Assistent erst, wenn Ihre Praxis zufrieden ist.",
+    },
+    {
+      nummer: "8",
+      title: "Go-live",
+      dauer: "spätestens 7 Tage nach Zahlungseingang",
+      text: "Garantiert innerhalb von 7 Tagen nach Zahlungseingang.",
+    },
+  ],
+};
+
+/**
+ * Go-live-Garantie — eigener, ruhig gesetzter Block auf /praxen, der
+ * Preisseite und im FAQ (Brief III §3.3). Nie als Aufzählungspunkt.
+ */
+export const GO_LIVE_GARANTIE = {
+  headline: "Die 7-Tage-Garantie",
+  text: "Ihr Empfang geht spätestens 7 Tage nach Zahlungseingang live. Halten wir diesen Termin nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr. Das steht so im Vertrag, nicht nur auf dieser Seite.",
+};
+
+/**
+ * M14 · Die Übergabe — der dokumentierte Abbruchgrund Nr. 1. Beschreibt den
+ * heutigen Weg ohne Beschönigung (Inhaber-Antwort B).
+ */
+export const UEBERGABE = {
+  headline: "Und wer tippt das dann bei Ihnen ein?",
+  paragraphs: [
+    "Der übliche Weg sieht so aus: Der Assistent nimmt den Anruf an, und Ihre MFA überträgt das Ergebnis anschließend von Hand ins Praxissystem. Das ist der Grund, warum viele Praxen solche Systeme nach wenigen Wochen wieder abschalten — die Arbeit ist nicht verschwunden, sie ist nur umgezogen.",
+    "Wir prüfen vor der Einrichtung, welche Schnittstelle Ihr System bietet, und bauen die Übergabe darauf auf. Wo eine Anbindung technisch möglich ist, landet das Anliegen direkt dort, wo Sie ohnehin arbeiten. Wo sie nicht möglich ist, sagen wir Ihnen das vorher — und nicht nach der Unterschrift.",
+  ],
+  wasAnkommt: {
+    headline: "Was nach jedem Anruf im Dashboard steht",
+    items: ["Anliegen", "Name", "Rückrufnummer", "Terminwunsch"],
+    hinweis:
+      "Strukturiert, nicht als Audiodatei — Gespräche werden nicht aufgezeichnet.",
+  },
+  // [[ASSET: Screenshot des Dashboards nach einem Anruf — Spezifikation in
+  // ASSETS-REQUIRED.md. Bis zur Lieferung bleibt der Bild-Slot ungerendert.]]
+};
+
+/**
+ * M18 · Betreuung — Antwort auf den dokumentierten Abbruchgrund (52 % nennen
+ * unzureichenden Support als Wechselgrund, Zi 2026).
+ */
+export const BETREUUNG = {
+  headline: "Wer sich kümmert, wenn Sie etwas ändern wollen",
+  person: {
+    name: "Lazar Popovic",
+    rolle: "Gründer und Leiter",
+    // [[ASSET: Foto Lazar Popovic — vom Inhaber freigegeben, public/Lazar_Popovic.png]]
+    bildAlt: "Lazar Popovic, Gründer und Leiter von Cogniiq",
+  },
+  text: "Sie sprechen mit einer Person, nicht mit einem Ticketsystem und nicht mit einem wechselnden Support-Team.",
+  fakten: [
+    { label: "Erreichbar", wert: "täglich 6–20 Uhr" },
+    { label: "Antwort", wert: "spätestens innerhalb von 24 Stunden" },
+    {
+      label: "Änderungen an Ansagen und Regeln",
+      wert: "eingereicht über das Kundendashboard oder per E-Mail, umgesetzt innerhalb von 3 Tagen",
+    },
+  ],
+};
+
+/**
+ * M19 · Umkehrbarkeit — kompakter Faktenblock, keine Marketingsprache.
+ * Die Testphase liegt nach Vertragsabschluss und Zahlung der ersten Hälfte;
+ * das wird ausdrücklich gesagt (Inhaber-Vorgabe).
+ */
+export const UMKEHRBARKEIT = {
+  headline: "Wie Sie wieder herauskommen",
+  fakten: [
+    {
+      label: "Laufzeit",
+      wert: "12 Monate — oder monatlich kündbar mit 20 % Aufschlag",
+    },
+    {
+      label: "Kündigung",
+      wert: "monatlich zum Laufzeitende, mit einem Klick im Kundendashboard. Kein Anruf, keine E-Mail, keine Fristfalle",
+    },
+    { label: "Preisgarantie", wert: "24 Monate, schriftlich" },
+    {
+      label: "Testphase",
+      wert: "2 Tage, nach Vertragsabschluss und Zahlung der ersten Hälfte. Live geht der Empfang erst, wenn Sie zufrieden sind",
+    },
+  ],
+  vetorecht:
+    "Die Testphase ist kein kostenloser Test. Sie ist der Punkt, an dem Sie ein Vetorecht haben: Ohne Ihre Freigabe geht der Empfang nicht live, und halten wir die 7 Tage nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.",
+  // [[CLAIM: Was mit den gespeicherten Ergebnissen nach Vertragsende geschieht,
+  // ist nicht beantwortet (Brief II §4.7). Bis dahin keine Aussage dazu.]]
+};
+
+/** Verankerung — sachlich, ohne Ersparnisbehauptung (Brief III §3.4). */
+export const PERSONALKOSTEN_ANKER = {
+  text: "Zum Vergleich, ohne daraus eine Ersparnis abzuleiten: Das Tarifgehalt für Medizinische Fachangestellte beginnt 2026 bei 2.939,59 € monatlich, zuzüglich Arbeitgeberkosten.",
+  source: "Gehaltstarifvertrag MFA (Virchowbund), 2026",
+};
