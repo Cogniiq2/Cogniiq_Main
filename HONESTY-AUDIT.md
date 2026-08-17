@@ -164,6 +164,79 @@ Runde auch die Sport-Formulierung auf eine neutrale Bewertungsbitte an *alle*
 Kunden umzustellen. Falls der tatsächliche Ablauf ein anderer ist, beschreiben
 Sie ihn mir; dann formuliere ich die Copy passend zum echten Mechanismus.
 
+## 7. Zweite Wahrheitsquellen — vollständige Karte der Metadaten
+
+Stand: 17.08.2026. Anlass: Drei Korrekturrunden mussten nachgebessert werden,
+weil dieselbe Aussage an einer zweiten, nicht offensichtlichen Stelle noch
+einmal stand. Diese Karte listet **jeden** Ort, an dem Title, Description oder
+OG-Text entsteht, damit keine Korrektur mehr eine Quelle übersieht.
+
+### 7.1 Zwei parallele Ketten — der Kern des Problems
+
+Das ausgelieferte `<head>` entsteht **zweimal**, aus **verschiedenen Quellen**:
+
+| | Statische Kette (Crawler ohne JS) | Laufzeit-Kette (Browser nach Hydration) |
+|---|---|---|
+| Quelle | `src/lib/routing/publicRoutes.ts` | `<PageSEO>`-Props der Seitenkomponente |
+| Mechanik | `scripts/prerender.mjs` ersetzt `<title>`, `description`, `robots`, `og:*`, `twitter:*` im HTML | `PageSEO.tsx` schreibt dieselben Tags per `useEffect` in den DOM |
+| Vorlage | `index.html` | — |
+
+**Konsequenz:** Eine Seitenkomponente zu korrigieren ändert nicht, was ein
+Crawler ohne JavaScript liest — und umgekehrt. Beide Ketten müssen bei jeder
+Textänderung gemeinsam angefasst werden. Genau dieser Fehler lag dem Nachtrag
+in `e060c94` und den Nachbesserungen vom 17.08.2026 zugrunde.
+
+### 7.2 Alle Definitionsorte
+
+| # | Ort | Rolle | Umfang | Status |
+|---|---|---|---|---|
+| 1 | `index.html` | Statische Vorlage; gilt für alles, was der Prerender nicht überschreibt | 1 Title, 1 Description, OG/Twitter-Block | geprüft |
+| 2 | `scripts/prerender.mjs` | Rewrite-Mechanik, erzeugt keinen eigenen Text | — | geprüft |
+| 3 | `src/lib/routing/publicRoutes.ts` | **Autoritativ für das ausgelieferte `<head>`** | 91 Routen mit eigenem Title + Description | geprüft, korrigiert |
+| 4 | `src/components/PageSEO.tsx` | Laufzeit-Head, erzeugt keinen eigenen Text | — | geprüft |
+| 5 | `src/lib/seo-data.ts` → `PAGE_META` | Zentrale Meta für 5 Seiten (`/`, `/leistungen`, `/ueber-uns`, `/faq`, `/kontakt`) | 5 Einträge | geprüft |
+| 6 | `src/lib/seo-data.ts` → `BUSINESS_INFO.description` | Speist `LocalBusinessSchema` und JSON-LD | 1 Eintrag | geprüft |
+| 7 | `src/lib/seo-metadata.ts` | **Toter Code — keine Importeure.** Erzeugt Title/Description-Vorlagen, die nirgends verwendet werden | 3 Generatoren | geprüft; Entfernung empfohlen |
+| 8 | `src/lib/standorte-service-configs.ts` → `seo:{}` | Stadt-Service-Seiten, eigene Title/Description **zusätzlich** zum Manifest | 9 Konfigurationen | geprüft, korrigiert |
+| 9 | `src/pages/industries/*.tsx` | Config-Objekte für `IndustryPage` (9) und `NationalIndustryPage` (13) | 22 Seiten | geprüft |
+| 10 | `src/pages/cluster/**/*.tsx` | Config-Objekte für `ClusterPage` | 15 Seiten | geprüft |
+| 11 | `src/pages/costs/*.tsx` | Config-Objekte für `CostPage` | 3 Seiten | geprüft, korrigiert |
+| 12 | `src/pages/problems/*.tsx` | Config-Objekte für `ProblemPage` | 5 Seiten | geprüft |
+| 13 | 27 Seiten mit direktem `<PageSEO … />` | Title/Description inline in der Komponente | 27 Dateien | geprüft |
+| 14 | `src/lib/blog-data.ts` | Blogartikel-Meta und Fließtext | 11 Descriptions | geprüft, korrigiert |
+| 15 | `src/components/LocalBusinessSchema.tsx` | JSON-LD-Descriptions aus `BUSINESS_INFO` | 3 Stellen | geprüft |
+| 16 | JSON-LD-Blöcke in Seitenkomponenten (`additionalSchema`) | `Service`/`FAQPage`-Descriptions, unabhängig von der Meta-Description | u. a. `/praxen`, Cluster-Seiten | geprüft |
+
+**Nebenbefund:** `src/lib/seo-metadata.ts` (#7) ist eine vierte, schlafende
+Quelle — sie erzeugt Marketing-Text („AI Rezeptionistin", „hochkonvertierende
+Websites"), wird aber von keiner Datei importiert. Sie richtet heute keinen
+Schaden an, würde aber bei künftiger Verwendung ungeprüften Text ausliefern.
+
+### 7.3 Prüfung gegen die bisherigen Korrekturen
+
+Alle Quellen aus 7.2 wurden gegen die vier Muster geprüft:
+
+| Muster | Ergebnis |
+|---|---|
+| Hosting-Standort / EU-Verarbeitung / „DSGVO-konform" als Zusage | **Ein Restbefund**, behoben: `blog-data.ts:198` — Callout „Ein DSGVO-konformer KI-Telefonassistent verarbeitet Patientendaten auf europäischen Servern" → umformuliert zu einer Prüffrage an den Leser, ohne Zusage. Verbleibende Treffer sind ausschließlich FAQ-**Fragen** („Ist der KI Telefonassistent DSGVO-konform?"), deren Antworten korrigiert sind |
+| Eigenaufnahme-Zusage | keine Treffer in irgendeiner Metadatenquelle |
+| Absolutversprechen | keine Treffer in Title, Description oder OG-Text |
+| PVS-Andeutung (Produktnamen, „direkt angebunden") | keine Treffer |
+
+**Außerhalb des Telefonassistenten unverändert** (Inhaber-Entscheidung vom
+17.08.2026, Option B): Die Aussage „DSGVO-konform / europäische Server" bleibt
+auf den Webdesign- und Automatisierungsseiten stehen, weil sie dort andere
+Produkte auf anderer Infrastruktur beschreibt. Ausgenommen sind zwei
+Querverweise, die den Telefonassistenten namentlich einschlossen — diese sind
+entfernt.
+
+### 7.4 Arbeitsregel für alle weiteren Änderungen
+
+> Wird ein Title, eine Description oder ein OG-Text geändert, ist die Änderung
+> erst vollständig, wenn **beide** Ketten aus 7.1 angefasst sind: die
+> Seitenkomponente *und* der Eintrag in `publicRoutes.ts`. Bei Stadtseiten
+> kommt `standorte-service-configs.ts` als dritte Stelle hinzu.
+
 ## 5. Positivbefunde
 
 - Kein `aggregateRating`, `Review`, `ratingValue` oder Sterne-Markup irgendwo

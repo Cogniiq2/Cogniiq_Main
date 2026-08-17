@@ -195,7 +195,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "callout",
         calloutType: "info",
         content:
-          "Wichtig: Ein DSGVO-konformer KI-Telefonassistent verarbeitet Patientendaten auf europäischen Servern und protokolliert Datenflüsse nachvollziehbar.",
+          "Wichtig: Klären Sie vor der Auswahl, wo verarbeitet wird, welche Unterauftragsverarbeiter beteiligt sind, was aufgezeichnet und gespeichert wird und ob ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gestellt wird.",
       },
       {
         type: "h2",
