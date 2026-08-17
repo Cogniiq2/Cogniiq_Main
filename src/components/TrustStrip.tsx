@@ -7,7 +7,8 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, nu
 // Kein Siegel-Charakter: neutrale Icons, Aussagen als Arbeitsweise formuliert.
 // [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1)]]
 const ITEMS = [
-  { icon: Shield, label: 'DSGVO-konform', sub: 'Verarbeitung auf europäischen Servern' },
+  // Keine Hosting-, Serverstandort- oder "DSGVO-konform"-Aussage (Inhaber-Antwort B).
+  { icon: Shield, label: 'Keine Gesprächsaufzeichnung', sub: 'Gespeichert wird nur das strukturierte Ergebnis' },
   { icon: Clock, label: 'Go-Live typisch in 7–14 Tagen', sub: 'Live erst nach Ihrer Freigabe' },
   { icon: Users, label: 'Direkter Ansprechpartner', sub: 'Kein Ticket-System' },
   { icon: Wrench, label: 'Keine Templates', sub: 'Gebaut für Ihren Prozess' },

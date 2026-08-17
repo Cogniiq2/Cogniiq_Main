@@ -39,7 +39,7 @@ const faqItems = [
   },
   {
     question: "Ist das System DSGVO-konform für den Einsatz in Deutschland?",
-    answer: "Ja. Der KI Telefonassistent unterstützt DSGVO-konforme Prozesse. Alle Daten werden auf europäischen Servern verarbeitet und gespeichert.",
+    answer: "Ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört zur Einrichtung. Gespräche werden nicht aufgezeichnet – gespeichert wird ausschließlich das strukturierte Ergebnis. Ihre Daten werden nicht zum Training von Modellen verwendet.",
   },
   {
     question: "Wie erhalte ich eine Demo für mein Unternehmen in Bayern?",
@@ -131,7 +131,7 @@ export function BayernKiTelefonassistentPage() {
     <>
       <PageSEO
         title="KI Telefonassistent für Unternehmen in Bayern | Cogniiq"
-        description="KI Telefonassistent für bayerische Unternehmen: nimmt Anrufe an, bucht Termine nach Ihren Regeln und entlastet Ihr Team – auch außerhalb der Öffnungszeiten. DSGVO-konform."
+        description="KI Telefonassistent für bayerische Unternehmen: nimmt Anrufe an, bucht Termine nach Ihren Regeln und entlastet Ihr Team – auch außerhalb der Öffnungszeiten, ohne Gesprächsaufzeichnung."
         canonical={`${BUSINESS_INFO.website}/bayern/ki-telefonassistent`}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
@@ -232,7 +232,7 @@ function HeroSection() {
               { icon: MapPin, label: "Bayernweit verfügbar" },
               { icon: Clock, label: "Auch außerhalb der Öffnungszeiten erreichbar" },
               { icon: Calendar, label: "Termine automatisch" },
-              { icon: Shield, label: "DSGVO-konform" },
+              { icon: Shield, label: "Keine Gesprächsaufzeichnung" },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -260,7 +260,7 @@ function TrustSection() {
         <div className="flex flex-wrap items-center justify-between gap-6">
           {[
             "Spezialisiert auf den bayerischen Mittelstand",
-            "DSGVO-konform · Europäische Server",
+            "Keine Gesprächsaufzeichnung",
             "Individuelle Konfiguration",
             "Schnelle Implementierung",
           ].map((item, i) => (
@@ -328,7 +328,7 @@ function IntroSection() {
               { icon: CheckCircle2, label: "Beantwortet Fragen und gibt Informationen weiter" },
               { icon: Calendar, label: "Bucht Termine direkt in Ihren Kalender" },
               { icon: Clock, label: "Erreichbar auch an Feiertagen in Bayern" },
-              { icon: Shield, label: "DSGVO-konform – Daten auf EU-Servern" },
+              { icon: Shield, label: "Keine Gesprächsaufzeichnung" },
               { icon: Zap, label: "Integration mit CRM und Automationen" },
             ].map((feat, i) => (
               <motion.div
@@ -451,7 +451,7 @@ function BenefitsSection() {
             {
               icon: Shield,
               title: "Datenschutzorientiert umgesetzt",
-              desc: "Verarbeitung auf europäischen Servern, Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört zur Einrichtung.",
+              desc: "Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört zur Einrichtung. Gespräche werden nicht aufgezeichnet.",
             },
             {
               icon: Zap,

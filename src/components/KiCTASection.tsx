@@ -13,7 +13,7 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, nu
 const trust = [
   { icon: CheckCircle, text: 'Einrichtung typischerweise in 7–14 Tagen' },
   { icon: CheckCircle, text: 'Anbindung an Kalender & CRM wird vorab geprüft' },
-  { icon: CheckCircle, text: 'DSGVO-konform & europäische Server' },
+  { icon: CheckCircle, text: 'Keine Gesprächsaufzeichnung, kein Training mit Ihren Daten' },
   { icon: CheckCircle, text: 'Auch außerhalb der Öffnungszeiten erreichbar' },
 ];
 

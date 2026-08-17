@@ -80,7 +80,7 @@ const faqItems = [
   {
     question: "Ist der KI Telefonassistent DSGVO-konform?",
     answer:
-      "Die Verarbeitung läuft auf europäischen Servern, ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört zur Einrichtung. Gespräche werden als strukturierte Zusammenfassung übergeben, nicht als Rohaudio gespeichert, sofern Sie das nicht wünschen. Anrufer werden zu Gesprächsbeginn über den Sprachassistenten informiert.",
+      "Ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört zur Einrichtung. Gespräche werden nicht aufgezeichnet – gespeichert wird ausschließlich das strukturierte Ergebnis: Anliegen, Name, Rückrufnummer, Terminwunsch. Ihre Daten werden nicht zum Training von Modellen verwendet. Anrufer erfahren zu Gesprächsbeginn, dass ein KI-System spricht. Ob Ihre Praxis eine Datenschutz-Folgenabschätzung benötigt, entscheidet Ihr Datenschutzbeauftragter – wir liefern die Unterlagen dafür zu.",
   },
   {
     question: "Was passiert bei einem technischen Ausfall?",
@@ -91,7 +91,7 @@ const faqItems = [
   {
     question: "Was kostet der KI Telefonassistent?",
     answer:
-      "Sie zahlen einen festen Monatsbetrag für einen definierten Leistungsumfang — keine Abrechnung pro Anruf, keine Überraschung nach einem starken Monat. Einmalige Posten wie die Einrichtung stehen vor Vertragsschluss schriftlich im Angebot. Details finden Sie auf der Kostenseite.",
+      "Sie zahlen einen festen Monatsbetrag für ein Minutenkontingent. Wird es überschritten, kostet jede weitere Minute 0,39 € – und die Rechnung übersteigt nie den nächsthöheren Tarif. Abgerechnet wird pro Praxis, nicht pro Behandler. Einmalig kommt die Einrichtung dazu; sie steht vor Vertragsschluss im Angebot. Details finden Sie auf der Kostenseite.",
   },
 ];
 
@@ -225,7 +225,7 @@ export function KiTelefonassistentPage() {
     <>
       <PageSEO
         title="KI Telefonassistent – individuell konfiguriert | Cogniiq"
-        description="KI Telefonassistent mit Ihren Ansagen, Ihren Regeln und strukturierter Übergabe an Ihr Team. Feste monatliche Kosten, kein Systemwechsel, DSGVO-konform."
+        description="KI Telefonassistent mit Ihrer Stimmauswahl, Ihren Regeln und strukturierter Übergabe an Ihr Team. Festes Minutenkontingent mit Obergrenze, keine Gesprächsaufzeichnung."
         canonical={`${BUSINESS_INFO.website}/ki-telefonassistent`}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
@@ -290,8 +290,8 @@ function HeroSection() {
               Anliegen strukturiert und übergibt sie dorthin, wo Ihr Team arbeitet.
             </p>
             <p className="text-sm text-gray-400 dark:text-gray-500 mb-10 max-w-lg leading-relaxed">
-              Mit Ihren Ansagen, Ihren Regeln und einer Übergabe, die im System
-              ankommt. Betrieben auf europäischen Servern.
+              Mit Ihrer Stimmauswahl, Ihren Regeln und einer Übergabe, die wir vor
+              der Unterschrift mit Ihnen klären.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 mb-10">
@@ -313,10 +313,10 @@ function HeroSection() {
 
             <div className="flex flex-wrap gap-x-7 gap-y-2.5">
               {[
-                "DSGVO-konform · Europäische Server",
-                "Ihre Rufnummer bleibt",
-                "Ihre Ansagen, Ihre Regeln",
-                "Feste monatliche Kosten",
+                "Keine Gesprächsaufzeichnung",
+                "Zehn Anrufe gleichzeitig",
+                "Ihre Stimmauswahl, Ihre Regeln",
+                "Festes Kontingent mit Obergrenze",
               ].map((item, i) => (
                 <motion.div
                   key={i}
@@ -392,7 +392,7 @@ function HeroSection() {
             <div className="mt-3 flex items-center gap-2 px-1">
               <Lock size={11} className="text-gray-300 dark:text-gray-600 flex-shrink-0" />
               <span className="text-[11px] text-gray-400 dark:text-gray-500">
-                DSGVO-konform · Verarbeitung auf europäischen Servern
+                Keine Gesprächsaufzeichnung · AVV nach Art. 28 DSGVO
               </span>
             </div>
           </motion.div>
@@ -404,7 +404,7 @@ function HeroSection() {
 
 function CredentialStrip() {
   const items = [
-    { label: "Feste monatliche Kosten", detail: "Keine Abrechnung pro Anruf" },
+    { label: "Festes Minutenkontingent", detail: "Darüber 0,39 €/Min., nie mehr als der nächsthöhere Tarif" },
     { label: "Ihre Rufnummer bleibt", detail: "Kein Systemwechsel nötig" },
     { label: "Strukturierte Übergabe", detail: "Anliegen landen bei Ihrem Team" },
     { label: "Europäische Server", detail: "AVV nach Art. 28 DSGVO" },

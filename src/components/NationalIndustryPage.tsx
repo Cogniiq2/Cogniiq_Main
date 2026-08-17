@@ -205,7 +205,7 @@ export function NationalIndustryPage({ config }: Props) {
                 </div>
 
                 <div className="flex flex-wrap gap-x-6 gap-y-2">
-                  {["DSGVO-konform · Europäische Server", "Einrichtung in wenigen Tagen", "Individuelle Konfiguration"].map((item, i) => (
+                  {["Keine Gesprächsaufzeichnung", "Einrichtung in wenigen Tagen", "Individuelle Konfiguration"].map((item, i) => (
                     <motion.div
                       key={i}
                       initial="hidden"
@@ -246,7 +246,7 @@ export function NationalIndustryPage({ config }: Props) {
                   </div>
                   <div className="px-5 py-3.5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-800/30 flex items-center gap-2">
                     <Lock size={11} className="text-gray-300 dark:text-gray-600 flex-shrink-0" />
-                    <span className="text-[11px] text-gray-400 dark:text-gray-500">DSGVO-konform · Verarbeitung auf europäischen Servern</span>
+                    <span className="text-[11px] text-gray-400 dark:text-gray-500">Auftragsverarbeitungsvertrag nach Art. 28 DSGVO · keine Gesprächsaufzeichnung</span>
                   </div>
                 </div>
               </motion.div>
@@ -258,7 +258,7 @@ export function NationalIndustryPage({ config }: Props) {
         <div className="border-y border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-900/30">
           <div className="max-w-6xl mx-auto px-6 lg:px-8 py-3.5">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              {["Deutschland · Remote", "DSGVO-konform", "Einrichtung in Tagen", "Individuelle Konfiguration", "Keine IT-Vorkenntnisse nötig"].map((item, i) => (
+              {["Deutschland · Remote", "AVV nach Art. 28 DSGVO", "Einrichtung in Tagen", "Individuelle Konfiguration", "Keine IT-Vorkenntnisse nötig"].map((item, i) => (
                 <span key={i} className="flex items-center gap-2 text-[12px] font-medium text-gray-500 dark:text-gray-400">
                   <CheckCircle2 size={11} className="text-emerald-500 flex-shrink-0" />
                   {item}

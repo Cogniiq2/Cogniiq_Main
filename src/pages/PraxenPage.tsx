@@ -65,7 +65,7 @@ const faqItems = [
   {
     question: "Was kostet der Assistent?",
     answer:
-      "Sie zahlen einen festen Monatsbetrag für einen definierten Leistungsumfang — keine Abrechnung pro Anruf. Einmalige Posten wie die Einrichtung stehen vor Vertragsschluss schriftlich im Angebot. Details finden Sie auf der Kostenseite.",
+      "Sie zahlen einen festen Monatsbetrag für ein Minutenkontingent. Wird es überschritten, kostet jede weitere Minute 0,39 € – und die Rechnung übersteigt nie den nächsthöheren Tarif. Abgerechnet wird pro Praxis, nicht pro Behandler. Einmalig kommt die Einrichtung dazu; sie steht vor Vertragsschluss im Angebot. Details finden Sie auf der Kostenseite.",
   },
 ];
 

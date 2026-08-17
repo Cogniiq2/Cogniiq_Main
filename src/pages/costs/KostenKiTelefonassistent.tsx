@@ -8,12 +8,12 @@ const config: CostPageConfig = {
   seo: {
     title: "Was kostet ein KI Telefonassistent? Preise | Cogniiq",
     description:
-      "Was kostet ein KI Telefonassistent? Feste monatliche Kosten statt Abrechnung pro Anruf: Preisstaffeln, Einflussfaktoren und Beispielkonfigurationen im Überblick.",
+      "Was kostet ein KI Telefonassistent? Festes Minutenkontingent mit Obergrenze: Tarife, Einrichtung und Einflussfaktoren im Überblick.",
     canonical: `${BUSINESS_INFO.website}/kosten-ki-telefonassistent`,
   },
   h1: "Was kostet ein KI Telefonassistent?",
   intro:
-    "Die wichtigste Antwort zuerst: Sie zahlen einen festen Monatsbetrag für einen definierten Leistungsumfang – keine Abrechnung pro Anruf, keine Staffel, die nach einem starken Montag überrascht. Was einmalig anfällt, etwa die Einrichtung, steht vor Vertragsschluss schriftlich im Angebot. Hier finden Sie die Preisstaffeln, die Faktoren dahinter und Beispielkonfigurationen zur Orientierung.",
+    "Die wichtigste Antwort zuerst: Sie zahlen einen festen Monatsbetrag für ein Minutenkontingent. Wird es überschritten, kostet jede weitere Minute 0,39 € – und die Rechnung übersteigt nie den nächsthöheren Tarif. Abgerechnet wird pro Praxis, nicht pro Behandler. Einmalig kommt die Einrichtung dazu; sie steht vor Vertragsschluss im Angebot. Hier finden Sie die Tarife, die Faktoren dahinter und Beispielkonfigurationen zur Orientierung.",
   serviceLink: "/ki-telefonassistent",
   serviceLinkLabel: "KI Telefonassistent entdecken",
   priceRanges: [
@@ -50,7 +50,7 @@ const config: CostPageConfig = {
     {
       title: "Eigene Ansagen und Stimme",
       description:
-        "Abgestimmte Ansagen gehören zur Einrichtung. Aufwendigere Varianten – etwa selbst aufgesprochene Ansagen für mehrere Szenarien – erhöhen den einmaligen Einrichtungsaufwand.",
+        "Stimmauswahl, Begrüßungssatz und Formulierungen gehören zur Einrichtung. Mehr Anliegen und mehr Regeln bedeuten mehr Abstimmung und damit einen höheren einmaligen Einrichtungsaufwand.",
     },
     {
       title: "Branchenspezifische Regeln",
@@ -90,7 +90,7 @@ const config: CostPageConfig = {
     {
       title: "Beispielkonfiguration: Therapiepraxis",
       description:
-        "Terminwünsche und Absagen während der Behandlungszeiten, Warteliste für frei werdende Termine, Auftragsverarbeitungsvertrag und Verarbeitung auf europäischen Servern.",
+        "Terminwünsche und Absagen während der Behandlungszeiten, Warteliste für frei werdende Termine, Auftragsverarbeitungsvertrag nach Art. 28 DSGVO.",
       investment: "299 €/Monat",
     },
   ],
@@ -111,7 +111,7 @@ const config: CostPageConfig = {
     {
       question: "Sind die Kosten wirklich planbar – auch bei vielen Anrufen?",
       answer:
-        "Ja, das ist der Kern des Modells: ein fester Monatsbetrag für einen definierten Leistungsumfang statt Abrechnung pro Anruf. Ein starker Montagmorgen oder eine Grippewelle verändert Ihre Rechnung nicht. Sollte Ihr Bedarf dauerhaft über den vereinbarten Umfang hinauswachsen, besprechen wir das offen – bevor sich am Preis etwas ändert.",
+        "Der Kern des Modells ist die Obergrenze: Ihr Tarif enthält ein Minutenkontingent, darüber kostet jede Minute 0,39 € – und die Monatsrechnung übersteigt nie den nächsthöheren Tarif. Eine Grippewelle kann Ihre Rechnung also bewegen, aber nicht sprengen. Wächst Ihr Bedarf dauerhaft über das Kontingent hinaus, besprechen wir den passenden Tarif offen.",
     },
     {
       question: "Was kostet ein KI Telefonassistent pro Monat?",

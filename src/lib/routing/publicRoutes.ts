@@ -145,7 +145,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/ki-telefonassistent",
     title: "KI Telefonassistent – individuell konfiguriert | Cogniiq",
-    description: "KI Telefonassistent mit Ihren Ansagen, Ihren Regeln und strukturierter Übergabe an Ihr Team. Feste monatliche Kosten, kein Systemwechsel, DSGVO-konform.",
+    description: "KI Telefonassistent mit Ihrer Stimmauswahl, Ihren Regeln und strukturierter Übergabe an Ihr Team. Festes Minutenkontingent mit Obergrenze, keine Gesprächsaufzeichnung.",
     keywords: "KI Telefonassistent, AI Rezeptionistin, KI Telefon Unternehmen, Anruf automatisieren, Telefonie außerhalb der Geschäftszeiten",
     indexable: true,
     sitemap: { lastmod: "2026-06-30", changefreq: "monthly", priority: "0.92" },
@@ -263,7 +263,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/bayreuth/ki-telefonassistent",
     title: "KI Telefonassistent Bayreuth – AI Rezeption & Anrufannahme | Cogniiq",
-    description: "KI Telefonassistent Bayreuth: Automatische Anrufannahme, Terminbuchung & Weiterleitung für lokale Unternehmen. DSGVO-konform, auch außerhalb der Öffnungszeiten, Einrichtung in 7–14 Tagen.",
+    description: "KI Telefonassistent Bayreuth: Anrufannahme, Terminbuchung und Weiterleitung für lokale Unternehmen. Auch außerhalb der Öffnungszeiten, ohne Gesprächsaufzeichnung, Go-live in 7 Tagen.",
     keywords: "KI Telefonassistent Bayreuth, AI Rezeptionistin Bayreuth, KI Telefon Bayreuth",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "weekly", priority: "0.9" },
@@ -331,7 +331,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/muenchen/ki-telefonassistent",
     title: "KI Telefonassistent München – AI Rezeption & Telefonservice | Cogniiq",
-    description: "KI Telefonassistent für Unternehmen in München: Anrufannahme mit Ihren Ansagen und Regeln, mehrsprachig möglich, strukturierte Übergabe. DSGVO-konform.",
+    description: "KI Telefonassistent für Unternehmen in München: Anrufannahme mit Ihren Regeln, bis zu fünf Sprachen, strukturierte Übergabe, keine Gesprächsaufzeichnung.",
     keywords: "KI Telefonassistent München, AI Rezeptionistin München, KI Telefon München",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "weekly", priority: "0.9" },
@@ -399,7 +399,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/regensburg/ki-telefonassistent",
     title: "KI Telefonassistent Regensburg – AI Rezeption & Anrufannahme | Cogniiq",
-    description: "KI Telefonassistent Regensburg: Automatische Anrufannahme, Terminbuchung & Weiterleitung für Praxen, Gastronomie und Dienstleister. Auch außerhalb der Öffnungszeiten, DSGVO-konform, Einrichtung in 7–14 Tagen.",
+    description: "KI Telefonassistent Regensburg: Anrufannahme, Terminbuchung und Weiterleitung für Praxen, Gastronomie und Dienstleister. Auch außerhalb der Öffnungszeiten, ohne Gesprächsaufzeichnung, Go-live in 7 Tagen.",
     keywords: "KI Telefonassistent Regensburg, AI Rezeptionistin Regensburg, KI Telefon Regensburg",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "weekly", priority: "0.9" },
@@ -599,7 +599,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/ki-telefonassistent-praxis",
     title: "KI-Telefonassistent für medizinische Praxen | Terminverwaltung automatisieren – Cogniiq",
-    description: "KI-Telefonassistent für Arzt- und Facharztpraxen: Termine buchen, Rezeptanfragen bearbeiten, Patientenkommunikation automatisieren – DSGVO-konform.",
+    description: "KI-Telefonassistent für Arzt- und Facharztpraxen: Termine aufnehmen, Rezeptanfragen strukturiert erfassen, Anmeldung entlasten – ohne Gesprächsaufzeichnung.",
     keywords: "KI Telefonassistent Praxis, Praxis Telefonassistent, Terminverwaltung Praxis KI, AI Praxis",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.85" },

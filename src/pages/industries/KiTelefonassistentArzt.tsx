@@ -7,12 +7,12 @@ const config: NationalIndustryPageConfig = {
   seo: {
     title: "KI Telefonassistent Arztpraxis – Terminannahme | Cogniiq",
     description:
-      "KI Telefonassistent für Arztpraxen: Terminwünsche, Stornierungen und Rezeptbestellungen strukturiert aufnehmen – zugeschnitten auf Ihre Praxis, DSGVO-konform.",
+      "KI Telefonassistent für Arztpraxen: Terminwünsche, Stornierungen und Rezeptbestellungen strukturiert aufnehmen – zugeschnitten auf Ihre Praxis, ohne Gesprächsaufzeichnung.",
     canonical: `${BUSINESS_INFO.website}/ki-telefonassistent-arzt`,
     keywords: "KI Telefonassistent Arztpraxis, Praxis Telefonservice, Telefonannahme Arztpraxis, telefonische Erreichbarkeit Praxis",
   },
   h1: "KI Telefonassistent für Arztpraxen",
-  tagline: "Arztpraxis · Anmeldung entlasten · DSGVO-konform",
+  tagline: "Arztpraxis · Anmeldung entlasten · keine Gesprächsaufzeichnung",
   intro:
     "Montagmorgen, kurz nach acht: Am Tresen steht eine Patientin, dahinter wartet die nächste, und das Telefon klingelt ohne Pause. Ihre MFA entscheidet im Sekundentakt, wer warten muss – und jemand verliert immer. Der KI Telefonassistent nimmt in solchen Momenten die Anrufe an, die sonst ins Leere laufen. Er erfasst das Anliegen strukturiert und übergibt es dorthin, wo Ihr Team arbeitet – mit Ihren Ansagen, nach Ihren Regeln.",
   serviceSlug: "ki-telefonassistent",
@@ -59,11 +59,11 @@ const config: NationalIndustryPageConfig = {
     "Terminwünsche und Stornierungen werden nach Ihren Regeln gebucht oder zur Bestätigung vorgelegt",
     "Rezept- und Überweisungswünsche kommen als strukturierte Liste an – kein Abhören, kein Abtippen",
     "Notfall-Hinweise führen sofort zu Ihrem Team, zum Bereitschaftsdienst oder zur Ansage, den Notruf 112 zu wählen",
-    "Ihre eigenen Ansagen, auf Wunsch selbst aufgesprochen – Anrufer erfahren transparent, dass ein Sprachassistent sie betreut",
-    "Auftragsverarbeitungsvertrag nach Art. 28 DSGVO, Verarbeitung auf europäischen Servern",
+    "Ihre Stimmauswahl, Ihr Begrüßungssatz, Ihre Formulierungen – Anrufer erfahren im ersten Satz, dass ein KI-System spricht",
+    "Auftragsverarbeitungsvertrag nach Art. 28 DSGVO; keine Gesprächsaufzeichnung, kein Training mit Ihren Daten",
     // [[CLAIM: verify — konkrete PVS-Anbindungen (Tomedo, Medistar, Dampsoft, CGM) je Praxis bestätigen]]
     "Anbindung an Ihre Praxissoftware wird vor dem Angebot geprüft – ein Systemwechsel ist nicht Voraussetzung",
-    "Feste monatliche Kosten – keine Abrechnung pro Anruf, keine Überraschung nach einer Grippewelle",
+    "Festes Minutenkontingent, darüber 0,39 €/Min. – die Rechnung übersteigt nie den nächsthöheren Tarif",
   ],
   workflow: {
     title: "So läuft ein Patientenanruf ab",
@@ -129,7 +129,7 @@ const config: NationalIndustryPageConfig = {
     {
       question: "Wie steht es um Datenschutz und Schweigepflicht?",
       answer:
-        "Ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört zur Einrichtung. Die Verarbeitung läuft auf europäischen Servern; Gespräche werden als strukturierte Zusammenfassung übergeben und nicht als Rohaudio gespeichert, sofern Sie das nicht ausdrücklich wünschen. Anrufer werden zu Gesprächsbeginn über den Sprachassistenten informiert. Ob Ihre Praxis eine Datenschutz-Folgenabschätzung benötigt, entscheidet Ihr Datenschutzbeauftragter – wir liefern die Dokumentation dafür zu.",
+        "Ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört zur Einrichtung. Gespräche werden nicht aufgezeichnet – gespeichert wird ausschließlich das strukturierte Ergebnis: Anliegen, Name, Rückrufnummer, Terminwunsch. Ihre Daten werden nicht zum Training von Modellen verwendet. Anrufer erfahren zu Gesprächsbeginn, dass ein KI-System spricht. Ob Ihre Praxis eine Datenschutz-Folgenabschätzung benötigt, entscheidet Ihr Datenschutzbeauftragter – wir liefern die Unterlagen dafür zu.",
     },
     {
       question: "Können wir Ansagen und Öffnungszeiten selbst anpassen?",

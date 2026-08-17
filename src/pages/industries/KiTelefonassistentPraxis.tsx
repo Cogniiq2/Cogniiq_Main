@@ -7,7 +7,7 @@ const config: NationalIndustryPageConfig = {
   seo: {
     title: "KI Telefonassistent für Therapiepraxen | Cogniiq",
     description:
-      "KI Telefonassistent für Physio-, Ergo- und Logopädie-Praxen: erreichbar bleiben, während Sie behandeln. Terminwünsche strukturiert erfasst, DSGVO-konform.",
+      "KI Telefonassistent für Physio-, Ergo- und Logopädie-Praxen: erreichbar bleiben, während Sie behandeln. Terminwünsche strukturiert erfasst, ohne Gesprächsaufzeichnung.",
     canonical: `${BUSINESS_INFO.website}/ki-telefonassistent-praxis`,
     keywords: "KI Telefonassistent Praxis, Physiotherapie Telefonannahme, telefonische Erreichbarkeit Therapiepraxis, Terminbuchung Therapeut",
   },
@@ -60,9 +60,9 @@ const config: NationalIndustryPageConfig = {
     "Terminwünsche und Absagen kommen als strukturierte Einträge an – mit Name, Nummer und Anliegen",
     "Frei werdende Termine sind sofort sichtbar und können neu vergeben werden",
     "Wiederkehrende Fragen zu Zeiten, Anfahrt oder Unterlagen beantwortet der Assistent nach Ihren Vorgaben",
-    "Ihre eigenen Ansagen, auf Wunsch selbst aufgesprochen – Anrufer erfahren transparent, dass ein Sprachassistent sie betreut",
-    "Auftragsverarbeitungsvertrag nach Art. 28 DSGVO, Verarbeitung auf europäischen Servern",
-    "Feste monatliche Kosten – keine Abrechnung pro Anruf",
+    "Ihre Stimmauswahl, Ihr Begrüßungssatz, Ihre Formulierungen – Anrufer erfahren im ersten Satz, dass ein KI-System spricht",
+    "Auftragsverarbeitungsvertrag nach Art. 28 DSGVO; keine Gesprächsaufzeichnung, kein Training mit Ihren Daten",
+    "Festes Minutenkontingent, darüber 0,39 €/Min. – die Rechnung übersteigt nie den nächsthöheren Tarif",
   ],
   workflow: {
     title: "So läuft ein Terminanruf in der Therapiepraxis ab",
@@ -117,7 +117,7 @@ const config: NationalIndustryPageConfig = {
     {
       question: "Ist das für Gesundheitsdaten in Therapiepraxen DSGVO-konform?",
       answer:
-        "Ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört zur Einrichtung. Die Verarbeitung läuft auf europäischen Servern; Gespräche werden als strukturierte Zusammenfassung übergeben und nicht als Rohaudio gespeichert, sofern Sie das nicht ausdrücklich wünschen. Anrufer werden zu Gesprächsbeginn über den Sprachassistenten informiert. Ob eine Datenschutz-Folgenabschätzung nötig ist, klären Sie mit Ihrem Datenschutzbeauftragten – wir liefern die Unterlagen dafür zu.",
+        "Ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört zur Einrichtung. Gespräche werden nicht aufgezeichnet – gespeichert wird ausschließlich das strukturierte Ergebnis: Anliegen, Name, Rückrufnummer, Terminwunsch. Ihre Daten werden nicht zum Training von Modellen verwendet. Anrufer erfahren zu Gesprächsbeginn, dass ein KI-System spricht. Ob Ihre Praxis eine Datenschutz-Folgenabschätzung benötigt, entscheidet Ihr Datenschutzbeauftragter – wir liefern die Unterlagen dafür zu.",
     },
     {
       question: "Was passiert mit Anliegen, die der Assistent nicht klären kann?",

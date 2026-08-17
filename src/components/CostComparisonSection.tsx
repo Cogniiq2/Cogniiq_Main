@@ -111,7 +111,7 @@ const HUMAN_CAPABILITIES = [
   { label: 'Empathische Sonderfälle', human: true, ki: false },
   { label: 'Kalender-/CRM-Integration', human: false, ki: true },
   { label: 'Sofortige Bestätigung (SMS/Mail)', human: false, ki: true },
-  { label: 'DSGVO-konform', human: true, ki: true },
+  { label: 'Auftragsverarbeitungsvertrag nach Art. 28 DSGVO', human: true, ki: true },
 ];
 
 export function CostComparisonSection() {
@@ -337,7 +337,7 @@ export function CostComparisonSection() {
                   'Integration Kalender & CRM',
                   'Sofortbestätigung per SMS oder Mail',
                   'Mehrere Anrufe gleichzeitig, ohne Warteschleife',
-                  'DSGVO-konform · europäische Server',
+                  'Keine Gesprächsaufzeichnung — nur das strukturierte Ergebnis',
                   'Laufende Optimierung inklusive',
                 ].map((feature) => (
                   <div key={feature} className="flex items-center gap-2.5">
@@ -461,7 +461,7 @@ export function CostComparisonSection() {
                   KI-Assistent live in 7–14 Tagen
                 </p>
                 <p className="text-[12px] text-gray-500 mb-5 leading-relaxed">
-                  Klare Vertragskonditionen · DSGVO-konform · persönliche Einrichtung
+                  Klare Vertragskonditionen · persönliche Einrichtung
                 </p>
                 <Link
                   to="/kontakt"
