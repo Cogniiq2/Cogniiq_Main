@@ -195,14 +195,8 @@ export function KiTelefonassistentPage() {
           url: BUSINESS_INFO.website,
         },
       },
-      {
-        "@type": "FAQPage",
-        mainEntity: faqItems.map((f) => ({
-          "@type": "Question",
-          name: f.question,
-          acceptedAnswer: { "@type": "Answer", text: f.answer },
-        })),
-      },
+      // FAQPage wird von PageSEO aus `faqItems` erzeugt und darf hier nicht
+      // noch einmal stehen — sonst läge derselbe Block zweimal im Dokument.
       {
         "@type": "HowTo",
         "name": "So wird Ihr Empfang am Telefon gebaut – in 5 Schritten",

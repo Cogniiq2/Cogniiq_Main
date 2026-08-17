@@ -116,14 +116,8 @@ export function BayernKiTelefonassistentPage() {
         provider: { "@id": `${BUSINESS_INFO.website}/#localbusiness` },
         areaServed: { "@type": "State", name: "Bayern" },
       },
-      {
-        "@type": "FAQPage",
-        mainEntity: faqItems.map((f) => ({
-          "@type": "Question",
-          name: f.question,
-          acceptedAnswer: { "@type": "Answer", text: f.answer },
-        })),
-      },
+      // FAQPage wird von PageSEO aus `faqItems` erzeugt und darf hier nicht
+      // noch einmal stehen — sonst läge derselbe Block zweimal im Dokument.
     ],
   };
 

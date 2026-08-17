@@ -92,6 +92,8 @@ const faqItems = [
  * sie ist bedingt und wäre dort nur als nackter Preis darstellbar, also
  * unehrlicher als der sichtbare Text.
  */
+// FAQPage wird von PageSEO aus `faqItems` erzeugt und steht deshalb NICHT
+// zusaetzlich hier — sonst laege derselbe Block zweimal im Dokument.
 const schema = {
   "@context": "https://schema.org",
   "@graph": [
@@ -130,14 +132,6 @@ const schema = {
           },
         })),
       ],
-    },
-    {
-      "@type": "FAQPage",
-      mainEntity: faqItems.map((f) => ({
-        "@type": "Question",
-        name: f.question,
-        acceptedAnswer: { "@type": "Answer", text: f.answer },
-      })),
     },
   ],
 };
@@ -348,8 +342,31 @@ export function KostenKiTelefonassistent() {
           </div>
         </section>
 
-        {/* ── 7 · Zusätzliche Sprachen ── */}
+        {/* ── Begriffsklärung: hält „AI Rezeptionist" als Synonym auf der Seite ── */}
         <section className={SECTION_ALT}>
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>Was kostet ein AI Rezeptionist im Vergleich?</h2>
+            <div className={`${PROSE} space-y-5`}>
+              <p>
+                AI Rezeptionist, KI Telefonassistent, digitale Rezeption,
+                Telefonannahme mit KI — gemeint ist überall dasselbe: ein System,
+                das ans Telefon geht, das Anliegen aufnimmt und strukturiert
+                weitergibt. Die Begriffe unterscheiden sich, die Preisfrage nicht.
+              </p>
+              <p>
+                Worin sich Angebote tatsächlich unterscheiden, ist die
+                Abrechnungsform. Verbreitet ist die Abrechnung pro Anruf oder pro
+                Minute ohne Obergrenze — planbar ist das nicht, weil ausgerechnet
+                der Monat teuer wird, in dem besonders viel los ist. Unser Modell
+                setzt deshalb an derselben Stelle an: ein Kontingent, ein fester
+                Betrag, eine benannte Obergrenze.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 7 · Zusätzliche Sprachen ── */}
+        <section className={SECTION}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>Was kostet eine weitere Sprache?</h2>
             <p className={PROSE}>{SPRACHEN.text}</p>
@@ -357,7 +374,7 @@ export function KostenKiTelefonassistent() {
         </section>
 
         {/* ── 8 · Laufzeit, Kündigung, Preisgarantie ── */}
-        <section className={SECTION}>
+        <section className={SECTION_ALT}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>{VERTRAG.headline}</h2>
             <dl className="space-y-5">
@@ -374,7 +391,7 @@ export function KostenKiTelefonassistent() {
         </section>
 
         {/* ── 9 · Was nicht extra kostet ── */}
-        <section className={SECTION_ALT}>
+        <section className={SECTION}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>{NICHT_EXTRA.headline}</h2>
             <p className={`${PROSE} mb-8`}>{NICHT_EXTRA.intro}</p>
@@ -398,7 +415,7 @@ export function KostenKiTelefonassistent() {
         </section>
 
         {/* ── 10 · FAQ zum Preis, unbequeme Fragen zuerst ── */}
-        <section className={SECTION}>
+        <section className={SECTION_ALT}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>Häufige Fragen zum Preis</h2>
             <div className="space-y-4">
@@ -413,7 +430,7 @@ export function KostenKiTelefonassistent() {
         </section>
 
         {/* ── Abschluss ── */}
-        <section className={SECTION_ALT}>
+        <section className={SECTION}>
           <div className="max-w-2xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>Ihr Angebot: schriftlich, aufgeschlüsselt, ohne Überraschungen</h2>
             <p className={`${PROSE} mb-8`}>
@@ -433,7 +450,7 @@ export function KostenKiTelefonassistent() {
         </section>
 
         {/* ── Interne Verlinkung: /praxen ist der Hub ── */}
-        <section className={`${SECTION} border-t border-gray-100 dark:border-gray-800`}>
+        <section className={`${SECTION_ALT} border-t border-gray-100 dark:border-gray-800`}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
               Weiterlesen

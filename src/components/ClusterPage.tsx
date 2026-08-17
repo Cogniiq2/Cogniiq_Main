@@ -99,19 +99,9 @@ export function ClusterPage({ config }: ClusterPageProps) {
     { name: config.topic, url: `${BUSINESS_INFO.website}${config.route}` },
   ];
 
-  // No "@context" here: this object is embedded as a node inside the @graph of `schema`
-  // below, and a nested @context inside @graph is invalid JSON-LD.
-  const faqSchema = {
-    "@type": "FAQPage",
-    mainEntity: config.faq.map((item) => ({
-      "@type": "Question",
-      name: item.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: item.answer,
-      },
-    })),
-  };
+  // FAQPage wird von PageSEO aus `faqItems` erzeugt und darf hier nicht noch
+  // einmal stehen — seit die Blöcke im SSR gerendert werden, läge derselbe
+  // Block sonst zweimal im ausgelieferten Dokument.
 
   const schema = {
     "@context": "https://schema.org",
@@ -146,7 +136,6 @@ export function ClusterPage({ config }: ClusterPageProps) {
         areaServed: { "@type": "City", name: config.city },
         keywords: config.seo.keywords,
       },
-      faqSchema,
     ],
   };
 

@@ -236,9 +236,39 @@ Zwei mögliche Wege, beide außerhalb des Copy-Auftrags:
 2. `scripts/prerender.mjs` injiziert das Schema analog zu Title und
    Description aus einer Manifest-Quelle.
 
-Weg 1 ist der kleinere Eingriff und hält Schema und sichtbaren Inhalt in
-derselben Komponente. Empfehlung: vor weiteren Seiten umstellen, sonst
-entsteht in jeder Stufe zusätzliches Schema, das im statischen HTML fehlt.
+**Behoben am 17.08.2026 (Weg 1).** `PageSEO` gibt die vier JSON-LD-Blöcke
+jetzt als echte `<script type="application/ld+json">`-Elemente im JSX zurück;
+`react-dom/server` rendert sie mit. Die Einfügung per Effekt ist entfallen, es
+gibt also genau eine Instanz je Block statt einer per SSR und einer per Effekt.
+Verifikation über alle 92 ausgelieferten HTML-Dokumente: `WebPage` in 92,
+`BreadcrumbList` in 91, `FAQPage` in 69, `Service` in 55 — keine doppelte
+Script-ID, kein ungültiges JSON, kein doppelter Knotentyp.
+
+**Nebenbefund aus derselben Umstellung:** 34 Seiten trugen `FAQPage`
+**zweimal** — einmal von `PageSEO` aus `faqItems`, einmal zusätzlich im
+`additionalSchema` der Seite bzw. der Konfigurations-Komponente. Solange beide
+Blöcke per Effekt entstanden, fiel das nicht auf; im statischen HTML wäre es
+crawlbare Doppelauszeichnung geworden. Die zweite Fassung ist entfernt in
+`NationalIndustryPage`, `ClusterPage`, `CostPage`, `KiTelefonassistentPage`,
+`BayernKiTelefonassistentPage`, `PraxenPage` und `KostenKiTelefonassistent`.
+
+### 7.6 Gegenprobe: erzeugt dieselbe Mechanik noch anderes fehlendes HTML?
+
+Geprüft wurde, ob weitere `<head>`-Elemente nur nach der Hydration existieren.
+Ergebnis: **nein.** `scripts/prerender.mjs` schreibt `<title>`, `meta
+description`, `meta robots`, `link canonical`, beide `hreflang`-Alternates
+sowie den vollständigen `og:`- und `twitter:`-Block aus dem Manifest in das
+statische HTML und **validiert** Canonical und Robots anschließend (Zeilen
+80–140 und 182–210). An `dist/praxen.html` einzeln nachgewiesen: alle zwölf
+Elemente vorhanden.
+
+Das Schema war damit die einzige Lücke — es kam als einziges Element nicht aus
+dem Manifest, sondern ausschließlich aus der Komponente.
+
+`CanonicalManager` arbeitet weiterhin per Effekt, entfernt dort aber nur
+Canonicals auf Seiten ohne öffentliche Adresse (`/d/:token`, `/auth/*`,
+unbekannte URLs). Das ist eine Korrektur nach der Hydration, kein fehlender
+Inhalt: Der Prerender vergibt für diese Routen ohnehin keinen Canonical.
 
 ### 7.3 Prüfung gegen die bisherigen Korrekturen
 

@@ -69,14 +69,9 @@ export function CostPage({ config }: CostPageProps) {
   const schema = {
     "@context": "https://schema.org",
     "@graph": [
-      {
-        "@type": "FAQPage",
-        mainEntity: config.faq.map((f) => ({
-          "@type": "Question",
-          name: f.question,
-          acceptedAnswer: { "@type": "Answer", text: f.answer },
-        })),
-      },
+  // FAQPage wird von PageSEO aus `faqItems` erzeugt und darf hier nicht noch
+  // einmal stehen — seit die Blöcke im SSR gerendert werden, läge derselbe
+  // Block sonst zweimal im ausgelieferten Dokument.
       {
         "@type": "Service",
         name: config.h1,

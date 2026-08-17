@@ -110,7 +110,10 @@ async function hydrateFromBuild(path: string) {
 }
 
 describe.skipIf(!hasBuild)('prerendered HTML hydrates without markup mismatch', () => {
-  for (const path of ['/', '/impressum', '/bayreuth/lokales-seo', '/blog/lokales-seo-unternehmen']) {
+  // /praxen und /kosten-ki-telefonassistent tragen seit dem SSR-Umbau von PageSEO
+  // JSON-LD im vorgerenderten Dokument — genau dort entstuende ein
+  // Markup-Mismatch, wenn Server und Client verschieden rendern.
+  for (const path of ['/', '/impressum', '/bayreuth/lokales-seo', '/blog/lokales-seo-unternehmen', '/praxen', '/kosten-ki-telefonassistent']) {
     it(`hydrates ${path}`, async () => {
       const container = await hydrateFromBuild(path);
       const mismatches = errors.filter((e) => MARKUP_MISMATCH.test(e));

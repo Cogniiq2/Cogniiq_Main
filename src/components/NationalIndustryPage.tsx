@@ -131,14 +131,9 @@ export function NationalIndustryPage({ config }: Props) {
         areaServed: { "@type": "Country", name: "Deutschland" },
         keywords: config.seo.keywords,
       },
-      {
-        "@type": "FAQPage",
-        mainEntity: config.faq.map((f) => ({
-          "@type": "Question",
-          name: f.question,
-          acceptedAnswer: { "@type": "Answer", text: f.answer },
-        })),
-      },
+  // FAQPage wird von PageSEO aus `faqItems` erzeugt und darf hier nicht noch
+  // einmal stehen — seit die Blöcke im SSR gerendert werden, läge derselbe
+  // Block sonst zweimal im ausgelieferten Dokument.
     ],
   };
 

@@ -51,24 +51,32 @@ function setLink(rel: string, href: string, extra?: Record<string, string>) {
   el.setAttribute("href", href);
 }
 
-function injectScript(id: string, content: string) {
-  let el = document.getElementById(id) as HTMLScriptElement | null;
-  if (!el) {
-    el = document.createElement("script");
-    el.id = id;
-    el.type = "application/ld+json";
-    document.head.appendChild(el);
-  }
-  el.textContent = content;
-}
-
 function removeElements(selector: string) {
   document.querySelectorAll(selector).forEach((el) => el.remove());
 }
 
-function removeScript(id: string) {
-  const el = document.getElementById(id);
-  if (el) el.remove();
+/**
+ * JSON-LD als echtes Element im Komponentenbaum.
+ *
+ * Vorher wurden diese Blöcke in einem `useEffect` in den `<head>` geschrieben.
+ * `useEffect` läuft im SSR nicht, deshalb fehlte sämtliches Seiten-Schema im
+ * vorgerenderten HTML und entstand erst nach der Hydration (HONESTY-AUDIT §7.5).
+ * Als JSX-Element rendert `react-dom/server` es mit, und React verwaltet
+ * Einfügen, Aktualisieren und Entfernen bei Navigation selbst — es gibt also
+ * genau eine Instanz je Block, nicht zusätzlich eine per Effekt.
+ *
+ * `<` wird escaped, damit ein `</script>` in einem Copy-String das Element
+ * nicht vorzeitig beendet. JSON-LD ist laut Google an beliebiger Stelle im
+ * Dokument gültig, auch außerhalb des `<head>`.
+ */
+function JsonLd({ id, data }: { id: string; data: object }) {
+  return (
+    <script
+      type="application/ld+json"
+      id={id}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c") }}
+    />
+  );
 }
 
 export function PageSEO({
@@ -117,86 +125,67 @@ export function PageSEO({
     setMeta("twitter:image", ogImage, "name");
     setMeta("twitter:image:alt", title, "name");
 
-    const webPageSchema = {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      "@id": `${canonical}#webpage`,
-      url: canonical,
-      name: title,
-      description,
-      isPartOf: {
-        "@type": "WebSite",
-        "@id": `${BUSINESS_INFO.website}/#website`,
-        url: BUSINESS_INFO.website,
+  }, [title, description, canonical, ogImage, noIndex, noCanonical]);
+
+  const breadcrumbList =
+    breadcrumbs && breadcrumbs.length > 0
+      ? {
+          "@type": "BreadcrumbList",
+          itemListElement: breadcrumbs.map((crumb, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            name: crumb.name,
+            item: crumb.url,
+          })),
+        }
+      : undefined;
+
+  const webPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${canonical}#webpage`,
+    url: canonical,
+    name: title,
+    description,
+    isPartOf: {
+      "@type": "WebSite",
+      "@id": `${BUSINESS_INFO.website}/#website`,
+      url: BUSINESS_INFO.website,
+      name: BUSINESS_INFO.name,
+      publisher: {
+        "@type": "Organization",
+        "@id": `${BUSINESS_INFO.website}/#organization`,
         name: BUSINESS_INFO.name,
-        publisher: {
-          "@type": "Organization",
-          "@id": `${BUSINESS_INFO.website}/#organization`,
-          name: BUSINESS_INFO.name,
-        },
       },
-      breadcrumb: breadcrumbs && breadcrumbs.length > 0
-        ? {
-            "@type": "BreadcrumbList",
-            itemListElement: breadcrumbs.map((crumb, index) => ({
-              "@type": "ListItem",
-              position: index + 1,
-              name: crumb.name,
-              item: crumb.url,
+    },
+    ...(breadcrumbList ? { breadcrumb: breadcrumbList } : {}),
+    inLanguage: "de-DE",
+  };
+
+  return (
+    <>
+      <JsonLd id="page-webpage-schema" data={webPageSchema} />
+      {breadcrumbList && (
+        <JsonLd
+          id="page-breadcrumb-schema"
+          data={{ "@context": "https://schema.org", ...breadcrumbList }}
+        />
+      )}
+      {faqItems && faqItems.length > 0 && (
+        <JsonLd
+          id="page-faq-schema"
+          data={{
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqItems.map((item) => ({
+              "@type": "Question",
+              name: item.question,
+              acceptedAnswer: { "@type": "Answer", text: item.answer },
             })),
-          }
-        : undefined,
-      inLanguage: "de-DE",
-    };
-    injectScript("page-webpage-schema", JSON.stringify(webPageSchema));
-
-    if (breadcrumbs && breadcrumbs.length > 0) {
-      const breadcrumbSchema = {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        itemListElement: breadcrumbs.map((crumb, index) => ({
-          "@type": "ListItem",
-          position: index + 1,
-          name: crumb.name,
-          item: crumb.url,
-        })),
-      };
-      injectScript("page-breadcrumb-schema", JSON.stringify(breadcrumbSchema));
-    } else {
-      removeScript("page-breadcrumb-schema");
-    }
-
-    if (faqItems && faqItems.length > 0) {
-      const faqSchema = {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: faqItems.map((item) => ({
-          "@type": "Question",
-          name: item.question,
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: item.answer,
-          },
-        })),
-      };
-      injectScript("page-faq-schema", JSON.stringify(faqSchema));
-    } else {
-      removeScript("page-faq-schema");
-    }
-
-    if (additionalSchema) {
-      injectScript("page-additional-schema", JSON.stringify(additionalSchema));
-    } else {
-      removeScript("page-additional-schema");
-    }
-
-    return () => {
-      removeScript("page-webpage-schema");
-      removeScript("page-breadcrumb-schema");
-      removeScript("page-faq-schema");
-      removeScript("page-additional-schema");
-    };
-  }, [title, description, canonical, breadcrumbs, faqItems, ogImage, additionalSchema, noIndex, noCanonical]);
-
-  return null;
+          }}
+        />
+      )}
+      {additionalSchema && <JsonLd id="page-additional-schema" data={additionalSchema} />}
+    </>
+  );
 }

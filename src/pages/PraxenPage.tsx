@@ -99,6 +99,8 @@ const faqItems = [
   },
 ];
 
+// FAQPage wird von PageSEO aus `faqItems` erzeugt und steht deshalb NICHT
+// zusaetzlich hier — sonst laege derselbe Block zweimal im Dokument.
 const schema = {
   "@context": "https://schema.org",
   "@graph": [
@@ -109,14 +111,6 @@ const schema = {
         "Telefonische Anrufannahme für Arzt-, Zahnarzt- und Therapiepraxen: mit eigener Stimmauswahl, praxiseigenen Regeln und strukturierter Übergabe an das Praxisteam.",
       url: `${base}/praxen`,
       provider: { "@type": "Organization", name: BUSINESS_INFO.name, url: base },
-    },
-    {
-      "@type": "FAQPage",
-      mainEntity: faqItems.map((f) => ({
-        "@type": "Question",
-        name: f.question,
-        acceptedAnswer: { "@type": "Answer", text: f.answer },
-      })),
     },
   ],
 };
