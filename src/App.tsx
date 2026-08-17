@@ -170,6 +170,15 @@ const BayernKiTelefonassistentPage = lazyNamed(
   () => import('./pages/BayernKiTelefonassistentPage'),
   'BayernKiTelefonassistentPage'
 );
+const PraxenPage = lazyNamed(() => import('./pages/PraxenPage'), 'PraxenPage');
+const IntegrationenPage = lazyNamed(
+  () => import('./pages/IntegrationenPage'),
+  'IntegrationenPage'
+);
+const DatenschutzSicherheitPage = lazyNamed(
+  () => import('./pages/DatenschutzSicherheitPage'),
+  'DatenschutzSicherheitPage'
+);
 
 // Webdesign city pages
 
@@ -522,6 +531,12 @@ export function AppInner() {
       <Route path="/anfrage-erhalten" element={<AnfrageErhaltenPage />} />
 
       <Route path="/ki-telefonassistent" element={<KiTelefonassistentPage />} />
+      {/* Healthcare-Einstieg (Positionierung Option B) + freigegebene Neu-Routen.
+          Inhalt von /integrationen und /datenschutz-sicherheit bleibt bis zur
+          Beantwortung von OWNER-INPUT B/C ein Grundgerüst ohne Fachaussagen. */}
+      <Route path="/praxen" element={<PraxenPage />} />
+      <Route path="/integrationen" element={<IntegrationenPage />} />
+      <Route path="/datenschutz-sicherheit" element={<DatenschutzSicherheitPage />} />
       <Route path="/ki-telefonassistent/demo" element={<KiTelefonassistentDemoPage />} />
       <Route path="/bayern/ki-telefonassistent" element={<BayernKiTelefonassistentPage />} />
 
