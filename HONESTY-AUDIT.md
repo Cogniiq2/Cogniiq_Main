@@ -31,6 +31,47 @@ kosmetische Befunde sind dokumentiert und bewusst belassen.
 | `components/CostComparisonSection.tsx` | Fixpreis 297 € widerspricht publizierten Staffeln [1]; „Unbegrenzte gleichzeitige Anrufe", „kündbar monatlich" unbestätigt [4] | als Beispielwert gekennzeichnet + [[CLAIM]]; begrenzt |
 | `standorte-service-configs.ts` (Automatisierung/Webdesign) | 10 konstruierte Kundencases mit realen Stadtvierteln + Leistungszahlen („100 Bestellungen/Tag", „unter 2 Minuten", „innerhalb von 8 Wochen auf ersten Positionen") [1][2]; massierte München-Jabs („Münchner Agenturpreise", „Büroräume in der Maximilianstraße", „drei Hierarchieebenen") [5]; Wix/Jimdo namentlich [5] | Zahlen qualitativ, Jabs → neutrales Remote+Festpreis-Framing, Markennamen entfernt (`612b994`) |
 
+## 1a. Expositionszeitraum — fabrizierter Knappheits-Zähler
+
+Reine Faktenaufstellung, keine Bewertung.
+
+| Frage | Befund |
+|---|---|
+| Eingeführt | Commit `3db541a`, **06.07.2026**, Commit-Nachricht „Create Execution page and Supabase integration" |
+| Datei | `src/hooks/useAvailability.ts` (Generator) + `src/components/FinalCTASection.tsx` (Anzeige als bernsteinfarbenes Badge) |
+| Beides im selben Commit? | Ja — Hook und anzeigende Komponente entstanden gemeinsam in `3db541a` |
+| Auf `main`? | Ja. `git merge-base --is-ancestor 3db541a origin/main` = wahr |
+| Gerenderte Route | **Ausschließlich `/` (Startseite)** — `FinalCTASection` wird nur von `src/pages/HomePage.tsx` eingebunden |
+| Im vorgerenderten HTML? | Nein. Der Wert entsteht clientseitig in einem `useEffect`; das statische Prerender-HTML enthält den Text nicht. Sichtbar wurde er erst nach der Hydration im Browser. |
+| Anzeigewert | 1–3 („N Platz/Plätze frei"), deterministisch aus dem Tag des Jahres abgeleitet (`dayOfYear * 2654435761 % 3 + 1`), zusätzlich 30 Minuten in der `sessionStorage` festgehalten |
+| Entfernt | Commit `ec27865`, **16.08.2026**, auf dem Branch `claude/cogniiq-copy-overhaul-mjkdf4` |
+| **Status in Produktion** | **Noch vorhanden.** `origin/main` enthält `src/hooks/useAvailability.ts` unverändert — die Entfernung liegt bislang nur auf dem Feature-Branch und wird erst mit dessen Merge wirksam. |
+| Zeitraum auf `main` | 06.07.2026 bis heute (16.08.2026) = **41 Tage und andauernd** |
+
+## 1b. Vollständigkeitsprüfung — fabrizierte Zitate und Triage außerhalb der Blogartikel
+
+Geprüft wurden: `src/**` (inkl. Kommentare), `public/**`, `index.html`,
+Meta-Tags, OG-Descriptions, JSON-LD, das Prerender-Manifest sowie
+Dateianhänge. Ergebnis:
+
+| Gesucht | Fundstellen außerhalb der Blogartikel |
+|---|---|
+| „Harvard Business Review" / „7× höhere Abschlusswahrscheinlichkeit" | **keine** |
+| „KfW-Studie" (fabrizierte Studienzuschreibung) | **keine.** Verbleibender KfW-Treffer in `blog-data.ts:860` ist die Nennung realer Förderprogramme („KfW-Digitalisierungskredite") — keine Studienbehauptung |
+| „laut einer Studie" / „Studien zeigen" o. ä. ohne Quelle | **keine** |
+| „80 % der Patienten akzeptieren" | **keine.** Alle verbleibenden „80 %"-Treffer sind CSS-Gradientwerte |
+| **Triage** (jede Schreibweise) | **Keine Fähigkeitsbehauptung.** Zwei Trefferklassen, beide unproblematisch: (1) `src/lib/telefonassistent-copy.ts` — ausdrückliche *Verneinung* im M15-Block („Keine medizinische Einschätzung, keine Triage, keine Beratung"); (2) `src/solutions/club-operations/**` — internes, authentifiziertes Betriebsmodul, „Triage" im softwaretechnischen Sinn (Alert-/Severity-Triage), keine öffentliche Marketingfläche |
+| PDFs mit Marketingtext | **keine** — im Repository existiert keine PDF-Datei |
+| `public/` | Enthält nur Icons, Logo, OG-Bild, robots.txt, _headers, _redirects, sitemap.xml. Kein Fließtext mit den geprüften Behauptungen. `Lazar_Popovic.png` ist ein Foto eines Gründers, kein Drittkunde. |
+
+**Nebenbefund aus derselben Prüfung** (behoben in `e060c94`): Das
+Prerender-Manifest `src/lib/routing/publicRoutes.ts` führt **eigene** Title-
+und Description-Texte und ist die Quelle des ausgelieferten `<head>`. Dort
+standen 15 Einträge noch im Wortlaut von vor dem Audit — darunter „Nie wieder
+verpasste Anrufe", „nimmt jeden Anruf an", „Kein Anruf geht verloren", „ohne
+Agentur-Overhead" sowie die Description der entfernten Fallstudie. Die
+Seiten-Komponenten allein zu korrigieren hätte diese Texte nicht erreicht.
+
 ## 2. Should-fix (behoben)
 
 - **Absolutversprechen-Langschwanz** in UeberUns, Leistungen, Bayern, Deutschland,
@@ -69,18 +110,59 @@ kosmetische Befunde sind dokumentiert und bewusst belassen.
 - `ReferenzenPage`/`BewertungenPage`: rendern **keinen** erfundenen Content;
   einzige Kundenstimme ist `REAL_TESTIMONIAL` (siehe unten).
 - **Review-Lenkung** („Positives Feedback wird in Richtung Google-Bewertung
-  gelenkt", Gastronomie-Seiten): rechtlich umstrittenes Muster (Review-Gating)
-  — **Empfehlung: entfernen**; Entscheidung beim Inhaber, da Funktionsbeschreibung
-  eines bestehenden Angebots. → COPY-GAPS.md.
+  gelenkt", Gastronomie-Seiten): **unverändert belassen** — der Inhaber hat
+  ausdrücklich angeordnet, hier vor seiner Entscheidung nichts zu ändern. Der
+  Mechanismus laut Copy ist in §6 beschrieben.
 
 ## 4. Offene Punkte mit Inhaber-Abhängigkeit
 
 | Punkt | Abhängigkeit |
 |---|---|
-| `REAL_TESTIMONIAL` (SV Heinersreuth, anonymer „Betreiber") wird auf Referenzen-/Bewertungen-Seite gerendert. Als „real" markiert, aber schriftliche Einwilligung nicht im Repo nachweisbar. | OWNER-INPUT F3: Einwilligung nachweisen oder Zitat entfernen. Bis dahin unverändert belassen (kein Platzhalter, möglicherweise echt). |
+| ~~`REAL_TESTIMONIAL` wird gerendert~~ | **Erledigt am 16.08.2026 (`4f135aa`).** Auf Anweisung des Inhabers vollständig aus dem Rendering entfernt — Zitat, Fallstudie, JSON-LD und Meta-Description. Wortlaut gesichert in `ASSETS-REQUIRED.md` §A3.1; Wiederherstellung nur nach schriftlicher Einwilligung. |
 | Art.-50-Ansage („Anrufer erfahren zu Beginn…") steht seit Pass 1 auf allen Telefonassistent-Seiten. | OWNER-INPUT C1. Bei „NEIN" wird die Aussage sofort entfernt — Suchanker: `Sprachassistent` in `telefonassistent-copy.ts`, Seiten-Configs und Workflow-Steps. |
 | JSON-LD `areaServed` (10+ Städte) und `priceRange: "€€€"` in `index.html`/`LocalBusinessSchema` | Service-Gebiet ist als Absichtserklärung vertretbar; Bestätigung empfohlen (OWNER-INPUT G2-nah). |
 | Blog-Preisspannen und verbleibende Faustregeln („1–3 % der Besucher") | explizit als Faustregel gekennzeichnet; bei Bedarf entfernen. |
+
+## 6. Review-Lenkung — Befund zur Entscheidung des Inhabers (nichts geändert)
+
+Wichtige Einschränkung vorab: Das Produkt selbst liegt nicht in diesem
+Repository. Hier steht nur, **was die Website über den Mechanismus behauptet** —
+was tatsächlich implementiert ist, kann nur der Inhaber beantworten.
+
+**Was die Copy sagt.** Auf zwei Seiten
+(`WebdesignGastronomieMuenchen.tsx:159`, `WebdesignGastronomieRegensburg.tsx:159`)
+steht unter der Überschrift „Automatisierter Feedback-Prozess": Gäste erhalten
+nach dem Besuch automatisch eine Feedback-Anfrage, und „**Positives Feedback wird
+in Richtung Google-Bewertung gelenkt**". Damit beschreibt die Website eine
+zweistufige Weiche: erst eine interne Abfrage der Zufriedenheit, dann eine je
+nach Ergebnis unterschiedliche Weiterleitung — positives Feedback zur
+öffentlichen Plattform, negatives implizit nicht dorthin. Das entspricht Ihrer
+**Variante 2**. Wohin negatives Feedback stattdessen geht, sagt die Copy nicht;
+ein internes Formular wird nicht ausdrücklich genannt, ist aber die logische
+Ergänzung der beschriebenen Weiche.
+
+**Abgrenzung: ähnlich klingende, aber andere Aussagen.** Drei weitere Seiten
+beschreiben etwas Milderes und sind nicht dasselbe Muster:
+`AutomatisierungArzt.tsx:42` und `AutomatisierungRestaurant.tsx:38` sagen, ein
+automatischer Follow-up „macht es zufriedenen Patienten/Gästen leichter, eine
+Bewertung zu hinterlassen" — eine Erleichterung, keine Weiche.
+`AutomatisierungSport.tsx:42/55/74` formuliert „Bewertungsanfragen nach positiven
+Erlebnissen" und „zufriedene Mitglieder werden um Bewertungen gebeten" — das
+beschreibt eine **Auswahl der Angefragten nach erwarteter Zufriedenheit** und
+liegt damit näher an Ihrer Variante 1 als an einer neutralen Bitte.
+
+**Was das bedeutet.** Trifft Variante 2 tatsächlich zu, ist die Aussage nicht nur
+eine Formulierungsfrage: Google untersagt in seinen Richtlinien das selektive
+Einwerben von Bewertungen ausdrücklich, und in Deutschland ist ein solches
+Vorgehen wettbewerbsrechtlich angreifbar (irreführende Gesamtdarstellung der
+Bewertungslage). Zusätzlich beschreibt die Website den Mechanismus offen — sie
+dokumentiert das Muster also selbst.
+
+**Nichts geändert, wie angeordnet.** Wenn Variante 1 oder 2 zutrifft, entferne
+ich auf Ihr Wort hin die Beschreibung ersatzlos — und empfehle, in derselben
+Runde auch die Sport-Formulierung auf eine neutrale Bewertungsbitte an *alle*
+Kunden umzustellen. Falls der tatsächliche Ablauf ein anderer ist, beschreiben
+Sie ihn mir; dann formuliere ich die Copy passend zum echten Mechanismus.
 
 ## 5. Positivbefunde
 

@@ -15,15 +15,24 @@ M17 (Onboarding mit echten Schritten und Dauern), M18 (Betreuung mit Person),
 M19 (Umkehrbarkeit), M22 (Referenz), Preisseite, Integrationen-Seite,
 Datenschutz-Sicherheit-Seite.
 
-**Entscheidungen, die nur Sie treffen können:**
+**Erledigt nach Ihrer Teilfreigabe vom 16.08.2026:**
+- Benannte Kundeninhalte vollständig aus dem Rendering entfernt (`4f135aa`).
+- Routen `/praxen`, `/integrationen`, `/datenschutz-sicherheit` angelegt
+  (`e060c94`); die beiden letzteren als Grundgerüst ohne Fachaussagen und
+  bewusst `noindex`.
+- Expositionszeitraum des Knappheits-Zählers und Vollständigkeitsprüfung der
+  fabrizierten Zitate dokumentiert (`HONESTY-AUDIT.md` §1a/§1b).
+
+**Weiterhin offen — Entscheidungen, die nur Sie treffen können:**
 1. **C1 (Art.-50-Ansage)** — steht als Produktfakt auf allen Telefonassistent-
    Seiten; bei „NEIN" fliegt die Aussage sofort raus.
-2. **ROUTING-PROPOSAL.md** — `/praxen`, `/integrationen`,
-   `/datenschutz-sicherheit` freigeben oder Namen korrigieren.
-3. **Review-Gating** („Positives Feedback wird in Richtung Google-Bewertung
-   gelenkt", Gastronomie-Webdesign-Seiten) — rechtlich riskant, Empfehlung:
-   Funktionsbeschreibung entfernen oder auf neutrale Bewertungsbitte umstellen.
-4. **Testimonial SV Heinersreuth** — Einwilligung nachweisen oder entfernen.
+2. **Review-Lenkung** (Gastronomie-Webdesign-Seiten) — Mechanismus beschrieben
+   in `HONESTY-AUDIT.md` §6, **unverändert belassen** bis zu Ihrer Entscheidung.
+3. **OWNER-INPUT A–F** — schaltet M14, M17, M18, M19, M22, die Preisseite sowie
+   die Inhalte von `/integrationen` und `/datenschutz-sicherheit` frei.
+4. **Merge des Branches** — der fabrizierte Knappheits-Zähler ist auf
+   `origin/main` weiterhin aktiv; seine Entfernung wird erst mit dem Merge
+   dieses Branches wirksam (siehe `HONESTY-AUDIT.md` §1a).
 
 
 ## 1. Seiten außerhalb dieses Durchlaufs (Entscheidung / Folgerunde)
