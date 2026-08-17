@@ -39,12 +39,12 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     route: "/bayreuth/ki-telefonassistent",
     seo: {
       title: "KI Telefonassistent Bayreuth – Anrufannahme | Cogniiq",
-      description: "KI Telefonassistent für Betriebe in Bayreuth: Anrufannahme mit Ihren Ansagen und Regeln, strukturierte Übergabe an Ihr Team, Betreuung vor Ort. DSGVO-konform.",
+      description: "KI Telefonassistent für Betriebe in Bayreuth: Anrufannahme mit Ihrer Stimmauswahl und Ihren Regeln, strukturierte Übergabe an Ihr Team, Betreuung vor Ort.",
       canonical: `${base}/bayreuth/ki-telefonassistent`,
     },
     intro: {
       h1: "KI Telefonassistent in Bayreuth",
-      lead: "Das Telefon klingelt, während Patient oder Gast vor Ihnen steht – in Praxen, Gastronomie und Betrieben in Bayreuth gehört dieser Moment zum Alltag. Der KI Telefonassistent von Cogniiq nimmt diese Anrufe an: mit Ihren Ansagen, nach Ihren Regeln und mit einer Übergabe, die bei Ihrem Team ankommt.",
+      lead: "Das Telefon klingelt, während Patient oder Gast vor Ihnen steht – in Praxen, Gastronomie und Betrieben in Bayreuth gehört dieser Moment zum Alltag. Der KI Telefonassistent von Cogniiq nimmt diese Anrufe an: mit Ihrer Stimmauswahl, Ihrem Begrüßungssatz, Ihren Formulierungen und Ihren Regeln.",
     },
     localIntro: {
       paragraphs: [
@@ -82,7 +82,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     ],
     processSteps: TELEFONASSISTENT_PROZESS,
     faq: [
-      { question: "Klingt der KI Telefonassistent natürlich?", answer: "Er klingt gut – aber ehrlich gesagt: Nicht jeder Anrufer mag Sprachassistenten, und das respektieren wir. Stimme, Sprechtempo und Ansagen werden auf Ihren Betrieb abgestimmt, auf Wunsch mit Ihren eigenen Aufnahmen. Anrufer erfahren zu Beginn, dass ein Sprachassistent sie betreut, und können jederzeit zu einem Menschen wechseln." },
+      { question: "Klingt der KI Telefonassistent natürlich?", answer: "Er klingt gut – aber ehrlich gesagt: Nicht jeder Anrufer mag Sprachassistenten, und das respektieren wir. Sie wählen die Stimme, formulieren den Begrüßungssatz und legen die Formulierungen fest. Anrufer erfahren im ersten Satz, dass ein KI-System spricht, und können jederzeit zu einem Menschen wechseln." },
       { question: "Was passiert, wenn der Assistent eine Frage nicht beantworten kann?", answer: "Er leitet den Anruf weiter oder nimmt eine strukturierte Nachricht mit Rückrufnummer und Anliegen auf. Was in welchem Fall passiert, legen Sie vor dem Start im Anliegen-Katalog fest – und können es später ändern." },
       { question: "Kann ich die Inhalte des Assistenten selbst anpassen?", answer: "Ja. Öffnungszeiten, Urlaubsansagen und aktuelle Hinweise ändern Sie selbst über ein Dashboard – auch kurzfristig vor Feiertagen. Für Änderungen an Gesprächslogik und Regeln haben Sie einen festen Ansprechpartner." },
       { question: "Ist der KI Telefonassistent DSGVO-konform?", answer: "Ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört zur Einrichtung. Gespräche werden nicht aufgezeichnet – gespeichert wird ausschließlich das strukturierte Ergebnis. Ihre Daten werden nicht zum Training von Modellen verwendet. Bei der Dokumentation für Ihren Datenschutzbeauftragten unterstützen wir." },
@@ -183,7 +183,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
         "Cogniiq analysiert, welche Abläufe in Ihrem Betrieb in Bayreuth automatisiert werden können – und setzt die Lösungen mit marktführenden Automatisierungsplattformen und direkten API-Integrationen um. Das Ergebnis sind zuverlässige Workflows, die vollständig im Hintergrund laufen: Buchungsbestätigungen, die automatisch ausgehen. Leads, die direkt qualifiziert ins CRM wandern. Rechnungen, die sich selbst erstellen. Fehlerbenachrichtigungen, die sofort informieren, wenn etwas schiefläuft.",
         "Als Anbieter mit Hauptsitz in Bayreuth kennen wir die lokalen Betriebsrealitäten – und betreuen Sie mit festem Ansprechpartner. Wir verstehen, wie ein Handwerksbetrieb in Oberfranken tickt, was eine Arztpraxis im Stadtgebiet täglich belastet und wo der Einzelhandel seine Zeitverluste hat. Diese lokale Perspektive fließt direkt in die Konzeption der Automatisierungen ein.",
         "Schrittweise Umsetzung ist unser Standard: Wir beginnen mit dem Prozess, der die meiste Zeit kostet, setzen ihn sauber um und zeigen das Ergebnis, bevor wir weitermachen. Keine Black Boxes, keine Systeme, die nur wir verstehen. Jede Automatisierung wird vollständig dokumentiert, sodass Ihr Team bei Bedarf einfache Anpassungen selbst vornehmen kann.",
-        "Neben der Automatisierung bieten wir in Bayreuth auch den [KI Telefonassistenten](/bayreuth/ki-telefonassistent) sowie professionelles [Webdesign für Bayreuth](/bayreuth/webdesign) an – drei Bausteine, die sich ideal ergänzen und zusammen die digitale Basis eines modernen lokalen Unternehmens bilden. Alle Lösungen sind DSGVO-konform und werden ausschließlich auf europäischen Servern betrieben.",
+        "Neben der Automatisierung bieten wir in Bayreuth auch den [KI Telefonassistenten](/bayreuth/ki-telefonassistent) sowie professionelles [Webdesign für Bayreuth](/bayreuth/webdesign) an – drei Bausteine, die sich ideal ergänzen und zusammen die digitale Basis eines modernen lokalen Unternehmens bilden.",
       ],
     },
     warumCogniiq: [
@@ -424,12 +424,12 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     route: "/regensburg/ki-telefonassistent",
     seo: {
       title: "KI Telefonassistent Regensburg – Anrufannahme | Cogniiq",
-      description: "KI Telefonassistent für Praxen, Gastronomie und Betriebe in Regensburg: Anrufannahme mit Ihren Ansagen und Regeln, strukturierte Übergabe. DSGVO-konform.",
+      description: "KI Telefonassistent für Praxen, Gastronomie und Betriebe in Regensburg: Anrufannahme mit Ihrer Stimmauswahl und Ihren Regeln, strukturierte Übergabe.",
       canonical: `${base}/regensburg/ki-telefonassistent`,
     },
     intro: {
       h1: "KI Telefonassistent in Regensburg",
-      lead: "In der Praxis stehen Patienten am Tresen, im Restaurant ist das Serviceteam im Einsatz, im Handwerksbetrieb sind alle beim Kunden – und das Telefon klingelt. Der KI Telefonassistent von Cogniiq nimmt diese Anrufe für Betriebe in Regensburg an: mit Ihren Ansagen, nach Ihren Regeln und mit einer Übergabe, die bei Ihrem Team ankommt.",
+      lead: "In der Praxis stehen Patienten am Tresen, im Restaurant ist das Serviceteam im Einsatz, im Handwerksbetrieb sind alle beim Kunden – und das Telefon klingelt. Der KI Telefonassistent von Cogniiq nimmt diese Anrufe für Betriebe in Regensburg an: mit Ihrer Stimmauswahl, Ihrem Begrüßungssatz, Ihren Formulierungen und Ihren Regeln.",
     },
     localIntro: {
       paragraphs: [
@@ -562,7 +562,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
         "Cogniiq löst dieses Problem mit gezielter Geschäftsprozess-Automatisierung: Wir analysieren, welche Abläufe in Ihrem Regensburger Unternehmen automatisiert werden können, und welche Integrationen dafür am sinnvollsten sind. Das Ergebnis sind stabile, vollständig dokumentierte Workflows – die im Hintergrund laufen, ohne dass jemand täglich daran denken muss.",
         "Von der automatischen Buchungsbestätigung für Regensburger Gastronomiebetriebe über die CRM-Synchronisation für mittelständische Dienstleister bis zur automatisierten Rechnungsstellung für Handwerksbetriebe im Landkreis Regensburg: Wir starten dort, wo der Hebel am größten ist, und bauen das System so, dass es mit Ihrem Unternehmen wachsen kann.",
         "Als Automatisierungs-Agentur mit bayerischer Verwurzelung bringen wir nicht nur technisches Know-how mit, sondern auch das Verständnis für mittelständische Prozessrealitäten. Wir erklären keine Konzepte – wir analysieren Ihren Betrieb, priorisieren nach ROI und liefern Ergebnisse, die spürbar sind.",
-        "Die Kombination aus Prozessautomatisierung und [KI Telefonassistent für Regensburg](/regensburg/ki-telefonassistent) sowie professionellem [Webdesign für Regensburg](/regensburg/webdesign) schafft eine vollständige digitale Betriebsinfrastruktur. Alle Lösungen werden DSGVO-konform umgesetzt und sind auf den langfristigen Betrieb ausgelegt.",
+        "Die Kombination aus Prozessautomatisierung und [KI Telefonassistent für Regensburg](/regensburg/ki-telefonassistent) sowie professionellem [Webdesign für Regensburg](/regensburg/webdesign) schafft eine vollständige digitale Betriebsinfrastruktur, die auf den langfristigen Betrieb ausgelegt ist.",
       ],
     },
     warumCogniiq: [
@@ -790,12 +790,12 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     locationNote: "Cogniiq betreut Projekte für Unternehmen in München vollständig remote – persönliche Termine im Raum München auf Anfrage möglich.",
     seo: {
       title: "KI Telefonassistent München – Telefonservice | Cogniiq",
-      description: "KI Telefonassistent für Unternehmen in München: Anrufannahme mit Ihren Ansagen und Regeln, mehrsprachig möglich, strukturierte Übergabe. DSGVO-konform.",
+      description: "KI Telefonassistent für Unternehmen in München: Anrufannahme mit Ihrer Stimmauswahl und Ihren Regeln, bis zu fünf Sprachen, strukturierte Übergabe.",
       canonical: `${base}/muenchen/ki-telefonassistent`,
     },
     intro: {
       h1: "KI Telefonassistent für Unternehmen in München",
-      lead: "In der Privatpraxis wartet ein Patient am Empfang, in der Kanzlei läuft eine Besprechung, im Restaurant ist Service – und das Telefon klingelt. Der KI Telefonassistent von Cogniiq nimmt diese Anrufe für Münchner Betriebe an: mit Ihren Ansagen, nach Ihren Regeln, auf Wunsch mehrsprachig, mit strukturierter Übergabe an Ihr Team.",
+      lead: "In der Privatpraxis wartet ein Patient am Empfang, in der Kanzlei läuft eine Besprechung, im Restaurant ist Service – und das Telefon klingelt. Der KI Telefonassistent von Cogniiq nimmt diese Anrufe für Münchner Betriebe an: mit Ihrer Stimmauswahl, Ihrem Begrüßungssatz und Ihren Regeln, auf Wunsch in bis zu fünf Sprachen.",
     },
     localIntro: {
       paragraphs: [
@@ -836,7 +836,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { question: "Kann der Assistent auf Englisch mit internationalen Kunden sprechen?", answer: "Mehrsprachige Konfigurationen sind möglich – üblicherweise Deutsch und Englisch. Wie die Sprachwahl im Gespräch abläuft und welche Sprachen Sie brauchen, klären wir im Erstgespräch und testen es vor dem Start." },
       { question: "Betreut Cogniiq Projekte in München vollständig remote?", answer: "Ja. Alle Projektphasen – Aufnahmegespräch, Ansagen, Testphase, laufende Anpassung – funktionieren remote. Persönliche Termine im Raum München sind auf Anfrage möglich." },
       { question: "Was kostet der KI Telefonassistent für ein Münchner Unternehmen?", answer: "Dieselben Konditionen wie überall: ein fester Monatsbetrag für ein Minutenkontingent, darüber 0,39 €/Min. und nie mehr als der nächsthöhere Tarif. Nach dem Erstgespräch erhalten Sie ein schriftliches Angebot mit allen Posten." },
-      { question: "Kommen unsere Kunden mit einer Computerstimme klar?", answer: "Nicht alle sofort – das nehmen wir ernst. Stimme und Ansagen werden auf Ihr Haus abgestimmt, auf Wunsch mit eigenen Aufnahmen. Anrufer erfahren zu Beginn, dass ein Sprachassistent sie betreut, und können jederzeit zu einem Menschen wechseln." },
+      { question: "Kommen unsere Kunden mit einer Computerstimme klar?", answer: "Nicht alle sofort – das nehmen wir ernst. Sie wählen die Stimme, formulieren den Begrüßungssatz und legen die Formulierungen fest. Anrufer erfahren im ersten Satz, dass ein KI-System spricht, und können jederzeit zu einem Menschen wechseln." },
       { question: "Was passiert bei mehreren Anrufen gleichzeitig?", answer: "Jeder Anruf wird angenommen, auch wenn mehrere parallel eingehen – ohne Warteschleife. Gerade zu Stoßzeiten wie Messen oder Ferienbeginn ist das der Unterschied zu einer einzelnen Leitung." },
       { question: "Wie schnell ist die Einrichtung?", answer: "In der Regel 7–14 Tage nach dem ersten Gespräch – inklusive Aufnahmegespräch, Ansagen und Testphase. Live geht der Assistent erst nach Ihrer Freigabe." },
       { question: "Kann der Assistent für mehrere Standorte konfiguriert werden?", answer: "Ja. Für Unternehmen mit mehreren Standorten im Großraum können separate Regeln und Ansagen pro Standort eingerichtet werden – mit einheitlichem Standard, wo Sie ihn wollen." },

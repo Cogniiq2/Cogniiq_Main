@@ -14,7 +14,7 @@ const config: NationalIndustryPageConfig = {
   h1: "KI Telefonassistent für Arztpraxen",
   tagline: "Arztpraxis · Anmeldung entlasten · keine Gesprächsaufzeichnung",
   intro:
-    "Montagmorgen, kurz nach acht: Am Tresen steht eine Patientin, dahinter wartet die nächste, und das Telefon klingelt ohne Pause. Ihre MFA entscheidet im Sekundentakt, wer warten muss – und jemand verliert immer. Der KI Telefonassistent nimmt in solchen Momenten die Anrufe an, die sonst ins Leere laufen. Er erfasst das Anliegen strukturiert und übergibt es dorthin, wo Ihr Team arbeitet – mit Ihren Ansagen, nach Ihren Regeln.",
+    "Montagmorgen, kurz nach acht: Am Tresen steht eine Patientin, dahinter wartet die nächste, und das Telefon klingelt ohne Pause. Ihre MFA entscheidet im Sekundentakt, wer warten muss – und jemand verliert immer. Der KI Telefonassistent nimmt in solchen Momenten die Anrufe an, die sonst ins Leere laufen. Er erfasst das Anliegen strukturiert – mit Ihrer Stimmauswahl, Ihrem Begrüßungssatz und Ihren Regeln.",
   serviceSlug: "ki-telefonassistent",
   serviceLabel: "KI Telefonassistent",
   costLink: "/kosten-ki-telefonassistent",
@@ -108,7 +108,7 @@ const config: NationalIndustryPageConfig = {
     {
       question: "Kommen meine Patienten mit einer Computerstimme klar?",
       answer:
-        "Ehrliche Antwort: nicht alle sofort. Manche Anrufer reagieren skeptisch auf synthetische Stimmen – andere gewöhnen sich schnell daran, wenn die Ansagen nach der eigenen Praxis klingen. Deshalb stimmen wir Begrüßung und Ansagen auf Ihre Praxis ab, auf Wunsch mit Ihren selbst aufgesprochenen Aufnahmen. Wer lieber mit einem Menschen sprechen möchte, wird jederzeit weitergeleitet. Die Eingewöhnungsphase begleiten wir aktiv und passen an, was nicht ankommt.",
+        "Ehrliche Antwort: nicht alle sofort. Manche Anrufer reagieren skeptisch auf synthetische Stimmen – andere gewöhnen sich schnell daran, wenn die Formulierungen nach der eigenen Praxis klingen. Deshalb wählen Sie die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihre Praxis am Telefon spricht. Wer lieber mit einem Menschen sprechen möchte, wird jederzeit weitergeleitet. Die Eingewöhnungsphase begleiten wir aktiv und passen an, was nicht ankommt.",
     },
     {
       question: "Lässt sich der Assistent an unsere Praxissoftware anbinden?",

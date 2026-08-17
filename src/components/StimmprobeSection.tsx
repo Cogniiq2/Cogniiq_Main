@@ -70,9 +70,9 @@ export function StimmprobeSection() {
         </h2>
         <p className="text-gray-500 dark:text-gray-400 leading-[1.7] mb-2 max-w-xl">
           Hören Sie selbst, bevor Sie mit uns sprechen: ein Anruf, wie er in einer
-          Praxis ankommt. Die Ansagen stammen aus der jeweiligen Konfiguration —
-          auf Wunsch mit Ihren eigenen Aufnahmen. Anrufer können während des
-          Gesprächs jederzeit zu einem Menschen wechseln.
+          Praxis ankommt. Stimme, Begrüßungssatz und
+          Formulierungen stammen aus der jeweiligen Konfiguration. Anrufer können
+          während des Gesprächs jederzeit zu einem Menschen wechseln.
         </p>
         <p className="text-[12px] font-semibold text-amber-700 dark:text-amber-500 mb-6">
           {PFLICHT_LABEL}

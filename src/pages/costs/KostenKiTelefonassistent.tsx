@@ -21,7 +21,7 @@ const config: CostPageConfig = {
       label: "Basis",
       range: "ab 99 €/Monat",
       description:
-        "Anrufannahme mit Ihren Ansagen, Beantwortung wiederkehrender Fragen und strukturierte Aufnahme von Anliegen mit Weiterleitung an Ihr Team. Für kleinere Betriebe mit überschaubarem Anrufaufkommen.",
+        "Anrufannahme mit Ihrer Stimmauswahl und Ihrem Begrüßungssatz, Beantwortung wiederkehrender Fragen und strukturierte Aufnahme von Anliegen mit Weiterleitung an Ihr Team. Für kleinere Betriebe mit überschaubarem Anrufaufkommen.",
     },
     {
       label: "Professionell",

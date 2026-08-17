@@ -112,7 +112,7 @@ const config: NationalIndustryPageConfig = {
     {
       question: "Kommen meine Patienten mit einer Computerstimme klar?",
       answer:
-        "Nicht jeder Anrufer mag synthetische Stimmen – das nehmen wir ernst. Ansagen und Begrüßung werden auf Ihre Praxis abgestimmt, auf Wunsch mit Ihren eigenen Aufnahmen. Wer nicht mit dem Assistenten sprechen möchte, kann jederzeit einen Rückruf hinterlassen und wird nicht in ein Menü gezwungen. In der Anfangszeit werten wir die Gespräche mit Ihnen aus und passen an, was nicht ankommt.",
+        "Nicht jeder Anrufer mag synthetische Stimmen – das nehmen wir ernst. Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihre Praxis am Telefon spricht. Wer nicht mit dem Assistenten sprechen möchte, kann jederzeit einen Rückruf hinterlassen und wird nicht in ein Menü gezwungen. In der Anfangszeit werten wir die Gespräche mit Ihnen aus und passen an, was nicht ankommt.",
     },
     {
       question: "Ist das für Gesundheitsdaten in Therapiepraxen DSGVO-konform?",

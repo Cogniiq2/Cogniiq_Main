@@ -59,7 +59,7 @@ const faqItems = [
   {
     question: "Kommen Anrufer mit der Stimme eines Sprachassistenten zurecht?",
     answer:
-      "Nicht jeder Anrufer mag synthetische Stimmen — das nehmen wir ernst. Begrüßung und Ansagen werden auf Ihren Betrieb abgestimmt, auf Wunsch mit Ihren eigenen Aufnahmen. Anrufer erfahren zu Beginn, dass ein Sprachassistent sie betreut, und können jederzeit zu einem Menschen wechseln. In der Startphase werten wir Gespräche mit Ihnen aus und passen an, was nicht sitzt.",
+      "Nicht jeder Anrufer mag synthetische Stimmen — das nehmen wir ernst. Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihr Betrieb am Telefon spricht. Anrufer erfahren im ersten Satz, dass ein KI-System spricht, und können jederzeit zu einem Menschen wechseln. In der Startphase werten wir Gespräche mit Ihnen aus und passen an, was nicht sitzt.",
   },
   {
     question: "Muss ich dafür mein System oder meine Rufnummer wechseln?",
@@ -150,7 +150,7 @@ const OBJECTIONS = [
   {
     icon: MessageSquare,
     q: "Kommen meine Kunden mit der Stimme klar?",
-    a: "Manche Anrufer sind skeptisch gegenüber synthetischen Stimmen — das ist berechtigt. Deshalb stimmen wir Stimme und Ansagen auf Ihren Betrieb ab, auf Wunsch mit Ihren eigenen Aufnahmen. Wer lieber mit einem Menschen spricht, wird jederzeit weitergeleitet.",
+    a: "Manche Anrufer sind skeptisch gegenüber synthetischen Stimmen — das ist berechtigt. Deshalb wählen Sie die Stimme, formulieren Ihren Begrüßungssatz und legen die Formulierungen fest. Wer lieber mit einem Menschen spricht, wird jederzeit weitergeleitet.",
   },
   {
     icon: GitMerge,
@@ -777,7 +777,7 @@ function SolutionSection() {
             </h2>
             <p className="text-gray-500 dark:text-gray-400 leading-[1.7] mb-8 max-w-lg">
               Der Telefonassistent übernimmt die Anrufe, die Ihr Team gerade nicht
-              annehmen kann. Er spricht mit Ihren Ansagen, folgt Ihren Regeln und
+              annehmen kann. Er spricht mit Ihrer Stimmauswahl, folgt Ihren Regeln und
               übergibt jedes Anliegen strukturiert – statt es auf der Mailbox
               liegen zu lassen. Was er übernimmt und was nicht, legen Sie fest.
             </p>
