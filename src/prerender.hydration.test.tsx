@@ -110,10 +110,29 @@ async function hydrateFromBuild(path: string) {
 }
 
 describe.skipIf(!hasBuild)('prerendered HTML hydrates without markup mismatch', () => {
-  // /praxen und /kosten-ki-telefonassistent tragen seit dem SSR-Umbau von PageSEO
-  // JSON-LD im vorgerenderten Dokument — genau dort entstuende ein
-  // Markup-Mismatch, wenn Server und Client verschieden rendern.
-  for (const path of ['/', '/impressum', '/bayreuth/lokales-seo', '/blog/lokales-seo-unternehmen', '/praxen', '/kosten-ki-telefonassistent']) {
+  // Bewusst keine Ausweitung auf alle 91 Routen — die Suite soll schnell bleiben.
+  // Abgedeckt sind: vier Stichproben aus dem Altbestand plus jede Seite, die der
+  // Copy-Pass anfasst. Diese Seiten tragen seit dem SSR-Umbau von PageSEO JSON-LD
+  // im vorgerenderten Dokument; genau dort entstuende ein Markup-Mismatch, wenn
+  // Server und Client verschieden rendern.
+  for (const path of [
+    // Stichproben Altbestand
+    '/',
+    '/impressum',
+    '/bayreuth/lokales-seo',
+    '/blog/lokales-seo-unternehmen',
+    // Seiten dieses Passes
+    '/praxen',
+    '/kosten-ki-telefonassistent',
+    '/ki-telefonassistent',
+    '/ki-telefonassistent-arzt',
+    '/ki-telefonassistent-praxis',
+    '/bayreuth/ki-telefonassistent',
+    '/regensburg/ki-telefonassistent',
+    '/muenchen/ki-telefonassistent',
+    '/integrationen',
+    '/datenschutz-sicherheit',
+  ]) {
     it(`hydrates ${path}`, async () => {
       const container = await hydrateFromBuild(path);
       const mismatches = errors.filter((e) => MARKUP_MISMATCH.test(e));
