@@ -1,61 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Chrome as Home, Briefcase, Users, CircleHelp as HelpCircle, Mail, MapPin, ChevronDown, X, ArrowRight, ArrowUpRight, Star, BookOpen, UserRound } from 'lucide-react';
-import { CITY_LINKS } from '@/lib/standorte-data';
+import { Chrome as Home, Briefcase, Users, CircleHelp as HelpCircle, Mail, MapPin, ChevronDown, X, ArrowRight, Star, BookOpen, UserRound } from 'lucide-react';
+import { LEISTUNGEN, LEISTUNGEN_AUSWEG, STANDORTE, HAUPTSITZ_SLUG } from '@/lib/navigation-data';
 import { Logo } from '@/components/Logo';
 import { useAuth } from '@/contexts/AuthContext';
 
-const leistungenItems = [
-  {
-    group: 'Webdesign',
-    links: [
-      { label: 'Webdesign Agentur Deutschland', href: '/webdesign-agentur-deutschland' },
-      { label: 'Für Arztpraxen', href: '/webdesign-arzt' },
-      { label: 'Für Gastronomie', href: '/webdesign-gastronomie' },
-      { label: 'Für Immobilien', href: '/webdesign-immobilien' },
-      { label: 'Für Hotels', href: '/webdesign-hotel' },
-      { label: 'Für Sport & Fitness', href: '/webdesign-sport' },
-      { label: 'Kosten Webdesign', href: '/kosten-webdesign' },
-    ],
-  },
-  {
-    group: 'KI-Telefonassistent',
-    links: [
-      { label: 'KI-Agentur Deutschland', href: '/ki-agentur-deutschland' },
-      { label: 'Für Arztpraxen', href: '/ki-telefonassistent-arzt' },
-      { label: 'Für Restaurants', href: '/ki-telefonassistent-restaurant' },
-      { label: 'Für Hotels', href: '/ki-telefonassistent-hotel' },
-      { label: 'Für Zahnarzt & Praxis', href: '/ki-telefonassistent-praxis' },
-      { label: 'Demo anhören', href: '/ki-telefonassistent/demo' },
-      { label: 'Kosten KI-Telefonassistent', href: '/kosten-ki-telefonassistent' },
-    ],
-  },
-  {
-    group: 'Automatisierung',
-    links: [
-      { label: 'Automatisierung Unternehmen', href: '/automatisierung-unternehmen' },
-      { label: 'Für Restaurants', href: '/automatisierung-restaurant' },
-      { label: 'Für Arztpraxen', href: '/automatisierung-arzt' },
-      { label: 'Für Immobilien', href: '/automatisierung-immobilien' },
-      { label: 'Für Sport & Fitness', href: '/automatisierung-sport' },
-      { label: 'Kosten Automatisierung', href: '/kosten-automatisierung' },
-    ],
-  },
-];
 
-const cityEntries = Object.entries(CITY_LINKS) as Array<[string, typeof CITY_LINKS[keyof typeof CITY_LINKS]]>;
 
 type NavSection = 'home' | 'leistungen' | 'standorte' | 'ueber-uns' | 'faq' | 'referenzen' | 'blog' | 'kontakt';
 
+// Dieselben drei Ziele wie am Desktop. FAQ, Referenzen und Blog sind aus der
+// Kopfzeile genommen und stehen weiter im Footer, der auf jeder Seite steht.
 const pillItems: { id: NavSection; label: string }[] = [
   { id: 'home', label: 'Home' },
   { id: 'leistungen', label: 'Leistungen' },
   { id: 'standorte', label: 'Standorte' },
   { id: 'ueber-uns', label: 'Über uns' },
-  { id: 'faq', label: 'FAQ' },
-  { id: 'referenzen', label: 'Referenzen' },
-  { id: 'blog', label: 'Blog' },
   { id: 'kontakt', label: 'Kontakt' },
 ];
 
@@ -87,6 +48,8 @@ export function PremiumMobileNav() {
   const [isOpen, setIsOpen] = useState(false);
   const [showLeistungen, setShowLeistungen] = useState(false);
   const [showStandorte, setShowStandorte] = useState(false);
+  // Ebene 2 auf dem Telefon: genau eine Leistung ist aufgeklappt, nie alle drei.
+  const [offeneLeistung, setOffeneLeistung] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isLoading } = useAuth();
@@ -164,7 +127,7 @@ export function PremiumMobileNav() {
               ))}
             </div>
             <div className="w-px h-3.5 bg-white/10" />
-            <span className="text-[13px] font-medium text-white/90 tracking-wide">
+            <span className="text-sm font-medium text-white/90 tracking-wide">
               {currentLabel}
             </span>
             <ChevronDown size={13} className="text-white/40" />
@@ -239,39 +202,79 @@ export function PremiumMobileNav() {
                       delay={0.04}
                       onToggle={() => setShowLeistungen(!showLeistungen)}
                     >
-                      <div className="pt-2 pb-1 px-2 space-y-4">
-                        {leistungenItems.map((group, gi) => (
-                          <motion.div
-                            key={group.group}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.05 + gi * 0.04 }}
-                          >
-                            <p className="text-[10px] font-semibold text-white/25 uppercase tracking-[0.12em] px-4 mb-1.5">
-                              {group.group}
-                            </p>
-                            <div className="space-y-0.5">
-                              {group.links.map((link) => {
-                                const active = location.pathname === link.href;
-                                return (
-                                  <button
-                                    key={link.href}
-                                    onClick={() => go(link.href)}
-                                    className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all ${
-                                      active
-                                        ? 'bg-white/[0.07] text-white'
-                                        : 'text-white/40 hover:bg-white/[0.04] hover:text-white/70'
-                                    }`}
+                      <div className="pt-2 pb-1 px-2 space-y-1">
+                        {/* Ebene 1: drei Leistungen. Ebene 2 klappt erst auf,
+                            wenn eine gewählt ist — nie alle gleichzeitig. */}
+                        {LEISTUNGEN.map((leistung) => {
+                          const auf = offeneLeistung === leistung.key;
+                          return (
+                            <div key={leistung.key}>
+                              <button
+                                onClick={() => setOffeneLeistung(auf ? null : leistung.key)}
+                                aria-expanded={auf}
+                                className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-left hover:bg-white/[0.04] transition-colors duration-200"
+                              >
+                                <span>
+                                  <span className="block text-[15px] font-semibold text-white/85">
+                                    {leistung.label}
+                                  </span>
+                                  <span className="block text-sm text-white/40 mt-0.5 leading-relaxed">
+                                    {leistung.claim}
+                                  </span>
+                                </span>
+                                <ChevronDown
+                                  size={16}
+                                  aria-hidden="true"
+                                  className={`flex-shrink-0 text-white/30 transition-transform duration-200 ${auf ? 'rotate-180' : ''}`}
+                                />
+                              </button>
+
+                              <AnimatePresence initial={false}>
+                                {auf && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.18, ease: 'easeOut' }}
+                                    className="overflow-hidden"
                                   >
-                                    <div className={`w-1 h-1 rounded-full flex-shrink-0 ${active ? 'bg-white/60' : 'bg-white/15'}`} />
-                                    <span className="text-[13px] font-medium text-left">{link.label}</span>
-                                    <ArrowUpRight size={11} className="ml-auto text-white/15 flex-shrink-0" />
-                                  </button>
-                                );
-                              })}
+                                    <div className="pl-4 pb-2 space-y-0.5">
+                                      <button
+                                        onClick={() => go(leistung.href)}
+                                        className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-white/70 hover:bg-white/[0.04] transition-colors duration-200"
+                                      >
+                                        <span className="text-[15px] font-medium text-left">Überblick</span>
+                                        <ArrowRight size={14} aria-hidden="true" className="ml-auto text-white/20" />
+                                      </button>
+                                      {[...leistung.nischen, ...leistung.abschluss].map((ziel) => {
+                                        const active = location.pathname === ziel.href;
+                                        return (
+                                          <button
+                                            key={ziel.href}
+                                            onClick={() => go(ziel.href)}
+                                            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors duration-200 ${
+                                              active ? 'bg-white/[0.07] text-white' : 'text-white/45 hover:bg-white/[0.04] hover:text-white/75'
+                                            }`}
+                                          >
+                                            <span className="text-[15px] font-medium text-left">{ziel.label}</span>
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
                             </div>
-                          </motion.div>
-                        ))}
+                          );
+                        })}
+
+                        <button
+                          onClick={() => go(LEISTUNGEN_AUSWEG.href)}
+                          className="w-full flex items-center gap-2 px-4 py-3 mt-2 rounded-xl text-white/45 hover:text-white/75 hover:bg-white/[0.04] transition-colors duration-200"
+                        >
+                          <span className="text-sm text-left">{LEISTUNGEN_AUSWEG.label}</span>
+                          <ArrowRight size={14} aria-hidden="true" className="ml-auto text-white/20" />
+                        </button>
                       </div>
                     </ExpandableRow>
 
@@ -284,55 +287,41 @@ export function PremiumMobileNav() {
                       delay={0.08}
                       onToggle={() => setShowStandorte(!showStandorte)}
                     >
-                      <div className="pt-2 pb-1 px-2 space-y-4">
-                        <motion.button
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.06 }}
-                          onClick={() => go('/bayern')}
-                          className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.05] hover:bg-white/[0.07] transition-all group"
-                          whileTap={{ scale: 0.985 }}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="w-2 h-2 rounded-full bg-white/30" />
-                            <span className="text-[13px] font-semibold text-white/70 uppercase tracking-wider">
-                              Bayern – Alle Standorte
-                            </span>
-                          </div>
-                          <ArrowRight size={14} className="text-white/20 group-hover:text-white/40 transition-colors" />
-                        </motion.button>
-
-                        {cityEntries.map(([slug, cityData], cityIndex) => (
-                          <motion.div
-                            key={slug}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.08 + cityIndex * 0.05 }}
-                          >
-                            <p className="text-[10px] font-semibold text-white/25 uppercase tracking-[0.12em] px-4 mb-1.5">
-                              {cityData.label}
-                            </p>
-                            <div className="space-y-0.5">
-                              {cityData.services.map((service) => {
-                                const active = location.pathname === service.href;
-                                return (
-                                  <button
-                                    key={service.href}
-                                    onClick={() => go(service.href)}
-                                    className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all ${
-                                      active
-                                        ? 'bg-white/[0.07] text-white'
-                                        : 'text-white/40 hover:bg-white/[0.04] hover:text-white/70'
-                                    }`}
-                                  >
-                                    <div className={`w-1 h-1 rounded-full flex-shrink-0 ${active ? 'bg-white/60' : 'bg-white/15'}`} />
-                                    <span className="text-[13px] font-medium">{service.label}</span>
-                                  </button>
-                                );
-                              })}
-                            </div>
-                          </motion.div>
-                        ))}
+                      <div className="pt-2 pb-1 px-2 space-y-0.5">
+                        {/* Fünf Ziele. Die Leistungen je Stadt stehen auf der
+                            Stadtseite, nicht hier. */}
+                        {STANDORTE.staedte.map((stadt) => {
+                          const active = location.pathname === stadt.href;
+                          return (
+                            <button
+                              key={stadt.href}
+                              onClick={() => go(stadt.href)}
+                              className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-colors duration-200 ${
+                                active ? 'bg-white/[0.07] text-white' : 'text-white/60 hover:bg-white/[0.04] hover:text-white/85'
+                              }`}
+                            >
+                              <span className="text-[15px] font-medium text-left">{stadt.label}</span>
+                              {stadt.href === HAUPTSITZ_SLUG && (
+                                <span className="text-sm text-white/30">Hauptsitz</span>
+                              )}
+                            </button>
+                          );
+                        })}
+                        <div className="h-px bg-white/[0.06] mx-4 my-2" />
+                        {STANDORTE.regionen.map((region) => {
+                          const active = location.pathname === region.href;
+                          return (
+                            <button
+                              key={region.href}
+                              onClick={() => go(region.href)}
+                              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors duration-200 ${
+                                active ? 'bg-white/[0.07] text-white' : 'text-white/45 hover:bg-white/[0.04] hover:text-white/75'
+                              }`}
+                            >
+                              <span className="text-[15px] font-medium text-left">{region.label}</span>
+                            </button>
+                          );
+                        })}
                       </div>
                     </ExpandableRow>
 

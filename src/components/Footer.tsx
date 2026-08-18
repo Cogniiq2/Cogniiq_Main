@@ -224,7 +224,11 @@ export function Footer() {
                   {
                     label: "KI-Telefonassistent",
                     links: [
-                      { text: "Arztpraxen", to: "/ki-telefonassistent-arzt" },
+                      // /praxen ist der Healthcare-Hub mit der vollständigen
+                      // Beweiskette und stand bis 18.08.2026 weder in der
+                      // Navigation noch im Footer — global also unerreichbar.
+                      { text: "Arzt- und Zahnarztpraxen", to: "/praxen" },
+                      { text: "Arztpraxen im Detail", to: "/ki-telefonassistent-arzt" },
                       { text: "Restaurants", to: "/ki-telefonassistent-restaurant" },
                       { text: "Hotels", to: "/ki-telefonassistent-hotel" },
                       { text: "Praxen", to: "/ki-telefonassistent-praxis" },
