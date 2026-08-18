@@ -86,7 +86,7 @@ const faqItems = [
   {
     question: "Kann die Rechnung teurer werden als geplant?",
     answer:
-      "Nur begrenzt. Jeder Tarif enthält ein Minutenkontingent; darüber kostet jede weitere Minute 0,39 €. Nach oben ist gedeckelt: Mehr als der nächsthöhere Tarif kostet es nie. Der Preis ist für 24 Monate garantiert, und abgerechnet wird pro Praxis, nicht pro Behandler.",
+      "Nur begrenzt. Jeder Tarif enthält ein Minutenkontingent; darüber kostet jede weitere Minute 0,39 €. Nach oben ist jeder Tarif auf seine ausgewiesene Obergrenze gedeckelt: 500 €, 800 € oder 1.400 € im Monat. Liegt Ihr Aufkommen dauerhaft höher, ordnen wir Sie dem günstigsten passenden Tarif zu. Der Preis ist für 24 Monate garantiert, und abgerechnet wird pro Praxis, nicht pro Behandler.",
   },
   {
     question: "Wie komme ich wieder aus dem Vertrag heraus?",

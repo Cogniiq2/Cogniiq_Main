@@ -295,7 +295,7 @@ export const DECKELUNG = {
     "Jeder Tarif enthält ein festes Minutenkontingent. Verbrauchen Sie mehr Minuten als enthalten, zahlen Sie 0,39 € je zusätzliche Minute. Nach oben ist jeder Tarif gedeckelt: In Basis und Praxis greift spätestens der Preis des nächsthöheren Tarifs, im Tarif MVZ liegt die Grenze bei 1.400 € — mehr zahlen Sie in diesem Monat nicht. Eine Grippewelle kann Ihre Rechnung also bewegen, aber nicht sprengen.",
   hinweis: "Mehr als die ausgewiesene Obergrenze kostet es nie.",
   tarifwechsel:
-    "Liegt Ihr Aufkommen dauerhaft höher, wechseln wir Sie in den passenden Tarif — damit Sie nicht Monat für Monat den Zuschlag zahlen.",
+    "Und Sie bleiben nicht im falschen Tarif sitzen: Liegt Ihr Aufkommen dauerhaft höher, ordnen wir Sie dem Tarif zu, der für Ihren Bedarf am günstigsten ist und nicht dauerhaft an seiner Obergrenze läuft. Wer Monat für Monat den Zuschlag zahlt, zahlt zu viel — dann gehört er in den nächsten Tarif.",
   nichtProBehandler:
     "Abgerechnet wird pro Praxis, nicht pro Behandler. Ob bei Ihnen zwei oder sieben Personen behandeln, ändert am Monatsbetrag nichts.",
 };

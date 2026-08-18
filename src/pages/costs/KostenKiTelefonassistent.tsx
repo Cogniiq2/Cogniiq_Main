@@ -53,7 +53,7 @@ const faqItems = [
   {
     question: "Kann die Rechnung teurer werden als der Tarif?",
     answer:
-      "Ja, aber nur bis zu einer festen Grenze. Über dem Minutenkontingent kostet jede weitere Minute 0,39 €. Nach oben ist gedeckelt: Mehr als der nächsthöhere Tarif kostet es nie. Im Tarif Basis heißt das 500 € im Monat, in Praxis 800 € und in MVZ 1.400 €.",
+      "Ja, aber nur bis zu einer festen Grenze. Über dem Minutenkontingent kostet jede weitere Minute 0,39 €. Nach oben ist jeder Tarif auf seine ausgewiesene Obergrenze gedeckelt: Basis auf 500 € im Monat, Praxis auf 800 €, MVZ auf 1.400 €. Und wenn Ihr Aufkommen dauerhaft über dem Kontingent liegt, ordnen wir Sie dem Tarif zu, der für Ihren Bedarf am günstigsten ist — Sie zahlen den Zuschlag also nicht dauerhaft.",
   },
   {
     question: "Was kostet ein KI Telefonassistent für eine Praxis pro Monat?",

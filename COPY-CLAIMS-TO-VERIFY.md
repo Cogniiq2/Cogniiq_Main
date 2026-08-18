@@ -70,6 +70,8 @@ zu entfernen**. Marker stehen als Code-Kommentare neben der jeweiligen Stelle
 | F7 | „Mehrere Anrufe gleichzeitig, ohne Warteschleife" | mehrere Seiten | Parallelitätsgrenzen bestätigen (B11) |
 | F8 | Blog-Orientierungspreise (150–500 €, 200–450 €, 300 € u. a.) | `blog-data.ts` | bestätigen oder entfernen |
 | F9 | PMS-/Systemnamen Hotel/Restaurant (protel, Apaleo, Lodgit, OpenTable, ResDiary, Resmio) | Hotel-/Restaurant-Segmentseiten | Anbindungstiefe bestätigen |
+| F10 | **Tarifzuordnung nach günstigstem Gesamtpreis** — Preisseite, `/praxen` und der Praxis-Rechner sagen zu, dass ein Kunde bei dauerhaft höherem Aufkommen dem Tarif zugeordnet wird, der für seinen Bedarf am günstigsten ist und nicht dauerhaft an der Obergrenze läuft | `telefonassistent-copy.ts` (`DECKELUNG.tarifwechsel`), `KostenKiTelefonassistent.tsx`, `PraxenPage.tsx`, `PraxisRechnerWidget.tsx` | **[[CLAIM: Tarifzuordnung nach günstigstem Gesamtpreis muss im Vertrag und im Abrechnungsprozess so umgesetzt sein — nicht nur im Rechner]]** Die Regel beschreibt inzwischen nicht mehr nur eine Rechnerannahme, sondern eine Zusage an den Kunden. Ohne vertragliche und prozessuale Deckung ist sie von den Seiten zu entfernen |
+| F11 | Deckelung im Tarif MVZ liegt bei 1.400 €, während der nächsthöhere Tarif (Enterprise) bei 5.000 € beginnt — die Regel „nie mehr als der nächsthöhere Tarif" trägt dort nicht | `telefonassistent-copy.ts` (`DECKELUNG.text`), beide Preisdarstellungen | Formulierung nennt jetzt beide Fälle getrennt; Obergrenze 1.400 € vom Inhaber als beabsichtigt bestätigt (17.08.2026) — Vertragstext angleichen |
 
 ## E. Nicht mehr behauptet (bewusst entfernt, kein Handlungsbedarf)
 
