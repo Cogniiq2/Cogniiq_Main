@@ -387,3 +387,61 @@ Stellen (Zeile 75 mit `[[CLAIM]]`-Marker, Zeile 416 als Vertrauensangabe ohne
 Marker). Die Service-Seite gilt als abgeschlossen; die Entscheidung, die Aussage
 dort mit Marker zu belassen, wurde am 17.08.2026 bewusst getroffen. Sie fällt
 oder bleibt mit der Antwort auf OWNER-INPUT B4.
+
+## Stufe 7 · Segmentseiten `/ki-telefonassistent-arzt` und `/ki-telefonassistent-praxis`
+
+Title, Description und H1 beider Seiten unverändert — die Angleichung betrifft
+Inhalt und Struktur, nicht die Metadaten. Beide Metadaten-Ketten mussten
+deshalb nicht angefasst werden.
+
+### Faktenkorrekturen (Blocker-Klasse)
+
+| Stelle | Befund | Korrektur |
+|---|---|---|
+| Arzt, FAQ „Praxissoftware" | Nannte Tomedo, Medistar, Dampsoft und CGM und stellte in Aussicht, das Ergebnis komme „als Termin im Kalender" an | Aus `FAKTEN.keineAnbindung`; keine Produktnamen, keine Liste unterstützter Systeme |
+| Arzt, Benefit | „Anbindung an Ihre Praxissoftware wird vor dem Angebot geprüft" ließ eine bestehende Anbindung vermuten | Prüfung zugesagt, fehlende Standardanbindung ausdrücklich benannt |
+| Arzt, Ablaufschritt 3 | „Der Termin steht im Kalender" | Strukturierter Eintrag im Dashboard, Übertrag durch das Team |
+| Therapie, Ablaufschritt 3 | „Termine stehen im Kalender" | dito |
+| Beide, Datenschutz-FAQ | Handgeschriebene Zweitfassung von `DATENSCHUTZ_PUNKTE` | Aus der Konstante zusammengesetzt |
+
+Die beiden `[[CLAIM]]`-Marker auf den PVS-Namen sind entfallen, nicht ersetzt:
+Nach der Regel aus HONESTY-AUDIT §7.7 ist ein Marker kein Ausweg für eine
+Aussage, die wir nicht belegen können.
+
+### Beweiskette
+
+Neu: `src/components/TelefonassistentBeweiskette.tsx`, eingebunden über das
+Opt-in `beweiskette` in `NationalIndustryPageConfig`. Die elf
+Nicht-Healthcare-Seiten, die dieselbe Komponente nutzen, bleiben unverändert.
+
+Reihenfolge nach COPY-BRIEF-3 §2, in drei Teilen, weil die segmentspezifischen
+Abschnitte dazwischenliegen und M15 vor dem Preis stehen muss:
+
+| Position | Module |
+|---|---|
+| nach den Problemen | M20 Patientensicht · M3 Gescheiterte Versuche · M4 Säulen (kompakt) |
+| nach dem Ablauf | M14 Übergabe · M8 Anliegen-Katalog |
+| aus der Config | M15 Grenzen |
+| vor dem FAQ | M21 Team · M17 Einrichtung · M18 Betreuung · M10 Preis (kompakt) · M19 Umkehrbarkeit (kompakt) · M16 Nicht passend · M7 Datenschutz (kompakt) |
+
+M13 bleibt asset-gated und rendert nicht. M22 existiert nicht. Vier Module
+stehen in der Kompaktfassung aus Stufe 6c — sie sind produktweit gleich und
+verlinken auf ihre Vollversion.
+
+### Einzigartiger Anteil, gemessen
+
+Satzvergleich über das vorgerenderte HTML, gegen `/praxen`,
+`/ki-telefonassistent`, die Preisseite und eine Stadtseite.
+
+| Seite | ohne Kette | **mit voller Kette** | Kette ohne M20/M8/M21/M17 |
+|---|---|---|---|
+| Arzt | 76,4 % | **40,0 %** | 49,5 % |
+| Therapie | 75,9 % | **39,5 %** | 48,9 % |
+| Arzt ∩ Therapie | 38,2 % | **71,7 %** | 64,2 % |
+
+**Befund:** Die volle Kette drückt beide Seiten auf die 40-%-Schwelle aus
+`COPY-BRIEF.md` §7.3 und macht sie untereinander zu 71,7 % identisch. Das ist
+dasselbe Muster, das für die Stadtseiten in Stufe 6b ausdrücklich abgelehnt
+wurde (dort 38,5 / 37,4 / 39,0 %). Entscheidung des Inhabers steht aus; die
+dritte Spalte zeigt die Wirkung, wenn die vier langen generischen Module wie
+bei den Stadtseiten auf einen Verweis verkürzt werden.

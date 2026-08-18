@@ -1,7 +1,7 @@
 import { NationalIndustryPage } from "@/components/NationalIndustryPage";
 import type { NationalIndustryPageConfig } from "@/components/NationalIndustryPage";
 import { BUSINESS_INFO } from "@/lib/seo-data";
-import { FAKTEN, GRENZEN } from "@/lib/telefonassistent-copy";
+import { DATENSCHUTZ_PUNKTE, FAKTEN, GRENZEN } from "@/lib/telefonassistent-copy";
 
 const config: NationalIndustryPageConfig = {
   seo: {
@@ -83,7 +83,7 @@ const config: NationalIndustryPageConfig = {
         step: "03",
         title: "Übergabe statt Rückruf-Marathon",
         description:
-          "Termine stehen im Kalender, offene Anliegen als sortierte Liste mit Rückrufnummer und Kontext. Was sich ohne Sie klären ließ, ist geklärt – der Rest ist in Minuten abgearbeitet.",
+          "Alle Anliegen stehen als sortierte Liste im Dashboard – mit Name, Rückrufnummer und Terminwunsch. Was sich ohne Sie klären ließ, ist geklärt; den Rest arbeiten Sie in Minuten ab, statt abends die Mailbox zu rekonstruieren.",
       },
     ],
   },
@@ -116,8 +116,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Worauf müssen Sie bei DSGVO und Gesundheitsdaten in Therapiepraxen achten?",
-      answer:
-        "Vier Punkte entscheiden, und Sie sollten sie bei jedem Anbieter abfragen: Wird das Gespräch aufgezeichnet und wie lange gespeichert. Werden Ihre Daten zum Training von Modellen verwendet. Gibt es einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO. Und wie wird die Schweigepflicht nach § 203 StGB vertraglich abgebildet. Bei uns: Gespräche werden nicht aufgezeichnet – gespeichert wird ausschließlich das strukturierte Ergebnis. Ihre Daten werden nicht zum Training von Modellen verwendet. Einen AVV nach Art. 28 DSGVO stellen wir jedem Kunden bereit. Cogniiq und alle Mitarbeitenden werden vertraglich auf das Berufsgeheimnis nach § 203 StGB verpflichtet. Der Assistent gibt sich zu Beginn jedes Anrufs als KI-System zu erkennen. Ob Ihre Praxis eine Datenschutz-Folgenabschätzung benötigt, entscheidet Ihr Datenschutzbeauftragter – wir liefern die Unterlagen dafür zu.",
+      answer: `Vier Punkte entscheiden, und Sie sollten sie bei jedem Anbieter abfragen: Wird das Gespräch aufgezeichnet und wie lange gespeichert. Werden Ihre Daten zum Training von Modellen verwendet. Gibt es einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO. Und wie wird die Schweigepflicht nach § 203 StGB vertraglich abgebildet. Bei uns: ${DATENSCHUTZ_PUNKTE.join(". ").replace(/\.\.$/, ".")}.`,
     },
     {
       question: "Was passiert mit Anliegen, die der Assistent nicht klären kann?",
@@ -132,6 +131,7 @@ const config: NationalIndustryPageConfig = {
   ],
   grenzen: GRENZEN,
   stimmprobe: true,
+  beweiskette: true,
 };
 
 export function KiTelefonassistentPraxis() {

@@ -1,7 +1,7 @@
 import { NationalIndustryPage } from "@/components/NationalIndustryPage";
 import type { NationalIndustryPageConfig } from "@/components/NationalIndustryPage";
 import { BUSINESS_INFO } from "@/lib/seo-data";
-import { FAKTEN, GRENZEN } from "@/lib/telefonassistent-copy";
+import { DATENSCHUTZ_PUNKTE, FAKTEN, GRENZEN } from "@/lib/telefonassistent-copy";
 
 const config: NationalIndustryPageConfig = {
   seo: {
@@ -61,8 +61,7 @@ const config: NationalIndustryPageConfig = {
     "Notfall-Hinweise führen sofort zu Ihrem Team, zum Bereitschaftsdienst oder zur Ansage, den Notruf 112 zu wählen",
     "Ihre Stimmauswahl, Ihr Begrüßungssatz, Ihre Formulierungen – Anrufer erfahren im ersten Satz, dass ein KI-System spricht",
     "Auftragsverarbeitungsvertrag nach Art. 28 DSGVO; keine Gesprächsaufzeichnung, kein Training mit Ihren Daten",
-    // [[CLAIM: verify — konkrete PVS-Anbindungen (Tomedo, Medistar, Dampsoft, CGM) je Praxis bestätigen]]
-    "Anbindung an Ihre Praxissoftware wird vor dem Angebot geprüft – ein Systemwechsel ist nicht Voraussetzung",
+    "Ob eine Anbindung an Ihre Praxissoftware möglich ist, prüfen wir vor dem Angebot – eine fertige Standardanbindung gibt es heute nicht",
     `Festes Minutenkontingent, darüber ${FAKTEN.mehrpreisProMinute}/Min. – gedeckelt auf die Obergrenze Ihres Tarifs`,
   ],
   workflow: {
@@ -84,7 +83,7 @@ const config: NationalIndustryPageConfig = {
         step: "03",
         title: "Übergabe an Ihr Team",
         description:
-          "Der Termin steht im Kalender, das Anliegen als strukturierter Eintrag bei Ihrem Team – mit Rückrufnummer, Kontext und nächstem Schritt. Ihre MFA arbeitet die Liste ab, wenn es in den Ablauf passt.",
+          "Das Anliegen steht als strukturierter Eintrag im Dashboard – mit Anliegen, Name, Rückrufnummer und Terminwunsch. Ihre MFA arbeitet die Liste ab, wenn es in den Ablauf passt, und überträgt das Ergebnis ins Praxissystem, solange dafür keine Schnittstelle möglich ist.",
       },
     ],
   },
@@ -112,9 +111,8 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Lässt sich der Assistent an unsere Praxissoftware anbinden?",
-      // [[CLAIM: verify — PVS-Integrationsliste (Tomedo, Medistar, Dampsoft, CGM) und Anbindungstiefe bestätigen]]
       answer:
-        "Das prüfen wir vor dem Angebot – nicht danach. Für gängige Systeme wie Tomedo, Medistar, Dampsoft oder CGM klären wir konkret, in welcher Form die Übergabe ankommt: als Termin im Kalender, als strukturierter Eintrag oder als Nachricht an Ihr Team. Wichtig für Ihre Entscheidung: Ein Wechsel Ihrer Praxissoftware ist nicht Voraussetzung.",
+        `${FAKTEN.keineAnbindung} Welche Schnittstelle Ihr System bietet, prüfen wir vor dem Angebot – nicht danach –, und das Ergebnis steht im Angebot, auch wenn es negativ ausfällt. Eine Liste unterstützter Systeme führen wir bewusst nicht: Sie wäre heute entweder leer oder unehrlich. Ein Wechsel Ihrer Praxissoftware ist keine Voraussetzung.`,
     },
     {
       question: "Was passiert, wenn ein Patient einen Notfall schildert?",
@@ -128,8 +126,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Wie steht es um Datenschutz und Schweigepflicht?",
-      answer:
-        "Vier Punkte entscheiden, und Sie sollten sie bei jedem Anbieter abfragen: Wird das Gespräch aufgezeichnet und wie lange gespeichert. Werden Ihre Daten zum Training von Modellen verwendet. Gibt es einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO. Und wie wird die Schweigepflicht nach § 203 StGB vertraglich abgebildet. Bei uns: Gespräche werden nicht aufgezeichnet – gespeichert wird ausschließlich das strukturierte Ergebnis. Ihre Daten werden nicht zum Training von Modellen verwendet. Einen AVV nach Art. 28 DSGVO stellen wir jedem Kunden bereit. Cogniiq und alle Mitarbeitenden werden vertraglich auf das Berufsgeheimnis nach § 203 StGB verpflichtet. Der Assistent gibt sich zu Beginn jedes Anrufs als KI-System zu erkennen. Ob Ihre Praxis eine Datenschutz-Folgenabschätzung benötigt, entscheidet Ihr Datenschutzbeauftragter – wir liefern die Unterlagen dafür zu.",
+      answer: `Vier Punkte entscheiden, und Sie sollten sie bei jedem Anbieter abfragen: Wird das Gespräch aufgezeichnet und wie lange gespeichert. Werden Ihre Daten zum Training von Modellen verwendet. Gibt es einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO. Und wie wird die Schweigepflicht nach § 203 StGB vertraglich abgebildet. Bei uns: ${DATENSCHUTZ_PUNKTE.join(". ").replace(/\.\.$/, ".")}.`,
     },
     {
       question: "Können wir Ansagen und Öffnungszeiten selbst anpassen?",
@@ -139,6 +136,7 @@ const config: NationalIndustryPageConfig = {
   ],
   grenzen: GRENZEN,
   stimmprobe: true,
+  beweiskette: true,
 };
 
 export function KiTelefonassistentArzt() {

@@ -13,6 +13,11 @@ import {
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 import { StimmprobeSection } from "@/components/StimmprobeSection";
+import {
+  BeweisketteMitte,
+  BeweisketteOben,
+  BeweisketteUnten,
+} from "@/components/TelefonassistentBeweiskette";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 22 },
@@ -58,6 +63,13 @@ export interface NationalIndustryPageConfig {
   grenzen?: { headline: string; intro: string; points: string[] };
   /** M13 · Stimmprobe-Slot (asset-gated; rendert ohne Audiodatei nichts). */
   stimmprobe?: boolean;
+  /**
+   * Geteilte Beweiskette aus COPY-BRIEF-3 §2 (M20, M3, M4, M14, M8, M21, M17,
+   * M18, M10, M19, M16, M7). Opt-in, damit die elf Nicht-Healthcare-Seiten
+   * unverändert bleiben. Setzt `grenzen` voraus — M15 gehört in die Kette und
+   * muss vor dem Preis stehen.
+   */
+  beweiskette?: boolean;
 }
 
 interface Props {
@@ -311,6 +323,10 @@ export function NationalIndustryPage({ config }: Props) {
           </div>
         </section>
 
+        {/* ── Beweiskette, Teil 1: M20 Patientensicht · M3 Gescheiterte
+            Versuche · M4 Säulen (kompakt) ── */}
+        {config.beweiskette && <BeweisketteOben />}
+
         {/* ── SOLUTION ── */}
         <section className="py-24 bg-gray-50 dark:bg-gray-900/40" aria-labelledby="solution-heading">
           <div className="max-w-6xl mx-auto px-6 lg:px-8">
@@ -420,6 +436,9 @@ export function NationalIndustryPage({ config }: Props) {
           </div>
         </section>
 
+        {/* ── Beweiskette, Teil 2: M14 Übergabe · M8 Anliegen-Katalog ── */}
+        {config.beweiskette && <BeweisketteMitte />}
+
         {/* ── M13 · STIMMPROBE (asset-gated, rendert ohne Audio nichts) ── */}
         {config.stimmprobe && <StimmprobeSection />}
 
@@ -461,6 +480,11 @@ export function NationalIndustryPage({ config }: Props) {
             </div>
           </section>
         )}
+
+        {/* ── Beweiskette, Teil 3: M21 Team · M17 Einrichtung · M18 Betreuung ·
+            M10 Preis · M19 Umkehrbarkeit · M16 Nicht passend · M7 Datenschutz.
+            Steht hinter M15, damit die Grenzen vor dem Preis stehen. ── */}
+        {config.beweiskette && <BeweisketteUnten />}
 
         {/* ── DEMO CTA ── */}
         <section className="py-20 bg-gray-50 dark:bg-gray-900/40 border-y border-gray-100 dark:border-gray-800">
