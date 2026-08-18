@@ -38,6 +38,10 @@ describe('module shell', () => {
     expect(Number(badge!.textContent)).toBe(fixtureAlerts.filter(isAlertOpen).length);
   });
 
+  // The only test that walks all twelve sections, which makes it by far the most expensive here:
+  // ~2s on an idle machine, but up to ~5.2s once the full suite saturates the workers — straddling
+  // vitest's 5000ms default. The extended timeout absorbs that contention; every iteration still
+  // has to pass, so it hides no failure, only the scheduling noise.
   it('shows no dead links: every navigation entry opens an implemented section', async () => {
     renderModule();
     const nav = screen.getByRole('navigation', { name: 'Vereinsbetrieb' });
@@ -50,7 +54,7 @@ describe('module shell', () => {
         screen.getAllByText(/keine Verbindung zu einem Live-System/i).length,
       ).toBeGreaterThan(0);
     }
-  });
+  }, 15_000);
 
   it('groups the navigation so twelve entries stay usable', () => {
     renderModule();
