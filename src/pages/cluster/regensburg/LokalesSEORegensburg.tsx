@@ -30,7 +30,7 @@ const config: ClusterPageConfig = {
       { label: "Für wen", value: "Gastronomie, Tourismus, Dienstleister, KMU" },
       { label: "Ziel", value: "Top-3 Google Maps & organische Ergebnisse Regensburg" },
       { label: "Zeithorizont", value: "Erste Verbesserungen in 4–10 Wochen" },
-      { label: "Preisrahmen", value: "ab ca. 800 € einmalig" },
+      { label: "Preisrahmen", value: "ab ca. 800 € einmalig" },
     ],
   },
   intro: {
@@ -75,7 +75,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie lange dauert es, bis lokales SEO Ergebnisse zeigt?",
-      answer: "Erste Verbesserungen nach 4–8 Wochen. Signifikante Rankings in harten Kategorien nach 3–6 Monaten. Viele Regensburger Nischen reagieren schneller.",
+      answer: "Erste Verbesserungen nach 4–8 Wochen. Signifikante Rankings in harten Kategorien nach 3–6 Monaten. Viele Regensburger Nischen reagieren schneller.",
     },
     {
       question: "Brauche ich monatliche SEO-Betreuung?",
@@ -83,7 +83,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Was kosten lokale SEO-Maßnahmen in Regensburg?",
-      answer: "Einmaliges SEO-Setup ab ca. 800 €. Monatliche Betreuung ab ca. 250 € / Monat.",
+      answer: "Einmaliges SEO-Setup ab ca. 800 €. Monatliche Betreuung ab ca. 250 € / Monat.",
     },
     {
       question: "Helfen Kundenbewertungen beim lokalen SEO?",

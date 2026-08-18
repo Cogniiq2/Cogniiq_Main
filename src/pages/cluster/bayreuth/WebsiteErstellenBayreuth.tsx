@@ -13,7 +13,7 @@ const config: ClusterPageConfig = {
   seo: {
     title: "Website erstellen lassen Bayreuth – Professionell & SEO-ready | Cogniiq",
     description:
-      "Website erstellen lassen in Bayreuth: Cogniiq entwickelt individuelle, schnelle und DSGVO-konforme Websites für Unternehmen in Bayreuth und Oberfranken. Persönliche Betreuung, lokales SEO inklusive.",
+      "Website erstellen lassen in Bayreuth: Cogniiq entwickelt individuelle, schnelle Websites für Unternehmen in Bayreuth und Oberfranken. Persönliche Betreuung, lokales SEO inklusive.",
     canonical: `${base}/bayreuth/website-erstellen`,
     keywords:
       "Website erstellen Bayreuth, Homepage erstellen Bayreuth, Website erstellen lassen Bayreuth, Webseite erstellen Bayreuth, neue Website Bayreuth",
@@ -21,7 +21,7 @@ const config: ClusterPageConfig = {
   hero: {
     h1: "Website erstellen lassen in Bayreuth",
     lead: "Individuelle Websites für Unternehmen in Bayreuth – von der ersten Idee bis zum fertigen System. Kein Baukasten, kein Template. Entwickelt für Ihre Zielgruppe, optimiert für Google.",
-    trustTags: ["Bayreuth", "Kein Template", "SEO-ready", "DSGVO-konform"],
+    trustTags: ["Bayreuth", "Kein Template", "SEO-ready", "Persönliche Betreuung"],
     ctaLabel: "Kostenloses Erstgespräch",
   },
   tldr: {
@@ -30,7 +30,7 @@ const config: ClusterPageConfig = {
       { label: "Für wen", value: "KMU, Praxen, Handwerk, Dienstleister" },
       { label: "Typische Ziele", value: "Mehr organische Anfragen, bessere Sichtbarkeit" },
       { label: "Projektdauer", value: "1–6 Wochen" },
-      { label: "Preisrahmen", value: "ab ca. 1.500 €" },
+      { label: "Preisrahmen", value: "ab ca. 1.500 €" },
     ],
   },
   intro: {
@@ -38,7 +38,7 @@ const config: ClusterPageConfig = {
     paragraphs: [
       "Eine neue Website ist mehr als Design. Es beginnt mit der Frage: Was soll die Website für Ihr Unternehmen leisten? Mehr Anfragen, bessere Sichtbarkeit in Bayreuth, klarere Positionierung? Die Antwort bestimmt Struktur, Inhalte und technisches Setup – noch bevor das erste Design entsteht.",
       "Cogniiq arbeitet in drei Phasen: Analyse & Konzept, Design & Entwicklung, dann Local SEO-Setup und Go-Live. Jede Phase hat klare Deliverables und einen definierten Zeitplan. Sie erhalten keine Überraschungen – nur Ergebnisse.",
-      "Alle Websites werden von Grund auf individuell entwickelt: sauberer Code, Mobile-First, Core Web Vitals optimiert, DSGVO-konform ab Auslieferung. Kein Template, kein Baukasten – das ist kein Qualitätsmerkmal, das ist der Standard.",
+      "Alle Websites werden von Grund auf individuell entwickelt: sauberer Code, Mobile-First, Core Web Vitals optimiert, Datenschutzdokumentation ab Auslieferung. Kein Template, kein Baukasten – das ist kein Qualitätsmerkmal, das ist der Standard.",
     ],
   },
   painPoints: [
@@ -74,7 +74,7 @@ const config: ClusterPageConfig = {
     {
       question: "Wie lange dauert es, eine neue Website in Bayreuth zu erstellen?",
       answer:
-        "Kompakte Projekte (bis 6 Seiten) sind in 7–14 Tagen live. Websites mit erweitertem SEO und Content: 3–5 Wochen. Komplexere Projekte mit Integrationen: 6–10 Wochen. Verbindlicher Zeitplan wird im Konzept festgelegt.",
+        "Kompakte Projekte (bis 6 Seiten) sind in 7–14 Tagen live. Websites mit erweitertem SEO und Content: 3–5 Wochen. Komplexere Projekte mit Integrationen: 6–10 Wochen. Verbindlicher Zeitplan wird im Konzept festgelegt.",
     },
     {
       question: "Muss ich Inhalte selbst liefern?",
@@ -104,12 +104,12 @@ const config: ClusterPageConfig = {
     {
       question: "Was kostet das Erstellen einer Website in Bayreuth?",
       answer:
-        "Einfache Websites starten typisch ab ca. 1.500 €. Der genaue Preis hängt von Umfang, SEO-Tiefe und Funktionen ab. Detaillierte Preisübersicht auf /bayreuth/webdesign-kosten.",
+        "Einfache Websites starten typisch ab ca. 1.500 €. Der genaue Preis hängt von Umfang, SEO-Tiefe und Funktionen ab. Detaillierte Preisübersicht auf /bayreuth/webdesign-kosten.",
     },
     {
       question: "Brauche ich ein Hosting-Paket?",
       answer:
-        "Ja. Wir empfehlen DSGVO-konforme, performante Hosting-Lösungen. Einrichtung und Konfiguration sind im Projektpreis enthalten, die laufenden Hosting-Kosten (ca. 10–20 € / Monat) sind separat.",
+        "Ja. Wir empfehlen performante Hosting-Lösungen mit europäischen Rechenzentren. Einrichtung und Konfiguration sind im Projektpreis enthalten, die laufenden Hosting-Kosten (ca. 10–20 € / Monat) sind separat.",
     },
     {
       question: "Kann Cogniiq auch meine bestehende Website überarbeiten?",
@@ -119,7 +119,7 @@ const config: ClusterPageConfig = {
     {
       question: "Wie starte ich?",
       answer:
-        "Kostenloses Erstgespräch buchen – 30–45 Minuten, remote oder vor Ort in Bayreuth. Wir analysieren Ihre Situation und erstellen im Anschluss ein konkretes Angebot.",
+        "Kostenloses Erstgespräch buchen – 30–45 Minuten, remote oder vor Ort in Bayreuth. Wir analysieren Ihre Situation und erstellen im Anschluss ein konkretes Angebot.",
     },
   ],
   internalLinks: [

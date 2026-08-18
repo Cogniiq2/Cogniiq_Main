@@ -81,9 +81,9 @@ const SERVICES = [
     index: "03",
     icon: Zap,
     name: "Automatisierung",
-    tagline: "Routineaufgaben laufen vollautomatisch — ohne tägliches Eingreifen, ohne zusätzliches Personal.",
+    tagline: "Routineaufgaben laufen automatisch nach Ihren Vorgaben — ohne tägliches Eingreifen, ohne zusätzliches Personal.",
     benefits: [
-      "Nahtlose Systemintegration: CRM, Kalender, Buchung, Kasse",
+      "Direkte Systemintegration: CRM, Kalender, Buchung, Kasse",
       "Automatische Benachrichtigungen, Erinnerungen und Follow-ups",
       "Prozess-Workflows mit Eskalations- und Ausfall-Logik",
       "Monitoring und Logging für zuverlässigen Dauerbetrieb",
@@ -104,9 +104,9 @@ const SERVICES = [
 ];
 
 const OUTCOMES = [
-  { metric: "Keine verpassten Anrufe mehr", context: "Der KI-Assistent nimmt ab — auch nachts, am Wochenende und bei Stoßzeiten" },
+  { metric: "Erreichbar auch dann, wenn niemand abnehmen kann", context: "Der KI-Assistent nimmt ab — auch nachts, am Wochenende und bei Stoßzeiten" },
   { metric: "Terminbuchung ohne Rückruf", context: "Patienten, Gäste und Kunden buchen direkt — ohne auf eine Antwort zu warten" },
-  { metric: "Automatische Terminerinnerungen", context: "Automatische Erinnerungen mit Bestätigungslink bis zu 48 Stunden vorher" },
+  { metric: "Automatische Terminerinnerungen", context: "Automatische Erinnerungen mit Bestätigungslink bis zu 48 Stunden vorher" },
   { metric: "Mehr qualifizierte Anfragen", context: "SEO-optimierte Websites, die gefunden werden — und Besucher in Kunden verwandeln" },
   { metric: "Stunden Verwaltung eingespart", context: "Bestätigungen, Erinnerungen, Follow-ups und CRM-Pflege laufen ohne manuellen Aufwand" },
 ];
@@ -116,7 +116,7 @@ const SYSTEM_PANELS = [
     label: "Praxis-System",
     stack: ["Website", "KI-Telefonrezeption", "Terminlogik", "Automatisierung"],
     outcomes: [
-      "Kein verpasster Anruf mehr",
+      "Anrufe werden angenommen statt verpasst",
       "Terminbuchung ohne Empfangsaufwand",
       "Automatische Erinnerungen für Patienten",
       "Entlastung des gesamten Praxisteams",
@@ -128,7 +128,7 @@ const SYSTEM_PANELS = [
     label: "Restaurant-System",
     stack: ["Website", "Reservierungslogik", "KI-Telefonassistent", "CRM-Integration"],
     outcomes: [
-      "Tischreservierung 24 Stunden, 7 Tage",
+      "Tischreservierung 24 Stunden, 7 Tage",
       "Spürbar weniger No-Shows",
       "Automatisierte Gäste-Erinnerungen",
       "Bessere Auslastung bei gleichem Team",
@@ -167,7 +167,7 @@ const PROCESS_STEPS = [
     number: "01",
     title: "Analyse & Zieldefinition",
     description:
-      "Wir verstehen Ihr Geschäftsmodell, Ihre konkreten Engpässe und messbaren Ziele. Kein generischer Fragebogen — spezifische Einschätzung in 30 Minuten.",
+      "Wir verstehen Ihr Geschäftsmodell, Ihre konkreten Engpässe und messbaren Ziele. Kein generischer Fragebogen — spezifische Einschätzung in 30 Minuten.",
   },
   {
     number: "02",
@@ -192,7 +192,7 @@ const PROCESS_STEPS = [
 const FAQ_ITEMS = [
   {
     q: "Wie schnell ist ein Go-Live realistisch?",
-    a: "Einzelne Workflows wie Terminbestätigungen oder der KI-Telefonassistent sind oft in 7–14 Tagen live. Vollständige Systemverbünde aus Website, KI-Assistenten und Automatisierung planen wir in 3–6 Wochen — abhängig vom Scope und wie schnell Feedback kommt.",
+    a: "Einzelne Workflows wie Terminbestätigungen oder der KI-Telefonassistent sind oft in 7–14 Tagen live. Vollständige Systemverbünde aus Website, KI-Assistenten und Automatisierung planen wir in 3–6 Wochen — abhängig vom Scope und wie schnell Feedback kommt.",
   },
   {
     q: "Was kostet ein System?",
@@ -200,7 +200,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Sind die Systeme DSGVO-konform?",
-    a: "Ja, und das ist kein Marketingversprechen. Alle Daten werden ausschließlich auf europäischen Servern verarbeitet. Wir liefern mit jedem System die notwendige Dokumentation: Datenschutzerklärung, AVV und Cookie-Consent. Für Praxen und Betriebe mit sensiblen Patientendaten gibt es spezielle Konfigurationen.",
+    a: "Diesen Satz stellen wir uns nicht selbst aus — konform ist eine Verarbeitung, kein Produkt. Was wir sagen können: Zu jedem System liefern wir Datenschutzerklärung, Auftragsverarbeitungsvertrag und Cookie-Einwilligung. Zum Verarbeitungsort machen wir derzeit keine Angabe — die Verträge mit den beteiligten Anbietern sind nicht abschließend unterzeichnet. Für Betriebe mit sensiblen Daten stimmen wir die Konfiguration gesondert ab. Die Bewertung des konkreten Einsatzes bleibt bei Ihrem Datenschutzbeauftragten.",
   },
   {
     q: "Kann das in unsere bestehenden Tools integriert werden?",
@@ -462,7 +462,7 @@ export function LeistungenPage() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.32 }}
             >
-              {["DSGVO-konform", "Europa-Hosting", "Setup 7–14 Tage", "Remote möglich"].map((chip) => (
+              {["Remote möglich"].map((chip) => (
                 <span
                   key={chip}
                   className="inline-block px-3 py-1 text-[11px] font-medium text-gray-500 dark:text-gray-500 border border-gray-200 dark:border-gray-800 tracking-wide"

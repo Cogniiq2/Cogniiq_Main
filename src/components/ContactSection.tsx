@@ -17,8 +17,6 @@ import {
   CircleCheck as CheckCircle,
   Sparkles,
   ShieldCheck,
-  Lock,
-  Server,
   BadgeCheck,
 } from 'lucide-react';
 import { PremiumCalendar } from './PremiumCalendar';
@@ -41,14 +39,12 @@ const STEPS = [
 
 const afterSteps = [
   { n: '01', label: 'Eingangsbestätigung', sub: 'Automatisch · sofort' },
-  { n: '02', label: 'Systemanalyse', sub: 'Innerhalb 24 h' },
+  { n: '02', label: 'Systemanalyse', sub: 'Nach Ihrer Anfrage' },
   { n: '03', label: 'Analysegespräch', sub: '45 Min. · Video' },
   { n: '04', label: 'Systemkonzept', sub: 'Maßgeschneidert' },
 ];
 
 const DSGVO_BADGES = [
-  { icon: Lock, label: 'DSGVO-konform' },
-  { icon: Server, label: 'Europäische Server' },
   { icon: ShieldCheck, label: 'SSL-verschlüsselt' },
   { icon: BadgeCheck, label: 'Keine Weitergabe' },
 ];
@@ -200,7 +196,7 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             </SelectTrigger>
             <SelectContent className="bg-white border border-gray-200 shadow-lg rounded-xl text-sm">
               <SelectItem value="asap" className="py-2.5 cursor-pointer">So schnell wie möglich</SelectItem>
-              <SelectItem value="1-2months" className="py-2.5 cursor-pointer">In 1–2 Monaten</SelectItem>
+              <SelectItem value="1-2months" className="py-2.5 cursor-pointer">In 1–2&nbsp;Monaten</SelectItem>
               <SelectItem value="3+months" className="py-2.5 cursor-pointer">In 3+ Monaten</SelectItem>
             </SelectContent>
           </Select>
@@ -306,7 +302,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       <div>
         <FormLabel optional>Bevorzugter Gesprächstermin</FormLabel>
         <p className="text-[12px] text-gray-400 mb-3 leading-relaxed">
-          Wählen Sie optional einen Wunschtermin. Wir bestätigen Ihnen den Termin in der Regel innerhalb von 24 Stunden.
+          Wählen Sie optional einen Wunschtermin. Wir bestätigen Ihnen den Termin in der Regel innerhalb von 24&nbsp;Stunden.
         </p>
         <div className="mt-1">
           <PremiumCalendar
@@ -326,7 +322,7 @@ function Step3({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             { label: 'E-Mail', value: data.email },
             { label: 'Unternehmen', value: data.company },
             { label: 'Branche', value: data.industry },
-            { label: 'Start', value: data.timeline === 'asap' ? 'So schnell wie möglich' : data.timeline === '1-2months' ? '1–2 Monate' : '3+ Monate' },
+            { label: 'Start', value: data.timeline === 'asap' ? 'So schnell wie möglich' : data.timeline === '1-2months' ? '1–2 Monate' : '3+ Monate' },
             { label: 'Services', value: data.interests.join(', ') || '—' },
           ].map(({ label, value }) => (
             <div key={label}>
@@ -477,7 +473,7 @@ export function ContactSection() {
               <CheckCircle size={13} className="text-emerald-600 flex-shrink-0 mt-0.5" />
               <p className="text-[12px] text-emerald-700 leading-relaxed">
                 Antwort in der Regel innerhalb von{' '}
-                <span className="font-semibold">24 Stunden</span>
+                <span className="font-semibold">24&nbsp;Stunden</span>
               </p>
             </div>
 

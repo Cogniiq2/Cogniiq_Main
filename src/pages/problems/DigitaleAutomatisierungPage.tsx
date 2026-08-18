@@ -39,17 +39,16 @@ const config: ProblemPageConfig = {
       },
       {
         title: "Kundenerwartungen steigen ständig",
-        description: "Kunden erwarten schnelle Reaktionszeiten, 24/7-Erreichbarkeit und nahtlose digitale Prozesse. Ohne Automatisierung können diese Erwartungen nicht erfüllt werden.",
+        description: "Kunden erwarten schnelle Reaktionszeiten, 24/7-Erreichbarkeit und durchgängige digitale Prozesse. Ohne Automatisierung können diese Erwartungen nicht erfüllt werden.",
       },
     ],
   },
   solution: {
     headline: "Digitale Automatisierung: einfacher als Sie denken.",
-    text: "Der richtige Einstieg in die Automatisierung beginnt mit dem Prozess, der den größten ROI hat. Cogniiq analysiert Ihre Abläufe, identifiziert Quick-Wins und setzt diese innerhalb von Wochen um – DSGVO-konform und vollständig dokumentiert.",
+    text: "Der richtige Einstieg in die Automatisierung beginnt mit dem Prozess, der den größten ROI hat. Cogniiq analysiert Ihre Abläufe, identifiziert Quick-Wins und setzt diese innerhalb von Wochen um – vollständig dokumentiert.",
     bullets: [
       "Kostenlose Analyse Ihrer automatisierungsfähigen Prozesse",
       "Quick-Win-Automatisierungen in 1–3 Wochen live",
-      "DSGVO-konform auf deutschen/europäischen Servern",
       "Vollständige Dokumentation – keine Abhängigkeit",
       "Schulung Ihres Teams in der Nutzung der Systeme",
       "Skalierbar: von einem Workflow zur vollständigen Digitalisierung",

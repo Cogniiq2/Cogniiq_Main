@@ -1,3 +1,16 @@
+## Website copy briefs (binding for all customer-facing copy)
+
+- `.claude/COPY-BRIEF.md` — Master prompt I: evidence base, voice spec, banned
+  words, approved statistics, page playbooks, QA gate. Binding for every line
+  of customer-facing copy (German, Sie-Form).
+- `.claude/COPY-BRIEF-2.md` — Master prompt II: trust layer (M13–M22), honesty
+  audit, positioning decision, `[[CLAIM]]`/`[[ASSET]]` marker conventions.
+  Phase 0 (`OWNER-INPUT.md`) is blocking: no copy that depends on unverified
+  pricing, integrations, response times or the Art.-50 announcement until the
+  owner has answered.
+- Status docs at repo root: `COPY-INVENTORY.md`, `COPY-SEO-CHANGELOG.md`,
+  `COPY-CLAIMS-TO-VERIFY.md`, `COPY-GAPS.md`, `OWNER-INPUT.md`.
+
 ## graphify
 
 This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.

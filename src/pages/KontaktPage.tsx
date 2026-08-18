@@ -55,7 +55,7 @@ const PROCESS_STEPS = [
   {
     number: "03",
     title: "Strategiegespräch (Video)",
-    description: "30–45 Minuten fokussiertes Gespräch über konkrete Potenziale und nächste Schritte.",
+    description: "30–45 Minuten fokussiertes Gespräch über konkrete Potenziale und nächste Schritte.",
   },
   {
     number: "04",
@@ -265,7 +265,7 @@ export function KontaktPage() {
                       </span>
                     </div>
                     <p className="text-[11.5px] text-gray-600 leading-relaxed">
-                      Antwort in der Regel innerhalb von 24 Stunden · Go-Live typischerweise in 7–14 Tagen ·
+                      Antwort in der Regel innerhalb von 24&nbsp;Stunden ·
                       kein Formular-Loop — persönliches Gespräch
                     </p>
                   </div>

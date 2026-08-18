@@ -14,18 +14,18 @@ const config: IndustryPageConfig = {
   seo: {
     title: "Webdesign & KI-Telefonassistent für Arztpraxen in München | Cogniiq",
     description:
-      "Praxis Website München: Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungen für Arztpraxen in München. Weniger Telefonüberlastung, mehr Online-Termine, DSGVO-konform.",
+      "Praxis Website München: Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungen für Arztpraxen in München. Weniger Telefonüberlastung, mehr Online-Termine, persönlich betreut.",
     canonical: `${base}/webdesign-arzt-muenchen`,
     keywords:
       "Praxis Website München, Arzt Website München, Terminbuchung Praxis München, KI Rezeption Arztpraxis München",
   },
   hero: {
-    trustTags: ["München", "DSGVO-konform", "KI-Integration", "Terminprozesse", "Automatisierung"],
+    trustTags: ["München", "KI-Integration", "Terminprozesse", "Automatisierung"],
     ctaLabel: "Projekt für Arztpraxis starten",
   },
   intro: {
     h1: "Webdesign & KI-Telefonassistent für Arztpraxen in München",
-    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Arztpraxen in München – für mehr Patientenanfragen, bessere Erreichbarkeit und automatisierte Terminprozesse. DSGVO-konform, schnell eingerichtet.",
+    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Arztpraxen in München – für mehr Patientenanfragen, bessere Erreichbarkeit und automatisierte Terminprozesse. Schnell eingerichtet, persönlich betreut.",
   },
   problems: [
     "In einer Millionenstadt wie München ist die Konkurrenz unter Praxen hoch – eine veraltete Website kostet täglich neue Patienten",
@@ -41,7 +41,7 @@ const config: IndustryPageConfig = {
       icon: "web",
       title: "Praxis-Website München",
       description:
-        "Hochperformante Praxis-Website mit Online-Terminbuchung, klarer Leistungsübersicht, Arztprofilen und gezieltem SEO für Suchanfragen wie 'Arzt München' oder 'Praxis München'. Conversion-optimiert, mobilfreundlich, DSGVO-konform – damit Ihre Praxis in der Münchner Suchergebnisseite sichtbar bleibt.",
+        "Hochperformante Praxis-Website mit Online-Terminbuchung, klarer Leistungsübersicht, Arztprofilen und gezieltem SEO für Suchanfragen wie 'Arzt München' oder 'Praxis München'. Conversion-optimiert und mobilfreundlich – damit Ihre Praxis in der Münchner Suchergebnisseite sichtbar bleibt.",
     },
     {
       icon: "phone",
@@ -53,7 +53,7 @@ const config: IndustryPageConfig = {
       icon: "zap",
       title: "Praxis-Automatisierung München",
       description:
-        "Terminbestätigungen, Erinnerungs-SMS, Recall-Kampagnen und Patientenkommunikation laufen automatisiert ab. Besonders in großstädtischen Praxen mit hohem Durchsatz reduziert das den administrativen Aufwand messbar und senkt die No-Show-Rate.",
+        "Terminbestätigungen, Erinnerungs-SMS, Recall-Kampagnen und Patientenkommunikation laufen automatisiert ab. Besonders in großstädtischen Praxen mit hohem Durchsatz reduziert das den administrativen Aufwand, und Erinnerungen wirken No-Shows entgegen.",
     },
   ],
   useCases: [
@@ -65,12 +65,12 @@ const config: IndustryPageConfig = {
     {
       title: "Automatische Terminerinnerungen",
       description:
-        "Patienten erhalten kurz vor dem Termin automatisch eine Erinnerung per SMS oder E-Mail. Die No-Show-Rate sinkt messbar – gerade in gut ausgelasteten Münchner Praxen ein entscheidender Effizienzgewinn.",
+        "Patienten erhalten kurz vor dem Termin automatisch eine Erinnerung per SMS oder E-Mail. Erinnerungen wirken No-Shows entgegen – gerade in gut ausgelasteten Münchner Praxen ein spürbarer Effizienzgewinn.",
     },
     {
       title: "Rezeption entlasten bei Stoßzeiten",
       description:
-        "Montags früh und während der Mittagspause ist die Rezeption in Münchner Praxen chronisch überlastet. Der KI-Telefonassistent nimmt parallel Anrufe entgegen, ohne Warteschleife – alle Anfragen werden zuverlässig erfasst.",
+        "Montags früh und während der Mittagspause ist die Rezeption in Münchner Praxen chronisch überlastet. Der KI-Telefonassistent nimmt parallel Anrufe entgegen, ohne Warteschleife – Anfragen werden strukturiert erfasst.",
     },
     {
       title: "Patientenanfragen über die Website qualifizieren",
@@ -85,22 +85,21 @@ const config: IndustryPageConfig = {
     {
       title: "Suchmaschinenoptimierung für lokale Suchanfragen",
       description:
-        "Die Praxis-Website wird technisch und inhaltlich so optimiert, dass sie bei Suchanfragen wie 'Arzt München', 'Hausarzt München' oder '[Fachrichtung] München' sichtbar erscheint – für messbaren Zustrom neuer Patienten.",
+        "Die Praxis-Website wird technisch und inhaltlich so optimiert, dass sie bei Suchanfragen wie 'Arzt München', 'Hausarzt München' oder '[Fachrichtung] München' sichtbar erscheint – und so neue Patienten erreicht.",
     },
   ],
   benefits: [
-    "Keine verpassten Anrufe mehr – der KI-Assistent nimmt auch bei vollem Betrieb alle Anrufe entgegen",
+    "Erreichbar auch dann, wenn niemand abnehmen kann – der KI-Assistent nimmt auch bei vollem Betrieb Anrufe entgegen",
     "Automatisierte Terminprozesse entlasten das Praxisteam in einer Großstadt mit hohem Anfragevolumen",
     "Mehr qualifizierte Patientenanfragen durch eine suchmaschinenoptimierte Praxis-Website für München",
     "Erreichbarkeit außerhalb der Sprechzeiten – in München eine Grundvoraussetzung für Patientenzufriedenheit",
     "Zeitersparnis durch automatisierte Erinnerungen, Bestätigungen und Kommunikationsabläufe",
     "Professioneller erster Eindruck durch moderne Website – besonders wichtig im Münchner Wettbewerb",
-    "Datenschutzorientierte Umsetzung – alle Daten werden ausschließlich auf europäischen Servern verarbeitet",
   ],
   localContext: [
     "München ist einer der dichtesten Gesundheitsmärkte Deutschlands. Arztpraxen konkurrieren in der Millionenstadt nicht nur um Kassenpatienten, sondern auch um Privatpatienten und Selbstzahler. Gleichzeitig sind die Erwartungen an Digitalität und Service in München überdurchschnittlich hoch – Patienten erwarten Online-Terminbuchung, schnelle Reaktionszeiten und eine moderne Praxis-Website als Selbstverständlichkeit.",
     "Cogniiq entwickelt für Arztpraxen in München maßgeschneiderte Digitallösungen: eine hochperformante Praxis-Website mit integrierter Terminbuchung, einen KI-Telefonassistenten, der die Rezeption auch außerhalb der Sprechzeiten entlastet, sowie Automatisierungssysteme, die Terminerinnerungen, Patientenkommunikation und interne Abläufe ohne manuellen Aufwand steuern.",
-    "Alle Systeme werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Die Betreuung erfolgt durch Cogniiq persönlich – transparent, direkt und ohne unnötige Zwischenstellen.",
+    "Alle Systeme werden datenschutzorientiert umgesetzt. Die Betreuung erfolgt durch Cogniiq persönlich – transparent, direkt und ohne unnötige Zwischenstellen.",
   ],
   internalLinks: [
     { label: "Webdesign München", href: "/muenchen/webdesign" },
@@ -115,9 +114,9 @@ const config: IndustryPageConfig = {
   ],
   faq: [
     {
-      question: "Kann Cogniiq eine DSGVO-konforme Praxis-Website in München erstellen?",
+      question: "Was liefert Cogniiq zum Datenschutz einer Praxis-Website in München?",
       answer:
-        "Ja. Alle Websites und Systeme von Cogniiq werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse. Formulare, Datenschutzerklärungen, Cookie-Einwilligungen und die Datenverarbeitung entsprechen den geltenden Datenschutzanforderungen für Arztpraxen.",
+        "Zum Lieferumfang gehören Datenschutzerklärung, Impressum, Cookie-Einwilligung, gesicherte Formularübertragung und die Dokumentation der Datenflüsse. Ob der konkrete Einsatz den Anforderungen genügt, beurteilt Ihr Datenschutzbeauftragter – wir liefern ihm die Unterlagen dafür zu.",
     },
     {
       question: "Funktioniert der KI-Telefonassistent mit meiner bestehenden Praxissoftware?",
@@ -127,7 +126,7 @@ const config: IndustryPageConfig = {
     {
       question: "Wie lange dauert die Einrichtung für eine Arztpraxis in München?",
       answer:
-        "Die Einrichtung dauert in der Regel 7–14 Tage und wird vollständig von Cogniiq übernommen. Sie müssen keine technischen Vorkenntnisse mitbringen.",
+        "Die Einrichtung wird vollständig von Cogniiq übernommen. Sie müssen keine technischen Vorkenntnisse mitbringen.",
     },
     {
       question: "Kann ich meinen Münchner Patienten Online-Terminbuchung anbieten?",

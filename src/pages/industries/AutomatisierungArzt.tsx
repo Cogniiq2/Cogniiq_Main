@@ -5,13 +5,13 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 const config: NationalIndustryPageConfig = {
   seo: {
     title: "Automatisierung für Arztpraxen & Praxisverwaltung | Cogniiq",
-    description: "Praxisautomatisierung: Terminbestätigungen, Patientenerinnerungen und Rezeptanfragen laufen vollautomatisch – DSGVO-konform, ohne zusätzliches Personal. Mehr Zeit für Ihre Patienten.",
+    description: "Praxisautomatisierung: Terminbestätigungen, Patientenerinnerungen und Rezeptanfragen laufen automatisch – ohne zusätzliches Personal. Mehr Zeit für Ihre Patienten.",
     canonical: `${BUSINESS_INFO.website}/automatisierung-arzt`,
     keywords: "Automatisierung Arztpraxis, Praxis Digitalisierung, Patientenkommunikation automatisieren, Praxisverwaltung Automatisierung",
   },
   h1: "Automatisierung für Arztpraxen & Praxisverwaltung",
-  tagline: "Arztpraxis · Routineprozesse · DSGVO-konform",
-  intro: "Jeden Morgen dasselbe: Terminbestätigungen rausschicken, Rezeptanfragen entgegennehmen, Erinnerungen verschicken, Wartelisten manuell abarbeiten. Jede dieser Aufgaben ist notwendig – aber keine davon braucht einen Menschen. Cogniiq automatisiert diese Routinen vollständig und DSGVO-konform, damit Ihr Team sich auf das konzentriert, was wirklich zählt.",
+  tagline: "Arztpraxis · Routineprozesse · Persönliche Betreuung",
+  intro: "Jeden Morgen dasselbe: Terminbestätigungen rausschicken, Rezeptanfragen entgegennehmen, Erinnerungen verschicken, Wartelisten manuell abarbeiten. Jede dieser Aufgaben ist notwendig – aber keine davon braucht einen Menschen. Cogniiq automatisiert diese Routinen vollständig, damit Ihr Team sich auf das konzentriert, was wirklich zählt.",
   serviceSlug: "leistungen",
   serviceLabel: "Automatisierung Leistungen",
   costLink: "/kosten-automatisierung",
@@ -19,7 +19,7 @@ const config: NationalIndustryPageConfig = {
   problems: [
     {
       title: "Terminbestätigungen binden täglich Stunden",
-      description: "Jeden Termin einzeln bestätigen, erinnern und bei Absagen nachfassen: In einer mittelgroßen Praxis kostet das 1–2 Stunden pro Tag – ohne jeden medizinischen Mehrwert.",
+      description: "Jeden Termin einzeln bestätigen, erinnern und bei Absagen nachfassen: In einer mittelgroßen Praxis kostet das täglich spürbar Zeit – ohne jeden medizinischen Mehrwert.",
     },
     {
       title: "Rezeptanfragen kommen per Telefon, gehen im Alltag unter",
@@ -39,7 +39,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       title: "Bewertungen entstehen nicht von selbst",
-      description: "Zufriedene Patienten denken nicht automatisch daran, eine Google-Bewertung zu hinterlassen. Ein automatisierter, freundlicher Follow-up nach dem Termin erhöht die Bewertungsrate messbar – ohne aktives Zutun.",
+      description: "Die wenigsten Patienten denken nach dem Termin daran, eine Bewertung zu hinterlassen. Ein automatisierter, freundlicher Follow-up macht es ihnen leichter.",
     },
   ],
   solution: {
@@ -47,11 +47,11 @@ const config: NationalIndustryPageConfig = {
     text: "Cogniiq automatisiert die Routineprozesse Ihrer Praxis vollständig: Terminbestätigungen, Erinnerungen, Rezeptanfragen, Wartelistenkontakt und Follow-ups laufen ohne manuellen Aufwand. Das Ergebnis: ein entlastetes Team, weniger Fehler und Patienten, die besser informiert sind.",
   },
   benefits: [
-    "Terminbestätigung und Erinnerung vollautomatisch",
+    "Terminbestätigung und Erinnerung automatisch",
     "Warteliste wird bei Absagen sofort automatisch kontaktiert",
     "Rezeptanfragen digital strukturiert und weitergeleitet",
     "Patientendaten systemübergreifend synchronisiert",
-    "DSGVO-konforme Verarbeitung mit AVV auf europäischen Servern",
+    "Verarbeitung mit Auftragsverarbeitungsvertrag",
     "Bewertungsanfragen nach jedem Termin automatisch versandt",
     "Einrichtung in 2–4 Wochen, ohne Praxisunterbrechung",
   ],
@@ -66,7 +66,7 @@ const config: NationalIndustryPageConfig = {
       {
         step: "02",
         title: "Automatische Kommunikation",
-        description: "Bestätigung sofort, Terminerinnerung 24 Stunden vorher, Hinweise auf mitzubringende Unterlagen – alles ohne einen einzigen manuellen Schritt.",
+        description: "Bestätigung sofort, Terminerinnerung 24 Stunden vorher, Hinweise auf mitzubringende Unterlagen – alles ohne einen einzigen manuellen Schritt.",
       },
       {
         step: "03",
@@ -91,8 +91,8 @@ const config: NationalIndustryPageConfig = {
   ],
   faq: [
     {
-      question: "Ist Praxisautomatisierung wirklich DSGVO-konform?",
-      answer: "Ja – und das ist für uns keine Selbstverständlichkeit, sondern Grundbedingung. Cogniiq arbeitet ausschließlich mit DSGVO-konformen Tools auf deutschen bzw. europäischen Servern. Jede Automatisierung wird mit einem Auftragsverarbeitungsvertrag (AVV) geliefert. Patientendaten verlassen niemals die vereinbarten Systeme.",
+      question: "Wie ist der Datenschutz bei der Praxisautomatisierung geregelt?",
+      answer: "Jede Automatisierung wird mit einem Auftragsverarbeitungsvertrag (AVV) geliefert, und Patientendaten verlassen die vereinbarten Systeme nicht. Zum Verarbeitungsort machen wir derzeit keine Angabe — die Verträge mit den beteiligten Anbietern sind nicht abschließend unterzeichnet. Ob der konkrete Einsatz in Ihrer Praxis den Anforderungen genügt, beurteilt Ihr Datenschutzbeauftragter – wir liefern ihm die Unterlagen dafür zu.",
     },
     {
       question: "Funktioniert die Automatisierung mit unserer bestehenden Praxissoftware?",
@@ -100,7 +100,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Was kostet Praxisautomatisierung?",
-      answer: "Einzelne Workflows wie Terminbestätigungen beginnen bei ca. 600–1.200 €. Umfassende Praxisautomatisierungen mit Systemintegration, Wartelistenmanagement und Follow-up-Sequenzen typischerweise 2.000–4.500 €. Das genaue Angebot erhalten Sie nach einem kostenlosen Erstgespräch.",
+      answer: "Einzelne Workflows wie Terminbestätigungen beginnen bei ca. 600–1.200 €. Umfassende Praxisautomatisierungen mit Systemintegration, Wartelistenmanagement und Follow-up-Sequenzen typischerweise 2.000–4.500 €. Das genaue Angebot erhalten Sie nach einem kostenlosen Erstgespräch.",
     },
     {
       question: "Wie lange dauert die Einrichtung – und merken unsere Patienten etwas davon?",

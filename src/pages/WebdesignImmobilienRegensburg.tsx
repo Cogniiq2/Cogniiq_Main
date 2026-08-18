@@ -14,18 +14,18 @@ const config: IndustryPageConfig = {
   seo: {
     title: "Webdesign & KI-Telefonassistent für Immobilienmakler in Regensburg | Cogniiq",
     description:
-      "Immobilien Website Regensburg: Cogniiq entwickelt Websites, KI-Telefonassistenten und Lead-Automatisierungen für Immobilienmakler in Regensburg. Mehr Anfragen, automatisierte Besichtigungen, DSGVO-konform.",
+      "Immobilien Website Regensburg: Cogniiq entwickelt Websites, KI-Telefonassistenten und Lead-Automatisierungen für Immobilienmakler in Regensburg. Mehr Anfragen, automatisierte Besichtigungen, persönlich betreut.",
     canonical: `${base}/webdesign-immobilien-regensburg`,
     keywords:
       "Immobilien Website Regensburg, Makler Website Regensburg, Immobilienmakler Regensburg Digital, KI Telefonassistent Immobilien Regensburg",
   },
   hero: {
-    trustTags: ["Regensburg", "DSGVO-konform", "KI-Integration", "Lead-Qualifizierung", "Automatisierung"],
+    trustTags: ["Regensburg", "KI-Integration", "Lead-Qualifizierung", "Automatisierung"],
     ctaLabel: "Projekt für Immobilienmakler starten",
   },
   intro: {
     h1: "Webdesign & KI-Telefonassistent für Immobilienmakler in Regensburg",
-    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Immobilienmakler in Regensburg – für mehr qualifizierte Kaufanfragen, automatisierte Besichtigungsprozesse und professionelle Objektpräsentation. DSGVO-konform, schnell eingerichtet.",
+    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Immobilienmakler in Regensburg – für mehr qualifizierte Kaufanfragen, automatisierte Besichtigungsprozesse und professionelle Objektpräsentation. Schnell eingerichtet, persönlich betreut.",
   },
   engpaesse: [
     "Regensburg wächst überdurchschnittlich – die Nachfrage nach Wohnraum übersteigt das Angebot, was zu einem hohen Anfragevolumen führt",
@@ -43,7 +43,7 @@ const config: IndustryPageConfig = {
     },
     {
       step: "Schritt 2",
-      title: "Umsetzung in 7–14 Tagen",
+      title: "Umsetzung nach Ihrer Freigabe",
       description:
         "Makler-Website mit Objektpräsentation, KI-Telefonassistent für Interessentenanfragen und Automatisierungsworkflows für Besichtigungen und Follow-ups werden vollständig von Cogniiq aufgebaut.",
     },
@@ -72,7 +72,7 @@ const config: IndustryPageConfig = {
         "Strukturierte Objektseiten mit Exposé-Darstellung",
         "Kontaktformular mit automatischer Lead-Benachrichtigung",
         "On-Page SEO für 'Immobilienmakler Regensburg'",
-        "DSGVO-konforme Datenschutzdokumentation",
+        "Datenschutzerklärung, Impressum und Cookie-Einwilligung",
       ],
     },
     {
@@ -112,7 +112,7 @@ const config: IndustryPageConfig = {
       icon: "web",
       title: "Immobilien-Website Regensburg",
       description:
-        "Hochwertige Makler-Website mit professionellen Objektseiten, Exposé-Darstellung, Anfrage-Workflow und gezieltem SEO für Suchanfragen wie 'Immobilienmakler Regensburg' oder 'Wohnung kaufen Regensburg'. Mobiloptimiert, conversion-stark, DSGVO-konform.",
+        "Hochwertige Makler-Website mit professionellen Objektseiten, Exposé-Darstellung, Anfrage-Workflow und gezieltem SEO für Suchanfragen wie 'Immobilienmakler Regensburg' oder 'Wohnung kaufen Regensburg'. Mobiloptimiert und conversion-stark.",
     },
     {
       icon: "phone",
@@ -124,7 +124,7 @@ const config: IndustryPageConfig = {
       icon: "zap",
       title: "Lead-Automatisierung Regensburg",
       description:
-        "Eingehende Anfragen werden automatisch qualifiziert, Besichtigungen koordiniert und Follow-ups nach Terminen strukturiert versandt. Keine Anfrage geht verloren, kein Interessent bleibt ohne Reaktion.",
+        "Eingehende Anfragen werden automatisch qualifiziert, Besichtigungen koordiniert und Follow-ups nach Terminen strukturiert versandt. Anfragen werden erfasst und beantwortet – auch abends und am Wochenende.",
     },
   ],
   useCases: [
@@ -136,7 +136,7 @@ const config: IndustryPageConfig = {
     {
       title: "Besichtigungstermine ohne manuelle Koordination",
       description:
-        "Interessenten buchen Besichtigungstermine direkt über die Website oder per KI-Assistent. Bestätigungen, Erinnerungen und Nachfassaktionen laufen vollautomatisch.",
+        "Interessenten buchen Besichtigungstermine direkt über die Website oder per KI-Assistent. Bestätigungen, Erinnerungen und Nachfassaktionen laufen automatisch.",
     },
     {
       title: "Objektanfragen außerhalb der Bürozeiten",
@@ -163,15 +163,14 @@ const config: IndustryPageConfig = {
     "Mehr qualifizierte Leads durch strukturierte Vorqualifizierung im Anfrage-Prozess",
     "Automatisierte Besichtigungskoordination spart Maklerzeit in einem Markt mit hohem Anfragevolumen",
     "Professionelle Objektpräsentation stärkt Vertrauen bei Käufern und Verkäufern in Regensburg",
-    "Keine verpassten Anfragen – KI-Assistent beantwortet auch abends und am Wochenende",
+    "Anfragen werden erfasst und beantwortet – der KI-Assistent antwortet auch abends und am Wochenende",
     "Follow-up-Automatisierung erhöht die Abschlussrate ohne zusätzlichen Aufwand",
     "Bessere Sichtbarkeit bei lokalen und überregionalen Suchanfragen – mehr organische Anfragen",
-    "Datenschutzorientierte Umsetzung – alle Kundendaten sicher auf europäischen Servern",
   ],
   localContext: [
     "Regensburg ist eine der am stärksten wachsenden Städte Bayerns. Der Immobilienmarkt ist geprägt von stabiler bis steigender Nachfrage – sowohl lokal als auch von Zugezogenen aus dem Großraum München. Makler profitieren von der dynamischen Marktlage, stehen aber vor der Herausforderung, qualifizierte Leads effizient zu bearbeiten.",
     "Cogniiq entwickelt für Immobilienmakler in Regensburg maßgeschneiderte Digitallösungen: eine hochwertige Makler-Website mit strukturierten Objektseiten, einen KI-Telefonassistenten für Interessentenanfragen sowie Automatisierungssysteme für Lead-Qualifizierung, Besichtigungsplanung und Follow-up-Prozesse.",
-    "Cogniiq betreut Projekte in Regensburg remote und ist für persönliche Abstimmungen direkt erreichbar. Die Einrichtung dauert 7–14 Tage. Alle Systeme werden datenschutzorientiert umgesetzt und auf europäischen Servern betrieben.",
+    "Cogniiq betreut Projekte in Regensburg remote und ist für persönliche Abstimmungen direkt erreichbar. Alle Systeme werden datenschutzorientiert umgesetzt.",
   ],
   internalLinks: [
     { label: "Webdesign Regensburg", href: "/regensburg/webdesign" },
@@ -185,9 +184,9 @@ const config: IndustryPageConfig = {
   ],
   faq: [
     {
-      question: "Kann Cogniiq eine DSGVO-konforme Makler-Website in Regensburg erstellen?",
+      question: "Was liefert Cogniiq zum Datenschutz einer Makler-Website in Regensburg erstellen?",
       answer:
-        "Ja. Alle Websites und Systeme werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse – mit korrekten Datenschutzdokumentationen, Cookie-Einwilligungen und sicherer Verarbeitung aller Interessentendaten auf europäischen Servern.",
+        "Zum Lieferumfang gehören Datenschutzerklärung, Impressum, Cookie-Einwilligung und die dokumentierte Verarbeitung der Interessentendaten. Zum Verarbeitungsort machen wir derzeit keine Angabe — die Verträge mit den beteiligten Anbietern sind nicht abschließend unterzeichnet. Ob der konkrete Einsatz den Anforderungen genügt, beurteilt Ihr Datenschutzbeauftragter – wir liefern ihm die Unterlagen dafür zu.",
     },
     {
       question: "Wie werden Interessentenanfragen über die Website automatisch vorqualifiziert?",
@@ -197,7 +196,7 @@ const config: IndustryPageConfig = {
     {
       question: "Wie lange dauert die Einrichtung für einen Immobilienmakler in Regensburg?",
       answer:
-        "Die Einrichtung dauert in der Regel 7–14 Tage. Website, KI-Assistent und Automatisierungs-Workflows werden vollständig von Cogniiq aufgebaut – Sie müssen keine technischen Vorkenntnisse mitbringen.",
+        "Website, KI-Assistent und Automatisierungs-Workflows werden vollständig von Cogniiq aufgebaut – Sie müssen keine technischen Vorkenntnisse mitbringen.",
     },
     {
       question: "Kann der KI-Telefonassistent auch Fragen zu spezifischen Objekten in Regensburg beantworten?",

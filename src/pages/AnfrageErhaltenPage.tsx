@@ -35,7 +35,6 @@ export function AnfrageErhaltenPage() {
             className="flex justify-center mb-10"
           >
             <div className="relative w-20 h-20">
-              <div className="absolute inset-0 rounded-full bg-emerald-100 dark:bg-emerald-900/30 animate-ping opacity-20" />
               <div className="relative w-20 h-20 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center">
                 <CheckCircle2 size={34} className="text-emerald-400" strokeWidth={1.6} />
               </div>

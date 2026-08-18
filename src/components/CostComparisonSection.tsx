@@ -5,7 +5,7 @@ import {
   ArrowRight, CircleCheck as CheckCircle, X, Info,
   User, Bot, TrendingDown,
 } from 'lucide-react';
-import { type Industry, INDUSTRY_PRESETS } from './ROICalculator';
+import { type Industry, INDUSTRY_PRESETS } from '@/lib/roi-presets';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
@@ -16,6 +16,8 @@ const INDUSTRY_ICONS: Record<Industry, string> = {
   Immobilien:     '🏢',
 };
 
+// [[CLAIM: verify — 297 € ist ein Beispielwert und weicht von den publizierten
+// Preisstaffeln (99/199–399/499 €) ab; vom Inhaber vereinheitlichen (OWNER-INPUT A1)]]
 const KI_PRICE_MONTHLY = 297;
 
 function AnimatedNumber({ value, prefix = '', suffix = '', decimals = 0 }: { value: number; prefix?: string; suffix?: string; decimals?: number }) {
@@ -105,11 +107,11 @@ const HUMAN_CAPABILITIES = [
   { label: 'Anrufe annehmen', human: true, ki: true },
   { label: 'Terminbuchung außerhalb der Öffnungszeiten', human: false, ki: true },
   { label: 'Gleichzeitige Anrufe', human: false, ki: true },
-  { label: 'Kein Urlaub, kein Ausfall', human: false, ki: true },
+  { label: 'Kein Urlaub, keine Krankheit', human: false, ki: true },
   { label: 'Empathische Sonderfälle', human: true, ki: false },
   { label: 'Kalender-/CRM-Integration', human: false, ki: true },
   { label: 'Sofortige Bestätigung (SMS/Mail)', human: false, ki: true },
-  { label: 'DSGVO-konform', human: true, ki: true },
+  { label: 'Auftragsverarbeitungsvertrag nach Art. 28 DSGVO', human: true, ki: true },
 ];
 
 export function CostComparisonSection() {
@@ -226,7 +228,7 @@ export function CostComparisonSection() {
               />
               <MiniSlider
                 label="Stundensatz (inkl. AG-Kosten)"
-                tooltip="Bruttogehalt + Sozialabgaben + Nebenkosten. Typisch: 25–50 €/h."
+                tooltip="Bruttogehalt + Sozialabgaben + Nebenkosten. Typisch: 25–50 €/h."
                 value={humanRate}
                 min={12} max={80} step={1} unit="€/h"
                 onChange={setHumanRate}
@@ -293,7 +295,7 @@ export function CostComparisonSection() {
               style={{ background: 'linear-gradient(90deg, transparent, rgba(2,132,199,0.4), rgba(16,185,129,0.2), transparent)' }}
             />
 
-            <div className="relative px-8 py-6 border-b border-white/[0.06]">
+            <div data-review-claim="preis-beispielwert" className="relative px-8 py-6 border-b border-white/[0.06]">
               <div className="flex items-center gap-3 mb-1">
                 <div className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
                   <Bot size={14} className="text-sky-400" />
@@ -303,7 +305,7 @@ export function CostComparisonSection() {
                   Empfohlen
                 </span>
               </div>
-              <p className="text-[11.5px] text-gray-500">Fixpreis. Transparent. Sofort einsetzbar.</p>
+              <p className="text-[11.5px] text-gray-500">Beispielwert. Fester Monatsbetrag, im Angebot verbindlich.</p>
             </div>
 
             <div className="relative px-8 py-6">
@@ -314,12 +316,13 @@ export function CostComparisonSection() {
                 </p>
                 <div className="flex items-baseline gap-2">
                   <span className="text-[42px] font-bold text-white tabular-nums leading-none">
-                    {KI_PRICE_MONTHLY} €
+                    {KI_PRICE_MONTHLY}&nbsp;€
                   </span>
                   <span className="text-[13px] text-gray-500">/ Monat</span>
                 </div>
+                {/* [[CLAIM: verify — Vertragskonditionen (kündbar monatlich) OWNER-INPUT A4/A5]] */}
                 <p className="text-[11.5px] text-gray-600 mt-2">
-                  Einmalige Einrichtung · kündbar monatlich · kein verstecktes
+                  Einmalige Einrichtung wird im Angebot ausgewiesen · Laufzeit und Kündigung stehen im Vertrag
                 </p>
               </div>
 
@@ -333,8 +336,8 @@ export function CostComparisonSection() {
                   'Automatische Terminbuchung',
                   'Integration Kalender & CRM',
                   'Sofortbestätigung per SMS oder Mail',
-                  'Unbegrenzte gleichzeitige Anrufe',
-                  'DSGVO-konform · europäische Server',
+                  'Mehrere Anrufe gleichzeitig, ohne Warteschleife',
+                  'Keine Gesprächsaufzeichnung — nur das strukturierte Ergebnis',
                   'Laufende Optimierung inklusive',
                 ].map((feature) => (
                   <div key={feature} className="flex items-center gap-2.5">
@@ -351,7 +354,7 @@ export function CostComparisonSection() {
                 <div className="flex justify-between pt-2">
                   <span className="text-[14px] font-bold text-gray-300">Gesamt / Monat</span>
                   <span className="text-[20px] font-bold text-white tabular-nums">
-                    {KI_PRICE_MONTHLY} €
+                    {KI_PRICE_MONTHLY}&nbsp;€
                   </span>
                 </div>
                 <p className="text-[10.5px] text-gray-700 mt-1.5">
@@ -455,10 +458,10 @@ export function CostComparisonSection() {
               />
               <div className="relative">
                 <p className="text-[14px] font-bold text-white mb-1.5">
-                  KI-Assistent live in 7–14 Tagen
+                  KI-Assistent live nach Ihrer Freigabe
                 </p>
                 <p className="text-[12px] text-gray-500 mb-5 leading-relaxed">
-                  Kündbar monatlich · DSGVO-konform · persönliche Einrichtung
+                  Klare Vertragskonditionen · persönliche Einrichtung
                 </p>
                 <Link
                   to="/kontakt"

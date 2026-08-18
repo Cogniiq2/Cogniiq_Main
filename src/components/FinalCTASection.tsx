@@ -1,14 +1,13 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Calendar, Shield, Clock, CircleCheck as CheckCircle, TrendingUp, PhoneCall, Zap } from 'lucide-react';
-import { useAvailability } from '@/hooks/useAvailability';
+import { ArrowRight, Calendar, Shield, Clock, CircleCheck as CheckCircle, TrendingUp, PhoneCall } from 'lucide-react';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 const guarantees = [
-  { icon: Shield, text: 'Keine Verpflichtung — kündbar jederzeit' },
-  { icon: Clock, text: 'Antwort in der Regel innerhalb von 24 Stunden' },
+  { icon: Shield, text: 'Unverbindlich — Sie entscheiden nach dem Gespräch' },
+  { icon: Clock, text: 'Antwort in der Regel innerhalb von 24 Stunden' },
   { icon: Calendar, text: 'Persönliches Gespräch — kein Formular-Loop' },
 ];
 
@@ -20,16 +19,15 @@ const outcomes = [
 
 // Outcome tiles carry no invented performance figures. Any number here would need a
 // real, attributable measurement; none exists in the repository.
+// [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1) bestätigen]]
 const microResults = [
   { icon: PhoneCall, stat: 'Auch nachts', label: 'Anrufannahme' },
   { icon: TrendingUp, stat: 'Strukturiert', label: 'qualifizierte Anfragen' },
-  { icon: Zap, stat: '7–14 Tage', label: 'bis Go-Live' },
 ];
 
 export function FinalCTASection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
-  const { label: availLabel } = useAvailability();
 
   return (
     <section
@@ -54,7 +52,7 @@ export function FinalCTASection() {
               id="final-cta-heading"
               className="text-4xl lg:text-[3.4rem] font-bold text-gray-900 leading-[1.04] tracking-[-0.024em] mb-6"
             >
-              30 Minuten, die zeigen,
+              30&nbsp;Minuten, die zeigen,
               <br />
               <span className="text-gray-200">was bei Ihnen möglich ist.</span>
             </h2>
@@ -84,7 +82,7 @@ export function FinalCTASection() {
             </div>
 
             {/* Micro results strip */}
-            <div className="flex items-stretch gap-0 mb-10 border border-gray-100 rounded-2xl overflow-hidden">
+            <div data-review-claim="go-live-und-reaktionszeit" className="flex items-stretch gap-0 mb-10 border border-gray-100 rounded-2xl overflow-hidden">
               {microResults.map(({ icon: Icon, stat, label }, i) => (
                 <div
                   key={stat}
@@ -130,9 +128,6 @@ export function FinalCTASection() {
                   />
                   <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-gray-500">
                     Kostenloses Erstgespräch
-                  </span>
-                  <span className="ml-auto text-[10px] font-semibold text-amber-400/80 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full">
-                    {availLabel}
                   </span>
                 </div>
 
@@ -184,7 +179,7 @@ export function FinalCTASection() {
                 <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl p-4 text-center">
                   <p className="text-[11.5px] text-gray-600 leading-relaxed">
                     Go-Live typischerweise in{' '}
-                    <span className="text-gray-400 font-medium">7–14 Tagen.</span>
+                    <span className="text-gray-400 font-medium">Ihrer Freigabe.</span>
                   </p>
                 </div>
               </div>
@@ -193,7 +188,7 @@ export function FinalCTASection() {
             {/* Below card: quick contact note */}
             <div className="mt-4 flex items-center justify-center gap-2 text-[11.5px] text-gray-400">
               <div className="w-1 h-1 rounded-full bg-emerald-500" />
-              Antwort in der Regel innerhalb von 24 Stunden
+              Antwort in der Regel innerhalb von 24&nbsp;Stunden
             </div>
           </motion.div>
 

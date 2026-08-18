@@ -6,9 +6,7 @@ import {
   PhoneCall,
   Globe,
   Zap,
-  CircleCheck as CheckCircle,
   ShieldCheck,
-  Clock,
 } from 'lucide-react';
 
 import { ErrorBoundary } from '../ErrorBoundary';
@@ -248,8 +246,7 @@ const services = [
 ];
 
 const proof = [
-  { value: 'Auch nachts', label: 'Erreichbarkeit', sub: 'Kein Anruf verpasst' },
-  { value: '7–14 Tage', label: 'Go-Live', sub: 'Typischer Projektzeitraum' },
+  { value: 'Auch nachts', label: 'Erreichbarkeit', sub: 'Anrufannahme außerhalb der Öffnungszeiten' },
 ];
 
 export function DesktopHero() {
@@ -331,9 +328,9 @@ export function DesktopHero() {
 
           <h1 className="mb-6">
             {[
-              { text: 'Kein Anruf', color: 'text-gray-950', delay: 0.55 },
-              { text: 'mehr verpasst.', color: 'text-gray-950', delay: 0.68 },
-              { text: 'Kein Lead verloren.', color: 'text-gray-200', delay: 0.81 },
+              { text: 'Erreichbar,', color: 'text-gray-950', delay: 0.55 },
+              { text: 'wenn niemand frei ist.', color: 'text-gray-950', delay: 0.68 },
+              { text: 'Auch nachts. Auch samstags.', color: 'text-gray-200', delay: 0.81 },
             ].map(({ text, color, delay }) => (
               <div key={text} className="overflow-hidden">
                 <motion.div
@@ -354,8 +351,9 @@ export function DesktopHero() {
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.75, delay: 1.05, ease: E }}
           >
-            Ihr KI-Telefonassistent nimmt jeden Anruf an — auch um 2 Uhr nachts, am Wochenende, bei Stoßzeiten.
-            Kein Rückruf nötig. Kein Kunde verloren.
+            Ihr KI-Telefonassistent nimmt Anrufe an, wenn Ihr Team gebunden ist —
+            abends, am Wochenende, zu Stoßzeiten. Anliegen kommen strukturiert
+            bei Ihnen an, statt auf der Mailbox zu enden.
           </motion.p>
 
           <motion.div
@@ -369,8 +367,9 @@ export function DesktopHero() {
             transition={{ duration: 0.6, delay: 1.18, ease: E }}
           >
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" aria-hidden="true" />
+            {/* [[CLAIM: verify — Go-Live-Zeitraum (OWNER-INPUT E1)]] */}
             <span className="text-[12px] font-semibold text-gray-700">
-              Go-Live typischerweise in 7–14 Tagen
+              Go-Live nach Ihrer Freigabe
             </span>
           </motion.div>
 
@@ -443,23 +442,10 @@ export function DesktopHero() {
                 <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-gray-600 transition-colors" aria-hidden="true" />
               </button>
             </div>
-
-            <div className="flex items-center gap-4 pt-0.5">
-              {[
-                { icon: ShieldCheck, text: 'DSGVO-konform' },
-                { icon: Clock, text: 'Go-Live typischerweise in 7–14 Tagen' },
-                { icon: CheckCircle, text: 'Europäische Server' },
-              ].map(({ icon: Icon, text }) => (
-                <div key={text} className="flex items-center gap-1.5">
-                  <Icon size={10} className="text-emerald-500 flex-shrink-0" aria-hidden="true" />
-                  <span className="text-[11px] text-gray-400">{text}</span>
-                </div>
-              ))}
-            </div>
           </motion.div>
 
-          <motion.div
-            className="mt-10 pt-8 border-t border-gray-100 grid grid-cols-3 gap-6"
+          <motion.div data-review-claim="go-live-zeitraum"
+            className="mt-10 pt-8 border-t border-gray-100 grid grid-cols-1 gap-6"
             initial={{ opacity: 0 }}
             animate={inView ? { opacity: 1 } : {}}
             transition={{ duration: 0.8, delay: 1.85, ease: E }}

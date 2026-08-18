@@ -30,13 +30,14 @@ function CountUp({ to, suffix = '', prefix = '' }: { to: number; suffix?: string
   );
 }
 
+// [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1) bestätigen]]
 const stats = [
   {
     display: 'Auch nachts',
     numeric: null,
-    label: 'Kein Anruf geht verloren',
-    sub: 'Der KI-Assistent nimmt den Anruf entgegen',
-    context: 'Während Wettbewerber schlafen',
+    label: 'Anrufannahme außerhalb der Öffnungszeiten',
+    sub: 'Der Assistent nimmt ab, wenn niemand frei ist',
+    context: 'Abends, am Wochenende, zu Stoßzeiten',
     href: '/ki-telefonassistent',
     accent: false,
   },
@@ -44,26 +45,26 @@ const stats = [
     display: null,
     numeric: { to: 14, prefix: '< ', suffix: '' },
     label: 'Tage bis zum Go-Live',
-    sub: 'Kein monatelanger Vorlauf',
-    context: 'Statt monatelanger Projektlaufzeiten',
+    sub: 'Typischer Projektzeitraum',
+    context: 'Live erst nach Ihrer Freigabe',
     href: '/kontakt',
     accent: true,
   },
   {
-    display: 'Jeder',
+    display: 'Strukturiert',
     numeric: null,
-    label: 'Anruf wird angenommen',
-    sub: 'Auch außerhalb der Öffnungszeiten',
-    context: 'Verpasste Anrufe kosten Umsatz',
+    label: 'Anliegen kommen bei Ihrem Team an',
+    sub: 'Mit Rückrufnummer und nächstem Schritt',
+    context: 'Statt Mailbox und Zettelnotizen',
     href: '/verpasste-anrufe-verlust',
     accent: false,
   },
   {
-    display: 'DSGVO',
+    display: 'AVV',
     numeric: null,
-    label: 'Konforme Umsetzung',
-    sub: 'Verarbeitung auf europäischen Servern',
-    context: 'Consent-Management ab Tag 1',
+    label: 'Auftragsverarbeitungsvertrag',
+    sub: 'Nach Art. 28 DSGVO für jeden Kunden',
+    context: 'Keine Gesprächsaufzeichnung',
     href: '/ki-telefonassistent',
     accent: false,
   },
@@ -74,7 +75,7 @@ export function StatsSection() {
   const isInView = useInView(ref, { once: true, amount: 0.3 });
 
   return (
-    <section ref={ref} aria-label="Kennzahlen" className="bg-white border-b border-gray-100">
+    <section ref={ref} aria-label="Kennzahlen" data-review-claim="go-live-zeitraum" className="bg-white border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, i) => (

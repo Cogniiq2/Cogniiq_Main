@@ -28,7 +28,7 @@ const config: ProblemPageConfig = {
     points: [
       {
         title: "Direkte Personalkosten",
-        description: "Eine Arbeitsstunde kostet inkl. Lohnnebenkosten ca. 30–60 €. Bei 3 Stunden täglich manueller Arbeit sind das 25.000–50.000 € pro Jahr – für vermeidbare Aufgaben.",
+        description: "Beispielrechnung mit frei gewählten Werten – setzen Sie Ihre eigenen ein: Bei ca. 30–60 € pro Arbeitsstunde inkl. Lohnnebenkosten und 3 Stunden täglich manueller Arbeit ergeben sich 25.000–50.000 € pro Jahr – für vermeidbare Aufgaben.",
       },
       {
         title: "Fehleranfälligkeit und Qualitätskosten",
@@ -46,13 +46,12 @@ const config: ProblemPageConfig = {
   },
   solution: {
     headline: "Automatisierung, die sofort Zeit freisetzt.",
-    text: "Cogniiq automatisiert die zeitaufwändigsten Prozesse Ihres Unternehmens – DSGVO-konform, auf europäischen Servern, vollständig dokumentiert. Die meisten Workflows sind in 1–3 Wochen live.",
+    text: "Cogniiq automatisiert die zeitaufwändigsten Prozesse Ihres Unternehmens – vollständig dokumentiert. Die meisten Workflows sind in 1–3 Wochen live.",
     bullets: [
       "Lead-Management vollständig automatisiert",
       "Terminbestätigung und Erinnerungen automatisch",
       "Rechnungsstellung und Mahnwesen automatisiert",
       "Daten zwischen Systemen automatisch synchronisiert",
-      "DSGVO-konform auf europäischen Servern",
       "Vollständige Dokumentation und Team-Schulung",
     ],
   },

@@ -30,7 +30,7 @@ const config: ClusterPageConfig = {
       { label: "Für wen", value: "Websites älter als 3 Jahre oder mit SEO-Problemen" },
       { label: "Typische Ziele", value: "Mehr Anfragen, bessere Rankings, schnellere Ladezeit" },
       { label: "Projektdauer", value: "3–8 Wochen" },
-      { label: "Preisrahmen", value: "ab ca. 2.000 €" },
+      { label: "Preisrahmen", value: "ab ca. 2.000 €" },
     ],
   },
   intro: {
@@ -61,7 +61,7 @@ const config: ClusterPageConfig = {
       "DSGVO-Seiten vollständig neu: Impressum, Datenschutz, Consent",
       "Analytics-Setup: GA4, Search Console, Conversion-Tracking",
       "Übergabe mit CMS und Schulung",
-      "3 Monate Post-Launch Monitoring auf Wunsch",
+      "3 Monate Post-Launch Monitoring auf Wunsch",
     ],
   },
   localRelevance: {
@@ -81,7 +81,7 @@ const config: ClusterPageConfig = {
     {
       question: "Was kostet ein Website Relaunch in Bayreuth?",
       answer:
-        "Einfache Relaunches starten ab ca. 2.000 €. Projekte mit vollständiger SEO-Migration, neuem Content und Integrationen liegen typisch bei 3.500 € – 7.000 €. Detailliertes Angebot nach kostenlosem Erstgespräch.",
+        "Einfache Relaunches starten ab ca. 2.000 €. Projekte mit vollständiger SEO-Migration, neuem Content und Integrationen liegen typisch bei 3.500 € – 7.000 €. Detailliertes Angebot nach kostenlosem Erstgespräch.",
     },
     {
       question: "Wie lange dauert ein Relaunch?",
@@ -96,7 +96,7 @@ const config: ClusterPageConfig = {
     {
       question: "Wann ist ein Relaunch notwendig?",
       answer:
-        "Wenn die Website älter als 3–4 Jahre ist, eine Ladezeit über 3 Sekunden hat, mobil nicht nutzbar ist, DSGVO-Lücken hat oder bei relevanten lokalen Suchanfragen nicht gefunden wird.",
+        "Wenn die Website älter als 3–4 Jahre ist, eine Ladezeit über 3 Sekunden hat, mobil nicht nutzbar ist, DSGVO-Lücken hat oder bei relevanten lokalen Suchanfragen nicht gefunden wird.",
     },
     {
       question: "Kann ich das CMS nach dem Relaunch beibehalten?",

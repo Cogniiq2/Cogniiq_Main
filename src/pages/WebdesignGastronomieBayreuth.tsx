@@ -14,18 +14,18 @@ const config: IndustryPageConfig = {
   seo: {
     title: "Webdesign & KI-Telefonassistent für Gastronomie in Bayreuth | Cogniiq",
     description:
-      "Restaurant Website Bayreuth: Cogniiq erstellt Websites, KI-Telefonassistenten und Reservierungsautomatisierungen für Restaurants in Bayreuth. Mehr Tischreservierungen, weniger Telefonaufwand, DSGVO-konform.",
+      "Restaurant Website Bayreuth: Cogniiq erstellt Websites, KI-Telefonassistenten und Reservierungsautomatisierungen für Restaurants in Bayreuth. Mehr Tischreservierungen, weniger Telefonaufwand, persönlich betreut.",
     canonical: `${base}/webdesign-gastronomie-bayreuth`,
     keywords:
       "Restaurant Website Bayreuth, Reservierungssystem Gastronomie Bayreuth, Website Gastronomie Bayreuth, KI Telefonassistent Restaurant Bayreuth",
   },
   hero: {
-    trustTags: ["Bayreuth", "DSGVO-konform", "KI-Integration", "Reservierungen", "Automatisierung"],
+    trustTags: ["Bayreuth", "KI-Integration", "Reservierungen", "Automatisierung"],
     ctaLabel: "Projekt für Gastronomie starten",
   },
   intro: {
     h1: "Webdesign & KI-Telefonassistent für Gastronomie in Bayreuth",
-    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Restaurants und Gastronomie in Bayreuth – für mehr Tischreservierungen, bessere Erreichbarkeit und automatisierte Gästekommunikation. Lokal betreut, DSGVO-konform.",
+    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Restaurants und Gastronomie in Bayreuth – für mehr Tischreservierungen, bessere Erreichbarkeit und automatisierte Gästekommunikation. Lokal betreut.",
   },
   engpaesse: [
     "Reservierungsanrufe binden Servicepersonal genau dann, wenn es im Betrieb gebraucht wird",
@@ -43,7 +43,7 @@ const config: IndustryPageConfig = {
     },
     {
       step: "Schritt 2",
-      title: "Umsetzung in 7–14 Tagen",
+      title: "Umsetzung nach Ihrer Freigabe",
       description:
         "Restaurant-Website mit Reservierungssystem, KI-Assistent und Automations-Workflows werden vollständig von Cogniiq aufgebaut und konfiguriert – ohne IT-Aufwand für den Betrieb.",
     },
@@ -72,7 +72,7 @@ const config: IndustryPageConfig = {
         "Online-Reservierungssystem (Tischbuchung)",
         "Speisekarte & Veranstaltungsbereich",
         "On-Page SEO für 'Restaurant Bayreuth'",
-        "DSGVO-konforme Gästekommunikation",
+        "Datenschutzerklärung, Impressum und Cookie-Einwilligung",
       ],
     },
     {
@@ -166,12 +166,11 @@ const config: IndustryPageConfig = {
     "Höhere Erreichbarkeit für Gäste – auch außerhalb der Öffnungszeiten, auf jedem Kanal",
     "Zeitersparnis durch automatisierte Bestätigungen, Erinnerungen und Gästekommunikation",
     "Professioneller erster Eindruck durch moderne Website und sofortige Gesprächsannahme",
-    "Datenschutzorientierte Umsetzung – alle Gästedaten sicher auf europäischen Servern verarbeitet",
   ],
   localContext: [
     "Die Bayreuther Gastronomie ist vielfältig und wettbewerbsintensiv – von der klassischen Gaststätte über das moderne Restaurant bis hin zu Event-Locations rund um die Festspiele. Gleichzeitig stehen viele Betriebe vor denselben Herausforderungen: zu viele Telefonanrufe, knappe Personalressourcen und eine veraltete Online-Präsenz.",
     "Cogniiq entwickelt für Gastronomiebetriebe in Bayreuth passgenaue Digitallösungen: eine moderne Restaurant-Website mit integriertem Reservierungssystem, einen KI-Telefonassistenten, der Reservierungen entgegennimmt und Fragen beantwortet, sowie Automatisierungen, die Bestätigungen, Erinnerungen und Feedback-Prozesse ohne manuellen Aufwand steuern.",
-    "Als Bayreuther Unternehmen kennen wir den lokalen Markt, die saisonalen Besonderheiten rund um die Festspiele und die Erwartungen der regionalen Gäste. Die Einrichtung aller Systeme dauert 7–14 Tage. Alle Lösungen werden datenschutzorientiert umgesetzt; technische und organisatorische Maßnahmen werden projektbezogen abgestimmt.",
+    "Als Bayreuther Unternehmen kennen wir den lokalen Markt, die saisonalen Besonderheiten rund um die Festspiele und die Erwartungen der regionalen Gäste. Alle Lösungen werden datenschutzorientiert umgesetzt; technische und organisatorische Maßnahmen werden projektbezogen abgestimmt.",
   ],
   internalLinks: [
     { label: "Webdesign Bayreuth", href: "/bayreuth/webdesign" },
@@ -197,7 +196,7 @@ const config: IndustryPageConfig = {
     {
       question: "Wie lange dauert die Einrichtung für ein Restaurant in Bayreuth?",
       answer:
-        "Die Einrichtung dauert in der Regel 7–14 Tage und wird vollständig von Cogniiq übernommen. Keine technischen Vorkenntnisse erforderlich – wir liefern alles schlüsselfertig.",
+        "Die Einrichtung wird vollständig von Cogniiq übernommen. Keine technischen Vorkenntnisse erforderlich – wir liefern alles schlüsselfertig.",
     },
     {
       question: "Kann die Website auch Veranstaltungen und saisonale Menüs für die Festspielzeit abbilden?",
@@ -205,14 +204,14 @@ const config: IndustryPageConfig = {
         "Ja. Wir bauen Ihre Website so, dass Sie Menüs, Aktionswochen und Events – auch rund um die Bayreuther Festspiele – selbst aktualisieren können, einfach und ohne Programmierkenntnisse.",
     },
     {
-      question: "Sind Gästedaten aus Reservierungen DSGVO-konform gespeichert?",
+      question: "Wie werden Gästedaten aus Reservierungen verarbeitet gespeichert?",
       answer:
-        "Ja. Alle Gästedaten werden ausschließlich auf europäischen Servern verarbeitet und nach den Anforderungen der DSGVO gespeichert und verwaltet.",
+        "Das hängt vom eingesetzten Reservierungstool ab. Wir binden es mit Auftragsverarbeitungsvertrag ein und dokumentieren, welche Daten wohin fließen. Den Verarbeitungsort nennt Ihnen der jeweilige Anbieter verbindlich — wir geben ihn nicht aus zweiter Hand weiter.",
     },
     {
       question: "Kann der KI-Telefonassistent auch Gruppenreservierungen und Eventanfragen bearbeiten?",
       answer:
-        "Für Standardreservierungen ja – vollautomatisch. Größere Gruppenanfragen oder Eventbuchungen werden durch den KI-Assistenten qualifiziert erfasst und mit allen relevanten Angaben strukturiert an Ihr Team weitergeleitet.",
+        "Für Standardreservierungen ja – automatisch nach Ihren Vorgaben. Größere Gruppenanfragen oder Eventbuchungen werden durch den KI-Assistenten qualifiziert erfasst und mit allen relevanten Angaben strukturiert an Ihr Team weitergeleitet.",
     },
     {
       question: "Kann Cogniiq auch bei bestehenden Websites Reservierungsfunktionen nachrüsten?",

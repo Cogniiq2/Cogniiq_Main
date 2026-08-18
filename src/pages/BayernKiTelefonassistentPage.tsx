@@ -26,19 +26,20 @@ const faqItems = [
   },
   {
     question: "Kann der Assistent auch Bayerisch oder regionale Dialekte verstehen?",
-    answer: "Der Assistent ist auf Hochdeutsch ausgelegt und versteht auch Sprecher mit regionalem Akzent zuverlässig. Eine vollständige Dialekt-Unterstützung ist in Entwicklung.",
+    answer: "Der Assistent ist auf Hochdeutsch ausgelegt und kommt mit regionalem Akzent in aller Regel gut zurecht. Bei sehr starkem Dialekt fragt er nach, statt zu raten – das prüfen wir in der Testphase mit echten Szenarien.",
   },
   {
     question: "Wie lange dauert die Einrichtung für ein Unternehmen in Bayern?",
-    answer: "Die Basisimplementierung dauert in der Regel 1–2 Wochen. Wir konfigurieren den Assistenten auf Ihre Branche, Öffnungszeiten und typische Anfragen.",
+    // [[CLAIM: verify — Einrichtungsdauer 1–2 Wochen bestätigen]]
+    answer: "Die Basisimplementierung dauert in der Regel 1–2 Wochen. Wir konfigurieren den Assistenten auf Ihre Branche, Öffnungszeiten und typische Anfragen – live geht er erst nach Ihrer Freigabe.",
   },
   {
-    question: "Welche bayerischen Branchen nutzen den KI Telefonassistenten?",
-    answer: "Besonders verbreitet bei Handwerksbetrieben, Arztpraxen, Immobilienmaklern, Dienstleistern und mittelständischen Unternehmen in München, Augsburg, Nürnberg, Regensburg und im ländlichen Bayern.",
+    question: "Für welche bayerischen Branchen eignet sich der KI Telefonassistent?",
+    answer: "Besonders für Betriebe, bei denen Telefon und eigentliche Arbeit um dieselben Hände konkurrieren: Handwerksbetriebe, Arztpraxen, Immobilienmakler, Dienstleister und mittelständische Unternehmen – in den Städten wie im ländlichen Bayern.",
   },
   {
-    question: "Ist das System DSGVO-konform für den Einsatz in Deutschland?",
-    answer: "Ja. Der KI Telefonassistent unterstützt DSGVO-konforme Prozesse. Alle Daten werden auf europäischen Servern verarbeitet und gespeichert.",
+    question: "Worauf müssen Sie bei DSGVO und KI-Telefonie in Deutschland achten?",
+    answer: "Ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört zur Einrichtung. Gespräche werden nicht aufgezeichnet – gespeichert wird ausschließlich das strukturierte Ergebnis. Ihre Daten werden nicht zum Training von Modellen verwendet.",
   },
   {
     question: "Wie erhalte ich eine Demo für mein Unternehmen in Bayern?",
@@ -70,7 +71,7 @@ const USE_CASES = [
   {
     icon: Home,
     industry: "Immobilien",
-    desc: "Besichtigungstermine für Objekte in ganz Bayern buchen – vollautomatisch, auch außerhalb der Bürozeiten.",
+    desc: "Besichtigungstermine für Objekte in ganz Bayern buchen – auch außerhalb der Bürozeiten.",
   },
   {
     icon: Building2,
@@ -115,14 +116,8 @@ export function BayernKiTelefonassistentPage() {
         provider: { "@id": `${BUSINESS_INFO.website}/#localbusiness` },
         areaServed: { "@type": "State", name: "Bayern" },
       },
-      {
-        "@type": "FAQPage",
-        mainEntity: faqItems.map((f) => ({
-          "@type": "Question",
-          name: f.question,
-          acceptedAnswer: { "@type": "Answer", text: f.answer },
-        })),
-      },
+      // FAQPage wird von PageSEO aus `faqItems` erzeugt und darf hier nicht
+      // noch einmal stehen — sonst läge derselbe Block zweimal im Dokument.
     ],
   };
 
@@ -130,7 +125,7 @@ export function BayernKiTelefonassistentPage() {
     <>
       <PageSEO
         title="KI Telefonassistent für Unternehmen in Bayern | Cogniiq"
-        description="KI Telefonassistent für bayerische Unternehmen: Beantwortet Anrufe automatisch, bucht Termine und entlastet Ihr Team – auch außerhalb regulärer Geschäftszeiten, DSGVO-konform, Made for Mittelstand."
+        description="KI Telefonassistent für bayerische Unternehmen: nimmt Anrufe an, bucht Termine nach Ihren Regeln und entlastet Ihr Team – auch außerhalb der Öffnungszeiten, ohne Gesprächsaufzeichnung."
         canonical={`${BUSINESS_INFO.website}/bayern/ki-telefonassistent`}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
@@ -221,7 +216,7 @@ function HeroSection() {
               to="/kontakt"
               className="inline-flex items-center justify-center gap-2 px-7 py-4 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm hover:border-gray-500 dark:hover:border-gray-400 transition-all duration-200"
             >
-              Termin vereinbaren
+              Unverbindliches Erstgespräch vereinbaren
               <ArrowRight size={15} />
             </Link>
           </div>
@@ -231,7 +226,7 @@ function HeroSection() {
               { icon: MapPin, label: "Bayernweit verfügbar" },
               { icon: Clock, label: "Auch außerhalb der Öffnungszeiten erreichbar" },
               { icon: Calendar, label: "Termine automatisch" },
-              { icon: Shield, label: "DSGVO-konform" },
+              { icon: Shield, label: "Keine Gesprächsaufzeichnung" },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -259,7 +254,7 @@ function TrustSection() {
         <div className="flex flex-wrap items-center justify-between gap-6">
           {[
             "Spezialisiert auf den bayerischen Mittelstand",
-            "DSGVO-konform · Europäische Server",
+            "Keine Gesprächsaufzeichnung",
             "Individuelle Konfiguration",
             "Schnelle Implementierung",
           ].map((item, i) => (
@@ -300,15 +295,15 @@ function IntroSection() {
                 ungünstigsten Moment, Personal ist beschäftigt, Kunden werden vertröstet.
               </p>
               <p>
-                Der KI Telefonassistent von Cogniiq löst dieses Problem. Als bayerisches
+                Der KI Telefonassistent von Cogniiq setzt genau dort an. Als bayerisches
                 Unternehmen kennen wir die Anforderungen des Mittelstands. Wir konfigurieren
                 den Assistenten individuell – auf Ihre Branche, Ihre Öffnungszeiten und
                 Ihre häufigen Anfragen.
               </p>
               <p>
-                Das Ergebnis: Jeder Anruf wird professionell beantwortet. Termine werden
-                automatisch gebucht. Ihr Team kann sich auf das konzentrieren, was wirklich
-                wichtig ist.
+                Das Ergebnis: Anrufe werden angenommen, wenn Ihr Team gebunden ist.
+                Termine werden nach Ihren Regeln gebucht. Ihr Team konzentriert sich
+                auf die Arbeit, für die es gebraucht wird.
               </p>
             </div>
           </motion.div>
@@ -327,7 +322,7 @@ function IntroSection() {
               { icon: CheckCircle2, label: "Beantwortet Fragen und gibt Informationen weiter" },
               { icon: Calendar, label: "Bucht Termine direkt in Ihren Kalender" },
               { icon: Clock, label: "Erreichbar auch an Feiertagen in Bayern" },
-              { icon: Shield, label: "DSGVO-konform – Daten auf EU-Servern" },
+              { icon: Shield, label: "Keine Gesprächsaufzeichnung" },
               { icon: Zap, label: "Integration mit CRM und Automationen" },
             ].map((feat, i) => (
               <motion.div
@@ -429,13 +424,13 @@ function BenefitsSection() {
           {[
             {
               icon: Phone,
-              title: "Nie wieder Anrufe verpassen",
-              desc: "Jeder Anruf wird professionell beantwortet – auch wenn Ihr Team auf der Baustelle, beim Patienten oder im Meeting ist.",
+              title: "Erreichbar, wenn niemand abnehmen kann",
+              desc: "Anrufe werden angenommen, auch wenn Ihr Team auf der Baustelle, beim Patienten oder im Termin ist – ohne Besetztzeichen, ohne Warteschleife.",
             },
             {
               icon: Calendar,
-              title: "Mehr Termine ohne Aufwand",
-              desc: "Der Assistent bucht Termine selbstständig und füllt Ihren Kalender – ohne dass Ihre Mitarbeiter eingreifen müssen.",
+              title: "Termine nach Ihren Regeln",
+              desc: "Der Assistent bucht Termine in Ihren Kalender oder legt sie zur Bestätigung vor – nach den Regeln, die Sie vorgeben.",
             },
             {
               icon: Clock,
@@ -450,12 +445,13 @@ function BenefitsSection() {
             {
               icon: Shield,
               title: "Datenschutzorientiert umgesetzt",
-              desc: "Alle Daten werden auf europäischen Servern verarbeitet – vollständig konform mit deutschem Datenschutzrecht.",
+              desc: "Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört zur Einrichtung. Gespräche werden nicht aufgezeichnet.",
             },
             {
               icon: Zap,
               title: "Schnell implementiert",
-              desc: "Innerhalb von 1–2 Wochen ist Ihr individuell konfigurierter KI Assistent einsatzbereit.",
+              // [[CLAIM: verify — Einrichtungsdauer 1–2 Wochen bestätigen]]
+              desc: "In der Regel ist Ihr individuell konfigurierter Assistent innerhalb von 1–2 Wochen einsatzbereit – live geht er erst nach Ihrer Freigabe.",
             },
           ].map((item, i) => (
             <motion.div
@@ -666,7 +662,7 @@ function FinalCtaSection() {
               to="/kontakt"
               className="inline-flex items-center justify-center gap-2 px-7 py-4 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm hover:border-gray-500 transition-all duration-200"
             >
-              Termin vereinbaren
+              Unverbindliches Erstgespräch vereinbaren
               <ArrowRight size={15} />
             </Link>
           </div>

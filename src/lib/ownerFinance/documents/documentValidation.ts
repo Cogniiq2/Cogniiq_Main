@@ -67,7 +67,7 @@ export function validateOfferForFinalization(doc: TransactionalDocument): Valida
     { key: 'vat_resolved', label: 'Aufgelöste USt-Behandlung', ok: base.every((l) => l.vatTreatment !== 'unknown'), blocking: true, section: 'positions' },
     { key: 'totals', label: 'Positive Summen (Netto/Brutto)', ok: doc.netTotalCents > 0 && doc.grossTotalCents > 0, blocking: true, section: 'positions' },
     { key: 'payment_terms', label: 'Zahlungsbedingungen', ok: !!doc.paymentTerms && doc.paymentTerms.trim().length > 0, blocking: true, section: 'terms' },
-    { key: 'schedule_sum', label: 'Zahlungsplan-Prozente ergeben 100 %', ok: paymentScheduleBalanced(doc.paymentSchedule), blocking: true, section: 'schedule' },
+    { key: 'schedule_sum', label: 'Zahlungsplan-Prozente ergeben 100 %', ok: paymentScheduleBalanced(doc.paymentSchedule), blocking: true, section: 'schedule' },
   ]);
 }
 

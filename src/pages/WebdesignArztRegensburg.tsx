@@ -14,18 +14,18 @@ const config: IndustryPageConfig = {
   seo: {
     title: "Webdesign & KI-Telefonassistent für Arztpraxen in Regensburg | Cogniiq",
     description:
-      "Praxis Website Regensburg: Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungen für Arztpraxen in Regensburg. Weniger Telefonüberlastung, mehr Online-Termine, DSGVO-konform.",
+      "Praxis Website Regensburg: Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungen für Arztpraxen in Regensburg. Weniger Telefonüberlastung, mehr Online-Termine, persönlich betreut.",
     canonical: `${base}/webdesign-arzt-regensburg`,
     keywords:
       "Praxis Website Regensburg, Arzt Website Regensburg, Terminbuchung Praxis Regensburg, KI Telefonassistent Arztpraxis Regensburg",
   },
   hero: {
-    trustTags: ["Regensburg", "DSGVO-konform", "KI-Integration", "Terminprozesse", "Automatisierung"],
+    trustTags: ["Regensburg", "KI-Integration", "Terminprozesse", "Automatisierung"],
     ctaLabel: "Projekt für Arztpraxis starten",
   },
   intro: {
     h1: "Webdesign & KI-Telefonassistent für Arztpraxen in Regensburg",
-    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Arztpraxen in Regensburg – für mehr Patientenanfragen, bessere Erreichbarkeit und automatisierte Terminprozesse. DSGVO-konform, schnell eingerichtet.",
+    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Arztpraxen in Regensburg – für mehr Patientenanfragen, bessere Erreichbarkeit und automatisierte Terminprozesse. Schnell eingerichtet, persönlich betreut.",
   },
   engpaesse: [
     "Regensburg wächst – Praxen versorgen zunehmend auch Patienten aus dem Umland, was das Telefonaufkommen weiter erhöht",
@@ -43,7 +43,7 @@ const config: IndustryPageConfig = {
     },
     {
       step: "Schritt 2",
-      title: "Umsetzung in 7–14 Tagen",
+      title: "Umsetzung nach Ihrer Freigabe",
       description:
         "Website, KI-Telefonassistent und Automatisierungsworkflows werden vollständig von Cogniiq aufgebaut und konfiguriert. Die Praxis erhält alles schlüsselfertig – ohne IT-Aufwand auf Praxisseite.",
     },
@@ -72,7 +72,7 @@ const config: IndustryPageConfig = {
         "Kontaktformular mit automatischer Benachrichtigung",
         "Google Maps Integration & NAP-Konsistenz Regensburg",
         "On-Page SEO für lokale Suchanfragen Regensburg",
-        "DSGVO-konforme Datenschutzdokumentation",
+        "Datenschutzerklärung, Impressum und Cookie-Einwilligung",
       ],
     },
     {
@@ -112,7 +112,7 @@ const config: IndustryPageConfig = {
       icon: "web",
       title: "Praxis-Website Regensburg",
       description:
-        "Moderne, schnelle Praxis-Website mit Online-Terminbuchung, klarer Leistungsübersicht, Arztprofilen und optimalem Ranking für Suchbegriffe wie 'Arzt Regensburg' oder 'Praxis Regensburg'. Conversion-optimiert, mobilfreundlich, DSGVO-konform.",
+        "Moderne, schnelle Praxis-Website mit Online-Terminbuchung, klarer Leistungsübersicht, Arztprofilen und optimalem Ranking für Suchbegriffe wie 'Arzt Regensburg' oder 'Praxis Regensburg'. Conversion-optimiert und mobilfreundlich.",
     },
     {
       icon: "phone",
@@ -166,12 +166,11 @@ const config: IndustryPageConfig = {
     "Höhere Erreichbarkeit für Patienten – auch außerhalb der Öffnungszeiten",
     "Zeitersparnis durch automatisierte Erinnerungen, Bestätigungen und Kommunikationsabläufe",
     "Bessere Ansprache des jungen Patientenprofils der Unistadt durch digitale Kanäle",
-    "Datenschutzorientierte Umsetzung – alle Daten auf europäischen Servern verarbeitet",
   ],
   localContext: [
     "Regensburg ist eine wachsende Mittelstadt mit einem breiten Praxisnetz und einem jungen Patientenprofil, das durch die Universität und das Uniklinikum geprägt wird. Gleichzeitig versorgen viele Praxen auch Patienten aus dem Landkreis – mit entsprechend hohem Anfragevolumen.",
     "Cogniiq entwickelt für Arztpraxen in Regensburg maßgeschneiderte Digitallösungen: eine hochperformante Praxis-Website mit integrierter Terminbuchung, einen KI-Telefonassistenten, der die Rezeption auch außerhalb der Sprechzeiten entlastet, sowie Automatisierungssysteme für Terminerinnerungen und Patientenkommunikation.",
-    "Cogniiq betreut Projekte in Regensburg remote und ist für persönliche Abstimmungen direkt erreichbar. Die Einrichtung aller Lösungen dauert 7–14 Tage. Alle Systeme werden datenschutzorientiert umgesetzt; technische und organisatorische Maßnahmen werden projektbezogen abgestimmt.",
+    "Cogniiq betreut Projekte in Regensburg remote und ist für persönliche Abstimmungen direkt erreichbar. Alle Systeme werden datenschutzorientiert umgesetzt; technische und organisatorische Maßnahmen werden projektbezogen abgestimmt.",
   ],
   internalLinks: [
     { label: "Webdesign Regensburg", href: "/regensburg/webdesign" },
@@ -185,9 +184,9 @@ const config: IndustryPageConfig = {
   ],
   faq: [
     {
-      question: "Kann Cogniiq eine DSGVO-konforme Praxis-Website in Regensburg erstellen?",
+      question: "Was liefert Cogniiq zum Datenschutz einer Praxis-Website in Regensburg?",
       answer:
-        "Ja. Alle Websites und Systeme von Cogniiq werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse. Formulare, Datenschutzerklärungen, Cookie-Einwilligungen und die Datenverarbeitung entsprechen den Datenschutzanforderungen für Arztpraxen in Bayern.",
+        "Zum Lieferumfang gehören Datenschutzerklärung, Impressum, Cookie-Einwilligung, gesicherte Formularübertragung und die Dokumentation der Datenflüsse. Ob der konkrete Einsatz den Anforderungen genügt, beurteilt Ihr Datenschutzbeauftragter – wir liefern ihm die Unterlagen dafür zu.",
     },
     {
       question: "Funktioniert der KI-Telefonassistent mit meiner bestehenden Praxissoftware in Regensburg?",
@@ -197,7 +196,7 @@ const config: IndustryPageConfig = {
     {
       question: "Wie lange dauert die Einrichtung für eine Arztpraxis in Regensburg?",
       answer:
-        "Die Einrichtung dauert in der Regel 7–14 Tage und wird vollständig von Cogniiq übernommen. Sie müssen keine technischen Vorkenntnisse mitbringen.",
+        "Die Einrichtung wird vollständig von Cogniiq übernommen. Sie müssen keine technischen Vorkenntnisse mitbringen.",
     },
     {
       question: "Kann ich meinen Patienten in Regensburg Online-Terminbuchung anbieten?",

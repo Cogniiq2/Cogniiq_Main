@@ -3,7 +3,6 @@ import { ArrowRight, CheckCircle2, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
-import { REAL_TESTIMONIAL } from "@/components/TestimonialBlock";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -21,11 +20,10 @@ const breadcrumbs = [
   { name: "Bewertungen", url: `${base}/bewertungen` },
 ];
 
-// No Review/AggregateRating markup is emitted here. The single verified customer
-// statement is prose feedback and carries no star rating from its author, so any
-// ratingValue would be invented. The quote is shown as visible text only.
-
-const allTestimonials = [REAL_TESTIMONIAL];
+// No Review/AggregateRating markup is emitted here, and no customer statement is
+// rendered at all: the previously shown quote named a real third party without a
+// documented written consent. It was removed rather than marked, and no placeholder
+// takes its place. See ASSETS-REQUIRED.md.
 
 export function BewertungenPage() {
   return (
@@ -60,9 +58,9 @@ export function BewertungenPage() {
                 Was Kunden über die Zusammenarbeit mit Cogniiq sagen – transparent und ohne Übertreibung.
               </p>
               <div className="flex flex-wrap gap-3 mt-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-xs font-medium">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 text-xs font-medium">
                   <CheckCircle2 size={12} />
-                  1 verifizierte Kundenstimme
+                  Veröffentlichung nur mit schriftlicher Freigabe
                 </div>
               </div>
             </motion.div>
@@ -83,43 +81,9 @@ export function BewertungenPage() {
                 Kundenstimmen
               </h2>
               <p className="text-gray-500 dark:text-gray-400">
-                Veröffentlicht wird ausschließlich Feedback aus real umgesetzten Projekten.
+                Derzeit ist hier keine Kundenstimme veröffentlicht.
               </p>
             </motion.div>
-
-            <div className="grid gap-6 max-w-2xl">
-              {allTestimonials.map((t, i) => (
-                <motion.div
-                  key={i}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  variants={fadeUp}
-                  custom={i * 0.1}
-                  className="relative bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-7 flex flex-col gap-5"
-                >
-                  <div className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-xs font-medium">
-                    <CheckCircle2 size={10} />
-                    Verifiziert
-                  </div>
-
-                  <p className="text-sm leading-relaxed flex-1 text-gray-700 dark:text-gray-300 pt-6">
-                    "{t.quote}"
-                  </p>
-
-                  <div className="flex flex-col gap-1 mt-auto">
-                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                      — {t.attribution}
-                    </span>
-                    {t.project && (
-                      <span className="text-xs text-gray-400 dark:text-gray-500">
-                        {t.project}
-                      </span>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
 
             <motion.div
               initial="hidden"
@@ -127,10 +91,16 @@ export function BewertungenPage() {
               viewport={{ once: true }}
               variants={fadeUp}
               custom={0.3}
-              className="mt-8 p-5 rounded-xl bg-white dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50"
+              className="p-5 rounded-xl bg-white dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700/50 max-w-2xl"
             >
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                <strong className="text-gray-700 dark:text-gray-300">Hinweis zur Transparenz:</strong> Cogniiq befindet sich im frühen Aufbau des öffentlichen Kundenstimmen-Portfolios. Die hier gezeigte Kundenstimme stammt aus einem real umgesetzten Projekt (SV Heinersreuth). Weitere Stimmen werden erst veröffentlicht, wenn sie vorliegen und freigegeben sind – wir zeigen keine Beispiel- oder Mustertexte.
+              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                <strong className="text-gray-700 dark:text-gray-300">Hinweis zur Transparenz:</strong>{" "}
+                Wir veröffentlichen Kundenstimmen ausschließlich mit schriftlicher
+                Freigabe der genannten Kundinnen und Kunden. Solange keine solche
+                Freigabe vorliegt, steht hier nichts – auch keine Beispiel- oder
+                Mustertexte und keine anonymisierten Zitate, die wir selbst
+                formuliert hätten. Eine leere Seite ist uns lieber als eine
+                geschönte.
               </p>
             </motion.div>
           </div>
@@ -189,7 +159,7 @@ export function BewertungenPage() {
                 Überzeugen Sie sich selbst
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-                Kostenloses Erstgespräch – 30–45 Minuten, ohne Verpflichtung. Sie entscheiden danach, ob es passt.
+                Kostenloses Erstgespräch – 30–45&nbsp;Minuten, ohne Verpflichtung. Sie entscheiden danach, ob es passt.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <Link

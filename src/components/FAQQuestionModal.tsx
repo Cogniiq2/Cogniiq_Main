@@ -348,7 +348,7 @@ function SuccessView() {
         className="text-gray-500"
         style={{ fontSize: '14px', lineHeight: 1.65, maxWidth: '30ch' }}
       >
-        Wir melden uns persönlich — in der Regel innerhalb von 24 Stunden.
+        Wir melden uns persönlich — in der Regel innerhalb von 24&nbsp;Stunden.
       </motion.p>
 
       <motion.div

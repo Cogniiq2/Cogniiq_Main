@@ -9,16 +9,26 @@ import {
 } from "@/components/ui/accordion";
 import { PageSEO } from "@/components/PageSEO";
 import { RelatedPages } from "@/components/RelatedPages";
+import { StimmprobeSection } from "@/components/StimmprobeSection";
+import { TelefonassistentKompaktSection } from "@/components/TelefonassistentKompaktSection";
 import { BUSINESS_INFO } from "@/lib/seo-data";
+import { FAKTEN } from "@/lib/telefonassistent-copy";
 import type { CityServiceConfig } from "@/lib/standorte-data";
 
+/**
+ * Bewegung nach COPY-BRIEF-3 §1.4: höchstens 180 ms, `ease-out`, ausschließlich
+ * Deckkraft und kleine Verschiebung. Keine gestaffelten Scroll-Sequenzen — die
+ * frühere Fassung verzögerte jedes Element um `i * 0.06`, was bei sechs Karten
+ * eine halbe Sekunde Nachlauf ergab. Das ist genau die Scroll-Choreografie, die
+ * §1.4 untersagt.
+ */
 const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (delay = 0) => ({
+  hidden: { opacity: 0, y: 8 },
+  visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
-  }),
+    transition: { duration: 0.18, ease: "easeOut" as const },
+  },
 };
 
 function renderWithLinks(text: string) {
@@ -49,6 +59,8 @@ interface CityServicePageProps {
 }
 
 export function CityServicePage({ config }: CityServicePageProps) {
+  const isTelefonassistent = config.serviceSlug === "ki-telefonassistent";
+
   const breadcrumbs = [
     { name: "Home", url: BUSINESS_INFO.website },
     { name: "Bayern", url: `${BUSINESS_INFO.website}/bayern` },
@@ -129,6 +141,9 @@ export function CityServicePage({ config }: CityServicePageProps) {
 
       <main className="min-h-screen">
         <HeroSection config={config} breadcrumbs={breadcrumbs} />
+        {/* M13 · Stimmprobe — nur Telefonassistent-Stadtseiten; asset-gated,
+            rendert ohne Audiodatei nichts. */}
+        {isTelefonassistent && <StimmprobeSection />}
         <TrustStrip config={config} />
         <LocalIntroSection config={config} />
         <WarumCogniiq config={config} />
@@ -138,6 +153,11 @@ export function CityServicePage({ config }: CityServicePageProps) {
         <BranchenSection config={config} />
         <LocalSzenarienSection config={config} />
         <LocalRelevanzSection config={config} />
+        {/* Kompaktfassungen von M4/M10/M19/M7 — nur auf den drei
+            Telefonassistent-Stadtseiten. Sie stehen nach dem lokalen Teil,
+            damit die Stadtseite lokal bleibt; die Vollversionen liegen auf
+            /praxen, der Preisseite und /datenschutz-sicherheit. */}
+        {isTelefonassistent && <TelefonassistentKompaktSection city={config.city} />}
         <FAQSection config={config} />
         <RelatedPages config={config} />
         <CTASection config={config} />
@@ -147,6 +167,8 @@ export function CityServicePage({ config }: CityServicePageProps) {
 }
 
 function HeroSection({ config, breadcrumbs }: { config: CityServiceConfig; breadcrumbs: Array<{ name: string; url: string }> }) {
+  const isTelefonassistent = config.serviceSlug === "ki-telefonassistent";
+
   return (
     <section className="pt-32 pb-20 bg-white dark:bg-gray-950 transition-colors duration-300">
       <div className="max-w-5xl mx-auto px-6 lg:px-8">
@@ -155,7 +177,7 @@ function HeroSection({ config, breadcrumbs }: { config: CityServiceConfig; bread
           className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8 flex-wrap"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.18, ease: "easeOut" }}
         >
           {breadcrumbs.map((crumb, i) => (
             <span key={crumb.url} className="flex items-center gap-1.5">
@@ -177,11 +199,15 @@ function HeroSection({ config, breadcrumbs }: { config: CityServiceConfig; bread
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          custom={0.1}
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium tracking-wide uppercase mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-sm font-medium tracking-wide uppercase mb-6">
             <MapPin size={12} />
-            {config.city} · Bayern · DSGVO-konform · Persönliche Betreuung
+            {/* „DSGVO-konform" stand hier als Selbstzusage. Sie ist auf keiner
+                Seite belegt — konform ist eine Verarbeitung, kein Produkt, und
+                die Verträge mit den Unterauftragsverarbeitern sind nicht
+                unterzeichnet (Inhaber-Entscheidung 18.08.2026, gilt fuer alle
+                Produkte, nicht nur den Telefonassistenten). */}
+            {config.city} · Bayern · {isTelefonassistent ? "Keine Gesprächsaufzeichnung" : "Feste Ansprechpartner"} · Persönliche Betreuung
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 leading-tight tracking-tight mb-6">
@@ -193,7 +219,7 @@ function HeroSection({ config, breadcrumbs }: { config: CityServiceConfig; bread
           </p>
 
           {config.locationNote && (
-            <div className="flex items-start gap-2.5 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 max-w-xl mb-8">
+            <div className="flex items-start gap-2.5 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 text-[17px] text-gray-600 dark:text-gray-400 max-w-xl mb-8">
               <Info size={16} className="flex-shrink-0 mt-0.5 text-gray-400" />
               <span>{config.locationNote}</span>
             </div>
@@ -221,13 +247,22 @@ function HeroSection({ config, breadcrumbs }: { config: CityServiceConfig; bread
 }
 
 function TrustStrip({ config }: { config: CityServiceConfig }) {
+  // Zwei Angaben standen hier und hielten der Prüfung nicht stand:
+  // - „DSGVO-konform" als Selbstzusage — auf keiner Seite belegt, siehe
+  //   Hero-Kommentar. Ersatzlos gestrichen, nicht umformuliert.
+  // - „Einrichtung in 7–14 Tagen" widerspricht der Go-live-Garantie aus
+  //   FAKTEN.goLive. Die Angabe wurde in den Stadt-Configs bereits an vier
+  //   Stellen korrigiert und lebte hier — in der geteilten Komponente —
+  //   unbemerkt weiter (die Fehlerklasse aus HONESTY-AUDIT §7).
+  const isTelefonassistent = config.serviceSlug === "ki-telefonassistent";
   const items = [
     config.city,
     config.service,
     "Bayern",
-    "DSGVO-konform",
     "Persönliche Betreuung",
-    "Einrichtung in 7–14 Tagen",
+    ...(isTelefonassistent
+      ? ["Keine Gesprächsaufzeichnung", `Go-live in ${FAKTEN.goLiveTage}\u00A0Tagen`]
+      : ["Persönliche Einrichtung"]),
   ];
 
   return (
@@ -255,7 +290,6 @@ function LocalIntroSection({ config }: { config: CityServiceConfig }) {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeUp}
-          custom={0}
         >
           <h2 id="local-intro-heading" className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">
             {config.service} in {config.city} – was das konkret für Ihren Betrieb bedeutet
@@ -263,7 +297,7 @@ function LocalIntroSection({ config }: { config: CityServiceConfig }) {
 
           <div className="space-y-5">
             {config.localIntro.paragraphs.map((paragraph, i) => (
-              <p key={i} className="text-gray-600 dark:text-gray-400 leading-relaxed">
+              <p key={i} className="text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed">
                 {renderWithLinks(paragraph)}
               </p>
             ))}
@@ -283,7 +317,6 @@ function WarumCogniiq({ config }: { config: CityServiceConfig }) {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeUp}
-          custom={0}
         >
           <h2 id="warum-heading" className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
             Warum Cogniiq für {config.service} in {config.city}
@@ -301,7 +334,6 @@ function WarumCogniiq({ config }: { config: CityServiceConfig }) {
               whileInView="visible"
               viewport={{ once: true }}
               variants={fadeUp}
-              custom={i * 0.07}
               className="flex items-start gap-3 p-5 rounded-xl bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50"
             >
               <CheckCircle2 size={18} className="flex-shrink-0 mt-0.5 text-[#515A61] dark:text-sky-400" />
@@ -323,15 +355,14 @@ function MidPageCTA({ config }: { config: CityServiceConfig }) {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeUp}
-          custom={0}
           className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
         >
           <div className="flex-1">
             <p className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
               {config.service} in {config.city} – kostenloses Erstgespräch
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              30–45 Minuten, unverbindlich, mit konkretem Ergebnis.
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              30–45&nbsp;Minuten, unverbindlich, mit konkretem Ergebnis.
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -367,7 +398,6 @@ function UseCasesSection({ config }: { config: CityServiceConfig }) {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeUp}
-          custom={0}
           className="mb-12"
         >
           <h2 id="usecases-heading" className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
@@ -386,10 +416,9 @@ function UseCasesSection({ config }: { config: CityServiceConfig }) {
               whileInView="visible"
               viewport={{ once: true }}
               variants={fadeUp}
-              custom={i * 0.1}
               className="bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 flex flex-col gap-3"
             >
-              <span className="text-xs font-semibold uppercase tracking-wider text-[#515A61] dark:text-sky-400">
+              <span className="text-sm font-semibold uppercase tracking-wider text-[#515A61] dark:text-sky-400">
                 {useCase.industry}
               </span>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -415,7 +444,6 @@ function ProcessSection({ config }: { config: CityServiceConfig }) {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeUp}
-          custom={0}
           className="mb-12"
         >
           <h2 id="process-heading" className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
@@ -434,7 +462,6 @@ function ProcessSection({ config }: { config: CityServiceConfig }) {
               whileInView="visible"
               viewport={{ once: true }}
               variants={fadeUp}
-              custom={i * 0.08}
               className="relative"
             >
               <div className="text-4xl font-black text-gray-100 dark:text-gray-800 mb-4 select-none">
@@ -443,7 +470,7 @@ function ProcessSection({ config }: { config: CityServiceConfig }) {
               <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 {step.title}
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+              <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed">
                 {step.description}
               </p>
             </motion.div>
@@ -464,15 +491,14 @@ function LocalRelevanzSection({ config }: { config: CityServiceConfig }) {
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
-            custom={0}
           >
             <h2 id="local-heading" className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
               Was Betriebe in {config.city} bremst
             </h2>
             <ul className="space-y-4">
               {config.localChallenges.map((challenge, i) => (
-                <li key={i} className="flex items-start gap-3 text-sm text-gray-600 dark:text-gray-400">
-                  <span className="flex-shrink-0 w-5 h-5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 flex items-center justify-center text-xs font-bold mt-0.5">
+                <li key={i} className="flex items-start gap-3 text-[17px] text-gray-600 dark:text-gray-400">
+                  <span className="flex-shrink-0 w-5 h-5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 flex items-center justify-center text-sm font-bold mt-0.5">
                     {i + 1}
                   </span>
                   {challenge}
@@ -486,7 +512,6 @@ function LocalRelevanzSection({ config }: { config: CityServiceConfig }) {
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
-            custom={0.1}
           >
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
               Geeignet für diese Branchen in {config.city}
@@ -519,7 +544,6 @@ function BranchenSection({ config }: { config: CityServiceConfig }) {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeUp}
-          custom={0}
           className="mb-12"
         >
           <h2 id="branchen-heading" className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
@@ -538,7 +562,6 @@ function BranchenSection({ config }: { config: CityServiceConfig }) {
               whileInView="visible"
               viewport={{ once: true }}
               variants={fadeUp}
-              custom={i * 0.07}
               className="p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/50"
             >
               <div className="flex items-center gap-2.5 mb-4">
@@ -551,15 +574,15 @@ function BranchenSection({ config }: { config: CityServiceConfig }) {
               </div>
               <div className="space-y-3">
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">
+                  <p className="text-sm font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">
                     Herausforderung
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                  <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed">
                     {block.problem}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-[#515A61] dark:text-sky-400 uppercase tracking-widest mb-1">
+                  <p className="text-sm font-semibold text-[#515A61] dark:text-sky-400 uppercase tracking-widest mb-1">
                     Lösung
                   </p>
                   <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
@@ -586,7 +609,6 @@ function LocalSzenarienSection({ config }: { config: CityServiceConfig }) {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeUp}
-          custom={0}
           className="mb-12"
         >
           <h2 id="szenarien-heading" className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
@@ -605,7 +627,6 @@ function LocalSzenarienSection({ config }: { config: CityServiceConfig }) {
               whileInView="visible"
               viewport={{ once: true }}
               variants={fadeUp}
-              custom={i * 0.09}
               className="flex gap-4 p-6 rounded-2xl bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
             >
               <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
@@ -615,7 +636,7 @@ function LocalSzenarienSection({ config }: { config: CityServiceConfig }) {
                 <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   {scenario.title}
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed">
                   {scenario.description}
                 </p>
               </div>
@@ -636,7 +657,6 @@ function FAQSection({ config }: { config: CityServiceConfig }) {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeUp}
-          custom={0}
           className="mb-10"
         >
           <h2 id="faq-heading" className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
@@ -652,7 +672,6 @@ function FAQSection({ config }: { config: CityServiceConfig }) {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeUp}
-          custom={0.1}
         >
           <Accordion type="single" collapsible className="space-y-3">
             {config.faq.map((item, i) => (
@@ -664,7 +683,7 @@ function FAQSection({ config }: { config: CityServiceConfig }) {
                 <AccordionTrigger className="text-left text-sm font-semibold text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 transition-colors py-5 [&>svg]:text-gray-400">
                   {item.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed pb-5">
+                <AccordionContent className="text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed pb-5">
                   {item.answer}
                 </AccordionContent>
               </AccordionItem>
@@ -685,13 +704,12 @@ function CTASection({ config }: { config: CityServiceConfig }) {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeUp}
-          custom={0}
         >
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             {config.service} in {config.city} anfragen
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-            Kostenloses Erstgespräch für Unternehmen in {config.city} – 30 bis 45 Minuten, ohne Verpflichtung. Danach wissen Sie genau, was möglich ist und was es kostet.
+            Kostenloses Erstgespräch für Unternehmen in {config.city} – 30 bis 45&nbsp;Minuten, ohne Verpflichtung. Danach wissen Sie genau, was möglich ist und was es kostet.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
@@ -709,7 +727,7 @@ function CTASection({ config }: { config: CityServiceConfig }) {
             </Link>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-center gap-4 text-xs text-gray-400 dark:text-gray-500">
+          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400 dark:text-gray-500">
             <Link to="/ki-telefonassistent" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">KI-Telefonassistent</Link>
             <span aria-hidden="true">·</span>
             <Link to="/webdesign-agentur-deutschland" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Webdesign Agentur</Link>

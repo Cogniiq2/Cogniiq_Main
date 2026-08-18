@@ -1,11 +1,18 @@
+// Die zuvor hier veröffentlichte Fallstudie benannte einen realen Kunden
+// (Verein, Ort, Projektdetails, wörtliches Zitat) ohne dokumentierte
+// schriftliche Einwilligung im Repository. Sie wurde vollständig aus dem
+// Rendering entfernt — inklusive Meta-Description und JSON-LD — und nicht
+// lediglich markiert. Kein Platzhalter, keine anonymisierte Restfassung:
+// Anlage, Ort und Funktionsumfang blieben auch ohne Namen identifizierbar.
+// Inhalt gesichert in ASSETS-REQUIRED.md; Wiederherstellung nur nach
+// schriftlicher Einwilligung.
+//
+// [[ASSET: Referenzprojekt mit schriftlicher Einwilligung]]
 import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle2, ExternalLink, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
-import {
-  REAL_TESTIMONIAL,
-} from "@/components/TestimonialBlock";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -43,26 +50,19 @@ const schema = {
       },
     },
     {
+      // Kein mainEntity mehr: Das benannte Kundenprojekt wurde aus dem Rendering
+      // entfernt, also darf es auch nicht im strukturierten Datenmarkup stehen.
       "@type": "CollectionPage",
       "@id": `${base}/referenzen/#webpage`,
       url: `${base}/referenzen`,
-      name: "Referenzen – Digitale Systeme im Livebetrieb | Cogniiq",
+      name: "Referenzen – Arbeitsweise und Projektverständnis | Cogniiq",
       description:
-        "Dokumentiertes Kundenprojekt von Cogniiq aus Webentwicklung, Buchungs- und Zahlungssystemen, Verwaltungssoftware und Prozessautomatisierung.",
+        "Wie Cogniiq digitale Systeme baut: Nutzerführung, Geschäftslogik, Verwaltung und Betrieb als zusammenhängendes System.",
       isPartOf: {
         "@id": `${base}/#website`,
       },
       about: {
         "@id": `${base}/#localbusiness`,
-      },
-      mainEntity: {
-        "@type": "CreativeWork",
-        name: "Digitale Infrastruktur für den SV Heinersreuth e.V.",
-        description:
-          "Website, Buchungs- und Zahlungssystem, Admin-Center sowie angebundene Automationen für den laufenden Betrieb der Sportanlage.",
-        creator: {
-          "@id": `${base}/#localbusiness`,
-        },
       },
     },
   ],
@@ -72,8 +72,8 @@ export function ReferenzenPage() {
   return (
     <>
       <PageSEO
-        title="Referenzen – Digitale Systeme im Livebetrieb | Cogniiq"
-        description="Cogniiq Referenzen: Website, Buchung, Zahlung, Verwaltung und Automatisierung für den SV Heinersreuth – als verbundenes System im Livebetrieb."
+        title="Referenzen – Arbeitsweise & Projektverständnis | Cogniiq"
+        description="Wie Cogniiq arbeitet: Nutzerführung, Geschäftslogik, Verwaltung und Betrieb als ein System. Kundenprojekte veröffentlichen wir nur mit schriftlicher Freigabe."
         canonical={`${base}/referenzen`}
         breadcrumbs={breadcrumbs}
         additionalSchema={schema}
@@ -103,197 +103,55 @@ export function ReferenzenPage() {
                 Digitale Systeme, die im Alltag funktionieren.
               </h1>
               <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed max-w-2xl mb-4">
-                Dokumentiertes Kundenprojekt aus Webentwicklung, Buchung, Zahlung, Verwaltung und Automatisierung – produktiv eingesetzt und langfristig betreut.
+                Wie wir arbeiten: Nutzerführung, Geschäftslogik, Verwaltung und Betrieb
+                gehören für uns in ein System – nicht in vier voneinander getrennte
+                Einzellösungen.
               </p>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium mt-2">
                 <CheckCircle2 size={12} aria-hidden="true" />
-                Reale Umsetzung · produktiver Betrieb · direkte Betreuung
+                Kundenprojekte nur mit schriftlicher Freigabe
               </div>
             </motion.div>
           </div>
         </section>
 
         <section className="py-20 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
-          <div className="max-w-5xl mx-auto px-6 lg:px-8">
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
               variants={fadeUp}
               custom={0}
-              className="mb-10"
             >
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                Ausgewähltes Kundenprojekt
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+                Warum hier gerade kein Kundenprojekt steht
               </h2>
-              <p className="text-gray-500 dark:text-gray-400 max-w-2xl">
-                Kein isolierter Website-Relaunch, sondern eine verbundene digitale Infrastruktur für den operativen Betrieb.
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+                An dieser Stelle stand bisher eine ausführliche Fallstudie mit
+                Kundennamen. Wir haben sie entfernt, weil uns dafür keine
+                schriftliche Freigabe des Kunden vorlag – unabhängig davon, wie
+                gut das Projekt gelaufen ist.
               </p>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+                Kundenprojekte veröffentlichen wir erst, wenn die Freigabe
+                schriftlich vorliegt. Anonymisierte Fassungen zeigen wir nicht:
+                Wo Branche, Ort und Funktionsumfang zusammenkommen, ist ein
+                Kunde auch ohne Namen erkennbar.
+              </p>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-8">
+                Wenn Sie wissen möchten, was wir konkret gebaut haben: Fragen Sie
+                uns im Erstgespräch. Dort zeigen wir umgesetzte Systeme – mit
+                Zustimmung der jeweiligen Kunden.
+              </p>
+              <Link
+                to="/kontakt"
+                className="inline-flex items-center gap-2 px-7 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-gray-700 dark:hover:bg-white transition-colors"
+              >
+                Projekte im Erstgespräch ansehen
+                <ArrowRight size={16} aria-hidden="true" />
+              </Link>
             </motion.div>
-
-            <motion.article
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeUp}
-              custom={0.1}
-              className="bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden"
-              aria-labelledby="svh-project-title"
-            >
-              <div className="p-8">
-                <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
-                  <div className="max-w-2xl">
-                    <div className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2">
-                      Sportverein · Heinersreuth bei Bayreuth · Oberfranken
-                    </div>
-                    <h3 id="svh-project-title" className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                      SV Heinersreuth e.V.
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-                      Digitale Infrastruktur für Website, Buchung, Zahlung, Verwaltung und Anlagenautomation
-                    </p>
-                  </div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-xs font-medium">
-                    <CheckCircle2 size={12} aria-hidden="true" />
-                    Im produktiven Betrieb
-                  </div>
-                </div>
-
-                <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-8 max-w-3xl">
-                  Für die Sportanlage entstand ein zusammenhängendes System, das die digitale Nutzerreise mit den internen Verwaltungsprozessen und technischen Funktionen der Anlage verbindet. Mitglieder, Gäste und Verantwortliche arbeiten dadurch nicht mit voneinander getrennten Einzellösungen, sondern mit einer zentralen Infrastruktur.
-                </p>
-
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-                  {[
-                    { label: "Nutzererlebnis", value: "Website" },
-                    { label: "Kernprozess", value: "Buchung & Zahlung" },
-                    { label: "Betrieb", value: "Admin-Center" },
-                    { label: "Infrastruktur", value: "Automation" },
-                  ].map((item) => (
-                    <div
-                      key={item.label}
-                      className="bg-gray-50 dark:bg-gray-900/40 rounded-xl p-4 border border-gray-100 dark:border-gray-700/50"
-                    >
-                      <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">
-                        {item.label}
-                      </p>
-                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{item.value}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-8 mb-8">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
-                      Ausgangslage
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                      Buchung, Bezahlung, Mitgliederstatus, Verwaltungsinformationen und technische Anlagenfunktionen sollten in einem belastbaren digitalen Ablauf zusammengeführt werden. Entscheidend war nicht nur die Oberfläche, sondern ein System, das sich im täglichen Vereinsbetrieb eigenständig bedienen und zuverlässig weiterbetreiben lässt.
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
-                      Zielbild
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                      Eine zentrale Nutzer- und Verwaltungsplattform, die wiederkehrende Abstimmungen reduziert, definierte Preis- und Berechtigungslogiken abbildet und digitale Buchungen mit den relevanten Prozessen der Sportanlage verbindet.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-8 mb-8">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
-                      Nutzer & Buchung
-                    </p>
-                    <ul className="space-y-2">
-                      {[
-                        "Kompletter Website-Relaunch mit mobiler Nutzerführung",
-                        "Zentraler Buchungsprozess für Mitglieder und Gäste",
-                        "Integrierte digitale Zahlungsabwicklung",
-                        "Automatisierte Preis-, Rollen- und Berechtigungslogik",
-                        "Klare Buchungsbestätigungen und Nutzerinformationen",
-                      ].map((item) => (
-                        <li key={item} className="flex items-start gap-2.5 text-sm text-gray-700 dark:text-gray-300">
-                          <CheckCircle2 size={14} className="flex-shrink-0 mt-0.5 text-[#515A61] dark:text-sky-400" aria-hidden="true" />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
-                      Verwaltung & Betrieb
-                    </p>
-                    <ul className="space-y-2">
-                      {[
-                        "Admin-Center für Buchungen und Zahlungen",
-                        "Mitglieder- und Gutscheinverwaltung zur eigenständigen Nutzung",
-                        "Finanz-, Steuer- und Berichtsfunktionen",
-                        "Auditierbare Systemhinweise, Alerts und Einstellungen",
-                        "Laufendes Hosting, Monitoring, Wartung und Support",
-                      ].map((item) => (
-                        <li key={item} className="flex items-start gap-2.5 text-sm text-gray-700 dark:text-gray-300">
-                          <CheckCircle2 size={14} className="flex-shrink-0 mt-0.5 text-[#515A61] dark:text-sky-400" aria-hidden="true" />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="bg-gray-50 dark:bg-gray-900/40 rounded-xl p-5 border border-gray-100 dark:border-gray-700/50 mb-8">
-                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
-                    Verbindung mit der Anlage
-                  </p>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                    Die Lösung endet nicht bei einer Buchungsbestätigung. Digitale Buchungsabläufe wurden mit der Flutlichtsteuerung der Padelanlage verbunden: Eine bestätigte Buchung schaltet das Flutlicht für den gebuchten Zeitraum, ohne manuelles Zutun.
-                  </p>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-8 mb-8">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
-                      Ergebnis im Betrieb
-                    </p>
-                    <ul className="space-y-2">
-                      {[
-                        "Reservierungen über einen zentralen digitalen Prozess",
-                        "Nachvollziehbare Verwaltung von Buchungen und Zahlungen",
-                        "Eigenständige Pflege zentraler Vereinsdaten und Gutscheine",
-                        "Verknüpfung digitaler Buchungen mit Anlagenfunktionen",
-                        "Betreuter Livebetrieb statt einmaliger Projektübergabe",
-                      ].map((item) => (
-                        <li key={item} className="flex items-start gap-2.5 text-sm text-gray-700 dark:text-gray-300">
-                          <CheckCircle2 size={14} className="flex-shrink-0 mt-0.5 text-[#515A61] dark:text-sky-400" aria-hidden="true" />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
-                      Verantwortung von Cogniiq
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                      Cogniiq konzipierte und implementierte die digitale Infrastruktur und verantwortet die technische Betreuung. Die laufende operative Datenpflege erfolgt durch den Verein über die bereitgestellten Verwaltungsfunktionen – ohne Abhängigkeit von manueller Agenturarbeit im Tagesgeschäft.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="bg-gray-50 dark:bg-gray-900/40 rounded-xl p-5 border border-gray-100 dark:border-gray-700/50">
-                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
-                    Rückmeldung aus dem laufenden Betrieb
-                  </p>
-                  <blockquote className="text-base text-gray-700 dark:text-gray-300 leading-relaxed italic mb-3">
-                    „{REAL_TESTIMONIAL.quote}“
-                  </blockquote>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    — {REAL_TESTIMONIAL.attribution}
-                  </p>
-                </div>
-              </div>
-            </motion.article>
           </div>
         </section>
 
@@ -308,10 +166,10 @@ export function ReferenzenPage() {
               className="mb-8"
             >
               <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                Was dieses Projekt über unsere Arbeitsweise zeigt
+                Wie wir Projekte angehen
               </h2>
               <p className="text-gray-500 dark:text-gray-400 max-w-2xl">
-                Digitale Projekte werden bei Cogniiq als betriebliche Gesamtsysteme gedacht – von der Nutzeroberfläche bis zum stabilen Betrieb.
+                Digitale Projekte denken wir als betriebliche Gesamtsysteme – von der Nutzeroberfläche bis zum stabilen Betrieb.
               </p>
             </motion.div>
 

@@ -60,6 +60,14 @@
   </url>
 
   <url>
+    <loc>https://cogniiq.de/praxen</loc>
+    <lastmod>2026-08-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.90</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/praxen"/>
+  </url>
+
+  <url>
     <loc>https://cogniiq.de/ki-telefonassistent</loc>
     <lastmod>2026-06-30</lastmod>
     <changefreq>monthly</changefreq>

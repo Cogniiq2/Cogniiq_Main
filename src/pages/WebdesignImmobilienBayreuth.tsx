@@ -14,18 +14,18 @@ const config: IndustryPageConfig = {
   seo: {
     title: "Webdesign & KI-Telefonassistent für Immobilienmakler in Bayreuth | Cogniiq",
     description:
-      "Immobilien Website Bayreuth: Cogniiq entwickelt Websites, KI-Telefonassistenten und Lead-Automatisierungen für Immobilienmakler in Bayreuth. Mehr Anfragen, automatisierte Besichtigungen, DSGVO-konform.",
+      "Immobilien Website Bayreuth: Cogniiq entwickelt Websites, KI-Telefonassistenten und Lead-Automatisierungen für Immobilienmakler in Bayreuth. Mehr Anfragen, automatisierte Besichtigungen, persönlich betreut.",
     canonical: `${base}/webdesign-immobilien-bayreuth`,
     keywords:
       "Immobilien Website Bayreuth, Makler Website Bayreuth, Immobilienmakler Bayreuth Digital, KI Telefonassistent Immobilien Bayreuth",
   },
   hero: {
-    trustTags: ["Bayreuth", "DSGVO-konform", "KI-Integration", "Lead-Qualifizierung", "Automatisierung"],
+    trustTags: ["Bayreuth", "KI-Integration", "Lead-Qualifizierung", "Automatisierung"],
     ctaLabel: "Projekt für Immobilienmakler starten",
   },
   intro: {
     h1: "Webdesign & KI-Telefonassistent für Immobilienmakler in Bayreuth",
-    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Immobilienmakler in Bayreuth – für mehr qualifizierte Kaufanfragen, automatisierte Besichtigungsprozesse und professionelle Objektpräsentation. DSGVO-konform, lokal betreut.",
+    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Immobilienmakler in Bayreuth – für mehr qualifizierte Kaufanfragen, automatisierte Besichtigungsprozesse und professionelle Objektpräsentation. Lokal betreut.",
   },
   engpaesse: [
     "Eingehende Interessentenanrufe lassen sich nicht skalieren – jeder Anruf kostet Maklerzeit ohne Vorqualifizierung",
@@ -43,7 +43,7 @@ const config: IndustryPageConfig = {
     },
     {
       step: "Schritt 2",
-      title: "Umsetzung in 7–14 Tagen",
+      title: "Umsetzung nach Ihrer Freigabe",
       description:
         "Makler-Website mit Objektpräsentation, KI-Telefonassistent für Interessentenanfragen und Automatisierungsworkflows für Besichtigungen und Follow-ups werden vollständig von Cogniiq aufgebaut.",
     },
@@ -72,7 +72,7 @@ const config: IndustryPageConfig = {
         "Strukturierte Objektseiten mit Exposé-Darstellung",
         "Kontaktformular mit automatischer Lead-Benachrichtigung",
         "On-Page SEO für 'Immobilienmakler Bayreuth'",
-        "DSGVO-konforme Datenschutzdokumentation",
+        "Datenschutzerklärung, Impressum und Cookie-Einwilligung",
       ],
     },
     {
@@ -112,7 +112,7 @@ const config: IndustryPageConfig = {
       icon: "web",
       title: "Immobilien-Website Bayreuth",
       description:
-        "Hochwertige Makler-Website mit professionellen Objektseiten, Exposé-Darstellung, Anfrage-Workflow und gezieltem SEO für Suchanfragen wie 'Immobilienmakler Bayreuth' oder 'Wohnung kaufen Bayreuth'. Mobiloptimiert, conversion-stark, DSGVO-konform.",
+        "Hochwertige Makler-Website mit professionellen Objektseiten, Exposé-Darstellung, Anfrage-Workflow und gezieltem SEO für Suchanfragen wie 'Immobilienmakler Bayreuth' oder 'Wohnung kaufen Bayreuth'. Mobiloptimiert und conversion-stark.",
     },
     {
       icon: "phone",
@@ -124,7 +124,7 @@ const config: IndustryPageConfig = {
       icon: "zap",
       title: "Lead-Automatisierung Bayreuth",
       description:
-        "Eingehende Anfragen werden automatisch qualifiziert, Besichtigungen koordiniert und Follow-ups nach Terminen strukturiert versandt. Keine Anfrage geht verloren, kein Interessent bleibt ohne Reaktion.",
+        "Eingehende Anfragen werden automatisch qualifiziert, Besichtigungen koordiniert und Follow-ups nach Terminen strukturiert versandt. Anfragen werden erfasst und beantwortet – auch abends und am Wochenende.",
     },
   ],
   useCases: [
@@ -136,7 +136,7 @@ const config: IndustryPageConfig = {
     {
       title: "Besichtigungstermine ohne manuelle Koordination",
       description:
-        "Interessenten buchen Besichtigungstermine direkt über die Website oder per KI-Assistent. Bestätigungen, Erinnerungen und Nachfassaktionen laufen vollautomatisch.",
+        "Interessenten buchen Besichtigungstermine direkt über die Website oder per KI-Assistent. Bestätigungen, Erinnerungen und Nachfassaktionen laufen automatisch.",
     },
     {
       title: "Objektanfragen außerhalb der Bürozeiten",
@@ -146,7 +146,7 @@ const config: IndustryPageConfig = {
     {
       title: "Follow-up nach Besichtigung automatisieren",
       description:
-        "Nach jeder Besichtigung wird automatisch eine strukturierte Nachfass-Sequenz ausgelöst. Kein Interessent wird vergessen, kein Kaufentscheidungsmoment verpasst.",
+        "Nach jeder Besichtigung wird automatisch eine strukturierte Nachfass-Sequenz ausgelöst. Interessenten bleiben strukturiert im Blick – auch nach dem Termin.",
     },
     {
       title: "Verkäufer-Akquise über digitale Kanäle",
@@ -163,15 +163,14 @@ const config: IndustryPageConfig = {
     "Mehr qualifizierte Leads durch strukturierte Vorqualifizierung im Anfrage-Prozess",
     "Automatisierte Besichtigungskoordination spart Maklerzeit bei jedem Objekt",
     "Professionelle Objektpräsentation und Makler-Website stärkt Vertrauen bei Käufern und Verkäufern",
-    "Keine verpassten Anfragen – KI-Assistent beantwortet auch abends und am Wochenende",
+    "Anfragen werden erfasst und beantwortet – der KI-Assistent antwortet auch abends und am Wochenende",
     "Follow-up-Automatisierung erhöht die Abschlussrate ohne zusätzlichen Aufwand",
     "Bessere Sichtbarkeit bei lokalen Suchanfragen in Bayreuth – mehr organische Anfragen",
-    "Datenschutzorientierte Umsetzung – alle Kundendaten sicher auf europäischen Servern",
   ],
   localContext: [
     "Der Bayreuther Immobilienmarkt ist von einer stabilen Nachfrage geprägt – sowohl im Kauf- als auch im Mietbereich. Makler stehen vor der Herausforderung, qualifizierte Interessenten schnell zu erreichen und gleichzeitig die eigene Effizienz bei der Lead-Bearbeitung zu steigern.",
     "Cogniiq entwickelt für Immobilienmakler in Bayreuth maßgeschneiderte Digitallösungen: eine hochwertige Makler-Website mit strukturierten Objektseiten, einen KI-Telefonassistenten für Interessentenanfragen sowie Automatisierungssysteme für Lead-Qualifizierung, Besichtigungsplanung und Follow-up-Prozesse.",
-    "Als Bayreuther Unternehmen mit direktem Ortsbezug verstehen wir den lokalen Markt und sind persönlich erreichbar. Die Einrichtung dauert 7–14 Tage. Alle Systeme werden datenschutzorientiert umgesetzt und auf europäischen Servern betrieben.",
+    "Als Bayreuther Unternehmen mit direktem Ortsbezug verstehen wir den lokalen Markt und sind persönlich erreichbar. Alle Systeme werden datenschutzorientiert umgesetzt.",
   ],
   internalLinks: [
     { label: "Webdesign Bayreuth", href: "/bayreuth/webdesign" },
@@ -185,9 +184,9 @@ const config: IndustryPageConfig = {
   ],
   faq: [
     {
-      question: "Kann Cogniiq eine DSGVO-konforme Makler-Website in Bayreuth erstellen?",
+      question: "Was liefert Cogniiq zum Datenschutz einer Makler-Website in Bayreuth erstellen?",
       answer:
-        "Ja. Alle Websites und Systeme werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse – mit korrekten Datenschutzdokumentationen, Cookie-Einwilligungen und sicherer Verarbeitung aller Interessentendaten auf europäischen Servern.",
+        "Zum Lieferumfang gehören Datenschutzerklärung, Impressum, Cookie-Einwilligung und die dokumentierte Verarbeitung der Interessentendaten. Zum Verarbeitungsort machen wir derzeit keine Angabe — die Verträge mit den beteiligten Anbietern sind nicht abschließend unterzeichnet. Ob der konkrete Einsatz den Anforderungen genügt, beurteilt Ihr Datenschutzbeauftragter – wir liefern ihm die Unterlagen dafür zu.",
     },
     {
       question: "Wie werden Interessentenanfragen über die Website automatisch vorqualifiziert?",
@@ -197,7 +196,7 @@ const config: IndustryPageConfig = {
     {
       question: "Wie lange dauert die Einrichtung für einen Immobilienmakler in Bayreuth?",
       answer:
-        "Die Einrichtung dauert in der Regel 7–14 Tage. Website, KI-Assistent und Automatisierungs-Workflows werden vollständig von Cogniiq aufgebaut – Sie müssen keine technischen Vorkenntnisse mitbringen.",
+        "Website, KI-Assistent und Automatisierungs-Workflows werden vollständig von Cogniiq aufgebaut – Sie müssen keine technischen Vorkenntnisse mitbringen.",
     },
     {
       question: "Kann der KI-Telefonassistent auch Fragen zu spezifischen Objekten beantworten?",

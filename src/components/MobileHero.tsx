@@ -484,7 +484,6 @@ export function MobileHero() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 2.5 }}
         >
-          <MetricCard value="7–14 Tage" label="typischer Go-Live" delay={2.6} accent="rgba(15,23,42,0.5)" />
           <MetricCard value="Auch nachts" label="Anrufannahme" delay={2.75} accent="#2e6f8f" />
           <MetricCard value="Individuell" label="statt Baukasten" delay={2.9} accent="rgba(15,23,42,0.3)" />
         </motion.div>
@@ -570,7 +569,7 @@ export function MobileHero() {
             <path d="M4 6l1.5 1.5L8 4" stroke="#16a34a" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <span style={{ fontSize: '11.5px', fontWeight: 600, color: '#15803d' }}>
-            Go-Live typischerweise in 7–14 Tagen
+            Go-Live nach Ihrer Freigabe
           </span>
         </motion.div>
 

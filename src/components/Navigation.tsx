@@ -1,13 +1,58 @@
-import { useState, useEffect, useRef } from 'react';
+// ─────────────────────────────────────────────────────────────────────────────
+// Öffentliche Hauptnavigation.
+//
+// AUFBAU: SCHRITTWEISE OFFENLEGUNG
+//
+// Vorher standen im Leistungs-Panel 37 Verweise gleichzeitig, in vier Spalten,
+// alle im selben visuellen Gewicht und aus drei verschiedenen Ordnungsachsen
+// gemischt (Leistung, Problem, Unternehmen). Dazu acht gleichrangige Einträge in
+// der Kopfzeile. Wer eine Sache suchte, musste alles lesen.
+//
+// Jetzt: Ebene 1 beantwortet „Was macht ihr?" mit drei Antworten. Ebene 2
+// beantwortet „Für wen?" und erscheint erst, wenn eine Leistung gewählt ist.
+// Die Kopfzeile trägt drei Ziele plus Handlung.
+//
+// Die Struktur liegt in src/lib/navigation-data.ts — eine Quelle für diese
+// Datei und die Mobilnavigation, damit beide nicht wieder auseinanderlaufen.
+//
+// BEDIENUNG
+//
+// Die Panels öffnen auf Zeigen UND auf Klick, Eingabe- oder Leertaste. Vorher
+// öffneten sie ausschließlich auf `mouseenter`: Die Auslöser waren `<button>`
+// mit `aria-expanded`, das für Tastaturbedienung immer „false" meldete, weil
+// kein Klick- oder Fokus-Handler existierte. Wer mit der Tastatur navigiert, kam
+// nicht in das Menü. Escape schließt und gibt den Fokus zurück; Pfeiltasten
+// wechseln in der Leistungsspalte.
+//
+// GESTALTUNG nach COPY-BRIEF-3 §1: kein Text unter 14 px (vorher 10–13 px),
+// Bewegung höchstens 180 ms und nur Deckkraft plus kleine Verschiebung,
+// Trennung durch Raum, Akzentfarbe ausschließlich für die Handlung.
+// ─────────────────────────────────────────────────────────────────────────────
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ArrowUpRight } from 'lucide-react';
+import { ChevronDown, ArrowUpRight, ArrowRight } from 'lucide-react';
 import { Logo } from './Logo';
 import { PremiumMobileNav } from './ui/premium-mobile-nav';
 import { ScrollProgress } from './ScrollProgress';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  HAUPTSITZ_SLUG,
+  LEISTUNGEN,
+  LEISTUNGEN_AUSWEG,
+  STANDORTE,
+  istAktiv,
+} from '@/lib/navigation-data';
 
 const ease = [0.22, 1, 0.36, 1] as [number, number, number, number];
+
+/** §1.4: höchstens 180 ms, nur Deckkraft und kleine Verschiebung. */
+const panelMotion = {
+  initial: { opacity: 0, y: -4 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -4 },
+  transition: { duration: 0.18, ease: 'easeOut' as const },
+};
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,6 +60,17 @@ export function Navigation() {
   const { user, isLoading } = useAuth();
   const location = useLocation();
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const triggerRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  // Merkt sich, welches Panel per Klick geöffnet wurde.
+  //
+  // Ohne diese Unterscheidung schließt ein Klick das Panel sofort wieder: Ein
+  // Zeigegerät sendet `mouseenter` VOR `click`, das Panel ist beim Klick also
+  // längst offen, und ein reines Umschalten macht daraus ein Schließen —
+  // Klicken zum Öffnen wäre unmöglich. Zeigen öffnet, ohne die Marke zu setzen;
+  // der erste Klick übernimmt das offene Panel, der zweite schließt es.
+  const perKlickGeoeffnet = useRef<string | null>(null);
+
   const customerNav = {
     label: !isLoading && user ? 'Dashboard' : 'Kundenlogin',
     href: !isLoading && user ? '/app' : '/app/login',
@@ -46,27 +102,67 @@ export function Navigation() {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  const openMenu = (name: string) => {
+  const openMenu = useCallback((name: string) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
     setActiveMenu(name);
-  };
+  }, []);
 
-  const closeMenu = () => {
+  const closeMenu = useCallback(() => {
     closeTimer.current = setTimeout(() => setActiveMenu(null), 120);
-  };
+  }, []);
 
-  const cancelClose = () => {
+  const cancelClose = useCallback(() => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
-  };
+  }, []);
 
-  const simpleItems = [
-    { label: 'Über uns', href: '/ueber-uns' },
-    { label: 'FAQ', href: '/faq' },
-  ];
+  const closeNow = useCallback(
+    (fokusZurueck?: string) => {
+      if (closeTimer.current) clearTimeout(closeTimer.current);
+      setActiveMenu(null);
+      perKlickGeoeffnet.current = null;
+      if (fokusZurueck) triggerRefs.current[fokusZurueck]?.focus();
+    },
+    []
+  );
+
+  /** Klick auf einen Auslöser: übernehmen, wenn per Zeigen geöffnet; sonst umschalten. */
+  const toggleMenu = useCallback(
+    (name: string) => {
+      if (perKlickGeoeffnet.current === name) {
+        closeNow();
+        return;
+      }
+      perKlickGeoeffnet.current = name;
+      openMenu(name);
+    },
+    [closeNow, openMenu]
+  );
+
+  // Escape schließt; ein Klick oder Fokus außerhalb ebenfalls.
+  useEffect(() => {
+    if (!activeMenu) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeNow(activeMenu);
+    };
+    const onOutside = (e: Event) => {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        closeNow();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', onOutside);
+    document.addEventListener('focusin', onOutside);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', onOutside);
+      document.removeEventListener('focusin', onOutside);
+    };
+  }, [activeMenu, closeNow]);
 
   return (
     <>
       <motion.nav
+        ref={navRef}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease }}
@@ -87,110 +183,82 @@ export function Navigation() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.15, duration: 0.5 }}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
                 className="flex items-center"
               >
                 <Logo />
               </motion.div>
             </Link>
 
-            {/* CENTER NAV */}
+            {/* MITTE — drei Ziele, mehr nicht */}
             <motion.div
               className="hidden lg:flex items-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.25, duration: 0.5 }}
             >
-              {/* LEISTUNGEN MEGA */}
               <NavDropdownTrigger
+                name="leistungen"
                 label="Leistungen"
-                isActive={
-                  activePath.startsWith('/webdesign') ||
-                  activePath.startsWith('/ki-') ||
-                  activePath.startsWith('/automatisierung') ||
-                  activePath === '/leistungen'
-                }
+                isActive={istAktiv(activePath, 'leistungen')}
                 isOpen={activeMenu === 'leistungen'}
                 onOpen={() => openMenu('leistungen')}
                 onClose={closeMenu}
+                onToggle={() => toggleMenu('leistungen')}
+                registerRef={(el) => (triggerRefs.current.leistungen = el)}
               />
-
-              {/* STANDORTE MEGA */}
               <NavDropdownTrigger
+                name="standorte"
                 label="Standorte"
-                isActive={
-                  activePath.startsWith('/bayreuth') ||
-                  activePath.startsWith('/muenchen') ||
-                  activePath.startsWith('/regensburg') ||
-                  activePath === '/bayern' ||
-                  activePath === '/deutschland'
-                }
+                isActive={istAktiv(activePath, 'standorte')}
                 isOpen={activeMenu === 'standorte'}
                 onOpen={() => openMenu('standorte')}
                 onClose={closeMenu}
+                onToggle={() => toggleMenu('standorte')}
+                registerRef={(el) => (triggerRefs.current.standorte = el)}
               />
-
-              {simpleItems.map((item) => (
-                <SimpleNavItem
-                  key={item.href}
-                  label={item.label}
-                  href={item.href}
-                  isActive={activePath === item.href}
-                />
-              ))}
+              <SimpleNavItem label="Über uns" href="/ueber-uns" isActive={activePath === '/ueber-uns'} />
             </motion.div>
 
-            {/* RIGHT CTA */}
+            {/* RECHTS — genau eine Handlung */}
             <motion.div
-              className="hidden lg:flex items-center gap-3"
+              className="hidden lg:flex items-center gap-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.5 }}
             >
               <SimpleNavItem
-                label="Referenzen"
-                href="/referenzen"
-                isActive={activePath === '/referenzen'}
-              />
-              <SimpleNavItem
-                label="Blog"
-                href="/blog"
-                isActive={activePath.startsWith('/blog')}
-              />
-              <SimpleNavItem
                 label={customerNav.label}
                 href={customerNav.href}
                 isActive={activePath.startsWith('/app')}
-                className="min-w-[96px] text-center"
+                className="min-w-[104px] text-center"
               />
               <Link
                 to="/kontakt"
-                className="group relative flex items-center gap-1.5 px-5 py-2.5 bg-gray-950 dark:bg-white text-white dark:text-gray-950 text-[13px] font-semibold tracking-wide rounded-full overflow-hidden transition-all duration-300 hover:shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:scale-[1.02] active:scale-[0.99]"
+                className="group relative flex items-center gap-1.5 px-5 py-2.5 bg-gray-950 dark:bg-white text-white dark:text-gray-950 text-sm font-semibold tracking-wide rounded-full overflow-hidden transition-colors duration-200"
               >
-                <span className="relative z-10">Kontakt</span>
-                <ArrowUpRight size={13} className="relative z-10 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                <div className="absolute inset-0 bg-gray-800 dark:bg-gray-100 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]" />
+                <span className="relative z-10">Erstgespräch</span>
+                <ArrowUpRight size={14} className="relative z-10" />
+                <div className="absolute inset-0 bg-gray-800 dark:bg-gray-100 translate-y-full group-hover:translate-y-0 transition-transform duration-200 ease-out" />
               </Link>
             </motion.div>
 
           </div>
         </div>
 
-        {/* MEGA MENU PANELS */}
         <AnimatePresence>
           {activeMenu === 'leistungen' && (
-            <LeistungenMega
+            <LeistungenPanel
               onMouseEnter={cancelClose}
               onMouseLeave={closeMenu}
-              currentPath={location.pathname}
+              currentPath={activePath}
+              onNavigate={() => closeNow()}
             />
           )}
           {activeMenu === 'standorte' && (
-            <StandorteMega
+            <StandortePanel
               onMouseEnter={cancelClose}
               onMouseLeave={closeMenu}
-              currentPath={location.pathname}
+              currentPath={activePath}
             />
           )}
         </AnimatePresence>
@@ -202,415 +270,268 @@ export function Navigation() {
   );
 }
 
-/* ─── Simple nav item ─────────────────────────────────────────────────── */
+/* ─── Einfacher Eintrag ───────────────────────────────────────────────── */
 function SimpleNavItem({
-  label,
-  href,
-  isActive,
-  className = '',
+  label, href, isActive, className = '',
 }: {
-  label: string;
-  href: string;
-  isActive: boolean;
-  className?: string;
+  label: string; href: string; isActive: boolean; className?: string;
 }) {
-  const [hovered, setHovered] = useState(false);
   return (
-    <Link
-      to={href}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className={`relative px-4 py-2 group ${className}`}
-    >
-      <span className={`text-[13px] font-medium tracking-wide transition-colors duration-200 ${
-        isActive ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+    <Link to={href} className={`relative px-4 py-2 group ${className}`}>
+      <span className={`text-sm font-medium tracking-wide transition-colors duration-200 ${
+        isActive
+          ? 'text-gray-900 dark:text-gray-100'
+          : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100'
       }`}>
         {label}
       </span>
-      <motion.div
-        className="absolute bottom-0 left-4 right-4 h-[1px] bg-gray-900 dark:bg-gray-100 origin-left"
-        animate={{ scaleX: isActive ? 1 : hovered ? 1 : 0, opacity: isActive ? 1 : hovered ? 0.4 : 0 }}
-        transition={{ duration: 0.25, ease }}
+      <span
+        aria-hidden="true"
+        className={`absolute bottom-0 left-4 right-4 h-px bg-gray-900 dark:bg-gray-100 origin-left transition-transform duration-200 ease-out ${
+          isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+        }`}
       />
     </Link>
   );
 }
 
-/* ─── Dropdown trigger ────────────────────────────────────────────────── */
+/* ─── Auslöser ────────────────────────────────────────────────────────── */
 function NavDropdownTrigger({
-  label, isActive, isOpen, onOpen, onClose,
+  name, label, isActive, isOpen, onOpen, onClose, onToggle, registerRef,
 }: {
-  label: string; isActive: boolean; isOpen: boolean;
-  onOpen: () => void; onClose: () => void;
+  name: string;
+  label: string;
+  isActive: boolean;
+  isOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+  onToggle: () => void;
+  registerRef: (el: HTMLButtonElement | null) => void;
 }) {
   return (
     <button
+      ref={registerRef}
+      type="button"
       onMouseEnter={onOpen}
       onMouseLeave={onClose}
+      onClick={onToggle}
+      onKeyDown={(e) => {
+        if (e.key === 'ArrowDown' && !isOpen) {
+          e.preventDefault();
+          onOpen();
+        }
+      }}
       className="relative flex items-center gap-1 px-4 py-2 group"
       aria-expanded={isOpen}
+      aria-controls={`nav-panel-${name}`}
       aria-haspopup="true"
     >
-      <span className={`text-[13px] font-medium tracking-wide transition-colors duration-200 ${
-        isActive || isOpen ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100'
+      <span className={`text-sm font-medium tracking-wide transition-colors duration-200 ${
+        isActive || isOpen
+          ? 'text-gray-900 dark:text-gray-100'
+          : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100'
       }`}>
         {label}
       </span>
       <ChevronDown
-        size={12}
-        className={`text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+        size={14}
+        aria-hidden="true"
+        className={`text-gray-400 transition-transform duration-200 ease-out ${isOpen ? 'rotate-180' : ''}`}
       />
-      <div className={`absolute bottom-0 left-4 right-4 h-[1px] bg-gray-900 dark:bg-gray-100 origin-left transition-all duration-200 ${
-        isActive || isOpen ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
-      }`} />
+      <span
+        aria-hidden="true"
+        className={`absolute bottom-0 left-4 right-4 h-px bg-gray-900 dark:bg-gray-100 origin-left transition-transform duration-200 ease-out ${
+          isActive || isOpen ? 'scale-x-100' : 'scale-x-0'
+        }`}
+      />
     </button>
   );
 }
 
-/* ─── Leistungen Mega Menu ────────────────────────────────────────────── */
-function LeistungenMega({ onMouseEnter, onMouseLeave, currentPath }: { onMouseEnter: () => void; onMouseLeave: () => void; currentPath: string }) {
+const PANEL_FLAECHE =
+  'absolute top-full left-0 right-0 bg-white/[0.98] dark:bg-gray-950/[0.98] backdrop-blur-xl border-b border-gray-100 dark:border-white/[0.05]';
+
+/* ─── Leistungen: Ebene 1 links, Ebene 2 rechts ───────────────────────── */
+function LeistungenPanel({
+  onMouseEnter, onMouseLeave, currentPath, onNavigate,
+}: {
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+  currentPath: string;
+  onNavigate: () => void;
+}) {
+  // Beim Öffnen steht die Leistung vorn, in der sich der Besucher gerade
+  // befindet — sonst die erste. Er sieht damit sofort seinen eigenen Kontext.
+  const startIndex = Math.max(
+    0,
+    LEISTUNGEN.findIndex(
+      (l) => currentPath.startsWith(l.href) || l.nischen.some((n) => currentPath.startsWith(n.href))
+    )
+  );
+  const [gewaehlt, setGewaehlt] = useState(startIndex);
+  const aktiv = LEISTUNGEN[gewaehlt];
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: -6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -6 }}
-      transition={{ duration: 0.2, ease }}
+      {...panelMotion}
+      id="nav-panel-leistungen"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className="absolute top-full left-0 right-0 bg-white/[0.98] dark:bg-gray-950/[0.98] backdrop-blur-xl border-b border-gray-100 dark:border-white/[0.05] shadow-[0_16px_48px_rgba(0,0,0,0.08)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.4)]"
+      className={PANEL_FLAECHE}
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-4 gap-8">
+      <div className="max-w-6xl mx-auto px-6 lg:px-8 py-10">
+        <div className="grid grid-cols-[1.1fr_1fr] gap-16">
 
-          {/* Webdesign */}
-          <MegaColumn
-            label="Webdesign"
-            href="/leistungen"
-            description="Websites die konvertieren"
-            currentPath={currentPath}
-            items={[
-              { label: 'Webdesign Agentur Deutschland', href: '/webdesign-agentur-deutschland', featured: true },
-              { label: 'Für Arztpraxen', href: '/webdesign-arzt' },
-              { label: 'Für Gastronomie', href: '/webdesign-gastronomie' },
-              { label: 'Für Immobilien', href: '/webdesign-immobilien' },
-              { label: 'Für Hotels', href: '/webdesign-hotel' },
-              { label: 'Für Sport & Fitness', href: '/webdesign-sport' },
-              { label: 'Kosten & Preise', href: '/kosten-webdesign', small: true },
-            ]}
-          />
-
-          {/* KI-Telefonassistent */}
-          <MegaColumn
-            label="KI-Telefonassistent"
-            href="/ki-telefonassistent"
-            description="Auch außerhalb der Öffnungszeiten erreichbar"
-            currentPath={currentPath}
-            items={[
-              { label: 'KI-Agentur Deutschland', href: '/ki-agentur-deutschland', featured: true },
-              { label: 'Für Arztpraxen', href: '/ki-telefonassistent-arzt' },
-              { label: 'Für Restaurants', href: '/ki-telefonassistent-restaurant' },
-              { label: 'Für Hotels', href: '/ki-telefonassistent-hotel' },
-              { label: 'Für Zahnarzt & Praxis', href: '/ki-telefonassistent-praxis' },
-              { label: 'Demo anhören', href: '/ki-telefonassistent/demo' },
-              { label: 'Kosten & Preise', href: '/kosten-ki-telefonassistent', small: true },
-            ]}
-          />
-
-          {/* Automatisierung */}
-          <MegaColumn
-            label="Automatisierung"
-            href="/automatisierung-unternehmen"
-            description="Prozesse auf Autopilot"
-            currentPath={currentPath}
-            items={[
-              { label: 'Automatisierung Unternehmen', href: '/automatisierung-unternehmen', featured: true },
-              { label: 'Für Restaurants', href: '/automatisierung-restaurant' },
-              { label: 'Für Arztpraxen', href: '/automatisierung-arzt' },
-              { label: 'Für Immobilien', href: '/automatisierung-immobilien' },
-              { label: 'Für Sport & Fitness', href: '/automatisierung-sport' },
-              { label: 'Kosten & Preise', href: '/kosten-automatisierung', small: true },
-            ]}
-          />
-
-          {/* Probleme / Über */}
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-600 mb-4">Ihr Problem</p>
-            <div className="space-y-0.5 mb-6">
-              {[
-                { label: 'Verpasste Anrufe', href: '/verpasste-anrufe-verlust' },
-                { label: 'Keine Anfragen von der Website', href: '/keine-anfragen-website' },
-                { label: 'Keine Online-Terminbuchung', href: '/keine-terminbuchung-online' },
-                { label: 'Zu viel manuelle Arbeit', href: '/zu-viel-manuelle-arbeit' },
-                { label: 'Digitalisierung starten', href: '/digitale-automatisierung-unternehmen' },
-              ].map((item) => (
+          {/* Ebene 1 — drei Antworten auf „Was macht ihr?" */}
+          <div
+            role="tablist"
+            aria-label="Leistungen"
+            className="space-y-1"
+            onKeyDown={(e) => {
+              if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+              e.preventDefault();
+              setGewaehlt((i) =>
+                e.key === 'ArrowDown'
+                  ? (i + 1) % LEISTUNGEN.length
+                  : (i - 1 + LEISTUNGEN.length) % LEISTUNGEN.length
+              );
+            }}
+          >
+            {LEISTUNGEN.map((leistung, i) => {
+              const offen = i === gewaehlt;
+              return (
                 <Link
-                  key={item.href}
-                  to={item.href}
-                  className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-[12.5px] transition-all group ${
-                    currentPath === item.href
-                      ? 'text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-white/[0.06] font-medium'
-                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-white/[0.04]'
+                  key={leistung.key}
+                  to={leistung.href}
+                  role="tab"
+                  aria-selected={offen}
+                  aria-controls="nav-nischen"
+                  tabIndex={offen ? 0 : -1}
+                  onMouseEnter={() => setGewaehlt(i)}
+                  onFocus={() => setGewaehlt(i)}
+                  onClick={onNavigate}
+                  className={`group block rounded-xl px-4 py-4 transition-colors duration-200 ${
+                    offen ? 'bg-gray-50 dark:bg-white/[0.05]' : 'hover:bg-gray-50/60 dark:hover:bg-white/[0.03]'
                   }`}
                 >
-                  <div className={`w-1 h-1 rounded-full flex-shrink-0 transition-colors ${
-                    currentPath === item.href ? 'bg-gray-700 dark:bg-gray-300' : 'bg-gray-300 dark:bg-gray-700 group-hover:bg-gray-500 dark:group-hover:bg-gray-400'
-                  }`} />
-                  {item.label}
+                  <span className="flex items-center gap-2">
+                    <span className="text-[17px] font-semibold text-gray-900 dark:text-gray-100">
+                      {leistung.label}
+                    </span>
+                    <ArrowRight
+                      size={15}
+                      aria-hidden="true"
+                      className={`text-gray-400 transition-opacity duration-200 ${offen ? 'opacity-100' : 'opacity-0'}`}
+                    />
+                  </span>
+                  <span className="block text-sm text-gray-500 dark:text-gray-400 leading-relaxed mt-1">
+                    {leistung.claim}
+                  </span>
                 </Link>
+              );
+            })}
+          </div>
+
+          {/* Ebene 2 — „Für wen?", erst nach der Wahl */}
+          <div id="nav-nischen" role="tabpanel" aria-label={aktiv.label} className="pt-4">
+            <p className="text-sm font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-5">
+              {aktiv.label} für
+            </p>
+            <div className="space-y-0.5">
+              {aktiv.nischen.map((n) => (
+                <PanelLink key={n.href} {...n} isActive={currentPath === n.href} onClick={onNavigate} />
               ))}
             </div>
-            <div className="border-t border-gray-100 dark:border-white/[0.05] pt-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-600 mb-3">Unternehmen</p>
-              <div className="space-y-0.5">
-                {[
-                  { label: 'Leistungen', href: '/leistungen' },
-                  { label: 'Über uns', href: '/ueber-uns' },
-                  { label: 'Referenzen', href: '/referenzen' },
-                  { label: 'Bewertungen', href: '/bewertungen' },
-                ].map((item) => (
-                  <Link
-                    key={item.href}
-                    to={item.href}
-                    className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-[12.5px] transition-all group ${
-                      currentPath === item.href
-                        ? 'text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-white/[0.06] font-medium'
-                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-white/[0.04]'
-                    }`}
-                  >
-                    <div className={`w-1 h-1 rounded-full flex-shrink-0 transition-colors ${
-                      currentPath === item.href ? 'bg-gray-700 dark:bg-gray-300' : 'bg-gray-300 dark:bg-gray-700 group-hover:bg-gray-500 dark:group-hover:bg-gray-400'
-                    }`} />
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
+            <div className="mt-6 pt-5 border-t border-gray-100 dark:border-white/[0.06] space-y-0.5">
+              {aktiv.abschluss.map((n) => (
+                <PanelLink key={n.href} {...n} isActive={currentPath === n.href} onClick={onNavigate} quiet />
+              ))}
             </div>
           </div>
+        </div>
 
+        {/* Der zweite Einstiegsweg — eine Zeile, nicht fünf Verweise */}
+        <div className="mt-8 pt-6 border-t border-gray-100 dark:border-white/[0.06]">
+          <Link
+            to={LEISTUNGEN_AUSWEG.href}
+            onClick={onNavigate}
+            className="group inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200"
+          >
+            {LEISTUNGEN_AUSWEG.label}
+            <ArrowRight size={14} aria-hidden="true" className="transition-transform duration-200 ease-out group-hover:translate-x-0.5" />
+          </Link>
         </div>
       </div>
     </motion.div>
   );
 }
 
-/* ─── Standorte Mega Menu ─────────────────────────────────────────────── */
-function StandorteMega({ onMouseEnter, onMouseLeave, currentPath }: { onMouseEnter: () => void; onMouseLeave: () => void; currentPath: string }) {
-  const cities = [
-    {
-      label: 'Bayreuth',
-      overview: '/bayreuth',
-      services: [
-        { label: 'Webdesign Bayreuth', href: '/bayreuth/webdesign' },
-        { label: 'KI-Telefonassistent', href: '/bayreuth/ki-telefonassistent' },
-        { label: 'Automatisierung', href: '/bayreuth/automatisierung' },
-        { label: 'Website erstellen', href: '/bayreuth/website-erstellen' },
-        { label: 'Landingpage', href: '/bayreuth/landingpage' },
-        { label: 'Lokales SEO', href: '/bayreuth/lokales-seo' },
-      ],
-      industries: [
-        { label: 'Arztpraxis Webdesign', href: '/webdesign-arzt-bayreuth' },
-        { label: 'Gastronomie Webdesign', href: '/webdesign-gastronomie-bayreuth' },
-        { label: 'Immobilien Webdesign', href: '/webdesign-immobilien-bayreuth' },
-      ],
-    },
-    {
-      label: 'München',
-      overview: '/muenchen',
-      services: [
-        { label: 'Webdesign München', href: '/muenchen/webdesign' },
-        { label: 'KI-Telefonassistent', href: '/muenchen/ki-telefonassistent' },
-        { label: 'Automatisierung', href: '/muenchen/automatisierung' },
-        { label: 'Website erstellen', href: '/muenchen/website-erstellen' },
-        { label: 'Landingpage', href: '/muenchen/landingpage' },
-        { label: 'Lokales SEO', href: '/muenchen/lokales-seo' },
-      ],
-      industries: [
-        { label: 'Arztpraxis Webdesign', href: '/webdesign-arzt-muenchen' },
-        { label: 'Gastronomie Webdesign', href: '/webdesign-gastronomie-muenchen' },
-        { label: 'Immobilien Webdesign', href: '/webdesign-immobilien-muenchen' },
-      ],
-    },
-    {
-      label: 'Regensburg',
-      overview: '/regensburg',
-      services: [
-        { label: 'Webdesign Regensburg', href: '/regensburg/webdesign' },
-        { label: 'KI-Telefonassistent', href: '/regensburg/ki-telefonassistent' },
-        { label: 'Automatisierung', href: '/regensburg/automatisierung' },
-        { label: 'Website erstellen', href: '/regensburg/website-erstellen' },
-        { label: 'Landingpage', href: '/regensburg/landingpage' },
-        { label: 'Lokales SEO', href: '/regensburg/lokales-seo' },
-      ],
-      industries: [
-        { label: 'Arztpraxis Webdesign', href: '/webdesign-arzt-regensburg' },
-        { label: 'Gastronomie Webdesign', href: '/webdesign-gastronomie-regensburg' },
-        { label: 'Immobilien Webdesign', href: '/webdesign-immobilien-regensburg' },
-      ],
-    },
-  ];
-
+/* ─── Standorte: fünf Ziele brauchen keine volle Bühne ────────────────── */
+function StandortePanel({
+  onMouseEnter, onMouseLeave, currentPath,
+}: {
+  onMouseEnter: () => void; onMouseLeave: () => void; currentPath: string;
+}) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: -6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -6 }}
-      transition={{ duration: 0.2, ease }}
+      {...panelMotion}
+      id="nav-panel-standorte"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className="absolute top-full left-0 right-0 bg-white/[0.98] dark:bg-gray-950/[0.98] backdrop-blur-xl border-b border-gray-100 dark:border-white/[0.05] shadow-[0_16px_48px_rgba(0,0,0,0.08)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.4)]"
+      className={PANEL_FLAECHE}
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-4 gap-8">
-
-          {/* Overview column */}
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-600 mb-4">Region</p>
-            <div className="space-y-1 mb-6">
-              <Link
-                to="/deutschland"
-                className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-gray-100 dark:border-white/[0.06] hover:border-gray-200 dark:hover:border-white/[0.1] hover:bg-gray-50/80 dark:hover:bg-white/[0.03] transition-all group"
-              >
-                <div>
-                  <p className="text-[13px] font-semibold text-gray-800 dark:text-gray-200">Deutschland</p>
-                  <p className="text-[11px] text-gray-400 dark:text-gray-600">Bundesweit</p>
-                </div>
-                <ArrowUpRight size={13} className="text-gray-300 dark:text-gray-700 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
-              </Link>
-              <Link
-                to="/bayern"
-                className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-gray-100 dark:border-white/[0.06] hover:border-gray-200 dark:hover:border-white/[0.1] hover:bg-gray-50/80 dark:hover:bg-white/[0.03] transition-all group"
-              >
-                <div>
-                  <p className="text-[13px] font-semibold text-gray-800 dark:text-gray-200">Bayern</p>
-                  <p className="text-[11px] text-gray-400 dark:text-gray-600">Alle Standorte</p>
-                </div>
-                <ArrowUpRight size={13} className="text-gray-300 dark:text-gray-700 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
-              </Link>
-            </div>
-            <div className="border-t border-gray-100 dark:border-white/[0.05] pt-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-600 mb-3">Bayern KI</p>
-              <Link
-                to="/bayern/ki-telefonassistent"
-                className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[12.5px] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-all group"
-              >
-                <div className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700 flex-shrink-0" />
-                KI-Telefonassistent Bayern
-              </Link>
-            </div>
+      <div className="max-w-6xl mx-auto px-6 lg:px-8 py-8">
+        <div className="max-w-xs">
+          <p className="text-sm font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-4">
+            Städte
+          </p>
+          <div className="space-y-0.5">
+            {STANDORTE.staedte.map((s) => (
+              <PanelLink
+                key={s.href}
+                {...s}
+                isActive={currentPath === s.href}
+                note={s.href === HAUPTSITZ_SLUG ? 'Hauptsitz' : undefined}
+              />
+            ))}
           </div>
-
-          {/* City columns */}
-          {cities.map((city) => (
-            <div key={city.label}>
-              <Link
-                to={city.overview}
-                className="group flex items-center gap-1.5 mb-4"
-              >
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-600 group-hover:text-gray-600 dark:group-hover:text-gray-400 transition-colors">
-                  {city.label}
-                </p>
-                <ArrowUpRight size={10} className="text-gray-300 dark:text-gray-700 group-hover:text-gray-500 transition-colors" />
-              </Link>
-
-              <div className="space-y-0.5 mb-4">
-                {city.services.map((s) => (
-                  <Link
-                    key={s.href}
-                    to={s.href}
-                    className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-[12.5px] transition-all group ${
-                      currentPath === s.href
-                        ? 'text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-white/[0.06] font-medium'
-                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-white/[0.04]'
-                    }`}
-                  >
-                    <div className={`w-1 h-1 rounded-full flex-shrink-0 transition-colors ${
-                      currentPath === s.href ? 'bg-gray-700 dark:bg-gray-300' : 'bg-gray-300 dark:bg-gray-700 group-hover:bg-gray-500 dark:group-hover:bg-gray-400'
-                    }`} />
-                    {s.label}
-                  </Link>
-                ))}
-              </div>
-
-              <div className="border-t border-gray-100 dark:border-white/[0.05] pt-3">
-                <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-gray-300 dark:text-gray-700 mb-2 px-2">Branchen</p>
-                {city.industries.map((ind) => (
-                  <Link
-                    key={ind.href}
-                    to={ind.href}
-                    className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-[12px] transition-all group ${
-                      currentPath === ind.href
-                        ? 'text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-white/[0.06] font-medium'
-                        : 'text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/[0.04]'
-                    }`}
-                  >
-                    <div className={`w-1 h-1 rounded-full flex-shrink-0 ${
-                      currentPath === ind.href ? 'bg-gray-500 dark:bg-gray-400' : 'bg-gray-200 dark:bg-gray-800'
-                    }`} />
-                    {ind.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ))}
-
+          <div className="mt-6 pt-5 border-t border-gray-100 dark:border-white/[0.06] space-y-0.5">
+            {STANDORTE.regionen.map((r) => (
+              <PanelLink key={r.href} {...r} isActive={currentPath === r.href} quiet />
+            ))}
+          </div>
         </div>
       </div>
     </motion.div>
   );
 }
 
-/* ─── Mega Column ─────────────────────────────────────────────────────── */
-function MegaColumn({
-  label, href, description, items, currentPath,
+/* ─── Verweis im Panel ────────────────────────────────────────────────── */
+function PanelLink({
+  label, href, isActive, quiet = false, note, onClick,
 }: {
   label: string;
   href: string;
-  description: string;
-  currentPath: string;
-  items: { label: string; href: string; featured?: boolean; small?: boolean }[];
+  isActive: boolean;
+  quiet?: boolean;
+  note?: string;
+  onClick?: () => void;
 }) {
   return (
-    <div>
-      <Link to={href} className="group block mb-4">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-400 dark:text-gray-600 group-hover:text-gray-600 dark:group-hover:text-gray-400 transition-colors mb-0.5">
-          {label}
-        </p>
-        <p className="text-[11px] text-gray-400 dark:text-gray-600">{description}</p>
-      </Link>
-      <div className="space-y-0.5">
-        {items.map((item) => {
-          const isActive = currentPath === item.href;
-          return (
-            <Link
-              key={item.href}
-              to={item.href}
-              className={`flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all group ${
-                isActive
-                  ? 'bg-gray-50 dark:bg-white/[0.06] text-gray-900 dark:text-gray-100 font-semibold'
-                  : item.featured
-                  ? 'text-[12.5px] font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-white/[0.04]'
-                  : item.small
-                  ? 'text-[11.5px] text-gray-400 dark:text-gray-600 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/[0.04]'
-                  : 'text-[12.5px] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-white/[0.04]'
-              }`}
-            >
-              <div className={`w-1 h-1 rounded-full flex-shrink-0 transition-colors ${
-                isActive
-                  ? 'bg-gray-700 dark:bg-gray-300'
-                  : item.featured
-                  ? 'bg-gray-400 dark:bg-gray-500 group-hover:bg-gray-600 dark:group-hover:bg-gray-300'
-                  : item.small
-                  ? 'bg-gray-200 dark:bg-gray-800'
-                  : 'bg-gray-300 dark:bg-gray-700 group-hover:bg-gray-500 dark:group-hover:bg-gray-400'
-              }`} />
-              {item.label}
-              {item.featured && !isActive && (
-                <ArrowUpRight size={10} className="ml-auto text-gray-300 dark:text-gray-700 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
-              )}
-            </Link>
-          );
-        })}
-      </div>
-    </div>
+    <Link
+      to={href}
+      onClick={onClick}
+      aria-current={isActive ? 'page' : undefined}
+      className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-[15px] transition-colors duration-200 ${
+        isActive
+          ? 'bg-gray-50 dark:bg-white/[0.06] text-gray-900 dark:text-gray-100 font-medium'
+          : quiet
+          ? 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-white/[0.04]'
+          : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-white/[0.04]'
+      }`}
+    >
+      <span>{label}</span>
+      {note && <span className="text-sm text-gray-400 dark:text-gray-500">{note}</span>}
+    </Link>
   );
 }

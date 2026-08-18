@@ -40,7 +40,7 @@ export function formatBpPercentDe(bp: number): string {
   const s = Number.isInteger(pct)
     ? String(pct)
     : formatDecimalDe(pct, 2).replace(/(,\d*?)0+$/, '$1').replace(/,$/, '');
-  return `${s} %`;
+  return `${s}\u00A0%`;
 }
 
 /**

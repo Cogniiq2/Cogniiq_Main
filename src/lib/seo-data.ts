@@ -122,7 +122,7 @@ export const FAQ_ITEMS = [
   },
   {
     question: "Wie schnell kann Cogniiq mit einem Projekt starten?",
-    answer: "In der Regel innerhalb von 7-14 Tagen. Manchmal schneller, je nach Auslastung und Umfang des Projekts.",
+    answer: "Das hängt von Auslastung und Umfang des Projekts ab — den Zeitplan nennen wir im Angebot.",
   },
   {
     question: "Kann Cogniiq bestehende Systeme übernehmen und verbessern?",
@@ -179,7 +179,7 @@ export const LOCATION_PAGES: LocationPage[] = [
     region: "Bayern",
     slug: "regensburg",
     title: "AI Agentur & Webdesign Regensburg | KI-Telefonassistent & Automatisierung – Cogniiq",
-    description: "Cogniiq – KI-Telefonassistent, Webdesign und Automatisierung für Unternehmen in Regensburg. Persönliche Betreuung, Go-Live in 7–14 Tagen.",
+    description: "Cogniiq – KI-Telefonassistent, Webdesign und Automatisierung für Unternehmen in Regensburg. Persönliche Betreuung.",
     keywords: ["AI Agentur Regensburg", "Webdesign Regensburg", "KI Telefonassistent Regensburg", "Automatisierung Regensburg"],
     canonical: "https://cogniiq.de/regensburg",
   },
@@ -188,12 +188,13 @@ export const LOCATION_PAGES: LocationPage[] = [
 export const PAGE_META = {
   home: {
     title: "Cogniiq – KI-Telefonassistent, Webdesign & Automatisierung für Unternehmen in Bayern",
-    description: "Cogniiq entwickelt operative KI-Systeme für Unternehmen in Bayern: KI-Telefonassistent, hochkonvertierende Websites und Prozessautomatisierung. Kein Anruf geht verloren. Go-Live in 7–14 Tagen.",
+    // [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1)]]
+    description: "Cogniiq entwickelt operative KI-Systeme für Unternehmen in Bayern: KI-Telefonassistent, Websites und Prozessautomatisierung. Erreichbar auch außerhalb der Öffnungszeiten.",
     canonical: "https://cogniiq.de",
   },
   leistungen: {
     title: "Leistungen | KI-Telefonassistent, Webdesign & Automatisierung – Cogniiq",
-    description: "Drei operative Systeme, die täglich für Ihr Unternehmen arbeiten: KI-Telefonassistent, der jeden Anruf beantwortet – Webdesign, das konvertiert – Automatisierung, die manuelle Arbeit eliminiert.",
+    description: "Drei operative Systeme für Ihr Unternehmen: KI-Telefonassistent für die Anrufannahme, Webdesign für mehr Anfragen, Automatisierung gegen manuelle Handarbeit.",
     canonical: "https://cogniiq.de/leistungen",
   },
   ueberUns: {

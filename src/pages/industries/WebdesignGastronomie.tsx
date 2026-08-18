@@ -53,7 +53,7 @@ const config: NationalIndustryPageConfig = {
     "Digitale Speisekarte mit einfacher Eigenaktualisierung",
     "Google Business Profil eingerichtet und optimiert",
     "Bewertungen und Atmosphäre-Fotos professionell eingebunden",
-    "DSGVO-konforme Website mit vollständiger Datenschutzdokumentation",
+    "Website mit vollständiger Datenschutzdokumentation",
   ],
   workflow: {
     title: "So entsteht Ihre Restaurant-Website",
@@ -92,11 +92,11 @@ const config: NationalIndustryPageConfig = {
   faq: [
     {
       question: "Was kostet eine Restaurant-Website mit Online-Reservierung?",
-      answer: "Restaurant-Websites mit professionellem Design und Reservierungsformular starten bei ca. 1.800 €. Mit vollständigem Reservierungssystem, Speisekarten-CMS und Local SEO-Setup typischerweise 3.000–5.000 €. Genaues Angebot nach kostenlosem Erstgespräch.",
+      answer: "Restaurant-Websites mit professionellem Design und Reservierungsformular starten bei ca. 1.800 €. Mit vollständigem Reservierungssystem, Speisekarten-CMS und Local SEO-Setup typischerweise 3.000–5.000 €. Genaues Angebot nach kostenlosem Erstgespräch.",
     },
     {
       question: "Welche Reservierungssysteme integriert Cogniiq?",
-      answer: "Wir integrieren OpenTable, ResDiary, Resmio und andere gängige Systeme. Auf Wunsch auch in Kombination mit dem KI-Telefonassistenten, sodass auch telefonische Reservierungen vollautomatisch laufen – 24 Stunden, 7 Tage.",
+      answer: "Welches Reservierungssystem Sie nutzen, klären wir vorab; ob und wie es sich einbinden lässt, steht vor der Beauftragung fest.",
     },
     {
       question: "Kann ich die Speisekarte selbst aktualisieren?",
@@ -107,8 +107,8 @@ const config: NationalIndustryPageConfig = {
       answer: "Sehr wichtig – und oft unterschätzt. Die meisten Restaurant-Besuche beginnen mit einer lokalen Google-Suche. Mit Local SEO und Google Business Optimierung erscheinen Sie bei diesen Suchen prominent, statt hinter Aggregatoren und Konkurrenten zu verschwinden.",
     },
     {
-      question: "Ist die Website DSGVO-konform?",
-      answer: "Ja. Alle Cogniiq-Websites werden mit vollständiger DSGVO-Dokumentation geliefert: Datenschutzerklärung, Impressum, Cookie-Consent und DSGVO-konforme Formularverarbeitung. Auch Reservierungstools werden datenschutzkonform eingebunden.",
+      question: "Welche Datenschutz-Unterlagen gehören zur Website?",
+      answer: "Zum Lieferumfang gehören Datenschutzerklärung, Impressum, Cookie-Einwilligung und die dokumentierte Formularverarbeitung. Reservierungstools binden wir mit Auftragsverarbeitungsvertrag ein.",
     },
   ],
 };

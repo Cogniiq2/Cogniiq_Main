@@ -16,10 +16,6 @@ import {
 } from "@/components/ui/accordion";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
-import {
-  TestimonialBlock,
-  REAL_TESTIMONIAL,
-} from "@/components/TestimonialBlock";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -103,19 +99,9 @@ export function ClusterPage({ config }: ClusterPageProps) {
     { name: config.topic, url: `${BUSINESS_INFO.website}${config.route}` },
   ];
 
-  // No "@context" here: this object is embedded as a node inside the @graph of `schema`
-  // below, and a nested @context inside @graph is invalid JSON-LD.
-  const faqSchema = {
-    "@type": "FAQPage",
-    mainEntity: config.faq.map((item) => ({
-      "@type": "Question",
-      name: item.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: item.answer,
-      },
-    })),
-  };
+  // FAQPage wird von PageSEO aus `faqItems` erzeugt und darf hier nicht noch
+  // einmal stehen — seit die Blöcke im SSR gerendert werden, läge derselbe
+  // Block sonst zweimal im ausgelieferten Dokument.
 
   const schema = {
     "@context": "https://schema.org",
@@ -150,7 +136,6 @@ export function ClusterPage({ config }: ClusterPageProps) {
         areaServed: { "@type": "City", name: config.city },
         keywords: config.seo.keywords,
       },
-      faqSchema,
     ],
   };
 
@@ -174,12 +159,10 @@ export function ClusterPage({ config }: ClusterPageProps) {
         {config.deliverables && <DeliverablesSection config={config} />}
         {config.comparison && <ComparisonSection config={config} />}
         <LocalRelevanceSection config={config} />
-        <TestimonialBlock
-          testimonials={[REAL_TESTIMONIAL]}
-          heading="Aus der Praxis"
-          subheading="Reale Projektumsetzung – Systeme im Livebetrieb."
-          compact
-        />
+        {/* Kundenstimmen-Block entfernt: das bisher gezeigte Zitat benannte einen
+            realen Dritten ohne dokumentierte schriftliche Einwilligung. Kein
+            Platzhalter — der Block kehrt erst mit einer freigegebenen Referenz
+            zurück (siehe ASSETS-REQUIRED.md). */}
         <FAQSection config={config} />
         <InternalLinksSection config={config} />
         <CTASection config={config} />
@@ -646,7 +629,7 @@ function CTASection({ config }: { config: ClusterPageConfig }) {
             Kostenloses Erstgespräch für Unternehmen in {config.city}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-            30–45 Minuten, ohne Verpflichtung. Wir analysieren Ihre Situation und geben eine konkrete Einschätzung zu {config.topic} in {config.city}.
+            30–45&nbsp;Minuten, ohne Verpflichtung. Wir analysieren Ihre Situation und geben eine konkrete Einschätzung zu {config.topic} in {config.city}.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link

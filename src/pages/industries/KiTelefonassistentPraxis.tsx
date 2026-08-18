@@ -1,77 +1,89 @@
 import { NationalIndustryPage } from "@/components/NationalIndustryPage";
 import type { NationalIndustryPageConfig } from "@/components/NationalIndustryPage";
 import { BUSINESS_INFO } from "@/lib/seo-data";
+import { DATENSCHUTZ_PUNKTE, FAKTEN, GRENZEN } from "@/lib/telefonassistent-copy";
 
 const config: NationalIndustryPageConfig = {
   seo: {
-    title: "KI Telefonassistent für Therapeuten & Praxen | Automatisierte Terminbuchung | Cogniiq",
-    description: "KI Telefonassistent für Physio-, Logo- und Ergotherapeuten: Automatische Terminbuchung, Erinnerungen und Praxisentlastung. DSGVO-konform, keine verpassten Patienten mehr.",
+    title: "KI Telefonassistent für Therapiepraxen | Cogniiq",
+    description:
+      "KI Telefonassistent für Physio-, Ergo- und Logopädie-Praxen: erreichbar bleiben, während Sie behandeln. Terminwünsche strukturiert erfasst, ohne Gesprächsaufzeichnung.",
     canonical: `${BUSINESS_INFO.website}/ki-telefonassistent-praxis`,
-    keywords: "KI Telefonassistent Praxis, Physiotherapie Telefonservice, Terminbuchung Therapeut, KI Rezeptionistin Therapiepraxis",
+    keywords: "KI Telefonassistent Praxis, Physiotherapie Telefonannahme, telefonische Erreichbarkeit Therapiepraxis, Terminbuchung Therapeut",
   },
   h1: "KI Telefonassistent für Therapeuten & Praxen",
-  tagline: "Therapeuten · Terminbuchung · Praxisentlastung",
-  intro: "Sie behandeln – und gleichzeitig klingelt das Telefon. Wer alleine oder mit kleinem Team arbeitet, kann keine Sitzung unterbrechen, um einen Terminwunsch entgegenzunehmen. Der Patient wartet kurz, bekommt keine Antwort und ruft den nächsten Therapeuten an. Der KI Telefonassistent nimmt ab, solange Sie im Behandlungsraum sind – und bucht den Termin direkt in Ihren Kalender.",
+  tagline: "Physio · Ergo · Logo · Erreichbar ohne besetzten Empfang",
+  intro:
+    "Ihre Hände sind am Patienten, und das Telefon klingelt im Flur. Nach Feierabend sitzen Sie über der Rückrufliste – falls die Mailbox überhaupt verwertbare Nachrichten enthält. Viele Therapiepraxen besetzen den Empfang nur wenige Stunden pro Woche; den Rest erledigt die Inhaberin abends selbst. Der KI Telefonassistent nimmt die Anrufe an, während Sie behandeln, erfasst Terminwünsche strukturiert und legt sie Ihnen so vor, dass der Rückruf in Minuten erledigt ist – oder gar nicht mehr nötig.",
   serviceSlug: "ki-telefonassistent",
   serviceLabel: "KI Telefonassistent",
   costLink: "/kosten-ki-telefonassistent",
   costLinkLabel: "Kosten KI Telefonassistent",
   problems: [
     {
-      title: "Behandlung und Telefon gleichzeitig ist nicht möglich",
-      description: "Physiotherapeuten, Ergotherapeuten und Logopäden haben keine freien Hände und keine freie Aufmerksamkeit während einer Sitzung. Anrufe in dieser Zeit gehen verloren – und mit ihnen potenzielle Patienten.",
+      title: "Behandlung und Telefon konkurrieren um dieselben Hände",
+      description:
+        "Eine Sitzung lässt sich nicht unterbrechen, um einen Terminwunsch aufzunehmen. Jeder Anruf während der Behandlung landet auf der Mailbox – oder nirgends.",
     },
     {
-      title: "Folgetermine werden telefonisch koordiniert – statt direkt gebucht",
-      description: "Nach jeder Behandlung die nächsten Termine koordinieren, Absagen umplanen, Wartelistenkontakt halten: Das summiert sich täglich auf wertvolle Stunden, die der Therapiearbeit fehlen.",
+      title: "Die Rückrufliste gehört dem Feierabend",
+      description:
+        "Wo kein Empfang dauerhaft besetzt ist, bleibt das Zurückrufen an der Inhaberin hängen – abends, nach der letzten Behandlung, oft bei Anrufern, die dann selbst nicht mehr abnehmen.",
     },
     {
-      title: "No-Shows treffen kleine Praxen besonders hart",
-      description: "Ein gebuchter Termin, der unbesetzt bleibt, ist in einer Einzelpraxis nicht durch andere Kapazitäten aufgefangen. Automatische Erinnerungen verhindern das zuverlässig – ohne tägliche Arbeit.",
+      title: "Mailbox-Nachrichten sind selten vollständig",
+      description:
+        "Name verstanden, Nummer fehlt – oder umgekehrt. Wer Nachrichten abhört, bekommt kein strukturiertes Anliegen, sondern ein Ratespiel. Und viele Anrufer sprechen gar nicht erst auf Band.",
     },
     {
-      title: "Abends und am Wochenende erreichbar sein ist die Ausnahme",
-      description: "Patienten, die nach Feierabend einen Termin buchen wollen, landen auf der Mailbox. Viele versuchen es nicht noch einmal. Erreichbarkeit außerhalb der Öffnungszeiten entscheidet heute über Patientenbindung.",
+      title: "Absagen erreichen niemanden – der Termin verfällt",
+      description:
+        "Wer kurzfristig absagen will und nicht durchkommt, erscheint als Ausfall im Plan. In einer Einzelpraxis lässt sich diese Stunde nicht auffangen – dabei hätte jemand von der Warteliste sie gern übernommen.",
     },
     {
-      title: "Patientendaten ohne strukturiertes System",
-      description: "Name, Anliegen, Kontaktdaten – am Telefon abgenommen und auf einem Notizzettel. Für Therapiepraxen mit ihren datenschutzrechtlichen Anforderungen ist das eine unnötige Schwachstelle.",
+      title: "Anfragen nach Feierabend laufen ins Leere",
+      description:
+        "Berufstätige Patienten rufen an, wenn Ihre Praxis geschlossen ist. Ohne verlässliche Annahme gehen genau die Anfragen verloren, die tagsüber nicht kommen konnten.",
     },
     {
-      title: "Rezept- und Routineanfragen fressen Verwaltungszeit",
-      description: "Kann ich meine Folgerezeptur verlängern lassen? Wann ist der nächste freie Termin? Wie lange dauert eine Einheit? Diese Fragen lassen sich vollständig automatisieren – und entlasten den Praxisalltag dauerhaft.",
+      title: "Zettel und Gedächtnis sind kein System für Patientendaten",
+      description:
+        "Name, Anliegen und Rückrufnummer zwischen zwei Behandlungen auf einen Block zu notieren, ist fehleranfällig – und für Gesundheitsdaten kein dokumentierter Prozess. Eine strukturierte Erfassung ist beides: verlässlicher und sauberer dokumentiert.",
     },
   ],
   solution: {
-    headline: "Mehr Zeit für Therapie. Kein verpasster Patient mehr.",
-    text: "Der KI Telefonassistent übernimmt Terminannahme, Bestätigung und Erinnerungen – vollständig automatisch. Sie behandeln, der Assistent verwaltet. Patienten werden nicht mehr abgewiesen, weil Sie gerade im Behandlungsraum sind.",
+    headline: "Erreichbar bleiben, ohne den Empfang zu besetzen",
+    text: "Der Assistent nimmt Anrufe an, während Sie behandeln: Er erfasst Terminwünsche, nimmt Absagen entgegen und beantwortet wiederkehrende Fragen nach Ihren Vorgaben. Fachliche und therapeutische Auskünfte gibt er nicht – solche Anliegen landen mit Rückrufnummer und Kontext auf Ihrer Liste. Sie entscheiden abends nicht mehr, wen Sie zuerst zurückrufen müssen, sondern sehen es.",
   },
   benefits: [
-    "Terminbuchung während der Behandlung – kein Anruf geht verloren",
-    "Automatische Terminerinnerungen reduzieren No-Shows messbar",
-    "DSGVO-konform – Patientendaten auf europäischen Servern mit AVV",
-    "Erreichbar für Terminwünsche und Standardfragen – auch außerhalb der Sprechzeiten",
-    "Folgetermine automatisch angeboten und eingetragen",
-    "Integration mit Praxisverwaltungssystemen",
-    "Eingerichtet in 7–14 Tagen – keine Unterbrechung des Betriebs",
+    "Anrufe werden angenommen, während Sie behandeln – ohne dass jemand am Empfang sitzt",
+    "Terminwünsche und Absagen kommen als strukturierte Einträge an – mit Name, Nummer und Anliegen",
+    "Frei werdende Termine sind sofort sichtbar und können neu vergeben werden",
+    "Wiederkehrende Fragen zu Zeiten, Anfahrt oder Unterlagen beantwortet der Assistent nach Ihren Vorgaben",
+    "Ihre Stimmauswahl, Ihr Begrüßungssatz, Ihre Formulierungen – Anrufer erfahren im ersten Satz, dass ein KI-System spricht",
+    "Auftragsverarbeitungsvertrag nach Art. 28 DSGVO; keine Gesprächsaufzeichnung, kein Training mit Ihren Daten",
+    `Festes Minutenkontingent, darüber ${FAKTEN.mehrpreisProMinute}/Min. – gedeckelt auf die Obergrenze Ihres Tarifs`,
   ],
   workflow: {
-    title: "So läuft ein Terminanruf in der Therapeutenpraxis ab",
+    title: "So läuft ein Terminanruf in der Therapiepraxis ab",
     steps: [
       {
         step: "01",
-        title: "Patient ruft an",
-        description: "Der Assistent nimmt sofort ab – auch wenn alle Behandlungsräume belegt sind. Kein verpasster Anruf, keine Warteschleife, kein Besetztzeichen.",
+        title: "Patient ruft an – Sie behandeln weiter",
+        description:
+          "Der Assistent nimmt ab, ohne dass eine Sitzung unterbrochen wird. Der Anrufer erfährt zu Beginn, dass ein Sprachassistent ihn betreut, und kann jederzeit um einen Rückruf bitten.",
       },
       {
         step: "02",
-        title: "Termin prüfen und buchen",
-        description: "Freie Termine werden in Echtzeit geprüft und dem Patienten vorgeschlagen – nach den Regeln und Zeitfenstern, die Sie vorgeben. Nach Bestätigung wird der Termin direkt eingetragen.",
+        title: "Anliegen strukturiert erfassen",
+        description:
+          "Terminwunsch, Absage oder Frage zur Praxis: Der Assistent bearbeitet, was Sie freigegeben haben – nach Ihren Zeitfenstern und Regeln. Therapeutische Fragen nimmt er nur auf, beantwortet sie aber nicht.",
       },
       {
         step: "03",
-        title: "Bestätigung sofort, Erinnerung automatisch",
-        description: "Sofortige Buchungsbestätigung per SMS oder E-Mail. 24 Stunden vorher folgt eine automatische Erinnerung – No-Shows sinken, ohne dass Sie einen Finger rühren.",
+        title: "Übergabe statt Rückruf-Marathon",
+        description:
+          "Alle Anliegen stehen als sortierte Liste im Dashboard – mit Name, Rückrufnummer und Terminwunsch. Was sich ohne Sie klären ließ, ist geklärt; den Rest arbeiten Sie in Minuten ab, statt abends die Mailbox zu rekonstruieren.",
       },
     ],
   },
@@ -82,35 +94,44 @@ const config: NationalIndustryPageConfig = {
     { label: "KI Telefonassistent Bayern", href: "/bayern/ki-telefonassistent" },
     { label: "KI Agentur Deutschland", href: "/ki-agentur-deutschland" },
   ],
+  // Option B (Positionierung): Healthcare-Journey bleibt geschlossen —
+  // keine Links in Hotel-/Restaurant-Inhalte.
   relatedLinks: [
     { label: "KI Telefonassistent Arzt", href: "/ki-telefonassistent-arzt" },
     { label: "Automatisierung Arzt", href: "/automatisierung-arzt" },
     { label: "Webdesign Arzt", href: "/webdesign-arzt" },
     { label: "Kosten KI Telefonassistent", href: "/kosten-ki-telefonassistent" },
-    { label: "KI Telefonassistent Restaurant", href: "/ki-telefonassistent-restaurant" },
+    { label: "KI Telefonassistent im Überblick", href: "/ki-telefonassistent" },
   ],
   faq: [
     {
-      question: "Welche Praxisarten profitieren am meisten?",
-      answer: "Physiotherapeuten, Ergotherapeuten, Logopäden, Psychotherapeuten und Heilpraktiker profitieren besonders stark – weil bei ihnen Behandlungszeit und Telefonzeit direkt konkurrieren. Je weniger Assistenz, desto höher der Gewinn durch Automatisierung.",
+      question: "Für welche Praxisformen eignet sich der Assistent?",
+      answer:
+        "Für Praxen, in denen Behandlungszeit und Telefonzeit direkt konkurrieren: Physiotherapie, Ergotherapie, Logopädie, Heilpraxis. Je seltener der Empfang besetzt ist, desto größer die spürbare Entlastung – vom Einzelkämpfer bis zur Praxis mit mehreren Behandlungsräumen.",
     },
     {
-      question: "Ist der Assistent DSGVO-konform für Patientendaten in Therapiepraxen?",
-      answer: "Ja. Alle Daten werden auf europäischen Servern verarbeitet. Der Assistent wird mit einem Auftragsverarbeitungsvertrag (AVV) geliefert – technische und organisatorische Maßnahmen werden projektbezogen abgestimmt, auch für Therapiepraxen, die sensible Gesundheitsdaten verarbeiten.",
+      question: "Kommen meine Patienten mit einer Computerstimme klar?",
+      answer:
+        "Nicht jeder Anrufer mag synthetische Stimmen – das nehmen wir ernst. Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihre Praxis am Telefon spricht. Wer nicht mit dem Assistenten sprechen möchte, kann jederzeit einen Rückruf hinterlassen und wird nicht in ein Menü gezwungen. In der Anfangszeit werten wir die Gespräche mit Ihnen aus und passen an, was nicht ankommt.",
     },
     {
-      question: "Kann der Assistent automatisch Folgetermine einplanen?",
-      answer: "Ja. Nach einer Sitzung kann der Assistent automatisch Folgetermine anbieten und einplanen – nach den Zeitfenstern und Regeln, die Sie vorgeben. Patienten müssen nicht aktiv nachfragen oder nochmals anrufen.",
+      question: "Worauf müssen Sie bei DSGVO und Gesundheitsdaten in Therapiepraxen achten?",
+      answer: `Vier Punkte entscheiden, und Sie sollten sie bei jedem Anbieter abfragen: Wird das Gespräch aufgezeichnet und wie lange gespeichert. Werden Ihre Daten zum Training von Modellen verwendet. Gibt es einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO. Und wie wird die Schweigepflicht nach § 203 StGB vertraglich abgebildet. Bei uns: ${DATENSCHUTZ_PUNKTE.join(". ").replace(/\.\.$/, ".")}.`,
     },
     {
-      question: "Was passiert mit Anfragen, die der Assistent nicht beantworten kann?",
-      answer: "Komplexe medizinische Fragen, unklare Anliegen oder Eskalationsszenarien werden mit vollständiger Gesprächszusammenfassung an Sie weitergeleitet – als Nachricht oder in Ihr Verwaltungssystem. Kein Informationsverlust.",
+      question: "Was passiert mit Anliegen, die der Assistent nicht klären kann?",
+      answer:
+        "Therapeutische Fragen, unklare Anliegen und alles, was Sie festgelegt haben, nimmt der Assistent nur strukturiert auf – mit Name, Rückrufnummer und Anliegen. Sie sehen die Liste, wenn Sie aus der Behandlung kommen, und entscheiden selbst über jede Rückmeldung.",
     },
     {
-      question: "Kann ich den Assistenten testen, bevor ich mich entscheide?",
-      answer: "Ja. Im kostenlosen Erstgespräch zeigen wir den Assistenten live – konfiguriert auf Ihre Praxis, Ihre häufigsten Anrufszenarien und Ihren Kalender. Sie können den Unterschied sofort einschätzen.",
+      question: "Kann ich den Assistenten hören, bevor ich mich entscheide?",
+      answer:
+        "Ja. Im unverbindlichen Erstgespräch gehen wir Ihre typischen Anrufe durch und zeigen an einer Beispielkonfiguration, wie der Assistent für Ihre Praxis klingt und was er übernimmt. Vor dem Start testen Sie mit echten Szenarien – erst wenn es sitzt, geht er live.",
     },
   ],
+  grenzen: GRENZEN,
+  stimmprobe: true,
+  beweiskette: true,
 };
 
 export function KiTelefonassistentPraxis() {

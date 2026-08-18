@@ -53,7 +53,7 @@ const config: NationalIndustryPageConfig = {
     "Saisonale Seiten für Events, Messen und Festspiele",
     "Strukturiertes Gruppenanfrage-Formular mit automatischer Bestätigung",
     "Google Business Profil optimiert und mit Website synchronisiert",
-    "DSGVO-konforme Gästedatenverarbeitung inklusive",
+    "Gästedatenverarbeitung mit Auftragsverarbeitungsvertrag",
   ],
   workflow: {
     title: "Hotel-Website mit Direktbuchung – in drei Phasen",
@@ -66,7 +66,7 @@ const config: NationalIndustryPageConfig = {
       {
         step: "02",
         title: "Buchungssystem, Zimmerpräsentation & SEO",
-        description: "Integration des Direktbuchungssystems (z. B. Little Hotelier, Booking Engine via Channel Manager), vollständige Zimmerpräsentation und Local SEO-Setup für Ihre wichtigsten Suchbegriffe.",
+        description: "Integration des Direktbuchungssystems (Anbindung wird vor der Beauftragung geprüft), vollständige Zimmerpräsentation und Local SEO-Setup für Ihre wichtigsten Suchbegriffe.",
       },
       {
         step: "03",
@@ -92,11 +92,11 @@ const config: NationalIndustryPageConfig = {
   faq: [
     {
       question: "Wie viel Provision kann durch mehr Direktbuchungen eingespart werden?",
-      answer: "Buchungsportale nehmen pro Buchung eine Provision, die je nach Plattform und Vertrag deutlich ins Gewicht fällt. Jede Buchung, die stattdessen direkt über Ihre eigene Website eingeht, spart diese Provision vollständig ein. Wie stark sich das rechnet, hängt von Zimmerpreis, Belegung und Ihrem heutigen Direktbuchungsanteil ab – das rechnen wir im Erstgespräch gemeinsam für Ihr Haus durch. Die Website amortisiert sich in der Regel innerhalb von 6–12 Monaten.",
+      answer: "Buchungsportale nehmen pro Buchung eine Provision, die je nach Plattform und Vertrag deutlich ins Gewicht fällt. Jede Buchung, die stattdessen direkt über Ihre eigene Website eingeht, spart diese Provision vollständig ein. Wie stark sich das rechnet, hängt von Zimmerpreis, Belegung und Ihrem heutigen Direktbuchungsanteil ab – das rechnen wir im Erstgespräch gemeinsam für Ihr Haus durch. Die Website amortisiert sich in der Regel innerhalb von 6–12 Monaten.",
     },
     {
       question: "Welches Buchungssystem integriert Cogniiq?",
-      answer: "Wir arbeiten mit gängigen Buchungssystemen wie Little Hotelier, Beds24, Apaleo und eigenen Channel-Manager-Lösungen. Die Wahl richtet sich nach Ihrer Größe, bestehenden Systemen und Budget. Ziel ist immer: direkt buchbar, ohne OTA-Weiterleitung.",
+      answer: "Welches Buchungssystem passt, richtet sich nach Ihrer Größe, Ihren bestehenden Systemen und Ihrem Budget. Ziel ist immer: direkt buchbar, ohne OTA-Weiterleitung.",
     },
     {
       question: "Kann die Website für Gruppen, Tagungen und Events optimiert werden?",

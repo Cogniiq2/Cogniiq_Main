@@ -14,18 +14,18 @@ const config: IndustryPageConfig = {
   seo: {
     title: "Webdesign & KI-Telefonassistent für Gastronomie in München | Cogniiq",
     description:
-      "Restaurant Website München: Cogniiq entwickelt Websites, KI-Telefonassistenten und Reservierungsautomatisierungen für Restaurants in München. Mehr Tischreservierungen, weniger Telefonaufwand, DSGVO-konform.",
+      "Restaurant Website München: Cogniiq entwickelt Websites, KI-Telefonassistenten und Reservierungsautomatisierungen für Restaurants in München. Mehr Tischreservierungen, weniger Telefonaufwand, persönlich betreut.",
     canonical: `${base}/webdesign-gastronomie-muenchen`,
     keywords:
       "Restaurant Website München, Reservierungssystem Gastronomie München, Website Restaurant München, KI Telefonassistent Gastronomie München",
   },
   hero: {
-    trustTags: ["München", "DSGVO-konform", "KI-Integration", "Reservierungen", "Automatisierung"],
+    trustTags: ["München", "KI-Integration", "Reservierungen", "Automatisierung"],
     ctaLabel: "Projekt für Gastronomie starten",
   },
   intro: {
     h1: "Webdesign & KI-Telefonassistent für Gastronomie in München",
-    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Restaurants und Gastronomie in München – für mehr Tischreservierungen, bessere Erreichbarkeit und automatisierte Gästekommunikation. DSGVO-konform, schnell eingerichtet.",
+    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Restaurants und Gastronomie in München – für mehr Tischreservierungen, bessere Erreichbarkeit und automatisierte Gästekommunikation. Schnell eingerichtet, persönlich betreut.",
   },
   engpaesse: [
     "In Münchens wettbewerbsintensivem Gastronomiemarkt kostet eine fehlende Online-Präsenz täglich Tischbuchungen",
@@ -43,7 +43,7 @@ const config: IndustryPageConfig = {
     },
     {
       step: "Schritt 2",
-      title: "Umsetzung in 7–14 Tagen",
+      title: "Umsetzung nach Ihrer Freigabe",
       description:
         "Restaurant-Website, Reservierungssystem, KI-Assistent und Automations-Workflows werden vollständig von Cogniiq aufgebaut – ohne IT-Aufwand für den Betrieb, schlüsselfertig in Betrieb.",
     },
@@ -72,7 +72,7 @@ const config: IndustryPageConfig = {
         "Online-Reservierungssystem (Tischbuchung)",
         "Speisekarte & Veranstaltungsbereich",
         "On-Page SEO für 'Restaurant München'",
-        "DSGVO-konforme Gästekommunikation",
+        "Datenschutzerklärung, Impressum und Cookie-Einwilligung",
       ],
     },
     {
@@ -112,7 +112,7 @@ const config: IndustryPageConfig = {
       icon: "web",
       title: "Restaurant-Website München",
       description:
-        "Hochwertige Gastronomie-Website mit Online-Reservierungssystem, digitaler Speisekarte, Event-Seiten und gezieltem SEO für Suchanfragen wie 'Restaurant München' oder 'Tisch reservieren München'. Mobiloptimiert, conversion-stark, DSGVO-konform.",
+        "Hochwertige Gastronomie-Website mit Online-Reservierungssystem, digitaler Speisekarte, Event-Seiten und gezieltem SEO für Suchanfragen wie 'Restaurant München' oder 'Tisch reservieren München'. Mobiloptimiert und conversion-stark.",
     },
     {
       icon: "phone",
@@ -156,7 +156,7 @@ const config: IndustryPageConfig = {
     {
       title: "Automatisierter Feedback-Prozess",
       description:
-        "Nach dem Besuch erhalten Gäste automatisch eine Nachricht mit einer Feedback-Anfrage. Positives Feedback wird in Richtung Google-Bewertung gelenkt – wichtig für das Münchner Ranking.",
+        "Nach dem Besuch erhalten Gäste automatisch eine Nachricht mit einer Feedback-Anfrage.",
     },
   ],
   benefits: [
@@ -166,12 +166,11 @@ const config: IndustryPageConfig = {
     "Höhere Erreichbarkeit für Gäste – auch außerhalb der Öffnungszeiten, in einer Stadt, die nie schläft",
     "Zeitersparnis durch automatisierte Bestätigungen, Erinnerungen und Gästekommunikation",
     "Professioneller erster Eindruck im wettbewerbsintensivsten Gastronomiemarkt Bayerns",
-    "Datenschutzorientierte Umsetzung – alle Gästedaten sicher auf europäischen Servern",
   ],
   localContext: [
     "München hat eine der dichtesten und wettbewerbsintensivsten Gastronomieszenen in Deutschland. Restaurants konkurrieren nicht nur um lokale Stammgäste, sondern auch um Touristen, Geschäftsreisende und den überregionalen Markt. Eine professionelle Online-Präsenz ist keine Option, sondern Grundvoraussetzung.",
     "Cogniiq entwickelt für Gastronomiebetriebe in München passgenaue Digitallösungen: eine moderne Restaurant-Website mit integriertem Reservierungssystem, einen KI-Telefonassistenten sowie Automatisierungen für Bestätigungen, Erinnerungen und Feedback-Prozesse.",
-    "Alle Systeme werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut das Setup langfristig remote – saisonale Anpassungen und neue Menükarten inklusive.",
+    "Alle Systeme werden datenschutzorientiert umgesetzt. Cogniiq betreut das Setup langfristig remote – saisonale Anpassungen und neue Menükarten inklusive.",
   ],
   internalLinks: [
     { label: "Webdesign München", href: "/muenchen/webdesign" },
@@ -197,7 +196,7 @@ const config: IndustryPageConfig = {
     {
       question: "Wie lange dauert die Einrichtung für ein Restaurant in München?",
       answer:
-        "Die Einrichtung dauert in der Regel 7–14 Tage und wird vollständig von Cogniiq übernommen. Keine technischen Vorkenntnisse erforderlich – wir liefern alles schlüsselfertig.",
+        "Die Einrichtung wird vollständig von Cogniiq übernommen. Keine technischen Vorkenntnisse erforderlich – wir liefern alles schlüsselfertig.",
     },
     {
       question: "Kann die Website auch Veranstaltungen, Saisonkarten und Events abbilden?",
@@ -205,9 +204,9 @@ const config: IndustryPageConfig = {
         "Ja. Wir bauen Ihre Website so, dass Sie Menüs, Events und saisonale Aktionen selbst aktualisieren können – einfach, ohne Programmierkenntnisse. Auf Wunsch übernehmen wir auch die Pflege.",
     },
     {
-      question: "Sind Gästedaten aus Reservierungen DSGVO-konform?",
+      question: "Wie werden Gästedaten aus Reservierungen verarbeitet?",
       answer:
-        "Ja. Alle Gästedaten werden ausschließlich auf europäischen Servern verarbeitet und nach den Anforderungen der DSGVO gespeichert.",
+        "Das hängt vom eingesetzten Reservierungstool ab. Wir binden es mit Auftragsverarbeitungsvertrag ein und dokumentieren, welche Daten wohin fließen. Den Verarbeitungsort nennt Ihnen der jeweilige Anbieter verbindlich — wir geben ihn nicht aus zweiter Hand weiter.",
     },
     {
       question: "Kann der KI-Assistent auch englischsprachige Gäste bedienen?",

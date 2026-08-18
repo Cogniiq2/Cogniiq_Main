@@ -1,15 +1,18 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { Shield, Clock, Users, Award, Lock } from 'lucide-react';
+import { Shield, Clock, Users, Wrench, Lock } from 'lucide-react';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
+// Kein Siegel-Charakter: neutrale Icons, Aussagen als Arbeitsweise formuliert.
+// [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1)]]
 const ITEMS = [
-  { icon: Shield, label: 'DSGVO-konform', sub: 'Verarbeitung auf europäischen Servern' },
-  { icon: Clock, label: 'Go-Live in 7–14 Tagen', sub: 'Nicht Monate – Wochen' },
+  // Keine Hosting-, Serverstandort- oder "DSGVO-konform"-Aussage (Inhaber-Antwort B).
+  { icon: Shield, label: 'Keine Gesprächsaufzeichnung', sub: 'Gespeichert wird nur das strukturierte Ergebnis' },
+  { icon: Clock, label: 'Go-Live erst nach Ihrer Freigabe', sub: 'Kein Start gegen Ihren Willen' },
   { icon: Users, label: 'Direkter Ansprechpartner', sub: 'Kein Ticket-System' },
-  { icon: Award, label: 'Keine Templates', sub: 'Gebaut für Ihren Prozess' },
-  { icon: Lock, label: 'Festpreis', sub: 'Kein verstecktes Scope-Creep' },
+  { icon: Wrench, label: 'Keine Templates', sub: 'Gebaut für Ihren Prozess' },
+  { icon: Lock, label: 'Festpreis', sub: 'Einmalposten stehen im Angebot' },
 ];
 
 export function TrustStrip() {
@@ -17,7 +20,7 @@ export function TrustStrip() {
   const isInView = useInView(ref, { once: true, amount: 0.4 });
 
   return (
-    <div ref={ref} className="w-full bg-white border-t border-b border-gray-100/80">
+    <div ref={ref} data-review-claim="go-live-zeitraum" className="w-full bg-white border-t border-b border-gray-100/80">
       <motion.div
         className="max-w-7xl mx-auto px-6 lg:px-8 py-4"
         initial={{ opacity: 0, y: 10 }}

@@ -13,7 +13,7 @@ const config: ClusterPageConfig = {
   seo: {
     title: "Website erstellen lassen München – Premium & SEO-dominierend | Cogniiq",
     description:
-      "Website erstellen lassen in München: Cogniiq entwickelt premium Websites für Unternehmen in München – schnell, SEO-ready, DSGVO-konform. Für den kompetitivsten lokalen Markt in Bayern.",
+      "Website erstellen lassen in München: Cogniiq entwickelt premium Websites für Unternehmen in München – schnell und SEO-ready. Für den kompetitivsten lokalen Markt in Bayern.",
     canonical: `${base}/muenchen/website-erstellen`,
     keywords:
       "Website erstellen München, Homepage erstellen München, Website erstellen lassen München, neue Website München",
@@ -21,7 +21,7 @@ const config: ClusterPageConfig = {
   hero: {
     h1: "Website erstellen lassen in München",
     lead: "München ist Deutschlands wettbewerbsintensivster lokaler Digitalmarkt. Wer hier eine neue Website erstellen lässt, braucht mehr als ein schönes Design – er braucht ein technisch überlegenes, SEO-dominierendes System.",
-    trustTags: ["München", "Premium-Standard", "SEO-Dominanz", "DSGVO-konform"],
+    trustTags: ["München", "Premium-Standard", "SEO-Dominanz", "Persönliche Betreuung"],
     ctaLabel: "Kostenloses Erstgespräch",
   },
   tldr: {
@@ -30,7 +30,7 @@ const config: ClusterPageConfig = {
       { label: "Für wen", value: "Unternehmen mit Wachstumsambitionen in München" },
       { label: "Typische Ziele", value: "Bessere Sichtbarkeit, mehr qualifizierte Anfragen" },
       { label: "Projektdauer", value: "1–8 Wochen" },
-      { label: "Preisrahmen", value: "ab ca. 1.500 €" },
+      { label: "Preisrahmen", value: "ab ca. 1.500 €" },
     ],
   },
   intro: {
@@ -38,7 +38,7 @@ const config: ClusterPageConfig = {
     paragraphs: [
       "In München reicht 'gut genug' nicht. Die Zielgruppe – ob Privatkunden, B2B-Entscheider oder Touristen – vergleicht digital versiert und entscheidet schnell. Eine neue Website muss beim ersten Eindruck überzeugen, innerhalb von zwei Sekunden laden und für relevante Münchner Suchanfragen gefunden werden.",
       "Cogniiq entwickelt Websites für München mit einer klaren Strategie: Wettbewerbsanalyse zuerst, dann Design und Entwicklung, dann vollständiges Local SEO-Setup. Das Ergebnis ist kein generisches Produkt, sondern ein System, das auf die spezifischen Wettbewerbssituationen in Ihrer Branche in München ausgerichtet ist.",
-      "Jede Website wird mit modernen Web-Technologien entwickelt: sauberer Code, Core Web Vitals grün, Mobile-First, strukturierte Daten, DSGVO-konform ab Auslieferung. Kein Template, kein Baukasten.",
+      "Jede Website wird mit modernen Web-Technologien entwickelt: sauberer Code, Core Web Vitals grün, Mobile-First, strukturierte Daten, Datenschutzdokumentation ab Auslieferung. Kein Template, kein Baukasten.",
     ],
   },
   painPoints: [
@@ -77,7 +77,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie lange dauert die Erstellung einer neuen Website in München?",
-      answer: "7–14 Tage für kompakte Projekte. 4–8 Wochen für Websites mit vollständiger SEO-Strategie.",
+      answer: "7–14 Tage für kompakte Projekte. 4–8 Wochen für Websites mit vollständiger SEO-Strategie.",
     },
     {
       question: "Muss ich Texte selbst liefern?",
@@ -97,7 +97,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Was kostet eine Website in München?",
-      answer: "Ab ca. 1.500 €. Für wettbewerbsfähige Sichtbarkeit in München typisch ab 2.500–4.000 €. Detaillierte Preisübersicht unter /muenchen/webdesign-kosten.",
+      answer: "Ab ca. 1.500 €. Für wettbewerbsfähige Sichtbarkeit in München typisch ab 2.500–4.000 €. Detaillierte Preisübersicht unter /muenchen/webdesign-kosten.",
     },
     {
       question: "Bietet Cogniiq auch laufende Betreuung für München an?",

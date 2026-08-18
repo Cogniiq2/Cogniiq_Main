@@ -10,12 +10,16 @@ export interface Testimonial {
   project?: string;
 }
 
-export const REAL_TESTIMONIAL: Testimonial = {
-  quote:
-    "Die neue Website und das Buchungssystem funktionieren deutlich zuverlässiger als vorher. Besucher finden schneller, was sie suchen, und Reservierungen laufen jetzt ohne manuelle Abstimmung. Insgesamt wirkt der Auftritt deutlich moderner und professioneller.",
-  attribution: "Betreiber, Sportanlage Region Bayreuth",
-  project: "SV Heinersreuth – Website + Buchungsautomatisierung",
-};
+// There is deliberately NO exported testimonial constant.
+//
+// The previously shipped quote named a real third party (a sports club) without a
+// documented written consent in this repository. It was removed from rendering
+// entirely — component, page usages and structured data — rather than merely
+// marked. The wording is preserved in ASSETS-REQUIRED.md and may only be restored
+// after written consent from the named party is on file.
+//
+// [[ASSET: Referenz mit schriftlicher Einwilligung — erst dann darf hier wieder
+// eine benannte Kundenstimme entstehen]]
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },

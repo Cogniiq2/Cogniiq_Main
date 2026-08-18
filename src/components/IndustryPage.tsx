@@ -247,10 +247,8 @@ function TrustStripSection({ config }: { config: IndustryPageConfig }) {
   const items = [
     config.city,
     config.industry,
-    "DSGVO-konform",
     "KI-Integration",
     "Automatisierung",
-    "7–14 Tage Setup",
   ];
 
   return (
@@ -854,7 +852,7 @@ function CTASection({ config }: { config: IndustryPageConfig }) {
             Nächster Schritt: {config.industry} in {config.city} digital aufstellen
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-            Kostenloses Erstgespräch für {config.industry}-Betriebe in {config.city} – 30 bis 45 Minuten, ohne Verpflichtung, mit konkretem Ergebnis.
+            Kostenloses Erstgespräch für {config.industry}-Betriebe in {config.city} – 30 bis 45&nbsp;Minuten, ohne Verpflichtung, mit konkretem Ergebnis.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link

@@ -45,13 +45,12 @@ const config: ProblemPageConfig = {
   },
   solution: {
     headline: "Online-Terminbuchung, die sich in Ihr System integriert.",
-    text: "Cogniiq richtet Online-Terminbuchung ein, die sich nahtlos mit Ihrem Kalender synchronisiert, automatische Bestätigungen versendet und No-Shows durch Erinnerungen reduziert. Optional mit KI-Telefonassistenten für telefonische Buchungen.",
+    text: "Cogniiq richtet Online-Terminbuchung ein, die sich direkt mit Ihrem Kalender synchronisiert, automatische Bestätigungen versendet und No-Shows durch Erinnerungen reduziert. Optional mit KI-Telefonassistenten für telefonische Buchungen.",
     bullets: [
       "Online-Buchung auch abends und am Wochenende",
       "Automatische Bestätigung und Erinnerungen",
       "Kalender-Integration (Google Calendar, Outlook)",
       "No-Show-Reduzierung durch SMS/E-Mail-Erinnerungen",
-      "Einrichtung in 7–14 Tagen",
       "Optional: KI-Telefonassistent für telefonische Buchungen",
     ],
   },

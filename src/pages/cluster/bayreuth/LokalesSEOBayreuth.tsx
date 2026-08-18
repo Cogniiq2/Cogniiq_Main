@@ -30,7 +30,7 @@ const config: ClusterPageConfig = {
       { label: "Für wen", value: "Lokale Betriebe, Praxen, Dienstleister" },
       { label: "Ziel", value: "Top-3 Google Maps & organische Ergebnisse" },
       { label: "Zeithorizont", value: "Erste Verbesserungen in 4–12 Wochen" },
-      { label: "Preisrahmen", value: "ab ca. 800 € einmalig oder monatlich" },
+      { label: "Preisrahmen", value: "ab ca. 800 € einmalig oder monatlich" },
     ],
   },
   intro: {
@@ -78,7 +78,7 @@ const config: ClusterPageConfig = {
     {
       question: "Wie lange dauert es, bis lokales SEO Ergebnisse zeigt?",
       answer:
-        "Erste Verbesserungen sind in der Regel nach 4–8 Wochen messbar. Signifikante Rankings in hart umkämpften Kategorien können 3–6 Monate benötigen. Viele Bayreuther Nischen zeigen schneller Resultate.",
+        "Erste Verbesserungen sind in der Regel nach 4–8 Wochen messbar. Signifikante Rankings in hart umkämpften Kategorien können 3–6 Monate benötigen. Viele Bayreuther Nischen zeigen schneller Resultate.",
     },
     {
       question: "Brauche ich monatliche SEO-Betreuung?",
@@ -88,7 +88,7 @@ const config: ClusterPageConfig = {
     {
       question: "Was kosten lokale SEO-Maßnahmen in Bayreuth?",
       answer:
-        "Einmaliges SEO-Setup (Google Business, On-Page, strukturierte Daten): ab ca. 800 €. Laufende monatliche Betreuung: ab ca. 250 € / Monat. Detailliertes Angebot nach Erstgespräch.",
+        "Einmaliges SEO-Setup (Google Business, On-Page, strukturierte Daten): ab ca. 800 €. Laufende monatliche Betreuung: ab ca. 250 € / Monat. Detailliertes Angebot nach Erstgespräch.",
     },
     {
       question: "Helfen Bewertungen beim lokalen SEO?",

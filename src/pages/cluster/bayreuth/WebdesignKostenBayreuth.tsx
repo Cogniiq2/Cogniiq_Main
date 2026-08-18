@@ -21,24 +21,24 @@ const config: ClusterPageConfig = {
   hero: {
     h1: "Webdesign Kosten in Bayreuth – Was kostet eine Website?",
     lead: "Transparente Preisübersicht für professionelles Webdesign in Bayreuth. Keine Pauschalen, keine versteckten Kosten – eine ehrliche Einschätzung, was Qualität kostet und warum sie sich lohnt.",
-    trustTags: ["Bayreuth", "Transparente Preise", "Kein Baukasten", "DSGVO-konform"],
+    trustTags: ["Bayreuth", "Transparente Preise", "Kein Baukasten", "Persönliche Betreuung"],
     ctaLabel: "Kostenloses Erstgespräch",
   },
   tldr: {
     heading: "Kurzüberblick: Webdesign Kosten Bayreuth",
     items: [
-      { label: "Einstieg ab", value: "typisch ab ca. 1.500 €" },
-      { label: "Mittelbereich", value: "2.500 € – 5.000 €" },
-      { label: "Marktführer-Setup", value: "5.000 € – 12.000 €+" },
+      { label: "Einstieg ab", value: "typisch ab ca. 1.500 €" },
+      { label: "Mittelbereich", value: "2.500 € – 5.000 €" },
+      { label: "Marktführer-Setup", value: "5.000 € – 12.000 €+" },
       { label: "Projektdauer", value: "1–6 Wochen" },
     ],
   },
   intro: {
     heading: "Was kostet ein professioneller Webauftritt in Bayreuth?",
     paragraphs: [
-      "Die meisten Webdesign-Projekte in Bayreuth liegen zwischen 1.500 € und 8.000 €. Kleinere Websites für lokale Dienstleister oder Praxen starten typischerweise ab ca. 1.500 €. Projekte mit erweitertem Local SEO, Content-Strategie und Integrationen bewegen sich im Bereich von 3.000 € bis 6.000 €.",
+      "Die meisten Webdesign-Projekte in Bayreuth liegen zwischen 1.500 € und 8.000 €. Kleinere Websites für lokale Dienstleister oder Praxen starten typischerweise ab ca. 1.500 €. Projekte mit erweitertem Local SEO, Content-Strategie und Integrationen bewegen sich im Bereich von 3.000 € bis 6.000 €.",
       "Der Preis hängt von drei Faktoren ab: Seitenumfang, SEO-Tiefe und Integrationen. Eine fünfseitige Unternehmenswebsite ohne komplexe Funktionen ist ein grundlegend anderes Projekt als eine skalierbare Plattform mit Buchungssystem, Automatisierungen und laufender SEO-Strategie.",
-      "Was in jedem Paket enthalten ist: individuelles Design (kein Template), sauberer Code, mobile Optimierung, DSGVO-Konformität und On-Page SEO. Das sind keine Extras – das ist der Standard, den jede professionelle Website erfüllen muss.",
+      "Was in jedem Paket enthalten ist: individuelles Design (kein Template), sauberer Code, mobile Optimierung, vollständige Datenschutzdokumentation und On-Page SEO. Das sind keine Extras – das ist der Standard, den jede professionelle Website erfüllen muss.",
     ],
   },
   painPoints: [
@@ -50,12 +50,12 @@ const config: ClusterPageConfig = {
   pricing: {
     heading: "Preisrahmen: Webdesign in Bayreuth",
     rangeText:
-      "Die meisten Webdesign-Projekte in Bayreuth liegen zwischen 1.500 € und 8.000 €. Folgende Orientierungswerte helfen bei der Einschätzung – das individuelle Angebot hängt immer vom konkreten Projekt ab.",
+      "Die meisten Webdesign-Projekte in Bayreuth liegen zwischen 1.500 € und 8.000 €. Folgende Orientierungswerte helfen bei der Einschätzung – das individuelle Angebot hängt immer vom konkreten Projekt ab.",
     tiers: [
       {
         name: "Website Launch",
-        anchor: "ab ca. 1.500 €",
-        range: "typisch: 1.500 € – 2.800 €",
+        anchor: "ab ca. 1.500 €",
+        range: "typisch: 1.500 € – 2.800 €",
         deliverables: [
           "Bis 6 Seiten, individuelles Design",
           "On-Page SEO Grundoptimierung",
@@ -67,21 +67,21 @@ const config: ClusterPageConfig = {
       },
       {
         name: "Website Wachstum",
-        anchor: "ab ca. 2.800 €",
-        range: "typisch: 2.800 € – 5.500 €",
+        anchor: "ab ca. 2.800 €",
+        range: "typisch: 2.800 € – 5.500 €",
         deliverables: [
           "Bis 12 Seiten, Conversion-Texte",
           "Lokale SEO-Strategie Bayreuth",
           "Strukturierte Daten (Schema.org)",
           "Google Analytics 4 & Search Console",
           "Core Web Vitals Optimierung",
-          "3 Monate Nachbetreuung",
+          "3 Monate Nachbetreuung",
         ],
       },
       {
         name: "Website Marktführer",
-        anchor: "ab ca. 5.500 €",
-        range: "typisch: 5.500 € – 12.000 €+",
+        anchor: "ab ca. 5.500 €",
+        range: "typisch: 5.500 € – 12.000 €+",
         deliverables: [
           "Unbegrenzte Seitenstruktur",
           "Dominanz-SEO Bayreuth/Oberfranken",
@@ -116,7 +116,7 @@ const config: ClusterPageConfig = {
     {
       question: "Was kostet eine einfache Website in Bayreuth?",
       answer:
-        "Eine professionelle Einsteiger-Website (bis 6 Seiten, On-Page SEO, DSGVO) startet typisch ab ca. 1.500 €. Der genaue Preis hängt von Design-Komplexität, Anzahl der Seiten und gewünschten Funktionen ab.",
+        "Eine professionelle Einsteiger-Website (bis 6 Seiten, On-Page SEO, DSGVO) startet typisch ab ca. 1.500 €. Der genaue Preis hängt von Design-Komplexität, Anzahl der Seiten und gewünschten Funktionen ab.",
     },
     {
       question: "Warum ist professionelles Webdesign teurer als ein Baukasten?",
@@ -126,12 +126,12 @@ const config: ClusterPageConfig = {
     {
       question: "Sind Hosting und Domain im Preis enthalten?",
       answer:
-        "Nein, Hosting und Domain sind separate Positionen. Wir empfehlen passende, DSGVO-konforme Anbieter und helfen bei der Einrichtung – in der Regel unter 20 € pro Monat für performantes Managed Hosting.",
+        "Nein, Hosting und Domain sind separate Positionen. Wir empfehlen passende Anbieter mit europäischen Rechenzentren und helfen bei der Einrichtung – in der Regel unter 20 € pro Monat für performantes Managed Hosting.",
     },
     {
       question: "Was kostet laufende Wartung und Pflege?",
       answer:
-        "Wartungspakete starten ab ca. 50–80 € pro Monat (Updates, Backups, Monitoring). Content-Pflege und SEO-Betreuung werden separat kalkuliert. Im Paket 'Website Marktführer' ist laufende Betreuung inklusive.",
+        "Wartungspakete starten ab ca. 50–80 € pro Monat (Updates, Backups, Monitoring). Content-Pflege und SEO-Betreuung werden separat kalkuliert. Im Paket 'Website Marktführer' ist laufende Betreuung inklusive.",
     },
     {
       question: "Gibt es versteckte Kosten?",
@@ -141,7 +141,7 @@ const config: ClusterPageConfig = {
     {
       question: "Wie lange dauert ein Webdesign-Projekt in Bayreuth?",
       answer:
-        "Website Launch: 7–14 Tage. Website Wachstum: 3–5 Wochen. Website Marktführer: 6–10 Wochen. Der Zeitplan wird im Konzept verbindlich festgelegt.",
+        "Website Launch: 7–14 Tage. Website Wachstum: 3–5 Wochen. Website Marktführer: 6–10 Wochen. Der Zeitplan wird im Konzept verbindlich festgelegt.",
     },
     {
       question: "Lohnt sich Webdesign für kleine Betriebe in Bayreuth?",

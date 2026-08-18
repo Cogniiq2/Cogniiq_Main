@@ -27,7 +27,7 @@ const config: ProblemPageConfig = {
     points: [
       {
         title: "Direkt verlorene Aufträge",
-        description: "Jeder Anrufer, der niemanden erreicht, fragt beim nächsten Anbieter an. Bei einem Auftragswert von 500 € und 3 verpassten Anrufen pro Tag sind das 375.000 € pro Jahr.",
+        description: "Jeder Anrufer, der niemanden erreicht, fragt beim nächsten Anbieter an. Was das kostet, hängt von Ihrem Auftragswert ab – rechnen Sie mit Ihren eigenen Zahlen.",
       },
       {
         title: "Kunden wechseln zur Konkurrenz",
@@ -44,14 +44,12 @@ const config: ProblemPageConfig = {
     ],
   },
   solution: {
-    headline: "Der KI Telefonassistent: Kein Anruf geht mehr verloren.",
-    text: "Ein KI Telefonassistent nimmt jeden eingehenden Anruf sofort entgegen – auch außerhalb regulärer Geschäftszeiten, ohne Warteschleife, ohne Personalaufwand. Er versteht Kundenanliegen, beantwortet Fragen und bucht Termine automatisch.",
+    headline: "Der KI Telefonassistent: Anrufe werden angenommen statt verpasst.",
+    text: "Ein KI Telefonassistent nimmt eingehende Anrufe sofort entgegen – auch zu Stoßzeiten und außerhalb regulärer Geschäftszeiten, ohne Warteschleife, ohne Personalaufwand. Er versteht Kundenanliegen, beantwortet Fragen und bucht Termine automatisch.",
     bullets: [
-      "Jeder Anruf wird sofort und professionell entgegengenommen",
+      "Anrufe werden sofort und professionell entgegengenommen – auch zu Stoßzeiten",
       "Erreichbar auch abends, am Wochenende und an Feiertagen",
       "Termine automatisch in den Kalender eingetragen",
-      "DSGVO-konform auf europäischen Servern",
-      "Einrichtung in 7–14 Tagen",
       "Skaliert mit Ihrem Unternehmen ohne Mehrkosten",
     ],
   },

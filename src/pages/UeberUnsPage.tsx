@@ -54,7 +54,7 @@ const COMPETENCIES = [
     index: "02",
     icon: Phone,
     name: "KI-Telefonassistenten",
-    tagline: "Kein Anruf geht verloren. Kein Termin bleibt ungebucht.",
+    tagline: "Anrufe werden angenommen statt verpasst. Terminwünsche kommen strukturiert an.",
     points: [
       "Anrufannahme in natürlicher Sprache, auch außerhalb der Öffnungszeiten",
       "Automatische Terminbuchung und Bestätigung",
@@ -91,15 +91,15 @@ const PRINCIPLES = [
   },
   {
     icon: Shield,
-    title: "DSGVO-konforme Architektur",
+    title: "Datenschutz in der Architektur",
     description:
-      "Alle Daten werden auf europäischen Servern verarbeitet. Datenschutzkonforme Architekturen und vollständige Dokumentation inklusive.",
+      "Zu jedem System dokumentieren wir, welche Daten wohin fließen, und liefern den Auftragsverarbeitungsvertrag mit.",
   },
   {
     icon: Clock,
     title: "Schnelle Inbetriebnahme",
     description:
-      "Go-Live in 7 bis 14 Tagen für erste Systeme. Komplexere Systemverbünde in 3 bis 5 Wochen — ohne Abstriche bei der Qualität.",
+      "Go-Live in 7 bis 14 Tagen für erste Systeme. Komplexere Systemverbünde in 3 bis 5 Wochen — ohne Abstriche bei der Qualität.",
   },
 ];
 
@@ -243,11 +243,11 @@ const FAQ_ITEMS = [
   },
   {
     q: "Wie schnell sind Systeme live?",
-    a: "Einzellösungen wie eine Website oder ein KI-Telefonassistent sind in 7 bis 14 Tagen einsatzbereit. Komplexe Systemverbünde planen wir in 3 bis 5 Wochen — mit regelmäßigen Zwischenständen und klar definierten Phasen.",
+    a: "Einzellösungen wie eine Website oder ein KI-Telefonassistent sind in 7 bis 14 Tagen einsatzbereit. Komplexe Systemverbünde planen wir in 3 bis 5 Wochen — mit regelmäßigen Zwischenständen und klar definierten Phasen.",
   },
   {
     q: "Sind die Systeme DSGVO-konform?",
-    a: "Ja. Alle Daten werden auf europäischen Servern verarbeitet und gespeichert. Wir implementieren datenschutzkonforme Architekturen und stellen alle notwendige Dokumentation bereit.",
+    a: "Diesen Satz stellen wir uns nicht selbst aus — konform ist eine Verarbeitung, kein Produkt. Die notwendige Dokumentation stellen wir bereit. Zum Verarbeitungsort machen wir derzeit keine Angabe — die Verträge mit den beteiligten Anbietern sind nicht abschließend unterzeichnet. Beurteilen kann die Konformität nur, wer den konkreten Einsatz kennt — das ist Ihr Datenschutzbeauftragter.",
   },
   {
     q: "Kann ich mit einem einzelnen Service starten?",
@@ -489,7 +489,7 @@ export function UeberUnsPage() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.32 }}
             >
-              {["Sitz in Bayreuth", "Projekte deutschlandweit", "KI & Automatisierung", "DSGVO-konform"].map((chip) => (
+              {["Sitz in Bayreuth", "Projekte deutschlandweit", "KI & Automatisierung"].map((chip) => (
                 <span
                   key={chip}
                   className="inline-block px-3 py-1 text-[11px] font-medium text-gray-500 dark:text-gray-500 border border-gray-200 dark:border-gray-800 tracking-wide"

@@ -198,7 +198,7 @@ export function ScanPage() {
           {/* Eyebrow */}
           <motion.div {...fadeUp(0.1)} className="mb-6">
             <span className="inline-flex items-center gap-2 text-xs font-medium tracking-[0.18em] uppercase text-[#2e6f8f] border border-[#2e6f8f]/20 rounded-full px-4 py-1.5 bg-[#2e6f8f]/04">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#2e6f8f] opacity-70 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2e6f8f] opacity-70" />
               Private Einstiegseite
             </span>
           </motion.div>
@@ -259,7 +259,6 @@ export function ScanPage() {
       {/* ── TRUST STRIP ───────────────────────────────────────── */}
       <section className="pb-20 px-6">
         <div className="max-w-2xl mx-auto grid grid-cols-3 gap-3">
-          <StatCard value="7–14 Tage" label="typischer Go-Live" delay={0} />
           <StatCard value="Auch nachts" label="Anrufannahme" delay={0.08} />
           <StatCard value="Individuell" label="statt Baukasten" delay={0.16} />
         </div>

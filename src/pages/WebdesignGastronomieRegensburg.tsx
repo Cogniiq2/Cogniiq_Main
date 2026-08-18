@@ -14,18 +14,18 @@ const config: IndustryPageConfig = {
   seo: {
     title: "Webdesign & KI-Telefonassistent für Gastronomie in Regensburg | Cogniiq",
     description:
-      "Restaurant Website Regensburg: Cogniiq erstellt Websites, KI-Telefonassistenten und Reservierungsautomatisierungen für Restaurants in Regensburg. Mehr Tischreservierungen, weniger Telefonaufwand, DSGVO-konform.",
+      "Restaurant Website Regensburg: Cogniiq erstellt Websites, KI-Telefonassistenten und Reservierungsautomatisierungen für Restaurants in Regensburg. Mehr Tischreservierungen, weniger Telefonaufwand, persönlich betreut.",
     canonical: `${base}/webdesign-gastronomie-regensburg`,
     keywords:
       "Restaurant Website Regensburg, Reservierungssystem Gastronomie Regensburg, Website Restaurant Regensburg, KI Telefonassistent Gastronomie Regensburg",
   },
   hero: {
-    trustTags: ["Regensburg", "DSGVO-konform", "KI-Integration", "Reservierungen", "Automatisierung"],
+    trustTags: ["Regensburg", "KI-Integration", "Reservierungen", "Automatisierung"],
     ctaLabel: "Projekt für Gastronomie starten",
   },
   intro: {
     h1: "Webdesign & KI-Telefonassistent für Gastronomie in Regensburg",
-    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Restaurants und Gastronomie in Regensburg – für mehr Tischreservierungen, bessere Erreichbarkeit und automatisierte Gästekommunikation. DSGVO-konform, schnell eingerichtet.",
+    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Restaurants und Gastronomie in Regensburg – für mehr Tischreservierungen, bessere Erreichbarkeit und automatisierte Gästekommunikation. Schnell eingerichtet, persönlich betreut.",
   },
   engpaesse: [
     "Regensburgs Gastronomie bedient Studenten, Touristen und Einheimische gleichzeitig – die Reservierungsnachfrage ist unberechenbar und saisonabhängig",
@@ -43,7 +43,7 @@ const config: IndustryPageConfig = {
     },
     {
       step: "Schritt 2",
-      title: "Umsetzung in 7–14 Tagen",
+      title: "Umsetzung nach Ihrer Freigabe",
       description:
         "Restaurant-Website mit Reservierungssystem, KI-Telefonassistent und Automatisierungs-Workflows werden vollständig von Cogniiq aufgebaut – schlüsselfertig, ohne IT-Aufwand für den Betrieb.",
     },
@@ -72,7 +72,7 @@ const config: IndustryPageConfig = {
         "Online-Reservierungssystem (Tischbuchung)",
         "Speisekarte & Veranstaltungsbereich",
         "On-Page SEO für 'Restaurant Regensburg'",
-        "DSGVO-konforme Gästekommunikation",
+        "Datenschutzerklärung, Impressum und Cookie-Einwilligung",
       ],
     },
     {
@@ -156,7 +156,7 @@ const config: IndustryPageConfig = {
     {
       title: "Automatisierter Feedback-Prozess nach Besuch",
       description:
-        "Nach dem Besuch erhalten Gäste automatisch eine Feedback-Anfrage. Positives Feedback wird in Richtung Google-Bewertung gelenkt – wichtig für das Ranking in einer stark bewerteten Tourismusstadt.",
+        "Nach dem Besuch erhalten Gäste automatisch eine Feedback-Anfrage. ",
     },
   ],
   benefits: [
@@ -166,12 +166,11 @@ const config: IndustryPageConfig = {
     "Höhere Erreichbarkeit für lokale und touristische Gäste – auch außerhalb der Öffnungszeiten, in jeder Sprache",
     "Zeitersparnis durch automatisierte Bestätigungen, Erinnerungen und Gästekommunikation",
     "Professioneller erster Eindruck in einer UNESCO-Welterbestadt mit hohen Gästeansprüchen",
-    "Datenschutzorientierte Umsetzung – alle Gästedaten sicher auf europäischen Servern",
   ],
   localContext: [
     "Regensburg zieht jährlich Millionen Touristen an und beheimatet eine der ältesten Universitäten Deutschlands. Die Gastronomie der Stadt profitiert von dieser Mischung aus lokalem Stammpublikum, Studenten und internationalem Tourismus – steht aber gleichzeitig vor der Herausforderung, digital präsent und buchbar zu sein.",
     "Cogniiq entwickelt für Gastronomiebetriebe in Regensburg passgenaue Digitallösungen: eine moderne Restaurant-Website mit integriertem Reservierungssystem, einen KI-Telefonassistenten sowie Automatisierungen für Bestätigungen, Erinnerungen und Feedback-Prozesse.",
-    "Alle Systeme werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut das Setup langfristig remote.",
+    "Alle Systeme werden datenschutzorientiert umgesetzt. Cogniiq betreut das Setup langfristig remote.",
   ],
   internalLinks: [
     { label: "Webdesign Regensburg", href: "/regensburg/webdesign" },
@@ -197,7 +196,7 @@ const config: IndustryPageConfig = {
     {
       question: "Wie lange dauert die Einrichtung für ein Restaurant in Regensburg?",
       answer:
-        "Die Einrichtung dauert in der Regel 7–14 Tage und wird vollständig von Cogniiq übernommen. Keine technischen Vorkenntnisse erforderlich – wir liefern alles schlüsselfertig.",
+        "Die Einrichtung wird vollständig von Cogniiq übernommen. Keine technischen Vorkenntnisse erforderlich – wir liefern alles schlüsselfertig.",
     },
     {
       question: "Kann die Website auch saisonale Menüs und touristische Informationen abbilden?",
@@ -205,14 +204,14 @@ const config: IndustryPageConfig = {
         "Ja. Wir bauen Ihre Website so, dass Sie Menüs, saisonale Angebote und Veranstaltungen selbst aktualisieren können – einfach und ohne Programmierkenntnisse.",
     },
     {
-      question: "Sind Gästedaten aus Reservierungen DSGVO-konform?",
+      question: "Wie werden Gästedaten aus Reservierungen verarbeitet?",
       answer:
-        "Ja. Alle Gästedaten werden ausschließlich auf europäischen Servern verarbeitet und nach den Anforderungen der DSGVO gespeichert und verwaltet.",
+        "Das hängt vom eingesetzten Reservierungstool ab. Wir binden es mit Auftragsverarbeitungsvertrag ein und dokumentieren, welche Daten wohin fließen. Den Verarbeitungsort nennt Ihnen der jeweilige Anbieter verbindlich — wir geben ihn nicht aus zweiter Hand weiter.",
     },
     {
       question: "Kann der KI-Assistent auch Gruppenreservierungen und Eventanfragen bearbeiten?",
       answer:
-        "Für Standardreservierungen ja – vollautomatisch. Größere Gruppen oder Events werden durch den KI-Assistenten qualifiziert erfasst und mit allen relevanten Angaben strukturiert an Ihr Team weitergeleitet.",
+        "Für Standardreservierungen ja – automatisch nach Ihren Vorgaben. Größere Gruppen oder Events werden durch den KI-Assistenten qualifiziert erfasst und mit allen relevanten Angaben strukturiert an Ihr Team weitergeleitet.",
     },
     {
       question: "Wie wichtig ist lokale SEO für Restaurants in Regensburg?",

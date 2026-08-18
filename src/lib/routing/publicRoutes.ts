@@ -60,7 +60,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/",
     title: "Cogniiq – KI-Telefonassistent, Webdesign & Automatisierung für Unternehmen in Bayern",
-    description: "Cogniiq entwickelt operative KI-Systeme für Unternehmen in Bayern: KI-Telefonassistent, hochkonvertierende Websites und Prozessautomatisierung. Kein Anruf geht verloren. Go-Live in 7–14 Tagen.",
+    description: "Cogniiq entwickelt operative KI-Systeme für Unternehmen in Bayern: KI-Telefonassistent, Websites und Prozessautomatisierung. Erreichbar auch außerhalb der Öffnungszeiten.",
     keywords: "AI Agentur Bayern, KI Telefonassistent, Webdesign Agentur Bayern, Prozessautomatisierung, Cogniiq",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "weekly", priority: "1.0", xDefault: true },
@@ -68,7 +68,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/leistungen",
     title: "Leistungen | KI-Telefonassistent, Webdesign & Automatisierung – Cogniiq",
-    description: "Drei operative Systeme für Ihr Unternehmen: KI-Telefonassistent, der jeden Anruf beantwortet – Webdesign, das konvertiert – Automatisierung, die manuelle Arbeit eliminiert.",
+    description: "Drei operative Systeme für Ihr Unternehmen: KI-Telefonassistent für die Anrufannahme, Webdesign für mehr Anfragen, Automatisierung gegen manuelle Handarbeit.",
     keywords: "KI Leistungen, Webdesign Leistungen, Automatisierung Leistungen, Cogniiq Services",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.95" },
@@ -84,7 +84,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/ueber-uns",
     title: "Über Uns | KI-Agentur Bayreuth – Lazar & Djordje Popovic – Cogniiq",
-    description: "Cogniiq wurde von Lazar und Djordje Popovic in Bayreuth gegründet. Wir bauen operative KI-Systeme – keine Beratungsfolien, keine generischen Pakete. Direkter Kontakt, messbare Ergebnisse.",
+    description: "Cogniiq wurde von Lazar und Djordje Popovic in Bayreuth gegründet. Wir bauen operative KI-Systeme – keine Beratungsfolien, keine generischen Pakete. Direkter Kontakt.",
     keywords: "Cogniiq Team, AI Agentur Gründer, Lazar Popovic, Djordje Popovic, Bayreuth",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.75" },
@@ -99,8 +99,8 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/referenzen",
-    title: "Referenzen & Projektbeispiele | Cogniiq KI- und Webdesign-Projekte",
-    description: "Echte Projekte, messbare Ergebnisse: Webdesign, KI-Telefonassistenten und Automatisierungslösungen von Cogniiq für Unternehmen in Bayern und Deutschland.",
+    title: "Referenzen – Arbeitsweise & Projektverständnis | Cogniiq",
+    description: "Wie Cogniiq arbeitet: Nutzerführung, Geschäftslogik, Verwaltung und Betrieb als ein System. Kundenprojekte veröffentlichen wir nur mit schriftlicher Freigabe.",
     keywords: "Cogniiq Referenzen, Webdesign Projekte, KI Projekte, Automatisierung Beispiele",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.80" },
@@ -115,10 +115,37 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
 
   // ─── PILLAR SERVICE PAGES ────────────────────────────────────────────────────
+  // ─── HEALTHCARE-EINSTIEG (Positionierung Option B) ───────────────────────────
+  {
+    path: "/praxen",
+    title: "KI Telefonassistent für Praxen – Ihr Empfang | Cogniiq",
+    description: "Ein Empfang am Telefon für Ihre Praxis: Ihre Stimmauswahl, Ihre Regeln, strukturierte Übergabe. Keine Triage, Kontingent mit Obergrenze, Go-live in 7 Tagen.",
+    keywords: "KI Telefonassistent Praxis, Praxisempfang Telefon, telefonische Erreichbarkeit Praxis, Anrufannahme Arztpraxis",
+    indexable: true,
+    sitemap: { lastmod: "2026-08-16", changefreq: "monthly", priority: "0.90" },
+  },
+
+  // Grundgerüste ohne Fachinhalt: bewusst NICHT indexierbar, bis die Angaben aus
+  // OWNER-INPUT.md (Gruppe B bzw. C) geprüft vorliegen. Eine Seite, die
+  // Integrationen oder Compliance verspricht, ohne sie belegen zu können, gehört
+  // weder in den Suchindex noch in die Sitemap.
+  {
+    path: "/integrationen",
+    title: "Anbindungen an Ihr System | Cogniiq",
+    description: "Was nach einem Anruf passiert, was wir für Ihr System prüfen — und was wir nicht behaupten: eine fertige Standardanbindung an Praxissysteme gibt es nicht.",
+    indexable: false,
+  },
+  {
+    path: "/datenschutz-sicherheit",
+    title: "Datenschutz & Sicherheit – die Prüfpunkte | Cogniiq",
+    description: "Was beim Praxis-Empfang gilt, was Ihr Datenschutzbeauftragter uns fragen sollte und was wir nicht behaupten. Keine Aufzeichnung, kein Training.",
+    indexable: false,
+  },
+
   {
     path: "/ki-telefonassistent",
-    title: "KI-Telefonassistent für Unternehmen | Nie wieder verpasste Anrufe – Cogniiq",
-    description: "Der KI-Telefonassistent von Cogniiq nimmt jeden Anruf an, bucht Termine direkt ins System und beantwortet Fragen – auch außerhalb regulärer Geschäftszeiten, ohne Wartezeit. Einsatzbereit in 7 Tagen.",
+    title: "KI Telefonassistent – individuell konfiguriert | Cogniiq",
+    description: "KI Telefonassistent mit Ihrer Stimmauswahl, Ihren Regeln und strukturierter Übergabe an Ihr Team. Festes Minutenkontingent mit Obergrenze, keine Gesprächsaufzeichnung.",
     keywords: "KI Telefonassistent, AI Rezeptionistin, KI Telefon Unternehmen, Anruf automatisieren, Telefonie außerhalb der Geschäftszeiten",
     indexable: true,
     sitemap: { lastmod: "2026-06-30", changefreq: "monthly", priority: "0.92" },
@@ -126,7 +153,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/webdesign",
     title: "Webdesign Agentur – Hochkonvertierende Websites für Unternehmen | Cogniiq",
-    description: "Cogniiq entwickelt individuelle Websites, die bei Google ranken und Besucher in Anfragen verwandeln. Kein Template, kein Baukasten – sauberer Code, Core Web Vitals, Local SEO.",
+    description: "Cogniiq entwickelt individuelle Websites, die bei Google sichtbar sind und Besucher zu Anfragen führen: sauberer Code, Core Web Vitals, Local SEO.",
     keywords: "Webdesign Agentur, Website erstellen lassen, professionelle Website, SEO Webdesign, Core Web Vitals",
     indexable: true,
     sitemap: { lastmod: "2026-06-30", changefreq: "monthly", priority: "0.92" },
@@ -150,7 +177,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/ki-agentur-deutschland",
     title: "KI Agentur Deutschland | AI-Systeme für Unternehmen – Cogniiq",
-    description: "Cogniiq ist Ihre KI-Agentur für ganz Deutschland. KI-Telefonassistenten, Chatbots und Automatisierungssysteme – entwickelt für den deutschen Markt, einsatzbereit in 7–14 Tagen.",
+    description: "Cogniiq ist Ihre KI-Agentur für ganz Deutschland. KI-Telefonassistenten, Chatbots und Automatisierungssysteme – entwickelt für den deutschen Markt.",
     keywords: "KI Agentur Deutschland, AI Agentur Deutschland, KI Systeme Unternehmen, Artificial Intelligence Deutschland",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.92" },
@@ -210,7 +237,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/muenchen",
     title: "AI-Systeme & Webdesign in München | KI-Telefonassistent & Automatisierung – Cogniiq",
-    description: "Cogniiq betreut Unternehmen in München mit KI-Telefonassistenten, Webdesign und Prozessautomatisierung. Kein Template, kein Overhead – Systeme, die täglich arbeiten.",
+    description: "Cogniiq betreut Unternehmen in München mit KI-Telefonassistenten, Webdesign und Prozessautomatisierung – remote, mit festem Ansprechpartner und Festpreis.",
     keywords: "AI Agentur München, Webdesign München, KI Telefonassistent München, Automatisierung München",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.85" },
@@ -218,7 +245,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/regensburg",
     title: "AI-Systeme & Webdesign in Regensburg | KI-Telefonassistent & Automatisierung – Cogniiq",
-    description: "Cogniiq entwickelt KI-Telefonassistenten, Webdesign und Automatisierungslösungen für Unternehmen in Regensburg. Persönliche Betreuung, Go-Live in 7–14 Tagen.",
+    description: "Cogniiq entwickelt KI-Telefonassistenten, Webdesign und Automatisierungslösungen für Unternehmen in Regensburg. Persönliche Betreuung.",
     keywords: "AI Agentur Regensburg, Webdesign Regensburg, KI Telefonassistent Regensburg, Automatisierung Regensburg",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.80" },
@@ -236,7 +263,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/bayreuth/ki-telefonassistent",
     title: "KI Telefonassistent Bayreuth – AI Rezeption & Anrufannahme | Cogniiq",
-    description: "KI Telefonassistent Bayreuth: Automatische Anrufannahme, Terminbuchung & Weiterleitung für lokale Unternehmen. DSGVO-konform, auch außerhalb der Öffnungszeiten, Einrichtung in 7–14 Tagen.",
+    description: "KI Telefonassistent Bayreuth: Anrufannahme, Terminbuchung und Weiterleitung für lokale Unternehmen. Auch außerhalb der Öffnungszeiten, ohne Gesprächsaufzeichnung, Go-live in 7 Tagen.",
     keywords: "KI Telefonassistent Bayreuth, AI Rezeptionistin Bayreuth, KI Telefon Bayreuth",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "weekly", priority: "0.9" },
@@ -262,7 +289,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/bayreuth/website-erstellen",
     title: "Website erstellen lassen in Bayreuth | Professionell & schnell – Cogniiq",
-    description: "Website in Bayreuth erstellen lassen: individuelle Entwicklung, SEO von Anfang an, DSGVO-konform. Go-Live in 7–14 Tagen. Persönliche Betreuung in Bayreuth.",
+    description: "Website in Bayreuth erstellen lassen: individuelle Entwicklung, SEO von Anfang an, kein Baukasten. Go-Live in 7–14 Tagen. Persönliche Betreuung in Bayreuth.",
     keywords: "Website erstellen Bayreuth, Homepage erstellen Bayreuth, Webseite erstellen Bayreuth",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.78" },
@@ -295,7 +322,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   // ─── MÜNCHEN — CITY SERVICES ─────────────────────────────────────────────────
   {
     path: "/muenchen/webdesign",
-    title: "Webdesign Agentur München – Website erstellen ohne Agentur-Overhead | Cogniiq",
+    title: "Webdesign Agentur München – Website erstellen | Cogniiq",
     description: "Webdesign München: Individuelle Websites für Startups, Mittelstand und Premium-Segment. Enterprise-Qualität ohne Münchner Agenturpreise. SEO-optimiert, schnell, mehrsprachig.",
     keywords: "Webdesign München, Webdesign Agentur München, Website erstellen München, Homepage München",
     indexable: true,
@@ -304,7 +331,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/muenchen/ki-telefonassistent",
     title: "KI Telefonassistent München – AI Rezeption & Telefonservice | Cogniiq",
-    description: "KI Telefonassistent München: Automatische Anrufannahme, Terminbuchung & Weiterleitung für Unternehmen. Auch außerhalb der Öffnungszeiten, mehrsprachig, DSGVO-konform. Ohne Münchner Agentur-Overhead.",
+    description: "KI Telefonassistent für Unternehmen in München: Anrufannahme mit Ihren Regeln, bis zu fünf Sprachen, strukturierte Übergabe, keine Gesprächsaufzeichnung.",
     keywords: "KI Telefonassistent München, AI Rezeptionistin München, KI Telefon München",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "weekly", priority: "0.9" },
@@ -330,7 +357,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/muenchen/website-erstellen",
     title: "Website erstellen lassen in München | Professionell & schnell – Cogniiq",
-    description: "Website in München erstellen lassen: maßgeschneiderte Entwicklung, SEO, DSGVO-konform. Keine Templates, kein Baukasten – Go-Live in 7–14 Tagen.",
+    description: "Website in München erstellen lassen: maßgeschneiderte Entwicklung, SEO, individuelles Design. Keine Fertigvorlagen – Go-Live typischerweise in 7–14 Tagen.",
     keywords: "Website erstellen München, Homepage erstellen München, Webseite erstellen München",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.78" },
@@ -372,7 +399,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/regensburg/ki-telefonassistent",
     title: "KI Telefonassistent Regensburg – AI Rezeption & Anrufannahme | Cogniiq",
-    description: "KI Telefonassistent Regensburg: Automatische Anrufannahme, Terminbuchung & Weiterleitung für Praxen, Gastronomie und Dienstleister. Auch außerhalb der Öffnungszeiten, DSGVO-konform, Einrichtung in 7–14 Tagen.",
+    description: "KI Telefonassistent Regensburg: Anrufannahme, Terminbuchung und Weiterleitung für Praxen, Gastronomie und Dienstleister. Auch außerhalb der Öffnungszeiten, ohne Gesprächsaufzeichnung, Go-live in 7 Tagen.",
     keywords: "KI Telefonassistent Regensburg, AI Rezeptionistin Regensburg, KI Telefon Regensburg",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "weekly", priority: "0.9" },
@@ -398,7 +425,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/regensburg/website-erstellen",
     title: "Website erstellen lassen in Regensburg | Professionell & schnell – Cogniiq",
-    description: "Website in Regensburg erstellen lassen: individuelle Entwicklung, SEO von Anfang an, DSGVO-konform. Persönliche Betreuung vor Ort in Regensburg.",
+    description: "Website in Regensburg erstellen lassen: individuelle Entwicklung, SEO von Anfang an, kein Baukasten. Persönliche Betreuung vor Ort in Regensburg.",
     keywords: "Website erstellen Regensburg, Homepage erstellen Regensburg, Webseite erstellen Regensburg",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.75" },
@@ -432,7 +459,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/webdesign-arzt-bayreuth",
     title: "Webdesign für Ärzte in Bayreuth | Praxis-Website erstellen – Cogniiq",
-    description: "Webdesign für Arztpraxen in Bayreuth: DSGVO-konforme Praxis-Websites mit Online-Terminbuchung, Patienteninformationen und lokalem SEO für mehr Neupatienten in Bayreuth.",
+    description: "Webdesign für Arztpraxen in Bayreuth: Praxis-Websites mit Online-Terminbuchung, Patienteninformationen und lokalem SEO für mehr Neupatienten in Bayreuth.",
     keywords: "Webdesign Arzt Bayreuth, Praxis Website Bayreuth, Arztwebsite Bayreuth",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.82" },
@@ -456,7 +483,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/webdesign-arzt-muenchen",
     title: "Webdesign für Ärzte in München | Praxis-Website erstellen – Cogniiq",
-    description: "Webdesign für Arztpraxen in München: DSGVO-konforme Websites mit Online-Terminbuchung und lokalem SEO für mehr Neupatienten in München.",
+    description: "Webdesign für Arztpraxen in München: Praxis-Websites mit Online-Terminbuchung und lokalem SEO für mehr Neupatienten in München.",
     keywords: "Webdesign Arzt München, Praxis Website München, Arztwebsite München",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.82" },
@@ -480,7 +507,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/webdesign-arzt-regensburg",
     title: "Webdesign für Ärzte in Regensburg | Praxis-Website erstellen – Cogniiq",
-    description: "Webdesign für Arztpraxen in Regensburg: DSGVO-konforme Praxis-Websites mit Online-Terminbuchung und lokalem SEO für mehr Neupatienten in Regensburg.",
+    description: "Webdesign für Arztpraxen in Regensburg: Praxis-Websites mit Online-Terminbuchung und lokalem SEO für mehr Neupatienten in Regensburg.",
     keywords: "Webdesign Arzt Regensburg, Praxis Website Regensburg, Arztwebsite Regensburg",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.78" },
@@ -514,7 +541,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/webdesign-arzt",
     title: "Webdesign für Ärzte & Praxen | Patientengewinnung online – Cogniiq",
-    description: "Professionelle Websites für Arztpraxen und medizinische Einrichtungen. DSGVO-konform, mit Online-Terminbuchung, lokales SEO für mehr Neupatienten.",
+    description: "Professionelle Websites für Arztpraxen und medizinische Einrichtungen. Mit Online-Terminbuchung, lokales SEO für mehr Neupatienten.",
     keywords: "Webdesign Arzt, Website Praxis, Arztwebsite erstellen, Webdesign Praxis, Patientenakquise Online",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.85" },
@@ -556,7 +583,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/ki-telefonassistent-restaurant",
     title: "KI-Telefonassistent für Restaurants | Reservierungen automatisch annehmen – Cogniiq",
-    description: "KI-Telefonassistent für Restaurants: Tischreservierungen automatisch annehmen, Fragen beantworten, Öffnungszeiten mitteilen – kein Anruf geht mehr verloren.",
+    description: "KI Telefonassistent für Restaurants: Tischreservierungen entgegennehmen, bestätigen und erinnern – auch während des Service, abends und am Wochenende.",
     keywords: "KI Telefonassistent Restaurant, Reservierungen KI, AI Rezeptionistin Restaurant, Gastronomie Automatisierung",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.85" },
@@ -572,7 +599,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/ki-telefonassistent-praxis",
     title: "KI-Telefonassistent für medizinische Praxen | Terminverwaltung automatisieren – Cogniiq",
-    description: "KI-Telefonassistent für Arzt- und Facharztpraxen: Termine buchen, Rezeptanfragen bearbeiten, Patientenkommunikation automatisieren – DSGVO-konform.",
+    description: "KI-Telefonassistent für Arzt- und Facharztpraxen: Termine aufnehmen, Rezeptanfragen strukturiert erfassen, Anmeldung entlasten – ohne Gesprächsaufzeichnung.",
     keywords: "KI Telefonassistent Praxis, Praxis Telefonassistent, Terminverwaltung Praxis KI, AI Praxis",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.85" },
@@ -623,8 +650,8 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/kosten-ki-telefonassistent",
-    title: "KI-Telefonassistent Kosten – Was kostet ein AI Rezeptionist? | Cogniiq",
-    description: "Transparente Preisübersicht für KI-Telefonassistenten: Einrichtung, monatliche Kosten, ROI-Berechnung. Was kostet ein AI-Rezeptionist für Praxen, Restaurants und Dienstleister?",
+    title: "Was kostet ein KI Telefonassistent? Preise | Cogniiq",
+    description: "Was kostet ein KI Telefonassistent für Praxen? Tarife ab 300 € im Monat mit festem Minutenkontingent, gedeckelter Rechnung, Einrichtung und Go-live-Garantie.",
     keywords: "KI Telefonassistent Kosten, AI Rezeptionist Preis, KI Telefonie Kosten, Automatisierung Kosten",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.88" },
@@ -642,8 +669,8 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/verpasste-anrufe-verlust",
     title: "Verpasste Anrufe kosten täglich Umsatz – So hören Sie damit auf | Cogniiq",
-    description: "Jeder verpasste Anruf ist ein verlorener Auftrag. Der KI-Telefonassistent von Cogniiq stellt sicher, dass kein Anruf mehr unbeantwortet bleibt – auch nachts und am Wochenende.",
-    keywords: "Verpasste Anrufe, Anrufe verpassen Unternehmen, KI Telefonassistent lösung, nie wieder verpasste Anrufe",
+    description: "Verpasste Anrufe sind verlorene Aufträge. Der KI-Telefonassistent von Cogniiq nimmt Anrufe an, wenn Ihr Team gebunden ist – auch abends und am Wochenende.",
+    keywords: "Verpasste Anrufe, Anrufe verpassen Unternehmen, KI Telefonassistent Lösung, telefonische Erreichbarkeit",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.80" },
   },
@@ -674,7 +701,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/digitale-automatisierung-unternehmen",
     title: "Digitale Automatisierung für Unternehmen – Praxisnah & sofort einsetzbar | Cogniiq",
-    description: "Digitale Automatisierung für KMU: Vom Erstgespräch bis zum laufenden System in 7–14 Tagen. Cogniiq entwickelt Automatisierungssysteme, die wirklich eingesetzt werden.",
+    description: "Digitale Automatisierung für KMU: Cogniiq entwickelt Automatisierungssysteme, die wirklich eingesetzt werden.",
     keywords: "Digitale Automatisierung, Automatisierung KMU, KI Digitalisierung Unternehmen, Digital Transformation",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.80" },

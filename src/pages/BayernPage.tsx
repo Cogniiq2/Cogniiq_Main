@@ -20,11 +20,10 @@ const SERVICES_OVERVIEW = [
     title: "KI-Telefonassistent Bayern",
     slug: "ki-telefonassistent",
     description:
-      "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, für Praxen, Gastronomie und Dienstleister in ganz Bayern. Einrichtung in 7–14 Tagen.",
+      "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, für Praxen, Gastronomie und Dienstleister in ganz Bayern.",
     benefits: [
-      "Kein Anruf mehr verpasst",
+      "Erreichbar auch dann, wenn niemand abnehmen kann",
       "Entlastung von Routinegesprächen",
-      "DSGVO-konforme Sprachverarbeitung",
     ],
   },
   {
@@ -46,7 +45,7 @@ const SERVICES_OVERVIEW = [
     description:
       "Hochkonvertierende Websites für Unternehmen in Bayern – individuell entwickelt, technisch präzise, lokal SEO-optimiert, auf Leads und Conversion ausgerichtet.",
     benefits: [
-      "Mobile-First, unter 2 Sekunden Ladezeit",
+      "Mobile-First, unter 2 Sekunden Ladezeit",
       "Lokales SEO für bayerische Märkte",
       "Conversion-Fokus statt Visitenkarte",
     ],
@@ -56,10 +55,8 @@ const SERVICES_OVERVIEW = [
 const TRUST_POINTS = [
   "Hauptsitz in Bayreuth – persönliche Betreuung in der Region",
   "Projekte in ganz Bayern – auch remote vollständig betreut",
-  "Einrichtung in 7–14 Tagen – keine monatelangen Projekte",
-  "DSGVO-konform – alle Daten bleiben in Europa",
-  "Keine anonymen Ticket-Systeme – direkter Ansprechpartner",
-  "Faire Preise – kein Agentur-Overhead, keine versteckten Kosten",
+  "Fester Ansprechpartner – direkter Kontakt für Ihr Projekt",
+  "Faire Preise – transparent kalkuliert, keine versteckten Kosten",
 ];
 
 const CHALLENGES = [
@@ -95,9 +92,9 @@ const CHALLENGES = [
   },
   {
     icon: Shield,
-    title: "DSGVO-konforme KI-Nutzung",
+    title: "Datenschutz beim KI-Einsatz",
     description:
-      "Viele bayerische Unternehmer zögern beim KI-Einsatz aus Datenschutzgründen zu Recht. Cogniiq setzt auf europäische Server und unterstützt DSGVO-konforme Prozesse; technische und organisatorische Maßnahmen werden projektbezogen abgestimmt.",
+      "Viele bayerische Unternehmer zögern beim KI-Einsatz aus Datenschutzgründen zu Recht. Technische und organisatorische Maßnahmen stimmen wir projektbezogen ab und dokumentieren, welche Daten wohin fließen.",
   },
 ];
 
@@ -140,7 +137,7 @@ const INDUSTRIES = [
   {
     name: "Sport, Wellness & Beauty",
     description:
-      "Studios und Salons in Bayern nehmen Buchungen vollautomatisch entgegen, senden Erinnerungen und sind mobil optimal auffindbar.",
+      "Studios und Salons in Bayern nehmen Buchungen automatisch entgegen, senden Erinnerungen und sind mobil optimal auffindbar.",
   },
 ];
 
@@ -149,19 +146,19 @@ const USE_CASE_SCENARIOS = [
     icon: "🏥",
     title: "Hausarztpraxis in Bayern",
     description:
-      "Eine Allgemeinmedizin-Praxis mit sechs Behandlungszimmern erhält montags über 100 Anrufe vor 9 Uhr. Das Praxisteam ist überlastet. Mit einem KI-Telefonassistenten könnten Standardtermine automatisch vergeben, Rezeptanfragen strukturiert entgegengenommen und Rückrufe priorisiert werden. Das Team könnte sich auf die Patienten im Raum konzentrieren.",
+      "Eine Allgemeinmedizin-Praxis erhält montags eine Anrufspitze, die die Anmeldung nicht bewältigen kann. Das Praxisteam ist überlastet. Mit einem KI-Telefonassistenten könnten Standardtermine automatisch vergeben, Rezeptanfragen strukturiert entgegengenommen und Rückrufe priorisiert werden. Das Team könnte sich auf die Patienten im Raum konzentrieren.",
   },
   {
     icon: "🍽️",
     title: "Restaurant in der bayerischen Innenstadt",
     description:
-      "Ein inhabergeführtes Restaurant mit 60 Plätzen erhält täglich Reservierungsanfragen per Telefon – viele abends nach Küchenschluss. Durch Automatisierung laufen Reservierungen, Bestätigungen und Erinnerungen vollautomatisch. Die Website generiert dank lokalem SEO messbar mehr direkte Buchungen.",
+      "Ein inhabergeführtes Restaurant erhält täglich Reservierungsanfragen per Telefon – viele abends nach Küchenschluss. Durch Automatisierung laufen Reservierungen, Bestätigungen und Erinnerungen automatisch. Die Website generiert dank lokalem SEO mehr direkte Buchungen, die sonst am unbesetzten Telefon gescheitert wären.",
   },
   {
     icon: "🔨",
     title: "Handwerksbetrieb im Umland",
     description:
-      "Ein Elektriker mit sieben Mitarbeitern verpasst täglich Auftragsanfragen, weil die Mitarbeiter auf der Baustelle sind. Der KI-Telefonassistent nimmt Anfragen entgegen, qualifiziert das Anliegen und leitet strukturierte Nachrichten weiter. Gleichzeitig läuft die Angebotserstellung und Rechnungsstellung über automatisierte Workflows.",
+      "Ein Elektrobetrieb verpasst täglich Auftragsanfragen, weil die Mitarbeiter auf der Baustelle sind. Der KI-Telefonassistent nimmt Anfragen entgegen, qualifiziert das Anliegen und leitet strukturierte Nachrichten weiter. Gleichzeitig läuft die Angebotserstellung und Rechnungsstellung über automatisierte Workflows.",
   },
   {
     icon: "💼",
@@ -186,11 +183,11 @@ const FAQ_ITEMS = [
   },
   {
     q: "Wie schnell sind die Lösungen einsatzbereit?",
-    a: "KI-Telefonassistenten: 7–14 Tage. Automatisierungsworkflows: 1–4 Wochen je nach Komplexität. Websites: 4–12 Wochen. Nach dem Erstgespräch erhalten Sie immer einen realistischen Zeitplan.",
+    a: "KI-Telefonassistenten: nach Aufnahme Ihrer Vorgaben. Automatisierungsworkflows: 1–4 Wochen je nach Komplexität. Websites: 4–12 Wochen. Nach dem Erstgespräch erhalten Sie immer einen realistischen Zeitplan.",
   },
   {
     q: "Sind alle Lösungen DSGVO-konform?",
-    a: "Ja. Alle Systeme verarbeiten Daten ausschließlich auf europäischen Servern. Wir erstellen auf Wunsch die notwendigen Auftragsverarbeitungsverträge (AVV) und unterstützen bei der Datenschutzdokumentation.",
+    a: "Diesen Satz stellen wir uns nicht selbst aus — konform ist eine Verarbeitung, kein Produkt. Die notwendigen Auftragsverarbeitungsverträge (AVV) erstellen wir, und bei der Datenschutzdokumentation unterstützen wir. Zum Verarbeitungsort machen wir derzeit keine Angabe — die Verträge mit den beteiligten Anbietern sind nicht abschließend unterzeichnet. Die Bewertung bleibt bei Ihrem Datenschutzbeauftragten.",
   },
   {
     q: "Was kostet ein KI-Telefonassistent für Bayern?",
@@ -198,11 +195,11 @@ const FAQ_ITEMS = [
   },
   {
     q: "Was kostet eine Website für ein bayerisches Unternehmen?",
-    a: "Websites starten ab ca. 1.500 €. Individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei ca. 2.500–5.000 €, komplexere Projekte nach Aufwand. Kein versteckter Overhead – faire Preise ohne Agenturaufschläge für teure Bürolagen.",
+    a: "Websites starten ab ca. 1.500 €. Individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei ca. 2.500–5.000 €, komplexere Projekte nach Aufwand. Transparente Festpreise ohne versteckte Kosten.",
   },
   {
     q: "Wie unterscheidet sich Cogniiq von anderen Agenturen in Bayern?",
-    a: "Wir sind auf drei Kernbereiche spezialisiert – KI-Telefonie, Automatisierung und Webdesign – und kennen deren Zusammenspiel. Kein Overhead einer Großagentur, direkter Ansprechpartner, persönliche Betreuung und faire Preise.",
+    a: "Wir sind auf drei Kernbereiche spezialisiert – KI-Telefonie, Automatisierung und Webdesign – und kennen deren Zusammenspiel. Direkter Ansprechpartner, persönliche Betreuung und faire, transparente Preise – vollständig remote betreut.",
   },
 ];
 
@@ -256,7 +253,7 @@ export function BayernPage() {
     <>
       <PageSEO
         title="KI Agentur Bayern – KI Telefonassistent, Automatisierung & Webdesign | Cogniiq"
-        description="Cogniiq ist Ihre KI Agentur für Bayern. KI Telefonassistent, Prozessautomatisierung und Webdesign für Unternehmen in Bayreuth, Regensburg, München und ganz Bayern. DSGVO-konform, persönliche Betreuung."
+        description="Cogniiq ist Ihre KI Agentur für Bayern. KI Telefonassistent, Prozessautomatisierung und Webdesign für Unternehmen in Bayreuth, Regensburg, München und ganz Bayern. Persönliche Betreuung, feste Ansprechpartner."
         canonical={`${BUSINESS_INFO.website}/bayern`}
         breadcrumbs={breadcrumbs}
         additionalSchema={bayernSchema}
@@ -281,7 +278,7 @@ export function BayernPage() {
             <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.1}>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium tracking-wide uppercase mb-6">
                 <MapPin size={12} />
-                Bayern · Deutschland · DSGVO-konform · Persönliche Betreuung
+                Bayern · Deutschland · Persönliche Betreuung
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 tracking-tight leading-tight mb-6">
@@ -315,7 +312,7 @@ export function BayernPage() {
         <div className="border-y border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
-              {["Bayern", "Bayreuth", "Regensburg", "München", "KI-Telefonassistent", "Automatisierung", "Webdesign", "DSGVO-konform"].map((item, i) => (
+              {["Bayern", "Bayreuth", "Regensburg", "München", "KI-Telefonassistent", "Automatisierung", "Webdesign"].map((item, i) => (
                 <span key={i} className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   {i > 0 && <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" aria-hidden="true" />}
                   {item}
@@ -340,10 +337,10 @@ export function BayernPage() {
               </h2>
               <div className="space-y-5">
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Bayern ist ein starker Wirtschaftsstandort – mit einem dichten Netz aus mittelständischen Unternehmen, Handwerksbetrieben, Praxen, Gastronomie und wachsenden Start-ups. Was viele dieser Unternehmen verbindet: Sie wollen digital effizienter werden, haben aber keine Ressourcen für große IT-Projekte, keine eigene Tech-Abteilung und kein Budget für teure Beratungsagenturen.
+                  Bayern ist ein starker Wirtschaftsstandort – mit einem dichten Netz aus mittelständischen Unternehmen, Handwerksbetrieben, Praxen, Gastronomie und wachsenden Start-ups. Was viele dieser Unternehmen verbindet: Sie wollen digital effizienter werden, haben aber keine Ressourcen für große IT-Projekte, keine eigene Tech-Abteilung und kein Budget für langwierige Beratungsprojekte.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Cogniiq ist als regionale KI-Agentur genau für diese Unternehmen gemacht. Wir automatisieren Prozesse, die täglich Zeit kosten. Wir setzen KI-Telefonassistenten ein, die keine Anrufe mehr verpassen lassen. Wir entwickeln Websites, die Besucher in Kunden verwandeln. Und wir tun das mit persönlicher Betreuung, klarer Kommunikation und fairen Preisen – ohne Agentur-Overhead, ohne versteckte Kosten.
+                  Cogniiq ist als regionale KI-Agentur genau für diese Unternehmen gemacht. Wir automatisieren Prozesse, die täglich Zeit kosten. Wir setzen KI-Telefonassistenten ein, die Anrufe auch dann annehmen, wenn niemand abnehmen kann. Wir entwickeln Websites, die Besucher in Kunden verwandeln. Und wir tun das mit persönlicher Betreuung, klarer Kommunikation und fairen, transparenten Preisen – ohne versteckte Kosten.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                   Mit Hauptsitz in Bayreuth kennen wir den bayerischen Mittelstand aus erster Hand. Projekte in Regensburg, München und dem gesamten Freistaat betreuen wir remote – vollständig, transparent und ohne Qualitätseinbußen. Unsere Lösungen sind auch <Link to="/deutschland" className="text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">deutschlandweit verfügbar</Link>.
@@ -731,7 +728,7 @@ export function BayernPage() {
                   Leistungen auch deutschlandweit verfügbar
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Cogniiq betreut Projekte in ganz Deutschland – remote, persönlich und DSGVO-konform.
+                  Cogniiq betreut Projekte in ganz Deutschland – remote und persönlich.
                 </p>
               </div>
               <Link
@@ -759,7 +756,7 @@ export function BayernPage() {
                 Projekt in Bayern besprechen
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-                Kostenloses Erstgespräch – für Unternehmen in ganz Bayern. Remote oder persönlich in Bayreuth und Umgebung. 30–45 Minuten, ohne Verpflichtung, mit konkretem Ergebnis.
+                Kostenloses Erstgespräch – für Unternehmen in ganz Bayern. Remote oder persönlich in Bayreuth und Umgebung. 30–45&nbsp;Minuten, ohne Verpflichtung, mit konkretem Ergebnis.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <Link
