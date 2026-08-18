@@ -1,5 +1,66 @@
 # COPY-CLAIMS-TO-VERIFY — Aussagen, die der Inhaber bestätigen muss
 
+Stand: **18.08.2026, bereinigt** · Branch `claude/cogniiq-copy-overhaul-mjkdf4`
+
+> **Grundsatz, der diese Liste kürzer macht als früher (18.08.2026):**
+> Eine unbelegte Zusage steht nicht auf der Seite — auch nicht markiert. Ein
+> `[[CLAIM]]`-Marker schützt intern, der Besucher liest die Zusage trotzdem.
+> Marker sind für Angaben, die wir für zutreffend halten und noch bestätigen;
+> nicht für Aussagen, die wir nicht belegen können.
+>
+> Deshalb ist der größte Teil der Liste vom 16.08.2026 nicht „noch offen",
+> sondern **von der Website entfernt**. Was unten in §Z steht, ist erledigt.
+
+## Z. Offen — vor dem Merge zu klären
+
+Nur diese Punkte stehen heute noch als Aussage auf der Website und brauchen
+eine Bestätigung.
+
+| # | Aussage | Wo | Was ohne Bestätigung passiert |
+|---|---|---|---|
+| Z1 | **Tarifzuordnung nach günstigstem Gesamtpreis** — die Zusage, dass ein Kunde bei dauerhaft höherem Aufkommen dem für ihn günstigsten Tarif zugeordnet wird | `FAKTEN.tarifzuordnung`, Preisseite, `/praxen`, Praxis-Rechner | Muss vertraglich und im Abrechnungsprozess gedeckt sein, nicht nur im Rechner. Sonst von allen Seiten entfernen |
+| Z2 | **AVV-Vorlage nach Art. 28 DSGVO** — „stellen wir jedem Kunden bereit" | `DATENSCHUTZ_PUNKTE`, Datenschutz-Seite, Segmentseiten | Vorlage finalisieren. Bis dahin ist es eine Absichtserklärung |
+| Z3 | **§ 203 StGB** — „Cogniiq und alle Mitarbeitenden werden vertraglich auf das Berufsgeheimnis verpflichtet" | wie Z2 | Klausel ausformulieren. Bis dahin Absichtserklärung |
+| Z4 | **Verbleib der Ergebnisse nach Vertragsende** | `UMKEHRBARKEIT` — heute bewusst **keine** Aussage | Solange unbeantwortet, bleibt M19 an dieser Stelle stumm. Der Datenschutzbeauftragte einer Praxis wird danach fragen |
+| Z5 | **Dauer des Erstgesprächs** | `CTA.microcopy` — heute ohne Minutenangabe | Bleibt ohne Zeitangabe. „15 Minuten" wäre ein starker Mikrotext (COPY-BRIEF-3 §4.2) |
+| Z6 | **Go-Live-Zeitraum „7–14 Tage" außerhalb des Clusters** | `StatsSection`, `DesktopHero`, `TrustSection`, `TrustStrip`, `FAQSection`, `KiCTASection`, `FinalCTASection` — Webdesign und Automatisierung | Für den Telefonassistenten ist die Frage beantwortet (7 Tage garantiert). Für die anderen Produkte steht die Zahl unbestätigt auf Startseite und Vertrauensflächen. **Nach dem Grundsatz oben gehört sie entfernt, wenn sie nicht bestätigt wird** |
+| Z7 | **Reaktionszeit „in der Regel 24 h" außerhalb des Clusters** | `ContactSection`, `FAQQuestionModal`, `ROICalculator`, `FinalCTASection`, `HowItWorksSection` | Für den Telefonassistenten bestätigt (Antwort D3). Für die übrigen Produkte unbestätigt |
+| Z8 | **Beispielbetrag 297 €** im Kostenvergleich | `CostComparisonSection` | Weicht von `TARIFE` ab. Als Beispielwert gekennzeichnet, aber unvereinheitlicht |
+| Z9 | **JSON-LD-Angaben** — `areaServed` (10+ Städte), `priceRange "€€€"`, `foundingDate 2025-10-15`, `availableLanguage` | `index.html`, `LocalBusinessSchema.tsx` | Strukturierte Daten sind Aussagen wie jede andere |
+| Z10 | **Review-Lenkung** — „positives Feedback wird in Richtung Google-Bewertung gelenkt" | Webdesign-Gastronomie-Stadtseiten | Rechtlich riskantes Muster (Review-Gating). Empfehlung unverändert: entfernen. Entscheidung liegt beim Inhaber |
+| Z11 | **PMS-/Systemnamen Hotel und Restaurant** (protel, Apaleo, Lodgit, OpenTable, ResDiary, Resmio) | Hotel-/Restaurant-Segmentseiten | Dieselbe Klasse wie die PVS-Namen, die im Healthcare-Cluster entfernt wurden. Anbindungstiefe bestätigen oder Namen streichen |
+| Z12 | **Blog-Orientierungspreise** (150–500 €, 200–450 €, 300 € u. a.) | `blog-data.ts` | Bestätigen oder entfernen |
+| Z13 | **Gründer-Spezialisierungen** | `AboutSection` — heute neutral „Gründer" | Erst nach Bestätigung wieder personenbezogen ausweisen |
+
+**Z6, Z7, Z10, Z11 und Z12 liegen außerhalb des Healthcare-Clusters.** Sie sind
+in diesem Durchgang bewusst nicht angefasst worden; die Nicht-Healthcare-Seiten
+stehen für einen eigenen Copy-Durchgang. Nach dem Grundsatz oben sind sie
+trotzdem fällig.
+
+## Y. Erledigt seit dem 16.08.2026
+
+| Frühere Nummer | Aussage | Wie erledigt |
+|---|---|---|
+| A1 | PVS-Namen Tomedo, Medistar, Dampsoft, CGM | **entfernt.** `FAKTEN.keineAnbindung` sagt jetzt, dass es keine Standardanbindung gibt; `/integrationen` führt bewusst keine Liste |
+| A2 | „Kein System-/Rufnummernwechsel nötig" | **entfernt** (B4 unbeantwortet). Ersetzt durch `FAKTEN.rufumleitung` |
+| A5 | Rohaudio-Speicherung „außer auf Wunsch" | **entfernt.** `FAKTEN.keineAufzeichnung`: es wird gar nicht aufgezeichnet |
+| A6 | Art.-50-Ansage | **bestätigt** und nicht abschaltbar — `FAKTEN.art50` |
+| A8 / F7 | „Mehrere Anrufe gleichzeitig" | **beziffert:** 10 gleichzeitige Anrufe (`FAKTEN.gleichzeitigeAnrufe`) |
+| A10 | Selbst aufgesprochene Ansagen | **abgeschwächt** auf Stimmauswahl und eigenen Begrüßungssatz |
+| B1 / E1 | „Einrichtung in 7–14 Tagen" | **überholt** durch die 7-Tage-Garantie; im Cluster und im Footer entfernt |
+| C1 / C2 | Preisstaffeln 99/199–399/499 €, Beispielpreise 249/149/199/299 € | **ersetzt** durch `TARIFE` (Basis/Praxis/MVZ) plus Enterprise-Zeile |
+| C4 | „Flexible Laufzeiten" | **beziffert:** 12 Monate, 20 % Aufschlag für monatliche Kündbarkeit |
+| D1 | „Verarbeitung ausschließlich auf europäischen Servern" | **repo-weit entfernt** — Sperre nach HONESTY-AUDIT §7.7 |
+| D4 | „Kein Training auf Patientendaten" | **bestätigt** — `FAKTEN.keinTraining` |
+| F1 | Kostenvergleich 297 € | offen, siehe Z8 |
+| F3 | Testimonial nennt SV Heinersreuth | **aus dem Rendering entfernt**, inklusive `/referenzen` und JSON-LD. Wiederherstellung nur mit schriftlicher Einwilligung |
+| F11 | Deckelung MVZ 1.400 € | **bestätigt** (17.08.2026); `FAKTEN.deckelung` nennt jede Obergrenze einzeln, der Guard-Test prüft die Widerspruchsfreiheit |
+
+## Historische Fassung (16.08.2026)
+
+Unverändert erhalten, damit nachvollziehbar bleibt, was zu welchem Zeitpunkt
+offen war. Die Gruppen A–F unten sind durch §Z und §Y oben abgelöst.
+
 Stand: 2026-08-16 (Pass 2) · Branch `claude/cogniiq-copy-overhaul-mjkdf4`
 Das Beantwortungsformular zu dieser Liste ist `OWNER-INPUT.md` — die
 Gruppen A–D unten entsprechen den dortigen Gruppen. Abschnitt F ergänzt

@@ -1,6 +1,49 @@
-# OWNER-INPUT — Bitte ausfüllen, bevor Pass 2 weiterläuft
+# OWNER-INPUT — beantwortet
 
-Stand: 2026-08-16 · Branch `claude/cogniiq-copy-overhaul-mjkdf4` · Grundlage: `.claude/COPY-BRIEF-2.md` (Phase 0)
+Stand: **18.08.2026, abgeschlossen** · Branch `claude/cogniiq-copy-overhaul-mjkdf4`
+Grundlage: `.claude/COPY-BRIEF-2.md` (Phase 0). Antworten des Inhabers vom
+17. und 18.08.2026.
+
+> **Dieses Dokument ist nicht mehr blockierend.** Die Antworten sind in
+> `src/lib/telefonassistent-copy.ts` eingearbeitet — `FAKTEN` und `TARIFE` sind
+> die einzige Quelle aller Kernzahlen, `telefonassistent-copy.test.ts` hält das
+> durch. Was hier steht, ist die Begründung; der Code ist die Fassung.
+>
+> **Was noch offen ist, steht gesammelt in `COPY-CLAIMS-TO-VERIFY.md`.**
+> Fehlende Beweis-Assets stehen in `ASSETS-REQUIRED.md` §C.
+
+## Zusammenfassung der Antworten
+
+| Gruppe | Ergebnis | Wirkung auf die Website |
+|---|---|---|
+| **A · Preis & Vertrag** | beantwortet | Drei Tarife (Basis/Praxis/MVZ) mit Kontingent, Obergrenze und Einrichtungsgebühr in `TARIFE`; Enterprise als Fließtextzeile. Laufzeit 12 Monate, 20 % Aufschlag für monatliche Kündbarkeit, Preisgarantie 24 Monate, Kündigung per Klick im Dashboard, Testphase 2 Tage nach Zahlung der ersten Hälfte |
+| **B · Produkt & Technik** | teilweise | **Keine fertige PVS-Standardanbindung** — daraus folgt `FAKTEN.keineAnbindung`, die Seite `/integrationen` und die Streichung aller PVS-Namen. Keine Gesprächsaufzeichnung, kein Training auf Kundendaten. 10 gleichzeitige Anrufe. **B4 (Anschlussart/Telefonanlage) blieb unbeantwortet** → jede Zusage dazu ist entfernt, es bleibt die Rufumleitung |
+| **C · Compliance** | teilweise | Art.-50-Ansage: **ja**, nicht abschaltbar. AVV wird gestellt, § 203 StGB vertraglich. **Keine TOM-Liste, Verarbeitungsort ungeklärt, AVV mit Unterauftragsverarbeitern unsigniert** → Sperre nach HONESTY-AUDIT §7.7 |
+| **D · Service & Betreuung** | beantwortet | Lazar Popovic persönlich, erreichbar täglich 6–20 Uhr, Antwort spätestens in 24 Stunden, Änderungen an Ansagen und Regeln in 3 Tagen |
+| **E · Onboarding** | beantwortet | Acht reale Schritte in `EINRICHTUNG_PROJEKT`. Dauern liegen nur für Testphase (2 Tage) und Go-live (7 Tage nach Zahlungseingang) vor — erfundene Dauern sind ausgeschlossen. **E1 („7–14 Tage") ist damit überholt** und aus dem Cluster entfernt |
+| **F · Proof-Assets** | offen | Alle fünf fehlen. Fünf Bausteine rendern deshalb nicht — vollständige Liste in `ASSETS-REQUIRED.md` §C |
+| **G · Positionierung** | **Option B** | Branchen bleiben nebeneinander, jede Vertikale bekommt einen geschlossenen Einstieg. Innerhalb einer Healthcare-Journey keine Links in Hotel- oder Restaurant-Inhalte |
+
+## Entscheidungen aus dem Nachgang (18.08.2026)
+
+| Thema | Entscheidung |
+|---|---|
+| Stadtseiten | Kompaktfassungen der geteilten Module mit Verweis auf `/praxen` (Option A) |
+| Segmentseiten | Beweiskette getrimmt: M3, M14, M16 voll, der Rest kompakt mit Verweis |
+| Seitenhierarchie | `/praxen` und die Service-Seite sind Hub mit voller Kette; Stadt- und Segmentseiten sind Einstiege — siehe `COPY-SEO-CHANGELOG.md` „Seitenhierarchie" |
+| Unbelegte Zusagen | Werden entfernt, nicht markiert. Ein `[[CLAIM]]`-Marker schützt intern, der Besucher liest die Zusage trotzdem |
+| Verarbeitungsort, Konformität, Zertifizierung | Auf **allen** Produkten gesperrt, bis AVV signiert und Verarbeitungsort geklärt (HONESTY-AUDIT §7.7). Ausnahme: der Standort Dritter, die der Kunde selbst beauftragt |
+| Bewegung | COPY-BRIEF-3 §1.4 gilt website-weit, nicht nur im Cluster |
+| Typografie | §1.2 gilt website-weit; Durchgang erfolgt, ohne Copy zu ändern |
+
+---
+
+## Die ursprünglichen Fragen
+
+Zur Nachvollziehbarkeit unverändert erhalten. Leer gebliebene Felder bedeuten:
+Die betroffene Aussage steht **nicht** auf der Website.
+
+Stand der Fassung unten: 2026-08-16
 
 **So funktioniert dieses Dokument:** Jede Zeile ist eine Frage. Tragen Sie die
 Antwort direkt in die Spalte „Ihre Antwort" ein (Datei editieren genügt).

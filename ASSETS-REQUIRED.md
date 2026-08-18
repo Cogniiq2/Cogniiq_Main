@@ -145,6 +145,42 @@ wird indexierbar; Downloads für AVV und TOM kommen als eigener Abschnitt dazu.
 TOM-Liste in Stichworten, oder die Angabe eines Verarbeitungsorts ohne
 unterzeichneten Vertrag dahinter.
 
+## C · Vollständige Liste der ungerenderten Bausteine (Stand 18.08.2026)
+
+Diese Bausteine sind gebaut und geprüft, rendern aber **nichts** — sie warten
+auf ein Asset. Keiner hinterlässt einen Platzhalter im DOM; im ausgelieferten
+HTML ist an ihrer Stelle nichts. Gegenprobe über alle 92 Dokumente: null
+Treffer für „Beispielanruf, nachgestellt" und „Referenzpraxis".
+
+| # | Baustein | Datei | Steht auf | Wartet auf | Was es freischaltet |
+|---|---|---|---|---|---|
+| 1 | **M13 Stimmprobe** | `components/StimmprobeSection.tsx` (Schalter: `STIMMPROBE.src = null`) | `/praxen`, `/ki-telefonassistent`, beide Segmentseiten, drei Stadtseiten — **7 Seiten** | Audiodatei eines nachgestellten Beispielanrufs, 30–90 s, ohne Patientendaten (A1) | Einwand #1 („Meine Patienten kommen mit einer Computerstimme nicht klar"), den kein Text beantworten kann. Der stärkste Einzelbaustein der Website |
+| 2 | **M14 Bildbeleg der Übergabe** | `components/TelefonassistentBeweiskette.tsx` Zeile 234, Textteil rendert bereits | `/praxen`, beide Segmentseiten | Screenshot oder 20–30-s-Bildschirmaufnahme des Dashboards nach einem Anruf (A2) | Einwand #2, der dokumentierte Abbruchgrund Nr. 1. Der Text steht; ihm fehlt der Beleg |
+| 3 | **M18 Foto des Ansprechpartners** | `components/TelefonassistentBeweiskette.tsx`, Kommentar im `betreuung`-Abschnitt | `/praxen`, beide Segmentseiten | Foto Lazar Popovic, freigegeben (A4) | Name, Rolle und Erreichbarkeit stehen bereits. Ein Gesicht schlägt bei diesem Käufer ein Ticketsystem-Versprechen deutlich |
+| 4 | **M22 Referenz** | `components/TestimonialBlock.tsx` | keine Seite — Komponente ist aus allen Seiten entfernt | Referenzpraxis mit schriftlicher Einwilligung; anonymisiert zulässig (A3) | Die Website hat heute **keine einzige Kundenstimme** |
+| 5 | **Referenz-Fallstudie** | `pages/ReferenzenPage.tsx` | `/referenzen` — Seite rendert ohne Fallstudie | Referenzprojekt mit schriftlicher Einwilligung (A3.1) | Die Seite existiert, trägt aber keinen Fall. Der frühere Inhalt benannte einen realen Verein ohne dokumentierte Einwilligung und ist vollständig entfernt, inklusive Meta-Description und JSON-LD |
+
+**Regel, die für alle fünf gilt:** Kein Ersatz, keine Andeutung, kein
+Platzhalter. Keine synthetische Stimmprobe, kein Stock-Screenshot, kein
+erfundenes Zitat, keine anonymisierte Restfassung, die den Beteiligten
+trotzdem identifizierbar lässt. Ein leerer, markierter Platz ist das richtige
+Ergebnis, solange das Asset fehlt.
+
+**Reihenfolge nach Wirkung:** 1 vor 2 vor 3 vor 4. Die Stimmprobe steht auf
+sieben Seiten und beantwortet den härtesten dokumentierten Einwand; sie ist die
+einzige Lieferung, die den Charakter der Website spürbar ändert.
+
+## D · Seiten, die auf `noindex` stehen
+
+Kein Asset im engeren Sinn, aber dieselbe Mechanik: Die Seiten sind fertig und
+ehrlich, dürfen aber nicht in den Index, weil sie ihre eigene Suchintention
+verneinen.
+
+| Seite | Freischaltbedingung |
+|---|---|
+| `/integrationen` | eines von B1.1 oder B1.2 |
+| `/datenschutz-sicherheit` | **alle vier** Punkte aus B2 |
+
 ## Übersicht: Baustein-Status
 
 | Baustein | Gebaut | Sichtbar | Wartet auf |

@@ -438,6 +438,93 @@ gesetzten Variablen tritt der Fall nicht auf.
 in `supabase.ts` bleiben, wie sie sind — beides liegt außerhalb des
 Copy-Auftrags. Vermerkt, damit der nächste Build nicht als kaputt gilt.
 
+## 9. Geteilte Flächen — vor jeder Prüfung lesen
+
+Sechsmal ist in diesem Durchgang eine Aussage durch die Prüfung gerutscht, und
+jedes Mal aus demselben Grund: **Die Prüfung zielte auf Seiten und Configs, die
+Aussage stand in einer geteilten Komponente.** Eine Korrektur an neun
+Stadt-Configs ändert nichts an einem Satz, der in `CityServicePage` steht.
+
+Wer als Nächstes an dieser Website arbeitet, prüft diese Liste **zuerst** —
+nicht zuletzt.
+
+### 9.1 Die Flächen, nach tatsächlicher Reichweite
+
+Reichweite gemessen an den 92 vorgerenderten Dokumenten, nicht an
+Import-Zählungen: Layout-Komponenten erscheinen im Import nur einmal und stehen
+trotzdem auf jeder Seite.
+
+| Fläche | Datei | Dokumente | Trägt sichtbare Sachaussagen |
+|---|---|---|---|
+| **Footer** | `components/Footer.tsx` | **92 / 92** | Vertrauens-Chips, Firmenanschrift, Rechtslinks |
+| **Navigation** | `components/Navigation.tsx`, `ui/premium-mobile-nav.tsx` | **92 / 92** | Menübeschriftungen, Einstiegspfade |
+| **PageSEO** | `components/PageSEO.tsx` | **92 / 92** | Title, Description, sämtliches JSON-LD |
+| Hero-Abzeichen | `components/hero/DesktopHero.tsx`, `MobileHero.tsx` | Startseite | Go-live-Zeitraum, Vertrauensangaben |
+| `NationalIndustryPage` | `components/NationalIndustryPage.tsx` | 14 | Hero-Abzeichen, Mikrotexte, Abschnittsreihenfolge |
+| `ClusterPage` | `components/ClusterPage.tsx` | 15 | Vertrauens-Tags, Leistungslisten |
+| `IndustryPage` | `components/IndustryPage.tsx` | 9 | Vertrauens-Tags |
+| `CityServicePage` | `components/CityServicePage.tsx` | 9 | Hero-Abzeichen, TrustStrip, Abschnittsreihenfolge |
+| `TrustStrip` | `components/TrustStrip.tsx` | 7 | Go-live-Zeitraum, Vertrauensangaben |
+| `ProblemPage` / `CostPage` | gleichnamige Dateien | 5 / 2 | Vertrauens-Chips, Preisrahmen |
+| `ContactSection` | `components/ContactSection.tsx` | 2 | Reaktionszeit, Vertrauensabzeichen |
+| `FAQSection`, `TrustSection`, `StatsSection`, `FinalCTASection`, `KiCTASection`, `HowItWorksSection`, `CostComparisonSection`, `ROICalculator` | `components/` | 1–7 | Zeiträume, Reaktionszeiten, Beispielbeträge |
+| `StimmprobeSection`, `TestimonialBlock` | `components/` | 0 (asset-gesperrt) | rendern bewusst nichts |
+
+### 9.2 Die sechs Vorfälle
+
+| # | Aussage | Lag in | Warum sie überlebt hat |
+|---|---|---|---|
+| 1 | Sämtliches JSON-LD fehlte im statischen HTML | `PageSEO` | Die Prüfung sah die Komponenten-Props, nicht das ausgelieferte Dokument (§7.5) |
+| 2 | „Einrichtung in 7–14 Tagen" neben der 7-Tage-Garantie | `CityServicePage` TrustStrip | In vier Stadt-Configs korrigiert, in der Komponente nicht |
+| 3 | „DSGVO-konform" im Hero-Abzeichen und TrustStrip | `CityServicePage` | Neun Configs geprüft, die Komponente nicht |
+| 4 | Chips „DSGVO" und „7–14 Tage" | `Footer` | Stand auf **allen 92** Dokumenten und tauchte in keiner Seitenprüfung auf |
+| 5 | „Ihre Rufnummer bleibt" und „Europäische Server" | `KiTelefonassistentPage` CredentialStrip | Die Seite galt als abgeschlossen; der Streifen wurde nie einzeln gelesen |
+| 6 | `animate-pulse` auf 13 Seiten | `NationalIndustryPage` | Der Gestaltungs-Pass war auf Seiten geplant, nicht auf Komponenten |
+
+### 9.3 Arbeitsregel
+
+> Eine Änderung an einer Aussage ist erst vollständig, wenn geprüft ist, ob
+> dieselbe Aussage in einer der Flächen aus 9.1 steht. Bei Zweifel gilt die
+> Gegenprobe am **ausgelieferten HTML**, nicht am Quelltext:
+>
+> ```
+> npm run build && grep -rl "<Aussage>" dist --include=*.html | wc -l
+> ```
+>
+> Diese Zahl ist die Wahrheit. Sie ist mehrfach höher ausgefallen als erwartet.
+
+Ergänzend gilt weiter die Metadaten-Regel aus 7.4 (beide Ketten) und die
+technische Absicherung aus 7.4.1 (Kernzahlen nur aus `FAKTEN`/`TARIFE`, durch
+`telefonassistent-copy.test.ts` erzwungen). Der Guard-Test deckt inzwischen auch
+`CityServicePage`, `NationalIndustryPage` und die beiden Beweisketten-Komponenten
+ab — die Flächen aus 9.1 gehören in die Liste `CLUSTER` dieses Tests, sobald sie
+Cluster-Copy tragen.
+
+## 10. Offene technische Schuld
+
+Kein Ehrlichkeitsbefund, aber Dinge, die die nächste Prüfung behindern.
+
+### 10.1 Build-Reihenfolge verdeckt fehlende Secrets
+
+Ausführlich in §8.1. Kurzfassung: `npm run sitemap` läuft an **zweiter** Stelle
+der Build-Kette, also vor `build:client` und `prerender`. Fehlt
+`VITE_SUPABASE_URL`, bricht die Kette dort ab — der Fehler sieht nach einem
+Sitemap-Problem aus, kostet aber den gesamten Prerender und damit **jede
+Prüfung am ausgelieferten HTML**, einschließlich der Gegenprobe aus 9.3.
+
+Mögliche Behebung, außerhalb des Copy-Auftrags: `sitemap` hinter `prerender`
+ziehen, oder die Supabase-Prüfung aus der Importkette des Sitemap-Generators
+lösen. Bis dahin: Platzhalterwerte setzen, bevor lokal gebaut wird.
+
+### 10.2 ROI-Rechner der Startseite: Zahl und Einheit in getrennten Elementen
+
+Nach dem website-weiten Typografie-Durchgang bleibt genau ein ungeschütztes
+Zahl-Einheit-Paar im sichtbaren Text der gesamten Website: `components/ROICalculator.tsx`
+setzt Betrag und Einheit in eigene Elemente (`1.780` · `€`, `86` · `%`). Das
+Leerzeichen entsteht dort aus dem Markup, nicht aus dem Text, und lässt sich
+nicht durch ein geschütztes Leerzeichen beheben — nötig wäre eine strukturelle
+Änderung. Bewusst nicht in einem Typografie-Durchgang erledigt.
+
 ## 5. Positivbefunde
 
 - Kein `aggregateRating`, `Review`, `ratingValue` oder Sterne-Markup irgendwo

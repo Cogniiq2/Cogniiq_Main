@@ -544,3 +544,50 @@ Ungeschützte Zahl-Einheit-Paare bestehen weiterhin auf Blog-, Hotel-,
 Restaurant-, Webdesign- und Automatisierungsseiten (rund 30 Muster in etwa 60
 Dokumenten). Der Gestaltungs-Pass war auf die Seiten dieses Durchgangs
 beauftragt; die Regel selbst gilt website-weit und wäre der nächste Schritt.
+
+## Stufe 8b · Typografie website-weit
+
+Ausschließlich Typografie. Kein Wort Copy auf den Nicht-Healthcare-Seiten
+geändert — nachgewiesen: 303 geänderte Zeilen, nach Normalisierung der
+Leerzeichen **null** inhaltliche Abweichung zwischen Vorher und Nachher.
+
+Geschützte Leerzeichen vor jeder Einheit in 77 Dateien. Schreibweise je
+Kontext, weil ESLint `no-irregular-whitespace` literale U+00A0 in
+Template-Literalen und JSX-Text verbietet: ` ` im Template, `&nbsp;` im
+JSX-Text, literales Zeichen im einfachen String.
+
+Nicht angefasst: Meta-Descriptions in `publicRoutes.ts` und `seo-data.ts` — dort
+ist ein geschütztes Leerzeichen wirkungslos und kostet Zeichenbudget. Ebenso
+alle nicht-öffentlichen Bereiche.
+
+Im ausgelieferten HTML der gesamten Website bleibt **ein** Fall: Der ROI-Rechner
+der Startseite setzt Zahl und Einheit in getrennte Elemente; das Leerzeichen
+entsteht dort aus dem Markup. Vermerkt als technische Schuld in
+`HONESTY-AUDIT.md` §10.2.
+
+## Stufe 9 · Dokumentation
+
+Keine Codeänderung, keine Metadaten berührt.
+
+| Dokument | Was daran neu ist |
+|---|---|
+| `OWNER-INPUT.md` | Von „blockierend" auf **beantwortet** umgestellt. Zusammenfassung der Antworten A–G mit ihrer Wirkung auf die Website, dazu die sieben Nachgangs-Entscheidungen vom 18.08.2026. Die ursprünglichen Fragen bleiben unverändert darunter stehen |
+| `COPY-CLAIMS-TO-VERIFY.md` | Neu gegliedert in **§Z offen** (13 Punkte) und **§Y erledigt** (14 Punkte). Die Liste ist kürzer als früher, weil unbelegte Zusagen entfernt statt markiert werden. Fünf der offenen Punkte liegen außerhalb des Healthcare-Clusters |
+| `ASSETS-REQUIRED.md` | **§C** — vollständige Liste der fünf ungerenderten Bausteine mit Datei, betroffenen Seiten, benötigtem Asset und freigeschaltetem Einwand. **§D** — die beiden `noindex`-Seiten mit ihrer Freischaltbedingung |
+| `HONESTY-AUDIT.md` | **§9** — die geteilten Flächen, nach gemessener Reichweite, mit den sechs Vorfällen und der Gegenprobe-Regel. **§10** — offene technische Schuld: Build-Reihenfolge und ROI-Rechner-Markup |
+
+### Warum §9 der wichtigste neue Abschnitt ist
+
+Sechsmal ist in diesem Durchgang eine Aussage durch die Prüfung gerutscht, immer
+aus demselben Grund: Die Prüfung zielte auf Seiten und Configs, die Aussage
+stand in einer geteilten Komponente. Der Footer trug „DSGVO" und „7–14 Tage" auf
+**allen 92** ausgelieferten Dokumenten und tauchte in keiner Seitenprüfung auf.
+
+§9 listet die Flächen nach gemessener Reichweite — nicht nach Import-Zählung,
+die Layout-Komponenten systematisch unterschätzt — und gibt die Gegenprobe an:
+
+```
+npm run build && grep -rl "<Aussage>" dist --include=*.html | wc -l
+```
+
+Diese Zahl ist mehrfach höher ausgefallen als erwartet.
