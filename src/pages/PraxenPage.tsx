@@ -30,6 +30,7 @@ import {
   DATENSCHUTZ_PUNKTE,
   DECKELUNG,
   EINRICHTUNG_PROJEKT,
+  FAKTEN,
   GO_LIVE_GARANTIE,
   GRENZEN,
   NICHT_PASSEND,
@@ -71,7 +72,7 @@ const faqItems = [
   {
     question: "Landet der Termin automatisch in meiner Praxissoftware?",
     answer:
-      "Heute in der Regel nicht. Eine fertige Standardanbindung an Praxisverwaltungssysteme gibt es nicht. Das Ergebnis jedes Anrufs steht strukturiert im Cogniiq-Dashboard, und Ihr Team überträgt es ins Praxissystem. Welche Schnittstelle Ihr System bietet, prüfen wir vor der Einrichtung — und sagen es Ihnen vor der Unterschrift, nicht danach.",
+      `Heute in der Regel nicht. ${FAKTEN.keineAnbindung} Welche Schnittstelle Ihr System bietet, prüfen wir vor der Einrichtung — und sagen es Ihnen vor der Unterschrift, nicht danach.`,
   },
   {
     question: "Beurteilt der Assistent, wie dringend ein Anliegen ist?",
@@ -81,22 +82,22 @@ const faqItems = [
   {
     question: "Was passiert, wenn der Empfang nicht in 7 Tagen läuft?",
     answer:
-      "Dann entfällt die zweite Hälfte der Einrichtungsgebühr. Der Go-live erfolgt spätestens 7 Tage nach Zahlungseingang; halten wir das nicht ein, tragen wir die Folge. Das steht so im Vertrag.",
+      `${FAKTEN.goLive} Das steht so im Vertrag.`,
   },
   {
     question: "Kann die Rechnung teurer werden als geplant?",
     answer:
-      "Nur begrenzt. Jeder Tarif enthält ein Minutenkontingent; darüber kostet jede weitere Minute 0,39 €. Nach oben ist jeder Tarif auf seine ausgewiesene Obergrenze gedeckelt: 500 €, 800 € oder 1.400 € im Monat. Liegt Ihr Aufkommen dauerhaft höher, ordnen wir Sie dem günstigsten passenden Tarif zu. Der Preis ist für 24 Monate garantiert, und abgerechnet wird pro Praxis, nicht pro Behandler.",
+      `Nur begrenzt. ${FAKTEN.deckelung} ${FAKTEN.tarifzuordnung} ${FAKTEN.preisgarantie} ${FAKTEN.nichtProBehandler}`,
   },
   {
     question: "Wie komme ich wieder aus dem Vertrag heraus?",
     answer:
-      "Über einen Klick im Kundendashboard, zum Laufzeitende. Die Laufzeit beträgt 12 Monate; wer monatlich kündbar bleiben möchte, zahlt 20 % Aufschlag. Kein Anruf, keine E-Mail, keine Fristfalle.",
+      `${FAKTEN.kuendigung} ${FAKTEN.laufzeit}`,
   },
   {
     question: "Werden Gespräche aufgezeichnet?",
     answer:
-      "Nein. Gespeichert wird ausschließlich das strukturierte Ergebnis: Anliegen, Name, Rückrufnummer, Terminwunsch. Ihre Daten werden nicht zum Training von Modellen verwendet. Das bedeutet auch: Wenn Sie später den genauen Wortlaut eines Anrufs brauchen, gibt es ihn nicht.",
+      `Nein. ${FAKTEN.keineAufzeichnung} ${FAKTEN.keinTraining} Das bedeutet auch: Wenn Sie später den genauen Wortlaut eines Anrufs brauchen, gibt es ihn nicht.`,
   },
 ];
 

@@ -32,6 +32,7 @@ import {
   ANLIEGEN_IMMER_MENSCH,
   ANLIEGEN_UEBERNIMMT,
   EINRICHTUNG_SCHRITTE,
+  FAKTEN,
   GRENZEN,
   NICHT_PASSEND,
   PATIENTEN_SICHT,
@@ -91,7 +92,7 @@ const faqItems = [
   {
     question: "Was kostet der KI Telefonassistent?",
     answer:
-      "Sie zahlen einen festen Monatsbetrag für ein Minutenkontingent. Wird es überschritten, kostet jede weitere Minute 0,39 € – und die Rechnung übersteigt nie den nächsthöheren Tarif. Abgerechnet wird pro Praxis, nicht pro Behandler. Einmalig kommt die Einrichtung dazu; sie steht vor Vertragsschluss im Angebot. Details finden Sie auf der Kostenseite.",
+      `Sie zahlen einen festen Monatsbetrag für ein Minutenkontingent. ${FAKTEN.deckelung} ${FAKTEN.nichtProBehandler} Einmalig kommt die Einrichtung dazu; sie steht vor Vertragsschluss im Angebot. Details finden Sie auf der Kostenseite.`,
   },
 ];
 
@@ -398,7 +399,7 @@ function HeroSection() {
 
 function CredentialStrip() {
   const items = [
-    { label: "Festes Minutenkontingent", detail: "Darüber 0,39 €/Min., nie mehr als der nächsthöhere Tarif" },
+    { label: "Festes Minutenkontingent", detail: `Darüber ${FAKTEN.mehrpreisProMinute}/Min., gedeckelt auf die Obergrenze Ihres Tarifs` },
     { label: "Ihre Rufnummer bleibt", detail: "Kein Systemwechsel nötig" },
     { label: "Strukturierte Übergabe", detail: "Anliegen landen bei Ihrem Team" },
     { label: "Europäische Server", detail: "AVV nach Art. 28 DSGVO" },

@@ -295,6 +295,47 @@ entfernt.
 > Seitenkomponente *und* der Eintrag in `publicRoutes.ts`. Bei Stadtseiten
 > kommt `standorte-service-configs.ts` als dritte Stelle hinzu.
 
+#### 7.4.1 Kernaussagen: technisch zusammengeführt (17.08.2026)
+
+Die Regel oben ist ein Merkposten und hat dreimal nicht gehalten. Für die
+Aussagen, die mehr als einmal vorkommen, ist sie deshalb durch Technik ersetzt:
+
+**`FAKTEN` in `src/lib/telefonassistent-copy.ts`** ist die einzige Quelle für
+Deckelung, Obergrenzen, Tarifzuordnung, Go-live-Garantie, 3-Tage-Zusage,
+Kündigung, Laufzeit, Preisgarantie, Erreichbarkeit, Antwortzeit, fehlende
+Aufzeichnung, kein Training, Art.-50-Ansage und fehlende PVS-Anbindung.
+Modultexte, FAQ-Antworten, Stadt-Configs und Segmentseiten setzen diese Sätze
+ein, statt sie neu zu formulieren.
+
+**`src/lib/telefonassistent-copy.test.ts`** hält das durch: Der Test schlägt an,
+sobald eine Kernzahl (0,39 €, 1.400 €, 7 Tage nach Zahlungseingang, 3 Tage,
+12 / 24 Monate, 20 % Aufschlag, 6–20 Uhr) in einer der neun Cluster-Dateien als
+Literal auftaucht. Er prüft zusätzlich, dass `FAKTEN` und `TARIFE`
+widerspruchsfrei bleiben — die Deckelungsaussage muss jede Obergrenze aus
+`TARIFE` wörtlich enthalten.
+
+**Was der Test beim ersten Lauf gefunden hat:** nicht nur Duplikate, sondern
+**sieben Stellen mit der bereits als falsch erkannten Formulierung** „nie mehr
+als der nächsthöhere Tarif" — in drei Stadt-Configs, drei Stadt-FAQ, der
+Serviceseite, beiden Segmentseiten und einem Fließtext der München-Seite. Sie
+war zweimal korrigiert worden und lebte an sieben weiteren Stellen weiter. Alle
+behoben; das Muster kommt im Repository nicht mehr vor.
+
+#### 7.4.2 Offene Strukturschuld
+
+Nicht zusammengeführt, bewusst:
+
+| Bereich | Grund |
+|---|---|
+| Hotel-, Restaurant-, Webdesign- und Automatisierungsseiten | Eigene Produkte mit eigenen Aussagen; eine gemeinsame Konstante mit dem Telefonassistenten würde falsche Kopplung erzeugen |
+| `blog-data.ts` | Redaktionelle Texte, die bewusst frei formuliert sind; Kernzahlen kommen dort nicht vor |
+| Meta-Descriptions in `publicRoutes.ts` | Sind auf Länge optimiert (140–158 Zeichen) und müssen frei formulierbar bleiben; der Test deckt sie trotzdem gegen Kernzahlen ab |
+| Prosa-Varianten derselben Aussage | Formulierungen dürfen sich je nach Kontext unterscheiden — der Test bindet die Zahlen, nicht den Satzbau. Das ist Absicht: Ein Zwang zur wörtlichen Wiederholung würde die Texte schlechter machen |
+
+Bleibt als Restrisiko: Eine Kernaussage ohne Zahl (etwa „keine Triage") kann
+weiterhin an einer Stelle abweichend formuliert werden, ohne dass der Test
+anschlägt. Für diese Fälle gilt weiter die Arbeitsregel aus 7.4.
+
 ## 5. Positivbefunde
 
 - Kein `aggregateRating`, `Review`, `ratingValue` oder Sterne-Markup irgendwo

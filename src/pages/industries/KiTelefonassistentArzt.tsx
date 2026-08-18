@@ -1,7 +1,7 @@
 import { NationalIndustryPage } from "@/components/NationalIndustryPage";
 import type { NationalIndustryPageConfig } from "@/components/NationalIndustryPage";
 import { BUSINESS_INFO } from "@/lib/seo-data";
-import { GRENZEN } from "@/lib/telefonassistent-copy";
+import { FAKTEN, GRENZEN } from "@/lib/telefonassistent-copy";
 
 const config: NationalIndustryPageConfig = {
   seo: {
@@ -63,7 +63,7 @@ const config: NationalIndustryPageConfig = {
     "Auftragsverarbeitungsvertrag nach Art. 28 DSGVO; keine Gesprächsaufzeichnung, kein Training mit Ihren Daten",
     // [[CLAIM: verify — konkrete PVS-Anbindungen (Tomedo, Medistar, Dampsoft, CGM) je Praxis bestätigen]]
     "Anbindung an Ihre Praxissoftware wird vor dem Angebot geprüft – ein Systemwechsel ist nicht Voraussetzung",
-    "Festes Minutenkontingent, darüber 0,39 €/Min. – die Rechnung übersteigt nie den nächsthöheren Tarif",
+    `Festes Minutenkontingent, darüber ${FAKTEN.mehrpreisProMinute}/Min. – gedeckelt auf die Obergrenze Ihres Tarifs`,
   ],
   workflow: {
     title: "So läuft ein Patientenanruf ab",

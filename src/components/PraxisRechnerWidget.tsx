@@ -376,7 +376,7 @@ export function PraxisRechnerWidget() {
             />
           )}
           <Zeile label="Einrichtung, einmalig" wert={tarif.einrichtung} />
-          <Zeile label="Einrichtung auf 12 Monate" wert={`${eur(einrichtungProMonat)} / Monat`} />
+          <Zeile label="Einrichtung, auf zwölf Monate verteilt" wert={`${eur(einrichtungProMonat)} / Monat`} />
           <Zeile label="Kosten im ersten Jahr" wert={`${eur(kostenProMonat)} / Monat`} />
         </div>
 

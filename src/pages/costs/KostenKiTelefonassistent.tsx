@@ -24,6 +24,7 @@ import {
   BETREUUNG,
   CTA,
   DECKELUNG,
+  FAKTEN,
   EINRICHTUNG_PROJEKT,
   GO_LIVE_GARANTIE,
   NICHT_EXTRA,
@@ -53,17 +54,17 @@ const faqItems = [
   {
     question: "Kann die Rechnung teurer werden als der Tarif?",
     answer:
-      "Ja, aber nur bis zu einer festen Grenze. Über dem Minutenkontingent kostet jede weitere Minute 0,39 €. Nach oben ist jeder Tarif auf seine ausgewiesene Obergrenze gedeckelt: Basis auf 500 € im Monat, Praxis auf 800 €, MVZ auf 1.400 €. Und wenn Ihr Aufkommen dauerhaft über dem Kontingent liegt, ordnen wir Sie dem Tarif zu, der für Ihren Bedarf am günstigsten ist — Sie zahlen den Zuschlag also nicht dauerhaft.",
+      `Ja, aber nur bis zu einer festen Grenze. ${FAKTEN.deckelung} ${FAKTEN.tarifzuordnung}`,
   },
   {
     question: "Was kostet ein KI Telefonassistent für eine Praxis pro Monat?",
     answer:
-      "300 € im Monat für 500 Minuten, 500 € für 1.000 Minuten und 800 € für 2.000 Minuten. 500 Minuten entsprechen ungefähr 250 Anrufen. Dazu kommt einmalig die Einrichtung Ihres Empfangs, je nach Tarif 1.490 €, 2.490 € oder 3.490 €.",
+      `${TARIFE.map((t) => `${t.monatlich} im Monat für ${t.minuten.toLocaleString("de-DE")} Minuten`).join(", ")}. ${TARIFE[0].minuten} Minuten entsprechen ungefähr ${TARIFE[0].anrufeCa} Anrufen. Dazu kommt einmalig die Einrichtung Ihres Empfangs, je nach Tarif ${TARIFE.map((t) => t.einrichtung).join(", ")}.`,
   },
   {
     question: "Warum kostet die Einrichtung so viel?",
     answer:
-      "Weil sie kein Freischalten ist, sondern acht Schritte Arbeit: Erstgespräch, Angebot, Unterschrift, Zugang, Ihre Vorgaben, Aufbau, zwei Tage Testphase und Go-live. Ihr Assistent wird auf Basis Ihrer Angaben gebaut, nicht aus einer Vorlage kopiert. Sie zahlen die Hälfte bei Vertragsabschluss und die Hälfte nach dem Go-live — und wenn wir die 7 Tage nicht halten, entfällt die zweite Hälfte.",
+      `Weil sie kein Freischalten ist, sondern acht Schritte Arbeit: Erstgespräch, Angebot, Unterschrift, Zugang, Ihre Vorgaben, Aufbau, zwei Tage Testphase und Go-live. Ihr Assistent wird auf Basis Ihrer Angaben gebaut, nicht aus einer Vorlage kopiert. Sie zahlen die Hälfte bei Vertragsabschluss und die Hälfte nach dem Go-live. ${FAKTEN.goLive}`,
   },
   {
     question: "Ist die Testphase kostenlos?",
@@ -73,12 +74,12 @@ const faqItems = [
   {
     question: "Wird pro Behandler abgerechnet?",
     answer:
-      "Nein. Der Monatsbetrag gilt für Ihre Praxis, unabhängig davon, wie viele Personen bei Ihnen behandeln. Wächst Ihr Team, ändert sich am Preis nichts — nur der Minutenverbrauch kann steigen.",
+      `Nein. ${FAKTEN.nichtProBehandler} Der Monatsbetrag gilt für Ihre Praxis, unabhängig davon, wie viele Personen bei Ihnen behandeln. Wächst Ihr Team, ändert sich am Preis nichts — nur der Minutenverbrauch kann steigen.`,
   },
   {
     question: "Wie lange bin ich gebunden und wie kündige ich?",
     answer:
-      "Die Laufzeit beträgt 12 Monate; wer monatlich kündbar bleiben möchte, zahlt 20 % Aufschlag. Gekündigt wird mit einem Klick im Kundendashboard, zum Laufzeitende. Der Preis ist für 24 Monate schriftlich garantiert.",
+      `${FAKTEN.laufzeit} ${FAKTEN.kuendigung} ${FAKTEN.preisgarantie}`,
   },
   {
     question: "Was kostet eine weitere Sprache?",

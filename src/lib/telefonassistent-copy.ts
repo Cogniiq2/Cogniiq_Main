@@ -20,6 +20,67 @@
 // - KEINE Behauptung einer fertigen PVS-Standardanbindung (Inhaber-Antwort B).
 // ─────────────────────────────────────────────────────────────────────────────
 
+/**
+ * KERNAUSSAGEN — die eine Quelle für alles, was mehr als einmal auf der Website
+ * steht.
+ *
+ * Hintergrund: Dieselbe Zusage stand mehrfach an Stellen, die niemand zusammen
+ * im Blick hatte — Modultext, FAQ-String einer Seite, Stadt-Config,
+ * Meta-Description. Drei Korrekturrunden mussten deshalb nachgebessert werden
+ * (HONESTY-AUDIT §7). Jede Aussage, die an mehr als einer Stelle vorkommt,
+ * gehört ab hier in diese Konstante; Modultexte, FAQ-Antworten und
+ * Seitenkomponenten setzen sie ein, statt sie neu zu formulieren.
+ *
+ * Ein Test (`telefonassistent-copy.test.ts`) hält das durch: Er schlägt an,
+ * sobald eine der Kernzahlen irgendwo im Cluster als Literal auftaucht.
+ */
+export const FAKTEN = {
+  // ── Zahlen ──
+  mehrpreisProMinute: `0,39\u00A0€`,
+  goLiveTage: 7,
+  aenderungTage: 3,
+  laufzeitMonate: 12,
+  preisgarantieMonate: 24,
+  monatlichAufschlag: `20\u00A0%`,
+  erreichbarkeit: "täglich 6–20 Uhr",
+  antwortzeit: "spätestens innerhalb von 24 Stunden",
+  gleichzeitigeAnrufe: 10,
+
+  // ── Sätze, die wörtlich wiederverwendet werden ──
+  /** Deckelung. Nennt die Obergrenzen einzeln, weil die Regel „nie mehr als der
+   *  nächsthöhere Tarif" für MVZ nicht trägt (dort 1.400 €, Enterprise ab 5.000 €). */
+  deckelung: `Über dem Minutenkontingent kostet jede weitere Minute 0,39\u00A0€. Nach oben ist jeder Tarif auf seine ausgewiesene Obergrenze gedeckelt: Basis auf 500\u00A0€ im Monat, Praxis auf 800\u00A0€, MVZ auf 1.400\u00A0€.`,
+
+  /** Tarifzuordnung. Beschreibt nicht nur den Rechner, sondern die Zusage an den
+   *  Kunden — siehe COPY-CLAIMS-TO-VERIFY F10. */
+  tarifzuordnung:
+    "Liegt Ihr Aufkommen dauerhaft höher, ordnen wir Sie dem Tarif zu, der für Ihren Bedarf am günstigsten ist und nicht dauerhaft an seiner Obergrenze läuft — Sie zahlen den Zuschlag also nicht Monat für Monat.",
+
+  nichtProBehandler:
+    "Abgerechnet wird pro Praxis, nicht pro Behandler.",
+
+  goLive: `Ihr Empfang geht spätestens 7 Tage nach Zahlungseingang live. Halten wir diesen Termin nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.`,
+
+  aenderungen: `Änderungen an Ansagen und Regeln reichen Sie über das Kundendashboard oder per E-Mail ein; umgesetzt sind sie innerhalb von 3 Tagen.`,
+
+  kuendigung: `Gekündigt wird mit einem Klick im Kundendashboard, zum Laufzeitende. Kein Anruf, keine E-Mail, keine Fristfalle.`,
+
+  laufzeit: `Die Laufzeit beträgt 12 Monate; wer monatlich kündbar bleiben möchte, zahlt 20\u00A0% Aufschlag.`,
+
+  preisgarantie: `Der Preis ist für 24 Monate schriftlich garantiert.`,
+
+  keineAufzeichnung:
+    "Gespräche werden nicht aufgezeichnet — gespeichert wird ausschließlich das strukturierte Ergebnis: Anliegen, Name, Rückrufnummer, Terminwunsch.",
+
+  keinTraining: "Ihre Daten werden nicht zum Training von Modellen verwendet.",
+
+  art50:
+    "Der Assistent gibt sich zu Beginn jedes Anrufs als KI-System zu erkennen (Art. 50 KI-Verordnung). Ihre Patientinnen und Patienten wissen von der ersten Sekunde an, mit wem sie sprechen — abschalten lässt sich das nicht.",
+
+  keineAnbindung:
+    "Eine fertige Standardanbindung an Praxisverwaltungssysteme gibt es heute nicht. Das Ergebnis eines Anrufs steht strukturiert im Cogniiq-Dashboard; den Übertrag ins Praxissystem macht Ihr Team, solange für Ihre Software keine Schnittstelle möglich ist.",
+};
+
 /** M4 · Die vier Säulen — als beschriebene Mechanik, nicht als Slogan. */
 export const SAEULEN: Array<{ title: string; description: string }> = [
   {
@@ -42,7 +103,7 @@ export const SAEULEN: Array<{ title: string; description: string }> = [
     description:
       // [[CLAIM: verify — Rufumleitung auf die bestehende Rufnummer, Kompatibilität
       // der Telefonanlage (OWNER-INPUT B4 weiterhin unbeantwortet)]]
-      "Jeder Tarif enthält ein festes Minutenkontingent. Wird es überschritten, kostet jede weitere Minute 0,39 € — und Ihre Monatsrechnung übersteigt nie den nächsthöheren Tarif. Eine Grippewelle kann Ihre Rechnung also bewegen, aber nicht sprengen. Der Preis ist für 24 Monate garantiert, und abgerechnet wird nicht pro Behandler.",
+      `Jeder Tarif enthält ein festes Minutenkontingent. ${FAKTEN.deckelung} Eine Grippewelle kann Ihre Rechnung also bewegen, aber nicht sprengen. ${FAKTEN.preisgarantie} ${FAKTEN.nichtProBehandler}`,
   },
 ];
 
@@ -67,7 +128,7 @@ export const SCHEITERN_MUSTER: Array<{ title: string; description: string }> = [
   {
     title: "Niemand hat das System an den Betrieb angepasst",
     description:
-      "Viele Systeme am Markt werden einmal eingerichtet und dann sich selbst überlassen. Ändern sich Sprechzeiten oder Abläufe, veraltet die Konfiguration. Bei uns reichen Sie eine Änderung über Ihr Kundendashboard oder per E-Mail ein; umgesetzt ist sie innerhalb von 3 Tagen — von einem festen Ansprechpartner, nicht von einem Ticketsystem.",
+      `Viele Systeme am Markt werden einmal eingerichtet und dann sich selbst überlassen. Ändern sich Sprechzeiten oder Abläufe, veraltet die Konfiguration. Bei uns ist das anders: ${FAKTEN.aenderungen} Von einem festen Ansprechpartner, nicht von einem Ticketsystem.`,
   },
 ];
 
@@ -108,7 +169,7 @@ export const EINRICHTUNG_SCHRITTE: Array<{
     step: "05",
     title: "Testphase und Go-live",
     description:
-      "Zwei Tage testen wir gemeinsam. Live geht der Assistent erst, wenn Ihre Praxis zufrieden ist — spätestens 7 Tage nach Zahlungseingang.",
+      `Zwei Tage testen wir gemeinsam. Live geht der Assistent erst, wenn Ihre Praxis zufrieden ist — spätestens ${FAKTEN.goLiveTage} Tage nach Zahlungseingang.`,
   },
 ];
 
@@ -125,7 +186,7 @@ export const TEAM_BLOCK = {
     "Jeder Anruf kommt strukturiert an: Anliegen, Name, Rückrufnummer, Terminwunsch — statt Notizzettel",
     "Rückrufliste statt Daueralarm: abarbeiten, wenn es in den Ablauf passt",
     "Ihr Team behält die Kontrolle — jede Regel und jede Ansage lässt sich ändern",
-    "Änderungen an Ansagen und Regeln reichen Sie über das Kundendashboard oder per E-Mail ein; umgesetzt sind sie innerhalb von 3 Tagen",
+    FAKTEN.aenderungen.replace(/\.$/, ""),
   ],
 };
 
@@ -139,9 +200,9 @@ export const TEAM_BLOCK = {
  * Keine TOM-Aussage (Liste existiert nicht). Keine DSFA-Aussage.
  */
 export const DATENSCHUTZ_PUNKTE: string[] = [
-  "Es wird kein Gespräch aufgezeichnet. Gespeichert wird ausschließlich das strukturierte Ergebnis: Anliegen, Name, Rückrufnummer, Terminwunsch",
-  "Ihre Daten werden nicht zum Training von Modellen verwendet",
-  "Der Assistent gibt sich zu Beginn jedes Anrufs als KI-System zu erkennen (Art. 50 KI-Verordnung). Ihre Patientinnen und Patienten wissen von der ersten Sekunde an, mit wem sie sprechen — abschalten lässt sich das nicht",
+  FAKTEN.keineAufzeichnung,
+  FAKTEN.keinTraining,
+  FAKTEN.art50,
   // [[CLAIM: Vorlage finalisieren (Inhaber-Antwort C)]]
   "Einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO stellen wir jedem Kunden bereit",
   // [[CLAIM: Klausel finalisieren (Inhaber-Antwort C)]]
@@ -168,7 +229,7 @@ export const ANLIEGEN_IMMER_MENSCH: string[] = [
 /** M10 · Planbare Kosten — Vorhersehbarkeit vor Preishöhe. */
 export const PLANBARE_KOSTEN = {
   headline: "Ein Kontingent, ein Preis, eine Obergrenze",
-  text: "Jeder Tarif enthält ein festes Minutenkontingent. Wird es überschritten, kostet jede weitere Minute 0,39 € — und Ihre Monatsrechnung übersteigt nie den nächsthöheren Tarif. Abgerechnet wird pro Praxis, nicht pro Behandler. Einmalig kommt die Einrichtung Ihres Empfangs dazu; sie steht vor Vertragsschluss im Angebot. Der Preis ist für 24 Monate garantiert.",
+  text: `Jeder Tarif enthält ein festes Minutenkontingent. ${FAKTEN.deckelung} ${FAKTEN.nichtProBehandler} Einmalig kommt die Einrichtung Ihres Empfangs dazu; sie steht vor Vertragsschluss im Angebot. ${FAKTEN.preisgarantie}`,
 };
 
 /**
@@ -185,7 +246,7 @@ export const GRENZEN = {
     "Kein Ersatz für Ihr Team. Der Assistent nimmt Anrufe an, die sonst verloren gingen – die Entscheidungen über Termine, Rückmeldungen und Ausnahmen bleiben bei Ihren Mitarbeiterinnen und Mitarbeitern.",
     "Notfälle werden erkannt und sofort weitergeleitet – an Ihr Team, den Bereitschaftsdienst oder mit der klaren Ansage, den Notruf 112 zu wählen. Eine Bewertung des Notfalls findet nicht statt.",
     "Beschwerden, emotionale Gespräche und alles, was Sie im Anliegen-Katalog als Chefsache markieren, landen immer bei einem Menschen.",
-    "Es gibt heute keine fertige Standardanbindung an Praxisverwaltungssysteme. Das Ergebnis eines Anrufs steht strukturiert im Cogniiq-Dashboard; den Übertrag ins Praxissystem macht Ihr Team, solange für Ihre Software keine Schnittstelle möglich ist. Was für Ihr System geht, prüfen wir vor dem Angebot.",
+    `${FAKTEN.keineAnbindung} Was für Ihr System geht, prüfen wir vor dem Angebot.`,
     "Gespräche werden nicht aufgezeichnet. Wenn Sie später den genauen Wortlaut eines Anrufs brauchen, gibt es ihn nicht – Sie haben das strukturierte Ergebnis, nicht die Aufnahme.",
     "Der Assistent übernimmt nicht alle Anrufe. Realistisch ist Entlastung zu Stoßzeiten und außerhalb der Öffnungszeiten – nicht die vollständige Übernahme Ihrer Telefonie.",
   ],
@@ -218,7 +279,7 @@ export const PATIENTEN_SICHT = {
     "Nichts davon hat mit der Qualität Ihrer Medizin zu tun. Aber genau das steht später in der Online-Bewertung – und genau diese Gespräche fängt Ihr Team am Tresen auf, jeden Tag.",
   ],
   stat: {
-    value: "39 %",
+    value: "39\u00A0%",
     text: "der Versicherten bewerten die Erreichbarkeit von Praxen außerhalb der Öffnungszeiten als schwierig.",
     source: "GKV-Spitzenverband, Versichertenbefragung 2025",
   },
@@ -259,31 +320,31 @@ export const TARIFE: Tarif[] = [
     name: "Basis",
     minuten: 500,
     anrufeCa: 250,
-    monatlich: "300 €",
-    obergrenze: "500 €",
-    einrichtung: "1.490 €",
+    monatlich: "300\u00A0€",
+    obergrenze: "500\u00A0€",
+    einrichtung: "1.490\u00A0€",
   },
   {
     name: "Praxis",
     minuten: 1000,
     anrufeCa: 500,
-    monatlich: "500 €",
-    obergrenze: "800 €",
-    einrichtung: "2.490 €",
+    monatlich: "500\u00A0€",
+    obergrenze: "800\u00A0€",
+    einrichtung: "2.490\u00A0€",
   },
   {
     name: "MVZ",
     minuten: 2000,
     anrufeCa: 1000,
-    monatlich: "800 €",
-    obergrenze: "1.400 €",
-    einrichtung: "3.490 €",
+    monatlich: "800\u00A0€",
+    obergrenze: "1.400\u00A0€",
+    einrichtung: "3.490\u00A0€",
   },
 ];
 
 /** Vierter Tarif ohne Kachel — bewusst als Fließtextzeile (Inhaber-Entscheidung). */
 export const TARIF_ENTERPRISE =
-  "Für Verbünde und Mehrstandort-MVZ: Kontingent nach Bedarf, ab 5.000 € im Monat.";
+  "Für Verbünde und Mehrstandort-MVZ: Kontingent nach Bedarf, ab 5.000\u00A0€ im Monat.";
 
 /**
  * M10 · Die Deckelung — steht auf der Preisseite VOR der ersten Zahl
@@ -292,7 +353,7 @@ export const TARIF_ENTERPRISE =
 export const DECKELUNG = {
   headline: "Zuerst die Obergrenze, dann der Preis",
   text:
-    "Jeder Tarif enthält ein festes Minutenkontingent. Verbrauchen Sie mehr Minuten als enthalten, zahlen Sie 0,39 € je zusätzliche Minute. Nach oben ist jeder Tarif gedeckelt: In Basis und Praxis greift spätestens der Preis des nächsthöheren Tarifs, im Tarif MVZ liegt die Grenze bei 1.400 € — mehr zahlen Sie in diesem Monat nicht. Eine Grippewelle kann Ihre Rechnung also bewegen, aber nicht sprengen.",
+    `Jeder Tarif enthält ein festes Minutenkontingent. ${FAKTEN.deckelung} Mehr zahlen Sie in diesem Monat nicht — eine Grippewelle kann Ihre Rechnung also bewegen, aber nicht sprengen.`,
   hinweis: "Mehr als die ausgewiesene Obergrenze kostet es nie.",
   tarifwechsel:
     "Und Sie bleiben nicht im falschen Tarif sitzen: Liegt Ihr Aufkommen dauerhaft höher, ordnen wir Sie dem Tarif zu, der für Ihren Bedarf am günstigsten ist und nicht dauerhaft an seiner Obergrenze läuft. Wer Monat für Monat den Zuschlag zahlt, zahlt zu viel — dann gehört er in den nächsten Tarif.",
@@ -302,7 +363,7 @@ export const DECKELUNG = {
 
 export const SPRACHEN = {
   headline: "Weitere Sprachen",
-  text: "Deutsch ist enthalten. Jede weitere Sprache kostet 79 € im Monat; ab drei Sprachen sind es 230 € im Monat für bis zu fünf Sprachen gleichzeitig. Der Assistent kann die Sprache mitten im Gespräch wechseln.",
+  text: "Deutsch ist enthalten. Jede weitere Sprache kostet 79\u00A0€ im Monat; ab drei Sprachen sind es 230\u00A0€ im Monat für bis zu fünf Sprachen gleichzeitig. Der Assistent kann die Sprache mitten im Gespräch wechseln.",
 };
 
 /**
@@ -360,8 +421,8 @@ export const EINRICHTUNG_PROJEKT = {
     {
       nummer: "8",
       title: "Go-live",
-      dauer: "spätestens 7 Tage nach Zahlungseingang",
-      text: "Garantiert innerhalb von 7 Tagen nach Zahlungseingang.",
+      dauer: `spätestens ${FAKTEN.goLiveTage} Tage nach Zahlungseingang`,
+      text: `Garantiert innerhalb von ${FAKTEN.goLiveTage} Tagen nach Zahlungseingang.`,
     },
   ],
 };
@@ -372,7 +433,7 @@ export const EINRICHTUNG_PROJEKT = {
  */
 export const GO_LIVE_GARANTIE = {
   headline: "Die 7-Tage-Garantie",
-  text: "Ihr Empfang geht spätestens 7 Tage nach Zahlungseingang live. Halten wir diesen Termin nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr. Das steht so im Vertrag, nicht nur auf dieser Seite.",
+  text: `${FAKTEN.goLive} Das steht so im Vertrag, nicht nur auf dieser Seite.`,
 };
 
 /**
@@ -409,11 +470,11 @@ export const BETREUUNG = {
   },
   text: "Sie sprechen mit einer Person, nicht mit einem Ticketsystem und nicht mit einem wechselnden Support-Team.",
   fakten: [
-    { label: "Erreichbar", wert: "täglich 6–20 Uhr" },
-    { label: "Antwort", wert: "spätestens innerhalb von 24 Stunden" },
+    { label: "Erreichbar", wert: FAKTEN.erreichbarkeit },
+    { label: "Antwort", wert: FAKTEN.antwortzeit },
     {
       label: "Änderungen an Ansagen und Regeln",
-      wert: "eingereicht über das Kundendashboard oder per E-Mail, umgesetzt innerhalb von 3 Tagen",
+      wert: `eingereicht über das Kundendashboard oder per E-Mail, umgesetzt innerhalb von ${FAKTEN.aenderungTage} Tagen`,
     },
   ],
 };
@@ -428,27 +489,27 @@ export const UMKEHRBARKEIT = {
   fakten: [
     {
       label: "Laufzeit",
-      wert: "12 Monate — oder monatlich kündbar mit 20 % Aufschlag",
+      wert: FAKTEN.laufzeit,
     },
     {
       label: "Kündigung",
-      wert: "monatlich zum Laufzeitende, mit einem Klick im Kundendashboard. Kein Anruf, keine E-Mail, keine Fristfalle",
+      wert: FAKTEN.kuendigung,
     },
-    { label: "Preisgarantie", wert: "24 Monate, schriftlich" },
+    { label: "Preisgarantie", wert: FAKTEN.preisgarantie },
     {
       label: "Testphase",
       wert: "2 Tage, nach Vertragsabschluss und Zahlung der ersten Hälfte. Live geht der Empfang erst, wenn Sie zufrieden sind",
     },
   ],
   vetorecht:
-    "Die Testphase ist kein kostenloser Test. Sie ist der Punkt, an dem Sie ein Vetorecht haben: Ohne Ihre Freigabe geht der Empfang nicht live, und halten wir die 7 Tage nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.",
+    `Die Testphase ist kein kostenloser Test. Sie ist der Punkt, an dem Sie ein Vetorecht haben: Ohne Ihre Freigabe geht der Empfang nicht live, und halten wir die ${FAKTEN.goLiveTage} Tage nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.`,
   // [[CLAIM: Was mit den gespeicherten Ergebnissen nach Vertragsende geschieht,
   // ist nicht beantwortet (Brief II §4.7). Bis dahin keine Aussage dazu.]]
 };
 
 /** Verankerung — sachlich, ohne Ersparnisbehauptung (Brief III §3.4). */
 export const PERSONALKOSTEN_ANKER = {
-  text: "Zum Vergleich, ohne daraus eine Ersparnis abzuleiten: Das Tarifgehalt für Medizinische Fachangestellte beginnt 2026 bei 2.939,59 € monatlich, zuzüglich Arbeitgeberkosten.",
+  text: "Zum Vergleich, ohne daraus eine Ersparnis abzuleiten: Das Tarifgehalt für Medizinische Fachangestellte beginnt 2026 bei 2.939,59\u00A0€ monatlich, zuzüglich Arbeitgeberkosten.",
   source: "Gehaltstarifvertrag MFA (Virchowbund), 2026",
 };
 
@@ -462,9 +523,9 @@ export const NICHT_EXTRA = {
   intro:
     "Diese Posten tauchen auf keiner Rechnung auf, weil sie im Monatsbetrag enthalten sind:",
   punkte: [
-    "Änderungen an Ansagen, Anliegen und Regeln — unbegrenzt, umgesetzt innerhalb von 3 Tagen",
-    "Ihr fester Ansprechpartner, erreichbar täglich 6–20 Uhr, Antwort spätestens in 24 Stunden",
-    "Zehn gleichzeitige Anrufe in jedem Tarif — auch im kleinsten",
+    `Änderungen an Ansagen, Anliegen und Regeln — unbegrenzt, umgesetzt innerhalb von ${FAKTEN.aenderungTage} Tagen`,
+    `Ihr fester Ansprechpartner, erreichbar ${FAKTEN.erreichbarkeit}, Antwort ${FAKTEN.antwortzeit}`,
+    `${FAKTEN.gleichzeitigeAnrufe} gleichzeitige Anrufe in jedem Tarif — auch im kleinsten`,
     "Deutsch als Sprache",
     "Der Auftragsverarbeitungsvertrag nach Art. 28 DSGVO",
     "Die zwei Tage Testphase, sie sind Teil der Einrichtung",
@@ -479,15 +540,15 @@ export const VERTRAG = {
   fakten: [
     {
       label: "Laufzeit",
-      wert: "12 Monate. Wer monatlich kündbar bleiben möchte, zahlt 20 % Aufschlag auf den Monatsbetrag.",
+      wert: FAKTEN.laufzeit,
     },
     {
       label: "Kündigung",
-      wert: "Mit einem Klick im Kundendashboard, zum Laufzeitende. Kein Anruf, keine E-Mail, keine Fristfalle.",
+      wert: FAKTEN.kuendigung,
     },
     {
       label: "Preisgarantie",
-      wert: "24 Monate, schriftlich. Innerhalb dieser Zeit ändert sich Ihr Monatsbetrag nicht.",
+      wert: `${FAKTEN.preisgarantie} Innerhalb dieser Zeit ändert sich Ihr Monatsbetrag nicht.`,
     },
     {
       label: "Zahlung der Einrichtung",

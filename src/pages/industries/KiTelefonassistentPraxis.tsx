@@ -1,7 +1,7 @@
 import { NationalIndustryPage } from "@/components/NationalIndustryPage";
 import type { NationalIndustryPageConfig } from "@/components/NationalIndustryPage";
 import { BUSINESS_INFO } from "@/lib/seo-data";
-import { GRENZEN } from "@/lib/telefonassistent-copy";
+import { FAKTEN, GRENZEN } from "@/lib/telefonassistent-copy";
 
 const config: NationalIndustryPageConfig = {
   seo: {
@@ -62,7 +62,7 @@ const config: NationalIndustryPageConfig = {
     "Wiederkehrende Fragen zu Zeiten, Anfahrt oder Unterlagen beantwortet der Assistent nach Ihren Vorgaben",
     "Ihre Stimmauswahl, Ihr Begrüßungssatz, Ihre Formulierungen – Anrufer erfahren im ersten Satz, dass ein KI-System spricht",
     "Auftragsverarbeitungsvertrag nach Art. 28 DSGVO; keine Gesprächsaufzeichnung, kein Training mit Ihren Daten",
-    "Festes Minutenkontingent, darüber 0,39 €/Min. – die Rechnung übersteigt nie den nächsthöheren Tarif",
+    `Festes Minutenkontingent, darüber ${FAKTEN.mehrpreisProMinute}/Min. – gedeckelt auf die Obergrenze Ihres Tarifs`,
   ],
   workflow: {
     title: "So läuft ein Terminanruf in der Therapiepraxis ab",
