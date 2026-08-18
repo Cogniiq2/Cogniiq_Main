@@ -34,7 +34,6 @@ const SERVICES = [
     description:
       "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, mehrsprachig. Für Praxen, Gastronomie, Dienstleister und Handwerk in ganz Deutschland.",
     benefits: [
-      "Einrichtung in 7–14 Tagen",
       "Erreichbar auch dann, wenn niemand abnehmen kann",
       "Mehrsprachig auf Anfrage",
     ],
@@ -211,7 +210,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Wie schnell können Projekte starten?",
-    a: "KI-Telefonassistenten sind in 7–14 Tagen live. Einfache Automatisierungen in 1–2 Wochen. Websites je nach Umfang in 4–12 Wochen. Realistischer Zeitplan nach dem Erstgespräch.",
+    a: "KI-Telefonassistenten gehen nach Aufnahme Ihrer Vorgaben live. Einfache Automatisierungen in 1–2 Wochen. Websites je nach Umfang in 4–12 Wochen. Realistischer Zeitplan nach dem Erstgespräch.",
   },
   {
     q: "Was kostet ein Projekt mit Cogniiq in Deutschland?",

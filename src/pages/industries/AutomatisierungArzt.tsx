@@ -39,7 +39,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       title: "Bewertungen entstehen nicht von selbst",
-      description: "Zufriedene Patienten denken nicht automatisch daran, eine Google-Bewertung zu hinterlassen. Ein automatisierter, freundlicher Follow-up nach dem Termin macht es zufriedenen Patienten leichter, eine Bewertung zu hinterlassen – ohne aktives Zutun.",
+      description: "Die wenigsten Patienten denken nach dem Termin daran, eine Bewertung zu hinterlassen. Ein automatisierter, freundlicher Follow-up macht es ihnen leichter.",
     },
   ],
   solution: {

@@ -43,7 +43,7 @@ const config: IndustryPageConfig = {
     },
     {
       step: "Schritt 2",
-      title: "Umsetzung in 7–14 Tagen",
+      title: "Umsetzung nach Ihrer Freigabe",
       description:
         "Restaurant-Website mit Reservierungssystem, KI-Telefonassistent und Automatisierungs-Workflows werden vollständig von Cogniiq aufgebaut – schlüsselfertig, ohne IT-Aufwand für den Betrieb.",
     },
@@ -156,7 +156,7 @@ const config: IndustryPageConfig = {
     {
       title: "Automatisierter Feedback-Prozess nach Besuch",
       description:
-        "Nach dem Besuch erhalten Gäste automatisch eine Feedback-Anfrage. Positives Feedback wird in Richtung Google-Bewertung gelenkt – wichtig für das Ranking in einer stark bewerteten Tourismusstadt.",
+        "Nach dem Besuch erhalten Gäste automatisch eine Feedback-Anfrage. ",
     },
   ],
   benefits: [
@@ -170,7 +170,7 @@ const config: IndustryPageConfig = {
   localContext: [
     "Regensburg zieht jährlich Millionen Touristen an und beheimatet eine der ältesten Universitäten Deutschlands. Die Gastronomie der Stadt profitiert von dieser Mischung aus lokalem Stammpublikum, Studenten und internationalem Tourismus – steht aber gleichzeitig vor der Herausforderung, digital präsent und buchbar zu sein.",
     "Cogniiq entwickelt für Gastronomiebetriebe in Regensburg passgenaue Digitallösungen: eine moderne Restaurant-Website mit integriertem Reservierungssystem, einen KI-Telefonassistenten sowie Automatisierungen für Bestätigungen, Erinnerungen und Feedback-Prozesse.",
-    "Alle Systeme werden datenschutzorientiert umgesetzt und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut das Setup langfristig remote.",
+    "Alle Systeme werden datenschutzorientiert umgesetzt. Cogniiq betreut das Setup langfristig remote.",
   ],
   internalLinks: [
     { label: "Webdesign Regensburg", href: "/regensburg/webdesign" },
@@ -196,7 +196,7 @@ const config: IndustryPageConfig = {
     {
       question: "Wie lange dauert die Einrichtung für ein Restaurant in Regensburg?",
       answer:
-        "Die Einrichtung dauert in der Regel 7–14 Tage und wird vollständig von Cogniiq übernommen. Keine technischen Vorkenntnisse erforderlich – wir liefern alles schlüsselfertig.",
+        "Die Einrichtung wird vollständig von Cogniiq übernommen. Keine technischen Vorkenntnisse erforderlich – wir liefern alles schlüsselfertig.",
     },
     {
       question: "Kann die Website auch saisonale Menüs und touristische Informationen abbilden?",

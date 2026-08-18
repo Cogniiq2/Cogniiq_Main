@@ -249,7 +249,6 @@ function TrustStripSection({ config }: { config: IndustryPageConfig }) {
     config.industry,
     "KI-Integration",
     "Automatisierung",
-    "7–14 Tage Setup",
   ];
 
   return (

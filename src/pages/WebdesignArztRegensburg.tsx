@@ -43,7 +43,7 @@ const config: IndustryPageConfig = {
     },
     {
       step: "Schritt 2",
-      title: "Umsetzung in 7–14 Tagen",
+      title: "Umsetzung nach Ihrer Freigabe",
       description:
         "Website, KI-Telefonassistent und Automatisierungsworkflows werden vollständig von Cogniiq aufgebaut und konfiguriert. Die Praxis erhält alles schlüsselfertig – ohne IT-Aufwand auf Praxisseite.",
     },
@@ -170,7 +170,7 @@ const config: IndustryPageConfig = {
   localContext: [
     "Regensburg ist eine wachsende Mittelstadt mit einem breiten Praxisnetz und einem jungen Patientenprofil, das durch die Universität und das Uniklinikum geprägt wird. Gleichzeitig versorgen viele Praxen auch Patienten aus dem Landkreis – mit entsprechend hohem Anfragevolumen.",
     "Cogniiq entwickelt für Arztpraxen in Regensburg maßgeschneiderte Digitallösungen: eine hochperformante Praxis-Website mit integrierter Terminbuchung, einen KI-Telefonassistenten, der die Rezeption auch außerhalb der Sprechzeiten entlastet, sowie Automatisierungssysteme für Terminerinnerungen und Patientenkommunikation.",
-    "Cogniiq betreut Projekte in Regensburg remote und ist für persönliche Abstimmungen direkt erreichbar. Die Einrichtung aller Lösungen dauert 7–14 Tage. Alle Systeme werden datenschutzorientiert umgesetzt; technische und organisatorische Maßnahmen werden projektbezogen abgestimmt.",
+    "Cogniiq betreut Projekte in Regensburg remote und ist für persönliche Abstimmungen direkt erreichbar. Alle Systeme werden datenschutzorientiert umgesetzt; technische und organisatorische Maßnahmen werden projektbezogen abgestimmt.",
   ],
   internalLinks: [
     { label: "Webdesign Regensburg", href: "/regensburg/webdesign" },
@@ -196,7 +196,7 @@ const config: IndustryPageConfig = {
     {
       question: "Wie lange dauert die Einrichtung für eine Arztpraxis in Regensburg?",
       answer:
-        "Die Einrichtung dauert in der Regel 7–14 Tage und wird vollständig von Cogniiq übernommen. Sie müssen keine technischen Vorkenntnisse mitbringen.",
+        "Die Einrichtung wird vollständig von Cogniiq übernommen. Sie müssen keine technischen Vorkenntnisse mitbringen.",
     },
     {
       question: "Kann ich meinen Patienten in Regensburg Online-Terminbuchung anbieten?",

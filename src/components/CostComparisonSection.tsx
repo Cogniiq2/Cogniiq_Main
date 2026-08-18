@@ -458,7 +458,7 @@ export function CostComparisonSection() {
               />
               <div className="relative">
                 <p className="text-[14px] font-bold text-white mb-1.5">
-                  KI-Assistent live in 7–14&nbsp;Tagen
+                  KI-Assistent live nach Ihrer Freigabe
                 </p>
                 <p className="text-[12px] text-gray-500 mb-5 leading-relaxed">
                   Klare Vertragskonditionen · persönliche Einrichtung

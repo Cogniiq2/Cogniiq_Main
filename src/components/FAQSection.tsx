@@ -15,7 +15,7 @@ const faqs = [
     question: 'Wie schnell könnt ihr starten?',
     // [[CLAIM: verify — Startzeitraum 7–14 Tage (OWNER-INPUT E1)]]
     answer:
-      'In der Regel innerhalb von 7–14 Tagen nach dem Analysegespräch. Je nach Auslastung und Projektumfang kann es auch anders liegen – wir nennen Ihnen im Erstgespräch einen konkreten Termin.',
+      'Das hängt vom Projektumfang und der Auslastung ab – wir nennen Ihnen im Erstgespräch einen konkreten Termin.',
     category: 'Ablauf',
   },
   {
@@ -131,7 +131,6 @@ export function FAQSection() {
             <div className="flex flex-col gap-0 mb-8">
               {[
                 { count: String(faqs.length), label: 'Antworten' },
-                { count: '7–14', label: 'Tage bis Start' },
                 { count: 'Remote', label: 'umsetzbar' },
               ].map((stat) => (
                 <div

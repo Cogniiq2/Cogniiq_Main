@@ -54,6 +54,95 @@ Keiner dieser Punkte ist ein Fehler im Code. Es sind Entscheidungen.
 | 3 | **Zwei Seiten auf `noindex`** — bewusst, bis die Freischaltbedingungen erfüllt sind | `ASSETS-REQUIRED.md` §B1/§B2, §D |
 | 4 | **Nicht-Healthcare-Copy** — Hotel, Restaurant, Webdesign, Automatisierung und Blog haben den Ehrlichkeits- und Gestaltungspass **nicht** vollständig durchlaufen. Verarbeitungsort und „DSGVO-konform" sind dort entfernt, Zeiträume und Reaktionszeiten stehen unbestätigt | `COPY-CLAIMS-TO-VERIFY.md` Z6, Z7, Z10–Z12 |
 
+## 4a. Bereinigung der Rest-Aussagen (18.08.2026, abgeschlossen)
+
+Die fünf Punkte aus §4.1, die außerhalb des Healthcare-Clusters lagen, sind
+bereinigt. **Nur Entfernung unbelegter Zusagen — keine Copy-Überarbeitung.**
+Jede Zeile mit der Gegenprobe aus `HONESTY-AUDIT.md` §9 gegen `dist` geprüft,
+nicht gegen die Quelldateien.
+
+| # | Aussage | Dokumente vorher | nachher |
+|---|---|---|---|
+| 1 | „7–14 Tage" auf Startseite und Vertrauensflächen | 35 | **7** |
+| 2 | „24 h" — siehe Aufteilung unten | 17 | 16 |
+| 3 | Review-Lenkung | 3 | **0** |
+| 4 | Hotel-/Restaurant-Systemnamen | 5 | **0** |
+| 5 | Blog-Preis gegen `TARIFE` | 1 | **0** |
+
+### Zu 1 — was entfernt wurde und was bleibt
+
+Entfernt: jede Nennung auf Startseite, Vertrauensstreifen, Kontaktseite, den
+Assistent-Segmentseiten, den Paketseiten, die den Assistenten einschließen, und
+in den Meta-Descriptions beider Ketten.
+
+**Es bleiben 7 Dokumente**, alle reine Website-Projektdauern
+(`*/webdesign-kosten`, `*/website-erstellen`, `/webdesign`). Das ist ein anderes
+Produkt mit eigener Laufzeit; die Angabe widerspricht der 7-Tage-Garantie des
+Telefonassistenten nicht. Sie ist weiterhin unbestätigt (OWNER-INPUT E1 bezog
+sich auf den Assistenten) und gehört in den Copy-Durchgang für die
+Nicht-Healthcare-Seiten.
+
+### Zu 2 — Abweichung von beiden angebotenen Optionen
+
+Weder „auf den Cluster begrenzen" noch „entfernen", sondern eine Aufteilung.
+Begründung: In den Fundstellen steckten **zwei verschiedene Aussagen**.
+
+| Aussage | Beleg | Ergebnis |
+|---|---|---|
+| **Antwortzeit** — „Wir melden uns in der Regel innerhalb von 24 Stunden" | OWNER-INPUT **D3** fragt allgemein nach der „Reaktionszeit auf Anfragen", nicht produktbezogen. Die Antwort lautet „spätestens innerhalb von 24 Stunden" — die Website sagt „in der Regel", also **schwächer als die Zusage** und damit gedeckt | **bleibt.** Nur die erledigten `[[CLAIM]]`-Marker sind entfernt. `COPY-BRIEF.md` §10 verlangt außerdem, dass jedes Formular sagt, was in welcher Frist passiert — eine Streichung hätte das gebrochen |
+| **Leistung in 24 h** — „Systemanalyse · Innerhalb 24 h" (`ContactSection`) und „Innerhalb 24 h" (`HowItWorksSection`) | D3 deckt eine **Antwort**, keine gelieferte Analyse | **entfernt** — das war die eigentliche Überdehnung |
+
+Falls die Antwortzeit doch clusterintern gemeint war, ist die Rücknahme zwei
+Zeilen; die Fundstellen stehen in `COPY-CLAIMS-TO-VERIFY.md` Z7.
+
+### Zu 3 — Review-Lenkung
+
+Entfernt in `WebdesignGastronomieMuenchen`, `WebdesignGastronomieRegensburg`
+(die Regensburger Fassung fand erst die Gegenprobe gegen `dist`, nicht die
+Quellensuche) sowie die Formulierungen „nach positiven Erlebnissen" in
+`AutomatisierungSport` und die gleichgelagerte Zielgruppenverengung in
+`AutomatisierungArzt`.
+
+**Produktseite geprüft:** Im Repository findet sich **keine Implementierung**
+einer Bewertungsweiche — keine Verzweigung nach Bewertungshöhe, kein
+Review-Gating im Code. Die Aussage war Copy ohne Funktion. Sollte die Weiche
+außerhalb dieses Repositories existieren (etwa im Automatisierungs-Workflow beim
+Kunden), ist sie rechtlich zu prüfen; das lässt sich von hier aus nicht
+feststellen. **Offener Punkt.**
+
+### Zu 4 — Systemnamen
+
+`protel`, `Apaleo`, `Lodgit`, `OpenTable`, `ResDiary`, `Resmio`, `TheFork`,
+`Little Hotelier`, `Beds24` sind aus Hotel- und Restaurant-Segmentseiten, den
+Webdesign-Branchenseiten und einem Blogartikel entfernt — dieselbe Behandlung
+wie bei den PVS-Namen. An ihre Stelle tritt die Schnittstellenprüfung vor dem
+Angebot. Die beiden `[[CLAIM]]`-Marker darauf sind entfallen, nicht ersetzt.
+
+Nebenbefund, mitgenommen: In derselben Antwort stand „vollautomatisch" — ein
+Wort von der Verbotsliste (`COPY-BRIEF.md` §5.9).
+
+### Zu 5 — Blog-Preise
+
+Gegen `TARIFE` geprüft. Ein Betrag widersprach: „Die monatlichen Kosten eines
+KI-Telefonassistenten für eine mittelgroße Praxis liegen zwischen 200 und
+450 €" — die bestätigten Tarife beginnen bei 300 € (Basis) und liegen für eine
+mittelgroße Praxis bei 500 €. **Entfernt, nicht korrigiert**, mit Verweis auf
+die Kostenseite.
+
+Die übrigen Blog-Beträge betreffen Webdesign und Automatisierung, nicht die
+bestätigten Tarife. Sie stehen weiter als Z12 offen.
+
+### Methodischer Nachtrag
+
+Die Gegenprobe gegen `dist` hat in dieser Runde **drei Fundstellen** aufgedeckt,
+welche die Quellensuche verfehlte, jedes Mal aus demselben Grund: Der
+Typografie-Durchgang hatte zwischen Zahl und Einheit geschützte Leerzeichen
+gesetzt — mal als literales U+00A0, mal als `\u00A0`, mal als `&nbsp;`. Ein
+Suchmuster mit gewöhnlichem Leerzeichen findet dann nichts und meldet trotzdem
+Erfolg. Dieselbe Fehlerklasse wie beim Muster `€\b`. **Konsequenz für die
+nächste Prüfung:** Suchmuster über Zahlen und Einheiten müssen jede
+Leerzeichen-Schreibweise abdecken, und die Zählung gehört gegen `dist`.
+
 ## 5. Was nach dem Merge sofort zu tun ist
 
 1. **`HONESTY-AUDIT.md` §9 lesen, bevor irgendetwas geprüft wird.** Die Liste der

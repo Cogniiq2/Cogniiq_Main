@@ -56,7 +56,7 @@ const config: NationalIndustryPageConfig = {
     // [[CLAIM: verify — PMS-/Channel-Manager-Anbindungen konkret bestätigen]]
     "Anbindung an gängige PMS-Systeme und Channel-Manager wird vor dem Angebot geprüft",
     // [[CLAIM: verify — Einrichtungsdauer 7–14 Tage]]
-    "Eingerichtet in der Regel in 7–14 Tagen – der Hotelbetrieb läuft weiter",
+    "Eingerichtet ohne Unterbrechung — der Hotelbetrieb läuft weiter",
   ],
   workflow: {
     title: "So läuft eine Buchungsanfrage ab",
@@ -96,8 +96,7 @@ const config: NationalIndustryPageConfig = {
   faq: [
     {
       question: "Kann der Assistent in unser Hotelverwaltungssystem integriert werden?",
-      // [[CLAIM: verify — PMS-Namen (protel, Apaleo, Lodgit) und Anbindungstiefe bestätigen]]
-      answer: "Für gängige PMS-Systeme und Channel-Manager – etwa protel, Apaleo oder Lodgit – prüfen wir die Anbindung vor dem Angebot und sagen Ihnen konkret, in welcher Form Buchungen ankommen. Ein Wechsel Ihres Systems ist nicht Voraussetzung.",
+      answer: "Welche Schnittstelle Ihr PMS oder Channel-Manager bietet, prüfen wir vor dem Angebot; das Ergebnis steht darin, auch wenn es negativ ausfällt. Eine Liste unterstützter Systeme führen wir nicht — sie wäre heute entweder leer oder unehrlich. Ein Wechsel Ihres Systems ist keine Voraussetzung.",
     },
     {
       question: "Wie hilft der Assistent dabei, Portalprovision einzusparen?",
@@ -114,7 +113,7 @@ const config: NationalIndustryPageConfig = {
     {
       question: "Wie lange dauert die Einrichtung?",
       // [[CLAIM: verify — Einrichtungsdauer bestätigen]]
-      answer: "In der Regel 7–14 Tage für einfache Setups. Komplexe PMS-Anbindungen oder mehrsprachige Konfigurationen dauern länger. Der Hotelbetrieb wird dabei nicht unterbrochen.",
+      answer: "Das hängt vom Umfang ab. Komplexe PMS-Anbindungen oder mehrsprachige Konfigurationen dauern länger. Der Hotelbetrieb wird dabei nicht unterbrochen.",
     },
   ],
 };

@@ -66,7 +66,7 @@ const config: NationalIndustryPageConfig = {
       {
         step: "02",
         title: "Buchungssystem, Zimmerpräsentation & SEO",
-        description: "Integration des Direktbuchungssystems (z. B. Little Hotelier, Booking Engine via Channel Manager), vollständige Zimmerpräsentation und Local SEO-Setup für Ihre wichtigsten Suchbegriffe.",
+        description: "Integration des Direktbuchungssystems (Anbindung wird vor der Beauftragung geprüft), vollständige Zimmerpräsentation und Local SEO-Setup für Ihre wichtigsten Suchbegriffe.",
       },
       {
         step: "03",
@@ -96,7 +96,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Welches Buchungssystem integriert Cogniiq?",
-      answer: "Wir arbeiten mit gängigen Buchungssystemen wie Little Hotelier, Beds24, Apaleo und eigenen Channel-Manager-Lösungen. Die Wahl richtet sich nach Ihrer Größe, bestehenden Systemen und Budget. Ziel ist immer: direkt buchbar, ohne OTA-Weiterleitung.",
+      answer: "Welches Buchungssystem passt, richtet sich nach Ihrer Größe, Ihren bestehenden Systemen und Ihrem Budget. Ziel ist immer: direkt buchbar, ohne OTA-Weiterleitung.",
     },
     {
       question: "Kann die Website für Gruppen, Tagungen und Events optimiert werden?",

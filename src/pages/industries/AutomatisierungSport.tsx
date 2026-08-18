@@ -39,7 +39,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       title: "Bewertungen und Empfehlungen werden nicht aktiv angefragt",
-      description: "Die meisten zufriedenen Mitglieder empfehlen das Studio nicht aktiv und hinterlassen keine Bewertung – solange man sie nicht darum bittet. Automatisierte Anfragen nach positiven Erlebnissen machen es zufriedenen Mitgliedern leichter, eine Bewertung zu hinterlassen und das Studio weiterzuempfehlen.",
+      description: "Die meisten Mitglieder hinterlassen keine Bewertung, solange man sie nicht darum bittet. Eine automatisierte Anfrage nach dem Besuch macht es ihnen leichter.",
     },
   ],
   solution: {
@@ -52,7 +52,7 @@ const config: NationalIndustryPageConfig = {
     "Zahlungserinnerungen und Mahnprozess automatisch",
     "Re-Engagement-Sequenz für inaktive Mitglieder",
     "Kurs- und Event-Kommunikation automatisch an alle Mitglieder",
-    "Bewertungsanfragen nach positiven Erlebnissen",
+    "Bewertungsanfragen nach dem Besuch",
     "Mitgliederdatenverarbeitung mit Auftragsverarbeitungsvertrag",
   ],
   workflow: {

@@ -462,7 +462,7 @@ export function LeistungenPage() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.32 }}
             >
-              {["Setup 7–14 Tage", "Remote möglich"].map((chip) => (
+              {["Remote möglich"].map((chip) => (
                 <span
                   key={chip}
                   className="inline-block px-3 py-1 text-[11px] font-medium text-gray-500 dark:text-gray-500 border border-gray-200 dark:border-gray-800 tracking-wide"

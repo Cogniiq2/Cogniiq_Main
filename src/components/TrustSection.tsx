@@ -25,7 +25,7 @@ const principles = [
     icon: Zap,
     title: "Wochen, nicht Monate.",
     // [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1)]]
-    text: "Go-Live typischerweise in 7–14 Tagen. Keine endlosen Abstimmungsrunden, keine Wasserfall-Projektphasen. Live geht das System erst nach Ihrer Freigabe.",
+    text: "Keine endlosen Abstimmungsrunden, keine Wasserfall-Projektphasen. Live geht das System erst nach Ihrer Freigabe.",
     link: "/kontakt",
     linkLabel: "Jetzt starten",
     highlight: false,

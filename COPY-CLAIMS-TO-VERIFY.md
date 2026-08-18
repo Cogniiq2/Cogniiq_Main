@@ -23,19 +23,21 @@ eine Bestätigung.
 | Z3 | **§ 203 StGB** — „Cogniiq und alle Mitarbeitenden werden vertraglich auf das Berufsgeheimnis verpflichtet" | wie Z2 | Klausel ausformulieren. Bis dahin Absichtserklärung |
 | Z4 | **Verbleib der Ergebnisse nach Vertragsende** | `UMKEHRBARKEIT` — heute bewusst **keine** Aussage | Solange unbeantwortet, bleibt M19 an dieser Stelle stumm. Der Datenschutzbeauftragte einer Praxis wird danach fragen |
 | Z5 | **Dauer des Erstgesprächs** | `CTA.microcopy` — heute ohne Minutenangabe | Bleibt ohne Zeitangabe. „15 Minuten" wäre ein starker Mikrotext (COPY-BRIEF-3 §4.2) |
-| Z6 | **Go-Live-Zeitraum „7–14 Tage" außerhalb des Clusters** | `StatsSection`, `DesktopHero`, `TrustSection`, `TrustStrip`, `FAQSection`, `KiCTASection`, `FinalCTASection` — Webdesign und Automatisierung | Für den Telefonassistenten ist die Frage beantwortet (7 Tage garantiert). Für die anderen Produkte steht die Zahl unbestätigt auf Startseite und Vertrauensflächen. **Nach dem Grundsatz oben gehört sie entfernt, wenn sie nicht bestätigt wird** |
-| Z7 | **Reaktionszeit „in der Regel 24 h" außerhalb des Clusters** | `ContactSection`, `FAQQuestionModal`, `ROICalculator`, `FinalCTASection`, `HowItWorksSection` | Für den Telefonassistenten bestätigt (Antwort D3). Für die übrigen Produkte unbestätigt |
+| ~~Z6~~ | **erledigt 18.08.2026** — auf Startseite, Vertrauensflächen, Assistent- und Paketseiten sowie in beiden Metadaten-Ketten entfernt (35 → 7 Dokumente). Es bleiben reine Website-Projektdauern: **Go-Live-Zeitraum „7–14 Tage"** | `StatsSection`, `DesktopHero`, `TrustSection`, `TrustStrip`, `FAQSection`, `KiCTASection`, `FinalCTASection` — Webdesign und Automatisierung | Für den Telefonassistenten ist die Frage beantwortet (7 Tage garantiert). Für die anderen Produkte steht die Zahl unbestätigt auf Startseite und Vertrauensflächen. **Nach dem Grundsatz oben gehört sie entfernt, wenn sie nicht bestätigt wird** |
+| ~~Z7~~ | **entschieden 18.08.2026** — die Antwortzeit ist durch D3 allgemein belegt und bleibt; entfernt wurden nur die zwei Stellen, die eine *Leistung* in 24 h versprachen. **Reaktionszeit „in der Regel 24 h"** | `ContactSection`, `FAQQuestionModal`, `ROICalculator`, `FinalCTASection`, `HowItWorksSection` | Für den Telefonassistenten bestätigt (Antwort D3). Für die übrigen Produkte unbestätigt |
 | Z8 | **Beispielbetrag 297 €** im Kostenvergleich | `CostComparisonSection` | Weicht von `TARIFE` ab. Als Beispielwert gekennzeichnet, aber unvereinheitlicht |
 | Z9 | **JSON-LD-Angaben** — `areaServed` (10+ Städte), `priceRange "€€€"`, `foundingDate 2025-10-15`, `availableLanguage` | `index.html`, `LocalBusinessSchema.tsx` | Strukturierte Daten sind Aussagen wie jede andere |
-| Z10 | **Review-Lenkung** — „positives Feedback wird in Richtung Google-Bewertung gelenkt" | Webdesign-Gastronomie-Stadtseiten | Rechtlich riskantes Muster (Review-Gating). Empfehlung unverändert: entfernen. Entscheidung liegt beim Inhaber |
-| Z11 | **PMS-/Systemnamen Hotel und Restaurant** (protel, Apaleo, Lodgit, OpenTable, ResDiary, Resmio) | Hotel-/Restaurant-Segmentseiten | Dieselbe Klasse wie die PVS-Namen, die im Healthcare-Cluster entfernt wurden. Anbindungstiefe bestätigen oder Namen streichen |
-| Z12 | **Blog-Orientierungspreise** (150–500 €, 200–450 €, 300 € u. a.) | `blog-data.ts` | Bestätigen oder entfernen |
+| ~~Z10~~ | **erledigt 18.08.2026** — Copy entfernt; im Repository keine Implementierung gefunden, außerhalb davon offen. **Review-Lenkung** — „positives Feedback wird in Richtung Google-Bewertung gelenkt" | Webdesign-Gastronomie-Stadtseiten | Rechtlich riskantes Muster (Review-Gating). Empfehlung unverändert: entfernen. Entscheidung liegt beim Inhaber |
+| ~~Z11~~ | **erledigt 18.08.2026** — alle Namen entfernt. **PMS-/Systemnamen Hotel und Restaurant** (protel, Apaleo, Lodgit, OpenTable, ResDiary, Resmio) | Hotel-/Restaurant-Segmentseiten | Dieselbe Klasse wie die PVS-Namen, die im Healthcare-Cluster entfernt wurden. Anbindungstiefe bestätigen oder Namen streichen |
+| Z12 | **Blog-Orientierungspreise** — der einzige Betrag, der den bestätigten `TARIFE` widersprach (200–450 € für den Telefonassistenten), ist am 18.08.2026 entfernt. Offen bleiben die Webdesign- und Automatisierungsbeträge (150–500 €, 2.500–8.000 € u. a.) | `blog-data.ts` | Bestätigen oder entfernen |
 | Z13 | **Gründer-Spezialisierungen** | `AboutSection` — heute neutral „Gründer" | Erst nach Bestätigung wieder personenbezogen ausweisen |
 
-**Z6, Z7, Z10, Z11 und Z12 liegen außerhalb des Healthcare-Clusters.** Sie sind
-in diesem Durchgang bewusst nicht angefasst worden; die Nicht-Healthcare-Seiten
-stehen für einen eigenen Copy-Durchgang. Nach dem Grundsatz oben sind sie
-trotzdem fällig.
+**Stand 18.08.2026:** Z6, Z7, Z10 und Z11 sind bereinigt, Z12 teilweise —
+Einzelheiten in `MERGE-READINESS.md` §4a. Es galt: nur Entfernung unbelegter
+Zusagen, keine Copy-Überarbeitung. Die eigentliche Copy der Nicht-Healthcare-
+Seiten steht weiterhin für einen eigenen Durchgang aus.
+
+**Weiterhin offen bleiben Z1–Z5, Z8, Z9, Z13** sowie die Reste aus Z6 und Z12.
 
 ## Y. Erledigt seit dem 16.08.2026
 

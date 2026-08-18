@@ -82,7 +82,7 @@ const config: IndustryPageConfig = {
     },
     {
       step: "Schritt 2",
-      title: "Umsetzung in 7–14 Tagen",
+      title: "Umsetzung nach Ihrer Freigabe",
       // ✓ "schlüsselfertig" and "keine IT-Kenntnisse" address the most common objections
       // ✓ Specific timeline (14 Tage) is a ranking differentiator and trust signal
       description:
@@ -254,7 +254,7 @@ const config: IndustryPageConfig = {
   localContext: [
     "Bayreuth ist ein wachsender Gesundheitsstandort mit einer dichten Praxislandschaft – von Allgemeinmedizin und Fachpraxen über Zahnarztpraxen bis zu Physiotherapie- und Psychotherapieeinrichtungen im Stadtgebiet und im Umland von Oberfranken. Der Wettbewerb um neue Patienten ist messbar gestiegen: Praxen mit moderner Website und digitaler Erreichbarkeit gewinnen Neupatienten, die bei Google nach 'Arzt Bayreuth' oder ihrer Fachrichtung suchen – Praxen ohne digitale Präsenz verlieren sie.",
     "Gleichzeitig begrenzt der Fachkräftemangel im medizinischen Verwaltungsbereich die Personalkapazitäten in Bayreuther Praxen. Jede Stunde, die das Rezeptionsteam mit Routineanrufen verbringt, fehlt im direkten Patientenkontakt. Cogniiq entwickelt für Arztpraxen in Bayreuth maßgeschneiderte Digitallösungen: eine hochperformante Praxis-Website mit integrierter Online-Terminbuchung, einen KI-Telefonassistenten, der die Rezeption auch außerhalb der Sprechzeiten entlastet, sowie Automatisierungssysteme für Terminerinnerungen und strukturierte Patientenkommunikation.",
-    "Als Unternehmen mit Sitz in Bayreuth kennen wir die lokalen Besonderheiten, die Praxisstruktur in der Region und die spezifischen Anforderungen bayerischer Datenschutzpraxis. Die Einrichtung aller Lösungen dauert 7–14 Tage und wird vollständig von Cogniiq übernommen – ohne IT-Aufwand auf Praxisseite. Wir sind für persönliche Abstimmungen direkt erreichbar – per Video-Call oder vor Ort in Bayreuth.",
+    "Als Unternehmen mit Sitz in Bayreuth kennen wir die lokalen Besonderheiten, die Praxisstruktur in der Region und die spezifischen Anforderungen bayerischer Datenschutzpraxis. Die Einrichtung aller Lösungen wird vollständig von Cogniiq übernommen – ohne IT-Aufwand auf Praxisseite. Wir sind für persönliche Abstimmungen direkt erreichbar – per Video-Call oder vor Ort in Bayreuth.",
   ],
 
   // ✓ Internal links kept structurally identical — no changes to href values
@@ -307,7 +307,7 @@ const config: IndustryPageConfig = {
       question:
         "Wie lange dauert die Einrichtung für eine Arztpraxis in Bayreuth?",
       answer:
-        "Die vollständige Einrichtung dauert 7–14 Tage und wird von Cogniiq komplett übernommen. Sie müssen keine technischen Kenntnisse mitbringen und keinen internen IT-Aufwand einplanen. Sie erhalten Website, KI-Telefonassistent und Automatisierungssysteme schlüsselfertig – inklusive DSGVO-Dokumentation und einer Einführung durch Ihr Cogniiq-Team vor Ort oder per Video-Call in Bayreuth.",
+        "Die vollständige Einrichtung wird von Cogniiq komplett übernommen. Sie müssen keine technischen Kenntnisse mitbringen und keinen internen IT-Aufwand einplanen. Sie erhalten Website, KI-Telefonassistent und Automatisierungssysteme schlüsselfertig – inklusive DSGVO-Dokumentation und einer Einführung durch Ihr Cogniiq-Team vor Ort oder per Video-Call in Bayreuth.",
     },
     {
       question:

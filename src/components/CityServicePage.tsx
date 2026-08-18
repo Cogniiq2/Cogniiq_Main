@@ -262,7 +262,7 @@ function TrustStrip({ config }: { config: CityServiceConfig }) {
     "Persönliche Betreuung",
     ...(isTelefonassistent
       ? ["Keine Gesprächsaufzeichnung", `Go-live in ${FAKTEN.goLiveTage}\u00A0Tagen`]
-      : ["Einrichtung in 7–14 Tagen"]),
+      : ["Persönliche Einrichtung"]),
   ];
 
   return (

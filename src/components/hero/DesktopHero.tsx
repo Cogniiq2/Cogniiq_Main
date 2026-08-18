@@ -7,7 +7,6 @@ import {
   Globe,
   Zap,
   ShieldCheck,
-  Clock,
 } from 'lucide-react';
 
 import { ErrorBoundary } from '../ErrorBoundary';
@@ -246,10 +245,8 @@ const services = [
   { icon: Zap, label: 'Automatisierung', href: '/automatisierung-unternehmen' },
 ];
 
-// [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1) bestätigen]]
 const proof = [
   { value: 'Auch nachts', label: 'Erreichbarkeit', sub: 'Anrufannahme außerhalb der Öffnungszeiten' },
-  { value: '7–14 Tage', label: 'Go-Live', sub: 'Typischer Projektzeitraum' },
 ];
 
 export function DesktopHero() {
@@ -372,7 +369,7 @@ export function DesktopHero() {
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" aria-hidden="true" />
             {/* [[CLAIM: verify — Go-Live-Zeitraum (OWNER-INPUT E1)]] */}
             <span className="text-[12px] font-semibold text-gray-700">
-              Go-Live typischerweise in 7–14&nbsp;Tagen
+              Go-Live nach Ihrer Freigabe
             </span>
           </motion.div>
 
@@ -445,21 +442,10 @@ export function DesktopHero() {
                 <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-gray-600 transition-colors" aria-hidden="true" />
               </button>
             </div>
-
-            <div className="flex items-center gap-4 pt-0.5">
-              {[
-                { icon: Clock, text: 'Go-Live typischerweise in 7–14 Tagen' },
-              ].map(({ icon: Icon, text }) => (
-                <div key={text} className="flex items-center gap-1.5">
-                  <Icon size={10} className="text-emerald-500 flex-shrink-0" aria-hidden="true" />
-                  <span className="text-[11px] text-gray-400">{text}</span>
-                </div>
-              ))}
-            </div>
           </motion.div>
 
           <motion.div data-review-claim="go-live-zeitraum"
-            className="mt-10 pt-8 border-t border-gray-100 grid grid-cols-3 gap-6"
+            className="mt-10 pt-8 border-t border-gray-100 grid grid-cols-1 gap-6"
             initial={{ opacity: 0 }}
             animate={inView ? { opacity: 1 } : {}}
             transition={{ duration: 0.8, delay: 1.85, ease: E }}

@@ -53,10 +53,9 @@ const config: NationalIndustryPageConfig = {
     "Automatische Erinnerung am Vortag wirkt No-Shows entgegen",
     // [[CLAIM: verify — Sprachumfang bestätigen]]
     "Mehrsprachig konfigurierbar: üblicherweise Deutsch und Englisch",
-    // [[CLAIM: verify — Reservierungssystem-Anbindungen (OpenTable, ResDiary, Resmio) bestätigen]]
     "Anbindung an gängige Reservierungssysteme wird vor dem Angebot geprüft",
     // [[CLAIM: verify — Einrichtungsdauer bestätigen]]
-    "Live in der Regel in 7–14 Tagen – der Betrieb läuft weiter wie gewohnt",
+    "Live ohne Unterbrechung — der Betrieb läuft weiter wie gewohnt",
   ],
   workflow: {
     title: "So läuft eine Reservierung ab",
@@ -97,8 +96,7 @@ const config: NationalIndustryPageConfig = {
   faq: [
     {
       question: "Kann der Assistent in unser bestehendes Reservierungssystem integriert werden?",
-      // [[CLAIM: verify — Systemnamen (OpenTable, ResDiary, Resmio) und Anbindungstiefe bestätigen]]
-      answer: "Für gängige Reservierungssysteme – etwa OpenTable, ResDiary oder Resmio – prüfen wir die Anbindung vor dem Angebot und sagen Ihnen konkret, in welcher Form Reservierungen ankommen. Ein Wechsel Ihres Systems ist nicht Voraussetzung.",
+      answer: "Welche Schnittstelle Ihr Reservierungssystem bietet, prüfen wir vor dem Angebot; das Ergebnis steht darin, auch wenn es negativ ausfällt. Eine Liste unterstützter Systeme führen wir nicht — sie wäre heute entweder leer oder unehrlich. Ein Wechsel Ihres Systems ist keine Voraussetzung.",
     },
     {
       question: "Was passiert, wenn ein Wunschtisch oder eine Uhrzeit nicht verfügbar ist?",

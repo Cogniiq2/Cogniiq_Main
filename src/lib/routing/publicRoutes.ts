@@ -177,7 +177,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/ki-agentur-deutschland",
     title: "KI Agentur Deutschland | AI-Systeme für Unternehmen – Cogniiq",
-    description: "Cogniiq ist Ihre KI-Agentur für ganz Deutschland. KI-Telefonassistenten, Chatbots und Automatisierungssysteme – entwickelt für den deutschen Markt, einsatzbereit in 7–14 Tagen.",
+    description: "Cogniiq ist Ihre KI-Agentur für ganz Deutschland. KI-Telefonassistenten, Chatbots und Automatisierungssysteme – entwickelt für den deutschen Markt.",
     keywords: "KI Agentur Deutschland, AI Agentur Deutschland, KI Systeme Unternehmen, Artificial Intelligence Deutschland",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.92" },
@@ -245,7 +245,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/regensburg",
     title: "AI-Systeme & Webdesign in Regensburg | KI-Telefonassistent & Automatisierung – Cogniiq",
-    description: "Cogniiq entwickelt KI-Telefonassistenten, Webdesign und Automatisierungslösungen für Unternehmen in Regensburg. Persönliche Betreuung, Go-Live in 7–14 Tagen.",
+    description: "Cogniiq entwickelt KI-Telefonassistenten, Webdesign und Automatisierungslösungen für Unternehmen in Regensburg. Persönliche Betreuung.",
     keywords: "AI Agentur Regensburg, Webdesign Regensburg, KI Telefonassistent Regensburg, Automatisierung Regensburg",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.80" },
@@ -701,7 +701,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/digitale-automatisierung-unternehmen",
     title: "Digitale Automatisierung für Unternehmen – Praxisnah & sofort einsetzbar | Cogniiq",
-    description: "Digitale Automatisierung für KMU: Vom Erstgespräch bis zum laufenden System in 7–14 Tagen. Cogniiq entwickelt Automatisierungssysteme, die wirklich eingesetzt werden.",
+    description: "Digitale Automatisierung für KMU: Cogniiq entwickelt Automatisierungssysteme, die wirklich eingesetzt werden.",
     keywords: "Digitale Automatisierung, Automatisierung KMU, KI Digitalisierung Unternehmen, Digital Transformation",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.80" },

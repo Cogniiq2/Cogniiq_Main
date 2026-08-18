@@ -20,7 +20,7 @@ const SERVICES_OVERVIEW = [
     title: "KI-Telefonassistent Bayern",
     slug: "ki-telefonassistent",
     description:
-      "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, für Praxen, Gastronomie und Dienstleister in ganz Bayern. Einrichtung in 7–14 Tagen.",
+      "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, für Praxen, Gastronomie und Dienstleister in ganz Bayern.",
     benefits: [
       "Erreichbar auch dann, wenn niemand abnehmen kann",
       "Entlastung von Routinegesprächen",
@@ -55,7 +55,6 @@ const SERVICES_OVERVIEW = [
 const TRUST_POINTS = [
   "Hauptsitz in Bayreuth – persönliche Betreuung in der Region",
   "Projekte in ganz Bayern – auch remote vollständig betreut",
-  "Einrichtung in 7–14 Tagen – keine monatelangen Projekte",
   "Fester Ansprechpartner – direkter Kontakt für Ihr Projekt",
   "Faire Preise – transparent kalkuliert, keine versteckten Kosten",
 ];
@@ -184,7 +183,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Wie schnell sind die Lösungen einsatzbereit?",
-    a: "KI-Telefonassistenten: 7–14 Tage. Automatisierungsworkflows: 1–4 Wochen je nach Komplexität. Websites: 4–12 Wochen. Nach dem Erstgespräch erhalten Sie immer einen realistischen Zeitplan.",
+    a: "KI-Telefonassistenten: nach Aufnahme Ihrer Vorgaben. Automatisierungsworkflows: 1–4 Wochen je nach Komplexität. Websites: 4–12 Wochen. Nach dem Erstgespräch erhalten Sie immer einen realistischen Zeitplan.",
   },
   {
     q: "Sind alle Lösungen DSGVO-konform?",

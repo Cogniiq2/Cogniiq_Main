@@ -11,7 +11,7 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, nu
 
 // [[CLAIM: verify — Einrichtungsdauer 7–14 Tage (OWNER-INPUT E1) bestätigen]]
 const trust = [
-  { icon: CheckCircle, text: 'Einrichtung typischerweise in 7–14 Tagen' },
+  { icon: CheckCircle, text: 'Einrichtung nach Ihren Vorgaben' },
   { icon: CheckCircle, text: 'Anbindung an Kalender & CRM wird vorab geprüft' },
   { icon: CheckCircle, text: 'Keine Gesprächsaufzeichnung, kein Training mit Ihren Daten' },
   { icon: CheckCircle, text: 'Auch außerhalb der Öffnungszeiten erreichbar' },
@@ -89,7 +89,7 @@ export function KiCTASection() {
                     animate={{ opacity: [1, 0.3, 1] }}
                     transition={{ duration: 1.8, repeat: Infinity }}
                   />
-                  <span className="text-[10px] text-emerald-400/70 font-medium">Live in 7–14&nbsp;Tagen</span>
+                  <span className="text-[10px] text-emerald-400/70 font-medium">Live nach Ihrer Freigabe</span>
                 </span>
               </div>
 

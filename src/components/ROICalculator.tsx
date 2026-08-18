@@ -357,7 +357,6 @@ export function ROICalculator() {
                 Kostenloses Erstgespräch
                 <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
               </Link>
-              {/* [[CLAIM: verify — Reaktionszeit 24 h (OWNER-INPUT D3)]] */}
               <p className="text-[11px] text-gray-400 text-center mt-3">
                 Kostenlos & unverbindlich · Antwort in der Regel innerhalb 24 h
               </p>

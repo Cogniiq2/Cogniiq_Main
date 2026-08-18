@@ -96,7 +96,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Welche Reservierungssysteme integriert Cogniiq?",
-      answer: "Wir integrieren OpenTable, ResDiary, Resmio und andere gängige Systeme. Auf Wunsch auch in Kombination mit dem KI-Telefonassistenten, sodass auch telefonische Reservierungen vollautomatisch laufen – 24 Stunden, 7 Tage.",
+      answer: "Welches Reservierungssystem Sie nutzen, klären wir vorab; ob und wie es sich einbinden lässt, steht vor der Beauftragung fest.",
     },
     {
       question: "Kann ich die Speisekarte selbst aktualisieren?",

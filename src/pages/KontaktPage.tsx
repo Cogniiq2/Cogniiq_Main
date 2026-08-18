@@ -265,7 +265,7 @@ export function KontaktPage() {
                       </span>
                     </div>
                     <p className="text-[11.5px] text-gray-600 leading-relaxed">
-                      Antwort in der Regel innerhalb von 24&nbsp;Stunden · Go-Live typischerweise in 7–14&nbsp;Tagen ·
+                      Antwort in der Regel innerhalb von 24&nbsp;Stunden ·
                       kein Formular-Loop — persönliches Gespräch
                     </p>
                   </div>

@@ -43,7 +43,7 @@ const config: IndustryPageConfig = {
     },
     {
       step: "Schritt 2",
-      title: "Umsetzung in 7–14 Tagen",
+      title: "Umsetzung nach Ihrer Freigabe",
       description:
         "Makler-Website mit Objektpräsentation, KI-Telefonassistent für Interessentenanfragen und Automatisierungsworkflows für Besichtigungen und Follow-ups werden vollständig von Cogniiq aufgebaut.",
     },
@@ -170,7 +170,7 @@ const config: IndustryPageConfig = {
   localContext: [
     "Regensburg ist eine der am stärksten wachsenden Städte Bayerns. Der Immobilienmarkt ist geprägt von stabiler bis steigender Nachfrage – sowohl lokal als auch von Zugezogenen aus dem Großraum München. Makler profitieren von der dynamischen Marktlage, stehen aber vor der Herausforderung, qualifizierte Leads effizient zu bearbeiten.",
     "Cogniiq entwickelt für Immobilienmakler in Regensburg maßgeschneiderte Digitallösungen: eine hochwertige Makler-Website mit strukturierten Objektseiten, einen KI-Telefonassistenten für Interessentenanfragen sowie Automatisierungssysteme für Lead-Qualifizierung, Besichtigungsplanung und Follow-up-Prozesse.",
-    "Cogniiq betreut Projekte in Regensburg remote und ist für persönliche Abstimmungen direkt erreichbar. Die Einrichtung dauert 7–14 Tage. Alle Systeme werden datenschutzorientiert umgesetzt.",
+    "Cogniiq betreut Projekte in Regensburg remote und ist für persönliche Abstimmungen direkt erreichbar. Alle Systeme werden datenschutzorientiert umgesetzt.",
   ],
   internalLinks: [
     { label: "Webdesign Regensburg", href: "/regensburg/webdesign" },
@@ -196,7 +196,7 @@ const config: IndustryPageConfig = {
     {
       question: "Wie lange dauert die Einrichtung für einen Immobilienmakler in Regensburg?",
       answer:
-        "Die Einrichtung dauert in der Regel 7–14 Tage. Website, KI-Assistent und Automatisierungs-Workflows werden vollständig von Cogniiq aufgebaut – Sie müssen keine technischen Vorkenntnisse mitbringen.",
+        "Website, KI-Assistent und Automatisierungs-Workflows werden vollständig von Cogniiq aufgebaut – Sie müssen keine technischen Vorkenntnisse mitbringen.",
     },
     {
       question: "Kann der KI-Telefonassistent auch Fragen zu spezifischen Objekten in Regensburg beantworten?",

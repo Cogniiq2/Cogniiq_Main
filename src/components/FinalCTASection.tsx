@@ -1,13 +1,12 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Calendar, Shield, Clock, CircleCheck as CheckCircle, TrendingUp, PhoneCall, Zap } from 'lucide-react';
+import { ArrowRight, Calendar, Shield, Clock, CircleCheck as CheckCircle, TrendingUp, PhoneCall } from 'lucide-react';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 const guarantees = [
   { icon: Shield, text: 'Unverbindlich — Sie entscheiden nach dem Gespräch' },
-  // [[CLAIM: verify — Reaktionszeit 24 Stunden (OWNER-INPUT D3) bestätigen]]
   { icon: Clock, text: 'Antwort in der Regel innerhalb von 24 Stunden' },
   { icon: Calendar, text: 'Persönliches Gespräch — kein Formular-Loop' },
 ];
@@ -24,7 +23,6 @@ const outcomes = [
 const microResults = [
   { icon: PhoneCall, stat: 'Auch nachts', label: 'Anrufannahme' },
   { icon: TrendingUp, stat: 'Strukturiert', label: 'qualifizierte Anfragen' },
-  { icon: Zap, stat: '7–14 Tage', label: 'bis Go-Live' },
 ];
 
 export function FinalCTASection() {
@@ -181,7 +179,7 @@ export function FinalCTASection() {
                 <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl p-4 text-center">
                   <p className="text-[11.5px] text-gray-600 leading-relaxed">
                     Go-Live typischerweise in{' '}
-                    <span className="text-gray-400 font-medium">7–14&nbsp;Tagen.</span>
+                    <span className="text-gray-400 font-medium">Ihrer Freigabe.</span>
                   </p>
                 </div>
               </div>

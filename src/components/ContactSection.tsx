@@ -39,8 +39,7 @@ const STEPS = [
 
 const afterSteps = [
   { n: '01', label: 'Eingangsbestätigung', sub: 'Automatisch · sofort' },
-  // [[CLAIM: verify — Reaktionszeit 24 h (OWNER-INPUT D3)]]
-  { n: '02', label: 'Systemanalyse', sub: 'Innerhalb 24 h' },
+  { n: '02', label: 'Systemanalyse', sub: 'Nach Ihrer Anfrage' },
   { n: '03', label: 'Analysegespräch', sub: '45 Min. · Video' },
   { n: '04', label: 'Systemkonzept', sub: 'Maßgeschneidert' },
 ];

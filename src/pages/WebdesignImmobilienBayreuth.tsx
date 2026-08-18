@@ -43,7 +43,7 @@ const config: IndustryPageConfig = {
     },
     {
       step: "Schritt 2",
-      title: "Umsetzung in 7–14 Tagen",
+      title: "Umsetzung nach Ihrer Freigabe",
       description:
         "Makler-Website mit Objektpräsentation, KI-Telefonassistent für Interessentenanfragen und Automatisierungsworkflows für Besichtigungen und Follow-ups werden vollständig von Cogniiq aufgebaut.",
     },
@@ -170,7 +170,7 @@ const config: IndustryPageConfig = {
   localContext: [
     "Der Bayreuther Immobilienmarkt ist von einer stabilen Nachfrage geprägt – sowohl im Kauf- als auch im Mietbereich. Makler stehen vor der Herausforderung, qualifizierte Interessenten schnell zu erreichen und gleichzeitig die eigene Effizienz bei der Lead-Bearbeitung zu steigern.",
     "Cogniiq entwickelt für Immobilienmakler in Bayreuth maßgeschneiderte Digitallösungen: eine hochwertige Makler-Website mit strukturierten Objektseiten, einen KI-Telefonassistenten für Interessentenanfragen sowie Automatisierungssysteme für Lead-Qualifizierung, Besichtigungsplanung und Follow-up-Prozesse.",
-    "Als Bayreuther Unternehmen mit direktem Ortsbezug verstehen wir den lokalen Markt und sind persönlich erreichbar. Die Einrichtung dauert 7–14 Tage. Alle Systeme werden datenschutzorientiert umgesetzt.",
+    "Als Bayreuther Unternehmen mit direktem Ortsbezug verstehen wir den lokalen Markt und sind persönlich erreichbar. Alle Systeme werden datenschutzorientiert umgesetzt.",
   ],
   internalLinks: [
     { label: "Webdesign Bayreuth", href: "/bayreuth/webdesign" },
@@ -196,7 +196,7 @@ const config: IndustryPageConfig = {
     {
       question: "Wie lange dauert die Einrichtung für einen Immobilienmakler in Bayreuth?",
       answer:
-        "Die Einrichtung dauert in der Regel 7–14 Tage. Website, KI-Assistent und Automatisierungs-Workflows werden vollständig von Cogniiq aufgebaut – Sie müssen keine technischen Vorkenntnisse mitbringen.",
+        "Website, KI-Assistent und Automatisierungs-Workflows werden vollständig von Cogniiq aufgebaut – Sie müssen keine technischen Vorkenntnisse mitbringen.",
     },
     {
       question: "Kann der KI-Telefonassistent auch Fragen zu spezifischen Objekten beantworten?",

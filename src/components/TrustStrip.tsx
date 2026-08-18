@@ -9,7 +9,7 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, nu
 const ITEMS = [
   // Keine Hosting-, Serverstandort- oder "DSGVO-konform"-Aussage (Inhaber-Antwort B).
   { icon: Shield, label: 'Keine Gesprächsaufzeichnung', sub: 'Gespeichert wird nur das strukturierte Ergebnis' },
-  { icon: Clock, label: 'Go-Live typisch in 7–14 Tagen', sub: 'Live erst nach Ihrer Freigabe' },
+  { icon: Clock, label: 'Go-Live erst nach Ihrer Freigabe', sub: 'Kein Start gegen Ihren Willen' },
   { icon: Users, label: 'Direkter Ansprechpartner', sub: 'Kein Ticket-System' },
   { icon: Wrench, label: 'Keine Templates', sub: 'Gebaut für Ihren Prozess' },
   { icon: Lock, label: 'Festpreis', sub: 'Einmalposten stehen im Angebot' },

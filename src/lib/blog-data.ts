@@ -201,7 +201,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Kosten und ROI in der Praxis",
         content:
-          "Die monatlichen Kosten eines KI-Telefonassistenten für eine mittelgroße Praxis liegen zwischen 200 und 450 €. Demgegenüber stehen entlastete Personalstunden sowie Patienten, die sonst zur Konkurrenz wechseln würden. Wann sich das rechnet, hängt von Anrufaufkommen und Praxisstruktur ab – rechnen Sie mit Ihren eigenen Zahlen.",
+          "Was ein KI-Telefonassistent für Ihre Praxis kostet, hängt vom Anrufaufkommen ab; die aktuellen Tarife stehen auf der Kostenseite. Demgegenüber stehen entlastete Personalstunden sowie Patienten, die sonst zur Konkurrenz wechseln würden. Wann sich das rechnet, hängt von Anrufaufkommen und Praxisstruktur ab – rechnen Sie mit Ihren eigenen Zahlen.",
       },
       {
         type: "table",
@@ -651,7 +651,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Integration mit Reservierungssystemen",
         content:
-          "Der KI-Telefonassistent kann mit gängigen Restaurantsystemen wie OpenTable, TheFork, resmio oder einem eigenen Kalender verbunden werden. Bei bestehenden Systemen ist eine Echtzeit-Verfügbarkeitsprüfung möglich – der Gast erhält sofort eine verbindliche Zusage.",
+          "Ob sich ein bestehendes Reservierungssystem anbinden lässt, hängt von dessen Schnittstelle ab und wird vor der Beauftragung geprüft. Ohne Anbindung nimmt der Assistent die Reservierung strukturiert auf, und das Team überträgt sie.",
       },
       {
         type: "h2",

@@ -294,7 +294,6 @@ export function KiTelefonassistentDemoPage() {
                   <ol className="space-y-2.5">
                     {[
                       "Formular ausfüllen und Demo-Termin anfragen",
-                      // [[CLAIM: verify — Reaktionszeit 24 Stunden (OWNER-INPUT D3) bestätigen]]
                       "Wir melden uns in der Regel innerhalb von 24 Stunden",
                       "Live-Demo per Video: KI-Assistent in Aktion",
                       "Individuelle Konfiguration für Ihr Unternehmen besprechen",
