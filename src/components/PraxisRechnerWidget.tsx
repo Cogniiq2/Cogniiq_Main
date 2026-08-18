@@ -23,8 +23,17 @@ const WOCHEN_PRO_MONAT = 4.33;
 const MINUTEN_PRO_ANRUF = 2;
 /** Preis je Minute über dem Kontingent. */
 const MEHRPREIS_PRO_MINUTE = 0.39;
-/** Belegte Untergrenze der einzigen dokumentierten Praxisrechnung. */
-const UNTERGRENZE_PROZENT = 10;
+/** Unteres Ende des Reglers. Der Voreinstellwert steht in AUTOMATISIERUNG_STANDARD. */
+const AUTOMATISIERUNG_MIN = 10;
+/**
+ * Voreingestellter Automatisierungsgrad — Anteil der Anrufe, den der Assistent
+ * vollständig übernimmt. Angabe des Inhabers vom 18.08.2026.
+ *
+ * [[CLAIM: verify — gemessene Übernahmequote (OWNER-INPUT F4). Die Zahl ist eine
+ * Aussage über das eigene Produkt und muss belegbar sein, bevor die Seite live
+ * geht: Sie steht als Vorgabewert vor jedem Besucher.]]
+ */
+const AUTOMATISIERUNG_STANDARD = 90;
 
 function eur(v: number): string {
   return `${Math.round(v).toLocaleString("de-DE")}\u00A0€`;
@@ -156,7 +165,7 @@ export function PraxisRechnerWidget() {
   const [verpasstProzent, setVerpasstProzent] = useState(20);
   const [minutenProAnruf, setMinutenProAnruf] = useState(3);
   const [stundenkosten, setStundenkosten] = useState(18);
-  const [ersparnisProzent, setErsparnisProzent] = useState(20);
+  const [automatisierungProzent, setAutomatisierungProzent] = useState(AUTOMATISIERUNG_STANDARD);
   // Bewusst als String und bewusst leer: ohne Angabe des Besuchers wird dieser
   // Teil der Rechnung NICHT berechnet und NICHT geschätzt.
   const [terminwertEingabe, setTerminwertEingabe] = useState("");
@@ -168,10 +177,8 @@ export function PraxisRechnerWidget() {
   // Kennzahl 2 — Bearbeitungszeit, getrennt von Kennzahl 1.
   const telefonzeitMinuten = heuteAngenommen * minutenProAnruf;
   const stundenBei = (p: number) => (telefonzeitMinuten * (p / 100)) / 60;
-  const stundenUnten = stundenBei(UNTERGRENZE_PROZENT);
-  const stundenOben = stundenBei(Math.max(ersparnisProzent, UNTERGRENZE_PROZENT));
-  const wertUnten = stundenUnten * stundenkosten;
-  const wertOben = stundenOben * stundenkosten;
+  const stunden = stundenBei(automatisierungProzent);
+  const wert = stunden * stundenkosten;
 
   // Cogniiq-Kosten, vollständig gegengerechnet.
   const minutenBedarf = anrufeProMonat * MINUTEN_PRO_ANRUF;
@@ -186,15 +193,13 @@ export function PraxisRechnerWidget() {
   const terminwertGueltig = terminwert !== null && Number.isFinite(terminwert) && terminwert > 0;
   const anrufwertMax = terminwertGueltig ? zusaetzlichAngenommen * (terminwert as number) : null;
 
-  const nettoUnten = wertUnten - kostenProMonat;
-  const nettoOben = wertOben - kostenProMonat;
+  const netto = wert - kostenProMonat;
   // Wie viele der zusätzlich angenommenen Anrufe zu einem Termin führen müssten,
   // damit sich der Empfang trägt. Keine Abschlussquote unterstellt — die Zahl
   // wird ausgerechnet, nicht angenommen.
   const noetigeTermine = terminwertGueltig
-    ? Math.max(0, (kostenProMonat - wertOben) / (terminwert as number))
+    ? Math.max(0, (kostenProMonat - wert) / (terminwert as number))
     : null;
-  const istPunktwert = ersparnisProzent <= UNTERGRENZE_PROZENT;
 
   return (
     <div className="grid lg:grid-cols-2 gap-6">
@@ -258,15 +263,15 @@ export function PraxisRechnerWidget() {
             </p>
           </div>
           <Regler
-            id="rechner-ersparnis"
-            label="Angenommene Zeitersparnis"
-            hinweis="Obere Kante der Spanne. Die untere liegt fest bei 10 %."
-            wert={ersparnisProzent}
-            min={10}
-            max={40}
+            id="rechner-automatisierung"
+            label="Automatisierungsgrad"
+            hinweis="Anteil der Anrufe, den der Assistent vollständig übernimmt. Stellen Sie den Wert auf Ihre Praxis ein."
+            wert={automatisierungProzent}
+            min={AUTOMATISIERUNG_MIN}
+            max={100}
             step={1}
             einheit="%"
-            onChange={setErsparnisProzent}
+            onChange={setAutomatisierungProzent}
           />
 
           <div className="pt-2 border-t border-gray-100 dark:border-gray-800">
@@ -346,21 +351,11 @@ export function PraxisRechnerWidget() {
             2 · Eingesparte Bearbeitungszeit
           </p>
           <p className="text-[26px] font-bold text-gray-900 dark:text-gray-100 tabular-nums leading-tight">
-            {istPunktwert
-              ? `${zahl(stundenOben)}\u00A0Stunden`
-              : `${zahl(stundenUnten)} bis ${zahl(stundenOben)}\u00A0Stunden`}
+            {zahl(stunden)}&nbsp;Stunden
           </p>
           <p className="text-[16px] text-gray-600 dark:text-gray-400 mb-4">im Monat</p>
-          <Zeile
-            label="Gegenwert"
-            wert={istPunktwert ? eur(wertOben) : `${eur(wertUnten)} bis ${eur(wertOben)}`}
-          />
-          {istPunktwert && (
-            <p className="text-[14px] text-gray-500 dark:text-gray-500 mt-3 leading-[1.5]">
-              Am unteren Anschlag rechnet der Rechner mit genau 10&nbsp;% — dann ist das
-              Ergebnis ein einzelner Wert statt einer Spanne.
-            </p>
-          )}
+          <Zeile label="Automatisierungsgrad" wert={`${automatisierungProzent}\u00A0%`} />
+          <Zeile label="Gegenwert" wert={eur(wert)} />
         </div>
 
         {/* Gegenrechnung */}
@@ -386,12 +381,10 @@ export function PraxisRechnerWidget() {
             Bleibt im ersten Jahr
           </p>
           <p className="text-[30px] font-bold text-gray-900 dark:text-gray-100 tabular-nums leading-tight">
-            {istPunktwert
-              ? `${eur(nettoOben)} / Monat`
-              : `${eur(nettoUnten)} bis ${eur(nettoOben)} / Monat`}
+            {eur(netto)} / Monat
           </p>
           <p className="text-[16px] text-gray-600 dark:text-gray-400 mt-3 leading-[1.6]">
-            {nettoOben < 0
+            {netto < 0
               ? "Bei diesen Angaben trägt sich der Empfang rechnerisch nicht. Das ist ein ehrliches Ergebnis und ein guter Grund, das Erstgespräch kurz zu halten."
               : "Nach Abzug unserer eigenen Kosten, einschließlich der Einrichtung."}
           </p>
@@ -447,9 +440,8 @@ export function PraxisRechnerWidget() {
               <strong className="font-semibold text-gray-900 dark:text-gray-100">
                 Eingesparte Zeit:
               </strong>{" "}
-              {UNTERGRENZE_PROZENT}&nbsp;% bis {Math.max(ersparnisProzent, UNTERGRENZE_PROZENT)}&nbsp;% davon
-              = {zahl(stundenUnten)} bis {zahl(stundenOben)}&nbsp;Stunden. Mal{" "}
-              {zahl(stundenkosten)}&nbsp;€/h ergibt {eur(wertUnten)} bis {eur(wertOben)}.
+              {automatisierungProzent}&nbsp;% davon = {zahl(stunden)}&nbsp;Stunden. Mal{" "}
+              {zahl(stundenkosten)}&nbsp;€/h ergibt {eur(wert)}.
             </p>
             <p>
               <strong className="font-semibold text-gray-900 dark:text-gray-100">
@@ -471,11 +463,13 @@ export function PraxisRechnerWidget() {
             </p>
             <p>
               <strong className="font-semibold text-gray-900 dark:text-gray-100">
-                Warum die untere Kante bei 10&nbsp;% liegt:
+                Woher der Automatisierungsgrad kommt:
               </strong>{" "}
-              Die einzige öffentlich dokumentierte Rechnung eines Praxisinhabers zu
-              genau dieser Frage liegt bei 10 bis 20&nbsp;%, bewusst netto nach Nacharbeit
-              gerechnet. Wir setzen die untere Kante deshalb fest auf diesen Wert.
+              Voreingestellt sind {AUTOMATISIERUNG_STANDARD}&nbsp;% — der Anteil der
+              Anrufe, den der Assistent nach Angabe von Cogniiq vollständig übernimmt.
+              Der Regler ist bewusst frei: Wie hoch der Anteil in Ihrer Praxis
+              ausfällt, hängt von Ihrem Anliegen-Katalog ab. Stellen Sie ihn auf den
+              Wert ein, den Sie für realistisch halten.
             </p>
             {terminwertGueltig ? (
               <p>

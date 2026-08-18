@@ -681,18 +681,21 @@ export const VERTRAG = {
  * Copy des Praxis-Rechners (COPY-BRIEF-3 §6). Die Zahlen des Rechners kommen
  * aus TARIFE; hier stehen ausschließlich die Texte.
  *
- * Zur Spanne: Die einzige öffentlich dokumentierte Rechnung eines
- * Praxisinhabers zu genau dieser Frage liegt bei 10–20 % netto. Die untere
- * Kante der Spanne ist deshalb fest auf 10 % gesetzt, die obere auf den vom
- * Besucher eingestellten Wert. Ein höherer Standardwert würde von genau der
- * Zielgruppe geprüft und widerlegt, die diese Seite überzeugen soll.
+ * Zum Automatisierungsgrad: Voreingestellt sind 90\u00A0% — der Anteil der Anrufe,
+ * den der Assistent nach Angabe des Inhabers (18.08.2026) vollständig übernimmt.
+ * Der Wert ist im Rechner frei einstellbar.
+ *
+ * [[CLAIM: verify — gemessene Übernahmequote (OWNER-INPUT F4). Die Zahl steht als
+ * Vorgabewert vor jedem Besucher und ist damit eine Aussage über das eigene
+ * Produkt. Diese Zielgruppe prüft solche Zahlen nach; ohne Beleg ist sie das
+ * größte Einzelrisiko auf der Preisseite.]]
  */
 export const RECHNER = {
   headline: "Was spart eine Praxis durch einen KI Telefonassistenten?",
   intro:
     "Stellen Sie die Regler auf Ihre Praxis ein. Der Rechner trennt bewusst zwei Dinge, die oft in einer Zahl verschwinden: wie viele Anrufe überhaupt angenommen werden — und wie viel Bearbeitungszeit dabei tatsächlich eingespart wird. Das ist nicht dasselbe.",
   rahmung:
-    "Wir rechnen bewusst vorsichtig. Der Rechner unterstellt eine Zeitersparnis am unteren Rand dessen, was Praxen berichten, und zieht unsere eigenen Kosten ab.",
+    "Der Rechner ist auf einen Automatisierungsgrad von 90\u00A0% voreingestellt und zieht unsere eigenen Kosten ab — Monatspreis und Einrichtung. Stellen Sie den Grad auf den Wert ein, den Sie für Ihre Praxis für realistisch halten; der Rechenweg bleibt vollständig nachvollziehbar.",
   label: "Rechnung mit Ihren Angaben — keine Zusage.",
   anbindungsHinweis:
     "Der Wert steigt, wo eine Anbindung an Ihr Praxisverwaltungssystem möglich ist: Dann entfällt auch das Übertragen von Hand. Was für Ihr System geht, prüfen wir vor dem Angebot.",

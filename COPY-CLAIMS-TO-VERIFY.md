@@ -18,6 +18,7 @@ eine Bestätigung.
 
 | # | Aussage | Wo | Was ohne Bestätigung passiert |
 |---|---|---|---|
+| Z0 | **Automatisierungsgrad 90 %** — Vorgabewert des Praxis-Rechners: der Anteil der Anrufe, den der Assistent vollständig übernimmt | `PraxisRechnerWidget`, `RECHNER.rahmung` — Preisseite und `/praxen` | **Höchste Priorität.** Die Zahl steht als Voreinstellung vor jedem Besucher und ist damit die sichtbarste Produktaussage der Preisseite. OWNER-INPUT **F4** („eigene gemessene Übernahmequote") ist unbeantwortet. Diese Zielgruppe rechnet solche Zahlen nach — ohne Beleg ist sie das größte Einzelrisiko der Seite. Ersetzt die vorherige Fassung, die bewusst am unteren Rand der einzigen dokumentierten Praxisrechnung (10–20 %) rechnete |
 | Z1 | **Tarifzuordnung nach günstigstem Gesamtpreis** — die Zusage, dass ein Kunde bei dauerhaft höherem Aufkommen dem für ihn günstigsten Tarif zugeordnet wird | `FAKTEN.tarifzuordnung`, Preisseite, `/praxen`, Praxis-Rechner | Muss vertraglich und im Abrechnungsprozess gedeckt sein, nicht nur im Rechner. Sonst von allen Seiten entfernen |
 | Z2 | **AVV-Vorlage nach Art. 28 DSGVO** — „stellen wir jedem Kunden bereit" | `DATENSCHUTZ_PUNKTE`, Datenschutz-Seite, Segmentseiten | Vorlage finalisieren. Bis dahin ist es eine Absichtserklärung |
 | Z3 | **§ 203 StGB** — „Cogniiq und alle Mitarbeitenden werden vertraglich auf das Berufsgeheimnis verpflichtet" | wie Z2 | Klausel ausformulieren. Bis dahin Absichtserklärung |
