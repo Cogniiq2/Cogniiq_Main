@@ -109,6 +109,42 @@ Aufnahme in die Sitemap über den bestehenden Generator, Verlinkung von
 `/praxen` aus, und Ergänzung des Abschnitts. Bis dahin ist die Seite über die
 interne Verlinkung erreichbar und erfüllt ihren Zweck im Verkaufsgespräch.
 
+## B2 · Was `/datenschutz-sicherheit` indexierbar macht
+
+Stand 17.08.2026: Die Seite ist ehrlich und für das Verkaufsgespräch brauchbar,
+steht aber auf `indexable: false`. Der Grund ist derselbe wie bei
+`/integrationen`: Sie beantwortet ihre eigene Suchintention — „KI
+Telefonassistent DSGVO Arztpraxis" — überwiegend mit „können wir noch nicht
+belegen". Als Aussage richtig, als indexierte Landingpage die falsche Antwort.
+
+**Anders als bei `/integrationen` reicht hier kein einzelner Baustein.** Der
+Datenschutz-Gatekeeper prüft die Kette, und eine Kette mit einem offenen Glied
+ist offen. Alle vier Punkte werden gebraucht:
+
+| # | Was Sie liefern | Warum es ohne nicht geht |
+|---|---|---|
+| **B2.1** | **Signierte Auftragsverarbeitungsverträge mit allen Unterauftragsverarbeitern** — nach Art. 28 Abs. 4 DSGVO, lückenlos für jeden Dienst, über den Gesprächsinhalte laufen | Ohne durchgehende Kette ist die Auftragsverarbeitung nicht sauber abgebildet. Solange hier eine Lücke besteht, darf die Website über Verarbeitung nichts zusagen |
+| **B2.2** | **Geklärter Verarbeitungsort** — für jeden beteiligten Dienst: in welchem Land verarbeitet wird, und bei Drittlandbezug, auf welcher Grundlage (Angemessenheitsbeschluss, Standardvertragsklauseln, Zusatzmaßnahmen) | Die erste Frage jedes Datenschutzbeauftragten. Bis sie beantwortet ist, steht auf der gesamten Website keine Aussage zu Servern oder Verarbeitungsort |
+| **B2.3** | **Liste der Unterauftragsverarbeiter** — Name, Zweck, Verarbeitungsort, jeweils veröffentlichungsfähig. Praxen brauchen sie für ihr Verarbeitungsverzeichnis und für die Information ihrer Patienten | Ohne diese Liste kann eine Praxis ihr eigenes Verzeichnis nach Art. 30 DSGVO nicht führen — sie kann Sie also gar nicht rechtssicher einsetzen |
+| **B2.4** | **TOM-Dokument** — technische und organisatorische Maßnahmen nach Art. 32 DSGVO, in der Form, die als AVV-Anlage taugt | Nachweispflicht. Eine unvollständige oder stichwortartige Fassung ist schlechter als keine, weil sie Vollständigkeit suggeriert |
+
+**Zusätzlich empfehlenswert, nicht zwingend:** die beiden noch offenen
+`[[CLAIM]]` aus den Inhaber-Antworten C schließen — die finalisierte
+AVV-Vorlage und die ausformulierte Klausel zur Schweigepflicht nach § 203 StGB.
+Beide stehen heute als Zusage auf der Seite; ohne fertige Dokumente sind sie
+Absichtserklärungen.
+
+**Was sich mit den vier Punkten ändert:** Abschnitt 3 („Was wir nicht
+behaupten") schrumpft auf die eine Aussage, die dauerhaft richtig bleibt —
+dass „DSGVO-konform" keine Eigenschaft ist, die ein Anbieter sich selbst
+ausstellt. Die Fragenliste in Abschnitt 2 bekommt neben jeder Frage die
+Antwort. Damit hat die Seite eine positive Antwort auf ihr Hauptkeyword und
+wird indexierbar; Downloads für AVV und TOM kommen als eigener Abschnitt dazu.
+
+**Was NICHT reicht:** ein Hinweis, dass Verträge „in Vorbereitung" sind, eine
+TOM-Liste in Stichworten, oder die Angabe eines Verarbeitungsorts ohne
+unterzeichneten Vertrag dahinter.
+
 ## Übersicht: Baustein-Status
 
 | Baustein | Gebaut | Sichtbar | Wartet auf |

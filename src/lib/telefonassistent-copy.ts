@@ -335,6 +335,70 @@ export const ANBINDUNG = {
   },
 };
 
+/**
+ * Datenschutz und Sicherheit (/datenschutz-sicherheit). Aufbau wie
+ * /integrationen: was gilt, was wir für Sie klären, was wir nicht behaupten.
+ *
+ * BINDEND: ausschließlich die fünf vom Inhaber freigegebenen Aussagen. Keine
+ * Aussage zu Hosting-Standort, Serverstandort, EU-Verarbeitung oder
+ * „DSGVO-konform". Keine TOM-Liste (existiert nicht). Keine Aussage zur
+ * DSFA-Pflicht — die Frage ist fachlich umstritten und gehört dem
+ * Datenschutzbeauftragten der Praxis.
+ */
+export const DATENSCHUTZ_SEITE = {
+  gilt: {
+    headline: "Was gilt",
+    frage: "Was passiert mit dem, was am Telefon gesagt wird?",
+    absaetze: [
+      "Fünf Punkte lassen sich heute belegen. Sie stehen hier vollständig, ohne Zusatz und ohne Auslassung.",
+    ],
+  },
+  klaeren: {
+    headline: "Was wir für Sie klären",
+    frage: "Was fragt Ihr Datenschutzbeauftragter — und was bekommt er von uns?",
+    absaetze: [
+      "Ob Ihre Praxis eine Datenschutz-Folgenabschätzung nach Art. 35 DSGVO benötigt, entscheidet Ihr Datenschutzbeauftragter. Diese Frage ist fachlich umstritten, und wir beantworten sie nicht für Sie — wir liefern die Unterlagen zu, mit denen er sie beantworten kann.",
+      "Damit dieses Gespräch nicht bei uns anfängt, sondern bei ihm: Das sind die Fragen, die er uns stellen sollte. Stellen Sie sie ruhig wörtlich — sie sind genau die richtigen, und wir beantworten sie schriftlich.",
+    ],
+    fragen: [
+      {
+        frage: "Wo werden die Daten verarbeitet, und welche Unterauftragsverarbeiter sind beteiligt?",
+        warum: "Bestimmt, ob ein Drittlandtransfer vorliegt und welche Garantien nötig sind.",
+      },
+      {
+        frage: "Liegt für jeden Unterauftragsverarbeiter ein Vertrag nach Art. 28 DSGVO vor?",
+        warum: "Ohne lückenlose Kette ist die Auftragsverarbeitung nicht sauber abgebildet.",
+      },
+      {
+        frage: "Was genau wird gespeichert, wie lange, und wann wird gelöscht?",
+        warum: "Grundlage für Löschkonzept und Verarbeitungsverzeichnis.",
+      },
+      {
+        frage: "Welche technischen und organisatorischen Maßnahmen sind dokumentiert?",
+        warum: "Nachweispflicht nach Art. 32 DSGVO; gehört als Anlage zum AVV.",
+      },
+      {
+        frage: "Wie ist die Schweigepflicht nach § 203 StGB vertraglich abgebildet — auch für Beschäftigte und Unterauftragnehmer?",
+        warum: "Gehilfenstellung: Ohne Verpflichtung droht Strafbarkeit auf beiden Seiten.",
+      },
+      {
+        frage: "Wie werden Anrufende darüber informiert, dass ein KI-System spricht?",
+        warum: "Transparenzpflicht nach Art. 50 KI-Verordnung.",
+      },
+    ],
+  },
+  nichtBehauptet: {
+    headline: "Was wir nicht behaupten",
+    frage: "Ist der Empfang DSGVO-konform?",
+    absaetze: [
+      "Diesen Satz schreiben wir nicht. „DSGVO-konform“ ist keine Eigenschaft, die ein Anbieter sich selbst ausstellen kann — konform ist eine Verarbeitung, nicht ein Produkt, und beurteilen kann das nur, wer den konkreten Einsatz in Ihrer Praxis kennt.",
+      "Wir machen auch keine Angabe zum Verarbeitungsort und nennen keine Unterauftragsverarbeiter, solange die Verträge dafür nicht abschließend unterzeichnet sind. Eine Aussage über Server, die wir später korrigieren müssten, wäre schlimmer als gar keine.",
+      "Eine Liste technischer und organisatorischer Maßnahmen liegt noch nicht in dokumentierter Form vor. Wir führen sie deshalb hier nicht auf — auch nicht in Stichworten, weil eine unvollständige TOM-Liste den Eindruck erweckt, es gäbe eine vollständige.",
+      "Was das für Sie heißt: Wenn Ihr Datenschutzbeauftragter diese Punkte vor einer Entscheidung schriftlich braucht, sprechen Sie uns an, bevor Sie weiter planen. Wir sagen Ihnen dann, was wir heute liefern können und was nicht.",
+    ],
+  },
+};
+
 /** M12 · Abschluss-CTA — klein, konkret, umkehrbar. */
 export const CTA = {
   primaryLabel: "Unverbindliches Erstgespräch vereinbaren",

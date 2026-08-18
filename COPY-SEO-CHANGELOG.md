@@ -239,3 +239,25 @@ Keine PVS-Namen. Schema: `WebPage`, `BreadcrumbList`, `FAQPage` — bei noindex
 ohne Ranking-Wirkung, aber konsistent mit dem sichtbaren Inhalt.
 
 Freischaltbedingungen für den Index stehen in `ASSETS-REQUIRED.md` §B1.
+
+## Stufe 5 · `/datenschutz-sicherheit`
+
+`indexable: false` bleibt.
+
+| Element | Vorher | Nachher |
+|---|---|---|
+| H1 | (Grundgerüst) | „Datenschutz und Sicherheit" |
+| Title | „Datenschutz & Sicherheit – die Prüfpunkte \| Cogniiq" | unverändert |
+| Description | „…AVV, Schweigepflicht, Speicherung, **Hosting**, KI-Transparenz." | „Was beim Praxis-Empfang gilt, was Ihr Datenschutzbeauftragter uns fragen sollte und was wir nicht behaupten. Keine Aufzeichnung, kein Training." (143) |
+
+Das Wort „Hosting" fällt aus der Description — es kündigte eine Aussage an, die
+die Seite nicht machen darf.
+
+Drei gleichrangige Abschnitte, H2 als Suchfrage: „Was passiert mit dem, was am
+Telefon gesagt wird?" · „Was fragt Ihr Datenschutzbeauftragter — und was
+bekommt er von uns?" · „Ist der Empfang DSGVO-konform?". Dazu vier FAQ und
+vier interne Links, darunter erstmals ein Verweis auf die rechtliche
+`/datenschutz`-Seite zur Abgrenzung.
+
+Freischaltbedingungen in `ASSETS-REQUIRED.md` §B2 — anders als bei
+`/integrationen` sind alle vier Punkte nötig, nicht einer.

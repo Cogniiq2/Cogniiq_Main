@@ -138,7 +138,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/datenschutz-sicherheit",
     title: "Datenschutz & Sicherheit – die Prüfpunkte | Cogniiq",
-    description: "Welche Datenschutzfragen eine Praxis vor dem Einsatz eines Telefonassistenten klären sollte: AVV, Schweigepflicht, Speicherung, Hosting, KI-Transparenz.",
+    description: "Was beim Praxis-Empfang gilt, was Ihr Datenschutzbeauftragter uns fragen sollte und was wir nicht behaupten. Keine Aufzeichnung, kein Training.",
     indexable: false,
   },
 
