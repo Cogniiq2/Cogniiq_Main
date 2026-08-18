@@ -218,3 +218,24 @@ er ersetzt keine Metadaten.
 Der Rechner auf der Startseite (`ROICalculator`) bleibt branchenübergreifend
 und behält seine Metadaten; korrigiert wurden dort nur die vier Verstöße gegen
 `COPY-BRIEF-3` §1 (siehe Commit-Nachricht).
+
+## Stufe 4 · `/integrationen`
+
+Route und Metadaten unverändert indexierungsseitig: `indexable: false` bleibt.
+
+| Element | Vorher | Nachher |
+|---|---|---|
+| H1 | „Anbindung an Ihr System" | unverändert |
+| Title | „Anbindungen an Ihr System \| Cogniiq" | „Anbindung an Ihr System \| Cogniiq" (Singular, konsistent mit H1) |
+| Description | „…Die verifizierte Übersicht folgt an dieser Stelle." | „Was nach einem Anruf passiert, was wir für Ihr System prüfen — und was wir nicht behaupten: eine fertige Standardanbindung an Praxissysteme gibt es nicht." (154) |
+
+Aus dem Grundgerüst wird eine Seite mit Substanz: drei Abschnitte, alle mit
+derselben H2-Größe, alle als echte Suchfrage formuliert — „Was passiert nach
+einem Anruf?" · „Lässt sich das an mein System anbinden?" · „Gibt es eine
+fertige Anbindung an mein Praxisverwaltungssystem?". Dazu drei FAQ und vier
+interne Links, `/praxen` als Hub im Breadcrumb.
+
+Keine PVS-Namen. Schema: `WebPage`, `BreadcrumbList`, `FAQPage` — bei noindex
+ohne Ranking-Wirkung, aber konsistent mit dem sichtbaren Inhalt.
+
+Freischaltbedingungen für den Index stehen in `ASSETS-REQUIRED.md` §B1.

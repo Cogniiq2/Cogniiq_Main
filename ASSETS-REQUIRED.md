@@ -83,6 +83,32 @@ Person.
 | Was | Eigene, konservativ gerechnete Quote (netto nach Nacharbeit) aus realem Betrieb |
 | Schaltet frei | Erst damit dürfen ROI-Rechner oder Seiten mit einer Cogniiq-Quote werben; bis dahin rechnet der Rechner ausschließlich mit Besucher-Eingaben (so umgesetzt) |
 
+## B1 · Was `/integrationen` indexierbar macht
+
+Stand 17.08.2026: Die Seite ist inhaltlich fertig und ehrlich, steht aber auf
+`indexable: false`. Grund ist nicht fehlender Text, sondern fehlende Substanz —
+sie beantwortet die Suchintention „KI Telefonassistent Anbindung PVS" derzeit
+mit „gibt es bei uns nicht". Das ist als Aussage richtig und gehört auf die
+Seite; als *indexierte Landingpage* wäre es eine Seite, die für ihr Hauptkeyword
+das Gegenteil dessen liefert, was der Suchende sucht.
+
+**Damit die Seite in den Index kann, reicht eines der beiden:**
+
+| # | Was Sie liefern | Was sich dann ändert |
+|---|---|---|
+| **B1.1** | **Mindestens eine real bestehende Anbindung** — ein System, in das ein Anrufergebnis heute tatsächlich ohne Handarbeit gelangt. Gebraucht werden: Name des Systems, was genau übertragen wird (Termin? Eintrag? Aufgabe?), ob es bei einem Kunden produktiv läuft, und ob der Systemname genannt werden darf | Die Seite bekommt einen vierten Abschnitt „Was heute angebunden ist" mit dem konkreten System. Erst damit hat sie eine positive Antwort auf ihr Hauptkeyword und wird indexierbar. Der Abschnitt „Was wir nicht behaupten" bleibt trotzdem stehen — er wird dann präziser, nicht kleiner |
+| **B1.2** | **Eine belastbare Aussage zur Schnittstellenprüfung** — nicht „wir prüfen das", sondern: welche Schnittstellenarten Sie technisch verarbeiten können (REST-API? Kalender über CalDAV oder ICS? E-Mail-Übergabe in ein festes Format? Webhook?), wie lange die Prüfung dauert und was sie kostet, wenn sie zu einer Anbindung führt | Die Seite kann beschreiben, *woran* sich eine Anbindung entscheidet, statt sie nur zu versprechen. Das beantwortet die Suchintention ebenfalls — „welche Schnittstelle brauche ich?" ist eine echte Frage — und macht die Seite indexierbar, auch ohne ein einziges angebundenes System |
+
+**Was NICHT reicht:** eine Absichtserklärung, eine Liste geplanter Anbindungen,
+oder die Nennung von PVS-Namen ohne bestehende Verbindung. Eine Liste
+unterstützter Systeme, die in Wahrheit eine Wunschliste ist, wäre genau das
+Muster, das `COPY-BRIEF.md` §7.5 untersagt.
+
+**Sobald eines von beidem vorliegt:** `indexable: true` in `publicRoutes.ts`,
+Aufnahme in die Sitemap über den bestehenden Generator, Verlinkung von
+`/praxen` aus, und Ergänzung des Abschnitts. Bis dahin ist die Seite über die
+interne Verlinkung erreichbar und erfüllt ihren Zweck im Verkaufsgespräch.
+
 ## Übersicht: Baustein-Status
 
 | Baustein | Gebaut | Sichtbar | Wartet auf |

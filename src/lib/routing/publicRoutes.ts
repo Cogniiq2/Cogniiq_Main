@@ -132,7 +132,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/integrationen",
     title: "Anbindungen an Ihr System | Cogniiq",
-    description: "Welche Anbindung an Praxissoftware, Kalender und Telefonanlage möglich ist, prüfen wir vor dem Angebot. Die verifizierte Übersicht folgt an dieser Stelle.",
+    description: "Was nach einem Anruf passiert, was wir für Ihr System prüfen — und was wir nicht behaupten: eine fertige Standardanbindung an Praxissysteme gibt es nicht.",
     indexable: false,
   },
   {

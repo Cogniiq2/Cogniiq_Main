@@ -285,6 +285,56 @@ export const PATIENTEN_SICHT = {
   },
 };
 
+/**
+ * Anbindung an bestehende Systeme (/integrationen). Dreistufig, in dieser
+ * Reihenfolge und optisch gleichrangig: was heute läuft, was wir prüfen, was
+ * wir nicht behaupten. Der dritte Abschnitt wird nicht kleiner gesetzt und
+ * nicht ans Ende geschoben — er ist der Grund, warum die Seite glaubwürdig ist.
+ *
+ * Keine Produktnamen von Praxisverwaltungssystemen, solange keine Anbindung
+ * existiert (Inhaber-Antwort B).
+ */
+export const ANBINDUNG = {
+  heute: {
+    headline: "Was heute läuft",
+    frage: "Was passiert nach einem Anruf?",
+    absaetze: [
+      "Jeder Anruf endet als strukturierter Eintrag im Cogniiq-Dashboard: Anliegen, Name, Rückrufnummer, Terminwunsch. Ihr Team sieht auf einen Blick, worum es ging, und arbeitet die Liste ab, wenn es in den Ablauf passt.",
+      "Das ist bewusst kein Postfach mit Sprachnachrichten. Der Unterschied ist die Arbeit danach: Eine Mailbox müssen Sie abhören, mitschreiben und einordnen — ein strukturierter Eintrag ist bereits sortiert. Was Ihr Team noch tut, ist der Übertrag ins Praxissystem, nicht das Rekonstruieren des Gesprächs.",
+      "Weil nichts aufgezeichnet wird, gibt es auch keine Audiodatei zum Abhören. Das ist eine Entscheidung, keine Lücke: Es entsteht keine Aufnahme, die aufbewahrt, geschützt und irgendwann gelöscht werden müsste.",
+    ],
+    punkte: [
+      "Anliegen — worum es im Gespräch ging",
+      "Name der anrufenden Person",
+      "Rückrufnummer",
+      "Terminwunsch, soweit genannt",
+    ],
+  },
+  pruefen: {
+    headline: "Was wir für Sie prüfen",
+    frage: "Lässt sich das an mein System anbinden?",
+    absaetze: [
+      "Vor der Einrichtung sehen wir uns an, welche Schnittstelle Ihr System bietet, und bauen die Übergabe darauf auf. Wo eine Anbindung technisch möglich ist, landet das Anliegen direkt dort, wo Sie ohnehin arbeiten.",
+      "Diese Prüfung gehört zum Angebot, nicht zum Projekt danach. Sie erfahren das Ergebnis vor der Unterschrift — und wenn es negativ ausfällt, erfahren Sie auch das vorher.",
+    ],
+    schritte: [
+      "Sie nennen uns Ihr Praxisverwaltungssystem, Ihren Kalender und Ihre Telefonanlage.",
+      "Wir prüfen, welche Schnittstelle es dafür gibt und was sie kann.",
+      "Das Ergebnis steht im Angebot: was möglich ist, was es kostet, was nicht geht.",
+      "Erst danach entscheiden Sie.",
+    ],
+  },
+  nichtBehauptet: {
+    headline: "Was wir nicht behaupten",
+    frage: "Gibt es eine fertige Anbindung an mein Praxisverwaltungssystem?",
+    absaetze: [
+      "Nein. Eine fertige Standardanbindung an gängige Praxisverwaltungssysteme gibt es bei uns heute nicht. Wir führen deshalb auch keine Liste unterstützter Systeme — sie wäre entweder leer oder unehrlich.",
+      "Das ist der Punkt, an dem viele Telefonassistenten scheitern, und wir halten es für falsch, ihn zu verschweigen: Solange keine Anbindung besteht, überträgt Ihr Team das Ergebnis von Hand ins Praxissystem. Die Arbeit ist dann nicht verschwunden, sie ist nur kürzer geworden.",
+      "Wenn Ihre Bedingung lautet, dass Termine automatisch in Ihrem System stehen, sind wir heute nicht der richtige Anbieter. Das sagen wir lieber jetzt als nach der Unterschrift.",
+    ],
+  },
+};
+
 /** M12 · Abschluss-CTA — klein, konkret, umkehrbar. */
 export const CTA = {
   primaryLabel: "Unverbindliches Erstgespräch vereinbaren",
