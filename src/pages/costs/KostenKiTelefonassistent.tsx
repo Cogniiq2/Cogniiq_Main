@@ -59,7 +59,7 @@ const faqItems = [
   {
     question: "Was kostet ein KI Telefonassistent für eine Praxis pro Monat?",
     answer:
-      `${TARIFE.map((t) => `${t.monatlich} im Monat für ${t.minuten.toLocaleString("de-DE")} Minuten`).join(", ")}. ${TARIFE[0].minuten} Minuten entsprechen ungefähr ${TARIFE[0].anrufeCa} Anrufen. Dazu kommt einmalig die Einrichtung Ihres Empfangs, je nach Tarif ${TARIFE.map((t) => t.einrichtung).join(", ")}.`,
+      `${TARIFE.map((t) => `${t.monatlich} im Monat für ${t.minuten.toLocaleString("de-DE")}\u00A0Minuten`).join(", ")}. ${TARIFE[0].minuten}\u00A0Minuten entsprechen ungefähr ${TARIFE[0].anrufeCa} Anrufen. Dazu kommt einmalig die Einrichtung Ihres Empfangs, je nach Tarif ${TARIFE.map((t) => t.einrichtung).join(", ")}.`,
   },
   {
     question: "Warum kostet die Einrichtung so viel?",
@@ -84,7 +84,7 @@ const faqItems = [
   {
     question: "Was kostet eine weitere Sprache?",
     answer:
-      "79 € im Monat je Sprache. Ab drei Sprachen sind es 230 € im Monat für bis zu fünf Sprachen gleichzeitig. Der Assistent kann die Sprache mitten im Gespräch wechseln.",
+      "79 € im Monat je Sprache. Ab drei Sprachen sind es 230 € im Monat für bis zu fünf Sprachen gleichzeitig. Der Assistent kann die Sprache mitten im Gespräch wechseln.",
   },
 ];
 
@@ -110,7 +110,7 @@ const schema = {
         ...TARIFE.map((t) => ({
           "@type": "Offer",
           name: `Tarif ${t.name}`,
-          description: `${t.minuten} Minuten im Monat, entspricht ungefähr ${t.anrufeCa} Anrufen.`,
+          description: `${t.minuten}\u00A0Minuten im Monat, entspricht ungefähr ${t.anrufeCa} Anrufen.`,
           url,
           priceSpecification: {
             "@type": "UnitPriceSpecification",
@@ -159,7 +159,7 @@ export function KostenKiTelefonassistent() {
     <>
       <PageSEO
         title="Was kostet ein KI Telefonassistent? Preise | Cogniiq"
-        description="Was kostet ein KI Telefonassistent für Praxen? Tarife ab 300 € im Monat mit festem Minutenkontingent, gedeckelter Rechnung, Einrichtung und Go-live-Garantie."
+        description="Was kostet ein KI Telefonassistent für Praxen? Tarife ab 300 € im Monat mit festem Minutenkontingent, gedeckelter Rechnung, Einrichtung und Go-live-Garantie."
         canonical={url}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
@@ -409,7 +409,7 @@ export function KostenKiTelefonassistent() {
               ))}
             </ul>
             <p className={`${PROSE} mt-8`}>
-              Bei 46 % der Praxen sind versteckte Preissteigerungen oder zu hohe
+              Bei 46&nbsp;% der Praxen sind versteckte Preissteigerungen oder zu hohe
               Wartungskosten ein Grund, ihr System zu wechseln. Deshalb steht diese
               Liste hier und nicht in den AGB.
             </p>
@@ -452,7 +452,7 @@ export function KostenKiTelefonassistent() {
             </Link>
             <p className="mt-4 text-[15px] text-gray-500 dark:text-gray-500">
               {CTA.microcopy} Antwort von {BETREUUNG.person.name} spätestens
-              innerhalb von 24 Stunden.
+              innerhalb von 24&nbsp;Stunden.
             </p>
           </div>
         </section>

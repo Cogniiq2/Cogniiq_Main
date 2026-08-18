@@ -160,11 +160,15 @@ export function Footer() {
               </div>
 
               <div className="flex flex-wrap gap-1.5">
-                {/* [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1)]] */}
-                {["DSGVO", "Festpreis", "7–14 Tage", "Aus Bayreuth"].map((t) => (
+                {/* Zwei Chips sind am 18.08.2026 entfallen und werden nicht ersetzt:
+                    „DSGVO" war ein Konformitätsabzeichen ohne Grundlage (§7.7),
+                    „7–14 Tage" widersprach der 7-Tage-Garantie aus FAKTEN.goLive
+                    und trug nur einen [[CLAIM]]-Marker — der ist kein Ausweg.
+                    Dieser Streifen steht auf jeder Seite der Website. */}
+                {["Festpreis", "Aus Bayreuth"].map((t) => (
                   <span
                     key={t}
-                    className="px-2.5 py-1 rounded-md text-[10px] font-medium bg-gray-100 dark:bg-white/[0.06] text-gray-500 dark:text-white/35 border border-gray-200 dark:border-white/[0.06]"
+                    className="px-2.5 py-1 rounded-md text-sm font-medium bg-gray-100 dark:bg-white/[0.06] text-gray-500 dark:text-white/35 border border-gray-200 dark:border-white/[0.06]"
                   >
                     {t}
                   </span>

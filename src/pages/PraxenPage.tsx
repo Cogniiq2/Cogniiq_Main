@@ -80,7 +80,7 @@ const faqItems = [
       "Nein, unter keinen Umständen. Er gibt keine medizinische Einschätzung ab und stellt keine Triage. Hinweise auf einen Notfall führen sofort zu einem Menschen, zum Bereitschaftsdienst oder zur Ansage, den Notruf 112 zu wählen.",
   },
   {
-    question: "Was passiert, wenn der Empfang nicht in 7 Tagen läuft?",
+    question: "Was passiert, wenn der Empfang nicht in 7 Tagen läuft?",
     answer:
       `${FAKTEN.goLive} Das steht so im Vertrag.`,
   },
@@ -158,7 +158,7 @@ export function PraxenPage() {
     <>
       <PageSEO
         title="KI Telefonassistent für Praxen – Ihr Empfang | Cogniiq"
-        description="Ein Empfang am Telefon für Ihre Praxis: Ihre Stimmauswahl, Ihre Regeln, strukturierte Übergabe. Keine Triage, Kontingent mit Obergrenze, Go-live in 7 Tagen."
+        description="Ein Empfang am Telefon für Ihre Praxis: Ihre Stimmauswahl, Ihre Regeln, strukturierte Übergabe. Keine Triage, Kontingent mit Obergrenze, Go-live in 7 Tagen."
         canonical={`${base}/praxen`}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
@@ -467,7 +467,7 @@ export function PraxenPage() {
               </dl>
             </div>
             <p className={`${PROSE} mt-6`}>
-              52 % der Praxen nennen unzureichenden Kundensupport als Grund, ihr
+              52&nbsp;% der Praxen nennen unzureichenden Kundensupport als Grund, ihr
               System zu wechseln. Deshalb steht hier eine Frist und kein
               Versprechen.
             </p>

@@ -16,11 +16,15 @@
 // M13 (Stimmprobe) rendert die Seite selbst, asset-gated. M22 (Referenz)
 // existiert nicht — es gibt keine Referenzpraxis mit Einwilligung.
 //
-// Vier Module stehen bewusst in der Kompaktfassung: M4, M10, M19 und M7 sind
-// produktweit gleich und tragen nichts Segmentspezifisches. Ihre Vollversionen
-// liegen auf /praxen, der Preisseite und /datenschutz-sicherheit; jede
-// Kompaktfassung verlinkt dorthin. Dieselbe Entscheidung wie bei den
-// Stadtseiten, aus demselben Grund: Die Tiefe gehört an eine Stelle.
+// Voll stehen hier nur M3, M14 und M16 (plus M15 aus der Config und der
+// Abschluss der Seite). Alles andere ist Kompaktfassung mit Verweis auf die
+// Vollversion: M4, M10, M19, M7 aus Stufe 6c, dazu M20, M8, M21 und M17.
+//
+// Grund, damit er nicht neu verhandelt wird (Inhaber-Festlegung 18.08.2026,
+// siehe COPY-SEO-CHANGELOG „Seitenhierarchie"): /praxen ist der Hub, die
+// Segment- und Stadtseiten sind Einstiege. Die volle Kette auf jeder Seite
+// gemessen: Arzt 40,0 % und Therapie 39,5 % einzigartig, untereinander 71,7 %
+// identisch — genau das Muster, das solche Seiten abwerten lässt.
 //
 // Sämtliche Texte kommen aus telefonassistent-copy.ts. Hier steht kein eigener
 // Fließtext — sonst entstünde die zweite Wahrheitsquelle aus HONESTY-AUDIT §7.
@@ -33,19 +37,18 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
-  ANLIEGEN_IMMER_MENSCH,
-  ANLIEGEN_UEBERNIMMT,
   BETREUUNG,
-  EINRICHTUNG_PROJEKT,
+  KOMPAKT_ANLIEGEN,
   KOMPAKT_DATENSCHUTZ,
+  KOMPAKT_EINRICHTUNG,
   KOMPAKT_KOSTEN,
+  KOMPAKT_PATIENTEN_SICHT,
   KOMPAKT_SAEULEN,
+  KOMPAKT_TEAM,
   KOMPAKT_UMKEHRBARKEIT,
   NICHT_PASSEND,
-  PATIENTEN_SICHT,
   SCHEITERN_INTRO,
   SCHEITERN_MUSTER,
-  TEAM_BLOCK,
   UEBERGABE,
 } from "@/lib/telefonassistent-copy";
 
@@ -132,23 +135,9 @@ function Mehr({ label, href }: { label: string; href: string }) {
 export function BeweisketteOben() {
   return (
     <>
-      <Section id="patientensicht" headline={PATIENTEN_SICHT.headline} tint>
-        <div className="space-y-5">
-          {PATIENTEN_SICHT.paragraphs.map((absatz) => (
-            <p key={absatz} className={BODY}>
-              {absatz}
-            </p>
-          ))}
-        </div>
-        <figure className="mt-8 border-l-2 border-gray-200 dark:border-gray-700 pl-6">
-          <p className="text-[17px] leading-relaxed text-gray-900 dark:text-gray-100">
-            <strong className="font-semibold">{PATIENTEN_SICHT.stat.value}</strong>{" "}
-            {PATIENTEN_SICHT.stat.text}
-          </p>
-          <figcaption className="text-[14px] text-gray-500 dark:text-gray-400 mt-2">
-            {PATIENTEN_SICHT.stat.source}
-          </figcaption>
-        </figure>
+      <Section id="patientensicht" headline={KOMPAKT_PATIENTEN_SICHT.headline} tint>
+        <p className={BODY}>{KOMPAKT_PATIENTEN_SICHT.text}</p>
+        <Mehr {...KOMPAKT_PATIENTEN_SICHT.mehr} />
       </Section>
 
       <Section id="gescheitert" headline="Warum bisherige Versuche gescheitert sind">
@@ -194,17 +183,9 @@ export function BeweisketteMitte() {
         </div>
       </Section>
 
-      <Section id="anliegen" headline="Was der Empfang übernimmt — und was nicht" tint>
-        <div className="space-y-10">
-          <div>
-            <h3 className={`${LABEL} mb-3`}>Das übernimmt der Assistent</h3>
-            <Punkte items={ANLIEGEN_UEBERNIMMT} />
-          </div>
-          <div>
-            <h3 className={`${LABEL} mb-3`}>Das landet immer bei einem Menschen</h3>
-            <Punkte items={ANLIEGEN_IMMER_MENSCH} />
-          </div>
-        </div>
+      <Section id="anliegen" headline={KOMPAKT_ANLIEGEN.headline} tint>
+        <Punkte items={KOMPAKT_ANLIEGEN.punkte} />
+        <Mehr {...KOMPAKT_ANLIEGEN.mehr} />
       </Section>
     </>
   );
@@ -218,37 +199,27 @@ export function BeweisketteMitte() {
 export function BeweisketteUnten() {
   return (
     <>
-      <Section id="team" headline={TEAM_BLOCK.headline} tint>
-        <p className={`${BODY} mb-6`}>{TEAM_BLOCK.text}</p>
-        <Punkte items={TEAM_BLOCK.points} />
+      <Section id="team" headline={KOMPAKT_TEAM.headline} tint>
+        <p className={BODY}>{KOMPAKT_TEAM.text}</p>
+        <Mehr {...KOMPAKT_TEAM.mehr} />
       </Section>
 
-      <Section id="einrichtung" headline={EINRICHTUNG_PROJEKT.headline}>
-        <p className={`${BODY} mb-8`}>{EINRICHTUNG_PROJEKT.intro}</p>
-        <ol className="space-y-6">
-          {EINRICHTUNG_PROJEKT.schritte.map((schritt) => (
-            <li key={schritt.nummer} className="flex gap-5">
+      <Section id="einrichtung" headline={KOMPAKT_EINRICHTUNG.headline}>
+        <p className={`${BODY} mb-6`}>{KOMPAKT_EINRICHTUNG.intro}</p>
+        <ol className="space-y-2">
+          {KOMPAKT_EINRICHTUNG.schritte.map((titel, i) => (
+            <li key={titel} className={`${BODY} flex gap-4`}>
               <span
                 aria-hidden="true"
-                className="shrink-0 text-[15px] font-semibold text-gray-400 dark:text-gray-500 tabular-nums pt-0.5 w-6"
+                className="shrink-0 text-[15px] font-semibold text-gray-400 dark:text-gray-500 tabular-nums w-5"
               >
-                {schritt.nummer}
+                {i + 1}
               </span>
-              <div>
-                <h3 className="text-[17px] font-semibold text-gray-900 dark:text-gray-100">
-                  {schritt.title}
-                  {schritt.dauer && (
-                    <span className="font-normal text-gray-500 dark:text-gray-400">
-                      {" · "}
-                      {schritt.dauer}
-                    </span>
-                  )}
-                </h3>
-                <p className={`${BODY} mt-1`}>{schritt.text}</p>
-              </div>
+              {titel}
             </li>
           ))}
         </ol>
+        <Mehr {...KOMPAKT_EINRICHTUNG.mehr} />
       </Section>
 
       <Section id="betreuung" headline={BETREUUNG.headline} tint>

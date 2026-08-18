@@ -439,9 +439,108 @@ Satzvergleich über das vorgerenderte HTML, gegen `/praxen`,
 | Therapie | 75,9 % | **39,5 %** | 48,9 % |
 | Arzt ∩ Therapie | 38,2 % | **71,7 %** | 64,2 % |
 
-**Befund:** Die volle Kette drückt beide Seiten auf die 40-%-Schwelle aus
-`COPY-BRIEF.md` §7.3 und macht sie untereinander zu 71,7 % identisch. Das ist
-dasselbe Muster, das für die Stadtseiten in Stufe 6b ausdrücklich abgelehnt
-wurde (dort 38,5 / 37,4 / 39,0 %). Entscheidung des Inhabers steht aus; die
-dritte Spalte zeigt die Wirkung, wenn die vier langen generischen Module wie
-bei den Stadtseiten auf einen Verweis verkürzt werden.
+**Befund:** Die volle Kette drückte beide Seiten auf die 40-%-Schwelle aus
+`COPY-BRIEF.md` §7.3 und machte sie untereinander zu 71,7 % identisch —
+dasselbe Muster, das für die Stadtseiten in Stufe 6b abgelehnt wurde (dort
+38,5 / 37,4 / 39,0 %).
+
+**Entscheidung des Inhabers (18.08.2026): getrimmt.** M20, M8, M21 und M17
+stehen jetzt als Kompaktfassung mit Verweis auf `/praxen`; M3, M14 und M16
+bleiben voll. Ergebnis:
+
+| Seite | ohne Kette | volle Kette | **umgesetzt: getrimmt** |
+|---|---|---|---|
+| Arzt | 76,4 % | 40,0 % | **48,1 %** |
+| Therapie | 75,9 % | 39,5 % | **47,6 %** |
+| Arzt ∩ Therapie | 38,2 % | 71,7 % | **67,3 %** |
+
+Beide Seiten liegen wieder deutlich über der 40-%-Schwelle. Die gegenseitige
+Überschneidung bleibt hoch, ist aber sachlich begründet: Zwei Segmentseiten
+desselben Produkts teilen notwendigerweise Preis, Vertrag, Grenzen und
+Datenschutz. Der unterscheidende Teil — Anrufanlässe, Problembeschreibung,
+Ablauf, FAQ — ist vollständig segmentspezifisch.
+
+## Seitenhierarchie — verbindlich ab 18.08.2026
+
+Damit die Frage nicht bei jeder Seite neu verhandelt wird:
+
+| Ebene | Seiten | Beweiskette |
+|---|---|---|
+| **Hub** | `/praxen`, `/ki-telefonassistent` | **vollständig**, alle 18 Abschnitte aus COPY-BRIEF-3 §2 |
+| **Einstieg** | Stadtseiten, Segmentseiten | M3, M13, M14, M15, M16 und der Abschluss **voll**; die generischen Tiefenblöcke **gekürzt mit Verweis auf `/praxen`** |
+
+Begründung: `/praxen` ist der Hub, die anderen sind Einstiege. Ein Einstieg
+muss den Einwand benennen und die Tiefe erreichbar machen — er muss sie nicht
+wiederholen. Wiederholung verdünnt den einzigartigen Anteil und erzeugt genau
+das Muster, das nachgeordnete Seiten abwerten lässt.
+
+Wer eine Kette erweitert oder eine neue nachgeordnete Seite anlegt, misst den
+einzigartigen Anteil und meldet ihn, statt ihn aufzufüllen. Ziel mindestens
+50 %, harte Untergrenze 40 % (`COPY-BRIEF.md` §7.3).
+
+## Stufe 8 · Gestaltungs-Pass (COPY-BRIEF-3 §1)
+
+Keine Metadaten berührt. Zehn Seiten geprüft: `/praxen`, Preisseite,
+`/ki-telefonassistent`, beide Segmentseiten, `/integrationen`,
+`/datenschutz-sicherheit`, drei Stadtseiten.
+
+### Bewegung (§1.4)
+
+| Datei | vorher | nachher |
+|---|---|---|
+| `NationalIndustryPage.tsx` | 580 ms, y 22 px, Staffelung `i * 0.06` | 180 ms, y 8 px, keine Staffelung |
+| `CityServicePage.tsx` | 550 ms, y 24 px, Staffelung | dito |
+| `KiTelefonassistentPage.tsx` | 600 ms, y 20 px, Staffelung | dito |
+
+Die Staffelung war der eigentliche Verstoß: Bei sechs Karten ergab `i * 0.06`
+eine halbe Sekunde Nachlauf — genau die scroll-getriggerte Sequenz, die §1.4
+untersagt. Referenz ist jetzt durchgehend die Fassung von `/praxen`.
+
+**`animate-pulse` und `animate-ping` entfernt**, website-weit auf öffentlichen
+Seiten (Inhaber-Entscheidung: §1.4 gilt für die ganze Website, nicht nur für
+den Cluster): beide Hero-Abzeichen in `NationalIndustryPage` (wirkt auf 13
+Seiten), drei in `KiTelefonassistentPage`, eines in der Demo-Seite, eines in
+`ScanPage`, der Ping-Ring auf `AnfrageErhaltenPage`. Ladeindikatoren
+(`animate-spin`, Skeletons) bleiben — Bewegung, die Verständnis unterstützt,
+ist nach §1.4 ausdrücklich erlaubt.
+
+### Typografie (§1.2)
+
+115 Klassenfolgen angepasst. Fließtext durchgehend ≥ 17 px, **kein Text mehr
+unter 14 px** — vorher gab es `text-[10px]` bis `text-[13px]` in Auszeichnungen,
+Quellenangaben und Fußzeilen. Die Sperrung der Versal-Labels wurde von
+`0.2em` auf `0.12em` zurückgenommen, weil gesperrte Versalien bei 14 px
+schlechter lesbar sind als bei 11 px.
+
+Geschützte Leerzeichen vor jeder Einheit: 24 in einfachen Strings, dazu die
+zusammengesetzten Fälle (`${FAKTEN.goLiveTage} Tage`) und die JSX-Textknoten.
+Konvention nach Dateityp, weil ESLint `no-irregular-whitespace` literale
+U+00A0 in Template-Literalen und JSX-Text verbietet:
+
+| Ort | Schreibweise |
+|---|---|
+| Template-Literal | ` ` |
+| JSX-Textknoten | `&nbsp;` |
+| einfacher String | literales U+00A0 (von ESLint erlaubt) |
+
+Kontrolle am ausgelieferten HTML: **null** ungeschützte Zahl-Einheit-Paare auf
+allen zehn Seiten.
+
+### Zwei Funde im Footer — auf jeder Seite der Website
+
+| Chip | Befund |
+|---|---|
+| `DSGVO` | Konformitätsabzeichen ohne Grundlage — fällt unter die Sperre aus HONESTY-AUDIT §7.7 |
+| `7–14 Tage` | Widersprach der 7-Tage-Garantie aus `FAKTEN.goLive` und trug nur einen `[[CLAIM]]`-Marker |
+
+Beide ersatzlos entfernt, nicht umformuliert. Es bleiben `Festpreis` und
+`Aus Bayreuth`. Der Streifen stand auf **jedem** Dokument der Website — dieselbe
+Fehlerklasse wie beim TrustStrip in Stufe 6c: die Aussage lag in einer
+geteilten Komponente, nicht in den geprüften Seiten-Configs.
+
+### Außerhalb dieses Durchgangs, gemeldet statt geändert
+
+Ungeschützte Zahl-Einheit-Paare bestehen weiterhin auf Blog-, Hotel-,
+Restaurant-, Webdesign- und Automatisierungsseiten (rund 30 Muster in etwa 60
+Dokumenten). Der Gestaltungs-Pass war auf die Seiten dieses Durchgangs
+beauftragt; die Regel selbst gilt website-weit und wäre der nächste Schritt.

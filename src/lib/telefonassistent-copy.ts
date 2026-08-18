@@ -42,8 +42,8 @@ export const FAKTEN = {
   laufzeitMonate: 12,
   preisgarantieMonate: 24,
   monatlichAufschlag: `20\u00A0%`,
-  erreichbarkeit: "täglich 6–20 Uhr",
-  antwortzeit: "spätestens innerhalb von 24 Stunden",
+  erreichbarkeit: "täglich 6–20 Uhr",
+  antwortzeit: "spätestens innerhalb von 24 Stunden",
   gleichzeitigeAnrufe: 10,
 
   // ── Sätze, die wörtlich wiederverwendet werden ──
@@ -59,15 +59,15 @@ export const FAKTEN = {
   nichtProBehandler:
     "Abgerechnet wird pro Praxis, nicht pro Behandler.",
 
-  goLive: `Ihr Empfang geht spätestens 7 Tage nach Zahlungseingang live. Halten wir diesen Termin nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.`,
+  goLive: `Ihr Empfang geht spätestens 7\u00A0Tage nach Zahlungseingang live. Halten wir diesen Termin nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.`,
 
-  aenderungen: `Änderungen an Ansagen und Regeln reichen Sie über das Kundendashboard oder per E-Mail ein; umgesetzt sind sie innerhalb von 3 Tagen.`,
+  aenderungen: `Änderungen an Ansagen und Regeln reichen Sie über das Kundendashboard oder per E-Mail ein; umgesetzt sind sie innerhalb von 3\u00A0Tagen.`,
 
   kuendigung: `Gekündigt wird mit einem Klick im Kundendashboard, zum Laufzeitende. Kein Anruf, keine E-Mail, keine Fristfalle.`,
 
-  laufzeit: `Die Laufzeit beträgt 12 Monate; wer monatlich kündbar bleiben möchte, zahlt 20\u00A0% Aufschlag.`,
+  laufzeit: `Die Laufzeit beträgt 12\u00A0Monate; wer monatlich kündbar bleiben möchte, zahlt 20\u00A0% Aufschlag.`,
 
-  preisgarantie: `Der Preis ist für 24 Monate schriftlich garantiert.`,
+  preisgarantie: `Der Preis ist für 24\u00A0Monate schriftlich garantiert.`,
 
   keineAufzeichnung:
     "Gespräche werden nicht aufgezeichnet — gespeichert wird ausschließlich das strukturierte Ergebnis: Anliegen, Name, Rückrufnummer, Terminwunsch.",
@@ -175,7 +175,7 @@ export const EINRICHTUNG_SCHRITTE: Array<{
     step: "05",
     title: "Testphase und Go-live",
     description:
-      `Zwei Tage testen wir gemeinsam. Live geht der Assistent erst, wenn Ihre Praxis zufrieden ist — spätestens ${FAKTEN.goLiveTage} Tage nach Zahlungseingang.`,
+      `Zwei Tage testen wir gemeinsam. Live geht der Assistent erst, wenn Ihre Praxis zufrieden ist — spätestens ${FAKTEN.goLiveTage}\u00A0Tage nach Zahlungseingang.`,
   },
 ];
 
@@ -535,14 +535,14 @@ export const EINRICHTUNG_PROJEKT = {
     {
       nummer: "7",
       title: "Testphase",
-      dauer: "2 Tage",
+      dauer: "2 Tage",
       text: "Zwei Tage testen wir gemeinsam. Live geht der Assistent erst, wenn Ihre Praxis zufrieden ist.",
     },
     {
       nummer: "8",
       title: "Go-live",
-      dauer: `spätestens ${FAKTEN.goLiveTage} Tage nach Zahlungseingang`,
-      text: `Garantiert innerhalb von ${FAKTEN.goLiveTage} Tagen nach Zahlungseingang.`,
+      dauer: `spätestens ${FAKTEN.goLiveTage}\u00A0Tage nach Zahlungseingang`,
+      text: `Garantiert innerhalb von ${FAKTEN.goLiveTage}\u00A0Tagen nach Zahlungseingang.`,
     },
   ],
 };
@@ -594,7 +594,7 @@ export const BETREUUNG = {
     { label: "Antwort", wert: FAKTEN.antwortzeit },
     {
       label: "Änderungen an Ansagen und Regeln",
-      wert: `eingereicht über das Kundendashboard oder per E-Mail, umgesetzt innerhalb von ${FAKTEN.aenderungTage} Tagen`,
+      wert: `eingereicht über das Kundendashboard oder per E-Mail, umgesetzt innerhalb von ${FAKTEN.aenderungTage}\u00A0Tagen`,
     },
   ],
 };
@@ -618,11 +618,11 @@ export const UMKEHRBARKEIT = {
     { label: "Preisgarantie", wert: FAKTEN.preisgarantie },
     {
       label: "Testphase",
-      wert: "2 Tage, nach Vertragsabschluss und Zahlung der ersten Hälfte. Live geht der Empfang erst, wenn Sie zufrieden sind",
+      wert: "2 Tage, nach Vertragsabschluss und Zahlung der ersten Hälfte. Live geht der Empfang erst, wenn Sie zufrieden sind",
     },
   ],
   vetorecht:
-    `Die Testphase ist kein kostenloser Test. Sie ist der Punkt, an dem Sie ein Vetorecht haben: Ohne Ihre Freigabe geht der Empfang nicht live, und halten wir die ${FAKTEN.goLiveTage} Tage nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.`,
+    `Die Testphase ist kein kostenloser Test. Sie ist der Punkt, an dem Sie ein Vetorecht haben: Ohne Ihre Freigabe geht der Empfang nicht live, und halten wir die ${FAKTEN.goLiveTage}\u00A0Tage nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.`,
   // [[CLAIM: Was mit den gespeicherten Ergebnissen nach Vertragsende geschieht,
   // ist nicht beantwortet (Brief II §4.7). Bis dahin keine Aussage dazu.]]
 };
@@ -643,7 +643,7 @@ export const NICHT_EXTRA = {
   intro:
     "Diese Posten tauchen auf keiner Rechnung auf, weil sie im Monatsbetrag enthalten sind:",
   punkte: [
-    `Änderungen an Ansagen, Anliegen und Regeln — unbegrenzt, umgesetzt innerhalb von ${FAKTEN.aenderungTage} Tagen`,
+    `Änderungen an Ansagen, Anliegen und Regeln — unbegrenzt, umgesetzt innerhalb von ${FAKTEN.aenderungTage}\u00A0Tagen`,
     `Ihr fester Ansprechpartner, erreichbar ${FAKTEN.erreichbarkeit}, Antwort ${FAKTEN.antwortzeit}`,
     `${FAKTEN.gleichzeitigeAnrufe} gleichzeitige Anrufe in jedem Tarif — auch im kleinsten`,
     "Deutsch als Sprache",
@@ -672,7 +672,7 @@ export const VERTRAG = {
     },
     {
       label: "Zahlung der Einrichtung",
-      wert: "50 % bei Vertragsabschluss, 50 % nach dem Go-live.",
+      wert: "50 % bei Vertragsabschluss, 50 % nach dem Go-live.",
     },
   ],
 };
@@ -697,7 +697,7 @@ export const RECHNER = {
   anbindungsHinweis:
     "Der Wert steigt, wo eine Anbindung an Ihr Praxisverwaltungssystem möglich ist: Dann entfällt auch das Übertragen von Hand. Was für Ihr System geht, prüfen wir vor dem Angebot.",
   stundenkostenQuelle:
-    "Vorschlagswert abgeleitet aus dem MFA-Tarifgehalt 2026 (ab 2.939,59 € brutto im Monat) bei angenommenen 38,5 Wochenstunden — ohne Arbeitgeberkosten. Passen Sie den Wert an Ihre Praxis an.",
+    "Vorschlagswert abgeleitet aus dem MFA-Tarifgehalt 2026 (ab 2.939,59 € brutto im Monat) bei angenommenen 38,5 Wochenstunden — ohne Arbeitgeberkosten. Passen Sie den Wert an Ihre Praxis an.",
   stundenkostenSource: "Gehaltstarifvertrag MFA (Virchowbund), 2026",
   startwertHinweis:
     "Alle Startwerte sind frei gewählte Beispiele, keine Branchenstatistik.",
@@ -777,5 +777,62 @@ export const KOMPAKT_DATENSCHUTZ: KompaktBlock & { punkte: string[] } = {
   mehr: {
     label: "Was Ihr Datenschutzbeauftragter fragen sollte",
     href: "/datenschutz-sicherheit",
+  },
+};
+
+/**
+ * M20 · Patientensicht — der Wiedererkennungsabsatz, ohne den zweiten Absatz
+ * und ohne die Statistik. Beides bleibt auf /praxen.
+ */
+export const KOMPAKT_PATIENTEN_SICHT: KompaktBlock & { text: string } = {
+  modul: "M20",
+  headline: PATIENTEN_SICHT.headline,
+  text: PATIENTEN_SICHT.paragraphs[0],
+  mehr: {
+    label: "Was Unerreichbarkeit Ihre Praxis kostet",
+    href: "/praxen",
+  },
+};
+
+/**
+ * M8 · Anliegen-Katalog — drei Beispiele statt der vollständigen Doppelliste.
+ * Die Grenzen stehen auf denselben Seiten ohnehin voll in M15.
+ */
+export const KOMPAKT_ANLIEGEN: KompaktBlock & { punkte: string[] } = {
+  modul: "M8",
+  headline: "Was der Empfang übernimmt",
+  punkte: ANLIEGEN_UEBERNIMMT.slice(0, 3),
+  mehr: {
+    label: "Der vollständige Katalog — auch, was immer bei einem Menschen landet",
+    href: "/praxen",
+  },
+};
+
+/** M21 · Für Ihr Team — der Absatz, ohne die sechs Punkte. */
+export const KOMPAKT_TEAM: KompaktBlock & { text: string } = {
+  modul: "M21",
+  headline: TEAM_BLOCK.headline,
+  text: TEAM_BLOCK.text,
+  mehr: {
+    label: "Was sich für Ihr Team konkret ändert",
+    href: "/praxen",
+  },
+};
+
+/**
+ * M17 · Einrichtung — Rahmen und die acht Schritttitel, ohne die
+ * Beschreibungen. Der Beweis ist, dass es acht benannte Schritte gibt.
+ */
+export const KOMPAKT_EINRICHTUNG: KompaktBlock & {
+  intro: string;
+  schritte: string[];
+} = {
+  modul: "M17",
+  headline: EINRICHTUNG_PROJEKT.headline,
+  intro: EINRICHTUNG_PROJEKT.intro,
+  schritte: EINRICHTUNG_PROJEKT.schritte.map((schritt) => schritt.title),
+  mehr: {
+    label: "Jeder Schritt im Einzelnen, mit Dauer",
+    href: "/praxen",
   },
 };

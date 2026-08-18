@@ -48,13 +48,20 @@ import {
 } from "@/lib/telefonassistent-copy";
 import { StimmprobeSection } from "@/components/StimmprobeSection";
 
+/**
+ * Bewegung nach COPY-BRIEF-3 §1.4: höchstens 180 ms, `ease-out`, ausschließlich
+ * Deckkraft und kleine Verschiebung. Keine gestaffelten Scroll-Sequenzen — die
+ * frühere Fassung verzögerte jedes Element um `i * 0.06`, was bei sechs Karten
+ * eine halbe Sekunde Nachlauf ergab. Das ist genau die Scroll-Choreografie, die
+ * §1.4 untersagt.
+ */
 const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (delay = 0) => ({
+  hidden: { opacity: 0, y: 8 },
+  visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
-  }),
+    transition: { duration: 0.18, ease: "easeOut" as const },
+  },
 };
 
 const breadcrumbs = [
@@ -275,9 +282,9 @@ function HeroSection() {
 
       <div className="relative max-w-6xl mx-auto px-6 lg:px-8">
         <div className="grid lg:grid-cols-[1fr_400px] gap-16 items-start">
-          <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 text-xs font-medium tracking-widest uppercase mb-8 shadow-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 text-sm font-medium tracking-widest uppercase mb-8 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               KI Telefonservice · Mittelstand Deutschland
             </div>
 
@@ -330,8 +337,7 @@ function HeroSection() {
                   initial="hidden"
                   animate="visible"
                   variants={fadeUp}
-                  custom={0.25 + i * 0.06}
-                  className="flex items-center gap-2 text-[13px] text-gray-500 dark:text-gray-400"
+                  className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
                 >
                   <CheckCircle2 size={12} className="text-emerald-500 flex-shrink-0" />
                   {item}
@@ -344,16 +350,15 @@ function HeroSection() {
             initial="hidden"
             animate="visible"
             variants={fadeUp}
-            custom={0.2}
             className="hidden lg:block"
           >
             <div className="rounded-2xl border border-gray-200 dark:border-gray-700/80 bg-white dark:bg-gray-900 overflow-hidden shadow-[0_2px_24px_rgba(0,0,0,0.07)] dark:shadow-[0_2px_24px_rgba(0,0,0,0.3)]">
               <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-800/60">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 tracking-widest uppercase">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
                   Eingehender Anruf
                 </span>
-                <span className="ml-auto text-[11px] text-gray-400 dark:text-gray-500 font-mono">
+                <span className="ml-auto text-sm text-gray-400 dark:text-gray-500 font-mono">
                   10:24
                 </span>
               </div>
@@ -363,20 +368,20 @@ function HeroSection() {
                   { role: "customer", text: "Guten Tag, ich möchte einen Termin vereinbaren." },
                   { role: "ai", text: "Gerne – für welchen Service planen Sie den Termin?" },
                   { role: "customer", text: "Eine Erstberatung." },
-                  { role: "ai", text: "Ich habe Dienstag, 10:30 Uhr frei. Passt Ihnen das?" },
+                  { role: "ai", text: "Ich habe Dienstag, 10:30 Uhr frei. Passt Ihnen das?" },
                   { role: "customer", text: "Ja, das passt sehr gut." },
                   { role: "ai", text: "Eingetragen. Sie erhalten eine Bestätigung per E-Mail." },
                 ].map((msg, i) => (
                   <div key={i} className={`flex ${msg.role === "ai" ? "justify-start" : "justify-end"}`}>
                     <div
-                      className={`max-w-[86%] px-3.5 py-2.5 rounded-xl text-[13px] leading-relaxed ${
+                      className={`max-w-[86%] px-3.5 py-2.5 rounded-xl text-sm leading-relaxed ${
                         msg.role === "ai"
                           ? "bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-100 dark:border-gray-700"
                           : "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
                       }`}
                     >
                       {msg.role === "ai" && (
-                        <span className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 mb-1 uppercase tracking-widest">
+                        <span className="block text-sm font-bold text-gray-400 dark:text-gray-500 mb-1 uppercase tracking-widest">
                           KI Assistent
                         </span>
                       )}
@@ -389,7 +394,7 @@ function HeroSection() {
               <div className="px-5 py-3.5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-800/40">
                 <div className="flex items-center gap-2">
                   <CheckCheck size={13} className="text-emerald-500 flex-shrink-0" />
-                  <span className="text-[12px] text-gray-500 dark:text-gray-400 font-medium">
+                  <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                     Termin automatisch gespeichert · Kalender aktualisiert
                   </span>
                 </div>
@@ -398,7 +403,7 @@ function HeroSection() {
 
             <div className="mt-3 flex items-center gap-2 px-1">
               <Lock size={11} className="text-gray-300 dark:text-gray-600 flex-shrink-0" />
-              <span className="text-[11px] text-gray-400 dark:text-gray-500">
+              <span className="text-sm text-gray-400 dark:text-gray-500">
                 Keine Gesprächsaufzeichnung · AVV nach Art. 28 DSGVO
               </span>
             </div>
@@ -428,10 +433,10 @@ function CredentialStrip() {
           {items.map((item, i) => (
             <div key={i} className="flex items-center gap-2.5">
               <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0" />
-              <span className="text-[13px] text-gray-700 dark:text-gray-300 font-medium">
+              <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
                 {item.label}
               </span>
-              <span className="hidden sm:inline text-[12px] text-gray-400 dark:text-gray-500">
+              <span className="hidden sm:inline text-sm text-gray-400 dark:text-gray-500">
                 · {item.detail}
               </span>
             </div>
@@ -451,10 +456,9 @@ function ProblemSection() {
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
           variants={fadeUp}
-          custom={0}
           className="max-w-2xl mb-6"
         >
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
             Das Problem
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4">
@@ -474,7 +478,6 @@ function ProblemSection() {
           whileInView="visible"
           viewport={{ once: true, margin: "-40px" }}
           variants={fadeUp}
-          custom={0.1}
           className="inline-flex items-center gap-4 px-6 py-4 rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800 mb-14"
         >
           <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">39&nbsp;%</span>
@@ -482,7 +485,7 @@ function ProblemSection() {
           <span className="text-sm text-gray-500 dark:text-gray-400 max-w-xs">
             der Versicherten bewerten die Erreichbarkeit von Praxen außerhalb der
             Öffnungszeiten als schwierig.
-            <span className="block text-[11px] text-gray-400 dark:text-gray-500 mt-1">
+            <span className="block text-sm text-gray-400 dark:text-gray-500 mt-1">
               Quelle: GKV-Spitzenverband, Versichertenbefragung 2025
             </span>
           </span>
@@ -496,16 +499,15 @@ function ProblemSection() {
               whileInView="visible"
               viewport={{ once: true, margin: "-40px" }}
               variants={fadeUp}
-              custom={i * 0.08}
               className="p-6 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 group hover:border-gray-200 dark:hover:border-gray-700 transition-colors duration-300"
             >
               <div className="w-10 h-10 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center mb-4 group-hover:border-gray-300 dark:group-hover:border-gray-600 transition-colors duration-300">
                 <item.icon size={17} className="text-gray-400 dark:text-gray-500" />
               </div>
-              <h3 className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 mb-2 leading-snug">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2 leading-snug">
                 {item.title}
               </h3>
-              <p className="text-[13px] text-gray-500 dark:text-gray-400 leading-relaxed">
+              <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed">
                 {item.desc}
               </p>
             </motion.div>
@@ -525,10 +527,9 @@ function FailurePatternsSection() {
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
           variants={fadeUp}
-          custom={0}
           className="max-w-2xl mb-12"
         >
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
             Ehrlich betrachtet
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4">
@@ -546,13 +547,12 @@ function FailurePatternsSection() {
               whileInView="visible"
               viewport={{ once: true, margin: "-30px" }}
               variants={fadeUp}
-              custom={i * 0.08}
               className="p-6 rounded-2xl bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50"
             >
               <h3 className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 mb-2.5 leading-snug">
                 {item.title}
               </h3>
-              <p className="text-[13px] text-gray-500 dark:text-gray-400 leading-relaxed">
+              <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed">
                 {item.description}
               </p>
             </motion.div>
@@ -572,10 +572,9 @@ function AnliegenKatalogSection() {
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
           variants={fadeUp}
-          custom={0}
           className="max-w-2xl mb-12"
         >
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
             Anliegen-Katalog
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4">
@@ -595,7 +594,6 @@ function AnliegenKatalogSection() {
             whileInView="visible"
             viewport={{ once: true, margin: "-30px" }}
             variants={fadeUp}
-            custom={0}
             className="p-7 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800"
           >
             <h3 className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 mb-4">
@@ -603,7 +601,7 @@ function AnliegenKatalogSection() {
             </h3>
             <ul className="space-y-3">
               {ANLIEGEN_UEBERNIMMT.map((item, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-[13px] text-gray-600 dark:text-gray-400 leading-relaxed">
+                <li key={i} className="flex items-start gap-2.5 text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed">
                   <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0 mt-0.5" />
                   {item}
                 </li>
@@ -616,7 +614,6 @@ function AnliegenKatalogSection() {
             whileInView="visible"
             viewport={{ once: true, margin: "-30px" }}
             variants={fadeUp}
-            custom={0.1}
             className="p-7 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800"
           >
             <h3 className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 mb-4">
@@ -624,7 +621,7 @@ function AnliegenKatalogSection() {
             </h3>
             <ul className="space-y-3">
               {ANLIEGEN_IMMER_MENSCH.map((item, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-[13px] text-gray-600 dark:text-gray-400 leading-relaxed">
+                <li key={i} className="flex items-start gap-2.5 text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed">
                   <Users size={13} className="text-gray-400 flex-shrink-0 mt-0.5" />
                   {item}
                 </li>
@@ -641,7 +638,7 @@ function PatientenSichtSection() {
   return (
     <section className="py-24 bg-white dark:bg-gray-950">
       <div className="max-w-3xl mx-auto px-6 lg:px-8">
-        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
           Die andere Seite der Leitung
         </p>
         <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-6">
@@ -659,7 +656,7 @@ function PatientenSichtSection() {
           <div className="h-8 w-px bg-gray-200 dark:bg-gray-700" />
           <span className="text-sm text-gray-500 dark:text-gray-400 max-w-xs">
             {PATIENTEN_SICHT.stat.text}
-            <span className="block text-[11px] text-gray-400 dark:text-gray-500 mt-1">
+            <span className="block text-sm text-gray-400 dark:text-gray-500 mt-1">
               Quelle: {PATIENTEN_SICHT.stat.source}
             </span>
           </span>
@@ -673,7 +670,7 @@ function GrenzenSection() {
   return (
     <section className="py-24 bg-gray-50 dark:bg-gray-900/40" aria-labelledby="grenzen-heading">
       <div className="max-w-3xl mx-auto px-6 lg:px-8">
-        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
           Klare Grenzen
         </p>
         <h2
@@ -687,7 +684,7 @@ function GrenzenSection() {
           {GRENZEN.points.map((point, i) => (
             <li
               key={i}
-              className="flex items-start gap-3 text-[14px] text-gray-600 dark:text-gray-400 leading-relaxed"
+              className="flex items-start gap-3 text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed"
             >
               <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0" />
               {point}
@@ -705,7 +702,7 @@ function TeamSection() {
       <div className="max-w-6xl mx-auto px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-16 items-start">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
               Für Ihr Praxisteam
             </p>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-5">
@@ -717,7 +714,7 @@ function TeamSection() {
             {TEAM_BLOCK.points.map((point, i) => (
               <li
                 key={i}
-                className="flex items-start gap-2.5 p-4 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 text-[13px] text-gray-600 dark:text-gray-400 leading-relaxed"
+                className="flex items-start gap-2.5 p-4 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed"
               >
                 <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0 mt-0.5" />
                 {point}
@@ -734,7 +731,7 @@ function NichtPassendSection() {
   return (
     <section className="py-20 bg-white dark:bg-gray-950">
       <div className="max-w-3xl mx-auto px-6 lg:px-8">
-        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
           Ehrliche Beratung
         </p>
         <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-4">
@@ -745,7 +742,7 @@ function NichtPassendSection() {
           {NICHT_PASSEND.points.map((point, i) => (
             <li
               key={i}
-              className="flex items-start gap-3 text-[14px] text-gray-600 dark:text-gray-400 leading-relaxed"
+              className="flex items-start gap-3 text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed"
             >
               <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0" />
               {point}
@@ -776,9 +773,8 @@ function SolutionSection() {
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
-            custom={0}
           >
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
               Die Lösung
             </p>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-5">
@@ -798,8 +794,8 @@ function SolutionSection() {
               Demo ansehen
               <ArrowRight size={14} />
             </Link>
-            <p className="mt-3 text-[12px] text-gray-400 dark:text-gray-500">
-              Kostenlos · Unverbindlich · Ca. 15 Minuten
+            <p className="mt-3 text-sm text-gray-400 dark:text-gray-500">
+              Kostenlos · Unverbindlich · Ca. 15&nbsp;Minuten
             </p>
           </motion.div>
 
@@ -808,7 +804,6 @@ function SolutionSection() {
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
-            custom={0.15}
             className="space-y-2.5"
           >
             {capabilities.map((feat, i) => (
@@ -818,13 +813,12 @@ function SolutionSection() {
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeUp}
-                custom={i * 0.06}
                 className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50 group hover:border-gray-200 dark:hover:border-gray-600 transition-colors duration-200"
               >
                 <div className="w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-700/60 border border-gray-150 dark:border-gray-600 flex items-center justify-center flex-shrink-0">
                   <feat.icon size={14} className="text-gray-400 dark:text-gray-400" />
                 </div>
-                <span className="text-[13px] text-gray-700 dark:text-gray-300 font-medium leading-snug">
+                <span className="text-[17px] text-gray-700 dark:text-gray-300 leading-relaxed">
                   {feat.label}
                 </span>
                 <CheckCircle2 size={13} className="text-emerald-400 ml-auto flex-shrink-0 opacity-70" />
@@ -877,10 +871,9 @@ function CallFlowSection() {
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
           variants={fadeUp}
-          custom={0}
           className="max-w-2xl mb-16"
         >
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
             Ablauf
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15]">
@@ -899,7 +892,6 @@ function CallFlowSection() {
                 whileInView="visible"
                 viewport={{ once: true, margin: "-30px" }}
                 variants={fadeUp}
-                custom={i * 0.1}
                 className="relative"
               >
                 <div className="flex items-center gap-3 mb-5">
@@ -908,17 +900,17 @@ function CallFlowSection() {
                   </div>
                 </div>
                 <div className="mb-1 flex items-center gap-2">
-                  <span className="text-[11px] font-bold tracking-[0.2em] text-gray-300 dark:text-gray-600 uppercase">
+                  <span className="text-sm font-bold tracking-[0.2em] text-gray-300 dark:text-gray-600 uppercase">
                     {step.number}
                   </span>
                 </div>
                 <h3 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100 mb-2 leading-snug">
                   {step.title}
                 </h3>
-                <p className="text-[13px] text-gray-500 dark:text-gray-400 leading-relaxed mb-3">
+                <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed mb-3">
                   {step.desc}
                 </p>
-                <span className="inline-flex items-center gap-1.5 text-[11px] text-gray-400 dark:text-gray-500 font-medium">
+                <span className="inline-flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 font-medium">
                   <span className="w-1 h-1 rounded-full bg-emerald-400" />
                   {step.detail}
                 </span>
@@ -941,9 +933,8 @@ function CallSummarySection() {
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
-            custom={0}
           >
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
               Nach jedem Gespräch
             </p>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-5">
@@ -970,17 +961,16 @@ function CallSummarySection() {
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
-            custom={0.15}
           >
             <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 overflow-hidden shadow-[0_2px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_20px_rgba(0,0,0,0.25)]">
               <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-800/60">
                 <div className="flex items-center gap-2.5">
                   <FileText size={14} className="text-gray-400" />
-                  <span className="text-[12px] font-semibold text-gray-600 dark:text-gray-400 tracking-wide uppercase">
+                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-400 tracking-wide uppercase">
                     Beispiel eines Dashboard-Eintrags
                   </span>
                 </div>
-                <span className="text-[11px] text-gray-400 dark:text-gray-500 font-mono">
+                <span className="text-sm text-gray-400 dark:text-gray-500 font-mono">
                   Heute · 18:47
                 </span>
               </div>
@@ -991,46 +981,46 @@ function CallSummarySection() {
               <div className="p-5 space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700">
-                    <p className="text-[10px] text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-widest mb-1">
+                    <p className="text-sm text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-widest mb-1">
                       Anrufer
                     </p>
-                    <p className="text-[13px] font-medium text-gray-800 dark:text-gray-200">
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
                       M. Berger
                     </p>
                   </div>
                   <div className="px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700">
-                    <p className="text-[10px] text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-widest mb-1">
+                    <p className="text-sm text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-widest mb-1">
                       Dauer
                     </p>
-                    <p className="text-[13px] font-medium text-gray-800 dark:text-gray-200">
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
                       2 Min 14 Sek
                     </p>
                   </div>
                 </div>
 
                 <div className="px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700">
-                  <p className="text-[10px] text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-widest mb-1.5">
+                  <p className="text-sm text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-widest mb-1.5">
                     Anliegen
                   </p>
-                  <p className="text-[13px] text-gray-700 dark:text-gray-300 leading-relaxed">
+                  <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                     Erstberatung zur Automatisierung der Telefonie. Interessiert an Terminbuchungslösung.
                   </p>
                 </div>
 
                 <div className="px-3.5 py-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/40">
-                  <p className="text-[10px] text-emerald-600 dark:text-emerald-500 font-semibold uppercase tracking-widest mb-1">
+                  <p className="text-sm text-emerald-600 dark:text-emerald-500 font-semibold uppercase tracking-widest mb-1">
                     Vereinbart
                   </p>
-                  <p className="text-[13px] font-semibold text-gray-800 dark:text-gray-200">
-                    Di., 18. März · 10:30 Uhr · Beratungsgespräch
+                  <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                    Di., 18. März · 10:30&nbsp;Uhr · Beratungsgespräch
                   </p>
                 </div>
 
                 <div className="px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700">
-                  <p className="text-[10px] text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-widest mb-1.5">
+                  <p className="text-sm text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-widest mb-1.5">
                     Empfohlene Maßnahme
                   </p>
-                  <p className="text-[13px] text-gray-600 dark:text-gray-400 leading-relaxed">
+                  <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed">
                     Unterlagen zur Telefonassistenz vorbereiten · Rückruf bestätigt
                   </p>
                 </div>
@@ -1038,7 +1028,7 @@ function CallSummarySection() {
 
               <div className="px-5 py-3.5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-800/30 flex items-center gap-2">
                 <CheckCheck size={13} className="text-emerald-500" />
-                <span className="text-[12px] text-gray-500 dark:text-gray-400 font-medium">
+                <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                   Eintrag im Dashboard · von Ihrem Team zu übertragen
                 </span>
               </div>
@@ -1216,10 +1206,9 @@ function ObjectionsSection() {
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
           variants={fadeUp}
-          custom={0}
           className="max-w-2xl mb-14"
         >
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
             Häufige Fragen im Vorfeld
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15]">
@@ -1235,7 +1224,6 @@ function ObjectionsSection() {
               whileInView="visible"
               viewport={{ once: true, margin: "-30px" }}
               variants={fadeUp}
-              custom={i * 0.07}
               className="p-6 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors duration-300 group"
             >
               <div className="w-9 h-9 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center mb-4">
@@ -1244,7 +1232,7 @@ function ObjectionsSection() {
               <h3 className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 mb-2.5 leading-snug">
                 {item.q}
               </h3>
-              <p className="text-[13px] text-gray-500 dark:text-gray-400 leading-relaxed">
+              <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed">
                 {item.a}
               </p>
             </motion.div>
@@ -1264,10 +1252,9 @@ function UseCasesSection() {
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
           variants={fadeUp}
-          custom={0}
           className="max-w-2xl mb-14"
         >
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
             Anwendungsbereiche
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15]">
@@ -1284,7 +1271,6 @@ function UseCasesSection() {
               whileInView="visible"
               viewport={{ once: true, margin: "-30px" }}
               variants={fadeUp}
-              custom={i * 0.07}
               className="flex gap-4 p-6 rounded-2xl bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50 hover:border-gray-200 dark:hover:border-gray-600 transition-colors duration-200"
             >
               <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-700/60 border border-gray-150 dark:border-gray-600 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -1294,7 +1280,7 @@ function UseCasesSection() {
                 <h3 className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 mb-1.5">
                   {item.industry}
                 </h3>
-                <p className="text-[13px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed">
                   {item.desc}
                 </p>
               </div>
@@ -1321,9 +1307,8 @@ function SetupSection() {
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
-            custom={0}
           >
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
               Implementierung
             </p>
             <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-4">
@@ -1345,15 +1330,14 @@ function SetupSection() {
                 whileInView="visible"
                 viewport={{ once: true, margin: "-20px" }}
                 variants={fadeUp}
-                custom={i * 0.08}
                 className="flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/60"
               >
                 <div className="flex-shrink-0 w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center">
-                  <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400">{i + 1}</span>
+                  <span className="text-sm font-bold text-gray-500 dark:text-gray-400">{i + 1}</span>
                 </div>
                 <div>
-                  <span className="text-[13px] font-semibold text-gray-900 dark:text-gray-100">{phase.step}</span>
-                  <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">{phase.desc}</p>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{phase.step}</span>
+                  <p className="text-[17px] text-gray-600 dark:text-gray-400 mt-0.5 leading-relaxed">{phase.desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -1373,13 +1357,12 @@ function DemoCtaSection() {
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
           variants={fadeUp}
-          custom={0}
         >
           <div className="relative rounded-3xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/60 px-10 lg:px-14 py-14 text-center overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(0,0,0,0.03)_0%,_transparent_60%)] dark:bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.03)_0%,_transparent_60%)] pointer-events-none" />
             <div className="relative">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-[11px] font-medium text-gray-600 dark:text-gray-400 mb-6 shadow-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-600 dark:text-gray-400 mb-6 shadow-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 Demo jetzt verfügbar
               </div>
               <h2 className="text-3xl lg:text-[2.25rem] font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4">
@@ -1394,22 +1377,22 @@ function DemoCtaSection() {
               <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
                 <Link
                   to="/ki-telefonassistent/demo"
-                  className="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[14px] hover:bg-gray-700 dark:hover:bg-white transition-all duration-200 hover:-translate-y-0.5 shadow-sm hover:shadow-lg"
+                  className="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[15px] hover:bg-gray-700 dark:hover:bg-white transition-all duration-200 hover:-translate-y-0.5 shadow-sm hover:shadow-lg"
                 >
                   <Phone size={15} />
                   Kostenlose Demo ansehen
                 </Link>
                 <Link
                   to="/kontakt"
-                  className="inline-flex items-center justify-center gap-2.5 px-8 py-4 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-[14px] hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 hover:bg-gray-50/80"
+                  className="inline-flex items-center justify-center gap-2.5 px-8 py-4 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-[15px] hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 hover:bg-gray-50/80"
                 >
                   Unverbindliches Erstgespräch vereinbaren
                   <ArrowRight size={14} />
                 </Link>
               </div>
 
-              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[12px] text-gray-400 dark:text-gray-500">
-                <span>Ca. 15 Minuten</span>
+              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-gray-400 dark:text-gray-500">
+                <span>Ca. 15&nbsp;Minuten</span>
                 <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
                 <span>Kostenlos</span>
                 <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
@@ -1436,10 +1419,9 @@ function FAQSectionBlock() {
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
           variants={fadeUp}
-          custom={0}
           className="mb-12"
         >
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
             FAQ
           </p>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15]">
@@ -1455,11 +1437,10 @@ function FAQSectionBlock() {
               whileInView="visible"
               viewport={{ once: true }}
               variants={fadeUp}
-              custom={i * 0.05}
               className="bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/60 rounded-xl overflow-hidden"
             >
               <button
-                className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left text-[14px] font-semibold text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800/80 transition-colors duration-150"
+                className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left text-[17px] font-semibold text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800/80 transition-colors duration-150"
                 onClick={() => setOpen(open === i ? null : i)}
               >
                 <span>{item.question}</span>
@@ -1476,12 +1457,12 @@ function FAQSectionBlock() {
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
                     className="overflow-hidden"
                   >
                     <div className="px-6 pb-5 pt-0">
                       <div className="w-full h-px bg-gray-100 dark:bg-gray-700/60 mb-4" />
-                      <p className="text-[14px] text-gray-600 dark:text-gray-400 leading-[1.7]">
+                      <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7]">
                         {item.answer}
                       </p>
                     </div>
@@ -1535,10 +1516,9 @@ function InternalLinksSection() {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeUp}
-          custom={0}
           className="mb-7"
         >
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500">
             Weiterführende Seiten
           </p>
         </motion.div>
@@ -1547,12 +1527,11 @@ function InternalLinksSection() {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeUp}
-          custom={0.1}
           className="grid sm:grid-cols-3 gap-8"
         >
           {cols.map((col) => (
             <div key={col.heading}>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-gray-400 dark:text-gray-500 mb-3">
+              <p className="text-sm font-semibold uppercase tracking-[0.15em] text-gray-400 dark:text-gray-500 mb-3">
                 {col.heading}
               </p>
               <ul className="space-y-2">
@@ -1560,7 +1539,7 @@ function InternalLinksSection() {
                   <li key={link.href}>
                     <Link
                       to={link.href}
-                      className="group inline-flex items-center gap-2 text-[13px] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 font-medium transition-colors"
+                      className="group inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 font-medium transition-colors"
                     >
                       <ArrowRight
                         size={11}
@@ -1588,7 +1567,6 @@ function FinalCtaSection() {
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
           variants={fadeUp}
-          custom={0}
         >
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4">
             Gehen wir Ihre Anrufe gemeinsam durch.
@@ -1601,20 +1579,20 @@ function FinalCtaSection() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-5">
             <Link
               to="/ki-telefonassistent/demo"
-              className="inline-flex items-center justify-center gap-2.5 px-7 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[14px] hover:bg-gray-700 dark:hover:bg-white transition-all duration-200 hover:-translate-y-0.5 shadow-sm"
+              className="inline-flex items-center justify-center gap-2.5 px-7 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[15px] hover:bg-gray-700 dark:hover:bg-white transition-all duration-200 hover:-translate-y-0.5 shadow-sm"
             >
               <Phone size={15} />
               Kostenlose Demo ansehen
             </Link>
             <Link
               to="/kontakt"
-              className="inline-flex items-center justify-center gap-2.5 px-7 py-4 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-[14px] hover:border-gray-400 transition-all duration-200"
+              className="inline-flex items-center justify-center gap-2.5 px-7 py-4 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-[15px] hover:border-gray-400 transition-all duration-200"
             >
               Unverbindliches Erstgespräch vereinbaren
               <ArrowRight size={14} />
             </Link>
           </div>
-          <p className="text-[12px] text-gray-400 dark:text-gray-500">
+          <p className="text-sm text-gray-400 dark:text-gray-500">
             {BUSINESS_INFO.name} · {BUSINESS_INFO.contact.email} · {BUSINESS_INFO.contact.phoneDisplay}
           </p>
         </motion.div>

@@ -260,7 +260,7 @@ export function PraxisRechnerWidget() {
           <Regler
             id="rechner-ersparnis"
             label="Angenommene Zeitersparnis"
-            hinweis="Obere Kante der Spanne. Die untere liegt fest bei 10 %."
+            hinweis="Obere Kante der Spanne. Die untere liegt fest bei 10 %."
             wert={ersparnisProzent}
             min={10}
             max={40}
@@ -322,7 +322,7 @@ export function PraxisRechnerWidget() {
           {terminwertGueltig ? (
             <div className="mt-5 pt-5 border-t border-gray-200 dark:border-gray-700">
               <Zeile
-                label={`Bei ${zahl(terminwert as number)} € je Termin, wenn jeder dieser Anrufe zu einem Termin führt`}
+                label={`Bei ${zahl(terminwert as number)}\u00A0€ je Termin, wenn jeder dieser Anrufe zu einem Termin führt`}
                 wert={`${eur(anrufwertMax as number)} / Monat`}
               />
               <p className="text-[14px] text-gray-500 dark:text-gray-500 mt-3 leading-[1.5]">
@@ -347,8 +347,8 @@ export function PraxisRechnerWidget() {
           </p>
           <p className="text-[26px] font-bold text-gray-900 dark:text-gray-100 tabular-nums leading-tight">
             {istPunktwert
-              ? `${zahl(stundenOben)} Stunden`
-              : `${zahl(stundenUnten)} bis ${zahl(stundenOben)} Stunden`}
+              ? `${zahl(stundenOben)}\u00A0Stunden`
+              : `${zahl(stundenUnten)} bis ${zahl(stundenOben)}\u00A0Stunden`}
           </p>
           <p className="text-[16px] text-gray-600 dark:text-gray-400 mb-4">im Monat</p>
           <Zeile
@@ -357,7 +357,7 @@ export function PraxisRechnerWidget() {
           />
           {istPunktwert && (
             <p className="text-[14px] text-gray-500 dark:text-gray-500 mt-3 leading-[1.5]">
-              Am unteren Anschlag rechnet der Rechner mit genau 10 % — dann ist das
+              Am unteren Anschlag rechnet der Rechner mit genau 10&nbsp;% — dann ist das
               Ergebnis ein einzelner Wert statt einer Spanne.
             </p>
           )}
@@ -447,9 +447,9 @@ export function PraxisRechnerWidget() {
               <strong className="font-semibold text-gray-900 dark:text-gray-100">
                 Eingesparte Zeit:
               </strong>{" "}
-              {UNTERGRENZE_PROZENT} % bis {Math.max(ersparnisProzent, UNTERGRENZE_PROZENT)} % davon
-              = {zahl(stundenUnten)} bis {zahl(stundenOben)} Stunden. Mal{" "}
-              {zahl(stundenkosten)} €/h ergibt {eur(wertUnten)} bis {eur(wertOben)}.
+              {UNTERGRENZE_PROZENT}&nbsp;% bis {Math.max(ersparnisProzent, UNTERGRENZE_PROZENT)}&nbsp;% davon
+              = {zahl(stundenUnten)} bis {zahl(stundenOben)}&nbsp;Stunden. Mal{" "}
+              {zahl(stundenkosten)}&nbsp;€/h ergibt {eur(wertUnten)} bis {eur(wertOben)}.
             </p>
             <p>
               <strong className="font-semibold text-gray-900 dark:text-gray-100">
@@ -460,7 +460,7 @@ export function PraxisRechnerWidget() {
               der bei diesem Bedarf nicht dauerhaft an seiner Obergrenze läuft:{" "}
               {tarif.name} mit {zahl(tarif.minuten)} Min.
               {mehrverbrauchMinuten > 0 &&
-                ` Darüber ${zahl(mehrverbrauchMinuten)} Min. zu ${MEHRPREIS_PRO_MINUTE.toLocaleString("de-DE", { minimumFractionDigits: 2 })} €, gedeckelt auf ${tarif.obergrenze}.`}
+                ` Darüber ${zahl(mehrverbrauchMinuten)} Min. zu ${MEHRPREIS_PRO_MINUTE.toLocaleString("de-DE", { minimumFractionDigits: 2 })}\u00A0€, gedeckelt auf ${tarif.obergrenze}.`}
             </p>
             <p>
               <strong className="font-semibold text-gray-900 dark:text-gray-100">
@@ -471,10 +471,10 @@ export function PraxisRechnerWidget() {
             </p>
             <p>
               <strong className="font-semibold text-gray-900 dark:text-gray-100">
-                Warum die untere Kante bei 10 % liegt:
+                Warum die untere Kante bei 10&nbsp;% liegt:
               </strong>{" "}
               Die einzige öffentlich dokumentierte Rechnung eines Praxisinhabers zu
-              genau dieser Frage liegt bei 10 bis 20 %, bewusst netto nach Nacharbeit
+              genau dieser Frage liegt bei 10 bis 20&nbsp;%, bewusst netto nach Nacharbeit
               gerechnet. Wir setzen die untere Kante deshalb fest auf diesen Wert.
             </p>
             {terminwertGueltig ? (
@@ -483,7 +483,7 @@ export function PraxisRechnerWidget() {
                   Gewonnene Termine, getrennt gerechnet:
                 </strong>{" "}
                 {zahl(zusaetzlichAngenommen)} zusätzlich angenommene Anrufe ×{" "}
-                {zahl(terminwert as number)} € = {eur(anrufwertMax as number)} — aber nur,
+                {zahl(terminwert as number)}&nbsp;€ = {eur(anrufwertMax as number)} — aber nur,
                 wenn jeder dieser Anrufe zu einem Termin führt. Diese Zahl fließt
                 deshalb NICHT in das Ergebnis oben ein; sie steht daneben. Ins
                 Verhältnis gesetzt ergibt sie, wie viele Termine die Kosten decken

@@ -38,7 +38,7 @@ const config: NationalIndustryPageConfig = {
     {
       title: "Außerhalb der Sprechzeiten ist niemand erreichbar",
       description:
-        "39 % der Versicherten bewerten die Erreichbarkeit von Praxen außerhalb der Öffnungszeiten als schwierig (GKV-Spitzenverband, Versichertenbefragung 2025). Wer abends absagen oder einen Termin anfragen will, landet auf der Mailbox – und die hört selten jemand vollständig ab.",
+        "39 % der Versicherten bewerten die Erreichbarkeit von Praxen außerhalb der Öffnungszeiten als schwierig (GKV-Spitzenverband, Versichertenbefragung 2025). Wer abends absagen oder einen Termin anfragen will, landet auf der Mailbox – und die hört selten jemand vollständig ab.",
     },
     {
       title: "Stornierungen kommen nicht an – Termine verfallen ungenutzt",

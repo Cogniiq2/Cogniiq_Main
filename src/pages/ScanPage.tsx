@@ -198,7 +198,7 @@ export function ScanPage() {
           {/* Eyebrow */}
           <motion.div {...fadeUp(0.1)} className="mb-6">
             <span className="inline-flex items-center gap-2 text-xs font-medium tracking-[0.18em] uppercase text-[#2e6f8f] border border-[#2e6f8f]/20 rounded-full px-4 py-1.5 bg-[#2e6f8f]/04">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#2e6f8f] opacity-70 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2e6f8f] opacity-70" />
               Private Einstiegseite
             </span>
           </motion.div>
