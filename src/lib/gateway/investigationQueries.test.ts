@@ -27,8 +27,12 @@ describe('the investigation queries cannot be executed automatically', () => {
       name.endsWith('.sql'),
     );
     expect(migrations.every((name) => /^\d{14}_/.test(name))).toBe(true);
+    // The club_operations migrations are an explicit, reviewed list rather than "whatever is
+    // there": each one is a deliberate step (declare the key inert, then activate it), and a third
+    // appearing without this list changing would be exactly the unnoticed migration this guards.
     expect(migrations.filter((name) => /club_operations/.test(name))).toEqual([
       '20260811120000_club_operations_catalog_entry.sql',
+      '20260818120000_club_operations_activation.sql',
     ]);
   });
 

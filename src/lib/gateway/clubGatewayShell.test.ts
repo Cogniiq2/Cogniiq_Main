@@ -3,8 +3,8 @@
 // No test here reaches a network, a hosted project or a real credential. The caller resolver, the
 // authorizer, the rate limiter and the transport are all injected fakes.
 
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readFileSync, readdirSync } from 'node:fs';
+import { join, relative, resolve, sep } from 'node:path';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -706,14 +706,14 @@ describe('errors and logs carry no secret', () => {
 
 const repoRoot = resolve(__dirname, '../../..');
 
-describe('Club Operations stays inert', () => {
-  it('the registry still resolves the solution to the unavailable fallback', () => {
-    const registry = readFileSync(resolve(repoRoot, 'src/lib/solutions/registry.tsx'), 'utf8');
-    expect(registry).toMatch(/club_operations:\s*unavailableImplementation/);
-    expect(registry).not.toMatch(/ClubOperationsModule/);
-  });
+describe('the gateway stays server-side even though the solution is live', () => {
+  // The solution is no longer inert: the customer portal mounts it. What has to stay true is the
+  // separation this directory exists for — the browser may *call* the boundary, but the signing
+  // contract, the upstream endpoint and the entitlement decision live only behind it.
 
-  it('the route tree still matches nothing', () => {
+  it('the route tree still reaches the module only through the registry', () => {
+    // No route of its own: the instance-scoped solution route is the single entrance, and its
+    // ownership check runs before the module is constructed.
     const app = readFileSync(resolve(repoRoot, 'src/App.tsx'), 'utf8');
     expect(app).not.toMatch(/club-operations/i);
     expect(app).not.toMatch(/ClubOperationsModule/);
@@ -732,8 +732,30 @@ describe('Club Operations stays inert', () => {
 
   it('no browser-reachable module imports the gateway', () => {
     // The gateway is server-side only. If a component ever imported it, the signing contract and the
-    // upstream endpoint would be one bundle away from the browser.
-    const app = readFileSync(resolve(repoRoot, 'src/App.tsx'), 'utf8');
-    expect(app).not.toMatch(/lib\/gateway\/clubGateway/);
+    // upstream endpoint would be one bundle away from the browser. Now that a browser module calls
+    // the boundary, the scan covers the whole of src rather than App.tsx alone: the browser
+    // transport must reach the Edge Function by name, never by importing what runs inside it.
+    const serverOnly = /['"]@?[./\w]*\/?(clubGatewayShell|clubGatewayTransport|clubGatewayResponse|cqgw1|entitlement|callerResolution)['"]/;
+
+    const offenders: string[] = [];
+    const walk = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+        const full = join(dir, entry.name);
+        return entry.isDirectory() ? walk(full) : [full];
+      });
+
+    for (const file of walk(resolve(repoRoot, 'src'))) {
+      if (!/\.(ts|tsx)$/.test(file) || /\.test\.(ts|tsx)$/.test(file)) continue;
+      // The gateway's own directory is the server side; it is allowed to import itself.
+      if (file.includes(`${sep}lib${sep}gateway${sep}`) && !file.endsWith('clubOperationsBrowserTransport.ts')) {
+        continue;
+      }
+      const code = readFileSync(file, 'utf8');
+      for (const specifier of [...code.matchAll(/\bfrom\s+('[^']+'|"[^"]+")/g)].map((m) => m[1])) {
+        if (serverOnly.test(specifier)) offenders.push(`${relative(repoRoot, file)} -> ${specifier}`);
+      }
+    }
+
+    expect(offenders).toEqual([]);
   });
 });

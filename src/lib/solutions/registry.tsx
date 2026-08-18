@@ -8,10 +8,15 @@
 
 import { lazy, type ComponentType, type LazyExoticComponent } from 'react';
 import {
+  BadgeEuro,
+  CalendarRange,
   Cpu,
   Headphones,
   LayoutGrid,
   Phone,
+  Receipt,
+  Settings,
+  Users,
   Wand2,
   type LucideIcon,
 } from 'lucide-react';
@@ -96,6 +101,32 @@ const automationImplementation: SolutionImplementation = {
   Landing: lazyLanding(() => import('@/components/app/solutions/AutomationSolutionLanding')),
 };
 
+// Vereinsbetrieb. The module owns twelve sections and its own grouped navigation; the portal
+// sidebar carries the six a club administrator opens directly, so the customer rail stays as short
+// as every other product's. Every entry here opens an implemented section — nothing is a
+// placeholder, and the remaining six stay one click away inside the module's own navigation.
+const clubOperationsImplementation: SolutionImplementation = {
+  implementationKey: 'club_operations',
+  label: 'Vereinsbetrieb',
+  icon: CalendarRange,
+  available: true,
+  navGroups: [
+    {
+      id: 'club-operations',
+      label: 'Vereinsbetrieb',
+      items: [
+        { key: 'overview', label: 'Übersicht', path: '', icon: LayoutGrid },
+        { key: 'bookings', label: 'Buchungen', path: '/bookings', icon: CalendarRange },
+        { key: 'payments', label: 'Zahlungen', path: '/payments', icon: BadgeEuro },
+        { key: 'invoices', label: 'Rechnungen', path: '/invoices', icon: Receipt },
+        { key: 'members', label: 'Mitglieder', path: '/members', icon: Users },
+        { key: 'settings', label: 'Einstellungen', path: '/settings', icon: Settings },
+      ],
+    },
+  ],
+  Landing: lazyLanding(() => import('@/components/app/solutions/ClubOperationsSolutionLanding')),
+};
+
 const unavailableImplementation: SolutionImplementation = {
   implementationKey: 'unavailable',
   label: 'Lösung',
@@ -109,12 +140,12 @@ const unavailableImplementation: SolutionImplementation = {
 const registry: Record<ImplementationKey, SolutionImplementation> = {
   ai_receptionist: receptionistImplementation,
   automation_workspace: automationImplementation,
-  // club_operations (Vereinsbetrieb) is declared but intentionally not implemented. It resolves to
-  // the safe fallback, so the key existing grants no surface and no data access. Its UI, and the
-  // authenticated server-side gateway that will feed it, arrive in later phases. No club-specific
-  // host, project reference or credential belongs in this module or in any browser-readable
-  // configuration.
-  club_operations: unavailableImplementation,
+  // club_operations (Vereinsbetrieb) is live. Resolving the key still grants nothing on its own:
+  // a surface appears only where an organization the caller is an active member of has a non-
+  // disabled instance, which RLS decides, and the module's data comes from the authenticated
+  // server-side read gateway. No club-specific host, project reference or credential belongs in
+  // this module or in any browser-readable configuration.
+  club_operations: clubOperationsImplementation,
   // pankofer_operations is intentionally not yet implemented; it resolves to the safe fallback
   // until its module is added here, without modifying the receptionist implementation.
   pankofer_operations: unavailableImplementation,
