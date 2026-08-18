@@ -5,7 +5,7 @@
 // Comments are stripped before scanning so a comment recording a rule cannot trip the rule.
 
 import { execSync } from 'node:child_process';
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
@@ -243,32 +243,59 @@ describe('import boundaries', () => {
   });
 });
 
-describe('the module stays unreachable in production routing', () => {
+describe('the module is reachable only through the customer portal solution route', () => {
   const appSource = readFileSync(resolve(repoRoot, 'src/App.tsx'), 'utf8');
   const registrySource = readFileSync(resolve(repoRoot, 'src/lib/solutions/registry.tsx'), 'utf8');
 
+  // The module is live, so "unreachable" is no longer the property. What replaces it is narrower
+  // and just as checkable: there is exactly one way in — the instance-scoped solution route, whose
+  // access check runs before the landing is ever constructed — and the surface area that may touch
+  // the module is an explicit, short list rather than "anywhere".
+  const permittedImporters = [
+    // The one host. Everything it renders has already passed SolutionPage's ownership check.
+    'src/components/app/solutions/ClubOperationsSolutionLanding.tsx',
+    // URL-segment ↔ section mapping, and the browser end of the read gateway.
+    'src/lib/solutions/clubOperationsSection.ts',
+    'src/lib/gateway/clubOperationsBrowserTransport.ts',
+  ];
+
   it('is not referenced by the route tree', () => {
+    // Routing reaches the module only through the registry's lazy landing, never by a route of its
+    // own. A direct route here would be a second entrance with no ownership check in front of it.
     expect(appSource).not.toMatch(/club-operations/i);
     expect(appSource).not.toMatch(/ClubOperationsModule/);
   });
 
-  it('is not referenced by the solution registry', () => {
-    expect(registrySource).not.toMatch(/club-operations/);
+  it('is not imported directly by the solution registry', () => {
+    // The registry names a lazy landing, not the module: a static import would pull the whole
+    // dashboard into the bundle of every customer who merely has a portal account.
     expect(registrySource).not.toMatch(/ClubOperationsModule/);
+    expect(registrySource).not.toMatch(/from '@\/solutions\/club-operations/);
   });
 
-  it('registry still resolves club_operations to the unavailable fallback', () => {
-    expect(registrySource).toMatch(/club_operations:\s*unavailableImplementation/);
+  it('registry resolves club_operations to its own implementation, lazily', () => {
+    expect(registrySource).toMatch(/club_operations:\s*clubOperationsImplementation/);
+    expect(registrySource).toMatch(
+      /Landing:\s*lazyLanding\(\(\) => import\('@\/components\/app\/solutions\/ClubOperationsSolutionLanding'\)\)/,
+    );
   });
 
-  it('no production file outside the module imports the module', () => {
+  it('no production file outside the module reaches it except the permitted host', () => {
     const srcRoot = resolve(repoRoot, 'src');
     const offenders = walk(srcRoot)
       .filter((file) => /\.(ts|tsx)$/.test(file))
+      .filter((file) => !/\.test\.(ts|tsx)$/.test(file))
       .filter((file) => !file.startsWith(moduleRoot))
       .filter((file) => /solutions\/club-operations/.test(readFileSync(file, 'utf8')))
-      .map((file) => relative(repoRoot, file).replace(/\\/g, '/'));
+      .map((file) => relative(repoRoot, file).replace(/\\/g, '/'))
+      .filter((path) => !permittedImporters.includes(path));
     expect(offenders).toEqual([]);
+  });
+
+  it('the permitted importers all still exist, so the allowlist cannot rot into a rubber stamp', () => {
+    for (const path of permittedImporters) {
+      expect(existsSync(resolve(repoRoot, path)), `${path} is listed but missing`).toBe(true);
+    }
   });
 
   it('adds no route, query-parameter or preview bypass of its own', () => {

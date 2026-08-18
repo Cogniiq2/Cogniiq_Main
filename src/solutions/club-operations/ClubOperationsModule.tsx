@@ -6,10 +6,10 @@
 // customer portal's. What it does own is the module's own header: which dataset, which period, how
 // fresh, how healthy, and the internal navigation.
 //
-// Reachability: nothing in the production route tree imports this file. The solution registry
-// continues to resolve `club_operations` to the shared unavailable fallback, so the module cannot
-// be reached by guessing a URL. It is wired up in a later phase, together with the authenticated
-// server-side gateway that will supply its data.
+// Reachability: hosted by `ClubOperationsSolutionLanding` at `/app/solutions/:instanceKey/*`. The
+// URL is not the boundary — `SolutionPage` resolves the instance against the caller's RLS-filtered
+// solution list first, so guessing an instance key yields the access-denied state, and the data
+// itself is gated again server-side by the read gateway's own entitlement check.
 
 import { useCallback, useMemo, useState } from 'react';
 
