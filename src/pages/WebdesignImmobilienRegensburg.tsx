@@ -14,18 +14,18 @@ const config: IndustryPageConfig = {
   seo: {
     title: "Webdesign & KI-Telefonassistent für Immobilienmakler in Regensburg | Cogniiq",
     description:
-      "Immobilien Website Regensburg: Cogniiq entwickelt Websites, KI-Telefonassistenten und Lead-Automatisierungen für Immobilienmakler in Regensburg. Mehr Anfragen, automatisierte Besichtigungen, DSGVO-konform.",
+      "Immobilien Website Regensburg: Cogniiq entwickelt Websites, KI-Telefonassistenten und Lead-Automatisierungen für Immobilienmakler in Regensburg. Mehr Anfragen, automatisierte Besichtigungen, persönlich betreut.",
     canonical: `${base}/webdesign-immobilien-regensburg`,
     keywords:
       "Immobilien Website Regensburg, Makler Website Regensburg, Immobilienmakler Regensburg Digital, KI Telefonassistent Immobilien Regensburg",
   },
   hero: {
-    trustTags: ["Regensburg", "DSGVO-konform", "KI-Integration", "Lead-Qualifizierung", "Automatisierung"],
+    trustTags: ["Regensburg", "KI-Integration", "Lead-Qualifizierung", "Automatisierung"],
     ctaLabel: "Projekt für Immobilienmakler starten",
   },
   intro: {
     h1: "Webdesign & KI-Telefonassistent für Immobilienmakler in Regensburg",
-    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Immobilienmakler in Regensburg – für mehr qualifizierte Kaufanfragen, automatisierte Besichtigungsprozesse und professionelle Objektpräsentation. DSGVO-konform, schnell eingerichtet.",
+    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Immobilienmakler in Regensburg – für mehr qualifizierte Kaufanfragen, automatisierte Besichtigungsprozesse und professionelle Objektpräsentation. Schnell eingerichtet, persönlich betreut.",
   },
   engpaesse: [
     "Regensburg wächst überdurchschnittlich – die Nachfrage nach Wohnraum übersteigt das Angebot, was zu einem hohen Anfragevolumen führt",
@@ -72,7 +72,7 @@ const config: IndustryPageConfig = {
         "Strukturierte Objektseiten mit Exposé-Darstellung",
         "Kontaktformular mit automatischer Lead-Benachrichtigung",
         "On-Page SEO für 'Immobilienmakler Regensburg'",
-        "DSGVO-konforme Datenschutzdokumentation",
+        "Datenschutzerklärung, Impressum und Cookie-Einwilligung",
       ],
     },
     {
@@ -112,7 +112,7 @@ const config: IndustryPageConfig = {
       icon: "web",
       title: "Immobilien-Website Regensburg",
       description:
-        "Hochwertige Makler-Website mit professionellen Objektseiten, Exposé-Darstellung, Anfrage-Workflow und gezieltem SEO für Suchanfragen wie 'Immobilienmakler Regensburg' oder 'Wohnung kaufen Regensburg'. Mobiloptimiert, conversion-stark, DSGVO-konform.",
+        "Hochwertige Makler-Website mit professionellen Objektseiten, Exposé-Darstellung, Anfrage-Workflow und gezieltem SEO für Suchanfragen wie 'Immobilienmakler Regensburg' oder 'Wohnung kaufen Regensburg'. Mobiloptimiert und conversion-stark.",
     },
     {
       icon: "phone",
@@ -185,9 +185,9 @@ const config: IndustryPageConfig = {
   ],
   faq: [
     {
-      question: "Kann Cogniiq eine DSGVO-konforme Makler-Website in Regensburg erstellen?",
+      question: "Was liefert Cogniiq zum Datenschutz einer Makler-Website in Regensburg erstellen?",
       answer:
-        "Ja. Alle Websites und Systeme werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse – mit korrekten Datenschutzdokumentationen, Cookie-Einwilligungen und sicherer Verarbeitung aller Interessentendaten auf europäischen Servern.",
+        "Zum Lieferumfang gehören Datenschutzerklärung, Impressum, Cookie-Einwilligung und die dokumentierte Verarbeitung der Interessentendaten auf europäischen Servern. Ob der konkrete Einsatz den Anforderungen genügt, beurteilt Ihr Datenschutzbeauftragter – wir liefern ihm die Unterlagen dafür zu.",
     },
     {
       question: "Wie werden Interessentenanfragen über die Website automatisch vorqualifiziert?",

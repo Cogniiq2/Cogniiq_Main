@@ -289,7 +289,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/bayreuth/website-erstellen",
     title: "Website erstellen lassen in Bayreuth | Professionell & schnell – Cogniiq",
-    description: "Website in Bayreuth erstellen lassen: individuelle Entwicklung, SEO von Anfang an, DSGVO-konform. Go-Live in 7–14 Tagen. Persönliche Betreuung in Bayreuth.",
+    description: "Website in Bayreuth erstellen lassen: individuelle Entwicklung, SEO von Anfang an, kein Baukasten. Go-Live in 7–14 Tagen. Persönliche Betreuung in Bayreuth.",
     keywords: "Website erstellen Bayreuth, Homepage erstellen Bayreuth, Webseite erstellen Bayreuth",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.78" },
@@ -357,7 +357,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/muenchen/website-erstellen",
     title: "Website erstellen lassen in München | Professionell & schnell – Cogniiq",
-    description: "Website in München erstellen lassen: maßgeschneiderte Entwicklung, SEO, DSGVO-konform. Keine Fertigvorlagen – Go-Live typischerweise in 7–14 Tagen.",
+    description: "Website in München erstellen lassen: maßgeschneiderte Entwicklung, SEO, individuelles Design. Keine Fertigvorlagen – Go-Live typischerweise in 7–14 Tagen.",
     keywords: "Website erstellen München, Homepage erstellen München, Webseite erstellen München",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.78" },
@@ -425,7 +425,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/regensburg/website-erstellen",
     title: "Website erstellen lassen in Regensburg | Professionell & schnell – Cogniiq",
-    description: "Website in Regensburg erstellen lassen: individuelle Entwicklung, SEO von Anfang an, DSGVO-konform. Persönliche Betreuung vor Ort in Regensburg.",
+    description: "Website in Regensburg erstellen lassen: individuelle Entwicklung, SEO von Anfang an, kein Baukasten. Persönliche Betreuung vor Ort in Regensburg.",
     keywords: "Website erstellen Regensburg, Homepage erstellen Regensburg, Webseite erstellen Regensburg",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.75" },
@@ -459,7 +459,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/webdesign-arzt-bayreuth",
     title: "Webdesign für Ärzte in Bayreuth | Praxis-Website erstellen – Cogniiq",
-    description: "Webdesign für Arztpraxen in Bayreuth: DSGVO-konforme Praxis-Websites mit Online-Terminbuchung, Patienteninformationen und lokalem SEO für mehr Neupatienten in Bayreuth.",
+    description: "Webdesign für Arztpraxen in Bayreuth: Praxis-Websites mit Online-Terminbuchung, Patienteninformationen und lokalem SEO für mehr Neupatienten in Bayreuth.",
     keywords: "Webdesign Arzt Bayreuth, Praxis Website Bayreuth, Arztwebsite Bayreuth",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.82" },
@@ -483,7 +483,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/webdesign-arzt-muenchen",
     title: "Webdesign für Ärzte in München | Praxis-Website erstellen – Cogniiq",
-    description: "Webdesign für Arztpraxen in München: DSGVO-konforme Websites mit Online-Terminbuchung und lokalem SEO für mehr Neupatienten in München.",
+    description: "Webdesign für Arztpraxen in München: Praxis-Websites mit Online-Terminbuchung und lokalem SEO für mehr Neupatienten in München.",
     keywords: "Webdesign Arzt München, Praxis Website München, Arztwebsite München",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.82" },
@@ -507,7 +507,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/webdesign-arzt-regensburg",
     title: "Webdesign für Ärzte in Regensburg | Praxis-Website erstellen – Cogniiq",
-    description: "Webdesign für Arztpraxen in Regensburg: DSGVO-konforme Praxis-Websites mit Online-Terminbuchung und lokalem SEO für mehr Neupatienten in Regensburg.",
+    description: "Webdesign für Arztpraxen in Regensburg: Praxis-Websites mit Online-Terminbuchung und lokalem SEO für mehr Neupatienten in Regensburg.",
     keywords: "Webdesign Arzt Regensburg, Praxis Website Regensburg, Arztwebsite Regensburg",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.78" },
@@ -541,7 +541,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/webdesign-arzt",
     title: "Webdesign für Ärzte & Praxen | Patientengewinnung online – Cogniiq",
-    description: "Professionelle Websites für Arztpraxen und medizinische Einrichtungen. DSGVO-konform, mit Online-Terminbuchung, lokales SEO für mehr Neupatienten.",
+    description: "Professionelle Websites für Arztpraxen und medizinische Einrichtungen. Mit Online-Terminbuchung, lokales SEO für mehr Neupatienten.",
     keywords: "Webdesign Arzt, Website Praxis, Arztwebsite erstellen, Webdesign Praxis, Patientenakquise Online",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.85" },

@@ -46,13 +46,13 @@ const config: ProblemPageConfig = {
   },
   solution: {
     headline: "Automatisierung, die sofort Zeit freisetzt.",
-    text: "Cogniiq automatisiert die zeitaufwändigsten Prozesse Ihres Unternehmens – DSGVO-konform, auf europäischen Servern, vollständig dokumentiert. Die meisten Workflows sind in 1–3 Wochen live.",
+    text: "Cogniiq automatisiert die zeitaufwändigsten Prozesse Ihres Unternehmens – auf europäischen Servern, vollständig dokumentiert. Die meisten Workflows sind in 1–3 Wochen live.",
     bullets: [
       "Lead-Management vollständig automatisiert",
       "Terminbestätigung und Erinnerungen automatisch",
       "Rechnungsstellung und Mahnwesen automatisiert",
       "Daten zwischen Systemen automatisch synchronisiert",
-      "DSGVO-konform auf europäischen Servern",
+      "Europäische Server",
       "Vollständige Dokumentation und Team-Schulung",
     ],
   },

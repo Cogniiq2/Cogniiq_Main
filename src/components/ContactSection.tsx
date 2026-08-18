@@ -17,7 +17,6 @@ import {
   CircleCheck as CheckCircle,
   Sparkles,
   ShieldCheck,
-  Lock,
   Server,
   BadgeCheck,
 } from 'lucide-react';
@@ -48,7 +47,6 @@ const afterSteps = [
 ];
 
 const DSGVO_BADGES = [
-  { icon: Lock, label: 'DSGVO-konform' },
   { icon: Server, label: 'Europäische Server' },
   { icon: ShieldCheck, label: 'SSL-verschlüsselt' },
   { icon: BadgeCheck, label: 'Keine Weitergabe' },

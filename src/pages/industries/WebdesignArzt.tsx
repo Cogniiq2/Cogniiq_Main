@@ -4,13 +4,13 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 
 const config: NationalIndustryPageConfig = {
   seo: {
-    title: "Webdesign für Arztpraxen | DSGVO-konforme Praxis-Website | Cogniiq",
-    description: "Webdesign für Arztpraxen: DSGVO-konforme Praxis-Website mit Online-Terminbuchung, Local SEO und digitalem Patientenformular. Mehr Neupatienten, weniger Routineanrufe.",
+    title: "Webdesign für Arztpraxen | Praxis-Website mit Terminbuchung | Cogniiq",
+    description: "Webdesign für Arztpraxen: Praxis-Website mit Online-Terminbuchung, Local SEO und digitalem Patientenformular. Mehr Neupatienten, weniger Routineanrufe.",
     canonical: `${BUSINESS_INFO.website}/webdesign-arzt`,
     keywords: "Webdesign Arztpraxis, Praxis Website, Arzt Homepage, Website Arztpraxis DSGVO, Webdesign Praxis",
   },
   h1: "Webdesign für Arztpraxen & Medizinische Einrichtungen",
-  tagline: "Arztpraxis · DSGVO-konform · Online-Terminbuchung",
+  tagline: "Arztpraxis · Local SEO · Online-Terminbuchung",
   intro: "Bevor ein neuer Patient anruft, hat er Ihre Website bereits beurteilt. In Sekundenbruchteilen entscheidet er, ob Ihre Praxis professionell wirkt, ob er seinen Kassentyp findet und ob er online buchen kann. Eine schwache Website schickt ihn zurück zur Google-Suche – und zur nächsten Praxis, die diese drei Punkte besser löst.",
   serviceSlug: "leistungen",
   serviceLabel: "Webdesign Leistungen",
@@ -35,7 +35,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       title: "DSGVO-Anforderungen nicht vollständig erfüllt",
-      description: "Praxis-Websites benötigen mehr als ein Impressum: DSGVO-konformes Cookie-Consent, sichere Formularübertragung und bei Terminbuchungstools einen AVV. Fehlende Komponenten sind rechtliche Risiken.",
+      description: "Praxis-Websites benötigen mehr als ein Impressum: Cookie-Einwilligung, sichere Formularübertragung und bei Terminbuchungstools einen AVV. Fehlende Komponenten sind rechtliche Risiken.",
     },
     {
       title: "Gemeinschaftspraxen und MVZ nicht korrekt abgebildet",
@@ -44,12 +44,12 @@ const config: NationalIndustryPageConfig = {
   ],
   solution: {
     headline: "Eine Praxis-Website, die gefunden wird, überzeugt und entlastet.",
-    text: "Cogniiq entwickelt DSGVO-konforme Praxis-Websites mit Online-Terminbuchung, strukturierten Daten für Google und klarer Patientenführung. Das Ergebnis: mehr Neupatienten über die organische Suche und weniger Routineanrufe im Praxisalltag.",
+    text: "Cogniiq entwickelt Praxis-Websites mit Online-Terminbuchung, strukturierten Daten für Google und klarer Patientenführung. Das Ergebnis: mehr Neupatienten über die organische Suche und weniger Routineanrufe im Praxisalltag.",
   },
   benefits: [
     "Local SEO: gefunden bei 'Arzt [Stadt]', 'Praxis [Fachgebiet] [Stadt]'",
     "Online-Terminbuchung – auch abends und am Wochenende",
-    "DSGVO-konform: Datenschutz, Cookie-Consent und AVV inklusive",
+    "Datenschutzerklärung, Cookie-Einwilligung und AVV inklusive",
     "Arztprofile und Leistungsdarstellung, die Vertrauen aufbauen",
     "Digitale Patientenformulare zur Entlastung der Anmeldung",
     "Strukturierte Daten für bessere Google-Darstellung (Rich Snippets)",
@@ -61,7 +61,7 @@ const config: NationalIndustryPageConfig = {
       {
         step: "01",
         title: "Analyse & Datenschutz-Check",
-        description: "Analyse der rechtlichen Anforderungen, der Patientenstruktur und der lokalen Suchlage. Konzept für eine DSGVO-konforme Website mit optimalem Informationsaufbau für Ihre Praxisart.",
+        description: "Analyse der rechtlichen Anforderungen, der Patientenstruktur und der lokalen Suchlage. Konzept für eine Website mit optimalem Informationsaufbau für Ihre Praxisart.",
       },
       {
         step: "02",
@@ -92,7 +92,7 @@ const config: NationalIndustryPageConfig = {
   faq: [
     {
       question: "Welche DSGVO-Anforderungen gelten speziell für Praxis-Websites?",
-      answer: "Praxis-Websites benötigen eine vollständige Datenschutzerklärung, DSGVO-konformes Cookie-Consent, gesicherte SSL-Formularübertragung und bei Terminbuchungstools einen Auftragsverarbeitungsvertrag (AVV). Wer Patientenfotos oder Gesundheitsbezüge einbindet, braucht zusätzliche Einwilligungsdokumentation. Cogniiq liefert alle diese Komponenten vollständig und rechtssicher.",
+      answer: "Praxis-Websites benötigen eine vollständige Datenschutzerklärung, eine Cookie-Einwilligung, gesicherte SSL-Formularübertragung und bei Terminbuchungstools einen Auftragsverarbeitungsvertrag (AVV). Wer Patientenfotos oder Gesundheitsbezüge einbindet, braucht zusätzliche Einwilligungsdokumentation. Diese Komponenten liefert Cogniiq vollständig; die rechtliche Bewertung des Ergebnisses bleibt bei Ihrem Datenschutzbeauftragten.",
     },
     {
       question: "Welche Online-Terminbuchungssysteme integriert Cogniiq?",

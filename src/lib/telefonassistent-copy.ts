@@ -77,6 +77,14 @@ export const FAKTEN = {
   art50:
     "Der Assistent gibt sich zu Beginn jedes Anrufs als KI-System zu erkennen (Art. 50 KI-Verordnung). Ihre Patientinnen und Patienten wissen von der ersten Sekunde an, mit wem sie sprechen — abschalten lässt sich das nicht.",
 
+  /** Anschluss. „Ihre Rufnummer bleibt" war eine Zusage ohne Grundlage; die
+   *  Rufumleitung auf die vereinbarte Nummer ist der belegbare Kern davon.
+   *  Inhaber-Entscheidung 18.08.2026: keine unbelegte Zusage auf der Seite,
+   *  auch nicht mit [[CLAIM]]-Marker — der Marker schuetzt intern, der Besucher
+   *  liest die Zusage trotzdem. */
+  rufumleitung:
+    "Ihre Anrufe werden auf die vereinbarte Nummer umgeleitet. Was dafür an Ihrem Anschluss nötig ist, sehen wir uns vor dem Angebot an und schreiben das Ergebnis hinein.",
+
   keineAnbindung:
     "Eine fertige Standardanbindung an Praxisverwaltungssysteme gibt es heute nicht. Das Ergebnis eines Anrufs steht strukturiert im Cogniiq-Dashboard; den Übertrag ins Praxissystem macht Ihr Team, solange für Ihre Software keine Schnittstelle möglich ist.",
 };
@@ -101,8 +109,6 @@ export const SAEULEN: Array<{ title: string; description: string }> = [
   {
     title: "Ein Kontingent, ein Preis, eine Obergrenze",
     description:
-      // [[CLAIM: verify — Rufumleitung auf die bestehende Rufnummer, Kompatibilität
-      // der Telefonanlage (OWNER-INPUT B4 weiterhin unbeantwortet)]]
       `Jeder Tarif enthält ein festes Minutenkontingent. ${FAKTEN.deckelung} Eine Grippewelle kann Ihre Rechnung also bewegen, aber nicht sprengen. ${FAKTEN.preisgarantie} ${FAKTEN.nichtProBehandler}`,
   },
 ];

@@ -53,7 +53,7 @@ const config: NationalIndustryPageConfig = {
     "Saisonale Seiten für Events, Messen und Festspiele",
     "Strukturiertes Gruppenanfrage-Formular mit automatischer Bestätigung",
     "Google Business Profil optimiert und mit Website synchronisiert",
-    "DSGVO-konforme Gästedatenverarbeitung inklusive",
+    "Gästedatenverarbeitung mit Auftragsverarbeitungsvertrag",
   ],
   workflow: {
     title: "Hotel-Website mit Direktbuchung – in drei Phasen",

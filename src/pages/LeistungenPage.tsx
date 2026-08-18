@@ -200,7 +200,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Sind die Systeme DSGVO-konform?",
-    a: "Ja, und das ist kein Marketingversprechen. Alle Daten werden ausschließlich auf europäischen Servern verarbeitet. Wir liefern mit jedem System die notwendige Dokumentation: Datenschutzerklärung, AVV und Cookie-Consent. Für Praxen und Betriebe mit sensiblen Patientendaten gibt es spezielle Konfigurationen.",
+    a: "Diesen Satz stellen wir uns nicht selbst aus — konform ist eine Verarbeitung, kein Produkt. Was wir sagen können: Alle Daten werden auf europäischen Servern verarbeitet, und zu jedem System liefern wir Datenschutzerklärung, Auftragsverarbeitungsvertrag und Cookie-Einwilligung. Für Betriebe mit sensiblen Daten stimmen wir die Konfiguration gesondert ab. Die Bewertung des konkreten Einsatzes bleibt bei Ihrem Datenschutzbeauftragten.",
   },
   {
     q: "Kann das in unsere bestehenden Tools integriert werden?",
@@ -462,7 +462,7 @@ export function LeistungenPage() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.32 }}
             >
-              {["DSGVO-konform", "Europa-Hosting", "Setup 7–14 Tage", "Remote möglich"].map((chip) => (
+              {["Europa-Hosting", "Setup 7–14 Tage", "Remote möglich"].map((chip) => (
                 <span
                   key={chip}
                   className="inline-block px-3 py-1 text-[11px] font-medium text-gray-500 dark:text-gray-500 border border-gray-200 dark:border-gray-800 tracking-wide"

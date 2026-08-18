@@ -449,7 +449,6 @@ export function DesktopHero() {
 
             <div className="flex items-center gap-4 pt-0.5">
               {[
-                { icon: ShieldCheck, text: 'DSGVO-konform' },
                 { icon: Clock, text: 'Go-Live typischerweise in 7–14 Tagen' },
                 { icon: CheckCircle, text: 'Europäische Server' },
               ].map(({ icon: Icon, text }) => (

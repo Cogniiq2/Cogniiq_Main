@@ -59,9 +59,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       `Festes Minutenkontingent, darüber ${FAKTEN.mehrpreisProMinute}/Min. – gedeckelt auf die ausgewiesene Obergrenze Ihres Tarifs; Einmalposten stehen vor Vertragsschluss im Angebot`,
       "Ihre Stimmauswahl, Ihr Begrüßungssatz, Ihre Formulierungen – Anrufer erfahren im ersten Satz, dass ein KI-System spricht",
       "Jedes Gespräch endet als strukturierter Eintrag bei Ihrem Team – kein Abhören, kein Abtippen",
-      // B4 (Rufumleitung, Kompatibilität der Telefonanlage) ist unbeantwortet;
-      // bis dahin keine Zusage, dass Rufnummer und Anlage bleiben.
-      "Ihre Anrufe werden auf den Assistenten umgeleitet – was dafür an Ihrer Telefonanlage nötig ist, klären wir vor dem Angebot",
+      "Ihre Anrufe werden auf die vereinbarte Nummer umgeleitet – was dafür an Ihrem Anschluss nötig ist, sehen wir uns vor dem Angebot an",
       "Hauptsitz in Bayreuth: fester Ansprechpartner, direkte Erreichbarkeit, Termine vor Ort möglich",
       "Keine Gesprächsaufzeichnung, kein Training mit Ihren Daten – Auftragsverarbeitungsvertrag nach Art. 28 DSGVO inklusive",
     ],
@@ -197,7 +195,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       "Schrittweise Umsetzung: erst ein Prozess, dann mehr – kein Alles-oder-Nichts-Ansatz",
       "Persönliche Einweisung Ihres Teams – kein Selbststudium mit Video-Tutorials",
       "Weiterentwicklung und Support aus Bayreuth – direkter Draht, kurze Reaktionszeiten",
-      "DSGVO-konform: alle Daten bleiben in Europa, keine unsicheren Drittland-Übertragungen",
+      "Alle Daten bleiben in Europa, keine unsicheren Drittland-Übertragungen",
     ],
     useCases: [
       {
@@ -223,10 +221,10 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { number: "04", title: "Go-Live & Optimierung", description: "Deployment, Einweisung Ihres Teams und vollständige Dokumentation. Sie verstehen, was läuft – und können einfache Anpassungen selbst vornehmen. Bei Fragen sind wir direkt erreichbar." },
     ],
     faq: [
-      { question: "Welche Tools nutzt Cogniiq für Automatisierungen in Bayreuth?", answer: "Wir setzen auf professionelle, DSGVO-konforme Automatisierungsplattformen und direkte API-Integrationen. Wir empfehlen immer die Lösung, die langfristig am sinnvollsten für Ihren Betrieb ist – nicht die teuerste." },
+      { question: "Welche Tools nutzt Cogniiq für Automatisierungen in Bayreuth?", answer: "Wir setzen auf professionelle, etablierte Automatisierungsplattformen und direkte API-Integrationen. Wir empfehlen immer die Lösung, die langfristig am sinnvollsten für Ihren Betrieb ist – nicht die teuerste." },
       { question: "Brauche ich technisches Vorwissen für Prozessautomatisierung?", answer: "Nein. Wir übernehmen den vollständigen Aufbau und erklären Ihnen das Ergebnis in verständlichen Worten. Nach der Übergabe können Sie einfache Änderungen selbst vornehmen." },
       { question: "Was kostet Prozessautomatisierung in Bayreuth?", answer: "Das hängt von der Komplexität ab. Einfache Workflows starten ab ca. 500–1.500 €, komplexere Projekte nach Aufwand. Das Erstgespräch und eine erste Einschätzung sind kostenlos und unverbindlich." },
-      { question: "Wie sicher sind die automatisierten Workflows?", answer: "Wir bauen ausschließlich auf etablierte, sicherheitszertifizierte Plattformen. Sensible Daten verlassen Europa nicht ohne Ihre ausdrückliche Zustimmung. Alle Workflows sind DSGVO-konform." },
+      { question: "Wie sicher sind die automatisierten Workflows?", answer: "Wir bauen ausschließlich auf etablierte, sicherheitszertifizierte Plattformen. Sensible Daten verlassen Europa nicht ohne Ihre ausdrückliche Zustimmung." },
       { question: "Können bestehende Systeme in Automatisierungen integriert werden?", answer: "Ja. Wir verbinden nahezu jede Software mit einer API – CRM, Buchungssystem, Buchhaltungssoftware oder branchenspezifische Anwendungen für Bayreuth-Unternehmen." },
       { question: "Was passiert wenn eine Automatisierung fehlschlägt?", answer: "Fehlerbenachrichtigungen sind standardmäßig eingebaut. Bei kritischen Prozessen gibt es immer einen manuellen Fallback – niemand verliert Daten, weil ein Workflow einen Fehler hatte." },
       { question: "Könnt ihr auch bestehende Workflows übernehmen?", answer: "Ja. Wir analysieren was vorhanden ist, beheben Fehler oder bauen es strukturierter neu auf. Oft lässt sich Bestehendes mit wenig Aufwand deutlich stabiler machen." },
@@ -256,7 +254,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         name: "Arztpraxen & Gesundheit",
         problem: "Praxen in Bayreuth verwalten Patientendaten, Terminkalender und Abrechnungssysteme in getrennten Anwendungen, die nicht automatisch synchronisieren.",
-        solution: "Wir automatisieren Erinnerungsbenachrichtigungen, Terminbestätigungen und Datenübertragungen zwischen Systemen – DSGVO-konform und ohne manuellen Aufwand.",
+        solution: "Wir automatisieren Erinnerungsbenachrichtigungen, Terminbestätigungen und Datenübertragungen zwischen Systemen – ohne manuellen Aufwand.",
       },
       {
         name: "Lokale Dienstleister",
@@ -335,7 +333,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         industry: "Arztpraxen & Gesundheit",
         title: "Praxis-Website mit Online-Terminbuchung",
-        description: "Vertrauenswürdiges Design, DSGVO-konformes Kontaktformular und optionale Buchungssystem-Integration. Patienten in Bayreuth finden und buchen Sie einfach online.",
+        description: "Vertrauenswürdiges Design, Kontaktformular mit Datenschutzhinweis und optionale Buchungssystem-Integration. Patienten in Bayreuth finden und buchen Sie einfach online.",
       },
       {
         industry: "Gastronomie & Hotellerie",
@@ -373,7 +371,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         name: "Arztpraxen & Zahnarztpraxen",
         problem: "Praxen in Bayreuth verlieren täglich potenzielle Patienten, weil ihre Website nicht gefunden wird oder nicht vertrauenswürdig wirkt. Online-Terminbuchung ist oft gar nicht vorhanden.",
-        solution: "Wir entwickeln vertrauenswürdige Praxis-Websites mit DSGVO-konformem Buchungssystem, optimiert für lokale Suchanfragen in Bayreuth.",
+        solution: "Wir entwickeln vertrauenswürdige Praxis-Websites mit Buchungssystem, optimiert für lokale Suchanfragen in Bayreuth.",
       },
       {
         name: "Gastronomie & Festspielstadt",
@@ -485,9 +483,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { question: "Kann der Assistent auch auf Englisch sprechen?", answer: "Für Betriebe mit internationalem Publikum – Tourismus, Universität, Technologie – sind mehrsprachige Konfigurationen möglich, üblicherweise Deutsch und Englisch. Den konkreten Umfang klären wir im Erstgespräch." },
       // Siehe Bayreuth: keine Zusage bestehender Anbindungen.
       { question: "Wie funktioniert die Anbindung an meinen bestehenden Kalender?", answer: "Welche Schnittstelle Ihr Kalender bietet, sehen wir uns vor dem Angebot an; das Ergebnis steht darin, auch wenn es negativ ausfällt. Wo keine Anbindung möglich ist, bleibt es beim strukturierten Eintrag im Dashboard, den Ihr Team überträgt." },
-      // B4 unbeantwortet: keine Zusage zur bestehenden Rufnummer, solange die
-      // Anschlussart nicht bestätigt ist.
-      { question: "Was ändert sich an meinem Telefonanschluss?", answer: "Ihre Anrufe werden auf den Assistenten umgeleitet. Was das für Ihre Anschlussart und Ihre Telefonanlage konkret bedeutet, prüfen wir vor dem Angebot und schreiben es hinein – nicht danach." },
+      { question: "Was ändert sich an meinem Telefonanschluss?", answer: FAKTEN.rufumleitung },
     ],
     localChallenges: [
       "Wirtschaftswachstum und Tourismus bringen deutlich mehr Anrufaufkommen – aber keinen entsprechenden Zuwachs an Personal am Telefon",
@@ -559,7 +555,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     route: "/regensburg/automatisierung",
     seo: {
       title: "Automatisierung Regensburg – Prozessautomatisierung & Workflows | Cogniiq",
-      description: "Prozessautomatisierung für Unternehmen in Regensburg: Workflows & CRM-Integration, Leadverarbeitung. Wartbar, DSGVO-konform, persönliche Betreuung.",
+      description: "Prozessautomatisierung für Unternehmen in Regensburg: Workflows & CRM-Integration, Leadverarbeitung. Wartbar, dokumentiert, persönliche Betreuung.",
       canonical: `${base}/regensburg/automatisierung`,
     },
     intro: {
@@ -579,7 +575,6 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       "Unabhängige Technologieberatung – wir empfehlen das Tool, das zu Ihrer Infrastruktur passt",
       "Wartbare Lösungen mit vollständiger Dokumentation – keine proprietären Systeme",
       "Skalierbar: was heute 10 Prozesse automatisiert, deckt morgen 50 ab",
-      "DSGVO-konform – alle Automatisierungen entsprechen europäischen Datenschutzstandards",
       "Schnelle Reaktionszeiten bei Anpassungen – auch nach dem Go-Live",
       "Schrittweise Einführung: kein Risiko, kein Alles-oder-Nichts",
     ],
@@ -758,7 +753,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         name: "Arztpraxen & Gesundheit",
         problem: "Praxen in Regensburg haben Websites, die nicht für lokale Suchanfragen optimiert sind und keine Online-Terminbuchung anbieten – Patienten gehen zur Konkurrenz.",
-        solution: "Vertrauenswürdige Praxis-Websites mit Terminbuchung, DSGVO-konformem Kontaktformular und lokalem SEO für Suchanfragen in Regensburg.",
+        solution: "Vertrauenswürdige Praxis-Websites mit Terminbuchung, Kontaktformular mit Datenschutzhinweis und lokalem SEO für Suchanfragen in Regensburg.",
       },
       {
         name: "Mittelstand & B2B",
@@ -926,7 +921,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     locationNote: "Cogniiq betreut Automatisierungsprojekte für Unternehmen in München vollständig remote – transparent, effizient, ohne Qualitätseinbußen.",
     seo: {
       title: "Automatisierung München – Prozessautomatisierung & Workflows | Cogniiq",
-      description: "Prozessautomatisierung für Unternehmen in München: Workflows & ERP-Integration, Leadverarbeitung. Remote betreut, skalierbar, DSGVO-konform. Transparente Festpreise.",
+      description: "Prozessautomatisierung für Unternehmen in München: Workflows & ERP-Integration, Leadverarbeitung. Remote betreut, skalierbar, dokumentiert. Transparente Festpreise.",
       canonical: `${base}/muenchen/automatisierung`,
     },
     intro: {
@@ -946,7 +941,6 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       "Vollständig remote betreut – direkte Zusammenarbeit, transparente Festpreise",
       "Technologieoffene Beratung: professionelle Plattformen und direkte APIs – je nach Bedarf",
       "Saubere Dokumentation, die Ihr Team versteht und nutzen kann",
-      "DSGVO-konforme Verarbeitung auf europäischen Servern – kein Datenschutz-Risiko",
       "Erfahrung mit Skalierung: von 5 bis 500 automatisierten Prozessen",
       "Schnelle Reaktionszeiten bei Anpassungen – auch für wachsende Münchner Unternehmen",
     ],
@@ -1005,7 +999,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         name: "Finanzdienstleistung & Beratung",
         problem: "Beratungsunternehmen in München verlieren Zeit mit manuellem Kunden-Onboarding, Dokumentenmanagement und CRM-Pflege.",
-        solution: "Vom Erstanfrage-Eingang bis zum abgeschlossenen Onboarding laufen alle Schritte automatisch – DSGVO-konform, vollständig dokumentiert.",
+        solution: "Vom Erstanfrage-Eingang bis zum abgeschlossenen Onboarding laufen alle Schritte automatisch – vollständig dokumentiert.",
       },
       {
         name: "Medizintechnik & Life Sciences",
@@ -1058,7 +1052,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       paragraphs: [
         "München ist ein digitaler Wettbewerbsmarkt, in dem Websites sowohl visuell als auch technisch auf höchstem Niveau sein müssen. Startups positionieren sich für internationale Investoren. Mittelständler brauchen Websites, die qualifizierte B2B-Anfragen generieren. Premium-Dienstleister müssen online dasselbe Niveau darstellen, das ihre Marke offline lebt. Und alle konkurrieren in einem Markt, in dem Google täglich entscheidet, wer gesehen wird – und wer nicht.",
         "Cogniiq bietet Münchner Unternehmen Entwicklung auf Enterprise-Niveau und direkte Zusammenarbeit mit dem Entwickler Ihrer Website – vollständig remote betreut, mit transparenten Festpreisen. Individuelle Konzeption, technische Präzision, SEO von Anfang an integriert, mehrsprachige Entwicklung auf Wunsch.",
-        "Was technisch Standard für uns ist: Ladezeiten unter 1,5 Sekunden, Core Web Vitals im grünen Bereich, Mobile-First-Design (der überwiegende Teil der Münchner Suchanfragen kommt vom Smartphone), strukturierte Daten für Google und DSGVO-konforme Implementierung aller Tools. Diese technischen Grundlagen sind keine Optional-Features – sie sind die Basis, auf der jede Website für den Münchner Markt gebaut sein muss.",
+        "Was technisch Standard für uns ist: Ladezeiten unter 1,5 Sekunden, Core Web Vitals im grünen Bereich, Mobile-First-Design (der überwiegende Teil der Münchner Suchanfragen kommt vom Smartphone), strukturierte Daten für Google und eine dokumentierte Einbindung aller Tools. Diese technischen Grundlagen sind keine Optional-Features – sie sind die Basis, auf der jede Website für den Münchner Markt gebaut sein muss.",
         "Für internationale Unternehmen und Münchner Firmen mit globalen Kunden: Mehrsprachige Website-Entwicklung auf Deutsch und Englisch ist Standard, weitere Sprachen auf Anfrage. Wir kennen die Anforderungen an internationale SEO-Strukturen und setzen sie technisch korrekt um.",
         "Als Ergänzung zum Webdesign bieten wir in München auch den [KI Telefonassistenten für München](/muenchen/ki-telefonassistent) und [Prozessautomatisierung für München](/muenchen/automatisierung) an. Alle drei Bereiche aus einer Hand – für eine konsistente, leistungsstarke digitale Infrastruktur ohne Schnittstellenprobleme zwischen verschiedenen Agenturen.",
       ],

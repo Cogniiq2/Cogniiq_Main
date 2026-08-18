@@ -32,7 +32,7 @@ const SERVICES = [
     title: "KI-Telefonassistent Deutschland",
     slug: "ki-telefonassistent",
     description:
-      "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, mehrsprachig, DSGVO-konform. Für Praxen, Gastronomie, Dienstleister und Handwerk in ganz Deutschland.",
+      "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, mehrsprachig. Für Praxen, Gastronomie, Dienstleister und Handwerk in ganz Deutschland.",
     benefits: [
       "Einrichtung in 7–14 Tagen",
       "Erreichbar auch dann, wenn niemand abnehmen kann",
@@ -48,7 +48,7 @@ const SERVICES = [
     benefits: [
       "Skalierbar ohne Mehrpersonal",
       "Vollständig dokumentiert, wartbar",
-      "DSGVO-konform auf europäischen Servern",
+      "Europäische Server",
     ],
   },
 ];
@@ -86,9 +86,9 @@ const CHALLENGES = [
   },
   {
     icon: Shield,
-    title: "DSGVO-konforme KI-Nutzung",
+    title: "Datenschutz beim KI-Einsatz",
     description:
-      "Viele deutsche Unternehmen scheuen KI-Einsatz aus Datenschutzgründen. Cogniiq arbeitet ausschließlich mit DSGVO-konformen Lösungen auf europäischen Servern, inklusive Auftragsverarbeitungsverträgen und dokumentierten Datenflüssen.",
+      "Viele deutsche Unternehmen scheuen KI-Einsatz aus Datenschutzgründen. Cogniiq arbeitet mit Lösungen auf europäischen Servern, inklusive Auftragsverarbeitungsverträgen und dokumentierten Datenflüssen.",
   },
 ];
 
@@ -166,7 +166,7 @@ const USE_CASE_SCENARIOS = [
   {
     title: "Arztpraxis in Deutschland",
     description:
-      "Eine Allgemeinmedizin-Praxis mit mehreren Behandlungszimmern erhält montags Anrufspitzen, die das Team überlasten. Der KI-Telefonassistent übernimmt Standardtermine, beantwortet Fragen zu Öffnungszeiten und qualifiziert Anfragen – ohne Personalaufwand und DSGVO-konform.",
+      "Eine Allgemeinmedizin-Praxis mit mehreren Behandlungszimmern erhält montags Anrufspitzen, die das Team überlasten. Der KI-Telefonassistent übernimmt Standardtermine, beantwortet Fragen zu Öffnungszeiten und qualifiziert Anfragen – ohne Personalaufwand.",
   },
   {
     title: "Restaurant deutschlandweit",
@@ -200,7 +200,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Sind die Lösungen DSGVO-konform für den deutschen Markt?",
-    a: "Ja. Alle Systeme verarbeiten Daten ausschließlich auf europäischen Servern, entsprechen der DSGVO vollständig und werden mit den notwendigen Auftragsverarbeitungsverträgen (AVV) geliefert.",
+    a: "Diesen Satz stellen wir uns nicht selbst aus — konform ist eine Verarbeitung, kein Produkt. Alle Systeme verarbeiten Daten auf europäischen Servern und werden mit den notwendigen Auftragsverarbeitungsverträgen (AVV) geliefert. Ob der konkrete Einsatz bei Ihnen genügt, beurteilt Ihr Datenschutzbeauftragter.",
   },
   {
     q: "Was unterscheidet Cogniiq von großen deutschen Agenturen?",
@@ -257,7 +257,7 @@ export function DeutschlandPage() {
     <>
       <PageSEO
         title="KI Agentur Deutschland – Webdesign, KI Telefonassistent & Automatisierung | Cogniiq"
-        description="Cogniiq – KI Agentur für Deutschland. Webdesign, KI Telefonassistent und Prozessautomatisierung für Unternehmen in ganz Deutschland. DSGVO-konform, remote betreut, faire Preise."
+        description="Cogniiq – KI Agentur für Deutschland. Webdesign, KI Telefonassistent und Prozessautomatisierung für Unternehmen in ganz Deutschland. Remote betreut, faire Preise, feste Ansprechpartner."
         canonical={`${BUSINESS_INFO.website}/deutschland`}
         breadcrumbs={breadcrumbs}
         additionalSchema={deutschlandSchema}
@@ -282,7 +282,7 @@ export function DeutschlandPage() {
             <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.1}>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium tracking-wide uppercase mb-6">
                 <MapPin size={12} />
-                Deutschland · DSGVO-konform · Remote & Vor Ort · Persönliche Betreuung
+                Deutschland · Remote & Vor Ort · Persönliche Betreuung
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 tracking-tight leading-tight mb-6">
@@ -316,7 +316,7 @@ export function DeutschlandPage() {
         <div className="border-y border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
-              {["Deutschland", "Bayern", "Bayreuth", "München", "Regensburg", "KI-Agentur", "DSGVO-konform", "Remote"].map((item, i) => (
+              {["Deutschland", "Bayern", "Bayreuth", "München", "Regensburg", "KI-Agentur", "Remote"].map((item, i) => (
                 <span key={i} className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   {i > 0 && <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" aria-hidden="true" />}
                   {item}
@@ -344,7 +344,7 @@ export function DeutschlandPage() {
                   Deutschland hat einen der dichtesten Mittelstandsmärkte der Welt – und gleichzeitig einen der größten Nachholbedarfe bei der Digitalisierung. Viele Unternehmen haben in den letzten Jahren Tools angesammelt, die nicht miteinander kommunizieren, Prozesse, die noch manuell laufen, und eine digitale Präsenz, die nicht dem Standard entspricht, den Kunden heute erwarten.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Cogniiq ist eine spezialisierte KI-Agentur, die genau dort ansetzt: Wir automatisieren Abläufe, die täglich Zeit kosten. Wir setzen KI-Telefonassistenten ein, die Unternehmen auch außerhalb der Öffnungszeiten erreichbar machen. Und wir entwickeln Websites, die in deutschen Suchmaschinen sichtbar sind und Besucher in qualifizierte Anfragen verwandeln. Alles DSGVO-konform, alles auf europäischen Servern, alles mit persönlicher Betreuung.
+                  Cogniiq ist eine spezialisierte KI-Agentur, die genau dort ansetzt: Wir automatisieren Abläufe, die täglich Zeit kosten. Wir setzen KI-Telefonassistenten ein, die Unternehmen auch außerhalb der Öffnungszeiten erreichbar machen. Und wir entwickeln Websites, die in deutschen Suchmaschinen sichtbar sind und Besucher in qualifizierte Anfragen verwandeln. Alles auf europäischen Servern, alles mit persönlicher Betreuung.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                   Mit Hauptsitz in Bayern betreuen wir Projekte in ganz Deutschland – vollständig remote, transparent und ohne Qualitätseinbußen gegenüber lokalen Agenturen. Unser Schwerpunkt liegt auf <Link to="/bayern" className="text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">Bayern</Link>, aber unsere Leistungen kennen keine Grenzen im Bundesgebiet.

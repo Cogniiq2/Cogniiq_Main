@@ -13,7 +13,7 @@ const config: ClusterPageConfig = {
   seo: {
     title: "Website erstellen lassen München – Premium & SEO-dominierend | Cogniiq",
     description:
-      "Website erstellen lassen in München: Cogniiq entwickelt premium Websites für Unternehmen in München – schnell, SEO-ready, DSGVO-konform. Für den kompetitivsten lokalen Markt in Bayern.",
+      "Website erstellen lassen in München: Cogniiq entwickelt premium Websites für Unternehmen in München – schnell und SEO-ready. Für den kompetitivsten lokalen Markt in Bayern.",
     canonical: `${base}/muenchen/website-erstellen`,
     keywords:
       "Website erstellen München, Homepage erstellen München, Website erstellen lassen München, neue Website München",
@@ -21,7 +21,7 @@ const config: ClusterPageConfig = {
   hero: {
     h1: "Website erstellen lassen in München",
     lead: "München ist Deutschlands wettbewerbsintensivster lokaler Digitalmarkt. Wer hier eine neue Website erstellen lässt, braucht mehr als ein schönes Design – er braucht ein technisch überlegenes, SEO-dominierendes System.",
-    trustTags: ["München", "Premium-Standard", "SEO-Dominanz", "DSGVO-konform"],
+    trustTags: ["München", "Premium-Standard", "SEO-Dominanz", "Persönliche Betreuung"],
     ctaLabel: "Kostenloses Erstgespräch",
   },
   tldr: {
@@ -38,7 +38,7 @@ const config: ClusterPageConfig = {
     paragraphs: [
       "In München reicht 'gut genug' nicht. Die Zielgruppe – ob Privatkunden, B2B-Entscheider oder Touristen – vergleicht digital versiert und entscheidet schnell. Eine neue Website muss beim ersten Eindruck überzeugen, innerhalb von zwei Sekunden laden und für relevante Münchner Suchanfragen gefunden werden.",
       "Cogniiq entwickelt Websites für München mit einer klaren Strategie: Wettbewerbsanalyse zuerst, dann Design und Entwicklung, dann vollständiges Local SEO-Setup. Das Ergebnis ist kein generisches Produkt, sondern ein System, das auf die spezifischen Wettbewerbssituationen in Ihrer Branche in München ausgerichtet ist.",
-      "Jede Website wird mit modernen Web-Technologien entwickelt: sauberer Code, Core Web Vitals grün, Mobile-First, strukturierte Daten, DSGVO-konform ab Auslieferung. Kein Template, kein Baukasten.",
+      "Jede Website wird mit modernen Web-Technologien entwickelt: sauberer Code, Core Web Vitals grün, Mobile-First, strukturierte Daten, Datenschutzdokumentation ab Auslieferung. Kein Template, kein Baukasten.",
     ],
   },
   painPoints: [

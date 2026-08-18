@@ -53,7 +53,7 @@ const config: NationalIndustryPageConfig = {
     "Digitale Speisekarte mit einfacher Eigenaktualisierung",
     "Google Business Profil eingerichtet und optimiert",
     "Bewertungen und Atmosphäre-Fotos professionell eingebunden",
-    "DSGVO-konforme Website mit vollständiger Datenschutzdokumentation",
+    "Website mit vollständiger Datenschutzdokumentation",
   ],
   workflow: {
     title: "So entsteht Ihre Restaurant-Website",
@@ -107,8 +107,8 @@ const config: NationalIndustryPageConfig = {
       answer: "Sehr wichtig – und oft unterschätzt. Die meisten Restaurant-Besuche beginnen mit einer lokalen Google-Suche. Mit Local SEO und Google Business Optimierung erscheinen Sie bei diesen Suchen prominent, statt hinter Aggregatoren und Konkurrenten zu verschwinden.",
     },
     {
-      question: "Ist die Website DSGVO-konform?",
-      answer: "Ja. Alle Cogniiq-Websites werden mit vollständiger DSGVO-Dokumentation geliefert: Datenschutzerklärung, Impressum, Cookie-Consent und DSGVO-konforme Formularverarbeitung. Auch Reservierungstools werden datenschutzkonform eingebunden.",
+      question: "Welche Datenschutz-Unterlagen gehören zur Website?",
+      answer: "Zum Lieferumfang gehören Datenschutzerklärung, Impressum, Cookie-Einwilligung und die dokumentierte Formularverarbeitung. Reservierungstools binden wir mit Auftragsverarbeitungsvertrag ein.",
     },
   ],
 };

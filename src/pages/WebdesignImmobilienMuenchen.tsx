@@ -14,13 +14,13 @@ const config: IndustryPageConfig = {
   seo: {
     title: "Webdesign & KI-Telefonassistent für Immobilienmakler in München | Cogniiq",
     description:
-      "Immobilien Website München: Cogniiq entwickelt Websites, KI-Telefonassistenten und Lead-Automatisierungen für Immobilienmakler in München. Mehr Anfragen, automatisierte Besichtigungen, DSGVO-konform.",
+      "Immobilien Website München: Cogniiq entwickelt Websites, KI-Telefonassistenten und Lead-Automatisierungen für Immobilienmakler in München. Mehr Anfragen, automatisierte Besichtigungen, persönlich betreut.",
     canonical: `${base}/webdesign-immobilien-muenchen`,
     keywords:
       "Immobilien Website München, Makler Website München, Immobilienmakler München Digital, KI Telefonassistent Immobilien München",
   },
   hero: {
-    trustTags: ["München", "DSGVO-konform", "KI-Integration", "Lead-Qualifizierung", "Automatisierung"],
+    trustTags: ["München", "KI-Integration", "Lead-Qualifizierung", "Automatisierung"],
     ctaLabel: "Projekt für Immobilienmakler starten",
   },
   intro: {
@@ -72,7 +72,7 @@ const config: IndustryPageConfig = {
         "Strukturierte Objektseiten mit Exposé-Darstellung",
         "Kontaktformular mit automatischer Lead-Benachrichtigung",
         "On-Page SEO für 'Immobilienmakler München'",
-        "DSGVO-konforme Datenschutzdokumentation",
+        "Datenschutzerklärung, Impressum und Cookie-Einwilligung",
       ],
     },
     {
@@ -171,7 +171,7 @@ const config: IndustryPageConfig = {
   localContext: [
     "München ist mit Abstand der teuerste Immobilienmarkt Deutschlands. Kaufinteressenten und Mieter sind im Schnitt besser informiert und haben höhere Ansprüche an den gesamten Prozess – von der Website-Recherche bis zur Besichtigungsorganisation.",
     "Cogniiq entwickelt für Immobilienmakler in München maßgeschneiderte Digitallösungen: eine hochwertige Makler-Website mit strukturierten Objektseiten, einen KI-Telefonassistenten für Interessentenanfragen sowie Automatisierungssysteme für Lead-Qualifizierung, Besichtigungsplanung und Follow-up-Prozesse.",
-    "Alle Systeme werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut alle Systeme langfristig remote.",
+    "Alle Systeme werden datenschutzorientiert umgesetzt, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut alle Systeme langfristig remote.",
   ],
   internalLinks: [
     { label: "Webdesign München", href: "/muenchen/webdesign" },
@@ -185,9 +185,9 @@ const config: IndustryPageConfig = {
   ],
   faq: [
     {
-      question: "Kann Cogniiq eine DSGVO-konforme Makler-Website in München erstellen?",
+      question: "Was liefert Cogniiq zum Datenschutz einer Makler-Website in München erstellen?",
       answer:
-        "Ja. Alle Websites und Systeme werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse – mit korrekten Datenschutzdokumentationen, Cookie-Einwilligungen und sicherer Verarbeitung aller Interessentendaten auf europäischen Servern.",
+        "Zum Lieferumfang gehören Datenschutzerklärung, Impressum, Cookie-Einwilligung und die dokumentierte Verarbeitung der Interessentendaten auf europäischen Servern. Ob der konkrete Einsatz den Anforderungen genügt, beurteilt Ihr Datenschutzbeauftragter – wir liefern ihm die Unterlagen dafür zu.",
     },
     {
       question: "Wie werden Interessentenanfragen über die Website automatisch vorqualifiziert?",

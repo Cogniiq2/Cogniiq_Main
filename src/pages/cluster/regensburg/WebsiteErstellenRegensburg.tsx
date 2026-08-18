@@ -13,7 +13,7 @@ const config: ClusterPageConfig = {
   seo: {
     title: "Website erstellen lassen Regensburg – Professionell & SEO-ready | Cogniiq",
     description:
-      "Website erstellen lassen in Regensburg: Cogniiq entwickelt individuelle, schnelle und DSGVO-konforme Websites für Unternehmen in Regensburg und der Oberpfalz. Kein Template – lokales SEO inklusive.",
+      "Website erstellen lassen in Regensburg: Cogniiq entwickelt individuelle, schnelle Websites für Unternehmen in Regensburg und der Oberpfalz. Kein Template – lokales SEO inklusive.",
     canonical: `${base}/regensburg/website-erstellen`,
     keywords:
       "Website erstellen Regensburg, Homepage erstellen Regensburg, Website erstellen lassen Regensburg, neue Website Regensburg",
@@ -21,7 +21,7 @@ const config: ClusterPageConfig = {
   hero: {
     h1: "Website erstellen lassen in Regensburg",
     lead: "Individuelle Websites für Unternehmen in Regensburg und der Oberpfalz. Kein Baukasten, kein Template. Entwickelt für Ihre Zielgruppe – ob Tourismusbetrieb, Dienstleister oder Mittelstand.",
-    trustTags: ["Regensburg", "Kein Template", "SEO-ready", "DSGVO-konform"],
+    trustTags: ["Regensburg", "Kein Template", "SEO-ready", "Persönliche Betreuung"],
     ctaLabel: "Kostenloses Erstgespräch",
   },
   tldr: {

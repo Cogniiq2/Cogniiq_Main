@@ -21,7 +21,7 @@ const config: ClusterPageConfig = {
   hero: {
     h1: "Landingpage erstellen lassen in Bayreuth",
     lead: "Conversion-optimierte Landingpages für Unternehmen in Bayreuth – für Google Ads, organischen Traffic und spezifische Kampagnenziele. Schnell, fokussiert, messbar.",
-    trustTags: ["Bayreuth", "Conversion-Fokus", "A/B-ready", "DSGVO-konform"],
+    trustTags: ["Bayreuth", "Conversion-Fokus", "A/B-ready", "Kein Baukasten"],
     ctaLabel: "Kostenloses Erstgespräch",
   },
   tldr: {
@@ -50,7 +50,7 @@ const config: ClusterPageConfig = {
       "Zentrales Kontaktformular oder CTA-Button",
       "Mobile-First, Ladezeit unter 2s",
       "Google Analytics 4 Event-Tracking",
-      "DSGVO-konformes Setup (Cookie-Consent, Datenschutz-Link)",
+      "Cookie-Einwilligung und Datenschutz-Link eingerichtet",
       "A/B-ready: Struktur für spätere Tests angelegt",
       "Optional: Anbindung an CRM oder E-Mail-Automatisierung",
       "Übergabe mit Bearbeitungszugang",

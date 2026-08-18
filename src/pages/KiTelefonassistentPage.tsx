@@ -69,10 +69,9 @@ const faqItems = [
       "Nicht jeder Anrufer mag synthetische Stimmen — das nehmen wir ernst. Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihr Betrieb am Telefon spricht. Anrufer erfahren im ersten Satz, dass ein KI-System spricht, und können jederzeit zu einem Menschen wechseln. In der Startphase werten wir Gespräche mit Ihnen aus und passen an, was nicht sitzt.",
   },
   {
-    question: "Muss ich dafür mein System oder meine Rufnummer wechseln?",
-    // [[CLAIM: verify — keine Systemumstellung nötig / bestehende Rufnummer bleibt (bereits publizierte Aussage, vom Inhaber bestätigen)]]
+    question: "Was ändert sich an meinem Telefonanschluss?",
     answer:
-      "Nein. Ihre Rufnummer bleibt, Ihre Telefonanlage bleibt, Ihr Kalender bleibt. Der Assistent wird an Ihre bestehende Arbeitsweise angebunden. Welche Anbindung für Ihr System möglich ist, prüfen wir vor dem Angebot — nicht danach.",
+      `${FAKTEN.rufumleitung} Dasselbe gilt für Kalender und Praxissystem: Welche Anbindung möglich ist, steht im Angebot — nicht in einer Zusage danach.`,
   },
   {
     question: "Was übernimmt der Assistent — und was bewusst nicht?",
@@ -413,9 +412,12 @@ function HeroSection() {
 function CredentialStrip() {
   const items = [
     { label: "Festes Minutenkontingent", detail: `Darüber ${FAKTEN.mehrpreisProMinute}/Min., gedeckelt auf die Obergrenze Ihres Tarifs` },
-    { label: "Ihre Rufnummer bleibt", detail: "Kein Systemwechsel nötig" },
+    { label: "Rufumleitung", detail: "Anrufe laufen auf die vereinbarte Nummer" },
     { label: "Strukturierte Übergabe", detail: "Anliegen landen bei Ihrem Team" },
-    { label: "Europäische Server", detail: "AVV nach Art. 28 DSGVO" },
+    // „Europäische Server" ist eine Aussage zum Verarbeitungsort und damit
+    // untersagt, solange die AVV mit den Infrastruktur-Anbietern nicht
+    // unterzeichnet sind (Inhaber-Antwort B, ASSETS-REQUIRED §B2.2).
+    { label: "Keine Gesprächsaufzeichnung", detail: "AVV nach Art. 28 DSGVO" },
     { label: "Erreichbar zu Stoßzeiten", detail: "Und außerhalb der Öffnungszeiten" },
   ];
 

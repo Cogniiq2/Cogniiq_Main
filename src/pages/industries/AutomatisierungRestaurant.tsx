@@ -53,7 +53,6 @@ const config: NationalIndustryPageConfig = {
     "Lieferantenbestellungen strukturiert und automatisch koordiniert",
     "Kassendaten automatisch in Buchhaltungssoftware übertragen",
     "Schichtplanung digital, übersichtlich und nachvollziehbar",
-    "DSGVO-konforme Gästedatenverarbeitung",
   ],
   workflow: {
     title: "Vom Tisch bis zur Bewertung – automatisch",

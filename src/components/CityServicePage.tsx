@@ -160,6 +160,8 @@ export function CityServicePage({ config }: CityServicePageProps) {
 }
 
 function HeroSection({ config, breadcrumbs }: { config: CityServiceConfig; breadcrumbs: Array<{ name: string; url: string }> }) {
+  const isTelefonassistent = config.serviceSlug === "ki-telefonassistent";
+
   return (
     <section className="pt-32 pb-20 bg-white dark:bg-gray-950 transition-colors duration-300">
       <div className="max-w-5xl mx-auto px-6 lg:px-8">
@@ -194,13 +196,12 @@ function HeroSection({ config, breadcrumbs }: { config: CityServiceConfig; bread
         >
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium tracking-wide uppercase mb-6">
             <MapPin size={12} />
-            {/* „DSGVO-konform" ist für den Telefonassistenten ausdrücklich
-                untersagt (HONESTY-AUDIT §7.3, DATENSCHUTZ_SEITE.nichtBehauptet):
-                konform ist eine Verarbeitung, kein Produkt — und die Verträge
-                mit den Unterauftragsverarbeitern sind nicht unterzeichnet. Auf
-                den Webdesign- und Automatisierungsseiten bleibt die Angabe
-                stehen (Inhaber-Entscheidung Option B vom 17.08.2026). */}
-            {config.city} · Bayern · {config.serviceSlug === "ki-telefonassistent" ? "Keine Gesprächsaufzeichnung" : "DSGVO-konform"} · Persönliche Betreuung
+            {/* „DSGVO-konform" stand hier als Selbstzusage. Sie ist auf keiner
+                Seite belegt — konform ist eine Verarbeitung, kein Produkt, und
+                die Verträge mit den Unterauftragsverarbeitern sind nicht
+                unterzeichnet (Inhaber-Entscheidung 18.08.2026, gilt fuer alle
+                Produkte, nicht nur den Telefonassistenten). */}
+            {config.city} · Bayern · {isTelefonassistent ? "Keine Gesprächsaufzeichnung" : "Feste Ansprechpartner"} · Persönliche Betreuung
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 leading-tight tracking-tight mb-6">
@@ -240,8 +241,9 @@ function HeroSection({ config, breadcrumbs }: { config: CityServiceConfig; bread
 }
 
 function TrustStrip({ config }: { config: CityServiceConfig }) {
-  // Zwei Angaben trägt der Telefonassistent nicht:
-  // - „DSGVO-konform" ist für dieses Produkt untersagt, siehe Hero-Kommentar.
+  // Zwei Angaben standen hier und hielten der Prüfung nicht stand:
+  // - „DSGVO-konform" als Selbstzusage — auf keiner Seite belegt, siehe
+  //   Hero-Kommentar. Ersatzlos gestrichen, nicht umformuliert.
   // - „Einrichtung in 7–14 Tagen" widerspricht der Go-live-Garantie aus
   //   FAKTEN.goLive. Die Angabe wurde in den Stadt-Configs bereits an vier
   //   Stellen korrigiert und lebte hier — in der geteilten Komponente —
@@ -251,11 +253,10 @@ function TrustStrip({ config }: { config: CityServiceConfig }) {
     config.city,
     config.service,
     "Bayern",
-    isTelefonassistent ? "Keine Gesprächsaufzeichnung" : "DSGVO-konform",
     "Persönliche Betreuung",
-    isTelefonassistent
-      ? `Go-live in ${FAKTEN.goLiveTage} Tagen`
-      : "Einrichtung in 7–14 Tagen",
+    ...(isTelefonassistent
+      ? ["Keine Gesprächsaufzeichnung", `Go-live in ${FAKTEN.goLiveTage} Tagen`]
+      : ["Einrichtung in 7–14 Tagen"]),
   ];
 
   return (

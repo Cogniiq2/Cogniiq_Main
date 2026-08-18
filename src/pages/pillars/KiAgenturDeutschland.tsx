@@ -17,7 +17,7 @@ const SERVICES = [
   {
     icon: Phone,
     title: "KI-Telefonassistent",
-    description: "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, mehrsprachig, DSGVO-konform. Erreichbar auch dann, wenn niemand abnehmen kann – ohne Warteschleife.",
+    description: "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, mehrsprachig. Erreichbar auch dann, wenn niemand abnehmen kann – ohne Warteschleife.",
     benefits: [
       "Einrichtung in 7–14 Tagen",
       "Integration in bestehende Kalender",
@@ -31,7 +31,7 @@ const SERVICES = [
     benefits: [
       "Quick-Win-Automatisierungen in 1–3 Wochen",
       "Vollständig dokumentiert, wartbar",
-      "DSGVO-konform auf europäischen Servern",
+      "Europäische Server",
     ],
   },
   {
@@ -70,7 +70,7 @@ const CHALLENGES = [
   {
     icon: Shield,
     title: "DSGVO-Unsicherheit bei KI-Einsatz",
-    description: "Viele Unternehmen scheuen KI aus Datenschutzgründen. Cogniiq arbeitet ausschließlich mit DSGVO-konformen Lösungen auf europäischen Servern.",
+    description: "Viele Unternehmen scheuen KI aus Datenschutzgründen. Cogniiq arbeitet mit Lösungen auf europäischen Servern und liefert die Auftragsverarbeitungsverträge dazu.",
   },
   {
     icon: Zap,
@@ -80,7 +80,7 @@ const CHALLENGES = [
 ];
 
 const INDUSTRIES = [
-  { name: "Arztpraxen & Therapeuten", href: "/ki-telefonassistent-arzt", description: "DSGVO-konforme Terminautomatisierung für Praxen." },
+  { name: "Arztpraxen & Therapeuten", href: "/ki-telefonassistent-arzt", description: "Terminautomatisierung für Praxen." },
   { name: "Gastronomie & Restaurants", href: "/ki-telefonassistent-restaurant", description: "Reservierungen außerhalb der Öffnungszeiten, mehrsprachig." },
   { name: "Hotels & Pensionen", href: "/ki-telefonassistent-hotel", description: "Rund-um-die-Uhr-Rezeption, PMS-Integration." },
   { name: "Therapiepraxen", href: "/ki-telefonassistent-praxis", description: "Terminbuchung, Folgetermine, No-Show-Reduktion." },
@@ -113,7 +113,7 @@ const RELATED_LINKS = [
 const USE_CASES = [
   {
     title: "Arztpraxis – keine Anrufspitzen mehr",
-    description: "Eine allgemeinmedizinische Praxis mit drei Ärzten erhält montags Anrufspitzen, die das Team überlasten. Der KI-Telefonassistent übernimmt Standardtermine, beantwortet Fragen zu Öffnungszeiten und qualifiziert Notfallanfragen – DSGVO-konform, automatisch nach Ihren Vorgaben.",
+    description: "Eine allgemeinmedizinische Praxis mit drei Ärzten erhält montags Anrufspitzen, die das Team überlasten. Der KI-Telefonassistent übernimmt Standardtermine, beantwortet Fragen zu Öffnungszeiten und qualifiziert Notfallanfragen – automatisch nach Ihren Vorgaben.",
   },
   {
     title: "Restaurant – Reservierungen außerhalb der Öffnungszeiten ohne Mitarbeiter",
@@ -139,8 +139,8 @@ const FAQ_ITEMS = [
     answer: "In der Regel 7–14 Tage. Das beinhaltet Einrichtung, Konfiguration der Sprache und Antworten, Integration in Ihren Kalender und eine Testphase. Bei einfacheren Setups auch schneller.",
   },
   {
-    question: "Ist KI DSGVO-konform für deutsche Unternehmen?",
-    answer: "Ja, wenn sie richtig konfiguriert ist. Cogniiq arbeitet ausschließlich mit Lösungen, die Daten auf europäischen Servern verarbeiten, DSGVO-konforme Prozesse unterstützen und mit den notwendigen Auftragsverarbeitungsverträgen geliefert werden.",
+    question: "Wie ist der Datenschutz beim KI-Einsatz geregelt?",
+    answer: "Cogniiq arbeitet mit Lösungen, die Daten auf europäischen Servern verarbeiten und mit den notwendigen Auftragsverarbeitungsverträgen geliefert werden. Die Bewertung des konkreten Einsatzes bleibt bei Ihrem Datenschutzbeauftragten.",
   },
   {
     question: "Für welche Unternehmensgröße ist ein KI-Telefonassistent geeignet?",
@@ -178,7 +178,7 @@ const kiAgenturSchema = {
         "name": "Deutschland",
       },
       "serviceType": "KI Automatisierung",
-      "description": "KI-Telefonassistenten und Prozessautomatisierung für Unternehmen in Deutschland. DSGVO-konform, schnelle Umsetzung, faire Preise.",
+      "description": "KI-Telefonassistenten und Prozessautomatisierung für Unternehmen in Deutschland. Schnelle Umsetzung, faire Preise.",
     },
   ],
 };
@@ -195,7 +195,7 @@ export function KiAgenturDeutschland() {
     <>
       <PageSEO
         title="KI Agentur Deutschland – KI Telefonassistent & Automatisierung für Unternehmen | Cogniiq"
-        description="Cogniiq – KI Agentur für Unternehmen in Deutschland. KI-Telefonassistenten, Prozessautomatisierung und digitale Systemintegration. DSGVO-konform, schnelle Umsetzung, direkte Betreuung."
+        description="Cogniiq – KI Agentur für Unternehmen in Deutschland. KI-Telefonassistenten, Prozessautomatisierung und digitale Systemintegration. Schnelle Umsetzung, direkte Betreuung."
         canonical={`${BUSINESS_INFO.website}/ki-agentur-deutschland`}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
@@ -221,7 +221,7 @@ export function KiAgenturDeutschland() {
             <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.1}>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium tracking-wide uppercase mb-6">
                 <Phone size={12} />
-                KI · Automatisierung · Deutschland · DSGVO-konform
+                KI · Automatisierung · Deutschland · Persönliche Betreuung
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 tracking-tight leading-tight mb-6">
@@ -229,7 +229,7 @@ export function KiAgenturDeutschland() {
               </h1>
 
               <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl leading-relaxed mb-8">
-                Cogniiq ist Ihre spezialisierte KI Agentur in Deutschland. Wir implementieren KI-Telefonassistenten, automatisieren Geschäftsprozesse und verbinden Ihre Systeme – DSGVO-konform, schnell und vollständig remote betreut.
+                Cogniiq ist Ihre spezialisierte KI Agentur in Deutschland. Wir implementieren KI-Telefonassistenten, automatisieren Geschäftsprozesse und verbinden Ihre Systeme – schnell und vollständig remote betreut.
               </p>
 
               <div className="flex flex-wrap gap-4">
@@ -255,7 +255,7 @@ export function KiAgenturDeutschland() {
         <div className="border-y border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
-              {["KI-Telefonassistent", "Prozessautomatisierung", "DSGVO-konform", "Einrichtung in 7–14 Tagen", "Europäische Server", "Persönliche Betreuung"].map((item, i) => (
+              {["KI-Telefonassistent", "Prozessautomatisierung", "Einrichtung in 7–14 Tagen", "Europäische Server", "Persönliche Betreuung"].map((item, i) => (
                 <span key={i} className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   {i > 0 && <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" aria-hidden="true" />}
                   {item}
@@ -277,7 +277,7 @@ export function KiAgenturDeutschland() {
                   KI wird in Deutschland viel diskutiert, aber selten konkret umgesetzt. Viele Unternehmen wissen, dass sie KI einsetzen sollten – aber nicht wie, wo sie anfangen sollen und was es wirklich kostet. Cogniiq macht KI für den deutschen Mittelstand greifbar und einsatzfähig, ohne Beratungsoverhead und ohne monatelange Implementierungsprojekte.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Unser Fokus liegt auf zwei Bereichen, die sofort ROI erzeugen: KI-Telefonassistenten, die Unternehmen auch außerhalb der Öffnungszeiten erreichbar machen – und Automatisierungen, die manuelle Abläufe ein für allemal lösen. Beides DSGVO-konform, beides auf europäischen Servern, beides in Wochen statt Monaten umgesetzt.
+                  Unser Fokus liegt auf zwei Bereichen, die sofort ROI erzeugen: KI-Telefonassistenten, die Unternehmen auch außerhalb der Öffnungszeiten erreichbar machen – und Automatisierungen, die manuelle Abläufe ein für allemal lösen. Beides auf europäischen Servern, beides in Wochen statt Monaten umgesetzt.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                   Mit Hauptsitz in{" "}

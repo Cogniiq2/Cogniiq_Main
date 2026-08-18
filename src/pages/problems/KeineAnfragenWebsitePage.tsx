@@ -53,7 +53,7 @@ const config: ProblemPageConfig = {
       "Conversion-optimiertes Design mit klaren CTAs",
       "Mobile-first: perfekt auf jedem Smartphone",
       "Google Analytics 4 & Search Console Setup",
-      "DSGVO-konforme Website mit allen Pflichtseiten",
+      "Website mit allen Pflichtseiten: Impressum, Datenschutz, Cookie-Einwilligung",
     ],
   },
   serviceLinks: [

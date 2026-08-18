@@ -53,7 +53,7 @@ const config: NationalIndustryPageConfig = {
     "Mitgliedschaftsoptionen übersichtlich und konversionsoptimiert dargestellt",
     "Trainerprofile und Community-Stimmen professionell eingebunden",
     "Mobile-first: der gesamte Anmeldeprozess auf dem Smartphone",
-    "DSGVO-konforme Mitgliederdatenverarbeitung inklusive",
+    "Mitgliederdatenverarbeitung mit Auftragsverarbeitungsvertrag",
   ],
   workflow: {
     title: "So entsteht Ihre Sport-Website",

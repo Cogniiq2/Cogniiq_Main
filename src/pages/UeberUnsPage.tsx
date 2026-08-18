@@ -91,7 +91,7 @@ const PRINCIPLES = [
   },
   {
     icon: Shield,
-    title: "DSGVO-konforme Architektur",
+    title: "Datenschutz in der Architektur",
     description:
       "Alle Daten werden auf europäischen Servern verarbeitet. Datenschutzkonforme Architekturen und vollständige Dokumentation inklusive.",
   },
@@ -247,7 +247,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Sind die Systeme DSGVO-konform?",
-    a: "Ja. Alle Daten werden auf europäischen Servern verarbeitet und gespeichert. Wir implementieren datenschutzkonforme Architekturen und stellen alle notwendige Dokumentation bereit.",
+    a: "Diesen Satz stellen wir uns nicht selbst aus — konform ist eine Verarbeitung, kein Produkt. Alle Daten werden auf europäischen Servern verarbeitet und gespeichert, und die notwendige Dokumentation stellen wir bereit. Beurteilen kann die Konformität nur, wer den konkreten Einsatz kennt — das ist Ihr Datenschutzbeauftragter.",
   },
   {
     q: "Kann ich mit einem einzelnen Service starten?",
@@ -489,7 +489,7 @@ export function UeberUnsPage() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.32 }}
             >
-              {["Sitz in Bayreuth", "Projekte deutschlandweit", "KI & Automatisierung", "DSGVO-konform"].map((chip) => (
+              {["Sitz in Bayreuth", "Projekte deutschlandweit", "KI & Automatisierung"].map((chip) => (
                 <span
                   key={chip}
                   className="inline-block px-3 py-1 text-[11px] font-medium text-gray-500 dark:text-gray-500 border border-gray-200 dark:border-gray-800 tracking-wide"

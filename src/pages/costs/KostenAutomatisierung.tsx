@@ -101,7 +101,7 @@ const config: CostPageConfig = {
     },
     {
       question: "Welche Tools nutzt Cogniiq für Automatisierungen?",
-      answer: "Wir setzen auf professionelle, DSGVO-konforme Automatisierungsplattformen, die auf europäischen Servern betrieben werden. Bei spezifischen Anforderungen auch direkte API-Integrationen.",
+      answer: "Wir setzen auf professionelle, etablierte Automatisierungsplattformen, die auf europäischen Servern betrieben werden. Bei spezifischen Anforderungen auch direkte API-Integrationen.",
     },
     {
       question: "Kann ich die Automatisierung später selbst anpassen?",
@@ -116,8 +116,8 @@ const config: CostPageConfig = {
       answer: "Ja, gerade für kleine Unternehmen ist Automatisierung besonders wertvoll, da jede eingesparte Arbeitsstunde direkt dem Betrieb zugute kommt. Bereits ein Workflow für 500–1.000 € kann täglich eine Stunde sparen.",
     },
     {
-      question: "Sind Automatisierungen DSGVO-konform?",
-      answer: "Ja. Cogniiq arbeitet ausschließlich mit DSGVO-konformen Tools auf europäischen Servern. Alle Automatisierungen werden mit dem notwendigen Datenschutznachweis geliefert.",
+      question: "Wie ist der Datenschutz bei Automatisierungen geregelt?",
+      answer: "Cogniiq arbeitet mit Tools auf europäischen Servern und liefert zu jeder Automatisierung den Auftragsverarbeitungsvertrag und die Dokumentation der Datenflüsse.",
     },
   ],
   ctaHeadline: "Kostenloses Automatisierungs-Audit",

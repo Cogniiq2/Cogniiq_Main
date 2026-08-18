@@ -5,13 +5,13 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 const config: NationalIndustryPageConfig = {
   seo: {
     title: "Automatisierung für Arztpraxen & Praxisverwaltung | Cogniiq",
-    description: "Praxisautomatisierung: Terminbestätigungen, Patientenerinnerungen und Rezeptanfragen laufen automatisch – DSGVO-konform, ohne zusätzliches Personal. Mehr Zeit für Ihre Patienten.",
+    description: "Praxisautomatisierung: Terminbestätigungen, Patientenerinnerungen und Rezeptanfragen laufen automatisch – ohne zusätzliches Personal. Mehr Zeit für Ihre Patienten.",
     canonical: `${BUSINESS_INFO.website}/automatisierung-arzt`,
     keywords: "Automatisierung Arztpraxis, Praxis Digitalisierung, Patientenkommunikation automatisieren, Praxisverwaltung Automatisierung",
   },
   h1: "Automatisierung für Arztpraxen & Praxisverwaltung",
-  tagline: "Arztpraxis · Routineprozesse · DSGVO-konform",
-  intro: "Jeden Morgen dasselbe: Terminbestätigungen rausschicken, Rezeptanfragen entgegennehmen, Erinnerungen verschicken, Wartelisten manuell abarbeiten. Jede dieser Aufgaben ist notwendig – aber keine davon braucht einen Menschen. Cogniiq automatisiert diese Routinen vollständig und DSGVO-konform, damit Ihr Team sich auf das konzentriert, was wirklich zählt.",
+  tagline: "Arztpraxis · Routineprozesse · Persönliche Betreuung",
+  intro: "Jeden Morgen dasselbe: Terminbestätigungen rausschicken, Rezeptanfragen entgegennehmen, Erinnerungen verschicken, Wartelisten manuell abarbeiten. Jede dieser Aufgaben ist notwendig – aber keine davon braucht einen Menschen. Cogniiq automatisiert diese Routinen vollständig, damit Ihr Team sich auf das konzentriert, was wirklich zählt.",
   serviceSlug: "leistungen",
   serviceLabel: "Automatisierung Leistungen",
   costLink: "/kosten-automatisierung",
@@ -51,7 +51,7 @@ const config: NationalIndustryPageConfig = {
     "Warteliste wird bei Absagen sofort automatisch kontaktiert",
     "Rezeptanfragen digital strukturiert und weitergeleitet",
     "Patientendaten systemübergreifend synchronisiert",
-    "DSGVO-konforme Verarbeitung mit AVV auf europäischen Servern",
+    "Verarbeitung mit Auftragsverarbeitungsvertrag auf europäischen Servern",
     "Bewertungsanfragen nach jedem Termin automatisch versandt",
     "Einrichtung in 2–4 Wochen, ohne Praxisunterbrechung",
   ],
@@ -91,8 +91,8 @@ const config: NationalIndustryPageConfig = {
   ],
   faq: [
     {
-      question: "Ist Praxisautomatisierung wirklich DSGVO-konform?",
-      answer: "Ja – und das ist für uns keine Selbstverständlichkeit, sondern Grundbedingung. Cogniiq arbeitet ausschließlich mit DSGVO-konformen Tools auf deutschen bzw. europäischen Servern. Jede Automatisierung wird mit einem Auftragsverarbeitungsvertrag (AVV) geliefert. Patientendaten verlassen niemals die vereinbarten Systeme.",
+      question: "Wie ist der Datenschutz bei der Praxisautomatisierung geregelt?",
+      answer: "Cogniiq arbeitet mit Tools auf deutschen bzw. europäischen Servern. Jede Automatisierung wird mit einem Auftragsverarbeitungsvertrag (AVV) geliefert, und Patientendaten verlassen die vereinbarten Systeme nicht. Ob der konkrete Einsatz in Ihrer Praxis den Anforderungen genügt, beurteilt Ihr Datenschutzbeauftragter – wir liefern ihm die Unterlagen dafür zu.",
     },
     {
       question: "Funktioniert die Automatisierung mit unserer bestehenden Praxissoftware?",

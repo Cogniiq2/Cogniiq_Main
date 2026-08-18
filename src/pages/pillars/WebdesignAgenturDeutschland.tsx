@@ -81,7 +81,7 @@ const CHALLENGES = [
 
 const INDUSTRIES = [
   { name: "Gastronomie & Restaurants", href: "/webdesign-gastronomie", description: "Digitale Speisekarten, Online-Reservierung, lokales SEO." },
-  { name: "Arztpraxen & Therapeuten", href: "/webdesign-arzt", description: "DSGVO-konforme Praxis-Websites mit Online-Terminbuchung." },
+  { name: "Arztpraxen & Therapeuten", href: "/webdesign-arzt", description: "Praxis-Websites mit Online-Terminbuchung." },
   { name: "Immobilien", href: "/webdesign-immobilien", description: "Premium-Webdesign für Makler mit Exposé-Präsentation." },
   { name: "Hotels & Pensionen", href: "/webdesign-hotel", description: "Direktbuchungs-Systeme, OTA-Abhängigkeit reduzieren." },
   { name: "Fitness & Sport", href: "/webdesign-sport", description: "Digitaler Kurskalender, Mitglieder gewinnen." },
@@ -194,7 +194,7 @@ export function WebdesignAgenturDeutschland() {
     <>
       <PageSEO
         title="Webdesign Agentur Deutschland – Professionelle Websites für Unternehmen | Cogniiq"
-        description="Cogniiq – Webdesign Agentur für Unternehmen in Deutschland. Individuelle Websites mit lokalem SEO, schneller Ladezeit und Conversion-Fokus. DSGVO-konform, transparent, fair bepreist."
+        description="Cogniiq – Webdesign Agentur für Unternehmen in Deutschland. Individuelle Websites mit lokalem SEO, schneller Ladezeit und Conversion-Fokus. Transparent und fair bepreist."
         canonical={`${BUSINESS_INFO.website}/webdesign-agentur-deutschland`}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
@@ -220,7 +220,7 @@ export function WebdesignAgenturDeutschland() {
             <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.1}>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium tracking-wide uppercase mb-6">
                 <Globe size={12} />
-                Webdesign · Deutschland · DSGVO-konform · Lokal & National
+                Webdesign · Deutschland · Lokal & National
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 tracking-tight leading-tight mb-6">
@@ -254,7 +254,7 @@ export function WebdesignAgenturDeutschland() {
         <div className="border-y border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
-              {["Individuelle Entwicklung", "Mobile-First", "SEO integriert", "DSGVO-konform", "Unter 2 Sekunden Ladezeit", "Persönliche Betreuung"].map((item, i) => (
+              {["Individuelle Entwicklung", "Mobile-First", "SEO integriert", "Unter 2 Sekunden Ladezeit", "Persönliche Betreuung"].map((item, i) => (
                 <span key={i} className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   {i > 0 && <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" aria-hidden="true" />}
                   {item}

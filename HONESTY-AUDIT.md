@@ -336,6 +336,39 @@ Bleibt als Restrisiko: Eine Kernaussage ohne Zahl (etwa „keine Triage") kann
 weiterhin an einer Stelle abweichend formuliert werden, ohne dass der Test
 anschlägt. Für diese Fälle gilt weiter die Arbeitsregel aus 7.4.
 
+## 8. Umgebung
+
+### 8.1 Build bricht ohne Secrets vor dem Prerender ab
+
+Festgestellt am 18.08.2026. Kein Fehler im Code, aber eine Stolperfalle für
+jeden, der ohne `.env` baut.
+
+`npm run build` ist eine Kette:
+
+```
+build:ssr → sitemap → build:client → prerender → clean:ssr
+```
+
+`npm run sitemap` (`scripts/generate-sitemap.mjs`) zieht über seine
+Importkette `src/lib/supabase.ts` herein, und die wirft beim Laden
+`Missing VITE_SUPABASE_URL`, wenn die Variable fehlt. Weil `sitemap` an
+**zweiter** Stelle steht, bricht die Kette ab, **bevor** `build:client` und
+`prerender` laufen.
+
+**Wirkung:** `dist/` enthält dann kein einziges HTML-Dokument. Der Abbruch sieht
+nach einem Sitemap-Problem aus, kostet aber den gesamten Prerender — und damit
+jede Prüfung, die am ausgelieferten HTML hängt (Metadaten, JSON-LD,
+Unique-Anteil der Stadtseiten).
+
+**Was zu tun ist:** Vor einem lokalen Build `VITE_SUPABASE_URL` und
+`VITE_SUPABASE_ANON_KEY` setzen. Für reine Copy- und SEO-Prüfungen genügen
+Platzhalterwerte; die Sitemap fragt zur Bauzeit keine Daten ab. Auf CI mit
+gesetzten Variablen tritt der Fall nicht auf.
+
+**Nicht geändert:** Die Reihenfolge der Build-Kette und die Fehlerbehandlung
+in `supabase.ts` bleiben, wie sie sind — beides liegt außerhalb des
+Copy-Auftrags. Vermerkt, damit der nächste Build nicht als kaputt gilt.
+
 ## 5. Positivbefunde
 
 - Kein `aggregateRating`, `Review`, `ratingValue` oder Sterne-Markup irgendwo

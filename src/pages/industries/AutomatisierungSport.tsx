@@ -53,7 +53,7 @@ const config: NationalIndustryPageConfig = {
     "Re-Engagement-Sequenz für inaktive Mitglieder",
     "Kurs- und Event-Kommunikation automatisch an alle Mitglieder",
     "Bewertungsanfragen nach positiven Erlebnissen",
-    "DSGVO-konforme Mitgliederdatenverarbeitung auf europäischen Servern",
+    "Mitgliederdatenverarbeitung auf europäischen Servern",
   ],
   workflow: {
     title: "So funktioniert automatisiertes Mitglieder-Management",
@@ -107,8 +107,8 @@ const config: NationalIndustryPageConfig = {
       answer: "Mitglieder, die 2–3 Wochen nicht eingecheckt haben, erhalten eine automatische, persönliche Nachricht – mit einem konkreten Angebot oder einer Einladung. Diese Sequenzen wirken Kündigungen entgegen, weil sie zum richtigen Zeitpunkt und ohne manuellen Aufwand greifen.",
     },
     {
-      question: "Ist die Verarbeitung von Mitgliederdaten DSGVO-konform?",
-      answer: "Ja. Alle Mitgliederdaten werden DSGVO-konform verarbeitet: auf deutschen bzw. europäischen Servern, mit klarer Einwilligungsdokumentation und Auftragsverarbeitungsvertrag (AVV). Die Datenschutzerklärung Ihrer Website wird entsprechend angepasst.",
+      question: "Wie werden Mitgliederdaten verarbeitet?",
+      answer: "Auf deutschen bzw. europäischen Servern, mit klarer Einwilligungsdokumentation und Auftragsverarbeitungsvertrag (AVV). Die Datenschutzerklärung Ihrer Website passen wir entsprechend an.",
     },
   ],
 };

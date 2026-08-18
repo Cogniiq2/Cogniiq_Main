@@ -24,7 +24,6 @@ const SERVICES_OVERVIEW = [
     benefits: [
       "Erreichbar auch dann, wenn niemand abnehmen kann",
       "Entlastung von Routinegesprächen",
-      "DSGVO-konforme Sprachverarbeitung",
     ],
   },
   {
@@ -57,7 +56,7 @@ const TRUST_POINTS = [
   "Hauptsitz in Bayreuth – persönliche Betreuung in der Region",
   "Projekte in ganz Bayern – auch remote vollständig betreut",
   "Einrichtung in 7–14 Tagen – keine monatelangen Projekte",
-  "DSGVO-konform – alle Daten bleiben in Europa",
+  "Alle Daten bleiben in Europa",
   "Fester Ansprechpartner – direkter Kontakt für Ihr Projekt",
   "Faire Preise – transparent kalkuliert, keine versteckten Kosten",
 ];
@@ -95,9 +94,9 @@ const CHALLENGES = [
   },
   {
     icon: Shield,
-    title: "DSGVO-konforme KI-Nutzung",
+    title: "Datenschutz beim KI-Einsatz",
     description:
-      "Viele bayerische Unternehmer zögern beim KI-Einsatz aus Datenschutzgründen zu Recht. Cogniiq setzt auf europäische Server und unterstützt DSGVO-konforme Prozesse; technische und organisatorische Maßnahmen werden projektbezogen abgestimmt.",
+      "Viele bayerische Unternehmer zögern beim KI-Einsatz aus Datenschutzgründen zu Recht. Cogniiq setzt auf europäische Server; technische und organisatorische Maßnahmen werden projektbezogen abgestimmt.",
   },
 ];
 
@@ -190,7 +189,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Sind alle Lösungen DSGVO-konform?",
-    a: "Ja. Alle Systeme verarbeiten Daten ausschließlich auf europäischen Servern. Wir erstellen auf Wunsch die notwendigen Auftragsverarbeitungsverträge (AVV) und unterstützen bei der Datenschutzdokumentation.",
+    a: "Diesen Satz stellen wir uns nicht selbst aus — konform ist eine Verarbeitung, kein Produkt. Alle Systeme verarbeiten Daten auf europäischen Servern; die notwendigen Auftragsverarbeitungsverträge (AVV) erstellen wir, und bei der Datenschutzdokumentation unterstützen wir. Die Bewertung bleibt bei Ihrem Datenschutzbeauftragten.",
   },
   {
     q: "Was kostet ein KI-Telefonassistent für Bayern?",
@@ -256,7 +255,7 @@ export function BayernPage() {
     <>
       <PageSEO
         title="KI Agentur Bayern – KI Telefonassistent, Automatisierung & Webdesign | Cogniiq"
-        description="Cogniiq ist Ihre KI Agentur für Bayern. KI Telefonassistent, Prozessautomatisierung und Webdesign für Unternehmen in Bayreuth, Regensburg, München und ganz Bayern. DSGVO-konform, persönliche Betreuung."
+        description="Cogniiq ist Ihre KI Agentur für Bayern. KI Telefonassistent, Prozessautomatisierung und Webdesign für Unternehmen in Bayreuth, Regensburg, München und ganz Bayern. Persönliche Betreuung, feste Ansprechpartner."
         canonical={`${BUSINESS_INFO.website}/bayern`}
         breadcrumbs={breadcrumbs}
         additionalSchema={bayernSchema}
@@ -281,7 +280,7 @@ export function BayernPage() {
             <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.1}>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium tracking-wide uppercase mb-6">
                 <MapPin size={12} />
-                Bayern · Deutschland · DSGVO-konform · Persönliche Betreuung
+                Bayern · Deutschland · Persönliche Betreuung
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 tracking-tight leading-tight mb-6">
@@ -315,7 +314,7 @@ export function BayernPage() {
         <div className="border-y border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
-              {["Bayern", "Bayreuth", "Regensburg", "München", "KI-Telefonassistent", "Automatisierung", "Webdesign", "DSGVO-konform"].map((item, i) => (
+              {["Bayern", "Bayreuth", "Regensburg", "München", "KI-Telefonassistent", "Automatisierung", "Webdesign"].map((item, i) => (
                 <span key={i} className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   {i > 0 && <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" aria-hidden="true" />}
                   {item}
@@ -731,7 +730,7 @@ export function BayernPage() {
                   Leistungen auch deutschlandweit verfügbar
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Cogniiq betreut Projekte in ganz Deutschland – remote, persönlich und DSGVO-konform.
+                  Cogniiq betreut Projekte in ganz Deutschland – remote und persönlich.
                 </p>
               </div>
               <Link

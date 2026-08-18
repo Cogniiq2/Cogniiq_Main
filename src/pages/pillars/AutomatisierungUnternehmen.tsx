@@ -81,7 +81,7 @@ const CHALLENGES = [
 
 const INDUSTRIES = [
   { name: "Automatisierung Restaurant", href: "/automatisierung-restaurant", description: "Reservierungen, No-Show-Kommunikation, Lieferanten." },
-  { name: "Automatisierung Arzt", href: "/automatisierung-arzt", description: "Terminbestätigung, Warteliste, DSGVO-konform." },
+  { name: "Automatisierung Arzt", href: "/automatisierung-arzt", description: "Terminbestätigung, Warteliste, Rezeptanfragen." },
   { name: "Automatisierung Immobilien", href: "/automatisierung-immobilien", description: "Lead-Erstansprache, Exposé-Versand, CRM-Pflege." },
   { name: "Automatisierung Sport", href: "/automatisierung-sport", description: "Mitglieder-Onboarding, Zahlungserinnerungen, Re-Engagement." },
 ];
@@ -145,8 +145,8 @@ const FAQ_ITEMS = [
     answer: "Nein. Cogniiq übernimmt die gesamte technische Umsetzung. Sie beschreiben, was Sie manuell tun – wir automatisieren es und dokumentieren alles so, dass Sie die Systeme verstehen und bei Bedarf anpassen können.",
   },
   {
-    question: "Sind automatisierte Prozesse DSGVO-konform?",
-    answer: "Ja, wenn richtig konfiguriert. Wir arbeiten ausschließlich mit Lösungen auf europäischen Servern, liefern die notwendigen Auftragsverarbeitungsverträge und stellen sicher, dass alle Datenflüsse DSGVO-konform sind.",
+    question: "Wie ist der Datenschutz bei automatisierten Prozessen geregelt?",
+    answer: "Wir arbeiten mit Lösungen auf europäischen Servern, liefern die notwendigen Auftragsverarbeitungsverträge und dokumentieren jeden Datenfluss. Die Bewertung des konkreten Einsatzes bleibt bei Ihrem Datenschutzbeauftragten.",
   },
   {
     question: "Was passiert, wenn eine Automatisierung fehlschlägt?",
@@ -176,7 +176,7 @@ const automatisierungSchema = {
         "name": "Deutschland",
       },
       "serviceType": "Prozessautomatisierung",
-      "description": "Prozessautomatisierung für Unternehmen in Deutschland. DSGVO-konform, Quick-Wins in 1–3 Wochen, vollständig dokumentiert.",
+      "description": "Prozessautomatisierung für Unternehmen in Deutschland. Quick-Wins in 1–3 Wochen, vollständig dokumentiert.",
     },
   ],
 };
@@ -193,7 +193,7 @@ export function AutomatisierungUnternehmen() {
     <>
       <PageSEO
         title="Automatisierung für Unternehmen – Prozessautomatisierung Deutschland | Cogniiq"
-        description="Cogniiq automatisiert Geschäftsprozesse für Unternehmen in Deutschland. Workflow-Automatisierung, System-Integration, Quick-Wins in 1–3 Wochen. DSGVO-konform, fair bepreist."
+        description="Cogniiq automatisiert Geschäftsprozesse für Unternehmen in Deutschland. Workflow-Automatisierung, System-Integration, Quick-Wins in 1–3 Wochen. Vollständig dokumentiert, fair bepreist."
         canonical={`${BUSINESS_INFO.website}/automatisierung-unternehmen`}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
@@ -218,7 +218,7 @@ export function AutomatisierungUnternehmen() {
             <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.1}>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium tracking-wide uppercase mb-6">
                 <Zap size={12} />
-                Automatisierung · Deutschland · DSGVO-konform · Quick-Wins
+                Automatisierung · Deutschland · Quick-Wins
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 tracking-tight leading-tight mb-6">
@@ -226,7 +226,7 @@ export function AutomatisierungUnternehmen() {
               </h1>
 
               <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl leading-relaxed mb-8">
-                Cogniiq automatisiert Geschäftsprozesse für Unternehmen in ganz Deutschland – Workflow-Automatisierung, System-Integration und automatisches Reporting. DSGVO-konform, vollständig dokumentiert, Quick-Wins in 1–3 Wochen.
+                Cogniiq automatisiert Geschäftsprozesse für Unternehmen in ganz Deutschland – Workflow-Automatisierung, System-Integration und automatisches Reporting. Vollständig dokumentiert, Quick-Wins in 1–3 Wochen.
               </p>
 
               <div className="flex flex-wrap gap-4">
@@ -251,7 +251,7 @@ export function AutomatisierungUnternehmen() {
         <div className="border-y border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
-              {["Quick-Wins in 1–3 Wochen", "API-Integrationen", "DSGVO-konform", "Europäische Server", "Vollständig dokumentiert", "Skalierbar"].map((item, i) => (
+              {["Quick-Wins in 1–3 Wochen", "API-Integrationen", "Europäische Server", "Vollständig dokumentiert", "Skalierbar"].map((item, i) => (
                 <span key={i} className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   {i > 0 && <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" aria-hidden="true" />}
                   {item}
@@ -272,7 +272,7 @@ export function AutomatisierungUnternehmen() {
                   Deutsche Unternehmen stehen unter Druck: Fachkräftemangel, steigende Lohnkosten, wachsender Wettbewerb. Die Antwort auf alle drei Probleme ist dieselbe – Automatisierung. Prozesse, die heute manuell 30 Minuten kosten, laufen automatisch in Sekunden. Ohne Fehler, ohne Personalaufwand, ohne Urlaub.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Cogniiq automatisiert Geschäftsprozesse mit professionellen Workflow-Systemen und direkten API-Integrationen – DSGVO-konform, auf europäischen Servern betrieben. Wir beginnen immer mit dem Prozess, der den schnellsten ROI erzeugt, und skalieren von dort aus. Von einem einzelnen Workflow zur vollständig automatisierten Geschäftsstruktur.
+                  Cogniiq automatisiert Geschäftsprozesse mit professionellen Workflow-Systemen und direkten API-Integrationen, auf europäischen Servern betrieben. Wir beginnen immer mit dem Prozess, der den schnellsten ROI erzeugt, und skalieren von dort aus. Von einem einzelnen Workflow zur vollständig automatisierten Geschäftsstruktur.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                   Mit Projekten in{" "}

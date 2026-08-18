@@ -53,7 +53,7 @@ const config: NationalIndustryPageConfig = {
     "Automatische Lead-Erfassung direkt in Ihr CRM (OnOffice, Propstack u.a.)",
     "Eigentümer-Landingpage für gezielte Verkaufsmandats-Akquise",
     "Online-Besichtigungsbuchung mit Kalenderabgleich",
-    "DSGVO-konforme Verarbeitung von Interessentendaten mit AVV",
+    "Verarbeitung von Interessentendaten mit Auftragsverarbeitungsvertrag",
   ],
   workflow: {
     title: "Immobilien-Website mit automatisierter Lead-Erfassung",

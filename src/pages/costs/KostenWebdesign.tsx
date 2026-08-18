@@ -16,7 +16,7 @@ const config: CostPageConfig = {
     {
       label: "Einfach",
       range: "ab 1.500 €",
-      description: "Professionelle Visitenkarten-Website mit 4–6 Seiten, responsivem Design, On-Page SEO und DSGVO-Konformität. Ideal für Einzelunternehmer und kleine Betriebe.",
+      description: "Professionelle Visitenkarten-Website mit 4–6 Seiten, responsivem Design, On-Page SEO und vollständiger Datenschutzdokumentation. Ideal für Einzelunternehmer und kleine Betriebe.",
     },
     {
       label: "Mittelstand",
@@ -58,12 +58,12 @@ const config: CostPageConfig = {
   exampleProjects: [
     {
       title: "Handwerksbetrieb Bayreuth",
-      description: "Neue 6-seitige Website mit responsivem Design, Local SEO Setup für Bayreuth, Google Business Optimierung, DSGVO-konforme Seiten und Kontaktformular mit Bestätigungs-Mail.",
+      description: "Neue 6-seitige Website mit responsivem Design, Local SEO Setup für Bayreuth, Google Business Optimierung, Datenschutz- und Impressumsseiten sowie Kontaktformular mit Bestätigungs-Mail.",
       investment: "1.800 – 2.400 €",
     },
     {
       title: "Arztpraxis München",
-      description: "Praxis-Website mit Online-Terminbuchungsintegration, DSGVO-konformer Patient-Kommunikation, Local SEO für München, strukturierten Daten für Gesundheitsdienstleister.",
+      description: "Praxis-Website mit Online-Terminbuchungsintegration, dokumentierter Patientenkommunikation, Local SEO für München, strukturierten Daten für Gesundheitsdienstleister.",
       investment: "3.500 – 5.000 €",
     },
     {
@@ -94,7 +94,7 @@ const config: CostPageConfig = {
   faq: [
     {
       question: "Was kostet eine einfache Website in Deutschland?",
-      answer: "Eine professionelle Einsteiger-Website mit 4–6 Seiten, responsivem Design und DSGVO-Konformität beginnt bei ca. 1.500 €. Der genaue Preis hängt vom Umfang und den gewünschten Funktionen ab.",
+      answer: "Eine professionelle Einsteiger-Website mit 4–6 Seiten, responsivem Design und vollständiger Datenschutzdokumentation beginnt bei ca. 1.500 €. Der genaue Preis hängt vom Umfang und den gewünschten Funktionen ab.",
     },
     {
       question: "Ist Webdesign von Cogniiq teurer als ein Baukasten?",

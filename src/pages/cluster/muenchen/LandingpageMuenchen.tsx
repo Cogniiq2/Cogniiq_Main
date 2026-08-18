@@ -50,7 +50,7 @@ const config: ClusterPageConfig = {
       "Fokussiertes Kontaktformular oder direkter CTA",
       "Ladezeit unter 1,5s für maximale Google Ads Qualitätsbewertung",
       "Google Analytics 4 Conversion-Tracking vollständig eingerichtet",
-      "DSGVO-konformes Setup",
+      "Cookie-Einwilligung und Datenschutz-Link eingerichtet",
       "A/B-Test-ready Grundstruktur",
       "Optional: CRM-Anbindung, Hubspot-Integration, Workflow-Automatisierung",
       "Übergabe mit Bearbeitungszugang",

@@ -21,7 +21,7 @@ const config: ClusterPageConfig = {
   hero: {
     h1: "Webdesign Kosten in Regensburg – Was kostet eine Website?",
     lead: "Transparente Preisübersicht für professionelles Webdesign in Regensburg. Keine versteckten Kosten, keine Pauschalen – eine ehrliche Einschätzung, was Qualität kostet und warum sie sich lohnt.",
-    trustTags: ["Regensburg", "Transparente Preise", "Kein Baukasten", "DSGVO-konform"],
+    trustTags: ["Regensburg", "Transparente Preise", "Kein Baukasten", "Persönliche Betreuung"],
     ctaLabel: "Kostenloses Erstgespräch",
   },
   tldr: {
@@ -38,7 +38,7 @@ const config: ClusterPageConfig = {
     paragraphs: [
       "Die meisten Webdesign-Projekte in Regensburg liegen zwischen 1.500 € und 8.000 €. Kleinere Websites starten typischerweise ab ca. 1.500 €. Projekte mit erweiterter lokaler SEO-Strategie für Regensburg und die Oberpfalz, Conversion-Texten und Integrationen bewegen sich im Bereich 3.000 € bis 6.000 €.",
       "Der Preis wird durch drei Faktoren bestimmt: Seitenumfang, SEO-Tiefe und technische Integrationen. Gastronomie-Websites mit Speisekarte und Reservierungssystem sind grundlegend andere Projekte als einfache Visitenkarten-Websites für lokale Dienstleister.",
-      "Was in jedem Paket enthalten ist: individuelles Design, sauberer Code, Mobile-First, DSGVO-Konformität und On-Page SEO. Das sind keine Extras – das ist Mindeststandard für professionelle Webentwicklung.",
+      "Was in jedem Paket enthalten ist: individuelles Design, sauberer Code, Mobile-First, vollständige Datenschutzdokumentation und On-Page SEO. Das sind keine Extras – das ist Mindeststandard für professionelle Webentwicklung.",
     ],
   },
   painPoints: [

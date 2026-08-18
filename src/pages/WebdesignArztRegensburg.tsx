@@ -14,18 +14,18 @@ const config: IndustryPageConfig = {
   seo: {
     title: "Webdesign & KI-Telefonassistent für Arztpraxen in Regensburg | Cogniiq",
     description:
-      "Praxis Website Regensburg: Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungen für Arztpraxen in Regensburg. Weniger Telefonüberlastung, mehr Online-Termine, DSGVO-konform.",
+      "Praxis Website Regensburg: Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungen für Arztpraxen in Regensburg. Weniger Telefonüberlastung, mehr Online-Termine, persönlich betreut.",
     canonical: `${base}/webdesign-arzt-regensburg`,
     keywords:
       "Praxis Website Regensburg, Arzt Website Regensburg, Terminbuchung Praxis Regensburg, KI Telefonassistent Arztpraxis Regensburg",
   },
   hero: {
-    trustTags: ["Regensburg", "DSGVO-konform", "KI-Integration", "Terminprozesse", "Automatisierung"],
+    trustTags: ["Regensburg", "KI-Integration", "Terminprozesse", "Automatisierung"],
     ctaLabel: "Projekt für Arztpraxis starten",
   },
   intro: {
     h1: "Webdesign & KI-Telefonassistent für Arztpraxen in Regensburg",
-    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Arztpraxen in Regensburg – für mehr Patientenanfragen, bessere Erreichbarkeit und automatisierte Terminprozesse. DSGVO-konform, schnell eingerichtet.",
+    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Arztpraxen in Regensburg – für mehr Patientenanfragen, bessere Erreichbarkeit und automatisierte Terminprozesse. Schnell eingerichtet, persönlich betreut.",
   },
   engpaesse: [
     "Regensburg wächst – Praxen versorgen zunehmend auch Patienten aus dem Umland, was das Telefonaufkommen weiter erhöht",
@@ -72,7 +72,7 @@ const config: IndustryPageConfig = {
         "Kontaktformular mit automatischer Benachrichtigung",
         "Google Maps Integration & NAP-Konsistenz Regensburg",
         "On-Page SEO für lokale Suchanfragen Regensburg",
-        "DSGVO-konforme Datenschutzdokumentation",
+        "Datenschutzerklärung, Impressum und Cookie-Einwilligung",
       ],
     },
     {
@@ -112,7 +112,7 @@ const config: IndustryPageConfig = {
       icon: "web",
       title: "Praxis-Website Regensburg",
       description:
-        "Moderne, schnelle Praxis-Website mit Online-Terminbuchung, klarer Leistungsübersicht, Arztprofilen und optimalem Ranking für Suchbegriffe wie 'Arzt Regensburg' oder 'Praxis Regensburg'. Conversion-optimiert, mobilfreundlich, DSGVO-konform.",
+        "Moderne, schnelle Praxis-Website mit Online-Terminbuchung, klarer Leistungsübersicht, Arztprofilen und optimalem Ranking für Suchbegriffe wie 'Arzt Regensburg' oder 'Praxis Regensburg'. Conversion-optimiert und mobilfreundlich.",
     },
     {
       icon: "phone",
@@ -185,9 +185,9 @@ const config: IndustryPageConfig = {
   ],
   faq: [
     {
-      question: "Kann Cogniiq eine DSGVO-konforme Praxis-Website in Regensburg erstellen?",
+      question: "Was liefert Cogniiq zum Datenschutz einer Praxis-Website in Regensburg?",
       answer:
-        "Ja. Alle Websites und Systeme von Cogniiq werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse. Formulare, Datenschutzerklärungen, Cookie-Einwilligungen und die Datenverarbeitung entsprechen den Datenschutzanforderungen für Arztpraxen in Bayern.",
+        "Zum Lieferumfang gehören Datenschutzerklärung, Impressum, Cookie-Einwilligung, gesicherte Formularübertragung und die Dokumentation der Datenflüsse. Ob der konkrete Einsatz den Anforderungen genügt, beurteilt Ihr Datenschutzbeauftragter – wir liefern ihm die Unterlagen dafür zu.",
     },
     {
       question: "Funktioniert der KI-Telefonassistent mit meiner bestehenden Praxissoftware in Regensburg?",

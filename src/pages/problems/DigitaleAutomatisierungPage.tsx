@@ -45,11 +45,11 @@ const config: ProblemPageConfig = {
   },
   solution: {
     headline: "Digitale Automatisierung: einfacher als Sie denken.",
-    text: "Der richtige Einstieg in die Automatisierung beginnt mit dem Prozess, der den größten ROI hat. Cogniiq analysiert Ihre Abläufe, identifiziert Quick-Wins und setzt diese innerhalb von Wochen um – DSGVO-konform und vollständig dokumentiert.",
+    text: "Der richtige Einstieg in die Automatisierung beginnt mit dem Prozess, der den größten ROI hat. Cogniiq analysiert Ihre Abläufe, identifiziert Quick-Wins und setzt diese innerhalb von Wochen um – vollständig dokumentiert.",
     bullets: [
       "Kostenlose Analyse Ihrer automatisierungsfähigen Prozesse",
       "Quick-Win-Automatisierungen in 1–3 Wochen live",
-      "DSGVO-konform auf deutschen/europäischen Servern",
+      "Deutsche bzw. europäische Server",
       "Vollständige Dokumentation – keine Abhängigkeit",
       "Schulung Ihres Teams in der Nutzung der Systeme",
       "Skalierbar: von einem Workflow zur vollständigen Digitalisierung",

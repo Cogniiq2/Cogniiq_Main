@@ -53,7 +53,6 @@ const config: NationalIndustryPageConfig = {
     "Lead-Qualifizierung per automatischem Fragebogen",
     "CRM automatisch befüllt: OnOffice, Propstack, HubSpot u.v.m.",
     "Follow-up-Sequenzen für passive Interessenten",
-    "DSGVO-konforme Interessentendatenverarbeitung",
   ],
   workflow: {
     title: "Von der Anfrage zum Termin – automatisch",
@@ -107,8 +106,8 @@ const config: NationalIndustryPageConfig = {
       answer: "Sofort nach Eingang der Anfrage. Das ist der entscheidende Unterschied zu manueller Bearbeitung: Während ein Makler morgens seine E-Mails öffnet, hat das System eingegangene Anfragen bereits kontaktiert, qualifiziert und Exposés verschickt.",
     },
     {
-      question: "Ist die Verarbeitung von Interessentendaten DSGVO-konform?",
-      answer: "Ja. Alle Interessentendaten werden DSGVO-konform verarbeitet – mit dokumentierter Einwilligung, auf europäischen Servern und mit einem Auftragsverarbeitungsvertrag (AVV). Datenschutzerklärung und Opt-in-Prozesse werden gemeinsam mit Ihnen konfiguriert.",
+      question: "Wie werden Interessentendaten verarbeitet?",
+      answer: "Mit dokumentierter Einwilligung, auf europäischen Servern und mit einem Auftragsverarbeitungsvertrag (AVV). Datenschutzerklärung und Opt-in-Prozesse konfigurieren wir gemeinsam mit Ihnen.",
     },
   ],
 };

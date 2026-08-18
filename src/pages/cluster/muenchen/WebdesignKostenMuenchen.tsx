@@ -21,7 +21,7 @@ const config: ClusterPageConfig = {
   hero: {
     h1: "Webdesign Kosten in München – Was kostet eine Website?",
     lead: "Transparente Preisübersicht für professionelles Webdesign in München. München ist der kompetitivste digitale Markt Bayerns – die Investition in Qualität ist hier keine Option, sondern Voraussetzung.",
-    trustTags: ["München", "Premium-Qualität", "Transparente Preise", "DSGVO-konform"],
+    trustTags: ["München", "Premium-Qualität", "Transparente Preise", "Persönliche Betreuung"],
     ctaLabel: "Kostenloses Erstgespräch",
   },
   tldr: {
@@ -38,7 +38,7 @@ const config: ClusterPageConfig = {
     paragraphs: [
       "Die meisten Webdesign-Projekte in München liegen zwischen 1.500 € und 10.000 €. Kleinere Websites starten typischerweise ab ca. 1.500 €. Wer im Münchner Markt – mit seinen höheren Wettbewerbsstandards und anspruchsvolleren Zielgruppen – nachhaltig sichtbar sein will, investiert typisch in den Bereich von 3.000 € bis 7.000 €.",
       "München unterscheidet sich von anderen Städten: Die Zielgruppe ist digital versierter, der Wettbewerb dichter, die Erwartungen an Qualität höher. Eine Website, die in einer Kleinstadt ausreicht, verliert im Münchner Markt sofort gegenüber besser aufgestellten Wettbewerbern.",
-      "In jedem Paket enthalten: individuelles Design, sauberer Code, Mobile-First, DSGVO-Konformität und On-Page SEO. Der Unterschied zwischen den Paketen liegt in SEO-Tiefe, Content-Umfang und laufender Betreuung.",
+      "In jedem Paket enthalten: individuelles Design, sauberer Code, Mobile-First, vollständige Datenschutzdokumentation und On-Page SEO. Der Unterschied zwischen den Paketen liegt in SEO-Tiefe, Content-Umfang und laufender Betreuung.",
     ],
   },
   painPoints: [

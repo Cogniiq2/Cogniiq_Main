@@ -14,18 +14,18 @@ const config: IndustryPageConfig = {
   seo: {
     title: "Webdesign & KI-Telefonassistent für Gastronomie in Bayreuth | Cogniiq",
     description:
-      "Restaurant Website Bayreuth: Cogniiq erstellt Websites, KI-Telefonassistenten und Reservierungsautomatisierungen für Restaurants in Bayreuth. Mehr Tischreservierungen, weniger Telefonaufwand, DSGVO-konform.",
+      "Restaurant Website Bayreuth: Cogniiq erstellt Websites, KI-Telefonassistenten und Reservierungsautomatisierungen für Restaurants in Bayreuth. Mehr Tischreservierungen, weniger Telefonaufwand, persönlich betreut.",
     canonical: `${base}/webdesign-gastronomie-bayreuth`,
     keywords:
       "Restaurant Website Bayreuth, Reservierungssystem Gastronomie Bayreuth, Website Gastronomie Bayreuth, KI Telefonassistent Restaurant Bayreuth",
   },
   hero: {
-    trustTags: ["Bayreuth", "DSGVO-konform", "KI-Integration", "Reservierungen", "Automatisierung"],
+    trustTags: ["Bayreuth", "KI-Integration", "Reservierungen", "Automatisierung"],
     ctaLabel: "Projekt für Gastronomie starten",
   },
   intro: {
     h1: "Webdesign & KI-Telefonassistent für Gastronomie in Bayreuth",
-    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Restaurants und Gastronomie in Bayreuth – für mehr Tischreservierungen, bessere Erreichbarkeit und automatisierte Gästekommunikation. Lokal betreut, DSGVO-konform.",
+    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Restaurants und Gastronomie in Bayreuth – für mehr Tischreservierungen, bessere Erreichbarkeit und automatisierte Gästekommunikation. Lokal betreut.",
   },
   engpaesse: [
     "Reservierungsanrufe binden Servicepersonal genau dann, wenn es im Betrieb gebraucht wird",
@@ -72,7 +72,7 @@ const config: IndustryPageConfig = {
         "Online-Reservierungssystem (Tischbuchung)",
         "Speisekarte & Veranstaltungsbereich",
         "On-Page SEO für 'Restaurant Bayreuth'",
-        "DSGVO-konforme Gästekommunikation",
+        "Datenschutzerklärung, Impressum und Cookie-Einwilligung",
       ],
     },
     {
@@ -205,7 +205,7 @@ const config: IndustryPageConfig = {
         "Ja. Wir bauen Ihre Website so, dass Sie Menüs, Aktionswochen und Events – auch rund um die Bayreuther Festspiele – selbst aktualisieren können, einfach und ohne Programmierkenntnisse.",
     },
     {
-      question: "Sind Gästedaten aus Reservierungen DSGVO-konform gespeichert?",
+      question: "Wie werden Gästedaten aus Reservierungen verarbeitet gespeichert?",
       answer:
         "Ja. Alle Gästedaten werden ausschließlich auf europäischen Servern verarbeitet und nach den Anforderungen der DSGVO gespeichert und verwaltet.",
     },

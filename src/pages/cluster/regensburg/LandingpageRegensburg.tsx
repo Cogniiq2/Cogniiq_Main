@@ -21,7 +21,7 @@ const config: ClusterPageConfig = {
   hero: {
     h1: "Landingpage erstellen lassen in Regensburg",
     lead: "Conversion-optimierte Landingpages für Unternehmen in Regensburg – für Google Ads, organischen Traffic und spezifische Kampagnenziele. Fokussiert, schnell, messbar.",
-    trustTags: ["Regensburg", "Conversion-Fokus", "Google Ads ready", "DSGVO-konform"],
+    trustTags: ["Regensburg", "Conversion-Fokus", "Google Ads ready", "Kein Baukasten"],
     ctaLabel: "Kostenloses Erstgespräch",
   },
   tldr: {
@@ -50,7 +50,7 @@ const config: ClusterPageConfig = {
       "Zentrales Kontaktformular oder Buchungs-CTA",
       "Mobile-First, Ladezeit unter 2s",
       "Google Analytics 4 Event-Tracking",
-      "DSGVO-konformes Setup",
+      "Cookie-Einwilligung und Datenschutz-Link eingerichtet",
       "A/B-ready Grundstruktur",
       "Optional: CRM-Anbindung, E-Mail-Automatisierung",
       "Übergabe mit Bearbeitungszugang",

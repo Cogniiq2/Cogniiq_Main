@@ -14,18 +14,18 @@ const config: IndustryPageConfig = {
   seo: {
     title: "Webdesign & KI-Telefonassistent für Immobilienmakler in Bayreuth | Cogniiq",
     description:
-      "Immobilien Website Bayreuth: Cogniiq entwickelt Websites, KI-Telefonassistenten und Lead-Automatisierungen für Immobilienmakler in Bayreuth. Mehr Anfragen, automatisierte Besichtigungen, DSGVO-konform.",
+      "Immobilien Website Bayreuth: Cogniiq entwickelt Websites, KI-Telefonassistenten und Lead-Automatisierungen für Immobilienmakler in Bayreuth. Mehr Anfragen, automatisierte Besichtigungen, persönlich betreut.",
     canonical: `${base}/webdesign-immobilien-bayreuth`,
     keywords:
       "Immobilien Website Bayreuth, Makler Website Bayreuth, Immobilienmakler Bayreuth Digital, KI Telefonassistent Immobilien Bayreuth",
   },
   hero: {
-    trustTags: ["Bayreuth", "DSGVO-konform", "KI-Integration", "Lead-Qualifizierung", "Automatisierung"],
+    trustTags: ["Bayreuth", "KI-Integration", "Lead-Qualifizierung", "Automatisierung"],
     ctaLabel: "Projekt für Immobilienmakler starten",
   },
   intro: {
     h1: "Webdesign & KI-Telefonassistent für Immobilienmakler in Bayreuth",
-    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Immobilienmakler in Bayreuth – für mehr qualifizierte Kaufanfragen, automatisierte Besichtigungsprozesse und professionelle Objektpräsentation. DSGVO-konform, lokal betreut.",
+    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Immobilienmakler in Bayreuth – für mehr qualifizierte Kaufanfragen, automatisierte Besichtigungsprozesse und professionelle Objektpräsentation. Lokal betreut.",
   },
   engpaesse: [
     "Eingehende Interessentenanrufe lassen sich nicht skalieren – jeder Anruf kostet Maklerzeit ohne Vorqualifizierung",
@@ -72,7 +72,7 @@ const config: IndustryPageConfig = {
         "Strukturierte Objektseiten mit Exposé-Darstellung",
         "Kontaktformular mit automatischer Lead-Benachrichtigung",
         "On-Page SEO für 'Immobilienmakler Bayreuth'",
-        "DSGVO-konforme Datenschutzdokumentation",
+        "Datenschutzerklärung, Impressum und Cookie-Einwilligung",
       ],
     },
     {
@@ -112,7 +112,7 @@ const config: IndustryPageConfig = {
       icon: "web",
       title: "Immobilien-Website Bayreuth",
       description:
-        "Hochwertige Makler-Website mit professionellen Objektseiten, Exposé-Darstellung, Anfrage-Workflow und gezieltem SEO für Suchanfragen wie 'Immobilienmakler Bayreuth' oder 'Wohnung kaufen Bayreuth'. Mobiloptimiert, conversion-stark, DSGVO-konform.",
+        "Hochwertige Makler-Website mit professionellen Objektseiten, Exposé-Darstellung, Anfrage-Workflow und gezieltem SEO für Suchanfragen wie 'Immobilienmakler Bayreuth' oder 'Wohnung kaufen Bayreuth'. Mobiloptimiert und conversion-stark.",
     },
     {
       icon: "phone",
@@ -185,9 +185,9 @@ const config: IndustryPageConfig = {
   ],
   faq: [
     {
-      question: "Kann Cogniiq eine DSGVO-konforme Makler-Website in Bayreuth erstellen?",
+      question: "Was liefert Cogniiq zum Datenschutz einer Makler-Website in Bayreuth erstellen?",
       answer:
-        "Ja. Alle Websites und Systeme werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse – mit korrekten Datenschutzdokumentationen, Cookie-Einwilligungen und sicherer Verarbeitung aller Interessentendaten auf europäischen Servern.",
+        "Zum Lieferumfang gehören Datenschutzerklärung, Impressum, Cookie-Einwilligung und die dokumentierte Verarbeitung der Interessentendaten auf europäischen Servern. Ob der konkrete Einsatz den Anforderungen genügt, beurteilt Ihr Datenschutzbeauftragter – wir liefern ihm die Unterlagen dafür zu.",
     },
     {
       question: "Wie werden Interessentenanfragen über die Website automatisch vorqualifiziert?",

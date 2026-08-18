@@ -14,18 +14,18 @@ const config: IndustryPageConfig = {
   seo: {
     title: "Webdesign & KI-Telefonassistent für Arztpraxen in München | Cogniiq",
     description:
-      "Praxis Website München: Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungen für Arztpraxen in München. Weniger Telefonüberlastung, mehr Online-Termine, DSGVO-konform.",
+      "Praxis Website München: Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungen für Arztpraxen in München. Weniger Telefonüberlastung, mehr Online-Termine, persönlich betreut.",
     canonical: `${base}/webdesign-arzt-muenchen`,
     keywords:
       "Praxis Website München, Arzt Website München, Terminbuchung Praxis München, KI Rezeption Arztpraxis München",
   },
   hero: {
-    trustTags: ["München", "DSGVO-konform", "KI-Integration", "Terminprozesse", "Automatisierung"],
+    trustTags: ["München", "KI-Integration", "Terminprozesse", "Automatisierung"],
     ctaLabel: "Projekt für Arztpraxis starten",
   },
   intro: {
     h1: "Webdesign & KI-Telefonassistent für Arztpraxen in München",
-    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Arztpraxen in München – für mehr Patientenanfragen, bessere Erreichbarkeit und automatisierte Terminprozesse. DSGVO-konform, schnell eingerichtet.",
+    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme für Arztpraxen in München – für mehr Patientenanfragen, bessere Erreichbarkeit und automatisierte Terminprozesse. Schnell eingerichtet, persönlich betreut.",
   },
   problems: [
     "In einer Millionenstadt wie München ist die Konkurrenz unter Praxen hoch – eine veraltete Website kostet täglich neue Patienten",
@@ -41,7 +41,7 @@ const config: IndustryPageConfig = {
       icon: "web",
       title: "Praxis-Website München",
       description:
-        "Hochperformante Praxis-Website mit Online-Terminbuchung, klarer Leistungsübersicht, Arztprofilen und gezieltem SEO für Suchanfragen wie 'Arzt München' oder 'Praxis München'. Conversion-optimiert, mobilfreundlich, DSGVO-konform – damit Ihre Praxis in der Münchner Suchergebnisseite sichtbar bleibt.",
+        "Hochperformante Praxis-Website mit Online-Terminbuchung, klarer Leistungsübersicht, Arztprofilen und gezieltem SEO für Suchanfragen wie 'Arzt München' oder 'Praxis München'. Conversion-optimiert und mobilfreundlich – damit Ihre Praxis in der Münchner Suchergebnisseite sichtbar bleibt.",
     },
     {
       icon: "phone",
@@ -100,7 +100,7 @@ const config: IndustryPageConfig = {
   localContext: [
     "München ist einer der dichtesten Gesundheitsmärkte Deutschlands. Arztpraxen konkurrieren in der Millionenstadt nicht nur um Kassenpatienten, sondern auch um Privatpatienten und Selbstzahler. Gleichzeitig sind die Erwartungen an Digitalität und Service in München überdurchschnittlich hoch – Patienten erwarten Online-Terminbuchung, schnelle Reaktionszeiten und eine moderne Praxis-Website als Selbstverständlichkeit.",
     "Cogniiq entwickelt für Arztpraxen in München maßgeschneiderte Digitallösungen: eine hochperformante Praxis-Website mit integrierter Terminbuchung, einen KI-Telefonassistenten, der die Rezeption auch außerhalb der Sprechzeiten entlastet, sowie Automatisierungssysteme, die Terminerinnerungen, Patientenkommunikation und interne Abläufe ohne manuellen Aufwand steuern.",
-    "Alle Systeme werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Die Betreuung erfolgt durch Cogniiq persönlich – transparent, direkt und ohne unnötige Zwischenstellen.",
+    "Alle Systeme werden datenschutzorientiert umgesetzt, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Die Betreuung erfolgt durch Cogniiq persönlich – transparent, direkt und ohne unnötige Zwischenstellen.",
   ],
   internalLinks: [
     { label: "Webdesign München", href: "/muenchen/webdesign" },
@@ -115,9 +115,9 @@ const config: IndustryPageConfig = {
   ],
   faq: [
     {
-      question: "Kann Cogniiq eine DSGVO-konforme Praxis-Website in München erstellen?",
+      question: "Was liefert Cogniiq zum Datenschutz einer Praxis-Website in München?",
       answer:
-        "Ja. Alle Websites und Systeme von Cogniiq werden datenschutzorientiert umgesetzt und unterstützen DSGVO-konforme Prozesse. Formulare, Datenschutzerklärungen, Cookie-Einwilligungen und die Datenverarbeitung entsprechen den geltenden Datenschutzanforderungen für Arztpraxen.",
+        "Zum Lieferumfang gehören Datenschutzerklärung, Impressum, Cookie-Einwilligung, gesicherte Formularübertragung und die Dokumentation der Datenflüsse. Ob der konkrete Einsatz den Anforderungen genügt, beurteilt Ihr Datenschutzbeauftragter – wir liefern ihm die Unterlagen dafür zu.",
     },
     {
       question: "Funktioniert der KI-Telefonassistent mit meiner bestehenden Praxissoftware?",

@@ -21,7 +21,7 @@ const config: ClusterPageConfig = {
   hero: {
     h1: "Webdesign Kosten in Bayreuth – Was kostet eine Website?",
     lead: "Transparente Preisübersicht für professionelles Webdesign in Bayreuth. Keine Pauschalen, keine versteckten Kosten – eine ehrliche Einschätzung, was Qualität kostet und warum sie sich lohnt.",
-    trustTags: ["Bayreuth", "Transparente Preise", "Kein Baukasten", "DSGVO-konform"],
+    trustTags: ["Bayreuth", "Transparente Preise", "Kein Baukasten", "Persönliche Betreuung"],
     ctaLabel: "Kostenloses Erstgespräch",
   },
   tldr: {
@@ -38,7 +38,7 @@ const config: ClusterPageConfig = {
     paragraphs: [
       "Die meisten Webdesign-Projekte in Bayreuth liegen zwischen 1.500 € und 8.000 €. Kleinere Websites für lokale Dienstleister oder Praxen starten typischerweise ab ca. 1.500 €. Projekte mit erweitertem Local SEO, Content-Strategie und Integrationen bewegen sich im Bereich von 3.000 € bis 6.000 €.",
       "Der Preis hängt von drei Faktoren ab: Seitenumfang, SEO-Tiefe und Integrationen. Eine fünfseitige Unternehmenswebsite ohne komplexe Funktionen ist ein grundlegend anderes Projekt als eine skalierbare Plattform mit Buchungssystem, Automatisierungen und laufender SEO-Strategie.",
-      "Was in jedem Paket enthalten ist: individuelles Design (kein Template), sauberer Code, mobile Optimierung, DSGVO-Konformität und On-Page SEO. Das sind keine Extras – das ist der Standard, den jede professionelle Website erfüllen muss.",
+      "Was in jedem Paket enthalten ist: individuelles Design (kein Template), sauberer Code, mobile Optimierung, vollständige Datenschutzdokumentation und On-Page SEO. Das sind keine Extras – das ist der Standard, den jede professionelle Website erfüllen muss.",
     ],
   },
   painPoints: [
@@ -126,7 +126,7 @@ const config: ClusterPageConfig = {
     {
       question: "Sind Hosting und Domain im Preis enthalten?",
       answer:
-        "Nein, Hosting und Domain sind separate Positionen. Wir empfehlen passende, DSGVO-konforme Anbieter und helfen bei der Einrichtung – in der Regel unter 20 € pro Monat für performantes Managed Hosting.",
+        "Nein, Hosting und Domain sind separate Positionen. Wir empfehlen passende Anbieter mit europäischen Rechenzentren und helfen bei der Einrichtung – in der Regel unter 20 € pro Monat für performantes Managed Hosting.",
     },
     {
       question: "Was kostet laufende Wartung und Pflege?",

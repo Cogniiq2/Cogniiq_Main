@@ -247,7 +247,6 @@ function TrustStripSection({ config }: { config: IndustryPageConfig }) {
   const items = [
     config.city,
     config.industry,
-    "DSGVO-konform",
     "KI-Integration",
     "Automatisierung",
     "7–14 Tage Setup",
