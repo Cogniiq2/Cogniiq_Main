@@ -291,8 +291,11 @@ export const TARIF_ENTERPRISE =
  */
 export const DECKELUNG = {
   headline: "Zuerst die Obergrenze, dann der Preis",
-  text: "Jeder Tarif enthält ein festes Minutenkontingent. Wird es überschritten, kostet jede weitere Minute 0,39 €. Nach oben ist die Rechnung gedeckelt: Mehr als der nächsthöhere Tarif kostet es nie. Eine Grippewelle kann Ihre Rechnung also bewegen, aber nicht sprengen.",
-  hinweis: "Mehr als der nächsthöhere Tarif kostet es nie.",
+  text:
+    "Jeder Tarif enthält ein festes Minutenkontingent. Verbrauchen Sie mehr Minuten als enthalten, zahlen Sie 0,39 € je zusätzliche Minute. Nach oben ist jeder Tarif gedeckelt: In Basis und Praxis greift spätestens der Preis des nächsthöheren Tarifs, im Tarif MVZ liegt die Grenze bei 1.400 € — mehr zahlen Sie in diesem Monat nicht. Eine Grippewelle kann Ihre Rechnung also bewegen, aber nicht sprengen.",
+  hinweis: "Mehr als die ausgewiesene Obergrenze kostet es nie.",
+  tarifwechsel:
+    "Liegt Ihr Aufkommen dauerhaft höher, wechseln wir Sie in den passenden Tarif — damit Sie nicht Monat für Monat den Zuschlag zahlen.",
   nichtProBehandler:
     "Abgerechnet wird pro Praxis, nicht pro Behandler. Ob bei Ihnen zwei oder sieben Personen behandeln, ändert am Monatsbetrag nichts.",
 };
@@ -517,4 +520,9 @@ export const RECHNER = {
   stundenkostenSource: "Gehaltstarifvertrag MFA (Virchowbund), 2026",
   startwertHinweis:
     "Alle Startwerte sind frei gewählte Beispiele, keine Branchenstatistik.",
+  terminwertLabel: "Was ist Ihnen ein gewonnener Termin wert?",
+  terminwertKontext:
+    "Der wirtschaftliche Nutzen liegt meist nicht in der eingesparten Zeit, sondern in den Anrufen, die heute gar nicht ankommen. Was ein gewonnener Termin für Ihre Praxis wert ist, wissen nur Sie — deshalb rechnen wir diesen Teil nicht ohne Ihre Angabe.",
+  terminwertLeer:
+    "Solange dieses Feld leer bleibt, bleibt dieser Teil der Rechnung leer. Wir setzen hier keinen typischen Wert ein.",
 };

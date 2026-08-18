@@ -481,6 +481,7 @@ export function PraxenPage() {
           <div className="max-w-4xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>{DECKELUNG.headline}</h2>
             <p className={`${PROSE} mb-4`}>{DECKELUNG.text}</p>
+            <p className={`${PROSE} mb-4`}>{DECKELUNG.tarifwechsel}</p>
             <p className={`${PROSE} mb-10`}>{DECKELUNG.nichtProBehandler}</p>
 
             {/* Tarife als Karten — auf dem Handy kein horizontales Scrollen */}

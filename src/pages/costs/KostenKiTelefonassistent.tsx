@@ -223,6 +223,9 @@ export function KostenKiTelefonassistent() {
                   </li>
                 ))}
               </ul>
+              <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7] mt-6">
+                {DECKELUNG.tarifwechsel}
+              </p>
             </div>
           </div>
         </section>

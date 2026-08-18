@@ -46,31 +46,48 @@ interface TarifErgebnis {
 }
 
 /**
- * Tarifwahl: der kleinste Tarif, dessen Kontingent den Bedarf deckt. Reicht
- * auch der größte nicht, kommt Mehrverbrauch dazu — gedeckelt auf dessen
+ * Tarifwahl — bildet die Zusage der Preisseite exakt ab:
+ *
+ *   1. Über dem Kontingent kostet jede Minute 0,39 €.
+ *   2. Nach oben ist jeder Tarif auf seine ausgewiesene Obergrenze gedeckelt.
+ *   3. Bei dauerhaft höherem Aufkommen wechseln wir in den passenden Tarif,
+ *      damit der Kunde nicht Monat für Monat den Zuschlag zahlt.
+ *
+ * Aus Punkt 3 folgt die Regel: Wir nehmen den günstigsten Tarif, dessen
+ * Obergrenze bei diesem Bedarf NICHT erreicht wird — denn ein dauerhaft am
+ * Deckel laufender Tarif ist genau der Zustand, den Punkt 3 ausschließt. Ist
+ * bei jedem Tarif der Deckel erreicht, bleibt der größte mit seiner
  * Obergrenze.
  *
- * ACHTUNG, bewusst konservativ gerechnet: Die Deckelungsregel „nie mehr als
- * der nächsthöhere Tarif" ließe sich auch so lesen, dass ein Basis-Kunde bei
- * beliebigem Verbrauch nie über 500 € zahlt. Dann wäre Basis bei hohem
- * Aufkommen dauerhaft der günstigste Tarif und die höheren Stufen
- * wirtschaftlich sinnlos. Wir unterstellen stattdessen die stufenweise
- * Lesart und wählen den Tarif, der zum Bedarf passt — das ist die für den
- * Kunden teurere und damit die sichere Annahme.
- * [[CLAIM: Auslegung der Deckelung über mehrere Stufen vom Inhaber bestätigen]]
+ * Ohne Punkt 3 würde die Deckelung den kleinsten Tarif bei hohem Verbrauch zum
+ * günstigsten machen; mit Punkt 3 wählt der Rechner das, was der Kunde
+ * tatsächlich bekommt.
  */
 function waehleTarif(minutenBedarf: number): TarifErgebnis {
-  const passend = TARIFE.find((t) => t.minuten >= minutenBedarf) ?? TARIFE[TARIFE.length - 1];
-  const ueber = Math.max(0, minutenBedarf - passend.minuten);
-  const monatlich = Math.min(
-    betragZuZahl(passend.monatlich) + ueber * MEHRPREIS_PRO_MINUTE,
-    betragZuZahl(passend.obergrenze)
-  );
+  const kandidaten = TARIFE.map((t) => {
+    const ueber = Math.max(0, minutenBedarf - t.minuten);
+    const obergrenze = betragZuZahl(t.obergrenze);
+    const roh = betragZuZahl(t.monatlich) + ueber * MEHRPREIS_PRO_MINUTE;
+    return {
+      tarif: t,
+      monatlich: Math.min(roh, obergrenze),
+      mehrverbrauchMinuten: ueber,
+      einrichtung: betragZuZahl(t.einrichtung),
+      amDeckel: roh >= obergrenze,
+    };
+  });
+
+  const ohneDeckel = kandidaten.filter((k) => !k.amDeckel);
+  const gewaehlt =
+    ohneDeckel.length > 0
+      ? ohneDeckel.reduce((a, b) => (b.monatlich < a.monatlich ? b : a))
+      : kandidaten[kandidaten.length - 1];
+
   return {
-    tarif: passend,
-    monatlich,
-    mehrverbrauchMinuten: ueber,
-    einrichtung: betragZuZahl(passend.einrichtung),
+    tarif: gewaehlt.tarif,
+    monatlich: gewaehlt.monatlich,
+    mehrverbrauchMinuten: gewaehlt.mehrverbrauchMinuten,
+    einrichtung: gewaehlt.einrichtung,
   };
 }
 
@@ -140,6 +157,9 @@ export function PraxisRechnerWidget() {
   const [minutenProAnruf, setMinutenProAnruf] = useState(3);
   const [stundenkosten, setStundenkosten] = useState(18);
   const [ersparnisProzent, setErsparnisProzent] = useState(20);
+  // Bewusst als String und bewusst leer: ohne Angabe des Besuchers wird dieser
+  // Teil der Rechnung NICHT berechnet und NICHT geschätzt.
+  const [terminwertEingabe, setTerminwertEingabe] = useState("");
 
   const anrufeProMonat = anrufeProWoche * WOCHEN_PRO_MONAT;
   const heuteAngenommen = anrufeProMonat * (1 - verpasstProzent / 100);
@@ -159,8 +179,21 @@ export function PraxisRechnerWidget() {
   const einrichtungProMonat = einrichtung / 12;
   const kostenProMonat = monatlich + einrichtungProMonat;
 
+  // Wert der zusätzlich angenommenen Anrufe — nur wenn der Besucher eine Zahl
+  // eingetragen hat. `null` bedeutet: dieser Teil bleibt leer.
+  const terminwert =
+    terminwertEingabe.trim() === "" ? null : Number(terminwertEingabe.replace(",", "."));
+  const terminwertGueltig = terminwert !== null && Number.isFinite(terminwert) && terminwert > 0;
+  const anrufwertMax = terminwertGueltig ? zusaetzlichAngenommen * (terminwert as number) : null;
+
   const nettoUnten = wertUnten - kostenProMonat;
   const nettoOben = wertOben - kostenProMonat;
+  // Wie viele der zusätzlich angenommenen Anrufe zu einem Termin führen müssten,
+  // damit sich der Empfang trägt. Keine Abschlussquote unterstellt — die Zahl
+  // wird ausgerechnet, nicht angenommen.
+  const noetigeTermine = terminwertGueltig
+    ? Math.max(0, (kostenProMonat - wertOben) / (terminwert as number))
+    : null;
   const istPunktwert = ersparnisProzent <= UNTERGRENZE_PROZENT;
 
   return (
@@ -235,6 +268,40 @@ export function PraxisRechnerWidget() {
             einheit="%"
             onChange={setErsparnisProzent}
           />
+
+          <div className="pt-2 border-t border-gray-100 dark:border-gray-800">
+            <p className="text-[16px] text-gray-600 dark:text-gray-400 leading-[1.7] mb-4 mt-5">
+              {RECHNER.terminwertKontext}
+            </p>
+            <label
+              htmlFor="rechner-terminwert"
+              className="block text-[16px] font-medium text-gray-800 dark:text-gray-200 mb-2"
+            >
+              {RECHNER.terminwertLabel}
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                id="rechner-terminwert"
+                type="number"
+                inputMode="decimal"
+                min={0}
+                step={1}
+                value={terminwertEingabe}
+                onChange={(e) => setTerminwertEingabe(e.target.value)}
+                aria-describedby="rechner-terminwert-hinweis"
+                className="w-40 min-h-[44px] px-4 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-[17px] text-gray-900 dark:text-gray-100 tabular-nums focus:outline-none focus:border-gray-900 dark:focus:border-gray-100"
+              />
+              <span className="text-[17px] text-gray-600 dark:text-gray-400">€ je Termin</span>
+            </div>
+            {!terminwertGueltig && (
+              <p
+                id="rechner-terminwert-hinweis"
+                className="text-[14px] text-gray-500 dark:text-gray-500 mt-2 leading-[1.5]"
+              >
+                {RECHNER.terminwertLeer}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
@@ -252,10 +319,25 @@ export function PraxisRechnerWidget() {
             <span className="font-semibold tabular-nums">{zahl(zusaetzlichAngenommen)}</span>{" "}
             Anrufe im Monat, die heute niemanden erreichen, werden angenommen.
           </p>
-          <p className="text-[14px] text-gray-500 dark:text-gray-500 mt-2 leading-[1.5]">
-            Bewusst ohne Eurobetrag: Was ein einzelner Anruf wert ist, weiß Ihre
-            Praxis besser als wir.
-          </p>
+          {terminwertGueltig ? (
+            <div className="mt-5 pt-5 border-t border-gray-200 dark:border-gray-700">
+              <Zeile
+                label={`Bei ${zahl(terminwert as number)} € je Termin, wenn jeder dieser Anrufe zu einem Termin führt`}
+                wert={`${eur(anrufwertMax as number)} / Monat`}
+              />
+              <p className="text-[14px] text-gray-500 dark:text-gray-500 mt-3 leading-[1.5]">
+                Das ist die Obergrenze, nicht die Erwartung: Nicht jeder angenommene
+                Anruf wird ein Termin. Wie hoch der Anteil in Ihrer Praxis ist, wissen
+                wir nicht und setzen dafür keine Zahl ein.
+              </p>
+            </div>
+          ) : (
+            <p className="text-[14px] text-gray-500 dark:text-gray-500 mt-2 leading-[1.5]">
+              Bewusst ohne Eurobetrag: Was ein einzelner Anruf wert ist, weiß Ihre
+              Praxis besser als wir. Tragen Sie unten einen Wert ein, wenn Sie diesen
+              Teil rechnen möchten.
+            </p>
+          )}
         </div>
 
         {/* Kennzahl 2 — getrennt, als Spanne */}
@@ -313,6 +395,30 @@ export function PraxisRechnerWidget() {
               ? "Bei diesen Angaben trägt sich der Empfang rechnerisch nicht. Das ist ein ehrliches Ergebnis und ein guter Grund, das Erstgespräch kurz zu halten."
               : "Nach Abzug unserer eigenen Kosten, einschließlich der Einrichtung."}
           </p>
+          {terminwertGueltig && (
+            <div className="mt-5 pt-5 border-t border-gray-200 dark:border-gray-700">
+              <p className="text-[17px] text-gray-900 dark:text-gray-100 leading-[1.6]">
+                {(noetigeTermine as number) <= 0 ? (
+                  <>Die eingesparte Zeit deckt die Kosten bereits — jeder gewonnene Termin kommt hinzu.</>
+                ) : (
+                  <>
+                    Damit sich der Empfang trägt, müssten{" "}
+                    <span className="font-semibold tabular-nums">
+                      {Math.ceil(noetigeTermine as number)}
+                    </span>{" "}
+                    der {zahl(zusaetzlichAngenommen)} zusätzlich angenommenen Anrufe im
+                    Monat zu einem Termin führen. Das sind{" "}
+                    {Math.round((Math.ceil(noetigeTermine as number) / zusaetzlichAngenommen) * 100)}{" "}
+                    Prozent.
+                  </>
+                )}
+              </p>
+              <p className="text-[14px] text-gray-500 dark:text-gray-500 mt-2 leading-[1.5]">
+                Diese Zahl ist ausgerechnet, nicht angenommen. Ob sie realistisch ist,
+                beurteilen Sie.
+              </p>
+            </div>
+          )}
           <p className="text-[14px] text-gray-500 dark:text-gray-500 mt-4 leading-[1.5]">
             {RECHNER.label}
           </p>
@@ -350,8 +456,9 @@ export function PraxisRechnerWidget() {
                 Tarifwahl:
               </strong>{" "}
               {zahl(anrufeProMonat)} Anrufe × {MINUTEN_PRO_ANRUF} Min. ={" "}
-              {zahl(minutenBedarf)} Min. Bedarf. Kleinster Tarif, dessen Kontingent
-              das deckt: {tarif.name} mit {zahl(tarif.minuten)} Min.
+              {zahl(minutenBedarf)} Min. Bedarf. Gewählt wird der günstigste Tarif,
+              der bei diesem Bedarf nicht dauerhaft an seiner Obergrenze läuft:{" "}
+              {tarif.name} mit {zahl(tarif.minuten)} Min.
               {mehrverbrauchMinuten > 0 &&
                 ` Darüber ${zahl(mehrverbrauchMinuten)} Min. zu ${MEHRPREIS_PRO_MINUTE.toLocaleString("de-DE", { minimumFractionDigits: 2 })} €, gedeckelt auf ${tarif.obergrenze}.`}
             </p>
@@ -370,14 +477,28 @@ export function PraxisRechnerWidget() {
               genau dieser Frage liegt bei 10 bis 20 %, bewusst netto nach Nacharbeit
               gerechnet. Wir setzen die untere Kante deshalb fest auf diesen Wert.
             </p>
-            <p>
-              <strong className="font-semibold text-gray-900 dark:text-gray-100">
-                Was nicht eingerechnet ist:
-              </strong>{" "}
-              Der Wert der zusätzlich angenommenen Anrufe. Was ein gewonnener Termin
-              oder eine rechtzeitige Absage wert ist, hängt von Ihrer Praxis ab — wir
-              setzen dafür keine Zahl ein.
-            </p>
+            {terminwertGueltig ? (
+              <p>
+                <strong className="font-semibold text-gray-900 dark:text-gray-100">
+                  Gewonnene Termine, getrennt gerechnet:
+                </strong>{" "}
+                {zahl(zusaetzlichAngenommen)} zusätzlich angenommene Anrufe ×{" "}
+                {zahl(terminwert as number)} € = {eur(anrufwertMax as number)} — aber nur,
+                wenn jeder dieser Anrufe zu einem Termin führt. Diese Zahl fließt
+                deshalb NICHT in das Ergebnis oben ein; sie steht daneben. Ins
+                Verhältnis gesetzt ergibt sie, wie viele Termine die Kosten decken
+                würden.
+              </p>
+            ) : (
+              <p>
+                <strong className="font-semibold text-gray-900 dark:text-gray-100">
+                  Was nicht eingerechnet ist:
+                </strong>{" "}
+                Der Wert der zusätzlich angenommenen Anrufe. Was ein gewonnener Termin
+                oder eine rechtzeitige Absage wert ist, hängt von Ihrer Praxis ab — wir
+                setzen dafür keine Zahl ein.
+              </p>
+            )}
           </div>
         </details>
       </div>
