@@ -59,7 +59,9 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       `Festes Minutenkontingent, darüber ${FAKTEN.mehrpreisProMinute}/Min. – gedeckelt auf die ausgewiesene Obergrenze Ihres Tarifs; Einmalposten stehen vor Vertragsschluss im Angebot`,
       "Ihre Stimmauswahl, Ihr Begrüßungssatz, Ihre Formulierungen – Anrufer erfahren im ersten Satz, dass ein KI-System spricht",
       "Jedes Gespräch endet als strukturierter Eintrag bei Ihrem Team – kein Abhören, kein Abtippen",
-      "Ihre Rufnummer und Ihre Telefonanlage bleiben – ein Systemwechsel ist nicht Voraussetzung",
+      // B4 (Rufumleitung, Kompatibilität der Telefonanlage) ist unbeantwortet;
+      // bis dahin keine Zusage, dass Rufnummer und Anlage bleiben.
+      "Ihre Anrufe werden auf den Assistenten umgeleitet – was dafür an Ihrer Telefonanlage nötig ist, klären wir vor dem Angebot",
       "Hauptsitz in Bayreuth: fester Ansprechpartner, direkte Erreichbarkeit, Termine vor Ort möglich",
       "Keine Gesprächsaufzeichnung, kein Training mit Ihren Daten – Auftragsverarbeitungsvertrag nach Art. 28 DSGVO inklusive",
     ],
@@ -92,7 +94,10 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { question: "Was unterscheidet den Assistenten von einem Telefonmenü oder Chatbot?", answer: "Ein Telefonmenü zwingt Anrufer in starre Optionen und Tastennavigation. Der Assistent arbeitet mit gesprochener Sprache: Er erfragt das Anliegen, beantwortet freigegebene Fragen und nimmt alles andere strukturiert auf – ohne dass sich jemand durch ein Menü drücken muss." },
       { question: "Können mehrere Anrufe gleichzeitig ankommen?", answer: "Ja. Auch wenn mehrere Anrufe gleichzeitig eingehen, wird jeder angenommen – ohne Warteschleife. Das ist gerade zu Stoßzeiten der eigentliche Unterschied zum klassischen Empfang mit einer Leitung." },
       { question: "Was passiert bei einem technischen Ausfall?", answer: "Für den Störungsfall wird ein Fallback eingerichtet: Anrufe laufen dann auf eine von Ihnen benannte Nummer oder auf eine klare Ansage mit dem nächsten Schritt. Diesen Weg legen wir gemeinsam bei der Einrichtung fest." },
-      { question: "Kann der Assistent in bestehende Buchungssysteme integriert werden?", answer: "Gängige Buchungs- und Kalender-Tools binden wir an; welches System Sie nutzen, klären wir im Erstgespräch und prüfen die Anbindung vor dem Angebot. Ein Wechsel Ihres Systems ist nicht Voraussetzung." },
+      // „binden wir an" behauptete bestehende Standardanbindungen. Es gibt keine
+      // Liste unterstützter Systeme (ANBINDUNG.nichtBehauptet) — die Prüfung ist
+      // das, was zugesagt werden darf.
+      { question: "Kann der Assistent in bestehende Buchungssysteme integriert werden?", answer: "Das hängt von Ihrem System ab. Welche Schnittstelle es bietet, prüfen wir vor dem Angebot – und das Ergebnis steht im Angebot, auch wenn es negativ ausfällt. Ohne Anbindung bleibt es beim strukturierten Eintrag im Dashboard, den Ihr Team überträgt." },
       { question: "Wer betreut uns nach dem Start?", answer: "Ein fester Ansprechpartner in Bayreuth – kein anonymes Ticketsystem. In den ersten Wochen werten wir Gesprächsverläufe gemeinsam aus und passen Regeln und Ansagen an; danach bleibt der Draht derselbe." },
     ],
     localChallenges: [
@@ -443,7 +448,9 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     warumCogniiq: [
       `Festes Minutenkontingent, darüber ${FAKTEN.mehrpreisProMinute}/Min. – gedeckelt auf die ausgewiesene Obergrenze Ihres Tarifs; Einmalposten stehen vor Vertragsschluss im Angebot`,
       "Ihre Stimmauswahl, Ihr Begrüßungssatz, Ihre Formulierungen – Anrufer erfahren im ersten Satz, dass ein KI-System spricht",
-      "Gespräche strukturiert protokolliert – übergeben dorthin, wo Ihr Team arbeitet: Kalender, CRM oder Buchungssystem",
+      // Widersprach FAKTEN.keineAnbindung: eine fertige Übergabe in Kalender,
+      // CRM oder Buchungssystem gibt es heute nicht.
+      "Jedes Gespräch endet als strukturierter Eintrag im Dashboard – kein Abhören, kein Rekonstruieren; ob eine Anbindung an Ihr System möglich ist, prüfen wir vor dem Angebot",
       "Auch bei Anrufspitzen in der Tourismussaison wird jeder Anruf angenommen – ohne Warteschleife",
       "Keine Gesprächsaufzeichnung, kein Training mit Ihren Daten – Auftragsverarbeitungsvertrag nach Art. 28 DSGVO inklusive",
       "Persönliche Betreuung mit festem Ansprechpartner – kein Ticketsystem",
@@ -476,8 +483,11 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { question: "Was kostet der KI Telefonassistent?", answer: `Sie zahlen einen festen Monatsbetrag für ein Minutenkontingent. ${FAKTEN.deckelung} ${FAKTEN.tarifzuordnung} Nach dem Erstgespräch erhalten Sie ein schriftliches Angebot, in dem auch Einmalposten offen ausgewiesen sind.` },
       { question: "Wie unterscheidet sich der Assistent von einer klassischen Telefonanlage?", answer: "Eine Anlage leitet weiter und zeichnet auf – ohne das Anliegen zu erfassen. Der Assistent erfragt das Anliegen in gesprochener Sprache, beantwortet freigegebene Fragen, trägt Termine nach Ihren Regeln ein und übergibt alles andere strukturiert – ohne Tastenmenü und starre Optionen." },
       { question: "Kann der Assistent auch auf Englisch sprechen?", answer: "Für Betriebe mit internationalem Publikum – Tourismus, Universität, Technologie – sind mehrsprachige Konfigurationen möglich, üblicherweise Deutsch und Englisch. Den konkreten Umfang klären wir im Erstgespräch." },
-      { question: "Wie funktioniert die Anbindung an meinen bestehenden Kalender?", answer: "Gängige Buchungs- und Kalendertools binden wir an. Welches System Sie nutzen, besprechen wir vorab und prüfen die Anbindung vor dem Angebot – ein Systemwechsel ist nicht Voraussetzung." },
-      { question: "Muss ich meine Telefonnummer wechseln?", answer: "Nein. Der Assistent läuft auf Ihrer bestehenden Rufnummer. Für Ihre Anrufer ändert sich nur eines: Es nimmt jemand ab." },
+      // Siehe Bayreuth: keine Zusage bestehender Anbindungen.
+      { question: "Wie funktioniert die Anbindung an meinen bestehenden Kalender?", answer: "Welche Schnittstelle Ihr Kalender bietet, sehen wir uns vor dem Angebot an; das Ergebnis steht darin, auch wenn es negativ ausfällt. Wo keine Anbindung möglich ist, bleibt es beim strukturierten Eintrag im Dashboard, den Ihr Team überträgt." },
+      // B4 unbeantwortet: keine Zusage zur bestehenden Rufnummer, solange die
+      // Anschlussart nicht bestätigt ist.
+      { question: "Was ändert sich an meinem Telefonanschluss?", answer: "Ihre Anrufe werden auf den Assistenten umgeleitet. Was das für Ihre Anschlussart und Ihre Telefonanlage konkret bedeutet, prüfen wir vor dem Angebot und schreiben es hinein – nicht danach." },
     ],
     localChallenges: [
       "Wirtschaftswachstum und Tourismus bringen deutlich mehr Anrufaufkommen – aber keinen entsprechenden Zuwachs an Personal am Telefon",

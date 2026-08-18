@@ -28,6 +28,8 @@ const CLUSTER = [
   "src/pages/DatenschutzSicherheitPage.tsx",
   "src/components/PraxisRechnerWidget.tsx",
   "src/components/PraxisRechnerSection.tsx",
+  "src/components/CityServicePage.tsx",
+  "src/components/TelefonassistentKompaktSection.tsx",
 ];
 
 /**

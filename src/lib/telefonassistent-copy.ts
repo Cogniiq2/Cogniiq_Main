@@ -701,3 +701,75 @@ export const RECHNER = {
   terminwertLeer:
     "Solange dieses Feld leer bleibt, bleibt dieser Teil der Rechnung leer. Wir setzen hier keinen typischen Wert ein.",
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// KOMPAKTFASSUNGEN für die drei Stadtseiten (Inhaber-Entscheidung „Option A“,
+// 18.08.2026).
+//
+// Warum kompakt und nicht vollständig: Die Stadtseite soll lokal sein. Die
+// Tiefe liegt auf /praxen. Die vollständige Beweiskette auf die Stadtseiten zu
+// kopieren, brächte je Seite rund 9.700 Zeichen geteilten Text und drückte alle
+// drei unter die 40-%-Schwelle für einzigartigen Inhalt — verdünnter
+// Unique-Anteil ist genau das Muster, das Stadtseiten abgewertet werden lässt.
+//
+// BINDEND: Diese Fassungen formulieren nichts neu. Jeder Satz kommt aus FAKTEN,
+// SAEULEN, DATENSCHUTZ_PUNKTE oder UMKEHRBARKEIT. Wer hier einen eigenen String
+// einsetzt, erzeugt genau die zweite Wahrheitsquelle, die HONESTY-AUDIT §7
+// beschreibt.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface KompaktBlock {
+  /** Welches Modul verkürzt wird — für Wartung, nicht für die Anzeige. */
+  modul: string;
+  headline: string;
+  /** Ziel der Vollversion. Jede Kompaktfassung verweist auf genau eine Seite. */
+  mehr: { label: string; href: string };
+}
+
+/** M4 · Die vier Säulen — Titel ohne die vier Absätze. */
+export const KOMPAKT_SAEULEN: KompaktBlock & { punkte: string[] } = {
+  modul: "M4",
+  headline: "Was wir konkret anders machen",
+  // Alle vier Säulen, weil P1–P4 zusammen die Positionierung tragen; verkürzt
+  // wird die Beschreibung, nicht die Zahl der Säulen.
+  punkte: SAEULEN.map((saeule) => saeule.title),
+  mehr: {
+    label: "Die vier Säulen mit der Mechanik dahinter",
+    href: "/praxen",
+  },
+};
+
+/** M10 · Planbare Kosten — die Deckelungsaussage, sonst nichts. */
+export const KOMPAKT_KOSTEN: KompaktBlock & { text: string } = {
+  modul: "M10",
+  headline: "Ein Kontingent, ein Preis, eine Obergrenze",
+  text: FAKTEN.deckelung,
+  mehr: {
+    label: "Alle Tarife, Kontingente und Obergrenzen",
+    href: "/kosten-ki-telefonassistent",
+  },
+};
+
+/** M19 · Umkehrbarkeit — Laufzeit und Kündigung, ohne Testphase und Vetorecht. */
+export const KOMPAKT_UMKEHRBARKEIT: KompaktBlock & {
+  fakten: Array<{ label: string; wert: string }>;
+} = {
+  modul: "M19",
+  headline: "Wie Sie wieder herauskommen",
+  fakten: UMKEHRBARKEIT.fakten.slice(0, 2),
+  mehr: {
+    label: "Testphase, Vetorecht und Preisgarantie im Detail",
+    href: "/praxen",
+  },
+};
+
+/** M7 · Datenschutz in drei Punkten — die drei belegbaren Aussagen. */
+export const KOMPAKT_DATENSCHUTZ: KompaktBlock & { punkte: string[] } = {
+  modul: "M7",
+  headline: "Datenschutz in drei Punkten",
+  punkte: DATENSCHUTZ_PUNKTE.slice(0, 3),
+  mehr: {
+    label: "Was Ihr Datenschutzbeauftragter fragen sollte",
+    href: "/datenschutz-sicherheit",
+  },
+};

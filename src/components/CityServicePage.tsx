@@ -10,7 +10,9 @@ import {
 import { PageSEO } from "@/components/PageSEO";
 import { RelatedPages } from "@/components/RelatedPages";
 import { StimmprobeSection } from "@/components/StimmprobeSection";
+import { TelefonassistentKompaktSection } from "@/components/TelefonassistentKompaktSection";
 import { BUSINESS_INFO } from "@/lib/seo-data";
+import { FAKTEN } from "@/lib/telefonassistent-copy";
 import type { CityServiceConfig } from "@/lib/standorte-data";
 
 const fadeUp = {
@@ -50,6 +52,8 @@ interface CityServicePageProps {
 }
 
 export function CityServicePage({ config }: CityServicePageProps) {
+  const isTelefonassistent = config.serviceSlug === "ki-telefonassistent";
+
   const breadcrumbs = [
     { name: "Home", url: BUSINESS_INFO.website },
     { name: "Bayern", url: `${BUSINESS_INFO.website}/bayern` },
@@ -132,7 +136,7 @@ export function CityServicePage({ config }: CityServicePageProps) {
         <HeroSection config={config} breadcrumbs={breadcrumbs} />
         {/* M13 · Stimmprobe — nur Telefonassistent-Stadtseiten; asset-gated,
             rendert ohne Audiodatei nichts. */}
-        {config.serviceSlug === "ki-telefonassistent" && <StimmprobeSection />}
+        {isTelefonassistent && <StimmprobeSection />}
         <TrustStrip config={config} />
         <LocalIntroSection config={config} />
         <WarumCogniiq config={config} />
@@ -142,6 +146,11 @@ export function CityServicePage({ config }: CityServicePageProps) {
         <BranchenSection config={config} />
         <LocalSzenarienSection config={config} />
         <LocalRelevanzSection config={config} />
+        {/* Kompaktfassungen von M4/M10/M19/M7 — nur auf den drei
+            Telefonassistent-Stadtseiten. Sie stehen nach dem lokalen Teil,
+            damit die Stadtseite lokal bleibt; die Vollversionen liegen auf
+            /praxen, der Preisseite und /datenschutz-sicherheit. */}
+        {isTelefonassistent && <TelefonassistentKompaktSection city={config.city} />}
         <FAQSection config={config} />
         <RelatedPages config={config} />
         <CTASection config={config} />
@@ -185,7 +194,13 @@ function HeroSection({ config, breadcrumbs }: { config: CityServiceConfig; bread
         >
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium tracking-wide uppercase mb-6">
             <MapPin size={12} />
-            {config.city} · Bayern · DSGVO-konform · Persönliche Betreuung
+            {/* „DSGVO-konform" ist für den Telefonassistenten ausdrücklich
+                untersagt (HONESTY-AUDIT §7.3, DATENSCHUTZ_SEITE.nichtBehauptet):
+                konform ist eine Verarbeitung, kein Produkt — und die Verträge
+                mit den Unterauftragsverarbeitern sind nicht unterzeichnet. Auf
+                den Webdesign- und Automatisierungsseiten bleibt die Angabe
+                stehen (Inhaber-Entscheidung Option B vom 17.08.2026). */}
+            {config.city} · Bayern · {config.serviceSlug === "ki-telefonassistent" ? "Keine Gesprächsaufzeichnung" : "DSGVO-konform"} · Persönliche Betreuung
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-gray-100 leading-tight tracking-tight mb-6">
@@ -225,13 +240,22 @@ function HeroSection({ config, breadcrumbs }: { config: CityServiceConfig; bread
 }
 
 function TrustStrip({ config }: { config: CityServiceConfig }) {
+  // Zwei Angaben trägt der Telefonassistent nicht:
+  // - „DSGVO-konform" ist für dieses Produkt untersagt, siehe Hero-Kommentar.
+  // - „Einrichtung in 7–14 Tagen" widerspricht der Go-live-Garantie aus
+  //   FAKTEN.goLive. Die Angabe wurde in den Stadt-Configs bereits an vier
+  //   Stellen korrigiert und lebte hier — in der geteilten Komponente —
+  //   unbemerkt weiter (die Fehlerklasse aus HONESTY-AUDIT §7).
+  const isTelefonassistent = config.serviceSlug === "ki-telefonassistent";
   const items = [
     config.city,
     config.service,
     "Bayern",
-    "DSGVO-konform",
+    isTelefonassistent ? "Keine Gesprächsaufzeichnung" : "DSGVO-konform",
     "Persönliche Betreuung",
-    "Einrichtung in 7–14 Tagen",
+    isTelefonassistent
+      ? `Go-live in ${FAKTEN.goLiveTage} Tagen`
+      : "Einrichtung in 7–14 Tagen",
   ];
 
   return (

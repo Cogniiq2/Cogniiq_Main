@@ -313,3 +313,77 @@ normalisiertem Stadtnamen, damit reines Austauschen nicht als unique zählt):
 Die vollständige Beweiskette ist **zurückgestellt** — Begründung in der
 Rückmeldung an den Inhaber: Sie brächte 9.711 Zeichen geteilten Text je Seite
 und drückte alle drei unter die 40-%-Schwelle (38,5 / 37,4 / 39,0 %).
+
+## Stufe 6c · Stadtseiten — Kompaktfassungen (Option A)
+
+Title, Description und H1 der drei Seiten unverändert. Die Änderung betrifft
+den Seitenkörper, nicht die Metadaten — die Ketten aus HONESTY-AUDIT §7.1
+mussten deshalb nicht angefasst werden.
+
+### Was dazugekommen ist
+
+Ein Abschnitt „Preis, Vertrag und Datenschutz — kurz gefasst" mit vier
+Kompaktfassungen, in der Reihenfolge der Beweiskette (COPY-BRIEF-3 §2):
+
+| Modul | Vollversion | Kompaktfassung auf der Stadtseite | Verweis |
+|---|---|---|---|
+| M4 Säulen | vier Absätze | die vier Titel als Zeilen | `/praxen` |
+| M10 Kosten | Absatz mit Einrichtung und Preisgarantie | `FAKTEN.deckelung`, zwei Sätze | `/kosten-ki-telefonassistent` |
+| M19 Umkehrbarkeit | vier Fakten plus Vetorecht | Laufzeit und Kündigung | `/praxen` |
+| M7 Datenschutz | sechs Punkte | die drei belegbaren Punkte | `/datenschutz-sicherheit` |
+
+Die Fassungen stehen als `KOMPAKT_*` in `src/lib/telefonassistent-copy.ts` und
+leiten sich aus `SAEULEN`, `FAKTEN`, `UMKEHRBARKEIT` und `DATENSCHUTZ_PUNKTE`
+ab — kein eigener Fließtext, damit keine zweite Wahrheitsquelle entsteht. Der
+Guard-Test deckt jetzt zusätzlich `CityServicePage.tsx` und
+`TelefonassistentKompaktSection.tsx` ab.
+
+Platzierung nach dem lokalen Teil und vor dem FAQ: Die Stadtseite beginnt
+lokal, die Tiefe liegt auf `/praxen`. Drei neue interne Links je Stadtseite.
+
+**Abweichung von der Vorgabe, bewusst:** M4 ist mit vier Zeilen umgesetzt, nicht
+mit drei. P1–P4 tragen zusammen die Positionierung; eine Säule wegzulassen
+hätte Information entfernt statt sie zu verkürzen. Verkürzt sind die
+Beschreibungen, nicht die Zahl der Säulen.
+
+### Unique-Anteil, gemessen
+
+Satzvergleich über das vorgerenderte HTML, Stadtname normalisiert, damit reines
+Austauschen nicht als unique zählt. Beide Spalten mit demselben Skript gemessen
+(die Werte aus Stufe 6b stammen aus einer anderen Tokenisierung und sind nicht
+direkt vergleichbar).
+
+| Seite | ohne Kompaktblock | mit Kompaktblock | Differenz |
+|---|---|---|---|
+| Bayreuth | 66,7 % | **58,7 %** | −8,0 pp |
+| Regensburg | 65,8 % | **57,1 %** | −8,7 pp |
+| München | 72,2 % | **62,7 %** | −9,5 pp |
+
+Alle drei liegen über dem Ziel von 50 % und deutlich über der 40-%-Schwelle aus
+`COPY-BRIEF.md` §7.3. Zum Vergleich: Die vollständige Beweiskette hätte sie auf
+38,5 / 37,4 / 39,0 % gedrückt.
+
+### Faktenkorrekturen in derselben Stufe
+
+Fünf Aussagen, die den freigegebenen Fakten widersprachen:
+
+| Stelle | Befund | Korrektur |
+|---|---|---|
+| `CityServicePage.tsx` TrustStrip | „Einrichtung in 7–14 Tagen" | aus `FAKTEN.goLiveTage` — die Angabe war in den Stadt-Configs bereits viermal korrigiert worden und lebte in der geteilten Komponente weiter |
+| `CityServicePage.tsx` Hero-Badge und TrustStrip | „DSGVO-konform" | für den Telefonassistenten ersetzt durch „Keine Gesprächsaufzeichnung"; auf Webdesign- und Automatisierungsseiten bleibt die Angabe (Option B, 17.08.2026) |
+| Bayreuth `warumCogniiq` | „Ihre Rufnummer und Ihre Telefonanlage bleiben" | Umleitung statt Zusage (B4 unbeantwortet) |
+| Regensburg FAQ | „Der Assistent läuft auf Ihrer bestehenden Rufnummer" | Frage umformuliert auf das, was zugesagt werden darf |
+| Regensburg `warumCogniiq` | „übergeben dorthin, wo Ihr Team arbeitet: Kalender, CRM oder Buchungssystem" | widersprach `FAKTEN.keineAnbindung` — jetzt Eintrag im Dashboard plus Schnittstellenprüfung |
+| Bayreuth und Regensburg FAQ | „Gängige Buchungs- und Kalendertools binden wir an" | es gibt keine Liste unterstützter Systeme (`ANBINDUNG.nichtBehauptet`) — zugesagt wird die Prüfung vor dem Angebot |
+
+Die beiden Treffer im Hero-Badge und im TrustStrip sind erneut die Fehlerklasse
+aus HONESTY-AUDIT §7: Die Aussage stand in einer geteilten Komponente, nicht in
+den neunmal geprüften Configs.
+
+### Offen, nicht in dieser Stufe geändert
+
+`src/pages/KiTelefonassistentPage.tsx` trägt „Ihre Rufnummer bleibt" an zwei
+Stellen (Zeile 75 mit `[[CLAIM]]`-Marker, Zeile 416 als Vertrauensangabe ohne
+Marker). Die Service-Seite gilt als abgeschlossen; die Entscheidung, die Aussage
+dort mit Marker zu belassen, wurde am 17.08.2026 bewusst getroffen. Sie fällt
+oder bleibt mit der Antwort auf OWNER-INPUT B4.
