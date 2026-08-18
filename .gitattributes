@@ -1,0 +1,11 @@
+# public/sitemap.xml is a generated artifact: scripts/generate-sitemap.mjs always
+# writes LF. On Windows with core.autocrlf=true, checkout rewrote it to CRLF, so
+# every `npm run build` re-flagged the file as modified in `git status` even
+# though the content was byte-identical after normalisation. Pinning this one
+# generated file to LF makes the checked-out bytes match what the generator
+# writes, which keeps the build side-effect-free locally and preserves the
+# "no tracked file was modified by the build" check in .github/workflows/build.yml.
+#
+# Deliberately scoped to this single path. Repository-wide line-ending behaviour
+# is intentionally left untouched.
+public/sitemap.xml text eol=lf

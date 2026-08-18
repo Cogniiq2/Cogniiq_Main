@@ -1,5 +1,5 @@
 import { readFileSync, readdirSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { resolve, sep } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 // Automatic invitation claiming must stay exactly where it is: once per authenticated user, inside
@@ -15,9 +15,12 @@ function read(relative: string): string {
 }
 
 function sourceFiles(): string[] {
-  return readdirSync(SRC, { recursive: true, encoding: 'utf8' }).filter(
-    (file) => /\.tsx?$/.test(file) && !/\.test\.tsx?$/.test(file)
-  );
+  // readdirSync reports platform-native separators, so on Windows this yields
+  // "contexts\AuthContext.tsx". Normalise to POSIX separators here: the call-site
+  // assertion below names files with "/", and it must hold on every platform.
+  return readdirSync(SRC, { recursive: true, encoding: 'utf8' })
+    .map((file) => file.split(sep).join('/'))
+    .filter((file) => /\.tsx?$/.test(file) && !/\.test\.tsx?$/.test(file));
 }
 
 describe('claim_my_client_invitations', () => {
