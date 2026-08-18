@@ -20,6 +20,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { StimmprobeSection } from "@/components/StimmprobeSection";
+import { PraxisRechnerSection } from "@/components/PraxisRechnerSection";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 import {
   ANLIEGEN_IMMER_MENSCH,
@@ -543,8 +544,12 @@ export function PraxenPage() {
           </div>
         </section>
 
+        {/* ── Rechner: steht NACH dem Preisblock, damit der Leser Tarife und
+            Deckelung kennt, bevor er rechnet (Inhaber-Vorgabe). ── */}
+        <PraxisRechnerSection />
+
         {/* ── 14 · M19 Umkehrbarkeit ── */}
-        <section className={SECTION}>
+        <section className={SECTION_ALT}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>{UMKEHRBARKEIT.headline}</h2>
             <dl className="space-y-5 mb-8">
@@ -562,7 +567,7 @@ export function PraxenPage() {
         </section>
 
         {/* ── 15 · M16 Wann wir nicht passen ── */}
-        <section className={SECTION_ALT}>
+        <section className={SECTION}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>{NICHT_PASSEND.headline}</h2>
             <p className={`${PROSE} mb-8`}>{NICHT_PASSEND.intro}</p>
@@ -578,7 +583,7 @@ export function PraxenPage() {
         </section>
 
         {/* ── 16 · M7 Datenschutz kurz ── */}
-        <section className={SECTION}>
+        <section className={SECTION_ALT}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>Was Ihr Datenschutzbeauftragter wissen will</h2>
             <ul className="space-y-5">
@@ -600,7 +605,7 @@ export function PraxenPage() {
         </section>
 
         {/* ── 17 · M11 FAQ ── */}
-        <section className={SECTION_ALT}>
+        <section className={SECTION}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>Häufige Fragen</h2>
             <div className="space-y-4">
@@ -615,7 +620,7 @@ export function PraxenPage() {
         </section>
 
         {/* ── 18 · M12 Nächster Schritt ── */}
-        <section className={SECTION}>
+        <section className={SECTION_ALT}>
           <div className="max-w-2xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>Gehen wir Ihre Anrufe gemeinsam durch.</h2>
             <p className={`${PROSE} mb-8`}>{CTA.nextStep}</p>
@@ -630,7 +635,7 @@ export function PraxenPage() {
         </section>
 
         {/* ── Wegweiser: nur Gesundheitsinhalte (Positionierung Option B) ── */}
-        <section className={`${SECTION_ALT} border-t border-gray-100 dark:border-gray-800`}>
+        <section className={`${SECTION} border-t border-gray-100 dark:border-gray-800`}>
           <div className="max-w-4xl mx-auto px-6 lg:px-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">
               Für Ihre Praxisform

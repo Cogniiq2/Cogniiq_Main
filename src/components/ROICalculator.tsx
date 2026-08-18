@@ -1,30 +1,12 @@
-import { motion, useInView, animate } from 'framer-motion';
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { motion, useInView } from 'framer-motion';
+import { useRef, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Info, TrendingDown, Phone, ChevronDown } from 'lucide-react';
+import { INDUSTRY_PRESETS, type Industry } from '@/lib/roi-presets';
+
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
-export type Industry = 'Arztpraxis' | 'Gastronomie' | 'Dienstleistung' | 'Immobilien';
-
-interface Preset {
-  callsPerWeek: number;
-  missedPercent: number;
-  avgValue: number;
-  adminHours: number;
-  hourlyRate: number;
-}
-
-// Frei gewählte Startwerte, keine Branchenstatistik — der Rechner arbeitet
-// ausschließlich mit den Eingaben des Besuchers.
-// [[CLAIM: eigene gemessene Übernahmequote (OWNER-INPUT F4) nachliefern, bevor
-// der Rechner mit Cogniiq-Werten wirbt]]
-export const INDUSTRY_PRESETS: Record<Industry, Preset> = {
-  Arztpraxis:     { callsPerWeek: 120, missedPercent: 32, avgValue: 180,  adminHours: 15, hourlyRate: 28 },
-  Gastronomie:    { callsPerWeek: 80,  missedPercent: 35, avgValue: 65,   adminHours: 10, hourlyRate: 18 },
-  Dienstleistung: { callsPerWeek: 50,  missedPercent: 28, avgValue: 320,  adminHours: 12, hourlyRate: 35 },
-  Immobilien:     { callsPerWeek: 40,  missedPercent: 22, avgValue: 4500, adminHours: 20, hourlyRate: 45 },
-};
 
 const INDUSTRY_CONTEXT: Record<Industry, string> = {
   Arztpraxis:     'Verpasste Anrufe kosten Praxen regelmäßig Neupatienten, die sich anderswo melden.',
@@ -40,19 +22,9 @@ const INDUSTRY_ICONS: Record<Industry, string> = {
   Immobilien:     '🏢',
 };
 
-function AnimatedNumber({ value, prefix = '', suffix = '' }: { value: number; prefix?: string; suffix?: string }) {
-  const [display, setDisplay] = useState(value);
-  const prevValue = useRef(value);
-  useEffect(() => {
-    const controls = animate(prevValue.current, value, {
-      duration: 0.65,
-      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-      onUpdate: (v) => setDisplay(Math.round(v)),
-      onComplete: () => { prevValue.current = value; },
-    });
-    return () => controls.stop();
-  }, [value]);
-  return <span>{prefix}{display.toLocaleString('de-DE')}{suffix}</span>;
+// Zahlen aktualisieren sich sofort und zaehlen nicht hoch (COPY-BRIEF-3 §1.4).
+function Amount({ value, prefix = '', suffix = '' }: { value: number; prefix?: string; suffix?: string }) {
+  return <span>{prefix}{Math.round(value).toLocaleString('de-DE')}{suffix}</span>;
 }
 
 interface SliderProps {
@@ -154,8 +126,6 @@ export function ROICalculator() {
   const adminCostMonth = Math.round(adminHours * 4.3 * hourlyRate);
   const totalLossMonth = lostRevenueMonth + adminCostMonth;
   const annualPotential = totalLossMonth * 12;
-
-  const severityLevel = totalLossMonth < 3000 ? 'low' : totalLossMonth < 8000 ? 'medium' : 'high';
 
   return (
     <section ref={ref} className="py-28 bg-gray-50" aria-labelledby="roi-heading">
@@ -308,47 +278,14 @@ export function ROICalculator() {
           {/* RIGHT: Results panel */}
           <div className="flex flex-col gap-4">
             <div className="bg-gray-950 rounded-2xl p-8 flex-1 relative overflow-hidden">
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background:
-                    severityLevel === 'high'
-                      ? 'radial-gradient(ellipse at 60% 10%, rgba(239,68,68,0.09) 0%, transparent 55%)'
-                      : severityLevel === 'medium'
-                      ? 'radial-gradient(ellipse at 60% 10%, rgba(245,158,11,0.07) 0%, transparent 55%)'
-                      : 'radial-gradient(ellipse at 60% 10%, rgba(2,132,199,0.07) 0%, transparent 55%)',
-                }}
-              />
-              <div
-                className="absolute top-0 left-0 right-0 h-px"
-                style={{
-                  background:
-                    severityLevel === 'high'
-                      ? 'linear-gradient(90deg, transparent, rgba(239,68,68,0.4), transparent)'
-                      : 'linear-gradient(90deg, transparent, rgba(2,132,199,0.3), transparent)',
-                }}
-              />
-
               <div className="relative">
-                <div className="flex items-center justify-between mb-7">
+                {/* Kein Severity-Badge: Rot bleibt Fehlerzustaenden vorbehalten
+                    (COPY-BRIEF-3 §1.1), und eine Dringlichkeitsstufe aus den
+                    eigenen Eingaben des Besuchers abzuleiten ist Dramatisierung. */}
+                <div className="mb-7">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-gray-600">
-                    Ihre Verlustanalyse
+                    Ergebnis Ihrer Eingaben
                   </p>
-                  <motion.span
-                    key={severityLevel}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3 }}
-                    className={`text-[9.5px] font-semibold uppercase tracking-[0.12em] px-2.5 py-1 rounded-full border ${
-                      severityLevel === 'high'
-                        ? 'border-red-900/50 text-red-400/80 bg-red-950/40'
-                        : severityLevel === 'medium'
-                        ? 'border-orange-900/50 text-orange-400/70 bg-orange-950/30'
-                        : 'border-white/[0.08] text-gray-500'
-                    }`}
-                  >
-                    {severityLevel === 'high' ? 'Kritisch' : severityLevel === 'medium' ? 'Erheblich' : 'Erkennbar'}
-                  </motion.span>
                 </div>
 
                 <div className="space-y-4 mb-8">
@@ -358,14 +295,14 @@ export function ROICalculator() {
                       <span className="text-[12px] text-gray-500">Verpasste Anrufe / Woche</span>
                     </div>
                     <span className="text-[13.5px] font-semibold text-white/80 tabular-nums">
-                      <AnimatedNumber value={missedCallsPerWeek} suffix=" Stk." />
+                      <Amount value={missedCallsPerWeek} suffix=" Stk." />
                     </span>
                   </div>
                   <div>
                     <div className="flex items-baseline justify-between mb-0.5">
                       <span className="text-[12px] text-gray-500">Entgangener Umsatz / Monat</span>
                       <span className="text-[14px] font-semibold text-white/80 tabular-nums">
-                        <AnimatedNumber value={lostRevenueMonth} prefix="−" suffix=" €" />
+                        <Amount value={lostRevenueMonth} prefix="−" suffix=" €" />
                       </span>
                     </div>
                     <p className="text-[10.5px] text-gray-700">Anrufe × Ø-Umsatz, aus Ihren Eingaben</p>
@@ -374,28 +311,32 @@ export function ROICalculator() {
                     <div className="flex items-baseline justify-between mb-0.5">
                       <span className="text-[12px] text-gray-500">Manuelle Personalkosten / Monat</span>
                       <span className="text-[14px] font-semibold text-white/80 tabular-nums">
-                        <AnimatedNumber value={adminCostMonth} prefix="−" suffix=" €" />
+                        <Amount value={adminCostMonth} prefix="−" suffix=" €" />
                       </span>
                     </div>
                     <p className="text-[10.5px] text-gray-700">Stunden × Stundensatz × 4,3 Wochen</p>
                   </div>
                   <div className="flex items-baseline justify-between pt-2 border-t border-white/[0.05]">
-                    <span className="text-[14px] font-semibold text-gray-300">Verlust gesamt / Monat</span>
+                    <span className="text-[14px] font-semibold text-gray-300">Summe / Monat</span>
                     <span className="text-[22px] font-bold text-white tabular-nums">
-                      <AnimatedNumber value={totalLossMonth} prefix="−" suffix=" €" />
+                      <Amount value={totalLossMonth} prefix="−" suffix=" €" />
                     </span>
                   </div>
                 </div>
 
                 <div className="bg-white/[0.04] border border-white/[0.07] rounded-xl p-5">
                   <p className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-gray-600 mb-2">
-                    Rechnerisches Jahrespotenzial
+                    Summe Ihrer Eingaben, auf zwoelf Monate
                   </p>
                   <p className="text-[34px] font-bold text-white tabular-nums leading-none mb-1">
-                    <AnimatedNumber value={annualPotential} suffix=" €" />
+                    <Amount value={annualPotential} suffix=" €" />
                   </p>
-                  <p className="text-[11px] text-gray-600 mt-1.5">
-                    rein rechnerisch, auf Basis Ihrer Eingaben — welcher Anteil realistisch ist, klären wir im Gespräch
+                  <p className="text-[11px] text-gray-600 mt-1.5 leading-relaxed">
+                    Das ist die Hochrechnung Ihrer eigenen Angaben, kein Betrag, der
+                    sich zurückgewinnen lässt. Ein Telefonassistent nimmt Anrufe an,
+                    die sonst niemand annimmt — er ersetzt nicht die Arbeit, die
+                    danach folgt. Welcher Anteil in Ihrem Betrieb überhaupt
+                    beeinflussbar ist, klären wir im Gespräch.
                   </p>
                 </div>
               </div>
@@ -423,7 +364,7 @@ export function ROICalculator() {
             </div>
 
             <div className="flex items-center justify-center gap-2 py-1">
-              <ChevronDown size={14} className="text-gray-300 animate-bounce" />
+              <ChevronDown size={14} className="text-gray-300" />
               <p className="text-[11.5px] text-gray-400">
                 Weiter: KI vs. menschlicher Assistent im Direktvergleich
               </p>

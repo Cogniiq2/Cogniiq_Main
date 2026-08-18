@@ -18,6 +18,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
+import { PraxisRechnerSection } from "@/components/PraxisRechnerSection";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 import {
   BETREUUNG,
@@ -414,8 +415,11 @@ export function KostenKiTelefonassistent() {
           </div>
         </section>
 
+        {/* ── Rechner: nach "Was nicht extra kostet", vor der FAQ ── */}
+        <PraxisRechnerSection tone="alt" />
+
         {/* ── 10 · FAQ zum Preis, unbequeme Fragen zuerst ── */}
-        <section className={SECTION_ALT}>
+        <section className={SECTION}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>Häufige Fragen zum Preis</h2>
             <div className="space-y-4">
@@ -430,7 +434,7 @@ export function KostenKiTelefonassistent() {
         </section>
 
         {/* ── Abschluss ── */}
-        <section className={SECTION}>
+        <section className={SECTION_ALT}>
           <div className="max-w-2xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>Ihr Angebot: schriftlich, aufgeschlüsselt, ohne Überraschungen</h2>
             <p className={`${PROSE} mb-8`}>
@@ -450,7 +454,7 @@ export function KostenKiTelefonassistent() {
         </section>
 
         {/* ── Interne Verlinkung: /praxen ist der Hub ── */}
-        <section className={`${SECTION_ALT} border-t border-gray-100 dark:border-gray-800`}>
+        <section className={`${SECTION} border-t border-gray-100 dark:border-gray-800`}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
               Weiterlesen

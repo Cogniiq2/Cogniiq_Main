@@ -198,3 +198,23 @@ Anbieter abfragen sollte, danach die fünf freigegebenen Aussagen über Cogniiq.
 
 `src/lib/seo-metadata.ts` — toter Code ohne Importeure, erzeugte ungeprüfte
 Title- und Description-Vorlagen. Siehe `HONESTY-AUDIT.md` §7.2 Nr. 7.
+
+## Stufe 3 · Praxis-Rechner
+
+Neue Komponenten, keine Routenänderung. Eingebunden auf `/praxen` (nach dem
+Preisblock M10) und auf `/kosten-ki-telefonassistent` (nach „Was nicht extra
+kostet", vor der FAQ).
+
+| Element | Wert |
+|---|---|
+| H2 | „Was spart eine Praxis durch einen KI Telefonassistenten?" — Suchfrage statt „ROI-Rechner" |
+| Schema | **keines.** Berechnete Werte sind keine Produktaussagen |
+| Zahlen | ausschließlich aus `TARIFE`; keine Zahl zweimal im Code |
+| Prerender | Überschrift, Einleitung, Rahmung und PVS-Hinweis stehen statisch im HTML; nur das interaktive Widget liegt in einem eigenen Chunk |
+
+Titles und Descriptions beider Seiten unverändert — der Rechner ergänzt Inhalt,
+er ersetzt keine Metadaten.
+
+Der Rechner auf der Startseite (`ROICalculator`) bleibt branchenübergreifend
+und behält seine Metadaten; korrigiert wurden dort nur die vier Verstöße gegen
+`COPY-BRIEF-3` §1 (siehe Commit-Nachricht).

@@ -5,7 +5,7 @@ import {
   ArrowRight, CircleCheck as CheckCircle, X, Info,
   User, Bot, TrendingDown,
 } from 'lucide-react';
-import { type Industry, INDUSTRY_PRESETS } from './ROICalculator';
+import { type Industry, INDUSTRY_PRESETS } from '@/lib/roi-presets';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
