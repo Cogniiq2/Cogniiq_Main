@@ -17,7 +17,6 @@ import {
   CircleCheck as CheckCircle,
   Sparkles,
   ShieldCheck,
-  Server,
   BadgeCheck,
 } from 'lucide-react';
 import { PremiumCalendar } from './PremiumCalendar';
@@ -47,7 +46,6 @@ const afterSteps = [
 ];
 
 const DSGVO_BADGES = [
-  { icon: Server, label: 'Europäische Server' },
   { icon: ShieldCheck, label: 'SSL-verschlüsselt' },
   { icon: BadgeCheck, label: 'Keine Weitergabe' },
 ];

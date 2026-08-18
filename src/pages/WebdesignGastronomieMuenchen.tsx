@@ -166,12 +166,11 @@ const config: IndustryPageConfig = {
     "Höhere Erreichbarkeit für Gäste – auch außerhalb der Öffnungszeiten, in einer Stadt, die nie schläft",
     "Zeitersparnis durch automatisierte Bestätigungen, Erinnerungen und Gästekommunikation",
     "Professioneller erster Eindruck im wettbewerbsintensivsten Gastronomiemarkt Bayerns",
-    "Datenschutzorientierte Umsetzung – alle Gästedaten sicher auf europäischen Servern",
   ],
   localContext: [
     "München hat eine der dichtesten und wettbewerbsintensivsten Gastronomieszenen in Deutschland. Restaurants konkurrieren nicht nur um lokale Stammgäste, sondern auch um Touristen, Geschäftsreisende und den überregionalen Markt. Eine professionelle Online-Präsenz ist keine Option, sondern Grundvoraussetzung.",
     "Cogniiq entwickelt für Gastronomiebetriebe in München passgenaue Digitallösungen: eine moderne Restaurant-Website mit integriertem Reservierungssystem, einen KI-Telefonassistenten sowie Automatisierungen für Bestätigungen, Erinnerungen und Feedback-Prozesse.",
-    "Alle Systeme werden datenschutzorientiert umgesetzt, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut das Setup langfristig remote – saisonale Anpassungen und neue Menükarten inklusive.",
+    "Alle Systeme werden datenschutzorientiert umgesetzt und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut das Setup langfristig remote – saisonale Anpassungen und neue Menükarten inklusive.",
   ],
   internalLinks: [
     { label: "Webdesign München", href: "/muenchen/webdesign" },
@@ -207,7 +206,7 @@ const config: IndustryPageConfig = {
     {
       question: "Wie werden Gästedaten aus Reservierungen verarbeitet?",
       answer:
-        "Ja. Alle Gästedaten werden ausschließlich auf europäischen Servern verarbeitet und nach den Anforderungen der DSGVO gespeichert.",
+        "Das hängt vom eingesetzten Reservierungstool ab. Wir binden es mit Auftragsverarbeitungsvertrag ein und dokumentieren, welche Daten wohin fließen. Den Verarbeitungsort nennt Ihnen der jeweilige Anbieter verbindlich — wir geben ihn nicht aus zweiter Hand weiter.",
     },
     {
       question: "Kann der KI-Assistent auch englischsprachige Gäste bedienen?",

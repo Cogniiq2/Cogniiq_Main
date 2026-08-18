@@ -166,7 +166,6 @@ const config: IndustryPageConfig = {
     "Höhere Erreichbarkeit für Patienten – auch außerhalb der Öffnungszeiten",
     "Zeitersparnis durch automatisierte Erinnerungen, Bestätigungen und Kommunikationsabläufe",
     "Bessere Ansprache des jungen Patientenprofils der Unistadt durch digitale Kanäle",
-    "Datenschutzorientierte Umsetzung – alle Daten auf europäischen Servern verarbeitet",
   ],
   localContext: [
     "Regensburg ist eine wachsende Mittelstadt mit einem breiten Praxisnetz und einem jungen Patientenprofil, das durch die Universität und das Uniklinikum geprägt wird. Gleichzeitig versorgen viele Praxen auch Patienten aus dem Landkreis – mit entsprechend hohem Anfragevolumen.",

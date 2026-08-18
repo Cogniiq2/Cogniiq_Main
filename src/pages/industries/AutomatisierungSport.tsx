@@ -53,7 +53,7 @@ const config: NationalIndustryPageConfig = {
     "Re-Engagement-Sequenz für inaktive Mitglieder",
     "Kurs- und Event-Kommunikation automatisch an alle Mitglieder",
     "Bewertungsanfragen nach positiven Erlebnissen",
-    "Mitgliederdatenverarbeitung auf europäischen Servern",
+    "Mitgliederdatenverarbeitung mit Auftragsverarbeitungsvertrag",
   ],
   workflow: {
     title: "So funktioniert automatisiertes Mitglieder-Management",
@@ -108,7 +108,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Wie werden Mitgliederdaten verarbeitet?",
-      answer: "Auf deutschen bzw. europäischen Servern, mit klarer Einwilligungsdokumentation und Auftragsverarbeitungsvertrag (AVV). Die Datenschutzerklärung Ihrer Website passen wir entsprechend an.",
+      answer: "Mit klarer Einwilligungsdokumentation und Auftragsverarbeitungsvertrag (AVV). Die Datenschutzerklärung Ihrer Website passen wir entsprechend an.",
     },
   ],
 };

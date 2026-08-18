@@ -166,12 +166,11 @@ const config: IndustryPageConfig = {
     "Anfragen werden erfasst und beantwortet – der KI-Assistent antwortet auch abends und am Wochenende",
     "Follow-up-Automatisierung erhöht die Abschlussrate im wettbewerbsintensiven Münchner Markt",
     "Bessere Sichtbarkeit bei lokalen Suchanfragen – mehr organische Anfragen aus dem Raum München",
-    "Datenschutzorientierte Umsetzung – alle Kundendaten sicher auf europäischen Servern",
   ],
   localContext: [
     "München ist mit Abstand der teuerste Immobilienmarkt Deutschlands. Kaufinteressenten und Mieter sind im Schnitt besser informiert und haben höhere Ansprüche an den gesamten Prozess – von der Website-Recherche bis zur Besichtigungsorganisation.",
     "Cogniiq entwickelt für Immobilienmakler in München maßgeschneiderte Digitallösungen: eine hochwertige Makler-Website mit strukturierten Objektseiten, einen KI-Telefonassistenten für Interessentenanfragen sowie Automatisierungssysteme für Lead-Qualifizierung, Besichtigungsplanung und Follow-up-Prozesse.",
-    "Alle Systeme werden datenschutzorientiert umgesetzt, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut alle Systeme langfristig remote.",
+    "Alle Systeme werden datenschutzorientiert umgesetzt und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut alle Systeme langfristig remote.",
   ],
   internalLinks: [
     { label: "Webdesign München", href: "/muenchen/webdesign" },
@@ -187,7 +186,7 @@ const config: IndustryPageConfig = {
     {
       question: "Was liefert Cogniiq zum Datenschutz einer Makler-Website in München erstellen?",
       answer:
-        "Zum Lieferumfang gehören Datenschutzerklärung, Impressum, Cookie-Einwilligung und die dokumentierte Verarbeitung der Interessentendaten auf europäischen Servern. Ob der konkrete Einsatz den Anforderungen genügt, beurteilt Ihr Datenschutzbeauftragter – wir liefern ihm die Unterlagen dafür zu.",
+        "Zum Lieferumfang gehören Datenschutzerklärung, Impressum, Cookie-Einwilligung und die dokumentierte Verarbeitung der Interessentendaten. Zum Verarbeitungsort machen wir derzeit keine Angabe — die Verträge mit den beteiligten Anbietern sind nicht abschließend unterzeichnet. Ob der konkrete Einsatz den Anforderungen genügt, beurteilt Ihr Datenschutzbeauftragter – wir liefern ihm die Unterlagen dafür zu.",
     },
     {
       question: "Wie werden Interessentenanfragen über die Website automatisch vorqualifiziert?",

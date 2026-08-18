@@ -166,7 +166,6 @@ const config: IndustryPageConfig = {
     "Höhere Erreichbarkeit für Gäste – auch außerhalb der Öffnungszeiten, auf jedem Kanal",
     "Zeitersparnis durch automatisierte Bestätigungen, Erinnerungen und Gästekommunikation",
     "Professioneller erster Eindruck durch moderne Website und sofortige Gesprächsannahme",
-    "Datenschutzorientierte Umsetzung – alle Gästedaten sicher auf europäischen Servern verarbeitet",
   ],
   localContext: [
     "Die Bayreuther Gastronomie ist vielfältig und wettbewerbsintensiv – von der klassischen Gaststätte über das moderne Restaurant bis hin zu Event-Locations rund um die Festspiele. Gleichzeitig stehen viele Betriebe vor denselben Herausforderungen: zu viele Telefonanrufe, knappe Personalressourcen und eine veraltete Online-Präsenz.",
@@ -207,7 +206,7 @@ const config: IndustryPageConfig = {
     {
       question: "Wie werden Gästedaten aus Reservierungen verarbeitet gespeichert?",
       answer:
-        "Ja. Alle Gästedaten werden ausschließlich auf europäischen Servern verarbeitet und nach den Anforderungen der DSGVO gespeichert und verwaltet.",
+        "Das hängt vom eingesetzten Reservierungstool ab. Wir binden es mit Auftragsverarbeitungsvertrag ein und dokumentieren, welche Daten wohin fließen. Den Verarbeitungsort nennt Ihnen der jeweilige Anbieter verbindlich — wir geben ihn nicht aus zweiter Hand weiter.",
     },
     {
       question: "Kann der KI-Telefonassistent auch Gruppenreservierungen und Eventanfragen bearbeiten?",

@@ -49,7 +49,6 @@ const config: ProblemPageConfig = {
     bullets: [
       "Kostenlose Analyse Ihrer automatisierungsfähigen Prozesse",
       "Quick-Win-Automatisierungen in 1–3 Wochen live",
-      "Deutsche bzw. europäische Server",
       "Vollständige Dokumentation – keine Abhängigkeit",
       "Schulung Ihres Teams in der Nutzung der Systeme",
       "Skalierbar: von einem Workflow zur vollständigen Digitalisierung",

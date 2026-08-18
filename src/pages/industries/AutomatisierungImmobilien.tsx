@@ -107,7 +107,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Wie werden Interessentendaten verarbeitet?",
-      answer: "Mit dokumentierter Einwilligung, auf europäischen Servern und mit einem Auftragsverarbeitungsvertrag (AVV). Datenschutzerklärung und Opt-in-Prozesse konfigurieren wir gemeinsam mit Ihnen.",
+      answer: "Mit dokumentierter Einwilligung und einem Auftragsverarbeitungsvertrag (AVV). Datenschutzerklärung und Opt-in-Prozesse konfigurieren wir gemeinsam mit Ihnen.",
     },
   ],
 };

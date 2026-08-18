@@ -48,7 +48,6 @@ const SERVICES = [
     benefits: [
       "Skalierbar ohne Mehrpersonal",
       "Vollständig dokumentiert, wartbar",
-      "Europäische Server",
     ],
   },
 ];
@@ -88,7 +87,7 @@ const CHALLENGES = [
     icon: Shield,
     title: "Datenschutz beim KI-Einsatz",
     description:
-      "Viele deutsche Unternehmen scheuen KI-Einsatz aus Datenschutzgründen. Cogniiq arbeitet mit Lösungen auf europäischen Servern, inklusive Auftragsverarbeitungsverträgen und dokumentierten Datenflüssen.",
+      "Viele deutsche Unternehmen scheuen KI-Einsatz aus Datenschutzgründen. Cogniiq liefert zu jeder Lösung den Auftragsverarbeitungsvertrag und dokumentiert die Datenflüsse.",
   },
 ];
 
@@ -200,7 +199,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Sind die Lösungen DSGVO-konform für den deutschen Markt?",
-    a: "Diesen Satz stellen wir uns nicht selbst aus — konform ist eine Verarbeitung, kein Produkt. Alle Systeme verarbeiten Daten auf europäischen Servern und werden mit den notwendigen Auftragsverarbeitungsverträgen (AVV) geliefert. Ob der konkrete Einsatz bei Ihnen genügt, beurteilt Ihr Datenschutzbeauftragter.",
+    a: "Diesen Satz stellen wir uns nicht selbst aus — konform ist eine Verarbeitung, kein Produkt. Alle Systeme werden mit den notwendigen Auftragsverarbeitungsverträgen (AVV) geliefert. Zum Verarbeitungsort machen wir derzeit keine Angabe — die Verträge mit den beteiligten Anbietern sind nicht abschließend unterzeichnet. Ob der konkrete Einsatz bei Ihnen genügt, beurteilt Ihr Datenschutzbeauftragter.",
   },
   {
     q: "Was unterscheidet Cogniiq von großen deutschen Agenturen?",
@@ -344,7 +343,7 @@ export function DeutschlandPage() {
                   Deutschland hat einen der dichtesten Mittelstandsmärkte der Welt – und gleichzeitig einen der größten Nachholbedarfe bei der Digitalisierung. Viele Unternehmen haben in den letzten Jahren Tools angesammelt, die nicht miteinander kommunizieren, Prozesse, die noch manuell laufen, und eine digitale Präsenz, die nicht dem Standard entspricht, den Kunden heute erwarten.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Cogniiq ist eine spezialisierte KI-Agentur, die genau dort ansetzt: Wir automatisieren Abläufe, die täglich Zeit kosten. Wir setzen KI-Telefonassistenten ein, die Unternehmen auch außerhalb der Öffnungszeiten erreichbar machen. Und wir entwickeln Websites, die in deutschen Suchmaschinen sichtbar sind und Besucher in qualifizierte Anfragen verwandeln. Alles auf europäischen Servern, alles mit persönlicher Betreuung.
+                  Cogniiq ist eine spezialisierte KI-Agentur, die genau dort ansetzt: Wir automatisieren Abläufe, die täglich Zeit kosten. Wir setzen KI-Telefonassistenten ein, die Unternehmen auch außerhalb der Öffnungszeiten erreichbar machen. Und wir entwickeln Websites, die in deutschen Suchmaschinen sichtbar sind und Besucher in qualifizierte Anfragen verwandeln. Alles mit persönlicher Betreuung.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                   Mit Hauptsitz in Bayern betreuen wir Projekte in ganz Deutschland – vollständig remote, transparent und ohne Qualitätseinbußen gegenüber lokalen Agenturen. Unser Schwerpunkt liegt auf <Link to="/bayern" className="text-gray-800 dark:text-gray-200 underline underline-offset-2 hover:text-gray-600 transition-colors">Bayern</Link>, aber unsere Leistungen kennen keine Grenzen im Bundesgebiet.

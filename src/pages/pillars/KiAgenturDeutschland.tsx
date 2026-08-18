@@ -31,7 +31,6 @@ const SERVICES = [
     benefits: [
       "Quick-Win-Automatisierungen in 1–3 Wochen",
       "Vollständig dokumentiert, wartbar",
-      "Europäische Server",
     ],
   },
   {
@@ -70,7 +69,7 @@ const CHALLENGES = [
   {
     icon: Shield,
     title: "DSGVO-Unsicherheit bei KI-Einsatz",
-    description: "Viele Unternehmen scheuen KI aus Datenschutzgründen. Cogniiq arbeitet mit Lösungen auf europäischen Servern und liefert die Auftragsverarbeitungsverträge dazu.",
+    description: "Viele Unternehmen scheuen KI aus Datenschutzgründen. Cogniiq liefert zu jeder Lösung den Auftragsverarbeitungsvertrag und dokumentiert die Datenflüsse.",
   },
   {
     icon: Zap,
@@ -140,7 +139,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "Wie ist der Datenschutz beim KI-Einsatz geregelt?",
-    answer: "Cogniiq arbeitet mit Lösungen, die Daten auf europäischen Servern verarbeiten und mit den notwendigen Auftragsverarbeitungsverträgen geliefert werden. Die Bewertung des konkreten Einsatzes bleibt bei Ihrem Datenschutzbeauftragten.",
+    answer: "Cogniiq liefert zu jeder Lösung die notwendigen Auftragsverarbeitungsverträge. Zum Verarbeitungsort machen wir derzeit keine Angabe — die Verträge mit den beteiligten Anbietern sind nicht abschließend unterzeichnet. Die Bewertung des konkreten Einsatzes bleibt bei Ihrem Datenschutzbeauftragten.",
   },
   {
     question: "Für welche Unternehmensgröße ist ein KI-Telefonassistent geeignet?",
@@ -255,7 +254,7 @@ export function KiAgenturDeutschland() {
         <div className="border-y border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
-              {["KI-Telefonassistent", "Prozessautomatisierung", "Einrichtung in 7–14 Tagen", "Europäische Server", "Persönliche Betreuung"].map((item, i) => (
+              {["KI-Telefonassistent", "Prozessautomatisierung", "Einrichtung in 7–14 Tagen", "Persönliche Betreuung"].map((item, i) => (
                 <span key={i} className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   {i > 0 && <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" aria-hidden="true" />}
                   {item}
@@ -277,7 +276,7 @@ export function KiAgenturDeutschland() {
                   KI wird in Deutschland viel diskutiert, aber selten konkret umgesetzt. Viele Unternehmen wissen, dass sie KI einsetzen sollten – aber nicht wie, wo sie anfangen sollen und was es wirklich kostet. Cogniiq macht KI für den deutschen Mittelstand greifbar und einsatzfähig, ohne Beratungsoverhead und ohne monatelange Implementierungsprojekte.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Unser Fokus liegt auf zwei Bereichen, die sofort ROI erzeugen: KI-Telefonassistenten, die Unternehmen auch außerhalb der Öffnungszeiten erreichbar machen – und Automatisierungen, die manuelle Abläufe ein für allemal lösen. Beides auf europäischen Servern, beides in Wochen statt Monaten umgesetzt.
+                  Unser Fokus liegt auf zwei Bereichen, die sofort ROI erzeugen: KI-Telefonassistenten, die Unternehmen auch außerhalb der Öffnungszeiten erreichbar machen – und Automatisierungen, die manuelle Abläufe ein für allemal lösen. Beides in Wochen statt Monaten umgesetzt.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                   Mit Hauptsitz in{" "}

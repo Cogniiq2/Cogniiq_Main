@@ -166,12 +166,11 @@ const config: IndustryPageConfig = {
     "Anfragen werden erfasst und beantwortet – der KI-Assistent antwortet auch abends und am Wochenende",
     "Follow-up-Automatisierung erhöht die Abschlussrate ohne zusätzlichen Aufwand",
     "Bessere Sichtbarkeit bei lokalen Suchanfragen in Bayreuth – mehr organische Anfragen",
-    "Datenschutzorientierte Umsetzung – alle Kundendaten sicher auf europäischen Servern",
   ],
   localContext: [
     "Der Bayreuther Immobilienmarkt ist von einer stabilen Nachfrage geprägt – sowohl im Kauf- als auch im Mietbereich. Makler stehen vor der Herausforderung, qualifizierte Interessenten schnell zu erreichen und gleichzeitig die eigene Effizienz bei der Lead-Bearbeitung zu steigern.",
     "Cogniiq entwickelt für Immobilienmakler in Bayreuth maßgeschneiderte Digitallösungen: eine hochwertige Makler-Website mit strukturierten Objektseiten, einen KI-Telefonassistenten für Interessentenanfragen sowie Automatisierungssysteme für Lead-Qualifizierung, Besichtigungsplanung und Follow-up-Prozesse.",
-    "Als Bayreuther Unternehmen mit direktem Ortsbezug verstehen wir den lokalen Markt und sind persönlich erreichbar. Die Einrichtung dauert 7–14 Tage. Alle Systeme werden datenschutzorientiert umgesetzt und auf europäischen Servern betrieben.",
+    "Als Bayreuther Unternehmen mit direktem Ortsbezug verstehen wir den lokalen Markt und sind persönlich erreichbar. Die Einrichtung dauert 7–14 Tage. Alle Systeme werden datenschutzorientiert umgesetzt.",
   ],
   internalLinks: [
     { label: "Webdesign Bayreuth", href: "/bayreuth/webdesign" },
@@ -187,7 +186,7 @@ const config: IndustryPageConfig = {
     {
       question: "Was liefert Cogniiq zum Datenschutz einer Makler-Website in Bayreuth erstellen?",
       answer:
-        "Zum Lieferumfang gehören Datenschutzerklärung, Impressum, Cookie-Einwilligung und die dokumentierte Verarbeitung der Interessentendaten auf europäischen Servern. Ob der konkrete Einsatz den Anforderungen genügt, beurteilt Ihr Datenschutzbeauftragter – wir liefern ihm die Unterlagen dafür zu.",
+        "Zum Lieferumfang gehören Datenschutzerklärung, Impressum, Cookie-Einwilligung und die dokumentierte Verarbeitung der Interessentendaten. Zum Verarbeitungsort machen wir derzeit keine Angabe — die Verträge mit den beteiligten Anbietern sind nicht abschließend unterzeichnet. Ob der konkrete Einsatz den Anforderungen genügt, beurteilt Ihr Datenschutzbeauftragter – wir liefern ihm die Unterlagen dafür zu.",
     },
     {
       question: "Wie werden Interessentenanfragen über die Website automatisch vorqualifiziert?",

@@ -101,7 +101,7 @@ const config: CostPageConfig = {
     },
     {
       question: "Welche Tools nutzt Cogniiq für Automatisierungen?",
-      answer: "Wir setzen auf professionelle, etablierte Automatisierungsplattformen, die auf europäischen Servern betrieben werden. Bei spezifischen Anforderungen auch direkte API-Integrationen.",
+      answer: "Wir setzen auf professionelle, etablierte Automatisierungsplattformen. Bei spezifischen Anforderungen auch direkte API-Integrationen. Welche Systeme beteiligt sind, steht vor Projektbeginn fest.",
     },
     {
       question: "Kann ich die Automatisierung später selbst anpassen?",
@@ -117,7 +117,7 @@ const config: CostPageConfig = {
     },
     {
       question: "Wie ist der Datenschutz bei Automatisierungen geregelt?",
-      answer: "Cogniiq arbeitet mit Tools auf europäischen Servern und liefert zu jeder Automatisierung den Auftragsverarbeitungsvertrag und die Dokumentation der Datenflüsse.",
+      answer: "Zu jeder Automatisierung liefern wir den Auftragsverarbeitungsvertrag und die Dokumentation der Datenflüsse. Zum Verarbeitungsort machen wir derzeit keine Angabe — die Verträge mit den beteiligten Anbietern sind nicht abschließend unterzeichnet.",
     },
   ],
   ctaHeadline: "Kostenloses Automatisierungs-Audit",

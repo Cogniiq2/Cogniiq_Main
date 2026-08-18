@@ -6,7 +6,6 @@ import {
   PhoneCall,
   Globe,
   Zap,
-  CircleCheck as CheckCircle,
   ShieldCheck,
   Clock,
 } from 'lucide-react';
@@ -450,7 +449,6 @@ export function DesktopHero() {
             <div className="flex items-center gap-4 pt-0.5">
               {[
                 { icon: Clock, text: 'Go-Live typischerweise in 7–14 Tagen' },
-                { icon: CheckCircle, text: 'Europäische Server' },
               ].map(({ icon: Icon, text }) => (
                 <div key={text} className="flex items-center gap-1.5">
                   <Icon size={10} className="text-emerald-500 flex-shrink-0" aria-hidden="true" />

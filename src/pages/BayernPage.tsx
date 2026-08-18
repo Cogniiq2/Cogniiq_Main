@@ -56,7 +56,6 @@ const TRUST_POINTS = [
   "Hauptsitz in Bayreuth – persönliche Betreuung in der Region",
   "Projekte in ganz Bayern – auch remote vollständig betreut",
   "Einrichtung in 7–14 Tagen – keine monatelangen Projekte",
-  "Alle Daten bleiben in Europa",
   "Fester Ansprechpartner – direkter Kontakt für Ihr Projekt",
   "Faire Preise – transparent kalkuliert, keine versteckten Kosten",
 ];
@@ -96,7 +95,7 @@ const CHALLENGES = [
     icon: Shield,
     title: "Datenschutz beim KI-Einsatz",
     description:
-      "Viele bayerische Unternehmer zögern beim KI-Einsatz aus Datenschutzgründen zu Recht. Cogniiq setzt auf europäische Server; technische und organisatorische Maßnahmen werden projektbezogen abgestimmt.",
+      "Viele bayerische Unternehmer zögern beim KI-Einsatz aus Datenschutzgründen zu Recht. Technische und organisatorische Maßnahmen stimmen wir projektbezogen ab und dokumentieren, welche Daten wohin fließen.",
   },
 ];
 
@@ -189,7 +188,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Sind alle Lösungen DSGVO-konform?",
-    a: "Diesen Satz stellen wir uns nicht selbst aus — konform ist eine Verarbeitung, kein Produkt. Alle Systeme verarbeiten Daten auf europäischen Servern; die notwendigen Auftragsverarbeitungsverträge (AVV) erstellen wir, und bei der Datenschutzdokumentation unterstützen wir. Die Bewertung bleibt bei Ihrem Datenschutzbeauftragten.",
+    a: "Diesen Satz stellen wir uns nicht selbst aus — konform ist eine Verarbeitung, kein Produkt. Die notwendigen Auftragsverarbeitungsverträge (AVV) erstellen wir, und bei der Datenschutzdokumentation unterstützen wir. Zum Verarbeitungsort machen wir derzeit keine Angabe — die Verträge mit den beteiligten Anbietern sind nicht abschließend unterzeichnet. Die Bewertung bleibt bei Ihrem Datenschutzbeauftragten.",
   },
   {
     q: "Was kostet ein KI-Telefonassistent für Bayern?",

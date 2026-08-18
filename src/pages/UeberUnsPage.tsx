@@ -93,7 +93,7 @@ const PRINCIPLES = [
     icon: Shield,
     title: "Datenschutz in der Architektur",
     description:
-      "Alle Daten werden auf europäischen Servern verarbeitet. Datenschutzkonforme Architekturen und vollständige Dokumentation inklusive.",
+      "Zu jedem System dokumentieren wir, welche Daten wohin fließen, und liefern den Auftragsverarbeitungsvertrag mit.",
   },
   {
     icon: Clock,
@@ -247,7 +247,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Sind die Systeme DSGVO-konform?",
-    a: "Diesen Satz stellen wir uns nicht selbst aus — konform ist eine Verarbeitung, kein Produkt. Alle Daten werden auf europäischen Servern verarbeitet und gespeichert, und die notwendige Dokumentation stellen wir bereit. Beurteilen kann die Konformität nur, wer den konkreten Einsatz kennt — das ist Ihr Datenschutzbeauftragter.",
+    a: "Diesen Satz stellen wir uns nicht selbst aus — konform ist eine Verarbeitung, kein Produkt. Die notwendige Dokumentation stellen wir bereit. Zum Verarbeitungsort machen wir derzeit keine Angabe — die Verträge mit den beteiligten Anbietern sind nicht abschließend unterzeichnet. Beurteilen kann die Konformität nur, wer den konkreten Einsatz kennt — das ist Ihr Datenschutzbeauftragter.",
   },
   {
     q: "Kann ich mit einem einzelnen Service starten?",

@@ -166,12 +166,11 @@ const config: IndustryPageConfig = {
     "Höhere Erreichbarkeit für lokale und touristische Gäste – auch außerhalb der Öffnungszeiten, in jeder Sprache",
     "Zeitersparnis durch automatisierte Bestätigungen, Erinnerungen und Gästekommunikation",
     "Professioneller erster Eindruck in einer UNESCO-Welterbestadt mit hohen Gästeansprüchen",
-    "Datenschutzorientierte Umsetzung – alle Gästedaten sicher auf europäischen Servern",
   ],
   localContext: [
     "Regensburg zieht jährlich Millionen Touristen an und beheimatet eine der ältesten Universitäten Deutschlands. Die Gastronomie der Stadt profitiert von dieser Mischung aus lokalem Stammpublikum, Studenten und internationalem Tourismus – steht aber gleichzeitig vor der Herausforderung, digital präsent und buchbar zu sein.",
     "Cogniiq entwickelt für Gastronomiebetriebe in Regensburg passgenaue Digitallösungen: eine moderne Restaurant-Website mit integriertem Reservierungssystem, einen KI-Telefonassistenten sowie Automatisierungen für Bestätigungen, Erinnerungen und Feedback-Prozesse.",
-    "Alle Systeme werden datenschutzorientiert umgesetzt, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut das Setup langfristig remote.",
+    "Alle Systeme werden datenschutzorientiert umgesetzt und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut das Setup langfristig remote.",
   ],
   internalLinks: [
     { label: "Webdesign Regensburg", href: "/regensburg/webdesign" },
@@ -207,7 +206,7 @@ const config: IndustryPageConfig = {
     {
       question: "Wie werden Gästedaten aus Reservierungen verarbeitet?",
       answer:
-        "Ja. Alle Gästedaten werden ausschließlich auf europäischen Servern verarbeitet und nach den Anforderungen der DSGVO gespeichert und verwaltet.",
+        "Das hängt vom eingesetzten Reservierungstool ab. Wir binden es mit Auftragsverarbeitungsvertrag ein und dokumentieren, welche Daten wohin fließen. Den Verarbeitungsort nennt Ihnen der jeweilige Anbieter verbindlich — wir geben ihn nicht aus zweiter Hand weiter.",
     },
     {
       question: "Kann der KI-Assistent auch Gruppenreservierungen und Eventanfragen bearbeiten?",

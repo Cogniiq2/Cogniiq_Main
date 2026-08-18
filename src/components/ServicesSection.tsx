@@ -55,7 +55,7 @@ const services = [
       'Anrufannahme in natürlicher Sprache',
       'Terminbuchung & -änderung in Echtzeit',
       'Anbindung an Kalender & CRM – vorab geprüft',
-      'Europäische Server · auch außerhalb der Öffnungszeiten',
+      'Erreichbar auch außerhalb der Öffnungszeiten',
     ],
     roi: { value: 'Auch nachts', label: 'Anrufannahme' },
     result: 'Der Assistent nimmt Anrufe auch außerhalb der Öffnungszeiten entgegen — abends, nachts und am Wochenende',

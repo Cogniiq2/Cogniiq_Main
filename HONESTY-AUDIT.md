@@ -281,12 +281,19 @@ Alle Quellen aus 7.2 wurden gegen die vier Muster geprüft:
 | Absolutversprechen | keine Treffer in Title, Description oder OG-Text |
 | PVS-Andeutung (Produktnamen, „direkt angebunden") | keine Treffer |
 
-**Außerhalb des Telefonassistenten unverändert** (Inhaber-Entscheidung vom
-17.08.2026, Option B): Die Aussage „DSGVO-konform / europäische Server" bleibt
-auf den Webdesign- und Automatisierungsseiten stehen, weil sie dort andere
-Produkte auf anderer Infrastruktur beschreibt. Ausgenommen sind zwei
-Querverweise, die den Telefonassistenten namentlich einschlossen — diese sind
-entfernt.
+**~~Außerhalb des Telefonassistenten unverändert~~ — überholt am 18.08.2026.**
+Die Festlegung vom 17.08.2026 (Option B) ließ „DSGVO-konform / europäische
+Server" auf den Webdesign- und Automatisierungsseiten stehen, mit der
+Begründung, dort werde ein anderes Produkt auf anderer Infrastruktur
+beschrieben. Diese Begründung trägt nicht: Die AVV-Kette mit den
+Unterauftragsverarbeitern ist unsigniert, **unabhängig davon, auf welcher
+Produktseite der Satz steht**. Eine Hosting-Aussage auf der Restaurant-Seite ist
+genauso unbelegt wie auf der Praxis-Seite. Die Festlegung stammt aus der Zeit
+vor dem AVV-Befund und ist damit hinfällig.
+
+**Ersetzt durch die Sperre in 7.7.** Beide Aussagen sind am 18.08.2026
+repo-weit entfernt worden — auf allen Produkten, nicht nur im
+Healthcare-Cluster.
 
 ### 7.4 Arbeitsregel für alle weiteren Änderungen
 
@@ -294,6 +301,50 @@ entfernt.
 > erst vollständig, wenn **beide** Ketten aus 7.1 angefasst sind: die
 > Seitenkomponente *und* der Eintrag in `publicRoutes.ts`. Bei Stadtseiten
 > kommt `standorte-service-configs.ts` als dritte Stelle hinzu.
+
+### 7.7 Gesperrte Aussagenklassen (Inhaber-Entscheidung, 18.08.2026)
+
+> Jede Aussage über **Verarbeitungsort**, **Datenschutzkonformität** oder
+> **Zertifizierung** ist gesperrt, bis die Auftragsverarbeitungsverträge
+> signiert sind und der Verarbeitungsort geklärt ist. Das gilt auf **allen
+> Produkten** — Telefonassistent, Webdesign, Automatisierung —, nicht nur im
+> Healthcare-Cluster.
+
+**Umfasste Formulierungen** (die Liste ist nicht abschließend, das Muster
+zählt): europäische Server · EU-Server · Serverstandort Deutschland ·
+Verarbeitung in der EU · Hosting in Deutschland · deutsche bzw. europäische
+Server · „Daten bleiben in Europa" · Europa-Hosting · „DSGVO-konform" in jeder
+Beugung · „datenschutzkonforme Architektur" · „rechtssicher" ·
+„sicherheitszertifiziert".
+
+**Ein [[CLAIM]]-Marker ist kein Ausweg.** Der Marker schützt intern, der
+Besucher liest die Zusage trotzdem. Marker sind für Angaben, die wir für
+zutreffend halten und noch bestätigen — nicht für Aussagen, die wir nicht
+belegen können. Eine unbelegte Zusage steht nicht auf der Seite, auch nicht
+markiert.
+
+**Was stehen bleiben darf:**
+
+| Zulässig | Beispiel |
+|---|---|
+| Die Frage in Frageform | „Sind die Systeme DSGVO-konform?" — die Antwort darf sie nicht bejahen |
+| Konformität als Prüfkriterium einer Leistung | „Cogniiq analysiert die bestehende Website: … DSGVO-Konformität" |
+| Das benannte Kundenbedenken | „Bedenken wegen Datenschutz und DSGVO-Konformität" |
+| Die Frage des Datenschutzbeauftragten | „Wo werden die Daten verarbeitet …?" |
+| Allgemeine Markteinschätzung ohne Cogniiq-Bezug | Blogtext: „Systeme mit europäischen Servern sind verfügbar" |
+| Der Verweigerungssatz selbst | `DATENSCHUTZ_SEITE.nichtBehauptet` |
+| Was tatsächlich geliefert wird | Datenschutzerklärung, Impressum, Cookie-Einwilligung, AVV, dokumentierte Datenflüsse |
+
+**Standardformulierung**, wo die Frage im Text auftaucht und beantwortet
+werden muss:
+
+> Zum Verarbeitungsort machen wir derzeit keine Angabe — die Verträge mit den
+> beteiligten Anbietern sind nicht abschließend unterzeichnet.
+
+**Was die Sperre aufhebt:** die vier Punkte aus `ASSETS-REQUIRED.md` §B2
+(signierte AVV mit allen Unterauftragsverarbeitern, geklärter
+Verarbeitungsort, veröffentlichungsfähige Unterauftragsverarbeiter-Liste,
+TOM-Dokument). Bis dahin bleibt jede Aussage dieser Klasse draußen.
 
 #### 7.4.1 Kernaussagen: technisch zusammengeführt (17.08.2026)
 

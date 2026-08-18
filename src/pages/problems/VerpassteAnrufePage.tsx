@@ -50,7 +50,6 @@ const config: ProblemPageConfig = {
       "Anrufe werden sofort und professionell entgegengenommen – auch zu Stoßzeiten",
       "Erreichbar auch abends, am Wochenende und an Feiertagen",
       "Termine automatisch in den Kalender eingetragen",
-      "Europäische Server",
       "Einrichtung in 7–14 Tagen",
       "Skaliert mit Ihrem Unternehmen ohne Mehrkosten",
     ],

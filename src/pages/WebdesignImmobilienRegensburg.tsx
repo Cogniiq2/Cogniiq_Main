@@ -166,12 +166,11 @@ const config: IndustryPageConfig = {
     "Anfragen werden erfasst und beantwortet – der KI-Assistent antwortet auch abends und am Wochenende",
     "Follow-up-Automatisierung erhöht die Abschlussrate ohne zusätzlichen Aufwand",
     "Bessere Sichtbarkeit bei lokalen und überregionalen Suchanfragen – mehr organische Anfragen",
-    "Datenschutzorientierte Umsetzung – alle Kundendaten sicher auf europäischen Servern",
   ],
   localContext: [
     "Regensburg ist eine der am stärksten wachsenden Städte Bayerns. Der Immobilienmarkt ist geprägt von stabiler bis steigender Nachfrage – sowohl lokal als auch von Zugezogenen aus dem Großraum München. Makler profitieren von der dynamischen Marktlage, stehen aber vor der Herausforderung, qualifizierte Leads effizient zu bearbeiten.",
     "Cogniiq entwickelt für Immobilienmakler in Regensburg maßgeschneiderte Digitallösungen: eine hochwertige Makler-Website mit strukturierten Objektseiten, einen KI-Telefonassistenten für Interessentenanfragen sowie Automatisierungssysteme für Lead-Qualifizierung, Besichtigungsplanung und Follow-up-Prozesse.",
-    "Cogniiq betreut Projekte in Regensburg remote und ist für persönliche Abstimmungen direkt erreichbar. Die Einrichtung dauert 7–14 Tage. Alle Systeme werden datenschutzorientiert umgesetzt und auf europäischen Servern betrieben.",
+    "Cogniiq betreut Projekte in Regensburg remote und ist für persönliche Abstimmungen direkt erreichbar. Die Einrichtung dauert 7–14 Tage. Alle Systeme werden datenschutzorientiert umgesetzt.",
   ],
   internalLinks: [
     { label: "Webdesign Regensburg", href: "/regensburg/webdesign" },
@@ -187,7 +186,7 @@ const config: IndustryPageConfig = {
     {
       question: "Was liefert Cogniiq zum Datenschutz einer Makler-Website in Regensburg erstellen?",
       answer:
-        "Zum Lieferumfang gehören Datenschutzerklärung, Impressum, Cookie-Einwilligung und die dokumentierte Verarbeitung der Interessentendaten auf europäischen Servern. Ob der konkrete Einsatz den Anforderungen genügt, beurteilt Ihr Datenschutzbeauftragter – wir liefern ihm die Unterlagen dafür zu.",
+        "Zum Lieferumfang gehören Datenschutzerklärung, Impressum, Cookie-Einwilligung und die dokumentierte Verarbeitung der Interessentendaten. Zum Verarbeitungsort machen wir derzeit keine Angabe — die Verträge mit den beteiligten Anbietern sind nicht abschließend unterzeichnet. Ob der konkrete Einsatz den Anforderungen genügt, beurteilt Ihr Datenschutzbeauftragter – wir liefern ihm die Unterlagen dafür zu.",
     },
     {
       question: "Wie werden Interessentenanfragen über die Website automatisch vorqualifiziert?",

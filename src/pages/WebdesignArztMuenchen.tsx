@@ -95,12 +95,11 @@ const config: IndustryPageConfig = {
     "Erreichbarkeit außerhalb der Sprechzeiten – in München eine Grundvoraussetzung für Patientenzufriedenheit",
     "Zeitersparnis durch automatisierte Erinnerungen, Bestätigungen und Kommunikationsabläufe",
     "Professioneller erster Eindruck durch moderne Website – besonders wichtig im Münchner Wettbewerb",
-    "Datenschutzorientierte Umsetzung – alle Daten werden ausschließlich auf europäischen Servern verarbeitet",
   ],
   localContext: [
     "München ist einer der dichtesten Gesundheitsmärkte Deutschlands. Arztpraxen konkurrieren in der Millionenstadt nicht nur um Kassenpatienten, sondern auch um Privatpatienten und Selbstzahler. Gleichzeitig sind die Erwartungen an Digitalität und Service in München überdurchschnittlich hoch – Patienten erwarten Online-Terminbuchung, schnelle Reaktionszeiten und eine moderne Praxis-Website als Selbstverständlichkeit.",
     "Cogniiq entwickelt für Arztpraxen in München maßgeschneiderte Digitallösungen: eine hochperformante Praxis-Website mit integrierter Terminbuchung, einen KI-Telefonassistenten, der die Rezeption auch außerhalb der Sprechzeiten entlastet, sowie Automatisierungssysteme, die Terminerinnerungen, Patientenkommunikation und interne Abläufe ohne manuellen Aufwand steuern.",
-    "Alle Systeme werden datenschutzorientiert umgesetzt, werden auf europäischen Servern betrieben und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Die Betreuung erfolgt durch Cogniiq persönlich – transparent, direkt und ohne unnötige Zwischenstellen.",
+    "Alle Systeme werden datenschutzorientiert umgesetzt und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Die Betreuung erfolgt durch Cogniiq persönlich – transparent, direkt und ohne unnötige Zwischenstellen.",
   ],
   internalLinks: [
     { label: "Webdesign München", href: "/muenchen/webdesign" },

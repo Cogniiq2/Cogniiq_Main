@@ -51,7 +51,7 @@ const config: NationalIndustryPageConfig = {
     "Warteliste wird bei Absagen sofort automatisch kontaktiert",
     "Rezeptanfragen digital strukturiert und weitergeleitet",
     "Patientendaten systemübergreifend synchronisiert",
-    "Verarbeitung mit Auftragsverarbeitungsvertrag auf europäischen Servern",
+    "Verarbeitung mit Auftragsverarbeitungsvertrag",
     "Bewertungsanfragen nach jedem Termin automatisch versandt",
     "Einrichtung in 2–4 Wochen, ohne Praxisunterbrechung",
   ],
@@ -92,7 +92,7 @@ const config: NationalIndustryPageConfig = {
   faq: [
     {
       question: "Wie ist der Datenschutz bei der Praxisautomatisierung geregelt?",
-      answer: "Cogniiq arbeitet mit Tools auf deutschen bzw. europäischen Servern. Jede Automatisierung wird mit einem Auftragsverarbeitungsvertrag (AVV) geliefert, und Patientendaten verlassen die vereinbarten Systeme nicht. Ob der konkrete Einsatz in Ihrer Praxis den Anforderungen genügt, beurteilt Ihr Datenschutzbeauftragter – wir liefern ihm die Unterlagen dafür zu.",
+      answer: "Jede Automatisierung wird mit einem Auftragsverarbeitungsvertrag (AVV) geliefert, und Patientendaten verlassen die vereinbarten Systeme nicht. Zum Verarbeitungsort machen wir derzeit keine Angabe — die Verträge mit den beteiligten Anbietern sind nicht abschließend unterzeichnet. Ob der konkrete Einsatz in Ihrer Praxis den Anforderungen genügt, beurteilt Ihr Datenschutzbeauftragter – wir liefern ihm die Unterlagen dafür zu.",
     },
     {
       question: "Funktioniert die Automatisierung mit unserer bestehenden Praxissoftware?",

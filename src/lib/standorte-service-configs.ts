@@ -195,7 +195,6 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       "Schrittweise Umsetzung: erst ein Prozess, dann mehr – kein Alles-oder-Nichts-Ansatz",
       "Persönliche Einweisung Ihres Teams – kein Selbststudium mit Video-Tutorials",
       "Weiterentwicklung und Support aus Bayreuth – direkter Draht, kurze Reaktionszeiten",
-      "Alle Daten bleiben in Europa, keine unsicheren Drittland-Übertragungen",
     ],
     useCases: [
       {
@@ -224,7 +223,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { question: "Welche Tools nutzt Cogniiq für Automatisierungen in Bayreuth?", answer: "Wir setzen auf professionelle, etablierte Automatisierungsplattformen und direkte API-Integrationen. Wir empfehlen immer die Lösung, die langfristig am sinnvollsten für Ihren Betrieb ist – nicht die teuerste." },
       { question: "Brauche ich technisches Vorwissen für Prozessautomatisierung?", answer: "Nein. Wir übernehmen den vollständigen Aufbau und erklären Ihnen das Ergebnis in verständlichen Worten. Nach der Übergabe können Sie einfache Änderungen selbst vornehmen." },
       { question: "Was kostet Prozessautomatisierung in Bayreuth?", answer: "Das hängt von der Komplexität ab. Einfache Workflows starten ab ca. 500–1.500 €, komplexere Projekte nach Aufwand. Das Erstgespräch und eine erste Einschätzung sind kostenlos und unverbindlich." },
-      { question: "Wie sicher sind die automatisierten Workflows?", answer: "Wir bauen ausschließlich auf etablierte, sicherheitszertifizierte Plattformen. Sensible Daten verlassen Europa nicht ohne Ihre ausdrückliche Zustimmung." },
+      { question: "Wie sicher sind die automatisierten Workflows?", answer: "Wir bauen auf etablierte Plattformen und dokumentieren zu jedem Workflow, welche Daten wohin fließen. Welche Systeme beteiligt sind, steht vor Projektbeginn fest." },
       { question: "Können bestehende Systeme in Automatisierungen integriert werden?", answer: "Ja. Wir verbinden nahezu jede Software mit einer API – CRM, Buchungssystem, Buchhaltungssoftware oder branchenspezifische Anwendungen für Bayreuth-Unternehmen." },
       { question: "Was passiert wenn eine Automatisierung fehlschlägt?", answer: "Fehlerbenachrichtigungen sind standardmäßig eingebaut. Bei kritischen Prozessen gibt es immer einen manuellen Fallback – niemand verliert Daten, weil ein Workflow einen Fehler hatte." },
       { question: "Könnt ihr auch bestehende Workflows übernehmen?", answer: "Ja. Wir analysieren was vorhanden ist, beheben Fehler oder bauen es strukturierter neu auf. Oft lässt sich Bestehendes mit wenig Aufwand deutlich stabiler machen." },

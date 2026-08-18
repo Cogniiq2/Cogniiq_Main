@@ -146,7 +146,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "Wie ist der Datenschutz bei automatisierten Prozessen geregelt?",
-    answer: "Wir arbeiten mit Lösungen auf europäischen Servern, liefern die notwendigen Auftragsverarbeitungsverträge und dokumentieren jeden Datenfluss. Die Bewertung des konkreten Einsatzes bleibt bei Ihrem Datenschutzbeauftragten.",
+    answer: "Wir liefern die notwendigen Auftragsverarbeitungsverträge und dokumentieren jeden Datenfluss. Zum Verarbeitungsort machen wir derzeit keine Angabe — die Verträge mit den beteiligten Anbietern sind nicht abschließend unterzeichnet. Die Bewertung des konkreten Einsatzes bleibt bei Ihrem Datenschutzbeauftragten.",
   },
   {
     question: "Was passiert, wenn eine Automatisierung fehlschlägt?",
@@ -251,7 +251,7 @@ export function AutomatisierungUnternehmen() {
         <div className="border-y border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
-              {["Quick-Wins in 1–3 Wochen", "API-Integrationen", "Europäische Server", "Vollständig dokumentiert", "Skalierbar"].map((item, i) => (
+              {["Quick-Wins in 1–3 Wochen", "API-Integrationen", "Vollständig dokumentiert", "Skalierbar"].map((item, i) => (
                 <span key={i} className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   {i > 0 && <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" aria-hidden="true" />}
                   {item}
@@ -272,7 +272,7 @@ export function AutomatisierungUnternehmen() {
                   Deutsche Unternehmen stehen unter Druck: Fachkräftemangel, steigende Lohnkosten, wachsender Wettbewerb. Die Antwort auf alle drei Probleme ist dieselbe – Automatisierung. Prozesse, die heute manuell 30 Minuten kosten, laufen automatisch in Sekunden. Ohne Fehler, ohne Personalaufwand, ohne Urlaub.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Cogniiq automatisiert Geschäftsprozesse mit professionellen Workflow-Systemen und direkten API-Integrationen, auf europäischen Servern betrieben. Wir beginnen immer mit dem Prozess, der den schnellsten ROI erzeugt, und skalieren von dort aus. Von einem einzelnen Workflow zur vollständig automatisierten Geschäftsstruktur.
+                  Cogniiq automatisiert Geschäftsprozesse mit professionellen Workflow-Systemen und direkten API-Integrationen. Wir beginnen immer mit dem Prozess, der den schnellsten ROI erzeugt, und skalieren von dort aus. Von einem einzelnen Workflow zur vollständig automatisierten Geschäftsstruktur.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                   Mit Projekten in{" "}
