@@ -152,6 +152,78 @@ Leerzeichen-Schreibweise abdecken, und die Zählung gehört gegen `dist`.
 3. Vor jedem lokalen Build `VITE_SUPABASE_URL` setzen — sonst bricht die Kette
    vor dem Prerender ab und jede HTML-Prüfung entfällt (§8.1, §10.1).
 
+## 7. Prüfgatter aus `.claude/COPY-BRIEF-2.md` — Punkt für Punkt
+
+Maschinell gegen `dist` geprüft, nicht behauptet. Prüflauf vom 18.08.2026,
+93 ausgelieferte Dokumente.
+
+### §8 · Erweitertes QA-Gate
+
+| Prüfpunkt | Ergebnis |
+|---|---|
+| Keine unbelegte Zahl in der Datei | **erfüllt** für den Cluster; außerhalb offen als Z8, Z9, Z12 |
+| Kein Abschnitt suggeriert ein nicht geliefertes Beweis-Asset | **erfüllt** |
+| Bausteine ohne Asset rendern nicht und lassen keinen Platzhalter im DOM | **erfüllt** — 0 Treffer für „Beispielanruf, nachgestellt" und „Referenzpraxis" in 93 Dokumenten |
+| `M15` (Grenzen) vorhanden und nicht abgeschwächt | **erfüllt** auf `/praxen`, `/ki-telefonassistent` und beiden Segmentseiten |
+| `M13` oder `M14` auf jeder kommerziellen Healthcare-Seite vorhanden oder als Slot | **erfüllt** — M13 als asset-gesperrter Slot auf 7 Seiten, M14 als Text auf 3 |
+| Umkehrbarkeit auf der Preisseite, auf der Landingpage genannt oder verlinkt | **erfüllt** — Laufzeit und Kündigung auf beiden |
+| Team-Abschnitt ohne Jobverlust-Abwehr | **erfüllt** — `TEAM_BLOCK` verteidigt nicht, sondern zeigt Entlastung |
+| Patientenabschnitt in eigenen Sätzen, kein Zitat | **erfüllt** — `PATIENTEN_SICHT`, keine Zitatsetzung |
+| Kein Cross-Industry-Link in der Healthcare-Journey | **erfüllt mit Einschränkung — siehe unten** |
+| Schema deckt nur sichtbaren, echten Inhalt | **erfüllt** — alles JSON-LD ist gültiges JSON, keine Auszeichnung eines ungerenderten Bausteins |
+| Jeder `[[CLAIM]]`/`[[ASSET]]` ist Code-Kommentar, nie gerenderter Text | **erfüllt** — 0 Treffer in 93 Dokumenten |
+| Vollständiges Gatter: typecheck, tests, lint, build, alle Routen vorgerendert | **erfüllt** — siehe §2 |
+
+### Die eine Einschränkung: Cross-Industry-Links
+
+Gemessen im `<main>` jeder Seite, also im primären Pfad — Navigation und Footer
+zählen nach COPY-BRIEF-2 §6 nicht dazu.
+
+| Seiten | Ergebnis |
+|---|---|
+| `/praxen`, beide Segmentseiten, Preisseite, `/integrationen`, `/datenschutz-sicherheit` | **0 Cross-Industry-Links.** Die geschlossene Healthcare-Journey hält |
+| `/ki-telefonassistent` und die drei Stadtseiten | verlinken je auf `/ki-telefonassistent-hotel` und `/ki-telefonassistent-restaurant` |
+
+Diese vier Seiten sind **selbst branchenübergreifend**: Die Service-Seite ist der
+Produkt-Einstieg für alle Branchen, die Stadtseiten behandeln in ihrem eigenen
+Inhalt Gastronomie, Sport und Handwerk neben Praxen. Ein Verweis auf die
+Geschwisterseiten desselben Produkts ist dort konsistent mit dem, was die Seite
+ist — Option B verbietet Querverweise *innerhalb einer Healthcare-Journey*, und
+diese vier Seiten sind keine.
+
+**Offene Entscheidung, nicht eigenmächtig getroffen:** Ob die drei Stadtseiten
+zu reinen Healthcare-Seiten werden sollen. Dann fielen die beiden Links
+(`components/RelatedPages.tsx` Zeile 44–45) und die Stadtseiten müssten ihre
+Gastronomie-, Sport- und Handwerksinhalte verlieren — ein Copy-Durchgang, kein
+Link-Fix.
+
+### §9 · Deliverables
+
+| Datei | Stand |
+|---|---|
+| `OWNER-INPUT.md` | beantwortet |
+| `HONESTY-AUDIT.md` | Befunde, §7 Metadatenkarte, §7.7 Sperre, §8 Umgebung, §9 geteilte Flächen, §10 technische Schuld |
+| `SEO-BASELINE.md` | vorhanden |
+| `COPY-SEO-CHANGELOG.md` | bis Stufe 9 fortgeschrieben |
+| `COPY-CLAIMS-TO-VERIFY.md` | §Z offen / §Y erledigt |
+| `ASSETS-REQUIRED.md` | §A Assets, §B Indexfreigabe, §C ungerenderte Bausteine, §C1 Abzeichen-Streifen, §D noindex |
+| `COPY-GAPS.md` | vorhanden |
+| Workflow: ein Baustein je Commit, auf den bestehenden Branch gepusht | eingehalten |
+
+### §10 · Der Maßstab dieses Durchgangs
+
+> Vertrauen entsteht bei diesem Käufer aus drei Dingen: **er hört es, man sagt
+> ihm, was es nicht kann, und er kommt wieder heraus.**
+
+| Kriterium | Stand |
+|---|---|
+| **Er hört es** | ❌ **Nicht erfüllt.** M13 ist gebaut, steht als Slot auf 7 Seiten und rendert nicht — die Audiodatei fehlt (`ASSETS-REQUIRED.md` §C, Punkt 1). Das ist die größte verbliebene Lücke dieses Durchgangs |
+| **Man sagt ihm, was es nicht kann** | ✅ Erfüllt. M15 auf allen kommerziellen Seiten, ungekürzt und vor dem Preis; M16 benennt drei Konstellationen, in denen abgeraten wird; `/integrationen` und `/datenschutz-sicherheit` sagen ausdrücklich, was nicht behauptet wird |
+| **Er kommt wieder heraus** | ✅ Erfüllt. M19 mit Laufzeit, Kündigung per Klick, Preisgarantie und Testphase mit Vetorecht — auf der Preisseite vollständig, auf den nachgeordneten Seiten kompakt mit Verweis |
+
+Zwei von drei Kriterien sind erfüllt. Das dritte hängt an einer Audiodatei, nicht
+an Text — und ist mit einer Lieferung erledigt.
+
 ## 6. Ausdrücklich nicht getan
 
 - Nicht gemergt, nicht deployt, keine Datenbankmigration, kein Produktionszugriff

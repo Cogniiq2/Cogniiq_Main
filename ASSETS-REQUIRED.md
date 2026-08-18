@@ -170,6 +170,45 @@ Ergebnis, solange das Asset fehlt.
 sieben Seiten und beantwortet den härtesten dokumentierten Einwand; sie ist die
 einzige Lieferung, die den Charakter der Website spürbar ändert.
 
+## C1 · Leerer Abzeichen-Streifen im Desktop-Hero der Startseite
+
+Stand 18.08.2026: Der Streifen unter dem Hero (`components/hero/DesktopHero.tsx`)
+trug drei Abzeichen, die alle drei in diesem Durchgang entfallen sind —
+„DSGVO-konform" (Konformitätszusage ohne Grundlage), „Europäische Server"
+(Verarbeitungsort, gesperrt nach HONESTY-AUDIT §7.7) und „Go-Live typischerweise
+in 7–14 Tagen" (widersprach der 7-Tage-Garantie). Der Streifen ist damit leer und
+vollständig aus dem Markup entfernt.
+
+**Inhaber-Entscheidung 18.08.2026: nicht wieder auffüllen, solange nichts
+Belegtes zur Verfügung steht.**
+
+Belegbar wäre heute schon einiges. Alle vier Aussagen stehen bestätigt in
+`FAKTEN` und sind durch `telefonassistent-copy.test.ts` gegen Abweichung
+gesichert:
+
+| Kandidat | Quelle | Warum er trägt |
+|---|---|---|
+| **7-Tage-Go-live-Garantie mit Vertragsstrafe** | `FAKTEN.goLive` | Nach COPY-BRIEF-3 §3.3 das stärkste Einzelargument der gesamten Website — eine Zusage mit finanzieller Konsequenz, nicht bloß ein Zeitraum |
+| **Änderungen umgesetzt in 3 Tagen** | `FAKTEN.aenderungen` | Kontert den dokumentierten Abbruchgrund Nr. 1 im Betrieb: 52 % nennen unzureichenden Support als Wechselgrund (Zi 2026) |
+| **Kündigung mit einem Klick im Dashboard** | `FAKTEN.kuendigung` | Risikoumkehr statt Dringlichkeit (§3.3). „Ich komme nicht mehr raus" ist eine der belegten Kaufängste |
+| **10 gleichzeitige Anrufe, kein Besetztzeichen** | `FAKTEN.gleichzeitigeAnrufe` | Spezifität schlägt Superlativ (§3.1) — eine prüfbare Zahl statt „deutliche Entlastung" |
+
+**Warum das trotzdem ein eigener Auftrag ist und nicht beiläufig passiert:**
+
+1. Der Hero der Startseite ist **branchenübergreifend**. Alle vier Kandidaten
+   gelten für den Telefonassistenten, nicht für Webdesign oder Automatisierung.
+   Ein Abzeichen dort verspricht dem Webdesign-Interessenten etwas, das für ihn
+   nicht gilt — dieselbe Fehlerklasse, die in diesem Durchgang mehrfach
+   aufgeräumt wurde.
+2. `DesktopHero` importiert heute nichts aus `telefonassistent-copy.ts`. Eine
+   Kopplung wäre nach HONESTY-AUDIT §7.4.2 zu prüfen, nicht nebenbei zu setzen.
+3. Der Streifen ist eine **geteilte Fläche** nach §9 — was dort steht, steht auf
+   der Startseite und wirkt auf jeden Besucher.
+
+Empfehlung für den Folgeauftrag: den Streifen nur dann zurückholen, wenn er
+produktbezogen ausgespielt wird, und dann mit der Go-live-Garantie an erster
+Stelle.
+
 ## D · Seiten, die auf `noindex` stehen
 
 Kein Asset im engeren Sinn, aber dieselbe Mechanik: Die Seiten sind fertig und
