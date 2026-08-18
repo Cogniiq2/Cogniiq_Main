@@ -92,7 +92,7 @@ const config: NationalIndustryPageConfig = {
   faq: [
     {
       question: "Was kostet eine Fitness-Website mit Kurskalender und Buchungssystem?",
-      answer: "Sport- und Fitness-Websites beginnen bei ca. 1.800 €. Mit digitalem Kurskalender, Online-Anmeldung und Probestunden-Buchung typischerweise 2.500–4.500 €. Für Studios mit erweitertem Mitgliederverwaltungssystem oder Integration in Magicline, Eversports oder ClubDesk auch darüber. Genaues Angebot nach kostenlosem Erstgespräch.",
+      answer: "Sport- und Fitness-Websites beginnen bei ca. 1.800 €. Mit digitalem Kurskalender, Online-Anmeldung und Probestunden-Buchung typischerweise 2.500–4.500 €. Für Studios mit erweitertem Mitgliederverwaltungssystem oder Integration in Magicline, Eversports oder ClubDesk auch darüber. Genaues Angebot nach kostenlosem Erstgespräch.",
     },
     {
       question: "Kann ich den Kurskalender selbst aktualisieren?",

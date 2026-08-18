@@ -30,7 +30,7 @@ const config: ClusterPageConfig = {
       { label: "Für wen", value: "Alle lokalen Unternehmen mit Münchner Zielgruppe" },
       { label: "Ziel", value: "Top-3 Google Maps, erste Seite organisch" },
       { label: "Zeithorizont", value: "Erste Verbesserungen in 6–14 Wochen" },
-      { label: "Preisrahmen", value: "ab ca. 1.000 € einmalig oder monatlich" },
+      { label: "Preisrahmen", value: "ab ca. 1.000 € einmalig oder monatlich" },
     ],
   },
   intro: {
@@ -75,7 +75,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie lange dauert es bis zu ersten Rankings in München?",
-      answer: "6–14 Wochen für erste messbare Verbesserungen. Stabile Rankings in harten Kategorien: 3–9 Monate.",
+      answer: "6–14 Wochen für erste messbare Verbesserungen. Stabile Rankings in harten Kategorien: 3–9 Monate.",
     },
     {
       question: "Brauche ich monatliche Betreuung?",
@@ -83,7 +83,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Was kostet lokales SEO in München?",
-      answer: "Einmaliges Setup ab ca. 1.000 €. Monatliche Betreuung ab ca. 350 € / Monat.",
+      answer: "Einmaliges Setup ab ca. 1.000 €. Monatliche Betreuung ab ca. 350 € / Monat.",
     },
     {
       question: "Wie helfen Bewertungen beim lokalen SEO in München?",

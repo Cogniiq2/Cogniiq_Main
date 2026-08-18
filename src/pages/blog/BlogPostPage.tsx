@@ -410,7 +410,7 @@ export function BlogPostPage() {
                     Analysegespräch vereinbaren
                   </h3>
                   <p className="text-[12.5px] text-gray-500 dark:text-gray-400 leading-relaxed mb-5">
-                    30 Minuten, in denen wir konkrete Potenziale für Ihr Unternehmen identifizieren.
+                    30&nbsp;Minuten, in denen wir konkrete Potenziale für Ihr Unternehmen identifizieren.
                   </p>
                   <Link
                     to="/kontakt"

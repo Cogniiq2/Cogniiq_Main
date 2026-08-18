@@ -42,7 +42,7 @@ const faqItems = [
   {
     question: "Wie lange dauert eine Website-Entwicklung?",
     answer:
-      "Einfache Unternehmenswebsites gehen in 7–14 Tagen live. Komplexere Projekte mit mehreren Seiten und Integrationen dauern 3–6 Wochen. Wir kommunizieren Meilensteine transparent.",
+      "Einfache Unternehmenswebsites gehen in 7–14 Tagen live. Komplexere Projekte mit mehreren Seiten und Integrationen dauern 3–6 Wochen. Wir kommunizieren Meilensteine transparent.",
   },
   {
     question: "Was kostet eine professionelle Website?",
@@ -160,7 +160,7 @@ export function WebdesignHub() {
               <span className="text-blue-600 dark:text-blue-400">Und konvertieren.</span>
             </motion.h1>
             <motion.p variants={fadeUp} custom={0.1} className="text-lg text-gray-500 dark:text-white/55 leading-relaxed max-w-2xl mb-10">
-              Cogniiq entwickelt individuelle Websites für Unternehmen in Bayern. Kein Template, kein Baukasten – sauberer Code, Core Web Vitals auf Niveau, Local SEO von Anfang an. Go-Live in 7–14 Tagen.
+              Cogniiq entwickelt individuelle Websites für Unternehmen in Bayern. Kein Template, kein Baukasten – sauberer Code, Core Web Vitals auf Niveau, Local SEO von Anfang an. Go-Live in 7–14&nbsp;Tagen.
             </motion.p>
             <motion.div variants={fadeUp} custom={0.15} className="flex flex-wrap gap-4">
               <Link

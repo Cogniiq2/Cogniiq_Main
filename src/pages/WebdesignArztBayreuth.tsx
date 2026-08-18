@@ -21,7 +21,7 @@ const config: IndustryPageConfig = {
     // ✓ Contains primary keyword, city, unique value prop, and implicit CTA
     // ✓ Addresses the core buyer fear (verpasste Anrufe / Terminverlust)
     description:
-      "Praxis Website Bayreuth mit KI-Telefonassistent: Cogniiq automatisiert Anrufannahme, Terminbuchung und Patientenkommunikation für Arztpraxen – Go-live in 14 Tagen.",
+      "Praxis Website Bayreuth mit KI-Telefonassistent: Cogniiq automatisiert Anrufannahme, Terminbuchung und Patientenkommunikation für Arztpraxen – Go-live in 14 Tagen.",
 
     canonical: `${base}/webdesign-arzt-bayreuth`,
 
@@ -56,7 +56,7 @@ const config: IndustryPageConfig = {
     // ✓ "Bayreuth" used twice — reinforces local relevance signal for Google Maps + organic
     // ✓ Specific outcomes named (Patientenanfragen, Erreichbarkeit, Terminprozesse) — matches buyer search intent
     // ✓ Trust signals (DSGVO-konform, lokal) anchor the paragraph
-    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme speziell für Arztpraxen in Bayreuth – damit Ihre Rezeption entlastet wird, Patientenanrufe auch dann angenommen werden, wenn niemand abnehmen kann, und Ihre Praxis bei lokalen Suchanfragen in Bayreuth sichtbar ist. Lokal betreut. Go-live in 14 Tagen.",
+    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme speziell für Arztpraxen in Bayreuth – damit Ihre Rezeption entlastet wird, Patientenanrufe auch dann angenommen werden, wenn niemand abnehmen kann, und Ihre Praxis bei lokalen Suchanfragen in Bayreuth sichtbar ist. Lokal betreut. Go-live in 14 Tagen.",
   },
 
   // ✓ Pain points rewritten to match the exact language patients and practice managers
@@ -82,7 +82,7 @@ const config: IndustryPageConfig = {
     },
     {
       step: "Schritt 2",
-      title: "Umsetzung in 7–14 Tagen",
+      title: "Umsetzung in 7–14 Tagen",
       // ✓ "schlüsselfertig" and "keine IT-Kenntnisse" address the most common objections
       // ✓ Specific timeline (14 Tage) is a ranking differentiator and trust signal
       description:
@@ -105,7 +105,7 @@ const config: IndustryPageConfig = {
     // customer project. No named customer project may be published anywhere on the site
     // without written consent on file (see ASSETS-REQUIRED.md).
     trigger:
-      "Angenommen, eine Allgemeinpraxis in Bayreuth mit drei Mitarbeitern an der Rezeption verzeichnet täglich eine hohe Zahl eingehender Anrufe. In den Stoßzeiten zwischen 8 und 10 Uhr sowie nach der Mittagspause können Anrufe nicht zeitnah angenommen werden. Außerhalb der Öffnungszeiten landen alle Anfragen auf dem Anrufbeantworter – mit der Folge, dass Patienten die nächste erreichbare Praxis in Bayreuth anrufen.",
+      "Angenommen, eine Allgemeinpraxis in Bayreuth mit drei Mitarbeitern an der Rezeption verzeichnet täglich eine hohe Zahl eingehender Anrufe. In den Stoßzeiten zwischen 8 und 10 Uhr sowie nach der Mittagspause können Anrufe nicht zeitnah angenommen werden. Außerhalb der Öffnungszeiten landen alle Anfragen auf dem Anrufbeantworter – mit der Folge, dass Patienten die nächste erreichbare Praxis in Bayreuth anrufen.",
 
     // ✓ Specific actions named (Online-Terminbuchung, Standardanfragen, Weiterleitung) — semantic depth
     process:
@@ -243,7 +243,7 @@ const config: IndustryPageConfig = {
     "Höhere Patientenzufriedenheit durch sofortige Reaktion auf Anrufe und Anfragen – auch außerhalb der Sprechzeiten, ohne Warteschleife",
     "Weniger No-Shows und Terminausfälle durch automatische Erinnerungen per SMS und E-Mail",
     "Professioneller erster Eindruck: moderne Website und sofortige Gesprächsannahme signalisieren Qualität, bevor der Patient die Praxis betritt",
-    "Go-live in 14 Tagen: keine lange Projektlaufzeit, kein IT-Aufwand auf Ihrer Seite, alles schlüsselfertig von Cogniiq",
+    "Go-live in 14 Tagen: keine lange Projektlaufzeit, kein IT-Aufwand auf Ihrer Seite, alles schlüsselfertig von Cogniiq",
   ],
 
   // ✓ Local context rewritten for maximum local SEO signal:
@@ -254,7 +254,7 @@ const config: IndustryPageConfig = {
   localContext: [
     "Bayreuth ist ein wachsender Gesundheitsstandort mit einer dichten Praxislandschaft – von Allgemeinmedizin und Fachpraxen über Zahnarztpraxen bis zu Physiotherapie- und Psychotherapieeinrichtungen im Stadtgebiet und im Umland von Oberfranken. Der Wettbewerb um neue Patienten ist messbar gestiegen: Praxen mit moderner Website und digitaler Erreichbarkeit gewinnen Neupatienten, die bei Google nach 'Arzt Bayreuth' oder ihrer Fachrichtung suchen – Praxen ohne digitale Präsenz verlieren sie.",
     "Gleichzeitig begrenzt der Fachkräftemangel im medizinischen Verwaltungsbereich die Personalkapazitäten in Bayreuther Praxen. Jede Stunde, die das Rezeptionsteam mit Routineanrufen verbringt, fehlt im direkten Patientenkontakt. Cogniiq entwickelt für Arztpraxen in Bayreuth maßgeschneiderte Digitallösungen: eine hochperformante Praxis-Website mit integrierter Online-Terminbuchung, einen KI-Telefonassistenten, der die Rezeption auch außerhalb der Sprechzeiten entlastet, sowie Automatisierungssysteme für Terminerinnerungen und strukturierte Patientenkommunikation.",
-    "Als Unternehmen mit Sitz in Bayreuth kennen wir die lokalen Besonderheiten, die Praxisstruktur in der Region und die spezifischen Anforderungen bayerischer Datenschutzpraxis. Die Einrichtung aller Lösungen dauert 7–14 Tage und wird vollständig von Cogniiq übernommen – ohne IT-Aufwand auf Praxisseite. Wir sind für persönliche Abstimmungen direkt erreichbar – per Video-Call oder vor Ort in Bayreuth.",
+    "Als Unternehmen mit Sitz in Bayreuth kennen wir die lokalen Besonderheiten, die Praxisstruktur in der Region und die spezifischen Anforderungen bayerischer Datenschutzpraxis. Die Einrichtung aller Lösungen dauert 7–14 Tage und wird vollständig von Cogniiq übernommen – ohne IT-Aufwand auf Praxisseite. Wir sind für persönliche Abstimmungen direkt erreichbar – per Video-Call oder vor Ort in Bayreuth.",
   ],
 
   // ✓ Internal links kept structurally identical — no changes to href values
@@ -283,7 +283,7 @@ const config: IndustryPageConfig = {
       // ✓ New FAQ — "Kosten" and "Preis" are consistently the highest-volume FAQ searches
       //   for any service. Answering it directly captures this intent and builds trust.
       answer:
-        "Die Kosten hängen von Umfang, Fachrichtung und gewünschten Automatisierungen ab. Cogniiq bietet drei Pakete: Start (Website mit lokalem SEO), Growth (Website + KI-Telefonassistent + Terminautomatisierung) und Premium (vollständige Praxisdigitalisierung). Im kostenlosen Erstgespräch erhalten Sie ein transparentes Angebot – ohne versteckte Kosten. Alle Lösungen sind go-live in 14 Tagen.",
+        "Die Kosten hängen von Umfang, Fachrichtung und gewünschten Automatisierungen ab. Cogniiq bietet drei Pakete: Start (Website mit lokalem SEO), Growth (Website + KI-Telefonassistent + Terminautomatisierung) und Premium (vollständige Praxisdigitalisierung). Im kostenlosen Erstgespräch erhalten Sie ein transparentes Angebot – ohne versteckte Kosten. Alle Lösungen sind go-live in 14 Tagen.",
     },
     {
       question:
@@ -307,7 +307,7 @@ const config: IndustryPageConfig = {
       question:
         "Wie lange dauert die Einrichtung für eine Arztpraxis in Bayreuth?",
       answer:
-        "Die vollständige Einrichtung dauert 7–14 Tage und wird von Cogniiq komplett übernommen. Sie müssen keine technischen Kenntnisse mitbringen und keinen internen IT-Aufwand einplanen. Sie erhalten Website, KI-Telefonassistent und Automatisierungssysteme schlüsselfertig – inklusive DSGVO-Dokumentation und einer Einführung durch Ihr Cogniiq-Team vor Ort oder per Video-Call in Bayreuth.",
+        "Die vollständige Einrichtung dauert 7–14 Tage und wird von Cogniiq komplett übernommen. Sie müssen keine technischen Kenntnisse mitbringen und keinen internen IT-Aufwand einplanen. Sie erhalten Website, KI-Telefonassistent und Automatisierungssysteme schlüsselfertig – inklusive DSGVO-Dokumentation und einer Einführung durch Ihr Cogniiq-Team vor Ort oder per Video-Call in Bayreuth.",
     },
     {
       question:

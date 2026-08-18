@@ -162,7 +162,7 @@ export function Footer() {
               <div className="flex flex-wrap gap-1.5">
                 {/* Zwei Chips sind am 18.08.2026 entfallen und werden nicht ersetzt:
                     „DSGVO" war ein Konformitätsabzeichen ohne Grundlage (§7.7),
-                    „7–14 Tage" widersprach der 7-Tage-Garantie aus FAKTEN.goLive
+                    „7–14&nbsp;Tage" widersprach der 7-Tage-Garantie aus FAKTEN.goLive
                     und trug nur einen [[CLAIM]]-Marker — der ist kein Ausweg.
                     Dieser Streifen steht auf jeder Seite der Website. */}
                 {["Festpreis", "Aus Bayreuth"].map((t) => (

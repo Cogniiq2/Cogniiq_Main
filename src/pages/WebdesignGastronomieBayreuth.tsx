@@ -43,7 +43,7 @@ const config: IndustryPageConfig = {
     },
     {
       step: "Schritt 2",
-      title: "Umsetzung in 7–14 Tagen",
+      title: "Umsetzung in 7–14 Tagen",
       description:
         "Restaurant-Website mit Reservierungssystem, KI-Assistent und Automations-Workflows werden vollständig von Cogniiq aufgebaut und konfiguriert – ohne IT-Aufwand für den Betrieb.",
     },
@@ -170,7 +170,7 @@ const config: IndustryPageConfig = {
   localContext: [
     "Die Bayreuther Gastronomie ist vielfältig und wettbewerbsintensiv – von der klassischen Gaststätte über das moderne Restaurant bis hin zu Event-Locations rund um die Festspiele. Gleichzeitig stehen viele Betriebe vor denselben Herausforderungen: zu viele Telefonanrufe, knappe Personalressourcen und eine veraltete Online-Präsenz.",
     "Cogniiq entwickelt für Gastronomiebetriebe in Bayreuth passgenaue Digitallösungen: eine moderne Restaurant-Website mit integriertem Reservierungssystem, einen KI-Telefonassistenten, der Reservierungen entgegennimmt und Fragen beantwortet, sowie Automatisierungen, die Bestätigungen, Erinnerungen und Feedback-Prozesse ohne manuellen Aufwand steuern.",
-    "Als Bayreuther Unternehmen kennen wir den lokalen Markt, die saisonalen Besonderheiten rund um die Festspiele und die Erwartungen der regionalen Gäste. Die Einrichtung aller Systeme dauert 7–14 Tage. Alle Lösungen werden datenschutzorientiert umgesetzt; technische und organisatorische Maßnahmen werden projektbezogen abgestimmt.",
+    "Als Bayreuther Unternehmen kennen wir den lokalen Markt, die saisonalen Besonderheiten rund um die Festspiele und die Erwartungen der regionalen Gäste. Die Einrichtung aller Systeme dauert 7–14 Tage. Alle Lösungen werden datenschutzorientiert umgesetzt; technische und organisatorische Maßnahmen werden projektbezogen abgestimmt.",
   ],
   internalLinks: [
     { label: "Webdesign Bayreuth", href: "/bayreuth/webdesign" },
@@ -196,7 +196,7 @@ const config: IndustryPageConfig = {
     {
       question: "Wie lange dauert die Einrichtung für ein Restaurant in Bayreuth?",
       answer:
-        "Die Einrichtung dauert in der Regel 7–14 Tage und wird vollständig von Cogniiq übernommen. Keine technischen Vorkenntnisse erforderlich – wir liefern alles schlüsselfertig.",
+        "Die Einrichtung dauert in der Regel 7–14 Tage und wird vollständig von Cogniiq übernommen. Keine technischen Vorkenntnisse erforderlich – wir liefern alles schlüsselfertig.",
     },
     {
       question: "Kann die Website auch Veranstaltungen und saisonale Menüs für die Festspielzeit abbilden?",

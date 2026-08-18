@@ -159,7 +159,7 @@ export function BewertungenPage() {
                 Überzeugen Sie sich selbst
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-                Kostenloses Erstgespräch – 30–45 Minuten, ohne Verpflichtung. Sie entscheiden danach, ob es passt.
+                Kostenloses Erstgespräch – 30–45&nbsp;Minuten, ohne Verpflichtung. Sie entscheiden danach, ob es passt.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <Link

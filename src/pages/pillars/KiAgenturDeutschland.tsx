@@ -19,7 +19,7 @@ const SERVICES = [
     title: "KI-Telefonassistent",
     description: "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, mehrsprachig. Erreichbar auch dann, wenn niemand abnehmen kann – ohne Warteschleife.",
     benefits: [
-      "Einrichtung in 7–14 Tagen",
+      "Einrichtung in 7–14 Tagen",
       "Integration in bestehende Kalender",
       "Mehrsprachig auf Anfrage",
     ],
@@ -116,7 +116,7 @@ const USE_CASES = [
   },
   {
     title: "Restaurant – Reservierungen außerhalb der Öffnungszeiten ohne Mitarbeiter",
-    description: "Ein inhabergeführtes Restaurant erhält Reservierungsanfragen auch nach 22 Uhr. KI-Telefonassistent nimmt Reservierungen entgegen, sendet Bestätigungen und Erinnerungen – ohne dass jemand zum Telefon greifen muss.",
+    description: "Ein inhabergeführtes Restaurant erhält Reservierungsanfragen auch nach 22 Uhr. KI-Telefonassistent nimmt Reservierungen entgegen, sendet Bestätigungen und Erinnerungen – ohne dass jemand zum Telefon greifen muss.",
   },
   {
     title: "Handwerksbetrieb – Auftragsanfragen werden angenommen statt verpasst",
@@ -135,7 +135,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "Wie schnell kann ein KI-Telefonassistent eingerichtet werden?",
-    answer: "In der Regel 7–14 Tage. Das beinhaltet Einrichtung, Konfiguration der Sprache und Antworten, Integration in Ihren Kalender und eine Testphase. Bei einfacheren Setups auch schneller.",
+    answer: "In der Regel 7–14 Tage. Das beinhaltet Einrichtung, Konfiguration der Sprache und Antworten, Integration in Ihren Kalender und eine Testphase. Bei einfacheren Setups auch schneller.",
   },
   {
     question: "Wie ist der Datenschutz beim KI-Einsatz geregelt?",
@@ -147,7 +147,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "Was kostet ein KI-Telefonassistent monatlich?",
-    answer: "Einfachere Setups beginnen ab ca. 99 €/Monat. Mittlere Konfigurationen mit Kalenderintegration und mehreren Szenarien 199–399 €/Monat. Komplexere Lösungen für große Praxen oder Unternehmensgruppen ab 499 €/Monat. Genaue Preise auf der Kosten-Seite.",
+    answer: "Einfachere Setups beginnen ab ca. 99 €/Monat. Mittlere Konfigurationen mit Kalenderintegration und mehreren Szenarien 199–399 €/Monat. Komplexere Lösungen für große Praxen oder Unternehmensgruppen ab 499 €/Monat. Genaue Preise auf der Kosten-Seite.",
   },
   {
     question: "Kann Cogniiq bestehende Telefonsysteme integrieren?",
@@ -254,7 +254,7 @@ export function KiAgenturDeutschland() {
         <div className="border-y border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
-              {["KI-Telefonassistent", "Prozessautomatisierung", "Einrichtung in 7–14 Tagen", "Persönliche Betreuung"].map((item, i) => (
+              {["KI-Telefonassistent", "Prozessautomatisierung", "Einrichtung in 7–14 Tagen", "Persönliche Betreuung"].map((item, i) => (
                 <span key={i} className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   {i > 0 && <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" aria-hidden="true" />}
                   {item}

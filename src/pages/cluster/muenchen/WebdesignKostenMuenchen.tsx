@@ -27,16 +27,16 @@ const config: ClusterPageConfig = {
   tldr: {
     heading: "Kurzüberblick: Webdesign Kosten München",
     items: [
-      { label: "Einstieg ab", value: "typisch ab ca. 1.500 €" },
-      { label: "Mittelbereich", value: "3.000 € – 7.000 €" },
-      { label: "Marktführer-Setup", value: "7.000 € – 15.000 €+" },
+      { label: "Einstieg ab", value: "typisch ab ca. 1.500 €" },
+      { label: "Mittelbereich", value: "3.000 € – 7.000 €" },
+      { label: "Marktführer-Setup", value: "7.000 € – 15.000 €+" },
       { label: "Projektdauer", value: "1–8 Wochen" },
     ],
   },
   intro: {
     heading: "Was kostet professionelles Webdesign in München?",
     paragraphs: [
-      "Die meisten Webdesign-Projekte in München liegen zwischen 1.500 € und 10.000 €. Kleinere Websites starten typischerweise ab ca. 1.500 €. Wer im Münchner Markt – mit seinen höheren Wettbewerbsstandards und anspruchsvolleren Zielgruppen – nachhaltig sichtbar sein will, investiert typisch in den Bereich von 3.000 € bis 7.000 €.",
+      "Die meisten Webdesign-Projekte in München liegen zwischen 1.500 € und 10.000 €. Kleinere Websites starten typischerweise ab ca. 1.500 €. Wer im Münchner Markt – mit seinen höheren Wettbewerbsstandards und anspruchsvolleren Zielgruppen – nachhaltig sichtbar sein will, investiert typisch in den Bereich von 3.000 € bis 7.000 €.",
       "München unterscheidet sich von anderen Städten: Die Zielgruppe ist digital versierter, der Wettbewerb dichter, die Erwartungen an Qualität höher. Eine Website, die in einer Kleinstadt ausreicht, verliert im Münchner Markt sofort gegenüber besser aufgestellten Wettbewerbern.",
       "In jedem Paket enthalten: individuelles Design, sauberer Code, Mobile-First, vollständige Datenschutzdokumentation und On-Page SEO. Der Unterschied zwischen den Paketen liegt in SEO-Tiefe, Content-Umfang und laufender Betreuung.",
     ],
@@ -50,12 +50,12 @@ const config: ClusterPageConfig = {
   pricing: {
     heading: "Preisrahmen: Webdesign in München",
     rangeText:
-      "Die meisten professionellen Webdesign-Projekte in München liegen zwischen 1.500 € und 12.000 €. Im Münchner Premium-Segment – wo Zielgruppen höhere Standards erwarten – lohnt die Investition in die oberen Pakete besonders.",
+      "Die meisten professionellen Webdesign-Projekte in München liegen zwischen 1.500 € und 12.000 €. Im Münchner Premium-Segment – wo Zielgruppen höhere Standards erwarten – lohnt die Investition in die oberen Pakete besonders.",
     tiers: [
       {
         name: "Website Launch",
-        anchor: "ab ca. 1.500 €",
-        range: "typisch: 1.500 € – 3.000 €",
+        anchor: "ab ca. 1.500 €",
+        range: "typisch: 1.500 € – 3.000 €",
         deliverables: [
           "Bis 6 Seiten, individuelles Design",
           "On-Page SEO Grundoptimierung",
@@ -67,21 +67,21 @@ const config: ClusterPageConfig = {
       },
       {
         name: "Website Wachstum",
-        anchor: "ab ca. 3.000 €",
-        range: "typisch: 3.000 € – 6.500 €",
+        anchor: "ab ca. 3.000 €",
+        range: "typisch: 3.000 € – 6.500 €",
         deliverables: [
           "Bis 12 Seiten, Conversion-Texte",
           "Lokale SEO-Strategie München",
           "Strukturierte Daten (Schema.org)",
           "Google Analytics 4 & Search Console",
           "Core Web Vitals Optimierung",
-          "3 Monate Nachbetreuung",
+          "3 Monate Nachbetreuung",
         ],
       },
       {
         name: "Website Marktführer",
-        anchor: "ab ca. 6.500 €",
-        range: "typisch: 6.500 € – 15.000 €+",
+        anchor: "ab ca. 6.500 €",
+        range: "typisch: 6.500 € – 15.000 €+",
         deliverables: [
           "Unbegrenzte Seitenstruktur",
           "Dominanz-SEO München",
@@ -115,7 +115,7 @@ const config: ClusterPageConfig = {
   faq: [
     {
       question: "Was kostet eine einfache Website in München?",
-      answer: "Einstiegsprojekte starten typisch ab ca. 1.500 €. Im Münchner Markt sind für wettbewerbsfähige Sichtbarkeit oft Investitionen im Bereich 2.500–5.000 € realistischer.",
+      answer: "Einstiegsprojekte starten typisch ab ca. 1.500 €. Im Münchner Markt sind für wettbewerbsfähige Sichtbarkeit oft Investitionen im Bereich 2.500–5.000 € realistischer.",
     },
     {
       question: "Warum sind Webdesign-Kosten in München höher als in anderen Städten?",
@@ -123,11 +123,11 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Sind Hosting und Domain inklusive?",
-      answer: "Nein. Hosting und Domain sind separate Positionen. Empfehlung und Einrichtung sind inklusive, laufende Kosten ca. 10–25 € / Monat.",
+      answer: "Nein. Hosting und Domain sind separate Positionen. Empfehlung und Einrichtung sind inklusive, laufende Kosten ca. 10–25 € / Monat.",
     },
     {
       question: "Was kostet laufende SEO-Betreuung in München?",
-      answer: "Monatliche Betreuung ab ca. 350 € / Monat. Im Paket 'Website Marktführer' inklusive.",
+      answer: "Monatliche Betreuung ab ca. 350 € / Monat. Im Paket 'Website Marktführer' inklusive.",
     },
     {
       question: "Gibt es versteckte Kosten?",
@@ -135,7 +135,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie lange dauert ein Webdesign-Projekt in München?",
-      answer: "Launch: 7–14 Tage. Wachstum: 3–6 Wochen. Marktführer: 6–10 Wochen.",
+      answer: "Launch: 7–14 Tage. Wachstum: 3–6 Wochen. Marktführer: 6–10 Wochen.",
     },
     {
       question: "Was ist in jedem Paket enthalten?",
@@ -151,7 +151,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie erhalte ich ein konkretes Angebot für München?",
-      answer: "Im kostenlosen Erstgespräch – 30–45 Minuten, remote oder vor Ort in München.",
+      answer: "Im kostenlosen Erstgespräch – 30–45 Minuten, remote oder vor Ort in München.",
     },
   ],
   internalLinks: [

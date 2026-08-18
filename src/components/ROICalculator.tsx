@@ -347,7 +347,7 @@ export function ROICalculator() {
                 Diese Zahlen konkret machen?
               </p>
               <p className="text-[12.5px] text-gray-500 mb-5 leading-relaxed">
-                30 Minuten. Wir zeigen, welcher Teil in Ihrem Unternehmen sofort
+                30&nbsp;Minuten. Wir zeigen, welcher Teil in Ihrem Unternehmen sofort
                 automatisierbar ist — ohne großen Aufwand.
               </p>
               <Link

@@ -30,7 +30,7 @@ const config: ClusterPageConfig = {
       { label: "Für wen", value: "Ads-Kampagnen, Lead-Generierung, B2B-Akquise" },
       { label: "Ziel", value: "Niedrigerer Cost-per-Lead, höhere Conversion" },
       { label: "Umsetzungsdauer", value: "5–10 Werktage" },
-      { label: "Preisrahmen", value: "ab ca. 900 €" },
+      { label: "Preisrahmen", value: "ab ca. 900 €" },
     ],
   },
   intro: {
@@ -79,7 +79,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Was kostet eine Landingpage in München?",
-      answer: "Ab ca. 900 €. Mit erweitertem Tracking, CRM-Integration und A/B-Test-Setup: 1.500 € – 3.000 €.",
+      answer: "Ab ca. 900 €. Mit erweitertem Tracking, CRM-Integration und A/B-Test-Setup: 1.500 € – 3.000 €.",
     },
     {
       question: "Wie hoch ist die Google Ads Qualitätsbewertung für eine schnelle Landingpage?",

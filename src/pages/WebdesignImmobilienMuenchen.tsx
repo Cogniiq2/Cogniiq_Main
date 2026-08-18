@@ -43,7 +43,7 @@ const config: IndustryPageConfig = {
     },
     {
       step: "Schritt 2",
-      title: "Umsetzung in 7–14 Tagen",
+      title: "Umsetzung in 7–14 Tagen",
       description:
         "Makler-Website, KI-Telefonassistent und Lead-Automatisierungsworkflows werden vollständig von Cogniiq aufgebaut. Sie erhalten alles schlüsselfertig – kein technischer Aufwand auf Maklerbüro-Seite.",
     },
@@ -170,7 +170,7 @@ const config: IndustryPageConfig = {
   localContext: [
     "München ist mit Abstand der teuerste Immobilienmarkt Deutschlands. Kaufinteressenten und Mieter sind im Schnitt besser informiert und haben höhere Ansprüche an den gesamten Prozess – von der Website-Recherche bis zur Besichtigungsorganisation.",
     "Cogniiq entwickelt für Immobilienmakler in München maßgeschneiderte Digitallösungen: eine hochwertige Makler-Website mit strukturierten Objektseiten, einen KI-Telefonassistenten für Interessentenanfragen sowie Automatisierungssysteme für Lead-Qualifizierung, Besichtigungsplanung und Follow-up-Prozesse.",
-    "Alle Systeme werden datenschutzorientiert umgesetzt und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut alle Systeme langfristig remote.",
+    "Alle Systeme werden datenschutzorientiert umgesetzt und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut alle Systeme langfristig remote.",
   ],
   internalLinks: [
     { label: "Webdesign München", href: "/muenchen/webdesign" },
@@ -196,7 +196,7 @@ const config: IndustryPageConfig = {
     {
       question: "Wie lange dauert die Einrichtung für einen Immobilienmakler in München?",
       answer:
-        "Die Einrichtung dauert in der Regel 7–14 Tage. Website, KI-Assistent und Automatisierungs-Workflows werden vollständig von Cogniiq aufgebaut – Sie müssen keine technischen Vorkenntnisse mitbringen.",
+        "Die Einrichtung dauert in der Regel 7–14 Tage. Website, KI-Assistent und Automatisierungs-Workflows werden vollständig von Cogniiq aufgebaut – Sie müssen keine technischen Vorkenntnisse mitbringen.",
     },
     {
       question: "Kann der KI-Telefonassistent auch Fragen zu spezifischen Objekten in München beantworten?",

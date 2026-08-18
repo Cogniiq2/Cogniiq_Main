@@ -65,7 +65,7 @@ const config: NationalIndustryPageConfig = {
       {
         step: "02",
         title: "Erinnerung & Bestätigung",
-        description: "24 Stunden vorher: automatische Erinnerung mit Bestätigungslink. Wer nicht bestätigt, wird erinnert. Freie Plätze bei Absagen gehen automatisch in die Warteliste.",
+        description: "24 Stunden vorher: automatische Erinnerung mit Bestätigungslink. Wer nicht bestätigt, wird erinnert. Freie Plätze bei Absagen gehen automatisch in die Warteliste.",
       },
       {
         step: "03",
@@ -99,7 +99,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Was kostet Gastronomie-Automatisierung?",
-      answer: "Einfache Workflows wie Reservierungsbestätigungen und Erinnerungen beginnen bei ca. 500–800 €. Umfassendere Automatisierungen inkl. Lieferantenintegration und Buchhaltungsanbindung typischerweise 1.500–3.500 €. Kleinere Restaurants profitieren besonders – jede eingesparte Stunde zählt.",
+      answer: "Einfache Workflows wie Reservierungsbestätigungen und Erinnerungen beginnen bei ca. 500–800 €. Umfassendere Automatisierungen inkl. Lieferantenintegration und Buchhaltungsanbindung typischerweise 1.500–3.500 €. Kleinere Restaurants profitieren besonders – jede eingesparte Stunde zählt.",
     },
     {
       question: "Lohnt sich Automatisierung für ein kleines Restaurant mit 5 Tischen?",

@@ -99,7 +99,7 @@ const PRINCIPLES = [
     icon: Clock,
     title: "Schnelle Inbetriebnahme",
     description:
-      "Go-Live in 7 bis 14 Tagen für erste Systeme. Komplexere Systemverbünde in 3 bis 5 Wochen — ohne Abstriche bei der Qualität.",
+      "Go-Live in 7 bis 14 Tagen für erste Systeme. Komplexere Systemverbünde in 3 bis 5 Wochen — ohne Abstriche bei der Qualität.",
   },
 ];
 
@@ -243,7 +243,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Wie schnell sind Systeme live?",
-    a: "Einzellösungen wie eine Website oder ein KI-Telefonassistent sind in 7 bis 14 Tagen einsatzbereit. Komplexe Systemverbünde planen wir in 3 bis 5 Wochen — mit regelmäßigen Zwischenständen und klar definierten Phasen.",
+    a: "Einzellösungen wie eine Website oder ein KI-Telefonassistent sind in 7 bis 14 Tagen einsatzbereit. Komplexe Systemverbünde planen wir in 3 bis 5 Wochen — mit regelmäßigen Zwischenständen und klar definierten Phasen.",
   },
   {
     q: "Sind die Systeme DSGVO-konform?",

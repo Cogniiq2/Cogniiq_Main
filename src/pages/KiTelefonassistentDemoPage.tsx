@@ -36,7 +36,7 @@ const DEMO_BENEFITS = [
   { icon: Phone, label: "Live-Demo des KI Telefonassistenten" },
   { icon: Calendar, label: "Sehen Sie automatische Terminbuchung in Aktion" },
   { icon: Zap, label: "Konfiguration für Ihre Branche besprechen" },
-  { icon: Clock, label: "Nur 30 Minuten, kein Verkaufsdruck" },
+  { icon: Clock, label: "Nur 30 Minuten, kein Verkaufsdruck" },
   { icon: Shield, label: "Kostenlos und unverbindlich" },
   { icon: Building2, label: "Individuelle Einschätzung für Ihr Unternehmen" },
 ];
@@ -213,7 +213,7 @@ export function KiTelefonassistentDemoPage() {
     <>
       <PageSEO
         title="KI Telefonassistent Demo buchen | Cogniiq"
-        description="Kostenlose Live-Demo des KI Telefonassistenten: Erleben Sie, wie Anrufe angenommen und Termine nach Ihren Regeln gebucht werden. Unverbindlich, ca. 30 Minuten."
+        description="Kostenlose Live-Demo des KI Telefonassistenten: Erleben Sie, wie Anrufe angenommen und Termine nach Ihren Regeln gebucht werden. Unverbindlich, ca. 30 Minuten."
         canonical={`${BUSINESS_INFO.website}/ki-telefonassistent/demo`}
         breadcrumbs={breadcrumbs}
         additionalSchema={schema}
@@ -295,7 +295,7 @@ export function KiTelefonassistentDemoPage() {
                     {[
                       "Formular ausfüllen und Demo-Termin anfragen",
                       // [[CLAIM: verify — Reaktionszeit 24 Stunden (OWNER-INPUT D3) bestätigen]]
-                      "Wir melden uns in der Regel innerhalb von 24 Stunden",
+                      "Wir melden uns in der Regel innerhalb von 24 Stunden",
                       "Live-Demo per Video: KI-Assistent in Aktion",
                       "Individuelle Konfiguration für Ihr Unternehmen besprechen",
                     ].map((step, i) => (
@@ -332,7 +332,7 @@ export function KiTelefonassistentDemoPage() {
                         Demo-Anfrage eingegangen
                       </h2>
                       <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-6">
-                        Wir melden uns in der Regel innerhalb von 24 Stunden, um Ihren Demo-Termin zu bestätigen.
+                        Wir melden uns in der Regel innerhalb von 24&nbsp;Stunden, um Ihren Demo-Termin zu bestätigen.
                       </p>
                       <Link
                         to="/ki-telefonassistent"
@@ -353,7 +353,7 @@ export function KiTelefonassistentDemoPage() {
                         Demo-Termin anfragen
                       </h2>
                       <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                        Kostenlos · Unverbindlich · Innerhalb von 24 Stunden Rückmeldung
+                        Kostenlos · Unverbindlich · Innerhalb von 24&nbsp;Stunden Rückmeldung
                       </p>
 
                       <form onSubmit={handleSubmit} className="space-y-4">

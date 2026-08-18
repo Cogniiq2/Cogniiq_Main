@@ -30,7 +30,7 @@ const config: ClusterPageConfig = {
       { label: "Für wen", value: "Ads-Kampagnen, Lead-Generierung, Saisonaktionen" },
       { label: "Ziel", value: "Höhere Conversion-Rate, weniger Budget-Verlust" },
       { label: "Umsetzungsdauer", value: "5–10 Werktage" },
-      { label: "Preisrahmen", value: "ab ca. 800 €" },
+      { label: "Preisrahmen", value: "ab ca. 800 €" },
     ],
   },
   intro: {
@@ -79,7 +79,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Was kostet eine Landingpage in Regensburg?",
-      answer: "Ab ca. 800 €. Mit erweitertem Tracking und CRM-Integration: 1.200 € – 2.500 €.",
+      answer: "Ab ca. 800 €. Mit erweitertem Tracking und CRM-Integration: 1.200 € – 2.500 €.",
     },
     {
       question: "Kann die Landingpage mit Google Ads verknüpft werden?",
@@ -103,7 +103,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie starte ich?",
-      answer: "Kostenloses Erstgespräch – 30–45 Minuten, remote oder vor Ort in Regensburg.",
+      answer: "Kostenloses Erstgespräch – 30–45 Minuten, remote oder vor Ort in Regensburg.",
     },
   ],
   internalLinks: [

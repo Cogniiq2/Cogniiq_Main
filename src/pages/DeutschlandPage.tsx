@@ -22,7 +22,7 @@ const SERVICES = [
     description:
       "Individuelle Websites für Unternehmen in ganz Deutschland – entwickelt für Performance, lokale SEO-Sichtbarkeit und messbare Conversion. Kein Template, kein Baukastenprodukt.",
     benefits: [
-      "Mobile-First, Ladezeit unter 2 Sekunden",
+      "Mobile-First, Ladezeit unter 2 Sekunden",
       "Lokal und national SEO-optimiert",
       "Klare Conversion-Struktur für mehr Anfragen",
     ],
@@ -34,7 +34,7 @@ const SERVICES = [
     description:
       "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, mehrsprachig. Für Praxen, Gastronomie, Dienstleister und Handwerk in ganz Deutschland.",
     benefits: [
-      "Einrichtung in 7–14 Tagen",
+      "Einrichtung in 7–14 Tagen",
       "Erreichbar auch dann, wenn niemand abnehmen kann",
       "Mehrsprachig auf Anfrage",
     ],
@@ -211,11 +211,11 @@ const FAQ_ITEMS = [
   },
   {
     q: "Wie schnell können Projekte starten?",
-    a: "KI-Telefonassistenten sind in 7–14 Tagen live. Einfache Automatisierungen in 1–2 Wochen. Websites je nach Umfang in 4–12 Wochen. Realistischer Zeitplan nach dem Erstgespräch.",
+    a: "KI-Telefonassistenten sind in 7–14 Tagen live. Einfache Automatisierungen in 1–2 Wochen. Websites je nach Umfang in 4–12 Wochen. Realistischer Zeitplan nach dem Erstgespräch.",
   },
   {
     q: "Was kostet ein Projekt mit Cogniiq in Deutschland?",
-    a: "Transparente Festpreise, vollständig remote betreut. KI-Telefonassistenten nach Anrufvolumen, Automatisierungen ab ca. 500–1.500 €. Websites starten ab 1.500 €; individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei etwa 2.500–5.000 €. Erstgespräch immer kostenlos.",
+    a: "Transparente Festpreise, vollständig remote betreut. KI-Telefonassistenten nach Anrufvolumen, Automatisierungen ab ca. 500–1.500 €. Websites starten ab 1.500 €; individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei etwa 2.500–5.000 €. Erstgespräch immer kostenlos.",
   },
 ];
 
@@ -807,7 +807,7 @@ export function DeutschlandPage() {
                 Digitale Systeme für Unternehmen in Deutschland
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-                Kostenloses Erstgespräch – für Unternehmen in ganz Deutschland. Remote, ohne Verpflichtung, mit konkretem Ergebnis in 30–45 Minuten.
+                Kostenloses Erstgespräch – für Unternehmen in ganz Deutschland. Remote, ohne Verpflichtung, mit konkretem Ergebnis in 30–45&nbsp;Minuten.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <Link

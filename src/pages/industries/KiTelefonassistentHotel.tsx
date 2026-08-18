@@ -11,7 +11,7 @@ const config: NationalIndustryPageConfig = {
   },
   h1: "KI Telefonassistent für Hotels & Pensionen",
   tagline: "Hotellerie · Rezeption auch nachts · Direktbuchungen stärken",
-  intro: "Reisende buchen spät abends – um 22 Uhr, nach dem Feierabend, wenn die Rezeption längst geschlossen ist. Wer in diesem Moment nicht erreichbar ist, verliert die Direktbuchung häufig an ein Buchungsportal – inklusive der fälligen Provision. Der KI Telefonassistent nimmt Buchungsanfragen auch außerhalb der Rezeptionszeiten entgegen und trägt sie nach Ihren Vorgaben in Ihr System ein.",
+  intro: "Reisende buchen spät abends – um 22 Uhr, nach dem Feierabend, wenn die Rezeption längst geschlossen ist. Wer in diesem Moment nicht erreichbar ist, verliert die Direktbuchung häufig an ein Buchungsportal – inklusive der fälligen Provision. Der KI Telefonassistent nimmt Buchungsanfragen auch außerhalb der Rezeptionszeiten entgegen und trägt sie nach Ihren Vorgaben in Ihr System ein.",
   serviceSlug: "ki-telefonassistent",
   serviceLabel: "KI Telefonassistent",
   costLink: "/kosten-ki-telefonassistent",
@@ -19,7 +19,7 @@ const config: NationalIndustryPageConfig = {
   problems: [
     {
       title: "Buchungsanfragen nachts und am Wochenende gehen verloren",
-      description: "Die Buchungsentscheidung fällt selten zwischen 9 und 17 Uhr. Reisende entscheiden sich abends, nach dem Urlaubs-Browsing. Wer da nicht telefonisch erreichbar ist, verliert die Direktbuchung an ein OTA.",
+      description: "Die Buchungsentscheidung fällt selten zwischen 9 und 17 Uhr. Reisende entscheiden sich abends, nach dem Urlaubs-Browsing. Wer da nicht telefonisch erreichbar ist, verliert die Direktbuchung an ein OTA.",
     },
     {
       title: "Jede Portalbuchung kostet Provision",
@@ -56,7 +56,7 @@ const config: NationalIndustryPageConfig = {
     // [[CLAIM: verify — PMS-/Channel-Manager-Anbindungen konkret bestätigen]]
     "Anbindung an gängige PMS-Systeme und Channel-Manager wird vor dem Angebot geprüft",
     // [[CLAIM: verify — Einrichtungsdauer 7–14 Tage]]
-    "Eingerichtet in der Regel in 7–14 Tagen – der Hotelbetrieb läuft weiter",
+    "Eingerichtet in der Regel in 7–14 Tagen – der Hotelbetrieb läuft weiter",
   ],
   workflow: {
     title: "So läuft eine Buchungsanfrage ab",
@@ -64,7 +64,7 @@ const config: NationalIndustryPageConfig = {
       {
         step: "01",
         title: "Gast ruft an",
-        description: "Ob um 10 Uhr morgens oder 23 Uhr abends – der Assistent ist sofort erreichbar, auf Deutsch oder Englisch, ohne Besetztzeichen und ohne Warteschleife.",
+        description: "Ob um 10 Uhr morgens oder 23 Uhr abends – der Assistent ist sofort erreichbar, auf Deutsch oder Englisch, ohne Besetztzeichen und ohne Warteschleife.",
       },
       {
         step: "02",
@@ -114,7 +114,7 @@ const config: NationalIndustryPageConfig = {
     {
       question: "Wie lange dauert die Einrichtung?",
       // [[CLAIM: verify — Einrichtungsdauer bestätigen]]
-      answer: "In der Regel 7–14 Tage für einfache Setups. Komplexe PMS-Anbindungen oder mehrsprachige Konfigurationen dauern länger. Der Hotelbetrieb wird dabei nicht unterbrochen.",
+      answer: "In der Regel 7–14 Tage für einfache Setups. Komplexe PMS-Anbindungen oder mehrsprachige Konfigurationen dauern länger. Der Hotelbetrieb wird dabei nicht unterbrochen.",
     },
   ],
 };

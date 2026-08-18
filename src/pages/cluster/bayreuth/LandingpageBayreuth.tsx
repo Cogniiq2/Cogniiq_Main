@@ -30,7 +30,7 @@ const config: ClusterPageConfig = {
       { label: "Für wen", value: "Ads-Kampagnen, Lead-Generierung, Events" },
       { label: "Ziel", value: "Höhere Conversion-Rate, weniger Absprünge" },
       { label: "Umsetzungsdauer", value: "5–10 Werktage" },
-      { label: "Preisrahmen", value: "ab ca. 800 €" },
+      { label: "Preisrahmen", value: "ab ca. 800 €" },
     ],
   },
   intro: {
@@ -83,7 +83,7 @@ const config: ClusterPageConfig = {
     {
       question: "Was kostet eine Landingpage in Bayreuth?",
       answer:
-        "Landingpages starten typisch ab ca. 800 €. Mit erweitertem Tracking, CRM-Integration und A/B-Test-Setup bewegen sich Projekte im Bereich 1.200 € – 2.500 €.",
+        "Landingpages starten typisch ab ca. 800 €. Mit erweitertem Tracking, CRM-Integration und A/B-Test-Setup bewegen sich Projekte im Bereich 1.200 € – 2.500 €.",
     },
     {
       question: "Kann die Landingpage mit Google Ads verknüpft werden?",
@@ -113,7 +113,7 @@ const config: ClusterPageConfig = {
     {
       question: "Wie starte ich?",
       answer:
-        "Kostenloses Erstgespräch buchen – 30–45 Minuten. Wir besprechen Kampagnenziel, Zielgruppe und Conversion-Mechanik und erstellen ein konkretes Angebot.",
+        "Kostenloses Erstgespräch buchen – 30–45 Minuten. Wir besprechen Kampagnenziel, Zielgruppe und Conversion-Mechanik und erstellen ein konkretes Angebot.",
     },
   ],
   internalLinks: [

@@ -15,7 +15,7 @@ const faqs = [
     question: 'Wie schnell könnt ihr starten?',
     // [[CLAIM: verify — Startzeitraum 7–14 Tage (OWNER-INPUT E1)]]
     answer:
-      'In der Regel innerhalb von 7–14 Tagen nach dem Analysegespräch. Je nach Auslastung und Projektumfang kann es auch anders liegen – wir nennen Ihnen im Erstgespräch einen konkreten Termin.',
+      'In der Regel innerhalb von 7–14 Tagen nach dem Analysegespräch. Je nach Auslastung und Projektumfang kann es auch anders liegen – wir nennen Ihnen im Erstgespräch einen konkreten Termin.',
     category: 'Ablauf',
   },
   {

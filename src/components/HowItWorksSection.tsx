@@ -10,7 +10,7 @@ const STEPS = [
     number: '01',
     icon: PhoneCall,
     title: 'Kostenloses Analysegespräch',
-    subtitle: '30 Minuten reichen aus',
+    subtitle: '30 Minuten reichen aus',
     description:
       'Wir analysieren gemeinsam Ihre größten Verlustquellen: verpasste Anrufe, langsame Websites, manuelle Prozesse. Keine Vorbereitung nötig.',
     outcomes: [
@@ -31,7 +31,7 @@ const STEPS = [
     title: 'System-Konzept & Angebot',
     subtitle: 'Maßgeschneidert, nicht von der Stange',
     description:
-      'Sie erhalten ein individuelles Systemkonzept mit klarer Roadmap, transparenter Preisgestaltung und definierten Meilensteinen — in der Regel innerhalb von 24 Stunden nach dem Gespräch.',
+      'Sie erhalten ein individuelles Systemkonzept mit klarer Roadmap, transparenter Preisgestaltung und definierten Meilensteinen — in der Regel innerhalb von 24 Stunden nach dem Gespräch.',
     outcomes: [
       'Individuelles Systemkonzept',
       'Feste Meilensteine & Kosten',
@@ -48,19 +48,19 @@ const STEPS = [
   {
     number: '03',
     icon: Zap,
-    title: 'Go-Live typischerweise in 7–14 Tagen',
+    title: 'Go-Live typischerweise in 7–14 Tagen',
     subtitle: 'Klarer Zeitplan, feste Sprints',
     description:
-      'Entwicklung in klaren Sprints, regelmäßige Zwischenstände, ausgiebige Tests. Go-Live typischerweise in 7–14 Tagen — mit Monitoring, Optimierung und langfristiger Partnerschaft.',
+      'Entwicklung in klaren Sprints, regelmäßige Zwischenstände, ausgiebige Tests. Go-Live typischerweise in 7–14 Tagen — mit Monitoring, Optimierung und langfristiger Partnerschaft.',
     outcomes: [
-      'Go-Live typischerweise in 7–14 Tagen',
+      'Go-Live typischerweise in 7–14 Tagen',
       'Laufendes Monitoring inklusive',
       'Feste Sprints mit regelmäßigen Zwischenständen',
     ],
     color: '#f59e0b',
     bgLight: 'rgba(245,158,11,0.06)',
     borderLight: 'rgba(245,158,11,0.12)',
-    tag: '7–14 Tage',
+    tag: '7–14 Tage',
     tagColor: '#d97706',
     tagBg: 'rgba(245,158,11,0.08)',
   },
@@ -278,7 +278,7 @@ export function HowItWorksSection() {
         >
           <div className="flex flex-col gap-1">
             <p className="text-[14px] font-bold text-gray-900">
-              Bereit, in 7–14 Tagen live zu gehen?
+              Bereit, in 7–14&nbsp;Tagen live zu gehen?
             </p>
             <p className="text-[12.5px] text-gray-400">
               Fester Zeitplan, regelmäßige Zwischenstände, keine Vorabkosten.

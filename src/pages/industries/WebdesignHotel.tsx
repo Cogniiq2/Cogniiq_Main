@@ -92,7 +92,7 @@ const config: NationalIndustryPageConfig = {
   faq: [
     {
       question: "Wie viel Provision kann durch mehr Direktbuchungen eingespart werden?",
-      answer: "Buchungsportale nehmen pro Buchung eine Provision, die je nach Plattform und Vertrag deutlich ins Gewicht fällt. Jede Buchung, die stattdessen direkt über Ihre eigene Website eingeht, spart diese Provision vollständig ein. Wie stark sich das rechnet, hängt von Zimmerpreis, Belegung und Ihrem heutigen Direktbuchungsanteil ab – das rechnen wir im Erstgespräch gemeinsam für Ihr Haus durch. Die Website amortisiert sich in der Regel innerhalb von 6–12 Monaten.",
+      answer: "Buchungsportale nehmen pro Buchung eine Provision, die je nach Plattform und Vertrag deutlich ins Gewicht fällt. Jede Buchung, die stattdessen direkt über Ihre eigene Website eingeht, spart diese Provision vollständig ein. Wie stark sich das rechnet, hängt von Zimmerpreis, Belegung und Ihrem heutigen Direktbuchungsanteil ab – das rechnen wir im Erstgespräch gemeinsam für Ihr Haus durch. Die Website amortisiert sich in der Regel innerhalb von 6–12 Monaten.",
     },
     {
       question: "Welches Buchungssystem integriert Cogniiq?",

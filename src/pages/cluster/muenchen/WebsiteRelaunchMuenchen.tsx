@@ -30,7 +30,7 @@ const config: ClusterPageConfig = {
       { label: "Für wen", value: "Münchner Unternehmen mit veralteter oder schwacher Website" },
       { label: "Typische Ziele", value: "Mehr Anfragen, bessere Rankings, schnellere Ladezeit" },
       { label: "Projektdauer", value: "4–10 Wochen" },
-      { label: "Preisrahmen", value: "ab ca. 2.500 €" },
+      { label: "Preisrahmen", value: "ab ca. 2.500 €" },
     ],
   },
   intro: {
@@ -43,7 +43,7 @@ const config: ClusterPageConfig = {
   },
   painPoints: [
     "Ladezeit über 3s: direkter Ranking-Malus im Münchner Hochkompetitionsmarkt",
-    "Veraltetes Design: Münchner Zielgruppe verlässt die Seite innerhalb von 3 Sekunden",
+    "Veraltetes Design: Münchner Zielgruppe verlässt die Seite innerhalb von 3 Sekunden",
     "Core Web Vitals schlecht: Google benachteiligt die Website in den Suchergebnissen",
     "DSGVO-Dokumentation veraltet: erhöhtes Abmahnrisiko in einem rechtsbewussten Markt",
     "Lokale SEO-Grundlage fehlt: Google Business nicht optimiert, keine strukturierten Daten",
@@ -79,7 +79,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Was kostet ein Website Relaunch in München?",
-      answer: "Einfache Relaunches ab ca. 2.500 €. Komplexere Projekte mit vollständiger SEO-Strategie: 4.500 € – 10.000 €.",
+      answer: "Einfache Relaunches ab ca. 2.500 €. Komplexere Projekte mit vollständiger SEO-Strategie: 4.500 € – 10.000 €.",
     },
     {
       question: "Wie lange dauert ein Relaunch in München?",
@@ -103,7 +103,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie schnell zeigen sich Ergebnisse nach dem Relaunch?",
-      answer: "Erste Ranking-Veränderungen nach 2–6 Wochen. Vollständige Indexierung und stabilisierte Rankings nach 2–3 Monaten.",
+      answer: "Erste Ranking-Veränderungen nach 2–6 Wochen. Vollständige Indexierung und stabilisierte Rankings nach 2–3 Monaten.",
     },
     {
       question: "Wie starte ich den Relaunch-Prozess?",

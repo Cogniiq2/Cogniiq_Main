@@ -54,14 +54,14 @@ export function PremiumCalendar({ onSelect }: PremiumCalendarProps) {
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
     if (selectedTime) {
-      onSelect(`${date.toLocaleDateString('de-DE')} um ${selectedTime} Uhr`);
+      onSelect(`${date.toLocaleDateString('de-DE')} um ${selectedTime}\u00A0Uhr`);
     }
   };
 
   const handleTimeSelect = (time: string) => {
     setSelectedTime(time);
     if (selectedDate) {
-      onSelect(`${selectedDate.toLocaleDateString('de-DE')} um ${time} Uhr`);
+      onSelect(`${selectedDate.toLocaleDateString('de-DE')} um ${time}\u00A0Uhr`);
     }
   };
 
@@ -206,7 +206,7 @@ export function PremiumCalendar({ onSelect }: PremiumCalendarProps) {
               <p className="text-gray-600 text-xs text-center" style={{ lineHeight: 1.5 }}>
                 Wunschtermin:{' '}
                 <span className="font-medium text-gray-900">
-                  {selectedDate.toLocaleDateString('de-DE')} · {selectedTime} Uhr
+                  {selectedDate.toLocaleDateString('de-DE')} · {selectedTime}&nbsp;Uhr
                 </span>
               </p>
             </div>

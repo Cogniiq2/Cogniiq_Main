@@ -629,7 +629,7 @@ function CTASection({ config }: { config: ClusterPageConfig }) {
             Kostenloses Erstgespräch für Unternehmen in {config.city}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-            30–45 Minuten, ohne Verpflichtung. Wir analysieren Ihre Situation und geben eine konkrete Einschätzung zu {config.topic} in {config.city}.
+            30–45&nbsp;Minuten, ohne Verpflichtung. Wir analysieren Ihre Situation und geben eine konkrete Einschätzung zu {config.topic} in {config.city}.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link

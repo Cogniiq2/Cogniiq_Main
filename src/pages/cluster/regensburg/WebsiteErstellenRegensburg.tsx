@@ -30,7 +30,7 @@ const config: ClusterPageConfig = {
       { label: "Für wen", value: "Gastronomie, Dienstleister, KMU, Praxen" },
       { label: "Typische Ziele", value: "Mehr organische Anfragen, bessere Sichtbarkeit" },
       { label: "Projektdauer", value: "1–6 Wochen" },
-      { label: "Preisrahmen", value: "ab ca. 1.500 €" },
+      { label: "Preisrahmen", value: "ab ca. 1.500 €" },
     ],
   },
   intro: {
@@ -73,7 +73,7 @@ const config: ClusterPageConfig = {
   faq: [
     {
       question: "Wie lange dauert die Erstellung einer neuen Website in Regensburg?",
-      answer: "7–14 Tage für kompakte Projekte. 3–6 Wochen für Websites mit erweitertem SEO und Integrationen.",
+      answer: "7–14 Tage für kompakte Projekte. 3–6 Wochen für Websites mit erweitertem SEO und Integrationen.",
     },
     {
       question: "Muss ich die Texte selbst liefern?",
@@ -97,7 +97,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Was kostet eine Website in Regensburg?",
-      answer: "Ab ca. 1.500 € für kompakte Projekte. Detaillierte Preisübersicht unter /regensburg/webdesign-kosten.",
+      answer: "Ab ca. 1.500 € für kompakte Projekte. Detaillierte Preisübersicht unter /regensburg/webdesign-kosten.",
     },
     {
       question: "Kann Cogniiq bestehende Websites überarbeiten?",
@@ -109,7 +109,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie starte ich?",
-      answer: "Kostenloses Erstgespräch – 30–45 Minuten, remote oder vor Ort in Regensburg.",
+      answer: "Kostenloses Erstgespräch – 30–45 Minuten, remote oder vor Ort in Regensburg.",
     },
   ],
   internalLinks: [

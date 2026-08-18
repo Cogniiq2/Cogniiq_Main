@@ -20,7 +20,7 @@ const SERVICES_OVERVIEW = [
     title: "KI-Telefonassistent Bayern",
     slug: "ki-telefonassistent",
     description:
-      "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, für Praxen, Gastronomie und Dienstleister in ganz Bayern. Einrichtung in 7–14 Tagen.",
+      "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, für Praxen, Gastronomie und Dienstleister in ganz Bayern. Einrichtung in 7–14 Tagen.",
     benefits: [
       "Erreichbar auch dann, wenn niemand abnehmen kann",
       "Entlastung von Routinegesprächen",
@@ -45,7 +45,7 @@ const SERVICES_OVERVIEW = [
     description:
       "Hochkonvertierende Websites für Unternehmen in Bayern – individuell entwickelt, technisch präzise, lokal SEO-optimiert, auf Leads und Conversion ausgerichtet.",
     benefits: [
-      "Mobile-First, unter 2 Sekunden Ladezeit",
+      "Mobile-First, unter 2 Sekunden Ladezeit",
       "Lokales SEO für bayerische Märkte",
       "Conversion-Fokus statt Visitenkarte",
     ],
@@ -55,7 +55,7 @@ const SERVICES_OVERVIEW = [
 const TRUST_POINTS = [
   "Hauptsitz in Bayreuth – persönliche Betreuung in der Region",
   "Projekte in ganz Bayern – auch remote vollständig betreut",
-  "Einrichtung in 7–14 Tagen – keine monatelangen Projekte",
+  "Einrichtung in 7–14 Tagen – keine monatelangen Projekte",
   "Fester Ansprechpartner – direkter Kontakt für Ihr Projekt",
   "Faire Preise – transparent kalkuliert, keine versteckten Kosten",
 ];
@@ -184,7 +184,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Wie schnell sind die Lösungen einsatzbereit?",
-    a: "KI-Telefonassistenten: 7–14 Tage. Automatisierungsworkflows: 1–4 Wochen je nach Komplexität. Websites: 4–12 Wochen. Nach dem Erstgespräch erhalten Sie immer einen realistischen Zeitplan.",
+    a: "KI-Telefonassistenten: 7–14 Tage. Automatisierungsworkflows: 1–4 Wochen je nach Komplexität. Websites: 4–12 Wochen. Nach dem Erstgespräch erhalten Sie immer einen realistischen Zeitplan.",
   },
   {
     q: "Sind alle Lösungen DSGVO-konform?",
@@ -196,7 +196,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Was kostet eine Website für ein bayerisches Unternehmen?",
-    a: "Websites starten ab ca. 1.500 €. Individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei ca. 2.500–5.000 €, komplexere Projekte nach Aufwand. Transparente Festpreise ohne versteckte Kosten.",
+    a: "Websites starten ab ca. 1.500 €. Individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei ca. 2.500–5.000 €, komplexere Projekte nach Aufwand. Transparente Festpreise ohne versteckte Kosten.",
   },
   {
     q: "Wie unterscheidet sich Cogniiq von anderen Agenturen in Bayern?",
@@ -757,7 +757,7 @@ export function BayernPage() {
                 Projekt in Bayern besprechen
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-                Kostenloses Erstgespräch – für Unternehmen in ganz Bayern. Remote oder persönlich in Bayreuth und Umgebung. 30–45 Minuten, ohne Verpflichtung, mit konkretem Ergebnis.
+                Kostenloses Erstgespräch – für Unternehmen in ganz Bayern. Remote oder persönlich in Bayreuth und Umgebung. 30–45&nbsp;Minuten, ohne Verpflichtung, mit konkretem Ergebnis.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <Link

@@ -51,7 +51,7 @@ const config: ProblemPageConfig = {
       "Automatische Bestätigung und Erinnerungen",
       "Kalender-Integration (Google Calendar, Outlook)",
       "No-Show-Reduzierung durch SMS/E-Mail-Erinnerungen",
-      "Einrichtung in 7–14 Tagen",
+      "Einrichtung in 7–14 Tagen",
       "Optional: KI-Telefonassistent für telefonische Buchungen",
     ],
   },

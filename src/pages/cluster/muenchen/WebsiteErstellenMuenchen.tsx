@@ -30,7 +30,7 @@ const config: ClusterPageConfig = {
       { label: "Für wen", value: "Unternehmen mit Wachstumsambitionen in München" },
       { label: "Typische Ziele", value: "Bessere Sichtbarkeit, mehr qualifizierte Anfragen" },
       { label: "Projektdauer", value: "1–8 Wochen" },
-      { label: "Preisrahmen", value: "ab ca. 1.500 €" },
+      { label: "Preisrahmen", value: "ab ca. 1.500 €" },
     ],
   },
   intro: {
@@ -77,7 +77,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie lange dauert die Erstellung einer neuen Website in München?",
-      answer: "7–14 Tage für kompakte Projekte. 4–8 Wochen für Websites mit vollständiger SEO-Strategie.",
+      answer: "7–14 Tage für kompakte Projekte. 4–8 Wochen für Websites mit vollständiger SEO-Strategie.",
     },
     {
       question: "Muss ich Texte selbst liefern?",
@@ -97,7 +97,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Was kostet eine Website in München?",
-      answer: "Ab ca. 1.500 €. Für wettbewerbsfähige Sichtbarkeit in München typisch ab 2.500–4.000 €. Detaillierte Preisübersicht unter /muenchen/webdesign-kosten.",
+      answer: "Ab ca. 1.500 €. Für wettbewerbsfähige Sichtbarkeit in München typisch ab 2.500–4.000 €. Detaillierte Preisübersicht unter /muenchen/webdesign-kosten.",
     },
     {
       question: "Bietet Cogniiq auch laufende Betreuung für München an?",

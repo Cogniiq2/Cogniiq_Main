@@ -43,7 +43,7 @@ const config: IndustryPageConfig = {
     },
     {
       step: "Schritt 2",
-      title: "Umsetzung in 7–14 Tagen",
+      title: "Umsetzung in 7–14 Tagen",
       description:
         "Restaurant-Website, Reservierungssystem, KI-Assistent und Automations-Workflows werden vollständig von Cogniiq aufgebaut – ohne IT-Aufwand für den Betrieb, schlüsselfertig in Betrieb.",
     },
@@ -170,7 +170,7 @@ const config: IndustryPageConfig = {
   localContext: [
     "München hat eine der dichtesten und wettbewerbsintensivsten Gastronomieszenen in Deutschland. Restaurants konkurrieren nicht nur um lokale Stammgäste, sondern auch um Touristen, Geschäftsreisende und den überregionalen Markt. Eine professionelle Online-Präsenz ist keine Option, sondern Grundvoraussetzung.",
     "Cogniiq entwickelt für Gastronomiebetriebe in München passgenaue Digitallösungen: eine moderne Restaurant-Website mit integriertem Reservierungssystem, einen KI-Telefonassistenten sowie Automatisierungen für Bestätigungen, Erinnerungen und Feedback-Prozesse.",
-    "Alle Systeme werden datenschutzorientiert umgesetzt und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut das Setup langfristig remote – saisonale Anpassungen und neue Menükarten inklusive.",
+    "Alle Systeme werden datenschutzorientiert umgesetzt und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Cogniiq betreut das Setup langfristig remote – saisonale Anpassungen und neue Menükarten inklusive.",
   ],
   internalLinks: [
     { label: "Webdesign München", href: "/muenchen/webdesign" },
@@ -196,7 +196,7 @@ const config: IndustryPageConfig = {
     {
       question: "Wie lange dauert die Einrichtung für ein Restaurant in München?",
       answer:
-        "Die Einrichtung dauert in der Regel 7–14 Tage und wird vollständig von Cogniiq übernommen. Keine technischen Vorkenntnisse erforderlich – wir liefern alles schlüsselfertig.",
+        "Die Einrichtung dauert in der Regel 7–14 Tage und wird vollständig von Cogniiq übernommen. Keine technischen Vorkenntnisse erforderlich – wir liefern alles schlüsselfertig.",
     },
     {
       question: "Kann die Website auch Veranstaltungen, Saisonkarten und Events abbilden?",

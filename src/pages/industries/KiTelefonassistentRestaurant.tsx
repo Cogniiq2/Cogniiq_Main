@@ -11,7 +11,7 @@ const config: NationalIndustryPageConfig = {
   },
   h1: "KI Telefonassistent für Restaurants & Gastronomie",
   tagline: "Gastronomie · Tischreservierung · auch außerhalb der Öffnungszeiten",
-  intro: "Freitagabend, 19:30 Uhr: Die Küche läuft auf Hochtouren, jeder Tisch ist besetzt – und das Telefon klingelt. Niemand kann abnehmen. Der Anrufer will für Samstag reservieren. Er legt auf und ruft das Restaurant nebenan an. Mit dem KI Telefonassistenten wäre sein Anruf angenommen worden: Tisch reserviert, Bestätigung erhalten – und am Samstagabend säße er als Gast bei Ihnen.",
+  intro: "Freitagabend, 19:30 Uhr: Die Küche läuft auf Hochtouren, jeder Tisch ist besetzt – und das Telefon klingelt. Niemand kann abnehmen. Der Anrufer will für Samstag reservieren. Er legt auf und ruft das Restaurant nebenan an. Mit dem KI Telefonassistenten wäre sein Anruf angenommen worden: Tisch reserviert, Bestätigung erhalten – und am Samstagabend säße er als Gast bei Ihnen.",
   serviceSlug: "ki-telefonassistent",
   serviceLabel: "KI Telefonassistent",
   costLink: "/kosten-ki-telefonassistent",
@@ -19,7 +19,7 @@ const config: NationalIndustryPageConfig = {
   problems: [
     {
       title: "Reservierungsanrufe kommen genau dann, wenn Sie nicht abnehmen können",
-      description: "Gäste reservieren zwischen 17 und 21 Uhr – also genau dann, wenn der Service läuft und niemand Zeit für Telefonate hat. Jede verpasste Reservierung ist ein Tisch, der am Abend leer bleibt.",
+      description: "Gäste reservieren zwischen 17 und 21 Uhr – also genau dann, wenn der Service läuft und niemand Zeit für Telefonate hat. Jede verpasste Reservierung ist ein Tisch, der am Abend leer bleibt.",
     },
     {
       title: "Ein Gast, der nicht durchkommt, reserviert anderswo",
@@ -27,7 +27,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       title: "No-Shows lassen sich nicht ohne Erinnerungssystem reduzieren",
-      description: "Ein Gast, der abends um 20 Uhr reserviert und die Stornierung vergisst, erscheint nicht. Automatische Erinnerungen mit Bestätigungslink am Vortag wirken dem strukturell entgegen.",
+      description: "Ein Gast, der abends um 20 Uhr reserviert und die Stornierung vergisst, erscheint nicht. Automatische Erinnerungen mit Bestätigungslink am Vortag wirken dem strukturell entgegen.",
     },
     {
       title: "Standardfragen fressen Serviceminuten",
@@ -56,7 +56,7 @@ const config: NationalIndustryPageConfig = {
     // [[CLAIM: verify — Reservierungssystem-Anbindungen (OpenTable, ResDiary, Resmio) bestätigen]]
     "Anbindung an gängige Reservierungssysteme wird vor dem Angebot geprüft",
     // [[CLAIM: verify — Einrichtungsdauer bestätigen]]
-    "Live in der Regel in 7–14 Tagen – der Betrieb läuft weiter wie gewohnt",
+    "Live in der Regel in 7–14 Tagen – der Betrieb läuft weiter wie gewohnt",
   ],
   workflow: {
     title: "So läuft eine Reservierung ab",
@@ -110,7 +110,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Wie wirksam sind die automatischen Erinnerungen gegen No-Shows?",
-      answer: "Automatische Erinnerungen per SMS oder E-Mail 24 Stunden vor dem Besuch helfen dabei, No-Shows spürbar zu reduzieren. Der genaue Zeitpunkt und der Inhalt werden für Ihr Restaurant individuell konfiguriert.",
+      answer: "Automatische Erinnerungen per SMS oder E-Mail 24 Stunden vor dem Besuch helfen dabei, No-Shows spürbar zu reduzieren. Der genaue Zeitpunkt und der Inhalt werden für Ihr Restaurant individuell konfiguriert.",
     },
     {
       question: "Lässt sich der Assistent auch auf Festspiel- und Eventzeiten vorbereiten?",

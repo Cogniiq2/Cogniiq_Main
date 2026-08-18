@@ -61,9 +61,9 @@ export function tradeTax(input: TradeTaxInput): TradeTaxResult {
     warnings,
     steps: [
       { label: 'Gewerbeertrag', valueCents: gewerbeertrag },
-      { label: 'abgerundet auf volle 100 €', valueCents: rounded },
-      { label: 'abzgl. Freibetrag 24.500 €', valueCents: afterAllowance },
-      { label: 'Steuermessbetrag (3,5 %)', valueCents: messbetrag },
+      { label: 'abgerundet auf volle 100 €', valueCents: rounded },
+      { label: 'abzgl. Freibetrag 24.500 €', valueCents: afterAllowance },
+      { label: 'Steuermessbetrag (3,5 %)', valueCents: messbetrag },
       { label: 'Gewerbesteuer (× Hebesatz)', valueCents: tradeTaxCents ?? 0 },
     ],
   };

@@ -15,17 +15,17 @@ const config: CostPageConfig = {
   priceRanges: [
     {
       label: "Einfach",
-      range: "ab 1.500 €",
+      range: "ab 1.500 €",
       description: "Professionelle Visitenkarten-Website mit 4–6 Seiten, responsivem Design, On-Page SEO und vollständiger Datenschutzdokumentation. Ideal für Einzelunternehmer und kleine Betriebe.",
     },
     {
       label: "Mittelstand",
-      range: "2.500 – 5.000 €",
+      range: "2.500 – 5.000 €",
       description: "Unternehmenswebsite mit erweiterter Seitenstruktur, Conversion-Optimierung, Local SEO, strukturierten Daten und Google Analytics. Für wachsende Unternehmen.",
     },
     {
       label: "Premium",
-      range: "ab 5.000 €",
+      range: "ab 5.000 €",
       description: "Komplexe Website mit umfassender SEO-Strategie, KI-Integration, Automatisierung, Content-Strategie und laufender Betreuung. Für Marktführer und ambitionierte Unternehmen.",
     },
   ],
@@ -59,22 +59,22 @@ const config: CostPageConfig = {
     {
       title: "Handwerksbetrieb Bayreuth",
       description: "Neue 6-seitige Website mit responsivem Design, Local SEO Setup für Bayreuth, Google Business Optimierung, Datenschutz- und Impressumsseiten sowie Kontaktformular mit Bestätigungs-Mail.",
-      investment: "1.800 – 2.400 €",
+      investment: "1.800 – 2.400 €",
     },
     {
       title: "Arztpraxis München",
       description: "Praxis-Website mit Online-Terminbuchungsintegration, dokumentierter Patientenkommunikation, Local SEO für München, strukturierten Daten für Gesundheitsdienstleister.",
-      investment: "3.500 – 5.000 €",
+      investment: "3.500 – 5.000 €",
     },
     {
       title: "Gastronomie Regensburg",
       description: "Restaurant-Website mit digitaler Speisekarte, Tischreservierungssystem, Integration KI-Telefonassistent für Anruf-Reservierungen und Local SEO Optimierung.",
-      investment: "2.800 – 4.200 €",
+      investment: "2.800 – 4.200 €",
     },
     {
       title: "Mittelstandsunternehmen deutschlandweit",
       description: "Unternehmenswebsite mit 15+ Seiten, umfassender SEO-Strategie, mehreren Standortseiten, Automatisierungsintegration für Lead-Management und laufender Betreuung.",
-      investment: "ab 7.500 €",
+      investment: "ab 7.500 €",
     },
   ],
   cityLinks: [
@@ -94,7 +94,7 @@ const config: CostPageConfig = {
   faq: [
     {
       question: "Was kostet eine einfache Website in Deutschland?",
-      answer: "Eine professionelle Einsteiger-Website mit 4–6 Seiten, responsivem Design und vollständiger Datenschutzdokumentation beginnt bei ca. 1.500 €. Der genaue Preis hängt vom Umfang und den gewünschten Funktionen ab.",
+      answer: "Eine professionelle Einsteiger-Website mit 4–6 Seiten, responsivem Design und vollständiger Datenschutzdokumentation beginnt bei ca. 1.500 €. Der genaue Preis hängt vom Umfang und den gewünschten Funktionen ab.",
     },
     {
       question: "Ist Webdesign von Cogniiq teurer als ein Baukasten?",
@@ -102,11 +102,11 @@ const config: CostPageConfig = {
     },
     {
       question: "Was kostet monatliche Website-Wartung?",
-      answer: "Wartungspakete bei Cogniiq beginnen ab ca. 50–150 €/Monat – inklusive Hosting, Backups, Updates und kleiner Anpassungen. Der genaue Umfang wird im Erstgespräch definiert.",
+      answer: "Wartungspakete bei Cogniiq beginnen ab ca. 50–150 €/Monat – inklusive Hosting, Backups, Updates und kleiner Anpassungen. Der genaue Umfang wird im Erstgespräch definiert.",
     },
     {
       question: "Wie viel kostet eine Website mit SEO?",
-      answer: "On-Page SEO Basis ist in jedem Paket inklusive. Erweiterte Local SEO Strategien für spezifische Städte und Branchen kosten ca. 500–2.000 € einmalig, je nach Wettbewerbsumfeld.",
+      answer: "On-Page SEO Basis ist in jedem Paket inklusive. Erweiterte Local SEO Strategien für spezifische Städte und Branchen kosten ca. 500–2.000 € einmalig, je nach Wettbewerbsumfeld.",
     },
     {
       question: "Zahle ich die Website in Raten?",
@@ -114,15 +114,15 @@ const config: CostPageConfig = {
     },
     {
       question: "Was kostet eine Website mit Terminbuchungssystem?",
-      answer: "Die Integration eines Terminbuchungssystems – z.B. für Arztpraxen oder Dienstleister – kostet je nach Komplexität ca. 800–2.500 € zusätzlich. Bei Integration des KI-Telefonassistenten entstehen Synergieeffekte.",
+      answer: "Die Integration eines Terminbuchungssystems – z.B. für Arztpraxen oder Dienstleister – kostet je nach Komplexität ca. 800–2.500 € zusätzlich. Bei Integration des KI-Telefonassistenten entstehen Synergieeffekte.",
     },
     {
       question: "Sind Bilder und Texte im Preis inbegriffen?",
-      answer: "Nein, standardmäßig nicht. Professionelle Texterstellung kostet ca. 80–150 € pro Seite. Stock-Bilder oder eigene Fotografie werden separat berechnet. Liefern Sie eigenen Content, entfällt dieser Aufwand.",
+      answer: "Nein, standardmäßig nicht. Professionelle Texterstellung kostet ca. 80–150 € pro Seite. Stock-Bilder oder eigene Fotografie werden separat berechnet. Liefern Sie eigenen Content, entfällt dieser Aufwand.",
     },
     {
       question: "Wie lange gilt das Angebot und wann muss ich entscheiden?",
-      answer: "Angebote von Cogniiq sind 30 Tage gültig. Es gibt keinen Druck zur schnellen Entscheidung – wir klären alle Fragen im kostenlosen Erstgespräch und geben Ihnen Zeit zur Entscheidung.",
+      answer: "Angebote von Cogniiq sind 30 Tage gültig. Es gibt keinen Druck zur schnellen Entscheidung – wir klären alle Fragen im kostenlosen Erstgespräch und geben Ihnen Zeit zur Entscheidung.",
     },
   ],
   ctaHeadline: "Kostenloses Angebot für Ihre Website",

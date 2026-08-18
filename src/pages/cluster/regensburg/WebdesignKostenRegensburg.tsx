@@ -27,22 +27,22 @@ const config: ClusterPageConfig = {
   tldr: {
     heading: "Kurzüberblick: Webdesign Kosten Regensburg",
     items: [
-      { label: "Einstieg ab", value: "typisch ab ca. 1.500 €" },
-      { label: "Mittelbereich", value: "2.500 € – 5.500 €" },
-      { label: "Marktführer-Setup", value: "5.500 € – 12.000 €+" },
+      { label: "Einstieg ab", value: "typisch ab ca. 1.500 €" },
+      { label: "Mittelbereich", value: "2.500 € – 5.500 €" },
+      { label: "Marktführer-Setup", value: "5.500 € – 12.000 €+" },
       { label: "Projektdauer", value: "1–6 Wochen" },
     ],
   },
   intro: {
     heading: "Was kostet ein professioneller Webauftritt in Regensburg?",
     paragraphs: [
-      "Die meisten Webdesign-Projekte in Regensburg liegen zwischen 1.500 € und 8.000 €. Kleinere Websites starten typischerweise ab ca. 1.500 €. Projekte mit erweiterter lokaler SEO-Strategie für Regensburg und die Oberpfalz, Conversion-Texten und Integrationen bewegen sich im Bereich 3.000 € bis 6.000 €.",
+      "Die meisten Webdesign-Projekte in Regensburg liegen zwischen 1.500 € und 8.000 €. Kleinere Websites starten typischerweise ab ca. 1.500 €. Projekte mit erweiterter lokaler SEO-Strategie für Regensburg und die Oberpfalz, Conversion-Texten und Integrationen bewegen sich im Bereich 3.000 € bis 6.000 €.",
       "Der Preis wird durch drei Faktoren bestimmt: Seitenumfang, SEO-Tiefe und technische Integrationen. Gastronomie-Websites mit Speisekarte und Reservierungssystem sind grundlegend andere Projekte als einfache Visitenkarten-Websites für lokale Dienstleister.",
       "Was in jedem Paket enthalten ist: individuelles Design, sauberer Code, Mobile-First, vollständige Datenschutzdokumentation und On-Page SEO. Das sind keine Extras – das ist Mindeststandard für professionelle Webentwicklung.",
     ],
   },
   painPoints: [
-    "Billiganbieter versprechen Websites für 299 € – und liefern Templates ohne SEO-Substanz",
+    "Billiganbieter versprechen Websites für 299 € – und liefern Templates ohne SEO-Substanz",
     "Fehlende Vergleichbarkeit von Angeboten ohne klare Leistungsbeschreibungen",
     "Unbekannte Folgekosten für Hosting, Wartung, Updates und Änderungen",
     "Websites, die nach 2 Jahren veralten und einen neuen Relaunch erfordern",
@@ -50,12 +50,12 @@ const config: ClusterPageConfig = {
   pricing: {
     heading: "Preisrahmen: Webdesign in Regensburg",
     rangeText:
-      "Die meisten Webdesign-Projekte in Regensburg liegen zwischen 1.500 € und 8.000 €. Folgende Orientierungswerte helfen bei der Einschätzung – das individuelle Angebot hängt vom konkreten Projekt ab.",
+      "Die meisten Webdesign-Projekte in Regensburg liegen zwischen 1.500 € und 8.000 €. Folgende Orientierungswerte helfen bei der Einschätzung – das individuelle Angebot hängt vom konkreten Projekt ab.",
     tiers: [
       {
         name: "Website Launch",
-        anchor: "ab ca. 1.500 €",
-        range: "typisch: 1.500 € – 2.800 €",
+        anchor: "ab ca. 1.500 €",
+        range: "typisch: 1.500 € – 2.800 €",
         deliverables: [
           "Bis 6 Seiten, individuelles Design",
           "On-Page SEO Grundoptimierung",
@@ -67,21 +67,21 @@ const config: ClusterPageConfig = {
       },
       {
         name: "Website Wachstum",
-        anchor: "ab ca. 2.800 €",
-        range: "typisch: 2.800 € – 5.500 €",
+        anchor: "ab ca. 2.800 €",
+        range: "typisch: 2.800 € – 5.500 €",
         deliverables: [
           "Bis 12 Seiten, Conversion-Texte",
           "Lokale SEO-Strategie Regensburg/Oberpfalz",
           "Strukturierte Daten (Schema.org)",
           "Google Analytics 4 & Search Console",
           "Core Web Vitals Optimierung",
-          "3 Monate Nachbetreuung",
+          "3 Monate Nachbetreuung",
         ],
       },
       {
         name: "Website Marktführer",
-        anchor: "ab ca. 5.500 €",
-        range: "typisch: 5.500 € – 12.000 €+",
+        anchor: "ab ca. 5.500 €",
+        range: "typisch: 5.500 € – 12.000 €+",
         deliverables: [
           "Unbegrenzte Seitenstruktur",
           "Dominanz-SEO Regensburg/Oberpfalz",
@@ -108,14 +108,14 @@ const config: ClusterPageConfig = {
     heading: "Webdesign-Kosten in Regensburg im lokalen Kontext",
     paragraphs: [
       "Regensburg wächst – wirtschaftlich und digital. Gastronomie, Tourismus, Dienstleister und ein wachsender Mittelstand bedeuten steigenden Wettbewerb bei lokalen Google-Suchanfragen. Die Investition in professionelles Webdesign zahlt sich aus, wenn sie strategisch aufgebaut ist.",
-      "Besonders in der Gastronomie und beim Tourismus ist die ROI-Gleichung klar: Wer bei 'Restaurant Regensburg Altstadt' auf Seite 1 erscheint, gewinnt Gäste, die sonst woanders reservieren. Eine Website-Investition von 2.500 € amortisiert sich in dieser Branche schnell.",
+      "Besonders in der Gastronomie und beim Tourismus ist die ROI-Gleichung klar: Wer bei 'Restaurant Regensburg Altstadt' auf Seite 1 erscheint, gewinnt Gäste, die sonst woanders reservieren. Eine Website-Investition von 2.500 € amortisiert sich in dieser Branche schnell.",
       "Cogniiq bietet auf Wunsch persönliche Termine in Regensburg an. Klare Angebote, nachvollziehbare Leistungsbeschreibungen, keine versteckten Kosten.",
     ],
   },
   faq: [
     {
       question: "Was kostet eine einfache Website in Regensburg?",
-      answer: "Einstiegsprojekte starten typisch ab ca. 1.500 €. Preis hängt von Seitenanzahl, Designkomplexität und Funktionen ab.",
+      answer: "Einstiegsprojekte starten typisch ab ca. 1.500 €. Preis hängt von Seitenanzahl, Designkomplexität und Funktionen ab.",
     },
     {
       question: "Warum ist professionelles Webdesign teurer als ein Baukasten?",
@@ -123,11 +123,11 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Sind Hosting und Domain im Preis enthalten?",
-      answer: "Nein, Hosting und Domain sind separate Positionen. Einrichtung ist im Projektpreis enthalten, laufende Kosten ca. 10–20 € / Monat.",
+      answer: "Nein, Hosting und Domain sind separate Positionen. Einrichtung ist im Projektpreis enthalten, laufende Kosten ca. 10–20 € / Monat.",
     },
     {
       question: "Was kostet laufende Wartung?",
-      answer: "Wartungspakete ab ca. 50–80 € / Monat. Im Paket 'Website Marktführer' inklusive.",
+      answer: "Wartungspakete ab ca. 50–80 € / Monat. Im Paket 'Website Marktführer' inklusive.",
     },
     {
       question: "Gibt es versteckte Kosten?",
@@ -135,7 +135,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie lange dauert ein Webdesign-Projekt in Regensburg?",
-      answer: "Launch: 7–14 Tage. Wachstum: 3–5 Wochen. Marktführer: 6–10 Wochen.",
+      answer: "Launch: 7–14 Tage. Wachstum: 3–5 Wochen. Marktführer: 6–10 Wochen.",
     },
     {
       question: "Lohnt sich Webdesign für Gastronomie in Regensburg?",
@@ -151,7 +151,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie erhalte ich ein konkretes Angebot?",
-      answer: "Im kostenlosen Erstgespräch – 30–45 Minuten, remote oder vor Ort in Regensburg.",
+      answer: "Im kostenlosen Erstgespräch – 30–45 Minuten, remote oder vor Ort in Regensburg.",
     },
   ],
   internalLinks: [

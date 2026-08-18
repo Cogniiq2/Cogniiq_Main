@@ -66,7 +66,7 @@ const config: NationalIndustryPageConfig = {
       {
         step: "02",
         title: "Automatische Kommunikation",
-        description: "Bestätigung sofort, Terminerinnerung 24 Stunden vorher, Hinweise auf mitzubringende Unterlagen – alles ohne einen einzigen manuellen Schritt.",
+        description: "Bestätigung sofort, Terminerinnerung 24 Stunden vorher, Hinweise auf mitzubringende Unterlagen – alles ohne einen einzigen manuellen Schritt.",
       },
       {
         step: "03",
@@ -100,7 +100,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Was kostet Praxisautomatisierung?",
-      answer: "Einzelne Workflows wie Terminbestätigungen beginnen bei ca. 600–1.200 €. Umfassende Praxisautomatisierungen mit Systemintegration, Wartelistenmanagement und Follow-up-Sequenzen typischerweise 2.000–4.500 €. Das genaue Angebot erhalten Sie nach einem kostenlosen Erstgespräch.",
+      answer: "Einzelne Workflows wie Terminbestätigungen beginnen bei ca. 600–1.200 €. Umfassende Praxisautomatisierungen mit Systemintegration, Wartelistenmanagement und Follow-up-Sequenzen typischerweise 2.000–4.500 €. Das genaue Angebot erhalten Sie nach einem kostenlosen Erstgespräch.",
     },
     {
       question: "Wie lange dauert die Einrichtung – und merken unsere Patienten etwas davon?",

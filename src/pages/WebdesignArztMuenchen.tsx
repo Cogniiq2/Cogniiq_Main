@@ -99,7 +99,7 @@ const config: IndustryPageConfig = {
   localContext: [
     "München ist einer der dichtesten Gesundheitsmärkte Deutschlands. Arztpraxen konkurrieren in der Millionenstadt nicht nur um Kassenpatienten, sondern auch um Privatpatienten und Selbstzahler. Gleichzeitig sind die Erwartungen an Digitalität und Service in München überdurchschnittlich hoch – Patienten erwarten Online-Terminbuchung, schnelle Reaktionszeiten und eine moderne Praxis-Website als Selbstverständlichkeit.",
     "Cogniiq entwickelt für Arztpraxen in München maßgeschneiderte Digitallösungen: eine hochperformante Praxis-Website mit integrierter Terminbuchung, einen KI-Telefonassistenten, der die Rezeption auch außerhalb der Sprechzeiten entlastet, sowie Automatisierungssysteme, die Terminerinnerungen, Patientenkommunikation und interne Abläufe ohne manuellen Aufwand steuern.",
-    "Alle Systeme werden datenschutzorientiert umgesetzt und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Die Betreuung erfolgt durch Cogniiq persönlich – transparent, direkt und ohne unnötige Zwischenstellen.",
+    "Alle Systeme werden datenschutzorientiert umgesetzt und sind in der Regel innerhalb von 7–14 Tagen einsatzbereit. Die Betreuung erfolgt durch Cogniiq persönlich – transparent, direkt und ohne unnötige Zwischenstellen.",
   ],
   internalLinks: [
     { label: "Webdesign München", href: "/muenchen/webdesign" },
@@ -126,7 +126,7 @@ const config: IndustryPageConfig = {
     {
       question: "Wie lange dauert die Einrichtung für eine Arztpraxis in München?",
       answer:
-        "Die Einrichtung dauert in der Regel 7–14 Tage und wird vollständig von Cogniiq übernommen. Sie müssen keine technischen Vorkenntnisse mitbringen.",
+        "Die Einrichtung dauert in der Regel 7–14 Tage und wird vollständig von Cogniiq übernommen. Sie müssen keine technischen Vorkenntnisse mitbringen.",
     },
     {
       question: "Kann ich meinen Münchner Patienten Online-Terminbuchung anbieten?",

@@ -36,7 +36,7 @@ const config: ProblemPageConfig = {
       },
       {
         title: "Reputationsschaden durch schlechten ersten Eindruck",
-        description: "Eine langsame, veraltete oder nicht-mobile Website schadet dem Vertrauen. Interessenten entscheiden innerhalb von 3 Sekunden, ob sie bleiben oder gehen.",
+        description: "Eine langsame, veraltete oder nicht-mobile Website schadet dem Vertrauen. Interessenten entscheiden innerhalb von 3 Sekunden, ob sie bleiben oder gehen.",
       },
       {
         title: "Keine Daten für Optimierung",
@@ -49,7 +49,7 @@ const config: ProblemPageConfig = {
     text: "Cogniiq entwickelt Websites, die bei relevanten Google-Suchen sichtbar sind, Besucher in Anfragen konvertieren und messbar Ergebnisse liefern. Core Web Vitals, Local SEO, Conversion-Struktur und Tracking – alles inklusive.",
     bullets: [
       "Local SEO: gefunden bei relevanten Suchen in Ihrer Stadt",
-      "Core Web Vitals: Ladezeit unter 2 Sekunden",
+      "Core Web Vitals: Ladezeit unter 2 Sekunden",
       "Conversion-optimiertes Design mit klaren CTAs",
       "Mobile-first: perfekt auf jedem Smartphone",
       "Google Analytics 4 & Search Console Setup",

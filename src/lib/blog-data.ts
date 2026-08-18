@@ -104,7 +104,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Was KI-Automatisierung realistisch kostet",
         content:
-          "Ein einfaches Automatisierungssystem (z. B. automatische Terminbestätigung + CRM-Eintrag) ist ab 150 € monatlich umsetzbar. Komplexere Lösungen mit mehreren verbundenen Systemen liegen bei 300–800 € pro Monat. Wann sich das rechnet, hängt vom Betrieb ab – rechnen Sie mit Ihren eigenen Zahlen.",
+          "Ein einfaches Automatisierungssystem (z. B. automatische Terminbestätigung + CRM-Eintrag) ist ab 150 € monatlich umsetzbar. Komplexere Lösungen mit mehreren verbundenen Systemen liegen bei 300–800 € pro Monat. Wann sich das rechnet, hängt vom Betrieb ab – rechnen Sie mit Ihren eigenen Zahlen.",
       },
       {
         type: "callout",
@@ -171,7 +171,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Das Problem: Überlastete Leitungen und verpasste Patienten",
         content:
-          "Wenn Patienten morgens um 8 Uhr nicht durchkommen, rufen sie bei einer anderen Praxis an. Dieser stille Verlust ist schwer messbar, hat aber direkte Auswirkungen auf Patientenbindung und Praxisumsatz. Wie groß das Problem ist, zeigt der vzbv (2025): Über ein Drittel der Befragten scheiterte bereits an der telefonischen Terminbuchung.",
+          "Wenn Patienten morgens um 8 Uhr nicht durchkommen, rufen sie bei einer anderen Praxis an. Dieser stille Verlust ist schwer messbar, hat aber direkte Auswirkungen auf Patientenbindung und Praxisumsatz. Wie groß das Problem ist, zeigt der vzbv (2025): Über ein Drittel der Befragten scheiterte bereits an der telefonischen Terminbuchung.",
       },
       {
         type: "ul",
@@ -201,13 +201,13 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Kosten und ROI in der Praxis",
         content:
-          "Die monatlichen Kosten eines KI-Telefonassistenten für eine mittelgroße Praxis liegen zwischen 200 und 450 €. Demgegenüber stehen entlastete Personalstunden sowie Patienten, die sonst zur Konkurrenz wechseln würden. Wann sich das rechnet, hängt von Anrufaufkommen und Praxisstruktur ab – rechnen Sie mit Ihren eigenen Zahlen.",
+          "Die monatlichen Kosten eines KI-Telefonassistenten für eine mittelgroße Praxis liegen zwischen 200 und 450 €. Demgegenüber stehen entlastete Personalstunden sowie Patienten, die sonst zur Konkurrenz wechseln würden. Wann sich das rechnet, hängt von Anrufaufkommen und Praxisstruktur ab – rechnen Sie mit Ihren eigenen Zahlen.",
       },
       {
         type: "table",
         heading: "Vergleich: Rezeptionskraft vs. KI-Telefonassistent",
         rows: [
-          { label: "Erreichbarkeit", value: "Rezeption: Mo–Fr 8–17 Uhr | KI: auch außerhalb der Öffnungszeiten" },
+          { label: "Erreichbarkeit", value: "Rezeption: Mo–Fr 8–17 Uhr | KI: auch außerhalb der Öffnungszeiten" },
           { label: "Reaktionszeit", value: "Rezeption: je nach Auslastung Warteschleife | KI: ohne Warteschleife" },
           { label: "Parallelgespräche", value: "Rezeption: 1 | KI: mehrere gleichzeitig" },
           { label: "DSGVO-Protokoll", value: "Manuell | Automatisch" },
@@ -322,7 +322,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         question: "Was kostet eine konversionsorientierte Unternehmenswebsite?",
         answer:
-          "Professionelle konversionsorientierte Websites für kleine und mittlere Unternehmen liegen in Deutschland bei 2.500 bis 8.000 €, je nach Umfang und Funktionen.",
+          "Professionelle konversionsorientierte Websites für kleine und mittlere Unternehmen liegen in Deutschland bei 2.500 bis 8.000 €, je nach Umfang und Funktionen.",
       },
       {
         question: "Wie lange dauert es, bis eine neue Website Anfragen generiert?",
@@ -454,7 +454,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     publishedAt: "2025-02-17",
     updatedAt: "2025-03-08",
     excerpt:
-      "Viele Unternehmen scheuen die Investition in Automatisierung, weil sie den Nutzen nicht greifbar machen können. Dieser Artikel zeigt, wie ein einfaches ROI-Modell in unter 30 Minuten aufgestellt werden kann.",
+      "Viele Unternehmen scheuen die Investition in Automatisierung, weil sie den Nutzen nicht greifbar machen können. Dieser Artikel zeigt, wie ein einfaches ROI-Modell in unter 30 Minuten aufgestellt werden kann.",
     heroKeyword: "Prozessautomatisierung ROI",
     sections: [
       {
@@ -472,7 +472,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Schritt 1: Zeitersparnis messen",
         content:
-          "Starten Sie mit einer Zeiterfassung: Wie viele Minuten pro Vorgang × wie viele Vorgänge pro Woche. Multiplizieren Sie das mit 52 (Wochen/Jahr) und mit dem internen Stundensatz der betroffenen Person. Ein frei erfundenes Rechenbeispiel – setzen Sie Ihre eigenen Werte ein: 15 Minuten pro Rechnungsversand × 60 Rechnungen/Monat × 12 Monate × 35 €/Stunde = 6.300 € Jahresersparnis.",
+          "Starten Sie mit einer Zeiterfassung: Wie viele Minuten pro Vorgang × wie viele Vorgänge pro Woche. Multiplizieren Sie das mit 52 (Wochen/Jahr) und mit dem internen Stundensatz der betroffenen Person. Ein frei erfundenes Rechenbeispiel – setzen Sie Ihre eigenen Werte ein: 15 Minuten pro Rechnungsversand × 60 Rechnungen/Monat × 12 Monate × 35 €/Stunde = 6.300 € Jahresersparnis.",
       },
       {
         type: "h2",
@@ -484,18 +484,18 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Schritt 3: Indirekte Nutzen bewerten",
         content:
-          "Schnellere Prozesse bedeuten schnellere Reaktion auf Kundenanfragen, was die Abschlusswahrscheinlichkeit erhöht. Wer auf eine Anfrage schnell antwortet, hat deutlich bessere Chancen auf den Abschluss als wer erst nach 24 Stunden reagiert.",
+          "Schnellere Prozesse bedeuten schnellere Reaktion auf Kundenanfragen, was die Abschlusswahrscheinlichkeit erhöht. Wer auf eine Anfrage schnell antwortet, hat deutlich bessere Chancen auf den Abschluss als wer erst nach 24 Stunden reagiert.",
       },
       {
         type: "table",
         heading: "Frei erfundenes Rechenbeispiel Terminautomatisierung – setzen Sie Ihre eigenen Werte ein",
         rows: [
-          { label: "Manueller Aufwand vorher", value: "8 Std./Woche × 40 €/Std. = 320 €/Woche" },
-          { label: "Jahreskosten manuell", value: "16.640 €" },
-          { label: "Einrichtungskosten Automatisierung", value: "1.200 €" },
-          { label: "Jährliche Betriebskosten", value: "1.800 €/Jahr" },
-          { label: "Jahresersparnis", value: "16.640 – 3.000 = 13.640 €" },
-          { label: "ROI Jahr 1", value: "355 %" },
+          { label: "Manueller Aufwand vorher", value: "8 Std./Woche × 40 €/Std. = 320 €/Woche" },
+          { label: "Jahreskosten manuell", value: "16.640 €" },
+          { label: "Einrichtungskosten Automatisierung", value: "1.200 €" },
+          { label: "Jährliche Betriebskosten", value: "1.800 €/Jahr" },
+          { label: "Jahresersparnis", value: "16.640 – 3.000 = 13.640 €" },
+          { label: "ROI Jahr 1", value: "355 %" },
         ],
       },
       {
@@ -508,14 +508,14 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "callout",
         calloutType: "tip",
         content:
-          "Berechnen Sie den ROI immer für 12 Monate und 24 Monate. Viele Projekte rechnen sich erst im zweiten Jahr richtig – was trotzdem eine sehr gute Investition ist.",
+          "Berechnen Sie den ROI immer für 12 Monate und 24 Monate. Viele Projekte rechnen sich erst im zweiten Jahr richtig – was trotzdem eine sehr gute Investition ist.",
       },
     ],
     faqItems: [
       {
         question: "Was ist ein guter ROI für ein Automatisierungsprojekt?",
         answer:
-          "Das lässt sich nicht pauschal beziffern – der erreichbare ROI hängt von Prozess, Volumen und Stundensätzen ab. Rechnen Sie mit Ihren eigenen Zahlen über 12 und 24 Monate.",
+          "Das lässt sich nicht pauschal beziffern – der erreichbare ROI hängt von Prozess, Volumen und Stundensätzen ab. Rechnen Sie mit Ihren eigenen Zahlen über 12 und 24 Monate.",
       },
       {
         question: "Wie berechne ich den internen Stundensatz?",
@@ -559,10 +559,10 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "table",
         heading: "Beispielrechnung mit frei gewählten Werten – setzen Sie Ihre eigenen ein",
         rows: [
-          { label: "Arztpraxis (Neupatienten)", value: "60 € × 12 Monate Ø-Umsatz = 720 € pro verlorenem Patient" },
-          { label: "Handwerk (Neukunde)", value: "Ø-Auftrag 1.200 € × 40% Abschlussrate = 480 € pro Anruf" },
-          { label: "Immobilienmakler", value: "Ø-Provision 8.000 € × 20% = 1.600 € pro verpasstem Anruf" },
-          { label: "Restaurant (Reservierung)", value: "Ø-Tisch 80 € × 3 Besuche/Jahr = 240 € pro verpasstem Tisch" },
+          { label: "Arztpraxis (Neupatienten)", value: "60 € × 12 Monate Ø-Umsatz = 720 € pro verlorenem Patient" },
+          { label: "Handwerk (Neukunde)", value: "Ø-Auftrag 1.200 € × 40% Abschlussrate = 480 € pro Anruf" },
+          { label: "Immobilienmakler", value: "Ø-Provision 8.000 € × 20% = 1.600 € pro verpasstem Anruf" },
+          { label: "Restaurant (Reservierung)", value: "Ø-Tisch 80 € × 3 Besuche/Jahr = 240 € pro verpasstem Tisch" },
         ],
       },
       {
@@ -587,7 +587,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Die Schwellenwertberechnung",
         content:
-          "Ab wie vielen verpassten Anrufen pro Monat rechnet sich ein KI-Telefonassistent? Ein frei erfundenes Rechenbeispiel – setzen Sie Ihre eigenen Werte ein: Bei einem monatlichen Systempreis von 300 € und einem angenommenen Anrufwert von 150 € würde sich die Investition bei zwei zusätzlich gewonnenen Aufträgen pro Monat rechnen.",
+          "Ab wie vielen verpassten Anrufen pro Monat rechnet sich ein KI-Telefonassistent? Ein frei erfundenes Rechenbeispiel – setzen Sie Ihre eigenen Werte ein: Bei einem monatlichen Systempreis von 300 € und einem angenommenen Anrufwert von 150 € würde sich die Investition bei zwei zusätzlich gewonnenen Aufträgen pro Monat rechnen.",
       },
     ],
     faqItems: [
@@ -620,7 +620,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     publishedAt: "2025-03-03",
     updatedAt: "2025-03-14",
     excerpt:
-      "Freitagabend, 19 Uhr: Das Restaurant ist voll, das Telefon klingelt, aber das Team hat beide Hände voll. Ein KI-Telefonassistent nimmt die Anrufe an, die sonst verloren gingen – auch in der Stoßzeit.",
+      "Freitagabend, 19 Uhr: Das Restaurant ist voll, das Telefon klingelt, aber das Team hat beide Hände voll. Ein KI-Telefonassistent nimmt die Anrufe an, die sonst verloren gingen – auch in der Stoßzeit.",
     heroKeyword: "KI-Telefonassistent Restaurant",
     sections: [
       {
@@ -657,7 +657,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "No-Show-Prävention durch automatische Erinnerungen",
         content:
-          "No-Shows kosten Restaurants bares Geld. Der KI-Assistent sendet automatisch 24 Stunden vor der Reservierung eine Erinnerung per SMS oder WhatsApp und ermöglicht die einfache Stornierung – Erinnerungen am Vortag wirken No-Shows entgegen.",
+          "No-Shows kosten Restaurants bares Geld. Der KI-Assistent sendet automatisch 24 Stunden vor der Reservierung eine Erinnerung per SMS oder WhatsApp und ermöglicht die einfache Stornierung – Erinnerungen am Vortag wirken No-Shows entgegen.",
       },
       {
         type: "table",
@@ -754,14 +754,14 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "callout",
         calloutType: "tip",
         content:
-          "Schnelltest: Zeigen Sie Ihrer Website jemandem, der Ihr Unternehmen nicht kennt. Fragen Sie nach 15 Sekunden: Was macht dieses Unternehmen? Für welche Kunden? Und was soll ich jetzt tun? Wenn die Antworten nicht klar sind, ist Handlungsbedarf.",
+          "Schnelltest: Zeigen Sie Ihrer Website jemandem, der Ihr Unternehmen nicht kennt. Fragen Sie nach 15 Sekunden: Was macht dieses Unternehmen? Für welche Kunden? Und was soll ich jetzt tun? Wenn die Antworten nicht klar sind, ist Handlungsbedarf.",
       },
     ],
     faqItems: [
       {
         question: "Wie viele Anfragen sollte eine gute Unternehmenswebsite bringen?",
         answer:
-          "Das hängt vom Traffic ab. Als grobe Faustregel: 1–3 % der Besucher stellen eine Anfrage. Bei 300 Besuchern/Monat wären das 3–9 Anfragen.",
+          "Das hängt vom Traffic ab. Als grobe Faustregel: 1–3 % der Besucher stellen eine Anfrage. Bei 300 Besuchern/Monat wären das 3–9 Anfragen.",
       },
       {
         question: "Kann ich das selbst verbessern oder brauche ich eine Agentur?",
@@ -847,7 +847,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         question: "Wie viel Budget sollte ein Mittelständler für Digitalisierung einplanen?",
         answer:
-          "Als grobe Faustregel werden oft 1–3 % des Jahresumsatzes genannt. Entscheidend ist weniger die Quote als der messbare Nutzen jeder einzelnen Maßnahme – rechnen Sie mit Ihren eigenen Zahlen.",
+          "Als grobe Faustregel werden oft 1–3 % des Jahresumsatzes genannt. Entscheidend ist weniger die Quote als der messbare Nutzen jeder einzelnen Maßnahme – rechnen Sie mit Ihren eigenen Zahlen.",
       },
       {
   question: "Welche Tools sind für den Einstieg empfehlenswert?",
@@ -939,7 +939,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         question: "Was kostet eine professionelle Unternehmenswebsite in Deutschland?",
         answer:
-          "Für kleine Unternehmen: 1.500–4.000 € (Template-basiert). Für individuelle Designs mit SEO-Strategie: 3.500–10.000 €. Für komplexe Systeme: 10.000 €+.",
+          "Für kleine Unternehmen: 1.500–4.000 € (Template-basiert). Für individuelle Designs mit SEO-Strategie: 3.500–10.000 €. Für komplexe Systeme: 10.000 €+.",
       },
       {
         question: "Sollte ich eine lokale Agentur oder eine deutschlandweit arbeitende Agentur wählen?",

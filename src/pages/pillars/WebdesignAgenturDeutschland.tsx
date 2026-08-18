@@ -19,7 +19,7 @@ const SERVICES = [
     title: "Individuelle Website-Entwicklung",
     description: "Keine Templates, kein Baukasten. Jede Website wird von Grund auf für Ihre Branche, Ihre Zielgruppe und Ihre Conversion-Ziele entwickelt.",
     benefits: [
-      "Mobile-First, Ladezeit unter 2 Sekunden",
+      "Mobile-First, Ladezeit unter 2 Sekunden",
       "Konversionsorientiertes Design",
       "Sauberer Code, keine unnötigen Plugins",
     ],
@@ -131,7 +131,7 @@ const USE_CASES = [
 const FAQ_ITEMS = [
   {
     question: "Was kostet eine professionelle Website bei Cogniiq?",
-    answer: "Websites starten ab 1.500 €. Individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei etwa 2.500–5.000 €. Komplexere Projekte mit Buchungssystem, Mehrsprachigkeit oder E-Commerce darüber. Genaue Preise auf der Kosten-Seite oder nach kostenlosem Erstgespräch.",
+    answer: "Websites starten ab 1.500 €. Individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei etwa 2.500–5.000 €. Komplexere Projekte mit Buchungssystem, Mehrsprachigkeit oder E-Commerce darüber. Genaue Preise auf der Kosten-Seite oder nach kostenlosem Erstgespräch.",
   },
   {
     question: "Wie lange dauert die Entwicklung einer Website?",
@@ -254,7 +254,7 @@ export function WebdesignAgenturDeutschland() {
         <div className="border-y border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
-              {["Individuelle Entwicklung", "Mobile-First", "SEO integriert", "Unter 2 Sekunden Ladezeit", "Persönliche Betreuung"].map((item, i) => (
+              {["Individuelle Entwicklung", "Mobile-First", "SEO integriert", "Unter 2 Sekunden Ladezeit", "Persönliche Betreuung"].map((item, i) => (
                 <span key={i} className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   {i > 0 && <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" aria-hidden="true" />}
                   {item}

@@ -228,7 +228,7 @@ export function CostComparisonSection() {
               />
               <MiniSlider
                 label="Stundensatz (inkl. AG-Kosten)"
-                tooltip="Bruttogehalt + Sozialabgaben + Nebenkosten. Typisch: 25–50 €/h."
+                tooltip="Bruttogehalt + Sozialabgaben + Nebenkosten. Typisch: 25–50 €/h."
                 value={humanRate}
                 min={12} max={80} step={1} unit="€/h"
                 onChange={setHumanRate}
@@ -316,7 +316,7 @@ export function CostComparisonSection() {
                 </p>
                 <div className="flex items-baseline gap-2">
                   <span className="text-[42px] font-bold text-white tabular-nums leading-none">
-                    {KI_PRICE_MONTHLY} €
+                    {KI_PRICE_MONTHLY}&nbsp;€
                   </span>
                   <span className="text-[13px] text-gray-500">/ Monat</span>
                 </div>
@@ -354,7 +354,7 @@ export function CostComparisonSection() {
                 <div className="flex justify-between pt-2">
                   <span className="text-[14px] font-bold text-gray-300">Gesamt / Monat</span>
                   <span className="text-[20px] font-bold text-white tabular-nums">
-                    {KI_PRICE_MONTHLY} €
+                    {KI_PRICE_MONTHLY}&nbsp;€
                   </span>
                 </div>
                 <p className="text-[10.5px] text-gray-700 mt-1.5">
@@ -458,7 +458,7 @@ export function CostComparisonSection() {
               />
               <div className="relative">
                 <p className="text-[14px] font-bold text-white mb-1.5">
-                  KI-Assistent live in 7–14 Tagen
+                  KI-Assistent live in 7–14&nbsp;Tagen
                 </p>
                 <p className="text-[12px] text-gray-500 mb-5 leading-relaxed">
                   Klare Vertragskonditionen · persönliche Einrichtung

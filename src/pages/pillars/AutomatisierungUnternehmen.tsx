@@ -50,7 +50,7 @@ const CHALLENGES = [
   {
     icon: Clock,
     title: "Stunden täglich für manuelle Aufgaben",
-    description: "Dateneingabe, Terminkoordination, Kundenkommunikation, Rechnungsstellung – alles manuell. Jede dieser Aufgaben kostet 30–60 € pro Stunde in Personalkosten.",
+    description: "Dateneingabe, Terminkoordination, Kundenkommunikation, Rechnungsstellung – alles manuell. Jede dieser Aufgaben kostet 30–60 € pro Stunde in Personalkosten.",
   },
   {
     icon: Users,
@@ -115,11 +115,11 @@ const USE_CASES = [
   },
   {
     title: "Online-Termin → Bestätigung → Erinnerung → Follow-up",
-    description: "Ein Kunde bucht einen Termin online. Sofort geht eine Bestätigung raus. 24 Stunden vorher eine Erinnerung. Nach dem Termin ein Follow-up mit Bewertungsanfrage. Alles automatisch, ohne manuellen Aufwand.",
+    description: "Ein Kunde bucht einen Termin online. Sofort geht eine Bestätigung raus. 24 Stunden vorher eine Erinnerung. Nach dem Termin ein Follow-up mit Bewertungsanfrage. Alles automatisch, ohne manuellen Aufwand.",
   },
   {
     title: "Angebot angenommen → Onboarding startet",
-    description: "Ein Kunde akzeptiert ein Angebot. Sofort starten: Willkommens-E-Mail, Vertragsversand, Zugangseinrichtung, Onboarding-Checkliste. Was früher 30 Minuten dauerte, passiert jetzt in Sekunden.",
+    description: "Ein Kunde akzeptiert ein Angebot. Sofort starten: Willkommens-E-Mail, Vertragsversand, Zugangseinrichtung, Onboarding-Checkliste. Was früher 30 Minuten dauerte, passiert jetzt in Sekunden.",
   },
   {
     title: "Monatliche Reports ohne Arbeit",
@@ -130,7 +130,7 @@ const USE_CASES = [
 const FAQ_ITEMS = [
   {
     question: "Was kostet Prozessautomatisierung für ein KMU?",
-    answer: "Einfache Automatisierungen (ein Workflow, ein Use Case) beginnen ab ca. 500–1.500 €. Mittlere Projekte mit mehreren Workflows 1.500–5.000 €. Komplexe Systemintegrationen ab 5.000 €. Genaue Preisübersicht auf der Kosten-Seite.",
+    answer: "Einfache Automatisierungen (ein Workflow, ein Use Case) beginnen ab ca. 500–1.500 €. Mittlere Projekte mit mehreren Workflows 1.500–5.000 €. Komplexe Systemintegrationen ab 5.000 €. Genaue Preisübersicht auf der Kosten-Seite.",
   },
   {
     question: "Wie schnell können Automatisierungen live gehen?",
@@ -269,7 +269,7 @@ export function AutomatisierungUnternehmen() {
               </h2>
               <div className="space-y-5">
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Deutsche Unternehmen stehen unter Druck: Fachkräftemangel, steigende Lohnkosten, wachsender Wettbewerb. Die Antwort auf alle drei Probleme ist dieselbe – Automatisierung. Prozesse, die heute manuell 30 Minuten kosten, laufen automatisch in Sekunden. Ohne Fehler, ohne Personalaufwand, ohne Urlaub.
+                  Deutsche Unternehmen stehen unter Druck: Fachkräftemangel, steigende Lohnkosten, wachsender Wettbewerb. Die Antwort auf alle drei Probleme ist dieselbe – Automatisierung. Prozesse, die heute manuell 30&nbsp;Minuten kosten, laufen automatisch in Sekunden. Ohne Fehler, ohne Personalaufwand, ohne Urlaub.
                 </p>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                   Cogniiq automatisiert Geschäftsprozesse mit professionellen Workflow-Systemen und direkten API-Integrationen. Wir beginnen immer mit dem Prozess, der den schnellsten ROI erzeugt, und skalieren von dort aus. Von einem einzelnen Workflow zur vollständig automatisierten Geschäftsstruktur.
