@@ -335,6 +335,24 @@ markiert.
 | Der Verweigerungssatz selbst | `DATENSCHUTZ_SEITE.nichtBehauptet` |
 | Was tatsächlich geliefert wird | Datenschutzerklärung, Impressum, Cookie-Einwilligung, AVV, dokumentierte Datenflüsse |
 
+**Ausdrücklich NICHT gesperrt: der Standort Dritter, die der Kunde selbst
+beauftragt.** Die Sperre gilt für Aussagen über **unsere** Verarbeitung. Ein
+Satz über einen Hoster, den der Kunde selbst bucht und bezahlt, spricht über
+einen Dritten — dessen Rechenzentrumsstandort ist öffentlich belegbar und hat
+mit unserer Sprachverarbeitung nichts zu tun. Diese Unterscheidung steht hier,
+damit die Regel beim nächsten Durchgang nicht zu breit ausgelegt wird.
+
+| | Beispiel | Status |
+|---|---|---|
+| Über **unsere** Verarbeitung | „Alle Daten werden auf europäischen Servern verarbeitet" | **gesperrt** |
+| Über einen **Dritten**, den der Kunde beauftragt | „Wir empfehlen passende Anbieter mit europäischen Rechenzentren" (Hosting und Domain sind separate Positionen) | zulässig |
+
+Zulässig ist die zweite Zeile nur, solange erkennbar bleibt, dass es sich um
+eine Empfehlung für eine vom Kunden selbst beauftragte Leistung handelt — nicht
+um Infrastruktur, auf der wir verarbeiten. Konkret betroffen sind heute die
+beiden Hosting-Antworten in `WebdesignKostenBayreuth.tsx` und
+`WebsiteErstellenBayreuth.tsx` (Inhaber-Entscheidung 18.08.2026).
+
 **Standardformulierung**, wo die Frage im Text auftaucht und beantwortet
 werden muss:
 

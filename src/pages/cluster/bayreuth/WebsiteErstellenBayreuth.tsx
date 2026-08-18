@@ -109,7 +109,7 @@ const config: ClusterPageConfig = {
     {
       question: "Brauche ich ein Hosting-Paket?",
       answer:
-        "Ja. Wir empfehlen performante Hosting-Lösungen. Einrichtung und Konfiguration sind im Projektpreis enthalten, die laufenden Hosting-Kosten (ca. 10–20 € / Monat) sind separat.",
+        "Ja. Wir empfehlen performante Hosting-Lösungen mit europäischen Rechenzentren. Einrichtung und Konfiguration sind im Projektpreis enthalten, die laufenden Hosting-Kosten (ca. 10–20 € / Monat) sind separat.",
     },
     {
       question: "Kann Cogniiq auch meine bestehende Website überarbeiten?",

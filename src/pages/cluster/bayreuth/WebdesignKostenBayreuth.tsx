@@ -126,7 +126,7 @@ const config: ClusterPageConfig = {
     {
       question: "Sind Hosting und Domain im Preis enthalten?",
       answer:
-        "Nein, Hosting und Domain sind separate Positionen. Wir empfehlen passende Anbieter und helfen bei der Einrichtung – in der Regel unter 20 € pro Monat für performantes Managed Hosting.",
+        "Nein, Hosting und Domain sind separate Positionen. Wir empfehlen passende Anbieter mit europäischen Rechenzentren und helfen bei der Einrichtung – in der Regel unter 20 € pro Monat für performantes Managed Hosting.",
     },
     {
       question: "Was kostet laufende Wartung und Pflege?",
