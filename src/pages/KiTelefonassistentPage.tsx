@@ -31,8 +31,14 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 import {
   ANLIEGEN_IMMER_MENSCH,
   ANLIEGEN_UEBERNIMMT,
+  BETREUUNG,
+  DATENSCHUTZ_PUNKTE,
+  DECKELUNG,
   EINRICHTUNG_SCHRITTE,
   FAKTEN,
+  SAEULEN,
+  UEBERGABE,
+  UMKEHRBARKEIT,
   GRENZEN,
   NICHT_PASSEND,
   PATIENTEN_SICHT,
@@ -228,26 +234,33 @@ export function KiTelefonassistentPage() {
       />
 
       <main className="min-h-screen">
-        <HeroSection />
-        <StimmprobeSection />
+        {/* Beweiskette nach COPY-BRIEF-3 §2, Referenz ist /praxen.
+            M13 bleibt asset-gated, M22 existiert nicht. */}
+        <HeroSection />                {/* 1 · M1 Wiedererkennung */}
         <CredentialStrip />
-        <ProblemSection />
-        <PatientenSichtSection />
-        <FailurePatternsSection />
+        <ProblemSection />             {/* 2 · M2 Was es kostet */}
+        <PatientenSichtSection />      {/* 3 · M20 Patientensicht */}
+        <FailurePatternsSection />     {/* 4 · M3 Warum es scheiterte */}
+        <StimmprobeSection />          {/* 5 · M13 Stimmprobe (asset-gated) */}
+        <SaeulenSection />             {/* 6 · M4 Die vier Säulen */}
         <SolutionSection />
         <CallFlowSection />
-        <CallSummarySection />
-        <AnliegenKatalogSection />
-        <GrenzenSection />
-        <TeamSection />
+        <CallSummarySection />         {/* 7 · M14 Die Übergabe */}
+        <AnliegenKatalogSection />     {/* 8 · M8 Anliegen-Katalog */}
+        <GrenzenSection />             {/* 9 · M15 Grenzen — vor dem Preis */}
+        <TeamSection />                {/* 10 · M21 Für Ihr Team */}
+        <SetupSection />               {/* 11 · M17 Einrichtung */}
+        <BetreuungSection />           {/* 12 · M18 Betreuung */}
+        <PreisLogikSection />          {/* 13 · M10 Preis & Deckelung */}
+        <UmkehrbarkeitSection />       {/* 14 · M19 Umkehrbarkeit */}
+        <NichtPassendSection />        {/* 15 · M16 Wann wir nicht passen */}
+        <DatenschutzTeaserSection />   {/* 16 · M7 Datenschutz kurz */}
         <ObjectionsSection />
-        <NichtPassendSection />
         <UseCasesSection />
-        <SetupSection />
         <DemoCtaSection />
-        <FAQSectionBlock />
+        <FAQSectionBlock />            {/* 17 · M11 FAQ */}
+        <FinalCtaSection />            {/* 18 · M12 Nächster Schritt */}
         <InternalLinksSection />
-        <FinalCtaSection />
       </main>
     </>
   );
@@ -935,21 +948,15 @@ function CallSummarySection() {
               Die Übergabe entscheidet.
               <br className="hidden sm:block" /> Deshalb ist sie der Kern.
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 leading-[1.7] mb-8 max-w-lg">
-              Ein angenommener Anruf ist erst dann Entlastung, wenn das Ergebnis
-              ohne Abtippen bei Ihrem Team ankommt. Jedes Gespräch endet deshalb
-              in einem klaren Protokoll – mit Anliegen, vereinbartem Termin und
-              nächstem Schritt.
-            </p>
+            <div className="text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7] mb-8 max-w-lg space-y-4">
+              {UEBERGABE.paragraphs.map((absatz, i) => (
+                <p key={i}>{absatz}</p>
+              ))}
+            </div>
             <div className="space-y-3">
-              {[
-                "Gesprächszusammenfassung direkt nach dem Anruf",
-                "Erfasstes Anliegen und Kontaktdaten",
-                "Vereinbarter Termin oder Rückrufwunsch",
-                "Automatische Weiterleitung an Ihr Team",
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-2.5 text-[13px] text-gray-600 dark:text-gray-400">
-                  <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0" />
+              {UEBERGABE.wasAnkommt.items.map((item, i) => (
+                <div key={i} className="flex items-start gap-3 text-[17px] text-gray-600 dark:text-gray-400">
+                  <span className="mt-[10px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0" />
                   {item}
                 </div>
               ))}
@@ -968,7 +975,7 @@ function CallSummarySection() {
                 <div className="flex items-center gap-2.5">
                   <FileText size={14} className="text-gray-400" />
                   <span className="text-[12px] font-semibold text-gray-600 dark:text-gray-400 tracking-wide uppercase">
-                    Gesprächsprotokoll
+                    Beispiel eines Dashboard-Eintrags
                   </span>
                 </div>
                 <span className="text-[11px] text-gray-400 dark:text-gray-500 font-mono">
@@ -976,6 +983,9 @@ function CallSummarySection() {
                 </span>
               </div>
 
+              <p className="px-5 pt-4 text-[14px] text-gray-500 dark:text-gray-500 leading-[1.5]">
+                Nachgestelltes Beispiel, kein echter Anruf.
+              </p>
               <div className="p-5 space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700">
@@ -983,7 +993,7 @@ function CallSummarySection() {
                       Anrufer
                     </p>
                     <p className="text-[13px] font-medium text-gray-800 dark:text-gray-200">
-                      Thomas Bauer
+                      M. Berger
                     </p>
                   </div>
                   <div className="px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700">
@@ -1027,7 +1037,7 @@ function CallSummarySection() {
               <div className="px-5 py-3.5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-800/30 flex items-center gap-2">
                 <CheckCheck size={13} className="text-emerald-500" />
                 <span className="text-[12px] text-gray-500 dark:text-gray-400 font-medium">
-                  Kalender aktualisiert · Team benachrichtigt
+                  Eintrag im Dashboard · von Ihrem Team zu übertragen
                 </span>
               </div>
             </div>
@@ -1035,6 +1045,163 @@ function CallSummarySection() {
         </div>
       </div>
     </section>
+  );
+}
+
+/**
+ * Fehlende Glieder der Beweiskette (COPY-BRIEF-3 §2), nachgezogen an der
+ * Referenz /praxen: M4 Säulen, M18 Betreuung, M10 Preislogik, M19
+ * Umkehrbarkeit, M7 Datenschutz.
+ *
+ * M10 steht hier bewusst OHNE Beträge: Die Tarife sind auf Praxen zugeschnitten,
+ * diese Seite ist branchenübergreifend. Genannt wird die Logik, die Zahlen
+ * stehen auf der Preisseite.
+ */
+function KettenStile() {
+  const PROSE = "text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7]";
+  const H2C = "text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6";
+  const CARD =
+    "p-7 rounded-2xl bg-white dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800";
+  const CARD_ALT =
+    "p-7 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800";
+  const DOT =
+    "mt-[10px] w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 flex-shrink-0";
+  const TEXT_LINK =
+    "inline-flex items-center gap-2 min-h-[44px] py-3 text-[16px] font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors";
+
+  return { PROSE, H2C, CARD, CARD_ALT, DOT, TEXT_LINK };
+}
+
+function SaeulenSection() {
+  const { PROSE, H2C, CARD_ALT } = KettenStile();
+  return (
+    <>
+      {/* ── M4 · Die vier Säulen ── */}
+      <section className="py-24">
+        <div className="max-w-4xl mx-auto px-6 lg:px-8">
+          <h2 className={H2C}>Was „für Ihren Betrieb gebaut" konkret heißt</h2>
+          <div className="space-y-4">
+            {SAEULEN.map((saeule, i) => (
+              <div key={i} className={CARD_ALT}>
+                <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-2.5">
+                  {saeule.title}
+                </h3>
+                <p className={PROSE}>{saeule.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+    </>
+  );
+}
+
+function BetreuungSection() {
+  const { PROSE, H2C, CARD } = KettenStile();
+  return (
+    <>
+      {/* ── M18 · Betreuung ── */}
+      <section className="py-24 bg-gray-50 dark:bg-gray-900/40">
+        <div className="max-w-3xl mx-auto px-6 lg:px-8">
+          <h2 className={H2C}>{BETREUUNG.headline}</h2>
+          <p className={`${PROSE} mb-8`}>{BETREUUNG.text}</p>
+          <div className={CARD}>
+            <p className="text-[19px] font-semibold text-gray-900 dark:text-gray-100">
+              {BETREUUNG.person.name}
+            </p>
+            <p className="text-[15px] text-gray-500 dark:text-gray-500 mb-6">
+              {BETREUUNG.person.rolle}
+            </p>
+            <dl className="space-y-4">
+              {BETREUUNG.fakten.map((fakt) => (
+                <div key={fakt.label}>
+                  <dt className="text-[15px] font-semibold text-gray-700 dark:text-gray-300">
+                    {fakt.label}
+                  </dt>
+                  <dd className={PROSE}>{fakt.wert}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+      </section>
+
+    </>
+  );
+}
+
+function PreisLogikSection() {
+  const { PROSE, H2C, TEXT_LINK } = KettenStile();
+  return (
+    <>
+      {/* ── M10 · Preislogik ohne Beträge ── */}
+      <section className="py-24">
+        <div className="max-w-3xl mx-auto px-6 lg:px-8">
+          <h2 className={H2C}>{DECKELUNG.headline}</h2>
+          <p className={`${PROSE} mb-4`}>{DECKELUNG.text}</p>
+          <p className={`${PROSE} mb-4`}>{DECKELUNG.tarifwechsel}</p>
+          <p className={PROSE}>{DECKELUNG.nichtProBehandler}</p>
+          <Link to="/kosten-ki-telefonassistent" className={TEXT_LINK}>
+            Alle Preisangaben im Detail
+            <ArrowRight size={15} aria-hidden="true" />
+          </Link>
+        </div>
+      </section>
+
+    </>
+  );
+}
+
+function UmkehrbarkeitSection() {
+  const { PROSE, H2C, CARD } = KettenStile();
+  return (
+    <>
+      {/* ── M19 · Umkehrbarkeit ── */}
+      <section className="py-24 bg-gray-50 dark:bg-gray-900/40">
+        <div className="max-w-3xl mx-auto px-6 lg:px-8">
+          <h2 className={H2C}>{UMKEHRBARKEIT.headline}</h2>
+          <dl className="space-y-5 mb-8">
+            {UMKEHRBARKEIT.fakten.map((fakt) => (
+              <div key={fakt.label} className={CARD}>
+                <dt className="text-[15px] font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                  {fakt.label}
+                </dt>
+                <dd className={PROSE}>{fakt.wert}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className={PROSE}>{UMKEHRBARKEIT.vetorecht}</p>
+        </div>
+      </section>
+
+    </>
+  );
+}
+
+function DatenschutzTeaserSection() {
+  const { PROSE, H2C, DOT, TEXT_LINK } = KettenStile();
+  return (
+    <>
+      {/* ── M7 · Datenschutz ── */}
+      <section className="py-24">
+        <div className="max-w-3xl mx-auto px-6 lg:px-8">
+          <h2 className={H2C}>Was Ihr Datenschutzbeauftragter wissen will</h2>
+          <ul className="space-y-5">
+            {DATENSCHUTZ_PUNKTE.map((punkt, i) => (
+              <li key={i} className={`flex items-start gap-3 ${PROSE}`}>
+                <span className={DOT} />
+                {punkt}
+              </li>
+            ))}
+          </ul>
+          <Link to="/datenschutz-sicherheit" className={TEXT_LINK}>
+            Datenschutz und Sicherheit im Detail
+            <ArrowRight size={15} aria-hidden="true" />
+          </Link>
+        </div>
+      </section>
+    </>
   );
 }
 

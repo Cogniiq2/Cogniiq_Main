@@ -24,6 +24,8 @@ const CLUSTER = [
   "src/pages/costs/KostenKiTelefonassistent.tsx",
   "src/pages/industries/KiTelefonassistentArzt.tsx",
   "src/pages/industries/KiTelefonassistentPraxis.tsx",
+  "src/pages/IntegrationenPage.tsx",
+  "src/pages/DatenschutzSicherheitPage.tsx",
   "src/components/PraxisRechnerWidget.tsx",
   "src/components/PraxisRechnerSection.tsx",
 ];

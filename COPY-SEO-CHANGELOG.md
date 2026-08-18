@@ -261,3 +261,55 @@ vier interne Links, darunter erstmals ein Verweis auf die rechtliche
 
 Freischaltbedingungen in `ASSETS-REQUIRED.md` §B2 — anders als bei
 `/integrationen` sind alle vier Punkte nötig, nicht einer.
+
+## Stufe 6a · Service-Seite `/ki-telefonassistent`
+
+Title, Description und H1 unverändert — die Angleichung betrifft die Struktur,
+nicht die Metadaten.
+
+Reihenfolge nach der Beweiskette gesetzt, mit `/praxen` als Referenz. Neu:
+M4 (Säulen), M18 (Betreuung), M10 (Preislogik **ohne Beträge** — die Tarife
+sind auf Praxen zugeschnitten, diese Seite ist branchenübergreifend), M19
+(Umkehrbarkeit), M7 (Datenschutz). Verschoben: M13 von Position 2 auf 5,
+M16 hinter M19.
+
+Zwei inhaltliche Korrekturen im Übergabe-Abschnitt:
+- „…wenn das Ergebnis **ohne Abtippen** bei Ihrem Team ankommt" und
+  „Automatische Weiterleitung an Ihr Team" → ersetzt durch M14, das den
+  tatsächlichen Weg beschreibt.
+- Das Beispiel-Protokoll war nicht als Beispiel gekennzeichnet, nannte einen
+  erfundenen Namen und behauptete „Kalender aktualisiert · Team
+  benachrichtigt" → Label „Beispiel eines Dashboard-Eintrags", Hinweis
+  „Nachgestelltes Beispiel, kein echter Anruf", Name generalisiert, die
+  Automatik-Zeile ersetzt durch „Eintrag im Dashboard · von Ihrem Team zu
+  übertragen".
+
+Neue interne Links: `/kosten-ki-telefonassistent`, `/datenschutz-sicherheit`.
+
+## Stufe 6b · Stadtseiten — Faktenkorrekturen (Beweiskette zurückgestellt)
+
+| Befund | Stellen | Korrektur |
+|---|---|---|
+| „Einrichtung dauert in der Regel 7–14 Tage" — widerspricht der 7-Tage-Garantie | 4 | aus `FAKTEN.goLive` |
+| „Ihre Rufnummer bleibt, Ihre Telefonanlage bleibt" (B4 unbeantwortet) | 1 | „Ihre Anrufe werden auf den Assistenten umgeleitet" |
+| Lokale Superlative ohne Beleg | 5 | neutralisiert, siehe unten |
+
+Neutralisiert: „gehört zu den wachstumsstärksten Städten Bayerns" →
+Universitätsstadt mit Uniklinikum und Welterbe-Altstadt (alles belegbar) ·
+„einer der dichtesten Dienstleistungsmärkte Deutschlands" (2×) → beschreibende
+Formulierung ohne Superlativ · „dichter Besatz an Praxen" und „Dichte an
+Praxen hoch" → neutral. Verifizierbare lokale Fakten (UNESCO-Welterbe,
+Universität, Uniklinikum, Oberfranken) bleiben.
+
+**Unique-Anteil gemessen** (Satzvergleich über das vorgerenderte HTML, mit
+normalisiertem Stadtnamen, damit reines Austauschen nicht als unique zählt):
+
+| Seite | vorher | nach den Korrekturen |
+|---|---|---|
+| Bayreuth | 70,8 % | 69,7 % |
+| Regensburg | 70,5 % | 69,5 % |
+| München | 73,0 % | 72,9 % |
+
+Die vollständige Beweiskette ist **zurückgestellt** — Begründung in der
+Rückmeldung an den Inhaber: Sie brächte 9.711 Zeichen geteilten Text je Seite
+und drückte alle drei unter die 40-%-Schwelle (38,5 / 37,4 / 39,0 %).
