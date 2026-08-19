@@ -223,6 +223,22 @@ main{max-width:52rem; margin:0 auto; padding:1.6rem 1.1rem 5rem}
 .verdict.ok .tag{color:var(--good)}
 .verdict.no .tag{color:var(--bad)}
 .verdict p{margin:.25rem 0 0; font-size:.9rem; color:var(--ink-2); line-height:1.6}
+.exp{font-size:.9rem; color:var(--ink-2); line-height:1.65}
+.exp p{margin:.5rem 0 0}
+.exp p:first-child{margin-top:.3rem}
+.exp ol{margin:.55rem 0 0; padding-left:1.35rem; display:flex; flex-direction:column; gap:.42rem}
+.exp li{padding-left:.1rem}
+.exp b{color:var(--ink); font-weight:600}
+.exp code{color:var(--ink); font-size:.92em}
+.pts{
+  font-family:var(--mono); font-size:.68rem; color:var(--accent-ink);
+  background:var(--accent-soft); border:1px solid var(--accent-line);
+  border-radius:20px; padding:.05rem .42rem;
+}
+.orig{
+  display:block; font-family:var(--mono); font-size:.68rem; letter-spacing:.07em;
+  text-transform:uppercase; color:var(--accent-ink); margin-bottom:.6rem; font-weight:500;
+}
 .qfoot{display:flex; align-items:center; gap:.6rem; margin-top:1.2rem; flex-wrap:wrap}
 .hint{font-family:var(--mono); font-size:.72rem; color:var(--ink-3); margin-left:auto}
 .hint kbd{border:1px solid var(--line-2); border-radius:3px; padding:0 .25rem; font-size:.95em}
@@ -1420,45 +1436,721 @@ theorie("wi","Wahlbereich Wirtschaftsinformatik",[
  ["Tabellen lesen","Zuerst die Gesamtsumme bilden, dann Anteile. Auf Einheiten achten (Tsd. €, Mio. €) — Einheitenfehler kosten mehr Punkte als Rechenfehler."]
 ]);
 
+/* ── Prüfungsrelevante Blöcke (nach der Originalklausur 2022) ────────── */
+theorie("ableitung","Ableitungen: Quotienten- & Kettenregel",[
+ ["Die drei Regeln","<b>Produktregel:</b> (u·v)′ = u′v + <b>u</b>v′ — hier steht ein Plus.<br><b>Quotientenregel:</b> (u/v)′ = (u′v − uv′) / v² — hier steht ein Minus, und die Reihenfolge ist entscheidend.<br><b>Kettenregel:</b> äußere Ableitung mal innere Ableitung."],
+ ["Eselsbrücke Quotientenregel","„NAZ minus ZAN, durch N-Quadrat dann“ — <b>N</b>enner mal <b>A</b>bleitung <b>Z</b>ähler, minus <b>Z</b>ähler mal <b>A</b>bleitung <b>N</b>enner, geteilt durch Nenner zum Quadrat. Wer die Reihenfolge dreht, bekommt exakt das falsche Vorzeichen — und genau diese Variante steht in der Klausur als Antwortoption bereit."],
+ ["ln(kx)′ = 1/x","Der wichtigste Einzelbaustein der Originalklausur. Jeder konstante Faktor im Logarithmus verschwindet beim Ableiten: ln(2x)′ = ln(7x)′ = ln(x)′ = 1/x. Grund: ln(kx) = ln k + ln x, und eine Konstante hat die Ableitung null."],
+ ["Allgemein ln und e","ln(u)′ = u′/u — Ableitung des Inneren über das Innere. e^u′ = u′·e^u — die e-Funktion bleibt stehen und wird mit der inneren Ableitung multipliziert."],
+ ["Wurzeln","√(u)′ = u′/(2√u). Bei u = x² ± c kürzt sich die Zwei immer weg, es bleibt x/√(x² ± c). Steht die Wurzel im Nenner, nie die Quotientenregel benutzen, sondern als negative Potenz schreiben: 1/√u = u^(−½)."],
+ ["Trigonometrie","sin′ = cos · cos′ = −sin. Das Minus entsteht nur beim Ableiten des Cosinus. Bei sin(2x) oder cos(x²) die innere Ableitung nicht vergessen."],
+ ["Doppelbrüche auflösen","Entsteht im Zähler ein Bruch (typisch bei Wurzeln), erweitere Zähler <em>und</em> Nenner mit dem störenden Term. Genau dieser Schritt führt in der Originalklausur von der rohen Quotientenregel auf die angebotene Antwortform."],
+ ["Antwort nicht gefunden?","Deine Lösung sieht anders aus als alle Optionen? Erst ausklammern, kürzen und erweitern, bevor du an einen Rechenfehler glaubst. Die Klausur bietet die Lösung fast nie in der Form an, in der sie beim Ableiten entsteht."],
+ ["Kontrolle ohne Taschenrechner","Setze eine Zahl ein, die die Wurzel glatt macht (bei √(x²−5) etwa x = 3, denn √4 = 2). Rechne den Wert mit zwei Kandidaten aus — meist unterscheiden sie sich sofort deutlich."]
+]);
+
+theorie("symmetrie","Symmetrie von Funktionen",[
+ ["Die zwei Definitionen","<b>gerade</b>: f(−x) = f(x) → achsensymmetrisch zur y-Achse.<br><b>ungerade</b>: f(−x) = −f(x) → punktsymmetrisch zum Ursprung.<br>Merkhilfe: <em>gerade → Gerade (Achse)</em>, <em>ungerade → Punkt</em>."],
+ ["Schnellregel für Polynome","Nur gerade Exponenten (x⁰, x², x⁴) → gerade. Nur ungerade Exponenten (x¹, x³, x⁵) → ungerade. Gemischt → keine der beiden Symmetrien. Konstanten zählen als x⁰, sind also gerade."],
+ ["Die Standardbausteine","sin, tan und 1/x sind <b>ungerade</b>. cos und alle x-Potenzen mit geradem Exponenten sind <b>gerade</b>. e^x ist weder noch."],
+ ["Produkte rechnen wie Vorzeichen","Setze gerade = „+“ und ungerade = „−“ und multipliziere: gerade·gerade = gerade, ungerade·ungerade = gerade, gerade·ungerade = ungerade. Für Quotienten gilt dasselbe. Bei <b>Summen</b> funktioniert das <em>nicht</em>: dort bleibt nur gerade+gerade = gerade und ungerade+ungerade = ungerade, gemischte Summen haben gar keine Symmetrie."],
+ ["Verschobene Funktionen — der Klausurtrick","Steht überall derselbe Klammerausdruck, substituiere ihn: bei f(x) = sin(x−1)·(x−1)² setze u = x−1. Bestimme die Symmetrie von g(u), und übersetze am Ende zurück: u = 0 entspricht x = 1, das Zentrum liegt also bei (1, 0)."],
+ ["Vorzeichenfalle beim Zurückübersetzen","Setze die Klammer null und löse nach x auf. (x − 2) → Zentrum bei x = 2. (x + 2) → Zentrum bei x = <b>−2</b>. Dieser eine Handgriff verhindert den häufigsten Fehler der Aufgabengattung."],
+ ["Achse oder Punkt?","Ist die substituierte Funktion gerade, lautet die Antwort „achsensymmetrisch zur Geraden x = a“. Ist sie ungerade, lautet sie „punktsymmetrisch zu (a, 0)“. Bei Achsensymmetrie ist eine additive Konstante egal, bei Punktsymmetrie gehört sie ins Zentrum."],
+ ["Der Freischuss","„Achsensymmetrisch zur x-Achse“ ist bei einer Funktion <b>immer</b> falsch — dann hätte ein x zwei y-Werte. Diese Option kannst du ohne jede Rechnung streichen."],
+ ["Ein-Zahl-Probe","Unsicher? Rechne f(1) und f(−1). Bei gerader Funktion müssen beide gleich sein, bei ungerader entgegengesetzt. Stimmt weder das eine noch das andere, liegt keine Symmetrie zum Ursprung vor."]
+]);
+
+theorie("raetsel","Ehrliche, Lügner & Normale",[
+ ["Die drei Rollen","<b>Ehrlicher:</b> jede Aussage wahr. <b>Lügner:</b> jede Aussage falsch. <b>Normaler:</b> darf beides — aus seinen Aussagen folgt nie ein Widerspruch. Der Normale ist der Joker und deshalb nie der Ansatzpunkt."],
+ ["Das Grundverfahren","Nimm eine Person, unterstelle ihr nacheinander jede Rolle und prüfe, ob ein Widerspruch entsteht. Beginne bei der Person, die etwas <em>über sich selbst</em> sagt — solche Aussagen schränken am stärksten ein."],
+ ["Zuerst die strengen Rollen prüfen","Widersprüche entstehen fast immer beim Ehrlichen oder beim Lügner, weil nur sie Verbote haben. Prüfe deshalb: Darf ein Lügner diesen Satz sagen (ist er also falsch)? Darf ein Ehrlicher ihn sagen (ist er also wahr)?"],
+ ["Zwei Sätze, die alles entscheiden","„<b>Ich bin ein Lügner</b>“ kann weder ein Ehrlicher (wäre falsch) noch ein Lügner (wäre wahr) sagen → die Person ist ein <b>Normaler</b>.<br>„<b>Ich bin ein Ehrlicher</b>“ kann <em>jeder</em> sagen und liefert null Information."],
+ ["Aussagen über Aussagen","„Was A gesagt hat, ist wahr“ überträgt den Wahrheitswert: Ist A's Aussage wahr, ist auch B's Aussage wahr — unabhängig davon, wer A und B sind. So verkettest du zwei Personen in einem Schritt."],
+ ["Und, oder, mindestens","Die Verneinung von „<em>beide</em> sind Lügner“ ist „<em>mindestens einer</em> ist kein Lügner“ — nicht „keiner ist Lügner“ (De Morgan). Die Verneinung von „mindestens einer“ ist „keiner“. Fast jedes Rätsel dieser Art hängt genau an dieser Umformung."],
+ ["Wenn-dann-Aussagen","Eine Wenn-dann-Aussage ist nur falsch, wenn die Bedingung zutrifft und die Folge nicht. Ist die Bedingung falsch, ist die gesamte Aussage <b>wahr</b>. Folge: Ein Lügner kann eine Wenn-dann-Aussage über sich selbst („Wenn ich ehrlich bin, dann …“) niemals aussprechen."],
+ ["Alle Fälle prüfen","Höre nicht bei der ersten passenden Lösung auf. Bleiben mehrere widerspruchsfreie Fälle übrig, lautet die Antwort „nicht bestimmbar“ — oder du suchst die Aussage, die in <em>allen</em> offenen Fällen gilt."],
+ ["Systematisch bei drei Personen","Bei genau einem Ehrlichen, einem Lügner und einem Normalen gibt es nur 3 · 2 · 1 = 6 Möglichkeiten. Notfalls schreibst du alle sechs untereinander und streichst durch — das dauert keine fünf Minuten und ist bei 8 Punkten die Zeit wert."]
+]);
+
+theorie("tv","Technisches Verständnis",[
+ ["Die Aufgabenstellung genau lesen","Gefragt ist ausschließlich: Steht das so im Text oder folgt es <em>direkt</em> daraus? Ob die Aussage in der Wirklichkeit zutrifft, ist ausdrücklich <b>irrelevant</b>. Schalte dein Fachwissen bewusst ab — es führt hier systematisch in die Irre."],
+ ["Vorgehen","Text einmal in Ruhe lesen und dabei Verneinungen, Vergleiche und Begründungen markieren. Dann Aussage für Aussage die zugehörige Textstelle aufsuchen und wörtlich vergleichen. Nie aus der Erinnerung antworten — bei vier Aussagen zu einem kurzen Text ist dafür genug Zeit."],
+ ["Falle 1: Begriffsvertauschung","Ein einziges Substantiv wird ausgetauscht: „Kollaps konventioneller <b>Methoden</b>“ wird zu „Kollaps konventioneller <b>Designs</b>“. Gegenmittel: Unterstreiche das zentrale Substantiv der Aussage und suche genau dieses Wort im Text."],
+ ["Falle 2: Bewertung umgedreht","Ein Nachteil wird als Vorteil ausgegeben. Achte auf Signalwörter im Text: <em>although, but, however, a serious problem, drops</em> — sie zeigen, auf welcher Seite der Bilanz etwas steht."],
+ ["Falle 3: Übergeneralisierung","Aus „manche“ oder „nicht alle“ wird „alle“. Absolutwörter (<em>alle, immer, nie, jeder</em>) sind fast immer ein Alarmsignal. Suche gezielt nach einer Ausnahme im Text."],
+ ["Falle 4: untergeschobene Ursache","Die Wirkung stimmt, die Begründung ist erfunden. Bei jedem <em>weil, deshalb, aufgrund</em> prüfst du zwei Dinge getrennt: Steht die Wirkung im Text? Und steht <b>diese</b> Ursache im Text?"],
+ ["Falle 5: Querverbindung","Zwei richtige Aussagen aus verschiedenen Absätzen werden mit einem „weil“ verbunden. Prüfe, ob Ursache und Wirkung im Text im <em>selben</em> Zusammenhang stehen."],
+ ["Falle 6: Handlungsempfehlung","Der Text beschreibt, die Aussage fordert („sollte“, „muss“). Fachtexte dieser Art geben selten Ratschläge — eine Aussage im Befehlston ist besonders verdächtig."],
+ ["Stärke muss passen","<em>may</em> ↔ <em>kann</em>, <em>often</em> ↔ <em>häufig</em>, <em>must</em> ↔ <em>zwangsläufig</em>. Eine Aussage, die mehr behauptet als der Text hergibt, ist falsch; eine, die <em>weniger</em> behauptet, ist meist gedeckt."],
+ ["Sinnprobe","Frage dich: Ergäbe der Text noch Sinn, wenn diese Aussage stimmte? Wird ein ganzer Absatz dadurch überflüssig, ist die Aussage falsch. Das funktioniert auch, wenn du die genaue Stelle nicht wiederfindest."],
+ ["Unbekannte Fachwörter","Die Erklärung steht fast immer im ersten Satz, in dem der Begriff auftaucht. Den ersten Absatz langsam lesen, den Rest schneller."]
+]);
+
+// Originalklausur TUM Eignungsfeststellungsverfahren, IN0000 Endterm, 30.08.2022
+// Alle drei Aufgaben im Wortlaut, mit vollständigem Lösungsweg.
+
+q("org-1a","symmetrie",3,
+ "<span class=\"orig\">Originalklausur 2022 · Aufgabe 1a · 4 Punkte</span>Bestimmen Sie das Symmetrieverhalten der folgenden Funktion:<pre class=\"code\">f(x) = sin(x − 1) · (x − 1)²</pre>",
+ ["Die Funktion ist punktsymmetrisch zu (1, 0).",
+  "Die Funktion ist achsensymmetrisch zur y-Achse.",
+  "Die Funktion ist punktsymmetrisch zum Ursprung.",
+  "Die Funktion ist achsensymmetrisch zur x-Achse."],0,
+ "<p><b>Der Trick: substituieren.</b> Überall steht <code>x − 1</code>. Setze <code>u = x − 1</code>, dann wird die Funktion zu <code>g(u) = sin(u) · u²</code>. Damit ist die Verschiebung erst einmal weg und du hast eine ganz normale Symmetriefrage.</p>"+
+ "<ol>"+
+ "<li><b>Bausteine einordnen.</b> <code>sin(u)</code> ist ungerade (punktsymmetrisch zum Ursprung), <code>u²</code> ist gerade (achsensymmetrisch zur y-Achse).</li>"+
+ "<li><b>Produktregel für Symmetrie.</b> ungerade · gerade = <b>ungerade</b>. Also ist <code>g(u)</code> ungerade, d. h. <code>g(−u) = −g(u)</code>.</li>"+
+ "<li><b>Zurückübersetzen.</b> <code>u = 0</code> entspricht <code>x = 1</code>. Der Ursprung der u-Welt liegt in der x-Welt bei <code>(1, 0)</code>. Aus „punktsymmetrisch zum Ursprung“ wird also <b>punktsymmetrisch zu (1, 0)</b>.</li>"+
+ "</ol>"+
+ "<p><b>Gegenprobe in Zahlen</b> (immer machen, kostet 20 Sekunden): <code>f(1 + t) = sin(t) · t²</code> und <code>f(1 − t) = sin(−t) · (−t)² = −sin(t) · t²</code>. Die beiden sind genau entgegengesetzt — das ist die Definition von Punktsymmetrie zu (1, 0).</p>"+
+ "<p><b>Warum die anderen falsch sind:</b> Achsensymmetrie zur y-Achse hieße <code>f(−x) = f(x)</code> — probiere <code>x = 1</code>: <code>f(1) = 0</code>, aber <code>f(−1) = sin(−2)·4 ≈ −3,64</code>. Punktsymmetrie zum <em>Ursprung</em> wäre nur richtig, wenn nirgends die Verschiebung um 1 stünde. Und „achsensymmetrisch zur x-Achse“ ist bei einer Funktion <b>nie</b> möglich — dann hätte sie zu einem x zwei y-Werte.</p>");
+
+q("org-1b","ableitung",3,
+ "<span class=\"orig\">Originalklausur 2022 · Aufgabe 1b · 8 Punkte</span>Bestimmen Sie die Ableitung f′(x):<pre class=\"code\">        √(x² − 5)\nf(x) = ───────────\n         ln(2x)</pre>",
+ ["f′(x) = (x²·ln(2x) − x² + 5) / (x · ln(2x)² · √(x² − 5))",
+  "f′(x) = ( (x/√(x²−5))·ln(2x) − √(x²−5) ) / ln(2x)²",
+  "f′(x) = ( ln(2x)·2x − √(x²−5) ) / ( ln(2x)² · x · √(x²−5) )",
+  "f′(x) = x² / √(x² − 5)"],0,
+ "<p>Das ist die teuerste Aufgabe der Klausur — 8 von 24 Punkten. Sie ist reine Handwerksarbeit: Quotientenregel, und in beiden Bausteinen steckt eine Kettenregel.</p>"+
+ "<ol>"+
+ "<li><b>Zerlegen.</b> Zähler <code>u = √(x² − 5)</code>, Nenner <code>v = ln(2x)</code>. Quotientenregel: <code>f′ = (u′·v − u·v′) / v²</code>.</li>"+
+ "<li><b>u′ (Kettenregel).</b> <code>u = (x² − 5)^½</code>, also <code>u′ = ½·(x² − 5)^(−½) · 2x = x / √(x² − 5)</code>. Die innere Ableitung von <code>x² − 5</code> ist <code>2x</code>, und die 2 kürzt sich gegen das ½.</li>"+
+ "<li><b>v′ — hier fällt die halbe Kohorte rein.</b> <code>v = ln(2x)</code>, also <code>v′ = (1/(2x)) · 2 = <b>1/x</b></code>. Der Faktor 2 im Logarithmus verschwindet vollständig. Merke: <code>ln(kx)′ = 1/x</code> für jede Konstante k.</li>"+
+ "<li><b>Einsetzen.</b> <code>f′ = [ (x/√(x²−5))·ln(2x) − √(x²−5)·(1/x) ] / ln(2x)²</code>. Das ist bereits richtig — steht aber so nicht zur Auswahl.</li>"+
+ "<li><b>Auf die Form der Antworten bringen.</b> Erweitere Zähler und Nenner mit <code>x · √(x² − 5)</code>:<br>Zähler: <code>x²·ln(2x) − (x² − 5) = x²·ln(2x) − x² + 5</code><br>Nenner: <code>x · ln(2x)² · √(x² − 5)</code></li>"+
+ "</ol>"+
+ "<p><b>Der schnelle Weg im Test:</b> Rechne <code>v′</code> aus und schau, welche Option <code>1/x</code> überhaupt enthält. Die Variante ohne <code>1/x</code> stammt von jemandem, der <code>v′ = 1</code> gesetzt hat. Die Variante mit <code>2x</code> im Zähler hat die Wurzelableitung vergessen. Und <code>x²/√(x²−5)</code> ist überhaupt keine Quotientenregel — dort fehlt der Nenner komplett.</p>"+
+ "<p><b>Kontrolle ohne Taschenrechner:</b> Wenn du unsicher bist, setze eine leichte Zahl ein, z. B. <code>x = 3</code>. Dann ist <code>√(9−5) = 2</code> — die Wurzel wird glatt. So lassen sich zwei Kandidaten oft in einer Minute unterscheiden.</p>");
+
+q("org-2","raetsel",3,
+ "<span class=\"orig\">Originalklausur 2022 · Aufgabe 2 · 8 Punkte</span>Auf der Insel der Ehrlichen und Lügner gibt es <b>Ehrliche</b>, die immer die Wahrheit sagen, <b>Lügner</b>, die immer lügen, und <b>normale Menschen</b>, die manchmal lügen. Von den drei Personen A, B, C ist genau einer ein Ehrlicher, genau einer ein Lügner und genau einer ein normaler Mensch. Sie sagen nacheinander:<pre class=\"code\">A: Ich bin ein normaler Mensch.\nB: Diese Aussage von A ist wahr.\nC: Ich bin kein normaler Mensch.</pre>Wer ist was?",
+ ["A ist ein Lügner, B ist ein Normaler, C ist ein Ehrlicher",
+  "A ist ein Normaler, B ist ein Ehrlicher, C ist ein Lügner",
+  "A ist ein Normaler, B ist ein Lügner, C ist ein Ehrlicher",
+  "A ist ein Ehrlicher, B ist ein Normaler, C ist ein Lügner",
+  "A ist ein Ehrlicher, B ist ein Lügner, C ist ein Normaler",
+  "A ist ein Lügner, B ist ein Ehrlicher, C ist ein Normaler"],0,
+ "<p><b>Die drei Regeln, aus denen alles folgt:</b> Ein Ehrlicher sagt <em>nur</em> Wahres. Ein Lügner sagt <em>nur</em> Falsches. Ein Normaler darf beides — aus seinen Aussagen folgt daher nie ein Widerspruch, er ist der „Joker“.</p>"+
+ "<p><b>Schritt 1 — A einschränken.</b> A sagt „Ich bin ein normaler Mensch.“<br>"+
+ "· Wäre A <b>Ehrlicher</b>, wäre die Aussage wahr, also wäre A normal. Aber A ist Ehrlicher. Widerspruch — A ist kein Ehrlicher.<br>"+
+ "· Wäre A <b>Lügner</b>, wäre die Aussage falsch, also wäre A nicht normal. Stimmt, A ist ja Lügner. Kein Widerspruch — möglich.<br>"+
+ "· Wäre A <b>Normaler</b>, wäre die Aussage wahr, und ein Normaler darf Wahres sagen. Auch möglich.<br>"+
+ "Es bleiben zwei Fälle.</p>"+
+ "<p><b>Schritt 2 — Fall „A ist Normaler“ durchspielen.</b> Dann ist A's Aussage wahr, also ist auch B's Aussage („A's Aussage ist wahr“) wahr. Ein Lügner kann nichts Wahres sagen, also ist B <b>Ehrlicher</b>. Für C bleibt <b>Lügner</b>. Aber C sagt „Ich bin kein normaler Mensch“ — und ein Lügner ist tatsächlich kein Normaler, die Aussage wäre also <b>wahr</b>. Ein Lügner darf nichts Wahres sagen. <b>Widerspruch — dieser Fall fällt weg.</b></p>"+
+ "<p><b>Schritt 3 — Fall „A ist Lügner“ durchspielen.</b> Dann ist A's Aussage falsch, also ist B's Aussage („A's Aussage ist wahr“) ebenfalls <b>falsch</b>. Ein Ehrlicher kann nichts Falsches sagen, also ist B <b>Normaler</b> (der darf lügen). Für C bleibt <b>Ehrlicher</b>. Probe: C sagt „Ich bin kein normaler Mensch“ — als Ehrlicher ist C tatsächlich kein Normaler, die Aussage ist wahr. <b>Alles passt.</b></p>"+
+ "<p><b>Ergebnis: A = Lügner, B = Normaler, C = Ehrlicher.</b></p>"+
+ "<p><b>Die Standardtechnik für jedes solche Rätsel:</b> Nimm die Person, über deren Rolle die Aussage am meisten verrät (meist die mit einer Aussage über sich selbst), schließe daraus Rollen aus, und spiele die verbleibenden Fälle bis zum Widerspruch durch. Wichtig: Der Widerspruch entsteht fast immer beim <em>Lügner</em>, weil er als Einziger nichts Wahres sagen darf — prüfe ihn zuerst.</p>");
+
+passage("orig-text","Design Validation (Originalklausur 2022, Aufgabe 3)",
+`The currently practiced methods for design validation in most sites are still the Veteran techniques of simulation and testing. Although provably effective in the very early stages of debugging, when the design is still infested with multiple bugs, their effectiveness drops quickly as the design becomes clearer, and they require an alarmingly increasing amount of time to uncover the more subtle bugs. A serious problem with these techniques is that one is never sure when they have reached their limits or even an estimate of how many bugs may still lurk in the design. As the complexity of designs drastically increases, say from having .5 million gates per chip to advanced designs with 5 million gates per chip, some far-seeing managers foresee the complete collapse of these conventional methods and their total inability to scale up.`);
+
+q("org-3a","tv",3,
+ "<span class=\"orig\">Originalklausur 2022 · Aufgabe 3 · je 1 Punkt</span>Steht die folgende Aussage so im Text oder ist sie eine direkte Folgerung daraus?<br><br><b>„Ein Vorteil von Tests ist, dass sie subtile Designfehler (‚bugs‘) aufspüren.“</b>",
+ ["Nein","Ja"],0,
+ "<p><b>Nein.</b> Der Text sagt zwar, dass die Methoden subtile Fehler aufspüren — aber er stellt das ausdrücklich als <em>Nachteil</em> dar, nicht als Vorteil: „they require an <b>alarmingly increasing amount of time</b> to uncover the more subtle bugs“. Sie brauchen dafür also erschreckend viel Zeit.</p>"+
+ "<p>Der Vorteil, den der Text nennt, ist ein ganz anderer: „provably effective in the <b>very early stages</b> of debugging, when the design is still infested with multiple bugs“ — stark bei <em>vielen groben</em> Fehlern am Anfang.</p>"+
+ "<p><b>Die Fallenart, die du hier erkennen musst:</b> Vorzeichenwechsel. Eine Information aus dem Text wird korrekt wiedergegeben, aber ihre Bewertung wird umgedreht (Nachteil → Vorteil). Achte im Text immer auf Signalwörter wie <em>although</em>, <em>drops</em>, <em>a serious problem</em> — sie markieren, auf welcher Seite der Bilanz etwas steht.</p>");
+
+q("org-3b","tv",3,
+ "<span class=\"orig\">Originalklausur 2022 · Aufgabe 3 · je 1 Punkt</span>Steht die folgende Aussage so im Text oder ist sie eine direkte Folgerung daraus?<br><br><b>„Manche Manager sagen vorher, dass gängige Methoden sich nicht auf Designs mit mehr als 5 Millionen Gattern pro Chip anwenden lassen.“</b>",
+ ["Ja","Nein"],0,
+ "<p><b>Ja.</b> Der Text: „some far-seeing <b>managers foresee</b> the complete collapse of these conventional methods and their total inability to scale up“ — und zwar im Zusammenhang mit dem Sprung auf „advanced designs with 5 million gates per chip“.</p>"+
+ "<p>Prüfe die Aussage Stück für Stück gegen den Text:<br>"+
+ "· „Manche Manager“ ↔ „some … managers“ ✓<br>"+
+ "· „sagen vorher“ ↔ „foresee“ ✓<br>"+
+ "· „gängige Methoden“ ↔ „conventional methods“ ✓<br>"+
+ "· „lassen sich nicht anwenden“ ↔ „complete collapse … total inability to scale up“ ✓</p>"+
+ "<p><b>Zum kritischen Punkt „mehr als 5 Millionen“:</b> Der Text nennt 5 Millionen als das Niveau, bei dem der Zusammenbruch erwartet wird. Wenn die Methoden schon bei 5 Millionen versagen und generell nicht mehr mitskalieren, dann erst recht darüber — das ist eine direkte Folgerung. Achtung: Das ist die schwierigste der vier Aussagen; wenn du hier zwischen zwei Lesarten schwankst, entscheide danach, ob die Aussage <em>mehr</em> behauptet als der Text hergibt (dann Nein) oder <em>weniger</em> (dann Ja). Hier behauptet sie weniger.</p>");
+
+q("org-3c","tv",3,
+ "<span class=\"orig\">Originalklausur 2022 · Aufgabe 3 · je 1 Punkt</span>Steht die folgende Aussage so im Text oder ist sie eine direkte Folgerung daraus?<br><br><b>„Manche Manager sagen den Kollaps konventioneller Designs vorher.“</b>",
+ ["Nein","Ja"],0,
+ "<p><b>Nein — und diese Aussage ist die wichtigste Lektion der ganzen Aufgabe.</b> Der Text sagt: „the complete collapse of these conventional <b>methods</b>“ — der Zusammenbruch der konventionellen <em>Methoden</em> (also von Simulation und Testing). Die Aussage behauptet dagegen den Kollaps konventioneller <b>Designs</b> (also der Chips selbst). Ein einziges ausgetauschtes Substantiv, und die Aussage ist falsch.</p>"+
+ "<p><b>Diese Falle heißt Begriffsvertauschung</b> und ist der mit Abstand häufigste Trick in diesem Aufgabentyp. Der Satz klingt beim Überfliegen fast identisch mit dem Original, weil alle anderen Wörter stimmen. Gegenmittel: Unterstreiche in jeder Aussage das <b>Substantiv</b>, um das es geht, und suche genau dieses Wort im Text. Hier: „Designs“ — im Text steht an dieser Stelle „methods“.</p>"+
+ "<p>Im Text kommen beide Wörter mehrfach vor („design validation“, „the design is still infested“, „conventional methods“). Genau das macht die Verwechslung so leicht.</p>");
+
+q("org-3d","tv",3,
+ "<span class=\"orig\">Originalklausur 2022 · Aufgabe 3 · je 1 Punkt</span>Steht die folgende Aussage so im Text oder ist sie eine direkte Folgerung daraus?<br><br><b>„Bei subtileren Designfehlern (‚bugs‘) kommen Simulationen zum Einsatz.“</b>",
+ ["Ja","Nein"],0,
+ "<p><b>Ja.</b> Der Text beschreibt Simulation und Testing als „the currently practiced methods“ — sie sind also das, was tatsächlich eingesetzt wird. Und er sagt weiter, dass sie „an alarmingly increasing amount of time <b>to uncover the more subtle bugs</b>“ brauchen. Damit werden sie bei subtilen Fehlern eingesetzt — sie sind dabei nur langsam.</p>"+
+ "<p><b>Wichtig für den Aufgabentyp:</b> Gefragt ist nur, ob die Aussage im Text steht oder direkt daraus folgt — <em>nicht</em>, ob sie eine gute Idee beschreibt. Dass der Text den Einsatz bei subtilen Fehlern <em>kritisiert</em>, ändert nichts daran, dass er ihn beschreibt.</p>"+
+ "<p><b>Vergleiche bewusst mit Aussage 1</b> („Ein Vorteil von Tests ist …“). Beide handeln von subtilen Fehlern, aber nur eine bewertet. Die bewertende ist falsch, die rein beschreibende ist richtig. Genau an dieser Grenze entscheidet sich dieser Aufgabentyp.</p>");
+
+// Ableitungen im Klausurformat: gegeben f, gesucht f' — Quotienten- und Kettenregel
+q("abl-01","ableitung",1,"Wie lautet die Ableitung von <code>f(x) = ln(2x)</code>?",
+ ["f′(x) = 1/x","f′(x) = 2/x","f′(x) = 1/(2x)","f′(x) = 2·ln(x)","f′(x) = ln(2)/x"],0,
+ "<p><b>Die wichtigste Einzelheit der ganzen Originalklausur.</b> Kettenregel: äußere Ableitung mal innere Ableitung.</p>"+
+ "<ol><li>Äußere Funktion <code>ln(…)</code>, abgeleitet <code>1/(…)</code> — hier also <code>1/(2x)</code>.</li>"+
+ "<li>Innere Funktion <code>2x</code>, abgeleitet <code>2</code>.</li>"+
+ "<li>Multiplizieren: <code>(1/(2x)) · 2 = 1/x</code>.</li></ol>"+
+ "<p><b>Merke ein für alle Mal:</b> Ein konstanter Faktor im Logarithmus verschwindet beim Ableiten. <code>ln(2x)′ = ln(5x)′ = ln(x)′ = 1/x</code>. Grund: <code>ln(kx) = ln k + ln x</code>, und die Konstante <code>ln k</code> fällt weg.</p>");
+
+q("abl-02","ableitung",2,"Wie lautet die Ableitung von <code>f(x) = √(x² + 1)</code>?",
+ ["f′(x) = x / √(x² + 1)","f′(x) = 2x / √(x² + 1)","f′(x) = 1 / (2√(x² + 1))","f′(x) = √(2x)","f′(x) = x² / √(x² + 1)"],0,
+ "<ol><li>Als Potenz schreiben: <code>f = (x² + 1)^½</code>.</li>"+
+ "<li>Äußere Ableitung: <code>½ · (x² + 1)^(−½) = 1/(2√(x² + 1))</code>.</li>"+
+ "<li>Innere Ableitung von <code>x² + 1</code>: <code>2x</code>.</li>"+
+ "<li>Multiplizieren: <code>2x / (2√(x² + 1)) = x / √(x² + 1)</code> — die 2 kürzt sich.</li></ol>"+
+ "<p><b>Faustformel zum Auswendiglernen:</b> <code>√(u)′ = u′ / (2√u)</code>. Bei <code>u = x² ± c</code> kürzt sich die 2 immer weg, es bleibt schlicht <code>x/√(x² ± c)</code>. Genau dieser Baustein kam in der Originalklausur vor.</p>");
+
+q("abl-03","ableitung",2,"Wie lautet die Ableitung von <code>f(x) = ln(3x) / x</code>?",
+ ["f′(x) = (1 − ln(3x)) / x²","f′(x) = (ln(3x) − 1) / x²","f′(x) = 3/x²","f′(x) = 1/x²","f′(x) = (1 − 3·ln(3x)) / x²"],0,
+ "<p>Quotientenregel <code>f′ = (u′v − uv′)/v²</code> mit <code>u = ln(3x)</code>, <code>v = x</code>.</p>"+
+ "<ol><li><code>u′ = 1/x</code> (die 3 verschwindet, siehe Regel zu ln).</li>"+
+ "<li><code>v′ = 1</code>.</li>"+
+ "<li>Zähler: <code>(1/x)·x − ln(3x)·1 = 1 − ln(3x)</code>.</li>"+
+ "<li>Nenner: <code>x²</code>.</li></ol>"+
+ "<p><b>Die klassische Verwechslung</b> ist die Reihenfolge im Zähler: erst <code>u′v</code>, dann <b>minus</b> <code>uv′</code>. Wer das dreht, landet bei <code>(ln(3x) − 1)/x²</code> — derselbe Bruch mit umgekehrtem Vorzeichen. Eselsbrücke: „<b>N</b>enner mal Ableitung <b>Z</b>ähler minus <b>Z</b>ähler mal Ableitung <b>N</b>enner“ — also NAZ minus ZAN.</p>");
+
+q("abl-04","ableitung",2,"Wie lautet die Ableitung von <code>f(x) = x / ln(x)</code>?",
+ ["f′(x) = (ln(x) − 1) / ln(x)²","f′(x) = (1 − ln(x)) / ln(x)²","f′(x) = 1 / ln(x)²","f′(x) = ln(x)/x","f′(x) = (ln(x) − x) / ln(x)²"],0,
+ "<p>Quotientenregel mit <code>u = x</code> (also <code>u′ = 1</code>) und <code>v = ln(x)</code> (also <code>v′ = 1/x</code>).</p>"+
+ "<ol><li>Zähler: <code>1 · ln(x) − x · (1/x) = ln(x) − 1</code>. Beachte, wie sich das <code>x</code> gegen <code>1/x</code> wegkürzt — dieser Effekt tritt fast immer auf, wenn ein <code>x</code> auf ein <code>ln</code> trifft.</li>"+
+ "<li>Nenner: <code>ln(x)²</code>.</li></ol>"+
+ "<p>Vergleiche mit der vorigen Aufgabe: Dort stand ln oben, hier unten — und prompt dreht sich das Vorzeichen im Zähler um. Wenn du beide sicher kannst, sitzt die Quotientenregel.</p>");
+
+q("abl-05","ableitung",3,"Wie lautet die Ableitung von <code>f(x) = √(x² − 5) · ln(2x)</code>?",
+ ["f′(x) = (x·ln(2x)) / √(x² − 5) + √(x² − 5)/x",
+  "f′(x) = (x·ln(2x)) / √(x² − 5) − √(x² − 5)/x",
+  "f′(x) = 2x · ln(2x) + √(x² − 5)/(2x)",
+  "f′(x) = x / (√(x² − 5) · x)",
+  "f′(x) = (x + ln(2x)) / √(x² − 5)"],0,
+ "<p>Dieselben zwei Bausteine wie in der Originalklausur, aber als <b>Produkt</b> statt als Quotient. Produktregel: <code>(u·v)′ = u′v + uv′</code> — hier steht ein <b>Plus</b>.</p>"+
+ "<ol><li><code>u = √(x² − 5)</code>, also <code>u′ = x/√(x² − 5)</code>.</li>"+
+ "<li><code>v = ln(2x)</code>, also <code>v′ = 1/x</code>.</li>"+
+ "<li><code>f′ = (x/√(x² − 5))·ln(2x) + √(x² − 5)·(1/x)</code>.</li></ol>"+
+ "<p><b>Warum diese Aufgabe wichtig ist:</b> In der Klausur entscheidet sich alles daran, ob du die beiden Bausteine <code>u′</code> und <code>v′</code> sicher hast. Ob sie dann durch Produkt- oder Quotientenregel verbunden werden, ist nur noch Buchhaltung. Übe die Bausteine, nicht die Gesamtformel.</p>");
+
+q("abl-06","ableitung",2,"Wie lautet die Ableitung von <code>f(x) = x² · ln(x)</code>?",
+ ["f′(x) = x · (2·ln(x) + 1)","f′(x) = 2x / x","f′(x) = 2x · ln(x)","f′(x) = 2x + 1/x","f′(x) = x²/x + 2x"],0,
+ "<p>Produktregel mit <code>u = x²</code> (<code>u′ = 2x</code>) und <code>v = ln(x)</code> (<code>v′ = 1/x</code>).</p>"+
+ "<ol><li><code>f′ = 2x·ln(x) + x²·(1/x)</code>.</li>"+
+ "<li>Der zweite Term vereinfacht sich: <code>x²/x = x</code>.</li>"+
+ "<li>Also <code>f′ = 2x·ln(x) + x</code>, ausgeklammert <code>x·(2·ln(x) + 1)</code>.</li></ol>"+
+ "<p><b>Zum Antwortenvergleich im Test:</b> <code>2x·ln(x) + x</code> und <code>x·(2·ln(x) + 1)</code> sind dasselbe. Wenn deine Rechnung nicht wörtlich unter den Optionen steht, klammere aus oder multipliziere aus, bevor du an einen Fehler glaubst.</p>");
+
+q("abl-07","ableitung",2,"Wie lautet die Ableitung von <code>f(x) = e^(x²)</code>?",
+ ["f′(x) = 2x · e^(x²)","f′(x) = e^(x²)","f′(x) = x² · e^(x²−1)","f′(x) = 2x · e^(2x)","f′(x) = e^(2x)"],0,
+ "<ol><li>Die e-Funktion bleibt beim Ableiten unverändert stehen: <code>e^(x²)</code>.</li>"+
+ "<li>Kettenregel: mal innere Ableitung, und die innere Funktion ist <code>x²</code> mit Ableitung <code>2x</code>.</li></ol>"+
+ "<p><b>Typischer Fehler:</b> die Potenzregel auf den Exponenten anwenden und <code>x²·e^(x²−1)</code> hinschreiben. Die Potenzregel gilt, wenn <code>x</code> in der <em>Basis</em> steht (<code>x²</code>), nicht wenn es im <em>Exponenten</em> steht (<code>e^(x²)</code>). Faustformel: <code>e^u′ = u′ · e^u</code>.</p>");
+
+q("abl-08","ableitung",2,"Wie lautet die Ableitung von <code>f(x) = ln(x² + 1)</code>?",
+ ["f′(x) = 2x / (x² + 1)","f′(x) = 1 / (x² + 1)","f′(x) = 2x","f′(x) = 1/(2x)","f′(x) = (x² + 1)/(2x)"],0,
+ "<ol><li>Äußere Ableitung von <code>ln(u)</code> ist <code>1/u</code>, also <code>1/(x² + 1)</code>.</li>"+
+ "<li>Innere Ableitung von <code>x² + 1</code> ist <code>2x</code>.</li>"+
+ "<li>Multiplizieren: <code>2x/(x² + 1)</code>.</li></ol>"+
+ "<p><b>Allgemeine Form, die du im Kopf haben solltest:</b> <code>ln(u)′ = u′/u</code>. Damit sind alle Logarithmus-Ableitungen ein Einzeiler: die Ableitung des Inneren über das Innere. Anders als bei <code>ln(2x)</code> bleibt hier etwas stehen, weil <code>x² + 1</code> kein konstantes Vielfaches von x ist.</p>");
+
+q("abl-09","ableitung",2,"Wie lautet die Ableitung von <code>f(x) = e^x / x</code>?",
+ ["f′(x) = e^x · (x − 1) / x²","f′(x) = e^x / 1","f′(x) = e^x · (1 − x) / x²","f′(x) = e^x/x²","f′(x) = e^x · x²"],0,
+ "<p>Quotientenregel mit <code>u = e^x</code> (<code>u′ = e^x</code>) und <code>v = x</code> (<code>v′ = 1</code>).</p>"+
+ "<ol><li>Zähler: <code>e^x · x − e^x · 1 = e^x(x − 1)</code>.</li>"+
+ "<li>Nenner: <code>x²</code>.</li></ol>"+
+ "<p>Ausklammern von <code>e^x</code> ist hier fast Pflicht — die Antwortoptionen stehen in der Klausur praktisch immer in der ausgeklammerten Form. Die Variante <code>e^x·(1 − x)/x²</code> hat das Vorzeichen im Zähler gedreht (ZAN minus NAZ statt NAZ minus ZAN).</p>");
+
+q("abl-10","ableitung",3,"Wie lautet die Ableitung von <code>f(x) = √x · ln(x)</code>?",
+ ["f′(x) = (ln(x) + 2) / (2√x)","f′(x) = ln(x) / (2√x)","f′(x) = (ln(x) − 2) / (2√x)","f′(x) = 1/(2√x) · 1/x","f′(x) = √x / x"],0,
+ "<p>Produktregel mit <code>u = √x</code> (<code>u′ = 1/(2√x)</code>) und <code>v = ln(x)</code> (<code>v′ = 1/x</code>).</p>"+
+ "<ol><li><code>f′ = ln(x)/(2√x) + √x/x</code>.</li>"+
+ "<li>Zweiten Term vereinfachen: <code>√x/x = 1/√x</code>, denn <code>x = √x·√x</code>.</li>"+
+ "<li>Auf gemeinsamen Nenner <code>2√x</code> bringen: <code>1/√x = 2/(2√x)</code>.</li>"+
+ "<li>Zusammen: <code>(ln(x) + 2)/(2√x)</code>.</li></ol>"+
+ "<p><b>Die Rechentechnik, die hier zählt:</b> <code>√x/x = 1/√x</code>. Wurzelterme lassen sich fast immer vereinfachen, indem man alles als Potenz schreibt: <code>x^½ / x¹ = x^(−½)</code>. In der Klausur brauchst du diesen Schritt, um deine Lösung überhaupt in einer der Antwortoptionen wiederzufinden.</p>");
+
+q("abl-11","ableitung",2,"Wie lautet die Ableitung von <code>f(x) = (x² + 1)³</code>?",
+ ["f′(x) = 6x · (x² + 1)²","f′(x) = 3 · (x² + 1)²","f′(x) = 3 · (2x)²","f′(x) = 6x · (x² + 1)³","f′(x) = (2x)³"],0,
+ "<ol><li>Äußere Ableitung: <code>3 · (x² + 1)²</code> — der Klammerinhalt bleibt unangetastet stehen.</li>"+
+ "<li>Innere Ableitung: <code>2x</code>.</li>"+
+ "<li>Multiplizieren: <code>3 · 2x · (x² + 1)² = 6x(x² + 1)²</code>.</li></ol>"+
+ "<p><b>Der häufigste Fehler bei der Kettenregel</b> ist, die innere Ableitung schlicht zu vergessen und bei <code>3·(x² + 1)²</code> stehen zu bleiben. Gewöhne dir an, nach jedem Ableiten einer Klammer laut „mal innere Ableitung“ mitzudenken.</p>");
+
+q("abl-12","ableitung",3,"Wie lautet die Ableitung von <code>f(x) = 1 / √(x² − 5)</code>?",
+ ["f′(x) = −x / √(x² − 5)³","f′(x) = x / √(x² − 5)³","f′(x) = −1 / (2√(x² − 5))","f′(x) = 1/(2x)","f′(x) = −2x / √(x² − 5)"],0,
+ "<ol><li>Als Potenz schreiben: <code>f = (x² − 5)^(−½)</code>. Das erspart die Quotientenregel vollständig.</li>"+
+ "<li>Potenzregel: <code>−½ · (x² − 5)^(−³⁄₂)</code>.</li>"+
+ "<li>Kettenregel: mal <code>2x</code>. Die 2 kürzt sich gegen das ½.</li>"+
+ "<li>Ergebnis: <code>−x · (x² − 5)^(−³⁄₂) = −x/√(x² − 5)³</code>.</li></ol>"+
+ "<p><b>Strategie:</b> Wenn im Zähler nur eine 1 steht, nie die Quotientenregel benutzen — als negative Potenz schreiben und ableiten. Das ist kürzer und deutlich weniger fehleranfällig. Das Minuszeichen kommt vom negativen Exponenten und wird gern vergessen.</p>");
+
+q("abl-13","ableitung",3,"Wie lautet die Ableitung von <code>f(x) = ln(x) / x²</code>?",
+ ["f′(x) = (1 − 2·ln(x)) / x³","f′(x) = (1 − ln(x)) / x³","f′(x) = (2·ln(x) − 1) / x³","f′(x) = 1 / (2x³)","f′(x) = (1 − 2·ln(x)) / x⁴"],0,
+ "<p>Quotientenregel mit <code>u = ln(x)</code> (<code>u′ = 1/x</code>) und <code>v = x²</code> (<code>v′ = 2x</code>).</p>"+
+ "<ol><li>Zähler: <code>(1/x)·x² − ln(x)·2x = x − 2x·ln(x)</code>.</li>"+
+ "<li>Nenner: <code>(x²)² = x⁴</code>.</li>"+
+ "<li>Kürzen: Zähler <code>x(1 − 2·ln(x))</code>, also <code>x(1 − 2·ln(x))/x⁴ = (1 − 2·ln(x))/x³</code>.</li></ol>"+
+ "<p><b>Der Schritt, der Punkte kostet:</b> das Kürzen am Ende. Die Variante mit <code>x⁴</code> im Nenner und bereits gekürztem Zähler ist deshalb falsch. Nach der Quotientenregel immer prüfen, ob sich ein <code>x</code> ausklammern lässt.</p>");
+
+q("abl-14","ableitung",2,"Wie lautet die Ableitung von <code>f(x) = x · e^(2x)</code>?",
+ ["f′(x) = e^(2x) · (1 + 2x)","f′(x) = e^(2x)","f′(x) = 2x · e^(2x)","f′(x) = e^(2x) · (1 + x)","f′(x) = 2 · e^(2x)"],0,
+ "<p>Produktregel mit <code>u = x</code> (<code>u′ = 1</code>) und <code>v = e^(2x)</code> (<code>v′ = 2e^(2x)</code>, Kettenregel).</p>"+
+ "<ol><li><code>f′ = 1 · e^(2x) + x · 2e^(2x)</code>.</li>"+
+ "<li><code>e^(2x)</code> ausklammern: <code>e^(2x)(1 + 2x)</code>.</li></ol>"+
+ "<p>Die Variante <code>e^(2x)·(1 + x)</code> vergisst die innere Ableitung 2 bei <code>e^(2x)</code> — die häufigste Fehlerquelle, sobald die Exponentialfunktion einen Faktor im Exponenten trägt.</p>");
+
+q("abl-15","ableitung",3,"Wie lautet die Ableitung von <code>f(x) = sin(2x) / x</code>?",
+ ["f′(x) = (2x·cos(2x) − sin(2x)) / x²","f′(x) = (cos(2x) − sin(2x)) / x²","f′(x) = 2·cos(2x)/x","f′(x) = (x·cos(2x) − sin(2x)) / x²","f′(x) = −2·cos(2x)/x²"],0,
+ "<p>Quotientenregel mit <code>u = sin(2x)</code> und <code>v = x</code>.</p>"+
+ "<ol><li><code>u′ = cos(2x) · 2 = 2·cos(2x)</code> — Kettenregel, die innere Ableitung von <code>2x</code> ist 2.</li>"+
+ "<li><code>v′ = 1</code>.</li>"+
+ "<li>Zähler: <code>2·cos(2x)·x − sin(2x)·1</code>.</li>"+
+ "<li>Nenner: <code>x²</code>.</li></ol>"+
+ "<p>Die Variante mit <code>x·cos(2x)</code> im Zähler hat die innere Ableitung bei <code>sin(2x)</code> unterschlagen. Prüfe bei jeder trigonometrischen Funktion, ob im Argument mehr als ein nacktes <code>x</code> steht.</p>");
+
+q("abl-16","ableitung",3,"Wie lautet die Ableitung von <code>f(x) = √(ln(x))</code>?",
+ ["f′(x) = 1 / (2x·√(ln(x)))","f′(x) = 1 / (2√(ln(x)))","f′(x) = 1/(2x)","f′(x) = √(1/x)","f′(x) = ln(x) / (2√x)"],0,
+ "<p>Zweifache Verschachtelung — genau die Bauart, die in der Klausur 8 Punkte wert ist.</p>"+
+ "<ol><li>Äußere Funktion ist die Wurzel: <code>√(u)′ = 1/(2√u)</code>, also <code>1/(2√(ln(x)))</code>.</li>"+
+ "<li>Innere Funktion ist <code>ln(x)</code> mit Ableitung <code>1/x</code>.</li>"+
+ "<li>Multiplizieren: <code>1/(2√(ln(x))) · 1/x = 1/(2x·√(ln(x)))</code>.</li></ol>"+
+ "<p><b>Vorgehen bei Verschachtelungen:</b> Von außen nach innen abarbeiten und die Faktoren einfach aneinanderhängen. Frage dich: „Was würde ich zuerst tun, wenn ich für ein konkretes x einen Wert ausrechnen wollte?“ Die <em>letzte</em> Rechenoperation ist die <em>äußere</em> Funktion — hier ziehst du zuletzt die Wurzel.</p>");
+
+q("abl-17","ableitung",2,"Wie lautet die Ableitung von <code>f(x) = cos(x²)</code>?",
+ ["f′(x) = −2x · sin(x²)","f′(x) = −sin(x²)","f′(x) = 2x · sin(x²)","f′(x) = −sin(2x)","f′(x) = −2x · cos(x²)"],0,
+ "<ol><li>Äußere Ableitung: <code>cos(u)′ = −sin(u)</code>, also <code>−sin(x²)</code>. Das Minus gehört zum Cosinus.</li>"+
+ "<li>Innere Ableitung von <code>x²</code>: <code>2x</code>.</li>"+
+ "<li>Zusammen: <code>−2x·sin(x²)</code>.</li></ol>"+
+ "<p><b>Die vier Werte, die sitzen müssen:</b> <code>sin′ = cos</code>, <code>cos′ = −sin</code>, <code>(−sin)′ = −cos</code>, <code>(−cos)′ = sin</code>. Das Minus taucht nur beim Ableiten des Cosinus auf — wer das verwechselt, verliert die ganze Aufgabe.</p>");
+
+q("abl-18","ableitung",3,"Wie lautet die Ableitung von <code>f(x) = x² / √(x + 1)</code>?",
+ ["f′(x) = x·(3x + 4) / (2·√(x + 1)³)","f′(x) = 2x / √(x + 1)","f′(x) = (2x·√(x+1) − x²) / (x + 1)","f′(x) = x² / (2√(x + 1))","f′(x) = (3x + 4) / (2√(x + 1))"],0,
+ "<p>Quotientenregel mit <code>u = x²</code> (<code>u′ = 2x</code>) und <code>v = √(x + 1)</code> (<code>v′ = 1/(2√(x+1))</code>).</p>"+
+ "<ol><li>Zähler: <code>2x·√(x+1) − x²/(2√(x+1))</code>.</li>"+
+ "<li>Nenner: <code>(√(x+1))² = x + 1</code>.</li>"+
+ "<li>Doppelbruch auflösen: Zähler und Nenner mit <code>2√(x+1)</code> erweitern. Zähler wird <code>4x(x+1) − x² = 4x² + 4x − x² = 3x² + 4x</code>, Nenner wird <code>2(x+1)·√(x+1) = 2√(x+1)³</code>.</li>"+
+ "<li><code>x</code> ausklammern: <code>x(3x + 4) / (2√(x+1)³)</code>.</li></ol>"+
+ "<p><b>Das ist die härteste Bauart überhaupt:</b> eine Wurzel im Nenner erzeugt einen Doppelbruch. Standardgriff: mit dem Wurzelterm erweitern, damit die Wurzel aus dem Zwischen-Nenner verschwindet. Genau dieser Schritt war auch in der Originalklausur nötig, um von der rohen Quotientenregel auf die angebotene Antwortform zu kommen.</p>");
+
+// Symmetrieverhalten von Funktionen — der 4-Punkte-Block der Klausur
+q("sym-01","symmetrie",1,"Welches Symmetrieverhalten hat <code>f(x) = x³ − x</code>?",
+ ["punktsymmetrisch zum Ursprung","achsensymmetrisch zur y-Achse","punktsymmetrisch zu (1, 0)","achsensymmetrisch zur x-Achse","keine Symmetrie"],0,
+ "<p><b>Der Test, der immer funktioniert:</b> Setze <code>−x</code> ein und vergleiche mit <code>f(x)</code>.</p>"+
+ "<ol><li><code>f(−x) = (−x)³ − (−x) = −x³ + x</code>.</li>"+
+ "<li>Das ist genau <code>−(x³ − x) = −f(x)</code>.</li>"+
+ "<li><code>f(−x) = −f(x)</code> heißt <b>ungerade</b> = punktsymmetrisch zum Ursprung.</li></ol>"+
+ "<p><b>Schnellregel für Polynome:</b> Kommen <em>nur</em> ungerade Exponenten vor (x¹, x³, x⁵ …), ist die Funktion ungerade. Kommen <em>nur</em> gerade vor (x⁰, x², x⁴ …), ist sie gerade. Gemischt heißt: keine der beiden Symmetrien. Daher der Name.</p>");
+
+q("sym-02","symmetrie",1,"Welches Symmetrieverhalten hat <code>f(x) = x⁴ − 3x² + 1</code>?",
+ ["achsensymmetrisch zur y-Achse","punktsymmetrisch zum Ursprung","punktsymmetrisch zu (0, 1)","achsensymmetrisch zur x-Achse","keine Symmetrie"],0,
+ "<ol><li><code>f(−x) = (−x)⁴ − 3(−x)² + 1 = x⁴ − 3x² + 1 = f(x)</code>. Gerade Exponenten schlucken das Minuszeichen.</li>"+
+ "<li><code>f(−x) = f(x)</code> heißt <b>gerade</b> = achsensymmetrisch zur y-Achse.</li></ol>"+
+ "<p>Die konstante 1 zählt als <code>1·x⁰</code>, also ebenfalls gerader Exponent — sie stört die Symmetrie nicht. Eine Konstante verschiebt den Graphen nur nach oben, und die y-Achse bleibt Spiegelachse.</p>");
+
+q("sym-03","symmetrie",2,"Welches Symmetrieverhalten hat <code>f(x) = x² · sin(x)</code>?",
+ ["punktsymmetrisch zum Ursprung","achsensymmetrisch zur y-Achse","keine Symmetrie","punktsymmetrisch zu (π, 0)","achsensymmetrisch zur Geraden x = π"],0,
+ "<p><b>Statt einzusetzen: die Bausteine einordnen.</b> Das ist im Test deutlich schneller.</p>"+
+ "<ol><li><code>x²</code> ist <b>gerade</b> (nur gerader Exponent).</li>"+
+ "<li><code>sin(x)</code> ist <b>ungerade</b>: <code>sin(−x) = −sin(x)</code>.</li>"+
+ "<li>Produktregel für Symmetrie: gerade · ungerade = <b>ungerade</b> → punktsymmetrisch zum Ursprung.</li></ol>"+
+ "<p><b>Die drei Produktregeln, die du auswendig brauchst</b> — sie funktionieren wie Vorzeichen beim Multiplizieren (gerade = „+“, ungerade = „−“):<br>gerade · gerade = gerade · ungerade · ungerade = gerade · gerade · ungerade = ungerade.<br>Dasselbe gilt für Quotienten. Genau darauf beruht die Originalklausur-Aufgabe.</p>");
+
+q("sym-04","symmetrie",2,"Welches Symmetrieverhalten hat <code>f(x) = sin(x) · cos(x)</code>?",
+ ["punktsymmetrisch zum Ursprung","achsensymmetrisch zur y-Achse","keine Symmetrie","achsensymmetrisch zur x-Achse","punktsymmetrisch zu (1, 0)"],0,
+ "<ol><li><code>sin(x)</code> ist ungerade, <code>cos(x)</code> ist gerade (<code>cos(−x) = cos(x)</code>).</li>"+
+ "<li>ungerade · gerade = ungerade → punktsymmetrisch zum Ursprung.</li></ol>"+
+ "<p><b>Gegenprobe:</b> <code>sin(x)·cos(x) = ½·sin(2x)</code>, und der Sinus ist ungerade — passt.</p>"+
+ "<p><b>Unbedingt merken:</b> <code>sin</code> ist ungerade, <code>cos</code> ist gerade. Anschaulich: Der Cosinus hat bei <code>x = 0</code> seinen Hochpunkt und liegt spiegelbildlich zur y-Achse; der Sinus geht bei 0 durch den Ursprung und steigt auf beiden Seiten entgegengesetzt.</p>");
+
+q("sym-05","symmetrie",2,"Welches Symmetrieverhalten hat <code>f(x) = (x − 2)³</code>?",
+ ["punktsymmetrisch zu (2, 0)","punktsymmetrisch zum Ursprung","achsensymmetrisch zur Geraden x = 2","achsensymmetrisch zur y-Achse","keine Symmetrie"],0,
+ "<p><b>Immer wenn überall derselbe Klammerausdruck steht, wird substituiert.</b></p>"+
+ "<ol><li>Setze <code>u = x − 2</code>. Dann ist <code>g(u) = u³</code>.</li>"+
+ "<li><code>u³</code> ist ungerade, also punktsymmetrisch zum Ursprung der u-Welt.</li>"+
+ "<li>Der Ursprung <code>u = 0</code> liegt bei <code>x = 2</code>. Also: punktsymmetrisch zu <code>(2, 0)</code>.</li></ol>"+
+ "<p><b>Die Merkregel für das Zurückübersetzen:</b> <code>x − a</code> in der Klammer bedeutet Verschiebung um <code>+a</code> nach rechts. Das Symmetriezentrum wandert genau mit. Vorsicht beim Vorzeichen: bei <code>(x + 2)³</code> läge das Zentrum bei <code>(−2, 0)</code>.</p>");
+
+q("sym-06","symmetrie",2,"Welches Symmetrieverhalten hat <code>f(x) = (x − 3)² + 4</code>?",
+ ["achsensymmetrisch zur Geraden x = 3","achsensymmetrisch zur y-Achse","punktsymmetrisch zu (3, 4)","punktsymmetrisch zum Ursprung","keine Symmetrie"],0,
+ "<ol><li>Substituiere <code>u = x − 3</code>: <code>g(u) = u² + 4</code>.</li>"+
+ "<li><code>u² + 4</code> ist gerade (nur gerade Exponenten), also achsensymmetrisch zur u-Achse durch <code>u = 0</code>.</li>"+
+ "<li><code>u = 0</code> entspricht <code>x = 3</code> → Spiegelachse ist die <b>senkrechte Gerade x = 3</b>.</li></ol>"+
+ "<p><b>Wichtiger Unterschied zur Punktsymmetrie:</b> Bei Achsensymmetrie ist das Ergebnis eine <em>Gerade</em> (<code>x = 3</code>), bei Punktsymmetrie ein <em>Punkt</em> (<code>(3, 0)</code>). Das <code>+4</code> verschiebt hier nur nach oben und ist für die Achse völlig egal — bei Punktsymmetrie wäre es dagegen Teil des Zentrums.</p>");
+
+q("sym-07","symmetrie",3,"Welches Symmetrieverhalten hat <code>f(x) = sin(x + 2) · (x + 2)⁴</code>?",
+ ["punktsymmetrisch zu (−2, 0)","punktsymmetrisch zu (2, 0)","achsensymmetrisch zur Geraden x = −2","punktsymmetrisch zum Ursprung","keine Symmetrie"],0,
+ "<p>Baugleich mit der Originalklausur, nur mit anderen Zahlen und einer vierten Potenz.</p>"+
+ "<ol><li>Substituiere <code>u = x + 2</code>: <code>g(u) = sin(u) · u⁴</code>.</li>"+
+ "<li><code>sin(u)</code> ungerade, <code>u⁴</code> gerade → Produkt ungerade → punktsymmetrisch zum Ursprung der u-Welt.</li>"+
+ "<li><code>u = 0</code> bedeutet <code>x + 2 = 0</code>, also <code>x = −2</code>. Zentrum: <code>(−2, 0)</code>.</li></ol>"+
+ "<p><b>Vorzeichenfalle:</b> <code>(x + 2)</code> verschiebt nach <em>links</em>, das Zentrum liegt bei <code>−2</code>, nicht bei <code>+2</code>. Setze im Zweifel die Klammer null: <code>x + 2 = 0 → x = −2</code>. Dieser eine Handgriff verhindert den häufigsten Fehler der ganzen Aufgabengattung.</p>");
+
+q("sym-08","symmetrie",2,"Welches Symmetrieverhalten hat <code>f(x) = x³ + x²</code>?",
+ ["keine der beiden Symmetrien","punktsymmetrisch zum Ursprung","achsensymmetrisch zur y-Achse","achsensymmetrisch zur x-Achse","punktsymmetrisch zu (1, 0)"],0,
+ "<ol><li><code>f(−x) = −x³ + x²</code>.</li>"+
+ "<li>Das ist weder <code>f(x) = x³ + x²</code> noch <code>−f(x) = −x³ − x²</code>.</li>"+
+ "<li>Also weder gerade noch ungerade.</li></ol>"+
+ "<p><b>Warum:</b> gerade und ungerade Exponenten sind gemischt. Sobald in einem Polynom beide Sorten vorkommen, entfällt jede Achsen- oder Punktsymmetrie zum Ursprung. Prüfe das immer zuerst — es kostet drei Sekunden und erledigt viele Aufgaben sofort.</p>"+
+ "<p><b>Schnelle Gegenprobe mit einer Zahl:</b> <code>f(1) = 2</code>, <code>f(−1) = −1 + 1 = 0</code>. Bei gerader Funktion müsste <code>f(−1) = 2</code> sein, bei ungerader <code>−2</code>. Beides trifft nicht zu. Diese Ein-Zahl-Probe schließt im Test blitzschnell falsche Optionen aus.</p>");
+
+q("sym-09","symmetrie",2,"Welches Symmetrieverhalten hat <code>f(x) = 1/x</code>?",
+ ["punktsymmetrisch zum Ursprung","achsensymmetrisch zur y-Achse","keine Symmetrie","achsensymmetrisch zur x-Achse","punktsymmetrisch zu (1, 1)"],0,
+ "<ol><li><code>f(−x) = 1/(−x) = −1/x = −f(x)</code>.</li>"+
+ "<li>Also ungerade → punktsymmetrisch zum Ursprung.</li></ol>"+
+ "<p>Passt zur Schnellregel: <code>1/x = x^(−1)</code>, und <code>−1</code> ist ein ungerader Exponent. Die Regel für gerade und ungerade Exponenten gilt auch für negative Exponenten. Dass die Funktion bei <code>x = 0</code> gar nicht definiert ist, stört die Symmetrie nicht — der Definitionsbereich liegt selbst symmetrisch um null.</p>");
+
+q("sym-10","symmetrie",2,"Welches Symmetrieverhalten hat <code>f(x) = x² + cos(x)</code>?",
+ ["achsensymmetrisch zur y-Achse","punktsymmetrisch zum Ursprung","keine Symmetrie","achsensymmetrisch zur Geraden x = 1","punktsymmetrisch zu (0, 1)"],0,
+ "<ol><li><code>x²</code> ist gerade, <code>cos(x)</code> ist gerade.</li>"+
+ "<li><b>Summenregel:</b> gerade + gerade = gerade. Also achsensymmetrisch zur y-Achse.</li></ol>"+
+ "<p><b>Aufgepasst — Summen verhalten sich anders als Produkte:</b> Bei Summen gilt nur gerade + gerade = gerade und ungerade + ungerade = ungerade. <em>Gemischte</em> Summen (z. B. <code>x² + sin(x)</code>) haben gar keine Symmetrie. Bei Produkten dagegen liefert jede Kombination ein Ergebnis. Diese Unterscheidung wird oft verwechselt.</p>");
+
+q("sym-11","symmetrie",3,"Welches Symmetrieverhalten hat <code>f(x) = sin(x)/x</code>?",
+ ["achsensymmetrisch zur y-Achse","punktsymmetrisch zum Ursprung","keine Symmetrie","achsensymmetrisch zur x-Achse","punktsymmetrisch zu (1, 0)"],0,
+ "<ol><li>Zähler <code>sin(x)</code> ungerade, Nenner <code>x</code> ungerade.</li>"+
+ "<li>ungerade / ungerade = <b>gerade</b> — die beiden Minuszeichen kürzen sich weg.</li>"+
+ "<li>Also achsensymmetrisch zur y-Achse.</li></ol>"+
+ "<p><b>Rechnerisch nachvollzogen:</b> <code>f(−x) = sin(−x)/(−x) = (−sin x)/(−x) = sin(x)/x = f(x)</code>.</p>"+
+ "<p>Das ist die Aufgabe, bei der die meisten reflexhaft „ungerade“ ankreuzen, weil überall Ungerades steht. Rechne die Vorzeichen wie beim Multiplizieren: minus geteilt durch minus ergibt plus.</p>");
+
+q("sym-12","symmetrie",1,"Warum kann der Graph einer Funktion nie achsensymmetrisch zur x-Achse sein?",
+ ["Weil dann einem x-Wert zwei y-Werte zugeordnet wären.","Weil Funktionen immer durch den Ursprung gehen.","Weil die x-Achse keine Symmetrieachse sein darf.","Weil dann die Ableitung nicht existieren würde.","Das kann sehr wohl vorkommen, etwa bei f(x) = x²."],0,
+ "<p>Achsensymmetrie zur x-Achse würde bedeuten: Zu jedem Punkt <code>(x, y)</code> gehört auch <code>(x, −y)</code> zum Graphen. Dann hätte dasselbe <code>x</code> zwei verschiedene Funktionswerte — und genau das ist bei einer Funktion per Definition verboten (jedem x <em>genau ein</em> y).</p>"+
+ "<p><b>Warum das für die Klausur zählt:</b> „achsensymmetrisch zur x-Achse“ stand in der Originalklausur als Antwortoption. Es ist ein <b>Freischuss</b>: Diese Option kannst du bei jeder Symmetrieaufgabe sofort streichen, ohne zu rechnen. Damit sind von vier Optionen nur noch drei übrig.</p>");
+
+q("sym-13","symmetrie",2,"Welches Symmetrieverhalten hat <code>f(x) = cos(x − π)</code>?",
+ ["achsensymmetrisch zur Geraden x = π","punktsymmetrisch zu (π, 0)","achsensymmetrisch zur y-Achse","punktsymmetrisch zum Ursprung","keine Symmetrie"],0,
+ "<ol><li>Substituiere <code>u = x − π</code>: <code>g(u) = cos(u)</code>.</li>"+
+ "<li><code>cos</code> ist gerade → achsensymmetrisch zur senkrechten Achse durch <code>u = 0</code>.</li>"+
+ "<li><code>u = 0</code> heißt <code>x = π</code>. Also Spiegelachse <code>x = π</code>.</li></ol>"+
+ "<p><b>Gerade → Achse, ungerade → Punkt.</b> Diese Zuordnung ist der Kern der ganzen Aufgabengattung: Erst bestimmst du mit den Bausteinregeln, ob die substituierte Funktion gerade oder ungerade ist; erst danach übersetzt du die Verschiebung zurück.</p>");
+
+q("sym-14","symmetrie",3,"Eine Funktion g ist ungerade, eine Funktion h ist gerade. Was gilt für <code>f(x) = g(x) · h(x)</code>?",
+ ["f ist ungerade.","f ist gerade.","f hat keine Symmetrie.","f ist gerade, falls g(0) = 0.","Das lässt sich allgemein nicht sagen."],0,
+ "<p><b>Der Beweis in einer Zeile</b> — genau die Rechnung, die hinter der Originalklausur steckt:</p>"+
+ "<p><code>f(−x) = g(−x) · h(−x) = (−g(x)) · h(x) = −(g(x)·h(x)) = −f(x)</code></p>"+
+ "<p>Das eine Minuszeichen aus dem ungeraden Faktor überlebt und steht am Ende vor dem gesamten Produkt. Also ist f ungerade — punktsymmetrisch zum Ursprung.</p>"+
+ "<p><b>Vollständige Tabelle für Produkte und Quotienten:</b><br>"+
+ "gerade · gerade = gerade<br>ungerade · ungerade = gerade<br>gerade · ungerade = ungerade<br>"+
+ "Rechne einfach mit Vorzeichen: gerade = „+“, ungerade = „−“. Das Ergebnis stimmt immer.</p>");
+
+// Ehrliche, Lügner und Normale — der 8-Punkte-Logikblock
+q("rae-01","raetsel",1,"Auf der Insel gibt es Ehrliche (sagen immer die Wahrheit), Lügner (lügen immer) und Normale (sagen mal so, mal so). A sagt: <b>„Ich bin ein Lügner.“</b> Was ist A?",
+ ["A ist ein Normaler.","A ist ein Lügner.","A ist ein Ehrlicher.","Das lässt sich nicht bestimmen.","Die Situation ist unmöglich."],0,
+ "<p><b>Der Grundgriff: jede Rolle einzeln durchspielen und auf Widerspruch prüfen.</b></p>"+
+ "<ol><li><b>Wäre A ein Ehrlicher?</b> Dann müsste die Aussage wahr sein, A wäre also ein Lügner. Aber A sollte Ehrlicher sein. Widerspruch.</li>"+
+ "<li><b>Wäre A ein Lügner?</b> Dann müsste die Aussage falsch sein. Sie lautet „Ich bin ein Lügner“ — und die wäre ja wahr. Ein Lügner darf nichts Wahres sagen. Widerspruch.</li>"+
+ "<li><b>Wäre A ein Normaler?</b> Dann ist die Aussage falsch (A ist kein Lügner), und ein Normaler darf lügen. Kein Widerspruch.</li></ol>"+
+ "<p><b>Der Satz, den du in jeder Aufgabe brauchst:</b> Niemand außer einem Normalen kann „Ich bin ein Lügner“ sagen. Ehrliche dürfen nichts Falsches sagen, Lügner nichts Wahres — und diese Aussage ist für sie jeweils das Verbotene. Auf einer Insel <em>ohne</em> Normale wäre die Situation schlicht unmöglich.</p>");
+
+q("rae-02","raetsel",2,"Nur Ehrliche und Lügner. A sagt: <b>„Wir beide sind Lügner“</b> (über sich und B). Was folgt?",
+ ["A ist ein Lügner, B ist ein Ehrlicher.","A und B sind beide Lügner.","A ist ein Ehrlicher, B ist ein Lügner.","A und B sind beide Ehrliche.","Nicht bestimmbar."],0,
+ "<ol><li><b>Annahme: A ist Ehrlicher.</b> Dann wäre die Aussage wahr, also wäre A ein Lügner. Widerspruch — A ist kein Ehrlicher.</li>"+
+ "<li><b>Also ist A ein Lügner.</b> Dann ist seine Aussage falsch.</li>"+
+ "<li><b>Was heißt „falsch“ hier genau?</b> Die Aussage „A und B sind Lügner“ ist eine Und-Verknüpfung. Sie ist bereits dann falsch, wenn <em>mindestens einer</em> der beiden kein Lügner ist. A <em>ist</em> Lügner — also muss B der Ehrliche sein.</li></ol>"+
+ "<p><b>Das ist der entscheidende Punkt bei „und“-Aussagen:</b> Die Verneinung von „beide sind X“ ist <em>nicht</em> „beide sind nicht X“, sondern „mindestens einer ist nicht X“ (Regel von De Morgan). Wer hier falsch verneint, kommt zwangsläufig auf ein falsches Ergebnis.</p>");
+
+q("rae-03","raetsel",2,"Nur Ehrliche und Lügner. A sagt: <b>„Mindestens einer von uns beiden ist ein Lügner“</b> (über sich und B). Was folgt?",
+ ["A ist ein Ehrlicher, B ist ein Lügner.","A ist ein Lügner, B ist ein Ehrlicher.","Beide sind Lügner.","Beide sind Ehrliche.","Nicht bestimmbar."],0,
+ "<ol><li><b>Annahme: A ist Lügner.</b> Dann ist seine Aussage falsch. Die Verneinung von „mindestens einer ist Lügner“ lautet „<em>keiner</em> ist Lügner“ — dann wäre aber auch A kein Lügner. Widerspruch.</li>"+
+ "<li><b>Also ist A ein Ehrlicher</b>, und seine Aussage ist wahr: Mindestens einer der beiden ist ein Lügner.</li>"+
+ "<li>A selbst ist es nicht — also ist B der Lügner.</li></ol>"+
+ "<p><b>Vergleiche bewusst mit der vorigen Aufgabe:</b> Fast derselbe Satz („beide“ statt „mindestens einer“) führt zum genau umgekehrten Ergebnis. Deshalb musst du bei diesen Rätseln jedes Quantorenwort — <em>alle, beide, mindestens einer, keiner, genau einer</em> — wörtlich nehmen.</p>");
+
+q("rae-04","raetsel",2,"Nur Ehrliche und Lügner. A sagt: <b>„B ist ein Lügner.“</b> B sagt: <b>„A ist ein Lügner.“</b> Was folgt?",
+ ["Genau einer von beiden ist ein Lügner; wer, lässt sich nicht bestimmen.","Beide sind Lügner.","Beide sind Ehrliche.","A ist der Lügner.","B ist der Lügner."],0,
+ "<ol><li><b>Annahme: A ist Ehrlicher.</b> Dann stimmt seine Aussage, B ist Lügner. B sagt „A ist ein Lügner“ — das ist falsch, und ein Lügner sagt Falsches. Alles passt.</li>"+
+ "<li><b>Annahme: A ist Lügner.</b> Dann ist seine Aussage falsch, B ist also Ehrlicher. B sagt „A ist ein Lügner“ — das ist wahr, und ein Ehrlicher sagt Wahres. Passt ebenfalls.</li></ol>"+
+ "<p><b>Beide Fälle sind widerspruchsfrei</b>, also ist die Zuordnung nicht eindeutig. Sicher ist nur: Genau einer der beiden lügt — denn in beiden Szenarien ist es immer einer und nie beide.</p>"+
+ "<p><b>Lehre daraus:</b> Wenn nach dem Durchspielen mehr als ein Fall übrig bleibt, ist „nicht bestimmbar“ die richtige Antwort — nicht ein Ratefehler. Prüfe aber vorher, ob es eine <em>gemeinsame</em> Erkenntnis aller offenen Fälle gibt; genau die ist hier gefragt.</p>");
+
+q("rae-05","raetsel",3,"Nur Ehrliche und Lügner. A sagt: <b>„Wenn ich ein Ehrlicher bin, dann ist B ein Lügner.“</b> Was folgt?",
+ ["A ist ein Ehrlicher, B ist ein Lügner.","A ist ein Lügner, B ist ein Ehrlicher.","Beide sind Ehrliche.","Beide sind Lügner.","Nicht bestimmbar."],0,
+ "<p>Hier musst du wissen, wann eine <b>Wenn-dann-Aussage falsch</b> ist: nur dann, wenn die Bedingung erfüllt ist, die Folge aber nicht. In allen anderen Fällen ist sie wahr — insbesondere ist sie <b>automatisch wahr, wenn die Bedingung falsch ist</b>.</p>"+
+ "<ol><li><b>Annahme: A ist Lügner.</b> Dann müsste seine Aussage falsch sein. Falsch wäre sie nur, wenn „Ich bin ein Ehrlicher“ zuträfe — A ist aber Lügner, die Bedingung ist also falsch. Damit ist die gesamte Wenn-dann-Aussage <b>wahr</b>. Ein Lügner kann nichts Wahres sagen. Widerspruch.</li>"+
+ "<li><b>Also ist A ein Ehrlicher</b>, und seine Aussage ist wahr.</li>"+
+ "<li>Da A tatsächlich Ehrlicher ist, ist die Bedingung erfüllt — also muss auch die Folge gelten: B ist ein Lügner.</li></ol>"+
+ "<p><b>Das ist die anspruchsvollste Bauart dieser Rätsel</b> und genau deshalb prüfungsrelevant. Merke: Eine Wenn-dann-Aussage mit falscher Bedingung ist wahr. Ein Lügner kann sie deshalb nie aussprechen.</p>");
+
+q("rae-06","raetsel",3,"Genau einer von A, B, C ist Ehrlicher, einer Lügner, einer Normaler. <b>A: „C ist ein Lügner.“ B: „A ist ein Ehrlicher.“ C: „Ich bin ein Normaler.“</b> Wer ist was?",
+ ["A Ehrlicher, B Normaler, C Lügner","A Lügner, B Normaler, C Ehrlicher","A Normaler, B Ehrlicher, C Lügner","A Ehrlicher, B Lügner, C Normaler","A Lügner, B Ehrlicher, C Normaler","A Normaler, B Lügner, C Ehrlicher"],0,
+ "<p><b>Beginne immer bei der Aussage über die eigene Person</b> — die schränkt am stärksten ein.</p>"+
+ "<ol><li><b>C sagt „Ich bin ein Normaler.“</b> Ein Ehrlicher könnte das nicht sagen (wäre falsch). Ein Normaler könnte es sagen (wäre wahr). Ein Lügner könnte es sagen (wäre falsch — er ist ja kein Normaler). Also ist C <b>Normaler oder Lügner</b>, aber kein Ehrlicher.</li>"+
+ "<li><b>Fall C = Normaler.</b> Dann ist A's Aussage („C ist Lügner“) falsch, A ist also nicht Ehrlicher — A muss Lügner sein, B wäre Ehrlicher. Aber B sagt „A ist ein Ehrlicher“, was dann falsch wäre. Ein Ehrlicher darf nichts Falsches sagen. <b>Widerspruch.</b></li>"+
+ "<li><b>Fall C = Lügner.</b> Dann ist A's Aussage wahr, A ist also Ehrlicher oder Normaler. B sagt „A ist ein Ehrlicher“.<br>· Wäre A Normaler, wäre B's Aussage falsch, B müsste Lügner sein — die Rolle hat aber schon C. Widerspruch.<br>· Also ist <b>A Ehrlicher</b>, und für B bleibt <b>Normaler</b>. Probe: B sagt etwas Wahres, das darf ein Normaler. Alles passt.</li></ol>"+
+ "<p><b>Ergebnis: A Ehrlicher, B Normaler, C Lügner.</b> Beachte das Muster: Der Widerspruch entsteht beide Male beim <em>Ehrlichen</em> oder <em>Lügner</em> — nie beim Normalen, denn der darf alles sagen. Prüfe deshalb die beiden strengen Rollen zuerst.</p>");
+
+q("rae-07","raetsel",3,"Genau einer von A, B, C ist Ehrlicher, einer Lügner, einer Normaler. <b>A: „Ich bin kein Lügner.“ B: „Ich bin kein Ehrlicher.“ C: „Ich bin kein Normaler.“</b> Wer ist was?",
+ ["A Lügner, B Normaler, C Ehrlicher","A Ehrlicher, B Normaler, C Lügner","A Normaler, B Lügner, C Ehrlicher","A Ehrlicher, B Lügner, C Normaler","A Lügner, B Ehrlicher, C Normaler","A Normaler, B Ehrlicher, C Lügner"],0,
+ "<p>Alle drei reden über sich selbst — arbeite die strengen Rollen der Reihe nach ab.</p>"+
+ "<ol><li><b>B sagt „Ich bin kein Ehrlicher.“</b> Wäre B Ehrlicher, wäre die Aussage falsch — verboten. Wäre B Lügner, wäre die Aussage wahr („kein Ehrlicher“ stimmt ja) — für einen Lügner ebenfalls verboten. Also ist <b>B ein Normaler</b>.</li>"+
+ "<li><b>C sagt „Ich bin kein Normaler.“</b> B ist bereits der Normale, C also Ehrlicher oder Lügner. Wäre C Lügner, wäre die Aussage wahr — verboten. Also ist <b>C ein Ehrlicher</b>, und die Aussage stimmt.</li>"+
+ "<li>Für A bleibt <b>Lügner</b>. Probe: A sagt „Ich bin kein Lügner“ — das ist falsch, und genau das muss ein Lügner tun. Passt.</li></ol>"+
+ "<p><b>Dieselbe Lösungsstruktur wie in der Originalklausur.</b> Der Schlüssel ist immer dieselbe Frage: <em>Welche Rollen kann diese Person aufgrund ihrer eigenen Aussage nicht haben?</em> Sobald eine Rolle eindeutig vergeben ist, fällt der Rest wie eine Kette.</p>");
+
+q("rae-08","raetsel",2,"Nur Ehrliche und Lügner. A sagt: <b>„Ich bin ein Ehrlicher.“</b> Was folgt?",
+ ["Nichts – jeder von beiden könnte das sagen.","A ist ein Ehrlicher.","A ist ein Lügner.","Die Situation ist unmöglich.","A ist ein Normaler."],0,
+ "<ol><li><b>Wäre A Ehrlicher:</b> Die Aussage wäre wahr — genau das, was ein Ehrlicher tun muss. Möglich.</li>"+
+ "<li><b>Wäre A Lügner:</b> Die Aussage „Ich bin ein Ehrlicher“ wäre falsch — genau das, was ein Lügner tun muss. Ebenfalls möglich.</li></ol>"+
+ "<p><b>Also liefert diese Aussage null Information.</b> Auf der Insel behauptet <em>jeder</em>, ehrlich zu sein.</p>"+
+ "<p><b>Das ist das genaue Gegenstück zu „Ich bin ein Lügner“:</b> Diesen Satz kann niemand sagen, jenen kann jeder sagen. Beide Extremfälle solltest du sofort erkennen — sie tauchen als Bausteine in größeren Rätseln auf und sparen dort viel Zeit.</p>");
+
+q("rae-09","raetsel",3,"Nur Ehrliche und Lügner. A sagt: <b>„B und ich gehören zur selben Sorte.“</b> Was folgt sicher?",
+ ["B ist ein Ehrlicher.","B ist ein Lügner.","A ist ein Ehrlicher.","A ist ein Lügner.","Nichts folgt."],0,
+ "<ol><li><b>Annahme: A ist Ehrlicher.</b> Dann ist die Aussage wahr, also gehört B zur selben Sorte — B ist Ehrlicher.</li>"+
+ "<li><b>Annahme: A ist Lügner.</b> Dann ist die Aussage falsch, die beiden gehören also <em>nicht</em> zur selben Sorte — B ist demnach Ehrlicher.</li></ol>"+
+ "<p><b>In beiden Fällen ist B ein Ehrlicher</b>, obwohl offen bleibt, was A ist. Genau das ist gefragt: nicht die vollständige Zuordnung, sondern die Aussage, die in <em>jedem</em> möglichen Fall gilt.</p>"+
+ "<p><b>Technik zum Mitnehmen:</b> Wenn beide Annahmen widerspruchsfrei sind, schreibe für jeden Fall auf, was folgt, und suche die Schnittmenge. Was in allen Fällen gleich ist, ist gesichert — der Rest bleibt offen.</p>");
+
+q("rae-10","raetsel",3,"Genau einer von A, B, C ist Ehrlicher, einer Lügner, einer Normaler. <b>A: „B ist ein Lügner.“ B: „Ich bin kein Lügner.“</b> C schweigt. Wer ist der Lügner?",
+ ["A","B","C","Nicht bestimmbar","Es gibt keinen Lügner."],0,
+ "<ol><li><b>B sagt „Ich bin kein Lügner.“</b> Wäre B der Lügner, wäre diese Aussage falsch — das ist für einen Lügner erlaubt. Kein Widerspruch, B <em>könnte</em> der Lügner sein.<br>Wäre B Ehrlicher oder Normaler, wäre die Aussage wahr — ebenfalls erlaubt. Aus B's Aussage folgt also nichts.</li>"+
+ "<li><b>Weiter über A.</b> Angenommen, A wäre Ehrlicher. Dann ist B tatsächlich Lügner, und C ist Normaler. Prüfung: B (Lügner) sagt „Ich bin kein Lügner“ — falsch, erlaubt. Alles widerspruchsfrei.</li>"+
+ "<li><b>Andere Möglichkeit prüfen.</b> Angenommen, A wäre Lügner. Dann ist seine Aussage falsch, B ist also kein Lügner — passt, denn A ist es ja selbst. B wäre dann Ehrlicher oder Normaler, C das jeweils andere. Auch das ist widerspruchsfrei.</li></ol>"+
+ "<p><b>Zwei verschiedene Lösungen bleiben übrig</b> (einmal ist B der Lügner, einmal A). Damit ist die Frage <b>nicht bestimmbar</b>.</p>"+
+ "<p><b>Warum diese Aufgabe wichtig ist:</b> Nicht jedes Rätsel hat eine eindeutige Lösung, und im Test steht „nicht bestimmbar“ oft zur Auswahl. Höre erst auf zu suchen, wenn du <em>alle</em> Möglichkeiten geprüft hast — nicht schon bei der ersten, die passt.</p>");
+
+q("rae-11","raetsel",2,"Nur Ehrliche und Lügner. A sagt über B: <b>„Er ist ein Ehrlicher.“</b> B sagt über A: <b>„Er ist ein Lügner.“</b> Was folgt?",
+ ["Die Situation ist unmöglich.","A ist Ehrlicher, B ist Lügner.","A ist Lügner, B ist Ehrlicher.","Beide sind Lügner.","Nicht bestimmbar."],0,
+ "<ol><li><b>Annahme: A ist Ehrlicher.</b> Dann stimmt seine Aussage, B ist Ehrlicher. Dann müsste auch B's Aussage stimmen: A wäre ein Lügner. Aber wir sind von „A ist Ehrlicher“ ausgegangen. Widerspruch.</li>"+
+ "<li><b>Annahme: A ist Lügner.</b> Dann ist seine Aussage falsch, B ist also Lügner. Dann müsste B's Aussage falsch sein, A wäre also <em>kein</em> Lügner. Widerspruch.</li></ol>"+
+ "<p><b>Beide Fälle scheitern — auf einer reinen Ehrlichen-Lügner-Insel ist diese Situation unmöglich.</b> Mit einem Normalen unter den beiden wäre sie dagegen sofort auflösbar; genau deshalb führt die Klausuraufgabe die dritte Rolle ein.</p>"+
+ "<p><b>Merke:</b> „Unmöglich“ ist ein zulässiges Ergebnis. Wenn <em>jede</em> Annahme in einen Widerspruch läuft, hast du nicht falsch gerechnet — die Angabe ist in sich widersprüchlich.</p>");
+
+q("rae-12","raetsel",3,"Genau einer von A, B, C ist Ehrlicher, einer Lügner, einer Normaler. <b>A: „Ich bin ein Ehrlicher.“ B: „A sagt die Wahrheit.“ C: „Ich bin ein Lügner.“</b> Wer ist was?",
+ ["Nicht eindeutig bestimmbar","A Ehrlicher, B Normaler, C Lügner","A Normaler, B Lügner, C Ehrlicher","A Lügner, B Normaler, C Ehrlicher","A Ehrlicher, B Lügner, C Normaler"],0,
+ "<ol><li><b>C sagt „Ich bin ein Lügner.“</b> Wie in Aufgabe 1: Weder ein Ehrlicher noch ein Lügner kann das sagen. Also ist <b>C der Normale</b> — das steht sofort fest.</li>"+
+ "<li>Damit sind A und B in irgendeiner Reihenfolge Ehrlicher und Lügner.</li>"+
+ "<li><b>Fall A = Ehrlicher, B = Lügner.</b> A's Aussage („Ich bin Ehrlicher“) ist wahr ✓. B sagt „A sagt die Wahrheit“ — das wäre wahr, aber B ist Lügner. Widerspruch.</li>"+
+ "<li><b>Fall A = Lügner, B = Ehrlicher.</b> A sagt „Ich bin Ehrlicher“ — falsch ✓, genau richtig für einen Lügner. B sagt „A sagt die Wahrheit“ — das wäre falsch, aber B ist Ehrlicher. Widerspruch.</li></ol>"+
+ "<p><b>Beide Fälle scheitern, die Angabe ist widersprüchlich</b> — es gibt keine gültige Zuordnung, also ist nichts eindeutig bestimmbar.</p>"+
+ "<p><b>Die Technik, die hier alles trägt:</b> Wenn eine Person eine Rolle <em>eindeutig</em> festlegt (hier C durch die Lügner-Selbstaussage), setze sie sofort und arbeite mit dem Rest weiter. Aus drei mal zwei mal eins = sechs Möglichkeiten werden so nur noch zwei.</p>");
+
+// Technisches Verständnis: Steht die Aussage im Text oder folgt sie direkt daraus?
+var JA = ["Ja – das steht so im Text oder folgt direkt daraus","Nein – das steht so nicht im Text"];
+var NEIN = ["Nein – das steht so nicht im Text","Ja – das steht so im Text oder folgt direkt daraus"];
+
+passage("tv-cache","Caches and Locality",
+`Modern processors execute instructions far faster than main memory can supply data, and the gap between the two has widened steadily for decades. Caches exist to hide it. They work because real programs exhibit locality: data used recently is likely to be used again soon, and data stored near a recently accessed address is likely to be accessed next.
+
+A cache hit costs a handful of cycles; a miss that reaches main memory costs hundreds. One might conclude that caches should simply be made as large as possible, but designers rarely do this. A larger cache takes longer to search and occupies chip area that could serve other purposes, so the additional capacity is paid for with additional latency. The usual compromise is a hierarchy of several levels, each larger and slower than the one above it.
+
+Not every workload benefits. Streaming computations that touch each item exactly once gain nothing from a cache, since nothing is ever reused, and they may actively harm overall performance by displacing data that other parts of the program still need.`);
+
+q("tv-c1","tv",2,"Steht das im Text?<br><br><b>„Ein Cache-Treffer ist deutlich günstiger als ein Zugriff auf den Hauptspeicher.“</b>",
+ JA,0,
+ "<p><b>Ja.</b> Wörtlich im Text: „A cache hit costs a handful of cycles; a miss that reaches main memory costs <b>hundreds</b>.“ Eine Handvoll gegen mehrere Hundert Takte — das ist genau die Aussage.</p>"+
+ "<p><b>Vorgehen bei solchen Aussagen:</b> Suche die Zahl oder den Vergleich im Text und lege beide nebeneinander. Wenn Größenordnung <em>und</em> Richtung des Vergleichs übereinstimmen, ist die Aussage gedeckt. Hier stimmt beides.</p>",
+ "tv-cache");
+
+q("tv-c2","tv",2,"Steht das im Text?<br><br><b>„Caches sollten grundsätzlich so groß wie möglich gebaut werden, weil mehr Kapazität immer mehr Leistung bedeutet.“</b>",
+ NEIN,0,
+ "<p><b>Nein — der Text sagt sogar ausdrücklich das Gegenteil.</b> „One might conclude that caches should simply be made as large as possible, <b>but designers rarely do this</b>.“ Begründung im Text: Ein größerer Cache braucht länger zum Durchsuchen und kostet Chipfläche.</p>"+
+ "<p><b>Die Falle heißt Scheinschlussfolgerung.</b> Der Text formuliert einen naheliegenden Gedanken (<em>one might conclude</em>) ausdrücklich nur, um ihn anschließend zu widerlegen. Wer beim Überfliegen nur den ersten Halbsatz erwischt, kreuzt „Ja“ an.</p>"+
+ "<p><b>Signalwörter, die dich warnen müssen:</b> <em>but, however, although, one might think, in fact</em>. Was hinter ihnen steht, kippt in der Regel die Aussage davor. Lies bei jeder Aussage den Satz zu Ende, bevor du entscheidest.</p>",
+ "tv-cache");
+
+q("tv-c3","tv",2,"Steht das im Text?<br><br><b>„Alle Programme profitieren von einem Cache.“</b>",
+ NEIN,0,
+ "<p><b>Nein.</b> Der letzte Absatz sagt genau das Gegenteil: „<b>Not every workload benefits.</b> Streaming computations that touch each item exactly once gain nothing from a cache.“</p>"+
+ "<p><b>Die Falle heißt Übergeneralisierung</b> — sie ist der zweithäufigste Trick in diesem Aufgabentyp. Der Text sagt „manche“ oder „nicht alle“, die Aussage macht daraus „alle“.</p>"+
+ "<p><b>Praktische Regel:</b> Absolutwörter wie <em>alle, immer, nie, jeder, ausschließlich</em> sind ein Alarmsignal. Sie sind selten gedeckt, weil Fachtexte fast immer einschränkend formulieren. Suche gezielt nach einer Ausnahme im Text — findest du eine, ist die Aussage falsch.</p>",
+ "tv-cache");
+
+q("tv-c4","tv",2,"Steht das im Text?<br><br><b>„Der Geschwindigkeitsunterschied zwischen Prozessor und Hauptspeicher ist über Jahrzehnte hinweg gewachsen.“</b>",
+ JA,0,
+ "<p><b>Ja.</b> Erster Satz: „the gap between the two has <b>widened steadily for decades</b>“ — der Abstand hat über Jahrzehnte stetig zugenommen.</p>"+
+ "<p><b>Warum diese Aussage leicht ist:</b> Sie ist eine reine Übersetzung, ohne Bewertung und ohne Verallgemeinerung. Solche Aussagen sind in der Klausur die geschenkten Punkte — sie zuerst abhaken und die Zeit für die kniffligen aufsparen.</p>",
+ "tv-cache");
+
+passage("tv-debt","Technical Debt",
+`The metaphor of technical debt was introduced by Ward Cunningham to explain to non-programmers why development slows down over time. Shipping quickly with a design one knows to be imperfect resembles borrowing money: it buys speed today and charges interest later, paid in the form of every future change taking longer than it should.
+
+Cunningham was insistent on a restriction that is now widely ignored. The metaphor applies only when the team understands the domain well enough to know that it is taking a deliberate shortcut. Code written out of ignorance of the problem is not debt; it is simply bad code, and calling it debt suggests a considered decision that was never made.
+
+Repayment means refactoring, and refactoring competes with new features for the same scarce engineering hours. That competition, rather than any technical difficulty, is why repayment is so often postponed. It is also worth noting that not all debt deserves repayment: a module scheduled for deletion next quarter can be left exactly as it is.`);
+
+q("tv-d1","tv",2,"Steht das im Text?<br><br><b>„Laut Cunningham liegt technische Schuld nur dann vor, wenn die Abkürzung bewusst gewählt wurde.“</b>",
+ JA,0,
+ "<p><b>Ja.</b> „The metaphor applies <b>only</b> when the team understands the domain well enough to know that it is taking a <b>deliberate shortcut</b>.“ Das Wort <em>only</em> macht daraus genau die Einschränkung, die die Aussage behauptet.</p>"+
+ "<p><b>Auf Einschränkungswörter achten:</b> <em>only, unless, provided that, except</em> tragen im Fachtext oft die eigentliche Aussage. Wenn eine Prüfungsaussage genau diese Einschränkung wiedergibt, ist sie in aller Regel gedeckt.</p>",
+ "tv-debt");
+
+q("tv-d2","tv",2,"Steht das im Text?<br><br><b>„Auch schlecht geschriebener Code aus Unwissenheit zählt laut Text als technische Schuld.“</b>",
+ NEIN,0,
+ "<p><b>Nein — der Text widerspricht ausdrücklich:</b> „Code written out of ignorance of the problem <b>is not debt</b>; it is simply bad code.“</p>"+
+ "<p><b>Die Falle ist eine Umkehrung der Einschränkung.</b> Der Text zieht eine Grenze (bewusst = Schuld, unwissend = nicht Schuld), die Aussage hebt diese Grenze auf. Solche Aussagen prüfst du am schnellsten, indem du im Text nach dem verneinenden Satz suchst — er steht fast immer direkt neben der Definition.</p>"+
+ "<p><b>Achtung, Weltwissen ausblenden:</b> Im echten Berufsleben nennen viele Teams jeden Murks „technische Schuld“. Genau davor warnt der Text sogar. Gefragt ist aber ausschließlich, was <em>im Text</em> steht — nicht, was üblich ist.</p>",
+ "tv-debt");
+
+q("tv-d3","tv",2,"Steht das im Text?<br><br><b>„Das Abtragen technischer Schuld konkurriert mit neuen Funktionen um dieselbe knappe Entwicklungszeit.“</b>",
+ JA,0,
+ "<p><b>Ja.</b> „refactoring <b>competes with new features for the same scarce engineering hours</b>“ — wörtlich dieselbe Aussage.</p>"+
+ "<p>Der Text geht sogar noch einen Schritt weiter und nennt genau diese Konkurrenz als Grund für das ständige Aufschieben („That competition, <b>rather than any technical difficulty</b>“). Auch das wäre als Aussage gedeckt — der Text benennt die Ursache ausdrücklich.</p>",
+ "tv-debt");
+
+q("tv-d4","tv",2,"Steht das im Text?<br><br><b>„Technische Schuld sollte immer so früh wie möglich abgetragen werden.“</b>",
+ NEIN,0,
+ "<p><b>Nein.</b> Der letzte Satz sagt das Gegenteil: „<b>not all debt deserves repayment</b>: a module scheduled for deletion next quarter can be left exactly as it is.“</p>"+
+ "<p><b>Zwei Fallen auf einmal:</b> erstens das Absolutwort <em>immer</em>, zweitens eine Handlungsempfehlung, die der Text nirgends ausspricht. Fachtexte dieser Art beschreiben meist Zusammenhänge und geben selten Ratschläge — eine Aussage im Befehlston („sollte“, „muss“) ist deshalb besonders verdächtig.</p>"+
+ "<p><b>Prüfmuster:</b> Wenn eine Aussage ein <em>Sollen</em> enthält, suche im Text nach einer Stelle, die tatsächlich eine Empfehlung ausspricht. Findest du nur Beschreibungen, lautet die Antwort Nein.</p>",
+ "tv-debt");
+
+passage("tv-drift","Model Drift",
+`A machine learning model deployed in production carries an assumption that is rarely stated: that the future will resemble the data it was trained on. When that assumption fails — customers change their habits, a sensor is recalibrated, a competitor adjusts its prices — the model's accuracy decays, sometimes within weeks.
+
+Practitioners distinguish two cases. In data drift the distribution of the inputs changes. In concept drift the relationship between inputs and the target changes, while the inputs themselves may look entirely ordinary. The second case is considerably harder to detect for exactly that reason: nothing about the incoming data appears unusual.
+
+Measuring accuracy directly would settle the question, but doing so requires labels, and labels frequently arrive weeks after the prediction or never arrive at all. Teams therefore fall back on proxy signals such as shifts in the distribution of the model's outputs. The standard remedy is retraining on recent data. This is not free: recent data may no longer contain the rare events that the older training set captured, and a retrained model can lose the ability to handle them.`);
+
+q("tv-m1","tv",2,"Steht das im Text?<br><br><b>„Konzeptdrift ist schwerer zu erkennen als Datendrift, weil die Eingabedaten unauffällig bleiben können.“</b>",
+ JA,0,
+ "<p><b>Ja.</b> „The second case is considerably <b>harder to detect</b> for exactly that reason: nothing about the incoming data appears unusual.“ Sowohl der Vergleich (schwerer) als auch die Begründung (unauffällige Eingaben) stehen wörtlich da.</p>"+
+ "<p><b>Wichtig:</b> Die Aussage enthält ein <em>weil</em>, behauptet also eine Ursache. Bei Kausalaussagen musst du beides prüfen — die Behauptung <em>und</em> die Begründung. Hier trägt der Text beides, deshalb Ja.</p>",
+ "tv-drift");
+
+q("tv-m2","tv",2,"Steht das im Text?<br><br><b>„Die Genauigkeit eines Modells lässt sich im laufenden Betrieb jederzeit direkt messen.“</b>",
+ NEIN,0,
+ "<p><b>Nein.</b> Der Text: „Measuring accuracy directly would settle the question, <b>but</b> doing so requires labels, and labels frequently arrive weeks after the prediction <b>or never arrive at all</b>.“</p>"+
+ "<p>Genau deshalb weichen Teams laut Text auf Ersatzsignale aus. Wäre direkte Messung jederzeit möglich, wäre dieser ganze Absatz überflüssig.</p>"+
+ "<p><b>Nützliche Gegenprobe:</b> Frage dich, ob der Text noch Sinn ergäbe, wenn die Aussage stimmte. Ergibt er dann keinen Sinn mehr, ist die Aussage falsch. Dieser Test funktioniert auch dann, wenn du die entscheidende Stelle nicht sofort wiederfindest.</p>",
+ "tv-drift");
+
+q("tv-m3","tv",2,"Steht das im Text?<br><br><b>„Ein auf neuen Daten neu trainiertes Modell kann die Fähigkeit verlieren, seltene Ereignisse zu behandeln.“</b>",
+ JA,0,
+ "<p><b>Ja.</b> „recent data may no longer contain the rare events that the older training set captured, and a retrained model <b>can lose the ability to handle them</b>.“</p>"+
+ "<p><b>Beachte das vorsichtige „kann“</b> in Aussage und Text. Stünde in der Aussage „verliert immer“, wäre sie falsch — der Text sagt nur, dass es passieren kann. Die Stärke der Behauptung muss zur Stärke der Textstelle passen: <em>may</em> ↔ <em>kann</em>, <em>always</em> ↔ <em>immer</em>.</p>",
+ "tv-drift");
+
+q("tv-m4","tv",2,"Steht das im Text?<br><br><b>„Modelle verlieren an Genauigkeit, weil ihre Algorithmen mit der Zeit veralten.“</b>",
+ NEIN,0,
+ "<p><b>Nein.</b> Der Text nennt eine völlig andere Ursache: Nicht das Modell altert, sondern die <em>Welt verändert sich</em> — „customers change their habits, a sensor is recalibrated, a competitor adjusts its prices“. Der Algorithmus bleibt derselbe; er passt nur nicht mehr zur Realität.</p>"+
+ "<p><b>Die Falle heißt untergeschobene Ursache</b> und ist besonders tückisch, weil das <em>Ergebnis</em> stimmt: Die Genauigkeit sinkt tatsächlich, das steht im Text. Falsch ist allein die Begründung.</p>"+
+ "<p><b>Merke:</b> Bei jeder Aussage mit <em>weil, deshalb, aufgrund</em> prüfst du zwei Dinge getrennt — steht die Wirkung im Text, und steht <em>diese</em> Ursache im Text? Nur wenn beides zutrifft, lautet die Antwort Ja.</p>",
+ "tv-drift");
+
+passage("tv-consensus","Consensus Protocols",
+`Distributed systems must agree on shared state even when some of their machines fail. Protocols such as Paxos and Raft achieve this by requiring a majority: as long as more than half the nodes can communicate, the system continues to make progress, and the remaining minority can be safely ignored. Without a majority, no progress is possible at all. This is why clusters are almost always sized with an odd number of nodes — an odd cluster tolerates the same number of failures as the next larger even one, at lower cost.
+
+A theoretical result known as FLP shows that in a fully asynchronous network, no deterministic protocol can guarantee both correctness and termination if even a single process may fail. Practical systems sidestep the result rather than solve it, using timeouts to decide when a node should be presumed dead. This trades a theoretical guarantee for behaviour that is adequate in practice.
+
+Raft was published well after Paxos, and its stated design goal was understandability. Its authors argued that Paxos was so difficult to reason about that implementations frequently diverged from the specification.`);
+
+q("tv-k1","tv",2,"Steht das im Text?<br><br><b>„Raft wurde in erster Linie mit dem Ziel entwickelt, verständlicher zu sein.“</b>",
+ JA,0,
+ "<p><b>Ja.</b> „its <b>stated design goal was understandability</b>“ — das erklärte Entwurfsziel war Verständlichkeit. Die Begründung liefert der Text gleich mit: Paxos sei so schwer zu durchdringen, dass Implementierungen von der Spezifikation abwichen.</p>"+
+ "<p>Achte darauf, dass der Text über das <em>Ziel</em> spricht, nicht über das Ergebnis. Die Aussage tut dasselbe („mit dem Ziel“) und ist damit exakt gedeckt.</p>",
+ "tv-consensus");
+
+q("tv-k2","tv",2,"Steht das im Text?<br><br><b>„Konsensprotokolle können auch dann Fortschritt erzielen, wenn keine Mehrheit erreichbar ist.“</b>",
+ NEIN,0,
+ "<p><b>Nein.</b> Der Text sagt unmissverständlich das Gegenteil: „<b>Without a majority, no progress is possible at all.</b>“</p>"+
+ "<p><b>Diese Fallenart ist die einfachste:</b> die direkte Umkehrung eines Satzes aus dem Text. Sie ist trotzdem gefährlich, wenn man den Text nur überflogen hat, denn die Begriffe (Mehrheit, Fortschritt) stimmen ja alle — nur die Verneinung fehlt.</p>"+
+ "<p><b>Gegenmittel:</b> Achte beim Lesen besonders auf Verneinungen (<em>no, not, without, never, unable</em>) und markiere sie. Genau an diesen Stellen entstehen die Umkehrfallen.</p>",
+ "tv-consensus");
+
+q("tv-k3","tv",2,"Steht das im Text?<br><br><b>„Praktische Systeme umgehen das FLP-Resultat mithilfe von Zeitschranken.“</b>",
+ JA,0,
+ "<p><b>Ja.</b> „Practical systems <b>sidestep</b> the result rather than solve it, <b>using timeouts</b> to decide when a node should be presumed dead.“</p>"+
+ "<p><b>Beachte die feine Wortwahl:</b> Der Text sagt „umgehen“ (<em>sidestep</em>), ausdrücklich nicht „lösen“ (<em>rather than solve it</em>). Die Aussage benutzt ebenfalls „umgehen“ und ist damit korrekt. Stünde dort „lösen das FLP-Problem“, wäre sie falsch — ein einziges Verb entscheidet.</p>",
+ "tv-consensus");
+
+q("tv-k4","tv",2,"Steht das im Text?<br><br><b>„Cluster werden mit einer ungeraden Anzahl von Knoten ausgelegt, weil das FLP-Resultat es verlangt.“</b>",
+ NEIN,0,
+ "<p><b>Nein.</b> Beide Tatsachen stehen im Text, aber sie gehören nicht zusammen. Die ungerade Knotenzahl begründet der Text mit der <b>Mehrheitsregel</b>: „an odd cluster tolerates the same number of failures as the next larger even one, at lower cost“. Das FLP-Resultat steht in einem völlig anderen Absatz und handelt von asynchronen Netzen.</p>"+
+ "<p><b>Die Falle heißt Querverbindung:</b> Zwei korrekte Aussagen aus verschiedenen Absätzen werden mit einem <em>weil</em> zusammengeklebt. Weil beide Teile für sich richtig sind, wirkt der Satz beim Überfliegen vertraut.</p>"+
+ "<p><b>Gegenmittel:</b> Bei jedem <em>weil</em> prüfst du, ob Ursache und Wirkung im Text <em>im selben Zusammenhang</em> stehen. Stammen sie aus verschiedenen Absätzen, ist der Zusammenhang meist hinzugedichtet.</p>",
+ "tv-consensus");
+
+passage("tv-static","Static Analysis",
+`A static analyser examines source code without executing it. Because it reasons about all possible runs of a program rather than the particular runs a test happens to exercise, it can expose defects that testing would never reach — a race condition that occurs once in a million executions is invisible to a test suite but plainly visible to an analyser that considers every interleaving.
+
+That same generality forces an uncomfortable trade-off. An analyser that never misses a genuine defect must, as a matter of logic, also produce warnings about code that is in fact correct. These false positives are not a sign of a badly built tool; they are the price of the guarantee. In practice teams abandon analysers whose false-positive rate is high, not because the warnings are wrong in principle but because the effort of examining each one exceeds what the tool returns.
+
+Type systems are a deliberately restricted form of static analysis. They have achieved far wider adoption than general analysers, largely because their rules are simple enough that a programmer can predict what the checker will say before running it.`);
+
+q("tv-s1","tv",2,"Steht das im Text?<br><br><b>„Statische Analyse führt das Programm aus, um Fehler zu finden.“</b>",
+ NEIN,0,
+ "<p><b>Nein.</b> Gleich der erste Satz: „A static analyser examines source code <b>without executing it</b>.“ Genau das ist die Definition von <em>statisch</em> — im Gegensatz zu <em>dynamisch</em>, wo man das Programm laufen lässt.</p>"+
+ "<p><b>Wenn dir ein Fachbegriff unbekannt ist,</b> steht seine Erklärung fast immer im ersten Satz, in dem er auftaucht. Genau deshalb lohnt es sich, den ersten Absatz einmal <em>langsam</em> zu lesen und den Rest schneller.</p>",
+ "tv-static");
+
+q("tv-s2","tv",2,"Steht das im Text?<br><br><b>„Ein Werkzeug, das nie einen echten Fehler übersieht, meldet zwangsläufig auch korrekten Code.“</b>",
+ JA,0,
+ "<p><b>Ja.</b> „An analyser that <b>never misses a genuine defect must, as a matter of logic, also produce warnings about code that is in fact correct</b>.“ Das <em>zwangsläufig</em> der Aussage entspricht dem <em>must, as a matter of logic</em> des Textes.</p>"+
+ "<p><b>Das ist der Kern des Absatzes:</b> Es handelt sich nicht um eine Schwäche schlechter Werkzeuge, sondern um einen logisch unvermeidlichen Preis („they are the price of the guarantee“). Wer diesen Zusammenhang erfasst hat, beantwortet auch die nächste Aussage sicher.</p>",
+ "tv-static");
+
+q("tv-s3","tv",2,"Steht das im Text?<br><br><b>„Teams geben Analysewerkzeuge mit vielen Fehlalarmen auf, weil der Aufwand für die Prüfung den Nutzen übersteigt.“</b>",
+ JA,0,
+ "<p><b>Ja.</b> „teams abandon analysers whose false-positive rate is high, <b>not because the warnings are wrong in principle but because the effort of examining each one exceeds what the tool returns</b>.“</p>"+
+ "<p><b>Der Text nennt die Ursache ausdrücklich</b> — und grenzt sie sogar gegen eine falsche Ursache ab. Bei Aussagen mit <em>weil</em> ist das der Idealfall: Wenn der Text selbst eine Begründung liefert und sie mit der Aussage übereinstimmt, lautet die Antwort Ja.</p>",
+ "tv-static");
+
+q("tv-s4","tv",2,"Steht das im Text?<br><br><b>„Typsysteme sind weiter verbreitet als allgemeine Analysewerkzeuge, weil sie mehr Fehler finden.“</b>",
+ NEIN,0,
+ "<p><b>Nein.</b> Die Verbreitung stimmt („far wider adoption“), die Begründung nicht. Laut Text liegt sie daran, dass „their rules are <b>simple enough that a programmer can predict</b> what the checker will say“ — an der Vorhersagbarkeit, nicht an der Fehlerausbeute.</p>"+
+ "<p>Der Text sagt sogar, Typsysteme seien eine <em>bewusst eingeschränkte</em> Form („deliberately restricted“) — sie finden also eher <em>weniger</em>, nicht mehr.</p>"+
+ "<p><b>Wieder das Muster untergeschobene Ursache</b> — inzwischen zum dritten Mal. Genau darauf laufen diese Aufgaben immer wieder hinaus: Die Hälfte des Satzes stimmt, die andere Hälfte ist erfunden. Zerlege deshalb jede Aussage in Behauptung und Begründung und prüfe beide einzeln.</p>",
+ "tv-static");
+
 /* ══ Annahmetest Garching — Lern- und Prüfungstrainer ══════════════════ */
 
 var TEST_AT = new Date("2026-08-21T09:00:00+02:00");
 
 var TOPICS = [
-  {id:"algebra", n:"Algebra & Gleichungen",        g:"Mathematik"},
-  {id:"potenz",  n:"Potenzen, Wurzeln, Logarithmen", g:"Mathematik"},
-  {id:"prozent", n:"Prozent, Zins & Dreisatz",     g:"Mathematik"},
-  {id:"analysis",n:"Analysis",                     g:"Mathematik"},
-  {id:"geo",     n:"Geometrie & Trigonometrie",    g:"Mathematik"},
-  {id:"stoch",   n:"Stochastik & Kombinatorik",    g:"Mathematik"},
-  {id:"folgen",  n:"Folgen & Reihen",              g:"Mathematik"},
-  {id:"logik",   n:"Aussagenlogik & Mengen",       g:"Logik"},
-  {id:"schluss", n:"Schlussfolgerndes Denken",     g:"Logik"},
-  {id:"reihen",  n:"Zahlenreihen & Muster",        g:"Logik"},
-  {id:"algo",    n:"Algorithmisches Denken",       g:"Logik"},
-  {id:"english", n:"English Reading Comprehension",g:"Textverständnis"},
-  {id:"wi",      n:"Wahlbereich Wirtschaftsinformatik", g:"Wahlbereich"}
+  {id:"ableitung",n:"Ableitungen — Quotienten- & Kettenregel", g:"Prüfungsrelevant"},
+  {id:"symmetrie",n:"Symmetrie von Funktionen",            g:"Prüfungsrelevant"},
+  {id:"raetsel",  n:"Ehrliche, Lügner & Normale",          g:"Prüfungsrelevant"},
+  {id:"tv",       n:"Technisches Verständnis",             g:"Prüfungsrelevant"},
+  {id:"analysis", n:"Analysis — Grundlagen",               g:"Mathematik: Unterbau"},
+  {id:"algebra",  n:"Algebra & Gleichungen",               g:"Mathematik: Unterbau"},
+  {id:"potenz",   n:"Potenzen, Wurzeln, Logarithmen",      g:"Mathematik: Unterbau"},
+  {id:"geo",      n:"Geometrie & Trigonometrie",           g:"Mathematik: Unterbau"},
+  {id:"prozent",  n:"Prozent, Zins & Dreisatz",            g:"Mathematik: Unterbau"},
+  {id:"stoch",    n:"Stochastik & Kombinatorik",           g:"Mathematik: Unterbau"},
+  {id:"folgen",   n:"Folgen & Reihen",                     g:"Mathematik: Unterbau"},
+  {id:"logik",    n:"Aussagenlogik & Mengen",              g:"Logik: Unterbau"},
+  {id:"schluss",  n:"Schlussfolgerndes Denken",            g:"Logik: Unterbau"},
+  {id:"reihen",   n:"Zahlenreihen & Muster",               g:"Logik: Unterbau"},
+  {id:"algo",     n:"Algorithmisches Denken",              g:"Logik: Unterbau"},
+  {id:"english",  n:"English Reading Comprehension",       g:"Zusatz"},
+  {id:"wi",       n:"Wirtschaftsinformatik",               g:"Zusatz"}
 ];
 var TOPIC_BY = {}; TOPICS.forEach(function(t){ TOPIC_BY[t.id] = t; });
 
-var MATH  = ["algebra","potenz","prozent","analysis","geo","stoch","folgen"];
-var LOGIC = ["logik","schluss","reihen","algo"];
+/* Aufbau der Originalklausur 2022: 3 Aufgaben, 24 Punkte, 90 Minuten. */
+var KERN = ["symmetrie","ableitung","raetsel","tv"];
+var PUNKTE = {symmetrie:4, ableitung:8, raetsel:8, tv:1};
+var GESAMT = 24;
 
-var PLAN = [
-  {d:"2026-08-15", t:"Standort bestimmen",
-   p:"Eine vollständige Prüfungssimulation — kalt, ohne Vorbereitung. Danach Crashkurs Algebra und Potenzen und beide Blöcke üben."},
-  {d:"2026-08-16", t:"Prozentrechnung & Reihen",
-   p:"Prozent, Zins, Dreisatz und Folgen & Reihen. Alles im Kopf rechnen, konsequent ohne Taschenrechner."},
-  {d:"2026-08-17", t:"Analysis & Geometrie",
-   p:"Ableitungen, Kurvendiskussion, Integrale. Dann Flächen, Körper, Pythagoras und die Standardwerte der Trigonometrie."},
-  {d:"2026-08-18", t:"Stochastik & Wahlbereich",
-   p:"Laplace, Gegenereignis, Binomialkoeffizient. Anschließend der Wirtschaftsinformatik-Block: Deckungsbeitrag, Break-even, Kennzahlen."},
-  {d:"2026-08-19", t:"Logik komplett",
-   p:"Aussagenlogik, Schlussfolgern, Zahlenreihen, algorithmisches Denken — die vier Blöcke am Stück. Hier liegen die schnellsten Punkte."},
-  {d:"2026-08-20", t:"Simulation & Fehlerarchiv",
-   p:"English Reading, dann die zweite Prüfungssimulation unter Zeitdruck. Zum Schluss das Fehlerarchiv leeren. Früh schlafen."},
-  {d:"2026-08-21", t:"Testtag in Garching",
-   p:"Nichts Neues mehr lernen. Ausweis, Einladung, Stifte. 90 Minuten, 100 Punkte, keine Hilfsmittel — im Zweifel raten und weitergehen."}
+var SPRINT = [
+  {tag:"Tag 1", titel:"Die drei Aufgabentypen beherrschen", schritte:[
+    {t:"Originalklausur 2022 durcharbeiten", z:"20 min",
+     p:"Alle drei echten Aufgaben mit vollständigem Lösungsweg. Danach weißt du genau, worauf es ankommt.",
+     act:"startOriginal()", btn:"Ansehen"},
+    {t:"Ableitungen — der 8-Punkte-Block", z:"60 min",
+     p:"Quotienten- und Kettenregel. Ein Drittel der Klausur hängt an dieser einen Aufgabe. Erst den Crashkurs lesen, dann alle 18 Aufgaben.",
+     act:"startPractice('ableitung')", btn:"Üben"},
+    {t:"Symmetrie — der 4-Punkte-Block", z:"30 min",
+     p:"Substituieren, Bausteine einordnen, zurückübersetzen. Der am schnellsten erlernbare Block der ganzen Klausur.",
+     act:"startPractice('symmetrie')", btn:"Üben"},
+    {t:"Ehrliche & Lügner — der 8-Punkte-Block", z:"45 min",
+     p:"Das Verfahren ist immer dasselbe: Rolle unterstellen, Widerspruch suchen. Zwölf Rätsel vom leichten bis zum Klausurniveau.",
+     act:"startPractice('raetsel')", btn:"Üben"},
+    {t:"Erste Prüfungssimulation", z:"90 min",
+     p:"Im Originalformat: 24 Punkte, 90 Minuten, Rückmeldung erst am Ende.",
+     act:"startExam()", btn:"Starten"}
+  ]},
+  {tag:"Tag 2", titel:"Festigen und Lücken schließen", schritte:[
+    {t:"Fehlerarchiv leeren", z:"30 min",
+     p:"Alles von gestern, was noch nicht sitzt. Das ist die wirksamste halbe Stunde des ganzen Plans.",
+     act:"startReview()", btn:"Wiederholen"},
+    {t:"Technisches Verständnis", z:"45 min",
+     p:"Sechs englische Fachtexte mit je vier Aussagen. Entscheidend sind nicht Englischkenntnisse, sondern das Erkennen der sechs Fallenarten.",
+     act:"startPractice('tv')", btn:"Üben"},
+    {t:"Ableitungen — zweite Runde", z:"40 min",
+     p:"Wiederholung mit Abstand ist der Grund, warum es hängen bleibt. Jetzt auf Zeit: höchstens drei Minuten pro Aufgabe.",
+     act:"startPractice('ableitung')", btn:"Üben"},
+    {t:"Rätsel und Symmetrie mischen", z:"30 min",
+     p:"Gemischte Runde aus allen vier Prüfungsblöcken — so wie es in der Klausur kommt.",
+     act:"startPractice('kern')", btn:"Üben"},
+    {t:"Zweite Prüfungssimulation", z:"90 min",
+     p:"Unter echten Bedingungen. Ziel: über 18 von 24 Punkten.",
+     act:"startExam()", btn:"Starten"},
+    {t:"Crashkurs querlesen", z:"20 min",
+     p:"Zum Abschluss alle Merksätze der vier Prüfungsblöcke durchgehen. Nichts Neues mehr anfangen.",
+     act:"go('wissen')", btn:"Öffnen"}
+  ]}
 ];
 
 /* ── Zustand ─────────────────────────────────────────────────────────── */
@@ -1553,7 +2245,9 @@ function pick(pool, n){
 var SES = null, TICK = null;
 
 function startPractice(topic){
-  var pool = topic==="alle" ? QUESTIONS.slice() : inTopic(topic);
+  var pool = topic==="alle" ? QUESTIONS.slice()
+    : topic==="kern" ? QUESTIONS.filter(function(x){ return KERN.indexOf(x.topic) >= 0; })
+    : inTopic(topic);
   var chosen = pick(pool, Math.min(10, pool.length));
   chosen = groupPassages(shuffle(chosen));
   SES = {mode:"practice", topic:topic, ids:chosen.map(function(x){return x.id;}), i:0, ans:{}, done:false};
@@ -1580,22 +2274,17 @@ function groupPassages(list){
 
 function buildExam(){
   var out = [];
-  /* 18 Mathematik, gleichmäßig über die sieben Blöcke */
-  var mathPool = [];
-  MATH.forEach(function(t){ mathPool = mathPool.concat(shuffle(inTopic(t)).slice(0,3)); });
-  out = out.concat(shuffle(mathPool).slice(0,18));
-  /* 10 Logik */
-  var logicPool = [];
-  LOGIC.forEach(function(t){ logicPool = logicPool.concat(shuffle(inTopic(t)).slice(0,3)); });
-  out = out.concat(shuffle(logicPool).slice(0,10));
-  /* 8 Textverständnis: zwei vollständige Texte */
-  var pids = shuffle(Object.keys(PASSAGES)).slice(0,2);
-  pids.forEach(function(p){
-    out = out.concat(QUESTIONS.filter(function(x){ return x.pid===p; }));
-  });
-  /* 4 Wahlbereich */
-  out = out.concat(shuffle(inTopic("wi")).slice(0,4));
-  return groupPassages(out);
+  /* Aufgabe 1: Symmetrie (4 P) und Ableitung (8 P) */
+  out = out.concat(shuffle(inTopic("symmetrie")).slice(0,1));
+  out = out.concat(shuffle(inTopic("ableitung")).slice(0,1));
+  /* Aufgabe 2: ein Logikrätsel (8 P) */
+  out = out.concat(shuffle(inTopic("raetsel")).slice(0,1));
+  /* Aufgabe 3: ein Fachtext mit allen vier Aussagen (je 1 P) */
+  var texte = {};
+  inTopic("tv").forEach(function(x){ if(x.pid) texte[x.pid] = 1; });
+  var pid = shuffle(Object.keys(texte))[0];
+  out = out.concat(QUESTIONS.filter(function(x){ return x.pid === pid; }));
+  return out;
 }
 function startExam(){
   var qs = buildExam();
@@ -1605,6 +2294,12 @@ function startExam(){
   go("run");
 }
 function resumeExam(){ SES = S.live; go("run"); }
+function startOriginal(){
+  var ids = ["org-1a","org-1b","org-2","org-3a","org-3b","org-3c","org-3d"]
+    .filter(function(id){ return byId(id); });
+  SES = {mode:"practice", topic:"original", ids:ids, i:0, ans:{}, done:false};
+  go("run");
+}
 
 function answer(pos){
   var qq = byId(SES.ids[SES.i]);
@@ -1628,15 +2323,16 @@ function prev(){ if(SES.i>0){ SES.i--; render(); } }
 function finish(){
   SES.done = true;
   if(SES.mode === "exam"){
-    var right = 0;
+    var right = 0, pts = 0;
     SES.ids.forEach(function(id){
       var qq = byId(id), given = SES.ans[id], r = rec(id);
       r.n++;
-      if(given === qq.ans){ right++; r.ok++; r.streak++; } else { r.streak = 0; r.wrong++; }
+      if(given === qq.ans){ right++; pts += (PUNKTE[qq.topic] || 1); r.ok++; r.streak++; }
+      else { r.streak = 0; r.wrong++; }
     });
-    SES.points = Math.round(right / SES.ids.length * 100);
+    SES.points = pts;
     SES.right = right;
-    S.exams.push({at:Date.now(), points:SES.points, right:right, of:SES.ids.length});
+    S.exams.push({at:Date.now(), points:pts, right:right, of:SES.ids.length});
     S.live = null;
   }
   save();
@@ -1697,44 +2393,47 @@ function tickExam(){
 
 /* ── Ansicht: Start ──────────────────────────────────────────────────── */
 function viewStart(){
-  var all = statOf(QUESTIONS);
+  var kern = QUESTIONS.filter(function(x){ return KERN.indexOf(x.topic) >= 0; });
+  var st = statOf(kern);
   var nw = wrongPool().length;
   var last = S.exams.length ? S.exams[S.exams.length-1] : null;
-  var td = today();
-
-  var planHtml = PLAN.map(function(p){
-    var done = !!S.plan[p.d];
-    return '<li class="'+(p.d===td?"now":"")+(done?" ok":"")+'">'+
-      '<span class="day">'+deDate(p.d)+'</span>'+
-      '<span class="what"><b>'+p.t+'</b><p>'+p.p+'</p></span>'+
-      '<button class="tick" onclick="togglePlan(\''+p.d+'\')" aria-pressed="'+done+'" '+
-        'title="'+(done?"Als offen markieren":"Als erledigt markieren")+'">'+(done?"✓":"")+'</button>'+
-    '</li>';
-  }).join("");
 
   return '<div class="stack">'+
     '<section class="hero">'+
-      '<p class="eyebrow">Eignungsfeststellungstest · B.Sc. Wirtschaftsinformatik</p>'+
-      '<h1>Sechs Tage, drei Testteile, keine Hilfsmittel.</h1>'+
-      '<p class="lead">Der Test dauert 90 Minuten, bringt maximal 100 Punkte und besteht ausschließlich aus Single-Choice-Aufgaben — genau eine Antwort ist richtig. Geprüft werden Schulmathematik, logisches Denken und englisches Textverständnis. Taschenrechner und Formelsammlungen sind nicht zugelassen.</p>'+
-      '<div class="dday"><b>'+Math.max(0,daysLeft())+'</b><span>Tage bis Freitag, 21.08.2026 · Forschungscampus Garching</span></div>'+
+      '<p class="eyebrow">Eignungsfeststellungsverfahren · TUM · Klausur IN0000</p>'+
+      '<h1>Drei Aufgaben, 24 Punkte, 90 Minuten.</h1>'+
+      '<p class="lead">Die Klausur besteht aus nur drei Aufgaben — und zwei davon sind Mathematik. '+
+      'Das heißt: Du hast pro Aufgabe sehr viel Zeit, aber ein einziger Fehler kostet bis zu einem Drittel der Punkte. '+
+      'Sorgfalt schlägt Geschwindigkeit. Hilfsmittel sind nicht zugelassen.</p>'+
       '<dl class="facts">'+
-        fact("Dauer","90 Minuten")+
-        fact("Punkte","max. 100")+
-        fact("Format","Single Choice")+
-        fact("Hilfsmittel","keine")+
+        fact("Aufgabe 1 · Mathematik","12 Punkte")+
+        fact("Aufgabe 2 · Logik","8 Punkte")+
+        fact("Aufgabe 3 · Text","4 Punkte")+
+        fact("Zeit","90 Minuten")+
       '</dl>'+
+      '<div class="dday"><b>'+Math.max(0,daysLeft())+'</b><span>Tage bis Freitag, 21.08.2026 · Forschungscampus Garching</span></div>'+
     '</section>'+
 
     '<div class="tiles">'+
-      tile("Weiterlernen", all.mastered+" / "+all.total, "Aufgaben sitzen sicher", "startPractice('alle')")+
-      tile("Prüfungssimulation", last? last.points+" P." : "90 min", last? "letztes Ergebnis" : "40 Aufgaben, volle Zeit", "go('pruefung')")+
+      tile("Originalklausur 2022", "3", "Aufgaben mit Lösungsweg", "startOriginal()")+
+      tile("Prüfungssimulation", last? last.points+" / 24" : "24 P.", last? "letztes Ergebnis" : "im Originalformat", "startExam()")+
       tile("Fehlerarchiv", String(nw), nw? "Aufgaben warten auf dich" : "nichts offen", nw? "startReview()" : "go('fehler')")+
     '</div>'+
 
+    '<section class="card" style="border-color:var(--accent-line)">'+
+      '<p class="eyebrow">Wo die Punkte liegen</p>'+
+      '<p class="lead" style="margin-top:.4rem">In der Originalklausur waren <b>20 von 24 Punkten</b> mit nur drei Fertigkeiten zu holen: '+
+      'eine Ableitung mit Quotienten- und Kettenregel (8 P), ein Logikrätsel um Ehrliche und Lügner (8 P) und eine Symmetriebestimmung (4 P). '+
+      'Genau diese drei stehen in deinem Plan ganz oben — sie sind alle in zwei Tagen erlernbar.</p>'+
+      '<div class="row" style="margin-top:.9rem">'+
+        '<button class="btn" onclick="startPractice(\'kern\')">Prüfungsblöcke üben</button>'+
+        '<span class="pct" style="align-self:center;color:var(--ink-2)">'+st.mastered+' von '+st.total+' sitzen sicher</span>'+
+      '</div>'+
+    '</section>'+
+
     '<section>'+
-      '<p class="eyebrow" style="margin-bottom:.5rem">Lernplan bis zum Testtag</p>'+
-      '<div class="list"><ul class="plan">'+planHtml+'</ul></div>'+
+      '<p class="eyebrow" style="margin-bottom:.5rem">Zwei-Tage-Plan</p>'+
+      sprintList()+
     '</section>'+
 
     '<section>'+
@@ -1743,12 +2442,33 @@ function viewStart(){
     '</section>'+
     footer();
 }
+
+function sprintList(){
+  return SPRINT.map(function(tag, ti){
+    var rows = tag.schritte.map(function(sc, si){
+      var key = ti+"-"+si, done = !!S.plan[key];
+      return '<li class="'+(done?"ok":"")+'">'+
+        '<span class="day">'+sc.z+'</span>'+
+        '<span class="what"><b>'+sc.t+'</b><p>'+sc.p+'</p>'+
+          '<button class="btn ghost" style="margin-top:.55rem;padding:.35rem .7rem;font-size:.82rem" onclick="'+sc.act+'">'+sc.btn+'</button>'+
+        '</span>'+
+        '<button class="tick" onclick="togglePlan(\''+key+'\')" aria-pressed="'+done+'" '+
+          'title="'+(done?"Als offen markieren":"Als erledigt markieren")+'">'+(done?"✓":"")+'</button>'+
+      '</li>';
+    }).join("");
+    return '<div class="list" style="margin-bottom:.75rem">'+
+      '<div class="item" style="pointer-events:none;background:var(--raise)">'+
+        '<span class="nm">'+tag.tag+' — '+tag.titel+'</span></div>'+
+      '<ul class="plan">'+rows+'</ul></div>';
+  }).join("");
+}
+
 function fact(k,v){ return '<div class="fact"><dt>'+k+'</dt><dd>'+v+'</dd></div>'; }
 function tile(t,big,sub,act){
   return '<button class="tile" onclick="'+act+'"><strong>'+t+'</strong>'+
     '<span class="big">'+big+'</span><em>'+sub+'</em></button>';
 }
-function togglePlan(d){ S.plan[d] = !S.plan[d]; save(); render(); }
+function togglePlan(k){ S.plan[k] = !S.plan[k]; save(); render(); }
 
 function topicList(){
   var out = '', group = '';
@@ -1786,8 +2506,8 @@ function viewUeben(){
 function viewPruefung(){
   var hist = S.exams.slice().reverse().map(function(e){
     var d = new Date(e.at);
-    return '<div class="rev"><span class="mk '+(e.points>=60?'ok':'no')+'">'+e.points+'</span>'+
-      '<span><span class="q">'+e.right+' von '+e.of+' richtig</span>'+
+    return '<div class="rev"><span class="mk '+(e.points>=15?'ok':'no')+'">'+e.points+'</span>'+
+      '<span><span class="q">'+e.points+' von 24 Punkten · '+e.right+' von '+e.of+' Aufgaben richtig</span>'+
       '<span class="a">'+pad(d.getDate())+"."+pad(d.getMonth()+1)+"."+d.getFullYear()+' · '+pad(d.getHours())+':'+pad(d.getMinutes())+'</span></span></div>';
   }).join("");
 
@@ -1798,16 +2518,22 @@ function viewPruefung(){
 
   return '<div class="stack">'+ live +
     '<section><h2>Prüfungssimulation</h2>'+
-      '<p class="lead">40 Aufgaben in 90 Minuten, gewichtet wie im echten Test: 18 Mathematik, 10 Logik, 8 englisches Textverständnis, 4 aus dem Wahlbereich Wirtschaftsinformatik. Jede Aufgabe zählt 2,5 Punkte. Rückmeldung gibt es erst am Ende — genau wie in Garching.</p>'+
+      '<p class="lead">Im Aufbau der Originalklausur vom 30.08.2022: drei Aufgaben, 24 Punkte, 90 Minuten. '+
+      'Aufgabe 1 besteht aus einer Symmetriebestimmung (4 P) und einer Ableitung (8 P), Aufgabe 2 ist ein Logikrätsel (8 P), '+
+      'Aufgabe 3 ein englischer Fachtext mit vier Aussagen (je 1 P). Rückmeldung gibt es erst am Ende.</p>'+
       '<div class="card" style="margin-top:.9rem">'+
-        '<p class="eyebrow">So läuft es ab</p>'+
+        '<p class="eyebrow">Zeiteinteilung, die aufgeht</p>'+
         '<ul style="margin:.5rem 0 0;padding-left:1.1rem;color:var(--ink-2);font-size:.9rem;line-height:1.7">'+
-          '<li>Kein Taschenrechner, kein Papier außer dem, was du dir selbst hinlegst.</li>'+
+          '<li><b>35 Minuten</b> für die Ableitung — sie ist mit 8 Punkten am teuersten und rein handwerklich.</li>'+
+          '<li><b>25 Minuten</b> für das Logikrätsel. Notfalls alle sechs Fälle durchschreiben, das reicht zeitlich.</li>'+
+          '<li><b>15 Minuten</b> für die Symmetrie, <b>15 Minuten</b> für den Text.</li>'+
           '<li>Falsche Antworten kosten keine Punkte — nichts unbeantwortet lassen.</li>'+
-          '<li>Rund 2 Minuten pro Aufgabe. Wer hängen bleibt, geht weiter und kommt zurück.</li>'+
         '</ul>'+
       '</div>'+
-      '<div class="row" style="margin-top:1rem"><button class="btn" onclick="startExam()">Simulation starten</button></div>'+
+      '<div class="row" style="margin-top:1rem">'+
+        '<button class="btn" onclick="startExam()">Simulation starten</button>'+
+        '<button class="btn ghost" onclick="startOriginal()">Originalklausur 2022 ansehen</button>'+
+      '</div>'+
     '</section>'+
     (hist? '<section><p class="eyebrow" style="margin-bottom:.3rem">Bisherige Ergebnisse</p><div class="card" style="padding-top:.2rem">'+hist+'</div></section>':'')+
     footer();
@@ -1840,19 +2566,29 @@ function viewFehler(){
 
 /* ── Ansicht: Wissen ─────────────────────────────────────────────────── */
 function viewWissen(){
-  var body = THEORIE.map(function(t){
-    var items = t.items.map(function(it){
-      return '<dt>'+it[0]+'</dt><dd>'+it[1]+'</dd>';
-    }).join("");
-    return '<details class="th"><summary>'+t.title+'</summary>'+
+  /* Reihenfolge wie in TOPICS: die vier Prüfungsblöcke zuerst. */
+  var sorted = THEORIE.slice().sort(function(a,b){
+    return TOPICS.findIndex(function(t){return t.id===a.topic;}) -
+           TOPICS.findIndex(function(t){return t.id===b.topic;});
+  });
+  var body = "", group = "";
+  sorted.forEach(function(t){
+    var g = (TOPIC_BY[t.topic]||{}).g || "Weitere";
+    if(g !== group){
+      group = g;
+      body += '<p class="eyebrow" style="margin:1.4rem 0 .5rem">'+group+'</p>';
+    }
+    var items = t.items.map(function(it){ return '<dt>'+it[0]+'</dt><dd>'+it[1]+'</dd>'; }).join("");
+    body += '<details class="th"><summary>'+t.title+'</summary>'+
       '<div class="thbody"><dl>'+items+'</dl>'+
       '<div class="row" style="margin-top:1rem"><button class="btn ghost" onclick="startPractice(\''+t.topic+'\')">Dazu üben</button></div>'+
       '</div></details>';
-  }).join("");
+  });
 
   return '<div class="stack"><section><h2>Crashkurs</h2>'+
-    '<p class="lead">Alles, was ohne Taschenrechner im Kopf verfügbar sein muss — Formeln, Rechenwege und die Fallen, die im Test regelmäßig Punkte kosten.</p>'+
-    '<div style="margin-top:1rem">'+body+'</div></section>'+footer();
+    '<p class="lead">Alles, was ohne Taschenrechner im Kopf verfügbar sein muss. '+
+    'Die vier Blöcke unter „Prüfungsrelevant“ decken die Originalklausur vollständig ab — wenn die Zeit knapp ist, lies nur diese.</p>'+
+    '<div style="margin-top:.4rem">'+body+'</div></section>'+footer();
 }
 
 /* ── Ansicht: laufende Sitzung ───────────────────────────────────────── */
@@ -1882,12 +2618,15 @@ function viewRun(){
     var ok = given === qq.ans;
     verdict = '<div class="verdict '+(ok?"ok":"no")+'">'+
       '<span class="tag">'+(ok?"Richtig":"Falsch — richtig ist "+ "ABCDE".charAt(order.indexOf(qq.ans)))+'</span>'+
-      '<p>'+qq.exp+'</p></div>';
+      '<div class="exp">'+qq.exp+'</div></div>';
   }
 
-  var label = SES.mode==="exam" ? "Prüfungssimulation"
+  var label = SES.topic==="original" ? "Originalklausur 2022"
+            : SES.mode==="exam" ? "Prüfungssimulation"
             : SES.mode==="review" ? "Fehlerarchiv"
             : TOPIC_BY[qq.topic].n;
+  var wert = PUNKTE[qq.topic];
+  var wertBadge = (SES.mode==="exam" && wert) ? '<span class="pts">'+wert+' P.</span>' : '';
 
   var timer = SES.mode==="exam"
     ? '<span id="timer" class="timer">'+mmss(Math.round((SES.ends-Date.now())/1000))+'</span>' : '';
@@ -1901,7 +2640,7 @@ function viewRun(){
   var answered = Object.keys(SES.ans).length;
 
   return '<div class="stack">'+
-    '<div class="qhead"><span>'+label+'</span>'+timer+
+    '<div class="qhead"><span>'+label+'</span>'+wertBadge+timer+
       '<span class="prog">'+(SES.i+1)+' / '+SES.ids.length+
       (SES.mode==="exam"? ' · '+answered+' beantwortet':'')+'</span></div>'+
     '<div class="card">'+ pas +
@@ -1939,21 +2678,22 @@ function viewResult(){
     return '<div class="rev"><span class="mk '+(ok?"ok":"no")+'">'+(ok?"✓":"✗")+'</span>'+
       '<span><span class="q">'+qq.text.replace(/<pre[\s\S]*?<\/pre>/g," …")+'</span>'+
       '<span class="a">'+line+'</span>'+
-      (!ok? '<span class="a" style="color:var(--ink-3);margin-top:.25rem">'+qq.exp+'</span>':'')+
+      (!ok? '<div class="exp" style="margin-top:.35rem">'+qq.exp+'</div>':'')+
       '</span></div>';
   }).join("");
 
+  var quote = SES.mode==="exam" ? Math.round(pts/GESAMT*100) : pts;
   var verdictText = SES.mode==="exam"
-    ? (pts>=75 ? "Das ist ein sicheres Ergebnis. Halte das Niveau und arbeite gezielt das Fehlerarchiv ab."
-      : pts>=55 ? "Solide Basis. Die Punkte liegen jetzt in den Blöcken mit den meisten Fehlern — genau dort weitermachen."
-      : "Noch Luft nach oben. Nimm dir die schwächsten zwei Themenblöcke im Crashkurs vor und übe sie am Stück.")
-    : "Alles Falsche liegt jetzt im Fehlerarchiv und kommt automatisch wieder.";
+    ? (pts>=18 ? "Das trägt. Halte das Niveau und arbeite nur noch das Fehlerarchiv ab."
+      : pts>=12 ? "Solide Basis. Schau dir an, welche der drei Aufgaben dich Punkte gekostet hat — dort liegt der ganze Rest."
+      : "Noch Luft nach oben. Die Ableitung allein ist 8 Punkte wert und rein handwerklich: Nimm dir den Crashkurs Ableitungen vor und übe den Block am Stück.")
+    : "Alles Falsche liegt jetzt im Fehlerarchiv und kommt automatisch wieder — es verschwindet erst nach zwei richtigen Antworten in Folge.";
 
   return '<div class="stack">'+
     '<section class="hero">'+
       '<p class="eyebrow">'+(SES.mode==="exam"?"Simulation abgeschlossen":"Runde abgeschlossen")+'</p>'+
-      '<div class="score" style="margin-top:.5rem"><b>'+pts+'</b><span>'+(SES.mode==="exam"?"von 100 Punkten":"% richtig")+' · '+right+' von '+ids.length+'</span></div>'+
-      '<div class="meter'+(pts>=60?' good':'')+'" style="margin-top:.9rem"><i style="width:'+pts+'%"></i></div>'+
+      '<div class="score" style="margin-top:.5rem"><b>'+pts+'</b><span>'+(SES.mode==="exam"?"von "+GESAMT+" Punkten":"% richtig")+' · '+right+' von '+ids.length+' Aufgaben</span></div>'+
+      '<div class="meter'+(quote>=60?' good':'')+'" style="margin-top:.9rem"><i style="width:'+quote+'%"></i></div>'+
       '<p class="lead">'+verdictText+'</p>'+
       '<div class="row" style="margin-top:1rem">'+
         '<button class="btn" onclick="go(\'start\')">Zur Übersicht</button>'+
@@ -1968,7 +2708,7 @@ function viewResult(){
 /* ── Fuß ─────────────────────────────────────────────────────────────── */
 function footer(){
   var st = statOf(QUESTIONS);
-  return '<div class="foot"><span>'+QUESTIONS.length+' Aufgaben · '+Object.keys(PASSAGES).length+' englische Texte · Fortschritt lokal im Browser gespeichert</span>'+
+  return '<div class="foot"><span>'+QUESTIONS.length+' Aufgaben · '+Object.keys(PASSAGES).length+' englische Fachtexte · Fortschritt lokal im Browser gespeichert</span>'+
     '<span style="margin-left:auto">'+st.seen+' bearbeitet</span>'+
     '<button class="btn quiet" onclick="resetAll()">Zurücksetzen</button></div>';
 }

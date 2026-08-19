@@ -125,3 +125,54 @@ theorie("wi","Wahlbereich Wirtschaftsinformatik",[
  ["Engpassdenken","In einer Prozesskette bestimmt die langsamste Station den Durchsatz. Mitteln ist hier immer falsch."],
  ["Tabellen lesen","Zuerst die Gesamtsumme bilden, dann Anteile. Auf Einheiten achten (Tsd. €, Mio. €) — Einheitenfehler kosten mehr Punkte als Rechenfehler."]
 ]);
+
+/* ── Prüfungsrelevante Blöcke (nach der Originalklausur 2022) ────────── */
+theorie("ableitung","Ableitungen: Quotienten- & Kettenregel",[
+ ["Die drei Regeln","<b>Produktregel:</b> (u·v)′ = u′v + <b>u</b>v′ — hier steht ein Plus.<br><b>Quotientenregel:</b> (u/v)′ = (u′v − uv′) / v² — hier steht ein Minus, und die Reihenfolge ist entscheidend.<br><b>Kettenregel:</b> äußere Ableitung mal innere Ableitung."],
+ ["Eselsbrücke Quotientenregel","„NAZ minus ZAN, durch N-Quadrat dann“ — <b>N</b>enner mal <b>A</b>bleitung <b>Z</b>ähler, minus <b>Z</b>ähler mal <b>A</b>bleitung <b>N</b>enner, geteilt durch Nenner zum Quadrat. Wer die Reihenfolge dreht, bekommt exakt das falsche Vorzeichen — und genau diese Variante steht in der Klausur als Antwortoption bereit."],
+ ["ln(kx)′ = 1/x","Der wichtigste Einzelbaustein der Originalklausur. Jeder konstante Faktor im Logarithmus verschwindet beim Ableiten: ln(2x)′ = ln(7x)′ = ln(x)′ = 1/x. Grund: ln(kx) = ln k + ln x, und eine Konstante hat die Ableitung null."],
+ ["Allgemein ln und e","ln(u)′ = u′/u — Ableitung des Inneren über das Innere. e^u′ = u′·e^u — die e-Funktion bleibt stehen und wird mit der inneren Ableitung multipliziert."],
+ ["Wurzeln","√(u)′ = u′/(2√u). Bei u = x² ± c kürzt sich die Zwei immer weg, es bleibt x/√(x² ± c). Steht die Wurzel im Nenner, nie die Quotientenregel benutzen, sondern als negative Potenz schreiben: 1/√u = u^(−½)."],
+ ["Trigonometrie","sin′ = cos · cos′ = −sin. Das Minus entsteht nur beim Ableiten des Cosinus. Bei sin(2x) oder cos(x²) die innere Ableitung nicht vergessen."],
+ ["Doppelbrüche auflösen","Entsteht im Zähler ein Bruch (typisch bei Wurzeln), erweitere Zähler <em>und</em> Nenner mit dem störenden Term. Genau dieser Schritt führt in der Originalklausur von der rohen Quotientenregel auf die angebotene Antwortform."],
+ ["Antwort nicht gefunden?","Deine Lösung sieht anders aus als alle Optionen? Erst ausklammern, kürzen und erweitern, bevor du an einen Rechenfehler glaubst. Die Klausur bietet die Lösung fast nie in der Form an, in der sie beim Ableiten entsteht."],
+ ["Kontrolle ohne Taschenrechner","Setze eine Zahl ein, die die Wurzel glatt macht (bei √(x²−5) etwa x = 3, denn √4 = 2). Rechne den Wert mit zwei Kandidaten aus — meist unterscheiden sie sich sofort deutlich."]
+]);
+
+theorie("symmetrie","Symmetrie von Funktionen",[
+ ["Die zwei Definitionen","<b>gerade</b>: f(−x) = f(x) → achsensymmetrisch zur y-Achse.<br><b>ungerade</b>: f(−x) = −f(x) → punktsymmetrisch zum Ursprung.<br>Merkhilfe: <em>gerade → Gerade (Achse)</em>, <em>ungerade → Punkt</em>."],
+ ["Schnellregel für Polynome","Nur gerade Exponenten (x⁰, x², x⁴) → gerade. Nur ungerade Exponenten (x¹, x³, x⁵) → ungerade. Gemischt → keine der beiden Symmetrien. Konstanten zählen als x⁰, sind also gerade."],
+ ["Die Standardbausteine","sin, tan und 1/x sind <b>ungerade</b>. cos und alle x-Potenzen mit geradem Exponenten sind <b>gerade</b>. e^x ist weder noch."],
+ ["Produkte rechnen wie Vorzeichen","Setze gerade = „+“ und ungerade = „−“ und multipliziere: gerade·gerade = gerade, ungerade·ungerade = gerade, gerade·ungerade = ungerade. Für Quotienten gilt dasselbe. Bei <b>Summen</b> funktioniert das <em>nicht</em>: dort bleibt nur gerade+gerade = gerade und ungerade+ungerade = ungerade, gemischte Summen haben gar keine Symmetrie."],
+ ["Verschobene Funktionen — der Klausurtrick","Steht überall derselbe Klammerausdruck, substituiere ihn: bei f(x) = sin(x−1)·(x−1)² setze u = x−1. Bestimme die Symmetrie von g(u), und übersetze am Ende zurück: u = 0 entspricht x = 1, das Zentrum liegt also bei (1, 0)."],
+ ["Vorzeichenfalle beim Zurückübersetzen","Setze die Klammer null und löse nach x auf. (x − 2) → Zentrum bei x = 2. (x + 2) → Zentrum bei x = <b>−2</b>. Dieser eine Handgriff verhindert den häufigsten Fehler der Aufgabengattung."],
+ ["Achse oder Punkt?","Ist die substituierte Funktion gerade, lautet die Antwort „achsensymmetrisch zur Geraden x = a“. Ist sie ungerade, lautet sie „punktsymmetrisch zu (a, 0)“. Bei Achsensymmetrie ist eine additive Konstante egal, bei Punktsymmetrie gehört sie ins Zentrum."],
+ ["Der Freischuss","„Achsensymmetrisch zur x-Achse“ ist bei einer Funktion <b>immer</b> falsch — dann hätte ein x zwei y-Werte. Diese Option kannst du ohne jede Rechnung streichen."],
+ ["Ein-Zahl-Probe","Unsicher? Rechne f(1) und f(−1). Bei gerader Funktion müssen beide gleich sein, bei ungerader entgegengesetzt. Stimmt weder das eine noch das andere, liegt keine Symmetrie zum Ursprung vor."]
+]);
+
+theorie("raetsel","Ehrliche, Lügner & Normale",[
+ ["Die drei Rollen","<b>Ehrlicher:</b> jede Aussage wahr. <b>Lügner:</b> jede Aussage falsch. <b>Normaler:</b> darf beides — aus seinen Aussagen folgt nie ein Widerspruch. Der Normale ist der Joker und deshalb nie der Ansatzpunkt."],
+ ["Das Grundverfahren","Nimm eine Person, unterstelle ihr nacheinander jede Rolle und prüfe, ob ein Widerspruch entsteht. Beginne bei der Person, die etwas <em>über sich selbst</em> sagt — solche Aussagen schränken am stärksten ein."],
+ ["Zuerst die strengen Rollen prüfen","Widersprüche entstehen fast immer beim Ehrlichen oder beim Lügner, weil nur sie Verbote haben. Prüfe deshalb: Darf ein Lügner diesen Satz sagen (ist er also falsch)? Darf ein Ehrlicher ihn sagen (ist er also wahr)?"],
+ ["Zwei Sätze, die alles entscheiden","„<b>Ich bin ein Lügner</b>“ kann weder ein Ehrlicher (wäre falsch) noch ein Lügner (wäre wahr) sagen → die Person ist ein <b>Normaler</b>.<br>„<b>Ich bin ein Ehrlicher</b>“ kann <em>jeder</em> sagen und liefert null Information."],
+ ["Aussagen über Aussagen","„Was A gesagt hat, ist wahr“ überträgt den Wahrheitswert: Ist A's Aussage wahr, ist auch B's Aussage wahr — unabhängig davon, wer A und B sind. So verkettest du zwei Personen in einem Schritt."],
+ ["Und, oder, mindestens","Die Verneinung von „<em>beide</em> sind Lügner“ ist „<em>mindestens einer</em> ist kein Lügner“ — nicht „keiner ist Lügner“ (De Morgan). Die Verneinung von „mindestens einer“ ist „keiner“. Fast jedes Rätsel dieser Art hängt genau an dieser Umformung."],
+ ["Wenn-dann-Aussagen","Eine Wenn-dann-Aussage ist nur falsch, wenn die Bedingung zutrifft und die Folge nicht. Ist die Bedingung falsch, ist die gesamte Aussage <b>wahr</b>. Folge: Ein Lügner kann eine Wenn-dann-Aussage über sich selbst („Wenn ich ehrlich bin, dann …“) niemals aussprechen."],
+ ["Alle Fälle prüfen","Höre nicht bei der ersten passenden Lösung auf. Bleiben mehrere widerspruchsfreie Fälle übrig, lautet die Antwort „nicht bestimmbar“ — oder du suchst die Aussage, die in <em>allen</em> offenen Fällen gilt."],
+ ["Systematisch bei drei Personen","Bei genau einem Ehrlichen, einem Lügner und einem Normalen gibt es nur 3 · 2 · 1 = 6 Möglichkeiten. Notfalls schreibst du alle sechs untereinander und streichst durch — das dauert keine fünf Minuten und ist bei 8 Punkten die Zeit wert."]
+]);
+
+theorie("tv","Technisches Verständnis",[
+ ["Die Aufgabenstellung genau lesen","Gefragt ist ausschließlich: Steht das so im Text oder folgt es <em>direkt</em> daraus? Ob die Aussage in der Wirklichkeit zutrifft, ist ausdrücklich <b>irrelevant</b>. Schalte dein Fachwissen bewusst ab — es führt hier systematisch in die Irre."],
+ ["Vorgehen","Text einmal in Ruhe lesen und dabei Verneinungen, Vergleiche und Begründungen markieren. Dann Aussage für Aussage die zugehörige Textstelle aufsuchen und wörtlich vergleichen. Nie aus der Erinnerung antworten — bei vier Aussagen zu einem kurzen Text ist dafür genug Zeit."],
+ ["Falle 1: Begriffsvertauschung","Ein einziges Substantiv wird ausgetauscht: „Kollaps konventioneller <b>Methoden</b>“ wird zu „Kollaps konventioneller <b>Designs</b>“. Gegenmittel: Unterstreiche das zentrale Substantiv der Aussage und suche genau dieses Wort im Text."],
+ ["Falle 2: Bewertung umgedreht","Ein Nachteil wird als Vorteil ausgegeben. Achte auf Signalwörter im Text: <em>although, but, however, a serious problem, drops</em> — sie zeigen, auf welcher Seite der Bilanz etwas steht."],
+ ["Falle 3: Übergeneralisierung","Aus „manche“ oder „nicht alle“ wird „alle“. Absolutwörter (<em>alle, immer, nie, jeder</em>) sind fast immer ein Alarmsignal. Suche gezielt nach einer Ausnahme im Text."],
+ ["Falle 4: untergeschobene Ursache","Die Wirkung stimmt, die Begründung ist erfunden. Bei jedem <em>weil, deshalb, aufgrund</em> prüfst du zwei Dinge getrennt: Steht die Wirkung im Text? Und steht <b>diese</b> Ursache im Text?"],
+ ["Falle 5: Querverbindung","Zwei richtige Aussagen aus verschiedenen Absätzen werden mit einem „weil“ verbunden. Prüfe, ob Ursache und Wirkung im Text im <em>selben</em> Zusammenhang stehen."],
+ ["Falle 6: Handlungsempfehlung","Der Text beschreibt, die Aussage fordert („sollte“, „muss“). Fachtexte dieser Art geben selten Ratschläge — eine Aussage im Befehlston ist besonders verdächtig."],
+ ["Stärke muss passen","<em>may</em> ↔ <em>kann</em>, <em>often</em> ↔ <em>häufig</em>, <em>must</em> ↔ <em>zwangsläufig</em>. Eine Aussage, die mehr behauptet als der Text hergibt, ist falsch; eine, die <em>weniger</em> behauptet, ist meist gedeckt."],
+ ["Sinnprobe","Frage dich: Ergäbe der Text noch Sinn, wenn diese Aussage stimmte? Wird ein ganzer Absatz dadurch überflüssig, ist die Aussage falsch. Das funktioniert auch, wenn du die genaue Stelle nicht wiederfindest."],
+ ["Unbekannte Fachwörter","Die Erklärung steht fast immer im ersten Satz, in dem der Begriff auftaucht. Den ersten Absatz langsam lesen, den Rest schneller."]
+]);

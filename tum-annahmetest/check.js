@@ -21,7 +21,9 @@ const code = readdirSync(dir).filter((f) => f.endsWith(".js")).sort()
 new Function("q", "passage", "theorie", code)(ctx.q, ctx.passage, ctx.theorie);
 
 const TOPICS = ["algebra","potenz","prozent","analysis","geo","stoch","folgen",
-                "logik","schluss","reihen","algo","english","wi"];
+                "logik","schluss","reihen","algo","english","wi",
+                "ableitung","symmetrie","raetsel","tv"];
+const ZWEIWAHL = ["tv"];  // Ja/Nein-Aussagen haben bewusst nur zwei Optionen
 
 const errors = [];
 const seen = new Set();
@@ -30,7 +32,8 @@ for (const x of QUESTIONS) {
   if (seen.has(x.id)) errors.push(`${at}: doppelte ID`);
   seen.add(x.id);
   if (!TOPICS.includes(x.topic)) errors.push(`${at}: unbekanntes Thema "${x.topic}"`);
-  if (!Array.isArray(x.opts) || x.opts.length < 4) errors.push(`${at}: weniger als 4 Optionen`);
+  const min = ZWEIWAHL.includes(x.topic) ? 2 : 4;
+  if (!Array.isArray(x.opts) || x.opts.length < min) errors.push(`${at}: weniger als ${min} Optionen`);
   if (new Set(x.opts).size !== x.opts.length) errors.push(`${at}: doppelte Option`);
   if (x.ans !== 0) errors.push(`${at}: Antwort muss beim Autoren-Format an Index 0 stehen`);
   if (!x.exp || x.exp.length < 20) errors.push(`${at}: Erklärung fehlt oder ist zu kurz`);

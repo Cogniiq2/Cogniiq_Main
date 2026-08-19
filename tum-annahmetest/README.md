@@ -3,21 +3,32 @@
 Lern- und Prüfungstrainer für den Eignungsfeststellungstest zum B.Sc. Wirtschaftsinformatik
 an der TUM (Forschungscampus Garching).
 
-Der Test dauert **90 Minuten**, bringt maximal **100 Punkte** und besteht ausschließlich aus
-**Single-Choice-Aufgaben**. Geprüft werden Schulmathematik, logisches Denken und englisches
-Textverständnis; dazu kommt ein Wahlbereich, in dem man zwischen einem Informatik- und einem
-Wirtschaftsinformatik-Block wählen kann. **Hilfsmittel sind nicht zugelassen** — kein
-Taschenrechner, keine Formelsammlung.
+## Format der Klausur
+
+Grundlage ist die Originalklausur **IN0000 Endterm vom 30.08.2022**, 90 Minuten,
+**24 Punkte**, ausschließlich Multiple Choice, **keine Hilfsmittel**:
+
+| Aufgabe | Inhalt | Punkte |
+|---|---|---|
+| 1a | Symmetrieverhalten einer Funktion | 4 |
+| 1b | Ableitung (Quotienten- und Kettenregel) | 8 |
+| 2 | Logikrätsel: Ehrliche, Lügner und Normale | 8 |
+| 3 | Englischer Fachtext, vier Aussagen einzeln beurteilen | 4 |
+
+Entscheidend ist der Zuschnitt: **nur drei Aufgaben in 90 Minuten**. Pro Aufgabe bleibt
+also sehr viel Zeit, aber ein einzelner Fehler kostet bis zu einem Drittel der Punkte.
+20 der 24 Punkte hängen an drei erlernbaren Fertigkeiten (Ableiten, Logikrätsel, Symmetrie).
 
 ## Inhalt
 
-- **233 Aufgaben** in 13 Themenblöcken, jede mit Lösungsweg und der typischen Falle
-- **5 englische Lesetexte** mit je 4 Fragen (Hauptaussage, Detail, Inferenz, Vokabel im Kontext)
-- **Crashkurs** — kompakte Formeln und Rechentechniken für den Kopf, ohne Taschenrechner
-- **Prüfungssimulation** — 40 Aufgaben, 90 Minuten, Rückmeldung erst am Ende
-- **Fehlerarchiv** — falsch beantwortete Aufgaben kommen automatisch wieder und verschwinden
-  erst nach zwei richtigen Antworten in Folge
-- **Lernplan** bis zum Testtag mit Countdown
+- **304 Aufgaben**, davon 71 in den vier prüfungsrelevanten Blöcken
+- **Originalklausur 2022** mit vollständig durchgerechnetem Lösungsweg zu allen drei Aufgaben
+- **11 englische Fachtexte**, davon 6 im Klausurformat „Steht das so im Text?“
+- **17 Crashkurs-Kapitel** mit Formeln, Rechenwegen und den typischen Fallen
+- **Prüfungssimulation** im Originalformat: 24 Punkte, 90 Minuten, Rückmeldung erst am Ende
+- **Fehlerarchiv** — falsche Aufgaben kommen automatisch wieder und verschwinden erst
+  nach zwei richtigen Antworten in Folge
+- **Zwei-Tage-Plan** mit Zeitangaben und direktem Einstieg in jede Übung
 
 Der Fortschritt liegt in `localStorage` — kein Server, kein Konto, keine Netzwerkanfragen.
 
@@ -47,8 +58,12 @@ In einer Datei unter `src/data/` anhängen — **die richtige Antwort steht imme
 die Reihenfolge wird zur Laufzeit pro Aufgabe stabil gemischt:
 
 ```js
-q("alg-25","algebra",2,"Frage …",["richtig","falsch","falsch","falsch"],0,"Lösungsweg …");
+q("abl-19","ableitung",2,"Frage …",["richtig","falsch","falsch","falsch"],0,"Lösungsweg …");
 ```
 
-Antwortoptionen wie „Keine der genannten“ bleiben beim Mischen automatisch an letzter Stelle.
+Erklärungen dürfen HTML enthalten (`<p>`, `<ol>`, `<code>`, `<b>`). **Verweise auf
+Optionsnummern sind nicht zulässig**, da die Reihenfolge gemischt wird — falsche Antworten
+immer inhaltlich benennen. Antwortoptionen wie „Keine der genannten“ bleiben beim Mischen
+automatisch an letzter Stelle. Aussagen zum Textverständnis (`tv`) haben zwei Optionen.
+
 Danach `node check.js && node build.js`.

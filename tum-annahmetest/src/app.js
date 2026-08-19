@@ -3,40 +3,69 @@
 var TEST_AT = new Date("2026-08-21T09:00:00+02:00");
 
 var TOPICS = [
-  {id:"algebra", n:"Algebra & Gleichungen",        g:"Mathematik"},
-  {id:"potenz",  n:"Potenzen, Wurzeln, Logarithmen", g:"Mathematik"},
-  {id:"prozent", n:"Prozent, Zins & Dreisatz",     g:"Mathematik"},
-  {id:"analysis",n:"Analysis",                     g:"Mathematik"},
-  {id:"geo",     n:"Geometrie & Trigonometrie",    g:"Mathematik"},
-  {id:"stoch",   n:"Stochastik & Kombinatorik",    g:"Mathematik"},
-  {id:"folgen",  n:"Folgen & Reihen",              g:"Mathematik"},
-  {id:"logik",   n:"Aussagenlogik & Mengen",       g:"Logik"},
-  {id:"schluss", n:"Schlussfolgerndes Denken",     g:"Logik"},
-  {id:"reihen",  n:"Zahlenreihen & Muster",        g:"Logik"},
-  {id:"algo",    n:"Algorithmisches Denken",       g:"Logik"},
-  {id:"english", n:"English Reading Comprehension",g:"Textverständnis"},
-  {id:"wi",      n:"Wahlbereich Wirtschaftsinformatik", g:"Wahlbereich"}
+  {id:"ableitung",n:"Ableitungen — Quotienten- & Kettenregel", g:"Prüfungsrelevant"},
+  {id:"symmetrie",n:"Symmetrie von Funktionen",            g:"Prüfungsrelevant"},
+  {id:"raetsel",  n:"Ehrliche, Lügner & Normale",          g:"Prüfungsrelevant"},
+  {id:"tv",       n:"Technisches Verständnis",             g:"Prüfungsrelevant"},
+  {id:"analysis", n:"Analysis — Grundlagen",               g:"Mathematik: Unterbau"},
+  {id:"algebra",  n:"Algebra & Gleichungen",               g:"Mathematik: Unterbau"},
+  {id:"potenz",   n:"Potenzen, Wurzeln, Logarithmen",      g:"Mathematik: Unterbau"},
+  {id:"geo",      n:"Geometrie & Trigonometrie",           g:"Mathematik: Unterbau"},
+  {id:"prozent",  n:"Prozent, Zins & Dreisatz",            g:"Mathematik: Unterbau"},
+  {id:"stoch",    n:"Stochastik & Kombinatorik",           g:"Mathematik: Unterbau"},
+  {id:"folgen",   n:"Folgen & Reihen",                     g:"Mathematik: Unterbau"},
+  {id:"logik",    n:"Aussagenlogik & Mengen",              g:"Logik: Unterbau"},
+  {id:"schluss",  n:"Schlussfolgerndes Denken",            g:"Logik: Unterbau"},
+  {id:"reihen",   n:"Zahlenreihen & Muster",               g:"Logik: Unterbau"},
+  {id:"algo",     n:"Algorithmisches Denken",              g:"Logik: Unterbau"},
+  {id:"english",  n:"English Reading Comprehension",       g:"Zusatz"},
+  {id:"wi",       n:"Wirtschaftsinformatik",               g:"Zusatz"}
 ];
 var TOPIC_BY = {}; TOPICS.forEach(function(t){ TOPIC_BY[t.id] = t; });
 
-var MATH  = ["algebra","potenz","prozent","analysis","geo","stoch","folgen"];
-var LOGIC = ["logik","schluss","reihen","algo"];
+/* Aufbau der Originalklausur 2022: 3 Aufgaben, 24 Punkte, 90 Minuten. */
+var KERN = ["symmetrie","ableitung","raetsel","tv"];
+var PUNKTE = {symmetrie:4, ableitung:8, raetsel:8, tv:1};
+var GESAMT = 24;
 
-var PLAN = [
-  {d:"2026-08-15", t:"Standort bestimmen",
-   p:"Eine vollständige Prüfungssimulation — kalt, ohne Vorbereitung. Danach Crashkurs Algebra und Potenzen und beide Blöcke üben."},
-  {d:"2026-08-16", t:"Prozentrechnung & Reihen",
-   p:"Prozent, Zins, Dreisatz und Folgen & Reihen. Alles im Kopf rechnen, konsequent ohne Taschenrechner."},
-  {d:"2026-08-17", t:"Analysis & Geometrie",
-   p:"Ableitungen, Kurvendiskussion, Integrale. Dann Flächen, Körper, Pythagoras und die Standardwerte der Trigonometrie."},
-  {d:"2026-08-18", t:"Stochastik & Wahlbereich",
-   p:"Laplace, Gegenereignis, Binomialkoeffizient. Anschließend der Wirtschaftsinformatik-Block: Deckungsbeitrag, Break-even, Kennzahlen."},
-  {d:"2026-08-19", t:"Logik komplett",
-   p:"Aussagenlogik, Schlussfolgern, Zahlenreihen, algorithmisches Denken — die vier Blöcke am Stück. Hier liegen die schnellsten Punkte."},
-  {d:"2026-08-20", t:"Simulation & Fehlerarchiv",
-   p:"English Reading, dann die zweite Prüfungssimulation unter Zeitdruck. Zum Schluss das Fehlerarchiv leeren. Früh schlafen."},
-  {d:"2026-08-21", t:"Testtag in Garching",
-   p:"Nichts Neues mehr lernen. Ausweis, Einladung, Stifte. 90 Minuten, 100 Punkte, keine Hilfsmittel — im Zweifel raten und weitergehen."}
+var SPRINT = [
+  {tag:"Tag 1", titel:"Die drei Aufgabentypen beherrschen", schritte:[
+    {t:"Originalklausur 2022 durcharbeiten", z:"20 min",
+     p:"Alle drei echten Aufgaben mit vollständigem Lösungsweg. Danach weißt du genau, worauf es ankommt.",
+     act:"startOriginal()", btn:"Ansehen"},
+    {t:"Ableitungen — der 8-Punkte-Block", z:"60 min",
+     p:"Quotienten- und Kettenregel. Ein Drittel der Klausur hängt an dieser einen Aufgabe. Erst den Crashkurs lesen, dann alle 18 Aufgaben.",
+     act:"startPractice('ableitung')", btn:"Üben"},
+    {t:"Symmetrie — der 4-Punkte-Block", z:"30 min",
+     p:"Substituieren, Bausteine einordnen, zurückübersetzen. Der am schnellsten erlernbare Block der ganzen Klausur.",
+     act:"startPractice('symmetrie')", btn:"Üben"},
+    {t:"Ehrliche & Lügner — der 8-Punkte-Block", z:"45 min",
+     p:"Das Verfahren ist immer dasselbe: Rolle unterstellen, Widerspruch suchen. Zwölf Rätsel vom leichten bis zum Klausurniveau.",
+     act:"startPractice('raetsel')", btn:"Üben"},
+    {t:"Erste Prüfungssimulation", z:"90 min",
+     p:"Im Originalformat: 24 Punkte, 90 Minuten, Rückmeldung erst am Ende.",
+     act:"startExam()", btn:"Starten"}
+  ]},
+  {tag:"Tag 2", titel:"Festigen und Lücken schließen", schritte:[
+    {t:"Fehlerarchiv leeren", z:"30 min",
+     p:"Alles von gestern, was noch nicht sitzt. Das ist die wirksamste halbe Stunde des ganzen Plans.",
+     act:"startReview()", btn:"Wiederholen"},
+    {t:"Technisches Verständnis", z:"45 min",
+     p:"Sechs englische Fachtexte mit je vier Aussagen. Entscheidend sind nicht Englischkenntnisse, sondern das Erkennen der sechs Fallenarten.",
+     act:"startPractice('tv')", btn:"Üben"},
+    {t:"Ableitungen — zweite Runde", z:"40 min",
+     p:"Wiederholung mit Abstand ist der Grund, warum es hängen bleibt. Jetzt auf Zeit: höchstens drei Minuten pro Aufgabe.",
+     act:"startPractice('ableitung')", btn:"Üben"},
+    {t:"Rätsel und Symmetrie mischen", z:"30 min",
+     p:"Gemischte Runde aus allen vier Prüfungsblöcken — so wie es in der Klausur kommt.",
+     act:"startPractice('kern')", btn:"Üben"},
+    {t:"Zweite Prüfungssimulation", z:"90 min",
+     p:"Unter echten Bedingungen. Ziel: über 18 von 24 Punkten.",
+     act:"startExam()", btn:"Starten"},
+    {t:"Crashkurs querlesen", z:"20 min",
+     p:"Zum Abschluss alle Merksätze der vier Prüfungsblöcke durchgehen. Nichts Neues mehr anfangen.",
+     act:"go('wissen')", btn:"Öffnen"}
+  ]}
 ];
 
 /* ── Zustand ─────────────────────────────────────────────────────────── */
@@ -131,7 +160,9 @@ function pick(pool, n){
 var SES = null, TICK = null;
 
 function startPractice(topic){
-  var pool = topic==="alle" ? QUESTIONS.slice() : inTopic(topic);
+  var pool = topic==="alle" ? QUESTIONS.slice()
+    : topic==="kern" ? QUESTIONS.filter(function(x){ return KERN.indexOf(x.topic) >= 0; })
+    : inTopic(topic);
   var chosen = pick(pool, Math.min(10, pool.length));
   chosen = groupPassages(shuffle(chosen));
   SES = {mode:"practice", topic:topic, ids:chosen.map(function(x){return x.id;}), i:0, ans:{}, done:false};
@@ -158,22 +189,17 @@ function groupPassages(list){
 
 function buildExam(){
   var out = [];
-  /* 18 Mathematik, gleichmäßig über die sieben Blöcke */
-  var mathPool = [];
-  MATH.forEach(function(t){ mathPool = mathPool.concat(shuffle(inTopic(t)).slice(0,3)); });
-  out = out.concat(shuffle(mathPool).slice(0,18));
-  /* 10 Logik */
-  var logicPool = [];
-  LOGIC.forEach(function(t){ logicPool = logicPool.concat(shuffle(inTopic(t)).slice(0,3)); });
-  out = out.concat(shuffle(logicPool).slice(0,10));
-  /* 8 Textverständnis: zwei vollständige Texte */
-  var pids = shuffle(Object.keys(PASSAGES)).slice(0,2);
-  pids.forEach(function(p){
-    out = out.concat(QUESTIONS.filter(function(x){ return x.pid===p; }));
-  });
-  /* 4 Wahlbereich */
-  out = out.concat(shuffle(inTopic("wi")).slice(0,4));
-  return groupPassages(out);
+  /* Aufgabe 1: Symmetrie (4 P) und Ableitung (8 P) */
+  out = out.concat(shuffle(inTopic("symmetrie")).slice(0,1));
+  out = out.concat(shuffle(inTopic("ableitung")).slice(0,1));
+  /* Aufgabe 2: ein Logikrätsel (8 P) */
+  out = out.concat(shuffle(inTopic("raetsel")).slice(0,1));
+  /* Aufgabe 3: ein Fachtext mit allen vier Aussagen (je 1 P) */
+  var texte = {};
+  inTopic("tv").forEach(function(x){ if(x.pid) texte[x.pid] = 1; });
+  var pid = shuffle(Object.keys(texte))[0];
+  out = out.concat(QUESTIONS.filter(function(x){ return x.pid === pid; }));
+  return out;
 }
 function startExam(){
   var qs = buildExam();
@@ -183,6 +209,12 @@ function startExam(){
   go("run");
 }
 function resumeExam(){ SES = S.live; go("run"); }
+function startOriginal(){
+  var ids = ["org-1a","org-1b","org-2","org-3a","org-3b","org-3c","org-3d"]
+    .filter(function(id){ return byId(id); });
+  SES = {mode:"practice", topic:"original", ids:ids, i:0, ans:{}, done:false};
+  go("run");
+}
 
 function answer(pos){
   var qq = byId(SES.ids[SES.i]);
@@ -206,15 +238,16 @@ function prev(){ if(SES.i>0){ SES.i--; render(); } }
 function finish(){
   SES.done = true;
   if(SES.mode === "exam"){
-    var right = 0;
+    var right = 0, pts = 0;
     SES.ids.forEach(function(id){
       var qq = byId(id), given = SES.ans[id], r = rec(id);
       r.n++;
-      if(given === qq.ans){ right++; r.ok++; r.streak++; } else { r.streak = 0; r.wrong++; }
+      if(given === qq.ans){ right++; pts += (PUNKTE[qq.topic] || 1); r.ok++; r.streak++; }
+      else { r.streak = 0; r.wrong++; }
     });
-    SES.points = Math.round(right / SES.ids.length * 100);
+    SES.points = pts;
     SES.right = right;
-    S.exams.push({at:Date.now(), points:SES.points, right:right, of:SES.ids.length});
+    S.exams.push({at:Date.now(), points:pts, right:right, of:SES.ids.length});
     S.live = null;
   }
   save();
@@ -275,44 +308,47 @@ function tickExam(){
 
 /* ── Ansicht: Start ──────────────────────────────────────────────────── */
 function viewStart(){
-  var all = statOf(QUESTIONS);
+  var kern = QUESTIONS.filter(function(x){ return KERN.indexOf(x.topic) >= 0; });
+  var st = statOf(kern);
   var nw = wrongPool().length;
   var last = S.exams.length ? S.exams[S.exams.length-1] : null;
-  var td = today();
-
-  var planHtml = PLAN.map(function(p){
-    var done = !!S.plan[p.d];
-    return '<li class="'+(p.d===td?"now":"")+(done?" ok":"")+'">'+
-      '<span class="day">'+deDate(p.d)+'</span>'+
-      '<span class="what"><b>'+p.t+'</b><p>'+p.p+'</p></span>'+
-      '<button class="tick" onclick="togglePlan(\''+p.d+'\')" aria-pressed="'+done+'" '+
-        'title="'+(done?"Als offen markieren":"Als erledigt markieren")+'">'+(done?"✓":"")+'</button>'+
-    '</li>';
-  }).join("");
 
   return '<div class="stack">'+
     '<section class="hero">'+
-      '<p class="eyebrow">Eignungsfeststellungstest · B.Sc. Wirtschaftsinformatik</p>'+
-      '<h1>Sechs Tage, drei Testteile, keine Hilfsmittel.</h1>'+
-      '<p class="lead">Der Test dauert 90 Minuten, bringt maximal 100 Punkte und besteht ausschließlich aus Single-Choice-Aufgaben — genau eine Antwort ist richtig. Geprüft werden Schulmathematik, logisches Denken und englisches Textverständnis. Taschenrechner und Formelsammlungen sind nicht zugelassen.</p>'+
-      '<div class="dday"><b>'+Math.max(0,daysLeft())+'</b><span>Tage bis Freitag, 21.08.2026 · Forschungscampus Garching</span></div>'+
+      '<p class="eyebrow">Eignungsfeststellungsverfahren · TUM · Klausur IN0000</p>'+
+      '<h1>Drei Aufgaben, 24 Punkte, 90 Minuten.</h1>'+
+      '<p class="lead">Die Klausur besteht aus nur drei Aufgaben — und zwei davon sind Mathematik. '+
+      'Das heißt: Du hast pro Aufgabe sehr viel Zeit, aber ein einziger Fehler kostet bis zu einem Drittel der Punkte. '+
+      'Sorgfalt schlägt Geschwindigkeit. Hilfsmittel sind nicht zugelassen.</p>'+
       '<dl class="facts">'+
-        fact("Dauer","90 Minuten")+
-        fact("Punkte","max. 100")+
-        fact("Format","Single Choice")+
-        fact("Hilfsmittel","keine")+
+        fact("Aufgabe 1 · Mathematik","12 Punkte")+
+        fact("Aufgabe 2 · Logik","8 Punkte")+
+        fact("Aufgabe 3 · Text","4 Punkte")+
+        fact("Zeit","90 Minuten")+
       '</dl>'+
+      '<div class="dday"><b>'+Math.max(0,daysLeft())+'</b><span>Tage bis Freitag, 21.08.2026 · Forschungscampus Garching</span></div>'+
     '</section>'+
 
     '<div class="tiles">'+
-      tile("Weiterlernen", all.mastered+" / "+all.total, "Aufgaben sitzen sicher", "startPractice('alle')")+
-      tile("Prüfungssimulation", last? last.points+" P." : "90 min", last? "letztes Ergebnis" : "40 Aufgaben, volle Zeit", "go('pruefung')")+
+      tile("Originalklausur 2022", "3", "Aufgaben mit Lösungsweg", "startOriginal()")+
+      tile("Prüfungssimulation", last? last.points+" / 24" : "24 P.", last? "letztes Ergebnis" : "im Originalformat", "startExam()")+
       tile("Fehlerarchiv", String(nw), nw? "Aufgaben warten auf dich" : "nichts offen", nw? "startReview()" : "go('fehler')")+
     '</div>'+
 
+    '<section class="card" style="border-color:var(--accent-line)">'+
+      '<p class="eyebrow">Wo die Punkte liegen</p>'+
+      '<p class="lead" style="margin-top:.4rem">In der Originalklausur waren <b>20 von 24 Punkten</b> mit nur drei Fertigkeiten zu holen: '+
+      'eine Ableitung mit Quotienten- und Kettenregel (8 P), ein Logikrätsel um Ehrliche und Lügner (8 P) und eine Symmetriebestimmung (4 P). '+
+      'Genau diese drei stehen in deinem Plan ganz oben — sie sind alle in zwei Tagen erlernbar.</p>'+
+      '<div class="row" style="margin-top:.9rem">'+
+        '<button class="btn" onclick="startPractice(\'kern\')">Prüfungsblöcke üben</button>'+
+        '<span class="pct" style="align-self:center;color:var(--ink-2)">'+st.mastered+' von '+st.total+' sitzen sicher</span>'+
+      '</div>'+
+    '</section>'+
+
     '<section>'+
-      '<p class="eyebrow" style="margin-bottom:.5rem">Lernplan bis zum Testtag</p>'+
-      '<div class="list"><ul class="plan">'+planHtml+'</ul></div>'+
+      '<p class="eyebrow" style="margin-bottom:.5rem">Zwei-Tage-Plan</p>'+
+      sprintList()+
     '</section>'+
 
     '<section>'+
@@ -321,12 +357,33 @@ function viewStart(){
     '</section>'+
     footer();
 }
+
+function sprintList(){
+  return SPRINT.map(function(tag, ti){
+    var rows = tag.schritte.map(function(sc, si){
+      var key = ti+"-"+si, done = !!S.plan[key];
+      return '<li class="'+(done?"ok":"")+'">'+
+        '<span class="day">'+sc.z+'</span>'+
+        '<span class="what"><b>'+sc.t+'</b><p>'+sc.p+'</p>'+
+          '<button class="btn ghost" style="margin-top:.55rem;padding:.35rem .7rem;font-size:.82rem" onclick="'+sc.act+'">'+sc.btn+'</button>'+
+        '</span>'+
+        '<button class="tick" onclick="togglePlan(\''+key+'\')" aria-pressed="'+done+'" '+
+          'title="'+(done?"Als offen markieren":"Als erledigt markieren")+'">'+(done?"✓":"")+'</button>'+
+      '</li>';
+    }).join("");
+    return '<div class="list" style="margin-bottom:.75rem">'+
+      '<div class="item" style="pointer-events:none;background:var(--raise)">'+
+        '<span class="nm">'+tag.tag+' — '+tag.titel+'</span></div>'+
+      '<ul class="plan">'+rows+'</ul></div>';
+  }).join("");
+}
+
 function fact(k,v){ return '<div class="fact"><dt>'+k+'</dt><dd>'+v+'</dd></div>'; }
 function tile(t,big,sub,act){
   return '<button class="tile" onclick="'+act+'"><strong>'+t+'</strong>'+
     '<span class="big">'+big+'</span><em>'+sub+'</em></button>';
 }
-function togglePlan(d){ S.plan[d] = !S.plan[d]; save(); render(); }
+function togglePlan(k){ S.plan[k] = !S.plan[k]; save(); render(); }
 
 function topicList(){
   var out = '', group = '';
@@ -364,8 +421,8 @@ function viewUeben(){
 function viewPruefung(){
   var hist = S.exams.slice().reverse().map(function(e){
     var d = new Date(e.at);
-    return '<div class="rev"><span class="mk '+(e.points>=60?'ok':'no')+'">'+e.points+'</span>'+
-      '<span><span class="q">'+e.right+' von '+e.of+' richtig</span>'+
+    return '<div class="rev"><span class="mk '+(e.points>=15?'ok':'no')+'">'+e.points+'</span>'+
+      '<span><span class="q">'+e.points+' von 24 Punkten · '+e.right+' von '+e.of+' Aufgaben richtig</span>'+
       '<span class="a">'+pad(d.getDate())+"."+pad(d.getMonth()+1)+"."+d.getFullYear()+' · '+pad(d.getHours())+':'+pad(d.getMinutes())+'</span></span></div>';
   }).join("");
 
@@ -376,16 +433,22 @@ function viewPruefung(){
 
   return '<div class="stack">'+ live +
     '<section><h2>Prüfungssimulation</h2>'+
-      '<p class="lead">40 Aufgaben in 90 Minuten, gewichtet wie im echten Test: 18 Mathematik, 10 Logik, 8 englisches Textverständnis, 4 aus dem Wahlbereich Wirtschaftsinformatik. Jede Aufgabe zählt 2,5 Punkte. Rückmeldung gibt es erst am Ende — genau wie in Garching.</p>'+
+      '<p class="lead">Im Aufbau der Originalklausur vom 30.08.2022: drei Aufgaben, 24 Punkte, 90 Minuten. '+
+      'Aufgabe 1 besteht aus einer Symmetriebestimmung (4 P) und einer Ableitung (8 P), Aufgabe 2 ist ein Logikrätsel (8 P), '+
+      'Aufgabe 3 ein englischer Fachtext mit vier Aussagen (je 1 P). Rückmeldung gibt es erst am Ende.</p>'+
       '<div class="card" style="margin-top:.9rem">'+
-        '<p class="eyebrow">So läuft es ab</p>'+
+        '<p class="eyebrow">Zeiteinteilung, die aufgeht</p>'+
         '<ul style="margin:.5rem 0 0;padding-left:1.1rem;color:var(--ink-2);font-size:.9rem;line-height:1.7">'+
-          '<li>Kein Taschenrechner, kein Papier außer dem, was du dir selbst hinlegst.</li>'+
+          '<li><b>35 Minuten</b> für die Ableitung — sie ist mit 8 Punkten am teuersten und rein handwerklich.</li>'+
+          '<li><b>25 Minuten</b> für das Logikrätsel. Notfalls alle sechs Fälle durchschreiben, das reicht zeitlich.</li>'+
+          '<li><b>15 Minuten</b> für die Symmetrie, <b>15 Minuten</b> für den Text.</li>'+
           '<li>Falsche Antworten kosten keine Punkte — nichts unbeantwortet lassen.</li>'+
-          '<li>Rund 2 Minuten pro Aufgabe. Wer hängen bleibt, geht weiter und kommt zurück.</li>'+
         '</ul>'+
       '</div>'+
-      '<div class="row" style="margin-top:1rem"><button class="btn" onclick="startExam()">Simulation starten</button></div>'+
+      '<div class="row" style="margin-top:1rem">'+
+        '<button class="btn" onclick="startExam()">Simulation starten</button>'+
+        '<button class="btn ghost" onclick="startOriginal()">Originalklausur 2022 ansehen</button>'+
+      '</div>'+
     '</section>'+
     (hist? '<section><p class="eyebrow" style="margin-bottom:.3rem">Bisherige Ergebnisse</p><div class="card" style="padding-top:.2rem">'+hist+'</div></section>':'')+
     footer();
@@ -418,19 +481,29 @@ function viewFehler(){
 
 /* ── Ansicht: Wissen ─────────────────────────────────────────────────── */
 function viewWissen(){
-  var body = THEORIE.map(function(t){
-    var items = t.items.map(function(it){
-      return '<dt>'+it[0]+'</dt><dd>'+it[1]+'</dd>';
-    }).join("");
-    return '<details class="th"><summary>'+t.title+'</summary>'+
+  /* Reihenfolge wie in TOPICS: die vier Prüfungsblöcke zuerst. */
+  var sorted = THEORIE.slice().sort(function(a,b){
+    return TOPICS.findIndex(function(t){return t.id===a.topic;}) -
+           TOPICS.findIndex(function(t){return t.id===b.topic;});
+  });
+  var body = "", group = "";
+  sorted.forEach(function(t){
+    var g = (TOPIC_BY[t.topic]||{}).g || "Weitere";
+    if(g !== group){
+      group = g;
+      body += '<p class="eyebrow" style="margin:1.4rem 0 .5rem">'+group+'</p>';
+    }
+    var items = t.items.map(function(it){ return '<dt>'+it[0]+'</dt><dd>'+it[1]+'</dd>'; }).join("");
+    body += '<details class="th"><summary>'+t.title+'</summary>'+
       '<div class="thbody"><dl>'+items+'</dl>'+
       '<div class="row" style="margin-top:1rem"><button class="btn ghost" onclick="startPractice(\''+t.topic+'\')">Dazu üben</button></div>'+
       '</div></details>';
-  }).join("");
+  });
 
   return '<div class="stack"><section><h2>Crashkurs</h2>'+
-    '<p class="lead">Alles, was ohne Taschenrechner im Kopf verfügbar sein muss — Formeln, Rechenwege und die Fallen, die im Test regelmäßig Punkte kosten.</p>'+
-    '<div style="margin-top:1rem">'+body+'</div></section>'+footer();
+    '<p class="lead">Alles, was ohne Taschenrechner im Kopf verfügbar sein muss. '+
+    'Die vier Blöcke unter „Prüfungsrelevant“ decken die Originalklausur vollständig ab — wenn die Zeit knapp ist, lies nur diese.</p>'+
+    '<div style="margin-top:.4rem">'+body+'</div></section>'+footer();
 }
 
 /* ── Ansicht: laufende Sitzung ───────────────────────────────────────── */
@@ -460,12 +533,15 @@ function viewRun(){
     var ok = given === qq.ans;
     verdict = '<div class="verdict '+(ok?"ok":"no")+'">'+
       '<span class="tag">'+(ok?"Richtig":"Falsch — richtig ist "+ "ABCDE".charAt(order.indexOf(qq.ans)))+'</span>'+
-      '<p>'+qq.exp+'</p></div>';
+      '<div class="exp">'+qq.exp+'</div></div>';
   }
 
-  var label = SES.mode==="exam" ? "Prüfungssimulation"
+  var label = SES.topic==="original" ? "Originalklausur 2022"
+            : SES.mode==="exam" ? "Prüfungssimulation"
             : SES.mode==="review" ? "Fehlerarchiv"
             : TOPIC_BY[qq.topic].n;
+  var wert = PUNKTE[qq.topic];
+  var wertBadge = (SES.mode==="exam" && wert) ? '<span class="pts">'+wert+' P.</span>' : '';
 
   var timer = SES.mode==="exam"
     ? '<span id="timer" class="timer">'+mmss(Math.round((SES.ends-Date.now())/1000))+'</span>' : '';
@@ -479,7 +555,7 @@ function viewRun(){
   var answered = Object.keys(SES.ans).length;
 
   return '<div class="stack">'+
-    '<div class="qhead"><span>'+label+'</span>'+timer+
+    '<div class="qhead"><span>'+label+'</span>'+wertBadge+timer+
       '<span class="prog">'+(SES.i+1)+' / '+SES.ids.length+
       (SES.mode==="exam"? ' · '+answered+' beantwortet':'')+'</span></div>'+
     '<div class="card">'+ pas +
@@ -517,21 +593,22 @@ function viewResult(){
     return '<div class="rev"><span class="mk '+(ok?"ok":"no")+'">'+(ok?"✓":"✗")+'</span>'+
       '<span><span class="q">'+qq.text.replace(/<pre[\s\S]*?<\/pre>/g," …")+'</span>'+
       '<span class="a">'+line+'</span>'+
-      (!ok? '<span class="a" style="color:var(--ink-3);margin-top:.25rem">'+qq.exp+'</span>':'')+
+      (!ok? '<div class="exp" style="margin-top:.35rem">'+qq.exp+'</div>':'')+
       '</span></div>';
   }).join("");
 
+  var quote = SES.mode==="exam" ? Math.round(pts/GESAMT*100) : pts;
   var verdictText = SES.mode==="exam"
-    ? (pts>=75 ? "Das ist ein sicheres Ergebnis. Halte das Niveau und arbeite gezielt das Fehlerarchiv ab."
-      : pts>=55 ? "Solide Basis. Die Punkte liegen jetzt in den Blöcken mit den meisten Fehlern — genau dort weitermachen."
-      : "Noch Luft nach oben. Nimm dir die schwächsten zwei Themenblöcke im Crashkurs vor und übe sie am Stück.")
-    : "Alles Falsche liegt jetzt im Fehlerarchiv und kommt automatisch wieder.";
+    ? (pts>=18 ? "Das trägt. Halte das Niveau und arbeite nur noch das Fehlerarchiv ab."
+      : pts>=12 ? "Solide Basis. Schau dir an, welche der drei Aufgaben dich Punkte gekostet hat — dort liegt der ganze Rest."
+      : "Noch Luft nach oben. Die Ableitung allein ist 8 Punkte wert und rein handwerklich: Nimm dir den Crashkurs Ableitungen vor und übe den Block am Stück.")
+    : "Alles Falsche liegt jetzt im Fehlerarchiv und kommt automatisch wieder — es verschwindet erst nach zwei richtigen Antworten in Folge.";
 
   return '<div class="stack">'+
     '<section class="hero">'+
       '<p class="eyebrow">'+(SES.mode==="exam"?"Simulation abgeschlossen":"Runde abgeschlossen")+'</p>'+
-      '<div class="score" style="margin-top:.5rem"><b>'+pts+'</b><span>'+(SES.mode==="exam"?"von 100 Punkten":"% richtig")+' · '+right+' von '+ids.length+'</span></div>'+
-      '<div class="meter'+(pts>=60?' good':'')+'" style="margin-top:.9rem"><i style="width:'+pts+'%"></i></div>'+
+      '<div class="score" style="margin-top:.5rem"><b>'+pts+'</b><span>'+(SES.mode==="exam"?"von "+GESAMT+" Punkten":"% richtig")+' · '+right+' von '+ids.length+' Aufgaben</span></div>'+
+      '<div class="meter'+(quote>=60?' good':'')+'" style="margin-top:.9rem"><i style="width:'+quote+'%"></i></div>'+
       '<p class="lead">'+verdictText+'</p>'+
       '<div class="row" style="margin-top:1rem">'+
         '<button class="btn" onclick="go(\'start\')">Zur Übersicht</button>'+
@@ -546,7 +623,7 @@ function viewResult(){
 /* ── Fuß ─────────────────────────────────────────────────────────────── */
 function footer(){
   var st = statOf(QUESTIONS);
-  return '<div class="foot"><span>'+QUESTIONS.length+' Aufgaben · '+Object.keys(PASSAGES).length+' englische Texte · Fortschritt lokal im Browser gespeichert</span>'+
+  return '<div class="foot"><span>'+QUESTIONS.length+' Aufgaben · '+Object.keys(PASSAGES).length+' englische Fachtexte · Fortschritt lokal im Browser gespeichert</span>'+
     '<span style="margin-left:auto">'+st.seen+' bearbeitet</span>'+
     '<button class="btn quiet" onclick="resetAll()">Zurücksetzen</button></div>';
 }
