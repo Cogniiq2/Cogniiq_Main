@@ -27,7 +27,7 @@ const principles = [
     // [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1)]]
     text: "Keine endlosen Abstimmungsrunden, keine Wasserfall-Projektphasen. Live geht das System erst nach Ihrer Freigabe.",
     link: "/kontakt",
-    linkLabel: "Jetzt starten",
+    linkLabel: "Nächster Schritt",
     highlight: false,
   },
   {

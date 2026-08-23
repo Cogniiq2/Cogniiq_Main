@@ -33,7 +33,21 @@ const AUTOMATISIERUNG_MIN = 10;
  * Aussage über das eigene Produkt und muss belegbar sein, bevor die Seite live
  * geht: Sie steht als Vorgabewert vor jedem Besucher.]]
  */
-const AUTOMATISIERUNG_STANDARD = 90;
+/*
+  Lowered from 90 to 20 on 23.08.2026.
+
+  90 % was the single riskiest statement on the website: it stood as the default
+  in front of every visitor to the pricing page and to /praxen, while OWNER-INPUT
+  F4 (our own measured take-over rate) is still unanswered. COPY-BRIEF §5.7 caps
+  the only documented, buyer-authored figure at 10–20 % net of follow-up work and
+  §2.4 bans claiming the system handles "the majority" of calls. A 4.5× overclaim
+  aimed at a segment the brief describes as actively debunking AI marketing is a
+  credibility and UWG risk, not a conversion lever.
+
+  20 % is the upper bound of the documented range — defensible today. Raise this
+  only once F4 is answered with a measured figure.
+*/
+const AUTOMATISIERUNG_STANDARD = 20;
 
 function eur(v: number): string {
   return `${Math.round(v).toLocaleString("de-DE")}\u00A0€`;

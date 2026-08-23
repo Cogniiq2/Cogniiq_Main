@@ -122,6 +122,52 @@ html.cq-public-light {
   --border: 0 0% 89.8%;
   --input: 0 0% 89.8%;
   --ring: 0 0% 3.9%;
+
+  /* ──────────────────────────────────────────────────────────────────────────
+     PUBLIC BRAND TOKENS (`--pub-*`)
+     ──────────────────────────────────────────────────────────────────────────
+     The public site had no owned colour: 5,169 raw `gray-*` utilities against
+     three accidental accents (#2e6f8f, #515A61, sky-500) that never agreed —
+     desktop and mobile hero did not even share one. These tokens replace all
+     three with a single signal colour applied by MEANING, not decoration.
+
+     Rules, deliberately narrow:
+     - `signal` marks the ONE primary action in a viewport. Never a section
+       heading, never an icon fill, never a background wash for emphasis.
+     - `verify` marks facts that are contractually true (Go-Live-Garantie,
+       Kündigung, keine Aufzeichnung). It is a proof colour, not a success tint.
+     - `caution` marks a named limitation. The copy brief rewards naming limits;
+       colouring them honestly is part of that.
+     - Everything else stays on the ink ramp. The restraint is the design.
+
+     Why vermilion and not blue: blue in German B2B reads Sparkasse / Telekom /
+     Krankenkasse — institutional wallpaper, and every competitor already uses
+     it. Vermilion is warm enough for Praxis and Gastronomie, high-attention
+     without reading as an alarm, and unclaimed in this category.
+
+     `ink-4` is for uppercase labels ONLY — it does not meet AA as body text.
+     Body copy must not go lighter than `ink-3` (5.9:1 on paper). */
+  --pub-ink:        #0b0f14;
+  --pub-ink-2:      #2c3540;
+  --pub-ink-3:      #5b6773;
+  --pub-ink-4:      #8a95a1;
+
+  --pub-paper:      #fbfaf7;
+  --pub-paper-2:    #f4f2ed;
+  --pub-card:       #ffffff;
+
+  --pub-signal:     #e4572e;
+  --pub-signal-ink: #b33f1e;
+  --pub-signal-wash:#fdf1ec;
+
+  --pub-verify:     #1f6f4a;
+  --pub-verify-wash:#edf5f0;
+
+  --pub-caution:     #9a6212;
+  --pub-caution-wash:#fdf5e7;
+
+  --pub-hairline:      rgba(11, 15, 20, 0.10);
+  --pub-hairline-soft: rgba(11, 15, 20, 0.055);
 }
 
 

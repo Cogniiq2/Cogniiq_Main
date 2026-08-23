@@ -328,16 +328,23 @@ export function DesktopHero() {
 
           <h1 className="mb-6">
             {[
-              { text: 'Erreichbar,', color: 'text-gray-950', delay: 0.55 },
-              { text: 'wenn niemand frei ist.', color: 'text-gray-950', delay: 0.68 },
-              { text: 'Auch nachts. Auch samstags.', color: 'text-gray-200', delay: 0.81 },
+              { text: 'Erreichbar,', color: 'text-pub-ink', delay: 0.2 },
+              { text: 'wenn niemand frei ist.', color: 'text-pub-ink', delay: 0.28 },
+              // This line shipped as `text-gray-200` — #e5e7eb on white, a measured
+              // 1.24:1. The third line of the H1 was invisible on the most important
+              // surface of the site. ink-3 is the lightest value that still clears AA.
+              { text: 'Auch nachts. Auch samstags.', color: 'text-pub-ink-3', delay: 0.36 },
             ].map(({ text, color, delay }) => (
               <div key={text} className="overflow-hidden">
                 <motion.div
                   className={`text-[clamp(42px,5vw,66px)] font-bold tracking-[-0.026em] leading-[1.05] ${color}`}
-                  initial={{ y: '110%' }}
-                  animate={inView ? { y: 0 } : {}}
-                  transition={{ duration: 0.75, delay, ease: E }}
+                  // The headline is the LCP element. It previously started fully
+                  // outside its clip (`y: '110%'`) and finished up to 1.56s later,
+                  // so the largest paint was deferred by the animation itself.
+                  // A short opacity + 12px lift reads the same and paints at once.
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={inView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.42, delay, ease: E }}
                 >
                   {text}
                 </motion.div>
@@ -406,18 +413,15 @@ export function DesktopHero() {
               <motion.button
                 type="button"
                 onClick={() => navigate('/kontakt')}
-                className="group relative flex items-center gap-3 px-7 py-3.5 bg-gray-950 text-white text-[13.5px] font-semibold overflow-hidden"
-                style={{ borderRadius: '4px' }}
+                // The primary action is the one element on a public page that carries
+                // a filled signal colour — it was previously near-black, identical in
+                // weight to every secondary control on the page.
+                className="group relative flex items-center gap-3 overflow-hidden rounded-xl bg-pub-signal px-7 py-3.5 text-[13.5px] font-semibold text-white transition-colors hover:bg-pub-signal-ink"
                 whileHover={{ scale: 1.015 }}
                 whileTap={{ scale: 0.975 }}
-                aria-label="Kostenloses Erstgespräch sichern"
+                aria-label="Unverbindliches Erstgespräch vereinbaren"
               >
-                <motion.div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  aria-hidden="true"
-                  style={{ background: 'linear-gradient(120deg, rgba(2,132,199,0.2) 0%, transparent 60%)' }}
-                />
-                <span className="relative whitespace-nowrap">Kostenloses Erstgespräch sichern</span>
+                <span className="relative whitespace-nowrap">Unverbindliches Erstgespräch vereinbaren</span>
                 <motion.div
                   className="relative"
                   aria-hidden="true"
@@ -435,11 +439,15 @@ export function DesktopHero() {
               <button
                 type="button"
                 onClick={() => navigate('/ki-telefonassistent')}
-                className="group flex items-center gap-1.5 text-[12.5px] font-medium text-gray-400 hover:text-gray-800 transition-colors"
-                aria-label="Demo des KI-Telefonassistenten anhören"
+                className="group flex items-center gap-1.5 text-[13px] font-medium text-pub-ink-3 transition-colors hover:text-pub-ink"
+                // Was "Demo anhören" / "…anhören", navigating to a text page. There is
+                // no audio: the Stimmprobe module cannot render until asset F1 exists.
+                // Promising a recording and delivering prose breaks trust at exactly
+                // the moment of curiosity. Restore the audio label with the asset.
+                aria-label="So funktioniert der KI-Telefonassistent"
               >
-                Demo anhören
-                <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-gray-600 transition-colors" aria-hidden="true" />
+                So funktioniert der Empfang
+                <ArrowRight className="h-3 w-3 text-pub-ink-4 transition-colors group-hover:text-pub-ink-2" aria-hidden="true" />
               </button>
             </div>
           </motion.div>

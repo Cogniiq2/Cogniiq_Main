@@ -25,6 +25,7 @@ export const BUSINESS_INFO = {
     email: "info@cogniiq.de",
   },
 
+
   website: "https://cogniiq.de",
 
   // jobTitle intentionally carries no specialisation. The visible copy on /ueber-uns
@@ -83,6 +84,17 @@ export const BUSINESS_INFO = {
 
   priceRange: "€€€",
 };
+
+/**
+ * RFC 3966 `tel:` target for the business number.
+ *
+ * `BUSINESS_INFO.contact.phone` is formatted for humans and contains spaces,
+ * which are not valid inside a `tel:` URI. Four of the five click-to-call links
+ * on the site interpolated it raw — including `Footer` and `NAP`, which render
+ * on every page — so the site-wide call link was malformed. Always link through
+ * this constant; never build a `tel:` href from `contact.phone` directly.
+ */
+export const PHONE_HREF = `tel:${BUSINESS_INFO.contact.phone.replace(/[^\d+]/g, "")}`;
 
 export const SERVICES = [
   {

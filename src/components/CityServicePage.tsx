@@ -11,7 +11,7 @@ import { PageSEO } from "@/components/PageSEO";
 import { RelatedPages } from "@/components/RelatedPages";
 import { StimmprobeSection } from "@/components/StimmprobeSection";
 import { TelefonassistentKompaktSection } from "@/components/TelefonassistentKompaktSection";
-import { BUSINESS_INFO } from "@/lib/seo-data";
+import { BUSINESS_INFO, PHONE_HREF } from "@/lib/seo-data";
 import { FAKTEN } from "@/lib/telefonassistent-copy";
 import type { CityServiceConfig } from "@/lib/standorte-data";
 
@@ -375,7 +375,7 @@ function MidPageCTA({ config }: { config: CityServiceConfig }) {
             </Link>
             {BUSINESS_INFO.contact.phone && (
               <a
-                href={`tel:${BUSINESS_INFO.contact.phone.replace(/\s/g, "")}`}
+                href={PHONE_HREF}
                 className="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm hover:border-gray-500 dark:hover:border-gray-400 transition-colors whitespace-nowrap"
               >
                 <Phone size={14} />

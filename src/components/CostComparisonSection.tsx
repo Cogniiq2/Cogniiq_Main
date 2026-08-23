@@ -467,7 +467,7 @@ export function CostComparisonSection() {
                   to="/kontakt"
                   className="group w-full inline-flex items-center justify-center gap-2.5 bg-white text-gray-900 font-semibold text-[13px] rounded-xl h-11 px-5 hover:bg-gray-50 transition-colors"
                 >
-                  Jetzt starten
+                  Nächster Schritt
                   <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
                 </Link>
               </div>
