@@ -4,7 +4,7 @@ import {
   Users, Wallet, type LucideIcon,
 } from 'lucide-react';
 
-import type { ShellSection, ShellSubNavItem } from '@/components/dashboard';
+import type { CommandGroup, CommandItem, ShellSection, ShellSubNavItem } from '@/components/dashboard';
 
 // Single source of truth for the unified internal workspace navigation. The top-level app switch
 // (Task Dashboard / Oura / CRM / Finance) and each module's sub-navigation are derived from the URL,
@@ -125,4 +125,65 @@ export function isSubNavActive(pathname: string, href: string): boolean {
   if (pathname === href) return true;
   if (href === '/admin') return false;
   return pathname.startsWith(`${href}/`);
+}
+
+// ------------------------------------------------------------------ Command palette model
+
+/**
+ * The static command model for ⌘K: every reachable page across every module the user may see,
+ * plus the create actions. Entity commands (clients by name) are loaded lazily by the workspace
+ * shell on first open — they are data, not navigation, and never belong in this static table.
+ */
+export function getAdminCommandGroups(opts: { isOwner: boolean }): CommandGroup[] {
+  const visibleModules = DISPLAY_ORDER
+    .map((key) => MODULES.find((m) => m.key === key)!)
+    .filter((m) => !m.ownerOnly || opts.isOwner);
+
+  const navigation: CommandItem[] = visibleModules.flatMap((module) => [
+    {
+      key: `module-${module.key}`,
+      label: module.label,
+      hint: 'Modul öffnen',
+      icon: module.icon,
+      to: module.href,
+    },
+    ...module.subNav
+      .filter((item) => item.href !== module.href)
+      .map((item) => ({
+        key: `nav-${module.key}-${item.key}`,
+        label: item.label,
+        hint: module.label,
+        icon: item.icon,
+        to: item.href,
+        keywords: [module.label],
+      })),
+  ]);
+
+  const actions: CommandItem[] = [
+    {
+      key: 'action-new-client',
+      label: 'Neuen Client anlegen',
+      hint: 'Client CRM · Onboarding-Assistent',
+      icon: Building2,
+      to: '/admin/clients/new',
+      keywords: ['kunde', 'organisation', 'anlegen', 'erstellen'],
+    },
+    ...(opts.isOwner
+      ? [
+          {
+            key: 'action-new-offer',
+            label: 'Neues Angebot erstellen',
+            hint: 'Finance & Steuern',
+            icon: FileSignature,
+            to: '/admin/finance/offers/new',
+            keywords: ['offer', 'angebot', 'erstellen'],
+          },
+        ]
+      : []),
+  ];
+
+  return [
+    { id: 'actions', label: 'Aktionen', items: actions },
+    { id: 'navigation', label: 'Navigation', items: navigation },
+  ];
 }

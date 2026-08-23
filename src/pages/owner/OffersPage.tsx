@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FileSignature, Plus, Search, Archive, Trash2, RotateCcw } from 'lucide-react';
 
 import {
   Button, DataTable, EmptyState, ErrorState, IconButton, KpiCard, PageHeader,
   Field, Select, StatusBadge, Tabs, TableSkeleton, useToast,
-  type Column,
+  type Column, type SortState,
 } from '@/components/dashboard';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import { loadOffers, loadPendingSendOfferIds } from '@/lib/ownerFinance/offersApi';
@@ -25,7 +25,14 @@ import type { ExportFormat, ExportMode, ExportMeta } from '@/lib/ownerFinance/ex
 export { offerStatusTone };
 
 interface CustomerOption { organizationId: string; name: string; legalName: string | null }
-type SortKey = 'newest' | 'oldest' | 'amount' | 'customer' | 'status';
+
+const DEFAULT_SORT = 'created.desc';
+
+/** URL form is `<columnKey>.<dir>`; `created` sorts in the page (it has no visible column). */
+function parseSort(raw: string): SortState {
+  const [key, dir] = raw.split('.');
+  return { key: key || 'created', dir: dir === 'asc' ? 'asc' : 'desc' };
+}
 
 export function OffersPage() {
   const { entity } = useOwnerEntity();
@@ -36,15 +43,35 @@ export function OffersPage() {
   const [customers, setCustomers] = useState<CustomerOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [query, setQuery] = useState('');
-  const [sort, setSort] = useState<SortKey>('newest');
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
-  const [minAmount, setMinAmount] = useState('');
-  const [maxAmount, setMaxAmount] = useState('');
   const [includeIds, setIncludeIds] = useState(false);
   const [archiveTarget, setArchiveTarget] = useState<OwnerOffer | null>(null);
+
+  // Every filter lives in the URL: reload, back-navigation from a detail page and shared links all
+  // restore the exact view. Defaults are omitted from the URL so a pristine list has a clean path.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const statusFilter = searchParams.get('status') ?? 'all';
+  const query = searchParams.get('q') ?? '';
+  const dateFrom = searchParams.get('von') ?? '';
+  const dateTo = searchParams.get('bis') ?? '';
+  const minAmount = searchParams.get('min') ?? '';
+  const maxAmount = searchParams.get('max') ?? '';
+  const sortParam = searchParams.get('sort') ?? DEFAULT_SORT;
+  const sortState = useMemo(() => parseSort(sortParam), [sortParam]);
+
+  const setParam = useCallback(
+    (key: string, value: string, defaultValue = '') => {
+      setSearchParams(
+        (previous) => {
+          const next = new URLSearchParams(previous);
+          if (!value || value === defaultValue) next.delete(key);
+          else next.set(key, value);
+          return next;
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
 
   const load = useCallback(async () => {
     if (!entity) return;
@@ -111,18 +138,17 @@ export function OffersPage() {
     if (min != null) list = list.filter((o) => o.gross_total_cents >= min);
     if (max != null) list = list.filter((o) => o.gross_total_cents <= max);
 
-    const sorted = [...list];
-    sorted.sort((a, b) => {
-      switch (sort) {
-        case 'oldest': return a.created_at.localeCompare(b.created_at);
-        case 'amount': return b.gross_total_cents - a.gross_total_cents;
-        case 'customer': return customerName(a).localeCompare(customerName(b), 'de');
-        case 'status': return a.status.localeCompare(b.status);
-        case 'newest': default: return b.created_at.localeCompare(a.created_at);
-      }
-    });
-    return sorted;
-  }, [offers, statusFilter, statusMatchers, query, dateFrom, dateTo, minAmount, maxAmount, sort, customerName]);
+    // Column sorting is the DataTable's job; only the created-at order (no visible column) is
+    // resolved here so "Neueste zuerst" keeps working on desktop and mobile alike.
+    if (sortState.key === 'created') {
+      const sorted = [...list];
+      sorted.sort((a, b) =>
+        sortState.dir === 'asc' ? a.created_at.localeCompare(b.created_at) : b.created_at.localeCompare(a.created_at),
+      );
+      return sorted;
+    }
+    return list;
+  }, [offers, statusFilter, statusMatchers, query, dateFrom, dateTo, minAmount, maxAmount, sortState, customerName]);
 
   const totals = useMemo(() => ({
     open: offers.filter((o) => !isArchived(o) && ['finalized', 'sent', 'viewed'].includes(o.status)).reduce((s, o) => s + o.gross_total_cents, 0),
@@ -158,18 +184,18 @@ export function OffersPage() {
   };
 
   const columns: Column<OwnerOffer>[] = [
-    { key: 'number', header: 'Nummer', render: (o) => <span className="font-semibold text-gray-950">{o.offer_number ?? 'Entwurf'}</span> },
-    { key: 'status', header: 'Status', render: (o) => (
+    { key: 'number', header: 'Nummer', sortValue: (o) => o.offer_number, render: (o) => <span className="font-semibold text-gray-950">{o.offer_number ?? 'Entwurf'}</span> },
+    { key: 'status', header: 'Status', sortValue: (o) => offerStatusLabel[o.status] ?? o.status, render: (o) => (
       <div className="flex flex-wrap items-center gap-1.5">
         <StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} />
         {pendingSend.has(o.id) && o.status !== 'sent' ? <StatusBadge label="Versand ausstehend" tone="info" /> : null}
         {o.archived_at ? <StatusBadge label={offerDisplayStateLabel[offerDisplayState(o)]} tone={offerDisplayStateTone.archived} /> : null}
       </div>
     ) },
-    { key: 'customer', header: 'Kunde', render: (o) => <span className="text-gray-600">{customerName(o)}</span> },
-    { key: 'title', header: 'Titel', render: (o) => <span className="text-gray-600">{o.title ?? '—'}</span>, hideOnMobile: true },
-    { key: 'valid', header: 'Gültig bis', render: (o) => <span className="text-gray-500">{o.valid_until ? formatDateDe(o.valid_until) : '—'}</span>, hideOnMobile: true },
-    { key: 'gross', header: 'Brutto', align: 'right', render: (o) => <span className="tabular-nums font-medium text-gray-900">{formatCents(o.gross_total_cents, o.currency)}</span> },
+    { key: 'customer', header: 'Kunde', sortValue: (o) => customerName(o), render: (o) => <span className="text-gray-600">{customerName(o)}</span> },
+    { key: 'title', header: 'Titel', sortValue: (o) => o.title, render: (o) => <span className="text-gray-600">{o.title ?? '—'}</span>, hideOnMobile: true },
+    { key: 'valid', header: 'Gültig bis', sortValue: (o) => o.valid_until, defaultSortDir: 'desc', render: (o) => <span className="text-gray-500">{o.valid_until ? formatDateDe(o.valid_until) : '—'}</span>, hideOnMobile: true },
+    { key: 'gross', header: 'Brutto', align: 'right', sortValue: (o) => o.gross_total_cents, defaultSortDir: 'desc', render: (o) => <span className="tabular-nums font-medium text-gray-900">{formatCents(o.gross_total_cents, o.currency)}</span> },
     { key: 'actions', header: '', align: 'right', render: (o) => (
       <div className="flex items-center justify-end gap-0.5" onClick={(e) => e.stopPropagation()}>
         {o.archived_at ? (
@@ -220,29 +246,32 @@ export function OffersPage() {
 
       {!loading && offers.length > 0 ? (
         <div className="mb-4 space-y-3">
-          <Tabs value={statusFilter} onChange={setStatusFilter} tabs={tabs} />
+          <Tabs value={statusFilter} onChange={(v) => setParam('status', v, 'all')} tabs={tabs} />
           <div className="grid gap-2 rounded-2xl border border-gray-100 bg-white p-3 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="relative sm:col-span-2 lg:col-span-1">
+            <div className="relative sm:col-span-2">
               <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
-              <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Nummer, Kunde, Titel …" aria-label="Angebote durchsuchen"
+              <input value={query} onChange={(e) => setParam('q', e.target.value)} placeholder="Nummer, Kunde, Titel …" aria-label="Angebote durchsuchen"
                 className="h-11 w-full rounded-xl border border-gray-200 bg-white pl-9 pr-3 text-sm text-gray-900 outline-none focus:border-gray-400" />
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <Field id="date-from" label="Von" type="date" value={dateFrom} onChange={setDateFrom} />
-              <Field id="date-to" label="Bis" type="date" value={dateTo} onChange={setDateTo} />
+              <Field id="date-from" label="Von" type="date" value={dateFrom} onChange={(v) => setParam('von', v)} />
+              <Field id="date-to" label="Bis" type="date" value={dateTo} onChange={(v) => setParam('bis', v)} />
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <Field id="min-amount" label="Betrag min." value={minAmount} onChange={setMinAmount} inputMode="decimal" prefix="€" />
-              <Field id="max-amount" label="Betrag max." value={maxAmount} onChange={setMaxAmount} inputMode="decimal" prefix="€" />
+              <Field id="min-amount" label="Betrag min." value={minAmount} onChange={(v) => setParam('min', v)} inputMode="decimal" prefix="€" />
+              <Field id="max-amount" label="Betrag max." value={maxAmount} onChange={(v) => setParam('max', v)} inputMode="decimal" prefix="€" />
             </div>
-            <Select id="offer-sort" label="Sortierung" value={sort} onChange={(v) => setSort(v as SortKey)}
-              options={[
-                { value: 'newest', label: 'Neueste zuerst' },
-                { value: 'oldest', label: 'Älteste zuerst' },
-                { value: 'amount', label: 'Betrag (absteigend)' },
-                { value: 'customer', label: 'Kunde (A–Z)' },
-                { value: 'status', label: 'Status' },
-              ]} />
+            {/* Desktop sorts via the column headers; this select is the mobile fallback (cards have no headers). */}
+            <div className="md:hidden">
+              <Select id="offer-sort" label="Sortierung" value={sortParam} onChange={(v) => setParam('sort', v, DEFAULT_SORT)}
+                options={[
+                  { value: 'created.desc', label: 'Neueste zuerst' },
+                  { value: 'created.asc', label: 'Älteste zuerst' },
+                  { value: 'gross.desc', label: 'Betrag (absteigend)' },
+                  { value: 'customer.asc', label: 'Kunde (A–Z)' },
+                  { value: 'status.asc', label: 'Status' },
+                ]} />
+            </div>
           </div>
         </div>
       ) : null}
@@ -254,6 +283,9 @@ export function OffersPage() {
           action={offers.length === 0 ? <Button icon={Plus} onClick={() => navigate('/admin/finance/offers/new')} disabled={!entity}>Neues Angebot</Button> : undefined} />
       ) : (
         <DataTable columns={columns} rows={filtered} getRowKey={(o) => o.id} minWidth={900}
+          stickyHeader
+          sort={sortState.key === 'created' ? null : sortState}
+          onSortChange={(s) => setParam('sort', `${s.key}.${s.dir}`, DEFAULT_SORT)}
           onRowClick={(o) => navigate(`/admin/finance/offers/${o.id}`)}
           mobileTitle={(o) => <div className="flex items-center gap-2"><span>{o.offer_number ?? 'Entwurf'}</span><StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} /></div>}
           mobileSubtitle={(o) => o.title ?? 'ohne Titel'} />

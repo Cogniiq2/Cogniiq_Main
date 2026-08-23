@@ -7,6 +7,8 @@ import { SidebarShell } from '@/components/navigation/SidebarShell';
 import type { SidebarNavGroup } from '@/components/navigation/navModel';
 import { useNavCollapse } from '@/components/navigation/useNavCollapse';
 import { useAuth } from '@/contexts/AuthContext';
+import { CommandPaletteProvider, useOptionalCommandPalette, type CommandGroup } from './CommandPalette';
+import type { BreadcrumbItem } from './primitives';
 
 // Unified dashboard shell shared by the Cogniiq internal workspace and the owner Finance & Steuern
 // module. One Cogniiq brand, one account/logout control, a top-level app switch and the active
@@ -35,23 +37,30 @@ export interface ShellSubNavItem {
 }
 
 export function DashboardShell({
-  sections, subNav, subNavLabel, activeSubKey, title, children,
+  sections, subNav, subNavLabel, activeSubKey, title, commandGroups, onCommandOpen, children,
 }: {
   sections: ShellSection[];
   subNav?: ShellSubNavItem[];
   subNavLabel?: string;
   activeSubKey?: (pathname: string, href: string) => boolean;
   title?: string;
+  /** Command palette model for this surface. Providing it enables ⌘K and the topbar search trigger. */
+  commandGroups?: CommandGroup[];
+  /** Fired when the palette opens — the hook for lazily loading entity commands. */
+  onCommandOpen?: () => void;
   children: ReactNode;
 }) {
   const { pathname } = useLocation();
   const { profile, user, signOut } = useAuth();
   const { collapsed, toggle } = useNavCollapse('internal');
 
-  const groups: SidebarNavGroup[] = useMemo(() => {
-    const isSubActive = (href: string) =>
-      activeSubKey ? activeSubKey(pathname, href) : pathname === href || pathname.startsWith(`${href}/`);
+  const isSubActive = useMemo(
+    () => (href: string) =>
+      activeSubKey ? activeSubKey(pathname, href) : pathname === href || pathname.startsWith(`${href}/`),
+    [activeSubKey, pathname],
+  );
 
+  const groups: SidebarNavGroup[] = useMemo(() => {
     const hasSubNav = Boolean(subNav && subNav.length);
 
     const result: SidebarNavGroup[] = [
@@ -89,10 +98,66 @@ export function DashboardShell({
     }
 
     return result;
-  }, [sections, subNav, subNavLabel, pathname, activeSubKey]);
+  }, [sections, subNav, subNavLabel, isSubActive]);
+
+  // Wayfinding: active module, then the active sub-item. Detail pages still resolve to their list
+  // section (isSubNavActive matches prefixes), so the trail never dead-ends.
+  const breadcrumbs: BreadcrumbItem[] = useMemo(() => {
+    const activeSection = sections.find((section) => section.active);
+    if (!activeSection) return [];
+    const items: BreadcrumbItem[] = [{ label: activeSection.label, href: activeSection.href }];
+    const activeSub = subNav?.find((item) => isSubActive(item.href));
+    if (activeSub && activeSub.href !== activeSection.href) {
+      items.push({ label: activeSub.label, href: activeSub.href });
+    }
+    return items;
+  }, [sections, subNav, isSubActive]);
 
   const email = profile?.email ?? user?.email ?? null;
   const displayName = profile?.full_name || email || 'Konto';
+
+  const shell = (
+    <ShellFrame
+      title={title}
+      groups={groups}
+      breadcrumbs={breadcrumbs}
+      collapsed={collapsed}
+      onToggleCollapse={toggle}
+      displayName={displayName}
+      email={displayName === email ? null : email}
+      onSignOut={() => void signOut()}
+    >
+      {children}
+    </ShellFrame>
+  );
+
+  if (!commandGroups) return shell;
+
+  return (
+    <CommandPaletteProvider groups={commandGroups} onOpen={onCommandOpen}>
+      {shell}
+    </CommandPaletteProvider>
+  );
+}
+
+/**
+ * Split so the topbar search trigger can consume the (optional) palette context from inside the
+ * provider, while a shell without commandGroups renders identically minus the trigger.
+ */
+function ShellFrame({
+  title, groups, breadcrumbs, collapsed, onToggleCollapse, displayName, email, onSignOut, children,
+}: {
+  title?: string;
+  groups: SidebarNavGroup[];
+  breadcrumbs: BreadcrumbItem[];
+  collapsed: boolean;
+  onToggleCollapse: () => void;
+  displayName: string;
+  email: string | null;
+  onSignOut: () => void;
+  children: ReactNode;
+}) {
+  const palette = useOptionalCommandPalette();
 
   return (
     <SidebarShell
@@ -102,15 +167,17 @@ export function DashboardShell({
       navLabel="Workspace Navigation"
       groups={groups}
       collapsed={collapsed}
-      onToggleCollapse={toggle}
+      onToggleCollapse={onToggleCollapse}
+      breadcrumbs={breadcrumbs}
+      onOpenSearch={palette ? palette.open : undefined}
       footerSlot={({ collapsed: railCollapsed }) => (
         <RailAccount
           collapsed={railCollapsed}
           withTooltip
           name={displayName}
-          email={displayName === email ? null : email}
+          email={email}
           links={[{ key: 'website', label: 'Zur Website', to: '/', icon: ExternalLink }]}
-          onSignOut={() => void signOut()}
+          onSignOut={onSignOut}
         />
       )}
     >

@@ -6,3 +6,7 @@ export * from './overlays';
 export { PremiumSelect, PremiumCombobox, type SelectOption, type PremiumSelectProps, type PremiumComboboxProps } from './PremiumSelect';
 export { DashboardShell, type ShellSection, type ShellSubNavItem } from './DashboardShell';
 export { ToastProvider, useToast, type ToastOptions, type ToastTone } from './toast';
+export {
+  CommandPaletteProvider, useCommandPalette, useOptionalCommandPalette,
+  type CommandGroup, type CommandItem,
+} from './CommandPalette';

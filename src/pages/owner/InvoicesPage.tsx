@@ -22,6 +22,7 @@ import { runFinanceExport } from '@/lib/ownerFinance/financeExportRunner';
 import {
   invoiceExportTable, invoiceReportModel, invoiceMetadataSheet,
 } from '@/lib/ownerFinance/exports/datasets';
+import { formatDateDe } from '@/lib/ownerFinance/exports';
 import type { ExportFormat, ExportMode, ExportMeta } from '@/lib/ownerFinance/exports';
 
 const invoiceTreatments = [
@@ -144,12 +145,12 @@ export function InvoicesPage() {
   }, [invoices]);
 
   const columns: Column<OwnerInvoice>[] = [
-    { key: 'number', header: 'Nummer', render: (inv) => <span className="font-semibold text-gray-950">{inv.invoice_number ?? 'Entwurf'}</span>, hideOnMobile: true },
-    { key: 'status', header: 'Status', render: (inv) => <StatusBadge label={statusLabel[inv.status] ?? inv.status} tone={invoiceStatusTone[inv.status]} /> },
-    { key: 'date', header: 'Datum', render: (inv) => <span className="text-gray-500">{inv.issue_date ?? '—'}</span> },
-    { key: 'net', header: 'Netto', align: 'right', render: (inv) => <span className="tabular-nums">{formatCents(inv.net_total_cents, inv.currency)}</span> },
-    { key: 'gross', header: 'Brutto', align: 'right', render: (inv) => <span className="tabular-nums font-medium text-gray-900">{formatCents(inv.gross_total_cents, inv.currency)}</span> },
-    { key: 'open', header: 'Offen', align: 'right', render: (inv) => <span className="tabular-nums">{formatCents(inv.gross_total_cents - inv.amount_paid_cents, inv.currency)}</span> },
+    { key: 'number', header: 'Nummer', sortValue: (inv) => inv.invoice_number, render: (inv) => <span className="font-semibold text-gray-950">{inv.invoice_number ?? 'Entwurf'}</span>, hideOnMobile: true },
+    { key: 'status', header: 'Status', sortValue: (inv) => statusLabel[inv.status] ?? inv.status, render: (inv) => <StatusBadge label={statusLabel[inv.status] ?? inv.status} tone={invoiceStatusTone[inv.status]} /> },
+    { key: 'date', header: 'Datum', sortValue: (inv) => inv.issue_date, defaultSortDir: 'desc', render: (inv) => <span className="text-gray-500">{inv.issue_date ? formatDateDe(inv.issue_date) : '—'}</span> },
+    { key: 'net', header: 'Netto', align: 'right', sortValue: (inv) => inv.net_total_cents, defaultSortDir: 'desc', render: (inv) => <span className="tabular-nums">{formatCents(inv.net_total_cents, inv.currency)}</span> },
+    { key: 'gross', header: 'Brutto', align: 'right', sortValue: (inv) => inv.gross_total_cents, defaultSortDir: 'desc', render: (inv) => <span className="tabular-nums font-medium text-gray-900">{formatCents(inv.gross_total_cents, inv.currency)}</span> },
+    { key: 'open', header: 'Offen', align: 'right', sortValue: (inv) => inv.gross_total_cents - inv.amount_paid_cents, defaultSortDir: 'desc', render: (inv) => <span className="tabular-nums">{formatCents(inv.gross_total_cents - inv.amount_paid_cents, inv.currency)}</span> },
     {
       key: 'actions', header: '', align: 'right', render: (inv) => (
         <div className="flex justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
@@ -223,13 +224,14 @@ export function InvoicesPage() {
           getRowKey={(inv) => inv.id}
           onRowClick={(inv) => navigate(`/admin/finance/invoices/${inv.id}`)}
           minWidth={820}
+          stickyHeader
           mobileTitle={(inv) => (
             <div className="flex items-center gap-2">
               <span>{inv.invoice_number ?? 'Entwurf'}</span>
               <StatusBadge label={statusLabel[inv.status] ?? inv.status} tone={invoiceStatusTone[inv.status]} />
             </div>
           )}
-          mobileSubtitle={(inv) => `${inv.issue_date ?? 'ohne Datum'}`}
+          mobileSubtitle={(inv) => (inv.issue_date ? formatDateDe(inv.issue_date) : 'ohne Datum')}
         />
       )}
 

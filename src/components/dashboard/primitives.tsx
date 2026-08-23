@@ -1,5 +1,6 @@
-import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import { forwardRef, useMemo, useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowDown, ArrowUp, ChevronRight, ChevronsUpDown } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -7,6 +8,7 @@ import { formatCents } from '@/lib/clientPlatform/validation';
 import {
   border, control, elevation, focusRing, focusRingOnSurface, interactive,
   radius, skeleton as skeletonClass, space, statusTone, surface, text,
+  zIndex as zIndexTokens,
 } from './tokens';
 import { PremiumSelect, type SelectOption } from './PremiumSelect';
 
@@ -141,6 +143,71 @@ export function PageHeader({ title, description, actions, breadcrumb }: { title:
         {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
       </div>
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ Breadcrumbs */
+
+export interface BreadcrumbItem {
+  label: string;
+  /** Omit for the current page (rendered as plain text with aria-current). */
+  href?: string;
+}
+
+/**
+ * Wayfinding trail for the topbar. The last item is the current page and is never a link;
+ * intermediate items link back up the hierarchy.
+ */
+export function Breadcrumbs({ items, className }: { items: BreadcrumbItem[]; className?: string }) {
+  if (items.length === 0) return null;
+  return (
+    <nav aria-label="Pfadnavigation" className={cn('min-w-0', className)}>
+      <ol className="flex min-w-0 items-center gap-1">
+        {items.map((item, index) => {
+          const last = index === items.length - 1;
+          return (
+            <li key={`${item.label}-${index}`} className="flex min-w-0 items-center gap-1">
+              {index > 0 ? (
+                <ChevronRight size={13} aria-hidden="true" className="shrink-0 text-[var(--cq-fg-subtle)]" />
+              ) : null}
+              {item.href && !last ? (
+                <Link
+                  to={item.href}
+                  className={cn(
+                    'truncate text-[12.5px] font-medium leading-5 text-[var(--cq-fg-muted)] hover:text-[var(--cq-fg)]',
+                    radius.sm, interactive.transition, focusRing,
+                  )}
+                >
+                  {item.label}
+                </Link>
+              ) : (
+                <span
+                  aria-current={last ? 'page' : undefined}
+                  className={cn('truncate text-[12.5px] leading-5', last ? 'font-semibold text-[var(--cq-fg)]' : 'font-medium text-[var(--cq-fg-muted)]')}
+                >
+                  {item.label}
+                </span>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+}
+
+/** Keyboard-shortcut chip, e.g. inside the topbar search trigger. */
+export function Kbd({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <kbd
+      className={cn(
+        'inline-flex h-5 min-w-5 items-center justify-center px-1 text-[10.5px] font-semibold tabular-nums',
+        'bg-[var(--cq-sunken)] text-[var(--cq-fg-muted)]',
+        border.hairline, radius.sm, className,
+      )}
+    >
+      {children}
+    </kbd>
   );
 }
 
@@ -495,13 +562,46 @@ export interface Column<T> {
   render: (row: T) => ReactNode;
   /** hide this column on small screens (folded into the mobile card) */
   hideOnMobile?: boolean;
+  /** Enables header sorting for this column: returns the value rows are compared by. */
+  sortValue?: (row: T) => string | number | null;
+  /** Direction of the first click on this header. Amounts/dates usually want 'desc'. */
+  defaultSortDir?: SortDir;
+}
+
+export type SortDir = 'asc' | 'desc';
+export interface SortState {
+  key: string;
+  dir: SortDir;
+}
+
+/** Stable comparator over Column.sortValue: numbers numerically, strings de-locale, nulls last. */
+function compareRows<T>(a: T, b: T, column: Column<T>, dir: SortDir): number {
+  const va = column.sortValue!(a);
+  const vb = column.sortValue!(b);
+  if (va == null && vb == null) return 0;
+  if (va == null) return 1; // nulls sort last regardless of direction
+  if (vb == null) return -1;
+  const cmp = typeof va === 'number' && typeof vb === 'number'
+    ? va - vb
+    : String(va).localeCompare(String(vb), 'de', { numeric: true, sensitivity: 'base' });
+  return dir === 'desc' ? -cmp : cmp;
 }
 
 /**
  * Responsive data table: a semantic <table> on md+ screens with controlled horizontal scroll, and a
  * stacked card list on small screens so rows never overflow unusably.
+ *
+ * Sorting: columns opt in via `sortValue`. Pass `sort`/`onSortChange` to control it (e.g. persist to
+ * the URL), or `defaultSort` for uncontrolled sorting. Header cells announce `aria-sort`.
+ *
+ * Sticky header: opt-in. Sticky positioning cannot work inside a horizontal scroll container, so it
+ * engages from xl (where the table fits without scrolling) and offsets below the sticky topbar via
+ * --cq-topbar-h, which the shell owns.
  */
-export function DataTable<T>({ columns, rows, getRowKey, mobileTitle, mobileSubtitle, onRowClick, minWidth = 720 }: {
+export function DataTable<T>({
+  columns, rows, getRowKey, mobileTitle, mobileSubtitle, onRowClick, minWidth = 720,
+  sort: sortProp, onSortChange, defaultSort, stickyHeader,
+}: {
   columns: Column<T>[];
   rows: T[];
   getRowKey: (row: T) => string;
@@ -509,28 +609,88 @@ export function DataTable<T>({ columns, rows, getRowKey, mobileTitle, mobileSubt
   mobileSubtitle?: (row: T) => ReactNode;
   onRowClick?: (row: T) => void;
   minWidth?: number;
+  sort?: SortState | null;
+  onSortChange?: (sort: SortState) => void;
+  defaultSort?: SortState;
+  stickyHeader?: boolean;
 }) {
   const alignClass = (a?: 'left' | 'right' | 'center') => (a === 'right' ? 'text-right' : a === 'center' ? 'text-center' : 'text-left');
+
+  const [internalSort, setInternalSort] = useState<SortState | null>(defaultSort ?? null);
+  const sort = sortProp !== undefined ? sortProp : internalSort;
+  const setSort = (next: SortState) => {
+    if (onSortChange) onSortChange(next);
+    else setInternalSort(next);
+  };
+
+  const sortColumn = sort ? columns.find((c) => c.key === sort.key && c.sortValue) : undefined;
+  const sortedRows = useMemo(() => {
+    if (!sort || !sortColumn) return rows;
+    // copy before sort: never mutate the caller's array
+    return [...rows].sort((a, b) => compareRows(a, b, sortColumn, sort.dir));
+  }, [rows, sort, sortColumn]);
+
+  const handleHeaderClick = (column: Column<T>) => {
+    if (!column.sortValue) return;
+    const first = column.defaultSortDir ?? 'asc';
+    if (sort?.key !== column.key) setSort({ key: column.key, dir: first });
+    else setSort({ key: column.key, dir: sort.dir === 'asc' ? 'desc' : 'asc' });
+  };
+
   return (
-    <div className={cn(surface.card, 'p-0')}>
-      {/* Desktop / tablet */}
-      <div className="hidden overflow-x-auto md:block">
+    <div className={cn(surface.card, 'p-0', stickyHeader && 'overflow-visible')}>
+      {/* Desktop / tablet. `xl:overflow-x-clip` (not auto) when sticky: clip keeps the box from
+          becoming a scroll container, which is what allows the thead to stick to the viewport. */}
+      <div className={cn('hidden md:block', stickyHeader ? 'overflow-x-auto xl:overflow-x-clip' : 'overflow-x-auto')}>
         <table className="w-full text-left" style={{ minWidth }}>
           <thead>
             <tr className={border.hairlineB}>
-              {columns.map((c) => (
-                <th
-                  key={c.key}
-                  scope="col"
-                  className={cn(space.cellX, 'py-2.5', text.eyebrow, alignClass(c.align))}
-                >
-                  {c.header}
-                </th>
-              ))}
+              {columns.map((c) => {
+                const sortable = Boolean(c.sortValue);
+                const activeSort = sortable && sort?.key === c.key ? sort.dir : null;
+                const SortIcon = activeSort === 'asc' ? ArrowUp : activeSort === 'desc' ? ArrowDown : ChevronsUpDown;
+                return (
+                  <th
+                    key={c.key}
+                    scope="col"
+                    aria-sort={activeSort ? (activeSort === 'asc' ? 'ascending' : 'descending') : undefined}
+                    className={cn(
+                      space.cellX, 'py-0', alignClass(c.align),
+                      stickyHeader && cn(
+                        'sticky top-[var(--cq-topbar-h,0px)] bg-[var(--cq-surface)] shadow-[inset_0_-1px_0_var(--cq-border)]',
+                        zIndexTokens.stickyHeader,
+                      ),
+                    )}
+                  >
+                    {sortable ? (
+                      <button
+                        type="button"
+                        onClick={() => handleHeaderClick(c)}
+                        className={cn(
+                          'group inline-flex min-h-[38px] items-center gap-1 py-2 uppercase',
+                          text.eyebrow, radius.sm, interactive.transition, focusRingOnSurface,
+                          'hover:text-[var(--cq-fg)]',
+                          c.align === 'right' && 'flex-row-reverse',
+                          activeSort && 'text-[var(--cq-fg)]',
+                        )}
+                      >
+                        {c.header}
+                        <SortIcon
+                          size={12}
+                          aria-hidden="true"
+                          className={cn('shrink-0', activeSort ? 'text-[var(--cq-fg)]' : 'text-[var(--cq-fg-subtle)] opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100', interactive.transition)}
+                        />
+                      </button>
+                    ) : (
+                      <span className={cn('inline-flex min-h-[38px] items-center py-2', text.eyebrow)}>{c.header}</span>
+                    )}
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
+            {sortedRows.map((row) => (
               <tr
                 key={getRowKey(row)}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
@@ -554,7 +714,7 @@ export function DataTable<T>({ columns, rows, getRowKey, mobileTitle, mobileSubt
       </div>
       {/* Mobile */}
       <div className="divide-y divide-[var(--cq-border-subtle)] md:hidden">
-        {rows.map((row) => (
+        {sortedRows.map((row) => (
           <div key={getRowKey(row)} onClick={onRowClick ? () => onRowClick(row) : undefined} className={cn('p-4', onRowClick && 'cursor-pointer')}>
             <div className="mb-2 flex items-center justify-between gap-3">
               <div className={cn('min-w-0', text.bodyStrong)}>{mobileTitle(row)}</div>

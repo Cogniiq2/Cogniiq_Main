@@ -1,11 +1,12 @@
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import * as Dialog from '@radix-ui/react-dialog';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Menu, PanelLeftClose, PanelLeftOpen, X } from 'lucide-react';
+import { Menu, PanelLeftClose, PanelLeftOpen, Search, X } from 'lucide-react';
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Breadcrumbs, Kbd, type BreadcrumbItem } from '@/components/dashboard/primitives';
 import { cn } from '@/lib/utils';
 import {
   NAV_DURATION_MS,
@@ -45,8 +46,20 @@ export interface SidebarShellProps {
   topSlot?: (context: SlotContext) => ReactNode;
   /** Rendered at the very bottom of the rail — account and session controls. */
   footerSlot?: (context: SlotContext) => ReactNode;
+  /**
+   * Wayfinding trail for the sticky desktop topbar. The topbar renders as soon as breadcrumbs,
+   * a search handler or end-slot content is provided; without any of them the layout is unchanged.
+   */
+  breadcrumbs?: BreadcrumbItem[];
+  /** Opens the surface's command palette (⌘K). Renders the search trigger in top/mobile bars. */
+  onOpenSearch?: () => void;
+  /** Right-aligned topbar slot for surface-level actions (notifications, environment, …). */
+  topbarEnd?: ReactNode;
   children: ReactNode;
 }
+
+/** Height of the sticky desktop topbar; published as --cq-topbar-h for sticky table headers. */
+const TOPBAR_HEIGHT_PX = 48;
 
 export function SidebarShell({
   surfaceLabel,
@@ -58,6 +71,9 @@ export function SidebarShell({
   onToggleCollapse,
   topSlot,
   footerSlot,
+  breadcrumbs,
+  onOpenSearch,
+  topbarEnd,
   children,
 }: SidebarShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -95,6 +111,8 @@ export function SidebarShell({
     ? { transitionDuration: `${NAV_DURATION_MS}ms`, transitionTimingFunction: NAV_EASE_CSS }
     : {};
 
+  const hasTopbar = Boolean((breadcrumbs && breadcrumbs.length > 0) || onOpenSearch || topbarEnd);
+
   return (
     <TooltipProvider delayDuration={120} skipDelayDuration={300}>
       <div
@@ -104,7 +122,11 @@ export function SidebarShell({
         // The canvas value is unchanged (#f7f7f4), so the approved sidebar renders identically.
         data-cq-surface="dashboard"
         className="min-h-screen bg-[var(--cq-canvas)] text-[var(--cq-fg)]"
-        style={{ '--nav-w': `${width}px` } as CSSProperties}
+        style={{
+          '--nav-w': `${width}px`,
+          // Consumed by sticky table headers, which engage only where the desktop topbar exists.
+          '--cq-topbar-h': hasTopbar ? `${TOPBAR_HEIGHT_PX}px` : '0px',
+        } as CSSProperties}
       >
         {/* ---------------------------------------------------------------- desktop rail */}
         <aside
@@ -145,15 +167,27 @@ export function SidebarShell({
             </span>
           </Link>
 
-          <button
-            type="button"
-            onClick={() => setMobileOpen(true)}
-            aria-label={navLabel}
-            aria-expanded={mobileOpen}
-            className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-colors duration-150 hover:border-gray-300 hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2"
-          >
-            <Menu size={18} aria-hidden="true" />
-          </button>
+          <div className="flex flex-shrink-0 items-center gap-2">
+            {onOpenSearch ? (
+              <button
+                type="button"
+                onClick={onOpenSearch}
+                aria-label="Suchen und Befehle öffnen"
+                className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-colors duration-150 hover:border-gray-300 hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2"
+              >
+                <Search size={17} aria-hidden="true" />
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => setMobileOpen(true)}
+              aria-label={navLabel}
+              aria-expanded={mobileOpen}
+              className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition-colors duration-150 hover:border-gray-300 hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2"
+            >
+              <Menu size={18} aria-hidden="true" />
+            </button>
+          </div>
         </header>
 
         {/* ---------------------------------------------------------------- mobile drawer
@@ -195,10 +229,56 @@ export function SidebarShell({
           className={cn('lg:pl-[var(--nav-w)]', transitions && 'transition-[padding-left]')}
           style={transitionStyle}
         >
+          {hasTopbar ? (
+            <Topbar breadcrumbs={breadcrumbs} onOpenSearch={onOpenSearch} topbarEnd={topbarEnd} />
+          ) : null}
           <main className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">{children}</main>
         </div>
       </div>
     </TooltipProvider>
+  );
+}
+
+/**
+ * Sticky desktop topbar: breadcrumbs for wayfinding on the left, the ⌘K search trigger and
+ * surface-level actions on the right. Hidden below lg — the mobile header already carries brand,
+ * search and drawer trigger there, and a second sticky bar would eat vertical space.
+ */
+function Topbar({
+  breadcrumbs,
+  onOpenSearch,
+  topbarEnd,
+}: {
+  breadcrumbs?: BreadcrumbItem[];
+  onOpenSearch?: () => void;
+  topbarEnd?: ReactNode;
+}) {
+  const shortcutLabel = useMemo(
+    () => (typeof navigator !== 'undefined' && /mac/i.test(navigator.platform) ? '⌘K' : 'Strg K'),
+    [],
+  );
+
+  return (
+    <header className="sticky top-0 z-30 hidden h-12 items-center justify-between gap-4 border-b border-[var(--cq-border)] bg-[var(--cq-canvas)]/90 px-6 backdrop-blur-md lg:flex lg:px-8">
+      <div className="min-w-0 flex-1">
+        {breadcrumbs && breadcrumbs.length > 0 ? <Breadcrumbs items={breadcrumbs} /> : null}
+      </div>
+
+      <div className="flex flex-shrink-0 items-center gap-2">
+        {onOpenSearch ? (
+          <button
+            type="button"
+            onClick={onOpenSearch}
+            className="inline-flex h-8 w-60 items-center gap-2 rounded-[8px] border border-[var(--cq-border)] bg-[var(--cq-surface)] px-2.5 text-[12.5px] text-[var(--cq-fg-subtle)] transition-colors duration-150 hover:border-[var(--cq-border-strong)] hover:text-[var(--cq-fg-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cq-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--cq-canvas)]"
+          >
+            <Search size={13.5} aria-hidden="true" className="shrink-0" />
+            <span className="flex-1 truncate text-left">Suchen …</span>
+            <Kbd>{shortcutLabel}</Kbd>
+          </button>
+        ) : null}
+        {topbarEnd}
+      </div>
+    </header>
   );
 }
 

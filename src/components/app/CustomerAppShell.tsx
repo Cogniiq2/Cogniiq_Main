@@ -5,6 +5,9 @@ import { CreditCard, ExternalLink, FileText, Headphones, LayoutGrid, Settings, U
 import type { LucideIcon } from 'lucide-react';
 
 import { AppRouteTransition, AppStatusBadge } from '@/components/app/CustomerAppPrimitives';
+import { CommandPaletteProvider, useOptionalCommandPalette } from '@/components/dashboard/CommandPalette';
+import type { CommandGroup } from '@/components/dashboard/CommandPalette';
+import type { BreadcrumbItem } from '@/components/dashboard/primitives';
 import { PremiumSelect } from '@/components/dashboard/PremiumSelect';
 import { radius, text as dashText } from '@/components/dashboard/tokens';
 import { lifecycleDisplays } from '@/components/app/customerPortalModel';
@@ -127,16 +130,54 @@ function CustomerAppShellInner({ children }: { children: ReactNode }) {
     return resolveAriaCurrent(built);
   }, [navGroups, location.pathname]);
 
+  // Wayfinding: the group and label of the deepest matching entry ("Portal / Dokumente",
+  // "<Lösung> / Rechnungen"). Groups are not pages, so only the leaf links.
+  const breadcrumbs: BreadcrumbItem[] = useMemo(() => {
+    let deepest: { group: string; label: string } | null = null;
+    let deepestHref = '';
+    for (const group of navGroups) {
+      for (const item of group.items) {
+        if (isActivePath(location.pathname, item.href) && item.href.length >= deepestHref.length) {
+          deepest = { group: group.label, label: item.label };
+          deepestHref = item.href;
+        }
+      }
+    }
+    if (!deepest) return [];
+    return [{ label: deepest.group }, { label: deepest.label }];
+  }, [navGroups, location.pathname]);
+
+  // ⌘K: every reachable portal destination. Entity search (documents, invoices) follows once the
+  // portal has a shared query layer — commands must never trigger a second fetch cascade per open.
+  const commandGroups: CommandGroup[] = useMemo(
+    () => [
+      {
+        id: 'navigation',
+        label: 'Navigation',
+        items: navGroups.flatMap((group) =>
+          group.items.map((item) => ({
+            key: `nav-${item.href}`,
+            label: item.label,
+            hint: group.label,
+            icon: item.icon,
+            to: item.href,
+            keywords: [group.label],
+          })),
+        ),
+      },
+    ],
+    [navGroups],
+  );
+
   return (
-    <SidebarShell
-      surfaceLabel="Kundenbereich"
-      brandHref="/app"
-      brandAriaLabel="Cogniiq Kundenbereich"
-      navLabel="Kundenbereich Navigation"
-      groups={groups}
-      collapsed={collapsed}
-      onToggleCollapse={toggle}
-      topSlot={({ collapsed: railCollapsed, variant }) => (
+    <CommandPaletteProvider groups={commandGroups}>
+      <CustomerShellFrame
+        groups={groups}
+        breadcrumbs={breadcrumbs}
+        collapsed={collapsed}
+        onToggleCollapse={toggle}
+        routeKey={location.pathname}
+        topSlot={({ collapsed: railCollapsed, variant }) => (
         <WorkspaceSlot
           collapsed={railCollapsed}
           variant={variant}
@@ -148,22 +189,66 @@ function CustomerAppShellInner({ children }: { children: ReactNode }) {
           hasMultipleOrganizations={hasMultipleOrganizations}
         />
       )}
-      footerSlot={({ collapsed: railCollapsed }) => (
-        <RailAccount
-          collapsed={railCollapsed}
-          withTooltip
-          name={displayName}
-          email={profile?.email ?? user?.email ?? null}
-          context={activeOrganization?.name ?? 'Keine Organisation verbunden'}
-          links={[
-            { key: 'settings', label: 'Profil & Konto', to: '/app/settings', icon: Settings },
-            { key: 'website', label: 'Zur Website', to: '/', icon: ExternalLink },
-          ]}
-          onSignOut={() => void signOut()}
-        />
-      )}
+        footerSlot={({ collapsed: railCollapsed }) => (
+          <RailAccount
+            collapsed={railCollapsed}
+            withTooltip
+            name={displayName}
+            email={profile?.email ?? user?.email ?? null}
+            context={activeOrganization?.name ?? 'Keine Organisation verbunden'}
+            links={[
+              { key: 'settings', label: 'Profil & Konto', to: '/app/settings', icon: Settings },
+              { key: 'website', label: 'Zur Website', to: '/', icon: ExternalLink },
+            ]}
+            onSignOut={() => void signOut()}
+          />
+        )}
+      >
+        {children}
+      </CustomerShellFrame>
+    </CommandPaletteProvider>
+  );
+}
+
+/**
+ * Inside the palette provider so the topbar/mobile search triggers can open it; owns nothing else.
+ */
+function CustomerShellFrame({
+  groups,
+  breadcrumbs,
+  collapsed,
+  onToggleCollapse,
+  routeKey,
+  topSlot,
+  footerSlot,
+  children,
+}: {
+  groups: SidebarNavGroup[];
+  breadcrumbs: BreadcrumbItem[];
+  collapsed: boolean;
+  onToggleCollapse: () => void;
+  routeKey: string;
+  topSlot: Parameters<typeof SidebarShell>[0]['topSlot'];
+  footerSlot: Parameters<typeof SidebarShell>[0]['footerSlot'];
+  children: ReactNode;
+}) {
+  const palette = useOptionalCommandPalette();
+
+  return (
+    <SidebarShell
+      surfaceLabel="Kundenbereich"
+      brandHref="/app"
+      brandAriaLabel="Cogniiq Kundenbereich"
+      navLabel="Kundenbereich Navigation"
+      groups={groups}
+      collapsed={collapsed}
+      onToggleCollapse={onToggleCollapse}
+      breadcrumbs={breadcrumbs}
+      onOpenSearch={palette ? palette.open : undefined}
+      topSlot={topSlot}
+      footerSlot={footerSlot}
     >
-      <AppRouteTransition routeKey={location.pathname}>{children}</AppRouteTransition>
+      <AppRouteTransition routeKey={routeKey}>{children}</AppRouteTransition>
     </SidebarShell>
   );
 }
