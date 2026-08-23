@@ -27,6 +27,7 @@ import {
   FAKTEN,
   EINRICHTUNG_PROJEKT,
   GO_LIVE_GARANTIE,
+  BETREUUNG_NACH_GOLIVE,
   NICHT_EXTRA,
   PERSONALKOSTEN_ANKER,
   SPRACHEN,
@@ -64,7 +65,7 @@ const faqItems = [
   {
     question: "Warum kostet die Einrichtung so viel?",
     answer:
-      `Weil sie kein Freischalten ist, sondern acht Schritte Arbeit: Erstgespräch, Angebot, Unterschrift, Zugang, Ihre Vorgaben, Aufbau, zwei Tage Testphase und Go-live. Ihr Assistent wird auf Basis Ihrer Angaben gebaut, nicht aus einer Vorlage kopiert. Sie zahlen die Hälfte bei Vertragsabschluss und die Hälfte nach dem Go-live. ${FAKTEN.goLive}`,
+      `Weil sie kein Freischalten ist, sondern acht Schritte Arbeit: Erstgespräch, Angebot, Unterschrift, Zugang, Ihre Vorgaben, Aufbau, zwei Tage Testphase und Go-live. Ihr Assistent wird auf Basis Ihrer Angaben gebaut, nicht aus einer Vorlage kopiert. ${FAKTEN.zahlungsaufteilung} ${FAKTEN.goLive}`,
   },
   {
     question: "Ist die Testphase kostenlos?",
@@ -324,11 +325,28 @@ export function KostenKiTelefonassistent() {
               ))}
             </ol>
 
-            <div className="mt-10 p-8 rounded-2xl border border-gray-300 dark:border-gray-600">
-              <h3 className="text-[22px] font-bold text-gray-900 dark:text-gray-100 mb-3">
+            <div className="mt-10 rounded-2xl border border-pub-signal/25 bg-pub-signal-wash p-8">
+              <h3 className="mb-3 text-[22px] font-bold text-pub-ink">
                 {GO_LIVE_GARANTIE.headline}
               </h3>
               <p className={PROSE}>{GO_LIVE_GARANTIE.text}</p>
+              <ul className="mt-5 space-y-2.5 border-t border-pub-signal/20 pt-5">
+                {GO_LIVE_GARANTIE.mechanik.map((satz) => (
+                  <li key={satz} className="flex gap-3 text-[15px] leading-relaxed text-pub-ink-2">
+                    <span aria-hidden="true" className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-pub-signal" />
+                    <span>{satz}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="mt-6 rounded-2xl border border-pub-hairline p-8">
+              <h3 className="mb-3 text-[22px] font-bold text-pub-ink">
+                {BETREUUNG_NACH_GOLIVE.headline}
+              </h3>
+              {BETREUUNG_NACH_GOLIVE.paragraphs.map((absatz) => (
+                <p key={absatz} className={`${PROSE} mt-3 first:mt-0`}>{absatz}</p>
+              ))}
             </div>
           </div>
         </section>

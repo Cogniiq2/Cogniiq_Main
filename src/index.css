@@ -140,10 +140,15 @@ html.cq-public-light {
        colouring them honestly is part of that.
      - Everything else stays on the ink ramp. The restraint is the design.
 
-     Why vermilion and not blue: blue in German B2B reads Sparkasse / Telekom /
-     Krankenkasse — institutional wallpaper, and every competitor already uses
-     it. Vermilion is warm enough for Praxis and Gastronomie, high-attention
-     without reading as an alarm, and unclaimed in this category.
+     Signal is a deep, saturated blue (owner decision, 23.08.2026): the buyer is
+     a Praxis- or Betriebsinhaber who reads blue as professional and expects it
+     from a supplier they are about to sign a contract with. The risk with blue
+     in German B2B is that it turns into institutional wallpaper, so two things
+     keep it from going generic: it sits on a WARM paper ground (#fbfaf7, not a
+     cold gray), which makes the blue read as ink rather than as chrome, and it
+     is rationed to a single primary action per viewport.
+
+     White on `signal` measures 6.27:1 — comfortably past AA for button labels.
 
      `ink-4` is for uppercase labels ONLY — it does not meet AA as body text.
      Body copy must not go lighter than `ink-3` (5.9:1 on paper). */
@@ -156,9 +161,9 @@ html.cq-public-light {
   --pub-paper-2:    #f4f2ed;
   --pub-card:       #ffffff;
 
-  --pub-signal:     #e4572e;
-  --pub-signal-ink: #b33f1e;
-  --pub-signal-wash:#fdf1ec;
+  --pub-signal:     #1c4fd8;
+  --pub-signal-ink: #1539a6;
+  --pub-signal-wash:#eef2fe;
 
   --pub-verify:     #1f6f4a;
   --pub-verify-wash:#edf5f0;

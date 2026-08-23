@@ -37,13 +37,25 @@
 export const FAKTEN = {
   // ── Zahlen ──
   mehrpreisProMinute: `0,39\u00A0€`,
-  goLiveTage: 7,
+  /*
+    Korrigiert am 23.08.2026 von 7 auf 14 (Inhaber).
+
+    Vertraglich zugesagt sind ZWEI WOCHEN. Die Website versprach an zehn Stellen
+    7 Tage — und zwar mit derselben Rechtsfolge, dem Wegfall der zweiten Hälfte
+    der Einrichtungsgebühr. Damit stand eine Frist im Markt, die der Vertrag
+    nicht trägt: Ein Kunde hätte auf 7 Tagen bestehen und bei Überschreitung die
+    Hälfte der Einrichtungsgebühr einbehalten können. Eine Zusage mit Geldfolge
+    darf nie kürzer sein als die vertragliche.
+  */
+  goLiveTage: 14,
+  /** Sprachform der Frist. In Fliesstext immer diese, nie "14 Tage". */
+  goLiveFrist: "zwei Wochen",
   aenderungTage: 3,
   laufzeitMonate: 12,
   preisgarantieMonate: 24,
   monatlichAufschlag: `20\u00A0%`,
-  erreichbarkeit: "täglich 6–20 Uhr",
-  antwortzeit: "spätestens innerhalb von 24 Stunden",
+  erreichbarkeit: "täglich 6–20\u00A0Uhr",
+  antwortzeit: "spätestens innerhalb von 24\u00A0Stunden",
   gleichzeitigeAnrufe: 10,
 
   // ── Sätze, die wörtlich wiederverwendet werden ──
@@ -59,9 +71,23 @@ export const FAKTEN = {
   nichtProBehandler:
     "Abgerechnet wird pro Praxis, nicht pro Behandler.",
 
-  goLive: `Ihr Empfang geht spätestens 7\u00A0Tage nach Zahlungseingang live. Halten wir diesen Termin nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.`,
+  /*
+    Die Zusage nennt zuerst die Frist, dann die Folge, in zwei kurzen Saetzen.
+    Eine Garantie, die erklaert werden muss, wirkt nicht wie eine Garantie.
+    Bezugspunkt ist der Zahlungseingang, nicht der Vertragsabschluss: Die Frist
+    laeuft erst mit der ersten Haelfte an, und das ist fuer beide Seiten pruefbar.
+  */
+  goLive: `Ihr Empfang geht spätestens zwei Wochen nach Zahlungseingang live. Halten wir diesen Termin nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.`,
 
-  aenderungen: `Änderungen an Ansagen und Regeln reichen Sie über das Kundendashboard oder per E-Mail ein; umgesetzt sind sie innerhalb von 3\u00A0Tagen.`,
+  /** Zahlungsaufteilung — erklaert, warum die Garantie ueberhaupt greifen kann. */
+  zahlungsaufteilung: `Die Einrichtungsgebühr zahlen Sie zur Hälfte bei Vertragsabschluss, zur zweiten Hälfte nach dem Go-live.`,
+
+  /*
+    "Kleinere Aenderungen" ist die Grenze, die der Inhaber selbst zieht
+    (23.08.2026). Sie bleibt im Satz stehen: Eine Zusage ohne Grenze bricht beim
+    ersten groesseren Umbau, und genau das merkt sich dieser Kaeufer.
+  */
+  aenderungen: `Kleinere Änderungen an Ansagen und Regeln reichen Sie über das Kundendashboard oder per E-Mail ein; umgesetzt sind sie innerhalb von 3\u00A0Tagen.`,
 
   kuendigung: `Gekündigt wird mit einem Klick im Kundendashboard, zum Laufzeitende. Kein Anruf, keine E-Mail, keine Fristfalle.`,
 
@@ -175,7 +201,7 @@ export const EINRICHTUNG_SCHRITTE: Array<{
     step: "05",
     title: "Testphase und Go-live",
     description:
-      `Zwei Tage testen wir gemeinsam. Live geht der Assistent erst, wenn Ihre Praxis zufrieden ist — spätestens ${FAKTEN.goLiveTage}\u00A0Tage nach Zahlungseingang.`,
+      `Zwei Tage testen wir gemeinsam. Live geht der Assistent erst, wenn Ihre Praxis zufrieden ist — spätestens ${FAKTEN.goLiveFrist} nach Zahlungseingang.`,
   },
 ];
 
@@ -535,14 +561,14 @@ export const EINRICHTUNG_PROJEKT = {
     {
       nummer: "7",
       title: "Testphase",
-      dauer: "2 Tage",
+      dauer: "2\u00A0Tage",
       text: "Zwei Tage testen wir gemeinsam. Live geht der Assistent erst, wenn Ihre Praxis zufrieden ist.",
     },
     {
       nummer: "8",
       title: "Go-live",
-      dauer: `spätestens ${FAKTEN.goLiveTage}\u00A0Tage nach Zahlungseingang`,
-      text: `Garantiert innerhalb von ${FAKTEN.goLiveTage}\u00A0Tagen nach Zahlungseingang.`,
+      dauer: `spätestens ${FAKTEN.goLiveFrist} nach Zahlungseingang`,
+      text: `Garantiert innerhalb von ${FAKTEN.goLiveFrist} nach Zahlungseingang. ${FAKTEN.zahlungsaufteilung}`,
     },
   ],
 };
@@ -552,8 +578,35 @@ export const EINRICHTUNG_PROJEKT = {
  * Preisseite und im FAQ (Brief III §3.3). Nie als Aufzählungspunkt.
  */
 export const GO_LIVE_GARANTIE = {
-  headline: "Die 7-Tage-Garantie",
+  headline: "Die Zwei-Wochen-Garantie",
   text: `${FAKTEN.goLive} Das steht so im Vertrag, nicht nur auf dieser Seite.`,
+
+  /*
+    Der Mechanismus gehoert dazu. Eine Frist ohne Folge ist eine Absichts-
+    erklaerung; eine Frist mit Geldfolge ist eine Zusage. Der dritte Satz
+    benennt, wer das Risiko traegt — das ist der Punkt, an dem diese Garantie
+    sich von "wir sind schnell" unterscheidet.
+  */
+  mechanik: [
+    FAKTEN.zahlungsaufteilung,
+    "Verpassen wir die Frist, fordern wir die zweite Hälfte nicht ein. Sie müssen dafür nichts geltend machen und keine Nachfrist setzen.",
+    "Das Risiko einer Verzögerung liegt damit bei uns — dort, wo wir es beeinflussen können.",
+  ],
+};
+
+/**
+ * Betreuung nach dem Go-live. Der dokumentierte Abbruchgrund im Betrieb ist
+ * nicht die Technik, sondern der Support: 52 % nennen unzureichende Betreuung
+ * als Wechselgrund (Zi 2026). Dieser Block beantwortet das mit einer Frist und
+ * einem Namen statt mit einer Absichtserklaerung.
+ */
+export const BETREUUNG_NACH_GOLIVE = {
+  headline: "Nach dem Go-live hört die Arbeit nicht auf",
+  paragraphs: [
+    "Ansagen und Regeln ändern sich: nach dem Urlaub, nach einer neuen Sprechzeit, nach der ersten Woche im Betrieb. Genau dann entscheidet sich, ob ein solches System im Alltag bleibt oder wieder abgeschaltet wird.",
+    FAKTEN.aenderungen,
+    "Zugesagt, nicht in Aussicht gestellt. Umgesetzt werden die Änderungen von Lazar Popovic persönlich, erreichbar täglich von 6 bis 20 Uhr — nicht von einem Ticketsystem und nicht von wechselnden Ansprechpartnern.",
+  ],
 };
 
 /**
@@ -618,11 +671,11 @@ export const UMKEHRBARKEIT = {
     { label: "Preisgarantie", wert: FAKTEN.preisgarantie },
     {
       label: "Testphase",
-      wert: "2 Tage, nach Vertragsabschluss und Zahlung der ersten Hälfte. Live geht der Empfang erst, wenn Sie zufrieden sind",
+      wert: "2\u00A0Tage, nach Vertragsabschluss und Zahlung der ersten Hälfte. Live geht der Empfang erst, wenn Sie zufrieden sind",
     },
   ],
   vetorecht:
-    `Die Testphase ist kein kostenloser Test. Sie ist der Punkt, an dem Sie ein Vetorecht haben: Ohne Ihre Freigabe geht der Empfang nicht live, und halten wir die ${FAKTEN.goLiveTage}\u00A0Tage nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.`,
+    `Die Testphase ist kein kostenloser Test. Sie ist der Punkt, an dem Sie ein Vetorecht haben: Ohne Ihre Freigabe geht der Empfang nicht live, und halten wir die ${FAKTEN.goLiveFrist} nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.`,
   // [[CLAIM: Was mit den gespeicherten Ergebnissen nach Vertragsende geschieht,
   // ist nicht beantwortet (Brief II §4.7). Bis dahin keine Aussage dazu.]]
 };
@@ -672,7 +725,7 @@ export const VERTRAG = {
     },
     {
       label: "Zahlung der Einrichtung",
-      wert: "50 % bei Vertragsabschluss, 50 % nach dem Go-live.",
+      wert: "50\u00A0% bei Vertragsabschluss, 50\u00A0% nach dem Go-live.",
     },
   ],
 };
@@ -700,7 +753,7 @@ export const RECHNER = {
   anbindungsHinweis:
     "Der Wert steigt, wo eine Anbindung an Ihr Praxisverwaltungssystem möglich ist: Dann entfällt auch das Übertragen von Hand. Was für Ihr System geht, prüfen wir vor dem Angebot.",
   stundenkostenQuelle:
-    "Vorschlagswert abgeleitet aus dem MFA-Tarifgehalt 2026 (ab 2.939,59 € brutto im Monat) bei angenommenen 38,5 Wochenstunden — ohne Arbeitgeberkosten. Passen Sie den Wert an Ihre Praxis an.",
+    "Vorschlagswert abgeleitet aus dem MFA-Tarifgehalt 2026 (ab 2.939,59\u00A0€ brutto im Monat) bei angenommenen 38,5 Wochenstunden — ohne Arbeitgeberkosten. Passen Sie den Wert an Ihre Praxis an.",
   stundenkostenSource: "Gehaltstarifvertrag MFA (Virchowbund), 2026",
   startwertHinweis:
     "Alle Startwerte sind frei gewählte Beispiele, keine Branchenstatistik.",

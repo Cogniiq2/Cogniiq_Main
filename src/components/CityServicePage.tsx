@@ -261,7 +261,7 @@ function TrustStrip({ config }: { config: CityServiceConfig }) {
     "Bayern",
     "Persönliche Betreuung",
     ...(isTelefonassistent
-      ? ["Keine Gesprächsaufzeichnung", `Go-live in ${FAKTEN.goLiveTage}\u00A0Tagen`]
+      ? ["Keine Gesprächsaufzeichnung", `Go-live in ${FAKTEN.goLiveFrist}`]
       : ["Persönliche Einrichtung"]),
   ];
 

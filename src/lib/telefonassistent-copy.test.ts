@@ -42,7 +42,7 @@ const CLUSTER = [
 const KERNZAHLEN: Array<{ literal: RegExp; quelle: string }> = [
   { literal: /0,39\s?€/, quelle: "FAKTEN.mehrpreisProMinute bzw. FAKTEN.deckelung" },
   { literal: /1\.400\s?€/, quelle: "TARIFE (obergrenze) bzw. FAKTEN.deckelung" },
-  { literal: /\b7\s?Tage[n]?\s+nach\s+Zahlungseingang/, quelle: "FAKTEN.goLive" },
+  { literal: /(zwei\s+Wochen|\b14\s?Tage[n]?)\s+nach\s+Zahlungseingang/, quelle: "FAKTEN.goLive" },
   { literal: /innerhalb\s+von\s+3\s?Tagen/, quelle: "FAKTEN.aenderungen" },
   { literal: /24\s?Monate/, quelle: "FAKTEN.preisgarantie" },
   { literal: /12\s?Monate/, quelle: "FAKTEN.laufzeit" },
@@ -77,7 +77,12 @@ describe("Kernaussagen liegen an genau einer Stelle", () => {
       expect(FAKTEN.deckelung).toContain(tarif.obergrenze);
     }
     expect(FAKTEN.deckelung).toContain(FAKTEN.mehrpreisProMinute);
-    expect(FAKTEN.goLive).toContain(String(FAKTEN.goLiveTage));
+    // Die Zusage spricht die Frist aus ("zwei Wochen"), sie beziffert sie nicht.
+    // Beide Formen muessen dieselbe Frist meinen — sonst steht eine Zusage mit
+    // Geldfolge im Markt, die der Vertrag nicht deckt (Korrektur 23.08.2026).
+    expect(FAKTEN.goLive).toContain(FAKTEN.goLiveFrist);
+    expect(FAKTEN.goLiveTage).toBe(14);
+    expect(FAKTEN.goLiveFrist).toBe("zwei Wochen");
     expect(FAKTEN.aenderungen).toContain(String(FAKTEN.aenderungTage));
     expect(FAKTEN.laufzeit).toContain(String(FAKTEN.laufzeitMonate));
     expect(FAKTEN.laufzeit).toContain(FAKTEN.monatlichAufschlag);
