@@ -1,2 +1,15 @@
 [functions.sync-oura]
 verify_jwt = false
+
+# The automation worker is invoked by pg_cron via net.http_post, which sends no Authorization
+# header — it authenticates with the x-worker-secret header instead (constant-time compared in the
+# function). It currently runs with verify_jwt disabled, set through the dashboard. Without these
+# entries a plain `supabase functions deploy` would re-apply the verify_jwt=true default and every
+# cron invocation would 401 silently: cron.job_run_details records "succeeded" for any request that
+# was merely enqueued, so the queue would stop draining with no visible signal anywhere.
+[functions.send-offer-document-email]
+verify_jwt = false
+
+# Called by the public offer portal on signature; authenticates by token, not by a Supabase JWT.
+[functions.process-accepted-offer]
+verify_jwt = false

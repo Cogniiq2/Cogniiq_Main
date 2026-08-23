@@ -210,9 +210,16 @@ export async function signedSignatureUrl(storagePath: string, expiresIn = 120): 
   return { url: data?.signedUrl ?? null, error: null };
 }
 
-/** Manually re-arm a failed automation job from the owner dashboard (secure owner RPC). */
+/**
+ * Manually re-arm a failed automation job from the owner dashboard (secure owner RPC).
+ *
+ * This previously wrote the table directly and set only `status`, leaving `attempt_count` at its
+ * exhausted value — and since a job only reaches `failed` once `attempt_count >= max_attempts`,
+ * which the claim query excludes, the badge flipped to "retrying" and the job was never picked up
+ * again. The RPC resets the attempt counter, clears the backoff and raises the ceiling.
+ */
 export async function retryAutomationJob(jobId: string): Promise<{ error: string | null }> {
-  const { error } = await supabase.from('owner_automation_jobs').update({ status: 'retrying', last_error: null }).eq('id', jobId);
+  const { error } = await supabase.rpc('owner_retry_automation_job_by_id', { p_job_id: jobId });
   return { error: error?.message ?? null };
 }
 
