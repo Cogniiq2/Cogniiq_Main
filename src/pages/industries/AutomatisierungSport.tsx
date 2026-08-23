@@ -92,7 +92,7 @@ const config: NationalIndustryPageConfig = {
   faq: [
     {
       question: "Welche Mitgliederverwaltungssysteme können integriert werden?",
-      answer: "Wir integrieren gängige Fitness-Management-Systeme direkt: Magicline, Eversports, ClubDesk, PerfectGym u.v.m. Wo keine direkte API besteht, entwickeln wir Übergabepunkte. Beim Erstgespräch klären wir die Kompatibilität Ihrer bestehenden Software.",
+      answer: "Wir integrieren gängige Fitness-Management-Systeme direkt: Magicline, Eversports, ClubDesk, PerfectGym u.v.m. Wo keine direkte API besteht, entwickeln wir Übergabepunkte. Beim Analysegespräch klären wir die Kompatibilität Ihrer bestehenden Software.",
     },
     {
       question: "Kann das System auch für Vereine und Outdoor-Kurse genutzt werden?",
@@ -100,7 +100,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Was kostet Automatisierung für ein Fitnessstudio?",
-      answer: "Einzelne Workflows wie Kursanmeldungen und Erinnerungen beginnen bei ca. 800–1.500 €. Vollständige Mitgliederverwaltungsautomatisierung mit Re-Engagement, Zahlungsverfolgung und Onboarding typischerweise 2.000–4.000 €. Genaues Angebot nach kostenlosem Erstgespräch.",
+      answer: "Einzelne Workflows wie Kursanmeldungen und Erinnerungen beginnen bei ca. 800–1.500 €. Vollständige Mitgliederverwaltungsautomatisierung mit Re-Engagement, Zahlungsverfolgung und Onboarding typischerweise 2.000–4.000 €. Genaues Angebot nach kostenlosem Analysegespräch.",
     },
     {
       question: "Wie hilft Re-Engagement-Automatisierung konkret bei der Mitgliederbindung?",

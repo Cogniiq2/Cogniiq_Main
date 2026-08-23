@@ -518,7 +518,7 @@ export function MobileHero() {
               whileTap={{ opacity: 1 }}
             />
             <span className="relative flex items-center justify-center gap-2">
-              Kostenloses Gespräch sichern
+              Analysegespräch vereinbaren
               <motion.svg
                 width="16" height="16" viewBox="0 0 16 16" fill="none"
                 animate={{ x: [0, 3, 0] }}

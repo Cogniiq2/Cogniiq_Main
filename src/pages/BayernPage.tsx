@@ -183,7 +183,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Wie schnell sind die Lösungen einsatzbereit?",
-    a: "KI-Telefonassistenten: nach Aufnahme Ihrer Vorgaben. Automatisierungsworkflows: 1–4 Wochen je nach Komplexität. Websites: 4–12 Wochen. Nach dem Erstgespräch erhalten Sie immer einen realistischen Zeitplan.",
+    a: "KI-Telefonassistenten: nach Aufnahme Ihrer Vorgaben. Automatisierungsworkflows: 1–4 Wochen je nach Komplexität. Websites: 4–12 Wochen. Nach dem Analysegespräch erhalten Sie immer einen realistischen Zeitplan.",
   },
   {
     q: "Sind alle Lösungen DSGVO-konform?",
@@ -191,7 +191,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Was kostet ein KI-Telefonassistent für Bayern?",
-    a: "Die Kosten hängen von Anrufvolumen und Konfigurationskomplexität ab. Nach dem Erstgespräch erhalten Sie ein transparentes Festpreisangebot. Das Erstgespräch ist kostenlos und unverbindlich.",
+    a: "Die Kosten hängen von Anrufvolumen und Konfigurationskomplexität ab. Nach dem Analysegespräch erhalten Sie ein transparentes Festpreisangebot. Das Analysegespräch ist kostenlos und unverbindlich.",
   },
   {
     q: "Was kostet eine Website für ein bayerisches Unternehmen?",
@@ -756,14 +756,14 @@ export function BayernPage() {
                 Projekt in Bayern besprechen
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-                Kostenloses Erstgespräch – für Unternehmen in ganz Bayern. Remote oder persönlich in Bayreuth und Umgebung. 30–45&nbsp;Minuten, ohne Verpflichtung, mit konkretem Ergebnis.
+                Kostenloses Analysegespräch – für Unternehmen in ganz Bayern. Remote oder persönlich in Bayreuth und Umgebung. 30–45&nbsp;Minuten, ohne Verpflichtung, mit konkretem Ergebnis.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <Link
                   to="/kontakt"
                   className="inline-flex items-center gap-2 px-7 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-gray-700 dark:hover:bg-white transition-colors"
                 >
-                  Kostenloses Erstgespräch
+                  Kostenloses Analysegespräch
                   <ArrowRight size={16} />
                 </Link>
                 <Link

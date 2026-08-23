@@ -389,7 +389,7 @@ function PricingSection({ config }: { config: ClusterPageConfig }) {
                 to="/kontakt"
                 className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
               >
-                Jetzt anfragen <ArrowUpRight size={13} />
+                Analysegespräch anfragen <ArrowUpRight size={13} />
               </Link>
             </motion.div>
           ))}
@@ -403,7 +403,7 @@ function PricingSection({ config }: { config: ClusterPageConfig }) {
           custom={0.3}
           className="mt-6 text-xs text-gray-400 dark:text-gray-500"
         >
-          Alle Preisangaben sind Richtwerte. Das individuelle Angebot hängt von Umfang, Zielgruppe und spezifischen Anforderungen ab. Kostenloses Erstgespräch für eine konkrete Einschätzung.
+          Alle Preisangaben sind Richtwerte. Das individuelle Angebot hängt von Umfang, Zielgruppe und spezifischen Anforderungen ab. Kostenloses Analysegespräch für eine konkrete Einschätzung.
         </motion.p>
       </div>
     </section>
@@ -626,7 +626,7 @@ function CTASection({ config }: { config: ClusterPageConfig }) {
           custom={0}
         >
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-            Kostenloses Erstgespräch für Unternehmen in {config.city}
+            Kostenloses Analysegespräch für Unternehmen in {config.city}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
             30–45&nbsp;Minuten, ohne Verpflichtung. Wir analysieren Ihre Situation und geben eine konkrete Einschätzung zu {config.topic} in {config.city}.

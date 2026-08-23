@@ -153,11 +153,11 @@ export function KiCTASection() {
                   className="inline-flex items-center justify-center gap-2 bg-white/[0.05] border border-white/[0.09] text-gray-300 font-semibold text-[13px] rounded-xl h-11 px-6 hover:bg-white/[0.09] hover:border-white/20 transition-all"
                 >
                   <Calendar size={12} />
-                  Kostenloses Gespräch
+                  Analysegespräch vereinbaren
                 </Link>
               </div>
               <p className="text-[11px] text-gray-700 mt-3">
-                30 Min · kostenlos & unverbindlich · kein Sales-Pitch
+                30–45 Min. · kostenlos und unverbindlich
               </p>
             </div>
 

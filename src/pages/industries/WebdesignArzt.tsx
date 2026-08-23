@@ -104,7 +104,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Was kostet eine Praxis-Website?",
-      answer: "Praxis-Websites starten bei ca. 2.500 €. Mit Terminbuchungsintegration, vollständigem DSGVO-Setup und Local SEO typischerweise 3.500–5.500 €. Ein genaues Angebot für Ihre Praxisgröße und -struktur erhalten Sie im kostenlosen Erstgespräch.",
+      answer: "Praxis-Websites starten bei ca. 2.500 €. Mit Terminbuchungsintegration, vollständigem DSGVO-Setup und Local SEO typischerweise 3.500–5.500 €. Ein genaues Angebot für Ihre Praxisgröße und -struktur erhalten Sie im kostenlosen Analysegespräch.",
     },
     {
       question: "Können mehrere Ärzte, Fachgebiete und Standorte abgebildet werden?",

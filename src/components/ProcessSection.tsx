@@ -20,7 +20,7 @@ const stages = [
     title: 'Kennenlernen & Zieldefinition',
     icon: MessageSquare,
     description:
-      'Kurzes Erstgespräch (30–45 Min.), in dem wir Ihr Geschäftsmodell, Ihre Ziele und den Status quo verstehen. Kostenlos und unverbindlich.',
+      'Kurzes Analysegespräch (30–45 Min.), in dem wir Ihr Geschäftsmodell, Ihre Ziele und den Status quo verstehen. Kostenlos und unverbindlich.',
     items: [
       'Kostenloser Strategiecall',
       'Analyse des Status Quo',
@@ -169,7 +169,7 @@ export function ProcessSection() {
                   to="/kontakt"
                   className="font-medium text-gray-700 hover:text-gray-900 transition-colors underline underline-offset-2 decoration-gray-200"
                 >
-                  Jetzt starten
+                  Analysegespräch vereinbaren
                 </Link>
                 .
               </p>
@@ -194,7 +194,7 @@ export function ProcessSection() {
                 to="/kontakt"
                 className="group inline-flex items-center gap-2 text-[13px] font-semibold text-gray-900 transition-all"
               >
-                Kostenloses Erstgespräch
+                Kostenloses Analysegespräch
                 <ArrowRight size={13} className="transition-transform duration-200 group-hover:translate-x-1" />
               </Link>
             </motion.div>

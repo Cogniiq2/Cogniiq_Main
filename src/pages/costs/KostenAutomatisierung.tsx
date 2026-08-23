@@ -121,7 +121,7 @@ const config: CostPageConfig = {
     },
   ],
   ctaHeadline: "Kostenloses Automatisierungs-Audit",
-  ctaText: "Im kostenlosen Erstgespräch analysieren wir gemeinsam, welche Ihrer Prozesse sich am schnellsten und günstigsten automatisieren lassen – mit konkreter ROI-Einschätzung.",
+  ctaText: "Im kostenlosen Analysegespräch analysieren wir gemeinsam, welche Ihrer Prozesse sich am schnellsten und günstigsten automatisieren lassen – mit konkreter ROI-Einschätzung.",
 };
 
 export function KostenAutomatisierung() {

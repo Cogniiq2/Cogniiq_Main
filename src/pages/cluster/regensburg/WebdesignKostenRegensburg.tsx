@@ -22,7 +22,7 @@ const config: ClusterPageConfig = {
     h1: "Webdesign Kosten in Regensburg – Was kostet eine Website?",
     lead: "Transparente Preisübersicht für professionelles Webdesign in Regensburg. Keine versteckten Kosten, keine Pauschalen – eine ehrliche Einschätzung, was Qualität kostet und warum sie sich lohnt.",
     trustTags: ["Regensburg", "Transparente Preise", "Kein Baukasten", "Persönliche Betreuung"],
-    ctaLabel: "Kostenloses Erstgespräch",
+    ctaLabel: "Kostenloses Analysegespräch",
   },
   tldr: {
     heading: "Kurzüberblick: Webdesign Kosten Regensburg",
@@ -151,7 +151,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie erhalte ich ein konkretes Angebot?",
-      answer: "Im kostenlosen Erstgespräch – 30–45 Minuten, remote oder vor Ort in Regensburg.",
+      answer: "Im kostenlosen Analysegespräch – 30–45 Minuten, remote oder vor Ort in Regensburg.",
     },
   ],
   internalLinks: [

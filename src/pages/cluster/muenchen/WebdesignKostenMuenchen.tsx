@@ -22,7 +22,7 @@ const config: ClusterPageConfig = {
     h1: "Webdesign Kosten in München – Was kostet eine Website?",
     lead: "Transparente Preisübersicht für professionelles Webdesign in München. München ist der kompetitivste digitale Markt Bayerns – die Investition in Qualität ist hier keine Option, sondern Voraussetzung.",
     trustTags: ["München", "Premium-Qualität", "Transparente Preise", "Persönliche Betreuung"],
-    ctaLabel: "Kostenloses Erstgespräch",
+    ctaLabel: "Kostenloses Analysegespräch",
   },
   tldr: {
     heading: "Kurzüberblick: Webdesign Kosten München",
@@ -151,7 +151,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie erhalte ich ein konkretes Angebot für München?",
-      answer: "Im kostenlosen Erstgespräch – 30–45 Minuten, remote oder vor Ort in München.",
+      answer: "Im kostenlosen Analysegespräch – 30–45 Minuten, remote oder vor Ort in München.",
     },
   ],
   internalLinks: [

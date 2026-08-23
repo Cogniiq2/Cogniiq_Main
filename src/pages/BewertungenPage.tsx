@@ -159,14 +159,14 @@ export function BewertungenPage() {
                 Überzeugen Sie sich selbst
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-                Kostenloses Erstgespräch – 30–45&nbsp;Minuten, ohne Verpflichtung. Sie entscheiden danach, ob es passt.
+                Kostenloses Analysegespräch – 30–45&nbsp;Minuten, ohne Verpflichtung. Sie entscheiden danach, ob es passt.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <Link
                   to="/kontakt"
                   className="inline-flex items-center gap-2 px-7 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-gray-700 dark:hover:bg-white transition-colors"
                 >
-                  Erstgespräch vereinbaren
+                  Analysegespräch vereinbaren
                   <ArrowRight size={16} />
                 </Link>
                 <Link

@@ -196,7 +196,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Was kostet ein System?",
-    a: "Einzellösungen starten im niedrigen vierstelligen Bereich. Integrierte Systemarchitekturen — Website, KI-Assistent und Automatisierung kombiniert — liegen je nach Komplexität höher. Eine konkrete Einschätzung Ihres spezifischen Setups erhalten Sie im kostenlosen Erstgespräch, ohne Verpflichtung.",
+    a: "Einzellösungen starten im niedrigen vierstelligen Bereich. Integrierte Systemarchitekturen — Website, KI-Assistent und Automatisierung kombiniert — liegen je nach Komplexität höher. Eine konkrete Einschätzung Ihres spezifischen Setups erhalten Sie im kostenlosen Analysegespräch, ohne Verpflichtung.",
   },
   {
     q: "Sind die Systeme DSGVO-konform?",
@@ -204,7 +204,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Kann das in unsere bestehenden Tools integriert werden?",
-    a: "In der Regel ja. Wir integrieren in gängige Kalender-, CRM-, Buchungs- und Kassensysteme: von Tomedo und CGM über OnOffice und HubSpot bis zu Lightspeed und Magicline. Im Erstgespräch klären wir konkret, was mit Ihrer Infrastruktur möglich und sinnvoll ist.",
+    a: "In der Regel ja. Wir integrieren in gängige Kalender-, CRM-, Buchungs- und Kassensysteme: von Tomedo und CGM über OnOffice und HubSpot bis zu Lightspeed und Magicline. Im Analysegespräch klären wir konkret, was mit Ihrer Infrastruktur möglich und sinnvoll ist.",
   },
   {
     q: "Was, wenn wir nur mit einem Service starten möchten?",
@@ -482,7 +482,7 @@ export function LeistungenPage() {
                 to="/kontakt"
                 className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-semibold text-sm tracking-wide hover:bg-gray-700 dark:hover:bg-white transition-colors"
               >
-                Kostenloses Erstgespräch
+                Kostenloses Analysegespräch
                 <ArrowRight size={14} />
               </Link>
               <Link
@@ -1011,7 +1011,7 @@ export function LeistungenPage() {
                 Bereit für ein System<br />statt Einzellösungen?
               </h2>
               <p className="text-gray-500 dark:text-gray-400 text-lg font-light mb-3 max-w-md mx-auto">
-                Kostenloses Erstgespräch. Konkrete Systemeinschätzung.
+                Kostenloses Analysegespräch. Konkrete Systemeinschätzung.
               </p>
               <p className="text-xs text-gray-400 dark:text-gray-600 tracking-wide mb-14">
                 30–45 Min. &middot; keine Vorbereitung nötig &middot; keine Verkaufspräsentation
@@ -1022,7 +1022,7 @@ export function LeistungenPage() {
                   to="/kontakt"
                   className="inline-flex items-center gap-2.5 px-8 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-semibold text-sm tracking-wide hover:bg-gray-700 dark:hover:bg-white transition-colors"
                 >
-                  Erstgespräch vereinbaren
+                  Analysegespräch vereinbaren
                   <ArrowRight size={15} />
                 </Link>
                 <Link

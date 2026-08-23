@@ -447,7 +447,7 @@ export function Footer() {
                 to="/kontakt"
                 className="inline-flex items-center gap-1.5 text-[12px] font-medium text-gray-500 dark:text-white/40 hover:text-gray-900 dark:hover:text-white transition-colors group"
               >
-                Erstgespräch
+                Analysegespräch
                 <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform" />
               </Link>
             </div>

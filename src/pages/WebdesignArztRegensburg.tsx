@@ -191,7 +191,7 @@ const config: IndustryPageConfig = {
     {
       question: "Funktioniert der KI-Telefonassistent mit meiner bestehenden Praxissoftware in Regensburg?",
       answer:
-        "In den meisten Fällen ja. Der KI-Telefonassistent kann an gängige Praxisverwaltungssysteme und Kalendertools angebunden werden. Wir klären die technische Integration im kostenlosen Erstgespräch individuell.",
+        "In den meisten Fällen ja. Der KI-Telefonassistent kann an gängige Praxisverwaltungssysteme und Kalendertools angebunden werden. Wir klären die technische Integration im kostenlosen Analysegespräch individuell.",
     },
     {
       question: "Wie lange dauert die Einrichtung für eine Arztpraxis in Regensburg?",

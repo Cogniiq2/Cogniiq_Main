@@ -240,7 +240,7 @@ export function ScanPage() {
               to="/kontakt"
               className="group inline-flex items-center gap-2 bg-gray-950 text-white text-sm font-medium px-6 py-3 rounded-xl hover:bg-gray-800 transition-all duration-200 shadow-sm"
             >
-              Kostenloses Gespräch sichern
+              Analysegespräch vereinbaren
               <ArrowRight
                 size={15}
                 className="transition-transform duration-200 group-hover:translate-x-0.5"
@@ -351,7 +351,7 @@ export function ScanPage() {
                   to="/kontakt"
                   className="inline-flex items-center gap-2 text-sm font-medium text-gray-700 border border-gray-200 px-5 py-2.5 rounded-xl hover:border-[#2e6f8f]/40 hover:text-[#2e6f8f] transition-all duration-200"
                 >
-                  Erstgespräch buchen
+                  Analysegespräch buchen
                 </Link>
               </div>
             </motion.div>
@@ -470,7 +470,7 @@ export function ScanPage() {
             />
             <div className="relative">
               <p className="text-xs font-medium tracking-[0.18em] uppercase text-[#3d8fad] mb-4">
-                Jetzt starten
+                Analysegespräch vereinbaren
               </p>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight mb-4 leading-snug">
                 Bereit für ein digitales System,{' '}
@@ -486,7 +486,7 @@ export function ScanPage() {
                   to="/kontakt"
                   className="group inline-flex items-center gap-2 bg-white text-gray-950 text-sm font-semibold px-6 py-3 rounded-xl hover:bg-gray-100 transition-all duration-200 shadow-sm"
                 >
-                  Kostenloses Gespräch sichern
+                  Analysegespräch vereinbaren
                   <ArrowRight size={15} className="transition-transform duration-200 group-hover:translate-x-0.5" />
                 </Link>
                 <Link

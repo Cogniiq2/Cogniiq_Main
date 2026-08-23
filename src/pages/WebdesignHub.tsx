@@ -47,7 +47,7 @@ const faqItems = [
   {
     question: "Was kostet eine professionelle Website?",
     answer:
-      "Die Kosten hängen von Umfang, Seiten und Integrationen ab. Wir arbeiten mit Festpreisen – keine versteckten Kosten. Im kostenlosen Erstgespräch erhalten Sie eine konkrete Einschätzung.",
+      "Die Kosten hängen von Umfang, Seiten und Integrationen ab. Wir arbeiten mit Festpreisen – keine versteckten Kosten. Im kostenlosen Analysegespräch erhalten Sie eine konkrete Einschätzung.",
   },
   {
     question: "Ist SEO im Preis inklusive?",
@@ -167,7 +167,7 @@ export function WebdesignHub() {
                 to="/kontakt"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition-colors"
               >
-                Kostenloses Erstgespräch <ArrowRight size={15} />
+                Kostenloses Analysegespräch <ArrowRight size={15} />
               </Link>
               <Link
                 to="/kosten-webdesign"
@@ -312,13 +312,13 @@ export function WebdesignHub() {
               Bereit für eine Website, die wirklich arbeitet?
             </h2>
             <p className="text-gray-500 dark:text-white/50 mb-8 text-sm">
-              Im kostenlosen Erstgespräch analysieren wir Ihre aktuelle Situation und zeigen konkret, was eine neue Website für Ihr Unternehmen bewirken kann.
+              Im kostenlosen Analysegespräch analysieren wir Ihre aktuelle Situation und zeigen konkret, was eine neue Website für Ihr Unternehmen bewirken kann.
             </p>
             <Link
               to="/kontakt"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors"
             >
-              Jetzt Erstgespräch buchen <ArrowRight size={16} />
+              Jetzt Analysegespräch buchen <ArrowRight size={16} />
             </Link>
           </motion.div>
         </section>

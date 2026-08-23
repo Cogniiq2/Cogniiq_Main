@@ -8,14 +8,14 @@ const faqs = [
   {
     question: 'Was kostet ein Projekt mit euch?',
     answer:
-      'Das hängt von Ziel und Umfang ab. Wir arbeiten nicht mit pauschalen Paketpreisen, sondern mit individuellen Angeboten – abgestimmt auf Ihre Prozesse und Systeme. Das Erstgespräch und eine erste Einschätzung sind kostenlos.',
+      'Das hängt von Ziel und Umfang ab. Wir arbeiten nicht mit pauschalen Paketpreisen, sondern mit individuellen Angeboten – abgestimmt auf Ihre Prozesse und Systeme. Das Analysegespräch und eine erste Einschätzung sind kostenlos.',
     category: 'Kosten',
   },
   {
     question: 'Wie schnell könnt ihr starten?',
     // [[CLAIM: verify — Startzeitraum 7–14 Tage (OWNER-INPUT E1)]]
     answer:
-      'Das hängt vom Projektumfang und der Auslastung ab – wir nennen Ihnen im Erstgespräch einen konkreten Termin.',
+      'Das hängt vom Projektumfang und der Auslastung ab – wir nennen Ihnen im Analysegespräch einen konkreten Termin.',
     category: 'Ablauf',
   },
   {
@@ -51,7 +51,7 @@ const faqs = [
   {
     question: 'Wie läuft ein Projekt typischerweise ab?',
     answer:
-      'Erstgespräch und Analyse, dann ein maßgeschneidertes Systemkonzept, danach Umsetzung in klar definierten Phasen – mit klaren Verantwortlichkeiten und direkter Kommunikation.',
+      'Analysegespräch und Analyse, dann ein maßgeschneidertes Systemkonzept, danach Umsetzung in klar definierten Phasen – mit klaren Verantwortlichkeiten und direkter Kommunikation.',
     category: 'Ablauf',
   },
 ];

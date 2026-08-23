@@ -100,7 +100,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Wie hilft der Assistent dabei, Portalprovision einzusparen?",
-      answer: "Eine Buchung, die ein Gast abends telefonisch direkt beim Hotel platziert statt über ein Portal, spart die Provision dieser Buchung. Wie stark sich das summiert, hängt von Ihrer Direktquote ab – wir rechnen im Erstgespräch mit Ihren eigenen Zahlen, nicht mit Musterwerten.",
+      answer: "Eine Buchung, die ein Gast abends telefonisch direkt beim Hotel platziert statt über ein Portal, spart die Provision dieser Buchung. Wie stark sich das summiert, hängt von Ihrer Direktquote ab – wir rechnen im Analysegespräch mit Ihren eigenen Zahlen, nicht mit Musterwerten.",
     },
     {
       question: "Was passiert bei komplexen Gruppenanfragen?",

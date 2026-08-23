@@ -64,7 +64,7 @@ const faqItems = [
   {
     question: "Warum kostet die Einrichtung so viel?",
     answer:
-      `Weil sie kein Freischalten ist, sondern acht Schritte Arbeit: Erstgespräch, Angebot, Unterschrift, Zugang, Ihre Vorgaben, Aufbau, zwei Tage Testphase und Go-live. Ihr Assistent wird auf Basis Ihrer Angaben gebaut, nicht aus einer Vorlage kopiert. Sie zahlen die Hälfte bei Vertragsabschluss und die Hälfte nach dem Go-live. ${FAKTEN.goLive}`,
+      `Weil sie kein Freischalten ist, sondern acht Schritte Arbeit: Analysegespräch, Angebot, Unterschrift, Zugang, Ihre Vorgaben, Aufbau, zwei Tage Testphase und Go-live. Ihr Assistent wird auf Basis Ihrer Angaben gebaut, nicht aus einer Vorlage kopiert. Sie zahlen die Hälfte bei Vertragsabschluss und die Hälfte nach dem Go-live. ${FAKTEN.goLive}`,
   },
   {
     question: "Ist die Testphase kostenlos?",
@@ -442,7 +442,7 @@ export function KostenKiTelefonassistent() {
           <div className="max-w-2xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>Ihr Angebot: schriftlich, aufgeschlüsselt, ohne Überraschungen</h2>
             <p className={`${PROSE} mb-8`}>
-              Im Erstgespräch gehen wir Ihre typischen Anrufe durch und klären,
+              Im Analysegespräch gehen wir Ihre typischen Anrufe durch und klären,
               welcher Tarif zu Ihrem Aufkommen passt. Danach erhalten Sie ein
               schriftliches Angebot mit allen Posten — und entscheiden in Ruhe.
             </p>

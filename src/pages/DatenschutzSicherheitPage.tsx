@@ -231,7 +231,7 @@ export function DatenschutzSicherheitPage() {
               Nehmen Sie Ihren Datenschutzbeauftragten mit.
             </h2>
             <p className={`${PROSE} mb-8`}>
-              Im Erstgespräch beantworten wir die sechs Fragen oben so weit, wie
+              Im Analysegespräch beantworten wir die sechs Fragen oben so weit, wie
               wir sie heute beantworten können — und sagen bei den übrigen, wann
               wir sie beantworten können. Schriftlich, damit Ihr
               Datenschutzbeauftragter es prüfen kann.

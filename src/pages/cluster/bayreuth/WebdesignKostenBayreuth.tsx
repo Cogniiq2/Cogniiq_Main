@@ -22,7 +22,7 @@ const config: ClusterPageConfig = {
     h1: "Webdesign Kosten in Bayreuth – Was kostet eine Website?",
     lead: "Transparente Preisübersicht für professionelles Webdesign in Bayreuth. Keine Pauschalen, keine versteckten Kosten – eine ehrliche Einschätzung, was Qualität kostet und warum sie sich lohnt.",
     trustTags: ["Bayreuth", "Transparente Preise", "Kein Baukasten", "Persönliche Betreuung"],
-    ctaLabel: "Kostenloses Erstgespräch",
+    ctaLabel: "Kostenloses Analysegespräch",
   },
   tldr: {
     heading: "Kurzüberblick: Webdesign Kosten Bayreuth",
@@ -161,7 +161,7 @@ const config: ClusterPageConfig = {
     {
       question: "Wie erhalte ich ein konkretes Angebot?",
       answer:
-        "Im kostenlosen Erstgespräch (30–45 Min.) analysieren wir Ihre Situation und erstellen im Anschluss ein detailliertes Angebot – ohne Verpflichtung.",
+        "Im kostenlosen Analysegespräch (30–45 Min.) analysieren wir Ihre Situation und erstellen im Anschluss ein detailliertes Angebot – ohne Verpflichtung.",
     },
   ],
   internalLinks: [

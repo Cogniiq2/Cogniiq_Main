@@ -54,7 +54,7 @@ const PROCESS_STEPS = [
   },
   {
     number: "03",
-    title: "Strategiegespräch (Video)",
+    title: "Analysegespräch (Video)",
     description: "30–45 Minuten fokussiertes Gespräch über konkrete Potenziale und nächste Schritte.",
   },
   {
@@ -154,9 +154,9 @@ export function KontaktPage() {
                   custom={0.08}
                   className="text-4xl sm:text-5xl lg:text-[3.6rem] font-bold text-gray-900 leading-[1.06] tracking-[-0.024em] mb-6"
                 >
-                  KI-Systeme für Ihr
+                  Sie kennen Ihre Engpässe.
                   <br />
-                  <span className="text-gray-200">Unternehmen besprechen</span>
+                  <span className="text-gray-200">Wir zeigen, was sie lösen kann.</span>
                 </motion.h1>
 
                 <motion.p
@@ -166,9 +166,10 @@ export function KontaktPage() {
                   custom={0.13}
                   className="text-[16px] text-gray-500 leading-[1.75] mb-8 max-w-[560px]"
                 >
-                  In einem strukturierten Analysegespräch prüfen wir, wo KI-Automatisierung,
-                  Webdesign oder digitale Systeme in Ihrem Unternehmen konkret Umsatz,
-                  Effizienz und Anfragen steigern können.
+                  Verpasste Anrufe, manuelle Abläufe, eine Website, die keine Anfragen bringt —
+                  Sie wissen längst, wo es klemmt. Im Analysegespräch (30–45 Min., Video) gehen
+                  wir Ihre Situation strukturiert durch und sagen Ihnen ehrlich, wo ein
+                  KI-System den größten Hebel hat — und wo nicht.
                 </motion.p>
 
                 <motion.div
@@ -188,7 +189,7 @@ export function KontaktPage() {
                   </a>
                   <Link
                     to="/leistungen"
-                    className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg border border-gray-200 text-[13px] font-medium text-gray-600 hover:border-gray-400 hover:text-gray-900 transition-colors"
+                    className="inline-flex items-center justify-center gap-2 px-2 py-3.5 text-[13px] font-medium text-gray-500 hover:text-gray-900 transition-colors"
                   >
                     Leistungen ansehen
                     <ArrowRight size={13} className="opacity-50" />
@@ -203,7 +204,7 @@ export function KontaktPage() {
                   className="flex flex-wrap gap-x-6 gap-y-2.5"
                 >
                   {[
-                    { icon: Clock, text: '30–45 Min. Strategiegespräch' },
+                    { icon: Clock, text: '30–45 Min. Analysegespräch' },
                     { icon: CheckCircle2, text: 'Einschätzung statt Verkauf' },
                     { icon: MapPin, text: 'Für Unternehmen in Deutschland' },
                   ].map(({ icon: Icon, text }) => (

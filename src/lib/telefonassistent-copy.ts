@@ -149,7 +149,7 @@ export const EINRICHTUNG_SCHRITTE: Array<{
 }> = [
   {
     step: "01",
-    title: "Erstgespräch",
+    title: "Analysegespräch",
     description:
       "Wir gehen Ihre typischen Anrufe durch: Welche Anliegen kommen täglich, welche zu Stoßzeiten, was darf der Assistent erledigen, was gehört immer in menschliche Hände. Dazu eine kurze Demo mit konkreten Beispielen.",
   },
@@ -265,7 +265,7 @@ export const GRENZEN = {
 export const NICHT_PASSEND = {
   headline: "Wann wir nicht die richtige Lösung sind",
   intro:
-    "Ein Erstgespräch lohnt sich nicht für jeden Betrieb. In diesen Konstellationen raten wir ab:",
+    "Ein Analysegespräch lohnt sich nicht für jeden Betrieb. In diesen Konstellationen raten wir ab:",
   points: [
     "Sie erwarten, dass aufgenommene Termine automatisch in Ihrem Praxisverwaltungssystem stehen. Eine fertige Standardanbindung gibt es heute nicht. Ist das Ihre Bedingung, sind wir noch nicht der richtige Anbieter.",
     "Sie erwarten, dass die Telefonie vollständig ohne Ihr Team läuft. Der Assistent entlastet – er ersetzt keine Anmeldung und keine fachliche Entscheidung.",
@@ -407,11 +407,11 @@ export const DATENSCHUTZ_SEITE = {
 
 /** M12 · Abschluss-CTA — klein, konkret, umkehrbar. */
 export const CTA = {
-  primaryLabel: "Unverbindliches Erstgespräch vereinbaren",
+  primaryLabel: "Unverbindliches Analysegespräch vereinbaren",
   secondaryLabel: "Anliegen-Katalog für Ihre Praxis durchgehen",
   nextStep:
-    "Im Erstgespräch gehen wir Ihre typischen Anrufe durch und skizzieren, wie Ihr Empfang am Telefon aussehen könnte. Danach entscheiden Sie in Ruhe — ohne Verpflichtung.",
-  // [[CLAIM: Dauer des Erstgesprächs bestätigen — bis dahin ohne Minutenangabe]]
+    "Im Analysegespräch gehen wir Ihre typischen Anrufe durch und skizzieren, wie Ihr Empfang am Telefon aussehen könnte. Danach entscheiden Sie in Ruhe — ohne Verpflichtung.",
+  // [[CLAIM: Dauer des Analysegesprächs bestätigen — bis dahin ohne Minutenangabe]]
   microcopy: "Kein Verkaufsgespräch, keine Präsentation.",
 };
 
@@ -498,7 +498,7 @@ export const EINRICHTUNG_PROJEKT = {
   schritte: [
     {
       nummer: "1",
-      title: "Erstgespräch",
+      title: "Analysegespräch",
       dauer: null as string | null,
       text: "Persönlich oder im Videocall. Wir gehen Ihre Praxissituation durch und zeigen an konkreten Beispielen, was der Empfang kann.",
     },

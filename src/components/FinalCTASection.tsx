@@ -127,7 +127,7 @@ export function FinalCTASection() {
                     transition={{ duration: 1.8, repeat: Infinity }}
                   />
                   <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-gray-500">
-                    Kostenloses Erstgespräch
+                    Kostenloses Analysegespräch
                   </span>
                 </div>
 
@@ -135,7 +135,7 @@ export function FinalCTASection() {
                   Gespräch vereinbaren
                 </h3>
                 <p className="text-[13px] text-gray-500 mb-8 leading-relaxed">
-                  30 Min · keine Vorbereitung nötig · kein Sales-Pitch
+                  30–45 Min. · keine Vorbereitung nötig
                 </p>
 
                 {/* Primary CTA */}

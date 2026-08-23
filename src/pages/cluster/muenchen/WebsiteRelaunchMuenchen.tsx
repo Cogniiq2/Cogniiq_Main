@@ -22,7 +22,7 @@ const config: ClusterPageConfig = {
     h1: "Website Relaunch in München",
     lead: "Im Münchner Wettbewerb ist eine veraltete Website keine Kleinigkeit – sie kostet täglich Anfragen an besser aufgestellte Konkurrenten. Ein Relaunch setzt den digitalen Auftritt auf das Niveau, das der Münchner Markt erfordert.",
     trustTags: ["München", "Premium-Standard", "SEO-Migration", "Kein Ranking-Verlust"],
-    ctaLabel: "Kostenloses Erstgespräch",
+    ctaLabel: "Kostenloses Analysegespräch",
   },
   tldr: {
     heading: "Kurzüberblick: Website Relaunch in München",
@@ -107,7 +107,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie starte ich den Relaunch-Prozess?",
-      answer: "Kostenloses Erstgespräch – Analyse des Ist-Zustands und konkrete Empfehlung.",
+      answer: "Kostenloses Analysegespräch – Analyse des Ist-Zustands und konkrete Empfehlung.",
     },
   ],
   internalLinks: [

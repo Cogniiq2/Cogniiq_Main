@@ -126,7 +126,7 @@ const config: NationalIndustryPageConfig = {
     {
       question: "Kann ich den Assistenten hören, bevor ich mich entscheide?",
       answer:
-        "Ja. Im unverbindlichen Erstgespräch gehen wir Ihre typischen Anrufe durch und zeigen an einer Beispielkonfiguration, wie der Assistent für Ihre Praxis klingt und was er übernimmt. Vor dem Start testen Sie mit echten Szenarien – erst wenn es sitzt, geht er live.",
+        "Ja. Im unverbindlichen Analysegespräch gehen wir Ihre typischen Anrufe durch und zeigen an einer Beispielkonfiguration, wie der Assistent für Ihre Praxis klingt und was er übernimmt. Vor dem Start testen Sie mit echten Szenarien – erst wenn es sitzt, geht er live.",
     },
   ],
   grenzen: GRENZEN,

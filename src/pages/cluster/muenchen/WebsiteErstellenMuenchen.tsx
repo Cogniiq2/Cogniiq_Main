@@ -22,7 +22,7 @@ const config: ClusterPageConfig = {
     h1: "Website erstellen lassen in München",
     lead: "München ist Deutschlands wettbewerbsintensivster lokaler Digitalmarkt. Wer hier eine neue Website erstellen lässt, braucht mehr als ein schönes Design – er braucht ein technisch überlegenes, SEO-dominierendes System.",
     trustTags: ["München", "Premium-Standard", "SEO-Dominanz", "Persönliche Betreuung"],
-    ctaLabel: "Kostenloses Erstgespräch",
+    ctaLabel: "Kostenloses Analysegespräch",
   },
   tldr: {
     heading: "Kurzüberblick: Website erstellen in München",
@@ -109,7 +109,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie starte ich?",
-      answer: "Kostenloses Erstgespräch – remote oder vor Ort in München.",
+      answer: "Kostenloses Analysegespräch – remote oder vor Ort in München.",
     },
   ],
   internalLinks: [

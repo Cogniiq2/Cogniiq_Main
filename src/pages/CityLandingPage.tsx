@@ -155,7 +155,7 @@ export function CityLandingPage({ citySlug }: Props) {
                   to="/kontakt"
                   className="inline-flex items-center gap-2 px-7 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-gray-700 dark:hover:bg-white transition-colors"
                 >
-                  Kostenloses Erstgespräch
+                  Kostenloses Analysegespräch
                   <ArrowRight size={16} />
                 </Link>
                 <Link

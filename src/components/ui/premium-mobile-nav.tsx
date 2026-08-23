@@ -391,7 +391,7 @@ export function PremiumMobileNav() {
                     className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-white text-gray-950 font-semibold text-[15px] tracking-tight hover:bg-white/90 transition-colors active:scale-[0.98]"
                     whileTap={{ scale: 0.98 }}
                   >
-                    Erstgespräch vereinbaren
+                    Analysegespräch vereinbaren
                     <ArrowRight size={16} />
                   </motion.button>
                 </div>

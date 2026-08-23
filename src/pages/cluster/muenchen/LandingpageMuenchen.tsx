@@ -22,7 +22,7 @@ const config: ClusterPageConfig = {
     h1: "Landingpage erstellen lassen in München",
     lead: "In München kostet jeder verschwendete Klick mehr. Conversion-optimierte Landingpages senken den Cost-per-Lead messbar – für Google Ads, organischen Traffic und spezifische Kampagnenziele.",
     trustTags: ["München", "Conversion-Fokus", "Google Ads ready", "A/B-ready"],
-    ctaLabel: "Kostenloses Erstgespräch",
+    ctaLabel: "Kostenloses Analysegespräch",
   },
   tldr: {
     heading: "Kurzüberblick: Landingpage in München",
@@ -103,7 +103,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie starte ich?",
-      answer: "Kostenloses Erstgespräch – remote oder vor Ort in München.",
+      answer: "Kostenloses Analysegespräch – remote oder vor Ort in München.",
     },
   ],
   internalLinks: [

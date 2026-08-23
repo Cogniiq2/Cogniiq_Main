@@ -320,7 +320,7 @@ function HeroSection() {
                 to="/kontakt"
                 className="inline-flex items-center justify-center gap-2.5 px-7 py-4 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-900"
               >
-                Unverbindliches Erstgespräch vereinbaren
+                Unverbindliches Analysegespräch vereinbaren
                 <ArrowRight size={14} />
               </Link>
             </div>
@@ -1386,7 +1386,7 @@ function DemoCtaSection() {
                   to="/kontakt"
                   className="inline-flex items-center justify-center gap-2.5 px-8 py-4 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-[15px] hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 hover:bg-gray-50/80"
                 >
-                  Unverbindliches Erstgespräch vereinbaren
+                  Unverbindliches Analysegespräch vereinbaren
                   <ArrowRight size={14} />
                 </Link>
               </div>
@@ -1572,7 +1572,7 @@ function FinalCtaSection() {
             Gehen wir Ihre Anrufe gemeinsam durch.
           </h2>
           <p className="text-[15px] text-gray-500 dark:text-gray-400 max-w-lg mx-auto mb-10 leading-[1.7]">
-            Im unverbindlichen Erstgespräch skizzieren wir, wie Ihr Empfang am
+            Im unverbindlichen Analysegespräch skizzieren wir, wie Ihr Empfang am
             Telefon aussehen könnte – mit Ihren Anrufanlässen, Ihren Regeln und
             Ihrer Übergabe. Danach entscheiden Sie in Ruhe.
           </p>
@@ -1588,7 +1588,7 @@ function FinalCtaSection() {
               to="/kontakt"
               className="inline-flex items-center justify-center gap-2.5 px-7 py-4 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-[15px] hover:border-gray-400 transition-all duration-200"
             >
-              Unverbindliches Erstgespräch vereinbaren
+              Unverbindliches Analysegespräch vereinbaren
               <ArrowRight size={14} />
             </Link>
           </div>

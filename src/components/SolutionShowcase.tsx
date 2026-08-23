@@ -438,14 +438,14 @@ export function SolutionShowcase() {
               Neugierig, wie das für Ihre Branche aussieht?
             </p>
             <p className="text-[13px] text-gray-500">
-              30-minütiges Gespräch — wir zeigen Ihnen einen konkreten Systemvorschlag.
+              Analysegespräch (30–45 Min.) — wir zeigen Ihnen einen konkreten Systemvorschlag.
             </p>
           </div>
           <Link
             to="/kontakt"
             className="group flex-shrink-0 inline-flex items-center gap-2.5 bg-gray-950 text-white font-semibold text-[13px] rounded-xl h-11 px-6 hover:bg-gray-800 transition-colors"
           >
-            Kostenloses Erstgespräch
+            Kostenloses Analysegespräch
             <ArrowRight size={13} className="transition-transform duration-200 group-hover:translate-x-1" />
           </Link>
         </motion.div>

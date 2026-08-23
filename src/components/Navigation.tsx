@@ -35,6 +35,7 @@ import { ChevronDown, ArrowUpRight, ArrowRight } from 'lucide-react';
 import { Logo } from './Logo';
 import { PremiumMobileNav } from './ui/premium-mobile-nav';
 import { ScrollProgress } from './ScrollProgress';
+import { SectionRail } from './SectionRail';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   HAUPTSITZ_SLUG,
@@ -236,7 +237,7 @@ export function Navigation() {
                 to="/kontakt"
                 className="group relative flex items-center gap-1.5 px-5 py-2.5 bg-gray-950 dark:bg-white text-white dark:text-gray-950 text-sm font-semibold tracking-wide rounded-full overflow-hidden transition-colors duration-200"
               >
-                <span className="relative z-10">Erstgespräch</span>
+                <span className="relative z-10">Analysegespräch</span>
                 <ArrowUpRight size={14} className="relative z-10" />
                 <div className="absolute inset-0 bg-gray-800 dark:bg-gray-100 translate-y-full group-hover:translate-y-0 transition-transform duration-200 ease-out" />
               </Link>
@@ -266,6 +267,7 @@ export function Navigation() {
 
       <PremiumMobileNav />
       <ScrollProgress />
+      <SectionRail />
     </>
   );
 }

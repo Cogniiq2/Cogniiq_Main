@@ -39,7 +39,7 @@ const faqItems = [
   {
     question: "Was kostet Prozessautomatisierung?",
     answer:
-      "Die Kosten hängen von Komplexität und Anzahl der Integrationen ab. Wir arbeiten mit Festpreisen nach transparenter Analyse. Im kostenlosen Erstgespräch erhalten Sie eine konkrete Einschätzung.",
+      "Die Kosten hängen von Komplexität und Anzahl der Integrationen ab. Wir arbeiten mit Festpreisen nach transparenter Analyse. Im kostenlosen Analysegespräch erhalten Sie eine konkrete Einschätzung.",
   },
   {
     question: "Braucht mein Team technisches Wissen?",
@@ -132,7 +132,7 @@ export function ProzessautomatisierungHub() {
                 to="/kontakt"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-colors"
               >
-                Kostenloses Erstgespräch <ArrowRight size={15} />
+                Kostenloses Analysegespräch <ArrowRight size={15} />
               </Link>
               <Link
                 to="/kosten-automatisierung"
@@ -267,13 +267,13 @@ export function ProzessautomatisierungHub() {
               Welche Prozesse können wir automatisieren?
             </h2>
             <p className="text-gray-500 dark:text-white/50 mb-8 text-sm">
-              Im kostenlosen Erstgespräch analysieren wir Ihre aktuellen Prozesse und zeigen, wo Automatisierung sofort messbar wirkt.
+              Im kostenlosen Analysegespräch analysieren wir Ihre aktuellen Prozesse und zeigen, wo Automatisierung sofort messbar wirkt.
             </p>
             <Link
               to="/kontakt"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition-colors"
             >
-              Jetzt Erstgespräch buchen <ArrowRight size={16} />
+              Jetzt Analysegespräch buchen <ArrowRight size={16} />
             </Link>
           </motion.div>
         </section>

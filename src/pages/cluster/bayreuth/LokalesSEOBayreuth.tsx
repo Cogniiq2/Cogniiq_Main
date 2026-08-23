@@ -22,7 +22,7 @@ const config: ClusterPageConfig = {
     h1: "Lokales SEO in Bayreuth – Mehr Sichtbarkeit bei Google",
     lead: "Wenn potenzielle Kunden in Bayreuth nach Ihrem Angebot suchen, müssen Sie gefunden werden. Lokales SEO sorgt dafür – durch Google Business Optimierung, strukturierte Daten und lokale Keyword-Strategie.",
     trustTags: ["Bayreuth", "Google Business", "Core Web Vitals", "Strukturierte Daten"],
-    ctaLabel: "Kostenloses Erstgespräch",
+    ctaLabel: "Kostenloses Analysegespräch",
   },
   tldr: {
     heading: "Kurzüberblick: Lokales SEO in Bayreuth",
@@ -88,7 +88,7 @@ const config: ClusterPageConfig = {
     {
       question: "Was kosten lokale SEO-Maßnahmen in Bayreuth?",
       answer:
-        "Einmaliges SEO-Setup (Google Business, On-Page, strukturierte Daten): ab ca. 800 €. Laufende monatliche Betreuung: ab ca. 250 € / Monat. Detailliertes Angebot nach Erstgespräch.",
+        "Einmaliges SEO-Setup (Google Business, On-Page, strukturierte Daten): ab ca. 800 €. Laufende monatliche Betreuung: ab ca. 250 € / Monat. Detailliertes Angebot nach Analysegespräch.",
     },
     {
       question: "Helfen Bewertungen beim lokalen SEO?",

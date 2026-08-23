@@ -108,7 +108,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Was kostet eine Immobilien-Website mit Lead-System?",
-      answer: "Immobilien-Websites beginnen bei ca. 3.000 €. Mit CRM-Integration, vollständigem Exposé-System, Eigentümer-Landingpage und Local SEO typischerweise 4.500–8.000 €. Genaues Angebot nach kostenlosem Erstgespräch.",
+      answer: "Immobilien-Websites beginnen bei ca. 3.000 €. Mit CRM-Integration, vollständigem Exposé-System, Eigentümer-Landingpage und Local SEO typischerweise 4.500–8.000 €. Genaues Angebot nach kostenlosem Analysegespräch.",
     },
   ],
 };

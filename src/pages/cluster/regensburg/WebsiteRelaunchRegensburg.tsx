@@ -22,7 +22,7 @@ const config: ClusterPageConfig = {
     h1: "Website Relaunch in Regensburg",
     lead: "Veraltete Website, schlechte Rankings, langsame Ladezeit – ein Relaunch setzt den digitalen Auftritt neu auf. Technisch fundiert, SEO-sicher, ohne Verlust bestehender Rankings.",
     trustTags: ["Regensburg", "SEO-Migration", "Pagespeed", "Kein Ranking-Verlust"],
-    ctaLabel: "Kostenloses Erstgespräch",
+    ctaLabel: "Kostenloses Analysegespräch",
   },
   tldr: {
     heading: "Kurzüberblick: Website Relaunch in Regensburg",
@@ -107,7 +107,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie starte ich den Relaunch-Prozess?",
-      answer: "Kostenloses Erstgespräch – Analyse, Zielsetzung, Angebot.",
+      answer: "Kostenloses Analysegespräch – Analyse, Zielsetzung, Angebot.",
     },
   ],
   internalLinks: [

@@ -385,7 +385,7 @@ export function PraxisRechnerWidget() {
           </p>
           <p className="text-[16px] text-gray-600 dark:text-gray-400 mt-3 leading-[1.6]">
             {netto < 0
-              ? "Bei diesen Angaben trägt sich der Empfang rechnerisch nicht. Das ist ein ehrliches Ergebnis und ein guter Grund, das Erstgespräch kurz zu halten."
+              ? "Bei diesen Angaben trägt sich der Empfang rechnerisch nicht. Das ist ein ehrliches Ergebnis und ein guter Grund, das Analysegespräch kurz zu halten."
               : "Nach Abzug unserer eigenen Kosten, einschließlich der Einrichtung."}
           </p>
           {terminwertGueltig && (

@@ -118,7 +118,7 @@ export const SERVICES = [
 export const FAQ_ITEMS = [
   {
     question: "Was kostet ein Projekt mit Cogniiq?",
-    answer: "Die Kosten hängen komplett von Ziel und Umfang ab. Wir arbeiten nicht mit pauschalen Paketpreisen, sondern mit individuellen Angeboten. Erstgespräch und grobe Einschätzung sind kostenlos.",
+    answer: "Die Kosten hängen komplett von Ziel und Umfang ab. Wir arbeiten nicht mit pauschalen Paketpreisen, sondern mit individuellen Angeboten. Analysegespräch und grobe Einschätzung sind kostenlos.",
   },
   {
     question: "Wie schnell kann Cogniiq mit einem Projekt starten?",
@@ -208,8 +208,8 @@ export const PAGE_META = {
     canonical: "https://cogniiq.de/faq",
   },
   kontakt: {
-    title: "Kostenloses Erstgespräch vereinbaren – Cogniiq | KI-Agentur Bayern",
-    description: "30 Minuten – wir schauen uns Ihre konkrete Situation an und zeigen, wo KI-Telefonie, Webdesign oder Automatisierung sofort wirkt. Kein Pitch. Kein Standardangebot.",
+    title: "Kostenloses Analysegespräch vereinbaren – Cogniiq | KI-Agentur Bayern",
+    description: "30–45 Minuten – wir schauen uns Ihre konkrete Situation an und zeigen, wo KI-Telefonie, Webdesign oder Automatisierung sofort wirkt. Kein Pitch. Kein Standardangebot.",
     canonical: "https://cogniiq.de/kontakt",
   },
 };

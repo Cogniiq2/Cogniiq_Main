@@ -283,7 +283,7 @@ const config: IndustryPageConfig = {
       // ✓ New FAQ — "Kosten" and "Preis" are consistently the highest-volume FAQ searches
       //   for any service. Answering it directly captures this intent and builds trust.
       answer:
-        "Die Kosten hängen von Umfang, Fachrichtung und gewünschten Automatisierungen ab. Cogniiq bietet drei Pakete: Start (Website mit lokalem SEO), Growth (Website + KI-Telefonassistent + Terminautomatisierung) und Premium (vollständige Praxisdigitalisierung). Im kostenlosen Erstgespräch erhalten Sie ein transparentes Angebot – ohne versteckte Kosten. Alle Lösungen sind go-live in 14 Tagen.",
+        "Die Kosten hängen von Umfang, Fachrichtung und gewünschten Automatisierungen ab. Cogniiq bietet drei Pakete: Start (Website mit lokalem SEO), Growth (Website + KI-Telefonassistent + Terminautomatisierung) und Premium (vollständige Praxisdigitalisierung). Im kostenlosen Analysegespräch erhalten Sie ein transparentes Angebot – ohne versteckte Kosten. Alle Lösungen sind go-live in 14 Tagen.",
     },
     {
       question:
@@ -301,7 +301,7 @@ const config: IndustryPageConfig = {
       question:
         "Funktioniert der KI-Telefonassistent mit meiner bestehenden Praxissoftware?",
       answer:
-        "In den meisten Fällen ja. Der KI-Telefonassistent von Cogniiq kann an gängige Praxisverwaltungssysteme und Kalendertools angebunden werden. Die technische Integration klären wir individuell im kostenlosen Erstgespräch – ohne Vorab-Verpflichtung. Praxen in Bayreuth erhalten dabei direkten lokalen Support von Cogniiq.",
+        "In den meisten Fällen ja. Der KI-Telefonassistent von Cogniiq kann an gängige Praxisverwaltungssysteme und Kalendertools angebunden werden. Die technische Integration klären wir individuell im kostenlosen Analysegespräch – ohne Vorab-Verpflichtung. Praxen in Bayreuth erhalten dabei direkten lokalen Support von Cogniiq.",
     },
     {
       question:

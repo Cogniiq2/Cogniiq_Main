@@ -22,7 +22,7 @@ const config: ClusterPageConfig = {
     h1: "Website Relaunch in Bayreuth",
     lead: "Veraltete Website, schlechtes Ranking, langsame Ladezeit? Ein Relaunch setzt den digitalen Auftritt auf eine neue Basis – technisch, inhaltlich und in der Sichtbarkeit.",
     trustTags: ["Bayreuth", "SEO-Neustart", "Pagespeed", "Kein Datenverlust"],
-    ctaLabel: "Kostenloses Erstgespräch",
+    ctaLabel: "Kostenloses Analysegespräch",
   },
   tldr: {
     heading: "Kurzüberblick: Website Relaunch in Bayreuth",
@@ -81,7 +81,7 @@ const config: ClusterPageConfig = {
     {
       question: "Was kostet ein Website Relaunch in Bayreuth?",
       answer:
-        "Einfache Relaunches starten ab ca. 2.000 €. Projekte mit vollständiger SEO-Migration, neuem Content und Integrationen liegen typisch bei 3.500 € – 7.000 €. Detailliertes Angebot nach kostenlosem Erstgespräch.",
+        "Einfache Relaunches starten ab ca. 2.000 €. Projekte mit vollständiger SEO-Migration, neuem Content und Integrationen liegen typisch bei 3.500 € – 7.000 €. Detailliertes Angebot nach kostenlosem Analysegespräch.",
     },
     {
       question: "Wie lange dauert ein Relaunch?",
@@ -116,7 +116,7 @@ const config: ClusterPageConfig = {
     {
       question: "Wie starte ich den Relaunch-Prozess?",
       answer:
-        "Im kostenlosen Erstgespräch analysieren wir gemeinsam den Ist-Zustand und definieren Ziele und Scope. Anschließend erhalten Sie ein konkretes Angebot.",
+        "Im kostenlosen Analysegespräch analysieren wir gemeinsam den Ist-Zustand und definieren Ziele und Scope. Anschließend erhalten Sie ein konkretes Angebot.",
     },
   ],
   internalLinks: [

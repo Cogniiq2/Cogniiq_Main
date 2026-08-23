@@ -22,7 +22,7 @@ const config: ClusterPageConfig = {
     h1: "Landingpage erstellen lassen in Regensburg",
     lead: "Conversion-optimierte Landingpages für Unternehmen in Regensburg – für Google Ads, organischen Traffic und spezifische Kampagnenziele. Fokussiert, schnell, messbar.",
     trustTags: ["Regensburg", "Conversion-Fokus", "Google Ads ready", "Kein Baukasten"],
-    ctaLabel: "Kostenloses Erstgespräch",
+    ctaLabel: "Kostenloses Analysegespräch",
   },
   tldr: {
     heading: "Kurzüberblick: Landingpage in Regensburg",
@@ -103,7 +103,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie starte ich?",
-      answer: "Kostenloses Erstgespräch – 30–45 Minuten, remote oder vor Ort in Regensburg.",
+      answer: "Kostenloses Analysegespräch – 30–45 Minuten, remote oder vor Ort in Regensburg.",
     },
   ],
   internalLinks: [

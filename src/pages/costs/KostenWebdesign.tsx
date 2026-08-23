@@ -102,7 +102,7 @@ const config: CostPageConfig = {
     },
     {
       question: "Was kostet monatliche Website-Wartung?",
-      answer: "Wartungspakete bei Cogniiq beginnen ab ca. 50–150 €/Monat – inklusive Hosting, Backups, Updates und kleiner Anpassungen. Der genaue Umfang wird im Erstgespräch definiert.",
+      answer: "Wartungspakete bei Cogniiq beginnen ab ca. 50–150 €/Monat – inklusive Hosting, Backups, Updates und kleiner Anpassungen. Der genaue Umfang wird im Analysegespräch definiert.",
     },
     {
       question: "Wie viel kostet eine Website mit SEO?",
@@ -122,11 +122,11 @@ const config: CostPageConfig = {
     },
     {
       question: "Wie lange gilt das Angebot und wann muss ich entscheiden?",
-      answer: "Angebote von Cogniiq sind 30 Tage gültig. Es gibt keinen Druck zur schnellen Entscheidung – wir klären alle Fragen im kostenlosen Erstgespräch und geben Ihnen Zeit zur Entscheidung.",
+      answer: "Angebote von Cogniiq sind 30 Tage gültig. Es gibt keinen Druck zur schnellen Entscheidung – wir klären alle Fragen im kostenlosen Analysegespräch und geben Ihnen Zeit zur Entscheidung.",
     },
   ],
   ctaHeadline: "Kostenloses Angebot für Ihre Website",
-  ctaText: "Im kostenlosen Erstgespräch analysieren wir Ihre Situation, Ihre Ziele und geben Ihnen ein konkretes Preisangebot – ohne versteckte Kosten, ohne Verpflichtung.",
+  ctaText: "Im kostenlosen Analysegespräch analysieren wir Ihre Situation, Ihre Ziele und geben Ihnen ein konkretes Preisangebot – ohne versteckte Kosten, ohne Verpflichtung.",
 };
 
 export function KostenWebdesign() {

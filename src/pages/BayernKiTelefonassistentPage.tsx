@@ -216,7 +216,7 @@ function HeroSection() {
               to="/kontakt"
               className="inline-flex items-center justify-center gap-2 px-7 py-4 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm hover:border-gray-500 dark:hover:border-gray-400 transition-all duration-200"
             >
-              Unverbindliches Erstgespräch vereinbaren
+              Unverbindliches Analysegespräch vereinbaren
               <ArrowRight size={15} />
             </Link>
           </div>
@@ -662,7 +662,7 @@ function FinalCtaSection() {
               to="/kontakt"
               className="inline-flex items-center justify-center gap-2 px-7 py-4 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm hover:border-gray-500 transition-all duration-200"
             >
-              Unverbindliches Erstgespräch vereinbaren
+              Unverbindliches Analysegespräch vereinbaren
               <ArrowRight size={15} />
             </Link>
           </div>

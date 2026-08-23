@@ -216,7 +216,7 @@ const config: IndustryPageConfig = {
     {
       question: "Kann Cogniiq auch bei bestehenden Websites Reservierungsfunktionen nachrüsten?",
       answer:
-        "Ja. Wir können ein Reservierungssystem und KI-Telefonassistenten auch an bestehende Restaurant-Websites anbinden, ohne die gesamte Website neu bauen zu müssen. Wir klären die Machbarkeit im Erstgespräch.",
+        "Ja. Wir können ein Reservierungssystem und KI-Telefonassistenten auch an bestehende Restaurant-Websites anbinden, ohne die gesamte Website neu bauen zu müssen. Wir klären die Machbarkeit im Analysegespräch.",
     },
   ],
 };

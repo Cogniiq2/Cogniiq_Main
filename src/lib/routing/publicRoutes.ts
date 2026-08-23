@@ -75,9 +75,9 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/kontakt",
-    title: "Kostenloses Erstgespräch vereinbaren – Cogniiq | KI-Agentur Bayern",
-    description: "30 Minuten – wir schauen uns Ihre konkrete Situation an und zeigen, wo KI-Telefonie, Webdesign oder Automatisierung sofort wirkt. Kein Pitch. Kein Standardangebot.",
-    keywords: "Cogniiq Kontakt, KI Erstgespräch, Webdesign Anfrage, Automatisierung Anfrage",
+    title: "Kostenloses Analysegespräch vereinbaren – Cogniiq | KI-Agentur Bayern",
+    description: "30–45 Minuten – wir schauen uns Ihre konkrete Situation an und zeigen, wo KI-Telefonie, Webdesign oder Automatisierung sofort wirkt. Kein Pitch. Kein Standardangebot.",
+    keywords: "Cogniiq Kontakt, KI Analysegespräch, Webdesign Anfrage, Automatisierung Anfrage",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.85" },
   },

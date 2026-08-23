@@ -354,7 +354,7 @@ export function ROICalculator() {
                 to="/kontakt"
                 className="group w-full inline-flex items-center justify-center gap-2.5 bg-gray-950 text-white font-semibold text-[13.5px] rounded-xl h-11 px-6 hover:bg-gray-800 transition-colors"
               >
-                Kostenloses Erstgespräch
+                Kostenloses Analysegespräch
                 <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
               </Link>
               <p className="text-[11px] text-gray-400 text-center mt-3">

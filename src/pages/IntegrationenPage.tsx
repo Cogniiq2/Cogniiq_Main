@@ -213,7 +213,7 @@ export function IntegrationenPage() {
               Gehen wir Ihr System gemeinsam durch.
             </h2>
             <p className={`${PROSE} mb-8`}>
-              Nennen Sie uns im Erstgespräch Ihr Praxisverwaltungssystem, Ihren
+              Nennen Sie uns im Analysegespräch Ihr Praxisverwaltungssystem, Ihren
               Kalender und Ihre Telefonanlage. Was möglich ist, steht danach im
               Angebot — vor Ihrer Entscheidung.
             </p>

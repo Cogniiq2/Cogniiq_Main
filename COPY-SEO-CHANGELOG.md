@@ -591,3 +591,52 @@ npm run build && grep -rl "<Aussage>" dist --include=*.html | wc -l
 ```
 
 Diese Zahl ist mehrfach höher ausgefallen als erwartet.
+
+---
+
+## Durchgang „Konversionslogik & Section-Rail" (23.08.2026, Branch `claude/conversion-flow-and-section-rail`)
+
+### Angebots-Vereinheitlichung
+
+Ein Angebot, ein Name: **Analysegespräch** — website-weit, in CTA-Labels,
+Überschriften, Meta-Titeln und dem Formular. Vorher konkurrierten vier
+Bezeichnungen (Erstgespräch / Analysegespräch / Strategiegespräch / Demo) auf
+dem Weg vom Klick zur Anfrage. Ausgenommen bleiben zwei Stellen, an denen
+„Erstgespräch" das Geschäft des **Kunden** beschreibt
+(`KiTelefonassistentPage.tsx` Use-Case, `WebdesignImmobilien.tsx` Tagline).
+
+| Fläche | Änderung |
+|---|---|
+| ~75 Dateien | `Erstgespräch` → `Analysegespräch` (Label, Fließtext, FAQ-Antworten) |
+| `seo-data.ts`, `publicRoutes.ts` | Kontakt-Meta-Titel/-Description auf Analysegespräch und 30–45 Minuten umgestellt |
+| Hero (Desktop/Mobile), Blog, Scan | „… sichern" entfernt (COPY-BRIEF §10: keine Verknappungssprache) → „Analysegespräch vereinbaren" |
+| Diverse | „Jetzt starten" / „Jetzt anfragen" / „Kostenloses Gespräch" → einheitliche Analysegespräch-Labels |
+| Dauerangaben | Einheitlich **30–45 Min.** (vorher 30 / 45 / 30–45 nebeneinander, zweimal auf derselben Seite) |
+
+### Konversionsfluss `/kontakt`
+
+- Formular neu in drei Schritten: **Situation** (nur Klicks) → **Vorhaben**
+  (Rolle, Teamgröße, Ziel) → **Kontakt & Termin**. Der n8n-Webhook
+  (`N8N_ENDPOINTS.contact`, POST) bleibt unverändert die einzige Übertragung.
+- Payload erweitert: `lead_score`, `qualification` (hoch/mittel/niedrig),
+  `qualification_reasons`, `submitted_at`, `page_url`, `referrer`,
+  `time_to_complete_s`, `spam_suspect` (Honeypot + Zeitprüfung). Scoring
+  blockiert nie — Entscheidung liegt in n8n.
+- Fehlerbehandlung repariert: Weiterleitung auf `/anfrage-erhalten` nur noch
+  bei erfolgreicher Übertragung; bei Fehler Retry-Zustand mit
+  `info@cogniiq.de`-Fallback. Vorher ging ein Lead bei Webhook-Fehler
+  kommentarlos verloren.
+- Echte Validierung mit Inline-Fehlertexten statt stummem deaktiviertem Button;
+  Entwurf wird in `sessionStorage` gehalten.
+- `/anfrage-erhalten` neu: persönliche Anrede, Empfangs-Recap (E-Mail,
+  Wunschtermin), drei nächste Schritte mit Zeitangaben, Fallback-Kontakt.
+
+### Orientierung
+
+- Neu: `SectionRail` — rechte Viewport-Kante ab `lg`, eine Haarlinie pro
+  `<section id>`, aktive Linie wächst und zeigt den Abschnittsnamen (14 px,
+  §1.2-konform), Hover zeigt alle, Klick scrollt. Automatische Erkennung auf
+  allen Seiten, versteckt unter 3 Abschnitten. `data-rail-label` überschreibt
+  den automatisch abgeleiteten Namen.
+- `ScrollProgress` von Gradient/Glow/Prozent-Chip auf eine stille Haarlinie
+  reduziert und auf < `lg` beschränkt (COPY-BRIEF-3 §1.4).

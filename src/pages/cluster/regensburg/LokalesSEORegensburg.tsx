@@ -22,7 +22,7 @@ const config: ClusterPageConfig = {
     h1: "Lokales SEO in Regensburg – Mehr Sichtbarkeit bei Google",
     lead: "Wenn potenzielle Kunden in Regensburg nach Ihrem Angebot suchen, müssen Sie gefunden werden. Lokales SEO sorgt dafür – besonders wichtig in einer Stadt mit hohem lokalem Suchvolumen durch Tourismus und wachsenden Mittelstand.",
     trustTags: ["Regensburg", "Google Business", "Map Pack", "Strukturierte Daten"],
-    ctaLabel: "Kostenloses Erstgespräch",
+    ctaLabel: "Kostenloses Analysegespräch",
   },
   tldr: {
     heading: "Kurzüberblick: Lokales SEO in Regensburg",
@@ -103,7 +103,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie starte ich?",
-      answer: "Kostenloses Erstgespräch – Analyse Ihrer aktuellen lokalen Sichtbarkeit und Handlungsempfehlung.",
+      answer: "Kostenloses Analysegespräch – Analyse Ihrer aktuellen lokalen Sichtbarkeit und Handlungsempfehlung.",
     },
   ],
   internalLinks: [

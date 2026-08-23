@@ -95,7 +95,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Kann das System mit unserem Kassensystem verbunden werden?",
-      answer: "In den meisten Fällen ja. Wir prüfen die Schnittstellen Ihres Kassensystems und entwickeln die passende Integration. Unterstützte Systeme u.a.: Lightspeed, Orderbird, Gastrofix, RKSV-konforme Lösungen. Beim Erstgespräch klären wir die Kompatibilität konkret.",
+      answer: "In den meisten Fällen ja. Wir prüfen die Schnittstellen Ihres Kassensystems und entwickeln die passende Integration. Unterstützte Systeme u.a.: Lightspeed, Orderbird, Gastrofix, RKSV-konforme Lösungen. Beim Analysegespräch klären wir die Kompatibilität konkret.",
     },
     {
       question: "Was kostet Gastronomie-Automatisierung?",

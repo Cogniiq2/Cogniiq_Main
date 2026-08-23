@@ -351,9 +351,9 @@ export function DesktopHero() {
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.75, delay: 1.05, ease: E }}
           >
-            Ihr KI-Telefonassistent nimmt Anrufe an, wenn Ihr Team gebunden ist —
-            abends, am Wochenende, zu Stoßzeiten. Anliegen kommen strukturiert
-            bei Ihnen an, statt auf der Mailbox zu enden.
+            Das Telefon klingelt, während Ihr Team gebunden ist — abends, am
+            Wochenende, zu Stoßzeiten. Ihr KI-Telefonassistent nimmt diese Anrufe
+            an, und jedes Anliegen kommt strukturiert bei Ihnen an statt auf der Mailbox.
           </motion.p>
 
           <motion.div
@@ -410,14 +410,14 @@ export function DesktopHero() {
                 style={{ borderRadius: '4px' }}
                 whileHover={{ scale: 1.015 }}
                 whileTap={{ scale: 0.975 }}
-                aria-label="Kostenloses Erstgespräch sichern"
+                aria-label="Analysegespräch vereinbaren"
               >
                 <motion.div
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                   aria-hidden="true"
                   style={{ background: 'linear-gradient(120deg, rgba(2,132,199,0.2) 0%, transparent 60%)' }}
                 />
-                <span className="relative whitespace-nowrap">Kostenloses Erstgespräch sichern</span>
+                <span className="relative whitespace-nowrap">Analysegespräch vereinbaren</span>
                 <motion.div
                   className="relative"
                   aria-hidden="true"

@@ -22,7 +22,7 @@ const config: ClusterPageConfig = {
     h1: "Website erstellen lassen in Bayreuth",
     lead: "Individuelle Websites für Unternehmen in Bayreuth – von der ersten Idee bis zum fertigen System. Kein Baukasten, kein Template. Entwickelt für Ihre Zielgruppe, optimiert für Google.",
     trustTags: ["Bayreuth", "Kein Template", "SEO-ready", "Persönliche Betreuung"],
-    ctaLabel: "Kostenloses Erstgespräch",
+    ctaLabel: "Kostenloses Analysegespräch",
   },
   tldr: {
     heading: "Kurzüberblick: Website erstellen in Bayreuth",
@@ -119,7 +119,7 @@ const config: ClusterPageConfig = {
     {
       question: "Wie starte ich?",
       answer:
-        "Kostenloses Erstgespräch buchen – 30–45 Minuten, remote oder vor Ort in Bayreuth. Wir analysieren Ihre Situation und erstellen im Anschluss ein konkretes Angebot.",
+        "Kostenloses Analysegespräch buchen – 30–45 Minuten, remote oder vor Ort in Bayreuth. Wir analysieren Ihre Situation und erstellen im Anschluss ein konkretes Angebot.",
     },
   ],
   internalLinks: [

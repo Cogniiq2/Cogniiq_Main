@@ -506,7 +506,7 @@ function PaketeSection({
                 to="/kontakt"
                 className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
               >
-                Jetzt anfragen <ArrowUpRight size={13} />
+                Analysegespräch anfragen <ArrowUpRight size={13} />
               </Link>
             </motion.div>
           ))}
@@ -852,7 +852,7 @@ function CTASection({ config }: { config: IndustryPageConfig }) {
             Nächster Schritt: {config.industry} in {config.city} digital aufstellen
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-            Kostenloses Erstgespräch für {config.industry}-Betriebe in {config.city} – 30 bis 45&nbsp;Minuten, ohne Verpflichtung, mit konkretem Ergebnis.
+            Kostenloses Analysegespräch für {config.industry}-Betriebe in {config.city} – 30 bis 45&nbsp;Minuten, ohne Verpflichtung, mit konkretem Ergebnis.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link

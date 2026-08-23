@@ -22,7 +22,7 @@ const config: ClusterPageConfig = {
     h1: "Lokales SEO in München – Google-Dominanz im härtesten Markt",
     lead: "München ist der wettbewerbsintensivste lokale Suchmarkt in Bayern. Top-3 im Map Pack zu erreichen erfordert mehr als ein ausgefülltes Google Business Profil – es erfordert eine vollständige lokale SEO-Strategie.",
     trustTags: ["München", "Map Pack", "Google Business", "Strukturierte Daten"],
-    ctaLabel: "Kostenloses Erstgespräch",
+    ctaLabel: "Kostenloses Analysegespräch",
   },
   tldr: {
     heading: "Kurzüberblick: Lokales SEO in München",
@@ -103,7 +103,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie starte ich?",
-      answer: "Kostenloses Erstgespräch – inkl. erster Analyse Ihrer aktuellen lokalen Sichtbarkeit in München.",
+      answer: "Kostenloses Analysegespräch – inkl. erster Analyse Ihrer aktuellen lokalen Sichtbarkeit in München.",
     },
   ],
   internalLinks: [

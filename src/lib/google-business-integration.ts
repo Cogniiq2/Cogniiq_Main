@@ -27,7 +27,7 @@ export function generateGooglePostsContent() {
       {
         title: "Neue Website benötigt?",
         description:
-          "Wir erstellen hochkonvertierende Websites mit Fokus auf Performance und SEO. Kostenloses Erstgespräch vereinbaren!",
+          "Wir erstellen hochkonvertierende Websites mit Fokus auf Performance und SEO. Kostenloses Analysegespräch vereinbaren!",
         callToAction: "Mehr erfahren",
         link: `${BUSINESS_INFO.website}#leistungen`,
       },
@@ -49,7 +49,7 @@ export function generateGooglePostsContent() {
     updates: [
       {
         title: "Wir sind für Sie da!",
-        description: `Besuchen Sie uns in ${BUSINESS_INFO.address.addressLocality} oder kontaktieren Sie uns für ein kostenloses Erstgespräch.`,
+        description: `Besuchen Sie uns in ${BUSINESS_INFO.address.addressLocality} oder kontaktieren Sie uns für ein kostenloses Analysegespräch.`,
         callToAction: "Termin vereinbaren",
         link: `${BUSINESS_INFO.website}#kontakt`,
       },

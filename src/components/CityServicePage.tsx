@@ -230,7 +230,7 @@ function HeroSection({ config, breadcrumbs }: { config: CityServiceConfig; bread
               to="/kontakt"
               className="inline-flex items-center gap-2 px-6 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors"
             >
-              Kostenloses Erstgespräch
+              Kostenloses Analysegespräch
               <ArrowRight size={16} />
             </Link>
             <Link
@@ -359,7 +359,7 @@ function MidPageCTA({ config }: { config: CityServiceConfig }) {
         >
           <div className="flex-1">
             <p className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
-              {config.service} in {config.city} – kostenloses Erstgespräch
+              {config.service} in {config.city} – kostenloses Analysegespräch
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               30–45&nbsp;Minuten, unverbindlich, mit konkretem Ergebnis.
@@ -709,7 +709,7 @@ function CTASection({ config }: { config: CityServiceConfig }) {
             {config.service} in {config.city} anfragen
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-            Kostenloses Erstgespräch für Unternehmen in {config.city} – 30 bis 45&nbsp;Minuten, ohne Verpflichtung. Danach wissen Sie genau, was möglich ist und was es kostet.
+            Kostenloses Analysegespräch für Unternehmen in {config.city} – 30 bis 45&nbsp;Minuten, ohne Verpflichtung. Danach wissen Sie genau, was möglich ist und was es kostet.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link

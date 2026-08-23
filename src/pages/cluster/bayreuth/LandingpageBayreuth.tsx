@@ -22,7 +22,7 @@ const config: ClusterPageConfig = {
     h1: "Landingpage erstellen lassen in Bayreuth",
     lead: "Conversion-optimierte Landingpages für Unternehmen in Bayreuth – für Google Ads, organischen Traffic und spezifische Kampagnenziele. Schnell, fokussiert, messbar.",
     trustTags: ["Bayreuth", "Conversion-Fokus", "A/B-ready", "Kein Baukasten"],
-    ctaLabel: "Kostenloses Erstgespräch",
+    ctaLabel: "Kostenloses Analysegespräch",
   },
   tldr: {
     heading: "Kurzüberblick: Landingpage in Bayreuth",
@@ -113,7 +113,7 @@ const config: ClusterPageConfig = {
     {
       question: "Wie starte ich?",
       answer:
-        "Kostenloses Erstgespräch buchen – 30–45 Minuten. Wir besprechen Kampagnenziel, Zielgruppe und Conversion-Mechanik und erstellen ein konkretes Angebot.",
+        "Kostenloses Analysegespräch buchen – 30–45 Minuten. Wir besprechen Kampagnenziel, Zielgruppe und Conversion-Mechanik und erstellen ein konkretes Angebot.",
     },
   ],
   internalLinks: [

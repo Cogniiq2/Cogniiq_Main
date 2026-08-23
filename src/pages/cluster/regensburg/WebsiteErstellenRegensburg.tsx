@@ -22,7 +22,7 @@ const config: ClusterPageConfig = {
     h1: "Website erstellen lassen in Regensburg",
     lead: "Individuelle Websites für Unternehmen in Regensburg und der Oberpfalz. Kein Baukasten, kein Template. Entwickelt für Ihre Zielgruppe – ob Tourismusbetrieb, Dienstleister oder Mittelstand.",
     trustTags: ["Regensburg", "Kein Template", "SEO-ready", "Persönliche Betreuung"],
-    ctaLabel: "Kostenloses Erstgespräch",
+    ctaLabel: "Kostenloses Analysegespräch",
   },
   tldr: {
     heading: "Kurzüberblick: Website erstellen in Regensburg",
@@ -109,7 +109,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie starte ich?",
-      answer: "Kostenloses Erstgespräch – 30–45 Minuten, remote oder vor Ort in Regensburg.",
+      answer: "Kostenloses Analysegespräch – 30–45 Minuten, remote oder vor Ort in Regensburg.",
     },
   ],
   internalLinks: [

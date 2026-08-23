@@ -156,7 +156,7 @@ export function CostPage({ config }: CostPageProps) {
                   to="/kontakt"
                   className="inline-flex items-center gap-2 px-6 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors"
                 >
-                  Kostenloses Erstgespräch
+                  Kostenloses Analysegespräch
                   <ArrowRight size={16} />
                 </Link>
                 <Link
@@ -173,7 +173,7 @@ export function CostPage({ config }: CostPageProps) {
         <div className="border-y border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
-              {["Individuelles Angebot", "Kostenlos Erstgespräch", "Faire Preise"].map((item, i) => (
+              {["Individuelles Angebot", "Kostenlos Analysegespräch", "Faire Preise"].map((item, i) => (
                 <span key={i} className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   {i > 0 && <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" aria-hidden="true" />}
                   {item}
@@ -197,7 +197,7 @@ export function CostPage({ config }: CostPageProps) {
                 Typische Preisspannen
               </h2>
               <p className="text-gray-500 dark:text-gray-400">
-                Orientierungswerte für Projekte in Deutschland – individuelle Angebote nach kostenlosem Erstgespräch.
+                Orientierungswerte für Projekte in Deutschland – individuelle Angebote nach kostenlosem Analysegespräch.
               </p>
             </motion.div>
 
@@ -235,7 +235,7 @@ export function CostPage({ config }: CostPageProps) {
             >
               <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-gray-400 dark:text-gray-500" />
               <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                Alle Preise sind Richtwerte. Das tatsächliche Angebot hängt von Ihrem individuellen Bedarf ab. Das Erstgespräch ist kostenlos und unverbindlich.
+                Alle Preise sind Richtwerte. Das tatsächliche Angebot hängt von Ihrem individuellen Bedarf ab. Das Analysegespräch ist kostenlos und unverbindlich.
               </p>
             </motion.div>
           </div>
@@ -451,7 +451,7 @@ export function CostPage({ config }: CostPageProps) {
                   to="/kontakt"
                   className="inline-flex items-center gap-2 px-7 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-gray-700 dark:hover:bg-white transition-colors"
                 >
-                  Kostenloses Erstgespräch
+                  Kostenloses Analysegespräch
                   <ArrowRight size={16} />
                 </Link>
                 <Link

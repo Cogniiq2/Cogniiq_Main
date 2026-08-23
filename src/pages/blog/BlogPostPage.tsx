@@ -416,7 +416,7 @@ export function BlogPostPage() {
                     to="/kontakt"
                     className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-gray-900 dark:bg-gray-50 text-white dark:text-gray-900 text-[13px] font-semibold hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors"
                   >
-                    Jetzt anfragen
+                    Analysegespräch anfragen
                     <ArrowRight size={13} />
                   </Link>
                 </div>

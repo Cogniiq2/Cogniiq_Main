@@ -210,11 +210,11 @@ const FAQ_ITEMS = [
   },
   {
     q: "Wie schnell können Projekte starten?",
-    a: "KI-Telefonassistenten gehen nach Aufnahme Ihrer Vorgaben live. Einfache Automatisierungen in 1–2 Wochen. Websites je nach Umfang in 4–12 Wochen. Realistischer Zeitplan nach dem Erstgespräch.",
+    a: "KI-Telefonassistenten gehen nach Aufnahme Ihrer Vorgaben live. Einfache Automatisierungen in 1–2 Wochen. Websites je nach Umfang in 4–12 Wochen. Realistischer Zeitplan nach dem Analysegespräch.",
   },
   {
     q: "Was kostet ein Projekt mit Cogniiq in Deutschland?",
-    a: "Transparente Festpreise, vollständig remote betreut. KI-Telefonassistenten nach Anrufvolumen, Automatisierungen ab ca. 500–1.500 €. Websites starten ab 1.500 €; individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei etwa 2.500–5.000 €. Erstgespräch immer kostenlos.",
+    a: "Transparente Festpreise, vollständig remote betreut. KI-Telefonassistenten nach Anrufvolumen, Automatisierungen ab ca. 500–1.500 €. Websites starten ab 1.500 €; individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei etwa 2.500–5.000 €. Analysegespräch immer kostenlos.",
   },
 ];
 
@@ -806,14 +806,14 @@ export function DeutschlandPage() {
                 Digitale Systeme für Unternehmen in Deutschland
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-                Kostenloses Erstgespräch – für Unternehmen in ganz Deutschland. Remote, ohne Verpflichtung, mit konkretem Ergebnis in 30–45&nbsp;Minuten.
+                Kostenloses Analysegespräch – für Unternehmen in ganz Deutschland. Remote, ohne Verpflichtung, mit konkretem Ergebnis in 30–45&nbsp;Minuten.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <Link
                   to="/kontakt"
                   className="inline-flex items-center gap-2 px-7 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-gray-700 dark:hover:bg-white transition-colors"
                 >
-                  Kostenloses Erstgespräch
+                  Kostenloses Analysegespräch
                   <ArrowRight size={16} />
                 </Link>
                 <Link

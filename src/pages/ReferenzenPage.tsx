@@ -141,14 +141,14 @@ export function ReferenzenPage() {
               </p>
               <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-8">
                 Wenn Sie wissen möchten, was wir konkret gebaut haben: Fragen Sie
-                uns im Erstgespräch. Dort zeigen wir umgesetzte Systeme – mit
+                uns im Analysegespräch. Dort zeigen wir umgesetzte Systeme – mit
                 Zustimmung der jeweiligen Kunden.
               </p>
               <Link
                 to="/kontakt"
                 className="inline-flex items-center gap-2 px-7 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold hover:bg-gray-700 dark:hover:bg-white transition-colors"
               >
-                Projekte im Erstgespräch ansehen
+                Projekte im Analysegespräch ansehen
                 <ArrowRight size={16} aria-hidden="true" />
               </Link>
             </motion.div>
@@ -218,7 +218,7 @@ export function ReferenzenPage() {
                 Welche Abläufe kosten Ihr Unternehmen heute unnötig Zeit?
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-                In einem unverbindlichen Erstgespräch analysieren wir Ihre bestehenden Prozesse und geben eine konkrete Einschätzung zu Automatisierungspotenzial, Machbarkeit und sinnvollen nächsten Schritten.
+                In einem unverbindlichen Analysegespräch analysieren wir Ihre bestehenden Prozesse und geben eine konkrete Einschätzung zu Automatisierungspotenzial, Machbarkeit und sinnvollen nächsten Schritten.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <Link

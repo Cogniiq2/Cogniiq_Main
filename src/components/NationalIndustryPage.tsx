@@ -206,7 +206,7 @@ export function NationalIndustryPage({ config }: Props) {
                     className="inline-flex items-center gap-2.5 px-7 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[15px] hover:bg-gray-700 dark:hover:bg-white transition-all duration-200 hover:-translate-y-0.5 shadow-sm hover:shadow-md"
                   >
                     <Phone size={14} />
-                    Kostenloses Erstgespräch
+                    Kostenloses Analysegespräch
                   </Link>
                   <Link
                     to={`/${config.serviceSlug}`}
@@ -496,7 +496,7 @@ export function NationalIndustryPage({ config }: Props) {
                 Passend für Ihren Betrieb?
               </h2>
               <p className="text-[17px] text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-8 leading-[1.7]">
-                Im kostenlosen Erstgespräch zeigen wir Ihnen, wie die Lösung konkret
+                Im kostenlosen Analysegespräch zeigen wir Ihnen, wie die Lösung konkret
                 in Ihrer Branche funktioniert – ohne Verpflichtung, ca. 15&nbsp;Minuten.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center mb-5">
@@ -505,7 +505,7 @@ export function NationalIndustryPage({ config }: Props) {
                   className="inline-flex items-center justify-center gap-2.5 px-7 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[15px] hover:bg-gray-700 dark:hover:bg-white transition-all duration-200 hover:-translate-y-0.5 shadow-sm"
                 >
                   <Phone size={14} />
-                  Kostenloses Erstgespräch
+                  Kostenloses Analysegespräch
                 </Link>
                 <Link
                   to={config.costLink}
@@ -628,7 +628,7 @@ export function NationalIndustryPage({ config }: Props) {
                 Nächster Schritt: Kostenlose Beratung
               </h2>
               <p className="text-[15px] text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto leading-[1.7]">
-                Im Erstgespräch zeigen wir Ihnen, wie die Lösung konkret in Ihrem
+                Im Analysegespräch zeigen wir Ihnen, wie die Lösung konkret in Ihrem
                 Betrieb funktioniert – spezifisch, realistisch, ohne Verpflichtung.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-3 mb-5">
@@ -636,7 +636,7 @@ export function NationalIndustryPage({ config }: Props) {
                   to="/kontakt"
                   className="inline-flex items-center gap-2.5 px-7 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[15px] hover:bg-gray-700 dark:hover:bg-white transition-all duration-200 hover:-translate-y-0.5 shadow-sm"
                 >
-                  Kostenloses Erstgespräch
+                  Kostenloses Analysegespräch
                   <ArrowRight size={14} />
                 </Link>
                 <Link

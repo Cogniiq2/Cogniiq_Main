@@ -147,7 +147,7 @@ const PROCESS_STEPS = [
     number: "01",
     title: "Kennenlernen & Zieldefinition",
     description:
-      "30-minütiges Erstgespräch — wir verstehen Ihr Geschäftsmodell, Ihre konkreten Engpässe und messbaren Ziele. Kein generischer Fragebogen.",
+      "Analysegespräch (30–45 Min.) — wir verstehen Ihr Geschäftsmodell, Ihre konkreten Engpässe und messbaren Ziele. Kein generischer Fragebogen.",
   },
   {
     number: "02",
@@ -1029,7 +1029,7 @@ export function UeberUnsPage() {
                   to="/kontakt"
                   className="inline-flex items-center gap-2.5 px-8 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-semibold text-sm tracking-wide hover:bg-gray-700 dark:hover:bg-white transition-colors"
                 >
-                  Erstgespräch vereinbaren
+                  Analysegespräch vereinbaren
                   <ArrowRight size={15} />
                 </Link>
                 <Link

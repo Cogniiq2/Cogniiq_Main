@@ -92,7 +92,7 @@ const config: NationalIndustryPageConfig = {
   faq: [
     {
       question: "Was kostet eine Restaurant-Website mit Online-Reservierung?",
-      answer: "Restaurant-Websites mit professionellem Design und Reservierungsformular starten bei ca. 1.800 €. Mit vollständigem Reservierungssystem, Speisekarten-CMS und Local SEO-Setup typischerweise 3.000–5.000 €. Genaues Angebot nach kostenlosem Erstgespräch.",
+      answer: "Restaurant-Websites mit professionellem Design und Reservierungsformular starten bei ca. 1.800 €. Mit vollständigem Reservierungssystem, Speisekarten-CMS und Local SEO-Setup typischerweise 3.000–5.000 €. Genaues Angebot nach kostenlosem Analysegespräch.",
     },
     {
       question: "Welche Reservierungssysteme integriert Cogniiq?",

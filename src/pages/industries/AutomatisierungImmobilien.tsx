@@ -99,7 +99,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Was kostet Lead-Automatisierung für Immobilienmakler?",
-      answer: "Einfache Lead-Automatisierung mit CRM-Integration beginnt bei ca. 1.200–2.500 €. Umfassendere Systeme mit Multi-Portal-Integration, Follow-up-Sequenzen und Besichtigungsmanagement typischerweise 3.000–6.000 €. Genaues Angebot nach kostenlosem Erstgespräch.",
+      answer: "Einfache Lead-Automatisierung mit CRM-Integration beginnt bei ca. 1.200–2.500 €. Umfassendere Systeme mit Multi-Portal-Integration, Follow-up-Sequenzen und Besichtigungsmanagement typischerweise 3.000–6.000 €. Genaues Angebot nach kostenlosem Analysegespräch.",
     },
     {
       question: "Wie schnell kontaktiert das System einen neuen Lead?",
