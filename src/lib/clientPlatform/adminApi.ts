@@ -229,8 +229,13 @@ export async function resendInvitationViaEdge(
   const result = data as { ok?: boolean; error?: string; invitation?: { status?: string } } | null;
   const outcome = result?.invitation?.status;
   if (error) {
-    // A non-2xx (e.g. email_error → 502) still carries a structured body via functions.invoke.
-    return { ok: false, outcome, error: result?.error ?? error.message };
+    // On a non-2xx, `data` is null — the structured body lives on the error's Response and has to
+    // be read out explicitly. Without this every real reason ("Invitation not found", "Cannot
+    // resend a revoked invitation", "Invitation is expired") surfaced to the operator as the
+    // generic "Edge Function returned a non-2xx status code". provisionClientViaEdge already does
+    // this via readFunctionErrorBody; resend never did.
+    const body = await readFunctionErrorBody(error);
+    return { ok: false, outcome, error: body?.error ?? result?.error ?? error.message };
   }
   return { ok: Boolean(result?.ok), outcome, error: result?.error };
 }

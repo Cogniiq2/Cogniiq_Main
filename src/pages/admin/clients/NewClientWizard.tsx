@@ -216,7 +216,7 @@ export function NewClientWizard() {
             <ResultRow label="Lösung zugewiesen" ok value={(workspace.instance_key as string) ?? 'zugewiesen'} />
             <ResultRow
               label="Einladung"
-              ok={invitation.status !== 'email_error'}
+              ok={inviteIsOk(invitation)}
               value={describeInvite(invitation)}
             />
           </ul>
@@ -456,12 +456,21 @@ function ResultRow({ label, value, ok }: { label: string; value: string; ok: boo
 }
 
 function describeInvite(invitation: Record<string, string>): string {
+  // `skipped` must be checked before the status switch: when the admin unticks "Einladung jetzt
+  // senden" the edge function returns { skipped: true } with NO status, so the old `case undefined`
+  // claimed "ausstehend" and the skipped branch below it was unreachable — an email that was
+  // deliberately never sent was reported as pending, with a green tick beside it.
+  if (invitation.skipped) return 'nicht gesendet – Einladung liegt bereit';
   switch (invitation.status) {
     case 'sent': return 'gesendet';
     case 'existing_user': return 'bestehender Nutzer – Zugang beim nächsten Login';
     case 'email_error': return 'E-Mail-Fehler (Einladung bleibt offen)';
     case 'skipped_existing_member': return 'nicht gesendet – bereits Mitglied dieser Organisation';
-    case undefined: return 'ausstehend';
-    default: return invitation.skipped ? 'nicht gesendet' : 'ausstehend';
+    default: return 'ausstehend';
   }
+}
+
+/** Only a genuinely delivered invitation is a success; everything else needs the amber treatment. */
+function inviteIsOk(invitation: Record<string, string>): boolean {
+  return !invitation.skipped && invitation.status !== 'email_error';
 }

@@ -74,6 +74,7 @@ export function SendOfferDialog({ offer, documentId, validDays, sellerName, emai
   const [copied, setCopied] = useState(false);
 
   const emailValid = EMAIL_RE.test(email.trim());
+  const offerEmail = offer.recipient_email?.trim().toLowerCase() ?? '';
   const liveStatus = deriveOfferEmailStatus(result?.status ? { status: result.status } : emailJob ?? null);
 
   const submit = async () => {
@@ -159,6 +160,11 @@ export function SendOfferDialog({ offer, documentId, validDays, sellerName, emai
             {result ? (
               <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4 text-[13px]">
                 <p className="font-semibold text-emerald-800">E-Mail wurde zur sicheren Verarbeitung eingeplant</p>
+                {/* The address is restated verbatim: it is the single fact the sender must be able
+                    to verify after the fact, and it is no longer editable from this dialog. */}
+                <p className="mt-1 text-emerald-700/90">
+                  Empfänger: <span className="font-medium break-all">{email.trim()}</span>
+                </p>
                 <p className="mt-1 text-emerald-700/90">Die E-Mail wird automatisch über den Server versendet. Aktueller Status: <span className="font-medium">{liveStatus.label}</span>.</p>
               </div>
             ) : (
@@ -168,6 +174,14 @@ export function SendOfferDialog({ offer, documentId, validDays, sellerName, emai
                   <input value={email} onChange={(e) => setEmail(e.target.value)} onBlur={() => setEmailTouched(true)} type="email"
                     className={`w-full rounded-xl border px-3 py-2.5 text-sm outline-none focus:border-slate-400 ${emailTouched && !emailValid ? 'border-red-300' : 'border-slate-200'}`} />
                   {emailTouched && !emailValid ? <span className="mt-1 block text-[12px] text-red-600">Bitte eine gültige E-Mail-Adresse eingeben.</span> : null}
+                  {/* A finalized offer's stored address can no longer be edited, so a divergence
+                      here is legitimate — but it must be a conscious choice, not a silent one. */}
+                  {emailValid && offerEmail && email.trim().toLowerCase() !== offerEmail ? (
+                    <span className="mt-1.5 block rounded-lg bg-amber-50 px-2.5 py-1.5 text-[12px] text-amber-800">
+                      Weicht von der im Angebot hinterlegten Adresse ab (<span className="break-all font-medium">{offerEmail}</span>).
+                      Gesendet wird an die hier eingetragene Adresse.
+                    </span>
+                  ) : null}
                 </label>
                 <label className="block">
                   <span className="mb-1 block text-[12px] font-medium text-slate-500">Betreff</span>

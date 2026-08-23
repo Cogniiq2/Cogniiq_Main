@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { RefreshCw, XCircle } from 'lucide-react';
 
+import { useToast } from '@/components/dashboard';
 import { AdminCard, Pill, invitationTone } from '@/pages/admin/clients/adminUi';
 import {
   loadAdminClients,
@@ -17,10 +18,10 @@ import {
 } from '@/lib/clientPlatform/invitationStatus';
 
 export function AdminInvitationsPage() {
+  const toast = useToast();
   const [rows, setRows] = useState<AdminClientRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('all');
 
   const reload = useCallback(async () => {
@@ -32,8 +33,6 @@ export function AdminInvitationsPage() {
 
   useEffect(() => { void reload(); }, [reload]);
 
-  const flash = (m: string) => { setNotice(m); setTimeout(() => setNotice(null), 2500); };
-
   const invitations = useMemo(
     () => rows.flatMap((r) => r.invitations.map((i) => ({ ...i, orgName: r.organizationName, effective: effectiveInvitationStatus(i) })))
       .filter((i) => statusFilter === 'all' || i.effective === statusFilter)
@@ -41,15 +40,25 @@ export function AdminInvitationsPage() {
     [rows, statusFilter],
   );
 
+  // Outcomes are reported through the toast system so a failure is red and stays until dismissed.
+  // The previous banner rendered every message — including "E-Mail-Versand fehlgeschlagen" — in
+  // success green and auto-hid it after 2.5s, so a failed customer email vanished unread.
   const resend = async (invitationId: string, renewExpired = false) => {
     const { ok, outcome, error: err } = await resendInvitationViaEdge(invitationId, renewExpired);
-    flash(outcome ? resendOutcomeMessage(outcome, renewExpired) : ok ? 'Einladung gesendet.' : `Fehler: ${err ?? 'unbekannt'}`);
-    if (ok) void reload();
+    if (!ok) {
+      toast.error('Einladung nicht gesendet', err ?? 'Unbekannter Fehler.');
+      return;
+    }
+    // 'email_error' returns ok:true — the invitation record is valid, only the mail failed.
+    if (outcome === 'email_error') toast.error('E-Mail-Versand fehlgeschlagen', resendOutcomeMessage(outcome, renewExpired));
+    else toast.success('Einladung gesendet', outcome ? resendOutcomeMessage(outcome, renewExpired) : undefined);
+    void reload();
   };
   const revoke = async (id: string) => {
     const { error: err } = await revokeInvitation(id);
-    flash(err ? `Fehler: ${err}` : 'Einladung widerrufen.');
-    if (!err) void reload();
+    if (err) { toast.error('Widerrufen fehlgeschlagen', err); return; }
+    toast.success('Einladung widerrufen', 'Der Zugang über diesen Link ist nicht mehr möglich.');
+    void reload();
   };
 
   return (
@@ -59,15 +68,14 @@ export function AdminInvitationsPage() {
           <h1 className="text-2xl font-semibold tracking-tight text-gray-950">Einladungen</h1>
           <p className="mt-1 text-sm text-gray-500">Status aller Client-Einladungen.</p>
         </div>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400">
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} aria-label="Nach Status filtern" className="h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400">
           <option value="all">Alle</option>
-          <option value="pending">pending</option>
-          <option value="accepted">accepted</option>
-          <option value="revoked">revoked</option>
-          <option value="expired">expired</option>
+          <option value="pending">Offen</option>
+          <option value="accepted">Angenommen</option>
+          <option value="revoked">Widerrufen</option>
+          <option value="expired">Abgelaufen</option>
         </select>
       </div>
-      {notice ? <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-800">{notice}</div> : null}
       {loading ? <div className="h-40 animate-pulse rounded-2xl border border-gray-100 bg-white" /> : error ? (
         <AdminCard><p className="text-sm text-red-600">Fehler: {error}</p></AdminCard>
       ) : invitations.length === 0 ? (

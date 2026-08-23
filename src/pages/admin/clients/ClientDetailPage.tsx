@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, Copy, ExternalLink, Pause, Play, Plus, RefreshCw, XCircle } from 'lucide-react';
 
+import { useToast } from '@/components/dashboard';
 import { AdminCard, AdminField, Pill, invitationTone, lifecycleTone, solutionTone } from '@/pages/admin/clients/adminUi';
 import {
   addClientContact,
@@ -29,13 +30,16 @@ import { offerStatusLabel } from '@/lib/ownerFinance/customerLabels';
 const tabs = ['Übersicht', 'Kontakte', 'Lösungen', 'Vertrag & Budget', 'Kommerziell', 'Zugang', 'Kundenportal', 'Aktivität'] as const;
 type Tab = (typeof tabs)[number];
 
+/** Tab callback for user feedback. The tone decides success vs. error presentation. */
+type Notify = (message: string, tone?: 'success' | 'error') => void;
+
 export function ClientDetailPage() {
   const { organizationId } = useParams<{ organizationId: string }>();
+  const toast = useToast();
   const [detail, setDetail] = useState<AdminClientDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>('Übersicht');
-  const [notice, setNotice] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
     if (!organizationId) return;
@@ -52,7 +56,12 @@ export function ClientDetailPage() {
 
   useEffect(() => { void reload(); }, [reload]);
 
-  const flash = (message: string) => { setNotice(message); setTimeout(() => setNotice(null), 3000); };
+  // Errors must not render as success. This previously pushed every message — failures included —
+  // into one emerald banner that auto-hid after 3s.
+  const flash: Notify = (message, tone = 'success') => {
+    if (tone === 'error') toast.error(message);
+    else toast.success(message);
+  };
 
   if (loading) return <div className="h-40 animate-pulse rounded-2xl border border-gray-100 bg-white" />;
   if (error) return <AdminCard><p className="text-sm text-red-600">Fehler: {error}</p></AdminCard>;
@@ -82,7 +91,6 @@ export function ClientDetailPage() {
         </div>
       </div>
 
-      {notice ? <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-800">{notice}</div> : null}
 
       <div className="flex flex-wrap gap-1 border-b border-gray-100">
         {tabs.map((t) => (
@@ -144,7 +152,7 @@ function OverviewTab({ detail }: { detail: AdminClientDetail }) {
   );
 }
 
-function ContactsTab({ detail, onChanged, flash }: { detail: AdminClientDetail; onChanged: () => void; flash: (m: string) => void }) {
+function ContactsTab({ detail, onChanged, flash }: { detail: AdminClientDetail; onChanged: () => void; flash: Notify }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -156,7 +164,7 @@ function ContactsTab({ detail, onChanged, flash }: { detail: AdminClientDetail; 
     const { error } = await addClientContact(detail.organizationId, { name: name.trim(), email: email.trim() || null, phone: phone.trim() || null });
     setBusy(false);
     if (!error) { setName(''); setEmail(''); setPhone(''); flash('Kontakt hinzugefügt.'); onChanged(); }
-    else flash(`Fehler: ${error}`);
+    else flash(`Kontakt konnte nicht angelegt werden: ${error}`, 'error');
   };
 
   return (
@@ -185,15 +193,17 @@ function ContactsTab({ detail, onChanged, flash }: { detail: AdminClientDetail; 
   );
 }
 
-function SolutionsTab({ detail, onChanged, flash }: { detail: AdminClientDetail; onChanged: () => void; flash: (m: string) => void }) {
+function SolutionsTab({ detail, onChanged, flash }: { detail: AdminClientDetail; onChanged: () => void; flash: Notify }) {
   const toggle = async (id: string, next: 'active' | 'paused') => {
     const { error } = await setSolutionStatus(id, next);
-    flash(error ? `Fehler: ${error}` : next === 'paused' ? 'Lösung pausiert.' : 'Lösung aktiviert.');
-    if (!error) onChanged();
+    if (error) { flash(`Status konnte nicht geändert werden: ${error}`, 'error'); return; }
+    flash(next === 'paused' ? 'Lösung pausiert. Der Kunde sieht diesen Bereich nicht mehr.' : 'Lösung aktiviert.');
+    onChanged();
   };
   const copyLink = async (instanceKey: string) => {
     const link = portalLinkForInstance(instanceKey);
-    try { await navigator.clipboard.writeText(link); flash('Portal-Link kopiert.'); } catch { flash(link); }
+    try { await navigator.clipboard.writeText(link); flash('Portal-Link kopiert.'); }
+    catch { flash(`Kopieren nicht möglich. Link: ${link}`, 'error'); }
   };
   return (
     <div className="space-y-2">
@@ -244,15 +254,17 @@ function BudgetTab({ detail }: { detail: AdminClientDetail }) {
   );
 }
 
-function AccessTab({ detail, onChanged, flash }: { detail: AdminClientDetail; onChanged: () => void; flash: (m: string) => void }) {
+function AccessTab({ detail, onChanged, flash }: { detail: AdminClientDetail; onChanged: () => void; flash: Notify }) {
   const resend = async (invitationId: string, renewExpired = false) => {
     const { ok, outcome, error } = await resendInvitationViaEdge(invitationId, renewExpired);
-    flash(outcome ? resendOutcomeMessage(outcome, renewExpired) : ok ? 'Einladung gesendet.' : `Fehler: ${error ?? 'unbekannt'}`);
-    if (ok) onChanged();
+    if (!ok) { flash(error ?? 'Einladung konnte nicht gesendet werden.', 'error'); return; }
+    // 'email_error' comes back ok:true — the invitation is valid, only the mail failed.
+    flash(resendOutcomeMessage(outcome ?? 'sent', renewExpired), outcome === 'email_error' ? 'error' : 'success');
+    onChanged();
   };
   const revoke = async (id: string) => {
     const { error } = await revokeInvitation(id);
-    flash(error ? `Fehler: ${error}` : 'Einladung widerrufen.');
+    flash(error ? `Widerrufen fehlgeschlagen: ${error}` : 'Einladung widerrufen.', error ? 'error' : 'success');
     if (!error) onChanged();
   };
   return (
