@@ -271,37 +271,112 @@ export async function renderAcceptanceCertificatePdf(ctx: CertificateContext, si
   space(16);
 
   // ---- Signature evidence ----
-  ensure(150);
+  // Keep the complete signature block together so labels, values and the image
+  // can never be split across pages or drawn on top of one another.
+  ensure(176);
   rule(MARGIN, PAGE_W - MARGIN); space(20);
   label('Unterschrift & Nachweis');
   space(4);
-  // The signature image sits in a bordered box.
-  const boxW = 260, boxH = 96, boxX = MARGIN;
+
+  // The customer's signature sits in a calm, bordered presentation box.
+  const boxW = 260, boxH = 108, boxX = MARGIN;
   ensure(boxH + 8);
-  const boxBottom = y - boxH;
+  const blockTop = y;
+  const boxBottom = blockTop - boxH;
+
   enc(`q 0.85 0.86 0.88 RG 0.7 w ${boxX} ${boxBottom} ${boxW} ${boxH} re S Q\n`);
+
   if (img) {
-    // Fit the image into the box while preserving aspect ratio.
-    const scale = Math.min((boxW - 16) / img.width, (boxH - 16) / img.height, 1);
-    const drawW = Math.max(1, img.width * scale), drawH = Math.max(1, img.height * scale);
-    const ix = boxX + (boxW - drawW) / 2, iy = boxBottom + (boxH - drawH) / 2;
+    // Fit the image into the box while preserving its aspect ratio and leaving
+    // enough white space around the handwritten signature.
+    const scale = Math.min((boxW - 22) / img.width, (boxH - 22) / img.height, 1);
+    const drawW = Math.max(1, img.width * scale);
+    const drawH = Math.max(1, img.height * scale);
+    const ix = boxX + (boxW - drawW) / 2;
+    const iy = boxBottom + (boxH - drawH) / 2;
+
     // A single /Im0 image XObject is registered on every page's resources.
     enc(`q ${drawW.toFixed(2)} 0 0 ${drawH.toFixed(2)} ${ix.toFixed(2)} ${iy.toFixed(2)} cm /Im0 Do Q\n`);
   } else {
-    text(boxX + 12, 9, false, 'Unterschrift privat gespeichert (siehe SHA-256).', '0.5 0.53 0.58');
+    const previousY = y;
+    y = boxBottom + boxH / 2 + 3;
+    text(
+      boxX + 18,
+      9,
+      false,
+      'Unterschrift privat gespeichert (siehe SHA-256).',
+      '0.5 0.53 0.58',
+    );
+    y = previousY;
   }
-  // Evidence details to the right of the box.
+
+  // Evidence details to the right of the signature box. Every label and value
+  // receives its own baseline. Values may wrap to a second line where needed.
   const rx = boxX + boxW + 24;
-  const saveY = y;
-  const evi = (k: string, v: string) => {
-    text(rx, 8, true, k.toUpperCase(), '0.55 0.58 0.62');
-    text(rx, 9.5, false, clip(v, 40), '0.12 0.14 0.17');
-    y -= 26;
+  const evidenceWidth = PAGE_W - MARGIN - rx;
+  const evidenceCharLimit = Math.max(22, Math.floor(evidenceWidth / 4.7));
+  y = blockTop;
+
+  const wrapEvidenceValue = (value: string, maxChars: number): string[] => {
+    if (value.length <= maxChars) return [value];
+
+    const words = value.split(/\s+/).filter(Boolean);
+    if (words.length <= 1) {
+      return [
+        value.slice(0, maxChars),
+        clip(value.slice(maxChars), maxChars),
+      ];
+    }
+
+    const lines: string[] = [];
+    let line = '';
+
+    for (const word of words) {
+      const candidate = line ? `${line} ${word}` : word;
+      if (candidate.length <= maxChars) {
+        line = candidate;
+      } else {
+        if (line) lines.push(line);
+        line = word;
+      }
+    }
+
+    if (line) lines.push(line);
+    return lines.slice(0, 2).map((entry, index) =>
+      index === 1 && lines.length > 2 ? clip(entry, Math.max(2, maxChars - 1)) : entry
+    );
   };
-  evi('Signaturklasse', 'Online-Annahme mit einfacher elektronischer Signatur');
-  evi('Signatur-SHA-256', ctx.signature.sha256 ? ctx.signature.sha256.slice(0, 32) + '…' : '—');
-  evi('Quell-Hash (Angebot)', ctx.offer.source_hash ? ctx.offer.source_hash.slice(0, 32) + '…' : '—');
-  y = Math.min(saveY - boxH, y) - 8;
+
+  const evidenceItem = (labelText: string, value: string, maxLines = 1) => {
+    text(rx, 7.4, true, labelText.toUpperCase(), '0.55 0.58 0.62');
+    y -= 11;
+
+    const lines = wrapEvidenceValue(value, evidenceCharLimit).slice(0, maxLines);
+    for (const line of lines) {
+      text(rx, 8.4, false, line, '0.12 0.14 0.17');
+      y -= 11;
+    }
+
+    // Consistent breathing room before the next evidence item.
+    y -= 8;
+  };
+
+  evidenceItem(
+    'Signaturklasse',
+    'Einfache elektronische Signatur',
+    2,
+  );
+  evidenceItem(
+    'Signatur-SHA-256',
+    ctx.signature.sha256 ? `${ctx.signature.sha256.slice(0, 28)}…` : '—',
+  );
+  evidenceItem(
+    'Quell-Hash (Angebot)',
+    ctx.offer.source_hash ? `${ctx.offer.source_hash.slice(0, 28)}…` : '—',
+  );
+
+  // Continue below whichever side of the block is taller.
+  y = Math.min(blockTop - boxH, y) - 10;
   if (y < BOTTOM) newPage();
   space(10);
 

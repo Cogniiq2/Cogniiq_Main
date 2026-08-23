@@ -38,6 +38,11 @@
 
 -- ------------------------------------------------------------------ offer context
 
+-- Postgres identifies a function by (name, argument types), so adding a defaulted parameter would
+-- create a second OVERLOAD rather than replacing the original — and a one-argument call would then
+-- match both candidates and fail as ambiguous. The single-argument versions must be dropped first.
+drop function if exists public.owner_worker_offer_context(uuid);
+
 create or replace function public.owner_worker_offer_context(
   p_offer_id uuid,
   p_recipient_override text default null
@@ -77,7 +82,14 @@ begin
 end;
 $function$;
 
+-- DROP discards the function's ACL, so the original grants are restored verbatim:
+-- the pre-migration ACL was {postgres=X, service_role=X} — worker-only, never client-reachable.
+revoke all on function public.owner_worker_offer_context(uuid, text) from public, anon, authenticated;
+grant execute on function public.owner_worker_offer_context(uuid, text) to service_role;
+
 -- ------------------------------------------------------------------ invoice context
+
+drop function if exists public.owner_worker_invoice_context(uuid);
 
 create or replace function public.owner_worker_invoice_context(
   p_invoice_id uuid,
@@ -135,6 +147,9 @@ begin
       'subject', s.invoice_email_subject_template, 'body', s.invoice_email_body_template));
 end;
 $function$;
+
+revoke all on function public.owner_worker_invoice_context(uuid, text) from public, anon, authenticated;
+grant execute on function public.owner_worker_invoice_context(uuid, text) to service_role;
 
 -- ------------------------------------------------------------------ enqueue RPC
 

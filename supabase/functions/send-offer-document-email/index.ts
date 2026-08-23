@@ -97,16 +97,40 @@ async function sendEmail(
     from: EMAIL_FROM, to: msg.to, subject: msg.subject, html: msg.html, text: msg.text,
   };
   if (opts.attachment) payload.attachments = [{ filename: opts.attachment.filename, content: opts.attachment.contentBase64 }];
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      authorization: `Bearer ${RESEND_API_KEY}`, 'content-type': 'application/json',
-      // Deterministic key -> retries never create a duplicate send.
-      'Idempotency-Key': opts.idempotencyKey,
-    },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) return { id: null, error: `provider ${res.status}` };
+  let res: Response;
+
+  try {
+    res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${RESEND_API_KEY}`,
+        'content-type': 'application/json',
+        // Deterministic key -> retries never create a duplicate send.
+        'Idempotency-Key': opts.idempotencyKey,
+      },
+      body: JSON.stringify(payload),
+      // A hung provider call must not run past the caller's own deadline and leave the job
+      // claimed-but-unfinished; the deadline is well inside the drain budget.
+      signal: AbortSignal.timeout(15_000),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'unknown provider error';
+    return { id: null, error: `provider request failed: ${message}` };
+  }
+
+  if (!res.ok) {
+    // Carry a bounded, whitespace-collapsed slice of the provider's reason into the job's
+    // last_error so a rejected send is diagnosable ("provider 422: <reason>") in the UI.
+    const providerBody = await res.text().catch(() => '');
+    const safeDetail = providerBody.replace(/\s+/g, ' ').trim().slice(0, 180);
+    return {
+      id: null,
+      error: safeDetail
+        ? `provider ${res.status}: ${safeDetail}`
+        : `provider ${res.status}`,
+    };
+  }
+
   const data = await res.json().catch(() => ({}));
   return { id: data?.id ?? null, error: null };
 }
@@ -125,7 +149,11 @@ Deno.serve(async (req: Request) => {
   // A job leaves 'processing' only via owner_complete_automation_job, so an isolate torn down
   // mid-job (the cron caller times out at 20s) orphans the row forever — one confirmation email
   // sat in 'processing' for 31 days. Best-effort: a failure here must never block the drain.
-  await svc.rpc('owner_reap_stalled_automation_jobs', { p_stale_minutes: 15 }).catch(() => {});
+  // NOTE: use try/catch, not .catch() — a PostgrestBuilder is a thenable and has no .catch method,
+  // so calling it throws a TypeError and takes down the whole handler.
+  try {
+    await svc.rpc('owner_reap_stalled_automation_jobs', { p_stale_minutes: 15 });
+  } catch { /* reaping is opportunistic; never block the drain */ }
 
   // ---- Atomic claim (FOR UPDATE SKIP LOCKED inside the RPC). ----
   const { data: claimed, error: claimErr } = await svc.rpc('owner_claim_automation_jobs', { p_limit: BATCH, p_types: null });
@@ -268,12 +296,23 @@ async function processJob(svc: Sb, job: ClaimedJob): Promise<JobOutcome> {
     );
     if (sent.error) {
       // Send failed → revoke the just-minted token so no active token is orphaned; a retry mints
-      // a fresh one. Best-effort; never throws over the original failure.
-      if (minted.token_id) await svc.rpc('owner_worker_revoke_offer_token', { p_token_id: minted.token_id }).catch(() => {});
+      // a fresh one. Best-effort: revocation failure must never replace the original email error,
+      // but it leaves a live token behind, so it is logged rather than swallowed.
+      if (minted.token_id) {
+        try {
+          const { error: revokeErr } = await svc.rpc('owner_worker_revoke_offer_token', { p_token_id: minted.token_id });
+          if (revokeErr) console.error('offer_email: token revocation failed', { jobId: job.id });
+        } catch {
+          console.error('offer_email: token revocation failed', { jobId: job.id });
+        }
+      }
       throw new Error(`email ${sent.error}`);
     }
     // Provider confirmed acceptance → advance the offer to 'sent' (finalized/viewed only; idempotent).
-    await svc.rpc('owner_worker_mark_offer_sent', { p_offer_id: job.offer_id });
+    // A failed advance must fail the job: silently swallowing it would leave the offer showing an
+    // unsent state while the job reports success and the customer already has the email.
+    const { error: markErr } = await svc.rpc('owner_worker_mark_offer_sent', { p_offer_id: job.offer_id });
+    if (markErr) throw new Error('offer status update failed');
     return { providerId: sent.id };
   }
 
