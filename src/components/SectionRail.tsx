@@ -37,21 +37,44 @@ function prettify(id: string): string {
 function labelFor(el: Element): string {
   const explicit = el.getAttribute('data-rail-label');
   if (explicit) return explicit;
-  const heading = el.querySelector('h1, h2');
-  const text = heading?.textContent?.replace(/\s+/g, ' ').trim();
+  const heading = el.querySelector('h1, h2, h3');
+  // headings often break across <br>/<span> lines; textContent glues those
+  // without spaces, so read only the first rendered line
+  let text = '';
+  if (heading) {
+    for (const node of Array.from(heading.childNodes)) {
+      if (node.nodeName === 'BR') break;
+      const piece = node.textContent?.replace(/\s+/g, ' ').trim();
+      if (piece) text += (text ? ' ' : '') + piece;
+    }
+    if (!text) text = heading.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+  }
   if (text) return text.length > 28 ? `${text.slice(0, 27)}…` : text;
   return prettify(el.id);
 }
 
+/*
+  Most pages ship `<section>` elements without an id, so the rail discovers
+  every top-level section itself and assigns a stable id where none exists.
+  Nested sections, chrome (nav/header/footer) and short strips are skipped;
+  the list is capped so long pillar pages stay legible.
+*/
+const MAX_LINES = 9;
+
 function collectSections(): RailSection[] {
-  const nodes = Array.from(document.querySelectorAll('section[id]'));
-  return nodes
-    .filter(el => {
-      // ignore invisible or tiny sections (spacers, hidden variants)
-      const rect = el.getBoundingClientRect();
-      return rect.height > 160;
-    })
-    .map(el => ({ id: el.id, label: labelFor(el) }));
+  const nodes = Array.from(document.querySelectorAll('section'));
+  const top = nodes.filter(el => {
+    if (el.closest('nav, header, footer, [data-rail-ignore]')) return false;
+    if (el.parentElement?.closest('section')) return false; // nested section
+    const rect = el.getBoundingClientRect();
+    return rect.height > 220;
+  });
+  return top.slice(0, MAX_LINES).map((el, i) => {
+    if (!el.id) el.id = `abschnitt-${i + 1}`;
+    // keep scrolled-to sections clear of the 72px fixed navigation
+    (el as HTMLElement).style.scrollMarginTop = '84px';
+    return { id: el.id, label: labelFor(el) };
+  });
 }
 
 export function SectionRail() {
