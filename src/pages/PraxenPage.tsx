@@ -31,7 +31,7 @@ import {
   DECKELUNG,
   EINRICHTUNG_PROJEKT,
   FAKTEN,
-  GO_LIVE_GARANTIE,
+  ZWEI_WOCHEN_GARANTIE,
   BETREUUNG_NACH_GOLIVE,
   GRENZEN,
   NICHT_PASSEND,
@@ -81,9 +81,9 @@ const faqItems = [
       "Nein, unter keinen Umständen. Er gibt keine medizinische Einschätzung ab und stellt keine Triage. Hinweise auf einen Notfall führen sofort zu einem Menschen, zum Bereitschaftsdienst oder zur Ansage, den Notruf 112 zu wählen.",
   },
   {
-    question: `Was passiert, wenn der Empfang nicht in ${FAKTEN.goLiveFrist} läuft?`,
+    question: `Was passiert, wenn der Empfang nicht in ${FAKTEN.einrichtungsfrist} übergeben ist?`,
     answer:
-      `${FAKTEN.goLive} ${FAKTEN.zahlungsaufteilung} Das steht so im Vertrag.`,
+      `${FAKTEN.uebergabeGarantie} ${FAKTEN.startDefinition} ${FAKTEN.garantieOhneAntrag} ${FAKTEN.zahlungsaufteilung}`,
   },
   {
     question: "Kann die Rechnung teurer werden als geplant?",
@@ -159,7 +159,7 @@ export function PraxenPage() {
     <>
       <PageSEO
         title="KI Telefonassistent für Praxen – Ihr Empfang | Cogniiq"
-        description="Ein Empfang am Telefon für Ihre Praxis: Ihre Stimmauswahl, Ihre Regeln, strukturierte Übergabe. Keine Triage, Kontingent mit Obergrenze, Go-live in zwei Wochen, vertraglich zugesagt."
+        description="Ein Empfang am Telefon für Ihre Praxis: Ihre Stimmauswahl, Ihre Regeln, strukturierte Übergabe. Keine Triage, Kontingent mit Obergrenze, in zwei Wochen eingerichtet und bereit zur Freigabe."
         canonical={`${base}/praxen`}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
@@ -408,7 +408,7 @@ export function PraxenPage() {
           </div>
         </section>
 
-        {/* ── 11 · M17 Einrichtung Ihres Empfangs + Go-live-Garantie ── */}
+        {/* ── 11 · M17 Einrichtung Ihres Empfangs + Zwei-Wochen-Garantie ── */}
         <section className={SECTION_ALT}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>{EINRICHTUNG_PROJEKT.headline}</h2>
@@ -434,16 +434,16 @@ export function PraxenPage() {
               ))}
             </ol>
 
-            {/* Go-live-Garantie: eigener Block, kein Aufzählungspunkt (§3.3).
+            {/* Zwei-Wochen-Garantie: eigener Block, kein Aufzählungspunkt (§3.3).
                 Der Mechanismus steht mit im Block — eine Frist ohne die Zahlungs-
                 aufteilung dahinter liest sich wie eine Absichtserklärung. */}
             <div className="mt-10 rounded-2xl border border-pub-signal/25 bg-pub-signal-wash p-8">
               <h3 className="mb-3 text-[22px] font-bold text-pub-ink">
-                {GO_LIVE_GARANTIE.headline}
+                {ZWEI_WOCHEN_GARANTIE.headline}
               </h3>
-              <p className={PROSE}>{GO_LIVE_GARANTIE.text}</p>
+              <p className={PROSE}>{ZWEI_WOCHEN_GARANTIE.text}</p>
               <ul className="mt-5 space-y-2.5 border-t border-pub-signal/20 pt-5">
-                {GO_LIVE_GARANTIE.mechanik.map((satz) => (
+                {ZWEI_WOCHEN_GARANTIE.mechanik.map((satz) => (
                   <li key={satz} className="flex gap-3 text-[15px] leading-relaxed text-pub-ink-2">
                     <span aria-hidden="true" className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-pub-signal" />
                     <span>{satz}</span>

@@ -250,8 +250,8 @@ function TrustStrip({ config }: { config: CityServiceConfig }) {
   // Zwei Angaben standen hier und hielten der Prüfung nicht stand:
   // - „DSGVO-konform" als Selbstzusage — auf keiner Seite belegt, siehe
   //   Hero-Kommentar. Ersatzlos gestrichen, nicht umformuliert.
-  // - „Einrichtung in 7–14 Tagen" widerspricht der Go-live-Garantie aus
-  //   FAKTEN.goLive. Die Angabe wurde in den Stadt-Configs bereits an vier
+  // - „Einrichtung in 7–14 Tagen" widerspricht der Zwei-Wochen-Garantie aus
+  //   FAKTEN.uebergabeGarantie. Die Angabe wurde in den Stadt-Configs bereits an vier
   //   Stellen korrigiert und lebte hier — in der geteilten Komponente —
   //   unbemerkt weiter (die Fehlerklasse aus HONESTY-AUDIT §7).
   const isTelefonassistent = config.serviceSlug === "ki-telefonassistent";
@@ -261,7 +261,7 @@ function TrustStrip({ config }: { config: CityServiceConfig }) {
     "Bayern",
     "Persönliche Betreuung",
     ...(isTelefonassistent
-      ? ["Keine Gesprächsaufzeichnung", `Go-live in ${FAKTEN.goLiveFrist}`]
+      ? ["Keine Gesprächsaufzeichnung", `Eingerichtet in ${FAKTEN.einrichtungsfrist}`]
       : ["Persönliche Einrichtung"]),
   ];
 

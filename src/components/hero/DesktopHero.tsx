@@ -374,7 +374,8 @@ export function DesktopHero() {
             transition={{ duration: 0.6, delay: 1.18, ease: E }}
           >
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" aria-hidden="true" />
-            {/* [[CLAIM: verify — Go-Live-Zeitraum (OWNER-INPUT E1)]] */}
+            {/* Kanonisch: Frist bis zur Übergabe zur Freigabe, nicht bis zum Go-live
+                (FAKTEN.uebergabeGarantie). Der Go-live hängt an der Kundenfreigabe. */}
             <span className="text-[12px] font-semibold text-gray-700">
               Go-Live nach Ihrer Freigabe
             </span>

@@ -23,8 +23,9 @@ const principles = [
   },
   {
     icon: Zap,
-    title: "Wochen, nicht Monate.",
-    // [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1)]]
+    title: "Wochen, nicht Monate.",// Kanonisch: 14 Kalendertage ab dem Start bis zur Übergabe zur Freigabe
+    // (FAKTEN.uebergabeGarantie). Der Go-live hängt an der Kundenfreigabe und
+    // darf hier nie mit einer Frist verbunden werden.
     text: "Keine endlosen Abstimmungsrunden, keine Wasserfall-Projektphasen. Live geht das System erst nach Ihrer Freigabe.",
     link: "/kontakt",
     linkLabel: "Nächster Schritt",

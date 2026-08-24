@@ -40,16 +40,20 @@ export const FAKTEN = {
   /*
     Korrigiert am 23.08.2026 von 7 auf 14 (Inhaber).
 
-    Vertraglich zugesagt sind ZWEI WOCHEN. Die Website versprach an zehn Stellen
-    7 Tage — und zwar mit derselben Rechtsfolge, dem Wegfall der zweiten Hälfte
-    der Einrichtungsgebühr. Damit stand eine Frist im Markt, die der Vertrag
-    nicht trägt: Ein Kunde hätte auf 7 Tagen bestehen und bei Überschreitung die
-    Hälfte der Einrichtungsgebühr einbehalten können. Eine Zusage mit Geldfolge
-    darf nie kürzer sein als die vertragliche.
+    Kanonische Bedeutung: 14 KALENDERTAGE ab dem Start, und sie laufen bis zur
+    UEBERGABE ZUR FREIGABE — nicht bis zum Go-live.
+
+    An diesem Punkt zerbrach die alte Fassung logisch: Sie garantierte einen
+    Live-Termin und raeumte im selben Atemzug ein unbefristetes Freigaberecht
+    ein ("ohne Ihre Freigabe geht der Empfang nicht live"). Beides zusammen ist
+    nicht erfuellbar — ein Kunde, der drei Wochen prueft, haette die Frist
+    gerissen, die wir uns selbst gesetzt haben, und dafuer die zweite Haelfte
+    der Einrichtungsgebuehr einbehalten koennen. Zugesagt wird deshalb nur, was
+    allein in unserer Hand liegt: der fertig eingerichtete, testbereite Empfang.
   */
-  goLiveTage: 14,
+  einrichtungsfristTage: 14,
   /** Sprachform der Frist. In Fliesstext immer diese, nie "14 Tage". */
-  goLiveFrist: "zwei Wochen",
+  einrichtungsfrist: "zwei Wochen",
   aenderungTage: 3,
   laufzeitMonate: 12,
   preisgarantieMonate: 24,
@@ -74,31 +78,43 @@ export const FAKTEN = {
   /*
     Die Zusage nennt zuerst die Frist, dann die Folge, in zwei kurzen Saetzen.
     Eine Garantie, die erklaert werden muss, wirkt nicht wie eine Garantie.
-    Bezugspunkt ist "der Start", nicht der Zahlungseingang allein: siehe
-    goLiveStart. Eine Frist, die ab Geldeingang unbedingt laeuft, macht uns fuer
-    Verzoegerungen haftbar, die der Kunde selbst verursacht.
+    Zugesagter Meilenstein ist die Uebergabe zur Freigabe, nicht der Go-live:
+    der Go-live haengt an einer Freigabe, die allein der Kunde erteilt und fuer
+    die er sich so viel Zeit nehmen darf, wie er moechte. Eine Frist mit
+    Geldfolge darf nur das umfassen, was wir selbst liefern.
   */
-  goLive: `Ihr Empfang geht spätestens zwei Wochen nach dem Start live. Halten wir diesen Termin nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.`,
+  uebergabeGarantie: `Spätestens zwei Wochen nach dem Start ist Ihr KI-Empfang vollständig eingerichtet und bereit für Ihre Freigabe. Halten wir diesen Termin nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.`,
 
   /*
     Der Fristbeginn ist eine eigene Aussage, weil er der Punkt ist, an dem die
-    Garantie kippen kann. Vorher lief die Frist unbedingt ab Zahlungseingang —
-    Schritt 5 der Einrichtung ("Ihre Vorgaben") liegt aber vollstaendig beim
-    Kunden. Wer seine Angaben zehn Tage liegen laesst, haette die Frist selbst
-    reissen und dafuer die zweite Haelfte einbehalten koennen.
+    Garantie kippen kann. Beide Bedingungen muessen erfuellt sein: Geldeingang
+    UND vollstaendige Angaben. Eine Frist, die ab Zahlungseingang allein laeuft,
+    macht uns fuer Verzoegerungen haftbar, die der Kunde selbst verursacht —
+    Schritt 5 der Einrichtung ("Ihre Vorgaben") liegt vollstaendig bei ihm.
   */
-  goLiveStart: `Der Start ist der Tag, an dem die erste Hälfte der Einrichtungsgebühr eingegangen ist und Ihre Angaben für die Einrichtung vollständig vorliegen: Stimme, Begrüßung, Anliegen, Regeln und Weiterleitungen.`,
-
-  /** Keine Antragspflicht — das ist der Teil, der die Zusage glaubwuerdig macht. */
-  goLiveOhneAntrag: `Sie müssen dafür nichts geltend machen und keine Nachfrist setzen: Wir stellen die zweite Hälfte dann einfach nicht in Rechnung.`,
+  startDefinition: `Der Start ist der Tag, an dem die erste Hälfte der Einrichtungsgebühr eingegangen ist und uns alle für die Einrichtung erforderlichen Angaben vollständig vorliegen.`,
 
   /*
-    Fairness in beide Richtungen, in einem Satz. Bewusst keine Ausschlussliste:
-    Rufnummernportierung kommt nicht vor (es wird umgeleitet, nicht portiert),
-    und breite Ausschluesse wuerden genau die Verbindlichkeit zerreden, die das
-    staerkste Verkaufsargument der Seite ist.
+    Der Satz, der die Garantie widerspruchsfrei macht: Was wir zusagen, endet an
+    der Uebergabe; was danach kommt, entscheidet der Kunde. Steht ueberall dort,
+    wo die Frist genannt wird — sonst liest sich die Frist wieder als Live-Termin.
   */
-  goLivePause: `Warten wir auf etwas, das nur von Ihnen kommen kann — eine Angabe, eine Freigabe, einen Zugang —, pausiert die Frist so lange und läuft danach weiter. Alles andere liegt bei uns.`,
+  freigabeNachUebergabe: `Nach der Übergabe testen Sie den Empfang in Ruhe. Live geschaltet wird erst nach Ihrer Freigabe.`,
+
+  /** Macht explizit, dass die Pruefzeit des Kunden in keine Richtung zaehlt:
+   *  nicht als Verzug bei uns, nicht als Versaeumnis bei ihm. */
+  pruefzeitNeutral: `Wie lange Sie prüfen, entscheiden Sie. Ihre Prüfzeit zählt weder als Verzögerung auf unserer Seite noch als Versäumnis auf Ihrer.`,
+
+  /** Keine Antragspflicht — das ist der Teil, der die Zusage glaubwuerdig macht. */
+  garantieOhneAntrag: `Sie müssen dafür nichts geltend machen und keine Nachfrist setzen: Wir stellen die zweite Hälfte dann einfach nicht in Rechnung.`,
+
+  /*
+    Fairness in beide Richtungen. Bewusst NUR kundenseitige Abhaengigkeiten, die
+    nach dem Start neu entstehen: Dienstleister, die wir selbst auswaehlen, sind
+    unser Risiko, nicht seines. Ein breiter Drittanbieter-Ausschluss wuerde genau
+    die Verbindlichkeit zerreden, die das staerkste Verkaufsargument der Seite ist.
+  */
+  fristPause: `Entsteht nach dem Start eine neue Abhängigkeit auf Ihrer Seite — geänderte Anforderungen, zusätzlicher Umfang, ein neu benötigter Zugang oder eine offene Entscheidung —, pausiert die Frist so lange und läuft danach weiter. Alles Übrige liegt bei uns, auch die Dienstleister, mit denen wir arbeiten.`,
 
   /** Zahlungsaufteilung — erklaert, warum die Garantie ueberhaupt greifen kann. */
   zahlungsaufteilung: `Die Einrichtungsgebühr zahlen Sie zur Hälfte bei Vertragsabschluss, zur zweiten Hälfte nach dem Go-live.`,
@@ -220,9 +236,9 @@ export const EINRICHTUNG_SCHRITTE: Array<{
   },
   {
     step: "05",
-    title: "Testphase und Go-live",
+    title: "Übergabe, Testphase und Go-live",
     description:
-      `Zwei Tage testen wir gemeinsam. Live geht der Assistent erst, wenn Ihre Praxis zufrieden ist — spätestens ${FAKTEN.goLiveFrist} nach dem Start.`,
+      `Spätestens ${FAKTEN.einrichtungsfrist} nach dem Start übergeben wir Ihnen den fertig eingerichteten Empfang. Zwei Tage testen wir gemeinsam; live geht der Assistent erst nach Ihrer Freigabe.`,
   },
 ];
 
@@ -535,8 +551,9 @@ export const SPRACHEN = {
 
 /**
  * M17 · Einrichtung Ihres Empfangs — die acht realen Schritte.
- * Dauerangaben liegen nur für Testphase und Go-live vor; erfundene Dauern
- * sind ausgeschlossen (Inhaber-Antwort E).
+ * Dauerangaben liegen nur für Testphase und Übergabe vor; erfundene Dauern
+ * sind ausgeschlossen (Inhaber-Antwort E). Schritt 8 ist bewusst die Übergabe
+ * und nicht der Go-live: nur bis dorthin reicht die zugesagte Frist.
  */
 export const EINRICHTUNG_PROJEKT = {
   headline: "Einrichtung Ihres Empfangs",
@@ -571,7 +588,7 @@ export const EINRICHTUNG_PROJEKT = {
       nummer: "5",
       title: "Ihre Vorgaben",
       dauer: null,
-      text: "Ein geführter Ablauf im Dashboard: Stimme, Begrüßungssatz, Anliegen, Regeln, Weiterleitungen. Ihre Angaben gehen direkt an uns — sobald sie vollständig sind, beginnt die Zwei-Wochen-Frist.",
+      text: "Ein geführter Ablauf im Dashboard: Stimme, Begrüßungssatz, Anliegen, Regeln, Weiterleitungen. Ihre Angaben gehen direkt an uns — sobald sie vollständig vorliegen und die erste Hälfte eingegangen ist, beginnt die Zwei-Wochen-Frist.",
     },
     {
       nummer: "6",
@@ -581,38 +598,47 @@ export const EINRICHTUNG_PROJEKT = {
     },
     {
       nummer: "7",
-      title: "Testphase",
-      dauer: "2\u00A0Tage",
-      text: "Zwei Tage testen wir gemeinsam. Live geht der Assistent erst, wenn Ihre Praxis zufrieden ist.",
+      title: "Übergabe zur Freigabe",
+      dauer: `spätestens ${FAKTEN.einrichtungsfrist} nach dem Start`,
+      text: `${FAKTEN.uebergabeGarantie} ${FAKTEN.startDefinition}`,
     },
     {
       nummer: "8",
-      title: "Go-live",
-      dauer: `spätestens ${FAKTEN.goLiveFrist} nach dem Start`,
-      text: `Garantiert innerhalb von ${FAKTEN.goLiveFrist} nach dem Start. ${FAKTEN.goLiveStart}`,
+      title: "Testphase und Go-live",
+      dauer: "2 Tage Test",
+      text: `${FAKTEN.freigabeNachUebergabe} Zwei Tage davon gehen wir gemeinsam mit Ihnen durch. ${FAKTEN.pruefzeitNeutral}`,
     },
   ],
 };
 
 /**
- * Go-live-Garantie — eigener, ruhig gesetzter Block auf /praxen, der
+ * Zwei-Wochen-Garantie — eigener, ruhig gesetzter Block auf /praxen, der
  * Preisseite und im FAQ (Brief III §3.3). Nie als Aufzählungspunkt.
+ *
+ * Zugesagt ist die Übergabe zur Freigabe, nicht der Go-live. Der Zusatz "Das
+ * steht so im Vertrag" ist bewusst entfernt: Ein Vertragsdokument mit genau
+ * diesen Bedingungen liegt nicht geprüft vor, und eine Zusage über den
+ * Vertragsinhalt darf nicht auf einer Annahme stehen (COPY-CLAIMS-TO-VERIFY).
  */
-export const GO_LIVE_GARANTIE = {
+export const ZWEI_WOCHEN_GARANTIE = {
   headline: "Die Zwei-Wochen-Garantie",
-  text: `${FAKTEN.goLive} Das steht so im Vertrag, nicht nur auf dieser Seite.`,
+  text: FAKTEN.uebergabeGarantie,
 
   /*
     Reihenfolge ist die Leseordnung der Frage, die der Kunde tatsaechlich hat:
-    Wie zahle ich? -> Ab wann laeuft die Uhr? -> Was passiert, wenn ihr zu spaet
+    Wie zahle ich? -> Ab wann laeuft die Uhr? -> Was passiert nach der
+    Uebergabe? -> Zaehlt meine Pruefzeit gegen euch? -> Was, wenn ihr zu spaet
     seid? -> Und wenn es an mir liegt? Eine Frist ohne Folge ist eine Absichts-
-    erklaerung; eine Frist ohne Startpunkt ist ein offenes Risiko.
+    erklaerung; eine Frist ohne Startpunkt ist ein offenes Risiko; eine Frist
+    ohne benannten Endpunkt widerspricht dem Freigaberecht.
   */
   mechanik: [
     FAKTEN.zahlungsaufteilung,
-    FAKTEN.goLiveStart,
-    FAKTEN.goLiveOhneAntrag,
-    FAKTEN.goLivePause,
+    FAKTEN.startDefinition,
+    FAKTEN.freigabeNachUebergabe,
+    FAKTEN.pruefzeitNeutral,
+    FAKTEN.garantieOhneAntrag,
+    FAKTEN.fristPause,
   ],
 };
 
@@ -693,11 +719,11 @@ export const UMKEHRBARKEIT = {
     { label: "Preisgarantie", wert: FAKTEN.preisgarantie },
     {
       label: "Testphase",
-      wert: "2\u00A0Tage, nach Vertragsabschluss und Zahlung der ersten Hälfte. Live geht der Empfang erst, wenn Sie zufrieden sind",
+      wert: "2\u00A0Tage, nach Vertragsabschluss und Zahlung der ersten Hälfte. Live geschaltet wird erst nach Ihrer Freigabe",
     },
   ],
   vetorecht:
-    `Die Testphase ist kein kostenloser Test. Sie ist der Punkt, an dem Sie ein Vetorecht haben: Ohne Ihre Freigabe geht der Empfang nicht live. Die Zwei-Wochen-Frist deckt unsere Arbeit bis zur Übergabe an Sie ab; wie lange Sie danach prüfen möchten, entscheiden Sie selbst.`,
+    `Die Testphase ist kein kostenloser Test. Sie ist der Punkt, an dem Sie ein Vetorecht haben: Ohne Ihre Freigabe geht der Empfang nicht live. Die Zwei-Wochen-Frist deckt unsere Arbeit bis zur Übergabe an Sie ab — was danach geschieht, bestimmen Sie. ${FAKTEN.pruefzeitNeutral}`,
   // [[CLAIM: Was mit den gespeicherten Ergebnissen nach Vertragsende geschieht,
   // ist nicht beantwortet (Brief II §4.7). Bis dahin keine Aussage dazu.]]
 };

@@ -200,7 +200,9 @@ export const LOCATION_PAGES: LocationPage[] = [
 export const PAGE_META = {
   home: {
     title: "Cogniiq – KI-Telefonassistent, Webdesign & Automatisierung für Unternehmen in Bayern",
-    // [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1)]]
+    // Kanonisch: 14 Kalendertage ab dem Start bis zur Übergabe zur Freigabe
+    // (FAKTEN.uebergabeGarantie). Der Go-live hängt an der Kundenfreigabe und
+    // darf hier nie mit einer Frist verbunden werden.
     description: "Cogniiq entwickelt operative KI-Systeme für Unternehmen in Bayern: KI-Telefonassistent, Websites und Prozessautomatisierung. Erreichbar auch außerhalb der Öffnungszeiten.",
     canonical: "https://cogniiq.de",
   },

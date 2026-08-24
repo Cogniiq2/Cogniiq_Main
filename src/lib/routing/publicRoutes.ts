@@ -119,7 +119,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/praxen",
     title: "KI Telefonassistent für Praxen – Ihr Empfang | Cogniiq",
-    description: "Ein Empfang am Telefon für Ihre Praxis: Ihre Stimmauswahl, Ihre Regeln, strukturierte Übergabe. Keine Triage, Kontingent mit Obergrenze, Go-live in zwei Wochen, vertraglich zugesagt.",
+    description: "Ein Empfang am Telefon für Ihre Praxis: Ihre Stimmauswahl, Ihre Regeln, strukturierte Übergabe. Keine Triage, Kontingent mit Obergrenze, in zwei Wochen eingerichtet und bereit zur Freigabe.",
     keywords: "KI Telefonassistent Praxis, Praxisempfang Telefon, telefonische Erreichbarkeit Praxis, Anrufannahme Arztpraxis",
     indexable: true,
     sitemap: { lastmod: "2026-08-16", changefreq: "monthly", priority: "0.90" },
@@ -263,7 +263,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/bayreuth/ki-telefonassistent",
     title: "KI Telefonassistent Bayreuth – AI Rezeption & Anrufannahme | Cogniiq",
-    description: "KI Telefonassistent Bayreuth: Anrufannahme, Terminbuchung und Weiterleitung für lokale Unternehmen. Auch außerhalb der Öffnungszeiten, ohne Gesprächsaufzeichnung, Go-live in zwei Wochen, vertraglich zugesagt.",
+    description: "KI Telefonassistent Bayreuth: Anrufannahme, Terminbuchung und Weiterleitung für lokale Unternehmen. Auch außerhalb der Öffnungszeiten, ohne Gesprächsaufzeichnung, in zwei Wochen eingerichtet und bereit zur Freigabe.",
     keywords: "KI Telefonassistent Bayreuth, AI Rezeptionistin Bayreuth, KI Telefon Bayreuth",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "weekly", priority: "0.9" },
@@ -399,7 +399,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/regensburg/ki-telefonassistent",
     title: "KI Telefonassistent Regensburg – AI Rezeption & Anrufannahme | Cogniiq",
-    description: "KI Telefonassistent Regensburg: Anrufannahme, Terminbuchung und Weiterleitung für Praxen, Gastronomie und Dienstleister. Auch außerhalb der Öffnungszeiten, ohne Gesprächsaufzeichnung, Go-live in zwei Wochen, vertraglich zugesagt.",
+    description: "KI Telefonassistent Regensburg: Anrufannahme, Terminbuchung und Weiterleitung für Praxen, Gastronomie und Dienstleister. Auch außerhalb der Öffnungszeiten, ohne Gesprächsaufzeichnung, in zwei Wochen eingerichtet und bereit zur Freigabe.",
     keywords: "KI Telefonassistent Regensburg, AI Rezeptionistin Regensburg, KI Telefon Regensburg",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "weekly", priority: "0.9" },
@@ -651,7 +651,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/kosten-ki-telefonassistent",
     title: "Was kostet ein KI Telefonassistent? Preise | Cogniiq",
-    description: "Was kostet ein KI Telefonassistent für Praxen? Tarife ab 300 € im Monat mit festem Minutenkontingent, gedeckelter Rechnung, Einrichtung und Go-live-Garantie.",
+    description: "Was kostet ein KI Telefonassistent für Praxen? Tarife ab 300 € im Monat mit festem Minutenkontingent, gedeckelter Rechnung, Einrichtung und Zwei-Wochen-Garantie.",
     keywords: "KI Telefonassistent Kosten, AI Rezeptionist Preis, KI Telefonie Kosten, Automatisierung Kosten",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.88" },
