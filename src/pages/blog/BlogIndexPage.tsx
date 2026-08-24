@@ -320,7 +320,7 @@ export function BlogIndexPage() {
                   to="/kontakt"
                   className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-white text-gray-900 text-[13.5px] font-semibold hover:bg-gray-100 transition-colors duration-200"
                 >
-                  Kostenloses Gespräch sichern
+                  Erstgespräch vereinbaren
                   <ArrowRight size={14} />
                 </Link>
               </div>

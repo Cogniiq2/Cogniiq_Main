@@ -19,7 +19,8 @@ const outcomes = [
 
 // Outcome tiles carry no invented performance figures. Any number here would need a
 // real, attributable measurement; none exists in the repository.
-// [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1) bestätigen]]
+// Kein Zeitraum an dieser Stelle: Der Go-live haengt an der Kundenfreigabe.
+// Die Frist gilt bis zur Uebergabe und steht in FAKTEN.uebergabeGarantie.
 const microResults = [
   { icon: PhoneCall, stat: 'Auch nachts', label: 'Anrufannahme' },
   { icon: TrendingUp, stat: 'Strukturiert', label: 'qualifizierte Anfragen' },
@@ -178,7 +179,7 @@ export function FinalCTASection() {
                 {/* Project timeline */}
                 <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl p-4 text-center">
                   <p className="text-[11.5px] text-gray-600 leading-relaxed">
-                    Go-Live typischerweise in{' '}
+                    Live geschaltet wird erst nach{' '}
                     <span className="text-gray-400 font-medium">Ihrer Freigabe.</span>
                   </p>
                 </div>

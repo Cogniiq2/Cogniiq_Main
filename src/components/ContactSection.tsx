@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
+import { BUSINESS_INFO, PHONE_HREF } from '@/lib/seo-data';
 import {
   Select,
   SelectContent,
@@ -146,6 +147,8 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             value={data.name}
             onChange={e => onChange({ name: e.target.value })}
             required
+            name="name"
+            autoComplete="name"
             placeholder="Max Mustermann"
             className="h-11 bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus-visible:ring-0 transition-colors"
           />
@@ -157,6 +160,9 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             value={data.email}
             onChange={e => onChange({ email: e.target.value })}
             required
+            name="email"
+            autoComplete="email"
+            inputMode="email"
             placeholder="max@unternehmen.de"
             className="h-11 bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus-visible:ring-0 transition-colors"
           />
@@ -168,6 +174,8 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           value={data.company}
           onChange={e => onChange({ company: e.target.value })}
           required
+          name="organization"
+          autoComplete="organization"
           placeholder="Unternehmensname"
           className="h-11 bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus-visible:ring-0 transition-colors"
         />
@@ -342,13 +350,21 @@ export function ContactSection() {
   const isInView = useInView(ref, { once: true, amount: 0.08 });
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [data, setData] = useState<FormData>(EMPTY);
 
   const update = (partial: Partial<FormData>) => setData(d => ({ ...d, ...partial }));
 
+  // `required` and `type="email"` never ran: the controls are not inside a <form>,
+  // so browser constraint validation is inert and a bare truthiness check let "x"
+  // through as an email address.
+  const emailLooksValid = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value.trim());
+
   const canAdvance = () => {
-    if (step === 0) return data.name && data.email && data.company && data.industry && data.timeline;
-    if (step === 1) return !!data.goal;
+    if (step === 0) {
+      return Boolean(data.name.trim() && emailLooksValid(data.email) && data.company.trim() && data.industry && data.timeline);
+    }
+    if (step === 1) return !!data.goal.trim();
     return true;
   };
 
@@ -359,19 +375,38 @@ export function ContactSection() {
 
   const handleBack = () => setStep(s => Math.max(s - 1, 0));
 
+  /*
+    This previously swallowed the error and navigated to the thank-you page from a
+    `finally`, so a network failure, a 5xx, a CORS rejection or an ad-blocker on the
+    webhook host all produced a cheerful confirmation. The lead was lost and nobody
+    — not the visitor, not us — ever learned. The response is now checked, the
+    entered data is preserved on failure, and the visitor is given a way through.
+  */
   const handleFinalSubmit = async () => {
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
-      await fetch(N8N_ENDPOINTS.contact, {
+      const res = await fetch(N8N_ENDPOINTS.contact, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, source: 'kontakt-page' }),
+        body: JSON.stringify({
+          ...data,
+          source: 'kontakt-page',
+          page_url: typeof window !== 'undefined' ? window.location.href : null,
+          referrer: typeof document !== 'undefined' ? document.referrer || null : null,
+        }),
       });
-    } catch (err) {
-      console.error(err);
+      if (!res.ok) throw new Error(`submit failed: ${res.status}`);
+      // Only a confirmed 2xx is a conversion. The thank-you page reads this state
+      // so it can fire the conversion event without counting failures.
+      navigate('/anfrage-erhalten', { state: { submitted: true } });
+    } catch {
+      setSubmitError(
+        'Ihre Anfrage konnte nicht gesendet werden. Bitte versuchen Sie es noch einmal. '
+        + 'Wenn es weiterhin nicht klappt, erreichen Sie uns direkt telefonisch oder per E-Mail.',
+      );
     } finally {
       setIsSubmitting(false);
-      navigate('/anfrage-erhalten');
     }
   };
 
@@ -600,6 +635,35 @@ export function ContactSection() {
                     </motion.button>
                   )}
                 </div>
+
+                {/* A failed submission used to be indistinguishable from a successful
+                    one. It now stays on the page, keeps the entered data, and offers
+                    the two channels that do not depend on the webhook. */}
+                {submitError && (
+                  <div
+                    role="alert"
+                    className="mt-5 rounded-xl border border-pub-signal/25 bg-pub-signal-wash px-4 py-3.5"
+                  >
+                    <p className="text-[13.5px] font-semibold text-pub-signal-ink">
+                      Ihre Anfrage konnte nicht gesendet werden.
+                    </p>
+                    <p className="mt-1 text-[13px] leading-relaxed text-pub-ink-2">
+                      Bitte versuchen Sie es noch einmal. Wenn es weiterhin nicht klappt, erreichen Sie
+                      uns direkt unter{' '}
+                      <a href={PHONE_HREF} className="font-medium text-pub-ink underline underline-offset-2">
+                        {BUSINESS_INFO.contact.phoneDisplay}
+                      </a>{' '}
+                      oder{' '}
+                      <a
+                        href={`mailto:${BUSINESS_INFO.contact.email}`}
+                        className="font-medium text-pub-ink underline underline-offset-2"
+                      >
+                        {BUSINESS_INFO.contact.email}
+                      </a>
+                      . Ihre Angaben bleiben erhalten.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>

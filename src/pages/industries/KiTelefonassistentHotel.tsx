@@ -55,7 +55,9 @@ const config: NationalIndustryPageConfig = {
     "Sonderwünsche und Gruppenanfragen strukturiert erfasst",
     // [[CLAIM: verify — PMS-/Channel-Manager-Anbindungen konkret bestätigen]]
     "Anbindung an gängige PMS-Systeme und Channel-Manager wird vor dem Angebot geprüft",
-    // [[CLAIM: verify — Einrichtungsdauer 7–14 Tage]]
+    // Kanonisch: 14 Kalendertage ab dem Start bis zur Übergabe zur Freigabe
+    // (FAKTEN.uebergabeGarantie). Der Go-live hängt an der Kundenfreigabe und
+    // darf hier nie mit einer Frist verbunden werden.
     "Eingerichtet ohne Unterbrechung — der Hotelbetrieb läuft weiter",
   ],
   workflow: {

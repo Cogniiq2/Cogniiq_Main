@@ -1,6 +1,6 @@
 import { MapPin, Users, Building2, Zap, Clock, Phone, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
-import { BUSINESS_INFO, getGoogleMapsUrl, getGoogleMapsEmbedUrl } from "@/lib/seo-data";
+import { BUSINESS_INFO, PHONE_HREF, getGoogleMapsUrl, getGoogleMapsEmbedUrl } from "@/lib/seo-data";
 import { motion } from "framer-motion";
 
 const SERVICE_CITIES: Array<{ label: string; href: string }> = [
@@ -271,7 +271,7 @@ export function LocationContent() {
                 </a>
 
                 <a
-                  href={`tel:${BUSINESS_INFO.contact.phone}`}
+                  href={PHONE_HREF}
                   className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
                   aria-label={`Cogniiq anrufen: ${BUSINESS_INFO.contact.phoneDisplay}`}
                 >
