@@ -134,17 +134,72 @@ export async function setOfferStatus(offerId: string, status: string, reason?: s
   return { error: error?.message ?? null };
 }
 
+export interface ConvertOfferToInvoiceResult {
+  invoiceId: string | null;
+  recurringLinesExcluded: number;
+  /** Set for a rate (partial) conversion; null for the whole one-time amount. */
+  milestoneLabel: string | null;
+  /** False for a rate conversion — the offer stays 'accepted' so a later rate stays possible. */
+  isFullConversion: boolean;
+  error: string | null;
+}
+
 /**
  * Convert an accepted offer into a draft invoice. Only ONE-TIME positions are copied — recurring
  * positions (pricing_type = 'recurring') are a separate billing track and are never included,
- * regardless of billing interval or minimum term. `recurringLinesExcluded` lets the caller tell
- * the owner how many recurring positions still need their own arrangement.
+ * regardless of billing interval or minimum term, in either mode.
+ *
+ * `milestoneIndex` selects what gets invoiced from the one-time amount:
+ *   - omitted/undefined: the whole one-time amount (all one-time lines, copied verbatim). This
+ *     is terminal — the offer becomes 'converted' and cannot be converted again.
+ *   - a 0-based index into the offer's payment_schedule: a single rate invoice for that
+ *     milestone's share, grouped by VAT. The offer stays 'accepted' so a later rate can still be
+ *     invoiced as its own deliberate action — nothing here creates the next rate automatically.
+ *
+ * The RPC itself refuses to create an empty draft: an offer with no one-time content (recurring
+ * -only, or every one-time line optional) raises before any row is inserted.
  */
-export async function convertOfferToInvoiceDraft(offerId: string): Promise<{ invoiceId: string | null; recurringLinesExcluded: number; error: string | null }> {
-  const { data, error } = await supabase.rpc('convert_owner_offer_to_invoice_draft', { p_idempotency_key: secureUuid(), p_offer_id: offerId });
-  if (error) return { invoiceId: null, recurringLinesExcluded: 0, error: error.message };
-  const result = data as { invoice_id?: string; recurring_lines_excluded?: number };
-  return { invoiceId: result?.invoice_id ?? null, recurringLinesExcluded: result?.recurring_lines_excluded ?? 0, error: null };
+export async function convertOfferToInvoiceDraft(offerId: string, milestoneIndex?: number): Promise<ConvertOfferToInvoiceResult> {
+  const { data, error } = await supabase.rpc('convert_owner_offer_to_invoice_draft', {
+    p_idempotency_key: secureUuid(), p_offer_id: offerId, p_milestone_index: milestoneIndex ?? null,
+  });
+  if (error) return { invoiceId: null, recurringLinesExcluded: 0, milestoneLabel: null, isFullConversion: true, error: error.message };
+  const result = data as {
+    invoice_id?: string; recurring_lines_excluded?: number; milestone_label?: string | null; is_full_conversion?: boolean;
+  };
+  return {
+    invoiceId: result?.invoice_id ?? null,
+    recurringLinesExcluded: result?.recurring_lines_excluded ?? 0,
+    milestoneLabel: result?.milestone_label ?? null,
+    isFullConversion: result?.is_full_conversion ?? true,
+    error: null,
+  };
+}
+
+export interface OfferLinkedInvoiceRef {
+  id: string;
+  invoice_number: string | null;
+  status: string;
+  currency: string;
+  net_total_cents: number;
+  gross_total_cents: number;
+  created_at: string;
+}
+
+/**
+ * Invoices already created from this offer (via convertOfferToInvoiceDraft) — the surface for
+ * "did I already invoice this rate?". A plain read, not a schedule or remaining-balance
+ * calculation: the caller shows this list so a human notices a rate has already been billed
+ * before choosing to invoice again.
+ */
+export async function loadInvoicesForOffer(offerId: string): Promise<{ data: OfferLinkedInvoiceRef[]; error: string | null }> {
+  const { data, error } = await supabase
+    .from('owner_invoices')
+    .select('id, invoice_number, status, currency, net_total_cents, gross_total_cents, created_at')
+    .eq('source_offer_id', offerId)
+    .order('created_at', { ascending: false });
+  if (error) return { data: [], error: error.message };
+  return { data: (data ?? []) as OfferLinkedInvoiceRef[], error: null };
 }
 
 /* ----------------------------------------------------------------- Generated documents + tokens */

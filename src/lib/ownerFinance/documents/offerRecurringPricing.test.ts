@@ -418,19 +418,29 @@ describe('offer to invoice conversion', () => {
   });
 
   it('never copies a recurring line onto the invoice in the SQL', () => {
-    // Guards the actual migration text: the insert loop that builds invoice lines must only
-    // ever run over pricing_type = 'one_time', and no second loop may insert recurring rows.
+    // Guards the actual migration text. The conversion function has TWO ways to build invoice
+    // lines now — the full-amount loop and the per-rate VAT-group loop (see
+    // offerInvoiceConversion.test.ts for the detailed rate-selection behaviour) — but neither
+    // may ever source from a recurring line.
     const code = MIGRATION_SQL.split('\n').filter((l) => !l.trim().startsWith('--')).join('\n');
     const conversion = code.slice(code.indexOf('function public.convert_owner_offer_to_invoice_draft'));
     const body = conversion.slice(0, conversion.indexOf('update public.owner_offers set converted_invoice_id'));
-    const insertStatements = body.match(/insert into public\.owner_invoice_lines[\s\S]*?;/g) ?? [];
-    expect(insertStatements).toHaveLength(1);
-    // The single insert is fed by exactly one `for` loop, and that loop's own source query is
-    // filtered to one-time lines only.
+    // Every "for v_line in select ..." loop that walks owner_offer_lines is explicitly
+    // filtered to one-time; the rate branch groups instead of looping per line, so it has no
+    // such loop at all — its own SQL guard is 'group by vat_rate_bp, vat_treatment' among
+    // one-time lines, asserted in offerInvoiceConversion.test.ts.
     const loops = body.match(/for v_line in select \* from public\.owner_offer_lines[\s\S]*?end loop;/g) ?? [];
     expect(loops).toHaveLength(1);
     expect(loops[0]).toMatch(/pricing_type = 'one_time'/);
     expect(loops[0]).not.toMatch(/pricing_type = 'recurring'/);
+    // Every query that FEEDS an insert (the full-amount loop, and the rate branch's two
+    // "group by vat_rate_bp" queries) is one-time only; the ONLY reference to
+    // pricing_type = 'recurring' anywhere in the function is the separate count used purely
+    // to report `recurring_lines_excluded` back to the caller — never to source an insert.
+    const occurrences = [...body.matchAll(/pricing_type = 'recurring'/g)];
+    expect(occurrences).toHaveLength(1);
+    const context = body.slice(Math.max(0, occurrences[0].index! - 200), occurrences[0].index!);
+    expect(context).toMatch(/select count\(\*\) into v_recurring_excluded/);
     // The excluded count is reported back to the caller (checked against the whole function,
     // since it is computed and returned after the insert loop, past the `body` truncation point).
     const fnEnd = conversion.indexOf('$fn$;');

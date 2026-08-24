@@ -11,9 +11,10 @@ import { offerStatusTone } from '@/pages/owner/OffersPage';
 import { PremiumOfferPreview } from '@/pages/owner/PremiumOfferPreview';
 import { PremiumPdfPreviewDialog } from '@/components/finance/PremiumPdfPreviewDialog';
 import { SendOfferDialog } from '@/components/finance/SendOfferDialog';
+import { ConvertOfferToInvoiceDialog } from '@/components/finance/ConvertOfferToInvoiceDialog';
 import { CustomerPortalPublishCard } from '@/components/finance/CustomerPortalPublishCard';
 import {
-  loadOffer, finalizeOffer, createOfferRevision, setOfferStatus, convertOfferToInvoiceDraft,
+  loadOffer, finalizeOffer, createOfferRevision, setOfferStatus,
   createOfferAccessToken, loadOfferAcceptanceEvents, loadGeneratedDocuments, signedDocumentUrl,
   deleteOfferDraft, loadLatestOfferVersion, loadDocumentSettings,
   loadAcceptanceSummary, signedSignatureUrl, retryAutomationJob, retryOfferAutomation,
@@ -79,6 +80,7 @@ export function OfferDetailPage() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
+  const [convertOpen, setConvertOpen] = useState(false);
   // Inline signature preview via a short-lived signed URL from the PRIVATE owner-offer-signatures bucket.
   const [sigPreview, setSigPreview] = useState<{ url: string | null; loading: boolean; error: boolean }>({ url: null, loading: false, error: false });
 
@@ -248,21 +250,10 @@ export function OfferDetailPage() {
     toast.success('Revision erstellt', 'Bearbeiten Sie den neuen Entwurf.'); navigate(`/admin/finance/offers/${id}/edit`);
   });
 
-  const convert = () => run('convert', async () => {
-    if (!offer) return;
-    const { invoiceId, recurringLinesExcluded, error: err } = await convertOfferToInvoiceDraft(offer.id);
-    if (err || !invoiceId) { toast.error('Umwandlung fehlgeschlagen', err ?? 'Unbekannt'); return; }
-    // Recurring positions are never copied onto the initial invoice — they are billed on their
-    // own interval, typically starting only after go-live. Make that explicit rather than let
-    // the owner assume the draft covers the full offer.
-    toast.success(
-      'Rechnungsentwurf erstellt',
-      recurringLinesExcluded > 0
-        ? `Bitte prüfen und stellen. ${recurringLinesExcluded} wiederkehrende Position${recurringLinesExcluded === 1 ? '' : 'en'} wurde${recurringLinesExcluded === 1 ? '' : 'n'} NICHT übernommen — diese werden separat gemäß Abrechnungsintervall berechnet.`
-        : 'Bitte prüfen und stellen.',
-    );
-    navigate(`/admin/finance/invoices/${invoiceId}`);
-  });
+  // The conversion dialog (ConvertOfferToInvoiceDialog) does the actual work: it lets the owner
+  // choose the full one-time amount or a specific payment-plan rate, and shows invoices already
+  // created from this offer before they decide. See that component for why this is not a direct
+  // one-click action.
 
   const downloadStored = (path: string) => run('stored', async () => {
     const { url, error: err } = await signedDocumentUrl(path);
@@ -300,7 +291,7 @@ export function OfferDetailPage() {
                 {['finalized', 'sent', 'viewed'].includes(offer.status) ? <Button size="sm" icon={Link2} onClick={() => setSendOpen(true)}>Angebot versenden</Button> : null}
                 {offer.status !== 'converted' && offer.status !== 'cancelled' ? <Button size="sm" variant="ghost" icon={Copy} onClick={createLink} loading={busy === 'link'}>Nur Link kopieren</Button> : null}
                 {offer.status !== 'converted' && offer.status !== 'cancelled' ? <Button size="sm" variant="secondary" icon={GitBranch} onClick={revision} loading={busy === 'revision'}>Revision erstellen</Button> : null}
-                {canConvert ? <Button size="sm" icon={Copy} onClick={convert} loading={busy === 'convert'}>Rechnungsentwurf erstellen</Button> : null}
+                {canConvert ? <Button size="sm" icon={Copy} onClick={() => setConvertOpen(true)}>Rechnungsentwurf erstellen</Button> : null}
               </>
             )}
           </div>
@@ -503,6 +494,7 @@ export function OfferDetailPage() {
             ) : null}
             <p className="mt-4 text-[12px] leading-relaxed text-gray-400">
               Angenommene Angebote werden zu einem Rechnungsentwurf. Rechnungen werden nie automatisch gestellt.
+              {offer.payment_schedule?.length ? ' Bei einem Zahlungsplan wählen Sie beim Erstellen die gewünschte Rate.' : ''}
               {pricing.hasRecurring ? ' Wiederkehrende Positionen werden dabei nicht übernommen — sie werden separat gemäß Abrechnungsintervall berechnet.' : ''}
             </p>
           </Card>
@@ -562,6 +554,14 @@ export function OfferDetailPage() {
           onSent={() => { void load({ silent: true }); }}
         />
       ) : null}
+
+      <ConvertOfferToInvoiceDialog
+        open={convertOpen}
+        offer={offer}
+        oneTimeNetCents={pricing.oneTime.netCents}
+        onClose={() => setConvertOpen(false)}
+        onDone={(invoiceId) => navigate(`/admin/finance/invoices/${invoiceId}`)}
+      />
     </>
   );
 }

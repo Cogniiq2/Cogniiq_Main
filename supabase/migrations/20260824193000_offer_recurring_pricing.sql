@@ -288,22 +288,51 @@ commit;
 
 begin;
 
+-- One additional, deliberately narrow lookup path: which invoices did this offer already
+-- produce? Without this, "did I already invoice Rate 1?" can only be answered by grepping
+-- external_reference text. This is the whole of the duplicate-instalment safeguard — no
+-- milestone-to-invoice-line mapping, no remaining-balance tracking, no scheduled billing. The
+-- owner sees what already exists and decides; the system does not try to enforce it, per the
+-- explicit instruction not to bolt a fragile partial invoice-schedule engine onto this.
+alter table public.owner_invoices
+  add column if not exists source_offer_id uuid references public.owner_offers(id) on delete set null;
+create index if not exists owner_invoices_source_offer_idx on public.owner_invoices (source_offer_id);
+
+commit;
+
+begin;
+
 -- Offer -> invoice: the initial invoice is the ONE-TIME project charge only. Recurring
 -- positions are a separate commercial track — billed per interval, on their own cadence,
 -- typically starting only after go-live/commissioning (see billing_start_type) — and are
--- deliberately NOT copied onto this invoice at all. Earlier this function copied each
--- recurring line at one billing period, which produced an initial invoice of
--- "setup + one month" the moment an offer was accepted; that silently invoices a recurring
--- charge before its own billing start has even occurred, and no customer approved a project
--- invoice that included it. Recurring invoicing is intentionally left as a future capability:
--- this function does not build it, but preserves pricing_type/billing_interval/
--- minimum_term_months/billing_start_* on the offer lines so it can be added without a schema
--- change. If a recurring-only offer is converted, the invoice is created with zero lines
--- (a valid draft the owner completes by hand); issue_owner_invoice already rejects a
--- draft with no lines or a non-positive total, so it cannot be sent unfinished.
-create or replace function public.convert_owner_offer_to_invoice_draft(p_idempotency_key uuid, p_offer_id uuid)
+-- deliberately NOT copied onto this invoice at all, in either mode below.
+--
+-- p_milestone_index selects WHAT gets invoiced from the one-time amount:
+--   * null            -> the whole one-time amount (all one-time lines, copied verbatim —
+--                        this is the historical behaviour, unchanged for an offer with no
+--                        payment plan). Terminal: sets converted_invoice_id and status =
+--                        'converted', exactly as before.
+--   * an array index into the offer's frozen payment_schedule -> ONE invoice line per
+--     (vat_rate_bp, vat_treatment) group among the one-time lines, each scaled by that
+--     milestone's share (percentage_bp, or amount_cents / one-time net). This is a rate
+--     invoice (e.g. "Rate 1 - 50 %") — an intentional, PARTIAL conversion. It does NOT set
+--     converted_invoice_id or flip the offer to 'converted': the offer stays 'accepted' so a
+--     later rate can be invoiced as its own deliberate action, exactly as the owner asked
+--     ("do not automatically create Rate 2"). Nothing tracks how much of the plan remains
+--     invoiced — that is the "no fragile subsystem" boundary; the caller lists
+--     source_offer_id-linked invoices first and shows them to the owner before this call.
+--
+-- Both modes require a positive one-time amount to invoice. An offer with no one-time content
+-- (recurring-only, or every one-time line optional) raises BEFORE any row is inserted, so a
+-- recurring-only offer can never produce an empty draft.
+create or replace function public.convert_owner_offer_to_invoice_draft(
+  p_idempotency_key uuid, p_offer_id uuid, p_milestone_index int default null
+)
 returns jsonb language plpgsql security definer set search_path = public, pg_temp as $fn$
-declare v_existing jsonb; o record; v_inv uuid; v_line record; v_terms int; v_result jsonb; v_recurring_excluded int;
+declare
+  v_existing jsonb; o record; v_inv uuid; v_line record; v_group record; v_terms int; v_result jsonb;
+  v_recurring_excluded int; v_one_time_net bigint; v_milestone jsonb; v_ratio numeric; v_label text;
+  v_group_count int; v_desc text; v_net bigint;
 begin
   if not public.is_platform_owner() then raise exception 'Owner access required'; end if;
   v_existing := public.owner_claim_idempotency(p_idempotency_key, 'convert_owner_offer_to_invoice_draft');
@@ -311,45 +340,101 @@ begin
 
   select * into o from public.owner_offers where id = p_offer_id for update;
   if o.id is null then raise exception 'offer not found'; end if;
-  -- Idempotent re-conversion: if already converted, return the existing invoice regardless of
-  -- the offer's now-'converted' status. This check must precede the accepted-status guard.
-  if o.converted_invoice_id is not null then
+  -- Idempotent re-conversion: a REPEAT of the exact same full (non-milestone) conversion
+  -- returns the existing invoice rather than raising or duplicating. This never fires for a
+  -- milestone call — that intentionally stays independent, see above.
+  if p_milestone_index is null and o.converted_invoice_id is not null then
     v_result := jsonb_build_object('invoice_id', o.converted_invoice_id, 'offer_id', p_offer_id, 'idempotent', true);
     update public.owner_finance_requests set result = v_result where idempotency_key = p_idempotency_key;
     return v_result;
   end if;
   if o.status <> 'accepted' then raise exception 'only accepted offers can be converted'; end if;
 
+  select coalesce(sum(net_cents), 0) into v_one_time_net from public.owner_offer_lines
+    where offer_id = p_offer_id and is_optional = false and pricing_type = 'one_time';
+  if v_one_time_net <= 0 then
+    raise exception 'offer has no invoiceable one-time position — recurring positions are billed separately';
+  end if;
+
+  v_label := null; v_ratio := null;
+  if p_milestone_index is not null then
+    if jsonb_typeof(o.payment_schedule) <> 'array' or p_milestone_index < 0
+       or p_milestone_index >= jsonb_array_length(o.payment_schedule) then
+      raise exception 'invalid payment milestone index';
+    end if;
+    v_milestone := o.payment_schedule -> p_milestone_index;
+    v_label := coalesce(v_milestone->>'label', 'Rate ' || (p_milestone_index + 1));
+    if v_milestone ? 'percentage_bp' and (v_milestone->>'percentage_bp') is not null then
+      v_ratio := (v_milestone->>'percentage_bp')::numeric / 10000;
+      v_label := v_label || ' (' || round((v_milestone->>'percentage_bp')::numeric / 100, 2) || ' %)';
+    elsif v_milestone ? 'amount_cents' and (v_milestone->>'amount_cents') is not null then
+      v_ratio := (v_milestone->>'amount_cents')::numeric / v_one_time_net;
+    else
+      raise exception 'payment milestone has neither a percentage nor an amount';
+    end if;
+    if v_ratio <= 0 then raise exception 'payment milestone resolves to a non-positive amount'; end if;
+  end if;
+
   select coalesce(default_payment_terms_days, 14) into v_terms from public.owner_document_settings where business_entity_id = o.business_entity_id;
   v_terms := coalesce(v_terms, 14);
 
   insert into public.owner_invoices (business_entity_id, organization_id, client_account_id, engagement_id,
-    status, issue_date, service_date, due_date, currency, notes, external_reference, created_by)
-  values (o.business_entity_id, o.organization_id, o.client_account_id, o.engagement_id, 'draft',
+    source_offer_id, status, issue_date, service_date, due_date, currency, notes, external_reference, created_by)
+  values (o.business_entity_id, o.organization_id, o.client_account_id, o.engagement_id, o.id, 'draft',
     current_date, current_date, current_date + v_terms, o.currency,
     coalesce(o.payment_terms, ''), 'Angebot ' || coalesce(o.offer_number, o.id::text), auth.uid())
   returning id into v_inv;
 
-  -- One-time positions only: copied as agreed. Recurring positions are never copied here.
-  for v_line in select * from public.owner_offer_lines
-    where offer_id = p_offer_id and is_optional = false and pricing_type = 'one_time' order by sort_order loop
-    insert into public.owner_invoice_lines (invoice_id, description, quantity_milli, unit_price_cents, vat_rate_bp, vat_treatment, sort_order)
-    values (v_inv, v_line.description, v_line.quantity_milli, v_line.unit_price_cents, v_line.vat_rate_bp, v_line.vat_treatment, v_line.sort_order);
-  end loop;
+  if p_milestone_index is null then
+    -- Full one-time amount: copied verbatim, one invoice line per offer line, unchanged from
+    -- the pre-payment-plan behaviour.
+    for v_line in select * from public.owner_offer_lines
+      where offer_id = p_offer_id and is_optional = false and pricing_type = 'one_time' order by sort_order loop
+      insert into public.owner_invoice_lines (invoice_id, description, quantity_milli, unit_price_cents, vat_rate_bp, vat_treatment, sort_order)
+      values (v_inv, v_line.description, v_line.quantity_milli, v_line.unit_price_cents, v_line.vat_rate_bp, v_line.vat_treatment, v_line.sort_order);
+    end loop;
+  else
+    -- A rate: one invoice line per (vat_rate_bp, vat_treatment) group among the one-time
+    -- lines, each scaled by the milestone's ratio. Grouping by VAT (not copying original
+    -- lines 1:1) is what keeps a partial invoice correct when the one-time amount spans more
+    -- than one VAT treatment; for the common single-treatment case (e.g. SVH Admin) this is
+    -- exactly one line at label + rate.
+    select count(*) into v_group_count from (
+      select 1 from public.owner_offer_lines
+      where offer_id = p_offer_id and is_optional = false and pricing_type = 'one_time'
+      group by vat_rate_bp, vat_treatment
+    ) g;
+    for v_group in
+      select vat_rate_bp, vat_treatment, sum(net_cents) as grp_net from public.owner_offer_lines
+      where offer_id = p_offer_id and is_optional = false and pricing_type = 'one_time'
+      group by vat_rate_bp, vat_treatment order by vat_rate_bp desc
+    loop
+      v_net := round(v_group.grp_net * v_ratio);
+      v_desc := v_label || case when v_group_count > 1 then format(' (%s USt)', v_group.vat_rate_bp / 100.0) else '' end;
+      insert into public.owner_invoice_lines (invoice_id, description, quantity_milli, unit_price_cents, vat_rate_bp, vat_treatment, sort_order)
+      values (v_inv, v_desc, 1000, v_net, v_group.vat_rate_bp, v_group.vat_treatment, 0);
+    end loop;
+  end if;
 
   select count(*) into v_recurring_excluded from public.owner_offer_lines
     where offer_id = p_offer_id and is_optional = false and pricing_type = 'recurring';
 
-  update public.owner_offers set converted_invoice_id = v_inv, converted_at = now(), status = 'converted' where id = p_offer_id;
+  -- Only a FULL conversion is terminal. A rate invoice leaves the offer 'accepted' so the next
+  -- rate — or the eventual full remainder — stays a possible, deliberate future action.
+  if p_milestone_index is null then
+    update public.owner_offers set converted_invoice_id = v_inv, converted_at = now(), status = 'converted' where id = p_offer_id;
+  end if;
 
-  v_result := jsonb_build_object('invoice_id', v_inv, 'offer_id', p_offer_id, 'recurring_lines_excluded', v_recurring_excluded);
+  v_result := jsonb_build_object(
+    'invoice_id', v_inv, 'offer_id', p_offer_id, 'recurring_lines_excluded', v_recurring_excluded,
+    'milestone_label', v_label, 'is_full_conversion', p_milestone_index is null);
   update public.owner_finance_requests set result = v_result where idempotency_key = p_idempotency_key;
   return v_result;
 end;
 $fn$;
 
-revoke execute on function public.convert_owner_offer_to_invoice_draft(uuid, uuid) from public, anon;
-grant execute on function public.convert_owner_offer_to_invoice_draft(uuid, uuid) to authenticated, service_role;
+revoke execute on function public.convert_owner_offer_to_invoice_draft(uuid, uuid, int) from public, anon;
+grant execute on function public.convert_owner_offer_to_invoice_draft(uuid, uuid, int) to authenticated, service_role;
 
 commit;
 

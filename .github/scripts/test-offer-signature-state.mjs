@@ -117,8 +117,13 @@ ok(!/getPublicUrl/.test(detail), '7: detail page never builds a public URL');
 ok(/loadAcceptanceSummary\(/.test(detail), '8: detail page loads owner_offer_acceptance_summary');
 ok(/visibilitychange/.test(detail) && /addEventListener\('focus'/.test(detail), '8: refetches acceptance data on focus/visibility');
 
-// 10. existing offer + invoice functionality preserved (key wiring still present).
-ok(/convertOfferToInvoiceDraft\(/.test(detail), '10: convert-to-invoice action preserved');
+// 10. existing offer + invoice functionality preserved (key wiring still present). The
+// convert-to-invoice action now goes through ConvertOfferToInvoiceDialog (payment-plan rate
+// selection), so the detail page is checked for wiring the dialog, and the dialog itself is
+// checked for the actual RPC call.
+const convertDialog = read('src/components/finance/ConvertOfferToInvoiceDialog.tsx');
+ok(/<ConvertOfferToInvoiceDialog/.test(detail), '10: detail page renders the convert-to-invoice dialog');
+ok(/convertOfferToInvoiceDraft\(/.test(convertDialog), '10: convert-to-invoice action preserved (in the dialog)');
 ok(/finalizeOffer\(/.test(detail) && /createOfferRevision\(/.test(detail), '10: finalize + revision actions preserved');
 
 // Summary interface exposes every field the summary RPC returns (path + hash + level + evidence).
