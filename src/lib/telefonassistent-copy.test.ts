@@ -11,7 +11,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { FAKTEN, TARIFE } from "./telefonassistent-copy";
+import { FAKTEN, GO_LIVE_GARANTIE, TARIFE } from "./telefonassistent-copy";
 
 const ROOT = join(__dirname, "..", "..");
 
@@ -87,5 +87,64 @@ describe("Kernaussagen liegen an genau einer Stelle", () => {
     expect(FAKTEN.laufzeit).toContain(String(FAKTEN.laufzeitMonate));
     expect(FAKTEN.laufzeit).toContain(FAKTEN.monatlichAufschlag);
     expect(FAKTEN.preisgarantie).toContain(String(FAKTEN.preisgarantieMonate));
+  });
+});
+
+/*
+  Die Go-live-Garantie ist die einzige Zusage der Website mit unmittelbarer
+  Geldfolge. Sie ist damit die Aussage, bei der Drift am teuersten ist: Eine
+  zu kurze Frist macht uns fuer einen Termin haftbar, den der Vertrag nicht
+  traegt, und eine bedingungslose Frist macht uns fuer Verzoegerungen haftbar,
+  die der Kunde selbst verursacht. Beides wird hier festgehalten.
+
+  Bewusst eng gefasst: geprueft werden nur die Zusage-Konstanten selbst und
+  eindeutig veraltete Fristvarianten, nicht beliebiger Fliesstext.
+*/
+describe("Go-live-Garantie bleibt vertragssicher", () => {
+  /** Fristvarianten, die einmal auf der Seite standen und nicht zurueckkehren duerfen. */
+  const VERALTET: RegExp[] = [
+    /\b7\s?Tage[n]?\s+nach\s+Zahlungseingang/,
+    /7-Tage-Garantie/,
+    /sieben\s+Tage/i,
+    /innerhalb\s+einer\s+Woche/i,
+  ];
+
+  const ZUSAGEN = [
+    FAKTEN.goLive,
+    FAKTEN.goLiveStart,
+    FAKTEN.goLiveOhneAntrag,
+    FAKTEN.goLivePause,
+    FAKTEN.zahlungsaufteilung,
+  ];
+
+  it("nennt keine veraltete Frist", () => {
+    for (const zusage of ZUSAGEN) {
+      for (const alt of VERALTET) expect(zusage).not.toMatch(alt);
+    }
+  });
+
+  it("laesst die Frist nicht bedingungslos ab Zahlungseingang laufen", () => {
+    // Der Ausloeser gehoert in goLiveStart, nicht in die Zusage selbst. Stuende
+    // "nach Zahlungseingang" wieder in goLive, waere die Frist wieder unbedingt
+    // — und Schritt 5 der Einrichtung liegt vollstaendig beim Kunden.
+    expect(FAKTEN.goLive).not.toMatch(/nach\s+Zahlungseingang/);
+    expect(FAKTEN.goLive).toContain("nach dem Start");
+  });
+
+  it("definiert den Fristbeginn und die Pause bei Kundenverzug", () => {
+    expect(FAKTEN.goLiveStart).toContain("erste Hälfte");
+    expect(FAKTEN.goLiveStart).toMatch(/vollständig/);
+    expect(FAKTEN.goLivePause).toMatch(/pausiert/);
+  });
+
+  it("verlangt vom Kunden keinen Antrag", () => {
+    expect(FAKTEN.goLiveOhneAntrag).toMatch(/nichts geltend machen/);
+  });
+
+  it("stellt die Zusage vollstaendig im Garantie-Block dar", () => {
+    // Die Zusage darf nie ohne ihren Ausloeser erscheinen.
+    expect(GO_LIVE_GARANTIE.text).toContain(FAKTEN.goLive);
+    expect(GO_LIVE_GARANTIE.mechanik).toContain(FAKTEN.goLiveStart);
+    expect(GO_LIVE_GARANTIE.mechanik).toContain(FAKTEN.goLivePause);
   });
 });

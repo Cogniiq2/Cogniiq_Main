@@ -74,10 +74,31 @@ export const FAKTEN = {
   /*
     Die Zusage nennt zuerst die Frist, dann die Folge, in zwei kurzen Saetzen.
     Eine Garantie, die erklaert werden muss, wirkt nicht wie eine Garantie.
-    Bezugspunkt ist der Zahlungseingang, nicht der Vertragsabschluss: Die Frist
-    laeuft erst mit der ersten Haelfte an, und das ist fuer beide Seiten pruefbar.
+    Bezugspunkt ist "der Start", nicht der Zahlungseingang allein: siehe
+    goLiveStart. Eine Frist, die ab Geldeingang unbedingt laeuft, macht uns fuer
+    Verzoegerungen haftbar, die der Kunde selbst verursacht.
   */
-  goLive: `Ihr Empfang geht spätestens zwei Wochen nach Zahlungseingang live. Halten wir diesen Termin nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.`,
+  goLive: `Ihr Empfang geht spätestens zwei Wochen nach dem Start live. Halten wir diesen Termin nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.`,
+
+  /*
+    Der Fristbeginn ist eine eigene Aussage, weil er der Punkt ist, an dem die
+    Garantie kippen kann. Vorher lief die Frist unbedingt ab Zahlungseingang —
+    Schritt 5 der Einrichtung ("Ihre Vorgaben") liegt aber vollstaendig beim
+    Kunden. Wer seine Angaben zehn Tage liegen laesst, haette die Frist selbst
+    reissen und dafuer die zweite Haelfte einbehalten koennen.
+  */
+  goLiveStart: `Der Start ist der Tag, an dem die erste Hälfte der Einrichtungsgebühr eingegangen ist und Ihre Angaben für die Einrichtung vollständig vorliegen: Stimme, Begrüßung, Anliegen, Regeln und Weiterleitungen.`,
+
+  /** Keine Antragspflicht — das ist der Teil, der die Zusage glaubwuerdig macht. */
+  goLiveOhneAntrag: `Sie müssen dafür nichts geltend machen und keine Nachfrist setzen: Wir stellen die zweite Hälfte dann einfach nicht in Rechnung.`,
+
+  /*
+    Fairness in beide Richtungen, in einem Satz. Bewusst keine Ausschlussliste:
+    Rufnummernportierung kommt nicht vor (es wird umgeleitet, nicht portiert),
+    und breite Ausschluesse wuerden genau die Verbindlichkeit zerreden, die das
+    staerkste Verkaufsargument der Seite ist.
+  */
+  goLivePause: `Warten wir auf etwas, das nur von Ihnen kommen kann — eine Angabe, eine Freigabe, einen Zugang —, pausiert die Frist so lange und läuft danach weiter. Alles andere liegt bei uns.`,
 
   /** Zahlungsaufteilung — erklaert, warum die Garantie ueberhaupt greifen kann. */
   zahlungsaufteilung: `Die Einrichtungsgebühr zahlen Sie zur Hälfte bei Vertragsabschluss, zur zweiten Hälfte nach dem Go-live.`,
@@ -201,7 +222,7 @@ export const EINRICHTUNG_SCHRITTE: Array<{
     step: "05",
     title: "Testphase und Go-live",
     description:
-      `Zwei Tage testen wir gemeinsam. Live geht der Assistent erst, wenn Ihre Praxis zufrieden ist — spätestens ${FAKTEN.goLiveFrist} nach Zahlungseingang.`,
+      `Zwei Tage testen wir gemeinsam. Live geht der Assistent erst, wenn Ihre Praxis zufrieden ist — spätestens ${FAKTEN.goLiveFrist} nach dem Start.`,
   },
 ];
 
@@ -550,7 +571,7 @@ export const EINRICHTUNG_PROJEKT = {
       nummer: "5",
       title: "Ihre Vorgaben",
       dauer: null,
-      text: "Ein geführter Ablauf im Dashboard: Stimme, Begrüßungssatz, Anliegen, Regeln, Weiterleitungen. Ihre Angaben gehen direkt an uns.",
+      text: "Ein geführter Ablauf im Dashboard: Stimme, Begrüßungssatz, Anliegen, Regeln, Weiterleitungen. Ihre Angaben gehen direkt an uns — sobald sie vollständig sind, beginnt die Zwei-Wochen-Frist.",
     },
     {
       nummer: "6",
@@ -567,8 +588,8 @@ export const EINRICHTUNG_PROJEKT = {
     {
       nummer: "8",
       title: "Go-live",
-      dauer: `spätestens ${FAKTEN.goLiveFrist} nach Zahlungseingang`,
-      text: `Garantiert innerhalb von ${FAKTEN.goLiveFrist} nach Zahlungseingang. ${FAKTEN.zahlungsaufteilung}`,
+      dauer: `spätestens ${FAKTEN.goLiveFrist} nach dem Start`,
+      text: `Garantiert innerhalb von ${FAKTEN.goLiveFrist} nach dem Start. ${FAKTEN.goLiveStart}`,
     },
   ],
 };
@@ -582,15 +603,16 @@ export const GO_LIVE_GARANTIE = {
   text: `${FAKTEN.goLive} Das steht so im Vertrag, nicht nur auf dieser Seite.`,
 
   /*
-    Der Mechanismus gehoert dazu. Eine Frist ohne Folge ist eine Absichts-
-    erklaerung; eine Frist mit Geldfolge ist eine Zusage. Der dritte Satz
-    benennt, wer das Risiko traegt — das ist der Punkt, an dem diese Garantie
-    sich von "wir sind schnell" unterscheidet.
+    Reihenfolge ist die Leseordnung der Frage, die der Kunde tatsaechlich hat:
+    Wie zahle ich? -> Ab wann laeuft die Uhr? -> Was passiert, wenn ihr zu spaet
+    seid? -> Und wenn es an mir liegt? Eine Frist ohne Folge ist eine Absichts-
+    erklaerung; eine Frist ohne Startpunkt ist ein offenes Risiko.
   */
   mechanik: [
     FAKTEN.zahlungsaufteilung,
-    "Verpassen wir die Frist, fordern wir die zweite Hälfte nicht ein. Sie müssen dafür nichts geltend machen und keine Nachfrist setzen.",
-    "Das Risiko einer Verzögerung liegt damit bei uns — dort, wo wir es beeinflussen können.",
+    FAKTEN.goLiveStart,
+    FAKTEN.goLiveOhneAntrag,
+    FAKTEN.goLivePause,
   ],
 };
 
@@ -675,7 +697,7 @@ export const UMKEHRBARKEIT = {
     },
   ],
   vetorecht:
-    `Die Testphase ist kein kostenloser Test. Sie ist der Punkt, an dem Sie ein Vetorecht haben: Ohne Ihre Freigabe geht der Empfang nicht live, und halten wir die ${FAKTEN.goLiveFrist} nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.`,
+    `Die Testphase ist kein kostenloser Test. Sie ist der Punkt, an dem Sie ein Vetorecht haben: Ohne Ihre Freigabe geht der Empfang nicht live. Die Zwei-Wochen-Frist deckt unsere Arbeit bis zur Übergabe an Sie ab; wie lange Sie danach prüfen möchten, entscheiden Sie selbst.`,
   // [[CLAIM: Was mit den gespeicherten Ergebnissen nach Vertragsende geschieht,
   // ist nicht beantwortet (Brief II §4.7). Bis dahin keine Aussage dazu.]]
 };
