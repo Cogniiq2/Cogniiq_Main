@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
+import { railWindow } from './sectionRailWindow';
+
 /*
   SectionRail — minimal section orientation, fixed to the right viewport edge.
 
@@ -55,10 +57,15 @@ function labelFor(el: Element): string {
 /*
   Most pages ship `<section>` elements without an id, so the rail discovers
   every top-level section itself and assigns a stable id where none exists.
-  Nested sections, chrome and short strips are skipped; the list is capped so
-  long pillar pages stay legible.
+  Nested sections, chrome and short strips are skipped.
+
+  EVERY qualifying section is tracked. An earlier version capped the tracked
+  list at MAX_LINES, which silently truncated long pillar pages: /praxen has 19
+  sections over 21,000px, so the ninth line stayed active for the final ~66% of
+  the page and the rail claimed the reader was still in section 9 while they
+  were in pricing, support or the FAQ. The cap belongs to the DISPLAY, not to
+  the tracking — see `railWindow`.
 */
-const MAX_LINES = 9;
 const MIN_SECTION_HEIGHT = 220;
 
 function collectSections(): RailSection[] {
@@ -68,13 +75,18 @@ function collectSections(): RailSection[] {
     if (el.parentElement?.closest('section')) return false; // nested section
     return el.getBoundingClientRect().height > MIN_SECTION_HEIGHT;
   });
-  return top.slice(0, MAX_LINES).map((el, i) => {
+  return top.map((el, i) => {
     if (!el.id) el.id = `abschnitt-${i + 1}`;
     // keep scrolled-to sections clear of the fixed navigation
     (el as HTMLElement).style.scrollMarginTop = '84px';
     return { id: el.id, label: labelFor(el) };
   });
 }
+
+/*
+  The rail stays compact — at most MAX_LINES slots — while the section list behind it
+  may be far longer. `railWindow` owns that reduction; see sectionRailWindow.ts.
+*/
 
 export function SectionRail() {
   const location = useLocation();
@@ -176,6 +188,11 @@ export function SectionRail() {
 
   if (sections.length < 3) return null;
 
+  // The active line is always inside the window, so the reader is never shown a
+  // rail whose highlighted section is the wrong one.
+  const activeIndex = Math.max(0, sections.findIndex((s) => s.id === activeId));
+  const items = railWindow(sections.length, activeIndex);
+
   return (
     <nav
       aria-label="Abschnitte dieser Seite"
@@ -183,7 +200,19 @@ export function SectionRail() {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {sections.map((s) => {
+      {items.map((item) => {
+        if (item.kind === 'gap') {
+          // A collapsed stretch. Decorative and inert: the sections it stands
+          // for are still tracked and still reachable by scrolling.
+          return (
+            <span
+              key={item.key}
+              aria-hidden="true"
+              className="block h-px w-2 rounded-full bg-pub-hairline-soft"
+            />
+          );
+        }
+        const s = sections[item.index];
         const active = s.id === activeId;
         const showLabel = active || hovered;
         return (
