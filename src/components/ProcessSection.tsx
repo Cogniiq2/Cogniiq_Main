@@ -169,7 +169,7 @@ export function ProcessSection() {
                   to="/kontakt"
                   className="font-medium text-gray-700 hover:text-gray-900 transition-colors underline underline-offset-2 decoration-gray-200"
                 >
-                  Jetzt starten
+                  Nächster Schritt
                 </Link>
                 .
               </p>

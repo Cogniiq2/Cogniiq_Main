@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, ChevronRight, Globe, Phone, Zap, Mail, MapPin, Clock, CircleCheck as CheckCircle2 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
-import { BUSINESS_INFO, getGoogleMapsUrl, getGoogleMapsEmbedUrl } from "@/lib/seo-data";
+import { BUSINESS_INFO, PHONE_HREF, getGoogleMapsUrl, getGoogleMapsEmbedUrl } from "@/lib/seo-data";
 import { ContactSection } from "@/components/ContactSection";
 
 const fadeUp = {
@@ -464,7 +464,7 @@ export function KontaktPage() {
                     </span>
                   </a>
                   <a
-                    href={`tel:${BUSINESS_INFO.contact.phone}`}
+                    href={PHONE_HREF}
                     className="flex items-center gap-3 group"
                   >
                     <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center flex-shrink-0 group-hover:border-gray-400 dark:group-hover:border-gray-500 transition-colors">

@@ -11,7 +11,7 @@ import { PageSEO } from "@/components/PageSEO";
 import { RelatedPages } from "@/components/RelatedPages";
 import { StimmprobeSection } from "@/components/StimmprobeSection";
 import { TelefonassistentKompaktSection } from "@/components/TelefonassistentKompaktSection";
-import { BUSINESS_INFO } from "@/lib/seo-data";
+import { BUSINESS_INFO, PHONE_HREF } from "@/lib/seo-data";
 import { FAKTEN } from "@/lib/telefonassistent-copy";
 import type { CityServiceConfig } from "@/lib/standorte-data";
 
@@ -250,8 +250,8 @@ function TrustStrip({ config }: { config: CityServiceConfig }) {
   // Zwei Angaben standen hier und hielten der Prüfung nicht stand:
   // - „DSGVO-konform" als Selbstzusage — auf keiner Seite belegt, siehe
   //   Hero-Kommentar. Ersatzlos gestrichen, nicht umformuliert.
-  // - „Einrichtung in 7–14 Tagen" widerspricht der Go-live-Garantie aus
-  //   FAKTEN.goLive. Die Angabe wurde in den Stadt-Configs bereits an vier
+  // - „Einrichtung in 7–14 Tagen" widerspricht der Zwei-Wochen-Garantie aus
+  //   FAKTEN.uebergabeGarantie. Die Angabe wurde in den Stadt-Configs bereits an vier
   //   Stellen korrigiert und lebte hier — in der geteilten Komponente —
   //   unbemerkt weiter (die Fehlerklasse aus HONESTY-AUDIT §7).
   const isTelefonassistent = config.serviceSlug === "ki-telefonassistent";
@@ -261,7 +261,7 @@ function TrustStrip({ config }: { config: CityServiceConfig }) {
     "Bayern",
     "Persönliche Betreuung",
     ...(isTelefonassistent
-      ? ["Keine Gesprächsaufzeichnung", `Go-live in ${FAKTEN.goLiveTage}\u00A0Tagen`]
+      ? ["Keine Gesprächsaufzeichnung", `Eingerichtet in ${FAKTEN.einrichtungsfrist}`]
       : ["Persönliche Einrichtung"]),
   ];
 
@@ -375,7 +375,7 @@ function MidPageCTA({ config }: { config: CityServiceConfig }) {
             </Link>
             {BUSINESS_INFO.contact.phone && (
               <a
-                href={`tel:${BUSINESS_INFO.contact.phone.replace(/\s/g, "")}`}
+                href={PHONE_HREF}
                 className="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm hover:border-gray-500 dark:hover:border-gray-400 transition-colors whitespace-nowrap"
               >
                 <Phone size={14} />

@@ -191,8 +191,8 @@ const PROCESS_STEPS = [
 
 const FAQ_ITEMS = [
   {
-    q: "Wie schnell ist ein Go-Live realistisch?",
-    a: "Einzelne Workflows wie Terminbestätigungen oder der KI-Telefonassistent sind oft in 7–14 Tagen live. Vollständige Systemverbünde aus Website, KI-Assistenten und Automatisierung planen wir in 3–6 Wochen — abhängig vom Scope und wie schnell Feedback kommt.",
+    q: "Wie schnell ist ein Start realistisch?",
+    a: "Der KI-Telefonassistent ist spätestens zwei Wochen nach dem Start vollständig eingerichtet und bereit für Ihre Freigabe; live geschaltet wird er erst nach Ihrer Freigabe. Einzelne Workflows wie Terminbestätigungen liegen in einer ähnlichen Größenordnung. Vollständige Systemverbünde aus Website, KI-Assistenten und Automatisierung planen wir in 3–6 Wochen — abhängig vom Scope und wie schnell Feedback kommt.",
   },
   {
     q: "Was kostet ein System?",

@@ -70,6 +70,27 @@ export default {
           4: 'hsl(var(--chart-4))',
           5: 'hsl(var(--chart-5))',
         },
+        // Public marketing brand ramp. Defined under `html.cq-public-light` in
+        // index.css, so these utilities resolve only on public surfaces and can
+        // never leak into the authenticated dashboard, which owns `--cq-*`.
+        pub: {
+          ink: 'var(--pub-ink)',
+          'ink-2': 'var(--pub-ink-2)',
+          'ink-3': 'var(--pub-ink-3)',
+          'ink-4': 'var(--pub-ink-4)',
+          paper: 'var(--pub-paper)',
+          'paper-2': 'var(--pub-paper-2)',
+          card: 'var(--pub-card)',
+          signal: 'var(--pub-signal)',
+          'signal-ink': 'var(--pub-signal-ink)',
+          'signal-wash': 'var(--pub-signal-wash)',
+          verify: 'var(--pub-verify)',
+          'verify-wash': 'var(--pub-verify-wash)',
+          caution: 'var(--pub-caution)',
+          'caution-wash': 'var(--pub-caution-wash)',
+          hairline: 'var(--pub-hairline)',
+          'hairline-soft': 'var(--pub-hairline-soft)',
+        },
       },
       keyframes: {
         'accordion-down': {

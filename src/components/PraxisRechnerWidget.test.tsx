@@ -16,9 +16,18 @@ function regler(): HTMLInputElement {
 }
 
 describe('Praxis-Rechner — Automatisierungsgrad', () => {
-  it('steht beim Öffnen auf 90 %', () => {
+  // Vorgabewert am 23.08.2026 von 90 % auf 20 % gesenkt. 90 % war eine Aussage
+  // über das eigene Produkt ohne Beleg: OWNER-INPUT F4 (gemessene Übernahmequote)
+  // ist unbeantwortet, COPY-BRIEF §5.7 deckelt die einzige dokumentierte, vom
+  // Käufer selbst gerechnete Spanne bei 10–20 % netto, und §2.4 verbietet die
+  // Zusage, der Assistent übernehme „die Mehrheit" der Anrufe.
+  //
+  // 20 % ist die Obergrenze der belegten Spanne. Dieser Test hält den Wert fest,
+  // damit er nicht unbemerkt zurückwandert — erhöht werden darf er erst, wenn F4
+  // mit einer gemessenen Zahl beantwortet ist.
+  it('steht beim Öffnen auf 20 % — der belegten Obergrenze', () => {
     render(<PraxisRechnerWidget />);
-    expect(regler().value).toBe('90');
+    expect(regler().value).toBe('20');
   });
 
   it('ist vom Besucher über die ganze Spanne einstellbar', () => {

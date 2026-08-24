@@ -210,7 +210,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Wie schnell können Projekte starten?",
-    a: "KI-Telefonassistenten gehen nach Aufnahme Ihrer Vorgaben live. Einfache Automatisierungen in 1–2 Wochen. Websites je nach Umfang in 4–12 Wochen. Realistischer Zeitplan nach dem Erstgespräch.",
+    a: "KI-Telefonassistenten sind zwei Wochen nach dem Start eingerichtet und bereit für Ihre Freigabe; live geschaltet werden sie erst danach. Einfache Automatisierungen in 1–2 Wochen. Websites je nach Umfang in 4–12 Wochen. Realistischer Zeitplan nach dem Erstgespräch.",
   },
   {
     q: "Was kostet ein Projekt mit Cogniiq in Deutschland?",

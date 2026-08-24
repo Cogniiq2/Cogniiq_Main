@@ -35,6 +35,7 @@ import { ChevronDown, ArrowUpRight, ArrowRight } from 'lucide-react';
 import { Logo } from './Logo';
 import { PremiumMobileNav } from './ui/premium-mobile-nav';
 import { ScrollProgress } from './ScrollProgress';
+import { SectionRail } from './SectionRail';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   HAUPTSITZ_SLUG,
@@ -266,6 +267,9 @@ export function Navigation() {
 
       <PremiumMobileNav />
       <ScrollProgress />
+      {/* Section orientation for every public page, not just the homepage. The rail
+          hides itself on pages with fewer than three qualifying sections. */}
+      <SectionRail />
     </>
   );
 }

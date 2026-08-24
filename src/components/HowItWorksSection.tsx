@@ -248,7 +248,7 @@ export function HowItWorksSection() {
                 to="/kontakt"
                 className="group inline-flex items-center gap-1.5 text-[13px] font-semibold text-gray-700 hover:text-gray-900 transition-colors"
               >
-                Jetzt starten
+                Nächster Schritt
                 <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
               </Link>
             </div>

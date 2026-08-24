@@ -30,7 +30,9 @@ function CountUp({ to, suffix = '', prefix = '' }: { to: number; suffix?: string
   );
 }
 
-// [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1) bestätigen]]
+// Kanonisch: 14 Kalendertage bis zur Übergabe zur Freigabe, nicht bis zum
+// Go-live (FAKTEN.einrichtungsfristTage). Der Go-live haengt an der Freigabe
+// des Kunden und darf hier deshalb nie als Frist erscheinen.
 const stats = [
   {
     display: 'Auch nachts',
@@ -43,10 +45,12 @@ const stats = [
   },
   {
     display: null,
-    numeric: { to: 14, prefix: '< ', suffix: '' },
-    label: 'Tage bis zum Go-Live',
-    sub: 'Typischer Projektzeitraum',
-    context: 'Live erst nach Ihrer Freigabe',
+    // Kein "< 14": die Zusage lautet SPÄTESTENS zwei Wochen. Ein "kleiner als"
+    // verspricht 13 und macht die Zahl damit wieder falsch.
+    numeric: { to: 14, prefix: '', suffix: '' },
+    label: 'Tage bis zur Übergabe',
+    sub: 'Spätestens, gerechnet ab dem Start',
+    context: 'Live geschaltet wird erst nach Ihrer Freigabe',
     href: '/kontakt',
     accent: true,
   },

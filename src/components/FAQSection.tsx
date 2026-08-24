@@ -13,7 +13,9 @@ const faqs = [
   },
   {
     question: 'Wie schnell könnt ihr starten?',
-    // [[CLAIM: verify — Startzeitraum 7–14 Tage (OWNER-INPUT E1)]]
+    // Kanonisch: 14 Kalendertage ab dem Start bis zur Übergabe zur Freigabe
+    // (FAKTEN.uebergabeGarantie). Der Go-live hängt an der Kundenfreigabe und
+    // darf hier nie mit einer Frist verbunden werden.
     answer:
       'Das hängt vom Projektumfang und der Auslastung ab – wir nennen Ihnen im Erstgespräch einen konkreten Termin.',
     category: 'Ablauf',
