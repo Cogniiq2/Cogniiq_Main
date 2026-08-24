@@ -202,6 +202,18 @@ export async function deleteDraftInvoice(invoiceId: string): Promise<{ error: st
   return { error: error?.message ?? null };
 }
 
+/**
+ * Delete an unreviewed, unpaid expense.
+ *
+ * The RPC has existed since the finance cockpit migration but had no caller, so
+ * a mistyped expense could only be worked around. The server still refuses once
+ * the expense is reviewed, paid, or carries payments or documents.
+ */
+export async function deleteDraftExpense(expenseId: string): Promise<{ error: string | null }> {
+  const { error } = await supabase.rpc('delete_owner_draft_expense', { p_expense_id: expenseId });
+  return { error: error?.message ?? null };
+}
+
 export async function loadExpenses(entityId: string): Promise<OwnerExpense[]> {
   const { data, error } = await supabase
     .from('owner_expenses').select('*').eq('business_entity_id', entityId)

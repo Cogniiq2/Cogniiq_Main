@@ -6,7 +6,8 @@
 import { supabase } from '@/lib/supabase';
 import { secureUuid } from '@/lib/ownerFinance/api';
 import type {
-  OwnerCustomerListRow, OwnerCustomerDetail, OwnerCustomerStatus, OwnerCustomerTaskStatus,
+  OwnerCustomerListRow, OwnerCustomerDetail, OwnerCustomerDeleteBlockers,
+  OwnerCustomerStatus, OwnerCustomerTaskStatus,
 } from '@/lib/ownerFinance/types';
 
 /* ----------------------------------------------------------------- Customers */
@@ -58,6 +59,75 @@ export async function updateCustomer(customerId: string, patch: Partial<Customer
 
 export async function setCustomerStatus(customerId: string, status: OwnerCustomerStatus): Promise<{ error: string | null }> {
   const { error } = await supabase.rpc('owner_set_customer_status', { p_customer_id: customerId, p_status: status });
+  return { error: error?.message ?? null };
+}
+
+/**
+ * What stands between this customer and permanent deletion.
+ *
+ * Read before opening the delete dialog so the confirmation can name the
+ * blockers ("2 ausgestellte Rechnungen") instead of only refusing. The same
+ * function is re-evaluated inside `owner_delete_customer`, so a stale UI can
+ * never talk the server into deleting protected records.
+ */
+export async function loadDeleteBlockers(customerId: string): Promise<OwnerCustomerDeleteBlockers | null> {
+  const { data, error } = await supabase.rpc('owner_customer_delete_blockers', { p_customer_id: customerId });
+  if (error) throw error;
+  return (data as OwnerCustomerDeleteBlockers | null) ?? null;
+}
+
+/**
+ * Permanently delete a customer together with its never-issued drafts.
+ *
+ * Refused by the server — and by the ON DELETE RESTRICT foreign keys underneath
+ * it — as soon as one issued invoice, payment, finalized offer or subscription
+ * exists. Those customers are archived instead; nothing cascades into
+ * accounting data.
+ */
+export async function deleteCustomer(customerId: string): Promise<{
+  deleted: boolean; deletedDraftOffers: number; deletedDraftInvoices: number; error: string | null;
+}> {
+  const { data, error } = await supabase.rpc('owner_delete_customer', { p_customer_id: customerId });
+  if (error) return { deleted: false, deletedDraftOffers: 0, deletedDraftInvoices: 0, error: error.message };
+  const r = data as { deleted?: boolean; deleted_draft_offers?: number; deleted_draft_invoices?: number };
+  return {
+    deleted: r?.deleted ?? false,
+    deletedDraftOffers: r?.deleted_draft_offers ?? 0,
+    deletedDraftInvoices: r?.deleted_draft_invoices ?? 0,
+    error: null,
+  };
+}
+
+/** Hide from the active CRM and from finance selectors. Destroys nothing. */
+export async function archiveCustomer(customerId: string): Promise<{ error: string | null }> {
+  const { error } = await supabase.rpc('owner_archive_customer', { p_customer_id: customerId });
+  return { error: error?.message ?? null };
+}
+
+export async function unarchiveCustomer(customerId: string): Promise<{ error: string | null }> {
+  const { error } = await supabase.rpc('owner_unarchive_customer', { p_customer_id: customerId });
+  return { error: error?.message ?? null };
+}
+
+/* ----------------------------------------------------------------- Invoices */
+
+/**
+ * Storno, not deletion. An issued invoice keeps its number, totals and lines —
+ * §147 AO retention — and only gains the fact, time, actor and reason of its
+ * cancellation. Drafts are refused here: they are deleted instead.
+ */
+export async function cancelInvoice(invoiceId: string, reason: string | null): Promise<{
+  status: string | null; alreadyCancelled: boolean; error: string | null;
+}> {
+  const { data, error } = await supabase.rpc('owner_cancel_invoice', { p_invoice_id: invoiceId, p_reason: reason });
+  if (error) return { status: null, alreadyCancelled: false, error: error.message };
+  const r = data as { status?: string; already_cancelled?: boolean };
+  return { status: r?.status ?? null, alreadyCancelled: r?.already_cancelled ?? false, error: null };
+}
+
+/** Point an invoice at the canonical customer. Re-pointing is draft-only. */
+export async function linkInvoiceCustomer(invoiceId: string, ownerCustomerId: string | null): Promise<{ error: string | null }> {
+  const { error } = await supabase.rpc('owner_link_invoice_customer', { p_invoice_id: invoiceId, p_owner_customer_id: ownerCustomerId });
   return { error: error?.message ?? null };
 }
 

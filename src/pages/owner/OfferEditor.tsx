@@ -9,8 +9,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Check, Eye, FileCheck2, Loader2, Plus, Save, Trash2 } from 'lucide-react';
 
 import {
-  Button, Card, Checkbox, Field, IconButton, InfoBanner, PageHeader, Select, SectionHeader, Tabs,
-  Textarea, useToast,
+  Button, Card, Checkbox, ConfirmDialog, Field, IconButton, InfoBanner, PageHeader, Select,
+  SectionHeader, Tabs, Textarea, useToast,
 } from '@/components/dashboard';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import { PremiumOfferPreview } from '@/pages/owner/PremiumOfferPreview';
@@ -215,6 +215,7 @@ export function OfferEditor() {
   const [customers, setCustomers] = useState<Array<{ organizationId: string; legalName: string | null; name: string; contact: string | null; email: string | null; phone: string | null; address: string | null }>>([]);
   const [ownerCustomers, setOwnerCustomers] = useState<OwnerCustomerListRow[]>([]);
   const [customerDialogOpen, setCustomerDialogOpen] = useState(false);
+  const [leaveOpen, setLeaveOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
@@ -331,9 +332,19 @@ export function OfferEditor() {
     navigate(`/admin/finance/offers/${id}?finalize=1`);
   };
 
-  const back = () => {
-    if (dirty && !window.confirm('Es gibt ungespeicherte Änderungen. Trotzdem verlassen?')) return;
+  const leave = useCallback(() => {
     navigate(currentOfferId.current ? `/admin/finance/offers/${currentOfferId.current}` : '/admin/finance/offers');
+  }, [navigate]);
+
+  /*
+    window.confirm() rendered a raw browser dialog in the middle of the design
+    system and could not describe what is at stake. The app's own ConfirmDialog
+    does both, and keeps the destructive styling consistent with every other
+    discard in the dashboard.
+  */
+  const back = () => {
+    if (dirty) { setLeaveOpen(true); return; }
+    leave();
   };
 
   if (loading) return <div className="space-y-4"><div className="h-8 w-64 animate-pulse rounded-lg bg-gray-100" /><div className="h-64 animate-pulse rounded-2xl bg-gray-100" /></div>;
@@ -524,6 +535,17 @@ export function OfferEditor() {
         <div className={mobileTab === 'edit' ? '' : 'hidden lg:block'}>{editor}</div>
         <div className={mobileTab === 'preview' ? '' : 'hidden lg:block'}>{preview}</div>
       </div>
+
+      <ConfirmDialog
+        open={leaveOpen}
+        onClose={() => setLeaveOpen(false)}
+        tone="danger"
+        title="Änderungen verwerfen?"
+        confirmLabel="Verwerfen und verlassen"
+        cancelLabel="Weiter bearbeiten"
+        message="Es gibt ungespeicherte Änderungen an diesem Angebot. Beim Verlassen gehen sie verloren."
+        onConfirm={() => { setLeaveOpen(false); leave(); }}
+      />
 
       <PremiumPdfPreviewDialog
         open={previewOpen}

@@ -49,6 +49,8 @@ export interface OwnerInvoice {
   business_entity_id: string;
   organization_id: string | null;
   client_account_id: string | null;
+  /** Canonical customer. The relational identity every surface joins on. */
+  owner_customer_id: string | null;
   engagement_id: string | null;
   invoice_number: string | null;
   status: 'draft' | 'issued' | 'partially_paid' | 'paid' | 'overdue' | 'void' | 'cancelled' | 'credited';
@@ -64,6 +66,10 @@ export interface OwnerInvoice {
   external_reference: string | null;
   issued_at: string | null;
   archived_at: string | null;
+  /** Storno. Set instead of deleting an issued invoice; number and totals stay. */
+  cancelled_at: string | null;
+  cancelled_by: string | null;
+  cancellation_reason: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -384,6 +390,8 @@ export interface OwnerCustomer {
   last_activity_at: string;
   completed_at: string | null;
   completed_by: string | null;
+  archived_at: string | null;
+  archived_by: string | null;
   created_by: string | null;
   created_at: string;
   updated_at: string;
@@ -396,13 +404,21 @@ export interface OwnerCustomerListRow {
   contact_name: string | null;
   email: string | null;
   phone: string | null;
+  street: string | null;
+  postal_code: string | null;
+  city: string | null;
   status: OwnerCustomerStatus;
   notes: string | null;
   client_account_id: string | null;
+  organization_id: string | null;
+  archived_at: string | null;
   last_activity_at: string;
   created_at: string;
   completed_at: string | null;
   offer_count: number;
+  invoice_count: number;
+  open_invoice_count: number;
+  revenue_gross_cents: number;
   open_task_count: number;
   completed_task_count: number;
 }
@@ -448,11 +464,57 @@ export interface OwnerCustomerOfferRef {
   sent_at: string | null;
 }
 
+/** Invoice as seen from the customer workspace. */
+export interface OwnerCustomerInvoiceRef {
+  id: string;
+  invoice_number: string | null;
+  status: OwnerInvoice['status'];
+  currency: string;
+  gross_total_cents: number;
+  amount_paid_cents: number;
+  issue_date: string | null;
+  due_date: string | null;
+  issued_at: string | null;
+  cancelled_at: string | null;
+  cancellation_reason: string | null;
+  created_at: string;
+}
+
+export interface OwnerCustomerPaymentRef {
+  id: string;
+  amount_cents: number;
+  direction: 'inflow' | 'outflow';
+  payment_date: string | null;
+  invoice_id: string | null;
+}
+
+/**
+ * What stands between a customer and permanent deletion.
+ *
+ * Computed by owner_customer_delete_blockers so the dialog, the RPC and the
+ * tests all read the same definition of "protected". Counts, not booleans: the
+ * confirmation names what is in the way instead of only refusing.
+ */
+export interface OwnerCustomerDeleteBlockers {
+  issued_invoices: number;
+  payments: number;
+  finalized_offers: number;
+  subscriptions: number;
+  portal_documents: number;
+  /** Never-issued drafts. These are removed together with the customer. */
+  draft_invoices: number;
+  draft_offers: number;
+  deletable: boolean;
+}
+
 export interface OwnerCustomerDetail {
   customer: OwnerCustomer;
   offers: OwnerCustomerOfferRef[];
+  invoices: OwnerCustomerInvoiceRef[];
+  payments: OwnerCustomerPaymentRef[];
   tasks: OwnerCustomerTask[];
   activity: OwnerCustomerActivity[];
+  delete_blockers: OwnerCustomerDeleteBlockers;
 }
 
 export interface OwnerOfferLine {

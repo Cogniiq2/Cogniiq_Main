@@ -10,13 +10,15 @@ import {
 import { invoiceStatusTone } from '@/pages/owner/ownerUi';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import {
-  createOwnerInvoice, deleteDraftInvoice, issueOwnerInvoice, loadInvoices, recordInvoicePayment, setInvoiceStatus,
+  createOwnerInvoice, deleteDraftInvoice, issueOwnerInvoice, loadInvoices, recordInvoicePayment,
   type InvoiceLineInput,
 } from '@/lib/ownerFinance/api';
-import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
+import { cancelInvoice, loadCustomers } from '@/lib/ownerFinance/customersApi';
+import { customerDisplayName } from '@/lib/ownerFinance/customerLabels';
+import { CustomerFormDialog } from '@/components/finance/CustomerFormDialog';
 import { computeInvoiceLine } from '@/lib/ownerFinance/tax';
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
-import type { OwnerInvoice } from '@/lib/ownerFinance/types';
+import type { OwnerCustomerListRow, OwnerInvoice } from '@/lib/ownerFinance/types';
 import { ExportMenu } from '@/components/finance/ExportMenu';
 import { runFinanceExport } from '@/lib/ownerFinance/financeExportRunner';
 import {
@@ -47,14 +49,25 @@ function toCents(input: string): number | null {
   return 'error' in p ? null : p.cents;
 }
 
-interface CustomerOption { organizationId: string; clientAccountId: string | null; name: string; email: string | null; legalName: string | null }
+/**
+ * The invoice composer selects from the SAME table the CRM writes to. It used to
+ * read loadAdminClients() (organizations + client_accounts) while the CRM page
+ * read owner_customers, which is why a customer created here never appeared
+ * there. There is no second list any more and nothing to synchronise.
+ *
+ * Archived customers are filtered out of the selector but still resolve for
+ * existing invoices, so an old invoice never renders as "unknown customer".
+ */
+function selectableCustomers(rows: OwnerCustomerListRow[]): OwnerCustomerListRow[] {
+  return rows.filter((c) => c.status !== 'archived');
+}
 
 export function InvoicesPage() {
   const { entity } = useOwnerEntity();
   const toast = useToast();
   const navigate = useNavigate();
   const [invoices, setInvoices] = useState<OwnerInvoice[]>([]);
-  const [customers, setCustomers] = useState<CustomerOption[]>([]);
+  const [customers, setCustomers] = useState<OwnerCustomerListRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -68,9 +81,9 @@ export function InvoicesPage() {
     if (!entity) return;
     setLoading(true);
     try {
-      const [inv, clients] = await Promise.all([loadInvoices(entity.id), loadAdminClients().catch(() => [])]);
+      const [inv, custs] = await Promise.all([loadInvoices(entity.id), loadCustomers(entity.id).catch(() => [])]);
       setInvoices(inv);
-      setCustomers(clients.map((c) => ({ organizationId: c.organizationId, clientAccountId: c.account?.id ?? null, name: c.organizationName, email: c.account?.primary_email ?? null, legalName: c.account?.legal_name ?? null })));
+      setCustomers(custs);
       setError(null);
     } catch (e: unknown) { setError(e instanceof Error ? e.message : String(e)); }
     finally { setLoading(false); }
@@ -90,8 +103,10 @@ export function InvoicesPage() {
   );
 
   const customerName = useCallback((inv: OwnerInvoice): string => {
-    const c = customers.find((x) => x.organizationId === inv.organization_id);
-    return c ? (c.legalName ?? c.name) : inv.organization_id ? 'CRM-Kunde' : '—';
+    const c = customers.find((x) => x.id === inv.owner_customer_id);
+    if (c) return customerDisplayName(c);
+    // Pre-migration rows may still carry only the tenant link.
+    return inv.organization_id ? 'Nicht zugeordnet' : '—';
   }, [customers]);
 
   const statusFilterLabel = statusFilter === 'all' ? 'Alle Status' : (statusLabel[statusFilter] ?? statusFilter);
@@ -241,6 +256,7 @@ export function InvoicesPage() {
           onClose={() => setComposerOpen(false)}
           onSaved={(msg) => { setComposerOpen(false); toast.success(msg); void load(); }}
           onError={(m) => toast.error('Rechnung konnte nicht gespeichert werden', m)}
+          onCustomerCreated={async () => { await load(); }}
         />
       ) : null}
 
@@ -256,8 +272,22 @@ export function InvoicesPage() {
         onClose={() => setConfirmDelete(null)}
         tone="danger"
         title="Entwurf löschen?"
-        message="Nur nie gestellte Entwürfe können gelöscht werden. Diese Aktion kann nicht rückgängig gemacht werden."
-        confirmLabel="Löschen"
+        message={
+          <>
+            <p>
+              Der Rechnungsentwurf über{' '}
+              <span className="font-semibold text-gray-950">
+                {confirmDelete ? formatCents(confirmDelete.gross_total_cents, confirmDelete.currency) : ''}
+              </span>{' '}
+              wird dauerhaft gelöscht.
+            </p>
+            <p className="mt-2">
+              Diese Aktion kann nicht rückgängig gemacht werden. Nur nie gestellte Entwürfe können
+              gelöscht werden — gestellte Rechnungen werden storniert.
+            </p>
+          </>
+        }
+        confirmLabel="Entwurf löschen"
         onConfirm={async () => {
           if (!confirmDelete) return;
           const { error: err } = await deleteDraftInvoice(confirmDelete.id);
@@ -268,18 +298,37 @@ export function InvoicesPage() {
         }}
       />
 
+{/*
+        Storno, deliberately NOT labelled as deletion. The invoice row, its
+        number, its totals and its lines are retained (§147 AO); only the status
+        changes and the cancellation is recorded with actor and time.
+      */}
       <ConfirmDialog
         open={!!confirmVoid}
         onClose={() => setConfirmVoid(null)}
         title="Rechnung stornieren?"
-        message="Die Rechnung bleibt zur Historie erhalten (kein Löschen). Der Status wird auf storniert gesetzt."
-        confirmLabel="Stornieren"
+        message={
+          <>
+            <p>
+              <span className="font-semibold text-gray-950">
+                {confirmVoid?.invoice_number ?? 'Diese Rechnung'}
+              </span>{' '}
+              wird storniert.
+            </p>
+            <p className="mt-2">
+              Die Rechnung wird <span className="font-semibold">nicht gelöscht</span>: Nummer, Beträge
+              und Positionen bleiben unverändert erhalten. Sie verschwindet aus der aktiven Ansicht
+              und trägt künftig den Status „Storniert“.
+            </p>
+          </>
+        }
+        confirmLabel="Rechnung stornieren"
         onConfirm={async () => {
           if (!confirmVoid) return;
-          const { error: err } = await setInvoiceStatus(confirmVoid.id, 'void');
+          const { error: err } = await cancelInvoice(confirmVoid.id, null);
           setConfirmVoid(null);
           if (err) { toast.error('Storno fehlgeschlagen', err); return; }
-          toast.success('Rechnung storniert');
+          toast.success('Rechnung storniert', 'Die Rechnung bleibt vollständig erhalten.');
           void load();
         }}
       />
@@ -295,13 +344,16 @@ function newLine(): DraftLine {
   return { id: Math.random().toString(36).slice(2), description: '', quantity: '1', unit: 'Stück', unitPrice: '', treatment: 'standard' };
 }
 
-function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError }: {
+function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError, onCustomerCreated }: {
   open: boolean;
   entityId: string;
-  customers: CustomerOption[];
+  customers: OwnerCustomerListRow[];
   onClose: () => void;
   onSaved: (message: string) => void;
   onError: (message: string) => void;
+  /** Inline creation writes to the canonical table; the page reloads so the new
+   *  customer is selectable here and visible in the CRM without a refresh. */
+  onCustomerCreated: (customerId: string) => Promise<void>;
 }) {
   const today = new Date().toISOString().slice(0, 10);
   const [customerId, setCustomerId] = useState('');
@@ -315,6 +367,7 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError 
   const [lines, setLines] = useState<DraftLine[]>([newLine()]);
   const [busy, setBusy] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [newCustomerOpen, setNewCustomerOpen] = useState(false);
 
   const reset = () => {
     setCustomerId(''); setIssueDate(today); setServiceMode('date'); setServiceDate(today);
@@ -329,7 +382,7 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError 
     return d.toISOString().slice(0, 10);
   }, [issueDate, terms]);
 
-  const customer = customers.find((c) => c.organizationId === customerId) ?? null;
+  const customer = customers.find((c) => c.id === customerId) ?? null;
 
   const computedLines = useMemo(() => lines.map((l) => {
     const price = toCents(l.unitPrice);
@@ -377,8 +430,9 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError 
       }));
     const header: Record<string, unknown> = {
       business_entity_id: entityId,
-      organization_id: customer?.organizationId ?? null,
-      client_account_id: customer?.clientAccountId ?? null,
+      owner_customer_id: customer?.id ?? null,
+      organization_id: customer?.organization_id ?? null,
+      client_account_id: customer?.client_account_id ?? null,
       issue_date: issueDate || null,
       service_date: serviceMode === 'date' ? serviceDate || null : null,
       service_period_start: serviceMode === 'period' ? servicePeriodStart || null : null,
@@ -428,14 +482,27 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError 
         <Card className="p-5">
           <SectionHeader title="Empfänger & Rahmendaten" />
           <div className="grid gap-4 sm:grid-cols-2">
-            <Select
-              id="customer"
-              label="CRM-Kunde"
-              value={customerId}
-              onChange={setCustomerId}
-              options={[{ value: '', label: '— Kein CRM-Kunde —' }, ...customers.map((c) => ({ value: c.organizationId, label: c.name }))]}
-              hint="Optional. Verknüpft die Rechnung mit dem CRM-Konto."
-            />
+            <div>
+              <Select
+                id="customer"
+                label="Kunde"
+                value={customerId}
+                onChange={setCustomerId}
+                options={[
+                  { value: '', label: '— Kein Kunde —' },
+                  ...selectableCustomers(customers).map((c) => ({ value: c.id, label: customerDisplayName(c) })),
+                ]}
+                hint="Derselbe Kundenstamm wie unter „Kunden & Aufgaben“."
+              />
+              <button
+                type="button"
+                onClick={() => setNewCustomerOpen(true)}
+                className="mt-2 inline-flex items-center gap-1 text-[12px] font-semibold text-gray-600 underline-offset-2 hover:text-gray-900 hover:underline"
+              >
+                <Plus size={13} aria-hidden="true" />
+                Neuen Kunden anlegen
+              </button>
+            </div>
             <Field id="issueDate" label="Rechnungsdatum" type="date" value={issueDate} onChange={setIssueDate} />
             <Select id="serviceMode" label="Leistung" value={serviceMode} onChange={(v) => setServiceMode(v as 'date' | 'period')} options={[{ value: 'date', label: 'Leistungsdatum' }, { value: 'period', label: 'Leistungszeitraum' }]} />
             {serviceMode === 'date' ? (
@@ -451,10 +518,29 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError 
           </div>
           {customer ? (
             <div className="mt-4 rounded-xl border border-gray-100 bg-gray-50/70 p-4 text-[13px] text-gray-600">
-              <p className="font-semibold text-gray-950">{customer.legalName ?? customer.name}</p>
+              <p className="font-semibold text-gray-950">{customerDisplayName(customer)}</p>
+              {customer.contact_name && customer.company ? <p className="mt-0.5">{customer.contact_name}</p> : null}
               {customer.email ? <p className="mt-0.5">{customer.email}</p> : null}
+              {customer.street || customer.postal_code || customer.city ? (
+                <p className="mt-0.5">
+                  {[customer.street, [customer.postal_code, customer.city].filter(Boolean).join(' ')]
+                    .filter(Boolean)
+                    .join(', ')}
+                </p>
+              ) : null}
             </div>
           ) : null}
+
+          <CustomerFormDialog
+            open={newCustomerOpen}
+            onClose={() => setNewCustomerOpen(false)}
+            entityId={entityId}
+            onSaved={async (id) => {
+              setNewCustomerOpen(false);
+              await onCustomerCreated(id);
+              setCustomerId(id);
+            }}
+          />
         </Card>
 
         <Card className="p-5">
