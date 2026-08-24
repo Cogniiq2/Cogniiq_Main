@@ -7,6 +7,8 @@ import { buildGreetingLine, buildThanksLine } from '@/lib/ownerFinance/greeting'
 import { WelcomeSequence } from '@/components/finance/WelcomeSequence';
 import { PremiumOfferWebView } from '@/components/finance/PremiumOfferWebView';
 import { SignaturePad, type SignaturePadHandle } from '@/components/finance/SignaturePad';
+import { computeOfferPricing, intervalSuffix, type OfferPricing } from '@/lib/ownerFinance/documents/offerPricing';
+import { publicLinesToDocumentItems } from '@/lib/ownerFinance/publicOfferPricing';
 
 // Standalone, tokenized customer document portal (/d/:token). No marketing/dashboard
 // chrome, no auth. Owns the full viewport. The raw token never grants access by resource
@@ -99,7 +101,7 @@ export function PublicDocumentPortal() {
       recipient: { name: offer.recipient?.company ?? '', addressLines: [] },
       issueDate: offer.issue_date, validUntil: offer.valid_until, serviceDate: null, currency: offer.currency,
       introduction: offer.introduction, scope: offer.scope, assumptions: offer.assumptions, exclusions: offer.exclusions,
-      lines: offer.lines.map((l) => ({ description: l.description, quantityMilli: l.quantity_milli, unit: l.unit, unitPriceCents: l.unit_price_cents, vatRateBp: l.vat_rate_bp, vatTreatment: l.vat_treatment, netCents: l.net_cents, vatCents: l.vat_cents, grossCents: l.gross_cents, isOptional: l.is_optional })),
+      lines: publicLinesToDocumentItems(offer.lines),
       netTotalCents: offer.net_total_cents, vatTotalCents: offer.vat_total_cents, grossTotalCents: offer.gross_total_cents,
       paymentTerms: offer.payment_terms, deliveryTerms: offer.delivery_terms, isDraft: false, templateVersion: TRANSACTIONAL_TEMPLATE_VERSION,
     });
@@ -139,6 +141,9 @@ export function PublicDocumentPortal() {
   }
 
   const expired = offer.expired && !done;
+  // Same split the owner authored: a one-time investment and an ongoing commitment are never
+  // fused into a single "Gesamt" the customer might read as immediately payable.
+  const pricing = computeOfferPricing(publicLinesToDocumentItems(offer.lines));
   const secondaryLine = 'Gemeinsam gestalten wir die nächste Stufe Ihrer digitalen Infrastruktur.';
 
   return (
@@ -167,7 +172,7 @@ export function PublicDocumentPortal() {
           <aside className="hidden lg:block">
             <div className="sticky top-8">
               <DecisionPanel
-                offer={offer} done={done} expired={expired}
+                offer={offer} pricing={pricing} done={done} expired={expired}
                 onAccept={() => setAcceptOpen(true)} onReject={() => setRejectOpen(true)}
                 onDownload={() => void downloadPdf()}
               />
@@ -182,8 +187,13 @@ export function PublicDocumentPortal() {
           style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 12px)' }}>
           <div className="mx-auto flex max-w-lg items-center justify-between gap-3 px-4 py-3">
             <div className="min-w-0">
-              <div className="text-[11px] text-slate-400">Gesamt</div>
-              <div className="truncate text-[15px] font-semibold text-slate-900">{formatCentsCurrencyDe(offer.gross_total_cents, offer.currency)}</div>
+              <div className="text-[11px] text-slate-400">{pricing.hasRecurring && pricing.hasOneTime ? 'Einmalig + laufend' : pricing.hasRecurring ? 'Laufend' : 'Gesamt'}</div>
+              <div className="truncate text-[15px] font-semibold text-slate-900">
+                {pricing.hasOneTime ? formatCentsCurrencyDe(pricing.oneTime.grossCents, offer.currency) : null}
+                {pricing.recurring.map((g, i) => (
+                  <span key={i} className="whitespace-nowrap">{pricing.hasOneTime || i > 0 ? ' + ' : ''}{formatCentsCurrencyDe(g.grossCents, offer.currency)} {intervalSuffix(g.interval)}</span>
+                ))}
+              </div>
             </div>
             <button onClick={() => setAcceptOpen(true)}
               className="min-h-[44px] shrink-0 rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white active:bg-slate-800">
@@ -213,17 +223,37 @@ export function PublicDocumentPortal() {
 }
 
 // -------------------------------------------------------------------------- Decision panel
-function DecisionPanel({ offer, done, expired, onAccept, onReject, onDownload }: {
-  offer: PublicOfferProjection; done: null | 'accepted' | 'rejected'; expired: boolean;
+function DecisionPanel({ offer, pricing, done, expired, onAccept, onReject, onDownload }: {
+  offer: PublicOfferProjection; pricing: OfferPricing; done: null | 'accepted' | 'rejected'; expired: boolean;
   onAccept: () => void; onReject: () => void; onDownload: () => void;
 }) {
+  const showTermTotal = pricing.recurring.some((g) => g.minimumTerm.grossCents > 0);
   return (
     <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-[0_12px_40px_rgba(15,23,42,0.05)]">
       <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">Angebot {offer.offer_number}</p>
       <div className="mt-3 text-[13px] text-slate-500">Gültig bis {formatDateDe(offer.valid_until)}</div>
-      <div className="mt-4 border-t border-slate-100 pt-4">
-        <div className="text-[12px] text-slate-400">Gesamt (brutto)</div>
-        <div className="mt-0.5 text-2xl font-semibold tracking-tight text-slate-900">{formatCentsCurrencyDe(offer.gross_total_cents, offer.currency)}</div>
+      {/* The decision headline mirrors the commercial structure: what is paid once, and what
+          is paid per interval. The first-term total stays small and explicitly not due now. */}
+      <div className="mt-4 space-y-3 border-t border-slate-100 pt-4">
+        {pricing.hasOneTime || !pricing.hasRecurring ? (
+          <div>
+            <div className="text-[12px] text-slate-400">{pricing.hasRecurring ? 'Einmalig (brutto)' : 'Gesamt (brutto)'}</div>
+            <div className="mt-0.5 text-2xl font-semibold tracking-tight text-slate-900">{formatCentsCurrencyDe(pricing.oneTime.grossCents, offer.currency)}</div>
+          </div>
+        ) : null}
+        {pricing.recurring.map((g, i) => (
+          <div key={i}>
+            <div className="text-[12px] text-slate-400">Laufend (brutto)</div>
+            <div className="mt-0.5 text-2xl font-semibold tracking-tight text-slate-900">
+              {formatCentsCurrencyDe(g.grossCents, offer.currency)} <span className="text-base font-medium text-slate-500">{intervalSuffix(g.interval)}</span>
+            </div>
+          </div>
+        ))}
+        {showTermTotal ? (
+          <p className="text-[11px] leading-relaxed text-slate-400">
+            Gesamtwert erste Mindestlaufzeit: {formatCentsCurrencyDe(pricing.minimumTermTotal.grossCents, offer.currency)} brutto — nicht sofort fällig.
+          </p>
+        ) : null}
       </div>
       <div className="mt-3 flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2 text-[12px] text-slate-500">
         <span aria-hidden>🔒</span> Sicheres, persönliches Dokument

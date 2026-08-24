@@ -21,6 +21,7 @@ import {
 } from '@/lib/ownerFinance/offersApi';
 import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
 import { offerToDocument, snapshotToDocument } from '@/lib/ownerFinance/buildTransactionalDoc';
+import { computeOfferPricing, intervalSuffix } from '@/lib/ownerFinance/documents/offerPricing';
 import { validateOfferForFinalization, documentFilename, type TransactionalDocument } from '@/lib/ownerFinance/documents';
 import { downloadBytes } from '@/lib/ownerFinance/exports';
 import { renderPremiumPdf } from '@/lib/ownerFinance/documents/premium';
@@ -161,6 +162,10 @@ export function OfferDetailPage() {
   }, [offer, lines, settings, recipient, entity, isDraft, version]);
 
   const validation = useMemo(() => (doc ? validateOfferForFinalization(doc) : null), [doc]);
+
+  // Split totals from the very document the customer receives — the snapshot for a finalized
+  // offer, the live draft otherwise.
+  const pricing = useMemo(() => computeOfferPricing(doc?.lines ?? []), [doc]);
 
   // Downstream signed-certificate availability, derived from the generated-documents list (never
   // from the acceptance summary). This is a SEPARATE state and must not gate "signatureCaptured".
@@ -456,11 +461,32 @@ export function OfferDetailPage() {
         <div className="space-y-5">
           <Card className="p-6">
             <SectionHeader title="Summen" />
-            <dl className="space-y-1.5 text-sm">
-              <div className="flex justify-between"><dt className="text-gray-500">Netto</dt><dd className="tabular-nums">{formatCents(offer.net_total_cents, offer.currency)}</dd></div>
-              <div className="flex justify-between"><dt className="text-gray-500">Umsatzsteuer</dt><dd className="tabular-nums">{formatCents(offer.vat_total_cents, offer.currency)}</dd></div>
-              <div className="flex justify-between border-t border-gray-100 pt-1.5"><dt className="font-semibold text-gray-950">Gesamt brutto</dt><dd className="tabular-nums text-base font-semibold text-gray-950">{formatCents(offer.gross_total_cents, offer.currency)}</dd></div>
-            </dl>
+            {/* Derived from the same positions the document renders, so this card, the preview
+                and the PDF can never show three different prices. */}
+            <div className="space-y-4 text-sm">
+              {pricing.hasOneTime || !pricing.hasRecurring ? (
+                <dl className="space-y-1.5">
+                  {pricing.hasRecurring ? <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Einmalige Investition</div> : null}
+                  <div className="flex justify-between"><dt className="text-gray-500">Netto</dt><dd className="tabular-nums">{formatCents(pricing.oneTime.netCents, offer.currency)}</dd></div>
+                  <div className="flex justify-between"><dt className="text-gray-500">Umsatzsteuer</dt><dd className="tabular-nums">{formatCents(pricing.oneTime.vatCents, offer.currency)}</dd></div>
+                  <div className="flex justify-between border-t border-gray-100 pt-1.5"><dt className="font-semibold text-gray-950">{pricing.hasRecurring ? 'Einmalig brutto' : 'Gesamt brutto'}</dt><dd className="tabular-nums text-base font-semibold text-gray-950">{formatCents(pricing.oneTime.grossCents, offer.currency)}</dd></div>
+                </dl>
+              ) : null}
+              {pricing.recurring.map((g, i) => (
+                <dl key={i} className="space-y-1.5">
+                  <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Laufende Betreuung</div>
+                  <div className="flex justify-between"><dt className="text-gray-500">Netto {intervalSuffix(g.interval)}</dt><dd className="tabular-nums">{formatCents(g.netCents, offer.currency)}</dd></div>
+                  <div className="flex justify-between"><dt className="text-gray-500">Umsatzsteuer</dt><dd className="tabular-nums">{formatCents(g.vatCents, offer.currency)}</dd></div>
+                  <div className="flex justify-between border-t border-gray-100 pt-1.5"><dt className="font-semibold text-gray-950">Brutto {intervalSuffix(g.interval)}</dt><dd className="tabular-nums text-base font-semibold text-gray-950">{formatCents(g.grossCents, offer.currency)}</dd></div>
+                  {g.minimumTermMonths ? <div className="flex justify-between text-[12px] text-gray-400"><dt>Mindestlaufzeit {g.minimumTermMonths} Monate</dt><dd className="tabular-nums">{formatCents(g.minimumTerm.netCents, offer.currency)} netto</dd></div> : null}
+                </dl>
+              ))}
+              {pricing.recurring.some((g) => g.minimumTerm.netCents > 0) ? (
+                <p className="text-[12px] leading-relaxed text-gray-400">
+                  Gesamtwert während der ersten Mindestlaufzeit: {formatCents(pricing.minimumTermTotal.netCents, offer.currency)} netto — nachrichtlich, nicht sofort fällig.
+                </p>
+              ) : null}
+            </div>
             {!isDraft && offer.status !== 'converted' && offer.status !== 'cancelled' ? (
               <div className="mt-4 flex flex-col gap-2 border-t border-gray-100 pt-4">
                 {['finalized', 'sent', 'viewed'].includes(offer.status) ? <Button variant="ghost" icon={XCircle} onClick={() => setConfirmReject(true)}>Als abgelehnt markieren</Button> : null}

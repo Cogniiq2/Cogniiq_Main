@@ -4,6 +4,15 @@
 
 export type TransactionalDocumentKind = 'offer' | 'invoice';
 
+/** Pricing model of a position: paid once, or per billing interval for a contract term. */
+export type PricingType = 'one_time' | 'recurring';
+
+/** Billing intervals. Only monthly is offered today; the calculation is interval-generic. */
+export type BillingInterval = 'monthly';
+
+/** Structured trigger for the first recurring charge. `custom` uses `billingStartLabel`. */
+export type BillingStartType = 'commissioning' | 'order' | 'go_live' | 'handover' | 'custom';
+
 export interface DocumentParty {
   name: string;
   contactName?: string | null;
@@ -34,6 +43,17 @@ export interface DocumentLineItem {
   vatCents: number;
   grossCents: number;
   isOptional?: boolean;
+  /**
+   * Pricing model. Absent means one-time — historical records and finalized snapshots
+   * predate recurring pricing and must keep their original presentation.
+   * For a recurring line `netCents` is the amount PER BILLING INTERVAL, never the whole
+   * minimum term: the term lives in `minimumTermMonths` and never in `quantityMilli`.
+   */
+  pricingType?: PricingType;
+  billingInterval?: BillingInterval | null;
+  minimumTermMonths?: number | null;
+  billingStartType?: BillingStartType | null;
+  billingStartLabel?: string | null;
 }
 
 /** A project timeline phase (premium offers). */

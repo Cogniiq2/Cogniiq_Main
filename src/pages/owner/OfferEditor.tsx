@@ -26,7 +26,10 @@ import { CustomerFormDialog } from '@/components/finance/CustomerFormDialog';
 import type { OwnerCustomerListRow } from '@/lib/ownerFinance/types';
 import { buildRecipientName, buildGreetingLine } from '@/lib/ownerFinance/greeting';
 import { computeInvoiceLine } from '@/lib/ownerFinance/tax';
-import { offerToDocument } from '@/lib/ownerFinance/buildTransactionalDoc';
+import { offerToDocument, offerLinesToDocumentItems } from '@/lib/ownerFinance/buildTransactionalDoc';
+import {
+  computeOfferPricing, monthlyGroup, intervalSuffix, type OfferPricing,
+} from '@/lib/ownerFinance/documents/offerPricing';
 import { validateOfferForFinalization, documentFilename, type EditorSection } from '@/lib/ownerFinance/documents';
 import { renderPremiumPdf } from '@/lib/ownerFinance/documents/premium';
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
@@ -41,11 +44,36 @@ const units = [{ value: 'Pauschal', label: 'Pauschal' }, { value: 'Stück', labe
 
 function rateFor(t: string): number { return t === 'reduced' ? 700 : t === 'standard' ? 1900 : 0; }
 function toCents(input: string): number | null { const p = parseAmountToCents(input); return 'error' in p ? null : p.cents; }
+/** Minimum term in whole months. Blank or non-positive means "no committed term". */
+function parseTerm(input: string): number | null {
+  const n = Math.round(Number(input.replace(',', '.')));
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
 const rid = () => Math.random().toString(36).slice(2);
+
+const pricingTypes = [
+  { value: 'one_time', label: 'Einmalig' }, { value: 'recurring', label: 'Wiederkehrend' },
+];
+const billingIntervals = [{ value: 'monthly', label: 'Monatlich' }];
+const billingStarts = [
+  { value: '', label: '— Kein Hinweis —' },
+  { value: 'commissioning', label: 'Ab Inbetriebnahme' },
+  { value: 'order', label: 'Ab Auftragserteilung' },
+  { value: 'go_live', label: 'Ab Go-Live' },
+  { value: 'handover', label: 'Ab Übergabe' },
+  { value: 'custom', label: 'Eigener Text …' },
+];
 
 interface EditorLine {
   id: string; description: string; details: string; deliverables: string; phaseLabel: string; durationLabel: string;
   quantity: string; unit: string; unitPrice: string; treatment: string; optional: boolean;
+  // Recurring pricing. `unitPrice` stays the price PER BILLING INTERVAL; the minimum term is
+  // a contract fact and is deliberately not expressible as quantity.
+  pricingType: 'one_time' | 'recurring';
+  billingInterval: 'monthly';
+  minimumTerm: string;
+  billingStartType: '' | 'commissioning' | 'order' | 'go_live' | 'handover' | 'custom';
+  billingStartLabel: string;
 }
 interface TimelineRow { id: string; phase: string; title: string; duration: string; description: string }
 interface PaymentRow { id: string; label: string; percentage: string }
@@ -69,7 +97,11 @@ const today = () => new Date().toISOString().slice(0, 10);
 const plusDays = (d: number) => new Date(Date.now() + d * 864e5).toISOString().slice(0, 10);
 
 function newLine(): EditorLine {
-  return { id: rid(), description: '', details: '', deliverables: '', phaseLabel: '', durationLabel: '', quantity: '1', unit: 'Pauschal', unitPrice: '', treatment: 'standard', optional: false };
+  return {
+    id: rid(), description: '', details: '', deliverables: '', phaseLabel: '', durationLabel: '',
+    quantity: '1', unit: 'Pauschal', unitPrice: '', treatment: 'standard', optional: false,
+    pricingType: 'one_time', billingInterval: 'monthly', minimumTerm: '', billingStartType: '', billingStartLabel: '',
+  };
 }
 function emptyState(validityDays: number): EditorState {
   return {
@@ -91,6 +123,13 @@ function linesFrom(offerLines: OwnerOfferLine[]): EditorLine[] {
     phaseLabel: l.phase_label ?? '', durationLabel: l.duration_label ?? '',
     quantity: String(l.quantity_milli / 1000), unit: l.unit, unitPrice: (l.unit_price_cents / 100).toString().replace('.', ','),
     treatment: l.vat_treatment, optional: l.is_optional,
+    // A draft written before recurring pricing existed loads as one-time — its presentation
+    // is never reinterpreted on the owner's behalf.
+    pricingType: l.pricing_type === 'recurring' ? 'recurring' : 'one_time',
+    billingInterval: l.billing_interval ?? 'monthly',
+    minimumTerm: l.minimum_term_months != null ? String(l.minimum_term_months) : '',
+    billingStartType: l.billing_start_type ?? '',
+    billingStartLabel: l.billing_start_label ?? '',
   }));
 }
 
@@ -126,21 +165,29 @@ function derivedGreetingName(state: EditorState): string {
 }
 
 /** Synthesize the shared TransactionalDocument from editor state for preview + validation. */
-function stateToDoc(state: EditorState, settings: OwnerDocumentSettings | null, entityName: string, isDraft: boolean): { doc: ReturnType<typeof offerToDocument>; net: number; vat: number; gross: number } {
+function stateToDoc(state: EditorState, settings: OwnerDocumentSettings | null, entityName: string, isDraft: boolean): { doc: ReturnType<typeof offerToDocument>; pricing: OfferPricing } {
   const lines: OwnerOfferLine[] = state.lines.map((l, i) => {
     const price = toCents(l.unitPrice) ?? 0;
     const q = Math.round((Number(l.quantity.replace(',', '.')) || 0) * 1000);
     const calc = computeInvoiceLine(q, price, rateFor(l.treatment), l.treatment as never);
+    const recurring = l.pricingType === 'recurring';
     return {
       id: l.id, offer_id: 'preview', description: l.description || 'Ohne Titel', details: l.details || null,
       deliverables: splitLines(l.deliverables), phase_label: l.phaseLabel || null, duration_label: l.durationLabel || null,
       quantity_milli: q, unit: l.unit, unit_price_cents: price, net_cents: calc.netCents, vat_rate_bp: rateFor(l.treatment),
       vat_treatment: l.treatment, vat_cents: calc.vatCents, gross_cents: calc.grossCents, is_optional: l.optional, sort_order: i,
+      pricing_type: recurring ? 'recurring' : 'one_time',
+      billing_interval: recurring ? l.billingInterval : null,
+      minimum_term_months: recurring ? (parseTerm(l.minimumTerm) ?? null) : null,
+      billing_start_type: recurring && l.billingStartType ? l.billingStartType : null,
+      billing_start_label: recurring && l.billingStartType === 'custom' ? (l.billingStartLabel.trim() || null) : null,
     };
   });
-  const base = lines.filter((l) => !l.is_optional);
-  const net = base.reduce((s, l) => s + l.net_cents, 0);
-  const vat = base.reduce((s, l) => s + l.vat_cents, 0);
+  // The preview totals come from the SAME calculator the PDF and the customer portal use.
+  const pricing = computeOfferPricing(offerLinesToDocumentItems(lines));
+  const net = pricing.oneTime.netCents;
+  const vat = pricing.oneTime.vatCents;
+  const monthly = monthlyGroup(pricing);
   const offer: OwnerOffer = {
     id: 'preview', business_entity_id: '', organization_id: state.customerId || null, client_account_id: null, engagement_id: null,
     offer_number: null, status: isDraft ? 'draft' : 'finalized', title: state.title, issue_date: state.issueDate, valid_until: state.validUntil,
@@ -156,12 +203,17 @@ function stateToDoc(state: EditorState, settings: OwnerDocumentSettings | null, 
     recipient_country_code: state.rcountry || null, recipient_email: state.remail || null, recipient_phone: state.rphone || null, recipient_vat_id: state.rvat || null,
     recipient_salutation: (state.rsalutation || null) as OwnerOffer['recipient_salutation'], recipient_title: state.rtitle || null,
     recipient_first_name: state.rfirstname || null, recipient_last_name: state.rlastname || null, recipient_greeting_name: state.rgreeting || null,
-    net_total_cents: net, vat_total_cents: vat, gross_total_cents: net + vat, finalized_version: null,
+    // Header totals mirror the server's split: the classic columns are one-time only.
+    net_total_cents: net, vat_total_cents: vat, gross_total_cents: net + vat,
+    recurring_monthly_net_cents: monthly?.netCents ?? 0,
+    recurring_monthly_vat_cents: monthly?.vatCents ?? 0,
+    recurring_monthly_gross_cents: monthly?.grossCents ?? 0,
+    finalized_version: null,
     accepted_at: null, rejected_at: null, rejection_reason: null, expired_at: null, converted_invoice_id: null, converted_at: null,
     owner_customer_id: state.ownerCustomerId || null, archived_at: null, archived_by: null,
     created_at: '', updated_at: '',
   };
-  return { doc: offerToDocument(offer, lines, settings, null, entityName), net, vat, gross: net + vat };
+  return { doc: offerToDocument(offer, lines, settings, null, entityName), pricing };
 }
 
 function buildPayload(state: EditorState, entityId: string): { header: Record<string, unknown>; lines: OfferLineInput[]; sections: OfferSectionsInput } {
@@ -187,6 +239,13 @@ function buildPayload(state: EditorState, entityId: string): { header: Record<st
       phase_label: l.phaseLabel.trim() || null, duration_label: l.durationLabel.trim() || null,
       quantity_milli: Math.round((Number(l.quantity.replace(',', '.')) || 0) * 1000), unit: l.unit,
       unit_price_cents: toCents(l.unitPrice) ?? 0, vat_rate_bp: rateFor(l.treatment), vat_treatment: l.treatment, is_optional: l.optional, sort_order: i,
+      // Recurring metadata is only sent for recurring lines; the RPC drops it otherwise, so a
+      // position switched back to "Einmalig" can never keep a stale minimum term.
+      pricing_type: l.pricingType,
+      billing_interval: l.pricingType === 'recurring' ? l.billingInterval : null,
+      minimum_term_months: l.pricingType === 'recurring' ? (parseTerm(l.minimumTerm) ?? null) : null,
+      billing_start_type: l.pricingType === 'recurring' && l.billingStartType ? l.billingStartType : null,
+      billing_start_label: l.pricingType === 'recurring' && l.billingStartType === 'custom' ? (l.billingStartLabel.trim() || null) : null,
     }))
     .filter((l) => l.description.length > 0);
   const sections: OfferSectionsInput = {
@@ -422,6 +481,8 @@ export function OfferEditor() {
           {state.lines.map((l, idx) => {
             const price = toCents(l.unitPrice); const q = Number(l.quantity.replace(',', '.')) || 0;
             const calc = price != null ? computeInvoiceLine(Math.round(q * 1000), price, rateFor(l.treatment), l.treatment as never) : null;
+            const isRecurring = l.pricingType === 'recurring';
+            const term = isRecurring ? parseTerm(l.minimumTerm) : null;
             return (
               <div key={l.id} className="rounded-xl border border-gray-100 p-4">
                 <div className="mb-3 flex items-center justify-between">
@@ -434,13 +495,34 @@ export function OfferEditor() {
                   <div className="sm:col-span-12"><Textarea id={`del-${l.id}`} label="Leistungen (eine je Zeile)" value={l.deliverables} onChange={(v) => patchLine(l.id, { deliverables: v })} rows={3} /></div>
                   <div className="sm:col-span-3"><Field id={`ph-${l.id}`} label="Phase" value={l.phaseLabel} onChange={(v) => patchLine(l.id, { phaseLabel: v })} /></div>
                   <div className="sm:col-span-3"><Field id={`du-${l.id}`} label="Dauer" value={l.durationLabel} onChange={(v) => patchLine(l.id, { durationLabel: v })} /></div>
+                  <div className="sm:col-span-3"><Select id={`pt-${l.id}`} label="Preisart" value={l.pricingType} onChange={(v) => patchLine(l.id, { pricingType: v as EditorLine['pricingType'] })} options={pricingTypes} /></div>
                   <div className="sm:col-span-2"><Field id={`q-${l.id}`} label="Menge" value={l.quantity} onChange={(v) => patchLine(l.id, { quantity: v })} inputMode="decimal" /></div>
-                  <div className="sm:col-span-2"><Select id={`u-${l.id}`} label="Einheit" value={l.unit} onChange={(v) => patchLine(l.id, { unit: v })} options={units} /></div>
-                  <div className="sm:col-span-2"><Field id={`p-${l.id}`} label="Netto" prefix="€" value={l.unitPrice} onChange={(v) => patchLine(l.id, { unitPrice: v })} inputMode="decimal" placeholder="10000,00" /></div>
+                  <div className="sm:col-span-2">
+                    {isRecurring
+                      ? <Select id={`bi-${l.id}`} label="Intervall" value={l.billingInterval} onChange={(v) => patchLine(l.id, { billingInterval: v as EditorLine['billingInterval'] })} options={billingIntervals} />
+                      : <Select id={`u-${l.id}`} label="Einheit" value={l.unit} onChange={(v) => patchLine(l.id, { unit: v })} options={units} />}
+                  </div>
+                  <div className="sm:col-span-2"><Field id={`p-${l.id}`} label={isRecurring ? 'Netto je Intervall' : 'Netto'} prefix="€" value={l.unitPrice} onChange={(v) => patchLine(l.id, { unitPrice: v })} inputMode="decimal" placeholder={isRecurring ? '290,00' : '10000,00'} /></div>
+                  {isRecurring ? (
+                    <>
+                      <div className="sm:col-span-3"><Field id={`mt-${l.id}`} label="Mindestlaufzeit (Monate)" value={l.minimumTerm} onChange={(v) => patchLine(l.id, { minimumTerm: v })} inputMode="numeric" placeholder="12" /></div>
+                      <div className="sm:col-span-4"><Select id={`bs-${l.id}`} label="Abrechnungsbeginn" value={l.billingStartType} onChange={(v) => patchLine(l.id, { billingStartType: v as EditorLine['billingStartType'] })} options={billingStarts} /></div>
+                      {l.billingStartType === 'custom' ? (
+                        <div className="sm:col-span-4"><Field id={`bsl-${l.id}`} label="Beginn (eigener Text)" value={l.billingStartLabel} onChange={(v) => patchLine(l.id, { billingStartLabel: v })} placeholder="ab Abnahme Phase 2" /></div>
+                      ) : null}
+                    </>
+                  ) : null}
                   <div className="sm:col-span-8"><Select id={`t-${l.id}`} label="USt-Behandlung" value={l.treatment} onChange={(v) => patchLine(l.id, { treatment: v })} options={treatments} /></div>
                   <div className="sm:col-span-4 flex items-end pb-2"><Checkbox id={`o-${l.id}`} label="Optional (nicht in Summe)" checked={l.optional} onChange={(v) => patchLine(l.id, { optional: v })} /></div>
                 </div>
-                {calc ? <div className="mt-2 flex gap-6 text-[12px] text-gray-500"><span>Netto <span className="font-semibold tabular-nums text-gray-700">{formatCents(calc.netCents)}</span></span><span>Brutto <span className="font-semibold tabular-nums text-gray-900">{formatCents(calc.grossCents)}</span></span></div> : null}
+                {calc ? (
+                  <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1 text-[12px] text-gray-500">
+                    <span>Netto <span className="font-semibold tabular-nums text-gray-700">{formatCents(calc.netCents)}{isRecurring ? ` ${intervalSuffix(l.billingInterval)}` : ''}</span></span>
+                    <span>Brutto <span className="font-semibold tabular-nums text-gray-900">{formatCents(calc.grossCents)}{isRecurring ? ` ${intervalSuffix(l.billingInterval)}` : ''}</span></span>
+                    {/* Nachrichtlich: the minimum term never changes the per-interval price. */}
+                    {isRecurring && term ? <span className="text-gray-400">Wert über {term} Monate <span className="tabular-nums">{formatCents(calc.netCents * term)} netto</span></span> : null}
+                  </div>
+                ) : null}
                 {idx > 0 || idx < state.lines.length - 1 ? (
                   <div className="mt-2 flex gap-2">
                     <button className="text-[11px] text-gray-400 hover:text-gray-700 disabled:opacity-30" disabled={idx === 0} onClick={() => { const a = [...state.lines]; [a[idx - 1], a[idx]] = [a[idx], a[idx - 1]]; patch({ lines: a }); }}>↑ nach oben</button>
@@ -451,11 +533,32 @@ export function OfferEditor() {
             );
           })}
         </div>
-        <dl className="mt-4 space-y-1.5 border-t border-gray-100 pt-4 text-sm">
-          <div className="flex justify-between"><dt className="text-gray-500">Netto (ohne optionale)</dt><dd className="tabular-nums">{formatCents(doc.net)}</dd></div>
-          <div className="flex justify-between"><dt className="text-gray-500">Umsatzsteuer</dt><dd className="tabular-nums">{formatCents(doc.vat)}</dd></div>
-          <div className="flex justify-between border-t border-gray-100 pt-1.5"><dt className="font-semibold text-gray-950">Gesamt brutto</dt><dd className="tabular-nums text-base font-semibold text-gray-950">{formatCents(doc.gross)}</dd></div>
-        </dl>
+        {/* The commercial summary the customer will see: what is paid once, what is paid per
+            interval, and — deliberately small — what the first minimum term adds up to. */}
+        <div className="mt-4 space-y-4 border-t border-gray-100 pt-4 text-sm">
+          {doc.pricing.hasOneTime || !doc.pricing.hasRecurring ? (
+            <dl className="space-y-1.5">
+              {doc.pricing.hasRecurring ? <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Einmalige Investition</div> : null}
+              <div className="flex justify-between"><dt className="text-gray-500">Netto (ohne optionale)</dt><dd className="tabular-nums">{formatCents(doc.pricing.oneTime.netCents)}</dd></div>
+              <div className="flex justify-between"><dt className="text-gray-500">Umsatzsteuer</dt><dd className="tabular-nums">{formatCents(doc.pricing.oneTime.vatCents)}</dd></div>
+              <div className="flex justify-between border-t border-gray-100 pt-1.5"><dt className="font-semibold text-gray-950">{doc.pricing.hasRecurring ? 'Einmalig brutto' : 'Gesamt brutto'}</dt><dd className="tabular-nums text-base font-semibold text-gray-950">{formatCents(doc.pricing.oneTime.grossCents)}</dd></div>
+            </dl>
+          ) : null}
+          {doc.pricing.recurring.map((g, i) => (
+            <dl key={i} className="space-y-1.5">
+              <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Laufende Betreuung</div>
+              <div className="flex justify-between"><dt className="text-gray-500">Netto {intervalSuffix(g.interval)}</dt><dd className="tabular-nums">{formatCents(g.netCents)}</dd></div>
+              <div className="flex justify-between"><dt className="text-gray-500">Umsatzsteuer</dt><dd className="tabular-nums">{formatCents(g.vatCents)}</dd></div>
+              <div className="flex justify-between border-t border-gray-100 pt-1.5"><dt className="font-semibold text-gray-950">Brutto {intervalSuffix(g.interval)}</dt><dd className="tabular-nums text-base font-semibold text-gray-950">{formatCents(g.grossCents)}</dd></div>
+              {g.minimumTermMonths ? <div className="flex justify-between text-[12px] text-gray-400"><dt>Mindestlaufzeit {g.minimumTermMonths} Monate</dt><dd className="tabular-nums">{formatCents(g.minimumTerm.netCents)} netto</dd></div> : null}
+            </dl>
+          ))}
+          {doc.pricing.recurring.some((g) => g.minimumTerm.netCents > 0) ? (
+            <p className="text-[12px] leading-relaxed text-gray-400">
+              Gesamtwert während der ersten Mindestlaufzeit: {formatCents(doc.pricing.minimumTermTotal.netCents)} netto — nachrichtlich, nicht sofort fällig.
+            </p>
+          ) : null}
+        </div>
       </Card>
 
       <Card className="p-5" id={sectionAnchor.schedule}>
@@ -473,7 +576,12 @@ export function OfferEditor() {
         </div>
         <Button size="sm" variant="ghost" icon={Plus} className="mt-2" onClick={() => patch({ timeline: [...state.timeline, { id: rid(), phase: '', title: '', duration: '', description: '' }] })}>Phase</Button>
 
-        <div className="mb-3 mt-5 text-[12px] font-semibold text-gray-600">Zahlungsplan (Prozent)</div>
+        <div className="mb-1 mt-5 text-[12px] font-semibold text-gray-600">Zahlungsplan (Prozent)</div>
+        <p className="mb-3 text-[11.5px] text-gray-400">
+          {doc.pricing.hasRecurring
+            ? 'Die Prozentsätze gelten ausschließlich für die einmalige Projektinvestition. Wiederkehrende Positionen werden gemäß ihrem Abrechnungsintervall separat berechnet.'
+            : 'Die Prozentsätze gelten für die einmalige Projektinvestition.'}
+        </p>
         <div className="space-y-2">
           {state.payment.map((p) => (
             <div key={p.id} className="grid grid-cols-12 gap-2">

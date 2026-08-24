@@ -171,14 +171,17 @@ const premiumDoc = {
 const psrc = premium.buildPremiumSource(premiumDoc);
 eq(psrc.modules.length, 2, 'premium source: base modules exclude optional');
 eq(psrc.optionalModules.length, 1, 'premium source: optional modules separated');
-ok(/80\.000,00/.test(psrc.investment.netLabel), 'premium source: net total formatted');
-ok(/95\.200,00/.test(psrc.investment.grossLabel), 'premium source: gross total formatted');
+ok(psrc.investment.oneTime !== null, 'premium source: one-time block present');
+ok(/80\.000,00/.test(psrc.investment.oneTime.netLabel), 'premium source: one-time net total formatted');
+ok(/95\.200,00/.test(psrc.investment.oneTime.grossLabel), 'premium source: one-time gross total formatted');
+eq(psrc.investment.recurring.length, 0, 'premium source: purely one-time offer has no recurring block');
+ok(!psrc.investment.isSplit, 'premium source: purely one-time offer is not split');
 eq(psrc.payment.rows.length, 2, 'premium source: payment rows');
 ok(psrc.payment.rows[0].amountLabel && /24\.000,00/.test(psrc.payment.rows[0].amountLabel), 'premium source: milestone amount computed against net');
 ok(psrc.payment.balanced, 'premium source: balanced payment schedule');
 eq(psrc.desiredOutcomes.length, 2, 'premium source: desired outcomes carried');
 ok(psrc.accent === '#0F766E', 'premium source: brand accent honoured');
-ok(!/vat_treatment|standard/.test(JSON.stringify(psrc.investment.vatRows)), 'premium source: no technical VAT labels');
+ok(!/vat_treatment|standard/.test(JSON.stringify(psrc.investment.oneTime.vatRows)), 'premium source: no technical VAT labels');
 
 /* ---- snapshotToDocument: finalized offers render from the frozen snapshot ---- */
 const snapshot = {

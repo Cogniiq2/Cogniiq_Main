@@ -349,9 +349,15 @@ export interface OwnerOffer {
   recipient_first_name: string | null;
   recipient_last_name: string | null;
   recipient_greeting_name: string | null;
+  // One-time (project) totals over the non-optional one-time positions. Recurring positions
+  // are summed separately below so a monthly fee never inflates the project headline.
   net_total_cents: number;
   vat_total_cents: number;
   gross_total_cents: number;
+  // Committed recurring commitment per billing interval (migration 20260824193000).
+  recurring_monthly_net_cents: number;
+  recurring_monthly_vat_cents: number;
+  recurring_monthly_gross_cents: number;
   finalized_version: number | null;
   accepted_at: string | null;
   rejected_at: string | null;
@@ -535,6 +541,15 @@ export interface OwnerOfferLine {
   gross_cents: number;
   is_optional: boolean;
   sort_order: number;
+  // Recurring pricing (migration 20260824193000). A line without `pricing_type` is one-time,
+  // so historical rows and finalized snapshots keep their original presentation. On a
+  // recurring line, net_cents is the amount PER BILLING INTERVAL — the minimum term is
+  // contract metadata and is never folded into quantity_milli.
+  pricing_type: 'one_time' | 'recurring';
+  billing_interval: 'monthly' | null;
+  minimum_term_months: number | null;
+  billing_start_type: 'commissioning' | 'order' | 'go_live' | 'handover' | 'custom' | null;
+  billing_start_label: string | null;
 }
 
 export interface OwnerGeneratedDocument {

@@ -65,6 +65,13 @@ export interface OfferLineInput {
   phase_label?: string | null; duration_label?: string | null;
   quantity_milli: number; unit: string; unit_price_cents: number;
   vat_rate_bp: number; vat_treatment: string; is_optional?: boolean; sort_order?: number;
+  // Recurring pricing. Omitted / 'one_time' keeps the classic single-charge position; the
+  // RPC ignores the recurring fields unless pricing_type is 'recurring'.
+  pricing_type?: 'one_time' | 'recurring';
+  billing_interval?: 'monthly' | null;
+  minimum_term_months?: number | null;
+  billing_start_type?: 'commissioning' | 'order' | 'go_live' | 'handover' | 'custom' | null;
+  billing_start_label?: string | null;
 }
 
 /** Structured offer-level content (JSONB arrays). */
@@ -285,6 +292,14 @@ export async function loadInvoiceDetail(invoiceId: string): Promise<{
 export interface PublicOfferLine {
   description: string; quantity_milli: number; unit: string; unit_price_cents: number;
   vat_rate_bp: number; vat_treatment: string; net_cents: number; vat_cents: number; gross_cents: number; is_optional: boolean;
+  details?: string | null;
+  // Recurring pricing. Offers finalized before this existed project these as null/absent and
+  // are therefore read as one-time — their presentation never changes.
+  pricing_type?: 'one_time' | 'recurring' | null;
+  billing_interval?: 'monthly' | null;
+  minimum_term_months?: number | null;
+  billing_start_type?: 'commissioning' | 'order' | 'go_live' | 'handover' | 'custom' | null;
+  billing_start_label?: string | null;
 }
 
 export interface PublicOfferRecipient {
@@ -326,9 +341,13 @@ export interface PublicOfferProjection {
   desired_outcomes: string[];
   timeline: PublicOfferTimelinePhase[];
   payment_schedule: PublicOfferPaymentMilestone[];
+  // One-time (project) totals. Recurring commitments are projected separately.
   net_total_cents: number;
   vat_total_cents: number;
   gross_total_cents: number;
+  recurring_monthly_net_cents?: number;
+  recurring_monthly_vat_cents?: number;
+  recurring_monthly_gross_cents?: number;
   lines: PublicOfferLine[];
   recipient: PublicOfferRecipient;
   accepted: boolean;

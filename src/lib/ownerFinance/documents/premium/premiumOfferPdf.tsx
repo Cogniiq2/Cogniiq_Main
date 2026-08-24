@@ -95,6 +95,8 @@ function buildDocument(RP: typeof import('@react-pdf/renderer'), src: PremiumSou
     invTotal: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, paddingHorizontal: 14, backgroundColor: SOFT },
     invTotalLabel: { fontSize: 11, fontWeight: 700, color: GRAPHITE },
     invTotalValue: { fontSize: 14, fontWeight: 700, color: GRAPHITE },
+    invKicker: { fontSize: 8, letterSpacing: 1.5, color: accent, textTransform: 'uppercase' },
+    invSecondary: { fontSize: 8.5, color: MUTED, marginTop: 8, lineHeight: 1.5 },
     // Payment / timeline rows
     payRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 9, borderBottomWidth: 1, borderBottomColor: HAIR },
     payLabel: { fontSize: 10, color: GRAPHITE, flex: 1 },
@@ -162,10 +164,22 @@ function buildDocument(RP: typeof import('@react-pdf/renderer'), src: PremiumSou
           <Text style={s.moduleNo}>{prefix} {m.index}</Text>
           <Text style={s.moduleTitle}>{m.title}</Text>
         </View>
-        <View><Text style={s.modulePriceLabel}>Netto</Text><Text style={s.modulePrice}>{m.netLabel}</Text></View>
+        <View>
+          <Text style={s.modulePriceLabel}>Netto</Text>
+          {/* A recurring position shows its per-interval price. It is never multiplied out
+              over the minimum term — the term is stated as a contract fact below. */}
+          <Text style={s.modulePrice}>{m.netLabel}{m.recurring ? ` ${m.recurring.suffix}` : ''}</Text>
+        </View>
       </View>
       {m.details ? <Text style={s.moduleDetails}>{m.details.split(/\n/).join(' ')}</Text> : null}
       {m.deliverables.length ? <Bullets items={m.deliverables} /> : null}
+      {m.recurring ? (
+        <View style={s.moduleMetaRow}>
+          {m.recurring.minimumTermLabel ? <Text style={s.moduleTag}>Mindestlaufzeit: <Text style={s.moduleTagStrong}>{m.recurring.minimumTermLabel}</Text></Text> : null}
+          <Text style={s.moduleTag}>Abrechnung: <Text style={s.moduleTagStrong}>{m.recurring.intervalAdverb}</Text></Text>
+          {m.recurring.billingStartLabel ? <Text style={s.moduleTag}>Beginn: <Text style={s.moduleTagStrong}>{m.recurring.billingStartLabel}</Text></Text> : null}
+        </View>
+      ) : null}
       {(m.phaseLabel || m.durationLabel) ? (
         <View style={s.moduleMetaRow}>
           {m.phaseLabel ? <Text style={s.moduleTag}>Phase: <Text style={s.moduleTagStrong}>{m.phaseLabel}</Text></Text> : null}
@@ -229,16 +243,55 @@ function buildDocument(RP: typeof import('@react-pdf/renderer'), src: PremiumSou
           <ModuleSection title="Optionale Zusatzmodule (nicht im Investitionsvolumen)" mods={src.optionalModules} prefix="Option" />
         ) : null}
 
+        {/* Investment: the one-time project sum and the ongoing commitment are two separate
+            headline figures. The first-term contract value stays deliberately secondary — it
+            is transparency, not an amount the customer owes on signature. */}
         <View style={s.block} wrap={false}>
           <Heading title="Investitionsübersicht" />
-          <View style={s.invBox}>
-            <View style={s.invRow}><Text style={s.invRowLabel}>Nettosumme</Text><Text style={s.invRowValue}>{src.investment.netLabel}</Text></View>
-            {src.investment.vatRows.map((r, i) => (
-              <View key={i} style={s.invRow}><Text style={s.invRowLabel}>{r.label} · Netto {r.net}</Text><Text style={s.invRowValue}>{r.vat}</Text></View>
-            ))}
-            <View style={s.invRow}><Text style={s.invRowLabel}>Umsatzsteuer gesamt</Text><Text style={s.invRowValue}>{src.investment.vatTotalLabel}</Text></View>
-            <View style={s.invTotal}><Text style={s.invTotalLabel}>Gesamtinvestition (brutto)</Text><Text style={s.invTotalValue}>{src.investment.grossLabel}</Text></View>
-          </View>
+          {src.investment.oneTime ? (
+            <View style={[s.invBox, src.investment.recurring.length ? { marginBottom: 10 } : {}]}>
+              {src.investment.isSplit ? <View style={s.invRow}><Text style={s.invKicker}>Einmalige Investition</Text><Text style={s.invRowValue} /></View> : null}
+              <View style={s.invRow}><Text style={s.invRowLabel}>Nettosumme</Text><Text style={s.invRowValue}>{src.investment.oneTime.netLabel}</Text></View>
+              {src.investment.oneTime.vatRows.map((r, i) => (
+                <View key={i} style={s.invRow}><Text style={s.invRowLabel}>{r.label} · Netto {r.net}</Text><Text style={s.invRowValue}>{r.vat}</Text></View>
+              ))}
+              <View style={s.invRow}><Text style={s.invRowLabel}>Umsatzsteuer gesamt</Text><Text style={s.invRowValue}>{src.investment.oneTime.vatTotalLabel}</Text></View>
+              <View style={s.invTotal}>
+                <Text style={s.invTotalLabel}>{src.investment.isSplit ? 'Einmalige Investition (brutto)' : 'Gesamtinvestition (brutto)'}</Text>
+                <Text style={s.invTotalValue}>{src.investment.oneTime.grossLabel}</Text>
+              </View>
+            </View>
+          ) : null}
+
+          {src.investment.recurring.map((r, i) => (
+            <View key={i} style={s.invBox}>
+              <View style={s.invRow}><Text style={s.invKicker}>Laufende Betreuung</Text><Text style={s.invRowValue} /></View>
+              <View style={s.invRow}><Text style={s.invRowLabel}>Netto {r.suffix}</Text><Text style={s.invRowValue}>{r.netLabel} {r.suffix}</Text></View>
+              {r.vatRows.map((v, j) => (
+                <View key={j} style={s.invRow}><Text style={s.invRowLabel}>{v.label} · Netto {v.net}</Text><Text style={s.invRowValue}>{v.vat}</Text></View>
+              ))}
+              <View style={s.invTotal}>
+                <Text style={s.invTotalLabel}>Laufende Betreuung (brutto)</Text>
+                <Text style={s.invTotalValue}>{r.grossLabel} {r.suffix}</Text>
+              </View>
+              <View style={s.invRow}>
+                <Text style={s.invRowLabel}>
+                  Abrechnung: {r.intervalAdverb}
+                  {r.minimumTermLabel ? ` · Mindestlaufzeit: ${r.minimumTermLabel}` : ''}
+                  {r.billingStartLabel ? ` · Beginn: ${r.billingStartLabel}` : ''}
+                </Text>
+                <Text style={s.invRowValue} />
+              </View>
+            </View>
+          ))}
+
+          {src.investment.minimumTermTotalNetLabel ? (
+            <Text style={s.invSecondary}>
+              Gesamtwert während der ersten Mindestlaufzeit: {src.investment.minimumTermTotalNetLabel} netto
+              {src.investment.minimumTermTotalGrossLabel ? ` (${src.investment.minimumTermTotalGrossLabel} brutto)` : ''}.
+              Nicht sofort fällig — die laufenden Leistungen werden gemäß ihrem Abrechnungsintervall berechnet.
+            </Text>
+          ) : null}
         </View>
 
         {(src.timeline.length || src.deliveryTerms) ? (
@@ -261,6 +314,7 @@ function buildDocument(RP: typeof import('@react-pdf/renderer'), src: PremiumSou
 
         {src.payment.rows.length ? (
           <Section title="Zahlungsplan">
+            {src.payment.scopeNote ? <Text style={[s.para, { marginBottom: 8 }]}>{src.payment.scopeNote}</Text> : null}
             {src.payment.rows.map((r, i) => (
               <View key={i} style={s.payRow} wrap={false}>
                 <View style={{ flex: 1 }}><Text style={s.payLabel}>{r.label}</Text>{r.note ? <Text style={s.payNote}>{r.note}</Text> : null}</View>
