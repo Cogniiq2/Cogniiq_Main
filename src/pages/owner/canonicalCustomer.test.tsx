@@ -475,10 +475,17 @@ describe('deletion is deliberate, not uniform', () => {
 /* ─────────────────────── the rules live in the database ──────────────────── */
 
 describe('migration encodes the deletion rules it promises', () => {
+  /*
+    Newlines are normalized before matching. The repository is checked out with
+    CRLF on Windows, and several assertions below are multi-line — anchoring on
+    "\n" against a "\r\n" file silently fails. That is exactly what happened when
+    the merge into main re-materialized this file: the same assertions passed on
+    the branch and failed on main, for no reason connected to the SQL.
+  */
   const sql = readFileSync(
     join(process.cwd(), 'supabase/migrations/20260824171403_canonical_customer_and_deletion.sql'),
     'utf-8',
-  );
+  ).replace(/\r\n/g, '\n');
 
   it('protects accounting tables with RESTRICT, never CASCADE', () => {
     for (const table of ['owner_invoices', 'owner_payments', 'owner_subscriptions']) {
