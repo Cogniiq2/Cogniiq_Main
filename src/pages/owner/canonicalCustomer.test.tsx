@@ -476,7 +476,7 @@ describe('deletion is deliberate, not uniform', () => {
 
 describe('migration encodes the deletion rules it promises', () => {
   const sql = readFileSync(
-    join(process.cwd(), 'supabase/migrations/20260824120000_canonical_customer_and_deletion.sql'),
+    join(process.cwd(), 'supabase/migrations/20260824171403_canonical_customer_and_deletion.sql'),
     'utf-8',
   );
 
