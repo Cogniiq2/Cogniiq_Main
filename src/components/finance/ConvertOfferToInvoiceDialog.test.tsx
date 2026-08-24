@@ -172,3 +172,87 @@ describe('duplicate-instalment warning', () => {
     expect(screen.queryByText(/bereits erstellte Rechnungen/i)).toBeNull();
   });
 });
+
+/* ------------------------------------------------- over-invoicing protection, in the dialog */
+
+const SVH_PLAN = [
+  { label: 'Bei Auftragserteilung', percentage_bp: 5000 },
+  { label: 'Nach Fertigstellung und Übergabe', percentage_bp: 5000 },
+];
+
+/** A prior conversion, as owner_invoices records it. */
+const conversion = (kind: 'full' | 'milestone', index: number | null, netCents: number) => ({
+  id: `inv-${kind}-${index}`, invoice_number: 'RE-2026-0007', status: 'draft', currency: 'EUR',
+  net_total_cents: netCents, gross_total_cents: Math.round(netCents * 1.19), created_at: '2026-08-20T10:00:00Z',
+  source_offer_conversion_kind: kind, source_offer_milestone_index: index,
+});
+
+async function openWith(existing: ReturnType<typeof conversion>[], schedule = SVH_PLAN) {
+  loadInvoicesForOffer.mockResolvedValue({ data: existing, error: null });
+  const offer = baseOffer({ payment_schedule: schedule });
+  renderDialog(<ConvertOfferToInvoiceDialog open offer={offer} oneTimeNetCents={390000} onClose={() => {}} onDone={() => {}} />);
+  await waitFor(() => expect(loadInvoicesForOffer).toHaveBeenCalled());
+}
+
+describe('Rate 1 already invoiced', () => {
+  it('disables Rate 1 and marks it as already billed', async () => {
+    await openWith([conversion('milestone', 0, 195000)]);
+    const rate1 = screen.getByText(/Rate 1/).closest('button')!;
+    expect(rate1).toBeDisabled();
+    expect(rate1.textContent).toContain('bereits abgerechnet');
+  });
+
+  it('keeps Rate 2 selectable', async () => {
+    await openWith([conversion('milestone', 0, 195000)]);
+    const rate2 = screen.getByText(/Rate 2/).closest('button')!;
+    expect(rate2).not.toBeDisabled();
+  });
+
+  it('removes the full-amount option entirely — offering it is what caused 5.850 EUR of invoices', async () => {
+    await openWith([conversion('milestone', 0, 195000)]);
+    expect(screen.queryByText('Gesamten Einmalbetrag')).toBeNull();
+    expect(screen.getByText(/„Gesamten Einmalbetrag“ ist nicht mehr möglich/)).toBeTruthy();
+  });
+
+  it('cannot submit Rate 1 again even by clicking it', async () => {
+    await openWith([conversion('milestone', 0, 195000)]);
+    const user = userEvent.setup();
+    await user.click(screen.getByText(/Rate 1/));
+    // A disabled option never becomes the selection, so the confirm button stays inert.
+    expect(screen.getByRole('button', { name: 'Rechnungsentwurf erstellen' })).toBeDisabled();
+    expect(convertOfferToInvoiceDraft).not.toHaveBeenCalled();
+  });
+});
+
+describe('both rates already invoiced', () => {
+  it('offers nothing and explains that the one-time amount is fully billed', async () => {
+    await openWith([conversion('milestone', 0, 195000), conversion('milestone', 1, 195000)]);
+    expect(screen.getByText(/Alle Raten des Zahlungsplans wurden bereits abgerechnet/)).toBeTruthy();
+    expect(screen.queryByText(/^Rate 1/)).toBeNull();
+    expect(screen.queryByText('Gesamten Einmalbetrag')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Rechnungsentwurf erstellen' })).toBeNull();
+    // The modal's own dismiss control shares this label, so assert there is a close affordance
+    // rather than a unique one.
+    expect(screen.getAllByRole('button', { name: 'Schließen' }).length).toBeGreaterThan(0);
+    expect(screen.queryByRole('button', { name: 'Abbrechen' })).toBeNull();
+  });
+});
+
+describe('full amount already invoiced', () => {
+  it('blocks every subsequent rate and explains why', async () => {
+    await openWith([conversion('full', null, 390000)]);
+    expect(screen.getByText(/Der gesamte einmalige Betrag dieses Angebots wurde bereits abgerechnet/)).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Rechnungsentwurf erstellen' })).toBeNull();
+    expect(convertOfferToInvoiceDraft).not.toHaveBeenCalled();
+  });
+});
+
+describe('recurring stays excluded no matter which path is taken', () => {
+  it('never surfaces the monthly amount, before or after an instalment', async () => {
+    await openWith([conversion('milestone', 0, 195000)]);
+    // 290,00 EUR / 34.510 cents gross is the offer's recurring side — it must not appear as an
+    // invoiceable option in any state of this dialog.
+    expect(screen.queryByText(/290,00/)).toBeNull();
+    expect(screen.queryByText(/345,10/)).toBeNull();
+  });
+});

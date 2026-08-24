@@ -288,15 +288,75 @@ commit;
 
 begin;
 
--- One additional, deliberately narrow lookup path: which invoices did this offer already
--- produce? Without this, "did I already invoice Rate 1?" can only be answered by grepping
--- external_reference text. This is the whole of the duplicate-instalment safeguard — no
--- milestone-to-invoice-line mapping, no remaining-balance tracking, no scheduled billing. The
--- owner sees what already exists and decides; the system does not try to enforce it, per the
--- explicit instruction not to bolt a fragile partial invoice-schedule engine onto this.
+-- Which offer, and which part of it, produced this invoice. Three columns, no schedule table:
+-- this is the entire installment-billing safeguard, and it is a provenance record rather than a
+-- billing engine. It exists because warnings alone allowed real over-invoicing — with Rate 1
+-- (1.950 EUR) already billed, nothing stopped a second Rate 1, or a full 3.900 EUR conversion on
+-- top, producing 5.850 EUR of invoices against a 3.900 EUR contract.
+--
+-- `source_offer_conversion_kind` names what was invoiced explicitly rather than encoding "full"
+-- as a magic milestone index:
+--   null        -> the invoice did not come from an offer conversion (hand-written, or created
+--                  before this migration — every existing production row).
+--   'full'      -> the whole one-time amount, in one conversion.
+--   'milestone' -> one payment-plan rate; source_offer_milestone_index says which.
 alter table public.owner_invoices
-  add column if not exists source_offer_id uuid references public.owner_offers(id) on delete set null;
+  add column if not exists source_offer_id uuid references public.owner_offers(id) on delete set null,
+  add column if not exists source_offer_conversion_kind text,
+  add column if not exists source_offer_milestone_index int;
+
 create index if not exists owner_invoices_source_offer_idx on public.owner_invoices (source_offer_id);
+
+do $guard$ begin
+  if not exists (select 1 from pg_constraint where conname = 'owner_invoices_source_offer_kind_valid') then
+    alter table public.owner_invoices add constraint owner_invoices_source_offer_kind_valid
+      check (source_offer_conversion_kind is null or source_offer_conversion_kind in ('full', 'milestone'));
+  end if;
+  -- A conversion kind is only meaningful with the offer it came from.
+  if not exists (select 1 from pg_constraint where conname = 'owner_invoices_source_offer_kind_needs_offer') then
+    alter table public.owner_invoices add constraint owner_invoices_source_offer_kind_needs_offer
+      check (source_offer_conversion_kind is null or source_offer_id is not null);
+  end if;
+  -- Only a milestone conversion carries an index, and it is always a real array position.
+  if not exists (select 1 from pg_constraint where conname = 'owner_invoices_source_offer_milestone_shape') then
+    alter table public.owner_invoices add constraint owner_invoices_source_offer_milestone_shape
+      check (
+        (source_offer_conversion_kind = 'milestone' and source_offer_milestone_index >= 0)
+        or (source_offer_conversion_kind is distinct from 'milestone' and source_offer_milestone_index is null)
+      );
+  end if;
+end $guard$;
+
+-- The actual enforcement, at the only level that survives two browser tabs, a retried request or
+-- a direct SQL call: one invoice per (offer, milestone), and at most one full conversion per
+-- offer. The RPC below checks the same rules first so the owner gets a readable German error
+-- instead of a constraint violation, but these indexes are what make the rule true.
+--
+-- DELIBERATE: neither index filters on invoice status. A cancelled or voided invoice keeps
+-- occupying its milestone slot. Re-invoicing a cancelled rate is a real workflow (credit note,
+-- then reissue) that needs its own design; leaving the slot blocked can only ever refuse a
+-- legitimate action — which the owner can still satisfy with a manual invoice — whereas freeing
+-- it on cancellation would silently re-open the exact double-invoicing hole this closes.
+create unique index if not exists owner_invoices_offer_milestone_once
+  on public.owner_invoices (source_offer_id, source_offer_milestone_index)
+  where source_offer_conversion_kind = 'milestone';
+
+create unique index if not exists owner_invoices_offer_full_once
+  on public.owner_invoices (source_offer_id)
+  where source_offer_conversion_kind = 'full';
+
+commit;
+
+begin;
+
+-- The pre-existing production function is the TWO-argument
+-- convert_owner_offer_to_invoice_draft(uuid, uuid) from 20260723121000_owner_offers.sql.
+-- The replacement below adds a third parameter with a default, which Postgres treats as a NEW
+-- function rather than a replacement: without this drop both overloads would exist, every
+-- two-argument call from the app would fail with "function ... is not unique", and the old body
+-- — which still copies recurring lines onto the invoice — would remain reachable. Dropped
+-- explicitly so exactly one conversion function exists after this migration.
+drop function if exists public.convert_owner_offer_to_invoice_draft(uuid, uuid);
 
 commit;
 
@@ -318,9 +378,17 @@ begin;
 --     invoice (e.g. "Rate 1 - 50 %") — an intentional, PARTIAL conversion. It does NOT set
 --     converted_invoice_id or flip the offer to 'converted': the offer stays 'accepted' so a
 --     later rate can be invoiced as its own deliberate action, exactly as the owner asked
---     ("do not automatically create Rate 2"). Nothing tracks how much of the plan remains
---     invoiced — that is the "no fragile subsystem" boundary; the caller lists
---     source_offer_id-linked invoices first and shows them to the owner before this call.
+--     ("do not automatically create Rate 2").
+--
+-- The one-time amount can never be over-invoiced. Every conversion records what it billed
+-- (source_offer_conversion_kind / source_offer_milestone_index), and the three mutually
+-- exclusive rules below are enforced HERE for a readable error and by unique indexes for
+-- correctness under concurrency:
+--   * a milestone can be invoiced at most once;
+--   * the full amount cannot be invoiced once any milestone has been;
+--   * no milestone can be invoiced once the full amount has been.
+-- The `for update` lock on the offer row serialises concurrent conversions of the same offer,
+-- so two tabs racing on "Rate 1" queue behind each other and the second sees the first's row.
 --
 -- Both modes require a positive one-time amount to invoice. An offer with no one-time content
 -- (recurring-only, or every one-time line optional) raises BEFORE any row is inserted, so a
@@ -333,6 +401,7 @@ declare
   v_existing jsonb; o record; v_inv uuid; v_line record; v_group record; v_terms int; v_result jsonb;
   v_recurring_excluded int; v_one_time_net bigint; v_milestone jsonb; v_ratio numeric; v_label text;
   v_group_count int; v_desc text; v_net bigint;
+  v_full_invoiced boolean; v_milestone_total int; v_this_milestone int;
 begin
   if not public.is_platform_owner() then raise exception 'Owner access required'; end if;
   v_existing := public.owner_claim_idempotency(p_idempotency_key, 'convert_owner_offer_to_invoice_draft');
@@ -340,14 +409,41 @@ begin
 
   select * into o from public.owner_offers where id = p_offer_id for update;
   if o.id is null then raise exception 'offer not found'; end if;
-  -- Idempotent re-conversion: a REPEAT of the exact same full (non-milestone) conversion
-  -- returns the existing invoice rather than raising or duplicating. This never fires for a
-  -- milestone call — that intentionally stays independent, see above.
-  if p_milestone_index is null and o.converted_invoice_id is not null then
-    v_result := jsonb_build_object('invoice_id', o.converted_invoice_id, 'offer_id', p_offer_id, 'idempotent', true);
-    update public.owner_finance_requests set result = v_result where idempotency_key = p_idempotency_key;
-    return v_result;
+
+  -- What has this offer already produced? Counted across ALL statuses on purpose: a cancelled
+  -- invoice keeps its slot (see the unique-index comment above).
+  select
+    coalesce(bool_or(i.source_offer_conversion_kind = 'full'), false),
+    count(*) filter (where i.source_offer_conversion_kind = 'milestone'),
+    count(*) filter (where i.source_offer_conversion_kind = 'milestone'
+                       and i.source_offer_milestone_index = p_milestone_index)
+  into v_full_invoiced, v_milestone_total, v_this_milestone
+  from public.owner_invoices i where i.source_offer_id = p_offer_id;
+
+  -- converted_invoice_id is the authoritative "full conversion happened" marker: it is also set
+  -- by conversions made BEFORE this migration, whose invoices carry no source_offer_* columns.
+  v_full_invoiced := v_full_invoiced or o.converted_invoice_id is not null;
+
+  if p_milestone_index is null then
+    -- Idempotent re-conversion: a REPEAT of the same full conversion returns the existing
+    -- invoice rather than raising or duplicating — unchanged behaviour.
+    if v_full_invoiced then
+      v_result := jsonb_build_object('invoice_id', o.converted_invoice_id, 'offer_id', p_offer_id, 'idempotent', true);
+      update public.owner_finance_requests set result = v_result where idempotency_key = p_idempotency_key;
+      return v_result;
+    end if;
+    if v_milestone_total > 0 then
+      raise exception 'cannot invoice the full one-time amount: % instalment invoice(s) already exist for this offer', v_milestone_total;
+    end if;
+  else
+    if v_full_invoiced then
+      raise exception 'cannot invoice an instalment: the full one-time amount of this offer has already been invoiced';
+    end if;
+    if v_this_milestone > 0 then
+      raise exception 'payment-plan instalment % has already been invoiced for this offer', p_milestone_index + 1;
+    end if;
   end if;
+
   if o.status <> 'accepted' then raise exception 'only accepted offers can be converted'; end if;
 
   select coalesce(sum(net_cents), 0) into v_one_time_net from public.owner_offer_lines
@@ -378,10 +474,15 @@ begin
   select coalesce(default_payment_terms_days, 14) into v_terms from public.owner_document_settings where business_entity_id = o.business_entity_id;
   v_terms := coalesce(v_terms, 14);
 
+  -- Recording the provenance in the same INSERT is what makes the unique indexes the real
+  -- guarantee: a concurrent duplicate fails here, inside this transaction, before any invoice
+  -- line exists.
   insert into public.owner_invoices (business_entity_id, organization_id, client_account_id, engagement_id,
-    source_offer_id, status, issue_date, service_date, due_date, currency, notes, external_reference, created_by)
-  values (o.business_entity_id, o.organization_id, o.client_account_id, o.engagement_id, o.id, 'draft',
-    current_date, current_date, current_date + v_terms, o.currency,
+    source_offer_id, source_offer_conversion_kind, source_offer_milestone_index,
+    status, issue_date, service_date, due_date, currency, notes, external_reference, created_by)
+  values (o.business_entity_id, o.organization_id, o.client_account_id, o.engagement_id, o.id,
+    case when p_milestone_index is null then 'full' else 'milestone' end, p_milestone_index,
+    'draft', current_date, current_date, current_date + v_terms, o.currency,
     coalesce(o.payment_terms, ''), 'Angebot ' || coalesce(o.offer_number, o.id::text), auth.uid())
   returning id into v_inv;
 

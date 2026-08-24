@@ -180,3 +180,92 @@ describe('the migration keeps every guarantee in the actual SQL', () => {
     expect(MIGRATION_SQL).not.toMatch(/milestone_invoice/i);
   });
 });
+
+/* -------------------------------------------------- over-invoicing protection, at the DB level */
+
+describe('10. the RPC itself rejects duplicate and conflicting conversions', () => {
+  it('refuses a milestone that already produced an invoice', () => {
+    expect(CONVERT_FN).toMatch(/if v_this_milestone > 0 then\s*\n\s*raise exception 'payment-plan instalment % has already been invoiced/);
+  });
+
+  it('refuses the full amount once any instalment exists', () => {
+    expect(CONVERT_FN).toMatch(/if v_milestone_total > 0 then\s*\n\s*raise exception 'cannot invoice the full one-time amount/);
+  });
+
+  it('refuses an instalment once the full amount has been invoiced', () => {
+    expect(CONVERT_FN).toMatch(/if v_full_invoiced then\s*\n\s*raise exception 'cannot invoice an instalment/);
+  });
+
+  it('treats a pre-migration conversion as a full conversion, so historical offers are protected', () => {
+    // Invoices created before this migration carry no source_offer_* columns at all; only
+    // owner_offers.converted_invoice_id records that they happened.
+    expect(CONVERT_FN).toMatch(/v_full_invoiced := v_full_invoiced or o\.converted_invoice_id is not null;/);
+  });
+
+  it('counts prior conversions across ALL invoice statuses (a cancelled invoice keeps its slot)', () => {
+    const countQuery = CONVERT_FN.slice(
+      CONVERT_FN.indexOf('into v_full_invoiced, v_milestone_total, v_this_milestone') - 500,
+      CONVERT_FN.indexOf('where i.source_offer_id = p_offer_id') + 60,
+    );
+    expect(countQuery).toMatch(/from public\.owner_invoices i where i\.source_offer_id = p_offer_id/);
+    expect(countQuery).not.toMatch(/i\.status/);
+  });
+
+  it('checks every rule BEFORE inserting the invoice', () => {
+    const insertIdx = CONVERT_FN.indexOf('insert into public.owner_invoices');
+    for (const guard of ['cannot invoice the full one-time amount', 'cannot invoice an instalment', 'has already been invoiced']) {
+      expect(CONVERT_FN.indexOf(guard)).toBeGreaterThan(-1);
+      expect(CONVERT_FN.indexOf(guard)).toBeLessThan(insertIdx);
+    }
+  });
+});
+
+describe('11. concurrency-safe duplicate prevention', () => {
+  it('serialises concurrent conversions of the same offer with a row lock', () => {
+    // Two tabs both clicking "Rate 1" queue behind this lock; the second then sees the first's
+    // invoice row in the count above and raises instead of inserting a duplicate.
+    const lockIdx = CONVERT_FN.indexOf('from public.owner_offers where id = p_offer_id for update');
+    const countIdx = CONVERT_FN.indexOf('into v_full_invoiced, v_milestone_total, v_this_milestone');
+    expect(lockIdx).toBeGreaterThan(-1);
+    expect(countIdx).toBeGreaterThan(lockIdx);
+  });
+
+  it('backs the rule with unique indexes, so even a direct INSERT cannot duplicate', () => {
+    expect(MIGRATION_SQL).toMatch(
+      /create unique index if not exists owner_invoices_offer_milestone_once\s*\n\s*on public\.owner_invoices \(source_offer_id, source_offer_milestone_index\)\s*\n\s*where source_offer_conversion_kind = 'milestone';/,
+    );
+    expect(MIGRATION_SQL).toMatch(
+      /create unique index if not exists owner_invoices_offer_full_once\s*\n\s*on public\.owner_invoices \(source_offer_id\)\s*\n\s*where source_offer_conversion_kind = 'full';/,
+    );
+  });
+
+  it('records the provenance in the same INSERT the index protects', () => {
+    const insert = CONVERT_FN.slice(CONVERT_FN.indexOf('insert into public.owner_invoices'));
+    expect(insert).toMatch(/source_offer_id, source_offer_conversion_kind, source_offer_milestone_index/);
+    expect(insert).toMatch(/case when p_milestone_index is null then 'full' else 'milestone' end, p_milestone_index/);
+  });
+});
+
+describe('the replaced production function leaves no reachable overload', () => {
+  it('drops the pre-existing two-argument signature', () => {
+    // convert_owner_offer_to_invoice_draft(uuid, uuid) is live in production. Adding a third
+    // parameter with a default creates a NEW function rather than replacing it: without this
+    // drop both would exist, every two-argument call would fail with "function is not unique",
+    // and the old body — which copies recurring lines onto the invoice — would stay reachable.
+    expect(MIGRATION_SQL).toMatch(/drop function if exists public\.convert_owner_offer_to_invoice_draft\(uuid, uuid\);/);
+  });
+
+  it('grants the new three-argument signature explicitly', () => {
+    expect(MIGRATION_SQL).toMatch(/revoke execute on function public\.convert_owner_offer_to_invoice_draft\(uuid, uuid, int\) from public, anon;/);
+    expect(MIGRATION_SQL).toMatch(/grant execute on function public\.convert_owner_offer_to_invoice_draft\(uuid, uuid, int\) to authenticated, service_role;/);
+  });
+});
+
+describe('12. recurring-only offer still creates no empty invoice', () => {
+  it('raises before the insert, with the recurring explanation', () => {
+    const insertIdx = CONVERT_FN.indexOf('insert into public.owner_invoices');
+    const guardIdx = CONVERT_FN.indexOf('offer has no invoiceable one-time position');
+    expect(guardIdx).toBeGreaterThan(-1);
+    expect(guardIdx).toBeLessThan(insertIdx);
+  });
+});

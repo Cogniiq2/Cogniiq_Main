@@ -184,18 +184,22 @@ export interface OfferLinkedInvoiceRef {
   net_total_cents: number;
   gross_total_cents: number;
   created_at: string;
+  /** What this invoice billed: the whole one-time amount, or one payment-plan instalment. */
+  source_offer_conversion_kind: 'full' | 'milestone' | null;
+  /** 0-based payment_schedule position for a milestone conversion; null for a full one. */
+  source_offer_milestone_index: number | null;
 }
 
 /**
- * Invoices already created from this offer (via convertOfferToInvoiceDraft) — the surface for
- * "did I already invoice this rate?". A plain read, not a schedule or remaining-balance
- * calculation: the caller shows this list so a human notices a rate has already been billed
- * before choosing to invoice again.
+ * Invoices already created from this offer (via convertOfferToInvoiceDraft), in any status.
+ * Feeds `offerConversionAvailability` so the conversion dialog can disable a rate that has
+ * already been billed rather than merely warn about it. Cancelled invoices are included on
+ * purpose — a cancelled invoice keeps its milestone slot.
  */
 export async function loadInvoicesForOffer(offerId: string): Promise<{ data: OfferLinkedInvoiceRef[]; error: string | null }> {
   const { data, error } = await supabase
     .from('owner_invoices')
-    .select('id, invoice_number, status, currency, net_total_cents, gross_total_cents, created_at')
+    .select('id, invoice_number, status, currency, net_total_cents, gross_total_cents, created_at, source_offer_conversion_kind, source_offer_milestone_index')
     .eq('source_offer_id', offerId)
     .order('created_at', { ascending: false });
   if (error) return { data: [], error: error.message };
