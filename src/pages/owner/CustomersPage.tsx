@@ -1,23 +1,38 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Plus, Search } from 'lucide-react';
+import { Users, Plus, Search, Archive, RotateCcw, Trash2 } from 'lucide-react';
 
 import {
-  Button, DataTable, EmptyState, ErrorState, KpiCard, PageHeader, Select,
-  StatusBadge, Tabs, TableSkeleton, type Column,
+  Button, ConfirmDialog, DataTable, EmptyState, ErrorState, IconButton, KpiCard, PageHeader, Select,
+  StatusBadge, Tabs, TableSkeleton, useToast, type Column,
 } from '@/components/dashboard';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
-import { loadCustomers } from '@/lib/ownerFinance/customersApi';
+import {
+  loadCustomers, loadDeleteBlockers, archiveCustomer, unarchiveCustomer, deleteCustomer,
+} from '@/lib/ownerFinance/customersApi';
 import { formatDateDe } from '@/lib/ownerFinance/exports';
 import { customerStatusLabel, customerStatusTone, customerDisplayName } from '@/lib/ownerFinance/customerLabels';
 import { CustomerFormDialog } from '@/components/finance/CustomerFormDialog';
-import type { OwnerCustomerListRow } from '@/lib/ownerFinance/types';
+import { formatCentsCurrencyDe } from '@/lib/ownerFinance/exports';
+import type { OwnerCustomerListRow, OwnerCustomerDeleteBlockers } from '@/lib/ownerFinance/types';
 
 // Primary operational workspace for owner-side customer management. All customers in one overview
 // with status/task filters, search, sorting and clear empty/loading/error states. Matches the
 // existing owner dashboard design system. German throughout.
 
 type SortKey = 'newest' | 'oldest' | 'activity' | 'name';
+
+/** Names only the non-zero reasons a customer cannot be deleted. */
+function blockerSentence(b: OwnerCustomerDeleteBlockers): string {
+  const parts: string[] = [];
+  if (b.issued_invoices > 0) parts.push(`${b.issued_invoices} ausgestellte Rechnung${b.issued_invoices === 1 ? '' : 'en'}`);
+  if (b.payments > 0) parts.push(`${b.payments} Zahlung${b.payments === 1 ? '' : 'en'}`);
+  if (b.finalized_offers > 0) parts.push(`${b.finalized_offers} verbindliche${b.finalized_offers === 1 ? 's' : ''} Angebot${b.finalized_offers === 1 ? '' : 'e'}`);
+  if (b.subscriptions > 0) parts.push(`${b.subscriptions} Abonnement${b.subscriptions === 1 ? '' : 's'}`);
+  if (parts.length === 0) return 'geschützte Datensätze';
+  if (parts.length === 1) return parts[0];
+  return `${parts.slice(0, -1).join(', ')} und ${parts[parts.length - 1]}`;
+}
 
 const FILTERS: { value: string; label: string; match: (c: OwnerCustomerListRow) => boolean }[] = [
   { value: 'all', label: 'Alle', match: () => true },
@@ -39,6 +54,11 @@ export function CustomersPage() {
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<SortKey>('activity');
   const [createOpen, setCreateOpen] = useState(false);
+  /* Row actions. Blockers are fetched when the dialog opens so the confirmation
+     can name what stands in the way instead of only refusing on submit. */
+  const [pendingDelete, setPendingDelete] = useState<{ row: OwnerCustomerListRow; blockers: OwnerCustomerDeleteBlockers | null } | null>(null);
+  const [pendingArchive, setPendingArchive] = useState<OwnerCustomerListRow | null>(null);
+  const toast = useToast();
 
   const load = useCallback(async () => {
     if (!entity) return;
@@ -51,6 +71,41 @@ export function CustomersPage() {
   }, [entity]);
 
   useEffect(() => { void load(); }, [load]);
+
+  const askDelete = useCallback(async (row: OwnerCustomerListRow) => {
+    setPendingDelete({ row, blockers: null });
+    try {
+      setPendingDelete({ row, blockers: await loadDeleteBlockers(row.id) });
+    } catch {
+      // Leave blockers null: the dialog then shows the plain warning and the
+      // server still refuses anything protected.
+    }
+  }, []);
+
+  const runDelete = useCallback(async () => {
+    if (!pendingDelete) return;
+    const { row } = pendingDelete;
+    const { deleted, error: err } = await deleteCustomer(row.id);
+    setPendingDelete(null);
+    if (err || !deleted) { toast.error('Löschen nicht möglich', err ?? 'Unbekannter Fehler'); return; }
+    toast.success('Kunde gelöscht', customerDisplayName(row));
+    void load();
+  }, [pendingDelete, toast, load]);
+
+  const runArchive = useCallback(async () => {
+    if (!pendingArchive) return;
+    const { error: err } = await archiveCustomer(pendingArchive.id);
+    setPendingArchive(null);
+    if (err) { toast.error('Archivieren fehlgeschlagen', err); return; }
+    toast.success('Kunde archiviert', 'Rechnungen und Angebote bleiben erhalten.');
+    void load();
+  }, [pendingArchive, toast, load]);
+
+  const runRestore = useCallback(async (row: OwnerCustomerListRow) => {
+    const { error: err } = await unarchiveCustomer(row.id);
+    if (err) { toast.error('Wiederherstellen fehlgeschlagen', err); return; }
+    void load();
+  }, [toast, load]);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
@@ -92,11 +147,25 @@ export function CustomersPage() {
     { key: 'email', header: 'E-Mail', render: (c) => <span className="text-gray-600">{c.email ?? '—'}</span>, hideOnMobile: true },
     { key: 'phone', header: 'Telefon', render: (c) => <span className="text-gray-600">{c.phone ?? '—'}</span>, hideOnMobile: true },
     { key: 'offers', header: 'Angebote', align: 'right', render: (c) => <span className="tabular-nums text-gray-700">{c.offer_count}</span> },
+    { key: 'invoices', header: 'Rechnungen', align: 'right', render: (c) => <span className="tabular-nums text-gray-700">{c.invoice_count}</span>, hideOnMobile: true },
+    { key: 'revenue', header: 'Umsatz', align: 'right', render: (c) => <span className="tabular-nums text-gray-700">{formatCentsCurrencyDe(c.revenue_gross_cents, 'EUR')}</span>, hideOnMobile: true },
     { key: 'open', header: 'Offene Aufgaben', align: 'right', render: (c) => <span className={`tabular-nums font-medium ${c.open_task_count > 0 ? 'text-amber-700' : 'text-gray-400'}`}>{c.open_task_count}</span> },
     { key: 'done', header: 'Erledigt', align: 'right', render: (c) => <span className="tabular-nums text-gray-500">{c.completed_task_count}</span>, hideOnMobile: true },
     { key: 'status', header: 'Status', render: (c) => <StatusBadge label={customerStatusLabel[c.status]} tone={customerStatusTone[c.status]} /> },
     { key: 'activity', header: 'Letzte Aktivität', render: (c) => <span className="text-gray-500">{formatDateDe(c.last_activity_at)}</span>, hideOnMobile: true },
     { key: 'created', header: 'Angelegt', render: (c) => <span className="text-gray-500">{formatDateDe(c.created_at)}</span>, hideOnMobile: true },
+    {
+      key: 'actions', header: '', align: 'right', render: (c) => (
+        <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+          {c.status === 'archived' ? (
+            <IconButton icon={RotateCcw} label="Kunde wiederherstellen" variant="ghost" onClick={() => void runRestore(c)} />
+          ) : (
+            <IconButton icon={Archive} label="Kunde archivieren" variant="ghost" onClick={() => setPendingArchive(c)} />
+          )}
+          <IconButton icon={Trash2} label="Kunde löschen" variant="ghost" onClick={() => void askDelete(c)} />
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -144,17 +213,17 @@ export function CustomersPage() {
 
       {loading ? <TableSkeleton rows={6} cols={6} /> : rows.length === 0 ? (
         <EmptyState icon={Users}
-          title="Noch keine Kunden im internen Finance-Aufgabensystem"
+          title="Noch keine Kunden angelegt"
           description={
-            'Dies ist NICHT die Liste Ihrer Portalkunden — „Kunden & Aufgaben“ ist ein separates, '
-            + 'internes Finance-System für Angebote und Aufgaben. Kunden aus bestehenden Angeboten '
-            + 'werden automatisch übernommen. Die tatsächlichen Portalkunden (Organisationen, '
-            + 'Kundenportal-Projekte, Dokumente) verwalten Sie unter „Kunden“.'
+            'Dies ist der zentrale Kundenstamm: Kunden, die Sie hier anlegen, stehen sofort im '
+            + 'Finanzbereich zur Auswahl, und Kunden, die Sie beim Erstellen eines Angebots oder '
+            + 'einer Rechnung anlegen, erscheinen sofort hier. Es ist derselbe Datensatz. '
+            + 'Portalzugang, Kundenprojekte und Dokumente verwalten Sie weiterhin unter „Kunden“.'
           }
           action={
             <div className="flex flex-wrap items-center justify-center gap-2">
               <Button icon={Plus} onClick={() => setCreateOpen(true)} disabled={!entity}>Neuer Kunde</Button>
-              <Button variant="secondary" onClick={() => navigate('/admin/clients')}>Zur Kundenliste (Kunden)</Button>
+              <Button variant="secondary" onClick={() => navigate('/admin/clients')}>Zum Portalzugang (Kunden)</Button>
             </div>
           } />
       ) : visible.length === 0 ? (
@@ -171,6 +240,81 @@ export function CustomersPage() {
           open={createOpen} onClose={() => setCreateOpen(false)} entityId={entity.id}
           onSaved={(id) => navigate(`/admin/finance/customers/${id}`)} />
       ) : null}
+
+      <ConfirmDialog
+        open={!!pendingArchive} onClose={() => setPendingArchive(null)} onConfirm={runArchive}
+        title="Kunde archivieren" confirmLabel="Kunde archivieren"
+        message={
+          <>
+            <p>
+              <span className="font-semibold text-gray-950">
+                {pendingArchive ? customerDisplayName(pendingArchive) : ''}
+              </span>{' '}
+              wird aus der aktiven Liste und aus den Auswahlfeldern im Finanzbereich ausgeblendet.
+            </p>
+            <p className="mt-2">Nichts wird gelöscht. Sie können den Kunden jederzeit wiederherstellen.</p>
+          </>
+        } />
+
+      {/*
+        Two outcomes behind one button, decided by the server's blocker counts:
+        a customer without protected records is deleted, a customer with them is
+        never silently archived instead — the dialog says why and offers the
+        archive explicitly.
+      */}
+      <ConfirmDialog
+        open={!!pendingDelete}
+        onClose={() => setPendingDelete(null)}
+        tone="danger"
+        title={pendingDelete?.blockers && !pendingDelete.blockers.deletable ? 'Löschen nicht möglich' : 'Kunde löschen?'}
+        confirmLabel={pendingDelete?.blockers && !pendingDelete.blockers.deletable ? 'Stattdessen archivieren' : 'Kunde löschen'}
+        onConfirm={async () => {
+          if (pendingDelete?.blockers && !pendingDelete.blockers.deletable) {
+            const row = pendingDelete.row;
+            setPendingDelete(null);
+            setPendingArchive(row);
+            return;
+          }
+          await runDelete();
+        }}
+        message={
+          pendingDelete?.blockers && !pendingDelete.blockers.deletable ? (
+            <>
+              <p>
+                <span className="font-semibold text-gray-950">{customerDisplayName(pendingDelete.row)}</span>{' '}
+                hat {blockerSentence(pendingDelete.blockers)} und kann deshalb nicht gelöscht werden.
+              </p>
+              <p className="mt-2">
+                Diese Unterlagen sind aufbewahrungspflichtig und werden nicht mitgelöscht. Archivieren
+                Sie den Kunden, um ihn aus der aktiven Ansicht zu entfernen.
+              </p>
+            </>
+          ) : (
+            <>
+              <p>
+                <span className="font-semibold text-gray-950">
+                  {pendingDelete ? customerDisplayName(pendingDelete.row) : ''}
+                </span>{' '}
+                wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.
+              </p>
+              {pendingDelete?.blockers
+                && pendingDelete.blockers.draft_invoices + pendingDelete.blockers.draft_offers > 0 ? (
+                <p className="mt-2">
+                  Mitgelöscht werden{' '}
+                  {[
+                    pendingDelete.blockers.draft_invoices > 0
+                      ? `${pendingDelete.blockers.draft_invoices} Rechnungsentwurf${pendingDelete.blockers.draft_invoices === 1 ? '' : 'e'}`
+                      : null,
+                    pendingDelete.blockers.draft_offers > 0
+                      ? `${pendingDelete.blockers.draft_offers} Angebotsentwurf${pendingDelete.blockers.draft_offers === 1 ? '' : 'e'}`
+                      : null,
+                  ].filter(Boolean).join(' und ')}
+                  .
+                </p>
+              ) : null}
+            </>
+          )
+        } />
     </>
   );
 }

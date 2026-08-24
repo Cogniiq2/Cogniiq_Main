@@ -2,14 +2,15 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Plus, Receipt, Trash2 } from 'lucide-react';
 
 import {
-  Button, Card, Checkbox, DataTable, EmptyState, ErrorState, IconButton, InfoBanner, KpiCard, Modal,
-  PageHeader, SectionHeader, SlideOver, StatusBadge, Tabs, TableSkeleton, Field, Select, Textarea,
-  useToast, type Column,
+  Button, Card, Checkbox, ConfirmDialog, DataTable, EmptyState, ErrorState, IconButton, InfoBanner,
+  KpiCard, Modal, PageHeader, SectionHeader, SlideOver, StatusBadge, Tabs, TableSkeleton, Field,
+  Select, Textarea, useToast, type Column,
 } from '@/components/dashboard';
 import { expenseReviewTone, paymentStatusTone } from '@/pages/owner/ownerUi';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import {
-  createOwnerExpense, loadCategories, loadExpenses, loadVendors, markExpenseReviewed, recordExpensePayment,
+  createOwnerExpense, deleteDraftExpense, loadCategories, loadExpenses, loadVendors,
+  markExpenseReviewed, recordExpensePayment,
   type ExpenseLineInput,
 } from '@/lib/ownerFinance/api';
 import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
@@ -59,6 +60,7 @@ export function ExpensesPage() {
   const [error, setError] = useState<string | null>(null);
   const [composerOpen, setComposerOpen] = useState(false);
   const [payFor, setPayFor] = useState<OwnerExpense | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<OwnerExpense | null>(null);
   const [filter, setFilter] = useState('all');
   const [includeIds, setIncludeIds] = useState(false);
 
@@ -144,6 +146,9 @@ export function ExpensesPage() {
         <div className="flex justify-end gap-1.5" onClick={(ev) => ev.stopPropagation()}>
           {e.payment_status !== 'paid' && e.payment_status !== 'void' ? <Button size="sm" variant="secondary" onClick={() => setPayFor(e)}>Zahlung</Button> : null}
           {e.review_status !== 'reviewed' ? <Button size="sm" variant="ghost" onClick={() => void markReviewed(e)}>Geprüft</Button> : null}
+          {e.review_status !== 'reviewed' && e.amount_paid_cents === 0
+            ? <IconButton icon={Trash2} label="Beleg löschen" variant="ghost" onClick={() => setConfirmDelete(e)} />
+            : null}
         </div>
       ),
     },
@@ -233,6 +238,41 @@ export function ExpensesPage() {
         onClose={() => setPayFor(null)}
         onDone={() => { setPayFor(null); toast.success('Zahlung erfasst'); void load(); }}
         onError={(m) => toast.error('Zahlung fehlgeschlagen', m)}
+      />
+
+      {/*
+        Only unreviewed, unpaid expenses reach this dialog. Anything that has
+        entered the books is refused by the RPC, so there is no path from here to
+        a reviewed or paid record.
+      */}
+      <ConfirmDialog
+        open={!!confirmDelete}
+        onClose={() => setConfirmDelete(null)}
+        tone="danger"
+        title="Beleg löschen?"
+        confirmLabel="Beleg löschen"
+        message={
+          <>
+            <p>
+              Der Beleg{confirmDelete?.supplier_invoice_number ? ` ${confirmDelete.supplier_invoice_number}` : ''} über{' '}
+              <span className="font-semibold text-gray-950">
+                {confirmDelete ? formatCents(confirmDelete.gross_total_cents, confirmDelete.currency) : ''}
+              </span>{' '}
+              wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.
+            </p>
+            <p className="mt-2">
+              Geprüfte oder bezahlte Ausgaben können nicht gelöscht werden.
+            </p>
+          </>
+        }
+        onConfirm={async () => {
+          if (!confirmDelete) return;
+          const { error: err } = await deleteDraftExpense(confirmDelete.id);
+          setConfirmDelete(null);
+          if (err) { toast.error('Löschen nicht möglich', err); return; }
+          toast.success('Beleg gelöscht');
+          void load();
+        }}
       />
     </>
   );

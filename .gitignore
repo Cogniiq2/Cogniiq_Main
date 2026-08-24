@@ -32,3 +32,8 @@ prerender-report.json
 
 # Graphify local generated output
 graphify-out/
+
+# Supabase CLI local-stack artifacts (`supabase start`). Machine-local state,
+# never part of the repository.
+supabase/.temp/
+supabase/.branches/
