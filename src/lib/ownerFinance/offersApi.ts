@@ -134,10 +134,17 @@ export async function setOfferStatus(offerId: string, status: string, reason?: s
   return { error: error?.message ?? null };
 }
 
-export async function convertOfferToInvoiceDraft(offerId: string): Promise<{ invoiceId: string | null; error: string | null }> {
+/**
+ * Convert an accepted offer into a draft invoice. Only ONE-TIME positions are copied — recurring
+ * positions (pricing_type = 'recurring') are a separate billing track and are never included,
+ * regardless of billing interval or minimum term. `recurringLinesExcluded` lets the caller tell
+ * the owner how many recurring positions still need their own arrangement.
+ */
+export async function convertOfferToInvoiceDraft(offerId: string): Promise<{ invoiceId: string | null; recurringLinesExcluded: number; error: string | null }> {
   const { data, error } = await supabase.rpc('convert_owner_offer_to_invoice_draft', { p_idempotency_key: secureUuid(), p_offer_id: offerId });
-  if (error) return { invoiceId: null, error: error.message };
-  return { invoiceId: (data as { invoice_id?: string })?.invoice_id ?? null, error: null };
+  if (error) return { invoiceId: null, recurringLinesExcluded: 0, error: error.message };
+  const result = data as { invoice_id?: string; recurring_lines_excluded?: number };
+  return { invoiceId: result?.invoice_id ?? null, recurringLinesExcluded: result?.recurring_lines_excluded ?? 0, error: null };
 }
 
 /* ----------------------------------------------------------------- Generated documents + tokens */

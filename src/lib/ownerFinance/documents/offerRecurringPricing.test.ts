@@ -362,35 +362,84 @@ describe('editor, preview, document and portal agree', () => {
 });
 
 describe('offer to invoice conversion', () => {
-  // The conversion RPC copies one-time lines verbatim and recurring lines at ONE billing
-  // period. Because a recurring line's unit price IS the per-interval amount and the term
-  // lives outside quantity, a verbatim copy already invoices exactly one period.
-  function convertToInvoiceNet(lines: DocumentLineItem[]): number {
-    return lines.filter((l) => !l.isOptional).reduce((sum, l) => sum + l.netCents, 0);
+  // The initial invoice is the ONE-TIME project charge only. Recurring positions are a
+  // separate billing track — typically starting only after go-live/commissioning — and must
+  // never appear on this invoice, not at one period and not at the whole minimum term. An
+  // earlier version of this RPC copied each recurring line at one billing period, which
+  // produced "setup + one month" the instant an offer was accepted, before the recurring
+  // charge's own billing start had even occurred. That is exactly the bug this policy exists
+  // to prevent.
+  function invoicedNet(lines: DocumentLineItem[]): number {
+    return lines
+      .filter((l) => !l.isOptional && pricingTypeOf(l) === 'one_time')
+      .reduce((sum, l) => sum + l.netCents, 0);
   }
 
-  it('invoices setup plus one month, never setup plus the whole minimum term', () => {
+  it('invoices the one-time amount only — never setup plus a month, never setup plus the term', () => {
     const lines = packageLines(PACKAGES[0]);
-    expect(convertToInvoiceNet(lines)).toBe(390000 + 29000);
-    expect(convertToInvoiceNet(lines)).not.toBe(738000);
+    expect(invoicedNet(lines)).toBe(390000);
+    expect(invoicedNet(lines)).not.toBe(390000 + 29000);
+    expect(invoicedNet(lines)).not.toBe(738000);
   });
 
-  it('keeps the invoiceable recurring amount independent of the term', () => {
+  it('excludes recurring lines from the invoice regardless of quantity or term', () => {
     const short = packageLines({ ...PACKAGES[0], term: 6 });
     const long = packageLines({ ...PACKAGES[0], term: 36 });
-    expect(convertToInvoiceNet(short)).toBe(convertToInvoiceNet(long));
+    expect(invoicedNet(short)).toBe(390000);
+    expect(invoicedNet(long)).toBe(390000);
   });
 
-  it('never multiplies a recurring line by its minimum term in the SQL', () => {
-    // Guards the actual migration text: the conversion must copy `quantity_milli` as stored
-    // and must not reference minimum_term_months when building invoice lines.
+  it('produces a zero-line invoice for a recurring-only offer rather than inventing a charge', () => {
+    expect(invoicedNet([monthlyLine('Betreuung', 290, 12)])).toBe(0);
+  });
+
+  it('SV Heinersreuth Admin: the initial invoice is 3.900 EUR, split 50/50, and never touches the 290 EUR/Monat', () => {
+    // Exactly the scenario from the commercial spec: setup 3.900 EUR, 50/50 payment plan,
+    // recurring 290 EUR/Monat starting ab Inbetriebnahme. The invoice must be 3.900 EUR — not
+    // 3.900 + 290, and never 3.900 + 12 x 290.
+    const lines = [
+      oneTimeLine('Einrichtung & Inbetriebnahme', 3900),
+      monthlyLine('Laufende Betreuung & Betrieb', 290, 12),
+    ];
+    const invoiced = invoicedNet(lines);
+    expect(invoiced).toBe(390000);
+
+    const rate1 = milestoneAmountCents({ label: '50 % bei Auftragserteilung', percentageBp: 5000 }, invoiced);
+    const rate2 = milestoneAmountCents({ label: '50 % nach Fertigstellung und Übergabe', percentageBp: 5000 }, invoiced);
+    expect(rate1).toBe(195000);
+    expect(rate2).toBe(195000);
+    expect(rate1! + rate2!).toBe(invoiced);
+
+    // The recurring commitment is untouched by the invoice — it stays a per-position fact on
+    // the offer, ready to be billed separately once its own billing start actually occurs.
+    const recurring = lines.find((l) => pricingTypeOf(l) === 'recurring')!;
+    expect(recurring.billingStartType).toBe('commissioning'); // "ab Inbetriebnahme"
+    expect(recurring.netCents).toBe(29000);
+  });
+
+  it('never copies a recurring line onto the invoice in the SQL', () => {
+    // Guards the actual migration text: the insert loop that builds invoice lines must only
+    // ever run over pricing_type = 'one_time', and no second loop may insert recurring rows.
     const code = MIGRATION_SQL.split('\n').filter((l) => !l.trim().startsWith('--')).join('\n');
     const conversion = code.slice(code.indexOf('function public.convert_owner_offer_to_invoice_draft'));
-    const insertBlock = conversion.slice(0, conversion.indexOf('update public.owner_offers set converted_invoice_id'));
-    expect(insertBlock).not.toMatch(/minimum_term_months/);
-    expect(insertBlock).toMatch(/pricing_type = 'one_time'/);
-    expect(insertBlock).toMatch(/pricing_type = 'recurring'/);
-    expect(insertBlock).toMatch(/v_line\.quantity_milli, v_line\.unit_price_cents/);
+    const body = conversion.slice(0, conversion.indexOf('update public.owner_offers set converted_invoice_id'));
+    const insertStatements = body.match(/insert into public\.owner_invoice_lines[\s\S]*?;/g) ?? [];
+    expect(insertStatements).toHaveLength(1);
+    // The single insert is fed by exactly one `for` loop, and that loop's own source query is
+    // filtered to one-time lines only.
+    const loops = body.match(/for v_line in select \* from public\.owner_offer_lines[\s\S]*?end loop;/g) ?? [];
+    expect(loops).toHaveLength(1);
+    expect(loops[0]).toMatch(/pricing_type = 'one_time'/);
+    expect(loops[0]).not.toMatch(/pricing_type = 'recurring'/);
+    // The excluded count is reported back to the caller (checked against the whole function,
+    // since it is computed and returned after the insert loop, past the `body` truncation point).
+    const fnEnd = conversion.indexOf('$fn$;');
+    expect(conversion.slice(0, fnEnd)).toMatch(/recurring_lines_excluded/);
+  });
+
+  it('surfaces the excluded count to the caller instead of silently dropping it', () => {
+    expect(MIGRATION_SQL).toMatch(/recurring_lines_excluded/);
+    expect(MIGRATION_SQL).not.toMatch(/recurring_lines_billed_once/);
   });
 });
 

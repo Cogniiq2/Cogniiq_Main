@@ -250,9 +250,17 @@ export function OfferDetailPage() {
 
   const convert = () => run('convert', async () => {
     if (!offer) return;
-    const { invoiceId, error: err } = await convertOfferToInvoiceDraft(offer.id);
+    const { invoiceId, recurringLinesExcluded, error: err } = await convertOfferToInvoiceDraft(offer.id);
     if (err || !invoiceId) { toast.error('Umwandlung fehlgeschlagen', err ?? 'Unbekannt'); return; }
-    toast.success('Rechnungsentwurf erstellt', 'Bitte prüfen und stellen.');
+    // Recurring positions are never copied onto the initial invoice — they are billed on their
+    // own interval, typically starting only after go-live. Make that explicit rather than let
+    // the owner assume the draft covers the full offer.
+    toast.success(
+      'Rechnungsentwurf erstellt',
+      recurringLinesExcluded > 0
+        ? `Bitte prüfen und stellen. ${recurringLinesExcluded} wiederkehrende Position${recurringLinesExcluded === 1 ? '' : 'en'} wurde${recurringLinesExcluded === 1 ? '' : 'n'} NICHT übernommen — diese werden separat gemäß Abrechnungsintervall berechnet.`
+        : 'Bitte prüfen und stellen.',
+    );
     navigate(`/admin/finance/invoices/${invoiceId}`);
   });
 
@@ -493,7 +501,10 @@ export function OfferDetailPage() {
                 <Button variant="ghost" onClick={() => setConfirmCancel(true)}>Angebot stornieren</Button>
               </div>
             ) : null}
-            <p className="mt-4 text-[12px] leading-relaxed text-gray-400">Angenommene Angebote werden zu einem Rechnungsentwurf. Rechnungen werden nie automatisch gestellt.</p>
+            <p className="mt-4 text-[12px] leading-relaxed text-gray-400">
+              Angenommene Angebote werden zu einem Rechnungsentwurf. Rechnungen werden nie automatisch gestellt.
+              {pricing.hasRecurring ? ' Wiederkehrende Positionen werden dabei nicht übernommen — sie werden separat gemäß Abrechnungsintervall berechnet.' : ''}
+            </p>
           </Card>
 
           <CustomerPortalPublishCard

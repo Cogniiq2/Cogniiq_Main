@@ -9,6 +9,7 @@ import { PremiumOfferWebView } from '@/components/finance/PremiumOfferWebView';
 import { SignaturePad, type SignaturePadHandle } from '@/components/finance/SignaturePad';
 import { computeOfferPricing, intervalSuffix, type OfferPricing } from '@/lib/ownerFinance/documents/offerPricing';
 import { publicLinesToDocumentItems } from '@/lib/ownerFinance/publicOfferPricing';
+import { formatOfferAmount } from '@/lib/ownerFinance/offerAmountDisplay';
 
 // Standalone, tokenized customer document portal (/d/:token). No marketing/dashboard
 // chrome, no auth. Owns the full viewport. The raw token never grants access by resource
@@ -298,7 +299,7 @@ function SuccessPanel({ offer, thanks, onDownload, via }: { offer: PublicOfferPr
         <div className="flex justify-between"><dt className="text-slate-400">Angebot</dt><dd className="font-semibold text-slate-800">{offer.offer_number}</dd></div>
         <div className="flex justify-between"><dt className="text-slate-400">Angenommen am</dt><dd className="text-slate-700">{formatDateDe(offer.accepted_at ?? new Date().toISOString())}</dd></div>
         {offer.accepted_signer_name ? <div className="flex justify-between"><dt className="text-slate-400">Unterschrieben von</dt><dd className="text-slate-700">{offer.accepted_signer_name}</dd></div> : null}
-        <div className="flex justify-between"><dt className="text-slate-400">Betrag</dt><dd className="tabular-nums font-semibold text-slate-900">{formatCentsCurrencyDe(offer.gross_total_cents, offer.currency)}</dd></div>
+        <div className="flex justify-between"><dt className="text-slate-400">Betrag</dt><dd className="tabular-nums font-semibold text-slate-900">{formatOfferAmount(offer, offer.currency, formatCentsCurrencyDe)}</dd></div>
       </dl>
 
       <p className="mt-4 max-w-md text-[13px] text-slate-400">
@@ -390,7 +391,7 @@ function AcceptFlow({ offer, onClose, onDone }: {
           {/* Offer being accepted — always visible */}
           <div className="mb-5 rounded-2xl bg-slate-50 p-4 text-[13px]">
             <div className="flex justify-between"><span className="text-slate-400">Angebot</span><span className="font-semibold text-slate-800">{offer.offer_number}</span></div>
-            <div className="mt-1 flex justify-between"><span className="text-slate-400">Betrag</span><span className="tabular-nums font-semibold text-slate-900">{formatCentsCurrencyDe(offer.gross_total_cents, offer.currency)}</span></div>
+            <div className="mt-1 flex justify-between"><span className="text-slate-400">Betrag</span><span className="tabular-nums font-semibold text-slate-900">{formatOfferAmount(offer, offer.currency, formatCentsCurrencyDe)}</span></div>
             <div className="mt-1 flex justify-between"><span className="text-slate-400">Gültig bis</span><span className="text-slate-700">{formatDateDe(offer.valid_until)}</span></div>
             {offer.recipient?.company ? <div className="mt-1 flex justify-between"><span className="text-slate-400">Unternehmen</span><span className="text-slate-700 [overflow-wrap:anywhere]">{offer.recipient.company}</span></div> : null}
           </div>
@@ -416,7 +417,7 @@ function AcceptFlow({ offer, onClose, onDone }: {
               <div className="grid grid-cols-[1fr_auto] items-start gap-4">
                 <div className="text-[13px]">
                   <div className="text-slate-400">Angebot</div><div className="font-semibold text-slate-800">{offer.offer_number}</div>
-                  <div className="mt-2 text-slate-400">Betrag</div><div className="tabular-nums font-semibold text-slate-900">{formatCentsCurrencyDe(offer.gross_total_cents, offer.currency)}</div>
+                  <div className="mt-2 text-slate-400">Betrag</div><div className="tabular-nums font-semibold text-slate-900">{formatOfferAmount(offer, offer.currency, formatCentsCurrencyDe)}</div>
                   <div className="mt-2 text-slate-400">Name</div><div className="text-slate-800">{signerName}</div>
                 </div>
                 {signaturePreview ? <img src={signaturePreview} alt="Unterschrift" className="h-20 w-40 rounded-lg border border-slate-100 object-contain" /> : null}

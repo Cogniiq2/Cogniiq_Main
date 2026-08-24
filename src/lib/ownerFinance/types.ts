@@ -462,7 +462,9 @@ export interface OwnerCustomerOfferRef {
   title: string | null;
   status: OwnerOfferStatus;
   currency: string;
+  // One-time (project) total. Recurring commitments are separate — see recurring_monthly_gross_cents.
   gross_total_cents: number;
+  recurring_monthly_gross_cents: number;
   created_at: string;
   valid_until: string | null;
   accepted_at: string | null;

@@ -20,6 +20,7 @@ import { ExportMenu } from '@/components/finance/ExportMenu';
 import { runFinanceExport } from '@/lib/ownerFinance/financeExportRunner';
 import { offerExportTable, offerReportModel, offerMetadataSheet } from '@/lib/ownerFinance/exports/datasets';
 import type { ExportFormat, ExportMode, ExportMeta } from '@/lib/ownerFinance/exports';
+import { offerPipelineSortValueCents, formatOfferAmount } from '@/lib/ownerFinance/offerAmountDisplay';
 
 // Re-exported for other owner views that render an offer status badge.
 export { offerStatusTone };
@@ -108,14 +109,17 @@ export function OffersPage() {
     if (q) list = list.filter((o) => [o.offer_number, o.title, customerName(o), o.recipient_contact_name, o.recipient_email].some((v) => (v ?? '').toLowerCase().includes(q)));
     if (dateFrom) list = list.filter((o) => (o.issue_date ?? o.created_at.slice(0, 10)) >= dateFrom);
     if (dateTo) list = list.filter((o) => (o.issue_date ?? o.created_at.slice(0, 10)) <= dateTo);
-    if (min != null) list = list.filter((o) => o.gross_total_cents >= min);
-    if (max != null) list = list.filter((o) => o.gross_total_cents <= max);
+    // Deal-size filter/sort: a recurring-only offer has gross_total_cents = 0 (that column is
+    // one-time only), so filtering/sorting on it alone makes real accepted deals disappear.
+    // offerPipelineSortValueCents folds the recurring amount back in as a size heuristic.
+    if (min != null) list = list.filter((o) => offerPipelineSortValueCents(o) >= min);
+    if (max != null) list = list.filter((o) => offerPipelineSortValueCents(o) <= max);
 
     const sorted = [...list];
     sorted.sort((a, b) => {
       switch (sort) {
         case 'oldest': return a.created_at.localeCompare(b.created_at);
-        case 'amount': return b.gross_total_cents - a.gross_total_cents;
+        case 'amount': return offerPipelineSortValueCents(b) - offerPipelineSortValueCents(a);
         case 'customer': return customerName(a).localeCompare(customerName(b), 'de');
         case 'status': return a.status.localeCompare(b.status);
         case 'newest': default: return b.created_at.localeCompare(a.created_at);
@@ -124,11 +128,20 @@ export function OffersPage() {
     return sorted;
   }, [offers, statusFilter, statusMatchers, query, dateFrom, dateTo, minAmount, maxAmount, sort, customerName]);
 
-  const totals = useMemo(() => ({
-    open: offers.filter((o) => !isArchived(o) && ['finalized', 'sent', 'viewed'].includes(o.status)).reduce((s, o) => s + o.gross_total_cents, 0),
-    accepted: offers.filter((o) => o.status === 'accepted' || o.status === 'converted').reduce((s, o) => s + o.gross_total_cents, 0),
-    drafts: offers.filter((o) => o.status === 'draft').length,
-  }), [offers]);
+  // One-time and recurring are kept apart even in the pipeline KPI: fusing them into one
+  // number would misstate the money owed, and dropping the recurring side (as the raw
+  // gross_total_cents sum would) hides real committed revenue.
+  const totals = useMemo(() => {
+    const open = offers.filter((o) => !isArchived(o) && ['finalized', 'sent', 'viewed'].includes(o.status));
+    const accepted = offers.filter((o) => o.status === 'accepted' || o.status === 'converted');
+    return {
+      open: open.reduce((s, o) => s + o.gross_total_cents, 0),
+      openMonthly: open.reduce((s, o) => s + o.recurring_monthly_gross_cents, 0),
+      accepted: accepted.reduce((s, o) => s + o.gross_total_cents, 0),
+      acceptedMonthly: accepted.reduce((s, o) => s + o.recurring_monthly_gross_cents, 0),
+      drafts: offers.filter((o) => o.status === 'draft').length,
+    };
+  }, [offers]);
 
   const unarchive = async (o: OwnerOffer) => {
     const { error: err } = await unarchiveOffer(o.id);
@@ -169,7 +182,7 @@ export function OffersPage() {
     { key: 'customer', header: 'Kunde', render: (o) => <span className="text-gray-600">{customerName(o)}</span> },
     { key: 'title', header: 'Titel', render: (o) => <span className="text-gray-600">{o.title ?? '—'}</span>, hideOnMobile: true },
     { key: 'valid', header: 'Gültig bis', render: (o) => <span className="text-gray-500">{o.valid_until ? formatDateDe(o.valid_until) : '—'}</span>, hideOnMobile: true },
-    { key: 'gross', header: 'Brutto', align: 'right', render: (o) => <span className="tabular-nums font-medium text-gray-900">{formatCents(o.gross_total_cents, o.currency)}</span> },
+    { key: 'gross', header: 'Brutto', align: 'right', render: (o) => <span className="tabular-nums font-medium text-gray-900">{formatOfferAmount(o, o.currency, formatCents)}</span> },
     { key: 'actions', header: '', align: 'right', render: (o) => (
       <div className="flex items-center justify-end gap-0.5" onClick={(e) => e.stopPropagation()}>
         {o.archived_at ? (
@@ -212,8 +225,10 @@ export function OffersPage() {
 
       {!loading && offers.length > 0 ? (
         <div className="mb-6 grid gap-3 sm:grid-cols-3">
-          <KpiCard label="Offen (versendet)" valueCents={totals.open} basis="actual" />
-          <KpiCard label="Angenommen" valueCents={totals.accepted} basis="actual" tone={totals.accepted > 0 ? 'positive' : 'neutral'} />
+          <KpiCard label="Offen (versendet)" valueCents={totals.open} basis="actual"
+            hint={totals.openMonthly > 0 ? `zzgl. ${formatCents(totals.openMonthly)} / Monat wiederkehrend` : undefined} />
+          <KpiCard label="Angenommen" valueCents={totals.accepted} basis="actual" tone={totals.accepted > 0 ? 'positive' : 'neutral'}
+            hint={totals.acceptedMonthly > 0 ? `zzgl. ${formatCents(totals.acceptedMonthly)} / Monat wiederkehrend` : undefined} />
           <KpiCard label="Entwürfe" value={String(totals.drafts)} basis="actual" hint="noch nicht finalisiert" />
         </div>
       ) : null}

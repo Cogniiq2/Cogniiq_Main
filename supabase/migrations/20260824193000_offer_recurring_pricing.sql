@@ -288,13 +288,22 @@ commit;
 
 begin;
 
--- Offer -> invoice: recurring positions are billed per interval, never as the whole minimum
--- term. Because a recurring line's unit price IS the per-interval amount and the minimum term
--- lives outside quantity, copying the line verbatim invoices exactly ONE billing period. The
--- explicit filter below documents that intent and keeps the distinction visible on the invoice.
+-- Offer -> invoice: the initial invoice is the ONE-TIME project charge only. Recurring
+-- positions are a separate commercial track — billed per interval, on their own cadence,
+-- typically starting only after go-live/commissioning (see billing_start_type) — and are
+-- deliberately NOT copied onto this invoice at all. Earlier this function copied each
+-- recurring line at one billing period, which produced an initial invoice of
+-- "setup + one month" the moment an offer was accepted; that silently invoices a recurring
+-- charge before its own billing start has even occurred, and no customer approved a project
+-- invoice that included it. Recurring invoicing is intentionally left as a future capability:
+-- this function does not build it, but preserves pricing_type/billing_interval/
+-- minimum_term_months/billing_start_* on the offer lines so it can be added without a schema
+-- change. If a recurring-only offer is converted, the invoice is created with zero lines
+-- (a valid draft the owner completes by hand); issue_owner_invoice already rejects a
+-- draft with no lines or a non-positive total, so it cannot be sent unfinished.
 create or replace function public.convert_owner_offer_to_invoice_draft(p_idempotency_key uuid, p_offer_id uuid)
 returns jsonb language plpgsql security definer set search_path = public, pg_temp as $fn$
-declare v_existing jsonb; o record; v_inv uuid; v_line record; v_terms int; v_result jsonb; v_recurring int;
+declare v_existing jsonb; o record; v_inv uuid; v_line record; v_terms int; v_result jsonb; v_recurring_excluded int;
 begin
   if not public.is_platform_owner() then raise exception 'Owner access required'; end if;
   v_existing := public.owner_claim_idempotency(p_idempotency_key, 'convert_owner_offer_to_invoice_draft');
@@ -321,29 +330,19 @@ begin
     coalesce(o.payment_terms, ''), 'Angebot ' || coalesce(o.offer_number, o.id::text), auth.uid())
   returning id into v_inv;
 
-  -- One-time positions: copied as agreed.
+  -- One-time positions only: copied as agreed. Recurring positions are never copied here.
   for v_line in select * from public.owner_offer_lines
     where offer_id = p_offer_id and is_optional = false and pricing_type = 'one_time' order by sort_order loop
     insert into public.owner_invoice_lines (invoice_id, description, quantity_milli, unit_price_cents, vat_rate_bp, vat_treatment, sort_order)
     values (v_inv, v_line.description, v_line.quantity_milli, v_line.unit_price_cents, v_line.vat_rate_bp, v_line.vat_treatment, v_line.sort_order);
   end loop;
 
-  -- Recurring positions: exactly ONE billing period each (quantity x unit price), never
-  -- multiplied by minimum_term_months. The period is named in the description so the invoice
-  -- says what it charges for.
-  v_recurring := 0;
-  for v_line in select * from public.owner_offer_lines
-    where offer_id = p_offer_id and is_optional = false and pricing_type = 'recurring' order by sort_order loop
-    insert into public.owner_invoice_lines (invoice_id, description, quantity_milli, unit_price_cents, vat_rate_bp, vat_treatment, sort_order)
-    values (v_inv,
-      v_line.description || case when v_line.billing_interval = 'monthly' then ' (monatlich, 1 Abrechnungsperiode)' else '' end,
-      v_line.quantity_milli, v_line.unit_price_cents, v_line.vat_rate_bp, v_line.vat_treatment, v_line.sort_order);
-    v_recurring := v_recurring + 1;
-  end loop;
+  select count(*) into v_recurring_excluded from public.owner_offer_lines
+    where offer_id = p_offer_id and is_optional = false and pricing_type = 'recurring';
 
   update public.owner_offers set converted_invoice_id = v_inv, converted_at = now(), status = 'converted' where id = p_offer_id;
 
-  v_result := jsonb_build_object('invoice_id', v_inv, 'offer_id', p_offer_id, 'recurring_lines_billed_once', v_recurring);
+  v_result := jsonb_build_object('invoice_id', v_inv, 'offer_id', p_offer_id, 'recurring_lines_excluded', v_recurring_excluded);
   update public.owner_finance_requests set result = v_result where idempotency_key = p_idempotency_key;
   return v_result;
 end;
@@ -505,5 +504,67 @@ $fn$;
 
 revoke execute on function public.public_offer_by_token(text, text) from public;
 grant execute on function public.public_offer_by_token(text, text) to anon, authenticated, service_role;
+
+commit;
+
+begin;
+
+-- owner_customer_detail's offer refs carried only gross_total_cents, which now means the
+-- one-time portion only. Without the recurring figure a customer whose only offer is a
+-- recurring-only package (a real, signed deal) shows as "0,00 EUR" on their own detail page.
+-- Re-created (identical to the definition in 20260824171403_canonical_customer_and_deletion.sql,
+-- already applied to production) with recurring_monthly_gross_cents added to each offer object.
+create or replace function public.owner_customer_detail(p_customer_id uuid)
+returns jsonb language plpgsql security definer stable set search_path = public, pg_temp as $fn$
+declare v_customer jsonb; v_offers jsonb; v_tasks jsonb; v_activity jsonb;
+        v_invoices jsonb; v_payments jsonb; v_blockers jsonb;
+begin
+  if not public.is_platform_owner() then raise exception 'Owner access required'; end if;
+  select to_jsonb(c) into v_customer from public.owner_customers c where c.id = p_customer_id;
+  if v_customer is null then raise exception 'customer not found'; end if;
+
+  select coalesce(jsonb_agg(jsonb_build_object(
+      'id', o.id, 'offer_number', o.offer_number, 'title', o.title, 'status', o.status,
+      'currency', o.currency, 'gross_total_cents', o.gross_total_cents,
+      'recurring_monthly_gross_cents', o.recurring_monthly_gross_cents,
+      'created_at', o.created_at, 'valid_until', o.valid_until, 'accepted_at', o.accepted_at,
+      'archived_at', o.archived_at, 'finalized_version', o.finalized_version,
+      'sent_at', (select max(j.sent_at) from public.owner_automation_jobs j where j.offer_id = o.id and j.job_type = 'offer_email')
+    ) order by o.created_at desc), '[]'::jsonb) into v_offers
+  from public.owner_offers o where o.owner_customer_id = p_customer_id;
+
+  select coalesce(jsonb_agg(jsonb_build_object(
+      'id', i.id, 'invoice_number', i.invoice_number, 'status', i.status,
+      'currency', i.currency, 'gross_total_cents', i.gross_total_cents,
+      'amount_paid_cents', i.amount_paid_cents,
+      'issue_date', i.issue_date, 'due_date', i.due_date, 'issued_at', i.issued_at,
+      'cancelled_at', i.cancelled_at, 'cancellation_reason', i.cancellation_reason,
+      'created_at', i.created_at
+    ) order by i.created_at desc), '[]'::jsonb) into v_invoices
+  from public.owner_invoices i where i.owner_customer_id = p_customer_id;
+
+  select coalesce(jsonb_agg(jsonb_build_object(
+      'id', p.id, 'amount_cents', p.amount_cents, 'direction', p.direction,
+      'payment_date', p.payment_date, 'invoice_id', p.invoice_id
+    ) order by p.payment_date desc nulls last), '[]'::jsonb) into v_payments
+  from public.owner_payments p where p.owner_customer_id = p_customer_id;
+
+  select coalesce(jsonb_agg(to_jsonb(t) order by t.sort_order, t.created_at), '[]'::jsonb) into v_tasks
+  from public.owner_customer_tasks t where t.customer_id = p_customer_id;
+
+  select coalesce(jsonb_agg(jsonb_build_object(
+      'id', a.id, 'event_type', a.event_type, 'summary', a.summary, 'created_at', a.created_at,
+      'related_offer_id', a.related_offer_id, 'related_task_id', a.related_task_id
+    ) order by a.created_at desc), '[]'::jsonb) into v_activity
+  from (select * from public.owner_customer_activity where customer_id = p_customer_id order by created_at desc limit 100) a;
+
+  v_blockers := public.owner_customer_delete_blockers(p_customer_id);
+
+  return jsonb_build_object(
+    'customer', v_customer, 'offers', v_offers, 'invoices', v_invoices,
+    'payments', v_payments, 'tasks', v_tasks, 'activity', v_activity,
+    'delete_blockers', v_blockers);
+end;
+$fn$;
 
 commit;
