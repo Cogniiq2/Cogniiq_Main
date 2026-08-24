@@ -42,7 +42,7 @@ export async function onRequest(context: CloudflarePagesContext) {
   const seoConfig: Record<string, { title: string; description: string; canonical: string; keywords?: string }> = {
     '/': {
       title: 'Cogniiq – KI-Telefonassistent, Webdesign & Automatisierung für Unternehmen in Bayern',
-      description: 'Cogniiq entwickelt operative KI-Systeme für Unternehmen in Bayern: KI-Telefonassistent, hochkonvertierende Websites und Prozessautomatisierung. Kein Anruf geht verloren. Go-Live in 7–14 Tagen.',
+      description: 'Cogniiq entwickelt operative KI-Systeme für Unternehmen in Bayern: KI-Telefonassistent, hochkonvertierende Websites und Prozessautomatisierung. Kein Anruf geht verloren. Erste Systeme in ein bis zwei Wochen einsatzbereit.',
       canonical: 'https://cogniiq.de/',
       keywords: 'AI Agentur Bayern, KI Telefonassistent, Webdesign Agentur Bayern, Prozessautomatisierung, Cogniiq',
     },
@@ -102,7 +102,7 @@ export async function onRequest(context: CloudflarePagesContext) {
     },
     '/ki-agentur-deutschland': {
       title: 'KI Agentur Deutschland | AI-Systeme für Unternehmen – Cogniiq',
-      description: 'Cogniiq ist Ihre KI-Agentur für ganz Deutschland. KI-Telefonassistenten, Chatbots und Automatisierungssysteme – entwickelt für den deutschen Markt, einsatzbereit in 7–14 Tagen.',
+      description: 'Cogniiq ist Ihre KI-Agentur für ganz Deutschland. KI-Telefonassistenten, Chatbots und Automatisierungssysteme – entwickelt für den deutschen Markt, einsatzbereit in ein bis zwei Wochen.',
       canonical: 'https://cogniiq.de/ki-agentur-deutschland',
       keywords: 'KI Agentur Deutschland, AI Agentur Deutschland, KI Systeme Unternehmen, Artificial Intelligence Deutschland',
     },
@@ -162,7 +162,7 @@ export async function onRequest(context: CloudflarePagesContext) {
     },
     '/regensburg': {
       title: 'AI-Systeme & Webdesign in Regensburg | KI-Telefonassistent & Automatisierung – Cogniiq',
-      description: 'Cogniiq entwickelt KI-Telefonassistenten, Webdesign und Automatisierungslösungen für Unternehmen in Regensburg. Persönliche Betreuung, Go-Live in 7–14 Tagen.',
+      description: 'Cogniiq entwickelt KI-Telefonassistenten, Webdesign und Automatisierungslösungen für Unternehmen in Regensburg. Persönliche Betreuung, erste Systeme in ein bis zwei Wochen einsatzbereit.',
       canonical: 'https://cogniiq.de/regensburg',
       keywords: 'AI Agentur Regensburg, Webdesign Regensburg, KI Telefonassistent Regensburg, Automatisierung Regensburg',
     },
@@ -276,7 +276,7 @@ export async function onRequest(context: CloudflarePagesContext) {
     },
     '/bayreuth/ki-telefonassistent': {
       title: 'KI Telefonassistent Bayreuth – AI Rezeption & Anrufannahme | Cogniiq',
-      description: 'KI Telefonassistent Bayreuth: Automatische Anrufannahme, Terminbuchung & Weiterleitung für lokale Unternehmen. DSGVO-konform, auch außerhalb der Öffnungszeiten, Einrichtung in 7–14 Tagen.',
+      description: 'KI Telefonassistent Bayreuth: Automatische Anrufannahme, Terminbuchung & Weiterleitung für lokale Unternehmen. Auch außerhalb der Öffnungszeiten, in zwei Wochen eingerichtet und bereit zur Freigabe.',
       canonical: 'https://cogniiq.de/bayreuth/ki-telefonassistent',
       keywords: 'KI Telefonassistent Bayreuth, AI Rezeptionistin Bayreuth, KI Telefon Bayreuth',
     },
@@ -300,7 +300,7 @@ export async function onRequest(context: CloudflarePagesContext) {
     },
     '/regensburg/ki-telefonassistent': {
       title: 'KI Telefonassistent Regensburg – AI Rezeption & Anrufannahme | Cogniiq',
-      description: 'KI Telefonassistent Regensburg: Automatische Anrufannahme, Terminbuchung & Weiterleitung für Praxen, Gastronomie und Dienstleister. Auch außerhalb der Öffnungszeiten, DSGVO-konform, Einrichtung in 7–14 Tagen.',
+      description: 'KI Telefonassistent Regensburg: Automatische Anrufannahme, Terminbuchung & Weiterleitung für Praxen, Gastronomie und Dienstleister. Auch außerhalb der Öffnungszeiten, in zwei Wochen eingerichtet und bereit zur Freigabe.',
       canonical: 'https://cogniiq.de/regensburg/ki-telefonassistent',
       keywords: 'KI Telefonassistent Regensburg, AI Rezeptionistin Regensburg, KI Telefon Regensburg',
     },
@@ -468,7 +468,7 @@ export async function onRequest(context: CloudflarePagesContext) {
     },
     '/digitale-automatisierung-unternehmen': {
       title: 'Digitale Automatisierung für Unternehmen – Praxisnah & sofort einsetzbar | Cogniiq',
-      description: 'Digitale Automatisierung für KMU: Vom Erstgespräch bis zum laufenden System in 7–14 Tagen. Cogniiq entwickelt Automatisierungssysteme, die wirklich eingesetzt werden.',
+      description: 'Digitale Automatisierung für KMU: Vom Erstgespräch bis zum laufenden System in ein bis zwei Wochen. Cogniiq entwickelt Automatisierungssysteme, die wirklich eingesetzt werden.',
       canonical: 'https://cogniiq.de/digitale-automatisierung-unternehmen',
       keywords: 'Digitale Automatisierung, Automatisierung KMU, KI Digitalisierung Unternehmen, Digital Transformation',
     },

@@ -99,7 +99,7 @@ const PRINCIPLES = [
     icon: Clock,
     title: "Schnelle Inbetriebnahme",
     description:
-      "Go-Live in 7 bis 14 Tagen für erste Systeme. Komplexere Systemverbünde in 3 bis 5 Wochen — ohne Abstriche bei der Qualität.",
+      "Erste Systeme sind in ein bis zwei Wochen eingerichtet und bereit für Ihre Freigabe. Komplexere Systemverbünde in 3 bis 5 Wochen — ohne Abstriche bei der Qualität.",
   },
 ];
 

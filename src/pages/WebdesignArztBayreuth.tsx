@@ -21,7 +21,7 @@ const config: IndustryPageConfig = {
     // ✓ Contains primary keyword, city, unique value prop, and implicit CTA
     // ✓ Addresses the core buyer fear (verpasste Anrufe / Terminverlust)
     description:
-      "Praxis Website Bayreuth mit KI-Telefonassistent: Cogniiq automatisiert Anrufannahme, Terminbuchung und Patientenkommunikation für Arztpraxen – Go-live in 14 Tagen.",
+      "Praxis Website Bayreuth mit KI-Telefonassistent: Cogniiq automatisiert Anrufannahme, Terminbuchung und Patientenkommunikation für Arztpraxen – in zwei Wochen eingerichtet und bereit zur Freigabe.",
 
     canonical: `${base}/webdesign-arzt-bayreuth`,
 
@@ -56,7 +56,7 @@ const config: IndustryPageConfig = {
     // ✓ "Bayreuth" used twice — reinforces local relevance signal for Google Maps + organic
     // ✓ Specific outcomes named (Patientenanfragen, Erreichbarkeit, Terminprozesse) — matches buyer search intent
     // ✓ Trust signals (DSGVO-konform, lokal) anchor the paragraph
-    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme speziell für Arztpraxen in Bayreuth – damit Ihre Rezeption entlastet wird, Patientenanrufe auch dann angenommen werden, wenn niemand abnehmen kann, und Ihre Praxis bei lokalen Suchanfragen in Bayreuth sichtbar ist. Lokal betreut. Go-live in 14 Tagen.",
+    lead: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungssysteme speziell für Arztpraxen in Bayreuth – damit Ihre Rezeption entlastet wird, Patientenanrufe auch dann angenommen werden, wenn niemand abnehmen kann, und Ihre Praxis bei lokalen Suchanfragen in Bayreuth sichtbar ist. Lokal betreut. Spätestens zwei Wochen nach dem Start ist alles eingerichtet und bereit für Ihre Freigabe.",
   },
 
   // ✓ Pain points rewritten to match the exact language patients and practice managers
@@ -84,7 +84,9 @@ const config: IndustryPageConfig = {
       step: "Schritt 2",
       title: "Umsetzung nach Ihrer Freigabe",
       // ✓ "schlüsselfertig" and "keine IT-Kenntnisse" address the most common objections
-      // ✓ Specific timeline (14 Tage) is a ranking differentiator and trust signal
+      // ✓ Specific timeline is a ranking differentiator and trust signal. Kanonisch sind
+      // 14 Kalendertage bis zur Übergabe zur Freigabe — nie bis zum Go-live, der an
+      // der Kundenfreigabe hängt (FAKTEN.uebergabeGarantie).
       description:
         "Praxis-Website, KI-Telefonassistent und Automatisierungsworkflows werden vollständig von Cogniiq aufgebaut und konfiguriert. Keine IT-Kenntnisse erforderlich, keine interne Projektarbeit. Sie erhalten alles betriebsbereit – inklusive DSGVO-Dokumentation und lokalem Support in Bayreuth.",
     },
@@ -243,7 +245,7 @@ const config: IndustryPageConfig = {
     "Höhere Patientenzufriedenheit durch sofortige Reaktion auf Anrufe und Anfragen – auch außerhalb der Sprechzeiten, ohne Warteschleife",
     "Weniger No-Shows und Terminausfälle durch automatische Erinnerungen per SMS und E-Mail",
     "Professioneller erster Eindruck: moderne Website und sofortige Gesprächsannahme signalisieren Qualität, bevor der Patient die Praxis betritt",
-    "Go-live in 14 Tagen: keine lange Projektlaufzeit, kein IT-Aufwand auf Ihrer Seite, alles schlüsselfertig von Cogniiq",
+    "In zwei Wochen eingerichtet und bereit zur Freigabe: keine lange Projektlaufzeit, kein IT-Aufwand auf Ihrer Seite, alles schlüsselfertig von Cogniiq",
   ],
 
   // ✓ Local context rewritten for maximum local SEO signal:
@@ -283,7 +285,7 @@ const config: IndustryPageConfig = {
       // ✓ New FAQ — "Kosten" and "Preis" are consistently the highest-volume FAQ searches
       //   for any service. Answering it directly captures this intent and builds trust.
       answer:
-        "Die Kosten hängen von Umfang, Fachrichtung und gewünschten Automatisierungen ab. Cogniiq bietet drei Pakete: Start (Website mit lokalem SEO), Growth (Website + KI-Telefonassistent + Terminautomatisierung) und Premium (vollständige Praxisdigitalisierung). Im kostenlosen Erstgespräch erhalten Sie ein transparentes Angebot – ohne versteckte Kosten. Alle Lösungen sind go-live in 14 Tagen.",
+        "Die Kosten hängen von Umfang, Fachrichtung und gewünschten Automatisierungen ab. Cogniiq bietet drei Pakete: Start (Website mit lokalem SEO), Growth (Website + KI-Telefonassistent + Terminautomatisierung) und Premium (vollständige Praxisdigitalisierung). Im kostenlosen Erstgespräch erhalten Sie ein transparentes Angebot – ohne versteckte Kosten. Alle Lösungen sind spätestens zwei Wochen nach dem Start eingerichtet und bereit für Ihre Freigabe; live geschaltet wird erst nach Ihrer Freigabe.",
     },
     {
       question:

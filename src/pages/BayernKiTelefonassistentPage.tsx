@@ -31,7 +31,7 @@ const faqItems = [
   {
     question: "Wie lange dauert die Einrichtung für ein Unternehmen in Bayern?",
     // [[CLAIM: verify — Einrichtungsdauer 1–2 Wochen bestätigen]]
-    answer: "Die Basisimplementierung dauert in der Regel 1–2 Wochen. Wir konfigurieren den Assistenten auf Ihre Branche, Öffnungszeiten und typische Anfragen – live geht er erst nach Ihrer Freigabe.",
+    answer: "Spätestens zwei Wochen nach dem Start ist Ihr Empfang vollständig eingerichtet und bereit für Ihre Freigabe. Wir konfigurieren den Assistenten auf Ihre Branche, Öffnungszeiten und typische Anfragen; live geschaltet wird er erst nach Ihrer Freigabe.",
   },
   {
     question: "Für welche bayerischen Branchen eignet sich der KI Telefonassistent?",
@@ -451,7 +451,7 @@ function BenefitsSection() {
               icon: Zap,
               title: "Schnell implementiert",
               // [[CLAIM: verify — Einrichtungsdauer 1–2 Wochen bestätigen]]
-              desc: "In der Regel ist Ihr individuell konfigurierter Assistent innerhalb von 1–2 Wochen einsatzbereit – live geht er erst nach Ihrer Freigabe.",
+              desc: "Spätestens zwei Wochen nach dem Start ist Ihr individuell konfigurierter Assistent vollständig eingerichtet und bereit für Ihre Freigabe – live geschaltet wird er erst nach Ihrer Freigabe.",
             },
           ].map((item, i) => (
             <motion.div

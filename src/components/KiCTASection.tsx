@@ -9,7 +9,9 @@ import {
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
-// [[CLAIM: verify — Einrichtungsdauer 7–14 Tage (OWNER-INPUT E1) bestätigen]]
+// Kanonisch: 14 Kalendertage ab dem Start bis zur Übergabe zur Freigabe
+// (FAKTEN.uebergabeGarantie). Der Go-live hängt an der Kundenfreigabe und
+// darf hier nie mit einer Frist verbunden werden.
 const trust = [
   { icon: CheckCircle, text: 'Einrichtung nach Ihren Vorgaben' },
   { icon: CheckCircle, text: 'Anbindung an Kalender & CRM wird vorab geprüft' },

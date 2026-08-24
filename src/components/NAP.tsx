@@ -1,5 +1,5 @@
 import { Mail, Phone, MapPin } from "lucide-react";
-import { BUSINESS_INFO, formatAddress, getGoogleMapsUrl } from "@/lib/seo-data";
+import { BUSINESS_INFO, PHONE_HREF, formatAddress, getGoogleMapsUrl } from "@/lib/seo-data";
 
 interface NAPProps {
   variant?: "vertical" | "horizontal" | "compact";
@@ -71,7 +71,7 @@ export function NAP({
       </a>
 
       <a
-        href={`tel:${BUSINESS_INFO.contact.phone}`}
+        href={PHONE_HREF}
         className={linkClass}
         itemProp="telephone"
         aria-label={`Telefon: ${BUSINESS_INFO.contact.phoneDisplay}`}

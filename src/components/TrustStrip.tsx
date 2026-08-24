@@ -5,7 +5,9 @@ import { Shield, Clock, Users, Wrench, Lock } from 'lucide-react';
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 // Kein Siegel-Charakter: neutrale Icons, Aussagen als Arbeitsweise formuliert.
-// [[CLAIM: verify — Go-Live-Zeitraum 7–14 Tage (OWNER-INPUT E1)]]
+// Kanonisch: 14 Kalendertage ab dem Start bis zur Übergabe zur Freigabe
+// (FAKTEN.uebergabeGarantie). Der Go-live hängt an der Kundenfreigabe und
+// darf hier nie mit einer Frist verbunden werden.
 const ITEMS = [
   // Keine Hosting-, Serverstandort- oder "DSGVO-konform"-Aussage (Inhaber-Antwort B).
   { icon: Shield, label: 'Keine Gesprächsaufzeichnung', sub: 'Gespeichert wird nur das strukturierte Ergebnis' },

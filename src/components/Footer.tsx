@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ChevronDown, Mail, Phone, MapPin, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Logo } from "./Logo";
-import { BUSINESS_INFO, getGoogleMapsUrl } from "@/lib/seo-data";
+import { BUSINESS_INFO, PHONE_HREF, getGoogleMapsUrl } from "@/lib/seo-data";
 import { openConsentSettings } from "@/lib/consent";
 
 const ease = [0.22, 1, 0.36, 1] as [number, number, number, number];
@@ -128,7 +128,7 @@ export function Footer() {
                 </a>
 
                 <a
-                  href={`tel:${BUSINESS_INFO.contact.phone}`}
+                  href={PHONE_HREF}
                   itemProp="telephone"
                   className="flex items-center gap-3 text-[13px] text-gray-500 dark:text-white/45 hover:text-gray-900 dark:hover:text-white transition-colors group"
                 >
@@ -161,8 +161,8 @@ export function Footer() {
 
               <div className="flex flex-wrap gap-1.5">
                 {/* Zwei Chips sind am 18.08.2026 entfallen und werden nicht ersetzt:
-                    „DSGVO" war ein Konformitätsabzeichen ohne Grundlage (§7.7),
-                    „7–14&nbsp;Tage" widersprach der 7-Tage-Garantie aus FAKTEN.goLive
+                {/* Zwei Chips sind am 18.08.2026 entfallen und werden nicht ersetzt:
+                    „7–14 Tage" widersprach der Zwei-Wochen-Garantie aus FAKTEN.uebergabeGarantie
                     und trug nur einen [[CLAIM]]-Marker — der ist kein Ausweg.
                     Dieser Streifen steht auf jeder Seite der Website. */}
                 {["Festpreis", "Aus Bayreuth"].map((t) => (

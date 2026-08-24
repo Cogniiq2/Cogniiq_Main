@@ -37,13 +37,29 @@
 export const FAKTEN = {
   // ── Zahlen ──
   mehrpreisProMinute: `0,39\u00A0€`,
-  goLiveTage: 7,
+  /*
+    Korrigiert am 23.08.2026 von 7 auf 14 (Inhaber).
+
+    Kanonische Bedeutung: 14 KALENDERTAGE ab dem Start, und sie laufen bis zur
+    UEBERGABE ZUR FREIGABE — nicht bis zum Go-live.
+
+    An diesem Punkt zerbrach die alte Fassung logisch: Sie garantierte einen
+    Live-Termin und raeumte im selben Atemzug ein unbefristetes Freigaberecht
+    ein ("ohne Ihre Freigabe geht der Empfang nicht live"). Beides zusammen ist
+    nicht erfuellbar — ein Kunde, der drei Wochen prueft, haette die Frist
+    gerissen, die wir uns selbst gesetzt haben, und dafuer die zweite Haelfte
+    der Einrichtungsgebuehr einbehalten koennen. Zugesagt wird deshalb nur, was
+    allein in unserer Hand liegt: der fertig eingerichtete, testbereite Empfang.
+  */
+  einrichtungsfristTage: 14,
+  /** Sprachform der Frist. In Fliesstext immer diese, nie "14 Tage". */
+  einrichtungsfrist: "zwei Wochen",
   aenderungTage: 3,
   laufzeitMonate: 12,
   preisgarantieMonate: 24,
   monatlichAufschlag: `20\u00A0%`,
-  erreichbarkeit: "täglich 6–20 Uhr",
-  antwortzeit: "spätestens innerhalb von 24 Stunden",
+  erreichbarkeit: "täglich 6–20\u00A0Uhr",
+  antwortzeit: "spätestens innerhalb von 24\u00A0Stunden",
   gleichzeitigeAnrufe: 10,
 
   // ── Sätze, die wörtlich wiederverwendet werden ──
@@ -59,9 +75,56 @@ export const FAKTEN = {
   nichtProBehandler:
     "Abgerechnet wird pro Praxis, nicht pro Behandler.",
 
-  goLive: `Ihr Empfang geht spätestens 7\u00A0Tage nach Zahlungseingang live. Halten wir diesen Termin nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.`,
+  /*
+    Die Zusage nennt zuerst die Frist, dann die Folge, in zwei kurzen Saetzen.
+    Eine Garantie, die erklaert werden muss, wirkt nicht wie eine Garantie.
+    Zugesagter Meilenstein ist die Uebergabe zur Freigabe, nicht der Go-live:
+    der Go-live haengt an einer Freigabe, die allein der Kunde erteilt und fuer
+    die er sich so viel Zeit nehmen darf, wie er moechte. Eine Frist mit
+    Geldfolge darf nur das umfassen, was wir selbst liefern.
+  */
+  uebergabeGarantie: `Spätestens zwei Wochen nach dem Start ist Ihr KI-Empfang vollständig eingerichtet und bereit für Ihre Freigabe. Halten wir diesen Termin nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.`,
 
-  aenderungen: `Änderungen an Ansagen und Regeln reichen Sie über das Kundendashboard oder per E-Mail ein; umgesetzt sind sie innerhalb von 3\u00A0Tagen.`,
+  /*
+    Der Fristbeginn ist eine eigene Aussage, weil er der Punkt ist, an dem die
+    Garantie kippen kann. Beide Bedingungen muessen erfuellt sein: Geldeingang
+    UND vollstaendige Angaben. Eine Frist, die ab Zahlungseingang allein laeuft,
+    macht uns fuer Verzoegerungen haftbar, die der Kunde selbst verursacht —
+    Schritt 5 der Einrichtung ("Ihre Vorgaben") liegt vollstaendig bei ihm.
+  */
+  startDefinition: `Der Start ist der Tag, an dem die erste Hälfte der Einrichtungsgebühr eingegangen ist und uns alle für die Einrichtung erforderlichen Angaben vollständig vorliegen.`,
+
+  /*
+    Der Satz, der die Garantie widerspruchsfrei macht: Was wir zusagen, endet an
+    der Uebergabe; was danach kommt, entscheidet der Kunde. Steht ueberall dort,
+    wo die Frist genannt wird — sonst liest sich die Frist wieder als Live-Termin.
+  */
+  freigabeNachUebergabe: `Nach der Übergabe testen Sie den Empfang in Ruhe. Live geschaltet wird erst nach Ihrer Freigabe.`,
+
+  /** Macht explizit, dass die Pruefzeit des Kunden in keine Richtung zaehlt:
+   *  nicht als Verzug bei uns, nicht als Versaeumnis bei ihm. */
+  pruefzeitNeutral: `Wie lange Sie prüfen, entscheiden Sie. Ihre Prüfzeit zählt weder als Verzögerung auf unserer Seite noch als Versäumnis auf Ihrer.`,
+
+  /** Keine Antragspflicht — das ist der Teil, der die Zusage glaubwuerdig macht. */
+  garantieOhneAntrag: `Sie müssen dafür nichts geltend machen und keine Nachfrist setzen: Wir stellen die zweite Hälfte dann einfach nicht in Rechnung.`,
+
+  /*
+    Fairness in beide Richtungen. Bewusst NUR kundenseitige Abhaengigkeiten, die
+    nach dem Start neu entstehen: Dienstleister, die wir selbst auswaehlen, sind
+    unser Risiko, nicht seines. Ein breiter Drittanbieter-Ausschluss wuerde genau
+    die Verbindlichkeit zerreden, die das staerkste Verkaufsargument der Seite ist.
+  */
+  fristPause: `Entsteht nach dem Start eine neue Abhängigkeit auf Ihrer Seite — geänderte Anforderungen, zusätzlicher Umfang, ein neu benötigter Zugang oder eine offene Entscheidung —, pausiert die Frist so lange und läuft danach weiter. Alles Übrige liegt bei uns, auch die Dienstleister, mit denen wir arbeiten.`,
+
+  /** Zahlungsaufteilung — erklaert, warum die Garantie ueberhaupt greifen kann. */
+  zahlungsaufteilung: `Die Einrichtungsgebühr zahlen Sie zur Hälfte bei Vertragsabschluss, zur zweiten Hälfte nach dem Go-live.`,
+
+  /*
+    "Kleinere Aenderungen" ist die Grenze, die der Inhaber selbst zieht
+    (23.08.2026). Sie bleibt im Satz stehen: Eine Zusage ohne Grenze bricht beim
+    ersten groesseren Umbau, und genau das merkt sich dieser Kaeufer.
+  */
+  aenderungen: `Kleinere Änderungen an Ansagen und Regeln reichen Sie über das Kundendashboard oder per E-Mail ein; umgesetzt sind sie innerhalb von 3\u00A0Tagen.`,
 
   kuendigung: `Gekündigt wird mit einem Klick im Kundendashboard, zum Laufzeitende. Kein Anruf, keine E-Mail, keine Fristfalle.`,
 
@@ -173,9 +236,9 @@ export const EINRICHTUNG_SCHRITTE: Array<{
   },
   {
     step: "05",
-    title: "Testphase und Go-live",
+    title: "Übergabe, Testphase und Go-live",
     description:
-      `Zwei Tage testen wir gemeinsam. Live geht der Assistent erst, wenn Ihre Praxis zufrieden ist — spätestens ${FAKTEN.goLiveTage}\u00A0Tage nach Zahlungseingang.`,
+      `Spätestens ${FAKTEN.einrichtungsfrist} nach dem Start übergeben wir Ihnen den fertig eingerichteten Empfang. Zwei Tage testen wir gemeinsam; live geht der Assistent erst nach Ihrer Freigabe.`,
   },
 ];
 
@@ -488,8 +551,9 @@ export const SPRACHEN = {
 
 /**
  * M17 · Einrichtung Ihres Empfangs — die acht realen Schritte.
- * Dauerangaben liegen nur für Testphase und Go-live vor; erfundene Dauern
- * sind ausgeschlossen (Inhaber-Antwort E).
+ * Dauerangaben liegen nur für Testphase und Übergabe vor; erfundene Dauern
+ * sind ausgeschlossen (Inhaber-Antwort E). Schritt 8 ist bewusst die Übergabe
+ * und nicht der Go-live: nur bis dorthin reicht die zugesagte Frist.
  */
 export const EINRICHTUNG_PROJEKT = {
   headline: "Einrichtung Ihres Empfangs",
@@ -524,7 +588,7 @@ export const EINRICHTUNG_PROJEKT = {
       nummer: "5",
       title: "Ihre Vorgaben",
       dauer: null,
-      text: "Ein geführter Ablauf im Dashboard: Stimme, Begrüßungssatz, Anliegen, Regeln, Weiterleitungen. Ihre Angaben gehen direkt an uns.",
+      text: "Ein geführter Ablauf im Dashboard: Stimme, Begrüßungssatz, Anliegen, Regeln, Weiterleitungen. Ihre Angaben gehen direkt an uns — sobald sie vollständig vorliegen und die erste Hälfte eingegangen ist, beginnt die Zwei-Wochen-Frist.",
     },
     {
       nummer: "6",
@@ -534,26 +598,63 @@ export const EINRICHTUNG_PROJEKT = {
     },
     {
       nummer: "7",
-      title: "Testphase",
-      dauer: "2 Tage",
-      text: "Zwei Tage testen wir gemeinsam. Live geht der Assistent erst, wenn Ihre Praxis zufrieden ist.",
+      title: "Übergabe zur Freigabe",
+      dauer: `spätestens ${FAKTEN.einrichtungsfrist} nach dem Start`,
+      text: `${FAKTEN.uebergabeGarantie} ${FAKTEN.startDefinition}`,
     },
     {
       nummer: "8",
-      title: "Go-live",
-      dauer: `spätestens ${FAKTEN.goLiveTage}\u00A0Tage nach Zahlungseingang`,
-      text: `Garantiert innerhalb von ${FAKTEN.goLiveTage}\u00A0Tagen nach Zahlungseingang.`,
+      title: "Testphase und Go-live",
+      dauer: "2 Tage Test",
+      text: `${FAKTEN.freigabeNachUebergabe} Zwei Tage davon gehen wir gemeinsam mit Ihnen durch. ${FAKTEN.pruefzeitNeutral}`,
     },
   ],
 };
 
 /**
- * Go-live-Garantie — eigener, ruhig gesetzter Block auf /praxen, der
+ * Zwei-Wochen-Garantie — eigener, ruhig gesetzter Block auf /praxen, der
  * Preisseite und im FAQ (Brief III §3.3). Nie als Aufzählungspunkt.
+ *
+ * Zugesagt ist die Übergabe zur Freigabe, nicht der Go-live. Der Zusatz "Das
+ * steht so im Vertrag" ist bewusst entfernt: Ein Vertragsdokument mit genau
+ * diesen Bedingungen liegt nicht geprüft vor, und eine Zusage über den
+ * Vertragsinhalt darf nicht auf einer Annahme stehen (COPY-CLAIMS-TO-VERIFY).
  */
-export const GO_LIVE_GARANTIE = {
-  headline: "Die 7-Tage-Garantie",
-  text: `${FAKTEN.goLive} Das steht so im Vertrag, nicht nur auf dieser Seite.`,
+export const ZWEI_WOCHEN_GARANTIE = {
+  headline: "Die Zwei-Wochen-Garantie",
+  text: FAKTEN.uebergabeGarantie,
+
+  /*
+    Reihenfolge ist die Leseordnung der Frage, die der Kunde tatsaechlich hat:
+    Wie zahle ich? -> Ab wann laeuft die Uhr? -> Was passiert nach der
+    Uebergabe? -> Zaehlt meine Pruefzeit gegen euch? -> Was, wenn ihr zu spaet
+    seid? -> Und wenn es an mir liegt? Eine Frist ohne Folge ist eine Absichts-
+    erklaerung; eine Frist ohne Startpunkt ist ein offenes Risiko; eine Frist
+    ohne benannten Endpunkt widerspricht dem Freigaberecht.
+  */
+  mechanik: [
+    FAKTEN.zahlungsaufteilung,
+    FAKTEN.startDefinition,
+    FAKTEN.freigabeNachUebergabe,
+    FAKTEN.pruefzeitNeutral,
+    FAKTEN.garantieOhneAntrag,
+    FAKTEN.fristPause,
+  ],
+};
+
+/**
+ * Betreuung nach dem Go-live. Der dokumentierte Abbruchgrund im Betrieb ist
+ * nicht die Technik, sondern der Support: 52 % nennen unzureichende Betreuung
+ * als Wechselgrund (Zi 2026). Dieser Block beantwortet das mit einer Frist und
+ * einem Namen statt mit einer Absichtserklaerung.
+ */
+export const BETREUUNG_NACH_GOLIVE = {
+  headline: "Nach dem Go-live hört die Arbeit nicht auf",
+  paragraphs: [
+    "Ansagen und Regeln ändern sich: nach dem Urlaub, nach einer neuen Sprechzeit, nach der ersten Woche im Betrieb. Genau dann entscheidet sich, ob ein solches System im Alltag bleibt oder wieder abgeschaltet wird.",
+    FAKTEN.aenderungen,
+    "Zugesagt, nicht in Aussicht gestellt. Umgesetzt werden die Änderungen von Lazar Popovic persönlich, erreichbar täglich von 6 bis 20 Uhr — nicht von einem Ticketsystem und nicht von wechselnden Ansprechpartnern.",
+  ],
 };
 
 /**
@@ -618,11 +719,11 @@ export const UMKEHRBARKEIT = {
     { label: "Preisgarantie", wert: FAKTEN.preisgarantie },
     {
       label: "Testphase",
-      wert: "2 Tage, nach Vertragsabschluss und Zahlung der ersten Hälfte. Live geht der Empfang erst, wenn Sie zufrieden sind",
+      wert: "2\u00A0Tage, nach Vertragsabschluss und Zahlung der ersten Hälfte. Live geschaltet wird erst nach Ihrer Freigabe",
     },
   ],
   vetorecht:
-    `Die Testphase ist kein kostenloser Test. Sie ist der Punkt, an dem Sie ein Vetorecht haben: Ohne Ihre Freigabe geht der Empfang nicht live, und halten wir die ${FAKTEN.goLiveTage}\u00A0Tage nicht ein, entfällt die zweite Hälfte der Einrichtungsgebühr.`,
+    `Die Testphase ist kein kostenloser Test. Sie ist der Punkt, an dem Sie ein Vetorecht haben: Ohne Ihre Freigabe geht der Empfang nicht live. Die Zwei-Wochen-Frist deckt unsere Arbeit bis zur Übergabe an Sie ab — was danach geschieht, bestimmen Sie. ${FAKTEN.pruefzeitNeutral}`,
   // [[CLAIM: Was mit den gespeicherten Ergebnissen nach Vertragsende geschieht,
   // ist nicht beantwortet (Brief II §4.7). Bis dahin keine Aussage dazu.]]
 };
@@ -672,7 +773,7 @@ export const VERTRAG = {
     },
     {
       label: "Zahlung der Einrichtung",
-      wert: "50 % bei Vertragsabschluss, 50 % nach dem Go-live.",
+      wert: "50\u00A0% bei Vertragsabschluss, 50\u00A0% nach dem Go-live.",
     },
   ],
 };
@@ -700,7 +801,7 @@ export const RECHNER = {
   anbindungsHinweis:
     "Der Wert steigt, wo eine Anbindung an Ihr Praxisverwaltungssystem möglich ist: Dann entfällt auch das Übertragen von Hand. Was für Ihr System geht, prüfen wir vor dem Angebot.",
   stundenkostenQuelle:
-    "Vorschlagswert abgeleitet aus dem MFA-Tarifgehalt 2026 (ab 2.939,59 € brutto im Monat) bei angenommenen 38,5 Wochenstunden — ohne Arbeitgeberkosten. Passen Sie den Wert an Ihre Praxis an.",
+    "Vorschlagswert abgeleitet aus dem MFA-Tarifgehalt 2026 (ab 2.939,59\u00A0€ brutto im Monat) bei angenommenen 38,5 Wochenstunden — ohne Arbeitgeberkosten. Passen Sie den Wert an Ihre Praxis an.",
   stundenkostenSource: "Gehaltstarifvertrag MFA (Virchowbund), 2026",
   startwertHinweis:
     "Alle Startwerte sind frei gewählte Beispiele, keine Branchenstatistik.",
