@@ -4,6 +4,7 @@
 
 import { buildPremiumSource } from '@/lib/ownerFinance/documents/premium';
 import type { TransactionalDocument } from '@/lib/ownerFinance/documents';
+import type { TextBlock } from '@/lib/ownerFinance/documents/listFields';
 
 function Bullets({ items }: { items: string[] }) {
   if (!items.length) return null;
@@ -18,6 +19,12 @@ function Bullets({ items }: { items: string[] }) {
 
 function Para({ text }: { text: string }) {
   return <>{text.split(/\n{2,}/).map((p, i) => <p key={i} className="mb-2 text-[12.5px] leading-relaxed text-gray-600">{p.split(/\n/).join(' ')}</p>)}</>;
+}
+
+// A list-capable field: bullet rows when the owner entered one entry per line, prose otherwise.
+// The decision comes from buildPremiumSource, so this preview and the PDF always agree.
+function Block({ block }: { block: TextBlock }) {
+  return block.kind === 'list' ? <Bullets items={block.items} /> : <Para text={block.text} />;
 }
 
 function Head({ children }: { children: React.ReactNode }) {
@@ -196,8 +203,8 @@ export function PremiumOfferPreview({ doc }: { doc: TransactionalDocument }) {
           <section>
             <Head>Annahmen &amp; Ausschlüsse</Head>
             <div className="grid gap-5 sm:grid-cols-2">
-              {src.assumptions ? <div><div className="text-[11.5px] font-semibold text-gray-800">Annahmen</div><Para text={src.assumptions} /></div> : null}
-              {src.exclusions ? <div><div className="text-[11.5px] font-semibold text-gray-800">Nicht enthalten</div><Para text={src.exclusions} /></div> : null}
+              {src.assumptions ? <div><div className="text-[11.5px] font-semibold text-gray-800">Annahmen</div><Block block={src.assumptions} /></div> : null}
+              {src.exclusions ? <div><div className="text-[11.5px] font-semibold text-gray-800">Nicht enthalten</div><Block block={src.exclusions} /></div> : null}
             </div>
           </section>
         ) : null}

@@ -3,6 +3,7 @@ import {
   computeOfferPricing, billingStartText, intervalSuffix, intervalAdverb,
 } from '@/lib/ownerFinance/documents/offerPricing';
 import { publicLinesToDocumentItems, termMonthsLabel } from '@/lib/ownerFinance/publicOfferPricing';
+import { asListOrProse } from '@/lib/ownerFinance/documents/listFields';
 import type { PublicOfferProjection, PublicOfferLine } from '@/lib/ownerFinance/offersApi';
 
 // Premium, responsive web presentation of the finalized offer. It consumes the SAME
@@ -208,8 +209,8 @@ export function PremiumOfferWebView({ offer, greeting }: { offer: PublicOfferPro
           <div className="space-y-3">
             {offer.payment_terms ? <p><span className="font-medium text-slate-700">Zahlung:</span> {offer.payment_terms}</p> : null}
             {offer.delivery_terms ? <p><span className="font-medium text-slate-700">Lieferung:</span> {offer.delivery_terms}</p> : null}
-            {offer.assumptions ? <p><span className="font-medium text-slate-700">Annahmen:</span> {offer.assumptions}</p> : null}
-            {offer.exclusions ? <p><span className="font-medium text-slate-700">Ausschlüsse:</span> {offer.exclusions}</p> : null}
+            <LabelledBlock label="Annahmen" text={offer.assumptions} />
+            <LabelledBlock label="Ausschlüsse" text={offer.exclusions} />
           </div>
         </Section>
       ) : null}
@@ -217,6 +218,31 @@ export function PremiumOfferWebView({ offer, greeting }: { offer: PublicOfferPro
       {offer.next_steps ? (
         <Section kicker="Nächste Schritte" title="So geht es weiter"><p className="whitespace-pre-line">{offer.next_steps}</p></Section>
       ) : null}
+    </div>
+  );
+}
+
+/**
+ * A list-capable field on the customer-facing portal. Renders one bullet row per entry when the
+ * owner entered several lines, and keeps the original inline "Label: text" prose for a single
+ * paragraph — so an already-signed historical offer looks exactly as it did.
+ *
+ * Shares `asListOrProse` with the owner preview and the PDF, so all three agree on what is a list.
+ */
+function LabelledBlock({ label, text }: { label: string; text: string | null | undefined }) {
+  const block = asListOrProse(text);
+  if (!block) return null;
+  if (block.kind === 'prose') {
+    return <p><span className="font-medium text-slate-700">{label}:</span> {block.text}</p>;
+  }
+  return (
+    <div>
+      <p className="font-medium text-slate-700">{label}:</p>
+      <ul className="mt-1 space-y-1">
+        {block.items.map((it, i) => (
+          <li key={i} className="flex gap-2"><span aria-hidden="true" className="text-slate-400">&bull;</span><span>{it}</span></li>
+        ))}
+      </ul>
     </div>
   );
 }

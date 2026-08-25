@@ -19,6 +19,7 @@
 
 import type { PremiumSource, PremiumModule } from './premiumSource';
 import { buildPremiumSource } from './premiumSource';
+import type { TextBlock } from '../listFields';
 import type { TransactionalDocument } from '../documentModel';
 import { PREMIUM_OFFER_TEMPLATE_KEY } from '../documentModel';
 
@@ -132,6 +133,13 @@ function buildDocument(RP: typeof import('@react-pdf/renderer'), src: PremiumSou
     <View>{items.map((it, i) => (
       <View key={i} style={s.bulletRow}><Text style={s.bulletDot}>•</Text><Text style={s.bulletText}>{it}</Text></View>
     ))}</View>
+  );
+
+  // A list-capable field: bullet rows when the owner entered one entry per line, prose
+  // otherwise. The list/prose decision is made once in buildPremiumSource so this document and
+  // the HTML preview always draw the same thing.
+  const Block = ({ block }: { block: TextBlock }) => (
+    block.kind === 'list' ? <Bullets items={block.items} /> : <Para text={block.text} />
   );
 
   const Heading = ({ title }: { title: string }) => (
@@ -329,8 +337,8 @@ function buildDocument(RP: typeof import('@react-pdf/renderer'), src: PremiumSou
         {(src.assumptions || src.exclusions) ? (
           <Section title="Annahmen & Ausschlüsse">
             <View style={s.twoCol}>
-              {src.assumptions ? <View style={s.col}><Text style={s.subHead}>Annahmen</Text><Para text={src.assumptions} /></View> : null}
-              {src.exclusions ? <View style={s.col}><Text style={s.subHead}>Nicht enthalten</Text><Para text={src.exclusions} /></View> : null}
+              {src.assumptions ? <View style={s.col}><Text style={s.subHead}>Annahmen</Text><Block block={src.assumptions} /></View> : null}
+              {src.exclusions ? <View style={s.col}><Text style={s.subHead}>Nicht enthalten</Text><Block block={src.exclusions} /></View> : null}
             </View>
           </Section>
         ) : null}

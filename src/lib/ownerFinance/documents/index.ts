@@ -2,6 +2,7 @@
 
 export * from './documentModel';
 export * from './offerPricing';
+export * from './listFields';
 export * from './documentValidation';
 export * from './documentHash';
 export * from './documentFilename';
