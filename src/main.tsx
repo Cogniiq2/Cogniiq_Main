@@ -4,7 +4,42 @@ import App from './App.tsx';
 import './index.css';
 import { ThemeProvider } from './components/theme-provider';
 
+/**
+ * Recover from a stale chunk ONCE, never in a loop.
+ *
+ * A deploy gives every chunk a new content hash. A browser or edge cache still holding the
+ * previous HTML then asks for a filename that no longer exists, and Vite fires
+ * `vite:preloadError`. Reloading fetches fresh HTML that names the current chunks, so a single
+ * reload genuinely fixes that case.
+ *
+ * It must be guarded, though. This handler previously reloaded unconditionally, so whenever the
+ * chunk stayed unavailable the page reloaded forever: it never survived long enough to paint,
+ * and the customer saw a permanently blank white page instead of any error state. That is
+ * exactly how a freshly emailed offer link opened to nothing — the portal never mounted, so
+ * `public_offer_by_token` was never even called.
+ *
+ * With the marker set, a second failure falls through to DocumentRouteBoundary (and the app's
+ * other boundaries), which paint a real recovery screen. The marker is per tab and expires, so
+ * a genuinely new incident later in the same session can still self-heal.
+ */
+const PRELOAD_RELOAD_KEY = 'cogniiq:preload-reloaded-at';
+const PRELOAD_RELOAD_COOLDOWN_MS = 60_000;
+
 window.addEventListener('vite:preloadError', () => {
+  let store: Storage | null = null;
+  try {
+    store = window.sessionStorage;
+  } catch {
+    store = null; // storage blocked (private mode): never risk an unguarded reload loop.
+  }
+  if (!store) return;
+
+  const previous = Number(store.getItem(PRELOAD_RELOAD_KEY));
+  const now = Date.now();
+  if (Number.isFinite(previous) && previous > 0 && now - previous < PRELOAD_RELOAD_COOLDOWN_MS) {
+    return; // already tried: let the error boundaries show a recovery screen instead.
+  }
+  store.setItem(PRELOAD_RELOAD_KEY, String(now));
   window.location.reload();
 });
 

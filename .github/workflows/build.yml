@@ -113,6 +113,12 @@ jobs:
           STATIC_SERVER_ASSET_DELAY_MS: '600'
         run: node .github/scripts/test-browser-hydration.mjs
 
+      # The customer offer portal (/d/:token) opened from an email must never be a blank
+      # white page. Runs against the built artifact in a real browser: a failed lazy chunk
+      # once reload-looped forever and painted nothing, which no component test can catch.
+      - name: Public document portal verification (real browser)
+        run: node .github/scripts/test-public-document-portal.mjs
+
       # The public marketing site must render light for every visitor. The theme
       # key is shared with the application, so a customer who chose dark inside
       # /app — or, previously, anyone whose OS simply preferred dark — used to get

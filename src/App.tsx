@@ -9,6 +9,7 @@ import { PremiumFooterReveal } from './components/PremiumFooterReveal';
 import { LocalBusinessSchema } from './components/LocalBusinessSchema';
 import { CanonicalManager } from './components/CanonicalManager';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { DocumentRouteBoundary, DocumentRouteFallback } from './pages/public/DocumentRouteBoundary';
 import { RoleLandingPage } from './components/auth/RoleLandingPage';
 import { LegacyLoginRedirect, LegacyOwnerRedirect } from './components/auth/LegacyRedirects';
 import { ReceptionistEntitlementRoute } from './components/app/ReceptionistEntitlementRoute';
@@ -465,7 +466,23 @@ export function AppInner() {
             entirely by the secure token, never by a raw resource id. It owns the full
             viewport (min-height:100dvh; width:100%; overflow-x:hidden) with no inherited
             top offset. */}
-        <Route path="/d/:token" element={<PublicDocumentPortal />} />
+        {/* The customer document route carries its OWN boundary and its own visible loading
+            state. PageFallback renders nothing, which is acceptable for surfaces the customer
+            reaches by navigating inside the app, but not for a link opened cold from an email:
+            a failed lazy chunk (a deploy changes every asset hash, so a cached app-shell.html
+            can name a chunk that no longer exists) re-throws out of Suspense and, with no
+            boundary, unmounts the whole React root — the customer sees a blank white page.
+            Scoped to this route on purpose; it must not become an app-wide error net. */}
+        <Route
+          path="/d/:token"
+          element={
+            <DocumentRouteBoundary>
+              <Suspense fallback={<DocumentRouteFallback />}>
+                <PublicDocumentPortal />
+              </Suspense>
+            </DocumentRouteBoundary>
+          }
+        />
 
         {/* Standalone authentication completion surface. Like /d/:token it lives entirely OUTSIDE
             the marketing and dashboard layouts — no Navigation, no Footer, no dashboard shell, no
