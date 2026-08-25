@@ -18,7 +18,9 @@ export interface OrganizationOfferSummary {
   issue_date: string | null;
   valid_until: string | null;
   currency: string;
+  // One-time (project) total. Recurring commitments are separate — see recurring_monthly_gross_cents.
   gross_total_cents: number;
+  recurring_monthly_gross_cents: number;
 }
 
 export interface OrganizationInvoiceSummary {
@@ -59,7 +61,7 @@ export async function loadOrganizationCommercialOverview(
   const [offersResult, invoicesResult] = await Promise.all([
     supabase
       .from('owner_offers')
-      .select('id, offer_number, title, status, issue_date, valid_until, currency, gross_total_cents')
+      .select('id, offer_number, title, status, issue_date, valid_until, currency, gross_total_cents, recurring_monthly_gross_cents')
       .eq('organization_id', organizationId)
       .order('issue_date', { ascending: false, nullsFirst: false })
       .order('created_at', { ascending: false }),

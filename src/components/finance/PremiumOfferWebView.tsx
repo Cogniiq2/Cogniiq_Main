@@ -1,4 +1,8 @@
 import { formatCentsCurrencyDe, formatBpPercentDe, formatDateDe } from '@/lib/ownerFinance/exports';
+import {
+  computeOfferPricing, billingStartText, intervalSuffix, intervalAdverb,
+} from '@/lib/ownerFinance/documents/offerPricing';
+import { publicLinesToDocumentItems, termMonthsLabel } from '@/lib/ownerFinance/publicOfferPricing';
 import type { PublicOfferProjection, PublicOfferLine } from '@/lib/ownerFinance/offersApi';
 
 // Premium, responsive web presentation of the finalized offer. It consumes the SAME
@@ -18,6 +22,14 @@ function Section({ id, kicker, title, children }: { id?: string; kicker?: string
 }
 
 function ModuleCard({ line, index, currency, optional }: { line: PublicOfferLine; index: number; currency: string; optional?: boolean }) {
+  // A recurring position shows its per-interval price plus the contract facts. It is never
+  // multiplied out over the minimum term.
+  const recurring = line.pricing_type === 'recurring';
+  const suffix = recurring ? intervalSuffix(line.billing_interval ?? 'monthly') : null;
+  const termLabel = recurring ? termMonthsLabel(line.minimum_term_months) : null;
+  const startLabel = recurring && line.billing_start_type
+    ? billingStartText({ type: line.billing_start_type, label: line.billing_start_label?.trim() || null })
+    : null;
   return (
     <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-[0_1px_0_rgba(15,23,42,0.03)]">
       <div className="flex items-start justify-between gap-4">
@@ -29,12 +41,16 @@ function ModuleCard({ line, index, currency, optional }: { line: PublicOfferLine
           <h3 className="mt-2 text-[15px] font-semibold text-slate-900 [overflow-wrap:anywhere] hyphens-auto">{line.description}</h3>
         </div>
         <div className="shrink-0 text-right">
-          <div className="tabular-nums text-[15px] font-semibold text-slate-900">{formatCentsCurrencyDe(line.net_cents, currency)}</div>
+          <div className="tabular-nums text-[15px] font-semibold text-slate-900">{formatCentsCurrencyDe(line.net_cents, currency)}{suffix ? <span className="ml-1 text-[13px] text-slate-500">{suffix}</span> : null}</div>
           <div className="text-[11px] text-slate-400">netto</div>
         </div>
       </div>
       <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-slate-400">
-        <span>{(line.quantity_milli / 1000).toLocaleString('de-DE')} {line.unit}</span>
+        {recurring ? null : <span>{(line.quantity_milli / 1000).toLocaleString('de-DE')} {line.unit}</span>}
+        {recurring && line.quantity_milli !== 1000 ? <span>{(line.quantity_milli / 1000).toLocaleString('de-DE')} × {formatCentsCurrencyDe(line.unit_price_cents, currency)}</span> : null}
+        {termLabel ? <span>Mindestlaufzeit: <span className="text-slate-600">{termLabel}</span></span> : null}
+        {recurring ? <span>Abrechnung: <span className="text-slate-600">{intervalAdverb(line.billing_interval ?? 'monthly')}</span></span> : null}
+        {startLabel ? <span>Beginn: <span className="text-slate-600">{startLabel}</span></span> : null}
         <span>USt {formatBpPercentDe(line.vat_rate_bp)}</span>
       </div>
     </div>
@@ -48,6 +64,10 @@ export function PremiumOfferWebView({ offer, greeting }: { offer: PublicOfferPro
   const outcomes = (offer.desired_outcomes ?? []).filter((o) => o && o.trim());
   const timeline = (offer.timeline ?? []).filter((t) => t.phase || t.title || t.duration || t.description);
   const schedule = (offer.payment_schedule ?? []).filter((m) => m.label);
+  // Derived from the projected positions with the SAME function the editor, preview and PDF
+  // use, so the customer never sees a total the owner did not see.
+  const pricing = computeOfferPricing(publicLinesToDocumentItems(offer.lines));
+  const showTermTotal = pricing.recurring.some((g) => g.minimumTerm.netCents > 0);
 
   return (
     <div>
@@ -104,11 +124,45 @@ export function PremiumOfferWebView({ offer, greeting }: { offer: PublicOfferPro
       ) : null}
 
       <Section kicker="Investition" title="Ihre Investition">
-        <dl className="ml-auto max-w-sm space-y-2">
-          <div className="flex justify-between"><dt className="text-slate-500">Netto</dt><dd className="tabular-nums text-slate-800">{formatCentsCurrencyDe(offer.net_total_cents, currency)}</dd></div>
-          <div className="flex justify-between"><dt className="text-slate-500">Umsatzsteuer</dt><dd className="tabular-nums text-slate-800">{formatCentsCurrencyDe(offer.vat_total_cents, currency)}</dd></div>
-          <div className="flex justify-between border-t border-slate-100 pt-2"><dt className="font-semibold text-slate-900">Gesamt (brutto)</dt><dd className="tabular-nums text-lg font-semibold text-slate-900">{formatCentsCurrencyDe(offer.gross_total_cents, currency)}</dd></div>
-        </dl>
+        <div className="ml-auto max-w-sm space-y-5">
+          {pricing.hasOneTime || !pricing.hasRecurring ? (
+            <dl className="space-y-2">
+              {pricing.hasRecurring ? <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">Einmalige Investition</div> : null}
+              <div className="flex justify-between"><dt className="text-slate-500">Netto</dt><dd className="tabular-nums text-slate-800">{formatCentsCurrencyDe(pricing.oneTime.netCents, currency)}</dd></div>
+              <div className="flex justify-between"><dt className="text-slate-500">Umsatzsteuer</dt><dd className="tabular-nums text-slate-800">{formatCentsCurrencyDe(pricing.oneTime.vatCents, currency)}</dd></div>
+              <div className="flex justify-between border-t border-slate-100 pt-2">
+                <dt className="font-semibold text-slate-900">{pricing.hasRecurring ? 'Einmalig (brutto)' : 'Gesamt (brutto)'}</dt>
+                <dd className="tabular-nums text-lg font-semibold text-slate-900">{formatCentsCurrencyDe(pricing.oneTime.grossCents, currency)}</dd>
+              </div>
+            </dl>
+          ) : null}
+
+          {pricing.recurring.map((g, i) => (
+            <dl key={i} className="space-y-2">
+              <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">Laufende Betreuung</div>
+              <div className="flex justify-between"><dt className="text-slate-500">Netto {intervalSuffix(g.interval)}</dt><dd className="tabular-nums text-slate-800">{formatCentsCurrencyDe(g.netCents, currency)}</dd></div>
+              <div className="flex justify-between"><dt className="text-slate-500">Umsatzsteuer</dt><dd className="tabular-nums text-slate-800">{formatCentsCurrencyDe(g.vatCents, currency)}</dd></div>
+              <div className="flex justify-between border-t border-slate-100 pt-2">
+                <dt className="font-semibold text-slate-900">Brutto {intervalSuffix(g.interval)}</dt>
+                <dd className="tabular-nums text-lg font-semibold text-slate-900">{formatCentsCurrencyDe(g.grossCents, currency)}</dd>
+              </div>
+              <p className="text-[12px] text-slate-400">
+                Abrechnung: <span className="text-slate-600">{intervalAdverb(g.interval)}</span>
+                {termMonthsLabel(g.minimumTermMonths) ? <> · Mindestlaufzeit: <span className="text-slate-600">{termMonthsLabel(g.minimumTermMonths)}</span></> : null}
+                {billingStartText(g.billingStart) ? <> · Beginn: <span className="text-slate-600">{billingStartText(g.billingStart)}</span></> : null}
+              </p>
+            </dl>
+          ))}
+
+          {/* Secondary transparency: what the first minimum term adds up to. Never a headline
+              price and explicitly not due on signature. */}
+          {showTermTotal ? (
+            <p className="border-t border-slate-100 pt-3 text-[12px] leading-relaxed text-slate-400">
+              Gesamtwert während der ersten Mindestlaufzeit: <span className="text-slate-600">{formatCentsCurrencyDe(pricing.minimumTermTotal.netCents, currency)} netto</span> ({formatCentsCurrencyDe(pricing.minimumTermTotal.grossCents, currency)} brutto).
+              Nicht sofort fällig — die laufenden Leistungen werden gemäß ihrem Abrechnungsintervall berechnet.
+            </p>
+          ) : null}
+        </div>
       </Section>
 
       {timeline.length ? (
@@ -130,6 +184,11 @@ export function PremiumOfferWebView({ offer, greeting }: { offer: PublicOfferPro
 
       {schedule.length ? (
         <Section kicker="Zahlung" title="Zahlungsplan">
+          {pricing.hasRecurring ? (
+            <p className="mb-3 text-[14px] text-slate-500">
+              Die Raten beziehen sich auf die einmalige Projektinvestition. Wiederkehrende Leistungen werden separat gemäß ihrem Abrechnungsintervall berechnet.
+            </p>
+          ) : null}
           <ul className="space-y-2">
             {schedule.map((m, i) => (
               <li key={i} className="flex items-center justify-between gap-4 border-b border-slate-50 pb-2 last:border-0">

@@ -55,13 +55,19 @@ function toMilestones(rows: OfferPaymentMilestone[] | undefined): PaymentMilesto
   return (rows ?? []).map((m) => ({ label: m.label, percentageBp: m.percentage_bp ?? null, amountCents: m.amount_cents ?? null, note: m.note ?? null }));
 }
 
-function offerLineItems(lines: OwnerOfferLine[]): DocumentLineItem[] {
+/** Map stored offer lines onto the shared line model (also used by the editor's live preview). */
+export function offerLinesToDocumentItems(lines: OwnerOfferLine[]): DocumentLineItem[] {
   return lines.map((l) => ({
     description: l.description, details: l.details, deliverables: l.deliverables ?? [],
     phaseLabel: l.phase_label, durationLabel: l.duration_label,
     quantityMilli: l.quantity_milli, unit: l.unit, unitPriceCents: l.unit_price_cents,
     vatRateBp: l.vat_rate_bp, vatTreatment: l.vat_treatment, netCents: l.net_cents, vatCents: l.vat_cents,
     grossCents: l.gross_cents, isOptional: l.is_optional,
+    pricingType: l.pricing_type === 'recurring' ? 'recurring' : 'one_time',
+    billingInterval: l.billing_interval ?? null,
+    minimumTermMonths: l.minimum_term_months ?? null,
+    billingStartType: l.billing_start_type ?? null,
+    billingStartLabel: l.billing_start_label ?? null,
   }));
 }
 
@@ -92,7 +98,7 @@ export function offerToDocument(offer: OwnerOffer, lines: OwnerOfferLine[], sett
     exclusions: offer.exclusions,
     brandAccent: settings?.brand_accent ?? null,
     templateKey: offer.template_key ?? PREMIUM_OFFER_TEMPLATE_KEY,
-    lines: offerLineItems(lines),
+    lines: offerLinesToDocumentItems(lines),
     netTotalCents: offer.net_total_cents,
     vatTotalCents: offer.vat_total_cents,
     grossTotalCents: offer.gross_total_cents,
@@ -160,6 +166,13 @@ export function snapshotToDocument(snapshot: Record<string, unknown>): Transacti
       quantityMilli: num(l.quantity_milli), unit: str(l.unit) ?? 'Stück', unitPriceCents: num(l.unit_price_cents),
       vatRateBp: num(l.vat_rate_bp), vatTreatment: str(l.vat_treatment) ?? 'standard',
       netCents: num(l.net_cents), vatCents: num(l.vat_cents), grossCents: num(l.gross_cents), isOptional: !!l.is_optional,
+      // Snapshots taken before recurring pricing existed carry none of these keys, so they
+      // read back as one-time and render exactly as they were finalized.
+      pricingType: l.pricing_type === 'recurring' ? 'recurring' : 'one_time',
+      billingInterval: (str(l.billing_interval) as DocumentLineItem['billingInterval']) ?? null,
+      minimumTermMonths: typeof l.minimum_term_months === 'number' ? l.minimum_term_months : null,
+      billingStartType: (str(l.billing_start_type) as DocumentLineItem['billingStartType']) ?? null,
+      billingStartLabel: str(l.billing_start_label),
     })),
     netTotalCents: num(o.net_total_cents),
     vatTotalCents: num(o.vat_total_cents),

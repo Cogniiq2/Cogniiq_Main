@@ -13,6 +13,7 @@ import {
   type AdminClientDetail,
 } from '@/lib/clientPlatform/adminApi';
 import { formatCents } from '@/lib/clientPlatform/validation';
+import { formatOfferAmount } from '@/lib/ownerFinance/offerAmountDisplay';
 import {
   canRenewInvitation,
   canResendInvitation,
@@ -409,7 +410,7 @@ function CommercialTab({ organizationId }: { organizationId: string }) {
                   <span className="flex shrink-0 items-center gap-3">
                     <Pill label={offerStatusLabel[o.status] ?? o.status} tone={offerPillTone[o.status] ?? 'neutral'} />
                     <span className="text-sm font-semibold tabular-nums text-gray-900">
-                      {formatCents(o.gross_total_cents, o.currency)}
+                      {formatOfferAmount(o, o.currency, formatCents)}
                     </span>
                     <ExternalLink size={14} className="text-gray-400" aria-hidden="true" />
                   </span>

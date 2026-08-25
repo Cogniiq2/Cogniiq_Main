@@ -9,6 +9,7 @@ import {
 import type { PdfReportModel, PdfSection } from '../exports/pdf';
 import { vatBreakdown, type TransactionalDocument } from './documentModel';
 import { validateTransactionalDocument } from './documentValidation';
+import { computeOfferPricing, intervalSuffix } from './offerPricing';
 
 const KIND_LABEL = { offer: 'Angebot', invoice: 'Rechnung' } as const;
 const DISCLAIMER =
@@ -83,14 +84,29 @@ export function buildTransactionalReportModel(doc: TransactionalDocument): PdfRe
       rows: breakdown.map((b) => [`Netto ${formatBpPercentDe(b.rateBp)} (${b.vatTreatment})`, `${formatCentsCurrencyDe(b.netCents, doc.currency)} → USt ${formatCentsCurrencyDe(b.vatCents, doc.currency)}`]),
     });
   }
-  sections.push({
-    kind: 'keyvalue', heading: 'Summen',
-    rows: [
-      ['Netto', formatCentsCurrencyDe(doc.netTotalCents, doc.currency)],
-      ['Umsatzsteuer', formatCentsCurrencyDe(doc.vatTotalCents, doc.currency)],
-      ['Gesamt (brutto)', formatCentsCurrencyDe(doc.grossTotalCents, doc.currency)],
-    ],
-  });
+  // Invoices never carry recurring lines (pricing_type is an offer-only concept), so this is a
+  // no-op for them. Always DERIVED from the lines, never from doc.{net,vat,gross}TotalCents: for
+  // an offer those header fields are the ONE-TIME portion only, and trusting them directly is
+  // what let a recurring commitment vanish off this printed total the instant an offer had a
+  // monthly line, while its own line row above still showed a price. Deriving from the lines
+  // also means the header fields can never drift out of sync with what is actually printed.
+  const pricing = computeOfferPricing(doc.lines);
+  const summenRows: [string, string][] = pricing.hasRecurring
+    ? [['Netto (einmalig)', formatCentsCurrencyDe(pricing.oneTime.netCents, doc.currency)],
+      ['Umsatzsteuer (einmalig)', formatCentsCurrencyDe(pricing.oneTime.vatCents, doc.currency)],
+      ['Gesamt (einmalig, brutto)', formatCentsCurrencyDe(pricing.oneTime.grossCents, doc.currency)]]
+    : [['Netto', formatCentsCurrencyDe(pricing.oneTime.netCents, doc.currency)],
+      ['Umsatzsteuer', formatCentsCurrencyDe(pricing.oneTime.vatCents, doc.currency)],
+      ['Gesamt (brutto)', formatCentsCurrencyDe(pricing.oneTime.grossCents, doc.currency)]];
+  for (const group of pricing.recurring) {
+    const suffix = intervalSuffix(group.interval);
+    summenRows.push(
+      ['Netto ' + suffix, `${formatCentsCurrencyDe(group.netCents, doc.currency)} ${suffix}`],
+      ['Umsatzsteuer ' + suffix, formatCentsCurrencyDe(group.vatCents, doc.currency)],
+      ['Gesamt (brutto) ' + suffix, `${formatCentsCurrencyDe(group.grossCents, doc.currency)} ${suffix}`],
+    );
+  }
+  sections.push({ kind: 'keyvalue', heading: 'Summen', rows: summenRows });
 
   const termRows: [string, string][] = [];
   if (doc.paymentTerms) termRows.push(['Zahlungsbedingungen', doc.paymentTerms]);

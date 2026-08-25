@@ -11,6 +11,7 @@ import {
   loadCustomerDetail, setCustomerStatus, archiveCustomer, unarchiveCustomer, deleteCustomer,
 } from '@/lib/ownerFinance/customersApi';
 import { formatCentsCurrencyDe, formatDateDe } from '@/lib/ownerFinance/exports';
+import { formatOfferAmount } from '@/lib/ownerFinance/offerAmountDisplay';
 import {
   customerStatusLabel, customerStatusTone, customerDisplayName, offerStatusLabel, offerStatusTone,
 } from '@/lib/ownerFinance/customerLabels';
@@ -129,7 +130,7 @@ export function CustomerDetailPage() {
   const offerColumns: Column<OwnerCustomerOfferRef>[] = [
     { key: 'number', header: 'Nummer', render: (o) => <span className="font-semibold text-gray-950">{o.offer_number ?? 'Entwurf'}</span> },
     { key: 'title', header: 'Titel', render: (o) => <span className="text-gray-600">{o.title ?? '—'}</span> },
-    { key: 'amount', header: 'Betrag', align: 'right', render: (o) => <span className="tabular-nums font-medium text-gray-900">{formatCentsCurrencyDe(o.gross_total_cents, o.currency)}</span> },
+    { key: 'amount', header: 'Betrag', align: 'right', render: (o) => <span className="tabular-nums font-medium text-gray-900">{formatOfferAmount(o, o.currency, formatCentsCurrencyDe)}</span> },
     { key: 'status', header: 'Status', render: (o) => (
       <div className="flex items-center gap-1.5">
         <StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} />
@@ -209,7 +210,7 @@ export function CustomerDetailPage() {
               <DataTable columns={offerColumns} rows={detail.offers} getRowKey={(o) => o.id} minWidth={760}
                 onRowClick={(o) => navigate(`/admin/finance/offers/${o.id}`)}
                 mobileTitle={(o) => <div className="flex items-center gap-2"><span>{o.offer_number ?? 'Entwurf'}</span><StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} /></div>}
-                mobileSubtitle={(o) => formatCentsCurrencyDe(o.gross_total_cents, o.currency)} />
+                mobileSubtitle={(o) => formatOfferAmount(o, o.currency, formatCentsCurrencyDe)} />
             )}
           </Card>
 

@@ -79,10 +79,21 @@ export function PremiumOfferPreview({ doc }: { doc: TransactionalDocument }) {
                       <div className="text-[9px] uppercase tracking-[0.12em]" style={{ color: src.accent }}>Modul {m.index}</div>
                       <div className="text-[13px] font-bold text-gray-900">{m.title}</div>
                     </div>
-                    <div className="text-right"><div className="text-[8px] uppercase tracking-wide text-gray-400">Netto</div><div className="text-[13px] font-bold text-gray-900 tabular-nums">{m.netLabel}</div></div>
+                    <div className="text-right">
+                      <div className="text-[8px] uppercase tracking-wide text-gray-400">Netto</div>
+                      {/* Recurring positions show the per-interval price, never the term total. */}
+                      <div className="text-[13px] font-bold text-gray-900 tabular-nums">{m.netLabel}{m.recurring ? <span className="ml-1 text-[11px] font-semibold text-gray-500">{m.recurring.suffix}</span> : null}</div>
+                    </div>
                   </div>
                   {m.details ? <p className="mt-1.5 text-[11.5px] leading-relaxed text-gray-600">{m.details}</p> : null}
                   <Bullets items={m.deliverables} />
+                  {m.recurring ? (
+                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[10.5px] text-gray-400">
+                      {m.recurring.minimumTermLabel ? <span>Mindestlaufzeit: <span className="text-gray-700">{m.recurring.minimumTermLabel}</span></span> : null}
+                      <span>Abrechnung: <span className="text-gray-700">{m.recurring.intervalAdverb}</span></span>
+                      {m.recurring.billingStartLabel ? <span>Beginn: <span className="text-gray-700">{m.recurring.billingStartLabel}</span></span> : null}
+                    </div>
+                  ) : null}
                   {(m.phaseLabel || m.durationLabel) ? (
                     <div className="mt-2 flex gap-4 text-[10.5px] text-gray-400">
                       {m.phaseLabel ? <span>Phase: <span className="text-gray-700">{m.phaseLabel}</span></span> : null}
@@ -109,15 +120,45 @@ export function PremiumOfferPreview({ doc }: { doc: TransactionalDocument }) {
           </section>
         ) : null}
 
+        {/* One-time investment and ongoing commitment are two separate headline figures. The
+            first-term contract value stays visually secondary. */}
         <section>
           <Head>Investitionsübersicht</Head>
-          <div className="overflow-hidden rounded-xl border border-gray-100">
-            <div className="flex justify-between px-4 py-2 text-[12px]"><span className="text-gray-500">Nettosumme</span><span className="tabular-nums">{src.investment.netLabel}</span></div>
-            {src.investment.vatRows.map((r, i) => (
-              <div key={i} className="flex justify-between border-t border-gray-100 px-4 py-2 text-[12px]"><span className="text-gray-500">{r.label} · Netto {r.net}</span><span className="tabular-nums">{r.vat}</span></div>
+          <div className="space-y-2.5">
+            {src.investment.oneTime ? (
+              <div className="overflow-hidden rounded-xl border border-gray-100">
+                {src.investment.isSplit ? <div className="border-b border-gray-100 px-4 pt-2.5 text-[9px] uppercase tracking-[0.12em] pb-1.5" style={{ color: src.accent }}>Einmalige Investition</div> : null}
+                <div className="flex justify-between px-4 py-2 text-[12px]"><span className="text-gray-500">Nettosumme</span><span className="tabular-nums">{src.investment.oneTime.netLabel}</span></div>
+                {src.investment.oneTime.vatRows.map((r, i) => (
+                  <div key={i} className="flex justify-between border-t border-gray-100 px-4 py-2 text-[12px]"><span className="text-gray-500">{r.label} · Netto {r.net}</span><span className="tabular-nums">{r.vat}</span></div>
+                ))}
+                <div className="flex justify-between border-t border-gray-100 px-4 py-2 text-[12px]"><span className="text-gray-500">Umsatzsteuer gesamt</span><span className="tabular-nums">{src.investment.oneTime.vatTotalLabel}</span></div>
+                <div className="flex justify-between bg-gray-50 px-4 py-3"><span className="text-[12.5px] font-bold text-gray-900">{src.investment.isSplit ? 'Einmalige Investition (brutto)' : 'Gesamtinvestition (brutto)'}</span><span className="text-[15px] font-bold text-gray-900 tabular-nums">{src.investment.oneTime.grossLabel}</span></div>
+              </div>
+            ) : null}
+
+            {src.investment.recurring.map((r, i) => (
+              <div key={i} className="overflow-hidden rounded-xl border border-gray-100">
+                <div className="border-b border-gray-100 px-4 pt-2.5 pb-1.5 text-[9px] uppercase tracking-[0.12em]" style={{ color: src.accent }}>Laufende Betreuung</div>
+                <div className="flex justify-between px-4 py-2 text-[12px]"><span className="text-gray-500">Netto {r.suffix}</span><span className="tabular-nums">{r.netLabel} {r.suffix}</span></div>
+                {r.vatRows.map((v, j) => (
+                  <div key={j} className="flex justify-between border-t border-gray-100 px-4 py-2 text-[12px]"><span className="text-gray-500">{v.label} · Netto {v.net}</span><span className="tabular-nums">{v.vat}</span></div>
+                ))}
+                <div className="flex justify-between bg-gray-50 px-4 py-3"><span className="text-[12.5px] font-bold text-gray-900">Laufende Betreuung (brutto)</span><span className="text-[15px] font-bold text-gray-900 tabular-nums">{r.grossLabel} {r.suffix}</span></div>
+                <div className="border-t border-gray-100 px-4 py-2 text-[10.5px] text-gray-400">
+                  Abrechnung: <span className="text-gray-700">{r.intervalAdverb}</span>
+                  {r.minimumTermLabel ? <> · Mindestlaufzeit: <span className="text-gray-700">{r.minimumTermLabel}</span></> : null}
+                  {r.billingStartLabel ? <> · Beginn: <span className="text-gray-700">{r.billingStartLabel}</span></> : null}
+                </div>
+              </div>
             ))}
-            <div className="flex justify-between border-t border-gray-100 px-4 py-2 text-[12px]"><span className="text-gray-500">Umsatzsteuer gesamt</span><span className="tabular-nums">{src.investment.vatTotalLabel}</span></div>
-            <div className="flex justify-between bg-gray-50 px-4 py-3"><span className="text-[12.5px] font-bold text-gray-900">Gesamtinvestition (brutto)</span><span className="text-[15px] font-bold text-gray-900 tabular-nums">{src.investment.grossLabel}</span></div>
+
+            {src.investment.minimumTermTotalNetLabel ? (
+              <p className="px-1 text-[10.5px] leading-relaxed text-gray-400">
+                Gesamtwert während der ersten Mindestlaufzeit: <span className="text-gray-600">{src.investment.minimumTermTotalNetLabel} netto</span>
+                {src.investment.minimumTermTotalGrossLabel ? ` (${src.investment.minimumTermTotalGrossLabel} brutto)` : ''}. Nicht sofort fällig — die laufenden Leistungen werden gemäß ihrem Abrechnungsintervall berechnet.
+              </p>
+            ) : null}
           </div>
         </section>
 
@@ -138,6 +179,7 @@ export function PremiumOfferPreview({ doc }: { doc: TransactionalDocument }) {
         {src.payment.rows.length ? (
           <section>
             <Head>Zahlungsplan</Head>
+            {src.payment.scopeNote ? <p className="mb-2 text-[11px] leading-relaxed text-gray-500">{src.payment.scopeNote}</p> : null}
             <div>
               {src.payment.rows.map((r, i) => (
                 <div key={i} className="flex items-center justify-between border-b border-gray-100 py-2">

@@ -1,6 +1,7 @@
 // Public surface for the shared transactional document system (offers + invoices).
 
 export * from './documentModel';
+export * from './offerPricing';
 export * from './documentValidation';
 export * from './documentHash';
 export * from './documentFilename';

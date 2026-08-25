@@ -65,6 +65,13 @@ export interface OfferLineInput {
   phase_label?: string | null; duration_label?: string | null;
   quantity_milli: number; unit: string; unit_price_cents: number;
   vat_rate_bp: number; vat_treatment: string; is_optional?: boolean; sort_order?: number;
+  // Recurring pricing. Omitted / 'one_time' keeps the classic single-charge position; the
+  // RPC ignores the recurring fields unless pricing_type is 'recurring'.
+  pricing_type?: 'one_time' | 'recurring';
+  billing_interval?: 'monthly' | null;
+  minimum_term_months?: number | null;
+  billing_start_type?: 'commissioning' | 'order' | 'go_live' | 'handover' | 'custom' | null;
+  billing_start_label?: string | null;
 }
 
 /** Structured offer-level content (JSONB arrays). */
@@ -127,10 +134,76 @@ export async function setOfferStatus(offerId: string, status: string, reason?: s
   return { error: error?.message ?? null };
 }
 
-export async function convertOfferToInvoiceDraft(offerId: string): Promise<{ invoiceId: string | null; error: string | null }> {
-  const { data, error } = await supabase.rpc('convert_owner_offer_to_invoice_draft', { p_idempotency_key: secureUuid(), p_offer_id: offerId });
-  if (error) return { invoiceId: null, error: error.message };
-  return { invoiceId: (data as { invoice_id?: string })?.invoice_id ?? null, error: null };
+export interface ConvertOfferToInvoiceResult {
+  invoiceId: string | null;
+  recurringLinesExcluded: number;
+  /** Set for a rate (partial) conversion; null for the whole one-time amount. */
+  milestoneLabel: string | null;
+  /** False for a rate conversion — the offer stays 'accepted' so a later rate stays possible. */
+  isFullConversion: boolean;
+  error: string | null;
+}
+
+/**
+ * Convert an accepted offer into a draft invoice. Only ONE-TIME positions are copied — recurring
+ * positions (pricing_type = 'recurring') are a separate billing track and are never included,
+ * regardless of billing interval or minimum term, in either mode.
+ *
+ * `milestoneIndex` selects what gets invoiced from the one-time amount:
+ *   - omitted/undefined: the whole one-time amount (all one-time lines, copied verbatim). This
+ *     is terminal — the offer becomes 'converted' and cannot be converted again.
+ *   - a 0-based index into the offer's payment_schedule: a single rate invoice for that
+ *     milestone's share, grouped by VAT. The offer stays 'accepted' so a later rate can still be
+ *     invoiced as its own deliberate action — nothing here creates the next rate automatically.
+ *
+ * The RPC itself refuses to create an empty draft: an offer with no one-time content (recurring
+ * -only, or every one-time line optional) raises before any row is inserted.
+ */
+export async function convertOfferToInvoiceDraft(offerId: string, milestoneIndex?: number): Promise<ConvertOfferToInvoiceResult> {
+  const { data, error } = await supabase.rpc('convert_owner_offer_to_invoice_draft', {
+    p_idempotency_key: secureUuid(), p_offer_id: offerId, p_milestone_index: milestoneIndex ?? null,
+  });
+  if (error) return { invoiceId: null, recurringLinesExcluded: 0, milestoneLabel: null, isFullConversion: true, error: error.message };
+  const result = data as {
+    invoice_id?: string; recurring_lines_excluded?: number; milestone_label?: string | null; is_full_conversion?: boolean;
+  };
+  return {
+    invoiceId: result?.invoice_id ?? null,
+    recurringLinesExcluded: result?.recurring_lines_excluded ?? 0,
+    milestoneLabel: result?.milestone_label ?? null,
+    isFullConversion: result?.is_full_conversion ?? true,
+    error: null,
+  };
+}
+
+export interface OfferLinkedInvoiceRef {
+  id: string;
+  invoice_number: string | null;
+  status: string;
+  currency: string;
+  net_total_cents: number;
+  gross_total_cents: number;
+  created_at: string;
+  /** What this invoice billed: the whole one-time amount, or one payment-plan instalment. */
+  source_offer_conversion_kind: 'full' | 'milestone' | null;
+  /** 0-based payment_schedule position for a milestone conversion; null for a full one. */
+  source_offer_milestone_index: number | null;
+}
+
+/**
+ * Invoices already created from this offer (via convertOfferToInvoiceDraft), in any status.
+ * Feeds `offerConversionAvailability` so the conversion dialog can disable a rate that has
+ * already been billed rather than merely warn about it. Cancelled invoices are included on
+ * purpose — a cancelled invoice keeps its milestone slot.
+ */
+export async function loadInvoicesForOffer(offerId: string): Promise<{ data: OfferLinkedInvoiceRef[]; error: string | null }> {
+  const { data, error } = await supabase
+    .from('owner_invoices')
+    .select('id, invoice_number, status, currency, net_total_cents, gross_total_cents, created_at, source_offer_conversion_kind, source_offer_milestone_index')
+    .eq('source_offer_id', offerId)
+    .order('created_at', { ascending: false });
+  if (error) return { data: [], error: error.message };
+  return { data: (data ?? []) as OfferLinkedInvoiceRef[], error: null };
 }
 
 /* ----------------------------------------------------------------- Generated documents + tokens */
@@ -285,6 +358,14 @@ export async function loadInvoiceDetail(invoiceId: string): Promise<{
 export interface PublicOfferLine {
   description: string; quantity_milli: number; unit: string; unit_price_cents: number;
   vat_rate_bp: number; vat_treatment: string; net_cents: number; vat_cents: number; gross_cents: number; is_optional: boolean;
+  details?: string | null;
+  // Recurring pricing. Offers finalized before this existed project these as null/absent and
+  // are therefore read as one-time — their presentation never changes.
+  pricing_type?: 'one_time' | 'recurring' | null;
+  billing_interval?: 'monthly' | null;
+  minimum_term_months?: number | null;
+  billing_start_type?: 'commissioning' | 'order' | 'go_live' | 'handover' | 'custom' | null;
+  billing_start_label?: string | null;
 }
 
 export interface PublicOfferRecipient {
@@ -326,9 +407,13 @@ export interface PublicOfferProjection {
   desired_outcomes: string[];
   timeline: PublicOfferTimelinePhase[];
   payment_schedule: PublicOfferPaymentMilestone[];
+  // One-time (project) totals. Recurring commitments are projected separately.
   net_total_cents: number;
   vat_total_cents: number;
   gross_total_cents: number;
+  recurring_monthly_net_cents?: number;
+  recurring_monthly_vat_cents?: number;
+  recurring_monthly_gross_cents?: number;
   lines: PublicOfferLine[];
   recipient: PublicOfferRecipient;
   accepted: boolean;

@@ -11,9 +11,10 @@ import { offerStatusTone } from '@/pages/owner/OffersPage';
 import { PremiumOfferPreview } from '@/pages/owner/PremiumOfferPreview';
 import { PremiumPdfPreviewDialog } from '@/components/finance/PremiumPdfPreviewDialog';
 import { SendOfferDialog } from '@/components/finance/SendOfferDialog';
+import { ConvertOfferToInvoiceDialog } from '@/components/finance/ConvertOfferToInvoiceDialog';
 import { CustomerPortalPublishCard } from '@/components/finance/CustomerPortalPublishCard';
 import {
-  loadOffer, finalizeOffer, createOfferRevision, setOfferStatus, convertOfferToInvoiceDraft,
+  loadOffer, finalizeOffer, createOfferRevision, setOfferStatus,
   createOfferAccessToken, loadOfferAcceptanceEvents, loadGeneratedDocuments, signedDocumentUrl,
   deleteOfferDraft, loadLatestOfferVersion, loadDocumentSettings,
   loadAcceptanceSummary, signedSignatureUrl, retryAutomationJob, retryOfferAutomation,
@@ -21,6 +22,7 @@ import {
 } from '@/lib/ownerFinance/offersApi';
 import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
 import { offerToDocument, snapshotToDocument } from '@/lib/ownerFinance/buildTransactionalDoc';
+import { computeOfferPricing, intervalSuffix } from '@/lib/ownerFinance/documents/offerPricing';
 import { validateOfferForFinalization, documentFilename, type TransactionalDocument } from '@/lib/ownerFinance/documents';
 import { downloadBytes } from '@/lib/ownerFinance/exports';
 import { renderPremiumPdf } from '@/lib/ownerFinance/documents/premium';
@@ -78,6 +80,7 @@ export function OfferDetailPage() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
+  const [convertOpen, setConvertOpen] = useState(false);
   // Inline signature preview via a short-lived signed URL from the PRIVATE owner-offer-signatures bucket.
   const [sigPreview, setSigPreview] = useState<{ url: string | null; loading: boolean; error: boolean }>({ url: null, loading: false, error: false });
 
@@ -162,6 +165,10 @@ export function OfferDetailPage() {
 
   const validation = useMemo(() => (doc ? validateOfferForFinalization(doc) : null), [doc]);
 
+  // Split totals from the very document the customer receives — the snapshot for a finalized
+  // offer, the live draft otherwise.
+  const pricing = useMemo(() => computeOfferPricing(doc?.lines ?? []), [doc]);
+
   // Downstream signed-certificate availability, derived from the generated-documents list (never
   // from the acceptance summary). This is a SEPARATE state and must not gate "signatureCaptured".
   const signedDocumentAvailable = useMemo(() => docs.some(isSignedCertificateDocument), [docs]);
@@ -243,13 +250,10 @@ export function OfferDetailPage() {
     toast.success('Revision erstellt', 'Bearbeiten Sie den neuen Entwurf.'); navigate(`/admin/finance/offers/${id}/edit`);
   });
 
-  const convert = () => run('convert', async () => {
-    if (!offer) return;
-    const { invoiceId, error: err } = await convertOfferToInvoiceDraft(offer.id);
-    if (err || !invoiceId) { toast.error('Umwandlung fehlgeschlagen', err ?? 'Unbekannt'); return; }
-    toast.success('Rechnungsentwurf erstellt', 'Bitte prüfen und stellen.');
-    navigate(`/admin/finance/invoices/${invoiceId}`);
-  });
+  // The conversion dialog (ConvertOfferToInvoiceDialog) does the actual work: it lets the owner
+  // choose the full one-time amount or a specific payment-plan rate, and shows invoices already
+  // created from this offer before they decide. See that component for why this is not a direct
+  // one-click action.
 
   const downloadStored = (path: string) => run('stored', async () => {
     const { url, error: err } = await signedDocumentUrl(path);
@@ -287,7 +291,7 @@ export function OfferDetailPage() {
                 {['finalized', 'sent', 'viewed'].includes(offer.status) ? <Button size="sm" icon={Link2} onClick={() => setSendOpen(true)}>Angebot versenden</Button> : null}
                 {offer.status !== 'converted' && offer.status !== 'cancelled' ? <Button size="sm" variant="ghost" icon={Copy} onClick={createLink} loading={busy === 'link'}>Nur Link kopieren</Button> : null}
                 {offer.status !== 'converted' && offer.status !== 'cancelled' ? <Button size="sm" variant="secondary" icon={GitBranch} onClick={revision} loading={busy === 'revision'}>Revision erstellen</Button> : null}
-                {canConvert ? <Button size="sm" icon={Copy} onClick={convert} loading={busy === 'convert'}>Rechnungsentwurf erstellen</Button> : null}
+                {canConvert ? <Button size="sm" icon={Copy} onClick={() => setConvertOpen(true)}>Rechnungsentwurf erstellen</Button> : null}
               </>
             )}
           </div>
@@ -456,18 +460,43 @@ export function OfferDetailPage() {
         <div className="space-y-5">
           <Card className="p-6">
             <SectionHeader title="Summen" />
-            <dl className="space-y-1.5 text-sm">
-              <div className="flex justify-between"><dt className="text-gray-500">Netto</dt><dd className="tabular-nums">{formatCents(offer.net_total_cents, offer.currency)}</dd></div>
-              <div className="flex justify-between"><dt className="text-gray-500">Umsatzsteuer</dt><dd className="tabular-nums">{formatCents(offer.vat_total_cents, offer.currency)}</dd></div>
-              <div className="flex justify-between border-t border-gray-100 pt-1.5"><dt className="font-semibold text-gray-950">Gesamt brutto</dt><dd className="tabular-nums text-base font-semibold text-gray-950">{formatCents(offer.gross_total_cents, offer.currency)}</dd></div>
-            </dl>
+            {/* Derived from the same positions the document renders, so this card, the preview
+                and the PDF can never show three different prices. */}
+            <div className="space-y-4 text-sm">
+              {pricing.hasOneTime || !pricing.hasRecurring ? (
+                <dl className="space-y-1.5">
+                  {pricing.hasRecurring ? <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Einmalige Investition</div> : null}
+                  <div className="flex justify-between"><dt className="text-gray-500">Netto</dt><dd className="tabular-nums">{formatCents(pricing.oneTime.netCents, offer.currency)}</dd></div>
+                  <div className="flex justify-between"><dt className="text-gray-500">Umsatzsteuer</dt><dd className="tabular-nums">{formatCents(pricing.oneTime.vatCents, offer.currency)}</dd></div>
+                  <div className="flex justify-between border-t border-gray-100 pt-1.5"><dt className="font-semibold text-gray-950">{pricing.hasRecurring ? 'Einmalig brutto' : 'Gesamt brutto'}</dt><dd className="tabular-nums text-base font-semibold text-gray-950">{formatCents(pricing.oneTime.grossCents, offer.currency)}</dd></div>
+                </dl>
+              ) : null}
+              {pricing.recurring.map((g, i) => (
+                <dl key={i} className="space-y-1.5">
+                  <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Laufende Betreuung</div>
+                  <div className="flex justify-between"><dt className="text-gray-500">Netto {intervalSuffix(g.interval)}</dt><dd className="tabular-nums">{formatCents(g.netCents, offer.currency)}</dd></div>
+                  <div className="flex justify-between"><dt className="text-gray-500">Umsatzsteuer</dt><dd className="tabular-nums">{formatCents(g.vatCents, offer.currency)}</dd></div>
+                  <div className="flex justify-between border-t border-gray-100 pt-1.5"><dt className="font-semibold text-gray-950">Brutto {intervalSuffix(g.interval)}</dt><dd className="tabular-nums text-base font-semibold text-gray-950">{formatCents(g.grossCents, offer.currency)}</dd></div>
+                  {g.minimumTermMonths ? <div className="flex justify-between text-[12px] text-gray-400"><dt>Mindestlaufzeit {g.minimumTermMonths} Monate</dt><dd className="tabular-nums">{formatCents(g.minimumTerm.netCents, offer.currency)} netto</dd></div> : null}
+                </dl>
+              ))}
+              {pricing.recurring.some((g) => g.minimumTerm.netCents > 0) ? (
+                <p className="text-[12px] leading-relaxed text-gray-400">
+                  Gesamtwert während der ersten Mindestlaufzeit: {formatCents(pricing.minimumTermTotal.netCents, offer.currency)} netto — nachrichtlich, nicht sofort fällig.
+                </p>
+              ) : null}
+            </div>
             {!isDraft && offer.status !== 'converted' && offer.status !== 'cancelled' ? (
               <div className="mt-4 flex flex-col gap-2 border-t border-gray-100 pt-4">
                 {['finalized', 'sent', 'viewed'].includes(offer.status) ? <Button variant="ghost" icon={XCircle} onClick={() => setConfirmReject(true)}>Als abgelehnt markieren</Button> : null}
                 <Button variant="ghost" onClick={() => setConfirmCancel(true)}>Angebot stornieren</Button>
               </div>
             ) : null}
-            <p className="mt-4 text-[12px] leading-relaxed text-gray-400">Angenommene Angebote werden zu einem Rechnungsentwurf. Rechnungen werden nie automatisch gestellt.</p>
+            <p className="mt-4 text-[12px] leading-relaxed text-gray-400">
+              Angenommene Angebote werden zu einem Rechnungsentwurf. Rechnungen werden nie automatisch gestellt.
+              {offer.payment_schedule?.length ? ' Bei einem Zahlungsplan wählen Sie beim Erstellen die gewünschte Rate.' : ''}
+              {pricing.hasRecurring ? ' Wiederkehrende Positionen werden dabei nicht übernommen — sie werden separat gemäß Abrechnungsintervall berechnet.' : ''}
+            </p>
           </Card>
 
           <CustomerPortalPublishCard
@@ -525,6 +554,14 @@ export function OfferDetailPage() {
           onSent={() => { void load({ silent: true }); }}
         />
       ) : null}
+
+      <ConvertOfferToInvoiceDialog
+        open={convertOpen}
+        offer={offer}
+        oneTimeNetCents={pricing.oneTime.netCents}
+        onClose={() => setConvertOpen(false)}
+        onDone={(invoiceId) => navigate(`/admin/finance/invoices/${invoiceId}`)}
+      />
     </>
   );
 }

@@ -8,6 +8,7 @@ import type { PdfReportModel, PdfSection } from './pdf';
 import type { ExportMeta } from './index';
 import { formatCentsCurrencyDe, formatDateDe } from './format';
 import { metadataRows, pdfMetaLines, EXPORT_DISCLAIMER } from './index';
+import { formatOfferAmount } from '@/lib/ownerFinance/offerAmountDisplay';
 
 const INVOICE_STATUS_LABEL: Record<string, string> = {
   draft: 'Entwurf', issued: 'Gestellt', partially_paid: 'Teilbezahlt', paid: 'Bezahlt',
@@ -203,9 +204,14 @@ export function offerExportTable(offers: OwnerOffer[], customerName: OfferCustom
     { key: 'title', header: 'Titel', type: 'text', value: (o) => o.title, width: 26 },
     { key: 'issue_date', header: 'Angebotsdatum', type: 'date', value: (o) => o.issue_date, width: 15 },
     { key: 'valid_until', header: 'Gültig bis', type: 'date', value: (o) => o.valid_until, width: 13 },
-    { key: 'net', header: 'Netto', type: 'currency', value: (o) => o.net_total_cents, width: 14 },
-    { key: 'vat', header: 'USt', type: 'currency', value: (o) => o.vat_total_cents, width: 12 },
-    { key: 'gross', header: 'Brutto', type: 'currency', value: (o) => o.gross_total_cents, width: 14 },
+    // Netto/USt/Brutto are the one-time (project) portion only — the same meaning owner_offers
+    // has always had for these columns. Recurring commitments are additional, separate columns
+    // so a recurring-only offer never reads as a 0,00 EUR row.
+    { key: 'net', header: 'Netto (einmalig)', type: 'currency', value: (o) => o.net_total_cents, width: 16 },
+    { key: 'vat', header: 'USt (einmalig)', type: 'currency', value: (o) => o.vat_total_cents, width: 14 },
+    { key: 'gross', header: 'Brutto (einmalig)', type: 'currency', value: (o) => o.gross_total_cents, width: 16 },
+    { key: 'recurring_net', header: 'Netto / Monat', type: 'currency', value: (o) => o.recurring_monthly_net_cents, width: 14 },
+    { key: 'recurring_gross', header: 'Brutto / Monat', type: 'currency', value: (o) => o.recurring_monthly_gross_cents, width: 14 },
     { key: 'currency', header: 'Währung', type: 'text', value: (o) => o.currency, width: 10 },
   ];
   return { name: 'Angebote', columns, rows: offers };
@@ -213,16 +219,17 @@ export function offerExportTable(offers: OwnerOffer[], customerName: OfferCustom
 
 export function offerReportModel(offers: OwnerOffer[], meta: ExportMeta, customerName: OfferCustomerLookup): PdfReportModel {
   const sum = (f: (o: OwnerOffer) => number) => offers.reduce((s, o) => s + f(o), 0);
-  const open = offers.filter((o) => ['finalized', 'sent', 'viewed'].includes(o.status)).reduce((s, o) => s + o.gross_total_cents, 0);
-  const accepted = offers.filter((o) => o.status === 'accepted' || o.status === 'converted').reduce((s, o) => s + o.gross_total_cents, 0);
+  const open = offers.filter((o) => ['finalized', 'sent', 'viewed'].includes(o.status));
+  const accepted = offers.filter((o) => o.status === 'accepted' || o.status === 'converted');
   const sections: PdfSection[] = [
     {
       kind: 'keyvalue', heading: 'Kennzahlen',
       rows: [
         ['Anzahl Angebote', String(offers.length)],
-        ['Brutto gesamt', formatCentsCurrencyDe(sum((o) => o.gross_total_cents))],
-        ['Offen (versendet)', formatCentsCurrencyDe(open)],
-        ['Angenommen', formatCentsCurrencyDe(accepted)],
+        ['Brutto gesamt (einmalig)', formatCentsCurrencyDe(sum((o) => o.gross_total_cents))],
+        ['Wiederkehrend gesamt (Monat)', formatCentsCurrencyDe(sum((o) => o.recurring_monthly_gross_cents))],
+        ['Offen (versendet)', formatCentsCurrencyDe(open.reduce((s, o) => s + o.gross_total_cents, 0))],
+        ['Angenommen', formatCentsCurrencyDe(accepted.reduce((s, o) => s + o.gross_total_cents, 0))],
       ],
     },
     {
@@ -232,14 +239,14 @@ export function offerReportModel(offers: OwnerOffer[], meta: ExportMeta, custome
         { header: 'Kunde', align: 'left', width: 4 },
         { header: 'Titel', align: 'left', width: 4 },
         { header: 'Status', align: 'left', width: 2.4 },
-        { header: 'Brutto', align: 'right', width: 2.6 },
+        { header: 'Betrag', align: 'right', width: 2.6 },
       ],
       rows: offers.map((o) => [
         o.offer_number ?? 'Entwurf', customerName(o), o.title ?? '—',
-        OFFER_STATUS_LABEL[o.status] ?? o.status, formatCentsCurrencyDe(o.gross_total_cents, o.currency),
+        OFFER_STATUS_LABEL[o.status] ?? o.status, formatOfferAmount(o, o.currency, formatCentsCurrencyDe),
       ]),
     },
-    { kind: 'note', text: `Angebotsübersicht. ${EXPORT_DISCLAIMER}` },
+    { kind: 'note', text: `Angebotsübersicht. Beträge je Position einmalig oder je Monat wiederkehrend, wie in der Spalte angegeben — niemals zu einer Summe verschmolzen. ${EXPORT_DISCLAIMER}` },
   ];
   return {
     brand: 'Cogniiq', documentTitle: 'Angebote — Bericht', entityName: meta.entityName,
