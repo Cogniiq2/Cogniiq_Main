@@ -354,7 +354,7 @@ export interface OwnerOffer {
   net_total_cents: number;
   vat_total_cents: number;
   gross_total_cents: number;
-  // Committed recurring commitment per billing interval (migration 20260824193000).
+  // Committed recurring commitment per billing interval (migration 20260825064048).
   recurring_monthly_net_cents: number;
   recurring_monthly_vat_cents: number;
   recurring_monthly_gross_cents: number;
@@ -543,7 +543,7 @@ export interface OwnerOfferLine {
   gross_cents: number;
   is_optional: boolean;
   sort_order: number;
-  // Recurring pricing (migration 20260824193000). A line without `pricing_type` is one-time,
+  // Recurring pricing (migration 20260825064048). A line without `pricing_type` is one-time,
   // so historical rows and finalized snapshots keep their original presentation. On a
   // recurring line, net_cents is the amount PER BILLING INTERVAL — the minimum term is
   // contract metadata and is never folded into quantity_milli.

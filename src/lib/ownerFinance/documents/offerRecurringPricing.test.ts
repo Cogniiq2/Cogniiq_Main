@@ -25,7 +25,7 @@ const VAT_19 = 1900;
 
 /** Read with normalised line endings so the assertions hold on Windows checkouts too. */
 const MIGRATION_SQL = readFileSync(
-  'supabase/migrations/20260824193000_offer_recurring_pricing.sql', 'utf8',
+  'supabase/migrations/20260825064048_offer_recurring_pricing.sql', 'utf8',
 ).replace(/\r\n/g, '\n');
 
 /** Server-side line math (mirrors owner_recalc_offer_line): net = qty x price, VAT on net. */

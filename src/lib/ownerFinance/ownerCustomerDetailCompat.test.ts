@@ -13,7 +13,7 @@ import { describe, it, expect } from 'vitest';
 
 const norm = (s: string) => s.replace(/\r\n/g, '\n');
 const PROD_MIGRATION = norm(readFileSync('supabase/migrations/20260824171403_canonical_customer_and_deletion.sql', 'utf8'));
-const NEW_MIGRATION = norm(readFileSync('supabase/migrations/20260824193000_offer_recurring_pricing.sql', 'utf8'));
+const NEW_MIGRATION = norm(readFileSync('supabase/migrations/20260825064048_offer_recurring_pricing.sql', 'utf8'));
 
 function extractFunction(sql: string, name: string, terminator: string): string {
   const start = sql.indexOf(`function public.${name}`);

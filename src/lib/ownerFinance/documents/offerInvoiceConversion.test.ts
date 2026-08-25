@@ -22,7 +22,7 @@ import { describe, it, expect } from 'vitest';
 import { milestoneAmountCents } from '@/lib/ownerFinance/documents/documentModel';
 
 const MIGRATION_SQL = readFileSync(
-  'supabase/migrations/20260824193000_offer_recurring_pricing.sql', 'utf8',
+  'supabase/migrations/20260825064048_offer_recurring_pricing.sql', 'utf8',
 ).replace(/\r\n/g, '\n');
 
 const CONVERT_FN = (() => {

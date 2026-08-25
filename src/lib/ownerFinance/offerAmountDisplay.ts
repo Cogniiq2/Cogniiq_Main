@@ -1,7 +1,7 @@
 // Owner-facing offer "amount" display: list columns, pipeline KPIs and exports.
 //
 // owner_offers.{net,vat,gross}_total_cents now mean the ONE-TIME portion only (migration
-// 20260824193000). Every place that showed `gross_total_cents` as "the offer's amount" was
+// 20260825064048). Every place that showed `gross_total_cents` as "the offer's amount" was
 // written when that column meant the whole offer, so a recurring-only accepted deal — a real,
 // signed contract worth real money — silently reads as "0,00 €": it drops out of a min-amount
 // filter, sorts as the smallest deal in the list, and disappears from the "Brutto gesamt" /
