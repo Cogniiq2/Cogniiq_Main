@@ -1,3 +1,9 @@
+// The document validator is shared with worker/index.mjs so the Pages and
+// Workers deployments cannot disagree about what a usable shell looks like.
+// Pages Functions are bundled with esbuild, so importing from outside
+// functions/ is resolved at build time.
+import { describeDocumentProblem } from '../worker/routing.mjs';
+
 interface CloudflarePagesContext {
   request: Request;
   next: () => Promise<Response>;
@@ -6,6 +12,34 @@ interface CloudflarePagesContext {
       fetch: (request: Request) => Promise<Response>;
     };
   };
+}
+
+/**
+ * The private SPA shell and the 404 document, addressed by their PRETTY paths.
+ *
+ * NEVER "/app-shell.html". Cloudflare Pages canonicalises an .html path to its
+ * extension-less form with a 3xx redirect, so fetching the physical filename
+ * returns a BODYLESS REDIRECT, not the document. Returning that body while
+ * forcing status 200 — which this middleware used to do — produces exactly the
+ * observed failure: a ~0.3 KB HTML document at HTTP 200 with no <script> tags,
+ * no CSS, no JS requests at all, and a permanently white page.
+ */
+const PRIVATE_SHELL = '/app-shell';
+const NOT_FOUND_DOCUMENT = '/404';
+
+/** Follows the .html -> pretty-path canonicalisation instead of returning it. */
+async function fetchDocument(context: CloudflarePagesContext, path: string): Promise<Response> {
+  let response = await context.env.ASSETS.fetch(
+    new Request(new URL(path, context.request.url).toString(), { method: 'GET' })
+  );
+  for (let hop = 0; hop < 3 && response.status >= 300 && response.status < 400; hop += 1) {
+    const location = response.headers.get('location');
+    if (!location) break;
+    response = await context.env.ASSETS.fetch(
+      new Request(new URL(location, context.request.url).toString(), { method: 'GET' })
+    );
+  }
+  return response;
 }
 
 export async function onRequest(context: CloudflarePagesContext) {
@@ -578,17 +612,40 @@ export async function onRequest(context: CloudflarePagesContext) {
   //  - private routes  -> /app-shell.html, 200 (empty #root, noindex)
   //  - anything else   -> /404.html, a REAL 404, never a soft 404 at 200
   // ============================================================
+  // A redirect is a real answer. Reading its (empty) body and re-emitting it at
+  // 200 is what produced the blank, script-less document; pass it through.
+  if (response.status >= 300 && response.status < 400) {
+    return response;
+  }
+
   if (response.status === 404) {
-    const fallbackDocument = isPrivateSurface ? '/app-shell.html' : '/404.html';
     status = isPrivateSurface ? 200 : 404;
-    response = await context.env.ASSETS.fetch(
-      new Request(new URL(fallbackDocument, context.request.url).toString(), {
-        method: 'GET',
-      })
-    );
+    response = await fetchDocument(context, isPrivateSurface ? PRIVATE_SHELL : NOT_FOUND_DOCUMENT);
   }
 
   let html = await response.text();
+
+  // Assert the document is actually usable BEFORE committing to a status. A
+  // failed or redirected asset lookup must surface as an error, never as a
+  // blank 200 that the browser renders as a white page.
+  const problem = describeDocumentProblem(
+    { ok: response.ok, status: response.status, contentType: response.headers.get('content-type') },
+    html,
+    isPrivateSurface
+  );
+  if (problem) {
+    return new Response(
+      `Cogniiq: cannot serve ${isPrivateSurface ? 'the application shell' : 'this page'} — ${problem}.`,
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'no-store',
+          'X-Cogniiq-Shell-Error': problem,
+        },
+      }
+    );
+  }
 
   // ============================================================
   // Cache semantics for HTML (the pointer to hashed assets):

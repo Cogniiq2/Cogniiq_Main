@@ -165,7 +165,10 @@ const rules = redirects
   .filter((l) => l && !l.startsWith('#'))
   .map((l) => l.split(/\s+/));
 
-const SHELL = '/app-shell.html';
+// The PRETTY path, with no .html extension. Cloudflare Pages canonicalises an
+// .html rewrite target to a bodyless 307, which functions/_middleware.ts then
+// re-emitted at HTTP 200 — a script-less blank page on every private deep link.
+const SHELL = '/app-shell';
 for (const prefix of ['/app', '/admin', '/owner', '/auth', '/d']) {
   for (const pattern of [prefix, `${prefix}/*`]) {
     const rule = rules.find((r) => r[0] === pattern);

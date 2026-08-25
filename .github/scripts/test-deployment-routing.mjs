@@ -41,7 +41,7 @@ import { dirname, join } from 'node:path';
 
 import { startCloudflareServer } from './lib/cloudflare-server.mjs';
 import { findChromium, launchChromium } from './lib/chromium.mjs';
-import { PRIVATE_PREFIXES } from '../../worker/routing.mjs';
+import { PRIVATE_PREFIXES, describeDocumentProblem } from '../../worker/routing.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DIST = join(ROOT, 'dist');
@@ -104,12 +104,18 @@ const SHELL = read('app-shell.html');
   }
 
   const redirects = readFileSync(join(ROOT, 'public/_redirects'), 'utf8');
+  check(
+    !/^\/\S+\s+\/app-shell\.html\s+200/m.test(redirects),
+    'public/_redirects targets the shell by pretty path, not /app-shell.html',
+    'public/_redirects points at /app-shell.html — Cloudflare Pages canonicalises that to a '
+      + 'bodyless 307 and the browser receives a script-less blank document'
+  );
   const headers = readFileSync(join(ROOT, 'public/_headers'), 'utf8');
   for (const prefix of PRIVATE_PREFIXES) {
     check(
-      new RegExp(`^${prefix}\\s+/app-shell\\.html\\s+200`, 'm').test(redirects)
-        && new RegExp(`^\\${prefix}/\\*\\s+/app-shell\\.html\\s+200`, 'm').test(redirects),
-      `public/_redirects routes ${prefix} and ${prefix}/* to the shell (Netlify build)`,
+      new RegExp(`^${prefix}\\s+/app-shell\\s+200`, 'm').test(redirects)
+        && new RegExp(`^\\${prefix}/\\*\\s+/app-shell\\s+200`, 'm').test(redirects),
+      `public/_redirects routes ${prefix} and ${prefix}/* to the shell by PRETTY path`,
       `public/_redirects is missing a shell rule for ${prefix}`
     );
     check(
@@ -157,6 +163,48 @@ const SHELL = read('app-shell.html');
     `app-shell.html references assets that this build did not emit: ${missing.join(', ')}`
   );
   if (VERBOSE) console.log(`   shell assets: ${referenced.join(', ')}`);
+}
+
+// ── 3b. The shell validator refuses to launder a failed lookup into a 200 ────
+// Shared by functions/_middleware.ts and worker/index.mjs. Every case below is
+// a way the fallback asset lookup can fail; each MUST be reported so the caller
+// answers with an explicit error instead of a blank 200.
+{
+  const okHtml = { ok: true, status: 200, contentType: 'text/html; charset=utf-8' };
+  const cases = [
+    {
+      name: 'the exact production failure: a bodyless 307 canonicalisation',
+      response: { ok: false, status: 307, contentType: null },
+      html: '',
+      shell: true,
+      expectProblem: true,
+    },
+    { name: 'a 404 from the asset store', response: { ok: false, status: 404, contentType: 'text/html' }, html: SHELL, shell: true, expectProblem: true },
+    { name: 'a non-HTML asset', response: { ok: true, status: 200, contentType: 'application/json' }, html: '{}', shell: true, expectProblem: true },
+    { name: 'a body that is not an HTML document', response: okHtml, html: 'not html at all', shell: true, expectProblem: true },
+    { name: 'the prerendered homepage offered as the shell', response: okHtml, html: HOMEPAGE, shell: true, expectProblem: true },
+    {
+      name: 'a shell with no Vite entry script',
+      response: okHtml,
+      html: '<html><body><div id="root"></div></body></html>',
+      shell: true,
+      expectProblem: true,
+    },
+    { name: 'the real app-shell.html', response: okHtml, html: SHELL, shell: true, expectProblem: false },
+    { name: 'the real 404.html as a non-shell document', response: okHtml, html: read('404.html'), shell: false, expectProblem: false },
+  ];
+  for (const c of cases) {
+    const problem = describeDocumentProblem(c.response, c.html, c.shell);
+    check(
+      Boolean(problem) === c.expectProblem,
+      c.expectProblem
+        ? `the validator rejects ${c.name} (${problem})`
+        : `the validator accepts ${c.name}`,
+      c.expectProblem
+        ? `the validator ACCEPTED ${c.name} — that becomes a blank 200`
+        : `the validator wrongly rejected ${c.name}: ${problem}`
+    );
+  }
 }
 
 // ── 4. The route table, over HTTP, under Workers Assets semantics ────────────

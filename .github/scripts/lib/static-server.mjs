@@ -132,8 +132,16 @@ export function startStaticServer(dist) {
 
     for (const [pattern, to, status] of redirects) {
       if (matchesPattern(pattern, path)) {
-        const file = join(dist, to.replace(/^\//, ''));
-        if (existsSync(file)) return send(res, file, Number(status) || 200, path);
+        // The target may be a PRETTY path ("/app-shell"), which resolves
+        // through the same <path>.html lookup that serves every prerendered
+        // public route. Cloudflare Pages canonicalises an .html target to this
+        // form, so the committed rules name it directly.
+        const base = join(dist, to.replace(/^\//, ''));
+        for (const file of [base, `${base}.html`, join(base, 'index.html')]) {
+          if (existsSync(file) && statSync(file).isFile()) {
+            return send(res, file, Number(status) || 200, path);
+          }
+        }
       }
     }
 

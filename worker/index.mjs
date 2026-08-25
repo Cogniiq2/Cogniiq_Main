@@ -28,7 +28,18 @@
 // file is kept for the Netlify build, and this Worker makes the Cloudflare
 // deployment stop depending on it.
 // ─────────────────────────────────────────────────────────────────────────────
-import { PRIVATE_SHELL_HEADERS, resolveUnmatchedRequest } from './routing.mjs';
+import { PRIVATE_SHELL_HEADERS, describeDocumentProblem, resolveUnmatchedRequest } from './routing.mjs';
+
+/** Follows the .html -> pretty-path canonicalisation instead of returning it. */
+async function fetchDocument(env, origin, path) {
+  let response = await env.ASSETS.fetch(new Request(new URL(path, origin), { method: 'GET' }));
+  for (let hop = 0; hop < 3 && response.status >= 300 && response.status < 400; hop += 1) {
+    const location = response.headers.get('location');
+    if (!location) break;
+    response = await env.ASSETS.fetch(new Request(new URL(location, origin), { method: 'GET' }));
+  }
+  return response;
+}
 
 export default {
   /**
@@ -45,15 +56,29 @@ export default {
       return new Response(null, { status: 404 });
     }
 
-    const document = await env.ASSETS.fetch(
-      new Request(new URL(decision.document, url.origin), { method: 'GET' })
-    );
+    const document = await fetchDocument(env, url.origin, decision.document);
+    const html = await document.text();
 
-    // The shell/404 document is expected to exist: the build writes both and
-    // .github/scripts/test-deployment-routing.mjs fails the build if it does
-    // not. Degrade to a bare status rather than to the homepage if it is gone.
-    if (!document.ok) {
-      return new Response(null, { status: decision.status });
+    // Assert the document is usable BEFORE committing to a status. A failed or
+    // redirected asset lookup must surface as an error, never as a blank 200
+    // that the browser renders as a white page.
+    const problem = describeDocumentProblem(
+      { ok: document.ok, status: document.status, contentType: document.headers.get('content-type') },
+      html,
+      decision.kind === 'private-shell'
+    );
+    if (problem) {
+      return new Response(
+        `Cogniiq: cannot serve ${decision.kind === 'private-shell' ? 'the application shell' : 'this page'} — ${problem}.`,
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'Cache-Control': 'no-store',
+            'X-Cogniiq-Shell-Error': problem,
+          },
+        }
+      );
     }
 
     const headers = new Headers(document.headers);
@@ -67,7 +92,7 @@ export default {
       headers.set('X-Robots-Tag', 'noindex, nofollow');
     }
 
-    return new Response(request.method === 'HEAD' ? null : document.body, {
+    return new Response(request.method === 'HEAD' ? null : html, {
       status: decision.status,
       headers,
     });

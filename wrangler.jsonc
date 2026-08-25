@@ -1,6 +1,15 @@
 {
   // Cloudflare Workers Assets deployment.
   //
+  // NOT the configuration that serves cogniiq.de today. The live deployment is
+  // Cloudflare PAGES, which ignores this file entirely — `wrangler pages dev`
+  // reads neither `main` nor `assets` from it. Pages routing lives in
+  // public/_redirects, public/_headers and functions/_middleware.ts, and is
+  // verified by .github/scripts/test-pages-routing.mjs against the real Pages
+  // runtime. This file only takes effect if the project is ever moved onto
+  // Workers Assets; it is kept correct so that move cannot reintroduce the
+  // homepage-as-SPA-fallback defect described below.
+  //
   // `not_found_handling` is deliberately "none" — NOT
   // "single-page-application". SPA handling answers every unmatched path with
   // the contents of dist/index.html, which in this repository is the

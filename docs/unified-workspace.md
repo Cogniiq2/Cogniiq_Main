@@ -60,12 +60,18 @@ Tests: `.github/scripts/test-auth-routing.mjs`.
   - `/admin/finance/*` → `FinanceModule` (owner-only `PlatformOwnerRoute` + readiness gate)
 - Public marketing site — pathless layout route `PublicLayout` (nav/footer chrome).
 
-Cloudflare deep-linking for the private surfaces is handled by `worker/index.mjs`,
-which serves `dist/app-shell.html` for `/app`, `/admin`, `/owner`, `/auth` and `/d`.
-It is NOT `not_found_handling: "single-page-application"`: that fallback serves the
-contents of `dist/index.html`, which is the prerendered marketing homepage, and it
-made every private deep link load the homepage instead of the application. See
-`worker/routing.mjs`.
+Cloudflare deep-linking for the private surfaces is handled on **Pages** by
+`public/_redirects`, which rewrites `/app`, `/admin`, `/owner`, `/auth` and `/d`
+to `/app-shell` — the pretty path, deliberately **without** the `.html`
+extension. Pages canonicalises an `.html` rewrite target to a bodyless 307, and
+`functions/_middleware.ts` used to re-emit that empty body at HTTP 200, which is
+what made every private deep link a blank page that loaded no JavaScript at all.
+The middleware now validates any document it falls back to and returns an
+explicit 5xx rather than a blank 200. Verified against the real Pages runtime by
+`.github/scripts/test-pages-routing.mjs` (`wrangler pages dev dist`).
+
+`wrangler.jsonc` and `worker/index.mjs` describe the Workers Assets path, which
+Pages ignores and which is not currently live.
 
 ## Shared shell & navigation
 

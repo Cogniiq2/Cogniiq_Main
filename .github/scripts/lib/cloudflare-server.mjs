@@ -37,7 +37,7 @@ import { createServer } from 'node:http';
 import { readFileSync, existsSync, statSync } from 'node:fs';
 import { join, extname, normalize } from 'node:path';
 
-import { PRIVATE_SHELL_HEADERS, resolveUnmatchedRequest } from '../../../worker/routing.mjs';
+import { DOCUMENT_FILES, PRIVATE_SHELL_HEADERS, resolveUnmatchedRequest } from '../../../worker/routing.mjs';
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -138,7 +138,9 @@ export function startCloudflareServer(dist) {
       res.end();
       return;
     }
-    const document = join(dist, decision.document.replace(/^\//, ''));
+    // The decision names a PRETTY path; resolve it to the physical file the
+    // asset store holds, which is what the edge's canonicalisation does.
+    const document = join(dist, DOCUMENT_FILES[decision.document] || decision.document.replace(/^\//, ''));
     if (!existsSync(document)) {
       res.writeHead(decision.status);
       res.end();

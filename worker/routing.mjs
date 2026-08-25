@@ -12,6 +12,18 @@
 // It is deliberately platform-free: no Request, no Response, no env. Given a
 // pathname it returns which document to serve and with what status.
 //
+// ── Which defect was which ──────────────────────────────────────────────────
+// The production white pages on cogniiq.de were NOT caused by the fallback
+// described below. That deployment is Cloudflare Pages, which ignores
+// wrangler.jsonc. Its cause was public/_redirects pointing the private routes
+// at "/app-shell.html": Pages canonicalised the .html target to a bodyless 307,
+// and functions/_middleware.ts re-emitted that empty body at status 200, so the
+// browser received a ~0.3 KB document with no <script> and fetched no JS at
+// all. That is fixed in public/_redirects and functions/_middleware.ts.
+//
+// What follows is why the WORKERS ASSETS fallback would be wrong too, so a
+// future migration onto that platform cannot trade one blank page for another.
+//
 // ── Why this exists ─────────────────────────────────────────────────────────
 // dist/index.html is the PRERENDERED MARKETING HOMEPAGE: its #root is full of
 // server-rendered homepage markup and its <head> carries the homepage canonical
@@ -44,11 +56,40 @@
  */
 export const PRIVATE_PREFIXES = ['/app', '/admin', '/owner', '/auth', '/d'];
 
-/** The clean, empty-root SPA shell. NEVER index.html. */
-export const PRIVATE_SHELL = '/app-shell.html';
+/**
+ * The clean, empty-root SPA shell. NEVER index.html.
+ *
+ * Addressed by its PRETTY path, with no .html extension. Cloudflare
+ * canonicalises an .html path to its extension-less form with a 3xx redirect,
+ * so asking the asset store for "/app-shell.html" yields a BODYLESS REDIRECT
+ * rather than the document — which, re-emitted at status 200, is precisely the
+ * ~0.3 KB script-less white page this whole module exists to prevent.
+ */
+export const PRIVATE_SHELL = '/app-shell';
 
-/** The real 404 document, served with a real 404 status. */
-export const NOT_FOUND_DOCUMENT = '/404.html';
+/** The real 404 document, served with a real 404 status. Pretty path, as above. */
+export const NOT_FOUND_DOCUMENT = '/404';
+
+/** The physical files behind those pretty paths, for build-time assertions. */
+export const DOCUMENT_FILES = { '/app-shell': 'app-shell.html', '/404': '404.html' };
+
+/**
+ * Why `html` is NOT a usable document, or null when it is fine. Shared by the
+ * Worker and the Pages middleware: an unsuccessful asset lookup must never be
+ * laundered into a blank 200.
+ */
+export function describeDocumentProblem({ ok, status, contentType }, html, requireEmptyRoot) {
+  if (!ok) return `asset lookup returned HTTP ${status}`;
+  if (contentType && !/^text\/html/i.test(contentType)) return `asset is ${contentType}, not HTML`;
+  if (!/<html[\s>]/i.test(html)) return 'asset body is not an HTML document';
+  if (requireEmptyRoot && !html.includes('<div id="root"></div>')) {
+    return 'shell has no empty <div id="root"></div>';
+  }
+  if (!/<script[^>]+src="\/assets\/[^"]+\.js"/.test(html)) {
+    return 'document references no Vite entry script';
+  }
+  return null;
+}
 
 /** Trailing slashes are a URL variant, not a different route. "/" is kept. */
 export function normalizePathname(pathname) {

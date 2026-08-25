@@ -179,8 +179,12 @@ for (const prefix of PRIVATE_PREFIXES) {
     // Must target the dedicated empty shell, never /index.html — that file is the
     // prerendered homepage, so private routes would serve marketing markup with
     // the homepage canonical on it.
-    if (!spa || spa[1] !== '/app-shell.html' || spa[2] !== '200') {
-      fail(`public/_redirects must serve /app-shell.html at 200 for ${pattern}`);
+    //
+    // And by its PRETTY path, never '/app-shell.html': Cloudflare Pages
+    // canonicalises an .html rewrite target to a bodyless 307, which the
+    // middleware re-emitted at HTTP 200 — a script-less blank page.
+    if (!spa || spa[1] !== '/app-shell' || spa[2] !== '200') {
+      fail(`public/_redirects must serve /app-shell at 200 for ${pattern}`);
     }
     const esc = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     if (!new RegExp(`^${esc}\\s*\\n\\s*X-Robots-Tag:\\s*noindex, nofollow, noarchive`, 'm').test(headersSrc)) {
