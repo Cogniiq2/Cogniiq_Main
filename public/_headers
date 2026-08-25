@@ -46,8 +46,8 @@
 # functions/_middleware.ts already sets the same header on HTML it returns. These
 # rules are not redundant: that file is a Cloudflare *Pages Function*, while
 # wrangler.jsonc declares a *Workers Assets* project, where functions/ does not
-# execute. _headers is honoured by both, so the protection no longer depends on
-# which deployment mode is live.
+# execute and worker/index.mjs serves the shell instead. _headers is honoured by
+# both, so the protection does not depend on which deployment mode is live.
 # ---------------------------------------------------------------------------
 
 /app
@@ -92,9 +92,11 @@
   X-Robots-Tag: noindex, nofollow, noarchive
   Cache-Control: no-cache, must-revalidate
 
-# The SPA fallback document itself. wrangler.jsonc sets
-# not_found_handling: "single-page-application", so an unmatched route (a
-# customer document link included) is served the CONTENTS of /index.html. It is
-# an HTML pointer to hashed chunks like any other shell and must revalidate too.
+# The prerendered homepage. It is NO LONGER a fallback for anything: wrangler.jsonc
+# used to set not_found_handling: "single-page-application", which served its
+# CONTENTS for every unmatched route — customer document links included — so a
+# /d/<token> link rendered the marketing homepage and the portal never mounted.
+# Unmatched routes now go to worker/index.mjs. This is still an HTML pointer to
+# hashed chunks and must revalidate like any other document.
 /index.html
   Cache-Control: no-cache, must-revalidate

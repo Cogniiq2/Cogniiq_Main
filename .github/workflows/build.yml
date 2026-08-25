@@ -118,6 +118,18 @@ jobs:
       - name: Deployment cache-header safety
         run: node .github/scripts/test-deploy-cache-headers.mjs
 
+      # The production routing contract, asserted under CLOUDFLARE WORKERS ASSETS
+      # semantics rather than Netlify's. wrangler.jsonc used to set
+      # not_found_handling: "single-page-application", so every private deep link
+      # (/admin/*, /app/*, /owner/*, /auth/*, /d/:token) was served the contents of
+      # dist/index.html — the prerendered marketing homepage — while the
+      # /app-shell.html rewrites in public/_redirects, which Workers Assets does not
+      # apply, never ran. Modelling only Netlify is why CI stayed green throughout.
+      - name: Deployment routing contract (Cloudflare Workers Assets)
+        env:
+          STATIC_SERVER_ASSET_DELAY_MS: '600'
+        run: node .github/scripts/test-deployment-routing.mjs
+
       # The customer offer portal (/d/:token) opened from an email must never be a blank
       # white page. Runs against the built artifact in a real browser: a failed lazy chunk
       # once reload-looped forever and painted nothing, which no component test can catch.

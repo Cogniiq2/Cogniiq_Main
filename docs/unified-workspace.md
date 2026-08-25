@@ -60,8 +60,12 @@ Tests: `.github/scripts/test-auth-routing.mjs`.
   - `/admin/finance/*` → `FinanceModule` (owner-only `PlatformOwnerRoute` + readiness gate)
 - Public marketing site — pathless layout route `PublicLayout` (nav/footer chrome).
 
-Cloudflare SPA deep-linking is handled by `wrangler.jsonc`
-(`not_found_handling: "single-page-application"`), so any nested route loads directly.
+Cloudflare deep-linking for the private surfaces is handled by `worker/index.mjs`,
+which serves `dist/app-shell.html` for `/app`, `/admin`, `/owner`, `/auth` and `/d`.
+It is NOT `not_found_handling: "single-page-application"`: that fallback serves the
+contents of `dist/index.html`, which is the prerendered marketing homepage, and it
+made every private deep link load the homepage instead of the application. See
+`worker/routing.mjs`.
 
 ## Shared shell & navigation
 

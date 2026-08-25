@@ -1,4 +1,15 @@
-# Netlify routing. First matching rule wins, and a rule is only consulted when no
+# Netlify routing. NOT the Cloudflare routing.
+#
+# Cloudflare Workers Assets does not apply the "200" REWRITE rules below — that
+# is a Netlify/Pages feature — so on Cloudflare these ten /app-shell.html rules
+# were silently inert and every private deep link fell through to
+# not_found_handling instead. worker/index.mjs now makes the Cloudflare
+# deployment independent of this file; these rules remain authoritative for the
+# Netlify build. worker/routing.mjs is the shared source of truth for which
+# prefixes are private, and .github/scripts/test-deployment-routing.mjs asserts
+# that this file still agrees with it.
+#
+# First matching rule wins, and a rule is only consulted when no
 # static file matches the request — so the prerendered public pages written by
 # scripts/prerender.mjs (dist/<route>/index.html) are served directly and never
 # reach these rules.

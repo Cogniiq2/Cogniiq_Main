@@ -33,11 +33,15 @@ export async function onRequest(context: CloudflarePagesContext) {
     pathname = pathname.slice(0, -1);
   }
 
-  const isPrivateSurface =
-    pathname === '/app' ||
-    pathname.startsWith('/app/') ||
-    pathname === '/admin' ||
-    pathname.startsWith('/admin/');
+  // Must stay in step with worker/routing.mjs PRIVATE_PREFIXES, which is the
+  // source of truth for the Workers-Assets deployment. /owner, /auth and /d
+  // were missing here, so the tokenized customer document portal was neither
+  // marked noindex nor given the private shell by this middleware.
+  // .github/scripts/test-deployment-routing.mjs asserts the two lists agree.
+  const PRIVATE_PREFIXES = ['/app', '/admin', '/owner', '/auth', '/d'];
+  const isPrivateSurface = PRIVATE_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+  );
 
   const seoConfig: Record<string, { title: string; description: string; canonical: string; keywords?: string }> = {
     '/': {
@@ -557,15 +561,31 @@ export async function onRequest(context: CloudflarePagesContext) {
 
   const config = seoConfig[pathname];
   let response = await context.next();
+  let status = 200;
 
-  // SPA fallback: ONLY for extension-less route paths (real pages).
+  // ============================================================
+  // Fallback for extension-less route paths that matched no file.
   // Asset 404s never reach this point — they returned real 404s above.
+  //
+  // This used to fetch /index.html, which is the PRERENDERED MARKETING
+  // HOMEPAGE: its #root is full of server-rendered homepage markup, so
+  // src/main.tsx took its hydrateRoot() branch and asked React to reconcile
+  // homepage markup against a tree rendered for /admin/finance or
+  // /d/<token>, with only the homepage's chunks preloaded — so the private
+  // application never mounted and the visitor was left on the marketing
+  // homepage, or on a discarded tree (React #421) that painted nothing.
+  //
+  //  - private routes  -> /app-shell.html, 200 (empty #root, noindex)
+  //  - anything else   -> /404.html, a REAL 404, never a soft 404 at 200
+  // ============================================================
   if (response.status === 404) {
-    const indexRequest = new Request(
-      new URL('/index.html', context.request.url).toString(),
-      context.request
+    const fallbackDocument = isPrivateSurface ? '/app-shell.html' : '/404.html';
+    status = isPrivateSurface ? 200 : 404;
+    response = await context.env.ASSETS.fetch(
+      new Request(new URL(fallbackDocument, context.request.url).toString(), {
+        method: 'GET',
+      })
     );
-    response = await context.env.ASSETS.fetch(indexRequest);
   }
 
   let html = await response.text();
@@ -592,14 +612,14 @@ export async function onRequest(context: CloudflarePagesContext) {
     html = html.replace(/(<meta\s+name="robots"\s+content=")[^"]*/i, '$1noindex, nofollow');
 
     return new Response(html, {
-      status: 200,
+      status,
       headers,
     });
   }
 
   if (!config) {
     return new Response(html, {
-      status: 200,
+      status,
       headers,
     });
   }
@@ -621,7 +641,7 @@ export async function onRequest(context: CloudflarePagesContext) {
   }
 
   return new Response(html, {
-    status: 200,
+    status,
     headers,
   });
 }

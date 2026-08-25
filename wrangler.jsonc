@@ -1,8 +1,28 @@
 {
+  // Cloudflare Workers Assets deployment.
+  //
+  // `not_found_handling` is deliberately "none" — NOT
+  // "single-page-application". SPA handling answers every unmatched path with
+  // the contents of dist/index.html, which in this repository is the
+  // PRERENDERED MARKETING HOMEPAGE, not an empty SPA shell. Serving it on
+  // /admin/*, /app/*, /owner/*, /auth/* and /d/:token makes React reconcile
+  // homepage markup against a different route, with only the homepage's chunks
+  // preloaded. Reproduced in a real browser against this artifact, the private
+  // application never mounts at all: the visitor is left on the marketing
+  // homepage (React #418), and on slower chunk delivery the route's Suspense
+  // boundary is still dehydrated when the auth context updates, which discards
+  // the tree (React #421) and paints nothing.
+  //
+  // With "none", an unmatched request falls through to worker/index.mjs, which
+  // serves dist/app-shell.html (empty #root, noindex) for the private route
+  // families and dist/404.html with a real 404 for everything else. Prerendered
+  // public routes and hashed assets never reach the Worker at all.
   "name": "cogniiq-main",
   "compatibility_date": "2026-07-11",
+  "main": "./worker/index.mjs",
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "single-page-application"
+    "binding": "ASSETS",
+    "not_found_handling": "none"
   }
 }
