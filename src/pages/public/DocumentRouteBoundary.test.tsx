@@ -121,6 +121,37 @@ describe('a failed chunk shows a recovery screen, never a blank page', () => {
     }
   });
 
+  it('"Erneut laden" reloads the document, preserving /d/:token and leaking nothing', async () => {
+    const { default: userEvent } = await import('@testing-library/user-event');
+    const reload = vi.fn();
+    const original = window.location;
+    const href = `https://cogniiq.de/d/${'t'.repeat(48)}`;
+    // A real reload re-requests the CURRENT url: the route (and its token) survive, and with
+    // Cache-Control: no-cache on /d/* the document is revalidated rather than served stale.
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: { ...original, href, pathname: `/d/${'t'.repeat(48)}`, reload, assign: vi.fn(), replace: vi.fn() },
+    });
+    try {
+      render(
+        <DocumentRouteBoundary>
+          <Boom message="Failed to fetch dynamically imported module" />
+        </DocumentRouteBoundary>,
+      );
+      await userEvent.click(screen.getByRole('button', { name: 'Erneut laden' }));
+
+      expect(reload).toHaveBeenCalledTimes(1);
+      // Never a redirect: the token must not be dropped or moved into a new URL.
+      expect(window.location.assign).not.toHaveBeenCalled();
+      expect(window.location.replace).not.toHaveBeenCalled();
+      expect(window.location.href).toBe(href);
+      // And the screen itself never prints the token.
+      expect(document.body.textContent).not.toContain('t'.repeat(48));
+    } finally {
+      Object.defineProperty(window, 'location', { configurable: true, value: original });
+    }
+  });
+
   it('passes healthy children straight through', () => {
     render(<DocumentRouteBoundary><p>Ihr Angebot</p></DocumentRouteBoundary>);
     expect(screen.getByText('Ihr Angebot')).toBeTruthy();

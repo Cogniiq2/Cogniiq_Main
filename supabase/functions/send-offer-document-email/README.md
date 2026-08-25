@@ -124,8 +124,21 @@ supabase secrets set SUPABASE_SERVICE_ROLE_KEY=…      # provided by the platfo
 supabase secrets set EMAIL_PROVIDER=resend
 supabase secrets set RESEND_API_KEY=…
 supabase secrets set EMAIL_FROM="Cogniiq <rechnungen@cogniiq.de>"
-supabase secrets set PUBLIC_APP_URL=https://app.cogniiq.de   # production URL, never a preview host
+supabase secrets set PUBLIC_APP_URL=https://cogniiq.de      # canonical app host, never a preview host
 ```
+
+`PUBLIC_APP_URL` is the origin the customer offer link is built from
+(`${PUBLIC_APP_URL}/d/<token>`). It is **`https://cogniiq.de`**: the marketing
+site and the application are one Cloudflare project (`wrangler.jsonc` →
+`cogniiq-main`), which serves `/`, `/app`, `/admin` and `/d/:token` from the same
+`dist`. `src/lib/routing/publicRoutes.ts` pins the same origin as `SITE_ORIGIN`,
+and `public/_redirects`, `public/_headers` and `functions/_middleware.ts` all
+route `/d/*` on that host. There is no separate `app.` deployment — this file
+previously documented one, which was never correct for this architecture.
+
+The e-mail tests deliberately use a DIFFERENT host in their fixtures. That is not
+an oversight: it proves the worker forwards the minted link verbatim instead of
+rebuilding it from a hardcoded origin.
 
 ## Deploy (run manually; NOT part of this task)
 
