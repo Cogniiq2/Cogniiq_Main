@@ -17,6 +17,10 @@ export function publicLinesToDocumentItems(lines: PublicOfferLine[]): DocumentLi
   return lines.map((l) => ({
     description: l.description,
     details: l.details ?? null,
+    // Presentation-only; ignored by computeOfferPricing, rendered by the premium PDF.
+    deliverables: (l.deliverables ?? []).filter((d): d is string => Boolean(d && d.trim())),
+    phaseLabel: l.phase_label ?? null,
+    durationLabel: l.duration_label ?? null,
     quantityMilli: l.quantity_milli,
     unit: l.unit,
     unitPriceCents: l.unit_price_cents,

@@ -129,6 +129,25 @@ jobs:
       - name: Cloudflare Pages routing contract (wrangler pages dev)
         run: node .github/scripts/test-pages-routing.mjs
 
+      # Poppler gives pdftotext/pdftoppm, which the offer-PDF test uses to measure word
+      # geometry (overlap, clipping, footer collisions) and to rasterise each page. Without
+      # it the PDF tests still run, but silently skip exactly the checks that matter.
+      - name: Install poppler-utils (PDF text + raster tooling)
+        run: sudo apt-get update -qq && sudo apt-get install --yes poppler-utils
+
+      # The PDF the customer downloads from /d/:token. It used to be produced by the GENERIC
+      # transactional renderer, whose keyvalue painter draws each value as one unwrapped
+      # right-aligned line and steps Y by a fixed amount — so the payment terms, delivery
+      # terms, assumptions and exclusions ran off both page edges and were painted over the
+      # labels beneath them, on a single crammed page, with "→" rendered as "?".
+      - name: Public offer PDF (premium engine, layout geometry)
+        run: node .github/scripts/test-public-offer-pdf.mjs
+
+      # The same download driven through the real browser build: the browser @react-pdf
+      # entry point and font registration are not reachable from the Node test.
+      - name: Public offer PDF download (real browser)
+        run: node .github/scripts/test-public-offer-pdf-browser.mjs
+
       # The customer offer portal (/d/:token) opened from an email must never be a blank
       # white page. Runs against the built artifact in a real browser: a failed lazy chunk
       # once reload-looped forever and painted nothing, which no component test can catch.

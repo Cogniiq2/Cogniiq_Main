@@ -129,9 +129,14 @@ function buildDocument(RP: typeof import('@react-pdf/renderer'), src: PremiumSou
     ))}</View>
   );
 
+  // wrap={false} keeps a bullet glued to its own text. Without it react-pdf splits the row
+  // at a page break: the dot is painted at the foot of one page and its entry continues on
+  // the next WITHOUT a marker, so one list item silently loses its bullet and another
+  // appears empty. Entries are single list items and always far shorter than a page, so
+  // holding them together never starves a page.
   const Bullets = ({ items }: { items: string[] }) => (
     <View>{items.map((it, i) => (
-      <View key={i} style={s.bulletRow}><Text style={s.bulletDot}>•</Text><Text style={s.bulletText}>{it}</Text></View>
+      <View key={i} style={s.bulletRow} wrap={false}><Text style={s.bulletDot}>•</Text><Text style={s.bulletText}>{it}</Text></View>
     ))}</View>
   );
 

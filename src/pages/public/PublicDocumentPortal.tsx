@@ -92,20 +92,29 @@ export function PublicDocumentPortal() {
   const greeting = useMemo(() => buildGreetingLine(greetingInput, { fallback: 'Guten Tag' }), [greetingInput]);
   const thanks = useMemo(() => buildThanksLine(greetingInput), [greetingInput]);
 
+  /**
+   * The customer's download. ONE function, used by both download buttons — the one shown
+   * before acceptance and the one on the success panel afterwards — so accepting can never
+   * switch the customer onto a different or degraded rendering path.
+   *
+   * It renders the PREMIUM offer engine, the same template that backs PremiumOfferWebView
+   * above. It used to call renderTransactionalPdf, the GENERIC finance-report renderer,
+   * whose keyvalue painter draws each value as one unwrapped right-aligned line and steps
+   * Y by a fixed amount: the long payment terms, delivery terms, assumptions and exclusions
+   * ran off the page and were overprinted by the following rows, the premium sections were
+   * missing entirely, and its WinAnsi encoder rendered "→" as "?".
+   *
+   * The document is built purely from `offer` — the curated projection of the IMMUTABLE
+   * finalized snapshot already in hand. Nothing is re-fetched at download time, so the PDF
+   * cannot disagree with what the customer read and accepted.
+   */
   const downloadPdf = async () => {
     if (!offer) return;
-    const { renderTransactionalPdf, TRANSACTIONAL_TEMPLATE_VERSION } = await import('@/lib/ownerFinance/documents');
-    const seller = offer.seller;
-    const bytes = await renderTransactionalPdf({
-      kind: 'offer', language: 'de', documentNumber: offer.offer_number, title: offer.title,
-      seller: { name: seller.legal_name, addressLines: [seller.street ?? '', [seller.postal_code, seller.city].filter(Boolean).join(' ')].filter(Boolean), email: seller.email, vatId: seller.vat_id },
-      recipient: { name: offer.recipient?.company ?? '', addressLines: [] },
-      issueDate: offer.issue_date, validUntil: offer.valid_until, serviceDate: null, currency: offer.currency,
-      introduction: offer.introduction, scope: offer.scope, assumptions: offer.assumptions, exclusions: offer.exclusions,
-      lines: publicLinesToDocumentItems(offer.lines),
-      netTotalCents: offer.net_total_cents, vatTotalCents: offer.vat_total_cents, grossTotalCents: offer.gross_total_cents,
-      paymentTerms: offer.payment_terms, deliveryTerms: offer.delivery_terms, isDraft: false, templateVersion: TRANSACTIONAL_TEMPLATE_VERSION,
-    });
+    const [{ renderPremiumPdf }, { publicOfferToPremiumDocument }] = await Promise.all([
+      import('@/lib/ownerFinance/documents/premium'),
+      import('@/lib/ownerFinance/documents/premium/publicOfferToPremium'),
+    ]);
+    const bytes = await renderPremiumPdf(publicOfferToPremiumDocument(offer));
     const url = URL.createObjectURL(new Blob([bytes.slice()], { type: 'application/pdf' }));
     const a = document.createElement('a'); a.href = url; a.download = `Angebot-${offer.offer_number ?? 'Cogniiq'}.pdf`; a.click();
     setTimeout(() => URL.revokeObjectURL(url), 60000);
