@@ -19,27 +19,67 @@
 #
 # noarchive is included so no cached copy of an authenticated shell can be served
 # from a search engine's cache.
+#
+# ---------------------------------------------------------------------------
+# Cache-Control on the HTML, and ONLY on the HTML.
+#
+# Every one of these routes is served an SPA shell document whose <script> tags
+# name content-hashed chunks. A deploy renames every chunk. If a browser or edge
+# still holds the previous HTML it will ask for a filename that no longer exists,
+# the dynamic import fails, and the customer gets a broken page — which is exactly
+# how a freshly emailed /d/<token> offer link opened to a blank screen.
+#
+# `no-cache` does not mean "do not store": it means "revalidate before reuse", so
+# the shell is cheap to serve and can never be stale after a deploy. Vite
+# recommends precisely this for the HTML entry.
+#
+# Cloudflare matches these rules against the REQUEST path, not against the file
+# that ends up being served — which is why /d/* is the correct target even though
+# the body comes from app-shell.html (or index.html via SPA fallback). The
+# X-Robots-Tag rules below have always depended on that same behaviour.
+#
+# Deliberately NOT here: /assets/*. Those filenames are content-hashed, so they
+# are immutable by construction and must keep their long-lived caching. Adding
+# no-cache there would re-download the whole bundle on every navigation and fix
+# nothing.
+#
+# functions/_middleware.ts already sets the same header on HTML it returns. These
+# rules are not redundant: that file is a Cloudflare *Pages Function*, while
+# wrangler.jsonc declares a *Workers Assets* project, where functions/ does not
+# execute. _headers is honoured by both, so the protection no longer depends on
+# which deployment mode is live.
+# ---------------------------------------------------------------------------
 
 /app
   X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-cache, must-revalidate
 /app/*
   X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-cache, must-revalidate
 /admin
   X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-cache, must-revalidate
 /admin/*
   X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-cache, must-revalidate
 /owner
   X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-cache, must-revalidate
 /owner/*
   X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-cache, must-revalidate
 /auth
   X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-cache, must-revalidate
 /auth/*
   X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-cache, must-revalidate
 /d
   X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-cache, must-revalidate
 /d/*
   X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-cache, must-revalidate
 
 # The 404 document is served for every unknown public URL. It must never be
 # indexed under any of those URLs.
@@ -50,3 +90,11 @@
 # as a static file, so it carries the same protection as the routes it serves.
 /app-shell.html
   X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-cache, must-revalidate
+
+# The SPA fallback document itself. wrangler.jsonc sets
+# not_found_handling: "single-page-application", so an unmatched route (a
+# customer document link included) is served the CONTENTS of /index.html. It is
+# an HTML pointer to hashed chunks like any other shell and must revalidate too.
+/index.html
+  Cache-Control: no-cache, must-revalidate
