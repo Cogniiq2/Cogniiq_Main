@@ -15,6 +15,7 @@ import {
   intervalSuffix, intervalAdverb,
   type OfferPricing, type RecurringGroup,
 } from '../offerPricing';
+import { asListOrProse, type TextBlock } from '../listFields';
 
 /** Recurring presentation for a single position ("290,00 € netto / Monat", term, start). */
 export interface PremiumModuleRecurring {
@@ -129,8 +130,13 @@ export interface PremiumSource {
      */
     scopeNote: string | null;
   };
-  assumptions: string | null;
-  exclusions: string | null;
+  /**
+   * Assumptions and exclusions are list-capable: the owner types one entry per line and the
+   * renderers draw a bullet row per entry. Resolved once here so the PDF and the HTML preview
+   * cannot disagree about whether a field is a list. See documents/listFields.ts.
+   */
+  assumptions: TextBlock | null;
+  exclusions: TextBlock | null;
   closing: string | null;
   nextSteps: string | null;
   footer: string | null;
@@ -303,8 +309,8 @@ export function buildPremiumSource(doc: TransactionalDocument): PremiumSource {
         ? 'Die Raten beziehen sich auf die einmalige Projektinvestition. Wiederkehrende Leistungen werden separat gemäß ihrem Abrechnungsintervall berechnet.'
         : null,
     },
-    assumptions: doc.assumptions ?? null,
-    exclusions: doc.exclusions ?? null,
+    assumptions: asListOrProse(doc.assumptions),
+    exclusions: asListOrProse(doc.exclusions),
     closing: doc.closing ?? null,
     nextSteps: doc.nextSteps ?? null,
     footer: doc.footer ?? null,
