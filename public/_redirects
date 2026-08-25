@@ -13,9 +13,9 @@
 # Both hosts resolve "/app-shell" to app-shell.html by the same pretty-URL
 # lookup that serves every prerendered public route, so the target is portable.
 #
-# worker/routing.mjs is the shared source of truth for which prefixes are
-# private, and .github/scripts/test-deployment-routing.mjs asserts that this
-# file still agrees with it.
+# scripts/lib/private-routing.mjs is the shared source of truth for which
+# prefixes are private, and .github/scripts/test-pages-routing.mjs asserts that
+# this file still agrees with it.
 #
 # First matching rule wins, and a rule is only consulted when no
 # static file matches the request — so the prerendered public pages written by

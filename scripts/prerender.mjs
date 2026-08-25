@@ -27,6 +27,7 @@ import { dirname, join } from 'node:path';
 import { registerHooks } from 'node:module';
 
 import { createRouteChunkResolver, trackSsrModuleLoads } from './lib/route-chunks.mjs';
+import { PRIVATE_PREFIXES, PRIVATE_SHELL_FILE } from './lib/private-routing.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = join(ROOT, 'dist');
@@ -34,11 +35,11 @@ const SSR_ENTRY = join(ROOT, 'dist-ssr', 'entry-server.js');
 const TEMPLATE_PATH = join(DIST, 'index.html');
 const ROOT_MARKER = '<div id="root"></div>';
 const PER_ROUTE_TIMEOUT_MS = 30_000;
-/** SPA fallback document for private routes. Must match public/_redirects. */
-const SHELL_FILE = 'app-shell.html';
-
-/** Private prefixes that must never receive prerendered HTML. */
-const PRIVATE_PREFIXES = ['/app', '/admin', '/owner', '/auth', '/d'];
+/**
+ * SPA fallback document for private routes. public/_redirects points at its
+ * PRETTY path (/app-shell, no extension) — see scripts/lib/private-routing.mjs.
+ */
+const SHELL_FILE = PRIVATE_SHELL_FILE;
 
 // ─── escaping ────────────────────────────────────────────────────────────────
 // Injected metadata is German marketing copy full of &, –, quotes and umlauts.

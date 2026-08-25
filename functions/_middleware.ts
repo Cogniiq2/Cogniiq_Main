@@ -1,8 +1,14 @@
-// The document validator is shared with worker/index.mjs so the Pages and
-// Workers deployments cannot disagree about what a usable shell looks like.
-// Pages Functions are bundled with esbuild, so importing from outside
-// functions/ is resolved at build time.
-import { describeDocumentProblem } from '../worker/routing.mjs';
+// The private-route contract — which prefixes are private, which documents
+// serve them, and what makes a served document valid — lives in one place and
+// is shared with scripts/prerender.mjs and the regression test. Pages Functions
+// are bundled with esbuild, so importing from outside functions/ is resolved at
+// build time.
+import {
+  NOT_FOUND_DOCUMENT,
+  PRIVATE_PREFIXES,
+  PRIVATE_SHELL,
+  describeDocumentProblem,
+} from '../scripts/lib/private-routing.mjs';
 
 interface CloudflarePagesContext {
   request: Request;
@@ -13,19 +19,6 @@ interface CloudflarePagesContext {
     };
   };
 }
-
-/**
- * The private SPA shell and the 404 document, addressed by their PRETTY paths.
- *
- * NEVER "/app-shell.html". Cloudflare Pages canonicalises an .html path to its
- * extension-less form with a 3xx redirect, so fetching the physical filename
- * returns a BODYLESS REDIRECT, not the document. Returning that body while
- * forcing status 200 — which this middleware used to do — produces exactly the
- * observed failure: a ~0.3 KB HTML document at HTTP 200 with no <script> tags,
- * no CSS, no JS requests at all, and a permanently white page.
- */
-const PRIVATE_SHELL = '/app-shell';
-const NOT_FOUND_DOCUMENT = '/404';
 
 /** Follows the .html -> pretty-path canonicalisation instead of returning it. */
 async function fetchDocument(context: CloudflarePagesContext, path: string): Promise<Response> {
@@ -67,12 +60,8 @@ export async function onRequest(context: CloudflarePagesContext) {
     pathname = pathname.slice(0, -1);
   }
 
-  // Must stay in step with worker/routing.mjs PRIVATE_PREFIXES, which is the
-  // source of truth for the Workers-Assets deployment. /owner, /auth and /d
-  // were missing here, so the tokenized customer document portal was neither
-  // marked noindex nor given the private shell by this middleware.
-  // .github/scripts/test-deployment-routing.mjs asserts the two lists agree.
-  const PRIVATE_PREFIXES = ['/app', '/admin', '/owner', '/auth', '/d'];
+  // /owner, /auth and /d used to be missing here, so the tokenized customer
+  // document portal was neither marked noindex nor given the private shell.
   const isPrivateSurface = PRIVATE_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
   );
@@ -601,17 +590,23 @@ export async function onRequest(context: CloudflarePagesContext) {
   // Fallback for extension-less route paths that matched no file.
   // Asset 404s never reach this point — they returned real 404s above.
   //
-  // This used to fetch /index.html, which is the PRERENDERED MARKETING
-  // HOMEPAGE: its #root is full of server-rendered homepage markup, so
-  // src/main.tsx took its hydrateRoot() branch and asked React to reconcile
-  // homepage markup against a tree rendered for /admin/finance or
-  // /d/<token>, with only the homepage's chunks preloaded — so the private
-  // application never mounted and the visitor was left on the marketing
-  // homepage, or on a discarded tree (React #421) that painted nothing.
+  //  - private routes  -> /app-shell, 200 (empty #root, noindex)
+  //  - anything else   -> /404, a REAL 404, never a soft 404 at 200
   //
-  //  - private routes  -> /app-shell.html, 200 (empty #root, noindex)
-  //  - anything else   -> /404.html, a REAL 404, never a soft 404 at 200
+  // Both are PRETTY paths. This used to fetch /index.html — the prerendered
+  // marketing homepage — which would have hydrated homepage markup against a
+  // tree rendered for /admin/finance or /d/<token>. It is also why the physical
+  // filenames are never used: Cloudflare canonicalises an .html path to its
+  // extension-less form with a bodyless 3xx, and this middleware forced every
+  // response to status 200, so that empty body became a ~0.3 KB document with
+  // no <script> and a permanently white page. fetchDocument() follows the
+  // canonicalisation, and describeDocumentProblem() below refuses to serve
+  // anything that is not a complete document.
   // ============================================================
+  // In normal operation Cloudflare Pages answers the private routes from the
+  // /app-shell rewrite in public/_redirects before this Function runs at all;
+  // this branch is what serves them if that rule is ever missing.
+  //
   // A redirect is a real answer. Reading its (empty) body and re-emitting it at
   // 200 is what produced the blank, script-less document; pass it through.
   if (response.status >= 300 && response.status < 400) {

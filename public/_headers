@@ -44,10 +44,9 @@
 # nothing.
 #
 # functions/_middleware.ts already sets the same header on HTML it returns. These
-# rules are not redundant: that file is a Cloudflare *Pages Function*, while
-# wrangler.jsonc declares a *Workers Assets* project, where functions/ does not
-# execute and worker/index.mjs serves the shell instead. _headers is honoured by
-# both, so the protection does not depend on which deployment mode is live.
+# rules are not redundant. Cloudflare Pages evaluates _redirects BEFORE Pages
+# Functions, so a private deep link is answered by the /app-shell rewrite and
+# the middleware never runs for it — _headers is what carries the policy there.
 # ---------------------------------------------------------------------------
 
 /app
@@ -92,11 +91,9 @@
   X-Robots-Tag: noindex, nofollow, noarchive
   Cache-Control: no-cache, must-revalidate
 
-# The prerendered homepage. It is NO LONGER a fallback for anything: wrangler.jsonc
-# used to set not_found_handling: "single-page-application", which served its
-# CONTENTS for every unmatched route — customer document links included — so a
-# /d/<token> link rendered the marketing homepage and the portal never mounted.
-# Unmatched routes now go to worker/index.mjs. This is still an HTML pointer to
-# hashed chunks and must revalidate like any other document.
+# The prerendered homepage. It is NOT a fallback for anything: private routes are
+# rewritten to /app-shell and unknown URLs are served /404 by
+# functions/_middleware.ts. It is still an HTML pointer to hashed chunks and must
+# revalidate like any other document.
 /index.html
   Cache-Control: no-cache, must-revalidate

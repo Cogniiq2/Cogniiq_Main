@@ -201,8 +201,18 @@ if (!failures.some((f) => f.includes('_redirects') || f.includes('_headers'))) {
 // contract is pinned so the guarantees cannot be quietly removed from the
 // generator without CI noticing, build or no build.
 const prerenderSrc = read('scripts/prerender.mjs');
+// The shell's filename now comes from the shared private-route contract, which
+// also pins the PRETTY path public/_redirects must target.
+const privateRoutingSrc = read('scripts/lib/private-routing.mjs');
 for (const [re, label] of [
-  [/const SHELL_FILE = 'app-shell\.html'/, 'the private shell is app-shell.html'],
+  [/const PRIVATE_SHELL_FILE = 'app-shell\.html'/, 'the private shell file is app-shell.html'],
+  [/const PRIVATE_SHELL = '\/app-shell'/, "the private shell is addressed as '/app-shell', never '/app-shell.html'"],
+]) {
+  if (!re.test(privateRoutingSrc)) fail(`Private routing contract: expected ${label}`);
+  else ok(label);
+}
+for (const [re, label] of [
+  [/const SHELL_FILE = PRIVATE_SHELL_FILE/, 'the prerenderer uses the shared shell filename'],
   [/Private SPA shell still carries a canonical link/, 'shell generation fails if a canonical survives'],
   [/Private SPA shell is not noindex/, 'shell generation fails if the shell is not noindex'],
   [/Private SPA shell lost its empty #root marker/, 'shell generation fails if #root is not empty'],

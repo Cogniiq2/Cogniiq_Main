@@ -70,8 +70,8 @@ The middleware now validates any document it falls back to and returns an
 explicit 5xx rather than a blank 200. Verified against the real Pages runtime by
 `.github/scripts/test-pages-routing.mjs` (`wrangler pages dev dist`).
 
-`wrangler.jsonc` and `worker/index.mjs` describe the Workers Assets path, which
-Pages ignores and which is not currently live.
+`wrangler.jsonc` is not read by Pages at all — `wrangler pages dev` reads
+neither `main` nor `assets` from it — so it plays no part in this routing.
 
 ## Shared shell & navigation
 

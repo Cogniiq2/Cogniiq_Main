@@ -6,9 +6,9 @@
 //
 // This boots `wrangler pages dev dist`, which executes public/_redirects,
 // public/_headers and functions/_middleware.ts exactly as Cloudflare Pages does.
-// It is NOT a hand-written model — the previous fix was validated only against a
-// Workers-Assets simulator, and shipped a preview in which every private deep
-// link was still a blank white page.
+// It is NOT a hand-written model — an earlier fix was validated only against a
+// hand-written simulator of a different Cloudflare product, and shipped a
+// preview in which every private deep link was still a blank white page.
 //
 // ── The defect this locks down ──────────────────────────────────────────────
 // Pages evaluates _redirects BEFORE Pages Functions, and then canonicalises an
@@ -34,6 +34,11 @@ import { dirname, join } from 'node:path';
 import { createServer } from 'node:net';
 
 import { findChromium, launchChromium } from './lib/chromium.mjs';
+import {
+  PRIVATE_PREFIXES,
+  PRIVATE_SHELL,
+  describeDocumentProblem,
+} from '../../scripts/lib/private-routing.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DIST = join(ROOT, 'dist');
@@ -57,6 +62,95 @@ const SHELL = readFileSync(join(DIST, 'app-shell.html'), 'utf8');
 const HOMEPAGE = readFileSync(join(DIST, 'index.html'), 'utf8');
 const shellAssets = [...SHELL.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)].map((m) => m[1]).sort();
 
+// ── 1. Source contract: every declaration of the private routes agrees ───────
+{
+  const redirects = readFileSync(join(ROOT, 'public/_redirects'), 'utf8');
+  const headers = readFileSync(join(ROOT, 'public/_headers'), 'utf8');
+
+  check(
+    !/^\/\S+\s+\/app-shell\.html\s+200/m.test(redirects),
+    "public/_redirects targets the shell as '/app-shell', never '/app-shell.html'",
+    'public/_redirects points at /app-shell.html — Cloudflare Pages canonicalises that to a '
+      + 'bodyless 307 and the browser receives a script-less blank document'
+  );
+  for (const prefix of PRIVATE_PREFIXES) {
+    check(
+      new RegExp(`^${prefix}\\s+${PRIVATE_SHELL}\\s+200`, 'm').test(redirects)
+        && new RegExp(`^\\${prefix}/\\*\\s+${PRIVATE_SHELL}\\s+200`, 'm').test(redirects),
+      `public/_redirects rewrites ${prefix} and ${prefix}/* to ${PRIVATE_SHELL}`,
+      `public/_redirects is missing a ${PRIVATE_SHELL} rule for ${prefix}`
+    );
+    check(
+      new RegExp(`^\\${prefix}/?\\*?$`, 'm').test(headers),
+      `public/_headers covers ${prefix}`,
+      `public/_headers is missing a block for ${prefix}`
+    );
+  }
+}
+
+// ── 2. The generated shell document's own invariants ─────────────────────────
+{
+  check(
+    SHELL.includes('<div id="root"></div>'),
+    'app-shell.html has an EMPTY #root before React mounts',
+    'app-shell.html #root is not empty — src/main.tsx would hydrate instead of mount'
+  );
+  check(
+    !HOMEPAGE.includes('<div id="root"></div>'),
+    'index.html is prerendered and is therefore unusable as the shell',
+    'index.html has an empty #root — the prerender did not run'
+  );
+  check(SHELL !== HOMEPAGE, 'app-shell.html is not the homepage HTML', 'app-shell.html is the homepage');
+  check(
+    /<meta name="robots" content="noindex, nofollow[^"]*"/.test(SHELL),
+    'app-shell.html is noindex',
+    'app-shell.html is missing a noindex robots tag'
+  );
+  check(
+    !/<link rel="canonical"/.test(SHELL),
+    'app-shell.html publishes no canonical URL',
+    'app-shell.html carries a canonical URL, which would apply to every private route'
+  );
+  const missing = shellAssets.filter((a) => !existsSync(join(DIST, a.replace(/^\//, ''))));
+  check(
+    shellAssets.length > 0 && missing.length === 0,
+    `all ${shellAssets.length} assets referenced by app-shell.html exist in this build`,
+    `app-shell.html references assets this build did not emit: ${missing.join(', ')}`
+  );
+}
+
+// ── 3. The guard that refuses to launder a failed lookup into a blank 200 ────
+// Shared by functions/_middleware.ts. Every case below is a way the fallback
+// asset lookup can fail; each MUST be reported so the middleware answers with
+// an explicit error instead of a blank 200.
+{
+  const okHtml = { ok: true, status: 200, contentType: 'text/html; charset=utf-8' };
+  const cases = [
+    {
+      name: 'the exact production failure: a bodyless 307 canonicalisation',
+      response: { ok: false, status: 307, contentType: null }, html: '', shell: true, problem: true,
+    },
+    { name: 'a 404 from the asset store', response: { ok: false, status: 404, contentType: 'text/html' }, html: SHELL, shell: true, problem: true },
+    { name: 'a non-HTML asset', response: { ok: true, status: 200, contentType: 'application/json' }, html: '{}', shell: true, problem: true },
+    { name: 'a body that is not an HTML document', response: okHtml, html: 'not html at all', shell: true, problem: true },
+    { name: 'the prerendered homepage offered as the shell', response: okHtml, html: HOMEPAGE, shell: true, problem: true },
+    { name: 'a shell with no Vite entry script', response: okHtml, html: '<html><body><div id="root"></div></body></html>', shell: true, problem: true },
+    { name: 'the real app-shell.html', response: okHtml, html: SHELL, shell: true, problem: false },
+    { name: 'the real 404.html', response: okHtml, html: readFileSync(join(DIST, '404.html'), 'utf8'), shell: false, problem: false },
+  ];
+  for (const c of cases) {
+    const problem = describeDocumentProblem(c.response, c.html, c.shell);
+    check(
+      Boolean(problem) === c.problem,
+      c.problem ? `the guard rejects ${c.name} (${problem})` : `the guard accepts ${c.name}`,
+      c.problem
+        ? `the guard ACCEPTED ${c.name} — that becomes a blank 200`
+        : `the guard wrongly rejected ${c.name}: ${problem}`
+    );
+  }
+}
+
+// ── 4. The route table, against the real Cloudflare Pages runtime ────────────
 const freePort = () =>
   new Promise((resolve, reject) => {
     const s = createServer();
@@ -216,20 +310,32 @@ const chromium = findChromium();
 if (!chromium) {
   console.log('SKIP: no Chromium installed — browser verification not run');
 } else {
-  for (const { path, settles } of [
-    { path: '/app/login', settles: ['/app/login'] },
-    { path: '/admin/finance', settles: ['/admin/finance', '/app/login'] },
-    { path: '/d/test-token', settles: ['/d/test-token'] },
-  ]) {
+  const JOURNEYS = [
+    { path: '/app/login', settles: ['/app/login'], expect: /sicherer zugang|anmelden|passwort|e-?mail/i,
+      describe: 'the login UI' },
+    // Signed out, the guard is expected to hand over to the auth entry point.
+    { path: '/admin/finance', settles: ['/admin/finance', '/app/login'], expect: /sicherer zugang|anmelden|passwort|e-?mail/i,
+      describe: 'the login UI (guard redirect)' },
+    // The offer RPC is fulfilled with the invalid-token error the live
+    // `public_offer_by_token` raises, so the portal renders its real
+    // invalid-link screen instead of a network-failure screen.
+    { path: '/d/THIS-IS-NOT-A-REAL-TOKEN', settles: ['/d/THIS-IS-NOT-A-REAL-TOKEN'],
+      expect: /Link nicht gültig/i, describe: 'the invalid-link state', rpcError: 'invalid token' },
+  ];
+
+  for (const { path, settles, expect, describe, rpcError } of JOURNEYS) {
     const browser = await launchChromium(chromium);
     const page = browser.page;
     const scriptsLoaded = [];
     const netFailures = [];
     const pageErrors = [];
+    const consoleErrors = [];
 
     await page.send('Runtime.enable');
     await page.send('Network.enable');
     await page.send('Page.enable');
+    await page.send('Fetch.enable', { patterns: [{ urlPattern: '*supabase.co*' }] });
+
     page.on('Network.responseReceived', (p) => {
       const url = p.response?.url || '';
       if (/\/assets\/.*\.(js|css)(\?|$)/.test(url)) {
@@ -237,39 +343,84 @@ if (!chromium) {
         else netFailures.push(`${p.response.status} ${url}`);
       }
     });
+    page.on('Network.loadingFailed', (p) => {
+      if (p.type === 'Script' || p.type === 'Stylesheet') netFailures.push(`${p.type} ${p.errorText}`);
+    });
     page.on('Runtime.exceptionThrown', (p) => {
       pageErrors.push(p.exceptionDetails?.exception?.description || p.exceptionDetails?.text || '?');
     });
+    page.on('Runtime.consoleAPICalled', (p) => {
+      if (p.type === 'error') {
+        consoleErrors.push((p.args || []).map((a) => a.value ?? a.description ?? '').join(' '));
+      }
+    });
+    page.on('Fetch.requestPaused', async ({ requestId, request }) => {
+      const cors = [
+        { name: 'access-control-allow-origin', value: '*' },
+        { name: 'access-control-allow-headers', value: '*' },
+        { name: 'access-control-allow-methods', value: '*' },
+      ];
+      try {
+        if (request.method === 'OPTIONS') {
+          await page.send('Fetch.fulfillRequest', { requestId, responseCode: 204, responseHeaders: cors, body: '' });
+          return;
+        }
+        const isOfferRpc = request.url.includes('/rest/v1/rpc/public_offer_by_token');
+        const body = isOfferRpc && rpcError
+          ? JSON.stringify({ code: 'P0001', message: rpcError, details: null, hint: null })
+          : '{}';
+        await page.send('Fetch.fulfillRequest', {
+          requestId,
+          responseCode: isOfferRpc && rpcError ? 400 : 200,
+          responseHeaders: [{ name: 'content-type', value: 'application/json' }, ...cors],
+          body: Buffer.from(body).toString('base64'),
+        });
+      } catch { /* target gone */ }
+    });
 
+    // DIRECT navigation, never a client-side transition from "/": the blank
+    // page only ever appeared on a cold deep link.
     await page.send('Page.navigate', { url: `${origin}${path}` });
     await page.send('Runtime.evaluate', {
       expression: 'new Promise(r=>{if(document.readyState==="complete")r();else addEventListener("load",()=>r(),{once:true})})',
       awaitPromise: true,
     });
-    await new Promise((r) => setTimeout(r, 3500));
+    await new Promise((r) => setTimeout(r, 4000));
 
     const { result } = await page.send('Runtime.evaluate', {
       expression: `JSON.stringify({
         rootChildren: document.getElementById('root')?.children.length ?? -1,
-        text: (document.body.innerText || '').trim().slice(0, 300),
+        text: (document.body.innerText || '').trim().slice(0, 400),
         path: location.pathname
       })`,
     });
     await browser.close();
     const state = JSON.parse(result.value);
-    if (VERBOSE) console.log(`   ${path}: root=${state.rootChildren} js=${scriptsLoaded.length} ${JSON.stringify(state.text.slice(0, 80))}`);
+    if (VERBOSE) console.log(`   ${path}: root=${state.rootChildren} assets=${scriptsLoaded.length} ${JSON.stringify(state.text.slice(0, 90))}`);
 
     check(
       scriptsLoaded.some((u) => /\.js$/.test(u)),
       `${path} fetches the application JS bundle (${scriptsLoaded.length} assets)`,
       `${path} fetched NO /assets/*.js — the browser received a script-less document`
     );
+    check(
+      scriptsLoaded.some((u) => /\.css$/.test(u)),
+      `${path} fetches the stylesheet`,
+      `${path} fetched no CSS`
+    );
     check(state.rootChildren > 0, `${path} paints (#root has ${state.rootChildren} children)`,
       `${path} rendered a BLANK PAGE (#root empty)`);
-    check(state.text.length > 0, `${path} renders visible UI`, `${path} rendered an empty body`);
+    check(expect.test(state.text), `${path} shows ${describe}`,
+      `${path} did not show ${describe} — saw: ${JSON.stringify(state.text.slice(0, 140))}`);
     check(settles.includes(state.path), `${path} settles on ${state.path}`,
       `${path} navigated unexpectedly to ${state.path}`);
-    check(netFailures.length === 0, `${path} loads every asset`, `${path} asset failures: ${netFailures.slice(0, 3).join(' | ')}`);
+    check(netFailures.length === 0, `${path} loads every script and stylesheet`,
+      `${path} asset failures: ${netFailures.slice(0, 3).join(' | ')}`);
+
+    const hydration = [...consoleErrors, ...pageErrors].filter((m) =>
+      /hydrat|Minified React error #(418|421|423)|did not match/i.test(m));
+    check(hydration.length === 0, `${path} produces no hydration error`,
+      `${path} hydration errors: ${hydration.slice(0, 2).join(' | ')}`);
     if (pageErrors.length && VERBOSE) console.log(`   page errors: ${pageErrors.slice(0, 2).join(' | ')}`);
   }
 
