@@ -359,6 +359,12 @@ export interface PublicOfferLine {
   description: string; quantity_milli: number; unit: string; unit_price_cents: number;
   vat_rate_bp: number; vat_treatment: string; net_cents: number; vat_cents: number; gross_cents: number; is_optional: boolean;
   details?: string | null;
+  // Module presentation carried by the finalized snapshot. PremiumOfferWebView does not
+  // render these, but the premium PDF does — declaring them keeps the customer's document
+  // from silently dropping data the projection actually returns.
+  deliverables?: string[] | null;
+  phase_label?: string | null;
+  duration_label?: string | null;
   // Recurring pricing. Offers finalized before this existed project these as null/absent and
   // are therefore read as one-time — their presentation never changes.
   pricing_type?: 'one_time' | 'recurring' | null;
