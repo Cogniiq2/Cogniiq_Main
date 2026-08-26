@@ -48,6 +48,19 @@ export async function renderPublicOfferPdf(projection) {
   return renderer.renderPremiumOfferPdfNode(doc, { fonts: FONTS });
 }
 
+/**
+ * Render an already-built TransactionalDocument through the real premium engine.
+ * Used by the long-module pagination regression, which needs to drive the renderer
+ * directly rather than through the public-offer projection adapter.
+ * @returns {Promise<Uint8Array>}
+ */
+export async function renderPremiumDocument(doc) {
+  const renderer = await bundle(
+    resolve(SRC, 'lib/ownerFinance/documents/premium/premiumOfferPdf.tsx'), 'premium-document'
+  );
+  return renderer.renderPremiumOfferPdfNode(doc, { fonts: FONTS });
+}
+
 /** The document the adapter produces, for field-level assertions. */
 export async function buildPublicOfferDocument(projection) {
   const adapter = await bundle(

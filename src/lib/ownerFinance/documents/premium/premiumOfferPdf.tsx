@@ -1,7 +1,8 @@
 // Premium transactional PDF engine (template "cogniiq-premium-offer-v2"). Uses
 // @react-pdf/renderer for real, selectable text with an embedded font (correct German +
 // euro glyphs — never "?"), variable-height module rows, section-aware pagination,
-// headings kept with their content (wrap={false}), a repeatable footer and page numbers.
+// headings held with their content (minPresenceAhead), module cards that paginate while
+// their header and each bullet row stay intact, a repeatable footer and page numbers.
 // It consumes the deterministic PremiumSource model, so preview and print never diverge.
 //
 // The engine and its fonts are loaded lazily (dynamic import) so react-pdf stays out of the
@@ -42,6 +43,15 @@ const SOFT = '#F7F8F9';
 // fixture/test harness, using on-disk file paths) must not be assumed valid for a later browser
 // render (Vite asset URLs), and vice versa.
 const fontsRegistered = { browser: false, node: false };
+
+/**
+ * Points of page that must remain before a module card / a module section heading is
+ * started. Enough for the header plus a first line of content, so neither is left stranded
+ * at the foot of a page — and small enough that it never forces an otherwise-fine module
+ * onto a new page.
+ */
+const MODULE_KEEP = 72;
+const MODULE_HEAD_KEEP = 96;
 
 /**
  * Build the React tree. `RP` is the loaded @react-pdf/renderer module. Kept as a factory so the
@@ -158,21 +168,34 @@ function buildDocument(RP: typeof import('@react-pdf/renderer'), src: PremiumSou
     </View>
   );
 
-  // Section whose heading is glued to its first item so the heading never sits alone at a
-  // page bottom (variable-height module rows make a distance heuristic unreliable).
+  // The module section. Its heading is held off the foot of a page by minPresenceAhead —
+  // NOT by being wrapped together with the first module, which is how this used to be done.
+  // Gluing the two made the pair indivisible, so a first module taller than the page could
+  // not break at all; and because module rows are variable-height, the heading must be kept
+  // in place by a reserve of following space rather than by a fixed offset.
   const ModuleSection = ({ title, mods, prefix }: { title: string; mods: PremiumModule[]; prefix: string }) => (
     <View style={s.block}>
-      <View wrap={false}>
+      <View minPresenceAhead={MODULE_HEAD_KEEP}>
         <Heading title={title} />
-        <ModuleCard m={mods[0]} prefix={prefix} />
       </View>
-      {mods.slice(1).map((m) => <ModuleCard key={`${prefix}${m.index}`} m={m} prefix={prefix} />)}
+      {mods.map((m) => <ModuleCard key={`${prefix}${m.index}`} m={m} prefix={prefix} />)}
     </View>
   );
 
+  // The card WRAPS. A module may carry fifty deliverables and several paragraphs, which is
+  // more than one A4 page holds; when this View was wrap={false} react-pdf could not break
+  // it, reported "Node of type VIEW can't wrap between pages and it's bigger than available
+  // page height", and painted the whole module at one origin — every line overprinting the
+  // next into an unreadable block, with the entire deliverables list unextractable.
+  //
+  // What still stays together is chosen deliberately:
+  //   - moduleTop (MODUL n + title + price) is wrap={false}, so the header never splits;
+  //   - each bullet row is wrap={false}, so a marker never parts from its text;
+  //   - minPresenceAhead stops a card starting with only a sliver of page left.
+  // Everything else — description, deliverables, metadata — paginates naturally.
   const ModuleCard = ({ m, prefix }: { m: PremiumModule; prefix: string }) => (
-    <View style={s.module} wrap={false}>
-      <View style={s.moduleTop}>
+    <View style={s.module} minPresenceAhead={MODULE_KEEP}>
+      <View style={s.moduleTop} wrap={false}>
         <View style={{ flex: 1, paddingRight: 12 }}>
           <Text style={s.moduleNo}>{prefix} {m.index}</Text>
           <Text style={s.moduleTitle}>{m.title}</Text>

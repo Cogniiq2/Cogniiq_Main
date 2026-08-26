@@ -148,6 +148,14 @@ jobs:
       - name: Public offer PDF download (real browser)
         run: node .github/scripts/test-public-offer-pdf-browser.mjs
 
+      # A single project module can carry more deliverables and prose than one A4 page
+      # holds. The module card used to be wrap={false}, so react-pdf could not break it
+      # ("Node of type VIEW can't wrap between pages and it's bigger than available page
+      # height") and painted the whole module at one origin — thousands of overlapping
+      # lines and an entire deliverables list that no longer existed in the text layer.
+      - name: Long project modules paginate (premium PDF)
+        run: node .github/scripts/test-long-module-pagination.mjs
+
       # The customer offer portal (/d/:token) opened from an email must never be a blank
       # white page. Runs against the built artifact in a real browser: a failed lazy chunk
       # once reload-looped forever and painted nothing, which no component test can catch.
