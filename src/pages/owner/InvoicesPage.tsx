@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Plus, Trash2 } from 'lucide-react';
+import { Archive, FileText, Plus, Trash2 } from 'lucide-react';
 
 import {
   Button, Card, ConfirmDialog, DataTable, EmptyState, ErrorState, IconButton, InfoBanner, KpiCard,
@@ -10,7 +10,8 @@ import {
 import { invoiceStatusTone } from '@/pages/owner/ownerUi';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import {
-  createOwnerInvoice, deleteDraftInvoice, issueOwnerInvoice, loadInvoices, recordInvoicePayment,
+  createOwnerInvoice, deleteDraftInvoice, issueOwnerInvoice, loadInvoices, recordHistoricalPaidInvoice,
+  recordInvoicePayment, OWNER_HISTORICAL_INVOICE_MIGRATION,
   type InvoiceLineInput,
 } from '@/lib/ownerFinance/api';
 import { cancelInvoice, loadCustomers } from '@/lib/ownerFinance/customersApi';
@@ -72,6 +73,7 @@ export function InvoicesPage() {
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [composerOpen, setComposerOpen] = useState(false);
+  const [historicalOpen, setHistoricalOpen] = useState(false);
   const [payFor, setPayFor] = useState<OwnerInvoice | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<OwnerInvoice | null>(null);
   const [confirmVoid, setConfirmVoid] = useState<OwnerInvoice | null>(null);
@@ -160,7 +162,14 @@ export function InvoicesPage() {
 
   const columns: Column<OwnerInvoice>[] = [
     { key: 'number', header: 'Nummer', render: (inv) => <span className="font-semibold text-gray-950">{inv.invoice_number ?? 'Entwurf'}</span>, hideOnMobile: true },
-    { key: 'status', header: 'Status', render: (inv) => <StatusBadge label={statusLabel[inv.status] ?? inv.status} tone={invoiceStatusTone[inv.status]} /> },
+    {
+      key: 'status', header: 'Status', render: (inv) => (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <StatusBadge label={statusLabel[inv.status] ?? inv.status} tone={invoiceStatusTone[inv.status]} />
+          {inv.historical_entry ? <StatusBadge label="Historisch erfasst" tone="neutral" /> : null}
+        </div>
+      ),
+    },
     { key: 'date', header: 'Datum', render: (inv) => <span className="text-gray-500">{inv.issue_date ?? '—'}</span> },
     { key: 'net', header: 'Netto', align: 'right', render: (inv) => <span className="tabular-nums">{formatCents(inv.net_total_cents, inv.currency)}</span> },
     { key: 'gross', header: 'Brutto', align: 'right', render: (inv) => <span className="tabular-nums font-medium text-gray-900">{formatCents(inv.gross_total_cents, inv.currency)}</span> },
@@ -194,6 +203,9 @@ export function InvoicesPage() {
                 { value: 'all', label: 'Alle Rechnungen', count: invoices.length },
               ]}
             />
+            <Button variant="secondary" icon={Archive} onClick={() => setHistoricalOpen(true)} disabled={!entity}>
+              Bereits bezahlte Rechnung erfassen
+            </Button>
             <Button icon={Plus} onClick={() => setComposerOpen(true)} disabled={!entity}>Neue Rechnung</Button>
           </div>
         }
@@ -249,15 +261,30 @@ export function InvoicesPage() {
       )}
 
       {entity ? (
-        <InvoiceComposer
-          open={composerOpen}
-          entityId={entity.id}
-          customers={customers}
-          onClose={() => setComposerOpen(false)}
-          onSaved={(msg) => { setComposerOpen(false); toast.success(msg); void load(); }}
-          onError={(m) => toast.error('Rechnung konnte nicht gespeichert werden', m)}
-          onCustomerCreated={async () => { await load(); }}
-        />
+        <>
+          <InvoiceComposer
+            open={composerOpen}
+            entityId={entity.id}
+            customers={customers}
+            onClose={() => setComposerOpen(false)}
+            onSaved={(msg) => { setComposerOpen(false); toast.success(msg); void load(); }}
+            onError={(m) => toast.error('Rechnung konnte nicht gespeichert werden', m)}
+            onCustomerCreated={async () => { await load(); }}
+          />
+          {/* Same composer, historical mode: identical customer/position/USt logic,
+              a payment block instead of the draft/issue footer, and a server path
+              that cannot notify the customer. */}
+          <InvoiceComposer
+            mode="historical"
+            open={historicalOpen}
+            entityId={entity.id}
+            customers={customers}
+            onClose={() => setHistoricalOpen(false)}
+            onSaved={(msg) => { setHistoricalOpen(false); toast.success(msg, 'Es wurde keine E-Mail an den Kunden versendet.'); void load(); }}
+            onError={(m) => toast.error('Rechnung konnte nicht erfasst werden', m)}
+            onCustomerCreated={async () => { await load(); }}
+          />
+        </>
       ) : null}
 
       <PaymentDialog
@@ -344,7 +371,16 @@ function newLine(): DraftLine {
   return { id: Math.random().toString(36).slice(2), description: '', quantity: '1', unit: 'Stück', unitPrice: '', treatment: 'standard' };
 }
 
-function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError, onCustomerCreated }: {
+/**
+ * 'normal'     — draft → optional issuance, the untouched original flow.
+ * 'historical' — a real invoice that was already issued AND already paid before
+ *                it reached Cogniiq. Same customer, position and USt logic; the
+ *                difference is a payment block and a single atomic server call.
+ */
+type ComposerMode = 'normal' | 'historical';
+
+function InvoiceComposer({ mode = 'normal', open, entityId, customers, onClose, onSaved, onError, onCustomerCreated }: {
+  mode?: ComposerMode;
   open: boolean;
   entityId: string;
   customers: OwnerCustomerListRow[];
@@ -355,6 +391,7 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError,
    *  customer is selectable here and visible in the CRM without a refresh. */
   onCustomerCreated: (customerId: string) => Promise<void>;
 }) {
+  const historical = mode === 'historical';
   const today = new Date().toISOString().slice(0, 10);
   const [customerId, setCustomerId] = useState('');
   const [issueDate, setIssueDate] = useState(today);
@@ -368,11 +405,31 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError,
   const [busy, setBusy] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [newCustomerOpen, setNewCustomerOpen] = useState(false);
+  // Historical mode only. paymentDate is the Zahlungsdatum and stays a separate
+  // fact from issueDate — never derived from it, in either direction.
+  const [paymentDate, setPaymentDate] = useState(today);
+  const [paymentMethod, setPaymentMethod] = useState('bank_transfer');
+  const [paymentReference, setPaymentReference] = useState('');
+  const [externalReference, setExternalReference] = useState('');
+  const [serviceTouched, setServiceTouched] = useState(false);
+
+  /**
+   * Historical mode: a past invoice's Leistungsdatum sits near its Rechnungsdatum,
+   * not near today. While the owner has not edited it themselves, it follows the
+   * invoice date — otherwise a backdated invoice would silently carry today's
+   * service date, which under Soll-Versteuerung would land its USt in the wrong
+   * period. Once edited, the entered value is never overwritten.
+   */
+  const setIssueDateSynced = (value: string) => {
+    setIssueDate(value);
+    if (historical && !serviceTouched && value) setServiceDate(value);
+  };
 
   const reset = () => {
     setCustomerId(''); setIssueDate(today); setServiceMode('date'); setServiceDate(today);
     setServicePeriodStart(''); setServicePeriodEnd(''); setTerms('14'); setNotes('');
-    setLines([newLine()]); setFieldErrors({});
+    setLines([newLine()]); setFieldErrors({}); setServiceTouched(false);
+    setPaymentDate(today); setPaymentMethod('bank_transfer'); setPaymentReference(''); setExternalReference('');
   };
 
   const dueDate = useMemo(() => {
@@ -413,6 +470,13 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError,
     });
     if (!anyValid) errs.form = 'Mindestens eine vollständige Position ist erforderlich.';
     if (serviceMode === 'period' && (!servicePeriodStart || !servicePeriodEnd)) errs.form = 'Leistungszeitraum unvollständig.';
+    if (historical) {
+      if (!issueDate) errs.issueDate = 'Rechnungsdatum erforderlich';
+      if (!paymentDate) errs.paymentDate = 'Zahlungsdatum erforderlich';
+      // Date-only string compare: both are YYYY-MM-DD, so this is a calendar
+      // comparison with no Date parsing and no timezone shift.
+      else if (issueDate && paymentDate < issueDate) errs.paymentDate = 'Zahlungsdatum darf nicht vor dem Rechnungsdatum liegen.';
+    }
     setFieldErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -437,11 +501,46 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError,
       service_date: serviceMode === 'date' ? serviceDate || null : null,
       service_period_start: serviceMode === 'period' ? servicePeriodStart || null : null,
       service_period_end: serviceMode === 'period' ? servicePeriodEnd || null : null,
-      due_date: dueDate || null,
+      // A settled historical invoice has no meaningful payment term, and the
+      // Zahlungsziel control is not shown for it. Sending null lets the server
+      // fall back to the invoice date rather than inventing issue_date + 14.
+      due_date: historical ? null : (dueDate || null),
       currency: 'EUR',
       notes: notes.trim() || null,
+      // Historical entries keep the owner's ORIGINAL document reference here.
+      // It is deliberately non-authoritative: the canonical RE-YYYY-NNNN number
+      // is still assigned server-side and is never typed in the browser.
+      ...(historical && externalReference.trim() ? { external_reference: externalReference.trim() } : {}),
     };
     return { header, lineInputs };
+  };
+
+  /**
+   * Historical entry. ONE server call that creates, issues and pays in a single
+   * transaction, so this can never leave an issued-but-unpaid invoice behind —
+   * a settled past transaction can never become an accidental open receivable.
+   * The paid amount is not sent: the server settles against its own computed
+   * gross, guaranteeing status "Bezahlt" and an open balance of exactly zero.
+   */
+  const saveHistorical = async () => {
+    if (!validate()) return;
+    setBusy(true);
+    const { header, lineInputs } = buildPayload();
+    const { result, error, backendMissing } = await recordHistoricalPaidInvoice(header, lineInputs, {
+      payment_date: paymentDate,
+      method: paymentMethod,
+      reference: paymentReference.trim() || null,
+      note: null,
+    });
+    setBusy(false);
+    if (error || !result) {
+      onError(backendMissing
+        ? `Der Erfassungspfad für bereits bezahlte Rechnungen ist in dieser Umgebung noch nicht installiert. Bitte die Migration ${OWNER_HISTORICAL_INVOICE_MIGRATION} anwenden.`
+        : (error ?? 'Unbekannter Fehler'));
+      return;
+    }
+    reset();
+    onSaved(`Bezahlte Rechnung ${result.invoice_number ?? ''} erfasst.`.replace('  ', ' '));
   };
 
   const save = async (issueAfter: boolean) => {
@@ -467,18 +566,36 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError,
     <SlideOver
       open={open}
       onClose={busy ? () => {} : onClose}
-      title="Rechnung erstellen"
-      description="Serverseitige Berechnung und Nummernvergabe. Sie geben keine finale Rechnungsnummer ein."
+      title={historical ? 'Bereits bezahlte Rechnung erfassen' : 'Rechnung erstellen'}
+      description={
+        historical
+          ? 'Für bereits abgeschlossene Rechnungen und Zahlungen. Es wird keine E-Mail an den Kunden versendet.'
+          : 'Serverseitige Berechnung und Nummernvergabe. Sie geben keine finale Rechnungsnummer ein.'
+      }
       width="xl"
       footer={
-        <>
-          <Button variant="secondary" onClick={onClose} disabled={busy}>Abbrechen</Button>
-          <Button variant="secondary" onClick={() => void save(false)} loading={busy}>Als Entwurf speichern</Button>
-          <Button onClick={() => void save(true)} loading={busy}>Rechnung stellen</Button>
-        </>
+        historical ? (
+          <>
+            <Button variant="secondary" onClick={onClose} disabled={busy}>Abbrechen</Button>
+            <Button onClick={() => void saveHistorical()} loading={busy}>Als bezahlt erfassen</Button>
+          </>
+        ) : (
+          <>
+            <Button variant="secondary" onClick={onClose} disabled={busy}>Abbrechen</Button>
+            <Button variant="secondary" onClick={() => void save(false)} loading={busy}>Als Entwurf speichern</Button>
+            <Button onClick={() => void save(true)} loading={busy}>Rechnung stellen</Button>
+          </>
+        )
       }
     >
       <div className="space-y-6">
+        {historical ? (
+          <InfoBanner tone="info" title="Rückwirkende Erfassung – ohne Kundenkontakt">
+            Diese Rechnung wird direkt als bezahlt gebucht: Rechnungsdatum und Zahlungsdatum bleiben
+            getrennt erhalten, der offene Betrag ist 0,00 €. Es wird <span className="font-semibold">keine
+            E-Mail, keine Zahlungserinnerung und keine Benachrichtigung</span> an den Kunden versendet.
+          </InfoBanner>
+        ) : null}
         <Card className="p-5">
           <SectionHeader title="Empfänger & Rahmendaten" />
           <div className="grid gap-4 sm:grid-cols-2">
@@ -503,18 +620,31 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError,
                 Neuen Kunden anlegen
               </button>
             </div>
-            <Field id="issueDate" label="Rechnungsdatum" type="date" value={issueDate} onChange={setIssueDate} />
+            <Field id="issueDate" label="Rechnungsdatum" type="date" value={issueDate} onChange={setIssueDateSynced} error={fieldErrors.issueDate} hint={historical ? 'Datum der ursprünglichen Rechnung' : undefined} />
             <Select id="serviceMode" label="Leistung" value={serviceMode} onChange={(v) => setServiceMode(v as 'date' | 'period')} options={[{ value: 'date', label: 'Leistungsdatum' }, { value: 'period', label: 'Leistungszeitraum' }]} />
             {serviceMode === 'date' ? (
-              <Field id="serviceDate" label="Leistungsdatum" type="date" value={serviceDate} onChange={setServiceDate} />
+              <Field id="serviceDate" label="Leistungsdatum" type="date" value={serviceDate} onChange={(v) => { setServiceTouched(true); setServiceDate(v); }} />
             ) : (
               <div className="grid grid-cols-2 gap-3">
                 <Field id="spStart" label="Zeitraum von" type="date" value={servicePeriodStart} onChange={setServicePeriodStart} />
                 <Field id="spEnd" label="Zeitraum bis" type="date" value={servicePeriodEnd} onChange={setServicePeriodEnd} />
               </div>
             )}
-            <Select id="terms" label="Zahlungsziel" value={terms} onChange={setTerms} options={[{ value: '0', label: 'Sofort' }, { value: '7', label: '7 Tage' }, { value: '14', label: '14 Tage' }, { value: '30', label: '30 Tage' }]} />
-            <Field id="due" label="Fällig am" type="date" value={dueDate} onChange={() => {}} disabled hint="Aus Rechnungsdatum + Zahlungsziel" />
+            {historical ? (
+              <Field
+                id="externalReference"
+                label="Ursprüngliche Rechnungsnummer / Beleg (optional)"
+                value={externalReference}
+                onChange={setExternalReference}
+                placeholder="z. B. 2026-014"
+                hint="Nur als Beleghinweis. Die verbindliche Nummer vergibt der Server."
+              />
+            ) : (
+              <>
+                <Select id="terms" label="Zahlungsziel" value={terms} onChange={setTerms} options={[{ value: '0', label: 'Sofort' }, { value: '7', label: '7 Tage' }, { value: '14', label: '14 Tage' }, { value: '30', label: '30 Tage' }]} />
+                <Field id="due" label="Fällig am" type="date" value={dueDate} onChange={() => {}} disabled hint="Aus Rechnungsdatum + Zahlungsziel" />
+              </>
+            )}
           </div>
           {customer ? (
             <div className="mt-4 rounded-xl border border-gray-100 bg-gray-50/70 p-4 text-[13px] text-gray-600">
@@ -571,6 +701,26 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError,
           </div>
         </Card>
 
+        {historical ? (
+          <Card className="p-5">
+            <SectionHeader
+              title="Zahlung"
+              description="Der Zahlungseingang wird mit dem vollen Bruttobetrag gebucht. Das Zahlungsdatum bestimmt die steuerliche Periode (Ist-Versteuerung) und bleibt vom Rechnungsdatum unabhängig."
+            />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field id="histPayDate" label="Zahlungsdatum" type="date" value={paymentDate} onChange={setPaymentDate} required error={fieldErrors.paymentDate} />
+              <Select id="histPayMethod" label="Zahlungsart" value={paymentMethod} onChange={setPaymentMethod} options={paymentMethods} />
+              <div className="sm:col-span-2">
+                <Field id="histPayRef" label="Zahlungsreferenz (optional)" value={paymentReference} onChange={setPaymentReference} placeholder="Verwendungszweck / Kontoauszug" />
+              </div>
+            </div>
+            <div className="mt-4 flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50/70 px-4 py-3">
+              <span className="text-[13px] text-gray-500">Wird als bezahlt gebucht</span>
+              <span className="text-base font-semibold tabular-nums text-gray-950">{formatCents(totals.gross)}</span>
+            </div>
+          </Card>
+        ) : null}
+
         <Card className="p-5">
           <SectionHeader title="Notizen & Vorschau" />
           <Textarea id="notes" label="Interne Notizen (optional)" value={notes} onChange={setNotes} rows={2} />
@@ -584,7 +734,9 @@ function InvoiceComposer({ open, entityId, customers, onClose, onSaved, onError,
           </div>
           {fieldErrors.form ? <p className="mt-3 text-[13px] text-red-600">{fieldErrors.form}</p> : null}
           <InfoBanner tone="info" title="Server-autoritative Nummerierung">
-            Die finale Rechnungsnummer wird erst beim Stellen concurrency-sicher pro Geschäftseinheit vergeben — nicht manuell.
+            {historical
+              ? 'Auch rückwirkend erfasste Rechnungen erhalten ihre Nummer aus derselben fortlaufenden Reihe der Geschäftseinheit — concurrency-sicher und nicht manuell.'
+              : 'Die finale Rechnungsnummer wird erst beim Stellen concurrency-sicher pro Geschäftseinheit vergeben — nicht manuell.'}
           </InfoBanner>
         </Card>
       </div>

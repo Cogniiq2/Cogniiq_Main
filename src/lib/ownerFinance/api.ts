@@ -163,6 +163,61 @@ export async function createOwnerInvoice(header: Record<string, unknown>, lines:
   return { id: (data as { invoice_id?: string })?.invoice_id ?? null, error: null };
 }
 
+export interface HistoricalPaymentInput {
+  /** Zahlungsdatum — stored independently of the invoice date. */
+  payment_date: string;
+  method?: string | null;
+  reference?: string | null;
+  note?: string | null;
+}
+
+export interface HistoricalPaidInvoiceResult {
+  invoice_id: string;
+  invoice_number: string | null;
+  status: string;
+  payment_id: string | null;
+  amount_paid_cents: number;
+  gross_total_cents: number;
+}
+
+/**
+ * Record an already-settled historical invoice: draft + server-numbered issuance
+ * + full payment, in ONE server transaction.
+ *
+ * Deliberately a single RPC rather than createOwnerInvoice → issueOwnerInvoice →
+ * recordInvoicePayment: composing the three client-side can leave an issued but
+ * unpaid invoice behind if the last call fails, turning a settled historical
+ * transaction into an accidental open receivable.
+ *
+ * NO CUSTOMER-FACING SIDE EFFECT. Every e-mail in this system is produced by an
+ * owner_automation_jobs row, and all three enqueue functions are keyed on an
+ * OFFER. This path creates no offer and no job, and the RPC touches neither
+ * table — so nothing is sent, regardless of what the UI does.
+ *
+ * The paid amount is NOT passed from the browser: the server pays the invoice
+ * off against its own trigger-computed gross_total_cents, so the result is
+ * always exactly paid-in-full with a zero open balance.
+ */
+export async function recordHistoricalPaidInvoice(
+  header: Record<string, unknown>,
+  lines: InvoiceLineInput[],
+  payment: HistoricalPaymentInput,
+): Promise<{ result: HistoricalPaidInvoiceResult | null; error: string | null; backendMissing: boolean }> {
+  const { data, error } = await supabase.rpc('record_owner_historical_paid_invoice', {
+    p_idempotency_key: secureUuid(),
+    p_header: header,
+    p_lines: lines,
+    p_payment: payment,
+  });
+  // A not-yet-applied migration must read as "install the migration", not as a
+  // generic bookkeeping failure — the same distinction the cockpit boot probe makes.
+  if (error) return { result: null, error: error.message, backendMissing: isMissingBackendError(error) };
+  return { result: (data as HistoricalPaidInvoiceResult) ?? null, error: null, backendMissing: false };
+}
+
+/** Migration that provisions the historical already-paid invoice entry path. */
+export const OWNER_HISTORICAL_INVOICE_MIGRATION = '20260826120000_owner_historical_paid_invoice.sql';
+
 export async function issueOwnerInvoice(invoiceId: string): Promise<{ result: Record<string, unknown> | null; error: string | null }> {
   const { data, error } = await supabase.rpc('issue_owner_invoice', { p_idempotency_key: secureUuid(), p_invoice_id: invoiceId });
   if (error) return { result: null, error: error.message };
@@ -299,7 +354,13 @@ export async function loadTaxEstimates(entityId: string, year: number): Promise<
   return (data ?? []) as OwnerTaxEstimate[];
 }
 
-export async function saveTaxEstimate(entityId: string, snapshot: Partial<OwnerTaxEstimate> & { tax_year: number; tax_type: string; rules_version: string }): Promise<{ error: string | null }> {
+/**
+ * Append an immutable tax snapshot. `period` is written explicitly (the column has
+ * existed since the cockpit migration) so a stored row always states which
+ * Auswertungszeitraum it belongs to and an annual snapshot can never later be
+ * mistaken for — or overwritten by — a quarterly one.
+ */
+export async function saveTaxEstimate(entityId: string, snapshot: Partial<OwnerTaxEstimate> & { tax_year: number; tax_type: string; rules_version: string; period: string }): Promise<{ error: string | null }> {
   const createdBy = await currentUserId();
   const { error } = await supabase.from('owner_tax_estimates').insert({ business_entity_id: entityId, created_by: createdBy, ...snapshot });
   return { error: error?.message ?? null };

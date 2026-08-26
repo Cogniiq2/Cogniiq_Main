@@ -134,6 +134,7 @@ export function InvoiceDetailPage() {
 
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <StatusBadge label={statusLabel[invoice.status] ?? invoice.status} tone={invoiceStatusTone[invoice.status]} />
+        {invoice.historical_entry ? <StatusBadge label="Historisch erfasst" tone="neutral" /> : null}
         <span className="text-[13px] text-gray-500">Datum {formatDateDe(invoice.issue_date)} · Fällig {formatDateDe(invoice.due_date)}</span>
         {invoice.external_reference?.startsWith('Angebot') ? <span className="text-[13px] text-gray-400">aus {invoice.external_reference}</span> : null}
       </div>
