@@ -37,3 +37,6 @@ graphify-out/
 # never part of the repository.
 supabase/.temp/
 supabase/.branches/
+
+# wrangler pages dev local asset cache
+.wrangler/

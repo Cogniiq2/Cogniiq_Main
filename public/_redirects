@@ -1,4 +1,23 @@
-# Netlify routing. First matching rule wins, and a rule is only consulted when no
+# Routing for Netlify AND for Cloudflare Pages.
+#
+# ── The rewrite target has NO .html extension, and that is load-bearing. ─────
+# Cloudflare Pages evaluates these rules BEFORE Pages Functions and then
+# canonicalises an .html target to its pretty path. A rule pointing at
+# "/app-shell.html" therefore did not serve the shell at all: it returned a
+# bodyless 307 to /app-shell, functions/_middleware.ts never ran, and the
+# browser received a document with no <script> at all. That is what made every
+# private deep link a blank white page with zero JS requests. Verified with
+# `wrangler pages dev dist` — see .github/scripts/test-pages-routing.mjs.
+# Pointing at "/app-shell" instead serves the real 10 KB shell body directly.
+#
+# Both hosts resolve "/app-shell" to app-shell.html by the same pretty-URL
+# lookup that serves every prerendered public route, so the target is portable.
+#
+# scripts/lib/private-routing.mjs is the shared source of truth for which
+# prefixes are private, and .github/scripts/test-pages-routing.mjs asserts that
+# this file still agrees with it.
+#
+# First matching rule wins, and a rule is only consulted when no
 # static file matches the request — so the prerendered public pages written by
 # scripts/prerender.mjs (dist/<route>/index.html) are served directly and never
 # reach these rules.
@@ -9,10 +28,10 @@
 #      and guarded by ProtectedRoute / PlatformAdminRoute / PlatformOwnerRoute, so
 #      the shell must still be served for deep links and page reloads.
 #
-#      The target is /app-shell.html, NOT /index.html: index.html is now the
+#      The target is /app-shell, NOT /index.html: index.html is now the
 #      prerendered HOMEPAGE, so falling back to it would serve marketing markup
 #      (with the homepage canonical and an indexable robots tag) on the customer
-#      portal and then discard it all on hydration. /app-shell.html is the
+#      portal and then discard it all on hydration. app-shell.html is the
 #      untouched client template with an empty #root, marked noindex.
 #
 #      Both the exact prefix root AND its deep paths are listed: on Netlify
@@ -23,16 +42,16 @@
 #      every unknown URL with the homepage shell at HTTP 200, which turned the
 #      entire unknown URL space into a soft 404.
 
-/app                /app-shell.html   200
-/app/*              /app-shell.html   200
-/admin              /app-shell.html   200
-/admin/*            /app-shell.html   200
-/owner              /app-shell.html   200
-/owner/*            /app-shell.html   200
-/auth               /app-shell.html   200
-/auth/*             /app-shell.html   200
-/d                  /app-shell.html   200
-/d/*                /app-shell.html   200
+/app                /app-shell     200
+/app/*              /app-shell     200
+/admin              /app-shell     200
+/admin/*            /app-shell     200
+/owner              /app-shell     200
+/owner/*            /app-shell     200
+/auth               /app-shell     200
+/auth/*             /app-shell     200
+/d                  /app-shell     200
+/d/*                /app-shell     200
 
 # @netlify-canonical-rewrites
 # NETLIFY ONLY. When the build runs on Netlify (NETLIFY=true),
@@ -53,4 +72,9 @@
 # duplicate variant that carries the canonical "/route" in its <link rel=
 # "canonical">, which is what consolidates it.
 
+# NETLIFY ONLY IN PRACTICE. Cloudflare Pages rejects this rule outright —
+# `wrangler pages dev` reports "Valid status codes are 200, 301, 302, 303, 307,
+# or 308. Got 404." — and drops it. On Pages an unknown URL therefore falls
+# through to functions/_middleware.ts, which serves /404 with a real 404 status.
+# The rule is kept because it IS honoured on Netlify.
 /*                  /404.html         404

@@ -179,8 +179,12 @@ for (const prefix of PRIVATE_PREFIXES) {
     // Must target the dedicated empty shell, never /index.html — that file is the
     // prerendered homepage, so private routes would serve marketing markup with
     // the homepage canonical on it.
-    if (!spa || spa[1] !== '/app-shell.html' || spa[2] !== '200') {
-      fail(`public/_redirects must serve /app-shell.html at 200 for ${pattern}`);
+    //
+    // And by its PRETTY path, never '/app-shell.html': Cloudflare Pages
+    // canonicalises an .html rewrite target to a bodyless 307, which the
+    // middleware re-emitted at HTTP 200 — a script-less blank page.
+    if (!spa || spa[1] !== '/app-shell' || spa[2] !== '200') {
+      fail(`public/_redirects must serve /app-shell at 200 for ${pattern}`);
     }
     const esc = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     if (!new RegExp(`^${esc}\\s*\\n\\s*X-Robots-Tag:\\s*noindex, nofollow, noarchive`, 'm').test(headersSrc)) {
@@ -197,8 +201,18 @@ if (!failures.some((f) => f.includes('_redirects') || f.includes('_headers'))) {
 // contract is pinned so the guarantees cannot be quietly removed from the
 // generator without CI noticing, build or no build.
 const prerenderSrc = read('scripts/prerender.mjs');
+// The shell's filename now comes from the shared private-route contract, which
+// also pins the PRETTY path public/_redirects must target.
+const privateRoutingSrc = read('scripts/lib/private-routing.mjs');
 for (const [re, label] of [
-  [/const SHELL_FILE = 'app-shell\.html'/, 'the private shell is app-shell.html'],
+  [/const PRIVATE_SHELL_FILE = 'app-shell\.html'/, 'the private shell file is app-shell.html'],
+  [/const PRIVATE_SHELL = '\/app-shell'/, "the private shell is addressed as '/app-shell', never '/app-shell.html'"],
+]) {
+  if (!re.test(privateRoutingSrc)) fail(`Private routing contract: expected ${label}`);
+  else ok(label);
+}
+for (const [re, label] of [
+  [/const SHELL_FILE = PRIVATE_SHELL_FILE/, 'the prerenderer uses the shared shell filename'],
   [/Private SPA shell still carries a canonical link/, 'shell generation fails if a canonical survives'],
   [/Private SPA shell is not noindex/, 'shell generation fails if the shell is not noindex'],
   [/Private SPA shell lost its empty #root marker/, 'shell generation fails if #root is not empty'],

@@ -118,6 +118,17 @@ jobs:
       - name: Deployment cache-header safety
         run: node .github/scripts/test-deploy-cache-headers.mjs
 
+      # The routing contract against the REAL Cloudflare Pages runtime, which is
+      # what actually serves cogniiq.de. `wrangler pages dev dist` executes
+      # public/_redirects, public/_headers and functions/_middleware.ts exactly
+      # as the edge does. This exists because a fix validated only against a
+      # hand-written model shipped a preview in which every private deep link
+      # was still blank: Pages canonicalised the "/app-shell.html" rewrite
+      # target to a bodyless 307 and the middleware re-emitted it at HTTP 200,
+      # so the browser fetched no JS at all.
+      - name: Cloudflare Pages routing contract (wrangler pages dev)
+        run: node .github/scripts/test-pages-routing.mjs
+
       # The customer offer portal (/d/:token) opened from an email must never be a blank
       # white page. Runs against the built artifact in a real browser: a failed lazy chunk
       # once reload-looped forever and painted nothing, which no component test can catch.

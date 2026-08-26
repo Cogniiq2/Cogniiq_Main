@@ -103,9 +103,10 @@ try {
 }
 
 // ── The Pages Function must keep the same policy ────────────────────────────
-// wrangler.jsonc declares a Workers Assets project, where functions/ does NOT
-// execute — which is exactly why _headers above must carry the policy too. Both
-// paths are asserted so neither deployment mode can regress silently.
+// Cloudflare Pages evaluates _redirects BEFORE Pages Functions, so a private
+// deep link is answered by the /app-shell rewrite and the middleware never runs
+// for it — which is exactly why _headers above must carry the policy too. Both
+// paths are asserted so neither can regress silently.
 const middleware = readFileSync(join(ROOT, 'functions', '_middleware.ts'), 'utf8');
 /headers\.set\(\s*['"]Cache-Control['"]\s*,\s*['"]no-cache/i.test(middleware)
   ? ok('middleware still sets Cache-Control: no-cache on HTML')
