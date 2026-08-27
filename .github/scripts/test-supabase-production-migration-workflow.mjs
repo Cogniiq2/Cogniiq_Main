@@ -109,18 +109,57 @@ assertStepIncludes('Verify expected migration exists', 'test -f "migration-sourc
 
 /* ------------------------------------------------------------------ isolation proof */
 
-const isolationBlock = stepBlock('Create isolated migration workspace');
-assertIncludes(isolationBlock, "if: ${{ inputs.mode != 'audit-history' }}", 'Isolation must run only outside audit-history mode');
-assertIncludes(isolationBlock, 'tar -C migration-source --exclude=.git -cf - . | tar -C "$isolated_root" -xf -', 'Isolation must copy the selected source workspace');
-assertIncludes(isolationBlock, 'find "$isolated_migrations" -mindepth 1 -maxdepth 1 ! -name "$TARGET_MIGRATION" -exec rm -rf {} +', 'Isolation must remove every non-target migration directory entry');
-assertIncludes(isolationBlock, 'if [ "${#remaining_entries[@]}" -ne 1 ]; then', 'Isolation must require exactly one directory entry');
-assertIncludes(isolationBlock, 'if [ "${remaining_entries[0]}" != "$TARGET_MIGRATION" ]; then', 'Isolation must require the exact selected migration entry');
-assertIncludes(isolationBlock, 'if [ "${#remaining_migrations[@]}" -ne 1 ]; then', 'Isolation must require exactly one SQL migration');
-assertIncludes(isolationBlock, 'if [ "${remaining_migrations[0]}" != "$TARGET_MIGRATION" ]; then', 'Isolation must require the exact selected migration filename');
-assertIncludes(isolationBlock, 'source_sha_before', 'Isolation must hash the source migration before copying');
-assertIncludes(isolationBlock, 'source_sha_after', 'Isolation must verify the source migration was not modified');
-assertIncludes(isolationBlock, 'isolated_sha_after', 'Isolation must verify the isolated migration was not modified');
-assertIncludes(isolationBlock, 'Non-selected migrations remain in the isolated workspace.', 'Isolation must fail if any non-selected migration remains');
+// The invariant changed: "exactly one SQL file in the directory" was unsatisfiable, because
+// db push refuses to run while the remote history holds versions with no local file. The
+// directory is now emptied, repopulated from the real remote history by the READ-ONLY
+// `migration fetch --linked`, and the target restored — leaving EXACTLY ONE local-only
+// migration, which is what push actually acts on. These assertions pin that whole sequence.
+
+const stageBlock = stepBlock('Stage target and empty the isolated migrations directory');
+assertIncludes(stageBlock, "if: ${{ inputs.mode != 'audit-history' }}", 'Staging must run only outside audit-history mode');
+assertIncludes(stageBlock, 'tar -C migration-source --exclude=.git -cf - . | tar -C "$isolated_root" -xf -', 'Staging must copy the selected source workspace');
+assertIncludes(stageBlock, 'target_staging="$RUNNER_TEMP/$TARGET_MIGRATION"', 'Target must be parked OUTSIDE the migrations directory');
+assertIncludes(stageBlock, 'source_sha="$(sha256sum "$source_migration"', 'Staging must hash the source migration');
+assertIncludes(stageBlock, 'staged_sha="$(sha256sum "$target_staging"', 'Staging must hash the staged copy');
+assertIncludes(stageBlock, 'rm -rf "$isolated_migrations"', 'Staging must empty the migrations directory completely');
+assertIncludes(stageBlock, 'Isolated migrations directory is not empty', 'Staging must prove the directory is empty');
+assertIncludes(stageBlock, 'Target must not be present in the migrations directory at this point.', 'Staging must prove the target is absent before the fetch');
+
+const fetchBlock = stepBlock('Fetch remote migration history into the isolated workspace');
+assertIncludes(fetchBlock, "if: ${{ inputs.mode != 'audit-history' }}", 'Fetch must run only outside audit-history mode');
+assertIncludes(fetchBlock, 'supabase migration fetch --linked', 'Reconciliation must use the read-only migration fetch');
+assertStepWorkingDirectory('Fetch remote migration history into the isolated workspace', 'isolated-migration-source');
+
+const fetchedGate = stepBlock('Verify fetched history matches the remote history exactly');
+assertIncludes(fetchedGate, 'verify-supabase-reconciliation.mjs fetched', 'Fetched-history audit must run');
+assertIncludes(fetchedGate, '--remote-before supabase-migration-list.txt', 'Fetched-history audit must compare against the pre-fetch remote snapshot');
+assertIncludes(fetchedGate, '--target-version "$TARGET_MIGRATION_VERSION"', 'Fetched-history audit must re-check the target is not already applied');
+
+const restoreBlock = stepBlock('Restore the selected target migration');
+assertIncludes(restoreBlock, 'cp "$TARGET_STAGING_PATH" "$restored"', 'Only the staged target may be restored');
+assertIncludes(restoreBlock, 'restored_sha=', 'Restore must hash the restored file');
+assertIncludes(restoreBlock, 'Target already exists in the reconciled workspace', 'Restore must refuse if the fetch produced the target');
+
+const finalGate = stepBlock('Verify isolated workspace has exactly one pending migration');
+assertIncludes(finalGate, 'verify-supabase-reconciliation.mjs final', 'Final isolation proof must run');
+assertIncludes(finalGate, '--final-list supabase-migration-list-reconciled.txt', 'Final proof must read the post-reconciliation list');
+assertIncludes(finalGate, '--source-sha "$TARGET_SOURCE_SHA"', 'Final proof must check the source SHA');
+assertIncludes(finalGate, '--staged-sha "$TARGET_STAGED_SHA"', 'Final proof must check the staged SHA');
+assertIncludes(finalGate, '--restored-sha "$TARGET_RESTORED_SHA"', 'Final proof must check the restored SHA');
+
+for (const [earlier, later] of [
+  ['Stage target and empty the isolated migrations directory', 'Fetch remote migration history into the isolated workspace'],
+  ['Fetch remote migration history into the isolated workspace', 'Verify fetched history matches the remote history exactly'],
+  ['Verify fetched history matches the remote history exactly', 'Restore the selected target migration'],
+  ['Restore the selected target migration', 'List migration history after reconciliation'],
+  ['List migration history after reconciliation', 'Verify isolated workspace has exactly one pending migration'],
+  ['Verify isolated workspace has exactly one pending migration', 'Dry run migration push'],
+]) {
+  assert(
+    workflowText.indexOf(`- name: ${earlier}`) < workflowText.indexOf(`- name: ${later}`),
+    `${earlier} must run before ${later}`,
+  );
+}
 
 /* ------------------------------------------------------------------ mode routing */
 
@@ -198,11 +237,38 @@ assert(/--request\s+(POST|PUT|PATCH|DELETE)/.test(advisorBlock) === false, 'Advi
 
 /* ------------------------------------------------------------------ global bans */
 
-assertNotIncludes(workflowText, '--include-all', 'Workflow must not use --include-all');
-assertNotIncludes(workflowText, '--include-seed', 'Workflow must not use --include-seed');
-assertNotIncludes(workflowText, '--include-roles', 'Workflow must not use --include-roles');
-assertNotIncludes(workflowText, 'migration repair', 'Workflow must not run migration repair');
-assertNotIncludes(workflowText, 'db reset', 'Workflow must not run db reset');
+// Comments legitimately NAME the forbidden commands — the workflow documents WHY
+// `migration repair` is refused — so only executable lines count. This mirrors how the
+// finance SQL write-safety test separates commentary from code.
+const executableWorkflow = workflowText
+  .split('\n')
+  .filter((line) => !line.trimStart().startsWith('#'))
+  .join('\n');
+
+assertNotIncludes(executableWorkflow, '--include-all', 'Workflow must not use --include-all');
+assertNotIncludes(executableWorkflow, '--include-seed', 'Workflow must not use --include-seed');
+assertNotIncludes(executableWorkflow, '--include-roles', 'Workflow must not use --include-roles');
+assertNotIncludes(executableWorkflow, 'migration repair', 'Workflow must not run migration repair');
+assertNotIncludes(executableWorkflow, 'db reset', 'Workflow must not run db reset');
+assertNotIncludes(executableWorkflow, 'db pull', 'Workflow must not run db pull');
+assertNotIncludes(executableWorkflow, 'migration up', 'Workflow must not run migration up');
+assertNotIncludes(executableWorkflow, 'migration squash', 'Workflow must not run migration squash');
+
+// `migration fetch` is the ONLY Supabase command the reconciliation design added. Pinning
+// the whole command set means a future edit cannot quietly introduce another one — most
+// importantly not `migration repair`, whose write to remote history is exactly what this
+// design exists to avoid.
+{
+  const supabaseCommands = [
+    // The second word is a subcommand, never a flag, so `--project-ref` is not captured.
+    ...new Set([...executableWorkflow.matchAll(/supabase ([a-z]+(?: (?!--)[a-z-]+)?)/g)].map((m) => m[1])),
+  ].sort();
+  const allowed = ['db dump', 'db push', 'link', 'migration fetch', 'migration list'].sort();
+  assert(
+    JSON.stringify(supabaseCommands) === JSON.stringify(allowed),
+    `Supabase commands drifted.\n  found:   ${JSON.stringify(supabaseCommands)}\n  allowed: ${JSON.stringify(allowed)}`,
+  );
+}
 assertNotIncludes(workflowText, 'database/backups/restore', 'Workflow must never call a backup write endpoint');
 
 // The protected club-operations migrations must never be selectable.

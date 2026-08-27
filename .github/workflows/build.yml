@@ -48,6 +48,9 @@ jobs:
       - name: Supabase migration ledger + dependency gate tests
         run: node .github/scripts/test-supabase-migration-ledger.mjs
 
+      - name: Supabase isolated-workspace reconciliation tests
+        run: node .github/scripts/test-supabase-migration-reconcile.mjs
+
       - name: Invitation status helper unit tests
         run: node .github/scripts/test-invitation-status.mjs
 

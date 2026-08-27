@@ -7,10 +7,13 @@ name: Supabase Production Migration
 # hard-wired, and every derived value — path, version, confirmation string — comes from the
 # validated selection rather than from separate operator input.
 #
-# The isolated-workspace architecture is the load-bearing part: `supabase db push` runs in a
-# directory containing exactly ONE migration file, so it is physically incapable of applying
-# anything else. That is what keeps unrelated pending migrations (the club-operations pair)
-# out of production without relying on the CLI to be told the right thing.
+# The isolated-workspace architecture is the load-bearing part. The migrations directory is
+# emptied and then repopulated ONLY from the real remote migration history (read-only
+# `supabase migration fetch --linked`), after which the selected target is restored. The
+# resulting invariant is that EXACTLY ONE local-only migration exists and it is the target,
+# so `db push` is physically incapable of applying anything else. That is what keeps the
+# unrelated club-operations migrations out of production without relying on the CLI to be
+# told the right thing, and without ever mutating remote migration history.
 
 on:
   workflow_dispatch:
@@ -134,9 +137,25 @@ jobs:
         run: node .github/scripts/test-supabase-production-migration-workflow.mjs
 
       # Safety gate: audit-history intentionally inspects the complete selected source
-      # branch, but dry-run/apply must never include any migration other than the selected
-      # one.
-      - name: Create isolated migration workspace
+      # branch. For dry-run/apply the workspace is rebuilt from scratch: the selected target
+      # is parked OUTSIDE the migrations directory, the directory is emptied, and it is then
+      # repopulated ONLY from the real remote migration history (read-only `migration fetch`).
+      #
+      # The old invariant — "exactly one SQL file exists in supabase/migrations" — is
+      # unsatisfiable against this database. `supabase db push` refuses to run when the
+      # remote history contains versions with no local file, and production has remote-only
+      # versions (including two whose SQL exists nowhere in this repository). The CLI's own
+      # suggestion, `migration repair --status reverted`, would MUTATE production migration
+      # history and is forbidden here.
+      #
+      # The replacement invariant is strictly stronger, because it bounds what `db push`
+      # actually acts on rather than bounding the directory and inferring the rest:
+      #
+      #     EXACTLY ONE local-only migration exists, and it is the selected target.
+      #
+      # Every other local file corresponds to an already-applied remote version, which push
+      # skips by definition and never executes.
+      - name: Stage target and empty the isolated migrations directory
         if: ${{ inputs.mode != 'audit-history' }}
         shell: bash
         run: |
@@ -145,61 +164,49 @@ jobs:
           source_migration="migration-source/$TARGET_MIGRATION_PATH"
           isolated_root="$ISOLATED_SOURCE_DIR"
           isolated_migrations="$isolated_root/supabase/migrations"
-          isolated_migration="$isolated_root/$TARGET_MIGRATION_PATH"
+          target_staging="$RUNNER_TEMP/$TARGET_MIGRATION"
 
           test -f "$source_migration"
-          source_sha_before="$(sha256sum "$source_migration" | awk '{print $1}')"
+          source_sha="$(sha256sum "$source_migration" | awk '{print $1}')"
 
           rm -rf "$isolated_root"
           mkdir -p "$isolated_root"
           tar -C migration-source --exclude=.git -cf - . | tar -C "$isolated_root" -xf -
 
-          test -f "$isolated_migration"
-          isolated_sha_before="$(sha256sum "$isolated_migration" | awk '{print $1}')"
-          if [ "$source_sha_before" != "$isolated_sha_before" ]; then
-            echo "Isolated migration does not match the selected source file."
+          # Park the target outside the workspace while the directory is emptied and
+          # refilled from remote history, so nothing that happens in between can touch it.
+          rm -f "$target_staging"
+          cp "$isolated_root/$TARGET_MIGRATION_PATH" "$target_staging"
+          staged_sha="$(sha256sum "$target_staging" | awk '{print $1}')"
+          if [ "$source_sha" != "$staged_sha" ]; then
+            echo "Staged target does not match the source-branch file."
             exit 1
           fi
 
-          find "$isolated_migrations" -mindepth 1 -maxdepth 1 ! -name "$TARGET_MIGRATION" -exec rm -rf {} +
+          # Empty completely. Every migration on the source branch — including the
+          # unrelated club-operations pair — is removed here. The directory is repopulated
+          # ONLY by `supabase migration fetch --linked`, so a file can reach the push
+          # workspace only by already being applied in production.
+          rm -rf "$isolated_migrations"
+          mkdir -p "$isolated_migrations"
 
-          mapfile -t remaining_entries < <(find "$isolated_migrations" -mindepth 1 -maxdepth 1 -printf '%f\n' | sort)
-          if [ "${#remaining_entries[@]}" -ne 1 ]; then
-            echo "Expected exactly one entry in the isolated migrations directory, found ${#remaining_entries[@]}."
-            printf '%s\n' "${remaining_entries[@]}"
+          remaining="$(find "$isolated_migrations" -mindepth 1 | wc -l)"
+          if [ "$remaining" -ne 0 ]; then
+            echo "Isolated migrations directory is not empty ($remaining entr(y|ies) remain)."
+            exit 1
+          fi
+          if [ -e "$isolated_migrations/$TARGET_MIGRATION" ]; then
+            echo "Target must not be present in the migrations directory at this point."
             exit 1
           fi
 
-          if [ "${remaining_entries[0]}" != "$TARGET_MIGRATION" ]; then
-            echo "Unexpected entry remained in the isolated migrations directory: ${remaining_entries[0]}"
-            exit 1
-          fi
+          {
+            echo "TARGET_STAGING_PATH=$target_staging"
+            echo "TARGET_SOURCE_SHA=$source_sha"
+            echo "TARGET_STAGED_SHA=$staged_sha"
+          } >> "$GITHUB_ENV"
 
-          mapfile -t remaining_migrations < <(find "$isolated_migrations" -maxdepth 1 -type f -name '*.sql' -printf '%f\n' | sort)
-          if [ "${#remaining_migrations[@]}" -ne 1 ]; then
-            echo "Expected exactly one SQL migration in the isolated workspace, found ${#remaining_migrations[@]}."
-            printf '%s\n' "${remaining_migrations[@]}"
-            exit 1
-          fi
-
-          if [ "${remaining_migrations[0]}" != "$TARGET_MIGRATION" ]; then
-            echo "Unexpected migration remained in the isolated workspace: ${remaining_migrations[0]}"
-            exit 1
-          fi
-
-          source_sha_after="$(sha256sum "$source_migration" | awk '{print $1}')"
-          isolated_sha_after="$(sha256sum "$isolated_migration" | awk '{print $1}')"
-          if [ "$source_sha_before" != "$source_sha_after" ] || [ "$source_sha_before" != "$isolated_sha_after" ]; then
-            echo "Selected migration changed while creating the isolated workspace."
-            exit 1
-          fi
-
-          if find "$isolated_migrations" -mindepth 1 -maxdepth 1 ! -name "$TARGET_MIGRATION" | grep -q .; then
-            echo "Non-selected migrations remain in the isolated workspace."
-            exit 1
-          fi
-
-          echo "Isolated workspace contains exactly one migration: $TARGET_MIGRATION"
+          echo "Isolated migrations directory emptied; target staged at $target_staging"
 
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
@@ -280,6 +287,83 @@ jobs:
       - name: Verify remote migration dependencies
         if: ${{ inputs.mode != 'audit-history' }}
         run: node .github/scripts/verify-supabase-migration-deps.mjs supabase-migration-list.txt "$TARGET_MIGRATION"
+
+      # Repopulate the emptied migrations directory from the REAL remote migration history.
+      #
+      # `migration fetch` is read-only with respect to the remote database: it reads the
+      # linked project's migration history and writes local files from it. It does not
+      # execute SQL, does not alter schema_migrations, and does not touch schema. It is the
+      # official read-only alternative to `migration repair`, which would mutate production
+      # history and is banned in this workflow.
+      #
+      # The files it creates are versions that are ALREADY applied remotely, so `db push`
+      # skips every one of them. They exist purely so the CLI's reconciliation check passes.
+      - name: Fetch remote migration history into the isolated workspace
+        if: ${{ inputs.mode != 'audit-history' }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        working-directory: isolated-migration-source
+        run: supabase migration fetch --linked
+
+      # Safety gate: audit exactly what the fetch created. The set of files produced must
+      # equal the set of remote versions captured BEFORE the fetch — no more, no fewer, none
+      # malformed. A fetched file with no corresponding remote version would mean the
+      # workspace gained a migration from somewhere other than production history, which is
+      # the single thing this design exists to prevent.
+      - name: Verify fetched history matches the remote history exactly
+        if: ${{ inputs.mode != 'audit-history' }}
+        run: |
+          node .github/scripts/verify-supabase-reconciliation.mjs fetched \
+            --remote-before supabase-migration-list.txt \
+            --migrations-dir "$ISOLATED_SOURCE_DIR/supabase/migrations" \
+            --target-version "$TARGET_MIGRATION_VERSION"
+
+      # Restore ONLY the staged target. Nothing else from the source branch returns to this
+      # directory, so the unrelated club-operations migrations cannot reappear.
+      - name: Restore the selected target migration
+        if: ${{ inputs.mode != 'audit-history' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          isolated_migrations="$ISOLATED_SOURCE_DIR/supabase/migrations"
+          restored="$isolated_migrations/$TARGET_MIGRATION"
+
+          if [ -e "$restored" ]; then
+            echo "Target already exists in the reconciled workspace, which means it is already applied remotely."
+            exit 1
+          fi
+
+          cp "$TARGET_STAGING_PATH" "$restored"
+          restored_sha="$(sha256sum "$restored" | awk '{print $1}')"
+          echo "TARGET_RESTORED_SHA=$restored_sha" >> "$GITHUB_ENV"
+          echo "Restored $TARGET_MIGRATION into the reconciled workspace"
+
+      - name: List migration history after reconciliation
+        if: ${{ inputs.mode != 'audit-history' }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        working-directory: isolated-migration-source
+        run: |
+          set -o pipefail
+          supabase migration list 2>&1 | tee ../supabase-migration-list-reconciled.txt
+
+      # THE isolation proof. Replaces "exactly one SQL file in the directory" with the
+      # stronger, directly relevant claim: exactly ONE local-only migration exists and it is
+      # the selected target — plus every remote version now has a local file, the target is
+      # genuinely pending (blank Remote), prerequisites are applied, the protected
+      # club-operations versions are absent from BOTH sides, and the target file is
+      # byte-identical to the source-branch file at all three points it was handled.
+      - name: Verify isolated workspace has exactly one pending migration
+        if: ${{ inputs.mode != 'audit-history' }}
+        run: |
+          node .github/scripts/verify-supabase-reconciliation.mjs final \
+            --final-list supabase-migration-list-reconciled.txt \
+            --migrations-dir "$ISOLATED_SOURCE_DIR/supabase/migrations" \
+            --target "$TARGET_MIGRATION" \
+            --source-sha "$TARGET_SOURCE_SHA" \
+            --staged-sha "$TARGET_STAGED_SHA" \
+            --restored-sha "$TARGET_RESTORED_SHA"
 
       # Safety gate: every run performs the dry run first so reviewers can see the exact
       # migration plan before apply mode reaches the write step.
