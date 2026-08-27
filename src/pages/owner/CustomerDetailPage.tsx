@@ -18,6 +18,8 @@ import {
 import { CustomerFormDialog } from '@/components/finance/CustomerFormDialog';
 import { CustomerTaskChecklist } from '@/components/finance/CustomerTaskChecklist';
 import { CustomerProjectPanel } from '@/components/finance/CustomerProjectPanel';
+import { CustomerServicesPanel } from '@/components/services/CustomerServicesPanel';
+import type { ServiceKey } from '@/lib/serviceOnboarding/types';
 import { invoiceStatusTone } from '@/pages/owner/ownerUi';
 import type {
   OwnerCustomerDetail, OwnerCustomerOfferRef, OwnerCustomerInvoiceRef, OwnerCustomerStatus,
@@ -60,6 +62,11 @@ export function CustomerDetailPage() {
   const [completeOpen, setCompleteOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  /* Reported by the services panel so the edit dialog can show which services are already
+     provisioned — and refuse to offer them for removal there. */
+  const [activeServices, setActiveServices] = useState<ServiceKey[]>([]);
+  /* Bumped after the edit dialog provisions a service, so the panel reloads its summaries. */
+  const [servicesVersion, setServicesVersion] = useState(0);
 
   const load = useCallback(async () => {
     if (!customerId) return;
@@ -197,8 +204,17 @@ export function CustomerDetailPage() {
       />
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
-        {/* Main column: offers + tasks */}
+        {/* Main column: services, offers, invoices, tasks */}
         <div className="space-y-5">
+          {/* Services come first: which Cogniiq services this customer receives, and how far each
+              delivery has progressed, is the fastest read on the whole relationship. */}
+          <CustomerServicesPanel
+            key={servicesVersion}
+            customerId={c.id}
+            onServicesChanged={() => void load()}
+            onLoaded={(services) => setActiveServices(services.filter((s) => s.state !== 'archived').map((s) => s.service_key))}
+          />
+
           <Card className="p-5">
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-[15px] font-semibold text-gray-950">Angebote</h3>
@@ -300,7 +316,8 @@ export function CustomerDetailPage() {
         <CustomerFormDialog
           open={editOpen} onClose={() => setEditOpen(false)} entityId={entity.id}
           initial={{ id: c.id, company: c.company ?? '', contact_name: c.contact_name ?? '', email: c.email ?? '', phone: c.phone ?? '', street: c.street ?? '', postal_code: c.postal_code ?? '', city: c.city ?? '', notes: c.notes ?? '' }}
-          onSaved={() => void load()} />
+          existingServices={activeServices}
+          onSaved={() => { setServicesVersion((v) => v + 1); void load(); }} />
       ) : null}
 
       <ConfirmDialog
@@ -354,6 +371,21 @@ export function CustomerDetailPage() {
                     : null,
                 ].filter(Boolean).join(' und ')}
                 .
+              </p>
+            ) : null}
+            {/*
+              Deleting a customer cascades into its service engagements — the whole onboarding
+              record: every completed step, every piece of evidence, every note and the full
+              activity history. That is not visible from the offer/invoice counts the server
+              returns, so the dialog says it explicitly rather than letting the owner find out
+              afterwards.
+            */}
+            {activeServices.length > 0 ? (
+              <p className="mt-2 text-amber-700">
+                Mitgelöscht wird außerdem das vollständige Onboarding von{' '}
+                {activeServices.length === 1 ? 'einer Leistung' : `${activeServices.length} Leistungen`}
+                {' '}— erledigte Schritte, Nachweise, Notizen und der gesamte Verlauf. Archivieren
+                Sie den Kunden, wenn diese Historie erhalten bleiben soll.
               </p>
             ) : null}
             {detail.delete_blockers.portal_documents > 0 ? (
