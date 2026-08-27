@@ -42,8 +42,22 @@ jobs:
       - name: Supabase dry-run scope verifier tests
         run: node .github/scripts/test-verify-supabase-dry-run.mjs
 
-      - name: Supabase backup / restore-point gate tests
+      - name: Supabase managed backup / PITR gate tests
         run: node .github/scripts/test-verify-supabase-backups.mjs
+
+      # The Free-plan recovery path: the logical `supabase db dump` bundle and the combined
+      # gate that decides whether a managed backup OR that bundle authorises a production
+      # write. Both must fail closed, so both are exercised on every build.
+      - name: Supabase Free-plan logical backup gate tests
+        run: node .github/scripts/test-verify-supabase-logical-backup.mjs
+
+      # This repository is public, so the gate that keeps plaintext production dumps out of
+      # uploaded artifacts is security-critical and is exercised on every build.
+      - name: Supabase backup encryption / round-trip gate tests
+        run: node .github/scripts/test-verify-supabase-backup-encryption.mjs
+
+      - name: Supabase restore-point gate tests
+        run: node .github/scripts/test-verify-supabase-restore-point.mjs
 
       - name: Supabase migration ledger + dependency gate tests
         run: node .github/scripts/test-supabase-migration-ledger.mjs

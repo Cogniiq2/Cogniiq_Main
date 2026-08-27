@@ -40,3 +40,7 @@ supabase/.branches/
 
 # wrangler pages dev local asset cache
 .wrangler/
+
+# Logical production backup bundle produced by the Supabase production migration
+# workflow. Database dumps are NEVER committed; they exist only as a run artifact.
+production-backup/

@@ -59,6 +59,19 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ISOLATED_SOURCE_DIR: isolated-migration-source
+      # The UPLOAD directory. Only ever holds the ENCRYPTED archive plus non-sensitive
+      # metadata — never a plaintext dump. Never committed.
+      BACKUP_DIR: production-backup
+      # Plaintext dumps live ONLY under $RUNNER_TEMP, outside $GITHUB_WORKSPACE, so no
+      # artifact path, glob or `git add` can reach them even by mistake. They are destroyed
+      # before the migration writes.
+      PLAINTEXT_BACKUP_SUBDIR: supabase-plaintext-backup
+      ROUNDTRIP_SUBDIR: supabase-backup-roundtrip
+      BACKUP_KEY_SUBDIR: supabase-backup-key
+      ENCRYPTED_ARCHIVE_NAME: supabase-production-backup.tar.gz.gpg
+      # Must equal the version pinned on supabase/setup-cli below; the workflow static test
+      # asserts they agree, so the manifest can record the CLI that produced the dump.
+      SUPABASE_CLI_VERSION: 2.116.0
 
     steps:
       - name: Checkout workflow tools
@@ -220,15 +233,31 @@ jobs:
 
       # Safety gate: fail closed if any required secret is missing, without printing
       # secret values.
+      #
+      # SUPABASE_BACKUP_PASSPHRASE is checked here — BEFORE a single production row is read —
+      # rather than at encryption time. This repository is PUBLIC, so a run that dumped
+      # production and only then discovered it had no way to encrypt the result would have
+      # created exactly the plaintext this design exists to prevent. Refusing early means the
+      # data is never extracted in the first place.
       - name: Verify required Supabase secrets are configured
         env:
+          MODE: ${{ inputs.mode }}
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_BACKUP_PASSPHRASE: ${{ secrets.SUPABASE_BACKUP_PASSPHRASE }}
         run: |
+          set -euo pipefail
           test -n "$SUPABASE_ACCESS_TOKEN"
           test -n "$SUPABASE_PROJECT_ID"
           test -n "$SUPABASE_DB_PASSWORD"
+
+          if [ "$MODE" = "apply" ] && [ -z "${SUPABASE_BACKUP_PASSPHRASE:-}" ]; then
+            echo "SUPABASE_BACKUP_PASSPHRASE is not configured."
+            echo "Apply mode requires it: the production backup must be encrypted before it can"
+            echo "be uploaded, because artifacts in this PUBLIC repository are world-readable."
+            exit 1
+          fi
 
       # Safety gate: apply mode requires an exact human-entered confirmation string that is
       # specific to the selected migration, so a confirmation typed for one migration can
@@ -391,12 +420,39 @@ jobs:
         if: ${{ inputs.mode == 'apply' }}
         run: node .github/scripts/verify-supabase-dry-run.mjs supabase-dry-run.txt "$TARGET_MIGRATION"
 
-      # Safety gate: refuse to apply unless a real restore source is verifiable. This is a
-      # READ-ONLY call to the Management API; it never creates or restores a backup. The
-      # response is written to a temp file, parsed by a dependency-free script that never
-      # sees the token, and deleted immediately afterwards — including on failure.
-      - name: Verify backup / restore point exists
+      # ---------------------------------------------------------------------------------
+      # RESTORE-POINT EVIDENCE (apply mode only)
+      #
+      # The original gate accepted exactly one kind of evidence: a managed Supabase backup or
+      # PITR window. That gate is correct and is still here — but this project is on the FREE
+      # plan, which provides neither, so it can never pass and every apply run stops on it.
+      #
+      # Upgrading to Pro is not the chosen answer. Supabase's documented answer for Free
+      # projects is a logical export taken with `supabase db dump`, so the gate now accepts a
+      # second, independently verified kind of evidence: a fresh logical backup created in
+      # THIS run, checksummed, and uploaded as an artifact BEFORE anything is written.
+      #
+      # A LOGICAL DUMP IS NOT PITR. It is a single snapshot with no write-ahead log to replay,
+      # so it recovers to the instant the dump ran and no finer. It is accepted because the
+      # alternative on a Free project is applying a production migration with no recovery
+      # artifact at all. Nothing about the migration-isolation design changes here: the
+      # allowlist, the emptied workspace, the read-only history reconciliation, the dry run,
+      # the dependency gate and the per-version confirmation all still run first, unchanged.
+      #
+      # The three evidence-producing steps below are `continue-on-error` on purpose. They must
+      # not be able to stop the run by themselves, because the decision belongs to ONE gate —
+      # "Verify a restore point exists before writing" — which reads their outcomes and fails
+      # closed when neither kind of evidence is usable.
+      # ---------------------------------------------------------------------------------
+
+      # Evidence A. READ-ONLY call to the Management API; it never creates or restores a
+      # backup. The response is written to a temp file, parsed by a dependency-free script
+      # that never sees the token, and deleted immediately afterwards — including on failure.
+      # On the Free plan this is expected to report nothing, which is not itself an error.
+      - name: Check managed Supabase backup / PITR availability (read-only)
+        id: managed_backup
         if: ${{ inputs.mode == 'apply' }}
+        continue-on-error: true
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
@@ -412,6 +468,297 @@ jobs:
             "https://api.supabase.com/v1/projects/$SUPABASE_PROJECT_ID/database/backups" || echo "000")"
 
           node .github/scripts/verify-supabase-backups.mjs supabase-backups.json "$http_status"
+
+      # Evidence B, part 1: take the backup. This runs AFTER the project is linked and after
+      # every isolation gate and the dry run have passed, and BEFORE the first write — so the
+      # snapshot describes production exactly as the migration is about to find it.
+      #
+      # PLAINTEXT LOCATION IS A SECURITY CONTROL. Every dump is written under $RUNNER_TEMP,
+      # which is OUTSIDE $GITHUB_WORKSPACE. This repository is PUBLIC and Actions artifacts are
+      # readable by anyone who can read the repository, so a plaintext dump sitting anywhere an
+      # artifact path could reach is a data-publication bug waiting to happen. Keeping it out
+      # of the workspace entirely means no upload path, glob or `git add` can pick it up —
+      # the protection does not depend on anyone writing the right `path:` later.
+      #
+      # `--linked` is used for every dump and `--db-url` deliberately is NOT: a connection URL
+      # would put the database password on the command line, where it would appear in the step
+      # log and in the process table. The CLI reads SUPABASE_DB_PASSWORD from the environment
+      # instead, so no credential is ever rendered into a log, a filename or a dump.
+      - name: Create Free-plan logical production backup
+        id: logical_backup
+        if: ${{ inputs.mode == 'apply' }}
+        continue-on-error: true
+        shell: bash
+        working-directory: isolated-migration-source
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          backup_dir="$RUNNER_TEMP/$PLAINTEXT_BACKUP_SUBDIR"
+          status_file="$backup_dir/dump-status.txt"
+
+          rm -rf "$backup_dir"
+          mkdir -p "$backup_dir"
+          chmod 700 "$backup_dir"
+          : > "$status_file"
+
+          echo "BACKUP_CREATED_AT_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+
+          # Record each dump's real exit status. `if` suppresses `set -e` for the command
+          # itself so the status can be written, then the failure is re-raised — which means a
+          # broken dump aborts the step and the completion sentinel below is never written.
+          run_dump() {
+            local name="$1"
+            shift
+            if supabase db dump --linked "$@" -f "$backup_dir/$name"; then
+              echo "$name=0" >> "$status_file"
+            else
+              local rc=$?
+              echo "$name=$rc" >> "$status_file"
+              return "$rc"
+            fi
+          }
+
+          # Roles, schema and public data: the three files Supabase documents for a Free-plan
+          # logical backup, in the order a restore replays them.
+          run_dump roles.sql --role-only
+          run_dump schema.sql
+          run_dump data.sql --data-only --use-copy --schema public
+
+          # Migration bookkeeping, so a restored database knows which migrations it has.
+          run_dump migrations-schema.sql --schema supabase_migrations
+          run_dump migrations-data.sql --data-only --use-copy --schema supabase_migrations
+
+          # `supabase db dump` filters Supabase-managed schemas, so the two files above are
+          # best-effort. The authoritative pre-migration ledger is the read-only
+          # `supabase migration list` output this run already captured; it joins the bundle
+          # so the artifact always carries a true record of migration history.
+          cp "$GITHUB_WORKSPACE/supabase-migration-list-reconciled.txt" "$backup_dir/migrations-ledger.txt"
+          echo "migrations-ledger.txt=0" >> "$status_file"
+
+          # Sentinel: written only if every dump above completed.
+          echo "__complete__=0" >> "$status_file"
+
+      # Evidence B, part 2: prove the plaintext bundle is real before it is encrypted. Checks
+      # every expected file exists, is non-empty, exceeds a per-file minimum and carries the
+      # content it should; checks every dump reported exit status 0 and that the completion
+      # sentinel is present; computes the SHA-256 that the round-trip check below will have to
+      # reproduce; and writes the manifest.
+      #
+      # The MANIFEST goes to the upload directory, the plaintext CHECKSUMS stay beside the
+      # dumps (and travel inside the encrypted archive). The manifest holds only filenames,
+      # sizes, hashes, identifiers and booleans — no rows, no SQL, no credentials.
+      #
+      # The secrets below are passed so the script can PROVE no credential leaked into a dump.
+      # It compares only, never echoes, and the manifest records how many values were scanned
+      # — never a value.
+      - name: Verify logical backup and write manifest
+        id: logical_backup_verify
+        if: ${{ inputs.mode == 'apply' }}
+        continue-on-error: true
+        env:
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$BACKUP_DIR"
+          node .github/scripts/verify-supabase-logical-backup.mjs \
+            --dir "$RUNNER_TEMP/$PLAINTEXT_BACKUP_SUBDIR" \
+            --status "$RUNNER_TEMP/$PLAINTEXT_BACKUP_SUBDIR/dump-status.txt" \
+            --manifest "$BACKUP_DIR/manifest.json" \
+            --checksums "$RUNNER_TEMP/$PLAINTEXT_BACKUP_SUBDIR/SHA256SUMS.txt" \
+            --ledger supabase-migration-list-reconciled.txt \
+            --target-migration "$TARGET_MIGRATION"
+
+      # Evidence B, part 3: ENCRYPT, then PROVE THE ENCRYPTION IS REVERSIBLE.
+      #
+      # Artifacts in this PUBLIC repository are readable by anyone who can read the repo, and
+      # GitHub's secret masking does nothing for artifact contents — it redacts secret values
+      # from logs, not from files. So the bundle is encrypted before it ever reaches the
+      # upload directory, and masking is nowhere in the security argument.
+      #
+      # ENCRYPTION MODE. `gpg --symmetric` alone does NOT give authenticated encryption: it
+      # defaults to a Symmetrically Encrypted and Integrity Protected Data packet version 1,
+      # which is CFB with an MDC — a SHA-1 checksum inside the ciphertext that detects
+      # corruption but is not AEAD. `--force-ocb` switches GnuPG to real authenticated
+      # encryption: a v5 symmetric-key ESK packet plus an AEAD Encrypted Data packet (tag 20)
+      # using AES-256 in OCB. The verifier walks the produced packets and FAILS unless the
+      # data packet really is OCB, so the manifest and the restore notes can never claim a
+      # stronger mode than the bytes actually provide.
+      #
+      # Decrypting an OCB archive needs GnuPG 2.3 or newer; ubuntu-latest ships 2.4.x, and the
+      # restore notes state the requirement for whoever recovers this later.
+      #
+      # `--no-symkey-cache` stops gpg-agent caching the backup passphrase, so the secret does
+      # not outlive the two commands that need it.
+      #
+      # PASSPHRASE HANDLING. The secret is written once to a 0600 file inside a 0700 directory
+      # under $RUNNER_TEMP and fed to gpg on a file descriptor. It is never an argv element
+      # (/proc/<pid>/cmdline is world-readable), never a filename, never echoed, and never
+      # written to the manifest or any artifact. GNUPGHOME is redirected into the same locked
+      # directory so gpg leaves nothing in the runner's home. The trap shreds all of it on
+      # every exit path, including failure.
+      #
+      # ROUND TRIP. A backup that cannot be decrypted is not a backup, and the only way to
+      # know is to decrypt it. The archive is decrypted with the same secret into a temporary
+      # directory and every recovered file is hashed against the SHA-256 recorded BEFORE
+      # encryption. The decrypted copies are destroyed as soon as that check has run.
+      - name: Encrypt the backup and prove it decrypts
+        id: logical_backup_encrypt
+        if: ${{ inputs.mode == 'apply' }}
+        continue-on-error: true
+        shell: bash
+        env:
+          SUPABASE_BACKUP_PASSPHRASE: ${{ secrets.SUPABASE_BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SUPABASE_BACKUP_PASSPHRASE:-}" ]; then
+            echo "SUPABASE_BACKUP_PASSPHRASE is empty. Refusing to produce an unencrypted production backup."
+            exit 1
+          fi
+
+          plaintext_dir="$RUNNER_TEMP/$PLAINTEXT_BACKUP_SUBDIR"
+          roundtrip_dir="$RUNNER_TEMP/$ROUNDTRIP_SUBDIR"
+          key_dir="$RUNNER_TEMP/$BACKUP_KEY_SUBDIR"
+          tar_archive="$RUNNER_TEMP/supabase-production-backup.tar.gz"
+          encrypted="$GITHUB_WORKSPACE/$BACKUP_DIR/$ENCRYPTED_ARCHIVE_NAME"
+
+          # Every exit path destroys the key material, the decrypted copies and the plaintext
+          # tarball — including the paths where gpg or tar fails part-way through.
+          cleanup() {
+            shred -u "$key_dir/passphrase" 2>/dev/null || true
+            rm -rf "$key_dir" "$roundtrip_dir" "$tar_archive"
+          }
+          trap cleanup EXIT
+
+          (
+            umask 077
+            mkdir -p "$key_dir/gnupg"
+            printf '%s' "$SUPABASE_BACKUP_PASSPHRASE" > "$key_dir/passphrase"
+          )
+          export GNUPGHOME="$key_dir/gnupg"
+
+          mkdir -p "$GITHUB_WORKSPACE/$BACKUP_DIR"
+          tar -czf "$tar_archive" -C "$plaintext_dir" .
+
+          # --passphrase-fd 0 reads the secret from stdin, which is redirected from the locked
+          # file. Nothing sensitive appears in argv; the plaintext tarball is the file operand.
+          gpg --batch --yes --quiet --no-tty --no-symkey-cache \
+            --pinentry-mode loopback --passphrase-fd 0 \
+            --symmetric --force-ocb --cipher-algo AES256 \
+            --digest-algo SHA512 --s2k-digest-algo SHA512 \
+            --s2k-mode 3 --s2k-count 65011712 \
+            --compress-algo none \
+            --output "$encrypted" "$tar_archive" < "$key_dir/passphrase"
+
+          # The plaintext tarball has served its purpose; it does not outlive the encryption.
+          rm -f "$tar_archive"
+
+          rm -rf "$roundtrip_dir"
+          mkdir -p "$roundtrip_dir"
+          chmod 700 "$roundtrip_dir"
+          gpg --batch --yes --quiet --no-tty --no-symkey-cache \
+            --pinentry-mode loopback --passphrase-fd 0 \
+            --decrypt --output "$roundtrip_dir/roundtrip.tar.gz" \
+            "$encrypted" < "$key_dir/passphrase"
+          tar -xzf "$roundtrip_dir/roundtrip.tar.gz" -C "$roundtrip_dir"
+          rm -f "$roundtrip_dir/roundtrip.tar.gz"
+
+          # The secret is no longer needed; destroy it before the verification runs, so the
+          # verifier provably cannot see it.
+          shred -u "$key_dir/passphrase" 2>/dev/null || true
+          rm -rf "$key_dir"
+
+          # Proves: the archive really is an OpenPGP message, it contains no readable dump
+          # content, every decrypted file matches its pre-encryption hash, and the upload
+          # directory holds nothing but the four permitted files. Also writes SHA256SUMS.txt
+          # for the ENCRYPTED archive and the restore notes.
+          node .github/scripts/verify-supabase-backup-encryption.mjs \
+            --manifest "$GITHUB_WORKSPACE/$BACKUP_DIR/manifest.json" \
+            --archive "$encrypted" \
+            --decrypted "$roundtrip_dir" \
+            --artifact-dir "$GITHUB_WORKSPACE/$BACKUP_DIR"
+
+          # Decrypted verification copies do not outlive the check that needed them.
+          rm -rf "$roundtrip_dir"
+
+      # Evidence B, part 4: the backup must be RETRIEVABLE, not merely present on a runner
+      # that is about to be destroyed. Upload happens before the push, so a failed migration
+      # can never leave the run without its restore artifact.
+      #
+      # ONLY $BACKUP_DIR is uploaded, and by this point it provably contains only the
+      # encrypted archive, the non-sensitive manifest, the encrypted archive's checksum and
+      # the restore notes. The plaintext dumps are under $RUNNER_TEMP and are unreachable from
+      # this path. Retention is 14 days: long enough to be a usable rollback window for this
+      # migration, short enough that an encrypted copy of production does not linger.
+      - name: Upload encrypted production backup artifact
+        id: logical_backup_artifact
+        if: ${{ inputs.mode == 'apply' }}
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: supabase-production-backup-${{ github.run_id }}-${{ github.run_attempt }}
+          path: production-backup
+          retention-days: 14
+          if-no-files-found: error
+
+      # Destroy every plaintext production dump BEFORE the migration is allowed to write, and
+      # prove it. This is not the safety net — the `always()` step at the end of the job is.
+      # This one is unconditional and ungated so that a failure to remove production data stops
+      # the run instead of being tidied up quietly afterwards.
+      - name: Remove all plaintext production dumps
+        id: plaintext_cleanup
+        if: ${{ inputs.mode == 'apply' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -rf "$RUNNER_TEMP/$PLAINTEXT_BACKUP_SUBDIR" \
+                 "$RUNNER_TEMP/$ROUNDTRIP_SUBDIR" \
+                 "$RUNNER_TEMP/$BACKUP_KEY_SUBDIR" \
+                 "$RUNNER_TEMP/supabase-production-backup.tar.gz"
+
+          for path in "$RUNNER_TEMP/$PLAINTEXT_BACKUP_SUBDIR" "$RUNNER_TEMP/$ROUNDTRIP_SUBDIR" "$RUNNER_TEMP/$BACKUP_KEY_SUBDIR"; do
+            if [ -e "$path" ]; then
+              echo "Plaintext production data still present after cleanup."
+              exit 1
+            fi
+          done
+
+          # The upload directory must never have held a dump. Checked again here, after the
+          # upload, because this is the last moment before the database is written.
+          leaked="$(find "$GITHUB_WORKSPACE/$BACKUP_DIR" -maxdepth 1 -type f \
+            \( -name '*.sql' -o -name 'migrations-ledger.txt' -o -name 'dump-status.txt' \) | wc -l)"
+          if [ "$leaked" -ne 0 ]; then
+            echo "Plaintext dump files found in the artifact directory."
+            exit 1
+          fi
+
+          echo "All plaintext production dumps removed."
+
+      # THE gate. Every leg is required: dump, verification, encryption, round-trip
+      # decryption, artifact upload, plaintext removal, and a manifest that belongs to this
+      # run and proves the archive is encrypted and dump-free. A managed backup is reported as
+      # additional evidence but can no longer authorise a write on its own — accepting it
+      # would let a run skip the encryption path, which is the one thing that keeps customer
+      # data out of a public artifact.
+      - name: Verify a restore point exists before writing
+        if: ${{ inputs.mode == 'apply' }}
+        run: |
+          node .github/scripts/verify-supabase-restore-point.mjs \
+            --managed "${{ steps.managed_backup.outcome }}" \
+            --logical-dump "${{ steps.logical_backup.outcome }}" \
+            --logical-verify "${{ steps.logical_backup_verify.outcome }}" \
+            --encryption "${{ steps.logical_backup_encrypt.outcome }}" \
+            --artifact "${{ steps.logical_backup_artifact.outcome }}" \
+            --plaintext-cleanup "${{ steps.plaintext_cleanup.outcome }}" \
+            --manifest "$BACKUP_DIR/manifest.json" \
+            --run-id "${{ github.run_id }}" \
+            --run-attempt "${{ github.run_attempt }}"
 
       - name: Apply migration push
         if: ${{ inputs.mode == 'apply' }}
@@ -471,6 +818,21 @@ jobs:
               console.log(`  [${lint.level ?? "?"}] ${lint.name ?? "?"} — ${lint.title ?? lint.description ?? ""}`);
             }
           '
+
+      # SAFETY NET. The unconditional cleanup before the gate is the one that matters for the
+      # write ordering; this one exists for every path that never reaches it — a dump that
+      # failed half-way, an encryption error, a cancelled run. `always()` means plaintext
+      # production data is destroyed even when the run is failing, which is exactly when it is
+      # most likely to have been left behind. Key material and decrypted copies go with it.
+      - name: Remove plaintext production data (safety net)
+        if: always()
+        shell: bash
+        run: |
+          shred -u "$RUNNER_TEMP/$BACKUP_KEY_SUBDIR/passphrase" 2>/dev/null || true
+          rm -rf "$RUNNER_TEMP/$PLAINTEXT_BACKUP_SUBDIR" \
+                 "$RUNNER_TEMP/$ROUNDTRIP_SUBDIR" \
+                 "$RUNNER_TEMP/$BACKUP_KEY_SUBDIR" \
+                 "$RUNNER_TEMP/supabase-production-backup.tar.gz"
 
       # Read-only audit path: dump only public schema DDL so operators can compare remote
       # history with existing objects.
