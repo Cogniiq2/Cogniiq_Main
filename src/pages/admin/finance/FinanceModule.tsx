@@ -12,6 +12,7 @@ import { OfferDetailPage } from '@/pages/owner/OfferDetailPage';
 import { OfferEditor } from '@/pages/owner/OfferEditor';
 import { CustomersPage } from '@/pages/owner/CustomersPage';
 import { CustomerDetailPage } from '@/pages/owner/CustomerDetailPage';
+import { ServiceEngagementPage } from '@/pages/owner/ServiceEngagementPage';
 import { ExpensesPage } from '@/pages/owner/ExpensesPage';
 import { TaxesPage } from '@/pages/owner/TaxesPage';
 import { RevenueContractsPage } from '@/pages/owner/RevenueContractsPage';
@@ -44,6 +45,8 @@ function FinanceRoutes() {
       <Route path="overview" element={<OverviewPage />} />
       <Route path="customers" element={<CustomersPage />} />
       <Route path="customers/:customerId" element={<CustomerDetailPage />} />
+      {/* One level under the canonical customer: the service is what hangs off it. */}
+      <Route path="customers/:customerId/services/:serviceKey" element={<ServiceEngagementPage />} />
       <Route path="offers" element={<OffersPage />} />
       <Route path="offers/new" element={<OfferEditor />} />
       <Route path="offers/:offerId/edit" element={<OfferEditor />} />

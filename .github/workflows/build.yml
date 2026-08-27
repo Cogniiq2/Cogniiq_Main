@@ -344,3 +344,27 @@ jobs:
       # pre-convergence anon exposure, data preservation, and idempotent replay.
       - name: Case D legacy convergence SQL tests
         run: bash .github/scripts/run-case-d-legacy-convergence-sql-tests.sh
+
+  client-service-onboarding-sql-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure PostgreSQL server binaries
+        run: |
+          if [ -z "$(ls -d /usr/lib/postgresql/*/bin 2>/dev/null)" ]; then
+            sudo apt-get update
+            sudo apt-get install --yes postgresql
+          fi
+
+      # Applies 20260830120000 + 20260830121000 in order against a throwaway cluster and
+      # asserts what only a database can prove: that the seed migration REFUSES to run
+      # before its schema, that a service can be added exactly once, that an engagement
+      # snapshots its template version and is never mutated by re-seeding that template,
+      # that BLOCKED needs a reason and WAITING_FOR_CLIENT needs its request, that a
+      # partial automation cannot be stored without its documented limitation, that the
+      # go-live gate genuinely refuses the production statuses, and that anon, a
+      # non-owner, and a plain authenticated role reach none of it.
+      - name: Client service onboarding SQL tests
+        run: bash .github/scripts/run-client-service-onboarding-sql-tests.sh

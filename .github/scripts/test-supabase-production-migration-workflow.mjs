@@ -18,7 +18,11 @@ import { ALLOWED_MIGRATIONS, PROTECTED_VERSIONS, confirmationFor } from './lib/s
 import { EXPECTED_BACKUP_FILES, dumpInvocation } from './verify-supabase-logical-backup.mjs';
 
 const workflowPath = '.github/workflows/supabase-production-migration.yml';
-const workflowText = readFileSync(workflowPath, 'utf8');
+// Normalised to LF. Every assertion below anchors on "\n"-terminated markers, so on a
+// Windows checkout (where git hands out CRLF) the raw text matched nothing and the gate
+// failed for a reason that had nothing to do with the workflow. The repository's other
+// migration tests already normalise the same way.
+const workflowText = readFileSync(workflowPath, 'utf8').replace(/\r\n/g, '\n');
 
 function fail(message) {
   throw new Error(message);
@@ -73,7 +77,54 @@ assert(
   'mode options drifted',
 );
 assert(inputs.source_ref.required === true, 'source_ref must remain required');
-assert(inputs.source_ref.default !== 'main', 'source_ref must not be hard-coded to main');
+
+/*
+  source_ref is deliberately NOT constrained to (or away from) any particular branch.
+
+  An earlier version asserted `default !== 'main'`, which protected nothing: the default is a
+  pre-filled value in a dispatch form, and a workflow_dispatch API call can send any ref
+  regardless. Treating one branch name as dangerous and every other one as safe is security
+  theatre — and it blocked the legitimate long-term default while still permitting the same run
+  to be started by typing `main` by hand.
+
+  What actually has to hold is that the ref is honoured EXACTLY and that nothing downstream is
+  relaxed because of what it is. Both operating modes depend on that:
+    - a pre-merge run from a feature branch, and
+    - a post-merge run from main
+  must behave identically. The assertions below pin that, and every real gate (allowlist,
+  filename validation, derived confirmation, dependency gate, isolation invariant, dry run,
+  backup/encryption/restore-point) is asserted elsewhere in this file and applies to every ref.
+*/
+{
+  const checkout = stepBlock('Checkout selected migration branch');
+  assertIncludes(checkout, 'ref: ${{ inputs.source_ref }}', 'The selected ref must be checked out verbatim');
+  assertIncludes(checkout, 'path: migration-source', 'The selected ref must be checked out into its own directory');
+
+  // No step may pin a ref of its own, which would silently act on something other than the
+  // operator's selection.
+  const pinnedRefs = [...workflowText.matchAll(/^\s*ref: (.+)$/gm)].map((m) => m[1].trim());
+  assert(
+    pinnedRefs.every((ref) => ref === '${{ inputs.source_ref }}'),
+    `Every checkout must use the selected ref, found: ${JSON.stringify(pinnedRefs)}`,
+  );
+
+  // The existence gate is what makes a wrong ref fail closed: the run stops before linking if
+  // the selected migration is not present in the ref that was actually checked out.
+  assertStepIncludes(
+    'Verify expected migration exists',
+    'test -f "migration-source/$TARGET_MIGRATION_PATH"',
+    'The selected ref must be proven to contain the selected migration',
+  );
+  assert(
+    workflowText.indexOf('- name: Verify expected migration exists') <
+      workflowText.indexOf('- name: Link Supabase project'),
+    'The existence gate must run before any Supabase connection is made',
+  );
+
+  // Nothing downstream may branch on WHICH ref was selected: every gate applies to all refs.
+  assertNotIncludes(workflowText, "inputs.source_ref == 'main'", 'No gate may be conditional on the selected ref');
+  assertNotIncludes(workflowText, "inputs.source_ref != 'main'", 'No gate may be conditional on the selected ref');
+}
 
 /* ------------------------------------------------ allowlist agreement (3 copies) */
 

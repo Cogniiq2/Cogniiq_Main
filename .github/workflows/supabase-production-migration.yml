@@ -19,9 +19,16 @@ on:
   workflow_dispatch:
     inputs:
       source_ref:
-        description: Git branch containing the migration
+        description: Git branch or tag containing the migration (e.g. main, or a feature branch)
         required: true
-        default: feat/finance-multipay-recurring-bulk
+        # `main` is the long-term default because it is the branch a migration normally lives on
+        # once it has been reviewed and merged. It is a DEFAULT, not a restriction: the operator
+        # can and does enter a feature branch here for a pre-merge run, and the workflow treats
+        # both identically — the ref is checked out verbatim and the selected migration must
+        # exist in it. None of the safety comes from which ref this is: it comes from the
+        # allowlist, the derived confirmation string, the dependency gate, the isolated-workspace
+        # invariant, the dry run and the backup gates, all of which run regardless of the ref.
+        default: main
       target_migration:
         description: Which allowlisted production migration to act on
         required: true
@@ -31,6 +38,8 @@ on:
           - 20260826120000_owner_historical_paid_invoice.sql
           - 20260828120000_owner_finance_multipay_recurring_bulk.sql
           - 20260829120000_owner_finance_advance_payments.sql
+          - 20260830120000_client_service_onboarding.sql
+          - 20260830121000_ai_receptionist_template_v1.sql
         default: 20260826120000_owner_historical_paid_invoice.sql
       mode:
         description: Audit history, run a dry run, or apply the migration
@@ -100,6 +109,8 @@ jobs:
             20260826120000_owner_historical_paid_invoice.sql) ;;
             20260828120000_owner_finance_multipay_recurring_bulk.sql) ;;
             20260829120000_owner_finance_advance_payments.sql) ;;
+            20260830120000_client_service_onboarding.sql) ;;
+            20260830121000_ai_receptionist_template_v1.sql) ;;
             *)
               echo "Refusing to act on a migration that is not on the production allowlist: $SELECTED_MIGRATION"
               exit 1
