@@ -68,6 +68,7 @@ MIGRATIONS=(
   20260825064048_offer_recurring_pricing
   20260826120000_owner_historical_paid_invoice
   20260828120000_owner_finance_multipay_recurring_bulk
+  20260829120000_owner_finance_advance_payments
 )
 
 PSQL -c "create database fin;" >/dev/null
@@ -94,7 +95,13 @@ done
 
 PSQL -d fin -f "$SQLDIR/finance-multipay-tests.sql"
 
-# Convergence: the new migration must be safely re-appliable and the tests must still pass.
+# Advance payments (Anzahlungen) run against the SAME cluster, after the multipay suite, so
+# the multipay assertions also prove the advance migration did not disturb them.
+PSQL -d fin -f "$SQLDIR/finance-advance-payment-tests.sql"
+
+# Convergence: each new migration must be safely re-appliable and the tests must still pass.
 PSQL -d fin -q -f "$MIG/20260828120000_owner_finance_multipay_recurring_bulk.sql" >/dev/null
+PSQL -d fin -q -f "$MIG/20260829120000_owner_finance_advance_payments.sql" >/dev/null
 PSQL -d fin -f "$SQLDIR/finance-multipay-tests.sql" >/dev/null
-echo "migration convergence: 20260828120000 re-applied cleanly and finance tests still pass"
+PSQL -d fin -f "$SQLDIR/finance-advance-payment-tests.sql" >/dev/null
+echo "migration convergence: 20260828120000 + 20260829120000 re-applied cleanly and finance tests still pass"

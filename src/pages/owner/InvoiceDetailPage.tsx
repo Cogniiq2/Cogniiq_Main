@@ -17,7 +17,7 @@ import { generateAndStoreDocument } from '@/lib/ownerFinance/generateDocument';
 import { runFinanceExport } from '@/lib/ownerFinance/financeExportRunner';
 import { invoiceExportTable, invoiceMetadataSheet, invoiceReportModel } from '@/lib/ownerFinance/exports/datasets';
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
-import { paymentMethodLabel, PAYMENT_METHOD_OPTIONS } from '@/lib/ownerFinance/paymentMethods';
+import { paymentMethodLabel, paymentKindLabel, isAdvancePayment, PAYMENT_METHOD_OPTIONS } from '@/lib/ownerFinance/paymentMethods';
 import { formatDateDe, formatCentsCurrencyDe, formatBpPercentDe, type ExportFormat, type ExportMode, type ExportMeta } from '@/lib/ownerFinance/exports';
 import { ExportMenu } from '@/components/finance/ExportMenu';
 import { CustomerPortalPublishCard } from '@/components/finance/CustomerPortalPublishCard';
@@ -177,16 +177,32 @@ export function InvoiceDetailPage() {
               action={['issued', 'partially_paid', 'overdue'].includes(invoice.status)
                 ? <Button size="sm" variant="secondary" onClick={() => setPayOpen(true)}>Zahlung erfassen</Button> : undefined} />
             {payments.length === 0 ? <p className="text-[13px] text-gray-400">Noch keine Zahlungen erfasst.</p> : (
-              <ul className="space-y-2">{payments.map((p) => (
-                <li key={String(p.id)} className="flex items-center justify-between gap-3 rounded-lg border border-gray-100 px-3 py-2 text-[13px]">
-                  <span className="min-w-0 text-gray-600">
-                    {formatDateDe(String(p.payment_date ?? ''))}
-                    {p.reference ? <span className="ml-2 text-gray-500">{String(p.reference)}</span> : null}
-                    {p.payment_method ? <span className="ml-2 text-[11px] text-gray-400">{paymentMethodLabel(String(p.payment_method))}</span> : null}
-                  </span>
-                  <span className="shrink-0 tabular-nums font-medium text-gray-900">{formatCents(Number(p.amount_cents ?? 0), invoice.currency)}</span>
-                </li>
-              ))}</ul>
+              <>
+              <ul className="space-y-2">{payments.map((p) => {
+                // An Anzahlung is the one receipt allowed to predate the invoice, so it is
+                // named rather than left to be inferred from a date that looks wrong.
+                const advance = isAdvancePayment(p.payment_kind as string | null);
+                return (
+                  <li key={String(p.id)} className="flex items-center justify-between gap-3 rounded-lg border border-gray-100 px-3 py-2 text-[13px]">
+                    <span className="min-w-0 text-gray-600">
+                      {formatDateDe(String(p.payment_date ?? ''))}
+                      <span className={`ml-2 rounded px-1.5 py-0.5 text-[11px] font-medium ${advance ? 'bg-sky-50 text-sky-700' : 'bg-gray-100 text-gray-600'}`}>
+                        {paymentKindLabel(p.payment_kind as string | null)}
+                      </span>
+                      {p.reference ? <span className="ml-2 text-gray-500">{String(p.reference)}</span> : null}
+                      {p.payment_method ? <span className="ml-2 text-[11px] text-gray-400">{paymentMethodLabel(String(p.payment_method))}</span> : null}
+                    </span>
+                    <span className="shrink-0 tabular-nums font-medium text-gray-900">{formatCents(Number(p.amount_cents ?? 0), invoice.currency)}</span>
+                  </li>
+                );
+              })}</ul>
+              {payments.some((p) => isAdvancePayment(p.payment_kind as string | null)) ? (
+                <p className="mt-3 text-[11px] leading-relaxed text-gray-400">
+                  Anzahlungen sind vor dem Rechnungsdatum eingegangen. Sie behalten ihr echtes
+                  Eingangsdatum und zählen dennoch auf diese Rechnung.
+                </p>
+              ) : null}
+              </>
             )}
             {/* An invoice imported before the overpayment guard existed can be paid ABOVE its
                 gross. Showing that as "Offen: -0,01 €" reads as a negative receivable, which is

@@ -8,12 +8,18 @@
 // Nothing here writes. Parsing and validation are pure; the owner sees totals and problems
 // first, and only a separate, explicit confirmation runs the atomic server import.
 
-import type { InvoicePaymentInput, RevenueContractLineInput } from '@/lib/ownerFinance/financeExtendedApi';
+import type { InvoicePaymentInput, InvoicePaymentKind, RevenueContractLineInput } from '@/lib/ownerFinance/financeExtendedApi';
 import type { InvoiceLineInput } from '@/lib/ownerFinance/api';
 
 // The schema contract lives HERE, next to the parser that enforces it, and is imported by
 // the API layer rather than the other way round. That keeps this module free of any runtime
 // dependency on the Supabase client, so it can be unit-tested without environment variables.
+//
+// STILL VERSION 1, DELIBERATELY. Adding advance payments did not break the contract: the new
+// `payment_kind` field is optional and its absence means exactly what a payment meant before
+// it existed (an ordinary payment, dated on or after the invoice). Every payload valid under
+// the previous parser is still valid here and still imports identically, so bumping the
+// version would only have forced owners to edit working files for no semantic gain.
 export const BULK_IMPORT_SCHEMA_VERSION = 1;
 /** Mirrors the server-side bound so the preview can refuse early with a clear message. */
 export const BULK_IMPORT_MAX_INVOICES = 100;
@@ -97,6 +103,10 @@ export function looksLikeSql(raw: string): boolean {
 
 const isIsoDate = (v: unknown): v is string => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
 const isInt = (v: unknown): v is number => typeof v === 'number' && Number.isInteger(v);
+
+const PAYMENT_KINDS: InvoicePaymentKind[] = ['invoice_payment', 'advance_payment'];
+const isPaymentKind = (v: unknown): v is InvoicePaymentKind =>
+  typeof v === 'string' && (PAYMENT_KINDS as string[]).includes(v);
 
 function validateLines(lines: unknown, row: string, errors: RowIssue[]): InvoiceLineInput[] {
   if (!Array.isArray(lines) || lines.length === 0) {
@@ -208,15 +218,46 @@ export function parseBulkImport(raw: string, entityId: string): BulkImportPrevie
 
     const payments = Array.isArray(inv.payments) ? (inv.payments as unknown[]) : [];
     let paidForInvoice = 0;
+    const outPayments: InvoicePaymentInput[] = [];
     payments.forEach((p, pi) => {
       const pay = p as Record<string, unknown>;
       if (!isIsoDate(pay.payment_date)) errors.push({ row, message: `Zahlung ${pi + 1}: payment_date fehlt oder ist kein JJJJ-MM-TT` });
       if (!isInt(pay.amount_cents) || (pay.amount_cents as number) <= 0) {
         errors.push({ row, message: `Zahlung ${pi + 1}: amount_cents muss eine positive ganze Zahl sein` });
       } else { paidForInvoice += pay.amount_cents as number; }
-      if (isIsoDate(pay.payment_date) && isIsoDate(inv.issue_date) && (pay.payment_date as string) < (inv.issue_date as string)) {
-        errors.push({ row, message: `Zahlung ${pi + 1}: liegt vor dem Rechnungsdatum` });
+
+      // Absent = ordinary payment, which is what every pre-advance payload meant.
+      const rawKind = pay.payment_kind;
+      let kind: InvoicePaymentKind = 'invoice_payment';
+      if (rawKind === undefined || rawKind === null || rawKind === '') {
+        kind = 'invoice_payment';
+      } else if (isPaymentKind(rawKind)) {
+        kind = rawKind;
+      } else {
+        errors.push({ row, message: `Zahlung ${pi + 1}: payment_kind muss „invoice_payment" oder „advance_payment" sein` });
       }
+
+      // The two kinds are disjoint, and the parser says so in the owner's terms rather
+      // than letting the server reject the paste after the fact. A receipt that genuinely
+      // predates the invoice is not an error any more — it is an Anzahlung, and the
+      // message names the fix instead of just refusing.
+      if (isIsoDate(pay.payment_date) && isIsoDate(inv.issue_date)) {
+        const before = (pay.payment_date as string) < (inv.issue_date as string);
+        if (kind === 'invoice_payment' && before) {
+          errors.push({ row, message: `Zahlung ${pi + 1}: liegt vor dem Rechnungsdatum — als Anzahlung erfassen ("payment_kind": "advance_payment")` });
+        } else if (kind === 'advance_payment' && !before) {
+          errors.push({ row, message: `Zahlung ${pi + 1}: als Anzahlung markiert, liegt aber nicht vor dem Rechnungsdatum` });
+        }
+      }
+
+      outPayments.push({
+        payment_date: String(pay.payment_date ?? ''),
+        amount_cents: isInt(pay.amount_cents) ? pay.amount_cents : 0,
+        method: typeof pay.method === 'string' ? pay.method : null,
+        reference: typeof pay.reference === 'string' ? pay.reference : null,
+        note: typeof pay.note === 'string' ? pay.note : null,
+        payment_kind: kind,
+      });
       paymentCount += 1;
     });
     if (paidForInvoice > invGross) {
@@ -243,7 +284,7 @@ export function parseBulkImport(raw: string, entityId: string): BulkImportPrevie
       currency: typeof inv.currency === 'string' ? inv.currency : 'EUR',
       notes: typeof inv.notes === 'string' ? inv.notes : null,
       lines,
-      payments: payments as InvoicePaymentInput[],
+      payments: outPayments,
     });
   });
 
@@ -353,9 +394,12 @@ export function bulkImportTemplate(): string {
         lines: [
           { description: 'Digitalisierung', quantity_milli: 1000, unit_price_cents: 1000000, vat_rate_bp: 1900, vat_treatment: 'standard' },
         ],
+        // payment_kind is optional. Weglassen = normale Zahlung (am oder nach dem
+        // Rechnungsdatum). "advance_payment" ist eine Anzahlung, die nachweislich VOR der
+        // Schlussrechnung eingegangen ist — nur dann darf das Zahlungsdatum davor liegen.
         payments: [
-          { payment_date: '2026-01-15', amount_cents: 300000, method: 'bank_transfer', reference: 'Abschlag 1' },
-          { payment_date: '2026-02-15', amount_cents: 400000, method: 'bank_transfer', reference: 'Abschlag 2' },
+          { payment_date: '2025-11-20', amount_cents: 300000, method: 'bank_transfer', reference: 'Abschlagszahlung 1', payment_kind: 'advance_payment' },
+          { payment_date: '2026-02-15', amount_cents: 400000, method: 'bank_transfer', reference: 'Abschlagszahlung 2', payment_kind: 'invoice_payment' },
           { payment_date: '2026-03-15', amount_cents: 490000, method: 'bank_transfer', reference: 'Restzahlung' },
         ],
       },

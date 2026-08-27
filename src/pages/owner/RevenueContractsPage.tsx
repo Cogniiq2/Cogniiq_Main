@@ -31,6 +31,7 @@ import {
   setRevenueContractStatus, OWNER_FINANCE_EXTENDED_MIGRATION,
   type RevenueContractOverview, type RevenueContractRow,
 } from '@/lib/ownerFinance/financeExtendedApi';
+import { describeSupabaseError } from '@/lib/ownerFinance/api';
 import {
   applyCustomerResolutions, bulkImportTemplate, parseBulkImport, type BulkImportPreview,
 } from '@/lib/ownerFinance/bulkImport';
@@ -297,8 +298,22 @@ function BulkImportModal({ open, entityId, onClose, onDone, onError }: {
     // Names are resolved server-side so the preview can show — before anything is written —
     // which customers are unknown or ambiguous.
     if (p.payload && p.unresolvedNames.length > 0) {
-      try { p = applyCustomerResolutions(p, await resolveImportCustomers(entityId, p.unresolvedNames)); }
-      catch (e: unknown) { p = { ...p, ok: false, errors: [...p.errors, { row: '—', message: `Kundenabgleich fehlgeschlagen: ${e instanceof Error ? e.message : String(e)}` }] }; }
+      // resolveImportCustomers RETURNS its failure already normalised, so there is no raw
+      // PostgREST object here to stringify into "[object Object]". The try/catch remains for
+      // a genuinely unexpected throw (network, aborted fetch) and normalises that too.
+      try {
+        const { resolutions, error, backendMissing } = await resolveImportCustomers(entityId, p.unresolvedNames);
+        if (error) {
+          const message = backendMissing
+            ? `Der Kundenabgleich ist in dieser Umgebung noch nicht installiert. Bitte die Migration ${OWNER_FINANCE_EXTENDED_MIGRATION} anwenden.`
+            : `Kundenabgleich fehlgeschlagen: ${error}`;
+          p = { ...p, ok: false, errors: [...p.errors, { row: '—', message }] };
+        } else {
+          p = applyCustomerResolutions(p, resolutions);
+        }
+      } catch (e: unknown) {
+        p = { ...p, ok: false, errors: [...p.errors, { row: '—', message: `Kundenabgleich fehlgeschlagen: ${describeSupabaseError(e)}` }] };
+      }
     }
     setResolving(false);
     setPreview(p);

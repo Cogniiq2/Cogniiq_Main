@@ -16,8 +16,14 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 
-const MIGRATION = 'supabase/migrations/20260828120000_owner_finance_multipay_recurring_bulk.sql';
-const sql = readFileSync(resolve(process.cwd(), MIGRATION), 'utf8');
+// Both finance migrations are checked as one body of code. The advance-payment migration
+// widens what a payment may be, so it has to clear exactly the same bar: adding a second
+// payment kind must not add a write target, a grant to anon, or any outbound path.
+const MIGRATIONS = [
+  'supabase/migrations/20260828120000_owner_finance_multipay_recurring_bulk.sql',
+  'supabase/migrations/20260829120000_owner_finance_advance_payments.sql',
+];
+const sql = MIGRATIONS.map((m) => readFileSync(resolve(process.cwd(), m), 'utf8')).join('\n');
 
 /** Comments in this file legitimately NAME the forbidden symbols; only code counts. */
 const executable = sql.split('\n').filter((l) => !l.trimStart().startsWith('--')).join('\n');

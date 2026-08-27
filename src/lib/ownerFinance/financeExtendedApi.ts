@@ -11,12 +11,28 @@
 // enqueue, no edge-function invoke and no bank integration — asserted by financeWriteSafety.test.ts.
 
 import { supabase } from '@/lib/supabase';
-import { secureUuid, isMissingBackendError, type InvoiceLineInput } from '@/lib/ownerFinance/api';
+import { secureUuid, isMissingBackendError, describeSupabaseError, type InvoiceLineInput } from '@/lib/ownerFinance/api';
 
 /** Migration that provisions everything in this module. */
 export const OWNER_FINANCE_EXTENDED_MIGRATION = '20260828120000_owner_finance_multipay_recurring_bulk.sql';
+/** Migration that adds pre-invoice advance payments (Anzahlungen). */
+export const OWNER_FINANCE_ADVANCE_MIGRATION = '20260829120000_owner_finance_advance_payments.sql';
 
 /* ------------------------------------------------------------------ Payments */
+
+/**
+ * How a receipt relates to the invoice it settles.
+ *
+ * 'invoice_payment' — ordinary payment, dated on or after the invoice date.
+ * 'advance_payment' — Anzahlung genuinely received BEFORE the final invoice was issued,
+ *                     e.g. the "Abschlagszahlung 1/2" a final invoice then deducts.
+ *
+ * This is a different axis from the payment's accounting kind (income/expense): that says
+ * what the money is, this says when it arrived relative to the invoice. Omitting the field
+ * means 'invoice_payment', so every payload written before this existed still means what it
+ * meant then.
+ */
+export type InvoicePaymentKind = 'invoice_payment' | 'advance_payment';
 
 export interface InvoicePaymentInput {
   payment_date: string;
@@ -24,6 +40,7 @@ export interface InvoicePaymentInput {
   method?: string | null;
   reference?: string | null;
   note?: string | null;
+  payment_kind?: InvoicePaymentKind;
 }
 
 export interface MultiPaymentInvoiceResult {
@@ -81,20 +98,22 @@ export async function addInvoicePayment(
   return { result: data as { status: string; amount_paid_cents: number; open_cents: number }, error: null };
 }
 
-/** Payment history of one invoice, newest first. Read-only. */
+/** Payment history of one invoice, oldest first. Read-only. */
 export async function loadInvoicePayments(invoiceId: string): Promise<Array<{
   id: string; payment_date: string; amount_cents: number;
   payment_method: string | null; reference: string | null; notes: string | null;
+  payment_kind: InvoicePaymentKind;
 }>> {
   const { data, error } = await supabase
     .from('owner_payments')
-    .select('id, payment_date, amount_cents, payment_method, reference, notes')
+    .select('id, payment_date, amount_cents, payment_method, reference, notes, payment_kind')
     .eq('invoice_id', invoiceId)
     .order('payment_date', { ascending: true });
   if (error) throw error;
   return (data ?? []) as Array<{
     id: string; payment_date: string; amount_cents: number;
     payment_method: string | null; reference: string | null; notes: string | null;
+    payment_kind: InvoicePaymentKind;
   }>;
 }
 
@@ -229,11 +248,26 @@ export interface CustomerResolution {
  *
  * A name matching two customers comes back `ambiguous` with no id, and the import UI stops
  * that row. Guessing between two similarly named customers would silently misfile revenue.
+ *
+ * Failure is RETURNED, not thrown. Throwing the raw PostgREST error was how a missing RPC
+ * reached the owner as "Kundenabgleich fehlgeschlagen: [object Object]": the value is a plain
+ * object, so the caller's `instanceof Error` guard fell through to String(). A caller cannot
+ * mis-render what it is handed already normalised, and `backendMissing` lets the UI say the
+ * useful thing — the migration is not installed here — instead of relaying a PostgREST code.
  */
-export async function resolveImportCustomers(entityId: string, names: string[]): Promise<CustomerResolution[]> {
+export async function resolveImportCustomers(
+  entityId: string,
+  names: string[],
+): Promise<{ resolutions: CustomerResolution[]; error: string | null; backendMissing: boolean }> {
   const { data, error } = await supabase.rpc('owner_resolve_import_customers', {
     p_entity: entityId, p_names: names,
   });
-  if (error) throw error;
-  return (data as CustomerResolution[]) ?? [];
+  if (error) {
+    return {
+      resolutions: [],
+      error: describeSupabaseError(error, 'Der Kundenabgleich konnte nicht ausgeführt werden.'),
+      backendMissing: isMissingBackendError(error),
+    };
+  }
+  return { resolutions: (data as CustomerResolution[]) ?? [], error: null, backendMissing: false };
 }

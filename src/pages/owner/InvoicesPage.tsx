@@ -19,7 +19,7 @@ import { customerDisplayName } from '@/lib/ownerFinance/customerLabels';
 import { CustomerFormDialog } from '@/components/finance/CustomerFormDialog';
 import { computeInvoiceLine } from '@/lib/ownerFinance/tax';
 import { PAYMENT_METHOD_OPTIONS } from '@/lib/ownerFinance/paymentMethods';
-import { recordHistoricalInvoiceWithPayments, type InvoicePaymentInput } from '@/lib/ownerFinance/financeExtendedApi';
+import { recordHistoricalInvoiceWithPayments, type InvoicePaymentInput, type InvoicePaymentKind } from '@/lib/ownerFinance/financeExtendedApi';
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
 import type { OwnerCustomerListRow, OwnerInvoice } from '@/lib/ownerFinance/types';
 import { ExportMenu } from '@/components/finance/ExportMenu';
@@ -378,11 +378,16 @@ function newLine(): DraftLine {
 }
 
 /** One real payment against a historical invoice. Amounts stay strings until validated. */
-interface DraftPayment { id: string; date: string; amount: string; method: string; reference: string }
+interface DraftPayment { id: string; date: string; amount: string; method: string; reference: string; kind: InvoicePaymentKind }
 
 function newPayment(date: string): DraftPayment {
-  return { id: Math.random().toString(36).slice(2), date, amount: '', method: 'bank_transfer', reference: '' };
+  return { id: Math.random().toString(36).slice(2), date, amount: '', method: 'bank_transfer', reference: '', kind: 'invoice_payment' };
 }
+
+const PAYMENT_KIND_OPTIONS: Array<{ value: InvoicePaymentKind; label: string }> = [
+  { value: 'invoice_payment', label: 'Zahlung (am/nach Rechnungsdatum)' },
+  { value: 'advance_payment', label: 'Anzahlung vor Rechnungsstellung' },
+];
 
 /**
  * 'normal'     — draft → optional issuance, the untouched original flow.
@@ -496,7 +501,15 @@ function InvoiceComposer({ mode = 'normal', open, entityId, customers, onClose, 
         if (!pay.date) errs['payDate-' + pay.id] = 'Datum erforderlich';
         // Date-only string compare: both are YYYY-MM-DD, so this is a calendar
         // comparison with no Date parsing and no timezone shift.
-        else if (issueDate && pay.date < issueDate) errs['payDate-' + pay.id] = 'Vor dem Rechnungsdatum';
+        //
+        // The two kinds are disjoint: an ordinary payment cannot predate the invoice, and
+        // an Anzahlung must. A date before the invoice is no longer simply wrong — it is
+        // wrong for THIS kind, and the message says which of the two to change.
+        else if (issueDate && pay.kind === 'invoice_payment' && pay.date < issueDate) {
+          errs['payDate-' + pay.id] = 'Vor dem Rechnungsdatum — als Anzahlung erfassen';
+        } else if (issueDate && pay.kind === 'advance_payment' && pay.date >= issueDate) {
+          errs['payDate-' + pay.id] = 'Anzahlung muss vor dem Rechnungsdatum liegen';
+        }
         const cents = toCents(pay.amount);
         if (cents == null || cents <= 0) errs['payAmount-' + pay.id] = 'Ungültiger Betrag';
         else sum += cents;
@@ -560,13 +573,20 @@ function InvoiceComposer({ mode = 'normal', open, entityId, customers, onClose, 
       method: pay.method,
       reference: pay.reference.trim() || null,
       note: null,
+      payment_kind: pay.kind,
     }));
     const paidSum = paymentInputs.reduce((a, b) => a + b.amount_cents, 0);
 
     // One payment settling the invoice in full keeps using the ORIGINAL RPC, whose
     // settle-or-fail guarantee is the stronger contract for that case. Instalments and
     // partial settlements go through the additive multi-payment path.
-    const singleFullPayment = paymentInputs.length === 1 && paidSum === totals.gross;
+    //
+    // An advance is excluded from that shortcut even when it is the only payment: the
+    // original RPC predates the second payment kind and would silently record it as an
+    // ordinary payment, then reject it for predating the invoice.
+    const singleFullPayment = paymentInputs.length === 1
+      && paidSum === totals.gross
+      && paymentInputs[0].payment_kind === 'invoice_payment';
     const { result, error, backendMissing } = singleFullPayment
       ? await recordHistoricalPaidInvoice(header, lineInputs, {
           payment_date: paymentInputs[0].payment_date,
@@ -753,22 +773,30 @@ function InvoiceComposer({ mode = 'normal', open, entityId, customers, onClose, 
           <Card className="p-5">
             <SectionHeader
               title="Zahlungen"
-              description="Eine Rechnung kann in mehreren Raten beglichen worden sein. Jede Zahlung behält ihr eigenes Datum — das bestimmt die steuerliche Periode (Ist-Versteuerung) und bleibt vom Rechnungsdatum unabhängig."
+              description="Eine Rechnung kann in mehreren Raten beglichen worden sein. Jede Zahlung behält ihr eigenes Datum — das bestimmt die steuerliche Periode und bleibt vom Rechnungsdatum unabhängig. Anzahlungen, die nachweislich vor der Schlussrechnung eingegangen sind, werden als solche erfasst; ihr echtes Eingangsdatum bleibt erhalten."
               action={<Button size="sm" variant="secondary" onClick={() => setPayments((rows) => [...rows, newPayment(issueDate || today)])}>+ Zahlung hinzufügen</Button>}
             />
             <div className="space-y-3">
               {payments.map((pay, idx) => (
                 <div key={pay.id} className="rounded-xl border border-gray-100 p-3">
                   <div className="mb-2 flex items-center justify-between">
-                    <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Zahlung {idx + 1}</span>
+                    <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">
+                      {pay.kind === 'advance_payment' ? 'Anzahlung' : 'Zahlung'} {idx + 1}
+                    </span>
                     {payments.length > 1 ? (
                       <button type="button" onClick={() => setPayments((rows) => rows.filter((r) => r.id !== pay.id))}
                         className="text-[12px] text-gray-400 hover:text-gray-900">Entfernen</button>
                     ) : null}
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2">
+                    {/* Explicit, never inferred from the date. A receipt that arrived before
+                        the final invoice is a different accounting fact, not a typo, and only
+                        the owner knows which of the two it was. */}
+                    <Select id={'payKind-' + pay.id} label="Art der Zahlung" value={pay.kind} options={PAYMENT_KIND_OPTIONS}
+                      onChange={(v) => setPayments((rows) => rows.map((r) => (r.id === pay.id ? { ...r, kind: v as InvoicePaymentKind } : r)))} />
                     <Field id={'payDate-' + pay.id} label="Zahlungsdatum" type="date" value={pay.date} required
                       error={fieldErrors['payDate-' + pay.id]}
+                      hint={pay.kind === 'advance_payment' ? 'Muss vor dem Rechnungsdatum liegen' : undefined}
                       onChange={(v) => setPayments((rows) => rows.map((r) => (r.id === pay.id ? { ...r, date: v } : r)))} />
                     <Field id={'payAmount-' + pay.id} label="Betrag (brutto)" value={pay.amount} required inputMode="decimal" prefix="€"
                       error={fieldErrors['payAmount-' + pay.id]}

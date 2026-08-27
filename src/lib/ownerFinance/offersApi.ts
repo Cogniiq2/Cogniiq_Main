@@ -344,7 +344,9 @@ export async function loadInvoiceDetail(invoiceId: string): Promise<{
   const [{ data: invoice, error: e1 }, { data: lines, error: e2 }, { data: payments, error: e3 }] = await Promise.all([
     supabase.from('owner_invoices').select('*').eq('id', invoiceId).maybeSingle(),
     supabase.from('owner_invoice_lines').select('*').eq('invoice_id', invoiceId).order('sort_order'),
-    supabase.from('owner_payments').select('*').eq('invoice_id', invoiceId).order('payment_date', { ascending: false }),
+    // Oldest first: a payment history reads as a sequence — Anzahlung, Anzahlung, Restzahlung
+    // — and reversing it puts the settlement before the instalments that led to it.
+    supabase.from('owner_payments').select('*').eq('invoice_id', invoiceId).order('payment_date', { ascending: true }),
   ]);
   if (e1) throw e1;
   if (e2) throw e2;

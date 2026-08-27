@@ -38,3 +38,26 @@ export function paymentMethodLabel(value: string | null | undefined): string {
   const humanised = key.replace(/[_-]+/g, ' ').trim();
   return humanised.charAt(0).toUpperCase() + humanised.slice(1);
 }
+
+/**
+ * German label for a payment's settlement kind.
+ *
+ * "Anzahlung" is not a decorative distinction: it is the reason a receipt is allowed to
+ * predate its invoice at all, and under Soll-Versteuerung it changes which period the USt
+ * falls into. The two must therefore be visibly different wherever payments are listed —
+ * an owner reading a payment history has to be able to see which receipts arrived before
+ * the invoice existed.
+ */
+export const PAYMENT_KIND_LABEL_DE: Record<string, string> = {
+  invoice_payment: 'Zahlung',
+  advance_payment: 'Anzahlung',
+};
+
+export function paymentKindLabel(value: string | null | undefined): string {
+  // Rows written before the column existed carry no value and are ordinary payments.
+  return PAYMENT_KIND_LABEL_DE[(value ?? '').trim()] ?? PAYMENT_KIND_LABEL_DE.invoice_payment;
+}
+
+export function isAdvancePayment(value: string | null | undefined): boolean {
+  return (value ?? '').trim() === 'advance_payment';
+}

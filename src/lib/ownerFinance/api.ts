@@ -22,30 +22,13 @@ export const OWNER_FINANCE_MIGRATION = '20260722120000_owner_finance_cockpit.sql
 
 export type FinanceBackendStatus = 'ready' | 'missing' | 'error';
 
-interface PostgrestLikeError {
-  code?: string | null;
-  message?: string | null;
-  details?: string | null;
-  hint?: string | null;
-}
-
-// Distinguishes "the finance backend has not been installed in this environment" from an ordinary
-// transient/auth error. Missing tables surface as Postgres 42P01 or PostgREST schema-cache misses
-// (PGRST205); missing RPCs as PGRST202. We never treat an RLS denial as "missing".
-export function isMissingBackendError(err: unknown): boolean {
-  const e = err as PostgrestLikeError | null;
-  if (!e) return false;
-  const code = (e.code ?? '').toUpperCase();
-  if (code === '42P01' || code === 'PGRST205' || code === 'PGRST202') return true;
-  const text = `${e.message ?? ''} ${e.details ?? ''} ${e.hint ?? ''}`.toLowerCase();
-  if (!text.trim()) return false;
-  return (
-    (text.includes('does not exist') && (text.includes('relation') || text.includes('table') || text.includes('function'))) ||
-    text.includes('could not find the table') ||
-    text.includes('could not find the function') ||
-    text.includes('schema cache')
-  );
-}
+// Error text and backend-missing detection live in errorText.ts, which has no dependency on
+// the Supabase client, so they can be unit-tested without environment variables. Re-exported
+// here because every existing caller imports them from this module.
+export type { PostgrestLikeError } from './errorText';
+export { isMissingBackendError, describeSupabaseError } from './errorText';
+// A re-export does not bind the name locally, and classifyBackendError below needs it.
+import { isMissingBackendError } from './errorText';
 
 export function classifyBackendError(err: unknown): FinanceBackendStatus {
   return isMissingBackendError(err) ? 'missing' : 'error';
@@ -126,6 +109,13 @@ export interface TaxPeriodInputs {
   vat_output_cents: number;
   vat_reverse_charge_output_cents: number;
   vat_input_cents: number;
+  /**
+   * Anzahlungen (pre-invoice receipts) falling in this period. Reported so the owner can see
+   * that a period's USt figure was shaped by advances — under Soll they are taxed on receipt
+   * per §13 Abs. 1 Nr. 1 lit. a Satz 4 UStG rather than with the later invoice. Optional
+   * because a database without the advance-payments migration does not return it.
+   */
+  advance_payment_count?: number;
   has_unlinked_income: boolean;
   has_unresolved_treatment: boolean;
   missing_service_date: boolean;
