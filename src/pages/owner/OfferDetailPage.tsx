@@ -13,6 +13,8 @@ import { PremiumPdfPreviewDialog } from '@/components/finance/PremiumPdfPreviewD
 import { SendOfferDialog } from '@/components/finance/SendOfferDialog';
 import { ConvertOfferToInvoiceDialog } from '@/components/finance/ConvertOfferToInvoiceDialog';
 import { CustomerPortalPublishCard } from '@/components/finance/CustomerPortalPublishCard';
+import { OfferEngagementCard } from '@/components/finance/OfferEngagementCard';
+import { OfferEngagementComparison, type ComparableOffer } from '@/components/finance/OfferEngagementComparison';
 import {
   loadOffer, finalizeOffer, createOfferRevision, setOfferStatus,
   createOfferAccessToken, loadOfferAcceptanceEvents, loadGeneratedDocuments, signedDocumentUrl,
@@ -20,6 +22,9 @@ import {
   loadAcceptanceSummary, signedSignatureUrl, retryAutomationJob, retryOfferAutomation,
   loadOfferAutomationJobs,
 } from '@/lib/ownerFinance/offersApi';
+import { loadOffers } from '@/lib/ownerFinance/offersApi';
+import { loadOfferEngagementSummary, loadOfferEngagementOverview } from '@/lib/ownerFinance/offerEngagementApi';
+import type { OfferEngagementSummary, OfferEngagementOverviewRow } from '@/lib/ownerFinance/offerEngagement';
 import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
 import { offerToDocument, snapshotToDocument } from '@/lib/ownerFinance/buildTransactionalDoc';
 import { computeOfferPricing, intervalSuffix } from '@/lib/ownerFinance/documents/offerPricing';
@@ -72,6 +77,11 @@ export function OfferDetailPage() {
   const [summary, setSummary] = useState<OwnerOfferAcceptanceSummary | null>(null);
   const [automationJobs, setAutomationJobs] = useState<OwnerAutomationJobStatus[]>([]);
   const [recipient, setRecipient] = useState<{ name: string; addressLines: string[]; email: string | null } | null>(null);
+  // Engagement is loaded ALONGSIDE the offer, never as a precondition for it: a failure
+  // here leaves the card empty and every existing action on this page untouched.
+  const [engagement, setEngagement] = useState<OfferEngagementSummary | null>(null);
+  const [engagementOverview, setEngagementOverview] = useState<OfferEngagementOverviewRow[]>([]);
+  const [siblingOffers, setSiblingOffers] = useState<ComparableOffer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -88,16 +98,30 @@ export function OfferDetailPage() {
     if (!offerId || !entity) return;
     if (!opts?.silent) setLoading(true);
     try {
-      const [res, settingsRow, evts, generated, clients, ver, jobs] = await Promise.all([
+      const [res, settingsRow, evts, generated, clients, ver, jobs, eng, engOverview, allOffers] = await Promise.all([
         loadOffer(offerId), loadDocumentSettings(entity.id).catch(() => null),
         loadOfferAcceptanceEvents(offerId).catch(() => []),
         loadGeneratedDocuments(entity.id, { type: 'owner_offers', id: offerId }).catch(() => []),
         loadAdminClients().catch(() => []),
         loadLatestOfferVersion(offerId).catch(() => null),
         loadOfferAutomationJobs(offerId).catch(() => []),
+        loadOfferEngagementSummary(offerId).catch(() => null),
+        loadOfferEngagementOverview(entity.id).catch(() => []),
+        loadOffers(entity.id).catch(() => []),
       ]);
       if (!res) { setError('Angebot nicht gefunden'); return; }
       setOffer(res.offer); setLines(res.lines); setSettings(settingsRow); setEvents(evts); setDocs(generated); setVersion(ver); setAutomationJobs(jobs);
+      setEngagement(eng); setEngagementOverview(engOverview);
+      // Siblings = other offers of the SAME organization. Without an organization there is
+      // no trustworthy relation, so no comparison is offered rather than one guessed from
+      // recipient text.
+      setSiblingOffers(
+        res.offer.organization_id
+          ? allOffers
+              .filter((o) => o.organization_id === res.offer.organization_id && o.archived_at == null && o.status !== 'draft')
+              .map((o) => ({ id: o.id, label: o.title?.trim() || o.offer_number || 'Angebot' }))
+          : [],
+      );
       if (['accepted', 'converted'].includes(res.offer.status)) {
         loadAcceptanceSummary(offerId).then(setSummary).catch(() => setSummary(null));
       } else setSummary(null);
@@ -437,6 +461,12 @@ export function OfferDetailPage() {
                 </div>
               </div>
             </Card>
+          ) : null}
+
+          {!isDraft ? <OfferEngagementCard summary={engagement} offerStatus={offer.status} /> : null}
+
+          {!isDraft ? (
+            <OfferEngagementComparison offers={siblingOffers} overview={engagementOverview} currentOfferId={offer.id} />
           ) : null}
 
           {events.length > 0 ? (

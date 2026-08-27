@@ -5,6 +5,7 @@ import {
 import { publicLinesToDocumentItems, termMonthsLabel } from '@/lib/ownerFinance/publicOfferPricing';
 import { asListOrProse } from '@/lib/ownerFinance/documents/listFields';
 import type { PublicOfferProjection, PublicOfferLine } from '@/lib/ownerFinance/offersApi';
+import type { OfferSectionId } from '@/lib/offerEngagement/sections';
 
 // Premium, responsive web presentation of the finalized offer. It consumes the SAME
 // immutable projection that backs the finalized PDF, so the customer can never see one
@@ -12,9 +13,16 @@ import type { PublicOfferProjection, PublicOfferLine } from '@/lib/ownerFinance/
 // mobile collapses modules into cards. Long German compound words wrap safely (no
 // truncation, no horizontal overflow).
 
-function Section({ id, kicker, title, children }: { id?: string; kicker?: string; title: string; children: React.ReactNode }) {
+// `track` marks a section for the owner's internal engagement measurement. It adds a
+// data attribute and nothing else — no listener, no state, no wrapper element — so the
+// customer's document is byte-for-byte what it was without it. The ids come from the
+// canonical OfferSectionId union, so a typo is a type error rather than a silently
+// unmeasured section.
+function Section({ id, track, kicker, title, children }: {
+  id?: string; track?: OfferSectionId; kicker?: string; title: string; children: React.ReactNode;
+}) {
   return (
-    <section id={id} className="scroll-mt-24 border-t border-slate-100 py-8 first:border-t-0 sm:py-10">
+    <section id={id} data-engagement-section={track} className="scroll-mt-24 border-t border-slate-100 py-8 first:border-t-0 sm:py-10">
       {kicker ? <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">{kicker}</p> : null}
       <h2 className="text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">{title}</h2>
       <div className="mt-4 text-[15px] leading-relaxed text-slate-600 [overflow-wrap:anywhere] hyphens-auto">{children}</div>
@@ -73,7 +81,7 @@ export function PremiumOfferWebView({ offer, greeting }: { offer: PublicOfferPro
   return (
     <div>
       {/* Hero */}
-      <header className="pb-4">
+      <header data-engagement-section="hero" className="pb-4">
         <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">{offer.seller.legal_name || 'Cogniiq'}</p>
         <p className="mt-3 text-[15px] font-medium text-slate-500">{greeting},</p>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 [overflow-wrap:anywhere] hyphens-auto sm:text-3xl">
@@ -89,19 +97,19 @@ export function PremiumOfferWebView({ offer, greeting }: { offer: PublicOfferPro
       </header>
 
       {offer.introduction ? (
-        <Section kicker="Ausgangslage" title="Ihre Ausgangslage"><p className="whitespace-pre-line">{offer.introduction}</p></Section>
+        <Section track="introduction" kicker="Ausgangslage" title="Ihre Ausgangslage"><p className="whitespace-pre-line">{offer.introduction}</p></Section>
       ) : null}
 
       {offer.executive_summary ? (
-        <Section kicker="Zielbild" title="Das Zielbild"><p className="whitespace-pre-line">{offer.executive_summary}</p></Section>
+        <Section track="executive_summary" kicker="Zielbild" title="Das Zielbild"><p className="whitespace-pre-line">{offer.executive_summary}</p></Section>
       ) : null}
 
       {offer.project_approach ? (
-        <Section kicker="Vorgehen" title="Unser Vorgehen"><p className="whitespace-pre-line">{offer.project_approach}</p></Section>
+        <Section track="project_approach" kicker="Vorgehen" title="Unser Vorgehen"><p className="whitespace-pre-line">{offer.project_approach}</p></Section>
       ) : null}
 
       {outcomes.length ? (
-        <Section kicker="Ergebnisse" title="Was Sie damit erreichen">
+        <Section track="desired_outcomes" kicker="Ergebnisse" title="Was Sie damit erreichen">
           <ul className="space-y-2">
             {outcomes.map((o, i) => (
               <li key={i} className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-teal-600" /><span>{o}</span></li>
@@ -110,21 +118,21 @@ export function PremiumOfferWebView({ offer, greeting }: { offer: PublicOfferPro
         </Section>
       ) : null}
 
-      <Section kicker="Leistungen" title="Ihre Projektmodule">
+      <Section track="modules" kicker="Leistungen" title="Ihre Projektmodule">
         <div className="grid gap-3">
           {modules.map((l, i) => <ModuleCard key={i} line={l} index={i + 1} currency={currency} />)}
         </div>
       </Section>
 
       {optional.length ? (
-        <Section kicker="Optional" title="Optionale Erweiterungen">
+        <Section track="optional_modules" kicker="Optional" title="Optionale Erweiterungen">
           <div className="grid gap-3">
             {optional.map((l, i) => <ModuleCard key={i} line={l} index={i + 1} currency={currency} optional />)}
           </div>
         </Section>
       ) : null}
 
-      <Section kicker="Investition" title="Ihre Investition">
+      <Section track="investment" kicker="Investition" title="Ihre Investition">
         <div className="ml-auto max-w-sm space-y-5">
           {pricing.hasOneTime || !pricing.hasRecurring ? (
             <dl className="space-y-2">
@@ -167,7 +175,7 @@ export function PremiumOfferWebView({ offer, greeting }: { offer: PublicOfferPro
       </Section>
 
       {timeline.length ? (
-        <Section kicker="Zeitplan" title="Der Zeitplan">
+        <Section track="timeline" kicker="Zeitplan" title="Der Zeitplan">
           <ol className="space-y-4">
             {timeline.map((t, i) => (
               <li key={i} className="relative pl-6">
@@ -184,7 +192,7 @@ export function PremiumOfferWebView({ offer, greeting }: { offer: PublicOfferPro
       ) : null}
 
       {schedule.length ? (
-        <Section kicker="Zahlung" title="Zahlungsplan">
+        <Section track="payment_schedule" kicker="Zahlung" title="Zahlungsplan">
           {pricing.hasRecurring ? (
             <p className="mb-3 text-[14px] text-slate-500">
               Die Raten beziehen sich auf die einmalige Projektinvestition. Wiederkehrende Leistungen werden separat gemäß ihrem Abrechnungsintervall berechnet.
@@ -205,7 +213,7 @@ export function PremiumOfferWebView({ offer, greeting }: { offer: PublicOfferPro
       ) : null}
 
       {(offer.assumptions || offer.exclusions || offer.payment_terms || offer.delivery_terms) ? (
-        <Section kicker="Rahmen" title="Annahmen & Rahmenbedingungen">
+        <Section track="terms" kicker="Rahmen" title="Annahmen & Rahmenbedingungen">
           <div className="space-y-3">
             {offer.payment_terms ? <p><span className="font-medium text-slate-700">Zahlung:</span> {offer.payment_terms}</p> : null}
             {offer.delivery_terms ? <p><span className="font-medium text-slate-700">Lieferung:</span> {offer.delivery_terms}</p> : null}
@@ -216,7 +224,7 @@ export function PremiumOfferWebView({ offer, greeting }: { offer: PublicOfferPro
       ) : null}
 
       {offer.next_steps ? (
-        <Section kicker="Nächste Schritte" title="So geht es weiter"><p className="whitespace-pre-line">{offer.next_steps}</p></Section>
+        <Section track="next_steps" kicker="Nächste Schritte" title="So geht es weiter"><p className="whitespace-pre-line">{offer.next_steps}</p></Section>
       ) : null}
     </div>
   );

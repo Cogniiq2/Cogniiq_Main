@@ -10,6 +10,7 @@ import { SignaturePad, type SignaturePadHandle } from '@/components/finance/Sign
 import { computeOfferPricing, intervalSuffix, type OfferPricing } from '@/lib/ownerFinance/documents/offerPricing';
 import { publicLinesToDocumentItems } from '@/lib/ownerFinance/publicOfferPricing';
 import { formatOfferAmount } from '@/lib/ownerFinance/offerAmountDisplay';
+import { useOfferEngagement } from '@/lib/offerEngagement/useOfferEngagement';
 
 // Standalone, tokenized customer document portal (/d/:token). No marketing/dashboard
 // chrome, no auth. Owns the full viewport. The raw token never grants access by resource
@@ -68,6 +69,13 @@ export function PublicDocumentPortal() {
 
   useEffect(() => { void load(); }, [load]);
 
+  // Internal engagement measurement for the OWNER's dashboard. Purely observational and
+  // entirely best-effort: it starts only once a valid offer is on screen, it never blocks
+  // rendering, the PDF or acceptance, and every one of its calls swallows its own errors.
+  // It does NOT re-enter public_offer_by_token, so it produces no extra view events, no
+  // status change and no owner notification.
+  const engagement = useOfferEngagement(token, !!offer && !failure);
+
   // Title = offer number after load (private surface: robots/referrer set in App).
   useEffect(() => {
     if (offer?.offer_number) document.title = `Angebot ${offer.offer_number} · Cogniiq`;
@@ -118,6 +126,26 @@ export function PublicDocumentPortal() {
     const url = URL.createObjectURL(new Blob([bytes.slice()], { type: 'application/pdf' }));
     const a = document.createElement('a'); a.href = url; a.download = `Angebot-${offer.offer_number ?? 'Cogniiq'}.pdf`; a.click();
     setTimeout(() => URL.revokeObjectURL(url), 60000);
+    // Recorded AFTER the click and inside its own guard: the download has already
+    // happened by this point, so no failure here can cost the customer their PDF.
+    // Nothing about the document itself changes — it is not re-rendered for tracking.
+    try { engagement.record('pdf_download'); } catch { /* analytics is never fatal */ }
+  };
+
+  /**
+   * Opening the acceptance dialog is an ATTENTION signal, not a decision. These helpers
+   * do exactly what the plain setState did before, plus one fire-and-forget analytics
+   * call. They do NOT accept the offer, change its status, price it, invoice it, enqueue
+   * automation or send any mail — the authoritative acceptance path is unchanged and
+   * still runs only from AcceptFlow's submit button.
+   */
+  const openAccept = () => {
+    setAcceptOpen(true);
+    try { engagement.record('acceptance_opened'); } catch { /* analytics is never fatal */ }
+  };
+  const openReject = () => {
+    setRejectOpen(true);
+    try { engagement.record('rejection_opened'); } catch { /* analytics is never fatal */ }
   };
 
   // ---- loading / failure -------------------------------------------------
@@ -183,7 +211,7 @@ export function PublicDocumentPortal() {
             <div className="sticky top-8">
               <DecisionPanel
                 offer={offer} pricing={pricing} done={done} expired={expired}
-                onAccept={() => setAcceptOpen(true)} onReject={() => setRejectOpen(true)}
+                onAccept={openAccept} onReject={openReject}
                 onDownload={() => void downloadPdf()}
               />
             </div>
@@ -205,7 +233,7 @@ export function PublicDocumentPortal() {
                 ))}
               </div>
             </div>
-            <button onClick={() => setAcceptOpen(true)}
+            <button onClick={openAccept}
               className="min-h-[44px] shrink-0 rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white active:bg-slate-800">
               Angebot annehmen
             </button>
@@ -217,7 +245,12 @@ export function PublicDocumentPortal() {
         <AcceptFlow
           offer={offer}
           onClose={() => setAcceptOpen(false)}
-          onDone={(via) => { setSubmitVia(via); setDone('accepted'); setAcceptOpen(false); }}
+          onDone={(via) => {
+            setSubmitVia(via); setDone('accepted'); setAcceptOpen(false);
+            // Observed AFTER the authoritative acceptance already succeeded — this
+            // records that it happened, it does not cause it.
+            try { engagement.record('acceptance_completed'); } catch { /* analytics is never fatal */ }
+          }}
         />
       ) : null}
 

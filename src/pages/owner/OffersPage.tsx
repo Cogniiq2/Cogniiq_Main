@@ -9,6 +9,11 @@ import {
 } from '@/components/dashboard';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import { loadOffers, loadPendingSendOfferIds } from '@/lib/ownerFinance/offersApi';
+import { loadOfferEngagementOverview } from '@/lib/ownerFinance/offerEngagementApi';
+import {
+  ENGAGEMENT_LEVEL_LABEL_DE, ENGAGEMENT_LEVEL_TONE, formatActiveClock, formatRelativeDe, scoreEngagement,
+  type OfferEngagementOverviewRow,
+} from '@/lib/ownerFinance/offerEngagement';
 import { unarchiveOffer } from '@/lib/ownerFinance/customersApi';
 import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
 import { formatCents } from '@/lib/clientPlatform/validation';
@@ -34,6 +39,9 @@ export function OffersPage() {
   const navigate = useNavigate();
   const [offers, setOffers] = useState<OwnerOffer[]>([]);
   const [pendingSend, setPendingSend] = useState<Set<string>>(new Set());
+  // Engagement is decoration on this table, never a precondition: it loads with its own
+  // catch so a failure leaves the offers list exactly as it was.
+  const [engagement, setEngagement] = useState<Map<string, OfferEngagementOverviewRow>>(new Map());
   const [customers, setCustomers] = useState<CustomerOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,13 +59,15 @@ export function OffersPage() {
     if (!entity) return;
     setLoading(true);
     try {
-      const [off, pending, clients] = await Promise.all([
+      const [off, pending, clients, eng] = await Promise.all([
         loadOffers(entity.id),
         loadPendingSendOfferIds(entity.id).catch(() => new Set<string>()),
         loadAdminClients().catch(() => []),
+        loadOfferEngagementOverview(entity.id).catch(() => [] as OfferEngagementOverviewRow[]),
       ]);
       setOffers(off);
       setPendingSend(pending);
+      setEngagement(new Map(eng.map((r) => [r.offer_id, r])));
       setCustomers(clients.map((c) => ({ organizationId: c.organizationId, name: c.organizationName, legalName: c.account?.legal_name ?? null })));
       setError(null);
     } catch (e: unknown) { setError(e instanceof Error ? e.message : String(e)); }
@@ -182,6 +192,19 @@ export function OffersPage() {
     { key: 'customer', header: 'Kunde', render: (o) => <span className="text-gray-600">{customerName(o)}</span> },
     { key: 'title', header: 'Titel', render: (o) => <span className="text-gray-600">{o.title ?? '—'}</span>, hideOnMobile: true },
     { key: 'valid', header: 'Gültig bis', render: (o) => <span className="text-gray-500">{o.valid_until ? formatDateDe(o.valid_until) : '—'}</span>, hideOnMobile: true },
+    { key: 'engagement', header: 'Interesse', hideOnMobile: true, render: (o) => {
+      const m = engagement.get(o.id);
+      if (!m || m.total_sessions === 0) return <span className="text-gray-300">—</span>;
+      const score = scoreEngagement(m);
+      return (
+        <div className="flex flex-col items-start gap-0.5">
+          <StatusBadge label={ENGAGEMENT_LEVEL_LABEL_DE[score.level]} tone={ENGAGEMENT_LEVEL_TONE[score.level]} />
+          <span className="text-[11px] text-gray-400">
+            {m.total_sessions}× · {formatActiveClock(m.total_active_seconds)} · {formatRelativeDe(m.last_activity_at)}
+          </span>
+        </div>
+      );
+    } },
     { key: 'gross', header: 'Brutto', align: 'right', render: (o) => <span className="tabular-nums font-medium text-gray-900">{formatOfferAmount(o, o.currency, formatCents)}</span> },
     { key: 'actions', header: '', align: 'right', render: (o) => (
       <div className="flex items-center justify-end gap-0.5" onClick={(e) => e.stopPropagation()}>
