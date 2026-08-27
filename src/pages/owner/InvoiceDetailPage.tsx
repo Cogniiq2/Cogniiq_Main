@@ -17,6 +17,7 @@ import { generateAndStoreDocument } from '@/lib/ownerFinance/generateDocument';
 import { runFinanceExport } from '@/lib/ownerFinance/financeExportRunner';
 import { invoiceExportTable, invoiceMetadataSheet, invoiceReportModel } from '@/lib/ownerFinance/exports/datasets';
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
+import { paymentMethodLabel, PAYMENT_METHOD_OPTIONS } from '@/lib/ownerFinance/paymentMethods';
 import { formatDateDe, formatCentsCurrencyDe, formatBpPercentDe, type ExportFormat, type ExportMode, type ExportMeta } from '@/lib/ownerFinance/exports';
 import { ExportMenu } from '@/components/finance/ExportMenu';
 import { CustomerPortalPublishCard } from '@/components/finance/CustomerPortalPublishCard';
@@ -181,16 +182,27 @@ export function InvoiceDetailPage() {
                   <span className="min-w-0 text-gray-600">
                     {formatDateDe(String(p.payment_date ?? ''))}
                     {p.reference ? <span className="ml-2 text-gray-500">{String(p.reference)}</span> : null}
-                    {p.payment_method ? <span className="ml-2 text-[11px] text-gray-400">{String(p.payment_method)}</span> : null}
+                    {p.payment_method ? <span className="ml-2 text-[11px] text-gray-400">{paymentMethodLabel(String(p.payment_method))}</span> : null}
                   </span>
                   <span className="shrink-0 tabular-nums font-medium text-gray-900">{formatCents(Number(p.amount_cents ?? 0), invoice.currency)}</span>
                 </li>
               ))}</ul>
             )}
+            {/* An invoice imported before the overpayment guard existed can be paid ABOVE its
+                gross. Showing that as "Offen: -0,01 €" reads as a negative receivable, which is
+                not what happened. The open balance floors at zero and the excess is named
+                separately. Nothing is recomputed or corrected here — both figures come from the
+                server's own amount_paid_cents. */}
             <dl className="mt-4 space-y-1.5 border-t border-gray-100 pt-3 text-[13px]">
               <div className="flex justify-between"><dt className="text-gray-500">Rechnungsbetrag</dt><dd className="tabular-nums text-gray-700">{formatCents(invoice.gross_total_cents, invoice.currency)}</dd></div>
               <div className="flex justify-between"><dt className="text-gray-500">Bezahlt</dt><dd className="tabular-nums font-medium text-emerald-700">{formatCents(invoice.amount_paid_cents, invoice.currency)}</dd></div>
-              <div className="flex justify-between"><dt className="font-semibold text-gray-950">Offen</dt><dd className="tabular-nums font-semibold text-gray-950">{formatCents(invoice.gross_total_cents - invoice.amount_paid_cents, invoice.currency)}</dd></div>
+              <div className="flex justify-between"><dt className="font-semibold text-gray-950">Offen</dt><dd className="tabular-nums font-semibold text-gray-950">{formatCents(Math.max(invoice.gross_total_cents - invoice.amount_paid_cents, 0), invoice.currency)}</dd></div>
+              {invoice.amount_paid_cents > invoice.gross_total_cents ? (
+                <div className="flex justify-between border-t border-gray-100 pt-1.5">
+                  <dt className="font-medium text-amber-700">Überzahlung</dt>
+                  <dd className="tabular-nums font-medium text-amber-700">{formatCents(invoice.amount_paid_cents - invoice.gross_total_cents, invoice.currency)}</dd>
+                </div>
+              ) : null}
             </dl>
             <p className="mt-3 text-[11px] leading-relaxed text-gray-400">
               Zahlungen werden rein intern erfasst. Es wird dabei nichts an den Kunden versendet.
@@ -268,7 +280,7 @@ function PaymentModal({ open, invoice, onClose, onDone, onError }: { open: boole
       <div className="grid gap-4 sm:grid-cols-2">
         <Field id="amt" label="Betrag" prefix="€" value={amount} onChange={setAmount} inputMode="decimal" autoFocus />
         <Field id="dt" label="Datum" type="date" value={date} onChange={setDate} />
-        <Select id="m" label="Zahlungsart" value={method} onChange={setMethod} options={[{ value: 'bank_transfer', label: 'Überweisung' }, { value: 'card', label: 'Karte' }, { value: 'cash', label: 'Bar' }, { value: 'paypal', label: 'PayPal' }, { value: 'other', label: 'Sonstige' }]} />
+        <Select id="m" label="Zahlungsart" value={method} onChange={setMethod} options={PAYMENT_METHOD_OPTIONS} />
       </div>
       {err ? <p className="mt-3 text-[13px] text-red-600">{err}</p> : null}
     </Modal>

@@ -168,6 +168,88 @@ begin
   end;
 end $$;
 
+-- ---------------------------------------------------------------------------
+-- 4b. LEGACY OVERPAYMENT REPAIR.
+--
+-- An invoice recorded before the overpayment guard existed may already overpay. The
+-- guard must not strand it: metadata has to stay editable and the amount has to be
+-- reducible, or the owner can never correct their own books. New overpayment stays
+-- blocked in every direction.
+--
+-- The fixture disables the validate trigger for exactly one INSERT to reproduce a row
+-- that predates the guard. That is the only way to create the legacy state now that the
+-- guard exists — which is itself the point of the test.
+-- ---------------------------------------------------------------------------
+do $$
+declare r jsonb; v_inv uuid; inv record;
+begin
+  r := public.record_owner_historical_paid_invoice(gen_random_uuid(),
+    pg_temp.header('2026-12-01'), pg_temp.body(),
+    jsonb_build_object('payment_date','2026-12-02','method','bank_transfer'));
+  v_inv := (r->>'invoice_id')::uuid;
+  perform set_config('t.legacy', v_inv::text, false);
+
+  alter table public.owner_payments disable trigger owner_payments_validate;
+  insert into public.owner_payments (business_entity_id, kind, direction, payment_date, amount_cents, invoice_id, notes)
+  select i.business_entity_id, 'income', 'inflow', '2026-12-03', 5000, v_inv, 'Altbestand: Ueberzahlung'
+  from public.owner_invoices i where i.id = v_inv;
+  alter table public.owner_payments enable trigger owner_payments_validate;
+
+  select * into inv from public.owner_invoices where id = v_inv;
+  perform pg_temp.want(inv.amount_paid_cents > inv.gross_total_cents,
+    'fixture: the invoice is now overpaid, as legacy data can be (' || inv.amount_paid_cents || ' > ' || inv.gross_total_cents || ')');
+end $$;
+
+do $$
+begin
+  update public.owner_payments set notes = 'Korrigierter Hinweis'
+   where invoice_id = current_setting('t.legacy')::uuid and amount_cents = 5000;
+  perform pg_temp.pass('METADATA-only edit on an already-overpaid invoice is allowed (repair is possible)');
+exception when others then
+  perform pg_temp.fail('metadata edit on a legacy overpaid invoice was blocked: ' || sqlerrm);
+end $$;
+
+do $$
+begin
+  -- Still above gross afterwards, but LOWER than before: this is repair, so it passes.
+  update public.owner_payments set amount_cents = 500
+   where invoice_id = current_setting('t.legacy')::uuid and amount_cents = 5000;
+  perform pg_temp.pass('REDUCING an overpaying amount is allowed even while still above gross');
+exception when others then
+  perform pg_temp.fail('reducing a legacy overpayment was blocked: ' || sqlerrm);
+end $$;
+
+do $$
+begin
+  update public.owner_payments set amount_cents = 9000
+   where invoice_id = current_setting('t.legacy')::uuid and amount_cents = 500;
+  perform pg_temp.fail('an UPDATE was allowed to INCREASE the overpayment');
+exception when others then
+  perform pg_temp.want(sqlerrm like '%exceed%',
+    'INCREASING an existing overpayment is still refused: ' || sqlerrm);
+end $$;
+
+do $$
+declare inv record;
+begin
+  -- Fully repair it: delete the stray row and confirm the invoice lands back on 'paid'.
+  delete from public.owner_payments
+   where invoice_id = current_setting('t.legacy')::uuid and amount_cents = 500;
+  select * into inv from public.owner_invoices where id = current_setting('t.legacy')::uuid;
+  perform pg_temp.want(inv.amount_paid_cents = inv.gross_total_cents and inv.status = 'paid',
+    'a legacy overpayment can be fully repaired back to exactly paid (status ' || inv.status || ')');
+end $$;
+
+do $$
+begin
+  -- And once repaired, the invoice behaves like any other: no new overpayment.
+  perform public.owner_add_invoice_payment(gen_random_uuid(), current_setting('t.legacy')::uuid,
+    jsonb_build_object('payment_date','2026-12-10','amount_cents',1));
+  perform pg_temp.fail('a NEW overpayment was accepted after repair');
+exception when others then
+  perform pg_temp.want(sqlerrm like '%exceed%', 'after repair, a new overpayment is refused again: ' || sqlerrm);
+end $$;
+
 -- A payment settling an invoice may not predate it. Genuine ADVANCE payments are a
 -- separate accounting model; this check is intentionally not relaxed.
 do $$

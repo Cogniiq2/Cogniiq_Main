@@ -21,6 +21,9 @@ import {
 import { Repeat } from 'lucide-react';
 
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
+import { RevenueContractFormDialog } from '@/components/finance/RevenueContractFormDialog';
+import { loadCustomers } from '@/lib/ownerFinance/customersApi';
+import type { OwnerCustomerListRow } from '@/lib/ownerFinance/types';
 import { formatCents } from '@/lib/clientPlatform/validation';
 import { formatDateDe } from '@/lib/ownerFinance/exports';
 import {
@@ -54,11 +57,19 @@ export function RevenueContractsPage() {
   const [error, setError] = useState<string | null>(null);
   const [postTarget, setPostTarget] = useState<RevenueContractRow | null>(null);
   const [importOpen, setImportOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [customers, setCustomers] = useState<OwnerCustomerListRow[]>([]);
 
   const load = useCallback(async () => {
     if (!entity) return;
     setLoading(true);
-    try { setOverview(await loadRevenueContractOverview(entity.id)); setError(null); }
+    try {
+      const [ov, custs] = await Promise.all([
+        loadRevenueContractOverview(entity.id),
+        loadCustomers(entity.id).catch(() => [] as OwnerCustomerListRow[]),
+      ]);
+      setOverview(ov); setCustomers(custs); setError(null);
+    }
     catch (e: unknown) { setError(e instanceof Error ? e.message : String(e)); }
     finally { setLoading(false); }
   }, [entity]);
@@ -118,7 +129,12 @@ export function RevenueContractsPage() {
       <PageHeader
         title="Laufende Verträge"
         description="Wiederkehrende Kundenumsätze. Diese Werte sind vertraglich erwartet — sie werden erst zu tatsächlichem Umsatz, wenn Sie einen Monat verbuchen. Es wird nie automatisch etwas an Kunden versendet."
-        actions={<Button variant="secondary" onClick={() => setImportOpen(true)} disabled={!entity}>Schnellimport</Button>}
+        actions={
+          <div className="flex items-center gap-2">
+            <Button variant="secondary" onClick={() => setImportOpen(true)} disabled={!entity}>Schnellimport</Button>
+            <Button onClick={() => setCreateOpen(true)} disabled={!entity}>+ Vertrag anlegen</Button>
+          </div>
+        }
       />
 
       {error ? <div className="mb-6"><ErrorState message={error} onRetry={() => void load()} /></div> : null}
@@ -146,8 +162,13 @@ export function RevenueContractsPage() {
         <EmptyState
           icon={Repeat}
           title="Noch keine laufenden Verträge"
-          description="Laufende Kundenverträge erscheinen hier mit MRR, ARR und dem nächsten abrechenbaren Zeitraum. Sie können sie auch per Schnellimport anlegen."
-          action={<Button variant="secondary" onClick={() => setImportOpen(true)}>Schnellimport</Button>}
+          description="Laufende Kundenverträge erscheinen hier mit MRR, ARR und dem nächsten abrechenbaren Zeitraum. Legen Sie einen Vertrag direkt an oder importieren Sie mehrere auf einmal."
+          action={
+            <div className="flex items-center gap-2">
+              <Button onClick={() => setCreateOpen(true)}>+ Vertrag anlegen</Button>
+              <Button variant="secondary" onClick={() => setImportOpen(true)}>Schnellimport</Button>
+            </div>
+          }
         />
       ) : (
         <DataTable columns={columns} rows={contracts} getRowKey={(c) => c.contract_id} minWidth={900}
@@ -160,6 +181,15 @@ export function RevenueContractsPage() {
         onClose={() => setPostTarget(null)}
         onDone={(msg) => { setPostTarget(null); toast.success(msg); void load(); }}
         onError={(m) => toast.error('Verbuchung fehlgeschlagen', m)}
+      />
+
+      <RevenueContractFormDialog
+        open={createOpen}
+        entityId={entity?.id ?? null}
+        customers={customers}
+        onClose={() => setCreateOpen(false)}
+        onCreated={(msg) => { setCreateOpen(false); toast.success('Vertrag angelegt', msg); void load(); }}
+        onError={(m) => toast.error('Vertrag konnte nicht angelegt werden', m)}
       />
 
       <BulkImportModal

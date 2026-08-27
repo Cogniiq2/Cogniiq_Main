@@ -18,6 +18,7 @@ import { cancelInvoice, loadCustomers } from '@/lib/ownerFinance/customersApi';
 import { customerDisplayName } from '@/lib/ownerFinance/customerLabels';
 import { CustomerFormDialog } from '@/components/finance/CustomerFormDialog';
 import { computeInvoiceLine } from '@/lib/ownerFinance/tax';
+import { PAYMENT_METHOD_OPTIONS } from '@/lib/ownerFinance/paymentMethods';
 import { recordHistoricalInvoiceWithPayments, type InvoicePaymentInput } from '@/lib/ownerFinance/financeExtendedApi';
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
 import type { OwnerCustomerListRow, OwnerInvoice } from '@/lib/ownerFinance/types';
@@ -174,7 +175,11 @@ export function InvoicesPage() {
     { key: 'date', header: 'Datum', render: (inv) => <span className="text-gray-500">{inv.issue_date ?? '—'}</span> },
     { key: 'net', header: 'Netto', align: 'right', render: (inv) => <span className="tabular-nums">{formatCents(inv.net_total_cents, inv.currency)}</span> },
     { key: 'gross', header: 'Brutto', align: 'right', render: (inv) => <span className="tabular-nums font-medium text-gray-900">{formatCents(inv.gross_total_cents, inv.currency)}</span> },
-    { key: 'open', header: 'Offen', align: 'right', render: (inv) => <span className="tabular-nums">{formatCents(inv.gross_total_cents - inv.amount_paid_cents, inv.currency)}</span> },
+    // A legacy overpaid invoice must not read as a negative receivable; the excess is
+    // surfaced as its own amber figure instead. Accounting values are untouched.
+    { key: 'open', header: 'Offen', align: 'right', render: (inv) => (inv.amount_paid_cents > inv.gross_total_cents
+      ? <span className="tabular-nums text-amber-700" title="Überzahlung aus Altbestand">{formatCents(0, inv.currency)} <span className="text-[11px]">(+{formatCents(inv.amount_paid_cents - inv.gross_total_cents, inv.currency)})</span></span>
+      : <span className="tabular-nums">{formatCents(inv.gross_total_cents - inv.amount_paid_cents, inv.currency)}</span>) },
     {
       key: 'actions', header: '', align: 'right', render: (inv) => (
         <div className="flex justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
@@ -627,10 +632,15 @@ function InvoiceComposer({ mode = 'normal', open, entityId, customers, onClose, 
       }
     >
       <div className="space-y-6">
+        {/* The old wording promised an open balance of 0,00 €. That stopped being true when
+            instalments arrived: a historical invoice may legitimately end up only partly
+            settled, and claiming otherwise would misdescribe what the owner is about to save. */}
         {historical ? (
           <InfoBanner tone="info" title="Rückwirkende Erfassung – ohne Kundenkontakt">
-            Diese Rechnung wird direkt als bezahlt gebucht: Rechnungsdatum und Zahlungsdatum bleiben
-            getrennt erhalten, der offene Betrag ist 0,00 €. Es wird <span className="font-semibold">keine
+            Diese Rechnung wird rein intern erfasst. Sie können eine oder mehrere bereits
+            erhaltene Zahlungen eintragen; Rechnungsdatum und Zahlungsdaten bleiben getrennt
+            erhalten. Je nach Summe der Zahlungen ergibt sich der Status <span className="font-semibold">Teilbezahlt</span> oder
+            {' '}<span className="font-semibold">Bezahlt</span>. Es wird <span className="font-semibold">keine
             E-Mail, keine Zahlungserinnerung und keine Benachrichtigung</span> an den Kunden versendet.
           </InfoBanner>
         ) : null}
@@ -813,13 +823,9 @@ function InvoiceComposer({ mode = 'normal', open, entityId, customers, onClose, 
 
 /* ------------------------------------------------------------------ Payment */
 
-const paymentMethods = [
-  { value: 'bank_transfer', label: 'Überweisung' },
-  { value: 'card', label: 'Karte' },
-  { value: 'cash', label: 'Bar' },
-  { value: 'paypal', label: 'PayPal' },
-  { value: 'other', label: 'Sonstige' },
-];
+// Single source of truth, shared with InvoiceDetailPage so the same stored token can never
+// render as "Überweisung" on one screen and "bank_transfer" on the next.
+const paymentMethods = PAYMENT_METHOD_OPTIONS;
 
 function PaymentDialog({ invoice, onClose, onDone, onError }: {
   invoice: OwnerInvoice | null;

@@ -7,6 +7,7 @@ import {
   Select, StatusBadge, TableSkeleton, useToast,
 } from '@/components/dashboard';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
+import { loadRevenueContractOverview, type RevenueContractOverview } from '@/lib/ownerFinance/financeExtendedApi';
 import {
   createAsset, createSubscription, loadAssets, loadAudit, loadDocuments, loadPeriodSummary,
   loadSubscriptions, secureUuid, setSubscriptionStatus,
@@ -26,6 +27,10 @@ export function RevenuePage() {
   const [summary, setSummary] = useState<PeriodSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Contractual forecast, loaded separately and NEVER merged into the figures above.
+  // A failure here leaves the actual numbers untouched — forecast is decoration on this
+  // page, not part of its accounting.
+  const [forecast, setForecast] = useState<RevenueContractOverview | null>(null);
 
   useEffect(() => {
     if (!entity) return;
@@ -34,6 +39,7 @@ export function RevenuePage() {
       .then((s) => { setSummary(s); setError(null); })
       .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)))
       .finally(() => setLoading(false));
+    loadRevenueContractOverview(entity.id).then(setForecast).catch(() => setForecast(null));
   }, [entity, taxYear]);
 
   return (
@@ -41,12 +47,38 @@ export function RevenuePage() {
       <PageHeader title="Umsatz" description={`Umsatz- und Forderungsübersicht ${taxYear}. Details und Rechnungserfassung im Bereich Rechnungen.`}
         actions={<Link to="/admin/finance/invoices" className="inline-flex h-11 items-center gap-2 rounded-xl bg-gray-950 px-4 text-[13.5px] font-semibold text-white transition-colors hover:bg-gray-800">Rechnungen verwalten</Link>} />
       {error ? <ErrorState message={error} /> : loading || !summary ? <KpiSkeletonGrid /> : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <KpiCard label="Fakturiert (netto)" valueCents={summary.invoiced_net_cents} basis="actual" />
-          <KpiCard label="Fakturiert (brutto)" valueCents={summary.invoiced_gross_cents} basis="actual" />
-          <KpiCard label="Zahlungseingang" valueCents={summary.cash_in_cents} basis="actual" />
-          <KpiCard label="Offene Forderungen" valueCents={summary.outstanding_cents} basis="actual" tone={summary.overdue_cents > 0 ? 'negative' : 'neutral'} hint={summary.overdue_count ? `${summary.overdue_count} überfällig` : undefined} />
-        </div>
+        <>
+          {/* IST — money actually invoiced and actually received. */}
+          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Ist · tatsächlich</p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <KpiCard label="Fakturiert (netto)" valueCents={summary.invoiced_net_cents} basis="actual" />
+            <KpiCard label="Fakturiert (brutto)" valueCents={summary.invoiced_gross_cents} basis="actual" />
+            <KpiCard label="Zahlungseingang" valueCents={summary.cash_in_cents} basis="actual" />
+            <KpiCard label="Offene Forderungen" valueCents={summary.outstanding_cents} basis="actual" tone={summary.overdue_cents > 0 ? 'negative' : 'neutral'} hint={summary.overdue_count ? `${summary.overdue_count} überfällig` : undefined} />
+          </div>
+
+          {/* ERWARTET — contractual only. Visually separated, separately labelled, and
+              deliberately NOT added into anything above: none of it is realised revenue,
+              and none of it reaches EÜR or USt. */}
+          {forecast && forecast.active_contract_count > 0 ? (
+            <div className="mt-6 rounded-2xl border border-sky-100 bg-sky-50/40 p-4">
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-sky-700">Erwartet · vertraglich</p>
+                  <p className="mt-1 text-[12px] leading-relaxed text-sky-900/70">
+                    Planwerte aus laufenden Verträgen. Nicht in „Ist", EÜR oder Umsatzsteuer enthalten.
+                  </p>
+                </div>
+                <Link to="/admin/finance/contracts" className="text-[13px] font-semibold text-sky-800 underline">Verträge verwalten</Link>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-3">
+                <KpiCard label="MRR (netto)" valueCents={forecast.mrr_net_cents} basis="forecast" hint="monatlich wiederkehrend" />
+                <KpiCard label="ARR (netto)" valueCents={forecast.arr_net_cents} basis="forecast" hint="12 × MRR" />
+                <KpiCard label="Aktive Verträge" value={String(forecast.active_contract_count)} basis="forecast" />
+              </div>
+            </div>
+          ) : null}
+        </>
       )}
     </>
   );

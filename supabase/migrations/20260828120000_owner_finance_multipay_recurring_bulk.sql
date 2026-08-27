@@ -60,8 +60,19 @@ begin
       where p.invoice_id = new.invoice_id and p.direction = 'inflow'
         and (tg_op = 'INSERT' or p.id <> new.id);
       if v_other + new.amount_cents > inv.gross_total_cents then
-        raise exception 'payments (% cents) would exceed the invoice gross (% cents)',
-          v_other + new.amount_cents, inv.gross_total_cents;
+        -- An invoice recorded BEFORE this guard existed may already overpay. Refusing every
+        -- write on such a row would strand it: its metadata could not be corrected and its
+        -- amount could not even be reduced back into range, because the running total stays
+        -- above gross either way. So on UPDATE, a change that does not INCREASE the recorded
+        -- total is let through — that is repair, not new overpayment.
+        --
+        -- New overpayment stays impossible: an INSERT is always refused, and so is an UPDATE
+        -- that raises the total. This is repair-only relaxation, not a credit-balance
+        -- feature; a genuine customer overpayment still cannot be attached to an invoice.
+        if not (tg_op = 'UPDATE' and v_other + new.amount_cents <= v_other + old.amount_cents) then
+          raise exception 'payments (% cents) would exceed the invoice gross (% cents)',
+            v_other + new.amount_cents, inv.gross_total_cents;
+        end if;
       end if;
     end if;
   end if;
