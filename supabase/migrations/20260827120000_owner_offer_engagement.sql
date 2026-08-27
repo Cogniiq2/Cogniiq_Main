@@ -180,13 +180,25 @@ begin;
 create or replace function public.owner_engagement_context(p_token text)
 returns table (token_id uuid, offer_id uuid, business_entity_id uuid)
 language plpgsql security definer set search_path = public, pg_temp as $$
-declare tok public.owner_document_access_tokens; o record;
+-- The OUT parameters (token_id, offer_id, business_entity_id) are ALSO PL/pgSQL
+-- variables inside this body. A bare column of the same name in a query is
+-- therefore ambiguous, and PL/pgSQL only raises that at RUNTIME — the function
+-- still creates cleanly, so a migration that merely applies proves nothing.
+-- Every source column is read through the alias `o` into explicitly named
+-- locals, and the OUT parameters are assigned only afterwards.
+-- Regression: .github/scripts/sql/offer-engagement-tests.sql executes all three
+-- public RPCs, which is what catches this class of defect.
+declare
+  tok public.owner_document_access_tokens;
+  v_offer_id uuid; v_entity_id uuid; v_status text;
 begin
   tok := public.owner_verify_offer_token(p_token);
-  select id, business_entity_id, status into o from public.owner_offers where id = tok.offer_id;
-  if o.id is null then raise exception 'offer unavailable'; end if;
-  if o.status = 'cancelled' then raise exception 'offer unavailable'; end if;
-  token_id := tok.id; offer_id := o.id; business_entity_id := o.business_entity_id;
+  select o.id, o.business_entity_id, o.status
+    into v_offer_id, v_entity_id, v_status
+    from public.owner_offers o where o.id = tok.offer_id;
+  if v_offer_id is null then raise exception 'offer unavailable'; end if;
+  if v_status = 'cancelled' then raise exception 'offer unavailable'; end if;
+  token_id := tok.id; offer_id := v_offer_id; business_entity_id := v_entity_id;
   return next;
 end;
 $$;

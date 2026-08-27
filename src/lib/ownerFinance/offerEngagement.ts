@@ -75,6 +75,23 @@ export interface OfferEngagementOverviewRow {
 
 export type EngagementLevel = 'none' | 'low' | 'medium' | 'high' | 'very_high';
 
+/**
+ * Full German headline per level, written out.
+ *
+ * German adjectives inflect irregularly, so these are NOT derived from
+ * ENGAGEMENT_LEVEL_LABEL_DE by concatenation: "Mittel" + "es" yields
+ * "Mitteles" (not a word), "Hoch" + "es" yields "Hoches" (the stem loses its
+ * <c>: "hohes"). Written out, they are simply correct.
+ */
+export const ENGAGEMENT_LEVEL_HEADLINE_DE: Record<EngagementLevel, string> = {
+  none: 'Keine gemessene Aktivität',
+  low: 'Niedriges Engagement',
+  medium: 'Mittleres Engagement',
+  high: 'Hohes Engagement',
+  very_high: 'Sehr hohes Engagement',
+};
+
+/** Short label for badges and dense table cells. */
 export const ENGAGEMENT_LEVEL_LABEL_DE: Record<EngagementLevel, string> = {
   none: 'Keine Aktivität',
   low: 'Niedrig',

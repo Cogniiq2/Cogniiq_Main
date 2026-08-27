@@ -8,7 +8,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  ENGAGEMENT_EVENT_LABEL_DE, ENGAGEMENT_LEVEL_LABEL_DE, ENGAGEMENT_MAX_POINTS,
+  ENGAGEMENT_EVENT_LABEL_DE, ENGAGEMENT_LEVEL_HEADLINE_DE, ENGAGEMENT_LEVEL_LABEL_DE, ENGAGEMENT_MAX_POINTS,
   compareEngagement, formatActiveClock, formatActiveDuration, formatRelativeDe, formatScrollBp,
   scoreEngagement, suggestsManualFollowUp, type EngagementComparisonRow,
 } from '@/lib/ownerFinance/offerEngagement';
@@ -169,6 +169,33 @@ describe('copy never claims intent', () => {
     'conversion probability', 'lesezeit', 'garantiert',
   ])('never says "%s"', (banned) => {
     expect(allCopy).not.toContain(banned);
+  });
+
+  // German adjectives inflect irregularly, so the headline must never be built by
+  // gluing a suffix onto the short label. Doing so previously shipped "Mitteles
+  // Engagement" (not a word) and "Sehr hoches Engagement" (stem should lose its <c>).
+  it.each([
+    ['none', 'Keine gemessene Aktivität'],
+    ['low', 'Niedriges Engagement'],
+    ['medium', 'Mittleres Engagement'],
+    ['high', 'Hohes Engagement'],
+    ['very_high', 'Sehr hohes Engagement'],
+  ] as const)('headline for %s is correct German', (level, expected) => {
+    expect(ENGAGEMENT_LEVEL_HEADLINE_DE[level]).toBe(expected);
+  });
+
+  it.each(['Mitteles', 'Hoches', 'Niedrigs', 'Sehr hoches'])(
+    'never produces the malformed adjective "%s"', (bad) => {
+      expect(Object.values(ENGAGEMENT_LEVEL_HEADLINE_DE).join(' | ')).not.toContain(bad);
+    });
+
+  it('does not derive the headline from the short label by concatenation', () => {
+    // "Niedrig" + "es" happens to land on the correct "Niedriges", which is exactly
+    // why the old bug survived review — three of the four levels were wrong and the
+    // first one looked fine. These are the three that concatenation gets wrong.
+    for (const level of ['medium', 'high', 'very_high'] as const) {
+      expect(ENGAGEMENT_LEVEL_HEADLINE_DE[level]).not.toBe(`${ENGAGEMENT_LEVEL_LABEL_DE[level]}es Engagement`);
+    }
   });
 
   it('describes opening the acceptance dialog as an open, never as an acceptance', () => {

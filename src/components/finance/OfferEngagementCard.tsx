@@ -15,7 +15,7 @@ import { ChevronDown } from 'lucide-react';
 
 import { Card, SectionHeader, StatusBadge } from '@/components/dashboard';
 import {
-  ENGAGEMENT_EVENT_LABEL_DE, ENGAGEMENT_LEVEL_LABEL_DE, ENGAGEMENT_LEVEL_TONE,
+  ENGAGEMENT_EVENT_LABEL_DE, ENGAGEMENT_LEVEL_HEADLINE_DE, ENGAGEMENT_LEVEL_LABEL_DE, ENGAGEMENT_LEVEL_TONE,
   formatActiveClock, formatActiveDuration, formatRelativeDe, formatScrollBp,
   offerSectionLabel, scoreEngagement, suggestsManualFollowUp,
   type OfferEngagementSummary,
@@ -108,7 +108,7 @@ export function OfferEngagementCard({ summary, offerStatus }: {
           {score && score.reasons.length ? (
             <div className="mt-4 rounded-xl border border-gray-100 p-3">
               <p className="text-[13px] font-semibold text-gray-950">
-                {ENGAGEMENT_LEVEL_LABEL_DE[score.level]}es Engagement
+                {ENGAGEMENT_LEVEL_HEADLINE_DE[score.level]}
                 <span className="ml-2 text-[11px] font-normal text-gray-400">
                   {score.points} von {score.maxPoints} Punkten
                 </span>
