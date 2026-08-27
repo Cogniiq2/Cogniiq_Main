@@ -110,6 +110,24 @@ jobs:
       - name: Verify expected migration exists
         run: test -f "migration-source/$TARGET_MIGRATION_PATH"
 
+      # The Node gates below (allowlist agreement, dependency gate, dry-run scope, backup
+      # gate, ledger verification) import js-yaml, so dependencies must exist before the
+      # first of them runs. This is deliberately the ONLY thing installed and it happens
+      # after the cheap bash validation, so a bad target still fails before any install.
+      #
+      # --ignore-scripts: this workflow can write to the production database. It never
+      # builds the application, and none of its gates need a native binary, so package
+      # lifecycle scripts have no reason to execute in this context. package-lock.json
+      # stays authoritative — `npm ci`, never `npm install`.
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - name: Install dependencies for the verification gates
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
       # Safety gate: the allowlist in this YAML, the bash case above and
       # .github/scripts/lib/supabase-migration-allowlist.mjs must agree exactly.
       - name: Verify workflow allowlist matches the canonical allowlist
