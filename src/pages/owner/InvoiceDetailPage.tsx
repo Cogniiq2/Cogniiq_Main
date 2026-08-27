@@ -17,6 +17,7 @@ import { generateAndStoreDocument } from '@/lib/ownerFinance/generateDocument';
 import { runFinanceExport } from '@/lib/ownerFinance/financeExportRunner';
 import { invoiceExportTable, invoiceMetadataSheet, invoiceReportModel } from '@/lib/ownerFinance/exports/datasets';
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
+import { paymentMethodLabel, paymentKindLabel, isAdvancePayment, PAYMENT_METHOD_OPTIONS } from '@/lib/ownerFinance/paymentMethods';
 import { formatDateDe, formatCentsCurrencyDe, formatBpPercentDe, type ExportFormat, type ExportMode, type ExportMeta } from '@/lib/ownerFinance/exports';
 import { ExportMenu } from '@/components/finance/ExportMenu';
 import { CustomerPortalPublishCard } from '@/components/finance/CustomerPortalPublishCard';
@@ -134,6 +135,7 @@ export function InvoiceDetailPage() {
 
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <StatusBadge label={statusLabel[invoice.status] ?? invoice.status} tone={invoiceStatusTone[invoice.status]} />
+        {invoice.historical_entry ? <StatusBadge label="Historisch erfasst" tone="neutral" /> : null}
         <span className="text-[13px] text-gray-500">Datum {formatDateDe(invoice.issue_date)} · Fällig {formatDateDe(invoice.due_date)}</span>
         {invoice.external_reference?.startsWith('Angebot') ? <span className="text-[13px] text-gray-400">aus {invoice.external_reference}</span> : null}
       </div>
@@ -166,13 +168,61 @@ export function InvoiceDetailPage() {
             </dl>
           </Card>
 
+          {/* An invoice may be settled by any number of payments. Each keeps its own date,
+              amount and reference; the running Bezahlt/Offen figures come from the server's
+              own amount_paid_cents, never from re-adding the rows in the browser. */}
           <Card className="p-6">
-            <SectionHeader title="Zahlungen" action={['issued', 'partially_paid', 'overdue'].includes(invoice.status) ? <Button size="sm" variant="secondary" onClick={() => setPayOpen(true)}>Zahlung erfassen</Button> : undefined} />
+            <SectionHeader title="Zahlungsverlauf"
+              description={payments.length > 1 ? `${payments.length} Zahlungen` : undefined}
+              action={['issued', 'partially_paid', 'overdue'].includes(invoice.status)
+                ? <Button size="sm" variant="secondary" onClick={() => setPayOpen(true)}>Zahlung erfassen</Button> : undefined} />
             {payments.length === 0 ? <p className="text-[13px] text-gray-400">Noch keine Zahlungen erfasst.</p> : (
-              <ul className="space-y-2">{payments.map((p) => (
-                <li key={String(p.id)} className="flex items-center justify-between rounded-lg border border-gray-100 px-3 py-2 text-[13px]"><span className="text-gray-600">{formatDateDe(String(p.payment_date ?? ''))} · {String(p.method ?? '')}</span><span className="tabular-nums font-medium text-gray-900">{formatCents(Number(p.amount_cents ?? 0), invoice.currency)}</span></li>
-              ))}</ul>
+              <>
+              <ul className="space-y-2">{payments.map((p) => {
+                // An Anzahlung is the one receipt allowed to predate the invoice, so it is
+                // named rather than left to be inferred from a date that looks wrong.
+                const advance = isAdvancePayment(p.payment_kind as string | null);
+                return (
+                  <li key={String(p.id)} className="flex items-center justify-between gap-3 rounded-lg border border-gray-100 px-3 py-2 text-[13px]">
+                    <span className="min-w-0 text-gray-600">
+                      {formatDateDe(String(p.payment_date ?? ''))}
+                      <span className={`ml-2 rounded px-1.5 py-0.5 text-[11px] font-medium ${advance ? 'bg-sky-50 text-sky-700' : 'bg-gray-100 text-gray-600'}`}>
+                        {paymentKindLabel(p.payment_kind as string | null)}
+                      </span>
+                      {p.reference ? <span className="ml-2 text-gray-500">{String(p.reference)}</span> : null}
+                      {p.payment_method ? <span className="ml-2 text-[11px] text-gray-400">{paymentMethodLabel(String(p.payment_method))}</span> : null}
+                    </span>
+                    <span className="shrink-0 tabular-nums font-medium text-gray-900">{formatCents(Number(p.amount_cents ?? 0), invoice.currency)}</span>
+                  </li>
+                );
+              })}</ul>
+              {payments.some((p) => isAdvancePayment(p.payment_kind as string | null)) ? (
+                <p className="mt-3 text-[11px] leading-relaxed text-gray-400">
+                  Anzahlungen sind vor dem Rechnungsdatum eingegangen. Sie behalten ihr echtes
+                  Eingangsdatum und zählen dennoch auf diese Rechnung.
+                </p>
+              ) : null}
+              </>
             )}
+            {/* An invoice imported before the overpayment guard existed can be paid ABOVE its
+                gross. Showing that as "Offen: -0,01 €" reads as a negative receivable, which is
+                not what happened. The open balance floors at zero and the excess is named
+                separately. Nothing is recomputed or corrected here — both figures come from the
+                server's own amount_paid_cents. */}
+            <dl className="mt-4 space-y-1.5 border-t border-gray-100 pt-3 text-[13px]">
+              <div className="flex justify-between"><dt className="text-gray-500">Rechnungsbetrag</dt><dd className="tabular-nums text-gray-700">{formatCents(invoice.gross_total_cents, invoice.currency)}</dd></div>
+              <div className="flex justify-between"><dt className="text-gray-500">Bezahlt</dt><dd className="tabular-nums font-medium text-emerald-700">{formatCents(invoice.amount_paid_cents, invoice.currency)}</dd></div>
+              <div className="flex justify-between"><dt className="font-semibold text-gray-950">Offen</dt><dd className="tabular-nums font-semibold text-gray-950">{formatCents(Math.max(invoice.gross_total_cents - invoice.amount_paid_cents, 0), invoice.currency)}</dd></div>
+              {invoice.amount_paid_cents > invoice.gross_total_cents ? (
+                <div className="flex justify-between border-t border-gray-100 pt-1.5">
+                  <dt className="font-medium text-amber-700">Überzahlung</dt>
+                  <dd className="tabular-nums font-medium text-amber-700">{formatCents(invoice.amount_paid_cents - invoice.gross_total_cents, invoice.currency)}</dd>
+                </div>
+              ) : null}
+            </dl>
+            <p className="mt-3 text-[11px] leading-relaxed text-gray-400">
+              Zahlungen werden rein intern erfasst. Es wird dabei nichts an den Kunden versendet.
+            </p>
           </Card>
         </div>
 
@@ -246,7 +296,7 @@ function PaymentModal({ open, invoice, onClose, onDone, onError }: { open: boole
       <div className="grid gap-4 sm:grid-cols-2">
         <Field id="amt" label="Betrag" prefix="€" value={amount} onChange={setAmount} inputMode="decimal" autoFocus />
         <Field id="dt" label="Datum" type="date" value={date} onChange={setDate} />
-        <Select id="m" label="Zahlungsart" value={method} onChange={setMethod} options={[{ value: 'bank_transfer', label: 'Überweisung' }, { value: 'card', label: 'Karte' }, { value: 'cash', label: 'Bar' }, { value: 'paypal', label: 'PayPal' }, { value: 'other', label: 'Sonstige' }]} />
+        <Select id="m" label="Zahlungsart" value={method} onChange={setMethod} options={PAYMENT_METHOD_OPTIONS} />
       </div>
       {err ? <p className="mt-3 text-[13px] text-red-600">{err}</p> : null}
     </Modal>

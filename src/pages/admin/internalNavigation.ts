@@ -45,6 +45,7 @@ const MODULES: ModuleConfig[] = [
       { key: 'assets', label: 'Anlagen', href: '/admin/finance/assets', icon: HardDrive },
       { key: 'taxes', label: 'Steuern', href: '/admin/finance/taxes', icon: Gauge },
       { key: 'revenue', label: 'Umsatz', href: '/admin/finance/revenue', icon: Wallet },
+      { key: 'contracts', label: 'Laufende Verträge', href: '/admin/finance/contracts', icon: Repeat },
       { key: 'documents', label: 'Dokumente', href: '/admin/finance/documents', icon: ScrollText },
       { key: 'audit', label: 'Audit', href: '/admin/finance/audit', icon: ShieldCheck },
       { key: 'settings', label: 'Einstellungen', href: '/admin/finance/settings', icon: Settings },

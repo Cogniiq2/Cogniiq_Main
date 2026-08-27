@@ -1,0 +1,10 @@
+{
+  "region": "eu-central-1",
+  "walg_enabled": false,
+  "pitr_enabled": false,
+  "backups": [
+    { "status": "FAILED", "is_physical_backup": false, "inserted_at": "2026-08-27T02:14:00Z" },
+    { "status": "PENDING", "is_physical_backup": false, "inserted_at": "2026-08-27T03:00:00Z" }
+  ],
+  "physical_backup_data": {}
+}

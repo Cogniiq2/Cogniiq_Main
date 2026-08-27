@@ -1,0 +1,10 @@
+{
+  "region": "eu-central-1",
+  "walg_enabled": true,
+  "pitr_enabled": true,
+  "backups": [],
+  "physical_backup_data": {
+    "earliest_physical_backup_date_utc": "2026-08-20T00:00:00Z",
+    "latest_physical_backup_date_utc": "2026-08-27T13:05:00Z"
+  }
+}

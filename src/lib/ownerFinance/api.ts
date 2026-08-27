@@ -22,30 +22,13 @@ export const OWNER_FINANCE_MIGRATION = '20260722120000_owner_finance_cockpit.sql
 
 export type FinanceBackendStatus = 'ready' | 'missing' | 'error';
 
-interface PostgrestLikeError {
-  code?: string | null;
-  message?: string | null;
-  details?: string | null;
-  hint?: string | null;
-}
-
-// Distinguishes "the finance backend has not been installed in this environment" from an ordinary
-// transient/auth error. Missing tables surface as Postgres 42P01 or PostgREST schema-cache misses
-// (PGRST205); missing RPCs as PGRST202. We never treat an RLS denial as "missing".
-export function isMissingBackendError(err: unknown): boolean {
-  const e = err as PostgrestLikeError | null;
-  if (!e) return false;
-  const code = (e.code ?? '').toUpperCase();
-  if (code === '42P01' || code === 'PGRST205' || code === 'PGRST202') return true;
-  const text = `${e.message ?? ''} ${e.details ?? ''} ${e.hint ?? ''}`.toLowerCase();
-  if (!text.trim()) return false;
-  return (
-    (text.includes('does not exist') && (text.includes('relation') || text.includes('table') || text.includes('function'))) ||
-    text.includes('could not find the table') ||
-    text.includes('could not find the function') ||
-    text.includes('schema cache')
-  );
-}
+// Error text and backend-missing detection live in errorText.ts, which has no dependency on
+// the Supabase client, so they can be unit-tested without environment variables. Re-exported
+// here because every existing caller imports them from this module.
+export type { PostgrestLikeError } from './errorText';
+export { isMissingBackendError, describeSupabaseError } from './errorText';
+// A re-export does not bind the name locally, and classifyBackendError below needs it.
+import { isMissingBackendError } from './errorText';
 
 export function classifyBackendError(err: unknown): FinanceBackendStatus {
   return isMissingBackendError(err) ? 'missing' : 'error';
@@ -126,6 +109,13 @@ export interface TaxPeriodInputs {
   vat_output_cents: number;
   vat_reverse_charge_output_cents: number;
   vat_input_cents: number;
+  /**
+   * Anzahlungen (pre-invoice receipts) falling in this period. Reported so the owner can see
+   * that a period's USt figure was shaped by advances — under Soll they are taxed on receipt
+   * per §13 Abs. 1 Nr. 1 lit. a Satz 4 UStG rather than with the later invoice. Optional
+   * because a database without the advance-payments migration does not return it.
+   */
+  advance_payment_count?: number;
   has_unlinked_income: boolean;
   has_unresolved_treatment: boolean;
   missing_service_date: boolean;
@@ -162,6 +152,61 @@ export async function createOwnerInvoice(header: Record<string, unknown>, lines:
   if (error) return { id: null, error: error.message };
   return { id: (data as { invoice_id?: string })?.invoice_id ?? null, error: null };
 }
+
+export interface HistoricalPaymentInput {
+  /** Zahlungsdatum — stored independently of the invoice date. */
+  payment_date: string;
+  method?: string | null;
+  reference?: string | null;
+  note?: string | null;
+}
+
+export interface HistoricalPaidInvoiceResult {
+  invoice_id: string;
+  invoice_number: string | null;
+  status: string;
+  payment_id: string | null;
+  amount_paid_cents: number;
+  gross_total_cents: number;
+}
+
+/**
+ * Record an already-settled historical invoice: draft + server-numbered issuance
+ * + full payment, in ONE server transaction.
+ *
+ * Deliberately a single RPC rather than createOwnerInvoice → issueOwnerInvoice →
+ * recordInvoicePayment: composing the three client-side can leave an issued but
+ * unpaid invoice behind if the last call fails, turning a settled historical
+ * transaction into an accidental open receivable.
+ *
+ * NO CUSTOMER-FACING SIDE EFFECT. Every e-mail in this system is produced by an
+ * owner_automation_jobs row, and all three enqueue functions are keyed on an
+ * OFFER. This path creates no offer and no job, and the RPC touches neither
+ * table — so nothing is sent, regardless of what the UI does.
+ *
+ * The paid amount is NOT passed from the browser: the server pays the invoice
+ * off against its own trigger-computed gross_total_cents, so the result is
+ * always exactly paid-in-full with a zero open balance.
+ */
+export async function recordHistoricalPaidInvoice(
+  header: Record<string, unknown>,
+  lines: InvoiceLineInput[],
+  payment: HistoricalPaymentInput,
+): Promise<{ result: HistoricalPaidInvoiceResult | null; error: string | null; backendMissing: boolean }> {
+  const { data, error } = await supabase.rpc('record_owner_historical_paid_invoice', {
+    p_idempotency_key: secureUuid(),
+    p_header: header,
+    p_lines: lines,
+    p_payment: payment,
+  });
+  // A not-yet-applied migration must read as "install the migration", not as a
+  // generic bookkeeping failure — the same distinction the cockpit boot probe makes.
+  if (error) return { result: null, error: error.message, backendMissing: isMissingBackendError(error) };
+  return { result: (data as HistoricalPaidInvoiceResult) ?? null, error: null, backendMissing: false };
+}
+
+/** Migration that provisions the historical already-paid invoice entry path. */
+export const OWNER_HISTORICAL_INVOICE_MIGRATION = '20260826120000_owner_historical_paid_invoice.sql';
 
 export async function issueOwnerInvoice(invoiceId: string): Promise<{ result: Record<string, unknown> | null; error: string | null }> {
   const { data, error } = await supabase.rpc('issue_owner_invoice', { p_idempotency_key: secureUuid(), p_invoice_id: invoiceId });
@@ -299,7 +344,13 @@ export async function loadTaxEstimates(entityId: string, year: number): Promise<
   return (data ?? []) as OwnerTaxEstimate[];
 }
 
-export async function saveTaxEstimate(entityId: string, snapshot: Partial<OwnerTaxEstimate> & { tax_year: number; tax_type: string; rules_version: string }): Promise<{ error: string | null }> {
+/**
+ * Append an immutable tax snapshot. `period` is written explicitly (the column has
+ * existed since the cockpit migration) so a stored row always states which
+ * Auswertungszeitraum it belongs to and an annual snapshot can never later be
+ * mistaken for — or overwritten by — a quarterly one.
+ */
+export async function saveTaxEstimate(entityId: string, snapshot: Partial<OwnerTaxEstimate> & { tax_year: number; tax_type: string; rules_version: string; period: string }): Promise<{ error: string | null }> {
   const createdBy = await currentUserId();
   const { error } = await supabase.from('owner_tax_estimates').insert({ business_entity_id: entityId, created_by: createdBy, ...snapshot });
   return { error: error?.message ?? null };

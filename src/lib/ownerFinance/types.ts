@@ -66,6 +66,12 @@ export interface OwnerInvoice {
   external_reference: string | null;
   issued_at: string | null;
   archived_at: string | null;
+  /**
+   * Recorded retroactively as an already-paid historical transaction. Metadata
+   * only — server-set, never client-writable, and it never affects totals,
+   * status or tax timing. Optional so pre-migration rows still type-check.
+   */
+  historical_entry?: boolean | null;
   /** Storno. Set instead of deleting an issued invoice; number and totals stay. */
   cancelled_at: string | null;
   cancelled_by: string | null;
