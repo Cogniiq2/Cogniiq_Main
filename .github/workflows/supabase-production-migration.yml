@@ -211,7 +211,12 @@ jobs:
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          # Pinned, not "latest". Resolving "latest" performs a GitHub release lookup at run
+          # time, which is both non-reproducible and a dependency on an unauthenticated rate
+          # limit — run 33084517446 failed on exactly that, before any Supabase interaction.
+          # A workflow that can write to the production database should run a known CLI
+          # version, chosen deliberately rather than by whatever shipped that morning.
+          version: 2.116.0
 
       # Safety gate: fail closed if any required secret is missing, without printing
       # secret values.
