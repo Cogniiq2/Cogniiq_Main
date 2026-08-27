@@ -167,13 +167,34 @@ export function InvoiceDetailPage() {
             </dl>
           </Card>
 
+          {/* An invoice may be settled by any number of payments. Each keeps its own date,
+              amount and reference; the running Bezahlt/Offen figures come from the server's
+              own amount_paid_cents, never from re-adding the rows in the browser. */}
           <Card className="p-6">
-            <SectionHeader title="Zahlungen" action={['issued', 'partially_paid', 'overdue'].includes(invoice.status) ? <Button size="sm" variant="secondary" onClick={() => setPayOpen(true)}>Zahlung erfassen</Button> : undefined} />
+            <SectionHeader title="Zahlungsverlauf"
+              description={payments.length > 1 ? `${payments.length} Zahlungen` : undefined}
+              action={['issued', 'partially_paid', 'overdue'].includes(invoice.status)
+                ? <Button size="sm" variant="secondary" onClick={() => setPayOpen(true)}>Zahlung erfassen</Button> : undefined} />
             {payments.length === 0 ? <p className="text-[13px] text-gray-400">Noch keine Zahlungen erfasst.</p> : (
               <ul className="space-y-2">{payments.map((p) => (
-                <li key={String(p.id)} className="flex items-center justify-between rounded-lg border border-gray-100 px-3 py-2 text-[13px]"><span className="text-gray-600">{formatDateDe(String(p.payment_date ?? ''))} · {String(p.method ?? '')}</span><span className="tabular-nums font-medium text-gray-900">{formatCents(Number(p.amount_cents ?? 0), invoice.currency)}</span></li>
+                <li key={String(p.id)} className="flex items-center justify-between gap-3 rounded-lg border border-gray-100 px-3 py-2 text-[13px]">
+                  <span className="min-w-0 text-gray-600">
+                    {formatDateDe(String(p.payment_date ?? ''))}
+                    {p.reference ? <span className="ml-2 text-gray-500">{String(p.reference)}</span> : null}
+                    {p.payment_method ? <span className="ml-2 text-[11px] text-gray-400">{String(p.payment_method)}</span> : null}
+                  </span>
+                  <span className="shrink-0 tabular-nums font-medium text-gray-900">{formatCents(Number(p.amount_cents ?? 0), invoice.currency)}</span>
+                </li>
               ))}</ul>
             )}
+            <dl className="mt-4 space-y-1.5 border-t border-gray-100 pt-3 text-[13px]">
+              <div className="flex justify-between"><dt className="text-gray-500">Rechnungsbetrag</dt><dd className="tabular-nums text-gray-700">{formatCents(invoice.gross_total_cents, invoice.currency)}</dd></div>
+              <div className="flex justify-between"><dt className="text-gray-500">Bezahlt</dt><dd className="tabular-nums font-medium text-emerald-700">{formatCents(invoice.amount_paid_cents, invoice.currency)}</dd></div>
+              <div className="flex justify-between"><dt className="font-semibold text-gray-950">Offen</dt><dd className="tabular-nums font-semibold text-gray-950">{formatCents(invoice.gross_total_cents - invoice.amount_paid_cents, invoice.currency)}</dd></div>
+            </dl>
+            <p className="mt-3 text-[11px] leading-relaxed text-gray-400">
+              Zahlungen werden rein intern erfasst. Es wird dabei nichts an den Kunden versendet.
+            </p>
           </Card>
         </div>
 

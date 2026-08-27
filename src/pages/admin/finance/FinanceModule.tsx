@@ -14,6 +14,7 @@ import { CustomersPage } from '@/pages/owner/CustomersPage';
 import { CustomerDetailPage } from '@/pages/owner/CustomerDetailPage';
 import { ExpensesPage } from '@/pages/owner/ExpensesPage';
 import { TaxesPage } from '@/pages/owner/TaxesPage';
+import { RevenueContractsPage } from '@/pages/owner/RevenueContractsPage';
 import { SettingsPage } from '@/pages/owner/SettingsPage';
 import { AssetsPage, AuditPage, DocumentsPage, RevenuePage, SubscriptionsPage } from '@/pages/owner/miscPages';
 
@@ -54,6 +55,7 @@ function FinanceRoutes() {
       <Route path="assets" element={<AssetsPage />} />
       <Route path="taxes" element={<TaxesPage />} />
       <Route path="revenue" element={<RevenuePage />} />
+      <Route path="contracts" element={<RevenueContractsPage />} />
       <Route path="documents" element={<DocumentsPage />} />
       <Route path="audit" element={<AuditPage />} />
       <Route path="settings" element={<SettingsPage />} />

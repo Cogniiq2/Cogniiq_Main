@@ -18,6 +18,7 @@ import { cancelInvoice, loadCustomers } from '@/lib/ownerFinance/customersApi';
 import { customerDisplayName } from '@/lib/ownerFinance/customerLabels';
 import { CustomerFormDialog } from '@/components/finance/CustomerFormDialog';
 import { computeInvoiceLine } from '@/lib/ownerFinance/tax';
+import { recordHistoricalInvoiceWithPayments, type InvoicePaymentInput } from '@/lib/ownerFinance/financeExtendedApi';
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
 import type { OwnerCustomerListRow, OwnerInvoice } from '@/lib/ownerFinance/types';
 import { ExportMenu } from '@/components/finance/ExportMenu';
@@ -371,6 +372,13 @@ function newLine(): DraftLine {
   return { id: Math.random().toString(36).slice(2), description: '', quantity: '1', unit: 'Stück', unitPrice: '', treatment: 'standard' };
 }
 
+/** One real payment against a historical invoice. Amounts stay strings until validated. */
+interface DraftPayment { id: string; date: string; amount: string; method: string; reference: string }
+
+function newPayment(date: string): DraftPayment {
+  return { id: Math.random().toString(36).slice(2), date, amount: '', method: 'bank_transfer', reference: '' };
+}
+
 /**
  * 'normal'     — draft → optional issuance, the untouched original flow.
  * 'historical' — a real invoice that was already issued AND already paid before
@@ -405,11 +413,10 @@ function InvoiceComposer({ mode = 'normal', open, entityId, customers, onClose, 
   const [busy, setBusy] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [newCustomerOpen, setNewCustomerOpen] = useState(false);
-  // Historical mode only. paymentDate is the Zahlungsdatum and stays a separate
-  // fact from issueDate — never derived from it, in either direction.
-  const [paymentDate, setPaymentDate] = useState(today);
-  const [paymentMethod, setPaymentMethod] = useState('bank_transfer');
-  const [paymentReference, setPaymentReference] = useState('');
+  // Historical mode only. Real invoices are often settled in instalments, so this is a
+  // LIST of payments, each keeping its own date — never collapsed into one synthetic
+  // payment. Payment dates stay a separate fact from issueDate in both directions.
+  const [payments, setPayments] = useState<DraftPayment[]>([newPayment(today)]);
   const [externalReference, setExternalReference] = useState('');
   const [serviceTouched, setServiceTouched] = useState(false);
 
@@ -429,7 +436,7 @@ function InvoiceComposer({ mode = 'normal', open, entityId, customers, onClose, 
     setCustomerId(''); setIssueDate(today); setServiceMode('date'); setServiceDate(today);
     setServicePeriodStart(''); setServicePeriodEnd(''); setTerms('14'); setNotes('');
     setLines([newLine()]); setFieldErrors({}); setServiceTouched(false);
-    setPaymentDate(today); setPaymentMethod('bank_transfer'); setPaymentReference(''); setExternalReference('');
+    setPayments([newPayment(today)]); setExternalReference('');
   };
 
   const dueDate = useMemo(() => {
@@ -453,6 +460,12 @@ function InvoiceComposer({ mode = 'normal', open, entityId, customers, onClose, 
     return { net: acc.net + calc.netCents, vat: acc.vat + calc.vatCents, gross: acc.gross + calc.grossCents };
   }, { net: 0, vat: 0, gross: 0 }), [computedLines]);
 
+  /** Live sum of the payment rows, for the Bezahlt/Offen reconciliation panel. */
+  const paymentsTotal = useMemo(
+    () => payments.reduce((sum, pay) => sum + (toCents(pay.amount) ?? 0), 0),
+    [payments],
+  );
+
   const updateLine = (id: string, patch: Partial<DraftLine>) => setLines((cur) => cur.map((l) => (l.id === id ? { ...l, ...patch } : l)));
   const removeLine = (id: string) => setLines((cur) => (cur.length > 1 ? cur.filter((l) => l.id !== id) : cur));
 
@@ -472,10 +485,20 @@ function InvoiceComposer({ mode = 'normal', open, entityId, customers, onClose, 
     if (serviceMode === 'period' && (!servicePeriodStart || !servicePeriodEnd)) errs.form = 'Leistungszeitraum unvollständig.';
     if (historical) {
       if (!issueDate) errs.issueDate = 'Rechnungsdatum erforderlich';
-      if (!paymentDate) errs.paymentDate = 'Zahlungsdatum erforderlich';
-      // Date-only string compare: both are YYYY-MM-DD, so this is a calendar
-      // comparison with no Date parsing and no timezone shift.
-      else if (issueDate && paymentDate < issueDate) errs.paymentDate = 'Zahlungsdatum darf nicht vor dem Rechnungsdatum liegen.';
+      if (payments.length === 0) errs.form = 'Mindestens eine Zahlung ist erforderlich.';
+      let sum = 0;
+      payments.forEach((pay) => {
+        if (!pay.date) errs['payDate-' + pay.id] = 'Datum erforderlich';
+        // Date-only string compare: both are YYYY-MM-DD, so this is a calendar
+        // comparison with no Date parsing and no timezone shift.
+        else if (issueDate && pay.date < issueDate) errs['payDate-' + pay.id] = 'Vor dem Rechnungsdatum';
+        const cents = toCents(pay.amount);
+        if (cents == null || cents <= 0) errs['payAmount-' + pay.id] = 'Ungültiger Betrag';
+        else sum += cents;
+      });
+      // The server rejects this too; catching it here keeps the owner from losing a
+      // long form to a round trip.
+      if (sum > totals.gross) errs.form = 'Die Zahlungen übersteigen den Rechnungsbetrag.';
     }
     setFieldErrors(errs);
     return Object.keys(errs).length === 0;
@@ -526,12 +549,27 @@ function InvoiceComposer({ mode = 'normal', open, entityId, customers, onClose, 
     if (!validate()) return;
     setBusy(true);
     const { header, lineInputs } = buildPayload();
-    const { result, error, backendMissing } = await recordHistoricalPaidInvoice(header, lineInputs, {
-      payment_date: paymentDate,
-      method: paymentMethod,
-      reference: paymentReference.trim() || null,
+    const paymentInputs: InvoicePaymentInput[] = payments.map((pay) => ({
+      payment_date: pay.date,
+      amount_cents: toCents(pay.amount) ?? 0,
+      method: pay.method,
+      reference: pay.reference.trim() || null,
       note: null,
-    });
+    }));
+    const paidSum = paymentInputs.reduce((a, b) => a + b.amount_cents, 0);
+
+    // One payment settling the invoice in full keeps using the ORIGINAL RPC, whose
+    // settle-or-fail guarantee is the stronger contract for that case. Instalments and
+    // partial settlements go through the additive multi-payment path.
+    const singleFullPayment = paymentInputs.length === 1 && paidSum === totals.gross;
+    const { result, error, backendMissing } = singleFullPayment
+      ? await recordHistoricalPaidInvoice(header, lineInputs, {
+          payment_date: paymentInputs[0].payment_date,
+          method: paymentInputs[0].method ?? 'bank_transfer',
+          reference: paymentInputs[0].reference,
+          note: null,
+        })
+      : await recordHistoricalInvoiceWithPayments(header, lineInputs, paymentInputs);
     setBusy(false);
     if (error || !result) {
       onError(backendMissing
@@ -704,20 +742,49 @@ function InvoiceComposer({ mode = 'normal', open, entityId, customers, onClose, 
         {historical ? (
           <Card className="p-5">
             <SectionHeader
-              title="Zahlung"
-              description="Der Zahlungseingang wird mit dem vollen Bruttobetrag gebucht. Das Zahlungsdatum bestimmt die steuerliche Periode (Ist-Versteuerung) und bleibt vom Rechnungsdatum unabhängig."
+              title="Zahlungen"
+              description="Eine Rechnung kann in mehreren Raten beglichen worden sein. Jede Zahlung behält ihr eigenes Datum — das bestimmt die steuerliche Periode (Ist-Versteuerung) und bleibt vom Rechnungsdatum unabhängig."
+              action={<Button size="sm" variant="secondary" onClick={() => setPayments((rows) => [...rows, newPayment(issueDate || today)])}>+ Zahlung hinzufügen</Button>}
             />
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field id="histPayDate" label="Zahlungsdatum" type="date" value={paymentDate} onChange={setPaymentDate} required error={fieldErrors.paymentDate} />
-              <Select id="histPayMethod" label="Zahlungsart" value={paymentMethod} onChange={setPaymentMethod} options={paymentMethods} />
-              <div className="sm:col-span-2">
-                <Field id="histPayRef" label="Zahlungsreferenz (optional)" value={paymentReference} onChange={setPaymentReference} placeholder="Verwendungszweck / Kontoauszug" />
+            <div className="space-y-3">
+              {payments.map((pay, idx) => (
+                <div key={pay.id} className="rounded-xl border border-gray-100 p-3">
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">Zahlung {idx + 1}</span>
+                    {payments.length > 1 ? (
+                      <button type="button" onClick={() => setPayments((rows) => rows.filter((r) => r.id !== pay.id))}
+                        className="text-[12px] text-gray-400 hover:text-gray-900">Entfernen</button>
+                    ) : null}
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <Field id={'payDate-' + pay.id} label="Zahlungsdatum" type="date" value={pay.date} required
+                      error={fieldErrors['payDate-' + pay.id]}
+                      onChange={(v) => setPayments((rows) => rows.map((r) => (r.id === pay.id ? { ...r, date: v } : r)))} />
+                    <Field id={'payAmount-' + pay.id} label="Betrag (brutto)" value={pay.amount} required inputMode="decimal" prefix="€"
+                      error={fieldErrors['payAmount-' + pay.id]}
+                      onChange={(v) => setPayments((rows) => rows.map((r) => (r.id === pay.id ? { ...r, amount: v } : r)))} />
+                    <Select id={'payMethod-' + pay.id} label="Zahlungsart" value={pay.method} options={paymentMethods}
+                      onChange={(v) => setPayments((rows) => rows.map((r) => (r.id === pay.id ? { ...r, method: v } : r)))} />
+                    <Field id={'payRef-' + pay.id} label="Referenz (optional)" value={pay.reference} placeholder="z. B. Abschlag 1"
+                      onChange={(v) => setPayments((rows) => rows.map((r) => (r.id === pay.id ? { ...r, reference: v } : r)))} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Live reconciliation so the owner sees the open balance before saving. */}
+            <dl className="mt-4 space-y-1.5 rounded-xl border border-gray-100 bg-gray-50/70 px-4 py-3 text-[13px]">
+              <div className="flex justify-between"><dt className="text-gray-500">Rechnungsbetrag</dt><dd className="tabular-nums text-gray-700">{formatCents(totals.gross)}</dd></div>
+              <div className="flex justify-between"><dt className="text-gray-500">Zahlungen</dt><dd className="tabular-nums text-gray-700">{formatCents(paymentsTotal)}</dd></div>
+              <div className="flex justify-between border-t border-gray-200 pt-1.5">
+                <dt className="font-semibold text-gray-950">Noch offen</dt>
+                <dd className="tabular-nums font-semibold text-gray-950">{formatCents(Math.max(totals.gross - paymentsTotal, 0))}</dd>
               </div>
-            </div>
-            <div className="mt-4 flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50/70 px-4 py-3">
-              <span className="text-[13px] text-gray-500">Wird als bezahlt gebucht</span>
-              <span className="text-base font-semibold tabular-nums text-gray-950">{formatCents(totals.gross)}</span>
-            </div>
+              <div className="pt-1">
+                <StatusBadge
+                  label={paymentsTotal >= totals.gross && totals.gross > 0 ? 'Vollständig bezahlt' : paymentsTotal > 0 ? 'Teilweise bezahlt' : 'Noch keine Zahlung'}
+                  tone={paymentsTotal >= totals.gross && totals.gross > 0 ? 'success' : paymentsTotal > 0 ? 'warning' : 'neutral'} />
+              </div>
+            </dl>
           </Card>
         ) : null}
 
