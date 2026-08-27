@@ -33,6 +33,21 @@ jobs:
       - name: Static receptionist migration convergence checks
         run: node .github/scripts/test-receptionist-migration-convergence.mjs
 
+      # The production migration workflow can write to the live database, so its allowlist,
+      # isolation proof and gate wiring are asserted on every build rather than at review
+      # time. The three script suites below cover the parsers those gates depend on.
+      - name: Supabase production migration workflow static checks
+        run: node .github/scripts/test-supabase-production-migration-workflow.mjs
+
+      - name: Supabase dry-run scope verifier tests
+        run: node .github/scripts/test-verify-supabase-dry-run.mjs
+
+      - name: Supabase backup / restore-point gate tests
+        run: node .github/scripts/test-verify-supabase-backups.mjs
+
+      - name: Supabase migration ledger + dependency gate tests
+        run: node .github/scripts/test-supabase-migration-ledger.mjs
+
       - name: Invitation status helper unit tests
         run: node .github/scripts/test-invitation-status.mjs
 

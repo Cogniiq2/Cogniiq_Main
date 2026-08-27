@@ -1,4 +1,20 @@
+// Static checks for the Supabase production migration workflow.
+//
+// The workflow can write to the PRODUCTION database, so its safety structure is asserted
+// here rather than trusted to review. The checks cover three things:
+//
+//  1. the allowlist in the YAML dropdown, the bash `case` and the canonical JS module all
+//     agree exactly — a migration can never be selectable in one place and unknown in
+//     another;
+//  2. the isolated-workspace proof is intact, because it is what physically prevents an
+//     unrelated pending migration from reaching production;
+//  3. every gate still exists and still runs in the mode it belongs to.
+//
+// Nothing here touches a database.
+
 import { readFileSync } from 'node:fs';
+import yaml from 'js-yaml';
+import { ALLOWED_MIGRATIONS, PROTECTED_VERSIONS, confirmationFor } from './lib/supabase-migration-allowlist.mjs';
 
 const workflowPath = '.github/workflows/supabase-production-migration.yml';
 const workflowText = readFileSync(workflowPath, 'utf8');
@@ -19,21 +35,12 @@ function assertNotIncludes(value, unexpected, message) {
   assert(!String(value ?? '').includes(unexpected), message);
 }
 
-function assertMatches(value, pattern, message) {
-  assert(pattern.test(String(value ?? '')), message);
-}
-
 function stepBlock(name) {
   const marker = `      - name: ${name}\n`;
   const start = workflowText.indexOf(marker);
-
-  if (start === -1) {
-    fail(`Missing workflow step: ${name}`);
-  }
-
+  if (start === -1) fail(`Missing workflow step: ${name}`);
   const rest = workflowText.slice(start + marker.length);
   const nextStep = rest.search(/\n      - name: /);
-
   return nextStep === -1 ? rest : rest.slice(0, nextStep);
 }
 
@@ -45,32 +52,77 @@ function assertStepWorkingDirectory(name, expectedDirectory) {
   assertStepIncludes(name, `working-directory: ${expectedDirectory}`, `${name} must run in ${expectedDirectory}`);
 }
 
+/* ------------------------------------------------------------------ YAML validity */
+
+const workflow = yaml.load(workflowText);
+assert(workflow && typeof workflow === 'object', 'Workflow YAML must parse to an object');
+// `on:` is parsed by js-yaml as the boolean true (YAML 1.1), so accept either key.
+const triggers = workflow.on ?? workflow[true];
+assert(triggers && triggers.workflow_dispatch, 'Workflow must be workflow_dispatch only');
+assert(!triggers.push && !triggers.pull_request && !triggers.schedule, 'Workflow must never run automatically');
+
+const inputs = triggers.workflow_dispatch.inputs ?? {};
+for (const required of ['source_ref', 'target_migration', 'mode', 'confirmation']) {
+  assert(inputs[required], `Workflow must expose the ${required} input`);
+}
+assert(inputs.target_migration.type === 'choice', 'target_migration must be a choice input');
+assert(inputs.mode.type === 'choice', 'mode must be a choice input');
+assert(
+  JSON.stringify(inputs.mode.options) === JSON.stringify(['audit-history', 'dry-run', 'apply']),
+  'mode options drifted',
+);
+assert(inputs.source_ref.required === true, 'source_ref must remain required');
+assert(inputs.source_ref.default !== 'main', 'source_ref must not be hard-coded to main');
+
+/* ------------------------------------------------ allowlist agreement (3 copies) */
+
+const canonicalFiles = ALLOWED_MIGRATIONS.map((m) => m.file);
+assert(
+  JSON.stringify(inputs.target_migration.options) === JSON.stringify(canonicalFiles),
+  `target_migration options must equal the canonical allowlist.\n  yaml: ${JSON.stringify(inputs.target_migration.options)}\n  canonical: ${JSON.stringify(canonicalFiles)}`,
+);
+
+const resolveBlock = stepBlock('Resolve and validate selected migration');
+for (const file of canonicalFiles) {
+  assertIncludes(resolveBlock, `${file}) ;;`, `bash allowlist is missing ${file}`);
+}
+const caseEntries = [...resolveBlock.matchAll(/^\s{12}(\S+\.sql)\) ;;$/gm)].map((m) => m[1]);
+assert(
+  JSON.stringify(caseEntries) === JSON.stringify(canonicalFiles),
+  `bash case allowlist must equal the canonical allowlist.\n  bash: ${JSON.stringify(caseEntries)}\n  canonical: ${JSON.stringify(canonicalFiles)}`,
+);
+assertIncludes(resolveBlock, 'not on the production allowlist', 'bash allowlist must reject unknown migrations');
+assertIncludes(resolveBlock, "'^[0-9]{14}_[A-Za-z0-9_.-]+\\.sql$'", 'bash must re-validate the filename shape');
+assertIncludes(resolveBlock, 'TARGET_MIGRATION_PATH=supabase/migrations/$SELECTED_MIGRATION', 'path must be derived, never taken as input');
+assertIncludes(resolveBlock, 'target_version="${SELECTED_MIGRATION%%_*}"', 'version must be derived from the validated filename');
+assertIncludes(resolveBlock, 'EXPECTED_CONFIRMATION=APPLY_MIGRATION_$target_version', 'confirmation must be derived from the version');
+assertNotIncludes(workflowText, 'TARGET_MIGRATION_VERSION: ', 'version must not be a hard-coded env value any more');
+
+/* ------------------------------------------------------------------ header + gates */
+
 assertIncludes(workflowText, 'name: Supabase Production Migration', 'Workflow name drifted');
 assertIncludes(workflowText, 'permissions:\n  contents: read', 'Workflow permissions must remain contents: read');
 assertIncludes(workflowText, 'group: supabase-production-migration', 'Workflow concurrency group drifted');
-assertIncludes(workflowText, 'TARGET_MIGRATION: 20260711120000_receptionist_persistence.sql', 'Target migration filename drifted');
-assertIncludes(
-  workflowText,
-  'TARGET_MIGRATION_PATH: supabase/migrations/20260711120000_receptionist_persistence.sql',
-  'Target migration path drifted'
-);
-assertIncludes(workflowText, 'TARGET_MIGRATION_VERSION: 20260711120000', 'Target migration version drifted');
 assertIncludes(workflowText, 'ISOLATED_SOURCE_DIR: isolated-migration-source', 'Isolated source directory drifted');
-
 assertStepIncludes('Checkout selected migration branch', 'path: migration-source', 'Selected migration branch must be checked out into migration-source');
+assertStepIncludes('Verify expected migration exists', 'test -f "migration-source/$TARGET_MIGRATION_PATH"', 'Existence gate drifted');
 
-const isolationBlock = stepBlock('Create isolated receptionist migration workspace');
+/* ------------------------------------------------------------------ isolation proof */
+
+const isolationBlock = stepBlock('Create isolated migration workspace');
 assertIncludes(isolationBlock, "if: ${{ inputs.mode != 'audit-history' }}", 'Isolation must run only outside audit-history mode');
 assertIncludes(isolationBlock, 'tar -C migration-source --exclude=.git -cf - . | tar -C "$isolated_root" -xf -', 'Isolation must copy the selected source workspace');
 assertIncludes(isolationBlock, 'find "$isolated_migrations" -mindepth 1 -maxdepth 1 ! -name "$TARGET_MIGRATION" -exec rm -rf {} +', 'Isolation must remove every non-target migration directory entry');
 assertIncludes(isolationBlock, 'if [ "${#remaining_entries[@]}" -ne 1 ]; then', 'Isolation must require exactly one directory entry');
-assertIncludes(isolationBlock, 'if [ "${remaining_entries[0]}" != "$TARGET_MIGRATION" ]; then', 'Isolation must require the exact receptionist migration entry');
+assertIncludes(isolationBlock, 'if [ "${remaining_entries[0]}" != "$TARGET_MIGRATION" ]; then', 'Isolation must require the exact selected migration entry');
 assertIncludes(isolationBlock, 'if [ "${#remaining_migrations[@]}" -ne 1 ]; then', 'Isolation must require exactly one SQL migration');
-assertIncludes(isolationBlock, 'if [ "${remaining_migrations[0]}" != "$TARGET_MIGRATION" ]; then', 'Isolation must require the exact receptionist migration filename');
+assertIncludes(isolationBlock, 'if [ "${remaining_migrations[0]}" != "$TARGET_MIGRATION" ]; then', 'Isolation must require the exact selected migration filename');
 assertIncludes(isolationBlock, 'source_sha_before', 'Isolation must hash the source migration before copying');
 assertIncludes(isolationBlock, 'source_sha_after', 'Isolation must verify the source migration was not modified');
 assertIncludes(isolationBlock, 'isolated_sha_after', 'Isolation must verify the isolated migration was not modified');
-assertIncludes(isolationBlock, 'Legacy migrations remain in the isolated workspace.', 'Isolation must fail if any legacy migration remains');
+assertIncludes(isolationBlock, 'Non-selected migrations remain in the isolated workspace.', 'Isolation must fail if any non-selected migration remains');
+
+/* ------------------------------------------------------------------ mode routing */
 
 assertStepIncludes('Link Supabase project for audit', "if: ${{ inputs.mode == 'audit-history' }}", 'Audit link must run only in audit-history mode');
 assertStepWorkingDirectory('Link Supabase project for audit', 'migration-source');
@@ -87,13 +139,42 @@ assertStepIncludes('Dry run migration push', "if: ${{ inputs.mode != 'audit-hist
 assertStepWorkingDirectory('Dry run migration push', 'isolated-migration-source');
 assertStepIncludes('Dry run migration push', 'supabase db push --dry-run', 'Dry run must call supabase db push --dry-run');
 
+/* ------------------------------------------------------------------ dependency gate */
+
+const depsBlock = stepBlock('Verify remote migration dependencies');
+assertIncludes(depsBlock, "if: ${{ inputs.mode != 'audit-history' }}", 'Dependency gate must run for dry-run and apply');
+assertIncludes(depsBlock, 'node .github/scripts/verify-supabase-migration-deps.mjs supabase-migration-list.txt "$TARGET_MIGRATION"', 'Dependency gate invocation drifted');
+assert(
+  workflowText.indexOf('- name: Verify remote migration dependencies') < workflowText.indexOf('- name: Dry run migration push'),
+  'Dependency gate must run BEFORE the dry run, and therefore before any push',
+);
+
+/* ------------------------------------------------------------------ apply gates */
+
 assertStepIncludes('Verify apply confirmation', "if: ${{ inputs.mode == 'apply' }}", 'Apply confirmation must run only in apply mode');
-assertStepIncludes('Verify apply confirmation', 'APPLY_RECEPTIONIST_PERSISTENCE', 'Apply confirmation phrase drifted');
+assertStepIncludes('Verify apply confirmation', '"$CONFIRMATION" != "$EXPECTED_CONFIRMATION"', 'Apply confirmation must compare against the derived value');
+assertNotIncludes(workflowText, 'APPLY_RECEPTIONIST_PERSISTENCE', 'The receptionist-only confirmation string must be gone');
+for (const generic of ['"YES"', '"APPLY"', '"CONFIRM"']) {
+  assertNotIncludes(stepBlock('Verify apply confirmation'), generic, `Generic confirmation ${generic} must never be accepted`);
+}
+
 assertStepIncludes('Verify apply migration scope', "if: ${{ inputs.mode == 'apply' }}", 'Dry-run parser gate must run only in apply mode');
 assertStepIncludes(
   'Verify apply migration scope',
-  'node .github/scripts/verify-supabase-dry-run.mjs supabase-dry-run.txt',
-  'Apply mode must preserve the dry-run parser gate'
+  'node .github/scripts/verify-supabase-dry-run.mjs supabase-dry-run.txt "$TARGET_MIGRATION"',
+  'Apply mode must pass the selected target to the dry-run parser gate',
+);
+
+const backupBlock = stepBlock('Verify backup / restore point exists');
+assertIncludes(backupBlock, "if: ${{ inputs.mode == 'apply' }}", 'Backup gate must run only in apply mode');
+assertIncludes(backupBlock, '/database/backups', 'Backup gate must call the documented read-only endpoint');
+assertIncludes(backupBlock, "trap 'rm -f supabase-backups.json' EXIT", 'Backup gate must delete the raw response, including on failure');
+assertIncludes(backupBlock, 'node .github/scripts/verify-supabase-backups.mjs supabase-backups.json "$http_status"', 'Backup gate must parse via the tested script');
+assert(/--request\s+(POST|PUT|PATCH|DELETE)/.test(backupBlock) === false, 'Backup gate must be read-only');
+assertNotIncludes(backupBlock, 'echo "$SUPABASE_ACCESS_TOKEN"', 'Backup gate must never print the access token');
+assert(
+  workflowText.indexOf('- name: Verify backup / restore point exists') < workflowText.indexOf('- name: Apply migration push'),
+  'Backup gate must run BEFORE the push',
 );
 
 const applyBlock = stepBlock('Apply migration push');
@@ -101,128 +182,52 @@ assertIncludes(applyBlock, "if: ${{ inputs.mode == 'apply' }}", 'Final push must
 assertIncludes(applyBlock, 'working-directory: isolated-migration-source', 'Final push must use the isolated workspace');
 assertIncludes(applyBlock, 'run: supabase db push', 'Final push command must remain supabase db push without extra flags');
 
+/* ------------------------------------------------------------------ post-apply */
+
 const verifyAppliedBlock = stepBlock('Verify applied migration history');
 assertIncludes(verifyAppliedBlock, "if: ${{ inputs.mode == 'apply' }}", 'Post-apply verification must run only in apply mode');
-assertIncludes(verifyAppliedBlock, 'working-directory: isolated-migration-source', 'Post-apply verification must use the isolated workspace');
 assertIncludes(verifyAppliedBlock, 'supabase migration list', 'Post-apply verification must list migration history again');
-assertIncludes(verifyAppliedBlock, `awk -F '|' -v target="$TARGET_MIGRATION_VERSION"`, 'Post-apply verification must parse Local and Remote columns with awk');
-assertMatches(verifyAppliedBlock, /raw_row\s*=\s*\$0/, 'Post-apply verification must determine column layout from the raw row');
-assertMatches(verifyAppliedBlock, /raw_row\s*~\s*\/\^\[\[:space:\]\]\*\\\|\//, 'Post-apply verification must detect leading-pipe table rows');
-assertMatches(verifyAppliedBlock, /local_version\s*=\s*normalize\(\$2\)[\s\S]*remote_version\s*=\s*normalize\(\$3\)/, 'Leading-pipe rows must parse Local from field $2 and Remote from field $3');
-assertMatches(verifyAppliedBlock, /local_version\s*=\s*normalize\(\$1\)[\s\S]*remote_version\s*=\s*normalize\(\$2\)/, 'Rows without a leading pipe must parse Local from field $1 and Remote from field $2');
-assertNotIncludes(verifyAppliedBlock, 'local_version == ""', 'Post-apply verification must not shift columns merely because Local is blank');
-assertMatches(verifyAppliedBlock, /remote_version\s*==\s*target/, 'Post-apply verification must require the Remote column to match the target');
-assertIncludes(verifyAppliedBlock, 'found_synced', 'Post-apply verification must succeed only when Local and Remote are both present');
-assertIncludes(verifyAppliedBlock, '$TARGET_MIGRATION_VERSION', 'Post-apply verification must use the target migration version env var');
-assertIncludes(verifyAppliedBlock, 'Remote column was blank or missing', 'Post-apply verification must explain local-only or blank-remote failures');
-assertIncludes(verifyAppliedBlock, 'Target migration was not found in the Local column', 'Post-apply verification must explain missing target-row failures');
+assertIncludes(verifyAppliedBlock, 'node .github/scripts/verify-supabase-ledger.mjs', 'Post-apply verification must use the tested ledger verifier');
+assertIncludes(verifyAppliedBlock, 'supabase-migration-list.txt', 'Post-apply verification must pass the pre-push snapshot for comparison');
 assertNotIncludes(verifyAppliedBlock, 'grep -Eq', 'Post-apply verification must not grep for the version anywhere in the output');
+
+const advisorBlock = stepBlock('Report Supabase security advisors (read-only)');
+assertIncludes(advisorBlock, '/advisors/security', 'Advisor step must call the documented endpoint');
+assertIncludes(advisorBlock, 'continue-on-error: true', 'Advisor findings must be report-only and never fail the run');
+assert(/--request\s+(POST|PUT|PATCH|DELETE)/.test(advisorBlock) === false, 'Advisor step must be read-only');
+
+/* ------------------------------------------------------------------ global bans */
 
 assertNotIncludes(workflowText, '--include-all', 'Workflow must not use --include-all');
 assertNotIncludes(workflowText, '--include-seed', 'Workflow must not use --include-seed');
 assertNotIncludes(workflowText, '--include-roles', 'Workflow must not use --include-roles');
 assertNotIncludes(workflowText, 'migration repair', 'Workflow must not run migration repair');
 assertNotIncludes(workflowText, 'db reset', 'Workflow must not run db reset');
+assertNotIncludes(workflowText, 'database/backups/restore', 'Workflow must never call a backup write endpoint');
 
-function normalizeMigrationVersion(value) {
-  return String(value ?? '').replace(/[^0-9]/g, '');
+// The protected club-operations migrations must never be selectable.
+for (const version of PROTECTED_VERSIONS) {
+  assert(
+    !canonicalFiles.some((f) => f.startsWith(version)),
+    `Protected migration ${version} must never appear on the allowlist`,
+  );
+  assertNotIncludes(inputs.target_migration.options.join(' '), version, `Protected migration ${version} must not be selectable`);
 }
 
-function migrationHistoryHasSyncedTarget(output, target) {
-  let foundLocal = false;
-  let foundSynced = false;
-
-  for (const row of output.split(/\r?\n/)) {
-    const fields = row.split('|');
-    let localVersion;
-    let remoteVersion;
-
-    if (/^[ \t]*\|/.test(row)) {
-      localVersion = normalizeMigrationVersion(fields[1]);
-      remoteVersion = normalizeMigrationVersion(fields[2]);
-    } else {
-      localVersion = normalizeMigrationVersion(fields[0]);
-      remoteVersion = normalizeMigrationVersion(fields[1]);
-    }
-
-    if (localVersion === target) {
-      foundLocal = true;
-
-      if (remoteVersion === target) {
-        foundSynced = true;
-      }
-    }
-  }
-
-  return { foundLocal, foundSynced, ok: foundSynced };
-}
-
-function assertMigrationHistoryParser(name, output, expectedOk) {
-  const result = migrationHistoryHasSyncedTarget(output, '20260711120000');
-
-  if (result.ok !== expectedOk) {
-    fail(`${name} expected ok=${expectedOk}, received ${JSON.stringify(result)}`);
+// Every allowlisted migration must have a file on disk and a derivable confirmation.
+for (const migration of ALLOWED_MIGRATIONS) {
+  assert(confirmationFor(migration.file) === `APPLY_MIGRATION_${migration.version}`, `Confirmation derivation drifted for ${migration.file}`);
+  try {
+    readFileSync(`supabase/migrations/${migration.file}`, 'utf8');
+  } catch {
+    fail(`Allowlisted migration ${migration.file} does not exist in supabase/migrations`);
   }
 }
 
-assertMigrationHistoryParser(
-  'no-leading-pipe local and remote both populated',
-  `
-  Local | Remote | Time (UTC)
-  20260711120000 | 20260711120000 | 2026-07-20
-  `,
-  true
-);
-assertMigrationHistoryParser(
-  'leading-pipe local and remote both populated',
-  `
-  | Local          | Remote         | Time (UTC) |
-  |----------------|----------------|------------|
-  | \`20260711120000\` | \`20260711120000\` | 2026-07-20 |
-  `,
-  true
-);
-assertMigrationHistoryParser(
-  'no-leading-pipe local populated and remote blank',
-  `
-  Local | Remote | Time (UTC)
-  20260711120000 |        | 2026-07-20
-  `,
-  false
-);
-assertMigrationHistoryParser(
-  'leading-pipe local blank remote target time normalizes to target',
-  `
-  | Local          | Remote | Time (UTC) |
-  |----------------|--------|------------|
-  |                | 20260711120000 | 2026-07-11 12:00:00 |
-  `,
-  false
-);
-assertMigrationHistoryParser(
-  'remote target only',
-  `
-  | Local          | Remote         | Time (UTC) |
-  |----------------|----------------|------------|
-  |                | 20260711120000 | 2026-07-20 |
-  `,
-  false
-);
-assertMigrationHistoryParser(
-  'local and remote differ',
-  `
-  Local | Remote | Time (UTC)
-  20260711120000 | 20260710133000 | 2026-07-20
-  `,
-  false
-);
-assertMigrationHistoryParser(
-  'malformed or missing target row',
-  `
-  Local | Remote | Time (UTC)
-  malformed output without the target local row
-  `,
-  false
+// Receptionist backward compatibility: the original use case must still be selectable.
+assert(
+  canonicalFiles.includes('20260711120000_receptionist_persistence.sql'),
+  'The receptionist migration must remain supported',
 );
 
 console.log('supabase production migration workflow static checks passed');

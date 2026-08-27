@@ -1,0 +1,7 @@
+{
+  "region": "eu-central-1",
+  "walg_enabled": false,
+  "pitr_enabled": false,
+  "backups": [],
+  "physical_backup_data": {}
+}
