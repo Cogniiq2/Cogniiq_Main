@@ -239,6 +239,16 @@ export function LocationContent() {
                 <Link to="/regensburg" className="font-medium text-[#515A61] dark:text-sky-400 hover:underline">Regensburg</Link>{" "}
                 mit denselben hochwertigen Systemen.
               </p>
+              <p className="text-gray-600 dark:text-gray-400 mb-5 leading-relaxed">
+                In Regensburg lassen sich{" "}
+                <Link
+                  to="/regensburg/website-relaunch"
+                  className="font-medium text-[#515A61] dark:text-sky-400 hover:underline"
+                >
+                  bestehende Websites modernisieren
+                </Link>{" "}
+                – mit sauberer SEO-Migration, ohne bestehende Rankings zu verlieren.
+              </p>
               <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
                 Unsere Kernleistungen stehen für alle drei Standorte zur Verfügung:
               </p>
