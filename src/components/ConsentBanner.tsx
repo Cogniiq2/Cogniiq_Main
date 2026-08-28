@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
+  DENIED_STATE,
   OPEN_CONSENT_EVENT,
-  denyConsent,
+  denyAll,
   getStoredConsent,
-  grantConsent,
+  grantAll,
   hasDecision,
   revokeConsent,
+  setConsent,
+  type ConsentState,
   type ConsentStatus,
 } from '@/lib/consent';
 
@@ -15,18 +18,26 @@ import {
 //   • a settings dialog that can be reopened at any time (e.g. from the footer
 //     "Cookie-Einstellungen" action) to change or revoke consent.
 // Accept and reject are given equal visual weight; reject is never hidden.
+//
+// Statistik (GA4) and Marketing (Google Ads) are INDEPENDENT purposes: each can
+// be granted or denied on its own. "Alle akzeptieren" grants both, and the
+// banner text names both purposes so that single click is informed.
 export function ConsentBanner() {
   const [showBanner, setShowBanner] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [current, setCurrent] = useState<ConsentStatus | null>(null);
+  const [current, setCurrent] = useState<ConsentState | null>(null);
+  // Draft toggle state inside the settings dialog, committed by "Auswahl speichern".
+  const [draft, setDraft] = useState<ConsentState>(DENIED_STATE);
   const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setCurrent(getStoredConsent());
+    setDraft(getStoredConsent() ?? DENIED_STATE);
     setShowBanner(!hasDecision());
 
     const openSettings = () => {
       setCurrent(getStoredConsent());
+      setDraft(getStoredConsent() ?? DENIED_STATE);
       setShowSettings(true);
     };
     window.addEventListener(OPEN_CONSENT_EVENT, openSettings);
@@ -45,24 +56,46 @@ export function ConsentBanner() {
     return () => window.removeEventListener('keydown', onKey);
   }, [showSettings]);
 
-  const accept = () => {
-    grantConsent();
-    setCurrent('granted');
+  const close = (state: ConsentState) => {
+    setCurrent(state);
+    setDraft(state);
     setShowBanner(false);
     setShowSettings(false);
   };
 
+  const accept = () => {
+    grantAll();
+    close({ marketing: 'granted', analytics: 'granted' });
+  };
+
   const reject = () => {
-    denyConsent();
-    setCurrent('denied');
-    setShowBanner(false);
-    setShowSettings(false);
+    denyAll();
+    close(DENIED_STATE);
+  };
+
+  /** Commits the per-purpose toggles exactly as chosen. */
+  const saveSelection = () => {
+    setConsent(draft);
+    close(draft);
   };
 
   const revoke = () => {
     revokeConsent();
-    setCurrent('denied');
-    setShowSettings(false);
+    close(DENIED_STATE);
+  };
+
+  const toggle = (purpose: keyof ConsentState) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const status: ConsentStatus = e.target.checked ? 'granted' : 'denied';
+    setDraft((d) => ({ ...d, [purpose]: status }));
+  };
+
+  const statusLabel = (state: ConsentState | null) => {
+    if (!state) return 'Noch keine Auswahl';
+    const parts = [
+      `Statistik ${state.analytics === 'granted' ? 'aktiviert' : 'deaktiviert'}`,
+      `Marketing ${state.marketing === 'granted' ? 'aktiviert' : 'deaktiviert'}`,
+    ];
+    return parts.join(' · ');
   };
 
   return (
@@ -77,8 +110,17 @@ export function ConsentBanner() {
         >
           <div className="mx-auto flex max-w-5xl flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between lg:px-8">
             <p className="text-[13px] leading-relaxed text-gray-600 dark:text-gray-300">
-              Wir verwenden technisch notwendige Speicherung. Mit Ihrer Einwilligung laden wir
-              zusätzlich Google Ads, um Werbewirkung zu messen. Details in unserer{' '}
+              Wir verwenden technisch notwendige Speicherung – dafür ist keine Einwilligung nötig
+              und die Website funktioniert vollständig. Mit Ihrer Einwilligung laden wir zusätzlich{' '}
+              <span className="font-medium text-gray-800 dark:text-gray-100">
+                Google Analytics (Statistik und Nutzungsanalyse)
+              </span>
+              , um zu verstehen, wie die Website genutzt wird, und sie zu verbessern, sowie{' '}
+              <span className="font-medium text-gray-800 dark:text-gray-100">
+                Google Ads (Marketing: Messung der Werbewirkung)
+              </span>
+              . „Alle akzeptieren“ erlaubt beides; unter „Einstellungen“ können Sie Statistik und
+              Marketing einzeln auswählen. Details in unserer{' '}
               <Link to="/datenschutz" className="underline hover:text-gray-900 dark:hover:text-white">
                 Datenschutzerklärung
               </Link>
@@ -131,11 +173,7 @@ export function ConsentBanner() {
             <p className="mb-4 text-[13px] leading-relaxed text-gray-600 dark:text-gray-400">
               Aktueller Status:{' '}
               <span className="font-medium text-gray-900 dark:text-gray-200">
-                {current === 'granted'
-                  ? 'Google Ads aktiviert'
-                  : current === 'denied'
-                    ? 'Nur notwendige Speicherung'
-                    : 'Noch keine Auswahl'}
+                {statusLabel(current)}
               </span>
             </p>
 
@@ -144,24 +182,60 @@ export function ConsentBanner() {
                 <p className="font-medium text-gray-800 dark:text-gray-200">Technisch notwendig</p>
                 <p>
                   Immer aktiv. Speichert z. B. Ihre Cookie-Auswahl und Anzeige-Einstellungen im
-                  Browser. Kein Tracking.
+                  Browser. Kein Tracking. Die Website funktioniert auch ohne die beiden folgenden
+                  Optionen vollständig.
                 </p>
               </div>
+
               <div className="rounded-xl border border-gray-200 p-3 dark:border-white/10">
-                <p className="font-medium text-gray-800 dark:text-gray-200">
-                  Marketing – Google Ads
-                </p>
-                <p>
-                  Wird nur nach Ihrer Einwilligung geladen und misst die Wirkung unserer Anzeigen.
-                  Beim Widerruf entfernen wir die zugehörigen First-Party-Cookies, soweit technisch
-                  über die Website möglich. Bereits übertragene Daten können über die Website nicht
-                  nachträglich zurückgezogen werden.
-                </p>
+                <label className="flex cursor-pointer items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={draft.analytics === 'granted'}
+                    onChange={toggle('analytics')}
+                    className="mt-0.5 h-4 w-4 flex-shrink-0 rounded border-gray-300 accent-gray-900 dark:border-white/20 dark:accent-white"
+                  />
+                  <span>
+                    <span className="block font-medium text-gray-800 dark:text-gray-200">
+                      Statistik und Nutzungsanalyse – Google Analytics
+                    </span>
+                    <span>
+                      Hilft uns zu verstehen, wie die Website genutzt wird (z. B. welche Seiten
+                      aufgerufen werden), damit wir sie verbessern können. Dabei wird eine
+                      pseudonyme Kennung in einem Cookie gespeichert; die Daten sind nicht
+                      vollständig anonym. Wird ausschließlich nach Ihrer Einwilligung geladen. Beim
+                      Widerruf entfernen wir die zugehörigen First-Party-Cookies, soweit technisch
+                      über die Website möglich. Details in unserer Datenschutzerklärung.
+                    </span>
+                  </span>
+                </label>
+              </div>
+
+              <div className="rounded-xl border border-gray-200 p-3 dark:border-white/10">
+                <label className="flex cursor-pointer items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={draft.marketing === 'granted'}
+                    onChange={toggle('marketing')}
+                    className="mt-0.5 h-4 w-4 flex-shrink-0 rounded border-gray-300 accent-gray-900 dark:border-white/20 dark:accent-white"
+                  />
+                  <span>
+                    <span className="block font-medium text-gray-800 dark:text-gray-200">
+                      Marketing – Google Ads
+                    </span>
+                    <span>
+                      Wird nur nach Ihrer Einwilligung geladen und misst die Wirkung unserer
+                      Anzeigen. Beim Widerruf entfernen wir die zugehörigen First-Party-Cookies,
+                      soweit technisch über die Website möglich. Bereits übertragene Daten können
+                      über die Website nicht nachträglich zurückgezogen werden.
+                    </span>
+                  </span>
+                </label>
               </div>
             </div>
 
             <div className="flex flex-wrap items-center justify-end gap-2.5">
-              {current === 'granted' ? (
+              {current && (current.marketing === 'granted' || current.analytics === 'granted') ? (
                 <button
                   type="button"
                   onClick={revoke}
@@ -178,6 +252,13 @@ export function ConsentBanner() {
                   Ablehnen
                 </button>
               )}
+              <button
+                type="button"
+                onClick={saveSelection}
+                className="rounded-lg border border-gray-300 px-5 py-2 text-[13px] font-semibold text-gray-800 transition-colors hover:border-gray-400 hover:bg-gray-50 dark:border-white/15 dark:text-gray-100 dark:hover:bg-white/[0.06]"
+              >
+                Auswahl speichern
+              </button>
               <button
                 type="button"
                 onClick={accept}
