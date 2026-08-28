@@ -5,41 +5,21 @@
 
 import { supabase } from '@/lib/supabase';
 import { secureUuid } from '@/lib/ownerFinance/api';
-import { describeSupabaseError, isMissingBackendError } from '@/lib/ownerFinance/errorText';
 import type {
   CustomerServiceSummary, EngagementDetail, EngagementStatus, EngagementTaskStatus,
   ServiceKey, ServiceState,
 } from '@/lib/serviceOnboarding/types';
+import { describeServiceFailure } from '@/lib/serviceOnboarding/serviceErrors';
+import type { ServiceFailure } from '@/lib/serviceOnboarding/serviceErrors';
 
-/**
- * How a caller should react to a failure from this module.
- *
- * `missing` means the two service-onboarding migrations have not been applied to this
- * environment yet — the tables and RPCs simply do not exist. That is a deployment state, not
- * a fault, and the UI says so calmly instead of showing a red error on every customer page
- * during the window between merging the frontend and running the migration.
- *
- * `error` is everything else and is never dressed up as "not deployed yet": an RLS denial, a
- * network failure or a constraint violation after deployment must stay visible.
- *
- * Reuses the finance area's tested classifier (`isMissingBackendError`) rather than
- * introducing a second, weaker notion of the same thing.
- */
-export type ServiceBackendStatus = 'missing' | 'error';
-
-export function classifyServiceError(err: unknown): ServiceBackendStatus {
-  return isMissingBackendError(err) ? 'missing' : 'error';
-}
-
-/** Human-readable text for a failure, never "[object Object]". */
-export function describeServiceError(err: unknown): string {
-  return describeSupabaseError(err, 'Unbekannter Fehler');
-}
-
-/** True when a returned `{ error }` string came from an un-migrated environment. */
-export function isMissingBackendMessage(message: string | null): boolean {
-  return message !== null && isMissingBackendError({ message });
-}
+// Error classification and sanitisation live in serviceErrors.ts, which has no Supabase
+// dependency. Re-exported here so every existing import keeps working.
+export {
+  classifyServiceError, describeServiceError, describeServiceFailure, isMissingBackendMessage,
+} from '@/lib/serviceOnboarding/serviceErrors';
+export type {
+  ServiceBackendStatus, ServiceFailure, ServiceFailureKind,
+} from '@/lib/serviceOnboarding/serviceErrors';
 
 /* ----------------------------------------------------------------- Services */
 
@@ -55,21 +35,32 @@ export async function loadCustomerServices(customerId: string): Promise<Customer
  * instead of creating a second one, so a double click, a retry or a re-save never duplicates an
  * onboarding. Re-adding a paused or archived service reactivates it with its history intact.
  */
-export async function addCustomerService(customerId: string, serviceKey: ServiceKey): Promise<{
-  serviceId: string | null; engagementId: string | null; created: boolean; error: string | null;
+export async function addCustomerService(customerId: string, serviceKey: ServiceKey, label?: string): Promise<{
+  serviceId: string | null; engagementId: string | null; created: boolean;
+  /** Raw message, kept for callers that classify on it. Do not render it. */
+  error: string | null;
+  /** Sanitised, renderable description of the same failure. */
+  failure: ServiceFailure | null;
 }> {
   const { data, error } = await supabase.rpc('owner_add_customer_service', {
     p_idempotency_key: secureUuid(),
     p_customer_id: customerId,
     p_service_key: serviceKey,
   });
-  if (error) return { serviceId: null, engagementId: null, created: false, error: error.message };
+  if (error) {
+    return {
+      serviceId: null, engagementId: null, created: false,
+      error: error.message,
+      failure: describeServiceFailure(error, label),
+    };
+  }
   const r = data as { service_id?: string; engagement_id?: string; created?: boolean };
   return {
     serviceId: r?.service_id ?? null,
     engagementId: r?.engagement_id ?? null,
     created: r?.created ?? false,
     error: null,
+    failure: null,
   };
 }
 
