@@ -13,9 +13,10 @@ import {
   serviceStateLabel, serviceStateTone,
 } from '@/lib/serviceOnboarding/catalog';
 import {
-  addCustomerService, classifyServiceError, describeServiceError, loadCustomerServices,
-  setCustomerServiceState,
+  addCustomerService, classifyServiceError, describeServiceError, describeServiceFailure,
+  loadCustomerServices, setCustomerServiceState,
 } from '@/lib/serviceOnboarding/api';
+import type { ServiceFailure } from '@/lib/serviceOnboarding/api';
 import type { CustomerServiceSummary, ServiceKey, ServiceState } from '@/lib/serviceOnboarding/types';
 
 /**
@@ -76,10 +77,16 @@ export function CustomerServicesPanel({ customerId, onServicesChanged, onLoaded 
   const confirmAdd = async () => {
     if (pending.length === 0) { setAddOpen(false); return; }
     setSaving(true);
-    const failures: string[] = [];
+    /* Keep the failure itself, not just the service name. Reporting only the name told the
+       owner which service failed and nothing about WHY — a foreign-key violation and an
+       expired session produced the identical toast. `describeServiceFailure` returns a
+       sanitised sentence (never raw SQL) plus the code worth quoting in a bug report, and has
+       already logged the original error to the console for developer diagnostics. */
+    const failures: { name: string; failure: ServiceFailure }[] = [];
     for (const key of pending) {
-      const { error: err } = await addCustomerService(customerId, key);
-      if (err) failures.push(SERVICE_BY_KEY[key].name);
+      const name = SERVICE_BY_KEY[key].name;
+      const { error: err, failure } = await addCustomerService(customerId, key, name);
+      if (err) failures.push({ name, failure: failure ?? describeServiceFailure(err, name) });
     }
     setSaving(false);
     setAddOpen(false);
@@ -87,7 +94,15 @@ export function CustomerServicesPanel({ customerId, onServicesChanged, onLoaded 
     await load();
     onServicesChanged?.();
     if (failures.length > 0) {
-      toast.error('Leistung konnte nicht hinzugefügt werden', failures.join(', '));
+      // One failure gets its own sentence. Several get the names plus the first reason, so the
+      // toast stays readable without hiding that something specific went wrong.
+      const first = failures[0];
+      toast.error(
+        first.failure.kind === 'missing' ? 'Leistungen noch nicht verfügbar' : 'Leistung konnte nicht hinzugefügt werden',
+        failures.length === 1
+          ? first.failure.message
+          : `${failures.map((f) => f.name).join(', ')} — ${first.failure.message}`,
+      );
     } else {
       toast.success('Leistung hinzugefügt', 'Der Onboarding-Workspace wurde angelegt.');
     }

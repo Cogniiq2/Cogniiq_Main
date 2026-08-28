@@ -26,6 +26,10 @@ export const MIGRATION_FILENAME_PATTERN = /^\d{14}_[A-Za-z0-9_.-]+\.sql$/;
  *    owner_record_customer_activity (20260724120000) and is_platform_owner / set_updated_at
  *    (20260710120000)
  *  - 20260830121000 seeds rows into the template tables 20260830120000 creates
+ *  - 20260830122000 replaces the audit triggers 20260830120000 created on four of its
+ *    tables and writes into owner_audit_log (20260722120000). It must also come after
+ *    20260830121000: 20260830120000 recreates those triggers pointing at the generic
+ *    factory, so the fix has to be the LAST of the onboarding chain to run
  * Applying them out of order would fail mid-transaction against production.
  *
  * A prerequisite does NOT have to be allowlisted itself — it only has to be applied. The
@@ -73,6 +77,23 @@ export const ALLOWED_MIGRATIONS = [
     // rather than merely intended.
     requires: ['20260710120000', '20260722120000', '20260724120000', '20260830120000'],
     description: 'AI Receptionist onboarding template v1 (content only — creates no customer)',
+  },
+  {
+    file: '20260830122000_service_onboarding_audit_fix.sql',
+    version: '20260830122000',
+    // The confirmed production failure: the generic audit factory fell back to the row's own
+    // id for owner_engagement_tasks / owner_engagement_fields, which carry no
+    // business_entity_id, so owner_add_customer_service died on 23503 against
+    // owner_audit_log_business_entity_id_fkey. This repoints the four onboarding audit
+    // triggers at a dedicated function that resolves the entity through engagement_id.
+    //
+    // Both onboarding migrations are prerequisites: 20260830120000 creates the tables and the
+    // triggers this replaces, and 20260830121000 must already be in the remote history
+    // because 20260830120000 re-running after this fix would repoint those triggers back at
+    // the generic factory. Applying the chain strictly in version order is the property this
+    // entry enforces.
+    requires: ['20260710120000', '20260722120000', '20260724120000', '20260830120000', '20260830121000'],
+    description: 'Service onboarding audit fix — resolve the business entity through the engagement',
   },
 ];
 

@@ -16,6 +16,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ToastProvider } from '@/components/dashboard';
 import { describeSupabaseError, isMissingBackendError } from '@/lib/ownerFinance/errorText';
+// The real sanitiser, not a stub: it has no Supabase dependency, and using the real one keeps
+// this suite honest about what the owner actually sees when a service cannot be added.
+import { describeServiceFailure } from '@/lib/serviceOnboarding/serviceErrors';
 import type {
   CustomerServiceSummary, EngagementDetail, EngagementField, EngagementSection,
   EngagementTask, EngagementTaskStatus, ServiceKey, ServiceState,
@@ -133,6 +136,7 @@ vi.mock('@/lib/serviceOnboarding/api', () => ({
   describeServiceError: (err: unknown) => describeSupabaseError(err, 'Unbekannter Fehler'),
   isMissingBackendMessage: (message: string | null) =>
     message !== null && isMissingBackendError({ message }),
+  describeServiceFailure,
 
   loadCustomerServices: vi.fn(async (customerId: string): Promise<CustomerServiceSummary[]> =>
     services.filter((s) => s.customer_id === customerId).map((s) => {
@@ -396,6 +400,39 @@ describe('existing customers', () => {
     expect(await screen.findByRole('link', { name: /AI Receptionist/ })).toBeInTheDocument();
   });
 
+  it('reports WHY a service could not be added, without painting SQL into the toast', async () => {
+    // The confirmed production failure. The panel used to discard this entirely and show
+    // "Leistung konnte nicht hinzugefügt werden" with only the service name, which is
+    // indistinguishable from an expired session and told the owner nothing.
+    const AUDIT_FK = {
+      code: '23503',
+      message: 'insert or update on table "owner_audit_log" violates foreign key constraint "owner_audit_log_business_entity_id_fkey"',
+      details: 'Key (business_entity_id)=(64e1b3cf-82c3-451c-b54c-636b86073903) is not present in table "owner_business_entities".',
+    };
+    const user = userEvent.setup();
+    const api = await import('@/lib/serviceOnboarding/api');
+    vi.mocked(api.addCustomerService).mockResolvedValueOnce({
+      serviceId: null, engagementId: null, created: false, error: AUDIT_FK.message,
+      failure: describeServiceFailure(AUDIT_FK, 'AI Receptionist'),
+    });
+
+    renderWithProviders(<CustomerServicesPanel customerId={CUSTOMER_ID} />);
+    await screen.findByText(/noch keine Leistung zugeordnet/);
+
+    await user.click(screen.getAllByRole('button', { name: /Leistung hinzufügen/ })[0]);
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', { name: /AI Receptionist/ }));
+    await user.click(within(dialog).getByRole('button', { name: 'Leistung hinzufügen' }));
+
+    // A real reason, naming the service and the code worth quoting in a bug report.
+    expect(await screen.findByText(/Datenbankregel 23503/)).toBeInTheDocument();
+    expect(screen.getByText(/erneuter Versuch ändert nichts/)).toBeInTheDocument();
+    // And none of the database's own words.
+    expect(screen.queryByText(/owner_audit_log/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/foreign key constraint/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/64e1b3cf/)).not.toBeInTheDocument();
+  });
+
   it('archiving a service preserves its onboarding history', async () => {
     const user = userEvent.setup();
     const engagement = await seedReceptionist();
@@ -471,6 +508,7 @@ describe('pre-migration behaviour', () => {
     const api = await import('@/lib/serviceOnboarding/api');
     vi.mocked(api.addCustomerService).mockResolvedValueOnce({
       serviceId: null, engagementId: null, created: false, error: MISSING_RPC.message,
+      failure: describeServiceFailure(MISSING_RPC, 'AI Receptionist'),
     });
     const onSaved = vi.fn();
 

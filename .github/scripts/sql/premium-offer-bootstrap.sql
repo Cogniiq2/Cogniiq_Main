@@ -67,7 +67,11 @@ create table if not exists public.owner_finance_requests (
 
 create table if not exists public.owner_audit_log (
   id uuid primary key default gen_random_uuid(),
-  business_entity_id uuid,
+  -- The FOREIGN KEY is not decoration. Production (20260722120000) declares it, and its
+  -- absence here is exactly why a wrong business_entity_id passed every disposable suite
+  -- while failing in production with 23503. A stub that is laxer than the real table proves
+  -- nothing about the real table.
+  business_entity_id uuid references public.owner_business_entities(id) on delete set null,
   actor_user_id uuid,
   action text not null,
   resource_type text not null,
