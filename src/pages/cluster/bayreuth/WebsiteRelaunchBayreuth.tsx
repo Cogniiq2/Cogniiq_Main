@@ -11,7 +11,7 @@ const config: ClusterPageConfig = {
   cityHub: "/bayreuth",
   topic: "Website Relaunch",
   seo: {
-    title: "Website Relaunch Bayreuth – Modernisierung & SEO-Neustart | Cogniiq",
+    title: "Website Relaunch Bayreuth – Mehr Performance & bessere Rankings | Cogniiq",
     description:
       "Website Relaunch in Bayreuth: Cogniiq modernisiert veraltete Websites für Unternehmen in Bayreuth und Oberfranken. Pagespeed, SEO, DSGVO und Conversion – komplett neu aufgesetzt.",
     canonical: `${base}/bayreuth/website-relaunch`,
