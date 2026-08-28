@@ -302,22 +302,97 @@ else if (/\bgtag\s*\(/.test(indexHtml))
   fail('index.html must NOT call gtag() (consent is managed in src/lib/consent.ts)');
 else ok('index.html loads no Google tag before consent');
 
+// Neither product id may be hard-coded into the static document: both load only
+// through the consent-gated loader.
+if (/G-K7BS3LKT6H/.test(indexHtml))
+  fail('index.html must NOT contain the GA4 measurement id (loads only after analytics consent)');
+else ok('index.html contains no GA4 measurement id');
+if (/AW-17946397271/.test(indexHtml))
+  fail('index.html must NOT contain the Google Ads id (loads only after marketing consent)');
+else ok('index.html contains no Google Ads id');
+
 const consent = read('src/lib/consent.ts');
 const consentChecks = [
   [/googletagmanager\.com\/gtag\/js/, 'consent.ts loads gtag.js dynamically'],
   [/AW-17946397271/, 'consent.ts references the Google Ads id'],
+  [/G-K7BS3LKT6H/, 'consent.ts references the GA4 measurement id'],
+  // Consent Mode v2 defaults: every signal denied before any choice.
   [/ad_storage:\s*'denied'/, "consent.ts sets ad_storage default 'denied'"],
-  [/ad_user_data:\s*'granted'/, "consent.ts grants ad_user_data on acceptance"],
-  [/ad_personalization:\s*'granted'/, "consent.ts grants ad_personalization on acceptance"],
+  [/ad_user_data:\s*'denied'/, "consent.ts sets ad_user_data default 'denied'"],
+  [/ad_personalization:\s*'denied'/, "consent.ts sets ad_personalization default 'denied'"],
+  [/analytics_storage:\s*'denied'/, "consent.ts sets analytics_storage default 'denied'"],
+  // Each signal is bound to its own purpose, never hard-coded to granted.
+  [/ad_storage:\s*state\.marketing/, 'ad_storage follows the marketing purpose'],
+  [/ad_user_data:\s*state\.marketing/, 'ad_user_data follows the marketing purpose'],
+  [/ad_personalization:\s*state\.marketing/, 'ad_personalization follows the marketing purpose'],
+  [/analytics_storage:\s*state\.analytics/, 'analytics_storage follows the analytics purpose'],
+  // Each product is configured only under its own purpose.
+  [/state\.marketing === 'granted'\)\s*configureProduct\(GOOGLE_ADS_ID\)/,
+    'Google Ads is configured only under marketing consent'],
+  [/state\.analytics === 'granted'\)\s*configureProduct\(GA4_ID\)/,
+    'GA4 is configured only under analytics consent'],
+  // Duplicate-load / duplicate-config guards.
+  [/configuredProducts\.has\(id\)/, 'consent.ts guards against duplicate gtag config calls'],
+  [/if \(tagLoaded\) return;/, 'consent.ts guards against duplicate library injection'],
+  // v1 → v2 migration must never invent analytics consent.
+  [/LEGACY_STORAGE_KEY/, 'consent.ts migrates the v1 record'],
+  [/legacyMarketing, analytics: 'denied'/, 'v1 migration never infers analytics consent'],
+  // Analytics revocation must clear GA4 first-party cookies.
+  [/removeAnalyticsCookies/, 'consent.ts removes GA4 first-party cookies on revocation'],
 ];
 for (const [re, label] of consentChecks) {
   if (!re.test(consent)) fail(`Consent contract: expected ${label}`);
   else ok(label);
 }
-// analytics_storage must NOT be granted (no analytics product in use).
+
+// Neither signal may ever be hard-granted: both must stay bound to a purpose so
+// consent cannot be granted for a product the user did not choose.
 if (/analytics_storage:\s*'granted'/.test(consent))
-  fail("consent.ts must not grant analytics_storage (no analytics product is used)");
-else ok("consent.ts leaves analytics_storage denied");
+  fail("consent.ts must not hard-grant analytics_storage (must follow the analytics purpose)");
+else ok('analytics_storage is purpose-bound, never unconditionally granted');
+if (/ad_storage:\s*'granted'/.test(consent))
+  fail("consent.ts must not hard-grant ad_storage (must follow the marketing purpose)");
+else ok('ad_storage is purpose-bound, never unconditionally granted');
+
+// Basic Consent Mode only — Advanced mode pings before consent and is not used.
+if (/url_passthrough/.test(consent) && !/No url_passthrough/.test(consent))
+  fail('consent.ts must keep url_passthrough disabled');
+else ok('consent.ts keeps url_passthrough disabled');
+
+// The privacy policy must actually disclose the analytics processing that the
+// code performs, and must not overstate it as anonymous.
+const legalText = read('src/lib/legal-content.tsx');
+const privacyChecks = [
+  [/Google Analytics/, 'privacy policy discloses Google Analytics'],
+  [/analytics_storage/, 'privacy policy names the analytics_storage signal'],
+  [/_ga_K7BS3LKT6H/, 'privacy policy names the actual GA4 cookie'],
+  [/§ 25\s*\n?\s*Abs\. 1 TDDDG|§ 25 Abs\. 1 TDDDG/, 'privacy policy cites § 25 Abs. 1 TDDDG'],
+  [/Art\. 6 Abs\. 1 lit\. a DSGVO/, 'privacy policy cites consent as the legal basis'],
+  [/cogniiq_consent_v2/, 'privacy policy names the current consent storage key'],
+];
+for (const [re, label] of privacyChecks) {
+  if (!re.test(legalText)) fail(`Privacy disclosure: expected ${label}`);
+  else ok(label);
+}
+// GA4 data is pseudonymous, not anonymous — the policy must not claim otherwise.
+if (/Google Analytics[^]{0,400}?\banonymisiert\b/.test(legalText))
+  fail('privacy policy must not describe Google Analytics data as "anonymisiert"');
+else ok('privacy policy does not overstate Google Analytics as anonymous');
+
+// The banner must name both purposes, so a single "Alle akzeptieren" is informed.
+const banner = read('src/components/ConsentBanner.tsx');
+const bannerChecks = [
+  [/Google Analytics/, 'banner names the Google Analytics purpose'],
+  [/Google Ads/, 'banner names the Google Ads purpose'],
+  [/Statistik und Nutzungsanalyse/, 'banner describes analytics accurately, not as anonymous'],
+  [/toggle\('analytics'\)/, 'settings expose an independent analytics toggle'],
+  [/toggle\('marketing'\)/, 'settings expose an independent marketing toggle'],
+  [/Auswahl speichern/, 'settings allow saving a per-purpose selection'],
+];
+for (const [re, label] of bannerChecks) {
+  if (!re.test(banner)) fail(`Consent banner: expected ${label}`);
+  else ok(label);
+}
 
 // ─── 7. Duplicate SEO config removed / unconsumed ────────────────────────────
 if (existsSync(join(ROOT, 'src/config/seoConfig.ts')))

@@ -21,7 +21,7 @@
 
 import { BUSINESS_INFO } from '@/lib/seo-data';
 
-export const LEGAL_LAST_UPDATED = '2026-07-23';
+export const LEGAL_LAST_UPDATED = '2026-08-28';
 
 const A = BUSINESS_INFO.address;
 const C = BUSINESS_INFO.contact;
@@ -139,7 +139,7 @@ export function DatenschutzContent() {
       <h2>5. Speicherung im Browser (localStorage / sessionStorage)</h2>
       <p>
         Wir speichern technisch notwendige Informationen lokal in Ihrem Browser, insbesondere Ihre
-        Cookie-/Einwilligungsauswahl (Schlüssel <code>cogniiq_consent_v1</code>) sowie Anzeige- und
+        Cookie-/Einwilligungsauswahl (Schlüssel <code>cogniiq_consent_v2</code>) sowie Anzeige- und
         Oberflächeneinstellungen (z. B. Hell-/Dunkeldarstellung). Diese Speicherung ist für den
         Betrieb der Website erforderlich, dient nicht der Analyse und findet ohne gesonderte
         Einwilligung statt (§ 25 Abs. 2 TDDDG).
@@ -160,7 +160,69 @@ export function DatenschutzContent() {
         Daten können über die Website nicht nachträglich zurückgezogen werden.
       </p>
 
-      <h2>7. Kundenbereich und Kundenprozesse</h2>
+      <h2>7. Google Analytics (nur mit Einwilligung)</h2>
+      <p>
+        Wir nutzen Google Analytics 4 (Anbieter: Google Ireland Limited, Gordon House, Barrow
+        Street, Dublin 4, Irland). Zweck ist die Statistik und Nutzungsanalyse: Wir möchten
+        verstehen, wie unsere Website genutzt wird – etwa welche Seiten aufgerufen werden – um sie
+        laufend zu verbessern.
+      </p>
+      <p>
+        Google Analytics wird{' '}
+        <strong>ausschließlich nach Ihrer ausdrücklichen Einwilligung in die Statistik</strong>{' '}
+        geladen. Vor dieser Einwilligung wird kein Google-Analytics-Skript geladen, es werden keine
+        Analyse-Cookies gesetzt und es werden keine Daten an Google übermittelt. Wir setzen den
+        Google Consent Mode v2 in der Basis-Variante ein: <code>analytics_storage</code> steht
+        standardmäßig auf „denied“ und wird erst nach Ihrer Einwilligung auf „granted“ gesetzt.
+      </p>
+      <p>
+        Die Einwilligung in die Statistik ist von der Einwilligung in Marketing (Google Ads,
+        Abschnitt 6) unabhängig: Sie können der Statistik zustimmen, ohne Marketing zu erlauben, und
+        umgekehrt. Sie können beides ablehnen; die Website ist ohne diese Einwilligungen
+        uneingeschränkt nutzbar.
+      </p>
+      <p>
+        Auf Basis unserer Einbindung werden insbesondere folgende Kategorien von Nutzungsdaten
+        verarbeitet: aufgerufene Seiten (URL und Seitentitel), die verweisende Seite (Referrer),
+        Zeitpunkt und Dauer des Aufrufs, ungefährer Standort (in der Regel auf Basis der IP-Adresse
+        abgeleitet), technische Angaben zu Gerät, Betriebssystem, Browser und Spracheinstellung
+        sowie eine pseudonyme Kennung, die in den Cookies <code>_ga</code> und{' '}
+        <code>_ga_K7BS3LKT6H</code> gespeichert wird. Diese Daten sind{' '}
+        <strong>pseudonym, aber nicht anonym</strong>: Über die Kennung können wiederkehrende
+        Aufrufe desselben Browsers zusammengeführt werden. Wir übermitteln keine Klardaten wie Namen,
+        E-Mail-Adressen oder Inhalte von Kontaktformularen an Google. Welche weiteren automatischen
+        Messungen aktiv sind, hängt zusätzlich von den Einstellungen der Google-Analytics-Property
+        ab.
+      </p>
+      <p>
+        Eine Übermittlung von Daten in Drittländer, insbesondere in die USA (Google LLC), kann nicht
+        ausgeschlossen werden. Google gibt an, sich hierfür auf das EU-US Data Privacy Framework
+        sowie auf Standardvertragsklauseln zu stützen. Ein den EU-Standards vollständig
+        entsprechendes Datenschutzniveau kann in Drittländern nicht in jedem Fall garantiert werden.
+        Informationen von Google zur Datenverarbeitung finden Sie unter{' '}
+        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
+          policies.google.com/privacy
+        </a>{' '}
+        sowie{' '}
+        <a
+          href="https://business.safety.google/privacy/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          business.safety.google/privacy
+        </a>
+        .
+      </p>
+      <p>
+        Rechtsgrundlage für das Speichern und Auslesen von Informationen auf Ihrem Endgerät ist § 25
+        Abs. 1 TDDDG, für die anschließende Verarbeitung der Nutzungsdaten Ihre Einwilligung nach
+        Art. 6 Abs. 1 lit. a DSGVO. Sie können Ihre Einwilligung jederzeit mit Wirkung für die
+        Zukunft über „Cookie-Einstellungen“ im Footer ändern oder widerrufen (Art. 7 Abs. 3 DSGVO).
+        Beim Widerruf entfernen wir die über die Website erreichbaren First-Party-Cookies. Bereits
+        übermittelte Daten können über die Website nicht nachträglich zurückgezogen werden.
+      </p>
+
+      <h2>8. Kundenbereich und Kundenprozesse</h2>
       <p>
         Für registrierte Kundinnen und Kunden betreiben wir einen passwortgeschützten Kundenbereich.
         Für Authentifizierung und die Speicherung der zugehörigen Kundendaten nutzen wir Supabase.
@@ -170,7 +232,7 @@ export function DatenschutzContent() {
         Geschäfts- und Vertragsbeziehungen; Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.
       </p>
 
-      <h2>8. Ihre Rechte</h2>
+      <h2>9. Ihre Rechte</h2>
       <ul>
         <li>Recht auf Auskunft (Art. 15 DSGVO)</li>
         <li>Recht auf Berichtigung (Art. 16 DSGVO)</li>
@@ -185,7 +247,7 @@ export function DatenschutzContent() {
         beispielsweise beim Bayerischen Landesamt für Datenschutzaufsicht (BayLDA).
       </p>
 
-      <h2>9. Kontakt zum Datenschutz</h2>
+      <h2>10. Kontakt zum Datenschutz</h2>
       <p>
         Bei Fragen zum Datenschutz erreichen Sie uns unter {C.email}.
       </p>
