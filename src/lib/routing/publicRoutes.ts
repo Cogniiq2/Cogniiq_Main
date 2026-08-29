@@ -207,9 +207,9 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   // prueft. Verlinkt absichtlich NICHT auf die eingefrorenen Experimentrouten.
   {
     path: "/ki-telefonassistent-einfuehren",
-    title: "KI-Telefonassistent einf\u00FChren \u2013 Praxisleitfaden | Cogniiq",
-    description: "Wie eine Praxis einen KI-Telefonassistenten einf\u00FChrt: Anrufanl\u00E4sse trennen, \u00DCbergabe vor der Unterschrift kl\u00E4ren, vor dem Go-live pr\u00FCfen, Freigabe im Team.",
-    keywords: "KI Telefonassistent einf\u00FChren, KI Telefonassistent Praxis einf\u00FChren, Einf\u00FChrung KI Telefonassistent, Telefonassistent Praxis Go-live",
+    title: "KI-Telefonassistent in der Praxis einführen | Cogniiq",
+    description: "Wie eine Praxis einen KI-Telefonassistenten einführt: welche Anrufe infrage kommen, wie die Übergabe geklärt wird und was vor der Freigabe geprüft gehört.",
+    keywords: "KI Telefonassistent in der Praxis einführen, KI Telefonassistent Praxis einführen, Einführung KI Telefonassistent, Telefonassistent Praxis Freigabe",
     indexable: true,
     sitemap: { lastmod: "2026-08-29", changefreq: "monthly", priority: "0.85" },
   },

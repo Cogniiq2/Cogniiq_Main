@@ -650,3 +650,59 @@ Description auf die vorherige Fassung zurücksetzen (siehe Diff oben, beide
 Dateien betroffen). Ein Revert der FAQ-Ergänzung ist nur nötig, falls der
 Inhaber eine der genannten Zahlen widerruft — bis dahin bleibt sie stehen, weil
 sie ausschließlich bereits geprüfte `FAKTEN`-Werte referenziert.
+
+---
+
+# Nachtrag 2026-08-29 · Branch `claude/graphify-repo-navigation-xb3aj2`
+
+## Neue Seite: `/ki-telefonassistent-einfuehren`
+
+| Element | Wert |
+|---|---|
+| H1 | „Einen KI-Telefonassistenten in der Praxis einführen" |
+| Title | „KI-Telefonassistent in der Praxis einführen \| Cogniiq" (53 Z.) |
+| Description | „Wie eine Praxis einen KI-Telefonassistenten einführt: welche Anrufe infrage kommen, wie die Übergabe geklärt wird und was vor der Freigabe geprüft gehört." (154 Z.) |
+| Canonical | `https://cogniiq.de/ki-telefonassistent-einfuehren` |
+| Indexierbar | ja · Sitemap `lastmod 2026-08-29`, `priority 0.85` |
+| Schema | WebPage, BreadcrumbList, FAQPage (5 Fragen), Article (`author` = Person Lazar Popovic, `image` = og-image.png) |
+| Statistiken | 2 — Zi PVS-Monitoring 2026 (52 %, ausdrücklich als Aussage über Praxisverwaltungssysteme gekennzeichnet) und GKV-Spitzenverband 2025 (39 %), beide mit Quelle und Jahr im sichtbaren Text |
+| Interne Links | ausgehend: `/ki-telefonassistent` (3×, davon einer auf `#einrichtung`), `/praxen`, `/ki-telefonassistent/demo`, `/kontakt`, `/impressum` |
+| Datei | `src/pages/guides/KiTelefonassistentEinfuehren.tsx` |
+
+Zielintention: „KI Telefonassistent in der Praxis einführen". Diese Absicht war
+bisher unbesetzt. Die Seite beschreibt ausschließlich die Entscheidungen und
+Prüfungen, die bei der Praxis liegen; der Einrichtungsablauf auf unserer Seite
+(M17 / `EINRICHTUNG_PROJEKT`) bleibt allein auf der Produktseite und wird von
+hier verlinkt. Bewusst **kein** zweiter nummerierter Prozess.
+
+Ausdrücklich nicht enthalten, weil gesperrt oder unbeantwortet: Aussagen zu
+Verarbeitungsort, Konformität oder Zertifizierung (HONESTY-AUDIT §7.7), Namen
+von Praxisverwaltungssystemen oder Anbindungszusagen (OWNER-INPUT B1–B3),
+Aussagen zum Verhalten bei Störung oder Ausfall und jede Frist für eine
+Rückschaltung (OWNER-INPUT B9), Anteil automatisierter Anrufe (F4/Z0), Namen
+eingesetzter Dienstleister. Alle Kernzahlen stammen aus `FAKTEN`; die Datei
+steht dafür in der CLUSTER-Liste von `telefonassistent-copy.test.ts`.
+
+## Geänderte Seite: `/ki-telefonassistent`
+
+| Element | Vorher | Nachher |
+|---|---|---|
+| Abschnitt „Einrichtung" | nur Fließtext | zusätzlich ein kontextueller Verweis auf den Einführungsleitfaden |
+| Schriftgrad dieses Absatzes | — | 17 px (Brief III §1.2) |
+
+H1, Title, Description, Canonical, Schema und alle übrigen internen Links
+unverändert.
+
+## Neue Komponente
+
+`src/components/RedaktionelleVerantwortung.tsx` — nennt die nach
+§ 18 Abs. 2 MStV verantwortliche Person (identisch mit dem Impressum) und grenzt
+den Beitrag ausdrücklich von ärztlicher, rechtlicher und
+datenschutzrechtlicher Beratung ab. Keine Qualifikationen, keine Berufsjahre,
+keine Aufgabenteilung zwischen den Gründern. Kein Foto (Asset nicht freigegeben).
+
+## Eingefrorene Experimente
+
+Keine der sechs Routen wurde verändert, und es wurde **kein** neuer interner
+Link auf sie gesetzt — auch nicht bei Kostenfragen, wo er naheliegend gewesen
+wäre. Abgesichert durch `src/protectedExperiments.test.tsx`.

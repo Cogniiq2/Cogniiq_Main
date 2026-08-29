@@ -1322,7 +1322,7 @@ function SetupSection() {
               Praxis dafür entscheiden und prüfen". Ein Listeneintrag weiter
               unten würde diese Frage nicht dort auffangen, wo sie entsteht.
             */}
-            <p className="text-[14px] text-gray-500 dark:text-gray-400 leading-[1.7] max-w-md mt-4">
+            <p className="text-[17px] text-gray-500 dark:text-gray-400 leading-[1.7] max-w-md mt-4">
               Was auf Ihrer Seite dazugehört — welche Anrufanlässe überhaupt in
               Frage kommen, was vor dem Go-live geprüft gehört und wer freigibt —
               steht im{" "}

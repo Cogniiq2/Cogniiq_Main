@@ -13,8 +13,48 @@
       "h1": [
         "Webdesign Agentur in Bayreuth"
       ],
-      "textLength": 12081,
-      "textDigest": "cf955c892f4a9b59",
+      "headings": [
+        "h1:Webdesign Agentur in Bayreuth",
+        "h2:Webdesign in Bayreuth – was das konkret für Ihren Betrieb bedeutet",
+        "h2:Warum Cogniiq für Webdesign in Bayreuth",
+        "h2:Wer in Bayreuth davon profitiert",
+        "h3:Unternehmens-Website mit Leadfokus",
+        "h3:Praxis-Website mit Online-Terminbuchung",
+        "h3:Restaurant-Website mit Reservierung",
+        "h2:So läuft ein Projekt ab",
+        "h3:Kennenlernen & Zieldefinition",
+        "h3:Konzept & Angebot",
+        "h3:Umsetzung & Feinschliff",
+        "h3:Go-Live & Optimierung",
+        "h2:Herausforderung & Lösung – branchenspezifisch",
+        "h3:Arztpraxen & Zahnarztpraxen",
+        "h3:Gastronomie & Festspielstadt",
+        "h3:Handwerk & lokale Betriebe",
+        "h3:Sport & Freizeitanlagen",
+        "h3:Lokale Dienstleister",
+        "h2:Beispielszenarien, in denen Webdesign greift",
+        "h3:Zahnarztpraxis in der Innenstadt",
+        "h3:Restaurant nahe der Universität",
+        "h3:Sanitär-Handwerksbetrieb im Umland",
+        "h2:Was Betriebe in Bayreuth bremst",
+        "h2:Geeignet für diese Branchen in Bayreuth",
+        "h2:Häufige Fragen",
+        "h3:Auf welcher Technologie baut Cogniiq Websites in Bayreuth?",
+        "h3:Wie lange dauert ein Webdesign-Projekt in Bayreuth?",
+        "h3:Was kostet eine Website für ein Unternehmen in Bayreuth?",
+        "h3:Kann ich die Website nach dem Launch selbst pflegen?",
+        "h3:Macht Cogniiq auch lokales SEO für Bayreuth?",
+        "h3:Habt ihr Erfahrung mit dem Bayreuth-Markt?",
+        "h3:Könnt ihr eine bestehende Website modernisieren?",
+        "h3:Bietet ihr auch Hosting an?",
+        "h3:Wie unterscheidet sich eine professionelle Website von einem Baukastensystem?",
+        "h3:Wird die Website auch für Google My Business optimiert?",
+        "h3:Können auch mehrsprachige Websites erstellt werden?",
+        "h3:Was passiert nach dem Launch?",
+        "h2:Webdesign in Bayreuth anfragen"
+      ],
+      "textLength": 12902,
+      "textDigest": "1f1ffebb47502efc",
       "jsonLd": [
         "13ec8e357526750e",
         "29aa7af0fa63bce2",
@@ -25,63 +65,11 @@
       "outgoingLinks": [
         {
           "href": "/",
-          "text": "COGNIIQ"
-        },
-        {
-          "href": "/",
-          "text": "COGNIIQ"
-        },
-        {
-          "href": "/",
-          "text": "Cogniiq"
-        },
-        {
-          "href": "/",
           "text": "Home"
         },
         {
-          "href": "/app/login",
-          "text": "Kundenlogin"
-        },
-        {
-          "href": "/automatisierung-arzt",
-          "text": "Für Arztpraxen"
-        },
-        {
-          "href": "/automatisierung-immobilien",
-          "text": "Für Immobilien"
-        },
-        {
-          "href": "/automatisierung-restaurant",
-          "text": "Für Restaurants"
-        },
-        {
-          "href": "/automatisierung-sport",
-          "text": "Für Sport und Fitness"
-        },
-        {
           "href": "/automatisierung-unternehmen",
           "text": "Automatisierung"
-        },
-        {
-          "href": "/automatisierung-unternehmen",
-          "text": "Automatisierung"
-        },
-        {
-          "href": "/automatisierung-unternehmen",
-          "text": "AutomatisierungWiederkehrende Abläufe laufen ohne Handarbeit."
-        },
-        {
-          "href": "/automatisierung-unternehmen",
-          "text": "Prozessautomatisierung"
-        },
-        {
-          "href": "/bayern",
-          "text": "Bayern"
-        },
-        {
-          "href": "/bayern",
-          "text": "Bayern"
         },
         {
           "href": "/bayern",
@@ -120,64 +108,8 @@
           "text": "Webdesign Bayreuth"
         },
         {
-          "href": "/bayreuth/webdesign",
-          "text": "Webdesign Bayreuth"
-        },
-        {
-          "href": "/bayreuth/website-relaunch",
-          "text": "Website Relaunch"
-        },
-        {
           "href": "/bayreuth",
           "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "BayreuthHauptsitz"
-        },
-        {
-          "href": "/bewertungen",
-          "text": "Bewertungen"
-        },
-        {
-          "href": "/blog",
-          "text": "Blog"
-        },
-        {
-          "href": "/datenschutz",
-          "text": "Datenschutz"
-        },
-        {
-          "href": "/deutschland",
-          "text": "Deutschland"
-        },
-        {
-          "href": "/deutschland",
-          "text": "Deutschland"
-        },
-        {
-          "href": "/deutschland",
-          "text": "Deutschland"
-        },
-        {
-          "href": "/faq",
-          "text": "Häufige Fragen"
-        },
-        {
-          "href": "/impressum",
-          "text": "Impressum"
         },
         {
           "href": "/keine-anfragen-website",
@@ -189,63 +121,15 @@
         },
         {
           "href": "/ki-agentur-deutschland",
-          "text": "KI-Agentur"
-        },
-        {
-          "href": "/ki-agentur-deutschland",
           "text": "KI-Agentur Deutschland"
         },
         {
-          "href": "/ki-telefonassistent-arzt",
-          "text": "Arztpraxen im Detail"
-        },
-        {
-          "href": "/ki-telefonassistent-hotel",
-          "text": "Für Hotels"
-        },
-        {
-          "href": "/ki-telefonassistent-restaurant",
-          "text": "Für Restaurants"
-        },
-        {
-          "href": "/ki-telefonassistent/demo",
-          "text": "Demo anhören"
-        },
-        {
-          "href": "/ki-telefonassistent/demo",
-          "text": "Live-Demo"
-        },
-        {
           "href": "/ki-telefonassistent",
           "text": "KI-Telefonassistent"
-        },
-        {
-          "href": "/ki-telefonassistent",
-          "text": "KI-Telefonassistent"
-        },
-        {
-          "href": "/ki-telefonassistent",
-          "text": "KI-TelefonassistentNimmt die Anrufe an, die sonst ins Leere laufen."
-        },
-        {
-          "href": "/ki-telefonassistent",
-          "text": "KI-Telefonassistenten"
-        },
-        {
-          "href": "/kontakt",
-          "text": "Erstgespräch"
-        },
-        {
-          "href": "/kontakt",
-          "text": "Erstgespräch"
         },
         {
           "href": "/kontakt",
           "text": "Gespräch vereinbaren"
-        },
-        {
-          "href": "/kontakt",
-          "text": "Kontakt"
         },
         {
           "href": "/kontakt",
@@ -254,30 +138,6 @@
         {
           "href": "/kontakt",
           "text": "Webdesign in Bayreuth anfragen"
-        },
-        {
-          "href": "/kosten-automatisierung",
-          "text": "Automatisierung"
-        },
-        {
-          "href": "/kosten-automatisierung",
-          "text": "Preise"
-        },
-        {
-          "href": "/kosten-ki-telefonassistent",
-          "text": "KI-Assistent Kosten"
-        },
-        {
-          "href": "/kosten-webdesign",
-          "text": "Preise"
-        },
-        {
-          "href": "/kosten-webdesign",
-          "text": "Webdesign"
-        },
-        {
-          "href": "/leistungen",
-          "text": "Alle Leistungen"
         },
         {
           "href": "/leistungen",
@@ -292,10 +152,6 @@
           "text": "Beispiele ansehen"
         },
         {
-          "href": "/leistungen",
-          "text": "Sie wissen noch nicht, was Sie brauchen?"
-        },
-        {
           "href": "/muenchen/automatisierung",
           "text": "Automatisierung München"
         },
@@ -304,44 +160,12 @@
           "text": "KI-Telefonassistent München"
         },
         {
-          "href": "/muenchen/webdesign-kosten",
-          "text": "Kosten"
-        },
-        {
           "href": "/muenchen/webdesign",
           "text": "Webdesign München"
         },
         {
           "href": "/muenchen/webdesign",
           "text": "Webdesign München"
-        },
-        {
-          "href": "/muenchen",
-          "text": "München"
-        },
-        {
-          "href": "/muenchen",
-          "text": "München"
-        },
-        {
-          "href": "/muenchen",
-          "text": "München"
-        },
-        {
-          "href": "/praxen",
-          "text": "Für Arzt- und Zahnarztpraxen"
-        },
-        {
-          "href": "/praxen",
-          "text": "Für Arzt- und Zahnarztpraxen"
-        },
-        {
-          "href": "/prozessautomatisierung",
-          "text": "Prozessautomatisierung"
-        },
-        {
-          "href": "/referenzen",
-          "text": "Referenzen"
         },
         {
           "href": "/regensburg/automatisierung",
@@ -360,30 +184,6 @@
           "text": "Webdesign Regensburg"
         },
         {
-          "href": "/regensburg/website-relaunch",
-          "text": "Website Relaunch"
-        },
-        {
-          "href": "/regensburg",
-          "text": "Regensburg"
-        },
-        {
-          "href": "/regensburg",
-          "text": "Regensburg"
-        },
-        {
-          "href": "/regensburg",
-          "text": "Regensburg"
-        },
-        {
-          "href": "/ueber-uns",
-          "text": "Über uns"
-        },
-        {
-          "href": "/ueber-uns",
-          "text": "Über uns"
-        },
-        {
           "href": "/verpasste-anrufe-verlust",
           "text": "Verpasste Anrufe"
         },
@@ -396,24 +196,8 @@
           "text": "Webdesign Agentur"
         },
         {
-          "href": "/webdesign-agentur-deutschland",
-          "text": "Webdesign-Agentur"
-        },
-        {
-          "href": "/webdesign-agentur-deutschland",
-          "text": "hochkonvertierende Websites"
-        },
-        {
-          "href": "/webdesign-arzt",
-          "text": "Für Arztpraxen"
-        },
-        {
           "href": "/webdesign-arzt",
           "text": "Webdesign für Arztpraxen"
-        },
-        {
-          "href": "/webdesign-gastronomie",
-          "text": "Für Gastronomie"
         },
         {
           "href": "/webdesign-gastronomie",
@@ -421,35 +205,19 @@
         },
         {
           "href": "/webdesign-hotel",
-          "text": "Für Hotels"
-        },
-        {
-          "href": "/webdesign-hotel",
           "text": "Webdesign für Hotels"
-        },
-        {
-          "href": "/webdesign-immobilien",
-          "text": "Für Immobilien"
         },
         {
           "href": "/webdesign-immobilien",
           "text": "Webdesign für Immobilien"
         },
         {
-          "href": "/webdesign-sport",
-          "text": "Für Sport und Fitness"
-        },
-        {
-          "href": "/webdesign",
-          "text": "Webdesign"
-        },
-        {
-          "href": "/webdesign",
-          "text": "WebdesignWebsites, die gefunden werden und Anfragen bringen."
-        },
-        {
           "href": "/zu-viel-manuelle-arbeit",
           "text": "Zu viel manuelle Arbeit"
+        },
+        {
+          "href": "tel:+491601832917",
+          "text": "Anrufen"
         }
       ]
     },
@@ -465,8 +233,27 @@
       "h1": [
         "Website Relaunch in Bayreuth"
       ],
-      "textLength": 5838,
-      "textDigest": "98cfe44ff1f45814",
+      "headings": [
+        "h1:Website Relaunch in Bayreuth",
+        "h2:Wann ist ein Relaunch sinnvoll – und wann nicht?",
+        "h2:Typische Ausgangssituationen",
+        "h2:Was ein Relaunch mit Cogniiq umfasst",
+        "h2:Website Relaunch für Bayreuther Unternehmen",
+        "h2:Häufige Fragen",
+        "h3:Verliere ich meine bestehenden Google-Rankings beim Relaunch?",
+        "h3:Was kostet ein Website Relaunch in Bayreuth?",
+        "h3:Wie lange dauert ein Relaunch?",
+        "h3:Was passiert mit meinen bisherigen Inhalten?",
+        "h3:Wann ist ein Relaunch notwendig?",
+        "h3:Kann ich das CMS nach dem Relaunch beibehalten?",
+        "h3:Ist ein Relaunch oder eine Optimierung sinnvoller?",
+        "h3:Werden auch die Texte beim Relaunch neu erstellt?",
+        "h3:Wie starte ich den Relaunch-Prozess?",
+        "h2:Weiterführende Seiten",
+        "h2:Kostenloses Erstgespräch für Unternehmen in Bayreuth"
+      ],
+      "textLength": 6086,
+      "textDigest": "86ae880a34d0c625",
       "jsonLd": [
         "0f521f8da7f743be",
         "b6267d2a72811455",
@@ -477,59 +264,7 @@
       "outgoingLinks": [
         {
           "href": "/",
-          "text": "COGNIIQ"
-        },
-        {
-          "href": "/",
-          "text": "COGNIIQ"
-        },
-        {
-          "href": "/",
-          "text": "Cogniiq"
-        },
-        {
-          "href": "/",
           "text": "Home"
-        },
-        {
-          "href": "/app/login",
-          "text": "Kundenlogin"
-        },
-        {
-          "href": "/automatisierung-arzt",
-          "text": "Für Arztpraxen"
-        },
-        {
-          "href": "/automatisierung-immobilien",
-          "text": "Für Immobilien"
-        },
-        {
-          "href": "/automatisierung-restaurant",
-          "text": "Für Restaurants"
-        },
-        {
-          "href": "/automatisierung-sport",
-          "text": "Für Sport und Fitness"
-        },
-        {
-          "href": "/automatisierung-unternehmen",
-          "text": "Automatisierung"
-        },
-        {
-          "href": "/automatisierung-unternehmen",
-          "text": "AutomatisierungWiederkehrende Abläufe laufen ohne Handarbeit."
-        },
-        {
-          "href": "/automatisierung-unternehmen",
-          "text": "Prozessautomatisierung"
-        },
-        {
-          "href": "/bayern",
-          "text": "Bayern"
-        },
-        {
-          "href": "/bayern",
-          "text": "Bayern"
         },
         {
           "href": "/bayern",
@@ -564,116 +299,12 @@
           "text": "Webdesign Bayreuth"
         },
         {
-          "href": "/bayreuth/webdesign",
-          "text": "Webdesign Bayreuth"
-        },
-        {
           "href": "/bayreuth/website-erstellen",
           "text": "Website erstellen Bayreuth"
         },
         {
-          "href": "/bayreuth/website-relaunch",
-          "text": "Website Relaunch"
-        },
-        {
           "href": "/bayreuth",
           "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "BayreuthHauptsitz"
-        },
-        {
-          "href": "/bewertungen",
-          "text": "Bewertungen"
-        },
-        {
-          "href": "/blog",
-          "text": "Blog"
-        },
-        {
-          "href": "/datenschutz",
-          "text": "Datenschutz"
-        },
-        {
-          "href": "/deutschland",
-          "text": "Deutschland"
-        },
-        {
-          "href": "/deutschland",
-          "text": "Deutschland"
-        },
-        {
-          "href": "/deutschland",
-          "text": "Deutschland"
-        },
-        {
-          "href": "/faq",
-          "text": "Häufige Fragen"
-        },
-        {
-          "href": "/impressum",
-          "text": "Impressum"
-        },
-        {
-          "href": "/ki-agentur-deutschland",
-          "text": "KI-Agentur"
-        },
-        {
-          "href": "/ki-telefonassistent-arzt",
-          "text": "Arztpraxen im Detail"
-        },
-        {
-          "href": "/ki-telefonassistent-hotel",
-          "text": "Für Hotels"
-        },
-        {
-          "href": "/ki-telefonassistent-restaurant",
-          "text": "Für Restaurants"
-        },
-        {
-          "href": "/ki-telefonassistent/demo",
-          "text": "Demo anhören"
-        },
-        {
-          "href": "/ki-telefonassistent/demo",
-          "text": "Live-Demo"
-        },
-        {
-          "href": "/ki-telefonassistent",
-          "text": "KI-Telefonassistent"
-        },
-        {
-          "href": "/ki-telefonassistent",
-          "text": "KI-TelefonassistentNimmt die Anrufe an, die sonst ins Leere laufen."
-        },
-        {
-          "href": "/ki-telefonassistent",
-          "text": "KI-Telefonassistenten"
-        },
-        {
-          "href": "/kontakt",
-          "text": "Erstgespräch"
-        },
-        {
-          "href": "/kontakt",
-          "text": "Erstgespräch"
-        },
-        {
-          "href": "/kontakt",
-          "text": "Kontakt"
         },
         {
           "href": "/kontakt",
@@ -684,128 +315,8 @@
           "text": "Kostenloses Erstgespräch"
         },
         {
-          "href": "/kosten-automatisierung",
-          "text": "Automatisierung"
-        },
-        {
-          "href": "/kosten-automatisierung",
-          "text": "Preise"
-        },
-        {
-          "href": "/kosten-ki-telefonassistent",
-          "text": "KI-Assistent Kosten"
-        },
-        {
-          "href": "/kosten-webdesign",
-          "text": "Preise"
-        },
-        {
-          "href": "/kosten-webdesign",
-          "text": "Webdesign"
-        },
-        {
           "href": "/leistungen",
           "text": "Alle Leistungen"
-        },
-        {
-          "href": "/leistungen",
-          "text": "Alle Leistungen"
-        },
-        {
-          "href": "/leistungen",
-          "text": "Sie wissen noch nicht, was Sie brauchen?"
-        },
-        {
-          "href": "/muenchen/webdesign-kosten",
-          "text": "Kosten"
-        },
-        {
-          "href": "/muenchen",
-          "text": "München"
-        },
-        {
-          "href": "/muenchen",
-          "text": "München"
-        },
-        {
-          "href": "/muenchen",
-          "text": "München"
-        },
-        {
-          "href": "/praxen",
-          "text": "Für Arzt- und Zahnarztpraxen"
-        },
-        {
-          "href": "/praxen",
-          "text": "Für Arzt- und Zahnarztpraxen"
-        },
-        {
-          "href": "/prozessautomatisierung",
-          "text": "Prozessautomatisierung"
-        },
-        {
-          "href": "/referenzen",
-          "text": "Referenzen"
-        },
-        {
-          "href": "/regensburg/website-relaunch",
-          "text": "Website Relaunch"
-        },
-        {
-          "href": "/regensburg",
-          "text": "Regensburg"
-        },
-        {
-          "href": "/regensburg",
-          "text": "Regensburg"
-        },
-        {
-          "href": "/regensburg",
-          "text": "Regensburg"
-        },
-        {
-          "href": "/ueber-uns",
-          "text": "Über uns"
-        },
-        {
-          "href": "/ueber-uns",
-          "text": "Über uns"
-        },
-        {
-          "href": "/webdesign-agentur-deutschland",
-          "text": "Webdesign-Agentur"
-        },
-        {
-          "href": "/webdesign-agentur-deutschland",
-          "text": "hochkonvertierende Websites"
-        },
-        {
-          "href": "/webdesign-arzt",
-          "text": "Für Arztpraxen"
-        },
-        {
-          "href": "/webdesign-gastronomie",
-          "text": "Für Gastronomie"
-        },
-        {
-          "href": "/webdesign-hotel",
-          "text": "Für Hotels"
-        },
-        {
-          "href": "/webdesign-immobilien",
-          "text": "Für Immobilien"
-        },
-        {
-          "href": "/webdesign-sport",
-          "text": "Für Sport und Fitness"
-        },
-        {
-          "href": "/webdesign",
-          "text": "Webdesign"
-        },
-        {
-          "href": "/webdesign",
-          "text": "WebdesignWebsites, die gefunden werden und Anfragen bringen."
         }
       ]
     },
@@ -821,8 +332,27 @@
       "h1": [
         "Website Relaunch in Regensburg"
       ],
-      "textLength": 5609,
-      "textDigest": "71498c595cdad67d",
+      "headings": [
+        "h1:Website Relaunch in Regensburg",
+        "h2:Wann ist ein Relaunch in Regensburg sinnvoll?",
+        "h2:Typische Ausgangssituationen",
+        "h2:Was ein Relaunch mit Cogniiq umfasst",
+        "h2:Website Relaunch für Regensburger Unternehmen",
+        "h2:Häufige Fragen",
+        "h3:Verliere ich meine Rankings beim Relaunch?",
+        "h3:Was kostet ein Website Relaunch in Regensburg?",
+        "h3:Wie lange dauert ein Relaunch?",
+        "h3:Was passiert mit meinen bestehenden Inhalten?",
+        "h3:Wann ist ein Relaunch notwendig?",
+        "h3:Kann das bestehende CMS beibehalten werden?",
+        "h3:Relaunch oder Optimierung – was ist sinnvoller?",
+        "h3:Werden Texte neu erstellt?",
+        "h3:Wie starte ich den Relaunch-Prozess?",
+        "h2:Weiterführende Seiten",
+        "h2:Kostenloses Erstgespräch für Unternehmen in Regensburg"
+      ],
+      "textLength": 5857,
+      "textDigest": "57b37606e663b484",
       "jsonLd": [
         "2dcb6c25013f4552",
         "40172b66f11ac907",
@@ -833,167 +363,11 @@
       "outgoingLinks": [
         {
           "href": "/",
-          "text": "COGNIIQ"
-        },
-        {
-          "href": "/",
-          "text": "COGNIIQ"
-        },
-        {
-          "href": "/",
-          "text": "Cogniiq"
-        },
-        {
-          "href": "/",
           "text": "Home"
         },
         {
-          "href": "/app/login",
-          "text": "Kundenlogin"
-        },
-        {
-          "href": "/automatisierung-arzt",
-          "text": "Für Arztpraxen"
-        },
-        {
-          "href": "/automatisierung-immobilien",
-          "text": "Für Immobilien"
-        },
-        {
-          "href": "/automatisierung-restaurant",
-          "text": "Für Restaurants"
-        },
-        {
-          "href": "/automatisierung-sport",
-          "text": "Für Sport und Fitness"
-        },
-        {
-          "href": "/automatisierung-unternehmen",
-          "text": "Automatisierung"
-        },
-        {
-          "href": "/automatisierung-unternehmen",
-          "text": "AutomatisierungWiederkehrende Abläufe laufen ohne Handarbeit."
-        },
-        {
-          "href": "/automatisierung-unternehmen",
-          "text": "Prozessautomatisierung"
-        },
-        {
           "href": "/bayern",
           "text": "Bayern"
-        },
-        {
-          "href": "/bayern",
-          "text": "Bayern"
-        },
-        {
-          "href": "/bayern",
-          "text": "Bayern"
-        },
-        {
-          "href": "/bayreuth/webdesign",
-          "text": "Webdesign Bayreuth"
-        },
-        {
-          "href": "/bayreuth/website-relaunch",
-          "text": "Website Relaunch"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "BayreuthHauptsitz"
-        },
-        {
-          "href": "/bewertungen",
-          "text": "Bewertungen"
-        },
-        {
-          "href": "/blog",
-          "text": "Blog"
-        },
-        {
-          "href": "/datenschutz",
-          "text": "Datenschutz"
-        },
-        {
-          "href": "/deutschland",
-          "text": "Deutschland"
-        },
-        {
-          "href": "/deutschland",
-          "text": "Deutschland"
-        },
-        {
-          "href": "/deutschland",
-          "text": "Deutschland"
-        },
-        {
-          "href": "/faq",
-          "text": "Häufige Fragen"
-        },
-        {
-          "href": "/impressum",
-          "text": "Impressum"
-        },
-        {
-          "href": "/ki-agentur-deutschland",
-          "text": "KI-Agentur"
-        },
-        {
-          "href": "/ki-telefonassistent-arzt",
-          "text": "Arztpraxen im Detail"
-        },
-        {
-          "href": "/ki-telefonassistent-hotel",
-          "text": "Für Hotels"
-        },
-        {
-          "href": "/ki-telefonassistent-restaurant",
-          "text": "Für Restaurants"
-        },
-        {
-          "href": "/ki-telefonassistent/demo",
-          "text": "Demo anhören"
-        },
-        {
-          "href": "/ki-telefonassistent/demo",
-          "text": "Live-Demo"
-        },
-        {
-          "href": "/ki-telefonassistent",
-          "text": "KI-Telefonassistent"
-        },
-        {
-          "href": "/ki-telefonassistent",
-          "text": "KI-TelefonassistentNimmt die Anrufe an, die sonst ins Leere laufen."
-        },
-        {
-          "href": "/ki-telefonassistent",
-          "text": "KI-Telefonassistenten"
-        },
-        {
-          "href": "/kontakt",
-          "text": "Erstgespräch"
-        },
-        {
-          "href": "/kontakt",
-          "text": "Erstgespräch"
-        },
-        {
-          "href": "/kontakt",
-          "text": "Kontakt"
         },
         {
           "href": "/kontakt",
@@ -1004,68 +378,8 @@
           "text": "Kostenloses Erstgespräch"
         },
         {
-          "href": "/kosten-automatisierung",
-          "text": "Automatisierung"
-        },
-        {
-          "href": "/kosten-automatisierung",
-          "text": "Preise"
-        },
-        {
-          "href": "/kosten-ki-telefonassistent",
-          "text": "KI-Assistent Kosten"
-        },
-        {
-          "href": "/kosten-webdesign",
-          "text": "Preise"
-        },
-        {
-          "href": "/kosten-webdesign",
-          "text": "Webdesign"
-        },
-        {
           "href": "/leistungen",
           "text": "Alle Leistungen"
-        },
-        {
-          "href": "/leistungen",
-          "text": "Alle Leistungen"
-        },
-        {
-          "href": "/leistungen",
-          "text": "Sie wissen noch nicht, was Sie brauchen?"
-        },
-        {
-          "href": "/muenchen/webdesign-kosten",
-          "text": "Kosten"
-        },
-        {
-          "href": "/muenchen",
-          "text": "München"
-        },
-        {
-          "href": "/muenchen",
-          "text": "München"
-        },
-        {
-          "href": "/muenchen",
-          "text": "München"
-        },
-        {
-          "href": "/praxen",
-          "text": "Für Arzt- und Zahnarztpraxen"
-        },
-        {
-          "href": "/praxen",
-          "text": "Für Arzt- und Zahnarztpraxen"
-        },
-        {
-          "href": "/prozessautomatisierung",
-          "text": "Prozessautomatisierung"
-        },
-        {
-          "href": "/referenzen",
-          "text": "Referenzen"
         },
         {
           "href": "/regensburg/landingpage",
@@ -1100,68 +414,8 @@
           "text": "Website erstellen Regensburg"
         },
         {
-          "href": "/regensburg/website-relaunch",
-          "text": "Website Relaunch"
-        },
-        {
           "href": "/regensburg",
           "text": "Regensburg"
-        },
-        {
-          "href": "/regensburg",
-          "text": "Regensburg"
-        },
-        {
-          "href": "/regensburg",
-          "text": "Regensburg"
-        },
-        {
-          "href": "/regensburg",
-          "text": "Regensburg"
-        },
-        {
-          "href": "/ueber-uns",
-          "text": "Über uns"
-        },
-        {
-          "href": "/ueber-uns",
-          "text": "Über uns"
-        },
-        {
-          "href": "/webdesign-agentur-deutschland",
-          "text": "Webdesign-Agentur"
-        },
-        {
-          "href": "/webdesign-agentur-deutschland",
-          "text": "hochkonvertierende Websites"
-        },
-        {
-          "href": "/webdesign-arzt",
-          "text": "Für Arztpraxen"
-        },
-        {
-          "href": "/webdesign-gastronomie",
-          "text": "Für Gastronomie"
-        },
-        {
-          "href": "/webdesign-hotel",
-          "text": "Für Hotels"
-        },
-        {
-          "href": "/webdesign-immobilien",
-          "text": "Für Immobilien"
-        },
-        {
-          "href": "/webdesign-sport",
-          "text": "Für Sport und Fitness"
-        },
-        {
-          "href": "/webdesign",
-          "text": "Webdesign"
-        },
-        {
-          "href": "/webdesign",
-          "text": "WebdesignWebsites, die gefunden werden und Anfragen bringen."
         }
       ]
     },
@@ -1177,8 +431,29 @@
       "h1": [
         "Webdesign Kosten in München – Was kostet eine Website?"
       ],
-      "textLength": 6962,
-      "textDigest": "09a4f11f2675c5c8",
+      "headings": [
+        "h1:Webdesign Kosten in München – Was kostet eine Website?",
+        "h2:Was kostet professionelles Webdesign in München?",
+        "h2:Typische Ausgangssituationen",
+        "h2:Preisrahmen: Webdesign in München",
+        "h2:Professionell vs. Baukasten im Münchner Markt",
+        "h2:Webdesign-Kosten in München: Warum sich Qualität doppelt auszahlt",
+        "h2:Häufige Fragen",
+        "h3:Was kostet eine einfache Website in München?",
+        "h3:Warum sind Webdesign-Kosten in München höher als in anderen Städten?",
+        "h3:Sind Hosting und Domain inklusive?",
+        "h3:Was kostet laufende SEO-Betreuung in München?",
+        "h3:Gibt es versteckte Kosten?",
+        "h3:Wie lange dauert ein Webdesign-Projekt in München?",
+        "h3:Was ist in jedem Paket enthalten?",
+        "h3:Lohnt sich Webdesign für Startups in München?",
+        "h3:Kann der Preis steigen?",
+        "h3:Wie erhalte ich ein konkretes Angebot für München?",
+        "h2:Weiterführende Seiten",
+        "h2:Kostenloses Erstgespräch für Unternehmen in München"
+      ],
+      "textLength": 7516,
+      "textDigest": "59cb50917e02bfd3",
       "jsonLd": [
         "0b087d937878939b",
         "372eb831b836cdd6",
@@ -1189,163 +464,11 @@
       "outgoingLinks": [
         {
           "href": "/",
-          "text": "COGNIIQ"
-        },
-        {
-          "href": "/",
-          "text": "COGNIIQ"
-        },
-        {
-          "href": "/",
-          "text": "Cogniiq"
-        },
-        {
-          "href": "/",
           "text": "Home"
         },
         {
-          "href": "/app/login",
-          "text": "Kundenlogin"
-        },
-        {
-          "href": "/automatisierung-arzt",
-          "text": "Für Arztpraxen"
-        },
-        {
-          "href": "/automatisierung-immobilien",
-          "text": "Für Immobilien"
-        },
-        {
-          "href": "/automatisierung-restaurant",
-          "text": "Für Restaurants"
-        },
-        {
-          "href": "/automatisierung-sport",
-          "text": "Für Sport und Fitness"
-        },
-        {
-          "href": "/automatisierung-unternehmen",
-          "text": "Automatisierung"
-        },
-        {
-          "href": "/automatisierung-unternehmen",
-          "text": "AutomatisierungWiederkehrende Abläufe laufen ohne Handarbeit."
-        },
-        {
-          "href": "/automatisierung-unternehmen",
-          "text": "Prozessautomatisierung"
-        },
-        {
           "href": "/bayern",
           "text": "Bayern"
-        },
-        {
-          "href": "/bayern",
-          "text": "Bayern"
-        },
-        {
-          "href": "/bayern",
-          "text": "Bayern"
-        },
-        {
-          "href": "/bayreuth/webdesign",
-          "text": "Webdesign Bayreuth"
-        },
-        {
-          "href": "/bayreuth/website-relaunch",
-          "text": "Website Relaunch"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "BayreuthHauptsitz"
-        },
-        {
-          "href": "/bewertungen",
-          "text": "Bewertungen"
-        },
-        {
-          "href": "/blog",
-          "text": "Blog"
-        },
-        {
-          "href": "/datenschutz",
-          "text": "Datenschutz"
-        },
-        {
-          "href": "/deutschland",
-          "text": "Deutschland"
-        },
-        {
-          "href": "/deutschland",
-          "text": "Deutschland"
-        },
-        {
-          "href": "/deutschland",
-          "text": "Deutschland"
-        },
-        {
-          "href": "/faq",
-          "text": "Häufige Fragen"
-        },
-        {
-          "href": "/impressum",
-          "text": "Impressum"
-        },
-        {
-          "href": "/ki-agentur-deutschland",
-          "text": "KI-Agentur"
-        },
-        {
-          "href": "/ki-telefonassistent-arzt",
-          "text": "Arztpraxen im Detail"
-        },
-        {
-          "href": "/ki-telefonassistent-hotel",
-          "text": "Für Hotels"
-        },
-        {
-          "href": "/ki-telefonassistent-restaurant",
-          "text": "Für Restaurants"
-        },
-        {
-          "href": "/ki-telefonassistent/demo",
-          "text": "Demo anhören"
-        },
-        {
-          "href": "/ki-telefonassistent/demo",
-          "text": "Live-Demo"
-        },
-        {
-          "href": "/ki-telefonassistent",
-          "text": "KI-Telefonassistent"
-        },
-        {
-          "href": "/ki-telefonassistent",
-          "text": "KI-TelefonassistentNimmt die Anrufe an, die sonst ins Leere laufen."
-        },
-        {
-          "href": "/ki-telefonassistent",
-          "text": "KI-Telefonassistenten"
-        },
-        {
-          "href": "/kontakt",
-          "text": "Erstgespräch"
-        },
-        {
-          "href": "/kontakt",
-          "text": "Erstgespräch"
         },
         {
           "href": "/kontakt",
@@ -1358,10 +481,6 @@
         {
           "href": "/kontakt",
           "text": "Jetzt anfragen"
-        },
-        {
-          "href": "/kontakt",
-          "text": "Kontakt"
         },
         {
           "href": "/kontakt",
@@ -1370,34 +489,6 @@
         {
           "href": "/kontakt",
           "text": "Kostenloses Erstgespräch"
-        },
-        {
-          "href": "/kosten-automatisierung",
-          "text": "Automatisierung"
-        },
-        {
-          "href": "/kosten-automatisierung",
-          "text": "Preise"
-        },
-        {
-          "href": "/kosten-ki-telefonassistent",
-          "text": "KI-Assistent Kosten"
-        },
-        {
-          "href": "/kosten-webdesign",
-          "text": "Preise"
-        },
-        {
-          "href": "/kosten-webdesign",
-          "text": "Webdesign"
-        },
-        {
-          "href": "/leistungen",
-          "text": "Alle Leistungen"
-        },
-        {
-          "href": "/leistungen",
-          "text": "Sie wissen noch nicht, was Sie brauchen?"
         },
         {
           "href": "/muenchen/landingpage",
@@ -1406,10 +497,6 @@
         {
           "href": "/muenchen/lokales-seo",
           "text": "Lokales SEO München"
-        },
-        {
-          "href": "/muenchen/webdesign-kosten",
-          "text": "Kosten"
         },
         {
           "href": "/muenchen/webdesign",
@@ -1440,96 +527,8 @@
           "text": "München"
         },
         {
-          "href": "/muenchen",
-          "text": "München"
-        },
-        {
-          "href": "/muenchen",
-          "text": "München"
-        },
-        {
-          "href": "/muenchen",
-          "text": "München"
-        },
-        {
-          "href": "/praxen",
-          "text": "Für Arzt- und Zahnarztpraxen"
-        },
-        {
-          "href": "/praxen",
-          "text": "Für Arzt- und Zahnarztpraxen"
-        },
-        {
-          "href": "/prozessautomatisierung",
-          "text": "Prozessautomatisierung"
-        },
-        {
           "href": "/referenzen",
           "text": "Referenzen"
-        },
-        {
-          "href": "/referenzen",
-          "text": "Referenzen"
-        },
-        {
-          "href": "/regensburg/website-relaunch",
-          "text": "Website Relaunch"
-        },
-        {
-          "href": "/regensburg",
-          "text": "Regensburg"
-        },
-        {
-          "href": "/regensburg",
-          "text": "Regensburg"
-        },
-        {
-          "href": "/regensburg",
-          "text": "Regensburg"
-        },
-        {
-          "href": "/ueber-uns",
-          "text": "Über uns"
-        },
-        {
-          "href": "/ueber-uns",
-          "text": "Über uns"
-        },
-        {
-          "href": "/webdesign-agentur-deutschland",
-          "text": "Webdesign-Agentur"
-        },
-        {
-          "href": "/webdesign-agentur-deutschland",
-          "text": "hochkonvertierende Websites"
-        },
-        {
-          "href": "/webdesign-arzt",
-          "text": "Für Arztpraxen"
-        },
-        {
-          "href": "/webdesign-gastronomie",
-          "text": "Für Gastronomie"
-        },
-        {
-          "href": "/webdesign-hotel",
-          "text": "Für Hotels"
-        },
-        {
-          "href": "/webdesign-immobilien",
-          "text": "Für Immobilien"
-        },
-        {
-          "href": "/webdesign-sport",
-          "text": "Für Sport und Fitness"
-        },
-        {
-          "href": "/webdesign",
-          "text": "Webdesign"
-        },
-        {
-          "href": "/webdesign",
-          "text": "WebdesignWebsites, die gefunden werden und Anfragen bringen."
         }
       ]
     },
@@ -1545,8 +544,44 @@
       "h1": [
         "KI Telefonassistent für Arztpraxen"
       ],
-      "textLength": 16684,
-      "textDigest": "bc235c4a541898a0",
+      "headings": [
+        "h1:KI Telefonassistent für Arztpraxen",
+        "h2:Typische Herausforderungen in der Branche",
+        "h3:Die Montagsflut trifft die Anmeldung mit voller Wucht",
+        "h3:Ständige Unterbrechungen erzeugen Fehler unter Druck",
+        "h3:Das Beschwerdegespräch dauert länger als das Anliegen",
+        "h3:Außerhalb der Sprechzeiten ist niemand erreichbar",
+        "h3:Stornierungen kommen nicht an – Termine verfallen ungenutzt",
+        "h3:Unerreichbarkeit landet in den Online-Bewertungen",
+        "h2:Was Ihre Patientinnen und Patienten gerade erleben",
+        "h2:Warum bisherige Versuche gescheitert sind",
+        "h3:Das Ergebnis kam nicht im System an",
+        "h3:Die Stimme klang nach Maschine",
+        "h3:Niemand hat das System an den Betrieb angepasst",
+        "h2:Was wir konkret anders machen",
+        "h2:Gebaut für Ihre Anmeldung – nicht als Ersatz, sondern als Entlastung",
+        "h2:So läuft ein Patientenanruf ab",
+        "h3:Patient ruft an",
+        "h3:Anliegen erkennen und bearbeiten",
+        "h3:Übergabe an Ihr Team",
+        "h2:Und wer tippt das dann bei Ihnen ein?",
+        "h3:Was nach jedem Anruf im Dashboard steht",
+        "h2:Was der Empfang übernimmt",
+        "h2:Was unser Empfang nicht macht",
+        "h2:Was sich für Ihr Team am ersten Tag ändert",
+        "h2:Einrichtung Ihres Empfangs",
+        "h2:Wer sich kümmert, wenn Sie etwas ändern wollen",
+        "h2:Ein Kontingent, ein Preis, eine Obergrenze",
+        "h2:Wie Sie wieder herauskommen",
+        "h2:Wann wir nicht die richtige Lösung sind",
+        "h2:Datenschutz in drei Punkten",
+        "h2:Passend für Ihren Betrieb?",
+        "h2:Verfügbar in ganz Deutschland",
+        "h2:Häufige Fragen",
+        "h2:Nächster Schritt: Kostenlose Beratung"
+      ],
+      "textLength": 15133,
+      "textDigest": "54b2cb00d96d3042",
       "jsonLd": [
         "551b2ad7e448d940",
         "6ba75b9d00b1ab9d",
@@ -1557,163 +592,31 @@
       "outgoingLinks": [
         {
           "href": "/",
-          "text": "COGNIIQ"
-        },
-        {
-          "href": "/",
-          "text": "COGNIIQ"
-        },
-        {
-          "href": "/",
-          "text": "Cogniiq"
-        },
-        {
-          "href": "/",
           "text": "Home"
-        },
-        {
-          "href": "/app/login",
-          "text": "Kundenlogin"
         },
         {
           "href": "/automatisierung-arzt",
           "text": "Automatisierung Arzt"
         },
         {
-          "href": "/automatisierung-arzt",
-          "text": "Für Arztpraxen"
-        },
-        {
-          "href": "/automatisierung-immobilien",
-          "text": "Für Immobilien"
-        },
-        {
-          "href": "/automatisierung-restaurant",
-          "text": "Für Restaurants"
-        },
-        {
-          "href": "/automatisierung-sport",
-          "text": "Für Sport und Fitness"
-        },
-        {
-          "href": "/automatisierung-unternehmen",
-          "text": "Automatisierung"
-        },
-        {
-          "href": "/automatisierung-unternehmen",
-          "text": "AutomatisierungWiederkehrende Abläufe laufen ohne Handarbeit."
-        },
-        {
-          "href": "/automatisierung-unternehmen",
-          "text": "Prozessautomatisierung"
-        },
-        {
           "href": "/bayern/ki-telefonassistent",
           "text": "KI Telefonassistent Bayern"
-        },
-        {
-          "href": "/bayern",
-          "text": "Bayern"
-        },
-        {
-          "href": "/bayern",
-          "text": "Bayern"
         },
         {
           "href": "/bayreuth/ki-telefonassistent",
           "text": "KI Telefonassistent Bayreuth"
         },
         {
-          "href": "/bayreuth/webdesign",
-          "text": "Webdesign Bayreuth"
-        },
-        {
-          "href": "/bayreuth/website-relaunch",
-          "text": "Website Relaunch"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "BayreuthHauptsitz"
-        },
-        {
-          "href": "/bewertungen",
-          "text": "Bewertungen"
-        },
-        {
-          "href": "/blog",
-          "text": "Blog"
-        },
-        {
           "href": "/datenschutz-sicherheit",
           "text": "Was Ihr Datenschutzbeauftragter fragen sollte"
-        },
-        {
-          "href": "/datenschutz",
-          "text": "Datenschutz"
-        },
-        {
-          "href": "/deutschland",
-          "text": "Deutschland"
-        },
-        {
-          "href": "/deutschland",
-          "text": "Deutschland"
-        },
-        {
-          "href": "/deutschland",
-          "text": "Deutschland"
-        },
-        {
-          "href": "/faq",
-          "text": "Häufige Fragen"
-        },
-        {
-          "href": "/impressum",
-          "text": "Impressum"
         },
         {
           "href": "/ki-agentur-deutschland",
           "text": "KI Agentur Deutschland"
         },
         {
-          "href": "/ki-agentur-deutschland",
-          "text": "KI-Agentur"
-        },
-        {
-          "href": "/ki-telefonassistent-arzt",
-          "text": "Arztpraxen im Detail"
-        },
-        {
-          "href": "/ki-telefonassistent-hotel",
-          "text": "Für Hotels"
-        },
-        {
           "href": "/ki-telefonassistent-praxis",
           "text": "KI Telefonassistent Praxis"
-        },
-        {
-          "href": "/ki-telefonassistent-restaurant",
-          "text": "Für Restaurants"
-        },
-        {
-          "href": "/ki-telefonassistent/demo",
-          "text": "Demo anhören"
-        },
-        {
-          "href": "/ki-telefonassistent/demo",
-          "text": "Live-Demo"
         },
         {
           "href": "/ki-telefonassistent",
@@ -1726,30 +629,6 @@
         {
           "href": "/ki-telefonassistent",
           "text": "KI Telefonassistent im Überblick"
-        },
-        {
-          "href": "/ki-telefonassistent",
-          "text": "KI-Telefonassistent"
-        },
-        {
-          "href": "/ki-telefonassistent",
-          "text": "KI-TelefonassistentNimmt die Anrufe an, die sonst ins Leere laufen."
-        },
-        {
-          "href": "/ki-telefonassistent",
-          "text": "KI-Telefonassistenten"
-        },
-        {
-          "href": "/kontakt",
-          "text": "Erstgespräch"
-        },
-        {
-          "href": "/kontakt",
-          "text": "Erstgespräch"
-        },
-        {
-          "href": "/kontakt",
-          "text": "Kontakt"
         },
         {
           "href": "/kontakt",
@@ -1768,23 +647,11 @@
           "text": "Lösung anfragen"
         },
         {
-          "href": "/kosten-automatisierung",
-          "text": "Automatisierung"
-        },
-        {
-          "href": "/kosten-automatisierung",
-          "text": "Preise"
-        },
-        {
           "href": "/kosten-ki-telefonassistent",
           "text": "Alle Tarife, Kontingente und Obergrenzen"
         },
         {
           "href": "/kosten-ki-telefonassistent",
-          "text": "KI-Assistent Kosten"
-        },
-        {
-          "href": "/kosten-ki-telefonassistent",
           "text": "Kosten KI Telefonassistent"
         },
         {
@@ -1794,42 +661,10 @@
         {
           "href": "/kosten-ki-telefonassistent",
           "text": "Kosten KI Telefonassistent"
-        },
-        {
-          "href": "/kosten-webdesign",
-          "text": "Preise"
-        },
-        {
-          "href": "/kosten-webdesign",
-          "text": "Webdesign"
-        },
-        {
-          "href": "/leistungen",
-          "text": "Alle Leistungen"
-        },
-        {
-          "href": "/leistungen",
-          "text": "Sie wissen noch nicht, was Sie brauchen?"
         },
         {
           "href": "/muenchen/ki-telefonassistent",
           "text": "KI Telefonassistent München"
-        },
-        {
-          "href": "/muenchen/webdesign-kosten",
-          "text": "Kosten"
-        },
-        {
-          "href": "/muenchen",
-          "text": "München"
-        },
-        {
-          "href": "/muenchen",
-          "text": "München"
-        },
-        {
-          "href": "/muenchen",
-          "text": "München"
         },
         {
           "href": "/praxen",
@@ -1838,14 +673,6 @@
         {
           "href": "/praxen",
           "text": "Die vier Säulen mit der Mechanik dahinter"
-        },
-        {
-          "href": "/praxen",
-          "text": "Für Arzt- und Zahnarztpraxen"
-        },
-        {
-          "href": "/praxen",
-          "text": "Für Arzt- und Zahnarztpraxen"
         },
         {
           "href": "/praxen",
@@ -1864,80 +691,12 @@
           "text": "Was sich für Ihr Team konkret ändert"
         },
         {
-          "href": "/prozessautomatisierung",
-          "text": "Prozessautomatisierung"
-        },
-        {
-          "href": "/referenzen",
-          "text": "Referenzen"
-        },
-        {
           "href": "/regensburg/ki-telefonassistent",
           "text": "KI Telefonassistent Regensburg"
         },
         {
-          "href": "/regensburg/website-relaunch",
-          "text": "Website Relaunch"
-        },
-        {
-          "href": "/regensburg",
-          "text": "Regensburg"
-        },
-        {
-          "href": "/regensburg",
-          "text": "Regensburg"
-        },
-        {
-          "href": "/regensburg",
-          "text": "Regensburg"
-        },
-        {
-          "href": "/ueber-uns",
-          "text": "Über uns"
-        },
-        {
-          "href": "/ueber-uns",
-          "text": "Über uns"
-        },
-        {
-          "href": "/webdesign-agentur-deutschland",
-          "text": "Webdesign-Agentur"
-        },
-        {
-          "href": "/webdesign-agentur-deutschland",
-          "text": "hochkonvertierende Websites"
-        },
-        {
-          "href": "/webdesign-arzt",
-          "text": "Für Arztpraxen"
-        },
-        {
           "href": "/webdesign-arzt",
           "text": "Webdesign Arzt"
-        },
-        {
-          "href": "/webdesign-gastronomie",
-          "text": "Für Gastronomie"
-        },
-        {
-          "href": "/webdesign-hotel",
-          "text": "Für Hotels"
-        },
-        {
-          "href": "/webdesign-immobilien",
-          "text": "Für Immobilien"
-        },
-        {
-          "href": "/webdesign-sport",
-          "text": "Für Sport und Fitness"
-        },
-        {
-          "href": "/webdesign",
-          "text": "Webdesign"
-        },
-        {
-          "href": "/webdesign",
-          "text": "WebdesignWebsites, die gefunden werden und Anfragen bringen."
         }
       ]
     },
@@ -1953,8 +712,41 @@
       "h1": [
         "Was kostet ein KI Telefonassistent?"
       ],
-      "textLength": 16975,
-      "textDigest": "cf2b920a77bdcb8f",
+      "headings": [
+        "h1:Was kostet ein KI Telefonassistent?",
+        "h2:Zuerst die Obergrenze, dann der Preis",
+        "h2:Welcher Tarif passt zu wie vielen Anrufen?",
+        "h3:Nicht pro Behandler",
+        "h2:Wofür zahlen Sie die Einrichtung?",
+        "h3:Erstgespräch",
+        "h3:Angebot",
+        "h3:Unterschrift",
+        "h3:Rechnung und Zugang",
+        "h3:Ihre Vorgaben",
+        "h3:Aufbau",
+        "h3:Übergabe zur Freigabe· spätestens zwei Wochen nach dem Start",
+        "h3:Testphase und Go-live· 2 Tage Test",
+        "h3:Die Zwei-Wochen-Garantie",
+        "h3:Nach dem Go-live hört die Arbeit nicht auf",
+        "h2:Können Sie den Empfang vorher testen?",
+        "h2:Was kostet ein AI Rezeptionist im Vergleich?",
+        "h2:Was kostet eine weitere Sprache?",
+        "h2:Laufzeit, Kündigung und Preisgarantie",
+        "h2:Was nicht extra kostet",
+        "h2:Was spart eine Praxis durch einen KI Telefonassistenten?",
+        "h2:Häufige Fragen zum Preis",
+        "h3:Kann die Rechnung teurer werden als der Tarif?",
+        "h3:Was kostet ein KI Telefonassistent für eine Praxis pro Monat?",
+        "h3:Warum kostet die Einrichtung so viel?",
+        "h3:Ist die Testphase kostenlos?",
+        "h3:Wird pro Behandler abgerechnet?",
+        "h3:Wie lange bin ich gebunden und wie kündige ich?",
+        "h3:Was kostet eine weitere Sprache?",
+        "h2:Ihr Angebot: schriftlich, aufgeschlüsselt, ohne Überraschungen",
+        "h2:Weiterlesen"
+      ],
+      "textLength": 15749,
+      "textDigest": "70a8df9a1b25d994",
       "jsonLd": [
         "07462b27c9aa167c",
         "0d00c9ea8232966c",
@@ -1965,159 +757,15 @@
       "outgoingLinks": [
         {
           "href": "/",
-          "text": "COGNIIQ"
-        },
-        {
-          "href": "/",
-          "text": "COGNIIQ"
-        },
-        {
-          "href": "/",
-          "text": "Cogniiq"
-        },
-        {
-          "href": "/",
           "text": "Home"
-        },
-        {
-          "href": "/app/login",
-          "text": "Kundenlogin"
-        },
-        {
-          "href": "/automatisierung-arzt",
-          "text": "Für Arztpraxen"
-        },
-        {
-          "href": "/automatisierung-immobilien",
-          "text": "Für Immobilien"
-        },
-        {
-          "href": "/automatisierung-restaurant",
-          "text": "Für Restaurants"
-        },
-        {
-          "href": "/automatisierung-sport",
-          "text": "Für Sport und Fitness"
-        },
-        {
-          "href": "/automatisierung-unternehmen",
-          "text": "Automatisierung"
-        },
-        {
-          "href": "/automatisierung-unternehmen",
-          "text": "AutomatisierungWiederkehrende Abläufe laufen ohne Handarbeit."
-        },
-        {
-          "href": "/automatisierung-unternehmen",
-          "text": "Prozessautomatisierung"
-        },
-        {
-          "href": "/bayern",
-          "text": "Bayern"
-        },
-        {
-          "href": "/bayern",
-          "text": "Bayern"
-        },
-        {
-          "href": "/bayreuth/webdesign",
-          "text": "Webdesign Bayreuth"
-        },
-        {
-          "href": "/bayreuth/website-relaunch",
-          "text": "Website Relaunch"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "Bayreuth"
-        },
-        {
-          "href": "/bayreuth",
-          "text": "BayreuthHauptsitz"
-        },
-        {
-          "href": "/bewertungen",
-          "text": "Bewertungen"
-        },
-        {
-          "href": "/blog",
-          "text": "Blog"
-        },
-        {
-          "href": "/datenschutz",
-          "text": "Datenschutz"
-        },
-        {
-          "href": "/deutschland",
-          "text": "Deutschland"
-        },
-        {
-          "href": "/deutschland",
-          "text": "Deutschland"
-        },
-        {
-          "href": "/deutschland",
-          "text": "Deutschland"
-        },
-        {
-          "href": "/faq",
-          "text": "Häufige Fragen"
-        },
-        {
-          "href": "/impressum",
-          "text": "Impressum"
-        },
-        {
-          "href": "/ki-agentur-deutschland",
-          "text": "KI-Agentur"
-        },
-        {
-          "href": "/ki-telefonassistent-arzt",
-          "text": "Arztpraxen im Detail"
         },
         {
           "href": "/ki-telefonassistent-arzt",
           "text": "KI Telefonassistent für Arztpraxen"
         },
         {
-          "href": "/ki-telefonassistent-hotel",
-          "text": "Für Hotels"
-        },
-        {
           "href": "/ki-telefonassistent-praxis",
           "text": "KI Telefonassistent für Therapiepraxen"
-        },
-        {
-          "href": "/ki-telefonassistent-restaurant",
-          "text": "Für Restaurants"
-        },
-        {
-          "href": "/ki-telefonassistent/demo",
-          "text": "Demo anhören"
-        },
-        {
-          "href": "/ki-telefonassistent/demo",
-          "text": "Live-Demo"
-        },
-        {
-          "href": "/ki-telefonassistent",
-          "text": "KI-Telefonassistent"
-        },
-        {
-          "href": "/ki-telefonassistent",
-          "text": "KI-TelefonassistentNimmt die Anrufe an, die sonst ins Leere laufen."
-        },
-        {
-          "href": "/ki-telefonassistent",
-          "text": "KI-Telefonassistenten"
         },
         {
           "href": "/ki-telefonassistent",
@@ -2125,63 +773,7 @@
         },
         {
           "href": "/kontakt",
-          "text": "Erstgespräch"
-        },
-        {
-          "href": "/kontakt",
-          "text": "Erstgespräch"
-        },
-        {
-          "href": "/kontakt",
-          "text": "Kontakt"
-        },
-        {
-          "href": "/kontakt",
           "text": "Unverbindliches Erstgespräch vereinbaren"
-        },
-        {
-          "href": "/kosten-automatisierung",
-          "text": "Automatisierung"
-        },
-        {
-          "href": "/kosten-automatisierung",
-          "text": "Preise"
-        },
-        {
-          "href": "/kosten-ki-telefonassistent",
-          "text": "KI-Assistent Kosten"
-        },
-        {
-          "href": "/kosten-webdesign",
-          "text": "Preise"
-        },
-        {
-          "href": "/kosten-webdesign",
-          "text": "Webdesign"
-        },
-        {
-          "href": "/leistungen",
-          "text": "Alle Leistungen"
-        },
-        {
-          "href": "/leistungen",
-          "text": "Sie wissen noch nicht, was Sie brauchen?"
-        },
-        {
-          "href": "/muenchen/webdesign-kosten",
-          "text": "Kosten"
-        },
-        {
-          "href": "/muenchen",
-          "text": "München"
-        },
-        {
-          "href": "/muenchen",
-          "text": "München"
-        },
-        {
-          "href": "/muenchen",
-          "text": "München"
         },
         {
           "href": "/praxen",
@@ -2189,93 +781,128 @@
         },
         {
           "href": "/praxen",
-          "text": "Für Arzt- und Zahnarztpraxen"
-        },
-        {
-          "href": "/praxen",
-          "text": "Für Arzt- und Zahnarztpraxen"
-        },
-        {
-          "href": "/praxen",
           "text": "Für Praxen"
-        },
-        {
-          "href": "/prozessautomatisierung",
-          "text": "Prozessautomatisierung"
-        },
-        {
-          "href": "/referenzen",
-          "text": "Referenzen"
-        },
-        {
-          "href": "/regensburg/website-relaunch",
-          "text": "Website Relaunch"
-        },
-        {
-          "href": "/regensburg",
-          "text": "Regensburg"
-        },
-        {
-          "href": "/regensburg",
-          "text": "Regensburg"
-        },
-        {
-          "href": "/regensburg",
-          "text": "Regensburg"
-        },
-        {
-          "href": "/ueber-uns",
-          "text": "Über uns"
-        },
-        {
-          "href": "/ueber-uns",
-          "text": "Über uns"
-        },
-        {
-          "href": "/webdesign-agentur-deutschland",
-          "text": "Webdesign-Agentur"
-        },
-        {
-          "href": "/webdesign-agentur-deutschland",
-          "text": "hochkonvertierende Websites"
-        },
-        {
-          "href": "/webdesign-arzt",
-          "text": "Für Arztpraxen"
-        },
-        {
-          "href": "/webdesign-gastronomie",
-          "text": "Für Gastronomie"
-        },
-        {
-          "href": "/webdesign-hotel",
-          "text": "Für Hotels"
-        },
-        {
-          "href": "/webdesign-immobilien",
-          "text": "Für Immobilien"
-        },
-        {
-          "href": "/webdesign-sport",
-          "text": "Für Sport und Fitness"
-        },
-        {
-          "href": "/webdesign",
-          "text": "Webdesign"
-        },
-        {
-          "href": "/webdesign",
-          "text": "WebdesignWebsites, die gefunden werden und Anfragen bringen."
         }
       ]
     }
   },
   "inboundOccurrences": {
-    "/bayreuth/webdesign": 38,
-    "/bayreuth/website-relaunch": 12,
-    "/regensburg/website-relaunch": 13,
-    "/muenchen/webdesign-kosten": 13,
-    "/ki-telefonassistent-arzt": 19,
-    "/kosten-ki-telefonassistent": 28
+    "/bayreuth/webdesign": {
+      "src/components/Footer.tsx": 2,
+      "src/components/LocationContent.tsx": 3,
+      "src/components/RelatedPages.tsx": 1,
+      "src/components/ServicesSection.tsx": 1,
+      "src/entry-server.test.tsx": 2,
+      "src/lib/routing/publicRoutePaths.ts": 1,
+      "src/lib/routing/publicRoutes.ts": 1,
+      "src/lib/routing/publicTheme.test.ts": 1,
+      "src/lib/standorte-data.ts": 2,
+      "src/lib/standorte-service-configs.ts": 8,
+      "src/pages/DeutschlandPage.tsx": 1,
+      "src/pages/WebdesignArztBayreuth.tsx": 1,
+      "src/pages/WebdesignGastronomieBayreuth.tsx": 1,
+      "src/pages/WebdesignHub.tsx": 1,
+      "src/pages/WebdesignImmobilienBayreuth.tsx": 1,
+      "src/pages/cluster/bayreuth/LandingpageBayreuth.tsx": 1,
+      "src/pages/cluster/bayreuth/LokalesSEOBayreuth.tsx": 1,
+      "src/pages/cluster/bayreuth/WebdesignKostenBayreuth.tsx": 1,
+      "src/pages/cluster/bayreuth/WebsiteErstellenBayreuth.tsx": 1,
+      "src/pages/cluster/bayreuth/WebsiteRelaunchBayreuth.tsx": 1,
+      "src/pages/costs/KostenWebdesign.tsx": 1,
+      "src/pages/industries/WebdesignHotel.tsx": 1,
+      "src/pages/industries/WebdesignSport.tsx": 1,
+      "src/pages/pillars/WebdesignAgenturDeutschland.tsx": 2,
+      "src/pages/problems/KeineAnfragenWebsitePage.tsx": 1,
+      "functions/_middleware.ts": 1
+    },
+    "/bayreuth/website-relaunch": {
+      "src/App.tsx": 1,
+      "src/components/Footer.tsx": 1,
+      "src/lib/routing/publicRoutePaths.ts": 1,
+      "src/lib/routing/publicRoutes.ts": 1,
+      "src/pages/WebdesignHub.tsx": 1,
+      "src/pages/cluster/bayreuth/LandingpageBayreuth.tsx": 1,
+      "src/pages/cluster/bayreuth/LokalesSEOBayreuth.tsx": 1,
+      "src/pages/cluster/bayreuth/WebdesignKostenBayreuth.tsx": 1,
+      "src/pages/cluster/bayreuth/WebsiteErstellenBayreuth.tsx": 1,
+      "src/pages/cluster/bayreuth/WebsiteRelaunchBayreuth.tsx": 2,
+      "src/pages/pillars/WebdesignAgenturDeutschland.tsx": 1,
+      "functions/_middleware.ts": 1
+    },
+    "/regensburg/website-relaunch": {
+      "src/App.tsx": 1,
+      "src/components/Footer.tsx": 1,
+      "src/components/LocationContent.tsx": 1,
+      "src/lib/routing/publicRoutePaths.ts": 1,
+      "src/lib/routing/publicRoutes.ts": 1,
+      "src/pages/CityLandingPage.tsx": 1,
+      "src/pages/WebdesignHub.tsx": 1,
+      "src/pages/cluster/regensburg/LandingpageRegensburg.tsx": 1,
+      "src/pages/cluster/regensburg/LokalesSEORegensburg.tsx": 1,
+      "src/pages/cluster/regensburg/WebdesignKostenRegensburg.tsx": 1,
+      "src/pages/cluster/regensburg/WebsiteErstellenRegensburg.tsx": 1,
+      "src/pages/cluster/regensburg/WebsiteRelaunchRegensburg.tsx": 2,
+      "functions/_middleware.ts": 1
+    },
+    "/muenchen/webdesign-kosten": {
+      "src/App.tsx": 1,
+      "src/components/Footer.tsx": 1,
+      "src/lib/routing/publicRoutePaths.ts": 1,
+      "src/lib/routing/publicRoutes.ts": 1,
+      "src/lib/standorte-service-configs.ts": 1,
+      "src/pages/WebdesignHub.tsx": 1,
+      "src/pages/cluster/muenchen/LandingpageMuenchen.tsx": 1,
+      "src/pages/cluster/muenchen/LokalesSEOMuenchen.tsx": 1,
+      "src/pages/cluster/muenchen/WebdesignKostenMuenchen.tsx": 2,
+      "src/pages/cluster/muenchen/WebsiteErstellenMuenchen.tsx": 2,
+      "src/pages/cluster/muenchen/WebsiteRelaunchMuenchen.tsx": 1,
+      "functions/_middleware.ts": 1
+    },
+    "/ki-telefonassistent-arzt": {
+      "src/App.tsx": 1,
+      "src/components/Footer.tsx": 1,
+      "src/components/KiCTASection.tsx": 1,
+      "src/components/RelatedPages.tsx": 1,
+      "src/lib/routing/publicRoutePaths.ts": 1,
+      "src/lib/routing/publicRoutes.ts": 1,
+      "src/pages/KiTelefonassistentPage.tsx": 1,
+      "src/pages/LeistungenPage.tsx": 1,
+      "src/pages/PraxenPage.tsx": 1,
+      "src/pages/costs/KostenKiTelefonassistent.tsx": 1,
+      "src/pages/industries/AutomatisierungArzt.tsx": 1,
+      "src/pages/industries/KiTelefonassistentArzt.tsx": 1,
+      "src/pages/industries/KiTelefonassistentPraxis.tsx": 1,
+      "src/pages/industries/WebdesignArzt.tsx": 1,
+      "src/pages/pillars/KiAgenturDeutschland.tsx": 1,
+      "src/pages/problems/KeineTerminbuchungPage.tsx": 1,
+      "src/pages/problems/VerpassteAnrufePage.tsx": 1,
+      "src/pages/problems/ZuVielManuelleArbeitPage.tsx": 1,
+      "src/prerender.hydration.test.tsx": 1,
+      "functions/_middleware.ts": 1
+    },
+    "/kosten-ki-telefonassistent": {
+      "src/App.tsx": 1,
+      "src/components/Footer.tsx": 1,
+      "src/components/Navigation.tsx": 2,
+      "src/lib/navigation-data.ts": 1,
+      "src/lib/routing/publicRoutePaths.ts": 1,
+      "src/lib/routing/publicRoutes.ts": 1,
+      "src/lib/telefonassistent-copy.ts": 1,
+      "src/pages/IntegrationenPage.tsx": 1,
+      "src/pages/KiTelefonassistentPage.tsx": 2,
+      "src/pages/LeistungenPage.tsx": 1,
+      "src/pages/PraxenPage.tsx": 1,
+      "src/pages/costs/KostenKiTelefonassistent.tsx": 2,
+      "src/pages/industries/KiTelefonassistentArzt.tsx": 2,
+      "src/pages/industries/KiTelefonassistentHotel.tsx": 2,
+      "src/pages/industries/KiTelefonassistentPraxis.tsx": 2,
+      "src/pages/industries/KiTelefonassistentRestaurant.tsx": 2,
+      "src/pages/pillars/AutomatisierungUnternehmen.tsx": 1,
+      "src/pages/pillars/KiAgenturDeutschland.tsx": 1,
+      "src/pages/problems/KeineTerminbuchungPage.tsx": 1,
+      "src/pages/problems/VerpassteAnrufePage.tsx": 1,
+      "src/prerender.hydration.test.tsx": 1,
+      "functions/_middleware.ts": 1
+    }
   }
 }

@@ -6,13 +6,17 @@
 // (/ki-telefonassistent) und die Praxisseite (/praxen), aber keine Seite, die
 // die EINFÜHRUNG als eigenes Vorhaben beschreibt.
 //
-// Abgrenzung zu /ki-telefonassistent und /praxen — bewusst und geprüft:
-// Jene Seiten beschreiben das PRODUKT und was Cogniiq liefert. Diese Seite
-// beschreibt, was die PRAXIS zu entscheiden und zu prüfen hat, damit die
-// Einführung trägt: welche Anrufanlässe überhaupt in Frage kommen, wie die
-// Übergabe vor der Unterschrift geklärt wird, was vor dem Go-live getestet
-// gehört, wer freigibt und was in der ersten Woche beobachtet wird. Kein
-// Modul der Beweiskette wird hier wiederholt.
+// ABGRENZUNG, die beim Bearbeiten erhalten bleiben muss:
+// Diese Seite beschreibt ausschliesslich die Entscheidungen und Pruefungen, die
+// bei der PRAXIS liegen. Der Ablauf, den Cogniiq liefert, ist
+// EINRICHTUNG_PROJEKT bzw. EINRICHTUNG_SCHRITTE (M17) und steht auf der
+// Produktseite. Diese Seite darf dazu keinen zweiten, konkurrierenden Ablauf
+// aufstellen und nummeriert ihre Abschnitte deshalb bewusst NICHT: zwei
+// nummerierte Prozesse auf einer Website sind zwei Antworten auf dieselbe Frage.
+//
+// Ebenso wenig werden Module der Beweiskette hier nachgetippt. Wo sich ein Thema
+// ueberschneidet (etwa "wann wir nicht passen", M16), steht hier nur der Teil,
+// der die EINFUEHRUNG betrifft, und im Uebrigen ein Verweis.
 //
 // Woher der Inhalt stammt: aus dem tatsächlich betriebenen Einführungsprozess
 // (interne Projektvorlage). Veröffentlicht werden ausschließlich das VORGEHEN
@@ -24,6 +28,11 @@
 //   Zertifizierung, in keiner Beugung (HONESTY-AUDIT §7.7).
 // - Kein Name eines Praxisverwaltungssystems und keine Anbindungszusage
 //   (OWNER-INPUT B). Der Stand dazu steht in FAKTEN.keineAnbindung.
+// - KEINE Aussage zum Verhalten bei Stoerung oder Ausfall und keine Frist fuer
+//   eine Rueckschaltung: OWNER-INPUT B9 ist unbeantwortet, und die Folgezeile
+//   dort verlangt ausdruecklich, dass die Fallback-Aussagen von allen Seiten
+//   verschwinden. Dass ein Rueckweg VEREINBART wird, darf gesagt werden; wie
+//   schnell er greift, nicht.
 // - Kein Name eines eingesetzten Dienstleisters oder Modellanbieters: die
 //   Unterauftragnehmerliste ist noch nicht veröffentlichungsreif.
 // - Keine Triage, keine medizinische Einschätzung — Notfälle werden erkannt
@@ -53,23 +62,12 @@ const VEROEFFENTLICHT = "2026-08-29";
 const AKTUALISIERT = "2026-08-29";
 
 /**
- * Die sieben Schritte. Bewusst als Vorhaben der Praxis formuliert, nicht als
- * Leistungsversprechen: Was Cogniiq liefert, steht auf der Produktseite.
- */
-const SCHRITTE: Array<{ nummer: string; titel: string; frage: string }> = [
-  { nummer: "1", titel: "Anrufanlässe erfassen", frage: "Worum geht es bei Ihren Anrufen tatsächlich?" },
-  { nummer: "2", titel: "Trennlinie ziehen", frage: "Was darf ein System übernehmen, was gehört immer zu einem Menschen?" },
-  { nummer: "3", titel: "Übergabe klären", frage: "Wo landet das Ergebnis eines Anrufs – und wer trägt es ein?" },
-  { nummer: "4", titel: "Regeln und Grenzen festlegen", frage: "Was passiert im Notfall, bei Unsicherheit, bei Widerspruch?" },
-  { nummer: "5", titel: "Prüfen, bevor jemand Echtes anruft", frage: "Woran erkennen Sie, dass es trägt?" },
-  { nummer: "6", titel: "Freigabe durch das Team", frage: "Wer entscheidet, dass es live gehen darf?" },
-  { nummer: "7", titel: "Die erste Woche begleiten", frage: "Was beobachten Sie, solange es neu ist?" },
-];
-
-/**
- * Prüfkategorien vor dem Go-live. Das sind die Gruppen, in denen wir vor jeder
- * Freigabe tatsächlich testen — als Kategorien beschrieben, damit eine Praxis
- * den gleichen Maßstab an jeden Anbieter anlegen kann.
+ * Prüfkategorien vor der Freigabe.
+ *
+ * [[CLAIM: verify — dass in genau diesen vier Gruppen geprüft wird, ist eine
+ * Aussage über das eigene Vorgehen. Sie ist aus der internen Projektvorlage
+ * abgeleitet und vom Inhaber zu bestätigen. Die einzelnen Beispiele sind
+ * Fallkategorien, keine Zusagen über Ergebnisse.]]
  */
 const PRUEFGRUPPEN: Array<{ titel: string; text: string; beispiele: string[] }> = [
   {
@@ -119,7 +117,13 @@ const PRUEFGRUPPEN: Array<{ titel: string; text: string; beispiele: string[] }> 
   },
 ];
 
-/** Was in der ersten Woche beobachtet wird. Beobachtungspunkte, keine Zusagen. */
+/**
+ * Beobachtungspunkte der ersten Betriebswoche.
+ *
+ * [[CLAIM: verify — abgeleitet aus der internen Projektvorlage. Bestätigung des
+ * Inhabers ausstehend; formuliert als Beobachtungspunkte, nicht als zugesagter
+ * Leistungsumfang.]]
+ */
 const ERSTE_WOCHE: string[] = [
   "Abgebrochene Gespräche und die Stelle, an der sie abbrechen",
   "Anliegen, die der Assistent nicht zuordnen konnte",
@@ -132,7 +136,7 @@ const ERSTE_WOCHE: string[] = [
 const FAQ: Array<{ question: string; answer: string }> = [
   {
     question: "Wie lange dauert die Einführung eines KI-Telefonassistenten?",
-    answer: `Die Einrichtungsarbeit ist zeitlich zugesagt: ${FAKTEN.uebergabeGarantie} ${FAKTEN.startDefinition} Wie lange Sie danach prüfen, entscheiden Sie selbst – ${FAKTEN.freigabeNachUebergabe} Weitere Fristen nennen wir bewusst nicht, weil sie von Ihren Vorgaben und Ihrer Prüfung abhängen.`,
+    answer: `Für die Einrichtungsarbeit gilt eine feste Zusage: ${FAKTEN.uebergabeGarantie} ${FAKTEN.startDefinition} ${FAKTEN.freigabeNachUebergabe} Wie lange Sie prüfen, entscheiden Sie. Weitere Fristen nennen wir nicht, weil sie von Ihren Vorgaben und Ihrer Prüfung abhängen.`,
   },
   {
     question: "Muss unser Praxisverwaltungssystem angebunden werden?",
@@ -152,11 +156,6 @@ const FAQ: Array<{ question: string; answer: string }> = [
     answer:
       "Dann tragen Sie die Einführung nicht. Deshalb testet in unserem Vorgehen die Anmeldung selbst, bevor irgendetwas live geht, und die Freigabe hängt nicht allein an der Praxisleitung. Wer den Assistenten täglich neben sich hat, muss vorher gesagt haben, dass die Regeln stimmen.",
   },
-  {
-    question: "Lässt sich die Einführung rückgängig machen?",
-    answer:
-      "Ja. Die Rufumleitung, über die Anrufe den Assistenten erreichen, lässt sich zurücknehmen – danach klingelt es wieder wie zuvor. Wie Sie den Vertrag beenden, steht auf der Produktseite; für die Einführung selbst ist entscheidend, dass der Rückweg vor dem Go-live festgelegt und nicht erst im Störungsfall gesucht wird.",
-  },
 ];
 
 export function KiTelefonassistentEinfuehren() {
@@ -172,13 +171,16 @@ export function KiTelefonassistentEinfuehren() {
     headline: "Einen KI-Telefonassistenten in der Praxis einführen",
     description:
       "Vorgehen, Prüfkategorien und Freigabe bei der Einführung eines KI-Telefonassistenten in einer Praxis.",
+    // Das reguläre OG-Bild der Website (public/og-image.png) — ein real
+    // vorhandenes Asset, kein Stockfoto und kein Platzhalter.
+    image: `${BUSINESS_INFO.website}/og-image.png`,
     datePublished: VEROEFFENTLICHT,
     dateModified: AKTUALISIERT,
     inLanguage: "de-DE",
     author: {
       "@type": "Person",
       name: REDAKTION.name,
-      jobTitle: "Gründer",
+      jobTitle: REDAKTION.schemaJobTitle,
       worksFor: {
         "@type": "Organization",
         "@id": `${BUSINESS_INFO.website}/#organization`,
@@ -196,13 +198,13 @@ export function KiTelefonassistentEinfuehren() {
   return (
     <div className="bg-white dark:bg-gray-950">
       <PageSEO
-        title="KI-Telefonassistent einführen – Praxisleitfaden | Cogniiq"
-        description="Wie eine Praxis einen KI-Telefonassistenten einführt: Anrufanlässe trennen, Übergabe vor der Unterschrift klären, vor dem Go-live prüfen, Freigabe im Team."
+        title="KI-Telefonassistent in der Praxis einführen | Cogniiq"
+        description="Wie eine Praxis einen KI-Telefonassistenten einführt: welche Anrufe infrage kommen, wie die Übergabe geklärt wird und was vor der Freigabe geprüft gehört."
         canonical={CANONICAL}
         breadcrumbs={[
           { name: "Startseite", url: BUSINESS_INFO.website },
           { name: "KI Telefonassistent", url: canonicalFor("/ki-telefonassistent") },
-          { name: "Einführen", url: CANONICAL },
+          { name: "In der Praxis einführen", url: CANONICAL },
         ]}
         faqItems={FAQ}
         additionalSchema={articleSchema}
@@ -226,7 +228,7 @@ export function KiTelefonassistentEinfuehren() {
           </li>
           <li aria-hidden="true">/</li>
           <li aria-current="page" className="text-gray-700 dark:text-gray-300">
-            Einführen
+            In der Praxis einführen
           </li>
         </ol>
       </nav>
@@ -237,16 +239,26 @@ export function KiTelefonassistentEinfuehren() {
           Einen KI-Telefonassistenten in der Praxis einführen
         </h1>
         <p className="text-[19px] text-gray-700 dark:text-gray-300 leading-[1.7] mt-8">
-          Die Einführung entscheidet sich nicht an der Technik. Sie entscheidet sich an vier
-          Fragen: Welche Anrufe kommen überhaupt in Frage, wo landet das Ergebnis eines
-          Gesprächs, was passiert, wenn es ernst wird – und wer in Ihrem Haus gibt frei.
-          Dieser Beitrag beschreibt das Vorgehen, mit dem wir diese Fragen abarbeiten, und
-          die Prüfungen, die vor einer Freigabe stehen.
+          Vier Fragen entscheiden über die Einführung: Welche Anrufe kommen überhaupt
+          infrage, wo landet das Ergebnis eines Gesprächs, was passiert, wenn es ernst wird,
+          und wer in Ihrem Haus gibt frei. Dieser Beitrag beschreibt, wie wir diese Fragen
+          abarbeiten und was vor einer Freigabe geprüft wird.
         </p>
         <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7] mt-5">
-          Geschrieben für Praxen, die vor der Entscheidung stehen – auch als Maßstab, um
-          Angebote zu vergleichen. Was hier steht, gilt unabhängig davon, mit wem Sie
+          Er ist für Praxen geschrieben, die vor der Entscheidung stehen, und als Maßstab,
+          um Angebote zu vergleichen. Was hier steht, gilt unabhängig davon, mit wem Sie
           arbeiten.
+        </p>
+        <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7] mt-5">
+          Es geht um die Entscheidungen, die bei Ihnen liegen. Wie die Einrichtung auf
+          unserer Seite abläuft, steht im Abschnitt{" "}
+          <Link
+            to="/ki-telefonassistent#einrichtung"
+            className="underline underline-offset-4 hover:no-underline"
+          >
+            Einrichtung auf der Produktseite
+          </Link>
+          .
         </p>
       </header>
 
@@ -274,14 +286,18 @@ export function KiTelefonassistentEinfuehren() {
               darf.
             </p>
             <p>
-              Der dritte Grund steht in den Zahlen zur Betreuung: 52&nbsp;% nennen
-              unzureichenden Kundensupport als Grund, ihr System zu wechseln
+              Der dritte Grund ist die Betreuung nach dem Start. Ansagen und Regeln ändern
+              sich nach dem Urlaub, nach einer neuen Sprechzeit, nach der ersten Woche im
+              Betrieb. Wie stark die Betreuung darüber entscheidet, ob ein System in einer
+              Praxis bleibt, zeigt der Blick auf die Praxissoftware: Dort nennen 52&nbsp;%
+              der wechselwilligen Praxen unzureichenden Kundensupport als Wechselgrund
               <span className="text-gray-500 dark:text-gray-500">
                 {" "}
                 (Zi, PVS-Monitoring, 2026)
               </span>
-              . Eine Einführung endet nicht am Go-live-Tag. Sie endet dort, wo niemand mehr
-              erreichbar ist, wenn sich eine Sprechzeit ändert.
+              . Die Zahl betrifft Praxisverwaltungssysteme, nicht Telefonassistenten. Sie
+              sagt etwas darüber, woran Software in einer Praxis scheitert, nicht wie häufig
+              das bei einer Telefonlösung geschieht.
             </p>
             <p>
               Dass der Bedarf besteht, ist unstrittig: 39&nbsp;% bewerten die Erreichbarkeit
@@ -297,46 +313,6 @@ export function KiTelefonassistentEinfuehren() {
         </div>
       </section>
 
-      {/* ── Die sieben Schritte ────────────────────────────────────────────── */}
-      <section className="py-14 bg-gray-50 dark:bg-gray-900/40" aria-labelledby="schritte-heading">
-        <div className="max-w-3xl mx-auto px-6 lg:px-8">
-          <h2
-            id="schritte-heading"
-            className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6"
-          >
-            Sieben Schritte, in dieser Reihenfolge
-          </h2>
-          <p className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] mb-8">
-            Die Reihenfolge ist nicht beliebig. Jeder Schritt beantwortet eine Frage, die im
-            nächsten vorausgesetzt wird – wer bei der Prüfung anfängt, prüft gegen Regeln,
-            die noch niemand festgelegt hat.
-          </p>
-          <ol className="space-y-4">
-            {SCHRITTE.map((s) => (
-              <li
-                key={s.nummer}
-                className="flex gap-5 rounded-xl bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 p-5"
-              >
-                <span
-                  aria-hidden="true"
-                  className="shrink-0 w-9 h-9 rounded-full bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 grid place-items-center text-[15px] font-semibold"
-                >
-                  {s.nummer}
-                </span>
-                <span>
-                  <span className="block text-[17px] font-semibold text-gray-900 dark:text-gray-100">
-                    {s.titel}
-                  </span>
-                  <span className="block text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7] mt-1">
-                    {s.frage}
-                  </span>
-                </span>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
       {/* ── Trennlinie ─────────────────────────────────────────────────────── */}
       <section className="py-14" aria-labelledby="trennlinie-heading">
         <div className="max-w-3xl mx-auto px-6 lg:px-8">
@@ -344,7 +320,7 @@ export function KiTelefonassistentEinfuehren() {
             id="trennlinie-heading"
             className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6"
           >
-            Schritt 2: Die Trennlinie ziehen
+            Die Trennlinie ziehen
           </h2>
           <div className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] space-y-5">
             <p>
@@ -383,13 +359,13 @@ export function KiTelefonassistentEinfuehren() {
       </section>
 
       {/* ── Übergabe ───────────────────────────────────────────────────────── */}
-      <section className="py-14 bg-gray-50 dark:bg-gray-900/40" aria-labelledby="uebergabe-heading">
+      <section className="py-14" aria-labelledby="uebergabe-heading">
         <div className="max-w-3xl mx-auto px-6 lg:px-8">
           <h2
             id="uebergabe-heading"
             className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6"
           >
-            Schritt 3: Die Übergabe klären, bevor Sie unterschreiben
+            Die Übergabe klären, bevor Sie unterschreiben
           </h2>
           <div className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] space-y-5">
             <p>
@@ -424,7 +400,7 @@ export function KiTelefonassistentEinfuehren() {
             id="weg-heading"
             className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6"
           >
-            Der Weg eines Anrufs
+            Der Weg eines Anrufs und seine zwei Ausstiege
           </h2>
           <p className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] mb-8">
             Vier Stationen, und an zwei Stellen ein Ausstieg zum Menschen. Wer die beiden
@@ -484,13 +460,13 @@ export function KiTelefonassistentEinfuehren() {
       </section>
 
       {/* ── Prüfkategorien ─────────────────────────────────────────────────── */}
-      <section className="py-14 bg-gray-50 dark:bg-gray-900/40" aria-labelledby="pruefen-heading">
+      <section className="py-14" aria-labelledby="pruefen-heading">
         <div className="max-w-3xl mx-auto px-6 lg:px-8">
           <h2
             id="pruefen-heading"
             className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6"
           >
-            Schritt 5: Was vor dem Go-live geprüft gehört
+            Was vor der Freigabe geprüft gehört
           </h2>
           <div className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] space-y-5 mb-10">
             <p>
@@ -510,7 +486,7 @@ export function KiTelefonassistentEinfuehren() {
             {PRUEFGRUPPEN.map((gruppe) => (
               <div
                 key={gruppe.titel}
-                className="rounded-xl bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 p-6"
+                className="rounded-xl border border-gray-200 dark:border-gray-800 p-6"
               >
                 <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100">
                   {gruppe.titel}
@@ -545,7 +521,7 @@ export function KiTelefonassistentEinfuehren() {
             id="freigabe-heading"
             className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6"
           >
-            Schritt 6: Wer freigibt – und was freigegeben wird
+            Wer freigibt, und was freigegeben wird
           </h2>
           <div className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] space-y-5">
             <p>
@@ -566,9 +542,8 @@ export function KiTelefonassistentEinfuehren() {
             </ul>
             <p>
               Erst wenn diese Punkte einzeln bestätigt sind, wird umgeschaltet. Und bevor
-              umgeschaltet wird, steht fest, wie innerhalb von Minuten wieder auf den
-              bisherigen Ablauf zurückgeschaltet wird. Ein Rückweg, der im Störungsfall erst
-              gesucht wird, ist keiner.
+              umgeschaltet wird, wird festgelegt, auf welchem Weg wieder auf den bisherigen
+              Ablauf zurückgeschaltet wird. Dieser Weg gehört vorher vereinbart.
             </p>
             <p className="rounded-xl border border-gray-200 dark:border-gray-800 p-5">
               {FAKTEN.freigabeNachUebergabe} {FAKTEN.pruefzeitNeutral}
@@ -578,13 +553,13 @@ export function KiTelefonassistentEinfuehren() {
       </section>
 
       {/* ── Erste Woche ────────────────────────────────────────────────────── */}
-      <section className="py-14 bg-gray-50 dark:bg-gray-900/40" aria-labelledby="woche-heading">
+      <section className="py-14" aria-labelledby="woche-heading">
         <div className="max-w-3xl mx-auto px-6 lg:px-8">
           <h2
             id="woche-heading"
             className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6"
           >
-            Schritt 7: Die erste Woche
+            Die erste Woche im Betrieb
           </h2>
           <p className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] mb-6">
             In der ersten Woche entscheidet sich, ob nachgeschärft wird oder ob sich
@@ -618,11 +593,12 @@ export function KiTelefonassistentEinfuehren() {
             id="grenzen-heading"
             className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6"
           >
-            Wann Sie die Einführung besser lassen
+            Wann eine Einführung nichts bringt
           </h2>
           <div className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] space-y-5">
             <p>
-              Nicht jede Praxis gewinnt dabei etwas. Drei Fälle, in denen wir selbst abraten:
+              Zwei Konstellationen, die sich erst bei der Einführung zeigen und in denen
+              wir abraten:
             </p>
             <ul className="space-y-3 list-disc pl-6">
               <li>
@@ -634,22 +610,29 @@ export function KiTelefonassistentEinfuehren() {
                 Niemand in Ihrem Haus kann die Regeln verantworten und pflegen. Ein
                 Assistent ohne Zuständigen veraltet innerhalb weniger Monate.
               </li>
-              <li>
-                Sie erwarten, dass die Anmeldung dadurch entbehrlich wird. Das ist nicht der
-                Zweck und wäre eine Zusage, die wir nicht geben.
-              </li>
             </ul>
+            <p>
+              Die übrigen Fälle, in denen wir von vornherein abraten, stehen gesammelt im
+              Abschnitt{" "}
+              <Link
+                to="/ki-telefonassistent"
+                className="underline underline-offset-4 hover:no-underline"
+              >
+                wann wir nicht die richtige Lösung sind
+              </Link>{" "}
+              auf der Produktseite.
+            </p>
             <p>
               Zur Erwartungshaltung noch ein Wort: Wir nennen bewusst keinen Anteil von
               Anrufen, den ein Assistent übernimmt. Diese Zahl hängt vollständig an Ihrer
-              Trennlinie aus Schritt&nbsp;2 – jede allgemeine Angabe dazu wäre geraten.
+              eigenen Trennlinie, und jede allgemeine Angabe dazu wäre geraten.
             </p>
           </div>
         </div>
       </section>
 
       {/* ── FAQ ────────────────────────────────────────────────────────────── */}
-      <section className="py-14 bg-gray-50 dark:bg-gray-900/40" aria-labelledby="faq-heading">
+      <section className="py-14" aria-labelledby="faq-heading">
         <div className="max-w-3xl mx-auto px-6 lg:px-8">
           <h2
             id="faq-heading"
@@ -725,8 +708,8 @@ export function KiTelefonassistentEinfuehren() {
 
           <div className="mt-12 rounded-2xl border border-gray-200 dark:border-gray-800 p-8">
             <p className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7]">
-              Wenn Sie Schritt&nbsp;1 und 2 für Ihre Praxis durchgehen möchten: Wir nehmen
-              Ihre Anrufanlässe auf und sagen Ihnen, was davon trägt und was nicht – auch
+              Wenn Sie die Trennlinie für Ihre Praxis durchgehen möchten: Wir nehmen Ihre
+              Anrufanlässe auf und sagen Ihnen, was davon trägt und was nicht – auch
               dann, wenn die Antwort gegen eine Einführung spricht.
             </p>
             <Link

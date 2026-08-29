@@ -146,3 +146,29 @@ zu entfernen**. Marker stehen als Code-Kommentare neben der jeweiligen Stelle
 - "Kunden bestellen den Service selten wieder ab", "unbegrenzte Anrufe"
 - Stimme "kaum von einem menschlichen Mitarbeiter zu unterscheiden"
 - Sämtliche "kein Anruf/Patient/Auftrag geht verloren"-Absolutversprechen
+
+---
+
+# Nachtrag 2026-08-29 — offene Punkte der Seite `/ki-telefonassistent-einfuehren`
+
+Die Seite beschreibt das eigene Einführungsvorgehen. Diese Aussagen sind aus der
+internen Projektvorlage abgeleitet und im Repository nachvollziehbar, aber vom
+Inhaber nicht bestätigt. Sie stehen als `[[CLAIM: verify]]` im Quelltext von
+`src/pages/guides/KiTelefonassistentEinfuehren.tsx`.
+
+| ID | Aussage | Fundstelle | Status |
+|---|---|---|---|
+| Z14 | „Vor einer Freigabe prüfen wir in vier Gruppen" — dass genau diese vier Prüfkategorien (normale Abläufe, Verwechslung und Zugriff, deutsche Sprachqualität, Ernstfall) das Vorgehen abbilden | `KiTelefonassistentEinfuehren.tsx`, Konstante `PRUEFGRUPPEN` | offen — Bestätigung des Inhabers |
+| Z15 | Die sechs Beobachtungspunkte der ersten Betriebswoche | ebd., Konstante `ERSTE_WOCHE` | offen — Bestätigung des Inhabers |
+| Z16 | „In unserem Vorgehen testet zuerst die Anmeldung, danach die Leitung" und die sieben einzeln freigegebenen Punkte | ebd., Abschnitt „Wer freigibt" | offen — Bestätigung des Inhabers |
+| Z17 | Die drei Prüffragen je Anrufanlass als unser vorgeschlagenes Entscheidungsraster | ebd., Abschnitt „Die Trennlinie ziehen" | offen — als Vorschlag formuliert, nicht als Zusage |
+
+Bewusst **nicht** auf der Seite, weil gesperrt: jede Aussage zum Verhalten bei
+Störung oder Ausfall und jede Frist für eine Rückschaltung (OWNER-INPUT B9 ist
+unbeantwortet; die Folgezeile dort verlangt, dass Fallback-Aussagen von allen
+Seiten verschwinden). Die Seite sagt nur, dass der Rückweg vor dem Umschalten
+vereinbart wird — nicht, wie schnell er greift.
+
+Ebenfalls nicht auf der Seite: Verarbeitungsort und Konformität (§7.7), Namen
+von Praxisverwaltungssystemen und Anbindungszusagen (B1–B3), ein Anteil
+automatisierter Anrufe (F4/Z0), Namen eingesetzter Dienstleister (B6).

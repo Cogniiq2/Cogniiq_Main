@@ -58,7 +58,8 @@ const RECORDING = process.env.SEO_RECORD_PROTECTED_BASELINE === '1';
 
 interface Baseline {
   readonly fingerprints: Record<string, unknown>;
-  readonly inboundOccurrences: Record<string, number>;
+  /** protected path -> source file -> number of occurrences in that file. */
+  readonly inboundOccurrences: Record<string, Record<string, number>>;
 }
 
 const EMPTY_BASELINE: Baseline = { fingerprints: {}, inboundOccurrences: {} };
@@ -69,8 +70,10 @@ const baseline: Baseline =
 
 // Mutable counterpart of Baseline: the recording pass fills this in as the
 // suite renders, so its fields cannot carry Baseline's `readonly`.
-const recorded: { fingerprints: Record<string, unknown>; inboundOccurrences: Record<string, number> } =
-  { fingerprints: {}, inboundOccurrences: {} };
+const recorded: {
+  fingerprints: Record<string, unknown>;
+  inboundOccurrences: Record<string, Record<string, number>>;
+} = { fingerprints: {}, inboundOccurrences: {} };
 
 function parseHtml(html: string): Document {
   return new DOMParser().parseFromString(html, 'text/html');
@@ -84,8 +87,17 @@ const EXCLUDED_FROM_SCAN = new Set([
   'src/test/fixtures/protected-experiments.baseline.json',
 ]);
 
-/** Every source file that could carry an internal link, keyed by repo-relative path. */
+/**
+ * Every file that could carry an internal link, keyed by repo-relative path.
+ *
+ * Scans more than src/: public/sitemap.xml, public/_redirects, index.html and
+ * the build scripts can all name a route, and a redirect added to a protected
+ * route changes its topology just as much as an anchor does.
+ */
+const SCAN_ROOTS = ['src', 'public', 'scripts', '.github/scripts', 'functions'];
+
 function collectSources(dir: string, out = new Map<string, string>()): Map<string, string> {
+  if (!existsSync(dir)) return out;
   for (const entry of readdirSync(dir)) {
     if (entry === 'node_modules' || entry === '.git' || entry === 'dist' || entry === 'dist-ssr') {
       continue;
@@ -95,7 +107,8 @@ function collectSources(dir: string, out = new Map<string, string>()): Map<strin
       collectSources(full, out);
       continue;
     }
-    if (!/\.(tsx?|mts|mjs|json|html)$/.test(entry)) continue;
+    if (!/\.(tsx?|mts|mjs|json|html|xml|txt|_redirects|_headers)$/.test(entry) && !/^_(redirects|headers)$/.test(entry))
+      continue;
     const key = relative(REPO_ROOT, full);
     if (EXCLUDED_FROM_SCAN.has(key)) continue;
     out.set(key, readFileSync(full, 'utf8'));
@@ -158,9 +171,10 @@ describe('the frozen SEO experiments have not drifted', () => {
     }, 60_000);
   }
 
-  it('has not changed how many places in the source link into an experiment', () => {
-    const sources = collectSources(join(REPO_ROOT, 'src'));
-    const actual: Record<string, number> = {};
+  it('has not changed which files link into an experiment, or how often', () => {
+    const sources = new Map<string, string>();
+    for (const root of SCAN_ROOTS) collectSources(join(REPO_ROOT, root), sources);
+    const actual: Record<string, Record<string, number>> = {};
     for (const path of PROTECTED_EXPERIMENT_PATHS) {
       actual[path] = countPathOccurrences(sources, path);
     }
@@ -169,7 +183,8 @@ describe('the frozen SEO experiments have not drifted', () => {
       return;
     }
     // Adding a link to a protected route is the failure this exists for; so is
-    // removing one. Both change internal link equity mid-experiment.
+    // removing one, and so is moving one from page to page — which a bare total
+    // would net to zero. Each changes internal link equity mid-experiment.
     expect(actual).toEqual(baseline.inboundOccurrences);
   });
 });

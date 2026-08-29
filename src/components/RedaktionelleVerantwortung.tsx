@@ -41,6 +41,15 @@ export const REDAKTION = {
   name: "Lazar Popovic",
   rolle: "Inhaber und Gründer von Cogniiq",
   ort: `${BUSINESS_INFO.address.postalCode} ${BUSINESS_INFO.address.addressLocality}`,
+  /**
+   * Rolle für strukturierte Daten. Bewusst NUR "Gründer", identisch mit
+   * BUSINESS_INFO.founders — das ist die Rolle, die schema.org als jobTitle
+   * erwartet, und sie ist im Impressum wie in seo-data.ts belegt. Der sichtbare
+   * Kasten nennt zusätzlich "Inhaber", weil das Impressum die Inhaberschaft
+   * ausweist; beide Angaben stehen auf derselben Quelle und widersprechen sich
+   * nicht.
+   */
+  schemaJobTitle: "Gründer",
 } as const;
 
 interface RedaktionelleVerantwortungProps {
@@ -82,7 +91,7 @@ export function RedaktionelleVerantwortung({
               {REDAKTION.name}
             </strong>
             , {REDAKTION.rolle}, {REDAKTION.ort}. Verantwortlich für den Inhalt nach
-            § 18 Abs. 2 MStV; die vollständige Anbieterkennzeichnung steht im{" "}
+            §&nbsp;18 Abs.&nbsp;2 MStV; die vollständige Anbieterkennzeichnung steht im{" "}
             <Link
               to="/impressum"
               className="underline underline-offset-4 hover:no-underline focus-visible:outline-2"
