@@ -254,7 +254,11 @@ export function Footer() {
                     label: "Bayreuth",
                     links: [
                       { text: "Übersicht", to: "/bayreuth" },
-                      { text: "Webdesign", to: "/bayreuth/webdesign" },
+                      // Anchor carries the city so this sitewide footer link (every
+                      // public page) reinforces /bayreuth/webdesign as the owner of
+                      // "Webdesign Bayreuth" queries instead of a bare, undifferentiated
+                      // "Webdesign" pointing at the same URL the homepage also targets.
+                      { text: "Webdesign Bayreuth", to: "/bayreuth/webdesign" },
                       { text: "KI-Telefonassistent", to: "/bayreuth/ki-telefonassistent" },
                       { text: "Automatisierung", to: "/bayreuth/automatisierung" },
                     ],

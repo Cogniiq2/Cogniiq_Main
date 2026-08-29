@@ -119,7 +119,7 @@ export function LocationContent() {
             und{" "}
             <InternalLink href="/bayreuth/automatisierung" label="Automatisierungssysteme" />{" "}
             für Unternehmen jeder Größe. Unsere Lösungen verbinden{" "}
-            <InternalLink href="/bayreuth/webdesign" label="Webdesign" />,
+            <InternalLink href="/bayreuth/webdesign" label="Webdesign Bayreuth" />,
             künstliche Intelligenz und Prozessautomatisierung zu einem durchgängigen digitalen Vertriebssystem.
           </p>
         </motion.div>
