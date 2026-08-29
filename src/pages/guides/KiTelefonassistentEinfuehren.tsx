@@ -369,7 +369,7 @@ export function KiTelefonassistentEinfuehren() {
             </ol>
             <p>
               Anliegen, bei denen eine der drei Fragen mit Nein beantwortet wird, gehören
-              auf die Liste „immer an einen Menschen". Diese Liste ist der wichtigste
+              auf die Liste „immer an einen Menschen“. Diese Liste ist der wichtigste
               Bestandteil der Einrichtung – und der einzige, den niemand außerhalb Ihrer
               Praxis für Sie ausfüllen kann.
             </p>
@@ -410,7 +410,7 @@ export function KiTelefonassistentEinfuehren() {
               <li>Und wenn nichts davon trägt: Wie sieht der Weg dann konkret aus?</li>
             </ul>
             <p>
-              Eine Antwort, die diese Fragen auf „das schauen wir uns später an" verschiebt,
+              Eine Antwort, die diese Fragen auf „das schauen wir uns später an“ verschiebt,
               ist die Antwort, aus der später Handarbeit wird.
             </p>
           </div>
@@ -549,12 +549,12 @@ export function KiTelefonassistentEinfuehren() {
           </h2>
           <div className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] space-y-5">
             <p>
-              Eine Freigabe „durch die Praxis" ist keine Freigabe. In unserem Vorgehen
+              Eine Freigabe „durch die Praxis“ ist keine Freigabe. In unserem Vorgehen
               testet zuerst die Anmeldung – die Menschen, die den Assistenten täglich neben
               sich haben –, danach die Leitung. Wer das umdreht, erfährt die Einwände erst
               im laufenden Betrieb.
             </p>
-            <p>Freigegeben wird nicht „das System", sondern einzeln:</p>
+            <p>Freigegeben wird nicht „das System“, sondern einzeln:</p>
             <ul className="space-y-2 list-disc pl-6">
               <li>die hinterlegten Informationen über Ihre Praxis,</li>
               <li>die Terminlogik,</li>
