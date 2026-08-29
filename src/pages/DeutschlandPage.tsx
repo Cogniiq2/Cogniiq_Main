@@ -267,17 +267,14 @@ export function DeutschlandPage() {
           <div className="max-w-5xl mx-auto px-6 lg:px-8">
             <motion.nav
               aria-label="Breadcrumb"
-              className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
+              className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8"
             >
               <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Home</Link>
               <ChevronRight size={12} />
               <span className="text-gray-600 dark:text-gray-300">Deutschland</span>
             </motion.nav>
 
-            <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.1}>
+            <motion.div className="cq-rise cq-rise-d1">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium tracking-wide uppercase mb-6">
                 <MapPin size={12} />
                 Deutschland · Remote & Vor Ort · Persönliche Betreuung
@@ -481,9 +478,9 @@ export function DeutschlandPage() {
                   variants={fadeUp}
                   custom={i * 0.07}
                   className={`p-5 rounded-xl border transition-colors ${
-                    region.highlight
-                      ? "bg-white dark:bg-gray-800/80 border-gray-300 dark:border-gray-600"
-                      : "bg-white dark:bg-gray-800/40 border-gray-200 dark:border-gray-700/50"
+                  region.highlight
+                  ? "bg-white dark:bg-gray-800/80 border-gray-300 dark:border-gray-600"
+                  : "bg-white dark:bg-gray-800/40 border-gray-200 dark:border-gray-700/50"
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-2">

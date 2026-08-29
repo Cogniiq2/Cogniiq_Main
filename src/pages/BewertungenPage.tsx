@@ -40,17 +40,14 @@ export function BewertungenPage() {
           <div className="max-w-5xl mx-auto px-6 lg:px-8">
             <motion.nav
               aria-label="Breadcrumb"
-              className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8 flex-wrap"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
+              className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8 flex-wrap"
             >
               <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Home</Link>
               <ChevronRight size={12} />
               <span className="text-gray-600 dark:text-gray-300">Bewertungen</span>
             </motion.nav>
 
-            <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.1}>
+            <motion.div className="cq-rise cq-rise-d1">
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-tight tracking-tight mb-6">
                 Bewertungen
               </h1>

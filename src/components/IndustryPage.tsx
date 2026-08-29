@@ -182,12 +182,9 @@ function HeroSection({
   return (
     <section className="pt-32 pb-20 bg-white dark:bg-gray-950 transition-colors duration-300">
       <div className="max-w-5xl mx-auto px-6 lg:px-8">
-        <motion.nav
+        <nav
           aria-label="Breadcrumb"
-          className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8 flex-wrap"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4 }}
+          className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8 flex-wrap"
         >
           {breadcrumbs.map((crumb, i) => (
             <span key={crumb.url} className="flex items-center gap-1.5">
@@ -206,9 +203,9 @@ function HeroSection({
               )}
             </span>
           ))}
-        </motion.nav>
+        </nav>
 
-        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0.1}>
+        <div className="cq-rise cq-rise-d1">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium tracking-wide uppercase mb-6">
             <MapPin size={12} />
             {config.hero.trustTags.join(" · ")}
@@ -237,7 +234,7 @@ function HeroSection({
               Alle Leistungen
             </Link>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

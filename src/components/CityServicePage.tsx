@@ -174,10 +174,7 @@ function HeroSection({ config, breadcrumbs }: { config: CityServiceConfig; bread
       <div className="max-w-5xl mx-auto px-6 lg:px-8">
         <motion.nav
           aria-label="Breadcrumb"
-          className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8 flex-wrap"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.18, ease: "easeOut" }}
+          className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8 flex-wrap"
         >
           {breadcrumbs.map((crumb, i) => (
             <span key={crumb.url} className="flex items-center gap-1.5">
@@ -195,11 +192,7 @@ function HeroSection({ config, breadcrumbs }: { config: CityServiceConfig; bread
           ))}
         </motion.nav>
 
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-        >
+        <motion.div className="cq-rise">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-sm font-medium tracking-wide uppercase mb-6">
             <MapPin size={12} />
             {/* „DSGVO-konform" stand hier als Selbstzusage. Sie ist auf keiner

@@ -165,7 +165,7 @@ function SectionBlock({ section }: { section: BlogSection }) {
                   <tr
                     key={i}
                     className={`border-b border-gray-100 dark:border-gray-800 last:border-0 ${
-                      i % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50/60 dark:bg-gray-800/40"
+                    i % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50/60 dark:bg-gray-800/40"
                     }`}
                   >
                     <td className="px-4 py-3 font-medium text-gray-700 dark:text-gray-300 w-[45%] align-top">
@@ -249,13 +249,7 @@ export function BlogPostPage() {
             }}
           />
           <div className="relative max-w-3xl mx-auto">
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-              custom={0}
-              className="flex items-center gap-2 mb-7"
-            >
+            <motion.div className="cq-rise flex items-center gap-2 mb-7">
               <Link to="/" className="text-[11px] text-gray-400 hover:text-gray-600 transition-colors">
                 Start
               </Link>
@@ -269,16 +263,10 @@ export function BlogPostPage() {
               </span>
             </motion.div>
 
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-              custom={0.04}
-              className="flex items-center gap-2 mb-5"
-            >
+            <motion.div className="cq-rise flex items-center gap-2 mb-5">
               <span
                 className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10.5px] font-semibold border ${
-                  CATEGORY_COLORS[article.category] ?? "bg-gray-100 text-gray-600 border-gray-200"
+                CATEGORY_COLORS[article.category] ?? "bg-gray-100 text-gray-600 border-gray-200"
                 }`}
               >
                 {article.category}
@@ -286,21 +274,13 @@ export function BlogPostPage() {
             </motion.div>
 
             <motion.h1
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-              custom={0.08}
-              className="text-3xl sm:text-4xl lg:text-[2.6rem] font-bold text-gray-900 dark:text-gray-50 leading-[1.15] tracking-[-0.022em] mb-6"
+              className="cq-rise text-3xl sm:text-4xl lg:text-[2.6rem] font-bold text-gray-900 dark:text-gray-50 leading-[1.15] tracking-[-0.022em] mb-6"
             >
               {article.title}
             </motion.h1>
 
             <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-              custom={0.12}
-              className="flex flex-wrap items-center gap-4 text-[12px] text-gray-400"
+              className="cq-rise cq-rise-d2 flex flex-wrap items-center gap-4 text-[12px] text-gray-400"
             >
               <span className="flex items-center gap-1.5">
                 <Clock size={11} />
@@ -323,21 +303,12 @@ export function BlogPostPage() {
           <div className="grid lg:grid-cols-[1fr_280px] gap-12 lg:gap-16 items-start">
             <article className="max-w-3xl">
               <motion.p
-                initial="hidden"
-                animate="visible"
-                variants={fadeUp}
-                custom={0}
-                className="text-[16px] font-medium text-gray-700 dark:text-gray-200 leading-[1.75] mb-8 border-l-2 border-gray-200 dark:border-gray-700 pl-5"
+                className="cq-rise text-[16px] font-medium text-gray-700 dark:text-gray-200 leading-[1.75] mb-8 border-l-2 border-gray-200 dark:border-gray-700 pl-5"
               >
                 {article.excerpt}
               </motion.p>
 
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                variants={fadeUp}
-                custom={0.06}
-              >
+              <motion.div className="cq-rise cq-rise-d1">
                 {article.sections.map((section, i) => (
                   <SectionBlock key={i} section={section} />
                 ))}
@@ -482,7 +453,7 @@ export function BlogPostPage() {
                     >
                       <span
                         className={`inline-flex items-center self-start px-2.5 py-1 rounded-full text-[10px] font-semibold border mb-4 ${
-                          CATEGORY_COLORS[r.category] ?? "bg-gray-100 text-gray-600 border-gray-200"
+                        CATEGORY_COLORS[r.category] ?? "bg-gray-100 text-gray-600 border-gray-200"
                         }`}
                       >
                         {r.category}

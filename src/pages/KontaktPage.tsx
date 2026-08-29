@@ -108,13 +108,7 @@ export function KontaktPage() {
           />
           <div className="relative max-w-7xl mx-auto">
             {/* Breadcrumb */}
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-              custom={0}
-              className="flex items-center gap-2 mb-8"
-            >
+            <motion.div className="cq-rise flex items-center gap-2 mb-8">
               <Link
                 to="/"
                 className="text-[11px] text-gray-400 hover:text-gray-600 transition-colors"
@@ -128,13 +122,7 @@ export function KontaktPage() {
             <div className="grid lg:grid-cols-[1fr_420px] gap-16 lg:gap-20 items-start">
               {/* Left: Headline */}
               <div>
-                <motion.div
-                  initial="hidden"
-                  animate="visible"
-                  variants={fadeUp}
-                  custom={0.04}
-                  className="flex items-center gap-2 mb-5"
-                >
+                <motion.div className="cq-rise flex items-center gap-2 mb-5">
                   <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-50 border border-gray-100">
                     <motion.div
                       className="w-1.5 h-1.5 rounded-full bg-emerald-500"
@@ -148,36 +136,20 @@ export function KontaktPage() {
                 </motion.div>
 
                 <motion.h1
-                  initial="hidden"
-                  animate="visible"
-                  variants={fadeUp}
-                  custom={0.08}
-                  className="text-4xl sm:text-5xl lg:text-[3.6rem] font-bold text-gray-900 leading-[1.06] tracking-[-0.024em] mb-6"
+                  className="cq-rise text-4xl sm:text-5xl lg:text-[3.6rem] font-bold text-gray-900 leading-[1.06] tracking-[-0.024em] mb-6"
                 >
                   KI-Systeme für Ihr
                   <br />
                   <span className="text-gray-200">Unternehmen besprechen</span>
                 </motion.h1>
 
-                <motion.p
-                  initial="hidden"
-                  animate="visible"
-                  variants={fadeUp}
-                  custom={0.13}
-                  className="text-[16px] text-gray-500 leading-[1.75] mb-8 max-w-[560px]"
-                >
+                <motion.p className="cq-rise text-[16px] text-gray-500 leading-[1.75] mb-8 max-w-[560px]">
                   In einem strukturierten Analysegespräch prüfen wir, wo KI-Automatisierung,
                   Webdesign oder digitale Systeme in Ihrem Unternehmen konkret Umsatz,
                   Effizienz und Anfragen steigern können.
                 </motion.p>
 
-                <motion.div
-                  initial="hidden"
-                  animate="visible"
-                  variants={fadeUp}
-                  custom={0.18}
-                  className="flex flex-col sm:flex-row gap-3 mb-10"
-                >
+                <motion.div className="cq-rise flex flex-col sm:flex-row gap-3 mb-10">
                   <a
                     href="#kontaktformular"
                     className="group inline-flex items-center justify-center gap-2.5 px-7 py-3.5 bg-gray-950 text-white text-[13.5px] font-semibold hover:bg-gray-800 transition-colors"
@@ -195,13 +167,7 @@ export function KontaktPage() {
                   </Link>
                 </motion.div>
 
-                <motion.div
-                  initial="hidden"
-                  animate="visible"
-                  variants={fadeUp}
-                  custom={0.23}
-                  className="flex flex-wrap gap-x-6 gap-y-2.5"
-                >
+                <motion.div className="cq-rise cq-rise-d3 flex flex-wrap gap-x-6 gap-y-2.5">
                   {[
                     { icon: Clock, text: '30–45 Min. Strategiegespräch' },
                     { icon: CheckCircle2, text: 'Einschätzung statt Verkauf' },
@@ -216,13 +182,7 @@ export function KontaktPage() {
               </div>
 
               {/* Right: Value card */}
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                variants={fadeUp}
-                custom={0.14}
-                className="hidden lg:block"
-              >
+              <motion.div className="cq-rise hidden lg:block">
                 <div className="bg-gray-950 rounded-2xl p-8 relative overflow-hidden">
                   <div
                     className="absolute inset-0 pointer-events-none"

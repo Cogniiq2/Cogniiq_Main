@@ -147,22 +147,18 @@ export function WebdesignHub() {
 
         {/* ── HERO ── */}
         <section className="pt-20 pb-16 px-6 lg:px-10 max-w-7xl mx-auto">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
-          >
-            <motion.p variants={fadeUp} custom={0} className="text-xs font-semibold tracking-[0.18em] uppercase text-blue-600 dark:text-blue-400 mb-4">
+          <div>
+            <motion.p className="cq-rise text-xs font-semibold tracking-[0.18em] uppercase text-blue-600 dark:text-blue-400 mb-4">
               Webdesign
             </motion.p>
-            <motion.h1 variants={fadeUp} custom={0.05} className="text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 dark:text-white leading-[1.08] mb-6 max-w-3xl">
+            <motion.h1 className="cq-rise cq-rise-d1 text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 dark:text-white leading-[1.08] mb-6 max-w-3xl">
               Websites, die ranken.<br />
               <span className="text-blue-600 dark:text-blue-400">Und konvertieren.</span>
             </motion.h1>
-            <motion.p variants={fadeUp} custom={0.1} className="text-lg text-gray-500 dark:text-white/55 leading-relaxed max-w-2xl mb-10">
+            <motion.p className="cq-rise cq-rise-d2 text-lg text-gray-500 dark:text-white/55 leading-relaxed max-w-2xl mb-10">
               Cogniiq entwickelt individuelle Websites für Unternehmen in Bayern. Kein Template, kein Baukasten – sauberer Code, Core Web Vitals auf Niveau, Local SEO von Anfang an. Go-Live in 7–14&nbsp;Tagen.
             </motion.p>
-            <motion.div variants={fadeUp} custom={0.15} className="flex flex-wrap gap-4">
+            <motion.div className="cq-rise cq-rise-d3 flex flex-wrap gap-4">
               <Link
                 to="/kontakt"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition-colors"
@@ -176,7 +172,7 @@ export function WebdesignHub() {
                 Webdesign Kosten
               </Link>
             </motion.div>
-          </motion.div>
+          </div>
         </section>
 
         {/* ── WHAT WE DO ── */}

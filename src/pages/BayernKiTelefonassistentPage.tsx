@@ -157,10 +157,7 @@ function HeroSection() {
       <div className="relative max-w-6xl mx-auto px-6 lg:px-8">
         <motion.nav
           aria-label="Breadcrumb"
-          className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8 flex-wrap"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4 }}
+          className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8 flex-wrap"
         >
           {breadcrumbs.map((crumb, i) => (
             <span key={crumb.url} className="flex items-center gap-1.5">
@@ -181,13 +178,7 @@ function HeroSection() {
           ))}
         </motion.nav>
 
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          custom={0}
-          className="max-w-4xl"
-        >
+        <motion.div className="cq-rise max-w-4xl">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium tracking-widest uppercase mb-6">
             <MapPin size={11} />
             Bayern · KI Automation · Mittelstand
@@ -230,11 +221,7 @@ function HeroSection() {
             ].map((item, i) => (
               <motion.div
                 key={i}
-                initial="hidden"
-                animate="visible"
-                variants={fadeUp}
-                custom={0.2 + i * 0.07}
-                className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
+                className="cq-rise flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
               >
                 <item.icon size={14} className="text-gray-400 dark:text-gray-500" />
                 {item.label}

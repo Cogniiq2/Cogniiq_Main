@@ -107,11 +107,8 @@ function FAQItem({ item }: { item: { question: string; answer: string } }) {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}
-            className="overflow-hidden"
+            className="cq-rise overflow-hidden"
           >
             <div className="px-6 pb-5 pt-0">
               <div className="w-full h-px bg-gray-100 dark:bg-gray-700/60 mb-4" />
@@ -173,10 +170,7 @@ export function NationalIndustryPage({ config }: Props) {
           <div className="max-w-6xl mx-auto px-6 lg:px-8">
             <motion.nav
               aria-label="Breadcrumb"
-              className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-10 flex-wrap"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-10 flex-wrap"
             >
               <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Home</Link>
               <ChevronRight size={10} />
@@ -186,7 +180,7 @@ export function NationalIndustryPage({ config }: Props) {
             </motion.nav>
 
             <div className="grid lg:grid-cols-[1fr_380px] gap-16 items-start">
-              <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+              <motion.div className="cq-rise">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 text-sm font-medium tracking-wider uppercase mb-8 shadow-sm">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                   {config.tagline}
@@ -221,10 +215,7 @@ export function NationalIndustryPage({ config }: Props) {
                   {["Keine Gesprächsaufzeichnung", "Einrichtung in wenigen Tagen", "Individuelle Konfiguration"].map((item, i) => (
                     <motion.div
                       key={i}
-                      initial="hidden"
-                      animate="visible"
-                      variants={fadeUp}
-                      className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
+                      className="cq-rise flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
                     >
                       <CheckCircle2 size={11} className="text-emerald-500 flex-shrink-0" />
                       {item}
@@ -234,12 +225,7 @@ export function NationalIndustryPage({ config }: Props) {
               </motion.div>
 
               {/* Hero trust card */}
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                variants={fadeUp}
-                className="hidden lg:block"
-              >
+              <motion.div className="cq-rise hidden lg:block">
                 <div className="rounded-2xl border border-gray-200 dark:border-gray-700/80 bg-white dark:bg-gray-900 overflow-hidden shadow-[0_2px_24px_rgba(0,0,0,0.07)] dark:shadow-[0_2px_24px_rgba(0,0,0,0.3)]">
                   <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-800/60">
                     <span className="w-2 h-2 rounded-full bg-emerald-400" />
