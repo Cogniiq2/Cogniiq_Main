@@ -1315,6 +1315,25 @@ function SetupSection() {
               beschreiben Ihre Anrufe, wir bauen daraus Regeln, Ansagen und die
               Übergabe. Vor dem Start hören Sie das Ergebnis selbst.
             </p>
+            {/*
+              Kontextueller Verweis auf den Einführungsleitfaden. Er steht hier,
+              weil genau an dieser Stelle die Frage aufkommt, die diese Seite
+              nicht beantwortet: nicht „was wird gebaut", sondern „was muss die
+              Praxis dafür entscheiden und prüfen". Ein Listeneintrag weiter
+              unten würde diese Frage nicht dort auffangen, wo sie entsteht.
+            */}
+            <p className="text-[14px] text-gray-500 dark:text-gray-400 leading-[1.7] max-w-md mt-4">
+              Was auf Ihrer Seite dazugehört — welche Anrufanlässe überhaupt in
+              Frage kommen, was vor dem Go-live geprüft gehört und wer freigibt —
+              steht im{" "}
+              <Link
+                to="/ki-telefonassistent-einfuehren"
+                className="underline underline-offset-4 hover:no-underline text-gray-700 dark:text-gray-300"
+              >
+                Leitfaden zur Einführung eines KI-Telefonassistenten
+              </Link>
+              .
+            </p>
           </motion.div>
 
           <div className="space-y-3">

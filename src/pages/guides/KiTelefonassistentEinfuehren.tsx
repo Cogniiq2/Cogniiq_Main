@@ -1,0 +1,743 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// FACHBEITRAG · „Einen KI-Telefonassistenten in der Praxis einführen"
+//
+// Zielintention: „KI Telefonassistent einführen" / „… in der Praxis einführen".
+// Diese Absicht war auf der Website bisher unbesetzt — es gab die Produktseite
+// (/ki-telefonassistent) und die Praxisseite (/praxen), aber keine Seite, die
+// die EINFÜHRUNG als eigenes Vorhaben beschreibt.
+//
+// Abgrenzung zu /ki-telefonassistent und /praxen — bewusst und geprüft:
+// Jene Seiten beschreiben das PRODUKT und was Cogniiq liefert. Diese Seite
+// beschreibt, was die PRAXIS zu entscheiden und zu prüfen hat, damit die
+// Einführung trägt: welche Anrufanlässe überhaupt in Frage kommen, wie die
+// Übergabe vor der Unterschrift geklärt wird, was vor dem Go-live getestet
+// gehört, wer freigibt und was in der ersten Woche beobachtet wird. Kein
+// Modul der Beweiskette wird hier wiederholt.
+//
+// Woher der Inhalt stammt: aus dem tatsächlich betriebenen Einführungsprozess
+// (interne Projektvorlage). Veröffentlicht werden ausschließlich das VORGEHEN
+// und die PRÜFKATEGORIEN — nie die interne Aufgabenliste als Zusage, nie ein
+// Kundenname, nie ein Anbieter- oder Systemname.
+//
+// Bindende Grenzen für jeden Satz auf dieser Seite:
+// - Keine Aussage zu Verarbeitungsort, EU-Servern, „DSGVO-konform" oder
+//   Zertifizierung, in keiner Beugung (HONESTY-AUDIT §7.7).
+// - Kein Name eines Praxisverwaltungssystems und keine Anbindungszusage
+//   (OWNER-INPUT B). Der Stand dazu steht in FAKTEN.keineAnbindung.
+// - Kein Name eines eingesetzten Dienstleisters oder Modellanbieters: die
+//   Unterauftragnehmerliste ist noch nicht veröffentlichungsreif.
+// - Keine Triage, keine medizinische Einschätzung — Notfälle werden erkannt
+//   und sofort weitergeleitet, nie bewertet.
+// - Kein Anteil automatisierter Anrufe, keine Zeitersparnis in Prozent.
+// - Keine weiteren Fristen als die zwei belegten (Übergabefrist, Testphase).
+// - Keine Kernzahl als Literal — alles aus FAKTEN. Diese Datei steht dafür in
+//   der CLUSTER-Liste von src/lib/telefonassistent-copy.test.ts.
+//
+// KEIN interner Link auf die sechs eingefrorenen Experimentrouten. Ein neuer
+// Link dorthin würde deren Messung verfälschen; siehe
+// src/lib/routing/protectedExperiments.ts. Deshalb verweist diese Seite bei
+// Kostenfragen bewusst NICHT auf die Preisseite.
+// ─────────────────────────────────────────────────────────────────────────────
+import { Link } from "react-router-dom";
+
+import { PageSEO } from "@/components/PageSEO";
+import { RedaktionelleVerantwortung, REDAKTION } from "@/components/RedaktionelleVerantwortung";
+import { BUSINESS_INFO } from "@/lib/seo-data";
+import { canonicalFor } from "@/lib/routing/publicRoutes";
+import { FAKTEN } from "@/lib/telefonassistent-copy";
+
+const PFAD = "/ki-telefonassistent-einfuehren";
+const CANONICAL = canonicalFor(PFAD);
+
+const VEROEFFENTLICHT = "2026-08-29";
+const AKTUALISIERT = "2026-08-29";
+
+/**
+ * Die sieben Schritte. Bewusst als Vorhaben der Praxis formuliert, nicht als
+ * Leistungsversprechen: Was Cogniiq liefert, steht auf der Produktseite.
+ */
+const SCHRITTE: Array<{ nummer: string; titel: string; frage: string }> = [
+  { nummer: "1", titel: "Anrufanlässe erfassen", frage: "Worum geht es bei Ihren Anrufen tatsächlich?" },
+  { nummer: "2", titel: "Trennlinie ziehen", frage: "Was darf ein System übernehmen, was gehört immer zu einem Menschen?" },
+  { nummer: "3", titel: "Übergabe klären", frage: "Wo landet das Ergebnis eines Anrufs – und wer trägt es ein?" },
+  { nummer: "4", titel: "Regeln und Grenzen festlegen", frage: "Was passiert im Notfall, bei Unsicherheit, bei Widerspruch?" },
+  { nummer: "5", titel: "Prüfen, bevor jemand Echtes anruft", frage: "Woran erkennen Sie, dass es trägt?" },
+  { nummer: "6", titel: "Freigabe durch das Team", frage: "Wer entscheidet, dass es live gehen darf?" },
+  { nummer: "7", titel: "Die erste Woche begleiten", frage: "Was beobachten Sie, solange es neu ist?" },
+];
+
+/**
+ * Prüfkategorien vor dem Go-live. Das sind die Gruppen, in denen wir vor jeder
+ * Freigabe tatsächlich testen — als Kategorien beschrieben, damit eine Praxis
+ * den gleichen Maßstab an jeden Anbieter anlegen kann.
+ */
+const PRUEFGRUPPEN: Array<{ titel: string; text: string; beispiele: string[] }> = [
+  {
+    titel: "Die normalen Abläufe",
+    text: "Der Anteil, an den jeder zuerst denkt – und der am schnellsten für erledigt gehalten wird. Interessant sind hier nicht die geglückten Fälle, sondern die Ränder.",
+    beispiele: [
+      "Es ist kein Termin frei",
+      "Der gewünschte Termin wird während des Gesprächs vergeben",
+      "Ein Termin soll verschoben oder abgesagt werden",
+      "Dieselbe Person ruft zweimal an",
+      "Die Verbindung zum System bricht mitten im Gespräch ab",
+      "Die Weiterleitung an einen Menschen gelingt nicht",
+    ],
+  },
+  {
+    titel: "Verwechslung und Zugriff",
+    text: "Die Gruppe, die in Anbieterbeschreibungen am häufigsten fehlt und in einer Praxis am meisten wiegt: Wer bekommt am Telefon welche Auskunft?",
+    beispiele: [
+      "Ein falsches Geburtsdatum wird abgewiesen",
+      "Zwei Personen tragen denselben Namen",
+      "Die angezeigte Rufnummer stimmt nicht mit der Person überein",
+      "Es wird nach Daten einer anderen Person gefragt",
+      "Jemand versucht, den Assistenten durch Anweisungen im Gespräch umzusteuern",
+    ],
+  },
+  {
+    titel: "Deutsch am Telefon, nicht im Labor",
+    text: "Sprachqualität entscheidet sich nicht an gut ausgesprochenen Beispielsätzen, sondern an dem, was in Ihrer Anmeldung tatsächlich ankommt.",
+    beispiele: [
+      "Schwierige Nachnamen und Straßennamen",
+      "Geburtsdaten, gesprochen statt buchstabiert",
+      "Ältere Anrufende und langsames Sprechtempo",
+      "Ausgeprägter Dialekt oder Akzent",
+      "Hintergrundgeräusche, Unterbrechungen, längeres Schweigen",
+    ],
+  },
+  {
+    titel: "Wenn es ernst wird",
+    text: "Die Gruppe, an der eine Einführung scheitern muss, wenn sie nicht sitzt. Ein Assistent, der hier nicht sauber aussteigt, gehört nicht ans Telefon einer Praxis.",
+    beispiele: [
+      "Eine medizinische Frage wird nicht beantwortet, sondern abgegeben",
+      "Um eine Einschätzung wird gebeten – und sie wird verweigert",
+      "Ein Notfall wird erkannt und sofort weitergeleitet",
+      "Jemand ist verwirrt oder erkennbar in einer belastenden Lage",
+      "Jemand möchte ausdrücklich mit einem Menschen sprechen",
+    ],
+  },
+];
+
+/** Was in der ersten Woche beobachtet wird. Beobachtungspunkte, keine Zusagen. */
+const ERSTE_WOCHE: string[] = [
+  "Abgebrochene Gespräche und die Stelle, an der sie abbrechen",
+  "Anliegen, die der Assistent nicht zuordnen konnte",
+  "Wie oft an einen Menschen weitergeleitet wurde – und warum",
+  "Verzögerungen, die im Gespräch spürbar sind",
+  "Einträge, mit denen Ihr Team im Alltag nichts anfangen kann",
+  "Rückmeldungen aus der Anmeldung, gesammelt statt nebenbei",
+];
+
+const FAQ: Array<{ question: string; answer: string }> = [
+  {
+    question: "Wie lange dauert die Einführung eines KI-Telefonassistenten?",
+    answer: `Die Einrichtungsarbeit ist zeitlich zugesagt: ${FAKTEN.uebergabeGarantie} ${FAKTEN.startDefinition} Wie lange Sie danach prüfen, entscheiden Sie selbst – ${FAKTEN.freigabeNachUebergabe} Weitere Fristen nennen wir bewusst nicht, weil sie von Ihren Vorgaben und Ihrer Prüfung abhängen.`,
+  },
+  {
+    question: "Muss unser Praxisverwaltungssystem angebunden werden?",
+    answer: FAKTEN.keineAnbindung,
+  },
+  {
+    question: "Übernimmt der Assistent eine Ersteinschätzung am Telefon?",
+    answer:
+      "Nein. Der Assistent schätzt nichts ein und beantwortet keine medizinischen Fragen. Anzeichen für einen Notfall führen dazu, dass sofort weitergeleitet wird – Erkennen und Weitergeben, nicht Bewerten. Dass diese Fälle sauber aussteigen, gehört zu den Punkten, die vor der Freigabe geprüft werden.",
+  },
+  {
+    question: "Merken Anrufende, dass sie mit einem KI-System sprechen?",
+    answer: FAKTEN.art50,
+  },
+  {
+    question: "Was ist, wenn das Team nicht mitzieht?",
+    answer:
+      "Dann tragen Sie die Einführung nicht. Deshalb testet in unserem Vorgehen die Anmeldung selbst, bevor irgendetwas live geht, und die Freigabe hängt nicht allein an der Praxisleitung. Wer den Assistenten täglich neben sich hat, muss vorher gesagt haben, dass die Regeln stimmen.",
+  },
+  {
+    question: "Lässt sich die Einführung rückgängig machen?",
+    answer:
+      "Ja. Die Rufumleitung, über die Anrufe den Assistenten erreichen, lässt sich zurücknehmen – danach klingelt es wieder wie zuvor. Wie Sie den Vertrag beenden, steht auf der Produktseite; für die Einführung selbst ist entscheidend, dass der Rückweg vor dem Go-live festgelegt und nicht erst im Störungsfall gesucht wird.",
+  },
+];
+
+export function KiTelefonassistentEinfuehren() {
+  /**
+   * Article statt WebPage-only: Das ist ein Fachbeitrag mit benannter
+   * Verantwortung. `author` ist dieselbe Person wie im sichtbaren Kasten —
+   * eine Auszeichnung, die vom sichtbaren Text abweicht, wäre irreführend.
+   */
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "@id": `${CANONICAL}#article`,
+    headline: "Einen KI-Telefonassistenten in der Praxis einführen",
+    description:
+      "Vorgehen, Prüfkategorien und Freigabe bei der Einführung eines KI-Telefonassistenten in einer Praxis.",
+    datePublished: VEROEFFENTLICHT,
+    dateModified: AKTUALISIERT,
+    inLanguage: "de-DE",
+    author: {
+      "@type": "Person",
+      name: REDAKTION.name,
+      jobTitle: "Gründer",
+      worksFor: {
+        "@type": "Organization",
+        "@id": `${BUSINESS_INFO.website}/#organization`,
+        name: BUSINESS_INFO.name,
+      },
+    },
+    publisher: {
+      "@type": "Organization",
+      "@id": `${BUSINESS_INFO.website}/#organization`,
+      name: BUSINESS_INFO.name,
+    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": `${CANONICAL}#webpage` },
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-950">
+      <PageSEO
+        title="KI-Telefonassistent einführen – Praxisleitfaden | Cogniiq"
+        description="Wie eine Praxis einen KI-Telefonassistenten einführt: Anrufanlässe trennen, Übergabe vor der Unterschrift klären, vor dem Go-live prüfen, Freigabe im Team."
+        canonical={CANONICAL}
+        breadcrumbs={[
+          { name: "Startseite", url: BUSINESS_INFO.website },
+          { name: "KI Telefonassistent", url: canonicalFor("/ki-telefonassistent") },
+          { name: "Einführen", url: CANONICAL },
+        ]}
+        faqItems={FAQ}
+        additionalSchema={articleSchema}
+      />
+
+      <nav aria-label="Breadcrumb" className="max-w-3xl mx-auto px-6 lg:px-8 pt-10">
+        <ol className="flex flex-wrap gap-2 text-[15px] text-gray-500 dark:text-gray-500">
+          <li>
+            <Link to="/" className="underline underline-offset-4 hover:no-underline">
+              Startseite
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <Link
+              to="/ki-telefonassistent"
+              className="underline underline-offset-4 hover:no-underline"
+            >
+              KI Telefonassistent
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page" className="text-gray-700 dark:text-gray-300">
+            Einführen
+          </li>
+        </ol>
+      </nav>
+
+      {/* ── Einstieg: direkte Antwort oben ─────────────────────────────────── */}
+      <header className="max-w-3xl mx-auto px-6 lg:px-8 pt-10 pb-4">
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15]">
+          Einen KI-Telefonassistenten in der Praxis einführen
+        </h1>
+        <p className="text-[19px] text-gray-700 dark:text-gray-300 leading-[1.7] mt-8">
+          Die Einführung entscheidet sich nicht an der Technik. Sie entscheidet sich an vier
+          Fragen: Welche Anrufe kommen überhaupt in Frage, wo landet das Ergebnis eines
+          Gesprächs, was passiert, wenn es ernst wird – und wer in Ihrem Haus gibt frei.
+          Dieser Beitrag beschreibt das Vorgehen, mit dem wir diese Fragen abarbeiten, und
+          die Prüfungen, die vor einer Freigabe stehen.
+        </p>
+        <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7] mt-5">
+          Geschrieben für Praxen, die vor der Entscheidung stehen – auch als Maßstab, um
+          Angebote zu vergleichen. Was hier steht, gilt unabhängig davon, mit wem Sie
+          arbeiten.
+        </p>
+      </header>
+
+      {/* ── Warum Einführungen scheitern ───────────────────────────────────── */}
+      <section className="py-14" aria-labelledby="scheitern-heading">
+        <div className="max-w-3xl mx-auto px-6 lg:px-8">
+          <h2
+            id="scheitern-heading"
+            className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6"
+          >
+            Woran Einführungen in der Praxis scheitern
+          </h2>
+          <div className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] space-y-5">
+            <p>
+              Der häufigste Abbruch hat keinen technischen Grund. Der Assistent nimmt Anrufe
+              an, das Ergebnis steht sauber da – und Ihre MFA überträgt es anschließend von
+              Hand. Die Arbeit ist dann nicht verschwunden, sie ist umgezogen. Nach ein paar
+              Wochen fragt jemand, wozu das gut sein soll, und die Umleitung wird wieder
+              abgeschaltet.
+            </p>
+            <p>
+              Der zweite Grund ist die Trennlinie. Wo nicht vorher festgelegt wurde, welche
+              Anliegen immer zu einem Menschen gehören, entscheidet das im Zweifel ein
+              System – und das fällt genau bei den Anrufen auf, bei denen es nicht auffallen
+              darf.
+            </p>
+            <p>
+              Der dritte Grund steht in den Zahlen zur Betreuung: 52&nbsp;% nennen
+              unzureichenden Kundensupport als Grund, ihr System zu wechseln
+              <span className="text-gray-500 dark:text-gray-500">
+                {" "}
+                (Zi, PVS-Monitoring, 2026)
+              </span>
+              . Eine Einführung endet nicht am Go-live-Tag. Sie endet dort, wo niemand mehr
+              erreichbar ist, wenn sich eine Sprechzeit ändert.
+            </p>
+            <p>
+              Dass der Bedarf besteht, ist unstrittig: 39&nbsp;% bewerten die Erreichbarkeit
+              außerhalb der Öffnungszeiten als schwierig
+              <span className="text-gray-500 dark:text-gray-500">
+                {" "}
+                (GKV-Spitzenverband, Versichertenbefragung, 2025)
+              </span>
+              . Die Frage ist nicht, ob Entlastung nötig ist, sondern ob die Einführung so
+              angelegt wird, dass sie hält.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Die sieben Schritte ────────────────────────────────────────────── */}
+      <section className="py-14 bg-gray-50 dark:bg-gray-900/40" aria-labelledby="schritte-heading">
+        <div className="max-w-3xl mx-auto px-6 lg:px-8">
+          <h2
+            id="schritte-heading"
+            className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6"
+          >
+            Sieben Schritte, in dieser Reihenfolge
+          </h2>
+          <p className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] mb-8">
+            Die Reihenfolge ist nicht beliebig. Jeder Schritt beantwortet eine Frage, die im
+            nächsten vorausgesetzt wird – wer bei der Prüfung anfängt, prüft gegen Regeln,
+            die noch niemand festgelegt hat.
+          </p>
+          <ol className="space-y-4">
+            {SCHRITTE.map((s) => (
+              <li
+                key={s.nummer}
+                className="flex gap-5 rounded-xl bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 p-5"
+              >
+                <span
+                  aria-hidden="true"
+                  className="shrink-0 w-9 h-9 rounded-full bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 grid place-items-center text-[15px] font-semibold"
+                >
+                  {s.nummer}
+                </span>
+                <span>
+                  <span className="block text-[17px] font-semibold text-gray-900 dark:text-gray-100">
+                    {s.titel}
+                  </span>
+                  <span className="block text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7] mt-1">
+                    {s.frage}
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* ── Trennlinie ─────────────────────────────────────────────────────── */}
+      <section className="py-14" aria-labelledby="trennlinie-heading">
+        <div className="max-w-3xl mx-auto px-6 lg:px-8">
+          <h2
+            id="trennlinie-heading"
+            className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6"
+          >
+            Schritt 2: Die Trennlinie ziehen
+          </h2>
+          <div className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] space-y-5">
+            <p>
+              Diese Entscheidung gehört der Praxis, nicht dem Anbieter. Wir schlagen dafür
+              drei Prüffragen je Anrufanlass vor. Nur wenn alle drei mit Ja beantwortet
+              werden, kommt der Anlass überhaupt für eine Übernahme in Frage.
+            </p>
+            <ol className="space-y-3 list-decimal pl-6">
+              <li>
+                Ist das Anliegen <strong className="font-semibold">eindeutig benennbar</strong>,
+                ohne dass jemand die Lage beurteilen muss?
+              </li>
+              <li>
+                Kommt man mit <strong className="font-semibold">festen Angaben</strong> aus –
+                Name, Rückrufnummer, Terminwunsch – ohne freie Auskunft?
+              </li>
+              <li>
+                Ist ein Fehler an dieser Stelle{" "}
+                <strong className="font-semibold">folgenlos korrigierbar</strong>, solange er
+                am selben Tag auffällt?
+              </li>
+            </ol>
+            <p>
+              Anliegen, bei denen eine der drei Fragen mit Nein beantwortet wird, gehören
+              auf die Liste „immer an einen Menschen". Diese Liste ist der wichtigste
+              Bestandteil der Einrichtung – und der einzige, den niemand außerhalb Ihrer
+              Praxis für Sie ausfüllen kann.
+            </p>
+            <p>
+              Alles, was mit Beschwerden, Befunden, Medikation oder der Einschätzung von
+              Beschwerden zu tun hat, steht bei uns unabhängig davon fest auf dieser Liste.
+              Ein Assistent, der hier verhandelt, ist falsch eingestellt.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Übergabe ───────────────────────────────────────────────────────── */}
+      <section className="py-14 bg-gray-50 dark:bg-gray-900/40" aria-labelledby="uebergabe-heading">
+        <div className="max-w-3xl mx-auto px-6 lg:px-8">
+          <h2
+            id="uebergabe-heading"
+            className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6"
+          >
+            Schritt 3: Die Übergabe klären, bevor Sie unterschreiben
+          </h2>
+          <div className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] space-y-5">
+            <p>
+              Das ist die Frage, an der sich entscheidet, ob die Einführung Arbeit abnimmt
+              oder nur verschiebt. Sie gehört vor die Unterschrift, nicht in die
+              Einrichtungsphase.
+            </p>
+            <p>{FAKTEN.keineAnbindung}</p>
+            <p>
+              Was Sie unabhängig vom Anbieter fragen sollten – und worauf Sie eine Antwort
+              vor der Unterschrift verlangen können:
+            </p>
+            <ul className="space-y-3 list-disc pl-6">
+              <li>Gibt es für unser System überhaupt eine geeignete Schnittstelle?</li>
+              <li>Bekommen Sie dafür Zugang, und wer erteilt die Freigabe dazu?</li>
+              <li>Welche Vorgänge lässt die Schnittstelle zu – lesen, eintragen, ändern?</li>
+              <li>Verlangt jemand dafür Gebühren, und wer trägt sie?</li>
+              <li>Und wenn nichts davon trägt: Wie sieht der Weg dann konkret aus?</li>
+            </ul>
+            <p>
+              Eine Antwort, die diese Fragen auf „das schauen wir uns später an" verschiebt,
+              ist die Antwort, aus der später Handarbeit wird.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Diagramm: der Weg eines Anrufs ─────────────────────────────────── */}
+      <section className="py-14" aria-labelledby="weg-heading">
+        <div className="max-w-3xl mx-auto px-6 lg:px-8">
+          <h2
+            id="weg-heading"
+            className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6"
+          >
+            Der Weg eines Anrufs
+          </h2>
+          <p className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] mb-8">
+            Vier Stationen, und an zwei Stellen ein Ausstieg zum Menschen. Wer die beiden
+            Ausstiege nicht festlegt, hat die Einführung nicht zu Ende gedacht.
+          </p>
+
+          {/*
+            Diagramm als Liste, nicht als Bild: So ist es vorgerendert lesbar,
+            skaliert auf schmalen Geräten, funktioniert ohne JavaScript und
+            bleibt für Screenreader eine geordnete Abfolge. Die Pfeile sind
+            dekorativ und werden ausgeblendet.
+          */}
+          <ol className="space-y-0">
+            {[
+              {
+                titel: "Anruf",
+                text: "Jemand ruft Ihre gewohnte Nummer an. Für die anrufende Person ändert sich nichts.",
+              },
+              {
+                titel: "Umleitung",
+                text: FAKTEN.rufumleitung,
+              },
+              {
+                titel: "Gespräch",
+                text: "Der Assistent gibt sich als KI-System zu erkennen, nimmt das Anliegen auf und folgt Ihren Regeln. Ausstieg 1: Notfallanzeichen oder der Wunsch nach einem Menschen führen sofort zur Weiterleitung.",
+              },
+              {
+                titel: "Ergebnis",
+                text: "Anliegen, Name, Rückrufnummer und Terminwunsch stehen strukturiert bereit. Ausstieg 2: Was der Assistent nicht zuordnen kann, geht als offener Fall an Ihr Team statt geraten zu werden.",
+              },
+            ].map((station, index, alle) => (
+              <li key={station.titel}>
+                <div className="rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+                  <p className="text-[15px] uppercase tracking-wide text-gray-500 dark:text-gray-500">
+                    Station {index + 1}
+                  </p>
+                  <p className="text-[17px] font-semibold text-gray-900 dark:text-gray-100 mt-1">
+                    {station.titel}
+                  </p>
+                  <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7] mt-2">
+                    {station.text}
+                  </p>
+                </div>
+                {index < alle.length - 1 && (
+                  <div aria-hidden="true" className="grid place-items-center py-2 text-gray-400">
+                    ↓
+                  </div>
+                )}
+              </li>
+            ))}
+          </ol>
+
+          <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7] mt-8">
+            {FAKTEN.keineAufzeichnung}
+          </p>
+        </div>
+      </section>
+
+      {/* ── Prüfkategorien ─────────────────────────────────────────────────── */}
+      <section className="py-14 bg-gray-50 dark:bg-gray-900/40" aria-labelledby="pruefen-heading">
+        <div className="max-w-3xl mx-auto px-6 lg:px-8">
+          <h2
+            id="pruefen-heading"
+            className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6"
+          >
+            Schritt 5: Was vor dem Go-live geprüft gehört
+          </h2>
+          <div className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] space-y-5 mb-10">
+            <p>
+              Vor jeder Freigabe prüfen wir in vier Gruppen. Wir beschreiben sie hier, weil
+              eine Praxis denselben Maßstab an jedes Angebot anlegen kann – und weil ein
+              Anbieter, der zu einer dieser Gruppen nichts sagen kann, sie vermutlich nicht
+              prüft.
+            </p>
+            <p>
+              Entscheidend ist dabei nicht die Zahl der Prüfungen, sondern dass die
+              schwierigen Fälle darin vorkommen. Ein Ablauf, der nur mit gelungenen
+              Gesprächen getestet wurde, ist nicht geprüft.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            {PRUEFGRUPPEN.map((gruppe) => (
+              <div
+                key={gruppe.titel}
+                className="rounded-xl bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 p-6"
+              >
+                <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100">
+                  {gruppe.titel}
+                </h3>
+                <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7] mt-2">
+                  {gruppe.text}
+                </p>
+                <ul className="mt-4 space-y-2">
+                  {gruppe.beispiele.map((beispiel) => (
+                    <li
+                      key={beispiel}
+                      className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] pl-5 relative"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="absolute left-0 top-[0.7em] w-2 h-px bg-gray-400"
+                      />
+                      {beispiel}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Freigabe ───────────────────────────────────────────────────────── */}
+      <section className="py-14" aria-labelledby="freigabe-heading">
+        <div className="max-w-3xl mx-auto px-6 lg:px-8">
+          <h2
+            id="freigabe-heading"
+            className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6"
+          >
+            Schritt 6: Wer freigibt – und was freigegeben wird
+          </h2>
+          <div className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] space-y-5">
+            <p>
+              Eine Freigabe „durch die Praxis" ist keine Freigabe. In unserem Vorgehen
+              testet zuerst die Anmeldung – die Menschen, die den Assistenten täglich neben
+              sich haben –, danach die Leitung. Wer das umdreht, erfährt die Einwände erst
+              im laufenden Betrieb.
+            </p>
+            <p>Freigegeben wird nicht „das System", sondern einzeln:</p>
+            <ul className="space-y-2 list-disc pl-6">
+              <li>die hinterlegten Informationen über Ihre Praxis,</li>
+              <li>die Terminlogik,</li>
+              <li>wie am Telefon die Identität geprüft wird,</li>
+              <li>die Weiterleitungsregeln,</li>
+              <li>die Notfallregeln,</li>
+              <li>Stimme und Tonfall,</li>
+              <li>der Hinweis, dass ein KI-System spricht.</li>
+            </ul>
+            <p>
+              Erst wenn diese Punkte einzeln bestätigt sind, wird umgeschaltet. Und bevor
+              umgeschaltet wird, steht fest, wie innerhalb von Minuten wieder auf den
+              bisherigen Ablauf zurückgeschaltet wird. Ein Rückweg, der im Störungsfall erst
+              gesucht wird, ist keiner.
+            </p>
+            <p className="rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+              {FAKTEN.freigabeNachUebergabe} {FAKTEN.pruefzeitNeutral}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Erste Woche ────────────────────────────────────────────────────── */}
+      <section className="py-14 bg-gray-50 dark:bg-gray-900/40" aria-labelledby="woche-heading">
+        <div className="max-w-3xl mx-auto px-6 lg:px-8">
+          <h2
+            id="woche-heading"
+            className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6"
+          >
+            Schritt 7: Die erste Woche
+          </h2>
+          <p className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] mb-6">
+            In der ersten Woche entscheidet sich, ob nachgeschärft wird oder ob sich
+            Ärgernisse festsetzen. Beobachtet wird nicht nach Gefühl, sondern an festen
+            Punkten:
+          </p>
+          <ul className="space-y-3">
+            {ERSTE_WOCHE.map((punkt) => (
+              <li
+                key={punkt}
+                className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] pl-5 relative"
+              >
+                <span
+                  aria-hidden="true"
+                  className="absolute left-0 top-[0.7em] w-2 h-px bg-gray-400"
+                />
+                {punkt}
+              </li>
+            ))}
+          </ul>
+          <p className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] mt-6">
+            {FAKTEN.aenderungen}
+          </p>
+        </div>
+      </section>
+
+      {/* ── Grenzen ────────────────────────────────────────────────────────── */}
+      <section className="py-14" aria-labelledby="grenzen-heading">
+        <div className="max-w-3xl mx-auto px-6 lg:px-8">
+          <h2
+            id="grenzen-heading"
+            className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6"
+          >
+            Wann Sie die Einführung besser lassen
+          </h2>
+          <div className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] space-y-5">
+            <p>
+              Nicht jede Praxis gewinnt dabei etwas. Drei Fälle, in denen wir selbst abraten:
+            </p>
+            <ul className="space-y-3 list-disc pl-6">
+              <li>
+                Ihre Anrufe bestehen überwiegend aus Anliegen, die eine Beurteilung
+                verlangen. Dann bleibt nach der Trennlinie zu wenig übrig, als dass sich der
+                Aufwand lohnt.
+              </li>
+              <li>
+                Niemand in Ihrem Haus kann die Regeln verantworten und pflegen. Ein
+                Assistent ohne Zuständigen veraltet innerhalb weniger Monate.
+              </li>
+              <li>
+                Sie erwarten, dass die Anmeldung dadurch entbehrlich wird. Das ist nicht der
+                Zweck und wäre eine Zusage, die wir nicht geben.
+              </li>
+            </ul>
+            <p>
+              Zur Erwartungshaltung noch ein Wort: Wir nennen bewusst keinen Anteil von
+              Anrufen, den ein Assistent übernimmt. Diese Zahl hängt vollständig an Ihrer
+              Trennlinie aus Schritt&nbsp;2 – jede allgemeine Angabe dazu wäre geraten.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ────────────────────────────────────────────────────────────── */}
+      <section className="py-14 bg-gray-50 dark:bg-gray-900/40" aria-labelledby="faq-heading">
+        <div className="max-w-3xl mx-auto px-6 lg:px-8">
+          <h2
+            id="faq-heading"
+            className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-8"
+          >
+            Häufige Fragen zur Einführung
+          </h2>
+          <dl className="space-y-8">
+            {FAQ.map((item) => (
+              <div key={item.question}>
+                <dt className="text-[19px] font-semibold text-gray-900 dark:text-gray-100">
+                  {item.question}
+                </dt>
+                <dd className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7] mt-2">
+                  {item.answer}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      <RedaktionelleVerantwortung
+        veroeffentlicht={VEROEFFENTLICHT}
+        aktualisiert={AKTUALISIERT}
+        grundlage="Grundlage ist der Einführungsprozess, den wir bei Cogniiq tatsächlich betreiben: dieselben Schritte, dieselben Prüfgruppen und dieselbe Freigabe, die jedem Go-live vorausgehen. Beschrieben ist das Vorgehen, nicht die eingesetzte Technik."
+      />
+
+      {/* ── Weiterlesen + ein Abschluss ────────────────────────────────────── */}
+      <section className="py-14" aria-labelledby="weiter-heading">
+        <div className="max-w-3xl mx-auto px-6 lg:px-8">
+          <h2
+            id="weiter-heading"
+            className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-6"
+          >
+            Weiterlesen
+          </h2>
+          <ul className="space-y-4 text-[17px] leading-[1.7]">
+            <li>
+              <Link
+                to="/ki-telefonassistent"
+                className="underline underline-offset-4 hover:no-underline font-semibold text-gray-900 dark:text-gray-100"
+              >
+                KI-Telefonassistent: Aufbau, Grenzen und Preislogik
+              </Link>
+              <span className="block text-gray-600 dark:text-gray-400">
+                Was der Empfang leistet, wo er aussteigt und wie er abgerechnet wird.
+              </span>
+            </li>
+            <li>
+              <Link
+                to="/praxen"
+                className="underline underline-offset-4 hover:no-underline font-semibold text-gray-900 dark:text-gray-100"
+              >
+                Der KI-Empfang für Arzt- und Zahnarztpraxen
+              </Link>
+              <span className="block text-gray-600 dark:text-gray-400">
+                Dieselbe Sache aus Sicht einer Praxis, mit den Anliegen Ihres Alltags.
+              </span>
+            </li>
+            <li>
+              <Link
+                to="/ki-telefonassistent/demo"
+                className="underline underline-offset-4 hover:no-underline font-semibold text-gray-900 dark:text-gray-100"
+              >
+                Den Assistenten im Gespräch erleben
+              </Link>
+              <span className="block text-gray-600 dark:text-gray-400">
+                Ein Termin, in dem wir an Ihren eigenen Anrufanlässen durchgehen, was trägt.
+              </span>
+            </li>
+          </ul>
+
+          <div className="mt-12 rounded-2xl border border-gray-200 dark:border-gray-800 p-8">
+            <p className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7]">
+              Wenn Sie Schritt&nbsp;1 und 2 für Ihre Praxis durchgehen möchten: Wir nehmen
+              Ihre Anrufanlässe auf und sagen Ihnen, was davon trägt und was nicht – auch
+              dann, wenn die Antwort gegen eine Einführung spricht.
+            </p>
+            <Link
+              to="/kontakt"
+              className="inline-block mt-6 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-6 py-3 text-[17px] font-semibold min-h-[44px]"
+            >
+              Anrufanlässe gemeinsam durchgehen
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

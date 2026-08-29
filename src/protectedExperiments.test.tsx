@@ -67,7 +67,10 @@ const baseline: Baseline =
     ? (JSON.parse(readFileSync(FIXTURE, 'utf8')) as Baseline)
     : EMPTY_BASELINE;
 
-const recorded: Baseline = { fingerprints: {}, inboundOccurrences: {} };
+// Mutable counterpart of Baseline: the recording pass fills this in as the
+// suite renders, so its fields cannot carry Baseline's `readonly`.
+const recorded: { fingerprints: Record<string, unknown>; inboundOccurrences: Record<string, number> } =
+  { fingerprints: {}, inboundOccurrences: {} };
 
 function parseHtml(html: string): Document {
   return new DOMParser().parseFromString(html, 'text/html');
