@@ -10,6 +10,7 @@ import type {
   OwnerOffer, OwnerOfferLine, OwnerDocumentSettings, OwnerGeneratedDocument,
   OwnerFinanceNotification, OwnerOfferAcceptanceEvent, OwnerInvoice, OwnerInvoiceLine,
   OwnerOfferVersion,
+  OwnerInvoiceVersion,
 } from '@/lib/ownerFinance/types';
 
 /* ----------------------------------------------------------------- Document settings */
@@ -337,6 +338,18 @@ export async function loadOfferAutomationJobs(offerId: string): Promise<import('
 }
 
 /* ----------------------------------------------------------------- Invoice detail */
+
+/**
+ * Load the immutable issuance snapshot for an invoice, if one exists (mirrors
+ * loadLatestOfferVersion). Issued invoices from before this snapshot mechanism existed have
+ * no row here — callers must render those from live data with a legacy-reconstruction warning,
+ * never silently claim the reconstruction is the historical original.
+ */
+export async function loadLatestInvoiceVersion(invoiceId: string): Promise<OwnerInvoiceVersion | null> {
+  const { data, error } = await supabase.from('owner_invoice_versions').select('*').eq('invoice_id', invoiceId).order('version', { ascending: false }).limit(1).maybeSingle();
+  if (error) throw error;
+  return (data as OwnerInvoiceVersion | null) ?? null;
+}
 
 export async function loadInvoiceDetail(invoiceId: string): Promise<{
   invoice: OwnerInvoice; lines: OwnerInvoiceLine[]; payments: Array<Record<string, unknown>>;

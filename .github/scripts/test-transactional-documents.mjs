@@ -203,5 +203,42 @@ ok(snapDoc.footer === 'Fuß' && snapDoc.closing === 'Gruß', 'snapshot doc: foot
 const psnap = premium.buildPremiumSource(snapDoc);
 eq(psnap.seller.legalName, 'Frozen Seller GmbH', 'snapshot premium source stable seller');
 
+/* ---- invoiceSnapshotToDocument: issued invoices render from the frozen snapshot (Phase 1A) ---- */
+const invSnapshot = {
+  schema_version: 1,
+  invoice: { issue_date: '2026-05-01', due_date: '2026-05-15', service_date: '2026-05-01', currency: 'EUR' },
+  lines: [{ description: 'Beratung', quantity_milli: 1000, unit_price_cents: 100000, vat_rate_bp: 1900, vat_treatment: 'standard', net_cents: 100000, vat_cents: 19000, gross_cents: 119000 }],
+  seller: { legal_name: 'Frozen Seller GmbH', street: 'Alt 1', postal_code: '10115', city: 'Berlin', vat_id: 'DE1', iban: 'DE89370400440532013000', bic: 'COBADEFFXXX', bank_name: 'Commerzbank', bank_account_holder: 'Frozen Seller GmbH' },
+  recipient: { company: 'Frozen Kunde', contact_name: 'Herr X', address_lines: ['Weg 2', '80331 München'], email: 'kunde@example.test' },
+  document_settings: { document_language: 'de', default_invoice_footer: 'Rechnungsfuß', invoice_number_prefix: 'RE' },
+  totals: { net_cents: 100000, vat_cents: 19000, gross_cents: 119000 },
+  invoice_number: 'RE-2026-0001', version: 1,
+};
+const invSnapDoc = buildDoc.invoiceSnapshotToDocument(invSnapshot);
+eq(invSnapDoc.kind, 'invoice', 'invoice snapshot doc: kind is invoice');
+eq(invSnapDoc.seller.name, 'Frozen Seller GmbH', 'invoice snapshot doc: seller from snapshot');
+eq(invSnapDoc.recipient.name, 'Frozen Kunde', 'invoice snapshot doc: recipient from snapshot');
+eq(invSnapDoc.documentNumber, 'RE-2026-0001', 'invoice snapshot doc: number from snapshot');
+eq(invSnapDoc.grossTotalCents, 119000, 'invoice snapshot doc: totals from snapshot');
+ok(invSnapDoc.bank?.iban === 'DE89370400440532013000', 'invoice snapshot doc: bank details from frozen seller snapshot');
+eq(invSnapDoc.isDraft, false, 'invoice snapshot doc: not a draft');
+// A later "live" change to seller/recipient must never affect a doc built from a frozen snapshot —
+// invoiceSnapshotToDocument takes no settings/CRM argument at all, so there is nothing live to leak in.
+eq(buildDoc.invoiceSnapshotToDocument(invSnapshot).seller.name, 'Frozen Seller GmbH', 'invoice snapshot doc: stable across repeated calls');
+
+/* ---- Disclaimer removal (Phase 1A): the old accuracy disclaimer must be ABSENT from every
+   invoice render path, while it is untouched for offers. ---- */
+const OLD_DISCLAIMER = 'Erstellt mit Cogniiq. Keine Zusicherung rechtlicher oder steuerlicher Vollständigkeit';
+const invoiceModel = txpdf.buildTransactionalReportModel(invComplete);
+const invoiceModelText = JSON.stringify(invoiceModel);
+ok(!invoiceModelText.includes(OLD_DISCLAIMER), 'invoice report model does not contain the removed disclaimer text');
+const invoicePdfBytes = pdf.renderReportPdf(invoiceModel);
+const invoicePdfStr = Buffer.from(invoicePdfBytes).toString('latin1');
+ok(!invoicePdfStr.includes(OLD_DISCLAIMER), 'rendered invoice PDF bytes do not contain the removed disclaimer text');
+// Offers are unaffected — this renderer has no live production caller for offers today, but its
+// existing behaviour must not silently change for any future/test caller of the offer path.
+const offerModel = txpdf.buildTransactionalReportModel(baseOffer);
+ok(JSON.stringify(offerModel).includes(OLD_DISCLAIMER), 'offer report model still carries its unchanged legacy disclaimer');
+
 if (failures > 0) { console.error(`\ntransactional document tests: ${failures} FAILED`); process.exit(1); }
 console.log('transactional document tests: ALL PASSED');
