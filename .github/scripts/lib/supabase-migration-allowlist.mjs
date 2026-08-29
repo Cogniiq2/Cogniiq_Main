@@ -166,6 +166,20 @@ export const ALLOWED_MIGRATIONS = [
     ],
     description: 'Finance — issued-invoice integrity guard + one canonical offer conversion (PR-0A)',
   },
+  {
+    file: '20260901120000_owner_invoice_preflight_array_fix.sql',
+    version: '20260901120000',
+    // A create-or-replace of ONE function and nothing else. Its only real dependency is the
+    // migration that created that function:
+    //  - 20260723120000: public.owner_document_settings, every seller column it reads
+    //  - 20260723121000: public.owner_offers, every recipient column it reads
+    //  - 20260723125000: the original owner_invoice_preflight() this migration replaces
+    // It does NOT depend on 20260831120000: the two touch different functions, and the
+    // preflight's callers read it the same way before and after. Listing a version this SQL
+    // does not reference would make the gate assert something untrue.
+    requires: ['20260723120000', '20260723121000', '20260723125000'],
+    description: 'Finance — repair owner_invoice_preflight missing-field reporting (malformed array literal)',
+  },
 ];
 
 /**
