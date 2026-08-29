@@ -58,13 +58,13 @@
 --
 -- WHAT THIS DOES
 --
---   * Revokes the client UPDATE and INSERT grants on owner_invoices outright,
---     leaving `authenticated` with SELECT only, and revokes the unused DELETE
---     grant from service_role. Every write the application performs already goes
---     through a SECURITY DEFINER RPC (create_owner_invoice, issue_owner_invoice,
---     owner_cancel_invoice, owner_link_invoice_customer,
+--   * Removes ALL direct DML on owner_invoices from every role: anon none,
+--     authenticated SELECT, service_role SELECT. Every write the application
+--     performs already goes through a SECURITY DEFINER RPC (create_owner_invoice,
+--     issue_owner_invoice, owner_cancel_invoice, owner_link_invoice_customer,
 --     assign_invoice_organization, record_owner_invoice_payment,
---     delete_owner_draft_invoice, ...).
+--     delete_owner_draft_invoice, ...), which runs as its owner and therefore
+--     needs no grant.
 --   * Rewrites owner_guard_invoice() so that AFTER ISSUANCE the permitted
 --     mutations are decided by FIELD DELTA and VALID STATE TRANSITION, not by
 --     the caller's privilege. There is no "privileged => allow everything"
@@ -107,35 +107,51 @@ begin;
 -- ---------------------------------------------------------------------------
 -- 1. Remove the client write capability on owner_invoices.
 --
---    A column-level REVOKE cannot subtract from a grant, so the whole UPDATE
---    grant goes and nothing is re-granted. INSERT goes with it: every creation
---    path in the repository is a SECURITY DEFINER RPC (create_owner_invoice,
---    record_owner_historical_paid_invoice, owner_build_issued_invoice,
---    owner_convert_offer_to_invoice_core), and a repository-wide sweep — src/,
---    supabase/functions/, the automation worker, the QA scripts — found no raw
---    INSERT against this table. `authenticated` is left with SELECT only; every
---    mutation is an RPC.
+--    NO ROLE GETS DIRECT DML ON THIS TABLE. Not `authenticated`, not
+--    `service_role`. After this migration the direct permissions are:
 --
---    DELETE is revoked from service_role for the same reason: nothing calls it
---    (delete_owner_draft_invoice is SECURITY DEFINER and therefore runs as its
---    owner, not as service_role), and it is the one destructive direct grant on
---    the table. service_role keeps INSERT/UPDATE — unused for this table today,
---    and now subject to exactly the same guard as everyone else.
+--        anon           none
+--        authenticated  SELECT
+--        service_role   SELECT
+--
+--    A column-level REVOKE cannot subtract from a grant, so the whole UPDATE
+--    grant goes and nothing is re-granted. INSERT goes with it, and both go for
+--    service_role as well, because the INSERT branch of the guard below
+--    deliberately lets a privileged caller insert ANY shape — which it must, for
+--    migrations, backfills, the staging fixture seed and the issuance RPCs that
+--    insert a draft and then issue it. Leaving raw INSERT with the service key
+--    would therefore have left a way to manufacture a finished, "paid" invoice
+--    directly, with no number allocation from the counter and no
+--    owner_invoice_versions snapshot — the one thing this PR exists to prevent.
+--
+--    Every creation and mutation path in the repository is a SECURITY DEFINER
+--    function (create_owner_invoice, record_owner_historical_paid_invoice,
+--    owner_build_issued_invoice, owner_convert_offer_to_invoice_core,
+--    issue_owner_invoice, owner_issue_invoice_internal, owner_cancel_invoice,
+--    owner_link_invoice_customer, assign_invoice_organization,
+--    delete_owner_draft_invoice, and the owner_apply_payment /
+--    owner_recalc_invoice_totals triggers). A SECURITY DEFINER function runs as
+--    its OWNER, so none of them consults these grants and none of them breaks.
+--    A repository-wide sweep — src/, supabase/functions/, the automation
+--    worker, the QA scripts, scripts/staging/, supabase/tests/ — found no raw
+--    INSERT, UPDATE or DELETE against this table by any client or service-key
+--    caller. The staging fixture seed runs as the database owner via psql, not
+--    as service_role, and is unaffected.
 --
 --    owner_invoice_lines keeps its column grant: the hardened
 --    owner_guard_invoice_line() below refuses every line write once the parent
 --    invoice leaves draft, for all callers.
 -- ---------------------------------------------------------------------------
-revoke update on table public.owner_invoices from authenticated;
-revoke insert on table public.owner_invoices from authenticated;
-revoke delete on table public.owner_invoices from service_role;
+revoke insert, update, delete on table public.owner_invoices from authenticated;
+revoke insert, update, delete on table public.owner_invoices from service_role;
 
 comment on table public.owner_invoices is
-  'Owner invoices. Client sessions have SELECT only: every mutation goes through a SECURITY '
-  'DEFINER RPC (create_owner_invoice, issue_owner_invoice, owner_cancel_invoice, '
-  'owner_link_invoice_customer, assign_invoice_organization, record_owner_invoice_payment, '
-  'delete_owner_draft_invoice). owner_guard_invoice() then enforces post-issuance immutability '
-  'by FIELD DELTA for every caller, privileged ones included.';
+  'Owner invoices. NO role holds direct DML: anon none, authenticated SELECT, service_role '
+  'SELECT. Every mutation goes through a SECURITY DEFINER RPC (create_owner_invoice, '
+  'issue_owner_invoice, owner_cancel_invoice, owner_link_invoice_customer, '
+  'assign_invoice_organization, record_owner_invoice_payment, delete_owner_draft_invoice). '
+  'owner_guard_invoice() then enforces post-issuance immutability by FIELD DELTA for every '
+  'caller, privileged ones included.';
 
 commit;
 
@@ -242,7 +258,13 @@ declare
   v_paid bigint;
   v_expected_status text;
 begin
-  v_privileged := public.is_database_admin() or public.request_is_service_role();
+  -- "Privileged" means a genuine database-owner context, which is exactly what a
+  -- SECURITY DEFINER function gives its body — nothing else. request_is_service_role()
+  -- is deliberately NOT part of this: a service-role JWT is a request header, and
+  -- treating it as privileged would mean the service key could insert a finished,
+  -- numbered, "paid" invoice directly if the revoked grant above were ever restored.
+  -- It reaches every legitimate operation through the same RPCs everyone else uses.
+  v_privileged := public.is_database_admin();
 
   if tg_op = 'DELETE' then
     if old.status <> 'draft' or old.issued_at is not null then

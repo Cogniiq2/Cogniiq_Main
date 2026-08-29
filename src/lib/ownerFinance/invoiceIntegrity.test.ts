@@ -68,12 +68,20 @@ describe('no client-side write path to owner_invoices survives', () => {
 });
 
 describe('the guard migration keeps its load-bearing shape', () => {
-  it('leaves authenticated with SELECT only and takes the destructive grant off service_role', () => {
-    expect(executable).toMatch(/revoke update on table public\.owner_invoices from authenticated;/);
-    expect(executable).toMatch(/revoke insert on table public\.owner_invoices from authenticated;/);
-    expect(executable).toMatch(/revoke delete on table public\.owner_invoices from service_role;/);
+  it('leaves every role with SELECT only on owner_invoices', () => {
+    for (const role of ['authenticated', 'service_role']) {
+      expect(executable).toMatch(
+        new RegExp(String.raw`revoke insert, update, delete on table public\.owner_invoices from ${role};`));
+    }
     // Nothing is handed back.
     expect(executable).not.toMatch(/grant (update|insert|delete)[\s\S]*?on table public\.owner_invoices/);
+  });
+
+  it('does not treat a service-role JWT as privileged', () => {
+    const guard = executable.slice(executable.indexOf('function public.owner_guard_invoice()'));
+    const body = guard.slice(0, guard.indexOf('$guard$;'));
+    expect(body).toContain('v_privileged := public.is_database_admin();');
+    expect(body).not.toContain('request_is_service_role');
   });
 
   it('covers INSERT as well as UPDATE and DELETE', () => {

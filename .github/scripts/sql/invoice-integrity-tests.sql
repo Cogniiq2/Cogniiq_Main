@@ -270,13 +270,171 @@ begin
   perform pg_temp.want(v_err = '42501', 'authenticated cannot INSERT into owner_invoices at all');
 end $$;
 
+-- The full direct-permission matrix: nobody may write this table directly.
 do $$
-declare v_count int;
+declare v_role text; v_extra text;
 begin
-  select count(*) into v_count from information_schema.table_privileges
-    where table_schema = 'public' and table_name = 'owner_invoices' and grantee = 'authenticated'
-      and privilege_type <> 'SELECT';
-  perform pg_temp.want(v_count = 0, 'authenticated holds SELECT and nothing else on owner_invoices');
+  foreach v_role in array array['anon', 'authenticated', 'service_role'] loop
+    select string_agg(privilege_type, ', ' order by privilege_type) into v_extra
+    from information_schema.table_privileges
+    where table_schema = 'public' and table_name = 'owner_invoices'
+      and grantee = v_role and privilege_type <> 'SELECT';
+    perform pg_temp.want(v_extra is null,
+      format('%s holds no direct DML on owner_invoices (found: %s)', v_role, coalesce(v_extra, 'none')));
+  end loop;
+
+  perform pg_temp.want(
+    not has_table_privilege('anon', 'public.owner_invoices', 'SELECT'),
+    'anon cannot even read owner_invoices');
+  perform pg_temp.want(
+    has_table_privilege('authenticated', 'public.owner_invoices', 'SELECT')
+    and has_table_privilege('service_role', 'public.owner_invoices', 'SELECT'),
+    'authenticated and service_role keep SELECT');
+end $$;
+
+-- service_role — the key an edge function or worker holds — cannot write the table
+-- by ANY verb. This is what stops the service key manufacturing a finished, numbered,
+-- "paid" invoice without the counter and without an owner_invoice_versions snapshot.
+do $$
+declare v_err text; v_op text;
+begin
+  perform set_config('request.jwt.claim.role', 'service_role', false);
+  set local role service_role;
+
+  begin
+    insert into public.owner_invoices (business_entity_id, organization_id, status, invoice_number,
+      issue_date, due_date, net_total_cents, vat_total_cents, gross_total_cents, amount_paid_cents)
+    values (current_setting('t.entity')::uuid, '44444444-4444-4444-4444-444444444444', 'paid',
+            'RE-SERVICE-FORGED', current_date, current_date, 100000, 19000, 119000, 119000);
+    v_err := null;
+  exception when others then v_err := sqlstate;
+  end;
+  if v_err is distinct from '42501' then
+    reset role; perform set_config('request.jwt.claim.role', 'authenticated', false);
+    perform pg_temp.fail(format('service_role INSERT was not refused with 42501 (got %s)', coalesce(v_err, 'success')));
+  end if;
+
+  v_err := null;
+  begin
+    update public.owner_invoices set issue_date = date '2020-01-01' where id = current_setting('t.issued')::uuid;
+    v_err := null;
+  exception when others then v_err := sqlstate;
+  end;
+  if v_err is distinct from '42501' then
+    reset role; perform set_config('request.jwt.claim.role', 'authenticated', false);
+    perform pg_temp.fail(format('service_role UPDATE was not refused with 42501 (got %s)', coalesce(v_err, 'success')));
+  end if;
+
+  v_err := null;
+  begin
+    delete from public.owner_invoices where id = current_setting('t.issued')::uuid;
+    v_err := null;
+  exception when others then v_err := sqlstate;
+  end;
+  if v_err is distinct from '42501' then
+    reset role; perform set_config('request.jwt.claim.role', 'authenticated', false);
+    perform pg_temp.fail(format('service_role DELETE was not refused with 42501 (got %s)', coalesce(v_err, 'success')));
+  end if;
+
+  reset role;
+  perform set_config('request.jwt.claim.role', 'authenticated', false);
+  perform pg_temp.want(true, 'service_role cannot raw INSERT, UPDATE or DELETE owner_invoices');
+  perform pg_temp.want(not exists (select 1 from public.owner_invoices where invoice_number = 'RE-SERVICE-FORGED'),
+    'no forged service-role invoice reached the table');
+end $$;
+
+-- ...and defence in depth: even if a later migration handed the grant back, a
+-- service-role JWT is not "privileged" to the guard, so the forged row is still refused.
+grant insert, update on table public.owner_invoices to service_role;
+
+do $$
+declare v_msg text;
+begin
+  perform set_config('request.jwt.claim.role', 'service_role', false);
+  set local role service_role;
+  begin
+    insert into public.owner_invoices (business_entity_id, organization_id, status, invoice_number, issue_date, due_date)
+    values (current_setting('t.entity')::uuid, '44444444-4444-4444-4444-444444444444', 'paid',
+            'RE-SERVICE-FORGED-2', current_date, current_date);
+    v_msg := null;
+  exception when others then v_msg := sqlerrm;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.role', 'authenticated', false);
+  perform pg_temp.want(v_msg like '%can only be created as drafts%',
+    format('a service-role JWT is not privileged to the guard either (got: %s)', coalesce(v_msg, '<allowed!>')));
+end $$;
+
+do $$
+declare v_msg text;
+begin
+  perform set_config('request.jwt.claim.role', 'service_role', false);
+  set local role service_role;
+  begin
+    update public.owner_invoices set issue_date = date '2020-01-01' where id = current_setting('t.issued')::uuid;
+    v_msg := null;
+  exception when others then v_msg := sqlerrm;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.role', 'authenticated', false);
+  perform pg_temp.want(v_msg like '%cannot be modified directly%',
+    format('a service-role UPDATE is refused by the guard as well (got: %s)', coalesce(v_msg, '<allowed!>')));
+end $$;
+
+revoke insert, update on table public.owner_invoices from service_role;
+
+-- The approved RPCs still work for the roles that must call them: the owner through
+-- PostgREST (SECURITY DEFINER, so no table grant is consulted)...
+do $$
+declare v_inv jsonb; v_id uuid; r jsonb;
+begin
+  set local role authenticated;
+  v_inv := public.create_owner_invoice(gen_random_uuid(), pg_temp.header(), pg_temp.body());
+  v_id := (v_inv->>'invoice_id')::uuid;
+  r := public.issue_owner_invoice(gen_random_uuid(), v_id);
+  reset role;
+  perform pg_temp.want(r->>'status' = 'issued',
+    'an authenticated owner still creates AND issues an invoice through the RPCs with no table grant');
+  perform pg_temp.want(exists (select 1 from public.owner_invoice_versions where invoice_id = v_id),
+    'and that RPC-issued invoice still captured its immutable snapshot');
+  perform set_config('t.rpc_issued', v_id::text, false);
+end $$;
+
+-- ...and the worker as service_role through its own service-role-gated RPC.
+do $$
+declare v_inv jsonb; v_id uuid; r jsonb;
+begin
+  v_inv := public.create_owner_invoice(gen_random_uuid(), pg_temp.header(), pg_temp.body());
+  v_id := (v_inv->>'invoice_id')::uuid;
+
+  perform set_config('request.jwt.claim.role', 'service_role', false);
+  set local role service_role;
+  r := public.owner_issue_invoice_internal(v_id);
+  reset role;
+  perform set_config('request.jwt.claim.role', 'authenticated', false);
+
+  perform pg_temp.want(r->>'status' = 'issued',
+    'service_role still issues through owner_issue_invoice_internal with no table grant at all');
+  perform pg_temp.want(exists (select 1 from public.owner_invoice_versions where invoice_id = v_id),
+    'and that worker-issued invoice still captured its immutable snapshot');
+end $$;
+
+-- A cancellation and a payment through the RPCs, with the caller holding SELECT only.
+do $$
+declare inv record; c jsonb;
+begin
+  set local role authenticated;
+  perform public.record_owner_invoice_payment(gen_random_uuid(), current_setting('t.rpc_issued')::uuid, 119000, current_date);
+  reset role;
+  select * into inv from public.owner_invoices where id = current_setting('t.rpc_issued')::uuid;
+  perform pg_temp.want(inv.status = 'paid' and inv.amount_paid_cents = 119000,
+    'record_owner_invoice_payment still reconciles with the caller holding SELECT only');
+
+  set local role authenticated;
+  c := public.owner_cancel_invoice(current_setting('t.rpc_issued')::uuid, 'Testabbruch');
+  reset role;
+  perform pg_temp.want(c->>'status' = 'cancelled',
+    'owner_cancel_invoice still cancels with the caller holding SELECT only');
 end $$;
 
 -- Defence in depth again: even with INSERT restored, the guard refuses a forged

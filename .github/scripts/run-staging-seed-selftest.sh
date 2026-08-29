@@ -173,7 +173,18 @@ for f in 20260710120000_phase0_auth_tenancy_rls 20260710133000_phase0_security_h
          20260723128000_owner_offer_email_workflow 20260724120000_owner_customer_task_management \
          20260728120000_customer_project_core 20260728121000_customer_documents \
          20260728122000_customer_billing_link 20260728123000_owner_invoice_organization_assignment \
-         20260728124000_customer_document_archive_service_role; do
+         20260728124000_customer_document_archive_service_role \
+         20260730120000_customer_project_organization_scope \
+         20260730130000_pankofer_organization_reconciliation \
+         20260731120000_customer_document_publish_guard \
+         20260731121000_client_provisioning_identity \
+         20260824171403_canonical_customer_and_deletion \
+         20260825064048_offer_recurring_pricing \
+         20260826120000_owner_historical_paid_invoice \
+         20260828120000_owner_finance_multipay_recurring_bulk \
+         20260829120000_owner_finance_advance_payments \
+         20260830123000_owner_invoice_immutable_snapshot \
+         20260831120000_owner_invoice_integrity_guard; do
   PSQL -d seed -q -f "$MIG/$f.sql" >/dev/null
 done
 
@@ -232,6 +243,24 @@ check_count "organization B's document is refused for A" "$INTERNAL" \
 check_count "the suspended member is refused the published document" "$INTERNAL" \
   "select count(*) from public.authorize_customer_document_download('$SUSPENDED_A', 'ffffffff-4444-0000-0000-000000000001');" 0
 
+# --- the invoice fixtures are genuinely issued/paid ---------------------------
+# The point of these four rows is that they are NOT drafts: that is the staging
+# coverage 20260831120000_owner_invoice_integrity_guard.sql now protects.
+NON_DRAFT="$(Q "select count(*) from public.owner_invoices where id::text like 'ffffffff-%' and status in ('issued','paid');" | tail -1)"
+if [ "$NON_DRAFT" = "4" ]; then
+  note_ok "all 4 invoice fixtures are issued/paid, not drafts (got $NON_DRAFT)"
+else
+  note_fail "expected 4 issued/paid invoice fixtures, got $NON_DRAFT"
+fi
+
+# ...and the guard really does refuse to delete one, so the teardown bypass below
+# is load-bearing rather than decorative.
+if PSQL -d seed -q -c "delete from public.owner_invoices where id = 'ffffffff-5555-0000-0000-000000000001';" >/dev/null 2>&1; then
+  note_fail "an issued fixture invoice was deletable WITHOUT the teardown bypass — the guard is not active"
+else
+  note_ok "the integrity guard refuses a plain delete of an issued fixture invoice"
+fi
+
 # --- cleanup must remove EVERYTHING ------------------------------------------
 if PSQL -d seed -q -f "$CLEAN_SQL" >/dev/null 2>&1; then
   note_ok "cleanup SQL runs"
@@ -250,6 +279,42 @@ for pair in "public.organizations:2" "public.customer_projects:2" "public.custom
     note_fail "cleanup left $left fixture row(s) in $table"
   fi
 done
+
+# --- the teardown must leave every protection switched back on ---------------
+# tgenabled: 'O' = enabled (origin), 'D' = disabled. A cleanup that left the
+# guard disabled would silently un-protect the invoice table for good.
+for trg in "public.owner_invoices:owner_invoices_guard" \
+           "public.owner_invoice_lines:owner_invoice_lines_guard" \
+           "public.organization_members:organization_members_guard_write"; do
+  tbl="${trg%%:*}"; name="${trg##*:}"
+  state="$(Q "select tgenabled from pg_trigger where tgrelid = '$tbl'::regclass and tgname = '$name';" | tail -1)"
+  if [ "$state" = "O" ]; then
+    note_ok "$name is still enabled after cleanup"
+  else
+    note_fail "$name is '$state' after cleanup (expected 'O' = enabled)"
+  fi
+done
+
+# The teardown must not have become a general capability: a NON-fixture issued
+# invoice is still undeletable once the script has finished.
+PSQL -d seed -q -c "insert into public.owner_invoices (id, business_entity_id, organization_id, invoice_number, status, issue_date, due_date, currency, net_total_cents, vat_total_cents, gross_total_cents) select 'aaaaaaaa-0000-0000-0000-0000000000ff', (select id from public.owner_business_entities order by created_at asc, id asc limit 1), null, 'ZZ-NOT-A-FIXTURE', 'issued', current_date, current_date, 'EUR', 1000, 190, 1190;" >/dev/null 2>&1
+if PSQL -d seed -q -c "delete from public.owner_invoices where id = 'aaaaaaaa-0000-0000-0000-0000000000ff';" >/dev/null 2>&1; then
+  note_fail "a NON-fixture issued invoice was deletable after cleanup — the teardown widened deletion rights"
+else
+  note_ok "a non-fixture issued invoice is still undeletable after cleanup"
+fi
+PSQL -d seed -q -c "alter table public.owner_invoices disable trigger owner_invoices_guard; delete from public.owner_invoices where id = 'aaaaaaaa-0000-0000-0000-0000000000ff'; alter table public.owner_invoices enable trigger owner_invoices_guard;" >/dev/null 2>&1 || true
+
+# The safety claim the teardown rests on: ALTER TABLE ... DISABLE TRIGGER is
+# transactional, so a cleanup that dies half-way can never leave the guard off.
+# Proven by deliberately failing a transaction that has already disabled it.
+PSQL -d seed -q -c "begin; alter table public.owner_invoices disable trigger owner_invoices_guard; select 1/0; commit;" >/dev/null 2>&1 || true
+state="$(Q "select tgenabled from pg_trigger where tgrelid = 'public.owner_invoices'::regclass and tgname = 'owner_invoices_guard';" | tail -1)"
+if [ "$state" = "O" ]; then
+  note_ok "a failed teardown transaction rolls the guard back on (still 'O')"
+else
+  note_fail "a failed teardown transaction left owner_invoices_guard '$state' — protections can be left disabled"
+fi
 
 # Cleanup must be safe to repeat.
 if PSQL -d seed -q -f "$CLEAN_SQL" >/dev/null 2>&1; then
