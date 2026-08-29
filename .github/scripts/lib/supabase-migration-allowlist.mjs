@@ -196,6 +196,28 @@ export const ALLOWED_MIGRATIONS = [
     requires: ['20260710120000', '20260730031350'],
     description: 'Security — receptionist lead PII row-level-security boundary (PR-0B)',
   },
+  {
+    file: '20260903120000_owner_crm_sales_pipeline.sql',
+    version: '20260903120000',
+    // Every version listed is an object this SQL genuinely references:
+    //  - 20260710120000: is_platform_owner(), set_updated_at()
+    //  - 20260722120000: owner_business_entities, owner_finance_requests,
+    //    owner_write_audit_row(), owner_claim_idempotency()
+    //  - 20260723121000: owner_offers, which gains owner_lead_id
+    //  - 20260724120000: owner_customers, owner_customer_tasks (which gains
+    //    lead_id and loses NOT NULL on customer_id), owner_record_customer_activity()
+    //  - 20260830120000: owner_add_customer_service(), owner_service_engagements
+    //    and owner_engagement_tasks -- the conversion RPC calls the first and the
+    //    command centre reads the other two.
+    // It deliberately does NOT list the later finance chain or
+    // 20260902120000_receptionist_leads_pii_rls: it references no object from
+    // either, and listing a version this SQL does not touch would make the
+    // dependency gate assert something untrue.
+    requires: [
+      '20260710120000', '20260722120000', '20260723121000', '20260724120000', '20260830120000',
+    ],
+    description: 'Owner CRM — manual sales pipeline, pre-offer integration gate, lead → customer conversion',
+  },
 ];
 
 /**
