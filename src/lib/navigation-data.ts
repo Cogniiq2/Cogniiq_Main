@@ -22,11 +22,15 @@
 //
 // WAS NICHT MEHR IN DER NAVIGATION STEHT
 //
-// Nichts geht verloren: Der Footer trägt eine vollständige Sitemap mit 77
-// Verweisen und steht auf jedem der 92 ausgelieferten Dokumente. Vor dieser
-// Umstellung wurde geprüft, dass **jede** Seite, welche die Navigation verlinkt,
-// auch im Footer steht. Die interne Verlinkung bleibt damit unverändert; nur die
-// Aufmerksamkeit des Besuchers wird nicht mehr geteilt.
+// Der Footer war einmal die Auffanglösung dafür: eine vollständige Sitemap mit
+// 78 Zielen auf jedem ausgelieferten Dokument. Das ist er seit der IA-Umstellung
+// nicht mehr — er trägt die Einstiege und die Pflichtseiten, rund 31 Ziele.
+// Was hier nicht steht, ist deshalb NICHT automatisch anderswo sitewide
+// verlinkt: Feingliedriges (Stadt x Leistung, Branchen-Landingpages,
+// Problemseiten, Blogartikel) wird aus dem Inhalt seiner Hub-Seite verlinkt.
+//
+// Wer hier ein Ziel streicht, prüft daher zuerst, woher es sonst noch verlinkt
+// ist — der Footer fängt es nicht mehr auf.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface NavZiel {
@@ -102,8 +106,11 @@ export const LEISTUNGEN: NavLeistung[] = [
 /**
  * Der zweite Einstiegsweg, für Besucher, die ihr Problem kennen, aber nicht den
  * Namen der Lösung. Eine einzelne, ruhig gesetzte Zeile am Fuß des Panels —
- * nicht fünf weitere Verweise neben den drei Leistungen. Die fünf
- * Problemseiten bleiben über den Footer erreichbar.
+ * nicht fünf weitere Verweise neben den drei Leistungen.
+ *
+ * Die fünf Problemseiten stehen seit der IA-Umstellung NICHT mehr im Footer.
+ * Sie werden aus dem Seiteninhalt der Leistungs- und Stadtseiten verlinkt
+ * (18–23 solche Verweise je Seite), nicht sitewide.
  */
 export const LEISTUNGEN_AUSWEG: NavZiel = {
   label: "Sie wissen noch nicht, was Sie brauchen?",
