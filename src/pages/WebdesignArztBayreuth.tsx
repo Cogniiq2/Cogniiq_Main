@@ -232,7 +232,7 @@ const config: IndustryPageConfig = {
     {
       title: "Lokales SEO für Arztpraxen in Bayreuth – bei Google sichtbar werden",
       description:
-        "Ihre Praxis-Website wird technisch und inhaltlich so aufgebaut, dass sie ihre Sichtbarkeit bei lokalen Suchanfragen wie 'Arzt Bayreuth', 'Hausarzt Bayreuth', 'Zahnarzt Bayreuth' oder '[Fachrichtung] Bayreuth' deutlich verbessert. Dazu gehören saubere URL-Struktur, strukturierte Daten (Schema Markup), Google Business Profile-Optimierung und ortsbezogene Inhalte. Neue Patienten finden Ihre Praxis – bevor sie die Konkurrenz finden.",
+        "Ihre Praxis-Website wird technisch und inhaltlich so aufgebaut, dass sie ihre Sichtbarkeit bei lokalen Suchanfragen wie 'Arzt Bayreuth', 'Hausarzt Bayreuth' oder 'Zahnarzt Bayreuth' deutlich verbessert. Dazu gehören saubere URL-Struktur, strukturierte Daten (Schema Markup), Google Business Profile-Optimierung und ortsbezogene Inhalte. Neue Patienten finden Ihre Praxis – bevor sie die Konkurrenz finden.",
     },
   ],
 

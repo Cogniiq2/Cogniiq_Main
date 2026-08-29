@@ -73,7 +73,7 @@ const faqItems = [
   {
     question: "Landet der Termin automatisch in meiner Praxissoftware?",
     answer:
-      `Heute in der Regel nicht. ${FAKTEN.keineAnbindung} Welche Schnittstelle Ihr System bietet, prüfen wir vor der Einrichtung — und sagen es Ihnen vor der Unterschrift, nicht danach.`,
+      `Das entscheidet Ihre Praxissoftware, nicht wir — und wir sagen es Ihnen vor der Unterschrift, nicht danach. ${FAKTEN.keineAnbindung}`,
   },
   {
     question: "Beurteilt der Assistent, wie dringend ein Anliegen ist?",

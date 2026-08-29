@@ -95,7 +95,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       // „binden wir an" behauptete bestehende Standardanbindungen. Es gibt keine
       // Liste unterstützter Systeme (ANBINDUNG.nichtBehauptet) — die Prüfung ist
       // das, was zugesagt werden darf.
-      { question: "Kann der Assistent in bestehende Buchungssysteme integriert werden?", answer: "Das hängt von Ihrem System ab. Welche Schnittstelle es bietet, prüfen wir vor dem Angebot – und das Ergebnis steht im Angebot, auch wenn es negativ ausfällt. Ohne Anbindung bleibt es beim strukturierten Eintrag im Dashboard, den Ihr Team überträgt." },
+      { question: "Kann der Assistent in bestehende Buchungssysteme integriert werden?", answer: "Das hängt von Ihrem System ab. Ob es eine geeignete Schnittstelle gibt, ob wir Zugang dafür bekommen und ob Dritte Gebühren dafür verlangen, prüfen wir vor dem Angebot – das Ergebnis steht darin, mit allen dafür bekannten Kosten für den vereinbarten Umfang, auch wenn es negativ ausfällt. Trägt die Prüfung, übergeben wir Termine direkt in Ihr System. Trägt sie nicht, bleibt es beim strukturierten Eintrag im Dashboard, den Ihr Team überträgt." },
       { question: "Wer betreut uns nach dem Start?", answer: "Ein fester Ansprechpartner in Bayreuth – kein anonymes Ticketsystem. In den ersten Wochen werten wir Gesprächsverläufe gemeinsam aus und passen Regeln und Ansagen an; danach bleibt der Draht derselbe." },
     ],
     localChallenges: [
@@ -445,9 +445,10 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     warumCogniiq: [
       `Festes Minutenkontingent, darüber ${FAKTEN.mehrpreisProMinute}/Min. – gedeckelt auf die ausgewiesene Obergrenze Ihres Tarifs; Einmalposten stehen vor Vertragsschluss im Angebot`,
       "Ihre Stimmauswahl, Ihr Begrüßungssatz, Ihre Formulierungen – Anrufer erfahren im ersten Satz, dass ein KI-System spricht",
-      // Widersprach FAKTEN.keineAnbindung: eine fertige Übergabe in Kalender,
-      // CRM oder Buchungssystem gibt es heute nicht.
-      "Jedes Gespräch endet als strukturierter Eintrag im Dashboard – kein Abhören, kein Rekonstruieren; ob eine Anbindung an Ihr System möglich ist, prüfen wir vor dem Angebot",
+      // Keine pauschale Übergabe-Zusage: ob Kalender, CRM oder Buchungssystem
+      // angebunden werden können, entscheidet die Prüfung des konkreten Systems
+      // vor dem Angebot (FAKTEN.keineAnbindung).
+      "Jedes Gespräch endet als strukturierter Eintrag im Dashboard – kein Abhören, kein Rekonstruieren; ob Ihr System angebunden werden kann und was eine Schnittstelle kostet, prüfen wir vor dem Angebot",
       "Auch bei Anrufspitzen in der Tourismussaison wird jeder Anruf angenommen – ohne Warteschleife",
       "Keine Gesprächsaufzeichnung, kein Training mit Ihren Daten – Auftragsverarbeitungsvertrag nach Art. 28 DSGVO inklusive",
       "Persönliche Betreuung mit festem Ansprechpartner – kein Ticketsystem",

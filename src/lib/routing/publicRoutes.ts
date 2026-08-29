@@ -108,7 +108,11 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/bewertungen",
     title: "Bewertungen & Kundenstimmen | Cogniiq AI-Agentur Bayern",
-    description: "Was Kunden über Cogniiq sagen: echte Bewertungen zu Webdesign, KI-Telefonassistenten und Automatisierung. Überzeugen Sie sich von unserer Arbeit.",
+    // Die Seite sagt selbst, dass derzeit keine Kundenstimme veröffentlicht ist.
+    // Eine Description, die "echte Bewertungen" verspricht, macht daraus einen
+    // Bait-and-Switch im SERP und untergräbt genau die Ehrlichkeit, die diese
+    // Seite eigentlich demonstriert.
+    description: "Kundenstimmen veröffentlichen wir nur mit schriftlicher Freigabe. Derzeit ist keine veröffentlicht — hier steht, warum, und woran Sie unsere Arbeit stattdessen prüfen können.",
     keywords: "Cogniiq Bewertungen, Kundenstimmen AI Agentur, Webdesign Bewertungen, KI Telefonassistent Erfahrungen",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.75" },
@@ -132,7 +136,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/integrationen",
     title: "Anbindungen an Ihr System | Cogniiq",
-    description: "Was nach einem Anruf passiert, was wir für Ihr System prüfen — und was wir nicht behaupten: eine fertige Standardanbindung an Praxissysteme gibt es nicht.",
+    description: "Was nach einem Anruf passiert, was wir an Ihrem System vor dem Angebot prüfen — geeignete Schnittstelle, Zugang, mögliche Vorgänge, Kosten Dritter — und was wir ohne diese Prüfung nicht zusagen.",
     indexable: false,
   },
   {

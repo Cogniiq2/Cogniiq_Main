@@ -30,7 +30,7 @@ export function BewertungenPage() {
     <>
       <PageSEO
         title="Bewertungen – Kundenmeinungen zu Cogniiq | Webdesign Bayreuth"
-        description="Bewertungen und Kundenmeinungen zu Cogniiq. Transparente Darstellung: veröffentlicht wird ausschließlich verifiziertes Kundenfeedback. Webdesign & Automatisierung aus Bayreuth."
+        description="Kundenstimmen veröffentlichen wir nur mit schriftlicher Freigabe. Derzeit ist keine veröffentlicht — hier steht, warum, und woran Sie unsere Arbeit stattdessen prüfen können."
         canonical={`${base}/bewertungen`}
         breadcrumbs={breadcrumbs}
       />

@@ -178,7 +178,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         heading: "Was ein KI-Telefonassistent für Arztpraxen übernimmt",
         items: [
           "Anrufannahme ohne Warteschleife – auch bei parallelen Anrufen",
-          "Terminbuchung direkt in das Praxisverwaltungssystem (z. B. Samedi, Doctolib, Medistar)",
+          "Terminwünsche strukturiert erfassen – und, wo die vorhandene Praxissoftware eine geeignete Schnittstelle bietet, direkt an sie übergeben",
           "Terminbestätigung und -erinnerung per SMS oder E-Mail",
           "Beantwortung häufiger Fragen (Öffnungszeiten, Parkplatz, Zuzahlung, Impftermine)",
           "Weiterleitung dringlicher Anliegen ans Praxisteam",
@@ -189,7 +189,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Integration in bestehende Praxissoftware",
         content:
-          "Ein gut entwickelter KI-Telefonassistent muss sich direkt in das bestehende Ökosystem einfügen. Die gängigen deutschen Praxisverwaltungssysteme wie Medistar, Turbomed oder Samedi bieten APIs, über die Terminslots abgerufen und Buchungen eingetragen werden können. DSGVO-Konformität ist dabei nicht optional, sondern Pflicht.",
+          "Ein Telefonassistent ist erst dann wirklich entlastend, wenn das Ergebnis eines Anrufs ohne Umweg dort landet, wo die Praxis ohnehin arbeitet. Ob das geht, entscheidet die vorhandene Software, nicht der Anbieter — weshalb eine pauschale Zusage vor der Prüfung nichts wert ist und wir auch keine Liste unterstützter Systeme führen. Cogniiq nimmt das eingesetzte Praxisverwaltungs- und Terminsystem im Erstgespräch auf und prüft vor dem Angebot, ob eine geeignete Schnittstelle existiert, ob Zugang oder Partnerfreigabe erreichbar ist, welche Vorgänge sie zulässt und ob Dritte dafür Gebühren verlangen. Trägt die Prüfung, werden Termine und Ergebnisse direkt in das bestehende System übergeben. Trägt sie nicht, wird der Übergabeweg vorher festgelegt und das Ergebnis steht strukturiert im Dashboard. In beiden Fällen stehen der vereinbarte Umfang und die dafür bekannten Kosten im Angebot, bevor unterschrieben wird. DSGVO-Konformität ist dabei nicht optional, sondern Pflicht.",
       },
       {
         type: "callout",
@@ -224,7 +224,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         question: "Kann der KI-Telefonassistent wirklich Termine direkt buchen?",
         answer:
-          "Ja, bei Integration mit einer kompatiblen Praxissoftware (Samedi, Doctolib u. a.) bucht das System Termine direkt – ohne Medienbruch.",
+          "Das hängt an Ihrer Praxissoftware, und genau das prüfen wir vor dem Angebot: geeignete Schnittstelle vorhanden, Zugang oder Freigabe erreichbar, welche Vorgänge möglich sind, welche Kosten Dritte dafür berechnen. Trägt die Prüfung, bucht das System direkt in Ihr Praxisverwaltungssystem. Trägt sie nicht, nimmt es den Terminwunsch strukturiert auf und Ihr Team übernimmt ihn aus dem Dashboard. Das Ergebnis der Prüfung steht im Angebot, mit allen dafür bekannten Kosten für den vereinbarten Umfang.",
       },
       {
         question: "Was passiert bei Notfällen?",
