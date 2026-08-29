@@ -10,7 +10,7 @@ export function DatenschutzPage() {
     <>
       <PageSEO
         title="Datenschutzerklärung | Cogniiq"
-        description="Datenschutzerklärung von Cogniiq: Welche Daten wir verarbeiten, Hosting, Kontaktanfragen, Google Ads mit Einwilligung (Consent Mode v2) und Ihre Rechte."
+        description="Datenschutzerklärung von Cogniiq: Welche Daten wir verarbeiten, Hosting, Kontaktanfragen, Google Analytics und Google Ads mit Einwilligung (Consent Mode v2) und Ihre Rechte."
         canonical={`${base}/datenschutz`}
         breadcrumbs={[
           { name: 'Home', url: base },
