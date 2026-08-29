@@ -381,6 +381,84 @@ if (/<lastmod>/.test(sitemap)) {
   } else ok('lastmod values come from the manifest, not the build date');
 }
 
+// ─── 9. one metadata source, end to end ──────────────────────────────────────
+// Not an "SEO rule about byte identity". The invariant is provenance: a route's
+// title and description are declared once, in PUBLIC_ROUTES, and everything that
+// states them must be that declaration.
+//
+//   manifest ──> scripts/prerender.mjs ──> served <title> / meta description
+//            └─> src/lib/routing/routeMetadata.ts ──> PageSEO ──> WebPage JSON-LD,
+//                                                     OG/Twitter, hydrated <head>
+//
+// Both legs are checked, because either one breaking reintroduces the defect this
+// architecture removed: 74 of 92 documents once shipped schema that contradicted
+// their own title, and the hydrated document contradicted both.
+{
+  let checked = 0;
+  const problems = [];
+  const unescape = (s) => s.replace(/\\u003c/g, '<');
+  const decode = (s) =>
+    s
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&');
+
+  for (const route of report.routes) {
+    const file = join(ROOT, route.file);
+    if (!existsSync(file)) continue;
+    const html = read(file);
+
+    const servedTitle = decode((html.match(/<title>([\s\S]*?)<\/title>/) || [])[1] ?? '');
+    const servedDescription = decode(
+      (html.match(/<meta name="description" content="([^"]*)" \/>/) || [])[1] ?? ''
+    );
+
+    // Leg 1 — the served head is the manifest's.
+    if (servedTitle !== route.title) {
+      problems.push(`${route.path}: served <title> "${servedTitle}" is not the manifest title "${route.title}"`);
+    }
+    if (route.description !== undefined && servedDescription !== route.description) {
+      problems.push(`${route.path}: served meta description is not the manifest description`);
+    }
+
+    // Leg 2 — the component rendered from the same source.
+    const open = '<script type="application/ld+json" id="page-webpage-schema">';
+    const start = html.indexOf(open);
+    if (start === -1) continue;
+    const from = start + open.length;
+    const end = html.indexOf('</script>', from);
+    if (end === -1) {
+      problems.push(`${route.path}: unterminated page-webpage-schema block`);
+      continue;
+    }
+
+    let node;
+    try {
+      node = JSON.parse(unescape(html.slice(from, end)));
+    } catch (error) {
+      problems.push(`${route.path}: page-webpage-schema is not valid JSON (${error.message})`);
+      continue;
+    }
+
+    checked += 1;
+    if (node.name !== servedTitle) {
+      problems.push(`${route.path}: WebPage.name "${node.name}" disagrees with the served <title> "${servedTitle}"`);
+    }
+    if (node.description !== servedDescription) {
+      problems.push(`${route.path}: WebPage.description disagrees with the served meta description`);
+    }
+  }
+
+  if (problems.length) {
+    for (const p of problems.slice(0, 12)) fail(p);
+    if (problems.length > 12) fail(`...and ${problems.length - 12} further metadata-provenance failures`);
+  } else {
+    ok(`title and description come from PUBLIC_ROUTES in the head and the schema on all ${checked} routes`);
+  }
+}
+
 // ─── Result ──────────────────────────────────────────────────────────────────
 if (failures.length) {
   console.error('\n✗ Prerender output verification FAILED:');

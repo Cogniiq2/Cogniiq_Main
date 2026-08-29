@@ -161,6 +161,7 @@ function buildHead(html, route, canonical) {
   return out;
 }
 
+
 // Preloads the route's own JS chunk and hands its URL to src/main.tsx, which
 // waits for it before hydrating. Without this the chunk is only requested after
 // hydration begins, so the route's Suspense boundary is still dehydrated when
@@ -458,6 +459,9 @@ async function main() {
           indexable: r.indexable,
           canonical: canonicalFor(r.path),
           title: r.title,
+          // Carried so the output verifier can assert the served description came
+          // from the manifest too, not only the title.
+          description: r.description,
           file: r.path === '/' ? 'dist/index.html' : `dist${r.path}.html`,
         })),
         provider: isNetlify ? 'netlify' : 'portable',
