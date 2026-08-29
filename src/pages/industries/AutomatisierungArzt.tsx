@@ -96,7 +96,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Funktioniert die Automatisierung mit unserer bestehenden Praxissoftware?",
-      answer: "Das prüfen wir vor dem Angebot, statt es vorab zu versprechen. Eine fertige Standardanbindung an Praxisverwaltungssysteme gibt es bei uns heute nicht, und eine Liste unterstützter Systeme führen wir bewusst nicht — sie wäre entweder leer oder unehrlich. Wir sehen uns Ihre Systemlandschaft an und sagen Ihnen konkret, was für Ihre Software möglich ist: von einer echten Schnittstelle bis zu einem definierten Übergabepunkt, an dem Ihr Team übernimmt.",
+      answer: "Das prüfen wir vor dem Angebot, statt es vorab zu versprechen. Eine Liste unterstützter Systeme führen wir bewusst nicht — sie wäre entweder unvollständig oder unehrlich. Stattdessen nehmen wir Ihre Praxissoftware im Erstgespräch auf und prüfen: ob eine geeignete Schnittstelle existiert, ob Zugang oder Freigabe erreichbar ist, welche Vorgänge sie zulässt und ob Dritte dafür Gebühren berechnen. Trägt das, binden wir Ihr System direkt an. Trägt es nicht, legen wir den Übergabeweg fest. Das Ergebnis steht mit allen Kosten im Angebot, bevor Sie unterschreiben.",
     },
     {
       question: "Was kostet Praxisautomatisierung?",

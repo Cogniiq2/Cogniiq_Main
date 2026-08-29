@@ -4,7 +4,7 @@
 // Dreistufig, in fester Reihenfolge und optisch GLEICHRANGIG:
 //   1. Was heute läuft      — die strukturierte Übergabe als echte Leistung
 //   2. Was wir für Sie prüfen — Schnittstellenprüfung vor der Unterschrift
-//   3. Was wir nicht behaupten — keine fertige Standardanbindung
+//   3. Was wir ohne Prüfung des konkreten Systems nicht zusagen
 //
 // Abschnitt 3 wird NICHT kleiner gesetzt und NICHT ans Ende geschoben. Er ist
 // der Grund, warum diese Seite glaubwürdig ist.
@@ -70,7 +70,7 @@ export function IntegrationenPage() {
     <>
       <PageSEO
         title="Anbindung an Ihr System | Cogniiq"
-        description="Was nach einem Anruf passiert, was wir für Ihr System prüfen — und was wir nicht behaupten: eine fertige Standardanbindung an Praxissysteme gibt es nicht."
+        description="Was nach einem Anruf passiert, was wir an Ihrem System vor dem Angebot prüfen — geeignete Schnittstelle, Zugang, mögliche Vorgänge, Kosten Dritter — und was wir ohne diese Prüfung nicht zusagen."
         canonical={url}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}

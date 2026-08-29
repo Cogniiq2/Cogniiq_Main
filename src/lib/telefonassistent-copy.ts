@@ -148,8 +148,11 @@ export const FAKTEN = {
   rufumleitung:
     "Ihre Anrufe werden auf die vereinbarte Nummer umgeleitet. Was dafür an Ihrem Anschluss nötig ist, sehen wir uns vor dem Angebot an und schreiben das Ergebnis hinein.",
 
+  // Kein Pauschalversprechen und keine Pauschalabsage: beides wäre eine Aussage
+  // über ein System, das wir noch nicht gesehen haben. Namen einzelner
+  // Praxisverwaltungssysteme stehen hier bewusst nicht (OWNER-INPUT B3).
   keineAnbindung:
-    "Eine fertige Standardanbindung an Praxisverwaltungssysteme gibt es heute nicht. Das Ergebnis eines Anrufs steht strukturiert im Cogniiq-Dashboard; den Übertrag ins Praxissystem macht Ihr Team, solange für Ihre Software keine Schnittstelle möglich ist.",
+    "Eine Standardanbindung, die auf jedes Praxisverwaltungssystem sofort passt, gibt es nicht — deshalb prüfen wir Ihr konkretes System vor dem Angebot: ob es eine geeignete Schnittstelle gibt, ob wir dafür Zugang oder eine Freigabe bekommen, welche Vorgänge sie zulässt und ob Dritte dafür Gebühren verlangen. Wo das trägt, übergeben wir Termine und Ergebnisse direkt in Ihr System. Wo es nicht trägt, steht das Ergebnis strukturiert im Cogniiq-Dashboard und wir legen den Übergabeweg vorher gemeinsam fest.",
 };
 
 /** M4 · Die vier Säulen — als beschriebene Mechanik, nicht als Slogan. */
@@ -315,7 +318,7 @@ export const GRENZEN = {
     "Kein Ersatz für Ihr Team. Der Assistent nimmt Anrufe an, die sonst verloren gingen – die Entscheidungen über Termine, Rückmeldungen und Ausnahmen bleiben bei Ihren Mitarbeiterinnen und Mitarbeitern.",
     "Notfälle werden erkannt und sofort weitergeleitet – an Ihr Team, den Bereitschaftsdienst oder mit der klaren Ansage, den Notruf 112 zu wählen. Eine Bewertung des Notfalls findet nicht statt.",
     "Beschwerden, emotionale Gespräche und alles, was Sie im Anliegen-Katalog als Chefsache markieren, landen immer bei einem Menschen.",
-    `${FAKTEN.keineAnbindung} Was für Ihr System geht, prüfen wir vor dem Angebot.`,
+    `${FAKTEN.keineAnbindung} Das Ergebnis der Prüfung steht mit allen Kosten im Angebot — auch die einer Schnittstelle, die Dritte berechnen.`,
     "Gespräche werden nicht aufgezeichnet. Wenn Sie später den genauen Wortlaut eines Anrufs brauchen, gibt es ihn nicht – Sie haben das strukturierte Ergebnis, nicht die Aufnahme.",
     "Der Assistent übernimmt nicht alle Anrufe. Realistisch ist Entlastung zu Stoßzeiten und außerhalb der Öffnungszeiten – nicht die vollständige Übernahme Ihrer Telefonie.",
   ],
@@ -330,7 +333,7 @@ export const NICHT_PASSEND = {
   intro:
     "Ein Erstgespräch lohnt sich nicht für jeden Betrieb. In diesen Konstellationen raten wir ab:",
   points: [
-    "Sie erwarten, dass aufgenommene Termine automatisch in Ihrem Praxisverwaltungssystem stehen. Eine fertige Standardanbindung gibt es heute nicht. Ist das Ihre Bedingung, sind wir noch nicht der richtige Anbieter.",
+    "Sie brauchen die Zusage, dass Termine automatisch in Ihrem Praxisverwaltungssystem stehen, schon bevor Ihr System geprüft ist. Ob das geht, hängt an Ihrer Software: Wir prüfen vor dem Angebot, ob eine geeignete Schnittstelle existiert, ob wir Zugang erhalten und was sie zulässt. Fällt die Prüfung negativ aus, sagen wir das vor der Unterschrift — eine Zusage vorab bekommen Sie von uns nicht.",
     "Sie erwarten, dass die Telefonie vollständig ohne Ihr Team läuft. Der Assistent entlastet – er ersetzt keine Anmeldung und keine fachliche Entscheidung.",
     "Ihr Anrufaufkommen ist sehr gering und Ihr Team gut erreichbar. Dann löst der Assistent kein Problem, das Sie haben – und ein System ohne Problem ist nur ein Kostenpunkt.",
     "Sie möchten, dass Anrufer nicht erfahren, dass ein KI-System spricht. Diese Transparenz ist für uns nicht verhandelbar – rechtlich wie inhaltlich.",
@@ -369,7 +372,7 @@ export const ANBINDUNG = {
     frage: "Was passiert nach einem Anruf?",
     absaetze: [
       "Jeder Anruf endet als strukturierter Eintrag im Cogniiq-Dashboard: Anliegen, Name, Rückrufnummer, Terminwunsch. Ihr Team sieht auf einen Blick, worum es ging, und arbeitet die Liste ab, wenn es in den Ablauf passt.",
-      "Das ist bewusst kein Postfach mit Sprachnachrichten. Der Unterschied ist die Arbeit danach: Eine Mailbox müssen Sie abhören, mitschreiben und einordnen — ein strukturierter Eintrag ist bereits sortiert. Was Ihr Team noch tut, ist der Übertrag ins Praxissystem, nicht das Rekonstruieren des Gesprächs.",
+      "Das ist bewusst kein Postfach mit Sprachnachrichten. Der Unterschied ist die Arbeit danach: Eine Mailbox müssen Sie abhören, mitschreiben und einordnen — ein strukturierter Eintrag ist bereits sortiert. Bleibt der Übertrag ins Praxissystem, weil keine Schnittstelle trägt, ist es ein Übertrag, kein Rekonstruieren des Gesprächs.",
       "Weil nichts aufgezeichnet wird, gibt es auch keine Audiodatei zum Abhören. Das ist eine Entscheidung, keine Lücke: Es entsteht keine Aufnahme, die aufbewahrt, geschützt und irgendwann gelöscht werden müsste.",
     ],
     punkte: [
@@ -397,9 +400,9 @@ export const ANBINDUNG = {
     headline: "Was wir nicht behaupten",
     frage: "Gibt es eine fertige Anbindung an mein Praxisverwaltungssystem?",
     absaetze: [
-      "Nein. Eine fertige Standardanbindung an gängige Praxisverwaltungssysteme gibt es bei uns heute nicht. Wir führen deshalb auch keine Liste unterstützter Systeme — sie wäre entweder leer oder unehrlich.",
-      "Das ist der Punkt, an dem viele Telefonassistenten scheitern, und wir halten es für falsch, ihn zu verschweigen: Solange keine Anbindung besteht, überträgt Ihr Team das Ergebnis von Hand ins Praxissystem. Die Arbeit ist dann nicht verschwunden, sie ist nur kürzer geworden.",
-      "Wenn Ihre Bedingung lautet, dass Termine automatisch in Ihrem System stehen, sind wir heute nicht der richtige Anbieter. Das sagen wir lieber jetzt als nach der Unterschrift.",
+      "Eine pauschale Ja-Antwort wäre unseriös, und eine Liste unterstützter Systeme führen wir bewusst nicht — sie wäre entweder unvollständig oder unehrlich. Was wir stattdessen tun: Wir nehmen Ihr Praxisverwaltungs- und Terminsystem im Erstgespräch auf und prüfen es, bevor Sie ein Angebot bekommen.",
+      "Geprüft wird vier Dinge: ob eine geeignete Schnittstelle überhaupt existiert, ob Zugang oder Partnerfreigabe dafür erreichbar ist, welche Vorgänge sie zulässt — und ob Dritte für die Schnittstelle Gebühren verlangen. Trägt die Prüfung, binden wir Ihr System an, bis hin zur direkten Übergabe von Terminen und Ergebnissen, soweit die Schnittstelle das hergibt.",
+      "Trägt sie nicht, sagen wir das vor der Unterschrift und legen stattdessen den Übergabeweg fest: Das Ergebnis steht strukturiert im Cogniiq-Dashboard, und Ihr Team übernimmt es von dort. In beiden Fällen steht das Ergebnis der Prüfung mit allen Kosten im Angebot — auch Schnittstellenkosten Dritter. Nach Projektstart kommt dazu nichts hinzu.",
     ],
   },
 };

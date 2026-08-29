@@ -61,7 +61,7 @@ const config: NationalIndustryPageConfig = {
     "Notfall-Hinweise führen sofort zu Ihrem Team, zum Bereitschaftsdienst oder zur Ansage, den Notruf 112 zu wählen",
     "Ihre Stimmauswahl, Ihr Begrüßungssatz, Ihre Formulierungen – Anrufer erfahren im ersten Satz, dass ein KI-System spricht",
     "Auftragsverarbeitungsvertrag nach Art. 28 DSGVO; keine Gesprächsaufzeichnung, kein Training mit Ihren Daten",
-    "Ob eine Anbindung an Ihre Praxissoftware möglich ist, prüfen wir vor dem Angebot – eine fertige Standardanbindung gibt es heute nicht",
+    "Ob Ihre Praxissoftware angebunden werden kann und was eine Schnittstelle kostet, prüfen wir vor dem Angebot – ohne diese Prüfung sagen wir es nicht zu",
     `Festes Minutenkontingent, darüber ${FAKTEN.mehrpreisProMinute}/Min. – gedeckelt auf die Obergrenze Ihres Tarifs`,
   ],
   workflow: {
@@ -112,7 +112,7 @@ const config: NationalIndustryPageConfig = {
     {
       question: "Lässt sich der Assistent an unsere Praxissoftware anbinden?",
       answer:
-        `${FAKTEN.keineAnbindung} Welche Schnittstelle Ihr System bietet, prüfen wir vor dem Angebot – nicht danach –, und das Ergebnis steht im Angebot, auch wenn es negativ ausfällt. Eine Liste unterstützter Systeme führen wir bewusst nicht: Sie wäre heute entweder leer oder unehrlich. Ein Wechsel Ihrer Praxissoftware ist keine Voraussetzung.`,
+        `${FAKTEN.keineAnbindung} Geprüft wird vor dem Angebot, nicht danach, und das Ergebnis steht mit allen Kosten darin — auch wenn es negativ ausfällt und auch, wenn Dritte für die Schnittstelle Gebühren verlangen. Eine Liste unterstützter Systeme führen wir bewusst nicht: Sie wäre unvollständig oder unehrlich. Ein Wechsel Ihrer Praxissoftware ist keine Voraussetzung.`,
     },
     {
       question: "Was passiert, wenn ein Patient einen Notfall schildert?",

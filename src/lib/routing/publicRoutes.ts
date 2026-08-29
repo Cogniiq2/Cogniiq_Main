@@ -136,7 +136,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/integrationen",
     title: "Anbindungen an Ihr System | Cogniiq",
-    description: "Was nach einem Anruf passiert, was wir für Ihr System prüfen — und was wir nicht behaupten: eine fertige Standardanbindung an Praxissysteme gibt es nicht.",
+    description: "Was nach einem Anruf passiert, was wir an Ihrem System vor dem Angebot prüfen — geeignete Schnittstelle, Zugang, mögliche Vorgänge, Kosten Dritter — und was wir ohne diese Prüfung nicht zusagen.",
     indexable: false,
   },
   {
