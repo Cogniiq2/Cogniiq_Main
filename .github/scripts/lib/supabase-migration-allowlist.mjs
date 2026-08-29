@@ -95,6 +95,40 @@ export const ALLOWED_MIGRATIONS = [
     requires: ['20260710120000', '20260722120000', '20260724120000', '20260830120000', '20260830121000'],
     description: 'Service onboarding audit fix — resolve the business entity through the engagement',
   },
+  {
+    file: '20260830123000_owner_invoice_immutable_snapshot.sql',
+    version: '20260830123000',
+    // Every version below is a real dependency of this SQL, not a recency guess:
+    //  - 20260710120000: is_platform_owner(), public.profiles, public.organizations
+    //  - 20260721120000: public.client_accounts
+    //  - 20260722120000: public.owner_invoices, public.owner_invoice_lines,
+    //    public.owner_finance_requests, public.owner_finance_documents,
+    //    owner_claim_idempotency(), and the original issue_owner_invoice() /
+    //    delete_owner_draft_invoice() this migration redefines
+    //  - 20260723120000: public.owner_document_settings (incl. invoice_number_prefix)
+    //  - 20260723121000: public.owner_offers
+    //  - 20260723122000: public.owner_generated_documents
+    //  - 20260723123000: owner_seller_snapshot()
+    //  - 20260723126000: the original owner_issue_invoice_internal() this migration redefines
+    //  - 20260724120000: public.owner_customers
+    //  - 20260826120000: the original record_owner_historical_paid_invoice() this migration redefines
+    //  - 20260828120000: the original owner_build_issued_invoice() this migration redefines
+    // All are already present in the production remote history at the time this entry was added.
+    requires: [
+      '20260710120000',
+      '20260721120000',
+      '20260722120000',
+      '20260723120000',
+      '20260723121000',
+      '20260723122000',
+      '20260723123000',
+      '20260723126000',
+      '20260724120000',
+      '20260826120000',
+      '20260828120000',
+    ],
+    description: 'Finance — immutable invoice issuance snapshots (Phase 1A)',
+  },
 ];
 
 /**

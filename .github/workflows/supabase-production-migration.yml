@@ -41,6 +41,7 @@ on:
           - 20260830120000_client_service_onboarding.sql
           - 20260830121000_ai_receptionist_template_v1.sql
           - 20260830122000_service_onboarding_audit_fix.sql
+          - 20260830123000_owner_invoice_immutable_snapshot.sql
         default: 20260826120000_owner_historical_paid_invoice.sql
       mode:
         description: Audit history, run a dry run, or apply the migration
@@ -113,6 +114,7 @@ jobs:
             20260830120000_client_service_onboarding.sql) ;;
             20260830121000_ai_receptionist_template_v1.sql) ;;
             20260830122000_service_onboarding_audit_fix.sql) ;;
+            20260830123000_owner_invoice_immutable_snapshot.sql) ;;
             *)
               echo "Refusing to act on a migration that is not on the production allowlist: $SELECTED_MIGRATION"
               exit 1
