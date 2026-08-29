@@ -304,7 +304,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/bayreuth/website-relaunch",
-    title: "Website Relaunch Bayreuth – Alte Website modernisieren | Cogniiq",
+    title: "Website Relaunch Bayreuth – Mehr Performance & bessere Rankings | Cogniiq",
     description: "Website Relaunch in Bayreuth: Ihre bestehende Website modernisieren ohne Rankingverlust. Neues Design, bessere Performance, stärkeres SEO – persönliche Betreuung.",
     keywords: "Website Relaunch Bayreuth, Website modernisieren Bayreuth, Homepage Relaunch Bayreuth",
     indexable: true,
