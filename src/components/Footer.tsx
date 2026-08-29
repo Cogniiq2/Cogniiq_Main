@@ -210,7 +210,9 @@ export function Footer() {
                   {
                     label: "Kosten",
                     links: [
-                      { text: "KI-Telefonassistent", to: "/kosten-ki-telefonassistent" },
+                      // Ankertext unverändert gegenüber dem Stand vor dieser
+                      // Umstellung: Diese URL wird gerade gemessen.
+                      { text: "KI-Assistent Kosten", to: "/kosten-ki-telefonassistent" },
                       { text: "Webdesign", to: "/kosten-webdesign" },
                       { text: "Automatisierung", to: "/kosten-automatisierung" },
                     ],
@@ -256,7 +258,7 @@ export function Footer() {
                 ]}
               />
 
-              {/* HALTEPUNKT bis zum Readout der Experimente vom 29.08.2026.
+              {/* HALTEPUNKT bis zum Readout der Messungen vom 29.08.2026.
                   Diese sechs URLs standen bis zur Kürzung sitewide im Footer und
                   wurden dadurch von allen 91 Dokumenten verlinkt. Sie fallen
                   nach der Tier-Logik eigentlich in Tier 3 (Verlinkung aus dem
@@ -268,9 +270,13 @@ export function Footer() {
                   getesteten Anker oder vom weggefallenen Footer kommt.
                   „Webdesign Bayreuth" ist zusätzlich der von dee7545 eigens
                   gesetzte Anker und darf ohnehin nicht verschwinden.
-                  ENTFERNEN, sobald die Experimente ausgewertet sind. */}
+                  ENTFERNEN, sobald die Messungen ausgewertet sind.
+
+                  Die Überschrift benennt bewusst nicht, dass hier gemessen wird:
+                  Interne Messvorgänge gehören nicht in die Oberfläche, die der
+                  Besucher sieht. „Weitere Themen" ist für ihn schlicht wahr. */}
               <FooterCol
-                title="Im Test"
+                title="Weitere Themen"
                 delay={0.24}
                 sections={[
                   {
