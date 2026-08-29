@@ -85,7 +85,7 @@ const config: IndustryPageConfig = {
     {
       title: "Suchmaschinenoptimierung für lokale Suchanfragen",
       description:
-        "Die Praxis-Website wird technisch und inhaltlich so optimiert, dass sie bei Suchanfragen wie 'Arzt München', 'Hausarzt München' oder '[Fachrichtung] München' sichtbar erscheint – und so neue Patienten erreicht.",
+        "Die Praxis-Website wird technisch und inhaltlich so optimiert, dass sie bei Suchanfragen wie 'Arzt München', 'Hausarzt München' oder 'Zahnarzt München' sichtbar erscheint – und so neue Patienten erreicht.",
     },
   ],
   benefits: [

@@ -178,7 +178,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         heading: "Was ein KI-Telefonassistent für Arztpraxen übernimmt",
         items: [
           "Anrufannahme ohne Warteschleife – auch bei parallelen Anrufen",
-          "Terminbuchung direkt in das Praxisverwaltungssystem (z. B. Samedi, Doctolib, Medistar)",
+          "Terminwünsche strukturiert erfassen – der Übertrag ins Praxisverwaltungssystem bleibt heute beim Praxisteam",
           "Terminbestätigung und -erinnerung per SMS oder E-Mail",
           "Beantwortung häufiger Fragen (Öffnungszeiten, Parkplatz, Zuzahlung, Impftermine)",
           "Weiterleitung dringlicher Anliegen ans Praxisteam",
@@ -189,7 +189,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Integration in bestehende Praxissoftware",
         content:
-          "Ein gut entwickelter KI-Telefonassistent muss sich direkt in das bestehende Ökosystem einfügen. Die gängigen deutschen Praxisverwaltungssysteme wie Medistar, Turbomed oder Samedi bieten APIs, über die Terminslots abgerufen und Buchungen eingetragen werden können. DSGVO-Konformität ist dabei nicht optional, sondern Pflicht.",
+          "Ein Telefonassistent ist erst dann wirklich entlastend, wenn das Ergebnis eines Anrufs ohne Umweg dort landet, wo die Praxis ohnehin arbeitet. Für Cogniiq gilt hier, was auch auf unseren Produktseiten steht: eine fertige Standardanbindung an Praxisverwaltungssysteme gibt es heute nicht, und eine Liste unterstützter Systeme führen wir bewusst nicht — sie wäre entweder leer oder unehrlich. Das Ergebnis eines Anrufs steht strukturiert im Cogniiq-Dashboard; was für Ihre konkrete Software darüber hinaus möglich ist, prüfen wir vor dem Angebot. DSGVO-Konformität ist dabei nicht optional, sondern Pflicht.",
       },
       {
         type: "callout",
@@ -224,7 +224,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         question: "Kann der KI-Telefonassistent wirklich Termine direkt buchen?",
         answer:
-          "Ja, bei Integration mit einer kompatiblen Praxissoftware (Samedi, Doctolib u. a.) bucht das System Termine direkt – ohne Medienbruch.",
+          "Er nimmt Terminwünsche strukturiert auf und legt sie im Cogniiq-Dashboard ab. Eine fertige Standardanbindung, die den Termin automatisch in Ihr Praxisverwaltungssystem schreibt, gibt es heute nicht — den Übertrag macht Ihr Team. Was für Ihre Software möglich ist, prüfen wir vor dem Angebot.",
       },
       {
         question: "Was passiert bei Notfällen?",

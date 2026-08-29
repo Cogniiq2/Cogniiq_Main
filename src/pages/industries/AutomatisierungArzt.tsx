@@ -96,7 +96,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Funktioniert die Automatisierung mit unserer bestehenden Praxissoftware?",
-      answer: "In den meisten Fällen ja. Wir analysieren zunächst Ihre bestehende Systemlandschaft und entwickeln passende Integrationen. Gängige Systeme wie Tomedo, Medistar, Dampsoft oder CGM werden direkt unterstützt. Wo keine direkte API existiert, bauen wir zuverlässige Übergabepunkte.",
+      answer: "Das prüfen wir vor dem Angebot, statt es vorab zu versprechen. Eine fertige Standardanbindung an Praxisverwaltungssysteme gibt es bei uns heute nicht, und eine Liste unterstützter Systeme führen wir bewusst nicht — sie wäre entweder leer oder unehrlich. Wir sehen uns Ihre Systemlandschaft an und sagen Ihnen konkret, was für Ihre Software möglich ist: von einer echten Schnittstelle bis zu einem definierten Übergabepunkt, an dem Ihr Team übernimmt.",
     },
     {
       question: "Was kostet Praxisautomatisierung?",

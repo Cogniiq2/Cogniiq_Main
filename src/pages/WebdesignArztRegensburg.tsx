@@ -156,7 +156,7 @@ const config: IndustryPageConfig = {
     {
       title: "Lokale SEO für Arztpraxen in Regensburg",
       description:
-        "Die Praxis-Website wird für Suchanfragen wie 'Arzt Regensburg', 'Hausarzt Regensburg' oder '[Fachrichtung] Regensburg' optimiert – mehr Sichtbarkeit, mehr Patientenanfragen.",
+        "Die Praxis-Website wird für Suchanfragen wie 'Arzt Regensburg', 'Hausarzt Regensburg' oder 'Zahnarzt Regensburg' optimiert – mehr Sichtbarkeit, mehr Patientenanfragen.",
     },
   ],
   benefits: [
