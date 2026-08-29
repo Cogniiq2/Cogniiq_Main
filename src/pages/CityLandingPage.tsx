@@ -24,6 +24,14 @@ interface CityConfig {
   description: string;
   intro: string;
   tagline: string;
+  /**
+   * Optional city-scoped follow-up topic, rendered under the service grid.
+   * Kept out of CITY_LINKS on purpose: that list feeds both the three-column
+   * grid here and the "Weitere Standorte" lists on the other city pages, so a
+   * fourth entry would break this layout and change what the other cities
+   * render. Cities without a deepDive render exactly as before.
+   */
+  deepDive?: { intro: string; label: string; href: string };
 }
 
 const CITY_CONFIGS: Record<CitySlug, CityConfig> = {
@@ -56,6 +64,11 @@ const CITY_CONFIGS: Record<CitySlug, CityConfig> = {
     description: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungslösungen für Unternehmen in Regensburg. Digitale Systeme für die Region Ostbayern.",
     intro: "Cogniiq betreut Unternehmen in Regensburg und der Region Ostbayern mit maßgeschneiderten Websites, KI-Telefonassistenten und Automatisierungslösungen.",
     tagline: "Webdesign Regensburg · KI-Telefonassistent Regensburg · Automatisierung Regensburg",
+    deepDive: {
+      intro: "Sie betreiben bereits eine Website? Häufig ist die Modernisierung der bestehenden Seite der wirtschaftlichere Weg als ein kompletter Neuaufbau:",
+      label: "Relaunch der bestehenden Website",
+      href: "/regensburg/website-relaunch",
+    },
   },
 };
 
@@ -224,6 +237,25 @@ export function CityLandingPage({ citySlug }: Props) {
                 );
               })}
             </div>
+
+            {config.deepDive && (
+              <motion.p
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                custom={0.3}
+                className="mt-8 text-gray-600 dark:text-gray-400"
+              >
+                {config.deepDive.intro}{" "}
+                <Link
+                  to={config.deepDive.href}
+                  className="font-medium text-gray-900 dark:text-gray-100 underline underline-offset-2 decoration-gray-300 dark:decoration-gray-600 hover:decoration-gray-900 dark:hover:decoration-gray-100 transition-colors"
+                >
+                  {config.deepDive.label}
+                </Link>
+              </motion.p>
+            )}
           </div>
         </section>
 
