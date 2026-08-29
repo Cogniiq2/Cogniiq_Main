@@ -112,7 +112,7 @@ const config: NationalIndustryPageConfig = {
     {
       question: "Lässt sich der Assistent an unsere Praxissoftware anbinden?",
       answer:
-        `${FAKTEN.keineAnbindung} Geprüft wird vor dem Angebot, nicht danach, und das Ergebnis steht mit allen Kosten darin — auch wenn es negativ ausfällt und auch, wenn Dritte für die Schnittstelle Gebühren verlangen. Eine Liste unterstützter Systeme führen wir bewusst nicht: Sie wäre unvollständig oder unehrlich. Ein Wechsel Ihrer Praxissoftware ist keine Voraussetzung.`,
+        `${FAKTEN.keineAnbindung} Geprüft wird vor dem Angebot, nicht danach, und das Ergebnis steht darin — mit allen dafür bekannten Kosten für den vereinbarten Umfang, auch wenn es negativ ausfällt und auch, wenn Dritte für die Schnittstelle Gebühren verlangen. Eine Liste unterstützter Systeme führen wir bewusst nicht: Sie wäre unvollständig oder unehrlich. Ein Wechsel Ihrer Praxissoftware ist keine Voraussetzung.`,
     },
     {
       question: "Was passiert, wenn ein Patient einen Notfall schildert?",

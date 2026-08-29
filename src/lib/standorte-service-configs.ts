@@ -95,7 +95,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       // „binden wir an" behauptete bestehende Standardanbindungen. Es gibt keine
       // Liste unterstützter Systeme (ANBINDUNG.nichtBehauptet) — die Prüfung ist
       // das, was zugesagt werden darf.
-      { question: "Kann der Assistent in bestehende Buchungssysteme integriert werden?", answer: "Das hängt von Ihrem System ab. Ob es eine geeignete Schnittstelle gibt, ob wir Zugang dafür bekommen und ob Dritte Gebühren dafür verlangen, prüfen wir vor dem Angebot – das Ergebnis steht mit allen Kosten darin, auch wenn es negativ ausfällt. Trägt die Prüfung, übergeben wir Termine direkt in Ihr System. Trägt sie nicht, bleibt es beim strukturierten Eintrag im Dashboard, den Ihr Team überträgt." },
+      { question: "Kann der Assistent in bestehende Buchungssysteme integriert werden?", answer: "Das hängt von Ihrem System ab. Ob es eine geeignete Schnittstelle gibt, ob wir Zugang dafür bekommen und ob Dritte Gebühren dafür verlangen, prüfen wir vor dem Angebot – das Ergebnis steht darin, mit allen dafür bekannten Kosten für den vereinbarten Umfang, auch wenn es negativ ausfällt. Trägt die Prüfung, übergeben wir Termine direkt in Ihr System. Trägt sie nicht, bleibt es beim strukturierten Eintrag im Dashboard, den Ihr Team überträgt." },
       { question: "Wer betreut uns nach dem Start?", answer: "Ein fester Ansprechpartner in Bayreuth – kein anonymes Ticketsystem. In den ersten Wochen werten wir Gesprächsverläufe gemeinsam aus und passen Regeln und Ansagen an; danach bleibt der Draht derselbe." },
     ],
     localChallenges: [

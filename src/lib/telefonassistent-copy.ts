@@ -318,7 +318,7 @@ export const GRENZEN = {
     "Kein Ersatz für Ihr Team. Der Assistent nimmt Anrufe an, die sonst verloren gingen – die Entscheidungen über Termine, Rückmeldungen und Ausnahmen bleiben bei Ihren Mitarbeiterinnen und Mitarbeitern.",
     "Notfälle werden erkannt und sofort weitergeleitet – an Ihr Team, den Bereitschaftsdienst oder mit der klaren Ansage, den Notruf 112 zu wählen. Eine Bewertung des Notfalls findet nicht statt.",
     "Beschwerden, emotionale Gespräche und alles, was Sie im Anliegen-Katalog als Chefsache markieren, landen immer bei einem Menschen.",
-    `${FAKTEN.keineAnbindung} Das Ergebnis der Prüfung steht mit allen Kosten im Angebot — auch die einer Schnittstelle, die Dritte berechnen.`,
+    `${FAKTEN.keineAnbindung} Das Ergebnis der Prüfung steht im Angebot, mit allen dafür bekannten Kosten für den vereinbarten Umfang — auch die einer Schnittstelle, die Dritte berechnen.`,
     "Gespräche werden nicht aufgezeichnet. Wenn Sie später den genauen Wortlaut eines Anrufs brauchen, gibt es ihn nicht – Sie haben das strukturierte Ergebnis, nicht die Aufnahme.",
     "Der Assistent übernimmt nicht alle Anrufe. Realistisch ist Entlastung zu Stoßzeiten und außerhalb der Öffnungszeiten – nicht die vollständige Übernahme Ihrer Telefonie.",
   ],
@@ -402,7 +402,7 @@ export const ANBINDUNG = {
     absaetze: [
       "Eine pauschale Ja-Antwort wäre unseriös, und eine Liste unterstützter Systeme führen wir bewusst nicht — sie wäre entweder unvollständig oder unehrlich. Was wir stattdessen tun: Wir nehmen Ihr Praxisverwaltungs- und Terminsystem im Erstgespräch auf und prüfen es, bevor Sie ein Angebot bekommen.",
       "Geprüft wird vier Dinge: ob eine geeignete Schnittstelle überhaupt existiert, ob Zugang oder Partnerfreigabe dafür erreichbar ist, welche Vorgänge sie zulässt — und ob Dritte für die Schnittstelle Gebühren verlangen. Trägt die Prüfung, binden wir Ihr System an, bis hin zur direkten Übergabe von Terminen und Ergebnissen, soweit die Schnittstelle das hergibt.",
-      "Trägt sie nicht, sagen wir das vor der Unterschrift und legen stattdessen den Übergabeweg fest: Das Ergebnis steht strukturiert im Cogniiq-Dashboard, und Ihr Team übernimmt es von dort. In beiden Fällen steht das Ergebnis der Prüfung mit allen Kosten im Angebot — auch Schnittstellenkosten Dritter. Nach Projektstart kommt dazu nichts hinzu.",
+      "Trägt sie nicht, sagen wir das vor der Unterschrift und legen stattdessen den Übergabeweg fest: Das Ergebnis steht strukturiert im Cogniiq-Dashboard, und Ihr Team übernimmt es von dort. In beiden Fällen steht das Ergebnis der Prüfung im Angebot, mit allen dafür bekannten Kosten für den vereinbarten Umfang — auch Schnittstellenkosten Dritter. Kommt später etwas hinzu, dann nur, weil sich der vereinbarte Umfang ändert oder ein externer Anbieter seine Preise ändert. Beides besprechen wir mit Ihnen und halten es fest, bevor es anfällt — nicht danach.",
     ],
   },
 };

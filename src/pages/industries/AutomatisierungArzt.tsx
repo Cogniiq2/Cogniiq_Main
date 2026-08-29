@@ -96,7 +96,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Funktioniert die Automatisierung mit unserer bestehenden Praxissoftware?",
-      answer: "Das prüfen wir vor dem Angebot, statt es vorab zu versprechen. Eine Liste unterstützter Systeme führen wir bewusst nicht — sie wäre entweder unvollständig oder unehrlich. Stattdessen nehmen wir Ihre Praxissoftware im Erstgespräch auf und prüfen: ob eine geeignete Schnittstelle existiert, ob Zugang oder Freigabe erreichbar ist, welche Vorgänge sie zulässt und ob Dritte dafür Gebühren berechnen. Trägt das, binden wir Ihr System direkt an. Trägt es nicht, legen wir den Übergabeweg fest. Das Ergebnis steht mit allen Kosten im Angebot, bevor Sie unterschreiben.",
+      answer: "Das prüfen wir vor dem Angebot, statt es vorab zu versprechen. Eine Liste unterstützter Systeme führen wir bewusst nicht — sie wäre entweder unvollständig oder unehrlich. Stattdessen nehmen wir Ihre Praxissoftware im Erstgespräch auf und prüfen: ob eine geeignete Schnittstelle existiert, ob Zugang oder Freigabe erreichbar ist, welche Vorgänge sie zulässt und ob Dritte dafür Gebühren berechnen. Trägt das, binden wir Ihr System direkt an. Trägt es nicht, legen wir den Übergabeweg fest. Das Ergebnis steht im Angebot, mit allen dafür bekannten Kosten für den vereinbarten Umfang, bevor Sie unterschreiben.",
     },
     {
       question: "Was kostet Praxisautomatisierung?",
