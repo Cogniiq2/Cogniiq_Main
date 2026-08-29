@@ -69,15 +69,19 @@ MIGRATIONS=(
   20260831120000_owner_invoice_integrity_guard
 )
 
-PSQL -c "create database invintegrity;" >/dev/null
-PSQL -d invintegrity -q -f "$ROOT/supabase/tests/lib_bootstrap.sql" >/dev/null
-
-# pgcrypto lands in `public` on a fresh cluster; the snapshot functions call
-# extensions.digest(...) explicitly, exactly as on real Supabase.
-PSQL -d invintegrity -q -c "create schema if not exists extensions; alter extension pgcrypto set schema extensions;" >/dev/null
-
-# Minimal Storage surface so the customer-documents migration can register its bucket.
-PSQL -d invintegrity -q <<'SQL' >/dev/null
+# One throwaway database per suite. These suites each own the whole schema — they wipe the
+# finance tables and seed their own fixtures with fixed UUIDs — so sharing a database between
+# two of them makes one fail on the other's leftovers (the snapshot suite and the bulk-import
+# suite both claim organization 44444444-...). Isolating them keeps every failure meaningful.
+prepare_db() {
+  local db="$1"
+  PSQL -c "create database $db;" >/dev/null
+  PSQL -d "$db" -q -f "$ROOT/supabase/tests/lib_bootstrap.sql" >/dev/null
+  # pgcrypto lands in `public` on a fresh cluster; the snapshot functions call
+  # extensions.digest(...) explicitly, exactly as on real Supabase.
+  PSQL -d "$db" -q -c "create schema if not exists extensions; alter extension pgcrypto set schema extensions;" >/dev/null
+  # Minimal Storage surface so the customer-documents migration can register its bucket.
+  PSQL -d "$db" -q <<'SQL' >/dev/null
 create schema if not exists storage;
 create table if not exists storage.buckets (
   id text primary key, name text not null, public boolean not null default false,
@@ -88,17 +92,28 @@ create table if not exists storage.objects (
   name text not null, owner uuid, metadata jsonb, created_at timestamptz not null default now());
 alter table storage.objects enable row level security;
 SQL
+  local f
+  for f in "${MIGRATIONS[@]}"; do
+    PSQL -d "$db" -q -f "$MIG/$f.sql" >/dev/null
+  done
+}
 
-for f in "${MIGRATIONS[@]}"; do
-  PSQL -d invintegrity -q -f "$MIG/$f.sql" >/dev/null
-done
-
+prepare_db invintegrity
 PSQL -d invintegrity -f "$SQLDIR/invoice-integrity-tests.sql"
 
-# The snapshot suite must still pass with the guard in place: the guard's whole point is that it
-# refuses nothing the sanctioned issuance paths do.
-PSQL -d invintegrity -f "$SQLDIR/finance-invoice-snapshot-tests.sql" >/dev/null
+# The guard's whole point is that it refuses nothing the sanctioned paths actually do, so the
+# three existing suites that exercise those paths are re-run against the GUARDED schema. The
+# chain above is the finance-multipay chain plus the two newest migrations, so they run
+# unchanged — what is being proven is exactly the guard.
+prepare_db invsnapshot
+PSQL -d invsnapshot -f "$SQLDIR/finance-invoice-snapshot-tests.sql" >/dev/null
 echo "regression: the invoice snapshot suite still passes with the integrity guard applied"
+
+prepare_db invmultipay
+PSQL -d invmultipay -f "$SQLDIR/finance-multipay-tests.sql" >/dev/null
+echo "regression: the multi-payment / bulk-import suite still passes with the integrity guard applied"
+PSQL -d invmultipay -f "$SQLDIR/finance-advance-payment-tests.sql" >/dev/null
+echo "regression: the advance-payment suite still passes with the integrity guard applied"
 
 # Convergence: the new migration must be safely re-appliable and the tests must still pass.
 PSQL -d invintegrity -q -f "$MIG/20260831120000_owner_invoice_integrity_guard.sql" >/dev/null

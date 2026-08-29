@@ -63,6 +63,12 @@ insert into public.organizations (id, name, status, created_by)
   values ('44444444-4444-4444-4444-444444444444','Integrity AG','active', current_setting('t.owner')::uuid)
   on conflict (id) do nothing;
 
+-- A SECOND organization, so "re-pointing an issued invoice to a different customer"
+-- is a real change rather than a no-op the delta check would wave through.
+insert into public.organizations (id, name, status, created_by)
+  values ('44444444-4444-4444-4444-444444444445','Fremd GmbH','active', current_setting('t.owner')::uuid)
+  on conflict (id) do nothing;
+
 insert into public.owner_document_settings (business_entity_id, legal_name, street, postal_code, city, tax_number, vat_id,
   bank_account_holder, iban, bic, bank_name, invoice_number_prefix, default_payment_terms_days, default_invoice_due_days,
   business_email)
@@ -246,9 +252,37 @@ end $$;
 revoke update on table public.owner_invoices from authenticated;
 
 -- ---------------------------------------------------------------------------
--- 4. An authenticated client cannot INSERT an already-issued invoice. Forging a
---    finished document one statement earlier is the same forgery.
+-- 4. An authenticated client cannot write the table at all: INSERT is revoked
+--    too, so `authenticated` has SELECT-only direct access.
 -- ---------------------------------------------------------------------------
+do $$
+declare v_err text;
+begin
+  set local role authenticated;
+  begin
+    insert into public.owner_invoices (business_entity_id, organization_id, status, issue_date, due_date)
+    values (current_setting('t.entity')::uuid, '44444444-4444-4444-4444-444444444444', 'draft',
+            current_date, current_date + 14);
+    v_err := null;
+  exception when others then v_err := sqlstate;
+  end;
+  reset role;
+  perform pg_temp.want(v_err = '42501', 'authenticated cannot INSERT into owner_invoices at all');
+end $$;
+
+do $$
+declare v_count int;
+begin
+  select count(*) into v_count from information_schema.table_privileges
+    where table_schema = 'public' and table_name = 'owner_invoices' and grantee = 'authenticated'
+      and privilege_type <> 'SELECT';
+  perform pg_temp.want(v_count = 0, 'authenticated holds SELECT and nothing else on owner_invoices');
+end $$;
+
+-- Defence in depth again: even with INSERT restored, the guard refuses a forged
+-- issued row while still permitting a genuine draft.
+grant insert on table public.owner_invoices to authenticated;
+
 do $$
 declare v_err text; v_msg text;
 begin
@@ -275,9 +309,11 @@ begin
           current_date, current_date + 14)
   returning id into v_id;
   reset role;
-  perform pg_temp.want(v_id is not null, 'a plain DRAFT insert is still allowed (nothing legitimate was blocked)');
+  perform pg_temp.want(v_id is not null, 'a plain DRAFT insert is still allowed by the guard itself');
   delete from public.owner_invoices where id = v_id;
 end $$;
+
+revoke insert on table public.owner_invoices from authenticated;
 
 -- ---------------------------------------------------------------------------
 -- 5. Payment reconciliation still works end to end on an issued invoice.
@@ -299,18 +335,257 @@ begin
 end $$;
 
 -- ---------------------------------------------------------------------------
--- 6. Invoice-number protection still holds for a PRIVILEGED caller as well.
+-- 6. THE POINT OF THIS PR: an issued invoice's issuance-defining fields are
+--    immutable for a PRIVILEGED caller too.
+--
+--    Every statement below runs as the database owner — is_database_admin() is
+--    true, request_is_service_role() can be made true, and a SECURITY DEFINER
+--    function runs in exactly this context. These are the mutations a future
+--    buggy privileged RPC would perform. All of them must be refused.
+--
+--    The subject is a freshly issued, UNPAID invoice built by offer conversion,
+--    so every field the battery attacks — provenance, canonical customer,
+--    organization, notes, external reference — actually carries a value and the
+--    attempted write is a real delta rather than a no-op.
+--
+--    The guard is deny-by-default: anything outside the three whitelisted
+--    transitions is refused, which is why a column a later migration adds is
+--    frozen after issuance without anyone remembering to list it here.
 -- ---------------------------------------------------------------------------
+do $$
+declare v_offer uuid; r jsonb; v_id uuid;
+begin
+  v_offer := pg_temp.make_offer('AN-FROZEN', null);
+  r := public.convert_owner_offer_to_invoice_draft(gen_random_uuid(), v_offer, null);
+  v_id := (r->>'invoice_id')::uuid;
+  r := public.issue_owner_invoice(gen_random_uuid(), v_id);
+  perform pg_temp.want(r->>'status' = 'issued', 'subject invoice issued for the immutability battery');
+  perform set_config('t.frozen', v_id::text, false);
+  perform set_config('t.frozen_number', r->>'invoice_number', false);
+end $$;
+
+create or replace function pg_temp.refuses_as_owner(p_set text, p_what text) returns void
+language plpgsql as $$
+declare v_msg text;
+begin
+  begin
+    execute format('update public.owner_invoices set %s where id = %L', p_set, current_setting('t.frozen'));
+    perform pg_temp.fail(format('a database-owner UPDATE changed %s on an issued invoice', p_what));
+  exception
+    -- P0001 = raise_exception: the guard's own refusal, not a constraint violation.
+    when sqlstate 'P0001' then v_msg := sqlerrm;
+  end;
+  perform pg_temp.want(v_msg is not null, format('issued invoice: %s refused for a privileged caller', p_what));
+end $$;
+
+do $$
+begin
+  perform pg_temp.refuses_as_owner($q$invoice_number = 'RE-RENUMBERED'$q$, 'invoice_number');
+  perform pg_temp.refuses_as_owner($q$issue_date = date '2020-01-01'$q$, 'issue_date');
+  perform pg_temp.refuses_as_owner($q$currency = 'CHF'$q$, 'currency');
+  perform pg_temp.refuses_as_owner($q$due_date = date '2030-12-31'$q$, 'due_date');
+  perform pg_temp.refuses_as_owner($q$service_date = date '2020-01-01'$q$, 'service_date');
+  perform pg_temp.refuses_as_owner($q$service_period_start = date '2020-01-01', service_period_end = date '2020-01-31'$q$, 'service period');
+  perform pg_temp.refuses_as_owner($q$issued_at = now() - interval '400 days'$q$, 'issued_at');
+  perform pg_temp.refuses_as_owner($q$notes = 'nachträglich geändert'$q$, 'notes');
+  perform pg_temp.refuses_as_owner($q$external_reference = 'Angebot GEFÄLSCHT'$q$, 'external_reference');
+  perform pg_temp.refuses_as_owner($q$net_total_cents = 1, vat_total_cents = 0, gross_total_cents = 1$q$, 'totals');
+  perform pg_temp.refuses_as_owner($q$archived_at = now()$q$, 'archived_at (no writer exists; deliberately frozen)');
+  perform pg_temp.refuses_as_owner($q$historical_entry = true$q$, 'historical_entry');
+  perform pg_temp.refuses_as_owner($q$source_offer_id = null$q$, 'source_offer_id');
+  perform pg_temp.refuses_as_owner($q$source_offer_conversion_kind = 'milestone', source_offer_milestone_index = 0$q$, 'source provenance');
+  perform pg_temp.refuses_as_owner($q$created_by = null$q$, 'created_by');
+  perform pg_temp.refuses_as_owner($q$status = 'draft', issued_at = null, invoice_number = null$q$, 'reverting to draft');
+  perform pg_temp.refuses_as_owner($q$status = 'void'$q$, 'status -> void (no sanctioned path)');
+  perform pg_temp.refuses_as_owner($q$status = 'credited'$q$, 'status -> credited (no sanctioned path)');
+  perform pg_temp.refuses_as_owner($q$status = 'overdue'$q$, 'status -> overdue (no sanctioned path)');
+  perform pg_temp.refuses_as_owner($q$amount_paid_cents = 999999$q$, 'a paid amount that contradicts the ledger');
+  perform pg_temp.refuses_as_owner($q$status = 'paid'$q$, 'a paid status that contradicts the ledger');
+  perform pg_temp.refuses_as_owner($q$status = 'paid', amount_paid_cents = gross_total_cents$q$,
+    'a fully forged payment that never entered the ledger');
+  perform pg_temp.refuses_as_owner($q$cancelled_at = now()$q$, 'cancellation metadata without the cancellation');
+  perform pg_temp.refuses_as_owner($q$status = 'cancelled'$q$, 'a cancellation without its metadata');
+end $$;
+
+-- Re-pointing the customer / organization of an issued invoice is refused; only a
+-- FIRST link (null -> value) is permitted, which is exactly what
+-- assign_invoice_organization() and owner_link_invoice_customer() allow themselves.
+do $$
+begin
+  perform pg_temp.refuses_as_owner($q$owner_customer_id = null$q$, 'clearing owner_customer_id');
+  perform pg_temp.refuses_as_owner($q$organization_id = '44444444-4444-4444-4444-444444444445'::uuid$q$,
+    're-pointing organization_id to a different organization');
+  perform pg_temp.refuses_as_owner($q$organization_id = null$q$, 'clearing organization_id');
+end $$;
+
+-- The same statements, run with a service_role JWT claim, are refused identically.
+do $$
+begin
+  perform set_config('request.jwt.claim.role', 'service_role', false);
+  perform pg_temp.refuses_as_owner($q$issue_date = date '2020-01-01'$q$, 'issue_date (service_role)');
+  perform pg_temp.refuses_as_owner($q$currency = 'USD'$q$, 'currency (service_role)');
+  perform pg_temp.refuses_as_owner($q$invoice_number = 'RE-SERVICE-ROLE'$q$, 'invoice_number (service_role)');
+  perform pg_temp.refuses_as_owner($q$owner_customer_id = null$q$, 'owner_customer_id (service_role)');
+  perform set_config('request.jwt.claim.role', 'authenticated', false);
+end $$;
+
+-- The row survived all of it unchanged.
+do $$
+declare inv record;
+begin
+  select * into inv from public.owner_invoices where id = current_setting('t.frozen')::uuid;
+  perform pg_temp.want(
+    inv.invoice_number = current_setting('t.frozen_number')
+    and inv.issue_date = current_date and inv.currency = 'EUR'
+    and inv.due_date = current_date + 21 and inv.archived_at is null
+    and inv.historical_entry = false and inv.status = 'issued'
+    and inv.amount_paid_cents = 0 and inv.net_total_cents = 200000
+    and inv.owner_customer_id = current_setting('t.customer')::uuid
+    and inv.organization_id = '44444444-4444-4444-4444-444444444444'
+    and inv.source_offer_conversion_kind = 'full',
+    'the issued invoice is field-for-field what it was after 28 privileged rewrite attempts');
+end $$;
+
+-- Line-level: an issued invoice's lines are frozen for a privileged caller too, even
+-- for an edit that moves no money and would therefore never disturb the totals.
 do $$
 declare v_msg text;
 begin
   begin
-    update public.owner_invoices set invoice_number = 'RE-RENUMBERED' where id = current_setting('t.issued')::uuid;
-    perform pg_temp.fail('an issued invoice was renumbered');
+    update public.owner_invoice_lines set description = 'Andere Leistung'
+      where invoice_id = current_setting('t.frozen')::uuid;
+    perform pg_temp.fail('a database-owner UPDATE rewrote an issued invoice line');
   exception when others then v_msg := sqlerrm;
   end;
-  perform pg_temp.want(v_msg like '%invoice numbers cannot be changed%',
-    'issued invoice numbers are still immutable, database owner included');
+  perform pg_temp.want(v_msg like '%lines cannot be changed after issuance%',
+    'issued invoice lines are immutable for a privileged caller');
+
+  v_msg := null;
+  begin
+    insert into public.owner_invoice_lines (invoice_id, description, quantity_milli, unit_price_cents, vat_rate_bp, vat_treatment)
+    values (current_setting('t.frozen')::uuid, 'Zusatzposition', 1000, 50000, 1900, 'standard');
+    perform pg_temp.fail('a line was appended to an issued invoice');
+  exception when others then v_msg := sqlerrm;
+  end;
+  perform pg_temp.want(v_msg is not null, 'no line can be appended to an issued invoice');
+
+  v_msg := null;
+  begin
+    delete from public.owner_invoice_lines where invoice_id = current_setting('t.frozen')::uuid;
+    perform pg_temp.fail('a line was deleted from an issued invoice');
+  exception when others then v_msg := sqlerrm;
+  end;
+  perform pg_temp.want(v_msg is not null, 'no line can be removed from an issued invoice');
+end $$;
+
+-- Hard DELETE of a non-draft invoice is refused for the database owner AND for
+-- service_role — the previous bypass is gone.
+do $$
+declare v_msg text;
+begin
+  begin
+    delete from public.owner_invoices where id = current_setting('t.frozen')::uuid;
+    perform pg_temp.fail('a database-owner DELETE removed an issued invoice');
+  exception when others then v_msg := sqlerrm;
+  end;
+  perform pg_temp.want(v_msg like '%cannot be deleted%',
+    'an issued invoice cannot be hard-deleted by the database owner');
+
+  v_msg := null;
+  perform set_config('request.jwt.claim.role', 'service_role', false);
+  begin
+    delete from public.owner_invoices where id = current_setting('t.frozen')::uuid;
+    perform pg_temp.fail('a service_role DELETE removed an issued invoice');
+  exception when others then v_msg := sqlerrm;
+  end;
+  perform set_config('request.jwt.claim.role', 'authenticated', false);
+  perform pg_temp.want(v_msg like '%cannot be deleted%',
+    'an issued invoice cannot be hard-deleted by service_role');
+
+  perform pg_temp.want(exists (select 1 from public.owner_invoices where id = current_setting('t.frozen')::uuid),
+    'the issued invoice is still there');
+end $$;
+
+-- service_role holds no direct DELETE privilege on the table either.
+do $$
+declare v_count int;
+begin
+  select count(*) into v_count from information_schema.table_privileges
+    where table_schema = 'public' and table_name = 'owner_invoices'
+      and grantee = 'service_role' and privilege_type = 'DELETE';
+  perform pg_temp.want(v_count = 0, 'service_role holds no direct DELETE grant on owner_invoices');
+end $$;
+
+-- A real DRAFT is still deletable through the approved RPC, and its lines go with it.
+do $$
+declare v_inv jsonb; v_id uuid;
+begin
+  v_inv := public.create_owner_invoice(gen_random_uuid(), pg_temp.header(), pg_temp.body());
+  v_id := (v_inv->>'invoice_id')::uuid;
+  perform public.delete_owner_draft_invoice(v_id);
+  perform pg_temp.want(not exists (select 1 from public.owner_invoices where id = v_id),
+    'a never-issued draft is still deletable through delete_owner_draft_invoice');
+  perform pg_temp.want(not exists (select 1 from public.owner_invoice_lines where invoice_id = v_id),
+    'its lines cascaded away with it');
+end $$;
+
+-- A draft's lines are still freely editable before issuance.
+do $$
+declare v_inv jsonb; v_id uuid; v_net bigint;
+begin
+  v_inv := public.create_owner_invoice(gen_random_uuid(), pg_temp.header(), pg_temp.body());
+  v_id := (v_inv->>'invoice_id')::uuid;
+  update public.owner_invoice_lines set unit_price_cents = 250000 where invoice_id = v_id;
+  select net_total_cents into v_net from public.owner_invoices where id = v_id;
+  perform pg_temp.want(v_net = 250000, 'a draft still recalculates its totals from an intentional line edit');
+  perform public.delete_owner_draft_invoice(v_id);
+end $$;
+
+-- A FIRST organization link on an ISSUED invoice still works: this is the
+-- pre-portal-provisioning case assign_invoice_organization exists for.
+do $$
+declare v_inv jsonb; v_id uuid; r jsonb; v_org uuid; v_cust uuid;
+begin
+  v_inv := public.create_owner_invoice(gen_random_uuid(),
+    jsonb_build_object('business_entity_id', current_setting('t.entity'),
+      'issue_date','2026-03-02','service_date','2026-03-02','due_date','2026-03-16','currency','EUR'),
+    pg_temp.body());
+  v_id := (v_inv->>'invoice_id')::uuid;
+  r := public.issue_owner_invoice(gen_random_uuid(), v_id);
+  perform pg_temp.want(r->>'status' = 'issued', 'orphan invoice (no organization, no customer) issued');
+
+  perform public.assign_invoice_organization(v_id, '44444444-4444-4444-4444-444444444444');
+  select organization_id into v_org from public.owner_invoices where id = v_id;
+  perform pg_temp.want(v_org = '44444444-4444-4444-4444-444444444444',
+    'a FIRST organization link on an issued invoice still succeeds (assign_invoice_organization)');
+
+  perform public.owner_link_invoice_customer(v_id, current_setting('t.customer')::uuid);
+  select owner_customer_id into v_cust from public.owner_invoices where id = v_id;
+  perform pg_temp.want(v_cust = current_setting('t.customer')::uuid,
+    'a FIRST canonical-customer link on an issued invoice still succeeds');
+
+  perform set_config('t.orphan', v_id::text, false);
+end $$;
+
+-- ...but re-pointing that same invoice is refused, by the RPC and by the table.
+do $$
+declare v_msg text;
+begin
+  begin
+    perform public.owner_link_invoice_customer(current_setting('t.orphan')::uuid, null);
+    perform pg_temp.fail('an issued invoice was unlinked from its customer');
+  exception when others then v_msg := sqlerrm;
+  end;
+  perform pg_temp.want(v_msg is not null, 're-pointing the customer of an issued invoice is refused');
+
+  v_msg := null;
+  begin
+    perform public.assign_invoice_organization(current_setting('t.orphan')::uuid,
+      '44444444-4444-4444-4444-444444444445');
+    perform pg_temp.fail('an issued invoice was reassigned to another organization');
+  exception when others then v_msg := sqlerrm;
+  end;
+  perform pg_temp.want(v_msg is not null, 're-assigning the organization of an issued invoice is refused');
 end $$;
 
 -- ---------------------------------------------------------------------------

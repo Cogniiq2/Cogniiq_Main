@@ -68,9 +68,12 @@ describe('no client-side write path to owner_invoices survives', () => {
 });
 
 describe('the guard migration keeps its load-bearing shape', () => {
-  it('revokes the client UPDATE grant and re-grants nothing', () => {
+  it('leaves authenticated with SELECT only and takes the destructive grant off service_role', () => {
     expect(executable).toMatch(/revoke update on table public\.owner_invoices from authenticated;/);
-    expect(executable).not.toMatch(/grant update[\s\S]*?on table public\.owner_invoices to authenticated/);
+    expect(executable).toMatch(/revoke insert on table public\.owner_invoices from authenticated;/);
+    expect(executable).toMatch(/revoke delete on table public\.owner_invoices from service_role;/);
+    // Nothing is handed back.
+    expect(executable).not.toMatch(/grant (update|insert|delete)[\s\S]*?on table public\.owner_invoices/);
   });
 
   it('covers INSERT as well as UPDATE and DELETE', () => {
@@ -78,8 +81,46 @@ describe('the guard migration keeps its load-bearing shape', () => {
       /create trigger owner_invoices_guard before insert or update or delete on public\.owner_invoices/);
   });
 
-  it('keeps the sanctioned server paths privileged rather than special-casing them', () => {
-    expect(executable).toContain('public.is_database_admin() or public.request_is_service_role()');
+  it('does not let caller privilege decide a post-issuance UPDATE', () => {
+    const guard = executable.slice(executable.indexOf('function public.owner_guard_invoice()'));
+    const body = guard.slice(0, guard.indexOf('$guard$;'));
+    const postIssuance = body.slice(body.indexOf('-- Post-issuance.'));
+    // The delta check is the whole test from here on: no privilege escape may appear.
+    expect(postIssuance).not.toMatch(/v_privileged/);
+    expect(postIssuance).not.toMatch(/is_database_admin|request_is_service_role/);
+    // ...and the decision is genuinely a whole-row diff, not a column enumeration.
+    expect(body).toContain('jsonb_object_keys(to_jsonb(new))');
+  });
+
+  it('whitelists exactly three post-issuance transitions', () => {
+    const guard = executable.slice(executable.indexOf('function public.owner_guard_invoice()'));
+    const body = guard.slice(0, guard.indexOf('$guard$;'));
+    // (A) payment-derived, re-derived from the ledger rather than trusted
+    expect(body).toContain("v_changed <@ array['amount_paid_cents', 'status']");
+    expect(body).toMatch(/from public\.owner_payments p[\s\S]*?direction = 'inflow'/);
+    expect(body).toContain('new.amount_paid_cents = v_paid and new.status = v_expected_status');
+    // (B) Storno
+    expect(body).toContain("v_changed <@ array['status', 'cancelled_at', 'cancelled_by', 'cancellation_reason']");
+    // (C) first link only, never a re-point
+    expect(body).toContain("v_changed = array['organization_id']");
+    expect(body).toContain("v_changed = array['owner_customer_id']");
+    expect(body).toContain('old.organization_id is null');
+    expect(body).toContain('old.owner_customer_id is null');
+  });
+
+  it('refuses a hard delete of any non-draft invoice, with no privileged bypass', () => {
+    const guard = executable.slice(executable.indexOf('function public.owner_guard_invoice()'));
+    const body = guard.slice(0, guard.indexOf('$guard$;'));
+    const del = body.slice(body.indexOf("if tg_op = 'DELETE'"), body.indexOf("if tg_op = 'INSERT'"));
+    expect(del).toContain("old.status <> 'draft' or old.issued_at is not null");
+    expect(del).not.toMatch(/v_privileged|is_database_admin|request_is_service_role/);
+  });
+
+  it('freezes issued invoice lines for every caller too', () => {
+    const line = executable.slice(executable.indexOf('function public.owner_guard_invoice_line()'));
+    const body = line.slice(0, line.indexOf('$line$;'));
+    expect(body).not.toMatch(/is_database_admin|request_is_service_role/);
+    expect(body).toContain("inv.status <> 'draft' or inv.issued_at is not null");
   });
 
   it('both conversion entry points delegate to the one canonical body', () => {

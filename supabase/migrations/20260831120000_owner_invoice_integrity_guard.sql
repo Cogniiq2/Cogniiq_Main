@@ -58,19 +58,26 @@
 --
 -- WHAT THIS DOES
 --
---   * Revokes the client UPDATE grant on owner_invoices outright. Every write
---     the application performs already goes through a SECURITY DEFINER RPC
---     (create_owner_invoice, issue_owner_invoice, owner_cancel_invoice,
---     owner_link_invoice_customer, assign_invoice_organization,
---     record_owner_invoice_payment, delete_owner_draft_invoice, ...); there is
---     not one raw UPDATE on this table left in src/ after this change.
---   * Rewrites owner_guard_invoice() as a real guard and extends its trigger to
---     INSERT. The discriminator is is_database_admin() / request_is_service_role(),
---     the pattern owner_guard_invoice_line() already uses: a SECURITY DEFINER
---     function runs as its owner, so every sanctioned server path — including
---     the owner_apply_payment() reconciliation trigger and owner_cancel_invoice()
---     — is privileged inside the trigger and is NOT affected. Only a raw
---     PostgREST statement, which arrives as role `authenticated`, is refused.
+--   * Revokes the client UPDATE and INSERT grants on owner_invoices outright,
+--     leaving `authenticated` with SELECT only, and revokes the unused DELETE
+--     grant from service_role. Every write the application performs already goes
+--     through a SECURITY DEFINER RPC (create_owner_invoice, issue_owner_invoice,
+--     owner_cancel_invoice, owner_link_invoice_customer,
+--     assign_invoice_organization, record_owner_invoice_payment,
+--     delete_owner_draft_invoice, ...).
+--   * Rewrites owner_guard_invoice() so that AFTER ISSUANCE the permitted
+--     mutations are decided by FIELD DELTA and VALID STATE TRANSITION, not by
+--     the caller's privilege. There is no "privileged => allow everything"
+--     branch for a non-draft invoice: a SECURITY DEFINER RPC, service_role and
+--     the database owner are all held to the same three whitelisted
+--     transitions (ledger-consistent payment application, Storno, first-time
+--     CRM link). The realistic threat to an issued invoice is not a malicious
+--     browser — it is a future privileged RPC with a bug in it, and only a
+--     delta check catches that. Hard-deleting a non-draft invoice is refused
+--     for every caller, with no service-role or admin bypass.
+--   * Hardens owner_guard_invoice_line() the same way: once the parent invoice
+--     leaves draft its lines are frozen for everyone, so a privileged edit
+--     cannot rewrite the document text without moving the totals.
 --   * Extracts owner_convert_offer_to_invoice_core(): ONE body holding the whole
 --     offer -> initial-invoice business rule. convert_owner_offer_to_invoice_draft
 --     (owner-gated + idempotency-keyed) and owner_convert_offer_internal
@@ -87,6 +94,9 @@
 --     recurring scheduler, or any historical row. It rewrites no data at all:
 --     the only DML in this file is none.
 --   * It does not relax anything. Every branch it adds can only refuse.
+--   * It grants no new capability to any role. The only grant statements in this
+--     file are REVOKEs plus the re-grants that keep the two conversion RPCs
+--     exactly as reachable as they were.
 --
 -- Idempotent and safely re-appliable: create-or-replace throughout, plus
 -- drop-and-recreate for the one trigger whose event list changes.
@@ -95,78 +105,150 @@
 begin;
 
 -- ---------------------------------------------------------------------------
--- 1. Remove the client UPDATE capability on owner_invoices.
+-- 1. Remove the client write capability on owner_invoices.
 --
---    A column-level REVOKE cannot subtract from a grant, so this drops the whole
---    thing and re-grants nothing. owner_invoice_lines keeps its column grant
---    untouched — owner_guard_invoice_line() already refuses any line write once
---    the parent invoice leaves draft, and lines are only ever written by the
---    same SECURITY DEFINER RPCs.
+--    A column-level REVOKE cannot subtract from a grant, so the whole UPDATE
+--    grant goes and nothing is re-granted. INSERT goes with it: every creation
+--    path in the repository is a SECURITY DEFINER RPC (create_owner_invoice,
+--    record_owner_historical_paid_invoice, owner_build_issued_invoice,
+--    owner_convert_offer_to_invoice_core), and a repository-wide sweep — src/,
+--    supabase/functions/, the automation worker, the QA scripts — found no raw
+--    INSERT against this table. `authenticated` is left with SELECT only; every
+--    mutation is an RPC.
 --
---    SELECT and INSERT are deliberately left in place: the cockpit reads this
---    table directly, and INSERT is now constrained by the guard below rather
---    than removed, so an existing owner-side create path cannot break silently.
+--    DELETE is revoked from service_role for the same reason: nothing calls it
+--    (delete_owner_draft_invoice is SECURITY DEFINER and therefore runs as its
+--    owner, not as service_role), and it is the one destructive direct grant on
+--    the table. service_role keeps INSERT/UPDATE — unused for this table today,
+--    and now subject to exactly the same guard as everyone else.
+--
+--    owner_invoice_lines keeps its column grant: the hardened
+--    owner_guard_invoice_line() below refuses every line write once the parent
+--    invoice leaves draft, for all callers.
 -- ---------------------------------------------------------------------------
 revoke update on table public.owner_invoices from authenticated;
+revoke insert on table public.owner_invoices from authenticated;
+revoke delete on table public.owner_invoices from service_role;
 
 comment on table public.owner_invoices is
-  'Owner invoices. Client sessions have SELECT/INSERT only: every UPDATE goes through a '
-  'SECURITY DEFINER RPC (issue_owner_invoice, owner_cancel_invoice, owner_link_invoice_customer, '
-  'assign_invoice_organization, record_owner_invoice_payment) and is additionally gated by '
-  'owner_guard_invoice().';
+  'Owner invoices. Client sessions have SELECT only: every mutation goes through a SECURITY '
+  'DEFINER RPC (create_owner_invoice, issue_owner_invoice, owner_cancel_invoice, '
+  'owner_link_invoice_customer, assign_invoice_organization, record_owner_invoice_payment, '
+  'delete_owner_draft_invoice). owner_guard_invoice() then enforces post-issuance immutability '
+  'by FIELD DELTA for every caller, privileged ones included.';
 
 commit;
 
 begin;
 
 -- ---------------------------------------------------------------------------
--- 2. owner_guard_invoice — the actual invariant.
+-- 2. owner_guard_invoice — post-issuance immutability by field delta.
 --
---    PRIVILEGED (is_database_admin() = a SECURITY DEFINER function or direct
---    database-owner maintenance; request_is_service_role() = trusted backend):
---    unchanged behaviour, plus the two pre-existing protections are KEPT rather
---    than skipped, because they are cheap and they are what stops a sanctioned
---    RPC from renumbering an issued invoice by accident.
+--    THE INVARIANT THIS ENFORCES
 --
---    UNPRIVILEGED (role `authenticated` — a browser/PostgREST statement):
---      INSERT  -> only a genuine draft: no number, not issued, not cancelled.
---      UPDATE  -> refused. There is no column on this table a client may write
---                 directly; the grant above already makes this unreachable, and
---                 this branch is what keeps it true if the grant is ever
---                 re-added by a later migration.
---      DELETE  -> unchanged: drafts only.
+--    Once an invoice has left draft it is a legal document (§14 UStG) and an
+--    accounting fact. From that moment the ONLY changes it may undergo are the
+--    ones the authoritative mechanisms genuinely produce. That has to hold for
+--    every caller — a SECURITY DEFINER RPC, service_role and the database owner
+--    included — because the realistic threat is not a malicious browser, it is a
+--    future RPC with a bug in it. A guard that trusts the caller's privilege
+--    cannot catch that; a guard that validates the DELTA can.
 --
---    The field classification this encodes, for the record:
---      DRAFT-EDITABLE ......... via create_owner_invoice / owner_link_invoice_customer /
---                               assign_invoice_organization / delete_owner_draft_invoice
---      SERVER-DERIVED ......... net_total_cents, vat_total_cents, gross_total_cents
---                               (owner_recalc_invoice_totals)
---      ISSUANCE-ONLY .......... invoice_number, issued_at, status->'issued'
---                               (issue_owner_invoice / owner_issue_invoice_internal /
---                               owner_build_issued_invoice / record_owner_historical_paid_invoice)
---      PAYMENT-DERIVED ........ amount_paid_cents and the paid/partially_paid/issued
---                               status transitions (owner_apply_payment)
---      CANCELLATION-METADATA .. cancelled_at, cancelled_by, cancellation_reason,
---                               status->'cancelled' (owner_cancel_invoice)
---      IMMUTABLE-AFTER-ISSUANCE issue_date, service_date, service_period_start,
---                               service_period_end, due_date, currency,
---                               organization_id, client_account_id, engagement_id,
---                               owner_customer_id, notes, external_reference,
---                               source_offer_*, historical_entry, invoice_number
---    Every one of those groups is written by a SECURITY DEFINER path, so the
---    privileged branch below is what keeps them writable by their owner and the
---    unprivileged branch is what makes them unwritable by anyone else.
+--    So the previous "privileged => allow everything" branch is gone. What
+--    remains is a whitelist of complete, validated transitions, computed by
+--    diffing to_jsonb(old) against to_jsonb(new). Anything not on the list is
+--    refused, which means a column ADDED to this table in the future is frozen
+--    after issuance by default rather than quietly mutable.
+--
+--    ALLOWED POST-ISSUANCE TRANSITIONS (each is an exact whole-row delta):
+--
+--    (A) PAYMENT-DERIVED — {amount_paid_cents} and/or {status}.
+--        Not merely whitelisted: RE-DERIVED. amount_paid_cents must equal the
+--        sum of inflow payments on the ledger and status must equal what
+--        owner_apply_payment() computes from that same sum. A payment-shaped
+--        UPDATE that does not agree with the ledger is refused, so this branch
+--        cannot be used to invent a payment.
+--
+--    (B) STORNO — {status, cancelled_at, cancelled_by, cancellation_reason},
+--        only into 'cancelled', only from a non-cancelled, non-void, non-draft
+--        state, and only with cancelled_at actually set. Exactly what
+--        owner_cancel_invoice() writes; drafts are deleted, never cancelled.
+--
+--    (C) FIRST-TIME CRM/PORTAL LINK — {organization_id} or {owner_customer_id},
+--        and ONLY null -> a value.
+--        This is the one deliberate deviation from "freeze every identity
+--        field", and it is narrow on purpose. assign_invoice_organization()
+--        exists precisely to attach an ALREADY-ISSUED invoice that predates
+--        portal provisioning to its organization (it is live in
+--        src/lib/customerPlatform/ownerProjectsApi.ts and has its own CI suite),
+--        and owner_link_invoice_customer() does the same for the canonical
+--        customer. Both RPCs already refuse re-pointing themselves; this branch
+--        refuses it a second time, at the table. Neither can alter the issued
+--        document: the recipient was frozen into owner_invoice_versions at
+--        issuance and is never re-read from these columns.
+--        To make these fields absolutely immutable instead, delete this branch —
+--        assign_invoice_organization() then fails for issued invoices.
+--
+--    FROZEN AFTER ISSUANCE FOR EVERY CALLER — everything else on the table:
+--      invoice_number, issued_at, issue_date, service_date,
+--      service_period_start, service_period_end, due_date, currency,
+--      net_total_cents, vat_total_cents, gross_total_cents, notes,
+--      external_reference, engagement_id, client_account_id, historical_entry,
+--      source_offer_id, source_offer_conversion_kind,
+--      source_offer_milestone_index, archived_at, business_entity_id,
+--      created_by, created_at, id — plus any column a later migration adds.
+--
+--      archived_at is frozen deliberately: a repository-wide search found NO
+--      writer for it on owner_invoices (the cockpit only ever FILTERS on it), so
+--      there is no legitimate mutation to preserve. If archiving an issued
+--      invoice is ever wanted, it needs an RPC and an entry here — which is the
+--      point: the whitelist is a decision, not an oversight.
+--
+--      'void', 'credited' and 'overdue' become unreachable statuses. Nothing in
+--      the codebase ever set them; the only path that could was the deleted
+--      client-side setInvoiceStatus. Reaching them would need a sanctioned RPC
+--      and a branch here.
+--
+--    updated_at is excluded from the diff: owner_invoices_set_updated_at is a
+--    separate BEFORE UPDATE trigger that fires after this one.
+--
+--    PRE-ISSUANCE (status = 'draft' AND issued_at IS NULL — the repository's own
+--    definition of a real draft, the same one delete_owner_draft_invoice uses):
+--    server paths keep full freedom, which is what lets create/edit/recalculate
+--    and the draft -> issued transition itself work. An unprivileged caller is
+--    refused outright; the revoked grants already make that unreachable, and
+--    this branch is what keeps it true if a later migration re-grants.
+--
+--    DELETE: a real draft only, for EVERY caller. The previous
+--    is_database_admin()/request_is_service_role() bypass is removed — an issued
+--    or cancelled invoice is accounting history and hard-deleting it is never a
+--    routine operation. There is no documented emergency path in this repository
+--    that requires it, so none is preserved. The DBA escape hatch that remains
+--    is `set session_replication_role = replica`, which needs superuser, is not
+--    reachable from PostgREST by `authenticated` or `service_role`, and is an
+--    explicit, deliberate act rather than a caller-privilege bypass.
+--
+--    INSERT: a privileged caller may insert any shape — migrations, backfills
+--    and the staging fixture seed depend on it, and every issuance RPC inserts a
+--    draft and then issues it. An unprivileged caller may only ever create a
+--    genuine draft.
 -- ---------------------------------------------------------------------------
 create or replace function public.owner_guard_invoice()
 returns trigger language plpgsql set search_path = public, pg_temp as $guard$
-declare v_privileged boolean;
+declare
+  v_privileged boolean;
+  v_was_draft boolean;
+  v_changed text[];
+  v_paid bigint;
+  v_expected_status text;
 begin
   v_privileged := public.is_database_admin() or public.request_is_service_role();
 
   if tg_op = 'DELETE' then
-    if v_privileged then return old; end if;
-    if old.status <> 'draft' then
-      raise exception 'issued invoices cannot be deleted; void or cancel instead';
+    if old.status <> 'draft' or old.issued_at is not null then
+      raise exception
+        'invoice % is % and cannot be deleted; accounting history is kept (cancel it instead)',
+        coalesce(old.invoice_number, old.id::text), old.status;
     end if;
     return old;
   end if;
@@ -187,31 +269,128 @@ begin
     return new;
   end if;
 
-  -- UPDATE
-  if old.status <> 'draft' and new.invoice_number is distinct from old.invoice_number then
-    raise exception 'issued invoice numbers cannot be changed';
-  end if;
-  if new.status = 'issued' and new.issued_at is null then
+  -- ----------------------------- UPDATE ------------------------------------
+  v_was_draft := old.status = 'draft' and old.issued_at is null;
+
+  if v_was_draft and new.status = 'issued' and new.issued_at is null then
     new.issued_at := now();
   end if;
 
-  if v_privileged then return new; end if;
+  -- A client session may not write this table AT ALL, at any lifecycle stage.
+  -- The revoked grant already makes this unreachable; the check is what keeps it
+  -- true if a later migration re-grants, and it runs before the post-issuance
+  -- whitelist so a client can never reach even a well-formed payment update.
+  if not v_privileged then
+    raise exception
+      'invoices cannot be modified directly; use the invoice RPCs (issue, cancel, record payment)';
+  end if;
+
+  if v_was_draft then
+    return new;
+  end if;
+
+  -- Post-issuance. Caller privilege is deliberately NOT consulted from here on:
+  -- among privileged callers the delta is the whole test, because the realistic
+  -- threat is a sanctioned RPC with a bug in it.
+  select coalesce(array_agg(k order by k), array[]::text[]) into v_changed
+  from jsonb_object_keys(to_jsonb(new)) as k
+  where k <> 'updated_at'
+    and (to_jsonb(new) -> k) is distinct from (to_jsonb(old) -> k);
+
+  if array_length(v_changed, 1) is null then
+    return new;                                   -- no-op update
+  end if;
+
+  -- (A) Payment-derived, re-derived from the ledger rather than trusted.
+  if v_changed <@ array['amount_paid_cents', 'status'] then
+    select coalesce(sum(p.amount_cents), 0) into v_paid
+    from public.owner_payments p
+    where p.invoice_id = new.id and p.direction = 'inflow';
+
+    v_expected_status := case
+      when old.status in ('draft', 'void', 'cancelled', 'credited') then old.status
+      when v_paid >= new.gross_total_cents and new.gross_total_cents > 0 then 'paid'
+      when v_paid > 0 then 'partially_paid'
+      else 'issued'
+    end;
+
+    if new.amount_paid_cents = v_paid and new.status = v_expected_status then
+      return new;
+    end if;
+    raise exception
+      'invoice % : a payment-derived update must match the payment ledger (ledger %, attempted paid %, expected status %, attempted %)',
+      coalesce(new.invoice_number, new.id::text), v_paid, new.amount_paid_cents,
+      v_expected_status, new.status;
+  end if;
+
+  -- (B) Storno.
+  if v_changed <@ array['status', 'cancelled_at', 'cancelled_by', 'cancellation_reason']
+     and new.status = 'cancelled'
+     and old.status not in ('cancelled', 'void')
+     and new.cancelled_at is not null then
+    return new;
+  end if;
+
+  -- (C) First-time CRM / portal link, null -> value only.
+  if v_changed = array['organization_id']
+     and old.organization_id is null and new.organization_id is not null then
+    return new;
+  end if;
+  if v_changed = array['owner_customer_id']
+     and old.owner_customer_id is null and new.owner_customer_id is not null then
+    return new;
+  end if;
 
   raise exception
-    'invoices cannot be modified directly; use the invoice RPCs (issue, cancel, record payment)';
+    'invoice % is % and its issuance-defining fields are immutable; refused change to: %',
+    coalesce(old.invoice_number, old.id::text), old.status, array_to_string(v_changed, ', ');
 end;
 $guard$;
 
 comment on function public.owner_guard_invoice() is
-  'Row guard for owner_invoices. A client session (role authenticated) may insert drafts and '
-  'delete drafts and may never UPDATE; every sanctioned mutation arrives through a SECURITY '
-  'DEFINER RPC or the owner_apply_payment reconciliation trigger, which are privileged here.';
+  'Row guard for owner_invoices. Once an invoice leaves draft, the only permitted UPDATEs are a '
+  'ledger-consistent payment application, a Storno into cancelled, and a first-time '
+  'organization/owner_customer link — validated by field delta for EVERY caller, including '
+  'SECURITY DEFINER RPCs, service_role and the database owner. Non-draft invoices can never be '
+  'hard-deleted. A client session may not write the table at all.';
 
 -- The event list changes (INSERT is added), which create-or-replace on the
 -- function cannot do — the trigger itself has to be recreated.
 drop trigger if exists owner_invoices_guard on public.owner_invoices;
 create trigger owner_invoices_guard before insert or update or delete on public.owner_invoices
   for each row execute function public.owner_guard_invoice();
+
+-- ---------------------------------------------------------------------------
+-- 2b. owner_guard_invoice_line — the same principle one table down.
+--
+--     The header guard already refuses any change to the totals, so a privileged
+--     line edit that changes money is caught there. A line edit that does NOT
+--     change money — a description, a service period, a sort order — would slip
+--     past it, and the description is document-defining text on the issued PDF.
+--     The is_database_admin()/request_is_service_role() bypass is therefore
+--     removed here too: once the parent invoice leaves draft, its lines are
+--     frozen for everyone.
+--
+--     The parent-is-gone case is kept exactly as before: when a draft invoice is
+--     deleted, ON DELETE CASCADE removes the parent row first, so the lookup
+--     finds nothing and the cascade proceeds.
+-- ---------------------------------------------------------------------------
+create or replace function public.owner_guard_invoice_line()
+returns trigger language plpgsql set search_path = public, pg_temp as $line$
+declare inv record;
+begin
+  select status, issued_at, invoice_number into inv
+  from public.owner_invoices where id = coalesce(new.invoice_id, old.invoice_id);
+  if inv.status is not null and (inv.status <> 'draft' or inv.issued_at is not null) then
+    raise exception 'invoice lines cannot be changed after issuance; use cancellation or a credit note';
+  end if;
+  return coalesce(new, old);
+end;
+$line$;
+
+drop trigger if exists owner_invoice_lines_guard on public.owner_invoice_lines;
+create trigger owner_invoice_lines_guard before insert or update or delete on public.owner_invoice_lines
+  for each row execute function public.owner_guard_invoice_line();
 
 commit;
 
