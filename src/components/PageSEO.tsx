@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { BUSINESS_INFO } from "@/lib/seo-data";
+import { routeMetadataForCanonical } from "@/lib/routing/routeMetadata";
 
 interface FaqItem {
   question: string;
@@ -80,8 +81,8 @@ function JsonLd({ id, data }: { id: string; data: object }) {
 }
 
 export function PageSEO({
-  title,
-  description,
+  title: titleProp,
+  description: descriptionProp,
   canonical,
   breadcrumbs,
   faqItems,
@@ -90,11 +91,25 @@ export function PageSEO({
   noIndex = false,
   noCanonical = false,
 }: PageSEOProps) {
+  // PUBLIC_ROUTES is the single source for a route's identity, on both sides of
+  // the build: scripts/prerender.mjs writes these exact strings into the crawled
+  // <head>, and resolving them here means the hydrated head, the OG/Twitter tags
+  // and the WebPage JSON-LD are the same strings rather than a second opinion.
+  // See src/lib/routing/routeMetadata.ts for why the manifest wins over the props.
+  //
+  // noCanonical marks a document with no canonical address of its own (the 404,
+  // which answers every unknown URL), so there is nothing to resolve against and
+  // the caller's own values stand.
+  const routeMetadata = noCanonical ? undefined : routeMetadataForCanonical(canonical);
+  const title = routeMetadata?.title ?? titleProp;
+  const description = routeMetadata?.description ?? descriptionProp;
+  const isNoIndex = routeMetadata ? !routeMetadata.indexable : noIndex;
+
   useEffect(() => {
     document.title = title;
 
     setMeta("description", description);
-    setMeta("robots", noIndex ? "noindex, nofollow" : "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1");
+    setMeta("robots", isNoIndex ? "noindex, nofollow" : "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1");
 
     if (noCanonical) {
       removeElements('link[rel="canonical"]');
@@ -125,7 +140,7 @@ export function PageSEO({
     setMeta("twitter:image", ogImage, "name");
     setMeta("twitter:image:alt", title, "name");
 
-  }, [title, description, canonical, ogImage, noIndex, noCanonical]);
+  }, [title, description, canonical, ogImage, isNoIndex, noCanonical]);
 
   const breadcrumbList =
     breadcrumbs && breadcrumbs.length > 0
