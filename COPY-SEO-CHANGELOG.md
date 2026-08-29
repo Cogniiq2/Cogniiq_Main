@@ -591,3 +591,62 @@ npm run build && grep -rl "<Aussage>" dist --include=*.html | wc -l
 ```
 
 Diese Zahl ist mehrfach höher ausgefallen als erwartet.
+
+## Stufe 10 · `/kosten-ki-telefonassistent` — Rankingpass (2026-08-29)
+
+Auslöser: `docs/SEO-OVERNIGHT-MASTER-REPORT-2026-08-29.md` (Branch
+`claude/seo-overnight-master-2026-08-29`). Belegte Zahlen für die Abfragefamilie
+„ki telefonassistent kosten" (+Varianten): **152 Impressionen in 28 Tagen
+(vorher 261, −42 %), Position 34–36**, Bottleneck-Klasse „External authority +
+internal authority", Priorität 62/100. Empfehlung des Reports: mit der
+Arztpraxis-Seite bündeln statt isoliert zu behandeln (dieselbe Zielgruppe,
+andere Funnel-Stufe).
+
+**Diagnose:** Die Seite selbst ist bereits gut ausgestattet — drei Tarife mit
+Deckelung, acht-Schritte-Einrichtung, sieben FAQ-Einträge, `Service`+`Offer`-
+Schema, Verlinkung aus Hauptnavigation (Leistungen-Panel), Footer, `/praxen`
+und allen Branchen-/Problem-Seiten. Title (52 Z.) und H1 treffen die
+Kernabfrage. Einzige gefundene Regelverletzung: Meta-Description lag bei 161
+Zeichen, außerhalb des in Brief §8.2 vorgegebenen Korridors (140–158). Die
+Arztpraxis-Seite (`/ki-telefonassistent-arzt`, dieselbe Zielgruppe, Objection
+#5 „Kosten nicht planbar" laut Brief §5.6 mid-hardness) hatte bislang **keine**
+Preis-FAQ — nur zwei CTA-Buttons zur Kostenseite, keinen inhaltlichen Absatz.
+Externe Autorität (Domain-Alter, Backlinks) bleibt der dominante,
+seitenübergreifende Faktor und ist mit On-Page-Mitteln nicht behebbar.
+
+| Element | Vorher | Nachher |
+|---|---|---|
+| Meta-Description `/kosten-ki-telefonassistent` (Komponente **und** `publicRoutes.ts`-Manifest — beide trugen denselben Text getrennt, siehe Stufe 8b/§9-Fehlerklasse) | „…gedeckelter Rechnung, Einrichtung und Zwei-Wochen-Garantie." (161 Z.) | „…gedeckelter Rechnung und Zwei-Wochen-Garantie." (148 Z., im Korridor) |
+| Title `/kosten-ki-telefonassistent` | unverändert (52 Z., bereits korrekt) | unverändert |
+| Canonical, Schema, H1, FAQ-Anzahl | unverändert | unverändert |
+| FAQ `/ki-telefonassistent-arzt` | keine Preisfrage | neu: „Sind die monatlichen Kosten planbar oder wird pro Anruf abgerechnet?" — beantwortet aus `FAKTEN.deckelung`, keine neue Zahl, nennt die Kostenseite als Textverweis |
+
+- Keyword erhalten: ja (Title/H1 unverändert, nur Description gekürzt).
+- Schema: `FAQPage` auf `/ki-telefonassistent-arzt` um einen validen Eintrag erweitert (Text = sichtbarer Absatz, keine Diskrepanz).
+- Interne Verlinkung: Bestand bereits bidirektional (`/kosten-ki-telefonassistent` ↔ `/ki-telefonassistent-arzt` ↔ `/praxen`); die neue FAQ verstärkt die inhaltliche Relevanz des bestehenden Links, ohne einen weiteren Link-Slot zu erzwingen.
+- Statistik: keine neue; `FAKTEN.deckelung` ist bereits an anderer Stelle im Cluster verwendete Konstante (kein neues Literal, siehe `telefonassistent-copy.test.ts`).
+- Cannibalization: keine neue Überschneidung geschaffen. `/praxen` bleibt der Hub mit eigener Preis-Kurzfassung (Seitenhierarchie-Entscheidung aus `OWNER-INPUT.md`); `/kosten-ki-telefonassistent` bleibt die alleinige Tiefenseite für die Kostenfrage.
+
+**Nicht umgesetzt (außerhalb der Evidenzlage):** zusätzliche Content-Blöcke,
+Titel-Umformulierung, neue Vergleichstabellen. Die Wettbewerbsrecherche
+(Phase 2) zeigte vergleichbare oder geringere Preistransparenz bei
+Mitbewerber-Inhalten; die Seite unterbietet sie inhaltlich bereits. Die externe
+Autoritätslücke bleibt unadressiert — außerhalb des Umfangs von Copy-/Onpage-
+Änderungen.
+
+### Messplan
+
+Baseline (2026-08-29, aus dem Overnight-Report): 152 Impressionen/28 Tage,
+Position 34–36, 0 Klicks für die Abfragefamilie „ki telefonassistent kosten".
+
+| Check-in | Was prüfen | Kriterium |
+|---|---|---|
+| Tag 7 (2026-09-05) | GSC: Impressionen, Position, CTR, Klicks für die Abfragefamilie; Indexierungsstatus der Description-Änderung (URL-Kontrolle) | Nur Beobachtung — 7 Tage sind zu kurz für ein Urteil |
+| Tag 14 (2026-09-12) | dito, plus: hat sich die rankende URL geändert (Ownership-Check ggü. `/praxen`, `/ki-telefonassistent-arzt`)? | Wenn Position sich um mehr als 5 Plätze verschlechtert: Ursache prüfen, ggf. Description-Änderung zurücknehmen |
+| Tag 28 (2026-09-26) | dito, vollständiger 28-Tage-Vergleich ggü. Baseline | Wenn Position sich nicht um mindestens einige Plätze verbessert und CTR trotz kürzerer Description nicht steigt: Änderung war wirkungslos — nächster Hebel ist externe Autorität (Backlinks, E-E-A-T), nicht weiteres Onpage-Tuning an dieser Seite |
+
+Rollback-Kriterium: Sollte die CTR bei gleicher oder besserer Position fallen,
+Description auf die vorherige Fassung zurücksetzen (siehe Diff oben, beide
+Dateien betroffen). Ein Revert der FAQ-Ergänzung ist nur nötig, falls der
+Inhaber eine der genannten Zahlen widerruft — bis dahin bleibt sie stehen, weil
+sie ausschließlich bereits geprüfte `FAKTEN`-Werte referenziert.

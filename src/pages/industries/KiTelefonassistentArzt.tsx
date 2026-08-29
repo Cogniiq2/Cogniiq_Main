@@ -133,6 +133,11 @@ const config: NationalIndustryPageConfig = {
       answer:
         "Ja. Sprechzeiten, Urlaubsansagen und aktuelle Hinweise pflegen Sie selbst über ein Dashboard – ohne Anruf beim Support, auch kurzfristig vor Feiertagen. Änderungen an Gesprächslogik und Regeln übernehmen wir; dafür haben Sie einen festen Ansprechpartner.",
     },
+    {
+      question: "Sind die monatlichen Kosten planbar oder wird pro Anruf abgerechnet?",
+      answer:
+        `Planbar: Jeder Tarif hat ein festes Minutenkontingent zu einem festen Monatspreis, keine Abrechnung pro Anruf. ${FAKTEN.deckelung} Alle Tarife, Kontingente und die Einrichtung im Detail stehen unter Kosten KI Telefonassistent.`,
+    },
   ],
   grenzen: GRENZEN,
   stimmprobe: true,
