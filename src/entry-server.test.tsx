@@ -133,3 +133,23 @@ describe('renderElement failure behaviour', () => {
     ).rejects.toThrow(/chunk load failed/);
   }, 20_000);
 });
+
+describe('SSR output is not corrupted at the encoder chunk boundary', () => {
+  // react-dom encodes SSR output into a fixed-size view with TextEncoder.encodeInto.
+  // A multi-byte character landing exactly on that view boundary used to emit a
+  // stray NUL immediately before the character, which then shipped inside
+  // prerendered German copy ("Die vier S\u0000\u00e4ulen"). The offsets that trigger
+  // it depend only on byte position, so this fixture sprays multi-byte characters
+  // across every offset parity in a document large enough to cross the boundary
+  // many times over.
+  it('emits no NUL bytes around multi-byte characters', async () => {
+    const parts = Array.from({ length: 4000 }, (_, i) => (
+      <p key={i}>{'x'.repeat(i % 11)}{'\u00e4\u00f6\u00fc\u2013'}</p>
+    ));
+    const { html } = await renderElement(<div>{parts}</div>, 'nul-boundary', 30_000);
+
+    expect(html).not.toContain('\u0000');
+    // and the characters themselves survive intact
+    expect(html.split('\u00e4\u00f6\u00fc\u2013').length - 1).toBe(4000);
+  });
+});
