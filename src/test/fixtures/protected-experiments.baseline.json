@@ -1,0 +1,2281 @@
+{
+  "_comment": "Recorded by `npm run seo:baseline`. Frozen fingerprints of the six live SEO experiments; see src/lib/routing/protectedExperiments.ts. Do not hand-edit, and do not regenerate to make a failing build pass — a diff here means a protected page moved.",
+  "fingerprints": {
+    "/bayreuth/webdesign": {
+      "path": "/bayreuth/webdesign",
+      "title": "Webdesign Agentur Bayreuth – Website erstellen & SEO | Cogniiq",
+      "description": "Webdesign Bayreuth: Individuelle Websites für lokale Unternehmen. Schnell, SEO-optimiert, Mobile-First. Keine Templates – professionelle Webentwicklung mit lokalem Ansprechpartner.",
+      "keywords": "Webdesign Bayreuth, Webdesign Agentur Bayreuth, Website erstellen Bayreuth, Homepage Bayreuth",
+      "canonical": "https://cogniiq.de/bayreuth/webdesign",
+      "robots": "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
+      "indexable": true,
+      "sitemap": "2026-03-14|weekly|0.9",
+      "h1": [
+        "Webdesign Agentur in Bayreuth"
+      ],
+      "textLength": 12081,
+      "textDigest": "cf955c892f4a9b59",
+      "jsonLd": [
+        "13ec8e357526750e",
+        "29aa7af0fa63bce2",
+        "659e3f5d2ff0e569",
+        "fd6b54fbf6cfd007",
+        "fdc2b84997aa4057"
+      ],
+      "outgoingLinks": [
+        {
+          "href": "/",
+          "text": "COGNIIQ"
+        },
+        {
+          "href": "/",
+          "text": "COGNIIQ"
+        },
+        {
+          "href": "/",
+          "text": "Cogniiq"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/app/login",
+          "text": "Kundenlogin"
+        },
+        {
+          "href": "/automatisierung-arzt",
+          "text": "Für Arztpraxen"
+        },
+        {
+          "href": "/automatisierung-immobilien",
+          "text": "Für Immobilien"
+        },
+        {
+          "href": "/automatisierung-restaurant",
+          "text": "Für Restaurants"
+        },
+        {
+          "href": "/automatisierung-sport",
+          "text": "Für Sport und Fitness"
+        },
+        {
+          "href": "/automatisierung-unternehmen",
+          "text": "Automatisierung"
+        },
+        {
+          "href": "/automatisierung-unternehmen",
+          "text": "Automatisierung"
+        },
+        {
+          "href": "/automatisierung-unternehmen",
+          "text": "AutomatisierungWiederkehrende Abläufe laufen ohne Handarbeit."
+        },
+        {
+          "href": "/automatisierung-unternehmen",
+          "text": "Prozessautomatisierung"
+        },
+        {
+          "href": "/bayern",
+          "text": "Bayern"
+        },
+        {
+          "href": "/bayern",
+          "text": "Bayern"
+        },
+        {
+          "href": "/bayern",
+          "text": "Bayern"
+        },
+        {
+          "href": "/bayern",
+          "text": "KI-Agentur Bayern – Übersicht"
+        },
+        {
+          "href": "/bayreuth/automatisierung",
+          "text": "Automatisierung Bayreuth"
+        },
+        {
+          "href": "/bayreuth/automatisierung",
+          "text": "Automatisierung Bayreuth"
+        },
+        {
+          "href": "/bayreuth/automatisierung",
+          "text": "Prozessautomatisierung"
+        },
+        {
+          "href": "/bayreuth/ki-telefonassistent",
+          "text": "KI Telefonassistenten für Bayreuth"
+        },
+        {
+          "href": "/bayreuth/ki-telefonassistent",
+          "text": "KI-Telefonassistent Bayreuth"
+        },
+        {
+          "href": "/bayreuth/ki-telefonassistent",
+          "text": "KI-Telefonassistent Bayreuth"
+        },
+        {
+          "href": "/bayreuth/webdesign",
+          "text": "Webdesign Bayreuth"
+        },
+        {
+          "href": "/bayreuth/webdesign",
+          "text": "Webdesign Bayreuth"
+        },
+        {
+          "href": "/bayreuth/website-relaunch",
+          "text": "Website Relaunch"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "BayreuthHauptsitz"
+        },
+        {
+          "href": "/bewertungen",
+          "text": "Bewertungen"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/datenschutz",
+          "text": "Datenschutz"
+        },
+        {
+          "href": "/deutschland",
+          "text": "Deutschland"
+        },
+        {
+          "href": "/deutschland",
+          "text": "Deutschland"
+        },
+        {
+          "href": "/deutschland",
+          "text": "Deutschland"
+        },
+        {
+          "href": "/faq",
+          "text": "Häufige Fragen"
+        },
+        {
+          "href": "/impressum",
+          "text": "Impressum"
+        },
+        {
+          "href": "/keine-anfragen-website",
+          "text": "Website bringt keine Anfragen"
+        },
+        {
+          "href": "/keine-terminbuchung-online",
+          "text": "Keine automatische Terminbuchung"
+        },
+        {
+          "href": "/ki-agentur-deutschland",
+          "text": "KI-Agentur"
+        },
+        {
+          "href": "/ki-agentur-deutschland",
+          "text": "KI-Agentur Deutschland"
+        },
+        {
+          "href": "/ki-telefonassistent-arzt",
+          "text": "Arztpraxen im Detail"
+        },
+        {
+          "href": "/ki-telefonassistent-hotel",
+          "text": "Für Hotels"
+        },
+        {
+          "href": "/ki-telefonassistent-restaurant",
+          "text": "Für Restaurants"
+        },
+        {
+          "href": "/ki-telefonassistent/demo",
+          "text": "Demo anhören"
+        },
+        {
+          "href": "/ki-telefonassistent/demo",
+          "text": "Live-Demo"
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI-Telefonassistent"
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI-Telefonassistent"
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI-TelefonassistentNimmt die Anrufe an, die sonst ins Leere laufen."
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI-Telefonassistenten"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Erstgespräch"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Erstgespräch"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Gespräch vereinbaren"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Kontakt"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Kostenloses Erstgespräch"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Webdesign in Bayreuth anfragen"
+        },
+        {
+          "href": "/kosten-automatisierung",
+          "text": "Automatisierung"
+        },
+        {
+          "href": "/kosten-automatisierung",
+          "text": "Preise"
+        },
+        {
+          "href": "/kosten-ki-telefonassistent",
+          "text": "KI-Assistent Kosten"
+        },
+        {
+          "href": "/kosten-webdesign",
+          "text": "Preise"
+        },
+        {
+          "href": "/kosten-webdesign",
+          "text": "Webdesign"
+        },
+        {
+          "href": "/leistungen",
+          "text": "Alle Leistungen"
+        },
+        {
+          "href": "/leistungen",
+          "text": "Alle Leistungen ansehen"
+        },
+        {
+          "href": "/leistungen",
+          "text": "Alle Leistungen von Cogniiq"
+        },
+        {
+          "href": "/leistungen",
+          "text": "Beispiele ansehen"
+        },
+        {
+          "href": "/leistungen",
+          "text": "Sie wissen noch nicht, was Sie brauchen?"
+        },
+        {
+          "href": "/muenchen/automatisierung",
+          "text": "Automatisierung München"
+        },
+        {
+          "href": "/muenchen/ki-telefonassistent",
+          "text": "KI-Telefonassistent München"
+        },
+        {
+          "href": "/muenchen/webdesign-kosten",
+          "text": "Kosten"
+        },
+        {
+          "href": "/muenchen/webdesign",
+          "text": "Webdesign München"
+        },
+        {
+          "href": "/muenchen/webdesign",
+          "text": "Webdesign München"
+        },
+        {
+          "href": "/muenchen",
+          "text": "München"
+        },
+        {
+          "href": "/muenchen",
+          "text": "München"
+        },
+        {
+          "href": "/muenchen",
+          "text": "München"
+        },
+        {
+          "href": "/praxen",
+          "text": "Für Arzt- und Zahnarztpraxen"
+        },
+        {
+          "href": "/praxen",
+          "text": "Für Arzt- und Zahnarztpraxen"
+        },
+        {
+          "href": "/prozessautomatisierung",
+          "text": "Prozessautomatisierung"
+        },
+        {
+          "href": "/referenzen",
+          "text": "Referenzen"
+        },
+        {
+          "href": "/regensburg/automatisierung",
+          "text": "Automatisierung Regensburg"
+        },
+        {
+          "href": "/regensburg/ki-telefonassistent",
+          "text": "KI-Telefonassistent Regensburg"
+        },
+        {
+          "href": "/regensburg/webdesign",
+          "text": "Webdesign Regensburg"
+        },
+        {
+          "href": "/regensburg/webdesign",
+          "text": "Webdesign Regensburg"
+        },
+        {
+          "href": "/regensburg/website-relaunch",
+          "text": "Website Relaunch"
+        },
+        {
+          "href": "/regensburg",
+          "text": "Regensburg"
+        },
+        {
+          "href": "/regensburg",
+          "text": "Regensburg"
+        },
+        {
+          "href": "/regensburg",
+          "text": "Regensburg"
+        },
+        {
+          "href": "/ueber-uns",
+          "text": "Über uns"
+        },
+        {
+          "href": "/ueber-uns",
+          "text": "Über uns"
+        },
+        {
+          "href": "/verpasste-anrufe-verlust",
+          "text": "Verpasste Anrufe"
+        },
+        {
+          "href": "/verpasste-anrufe-verlust",
+          "text": "Verpasste Anrufe & Umsatzverlust"
+        },
+        {
+          "href": "/webdesign-agentur-deutschland",
+          "text": "Webdesign Agentur"
+        },
+        {
+          "href": "/webdesign-agentur-deutschland",
+          "text": "Webdesign-Agentur"
+        },
+        {
+          "href": "/webdesign-agentur-deutschland",
+          "text": "hochkonvertierende Websites"
+        },
+        {
+          "href": "/webdesign-arzt",
+          "text": "Für Arztpraxen"
+        },
+        {
+          "href": "/webdesign-arzt",
+          "text": "Webdesign für Arztpraxen"
+        },
+        {
+          "href": "/webdesign-gastronomie",
+          "text": "Für Gastronomie"
+        },
+        {
+          "href": "/webdesign-gastronomie",
+          "text": "Webdesign für Gastronomie"
+        },
+        {
+          "href": "/webdesign-hotel",
+          "text": "Für Hotels"
+        },
+        {
+          "href": "/webdesign-hotel",
+          "text": "Webdesign für Hotels"
+        },
+        {
+          "href": "/webdesign-immobilien",
+          "text": "Für Immobilien"
+        },
+        {
+          "href": "/webdesign-immobilien",
+          "text": "Webdesign für Immobilien"
+        },
+        {
+          "href": "/webdesign-sport",
+          "text": "Für Sport und Fitness"
+        },
+        {
+          "href": "/webdesign",
+          "text": "Webdesign"
+        },
+        {
+          "href": "/webdesign",
+          "text": "WebdesignWebsites, die gefunden werden und Anfragen bringen."
+        },
+        {
+          "href": "/zu-viel-manuelle-arbeit",
+          "text": "Zu viel manuelle Arbeit"
+        }
+      ]
+    },
+    "/bayreuth/website-relaunch": {
+      "path": "/bayreuth/website-relaunch",
+      "title": "Website Relaunch Bayreuth – Mehr Performance & bessere Rankings | Cogniiq",
+      "description": "Website Relaunch in Bayreuth: Ihre bestehende Website modernisieren ohne Rankingverlust. Neues Design, bessere Performance, stärkeres SEO – persönliche Betreuung.",
+      "keywords": "Website Relaunch Bayreuth, Website modernisieren Bayreuth, Homepage Relaunch Bayreuth",
+      "canonical": "https://cogniiq.de/bayreuth/website-relaunch",
+      "robots": "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
+      "indexable": true,
+      "sitemap": "2026-03-14|monthly|0.78",
+      "h1": [
+        "Website Relaunch in Bayreuth"
+      ],
+      "textLength": 5838,
+      "textDigest": "98cfe44ff1f45814",
+      "jsonLd": [
+        "0f521f8da7f743be",
+        "b6267d2a72811455",
+        "e82b33fbbf548ffc",
+        "f23ed986bfd8705c",
+        "fd6b54fbf6cfd007"
+      ],
+      "outgoingLinks": [
+        {
+          "href": "/",
+          "text": "COGNIIQ"
+        },
+        {
+          "href": "/",
+          "text": "COGNIIQ"
+        },
+        {
+          "href": "/",
+          "text": "Cogniiq"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/app/login",
+          "text": "Kundenlogin"
+        },
+        {
+          "href": "/automatisierung-arzt",
+          "text": "Für Arztpraxen"
+        },
+        {
+          "href": "/automatisierung-immobilien",
+          "text": "Für Immobilien"
+        },
+        {
+          "href": "/automatisierung-restaurant",
+          "text": "Für Restaurants"
+        },
+        {
+          "href": "/automatisierung-sport",
+          "text": "Für Sport und Fitness"
+        },
+        {
+          "href": "/automatisierung-unternehmen",
+          "text": "Automatisierung"
+        },
+        {
+          "href": "/automatisierung-unternehmen",
+          "text": "AutomatisierungWiederkehrende Abläufe laufen ohne Handarbeit."
+        },
+        {
+          "href": "/automatisierung-unternehmen",
+          "text": "Prozessautomatisierung"
+        },
+        {
+          "href": "/bayern",
+          "text": "Bayern"
+        },
+        {
+          "href": "/bayern",
+          "text": "Bayern"
+        },
+        {
+          "href": "/bayern",
+          "text": "Bayern"
+        },
+        {
+          "href": "/bayreuth/landingpage",
+          "text": "Landingpage Bayreuth"
+        },
+        {
+          "href": "/bayreuth/lokales-seo",
+          "text": "Lokales SEO Bayreuth"
+        },
+        {
+          "href": "/bayreuth/webdesign-kosten",
+          "text": "Webdesign Kosten Bayreuth"
+        },
+        {
+          "href": "/bayreuth/webdesign",
+          "text": "Webdesign"
+        },
+        {
+          "href": "/bayreuth/webdesign",
+          "text": "Webdesign Bayreuth"
+        },
+        {
+          "href": "/bayreuth/webdesign",
+          "text": "Webdesign Bayreuth"
+        },
+        {
+          "href": "/bayreuth/webdesign",
+          "text": "Webdesign Bayreuth"
+        },
+        {
+          "href": "/bayreuth/webdesign",
+          "text": "Webdesign Bayreuth"
+        },
+        {
+          "href": "/bayreuth/website-erstellen",
+          "text": "Website erstellen Bayreuth"
+        },
+        {
+          "href": "/bayreuth/website-relaunch",
+          "text": "Website Relaunch"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "BayreuthHauptsitz"
+        },
+        {
+          "href": "/bewertungen",
+          "text": "Bewertungen"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/datenschutz",
+          "text": "Datenschutz"
+        },
+        {
+          "href": "/deutschland",
+          "text": "Deutschland"
+        },
+        {
+          "href": "/deutschland",
+          "text": "Deutschland"
+        },
+        {
+          "href": "/deutschland",
+          "text": "Deutschland"
+        },
+        {
+          "href": "/faq",
+          "text": "Häufige Fragen"
+        },
+        {
+          "href": "/impressum",
+          "text": "Impressum"
+        },
+        {
+          "href": "/ki-agentur-deutschland",
+          "text": "KI-Agentur"
+        },
+        {
+          "href": "/ki-telefonassistent-arzt",
+          "text": "Arztpraxen im Detail"
+        },
+        {
+          "href": "/ki-telefonassistent-hotel",
+          "text": "Für Hotels"
+        },
+        {
+          "href": "/ki-telefonassistent-restaurant",
+          "text": "Für Restaurants"
+        },
+        {
+          "href": "/ki-telefonassistent/demo",
+          "text": "Demo anhören"
+        },
+        {
+          "href": "/ki-telefonassistent/demo",
+          "text": "Live-Demo"
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI-Telefonassistent"
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI-TelefonassistentNimmt die Anrufe an, die sonst ins Leere laufen."
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI-Telefonassistenten"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Erstgespräch"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Erstgespräch"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Kontakt"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Kostenloses Erstgespräch"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Kostenloses Erstgespräch"
+        },
+        {
+          "href": "/kosten-automatisierung",
+          "text": "Automatisierung"
+        },
+        {
+          "href": "/kosten-automatisierung",
+          "text": "Preise"
+        },
+        {
+          "href": "/kosten-ki-telefonassistent",
+          "text": "KI-Assistent Kosten"
+        },
+        {
+          "href": "/kosten-webdesign",
+          "text": "Preise"
+        },
+        {
+          "href": "/kosten-webdesign",
+          "text": "Webdesign"
+        },
+        {
+          "href": "/leistungen",
+          "text": "Alle Leistungen"
+        },
+        {
+          "href": "/leistungen",
+          "text": "Alle Leistungen"
+        },
+        {
+          "href": "/leistungen",
+          "text": "Sie wissen noch nicht, was Sie brauchen?"
+        },
+        {
+          "href": "/muenchen/webdesign-kosten",
+          "text": "Kosten"
+        },
+        {
+          "href": "/muenchen",
+          "text": "München"
+        },
+        {
+          "href": "/muenchen",
+          "text": "München"
+        },
+        {
+          "href": "/muenchen",
+          "text": "München"
+        },
+        {
+          "href": "/praxen",
+          "text": "Für Arzt- und Zahnarztpraxen"
+        },
+        {
+          "href": "/praxen",
+          "text": "Für Arzt- und Zahnarztpraxen"
+        },
+        {
+          "href": "/prozessautomatisierung",
+          "text": "Prozessautomatisierung"
+        },
+        {
+          "href": "/referenzen",
+          "text": "Referenzen"
+        },
+        {
+          "href": "/regensburg/website-relaunch",
+          "text": "Website Relaunch"
+        },
+        {
+          "href": "/regensburg",
+          "text": "Regensburg"
+        },
+        {
+          "href": "/regensburg",
+          "text": "Regensburg"
+        },
+        {
+          "href": "/regensburg",
+          "text": "Regensburg"
+        },
+        {
+          "href": "/ueber-uns",
+          "text": "Über uns"
+        },
+        {
+          "href": "/ueber-uns",
+          "text": "Über uns"
+        },
+        {
+          "href": "/webdesign-agentur-deutschland",
+          "text": "Webdesign-Agentur"
+        },
+        {
+          "href": "/webdesign-agentur-deutschland",
+          "text": "hochkonvertierende Websites"
+        },
+        {
+          "href": "/webdesign-arzt",
+          "text": "Für Arztpraxen"
+        },
+        {
+          "href": "/webdesign-gastronomie",
+          "text": "Für Gastronomie"
+        },
+        {
+          "href": "/webdesign-hotel",
+          "text": "Für Hotels"
+        },
+        {
+          "href": "/webdesign-immobilien",
+          "text": "Für Immobilien"
+        },
+        {
+          "href": "/webdesign-sport",
+          "text": "Für Sport und Fitness"
+        },
+        {
+          "href": "/webdesign",
+          "text": "Webdesign"
+        },
+        {
+          "href": "/webdesign",
+          "text": "WebdesignWebsites, die gefunden werden und Anfragen bringen."
+        }
+      ]
+    },
+    "/regensburg/website-relaunch": {
+      "path": "/regensburg/website-relaunch",
+      "title": "Website Relaunch Regensburg – Modernisierung ohne Rankingverlust | Cogniiq",
+      "description": "Website Relaunch in Regensburg: alte Website modernisieren, Performance verbessern, lokales SEO optimieren. Professionelle Umsetzung für Unternehmen in Ostbayern.",
+      "keywords": "Website Relaunch Regensburg, Homepage Relaunch Regensburg, Website modernisieren Regensburg",
+      "canonical": "https://cogniiq.de/regensburg/website-relaunch",
+      "robots": "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
+      "indexable": true,
+      "sitemap": "2026-03-14|monthly|0.75",
+      "h1": [
+        "Website Relaunch in Regensburg"
+      ],
+      "textLength": 5609,
+      "textDigest": "71498c595cdad67d",
+      "jsonLd": [
+        "2dcb6c25013f4552",
+        "40172b66f11ac907",
+        "6c7c403f24b3d570",
+        "9cfe2572dad25f38",
+        "fd6b54fbf6cfd007"
+      ],
+      "outgoingLinks": [
+        {
+          "href": "/",
+          "text": "COGNIIQ"
+        },
+        {
+          "href": "/",
+          "text": "COGNIIQ"
+        },
+        {
+          "href": "/",
+          "text": "Cogniiq"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/app/login",
+          "text": "Kundenlogin"
+        },
+        {
+          "href": "/automatisierung-arzt",
+          "text": "Für Arztpraxen"
+        },
+        {
+          "href": "/automatisierung-immobilien",
+          "text": "Für Immobilien"
+        },
+        {
+          "href": "/automatisierung-restaurant",
+          "text": "Für Restaurants"
+        },
+        {
+          "href": "/automatisierung-sport",
+          "text": "Für Sport und Fitness"
+        },
+        {
+          "href": "/automatisierung-unternehmen",
+          "text": "Automatisierung"
+        },
+        {
+          "href": "/automatisierung-unternehmen",
+          "text": "AutomatisierungWiederkehrende Abläufe laufen ohne Handarbeit."
+        },
+        {
+          "href": "/automatisierung-unternehmen",
+          "text": "Prozessautomatisierung"
+        },
+        {
+          "href": "/bayern",
+          "text": "Bayern"
+        },
+        {
+          "href": "/bayern",
+          "text": "Bayern"
+        },
+        {
+          "href": "/bayern",
+          "text": "Bayern"
+        },
+        {
+          "href": "/bayreuth/webdesign",
+          "text": "Webdesign Bayreuth"
+        },
+        {
+          "href": "/bayreuth/website-relaunch",
+          "text": "Website Relaunch"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "BayreuthHauptsitz"
+        },
+        {
+          "href": "/bewertungen",
+          "text": "Bewertungen"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/datenschutz",
+          "text": "Datenschutz"
+        },
+        {
+          "href": "/deutschland",
+          "text": "Deutschland"
+        },
+        {
+          "href": "/deutschland",
+          "text": "Deutschland"
+        },
+        {
+          "href": "/deutschland",
+          "text": "Deutschland"
+        },
+        {
+          "href": "/faq",
+          "text": "Häufige Fragen"
+        },
+        {
+          "href": "/impressum",
+          "text": "Impressum"
+        },
+        {
+          "href": "/ki-agentur-deutschland",
+          "text": "KI-Agentur"
+        },
+        {
+          "href": "/ki-telefonassistent-arzt",
+          "text": "Arztpraxen im Detail"
+        },
+        {
+          "href": "/ki-telefonassistent-hotel",
+          "text": "Für Hotels"
+        },
+        {
+          "href": "/ki-telefonassistent-restaurant",
+          "text": "Für Restaurants"
+        },
+        {
+          "href": "/ki-telefonassistent/demo",
+          "text": "Demo anhören"
+        },
+        {
+          "href": "/ki-telefonassistent/demo",
+          "text": "Live-Demo"
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI-Telefonassistent"
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI-TelefonassistentNimmt die Anrufe an, die sonst ins Leere laufen."
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI-Telefonassistenten"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Erstgespräch"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Erstgespräch"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Kontakt"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Kostenloses Erstgespräch"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Kostenloses Erstgespräch"
+        },
+        {
+          "href": "/kosten-automatisierung",
+          "text": "Automatisierung"
+        },
+        {
+          "href": "/kosten-automatisierung",
+          "text": "Preise"
+        },
+        {
+          "href": "/kosten-ki-telefonassistent",
+          "text": "KI-Assistent Kosten"
+        },
+        {
+          "href": "/kosten-webdesign",
+          "text": "Preise"
+        },
+        {
+          "href": "/kosten-webdesign",
+          "text": "Webdesign"
+        },
+        {
+          "href": "/leistungen",
+          "text": "Alle Leistungen"
+        },
+        {
+          "href": "/leistungen",
+          "text": "Alle Leistungen"
+        },
+        {
+          "href": "/leistungen",
+          "text": "Sie wissen noch nicht, was Sie brauchen?"
+        },
+        {
+          "href": "/muenchen/webdesign-kosten",
+          "text": "Kosten"
+        },
+        {
+          "href": "/muenchen",
+          "text": "München"
+        },
+        {
+          "href": "/muenchen",
+          "text": "München"
+        },
+        {
+          "href": "/muenchen",
+          "text": "München"
+        },
+        {
+          "href": "/praxen",
+          "text": "Für Arzt- und Zahnarztpraxen"
+        },
+        {
+          "href": "/praxen",
+          "text": "Für Arzt- und Zahnarztpraxen"
+        },
+        {
+          "href": "/prozessautomatisierung",
+          "text": "Prozessautomatisierung"
+        },
+        {
+          "href": "/referenzen",
+          "text": "Referenzen"
+        },
+        {
+          "href": "/regensburg/landingpage",
+          "text": "Landingpage Regensburg"
+        },
+        {
+          "href": "/regensburg/lokales-seo",
+          "text": "Lokales SEO Regensburg"
+        },
+        {
+          "href": "/regensburg/webdesign-kosten",
+          "text": "Webdesign Kosten Regensburg"
+        },
+        {
+          "href": "/regensburg/webdesign",
+          "text": "Webdesign"
+        },
+        {
+          "href": "/regensburg/webdesign",
+          "text": "Webdesign Regensburg"
+        },
+        {
+          "href": "/regensburg/webdesign",
+          "text": "Webdesign Regensburg"
+        },
+        {
+          "href": "/regensburg/webdesign",
+          "text": "Webdesign Regensburg"
+        },
+        {
+          "href": "/regensburg/website-erstellen",
+          "text": "Website erstellen Regensburg"
+        },
+        {
+          "href": "/regensburg/website-relaunch",
+          "text": "Website Relaunch"
+        },
+        {
+          "href": "/regensburg",
+          "text": "Regensburg"
+        },
+        {
+          "href": "/regensburg",
+          "text": "Regensburg"
+        },
+        {
+          "href": "/regensburg",
+          "text": "Regensburg"
+        },
+        {
+          "href": "/regensburg",
+          "text": "Regensburg"
+        },
+        {
+          "href": "/ueber-uns",
+          "text": "Über uns"
+        },
+        {
+          "href": "/ueber-uns",
+          "text": "Über uns"
+        },
+        {
+          "href": "/webdesign-agentur-deutschland",
+          "text": "Webdesign-Agentur"
+        },
+        {
+          "href": "/webdesign-agentur-deutschland",
+          "text": "hochkonvertierende Websites"
+        },
+        {
+          "href": "/webdesign-arzt",
+          "text": "Für Arztpraxen"
+        },
+        {
+          "href": "/webdesign-gastronomie",
+          "text": "Für Gastronomie"
+        },
+        {
+          "href": "/webdesign-hotel",
+          "text": "Für Hotels"
+        },
+        {
+          "href": "/webdesign-immobilien",
+          "text": "Für Immobilien"
+        },
+        {
+          "href": "/webdesign-sport",
+          "text": "Für Sport und Fitness"
+        },
+        {
+          "href": "/webdesign",
+          "text": "Webdesign"
+        },
+        {
+          "href": "/webdesign",
+          "text": "WebdesignWebsites, die gefunden werden und Anfragen bringen."
+        }
+      ]
+    },
+    "/muenchen/webdesign-kosten": {
+      "path": "/muenchen/webdesign-kosten",
+      "title": "Webdesign Kosten München – Preise für professionelle Websites | Cogniiq",
+      "description": "Was kostet Webdesign in München? Ehrliche Preisübersicht für individuelle Website-Entwicklung im Münchner Markt. Jetzt kostenlosen Kostenvoranschlag anfragen.",
+      "keywords": "Webdesign Kosten München, Website Preise München, Homepage Kosten München",
+      "canonical": "https://cogniiq.de/muenchen/webdesign-kosten",
+      "robots": "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
+      "indexable": true,
+      "sitemap": "2026-03-14|monthly|0.78",
+      "h1": [
+        "Webdesign Kosten in München – Was kostet eine Website?"
+      ],
+      "textLength": 6962,
+      "textDigest": "09a4f11f2675c5c8",
+      "jsonLd": [
+        "0b087d937878939b",
+        "372eb831b836cdd6",
+        "3f95abf89a113abe",
+        "a1d92bb760b9b418",
+        "fd6b54fbf6cfd007"
+      ],
+      "outgoingLinks": [
+        {
+          "href": "/",
+          "text": "COGNIIQ"
+        },
+        {
+          "href": "/",
+          "text": "COGNIIQ"
+        },
+        {
+          "href": "/",
+          "text": "Cogniiq"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/app/login",
+          "text": "Kundenlogin"
+        },
+        {
+          "href": "/automatisierung-arzt",
+          "text": "Für Arztpraxen"
+        },
+        {
+          "href": "/automatisierung-immobilien",
+          "text": "Für Immobilien"
+        },
+        {
+          "href": "/automatisierung-restaurant",
+          "text": "Für Restaurants"
+        },
+        {
+          "href": "/automatisierung-sport",
+          "text": "Für Sport und Fitness"
+        },
+        {
+          "href": "/automatisierung-unternehmen",
+          "text": "Automatisierung"
+        },
+        {
+          "href": "/automatisierung-unternehmen",
+          "text": "AutomatisierungWiederkehrende Abläufe laufen ohne Handarbeit."
+        },
+        {
+          "href": "/automatisierung-unternehmen",
+          "text": "Prozessautomatisierung"
+        },
+        {
+          "href": "/bayern",
+          "text": "Bayern"
+        },
+        {
+          "href": "/bayern",
+          "text": "Bayern"
+        },
+        {
+          "href": "/bayern",
+          "text": "Bayern"
+        },
+        {
+          "href": "/bayreuth/webdesign",
+          "text": "Webdesign Bayreuth"
+        },
+        {
+          "href": "/bayreuth/website-relaunch",
+          "text": "Website Relaunch"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "BayreuthHauptsitz"
+        },
+        {
+          "href": "/bewertungen",
+          "text": "Bewertungen"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/datenschutz",
+          "text": "Datenschutz"
+        },
+        {
+          "href": "/deutschland",
+          "text": "Deutschland"
+        },
+        {
+          "href": "/deutschland",
+          "text": "Deutschland"
+        },
+        {
+          "href": "/deutschland",
+          "text": "Deutschland"
+        },
+        {
+          "href": "/faq",
+          "text": "Häufige Fragen"
+        },
+        {
+          "href": "/impressum",
+          "text": "Impressum"
+        },
+        {
+          "href": "/ki-agentur-deutschland",
+          "text": "KI-Agentur"
+        },
+        {
+          "href": "/ki-telefonassistent-arzt",
+          "text": "Arztpraxen im Detail"
+        },
+        {
+          "href": "/ki-telefonassistent-hotel",
+          "text": "Für Hotels"
+        },
+        {
+          "href": "/ki-telefonassistent-restaurant",
+          "text": "Für Restaurants"
+        },
+        {
+          "href": "/ki-telefonassistent/demo",
+          "text": "Demo anhören"
+        },
+        {
+          "href": "/ki-telefonassistent/demo",
+          "text": "Live-Demo"
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI-Telefonassistent"
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI-TelefonassistentNimmt die Anrufe an, die sonst ins Leere laufen."
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI-Telefonassistenten"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Erstgespräch"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Erstgespräch"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Jetzt anfragen"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Jetzt anfragen"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Jetzt anfragen"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Kontakt"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Kostenloses Erstgespräch"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Kostenloses Erstgespräch"
+        },
+        {
+          "href": "/kosten-automatisierung",
+          "text": "Automatisierung"
+        },
+        {
+          "href": "/kosten-automatisierung",
+          "text": "Preise"
+        },
+        {
+          "href": "/kosten-ki-telefonassistent",
+          "text": "KI-Assistent Kosten"
+        },
+        {
+          "href": "/kosten-webdesign",
+          "text": "Preise"
+        },
+        {
+          "href": "/kosten-webdesign",
+          "text": "Webdesign"
+        },
+        {
+          "href": "/leistungen",
+          "text": "Alle Leistungen"
+        },
+        {
+          "href": "/leistungen",
+          "text": "Sie wissen noch nicht, was Sie brauchen?"
+        },
+        {
+          "href": "/muenchen/landingpage",
+          "text": "Landingpage München"
+        },
+        {
+          "href": "/muenchen/lokales-seo",
+          "text": "Lokales SEO München"
+        },
+        {
+          "href": "/muenchen/webdesign-kosten",
+          "text": "Kosten"
+        },
+        {
+          "href": "/muenchen/webdesign",
+          "text": "Webdesign"
+        },
+        {
+          "href": "/muenchen/webdesign",
+          "text": "Webdesign München"
+        },
+        {
+          "href": "/muenchen/webdesign",
+          "text": "Webdesign München"
+        },
+        {
+          "href": "/muenchen/webdesign",
+          "text": "Webdesign München"
+        },
+        {
+          "href": "/muenchen/website-erstellen",
+          "text": "Website erstellen München"
+        },
+        {
+          "href": "/muenchen/website-relaunch",
+          "text": "Website Relaunch München"
+        },
+        {
+          "href": "/muenchen",
+          "text": "München"
+        },
+        {
+          "href": "/muenchen",
+          "text": "München"
+        },
+        {
+          "href": "/muenchen",
+          "text": "München"
+        },
+        {
+          "href": "/muenchen",
+          "text": "München"
+        },
+        {
+          "href": "/praxen",
+          "text": "Für Arzt- und Zahnarztpraxen"
+        },
+        {
+          "href": "/praxen",
+          "text": "Für Arzt- und Zahnarztpraxen"
+        },
+        {
+          "href": "/prozessautomatisierung",
+          "text": "Prozessautomatisierung"
+        },
+        {
+          "href": "/referenzen",
+          "text": "Referenzen"
+        },
+        {
+          "href": "/referenzen",
+          "text": "Referenzen"
+        },
+        {
+          "href": "/regensburg/website-relaunch",
+          "text": "Website Relaunch"
+        },
+        {
+          "href": "/regensburg",
+          "text": "Regensburg"
+        },
+        {
+          "href": "/regensburg",
+          "text": "Regensburg"
+        },
+        {
+          "href": "/regensburg",
+          "text": "Regensburg"
+        },
+        {
+          "href": "/ueber-uns",
+          "text": "Über uns"
+        },
+        {
+          "href": "/ueber-uns",
+          "text": "Über uns"
+        },
+        {
+          "href": "/webdesign-agentur-deutschland",
+          "text": "Webdesign-Agentur"
+        },
+        {
+          "href": "/webdesign-agentur-deutschland",
+          "text": "hochkonvertierende Websites"
+        },
+        {
+          "href": "/webdesign-arzt",
+          "text": "Für Arztpraxen"
+        },
+        {
+          "href": "/webdesign-gastronomie",
+          "text": "Für Gastronomie"
+        },
+        {
+          "href": "/webdesign-hotel",
+          "text": "Für Hotels"
+        },
+        {
+          "href": "/webdesign-immobilien",
+          "text": "Für Immobilien"
+        },
+        {
+          "href": "/webdesign-sport",
+          "text": "Für Sport und Fitness"
+        },
+        {
+          "href": "/webdesign",
+          "text": "Webdesign"
+        },
+        {
+          "href": "/webdesign",
+          "text": "WebdesignWebsites, die gefunden werden und Anfragen bringen."
+        }
+      ]
+    },
+    "/ki-telefonassistent-arzt": {
+      "path": "/ki-telefonassistent-arzt",
+      "title": "KI-Telefonassistent für Arztpraxen | Termine automatisch buchen – Cogniiq",
+      "description": "Der KI-Telefonassistent für Praxen: nimmt Patientenanrufe an, bucht Termine ins System, beantwortet häufige Fragen – auch außerhalb der Sprechzeiten, ohne Praxismitarbeiterin am Telefon.",
+      "keywords": "KI Telefonassistent Arzt, AI Rezeptionistin Praxis, Terminbuchung Praxis KI, Arztpraxis Automatisierung",
+      "canonical": "https://cogniiq.de/ki-telefonassistent-arzt",
+      "robots": "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
+      "indexable": true,
+      "sitemap": "2026-03-14|monthly|0.87",
+      "h1": [
+        "KI Telefonassistent für Arztpraxen"
+      ],
+      "textLength": 16684,
+      "textDigest": "bc235c4a541898a0",
+      "jsonLd": [
+        "551b2ad7e448d940",
+        "6ba75b9d00b1ab9d",
+        "729f524ca6dfd16e",
+        "e934e18cf44ecc7a",
+        "fd6b54fbf6cfd007"
+      ],
+      "outgoingLinks": [
+        {
+          "href": "/",
+          "text": "COGNIIQ"
+        },
+        {
+          "href": "/",
+          "text": "COGNIIQ"
+        },
+        {
+          "href": "/",
+          "text": "Cogniiq"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/app/login",
+          "text": "Kundenlogin"
+        },
+        {
+          "href": "/automatisierung-arzt",
+          "text": "Automatisierung Arzt"
+        },
+        {
+          "href": "/automatisierung-arzt",
+          "text": "Für Arztpraxen"
+        },
+        {
+          "href": "/automatisierung-immobilien",
+          "text": "Für Immobilien"
+        },
+        {
+          "href": "/automatisierung-restaurant",
+          "text": "Für Restaurants"
+        },
+        {
+          "href": "/automatisierung-sport",
+          "text": "Für Sport und Fitness"
+        },
+        {
+          "href": "/automatisierung-unternehmen",
+          "text": "Automatisierung"
+        },
+        {
+          "href": "/automatisierung-unternehmen",
+          "text": "AutomatisierungWiederkehrende Abläufe laufen ohne Handarbeit."
+        },
+        {
+          "href": "/automatisierung-unternehmen",
+          "text": "Prozessautomatisierung"
+        },
+        {
+          "href": "/bayern/ki-telefonassistent",
+          "text": "KI Telefonassistent Bayern"
+        },
+        {
+          "href": "/bayern",
+          "text": "Bayern"
+        },
+        {
+          "href": "/bayern",
+          "text": "Bayern"
+        },
+        {
+          "href": "/bayreuth/ki-telefonassistent",
+          "text": "KI Telefonassistent Bayreuth"
+        },
+        {
+          "href": "/bayreuth/webdesign",
+          "text": "Webdesign Bayreuth"
+        },
+        {
+          "href": "/bayreuth/website-relaunch",
+          "text": "Website Relaunch"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "BayreuthHauptsitz"
+        },
+        {
+          "href": "/bewertungen",
+          "text": "Bewertungen"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/datenschutz-sicherheit",
+          "text": "Was Ihr Datenschutzbeauftragter fragen sollte"
+        },
+        {
+          "href": "/datenschutz",
+          "text": "Datenschutz"
+        },
+        {
+          "href": "/deutschland",
+          "text": "Deutschland"
+        },
+        {
+          "href": "/deutschland",
+          "text": "Deutschland"
+        },
+        {
+          "href": "/deutschland",
+          "text": "Deutschland"
+        },
+        {
+          "href": "/faq",
+          "text": "Häufige Fragen"
+        },
+        {
+          "href": "/impressum",
+          "text": "Impressum"
+        },
+        {
+          "href": "/ki-agentur-deutschland",
+          "text": "KI Agentur Deutschland"
+        },
+        {
+          "href": "/ki-agentur-deutschland",
+          "text": "KI-Agentur"
+        },
+        {
+          "href": "/ki-telefonassistent-arzt",
+          "text": "Arztpraxen im Detail"
+        },
+        {
+          "href": "/ki-telefonassistent-hotel",
+          "text": "Für Hotels"
+        },
+        {
+          "href": "/ki-telefonassistent-praxis",
+          "text": "KI Telefonassistent Praxis"
+        },
+        {
+          "href": "/ki-telefonassistent-restaurant",
+          "text": "Für Restaurants"
+        },
+        {
+          "href": "/ki-telefonassistent/demo",
+          "text": "Demo anhören"
+        },
+        {
+          "href": "/ki-telefonassistent/demo",
+          "text": "Live-Demo"
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI Telefonassistent"
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI Telefonassistent"
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI Telefonassistent im Überblick"
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI-Telefonassistent"
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI-TelefonassistentNimmt die Anrufe an, die sonst ins Leere laufen."
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI-Telefonassistenten"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Erstgespräch"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Erstgespräch"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Kontakt"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Kostenloses Erstgespräch"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Kostenloses Erstgespräch"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Kostenloses Erstgespräch"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Lösung anfragen"
+        },
+        {
+          "href": "/kosten-automatisierung",
+          "text": "Automatisierung"
+        },
+        {
+          "href": "/kosten-automatisierung",
+          "text": "Preise"
+        },
+        {
+          "href": "/kosten-ki-telefonassistent",
+          "text": "Alle Tarife, Kontingente und Obergrenzen"
+        },
+        {
+          "href": "/kosten-ki-telefonassistent",
+          "text": "KI-Assistent Kosten"
+        },
+        {
+          "href": "/kosten-ki-telefonassistent",
+          "text": "Kosten KI Telefonassistent"
+        },
+        {
+          "href": "/kosten-ki-telefonassistent",
+          "text": "Kosten KI Telefonassistent"
+        },
+        {
+          "href": "/kosten-ki-telefonassistent",
+          "text": "Kosten KI Telefonassistent"
+        },
+        {
+          "href": "/kosten-webdesign",
+          "text": "Preise"
+        },
+        {
+          "href": "/kosten-webdesign",
+          "text": "Webdesign"
+        },
+        {
+          "href": "/leistungen",
+          "text": "Alle Leistungen"
+        },
+        {
+          "href": "/leistungen",
+          "text": "Sie wissen noch nicht, was Sie brauchen?"
+        },
+        {
+          "href": "/muenchen/ki-telefonassistent",
+          "text": "KI Telefonassistent München"
+        },
+        {
+          "href": "/muenchen/webdesign-kosten",
+          "text": "Kosten"
+        },
+        {
+          "href": "/muenchen",
+          "text": "München"
+        },
+        {
+          "href": "/muenchen",
+          "text": "München"
+        },
+        {
+          "href": "/muenchen",
+          "text": "München"
+        },
+        {
+          "href": "/praxen",
+          "text": "Der vollständige Katalog — auch, was immer bei einem Menschen landet"
+        },
+        {
+          "href": "/praxen",
+          "text": "Die vier Säulen mit der Mechanik dahinter"
+        },
+        {
+          "href": "/praxen",
+          "text": "Für Arzt- und Zahnarztpraxen"
+        },
+        {
+          "href": "/praxen",
+          "text": "Für Arzt- und Zahnarztpraxen"
+        },
+        {
+          "href": "/praxen",
+          "text": "Jeder Schritt im Einzelnen, mit Dauer"
+        },
+        {
+          "href": "/praxen",
+          "text": "Testphase, Vetorecht und Preisgarantie im Detail"
+        },
+        {
+          "href": "/praxen",
+          "text": "Was Unerreichbarkeit Ihre Praxis kostet"
+        },
+        {
+          "href": "/praxen",
+          "text": "Was sich für Ihr Team konkret ändert"
+        },
+        {
+          "href": "/prozessautomatisierung",
+          "text": "Prozessautomatisierung"
+        },
+        {
+          "href": "/referenzen",
+          "text": "Referenzen"
+        },
+        {
+          "href": "/regensburg/ki-telefonassistent",
+          "text": "KI Telefonassistent Regensburg"
+        },
+        {
+          "href": "/regensburg/website-relaunch",
+          "text": "Website Relaunch"
+        },
+        {
+          "href": "/regensburg",
+          "text": "Regensburg"
+        },
+        {
+          "href": "/regensburg",
+          "text": "Regensburg"
+        },
+        {
+          "href": "/regensburg",
+          "text": "Regensburg"
+        },
+        {
+          "href": "/ueber-uns",
+          "text": "Über uns"
+        },
+        {
+          "href": "/ueber-uns",
+          "text": "Über uns"
+        },
+        {
+          "href": "/webdesign-agentur-deutschland",
+          "text": "Webdesign-Agentur"
+        },
+        {
+          "href": "/webdesign-agentur-deutschland",
+          "text": "hochkonvertierende Websites"
+        },
+        {
+          "href": "/webdesign-arzt",
+          "text": "Für Arztpraxen"
+        },
+        {
+          "href": "/webdesign-arzt",
+          "text": "Webdesign Arzt"
+        },
+        {
+          "href": "/webdesign-gastronomie",
+          "text": "Für Gastronomie"
+        },
+        {
+          "href": "/webdesign-hotel",
+          "text": "Für Hotels"
+        },
+        {
+          "href": "/webdesign-immobilien",
+          "text": "Für Immobilien"
+        },
+        {
+          "href": "/webdesign-sport",
+          "text": "Für Sport und Fitness"
+        },
+        {
+          "href": "/webdesign",
+          "text": "Webdesign"
+        },
+        {
+          "href": "/webdesign",
+          "text": "WebdesignWebsites, die gefunden werden und Anfragen bringen."
+        }
+      ]
+    },
+    "/kosten-ki-telefonassistent": {
+      "path": "/kosten-ki-telefonassistent",
+      "title": "Was kostet ein KI Telefonassistent? Preise | Cogniiq",
+      "description": "Was kostet ein KI Telefonassistent für Praxen? Tarife ab 300 € im Monat mit festem Minutenkontingent, gedeckelter Rechnung und Zwei-Wochen-Garantie.",
+      "keywords": "KI Telefonassistent Kosten, AI Rezeptionist Preis, KI Telefonie Kosten, Automatisierung Kosten",
+      "canonical": "https://cogniiq.de/kosten-ki-telefonassistent",
+      "robots": "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
+      "indexable": true,
+      "sitemap": "2026-03-14|monthly|0.88",
+      "h1": [
+        "Was kostet ein KI Telefonassistent?"
+      ],
+      "textLength": 16975,
+      "textDigest": "cf2b920a77bdcb8f",
+      "jsonLd": [
+        "07462b27c9aa167c",
+        "0d00c9ea8232966c",
+        "74a7c10094c4ce5a",
+        "c75e3cf24c241e84",
+        "fd6b54fbf6cfd007"
+      ],
+      "outgoingLinks": [
+        {
+          "href": "/",
+          "text": "COGNIIQ"
+        },
+        {
+          "href": "/",
+          "text": "COGNIIQ"
+        },
+        {
+          "href": "/",
+          "text": "Cogniiq"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/app/login",
+          "text": "Kundenlogin"
+        },
+        {
+          "href": "/automatisierung-arzt",
+          "text": "Für Arztpraxen"
+        },
+        {
+          "href": "/automatisierung-immobilien",
+          "text": "Für Immobilien"
+        },
+        {
+          "href": "/automatisierung-restaurant",
+          "text": "Für Restaurants"
+        },
+        {
+          "href": "/automatisierung-sport",
+          "text": "Für Sport und Fitness"
+        },
+        {
+          "href": "/automatisierung-unternehmen",
+          "text": "Automatisierung"
+        },
+        {
+          "href": "/automatisierung-unternehmen",
+          "text": "AutomatisierungWiederkehrende Abläufe laufen ohne Handarbeit."
+        },
+        {
+          "href": "/automatisierung-unternehmen",
+          "text": "Prozessautomatisierung"
+        },
+        {
+          "href": "/bayern",
+          "text": "Bayern"
+        },
+        {
+          "href": "/bayern",
+          "text": "Bayern"
+        },
+        {
+          "href": "/bayreuth/webdesign",
+          "text": "Webdesign Bayreuth"
+        },
+        {
+          "href": "/bayreuth/website-relaunch",
+          "text": "Website Relaunch"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "Bayreuth"
+        },
+        {
+          "href": "/bayreuth",
+          "text": "BayreuthHauptsitz"
+        },
+        {
+          "href": "/bewertungen",
+          "text": "Bewertungen"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/datenschutz",
+          "text": "Datenschutz"
+        },
+        {
+          "href": "/deutschland",
+          "text": "Deutschland"
+        },
+        {
+          "href": "/deutschland",
+          "text": "Deutschland"
+        },
+        {
+          "href": "/deutschland",
+          "text": "Deutschland"
+        },
+        {
+          "href": "/faq",
+          "text": "Häufige Fragen"
+        },
+        {
+          "href": "/impressum",
+          "text": "Impressum"
+        },
+        {
+          "href": "/ki-agentur-deutschland",
+          "text": "KI-Agentur"
+        },
+        {
+          "href": "/ki-telefonassistent-arzt",
+          "text": "Arztpraxen im Detail"
+        },
+        {
+          "href": "/ki-telefonassistent-arzt",
+          "text": "KI Telefonassistent für Arztpraxen"
+        },
+        {
+          "href": "/ki-telefonassistent-hotel",
+          "text": "Für Hotels"
+        },
+        {
+          "href": "/ki-telefonassistent-praxis",
+          "text": "KI Telefonassistent für Therapiepraxen"
+        },
+        {
+          "href": "/ki-telefonassistent-restaurant",
+          "text": "Für Restaurants"
+        },
+        {
+          "href": "/ki-telefonassistent/demo",
+          "text": "Demo anhören"
+        },
+        {
+          "href": "/ki-telefonassistent/demo",
+          "text": "Live-Demo"
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI-Telefonassistent"
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI-TelefonassistentNimmt die Anrufe an, die sonst ins Leere laufen."
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "KI-Telefonassistenten"
+        },
+        {
+          "href": "/ki-telefonassistent",
+          "text": "Wie der Empfang am Telefon arbeitet"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Erstgespräch"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Erstgespräch"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Kontakt"
+        },
+        {
+          "href": "/kontakt",
+          "text": "Unverbindliches Erstgespräch vereinbaren"
+        },
+        {
+          "href": "/kosten-automatisierung",
+          "text": "Automatisierung"
+        },
+        {
+          "href": "/kosten-automatisierung",
+          "text": "Preise"
+        },
+        {
+          "href": "/kosten-ki-telefonassistent",
+          "text": "KI-Assistent Kosten"
+        },
+        {
+          "href": "/kosten-webdesign",
+          "text": "Preise"
+        },
+        {
+          "href": "/kosten-webdesign",
+          "text": "Webdesign"
+        },
+        {
+          "href": "/leistungen",
+          "text": "Alle Leistungen"
+        },
+        {
+          "href": "/leistungen",
+          "text": "Sie wissen noch nicht, was Sie brauchen?"
+        },
+        {
+          "href": "/muenchen/webdesign-kosten",
+          "text": "Kosten"
+        },
+        {
+          "href": "/muenchen",
+          "text": "München"
+        },
+        {
+          "href": "/muenchen",
+          "text": "München"
+        },
+        {
+          "href": "/muenchen",
+          "text": "München"
+        },
+        {
+          "href": "/praxen",
+          "text": "Der Praxis-Empfang im Überblick"
+        },
+        {
+          "href": "/praxen",
+          "text": "Für Arzt- und Zahnarztpraxen"
+        },
+        {
+          "href": "/praxen",
+          "text": "Für Arzt- und Zahnarztpraxen"
+        },
+        {
+          "href": "/praxen",
+          "text": "Für Praxen"
+        },
+        {
+          "href": "/prozessautomatisierung",
+          "text": "Prozessautomatisierung"
+        },
+        {
+          "href": "/referenzen",
+          "text": "Referenzen"
+        },
+        {
+          "href": "/regensburg/website-relaunch",
+          "text": "Website Relaunch"
+        },
+        {
+          "href": "/regensburg",
+          "text": "Regensburg"
+        },
+        {
+          "href": "/regensburg",
+          "text": "Regensburg"
+        },
+        {
+          "href": "/regensburg",
+          "text": "Regensburg"
+        },
+        {
+          "href": "/ueber-uns",
+          "text": "Über uns"
+        },
+        {
+          "href": "/ueber-uns",
+          "text": "Über uns"
+        },
+        {
+          "href": "/webdesign-agentur-deutschland",
+          "text": "Webdesign-Agentur"
+        },
+        {
+          "href": "/webdesign-agentur-deutschland",
+          "text": "hochkonvertierende Websites"
+        },
+        {
+          "href": "/webdesign-arzt",
+          "text": "Für Arztpraxen"
+        },
+        {
+          "href": "/webdesign-gastronomie",
+          "text": "Für Gastronomie"
+        },
+        {
+          "href": "/webdesign-hotel",
+          "text": "Für Hotels"
+        },
+        {
+          "href": "/webdesign-immobilien",
+          "text": "Für Immobilien"
+        },
+        {
+          "href": "/webdesign-sport",
+          "text": "Für Sport und Fitness"
+        },
+        {
+          "href": "/webdesign",
+          "text": "Webdesign"
+        },
+        {
+          "href": "/webdesign",
+          "text": "WebdesignWebsites, die gefunden werden und Anfragen bringen."
+        }
+      ]
+    }
+  },
+  "inboundOccurrences": {
+    "/bayreuth/webdesign": 38,
+    "/bayreuth/website-relaunch": 12,
+    "/regensburg/website-relaunch": 13,
+    "/muenchen/webdesign-kosten": 13,
+    "/ki-telefonassistent-arzt": 19,
+    "/kosten-ki-telefonassistent": 28
+  }
+}
