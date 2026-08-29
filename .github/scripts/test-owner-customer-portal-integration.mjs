@@ -140,8 +140,11 @@ for (const existing of [
 }
 
 // The empty "Kunden & Aufgaben" screen explains itself and links to the canonical list.
-ok(/internen Finance-Aufgabensystem|separates.*internes Finance-System/.test(customersPage),
-  'empty CustomersPage screen explains it is the separate internal Finance system');
+// Post canonical-customer consolidation (feat(admin): one canonical customer, and deletion
+// that respects the books): owner_customers IS the canonical commercial customer — CRM and
+// Finance read the same row, there is no second dataset to synchronise. The copy must say so.
+ok(/derselbe Datensatz/.test(customersPage),
+  'empty CustomersPage screen explains Finance/CRM share the same canonical customer record');
 ok(/navigate\('\/admin\/clients'\)/.test(customersPage),
   'empty CustomersPage screen links to the canonical /admin/clients customer list');
 
