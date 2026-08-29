@@ -142,20 +142,22 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
     >
       <div className="grid md:grid-cols-2 gap-5">
         <div>
-          <FormLabel>Name *</FormLabel>
+          <FormLabel htmlFor="contact-name">Name *</FormLabel>
           <Input
+            id="contact-name"
             value={data.name}
             onChange={e => onChange({ name: e.target.value })}
             required
             name="name"
             autoComplete="name"
             placeholder="Max Mustermann"
-            className="h-11 bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus-visible:ring-0 transition-colors"
+            className="h-11 bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-500 focus:border-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 transition-colors"
           />
         </div>
         <div>
-          <FormLabel>E-Mail *</FormLabel>
+          <FormLabel htmlFor="contact-email">E-Mail *</FormLabel>
           <Input
+            id="contact-email"
             type="email"
             value={data.email}
             onChange={e => onChange({ email: e.target.value })}
@@ -164,27 +166,28 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
             autoComplete="email"
             inputMode="email"
             placeholder="max@unternehmen.de"
-            className="h-11 bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus-visible:ring-0 transition-colors"
+            className="h-11 bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-500 focus:border-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 transition-colors"
           />
         </div>
       </div>
       <div>
-        <FormLabel>Unternehmen *</FormLabel>
+        <FormLabel htmlFor="contact-company">Unternehmen *</FormLabel>
         <Input
+          id="contact-company"
           value={data.company}
           onChange={e => onChange({ company: e.target.value })}
           required
           name="organization"
           autoComplete="organization"
           placeholder="Unternehmensname"
-          className="h-11 bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus-visible:ring-0 transition-colors"
+          className="h-11 bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-500 focus:border-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 transition-colors"
         />
       </div>
       <div className="grid md:grid-cols-2 gap-5">
         <div>
-          <FormLabel>Branche *</FormLabel>
+          <FormLabel htmlFor="contact-industry">Branche *</FormLabel>
           <Select value={data.industry} onValueChange={v => onChange({ industry: v })} required>
-            <SelectTrigger className="h-11 bg-white border-gray-200 rounded-lg text-sm focus:border-gray-400 focus:ring-0 transition-colors">
+            <SelectTrigger id="contact-industry" className="h-11 bg-white border-gray-200 rounded-lg text-sm focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-colors">
               <SelectValue placeholder="Branche wählen" />
             </SelectTrigger>
             <SelectContent className="bg-white border border-gray-200 shadow-lg rounded-xl text-sm">
@@ -197,9 +200,9 @@ function Step1({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
           </Select>
         </div>
         <div>
-          <FormLabel>Startzeitraum *</FormLabel>
+          <FormLabel htmlFor="contact-timeline">Startzeitraum *</FormLabel>
           <Select value={data.timeline} onValueChange={v => onChange({ timeline: v })} required>
-            <SelectTrigger className="h-11 bg-white border-gray-200 rounded-lg text-sm focus:border-gray-400 focus:ring-0 transition-colors">
+            <SelectTrigger id="contact-timeline" className="h-11 bg-white border-gray-200 rounded-lg text-sm focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-colors">
               <SelectValue placeholder="Zeitraum wählen" />
             </SelectTrigger>
             <SelectContent className="bg-white border border-gray-200 shadow-lg rounded-xl text-sm">
@@ -283,14 +286,15 @@ function Step2({ data, onChange }: { data: FormData; onChange: (d: Partial<FormD
       </div>
 
       <div>
-        <FormLabel>Ziel und Ausgangssituation *</FormLabel>
+        <FormLabel htmlFor="contact-goal">Ziel und Ausgangssituation *</FormLabel>
         <Textarea
+          id="contact-goal"
           value={data.goal}
           onChange={e => onChange({ goal: e.target.value })}
           required
           rows={4}
           placeholder="Beschreiben Sie Ihre aktuelle Situation und was Sie verändern möchten …"
-          className="bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-300 focus:border-gray-400 focus-visible:ring-0 resize-none transition-colors leading-relaxed"
+          className="bg-white border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-500 focus:border-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 resize-none transition-colors leading-relaxed"
         />
       </div>
     </motion.div>
@@ -673,9 +677,22 @@ export function ContactSection() {
   );
 }
 
-function FormLabel({ children, optional }: { children: React.ReactNode; optional?: boolean }) {
+// `htmlFor` is required for every control-bound label. Radix's Label renders a
+// real <label>, but without htmlFor (and a matching id on the control) the
+// association is visual only: screen readers announced these fields as unlabelled
+// and clicking the label did not focus the input. WCAG 1.3.1 / 3.3.2 / 4.1.2.
+function FormLabel({
+  children,
+  optional,
+  htmlFor,
+}: {
+  children: React.ReactNode;
+  optional?: boolean;
+  htmlFor?: string;
+}) {
   return (
     <Label
+      htmlFor={htmlFor}
       className="block text-gray-700 mb-1.5"
       style={{ fontSize: '12.5px', fontWeight: 500, letterSpacing: '0.01em' }}
     >

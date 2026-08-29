@@ -102,14 +102,25 @@ export function ConsentBanner() {
     <>
       {/* ─── Equal-choice banner (only until a decision exists) ─── */}
       {showBanner && !showSettings && (
+        /* Below lg the banner must clear the floating mobile nav pill
+           (premium-mobile-nav.tsx: `fixed bottom-6 ... z-50`). The banner is
+           z-60, so anchored to bottom-0 it covered the pill outright and
+           elementFromPoint over the nav button returned the banner — the only
+           navigation that exists on mobile was unreachable until the visitor
+           dealt with consent. It now floats above the pill as a card, and only
+           becomes a full-width bottom bar from lg up, where no pill exists. */
         <div
           role="dialog"
           aria-modal="false"
           aria-label="Cookie-Einwilligung"
-          className="fixed inset-x-0 bottom-0 z-[60] border-t border-gray-200 bg-white/95 backdrop-blur-md dark:border-white/10 dark:bg-gray-950/95"
+          className="fixed inset-x-0 bottom-24 z-[60] mx-3 rounded-2xl border border-gray-200 bg-white/95 shadow-lg backdrop-blur-md dark:border-white/10 dark:bg-gray-950/95 lg:mx-0 lg:rounded-none lg:border-x-0 lg:border-b-0 lg:border-t lg:bottom-0 lg:shadow-none"
         >
-          <div className="mx-auto flex max-w-5xl flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between lg:px-8">
-            <p className="text-[13px] leading-relaxed text-gray-600 dark:text-gray-300">
+          <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-5 sm:py-4 lg:px-8">
+            {/* Tighter type below sm purely to reduce how much of a 844px phone
+                viewport the first consent layer occupies. Not one word of the notice
+                is removed or clamped: what it says is a legal question, only how
+                much room it takes is a layout one. */}
+            <p className="text-[12px] leading-snug text-gray-600 dark:text-gray-300 sm:text-[13px] sm:leading-relaxed">
               Wir verwenden technisch notwendige Speicherung – dafür ist keine Einwilligung nötig
               und die Website funktioniert vollständig. Mit Ihrer Einwilligung laden wir zusätzlich{' '}
               <span className="font-medium text-gray-800 dark:text-gray-100">
@@ -126,7 +137,7 @@ export function ConsentBanner() {
               </Link>
               . Sie können Ihre Wahl jederzeit ändern.
             </p>
-            <div className="flex flex-shrink-0 flex-wrap items-center gap-2.5">
+            <div className="flex flex-shrink-0 flex-wrap items-center gap-2 sm:gap-2.5">
               <button
                 type="button"
                 onClick={() => setShowSettings(true)}
