@@ -40,7 +40,7 @@ const INDUSTRY_LINKS: Record<string, Array<{ label: string; href: string }>> = {
     { label: "Webdesign für Hotels", href: "/webdesign-hotel" },
   ],
   "ki-telefonassistent": [
-    { label: "KI-Telefonassistent für Praxen", href: "/ki-telefonassistent-arzt" },
+    { label: "KI-Telefonassistent Arztpraxis", href: "/ki-telefonassistent-arzt" },
     { label: "KI-Telefonassistent für Restaurants", href: "/ki-telefonassistent-restaurant" },
     { label: "KI-Telefonassistent für Hotels", href: "/ki-telefonassistent-hotel" },
   ],
