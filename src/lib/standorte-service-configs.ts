@@ -1089,7 +1089,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     ],
     faq: [
       { question: "Arbeitet ihr auch für größere Münchner Unternehmen?", answer: "Ja. Wir skalieren den Prozess entsprechend – von der einfachen Unternehmenswebsite bis zum komplexen mehrsprachigen Web-Projekt." },
-      { question: "Was kostet eine Website für ein Münchner Unternehmen?", answer: "Websites starten ab ca. 1.500 €. Individuell entwickelte Unternehmenswebsites liegen je nach Umfang typischerweise bei ca. 2.500–5.000 €, komplexere Projekte nach Aufwand. Kein Münchner Aufpreis – faire Preise für jeden Markt." },
+      { question: "Was kostet eine Website für ein Münchner Unternehmen?", answer: "Websites starten ab ca. 1.500 €, abhängig von Umfang und Anforderungen. Die vollständige Preisstaffelung mit allen Paketen für den Münchner Markt finden Sie auf unserer Seite „Webdesign Kosten München“." },
       { question: "Könnt ihr mit Münchner Markenagenturen zusammenarbeiten?", answer: "Ja. Wir übernehmen gerne die technische Umsetzung von Designs, die von anderen Agenturen erstellt wurden." },
       { question: "Habt ihr Erfahrung mit SEO für den Münchner Markt?", answer: "Ja. Lokaler SEO für den Münchner Markt erfordert Strategie – wir kennen den Wettbewerb und setzen gezielte Maßnahmen um." },
       { question: "Wie funktioniert die Remote-Zusammenarbeit?", answer: "Video-Calls, Figma-Boards, Staging-Umgebungen – genauso wie bei lokalen Agenturen, ohne Pendelzeit." },
@@ -1147,6 +1147,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { label: "Webdesign Regensburg", href: "/regensburg/webdesign" },
     ],
     otherServicesInCity: [
+      { label: "Webdesign Kosten München", href: "/muenchen/webdesign-kosten" },
       { label: "KI-Telefonassistent München", href: "/muenchen/ki-telefonassistent" },
       { label: "Automatisierung München", href: "/muenchen/automatisierung" },
     ],
