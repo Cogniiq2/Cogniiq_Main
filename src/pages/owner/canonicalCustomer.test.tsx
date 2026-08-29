@@ -221,7 +221,6 @@ vi.mock('@/lib/ownerFinance/api', async (orig) => {
       return { error: null };
     }),
     recordInvoicePayment: vi.fn(async () => ({ error: null })),
-    setInvoiceStatus: vi.fn(async () => ({ error: null })),
   };
 });
 

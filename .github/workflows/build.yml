@@ -368,3 +368,26 @@ jobs:
       # non-owner, and a plain authenticated role reach none of it.
       - name: Client service onboarding SQL tests
         run: bash .github/scripts/run-client-service-onboarding-sql-tests.sh
+
+  invoice-integrity-sql-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure PostgreSQL server binaries
+        run: |
+          if [ -z "$(ls -d /usr/lib/postgresql/*/bin 2>/dev/null)" ]; then
+            sudo apt-get update
+            sudo apt-get install --yes postgresql
+          fi
+
+      # Applies the whole owner-finance chain plus 20260831120000 against a throwaway cluster
+      # and asserts what only a database can prove, as an unprivileged `authenticated` role:
+      # that no column of an issued invoice is client-writable (and that the guard still
+      # refuses even if the grant were restored), that a client cannot INSERT an already-issued
+      # invoice, that Storno, payment reconciliation, issuance and the immutable snapshot are
+      # all untouched, and that the manual and the automated offer->invoice conversions now
+      # produce the identical invoice and cannot duplicate it.
+      - name: Invoice integrity SQL tests
+        run: bash .github/scripts/run-invoice-integrity-sql-tests.sh

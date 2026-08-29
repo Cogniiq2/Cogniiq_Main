@@ -214,11 +214,14 @@ export async function issueOwnerInvoice(invoiceId: string): Promise<{ result: Re
   return { result: data as Record<string, unknown>, error: null };
 }
 
-// void / cancel — an allowed, audited status update (never a hard delete).
-export async function setInvoiceStatus(invoiceId: string, status: OwnerInvoice['status']): Promise<{ error: string | null }> {
-  const { error } = await supabase.from('owner_invoices').update({ status }).eq('id', invoiceId);
-  return { error: error?.message ?? null };
-}
+// There is deliberately NO client-side invoice status setter. A raw
+// `from('owner_invoices').update({ status })` used to live here; it was unreachable from the UI
+// and it was the exact capability that let an authenticated session turn an issued invoice into
+// any other state, bypassing the number allocation, the immutable snapshot, the payment ledger
+// and the audited Storno record. 20260831120000_owner_invoice_integrity_guard.sql revoked the
+// underlying UPDATE grant, so the call could only fail from here on anyway. Every supported
+// transition has its own RPC: issueOwnerInvoice (draft -> issued), owner_cancel_invoice
+// (Storno), recordInvoicePayment (payment-derived paid / partially_paid).
 
 export interface PaymentMeta { method?: string | null; reference?: string | null; note?: string | null }
 

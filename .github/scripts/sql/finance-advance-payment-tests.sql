@@ -209,10 +209,18 @@ end $$;
 -- ---------------------------------------------------------------------------
 
 -- Isolate RE-2026-001: the compatibility invoice from block 0 would otherwise be mixed in.
+--
+-- Harness teardown, not a product path: these rows are ISSUED, and since
+-- 20260831120000_owner_invoice_integrity_guard.sql an issued invoice and its lines can no
+-- longer be deleted by ANY caller — that is the invariant the guard exists for. The suite
+-- therefore drops them the same way its own wipe at the top of this file does: with triggers
+-- off, a superuser-only, explicitly-scoped teardown mechanism. Nothing asserted below changes.
 do $$ begin
+  set session_replication_role = replica;
   delete from public.owner_payments where invoice_id <> current_setting('t.re001')::uuid;
   delete from public.owner_invoice_lines where invoice_id <> current_setting('t.re001')::uuid;
   delete from public.owner_invoices where id <> current_setting('t.re001')::uuid;
+  set session_replication_role = origin;
 end $$;
 
 -- EÜR (cash basis): real receipts stay on their real dates.
@@ -289,14 +297,24 @@ do $$
 declare q1_2026 jsonb; v_entity uuid := current_setting('t.entity')::uuid;
 begin
   -- Move the invoice date back so ordinary payments are legal, then relabel.
+  --
+  -- Re-dating an ISSUED invoice is exactly what 20260831120000_owner_invoice_integrity_guard.sql
+  -- forbids for every caller, database owner included. This is harness scaffolding for a tax
+  -- calculation, not a product path, so it is done with triggers off — the same superuser-only
+  -- teardown mechanism this file already uses for its wipes. The row is restored below and no
+  -- assertion changes.
+  set session_replication_role = replica;
   update public.owner_invoices set issue_date = date '2025-01-01' where id = current_setting('t.re001')::uuid;
+  set session_replication_role = origin;
   update public.owner_payments set payment_kind = 'invoice_payment' where invoice_id = current_setting('t.re001')::uuid;
   q1_2026 := public.owner_tax_period_inputs(v_entity, '2026-01-01','2026-03-31','soll');
   perform pg_temp.want((q1_2026->>'vat_output_cents')::bigint = 93100,
     'with ZERO advance rows the Soll branch returns the full invoice VAT, exactly as before this feature');
   perform pg_temp.want((q1_2026->>'advance_payment_count')::int = 0, 'and reports no advances');
-  -- Restore.
+  -- Restore (same reason, same mechanism).
+  set session_replication_role = replica;
   update public.owner_invoices set issue_date = date '2026-02-28' where id = current_setting('t.re001')::uuid;
+  set session_replication_role = origin;
   update public.owner_payments set payment_kind = 'advance_payment'
     where invoice_id = current_setting('t.re001')::uuid and payment_date < date '2026-02-28';
 end $$;

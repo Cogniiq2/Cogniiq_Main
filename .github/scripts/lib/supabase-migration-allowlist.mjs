@@ -129,6 +129,43 @@ export const ALLOWED_MIGRATIONS = [
     ],
     description: 'Finance — immutable invoice issuance snapshots (Phase 1A)',
   },
+  {
+    file: '20260831120000_owner_invoice_integrity_guard.sql',
+    version: '20260831120000',
+    // Real dependencies, every one of them referenced by this SQL:
+    //  - 20260710120000: is_database_admin(), request_is_service_role(), is_platform_owner()
+    //  - 20260722120000: public.owner_invoices and its column-level UPDATE grant (revoked here),
+    //    public.owner_invoice_lines, owner_claim_idempotency(), public.owner_finance_requests,
+    //    and the original owner_guard_invoice() this migration redefines
+    //  - 20260723120000: public.owner_document_settings (default_payment_terms_days)
+    //  - 20260723121000: public.owner_offers / public.owner_offer_lines
+    //  - 20260723125000: the original owner_convert_offer_internal() and
+    //    owner_process_offer_acceptance() this migration redefines, plus
+    //    owner_invoice_preflight()
+    //  - 20260723126000: owner_enqueue_automation_job(), called by owner_process_offer_acceptance
+    //  - 20260723127000: the LATEST definition of owner_process_offer_acceptance, which this
+    //    migration reproduces with its one behavioural change. Applying this before 127000
+    //    would let that older definition win.
+    //  - 20260724120000: public.owner_customers (the canonical customer link the conversion sets)
+    //  - 20260824171403: owner_invoices.owner_customer_id / cancelled_at / cancelled_by /
+    //    cancellation_reason, all read by the guard
+    //  - 20260825064048: owner_invoices.source_offer_id / source_offer_conversion_kind /
+    //    source_offer_milestone_index, their unique indexes, and the canonical conversion body
+    //    this migration extracts
+    requires: [
+      '20260710120000',
+      '20260722120000',
+      '20260723120000',
+      '20260723121000',
+      '20260723125000',
+      '20260723126000',
+      '20260723127000',
+      '20260724120000',
+      '20260824171403',
+      '20260825064048',
+    ],
+    description: 'Finance — issued-invoice integrity guard + one canonical offer conversion (PR-0A)',
+  },
 ];
 
 /**
