@@ -97,9 +97,12 @@ export function renderElement(
       });
     }, timeoutMs);
 
+    // Collected as Buffers and decoded once, at the end: decoding each chunk on its
+    // own would corrupt any multi-byte character split across a chunk boundary.
+    const chunks: Buffer[] = [];
     const sink = new Writable({
       write(chunk, _encoding, callback) {
-        state.html += chunk.toString('utf8');
+        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
         callback();
       },
     });
@@ -107,7 +110,21 @@ export function renderElement(
     sink.on('error', (error) => finish(() => reject(error)));
 
     const pipeOut = () => {
-      sink.on('finish', () => finish(() => resolve({ html: state.html })));
+      sink.on('finish', () =>
+        finish(() => {
+          // react-dom 18.3.1 encodes SSR output into a fixed-size view with
+          // TextEncoder.encodeInto. When a multi-byte character lands exactly on
+          // that view's boundary it emits a stray NUL immediately before the
+          // character, which then ships inside customer-facing prerendered copy
+          // ("Die vier S\u0000\u00e4ulen"). Measured across a full build: every NUL
+          // sat directly before a multi-byte lead byte and no text was lost, so
+          // dropping NULs restores the intended string exactly. A NUL is never
+          // legitimate in this HTML. Which pages were hit shifted with any content
+          // change, because it depends only on byte offsets.
+          state.html = Buffer.concat(chunks).toString('utf8').split('\u0000').join('');
+          resolve({ html: state.html });
+        })
+      );
       state.controls!.pipe(sink);
     };
 
