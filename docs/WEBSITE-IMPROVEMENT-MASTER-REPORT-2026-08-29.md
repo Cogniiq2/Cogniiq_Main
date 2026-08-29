@@ -379,3 +379,53 @@ process with a server-enforced gate, a pre-go-live test battery including
 prompt-injection and vulnerable-caller handling, three named outage routes. That is
 exactly the "information gain" the site lacks, it is real, and it is blocked on
 owner confirmation rather than on writing.
+
+---
+
+## 19. Owner review round 1 — 2026-08-29 (revisions)
+
+Base moved to `origin/main` @ `7c94cb7` (PR #57 invoice snapshot, PR #58 test fix —
+both owner/finance surfaces, no overlap with these PRs). All three branches
+rebased; all three merge together cleanly (verified in a throwaway branch:
+2080 tests pass, guards pass).
+
+**PR #59 — reworked from a patch into the architecture fix.** The owner was right
+that rewriting JSON-LD during prerender hid the drift instead of removing the
+duplicate source, and that it left `PageSEO`'s effect still writing component
+values into the hydrated head. Measured in a browser: 8 of 8 sampled routes
+served one title and hydrated another. `src/lib/routing/routeMetadata.ts` now
+exposes the manifest at runtime and `PageSEO` resolves title, description and
+indexability from it, so the prerendered head, the hydrated head, OG/Twitter, the
+robots meta and the WebPage JSON-LD are one set of strings. The prerender patch
+is deleted. Crawled `<head>` is byte-identical to a pre-change build on all 93
+documents; the 8/8 drift is now 0/8. Cost: PageSEO's shared chunk 1.2 KB -> 9.4 KB
+gzipped. The CI guard is reframed around provenance rather than the byte-identity
+rule it wrongly asserted, and is verified to fail on a regressed build.
+
+**PR #60 — PVS positioning corrected.** The first version's "den Übertrag macht
+Ihr Team" was an overcorrection: it answered a question about the customer's
+software before that software had been examined. Copy now states the real model —
+system recorded in the first call; interface, access, permitted operations and
+third-party fees checked before the final offer; that result and its costs in the
+offer; direct handover where the interface carries; an agreed handover path where
+it does not. Revised across the shared constants, not just the two pages the PVS
+names appeared on. No system named anywhere in dist/, no compatibility or price
+invented.
+
+**PR #61 — re-verified at 320x568, 360x800, 390x844, 430x932 and 844x390.** Nav
+unblocked at all five (blocked at all five before). Additionally found and fixed a
+pre-existing defect: the consent SETTINGS dialog did not scroll, so in landscape
+all three of its actions rendered offscreen while "Alle akzeptieren" stayed
+reachable behind it — refusing consent was harder than accepting it. Horizontal
+overflow measured identical before and after: pre-existing (MOB-01), not from
+this PR.
+
+**Correction to §12 of this report.** The flaky `serviceOnboarding.test.tsx` was
+described as failing "1-2 of 2072". Running it three times on clean `origin/main`
+shows it fails **2 of 3 runs** there, and the failing test varies. It is genuinely
+flaky on main and will intermittently red CI for everyone — worth its own fix
+(added as N-17).
+
+| # | Item | Priority |
+|---|---|---|
+| N-17 | Fix flaky `src/pages/owner/serviceOnboarding.test.tsx` (fails 2/3 runs on clean main) | P2 |
