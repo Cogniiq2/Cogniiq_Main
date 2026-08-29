@@ -165,7 +165,7 @@ function SectionBlock({ section }: { section: BlogSection }) {
                   <tr
                     key={i}
                     className={`border-b border-gray-100 dark:border-gray-800 last:border-0 ${
-                    i % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50/60 dark:bg-gray-800/40"
+                      i % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50/60 dark:bg-gray-800/40"
                     }`}
                   >
                     <td className="px-4 py-3 font-medium text-gray-700 dark:text-gray-300 w-[45%] align-top">
@@ -266,7 +266,7 @@ export function BlogPostPage() {
             <motion.div className="cq-rise flex items-center gap-2 mb-5">
               <span
                 className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10.5px] font-semibold border ${
-                CATEGORY_COLORS[article.category] ?? "bg-gray-100 text-gray-600 border-gray-200"
+                  CATEGORY_COLORS[article.category] ?? "bg-gray-100 text-gray-600 border-gray-200"
                 }`}
               >
                 {article.category}
@@ -453,7 +453,7 @@ export function BlogPostPage() {
                     >
                       <span
                         className={`inline-flex items-center self-start px-2.5 py-1 rounded-full text-[10px] font-semibold border mb-4 ${
-                        CATEGORY_COLORS[r.category] ?? "bg-gray-100 text-gray-600 border-gray-200"
+                          CATEGORY_COLORS[r.category] ?? "bg-gray-100 text-gray-600 border-gray-200"
                         }`}
                       >
                         {r.category}

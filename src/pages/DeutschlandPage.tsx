@@ -478,9 +478,9 @@ export function DeutschlandPage() {
                   variants={fadeUp}
                   custom={i * 0.07}
                   className={`p-5 rounded-xl border transition-colors ${
-                  region.highlight
-                  ? "bg-white dark:bg-gray-800/80 border-gray-300 dark:border-gray-600"
-                  : "bg-white dark:bg-gray-800/40 border-gray-200 dark:border-gray-700/50"
+                    region.highlight
+                      ? "bg-white dark:bg-gray-800/80 border-gray-300 dark:border-gray-600"
+                      : "bg-white dark:bg-gray-800/40 border-gray-200 dark:border-gray-700/50"
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-2">

@@ -107,9 +107,9 @@ export function BlogIndexPage() {
                   type="button"
                   onClick={() => setActiveCategory(cat)}
                   className={`px-3.5 py-1.5 rounded-full text-[12px] font-medium border transition-all duration-200 ${
-                  activeCategory === cat
-                  ? "bg-gray-900 text-white border-gray-900 dark:bg-gray-50 dark:text-gray-900 dark:border-gray-50"
-                  : "bg-white text-gray-500 border-gray-200 hover:border-gray-400 dark:bg-gray-900 dark:text-gray-400 dark:border-gray-700 dark:hover:border-gray-500"
+                    activeCategory === cat
+                      ? "bg-gray-900 text-white border-gray-900 dark:bg-gray-50 dark:text-gray-900 dark:border-gray-50"
+                      : "bg-white text-gray-500 border-gray-200 hover:border-gray-400 dark:bg-gray-900 dark:text-gray-400 dark:border-gray-700 dark:hover:border-gray-500"
                   }`}
                 >
                   {cat}
@@ -152,7 +152,7 @@ export function BlogIndexPage() {
                     <div className="relative">
                       <span
                         className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10.5px] font-semibold border mb-4 ${
-                        CATEGORY_COLORS[featured.category] ?? "bg-gray-800 text-gray-300 border-gray-700"
+                          CATEGORY_COLORS[featured.category] ?? "bg-gray-800 text-gray-300 border-gray-700"
                         } !bg-opacity-20 !text-white !border-white/20`}
                       >
                         {featured.category}

@@ -88,10 +88,10 @@ function PremiumSelect({ value, onChange, placeholder, options }: PremiumSelectP
         type="button"
         onClick={() => setOpen((p) => !p)}
         className={`w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-lg border text-sm transition-all duration-200 text-left
-        ${open
-        ? "border-gray-400 dark:border-gray-500 bg-white dark:bg-gray-800/80 shadow-sm"
-        : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 hover:border-gray-300 dark:hover:border-gray-600"
-        }`}
+          ${open
+            ? "border-gray-400 dark:border-gray-500 bg-white dark:bg-gray-800/80 shadow-sm"
+            : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 hover:border-gray-300 dark:hover:border-gray-600"
+          }`}
       >
         <span className={selected ? "text-gray-900 dark:text-gray-100 flex items-center gap-2" : "text-gray-400 dark:text-gray-500"}>
           {selected ? (
@@ -110,8 +110,11 @@ function PremiumSelect({ value, onChange, placeholder, options }: PremiumSelectP
       <AnimatePresence>
         {open && (
           <motion.div
+            initial={{ opacity: 0, y: -6, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.98 }}
-            className="cq-rise absolute z-50 top-full mt-1.5 left-0 right-0 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden"
+            transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
+            className="absolute z-50 top-full mt-1.5 left-0 right-0 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden"
           >
             <div className="p-1.5 space-y-0.5 max-h-56 overflow-y-auto">
               {options.map((opt) => (
@@ -120,10 +123,10 @@ function PremiumSelect({ value, onChange, placeholder, options }: PremiumSelectP
                   type="button"
                   onClick={() => { onChange(opt.value); setOpen(false); }}
                   className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors duration-150 text-left group
-                  ${value === opt.value
-                  ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60"
-                  }`}
+                    ${value === opt.value
+                      ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60"
+                    }`}
                 >
                   <span className="flex items-center gap-2.5 min-w-0">
                     {opt.icon && (
@@ -299,7 +302,10 @@ export function KiTelefonassistentDemoPage() {
                   {sent ? (
                     <motion.div
                       key="success"
-                      className="cq-rise rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 p-10 text-center"
+                      initial={{ opacity: 0, scale: 0.97 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
+                      className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 p-10 text-center"
                     >
                       <div className="w-14 h-14 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center mx-auto mb-5">
                         <CheckCircle2 size={24} className="text-emerald-500" />

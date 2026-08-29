@@ -107,8 +107,11 @@ function FAQItem({ item }: { item: { question: string; answer: string } }) {
       <AnimatePresence>
         {open && (
           <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="cq-rise overflow-hidden"
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="overflow-hidden"
           >
             <div className="px-6 pb-5 pt-0">
               <div className="w-full h-px bg-gray-100 dark:bg-gray-700/60 mb-4" />

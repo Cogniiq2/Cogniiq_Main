@@ -334,7 +334,10 @@ function HeroSection() {
               ].map((item, i) => (
                 <motion.div
                   key={i}
-                  className="cq-rise flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
+                  initial="hidden"
+                  animate="visible"
+                  variants={fadeUp}
+                  className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
                 >
                   <CheckCircle2 size={12} className="text-emerald-500 flex-shrink-0" />
                   {item}
@@ -367,9 +370,9 @@ function HeroSection() {
                   <div key={i} className={`flex ${msg.role === "ai" ? "justify-start" : "justify-end"}`}>
                     <div
                       className={`max-w-[86%] px-3.5 py-2.5 rounded-xl text-sm leading-relaxed ${
-                      msg.role === "ai"
-                      ? "bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-100 dark:border-gray-700"
-                      : "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
+                        msg.role === "ai"
+                          ? "bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-100 dark:border-gray-700"
+                          : "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
                       }`}
                     >
                       {msg.role === "ai" && (
@@ -1446,8 +1449,11 @@ function FAQSectionBlock() {
               <AnimatePresence>
                 {open === i && (
                   <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    className="cq-rise overflow-hidden"
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                    className="overflow-hidden"
                   >
                     <div className="px-6 pb-5 pt-0">
                       <div className="w-full h-px bg-gray-100 dark:bg-gray-700/60 mb-4" />
