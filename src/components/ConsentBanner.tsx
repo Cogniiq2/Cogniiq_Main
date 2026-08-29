@@ -175,7 +175,14 @@ export function ConsentBanner() {
             role="dialog"
             aria-modal="true"
             aria-label="Cookie-Einstellungen"
-            className="w-full max-w-lg rounded-t-2xl bg-white p-6 shadow-2xl dark:bg-gray-950 sm:rounded-2xl"
+            /* max-h + overflow-y-auto because the panel is taller than a phone in
+               landscape (390px): all three actions — Ablehnen, Auswahl speichern,
+               Alle akzeptieren — rendered below the fold with no way to scroll to
+               them, so granular consent could not be saved at all in that
+               orientation while "Alle akzeptieren" stayed reachable in the banner
+               behind it. Rejecting or refining consent must never be harder to
+               reach than accepting it. */
+            className="max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto overscroll-contain rounded-t-2xl bg-white p-6 shadow-2xl dark:bg-gray-950 sm:rounded-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="mb-1 text-base font-semibold text-gray-900 dark:text-gray-100">
