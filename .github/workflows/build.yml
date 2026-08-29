@@ -391,3 +391,28 @@ jobs:
       # produce the identical invoice and cannot duplicate it.
       - name: Invoice integrity SQL tests
         run: bash .github/scripts/run-invoice-integrity-sql-tests.sh
+
+  invoice-preflight-sql-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure PostgreSQL server binaries
+        run: |
+          if [ -z "$(ls -d /usr/lib/postgresql/*/bin 2>/dev/null)" ]; then
+            sudo apt-get update
+            sudo apt-get install --yes postgresql
+          fi
+
+      # owner_invoice_preflight built its missing[] array with `missing || 'literal'`, which
+      # Postgres resolves as array||array and which therefore died with "malformed array
+      # literal" on the FIRST missing field — so the gate raised in exactly the case it exists
+      # to report, and owner_process_offer_acceptance propagated that out of the whole
+      # acceptance transaction. This applies 20260901120000 against a throwaway cluster and
+      # asserts what only a database can: that each of the seven checks is individually
+      # reachable, that many and all-seven report deterministically in check order, that the
+      # result shape callers read is unchanged, and that the acceptance pipeline now completes
+      # and reports the missing fields instead of aborting.
+      - name: Invoice preflight SQL tests
+        run: bash .github/scripts/run-invoice-preflight-sql-tests.sh
