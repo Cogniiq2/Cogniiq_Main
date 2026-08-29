@@ -416,3 +416,30 @@ jobs:
       # and reports the missing fields instead of aborting.
       - name: Invoice preflight SQL tests
         run: bash .github/scripts/run-invoice-preflight-sql-tests.sh
+
+  receptionist-leads-rls-sql-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure PostgreSQL server binaries
+        run: |
+          if [ -z "$(ls -d /usr/lib/postgresql/*/bin 2>/dev/null)" ]; then
+            sudo apt-get update
+            sudo apt-get install --yes postgresql
+          fi
+
+      # public.cogniiq_receptionist_leads shipped with no RLS and Supabase's default
+      # public-schema grants, so anon held full SELECT/INSERT/UPDATE/DELETE/TRUNCATE over
+      # 50 rows of third-party contact PII. This applies 20260902120000 against a throwaway
+      # cluster and asserts what only a database can: that the exposure was real (it is
+      # exercised as anon BEFORE the migration, TRUNCATE included), that afterwards anon
+      # holds no privilege at all, that an ordinary authenticated non-owner reads zero rows
+      # and is refused every write, that the platform owner keeps the full internal surface,
+      # that service-role ingestion is untouched, that the identity sequence is no longer
+      # anon-writable, that the pre-existing rows are unchanged, and that a replay is a
+      # no-op. TRUNCATE and the sequence are checked explicitly because RLS does not cover
+      # either: a policy-only review would call this table safe while anon could still empty it.
+      - name: Receptionist leads RLS SQL tests
+        run: bash .github/scripts/run-receptionist-leads-rls-sql-tests.sh

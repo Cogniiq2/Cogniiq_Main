@@ -138,6 +138,25 @@ PSQL -d pre -c "
     ('20260731122000', 'case_d_legacy_convergence');
 " >/dev/null
 
+# Lead PII. The ledger repair above already claims 20260730031350 as applied, but
+# this database never ran its SQL, so create the table for real first -- that is
+# what production actually has, and 20260902120000 fails closed without it (a
+# property the guard below deliberately keeps). Then apply the boundary migration.
+PSQL -d pre -q -f "$MIG/20260730031350_create_cogniiq_receptionist_leads.sql" >/dev/null
+# Reproduce Supabase's default public-schema grants, which a local `create table`
+# does not: without them the preflight's anon assertions would pass vacuously.
+PSQL -d pre -c "
+  grant insert, select, update, delete, truncate, references, trigger
+    on table public.cogniiq_receptionist_leads to anon, authenticated, service_role;
+  grant usage, select, update
+    on sequence public.cogniiq_receptionist_leads_id_seq to anon, authenticated, service_role;
+" >/dev/null
+PSQL -d pre -q -f "$MIG/20260902120000_receptionist_leads_pii_rls.sql" >/dev/null
+PSQL -d pre -c "
+  insert into supabase_migrations.schema_migrations (version, name) values
+    ('20260902120000', 'receptionist_leads_pii_rls');
+" >/dev/null
+
 OUT="$(run_preflight)"
 FAILED_LINES="$(printf '%s\n' "$OUT" | grep '^FAIL: ' || true)"
 PASS_COUNT="$(printf '%s\n' "$OUT" | grep -c '^PASS: ' || true)"
@@ -259,6 +278,39 @@ assert_break "the convergence migration missing from the ledger" \
 assert_break "a future-dated shadow version in the ledger" \
   "insert into supabase_migrations.schema_migrations (version, name) values ('99999999999999', 'shadow');" \
   "no version dated after the newest repository migration"
+
+# --- Lead-PII falsifications ----------------------------------------------
+# TRUNCATE and the identity sequence get their own breaks because RLS covers
+# neither: without these, a regression that re-granted either would sail through.
+assert_break "lead PII granted to anon" \
+  "grant select on table public.cogniiq_receptionist_leads to anon;" \
+  "anon holds NO privilege at all on lead PII"
+
+assert_break "RLS switched off on lead PII" \
+  "alter table public.cogniiq_receptionist_leads disable row level security;" \
+  "RLS is enabled on public.cogniiq_receptionist_leads"
+
+assert_break "TRUNCATE on lead PII re-granted to authenticated" \
+  "grant truncate on table public.cogniiq_receptionist_leads to authenticated;" \
+  "authenticated holds NO TRUNCATE on lead PII"
+
+assert_break "the lead-PII policy widened past is_platform_owner()" \
+  "drop policy cogniiq_receptionist_leads_owner_all on public.cogniiq_receptionist_leads;
+   create policy cogniiq_receptionist_leads_owner_all on public.cogniiq_receptionist_leads
+     for all to authenticated using (true) with check (true);" \
+  "lead PII has exactly one policy and it is gated on is_platform_owner"
+
+assert_break "the lead identity sequence re-granted to anon" \
+  "grant usage, select, update on sequence public.cogniiq_receptionist_leads_id_seq to anon;" \
+  "anon holds no privilege on the lead identity sequence"
+
+assert_break "service_role losing write access to lead PII" \
+  "revoke insert on table public.cogniiq_receptionist_leads from service_role;" \
+  "service_role retains full SELECT/INSERT/UPDATE/DELETE on lead PII"
+
+assert_break "the lead-PII migration missing from the ledger" \
+  "delete from supabase_migrations.schema_migrations where version = '20260902120000';" \
+  "ledger names the lead-PII migration 20260902120000 as applied"
 
 assert_break "a generated-shadow version in the ledger (Class A pattern, no repository file)" \
   "insert into supabase_migrations.schema_migrations (version, name) values ('20260730183911', 'shadow');" \

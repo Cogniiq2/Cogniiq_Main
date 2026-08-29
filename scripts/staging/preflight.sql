@@ -29,6 +29,11 @@
 --      search_path? Does the migration ledger name exactly the five legacy
 --      versions plus the convergence version, with no future-dated or
 --      unrecognized (shadow) version present?
+--  10. Receptionist lead PII (migration 20260902120000): is RLS on, does anon
+--      hold NO privilege of any kind (TRUNCATE and the identity sequence
+--      included, neither of which RLS covers), is authenticated's grant set
+--      exactly SELECT/INSERT/UPDATE/DELETE gated on is_platform_owner(), and is
+--      service_role's ingestion path intact?
 --
 -- Deliberately NOT checked here (they are not database state): Edge Function
 -- deployment/health and frontend↔backend project agreement. Those live in
@@ -145,7 +150,8 @@ case_d_known_version(version) as (
     ('20260723126000'), ('20260723127000'), ('20260723128000'), ('20260724120000'),
     ('20260728120000'), ('20260728121000'), ('20260728122000'), ('20260728123000'),
     ('20260728124000'), ('20260730031350'), ('20260730120000'), ('20260730130000'),
-    ('20260731120000'), ('20260731121000'), ('20260731122000')
+    ('20260731120000'), ('20260731121000'), ('20260731122000'),
+    ('20260902120000')
 ),
 
 case_d_legacy_version(version) as (
@@ -510,6 +516,82 @@ checks(section, ord, label, passed) as (
            select 1 from supabase_migrations.schema_migrations m
            where m.version not in (select version from case_d_known_version)
          )
+  from (select 1) as _dummy
+  where to_regclass('supabase_migrations.schema_migrations') is not null
+
+  -- ------------------------------------------------ 10) receptionist lead PII
+  -- The table shipped with no RLS and Supabase's default public-schema grants,
+  -- leaving 50 rows of third-party contact PII fully readable and writable by
+  -- anon. These checks assert the boundary 20260902120000 installs. TRUNCATE and
+  -- the identity sequence are checked in their own right: RLS filters neither, so
+  -- a policy-only assertion would report this table safe while anon could still
+  -- empty it or reset its primary key.
+  union all
+  select '10 lead-pii', 1000, 'table public.cogniiq_receptionist_leads exists',
+         to_regclass('public.cogniiq_receptionist_leads') is not null
+
+  union all
+  select '10 lead-pii', 1001, 'RLS is enabled on public.cogniiq_receptionist_leads',
+         coalesce((select c.relrowsecurity from pg_class c
+                   join pg_namespace n on n.oid = c.relnamespace
+                   where n.nspname = 'public' and c.relname = 'cogniiq_receptionist_leads'), false)
+  from (select 1) as _dummy
+  where to_regclass('public.cogniiq_receptionist_leads') is not null
+
+  union all
+  select '10 lead-pii', 1002, 'anon holds NO privilege at all on lead PII (SELECT/INSERT/UPDATE/DELETE/TRUNCATE/REFERENCES)',
+         not coalesce((select bool_or(has_table_privilege((select anon from roles), 'public.cogniiq_receptionist_leads', priv))
+                       from (values ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE'), ('TRUNCATE'), ('REFERENCES')) as p(priv)), true)
+  from (select 1) as _dummy
+  where to_regclass('public.cogniiq_receptionist_leads') is not null
+
+  union all
+  select '10 lead-pii', 1003, 'authenticated holds NO TRUNCATE on lead PII (RLS does not filter TRUNCATE)',
+         not coalesce(has_table_privilege((select authenticated from roles), 'public.cogniiq_receptionist_leads', 'TRUNCATE'), true)
+  from (select 1) as _dummy
+  where to_regclass('public.cogniiq_receptionist_leads') is not null
+
+  union all
+  select '10 lead-pii', 1004, 'authenticated grant set on lead PII is exactly SELECT/INSERT/UPDATE/DELETE',
+         coalesce((
+           select string_agg(distinct g.privilege_type, ',' order by g.privilege_type)
+           from information_schema.role_table_grants g
+           where g.table_schema = 'public' and g.table_name = 'cogniiq_receptionist_leads'
+             and g.grantee = 'authenticated'
+         ), '(none)') = 'DELETE,INSERT,SELECT,UPDATE'
+  from (select 1) as _dummy
+  where to_regclass('public.cogniiq_receptionist_leads') is not null
+
+  union all
+  select '10 lead-pii', 1005, 'lead PII has exactly one policy and it is gated on is_platform_owner() in USING and WITH CHECK',
+         coalesce((
+           select count(*) = 1
+                  and bool_and(p.qual like '%is_platform_owner%')
+                  and bool_and(p.with_check like '%is_platform_owner%')
+                  and bool_and(array_to_string(p.roles, ',') = 'authenticated')
+           from pg_policies p
+           where p.schemaname = 'public' and p.tablename = 'cogniiq_receptionist_leads'
+         ), false)
+  from (select 1) as _dummy
+  where to_regclass('public.cogniiq_receptionist_leads') is not null
+
+  union all
+  select '10 lead-pii', 1006, 'service_role retains full SELECT/INSERT/UPDATE/DELETE on lead PII',
+         coalesce((select bool_and(has_table_privilege((select service_role from roles), 'public.cogniiq_receptionist_leads', priv))
+                   from (values ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE')) as p(priv)), false)
+  from (select 1) as _dummy
+  where to_regclass('public.cogniiq_receptionist_leads') is not null
+
+  union all
+  select '10 lead-pii', 1007, 'anon holds no privilege on the lead identity sequence (UPDATE would allow setval)',
+         not coalesce((select bool_or(has_sequence_privilege((select anon from roles), 'public.cogniiq_receptionist_leads_id_seq', priv))
+                       from (values ('USAGE'), ('SELECT'), ('UPDATE')) as p(priv)), true)
+  from (select 1) as _dummy
+  where to_regclass('public.cogniiq_receptionist_leads_id_seq') is not null
+
+  union all
+  select '10 lead-pii', 1008, 'ledger names the lead-PII migration 20260902120000 as applied',
+         exists (select 1 from supabase_migrations.schema_migrations m where m.version = '20260902120000')
   from (select 1) as _dummy
   where to_regclass('supabase_migrations.schema_migrations') is not null
 )

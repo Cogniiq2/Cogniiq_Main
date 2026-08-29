@@ -180,6 +180,22 @@ export const ALLOWED_MIGRATIONS = [
     requires: ['20260723120000', '20260723121000', '20260723125000'],
     description: 'Finance — repair owner_invoice_preflight missing-field reporting (malformed array literal)',
   },
+  {
+    file: '20260902120000_receptionist_leads_pii_rls.sql',
+    version: '20260902120000',
+    // Real dependencies, both genuinely referenced by this SQL and both already
+    // present in the production remote history when this entry was added:
+    //  - 20260710120000: public.is_platform_owner(), the helper both policy clauses
+    //    call. (The migration's precondition block fails closed if it is absent.)
+    //  - 20260730031350: public.cogniiq_receptionist_leads and its identity sequence
+    //    public.cogniiq_receptionist_leads_id_seq -- the table this migration enables
+    //    RLS on and the sequence whose grants it revokes.
+    // It depends on nothing in the finance chain: it touches no invoice object and
+    // shares no function with PR #65/#67. Listing a version this SQL does not
+    // reference would make the dependency gate assert something untrue.
+    requires: ['20260710120000', '20260730031350'],
+    description: 'Security — receptionist lead PII row-level-security boundary (PR-0B)',
+  },
 ];
 
 /**
