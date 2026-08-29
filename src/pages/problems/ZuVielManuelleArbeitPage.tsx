@@ -57,6 +57,7 @@ const config: ProblemPageConfig = {
   },
   serviceLinks: [
     { label: "Automatisierung für Unternehmen", href: "/automatisierung-unternehmen" },
+    { label: "KI Telefonassistent Arztpraxis", href: "/ki-telefonassistent-arzt" },
     { label: "Automatisierung Kosten", href: "/kosten-automatisierung" },
     { label: "KI Agentur Deutschland", href: "/ki-agentur-deutschland" },
     { label: "Digitale Automatisierung", href: "/digitale-automatisierung-unternehmen" },
