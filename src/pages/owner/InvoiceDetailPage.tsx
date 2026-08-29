@@ -8,10 +8,10 @@ import {
 } from '@/components/dashboard';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import { invoiceStatusTone } from '@/pages/owner/ownerUi';
-import { loadInvoiceDetail, loadDocumentSettings, loadGeneratedDocuments, signedDocumentUrl } from '@/lib/ownerFinance/offersApi';
+import { loadInvoiceDetail, loadDocumentSettings, loadGeneratedDocuments, loadLatestInvoiceVersion, signedDocumentUrl } from '@/lib/ownerFinance/offersApi';
 import { issueOwnerInvoice, recordInvoicePayment } from '@/lib/ownerFinance/api';
 import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
-import { invoiceToDocument } from '@/lib/ownerFinance/buildTransactionalDoc';
+import { invoiceToDocument, invoiceSnapshotToDocument } from '@/lib/ownerFinance/buildTransactionalDoc';
 import { renderTransactionalPdf, exportTransactionalPdf, validateTransactionalDocument, vatBreakdown } from '@/lib/ownerFinance/documents';
 import { generateAndStoreDocument } from '@/lib/ownerFinance/generateDocument';
 import { runFinanceExport } from '@/lib/ownerFinance/financeExportRunner';
@@ -21,7 +21,7 @@ import { paymentMethodLabel, paymentKindLabel, isAdvancePayment, PAYMENT_METHOD_
 import { formatDateDe, formatCentsCurrencyDe, formatBpPercentDe, type ExportFormat, type ExportMode, type ExportMeta } from '@/lib/ownerFinance/exports';
 import { ExportMenu } from '@/components/finance/ExportMenu';
 import { CustomerPortalPublishCard } from '@/components/finance/CustomerPortalPublishCard';
-import type { OwnerInvoice, OwnerInvoiceLine, OwnerDocumentSettings, OwnerGeneratedDocument } from '@/lib/ownerFinance/types';
+import type { OwnerInvoice, OwnerInvoiceLine, OwnerDocumentSettings, OwnerGeneratedDocument, OwnerInvoiceVersion } from '@/lib/ownerFinance/types';
 
 const statusLabel: Record<string, string> = {
   draft: 'Entwurf', issued: 'Gestellt', partially_paid: 'Teilbezahlt', paid: 'Bezahlt',
@@ -39,6 +39,7 @@ export function InvoiceDetailPage() {
   const [payments, setPayments] = useState<Array<Record<string, unknown>>>([]);
   const [settings, setSettings] = useState<OwnerDocumentSettings | null>(null);
   const [docs, setDocs] = useState<OwnerGeneratedDocument[]>([]);
+  const [version, setVersion] = useState<OwnerInvoiceVersion | null>(null);
   const [recipient, setRecipient] = useState<{ name: string; addressLines: string[]; email: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,13 +51,14 @@ export function InvoiceDetailPage() {
     if (!invoiceId || !entity) return;
     setLoading(true);
     try {
-      const [res, settingsRow, generated, clients] = await Promise.all([
+      const [res, settingsRow, generated, clients, ver] = await Promise.all([
         loadInvoiceDetail(invoiceId), loadDocumentSettings(entity.id).catch(() => null),
         loadGeneratedDocuments(entity.id, { type: 'owner_invoices', id: invoiceId }).catch(() => []),
         loadAdminClients().catch(() => []),
+        loadLatestInvoiceVersion(invoiceId).catch(() => null),
       ]);
       if (!res) { setError('Rechnung nicht gefunden'); return; }
-      setInvoice(res.invoice); setLines(res.lines); setPayments(res.payments); setSettings(settingsRow); setDocs(generated);
+      setInvoice(res.invoice); setLines(res.lines); setPayments(res.payments); setSettings(settingsRow); setDocs(generated); setVersion(ver);
       const c = clients.find((x) => x.organizationId === res.invoice.organization_id);
       setRecipient(c ? { name: c.account?.legal_name ?? c.organizationName, addressLines: (c.account?.address ?? '').split('\n').filter(Boolean), email: c.account?.primary_email ?? null } : null);
       setError(null);
@@ -66,18 +68,49 @@ export function InvoiceDetailPage() {
 
   useEffect(() => { void load(); }, [load]);
 
-  const doc = useMemo(() => (invoice ? invoiceToDocument(invoice, lines, settings, recipient, entity?.display_name ?? 'Cogniiq') : null), [invoice, lines, settings, recipient, entity]);
+  const isDraftStatus = invoice?.status === 'draft';
+  // An issued invoice with a captured snapshot MUST render exclusively from it — never from
+  // live settings/CRM data — so a later customer-address or bank-detail change can never alter
+  // an already-issued document. Only an issued invoice from BEFORE this snapshot mechanism
+  // existed (legacy) falls back to a live reconstruction, which is flagged below.
+  const hasSnapshot = !isDraftStatus && !!version?.snapshot;
+  const isLegacyIssued = !isDraftStatus && !hasSnapshot;
+  const doc = useMemo(() => {
+    if (!invoice) return null;
+    if (hasSnapshot) return invoiceSnapshotToDocument(version!.snapshot);
+    return invoiceToDocument(invoice, lines, settings, recipient, entity?.display_name ?? 'Cogniiq');
+  }, [invoice, lines, settings, recipient, entity, hasSnapshot, version]);
+  // The newest already-stored, finalized PDF file — a real static blob, immutable regardless of
+  // what a live re-render would produce today. Preferred over re-rendering for a legacy issued
+  // invoice that predates the snapshot mechanism, so the admin sees the actual historical
+  // document instead of a reconstruction whenever one was already generated and saved.
+  const latestStoredFinalizedDoc = useMemo(
+    () => docs.filter((d) => d.status === 'finalized' && d.pdf_storage_path).sort((a, b) => b.version - a.version)[0] ?? null,
+    [docs],
+  );
   const validation = useMemo(() => (doc ? validateTransactionalDocument(doc) : null), [doc]);
   const breakdown = useMemo(() => (doc ? vatBreakdown(doc.lines) : []), [doc]);
   const run = async (key: string, fn: () => Promise<void>) => { setBusy(key); try { await fn(); } finally { setBusy(null); } };
 
+  const openStoredPdf = async (path: string): Promise<void> => {
+    const { url, error: err } = await signedDocumentUrl(path);
+    if (err || !url) { toast.error('Download fehlgeschlagen', err ?? 'Kein Link'); return; }
+    window.open(url, '_blank', 'noopener');
+  };
+
   const previewPdf = () => run('preview', async () => {
+    // A legacy issued invoice (no snapshot) that already has a stored, finalized PDF shows THAT
+    // real historical file rather than a fresh reconstruction from today's live data.
+    if (isLegacyIssued && latestStoredFinalizedDoc?.pdf_storage_path) { await openStoredPdf(latestStoredFinalizedDoc.pdf_storage_path); return; }
     if (!doc) return;
     const bytes = await renderTransactionalPdf(doc);
     const url = URL.createObjectURL(new Blob([bytes.slice()], { type: 'application/pdf' }));
     window.open(url, '_blank', 'noopener'); setTimeout(() => URL.revokeObjectURL(url), 60000);
   });
-  const downloadPdf = () => run('download', async () => { if (doc) await exportTransactionalPdf(doc); });
+  const downloadPdf = () => run('download', async () => {
+    if (isLegacyIssued && latestStoredFinalizedDoc?.pdf_storage_path) { await openStoredPdf(latestStoredFinalizedDoc.pdf_storage_path); return; }
+    if (doc) await exportTransactionalPdf(doc);
+  });
   const generateStore = () => run('generate', async () => {
     if (!invoice || !doc || !entity) return;
     const res = await generateAndStoreDocument(entity.id, invoice.id, doc, { requireValid: invoice.status !== 'draft' });
@@ -96,9 +129,7 @@ export function InvoiceDetailPage() {
     try { await navigator.clipboard.writeText(parts); toast.success('Zahlungsinformationen kopiert'); } catch { toast.error('Kopieren fehlgeschlagen'); }
   };
   const downloadStored = (path: string) => run('stored', async () => {
-    const { url, error: err } = await signedDocumentUrl(path);
-    if (err || !url) { toast.error('Download fehlgeschlagen', err ?? 'Kein Link'); return; }
-    window.open(url, '_blank', 'noopener');
+    await openStoredPdf(path);
   });
   const exportData = async (format: ExportFormat, mode: ExportMode) => {
     if (!entity || !invoice) return;
@@ -121,7 +152,7 @@ export function InvoiceDetailPage() {
       <button onClick={() => navigate('/admin/finance/invoices')} className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-gray-950"><ArrowLeft size={15} /> Zurück zu Rechnungen</button>
       <PageHeader
         title={invoice.invoice_number ?? 'Rechnung (Entwurf)'}
-        description={recipient?.name ?? undefined}
+        description={(doc?.recipient.name !== '—' ? doc?.recipient.name : recipient?.name) ?? undefined}
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <Button size="sm" variant="secondary" icon={Eye} onClick={previewPdf} loading={busy === 'preview'}>Vorschau</Button>
@@ -141,7 +172,16 @@ export function InvoiceDetailPage() {
       </div>
 
       {isDraft && validation && validation.missing.length > 0 ? (
-        <div className="mb-5"><InfoBanner tone="warning" title="Vor dem finalen PDF fehlen Pflichtangaben">{validation.missing.join(' · ')}. Ein finales Rechnungs-PDF wird erst nach Vervollständigung erzeugt (keine Zusicherung rechtlicher/steuerlicher Vollständigkeit).</InfoBanner></div>
+        <div className="mb-5"><InfoBanner tone="warning" title="Vor dem finalen PDF fehlen Pflichtangaben">{validation.missing.join(' · ')}. Ein finales Rechnungs-PDF wird erst nach Vervollständigung erzeugt.</InfoBanner></div>
+      ) : null}
+
+      {isLegacyIssued ? (
+        <div className="mb-5">
+          <InfoBanner tone="info" title="Historische Rechnung ohne gespeicherten Inhalts-Snapshot (nur intern sichtbar)">
+            Diese Rechnung wurde vor Einführung der unveränderlichen Dokumentversionierung gestellt.
+            {latestStoredFinalizedDoc ? ' Vorschau und Download öffnen das tatsächlich gespeicherte historische PDF.' : ' Eine neu erzeugte Vorschau/PDF ist eine nachträgliche Rekonstruktion aus den aktuellen Stammdaten, nicht das historische Original — es wurde bislang kein PDF für diese Rechnung gespeichert.'}
+          </InfoBanner>
+        </div>
       ) : null}
 
       <div className="grid gap-5 lg:grid-cols-3">

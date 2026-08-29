@@ -186,6 +186,64 @@ export function snapshotToDocument(snapshot: Record<string, unknown>): Transacti
   };
 }
 
+/**
+ * Build a TransactionalDocument from an IMMUTABLE issuance snapshot (owner_invoice_versions.snapshot).
+ * An issued invoice with a snapshot row MUST render through this function (never
+ * invoiceToDocument with live settings/recipient), so the document a customer receives never
+ * changes because a customer address, Cogniiq bank detail or tax setting changed later. Mirrors
+ * snapshotToDocument() for offers.
+ */
+export function invoiceSnapshotToDocument(snapshot: Record<string, unknown>): TransactionalDocument {
+  const inv = (snapshot.invoice ?? {}) as Record<string, unknown>;
+  const seller = (snapshot.seller ?? {}) as Record<string, unknown>;
+  const rec = (snapshot.recipient ?? {}) as Record<string, unknown>;
+  const ds = (snapshot.document_settings ?? {}) as Record<string, unknown>;
+  const totals = (snapshot.totals ?? {}) as Record<string, unknown>;
+  const rawLines = (snapshot.lines ?? []) as Array<Record<string, unknown>>;
+  const str = (v: unknown): string | null => (typeof v === 'string' && v.length ? v : null);
+  const num = (v: unknown): number => (typeof v === 'number' ? v : Number(v) || 0);
+
+  const sellerAddr = [str(seller.street), [str(seller.postal_code), str(seller.city)].filter(Boolean).join(' ')].filter((l) => l && (l as string).trim()) as string[];
+  const recAddrRaw = Array.isArray(rec.address_lines) ? (rec.address_lines as unknown[]).map((l) => str(l)).filter((l): l is string => !!l && l.trim().length > 0) : [];
+
+  return {
+    kind: 'invoice',
+    language: (str(ds.document_language) as 'de' | 'en') ?? 'de',
+    documentNumber: str(snapshot.invoice_number) ?? str(inv.invoice_number),
+    title: null,
+    seller: {
+      name: str(seller.legal_name) ?? 'Cogniiq', addressLines: sellerAddr,
+      email: str(seller.email), phone: str(seller.phone), vatId: str(seller.vat_id), taxNumber: str(seller.tax_number),
+      website: str(seller.website),
+    } as DocumentParty,
+    recipient: {
+      name: str(rec.company) ?? '—', contactName: str(rec.contact_name), department: str(rec.department),
+      addressLines: recAddrRaw, email: str(rec.email), phone: str(rec.phone), vatId: str(rec.vat_id),
+    },
+    issueDate: str(inv.issue_date),
+    dueDate: str(inv.due_date),
+    serviceDate: str(inv.service_date),
+    servicePeriodStart: str(inv.service_period_start),
+    servicePeriodEnd: str(inv.service_period_end),
+    currency: str(inv.currency) ?? 'EUR',
+    lines: rawLines.map((l) => ({
+      description: str(l.description) ?? '', quantityMilli: num(l.quantity_milli), unit: 'Stück',
+      unitPriceCents: num(l.unit_price_cents), vatRateBp: num(l.vat_rate_bp), vatTreatment: str(l.vat_treatment) ?? 'standard',
+      netCents: num(l.net_cents), vatCents: num(l.vat_cents), grossCents: num(l.gross_cents), isOptional: false,
+    })),
+    netTotalCents: num(totals.net_cents),
+    vatTotalCents: num(totals.vat_cents),
+    grossTotalCents: num(totals.gross_cents),
+    paymentTerms: inv.due_date ? `Zahlbar bis ${str(inv.due_date) ?? ''}` : null,
+    bank: {
+      holder: str(seller.bank_account_holder), iban: str(seller.iban), bic: str(seller.bic), bankName: str(seller.bank_name),
+    },
+    footer: str(ds.default_invoice_footer),
+    isDraft: false,
+    templateVersion: TRANSACTIONAL_TEMPLATE_VERSION,
+  };
+}
+
 export function invoiceToDocument(invoice: OwnerInvoice, lines: OwnerInvoiceLine[], settings: OwnerDocumentSettings | null, recipient: RecipientInput | null, fallbackSeller: string): TransactionalDocument {
   return {
     kind: 'invoice',

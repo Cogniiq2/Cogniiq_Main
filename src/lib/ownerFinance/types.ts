@@ -309,6 +309,23 @@ export interface OwnerOfferVersion {
   finalized_at: string;
 }
 
+/**
+ * Immutable per-issuance invoice snapshot row (mirrors OwnerOfferVersion). Captured
+ * atomically at the moment an invoice moves to status='issued' — see
+ * owner_capture_invoice_snapshot() / owner_build_invoice_snapshot() in
+ * 20260830123000_owner_invoice_immutable_snapshot.sql. An issued invoice with a row
+ * here MUST always render from `snapshot`, never from live customer/settings data.
+ */
+export interface OwnerInvoiceVersion {
+  id: string;
+  invoice_id: string;
+  version: number;
+  invoice_number: string | null;
+  snapshot: Record<string, unknown>;
+  source_hash: string;
+  issued_at: string;
+}
+
 export interface OwnerOffer {
   id: string;
   business_entity_id: string;

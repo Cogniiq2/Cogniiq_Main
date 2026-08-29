@@ -12,6 +12,12 @@ import { validateTransactionalDocument } from './documentValidation';
 import { computeOfferPricing, intervalSuffix } from './offerPricing';
 
 const KIND_LABEL = { offer: 'Angebot', invoice: 'Rechnung' } as const;
+// Offer-only legacy disclaimer. Invoices never render this (see the `doc.kind === 'offer'` guard
+// below) — a Rechnung shows only the owner's own configured footer (doc.footer), the same
+// professional, factual content already used for payment/contact details. Kept for offers only
+// because this generic renderer has no live production caller for offers today (they use the
+// premium engine — see PublicDocumentPortal.tsx/OfferDetailPage.tsx), so removing it here would
+// be a change with no observable effect other than on tests/future callers of this path.
 const DISCLAIMER =
   'Erstellt mit Cogniiq. Keine Zusicherung rechtlicher oder steuerlicher Vollständigkeit — bitte fachlich prüfen.';
 
@@ -123,7 +129,10 @@ export function buildTransactionalReportModel(doc: TransactionalDocument): PdfRe
 
   if (doc.closing) sections.push({ kind: 'paragraph', text: doc.closing });
   if (doc.footer) sections.push({ kind: 'note', text: doc.footer });
-  sections.push({ kind: 'note', text: DISCLAIMER });
+  // Invoices: no fabricated legal/accuracy disclaimer — only the owner's own configured footer
+  // above (payment/contact details already present in Dokument-Einstellungen). Offers keep the
+  // legacy disclaimer unchanged (see the comment on DISCLAIMER above).
+  if (doc.kind === 'offer') sections.push({ kind: 'note', text: DISCLAIMER });
 
   return {
     brand: 'Cogniiq',
