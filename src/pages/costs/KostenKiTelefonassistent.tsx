@@ -160,7 +160,7 @@ export function KostenKiTelefonassistent() {
     <>
       <PageSEO
         title="Was kostet ein KI Telefonassistent? Preise | Cogniiq"
-        description="Was kostet ein KI Telefonassistent für Praxen? Tarife ab 300 € im Monat mit festem Minutenkontingent, gedeckelter Rechnung, Einrichtung und Zwei-Wochen-Garantie."
+        description="Was kostet ein KI Telefonassistent für Praxen? Tarife ab 300 € im Monat mit festem Minutenkontingent, gedeckelter Rechnung und Zwei-Wochen-Garantie."
         canonical={url}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
