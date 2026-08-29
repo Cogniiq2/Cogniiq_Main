@@ -335,19 +335,24 @@ export function DesktopHero() {
               // surface of the site. ink-3 is the lightest value that still clears AA.
               { text: 'Auch nachts. Auch samstags.', color: 'text-pub-ink-3', delay: 0.36 },
             ].map(({ text, color, delay }) => (
-              <div key={text} className="overflow-hidden">
-                <motion.div
-                  className={`text-[clamp(42px,5vw,66px)] font-bold tracking-[-0.026em] leading-[1.05] ${color}`}
-                  // The headline is the LCP element. It previously started fully
-                  // outside its clip (`y: '110%'`) and finished up to 1.56s later,
-                  // so the largest paint was deferred by the animation itself.
-                  // A short opacity + 12px lift reads the same and paints at once.
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={inView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.42, delay, ease: E }}
+              <div key={text}>
+                {/* The headline is the LCP element. It started at `opacity: 0` and
+                    was faded in by framer-motion once the hero had mounted, so the
+                    largest paint waited on hydration *and then* on the animation —
+                    measured at ~1.1s after the headline already existed in the DOM.
+                    Chrome does not treat an element as an LCP candidate while its
+                    opacity is 0. This is the same transform-only entrance the rest
+                    of the site uses (.cq-rise), so the text is painted and readable
+                    on its first frame; easing, stagger and duration are unchanged.
+                    The wrapper's `overflow-hidden` clip is gone with the opacity
+                    fade: it existed for an earlier slide-from-outside version and
+                    would now crop the headline on that first frame. */}
+                <div
+                  className={`cq-rise text-[clamp(42px,5vw,66px)] font-bold tracking-[-0.026em] leading-[1.05] ${color}`}
+                  style={{ animationDelay: `${delay}s`, animationDuration: '0.42s' }}
                 >
                   {text}
-                </motion.div>
+                </div>
               </div>
             ))}
           </h1>

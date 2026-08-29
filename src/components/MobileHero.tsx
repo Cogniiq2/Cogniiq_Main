@@ -111,17 +111,16 @@ function MetricCard({
   value: string; label: string; delay: number; accent: string;
 }) {
   return (
-    <motion.div
-      className="flex-1 flex flex-col items-center gap-0.5 py-3 px-2 rounded-2xl"
+    <div
+      className="cq-rise flex-1 flex flex-col items-center gap-0.5 py-3 px-2 rounded-2xl"
       style={{
         background: 'rgba(255,255,255,0.7)',
         border: '1px solid rgba(15,23,42,0.07)',
         backdropFilter: 'blur(12px)',
         boxShadow: '0 2px 12px rgba(15,23,42,0.04)',
+        animationDelay: `${delay}s`,
+        animationDuration: '0.65s',
       }}
-      initial={{ opacity: 0, y: 16, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.65, delay, ease: EASE_OUT }}
     >
       <span
         className="text-2xl font-bold tracking-tight"
@@ -139,7 +138,7 @@ function MetricCard({
         className="mt-1 h-0.5 rounded-full"
         style={{ width: '20px', background: accent }}
       />
-    </motion.div>
+    </div>
   );
 }
 
@@ -461,7 +460,12 @@ export function MobileHero() {
           <div style={{ width: 32, height: 1, background: 'rgba(15,23,42,0.12)' }} />
         </motion.div>
 
-        <motion.p
+        {/* Essential above-the-fold copy. It shipped as `opacity:0` in the
+            prerendered HTML, so it was invisible until hydration ran the fade —
+            and permanently invisible without JavaScript. Transform-only entrance
+            (.cq-rise) keeps the choreography but paints the text immediately. */}
+        <p
+          className="cq-rise"
           style={{
             fontSize: 'clamp(14.5px, 3.8vw, 15.5px)',
             fontWeight: 400,
@@ -470,29 +474,23 @@ export function MobileHero() {
             maxWidth: '30ch',
             textAlign: 'center',
             marginBottom: '36px',
+            animationDelay: '2.2s',
+            animationDuration: '0.8s',
           }}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 2.2, ease: EASE_OUT }}
         >
           Wir entwickeln operative KI-Strukturen, die Anfragen übernehmen, Prozesse steuern und Wachstum automatisieren.
-        </motion.p>
+        </p>
 
-        <motion.div
-          className="w-full flex gap-3 mb-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 2.5 }}
-        >
+        <div className="w-full flex gap-3 mb-4">
           <MetricCard value="Auch nachts" label="Anrufannahme" delay={2.75} accent="#2e6f8f" />
           <MetricCard value="Individuell" label="statt Baukasten" delay={2.9} accent="rgba(15,23,42,0.3)" />
-        </motion.div>
+        </div>
 
-        <motion.div
-          className="w-full flex flex-col gap-3 mt-4"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 3.1, ease: EASE_OUT }}
+        {/* Primary call to action. Same defect as the lead copy: shipped at
+            `opacity:0`, so a visitor without JavaScript never saw a CTA at all. */}
+        <div
+          className="cq-rise w-full flex flex-col gap-3 mt-4"
+          style={{ animationDelay: '3.1s', animationDuration: '0.7s' }}
         >
           <motion.button
             onClick={() => navigate('/kontakt')}
@@ -549,7 +547,7 @@ export function MobileHero() {
           >
             Leistungen entdecken
           </motion.button>
-        </motion.div>
+        </div>
 
         {/* Guarantee strip */}
         <motion.div
