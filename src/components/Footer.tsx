@@ -179,6 +179,19 @@ export function Footer() {
             {/* LINK COLUMNS */}
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-x-6 gap-y-10">
 
+              {/* Der Footer trug 80 Verweise auf 78 Ziele und stand so auf jedem
+                  der 91 Dokumente. Damit war er keine Navigation mehr, sondern
+                  eine Sitemap: 79 Ziele waren von fast jeder Seite verlinkt, und
+                  /impressum bekam dasselbe Gewicht wie /bayreuth/webdesign. Eine
+                  Rangfolge, in der alles gleich wichtig ist, ist keine.
+                  Er trägt jetzt die Einstiege und die Pflichtseiten. Alles
+                  Feingliedrige — Stadt x Leistung, Branchen-Landingpages,
+                  Problemseiten, Blogartikel — steht dort, wo es hingehört: im
+                  Menü unter seiner Leistung und auf der jeweiligen Hub-Seite.
+                  Vor dieser Kürzung wurde für JEDES entfernte Ziel geprüft, dass
+                  es weiterhin aus dem Seiteninhalt verlinkt ist; das schwächste
+                  hat 3 solche Verweise, die meisten zweistellig. */}
+
               <FooterCol
                 title="Leistungen"
                 delay={0.06}
@@ -189,18 +202,16 @@ export function Footer() {
                       { text: "Alle Leistungen", to: "/leistungen" },
                       { text: "KI-Telefonassistent", to: "/ki-telefonassistent" },
                       { text: "Webdesign", to: "/webdesign" },
-                      { text: "Prozessautomatisierung", to: "/prozessautomatisierung" },
-                      { text: "Webdesign Agentur DE", to: "/webdesign-agentur-deutschland" },
-                      { text: "KI Agentur DE", to: "/ki-agentur-deutschland" },
                       { text: "Automatisierung", to: "/automatisierung-unternehmen" },
-                      { text: "Live-Demo", to: "/ki-telefonassistent/demo" },
+                      { text: "Prozessautomatisierung", to: "/prozessautomatisierung" },
+                      { text: "Für Arzt- und Zahnarztpraxen", to: "/praxen" },
                     ],
                   },
                   {
                     label: "Kosten",
                     links: [
-                      { text: "Webdesign Kosten", to: "/kosten-webdesign" },
-                      { text: "KI-Assistent Kosten", to: "/kosten-ki-telefonassistent" },
+                      { text: "KI-Telefonassistent", to: "/kosten-ki-telefonassistent" },
+                      { text: "Webdesign", to: "/kosten-webdesign" },
                       { text: "Automatisierung", to: "/kosten-automatisierung" },
                     ],
                   },
@@ -208,77 +219,15 @@ export function Footer() {
               />
 
               <FooterCol
-                title="Branchen"
-                delay={0.10}
-                sections={[
-                  {
-                    label: "Webdesign",
-                    links: [
-                      { text: "Arztpraxen", to: "/webdesign-arzt" },
-                      { text: "Gastronomie", to: "/webdesign-gastronomie" },
-                      { text: "Immobilien", to: "/webdesign-immobilien" },
-                      { text: "Hotels", to: "/webdesign-hotel" },
-                      { text: "Sport & Fitness", to: "/webdesign-sport" },
-                    ],
-                  },
-                  {
-                    label: "KI-Telefonassistent",
-                    links: [
-                      // /praxen ist der Healthcare-Hub mit der vollständigen
-                      // Beweiskette und stand bis 18.08.2026 weder in der
-                      // Navigation noch im Footer — global also unerreichbar.
-                      { text: "Arzt- und Zahnarztpraxen", to: "/praxen" },
-                      { text: "Arztpraxen im Detail", to: "/ki-telefonassistent-arzt" },
-                      { text: "Restaurants", to: "/ki-telefonassistent-restaurant" },
-                      { text: "Hotels", to: "/ki-telefonassistent-hotel" },
-                      { text: "Praxen", to: "/ki-telefonassistent-praxis" },
-                    ],
-                  },
-                  {
-                    label: "Automatisierung",
-                    links: [
-                      { text: "Arztpraxen", to: "/automatisierung-arzt" },
-                      { text: "Restaurants", to: "/automatisierung-restaurant" },
-                      { text: "Immobilien", to: "/automatisierung-immobilien" },
-                      { text: "Sport & Fitness", to: "/automatisierung-sport" },
-                    ],
-                  },
-                ]}
-              />
-
-              <FooterCol
                 title="Standorte"
-                delay={0.14}
+                delay={0.12}
                 sections={[
                   {
-                    label: "Bayreuth",
+                    label: "Städte",
                     links: [
-                      { text: "Übersicht", to: "/bayreuth" },
-                      // Anchor carries the city so this sitewide footer link (every
-                      // public page) reinforces /bayreuth/webdesign as the owner of
-                      // "Webdesign Bayreuth" queries instead of a bare, undifferentiated
-                      // "Webdesign" pointing at the same URL the homepage also targets.
-                      { text: "Webdesign Bayreuth", to: "/bayreuth/webdesign" },
-                      { text: "KI-Telefonassistent", to: "/bayreuth/ki-telefonassistent" },
-                      { text: "Automatisierung", to: "/bayreuth/automatisierung" },
-                    ],
-                  },
-                  {
-                    label: "München",
-                    links: [
-                      { text: "Übersicht", to: "/muenchen" },
-                      { text: "Webdesign", to: "/muenchen/webdesign" },
-                      { text: "KI-Telefonassistent", to: "/muenchen/ki-telefonassistent" },
-                      { text: "Automatisierung", to: "/muenchen/automatisierung" },
-                    ],
-                  },
-                  {
-                    label: "Regensburg",
-                    links: [
-                      { text: "Übersicht", to: "/regensburg" },
-                      { text: "Webdesign", to: "/regensburg/webdesign" },
-                      { text: "KI-Telefonassistent", to: "/regensburg/ki-telefonassistent" },
-                      { text: "Automatisierung", to: "/regensburg/automatisierung" },
+                      { text: "Bayreuth", to: "/bayreuth" },
+                      { text: "München", to: "/muenchen" },
+                      { text: "Regensburg", to: "/regensburg" },
                     ],
                   },
                   {
@@ -292,85 +241,71 @@ export function Footer() {
               />
 
               <FooterCol
-                title="Stadtseiten"
+                title="Unternehmen"
                 delay={0.18}
+                sections={[
+                  {
+                    label: "",
+                    links: [
+                      { text: "Über uns", to: "/ueber-uns" },
+                      { text: "Referenzen", to: "/referenzen" },
+                      { text: "Bewertungen", to: "/bewertungen" },
+                      { text: "Kontakt", to: "/kontakt" },
+                    ],
+                  },
+                ]}
+              />
+
+              {/* HALTEPUNKT bis zum Readout der Experimente vom 29.08.2026.
+                  Diese sechs URLs standen bis zur Kürzung sitewide im Footer und
+                  wurden dadurch von allen 91 Dokumenten verlinkt. Sie fallen
+                  nach der Tier-Logik eigentlich in Tier 3 (Verlinkung aus dem
+                  Seiteninhalt ihres Hubs), und dort gehören sie nach dem Readout
+                  auch hin.
+                  Sie bleiben vorerst hier, weil ein Sturz von 91 auf 6 sitewide
+                  Verweise mitten in der Messung die Experimente unlesbar machen
+                  würde — man wüsste hinterher nicht, ob eine Bewegung vom
+                  getesteten Anker oder vom weggefallenen Footer kommt.
+                  „Webdesign Bayreuth" ist zusätzlich der von dee7545 eigens
+                  gesetzte Anker und darf ohnehin nicht verschwinden.
+                  ENTFERNEN, sobald die Experimente ausgewertet sind. */}
+              <FooterCol
+                title="Im Test"
+                delay={0.24}
                 sections={[
                   {
                     label: "Bayreuth",
                     links: [
-                      { text: "Arzt", to: "/webdesign-arzt-bayreuth" },
-                      { text: "Gastronomie", to: "/webdesign-gastronomie-bayreuth" },
-                      { text: "Immobilien", to: "/webdesign-immobilien-bayreuth" },
-                      { text: "Kosten", to: "/bayreuth/webdesign-kosten" },
-                      { text: "Website erstellen", to: "/bayreuth/website-erstellen" },
-                      { text: "Landingpage", to: "/bayreuth/landingpage" },
+                      { text: "Webdesign Bayreuth", to: "/bayreuth/webdesign" },
                       { text: "Website Relaunch", to: "/bayreuth/website-relaunch" },
-                      { text: "Lokales SEO", to: "/bayreuth/lokales-seo" },
                     ],
                   },
                   {
-                    label: "München",
+                    label: "München · Regensburg",
                     links: [
-                      { text: "Arzt", to: "/webdesign-arzt-muenchen" },
-                      { text: "Gastronomie", to: "/webdesign-gastronomie-muenchen" },
-                      { text: "Immobilien", to: "/webdesign-immobilien-muenchen" },
                       { text: "Kosten", to: "/muenchen/webdesign-kosten" },
-                      { text: "Website erstellen", to: "/muenchen/website-erstellen" },
-                      { text: "Landingpage", to: "/muenchen/landingpage" },
-                      { text: "Website Relaunch", to: "/muenchen/website-relaunch" },
-                      { text: "Lokales SEO", to: "/muenchen/lokales-seo" },
+                      { text: "Website Relaunch", to: "/regensburg/website-relaunch" },
                     ],
                   },
                   {
-                    label: "Regensburg",
+                    label: "Praxen",
                     links: [
-                      { text: "Arzt", to: "/webdesign-arzt-regensburg" },
-                      { text: "Gastronomie", to: "/webdesign-gastronomie-regensburg" },
-                      { text: "Immobilien", to: "/webdesign-immobilien-regensburg" },
-                      { text: "Kosten", to: "/regensburg/webdesign-kosten" },
-                      { text: "Website erstellen", to: "/regensburg/website-erstellen" },
-                      { text: "Landingpage", to: "/regensburg/landingpage" },
-                      { text: "Website Relaunch", to: "/regensburg/website-relaunch" },
-                      { text: "Lokales SEO", to: "/regensburg/lokales-seo" },
+                      { text: "Arztpraxen im Detail", to: "/ki-telefonassistent-arzt" },
                     ],
                   },
                 ]}
               />
 
               <FooterCol
-                title="Unternehmen"
-                delay={0.22}
+                title="Wissen"
+                delay={0.3}
                 sections={[
                   {
                     label: "",
                     links: [
-                      { text: "Startseite", to: "/" },
-                      { text: "Über uns", to: "/ueber-uns" },
-                      { text: "Leistungen", to: "/leistungen" },
-                      { text: "Referenzen", to: "/referenzen" },
-                      { text: "Bewertungen", to: "/bewertungen" },
                       { text: "Blog", to: "/blog" },
-                      { text: "FAQ", to: "/faq" },
-                      { text: "Kontakt", to: "/kontakt" },
-                    ],
-                  },
-                  {
-                    label: "Probleme",
-                    links: [
-                      { text: "Verpasste Anrufe", to: "/verpasste-anrufe-verlust" },
-                      { text: "Keine Web-Anfragen", to: "/keine-anfragen-website" },
-                      { text: "Keine Terminbuchung", to: "/keine-terminbuchung-online" },
-                      { text: "Manuelle Arbeit", to: "/zu-viel-manuelle-arbeit" },
-                      { text: "Digitale Automatisierung", to: "/digitale-automatisierung-unternehmen" },
-                    ],
-                  },
-                  {
-                    label: "Pillar Pages",
-                    links: [
-                      { text: "Webdesign Agentur DE", to: "/webdesign-agentur-deutschland" },
-                      { text: "KI-Agentur Deutschland", to: "/ki-agentur-deutschland" },
-                      { text: "Automatisierung DE", to: "/automatisierung-unternehmen" },
-                      { text: "KI-Assistent Bayern", to: "/bayern/ki-telefonassistent" },
+                      { text: "Häufige Fragen", to: "/faq" },
+                      { text: "Live-Demo", to: "/ki-telefonassistent/demo" },
                     ],
                   },
                 ]}

@@ -30,7 +30,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ChevronDown, ArrowUpRight, ArrowRight } from 'lucide-react';
 import { Logo } from './Logo';
 import { PremiumMobileNav } from './ui/premium-mobile-nav';
@@ -246,23 +246,28 @@ export function Navigation() {
           </div>
         </div>
 
-        <AnimatePresence>
-          {activeMenu === 'leistungen' && (
-            <LeistungenPanel
-              onMouseEnter={cancelClose}
-              onMouseLeave={closeMenu}
-              currentPath={activePath}
-              onNavigate={() => closeNow()}
-            />
-          )}
-          {activeMenu === 'standorte' && (
-            <StandortePanel
-              onMouseEnter={cancelClose}
-              onMouseLeave={closeMenu}
-              currentPath={activePath}
-            />
-          )}
-        </AnimatePresence>
+        {/* Beide Panels stehen immer im Dokument und werden geschlossen per
+            `hidden` ausgeblendet, statt aus- und wieder eingehängt zu werden.
+            Vorher rendert der Server sie nie: Das vorgerenderte Dokument trug
+            genau vier Verweise in <nav>, während `aria-controls` auf
+            nav-panel-leistungen und nav-panel-standorte zeigte — auf Elemente,
+            die es in diesem Dokument nicht gab. Die gesamte entworfene
+            Informationsarchitektur existierte nur nach der Hydration.
+            Es ist dasselbe Menü für Besucher wie für Crawler; sichtbar wird es
+            weiterhin erst durch Zeigen, Klicken oder Tastatur. */}
+        <LeistungenPanel
+          isOpen={activeMenu === 'leistungen'}
+          onMouseEnter={cancelClose}
+          onMouseLeave={closeMenu}
+          currentPath={activePath}
+          onNavigate={() => closeNow()}
+        />
+        <StandortePanel
+          isOpen={activeMenu === 'standorte'}
+          onMouseEnter={cancelClose}
+          onMouseLeave={closeMenu}
+          currentPath={activePath}
+        />
       </motion.nav>
 
       <PremiumMobileNav />
@@ -357,8 +362,9 @@ const PANEL_FLAECHE =
 
 /* ─── Leistungen: Ebene 1 links, Ebene 2 rechts ───────────────────────── */
 function LeistungenPanel({
-  onMouseEnter, onMouseLeave, currentPath, onNavigate,
+  isOpen, onMouseEnter, onMouseLeave, currentPath, onNavigate,
 }: {
+  isOpen: boolean;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
   currentPath: string;
@@ -373,11 +379,21 @@ function LeistungenPanel({
     )
   );
   const [gewaehlt, setGewaehlt] = useState(startIndex);
-  const aktiv = LEISTUNGEN[gewaehlt];
+
+  // Das Panel wird nicht mehr bei jedem Öffnen neu eingehängt, also setzt es
+  // die vorgewählte Leistung beim Öffnen selbst zurück. Ohne das bliebe für
+  // immer die Auswahl stehen, die beim ersten Rendern galt — auf dem Server
+  // ist das mangels Pfad die erste.
+  useEffect(() => {
+    if (isOpen) setGewaehlt(startIndex);
+  }, [isOpen, startIndex]);
 
   return (
     <motion.div
-      {...panelMotion}
+      hidden={!isOpen}
+      initial={false}
+      animate={isOpen ? { opacity: 1, y: 0 } : { opacity: 0, y: -4 }}
+      transition={panelMotion.transition}
       id="nav-panel-leistungen"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
@@ -409,7 +425,8 @@ function LeistungenPanel({
                   to={leistung.href}
                   role="tab"
                   aria-selected={offen}
-                  aria-controls="nav-nischen"
+                  aria-controls={`nav-nischen-${leistung.key}`}
+                  id={`nav-tab-${leistung.key}`}
                   tabIndex={offen ? 0 : -1}
                   onMouseEnter={() => setGewaehlt(i)}
                   onFocus={() => setGewaehlt(i)}
@@ -436,21 +453,38 @@ function LeistungenPanel({
             })}
           </div>
 
-          {/* Ebene 2 — „Für wen?", erst nach der Wahl */}
-          <div id="nav-nischen" role="tabpanel" aria-label={aktiv.label} className="pt-4">
-            <p className="text-sm font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-5">
-              {aktiv.label} für
-            </p>
-            <div className="space-y-0.5">
-              {aktiv.nischen.map((n) => (
-                <PanelLink key={n.href} {...n} isActive={currentPath === n.href} onClick={onNavigate} />
-              ))}
-            </div>
-            <div className="mt-6 pt-5 border-t border-gray-100 dark:border-white/[0.06] space-y-0.5">
-              {aktiv.abschluss.map((n) => (
-                <PanelLink key={n.href} {...n} isActive={currentPath === n.href} onClick={onNavigate} quiet />
-              ))}
-            </div>
+          {/* Ebene 2 — „Für wen?", erst nach der Wahl.
+              Je Leistung ein eigenes Tabpanel, das inaktive per `hidden`.
+              Vorher teilten sich alle drei Reiter EIN Panel mit der id
+              nav-nischen, dessen Inhalt beim Wechsel ausgetauscht wurde: Die
+              elf Ziele der beiden nicht gewählten Leistungen standen damit in
+              keinem ausgelieferten Dokument, und drei Reiter zeigten per
+              aria-controls auf dasselbe Element. Beides ist hiermit erledigt —
+              sichtbar ist weiterhin nur das gewählte Panel. */}
+          <div className="pt-4">
+            {LEISTUNGEN.map((leistung, i) => (
+              <div
+                key={leistung.key}
+                id={`nav-nischen-${leistung.key}`}
+                role="tabpanel"
+                aria-labelledby={`nav-tab-${leistung.key}`}
+                hidden={i !== gewaehlt}
+              >
+                <p className="text-sm font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-5">
+                  {leistung.label} für
+                </p>
+                <div className="space-y-0.5">
+                  {leistung.nischen.map((n) => (
+                    <PanelLink key={n.href} {...n} isActive={currentPath === n.href} onClick={onNavigate} />
+                  ))}
+                </div>
+                <div className="mt-6 pt-5 border-t border-gray-100 dark:border-white/[0.06] space-y-0.5">
+                  {leistung.abschluss.map((n) => (
+                    <PanelLink key={n.href} {...n} isActive={currentPath === n.href} onClick={onNavigate} quiet />
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -472,13 +506,16 @@ function LeistungenPanel({
 
 /* ─── Standorte: fünf Ziele brauchen keine volle Bühne ────────────────── */
 function StandortePanel({
-  onMouseEnter, onMouseLeave, currentPath,
+  isOpen, onMouseEnter, onMouseLeave, currentPath,
 }: {
-  onMouseEnter: () => void; onMouseLeave: () => void; currentPath: string;
+  isOpen: boolean; onMouseEnter: () => void; onMouseLeave: () => void; currentPath: string;
 }) {
   return (
     <motion.div
-      {...panelMotion}
+      hidden={!isOpen}
+      initial={false}
+      animate={isOpen ? { opacity: 1, y: 0 } : { opacity: 0, y: -4 }}
+      transition={panelMotion.transition}
       id="nav-panel-standorte"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
