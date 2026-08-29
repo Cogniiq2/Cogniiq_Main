@@ -224,10 +224,7 @@ export function KiTelefonassistentDemoPage() {
           <div className="max-w-6xl mx-auto px-6 lg:px-8">
             <motion.nav
               aria-label="Breadcrumb"
-              className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8 flex-wrap"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
+              className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8 flex-wrap"
             >
               {breadcrumbs.map((crumb, i) => (
                 <span key={crumb.url} className="flex items-center gap-1.5">
@@ -249,12 +246,7 @@ export function KiTelefonassistentDemoPage() {
             </motion.nav>
 
             <div className="grid lg:grid-cols-2 gap-16 items-start">
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                variants={fadeUp}
-                custom={0}
-              >
+              <motion.div className="cq-rise">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium tracking-widest uppercase mb-6">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                   Kostenlos · Unverbindlich
@@ -273,11 +265,7 @@ export function KiTelefonassistentDemoPage() {
                   {DEMO_BENEFITS.map((item, i) => (
                     <motion.div
                       key={i}
-                      initial="hidden"
-                      animate="visible"
-                      variants={fadeUp}
-                      custom={0.1 + i * 0.06}
-                      className="flex items-center gap-3"
+                      className="cq-rise flex items-center gap-3"
                     >
                       <div className="w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center flex-shrink-0">
                         <item.icon size={14} className="text-gray-500 dark:text-gray-400" />
@@ -309,12 +297,7 @@ export function KiTelefonassistentDemoPage() {
                 </div>
               </motion.div>
 
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                variants={fadeUp}
-                custom={0.15}
-              >
+              <motion.div className="cq-rise cq-rise-d2">
                 <AnimatePresence mode="wait">
                   {sent ? (
                     <motion.div

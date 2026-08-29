@@ -441,38 +441,25 @@ export function UeberUnsPage() {
         {/* ── HERO ──────────────────────────────────────────────────────── */}
         <section id="ueber-uns" className="pt-40 pb-20 px-6 lg:px-8 scroll-mt-0">
           <div className="max-w-[780px] mx-auto">
-            <motion.nav
+            <nav
               aria-label="Breadcrumb"
-              className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-600 mb-12"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
+              className="cq-rise flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-600 mb-12"
             >
               <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-400 transition-colors">
                 Home
               </Link>
               <ChevronRight size={10} />
               <span className="text-gray-500 dark:text-gray-400">Über Uns</span>
-            </motion.nav>
+            </nav>
 
-            <motion.h1
-              className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-gray-100 tracking-tight leading-[1.05] mb-7"
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
-            >
+            <h1 className="cq-rise cq-rise-d1 text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-gray-100 tracking-tight leading-[1.05] mb-7">
               Wer hinter<br />
               Cogniiq steckt.
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              className="text-lg text-gray-500 dark:text-gray-400 leading-relaxed font-light max-w-[560px] mb-8"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
-            >
+            <p className="cq-rise cq-rise-d3 text-lg text-gray-500 dark:text-gray-400 leading-relaxed font-light max-w-[560px] mb-8">
               AI-Agentur aus Bayreuth für Webdesign, KI-Automatisierung und digitale Systeme — tätig für Unternehmen in ganz Deutschland.
-            </motion.p>
+            </p>
 
             <motion.p
               className="text-xs text-gray-400 dark:text-gray-600 tracking-wide mb-9 font-light italic"

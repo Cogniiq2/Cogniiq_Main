@@ -56,13 +56,7 @@ export function BlogIndexPage() {
             }}
           />
           <div className="relative max-w-7xl mx-auto">
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-              custom={0}
-              className="flex items-center gap-2 mb-6"
-            >
+            <motion.div className="cq-rise flex items-center gap-2 mb-6">
               <Link to="/" className="text-[11px] text-gray-400 hover:text-gray-600 transition-colors">
                 Start
               </Link>
@@ -72,13 +66,7 @@ export function BlogIndexPage() {
 
             <div className="grid lg:grid-cols-[1fr_auto] gap-8 items-end">
               <div>
-                <motion.div
-                  initial="hidden"
-                  animate="visible"
-                  variants={fadeUp}
-                  custom={0.04}
-                  className="flex items-center gap-2 mb-4"
-                >
+                <motion.div className="cq-rise flex items-center gap-2 mb-4">
                   <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-50 border border-gray-100 dark:bg-gray-900 dark:border-gray-800">
                     <BookOpen size={10} className="text-gray-400" />
                     <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-gray-500">
@@ -88,22 +76,14 @@ export function BlogIndexPage() {
                 </motion.div>
 
                 <motion.h1
-                  initial="hidden"
-                  animate="visible"
-                  variants={fadeUp}
-                  custom={0.08}
-                  className="text-4xl sm:text-5xl lg:text-[3rem] font-bold text-gray-900 dark:text-gray-50 leading-[1.08] tracking-[-0.022em] mb-4"
+                  className="cq-rise text-4xl sm:text-5xl lg:text-[3rem] font-bold text-gray-900 dark:text-gray-50 leading-[1.08] tracking-[-0.022em] mb-4"
                 >
                   KI, Webdesign &<br />
                   <span className="text-gray-400 dark:text-gray-500 font-light">Automatisierung</span>
                 </motion.h1>
 
                 <motion.p
-                  initial="hidden"
-                  animate="visible"
-                  variants={fadeUp}
-                  custom={0.12}
-                  className="text-[15px] text-gray-500 dark:text-gray-400 leading-relaxed max-w-[520px]"
+                  className="cq-rise cq-rise-d2 text-[15px] text-gray-500 dark:text-gray-400 leading-relaxed max-w-[520px]"
                 >
                   Praxisorientiertes Wissen für Unternehmer, die digitale Systeme
                   nutzen wollen, um Effizienz zu steigern und mehr Kunden zu gewinnen.
@@ -111,11 +91,7 @@ export function BlogIndexPage() {
               </div>
 
               <motion.div
-                initial="hidden"
-                animate="visible"
-                variants={fadeUp}
-                custom={0.14}
-                className="flex items-center gap-1.5 text-[12px] text-gray-400 dark:text-gray-500"
+                className="cq-rise flex items-center gap-1.5 text-[12px] text-gray-400 dark:text-gray-500"
               >
                 <span className="font-semibold text-gray-900 dark:text-gray-100 text-lg">
                   {BLOG_ARTICLES.length}
@@ -124,13 +100,7 @@ export function BlogIndexPage() {
               </motion.div>
             </div>
 
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-              custom={0.16}
-              className="flex flex-wrap gap-2 mt-8"
-            >
+            <motion.div className="cq-rise flex flex-wrap gap-2 mt-8">
               {categories.map((cat) => (
                 <button
                   key={cat}

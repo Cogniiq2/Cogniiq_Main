@@ -564,3 +564,48 @@ html.cq-public-light {
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Above-the-fold entrance ──────────────────────────────────────────────────
+   Hero content must be painted, and LCP-eligible, on the very first frame.
+
+   framer-motion serialises a mount-time `initial={{ opacity: 0 }}` into the
+   prerendered HTML as `style="opacity:0"`. The heading therefore stayed invisible
+   until React had hydrated and the entrance animation ran — measured at 1.0–1.5s
+   after FCP on /webdesign, /praxen and /ki-telefonassistent, with the H1 as the
+   LCP element on each.
+
+   This entrance is plain CSS, so it starts at first paint rather than at
+   hydration, and it animates transform only. Opacity is deliberately left alone:
+   Chrome does not treat an element as an FCP or LCP candidate while its opacity
+   is 0, and an element that *begins* a CSS animation at opacity 0 is never
+   reported as a candidate at all — measured, not assumed. Animating transform
+   costs no layout, so it also cannot shift the page. */
+@keyframes cq-rise {
+  from {
+    transform: translateY(20px);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.cq-rise {
+  animation: cq-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Stagger steps, mirroring the `custom={…}` delays the framer variants used. */
+.cq-rise-d1 {
+  animation-delay: 0.06s;
+}
+.cq-rise-d2 {
+  animation-delay: 0.12s;
+}
+.cq-rise-d3 {
+  animation-delay: 0.18s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cq-rise {
+    animation: none;
+  }
+}

@@ -112,22 +112,18 @@ export function ProzessautomatisierungHub() {
 
         {/* ── HERO ── */}
         <section className="pt-20 pb-16 px-6 lg:px-10 max-w-7xl mx-auto">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
-          >
-            <motion.p variants={fadeUp} custom={0} className="text-xs font-semibold tracking-[0.18em] uppercase text-emerald-600 dark:text-emerald-400 mb-4">
+          <div>
+            <motion.p className="cq-rise text-xs font-semibold tracking-[0.18em] uppercase text-emerald-600 dark:text-emerald-400 mb-4">
               Prozessautomatisierung
             </motion.p>
-            <motion.h1 variants={fadeUp} custom={0.05} className="text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 dark:text-white leading-[1.08] mb-6 max-w-3xl">
+            <motion.h1 className="cq-rise cq-rise-d1 text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 dark:text-white leading-[1.08] mb-6 max-w-3xl">
               Manuelle Prozesse stoppen.<br />
               <span className="text-emerald-600 dark:text-emerald-400">KI übernimmt.</span>
             </motion.h1>
-            <motion.p variants={fadeUp} custom={0.1} className="text-lg text-gray-500 dark:text-white/55 leading-relaxed max-w-2xl mb-10">
+            <motion.p className="cq-rise cq-rise-d2 text-lg text-gray-500 dark:text-white/55 leading-relaxed max-w-2xl mb-10">
               Cogniiq automatisiert wiederkehrende Aufgaben in Ihrem Unternehmen: Buchungen, Lead-Nachverfolgung, E-Mail-Sequenzen, Terminbestätigungen. Weniger manuelle Arbeit – mehr Kapazität für Wachstum.
             </motion.p>
-            <motion.div variants={fadeUp} custom={0.15} className="flex flex-wrap gap-4">
+            <motion.div className="cq-rise cq-rise-d3 flex flex-wrap gap-4">
               <Link
                 to="/kontakt"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-colors"
@@ -141,7 +137,7 @@ export function ProzessautomatisierungHub() {
                 Automatisierung Kosten
               </Link>
             </motion.div>
-          </motion.div>
+          </div>
         </section>
 
         {/* ── WHAT WE DO ── */}

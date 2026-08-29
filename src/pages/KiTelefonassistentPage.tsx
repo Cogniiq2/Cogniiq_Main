@@ -282,7 +282,7 @@ function HeroSection() {
 
       <div className="relative max-w-6xl mx-auto px-6 lg:px-8">
         <div className="grid lg:grid-cols-[1fr_400px] gap-16 items-start">
-          <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+          <motion.div className="cq-rise">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 text-sm font-medium tracking-widest uppercase mb-8 shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               KI Telefonservice · Mittelstand Deutschland
@@ -346,12 +346,7 @@ function HeroSection() {
             </div>
           </motion.div>
 
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            className="hidden lg:block"
-          >
+          <motion.div className="cq-rise hidden lg:block">
             <div className="rounded-2xl border border-gray-200 dark:border-gray-700/80 bg-white dark:bg-gray-900 overflow-hidden shadow-[0_2px_24px_rgba(0,0,0,0.07)] dark:shadow-[0_2px_24px_rgba(0,0,0,0.3)]">
               <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-800/60">
                 <span className="w-2 h-2 rounded-full bg-emerald-400" />

@@ -49,16 +49,6 @@ import {
 
 const base = BUSINESS_INFO.website;
 
-/** Bewegung nach §1.4: nur Deckkraft und kleine Verschiebung, ≤ 180 ms. */
-const fadeUp = {
-  hidden: { opacity: 0, y: 8 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.18, ease: "easeOut" as const },
-  },
-};
-
 const breadcrumbs = [
   { name: "Home", url: base },
   { name: "Für Praxen", url: `${base}/praxen` },
@@ -183,7 +173,7 @@ export function PraxenPage() {
               </span>
             </nav>
 
-            <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+            <motion.div className="cq-rise">
               <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-[1.12] tracking-tight mb-7">
                 Am Tresen steht eine Patientin.
                 <br />
