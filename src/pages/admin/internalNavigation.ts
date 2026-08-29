@@ -1,7 +1,7 @@
 import {
   AlertTriangle, Building2, CalendarCheck, CheckCircle2, Cpu, FileSignature, FileText, Gauge, HardDrive, HeartPulse,
   LayoutDashboard, LayoutGrid, Mail, Receipt, Repeat, ScrollText, Settings, ShieldCheck, TrendingUp,
-  Users, Wallet, type LucideIcon,
+  Target, Users, Wallet, type LucideIcon,
 } from 'lucide-react';
 
 import type { ShellSection, ShellSubNavItem } from '@/components/dashboard';
@@ -29,15 +29,17 @@ const MODULES: ModuleConfig[] = [
   {
     key: 'finance',
     label: 'Finance & Steuern',
-    href: '/admin/finance/overview',
+    href: '/admin/finance/cockpit',
     icon: Wallet,
     title: 'Finance & Steuern',
     subNavLabel: 'Finance & Steuern',
     ownerOnly: true,
     matches: (p) => p === '/admin/finance' || p.startsWith('/admin/finance/'),
     subNav: [
-      { key: 'overview', label: 'Übersicht', href: '/admin/finance/overview', icon: LayoutDashboard },
+      { key: 'cockpit', label: 'Cockpit', href: '/admin/finance/cockpit', icon: Gauge },
+      { key: 'leads', label: 'Leads', href: '/admin/finance/leads', icon: Target },
       { key: 'customers', label: 'Kunden & Aufgaben', href: '/admin/finance/customers', icon: Users },
+      { key: 'overview', label: 'Finanzübersicht', href: '/admin/finance/overview', icon: LayoutDashboard },
       { key: 'offers', label: 'Angebote', href: '/admin/finance/offers', icon: FileSignature },
       { key: 'invoices', label: 'Rechnungen', href: '/admin/finance/invoices', icon: FileText },
       { key: 'expenses', label: 'Ausgaben', href: '/admin/finance/expenses', icon: Receipt },

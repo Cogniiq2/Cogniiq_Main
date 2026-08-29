@@ -5,7 +5,7 @@
 // the SAME document model as the PDF. Finalisieren stays a separate explicit action.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Check, Eye, FileCheck2, Loader2, Plus, Save, Trash2 } from 'lucide-react';
 
 import {
@@ -21,6 +21,7 @@ import {
 } from '@/lib/ownerFinance/offersApi';
 import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
 import { loadCustomers, linkOfferCustomer } from '@/lib/ownerFinance/customersApi';
+import { linkOfferLead, loadLeadDetail } from '@/lib/ownerCrm/api';
 import { customerDisplayName } from '@/lib/ownerFinance/customerLabels';
 import { CustomerFormDialog } from '@/components/finance/CustomerFormDialog';
 import type { OwnerCustomerListRow } from '@/lib/ownerFinance/types';
@@ -264,6 +265,12 @@ const sectionAnchor: Record<EditorSection, string> = {
 
 export function OfferEditor() {
   const { offerId } = useParams<{ offerId: string }>();
+  const [searchParams] = useSearchParams();
+  /* Arriving from a lead's "Angebot erstellen". The prospect's contact details
+     prefill the recipient, and the finished offer is linked back to the lead so
+     both sides of the deal show the same document. Only ever set on a NEW offer;
+     an existing one keeps whatever it was already linked to. */
+  const fromLeadId = offerId ? null : searchParams.get('leadId');
   const isNew = !offerId;
   const { entity } = useOwnerEntity();
   const toast = useToast();
@@ -308,12 +315,28 @@ export function OfferEditor() {
         expectedUpdatedAt.current = res.offer.updated_at;
         setState(stateFromOffer(res.offer, res.lines));
       } else {
-        setState(emptyState(settingsRow?.default_offer_validity_days ?? 30));
+        const blank = emptyState(settingsRow?.default_offer_validity_days ?? 30);
+        // Prefill from the lead where one was named. Failures are swallowed: a
+        // prefill that cannot be fetched must never block writing an offer.
+        const lead = fromLeadId ? await loadLeadDetail(fromLeadId).catch(() => null) : null;
+        setState(lead
+          ? {
+              ...blank,
+              rcompany: lead.lead.company ?? '',
+              rcontact: lead.lead.contact_name ?? '',
+              rstreet: lead.lead.street ?? '',
+              rpostal: lead.lead.postal_code ?? '',
+              rcity: lead.lead.city ?? '',
+              rcountry: lead.lead.country_code ?? 'DE',
+              remail: lead.lead.email ?? '',
+              rphone: lead.lead.phone ?? '',
+            }
+          : blank);
       }
       setError(null);
     } catch (e: unknown) { setError(e instanceof Error ? e.message : String(e)); }
     finally { setLoading(false); }
-  }, [entity, offerId]);
+  }, [entity, offerId, fromLeadId]);
 
   useEffect(() => { void load(); }, [load]);
 
@@ -358,6 +381,7 @@ export function OfferEditor() {
       const res = await loadOffer(id);
       expectedUpdatedAt.current = res?.offer.updated_at ?? null;
       await maybeLinkOwnerCustomer(id);
+      await maybeLinkLead(id);
       setSaveState('saved'); setDirty(false);
       return id;
     }
@@ -380,6 +404,13 @@ export function OfferEditor() {
   const maybeLinkOwnerCustomer = async (offerId: string) => {
     if (!state?.ownerCustomerId) return;
     await linkOfferCustomer(offerId, state.ownerCustomerId);
+  };
+
+  // Same contract for the originating lead: best-effort, never blocking. The
+  // lead page can link an existing offer if this does not get through.
+  const maybeLinkLead = async (savedOfferId: string) => {
+    if (!fromLeadId) return;
+    await linkOfferLead(savedOfferId, fromLeadId);
   };
 
   const save = async () => { const id = await persist(); if (id) toast.success('Gespeichert'); };
