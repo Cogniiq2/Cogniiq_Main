@@ -1,15 +1,21 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Pause, Play } from 'lucide-react';
+import { LayoutGrid, Pause, Play } from 'lucide-react';
 
-import { AdminCard, Pill, solutionTone } from '@/pages/admin/clients/adminUi';
+import {
+  Button, DataTable, EmptyState, ErrorState, PageHeader, StatusBadge, TableSkeleton, useToast,
+} from '@/components/dashboard';
+import { solutionTone } from '@/pages/admin/clients/statusTones';
 import { loadAdminClients, setSolutionStatus, type AdminClientRow } from '@/lib/clientPlatform/adminApi';
+
+type SolutionRow = AdminClientRow['solutions'][number] & { orgName: string };
 
 export function AdminSolutionsPage() {
   const [rows, setRows] = useState<AdminClientRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const reload = useCallback(async () => {
     setLoading(true);
@@ -20,50 +26,112 @@ export function AdminSolutionsPage() {
 
   useEffect(() => { void reload(); }, [reload]);
 
-  const flat = useMemo(
+  const flat: SolutionRow[] = useMemo(
     () => rows.flatMap((r) => r.solutions.map((s) => ({ ...s, orgName: r.organizationName }))),
     [rows],
   );
 
   const toggle = async (id: string, next: 'active' | 'paused') => {
+    setBusyId(id);
     const { error: err } = await setSolutionStatus(id, next);
-    setNotice(err ? `Fehler: ${err}` : 'Status aktualisiert.');
-    setTimeout(() => setNotice(null), 2500);
-    if (!err) void reload();
+    setBusyId(null);
+    if (err) {
+      toast({ tone: 'error', title: 'Status nicht geändert', description: err });
+      return;
+    }
+    toast({ tone: 'success', title: next === 'active' ? 'Lösung aktiviert' : 'Lösung pausiert' });
+    void reload();
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-gray-950">Lösungen</h1>
-        <p className="mt-1 text-sm text-gray-500">Alle kundensichtbaren Lösungsinstanzen über alle Organisationen.</p>
-      </div>
-      {notice ? <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-800">{notice}</div> : null}
-      {loading ? <div className="h-40 animate-pulse rounded-2xl border border-gray-100 bg-white" /> : error ? (
-        <AdminCard><p className="text-sm text-red-600">Fehler: {error}</p></AdminCard>
+    <div>
+      <PageHeader
+        title="Lösungen"
+        description="Alle kundensichtbaren Lösungsinstanzen über alle Organisationen."
+      />
+
+      {loading ? (
+        <TableSkeleton rows={4} cols={4} />
+      ) : error ? (
+        <ErrorState message={error} onRetry={() => void reload()} />
       ) : flat.length === 0 ? (
-        <AdminCard><p className="text-sm text-gray-500">Noch keine Lösungen provisioniert.</p></AdminCard>
+        <EmptyState
+          icon={LayoutGrid}
+          title="Noch keine Lösungen provisioniert"
+          description="Sobald ein Kunde eine Lösung erhält, erscheint die Instanz hier."
+        />
       ) : (
-        <div className="space-y-2">
-          {flat.map((s) => (
-            <AdminCard key={s.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm font-semibold text-gray-900">
-                  <Link to={`/admin/clients/${s.organization_id}`} className="hover:underline">{s.orgName}</Link>
-                  {' · '}{s.display_name} <Pill label={s.status} tone={solutionTone[s.status]} />
-                </p>
-                <p className="text-[12px] text-gray-500">{s.catalog_key} · {s.implementation_key} · <span className="font-mono">{s.instance_key}</span></p>
-              </div>
-              <div className="flex gap-2">
-                {s.status === 'paused' ? (
-                  <button type="button" onClick={() => void toggle(s.id, 'active')} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 text-[13px] font-semibold text-emerald-700 hover:bg-emerald-100"><Play size={14} /> Aktivieren</button>
-                ) : (
-                  <button type="button" onClick={() => void toggle(s.id, 'paused')} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 text-[13px] font-semibold text-amber-700 hover:bg-amber-100"><Pause size={14} /> Pausieren</button>
-                )}
-              </div>
-            </AdminCard>
-          ))}
-        </div>
+        <DataTable
+          rows={flat}
+          getRowKey={(s) => s.id}
+          minWidth={820}
+          mobileTitle={(s) => (
+            <span className="flex items-center gap-2">
+              {s.display_name} <StatusBadge label={s.status} tone={solutionTone[s.status]} />
+            </span>
+          )}
+          mobileSubtitle={(s) => s.orgName}
+          columns={[
+            {
+              key: 'organization',
+              header: 'Organisation',
+              hideOnMobile: true,
+              render: (s) => (
+                <Link to={`/admin/clients/${s.organization_id}`} className="font-medium hover:underline">
+                  {s.orgName}
+                </Link>
+              ),
+            },
+            {
+              key: 'solution',
+              header: 'Lösung',
+              render: (s) => (
+                <>
+                  <span className="font-medium">{s.display_name}</span>
+                  <span className="block text-[12px] text-[var(--cq-fg-subtle)]">
+                    {s.catalog_key} · {s.implementation_key}
+                  </span>
+                </>
+              ),
+            },
+            {
+              key: 'instance',
+              header: 'Instanz',
+              render: (s) => <span className="font-mono text-[12px]">{s.instance_key}</span>,
+            },
+            {
+              key: 'status',
+              header: 'Status',
+              render: (s) => <StatusBadge label={s.status} tone={solutionTone[s.status]} />,
+            },
+            {
+              key: 'action',
+              header: 'Aktion',
+              align: 'right',
+              render: (s) => (s.status === 'paused' ? (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  icon={Play}
+                  loading={busyId === s.id}
+                  onClick={() => void toggle(s.id, 'active')}
+                >
+                  Aktivieren
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  icon={Pause}
+                  loading={busyId === s.id}
+                  onClick={() => void toggle(s.id, 'paused')}
+                >
+                  Pausieren
+                </Button>
+              )),
+            },
+          ]}
+        />
       )}
     </div>
   );

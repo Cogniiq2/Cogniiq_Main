@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, Copy, ExternalLink, Pause, Play, Plus, RefreshCw, XCircle } from 'lucide-react';
 
-import { AdminCard, AdminField, Pill, invitationTone, lifecycleTone, solutionTone } from '@/pages/admin/clients/adminUi';
+import { AdminCard, AdminField, Pill } from '@/pages/admin/clients/adminUi';
+import { invitationTone, lifecycleTone, solutionTone } from '@/pages/admin/clients/statusTones';
 import {
   addClientContact,
   loadClientDetail,

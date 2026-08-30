@@ -2,9 +2,16 @@ import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
 
-// Shared CRM UI primitives. The CRM pages render inside the unified InternalWorkspaceLayout shell now,
-// so this module no longer ships its own application header/navigation — only the card, pill, field
-// and status-tone primitives the client pages still use.
+// Legacy CRM UI recipes, kept only for the two pages that have not been migrated yet
+// (ClientDetailPage and NewClientWizard — see docs/admin-center-design-system.md).
+//
+// Everything here duplicates something @/components/dashboard already provides, in a different
+// visual language: 16px radii against the dashboard's 12px, a 60px drop shadow against its
+// hairline border, and fully-rounded pills against its 6px status badges. The list pages no
+// longer use it. Nothing new should.
+//
+// The status tone maps that used to live here moved to ./statusTones: they are domain knowledge,
+// not styling, and the migrated pages need them without needing any of this.
 
 const pillTones: Record<string, string> = {
   neutral: 'border-gray-200 bg-gray-50 text-gray-600',
@@ -99,26 +106,3 @@ export function AdminSelect({
     </div>
   );
 }
-
-export const lifecycleTone: Record<string, keyof typeof pillTones> = {
-  lead: 'neutral',
-  qualified: 'info',
-  active: 'success',
-  paused: 'warning',
-  churned: 'danger',
-  archived: 'neutral',
-};
-
-export const solutionTone: Record<string, keyof typeof pillTones> = {
-  active: 'success',
-  provisioning: 'info',
-  paused: 'warning',
-  disabled: 'neutral',
-};
-
-export const invitationTone: Record<string, keyof typeof pillTones> = {
-  pending: 'warning',
-  accepted: 'success',
-  revoked: 'danger',
-  expired: 'neutral',
-};

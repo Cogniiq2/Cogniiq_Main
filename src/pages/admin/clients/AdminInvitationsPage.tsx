@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { RefreshCw, XCircle } from 'lucide-react';
+import { Mail, RefreshCw, XCircle } from 'lucide-react';
 
-import { AdminCard, Pill, invitationTone } from '@/pages/admin/clients/adminUi';
+import {
+  Button, DataTable, EmptyState, ErrorState, PageHeader, Select, StatusBadge, TableSkeleton, useToast,
+} from '@/components/dashboard';
+import { invitationTone } from '@/pages/admin/clients/statusTones';
 import {
   loadAdminClients,
   resendInvitationViaEdge,
@@ -16,12 +19,27 @@ import {
   resendOutcomeMessage,
 } from '@/lib/clientPlatform/invitationStatus';
 
+// `effective` keeps the narrow status union rather than widening to `string`: the
+// canRenew/canResend predicates are typed against it, so a plain string would silently
+// disable that checking exactly where an invitation's action set is decided.
+type EffectiveStatus = ReturnType<typeof effectiveInvitationStatus>;
+type InvitationRow = AdminClientRow['invitations'][number] & { orgName: string; effective: EffectiveStatus };
+
+const STATUS_OPTIONS = [
+  { value: 'all', label: 'Alle' },
+  { value: 'pending', label: 'pending' },
+  { value: 'accepted', label: 'accepted' },
+  { value: 'revoked', label: 'revoked' },
+  { value: 'expired', label: 'expired' },
+];
+
 export function AdminInvitationsPage() {
   const [rows, setRows] = useState<AdminClientRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const reload = useCallback(async () => {
     setLoading(true);
@@ -32,9 +50,7 @@ export function AdminInvitationsPage() {
 
   useEffect(() => { void reload(); }, [reload]);
 
-  const flash = (m: string) => { setNotice(m); setTimeout(() => setNotice(null), 2500); };
-
-  const invitations = useMemo(
+  const invitations: InvitationRow[] = useMemo(
     () => rows.flatMap((r) => r.invitations.map((i) => ({ ...i, orgName: r.organizationName, effective: effectiveInvitationStatus(i) })))
       .filter((i) => statusFilter === 'all' || i.effective === statusFilter)
       .sort((a, b) => b.created_at.localeCompare(a.created_at)),
@@ -42,61 +58,108 @@ export function AdminInvitationsPage() {
   );
 
   const resend = async (invitationId: string, renewExpired = false) => {
+    setBusyId(invitationId);
     const { ok, outcome, error: err } = await resendInvitationViaEdge(invitationId, renewExpired);
-    flash(outcome ? resendOutcomeMessage(outcome, renewExpired) : ok ? 'Einladung gesendet.' : `Fehler: ${err ?? 'unbekannt'}`);
+    setBusyId(null);
+    if (outcome) toast({ tone: ok ? 'success' : 'warning', title: resendOutcomeMessage(outcome, renewExpired) });
+    else if (ok) toast({ tone: 'success', title: 'Einladung gesendet.' });
+    else toast({ tone: 'error', title: 'Einladung nicht gesendet', description: err ?? 'unbekannt' });
     if (ok) void reload();
   };
+
   const revoke = async (id: string) => {
+    setBusyId(id);
     const { error: err } = await revokeInvitation(id);
-    flash(err ? `Fehler: ${err}` : 'Einladung widerrufen.');
-    if (!err) void reload();
+    setBusyId(null);
+    if (err) {
+      toast({ tone: 'error', title: 'Einladung nicht widerrufen', description: err });
+      return;
+    }
+    toast({ tone: 'success', title: 'Einladung widerrufen.' });
+    void reload();
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-gray-950">Einladungen</h1>
-          <p className="mt-1 text-sm text-gray-500">Status aller Client-Einladungen.</p>
-        </div>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400">
-          <option value="all">Alle</option>
-          <option value="pending">pending</option>
-          <option value="accepted">accepted</option>
-          <option value="revoked">revoked</option>
-          <option value="expired">expired</option>
-        </select>
-      </div>
-      {notice ? <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-800">{notice}</div> : null}
-      {loading ? <div className="h-40 animate-pulse rounded-2xl border border-gray-100 bg-white" /> : error ? (
-        <AdminCard><p className="text-sm text-red-600">Fehler: {error}</p></AdminCard>
+    <div>
+      <PageHeader
+        title="Einladungen"
+        description="Status aller Client-Einladungen."
+        actions={(
+          <div className="w-full sm:w-56">
+            <Select
+              id="invitation-status-filter"
+              label="Status"
+              value={statusFilter}
+              onChange={setStatusFilter}
+              options={STATUS_OPTIONS}
+            />
+          </div>
+        )}
+      />
+
+      {loading ? (
+        <TableSkeleton rows={4} cols={4} />
+      ) : error ? (
+        <ErrorState message={error} onRetry={() => void reload()} />
       ) : invitations.length === 0 ? (
-        <AdminCard><p className="text-sm text-gray-500">Keine Einladungen für diesen Filter.</p></AdminCard>
+        <EmptyState
+          icon={Mail}
+          title="Keine Einladungen für diesen Filter"
+          description="Ändern Sie den Statusfilter, um weitere Einladungen zu sehen."
+        />
       ) : (
-        <div className="space-y-2">
-          {invitations.map((inv) => (
-            <AdminCard key={inv.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm font-semibold text-gray-900">{inv.email} <Pill label={inv.effective} tone={invitationTone[inv.effective]} /></p>
-                <p className="text-[12px] text-gray-500">
-                  <Link to={`/admin/clients/${inv.organization_id}`} className="hover:underline">{inv.orgName}</Link>
-                  {' · '}Rolle: {inv.organization_role}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                {canResendInvitation(inv.effective) ? (
-                  <button type="button" onClick={() => void resend(inv.id)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-[13px] font-semibold text-gray-700 hover:border-gray-300"><RefreshCw size={14} /> Erneut senden</button>
-                ) : null}
-                {canRenewInvitation(inv.effective) ? (
-                  <button type="button" onClick={() => void resend(inv.id, true)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 text-[13px] font-semibold text-amber-700 hover:bg-amber-100"><RefreshCw size={14} /> Erneuern & senden</button>
-                ) : null}
-                {canResendInvitation(inv.effective) ? (
-                  <button type="button" onClick={() => void revoke(inv.id)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 text-[13px] font-semibold text-red-700 hover:bg-red-100"><XCircle size={14} /> Widerrufen</button>
-                ) : null}
-              </div>
-            </AdminCard>
-          ))}
-        </div>
+        <DataTable
+          rows={invitations}
+          getRowKey={(i) => i.id}
+          minWidth={860}
+          mobileTitle={(i) => (
+            <span className="flex items-center gap-2">
+              {i.email} <StatusBadge label={i.effective} tone={invitationTone[i.effective]} />
+            </span>
+          )}
+          mobileSubtitle={(i) => i.orgName}
+          columns={[
+            { key: 'email', header: 'E-Mail', render: (i) => <span className="font-medium">{i.email}</span> },
+            {
+              key: 'organization',
+              header: 'Organisation',
+              hideOnMobile: true,
+              render: (i) => (
+                <Link to={`/admin/clients/${i.organization_id}`} className="hover:underline">{i.orgName}</Link>
+              ),
+            },
+            { key: 'role', header: 'Rolle', render: (i) => i.organization_role },
+            {
+              key: 'status',
+              header: 'Status',
+              render: (i) => <StatusBadge label={i.effective} tone={invitationTone[i.effective]} />,
+            },
+            {
+              key: 'actions',
+              header: 'Aktionen',
+              align: 'right',
+              render: (i) => (
+                <div className="flex flex-wrap justify-end gap-2">
+                  {canResendInvitation(i.effective) ? (
+                    <Button size="sm" variant="secondary" icon={RefreshCw} loading={busyId === i.id} onClick={() => void resend(i.id)}>
+                      Erneut senden
+                    </Button>
+                  ) : null}
+                  {canRenewInvitation(i.effective) ? (
+                    <Button size="sm" variant="secondary" icon={RefreshCw} loading={busyId === i.id} onClick={() => void resend(i.id, true)}>
+                      Erneuern &amp; senden
+                    </Button>
+                  ) : null}
+                  {canResendInvitation(i.effective) ? (
+                    <Button size="sm" variant="danger" icon={XCircle} loading={busyId === i.id} onClick={() => void revoke(i.id)}>
+                      Widerrufen
+                    </Button>
+                  ) : null}
+                </div>
+              ),
+            },
+          ]}
+        />
       )}
     </div>
   );
