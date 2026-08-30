@@ -1,13 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, Search } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Building2, Plus } from 'lucide-react';
 
-import { AdminCard, Pill, invitationTone, lifecycleTone, solutionTone } from '@/pages/admin/clients/adminUi';
+import {
+  Button, Card, DataTable, EmptyState, ErrorState, Field, PageHeader, Select, StatusBadge, TableSkeleton,
+} from '@/components/dashboard';
+import { invitationTone, lifecycleTone, solutionTone } from '@/pages/admin/clients/statusTones';
 import { loadAdminClients, type AdminClientRow } from '@/lib/clientPlatform/adminApi';
 import { formatCents } from '@/lib/clientPlatform/validation';
 import { clientLifecycleStatuses, solutionCatalogKeys } from '@/lib/clientPlatform/types';
 
 type SortKey = 'name' | 'updated' | 'monthly';
+
+const SORT_OPTIONS = [
+  { value: 'name', label: 'Name (A-Z)' },
+  { value: 'updated', label: 'Zuletzt aktualisiert' },
+  { value: 'monthly', label: 'Monatswert' },
+];
 
 export function ClientsListPage() {
   const [rows, setRows] = useState<AdminClientRow[]>([]);
@@ -17,6 +26,7 @@ export function ClientsListPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [solutionFilter, setSolutionFilter] = useState('all');
   const [sort, setSort] = useState<SortKey>('name');
+  const navigate = useNavigate();
 
   useEffect(() => {
     let active = true;
@@ -49,111 +59,151 @@ export function ClientsListPage() {
     return sorted;
   }, [rows, statusFilter, solutionFilter, search, sort]);
 
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-gray-950">Kunden</h1>
-          <p className="mt-1 text-sm text-gray-500">Interne CRM-Übersicht aller Client-Workspaces.</p>
-        </div>
-        <Link
-          to="/admin/clients/new"
-          className="inline-flex h-11 items-center gap-2 rounded-xl bg-gray-950 px-4 text-sm font-semibold text-white transition-colors hover:bg-gray-800"
-        >
-          <Plus size={16} aria-hidden="true" /> Neuer Kunde
-        </Link>
-      </div>
+  const hasFilters = search.trim() !== '' || statusFilter !== 'all' || solutionFilter !== 'all';
 
-      <AdminCard className="p-4">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-          <label className="relative block flex-1">
-            <span className="sr-only">Suchen</span>
-            <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-300" aria-hidden="true" />
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Suche nach Firma, Kontakt, E-Mail, Branche"
-              className="h-11 w-full rounded-xl border border-gray-200 bg-white pl-9 pr-3 text-sm outline-none focus:border-gray-400"
-            />
-          </label>
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400">
-            <option value="all">Alle Status</option>
-            {clientLifecycleStatuses.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-          <select value={solutionFilter} onChange={(e) => setSolutionFilter(e.target.value)} className="h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400">
-            <option value="all">Alle Lösungen</option>
-            {solutionCatalogKeys.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-          <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)} className="h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400">
-            <option value="name">Name (A-Z)</option>
-            <option value="updated">Zuletzt aktualisiert</option>
-            <option value="monthly">Monatswert</option>
-          </select>
+  return (
+    <div>
+      <PageHeader
+        title="Kunden"
+        description="Interne CRM-Übersicht aller Client-Workspaces."
+        actions={<Button icon={Plus} onClick={() => navigate('/admin/clients/new')}>Neuer Kunde</Button>}
+      />
+
+      <Card className="mb-4">
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))]">
+          <Field
+            id="client-search"
+            label="Suche"
+            value={search}
+            onChange={setSearch}
+            placeholder="Firma, Kontakt, E-Mail, Branche"
+          />
+          <Select
+            id="client-status-filter"
+            label="Status"
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={[{ value: 'all', label: 'Alle Status' }, ...clientLifecycleStatuses.map((s) => ({ value: s, label: s }))]}
+          />
+          <Select
+            id="client-solution-filter"
+            label="Lösung"
+            value={solutionFilter}
+            onChange={setSolutionFilter}
+            options={[{ value: 'all', label: 'Alle Lösungen' }, ...solutionCatalogKeys.map((s) => ({ value: s, label: s }))]}
+          />
+          <Select
+            id="client-sort"
+            label="Sortierung"
+            value={sort}
+            onChange={(value) => setSort(value as SortKey)}
+            options={SORT_OPTIONS}
+          />
         </div>
-      </AdminCard>
+      </Card>
 
       {loading ? (
-        <div className="space-y-2">
-          {[0, 1, 2].map((i) => <div key={i} className="h-16 animate-pulse rounded-2xl border border-gray-100 bg-white" />)}
-        </div>
+        <TableSkeleton rows={5} cols={6} />
       ) : error ? (
-        <AdminCard><p className="text-sm text-red-600">Fehler: {error}</p></AdminCard>
+        <ErrorState message={error} onRetry={() => window.location.reload()} />
       ) : filtered.length === 0 ? (
-        <AdminCard>
-          <p className="text-sm font-semibold text-gray-900">Keine Kunden gefunden</p>
-          <p className="mt-1 text-sm text-gray-500">Passen Sie Suche und Filter an oder legen Sie einen neuen Kunden an.</p>
-        </AdminCard>
+        <EmptyState
+          icon={Building2}
+          title={hasFilters ? 'Keine Kunden gefunden' : 'Noch keine Kunden'}
+          description={hasFilters
+            ? 'Passen Sie Suche und Filter an oder legen Sie einen neuen Kunden an.'
+            : 'Legen Sie den ersten Client-Workspace an, um ihn hier zu sehen.'}
+          action={<Button icon={Plus} onClick={() => navigate('/admin/clients/new')}>Neuer Kunde</Button>}
+        />
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-gray-100 bg-white">
-          <table className="w-full min-w-[880px] text-left text-sm">
-            <thead>
-              <tr className="border-b border-gray-100 text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">
-                <th className="px-4 py-3">Firma</th>
-                <th className="px-4 py-3">Kontakt</th>
-                <th className="px-4 py-3">Branche</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Lösungen</th>
-                <th className="px-4 py-3">Monatswert</th>
-                <th className="px-4 py-3">Zugang</th>
-                <th className="px-4 py-3">Owner</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((row) => {
-                const account = row.account;
+        <DataTable
+          rows={filtered}
+          getRowKey={(row) => row.organizationId}
+          minWidth={880}
+          // Below md the table becomes a stack of cards. The previous markup forced a
+          // 880px-wide table through a horizontal scroller on every phone, which put the
+          // customer name off screen as soon as the owner scrolled to read a status.
+          onRowClick={(row) => navigate(`/admin/clients/${row.organizationId}`)}
+          // A LINK, not plain text. The mobile card's only other affordance is the row
+          // click above, which a keyboard cannot reach — and the "Firma" column that
+          // carries the desktop link is hidden at this width. Without this the client
+          // detail page would be keyboard-unreachable on a phone.
+          mobileTitle={(row) => (
+            <Link
+              to={`/admin/clients/${row.organizationId}`}
+              className="hover:underline"
+              onClick={(event) => event.stopPropagation()}
+            >
+              {row.organizationName}
+            </Link>
+          )}
+          mobileSubtitle={(row) => row.account?.primary_email ?? '—'}
+          columns={[
+            {
+              key: 'company',
+              header: 'Firma',
+              hideOnMobile: true,
+              render: (row) => (
+                <>
+                  <Link
+                    to={`/admin/clients/${row.organizationId}`}
+                    className="font-medium hover:underline"
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    {row.organizationName}
+                  </Link>
+                  <span className="block text-[12px] text-[var(--cq-fg-subtle)]">{row.account?.primary_email ?? '—'}</span>
+                </>
+              ),
+            },
+            {
+              key: 'contact',
+              header: 'Kontakt',
+              render: (row) => (
+                <>
+                  {row.account?.primary_contact_name ?? '—'}
+                  {row.account?.phone ? (
+                    <span className="block text-[12px] text-[var(--cq-fg-subtle)]">{row.account.phone}</span>
+                  ) : null}
+                </>
+              ),
+            },
+            { key: 'industry', header: 'Branche', render: (row) => row.account?.industry ?? '—' },
+            {
+              key: 'status',
+              header: 'Status',
+              render: (row) => (row.account
+                ? <StatusBadge label={row.account.lifecycle_status} tone={lifecycleTone[row.account.lifecycle_status]} />
+                : '—'),
+            },
+            {
+              key: 'solutions',
+              header: 'Lösungen',
+              render: (row) => (row.solutions.length === 0 ? '—' : (
+                <div className="flex flex-wrap gap-1">
+                  {row.solutions.map((s) => (
+                    <StatusBadge key={s.id} label={s.catalog_key.replace(/_/g, ' ')} tone={solutionTone[s.status]} />
+                  ))}
+                </div>
+              )),
+            },
+            {
+              key: 'monthly',
+              header: 'Monatswert',
+              align: 'right',
+              render: (row) => formatCents(row.account?.estimated_monthly_value_cents, row.account?.currency),
+            },
+            {
+              key: 'access',
+              header: 'Zugang',
+              render: (row) => {
                 const invitation = row.invitations.find((i) => i.status === 'pending') ?? row.invitations[0];
-                return (
-                  <tr key={row.organizationId} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60">
-                    <td className="px-4 py-3">
-                      <Link to={`/admin/clients/${row.organizationId}`} className="font-semibold text-gray-950 hover:underline">
-                        {row.organizationName}
-                      </Link>
-                      <div className="text-[12px] text-gray-400">{account?.primary_email ?? '—'}</div>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">
-                      {account?.primary_contact_name ?? '—'}
-                      <div className="text-[12px] text-gray-400">{account?.phone ?? ''}</div>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">{account?.industry ?? '—'}</td>
-                    <td className="px-4 py-3">
-                      {account ? <Pill label={account.lifecycle_status} tone={lifecycleTone[account.lifecycle_status]} /> : '—'}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
-                        {row.solutions.length === 0 ? <span className="text-gray-400">—</span> : row.solutions.map((s) => (
-                          <Pill key={s.id} label={`${s.catalog_key.replace(/_/g, ' ')}`} tone={solutionTone[s.status]} />
-                        ))}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-gray-700">{formatCents(account?.estimated_monthly_value_cents, account?.currency)}</td>
-                    <td className="px-4 py-3">{invitation ? <Pill label={invitation.status} tone={invitationTone[invitation.status]} /> : '—'}</td>
-                    <td className="px-4 py-3 text-gray-600">{account?.internal_owner ?? '—'}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                return invitation ? <StatusBadge label={invitation.status} tone={invitationTone[invitation.status]} /> : '—';
+              },
+            },
+            { key: 'owner', header: 'Owner', hideOnMobile: true, render: (row) => row.account?.internal_owner ?? '—' },
+          ]}
+        />
       )}
     </div>
   );
