@@ -39,16 +39,20 @@
 //   und sofort weitergeleitet, nie bewertet.
 // - Kein Anteil automatisierter Anrufe, keine Zeitersparnis in Prozent.
 // - Keine weiteren Fristen als die zwei belegten (Übergabefrist, Testphase).
-// - KEINE fremde Statistik. Der Beitrag zitierte urspruenglich zwei Fremdzahlen
-//   (Zi PVS-Monitoring; GKV-Versichertenbefragung). Beide wurden entfernt: in
-//   dieser Umgebung ist WebFetch durch die Egress-Policy gesperrt, die
-//   Primaerquellen liessen sich also nicht oeffnen und lesen. Eine Suchtreffer-
-//   Snippet-Bestaetigung ist ausdruecklich KEINE Verifikation
-//   (docs/seo/VERIFIKATION.md). Bei einer der beiden wich zudem die Jahresangabe
-//   von der in den Treffern genannten Ausgabe ab. Der Beitrag traegt ohnehin
-//   nicht durch geliehene Zahlen, sondern durch das eigene Vorgehen. Wer eine
-//   Fremdzahl aufnehmen will: Primaerquelle oeffnen, Abrufdatum notieren, erst
-//   dann zitieren.
+// - Fremdstatistiken NUR in der vom Inhaber am Primaerbeleg geprueften Fassung.
+//   Zwei sind zugelassen, jeweils mit ihrer Bezugsgroesse:
+//     * Zi-PVS-Monitoring 2025 (Zi-Paper 32/2026, veroeffentlicht 14.01.2026):
+//       52,1 % — Bezugsgroesse sind die 901 WECHSELWILLIGEN Teilnehmenden, nicht
+//       alle Praxen. Die Studie heisst PVS-Monitoring 2025, nicht 2026. Niemals
+//       zu "52 % der Praxen sind mit dem Support unzufrieden" verkuerzen.
+//     * GKV-Versichertenbefragung 2025 (n = 3.520): 39 % bewerteten die
+//       ERREICHBARKEIT MEDIZINISCHER VERSORGUNG ausserhalb der ueblichen
+//       Praxisoeffnungszeiten als schwierig. Das ist eine Aussage ueber die
+//       Versorgung insgesamt — niemals zu "39 % erreichen ihre Praxis nicht"
+//       umdeuten.
+//   Beide betreffen NICHT Telefonassistenten. Der Text sagt das jeweils dazu.
+//   Jede weitere Fremdzahl braucht denselben Weg: Primaerquelle oeffnen,
+//   Bezugsgroesse und Ausgabe pruefen, erst dann zitieren.
 // - Keine Kernzahl als Literal — alles aus FAKTEN. Diese Datei steht dafür in
 //   der CLUSTER-Liste von src/lib/telefonassistent-copy.test.ts.
 //
@@ -63,7 +67,24 @@ import { PageSEO } from "@/components/PageSEO";
 import { RedaktionelleVerantwortung, REDAKTION } from "@/components/RedaktionelleVerantwortung";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 import { canonicalFor } from "@/lib/routing/publicRoutes";
-import { FAKTEN } from "@/lib/telefonassistent-copy";
+import { FAKTEN, GRENZEN } from "@/lib/telefonassistent-copy";
+
+/**
+ * Die beiden Grenzen, die auf dieser Seite wiederholt werden, stammen woertlich
+ * aus GRENZEN.points — derselben Quelle, aus der /praxen und die Produktseite
+ * sie beziehen. Nachgetippt waeren sie eine zweite Fassung derselben Zusage in
+ * einem medizinnahen Kontext, und die beiden Fassungen wuerden auseinander
+ * laufen, sobald eine davon praezisiert wird. Der Index ist bewusst benannt
+ * statt hartkodiert kommentarlos: faellt ein Punkt weg, faellt der Build auf.
+ */
+const GRENZEN_TRIAGE = GRENZEN.points.find((p) => p.startsWith("Keine medizinische Einschätzung"));
+const GRENZEN_NOTFALL = GRENZEN.points.find((p) => p.startsWith("Notfälle werden erkannt"));
+if (!GRENZEN_TRIAGE || !GRENZEN_NOTFALL) {
+  throw new Error(
+    "GRENZEN.points hat die Triage- oder Notfall-Zusage verloren oder umformuliert. " +
+      "Diese Seite zitiert sie woertlich; bitte hier nachziehen statt neu zu formulieren."
+  );
+}
 
 const PFAD = "/ki-telefonassistent-einfuehren";
 const CANONICAL = canonicalFor(PFAD);
@@ -156,7 +177,7 @@ const FAQ: Array<{ question: string; answer: string }> = [
   {
     question: "Übernimmt der Assistent eine Ersteinschätzung am Telefon?",
     answer:
-      "Nein. Der Assistent schätzt nichts ein und beantwortet keine medizinischen Fragen. Anzeichen für einen Notfall führen dazu, dass sofort weitergeleitet wird – Erkennen und Weitergeben, nicht Bewerten. Dass diese Fälle sauber aussteigen, gehört zu den Punkten, die vor der Freigabe geprüft werden.",
+      `Nein. ${GRENZEN_TRIAGE} ${GRENZEN_NOTFALL} Dass diese Fälle sauber aussteigen, gehört zu den Punkten, die vor der Freigabe geprüft werden.`,
   },
   {
     question: "Merken Anrufende, dass sie mit einem KI-System sprechen?",
@@ -306,10 +327,34 @@ export function KiTelefonassistentEinfuehren() {
               schaltet es irgendwann ab.
             </p>
             <p>
+              Dass Betreuung dabei schwer wiegt, ist für ein Nachbarfeld erhoben: Unter
+              den wechselwilligen
+              Teilnehmenden des Zi-PVS-Monitorings 2025 nannten 52,1&nbsp;% mangelnden
+              Kundensupport als einen ausschlaggebenden Grund für einen möglichen
+              PVS-Wechsel
+              <span className="text-gray-500 dark:text-gray-500">
+                {" "}
+                (Zi, PVS-Monitoring 2025 / Zi-Paper 32/2026)
+              </span>
+              . Die Erhebung betrifft Praxisverwaltungssysteme, nicht Telefonassistenten,
+              und ihre Bezugsgröße sind die wechselwilligen Befragten – nicht alle Praxen.
+              Übertragbar ist daraus nichts als die Richtung: Software scheitert in einer
+              Praxis selten allein an ihren Funktionen.
+            </p>
+            <p>
               Alle drei Muster haben gemeinsam, dass sie vor dem Start entschieden werden
-              und nach dem Start teuer sind. Die Frage ist deshalb nicht, ob eine Praxis
-              Entlastung am Telefon braucht, sondern ob die Einführung so angelegt wird,
-              dass sie hält.
+              und nach dem Start teuer sind. Dass Bedarf an Entlastung besteht, ist für die
+              Versorgung insgesamt erhoben: 39&nbsp;% der Befragten bewerteten die
+              Erreichbarkeit medizinischer Versorgung außerhalb der üblichen
+              Praxisöffnungszeiten – etwa abends oder am Wochenende – als schwierig
+              <span className="text-gray-500 dark:text-gray-500">
+                {" "}
+                (GKV-Spitzenverband, GKV-Versichertenbefragung 2025, n&nbsp;=&nbsp;3.520)
+              </span>
+              . Das ist eine Aussage über die Versorgung insgesamt, nicht über die
+              Erreichbarkeit einer einzelnen Praxis. Die Frage ist deshalb nicht, ob eine
+              Praxis Entlastung am Telefon braucht, sondern ob die Einführung so angelegt
+              wird, dass sie hält.
             </p>
           </div>
         </div>

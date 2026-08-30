@@ -173,15 +173,27 @@ Ebenfalls nicht auf der Seite: Verarbeitungsort und Konformität (§7.7), Namen
 von Praxisverwaltungssystemen und Anbindungszusagen (B1–B3), ein Anteil
 automatisierter Anrufe (F4/Z0), Namen eingesetzter Dienstleister (B6).
 
-## Nachtrag 2026-08-30 — entfernte Fremdstatistiken
+## Nachtrag 2026-08-30 — Fremdstatistiken, am Primaerbeleg geprueft
 
-Zwei Fremdzahlen standen im ersten Entwurf von `/ki-telefonassistent-einfuehren`
-und wurden vor der Veröffentlichung **entfernt**, nicht nur markiert:
+Zwei Fremdzahlen standen im ersten Entwurf von `/ki-telefonassistent-einfuehren`.
+Sie wurden zwischenzeitlich entfernt, weil die Primärquellen in der
+Arbeitsumgebung nicht zu öffnen waren. **Der Inhaber hat beide anschließend
+selbst am Primärbeleg geprüft.** Sie stehen wieder im Text — ausschließlich in
+der geprüften, eng gefassten Fassung.
 
-| ID | Aussage | Warum entfernt |
-|---|---|---|
-| Z18 | „52 % der wechselwilligen Praxen nennen unzureichenden Kundensupport als Wechselgrund" (Zi, PVS-Monitoring) | Primärquelle nicht zu öffnen (WebFetch durch Egress-Policy gesperrt). Suchtreffer stützen die Zahl, weisen sie aber der Ausgabe **2025** zu, während der Entwurf **2026** angab. Snippet ≠ Verifikation (`docs/seo/VERIFIKATION.md`). |
-| Z19 | „39 % bewerten die Erreichbarkeit außerhalb der Öffnungszeiten als schwierig" (GKV-Spitzenverband, Versichertenbefragung 2025) | Jahresangabe deckt sich mit den Suchtreffern, Primärquelle aber ebenfalls nicht zu öffnen. Gleiche Regel, gleiche Konsequenz. |
+| ID | Aussage im Text | Beleg | Status |
+|---|---|---|---|
+| Z18 | „Unter den wechselwilligen Teilnehmenden des Zi-PVS-Monitorings 2025 nannten 52,1 % mangelnden Kundensupport als einen ausschlaggebenden Grund für einen möglichen PVS-Wechsel." | Zi, *Praxisverwaltungssysteme (PVS) in Praxen und MVZ — Eine Befragung zur Zufriedenheit und Leistungsfähigkeit in 2025*, Zi-Paper 32/2026, veröffentlicht 14.01.2026. Datensatz: **PVS-Monitoring 2025**. Bezugsgröße: 901 wechselwillige Teilnehmende. | **geprüft** |
+| Z19 | „39 % der Befragten bewerteten die Erreichbarkeit medizinischer Versorgung außerhalb der üblichen Praxisöffnungszeiten – etwa abends oder am Wochenende – als schwierig." | GKV-Spitzenverband, GKV-Versichertenbefragung 2025, n = 3.520. | **geprüft** |
 
-Beide dürfen zurück in den Text, sobald jemand die Primärquelle geöffnet, die
-Zahl und die Ausgabe geprüft und das Abrufdatum notiert hat. Vorher nicht.
+**Grenzen, die beim Bearbeiten erhalten bleiben müssen:**
+
+- Die Studie heißt **PVS-Monitoring 2025**, nicht 2026. 2026 ist das
+  Erscheinungsjahr des Zi-Papers, nicht der Erhebung.
+- Die 52,1 % beziehen sich auf die **wechselwilligen** Teilnehmenden, nicht auf
+  alle Praxen. „52 % der Praxen sind mit dem Kundensupport unzufrieden" wäre
+  falsch.
+- Die 39 % betreffen die **Erreichbarkeit medizinischer Versorgung** insgesamt,
+  nicht die Erreichbarkeit einer einzelnen Praxis am Telefon.
+- Beide Zahlen betreffen **keine Telefonassistenten**. Der Beitrag sagt das an
+  beiden Stellen ausdrücklich dazu.
