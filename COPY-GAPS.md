@@ -93,3 +93,29 @@ nicht angelegt:
   beschrieben (A6 in der Claims-Liste). Sollte das Produkt den Hinweis heute
   nicht sprechen, muss entweder das Produkt nachziehen oder die Aussage raus —
   Dritte Option gibt es nicht, die Pflicht gilt unabhängig vom Marketing.
+
+---
+
+# Nachtrag 2026-08-29 — Lücken, die diese Runde geschlossen und offen gelassen hat
+
+## Geschlossen
+
+- **Einführung als eigene Absicht.** Es gab keine Seite, die beschreibt, was die
+  Praxis für eine Einführung entscheiden und prüfen muss. Jetzt
+  `/ki-telefonassistent-einfuehren`.
+- **Redaktionelle Verantwortung.** Kein Fachbeitrag der Website nannte bisher
+  eine verantwortliche Person. `RedaktionelleVerantwortung` schließt das für neue
+  Beiträge; die bestehenden Blogbeiträge tragen weiterhin nur `Organization` als
+  `author` (siehe offen).
+
+## Weiterhin offen
+
+| Lücke | Warum sie offen bleibt |
+|---|---|
+| Rechtsrahmen-Seite (§ 203 StGB, Art. 9/28/32 DSGVO, Art. 50 KI-VO) | Stärkste unbesetzte Absicht des Clusters. Ohne geprüfte Primärquellen nicht publizierbar; Einzelheiten in `docs/seo/serp-research-2026-08-29.md`. |
+| PVS-/Schnittstellen-Seite | Gesperrt durch OWNER-INPUT B1–B3 und die fehlende Unterauftragnehmerliste (`ASSETS-REQUIRED.md` §B2.3). |
+| Terminbuchung als eigene Absicht | Nahe an einer Buchungszusage; erst nach B1–B4 sinnvoll. |
+| Kanonischer Eigentümer für „KI Telefonassistent Arztpraxis" | `/praxen`, `/ki-telefonassistent-praxis` und die eingefrorene Route `/ki-telefonassistent-arzt` konkurrieren um dieselbe Absicht. Nicht auflösbar, solange zwei der drei Seiten eingefroren sind — vorgemerkt in `docs/seo/post-experiment-opportunities.md`. |
+| Titel-/H1-Widerspruch auf `/ki-telefonassistent-praxis` | Manifest-Title spricht von medizinischen Praxen, die H1 von Therapeuten. Nicht Teil dieser Runde. |
+| Blogbeiträge ohne benannte Verantwortung | `RedaktionelleVerantwortung` ist gebaut, aber nur auf der neuen Seite eingesetzt. Ein Einsatz im Blog verlangt, das `Article`-Schema in `BlogPostPage.tsx` im selben Schritt von `Organization` auf `Person` umzustellen, sonst widerspricht die Auszeichnung dem sichtbaren Text. |
+| Autoritäts-Aufbau off-site | Der eigentliche Engpass. Plan in `docs/seo/authority-acquisition-plan.md`; on-site nicht lösbar. |

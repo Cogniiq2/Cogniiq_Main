@@ -6,6 +6,21 @@ sondern **fehlende Bestätigung durch Dritte**. Code kann das nicht herstellen.
 ⚠️ Verifikationsstatus: siehe `VERIFIKATION.md`. Die genannten Kategorien sind
 Rechercheergebnis, die Eignung im Einzelfall ist **nicht geprüft**.
 
+## Zwei Randbedingungen, die den Plan begrenzen
+
+Beide sind im Repository belegt und ändern, was realistisch ist:
+
+- **Cogniiq besteht seit dem 2025-10-15** (`src/lib/seo-data.ts`, `foundingDate`).
+  Ein knapp einjähriges Unternehmen hat kein Jahrzehnt an Erwähnungen, auf das
+  sich aufbauen liesse. Jede Zeile unten ist Aufbauarbeit, kein Einsammeln.
+- **Es gibt keine öffentlich benannte Kundenreferenz.** `src/pages/ReferenzenPage.tsx`
+  nennt Prinzipien, keinen einzigen Namen. Ansatzpunkt 5 beginnt deshalb nicht
+  bei „Referenz verlinken", sondern eine Stufe davor: bei der schriftlichen
+  Erlaubnis, die Beziehung überhaupt zu nennen.
+
+Daraus folgt die Reihenfolge am Ende dieses Dokuments: erst die Schritte, die
+ohne neuen Inhalt und ohne fremde Zustimmung funktionieren.
+
 ## Grundregel
 
 **Diese Liste ist keine Outreach-Automatisierung.** Kein Kontakt wurde aufgenommen,
