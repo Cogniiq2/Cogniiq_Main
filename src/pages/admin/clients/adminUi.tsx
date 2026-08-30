@@ -100,25 +100,6 @@ export function AdminSelect({
   );
 }
 
-export const lifecycleTone: Record<string, keyof typeof pillTones> = {
-  lead: 'neutral',
-  qualified: 'info',
-  active: 'success',
-  paused: 'warning',
-  churned: 'danger',
-  archived: 'neutral',
-};
-
-export const solutionTone: Record<string, keyof typeof pillTones> = {
-  active: 'success',
-  provisioning: 'info',
-  paused: 'warning',
-  disabled: 'neutral',
-};
-
-export const invitationTone: Record<string, keyof typeof pillTones> = {
-  pending: 'warning',
-  accepted: 'success',
-  revoked: 'danger',
-  expired: 'neutral',
-};
+// Status tones moved to ./statusTones so the migrated list pages and this legacy detail
+// page name the same tone for the same state. Re-exported here for the existing imports.
+export { lifecycleTone, solutionTone, invitationTone } from '@/pages/admin/clients/statusTones';

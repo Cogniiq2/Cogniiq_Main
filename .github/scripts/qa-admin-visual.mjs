@@ -64,6 +64,9 @@ const ROUTES = [
   { slug: '07-expenses', path: '/admin/finance/expenses' },
   { slug: '08-contracts', path: '/admin/finance/contracts' },
   { slug: '09-clients', path: '/admin/clients' },
+  { slug: '10-solutions', path: '/admin/solutions' },
+  { slug: '11-invitations', path: '/admin/invitations' },
+  { slug: '12-tasks', path: '/admin/tasks' },
 ];
 
 let failures = 0;
@@ -253,6 +256,40 @@ try {
         bad(`${label}: console errors`, consoleErrors.slice(0, 3).join('\n      '));
       }
     }
+  }
+
+  // ⌘K: the palette must open from the keyboard, be reachable from the rail's trigger,
+  // and put focus in its own input rather than leaving it behind the overlay.
+  await setViewport(page, ALL_VIEWPORTS[0]);
+  consoleErrors.length = 0;
+  if (await goto(page, '/admin')) {
+    await evaluate(page, `document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }))`);
+    await wait(400);
+    const palette = await evaluate(page, `(() => {
+      const dialog = document.querySelector('[role="dialog"][aria-label="Schnellsuche"]');
+      if (!dialog) return { open: false };
+      const input = dialog.querySelector('[role="combobox"]');
+      return {
+        open: true,
+        focused: document.activeElement === input,
+        options: dialog.querySelectorAll('[role="option"]').length,
+        trigger: Boolean(document.querySelector('[aria-label="Schnellsuche öffnen"]')),
+      };
+    })()`);
+    await screenshot(page, `${OUT_DIR}/00-command-palette.png`);
+    if (!palette.open) bad('command palette: Ctrl+K', 'the palette did not open');
+    else if (!palette.focused) bad('command palette: focus', 'the search input did not take focus');
+    else if (!palette.options) bad('command palette: results', 'no options were offered');
+    else if (!palette.trigger) bad('command palette: rail trigger', 'the rail has no visible affordance');
+    else ok(`command palette: opens with ${palette.options} options, focused, rail trigger present`);
+
+    // Escape must close it and hand focus back to the page rather than trapping it.
+    await evaluate(page, `document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))`);
+    await wait(300);
+    const closed = await evaluate(page, `!document.querySelector('[role="dialog"][aria-label="Schnellsuche"]')`);
+    if (closed) ok('command palette: Escape closes it');
+    else bad('command palette: Escape', 'the palette stayed open');
+    if (consoleErrors.length) bad('command palette: console errors', consoleErrors.slice(0, 2).join(' '));
   }
 
   // Reduced motion: the same landing surface must still render completely.

@@ -2,6 +2,7 @@ import { useMemo, type ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ExternalLink, type LucideIcon } from 'lucide-react';
 
+import { CommandPaletteTrigger } from './CommandPalette';
 import { RailAccount } from '@/components/navigation/RailAccount';
 import { SidebarShell } from '@/components/navigation/SidebarShell';
 import type { SidebarNavGroup } from '@/components/navigation/navModel';
@@ -124,6 +125,9 @@ export function DashboardShell({
       groups={groups}
       collapsed={collapsed}
       onToggleCollapse={toggle}
+      // Renders nothing unless a CommandPaletteProvider is mounted above the shell, so a
+      // surface without a palette never grows a button that opens nothing.
+      topSlot={({ collapsed: railCollapsed }) => <CommandPaletteTrigger collapsed={railCollapsed} />}
       footerSlot={({ collapsed: railCollapsed }) => (
         <RailAccount
           collapsed={railCollapsed}

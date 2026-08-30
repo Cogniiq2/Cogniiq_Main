@@ -50,6 +50,8 @@ interface ShellSubNavItemWithGate {
 interface ModuleConfig {
   key: ModuleKey;
   label: string;
+  /** Extra words the command palette matches against ("umsatz", "steuern", …). */
+  keywords?: string;
   /** Where the module's own top-level item points. Owner and non-owner can differ. */
   href: string;
   ownerHref?: string;
@@ -70,6 +72,7 @@ const MODULES: ModuleConfig[] = [
     href: '/admin',
     icon: LayoutDashboard,
     title: 'Command Center',
+    keywords: 'start home dashboard uebersicht heute',
     matches: (p) => p === '/admin',
     subNav: [],
   },
@@ -82,6 +85,7 @@ const MODULES: ModuleConfig[] = [
     ownerHref: '/admin/finance/customers',
     icon: Users,
     title: 'Kunden',
+    keywords: 'kunde kunden crm portal organisation',
     matches: (p) =>
       p === '/admin/finance/customers' || p.startsWith('/admin/finance/customers/') ||
       p === '/admin/clients' || p.startsWith('/admin/clients/') ||
@@ -112,6 +116,7 @@ const MODULES: ModuleConfig[] = [
     href: '/admin/finance/overview',
     icon: Wallet,
     title: 'Finanzen',
+    keywords: 'finanzen geld buchhaltung steuern euer',
     ownerOnly: true,
     matches: (p) => p === '/admin/finance' || p.startsWith('/admin/finance/'),
     // Grouped by what the business actually does with the money: what comes in, what goes out,
@@ -167,6 +172,7 @@ const MODULES: ModuleConfig[] = [
     href: '/admin/tasks',
     icon: LayoutGrid,
     title: 'Task-Dashboard',
+    keywords: 'aufgaben tasks execution',
     // A standalone task universe with its own `tasks` table, unrelated to the customer tasks the
     // business actually runs on. It leaves the rail; the Command Center surfaces the same queue
     // contextually and links here, and every /admin/tasks/* route still resolves.
@@ -180,6 +186,7 @@ const MODULES: ModuleConfig[] = [
     href: '/admin/oura-analytics',
     icon: LayoutGrid,
     title: 'Oura Analytics',
+    keywords: 'oura schlaf gesundheit analytics',
     // Personal health analytics: not part of the business operating system, and every day it sits
     // in the rail it costs a top-level slot. Route, page and data untouched.
     hiddenFromNav: true,
@@ -238,6 +245,43 @@ export function isSubNavActive(pathname: string, href: string): boolean {
   if (pathname === href) return true;
   if (href === '/admin') return false;
   return pathname.startsWith(`${href}/`);
+}
+
+/**
+ * Modules for the command palette.
+ *
+ * Includes the modules withheld from the rail: they left the navigation to free a
+ * top-level slot, not to become unreachable, and ⌘K is exactly where a rarely-used
+ * surface belongs. Owner-only gating is applied identically to `getSections`.
+ */
+export function listModulesForCommands(opts: { isOwner: boolean }): Array<{
+  key: ModuleKey; label: string; href: string; icon: LucideIcon; keywords?: string;
+}> {
+  return MODULES
+    .filter((m) => !m.ownerOnly || opts.isOwner)
+    .map((m) => ({
+      key: m.key,
+      label: m.label,
+      href: (opts.isOwner && m.ownerHref) || m.href,
+      icon: m.icon,
+      keywords: m.keywords,
+    }));
+}
+
+/** One module's owner-filtered sub-navigation, addressed by key rather than by URL. */
+export function getSubNavForModule(key: ModuleKey, opts: { isOwner: boolean }): ShellSubNavGroup[] {
+  const module = MODULES.find((m) => m.key === key);
+  if (!module || (module.ownerOnly && !opts.isOwner)) return [];
+  return module.subNav
+    .filter((group) => !group.ownerOnly || opts.isOwner)
+    .map((group) => ({
+      key: group.key,
+      label: group.label,
+      items: group.items
+        .filter((item) => !item.ownerOnly || opts.isOwner)
+        .map(({ key: itemKey, label, href, icon }) => ({ key: itemKey, label, href, icon })),
+    }))
+    .filter((group) => group.items.length > 0);
 }
 
 /** Every destination the rail can reach, flattened — used by the navigation contract tests. */

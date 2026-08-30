@@ -1,11 +1,31 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, Search } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Building2, Plus, Search } from 'lucide-react';
 
-import { AdminCard, Pill, invitationTone, lifecycleTone, solutionTone } from '@/pages/admin/clients/adminUi';
+import {
+  DataTable, EmptyState, ErrorState, FilterChips, LinkButton, SearchInput, Select, StatBand,
+  StatBandSkeleton, StatusBadge, TableSkeleton, Toolbar, WorkspaceHeader,
+  type Column, type SortDirection, type StatItem,
+} from '@/components/dashboard';
 import { loadAdminClients, type AdminClientRow } from '@/lib/clientPlatform/adminApi';
 import { formatCents } from '@/lib/clientPlatform/validation';
 import { clientLifecycleStatuses, solutionCatalogKeys } from '@/lib/clientPlatform/types';
+import {
+  catalogLabel, invitationLabel, invitationTone, lifecycleLabel, lifecycleTone, solutionTone,
+} from '@/pages/admin/clients/statusTones';
+
+/**
+ * Portal tenants — organizations with a Cogniiq login, their provisioned solutions and
+ * their invitation state.
+ *
+ * This is deliberately NOT the customer list. `owner_customers` is the commercial
+ * identity that invoices and offers point at; an organization is the portal tenant a
+ * customer signs in to, and the two are separate records on purpose. The page says so
+ * in its subtitle rather than letting the owner discover it from behaviour.
+ *
+ * Migrated onto the shared dashboard system (the intent of PR #77, rebuilt on current
+ * main): the hand-rolled table, four bare `<select>`s and 44px pill buttons are gone, so
+ * moving here from the customer workspace no longer looks like changing application.
+ */
 
 type SortKey = 'name' | 'updated' | 'monthly';
 
@@ -17,16 +37,46 @@ export function ClientsListPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [solutionFilter, setSolutionFilter] = useState('all');
   const [sort, setSort] = useState<SortKey>('name');
+  const [tableSort, setTableSort] = useState<{ key: string; direction: SortDirection } | null>(null);
 
-  useEffect(() => {
-    let active = true;
+  const load = useCallback(async () => {
     setLoading(true);
-    loadAdminClients()
-      .then((data) => { if (active) { setRows(data); setError(null); } })
-      .catch((e: unknown) => { if (active) setError(e instanceof Error ? e.message : String(e)); })
-      .finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
+    try { setRows(await loadAdminClients()); setError(null); }
+    catch (e: unknown) { setError(e instanceof Error ? e.message : String(e)); }
+    finally { setLoading(false); }
   }, []);
+
+  useEffect(() => { void load(); }, [load]);
+
+  const statusCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: rows.length };
+    for (const row of rows) {
+      const status = row.account?.lifecycle_status;
+      if (status) counts[status] = (counts[status] ?? 0) + 1;
+    }
+    return counts;
+  }, [rows]);
+
+  const stats: StatItem[] = useMemo(() => {
+    const active = rows.filter((r) => r.account?.lifecycle_status === 'active');
+    const monthly = rows.reduce((sum, r) => sum + (r.account?.estimated_monthly_value_cents ?? 0), 0);
+    const solutions = rows.reduce((sum, r) => sum + r.solutions.filter((s) => s.status === 'active').length, 0);
+    const pending = rows.reduce((sum, r) => sum + r.invitations.filter((i) => i.status === 'pending').length, 0);
+    return [
+      {
+        key: 'monthly',
+        label: 'Geschätzter Monatswert',
+        value: formatCents(monthly),
+        // The CRM field is an estimate the owner maintains by hand; it is not revenue and
+        // must never be read as one.
+        hint: 'manuell gepflegte Schätzung — kein Umsatz',
+        lead: true,
+      },
+      { key: 'orgs', label: 'Organisationen', value: String(rows.length), hint: `${active.length} aktiv` },
+      { key: 'solutions', label: 'Aktive Lösungen', value: String(solutions), to: '/admin/solutions' },
+      { key: 'pending', label: 'Offene Einladungen', value: String(pending), tone: pending > 0 ? 'attention' : 'neutral', to: '/admin/invitations' },
+    ];
+  }, [rows]);
 
   const filtered = useMemo(() => {
     let result = rows;
@@ -44,117 +94,194 @@ export function ClientsListPage() {
     sorted.sort((a, b) => {
       if (sort === 'monthly') return (b.account?.estimated_monthly_value_cents ?? 0) - (a.account?.estimated_monthly_value_cents ?? 0);
       if (sort === 'updated') return (b.account?.updated_at ?? '').localeCompare(a.account?.updated_at ?? '');
-      return a.organizationName.localeCompare(b.organizationName);
+      return a.organizationName.localeCompare(b.organizationName, 'de');
     });
     return sorted;
   }, [rows, statusFilter, solutionFilter, search, sort]);
 
+  const columns: Column<AdminClientRow>[] = [
+    {
+      key: 'organisation',
+      header: 'Organisation',
+      sortValue: (r) => r.organizationName,
+      render: (r) => (
+        <div className="min-w-0">
+          <div className="truncate font-semibold text-[var(--cq-fg)]">{r.organizationName}</div>
+          <div className="truncate text-[12px] text-[var(--cq-fg-subtle)]">
+            {[r.account?.primary_contact_name, r.account?.primary_email].filter(Boolean).join(' · ') || '—'}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'industry',
+      header: 'Branche',
+      hideOnMobile: true,
+      render: (r) => <span className="text-[var(--cq-fg-muted)]">{r.account?.industry ?? '—'}</span>,
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      sortValue: (r) => r.account?.lifecycle_status ?? '',
+      render: (r) => (r.account ? (
+        <span className="whitespace-nowrap">
+          <StatusBadge
+            label={lifecycleLabel[r.account.lifecycle_status] ?? r.account.lifecycle_status}
+            tone={lifecycleTone[r.account.lifecycle_status]}
+          />
+        </span>
+      ) : <span className="text-[var(--cq-fg-subtle)]">—</span>),
+    },
+    {
+      key: 'solutions',
+      header: 'Lösungen',
+      render: (r) => (
+        r.solutions.length === 0
+          ? <span className="text-[12px] text-[var(--cq-fg-subtle)]">keine</span>
+          : (
+            <div className="flex flex-wrap gap-1">
+              {r.solutions.map((s) => (
+                <StatusBadge key={s.id} label={catalogLabel(s.catalog_key)} tone={solutionTone[s.status]} />
+              ))}
+            </div>
+          )
+      ),
+    },
+    {
+      key: 'monthly',
+      header: 'Monatswert',
+      align: 'right',
+      sortValue: (r) => r.account?.estimated_monthly_value_cents ?? 0,
+      render: (r) => (
+        <span className="whitespace-nowrap text-[var(--cq-fg-muted)]">
+          {formatCents(r.account?.estimated_monthly_value_cents, r.account?.currency)}
+        </span>
+      ),
+    },
+    {
+      key: 'access',
+      header: 'Zugang',
+      hideOnMobile: true,
+      render: (r) => {
+        const invitation = r.invitations.find((i) => i.status === 'pending') ?? r.invitations[0];
+        if (!invitation) return <span className="text-[12px] text-[var(--cq-fg-subtle)]">keine Einladung</span>;
+        return (
+          <span className="whitespace-nowrap">
+            <StatusBadge label={invitationLabel[invitation.status] ?? invitation.status} tone={invitationTone[invitation.status]} />
+          </span>
+        );
+      },
+    },
+  ];
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-gray-950">Kunden</h1>
-          <p className="mt-1 text-sm text-gray-500">Interne CRM-Übersicht aller Client-Workspaces.</p>
-        </div>
-        <Link
-          to="/admin/clients/new"
-          className="inline-flex h-11 items-center gap-2 rounded-xl bg-gray-950 px-4 text-sm font-semibold text-white transition-colors hover:bg-gray-800"
-        >
-          <Plus size={16} aria-hidden="true" /> Neuer Kunde
-        </Link>
+    <>
+      <WorkspaceHeader
+        eyebrow="Kunden"
+        title="Portalzugänge"
+        subtitle="Organisationen mit Cogniiq-Login: provisionierte Lösungen, Einladungen und Ansprechpartner. Die kaufmännische Kundenidentität für Angebote und Rechnungen liegt im Kundenstamm."
+        actions={<LinkButton to="/admin/clients/new" variant="primary" icon={Plus}>Neue Organisation</LinkButton>}
+        toolbar={
+          !loading && rows.length > 0 ? (
+            <Toolbar
+              trailing={
+                <>
+                  <SearchInput
+                    value={search}
+                    onChange={setSearch}
+                    label="Portalzugänge durchsuchen"
+                    placeholder="Firma, Kontakt, E-Mail, Branche …"
+                    className="w-full sm:w-64"
+                  />
+                  <div className="w-full sm:w-48">
+                    <Select
+                      id="solution-filter"
+                      value={solutionFilter}
+                      onChange={setSolutionFilter}
+                      options={[
+                        { value: 'all', label: 'Alle Lösungen' },
+                        ...solutionCatalogKeys.map((key) => ({ value: key, label: catalogLabel(key) })),
+                      ]}
+                    />
+                  </div>
+                  <div className="w-full sm:w-44">
+                    <Select
+                      id="client-sort"
+                      value={sort}
+                      onChange={(v) => { setSort(v as SortKey); setTableSort(null); }}
+                      options={[
+                        { value: 'name', label: 'Name (A–Z)' },
+                        { value: 'updated', label: 'Zuletzt aktualisiert' },
+                        { value: 'monthly', label: 'Monatswert' },
+                      ]}
+                    />
+                  </div>
+                </>
+              }
+            >
+              <FilterChips
+                label="Nach Lebenszyklus filtern"
+                value={statusFilter}
+                onChange={setStatusFilter}
+                options={[
+                  { value: 'all', label: 'Alle', count: statusCounts.all },
+                  ...clientLifecycleStatuses
+                    .filter((status) => (statusCounts[status] ?? 0) > 0)
+                    .map((status) => ({ value: status, label: lifecycleLabel[status] ?? status, count: statusCounts[status] })),
+                ]}
+              />
+            </Toolbar>
+          ) : undefined
+        }
+      />
+
+      {error ? <div className="mb-4"><ErrorState message={error} onRetry={() => void load()} /></div> : null}
+
+      <div className="space-y-4">
+        {loading ? <StatBandSkeleton count={4} /> : rows.length > 0 ? <StatBand items={stats} /> : null}
+
+        {loading ? <TableSkeleton rows={5} cols={5} /> : rows.length === 0 ? (
+          <EmptyState
+            icon={Building2}
+            title="Noch keine Portalzugänge"
+            description="Eine Organisation entsteht, sobald Sie einen Kunden für das Kundenportal freischalten. Sie bekommt einen Login, sieht ihre Lösungen und ihre Dokumente."
+            action={<LinkButton to="/admin/clients/new" variant="primary" icon={Plus}>Neue Organisation</LinkButton>}
+          />
+        ) : filtered.length === 0 ? (
+          <EmptyState
+            icon={Search}
+            title="Keine Treffer"
+            description="Keine Organisation passt zu dieser Kombination aus Suche, Lebenszyklus und Lösung."
+            action={
+              <LinkButton to="/admin/clients" variant="secondary">Filter zurücksetzen</LinkButton>
+            }
+          />
+        ) : (
+          <DataTable
+            columns={columns}
+            rows={filtered}
+            getRowKey={(r) => r.organizationId}
+            minWidth={880}
+            sort={tableSort}
+            onSortChange={setTableSort}
+            rowHref={(r) => `/admin/clients/${r.organizationId}`}
+            mobileTitle={(r) => (
+              <div className="flex items-center gap-2">
+                <span>{r.organizationName}</span>
+                {r.account ? (
+                  <StatusBadge
+                    label={lifecycleLabel[r.account.lifecycle_status] ?? r.account.lifecycle_status}
+                    tone={lifecycleTone[r.account.lifecycle_status]}
+                  />
+                ) : null}
+              </div>
+            )}
+            mobileSubtitle={(r) => r.account?.primary_email ?? 'kein Kontakt hinterlegt'}
+          />
+        )}
       </div>
-
-      <AdminCard className="p-4">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-          <label className="relative block flex-1">
-            <span className="sr-only">Suchen</span>
-            <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-300" aria-hidden="true" />
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Suche nach Firma, Kontakt, E-Mail, Branche"
-              className="h-11 w-full rounded-xl border border-gray-200 bg-white pl-9 pr-3 text-sm outline-none focus:border-gray-400"
-            />
-          </label>
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400">
-            <option value="all">Alle Status</option>
-            {clientLifecycleStatuses.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-          <select value={solutionFilter} onChange={(e) => setSolutionFilter(e.target.value)} className="h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400">
-            <option value="all">Alle Lösungen</option>
-            {solutionCatalogKeys.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-          <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)} className="h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400">
-            <option value="name">Name (A-Z)</option>
-            <option value="updated">Zuletzt aktualisiert</option>
-            <option value="monthly">Monatswert</option>
-          </select>
-        </div>
-      </AdminCard>
-
-      {loading ? (
-        <div className="space-y-2">
-          {[0, 1, 2].map((i) => <div key={i} className="h-16 animate-pulse rounded-2xl border border-gray-100 bg-white" />)}
-        </div>
-      ) : error ? (
-        <AdminCard><p className="text-sm text-red-600">Fehler: {error}</p></AdminCard>
-      ) : filtered.length === 0 ? (
-        <AdminCard>
-          <p className="text-sm font-semibold text-gray-900">Keine Kunden gefunden</p>
-          <p className="mt-1 text-sm text-gray-500">Passen Sie Suche und Filter an oder legen Sie einen neuen Kunden an.</p>
-        </AdminCard>
-      ) : (
-        <div className="overflow-x-auto rounded-2xl border border-gray-100 bg-white">
-          <table className="w-full min-w-[880px] text-left text-sm">
-            <thead>
-              <tr className="border-b border-gray-100 text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400">
-                <th className="px-4 py-3">Firma</th>
-                <th className="px-4 py-3">Kontakt</th>
-                <th className="px-4 py-3">Branche</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Lösungen</th>
-                <th className="px-4 py-3">Monatswert</th>
-                <th className="px-4 py-3">Zugang</th>
-                <th className="px-4 py-3">Owner</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((row) => {
-                const account = row.account;
-                const invitation = row.invitations.find((i) => i.status === 'pending') ?? row.invitations[0];
-                return (
-                  <tr key={row.organizationId} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60">
-                    <td className="px-4 py-3">
-                      <Link to={`/admin/clients/${row.organizationId}`} className="font-semibold text-gray-950 hover:underline">
-                        {row.organizationName}
-                      </Link>
-                      <div className="text-[12px] text-gray-400">{account?.primary_email ?? '—'}</div>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">
-                      {account?.primary_contact_name ?? '—'}
-                      <div className="text-[12px] text-gray-400">{account?.phone ?? ''}</div>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">{account?.industry ?? '—'}</td>
-                    <td className="px-4 py-3">
-                      {account ? <Pill label={account.lifecycle_status} tone={lifecycleTone[account.lifecycle_status]} /> : '—'}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
-                        {row.solutions.length === 0 ? <span className="text-gray-400">—</span> : row.solutions.map((s) => (
-                          <Pill key={s.id} label={`${s.catalog_key.replace(/_/g, ' ')}`} tone={solutionTone[s.status]} />
-                        ))}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-gray-700">{formatCents(account?.estimated_monthly_value_cents, account?.currency)}</td>
-                    <td className="px-4 py-3">{invitation ? <Pill label={invitation.status} tone={invitationTone[invitation.status]} /> : '—'}</td>
-                    <td className="px-4 py-3 text-gray-600">{account?.internal_owner ?? '—'}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+    </>
   );
 }
+
+export default ClientsListPage;

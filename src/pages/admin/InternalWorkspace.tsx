@@ -1,10 +1,11 @@
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 
 import { PlatformAdminRoute } from '@/components/auth/PlatformAdminRoute';
-import { DashboardShell, ToastProvider } from '@/components/dashboard';
+import { CommandPaletteProvider, DashboardShell, ToastProvider } from '@/components/dashboard';
 import { useAuth } from '@/contexts/AuthContext';
 import { getActiveModule, getSections, getSubNav, isSubNavActive } from '@/pages/admin/internalNavigation';
+import { buildCommandItems, loadCustomerCommandItems } from '@/pages/admin/commandItems';
 
 // The one internal workspace shell shared by every /admin/* module (Tasks, Oura, CRM, Finance).
 // It is protected once by PlatformAdminRoute, renders a single DashboardShell with one account/logout
@@ -36,9 +37,18 @@ export function InternalWorkspaceLayout() {
   const moduleAllowed = !activeModule.ownerOnly || isPlatformOwner;
   const subNav = getSubNav(pathname, { isOwner: isPlatformOwner });
 
+  // ⌘K reaches every destination this user may see, plus the surfaces withheld from the
+  // rail. The customer read only runs on first open, and only succeeds for an owner —
+  // RLS decides, not this flag.
+  const commandItems = useMemo(() => buildCommandItems({ isOwner: isPlatformOwner }), [isPlatformOwner]);
+
   return (
     <PlatformAdminRoute>
       <ToastProvider>
+        <CommandPaletteProvider
+          items={commandItems}
+          loadObjects={isPlatformOwner ? loadCustomerCommandItems : undefined}
+        >
         <DashboardShell
           sections={sections}
           subNav={subNav}
@@ -50,6 +60,7 @@ export function InternalWorkspaceLayout() {
             <Outlet />
           </Suspense>
         </DashboardShell>
+        </CommandPaletteProvider>
       </ToastProvider>
     </PlatformAdminRoute>
   );
