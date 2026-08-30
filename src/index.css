@@ -71,6 +71,44 @@
     scroll-behavior: smooth;
   }
 
+  /* ───────────────────────────────────────────────────────────────────────────
+     German compounds vs. narrow columns.
+
+     This is a German-language site (<html lang="de">), and German builds
+     arbitrarily long single words: "Auftragsverarbeitungsvertrag",
+     "Datenschutzbeauftragter", "Praxisverwaltungssystem". A word cannot wrap
+     inside itself, so it sets a floor under its container's min-content width.
+     In a narrow column that floor is wider than the viewport, and the page
+     grows a horizontal scrollbar — measured at 49px on the homepage and 62px
+     on /ki-telefonassistent at a 390px viewport.
+
+     `hyphens: auto` is the fix rather than a hard character break: with
+     lang="de" the browser applies German hyphenation rules and breaks
+     "Auf-trags-ver-ar-bei-tungs-ver-trag" at legitimate points, which is how
+     the word is meant to be set. `overflow-wrap: break-word` stays as the
+     fallback for the cases hyphenation cannot solve — a URL, an identifier, a
+     product name with no hyphenation points — so nothing can escape its column.
+
+     Deliberately NOT `overflow-x: hidden` on a container: that hides the
+     symptom, leaves the text clipped and unreadable, and silently breaks
+     `position: sticky` inside the same subtree.
+     ─────────────────────────────────────────────────────────────────────────── */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  li,
+  dt,
+  dd,
+  blockquote,
+  figcaption {
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
   *,
   *::before,
   *::after {
