@@ -62,3 +62,17 @@ Brief geschärft, Übertreibungen und erfundene Zahlen entfernt.
 7. **AI-Act-Transparenz (Art. 50), § 203 StGB, § 201 StGB** nirgends
    adressiert (§5.4) — Datenschutz-Aussagen beschränken sich auf
    "DSGVO-konform, europäische Server, AVV".
+
+---
+
+## Nachtrag 2026-08-29 — neue Seite im Cluster
+
+| # | Route | Datei | Seitentyp | H1 | Meta-Title | Ziel-Keyword | Wörter |
+|---|---|---|---|---|---|---|---|
+| 15 | `/ki-telefonassistent-einfuehren` | `src/pages/guides/KiTelefonassistentEinfuehren.tsx` | Fachbeitrag (Einführung) | „Einen KI-Telefonassistenten in der Praxis einführen" | „KI-Telefonassistent in der Praxis einführen \| Cogniiq" | KI Telefonassistent in der Praxis einführen | ~1.900 |
+
+Abgrenzung im Cluster: Produkt (`/ki-telefonassistent`) und Praxissicht
+(`/praxen`) beschreiben die Leistung; diese Seite beschreibt die Einführung als
+Vorhaben der Praxis. Keine Wiederholung eines Beweisketten-Moduls; wo sich ein
+Thema überschneidet (M16), steht hier nur der einführungsspezifische Teil und im
+Übrigen ein Verweis.

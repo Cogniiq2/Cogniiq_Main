@@ -19,7 +19,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json"
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "seo:baseline": "SEO_RECORD_PROTECTED_BASELINE=1 vitest run src/protectedExperiments.test.tsx"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

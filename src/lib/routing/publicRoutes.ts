@@ -202,6 +202,17 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.70" },
   },
+  // Fachbeitrag zur EINFUEHRUNG, bewusst getrennt von der Produktseite: dort
+  // steht, was der Empfang leistet, hier, was die Praxis dafuer entscheidet und
+  // prueft. Verlinkt absichtlich NICHT auf die eingefrorenen Experimentrouten.
+  {
+    path: "/ki-telefonassistent-einfuehren",
+    title: "KI-Telefonassistent in der Praxis einführen | Cogniiq",
+    description: "Wie eine Praxis einen KI-Telefonassistenten einführt: welche Anrufe infrage kommen, wie die Übergabe geklärt wird und was vor der Freigabe geprüft gehört.",
+    keywords: "KI Telefonassistent in der Praxis einführen, KI Telefonassistent Praxis einführen, Einführung KI Telefonassistent, Telefonassistent Praxis Freigabe",
+    indexable: true,
+    sitemap: { lastmod: "2026-08-29", changefreq: "monthly", priority: "0.85" },
+  },
 
   // ─── GEO HUBS ────────────────────────────────────────────────────────────────
   {

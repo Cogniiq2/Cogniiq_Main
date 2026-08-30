@@ -146,3 +146,54 @@ zu entfernen**. Marker stehen als Code-Kommentare neben der jeweiligen Stelle
 - "Kunden bestellen den Service selten wieder ab", "unbegrenzte Anrufe"
 - Stimme "kaum von einem menschlichen Mitarbeiter zu unterscheiden"
 - Sämtliche "kein Anruf/Patient/Auftrag geht verloren"-Absolutversprechen
+
+---
+
+# Nachtrag 2026-08-29 — offene Punkte der Seite `/ki-telefonassistent-einfuehren`
+
+Die Seite beschreibt das eigene Einführungsvorgehen. Diese Aussagen sind aus der
+internen Projektvorlage abgeleitet und im Repository nachvollziehbar, aber vom
+Inhaber nicht bestätigt. Sie stehen als `[[CLAIM: verify]]` im Quelltext von
+`src/pages/guides/KiTelefonassistentEinfuehren.tsx`.
+
+| ID | Aussage | Fundstelle | Status |
+|---|---|---|---|
+| Z14 | „Vor einer Freigabe gehören vier Gruppen von Fällen geprüft" — dass genau diese vier Prüfkategorien (normale Abläufe, Verwechslung und Zugriff, deutsche Sprachqualität, Ernstfall) das Vorgehen abbilden | `KiTelefonassistentEinfuehren.tsx`, Konstante `PRUEFGRUPPEN` | offen — Bestätigung des Inhabers |
+| Z15 | Die sechs Beobachtungspunkte der ersten Betriebswoche | ebd., Konstante `ERSTE_WOCHE` | offen — Bestätigung des Inhabers |
+| Z16 | Die empfohlene Freigabereihenfolge (erst Anmeldung, dann Leitung) und die sieben einzeln freigegebenen Punkte | ebd., Abschnitt „Wer freigibt" | als Empfehlung formuliert, nicht als eigener Ablauf — Bestätigung des Inhabers weiterhin sinnvoll |
+| Z17 | Die drei Prüffragen je Anrufanlass als unser vorgeschlagenes Entscheidungsraster | ebd., Abschnitt „Die Trennlinie ziehen" | offen — als Vorschlag formuliert, nicht als Zusage |
+
+Bewusst **nicht** auf der Seite, weil gesperrt: jede Aussage zum Verhalten bei
+Störung oder Ausfall und jede Frist für eine Rückschaltung (OWNER-INPUT B9 ist
+unbeantwortet; die Folgezeile dort verlangt, dass Fallback-Aussagen von allen
+Seiten verschwinden). Die Seite sagt nur, dass der Rückweg vor dem Umschalten
+vereinbart wird — nicht, wie schnell er greift.
+
+Ebenfalls nicht auf der Seite: Verarbeitungsort und Konformität (§7.7), Namen
+von Praxisverwaltungssystemen und Anbindungszusagen (B1–B3), ein Anteil
+automatisierter Anrufe (F4/Z0), Namen eingesetzter Dienstleister (B6).
+
+## Nachtrag 2026-08-30 — Fremdstatistiken, am Primaerbeleg geprueft
+
+Zwei Fremdzahlen standen im ersten Entwurf von `/ki-telefonassistent-einfuehren`.
+Sie wurden zwischenzeitlich entfernt, weil die Primärquellen in der
+Arbeitsumgebung nicht zu öffnen waren. **Der Inhaber hat beide anschließend
+selbst am Primärbeleg geprüft.** Sie stehen wieder im Text — ausschließlich in
+der geprüften, eng gefassten Fassung.
+
+| ID | Aussage im Text | Beleg | Status |
+|---|---|---|---|
+| Z18 | „Unter den wechselwilligen Teilnehmenden des Zi-PVS-Monitorings 2025 nannten 52,1 % mangelnden Kundensupport als einen ausschlaggebenden Grund für einen möglichen PVS-Wechsel." | Zi, *Praxisverwaltungssysteme (PVS) in Praxen und MVZ — Eine Befragung zur Zufriedenheit und Leistungsfähigkeit in 2025*, Zi-Paper 32/2026, veröffentlicht 14.01.2026. Datensatz: **PVS-Monitoring 2025**. Bezugsgröße: 901 wechselwillige Teilnehmende. | **geprüft** |
+| Z19 | „39 % der Befragten bewerteten die Erreichbarkeit medizinischer Versorgung außerhalb der üblichen Praxisöffnungszeiten – etwa abends oder am Wochenende – als schwierig." | GKV-Spitzenverband, GKV-Versichertenbefragung 2025, n = 3.520. | **geprüft** |
+
+**Grenzen, die beim Bearbeiten erhalten bleiben müssen:**
+
+- Die Studie heißt **PVS-Monitoring 2025**, nicht 2026. 2026 ist das
+  Erscheinungsjahr des Zi-Papers, nicht der Erhebung.
+- Die 52,1 % beziehen sich auf die **wechselwilligen** Teilnehmenden, nicht auf
+  alle Praxen. „52 % der Praxen sind mit dem Kundensupport unzufrieden" wäre
+  falsch.
+- Die 39 % betreffen die **Erreichbarkeit medizinischer Versorgung** insgesamt,
+  nicht die Erreichbarkeit einer einzelnen Praxis am Telefon.
+- Beide Zahlen betreffen **keine Telefonassistenten**. Der Beitrag sagt das an
+  beiden Stellen ausdrücklich dazu.
