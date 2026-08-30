@@ -251,6 +251,11 @@ async function expectRow(text: string) {
   return hits[0];
 }
 
+/**
+ * Row actions are named after the customer they act on ("Autohaus Weber löschen"),
+ * so a screen-reader user hears which record a delete button belongs to rather than
+ * ten identical "Kunde löschen" buttons.
+ */
 async function clickRowAction(name: RegExp) {
   const buttons = await screen.findAllByRole('button', { name });
   await userEvent.click(buttons[0]);
@@ -428,7 +433,7 @@ describe('deletion is deliberate, not uniform', () => {
     renderPage(<CustomersPage />);
     await expectRow('Wegzukunde GmbH');
 
-    await clickRowAction(/Kunde löschen/i);
+    await clickRowAction(/ löschen$/i);
     const dialog = await screen.findByRole('dialog');
     await user.click(within(dialog).getByRole('button', { name: /Kunde löschen/i }));
 
@@ -445,7 +450,7 @@ describe('deletion is deliberate, not uniform', () => {
 
     renderPage(<CustomersPage />);
     await expectRow('SV Heinersreuth 1921 e.V.');
-    await clickRowAction(/Kunde löschen/i);
+    await clickRowAction(/ löschen$/i);
 
     const dialog = await screen.findByRole('dialog');
     expect(within(dialog).getByText(/SV Heinersreuth 1921 e\.V\./)).toBeTruthy();
@@ -462,7 +467,7 @@ describe('deletion is deliberate, not uniform', () => {
 
     renderPage(<CustomersPage />);
     await expectRow('Pankofer GmbH');
-    await clickRowAction(/Kunde löschen/i);
+    await clickRowAction(/ löschen$/i);
 
     const dialog = await screen.findByRole('dialog');
     expect(within(dialog).getAllByText(/Löschen nicht möglich/i).length).toBeGreaterThan(0);

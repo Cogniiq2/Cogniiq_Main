@@ -16,8 +16,8 @@ import type { OwnerCustomerListRow, OwnerExpense, OwnerInvoice, OwnerOffer, Owne
 
 const TODAY = '2026-08-30';
 
-const invoice = (over: Partial<OwnerInvoice> & { id: string }): OwnerInvoice => ({
-  id: over.id,
+const invoice = (over: Partial<OwnerInvoice>): OwnerInvoice => ({
+  id: 'invoice',
   business_entity_id: 'e1',
   organization_id: null,
   client_account_id: null,
@@ -45,8 +45,8 @@ const invoice = (over: Partial<OwnerInvoice> & { id: string }): OwnerInvoice => 
   ...over,
 });
 
-const offer = (over: Partial<OwnerOffer> & { id: string }): OwnerOffer => ({
-  id: over.id,
+const offer = (over: Partial<OwnerOffer>): OwnerOffer => ({
+  id: 'offer',
   business_entity_id: 'e1',
   organization_id: null,
   client_account_id: null,
@@ -191,8 +191,8 @@ describe('buildAttention', () => {
 });
 
 describe('buildUpcoming', () => {
-  const subscription = (over: Partial<OwnerSubscription> & { id: string }): OwnerSubscription => ({
-    id: over.id, business_entity_id: 'e1', vendor_id: null, category_id: null,
+  const subscription = (over: Partial<OwnerSubscription>): OwnerSubscription => ({
+    id: 'subscription', business_entity_id: 'e1', vendor_id: null, category_id: null,
     name: 'Abo', billing_frequency: 'monthly', expected_net_cents: 1000,
     expected_gross_cents: 1190, vat_treatment: 'standard', next_billing_date: '2026-09-05',
     start_date: null, end_date: null, status: 'active', cancellation_notice_date: null, notes: null,

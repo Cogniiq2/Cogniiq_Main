@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileSignature, Plus, Search, Archive, Trash2, RotateCcw } from 'lucide-react';
+import { FileSignature, Plus, SlidersHorizontal, Archive, Trash2, RotateCcw } from 'lucide-react';
 
 import {
-  Button, DataTable, EmptyState, ErrorState, IconButton, KpiCard, PageHeader,
-  Field, Select, StatusBadge, Tabs, TableSkeleton, useToast,
-  type Column,
+  Button, DataTable, EmptyState, ErrorState, FilterChips, IconButton, Panel, SearchInput,
+  Field, Select, StatBand, StatBandSkeleton, StatusBadge, TableSkeleton, Toolbar, WorkspaceHeader,
+  useToast, type Column, type SortDirection, type StatItem,
 } from '@/components/dashboard';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import { loadOffers, loadPendingSendOfferIds } from '@/lib/ownerFinance/offersApi';
@@ -46,6 +46,10 @@ export function OffersPage() {
   const [maxAmount, setMaxAmount] = useState('');
   const [includeIds, setIncludeIds] = useState(false);
   const [archiveTarget, setArchiveTarget] = useState<OwnerOffer | null>(null);
+  const [tableSort, setTableSort] = useState<{ key: string; direction: SortDirection } | null>(null);
+  /* The date/amount filters are the rarely-used half of the toolbar; they stay collapsed
+     until asked for so the common case (status + search) is one uncluttered rail. */
+  const [advancedOpen, setAdvancedOpen] = useState(false);
 
   const load = useCallback(async () => {
     if (!entity) return;
@@ -170,28 +174,108 @@ export function OffersPage() {
     } catch (e: unknown) { toast.error('Export fehlgeschlagen', e instanceof Error ? e.message : String(e)); }
   };
 
+  /**
+   * The identity cell carries number, customer and title together — an offer is
+   * recognised by all three, and giving each its own column was what pushed this
+   * table past its container. The commercial state (status, pending send, archived)
+   * gets its own column, and the amount keeps the one-time and recurring halves apart.
+   */
   const columns: Column<OwnerOffer>[] = [
-    { key: 'number', header: 'Nummer', render: (o) => <span className="font-semibold text-gray-950">{o.offer_number ?? 'Entwurf'}</span> },
-    { key: 'status', header: 'Status', render: (o) => (
-      <div className="flex flex-wrap items-center gap-1.5">
-        <StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} />
-        {pendingSend.has(o.id) && o.status !== 'sent' ? <StatusBadge label="Versand ausstehend" tone="info" /> : null}
-        {o.archived_at ? <StatusBadge label={offerDisplayStateLabel[offerDisplayState(o)]} tone={offerDisplayStateTone.archived} /> : null}
-      </div>
-    ) },
-    { key: 'customer', header: 'Kunde', render: (o) => <span className="text-gray-600">{customerName(o)}</span> },
-    { key: 'title', header: 'Titel', render: (o) => <span className="text-gray-600">{o.title ?? '—'}</span>, hideOnMobile: true },
-    { key: 'valid', header: 'Gültig bis', render: (o) => <span className="text-gray-500">{o.valid_until ? formatDateDe(o.valid_until) : '—'}</span>, hideOnMobile: true },
-    { key: 'gross', header: 'Brutto', align: 'right', render: (o) => <span className="tabular-nums font-medium text-gray-900">{formatOfferAmount(o, o.currency, formatCents)}</span> },
-    { key: 'actions', header: '', align: 'right', render: (o) => (
-      <div className="flex items-center justify-end gap-0.5" onClick={(e) => e.stopPropagation()}>
-        {o.archived_at ? (
-          <IconButton icon={RotateCcw} label="Wiederherstellen" variant="ghost" onClick={() => void unarchive(o)} />
-        ) : (
-          <IconButton icon={o.status === 'draft' ? Trash2 : Archive} label={o.status === 'draft' ? 'Löschen' : 'Archivieren'} variant="ghost" onClick={() => setArchiveTarget(o)} />
-        )}
-      </div>
-    ) },
+    {
+      key: 'offer',
+      header: 'Angebot',
+      sortValue: (o) => o.offer_number ?? 'zzz',
+      render: (o) => (
+        <div className="min-w-0">
+          <div className="truncate font-semibold text-[var(--cq-fg)]">{o.offer_number ?? 'Entwurf'}</div>
+          <div className="truncate text-[12px] text-[var(--cq-fg-subtle)]">
+            {[customerName(o), o.title].filter((v) => v && v !== '—').join(' · ') || '—'}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      sortValue: (o) => o.status,
+      render: (o) => (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} />
+          {pendingSend.has(o.id) && o.status !== 'sent' ? <StatusBadge label="Versand ausstehend" tone="info" /> : null}
+          {o.archived_at ? <StatusBadge label={offerDisplayStateLabel[offerDisplayState(o)]} tone={offerDisplayStateTone.archived} /> : null}
+        </div>
+      ),
+    },
+    {
+      key: 'valid',
+      header: 'Verlauf',
+      hideOnMobile: true,
+      sortValue: (o) => o.valid_until ?? '',
+      render: (o) => (
+        <div className="whitespace-nowrap text-[12.5px] leading-4">
+          <div className="text-[var(--cq-fg-muted)]">Erstellt {formatDateDe(o.created_at)}</div>
+          <div className="text-[var(--cq-fg-subtle)]">
+            {o.accepted_at ? `Angenommen ${formatDateDe(o.accepted_at)}`
+              : o.valid_until ? `Gültig bis ${formatDateDe(o.valid_until)}`
+              : 'ohne Frist'}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'gross',
+      header: 'Betrag',
+      align: 'right',
+      sortValue: (o) => offerPipelineSortValueCents(o),
+      render: (o) => (
+        <span className="whitespace-nowrap font-medium text-[var(--cq-fg)]">
+          {formatOfferAmount(o, o.currency, formatCents)}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      header: '',
+      align: 'right',
+      sticky: true,
+      hideOnCard: true,
+      render: (o) => (
+        <div className="flex items-center justify-end gap-0.5" onClick={(e) => e.stopPropagation()}>
+          {o.archived_at ? (
+            <IconButton icon={RotateCcw} label={`${o.offer_number ?? 'Angebot'} wiederherstellen`} variant="ghost" onClick={() => void unarchive(o)} />
+          ) : (
+            <IconButton
+              icon={o.status === 'draft' ? Trash2 : Archive}
+              label={`${o.offer_number ?? 'Entwurf'} ${o.status === 'draft' ? 'löschen' : 'archivieren'}`}
+              variant="ghost"
+              onClick={() => setArchiveTarget(o)}
+            />
+          )}
+        </div>
+      ),
+    },
+  ];
+
+  const stats: StatItem[] = [
+    {
+      key: 'open',
+      label: 'Beim Kunden',
+      value: formatCents(totals.open),
+      hint: totals.openMonthly > 0
+        ? `zzgl. ${formatCents(totals.openMonthly)}/Monat · noch kein Umsatz`
+        : 'versendet oder finalisiert · noch kein Umsatz',
+      lead: true,
+    },
+    {
+      key: 'accepted',
+      label: 'Angenommen',
+      value: formatCents(totals.accepted),
+      hint: totals.acceptedMonthly > 0 ? `zzgl. ${formatCents(totals.acceptedMonthly)}/Monat` : 'wird erst mit der Rechnung zu Umsatz',
+      tone: totals.accepted > 0 ? 'positive' : 'neutral',
+    },
+    { key: 'drafts', label: 'Entwürfe', value: String(totals.drafts), hint: 'noch nicht finalisiert' },
+    { key: 'sent', label: 'Versendet', value: String(counts.sent + counts.viewed), hint: `${counts.viewed} angesehen` },
+    { key: 'expired', label: 'Abgelaufen', value: String(counts.expired), hint: 'ohne Antwort verfallen', tone: counts.expired > 0 ? 'attention' : 'neutral' },
   ];
 
   const tabs = [
@@ -207,72 +291,121 @@ export function OffersPage() {
     { value: 'archived', label: 'Archiviert', count: counts.archived },
   ];
 
+  const advancedActive = Boolean(dateFrom || dateTo || minAmount || maxAmount);
+
   return (
     <>
-      <PageHeader
+      <WorkspaceHeader
+        eyebrow="Einnahmen"
         title="Angebote"
-        description="Professionelle Angebote mit serverseitig berechneten Summen, unveränderlichen finalisierten Versionen und sicherer Online-Annahme. Angenommene Angebote werden zu Rechnungsentwürfen — Rechnungen werden nie automatisch gestellt."
+        subtitle="Serverseitig berechnete Summen, unveränderliche finalisierte Versionen und sichere Online-Annahme. Ein angenommenes Angebot wird zum Rechnungsentwurf — eine Rechnung wird nie automatisch gestellt."
         actions={
-          <div className="flex items-center gap-2">
+          <>
             <ExportMenu onExport={runExport} disabled={!entity || offers.length === 0} includeIds={includeIds} onIncludeIdsChange={setIncludeIds}
               modes={[{ value: 'current', label: 'Aktuelle Ansicht', count: filtered.length }, { value: 'all', label: 'Alle Angebote', count: offers.length }]} />
             <Button icon={Plus} onClick={() => navigate('/admin/finance/offers/new')} disabled={!entity}>Neues Angebot</Button>
-          </div>
+          </>
+        }
+        toolbar={
+          !loading && offers.length > 0 ? (
+            <Toolbar
+              trailing={
+                <>
+                  <SearchInput
+                    value={query}
+                    onChange={setQuery}
+                    label="Angebote durchsuchen"
+                    placeholder="Nummer, Kunde, Titel …"
+                    className="w-full sm:w-64"
+                  />
+                  <div className="w-full sm:w-48">
+                    <Select id="offer-sort" value={sort} onChange={(v) => { setSort(v as SortKey); setTableSort(null); }}
+                      options={[
+                        { value: 'newest', label: 'Neueste zuerst' },
+                        { value: 'oldest', label: 'Älteste zuerst' },
+                        { value: 'amount', label: 'Betrag (absteigend)' },
+                        { value: 'customer', label: 'Kunde (A–Z)' },
+                        { value: 'status', label: 'Status' },
+                      ]} />
+                  </div>
+                  <Button
+                    variant={advancedOpen || advancedActive ? 'secondary' : 'ghost'}
+                    icon={SlidersHorizontal}
+                    aria-expanded={advancedOpen}
+                    onClick={() => setAdvancedOpen((open) => !open)}
+                  >
+                    Zeitraum & Betrag{advancedActive ? ' ·' : ''}
+                  </Button>
+                </>
+              }
+            >
+              <FilterChips
+                label="Angebote nach Status filtern"
+                value={statusFilter}
+                onChange={setStatusFilter}
+                options={tabs.filter((t) => t.value === 'all' || (t.count ?? 0) > 0)}
+              />
+            </Toolbar>
+          ) : undefined
         }
       />
 
-      {error ? <div className="mb-6"><ErrorState message={error} onRetry={() => void load()} /></div> : null}
+      {error ? <div className="mb-4"><ErrorState message={error} onRetry={() => void load()} /></div> : null}
 
-      {!loading && offers.length > 0 ? (
-        <div className="mb-6 grid gap-3 sm:grid-cols-3">
-          <KpiCard label="Offen (versendet)" valueCents={totals.open} basis="actual"
-            hint={totals.openMonthly > 0 ? `zzgl. ${formatCents(totals.openMonthly)} / Monat wiederkehrend` : undefined} />
-          <KpiCard label="Angenommen" valueCents={totals.accepted} basis="actual" tone={totals.accepted > 0 ? 'positive' : 'neutral'}
-            hint={totals.acceptedMonthly > 0 ? `zzgl. ${formatCents(totals.acceptedMonthly)} / Monat wiederkehrend` : undefined} />
-          <KpiCard label="Entwürfe" value={String(totals.drafts)} basis="actual" hint="noch nicht finalisiert" />
-        </div>
-      ) : null}
+      <div className="space-y-4">
+        {loading ? <StatBandSkeleton count={5} /> : offers.length > 0 ? <StatBand items={stats} /> : null}
 
-      {!loading && offers.length > 0 ? (
-        <div className="mb-4 space-y-3">
-          <Tabs value={statusFilter} onChange={setStatusFilter} tabs={tabs} />
-          <div className="grid gap-2 rounded-2xl border border-gray-100 bg-white p-3 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="relative sm:col-span-2 lg:col-span-1">
-              <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
-              <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Nummer, Kunde, Titel …" aria-label="Angebote durchsuchen"
-                className="h-11 w-full rounded-xl border border-gray-200 bg-white pl-9 pr-3 text-sm text-gray-900 outline-none focus:border-gray-400" />
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <Field id="date-from" label="Von" type="date" value={dateFrom} onChange={setDateFrom} />
-              <Field id="date-to" label="Bis" type="date" value={dateTo} onChange={setDateTo} />
-            </div>
-            <div className="grid grid-cols-2 gap-2">
+        {advancedOpen ? (
+          <Panel
+            title="Zeitraum & Betrag"
+            description="Filtert die Liste zusätzlich zum Status"
+            action={
+              advancedActive ? (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => { setDateFrom(''); setDateTo(''); setMinAmount(''); setMaxAmount(''); }}
+                >
+                  Zurücksetzen
+                </Button>
+              ) : undefined
+            }
+          >
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <Field id="date-from" label="Erstellt von" type="date" value={dateFrom} onChange={setDateFrom} />
+              <Field id="date-to" label="Erstellt bis" type="date" value={dateTo} onChange={setDateTo} />
               <Field id="min-amount" label="Betrag min." value={minAmount} onChange={setMinAmount} inputMode="decimal" prefix="€" />
               <Field id="max-amount" label="Betrag max." value={maxAmount} onChange={setMaxAmount} inputMode="decimal" prefix="€" />
             </div>
-            <Select id="offer-sort" label="Sortierung" value={sort} onChange={(v) => setSort(v as SortKey)}
-              options={[
-                { value: 'newest', label: 'Neueste zuerst' },
-                { value: 'oldest', label: 'Älteste zuerst' },
-                { value: 'amount', label: 'Betrag (absteigend)' },
-                { value: 'customer', label: 'Kunde (A–Z)' },
-                { value: 'status', label: 'Status' },
-              ]} />
-          </div>
-        </div>
-      ) : null}
+          </Panel>
+        ) : null}
 
-      {loading ? <TableSkeleton rows={5} cols={5} /> : filtered.length === 0 ? (
-        <EmptyState icon={FileSignature}
-          title={offers.length === 0 ? 'Noch keine Angebote' : 'Keine Angebote in dieser Ansicht'}
-          description={offers.length === 0 ? 'Erstellen Sie Ihr erstes Angebot. Es werden keine Beispieldaten angezeigt.' : 'Passen Sie Filter oder Suche an.'}
-          action={offers.length === 0 ? <Button icon={Plus} onClick={() => navigate('/admin/finance/offers/new')} disabled={!entity}>Neues Angebot</Button> : undefined} />
-      ) : (
-        <DataTable columns={columns} rows={filtered} getRowKey={(o) => o.id} minWidth={900}
-          onRowClick={(o) => navigate(`/admin/finance/offers/${o.id}`)}
-          mobileTitle={(o) => <div className="flex items-center gap-2"><span>{o.offer_number ?? 'Entwurf'}</span><StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} /></div>}
-          mobileSubtitle={(o) => o.title ?? 'ohne Titel'} />
-      )}
+        {loading ? <TableSkeleton rows={5} cols={5} /> : filtered.length === 0 ? (
+          <EmptyState icon={FileSignature}
+            title={offers.length === 0 ? 'Noch keine Angebote' : 'Keine Angebote in dieser Ansicht'}
+            description={offers.length === 0
+              ? 'Erstellen Sie Ihr erstes Angebot. Es werden keine Beispieldaten angezeigt.'
+              : 'Kein Angebot passt zu dieser Kombination aus Status, Suche und Zeitraum.'}
+            action={offers.length === 0
+              ? <Button icon={Plus} onClick={() => navigate('/admin/finance/offers/new')} disabled={!entity}>Neues Angebot</Button>
+              : (
+                <Button
+                  variant="secondary"
+                  onClick={() => { setStatusFilter('all'); setQuery(''); setDateFrom(''); setDateTo(''); setMinAmount(''); setMaxAmount(''); }}
+                >
+                  Filter zurücksetzen
+                </Button>
+              )} />
+        ) : (
+          <DataTable columns={columns} rows={filtered} getRowKey={(o) => o.id} minWidth={760}
+            sort={tableSort}
+            onSortChange={setTableSort}
+            rowHref={(o) => `/admin/finance/offers/${o.id}`}
+            onRowClick={(o) => navigate(`/admin/finance/offers/${o.id}`)}
+            mobileTitle={(o) => <div className="flex items-center gap-2"><span>{o.offer_number ?? 'Entwurf'}</span><StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} /></div>}
+            mobileSubtitle={(o) => [customerName(o), o.title].filter((v) => v && v !== '—').join(' · ') || 'ohne Titel'} />
+        )}
+      </div>
 
       <OfferArchiveDialog open={!!archiveTarget} offer={archiveTarget} onClose={() => setArchiveTarget(null)} onDone={() => void load()} />
     </>

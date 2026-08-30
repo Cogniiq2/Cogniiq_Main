@@ -92,7 +92,7 @@ const MODULES: ModuleConfig[] = [
         items: [
           // owner_customers is the canonical commercial customer. Everything else in this module
           // hangs off the portal tenant, which is a different object and is labelled as one.
-          { key: 'customers', label: 'Kunden', href: '/admin/finance/customers', icon: Users, ownerOnly: true },
+          { key: 'customers', label: 'Kundenstamm', href: '/admin/finance/customers', icon: Users, ownerOnly: true },
           { key: 'clients', label: 'Portalzugänge', href: '/admin/clients', icon: Building2 },
         ],
       },

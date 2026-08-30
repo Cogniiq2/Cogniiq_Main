@@ -1,10 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Pencil, CheckCircle2, RotateCcw, Archive, Trash2 } from 'lucide-react';
+import {
+  Archive, CheckCircle2, FileSignature, FileText, Mail, MapPin, Pencil, Phone, RotateCcw, Trash2,
+  Wallet,
+} from 'lucide-react';
 
 import {
-  Button, Card, DataTable, ErrorState, PageHeader, Select, StatusBadge, ConfirmDialog,
-  TableSkeleton, useToast, type Column,
+  Button, ConfirmDialog, DataTable, DefinitionGrid, ErrorState, HeaderMeta, LinkButton, Panel,
+  PanelLink, SectionNav, Select, StatBand, StatBandSkeleton, StatusBadge, TableSkeleton, Timeline,
+  WorkspaceHeader, useToast, type Column, type StatItem,
 } from '@/components/dashboard';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import {
@@ -24,6 +28,21 @@ import { invoiceStatusTone } from '@/pages/owner/ownerUi';
 import type {
   OwnerCustomerDetail, OwnerCustomerOfferRef, OwnerCustomerInvoiceRef, OwnerCustomerStatus,
 } from '@/lib/ownerFinance/types';
+
+/**
+ * Customer 360 — one customer, seen from every side the business has on them.
+ *
+ * The page is a single document with a sticky section switch rather than a stack of
+ * unlabelled cards: identity and money first, then what Cogniiq delivers, then the
+ * commercial record, then the work, then the history. Sections are real anchors, so
+ * they stay linkable and nothing is hidden behind a tab.
+ *
+ * It composes; it does not recompute. Every figure in the summary band is a sum over
+ * rows owner_customer_detail already returned, and the two that could be confused —
+ * what was invoiced and what was actually collected — are labelled apart and never
+ * added together. No finance logic is duplicated here, and no mutation reaches the
+ * database except through the same owner-gated RPCs as before.
+ */
 
 const invoiceStatusLabel: Record<string, string> = {
   draft: 'Entwurf', issued: 'Gestellt', partially_paid: 'Teilbezahlt', paid: 'Bezahlt',
@@ -45,10 +64,6 @@ function blockerSentence(b: OwnerCustomerDetail['delete_blockers']): string {
   if (parts.length === 1) return parts[0];
   return `${parts.slice(0, -1).join(', ')} und ${parts[parts.length - 1]}`;
 }
-
-// Dedicated customer detail workspace: customer information, related offers, the task checklist and
-// a sanitized activity timeline. The "als abgeschlossen markieren" action confirms first and warns
-// when open tasks remain — completion never touches tasks, offers or history. German throughout.
 
 export function CustomerDetailPage() {
   const { customerId } = useParams<{ customerId: string }>();
@@ -84,6 +99,28 @@ export function CustomerDetailPage() {
     () => (detail?.tasks ?? []).filter((t) => t.status === 'open' || t.status === 'in_progress').length,
     [detail],
   );
+
+  /**
+   * Money, kept honest.
+   *
+   * `invoiced` counts every invoice that was actually issued and not cancelled.
+   * `collected` counts recorded inbound payments — the only figure that means the
+   * customer paid. `open` is what those issued invoices still owe. They are three
+   * different facts and the band labels them as three different facts.
+   */
+  const money = useMemo(() => {
+    const invoices = detail?.invoices ?? [];
+    const live = invoices.filter((i) => !i.cancelled_at && i.status !== 'draft');
+    const invoiced = live.reduce((sum, i) => sum + i.gross_total_cents, 0);
+    const open = live
+      .filter((i) => ['issued', 'partially_paid', 'overdue'].includes(i.status))
+      .reduce((sum, i) => sum + Math.max(0, i.gross_total_cents - i.amount_paid_cents), 0);
+    const collected = (detail?.payments ?? [])
+      .filter((p) => p.direction === 'inflow')
+      .reduce((sum, p) => sum + p.amount_cents, 0);
+    const cancelled = invoices.filter((i) => i.cancelled_at).length;
+    return { invoiced, open, collected, cancelled, liveCount: live.length };
+  }, [detail]);
 
   const setStatus = async (status: OwnerCustomerStatus) => {
     if (!customerId) return;
@@ -128,54 +165,197 @@ export function CustomerDetailPage() {
     navigate('/admin/finance/customers');
   };
 
-  if (loading) return <div className="space-y-4"><div className="h-8 w-64 animate-pulse rounded-lg bg-gray-100" /><TableSkeleton rows={4} /></div>;
-  if (error || !detail) return <ErrorState message={error ?? 'Kunde nicht gefunden'} onRetry={() => void load()} />;
+  if (loading) {
+    return (
+      <>
+        <WorkspaceHeader crumbs={[{ label: 'Kunden', to: '/admin/finance/customers' }, { label: 'Wird geladen …' }]} title="Kunde" />
+        <div className="space-y-4">
+          <StatBandSkeleton count={5} />
+          <TableSkeleton rows={4} />
+        </div>
+      </>
+    );
+  }
+  if (error || !detail) {
+    return (
+      <>
+        <WorkspaceHeader crumbs={[{ label: 'Kunden', to: '/admin/finance/customers' }]} title="Kunde" />
+        <ErrorState message={error ?? 'Kunde nicht gefunden'} onRetry={() => void load()} />
+      </>
+    );
+  }
 
   const c = detail.customer;
   const name = customerDisplayName(c);
+  const address = [c.street, [c.postal_code, c.city].filter(Boolean).join(' '), c.country_code]
+    .filter(Boolean).join(', ');
+
+  const stats: StatItem[] = [
+    {
+      key: 'collected',
+      label: 'Tatsächlich bezahlt',
+      value: formatCentsCurrencyDe(money.collected),
+      hint: 'erfasste Zahlungseingänge dieses Kunden',
+      lead: true,
+      tone: money.collected > 0 ? 'positive' : 'neutral',
+    },
+    {
+      key: 'invoiced',
+      label: 'Fakturiert',
+      value: formatCentsCurrencyDe(money.invoiced),
+      hint: `${money.liveCount} gestellte Rechnungen${money.cancelled > 0 ? ` · ${money.cancelled} storniert` : ''}`,
+    },
+    {
+      key: 'open',
+      label: 'Noch offen',
+      value: formatCentsCurrencyDe(money.open),
+      hint: money.open > 0 ? 'aus gestellten Rechnungen' : 'nichts offen',
+      tone: money.open > 0 ? 'attention' : 'neutral',
+    },
+    {
+      key: 'offers',
+      label: 'Angebote',
+      value: String(detail.offers.length),
+      hint: `${detail.offers.filter((o) => o.accepted_at).length} angenommen`,
+    },
+    {
+      key: 'tasks',
+      label: 'Offene Aufgaben',
+      value: String(openTaskCount),
+      hint: `${detail.tasks.filter((t) => t.status === 'completed').length} erledigt`,
+      tone: openTaskCount > 0 ? 'attention' : 'neutral',
+    },
+  ];
 
   const offerColumns: Column<OwnerCustomerOfferRef>[] = [
-    { key: 'number', header: 'Nummer', render: (o) => <span className="font-semibold text-gray-950">{o.offer_number ?? 'Entwurf'}</span> },
-    { key: 'title', header: 'Titel', render: (o) => <span className="text-gray-600">{o.title ?? '—'}</span> },
-    { key: 'amount', header: 'Betrag', align: 'right', render: (o) => <span className="tabular-nums font-medium text-gray-900">{formatOfferAmount(o, o.currency, formatCentsCurrencyDe)}</span> },
-    { key: 'status', header: 'Status', render: (o) => (
-      <div className="flex items-center gap-1.5">
-        <StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} />
-        {o.archived_at ? <StatusBadge label="Archiviert" tone="neutral" /> : null}
-      </div>
-    ) },
-    { key: 'created', header: 'Erstellt', render: (o) => <span className="text-gray-500">{formatDateDe(o.created_at)}</span>, hideOnMobile: true },
-    { key: 'valid', header: 'Gültig bis', render: (o) => <span className="text-gray-500">{o.valid_until ? formatDateDe(o.valid_until) : '—'}</span>, hideOnMobile: true },
-    { key: 'sent', header: 'Versendet', render: (o) => <span className="text-gray-500">{o.sent_at ? formatDateDe(o.sent_at) : '—'}</span>, hideOnMobile: true },
-    { key: 'accepted', header: 'Angenommen', render: (o) => <span className="text-gray-500">{o.accepted_at ? formatDateDe(o.accepted_at) : '—'}</span>, hideOnMobile: true },
+    {
+      key: 'offer',
+      header: 'Angebot',
+      render: (o) => (
+        <div className="min-w-0">
+          <div className="truncate font-semibold text-[var(--cq-fg)]">{o.offer_number ?? 'Entwurf'}</div>
+          <div className="truncate text-[12px] text-[var(--cq-fg-subtle)]">{o.title ?? '—'}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (o) => (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} />
+          {o.archived_at ? <StatusBadge label="Archiviert" tone="neutral" /> : null}
+        </div>
+      ),
+    },
+    {
+      key: 'amount',
+      header: 'Betrag',
+      align: 'right',
+      render: (o) => <span className="font-medium text-[var(--cq-fg)]">{formatOfferAmount(o, o.currency, formatCentsCurrencyDe)}</span>,
+    },
+    {
+      key: 'timeline',
+      header: 'Verlauf',
+      align: 'right',
+      hideOnMobile: true,
+      render: (o) => (
+        <div className="text-[12px] leading-4 text-[var(--cq-fg-subtle)]">
+          <div>Erstellt {formatDateDe(o.created_at)}</div>
+          <div>
+            {o.accepted_at ? `Angenommen ${formatDateDe(o.accepted_at)}`
+              : o.sent_at ? `Versendet ${formatDateDe(o.sent_at)}`
+              : o.valid_until ? `Gültig bis ${formatDateDe(o.valid_until)}`
+              : 'Noch nicht versendet'}
+          </div>
+        </div>
+      ),
+    },
   ];
 
   const invoiceColumns: Column<OwnerCustomerInvoiceRef>[] = [
-    { key: 'number', header: 'Nummer', render: (i) => <span className="font-semibold text-gray-950">{i.invoice_number ?? 'Entwurf'}</span> },
-    { key: 'status', header: 'Status', render: (i) => (
-      <div className="flex items-center gap-1.5">
-        <StatusBadge label={invoiceStatusLabel[i.status] ?? i.status} tone={invoiceStatusTone[i.status]} />
-      </div>
-    ) },
-    { key: 'gross', header: 'Brutto', align: 'right', render: (i) => <span className="tabular-nums font-medium text-gray-900">{formatCentsCurrencyDe(i.gross_total_cents, i.currency)}</span> },
-    { key: 'open', header: 'Offen', align: 'right', render: (i) => <span className="tabular-nums">{formatCentsCurrencyDe(i.gross_total_cents - i.amount_paid_cents, i.currency)}</span>, hideOnMobile: true },
-    { key: 'issue', header: 'Datum', render: (i) => <span className="text-gray-500">{i.issue_date ? formatDateDe(i.issue_date) : '—'}</span>, hideOnMobile: true },
-    { key: 'due', header: 'Fällig', render: (i) => <span className="text-gray-500">{i.due_date ? formatDateDe(i.due_date) : '—'}</span>, hideOnMobile: true },
+    {
+      key: 'number',
+      header: 'Rechnung',
+      render: (i) => (
+        <div className="min-w-0">
+          <div className="truncate font-semibold text-[var(--cq-fg)]">{i.invoice_number ?? 'Entwurf'}</div>
+          <div className="truncate text-[12px] text-[var(--cq-fg-subtle)]">
+            {i.issue_date ? `Gestellt ${formatDateDe(i.issue_date)}` : 'Noch nicht gestellt'}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (i) => (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <StatusBadge label={invoiceStatusLabel[i.status] ?? i.status} tone={invoiceStatusTone[i.status]} />
+          {i.cancelled_at ? <StatusBadge label="Storno" tone="neutral" /> : null}
+        </div>
+      ),
+    },
+    {
+      key: 'gross',
+      header: 'Brutto',
+      align: 'right',
+      render: (i) => <span className="font-medium text-[var(--cq-fg)]">{formatCentsCurrencyDe(i.gross_total_cents, i.currency)}</span>,
+    },
+    {
+      key: 'open',
+      header: 'Offen',
+      align: 'right',
+      render: (i) => {
+        const open = i.cancelled_at ? 0 : Math.max(0, i.gross_total_cents - i.amount_paid_cents);
+        return (
+          <span className={open > 0 ? 'font-medium text-amber-700' : 'text-[var(--cq-fg-subtle)]'}>
+            {formatCentsCurrencyDe(open, i.currency)}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'due',
+      header: 'Fällig',
+      align: 'right',
+      hideOnMobile: true,
+      render: (i) => <span className="text-[var(--cq-fg-subtle)]">{i.due_date ? formatDateDe(i.due_date) : '—'}</span>,
+    },
+  ];
+
+  const sections = [
+    { id: 'leistungen', label: 'Leistungen' },
+    { id: 'angebote', label: 'Angebote', count: detail.offers.length },
+    { id: 'rechnungen', label: 'Rechnungen', count: detail.invoices.length },
+    { id: 'aufgaben', label: 'Aufgaben', count: openTaskCount },
+    { id: 'projekt', label: 'Projekt' },
+    { id: 'stammdaten', label: 'Stammdaten' },
   ];
 
   return (
     <>
-      <PageHeader
+      <WorkspaceHeader
+        crumbs={[{ label: 'Kunden', to: '/admin/finance/customers' }, { label: name }]}
         title={name}
-        breadcrumb={<button onClick={() => navigate('/admin/finance/customers')} className="inline-flex items-center gap-1 text-[13px] font-medium text-gray-500 hover:text-gray-900"><ArrowLeft size={14} /> Kunden &amp; Aufgaben</button>}
+        status={<StatusBadge label={customerStatusLabel[c.status]} tone={customerStatusTone[c.status]} />}
+        meta={
+          <>
+            {c.email ? <HeaderMeta label="E-Mail">{c.email}</HeaderMeta> : null}
+            {c.phone ? <HeaderMeta label="Telefon">{c.phone}</HeaderMeta> : null}
+            {c.city ? <HeaderMeta label="Ort">{c.city}</HeaderMeta> : null}
+            <HeaderMeta label="Kunde seit">{formatDateDe(c.created_at)}</HeaderMeta>
+            <HeaderMeta label="Letzte Aktivität">{formatDateDe(c.last_activity_at)}</HeaderMeta>
+          </>
+        }
         actions={
-          <div className="flex flex-wrap items-center gap-2">
+          <>
             <Button variant="secondary" icon={Pencil} onClick={() => setEditOpen(true)}>Bearbeiten</Button>
             {c.status === 'completed' ? (
               <Button variant="secondary" icon={RotateCcw} onClick={() => void setStatus('active')}>Wieder öffnen</Button>
-            ) : (
-              <Button icon={CheckCircle2} onClick={() => setCompleteOpen(true)}>Als abgeschlossen markieren</Button>
-            )}
+            ) : c.status !== 'archived' ? (
+              <Button icon={CheckCircle2} onClick={() => setCompleteOpen(true)}>Abschließen</Button>
+            ) : null}
             {c.status === 'archived' ? (
               <Button variant="secondary" icon={RotateCcw} onClick={() => void restore()}>Wiederherstellen</Button>
             ) : (
@@ -199,36 +379,61 @@ export function CustomerDetailPage() {
             >
               Löschen
             </Button>
-          </div>
+          </>
         }
       />
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
-        {/* Main column: services, offers, invoices, tasks */}
-        <div className="space-y-5">
-          {/* Services come first: which Cogniiq services this customer receives, and how far each
-              delivery has progressed, is the fastest read on the whole relationship. */}
-          <CustomerServicesPanel
-            key={servicesVersion}
-            customerId={c.id}
-            onServicesChanged={() => void load()}
-            onLoaded={(services) => setActiveServices(services.filter((s) => s.state !== 'archived').map((s) => s.service_key))}
-          />
+      <div className="mb-4"><StatBand items={stats} /></div>
 
-          <Card className="p-5">
-            <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-[15px] font-semibold text-gray-950">Angebote</h3>
-              <span className="text-[12px] text-gray-400">{detail.offers.length} gesamt</span>
-            </div>
+      <SectionNav sections={sections} />
+
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="space-y-4">
+          {/* Services first: which Cogniiq services this customer receives, and how far each
+              delivery has progressed, is the fastest read on the whole relationship. */}
+          <section id="leistungen" className="scroll-mt-20">
+            <CustomerServicesPanel
+              key={servicesVersion}
+              customerId={c.id}
+              onServicesChanged={() => void load()}
+              onLoaded={(services) => setActiveServices(services.filter((s) => s.state !== 'archived').map((s) => s.service_key))}
+            />
+          </section>
+
+          <Panel
+            id="angebote"
+            className="scroll-mt-20"
+            title="Angebote"
+            description="Der kommerzielle Verlauf dieses Kunden"
+            count={detail.offers.length}
+            icon={FileSignature}
+            action={<PanelLink to="/admin/finance/offers">Alle Angebote</PanelLink>}
+            flush={detail.offers.length > 0}
+          >
             {detail.offers.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-gray-200 px-4 py-8 text-center text-[13px] text-gray-500">Noch keine Angebote für diesen Kunden.</div>
+              <div className="py-8 text-center">
+                <p className="text-[13px] leading-5 text-[var(--cq-fg-muted)]">Für diesen Kunden gibt es noch kein Angebot.</p>
+                <div className="mt-3"><LinkButton to="/admin/finance/offers/new" icon={FileSignature}>Angebot erstellen</LinkButton></div>
+              </div>
             ) : (
-              <DataTable columns={offerColumns} rows={detail.offers} getRowKey={(o) => o.id} minWidth={760}
+              <DataTable
+                columns={offerColumns}
+                rows={detail.offers}
+                getRowKey={(o) => o.id}
+                minWidth={640}
+                density="compact"
+                rowHref={(o) => `/admin/finance/offers/${o.id}`}
                 onRowClick={(o) => navigate(`/admin/finance/offers/${o.id}`)}
-                mobileTitle={(o) => <div className="flex items-center gap-2"><span>{o.offer_number ?? 'Entwurf'}</span><StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} /></div>}
-                mobileSubtitle={(o) => formatOfferAmount(o, o.currency, formatCentsCurrencyDe)} />
+                mobileTitle={(o) => (
+                  <div className="flex items-center gap-2">
+                    <span>{o.offer_number ?? 'Entwurf'}</span>
+                    <StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} />
+                  </div>
+                )}
+                mobileSubtitle={(o) => o.title ?? formatOfferAmount(o, o.currency, formatCentsCurrencyDe)}
+              />
             )}
-          </Card>
+          </Panel>
 
           {/*
             Invoices belong on the customer, not only in the finance list: this is
@@ -236,79 +441,141 @@ export function CustomerDetailPage() {
             record. Cancelled invoices stay visible — a Storno is part of the
             history, not its removal.
           */}
-          <Card className="p-5">
-            <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-[15px] font-semibold text-gray-950">Rechnungen</h3>
-              <span className="text-[12px] text-gray-400">{detail.invoices.length} gesamt</span>
-            </div>
+          <Panel
+            id="rechnungen"
+            className="scroll-mt-20"
+            title="Rechnungen & Zahlungen"
+            description="Stornierte Rechnungen bleiben sichtbar — ein Storno ist Teil der Historie"
+            count={detail.invoices.length}
+            icon={FileText}
+            action={<PanelLink to="/admin/finance/invoices">Alle Rechnungen</PanelLink>}
+            flush={detail.invoices.length > 0}
+            footer={
+              detail.payments.length > 0 ? (
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-[12.5px] leading-5 text-[var(--cq-fg-muted)]">
+                    {detail.payments.filter((p) => p.direction === 'inflow').length} erfasste Zahlungseingänge
+                  </span>
+                  <span className="text-[13px] font-semibold tabular-nums text-[var(--cq-fg)]">
+                    {formatCentsCurrencyDe(money.collected)} tatsächlich bezahlt
+                  </span>
+                </div>
+              ) : undefined
+            }
+          >
             {detail.invoices.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-gray-200 px-4 py-8 text-center text-[13px] text-gray-500">Noch keine Rechnungen für diesen Kunden.</div>
+              <div className="py-8 text-center">
+                <p className="text-[13px] leading-5 text-[var(--cq-fg-muted)]">Für diesen Kunden gibt es noch keine Rechnung.</p>
+                <div className="mt-3"><LinkButton to="/admin/finance/invoices" icon={Wallet}>Zu den Rechnungen</LinkButton></div>
+              </div>
             ) : (
-              <DataTable columns={invoiceColumns} rows={detail.invoices} getRowKey={(i) => i.id} minWidth={700}
+              <DataTable
+                columns={invoiceColumns}
+                rows={detail.invoices}
+                getRowKey={(i) => i.id}
+                minWidth={620}
+                density="compact"
+                rowHref={(i) => `/admin/finance/invoices/${i.id}`}
                 onRowClick={(i) => navigate(`/admin/finance/invoices/${i.id}`)}
-                mobileTitle={(i) => <div className="flex items-center gap-2"><span>{i.invoice_number ?? 'Entwurf'}</span><StatusBadge label={invoiceStatusLabel[i.status] ?? i.status} tone={invoiceStatusTone[i.status]} /></div>}
-                mobileSubtitle={(i) => formatCentsCurrencyDe(i.gross_total_cents, i.currency)} />
+                mobileTitle={(i) => (
+                  <div className="flex items-center gap-2">
+                    <span>{i.invoice_number ?? 'Entwurf'}</span>
+                    <StatusBadge label={invoiceStatusLabel[i.status] ?? i.status} tone={invoiceStatusTone[i.status]} />
+                  </div>
+                )}
+                mobileSubtitle={(i) => formatCentsCurrencyDe(i.gross_total_cents, i.currency)}
+              />
             )}
-          </Card>
+          </Panel>
 
-          <Card className="p-5">
+          {/* The checklist owns its own header and "Aufgabe" action, so it sits in a
+              bare panel — wrapping it in a titled one would name the section twice. */}
+          <Panel id="aufgaben" className="scroll-mt-20">
             <CustomerTaskChecklist customerId={c.id} tasks={detail.tasks} onChanged={() => void load()} />
-          </Card>
+          </Panel>
 
           {/* Customer-VISIBLE project projection. Deliberately separate from the internal
               task checklist above: nothing edited there ever reaches the portal. */}
-          <CustomerProjectPanel
-            ownerCustomerId={c.id}
-            organizationId={c.organization_id}
-            clientAccountId={c.client_account_id}
-          />
+          <section id="projekt" className="scroll-mt-20">
+            <CustomerProjectPanel
+              ownerCustomerId={c.id}
+              organizationId={c.organization_id}
+              clientAccountId={c.client_account_id}
+            />
+          </section>
         </div>
 
-        {/* Side column: info + status + activity */}
-        <div className="space-y-5">
-          <Card className="p-5">
-            <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-[15px] font-semibold text-gray-950">Kundendaten</h3>
-              <StatusBadge label={customerStatusLabel[c.status]} tone={customerStatusTone[c.status]} />
-            </div>
-            <dl className="space-y-2 text-[13px]">
-              <Row label="Firma" value={c.company} />
-              <Row label="Ansprechpartner" value={c.contact_name} />
-              <Row label="E-Mail" value={c.email} />
-              <Row label="Telefon" value={c.phone} />
-              <Row label="Adresse" value={[c.street, [c.postal_code, c.city].filter(Boolean).join(' '), c.country_code].filter(Boolean).join(', ') || null} />
-              <Row label="Angelegt" value={formatDateDe(c.created_at)} />
-              <Row label="Letzte Aktivität" value={formatDateDe(c.last_activity_at)} />
-              {c.completed_at ? <Row label="Abgeschlossen am" value={formatDateDe(c.completed_at)} /> : null}
-            </dl>
+        {/* Context column: identity, status, notes, history. */}
+        <div className="space-y-4">
+          <Panel id="stammdaten" className="scroll-mt-20" title="Stammdaten">
+            <DefinitionGrid
+              items={[
+                { label: 'Firma', value: c.company || '—' },
+                { label: 'Ansprechpartner', value: c.contact_name || '—' },
+                {
+                  label: 'E-Mail',
+                  value: c.email ? (
+                    <a href={`mailto:${c.email}`} className="inline-flex items-center gap-1.5 underline-offset-2 hover:underline">
+                      <Mail size={12} aria-hidden="true" />{c.email}
+                    </a>
+                  ) : '—',
+                },
+                {
+                  label: 'Telefon',
+                  value: c.phone ? (
+                    <a href={`tel:${c.phone.replace(/\s/g, '')}`} className="inline-flex items-center gap-1.5 underline-offset-2 hover:underline">
+                      <Phone size={12} aria-hidden="true" />{c.phone}
+                    </a>
+                  ) : '—',
+                },
+                {
+                  label: 'Adresse',
+                  value: address ? (
+                    <span className="inline-flex items-start gap-1.5">
+                      <MapPin size={12} className="mt-0.5 shrink-0" aria-hidden="true" />{address}
+                    </span>
+                  ) : '—',
+                },
+                { label: 'Portalzugang', value: c.organization_id ? 'Verknüpft' : 'Nicht verknüpft' },
+                ...(c.completed_at ? [{ label: 'Abgeschlossen am', value: formatDateDe(c.completed_at) }] : []),
+              ]}
+            />
             <div className="mt-4">
-              <Select id="cust-status" label="Status ändern" value={c.status} onChange={(v) => void setStatus(v as OwnerCustomerStatus)}
+              <Select
+                id="cust-status"
+                label="Status ändern"
+                value={c.status}
+                onChange={(v) => void setStatus(v as OwnerCustomerStatus)}
                 options={[
                   { value: 'active', label: 'Aktiv' },
                   { value: 'waiting', label: 'Wartend' },
                   { value: 'completed', label: 'Abgeschlossen' },
                   { value: 'archived', label: 'Archiviert' },
-                ]} />
+                ]}
+                hint="Rein operativ — Rechnungen, Zahlungen und Angebote bleiben unverändert."
+              />
             </div>
-            {c.notes ? <div className="mt-4 rounded-xl bg-gray-50 p-3 text-[12.5px] text-gray-600 [overflow-wrap:anywhere] whitespace-pre-line">{c.notes}</div> : null}
-          </Card>
+          </Panel>
 
-          <Card className="p-5">
-            <h3 className="mb-3 text-[15px] font-semibold text-gray-950">Aktivität</h3>
+          {c.notes ? (
+            <Panel title="Notiz">
+              <p className="whitespace-pre-line text-[12.5px] leading-5 text-[var(--cq-fg-muted)] [overflow-wrap:anywhere]">{c.notes}</p>
+            </Panel>
+          ) : null}
+
+          <Panel title="Aktivität" count={detail.activity.length}>
             {detail.activity.length === 0 ? (
-              <p className="text-[13px] text-gray-400">Noch keine Aktivität.</p>
+              <p className="py-4 text-center text-[13px] leading-5 text-[var(--cq-fg-muted)]">Noch keine Aktivität erfasst.</p>
             ) : (
-              <ul className="space-y-3">
-                {detail.activity.map((a) => (
-                  <li key={a.id} className="relative pl-4">
-                    <span className="absolute left-0 top-1.5 h-1.5 w-1.5 rounded-full bg-gray-300" />
-                    <div className="text-[13px] text-gray-700 [overflow-wrap:anywhere]">{a.summary}</div>
-                    <div className="text-[11px] text-gray-400">{formatDateDe(a.created_at)}</div>
-                  </li>
-                ))}
-              </ul>
+              <Timeline
+                items={detail.activity.map((a) => ({
+                  id: a.id,
+                  title: a.summary,
+                  time: formatDateDe(a.created_at),
+                }))}
+              />
             )}
-          </Card>
+          </Panel>
         </div>
       </div>
 
@@ -335,7 +602,7 @@ export function CustomerDetailPage() {
         message={
           <>
             <p>
-              <span className="font-semibold text-gray-950">{name}</span> wird aus der aktiven
+              <span className="font-semibold text-[var(--cq-fg)]">{name}</span> wird aus der aktiven
               Kundenliste und aus den Auswahlfeldern im Finanzbereich ausgeblendet.
             </p>
             <p className="mt-2">
@@ -356,7 +623,7 @@ export function CustomerDetailPage() {
         message={
           <>
             <p>
-              <span className="font-semibold text-gray-950">{name}</span> wird dauerhaft gelöscht.
+              <span className="font-semibold text-[var(--cq-fg)]">{name}</span> wird dauerhaft gelöscht.
               Diese Aktion kann nicht rückgängig gemacht werden.
             </p>
             {detail.delete_blockers.draft_invoices + detail.delete_blockers.draft_offers > 0 ? (
@@ -398,15 +665,6 @@ export function CustomerDetailPage() {
           </>
         } />
     </>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string | null }) {
-  return (
-    <div className="flex justify-between gap-4">
-      <dt className="shrink-0 text-gray-400">{label}</dt>
-      <dd className="min-w-0 text-right text-gray-800 [overflow-wrap:anywhere]">{value || '—'}</dd>
-    </div>
   );
 }
 

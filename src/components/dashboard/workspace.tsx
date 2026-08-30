@@ -424,8 +424,11 @@ export const SearchInput = forwardRef<HTMLInputElement, {
         placeholder={placeholder}
         aria-label={label}
         className={cn(
-          'w-full bg-[var(--cq-surface)] pl-8 pr-8 text-[13px] text-[var(--cq-fg)] outline-none',
+          'w-full bg-[var(--cq-surface)] text-[13px] text-[var(--cq-fg)] outline-none',
           control.md, border.hairline, radius.md, interactive.transition, focusRing,
+          // AFTER control.md: cn() runs tailwind-merge, and control.md's `px-3` would
+          // otherwise drop these, putting the placeholder's first character under the icon.
+          'pl-9 pr-8',
           'placeholder:text-[var(--cq-fg-subtle)] hover:border-[var(--cq-border-strong)]',
           '[&::-webkit-search-cancel-button]:appearance-none',
         )}

@@ -1,26 +1,36 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Plus, Search, Archive, RotateCcw, Trash2 } from 'lucide-react';
+import { Archive, Plus, RotateCcw, Search, Trash2, Users } from 'lucide-react';
 
 import {
-  Button, ConfirmDialog, DataTable, EmptyState, ErrorState, IconButton, KpiCard, PageHeader, Select,
-  StatusBadge, Tabs, TableSkeleton, useToast, type Column,
+  Button, ConfirmDialog, DataTable, EmptyState, ErrorState, FilterChips, IconButton,
+  SearchInput, Select, StatBand, StatBandSkeleton, StatusBadge, TableSkeleton, Toolbar,
+  WorkspaceHeader, useToast, type Column, type SortDirection, type StatItem,
 } from '@/components/dashboard';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import {
   loadCustomers, loadDeleteBlockers, archiveCustomer, unarchiveCustomer, deleteCustomer,
 } from '@/lib/ownerFinance/customersApi';
-import { formatDateDe } from '@/lib/ownerFinance/exports';
+import { formatCentsCurrencyDe, formatDateDe } from '@/lib/ownerFinance/exports';
 import { customerStatusLabel, customerStatusTone, customerDisplayName } from '@/lib/ownerFinance/customerLabels';
 import { CustomerFormDialog } from '@/components/finance/CustomerFormDialog';
-import { formatCentsCurrencyDe } from '@/lib/ownerFinance/exports';
 import type { OwnerCustomerListRow, OwnerCustomerDeleteBlockers } from '@/lib/ownerFinance/types';
 
-// Primary operational workspace for owner-side customer management. All customers in one overview
-// with status/task filters, search, sorting and clear empty/loading/error states. Matches the
-// existing owner dashboard design system. German throughout.
+/**
+ * The customer workspace — the list the whole operating system hangs off.
+ *
+ * The previous version showed eleven equally-weighted columns (e-mail, phone, offers,
+ * invoices, revenue, open tasks, done tasks, status, activity, created, actions) which
+ * overflowed its own container and left the owner reading a spreadsheet. This one asks
+ * what the list is actually for: who is this, what commercial state are they in, what
+ * do they owe, and what work is open. Everything else moved into the customer's own
+ * page, where there is room for it.
+ *
+ * The data is unchanged — the same owner_list_customers row, the same RPCs behind the
+ * same archive/delete boundaries.
+ */
 
-type SortKey = 'newest' | 'oldest' | 'activity' | 'name';
+type SortKey = 'activity' | 'name' | 'revenue' | 'work' | 'created';
 
 /** Names only the non-zero reasons a customer cannot be deleted. */
 function blockerSentence(b: OwnerCustomerDeleteBlockers): string {
@@ -35,14 +45,21 @@ function blockerSentence(b: OwnerCustomerDeleteBlockers): string {
 }
 
 const FILTERS: { value: string; label: string; match: (c: OwnerCustomerListRow) => boolean }[] = [
-  { value: 'all', label: 'Alle', match: () => true },
+  { value: 'all', label: 'Alle', match: (c) => c.status !== 'archived' },
   { value: 'active', label: 'Aktiv', match: (c) => c.status === 'active' },
   { value: 'waiting', label: 'Wartend', match: (c) => c.status === 'waiting' },
+  { value: 'open_work', label: 'Offene Arbeit', match: (c) => c.status !== 'archived' && (c.open_task_count > 0 || c.open_invoice_count > 0) },
   { value: 'completed', label: 'Abgeschlossen', match: (c) => c.status === 'completed' },
   { value: 'archived', label: 'Archiviert', match: (c) => c.status === 'archived' },
-  { value: 'with_open', label: 'Mit offenen Aufgaben', match: (c) => c.open_task_count > 0 },
-  { value: 'without_open', label: 'Ohne offene Aufgaben', match: (c) => c.open_task_count === 0 },
 ];
+
+/** Two-letter monogram for the row's identity chip. Never derived from an e-mail domain. */
+function initials(row: OwnerCustomerListRow): string {
+  const source = (row.company?.trim() || row.contact_name?.trim() || row.email?.trim() || '?');
+  const words = source.split(/\s+/).filter(Boolean);
+  if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+  return source.slice(0, 2).toUpperCase();
+}
 
 export function CustomersPage() {
   const { entity } = useOwnerEntity();
@@ -53,6 +70,7 @@ export function CustomersPage() {
   const [filter, setFilter] = useState('all');
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<SortKey>('activity');
+  const [tableSort, setTableSort] = useState<{ key: string; direction: SortDirection } | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   /* Row actions. Blockers are fetched when the dialog opens so the confirmation
      can name what stands in the way instead of only refusing on submit. */
@@ -104,6 +122,7 @@ export function CustomersPage() {
   const runRestore = useCallback(async (row: OwnerCustomerListRow) => {
     const { error: err } = await unarchiveCustomer(row.id);
     if (err) { toast.error('Wiederherstellen fehlgeschlagen', err); return; }
+    toast.success('Kunde wiederhergestellt', customerDisplayName(row));
     void load();
   }, [toast, load]);
 
@@ -113,24 +132,40 @@ export function CustomersPage() {
     return c;
   }, [rows]);
 
-  const kpis = useMemo(() => ({
-    total: rows.length,
-    active: rows.filter((c) => c.status === 'active').length,
-    openTasks: rows.reduce((s, c) => s + c.open_task_count, 0),
-  }), [rows]);
+  const stats: StatItem[] = useMemo(() => {
+    const live = rows.filter((c) => c.status !== 'archived');
+    const openTasks = live.reduce((sum, c) => sum + c.open_task_count, 0);
+    const openInvoices = live.reduce((sum, c) => sum + c.open_invoice_count, 0);
+    const revenue = rows.reduce((sum, c) => sum + c.revenue_gross_cents, 0);
+    return [
+      {
+        key: 'revenue',
+        label: 'Fakturiert gesamt',
+        value: formatCentsCurrencyDe(revenue),
+        hint: 'Summe aller gestellten Rechnungen je Kunde',
+        lead: true,
+      },
+      { key: 'active', label: 'Aktive Kunden', value: String(live.filter((c) => c.status === 'active').length), hint: `${live.length} nicht archiviert` },
+      { key: 'waiting', label: 'Wartend', value: String(live.filter((c) => c.status === 'waiting').length), hint: 'warten auf Zuarbeit', tone: live.some((c) => c.status === 'waiting') ? 'attention' : 'neutral' },
+      { key: 'tasks', label: 'Offene Aufgaben', value: String(openTasks), hint: 'über alle Kunden' },
+      { key: 'invoices', label: 'Offene Rechnungen', value: String(openInvoices), hint: 'noch nicht vollständig bezahlt', to: '/admin/finance/invoices' },
+    ];
+  }, [rows]);
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
     const base = rows.filter(FILTERS.find((f) => f.value === filter)?.match ?? (() => true));
     const searched = q
-      ? base.filter((c) => [c.company, c.contact_name, c.email].some((v) => (v ?? '').toLowerCase().includes(q)))
+      ? base.filter((c) => [c.company, c.contact_name, c.email, c.city, c.phone]
+          .some((v) => (v ?? '').toLowerCase().includes(q)))
       : base;
     const sorted = [...searched];
     sorted.sort((a, b) => {
       switch (sort) {
-        case 'newest': return b.created_at.localeCompare(a.created_at);
-        case 'oldest': return a.created_at.localeCompare(b.created_at);
+        case 'created': return b.created_at.localeCompare(a.created_at);
         case 'name': return customerDisplayName(a).localeCompare(customerDisplayName(b), 'de');
+        case 'revenue': return b.revenue_gross_cents - a.revenue_gross_cents;
+        case 'work': return (b.open_task_count + b.open_invoice_count) - (a.open_task_count + a.open_invoice_count);
         case 'activity': default: return b.last_activity_at.localeCompare(a.last_activity_at);
       }
     });
@@ -138,31 +173,106 @@ export function CustomersPage() {
   }, [rows, filter, query, sort]);
 
   const columns: Column<OwnerCustomerListRow>[] = [
-    { key: 'name', header: 'Kunde', render: (c) => (
-      <div className="min-w-0">
-        <div className="font-semibold text-gray-950">{customerDisplayName(c)}</div>
-        {c.contact_name && c.company ? <div className="text-[12px] text-gray-500">{c.contact_name}</div> : null}
-      </div>
-    ) },
-    { key: 'email', header: 'E-Mail', render: (c) => <span className="text-gray-600">{c.email ?? '—'}</span>, hideOnMobile: true },
-    { key: 'phone', header: 'Telefon', render: (c) => <span className="text-gray-600">{c.phone ?? '—'}</span>, hideOnMobile: true },
-    { key: 'offers', header: 'Angebote', align: 'right', render: (c) => <span className="tabular-nums text-gray-700">{c.offer_count}</span> },
-    { key: 'invoices', header: 'Rechnungen', align: 'right', render: (c) => <span className="tabular-nums text-gray-700">{c.invoice_count}</span>, hideOnMobile: true },
-    { key: 'revenue', header: 'Umsatz', align: 'right', render: (c) => <span className="tabular-nums text-gray-700">{formatCentsCurrencyDe(c.revenue_gross_cents, 'EUR')}</span>, hideOnMobile: true },
-    { key: 'open', header: 'Offene Aufgaben', align: 'right', render: (c) => <span className={`tabular-nums font-medium ${c.open_task_count > 0 ? 'text-amber-700' : 'text-gray-400'}`}>{c.open_task_count}</span> },
-    { key: 'done', header: 'Erledigt', align: 'right', render: (c) => <span className="tabular-nums text-gray-500">{c.completed_task_count}</span>, hideOnMobile: true },
-    { key: 'status', header: 'Status', render: (c) => <StatusBadge label={customerStatusLabel[c.status]} tone={customerStatusTone[c.status]} /> },
-    { key: 'activity', header: 'Letzte Aktivität', render: (c) => <span className="text-gray-500">{formatDateDe(c.last_activity_at)}</span>, hideOnMobile: true },
-    { key: 'created', header: 'Angelegt', render: (c) => <span className="text-gray-500">{formatDateDe(c.created_at)}</span>, hideOnMobile: true },
     {
-      key: 'actions', header: '', align: 'right', render: (c) => (
+      key: 'name',
+      header: 'Kunde',
+      sortValue: (c) => customerDisplayName(c),
+      render: (c) => (
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span
+            aria-hidden="true"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[7px] border border-[var(--cq-border)] bg-[var(--cq-sunken)] text-[10.5px] font-semibold tracking-tight text-[var(--cq-fg-muted)]"
+          >
+            {initials(c)}
+          </span>
+          <span className="min-w-0">
+            <span className="block truncate font-semibold text-[var(--cq-fg)]">{customerDisplayName(c)}</span>
+            <span className="block truncate text-[12px] text-[var(--cq-fg-subtle)]">
+              {[c.contact_name && c.company ? c.contact_name : null, c.city].filter(Boolean).join(' · ') || '—'}
+            </span>
+          </span>
+        </div>
+      ),
+    },
+    {
+      key: 'contact',
+      header: 'Kontakt',
+      hideOnMobile: true,
+      render: (c) => (
+        <div className="min-w-0">
+          <div className="truncate text-[var(--cq-fg-muted)]">{c.email ?? '—'}</div>
+          <div className="truncate text-[12px] text-[var(--cq-fg-subtle)] tabular-nums">
+            {c.offer_count} Angebote · {c.invoice_count} Rechnungen
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'revenue',
+      header: 'Fakturiert',
+      align: 'right',
+      sortValue: (c) => c.revenue_gross_cents,
+      render: (c) => (
+        <span className={c.revenue_gross_cents > 0 ? 'font-medium text-[var(--cq-fg)]' : 'text-[var(--cq-fg-subtle)]'}>
+          {formatCentsCurrencyDe(c.revenue_gross_cents)}
+        </span>
+      ),
+    },
+    {
+      key: 'work',
+      header: 'Offen',
+      sortValue: (c) => c.open_task_count + c.open_invoice_count,
+      render: (c) => {
+        if (c.open_task_count === 0 && c.open_invoice_count === 0) {
+          return <span className="whitespace-nowrap text-[12px] text-[var(--cq-fg-subtle)]">nichts offen</span>;
+        }
+        return (
+          <div className="whitespace-nowrap text-[12.5px] leading-4">
+            {c.open_task_count > 0 ? (
+              <div className="font-medium text-amber-700 tabular-nums">
+                {c.open_task_count} {c.open_task_count === 1 ? 'Aufgabe' : 'Aufgaben'}
+              </div>
+            ) : null}
+            {c.open_invoice_count > 0 ? (
+              <div className="text-[var(--cq-fg-muted)] tabular-nums">
+                {c.open_invoice_count} {c.open_invoice_count === 1 ? 'Rechnung' : 'Rechnungen'}
+              </div>
+            ) : null}
+          </div>
+        );
+      },
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (c) => (
+        <span className="whitespace-nowrap">
+          <StatusBadge label={customerStatusLabel[c.status]} tone={customerStatusTone[c.status]} />
+        </span>
+      ),
+    },
+    {
+      key: 'activity',
+      header: 'Letzte Aktivität',
+      align: 'right',
+      hideOnMobile: true,
+      sortValue: (c) => c.last_activity_at,
+      render: (c) => <span className="whitespace-nowrap text-[var(--cq-fg-subtle)]">{formatDateDe(c.last_activity_at)}</span>,
+    },
+    {
+      key: 'actions',
+      header: '',
+      align: 'right',
+      sticky: true,
+      hideOnCard: true,
+      render: (c) => (
         <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
           {c.status === 'archived' ? (
-            <IconButton icon={RotateCcw} label="Kunde wiederherstellen" variant="ghost" onClick={() => void runRestore(c)} />
+            <IconButton icon={RotateCcw} label={`${customerDisplayName(c)} wiederherstellen`} variant="ghost" onClick={() => void runRestore(c)} />
           ) : (
-            <IconButton icon={Archive} label="Kunde archivieren" variant="ghost" onClick={() => setPendingArchive(c)} />
+            <IconButton icon={Archive} label={`${customerDisplayName(c)} archivieren`} variant="ghost" onClick={() => setPendingArchive(c)} />
           )}
-          <IconButton icon={Trash2} label="Kunde löschen" variant="ghost" onClick={() => void askDelete(c)} />
+          <IconButton icon={Trash2} label={`${customerDisplayName(c)} löschen`} variant="ghost" onClick={() => void askDelete(c)} />
         </div>
       ),
     },
@@ -170,70 +280,107 @@ export function CustomersPage() {
 
   return (
     <>
-      <PageHeader
-        title="Kunden & Aufgaben"
-        description="Ihr zentraler Arbeitsbereich für die Kundenverwaltung: alle Kunden, zugehörige Angebote und Aufgaben an einem Ort."
+      <WorkspaceHeader
+        eyebrow="Kunden"
+        title="Kundenstamm"
+        subtitle="Die kaufmännische Kundenidentität, auf die Angebote, Rechnungen, Zahlungen und Aufgaben verweisen."
         actions={<Button icon={Plus} onClick={() => setCreateOpen(true)} disabled={!entity}>Neuer Kunde</Button>}
+        toolbar={
+          !loading && rows.length > 0 ? (
+            <Toolbar
+              trailing={
+                <>
+                  <SearchInput
+                    value={query}
+                    onChange={setQuery}
+                    label="Kunden durchsuchen"
+                    placeholder="Firma, Kontakt, Ort, E-Mail …"
+                    className="w-full sm:w-72"
+                  />
+                  <div className="w-full sm:w-52">
+                    <Select
+                      id="sort"
+                      value={sort}
+                      onChange={(v) => { setSort(v as SortKey); setTableSort(null); }}
+                      options={[
+                        { value: 'activity', label: 'Letzte Aktivität' },
+                        { value: 'work', label: 'Meiste offene Arbeit' },
+                        { value: 'revenue', label: 'Höchster Umsatz' },
+                        { value: 'name', label: 'Name (A–Z)' },
+                        { value: 'created', label: 'Zuletzt angelegt' },
+                      ]}
+                    />
+                  </div>
+                </>
+              }
+            >
+              <FilterChips
+                label="Kunden filtern"
+                value={filter}
+                onChange={setFilter}
+                options={FILTERS.map((f) => ({ value: f.value, label: f.label, count: counts[f.value] }))}
+              />
+            </Toolbar>
+          ) : undefined
+        }
       />
 
-      {error ? <div className="mb-6"><ErrorState message={error} onRetry={() => void load()} /></div> : null}
+      {error ? <div className="mb-4"><ErrorState message={error} onRetry={() => void load()} /></div> : null}
 
-      {!loading && rows.length > 0 ? (
-        <div className="mb-6 grid gap-3 sm:grid-cols-3">
-          <KpiCard label="Kunden gesamt" value={String(kpis.total)} />
-          <KpiCard label="Aktive Kunden" value={String(kpis.active)} tone={kpis.active > 0 ? 'positive' : 'neutral'} />
-          <KpiCard label="Offene Aufgaben" value={String(kpis.openTasks)} hint="über alle Kunden" />
-        </div>
-      ) : null}
+      <div className="space-y-4">
+        {loading ? <StatBandSkeleton count={5} /> : rows.length > 0 ? <StatBand items={stats} /> : null}
 
-      {!loading && rows.length > 0 ? (
-        <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="min-w-0 flex-1"><Tabs value={filter} onChange={setFilter} tabs={FILTERS.map((f) => ({ value: f.value, label: f.label, count: counts[f.value] }))} /></div>
-          <div className="flex shrink-0 items-center gap-2">
-            <div className="relative">
-              <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
-              <input
-                value={query} onChange={(e) => setQuery(e.target.value)}
-                placeholder="Kunde, Firma, E-Mail …" aria-label="Kunden durchsuchen"
-                className="h-10 w-full rounded-xl border border-gray-200 bg-white pl-9 pr-3 text-sm text-gray-900 outline-none transition-colors focus:border-gray-400 sm:w-64"
-              />
-            </div>
-            <div className="w-44">
-              <Select id="sort" value={sort} onChange={(v) => setSort(v as SortKey)}
-                options={[
-                  { value: 'activity', label: 'Letzte Aktivität' },
-                  { value: 'newest', label: 'Neueste zuerst' },
-                  { value: 'oldest', label: 'Älteste zuerst' },
-                  { value: 'name', label: 'Name (A–Z)' },
-                ]} />
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      {loading ? <TableSkeleton rows={6} cols={6} /> : rows.length === 0 ? (
-        <EmptyState icon={Users}
-          title="Noch keine Kunden angelegt"
-          description={
-            'Dies ist der zentrale Kundenstamm: Kunden, die Sie hier anlegen, stehen sofort im '
-            + 'Finanzbereich zur Auswahl, und Kunden, die Sie beim Erstellen eines Angebots oder '
-            + 'einer Rechnung anlegen, erscheinen sofort hier. Es ist derselbe Datensatz. '
-            + 'Portalzugang, Kundenprojekte und Dokumente verwalten Sie weiterhin unter „Kunden“.'
-          }
-          action={
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              <Button icon={Plus} onClick={() => setCreateOpen(true)} disabled={!entity}>Neuer Kunde</Button>
-              <Button variant="secondary" onClick={() => navigate('/admin/clients')}>Zum Portalzugang (Kunden)</Button>
-            </div>
-          } />
-      ) : visible.length === 0 ? (
-        <EmptyState icon={Search} title="Keine Treffer" description="Passen Sie Filter oder Suche an." />
-      ) : (
-        <DataTable columns={columns} rows={visible} getRowKey={(c) => c.id} minWidth={920}
-          onRowClick={(c) => navigate(`/admin/finance/customers/${c.id}`)}
-          mobileTitle={(c) => <div className="flex items-center gap-2"><span>{customerDisplayName(c)}</span><StatusBadge label={customerStatusLabel[c.status]} tone={customerStatusTone[c.status]} /></div>}
-          mobileSubtitle={(c) => `${c.open_task_count} offen · ${c.offer_count} Angebote`} />
-      )}
+        {loading ? <TableSkeleton rows={6} cols={6} /> : rows.length === 0 ? (
+          <EmptyState
+            icon={Users}
+            title="Noch keine Kunden angelegt"
+            description={
+              'Dies ist der zentrale Kundenstamm: Kunden, die Sie hier anlegen, stehen sofort im '
+              + 'Finanzbereich zur Auswahl, und Kunden, die Sie beim Erstellen eines Angebots oder '
+              + 'einer Rechnung anlegen, erscheinen sofort hier. Es ist derselbe Datensatz. '
+              + 'Portalzugang und Kundendokumente verwalten Sie unter „Portalzugänge".'
+            }
+            action={
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <Button icon={Plus} onClick={() => setCreateOpen(true)} disabled={!entity}>Neuer Kunde</Button>
+                <Button variant="secondary" onClick={() => navigate('/admin/clients')}>Zu den Portalzugängen</Button>
+              </div>
+            }
+          />
+        ) : visible.length === 0 ? (
+          <EmptyState
+            icon={Search}
+            title="Keine Treffer"
+            description={query
+              ? `Kein Kunde passt zu „${query}" im Filter „${FILTERS.find((f) => f.value === filter)?.label}".`
+              : 'In diesem Filter liegt gerade kein Kunde.'}
+            action={
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                {query ? <Button variant="secondary" onClick={() => setQuery('')}>Suche zurücksetzen</Button> : null}
+                {filter !== 'all' ? <Button variant="secondary" onClick={() => setFilter('all')}>Alle Kunden zeigen</Button> : null}
+              </div>
+            }
+          />
+        ) : (
+          <DataTable
+            columns={columns}
+            rows={visible}
+            getRowKey={(c) => c.id}
+            minWidth={880}
+            sort={tableSort}
+            onSortChange={setTableSort}
+            rowHref={(c) => `/admin/finance/customers/${c.id}`}
+            onRowClick={(c) => navigate(`/admin/finance/customers/${c.id}`)}
+            mobileTitle={(c) => (
+              <div className="flex items-center gap-2">
+                <span>{customerDisplayName(c)}</span>
+                <StatusBadge label={customerStatusLabel[c.status]} tone={customerStatusTone[c.status]} />
+              </div>
+            )}
+            mobileSubtitle={(c) => [c.city, c.email].filter(Boolean).join(' · ') || '—'}
+          />
+        )}
+      </div>
 
       {entity ? (
         <CustomerFormDialog
@@ -247,7 +394,7 @@ export function CustomersPage() {
         message={
           <>
             <p>
-              <span className="font-semibold text-gray-950">
+              <span className="font-semibold text-[var(--cq-fg)]">
                 {pendingArchive ? customerDisplayName(pendingArchive) : ''}
               </span>{' '}
               wird aus der aktiven Liste und aus den Auswahlfeldern im Finanzbereich ausgeblendet.
@@ -281,7 +428,7 @@ export function CustomersPage() {
           pendingDelete?.blockers && !pendingDelete.blockers.deletable ? (
             <>
               <p>
-                <span className="font-semibold text-gray-950">{customerDisplayName(pendingDelete.row)}</span>{' '}
+                <span className="font-semibold text-[var(--cq-fg)]">{customerDisplayName(pendingDelete.row)}</span>{' '}
                 hat {blockerSentence(pendingDelete.blockers)} und kann deshalb nicht gelöscht werden.
               </p>
               <p className="mt-2">
@@ -292,7 +439,7 @@ export function CustomersPage() {
           ) : (
             <>
               <p>
-                <span className="font-semibold text-gray-950">
+                <span className="font-semibold text-[var(--cq-fg)]">
                   {pendingDelete ? customerDisplayName(pendingDelete.row) : ''}
                 </span>{' '}
                 wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.
