@@ -630,6 +630,144 @@ try {
       await browser.close();
     }
   }
+
+  // ---- 7) the REAL portal, not a synthetic element in the dashboard root
+  //
+  // Radix renders the mobile drawer into document.body, so it leaves the
+  // [data-cq-surface="dashboard"] subtree entirely and the surface selector cannot
+  // reach it. The only thing that brings it back under the dashboard motion rules
+  // is the `data-cq-portal="dashboard"` attribute set at the portal site. A
+  // synthetic probe inside the dashboard root would pass whether or not that
+  // attribute exists, so this opens the actual drawer and measures what Radix put
+  // in the DOM.
+  const OPEN_DRAWER = `document.querySelector('header button[aria-expanded]').click()`;
+
+  const PROBE_PORTAL = `((className) => {
+    const dialog = document.querySelector('[role="dialog"]');
+    if (!dialog) return { open: false };
+    const overlayStyle = getComputedStyle(dialog);
+    // The close button is a REAL component element that declares its own motion.
+    const close = dialog.querySelector('button[aria-label]');
+    const closeStyle = close ? getComputedStyle(close) : null;
+    // Two children: one bare (must inherit nothing) and one that declares motion
+    // (must still resolve). Measuring only one of them cannot tell the two apart.
+    const bare = document.createElement('div');
+    dialog.appendChild(bare);
+    const bareStyle = getComputedStyle(bare);
+    const declared = document.createElement('div');
+    if (className) declared.className = className;
+    dialog.appendChild(declared);
+    const declaredStyle = getComputedStyle(declared);
+    const out = {
+      open: true,
+      // Proof it really escaped the surface subtree.
+      escapedSurface: dialog.closest('[data-cq-surface="dashboard"]') === null,
+      markedAsDashboardPortal: dialog.getAttribute('data-cq-portal') === 'dashboard',
+      dialog: { property: overlayStyle.transitionProperty, duration: overlayStyle.transitionDuration },
+      realCloseButton: closeStyle
+        ? { property: closeStyle.transitionProperty, duration: closeStyle.transitionDuration }
+        : null,
+      bareChild: { property: bareStyle.transitionProperty, duration: bareStyle.transitionDuration },
+      declaredChild: { property: declaredStyle.transitionProperty, duration: declaredStyle.transitionDuration },
+    };
+    bare.remove();
+    declared.remove();
+    return out;
+  })`;
+
+  {
+    const viewport = VIEWPORTS[VIEWPORTS.length - 1]; // 390x844 — the drawer viewport
+    const browser = await launchChromium(chromiumPath);
+    try {
+      await preparePage(browser.page, viewport);
+      await goto(browser.page, '/admin/finance/overview');
+      await evaluate(browser.page, OPEN_DRAWER);
+      await wait(700);
+      const portal = await evaluate(browser.page, `${PROBE_PORTAL}('transition-colors duration-fast')`);
+
+      if (!portal || !portal.open) {
+        bad('portal: the mobile drawer opens as a real Radix portal', JSON.stringify(portal));
+      } else {
+        if (portal.escapedSurface) {
+          ok('portal: the drawer really is outside the dashboard surface subtree');
+        } else {
+          bad('portal: the drawer really is outside the dashboard surface subtree', 'it did not escape — this probe would prove nothing');
+        }
+
+        if (portal.markedAsDashboardPortal) {
+          ok('portal: the portaled drawer carries data-cq-portal="dashboard"');
+        } else {
+          bad('portal: the portaled drawer carries data-cq-portal="dashboard"', JSON.stringify(portal));
+        }
+
+        // A — the real portaled node, and a bare child of it, inherit nothing.
+        if (portal.dialog.property === 'none' && portal.bareChild.property === 'none') {
+          ok('portal: a real portaled element inherits no transition');
+        } else {
+          bad('portal: a real portaled element inherits no transition', JSON.stringify(portal));
+        }
+
+        // B — declared motion inside the real portal still resolves, and in band.
+        const declaredMs = ms(portal.declaredChild?.duration);
+        if (portal.declaredChild.property !== 'none' && declaredMs >= 140 && declaredMs <= 180) {
+          ok(`portal: declared motion inside the real portal resolves to ${portal.declaredChild.duration}`);
+        } else {
+          bad('portal: declared motion inside the real portal resolves to the 140-180ms band', JSON.stringify(portal.declaredChild));
+        }
+
+        // B — a real component element inside the portal that DOES declare motion.
+        const closeMs = ms(portal.realCloseButton?.duration);
+        if (portal.realCloseButton && portal.realCloseButton.property !== 'none' && closeMs > 0 && closeMs <= 200) {
+          ok(`portal: the drawer close button keeps its declared ${portal.realCloseButton.duration} transition`);
+        } else {
+          bad('portal: the drawer close button keeps its declared transition', JSON.stringify(portal.realCloseButton));
+        }
+      }
+    } finally {
+      await browser.close();
+    }
+  }
+
+  // C for the real portal — reduced motion must reach it too.
+  {
+    const viewport = VIEWPORTS[VIEWPORTS.length - 1];
+    const browser = await launchChromium(chromiumPath);
+    try {
+      await preparePage(browser.page, viewport, { reducedMotion: true });
+      await goto(browser.page, '/admin/finance/overview');
+      await evaluate(browser.page, OPEN_DRAWER);
+      await wait(700);
+      const portal = await evaluate(browser.page, `${PROBE_PORTAL}('transition-colors duration-fast')`);
+      const childMs = ms(portal?.declaredChild?.duration);
+      if (portal && portal.open && childMs <= 1) {
+        ok(`portal: reduced motion collapses declared portal motion to ${portal.declaredChild.duration}`);
+      } else {
+        bad('portal: reduced motion collapses declared portal motion', JSON.stringify(portal));
+      }
+    } finally {
+      await browser.close();
+    }
+  }
+
+  // D — a public page must not carry dashboard portal scoping at all.
+  {
+    const browser = await launchChromium(chromiumPath);
+    try {
+      await preparePage(browser.page, VIEWPORTS[0]);
+      await goto(browser.page, '/', { expect: 'footer' });
+      const publicScope = await evaluate(browser.page, `({
+        dashboardPortals: document.querySelectorAll('[data-cq-portal]').length,
+        dashboardSurfaces: document.querySelectorAll('[data-cq-surface]').length,
+      })`);
+      if (publicScope.dashboardPortals === 0 && publicScope.dashboardSurfaces === 0) {
+        ok('portal: the public site carries no dashboard portal or surface scoping');
+      } else {
+        bad('portal: the public site carries no dashboard portal or surface scoping', JSON.stringify(publicScope));
+      }
+    } finally {
+      await browser.close();
+    }
+  }
 } finally {
   try { process.kill(-server.pid, 'SIGTERM'); } catch { server.kill('SIGTERM'); }
 }

@@ -161,9 +161,24 @@ export function SidebarShell({
             Radix Dialog supplies the focus trap, Escape handling, outside-click close and
             body-scroll lock, so this surface does not reimplement any of them. */}
         <Dialog.Root open={mobileOpen} onOpenChange={setMobileOpen}>
+          {/* `data-cq-portal="dashboard"` on BOTH portaled nodes, not decoration:
+              Radix renders these into document.body, so they leave the
+              [data-cq-surface="dashboard"] subtree and would otherwise pick up the
+              document-wide 300ms colour transition in @layer base. The attribute is
+              what the dashboard opt-out in src/index.css keys on, and it is the same
+              convention the dashboard overlays and PremiumSelect already use.
+
+              Safe to set unconditionally here because SidebarShell is only ever
+              rendered by DashboardShell (admin) and CustomerAppShell (customer app) —
+              both authenticated dashboard surfaces. It never renders on a public page,
+              so this cannot mark a public portal as a dashboard one. */}
           <Dialog.Portal>
-            <Dialog.Overlay className="fixed inset-0 z-50 bg-gray-950/25 backdrop-blur-[2px] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 lg:hidden" />
+            <Dialog.Overlay
+              data-cq-portal="dashboard"
+              className="fixed inset-0 z-50 bg-gray-950/25 backdrop-blur-[2px] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 lg:hidden"
+            />
             <Dialog.Content
+              data-cq-portal="dashboard"
               className="fixed inset-y-0 left-0 z-50 flex w-[300px] max-w-[86vw] flex-col overflow-hidden border-r border-gray-200/80 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.16)] duration-200 data-[state=closed]:animate-out data-[state=closed]:slide-out-to-left data-[state=open]:animate-in data-[state=open]:slide-in-from-left lg:hidden"
               aria-describedby={undefined}
             >

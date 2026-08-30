@@ -145,9 +145,27 @@
      reduced motion is still handled by the `prefers-reduced-motion` block that
      collapses the dashboard tokens and forces `transition-duration: 1ms`.
 
-     Scope: `[data-cq-surface='dashboard']` is the shell root (SidebarShell) and
-     `[data-cq-portal='dashboard']` covers overlays that portal to document.body.
-     Nothing outside those two subtrees is affected, so public-site behaviour is
+     Scope: `[data-cq-surface='dashboard']` is the shell root (SidebarShell).
+     `[data-cq-portal='dashboard']` is the opt-in marker for the nodes that Radix
+     and react-dom render into document.body, which therefore leave that subtree.
+     The attribute is NOT automatic — it is set by hand at each portal site, and
+     the full set is exactly three:
+
+       - src/components/dashboard/overlays.tsx  (createPortal, dialog + sheet)
+       - src/components/dashboard/PremiumSelect.tsx  (Select.Portal, Popover.Portal)
+       - src/components/navigation/SidebarShell.tsx  (Dialog.Portal, mobile drawer)
+
+     Anything added later that portals out of the dashboard must set it too, or it
+     silently falls back to the 300ms rule. `qa-admin-shell.mjs` opens the real
+     mobile drawer and measures the portaled node, so that gap is caught rather
+     than assumed.
+
+     The shared primitives in src/components/ui/* are deliberately NOT marked: they
+     are generic and could be used on a public page, where the 300ms transition is
+     the correct, established behaviour. Marking a portal is a decision made by the
+     dashboard component that owns it, never by the primitive.
+
+     Nothing outside these subtrees is affected, so public-site behaviour is
      byte-for-byte what it was.
      ─────────────────────────────────────────────────────────────────────────── */
   [data-cq-surface='dashboard'],
