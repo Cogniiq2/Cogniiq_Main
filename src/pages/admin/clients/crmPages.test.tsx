@@ -178,6 +178,22 @@ describe('AdminInvitationsPage', () => {
     await waitFor(() => expect(revokeInvitation).toHaveBeenCalledWith('inv-b'));
   });
 
+  it('filters by status through the picker', async () => {
+    // The native <select> became the dashboard's listbox picker. Swapping a control is
+    // exactly the kind of change that keeps rendering while quietly no longer filtering,
+    // so the wiring is asserted rather than assumed.
+    const user = userEvent.setup();
+    renderPage(<AdminInvitationsPage />);
+    await screen.findAllByText('beta@example.de');
+    expect(within(table()).getAllByText('alpha@example.de').length).toBeGreaterThan(0);
+
+    await user.click(screen.getByRole('combobox', { name: /Status/ }));
+    await user.click(within(await screen.findByRole('listbox')).getByRole('option', { name: 'accepted' }));
+
+    await waitFor(() => expect(screen.queryAllByText('beta@example.de').length).toBe(0));
+    expect(within(table()).getAllByText('alpha@example.de').length).toBeGreaterThan(0);
+  });
+
   it('shows an empty state when the status filter matches nothing', async () => {
     loadAdminClients.mockResolvedValue([]);
     renderPage(<AdminInvitationsPage />);
