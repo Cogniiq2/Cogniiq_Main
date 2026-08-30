@@ -165,7 +165,9 @@ export function StatBand({ items, className }: { items: StatItem[]; className?: 
               <dd
                 className={cn(
                   'mt-1.5',
-                  item.lead ? text.metricLead : text.metricSm,
+                  // The lead figure steps down on a phone: at 27px a five-digit euro
+                  // amount wraps mid-number inside a two-column band.
+                  item.lead ? cn(text.metricSm, 'sm:text-[27px] sm:leading-8 sm:tracking-[-0.028em]') : text.metricSm,
                   statValueTone[item.tone ?? 'neutral'],
                 )}
               >
@@ -258,14 +260,16 @@ export function Panel({
             {Icon ? <Icon size={14} className="shrink-0 text-[var(--cq-fg-subtle)]" aria-hidden="true" /> : null}
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h2 id={headingId} className={cn('truncate', text.cardTitle)}>{title}</h2>
+                {/* Wraps rather than truncates: a clipped panel title ("Offene Forderungen …")
+                    is unreadable on a phone, where the header also carries an action. */}
+                <h2 id={headingId} className={cn('min-w-0 [overflow-wrap:anywhere]', text.cardTitle)}>{title}</h2>
                 {count != null ? (
                   <span className={cn('shrink-0 px-1.5 py-0.5 text-[11px] font-semibold tabular-nums', radius.sm, statusTone.neutral, 'border')}>
                     {count}
                   </span>
                 ) : null}
               </div>
-              {description ? <p className={cn('mt-0.5 truncate', text.hint)}>{description}</p> : null}
+              {description ? <p className={cn('mt-0.5', text.hint)}>{description}</p> : null}
             </div>
           </div>
           {action ? <div className="flex shrink-0 items-center gap-1.5">{action}</div> : null}
@@ -580,7 +584,7 @@ export function DefinitionGrid({ items, columns = 1 }: {
   columns?: 1 | 2;
 }) {
   return (
-    <dl className={cn('grid gap-x-6 gap-y-2.5', columns === 2 ? 'sm:grid-cols-2' : '')}>
+    <dl className={cn('grid grid-cols-1 gap-x-6 gap-y-2.5', columns === 2 ? 'sm:grid-cols-2' : '')}>
       {items.map((item) => (
         <div key={item.label} className="min-w-0">
           <dt className={text.eyebrow}>{item.label}</dt>

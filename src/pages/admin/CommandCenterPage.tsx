@@ -272,7 +272,7 @@ export function CommandCenterPage() {
           subtitle="Ihr Einstieg in den internen Arbeitsbereich. Finanzdaten sind dem Inhaber vorbehalten."
           meta={<HeaderMeta label="Angemeldet als">{profile?.email ?? user?.email ?? '—'}</HeaderMeta>}
         />
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <TaskPanel section={data.tasks} onRetry={() => void load()} />
           <Panel title="Kundenportal" description="Was Sie hier verwalten können" flush>
             <RowList>
@@ -348,7 +348,7 @@ export function CommandCenterPage() {
       <div className="space-y-4">
         {loading ? <StatBandSkeleton count={5} /> : stats.length ? <StatBand items={stats} /> : null}
 
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
           {/* -------------------------------------------------------- attention */}
           <div className="space-y-4">
             <Panel

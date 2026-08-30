@@ -245,6 +245,8 @@ export function CustomersPage() {
     {
       key: 'status',
       header: 'Status',
+      // Already carried by the mobile card's title, so it is not repeated as a field.
+      hideOnCard: true,
       render: (c) => (
         <span className="whitespace-nowrap">
           <StatusBadge label={customerStatusLabel[c.status]} tone={customerStatusTone[c.status]} />

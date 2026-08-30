@@ -198,6 +198,8 @@ export function OffersPage() {
       key: 'status',
       header: 'Status',
       sortValue: (o) => o.status,
+      // Already carried by the mobile card's title.
+      hideOnCard: true,
       render: (o) => (
         <div className="flex flex-wrap items-center gap-1.5">
           <StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} />

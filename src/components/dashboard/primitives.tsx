@@ -704,7 +704,9 @@ export function DataTable<T>({
       <div className="divide-y divide-[var(--cq-border-subtle)] md:hidden">
         {sorted.map((row) => {
           const href = linkFor(row);
-          const cardFields = columns.filter((c) => !c.hideOnMobile && !c.hideOnCard);
+          // The first column IS the card's title, so repeating it in the field list
+          // would print the customer's name twice on every phone-sized row.
+          const cardFields = columns.filter((c, index) => index > 0 && !c.hideOnMobile && !c.hideOnCard);
           const actions = columns.filter((c) => c.hideOnCard);
           const title = (
             <div className="flex items-start justify-between gap-3">

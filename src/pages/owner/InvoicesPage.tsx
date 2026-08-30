@@ -235,6 +235,8 @@ export function InvoicesPage() {
       key: 'status',
       header: 'Status',
       sortValue: (inv) => inv.status,
+      // Already carried by the mobile card's title.
+      hideOnCard: true,
       render: (inv) => (
         <span className="whitespace-nowrap">
           <StatusBadge label={statusLabel[inv.status] ?? inv.status} tone={invoiceStatusTone[inv.status]} />

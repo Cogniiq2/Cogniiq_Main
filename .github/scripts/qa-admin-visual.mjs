@@ -191,13 +191,23 @@ async function setViewport(page, viewport) {
   });
 }
 
+/**
+ * Navigate and wait for the PAGE, not just the shell.
+ *
+ * The shell paints as soon as the layout chunk arrives; on a cold Vite server the
+ * page's own chunk can be another few seconds behind. Waiting only for the rail
+ * screenshotted an empty content area and reported it as a missing heading.
+ */
 async function goto(page, path) {
   await page.send('Page.navigate', { url: `${ORIGIN}${path}` });
-  const deadline = Date.now() + 45_000;
+  const deadline = Date.now() + 60_000;
   while (Date.now() < deadline) {
     await wait(400);
-    const ready = await evaluate(page, 'Boolean(document.querySelector("aside, header"))').catch(() => false);
-    if (ready) { await wait(1200); return true; }
+    const ready = await evaluate(
+      page,
+      'Boolean(document.querySelector("main h1") || document.querySelector("main [role=\'alert\']"))',
+    ).catch(() => false);
+    if (ready) { await wait(900); return true; }
   }
   return false;
 }

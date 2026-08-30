@@ -387,7 +387,7 @@ export function CustomerDetailPage() {
 
       <SectionNav sections={sections} />
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-4">
           {/* Services first: which Cogniiq services this customer receives, and how far each
               delivery has progressed, is the fastest read on the whole relationship. */}

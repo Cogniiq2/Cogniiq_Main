@@ -190,7 +190,7 @@ export function OverviewPage() {
         <div className="space-y-4">
           <StatBand items={stats} />
 
-          <div className="grid gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
             {/* ------------------------------------------------------- what happened */}
             <div className="space-y-4">
               <Panel

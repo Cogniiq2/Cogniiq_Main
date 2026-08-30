@@ -154,6 +154,11 @@ export const interactive = {
 /**
  * Card/panel rhythm for the workspace grids.
  *
+ * Every recipe starts at an explicit `grid-cols-1`, which is `minmax(0, 1fr)`. A bare
+ * `grid` leaves the single implicit column at max-content, so one wide child — a chart,
+ * a long row, a nowrap amount — silently widens the track and gives the whole page a
+ * horizontal scrollbar on a phone.
+ *
  * The Admin Center used one 4-up grid of identical cards on every page, which is
  * why every page looked like every other page. These are the two compositions
  * that replaced it: an asymmetric main/side split for a workspace, and a
@@ -161,11 +166,11 @@ export const interactive = {
  */
 export const grid = {
   /** Main work area with a narrower context column. Collapses under xl. */
-  workspace: 'grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]',
+  workspace: 'grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_360px]',
   /** Two equal halves. Collapses under lg. */
-  halves: 'grid gap-4 lg:grid-cols-2',
+  halves: 'grid grid-cols-1 gap-4 lg:grid-cols-2',
   /** Attention-first landing: a wide primary column and a narrower rail. */
-  landing: 'grid gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]',
+  landing: 'grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]',
 } as const;
 
 /**

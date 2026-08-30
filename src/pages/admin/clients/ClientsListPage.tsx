@@ -123,6 +123,8 @@ export function ClientsListPage() {
       key: 'status',
       header: 'Status',
       sortValue: (r) => r.account?.lifecycle_status ?? '',
+      // Already carried by the mobile card's title.
+      hideOnCard: true,
       render: (r) => (r.account ? (
         <span className="whitespace-nowrap">
           <StatusBadge
