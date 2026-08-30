@@ -5,6 +5,9 @@ import { KpiSkeletonGrid, TableSkeleton } from '@/components/dashboard';
 import { OwnerEntityProvider, useOwnerEntity } from '@/pages/owner/ownerContext';
 import { BackendErrorScreen, BackendSetupScreen } from '@/pages/owner/BackendStates';
 import { OverviewPage } from '@/pages/owner/OverviewPage';
+import { CommandCenterPage } from '@/pages/owner/CommandCenterPage';
+import { LeadsPage } from '@/pages/owner/LeadsPage';
+import { LeadDetailPage } from '@/pages/owner/LeadDetailPage';
 import { InvoicesPage } from '@/pages/owner/InvoicesPage';
 import { InvoiceDetailPage } from '@/pages/owner/InvoiceDetailPage';
 import { OffersPage } from '@/pages/owner/OffersPage';
@@ -41,8 +44,14 @@ function FinanceRoutes() {
 
   return (
     <Routes>
-      <Route index element={<Navigate to="overview" replace />} />
+      {/* The cockpit is the landing screen: what needs doing today comes before
+          what was earned last month. The financial overview keeps its own route. */}
+      <Route index element={<Navigate to="cockpit" replace />} />
+      <Route path="cockpit" element={<CommandCenterPage />} />
       <Route path="overview" element={<OverviewPage />} />
+      {/* Sales sits in front of the canonical customer, one level up from it. */}
+      <Route path="leads" element={<LeadsPage />} />
+      <Route path="leads/:leadId" element={<LeadDetailPage />} />
       <Route path="customers" element={<CustomersPage />} />
       <Route path="customers/:customerId" element={<CustomerDetailPage />} />
       {/* One level under the canonical customer: the service is what hangs off it. */}
@@ -62,7 +71,7 @@ function FinanceRoutes() {
       <Route path="documents" element={<DocumentsPage />} />
       <Route path="audit" element={<AuditPage />} />
       <Route path="settings" element={<SettingsPage />} />
-      <Route path="*" element={<Navigate to="overview" replace />} />
+      <Route path="*" element={<Navigate to="cockpit" replace />} />
     </Routes>
   );
 }

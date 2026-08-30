@@ -19,6 +19,7 @@ import { CustomerFormDialog } from '@/components/finance/CustomerFormDialog';
 import { CustomerTaskChecklist } from '@/components/finance/CustomerTaskChecklist';
 import { CustomerProjectPanel } from '@/components/finance/CustomerProjectPanel';
 import { CustomerServicesPanel } from '@/components/services/CustomerServicesPanel';
+import { OriginLeadCard } from '@/components/crm/OriginLeadCard';
 import type { ServiceKey } from '@/lib/serviceOnboarding/types';
 import { invoiceStatusTone } from '@/pages/owner/ownerUi';
 import type {
@@ -264,7 +265,7 @@ export function CustomerDetailPage() {
           />
         </div>
 
-        {/* Side column: info + status + activity */}
+        {/* Side column: info + status + provenance + activity */}
         <div className="space-y-5">
           <Card className="p-5">
             <div className="mb-3 flex items-center justify-between">
@@ -292,6 +293,10 @@ export function CustomerDetailPage() {
             </div>
             {c.notes ? <div className="mt-4 rounded-xl bg-gray-50 p-3 text-[12.5px] text-gray-600 [overflow-wrap:anywhere] whitespace-pre-line">{c.notes}</div> : null}
           </Card>
+
+          {/* Where this customer came from, when it came from a lead. Renders
+              nothing for a directly created customer. */}
+          <OriginLeadCard customerId={c.id} />
 
           <Card className="p-5">
             <h3 className="mb-3 text-[15px] font-semibold text-gray-950">Aktivität</h3>
