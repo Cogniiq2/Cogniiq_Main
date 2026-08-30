@@ -525,6 +525,18 @@ const CLIENT_ACCOUNTS = [
   { id: 'acc2', organization_id: 'org2', legal_name: 'Gasthof Sonnenhof GmbH', primary_contact_name: 'Michael Brandt', primary_email: 'info@sonnenhof.invalid', industry: 'Gastronomie', lifecycle_status: 'active', estimated_monthly_value_cents: 24900, updated_at: at(8, 25), created_at: at(5, 19) },
 ];
 
+const ORGANIZATION_SOLUTIONS = [
+  { id: 'sol1', organization_id: 'org1', catalog_key: 'ai_receptionist', implementation_key: 'ai_receptionist', instance_key: 'merten-reception', display_name: 'Empfang Hauptstandort', status: 'active', nav_order: 1, created_at: at(4, 24) },
+  { id: 'sol2', organization_id: 'org1', catalog_key: 'website_management', implementation_key: 'unavailable', instance_key: 'merten-web', display_name: 'Website-Betreuung', status: 'paused', nav_order: 2, created_at: at(5, 2) },
+  { id: 'sol3', organization_id: 'org2', catalog_key: 'ai_receptionist', implementation_key: 'ai_receptionist', instance_key: 'sonnenhof-reservierung', display_name: 'Reservierungsannahme', status: 'provisioning', nav_order: 1, created_at: at(7, 24) },
+];
+
+const CLIENT_INVITATIONS = [
+  { id: 'inv1', organization_id: 'org1', email: 'praxis@merten-dental.invalid', organization_role: 'owner', status: 'accepted', expires_at: `${iso(5, 8)}T00:00:00Z`, created_at: at(4, 24) },
+  { id: 'inv2', organization_id: 'org2', email: 'info@sonnenhof.invalid', organization_role: 'owner', status: 'pending', expires_at: `${iso(9, 20)}T00:00:00Z`, created_at: at(8, 20) },
+  { id: 'inv3', organization_id: 'org2', email: 'kueche@sonnenhof.invalid', organization_role: 'member', status: 'pending', expires_at: `${iso(6, 1)}T00:00:00Z`, created_at: at(5, 18) },
+];
+
 /* ------------------------------------------------------------------ router */
 
 const TABLES = {
@@ -551,9 +563,9 @@ const TABLES = {
   owner_document_settings: [],
   organizations: ORGANIZATIONS,
   client_accounts: CLIENT_ACCOUNTS,
-  organization_solutions: [],
+  organization_solutions: ORGANIZATION_SOLUTIONS,
   client_engagements: [],
-  client_invitations: [],
+  client_invitations: CLIENT_INVITATIONS,
   client_contacts: [],
   organization_members: [],
   customer_projects: [],
