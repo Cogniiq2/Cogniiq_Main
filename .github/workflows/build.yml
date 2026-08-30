@@ -443,3 +443,40 @@ jobs:
       # either: a policy-only review would call this table safe while anon could still empty it.
       - name: Receptionist leads RLS SQL tests
         run: bash .github/scripts/run-receptionist-leads-rls-sql-tests.sh
+
+  owner-crm-lead-foundation-sql-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure PostgreSQL server binaries
+        run: |
+          if [ -z "$(ls -d /usr/lib/postgresql/*/bin 2>/dev/null)" ]; then
+            sudo apt-get update
+            sudo apt-get install --yes postgresql
+          fi
+
+      # PR 70A adds the pre-customer sales domain. Its security claim — that no
+      # browser role can write a CRM table directly, so the validating RPCs cannot
+      # be bypassed — is not something source review can settle: a file that reads
+      # `enable row level security` plus an owner policy looks safe while an owner's
+      # session can still PATCH owner_lead_integration_checks straight to
+      # status='complete'. This boots a throwaway cluster with Supabase's real
+      # default public-schema grants reproduced, applies 20260903120000, and issues
+      # every statement as every role: anon, an ordinary customer, a cogniiq_admin
+      # and the real platform owner. It asserts the grant matrix from the live
+      # catalogs (TRUNCATE included, which no policy covers), that direct
+      # INSERT/UPDATE/DELETE is refused even for the owner, that the sanctioned RPCs
+      # work, that each of the five pre-offer gate conditions is refused independently
+      # by BOTH layers — the RPC answering with its own domain message before it writes
+      # anything (a raw check_violation surfacing there is a failure, because it would
+      # mean validation ran after the write) and the table constraint rejecting a raw
+      # superuser write — that tri-state capability booleans never decay to false, that
+      # duplicates warn without merging or blocking, that a stage change touches nothing
+      # outside the lead, that 'won' is refused through both the RPC and a direct write
+      # (a project starts at Won and the atomic conversion does not exist yet), that
+      # entities stay isolated, and that a replay changes neither the grants nor the
+      # data.
+      - name: Owner CRM lead foundation SQL tests
+        run: bash .github/scripts/run-owner-crm-lead-foundation-sql-tests.sh

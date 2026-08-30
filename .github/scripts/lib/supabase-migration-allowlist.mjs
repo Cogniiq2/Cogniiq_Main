@@ -196,6 +196,30 @@ export const ALLOWED_MIGRATIONS = [
     requires: ['20260710120000', '20260730031350'],
     description: 'Security — receptionist lead PII row-level-security boundary (PR-0B)',
   },
+  {
+    file: '20260903120000_owner_crm_lead_foundation.sql',
+    version: '20260903120000',
+    // Real dependencies, every one of them named by this migration's own
+    // fail-closed preamble and referenced by its SQL. All are already present in
+    // the production remote history at the time this entry was added:
+    //  - 20260710120000: public.is_platform_owner() (every RPC's first line and
+    //    every SELECT policy), public.set_updated_at() (the updated_at triggers)
+    //    and public.profiles (the created_by / archived_by / actor FKs)
+    //  - 20260722120000: public.owner_business_entities (owner_leads'
+    //    business_entity_id FK), public.owner_audit_log (the audit trigger's
+    //    target, including its business_entity_id foreign key),
+    //    public.owner_finance_requests and owner_claim_idempotency(uuid, text)
+    //    (owner_create_lead's replay protection)
+    //  - 20260724120000: public.owner_customers, read by
+    //    owner_find_lead_duplicates so "this is already a customer" is warned
+    //    about and not missed
+    // It depends on nothing in the offer, invoice, onboarding or receptionist
+    // chains: it references no object from any of them. Listing a version this
+    // SQL does not reference would make the dependency gate assert something
+    // untrue.
+    requires: ['20260710120000', '20260722120000', '20260724120000'],
+    description: 'CRM PR-70A — pre-customer manual sales foundation (leads, follow-ups, activity, pre-offer gate)',
+  },
 ];
 
 /**
