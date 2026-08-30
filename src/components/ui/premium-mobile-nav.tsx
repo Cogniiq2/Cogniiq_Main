@@ -100,11 +100,22 @@ export function PremiumMobileNav() {
   return (
     <>
       {/* TRIGGER PILL */}
+      {/* The horizontal centering lives in the motion transform, NOT in a
+          Tailwind `-translate-x-1/2` class. framer-motion owns the `transform`
+          property of an element it animates and writes it wholesale: animating
+          `y` alone emitted `transform: none` on the settled frame, which
+          discarded the -50% correction while `left: 50%` stayed. The pill was
+          therefore laid out from the viewport's midpoint rather than centred on
+          it, and its full width (187-224px, depending on the active section
+          label) hung off the right edge — giving every page carrying this nav a
+          horizontal scrollbar below the `lg` breakpoint. Keeping `x: '-50%'` in
+          both the initial and animate states makes framer-motion emit the
+          correction itself, so it survives every frame. */}
       <motion.button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 lg:hidden"
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
+        className="fixed bottom-6 left-1/2 z-50 lg:hidden"
+        initial={{ x: '-50%', y: 100, opacity: 0 }}
+        animate={{ x: '-50%', y: 0, opacity: 1 }}
         transition={{ delay: 0.4, type: 'spring', stiffness: 240, damping: 22 }}
         whileTap={{ scale: 0.96 }}
         aria-label="Navigation öffnen"
