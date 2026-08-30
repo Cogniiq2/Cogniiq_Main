@@ -42,7 +42,6 @@ export function InternalWorkspaceLayout() {
         <DashboardShell
           sections={sections}
           subNav={subNav}
-          subNavLabel={activeModule.subNavLabel}
           activeSubKey={isSubNavActive}
           title={moduleAllowed ? activeModule.title : 'Cogniiq'}
         >
