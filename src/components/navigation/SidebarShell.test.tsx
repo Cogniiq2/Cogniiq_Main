@@ -145,3 +145,43 @@ describe('SidebarShell', () => {
     expect(screen.getByText('Inhalt')).toBeTruthy();
   });
 });
+
+// ---------------------------------------------------------------- rail scrolling
+// The rail scrolls inside a Radix ScrollArea instead of a native `overflow-y-auto`
+// box. These lock in the two things that regressed silently when that changed:
+// the navigation must still be one scroll container that can shrink, and every
+// item must still be reachable — a custom scroller that clipped content would
+// look fine in a screenshot and hide navigation from real users.
+describe('SidebarShell rail scrolling', () => {
+  it('keeps every navigation item in the accessibility tree inside the custom scroller', () => {
+    renderShell();
+    const nav = desktopNav();
+    expect(within(nav).getByRole('link', { name: 'Übersicht' })).toBeTruthy();
+    expect(within(nav).getByRole('link', { name: 'Abrechnung' })).toBeTruthy();
+  });
+
+  it('renders exactly one scrollable viewport inside the desktop navigation landmark', () => {
+    renderShell();
+    // Radix marks its scroll container with this attribute; more than one would
+    // mean nested scrollers fighting over the wheel.
+    const viewports = desktopNav().querySelectorAll('[data-radix-scroll-area-viewport]');
+    expect(viewports.length).toBe(1);
+  });
+
+  it('lets the navigation shrink so the footer is never pushed off a short rail', () => {
+    renderShell();
+    // `min-h-0` on the flex child is the entire reason a long sub-navigation
+    // scrolls instead of growing the rail past the viewport.
+    expect(desktopNav().className).toMatch(/min-h-0/);
+  });
+
+  it('marks the overflow affordance as decorative so it cannot swallow a nav click', () => {
+    renderShell();
+    const fades = desktopNav().querySelectorAll('[data-rail-fade]');
+    expect(fades.length).toBe(2);
+    fades.forEach((fade) => {
+      expect(fade.getAttribute('aria-hidden')).toBe('true');
+      expect(fade.className).toMatch(/pointer-events-none/);
+    });
+  });
+});

@@ -308,10 +308,31 @@ html.cq-public-light {
 /* ADMIN THEME SYSTEM                                                             */
 /* ============================================================================= */
 
-/* Admin theme smooth transition */
-[data-admin-theme] * {
-  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease;
-}
+/* NO BLANKET TRANSITION HERE — deliberately.
+ *
+ * This block used to carry:
+ *
+ *   [data-admin-theme] * { transition: background-color .25s, border-color .25s, color .2s }
+ *
+ * `data-admin-theme` is set on <html> (see InternalWorkspaceLayout), so `*` matched
+ * EVERY element in the document, not the admin surface. Three consequences:
+ *
+ *   1. It was motion nobody asked for. The internal workspace pins the light
+ *      palette and ships no theme toggle, so the theme-crossfade this rule
+ *      existed for can never be triggered — it only taxed every paint.
+ *   2. 250ms is far outside the 140-180ms interaction band the dashboard tokens
+ *      define, so hover feedback on tables, rows and buttons lagged behind the
+ *      pointer wherever a component did not declare its own faster transition.
+ *   3. The attribute is only removed when the workspace unmounts, so before that
+ *      fix the rule followed the user back onto public marketing pages for the
+ *      rest of the SPA session.
+ *
+ * Motion is now declared where it belongs: `--cq-duration-*` / `--cq-ease` under
+ * [data-cq-surface='dashboard'] and explicit `transition-colors` utilities on the
+ * components that actually change colour. Those are also what the reduced-motion
+ * block further down can collapse — a blanket `*` rule outside that scope was
+ * never covered by it.
+ */
 
 /* Dark Admin Theme (default, matches current design) */
 [data-admin-theme="dark"] {
