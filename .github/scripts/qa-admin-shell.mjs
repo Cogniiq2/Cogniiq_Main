@@ -521,6 +521,115 @@ try {
       await browser.close();
     }
   }
+
+  // ---- 6) motion is DECLARED, never inherited
+  //
+  // src/index.css carries a document-wide `*` rule giving every element a 300ms
+  // colour/background/border transition. It predates the dashboard and stays for
+  // the public site. The Admin Center opts out of it, so that the only motion
+  // inside the workspace is motion a component asked for.
+  //
+  // Probes are synthetic elements injected into the real scope rather than
+  // whichever component happens to be on screen: this asserts the CASCADE, so it
+  // cannot start passing (or failing) because a component's classes changed.
+  const PROBE_MOTION = `((selector, className) => {
+    const scope = document.querySelector(selector);
+    if (!scope) return null;
+    const probe = document.createElement('div');
+    if (className) probe.className = className;
+    scope.appendChild(probe);
+    const style = getComputedStyle(probe);
+    const out = { property: style.transitionProperty, duration: style.transitionDuration };
+    probe.remove();
+    return out;
+  })`;
+
+  /** Chrome reports seconds ("0.14s"); accept either unit. */
+  const ms = (value) => {
+    if (typeof value !== 'string') return NaN;
+    const n = Number.parseFloat(value);
+    if (Number.isNaN(n)) return NaN;
+    return value.trim().endsWith('ms') ? n : n * 1000;
+  };
+
+  {
+    const browser = await launchChromium(chromiumPath);
+    try {
+      await preparePage(browser.page, VIEWPORTS[0]);
+      await goto(browser.page, '/admin/finance/overview');
+
+      // A. no explicit transition => no inherited transition at all.
+      const bare = await evaluate(browser.page, `${PROBE_MOTION}('[data-cq-surface="dashboard"]', '')`);
+      if (bare && bare.property === 'none') {
+        ok('motion: an admin element without an explicit transition inherits none');
+      } else {
+        bad('motion: an admin element without an explicit transition inherits none', JSON.stringify(bare));
+      }
+
+      // B. declared dashboard motion still resolves, and to the dashboard band.
+      const declared = await evaluate(
+        browser.page,
+        `${PROBE_MOTION}('[data-cq-surface="dashboard"]', 'transition-colors duration-fast')`
+      );
+      const declaredMs = ms(declared?.duration);
+      if (declared && declared.property !== 'none' && declaredMs >= 140 && declaredMs <= 180) {
+        ok(`motion: declared dashboard motion resolves to ${declared.duration} (140-180ms band)`);
+      } else {
+        bad('motion: declared dashboard motion resolves to the 140-180ms band', JSON.stringify(declared));
+      }
+
+      // Stated separately from A because it is the specific regression: whatever
+      // else changes, the 300ms blanket must never be what an admin element gets.
+      // Inert means either no property to animate, or nothing to wait for.
+      const bareIsInert = Boolean(bare) && (bare.property === 'none' || ms(bare.duration) === 0);
+      if (bareIsInert) {
+        ok('motion: the document-wide 300ms transition does not reach the workspace');
+      } else {
+        bad('motion: the document-wide 300ms transition does not reach the workspace', JSON.stringify(bare));
+      }
+
+      // D. the public site keeps the rule exactly as it was.
+      await evaluate(browser.page, `(() => {
+        window.history.pushState({}, '', '/');
+        window.dispatchEvent(new PopStateEvent('popstate'));
+        return true;
+      })()`);
+      await wait(1500);
+      const publicProbe = await evaluate(browser.page, `${PROBE_MOTION}('body', '')`);
+      if (
+        publicProbe &&
+        publicProbe.property.includes('background-color') &&
+        ms(publicProbe.duration) === 300
+      ) {
+        ok('motion: the public site still inherits its 300ms transition (unchanged by this PR)');
+      } else {
+        bad('motion: the public site still inherits its 300ms transition', JSON.stringify(publicProbe));
+      }
+    } finally {
+      await browser.close();
+    }
+  }
+
+  // C. reduced motion still collapses DECLARED admin motion.
+  {
+    const browser = await launchChromium(chromiumPath);
+    try {
+      await preparePage(browser.page, VIEWPORTS[0], { reducedMotion: true });
+      await goto(browser.page, '/admin/finance/overview');
+      const reduced = await evaluate(
+        browser.page,
+        `${PROBE_MOTION}('[data-cq-surface="dashboard"]', 'transition-colors duration-fast')`
+      );
+      const reducedMs = ms(reduced?.duration);
+      if (reduced && reducedMs <= 1) {
+        ok(`motion: reduced motion collapses declared admin motion to ${reduced.duration}`);
+      } else {
+        bad('motion: reduced motion collapses declared admin motion', JSON.stringify(reduced));
+      }
+    } finally {
+      await browser.close();
+    }
+  }
 } finally {
   try { process.kill(-server.pid, 'SIGTERM'); } catch { server.kill('SIGTERM'); }
 }

@@ -116,6 +116,50 @@
     transition-duration: 0.3s;
     transition-timing-function: ease;
   }
+
+  /* ───────────────────────────────────────────────────────────────────────────
+     The Admin Center opts OUT of the document-wide transition above.
+
+     That `*` rule predates the dashboard (it arrived with the customer-billing
+     work in July) and gives every element on the site a 300ms colour, background
+     and border transition whether or not anyone asked for one. On the public
+     marketing pages that is the established look and this PR does not touch it.
+
+     Inside the Admin Center it is wrong in three ways: it is motion nobody
+     declared, 300ms is far outside the 140-180ms interaction band the dashboard
+     tokens define, and it is the reason a hover on a table row used to lag
+     behind the pointer. Removing the blanket `[data-admin-theme] *` transition
+     further down only solved half of that — this rule was the other half, and
+     without this opt-out the claim that admin motion comes only from explicit
+     dashboard tokens is not yet true.
+
+     Why `transition-property: none` and not `transition: none`: it disables only
+     the INHERITED property list. Anything that declares its own transition still
+     works, because Tailwind emits utilities after `@layer base`, so
+     `.transition-colors` (0,1,0) beats this selector (0,1,0) on source order.
+     Intentional dashboard motion is therefore untouched; only the accident is
+     removed.
+
+     Animations are unaffected — `animate-in` / `duration-fast` on the overlays
+     and the select menu drive `animation-duration`, not a transition — and
+     reduced motion is still handled by the `prefers-reduced-motion` block that
+     collapses the dashboard tokens and forces `transition-duration: 1ms`.
+
+     Scope: `[data-cq-surface='dashboard']` is the shell root (SidebarShell) and
+     `[data-cq-portal='dashboard']` covers overlays that portal to document.body.
+     Nothing outside those two subtrees is affected, so public-site behaviour is
+     byte-for-byte what it was.
+     ─────────────────────────────────────────────────────────────────────────── */
+  [data-cq-surface='dashboard'],
+  [data-cq-surface='dashboard'] *,
+  [data-cq-surface='dashboard'] *::before,
+  [data-cq-surface='dashboard'] *::after,
+  [data-cq-portal='dashboard'],
+  [data-cq-portal='dashboard'] *,
+  [data-cq-portal='dashboard'] *::before,
+  [data-cq-portal='dashboard'] *::after {
+    transition-property: none;
+  }
 }
 
 @layer utilities {
