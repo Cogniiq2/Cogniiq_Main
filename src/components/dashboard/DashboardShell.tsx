@@ -34,12 +34,29 @@ export interface ShellSubNavItem {
   icon?: LucideIcon;
 }
 
+/**
+ * A labelled band inside one module's sub-navigation.
+ *
+ * The Finance module carries a dozen destinations. As one flat list they read as an
+ * undifferentiated wall: nothing tells the owner that "Rechnungen" and "Ausgaben" sit
+ * on opposite sides of the business. Grouping them under the headings the business
+ * actually uses — income, costs, accounting — is the whole reason this type exists.
+ *
+ * `label` is optional: a leading group without one renders as a plain block, which is
+ * how a module's primary destinations sit above the first heading.
+ */
+export interface ShellSubNavGroup {
+  key: string;
+  label?: string;
+  items: ShellSubNavItem[];
+}
+
 export function DashboardShell({
-  sections, subNav, subNavLabel, activeSubKey, title, children,
+  sections, subNav, activeSubKey, title, children,
 }: {
   sections: ShellSection[];
-  subNav?: ShellSubNavItem[];
-  subNavLabel?: string;
+  /** The active module's sub-navigation, already grouped by the caller. */
+  subNav?: ShellSubNavGroup[];
   activeSubKey?: (pathname: string, href: string) => boolean;
   title?: string;
   children: ReactNode;
@@ -52,7 +69,11 @@ export function DashboardShell({
     const isSubActive = (href: string) =>
       activeSubKey ? activeSubKey(pathname, href) : pathname === href || pathname.startsWith(`${href}/`);
 
-    const hasSubNav = Boolean(subNav && subNav.length);
+    // A group with no items would render an orphan heading, so empty bands are dropped
+    // rather than pushed at the rail. This is what lets a caller describe the full target
+    // navigation and simply omit the destinations that do not exist yet.
+    const subGroups = (subNav ?? []).filter((group) => group.items.length > 0);
+    const hasSubNav = subGroups.length > 0;
 
     const result: SidebarNavGroup[] = [
       {
@@ -66,18 +87,18 @@ export function DashboardShell({
           active: section.active,
           // The active module only *contains* the current page once its sub-navigation is on
           // screen, so it announces 'true' and leaves the single 'page' to the active sub-item.
-          // A module without sub-navigation (Oura, or any module whose sub-nav is withheld from a
+          // A module without sub-navigation (or any module whose sub-nav is withheld from a
           // non-owner) is itself the destination and keeps 'page'.
           current: hasSubNav ? ('true' as const) : ('page' as const),
         })),
       },
     ];
 
-    if (hasSubNav) {
+    for (const group of subGroups) {
       result.push({
-        id: 'module',
-        label: subNavLabel ?? 'Navigation',
-        items: subNav!.map((item) => ({
+        id: `module-${group.key}`,
+        label: group.label,
+        items: group.items.map((item) => ({
           key: item.key,
           label: item.label,
           href: item.href,
@@ -89,7 +110,7 @@ export function DashboardShell({
     }
 
     return result;
-  }, [sections, subNav, subNavLabel, pathname, activeSubKey]);
+  }, [sections, subNav, pathname, activeSubKey]);
 
   const email = profile?.email ?? user?.email ?? null;
   const displayName = profile?.full_name || email || 'Konto';

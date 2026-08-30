@@ -4,7 +4,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { PlatformAdminRoute } from '@/components/auth/PlatformAdminRoute';
 import { DashboardShell, ToastProvider } from '@/components/dashboard';
 import { useAuth } from '@/contexts/AuthContext';
-import { getActiveModule, getSections, isSubNavActive } from '@/pages/admin/internalNavigation';
+import { getActiveModule, getSections, getSubNav, isSubNavActive } from '@/pages/admin/internalNavigation';
 
 // The one internal workspace shell shared by every /admin/* module (Tasks, Oura, CRM, Finance).
 // It is protected once by PlatformAdminRoute, renders a single DashboardShell with one account/logout
@@ -30,11 +30,11 @@ export function InternalWorkspaceLayout() {
   const activeModule = getActiveModule(pathname);
   const sections = getSections(pathname, { isOwner: isPlatformOwner });
 
-  // Never render an owner-only module's sub-navigation to a non-owner, even if they typed the URL
-  // (they will see the owner-only access-denied screen in the outlet). Hiding it is convenience;
+  // Never render an owner-only destination to a non-owner, even if they typed the URL (they will
+  // see the owner-only access-denied screen in the outlet). Hiding it is convenience;
   // PlatformOwnerRoute + RLS remain the boundary.
   const moduleAllowed = !activeModule.ownerOnly || isPlatformOwner;
-  const subNav = moduleAllowed ? activeModule.subNav : [];
+  const subNav = getSubNav(pathname, { isOwner: isPlatformOwner });
 
   return (
     <PlatformAdminRoute>
@@ -42,7 +42,6 @@ export function InternalWorkspaceLayout() {
         <DashboardShell
           sections={sections}
           subNav={subNav}
-          subNavLabel={activeModule.subNavLabel}
           activeSubKey={isSubNavActive}
           title={moduleAllowed ? activeModule.title : 'Cogniiq'}
         >

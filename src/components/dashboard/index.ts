@@ -3,6 +3,7 @@
 export * from './tokens';
 export * from './primitives';
 export * from './overlays';
+export * from './workspace';
 export { PremiumSelect, PremiumCombobox, type SelectOption, type PremiumSelectProps, type PremiumComboboxProps } from './PremiumSelect';
-export { DashboardShell, type ShellSection, type ShellSubNavItem } from './DashboardShell';
+export { DashboardShell, type ShellSection, type ShellSubNavItem, type ShellSubNavGroup } from './DashboardShell';
 export { ToastProvider, useToast, type ToastOptions, type ToastTone } from './toast';

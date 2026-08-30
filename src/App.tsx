@@ -411,6 +411,7 @@ const InternalWorkspaceLayout = lazyNamed(
 );
 
 // Unified internal workspace content (all rendered inside InternalWorkspaceLayout's shared shell).
+const CommandCenterPage = lazyNamed(() => import('./pages/admin/CommandCenterPage'), 'CommandCenterPage');
 const TaskDashboardContent = lazyNamed(() => import('./pages/admin/tasks/TaskDashboardContent'), 'TaskDashboardContent');
 const ExecutionContent = lazyNamed(() => import('./pages/ExecutionPage'), 'ExecutionContent');
 const OuraAnalyticsContent = lazyNamed(() => import('./pages/OuraAnalyticsPage'), 'OuraAnalyticsContent');
@@ -526,7 +527,11 @@ export function AppInner() {
 
         {/* Unified internal workspace (/admin/*) — one shell, role-aware nav, owner-only finance. */}
         <Route element={<InternalWorkspaceLayout />}>
-          <Route path="/admin" element={<TaskDashboardContent />} />
+          {/* The Command Center is the Admin Center's landing surface. The task dashboard that
+              used to sit here keeps every one of its routes and its data — it moved to
+              /admin/tasks and is reached from the Command Center rather than from the rail. */}
+          <Route path="/admin" element={<CommandCenterPage />} />
+          <Route path="/admin/tasks" element={<TaskDashboardContent />} />
           <Route path="/admin/tasks/today" element={<TaskDashboardContent view="today" />} />
           <Route path="/admin/tasks/overdue" element={<TaskDashboardContent view="overdue" />} />
           <Route path="/admin/tasks/completed" element={<TaskDashboardContent view="completed" />} />

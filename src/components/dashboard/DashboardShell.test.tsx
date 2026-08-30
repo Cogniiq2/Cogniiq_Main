@@ -13,7 +13,8 @@ vi.mock('@/contexts/AuthContext', () => ({
 }));
 
 const { DashboardShell } = await import('@/components/dashboard/DashboardShell');
-const { getSections, getActiveModule, isSubNavActive } = await import('@/pages/admin/internalNavigation');
+const { getSections, getSubNav, getActiveModule, isSubNavActive } =
+  await import('@/pages/admin/internalNavigation');
 
 function renderAt(pathname: string, { isOwner = true } = {}) {
   const activeModule = getActiveModule(pathname);
@@ -22,8 +23,7 @@ function renderAt(pathname: string, { isOwner = true } = {}) {
     <MemoryRouter initialEntries={[pathname]}>
       <DashboardShell
         sections={getSections(pathname, { isOwner })}
-        subNav={moduleAllowed ? activeModule.subNav : []}
-        subNavLabel={activeModule.subNavLabel}
+        subNav={getSubNav(pathname, { isOwner })}
         activeSubKey={isSubNavActive}
         title={moduleAllowed ? activeModule.title : 'Cogniiq'}
       >
@@ -42,18 +42,18 @@ describe('DashboardShell aria-current semantics', () => {
     renderAt('/admin/finance/invoices');
     const nav = rail();
 
-    expect(within(nav).getByRole('link', { name: 'Finance & Steuern' }).getAttribute('aria-current')).toBe('true');
+    expect(within(nav).getByRole('link', { name: 'Finanzen' }).getAttribute('aria-current')).toBe('true');
     expect(within(nav).getByRole('link', { name: 'Rechnungen' }).getAttribute('aria-current')).toBe('page');
   });
 
   it('renders exactly one aria-current="page" per navigation landmark', () => {
     for (const pathname of [
       '/admin',
-      '/admin/tasks/today',
       '/admin/clients',
+      '/admin/solutions',
+      '/admin/finance/customers',
       '/admin/finance/overview',
       '/admin/finance/invoices',
-      '/admin/oura-analytics',
     ]) {
       const view = renderAt(pathname);
       for (const nav of screen.getAllByRole('navigation', { name: 'Workspace Navigation' })) {
@@ -64,16 +64,16 @@ describe('DashboardShell aria-current semantics', () => {
   });
 
   it('keeps a module without sub-navigation as the page itself', () => {
-    renderAt('/admin/oura-analytics');
+    renderAt('/admin');
     const nav = rail();
-    // Oura has no sub-nav, so the module row is the destination rather than a container.
-    expect(within(nav).getByRole('link', { name: 'Oura Analytics' }).getAttribute('aria-current')).toBe('page');
+    // The Command Center is a single destination, so its module row IS the page.
+    expect(within(nav).getByRole('link', { name: 'Command Center' }).getAttribute('aria-current')).toBe('page');
   });
 
   it('still marks the module as active, so the visual selected state is unchanged', () => {
     renderAt('/admin/finance/invoices');
     const nav = rail();
-    const moduleLink = within(nav).getByRole('link', { name: 'Finance & Steuern' });
+    const moduleLink = within(nav).getByRole('link', { name: 'Finanzen' });
     // 'true' and 'page' both style as selected; what matters is that it is still marked at all.
     expect(moduleLink.getAttribute('aria-current')).not.toBeNull();
   });
@@ -81,16 +81,35 @@ describe('DashboardShell aria-current semantics', () => {
   it('withholds the owner-only module from a non-owner without breaking the landmark', () => {
     renderAt('/admin', { isOwner: false });
     const nav = rail();
-    expect(within(nav).queryByRole('link', { name: 'Finance & Steuern' })).toBeNull();
+    expect(within(nav).queryByRole('link', { name: 'Finanzen' })).toBeNull();
     expect(nav.querySelectorAll('[aria-current="page"]').length).toBe(1);
   });
 
-  it('preserves every destination the navigation module defines', () => {
+  it('withholds owner-only destinations inside a shared module from a non-owner', () => {
+    renderAt('/admin/clients', { isOwner: false });
+    const nav = rail();
+    // The canonical owner_customers workspace is owner-only; the portal tenants are not.
+    // Checked by destination: the module row is also labelled "Kunden" and stays visible,
+    // pointing a non-owner at the portal tenants they can actually administer.
+    const hrefs = [...nav.querySelectorAll('a')].map((a) => a.getAttribute('href'));
+    expect(hrefs).toContain('/admin/clients');
+    expect(hrefs).not.toContain('/admin/finance/customers');
+  });
+
+  it('preserves every destination the active module defines', () => {
     renderAt('/admin/finance/overview');
     const nav = rail();
     const hrefs = [...nav.querySelectorAll('a')].map((a) => a.getAttribute('href'));
-    for (const item of getActiveModule('/admin/finance/overview').subNav) {
-      expect(hrefs, item.label).toContain(item.href);
+    for (const group of getSubNav('/admin/finance/overview', { isOwner: true })) {
+      for (const item of group.items) expect(hrefs, item.label).toContain(item.href);
+    }
+  });
+
+  it('renders the finance sub-navigation as labelled bands rather than one flat list', () => {
+    renderAt('/admin/finance/overview');
+    const nav = rail();
+    for (const label of ['Einnahmen', 'Kosten', 'Buchhaltung']) {
+      expect(within(nav).getAllByText(label).length, label).toBeGreaterThan(0);
     }
   });
 });
