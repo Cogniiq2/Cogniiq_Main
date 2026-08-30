@@ -395,6 +395,67 @@ try {
     }
   }
 
+  // ---- 1b) the navigation architecture, in the real rail -----------------
+  // The rail is the owner's map of the business. These assertions are about what it
+  // SAYS, not how it looks: the finance destinations are banded, the surfaces that
+  // deliberately left the rail are still routable, and no rail entry is a dead link.
+  {
+    const viewport = VIEWPORTS[0];
+    const browser = await launchChromium(chromiumPath);
+    try {
+      const consoleErrors = await preparePage(browser.page, viewport);
+      await goto(browser.page, '/admin');
+
+      const home = await evaluate(browser.page, `(() => {
+        const nav = document.querySelector('nav[aria-label="Workspace Navigation"]');
+        if (!nav) return null;
+        const current = [...nav.querySelectorAll('[aria-current]')].map((a) => ({
+          href: a.getAttribute('href'), value: a.getAttribute('aria-current'), text: a.textContent.trim(),
+        }));
+        return {
+          heading: document.querySelector('main h1')?.textContent?.trim() ?? null,
+          modules: [...nav.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')),
+          currentPage: current.filter((c) => c.value === 'page'),
+          search: Boolean(document.querySelector('[aria-label="Schnellsuche öffnen"]')),
+        };
+      })()`);
+
+      if (home?.heading) ok(`architecture: /admin lands on the Command Center ("${home.heading}")`);
+      else bad('architecture: /admin lands on the Command Center', JSON.stringify(home));
+
+      if (home?.currentPage.length === 1) ok('architecture: exactly one rail entry is the current page');
+      else bad('architecture: exactly one rail entry is the current page', JSON.stringify(home?.currentPage));
+
+      if (home?.search) ok('architecture: the rail carries the ⌘K affordance');
+      else bad('architecture: the rail carries the ⌘K affordance', 'no trigger found');
+
+      // Oura and the standalone task/execution OS are withheld from the business rail.
+      const withheld = ['/admin/oura-analytics', '/admin/execution', '/admin/tasks'];
+      const leaked = withheld.filter((href) => home?.modules.includes(href));
+      if (leaked.length === 0) ok('architecture: Oura and the standalone task OS stay out of the rail');
+      else bad('architecture: Oura and the standalone task OS stay out of the rail', leaked.join(', '));
+
+      await goto(browser.page, '/admin/finance/overview');
+      const bands = await evaluate(browser.page, `(() => {
+        const nav = document.querySelector('nav[aria-label="Workspace Navigation"]');
+        return [...nav.querySelectorAll('p')].map((p) => p.textContent.trim());
+      })()`);
+      const expectedBands = ['Einnahmen', 'Kosten', 'Buchhaltung'];
+      const missing = expectedBands.filter((band) => !bands.includes(band));
+      if (missing.length === 0) ok(`architecture: the finance rail is banded (${bands.join(' · ')})`);
+      else bad('architecture: the finance rail is banded', `missing ${missing.join(', ')}`);
+
+      // Whether every rail destination actually renders a page is asserted in
+      // qa-admin-visual.mjs, which answers the reads with fixtures rich enough for the
+      // finance pages to finish loading. This runner deliberately answers everything
+      // empty, which is right for rail geometry and wrong for page content.
+
+      reportConsole(consoleErrors, 'architecture');
+    } finally {
+      await browser.close();
+    }
+  }
+
   // ---- 2) the mobile drawer opens and lists the navigation ----------------
   {
     const viewport = VIEWPORTS[VIEWPORTS.length - 1];

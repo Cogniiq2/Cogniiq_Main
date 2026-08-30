@@ -268,6 +268,37 @@ try {
     }
   }
 
+  // No dead links, and nothing destroyed by leaving the rail.
+  //
+  // Every destination the rail offers must render a real page, and the two surfaces
+  // deliberately withheld from the rail (Oura, the standalone task/execution OS) must
+  // still resolve when typed — withheld is a navigation decision, not a deletion.
+  await setViewport(page, ALL_VIEWPORTS[0]);
+  if (await goto(page, '/admin/finance/overview')) {
+    const hrefs = await evaluate(page, `(() => {
+      const nav = document.querySelector('nav[aria-label="Workspace Navigation"]');
+      return [...new Set([...nav.querySelectorAll('a[href^="/admin"]')].map((a) => a.getAttribute('href')))];
+    })()`);
+    const dead = [];
+    for (const href of hrefs) {
+      if (!(await goto(page, href))) { dead.push(`${href} (never rendered)`); continue; }
+      const heading = await evaluate(page, `document.querySelector('main h1')?.textContent?.trim() ?? null`);
+      if (!heading) dead.push(href);
+    }
+    if (dead.length === 0) ok(`navigation: all ${hrefs.length} rail destinations render a page`);
+    else bad('navigation: all rail destinations render a page', dead.join(', '));
+
+    const unreachable = [];
+    for (const href of ['/admin/oura-analytics', '/admin/execution', '/admin/tasks/today']) {
+      await page.send('Page.navigate', { url: `${ORIGIN}${href}` });
+      await wait(2500);
+      const rendered = await evaluate(page, `Boolean(document.querySelector('main')?.innerText?.trim())`).catch(() => false);
+      if (!rendered) unreachable.push(href);
+    }
+    if (unreachable.length === 0) ok('navigation: the surfaces withheld from the rail still resolve when typed');
+    else bad('navigation: the withheld surfaces still resolve', unreachable.join(', '));
+  }
+
   // ⌘K: the palette must open from the keyboard, be reachable from the rail's trigger,
   // and put focus in its own input rather than leaving it behind the overlay.
   await setViewport(page, ALL_VIEWPORTS[0]);

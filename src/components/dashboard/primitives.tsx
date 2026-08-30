@@ -9,6 +9,7 @@ import {
   radius, skeleton as skeletonClass, space, statusTone, surface, text, zIndex,
 } from './tokens';
 import { PremiumSelect, type SelectOption } from './PremiumSelect';
+import { WorkspaceHeader } from './workspace';
 
 // Shared dashboard primitives for the authenticated Cogniiq surfaces.
 //
@@ -161,18 +162,22 @@ export function SectionHeader({ title, description, action, className }: { title
   );
 }
 
+/**
+ * The original page header, kept as the compatibility surface for the pages that have
+ * not been recomposed yet — it now renders through `WorkspaceHeader`, so every screen
+ * in the workspace shares one header structure, spacing and type scale rather than two.
+ *
+ * New pages should use `WorkspaceHeader` directly: it additionally carries an eyebrow,
+ * a breadcrumb trail, status badges, a meta line and a toolbar rail.
+ */
 export function PageHeader({ title, description, actions, breadcrumb }: { title: string; description?: string; actions?: ReactNode; breadcrumb?: ReactNode }) {
   return (
-    <div className="mb-5">
-      {breadcrumb ? <div className="mb-2">{breadcrumb}</div> : null}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0">
-          <h1 className={text.pageTitle}>{title}</h1>
-          {description ? <p className={cn('mt-1 max-w-2xl', text.body)}>{description}</p> : null}
-        </div>
-        {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
-      </div>
-    </div>
+    <WorkspaceHeader
+      title={title}
+      subtitle={description}
+      actions={actions}
+      leading={breadcrumb}
+    />
   );
 }
 

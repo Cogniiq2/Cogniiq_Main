@@ -38,11 +38,13 @@ export interface Crumb {
  * toolbar slot is what pulls that back into the header.
  */
 export function WorkspaceHeader({
-  eyebrow, crumbs, title, subtitle, status, actions, toolbar, meta, className,
+  eyebrow, crumbs, leading, title, subtitle, status, actions, toolbar, meta, className,
 }: {
   /** Small caps context line. Use when there is no breadcrumb trail. */
   eyebrow?: string;
   crumbs?: Crumb[];
+  /** Caller-supplied element above the title — a hand-rolled back link, say. */
+  leading?: ReactNode;
   title: ReactNode;
   subtitle?: ReactNode;
   /** Badges sitting on the title line — the record's state, not decoration. */
@@ -85,6 +87,8 @@ export function WorkspaceHeader({
         </nav>
       ) : eyebrow ? (
         <p className={cn('mb-1.5', text.eyebrow)}>{eyebrow}</p>
+      ) : leading ? (
+        <div className="mb-2">{leading}</div>
       ) : null}
 
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
