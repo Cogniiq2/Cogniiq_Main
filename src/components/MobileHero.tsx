@@ -506,12 +506,15 @@ export function MobileHero() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              // A <button> centres its own label; an <a> does not. Without this
+              // a wrapped second line goes hard left — invisible today because
+              // the German labels happen to fit on one line at 320px, one copy
+              // edit away from not.
+              textAlign: 'center',
               textDecoration: 'none',
               minHeight: 54,
               borderRadius: 14,
               background: '#0d1821',
-              border: 'none',
-              cursor: 'pointer',
               fontSize: '15px',
               fontWeight: 600,
               color: '#ffffff',
@@ -552,12 +555,16 @@ export function MobileHero() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              // A <button> centres its own label; an <a> does not. Without this
+              // a wrapped second line goes hard left — invisible today because
+              // the German labels happen to fit on one line at 320px, one copy
+              // edit away from not.
+              textAlign: 'center',
               textDecoration: 'none',
               minHeight: 48,
               borderRadius: 14,
               background: 'rgba(255,255,255,0.7)',
               border: '1px solid rgba(15,23,42,0.1)',
-              cursor: 'pointer',
               fontSize: '14px',
               fontWeight: 500,
               color: '#374151',

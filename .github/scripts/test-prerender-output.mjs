@@ -459,6 +459,21 @@ if (/<lastmod>/.test(sitemap)) {
   }
 }
 
+/**
+ * Offset just past the `</section>` that closes the <section> opening at
+ * `openIndex`, counting nested sections. Returns -1 if it is never closed.
+ */
+function matchingSectionEnd(html, openIndex) {
+  const token = /<\/?section[\s>]/g;
+  token.lastIndex = openIndex;
+  let depth = 0;
+  for (let m = token.exec(html); m; m = token.exec(html)) {
+    depth += m[0][1] === '/' ? -1 : 1;
+    if (depth === 0) return m.index + '</section>'.length;
+  }
+  return -1;
+}
+
 // ─── 10. the homepage hero is crawlable and works without JavaScript ─────────
 // The hero is the most prominent module on the site and the only one that links
 // to the two pages the business cares about. Both of its calls to action shipped
@@ -472,6 +487,13 @@ if (/<lastmod>/.test(sitemap)) {
 // the homepage is rendered from MobileHero at build time and swapped to
 // DesktopHero after hydration, so "how many H1s does / actually ship" is a
 // question only the artifact can answer.
+//
+// SCOPE: this covers the MOBILE hero only, and structurally cannot cover the
+// desktop one. HeroSection seeds isDesktop=false unconditionally, so the build
+// only ever prerenders MobileHero and DesktopHero never reaches dist/ — which
+// is also the version Googlebot indexes, under mobile-first indexing. The
+// desktop hero's calls to action are asserted where they actually exist: in a
+// real browser at a desktop width, in test-browser-hydration.mjs.
 {
   const homepage = read(join(DIST, 'index.html'));
   const rootMatch = homepage.match(/<div id="root">([\s\S]*)<\/div>\s*<\/body>/);
@@ -481,18 +503,29 @@ if (/<lastmod>/.test(sitemap)) {
   } else {
     const root = rootMatch[1];
 
-    // The hero region is bounded by the <section> that CONTAINS the H1: from the
-    // last <section> opening before it to the next <section> opening after it.
-    // A fixed byte window would silently pass — the pre-fix homepage had a
-    // /kontakt link a few thousand bytes further down, in an unrelated section.
+    // The hero region is exactly the <section> that CONTAINS the H1 — from its
+    // opening tag to its OWN matching close, found by counting nesting depth.
+    //
+    // Neither shortcut works here. A fixed byte window passes vacuously: the
+    // pre-fix homepage had an unrelated /kontakt link a few thousand bytes
+    // below the hero. Ending at "the next <section>" is the same bug with a
+    // different constant — on the real artifact that over-reaches the hero's
+    // own </section> by ~4.3kB and swallows the trust strip that follows it,
+    // so a hero with no anchors at all still passes. Both were demonstrated by
+    // mutating dist/index.html, not reasoned about.
     const h1Index = root.indexOf('<h1');
     if (h1Index === -1) {
       fail('homepage: no <h1> in the prerendered markup');
     } else {
       const heroStart = root.lastIndexOf('<section', h1Index);
-      const nextSection = root.indexOf('<section', h1Index);
-      const heroEnd = nextSection === -1 ? root.length : nextSection;
-      const heroRegion = root.slice(heroStart === -1 ? 0 : heroStart, heroEnd);
+      const heroEnd = heroStart === -1 ? -1 : matchingSectionEnd(root, heroStart);
+
+      if (heroStart === -1 || heroEnd === -1) {
+        // Never silently widen the window: an unbounded region is exactly how
+        // this assertion would start passing for the wrong reason.
+        fail('homepage: could not delimit the hero <section> around the <h1>');
+      } else {
+      const heroRegion = root.slice(heroStart, heroEnd);
 
       const h1Count = (root.match(/<h1[\s>]/g) || []).length;
       if (h1Count !== 1) {
@@ -556,6 +589,7 @@ if (/<lastmod>/.test(sitemap)) {
         );
       } else {
         ok('homepage hero has no focusable decorative elements');
+      }
       }
     }
   }
