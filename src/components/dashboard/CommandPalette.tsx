@@ -179,6 +179,9 @@ export function CommandPalette({ items, loadObjects, label = 'Schnellsuche' }: C
 
   const onKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Escape') { event.preventDefault(); setOpen(false); return; }
+    // aria-modal is a promise about focus, not just a label: the input is the only
+    // focusable node in here, so Tab keeps it rather than walking into the page behind.
+    if (event.key === 'Tab') { event.preventDefault(); inputRef.current?.focus(); return; }
     if (event.key === 'ArrowDown') {
       event.preventDefault();
       setActive((index) => (flat.length ? (index + 1) % flat.length : 0));

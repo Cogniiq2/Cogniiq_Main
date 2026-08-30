@@ -204,7 +204,16 @@ export function InvoicesPage() {
       tone: totals.overdue > 0 ? 'negative' : 'neutral',
     },
     { key: 'issued', label: 'Fakturiert', value: formatCents(totals.issued), hint: 'Bruttosumme gestellter Rechnungen' },
-    { key: 'paid', label: 'Eingegangen', value: formatCents(totals.paid), hint: 'tatsächlich erfasste Zahlungen', tone: 'positive' },
+    {
+      key: 'paid',
+      label: 'Auf Rechnungen eingegangen',
+      value: formatCents(totals.paid),
+      // Deliberately NOT the period's cash-in: this is the sum of payments recorded
+      // against these invoices, which excludes receipts without an invoice link and is
+      // not bounded by the tax year. The finance overview owns the cash figure.
+      hint: 'erfasste Zahlungen auf diese Rechnungen',
+      tone: 'positive',
+    },
     { key: 'drafts', label: 'Entwürfe', value: String(totals.drafts), hint: 'noch nicht gestellt' },
   ];
 

@@ -158,15 +158,18 @@ export function StatBand({ items, className }: { items: StatItem[]; className?: 
   if (!items.length) return null;
   return (
     <div className={cn(surface.card, 'overflow-hidden p-0', className)}>
-      <dl className="grid grid-cols-2 divide-[var(--cq-border-subtle)] sm:grid-cols-3 lg:flex lg:divide-x [&>*]:border-t [&>*]:border-[var(--cq-border-subtle)] sm:[&>*:nth-child(-n+3)]:border-t-0 [&>*:nth-child(-n+2)]:border-t-0 lg:[&>*]:border-t-0">
+      {/* Deliberately not a <dl>: a definition list may contain only dt/dd (or div
+          wrappers of them), and half of these cells are links. Label-then-value order
+          reads identically and the markup is valid. */}
+      <div className="grid grid-cols-2 divide-[var(--cq-border-subtle)] sm:grid-cols-3 lg:flex lg:divide-x [&>*]:border-t [&>*]:border-[var(--cq-border-subtle)] sm:[&>*:nth-child(-n+3)]:border-t-0 [&>*:nth-child(-n+2)]:border-t-0 lg:[&>*]:border-t-0">
         {items.map((item) => {
           const inner = (
             <>
               {/* Neither the label nor the hint truncates: a clipped metric label
                   ("VERTRAGLICH WIEDERKEH…") is worse than a two-line one, because the
                   owner then cannot tell what the number counts. */}
-              <dt className={text.eyebrow}>{item.label}</dt>
-              <dd
+              <p className={text.eyebrow}>{item.label}</p>
+              <p
                 className={cn(
                   'mt-1.5',
                   // The lead figure steps down on a phone: at 27px a five-digit euro
@@ -176,7 +179,7 @@ export function StatBand({ items, className }: { items: StatItem[]; className?: 
                 )}
               >
                 {item.value}
-              </dd>
+              </p>
               {item.visual ? <div className="mt-2">{item.visual}</div> : null}
               {item.hint ? <p className={cn('mt-1', text.hint)}>{item.hint}</p> : null}
             </>
@@ -198,7 +201,7 @@ export function StatBand({ items, className }: { items: StatItem[]; className?: 
           }
           return <div key={item.key} className={base}>{inner}</div>;
         })}
-      </dl>
+      </div>
     </div>
   );
 }
@@ -445,7 +448,7 @@ export const SearchInput = forwardRef<HTMLInputElement, {
         <button
           type="button"
           onClick={() => onChange('')}
-          aria-label="Suche zurücksetzen"
+          aria-label="Suchbegriff löschen"
           className={cn(
             'absolute right-1.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center text-[var(--cq-fg-subtle)]',
             radius.sm, interactive.transition, focusRingOnSurface, 'hover:bg-[var(--cq-hover)] hover:text-[var(--cq-fg)]',
@@ -639,6 +642,7 @@ export function SectionNav({ sections, className }: {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') return;
     const nodes = sections
       .map((section) => document.getElementById(section.id))
       .filter((node): node is HTMLElement => Boolean(node));
