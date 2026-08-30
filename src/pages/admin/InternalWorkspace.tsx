@@ -16,8 +16,15 @@ export function InternalWorkspaceLayout() {
 
   // The internal modules use a single premium light palette — pin it and never expose a dark/theme
   // toggle. (The legacy admin CSS variables resolve to their light values from this attribute.)
+  //
+  // Removed again on unmount. The attribute lives on <html>, which outlives this layout in a
+  // single-page session: leaving it behind meant every marketing page visited after /admin still
+  // carried the admin theme scope. Only ExecutionPage and OuraAnalyticsPage read the resulting
+  // `--admin-*` variables, and both render inside this layout, so nothing needs it afterwards.
   useEffect(() => {
-    document.documentElement.setAttribute('data-admin-theme', 'light');
+    const root = document.documentElement;
+    root.setAttribute('data-admin-theme', 'light');
+    return () => root.removeAttribute('data-admin-theme');
   }, []);
 
   const activeModule = getActiveModule(pathname);

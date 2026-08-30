@@ -116,6 +116,68 @@
     transition-duration: 0.3s;
     transition-timing-function: ease;
   }
+
+  /* ───────────────────────────────────────────────────────────────────────────
+     The Admin Center opts OUT of the document-wide transition above.
+
+     That `*` rule predates the dashboard (it arrived with the customer-billing
+     work in July) and gives every element on the site a 300ms colour, background
+     and border transition whether or not anyone asked for one. On the public
+     marketing pages that is the established look and this PR does not touch it.
+
+     Inside the Admin Center it is wrong in three ways: it is motion nobody
+     declared, 300ms is far outside the 140-180ms interaction band the dashboard
+     tokens define, and it is the reason a hover on a table row used to lag
+     behind the pointer. Removing the blanket `[data-admin-theme] *` transition
+     further down only solved half of that — this rule was the other half, and
+     without this opt-out the claim that admin motion comes only from explicit
+     dashboard tokens is not yet true.
+
+     Why `transition-property: none` and not `transition: none`: it disables only
+     the INHERITED property list. Anything that declares its own transition still
+     works, because Tailwind emits utilities after `@layer base`, so
+     `.transition-colors` (0,1,0) beats this selector (0,1,0) on source order.
+     Intentional dashboard motion is therefore untouched; only the accident is
+     removed.
+
+     Animations are unaffected — `animate-in` / `duration-fast` on the overlays
+     and the select menu drive `animation-duration`, not a transition — and
+     reduced motion is still handled by the `prefers-reduced-motion` block that
+     collapses the dashboard tokens and forces `transition-duration: 1ms`.
+
+     Scope: `[data-cq-surface='dashboard']` is the shell root (SidebarShell).
+     `[data-cq-portal='dashboard']` is the opt-in marker for the nodes that Radix
+     and react-dom render into document.body, which therefore leave that subtree.
+     The attribute is NOT automatic — it is set by hand at each portal site, and
+     the full set is exactly three:
+
+       - src/components/dashboard/overlays.tsx  (createPortal, dialog + sheet)
+       - src/components/dashboard/PremiumSelect.tsx  (Select.Portal, Popover.Portal)
+       - src/components/navigation/SidebarShell.tsx  (Dialog.Portal, mobile drawer)
+
+     Anything added later that portals out of the dashboard must set it too, or it
+     silently falls back to the 300ms rule. `qa-admin-shell.mjs` opens the real
+     mobile drawer and measures the portaled node, so that gap is caught rather
+     than assumed.
+
+     The shared primitives in src/components/ui/* are deliberately NOT marked: they
+     are generic and could be used on a public page, where the 300ms transition is
+     the correct, established behaviour. Marking a portal is a decision made by the
+     dashboard component that owns it, never by the primitive.
+
+     Nothing outside these subtrees is affected, so public-site behaviour is
+     byte-for-byte what it was.
+     ─────────────────────────────────────────────────────────────────────────── */
+  [data-cq-surface='dashboard'],
+  [data-cq-surface='dashboard'] *,
+  [data-cq-surface='dashboard'] *::before,
+  [data-cq-surface='dashboard'] *::after,
+  [data-cq-portal='dashboard'],
+  [data-cq-portal='dashboard'] *,
+  [data-cq-portal='dashboard'] *::before,
+  [data-cq-portal='dashboard'] *::after {
+    transition-property: none;
+  }
 }
 
 @layer utilities {
@@ -346,10 +408,31 @@ html.cq-public-light {
 /* ADMIN THEME SYSTEM                                                             */
 /* ============================================================================= */
 
-/* Admin theme smooth transition */
-[data-admin-theme] * {
-  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease;
-}
+/* NO BLANKET TRANSITION HERE — deliberately.
+ *
+ * This block used to carry:
+ *
+ *   [data-admin-theme] * { transition: background-color .25s, border-color .25s, color .2s }
+ *
+ * `data-admin-theme` is set on <html> (see InternalWorkspaceLayout), so `*` matched
+ * EVERY element in the document, not the admin surface. Three consequences:
+ *
+ *   1. It was motion nobody asked for. The internal workspace pins the light
+ *      palette and ships no theme toggle, so the theme-crossfade this rule
+ *      existed for can never be triggered — it only taxed every paint.
+ *   2. 250ms is far outside the 140-180ms interaction band the dashboard tokens
+ *      define, so hover feedback on tables, rows and buttons lagged behind the
+ *      pointer wherever a component did not declare its own faster transition.
+ *   3. The attribute is only removed when the workspace unmounts, so before that
+ *      fix the rule followed the user back onto public marketing pages for the
+ *      rest of the SPA session.
+ *
+ * Motion is now declared where it belongs: `--cq-duration-*` / `--cq-ease` under
+ * [data-cq-surface='dashboard'] and explicit `transition-colors` utilities on the
+ * components that actually change colour. Those are also what the reduced-motion
+ * block further down can collapse — a blanket `*` rule outside that scope was
+ * never covered by it.
+ */
 
 /* Dark Admin Theme (default, matches current design) */
 [data-admin-theme="dark"] {
