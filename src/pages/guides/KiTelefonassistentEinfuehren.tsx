@@ -274,7 +274,7 @@ export function KiTelefonassistentEinfuehren() {
           Vier Fragen entscheiden über die Einführung: Welche Anrufe kommen überhaupt
           infrage, wo landet das Ergebnis eines Gesprächs, was passiert, wenn es ernst wird,
           und wer in Ihrem Haus gibt frei. Dieser Beitrag beschreibt, wie wir diese Fragen
-          abarbeiten und was vor einer Freigabe geprüft wird.
+          angehen und was vor einer Freigabe geprüft gehört.
         </p>
         <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7] mt-5">
           Er ist für Praxen geschrieben, die vor der Entscheidung stehen, und als Maßstab,
