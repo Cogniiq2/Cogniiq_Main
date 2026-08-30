@@ -569,19 +569,52 @@ end;
 $$;
 
 -- ===========================================================================
--- F. THE PRE-OFFER GATE. Each of the five conditions, independently.
+-- F. THE PRE-OFFER GATE. Two independent layers, tested separately.
 --
---    Every case is driven to the brink -- four conditions satisfied, one
---    missing -- so a passing suite cannot be explained by some other refusal.
---    Each is then asserted TWICE: once through the RPC (the friendly message)
---    and once as a raw write by the table owner (the constraint), because the
---    claim "the server is authoritative" is only true if it holds for a write
---    path the RPC never sees.
+--    F-A (this block) is the RPC's MESSAGE layer. Each of the five conditions is
+--    driven to the brink -- four satisfied, one missing -- and the RPC must
+--    answer with the specific domain sentence naming what is missing. A raw
+--    check_violation surfacing here is a FAILURE, not a pass: it would mean the
+--    RPC validated after issuing the UPDATE, the constraint rejected the
+--    statement first, and the owner is being shown a constraint name instead of
+--    an explanation.
+--
+--    F-B (the next block) is the ENFORCEMENT layer: the same five conditions
+--    against a raw write by the table owner, which never enters the RPC at all.
+--
+--    Neither block substitutes for the other. If the constraint were dropped,
+--    F-B fails. If the RPC went back to validating after the write, F-A fails.
 -- ===========================================================================
+
+-- Asserts BOTH that the RPC refused AND that it refused with its own message.
+-- The check_violation arm is the whole point: it converts "validated too late"
+-- from a silent behaviour into a test failure.
+create or replace function pg_temp.assert_gate_message(
+  p_lead uuid, p_patch jsonb, p_expect text, p_label text
+) returns void language plpgsql as $$
+declare v_msg text; v_raised boolean := false;
+begin
+  begin
+    perform public.owner_upsert_lead_integration_check(p_lead, p_patch);
+  exception
+    when check_violation then
+      raise exception 'TEST %: the RPC surfaced a raw constraint violation (SQLSTATE %) instead of its own message -- validation must happen BEFORE the write', p_label, sqlstate;
+    when raise_exception then
+      get stacked diagnostics v_msg = message_text;
+      v_raised := true;
+  end;
+  if not v_raised then
+    raise exception 'TEST %: the RPC accepted an invalid completion', p_label;
+  end if;
+  if position(p_expect in v_msg) = 0 then
+    raise exception 'TEST %: expected a message containing "%", got "%"', p_label, p_expect, v_msg;
+  end if;
+end;
+$$;
+
 do $$
 declare
   v_lead uuid;
-  v_denied boolean;
   v_ok jsonb := jsonb_build_object(
     'pvs_name', 'Medistar',
     'interface_type', 'official_api',
@@ -589,7 +622,7 @@ declare
     'third_party_setup_cents', 0,
     'third_party_monthly_cents', 0,
     'integration_mode', 'full_automation');
-  v_patch jsonb;
+  v_before jsonb;
 begin
   set local role authenticated;
   perform set_config('app.uid', crm_id('owner')::text, true);
@@ -599,19 +632,17 @@ begin
   insert into crm_ids values ('lead_gate', v_lead);
 
   -- (F0) an assessment that answers nothing cannot be completed.
-  v_denied := false;
-  begin perform public.owner_upsert_lead_integration_check(v_lead, jsonb_build_object('status','complete'));
-  exception when raise_exception or check_violation then v_denied := true; end;
-  if not v_denied then raise exception 'TEST F0: an empty assessment was completed'; end if;
+  perform pg_temp.assert_gate_message(v_lead, jsonb_build_object('status', 'complete'),
+    'record the PVS or the appointment system', 'F0');
 
-  -- (F1) no PVS and no appointment system. Explicit JSON nulls, not absent
-  --      keys: an absent key means "leave alone" under patch semantics, so
-  --      clearing the column is the only way to test the condition in isolation.
-  v_patch := v_ok || jsonb_build_object('pvs_name', null, 'appointment_system', null, 'status', 'complete');
-  v_denied := false;
-  begin perform public.owner_upsert_lead_integration_check(v_lead, v_patch);
-  exception when raise_exception or check_violation then v_denied := true; end;
-  if not v_denied then raise exception 'TEST F1: completed with neither a PVS nor an appointment system'; end if;
+  -- Every case below uses explicit JSON nulls, not absent keys: an absent key
+  -- means "leave alone" under patch semantics, so clearing the column is the
+  -- only way to test one condition in isolation.
+
+  -- (F1) no PVS and no appointment system.
+  perform pg_temp.assert_gate_message(v_lead,
+    v_ok || jsonb_build_object('pvs_name', null, 'appointment_system', null, 'status', 'complete'),
+    'record the PVS or the appointment system', 'F1');
 
   -- (F1b) an appointment system alone is enough for THIS condition.
   perform public.owner_upsert_lead_integration_check(v_lead,
@@ -623,18 +654,14 @@ begin
     jsonb_build_object('status', 'in_progress', 'appointment_system', ''));
 
   -- (F2) the interface question is unanswered. NULL is not an answer...
-  v_patch := v_ok || jsonb_build_object('interface_type', null, 'status', 'complete');
-  v_denied := false;
-  begin perform public.owner_upsert_lead_integration_check(v_lead, v_patch);
-  exception when raise_exception or check_violation then v_denied := true; end;
-  if not v_denied then raise exception 'TEST F2: completed with interface_type NULL'; end if;
+  perform pg_temp.assert_gate_message(v_lead,
+    v_ok || jsonb_build_object('interface_type', null, 'status', 'complete'),
+    'record which interface exists', 'F2');
 
   -- ...and neither is 'unknown'.
-  v_patch := v_ok || jsonb_build_object('interface_type', 'unknown', 'status', 'complete');
-  v_denied := false;
-  begin perform public.owner_upsert_lead_integration_check(v_lead, v_patch);
-  exception when raise_exception or check_violation then v_denied := true; end;
-  if not v_denied then raise exception 'TEST F2b: completed with interface_type = unknown'; end if;
+  perform pg_temp.assert_gate_message(v_lead,
+    v_ok || jsonb_build_object('interface_type', 'unknown', 'status', 'complete'),
+    'record which interface exists', 'F2b');
 
   -- ...but 'none' IS an answer. "There is no interface" is a finding, not a gap.
   perform public.owner_upsert_lead_integration_check(v_lead,
@@ -646,22 +673,17 @@ begin
   perform public.owner_upsert_lead_integration_check(v_lead, jsonb_build_object('status', 'in_progress'));
 
   -- (F3) third-party costs not confirmed.
-  v_patch := v_ok || jsonb_build_object('third_party_costs_confirmed', false, 'status', 'complete');
-  v_denied := false;
-  begin perform public.owner_upsert_lead_integration_check(v_lead, v_patch);
-  exception when raise_exception or check_violation then v_denied := true; end;
-  if not v_denied then raise exception 'TEST F3: completed without confirming third-party costs'; end if;
+  perform pg_temp.assert_gate_message(v_lead,
+    v_ok || jsonb_build_object('third_party_costs_confirmed', false, 'status', 'complete'),
+    'third-party costs must be confirmed', 'F3');
 
   -- (F3b) confirmed but with no amount recorded. "Confirmed" without a number
   --       is not a confirmation.
-  v_patch := v_ok || jsonb_build_object('third_party_monthly_cents', null, 'status', 'complete');
-  v_denied := false;
-  begin perform public.owner_upsert_lead_integration_check(v_lead, v_patch);
-  exception when raise_exception or check_violation then v_denied := true; end;
-  if not v_denied then raise exception 'TEST F3b: completed with a confirmed-but-absent third-party amount'; end if;
+  perform pg_temp.assert_gate_message(v_lead,
+    v_ok || jsonb_build_object('third_party_monthly_cents', null, 'status', 'complete'),
+    'third-party costs must be confirmed', 'F3b');
 
-  -- (F3c) ZERO is a valid confirmed amount -- proved by F1b/F2c above, which
-  --       both completed with 0/0. Assert it explicitly so it cannot regress.
+  -- (F3c) ZERO is a valid confirmed amount.
   perform public.owner_upsert_lead_integration_check(v_lead, v_ok || jsonb_build_object('status', 'complete'));
   if (select third_party_setup_cents from public.owner_lead_integration_checks where lead_id = v_lead) <> 0 then
     raise exception 'TEST F3c: a confirmed zero third-party cost was not stored as zero';
@@ -669,45 +691,70 @@ begin
   perform public.owner_upsert_lead_integration_check(v_lead, jsonb_build_object('status', 'in_progress'));
 
   -- (F4) the integration mode is undecided.
-  v_patch := v_ok || jsonb_build_object('integration_mode', null, 'status', 'complete');
-  v_denied := false;
-  begin perform public.owner_upsert_lead_integration_check(v_lead, v_patch);
-  exception when raise_exception or check_violation then v_denied := true; end;
-  if not v_denied then raise exception 'TEST F4: completed with integration_mode NULL'; end if;
+  perform pg_temp.assert_gate_message(v_lead,
+    v_ok || jsonb_build_object('integration_mode', null, 'status', 'complete'),
+    'full or partial automation', 'F4');
 
-  v_patch := v_ok || jsonb_build_object('integration_mode', 'unknown', 'status', 'complete');
-  v_denied := false;
-  begin perform public.owner_upsert_lead_integration_check(v_lead, v_patch);
-  exception when raise_exception or check_violation then v_denied := true; end;
-  if not v_denied then raise exception 'TEST F4b: completed with integration_mode = unknown'; end if;
+  perform pg_temp.assert_gate_message(v_lead,
+    v_ok || jsonb_build_object('integration_mode', 'unknown', 'status', 'complete'),
+    'full or partial automation', 'F4b');
 
   -- (F5) anything short of full automation must state its fallback.
-  v_patch := v_ok || jsonb_build_object('integration_mode', 'partial_automation',
-                                        'fallback_description', null, 'status', 'complete');
-  v_denied := false;
-  begin perform public.owner_upsert_lead_integration_check(v_lead, v_patch);
-  exception when raise_exception or check_violation then v_denied := true; end;
-  if not v_denied then raise exception 'TEST F5: partial automation completed with no fallback'; end if;
+  perform pg_temp.assert_gate_message(v_lead,
+    v_ok || jsonb_build_object('integration_mode', 'partial_automation',
+                               'fallback_description', null, 'status', 'complete'),
+    'describe its exact fallback', 'F5');
 
-  v_patch := v_ok || jsonb_build_object('integration_mode', 'not_possible',
-                                        'fallback_description', null, 'status', 'complete');
-  v_denied := false;
-  begin perform public.owner_upsert_lead_integration_check(v_lead, v_patch);
-  exception when raise_exception or check_violation then v_denied := true; end;
-  if not v_denied then raise exception 'TEST F5b: not_possible completed with no fallback'; end if;
+  perform pg_temp.assert_gate_message(v_lead,
+    v_ok || jsonb_build_object('integration_mode', 'not_possible',
+                               'fallback_description', null, 'status', 'complete'),
+    'describe its exact fallback', 'F5b');
 
-  v_patch := v_ok || jsonb_build_object('integration_mode', 'partial_automation',
-                                        'fallback_description', 'Termine werden per E-Mail gemeldet', 'status', 'complete');
-  perform public.owner_upsert_lead_integration_check(v_lead, v_patch);
+  perform public.owner_upsert_lead_integration_check(v_lead,
+    v_ok || jsonb_build_object('integration_mode', 'partial_automation',
+                               'fallback_description', 'Termine werden per E-Mail gemeldet', 'status', 'complete'));
   if (select status from public.owner_lead_integration_checks where lead_id = v_lead) <> 'complete' then
     raise exception 'TEST F5c: a stated fallback should satisfy condition 5';
   end if;
 end;
 $$;
 
--- The same five conditions, asserted against a RAW write by the table owner --
--- the one caller no grant can stop. If the gate lived only in the RPC, every
--- statement below would succeed.
+-- (F6) A REFUSED completion must write NOTHING. Validating before the UPDATE is
+-- what makes this true: the patch that would have accompanied the invalid
+-- completion is discarded whole, so a rejected save cannot half-apply.
+do $$
+declare v_lead uuid; v_before jsonb; v_after jsonb;
+begin
+  set local role authenticated;
+  perform set_config('app.uid', crm_id('owner')::text, true);
+  v_lead := crm_id('lead_gate');
+
+  select to_jsonb(ic) - 'updated_at' - 'updated_by'
+    into v_before from public.owner_lead_integration_checks ic where ic.lead_id = v_lead;
+
+  perform pg_temp.assert_gate_message(v_lead,
+    jsonb_build_object('status', 'complete', 'integration_mode', 'unknown',
+                       'notes', 'diese Notiz darf nicht gespeichert werden',
+                       'pvs_vendor', 'darf nicht gespeichert werden'),
+    'full or partial automation', 'F6');
+
+  select to_jsonb(ic) - 'updated_at' - 'updated_by'
+    into v_after from public.owner_lead_integration_checks ic where ic.lead_id = v_lead;
+
+  if v_after is distinct from v_before then
+    raise exception 'TEST F6: a refused completion still wrote part of its patch (% -> %)', v_before, v_after;
+  end if;
+end;
+$$;
+
+
+-- F-B. THE ENFORCEMENT LAYER: the same five conditions against a RAW write by
+-- the table owner -- the one caller no grant can stop and which never enters the
+-- RPC at all. Each statement must be rejected by
+-- owner_lead_integration_checks_complete_gate specifically (check_violation is
+-- the only condition caught below, so a different failure is still a test
+-- failure). If the gate lived only in the RPC, every statement here would
+-- succeed.
 do $$
 declare v_lead uuid; v_denied boolean; s text;
 begin
@@ -829,20 +876,59 @@ begin
     raise exception 'TEST H3c: the loss disappeared from the timeline when the lead was reopened';
   end if;
 
-  -- (H4) marking a lead WON is a sales fact and nothing else. In 70A it creates
-  --      no customer, no offer and no invoice -- conversion is PR 70B.
-  perform public.owner_set_lead_stage(v_lead, 'won');
-  select * into r from public.owner_leads where id = v_lead;
-  if r.stage <> 'won' or r.won_at is null then raise exception 'TEST H4: won was not recorded'; end if;
+  -- (H4) WON IS REFUSED IN 70A. A project starts at Won, so winning must create
+  --      the customer, the project and the sold services atomically. That path
+  --      does not exist yet, and a lead parked at 'won' with none of them would
+  --      be an orphan the rest of the system cannot represent. The transition is
+  --      withheld; the schema value stays valid so the successor migration needs
+  --      no destructive change.
+  v_denied := false;
+  begin perform public.owner_set_lead_stage(v_lead, 'won');
+  exception when raise_exception then v_denied := true; end;
+  if not v_denied then raise exception 'TEST H4: a lead was set to won with no customer and no project'; end if;
 
+  -- The refusal left the lead exactly where it was.
+  select * into r from public.owner_leads where id = v_lead;
+  if r.stage <> 'negotiation' then
+    raise exception 'TEST H4a: the refused transition still moved the stage to %', r.stage;
+  end if;
+  if r.won_at is not null then
+    raise exception 'TEST H4b: the refused transition stamped won_at';
+  end if;
+
+  -- And created nothing anywhere else.
   if (select count(*) from public.owner_customers) <> v_customers then
-    raise exception 'TEST H4a: a stage change created or removed a customer';
+    raise exception 'TEST H4c: a stage change created or removed a customer';
   end if;
   if (select count(*) from public.owner_offers) <> v_offers then
-    raise exception 'TEST H4b: a stage change touched owner_offers';
+    raise exception 'TEST H4d: a stage change touched owner_offers';
   end if;
   if (select count(*) from public.owner_invoices) <> v_invoices then
-    raise exception 'TEST H4c: a stage change touched owner_invoices';
+    raise exception 'TEST H4e: a stage change touched owner_invoices';
+  end if;
+  if exists (select 1 from public.owner_lead_activity where lead_id = v_lead and event_type = 'lead_won') then
+    raise exception 'TEST H4f: the refused transition still wrote a lead_won timeline row';
+  end if;
+
+  -- 'won' is still a legal value of the CHECK -- it is the TRANSITION that is
+  -- withheld, not the value, so the conversion migration needs no schema change.
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.owner_leads'::regclass
+      and contype = 'c'
+      and pg_get_constraintdef(oid) like '%stage%'
+      and pg_get_constraintdef(oid) like '%''won''%') then
+    raise exception 'TEST H4g: ''won'' is no longer a valid schema stage value';
+  end if;
+
+  -- No other sanctioned path can produce a won lead either: creation refuses it
+  -- (E3 above) and owner_update_lead cannot write `stage` at all.
+  perform public.owner_update_lead(v_lead, jsonb_build_object('stage', 'won'));
+  if (select stage from public.owner_leads where id = v_lead) <> 'negotiation' then
+    raise exception 'TEST H4h: owner_update_lead wrote the pipeline stage';
+  end if;
+  if (select count(*) from public.owner_leads where stage = 'won') <> 0 then
+    raise exception 'TEST H4i: a won lead exists after 70A''s sanctioned RPCs';
   end if;
 
   -- (H5) an invalid stage is refused outright.
@@ -853,7 +939,29 @@ begin
 
   -- (H6) 70A ships no conversion RPC at all. Its absence is the assertion.
   if to_regprocedure('public.owner_convert_lead_to_customer(uuid, jsonb)') is not null then
-    raise exception 'TEST H6: a lead->customer conversion RPC exists in 70A; that is 70B';
+    raise exception 'TEST H6: a lead->customer conversion RPC exists in 70A; the atomic conversion is a later PR';
+  end if;
+end;
+$$;
+
+-- (H7) The RPC refusal is a domain rule, not the boundary. A browser that
+-- skipped the RPC entirely and issued the UPDATE itself is still refused -- by
+-- the table grants, as the real platform owner. Without this, "no won lead can
+-- exist in 70A" would rest on the RPC alone.
+do $$
+declare v_denied boolean;
+begin
+  set local role authenticated;
+  perform set_config('app.uid', crm_id('owner')::text, true);
+
+  v_denied := false;
+  begin
+    update public.owner_leads set stage = 'won', won_at = now() where id = crm_id('lead_b');
+  exception when insufficient_privilege then v_denied := true; end;
+  if not v_denied then raise exception 'TEST H7: the owner set stage=won with a DIRECT UPDATE'; end if;
+
+  if (select count(*) from public.owner_leads where stage = 'won') <> 0 then
+    raise exception 'TEST H7b: a won lead exists after the direct write was refused';
   end if;
 end;
 $$;
@@ -939,9 +1047,16 @@ begin
   select count(*) into c from public.owner_lead_activity where actor_user_id is null;
   if c <> 0 then raise exception 'TEST K1: % timeline rows have no actor', c; end if;
 
+  -- The loss and the reopen are both on the timeline. There is no 'lead_won'
+  -- row anywhere, because 70A cannot produce a won lead at all.
   select count(*) into c from public.owner_lead_activity
-  where lead_id = crm_id('lead_b') and event_type in ('lead_lost', 'lead_won', 'stage_changed');
-  if c < 3 then raise exception 'TEST K2: the stage history is incomplete (% rows)', c; end if;
+  where lead_id = crm_id('lead_b') and event_type = 'lead_lost';
+  if c <> 1 then raise exception 'TEST K2: the loss is missing from the timeline (% rows)', c; end if;
+  select count(*) into c from public.owner_lead_activity
+  where lead_id = crm_id('lead_b') and event_type = 'stage_changed';
+  if c < 1 then raise exception 'TEST K2b: the reopen is missing from the timeline'; end if;
+  select count(*) into c from public.owner_lead_activity where event_type = 'lead_won';
+  if c <> 0 then raise exception 'TEST K2c: a lead_won timeline row exists in 70A'; end if;
 
   -- The audit trigger resolved the business entity HONESTLY -- through the lead
   -- for owner_lead_integration_checks, which carries no business_entity_id and
@@ -986,18 +1101,18 @@ begin
   -- owner_offers: no lead provenance column.
   if exists (select 1 from information_schema.columns
              where table_schema = 'public' and table_name = 'owner_offers' and column_name = 'owner_lead_id') then
-    raise exception 'TEST L3: owner_offers gained owner_lead_id; that is 70C';
+    raise exception 'TEST L3: owner_offers gained owner_lead_id; offer provenance is a later phase';
   end if;
   if to_regprocedure('public.owner_link_offer_lead(uuid, uuid)') is not null then
-    raise exception 'TEST L4: an offer<->lead linking RPC exists; that is 70C';
+    raise exception 'TEST L4: an offer<->lead linking RPC exists; offer provenance is a later phase';
   end if;
 
   -- No command center, no project architecture.
   if to_regprocedure('public.owner_command_center(uuid, date)') is not null then
-    raise exception 'TEST L5: a command-center RPC exists; that is 70E';
+    raise exception 'TEST L5: a command-center RPC exists; that is the Command Center phase';
   end if;
   if to_regclass('public.owner_projects') is not null then
-    raise exception 'TEST L6: owner_projects exists; that is 70D';
+    raise exception 'TEST L6: owner_projects exists; the project spine is a later phase';
   end if;
 end;
 $$;

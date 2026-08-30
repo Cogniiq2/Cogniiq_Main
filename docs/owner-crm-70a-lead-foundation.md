@@ -105,14 +105,26 @@ conditions hold:
 5. anything other than `'full_automation'` states an explicit
    `fallback_description`.
 
-This is enforced by a **table CHECK constraint**
-(`owner_lead_integration_checks_complete_gate`), not only by the RPC. The RPC
-checks the same five conditions first so the owner gets a specific German
-message instead of a constraint name, but the constraint is what makes the claim
-true for every write path that exists now or is added later — a future
-migration, a direct `psql` session, a superuser. The test suite asserts each
-condition twice for exactly this reason: once through the RPC and once as a raw
-write.
+Two independent layers enforce this, and neither may be weakened in favour of the
+other:
+
+1. **Message layer.** `owner_upsert_lead_integration_check` folds the patch over
+   the current row to build the *prospective* row, validates that, and raises the
+   condition-specific German error **before issuing any `UPDATE`**. Because
+   patch semantics are applied once, the state validated is exactly the state
+   written. A refused completion therefore writes nothing at all — a rejected
+   save cannot half-apply.
+2. **Enforcement layer.** The table constraint
+   `owner_lead_integration_checks_complete_gate` is the hard backstop and holds
+   for every write path that exists now or is added later — a future migration,
+   a direct `psql` session, a superuser — none of which pass through the RPC.
+
+Validating *after* the `UPDATE` would make layer 1 unreachable: the constraint
+rejects the statement first and the caller sees a constraint name instead of an
+explanation. The suite asserts both layers separately — section F-A requires the
+RPC's own message and treats a raw `check_violation` surfacing there as a
+failure; section F-B drives each condition through a raw table-owner write and
+requires the constraint to reject it.
 
 **Tri-state is load-bearing.** `supports_availability`, `supports_booking`,
 `supports_reschedule`, `supports_cancel` and `supports_patient_write` are
@@ -139,8 +151,18 @@ scanned too, so "this is already a customer" is not missed.
 
 A stage change writes an activity row and nothing else. It creates no customer,
 no project and no invoice; it mutates no accounting, sends no mail and triggers
-no external system. `'won'` in 70A means "the owner marked this opportunity
-won" — it is a sales fact, not a conversion.
+no external system.
+
+**`'won'` is refused in 70A.** A project starts at Won, so winning must create
+the customer, the project and the sold services atomically. That path does not
+exist yet, and a lead parked at `'won'` with none of them would be an orphan the
+rest of the system cannot represent. `'won'` remains a valid value of the stage
+`CHECK` so the conversion migration needs no destructive schema change — it is
+the *transition* that is withheld, not the value. No sanctioned path can produce
+a won lead: `owner_create_lead` refuses `'won'` as a starting stage,
+`owner_update_lead` cannot write `stage` at all, `owner_set_lead_stage` refuses
+it with a domain error naming the future atomic path, and a direct table write is
+refused by the grant matrix.
 
 A loss requires a reason. Reopening a lost lead keeps every field and every
 timeline row and clears only the now-stale loss.
@@ -213,9 +235,10 @@ migration chain, and executes
 | C | `anon`, an ordinary customer and `cogniiq_admin`: no reads, no writes, no RPCs |
 | D | the sanctioned owner RPCs, the deterministic follow-up cache, patch semantics, read-model shape |
 | E | identity validation and advisory duplicate warnings (strong vs. weak, cross-format phone, website host, existing customers) |
-| F | each of the five pre-offer gate conditions independently, through the RPC **and** through a raw superuser write |
+| F-A | each of the five gate conditions independently through the RPC, asserting its specific domain message and failing on a raw `check_violation`; plus a refused completion writing nothing |
+| F-B | the same five conditions through a raw table-owner write, requiring the CHECK constraint to reject each |
 | G | tri-state preservation across absent / null / true / false patches |
-| H | loss, reopening, and the containment of a stage change |
+| H | loss, reopening, the refusal of `'won'` (RPC and direct write), and the containment of a stage change |
 | I | idempotency, including key-to-operation binding |
 | J | cross-business-entity isolation |
 | K | the append-only activity contract and honest audit-entity resolution |
@@ -230,7 +253,13 @@ Wired into CI as the `owner-crm-lead-foundation-sql-tests` job in
 
 This PR is **not** the Owner OS and does **not** deliver conversion.
 
-- **70B** — Lead UI + safe Won → customer conversion integration
-- **70C** — Offer ↔ lead provenance policy
-- **70D** — `owner_projects` + project / service / work architecture
+The order is fixed by one architectural fact: **a project starts at Won.**
+Winning an opportunity must create the customer, the project and the sold
+services in a single atomic step, so conversion cannot ship before the
+first-class project spine exists.
+
+- **70A** — CRM lead foundation *(this PR)*
+- **70B** — `owner_projects` + project / service architecture
+- **70C** — atomic Won → customer → project → sold-service conversion, + Lead UI
+- **70D** — offer / project provenance + work / task integration
 - **70E** — Command Center + final HOME / CUSTOMERS / FINANCE navigation

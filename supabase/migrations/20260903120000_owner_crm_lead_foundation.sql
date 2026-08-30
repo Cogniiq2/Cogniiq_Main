@@ -202,7 +202,7 @@ create index if not exists owner_leads_phone_idx
 comment on table public.owner_leads is
   'Manually entered sales prospect. Populated only by a human through owner_create_lead -- there is no sourcing, enrichment, outreach or import path into this table.';
 comment on column public.owner_leads.stage is
-  'Sales pipeline stage. NOT a service lifecycle status, and NOT a conversion mechanism: reaching ''won'' records an activity row and changes nothing outside this table. Lead -> customer conversion is PR 70B.';
+  'Sales pipeline stage. NOT a service lifecycle status. ''won'' is a valid value of the CHECK but NO RPC in this release can set it: a project starts at Won, so winning must create the customer, the project and the sold services atomically, and that path arrives with the project spine in a later PR.';
 comment on column public.owner_leads.next_follow_up_at is
   'Cache of the earliest open owner_lead_follow_ups.due_at. Recomputed by owner_lead_refresh_follow_up; never written directly by a client.';
 
@@ -832,9 +832,21 @@ commit;
 --
 --     Changing a stage records an activity row and NOTHING ELSE. It creates no
 --     customer, no project and no invoice, mutates no accounting, sends no mail
---     and triggers no external system. 'won' here means "the owner marked this
---     opportunity won" -- conversion into a customer is PR 70B and does not
---     exist yet.
+--     and triggers no external system.
+--
+--     'won' IS REFUSED IN 70A. The locked architecture is that a project starts
+--     at Won: winning an opportunity creates the customer, the project and the
+--     sold services in ONE atomic step. 70A has no project spine and no
+--     conversion path, so a lead sitting at 'won' with no customer and no
+--     project would be a state the rest of the system cannot represent -- an
+--     orphan that later has to be reconciled by hand.
+--
+--     'won' stays a valid value of the stage CHECK so the migration that adds
+--     the atomic conversion needs no destructive schema change; it is the
+--     TRANSITION that is withheld, not the value. No RPC in this migration can
+--     produce a won lead: owner_create_lead refuses 'won' as a starting stage,
+--     owner_update_lead cannot write `stage` at all, and this function refuses
+--     it below.
 -- ---------------------------------------------------------------------------
 begin;
 
@@ -846,6 +858,12 @@ begin
   if p_stage not in ('new','contacted','qualification','discovery','interested',
                      'offer_preparation','offer_sent','negotiation','won','lost') then
     raise exception 'invalid pipeline stage %', p_stage;
+  end if;
+  -- Refused before anything is read or written. See the section header: a won
+  -- lead without a customer and a project is not a state this system may hold,
+  -- and the atomic path that would create them does not exist yet.
+  if p_stage = 'won' then
+    raise exception 'a lead cannot be set to won from the pipeline: winning creates the customer, the project and the sold services in one atomic step, and that conversion path does not exist yet (it arrives with the atomic conversion, which follows the project spine)';
   end if;
   select * into l from public.owner_leads where id = p_lead_id for update;
   if l.id is null then raise exception 'lead not found'; end if;
@@ -860,6 +878,10 @@ begin
     when 'offer_sent' then 'Angebot versendet' when 'negotiation' then 'Verhandlung'
     when 'won' then 'Gewonnen' else 'Verloren' end;
 
+  -- The 'won' arms below are unreachable while the guard above stands. They are
+  -- kept deliberately: the successor migration lifts the guard and calls this
+  -- same transition from inside the atomic conversion, and a CASE that stayed
+  -- total is one less thing for that change to get wrong.
   update public.owner_leads set
     stage = p_stage,
     won_at  = case when p_stage = 'won'  then coalesce(won_at, now())  else null end,
@@ -988,10 +1010,20 @@ commit;
 -- ---------------------------------------------------------------------------
 -- 12. The pre-offer integration and third-party-cost gate.
 --
---     status = 'complete' is refused until all five conditions hold. The checks
---     below exist to produce a specific German message; the TABLE CONSTRAINT
---     installed in section 4 is what makes the refusal true for every write
---     path, including ones this migration cannot see.
+--     status = 'complete' is refused until all five conditions hold, in TWO
+--     independent layers that must both stay intact:
+--
+--       1. this RPC validates the PROSPECTIVE row -- the current row with the
+--          patch folded over it -- BEFORE issuing any UPDATE, so the owner gets
+--          the specific German sentence naming what is missing. It is a message
+--          layer and enforces nothing on its own.
+--       2. the TABLE CONSTRAINT installed in section 4 is the enforcement. It
+--          holds for every write path, including ones this migration cannot see
+--          and ones that never enter this function.
+--
+--     Validating after the UPDATE would make layer 1 unreachable: the constraint
+--     rejects the statement first and the caller sees a constraint name instead
+--     of an explanation. Neither layer may be weakened in favour of the other.
 --
 --     Tri-state is preserved end to end: a key absent from the patch leaves the
 --     column alone, a key present with JSON null clears it back to "unknown",
@@ -1001,7 +1033,11 @@ begin;
 
 create or replace function public.owner_upsert_lead_integration_check(p_lead_id uuid, p_patch jsonb)
 returns jsonb language plpgsql security definer set search_path = public, pg_temp as $$
-declare c record;
+-- %rowtype, not `record`: `c` is loaded with the row as it stands and then
+-- carries the PROSPECTIVE row -- existing values overwritten by whatever the
+-- patch actually supplies. Patch semantics are applied ONCE, here, so the state
+-- validated below is byte-for-byte the state written afterwards.
+declare c public.owner_lead_integration_checks%rowtype;
 begin
   if not public.is_platform_owner() then raise exception 'Owner access required'; end if;
   if not exists (select 1 from public.owner_leads where id = p_lead_id) then raise exception 'lead not found'; end if;
@@ -1013,40 +1049,53 @@ begin
   insert into public.owner_lead_integration_checks (lead_id) values (p_lead_id)
   on conflict (lead_id) do nothing;
 
-  update public.owner_lead_integration_checks set
-    pvs_name                    = case when p_patch ? 'pvs_name'                    then nullif(btrim(p_patch->>'pvs_name'), '')            else pvs_name end,
-    pvs_vendor                  = case when p_patch ? 'pvs_vendor'                  then nullif(btrim(p_patch->>'pvs_vendor'), '')          else pvs_vendor end,
-    pvs_version                 = case when p_patch ? 'pvs_version'                 then nullif(btrim(p_patch->>'pvs_version'), '')         else pvs_version end,
-    appointment_system          = case when p_patch ? 'appointment_system'          then nullif(btrim(p_patch->>'appointment_system'), '')  else appointment_system end,
-    interface_type              = case when p_patch ? 'interface_type'              then nullif(p_patch->>'interface_type', '')             else interface_type end,
-    api_documentation_obtained  = case when p_patch ? 'api_documentation_obtained'  then nullif(p_patch->>'api_documentation_obtained', '')::boolean else api_documentation_obtained end,
-    api_access_included         = case when p_patch ? 'api_access_included'         then nullif(p_patch->>'api_access_included', '')::boolean        else api_access_included end,
-    partner_approval_required   = case when p_patch ? 'partner_approval_required'   then nullif(p_patch->>'partner_approval_required', '')::boolean  else partner_approval_required end,
-    partner_approval_status     = case when p_patch ? 'partner_approval_status'     then nullif(p_patch->>'partner_approval_status', '')    else partner_approval_status end,
-    sandbox_available           = case when p_patch ? 'sandbox_available'           then nullif(p_patch->>'sandbox_available', '')::boolean  else sandbox_available end,
-    supports_availability       = case when p_patch ? 'supports_availability'       then nullif(p_patch->>'supports_availability', '')::boolean   else supports_availability end,
-    supports_booking            = case when p_patch ? 'supports_booking'            then nullif(p_patch->>'supports_booking', '')::boolean        else supports_booking end,
-    supports_reschedule         = case when p_patch ? 'supports_reschedule'         then nullif(p_patch->>'supports_reschedule', '')::boolean     else supports_reschedule end,
-    supports_cancel             = case when p_patch ? 'supports_cancel'             then nullif(p_patch->>'supports_cancel', '')::boolean         else supports_cancel end,
-    supports_patient_write      = case when p_patch ? 'supports_patient_write'      then nullif(p_patch->>'supports_patient_write', '')::boolean  else supports_patient_write end,
-    rate_limits                 = case when p_patch ? 'rate_limits'                 then nullif(btrim(p_patch->>'rate_limits'), '')          else rate_limits end,
-    vendor_restrictions         = case when p_patch ? 'vendor_restrictions'         then nullif(btrim(p_patch->>'vendor_restrictions'), '')  else vendor_restrictions end,
-    third_party_setup_cents     = case when p_patch ? 'third_party_setup_cents'     then nullif(p_patch->>'third_party_setup_cents', '')::bigint   else third_party_setup_cents end,
-    third_party_monthly_cents   = case when p_patch ? 'third_party_monthly_cents'   then nullif(p_patch->>'third_party_monthly_cents', '')::bigint else third_party_monthly_cents end,
-    third_party_cost_note       = case when p_patch ? 'third_party_cost_note'       then nullif(btrim(p_patch->>'third_party_cost_note'), '') else third_party_cost_note end,
-    third_party_costs_confirmed = case when p_patch ? 'third_party_costs_confirmed' then coalesce(nullif(p_patch->>'third_party_costs_confirmed', '')::boolean, false) else third_party_costs_confirmed end,
-    integration_mode            = case when p_patch ? 'integration_mode'            then nullif(p_patch->>'integration_mode', '')            else integration_mode end,
-    fallback_description        = case when p_patch ? 'fallback_description'        then nullif(btrim(p_patch->>'fallback_description'), '') else fallback_description end,
-    customer_informed_at        = case when p_patch ? 'customer_informed_at'        then nullif(p_patch->>'customer_informed_at', '')::timestamptz   else customer_informed_at end,
-    documented_in_offer_at      = case when p_patch ? 'documented_in_offer_at'      then nullif(p_patch->>'documented_in_offer_at', '')::timestamptz else documented_in_offer_at end,
-    notes                       = case when p_patch ? 'notes'                       then nullif(btrim(p_patch->>'notes'), '')                else notes end,
-    status                      = case when p_patch ? 'status'                      then coalesce(nullif(p_patch->>'status', ''), 'not_started') else status end,
-    updated_by                  = auth.uid()
-  where lead_id = p_lead_id
-  returning * into c;
+  -- Lock and load the current row, then fold the patch over it. An absent key
+  -- leaves the existing value untouched; a key present with JSON null clears the
+  -- column back to "unknown"; only an explicit false stores false. Tri-state
+  -- survives all three shapes because nothing here coalesces NULL into false.
+  select * into c from public.owner_lead_integration_checks where lead_id = p_lead_id for update;
 
-  -- The five conditions, each with its own message. The table constraint says
-  -- the same thing in a way no caller can route around.
+  if p_patch ? 'pvs_name'                    then c.pvs_name                    := nullif(btrim(p_patch->>'pvs_name'), ''); end if;
+  if p_patch ? 'pvs_vendor'                  then c.pvs_vendor                  := nullif(btrim(p_patch->>'pvs_vendor'), ''); end if;
+  if p_patch ? 'pvs_version'                 then c.pvs_version                 := nullif(btrim(p_patch->>'pvs_version'), ''); end if;
+  if p_patch ? 'appointment_system'          then c.appointment_system          := nullif(btrim(p_patch->>'appointment_system'), ''); end if;
+  if p_patch ? 'interface_type'              then c.interface_type              := nullif(p_patch->>'interface_type', ''); end if;
+  if p_patch ? 'api_documentation_obtained'  then c.api_documentation_obtained  := nullif(p_patch->>'api_documentation_obtained', '')::boolean; end if;
+  if p_patch ? 'api_access_included'         then c.api_access_included         := nullif(p_patch->>'api_access_included', '')::boolean; end if;
+  if p_patch ? 'partner_approval_required'   then c.partner_approval_required   := nullif(p_patch->>'partner_approval_required', '')::boolean; end if;
+  if p_patch ? 'partner_approval_status'     then c.partner_approval_status     := nullif(p_patch->>'partner_approval_status', ''); end if;
+  if p_patch ? 'sandbox_available'           then c.sandbox_available           := nullif(p_patch->>'sandbox_available', '')::boolean; end if;
+  if p_patch ? 'supports_availability'       then c.supports_availability       := nullif(p_patch->>'supports_availability', '')::boolean; end if;
+  if p_patch ? 'supports_booking'            then c.supports_booking            := nullif(p_patch->>'supports_booking', '')::boolean; end if;
+  if p_patch ? 'supports_reschedule'         then c.supports_reschedule         := nullif(p_patch->>'supports_reschedule', '')::boolean; end if;
+  if p_patch ? 'supports_cancel'             then c.supports_cancel             := nullif(p_patch->>'supports_cancel', '')::boolean; end if;
+  if p_patch ? 'supports_patient_write'      then c.supports_patient_write      := nullif(p_patch->>'supports_patient_write', '')::boolean; end if;
+  if p_patch ? 'rate_limits'                 then c.rate_limits                 := nullif(btrim(p_patch->>'rate_limits'), ''); end if;
+  if p_patch ? 'vendor_restrictions'         then c.vendor_restrictions         := nullif(btrim(p_patch->>'vendor_restrictions'), ''); end if;
+  if p_patch ? 'third_party_setup_cents'     then c.third_party_setup_cents     := nullif(p_patch->>'third_party_setup_cents', '')::bigint; end if;
+  if p_patch ? 'third_party_monthly_cents'   then c.third_party_monthly_cents   := nullif(p_patch->>'third_party_monthly_cents', '')::bigint; end if;
+  if p_patch ? 'third_party_cost_note'       then c.third_party_cost_note       := nullif(btrim(p_patch->>'third_party_cost_note'), ''); end if;
+  if p_patch ? 'third_party_costs_confirmed' then c.third_party_costs_confirmed := coalesce(nullif(p_patch->>'third_party_costs_confirmed', '')::boolean, false); end if;
+  if p_patch ? 'integration_mode'            then c.integration_mode            := nullif(p_patch->>'integration_mode', ''); end if;
+  if p_patch ? 'fallback_description'        then c.fallback_description        := nullif(btrim(p_patch->>'fallback_description'), ''); end if;
+  if p_patch ? 'customer_informed_at'        then c.customer_informed_at        := nullif(p_patch->>'customer_informed_at', '')::timestamptz; end if;
+  if p_patch ? 'documented_in_offer_at'      then c.documented_in_offer_at      := nullif(p_patch->>'documented_in_offer_at', '')::timestamptz; end if;
+  if p_patch ? 'notes'                       then c.notes                       := nullif(btrim(p_patch->>'notes'), ''); end if;
+  if p_patch ? 'status'                      then c.status                      := coalesce(nullif(p_patch->>'status', ''), 'not_started'); end if;
+  c.updated_by := auth.uid();
+
+  -- VALIDATE BEFORE WRITING.
+  --
+  -- The five conditions are checked against the prospective row while nothing
+  -- has been written yet, so the owner gets the specific German sentence naming
+  -- what is missing. Validating after the UPDATE could not work: the table
+  -- constraint owner_lead_integration_checks_complete_gate rejects the statement
+  -- first, and the caller would see a constraint name instead of an explanation.
+  --
+  -- This is a message layer, NOT the enforcement. The constraint below is
+  -- untouched and remains the hard backstop for every write path -- a future
+  -- migration, a direct psql session, a superuser -- none of which pass through
+  -- here. Neither layer may be weakened in favour of the other.
   if c.status = 'complete' then
     if coalesce(btrim(c.pvs_name), '') = '' and coalesce(btrim(c.appointment_system), '') = '' then
       raise exception 'record the PVS or the appointment system before completing the assessment';
@@ -1067,6 +1116,37 @@ begin
     end if;
   end if;
 
+  update public.owner_lead_integration_checks set
+    pvs_name                    = c.pvs_name,
+    pvs_vendor                  = c.pvs_vendor,
+    pvs_version                 = c.pvs_version,
+    appointment_system          = c.appointment_system,
+    interface_type              = c.interface_type,
+    api_documentation_obtained  = c.api_documentation_obtained,
+    api_access_included         = c.api_access_included,
+    partner_approval_required   = c.partner_approval_required,
+    partner_approval_status     = c.partner_approval_status,
+    sandbox_available           = c.sandbox_available,
+    supports_availability       = c.supports_availability,
+    supports_booking            = c.supports_booking,
+    supports_reschedule         = c.supports_reschedule,
+    supports_cancel             = c.supports_cancel,
+    supports_patient_write      = c.supports_patient_write,
+    rate_limits                 = c.rate_limits,
+    vendor_restrictions         = c.vendor_restrictions,
+    third_party_setup_cents     = c.third_party_setup_cents,
+    third_party_monthly_cents   = c.third_party_monthly_cents,
+    third_party_cost_note       = c.third_party_cost_note,
+    third_party_costs_confirmed = c.third_party_costs_confirmed,
+    integration_mode            = c.integration_mode,
+    fallback_description        = c.fallback_description,
+    customer_informed_at        = c.customer_informed_at,
+    documented_in_offer_at      = c.documented_in_offer_at,
+    notes                       = c.notes,
+    status                      = c.status,
+    updated_by                  = c.updated_by
+  where lead_id = p_lead_id;
+
   perform public.owner_record_lead_activity(p_lead_id, 'integration_check_updated',
     'Schnittstellen-Prüfung aktualisiert'
     || case when c.status = 'complete' then ' — abgeschlossen' else '' end);
@@ -1082,7 +1162,7 @@ commit;
 --
 --     Two projections shaped the way a sales surface consumes them, so no screen
 --     assembles a lead from parts. There is deliberately no command-center or
---     cross-domain aggregate here: that is PR 70E.
+--     cross-domain aggregate here: that belongs to the Command Center phase.
 --
 --     TASK SEAM (documented on purpose, not implemented):
 --     A lead may eventually need internal to-dos. This PR does NOT add a
