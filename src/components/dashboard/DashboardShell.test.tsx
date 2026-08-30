@@ -23,7 +23,6 @@ function renderAt(pathname: string, { isOwner = true } = {}) {
       <DashboardShell
         sections={getSections(pathname, { isOwner })}
         subNav={moduleAllowed ? activeModule.subNav : []}
-        subNavLabel={activeModule.subNavLabel}
         activeSubKey={isSubNavActive}
         title={moduleAllowed ? activeModule.title : 'Cogniiq'}
       >
@@ -53,7 +52,8 @@ describe('DashboardShell aria-current semantics', () => {
       '/admin/clients',
       '/admin/finance/overview',
       '/admin/finance/invoices',
-      '/admin/oura-analytics',
+      '/admin/finance/expenses',
+      '/admin/finance/taxes',
     ]) {
       const view = renderAt(pathname);
       for (const nav of screen.getAllByRole('navigation', { name: 'Workspace Navigation' })) {
@@ -63,11 +63,52 @@ describe('DashboardShell aria-current semantics', () => {
     }
   });
 
-  it('keeps a module without sub-navigation as the page itself', () => {
+  it('never announces more than one current page on a route the rail does not represent', () => {
+    // Oura is withheld from the rail (route intact, link gone), so nothing in the
+    // navigation corresponds to this location. Announcing zero current pages is correct;
+    // announcing two would be a broken landmark.
     renderAt('/admin/oura-analytics');
-    const nav = rail();
-    // Oura has no sub-nav, so the module row is the destination rather than a container.
-    expect(within(nav).getByRole('link', { name: 'Oura Analytics' }).getAttribute('aria-current')).toBe('page');
+    for (const nav of screen.getAllByRole('navigation', { name: 'Workspace Navigation' })) {
+      expect(nav.querySelectorAll('[aria-current="page"]').length).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('keeps a module without sub-navigation as the page itself', () => {
+    // A component-level contract, exercised directly: every module in the app's current
+    // navigation happens to carry a sub-navigation, but the shell must still downgrade
+    // nothing when a caller supplies none.
+    render(
+      <MemoryRouter initialEntries={['/admin/solo']}>
+        <DashboardShell
+          sections={[{ key: 'solo', label: 'Solo', href: '/admin/solo', active: true }]}
+          subNav={[]}
+        >
+          <p>Inhalt</p>
+        </DashboardShell>
+      </MemoryRouter>,
+    );
+    const nav = screen.getAllByRole('navigation', { name: 'Workspace Navigation' })[0];
+    expect(within(nav).getByRole('link', { name: 'Solo' }).getAttribute('aria-current')).toBe('page');
+  });
+
+  it('drops an empty sub-navigation group instead of rendering an orphan heading', () => {
+    render(
+      <MemoryRouter initialEntries={['/admin/solo']}>
+        <DashboardShell
+          sections={[{ key: 'solo', label: 'Solo', href: '/admin/solo', active: true }]}
+          subNav={[
+            { key: 'filled', label: 'Vorhanden', items: [{ key: 'a', label: 'A', href: '/admin/solo/a' }] },
+            // The shape a future section takes while its destinations do not exist yet.
+            { key: 'pending', label: 'Noch nicht da', items: [] },
+          ]}
+        >
+          <p>Inhalt</p>
+        </DashboardShell>
+      </MemoryRouter>,
+    );
+    const nav = screen.getAllByRole('navigation', { name: 'Workspace Navigation' })[0];
+    expect(within(nav).queryByText('Noch nicht da')).toBeNull();
+    expect(within(nav).getByText('Vorhanden')).toBeTruthy();
   });
 
   it('still marks the module as active, so the visual selected state is unchanged', () => {
@@ -89,8 +130,10 @@ describe('DashboardShell aria-current semantics', () => {
     renderAt('/admin/finance/overview');
     const nav = rail();
     const hrefs = [...nav.querySelectorAll('a')].map((a) => a.getAttribute('href'));
-    for (const item of getActiveModule('/admin/finance/overview').subNav) {
-      expect(hrefs, item.label).toContain(item.href);
+    for (const group of getActiveModule('/admin/finance/overview').subNav) {
+      for (const item of group.items) {
+        expect(hrefs, item.label).toContain(item.href);
+      }
     }
   });
 });
