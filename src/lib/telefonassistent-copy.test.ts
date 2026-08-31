@@ -21,6 +21,7 @@ const CLUSTER = [
   "src/lib/routing/publicRoutes.ts",
   "src/pages/PraxenPage.tsx",
   "src/pages/KiTelefonassistentPage.tsx",
+  "src/pages/guides/KiTelefonassistentEinfuehren.tsx",
   "src/pages/costs/KostenKiTelefonassistent.tsx",
   "src/pages/industries/KiTelefonassistentArzt.tsx",
   "src/pages/industries/KiTelefonassistentPraxis.tsx",
