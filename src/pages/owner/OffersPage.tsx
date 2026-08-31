@@ -9,7 +9,8 @@ import {
 } from '@/components/dashboard';
 import {
   MoveToFolderDialog, RowOrganizeMenu, TrashRowActions, WorkspaceBulkBar, WorkspaceDeleteDialog,
-  WorkspaceFolderRail, restoreFromTrash, useTrashPlans, useWorkspaceOrganization,
+  WorkspaceFolderContextHeader, WorkspaceFolderOverview,
+  emptyFolderCopy, restoreFromTrash, useTrashPlans, useWorkspaceOrganization,
 } from '@/components/finance/workspaceOrganizationUi';
 import { FOLDER_TRASH, filterByFolder, folderCounts } from '@/lib/ownerFinance/workspaceOrganization';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
@@ -143,19 +144,33 @@ export function OffersPage() {
     });
     // Folder ∩ status ∩ search ∩ date ∩ amount. Every existing filter keeps its value when
     // the folder changes, and the folder keeps its value when they do.
-    return filterByFolder(sorted, (o) => o.id, org.state, org.selection);
+    return filterByFolder(sorted, (o) => o.id, org.state, org.view);
   }, [offers, statusFilter, statusMatchers, query, dateFrom, dateTo, minAmount, maxAmount, sort,
-      customerName, org.state, org.selection]);
+      customerName, org.state, org.view]);
 
   const folderRailCounts = useMemo(
     () => folderCounts(offers, (o) => o.id, org.state),
     [offers, org.state],
   );
 
-  const inTrash = org.selection === FOLDER_TRASH;
+  const inTrash = org.view === FOLDER_TRASH;
+
+  /**
+   * Folder-first: with no folder open the page shows FOLDERS, not records.
+   *
+   * The one exception is a workspace with nothing in it at all — no records and no folders.
+   * There is nothing to organise there, so the page keeps its existing first-run empty state
+   * with its create action rather than presenting three empty system tiles.
+   */
+  const showFolderOverview = !loading && org.isOverview
+    && (offers.length > 0 || org.state.folders.length > 0);
+  const showRecords = !showFolderOverview;
+
+  // An empty CUSTOM folder says so, rather than borrowing the page's "no match" wording.
+  const folderEmpty = emptyFolderCopy(org, folderRailCounts);
   const trashPlans = useTrashPlans('offer', inTrash ? filtered.map((o) => o.id) : [], inTrash);
 
-  useEffect(() => { setSelected(new Set()); }, [org.selection, statusFilter]);
+  useEffect(() => { setSelected(new Set()); }, [org.view, statusFilter]);
   const visibleSelected = useMemo(
     () => filtered.filter((o) => selected.has(o.id)).map((o) => o.id),
     [filtered, selected],
@@ -369,7 +384,7 @@ export function OffersPage() {
           </>
         }
         toolbar={
-          !loading && offers.length > 0 ? (
+          !loading && !org.isOverview && offers.length > 0 ? (
             <Toolbar
               trailing={
                 <>
@@ -417,10 +432,26 @@ export function OffersPage() {
       <div className="space-y-4">
         {loading ? <StatBandSkeleton count={5} /> : offers.length > 0 ? <StatBand items={stats} /> : null}
 
-        {!loading && offers.length > 0 ? (
-          <WorkspaceFolderRail org={org} counts={folderRailCounts} resourceLabel="Angebote" />
+        {showFolderOverview ? (
+          <WorkspaceFolderOverview
+            org={org}
+            counts={folderRailCounts}
+            resourceLabel="Angebote"
+            resourcePlural="Angebote"
+          />
         ) : null}
 
+        {showRecords && !org.isOverview && !loading ? (
+          <WorkspaceFolderContextHeader
+            org={org}
+            counts={folderRailCounts}
+            resourceLabel="Angebote"
+            backLabel="Angebote"
+          />
+        ) : null}
+
+        {showRecords ? (
+        <>
         <WorkspaceBulkBar
           count={visibleSelected.length}
           onMove={() => setMoveTargets(visibleSelected)}
@@ -455,8 +486,10 @@ export function OffersPage() {
 
         {loading ? <TableSkeleton rows={5} cols={5} /> : filtered.length === 0 ? (
           <EmptyState icon={FileSignature}
-            title={offers.length === 0 ? 'Noch keine Angebote' : inTrash ? 'Papierkorb ist leer' : 'Keine Angebote in dieser Ansicht'}
-            description={offers.length === 0
+            title={folderEmpty ? folderEmpty.title
+              : offers.length === 0 ? 'Noch keine Angebote' : inTrash ? 'Papierkorb ist leer' : 'Keine Angebote in dieser Ansicht'}
+            description={folderEmpty ? folderEmpty.description
+              : offers.length === 0
               ? 'Erstellen Sie Ihr erstes Angebot. Es werden keine Beispieldaten angezeigt.'
               : inTrash
                 ? 'Hier liegen Angebote, die Sie aus dem Arbeitsbereich entfernt haben. Versionen, Dokumente und Nachweise bleiben erhalten.'
@@ -490,6 +523,8 @@ export function OffersPage() {
             mobileTitle={(o) => <div className="flex items-center gap-2"><span>{o.offer_number ?? 'Entwurf'}</span><StatusBadge label={offerStatusLabel[o.status] ?? o.status} tone={offerStatusTone[o.status]} /></div>}
             mobileSubtitle={(o) => [customerName(o), o.title].filter((v) => v && v !== '—').join(' · ') || 'ohne Titel'} />
         )}
+        </>
+        ) : null}
       </div>
 
       <OfferArchiveDialog open={!!archiveTarget} offer={archiveTarget} onClose={() => setArchiveTarget(null)} onDone={() => void load()} />

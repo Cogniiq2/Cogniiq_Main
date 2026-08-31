@@ -4,13 +4,14 @@ import {
 import { useSearchParams } from 'react-router-dom';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import {
-  Folder, FolderInput, FolderPlus, MoreHorizontal, Pencil, RotateCcw, Trash2, X,
+  ChevronLeft, Folder, FolderInput, FolderOpen, FolderPlus, LayoutList, MoreHorizontal,
+  Pencil, RotateCcw, Trash2, X, type LucideIcon,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import {
   Button, Field, Modal, Spinner, border, focusRing, focusRingOnSurface, interactive, radius,
-  text, useToast, zIndex,
+  surface, text, useToast, zIndex,
 } from '@/components/dashboard';
 import {
   EMPTY_WORKSPACE_STATE, FOLDER_ALL, FOLDER_TRASH, FOLDER_UNFILED,
@@ -43,17 +44,21 @@ export const FOLDER_PARAM = 'folder';
 
 /**
  * Folder selection lives in the query string so a view survives a reload and can be linked.
- * `all` is the default and writes no parameter at all, which keeps the plain list URL plain —
- * and every mutation of the params is a functional update, so `?create=1` and anything else
- * the page owns is preserved rather than clobbered.
+ *
+ * NO PARAMETER MEANS THE FOLDER OVERVIEW, not "all records". That is the whole point of the
+ * folder-first navigation: opening Rechnungen shows folders, and a record list is something
+ * the owner enters deliberately. `null` is therefore a real state, not a missing value.
+ *
+ * Every mutation is a functional update on the existing params, so `?create=1` and anything
+ * else the page owns is preserved rather than clobbered.
  */
-export function useFolderSelection(): [FolderSelection, (next: FolderSelection) => void] {
+export function useFolderSelection(): [FolderSelection | null, (next: FolderSelection | null) => void] {
   const [params, setParams] = useSearchParams();
-  const selection = params.get(FOLDER_PARAM) || FOLDER_ALL;
-  const set = useCallback((next: FolderSelection) => {
+  const selection = params.get(FOLDER_PARAM) || null;
+  const set = useCallback((next: FolderSelection | null) => {
     setParams((prev) => {
       const updated = new URLSearchParams(prev);
-      if (next === FOLDER_ALL) updated.delete(FOLDER_PARAM);
+      if (next === null) updated.delete(FOLDER_PARAM);
       else updated.set(FOLDER_PARAM, next);
       return updated;
     }, { replace: true });
@@ -68,8 +73,19 @@ export interface WorkspaceOrganization {
   entityId: string | null;
   state: WorkspaceState;
   ready: boolean;
-  selection: FolderSelection;
-  setSelection: (next: FolderSelection) => void;
+  /** `null` is the folder overview. A string is a folder id or a system view. */
+  selection: FolderSelection | null;
+  setSelection: (next: FolderSelection | null) => void;
+  /** True while no folder is open — the page shows folders, never records. */
+  isOverview: boolean;
+  /**
+   * What the record list filters by. On the overview this is FOLDER_ALL so anything that
+   * legitimately spans the whole collection — the export menu, the stat band — keeps
+   * working unchanged; the table simply is not rendered there.
+   */
+  view: FolderSelection;
+  /** The custom folder currently open, if the selection names one. */
+  activeFolder: WorkspaceFolder | null;
   reload: () => Promise<void>;
   /** Local-first update so a move or a trash lands in the same frame as the click. */
   patch: (updater: (previous: WorkspaceState) => WorkspaceState) => void;
@@ -100,8 +116,31 @@ export function useWorkspaceOrganization(entityId: string | null, scope: Workspa
 
   useEffect(() => { void reload(); }, [reload]);
 
+  const isSystem = selection === FOLDER_ALL || selection === FOLDER_UNFILED || selection === FOLDER_TRASH;
+  const activeFolder = selection && !isSystem
+    ? state.folders.find((folder) => folder.id === selection) ?? null
+    : null;
+
+  /**
+   * A folder id in the URL that no longer resolves — deleted in another tab, an old
+   * bookmark, a typo — must not leave the owner staring at an empty list. Once the state
+   * has actually loaded, the parameter is dropped and the overview takes over.
+   */
+  useEffect(() => {
+    if (!ready || !selection || isSystem || activeFolder) return;
+    setSelection(null);
+  }, [ready, selection, isSystem, activeFolder, setSelection]);
+
+  const resolved = selection && !isSystem && !activeFolder ? null : selection;
+
   return {
-    scope, entityId, state, ready, selection, setSelection, reload,
+    scope, entityId, state, ready,
+    selection: resolved,
+    setSelection,
+    isOverview: resolved === null,
+    view: resolved ?? FOLDER_ALL,
+    activeFolder,
+    reload,
     patch: (updater) => setState(updater),
   };
 }
@@ -178,68 +217,28 @@ export function RowOrganizeMenu({ label, items }: {
   );
 }
 
-/* ============================================================ folder rail */
-
-const chipBase = cn(
-  'inline-flex h-8 shrink-0 items-center gap-1.5 border px-2.5 text-[12.5px] font-medium',
-  radius.md, interactive.press, focusRing,
-);
-const chipIdle = cn(
-  'border-transparent bg-transparent text-[var(--cq-fg-muted)]',
-  'hover:bg-[var(--cq-hover)] hover:text-[var(--cq-fg)]',
-);
-const chipActive = 'border-[var(--cq-accent-border)] bg-[var(--cq-accent-weak)] text-[var(--cq-accent-fg)]';
-
-function Chip({ active, onClick, children, count, title }: {
-  active: boolean; onClick: () => void; children: ReactNode; count?: number; title?: string;
-}) {
-  return (
-    <button
-      type="button"
-      role="radio"
-      aria-checked={active}
-      tabIndex={active ? 0 : -1}
-      title={title}
-      onClick={onClick}
-      className={cn(chipBase, active ? chipActive : chipIdle, 'max-w-[220px]')}
-    >
-      <span className="min-w-0 truncate">{children}</span>
-      {count != null ? (
-        <span className={cn('shrink-0 tabular-nums', active ? 'opacity-70' : 'text-[var(--cq-fg-subtle)]')}>
-          {count}
-        </span>
-      ) : null}
-    </button>
-  );
-}
+/* ======================================================== folder overview */
 
 /**
- * The rail itself: Alle · Ohne Ordner · the owner's folders · Papierkorb.
+ * Folder create / rename / delete, in one place.
  *
- * One row, chip density identical to the status filter directly above it, and horizontally
- * scrollable rather than wrapping — so a workspace with twenty folders never pushes the table
- * down the page and never gives the PAGE a horizontal scrollbar (the overflow is owned by this
- * strip, which is why `min-w-0` runs all the way down).
+ * The overview and the in-folder header both need these dialogs and neither should own a
+ * second copy, so the state and the JSX live here and each surface just calls `open*`.
+ * Every one of them goes through the same backend path as before — nothing about creating,
+ * renaming or deleting a folder changed in this feature.
  */
-export function WorkspaceFolderRail({ org, counts, resourceLabel }: {
-  org: WorkspaceOrganization;
-  counts: FolderCounts;
-  /** Plural noun for the confirmation copy, e.g. "Rechnungen". */
-  resourceLabel: string;
-}) {
+function useFolderAdmin(org: WorkspaceOrganization, resourceLabel: string) {
   const toast = useToast();
   const [createOpen, setCreateOpen] = useState(false);
   const [renaming, setRenaming] = useState<WorkspaceFolder | null>(null);
   const [deleting, setDeleting] = useState<WorkspaceFolder | null>(null);
 
-  const { state, selection, setSelection } = org;
-
-  const railRadioGroupProps = { role: 'radiogroup' as const, 'aria-label': 'Nach Ordner filtern' };
-
   const removeFolder = async (folder: WorkspaceFolder) => {
     const { unassigned, error } = await deleteWorkspaceFolder(folder.id);
     if (error) { toast.error('Ordner konnte nicht gelöscht werden', 'Bitte erneut versuchen.'); return; }
-    if (selection === folder.id) setSelection(FOLDER_ALL);
+    // Deleting the folder you are standing in returns you to the overview rather than to
+    // a view that no longer exists.
+    if (org.selection === folder.id) org.setSelection(null);
     setDeleting(null);
     await org.reload();
     toast.success('Ordner gelöscht', unassigned > 0
@@ -247,70 +246,13 @@ export function WorkspaceFolderRail({ org, counts, resourceLabel }: {
       : 'Der Ordner war leer.');
   };
 
-  return (
+  const dialogs = (
     <>
-      <div className="flex items-center gap-2">
-        <div
-          {...railRadioGroupProps}
-          className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
-          <Chip active={selection === FOLDER_ALL} onClick={() => setSelection(FOLDER_ALL)} count={counts.all}>
-            Alle
-          </Chip>
-          <Chip active={selection === FOLDER_UNFILED} onClick={() => setSelection(FOLDER_UNFILED)} count={counts.unfiled}>
-            Ohne Ordner
-          </Chip>
-
-          {state.folders.map((folder) => (
-            <span key={folder.id} className="flex shrink-0 items-center">
-              <Chip
-                active={selection === folder.id}
-                onClick={() => setSelection(folder.id)}
-                count={counts.byFolder[folder.id] ?? 0}
-                title={folder.name}
-              >
-                <span className="inline-flex min-w-0 items-center gap-1.5">
-                  <Folder size={13} aria-hidden="true" className="shrink-0 opacity-60" />
-                  <span className="min-w-0 truncate">{folder.name}</span>
-                </span>
-              </Chip>
-              {selection === folder.id ? (
-                <RowOrganizeMenu
-                  label={`Ordner ${folder.name} verwalten`}
-                  items={[
-                    { key: 'rename', label: 'Umbenennen', icon: Pencil, onSelect: () => setRenaming(folder) },
-                    { key: 'delete', label: 'Ordner löschen', icon: Trash2, tone: 'danger', onSelect: () => setDeleting(folder) },
-                  ]}
-                />
-              ) : null}
-            </span>
-          ))}
-
-          <span className="mx-1 h-4 w-px shrink-0 bg-[var(--cq-border)]" aria-hidden="true" />
-          <Chip active={selection === FOLDER_TRASH} onClick={() => setSelection(FOLDER_TRASH)} count={counts.trash}>
-            Papierkorb
-          </Chip>
-        </div>
-
-        {/* The label shortens to the icon on a phone, so the accessible name is stated
-            explicitly rather than left to whatever text happens to be visible. */}
-        <Button
-          size="sm"
-          variant="ghost"
-          icon={FolderPlus}
-          aria-label="Neuer Ordner"
-          onClick={() => setCreateOpen(true)}
-          disabled={!org.entityId}
-        >
-          <span className="hidden sm:inline">Ordner</span>
-        </Button>
-      </div>
-
       <FolderNameDialog
         open={createOpen}
         title="Neuer Ordner"
         confirmLabel="Ordner anlegen"
-        existing={state.folders}
+        existing={org.state.folders}
         onClose={() => setCreateOpen(false)}
         onSubmit={async (name) => {
           if (!org.entityId) return 'Kein Geschäftsbereich aktiv.';
@@ -318,7 +260,8 @@ export function WorkspaceFolderRail({ org, counts, resourceLabel }: {
           if (error || !folder) return folderErrorText(error);
           await org.reload();
           setCreateOpen(false);
-          setSelection(folder.id);
+          // Stay on the overview. The point of creating a folder is to organise into it,
+          // and dropping the owner into an empty list would hide the folder they just made.
           return null;
         }}
       />
@@ -328,7 +271,7 @@ export function WorkspaceFolderRail({ org, counts, resourceLabel }: {
         title="Ordner umbenennen"
         confirmLabel="Speichern"
         initial={renaming?.name ?? ''}
-        existing={state.folders}
+        existing={org.state.folders}
         ignoreId={renaming?.id}
         onClose={() => setRenaming(null)}
         onSubmit={async (name) => {
@@ -364,6 +307,259 @@ export function WorkspaceFolderRail({ org, counts, resourceLabel }: {
         </p>
       </Modal>
     </>
+  );
+
+  return {
+    openCreate: () => setCreateOpen(true),
+    openRename: (folder: WorkspaceFolder) => setRenaming(folder),
+    openDelete: (folder: WorkspaceFolder) => setDeleting(folder),
+    dialogs,
+  };
+}
+
+/** The menu items a custom folder offers. System folders get none — they cannot be edited. */
+function folderMenuItems(
+  folder: WorkspaceFolder,
+  admin: { openRename: (f: WorkspaceFolder) => void; openDelete: (f: WorkspaceFolder) => void },
+) {
+  return [
+    { key: 'rename', label: 'Umbenennen', icon: Pencil, onSelect: () => admin.openRename(folder) },
+    { key: 'delete', label: 'Ordner löschen', icon: Trash2, tone: 'danger' as const, onSelect: () => admin.openDelete(folder) },
+  ];
+}
+
+/**
+ * One folder tile.
+ *
+ * The whole tile is the click target, so the accessible name lives on a button stretched
+ * across it rather than on the visible text — a nested button (the overflow menu) inside a
+ * button would be invalid markup and would swallow the menu's own clicks. The content is
+ * pointer-transparent; only the menu sits above the overlay.
+ */
+function FolderTile({ name, count, caption, icon: Icon, onOpen, menu, tone = 'folder' }: {
+  name: string;
+  count: number;
+  caption?: string;
+  icon: LucideIcon;
+  onOpen: () => void;
+  menu?: ReactNode;
+  tone?: 'folder' | 'system';
+}) {
+  return (
+    <div
+      className={cn(
+        'group relative flex min-h-[92px] flex-col justify-between p-3.5',
+        surface.card, interactive.transition,
+        'hover:border-[var(--cq-border-strong)] hover:bg-[var(--cq-hover)]',
+        'focus-within:border-[var(--cq-border-strong)]',
+      )}
+    >
+      {/* The stretched click target. Everything visible above it is decoration. */}
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-label={`${name} öffnen — ${count} ${count === 1 ? 'Eintrag' : 'Einträge'}`}
+        className={cn('absolute inset-0 rounded-[12px]', interactive.press, focusRing)}
+      />
+
+      <div className="pointer-events-none flex items-start justify-between gap-2">
+        <Icon
+          size={16}
+          aria-hidden="true"
+          className={cn('shrink-0', tone === 'system' ? 'text-[var(--cq-fg-subtle)]' : 'text-[var(--cq-accent-fg)] opacity-80')}
+        />
+        <span className={cn('shrink-0 tabular-nums', text.bodyStrong)}>{count}</span>
+      </div>
+
+      {/* The menu sits on the caption line, not beside the count: at the top right the two
+          would collide, and the count is the thing the eye is scanning for. */}
+      <div className="mt-2 flex items-end justify-between gap-2">
+        <div className="pointer-events-none min-w-0">
+          <div className={cn('truncate', text.cardTitle)} title={name}>{name}</div>
+          {caption ? <div className={cn('mt-0.5 truncate', text.hint)}>{caption}</div> : null}
+        </div>
+        {menu ? <div className="relative z-10 -mb-1 -mr-1 shrink-0">{menu}</div> : null}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * THE FOLDER OVERVIEW — what the owner sees when they open Rechnungen, Angebote or Ausgaben.
+ *
+ * Folders, and only folders. No record rows, no table, no status filters, no bulk bar: the
+ * list is something you enter, which is the entire reason this exists. A collection with
+ * dozens of invoices should open calm rather than dumping every row on the screen.
+ *
+ * Custom folders come first; the three system views sit under a hairline so they read as a
+ * different kind of thing without needing a different visual language. Counts come from the
+ * folder state the page already loaded — one read per scope, never one per folder.
+ */
+export function WorkspaceFolderOverview({ org, counts, resourceLabel, resourcePlural }: {
+  org: WorkspaceOrganization;
+  counts: FolderCounts;
+  /** Plural noun for the confirmation copy, e.g. "Rechnungen". */
+  resourceLabel: string;
+  /** Caption under a folder name, e.g. "Rechnungen". Usually the same word. */
+  resourcePlural: string;
+}) {
+  const admin = useFolderAdmin(org, resourceLabel);
+  const { state, setSelection } = org;
+
+  const grid = 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
+
+  return (
+    <div className="animate-in fade-in slide-in-from-top-1 duration-fast ease-premium">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 className={text.sectionTitle}>Ordner</h2>
+        <Button
+          size="sm"
+          variant="secondary"
+          icon={FolderPlus}
+          onClick={admin.openCreate}
+          disabled={!org.entityId}
+        >
+          Neuer Ordner
+        </Button>
+      </div>
+
+      {state.folders.length > 0 ? (
+        <div className={grid}>
+          {state.folders.map((folder) => (
+            <FolderTile
+              key={folder.id}
+              name={folder.name}
+              count={counts.byFolder[folder.id] ?? 0}
+              caption={resourcePlural}
+              icon={Folder}
+              onOpen={() => setSelection(folder.id)}
+              menu={<RowOrganizeMenu label={`Ordner ${folder.name} verwalten`} items={folderMenuItems(folder, admin)} />}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className={cn('px-4 py-6 text-center', surface.sunken)}>
+          <p className={text.bodyStrong}>Noch keine Ordner</p>
+          <p className={cn('mt-1', text.body)}>
+            Legen Sie einen Ordner an — zum Beispiel einen Kundennamen, ein Jahr oder ein Projekt.
+          </p>
+        </div>
+      )}
+
+      {/* The system views. Same tile, quieter icon: they behave identically but cannot be
+          renamed or deleted, so they carry no overflow menu. */}
+      <div className={cn('mt-4 pt-4', border.hairlineT)}>
+        <div className={grid}>
+          <FolderTile
+            name="Alle Einträge"
+            count={counts.all}
+            caption="ohne Ordnerfilter"
+            icon={LayoutList}
+            tone="system"
+            onOpen={() => setSelection(FOLDER_ALL)}
+          />
+          <FolderTile
+            name="Ohne Ordner"
+            count={counts.unfiled}
+            caption="noch nicht einsortiert"
+            icon={FolderOpen}
+            tone="system"
+            onOpen={() => setSelection(FOLDER_UNFILED)}
+          />
+          <FolderTile
+            name="Papierkorb"
+            count={counts.trash}
+            caption="aus dem Arbeitsbereich entfernt"
+            icon={Trash2}
+            tone="system"
+            onOpen={() => setSelection(FOLDER_TRASH)}
+          />
+        </div>
+      </div>
+
+      {admin.dialogs}
+    </div>
+  );
+}
+
+/**
+ * Copy for a custom folder that genuinely holds nothing.
+ *
+ * Returns null unless the owner is standing in a custom folder whose count is zero, so a
+ * folder that merely looks empty because of an active status filter or search still gets the
+ * page's own "no match" wording instead of being called empty.
+ */
+export function emptyFolderCopy(
+  org: WorkspaceOrganization, counts: FolderCounts,
+): { title: string; description: string } | null {
+  const folder = org.activeFolder;
+  if (!folder || (counts.byFolder[folder.id] ?? 0) !== 0) return null;
+  return {
+    title: 'Noch keine Einträge in diesem Ordner',
+    description: 'Verschieben Sie Einträge über „In Ordner verschieben" im Zeilenmenü hierher.',
+  };
+}
+
+/* ================================================== in-folder context bar */
+
+const systemFolderLabel: Record<string, string> = {
+  [FOLDER_ALL]: 'Alle Einträge',
+  [FOLDER_UNFILED]: 'Ohne Ordner',
+  [FOLDER_TRASH]: 'Papierkorb',
+};
+
+/**
+ * The band that says which folder you are standing in.
+ *
+ * Deliberately small: the page keeps its own WorkspaceHeader, and a second full-size header
+ * would read as a different page rather than a folder inside one. A back control, the folder
+ * name, its count, and — for a custom folder — the same rename/delete menu the overview offers.
+ */
+export function WorkspaceFolderContextHeader({ org, counts, resourceLabel, backLabel }: {
+  org: WorkspaceOrganization;
+  counts: FolderCounts;
+  /** Plural noun for the count line and the delete copy, e.g. "Rechnungen". */
+  resourceLabel: string;
+  /** The page's own name, used on the back control: "← Rechnungen". */
+  backLabel: string;
+}) {
+  const admin = useFolderAdmin(org, resourceLabel);
+  const folder = org.activeFolder;
+  const name = folder?.name ?? systemFolderLabel[org.view] ?? backLabel;
+  const count = folder
+    ? counts.byFolder[folder.id] ?? 0
+    : org.view === FOLDER_TRASH ? counts.trash
+    : org.view === FOLDER_UNFILED ? counts.unfiled
+    : counts.all;
+
+  return (
+    <div className="animate-in fade-in slide-in-from-top-1 duration-fast ease-premium">
+      {/* Not history.back(): this has to behave the same after a direct URL load, so it
+          clears the parameter rather than popping whatever came before. */}
+      <button
+        type="button"
+        onClick={() => org.setSelection(null)}
+        className={cn(
+          '-ml-1 inline-flex items-center gap-1 px-1 py-0.5 text-[12px] font-medium text-[var(--cq-fg-muted)]',
+          radius.sm, interactive.transition, focusRing, 'hover:text-[var(--cq-fg)]',
+        )}
+      >
+        <ChevronLeft size={13} aria-hidden="true" />
+        {backLabel}
+      </button>
+
+      <div className="mt-1 flex items-center gap-2">
+        <h2 className={cn('min-w-0 truncate', text.cardTitle)} title={name}>{name}</h2>
+        <span className={cn('shrink-0', text.hint)}>
+          {count} {count === 1 ? 'Eintrag' : 'Einträge'}
+        </span>
+        {folder ? (
+          <RowOrganizeMenu label={`Ordner ${folder.name} verwalten`} items={folderMenuItems(folder, admin)} />
+        ) : null}
+      </div>
+
+      {admin.dialogs}
+    </div>
   );
 }
 

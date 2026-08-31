@@ -10,7 +10,8 @@ import {
 } from '@/components/dashboard';
 import {
   MoveToFolderDialog, RowOrganizeMenu, TrashRowActions, WorkspaceBulkBar, WorkspaceDeleteDialog,
-  WorkspaceFolderRail, restoreFromTrash, useTrashPlans, useWorkspaceOrganization,
+  WorkspaceFolderContextHeader, WorkspaceFolderOverview,
+  emptyFolderCopy, restoreFromTrash, useTrashPlans, useWorkspaceOrganization,
 } from '@/components/finance/workspaceOrganizationUi';
 import { FOLDER_TRASH, filterByFolder, folderCounts } from '@/lib/ownerFinance/workspaceOrganization';
 import { invoiceStatusTone } from '@/pages/owner/ownerUi';
@@ -143,18 +144,32 @@ export function InvoicesPage() {
     }
     // Intersection, not replacement: folder ∩ status ∩ search. Selecting a folder leaves
     // the status filter and the search term exactly where the owner put them.
-    return filterByFolder(rows, (i) => i.id, org.state, org.selection);
-  }, [invoices, statusFilter, query, customerName, org.state, org.selection]);
+    return filterByFolder(rows, (i) => i.id, org.state, org.view);
+  }, [invoices, statusFilter, query, customerName, org.state, org.view]);
 
   const folderRailCounts = useMemo(
     () => folderCounts(invoices, (i) => i.id, org.state),
     [invoices, org.state],
   );
 
-  const inTrash = org.selection === FOLDER_TRASH;
+  const inTrash = org.view === FOLDER_TRASH;
+
+  /**
+   * Folder-first: with no folder open the page shows FOLDERS, not records.
+   *
+   * The one exception is a workspace with nothing in it at all — no records and no folders.
+   * There is nothing to organise there, so the page keeps its existing first-run empty state
+   * with its create action rather than presenting three empty system tiles.
+   */
+  const showFolderOverview = !loading && org.isOverview
+    && (invoices.length > 0 || org.state.folders.length > 0);
+  const showRecords = !showFolderOverview;
+
+  // An empty CUSTOM folder says so, rather than borrowing the page's "no match" wording.
+  const folderEmpty = emptyFolderCopy(org, folderRailCounts);
   const trashPlans = useTrashPlans('invoice', inTrash ? filtered.map((i) => i.id) : [], inTrash);
 
-  useEffect(() => { setSelected(new Set()); }, [org.selection, statusFilter]);
+  useEffect(() => { setSelected(new Set()); }, [org.view, statusFilter]);
   const visibleSelected = useMemo(
     () => filtered.filter((i) => selected.has(i.id)).map((i) => i.id),
     [filtered, selected],
@@ -415,7 +430,7 @@ export function InvoicesPage() {
           </>
         }
         toolbar={
-          !loading && invoices.length > 0 ? (
+          !loading && !org.isOverview && invoices.length > 0 ? (
             <Toolbar
               trailing={
                 <SearchInput
@@ -443,10 +458,26 @@ export function InvoicesPage() {
       <div className="space-y-4">
         {loading ? <StatBandSkeleton count={5} /> : invoices.length > 0 ? <StatBand items={stats} /> : null}
 
-        {!loading && invoices.length > 0 ? (
-          <WorkspaceFolderRail org={org} counts={folderRailCounts} resourceLabel="Rechnungen" />
+        {showFolderOverview ? (
+          <WorkspaceFolderOverview
+            org={org}
+            counts={folderRailCounts}
+            resourceLabel="Rechnungen"
+            resourcePlural="Rechnungen"
+          />
         ) : null}
 
+        {showRecords && !org.isOverview && !loading ? (
+          <WorkspaceFolderContextHeader
+            org={org}
+            counts={folderRailCounts}
+            resourceLabel="Rechnungen"
+            backLabel="Rechnungen"
+          />
+        ) : null}
+
+        {showRecords ? (
+        <>
         <WorkspaceBulkBar
           count={visibleSelected.length}
           onMove={() => setMoveTargets(visibleSelected)}
@@ -458,13 +489,15 @@ export function InvoicesPage() {
           <EmptyState
             icon={FileText}
             title={
-              invoices.length === 0 ? 'Noch keine Rechnungen'
+              folderEmpty ? folderEmpty.title
+                : invoices.length === 0 ? 'Noch keine Rechnungen'
                 : inTrash ? 'Papierkorb ist leer'
                 : query ? 'Keine Treffer'
                 : 'Keine Rechnungen in dieser Ansicht'
             }
             description={
-              invoices.length === 0
+              folderEmpty ? folderEmpty.description
+                : invoices.length === 0
                 ? 'Erstellen Sie Ihre erste Rechnung, um Umsatz und Forderungen zu erfassen. Es werden keine Beispieldaten angezeigt.'
                 : inTrash
                   ? 'Hier liegen Rechnungen, die Sie aus dem Arbeitsbereich entfernt haben. Nummern, Beträge und Nachweise bleiben unverändert erhalten.'
@@ -509,6 +542,8 @@ export function InvoicesPage() {
             mobileSubtitle={(inv) => `${customerName(inv)} · ${inv.issue_date ? formatDateDe(inv.issue_date) : 'ohne Datum'}`}
           />
         )}
+        </>
+        ) : null}
       </div>
 
       {entity ? (

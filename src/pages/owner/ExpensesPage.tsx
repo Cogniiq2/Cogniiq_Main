@@ -9,7 +9,8 @@ import {
 } from '@/components/dashboard';
 import {
   MoveToFolderDialog, RowOrganizeMenu, TrashRowActions, WorkspaceBulkBar, WorkspaceDeleteDialog,
-  WorkspaceFolderRail, restoreFromTrash, useTrashPlans, useWorkspaceOrganization,
+  WorkspaceFolderContextHeader, WorkspaceFolderOverview,
+  emptyFolderCopy, restoreFromTrash, useTrashPlans, useWorkspaceOrganization,
 } from '@/components/finance/workspaceOrganizationUi';
 import {
   FOLDER_TRASH, filterByFolder, folderCounts,
@@ -130,19 +131,33 @@ export function ExpensesPage() {
     }
     // The folder composes with status and search rather than replacing either: this is the
     // intersection of all three, and changing the folder never resets the other two.
-    return filterByFolder(rows, (e) => e.id, org.state, org.selection);
-  }, [expenses, filter, query, catLabelFor, org.state, org.selection]);
+    return filterByFolder(rows, (e) => e.id, org.state, org.view);
+  }, [expenses, filter, query, catLabelFor, org.state, org.view]);
 
   const folderRailCounts = useMemo(
     () => folderCounts(expenses, (e) => e.id, org.state),
     [expenses, org.state],
   );
 
-  const inTrash = org.selection === FOLDER_TRASH;
+  const inTrash = org.view === FOLDER_TRASH;
+
+  /**
+   * Folder-first: with no folder open the page shows FOLDERS, not records.
+   *
+   * The one exception is a workspace with nothing in it at all — no records and no folders.
+   * There is nothing to organise there, so the page keeps its existing first-run empty state
+   * with its create action rather than presenting three empty system tiles.
+   */
+  const showFolderOverview = !loading && org.isOverview
+    && (expenses.length > 0 || org.state.folders.length > 0);
+  const showRecords = !showFolderOverview;
+
+  // An empty CUSTOM folder says so, rather than borrowing the page's "no match" wording.
+  const folderEmpty = emptyFolderCopy(org, folderRailCounts);
   const trashPlans = useTrashPlans('expense', inTrash ? filtered.map((e) => e.id) : [], inTrash);
 
   // A selection only ever means what is currently on screen.
-  useEffect(() => { setSelected(new Set()); }, [org.selection, filter]);
+  useEffect(() => { setSelected(new Set()); }, [org.view, filter]);
   const visibleSelected = useMemo(
     () => filtered.filter((e) => selected.has(e.id)).map((e) => e.id),
     [filtered, selected],
@@ -332,7 +347,7 @@ export function ExpensesPage() {
           </>
         }
         toolbar={
-          !loading && expenses.length > 0 ? (
+          !loading && !org.isOverview && expenses.length > 0 ? (
             <Toolbar
               trailing={
                 <SearchInput
@@ -365,10 +380,26 @@ export function ExpensesPage() {
       <div className="space-y-4">
         {loading ? <StatBandSkeleton count={4} /> : expenses.length > 0 ? <StatBand items={stats} /> : null}
 
-        {!loading && expenses.length > 0 ? (
-          <WorkspaceFolderRail org={org} counts={folderRailCounts} resourceLabel="Belege" />
+        {showFolderOverview ? (
+          <WorkspaceFolderOverview
+            org={org}
+            counts={folderRailCounts}
+            resourceLabel="Belege"
+            resourcePlural="Belege"
+          />
         ) : null}
 
+        {showRecords && !org.isOverview && !loading ? (
+          <WorkspaceFolderContextHeader
+            org={org}
+            counts={folderRailCounts}
+            resourceLabel="Belege"
+            backLabel="Ausgaben"
+          />
+        ) : null}
+
+        {showRecords ? (
+        <>
         <WorkspaceBulkBar
           count={visibleSelected.length}
           onMove={() => setMoveTargets(visibleSelected)}
@@ -380,13 +411,15 @@ export function ExpensesPage() {
           <EmptyState
             icon={Receipt}
             title={
-              expenses.length === 0 ? 'Noch keine Ausgaben'
+              folderEmpty ? folderEmpty.title
+                : expenses.length === 0 ? 'Noch keine Ausgaben'
                 : inTrash ? 'Papierkorb ist leer'
                 : query ? 'Keine Treffer'
                 : 'Keine Ausgaben in dieser Ansicht'
             }
             description={
-              expenses.length === 0
+              folderEmpty ? folderEmpty.description
+                : expenses.length === 0
                 ? 'Erfassen Sie Betriebsausgaben, um Vorsteuer und EÜR-Ergebnis zu berechnen.'
                 : inTrash
                   ? 'Hier liegen Belege, die Sie aus dem Arbeitsbereich entfernt haben. Sie bleiben in Buchhaltung und Historie erhalten.'
@@ -424,6 +457,8 @@ export function ExpensesPage() {
             mobileSubtitle={(e) => [e.invoice_date ? formatDateDe(e.invoice_date) : 'ohne Datum', e.supplier_invoice_number].filter(Boolean).join(' · ')}
           />
         )}
+        </>
+        ) : null}
       </div>
 
       {entity ? (
