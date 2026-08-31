@@ -111,9 +111,12 @@ vi.mock('@/pages/owner/ownerContext', () => ({
 const { ToastProvider } = await import('@/components/dashboard');
 const { InvoicesPage } = await import('@/pages/owner/InvoicesPage');
 
+// `?folder=all` rather than the bare route: the page is folder-first now, so the plain URL
+// shows the folder overview. These tests are about the delete semantics of a ROW, so they
+// enter the all-records view the same way the owner would.
 function renderPage() {
   return render(
-    <MemoryRouter initialEntries={['/admin/finance/invoices']}>
+    <MemoryRouter initialEntries={['/admin/finance/invoices?folder=all']}>
       <ToastProvider>
         <InvoicesPage />
       </ToastProvider>

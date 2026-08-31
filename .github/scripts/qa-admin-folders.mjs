@@ -339,9 +339,15 @@ async function screenshot(page, file) {
 
 const HELPERS = `
   window.__qa = {
-    rail: () => document.querySelector('[role="radiogroup"][aria-label="Nach Ordner filtern"]'),
-    chips: () => [...(window.__qa.rail()?.querySelectorAll('[role="radio"]') ?? [])],
-    chip: (text) => window.__qa.chips().find((c) => c.textContent.includes(text)),
+    // The folder overview: tiles whose stretched click target carries the accessible name.
+    overview: () => [...document.querySelectorAll('h2')].find((h) => h.textContent.trim() === 'Ordner') ?? null,
+    tiles: () => [...document.querySelectorAll('button[aria-label$="Einträge"], button[aria-label$="Eintrag"]')]
+      .filter((b) => b.getAttribute('aria-label').includes(' öffnen — ')),
+    tile: (name) => window.__qa.tiles().find((b) => b.getAttribute('aria-label').startsWith(name + ' öffnen')),
+    tileNames: () => window.__qa.tiles().map((b) => b.getAttribute('aria-label').split(' öffnen — ')[0]),
+    tileCard: (name) => window.__qa.tile(name)?.parentElement ?? null,
+    back: (label) => [...document.querySelectorAll('button')].find((b) => b.textContent.trim() === label),
+    folderHeading: () => document.querySelector('.space-y-4 h2')?.textContent?.trim() ?? null,
     byName: (role, name) => [...document.querySelectorAll('[role="' + role + '"], button, input')]
       .filter((el) => {
         const label = el.getAttribute('aria-label') ?? el.textContent.trim();
@@ -401,15 +407,25 @@ try {
   if (!(await goto(page, '/admin/finance/invoices'))) {
     bad('flow: invoices did not render');
   } else {
-    // 1. The rail opens on "Alle" with both system views and nothing invented.
+    // 1. THE point of the feature: the bare route shows folders, not 40 invoice rows.
     const initial = await run(page, `({
-      chips: window.__qa.chips().map((c) => c.textContent.trim()),
-      active: window.__qa.chips().find((c) => c.getAttribute('aria-checked') === 'true')?.textContent.trim(),
+      overview: Boolean(window.__qa.overview()),
+      tiles: window.__qa.tileNames(),
+      rows: window.__qa.rows().length,
+      statusFilter: Boolean(document.querySelector('[role="radiogroup"]')),
+      search: Boolean(document.querySelector('input[type="search"]')),
+      table: Boolean(document.querySelector('table')),
     })`);
-    if (initial.active?.startsWith('Alle') && initial.chips.some((c) => c.startsWith('Papierkorb'))) {
-      ok(`rail: opens on "Alle" with ${initial.chips.length} views`);
+    if (!initial.overview) {
+      bad('overview: not rendered on the bare route', JSON.stringify(initial));
+    } else if (initial.rows > 0 || initial.table) {
+      bad('overview: records are still on screen', `${initial.rows} rows, table=${initial.table}`);
+    } else if (!initial.tiles.includes('Papierkorb') || !initial.tiles.includes('Ohne Ordner')) {
+      bad('overview: system folders', JSON.stringify(initial.tiles));
+    } else if (initial.statusFilter || initial.search) {
+      bad('overview: record-level controls are still rendered', JSON.stringify(initial));
     } else {
-      bad('rail: initial state', JSON.stringify(initial));
+      ok(`overview: opens with ${initial.tiles.length} folder tiles, no table, no record filters`);
     }
 
     // 2. Create a folder: click +, type, Enter. It exists once the server confirms.
@@ -424,13 +440,14 @@ try {
     await run(page, `window.__qa.click(window.__qa.button('Ordner anlegen'))`);
     await wait(900);
     const created = await run(page, `({
-      chips: window.__qa.chips().map((c) => c.textContent.trim()),
+      tiles: window.__qa.tileNames(),
       dialogOpen: Boolean(window.__qa.dialog()),
-      active: window.__qa.chips().find((c) => c.getAttribute('aria-checked') === 'true')?.textContent.trim(),
+      stillOverview: Boolean(window.__qa.overview()),
+      rows: window.__qa.rows().length,
     })`);
-    if (created.chips.some((c) => c.includes('SV Heinersreuth')) && !created.dialogOpen
-        && created.active?.includes('SV Heinersreuth')) {
-      ok('create folder: appears immediately and becomes the active view');
+    if (created.tiles.includes('SV Heinersreuth') && !created.dialogOpen
+        && created.stillOverview && created.rows === 0) {
+      ok('create folder: appears immediately and the owner stays on the overview');
     } else {
       bad('create folder', JSON.stringify(created));
     }
@@ -458,8 +475,8 @@ try {
     else bad('overlays: Escape', 'the folder dialog stayed open');
 
     // 4. Move rows into it, from the bulk bar, in one request.
-    await run(page, `window.__qa.click(window.__qa.chip('Alle'))`);
-    await wait(500);
+    await run(page, `window.__qa.click(window.__qa.tile('Alle Einträge'))`);
+    await wait(700);
     await run(page, `window.__qa.click(document.querySelector('input[aria-label="Alle sichtbaren Zeilen auswählen"]'))`);
     await wait(300);
     const bulkBar = await run(page, `document.body.innerText.includes('ausgewählt')`);
@@ -470,13 +487,27 @@ try {
     await wait(400);
     await run(page, `window.__qa.click([...window.__qa.dialog().querySelectorAll('button')].find((b) => b.textContent.trim() === 'SV Heinersreuth'))`);
     await wait(1200);
-    const moved = await run(page, `window.__qa.chip('SV Heinersreuth')?.textContent.trim() ?? null`);
-    if (/SV Heinersreuth\s*10/.test(moved ?? '')) ok(`bulk move: the folder now counts every moved row (${moved})`);
-    else bad('bulk move', `folder chip reads "${moved}"`);
 
-    // 5. Open the folder: the list is exactly its contents.
-    await run(page, `window.__qa.click(window.__qa.chip('SV Heinersreuth'))`);
+    // Back to the overview: the tile must now count every moved row.
+    await run(page, `window.__qa.click(window.__qa.back('Rechnungen'))`);
+    await wait(800);
+    const moved = await run(page, `window.__qa.tile('SV Heinersreuth')?.getAttribute('aria-label') ?? null`);
+    if (/SV Heinersreuth öffnen — 10 /.test(moved ?? '')) ok(`bulk move: the folder tile counts every moved row (${moved})`);
+    else bad('bulk move', `folder tile reads "${moved}"`);
+
+    // 5. Open the folder: the list is exactly its contents, and the context band says so.
+    await run(page, `window.__qa.click(window.__qa.tile('SV Heinersreuth'))`);
     await wait(700);
+    const context = await run(page, `({
+      heading: window.__qa.folderHeading(),
+      back: Boolean(window.__qa.back('Rechnungen')),
+      filters: Boolean(document.querySelector('[role="radiogroup"]')),
+    })`);
+    if (context.heading === 'SV Heinersreuth' && context.back && context.filters) {
+      ok('folder view: names the folder, offers a back control, and restores the record filters');
+    } else {
+      bad('folder view: context band', JSON.stringify(context));
+    }
     const inFolder = await run(page, `window.__qa.rows().length`);
     if (inFolder === 10) ok('folder view: shows only the folder’s records');
     else bad('folder view', `${inFolder} rows in a folder that holds 10`);
@@ -535,7 +566,9 @@ try {
     await run(page, `window.__qa.click([...window.__qa.dialog().querySelectorAll('button')].find((b) => b.textContent.trim() === 'Entfernen'))`);
     await wait(1800);
 
-    await run(page, `window.__qa.click(window.__qa.chip('Papierkorb'))`);
+    await run(page, `window.__qa.click(window.__qa.back('Rechnungen'))`);
+    await wait(700);
+    await run(page, `window.__qa.click(window.__qa.tile('Papierkorb'))`);
     await wait(900);
     const trash = await run(page, `({
       rows: window.__qa.rows().length,
@@ -562,40 +595,58 @@ try {
   }
 
   // ----------------------------------------------------------- viewports
-  // The rail must fit every supported width without ever giving the PAGE a
-  // horizontal scrollbar, and a long folder name must truncate rather than widen it.
+  // The folder GRID must fit every supported width without ever giving the PAGE a
+  // horizontal scrollbar, a long folder name must truncate rather than widen a tile,
+  // and no record table may appear on the overview at any size.
   for (const viewport of VIEWPORTS) {
     await setViewport(page, viewport);
     for (const target of PAGES) {
       const label = `${target.slug} @ ${viewport.label}`;
       consoleErrors.length = 0;
       if (!(await goto(page, target.path))) { bad(label, 'never rendered'); continue; }
-      await screenshot(page, `${OUT_DIR}/${target.slug}--${viewport.label}.png`);
+      await screenshot(page, `${OUT_DIR}/${target.slug}--overview--${viewport.label}.png`);
       const probe = await run(page, `(() => {
-        const rail = window.__qa.rail();
-        const chips = window.__qa.chips();
-        const long = chips.find((c) => c.textContent.includes('Website-Projekte'));
-        // Truncation shows up as SOME element inside the chip being clipped; which one
+        const overview = window.__qa.overview();
+        const tiles = window.__qa.tiles();
+        const long = window.__qa.tileCard('Website-Projekte und Wartungsverträge');
+        // Truncation shows up as SOME element inside the tile being clipped; which one
         // depends on the markup, so the whole subtree is asked rather than one guess.
         const clipped = long
           ? [long, ...long.querySelectorAll('*')].some((el) => el.scrollWidth > el.clientWidth + 1)
           : null;
+        const box = tiles[0]?.getBoundingClientRect();
         return {
           overflow: window.__qa.overflow(),
-          rail: Boolean(rail),
-          chipWidth: long ? Math.round(long.getBoundingClientRect().width) : null,
+          overview: Boolean(overview),
+          table: Boolean(document.querySelector('table')),
+          rows: window.__qa.rows().length,
+          tiles: tiles.length,
+          columns: box ? Math.max(1, Math.round((tiles[0].parentElement.parentElement.getBoundingClientRect().width + 12) / (box.width + 12))) : null,
           truncated: clipped,
-          chips: chips.length,
         };
       })()`);
-      if (!probe.rail) { bad(label, 'no folder rail rendered'); continue; }
+      if (!probe.overview) { bad(label, 'no folder overview rendered'); continue; }
+      if (probe.table || probe.rows > 0) { bad(`${label}: records on the overview`, `${probe.rows} rows`); continue; }
       if (probe.overflow > 1) { bad(`${label}: horizontal page overflow`, `${probe.overflow}px`); continue; }
-      if (probe.truncated === false) {
-        bad(`${label}: long folder name`, `chip is ${probe.chipWidth}px and nothing inside it is clipped`);
-        continue;
-      }
+      if (probe.truncated === false) { bad(`${label}: long folder name was not truncated`); continue; }
       if (consoleErrors.length) { bad(`${label}: console errors`, consoleErrors.slice(0, 2).join('; ')); continue; }
-      ok(`${label}: rail with ${probe.chips} views, no page overflow`);
+      ok(`${label}: ${probe.tiles} tiles in ~${probe.columns} column(s), no table, no page overflow`);
+
+      // And a folder opened at this width still behaves: records, and no page overflow.
+      const first = await run(page, `window.__qa.tileNames()[0] ?? null`);
+      if (first) {
+        await run(page, `window.__qa.click(window.__qa.tiles()[0])`);
+        await wait(700);
+        const inside = await run(page, `({
+          overflow: window.__qa.overflow(),
+          heading: window.__qa.folderHeading(),
+          back: Boolean(window.__qa.back(${JSON.stringify(target.heading)})),
+        })`);
+        await screenshot(page, `${OUT_DIR}/${target.slug}--folder--${viewport.label}.png`);
+        if (inside.overflow > 1) bad(`${label}: overflow inside a folder`, `${inside.overflow}px`);
+        else if (!inside.back) bad(`${label}: no back control inside a folder`);
+        else ok(`${label}: folder "${inside.heading}" opens with a back control and no overflow`);
+      }
     }
   }
 
@@ -616,7 +667,7 @@ try {
     await wait(700);
     const motion = await run(page, `(() => {
       const ms = (value) => Math.max(...String(value).split(',').map((v) => parseFloat(v) * (v.includes('ms') ? 1 : 1000) || 0));
-      const chip = window.__qa.chips()[0];
+      const chip = window.__qa.tiles()[0];
       const dialog = window.__qa.dialog();
       const portal = dialog?.closest('[data-cq-portal="dashboard"]');
       return {

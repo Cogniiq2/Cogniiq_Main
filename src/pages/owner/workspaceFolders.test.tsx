@@ -186,7 +186,11 @@ vi.mock('@/pages/owner/ownerContext', () => ({
 const { ToastProvider } = await import('@/components/dashboard');
 const { ExpensesPage } = await import('@/pages/owner/ExpensesPage');
 
-function renderPage(initialEntry = '/admin/finance/expenses') {
+// The page is folder-first: the bare route shows the folder overview. These tests are about
+// what happens INSIDE a list — moving, deleting, filtering, the Papierkorb — so unless a test
+// says otherwise they start in the explicit all-records view, which is where those controls
+// live. Folder-first navigation itself is covered by folderFirstNavigation.test.tsx.
+function renderPage(initialEntry = '/admin/finance/expenses?folder=all') {
   return render(
     <MemoryRouter initialEntries={[initialEntry]}>
       <ToastProvider>
@@ -196,10 +200,17 @@ function renderPage(initialEntry = '/admin/finance/expenses') {
   );
 }
 
-const rail = () => screen.getByRole('radiogroup', { name: 'Nach Ordner filtern' });
-const chip = (name: RegExp) => within(rail()).getByRole('radio', { name });
-// The page's own status filter is a SECOND radiogroup; both are scoped so a shared label
-// like "Alle" can never resolve to the wrong one.
+// Folder navigation is the overview's tiles plus the in-folder back control; there is no
+// rail any more. `open` enters a view, `back` returns to the overview.
+const tile = (name: string) => screen.getByRole('button', { name: new RegExp(`^${name} öffnen`) });
+/** The tile card around the stretched click target — where the visible count lives. */
+const tileCard = (name: string) => tile(name).parentElement as HTMLElement;
+const open = async (user: ReturnType<typeof userEvent.setup>, name: string) => {
+  await user.click(tile(name));
+};
+const back = async (user: ReturnType<typeof userEvent.setup>) => {
+  await user.click(screen.getByRole('button', { name: 'Ausgaben' }));
+};
 const statusChip = (name: RegExp) =>
   within(screen.getByRole('radiogroup', { name: 'Ausgaben filtern' })).getByRole('radio', { name });
 const visibleRefs = () => screen.getAllByRole('row').slice(1)
@@ -216,30 +227,31 @@ beforeEach(() => {
 });
 
 async function createFolder(user: ReturnType<typeof userEvent.setup>, name: string) {
-  await user.click(screen.getByRole('button', { name: /Ordner$/i }));
+  await user.click(screen.getByRole('button', { name: 'Neuer Ordner' }));
   await screen.findByRole('dialog', { name: 'Neuer Ordner' });
   await user.type(screen.getByLabelText('Name'), name);
   await user.click(screen.getByRole('button', { name: 'Ordner anlegen' }));
 }
 
-describe('the folder rail', () => {
-  it('opens on "Alle" with the system views present and no folders yet', async () => {
-    renderPage();
-    await screen.findAllByText(/SV-1/);
-    expect(chip(/^Alle/)).toHaveAttribute('aria-checked', 'true');
-    expect(chip(/^Ohne Ordner/)).toBeInTheDocument();
-    expect(chip(/^Papierkorb/)).toBeInTheDocument();
+describe('the folder overview', () => {
+  it('offers the system views even before any folder exists', async () => {
+    renderPage('/admin/finance/expenses');
+    await screen.findByRole('heading', { name: 'Ordner' });
+    expect(tile('Alle Einträge')).toBeInTheDocument();
+    expect(tile('Ohne Ordner')).toBeInTheDocument();
+    expect(tile('Papierkorb')).toBeInTheDocument();
   });
 
-  it('creates a folder, selects it, and refuses a case-insensitive duplicate inline', async () => {
+  it('creates a folder and refuses a case-insensitive duplicate inline', async () => {
     const user = userEvent.setup();
-    renderPage();
-    await screen.findAllByText(/SV-1/);
+    renderPage('/admin/finance/expenses');
+    await screen.findByRole('heading', { name: 'Ordner' });
 
     await createFolder(user, 'SV Heinersreuth');
-    await waitFor(() => expect(chip(/SV Heinersreuth/)).toHaveAttribute('aria-checked', 'true'));
+    // The folder appears and the owner stays on the overview.
+    await waitFor(() => expect(tile('SV Heinersreuth')).toBeInTheDocument());
 
-    await user.click(screen.getByRole('button', { name: /Ordner$/i }));
+    await user.click(screen.getByRole('button', { name: 'Neuer Ordner' }));
     await screen.findByRole('dialog', { name: 'Neuer Ordner' });
     await user.type(screen.getByLabelText('Name'), 'sv heinersreuth');
     await user.click(screen.getByRole('button', { name: 'Ordner anlegen' }));
@@ -252,10 +264,10 @@ describe('the folder rail', () => {
 
   it('renames a folder', async () => {
     const user = userEvent.setup();
-    renderPage();
-    await screen.findAllByText(/SV-1/);
+    renderPage('/admin/finance/expenses');
+    await screen.findByRole('heading', { name: 'Ordner' });
     await createFolder(user, 'Test');
-    await waitFor(() => expect(chip(/Test/)).toBeInTheDocument());
+    await waitFor(() => expect(tile('Test')).toBeInTheDocument());
 
     await user.click(await screen.findByRole('button', { name: 'Ordner Test verwalten' }));
     await user.click(await screen.findByRole('menuitem', { name: 'Umbenennen' }));
@@ -264,40 +276,46 @@ describe('the folder rail', () => {
     await user.type(field, 'Archiv 2026');
     await user.click(screen.getByRole('button', { name: 'Speichern' }));
 
-    await waitFor(() => expect(chip(/Archiv 2026/)).toBeInTheDocument());
+    await waitFor(() => expect(tile('Archiv 2026')).toBeInTheDocument());
   });
 });
 
 describe('moving records and filtering by folder', () => {
   it('moves one record and shows it only inside its folder', async () => {
     const user = userEvent.setup();
-    renderPage();
-    await screen.findAllByText(/SV-1/);
+    renderPage('/admin/finance/expenses');
+    await screen.findByRole('heading', { name: 'Ordner' });
     await createFolder(user, 'Pankofer');
-    await waitFor(() => expect(chip(/Pankofer/)).toBeInTheDocument());
-    // Creating a folder selects it, and it is empty. Back to "Alle" to pick a record.
-    await user.click(chip(/^Alle/));
+    await waitFor(() => expect(tile('Pankofer')).toBeInTheDocument());
+
+    await open(user, 'Alle Einträge');
     await waitFor(() => expect(visibleRefs()).toHaveLength(4));
 
     await user.click(screen.getAllByRole('button', { name: /organisieren/ })[0]);
     await user.click(await screen.findByRole('menuitem', { name: 'In Ordner verschieben' }));
     await user.click(await screen.findByRole('button', { name: /^Pankofer$/ }));
 
-    await waitFor(() => expect(within(chip(/Pankofer/)).getByText('1')).toBeInTheDocument());
+    // Back to the overview: the folder now counts the moved record.
+    await back(user);
+    await screen.findByRole('heading', { name: 'Ordner' });
+    await waitFor(() => expect(tileCard('Pankofer')).toHaveTextContent('1'));
 
-    await user.click(chip(/Pankofer/));
+    await open(user, 'Pankofer');
     await waitFor(() => expect(visibleRefs()).toHaveLength(1));
-    await user.click(chip(/^Ohne Ordner/));
+
+    await back(user);
+    await open(user, 'Ohne Ordner');
     await waitFor(() => expect(visibleRefs()).toHaveLength(3));
   });
 
   it('bulk-moves the whole selection in ONE request', async () => {
     const user = userEvent.setup();
-    renderPage();
-    await screen.findAllByText(/SV-1/);
+    renderPage('/admin/finance/expenses');
+    await screen.findByRole('heading', { name: 'Ordner' });
     await createFolder(user, '2026');
-    await waitFor(() => expect(chip(/2026/)).toBeInTheDocument());
-    await user.click(chip(/^Alle/));
+    await waitFor(() => expect(tile('2026')).toBeInTheDocument());
+
+    await open(user, 'Alle Einträge');
     await waitFor(() => expect(visibleRefs()).toHaveLength(4));
 
     await user.click(screen.getByRole('checkbox', { name: 'Alle sichtbaren Zeilen auswählen' }));
@@ -316,24 +334,22 @@ describe('moving records and filtering by folder', () => {
     server.folders = [{ id: 'f1', name: 'SV Heinersreuth', sort_order: 0, created_at: '2026-01-01' }];
     server.items.set('x1', { folder_id: 'f1', trashed_at: null });
     server.items.set('x4', { folder_id: 'f1', trashed_at: null });
-    renderPage();
-    await screen.findAllByText(/SV-1/);
-
-    await user.click(chip(/SV Heinersreuth/));
+    renderPage('/admin/finance/expenses?folder=f1');
     await waitFor(() => expect(visibleRefs()).toHaveLength(2));
 
     // + status: only the unpaid one is left …
     await user.click(statusChip(/^Unbezahlt/));
     await waitFor(() => expect(visibleRefs()).toHaveLength(1));
-    // … and the folder is STILL the selected one.
-    expect(chip(/SV Heinersreuth/)).toHaveAttribute('aria-checked', 'true');
+    // … and the folder is STILL the one that is open.
+    expect(screen.getByRole('heading', { name: 'SV Heinersreuth' })).toBeInTheDocument();
 
     // + search that matches nothing in this intersection.
     await user.type(screen.getByLabelText('Ausgaben durchsuchen'), 'PK-3');
     await waitFor(() => expect(screen.getByText('Keine Treffer')).toBeInTheDocument());
 
-    // Changing the folder does not reset the status filter or the search.
-    await user.click(chip(/^Alle/));
+    // Leaving the folder for the all-records view does not reset the status filter or search.
+    await back(user);
+    await open(user, 'Alle Einträge');
     expect(statusChip(/^Unbezahlt/)).toHaveAttribute('aria-checked', 'true');
     expect(screen.getByLabelText('Ausgaben durchsuchen')).toHaveValue('PK-3');
   });
@@ -343,7 +359,7 @@ describe('moving records and filtering by folder', () => {
     server.items.set('x2', { folder_id: 'f1', trashed_at: null });
     renderPage('/admin/finance/expenses?folder=f1');
     await screen.findAllByText(/SV-2/);
-    await waitFor(() => expect(chip(/Archiv/)).toHaveAttribute('aria-checked', 'true'));
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Archiv' })).toBeInTheDocument());
     expect(visibleRefs()).toHaveLength(1);
   });
 });
@@ -365,10 +381,13 @@ describe('deleting a folder', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Ordner löschen' }));
 
     await waitFor(() => expect(server.folders).toHaveLength(0));
-    // The records are untouched and simply unfiled again.
+    // Deleting the folder you are standing in returns you to the overview, and the folder
+    // is gone from it. The records are untouched and simply unfiled again.
+    await screen.findByRole('heading', { name: 'Ordner' });
     expect(DELETED.size).toBe(0);
+    expect(screen.queryByRole('button', { name: 'Test öffnen' })).not.toBeInTheDocument();
+    await user.click(tile('Ohne Ordner'));
     await waitFor(() => expect(visibleRefs()).toHaveLength(4));
-    expect(screen.queryByRole('radio', { name: /Test/ })).not.toBeInTheDocument();
   });
 });
 
@@ -430,11 +449,15 @@ describe('the Papierkorb', () => {
     await screen.findAllByText(/SV-1/);
 
     expect(visibleRefs()).toHaveLength(3);
-    // The record is filed in "Archiv" AND trashed: the folder must not show it either.
-    await user.click(chip(/Archiv/));
-    await waitFor(() => expect(screen.getByText('Keine Ausgaben in dieser Ansicht')).toBeInTheDocument());
 
-    await user.click(chip(/^Papierkorb/));
+    // The record is filed in "Archiv" AND trashed: the folder must not show it either.
+    await back(user);
+    await open(user, 'Archiv');
+    // Its only member is in the Papierkorb, so the folder holds nothing and says so.
+    await waitFor(() => expect(screen.getByText('Noch keine Einträge in diesem Ordner')).toBeInTheDocument());
+
+    await back(user);
+    await open(user, 'Papierkorb');
     await waitFor(() => expect(visibleRefs()).toHaveLength(1));
 
     // A record that must be retained shows no permanent-delete button — it says why instead.
