@@ -172,6 +172,7 @@ export const deleteReasonLabel: Record<string, string> = {
   converted_to_invoice: 'in eine Rechnung überführt',
   partially_or_fully_paid: 'bereits ganz oder teilweise bezahlt',
   issued_invoice_requires_storno: 'gestellte Rechnung — Storno erforderlich',
+  fully_paid_invoice: 'vollständig bezahlt — bleibt unverändert in der Buchhaltung',
   invoice_number_retained: 'Rechnungsnummer bleibt vergeben',
   already_cancelled: 'bereits storniert',
   not_a_pristine_draft: 'nicht mehr im Entwurfszustand',

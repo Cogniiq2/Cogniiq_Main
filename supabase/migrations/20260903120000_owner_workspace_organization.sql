@@ -384,6 +384,33 @@ begin
           'project_links', v_projects, 'invoice_number', inv.invoice_number));
     end if;
 
+    -- A FULLY PAID invoice is only ever removed from the workspace. It is never
+    -- run through Storno from here.
+    --
+    -- Storno is a real accounting correction, and a settled invoice is not a thing
+    -- the owner is correcting when they tidy a list — the money arrived, the payment
+    -- rows are facts, and turning `paid` into `cancelled` behind a cleanup action
+    -- would silently change what the books say. The pre-existing Invoices page
+    -- encodes exactly this: its Storno button is rendered for every status EXCEPT
+    -- 'paid' (and 'void'/'draft'). owner_cancel_invoice itself does NOT refuse a paid
+    -- invoice, so that guard lives only in the UI — which is precisely why a generic
+    -- delete path has to re-state it here, on the server, rather than inherit it.
+    --
+    -- Everything about the invoice therefore stays as it is: status 'paid',
+    -- amount_paid_cents, every owner_payments row, the number, the snapshot. Only
+    -- the workspace view changes, and restoring brings it back still paid.
+    if inv.status = 'paid' then
+      return jsonb_build_object('resource_id', p_resource_id, 'action', 'trash_only',
+        'reasons', to_jsonb(array['fully_paid_invoice', 'invoice_number_retained']),
+        'dependencies', jsonb_build_object('payments', v_payments, 'documents', v_documents,
+          'project_links', v_projects, 'invoice_number', inv.invoice_number,
+          'amount_paid_cents', inv.amount_paid_cents));
+    end if;
+
+    -- Issued and not settled: 'issued', 'overdue', 'partially_paid'. These keep the
+    -- sanctioned Storno path, which is the behaviour the Invoices page already
+    -- exposed for each of them before this feature existed. Widening or narrowing
+    -- that set would be a new accounting decision and is deliberately not made here.
     return jsonb_build_object('resource_id', p_resource_id, 'action', 'cancel_and_trash',
       'reasons', to_jsonb(array['issued_invoice_requires_storno', 'invoice_number_retained']),
       'dependencies', jsonb_build_object('payments', v_payments, 'documents', v_documents,

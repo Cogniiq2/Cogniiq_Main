@@ -271,6 +271,138 @@ begin
 end $$;
 
 -- ===========================================================================
+-- 3b. A FULLY PAID invoice is removed from the workspace and NOTHING else.
+--
+--     The generic "Löschen" must never turn a settled invoice into a cancelled
+--     one. The pre-existing Invoices page never offered Storno for `paid`, and
+--     owner_cancel_invoice does not refuse it on its own, so the rule is
+--     asserted here — on the server — against a real payment.
+-- ===========================================================================
+do $$
+declare
+  v_inv uuid; v_number text; v_paid bigint; v_gross bigint; v_plan jsonb; v_res jsonb;
+  v_pay_before jsonb; v_pay_after jsonb; v_eur_before jsonb; v_eur_after jsonb;
+  v_sum_before jsonb; v_sum_after jsonb; v_counter bigint;
+begin
+  v_inv := pg_temp.new_invoice();
+  perform public.issue_owner_invoice(gen_random_uuid(), v_inv);
+  select invoice_number, gross_total_cents into v_number, v_gross
+    from public.owner_invoices where id = v_inv;
+
+  -- Settle it in full through the sanctioned payment RPC.
+  perform public.record_owner_invoice_payment(gen_random_uuid(), v_inv, v_gross, '2026-03-20');
+  select status, amount_paid_cents into strict v_plan, v_paid
+    from (select to_jsonb(status) as status, amount_paid_cents from public.owner_invoices where id = v_inv) q;
+  perform pg_temp.want(v_plan #>> '{}' = 'paid', 'the fixture invoice is genuinely fully paid');
+  perform pg_temp.want(v_paid = v_gross, 'and its paid amount equals its gross total');
+
+  -- Byte-exact snapshots of everything that must not move.
+  select to_jsonb(p) into v_pay_before from public.owner_payments p where p.invoice_id = v_inv;
+  v_eur_before := public.owner_tax_period_inputs(current_setting('t.entity')::uuid, '2026-01-01', '2026-12-31', 'ist');
+  v_sum_before := to_jsonb(public.owner_finance_period_summary(current_setting('t.entity')::uuid, '2026-01-01', '2026-12-31'));
+  select next_number into v_counter from public.owner_invoice_counters
+    where business_entity_id = current_setting('t.entity')::uuid limit 1;
+
+  -- 1. The preflight must say trash_only, NOT cancel_and_trash.
+  v_plan := public.owner_workspace_delete_preflight_one('invoice', v_inv);
+  perform pg_temp.want(v_plan->>'action' = 'trash_only',
+    'a fully paid invoice is trash-only — the generic delete never storns it');
+  perform pg_temp.want(v_plan->'reasons' ? 'fully_paid_invoice', 'and states that it is fully paid');
+  perform pg_temp.want(v_plan->'reasons' ? 'invoice_number_retained', 'and that the number is kept');
+
+  -- 2. Performing it reports a move to the Papierkorb, not a Storno.
+  v_res := public.owner_workspace_delete_items(current_setting('t.entity')::uuid, 'invoice', array[v_inv]);
+  perform pg_temp.want(v_res->0->>'outcome' = 'trashed', 'the outcome is "trashed", never "cancelled_and_trashed"');
+
+  -- 3-7. Nothing about the invoice or its payment moved.
+  perform pg_temp.want(exists (select 1 from public.owner_invoices where id = v_inv),
+    'the paid invoice still exists');
+  perform pg_temp.want(
+    (select status from public.owner_invoices where id = v_inv) = 'paid',
+    'its status is STILL paid — no Storno was applied');
+  perform pg_temp.want(
+    (select cancelled_at is null and cancelled_by is null and cancellation_reason is null
+       from public.owner_invoices where id = v_inv),
+    'and it carries no cancellation record at all');
+  perform pg_temp.want(
+    (select amount_paid_cents from public.owner_invoices where id = v_inv) = v_paid,
+    'amount_paid_cents is unchanged');
+  perform pg_temp.want(
+    (select invoice_number from public.owner_invoices where id = v_inv) = v_number,
+    'the invoice number is unchanged');
+  select to_jsonb(p) into v_pay_after from public.owner_payments p where p.invoice_id = v_inv;
+  perform pg_temp.want(v_pay_before = v_pay_after,
+    'the linked ledger payment row is byte-identical');
+  perform pg_temp.want(
+    (select next_number from public.owner_invoice_counters
+      where business_entity_id = current_setting('t.entity')::uuid limit 1) = v_counter,
+    'the invoice-number counter did not move');
+
+  -- 8. Accounting truth is untouched.
+  v_eur_after := public.owner_tax_period_inputs(current_setting('t.entity')::uuid, '2026-01-01', '2026-12-31', 'ist');
+  v_sum_after := to_jsonb(public.owner_finance_period_summary(current_setting('t.entity')::uuid, '2026-01-01', '2026-12-31'));
+  perform pg_temp.want(v_eur_before = v_eur_after, 'EÜR / VAT period inputs are byte-identical');
+  perform pg_temp.want(v_sum_before = v_sum_after, 'the period summary is byte-identical');
+
+  -- The item did leave the workspace.
+  perform pg_temp.want(
+    (select trashed_at is not null from public.owner_workspace_item_state where resource_id = v_inv),
+    'the invoice is in the Papierkorb');
+
+  -- 9. Restoring brings it back, still paid, payment still untouched.
+  perform public.owner_workspace_restore_items(current_setting('t.entity')::uuid, 'invoice', array[v_inv]);
+  perform pg_temp.want(
+    not exists (select 1 from public.owner_workspace_item_state
+                where resource_id = v_inv and trashed_at is not null),
+    'restoring returns it to the workspace');
+  perform pg_temp.want(
+    (select status from public.owner_invoices where id = v_inv) = 'paid',
+    'and it is still paid afterwards');
+  select to_jsonb(p) into v_pay_after from public.owner_payments p where p.invoice_id = v_inv;
+  perform pg_temp.want(v_pay_before = v_pay_after, 'and its payment is still byte-identical');
+
+  -- Permanent deletion is refused for it, as for every protected record.
+  perform public.owner_workspace_delete_items(current_setting('t.entity')::uuid, 'invoice', array[v_inv]);
+  v_res := public.owner_workspace_purge_items(current_setting('t.entity')::uuid, 'invoice', array[v_inv]);
+  perform pg_temp.want(v_res->0->>'outcome' = 'blocked', 'a paid invoice can never be purged from the trash');
+  perform set_config('t.paid_invoice', v_inv::text, false);
+end $$;
+
+-- ===========================================================================
+-- 3c. An issued but UNSETTLED invoice still takes the sanctioned Storno path.
+--
+--     The correction above must not have broadened into "never Storno anything".
+--     'issued', 'overdue' and 'partially_paid' are exactly the statuses the
+--     Invoices page already offered Storno for, and they keep it.
+-- ===========================================================================
+do $$
+declare v_issued uuid; v_partial uuid; v_gross bigint; v_res jsonb;
+begin
+  v_issued := pg_temp.new_invoice();
+  perform public.issue_owner_invoice(gen_random_uuid(), v_issued);
+  perform pg_temp.want(
+    public.owner_workspace_delete_preflight_one('invoice', v_issued)->>'action' = 'cancel_and_trash',
+    'an issued UNPAID invoice still resolves to Storno + workspace removal');
+  v_res := public.owner_workspace_delete_items(current_setting('t.entity')::uuid, 'invoice', array[v_issued]);
+  perform pg_temp.want(v_res->0->>'outcome' = 'cancelled_and_trashed', 'and the Storno path actually runs');
+  perform pg_temp.want(
+    (select status from public.owner_invoices where id = v_issued) = 'cancelled',
+    'leaving it cancelled, with its number intact');
+
+  -- Partially paid: pre-existing behaviour, deliberately preserved rather than re-decided.
+  v_partial := pg_temp.new_invoice();
+  perform public.issue_owner_invoice(gen_random_uuid(), v_partial);
+  select gross_total_cents into v_gross from public.owner_invoices where id = v_partial;
+  perform public.record_owner_invoice_payment(gen_random_uuid(), v_partial, v_gross / 3, '2026-03-21');
+  perform pg_temp.want(
+    (select status from public.owner_invoices where id = v_partial) = 'partially_paid',
+    'the fixture invoice is partially paid');
+  perform pg_temp.want(
+    public.owner_workspace_delete_preflight_one('invoice', v_partial)->>'action' = 'cancel_and_trash',
+    'a partially paid invoice keeps the Storno path the Invoices page already exposed for it');
+end $$;
+
+-- ===========================================================================
 -- 4. A draft invoice carrying a real dependency is trash-only, not destroyed
 -- ===========================================================================
 do $$
