@@ -547,6 +547,42 @@ export interface Column<T> {
 export type SortDirection = 'asc' | 'desc';
 
 /**
+ * Opt-in row selection.
+ *
+ * It exists for exactly one reason: bulk "In Ordner verschieben" and bulk "Löschen" on the
+ * high-volume owner collections. A table that is not handed a `selection` renders precisely
+ * as it did before — no extra column, no changed markup, no behavioural difference.
+ */
+export interface TableSelection<T> {
+  selectedKeys: Set<string>;
+  onToggle: (key: string, next: boolean) => void;
+  /** Called with every currently rendered key, so "select all" respects the active filters. */
+  onToggleAll: (keys: string[], next: boolean) => void;
+  /** Accessible name for one row's checkbox. Never just "Auswählen" for every row. */
+  rowLabel: (row: T) => string;
+}
+
+/** Compact, table-density checkbox. The full `Checkbox` primitive is a form field with a label. */
+function SelectCell({ checked, indeterminate, onChange, label }: {
+  checked: boolean; indeterminate?: boolean; onChange: (next: boolean) => void; label: string;
+}) {
+  return (
+    <input
+      type="checkbox"
+      checked={checked}
+      aria-label={label}
+      ref={(node) => { if (node) node.indeterminate = Boolean(indeterminate) && !checked; }}
+      onClick={(event) => event.stopPropagation()}
+      onChange={(event) => onChange(event.target.checked)}
+      className={cn(
+        'h-4 w-4 shrink-0 cursor-pointer border-[var(--cq-border-strong)] text-[var(--cq-fg)]',
+        radius.sm, focusRingOnSurface,
+      )}
+    />
+  );
+}
+
+/**
  * Responsive data table: a semantic `<table>` on md+ screens with a sticky header
  * and controlled horizontal scroll, and a stacked card list on small screens.
  *
@@ -562,7 +598,7 @@ export type SortDirection = 'asc' | 'desc';
  */
 export function DataTable<T>({
   columns, rows, getRowKey, mobileTitle, mobileSubtitle, onRowClick, rowHref, minWidth = 720,
-  density = 'default', isRowActive, sort, onSortChange, maxBodyHeight,
+  density = 'default', isRowActive, sort, onSortChange, maxBodyHeight, selection,
 }: {
   columns: Column<T>[];
   rows: T[];
@@ -579,6 +615,8 @@ export function DataTable<T>({
   onSortChange?: (next: { key: string; direction: SortDirection }) => void;
   /** Caps the scrolling body so a long table cannot push the page out of reach. */
   maxBodyHeight?: number;
+  /** Omit for the unchanged table. Supplying it adds one leading checkbox column. */
+  selection?: TableSelection<T>;
 }) {
   const alignClass = (a?: Column<T>['align']) =>
     a === 'right' ? 'text-right' : a === 'center' ? 'text-center' : 'text-left';
@@ -601,6 +639,10 @@ export function DataTable<T>({
 
   const linkFor = (row: T) => (rowHref ? rowHref(row) : null);
 
+  const visibleKeys = selection ? sorted.map(getRowKey) : [];
+  const selectedVisible = selection ? visibleKeys.filter((key) => selection.selectedKeys.has(key)).length : 0;
+  const allSelected = selection ? visibleKeys.length > 0 && selectedVisible === visibleKeys.length : false;
+
   return (
     <div className={cn(surface.card, 'overflow-hidden p-0')}>
       {/* Desktop / tablet */}
@@ -611,6 +653,16 @@ export function DataTable<T>({
         <table className="w-full text-left" style={{ minWidth }}>
           <thead className={cn('sticky top-0 bg-[var(--cq-surface)]', zIndex.stickyHeader)}>
             <tr className={border.hairlineB}>
+              {selection ? (
+                <th scope="col" className={cn('w-9 bg-[var(--cq-surface)] py-2.5 pl-4 pr-0')}>
+                  <SelectCell
+                    checked={allSelected}
+                    indeterminate={selectedVisible > 0}
+                    onChange={(next) => selection.onToggleAll(visibleKeys, next)}
+                    label={allSelected ? 'Auswahl aufheben' : 'Alle sichtbaren Zeilen auswählen'}
+                  />
+                </th>
+              ) : null}
               {columns.map((c) => {
                 const sortable = Boolean(c.sortValue && onSortChange);
                 const active = sort?.key === c.key;
@@ -664,9 +716,19 @@ export function DataTable<T>({
                   className={cn(
                     'group border-b border-[var(--cq-border-subtle)] last:border-0',
                     active && 'bg-[var(--cq-accent-weak)]',
+                    !active && selection?.selectedKeys.has(getRowKey(row)) && 'bg-[var(--cq-sunken)]',
                     (onRowClick || href) && cn('cursor-pointer', interactive.transition, !active && interactive.hoverRow),
                   )}
                 >
+                  {selection ? (
+                    <td className="w-9 py-2.5 pl-4 pr-0">
+                      <SelectCell
+                        checked={selection.selectedKeys.has(getRowKey(row))}
+                        onChange={(next) => selection.onToggle(getRowKey(row), next)}
+                        label={selection.rowLabel(row)}
+                      />
+                    </td>
+                  ) : null}
                   {columns.map((c, index) => (
                     <td
                       key={c.key}
@@ -721,8 +783,8 @@ export function DataTable<T>({
               ) : null}
             </div>
           );
-          return (
-            <div key={getRowKey(row)} className="px-4 py-4">
+          const cardBody = (
+            <>
               {href ? (
                 <Link to={href} className={cn('-m-1 block rounded-[8px] p-1', interactive.press, focusRingOnSurface)}>
                   {title}
@@ -756,6 +818,20 @@ export function DataTable<T>({
                   {actions.map((c) => <div key={c.key}>{c.render(row)}</div>)}
                 </div>
               ) : null}
+            </>
+          );
+          return (
+            <div key={getRowKey(row)} className="flex items-start gap-3 px-4 py-4">
+              {selection ? (
+                <span className="pt-0.5">
+                  <SelectCell
+                    checked={selection.selectedKeys.has(getRowKey(row))}
+                    onChange={(next) => selection.onToggle(getRowKey(row), next)}
+                    label={selection.rowLabel(row)}
+                  />
+                </span>
+              ) : null}
+              <div className="min-w-0 flex-1">{cardBody}</div>
             </div>
           );
         })}

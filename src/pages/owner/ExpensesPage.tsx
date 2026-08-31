@@ -1,17 +1,24 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Plus, Receipt, Trash2 } from 'lucide-react';
+import { FolderInput, Plus, Receipt, Trash2 } from 'lucide-react';
 
 import {
-  Button, Card, Checkbox, ConfirmDialog, DataTable, EmptyState, ErrorState, FilterChips, IconButton,
+  Button, Card, Checkbox, DataTable, EmptyState, ErrorState, FilterChips, IconButton,
   InfoBanner, Modal, SearchInput, SectionHeader, SlideOver, StatBand, StatBandSkeleton, StatusBadge,
   TableSkeleton, Field, Select, Textarea, Toolbar, WorkspaceHeader, useToast,
   type Column, type SortDirection, type StatItem,
 } from '@/components/dashboard';
+import {
+  MoveToFolderDialog, RowOrganizeMenu, TrashRowActions, WorkspaceBulkBar, WorkspaceDeleteDialog,
+  WorkspaceFolderRail, restoreFromTrash, useTrashPlans, useWorkspaceOrganization,
+} from '@/components/finance/workspaceOrganizationUi';
+import {
+  FOLDER_TRASH, filterByFolder, folderCounts,
+} from '@/lib/ownerFinance/workspaceOrganization';
 import { expenseReviewTone, paymentStatusTone } from '@/pages/owner/ownerUi';
 import { useCreateIntent } from '@/pages/admin/routeIntent';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import {
-  createOwnerExpense, deleteDraftExpense, loadCategories, loadExpenses, loadVendors,
+  createOwnerExpense, loadCategories, loadExpenses, loadVendors,
   markExpenseReviewed, recordExpensePayment,
   type ExpenseLineInput,
 } from '@/lib/ownerFinance/api';
@@ -66,8 +73,14 @@ export function ExpensesPage() {
   // already owns. Without the intent nothing opens — the plain list URL stays a list.
   useCreateIntent(() => setComposerOpen(true));
   const [payFor, setPayFor] = useState<OwnerExpense | null>(null);
-  const [confirmDelete, setConfirmDelete] = useState<OwnerExpense | null>(null);
   const [filter, setFilter] = useState('all');
+  // Folders, Papierkorb and the delete path. Organisation only — nothing here reaches
+  // the EÜR, the Vorsteuer or a payment. See lib/ownerFinance/workspaceOrganization.
+  const org = useWorkspaceOrganization(entity?.id ?? null, 'expense');
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [moveTargets, setMoveTargets] = useState<string[]>([]);
+  const [deleteTargets, setDeleteTargets] = useState<string[]>([]);
+  const [purgeTarget, setPurgeTarget] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [tableSort, setTableSort] = useState<{ key: string; direction: SortDirection } | null>(null);
   const [includeIds, setIncludeIds] = useState(false);
@@ -106,15 +119,34 @@ export function ExpensesPage() {
     else if (filter === 'unpaid') rows = rows.filter((e) => e.payment_status === 'unpaid');
     else if (filter === 'paid') rows = rows.filter((e) => e.payment_status === 'paid');
     const q = query.trim().toLowerCase();
-    if (!q) return rows;
     // Over what the row prints: category, supplier reference and the amount.
-    return rows.filter((e) => [
-      catLabelFor(e.category_id),
-      e.supplier_invoice_number,
-      e.notes,
-      formatCents(e.net_total_cents, e.currency),
-    ].some((v) => (v ?? '').toLowerCase().includes(q)));
-  }, [expenses, filter, query, catLabelFor]);
+    if (q) {
+      rows = rows.filter((e) => [
+        catLabelFor(e.category_id),
+        e.supplier_invoice_number,
+        e.notes,
+        formatCents(e.net_total_cents, e.currency),
+      ].some((v) => (v ?? '').toLowerCase().includes(q)));
+    }
+    // The folder composes with status and search rather than replacing either: this is the
+    // intersection of all three, and changing the folder never resets the other two.
+    return filterByFolder(rows, (e) => e.id, org.state, org.selection);
+  }, [expenses, filter, query, catLabelFor, org.state, org.selection]);
+
+  const folderRailCounts = useMemo(
+    () => folderCounts(expenses, (e) => e.id, org.state),
+    [expenses, org.state],
+  );
+
+  const inTrash = org.selection === FOLDER_TRASH;
+  const trashPlans = useTrashPlans('expense', inTrash ? filtered.map((e) => e.id) : [], inTrash);
+
+  // A selection only ever means what is currently on screen.
+  useEffect(() => { setSelected(new Set()); }, [org.selection, filter]);
+  const visibleSelected = useMemo(
+    () => filtered.filter((e) => selected.has(e.id)).map((e) => e.id),
+    [filtered, selected],
+  );
 
   const totals = useMemo(() => ({
     net: expenses.reduce((s, e) => s + e.net_total_cents, 0),
@@ -208,11 +240,32 @@ export function ExpensesPage() {
     {
       key: 'actions', header: '', align: 'right', sticky: true, hideOnCard: true, render: (e) => (
         <div className="flex justify-end gap-1.5" onClick={(ev) => ev.stopPropagation()}>
-          {e.payment_status !== 'paid' && e.payment_status !== 'void' ? <Button size="sm" variant="secondary" onClick={() => setPayFor(e)}>Zahlung</Button> : null}
-          {e.review_status !== 'reviewed' ? <Button size="sm" variant="ghost" onClick={() => void markReviewed(e)}>Geprüft</Button> : null}
-          {e.review_status !== 'reviewed' && e.amount_paid_cents === 0
-            ? <IconButton icon={Trash2} label={`Beleg ${catLabel(e.category_id)} löschen`} variant="ghost" onClick={() => setConfirmDelete(e)} />
-            : null}
+          {inTrash ? (
+            <TrashRowActions
+              plan={trashPlans[e.id]}
+              onRestore={() => void restore([e.id])}
+              onPurge={() => setPurgeTarget(e.id)}
+            />
+          ) : (
+            <>
+              {e.payment_status !== 'paid' && e.payment_status !== 'void' ? <Button size="sm" variant="secondary" onClick={() => setPayFor(e)}>Zahlung</Button> : null}
+              {e.review_status !== 'reviewed' ? <Button size="sm" variant="ghost" onClick={() => void markReviewed(e)}>Geprüft</Button> : null}
+              {/*
+                "Löschen" is offered on EVERY row, and the server decides what it means. An
+                unpaid receipt with no linked payment or document is genuinely deleted —
+                including one that was marked "Geprüft" by mistake, which previously left the
+                owner editing the database by hand. Anything with a real dependency is moved
+                to the Papierkorb instead, and the confirmation says so before it happens.
+              */}
+              <RowOrganizeMenu
+                label={`${catLabel(e.category_id)} organisieren`}
+                items={[
+                  { key: 'move', label: 'In Ordner verschieben', icon: FolderInput, onSelect: () => setMoveTargets([e.id]) },
+                  { key: 'delete', label: 'Löschen', icon: Trash2, tone: 'danger', onSelect: () => setDeleteTargets([e.id]) },
+                ]}
+              />
+            </>
+          )}
         </div>
       ),
     },
@@ -242,6 +295,13 @@ export function ExpensesPage() {
       tone: counts.review > 0 ? 'attention' : 'neutral',
     },
   ];
+
+  const restore = async (ids: string[]) => {
+    const { error: err } = await restoreFromTrash(org, ids);
+    if (err) { toast.error('Wiederherstellen fehlgeschlagen', 'Bitte erneut versuchen.'); return; }
+    setSelected(new Set());
+    toast.success(ids.length === 1 ? 'Wiederhergestellt' : `${ids.length} wiederhergestellt`);
+  };
 
   const markReviewed = async (e: OwnerExpense) => {
     const { error: err } = await markExpenseReviewed(e.id);
@@ -305,16 +365,34 @@ export function ExpensesPage() {
       <div className="space-y-4">
         {loading ? <StatBandSkeleton count={4} /> : expenses.length > 0 ? <StatBand items={stats} /> : null}
 
+        {!loading && expenses.length > 0 ? (
+          <WorkspaceFolderRail org={org} counts={folderRailCounts} resourceLabel="Belege" />
+        ) : null}
+
+        <WorkspaceBulkBar
+          count={visibleSelected.length}
+          onMove={() => setMoveTargets(visibleSelected)}
+          onDelete={() => setDeleteTargets(visibleSelected)}
+          onClear={() => setSelected(new Set())}
+        />
+
         {loading ? <TableSkeleton rows={5} cols={6} /> : filtered.length === 0 ? (
           <EmptyState
             icon={Receipt}
-            title={expenses.length === 0 ? 'Noch keine Ausgaben' : query ? 'Keine Treffer' : 'Keine Ausgaben in dieser Ansicht'}
+            title={
+              expenses.length === 0 ? 'Noch keine Ausgaben'
+                : inTrash ? 'Papierkorb ist leer'
+                : query ? 'Keine Treffer'
+                : 'Keine Ausgaben in dieser Ansicht'
+            }
             description={
               expenses.length === 0
                 ? 'Erfassen Sie Betriebsausgaben, um Vorsteuer und EÜR-Ergebnis zu berechnen.'
-                : query
-                  ? `Kein Beleg passt zu „${query}".`
-                  : 'Passen Sie den Filter an, um weitere Ausgaben zu sehen.'
+                : inTrash
+                  ? 'Hier liegen Belege, die Sie aus dem Arbeitsbereich entfernt haben. Sie bleiben in Buchhaltung und Historie erhalten.'
+                  : query
+                    ? `Kein Beleg passt zu „${query}".`
+                    : 'Passen Sie Filter oder Ordner an, um weitere Ausgaben zu sehen.'
             }
             action={
               expenses.length === 0
@@ -330,6 +408,16 @@ export function ExpensesPage() {
             rows={filtered}
             getRowKey={(e) => e.id}
             minWidth={780}
+            selection={{
+              selectedKeys: selected,
+              onToggle: (key, next) => setSelected((prev) => {
+                const updated = new Set(prev);
+                if (next) updated.add(key); else updated.delete(key);
+                return updated;
+              }),
+              onToggleAll: (keys, next) => setSelected(next ? new Set(keys) : new Set()),
+              rowLabel: (e) => `${catLabel(e.category_id)} auswählen`,
+            }}
             sort={tableSort}
             onSortChange={setTableSort}
             mobileTitle={(e) => <span>{catLabel(e.category_id)}</span>}
@@ -358,40 +446,37 @@ export function ExpensesPage() {
         onError={(m) => toast.error('Zahlung fehlgeschlagen', m)}
       />
 
-      {/*
-        Only unreviewed, unpaid expenses reach this dialog. Anything that has
-        entered the books is refused by the RPC, so there is no path from here to
-        a reviewed or paid record.
-      */}
-      <ConfirmDialog
-        open={!!confirmDelete}
-        onClose={() => setConfirmDelete(null)}
-        tone="danger"
-        title="Beleg löschen?"
-        confirmLabel="Beleg löschen"
-        message={
-          <>
-            <p>
-              Der Beleg{confirmDelete?.supplier_invoice_number ? ` ${confirmDelete.supplier_invoice_number}` : ''} über{' '}
-              <span className="font-semibold text-gray-950">
-                {confirmDelete ? formatCents(confirmDelete.gross_total_cents, confirmDelete.currency) : ''}
-              </span>{' '}
-              wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.
-            </p>
-            <p className="mt-2">
-              Geprüfte oder bezahlte Ausgaben können nicht gelöscht werden.
-            </p>
-          </>
-        }
-        onConfirm={async () => {
-          if (!confirmDelete) return;
-          const { error: err } = await deleteDraftExpense(confirmDelete.id);
-          setConfirmDelete(null);
-          if (err) { toast.error('Löschen nicht möglich', err); return; }
-          toast.success('Beleg gelöscht');
-          void load();
-        }}
+      <MoveToFolderDialog
+        open={moveTargets.length > 0}
+        org={org}
+        resourceIds={moveTargets}
+        onClose={() => setMoveTargets([])}
+        onDone={() => setSelected(new Set())}
       />
+
+      <WorkspaceDeleteDialog
+        open={deleteTargets.length > 0}
+        org={org}
+        resourceIds={deleteTargets}
+        resourceSingular="Beleg"
+        resourcePlural="Belege"
+        onClose={() => setDeleteTargets([])}
+        onDone={() => { setSelected(new Set()); void load(); }}
+      />
+
+      {/* The Papierkorb's permanent delete. The server re-runs the preflight and still refuses
+          anything that must be retained, so this can never become a bypass. */}
+      <WorkspaceDeleteDialog
+        open={Boolean(purgeTarget)}
+        org={org}
+        mode="purge"
+        resourceIds={purgeTarget ? [purgeTarget] : []}
+        resourceSingular="Beleg"
+        resourcePlural="Belege"
+        onClose={() => setPurgeTarget(null)}
+        onDone={() => { setSelected(new Set()); void load(); }}
+      />
+
     </>
   );
 }

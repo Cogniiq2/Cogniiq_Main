@@ -417,6 +417,33 @@ jobs:
       - name: Invoice preflight SQL tests
         run: bash .github/scripts/run-invoice-preflight-sql-tests.sh
 
+  workspace-organization-sql-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure PostgreSQL server binaries
+        run: |
+          if [ -z "$(ls -d /usr/lib/postgresql/*/bin 2>/dev/null)" ]; then
+            sudo apt-get update
+            sudo apt-get install --yes postgresql
+          fi
+
+      # The Admin Center's folders, Papierkorb and single delete path. This applies
+      # 20260903120000 against a throwaway cluster and asserts what only a database can:
+      # that a REVIEWED but unencumbered expense is now permanently deletable (the reported
+      # defect) while the pre-existing delete_owner_draft_expense is untouched and still
+      # refuses it; that an issued invoice is never hard-deleted, keeps its number and never
+      # rolls the number counter back; that a finalized offer keeps its immutable version,
+      # documents and acceptance evidence; that deleting a FOLDER reaches no record; that
+      # trash state leaves the EÜR/VAT inputs and the period summary byte-identical; and
+      # that anon and a non-owner reach none of it. The invoice-integrity and invoice-snapshot
+      # suites are re-run against the patched schema, because this migration's delete path
+      # calls their RPCs.
+      - name: Workspace organization (folders / trash / delete) SQL tests
+        run: bash .github/scripts/run-workspace-organization-sql-tests.sh
+
   receptionist-leads-rls-sql-tests:
     runs-on: ubuntu-latest
     steps:
