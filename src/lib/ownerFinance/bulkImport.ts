@@ -167,6 +167,14 @@ export function parseBulkImport(raw: string, entityId: string): BulkImportPrevie
     errors.push({ row: '—', message: `schema_version muss ${BULK_IMPORT_SCHEMA_VERSION} sein.` });
   }
 
+  // `expenses` rides on the SAME schema_version and belongs to the Ausgaben-Schnellimport
+  // (parseExpenseBulkImport). Ignoring the key here would import the invoices and drop the
+  // expense rows without a word, which in a bookkeeping tool is worse than refusing. The
+  // server refuses it too — this only says so before the round trip.
+  if (Array.isArray(doc.expenses) && (doc.expenses as unknown[]).length > 0) {
+    errors.push({ row: '—', message: '„expenses" gehört in den Ausgaben-Schnellimport (Finanzen → Ausgaben) und wird hier nicht importiert.' });
+  }
+
   const invoices = Array.isArray(doc.invoices) ? (doc.invoices as unknown[]) : [];
   const contracts = Array.isArray(doc.recurring_contracts) ? (doc.recurring_contracts as unknown[]) : [];
   if (invoices.length === 0 && contracts.length === 0) {

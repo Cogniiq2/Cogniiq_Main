@@ -339,11 +339,16 @@ const PAYMENTS = [
 
 /* ---------------------------------------------------------------- expenses */
 
+// `key` is the column owner_expense_categories actually has (a stable identifier the
+// expense import resolves against); `code` is kept because existing fixtures read it.
 const CATEGORIES = [
-  { id: 'cat1', label: 'Software & Lizenzen', code: 'software', is_active: true },
-  { id: 'cat2', label: 'Telekommunikation', code: 'telco', is_active: true },
-  { id: 'cat3', label: 'Fremdleistungen', code: 'external', is_active: true },
-  { id: 'cat4', label: 'Bürobedarf', code: 'office', is_active: true },
+  { id: 'cat1', key: 'software', label: 'Software & Lizenzen', code: 'software', is_active: true },
+  { id: 'cat2', key: 'telecom', label: 'Telekommunikation', code: 'telco', is_active: true },
+  { id: 'cat3', key: 'professional_services', label: 'Fremdleistungen', code: 'external', is_active: true },
+  { id: 'cat4', key: 'office', label: 'Bürobedarf', code: 'office', is_active: true },
+  { id: 'cat5', key: 'ai_api', label: 'KI & API-Kosten', code: 'ai', is_active: true },
+  { id: 'cat6', key: 'cloud_hosting', label: 'Cloud & Hosting', code: 'cloud', is_active: true },
+  { id: 'cat7', key: 'review_required', label: 'Prüfung erforderlich', code: 'review', is_active: true },
 ];
 
 const expense = (over) => ({

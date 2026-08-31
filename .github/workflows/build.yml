@@ -444,6 +444,38 @@ jobs:
       - name: Workspace organization (folders / trash / delete) SQL tests
         run: bash .github/scripts/run-workspace-organization-sql-tests.sh
 
+  expense-bulk-import-sql-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure PostgreSQL server binaries
+        run: |
+          if [ -z "$(ls -d /usr/lib/postgresql/*/bin 2>/dev/null)" ]; then
+            sudo apt-get update
+            sudo apt-get install --yes postgresql
+          fi
+
+      # The Ausgaben-Schnellimport. The reported defect was arithmetic (a 19,33 € net expense
+      # at 19 % was previewed as a 19,33 € gross, so the real 23,00 € payment looked like an
+      # overpayment) and referential (Amazon and OpenAI were looked up as CUSTOMERS). Neither
+      # can be caught by parsing source, so this applies 20260904120000 against a throwaway
+      # cluster and asserts what only a database can: that the defect existed BEFORE the
+      # migration (expense rows sent to the revenue importer were silently dropped); that
+      # 1933 + 19 % now yields 367 VAT and a 2300 gross which a 2300 payment settles to
+      # `paid`; that the payment is a real expense OUTFLOW; that suppliers resolve against
+      # owner_vendors with ambiguity blocking and unknown vendors created inside the same
+      # transaction; that a negative supplier credit is REFUSED rather than abs()'d; that one
+      # bad row rolls the whole batch back including the vendor it would have created; that a
+      # replayed idempotency key and a repeated client_import_id both write nothing; and that
+      # across every import NO organization, owner_customer, invoice, invoice number or
+      # automation job comes into existence. The multipay and advance-payment suites are
+      # re-run against the patched schema, because this migration replaces
+      # owner_bulk_import_finance to add its guard.
+      - name: Expense bulk import (Ausgaben-Schnellimport) SQL tests
+        run: bash .github/scripts/run-expense-bulk-import-sql-tests.sh
+
   receptionist-leads-rls-sql-tests:
     runs-on: ubuntu-latest
     steps:

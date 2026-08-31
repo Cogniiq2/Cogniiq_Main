@@ -22,6 +22,10 @@ import { describe, expect, it, vi } from 'vitest';
 const MIGRATIONS = [
   'supabase/migrations/20260828120000_owner_finance_multipay_recurring_bulk.sql',
   'supabase/migrations/20260829120000_owner_finance_advance_payments.sql',
+  // The expense importer clears exactly the same bar. It writes MORE tables than the
+  // revenue path (expenses, expense lines, vendors), which is precisely why its blast
+  // radius has to be enumerated here rather than assumed.
+  'supabase/migrations/20260904120000_owner_expense_bulk_import.sql',
 ];
 const sql = MIGRATIONS.map((m) => readFileSync(resolve(process.cwd(), m), 'utf8')).join('\n');
 
@@ -66,6 +70,12 @@ describe('finance writes can never reach a customer', () => {
       'public.owner_revenue_contract_postings',
       'public.owner_finance_import_batches',
       'public.owner_finance_import_records',
+      // Expense import. Note what is NOT here and can never be added silently:
+      // organizations, owner_customers, client_accounts, owner_invoices,
+      // owner_invoice_counters. A supplier named OpenAI cannot become a Cogniiq customer.
+      'public.owner_expenses',
+      'public.owner_expense_lines',
+      'public.owner_vendors',
     ]);
     const writes = [
       ...executable.matchAll(/\binsert\s+into\s+(public\.[a-z_]+)/gi),
@@ -95,6 +105,8 @@ describe('finance writes are owner-only', () => {
     'owner_post_revenue_contract_month',
     'owner_bulk_import_finance',
     'owner_resolve_import_customers',
+    'owner_bulk_import_expenses',
+    'owner_resolve_import_vendors',
   ];
 
   it.each(ownerRpcs)('%s checks is_platform_owner()', (fn) => {
@@ -139,6 +151,68 @@ describe('finance writes are owner-only', () => {
     expect(executable).toContain('at most 100 invoices per import');
     expect(executable).toContain('at most 100 contracts per import');
     expect(executable).toContain('at most 60 payments per invoice');
+    expect(executable).toContain('at most 100 expenses per import');
+  });
+});
+
+describe('THE ACCOUNTING FIREWALL: an expense import cannot reach revenue', () => {
+  const expenseSql = readFileSync(
+    resolve(process.cwd(), 'supabase/migrations/20260904120000_owner_expense_bulk_import.sql'), 'utf8');
+  // Only the expense RPC itself, so the file's verbatim copy of owner_bulk_import_finance
+  // (which legitimately writes invoices) does not mask a real leak in the expense path.
+  const expenseFn = (() => {
+    const start = expenseSql.indexOf('create or replace function public.owner_bulk_import_expenses(');
+    expect(start).toBeGreaterThan(-1);
+    const body = expenseSql.slice(start);
+    return body.slice(0, body.indexOf('$$;'))
+      .split('\n').filter((l) => !l.trimStart().startsWith('--')).join('\n');
+  })();
+
+  it.each([
+    'owner_invoices', 'owner_invoice_lines', 'owner_invoice_counters', 'owner_customers',
+    'organizations', 'client_accounts', 'owner_revenue_contracts', 'owner_offers',
+    'owner_resolve_import_customers', 'issue_owner_invoice', 'owner_build_issued_invoice',
+  ])('the expense import never mentions %s', (symbol) => {
+    expect(expenseFn).not.toContain(symbol);
+  });
+
+  it('never touches an invoice number — only the SUPPLIER\'s own document number', () => {
+    // supplier_invoice_number is an expense column: it records what the vendor called their
+    // document. Cogniiq's own invoice_number counter must stay untouched, so the check has
+    // to distinguish the two rather than banning the substring.
+    expect(expenseFn).not.toMatch(/(?<!supplier_)\binvoice_number\b/);
+    expect(expenseFn).toContain('supplier_invoice_number');
+    expect(expenseFn).not.toContain('owner_invoice_counters');
+  });
+
+  it('resolves suppliers against owner_vendors — the mutation guard for the reported defect', () => {
+    // Swapping vendor resolution back to customer resolution fails BOTH halves of this.
+    expect(expenseFn).toContain('from public.owner_vendors');
+    expect(expenseFn).not.toContain('public.organizations');
+  });
+
+  it('records expense payments as outflows linked to the expense', () => {
+    expect(expenseFn).toContain("'expense', 'outflow'");
+    expect(expenseFn).toContain('expense_id, created_by');
+    expect(expenseFn).not.toMatch(/\binvoice_id\b/);
+  });
+
+  it('never reads a client-supplied derived total', () => {
+    for (const forbidden of ["'net_total_cents'", "'vat_total_cents'", "'gross_total_cents'",
+      "'input_vat_cents'", "'amount_paid_cents'", "'payment_status'", "'review_status'"]) {
+      expect(expenseFn).not.toContain(`>>${forbidden}`);
+    }
+  });
+
+  it('refuses a negative supplier credit rather than importing it', () => {
+    expect(expenseFn).toContain('if v_net < 0 then');
+    expect(expenseFn).toContain('supplier credits (negative expenses) need a separate booking type');
+    expect(expenseFn).not.toContain('abs(');
+  });
+
+  it('refuses a revenue payload sent to the expense importer, and vice versa', () => {
+    expect(expenseFn).toContain('this import accepts expenses only');
+    expect(expenseSql).toContain('this import accepts revenue only');
   });
 });
 
@@ -172,6 +246,8 @@ describe('recording payments never triggers communication at the wiring level', 
     await api.createRevenueContract({}, []);
     await api.postRevenueContractMonth('c1', '2026-03-01');
     await api.runBulkImport({});
+    await api.runExpenseBulkImport({});
+    await api.resolveImportVendors('e1', ['OpenAI Ireland Limited']);
 
     expect(rpc.mock.calls.map((c) => (c as unknown as string[])[0])).toEqual([
       'record_owner_historical_invoice_with_payments',
@@ -179,6 +255,8 @@ describe('recording payments never triggers communication at the wiring level', 
       'owner_create_revenue_contract',
       'owner_post_revenue_contract_month',
       'owner_bulk_import_finance',
+      'owner_bulk_import_expenses',
+      'owner_resolve_import_vendors',
     ]);
     expect(invoke).not.toHaveBeenCalled();
     expect(from).not.toHaveBeenCalled();
