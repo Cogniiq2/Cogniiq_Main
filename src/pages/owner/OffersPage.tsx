@@ -1,12 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileSignature, Plus, SlidersHorizontal, Archive, Trash2, RotateCcw } from 'lucide-react';
+import { FileSignature, FolderInput, Plus, SlidersHorizontal, Archive, Trash2, RotateCcw } from 'lucide-react';
 
 import {
   Button, DataTable, EmptyState, ErrorState, FilterChips, IconButton, Panel, SearchInput,
   Field, Select, StatBand, StatBandSkeleton, StatusBadge, TableSkeleton, Toolbar, WorkspaceHeader,
   useToast, type Column, type SortDirection, type StatItem,
 } from '@/components/dashboard';
+import {
+  MoveToFolderDialog, RowOrganizeMenu, TrashRowActions, WorkspaceBulkBar, WorkspaceDeleteDialog,
+  WorkspaceFolderRail, restoreFromTrash, useTrashPlans, useWorkspaceOrganization,
+} from '@/components/finance/workspaceOrganizationUi';
+import { FOLDER_TRASH, filterByFolder, folderCounts } from '@/lib/ownerFinance/workspaceOrganization';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import { loadOffers, loadPendingSendOfferIds } from '@/lib/ownerFinance/offersApi';
 import { unarchiveOffer } from '@/lib/ownerFinance/customersApi';
@@ -46,6 +51,13 @@ export function OffersPage() {
   const [maxAmount, setMaxAmount] = useState('');
   const [includeIds, setIncludeIds] = useState(false);
   const [archiveTarget, setArchiveTarget] = useState<OwnerOffer | null>(null);
+  // Folders, Papierkorb and the delete path. Organisation only — the offer's commercial
+  // state, its versions and its acceptance evidence are never derived from it.
+  const org = useWorkspaceOrganization(entity?.id ?? null, 'offer');
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [moveTargets, setMoveTargets] = useState<string[]>([]);
+  const [deleteTargets, setDeleteTargets] = useState<string[]>([]);
+  const [purgeTarget, setPurgeTarget] = useState<string | null>(null);
   const [tableSort, setTableSort] = useState<{ key: string; direction: SortDirection } | null>(null);
   /* The date/amount filters are the rarely-used half of the toolbar; they stay collapsed
      until asked for so the common case (status + search) is one uncluttered rail. */
@@ -129,8 +141,32 @@ export function OffersPage() {
         case 'newest': default: return b.created_at.localeCompare(a.created_at);
       }
     });
-    return sorted;
-  }, [offers, statusFilter, statusMatchers, query, dateFrom, dateTo, minAmount, maxAmount, sort, customerName]);
+    // Folder ∩ status ∩ search ∩ date ∩ amount. Every existing filter keeps its value when
+    // the folder changes, and the folder keeps its value when they do.
+    return filterByFolder(sorted, (o) => o.id, org.state, org.selection);
+  }, [offers, statusFilter, statusMatchers, query, dateFrom, dateTo, minAmount, maxAmount, sort,
+      customerName, org.state, org.selection]);
+
+  const folderRailCounts = useMemo(
+    () => folderCounts(offers, (o) => o.id, org.state),
+    [offers, org.state],
+  );
+
+  const inTrash = org.selection === FOLDER_TRASH;
+  const trashPlans = useTrashPlans('offer', inTrash ? filtered.map((o) => o.id) : [], inTrash);
+
+  useEffect(() => { setSelected(new Set()); }, [org.selection, statusFilter]);
+  const visibleSelected = useMemo(
+    () => filtered.filter((o) => selected.has(o.id)).map((o) => o.id),
+    [filtered, selected],
+  );
+
+  const restore = async (ids: string[]) => {
+    const { error: err } = await restoreFromTrash(org, ids);
+    if (err) { toast.error('Wiederherstellen fehlgeschlagen', 'Bitte erneut versuchen.'); return; }
+    setSelected(new Set());
+    toast.success(ids.length === 1 ? 'Wiederhergestellt' : `${ids.length} wiederhergestellt`);
+  };
 
   // One-time and recurring are kept apart even in the pipeline KPI: fusing them into one
   // number would misstate the money owed, and dropping the recurring side (as the raw
@@ -243,15 +279,39 @@ export function OffersPage() {
       hideOnCard: true,
       render: (o) => (
         <div className="flex items-center justify-end gap-0.5" onClick={(e) => e.stopPropagation()}>
-          {o.archived_at ? (
-            <IconButton icon={RotateCcw} label={`${o.offer_number ?? 'Angebot'} wiederherstellen`} variant="ghost" onClick={() => void unarchive(o)} />
-          ) : (
-            <IconButton
-              icon={o.status === 'draft' ? Trash2 : Archive}
-              label={`${o.offer_number ?? 'Entwurf'} ${o.status === 'draft' ? 'löschen' : 'archivieren'}`}
-              variant="ghost"
-              onClick={() => setArchiveTarget(o)}
+          {inTrash ? (
+            <TrashRowActions
+              plan={trashPlans[o.id]}
+              onRestore={() => void restore([o.id])}
+              onPurge={() => setPurgeTarget(o.id)}
             />
+          ) : (
+            <>
+              {o.archived_at ? (
+                <IconButton icon={RotateCcw} label={`${o.offer_number ?? 'Angebot'} wiederherstellen`} variant="ghost" onClick={() => void unarchive(o)} />
+              ) : o.status !== 'draft' ? (
+                // Archiving is not the same thing as removing from the workspace: an archived
+                // offer is still reachable under "Archiviert". Left exactly as it was.
+                <IconButton
+                  icon={Archive}
+                  label={`${o.offer_number ?? 'Angebot'} archivieren`}
+                  variant="ghost"
+                  onClick={() => setArchiveTarget(o)}
+                />
+              ) : null}
+              {/*
+                "Löschen": a pristine draft is genuinely deleted; anything carrying an
+                immutable version, generated documents, a share link or acceptance evidence
+                is archived and removed from the workspace with all of it preserved.
+              */}
+              <RowOrganizeMenu
+                label={`Angebot ${o.offer_number ?? 'Entwurf'} organisieren`}
+                items={[
+                  { key: 'move', label: 'In Ordner verschieben', icon: FolderInput, onSelect: () => setMoveTargets([o.id]) },
+                  { key: 'delete', label: 'Löschen', icon: Trash2, tone: 'danger', onSelect: () => setDeleteTargets([o.id]) },
+                ]}
+              />
+            </>
           )}
         </div>
       ),
@@ -357,6 +417,17 @@ export function OffersPage() {
       <div className="space-y-4">
         {loading ? <StatBandSkeleton count={5} /> : offers.length > 0 ? <StatBand items={stats} /> : null}
 
+        {!loading && offers.length > 0 ? (
+          <WorkspaceFolderRail org={org} counts={folderRailCounts} resourceLabel="Angebote" />
+        ) : null}
+
+        <WorkspaceBulkBar
+          count={visibleSelected.length}
+          onMove={() => setMoveTargets(visibleSelected)}
+          onDelete={() => setDeleteTargets(visibleSelected)}
+          onClear={() => setSelected(new Set())}
+        />
+
         {advancedOpen ? (
           <Panel
             title="Zeitraum & Betrag"
@@ -384,10 +455,12 @@ export function OffersPage() {
 
         {loading ? <TableSkeleton rows={5} cols={5} /> : filtered.length === 0 ? (
           <EmptyState icon={FileSignature}
-            title={offers.length === 0 ? 'Noch keine Angebote' : 'Keine Angebote in dieser Ansicht'}
+            title={offers.length === 0 ? 'Noch keine Angebote' : inTrash ? 'Papierkorb ist leer' : 'Keine Angebote in dieser Ansicht'}
             description={offers.length === 0
               ? 'Erstellen Sie Ihr erstes Angebot. Es werden keine Beispieldaten angezeigt.'
-              : 'Kein Angebot passt zu dieser Kombination aus Status, Suche und Zeitraum.'}
+              : inTrash
+                ? 'Hier liegen Angebote, die Sie aus dem Arbeitsbereich entfernt haben. Versionen, Dokumente und Nachweise bleiben erhalten.'
+                : 'Kein Angebot passt zu dieser Kombination aus Ordner, Status, Suche und Zeitraum.'}
             action={offers.length === 0
               ? <Button icon={Plus} onClick={() => navigate('/admin/finance/offers/new')} disabled={!entity}>Neues Angebot</Button>
               : (
@@ -400,6 +473,16 @@ export function OffersPage() {
               )} />
         ) : (
           <DataTable columns={columns} rows={filtered} getRowKey={(o) => o.id} minWidth={760}
+            selection={{
+              selectedKeys: selected,
+              onToggle: (key, next) => setSelected((prev) => {
+                const updated = new Set(prev);
+                if (next) updated.add(key); else updated.delete(key);
+                return updated;
+              }),
+              onToggleAll: (keys, next) => setSelected(next ? new Set(keys) : new Set()),
+              rowLabel: (o) => `Angebot ${o.offer_number ?? 'Entwurf'} auswählen`,
+            }}
             sort={tableSort}
             onSortChange={setTableSort}
             rowHref={(o) => `/admin/finance/offers/${o.id}`}
@@ -410,6 +493,35 @@ export function OffersPage() {
       </div>
 
       <OfferArchiveDialog open={!!archiveTarget} offer={archiveTarget} onClose={() => setArchiveTarget(null)} onDone={() => void load()} />
+
+      <MoveToFolderDialog
+        open={moveTargets.length > 0}
+        org={org}
+        resourceIds={moveTargets}
+        onClose={() => setMoveTargets([])}
+        onDone={() => setSelected(new Set())}
+      />
+
+      <WorkspaceDeleteDialog
+        open={deleteTargets.length > 0}
+        org={org}
+        resourceIds={deleteTargets}
+        resourceSingular="Angebot"
+        resourcePlural="Angebote"
+        onClose={() => setDeleteTargets([])}
+        onDone={() => { setSelected(new Set()); void load(); }}
+      />
+
+      <WorkspaceDeleteDialog
+        open={Boolean(purgeTarget)}
+        org={org}
+        mode="purge"
+        resourceIds={purgeTarget ? [purgeTarget] : []}
+        resourceSingular="Angebot"
+        resourcePlural="Angebote"
+        onClose={() => setPurgeTarget(null)}
+        onDone={() => { setSelected(new Set()); void load(); }}
+      />
     </>
   );
 }

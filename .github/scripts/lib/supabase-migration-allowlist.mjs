@@ -196,6 +196,30 @@ export const ALLOWED_MIGRATIONS = [
     requires: ['20260710120000', '20260730031350'],
     description: 'Security — receptionist lead PII row-level-security boundary (PR-0B)',
   },
+  {
+    file: '20260903120000_owner_workspace_organization.sql',
+    version: '20260903120000',
+    // Real dependencies, every one of them an object this SQL actually references:
+    //  - 20260710120000: public.is_platform_owner() (every RLS policy and every RPC here
+    //    opens with it) and public.set_updated_at() (both new tables' touch triggers)
+    //  - 20260722120000: owner_business_entities (both FKs), owner_invoices,
+    //    owner_expenses, owner_expense_lines, owner_payments, owner_finance_documents,
+    //    and delete_owner_draft_invoice(uuid), which the invoice hard-delete path calls
+    //  - 20260723122000: owner_generated_documents, owner_document_access_tokens and
+    //    owner_offer_acceptance_events -- the three the offer preflight counts
+    //  - 20260723123000: delete_owner_offer_draft(uuid, uuid), the offer hard-delete path
+    //  - 20260724120000: owner_archive_offer(uuid), the sanctioned offer archive path
+    //  - 20260728122000: customer_project_invoices, read by the invoice preflight
+    //  - 20260824171403: owner_cancel_invoice(uuid, text), the sanctioned Storno path
+    // It does NOT depend on the invoice-integrity guard (20260831120000): it adds no
+    // grant and replaces no function that migration hardened. Listing a version this SQL
+    // does not reference would make the dependency gate assert something untrue.
+    requires: [
+      '20260710120000', '20260722120000', '20260723122000', '20260723123000',
+      '20260724120000', '20260728122000', '20260824171403',
+    ],
+    description: 'Admin Center — workspace folders, Papierkorb and the owner delete preflight',
+  },
 ];
 
 /**

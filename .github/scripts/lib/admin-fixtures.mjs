@@ -585,8 +585,46 @@ const TABLES = {
   customer_projects: [],
 };
 
+/**
+ * Workspace organization: folders and per-record folder/trash state.
+ *
+ * fixtureFor() sees only the URL, and every scope calls the SAME rpc endpoint, so one
+ * payload answers Invoices, Offers and Expenses alike. That is fine here — the folder ids
+ * are shared, and an item id only ever matches rows on the page it belongs to, so each
+ * page renders a real, populated rail with a real Papierkorb to look at.
+ */
+const WORKSPACE_STATE = {
+  folders: [
+    { id: 'wf1', name: '2026', sort_order: 0, created_at: '2026-01-02T00:00:00Z' },
+    { id: 'wf2', name: 'SV Heinersreuth', sort_order: 1, created_at: '2026-02-11T00:00:00Z' },
+    { id: 'wf3', name: 'Archiv', sort_order: 2, created_at: '2026-03-04T00:00:00Z' },
+    // A deliberately long name: the rail must truncate it rather than widen the page.
+    { id: 'wf4', name: 'Website-Projekte und Wartungsverträge', sort_order: 3, created_at: '2026-03-05T00:00:00Z' },
+  ],
+  items: [
+    { resource_id: 'i1', folder_id: 'wf2', trashed_at: null },
+    { resource_id: 'i3', folder_id: 'wf2', trashed_at: null },
+    { resource_id: 'i6', folder_id: 'wf1', trashed_at: null },
+    { resource_id: 'i10', folder_id: null, trashed_at: '2026-08-20T10:00:00Z' },
+    { resource_id: 'o1', folder_id: 'wf4', trashed_at: null },
+    { resource_id: 'o2', folder_id: 'wf4', trashed_at: null },
+    { resource_id: 'o6', folder_id: null, trashed_at: '2026-08-21T10:00:00Z' },
+    { resource_id: 'x1', folder_id: 'wf1', trashed_at: null },
+    { resource_id: 'x2', folder_id: 'wf3', trashed_at: null },
+    { resource_id: 'x5', folder_id: null, trashed_at: '2026-08-22T10:00:00Z' },
+  ],
+};
+
 const RPCS = {
   owner_finance_period_summary: PERIOD_SUMMARY,
+  owner_workspace_state: WORKSPACE_STATE,
+  // Everything in the Papierkorb here is protected, so the trash view shows the
+  // explanatory line rather than a permanent-delete button that would always refuse.
+  owner_workspace_delete_preflight: [
+    { resource_id: 'i10', action: 'trash_only', reasons: ['already_cancelled', 'invoice_number_retained'], dependencies: {} },
+    { resource_id: 'o6', action: 'trash_only', reasons: ['has_immutable_version'], dependencies: {} },
+    { resource_id: 'x5', action: 'trash_only', reasons: ['has_payments'], dependencies: {} },
+  ],
   owner_tax_period_inputs: TAX_PERIOD_INPUTS,
   owner_revenue_contract_overview: REVENUE_CONTRACT_OVERVIEW,
   owner_list_customers: CUSTOMERS,

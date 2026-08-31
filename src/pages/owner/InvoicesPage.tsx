@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Archive, FileText, Plus, Trash2 } from 'lucide-react';
+import { Archive, FileText, FolderInput, Plus, Trash2 } from 'lucide-react';
 
 import {
   Button, Card, ConfirmDialog, DataTable, EmptyState, ErrorState, FilterChips, IconButton,
@@ -8,11 +8,16 @@ import {
   Field, Select, Textarea, SectionHeader, Toolbar, WorkspaceHeader, useToast,
   type Column, type SortDirection, type StatItem,
 } from '@/components/dashboard';
+import {
+  MoveToFolderDialog, RowOrganizeMenu, TrashRowActions, WorkspaceBulkBar, WorkspaceDeleteDialog,
+  WorkspaceFolderRail, restoreFromTrash, useTrashPlans, useWorkspaceOrganization,
+} from '@/components/finance/workspaceOrganizationUi';
+import { FOLDER_TRASH, filterByFolder, folderCounts } from '@/lib/ownerFinance/workspaceOrganization';
 import { invoiceStatusTone } from '@/pages/owner/ownerUi';
 import { useCreateIntent } from '@/pages/admin/routeIntent';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import {
-  createOwnerInvoice, deleteDraftInvoice, issueOwnerInvoice, loadInvoices, recordHistoricalPaidInvoice,
+  createOwnerInvoice, issueOwnerInvoice, loadInvoices, recordHistoricalPaidInvoice,
   recordInvoicePayment, OWNER_HISTORICAL_INVOICE_MIGRATION,
   type InvoiceLineInput,
 } from '@/lib/ownerFinance/api';
@@ -86,8 +91,14 @@ export function InvoicesPage() {
   // already owns. Without the intent nothing opens — the plain list URL stays a list.
   useCreateIntent(() => setComposerOpen(true));
   const [payFor, setPayFor] = useState<OwnerInvoice | null>(null);
-  const [confirmDelete, setConfirmDelete] = useState<OwnerInvoice | null>(null);
   const [confirmVoid, setConfirmVoid] = useState<OwnerInvoice | null>(null);
+  // Folders, Papierkorb and the delete path. Organisation only: no figure on this page,
+  // and no figure anywhere in the accounting, is derived from folder or trash state.
+  const org = useWorkspaceOrganization(entity?.id ?? null, 'invoice');
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [moveTargets, setMoveTargets] = useState<string[]>([]);
+  const [deleteTargets, setDeleteTargets] = useState<string[]>([]);
+  const [purgeTarget, setPurgeTarget] = useState<string | null>(null);
   const [includeIds, setIncludeIds] = useState(false);
 
   const load = useCallback(async () => {
@@ -120,16 +131,41 @@ export function InvoicesPage() {
   // Search is over what is actually printed on the row — number, customer, amount —
   // so the owner can find an invoice by any of the things they remember about it.
   const filtered = useMemo(() => {
-    const byStatus = invoices.filter((i) => statusFilter === 'all' || i.status === statusFilter);
+    let rows = invoices.filter((i) => statusFilter === 'all' || i.status === statusFilter);
     const q = query.trim().toLowerCase();
-    if (!q) return byStatus;
-    return byStatus.filter((i) => [
-      i.invoice_number,
-      customerName(i),
-      i.external_reference,
-      formatCents(i.gross_total_cents, i.currency),
-    ].some((v) => (v ?? '').toLowerCase().includes(q)));
-  }, [invoices, statusFilter, query, customerName]);
+    if (q) {
+      rows = rows.filter((i) => [
+        i.invoice_number,
+        customerName(i),
+        i.external_reference,
+        formatCents(i.gross_total_cents, i.currency),
+      ].some((v) => (v ?? '').toLowerCase().includes(q)));
+    }
+    // Intersection, not replacement: folder ∩ status ∩ search. Selecting a folder leaves
+    // the status filter and the search term exactly where the owner put them.
+    return filterByFolder(rows, (i) => i.id, org.state, org.selection);
+  }, [invoices, statusFilter, query, customerName, org.state, org.selection]);
+
+  const folderRailCounts = useMemo(
+    () => folderCounts(invoices, (i) => i.id, org.state),
+    [invoices, org.state],
+  );
+
+  const inTrash = org.selection === FOLDER_TRASH;
+  const trashPlans = useTrashPlans('invoice', inTrash ? filtered.map((i) => i.id) : [], inTrash);
+
+  useEffect(() => { setSelected(new Set()); }, [org.selection, statusFilter]);
+  const visibleSelected = useMemo(
+    () => filtered.filter((i) => selected.has(i.id)).map((i) => i.id),
+    [filtered, selected],
+  );
+
+  const restore = async (ids: string[]) => {
+    const { error: err } = await restoreFromTrash(org, ids);
+    if (err) { toast.error('Wiederherstellen fehlgeschlagen', 'Bitte erneut versuchen.'); return; }
+    setSelected(new Set());
+    toast.success(ids.length === 1 ? 'Wiederhergestellt' : `${ids.length} wiederhergestellt`);
+  };
 
   const statusFilterLabel = statusFilter === 'all' ? 'Alle Status' : (statusLabel[statusFilter] ?? statusFilter);
 
@@ -313,10 +349,32 @@ export function InvoicesPage() {
       hideOnCard: true,
       render: (inv) => (
         <div className="flex justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
-          {inv.status === 'draft' ? <Button size="sm" onClick={() => void issue(inv)}>Stellen</Button> : null}
-          {inv.status === 'draft' ? <IconButton icon={Trash2} label={`Entwurf ${formatCents(inv.gross_total_cents, inv.currency)} löschen`} variant="ghost" onClick={() => setConfirmDelete(inv)} /> : null}
-          {['issued', 'partially_paid', 'overdue'].includes(inv.status) ? <Button size="sm" variant="secondary" onClick={() => setPayFor(inv)}>Zahlung</Button> : null}
-          {inv.status !== 'void' && inv.status !== 'paid' && inv.status !== 'draft' ? <Button size="sm" variant="ghost" onClick={() => setConfirmVoid(inv)}>Storno</Button> : null}
+          {inTrash ? (
+            <TrashRowActions
+              plan={trashPlans[inv.id]}
+              onRestore={() => void restore([inv.id])}
+              onPurge={() => setPurgeTarget(inv.id)}
+            />
+          ) : (
+            <>
+              {inv.status === 'draft' ? <Button size="sm" onClick={() => void issue(inv)}>Stellen</Button> : null}
+              {['issued', 'partially_paid', 'overdue'].includes(inv.status) ? <Button size="sm" variant="secondary" onClick={() => setPayFor(inv)}>Zahlung</Button> : null}
+              {inv.status !== 'void' && inv.status !== 'paid' && inv.status !== 'draft' ? <Button size="sm" variant="ghost" onClick={() => setConfirmVoid(inv)}>Storno</Button> : null}
+              {/*
+                "Löschen" on every row; the server decides what it can honestly mean. A
+                never-issued draft is removed for good. An issued invoice is NEVER destroyed:
+                the sanctioned Storno runs and the invoice leaves the workspace with its
+                number, totals and payments intact — which the confirmation says first.
+              */}
+              <RowOrganizeMenu
+                label={`Rechnung ${inv.invoice_number ?? 'Entwurf'} organisieren`}
+                items={[
+                  { key: 'move', label: 'In Ordner verschieben', icon: FolderInput, onSelect: () => setMoveTargets([inv.id]) },
+                  { key: 'delete', label: 'Löschen', icon: Trash2, tone: 'danger', onSelect: () => setDeleteTargets([inv.id]) },
+                ]}
+              />
+            </>
+          )}
         </div>
       ),
     },
@@ -385,16 +443,34 @@ export function InvoicesPage() {
       <div className="space-y-4">
         {loading ? <StatBandSkeleton count={5} /> : invoices.length > 0 ? <StatBand items={stats} /> : null}
 
+        {!loading && invoices.length > 0 ? (
+          <WorkspaceFolderRail org={org} counts={folderRailCounts} resourceLabel="Rechnungen" />
+        ) : null}
+
+        <WorkspaceBulkBar
+          count={visibleSelected.length}
+          onMove={() => setMoveTargets(visibleSelected)}
+          onDelete={() => setDeleteTargets(visibleSelected)}
+          onClear={() => setSelected(new Set())}
+        />
+
         {loading ? <TableSkeleton rows={5} cols={6} /> : filtered.length === 0 ? (
           <EmptyState
             icon={FileText}
-            title={invoices.length === 0 ? 'Noch keine Rechnungen' : query ? 'Keine Treffer' : 'Keine Rechnungen in diesem Status'}
+            title={
+              invoices.length === 0 ? 'Noch keine Rechnungen'
+                : inTrash ? 'Papierkorb ist leer'
+                : query ? 'Keine Treffer'
+                : 'Keine Rechnungen in dieser Ansicht'
+            }
             description={
               invoices.length === 0
                 ? 'Erstellen Sie Ihre erste Rechnung, um Umsatz und Forderungen zu erfassen. Es werden keine Beispieldaten angezeigt.'
-                : query
-                  ? `Keine Rechnung passt zu „${query}".`
-                  : 'Passen Sie den Statusfilter an, um weitere Rechnungen zu sehen.'
+                : inTrash
+                  ? 'Hier liegen Rechnungen, die Sie aus dem Arbeitsbereich entfernt haben. Nummern, Beträge und Nachweise bleiben unverändert erhalten.'
+                  : query
+                    ? `Keine Rechnung passt zu „${query}".`
+                    : 'Passen Sie Statusfilter oder Ordner an, um weitere Rechnungen zu sehen.'
             }
             action={
               invoices.length === 0
@@ -409,6 +485,16 @@ export function InvoicesPage() {
             columns={columns}
             rows={filtered}
             getRowKey={(inv) => inv.id}
+            selection={{
+              selectedKeys: selected,
+              onToggle: (key, next) => setSelected((prev) => {
+                const updated = new Set(prev);
+                if (next) updated.add(key); else updated.delete(key);
+                return updated;
+              }),
+              onToggleAll: (keys, next) => setSelected(next ? new Set(keys) : new Set()),
+              rowLabel: (inv) => `Rechnung ${inv.invoice_number ?? 'Entwurf'} auswählen`,
+            }}
             sort={tableSort}
             onSortChange={setTableSort}
             rowHref={(inv) => `/admin/finance/invoices/${inv.id}`}
@@ -459,38 +545,39 @@ export function InvoicesPage() {
         onError={(m) => toast.error('Zahlung fehlgeschlagen', m)}
       />
 
-      <ConfirmDialog
-        open={!!confirmDelete}
-        onClose={() => setConfirmDelete(null)}
-        tone="danger"
-        title="Entwurf löschen?"
-        message={
-          <>
-            <p>
-              Der Rechnungsentwurf über{' '}
-              <span className="font-semibold text-gray-950">
-                {confirmDelete ? formatCents(confirmDelete.gross_total_cents, confirmDelete.currency) : ''}
-              </span>{' '}
-              wird dauerhaft gelöscht.
-            </p>
-            <p className="mt-2">
-              Diese Aktion kann nicht rückgängig gemacht werden. Nur nie gestellte Entwürfe können
-              gelöscht werden — gestellte Rechnungen werden storniert.
-            </p>
-          </>
-        }
-        confirmLabel="Entwurf löschen"
-        onConfirm={async () => {
-          if (!confirmDelete) return;
-          const { error: err } = await deleteDraftInvoice(confirmDelete.id);
-          setConfirmDelete(null);
-          if (err) { toast.error('Löschen nicht möglich', err); return; }
-          toast.success('Entwurf gelöscht');
-          void load();
-        }}
+      <MoveToFolderDialog
+        open={moveTargets.length > 0}
+        org={org}
+        resourceIds={moveTargets}
+        onClose={() => setMoveTargets([])}
+        onDone={() => setSelected(new Set())}
       />
 
-{/*
+      {/* One delete entry point for every invoice state. The dialog's title, body and button
+          label all come from the server preflight, so it can never promise a deletion that
+          will not happen — and never call a Storno a deletion. */}
+      <WorkspaceDeleteDialog
+        open={deleteTargets.length > 0}
+        org={org}
+        resourceIds={deleteTargets}
+        resourceSingular="Rechnung"
+        resourcePlural="Rechnungen"
+        onClose={() => setDeleteTargets([])}
+        onDone={() => { setSelected(new Set()); void load(); }}
+      />
+
+      <WorkspaceDeleteDialog
+        open={Boolean(purgeTarget)}
+        org={org}
+        mode="purge"
+        resourceIds={purgeTarget ? [purgeTarget] : []}
+        resourceSingular="Rechnung"
+        resourcePlural="Rechnungen"
+        onClose={() => setPurgeTarget(null)}
+        onDone={() => { setSelected(new Set()); void load(); }}
+      />
+
+      {/*
         Storno, deliberately NOT labelled as deletion. The invoice row, its
         number, its totals and its lines are retained (§147 AO); only the status
         changes and the cancellation is recorded with actor and time.
