@@ -15,8 +15,9 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import {
-  Button, DataTable, EmptyState, ErrorState, Field, InfoBanner, KpiCard, Modal,
-  PageHeader, SectionHeader, StatusBadge, TableSkeleton, useToast, type Column,
+  Button, DataTable, EmptyState, ErrorState, Field, InfoBanner, Modal, SectionHeader,
+  StatBand, StatBandSkeleton, StatusBadge, TableSkeleton, WorkspaceHeader, useToast,
+  type Column, type StatItem,
 } from '@/components/dashboard';
 import { Repeat } from 'lucide-react';
 
@@ -125,29 +126,37 @@ export function RevenueContractsPage() {
     void load();
   };
 
+  /** The contract forecast, labelled so it can never be mistaken for booked revenue. */
+  const contractStats = (o: NonNullable<typeof overview>): StatItem[] => [
+    { key: 'mrr', label: 'MRR (netto) · erwartet', value: formatCents(o.mrr_net_cents), hint: 'vertraglich vereinbart, nicht verbucht', lead: true },
+    { key: 'arr', label: 'ARR (netto) · erwartet', value: formatCents(o.arr_net_cents), hint: '12 × MRR' },
+    { key: 'mrrg', label: 'MRR (brutto) · erwartet', value: formatCents(o.mrr_gross_cents), hint: 'inkl. USt' },
+    { key: 'count', label: 'Aktive Verträge', value: String(o.active_contract_count), hint: 'laufend' },
+  ];
+
   return (
     <>
-      <PageHeader
+      <WorkspaceHeader
+        eyebrow="Einnahmen"
         title="Laufende Verträge"
-        description="Wiederkehrende Kundenumsätze. Diese Werte sind vertraglich erwartet — sie werden erst zu tatsächlichem Umsatz, wenn Sie einen Monat verbuchen. Es wird nie automatisch etwas an Kunden versendet."
+        subtitle="Wiederkehrende Kundenumsätze. Diese Werte sind vertraglich erwartet — sie werden erst zu tatsächlichem Umsatz, wenn Sie einen Monat verbuchen. Es wird nie automatisch etwas an Kunden versendet."
         actions={
-          <div className="flex items-center gap-2">
+          <>
             <Button variant="secondary" onClick={() => setImportOpen(true)} disabled={!entity}>Schnellimport</Button>
-            <Button onClick={() => setCreateOpen(true)} disabled={!entity}>+ Vertrag anlegen</Button>
-          </div>
+            <Button onClick={() => setCreateOpen(true)} disabled={!entity}>Vertrag anlegen</Button>
+          </>
         }
       />
 
-      {error ? <div className="mb-6"><ErrorState message={error} onRetry={() => void load()} /></div> : null}
+      {error ? <div className="mb-4"><ErrorState message={error} onRetry={() => void load()} /></div> : null}
 
-      {/* FORECAST tiles. The "Erwartet" basis label is not decoration: without it these
+      {/* FORECAST figures. Every label says "erwartet" or "vertraglich": without that these
           numbers look like revenue, which they are not. */}
-      {!loading && overview ? (
-        <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <KpiCard label="MRR (netto)" valueCents={overview.mrr_net_cents} basis="forecast" hint="vertraglich erwartet" />
-          <KpiCard label="ARR (netto)" valueCents={overview.arr_net_cents} basis="forecast" hint="12 × MRR" />
-          <KpiCard label="MRR (brutto)" valueCents={overview.mrr_gross_cents} basis="forecast" hint="inkl. USt" />
-          <KpiCard label="Aktive Verträge" value={String(overview.active_contract_count)} basis="forecast" />
+      {loading ? (
+        <div className="mb-4"><StatBandSkeleton count={4} /></div>
+      ) : overview ? (
+        <div className="mb-4">
+          <StatBand items={contractStats(overview)} />
         </div>
       ) : null}
 

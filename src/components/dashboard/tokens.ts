@@ -86,7 +86,7 @@ export const elevation = {
  * marketing headline. (The customer portal previously ran up to 44px — the public site's scale.)
  */
 export const text = {
-  pageTitle: 'text-[20px] font-semibold leading-7 tracking-[-0.012em] text-[var(--cq-fg)]',
+  pageTitle: 'text-[21px] font-semibold leading-7 tracking-[-0.018em] text-[var(--cq-fg)]',
   sectionTitle: 'text-[13px] font-semibold leading-5 tracking-[-0.004em] text-[var(--cq-fg)]',
   cardTitle: 'text-[14px] font-semibold leading-5 tracking-[-0.004em] text-[var(--cq-fg)]',
   body: 'text-[13px] leading-5 text-[var(--cq-fg-muted)]',
@@ -97,6 +97,10 @@ export const text = {
   eyebrow:
     'text-[11px] font-medium uppercase leading-4 tracking-[0.04em] text-[var(--cq-fg-subtle)]',
   metric: 'text-[22px] font-semibold leading-7 tracking-[-0.02em] tabular-nums text-[var(--cq-fg)]',
+  /** The one figure a summary band leads with. Used sparingly — once per band. */
+  metricLead: 'text-[27px] font-semibold leading-8 tracking-[-0.028em] tabular-nums text-[var(--cq-fg)]',
+  /** Secondary figures inside a summary band: readable at a glance, not shouting. */
+  metricSm: 'text-[17px] font-semibold leading-6 tracking-[-0.016em] tabular-nums text-[var(--cq-fg)]',
   numeric: 'tabular-nums',
 } as const;
 
@@ -136,6 +140,37 @@ export const interactive = {
   transition: 'transition-colors duration-fast ease-premium',
   hoverRow: 'hover:bg-[var(--cq-hover)]',
   disabled: 'disabled:cursor-not-allowed disabled:opacity-50',
+  /**
+   * Tactile press. Buttons and clickable rows answer a pointer-down within one
+   * frame with a 1px sink instead of waiting for the network — the whole reason
+   * the interface reads as responsive rather than merely fast.
+   *
+   * `transform` is on the compositor, so this never triggers layout, and the
+   * reduced-motion block in index.css collapses its duration to 1ms.
+   */
+  press: 'transition-[background-color,border-color,color,transform] duration-fast ease-premium active:translate-y-px',
+} as const;
+
+/**
+ * Card/panel rhythm for the workspace grids.
+ *
+ * Every recipe starts at an explicit `grid-cols-1`, which is `minmax(0, 1fr)`. A bare
+ * `grid` leaves the single implicit column at max-content, so one wide child — a chart,
+ * a long row, a nowrap amount — silently widens the track and gives the whole page a
+ * horizontal scrollbar on a phone.
+ *
+ * The Admin Center used one 4-up grid of identical cards on every page, which is
+ * why every page looked like every other page. These are the two compositions
+ * that replaced it: an asymmetric main/side split for a workspace, and a
+ * three-band split for a landing surface.
+ */
+export const grid = {
+  /** Main work area with a narrower context column. Collapses under xl. */
+  workspace: 'grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_360px]',
+  /** Two equal halves. Collapses under lg. */
+  halves: 'grid grid-cols-1 gap-4 lg:grid-cols-2',
+  /** Attention-first landing: a wide primary column and a narrower rail. */
+  landing: 'grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]',
 } as const;
 
 /**
@@ -156,6 +191,7 @@ export const control = {
  */
 export const statusTone = {
   neutral: 'border-[var(--cq-border)] bg-[var(--cq-sunken)] text-[var(--cq-fg-muted)]',
+  accent: 'border-[var(--cq-accent-border)] bg-[var(--cq-accent-weak)] text-[var(--cq-accent-fg)]',
   success: 'border-emerald-200 bg-emerald-50 text-emerald-700',
   warning: 'border-amber-200 bg-amber-50 text-amber-700',
   danger: 'border-red-200 bg-red-50 text-red-700',

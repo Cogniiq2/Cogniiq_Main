@@ -2,11 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Plus, Receipt, Trash2 } from 'lucide-react';
 
 import {
-  Button, Card, Checkbox, ConfirmDialog, DataTable, EmptyState, ErrorState, IconButton, InfoBanner,
-  KpiCard, Modal, PageHeader, SectionHeader, SlideOver, StatusBadge, Tabs, TableSkeleton, Field,
-  Select, Textarea, useToast, type Column,
+  Button, Card, Checkbox, ConfirmDialog, DataTable, EmptyState, ErrorState, FilterChips, IconButton,
+  InfoBanner, Modal, SearchInput, SectionHeader, SlideOver, StatBand, StatBandSkeleton, StatusBadge,
+  TableSkeleton, Field, Select, Textarea, Toolbar, WorkspaceHeader, useToast,
+  type Column, type SortDirection, type StatItem,
 } from '@/components/dashboard';
 import { expenseReviewTone, paymentStatusTone } from '@/pages/owner/ownerUi';
+import { useCreateIntent } from '@/pages/admin/routeIntent';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import {
   createOwnerExpense, deleteDraftExpense, loadCategories, loadExpenses, loadVendors,
@@ -16,6 +18,7 @@ import {
 import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
 import { computeExpenseLine, eligibleInputVat } from '@/lib/ownerFinance/tax';
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
+import { formatDateDe } from '@/lib/ownerFinance/exports';
 import type { OwnerExpense, OwnerExpenseCategory, OwnerVendor } from '@/lib/ownerFinance/types';
 import { ExportMenu } from '@/components/finance/ExportMenu';
 import { runFinanceExport } from '@/lib/ownerFinance/financeExportRunner';
@@ -59,9 +62,14 @@ export function ExpensesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [composerOpen, setComposerOpen] = useState(false);
+  // ⌘K's create action navigates here with ?create=1; this opens the dialog this page
+  // already owns. Without the intent nothing opens — the plain list URL stays a list.
+  useCreateIntent(() => setComposerOpen(true));
   const [payFor, setPayFor] = useState<OwnerExpense | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<OwnerExpense | null>(null);
   const [filter, setFilter] = useState('all');
+  const [query, setQuery] = useState('');
+  const [tableSort, setTableSort] = useState<{ key: string; direction: SortDirection } | null>(null);
   const [includeIds, setIncludeIds] = useState(false);
 
   const load = useCallback(async () => {
@@ -87,12 +95,26 @@ export function ExpensesPage() {
     paid: expenses.filter((e) => e.payment_status === 'paid').length,
   }), [expenses]);
 
+  const catLabelFor = useCallback(
+    (id: string | null) => categories.find((c) => c.id === id)?.label ?? '—',
+    [categories],
+  );
+
   const filtered = useMemo(() => {
-    if (filter === 'review') return expenses.filter((e) => e.review_status !== 'reviewed');
-    if (filter === 'unpaid') return expenses.filter((e) => e.payment_status === 'unpaid');
-    if (filter === 'paid') return expenses.filter((e) => e.payment_status === 'paid');
-    return expenses;
-  }, [expenses, filter]);
+    let rows = expenses;
+    if (filter === 'review') rows = rows.filter((e) => e.review_status !== 'reviewed');
+    else if (filter === 'unpaid') rows = rows.filter((e) => e.payment_status === 'unpaid');
+    else if (filter === 'paid') rows = rows.filter((e) => e.payment_status === 'paid');
+    const q = query.trim().toLowerCase();
+    if (!q) return rows;
+    // Over what the row prints: category, supplier reference and the amount.
+    return rows.filter((e) => [
+      catLabelFor(e.category_id),
+      e.supplier_invoice_number,
+      e.notes,
+      formatCents(e.net_total_cents, e.currency),
+    ].some((v) => (v ?? '').toLowerCase().includes(q)));
+  }, [expenses, filter, query, catLabelFor]);
 
   const totals = useMemo(() => ({
     net: expenses.reduce((s, e) => s + e.net_total_cents, 0),
@@ -100,7 +122,7 @@ export function ExpensesPage() {
     unpaid: expenses.filter((e) => e.payment_status !== 'paid' && e.payment_status !== 'void').reduce((s, e) => s + (e.gross_total_cents - e.amount_paid_cents), 0),
   }), [expenses]);
 
-  const catLabel = (id: string | null) => categories.find((c) => c.id === id)?.label ?? '—';
+  const catLabel = catLabelFor;
   const vendorName = useCallback((e: OwnerExpense): string => vendors.find((v) => v.id === e.vendor_id)?.name ?? '—', [vendors]);
 
   const filterLabel = filter === 'all' ? 'Alle' : filter === 'review' ? 'Prüfung offen' : filter === 'unpaid' ? 'Offen' : 'Bezahlt';
@@ -135,22 +157,89 @@ export function ExpensesPage() {
   };
 
   const columns: Column<OwnerExpense>[] = [
-    { key: 'date', header: 'Datum', render: (e) => <span className="text-gray-500">{e.invoice_date ?? '—'}</span> },
-    { key: 'cat', header: 'Kategorie', render: (e) => <span className="font-medium text-gray-900">{catLabel(e.category_id)}</span> },
-    { key: 'net', header: 'Netto', align: 'right', render: (e) => <span className="tabular-nums">{formatCents(e.net_total_cents, e.currency)}</span> },
-    { key: 'vat', header: 'Vorsteuer', align: 'right', render: (e) => <span className="tabular-nums text-gray-500">{formatCents(e.input_vat_cents, e.currency)}</span> },
-    { key: 'pay', header: 'Zahlung', render: (e) => <StatusBadge label={paymentLabel[e.payment_status] ?? e.payment_status} tone={paymentStatusTone[e.payment_status]} /> },
-    { key: 'review', header: 'Prüfung', render: (e) => <StatusBadge label={reviewLabel[e.review_status] ?? e.review_status} tone={expenseReviewTone[e.review_status]} /> },
     {
-      key: 'actions', header: '', align: 'right', render: (e) => (
+      key: 'cat',
+      header: 'Ausgabe',
+      sortValue: (e) => catLabel(e.category_id),
+      render: (e) => (
+        <div className="min-w-0">
+          <div className="truncate font-semibold text-[var(--cq-fg)]">{catLabel(e.category_id)}</div>
+          <div className="truncate text-[12px] text-[var(--cq-fg-subtle)]">
+            {[e.invoice_date ? formatDateDe(e.invoice_date) : 'ohne Datum', e.supplier_invoice_number].filter(Boolean).join(' · ')}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'net',
+      header: 'Netto',
+      align: 'right',
+      sortValue: (e) => e.net_total_cents,
+      render: (e) => <span className="whitespace-nowrap font-medium text-[var(--cq-fg)]">{formatCents(e.net_total_cents, e.currency)}</span>,
+    },
+    {
+      key: 'vat',
+      header: 'Vorsteuer',
+      align: 'right',
+      hideOnMobile: true,
+      sortValue: (e) => e.input_vat_cents,
+      render: (e) => <span className="whitespace-nowrap text-[var(--cq-fg-muted)]">{formatCents(e.input_vat_cents, e.currency)}</span>,
+    },
+    {
+      key: 'pay',
+      header: 'Zahlung',
+      sortValue: (e) => e.payment_status,
+      render: (e) => (
+        <span className="whitespace-nowrap">
+          <StatusBadge label={paymentLabel[e.payment_status] ?? e.payment_status} tone={paymentStatusTone[e.payment_status]} />
+        </span>
+      ),
+    },
+    {
+      key: 'review',
+      header: 'Prüfung',
+      sortValue: (e) => e.review_status,
+      render: (e) => (
+        <span className="whitespace-nowrap">
+          <StatusBadge label={reviewLabel[e.review_status] ?? e.review_status} tone={expenseReviewTone[e.review_status]} />
+        </span>
+      ),
+    },
+    {
+      key: 'actions', header: '', align: 'right', sticky: true, hideOnCard: true, render: (e) => (
         <div className="flex justify-end gap-1.5" onClick={(ev) => ev.stopPropagation()}>
           {e.payment_status !== 'paid' && e.payment_status !== 'void' ? <Button size="sm" variant="secondary" onClick={() => setPayFor(e)}>Zahlung</Button> : null}
           {e.review_status !== 'reviewed' ? <Button size="sm" variant="ghost" onClick={() => void markReviewed(e)}>Geprüft</Button> : null}
           {e.review_status !== 'reviewed' && e.amount_paid_cents === 0
-            ? <IconButton icon={Trash2} label="Beleg löschen" variant="ghost" onClick={() => setConfirmDelete(e)} />
+            ? <IconButton icon={Trash2} label={`Beleg ${catLabel(e.category_id)} löschen`} variant="ghost" onClick={() => setConfirmDelete(e)} />
             : null}
         </div>
       ),
+    },
+  ];
+
+  const stats: StatItem[] = [
+    {
+      key: 'net',
+      label: 'Betriebsausgaben (netto)',
+      value: formatCents(totals.net),
+      hint: 'erfasste Belege im Geschäftsjahr',
+      lead: true,
+    },
+    { key: 'vat', label: 'Vorsteuer erfasst', value: formatCents(totals.inputVat), hint: 'abziehbar laut USt-Behandlung' },
+    {
+      key: 'unpaid',
+      label: 'Offen (unbezahlt)',
+      value: formatCents(totals.unpaid),
+      hint: counts.unpaid ? `${counts.unpaid} Belege` : 'nichts offen',
+      tone: totals.unpaid > 0 ? 'attention' : 'neutral',
+    },
+    {
+      key: 'review',
+      label: 'Prüf-Queue',
+      value: String(counts.review),
+      hint: 'Belege oder Zuordnung fehlen',
+      tone: counts.review > 0 ? 'attention' : 'neutral',
     },
   ];
 
@@ -163,11 +252,12 @@ export function ExpensesPage() {
 
   return (
     <>
-      <PageHeader
+      <WorkspaceHeader
+        eyebrow="Kosten"
         title="Ausgaben"
-        description="Betriebsausgaben mit USt-Behandlung, Vorsteuer-Abzugsfähigkeit und Betriebsanteil. Ausländische SaaS-Rechnungen werden nicht automatisch als voll abziehbar klassifiziert."
+        subtitle="Betriebsausgaben mit USt-Behandlung, Vorsteuer-Abzugsfähigkeit und Betriebsanteil. Ausländische SaaS-Rechnungen werden nicht automatisch als voll abziehbar klassifiziert."
         actions={
-          <div className="flex items-center gap-2">
+          <>
             <ExportMenu
               onExport={runExport}
               disabled={!entity || expenses.length === 0}
@@ -179,46 +269,74 @@ export function ExpensesPage() {
               ]}
             />
             <Button icon={Plus} onClick={() => setComposerOpen(true)} disabled={!entity}>Ausgabe erfassen</Button>
-          </div>
+          </>
+        }
+        toolbar={
+          !loading && expenses.length > 0 ? (
+            <Toolbar
+              trailing={
+                <SearchInput
+                  value={query}
+                  onChange={setQuery}
+                  label="Ausgaben durchsuchen"
+                  placeholder="Kategorie, Belegnummer …"
+                  className="w-full sm:w-64"
+                />
+              }
+            >
+              <FilterChips
+                label="Ausgaben filtern"
+                value={filter}
+                onChange={setFilter}
+                options={[
+                  { value: 'all', label: 'Alle', count: counts.all },
+                  { value: 'review', label: 'Prüf-Queue', count: counts.review },
+                  { value: 'unpaid', label: 'Unbezahlt', count: counts.unpaid },
+                  { value: 'paid', label: 'Bezahlt', count: counts.paid },
+                ]}
+              />
+            </Toolbar>
+          ) : undefined
         }
       />
 
-      {error ? <div className="mb-6"><ErrorState message={error} onRetry={() => void load()} /></div> : null}
+      {error ? <div className="mb-4"><ErrorState message={error} onRetry={() => void load()} /></div> : null}
 
-      {!loading && expenses.length > 0 ? (
-        <div className="mb-6 grid gap-3 sm:grid-cols-3">
-          <KpiCard label="Betriebsausgaben (netto)" valueCents={totals.net} basis="actual" />
-          <KpiCard label="Vorsteuer erfasst" valueCents={totals.inputVat} basis="actual" />
-          <KpiCard label="Offen (unbezahlt)" valueCents={totals.unpaid} basis="actual" tone={totals.unpaid > 0 ? 'negative' : 'neutral'} />
-        </div>
-      ) : null}
+      <div className="space-y-4">
+        {loading ? <StatBandSkeleton count={4} /> : expenses.length > 0 ? <StatBand items={stats} /> : null}
 
-      <div className="mb-4">
-        <Tabs value={filter} onChange={setFilter} tabs={[
-          { value: 'all', label: 'Alle', count: counts.all },
-          { value: 'review', label: 'Prüf-Queue', count: counts.review },
-          { value: 'unpaid', label: 'Unbezahlt', count: counts.unpaid },
-          { value: 'paid', label: 'Bezahlt', count: counts.paid },
-        ]} />
+        {loading ? <TableSkeleton rows={5} cols={6} /> : filtered.length === 0 ? (
+          <EmptyState
+            icon={Receipt}
+            title={expenses.length === 0 ? 'Noch keine Ausgaben' : query ? 'Keine Treffer' : 'Keine Ausgaben in dieser Ansicht'}
+            description={
+              expenses.length === 0
+                ? 'Erfassen Sie Betriebsausgaben, um Vorsteuer und EÜR-Ergebnis zu berechnen.'
+                : query
+                  ? `Kein Beleg passt zu „${query}".`
+                  : 'Passen Sie den Filter an, um weitere Ausgaben zu sehen.'
+            }
+            action={
+              expenses.length === 0
+                ? <Button icon={Plus} onClick={() => setComposerOpen(true)} disabled={!entity}>Ausgabe erfassen</Button>
+                : query
+                  ? <Button variant="secondary" onClick={() => setQuery('')}>Suche zurücksetzen</Button>
+                  : <Button variant="secondary" onClick={() => setFilter('all')}>Alle Ausgaben zeigen</Button>
+            }
+          />
+        ) : (
+          <DataTable
+            columns={columns}
+            rows={filtered}
+            getRowKey={(e) => e.id}
+            minWidth={780}
+            sort={tableSort}
+            onSortChange={setTableSort}
+            mobileTitle={(e) => <span>{catLabel(e.category_id)}</span>}
+            mobileSubtitle={(e) => [e.invoice_date ? formatDateDe(e.invoice_date) : 'ohne Datum', e.supplier_invoice_number].filter(Boolean).join(' · ')}
+          />
+        )}
       </div>
-
-      {loading ? <TableSkeleton rows={5} cols={6} /> : filtered.length === 0 ? (
-        <EmptyState
-          icon={Receipt}
-          title={expenses.length === 0 ? 'Noch keine Ausgaben' : 'Keine Ausgaben in dieser Ansicht'}
-          description={expenses.length === 0 ? 'Erfassen Sie Betriebsausgaben, um Vorsteuer und EÜR-Ergebnis zu berechnen.' : 'Passen Sie den Filter an, um weitere Ausgaben zu sehen.'}
-          action={expenses.length === 0 ? <Button icon={Plus} onClick={() => setComposerOpen(true)} disabled={!entity}>Ausgabe erfassen</Button> : undefined}
-        />
-      ) : (
-        <DataTable
-          columns={columns}
-          rows={filtered}
-          getRowKey={(e) => e.id}
-          minWidth={820}
-          mobileTitle={(e) => <span>{catLabel(e.category_id)}</span>}
-          mobileSubtitle={(e) => `${e.invoice_date ?? 'ohne Datum'} · ${e.supplier_invoice_number ?? ''}`}
-        />
-      )}
 
       {entity ? (
         <ExpenseComposer

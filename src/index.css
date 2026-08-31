@@ -622,8 +622,17 @@ html.cq-public-light {
   --cq-elev-2: 0 4px 12px -2px rgba(16, 24, 40, 0.06);
   --cq-elev-3: 0 16px 48px -8px rgba(16, 24, 40, 0.18);
 
+  /* Signal accent — the one saturated colour in the workspace. It marks the
+     active/primary path (selected rows, focus emphasis, the attention rail) and
+     nothing decorative, so a blue element always means "this is the thing". */
+  --cq-accent: #1d4ed8;
+  --cq-accent-hover: #1e40af;
+  --cq-accent-weak: rgba(29, 78, 216, 0.08);
+  --cq-accent-border: rgba(29, 78, 216, 0.22);
+  --cq-accent-fg: #1e40af;
+
   /* Focus */
-  --cq-focus: rgba(13, 17, 23, 0.45);
+  --cq-focus: rgba(29, 78, 216, 0.55);
 
   /* Motion */
   --cq-ease: cubic-bezier(0.2, 0, 0, 1);
@@ -658,7 +667,12 @@ html.cq-public-light {
   --cq-elev-1: 0 1px 2px rgba(16, 24, 40, 0.04);
   --cq-elev-2: 0 4px 12px -2px rgba(16, 24, 40, 0.06);
   --cq-elev-3: 0 16px 48px -8px rgba(16, 24, 40, 0.18);
-  --cq-focus: rgba(13, 17, 23, 0.45);
+  --cq-accent: #1d4ed8;
+  --cq-accent-hover: #1e40af;
+  --cq-accent-weak: rgba(29, 78, 216, 0.08);
+  --cq-accent-border: rgba(29, 78, 216, 0.22);
+  --cq-accent-fg: #1e40af;
+  --cq-focus: rgba(29, 78, 216, 0.55);
   --cq-canvas: #f7f7f4;
   --cq-ease: cubic-bezier(0.2, 0, 0, 1);
   --cq-duration-fast: 140ms;

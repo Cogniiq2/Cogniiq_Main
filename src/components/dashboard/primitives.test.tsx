@@ -132,10 +132,91 @@ describe('DataTable', () => {
 
   it('also renders a stacked mobile representation of every row', () => {
     renderTable();
-    // Desktop cell + mobile card title + mobile definition list. Both representations are always
-    // in the DOM; CSS decides which is visible. (The mobile card repeating the title column in its
-    // <dl> is pre-existing behaviour, carried over unchanged — see the P4 notes.)
+    // Desktop cell + mobile card title. Both representations are always in the DOM;
+    // CSS decides which is visible.
     expect(screen.getAllByText('Muster GmbH').length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('does not print the first column twice in the mobile card', () => {
+    renderTable();
+    // The first column IS the card's title. Repeating it as a field printed the
+    // customer's name twice on every phone-sized row.
+    expect(screen.getAllByText('Muster GmbH')).toHaveLength(2);
+    expect(screen.queryAllByText('Kunde')).toHaveLength(1); // the column header only
+  });
+
+  it('makes the row destination a real link, so it is reachable by keyboard', () => {
+    render(
+      <MemoryRouter>
+        <DataTable
+          rows={rows}
+          getRowKey={(r) => r.id}
+          mobileTitle={(r) => r.name}
+          rowHref={(r) => `/admin/finance/customers/${r.id}`}
+          columns={[
+            { key: 'name', header: 'Kunde', render: (r) => r.name },
+            { key: 'amount', header: 'Betrag', align: 'right', render: (r) => r.amount },
+          ]}
+        />
+      </MemoryRouter>,
+    );
+    const links = screen.getAllByRole('link', { name: /Muster GmbH/ });
+    expect(links.length).toBeGreaterThan(0);
+    expect(links[0]).toHaveAttribute('href', `/admin/finance/customers/${rows[0].id}`);
+  });
+
+  it('announces the current sort and flips direction on a second activation', async () => {
+    const user = userEvent.setup();
+    function Sortable() {
+      const [sort, setSort] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
+      return (
+        <DataTable
+          rows={rows}
+          getRowKey={(r) => r.id}
+          mobileTitle={(r) => r.name}
+          sort={sort}
+          onSortChange={setSort}
+          columns={[
+            { key: 'name', header: 'Kunde', sortValue: (r) => r.name, render: (r) => r.name },
+            { key: 'amount', header: 'Betrag', align: 'right', render: (r) => r.amount },
+          ]}
+        />
+      );
+    }
+    render(<Sortable />);
+
+    const header = screen.getByRole('columnheader', { name: /Kunde/ });
+    expect(header).toHaveAttribute('aria-sort', 'none');
+    // The non-sortable column offers no control and announces no sort state.
+    expect(screen.getByRole('columnheader', { name: 'Betrag' })).not.toHaveAttribute('aria-sort');
+
+    await user.click(within(header).getByRole('button'));
+    expect(header).toHaveAttribute('aria-sort', 'ascending');
+    await user.click(within(header).getByRole('button'));
+    expect(header).toHaveAttribute('aria-sort', 'descending');
+  });
+
+  it('actually reorders the rows it was given', async () => {
+    const user = userEvent.setup();
+    function Sortable() {
+      const [sort, setSort] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
+      return (
+        <DataTable
+          rows={rows}
+          getRowKey={(r) => r.id}
+          mobileTitle={(r) => r.name}
+          sort={sort}
+          onSortChange={setSort}
+          columns={[{ key: 'name', header: 'Kunde', sortValue: (r) => r.name, render: (r) => r.name }]}
+        />
+      );
+    }
+    const { container } = render(<Sortable />);
+    const names = () => [...container.querySelectorAll('tbody tr td:first-child')].map((c) => c.textContent);
+    const original = names();
+
+    await user.click(within(screen.getByRole('columnheader', { name: /Kunde/ })).getByRole('button'));
+    expect(names()).toEqual([...original].sort((a, b) => (a ?? '').localeCompare(b ?? '', 'de')));
   });
 });
 

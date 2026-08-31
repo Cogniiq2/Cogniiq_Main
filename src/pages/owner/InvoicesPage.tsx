@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { Archive, FileText, Plus, Trash2 } from 'lucide-react';
 
 import {
-  Button, Card, ConfirmDialog, DataTable, EmptyState, ErrorState, IconButton, InfoBanner, KpiCard,
-  Modal, PageHeader, SlideOver, StatusBadge, Tabs, TableSkeleton, Field, Select, Textarea, SectionHeader,
-  useToast, type Column,
+  Button, Card, ConfirmDialog, DataTable, EmptyState, ErrorState, FilterChips, IconButton,
+  InfoBanner, Modal, SearchInput, SlideOver, StatBand, StatBandSkeleton, StatusBadge, TableSkeleton,
+  Field, Select, Textarea, SectionHeader, Toolbar, WorkspaceHeader, useToast,
+  type Column, type SortDirection, type StatItem,
 } from '@/components/dashboard';
 import { invoiceStatusTone } from '@/pages/owner/ownerUi';
+import { useCreateIntent } from '@/pages/admin/routeIntent';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import {
   createOwnerInvoice, deleteDraftInvoice, issueOwnerInvoice, loadInvoices, recordHistoricalPaidInvoice,
@@ -21,6 +23,8 @@ import { computeInvoiceLine } from '@/lib/ownerFinance/tax';
 import { PAYMENT_METHOD_OPTIONS } from '@/lib/ownerFinance/paymentMethods';
 import { recordHistoricalInvoiceWithPayments, type InvoicePaymentInput, type InvoicePaymentKind } from '@/lib/ownerFinance/financeExtendedApi';
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
+import { formatDateDe } from '@/lib/ownerFinance/exports';
+import { openAmountCents } from '@/lib/ownerFinance/commandCenter';
 import type { OwnerCustomerListRow, OwnerInvoice } from '@/lib/ownerFinance/types';
 import { ExportMenu } from '@/components/finance/ExportMenu';
 import { runFinanceExport } from '@/lib/ownerFinance/financeExportRunner';
@@ -74,8 +78,13 @@ export function InvoicesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [query, setQuery] = useState('');
+  const [tableSort, setTableSort] = useState<{ key: string; direction: SortDirection } | null>(null);
   const [composerOpen, setComposerOpen] = useState(false);
   const [historicalOpen, setHistoricalOpen] = useState(false);
+  // ⌘K's create action navigates here with ?create=1; this opens the dialog this page
+  // already owns. Without the intent nothing opens — the plain list URL stays a list.
+  useCreateIntent(() => setComposerOpen(true));
   const [payFor, setPayFor] = useState<OwnerInvoice | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<OwnerInvoice | null>(null);
   const [confirmVoid, setConfirmVoid] = useState<OwnerInvoice | null>(null);
@@ -101,17 +110,26 @@ export function InvoicesPage() {
     return c;
   }, [invoices]);
 
-  const filtered = useMemo(
-    () => invoices.filter((i) => statusFilter === 'all' || i.status === statusFilter),
-    [invoices, statusFilter],
-  );
-
   const customerName = useCallback((inv: OwnerInvoice): string => {
     const c = customers.find((x) => x.id === inv.owner_customer_id);
     if (c) return customerDisplayName(c);
     // Pre-migration rows may still carry only the tenant link.
     return inv.organization_id ? 'Nicht zugeordnet' : '—';
   }, [customers]);
+
+  // Search is over what is actually printed on the row — number, customer, amount —
+  // so the owner can find an invoice by any of the things they remember about it.
+  const filtered = useMemo(() => {
+    const byStatus = invoices.filter((i) => statusFilter === 'all' || i.status === statusFilter);
+    const q = query.trim().toLowerCase();
+    if (!q) return byStatus;
+    return byStatus.filter((i) => [
+      i.invoice_number,
+      customerName(i),
+      i.external_reference,
+      formatCents(i.gross_total_cents, i.currency),
+    ].some((v) => (v ?? '').toLowerCase().includes(q)));
+  }, [invoices, statusFilter, query, customerName]);
 
   const statusFilterLabel = statusFilter === 'all' ? 'Alle Status' : (statusLabel[statusFilter] ?? statusFilter);
 
@@ -155,36 +173,148 @@ export function InvoicesPage() {
     void load();
   };
 
+  /**
+   * The summary band. Every figure is a sum over the rows on this page and each is
+   * labelled with what it actually is: what has been invoiced is not what has been
+   * collected, and neither is what is still owed. `openAmountCents` is the shared
+   * definition of an open receivable, so this page and the Command Center can never
+   * disagree about which invoices count.
+   */
   const totals = useMemo(() => {
-    const outstanding = invoices.filter((i) => ['issued', 'partially_paid', 'overdue'].includes(i.status)).reduce((s, i) => s + (i.gross_total_cents - i.amount_paid_cents), 0);
-    const overdue = invoices.filter((i) => i.status === 'overdue').reduce((s, i) => s + (i.gross_total_cents - i.amount_paid_cents), 0);
+    const outstanding = invoices.reduce((sum, i) => sum + openAmountCents(i), 0);
+    const overdue = invoices.filter((i) => i.status === 'overdue').reduce((sum, i) => sum + openAmountCents(i), 0);
     const drafts = invoices.filter((i) => i.status === 'draft').length;
-    return { outstanding, overdue, drafts };
+    const issued = invoices
+      .filter((i) => i.status !== 'draft' && !i.cancelled_at)
+      .reduce((sum, i) => sum + i.gross_total_cents, 0);
+    const paid = invoices.filter((i) => !i.cancelled_at).reduce((sum, i) => sum + i.amount_paid_cents, 0);
+    return { outstanding, overdue, drafts, issued, paid };
   }, [invoices]);
 
-  const columns: Column<OwnerInvoice>[] = [
-    { key: 'number', header: 'Nummer', render: (inv) => <span className="font-semibold text-gray-950">{inv.invoice_number ?? 'Entwurf'}</span>, hideOnMobile: true },
+  const stats: StatItem[] = [
     {
-      key: 'status', header: 'Status', render: (inv) => (
-        <div className="flex flex-wrap items-center gap-1.5">
-          <StatusBadge label={statusLabel[inv.status] ?? inv.status} tone={invoiceStatusTone[inv.status]} />
-          {inv.historical_entry ? <StatusBadge label="Historisch erfasst" tone="neutral" /> : null}
+      key: 'outstanding',
+      label: 'Offene Forderungen',
+      value: formatCents(totals.outstanding),
+      hint: 'aus gestellten, nicht stornierten Rechnungen',
+      lead: true,
+      tone: totals.outstanding > 0 ? 'attention' : 'neutral',
+    },
+    {
+      key: 'overdue',
+      label: 'Davon überfällig',
+      value: formatCents(totals.overdue),
+      hint: counts.overdue ? `${counts.overdue} Rechnungen` : 'keine',
+      tone: totals.overdue > 0 ? 'negative' : 'neutral',
+    },
+    { key: 'issued', label: 'Fakturiert', value: formatCents(totals.issued), hint: 'Bruttosumme gestellter Rechnungen' },
+    {
+      key: 'paid',
+      label: 'Auf Rechnungen eingegangen',
+      value: formatCents(totals.paid),
+      // Deliberately NOT the period's cash-in: this is the sum of payments recorded
+      // against these invoices, which excludes receipts without an invoice link and is
+      // not bounded by the tax year. The finance overview owns the cash figure.
+      hint: 'erfasste Zahlungen auf diese Rechnungen',
+      tone: 'positive',
+    },
+    { key: 'drafts', label: 'Entwürfe', value: String(totals.drafts), hint: 'noch nicht gestellt' },
+  ];
+
+  /**
+   * Six columns instead of seven, each carrying more.
+   *
+   * The identity cell states the number, who it is for and when it went out, which is
+   * what the owner scans for; net and gross no longer both take a column, because the
+   * only two amounts that matter in a list are what was billed and what is still owed.
+   * Actions are pinned to the right edge so they stay reachable while the table scrolls.
+   */
+  const columns: Column<OwnerInvoice>[] = [
+    {
+      key: 'number',
+      header: 'Rechnung',
+      sortValue: (inv) => inv.invoice_number ?? 'zzz',
+      render: (inv) => (
+        <div className="min-w-0">
+          <div className="flex items-center gap-1.5">
+            <span className="truncate font-semibold text-[var(--cq-fg)]">{inv.invoice_number ?? 'Entwurf'}</span>
+            {inv.historical_entry ? <StatusBadge label="Historisch" tone="neutral" /> : null}
+          </div>
+          <div className="truncate text-[12px] text-[var(--cq-fg-subtle)]">{customerName(inv)}</div>
         </div>
       ),
     },
-    { key: 'date', header: 'Datum', render: (inv) => <span className="text-gray-500">{inv.issue_date ?? '—'}</span> },
-    { key: 'net', header: 'Netto', align: 'right', render: (inv) => <span className="tabular-nums">{formatCents(inv.net_total_cents, inv.currency)}</span> },
-    { key: 'gross', header: 'Brutto', align: 'right', render: (inv) => <span className="tabular-nums font-medium text-gray-900">{formatCents(inv.gross_total_cents, inv.currency)}</span> },
+    {
+      key: 'status',
+      header: 'Status',
+      sortValue: (inv) => inv.status,
+      // Already carried by the mobile card's title.
+      hideOnCard: true,
+      render: (inv) => (
+        <span className="whitespace-nowrap">
+          <StatusBadge label={statusLabel[inv.status] ?? inv.status} tone={invoiceStatusTone[inv.status]} />
+        </span>
+      ),
+    },
+    {
+      key: 'date',
+      header: 'Gestellt',
+      sortValue: (inv) => inv.issue_date ?? '',
+      hideOnMobile: true,
+      render: (inv) => (
+        <div className="whitespace-nowrap text-[12.5px] leading-4">
+          <div className="text-[var(--cq-fg-muted)]">{inv.issue_date ? formatDateDe(inv.issue_date) : '—'}</div>
+          <div className="text-[var(--cq-fg-subtle)]">{inv.due_date ? `fällig ${formatDateDe(inv.due_date)}` : 'ohne Zahlungsziel'}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'gross',
+      header: 'Brutto',
+      align: 'right',
+      sortValue: (inv) => inv.gross_total_cents,
+      render: (inv) => (
+        <div className="whitespace-nowrap">
+          <div className="font-medium text-[var(--cq-fg)]">{formatCents(inv.gross_total_cents, inv.currency)}</div>
+          <div className="text-[12px] text-[var(--cq-fg-subtle)]">netto {formatCents(inv.net_total_cents, inv.currency)}</div>
+        </div>
+      ),
+    },
     // A legacy overpaid invoice must not read as a negative receivable; the excess is
     // surfaced as its own amber figure instead. Accounting values are untouched.
-    { key: 'open', header: 'Offen', align: 'right', render: (inv) => (inv.amount_paid_cents > inv.gross_total_cents
-      ? <span className="tabular-nums text-amber-700" title="Überzahlung aus Altbestand">{formatCents(0, inv.currency)} <span className="text-[11px]">(+{formatCents(inv.amount_paid_cents - inv.gross_total_cents, inv.currency)})</span></span>
-      : <span className="tabular-nums">{formatCents(inv.gross_total_cents - inv.amount_paid_cents, inv.currency)}</span>) },
     {
-      key: 'actions', header: '', align: 'right', render: (inv) => (
+      key: 'open',
+      header: 'Offen',
+      align: 'right',
+      sortValue: (inv) => openAmountCents(inv),
+      render: (inv) => {
+        if (inv.amount_paid_cents > inv.gross_total_cents) {
+          return (
+            <span className="whitespace-nowrap text-amber-700" title="Überzahlung aus Altbestand">
+              {formatCents(0, inv.currency)}{' '}
+              <span className="text-[11px]">(+{formatCents(inv.amount_paid_cents - inv.gross_total_cents, inv.currency)})</span>
+            </span>
+          );
+        }
+        const open = inv.gross_total_cents - inv.amount_paid_cents;
+        const owed = ['issued', 'partially_paid', 'overdue'].includes(inv.status) && !inv.cancelled_at;
+        return (
+          <span className={owed && open > 0 ? 'whitespace-nowrap font-medium text-amber-700' : 'whitespace-nowrap text-[var(--cq-fg-subtle)]'}>
+            {formatCents(owed ? open : 0, inv.currency)}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'actions',
+      header: '',
+      align: 'right',
+      sticky: true,
+      hideOnCard: true,
+      render: (inv) => (
         <div className="flex justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
           {inv.status === 'draft' ? <Button size="sm" onClick={() => void issue(inv)}>Stellen</Button> : null}
-          {inv.status === 'draft' ? <IconButton icon={Trash2} label="Entwurf löschen" onClick={() => setConfirmDelete(inv)} /> : null}
+          {inv.status === 'draft' ? <IconButton icon={Trash2} label={`Entwurf ${formatCents(inv.gross_total_cents, inv.currency)} löschen`} variant="ghost" onClick={() => setConfirmDelete(inv)} /> : null}
           {['issued', 'partially_paid', 'overdue'].includes(inv.status) ? <Button size="sm" variant="secondary" onClick={() => setPayFor(inv)}>Zahlung</Button> : null}
           {inv.status !== 'void' && inv.status !== 'paid' && inv.status !== 'draft' ? <Button size="sm" variant="ghost" onClick={() => setConfirmVoid(inv)}>Storno</Button> : null}
         </div>
@@ -192,13 +322,24 @@ export function InvoicesPage() {
     },
   ];
 
+  const statusOptions = [
+    { value: 'all', label: 'Alle', count: counts.all },
+    { value: 'draft', label: 'Entwurf', count: counts.draft },
+    { value: 'issued', label: 'Gestellt', count: counts.issued },
+    { value: 'partially_paid', label: 'Teilbezahlt', count: counts.partially_paid },
+    { value: 'overdue', label: 'Überfällig', count: counts.overdue },
+    { value: 'paid', label: 'Bezahlt', count: counts.paid },
+    { value: 'cancelled', label: 'Storniert', count: counts.cancelled },
+  ].filter((option) => option.value === 'all' || (option.count ?? 0) > 0);
+
   return (
     <>
-      <PageHeader
+      <WorkspaceHeader
+        eyebrow="Einnahmen"
         title="Rechnungen"
-        description="Rechnungen mit serverseitig berechneten Beträgen und server-autoritativer Nummernvergabe. Gebuchte Rechnungen werden storniert, nicht gelöscht."
+        subtitle="Beträge und Nummern werden serverseitig vergeben. Gestellte Rechnungen werden storniert, nicht gelöscht."
         actions={
-          <div className="flex items-center gap-2">
+          <>
             <ExportMenu
               onExport={runExport}
               disabled={!entity || invoices.length === 0}
@@ -210,61 +351,79 @@ export function InvoicesPage() {
               ]}
             />
             <Button variant="secondary" icon={Archive} onClick={() => setHistoricalOpen(true)} disabled={!entity}>
-              Bereits bezahlte Rechnung erfassen
+              Bezahlte Rechnung erfassen
             </Button>
             <Button icon={Plus} onClick={() => setComposerOpen(true)} disabled={!entity}>Neue Rechnung</Button>
-          </div>
+          </>
+        }
+        toolbar={
+          !loading && invoices.length > 0 ? (
+            <Toolbar
+              trailing={
+                <SearchInput
+                  value={query}
+                  onChange={setQuery}
+                  label="Rechnungen durchsuchen"
+                  placeholder="Nummer, Kunde, Betrag …"
+                  className="w-full sm:w-72"
+                />
+              }
+            >
+              <FilterChips
+                label="Rechnungen nach Status filtern"
+                value={statusFilter}
+                onChange={setStatusFilter}
+                options={statusOptions}
+              />
+            </Toolbar>
+          ) : undefined
         }
       />
 
-      {error ? <div className="mb-6"><ErrorState message={error} onRetry={() => void load()} /></div> : null}
+      {error ? <div className="mb-4"><ErrorState message={error} onRetry={() => void load()} /></div> : null}
 
-      {!loading && invoices.length > 0 ? (
-        <div className="mb-6 grid gap-3 sm:grid-cols-3">
-          <KpiCard label="Offene Forderungen" valueCents={totals.outstanding} basis="actual" />
-          <KpiCard label="Überfällig" valueCents={totals.overdue} basis="actual" tone={totals.overdue > 0 ? 'negative' : 'neutral'} />
-          <KpiCard label="Entwürfe" value={String(totals.drafts)} basis="actual" hint="noch nicht gestellt" />
-        </div>
-      ) : null}
+      <div className="space-y-4">
+        {loading ? <StatBandSkeleton count={5} /> : invoices.length > 0 ? <StatBand items={stats} /> : null}
 
-      <div className="mb-4">
-        <Tabs
-          value={statusFilter}
-          onChange={setStatusFilter}
-          tabs={[
-            { value: 'all', label: 'Alle', count: counts.all },
-            { value: 'draft', label: 'Entwurf', count: counts.draft },
-            { value: 'issued', label: 'Gestellt', count: counts.issued },
-            { value: 'partially_paid', label: 'Teilbezahlt', count: counts.partially_paid },
-            { value: 'overdue', label: 'Überfällig', count: counts.overdue },
-            { value: 'paid', label: 'Bezahlt', count: counts.paid },
-          ]}
-        />
+        {loading ? <TableSkeleton rows={5} cols={6} /> : filtered.length === 0 ? (
+          <EmptyState
+            icon={FileText}
+            title={invoices.length === 0 ? 'Noch keine Rechnungen' : query ? 'Keine Treffer' : 'Keine Rechnungen in diesem Status'}
+            description={
+              invoices.length === 0
+                ? 'Erstellen Sie Ihre erste Rechnung, um Umsatz und Forderungen zu erfassen. Es werden keine Beispieldaten angezeigt.'
+                : query
+                  ? `Keine Rechnung passt zu „${query}".`
+                  : 'Passen Sie den Statusfilter an, um weitere Rechnungen zu sehen.'
+            }
+            action={
+              invoices.length === 0
+                ? <Button icon={Plus} onClick={() => setComposerOpen(true)} disabled={!entity}>Neue Rechnung</Button>
+                : query
+                  ? <Button variant="secondary" onClick={() => setQuery('')}>Suche zurücksetzen</Button>
+                  : <Button variant="secondary" onClick={() => setStatusFilter('all')}>Alle Rechnungen zeigen</Button>
+            }
+          />
+        ) : (
+          <DataTable
+            columns={columns}
+            rows={filtered}
+            getRowKey={(inv) => inv.id}
+            sort={tableSort}
+            onSortChange={setTableSort}
+            rowHref={(inv) => `/admin/finance/invoices/${inv.id}`}
+            onRowClick={(inv) => navigate(`/admin/finance/invoices/${inv.id}`)}
+            minWidth={860}
+            mobileTitle={(inv) => (
+              <div className="flex items-center gap-2">
+                <span>{inv.invoice_number ?? 'Entwurf'}</span>
+                <StatusBadge label={statusLabel[inv.status] ?? inv.status} tone={invoiceStatusTone[inv.status]} />
+              </div>
+            )}
+            mobileSubtitle={(inv) => `${customerName(inv)} · ${inv.issue_date ? formatDateDe(inv.issue_date) : 'ohne Datum'}`}
+          />
+        )}
       </div>
-
-      {loading ? <TableSkeleton rows={5} cols={6} /> : filtered.length === 0 ? (
-        <EmptyState
-          icon={FileText}
-          title={invoices.length === 0 ? 'Noch keine Rechnungen' : 'Keine Rechnungen in diesem Status'}
-          description={invoices.length === 0 ? 'Erstellen Sie Ihre erste Rechnung, um Umsatz und Forderungen zu erfassen. Es werden keine Beispieldaten angezeigt.' : 'Passen Sie den Statusfilter an, um weitere Rechnungen zu sehen.'}
-          action={invoices.length === 0 ? <Button icon={Plus} onClick={() => setComposerOpen(true)} disabled={!entity}>Neue Rechnung</Button> : undefined}
-        />
-      ) : (
-        <DataTable
-          columns={columns}
-          rows={filtered}
-          getRowKey={(inv) => inv.id}
-          onRowClick={(inv) => navigate(`/admin/finance/invoices/${inv.id}`)}
-          minWidth={820}
-          mobileTitle={(inv) => (
-            <div className="flex items-center gap-2">
-              <span>{inv.invoice_number ?? 'Entwurf'}</span>
-              <StatusBadge label={statusLabel[inv.status] ?? inv.status} tone={invoiceStatusTone[inv.status]} />
-            </div>
-          )}
-          mobileSubtitle={(inv) => `${inv.issue_date ?? 'ohne Datum'}`}
-        />
-      )}
 
       {entity ? (
         <>

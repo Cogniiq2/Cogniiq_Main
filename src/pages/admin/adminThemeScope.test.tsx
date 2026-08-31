@@ -18,6 +18,7 @@ vi.mock('@/components/auth/PlatformAdminRoute', () => ({
 vi.mock('@/components/dashboard', () => ({
   DashboardShell: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   ToastProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  CommandPaletteProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 vi.mock('@/contexts/AuthContext', () => ({

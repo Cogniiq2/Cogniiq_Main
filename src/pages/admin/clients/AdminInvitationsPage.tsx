@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { RefreshCw, XCircle } from 'lucide-react';
+import { Mail, RefreshCw, XCircle } from 'lucide-react';
 
-import { AdminCard, Pill, invitationTone } from '@/pages/admin/clients/adminUi';
+import {
+  Button, ConfirmDialog, EmptyState, ErrorState, FilterChips, ListRow, Panel, RowList,
+  RowListSkeleton, StatusBadge, Toolbar, WorkspaceHeader, useToast,
+} from '@/components/dashboard';
 import {
   loadAdminClients,
   resendInvitationViaEdge,
@@ -13,15 +16,28 @@ import {
   canRenewInvitation,
   canResendInvitation,
   effectiveInvitationStatus,
+  isResendEmailOk,
   resendOutcomeMessage,
 } from '@/lib/clientPlatform/invitationStatus';
+import { invitationLabel, invitationTone } from '@/pages/admin/clients/statusTones';
 
+/**
+ * Portal invitations across every organization.
+ *
+ * Two things changed beyond the visual system. Feedback was a single green banner for
+ * every outcome, including "the address already belongs to a user" and an e-mail
+ * provider failure — those now surface as the errors they are, using the outcome the
+ * edge function actually returned. And revoking, which cannot be undone from here, asks
+ * first instead of firing on one click.
+ */
 export function AdminInvitationsPage() {
   const [rows, setRows] = useState<AdminClientRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [busy, setBusy] = useState<string | null>(null);
+  const [revokeTarget, setRevokeTarget] = useState<{ id: string; email: string } | null>(null);
+  const toast = useToast();
 
   const reload = useCallback(async () => {
     setLoading(true);
@@ -32,72 +48,165 @@ export function AdminInvitationsPage() {
 
   useEffect(() => { void reload(); }, [reload]);
 
-  const flash = (m: string) => { setNotice(m); setTimeout(() => setNotice(null), 2500); };
-
-  const invitations = useMemo(
-    () => rows.flatMap((r) => r.invitations.map((i) => ({ ...i, orgName: r.organizationName, effective: effectiveInvitationStatus(i) })))
-      .filter((i) => statusFilter === 'all' || i.effective === statusFilter)
+  const all = useMemo(
+    () => rows
+      .flatMap((r) => r.invitations.map((i) => ({ ...i, orgName: r.organizationName, effective: effectiveInvitationStatus(i) })))
       .sort((a, b) => b.created_at.localeCompare(a.created_at)),
-    [rows, statusFilter],
+    [rows],
   );
 
-  const resend = async (invitationId: string, renewExpired = false) => {
+  const counts = useMemo(() => {
+    const c: Record<string, number> = { all: all.length };
+    for (const invitation of all) c[invitation.effective] = (c[invitation.effective] ?? 0) + 1;
+    return c;
+  }, [all]);
+
+  const invitations = useMemo(
+    () => all.filter((i) => statusFilter === 'all' || i.effective === statusFilter),
+    [all, statusFilter],
+  );
+
+  const resend = async (invitationId: string, email: string, renewExpired = false) => {
+    setBusy(invitationId);
     const { ok, outcome, error: err } = await resendInvitationViaEdge(invitationId, renewExpired);
-    flash(outcome ? resendOutcomeMessage(outcome, renewExpired) : ok ? 'Einladung gesendet.' : `Fehler: ${err ?? 'unbekannt'}`);
-    if (ok) void reload();
+    setBusy(null);
+    if (!ok) {
+      toast.error('Einladung konnte nicht gesendet werden', err ?? 'Unbekannter Fehler');
+      return;
+    }
+    // `ok` only means the call succeeded. Whether an e-mail actually went out is the
+    // outcome's business, and "existing_user" or "email_error" is not a success.
+    const message = outcome ? resendOutcomeMessage(outcome, renewExpired) : 'Einladung gesendet.';
+    if (outcome && !isResendEmailOk(outcome)) toast.toast({ tone: 'warning', title: email, description: message });
+    else toast.success(renewExpired ? 'Einladung erneuert und gesendet' : 'Einladung gesendet', `${email} — ${message}`);
+    void reload();
   };
-  const revoke = async (id: string) => {
+
+  const revoke = async () => {
+    if (!revokeTarget) return;
+    const { id, email } = revokeTarget;
+    setBusy(id);
     const { error: err } = await revokeInvitation(id);
-    flash(err ? `Fehler: ${err}` : 'Einladung widerrufen.');
-    if (!err) void reload();
+    setBusy(null);
+    setRevokeTarget(null);
+    if (err) { toast.error('Widerrufen fehlgeschlagen', err); return; }
+    toast.success('Einladung widerrufen', `${email} kann sich mit diesem Link nicht mehr registrieren.`);
+    void reload();
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-gray-950">Einladungen</h1>
-          <p className="mt-1 text-sm text-gray-500">Status aller Client-Einladungen.</p>
-        </div>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400">
-          <option value="all">Alle</option>
-          <option value="pending">pending</option>
-          <option value="accepted">accepted</option>
-          <option value="revoked">revoked</option>
-          <option value="expired">expired</option>
-        </select>
-      </div>
-      {notice ? <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-800">{notice}</div> : null}
-      {loading ? <div className="h-40 animate-pulse rounded-2xl border border-gray-100 bg-white" /> : error ? (
-        <AdminCard><p className="text-sm text-red-600">Fehler: {error}</p></AdminCard>
+    <>
+      <WorkspaceHeader
+        eyebrow="Kundenportal"
+        title="Einladungen"
+        subtitle="Status aller Portal-Einladungen. Ein Widerruf entwertet den Link sofort und kann hier nicht rückgängig gemacht werden."
+        toolbar={
+          !loading && all.length > 0 ? (
+            <Toolbar>
+              <FilterChips
+                label="Einladungen nach Status filtern"
+                value={statusFilter}
+                onChange={setStatusFilter}
+                options={[
+                  { value: 'all', label: 'Alle', count: counts.all },
+                  ...['pending', 'accepted', 'expired', 'revoked']
+                    .filter((status) => (counts[status] ?? 0) > 0)
+                    .map((status) => ({ value: status, label: invitationLabel[status] ?? status, count: counts[status] })),
+                ]}
+              />
+            </Toolbar>
+          ) : undefined
+        }
+      />
+
+      {error ? <div className="mb-4"><ErrorState message={error} onRetry={() => void reload()} /></div> : null}
+
+      {loading ? (
+        <Panel title="Einladungen" flush><RowListSkeleton rows={4} /></Panel>
+      ) : all.length === 0 ? (
+        <EmptyState
+          icon={Mail}
+          title="Noch keine Einladungen"
+          description="Eine Einladung entsteht, wenn Sie eine Organisation für das Kundenportal freischalten. Der Status hier zeigt, ob der Kunde den Zugang bereits angenommen hat."
+        />
       ) : invitations.length === 0 ? (
-        <AdminCard><p className="text-sm text-gray-500">Keine Einladungen für diesen Filter.</p></AdminCard>
+        <EmptyState
+          icon={Mail}
+          title="Keine Einladungen in diesem Status"
+          description="Wählen Sie einen anderen Status, um weitere Einladungen zu sehen."
+          action={<Button variant="secondary" onClick={() => setStatusFilter('all')}>Alle Einladungen zeigen</Button>}
+        />
       ) : (
-        <div className="space-y-2">
-          {invitations.map((inv) => (
-            <AdminCard key={inv.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm font-semibold text-gray-900">{inv.email} <Pill label={inv.effective} tone={invitationTone[inv.effective]} /></p>
-                <p className="text-[12px] text-gray-500">
-                  <Link to={`/admin/clients/${inv.organization_id}`} className="hover:underline">{inv.orgName}</Link>
-                  {' · '}Rolle: {inv.organization_role}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                {canResendInvitation(inv.effective) ? (
-                  <button type="button" onClick={() => void resend(inv.id)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 text-[13px] font-semibold text-gray-700 hover:border-gray-300"><RefreshCw size={14} /> Erneut senden</button>
-                ) : null}
-                {canRenewInvitation(inv.effective) ? (
-                  <button type="button" onClick={() => void resend(inv.id, true)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 text-[13px] font-semibold text-amber-700 hover:bg-amber-100"><RefreshCw size={14} /> Erneuern & senden</button>
-                ) : null}
-                {canResendInvitation(inv.effective) ? (
-                  <button type="button" onClick={() => void revoke(inv.id)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 text-[13px] font-semibold text-red-700 hover:bg-red-100"><XCircle size={14} /> Widerrufen</button>
-                ) : null}
-              </div>
-            </AdminCard>
-          ))}
-        </div>
+        <Panel title="Einladungen" count={invitations.length} flush>
+          <RowList>
+            {invitations.map((invitation) => (
+              <ListRow
+                key={invitation.id}
+                title={invitation.email}
+                meta={
+                  <>
+                    <Link
+                      to={`/admin/clients/${invitation.organization_id}`}
+                      className="underline-offset-2 hover:underline"
+                    >
+                      {invitation.orgName}
+                    </Link>
+                    {` · Rolle: ${invitation.organization_role}`}
+                  </>
+                }
+                tone={invitation.effective === 'pending' ? 'attention' : 'neutral'}
+                badge={<StatusBadge label={invitationLabel[invitation.effective] ?? invitation.effective} tone={invitationTone[invitation.effective]} />}
+                trailing={
+                  <div className="flex flex-wrap items-center justify-end gap-1.5">
+                    {canResendInvitation(invitation.effective) ? (
+                      <Button size="sm" variant="secondary" icon={RefreshCw} loading={busy === invitation.id}
+                        onClick={() => void resend(invitation.id, invitation.email)}>
+                        Erneut senden
+                      </Button>
+                    ) : null}
+                    {canRenewInvitation(invitation.effective) ? (
+                      <Button size="sm" variant="secondary" icon={RefreshCw} loading={busy === invitation.id}
+                        onClick={() => void resend(invitation.id, invitation.email, true)}>
+                        Erneuern & senden
+                      </Button>
+                    ) : null}
+                    {canResendInvitation(invitation.effective) ? (
+                      <Button size="sm" variant="ghost" icon={XCircle}
+                        onClick={() => setRevokeTarget({ id: invitation.id, email: invitation.email })}>
+                        Widerrufen
+                      </Button>
+                    ) : null}
+                  </div>
+                }
+              />
+            ))}
+          </RowList>
+        </Panel>
       )}
-    </div>
+
+      <ConfirmDialog
+        open={!!revokeTarget}
+        onClose={() => setRevokeTarget(null)}
+        onConfirm={revoke}
+        tone="danger"
+        title="Einladung widerrufen?"
+        confirmLabel="Einladung widerrufen"
+        message={
+          <>
+            <p>
+              Der Einladungslink für{' '}
+              <span className="font-semibold text-[var(--cq-fg)]">{revokeTarget?.email}</span>{' '}
+              wird sofort entwertet.
+            </p>
+            <p className="mt-2">
+              Ein bereits registriertes Konto bleibt unberührt. Sie können jederzeit eine neue
+              Einladung an dieselbe Adresse senden.
+            </p>
+          </>
+        }
+      />
+    </>
   );
 }
+
+export default AdminInvitationsPage;

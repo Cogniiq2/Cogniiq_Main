@@ -1,14 +1,15 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import type { LucideIcon } from 'lucide-react';
+import { ArrowUpDown, ChevronRight, type LucideIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { formatCents } from '@/lib/clientPlatform/validation';
 import {
   border, control, elevation, focusRing, focusRingOnSurface, interactive,
-  radius, skeleton as skeletonClass, space, statusTone, surface, text,
+  radius, skeleton as skeletonClass, space, statusTone, surface, text, zIndex,
 } from './tokens';
 import { PremiumSelect, type SelectOption } from './PremiumSelect';
+import { WorkspaceHeader } from './workspace';
 
 // Shared dashboard primitives for the authenticated Cogniiq surfaces.
 //
@@ -18,19 +19,23 @@ import { PremiumSelect, type SelectOption } from './PremiumSelect';
 
 /* ------------------------------------------------------------------ Buttons */
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
+type ButtonVariant = 'primary' | 'accent' | 'secondary' | 'ghost' | 'danger' | 'success';
 type ButtonSize = 'sm' | 'md';
 
+// `press` rather than `transition`: a button answers pointer-down with a 1px sink
+// in the same frame, so the interface feels responsive before the request returns.
 const buttonBase = cn(
   'inline-flex items-center justify-center gap-1.5 font-medium whitespace-nowrap',
   radius.md,
-  interactive.transition,
+  interactive.press,
   interactive.disabled,
+  'disabled:active:translate-y-0',
   focusRing,
 );
 
 const buttonVariants: Record<ButtonVariant, string> = {
-  primary: 'bg-[var(--cq-fg)] text-white hover:bg-[#22272f]',
+  primary: 'bg-[var(--cq-fg)] text-white shadow-[var(--cq-elev-1)] hover:bg-[#22272f]',
+  accent: 'bg-[var(--cq-accent)] text-white shadow-[var(--cq-elev-1)] hover:bg-[var(--cq-accent-hover)]',
   secondary: cn('bg-[var(--cq-surface)] text-[var(--cq-fg)]', border.hairline, 'hover:bg-[var(--cq-hover)] hover:border-[var(--cq-border-strong)]'),
   ghost: 'text-[var(--cq-fg-muted)] hover:bg-[var(--cq-hover)] hover:text-[var(--cq-fg)]',
   danger: 'bg-red-600 text-white hover:bg-red-700',
@@ -61,11 +66,39 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       className={cn(buttonBase, buttonVariants[variant], buttonSizes[size], className)}
       {...rest}
     >
+      {/* The icon slot keeps its box while loading, so the button never changes
+          width mid-request and the row of actions does not reflow under the cursor. */}
       {loading ? <Spinner /> : Icon ? <Icon size={14} aria-hidden="true" /> : null}
       {children}
     </button>
   );
 });
+
+/**
+ * A navigation action that must look and feel exactly like a Button.
+ *
+ * Pages were hand-rolling `<Link className="inline-flex h-11 rounded-xl bg-gray-950 …">`
+ * for "Rechnungen verwalten"-style actions, which is how three different button
+ * heights ended up in the finance area. This renders a real link — middle-click and
+ * "open in new tab" keep working — with the shared recipe.
+ */
+export function LinkButton({
+  to, variant = 'secondary', size = 'md', icon: Icon, className, children,
+}: {
+  to: string;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  icon?: LucideIcon;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <Link to={to} className={cn(buttonBase, buttonVariants[variant], buttonSizes[size], className)}>
+      {Icon ? <Icon size={14} aria-hidden="true" /> : null}
+      {children}
+    </Link>
+  );
+}
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon: LucideIcon;
@@ -85,7 +118,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
       className={cn(
         // 36px square keeps icon-only actions inside the minimum touch target.
         'inline-flex h-9 w-9 items-center justify-center',
-        radius.md, interactive.transition, interactive.disabled, focusRing,
+        radius.md, interactive.press, interactive.disabled, 'disabled:active:translate-y-0', focusRing,
         variant === 'secondary'
           ? cn('bg-[var(--cq-surface)] text-[var(--cq-fg-muted)]', border.hairline, 'hover:text-[var(--cq-fg)] hover:border-[var(--cq-border-strong)]')
           : 'text-[var(--cq-fg-subtle)] hover:bg-[var(--cq-hover)] hover:text-[var(--cq-fg)]',
@@ -129,18 +162,22 @@ export function SectionHeader({ title, description, action, className }: { title
   );
 }
 
+/**
+ * The original page header, kept as the compatibility surface for the pages that have
+ * not been recomposed yet — it now renders through `WorkspaceHeader`, so every screen
+ * in the workspace shares one header structure, spacing and type scale rather than two.
+ *
+ * New pages should use `WorkspaceHeader` directly: it additionally carries an eyebrow,
+ * a breadcrumb trail, status badges, a meta line and a toolbar rail.
+ */
 export function PageHeader({ title, description, actions, breadcrumb }: { title: string; description?: string; actions?: ReactNode; breadcrumb?: ReactNode }) {
   return (
-    <div className="mb-5">
-      {breadcrumb ? <div className="mb-2">{breadcrumb}</div> : null}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0">
-          <h1 className={text.pageTitle}>{title}</h1>
-          {description ? <p className={cn('mt-1 max-w-2xl', text.body)}>{description}</p> : null}
-        </div>
-        {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
-      </div>
-    </div>
+    <WorkspaceHeader
+      title={title}
+      subtitle={description}
+      actions={actions}
+      leading={breadcrumb}
+    />
   );
 }
 
@@ -495,85 +532,238 @@ export interface Column<T> {
   render: (row: T) => ReactNode;
   /** hide this column on small screens (folded into the mobile card) */
   hideOnMobile?: boolean;
+  /**
+   * Comparable value for this column. Supplying it makes the header a sort
+   * control; omitting it leaves the column static. Sorting is client-side over
+   * the rows already handed in — a table never re-queries behind the caller's back.
+   */
+  sortValue?: (row: T) => string | number;
+  /** Suppresses the mobile card entry (actions, redundant identity). */
+  hideOnCard?: boolean;
+  /** Pinned to the right edge on wide screens — the row's actions. */
+  sticky?: boolean;
 }
 
+export type SortDirection = 'asc' | 'desc';
+
 /**
- * Responsive data table: a semantic <table> on md+ screens with controlled horizontal scroll, and a
- * stacked card list on small screens so rows never overflow unusably.
+ * Responsive data table: a semantic `<table>` on md+ screens with a sticky header
+ * and controlled horizontal scroll, and a stacked card list on small screens.
+ *
+ * Three things it does that the previous version did not:
+ *
+ *  * `rowHref` renders the first cell as a real link, so every destination is
+ *    reachable — and openable in a new tab — by keyboard. `onRowClick` still
+ *    works for pointer convenience, but it is no longer the only way in.
+ *  * Sortable headers are `<button>`s inside `<th aria-sort>`, so the current
+ *    sort is announced rather than only drawn.
+ *  * The header stays put while the body scrolls, which is what makes a long
+ *    invoice list readable at all.
  */
-export function DataTable<T>({ columns, rows, getRowKey, mobileTitle, mobileSubtitle, onRowClick, minWidth = 720 }: {
+export function DataTable<T>({
+  columns, rows, getRowKey, mobileTitle, mobileSubtitle, onRowClick, rowHref, minWidth = 720,
+  density = 'default', isRowActive, sort, onSortChange, maxBodyHeight,
+}: {
   columns: Column<T>[];
   rows: T[];
   getRowKey: (row: T) => string;
   mobileTitle: (row: T) => ReactNode;
   mobileSubtitle?: (row: T) => ReactNode;
   onRowClick?: (row: T) => void;
+  /** Destination for the row. Renders the first cell as a link — the keyboard path. */
+  rowHref?: (row: T) => string;
   minWidth?: number;
+  density?: 'default' | 'compact';
+  isRowActive?: (row: T) => boolean;
+  sort?: { key: string; direction: SortDirection } | null;
+  onSortChange?: (next: { key: string; direction: SortDirection }) => void;
+  /** Caps the scrolling body so a long table cannot push the page out of reach. */
+  maxBodyHeight?: number;
 }) {
-  const alignClass = (a?: 'left' | 'right' | 'center') => (a === 'right' ? 'text-right' : a === 'center' ? 'text-center' : 'text-left');
+  const alignClass = (a?: Column<T>['align']) =>
+    a === 'right' ? 'text-right' : a === 'center' ? 'text-center' : 'text-left';
+  const cellY = density === 'compact' ? 'py-1.5' : 'py-2.5';
+
+  // Sorting is applied here rather than in every page, but only when the caller
+  // asked for it by handing in a `sort` — otherwise row order is the caller's.
+  const sorted = (() => {
+    if (!sort) return rows;
+    const column = columns.find((c) => c.key === sort.key);
+    if (!column?.sortValue) return rows;
+    const factor = sort.direction === 'asc' ? 1 : -1;
+    return [...rows].sort((a, b) => {
+      const av = column.sortValue!(a);
+      const bv = column.sortValue!(b);
+      if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * factor;
+      return String(av).localeCompare(String(bv), 'de') * factor;
+    });
+  })();
+
+  const linkFor = (row: T) => (rowHref ? rowHref(row) : null);
+
   return (
-    <div className={cn(surface.card, 'p-0')}>
+    <div className={cn(surface.card, 'overflow-hidden p-0')}>
       {/* Desktop / tablet */}
-      <div className="hidden overflow-x-auto md:block">
+      <div
+        className="hidden overflow-auto md:block"
+        style={maxBodyHeight ? { maxHeight: maxBodyHeight } : undefined}
+      >
         <table className="w-full text-left" style={{ minWidth }}>
-          <thead>
+          <thead className={cn('sticky top-0 bg-[var(--cq-surface)]', zIndex.stickyHeader)}>
             <tr className={border.hairlineB}>
-              {columns.map((c) => (
-                <th
-                  key={c.key}
-                  scope="col"
-                  className={cn(space.cellX, 'py-2.5', text.eyebrow, alignClass(c.align))}
-                >
-                  {c.header}
-                </th>
-              ))}
+              {columns.map((c) => {
+                const sortable = Boolean(c.sortValue && onSortChange);
+                const active = sort?.key === c.key;
+                return (
+                  <th
+                    key={c.key}
+                    scope="col"
+                    aria-sort={active ? (sort!.direction === 'asc' ? 'ascending' : 'descending') : sortable ? 'none' : undefined}
+                    className={cn(
+                      space.cellX, 'bg-[var(--cq-surface)] py-2.5', text.eyebrow, alignClass(c.align),
+                      c.sticky && 'sticky right-0 bg-[var(--cq-surface)]',
+                    )}
+                  >
+                    {sortable ? (
+                      <button
+                        type="button"
+                        onClick={() => onSortChange!({
+                          key: c.key,
+                          direction: active && sort!.direction === 'asc' ? 'desc' : 'asc',
+                        })}
+                        className={cn(
+                          'inline-flex items-center gap-1 uppercase tracking-[0.04em]',
+                          radius.sm, interactive.transition, focusRingOnSurface,
+                          active ? 'text-[var(--cq-fg)]' : 'hover:text-[var(--cq-fg)]',
+                        )}
+                      >
+                        {c.header}
+                        <ArrowUpDown
+                          size={11}
+                          aria-hidden="true"
+                          className={cn('shrink-0', active ? 'opacity-90' : 'opacity-35')}
+                        />
+                      </button>
+                    ) : (
+                      c.header
+                    )}
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
-              <tr
-                key={getRowKey(row)}
-                onClick={onRowClick ? () => onRowClick(row) : undefined}
-                className={cn(
-                  'border-b border-[var(--cq-border-subtle)] last:border-0',
-                  onRowClick && cn('cursor-pointer', interactive.transition, interactive.hoverRow),
-                )}
-              >
-                {columns.map((c) => (
-                  <td
-                    key={c.key}
-                    className={cn(space.cellX, 'py-2.5 text-[13px] leading-5 text-[var(--cq-fg)]', alignClass(c.align), c.align === 'right' && text.numeric, c.className)}
-                  >
-                    {c.render(row)}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {sorted.map((row) => {
+              const href = linkFor(row);
+              const active = isRowActive?.(row) ?? false;
+              return (
+                <tr
+                  key={getRowKey(row)}
+                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  aria-current={active ? 'true' : undefined}
+                  className={cn(
+                    'group border-b border-[var(--cq-border-subtle)] last:border-0',
+                    active && 'bg-[var(--cq-accent-weak)]',
+                    (onRowClick || href) && cn('cursor-pointer', interactive.transition, !active && interactive.hoverRow),
+                  )}
+                >
+                  {columns.map((c, index) => (
+                    <td
+                      key={c.key}
+                      className={cn(
+                        space.cellX, cellY, 'text-[13px] leading-5 text-[var(--cq-fg)]',
+                        alignClass(c.align), c.align === 'right' && text.numeric,
+                        c.sticky && cn(
+                          'sticky right-0 bg-[var(--cq-surface)]',
+                          active ? 'bg-[var(--cq-accent-weak)]' : 'group-hover:bg-[var(--cq-hover)]',
+                        ),
+                        c.className,
+                      )}
+                    >
+                      {/* Only the first cell becomes the link: one focus stop per row,
+                          and the row's own action buttons stay independently reachable. */}
+                      {index === 0 && href ? (
+                        <Link
+                          to={href}
+                          onClick={(event) => event.stopPropagation()}
+                          className={cn('-mx-1 block rounded-[6px] px-1', focusRingOnSurface)}
+                        >
+                          {c.render(row)}
+                        </Link>
+                      ) : (
+                        c.render(row)
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
-      {/* Mobile */}
+
+      {/* Mobile: one card per row. Never a horizontally scrolling table.
+          The title is the link and the fields sit beside it rather than inside it —
+          wrapping the whole card in an anchor would swallow the row's own action
+          buttons and produce invalid nesting. */}
       <div className="divide-y divide-[var(--cq-border-subtle)] md:hidden">
-        {rows.map((row) => (
-          <div key={getRowKey(row)} onClick={onRowClick ? () => onRowClick(row) : undefined} className={cn('p-4', onRowClick && 'cursor-pointer')}>
-            <div className="mb-2 flex items-center justify-between gap-3">
+        {sorted.map((row) => {
+          const href = linkFor(row);
+          // The first column IS the card's title, so repeating it in the field list
+          // would print the customer's name twice on every phone-sized row.
+          const cardFields = columns.filter((c, index) => index > 0 && !c.hideOnMobile && !c.hideOnCard);
+          const actions = columns.filter((c) => c.hideOnCard);
+          const title = (
+            <div className="flex items-start justify-between gap-3">
               <div className={cn('min-w-0', text.bodyStrong)}>{mobileTitle(row)}</div>
+              {href || onRowClick ? (
+                <ChevronRight size={15} className="mt-0.5 shrink-0 text-[var(--cq-fg-subtle)]" aria-hidden="true" />
+              ) : null}
             </div>
-            {mobileSubtitle ? <div className={cn('mb-3', text.hint)}>{mobileSubtitle(row)}</div> : null}
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-2">
-              {columns.filter((c) => !c.hideOnMobile).map((c) => (
-                <div key={c.key} className="min-w-0">
-                  <dt className={text.eyebrow}>{c.header}</dt>
-                  <dd className={cn('mt-0.5 text-[13px] leading-5 text-[var(--cq-fg)]', c.align === 'right' && text.numeric)}>{c.render(row)}</dd>
+          );
+          return (
+            <div key={getRowKey(row)} className="px-4 py-4">
+              {href ? (
+                <Link to={href} className={cn('-m-1 block rounded-[8px] p-1', interactive.press, focusRingOnSurface)}>
+                  {title}
+                </Link>
+              ) : onRowClick ? (
+                <button
+                  type="button"
+                  onClick={() => onRowClick(row)}
+                  className={cn('-m-1 block w-full rounded-[8px] p-1 text-left', interactive.press, focusRingOnSurface)}
+                >
+                  {title}
+                </button>
+              ) : (
+                title
+              )}
+              {mobileSubtitle ? <div className={cn('mt-1.5', text.hint)}>{mobileSubtitle(row)}</div> : null}
+              {cardFields.length ? (
+                <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2">
+                  {cardFields.map((c) => (
+                    <div key={c.key} className="min-w-0">
+                      <dt className={text.eyebrow}>{c.header}</dt>
+                      <dd className={cn('mt-0.5 text-[13px] leading-5 text-[var(--cq-fg)]', c.align === 'right' && text.numeric)}>
+                        {c.render(row)}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              ) : null}
+              {actions.length ? (
+                <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                  {actions.map((c) => <div key={c.key}>{c.render(row)}</div>)}
                 </div>
-              ))}
-            </dl>
-          </div>
-        ))}
+              ) : null}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
+
 
 /* ------------------------------------------------------------------ Misc */
 

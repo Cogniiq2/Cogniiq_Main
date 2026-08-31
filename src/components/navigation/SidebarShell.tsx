@@ -287,14 +287,14 @@ function RailContent({
       <nav aria-label={navLabel} className="flex min-h-0 flex-1 flex-col">
         <RailScroller viewportClassName={cn('py-3', collapsed ? 'px-2.5' : 'px-3')}>
           {groups.map((group, groupIndex) => (
-            <div key={group.id} className={groupIndex > 0 ? 'mt-5' : undefined}>
+            <div key={group.id} className={groupIndex > 0 ? 'mt-3.5' : undefined}>
               {group.label ? (
                 collapsed ? (
                   // Collapsed rails trade the section label for a hairline rule: the grouping stays
                   // legible without a cramped, unreadable caption.
                   <div className="mx-auto mb-2 mt-1 h-px w-6 bg-gray-200" aria-hidden="true" />
                 ) : (
-                  <p className="mb-1.5 truncate px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400">
+                  <p className="mb-1 truncate px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400">
                     {group.label}
                   </p>
                 )
@@ -383,8 +383,9 @@ function NavRow({
       // A leaf destination defaults to 'page'; callers downgrade containing sections to 'true'.
       aria-current={item.active ? item.current ?? 'page' : undefined}
       className={cn(
-        // 44px touch targets below lg (the drawer); the denser 38px rail applies from lg up.
-        'group relative flex min-h-[44px] items-center rounded-lg text-[13.5px] font-medium outline-none lg:min-h-[38px] lg:text-[13px]',
+        // 44px touch targets below lg (the drawer); 36px from lg up, which is what keeps the
+        // grouped finance navigation on screen at 1440x900 without shrinking the type.
+        'group relative flex min-h-[44px] items-center rounded-lg text-[13.5px] font-medium outline-none lg:min-h-[36px] lg:text-[13px]',
         'transition-colors duration-150 ease-[cubic-bezier(0.22,1,0.36,1)]',
         'focus-visible:ring-2 focus-visible:ring-gray-950/25 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
         collapsed ? 'justify-center px-0' : 'gap-3 px-3',
