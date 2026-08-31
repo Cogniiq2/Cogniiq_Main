@@ -17,9 +17,10 @@ import { loadOffers } from '@/lib/ownerFinance/offersApi';
 import { loadCustomers } from '@/lib/ownerFinance/customersApi';
 import { loadRevenueContractOverview } from '@/lib/ownerFinance/financeExtendedApi';
 import {
-  buildAttention, buildRecent, buildUpcoming, monthlyCashSeries, receivableAging, summarisePipeline,
+  buildAttention, buildRecent, buildUpcoming, receivableAging, summarisePipeline,
   type AttentionItem, type RecentItem, type UpcomingItem,
 } from '@/lib/ownerFinance/commandCenter';
+import { monthlyPaymentFlows, summarisePaymentFlows } from '@/lib/ownerFinance/paymentFlows';
 import { formatCentsCurrencyDe, formatDateDe } from '@/lib/ownerFinance/exports';
 import { customerDisplayName } from '@/lib/ownerFinance/customerLabels';
 import type {
@@ -72,7 +73,9 @@ interface OwnerData {
   customers: Section<OwnerCustomerListRow[]>;
   expenses: Section<OwnerExpense[]>;
   subscriptions: Section<OwnerSubscription[]>;
-  payments: Section<{ id: string; payment_date: string | null; direction: string; amount_cents: number; invoice_id: string | null }[]>;
+  // `kind` is selected because `direction` alone cannot tell a customer payment from a
+  // private capital contribution, a tax refund or a transfer. See lib/ownerFinance/paymentFlows.ts.
+  payments: Section<{ id: string; payment_date: string | null; direction: string; kind: string; amount_cents: number; invoice_id: string | null }[]>;
   contracts: Section<{ mrr_net_cents: number; active_contract_count: number } | null>;
   tasks: Section<{ today: { id: string; title: string; due_date: string | null }[]; overdue: { id: string; title: string; due_date: string | null }[] }>;
 }
@@ -142,7 +145,7 @@ export function CommandCenterPage() {
         loadSubscriptions(entity.id),
         supabase
           .from('owner_payments')
-          .select('id, payment_date, direction, amount_cents, invoice_id')
+          .select('id, payment_date, direction, kind, amount_cents, invoice_id')
           .eq('business_entity_id', entity.id)
           .gte('payment_date', from).lte('payment_date', to)
           .then((res) => {
@@ -207,7 +210,8 @@ export function CommandCenterPage() {
   }, [data]);
 
   const pipeline = useMemo(() => summarisePipeline(data?.offers.data ?? []), [data]);
-  const cash = useMemo(() => monthlyCashSeries(data?.payments.data ?? []), [data]);
+  const cash = useMemo(() => monthlyPaymentFlows(data?.payments.data ?? []), [data]);
+  const flows = useMemo(() => summarisePaymentFlows(data?.payments.data ?? []), [data]);
   const aging = useMemo(() => receivableAging(data?.invoices.data ?? [], today), [data, today]);
 
   const summary = data?.summary.data ?? null;
@@ -217,13 +221,22 @@ export function CommandCenterPage() {
   const stats: StatItem[] = summary
     ? [
         {
+          // Deliberately NOT summary.cash_in_cents: that is every inflow, including
+          // private capital, tax refunds and transfers. This is kind = 'income' only.
           key: 'cash-in',
-          label: `Zahlungseingang ${year}`,
-          value: formatCentsCurrencyDe(summary.cash_in_cents),
-          hint: 'tatsächlich eingegangene Kundenzahlungen',
+          label: `Kundenzahlungen ${year}`,
+          value: formatCentsCurrencyDe(flows.collectionsCents),
+          hint: 'eingegangene Kundenzahlungen — ohne Privateinlagen, Steuererstattungen und Umbuchungen',
           lead: true,
           to: '/admin/finance/revenue',
-          visual: <Sparkline values={cash.net} tone={cash.net[cash.net.length - 1] >= 0 ? 'positive' : 'negative'} label="Kumulierter Netto-Cashflow" />,
+          visual: (
+            <Sparkline
+              values={cash.cumulativeNetLiquidity}
+              tone={cash.cumulativeNetLiquidity[cash.cumulativeNetLiquidity.length - 1] >= 0 ? 'positive' : 'negative'}
+              // The sparkline is the liquidity position, not the KPI above it, and says so.
+              label="Kumulierter Netto-Zahlungsfluss (alle Zahlungsarten)"
+            />
+          ),
         },
         {
           key: 'outstanding',
@@ -482,13 +495,17 @@ export function CommandCenterPage() {
                   items={recent.map((item) => ({
                     id: item.id,
                     tone: item.tone,
-                    title: (
+                    // An event without a record page stays plain text rather than
+                    // becoming a link to somewhere it cannot be found.
+                    title: item.to ? (
                       <Link
                         to={item.to}
                         className="rounded-[4px] font-medium text-[var(--cq-fg)] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cq-focus)]"
                       >
                         {item.title}
                       </Link>
+                    ) : (
+                      <span className="font-medium text-[var(--cq-fg)]">{item.title}</span>
                     ),
                     time: `${formatDateDe(item.date)} · ${item.meta}`,
                   }))}

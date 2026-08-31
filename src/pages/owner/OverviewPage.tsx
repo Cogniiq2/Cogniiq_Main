@@ -10,7 +10,7 @@ import {
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import { loadAssets, loadCategories, loadExpenses, loadInvoices, loadPeriodSummary, loadTaxPeriodInputs, loadTaxSettings } from '@/lib/ownerFinance/api';
 import { computeTaxSnapshot, type TaxSnapshot } from '@/lib/ownerFinance/taxSnapshot';
-import { monthlyCashSeries } from '@/lib/ownerFinance/commandCenter';
+import { monthlyPaymentFlows, summarisePaymentFlows, type PaymentFlowTotals } from '@/lib/ownerFinance/paymentFlows';
 import { supabase } from '@/lib/supabase';
 import { formatCents } from '@/lib/clientPlatform/validation';
 import type { OwnerExpense, OwnerExpenseCategory, OwnerInvoice, PeriodSummary } from '@/lib/ownerFinance/types';
@@ -20,9 +20,14 @@ import type { OwnerExpense, OwnerExpenseCategory, OwnerInvoice, PeriodSummary } 
  *
  * Redesigned around the one distinction that matters on this page and was previously
  * flattened into eight identical cards: money that actually moved, money that is owed,
- * and money that is only estimated. The summary band leads with collected cash; the
- * planning figures (tax reserve, available cash after reserve) sit in their own column
- * with the estimate basis stated on every one of them.
+ * and money that is only estimated. The summary band leads with customer collections;
+ * the planning figures sit in their own column with the estimate basis stated on each.
+ *
+ * A second distinction runs through every figure here: `owner_payments` is a cash ledger
+ * covering customer income, operating expenses, the owner's own capital, the tax account
+ * and transfers. `owner_finance_period_summary.cash_in_cents` / `cash_out_cents` are the
+ * totals over ALL of those, so they are labelled as liquidity, while the customer and
+ * operating figures are classified by `kind` in `lib/ownerFinance/paymentFlows.ts`.
  *
  * No accounting semantics changed. Every figure still comes from
  * owner_finance_period_summary and computeTaxSnapshot exactly as before — the tax
@@ -35,9 +40,12 @@ interface OverviewData {
   summary: PeriodSummary | null;
   snapshot: TaxSnapshot;
   setupComplete: boolean;
+  /** All inflows vs. all outflows per month — liquidity, not revenue and expenses. */
   trend: { month: string; in: number; out: number }[];
   cumulative: { month: string; net: number }[];
   netSeries: number[];
+  /** Classified cash figures from owner_payments.kind. See lib/ownerFinance/paymentFlows.ts. */
+  flows: PaymentFlowTotals;
   aging: { label: string; cents: number; tone: 'neutral' | 'warning' | 'danger' }[];
   categoryBreakdown: { label: string; cents: number }[];
 }
@@ -63,7 +71,7 @@ export function OverviewPage() {
         loadPeriodSummary(entity.id, from, to),
         loadTaxPeriodInputs(entity.id, from, to, timing),
         loadAssets(entity.id),
-        supabase.from('owner_payments').select('payment_date, direction, amount_cents').eq('business_entity_id', entity.id).gte('payment_date', from).lte('payment_date', to),
+        supabase.from('owner_payments').select('payment_date, direction, kind, amount_cents').eq('business_entity_id', entity.id).gte('payment_date', from).lte('payment_date', to),
         loadInvoices(entity.id),
         loadExpenses(entity.id),
         loadCategories(),
@@ -71,12 +79,14 @@ export function OverviewPage() {
 
       const snapshot = computeTaxSnapshot({ inputs: taxInputs, assets, settings, taxYear });
 
-      const rows = (payments.data ?? []) as { payment_date: string; direction: string; amount_cents: number }[];
-      const series = monthlyCashSeries(rows);
-      const trend = series.inflow.map((value, index) => ({
-        month: MONTHS[index], in: value / 100, out: series.outflow[index] / 100,
+      // `kind` is read so a private capital contribution, a tax refund or a transfer
+      // is never counted as a customer payment or an operating expense.
+      const rows = (payments.data ?? []) as { payment_date: string; direction: string; kind: string; amount_cents: number }[];
+      const series = monthlyPaymentFlows(rows);
+      const trend = series.liquidityIn.map((value, index) => ({
+        month: MONTHS[index], in: value / 100, out: series.liquidityOut[index] / 100,
       }));
-      const cumulative = series.net.map((value, index) => ({
+      const cumulative = series.cumulativeNetLiquidity.map((value, index) => ({
         month: MONTHS[index], net: Math.round(value) / 100,
       }));
 
@@ -86,7 +96,8 @@ export function OverviewPage() {
         setupComplete: settings?.setup_complete ?? false,
         trend,
         cumulative,
-        netSeries: series.net,
+        netSeries: series.cumulativeNetLiquidity,
+        flows: summarisePaymentFlows(rows),
         aging: buildAging(invoices),
         categoryBreakdown: buildCategoryBreakdown(expenses, categories),
       });
@@ -111,29 +122,51 @@ export function OverviewPage() {
 
   const s = data?.summary ?? null;
   const snap = data?.snapshot ?? null;
-  const cashProfit = s ? s.cash_in_cents - s.cash_out_cents : 0;
+  // cash_in_cents and cash_out_cents are ALL inflows and ALL outflows, over every kind.
+  // Their difference is the net movement of cash, not an operating result — the labels
+  // below say so, and the operating figures come from the classified totals instead.
+  const netLiquidity = s ? s.cash_in_cents - s.cash_out_cents : 0;
+  const flows = data?.flows ?? null;
   const totalReserve = snap?.reserve.totalReserveCents ?? 0;
-  const availableAfterReserve = cashProfit - totalReserve;
+  const netLiquidityAfterReserve = netLiquidity - totalReserve;
   const hasTrend = (data?.trend ?? []).some((t) => t.in > 0 || t.out > 0);
   const agingTotal = (data?.aging ?? []).reduce((sum, a) => sum + a.cents, 0);
 
-  const stats: StatItem[] = s && snap
+  const stats: StatItem[] = s && snap && flows
     ? [
         {
+          // kind = 'income' only. Not s.cash_in_cents, which also carries private
+          // capital, tax refunds and transfers.
           key: 'cash-in',
-          label: `Zahlungseingang ${taxYear}`,
-          value: formatCents(s.cash_in_cents),
-          hint: 'tatsächlich eingegangene Kundenzahlungen',
+          label: `Kundenzahlungen ${taxYear}`,
+          value: formatCents(flows.collectionsCents),
+          hint: 'eingegangene Kundenzahlungen — ohne Privateinlagen, Steuererstattungen und Umbuchungen',
           lead: true,
-          visual: <Sparkline values={data!.netSeries} tone={cashProfit >= 0 ? 'positive' : 'negative'} label="Kumulierter Netto-Cashflow" />,
+          visual: (
+            <Sparkline
+              values={data!.netSeries}
+              tone={netLiquidity >= 0 ? 'positive' : 'negative'}
+              label="Kumulierter Netto-Zahlungsfluss (alle Zahlungsarten)"
+            />
+          ),
         },
-        { key: 'cash-out', label: 'Bezahlte Ausgaben', value: formatCents(s.cash_out_cents), hint: 'tatsächlich abgeflossen' },
         {
-          key: 'cash-profit',
-          label: 'Cash-Betriebsergebnis',
-          value: formatCents(cashProfit),
-          hint: 'Eingang abzüglich bezahlter Ausgaben',
-          tone: cashProfit >= 0 ? 'positive' : 'negative',
+          // kind = 'expense' only. Not s.cash_out_cents, which also carries private
+          // withdrawals, tax payments and transfers.
+          key: 'cash-out',
+          label: 'Bezahlte Betriebsausgaben',
+          value: formatCents(flows.operatingExpensePaymentsCents),
+          hint: 'ohne Privatentnahmen, Steuerzahlungen und Umbuchungen',
+        },
+        {
+          // Two liquidity totals subtracted from each other. Naming this an operating
+          // result would count private capital and the tax account as business
+          // performance, which it is not.
+          key: 'net-liquidity',
+          label: 'Netto-Zahlungsfluss',
+          value: formatCents(netLiquidity),
+          hint: 'alle Zuflüsse abzüglich aller Abflüsse — kein Betriebsergebnis',
+          tone: netLiquidity >= 0 ? 'positive' : 'negative',
         },
         {
           key: 'outstanding',
@@ -159,7 +192,7 @@ export function OverviewPage() {
       <WorkspaceHeader
         eyebrow="Finanzen"
         title={`Übersicht ${taxYear}`}
-        subtitle="Reale, gebuchte Werte für Ihre Einnahmenüberschussrechnung. Steuerwerte sind gekennzeichnete Planungsschätzungen; es werden keine Beispieldaten angezeigt."
+        subtitle="Gebuchte Zahlungsflüsse und offene Forderungen. Kundenzahlungen und Betriebsausgaben sind nach Zahlungsart abgegrenzt; Steuerwerte sind gekennzeichnete Planungsschätzungen."
         actions={
           <div className="w-48">
             <Select id="period" value={period} onChange={() => {}} options={[{ value: 'ytd', label: `Geschäftsjahr ${taxYear}` }]} />
@@ -193,9 +226,14 @@ export function OverviewPage() {
           <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
             {/* ------------------------------------------------------- what happened */}
             <div className="space-y-4">
+              {/*
+                Every inflow against every outflow, over all payment kinds — so this is
+                liquidity, not revenue against expenses. Owner contributions, tax payments
+                and transfers are part of these bars, which is why the title names them.
+              */}
               <Panel
-                title={`Einnahmen & Ausgaben ${taxYear}`}
-                description="Gebuchte Zahlungen pro Monat — keine Forderungen, keine Planwerte"
+                title={`Liquiditätszuflüsse & -abflüsse ${taxYear}`}
+                description="Alle gebuchten Zahlungen pro Monat, unabhängig von der Zahlungsart — keine Forderungen, keine Planwerte"
                 icon={Wallet}
               >
                 {hasTrend ? (
@@ -205,7 +243,7 @@ export function OverviewPage() {
                         <CartesianGrid strokeDasharray="3 3" stroke="#f1f1ee" vertical={false} />
                         <XAxis dataKey="month" stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} />
                         <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} axisLine={false} width={52} tickFormatter={(v: number) => `${Math.round(v / 1000)}k`} />
-                        <Tooltip contentStyle={tooltipStyle} formatter={(v: number, name) => [chartMoney(v), name === 'in' ? 'Eingang' : 'Ausgang']} labelStyle={{ color: '#111827', fontWeight: 600 }} />
+                        <Tooltip contentStyle={tooltipStyle} formatter={(v: number, name) => [chartMoney(v), name === 'in' ? 'Zuflüsse gesamt' : 'Abflüsse gesamt']} labelStyle={{ color: '#111827', fontWeight: 600 }} />
                         <Bar dataKey="in" name="in" fill="#059669" radius={[3, 3, 0, 0]} />
                         <Bar dataKey="out" name="out" fill="#d1d5db" radius={[3, 3, 0, 0]} />
                       </BarChart>
@@ -214,7 +252,7 @@ export function OverviewPage() {
                 ) : <ChartEmpty />}
               </Panel>
 
-              <Panel title="Liquiditätsverlauf" description="Kumulierter Netto-Cashflow aus gebuchten Zahlungen">
+              <Panel title="Liquiditätsverlauf" description="Kumulierter Netto-Zahlungsfluss aus allen gebuchten Zahlungen">
                 {hasTrend ? (
                   <div className="h-56">
                     <ResponsiveContainer width="100%" height="100%">
@@ -277,13 +315,14 @@ export function OverviewPage() {
                 surface rather than the last row of a card grid — and its own sentence
                 saying what it is not: a bank balance.
               */}
-              <Panel title="Verfügbares Cash nach Rücklagen" tone="attention">
-                <p className={`text-[27px] font-semibold leading-8 tracking-[-0.028em] tabular-nums ${availableAfterReserve >= 0 ? 'text-[var(--cq-fg)]' : 'text-red-600'}`}>
-                  {formatCents(availableAfterReserve)}
+              <Panel title="Netto-Zahlungsfluss nach Rücklagenziel (Planung)" tone="attention">
+                <p className={`text-[27px] font-semibold leading-8 tracking-[-0.028em] tabular-nums ${netLiquidityAfterReserve >= 0 ? 'text-[var(--cq-fg)]' : 'text-red-600'}`}>
+                  {formatCents(netLiquidityAfterReserve)}
                 </p>
                 <p className="mt-2 text-[12.5px] leading-5 text-[var(--cq-fg-muted)]">
-                  Operatives Cash ({formatCents(cashProfit)}) abzüglich empfohlener Steuerrücklage ({formatCents(totalReserve)}).
-                  Kein Bankkontostand — nur gebuchte Zahlungsflüsse.
+                  Netto-Zahlungsfluss {taxYear} ({formatCents(netLiquidity)}) abzüglich empfohlener Steuerrücklage ({formatCents(totalReserve)}).
+                  Kein Kontostand und kein verfügbares Guthaben: Anfangsbestände, Konten und
+                  Zahlungen außerhalb dieses Zeitraums sind nicht enthalten.
                 </p>
               </Panel>
 
@@ -314,7 +353,8 @@ export function OverviewPage() {
                     to="/admin/finance/expenses"
                     tone={s.review_expense_count > 0 ? 'attention' : 'neutral'}
                     title="Ausgaben zur Prüfung"
-                    meta={s.review_expense_count > 0 ? 'Belege oder Zuordnung fehlen' : 'alles geprüft'}
+                    // review_status = 'pending' says only that the row is unreviewed.
+                    meta={s.review_expense_count > 0 ? 'noch nicht geprüft' : 'alles geprüft'}
                     badge={<StatusBadge label={String(s.review_expense_count)} tone={s.review_expense_count ? 'warning' : 'success'} />}
                   />
                   <ListRow

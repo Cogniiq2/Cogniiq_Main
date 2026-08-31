@@ -9,6 +9,7 @@ import {
   type Column, type SortDirection, type StatItem,
 } from '@/components/dashboard';
 import { invoiceStatusTone } from '@/pages/owner/ownerUi';
+import { useCreateIntent } from '@/pages/admin/routeIntent';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import {
   createOwnerInvoice, deleteDraftInvoice, issueOwnerInvoice, loadInvoices, recordHistoricalPaidInvoice,
@@ -81,6 +82,9 @@ export function InvoicesPage() {
   const [tableSort, setTableSort] = useState<{ key: string; direction: SortDirection } | null>(null);
   const [composerOpen, setComposerOpen] = useState(false);
   const [historicalOpen, setHistoricalOpen] = useState(false);
+  // ⌘K's create action navigates here with ?create=1; this opens the dialog this page
+  // already owns. Without the intent nothing opens — the plain list URL stays a list.
+  useCreateIntent(() => setComposerOpen(true));
   const [payFor, setPayFor] = useState<OwnerInvoice | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<OwnerInvoice | null>(null);
   const [confirmVoid, setConfirmVoid] = useState<OwnerInvoice | null>(null);

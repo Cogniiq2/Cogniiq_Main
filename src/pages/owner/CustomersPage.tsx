@@ -7,6 +7,7 @@ import {
   SearchInput, Select, StatBand, StatBandSkeleton, StatusBadge, TableSkeleton, Toolbar,
   WorkspaceHeader, useToast, type Column, type SortDirection, type StatItem,
 } from '@/components/dashboard';
+import { useCreateIntent } from '@/pages/admin/routeIntent';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import {
   loadCustomers, loadDeleteBlockers, archiveCustomer, unarchiveCustomer, deleteCustomer,
@@ -72,6 +73,9 @@ export function CustomersPage() {
   const [sort, setSort] = useState<SortKey>('activity');
   const [tableSort, setTableSort] = useState<{ key: string; direction: SortDirection } | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
+  // ⌘K's create action navigates here with ?create=1; this opens the dialog this page
+  // already owns. Without the intent nothing opens — the plain list URL stays a list.
+  useCreateIntent(() => setCreateOpen(true));
   /* Row actions. Blockers are fetched when the dialog opens so the confirmation
      can name what stands in the way instead of only refusing on submit. */
   const [pendingDelete, setPendingDelete] = useState<{ row: OwnerCustomerListRow; blockers: OwnerCustomerDeleteBlockers | null } | null>(null);

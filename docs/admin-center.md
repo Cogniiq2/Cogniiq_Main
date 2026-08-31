@@ -96,12 +96,47 @@ before. Every figure the redesign added is a sum over rows an existing read alre
 returned, and the ones that could be confused are labelled apart:
 
 - *fakturiert* — gross of issued, non-cancelled invoices
-- *tatsächlich bezahlt / eingegangen* — recorded payments; the only figure meaning the
-  customer paid
+- *Kundenzahlungen* — `owner_payments` rows with `direction = 'inflow'` **and**
+  `kind = 'income'`; the only figure meaning a customer paid
 - *offen* — gross minus paid on genuinely open invoices, defined once in
   `lib/ownerFinance/commandCenter.ts` and shared, so two pages cannot disagree
 - *Angebote in Prüfung / erwartet / vertraglich* — pipeline and contract values, which
   never enter a cash, EÜR or VAT figure
+
+### The payment firewall
+
+`owner_payments` is a **cash-transaction ledger**, not a revenue ledger. Each row carries
+two independent axes, both enforced by the database: `direction` (inflow/outflow) and
+`kind` (`income`, `expense`, `owner_contribution`, `owner_withdrawal`, `tax_payment`,
+`tax_refund`, `transfer`).
+
+This matters because `owner_finance_period_summary` returns `cash_in_cents` as the sum of
+*every* inflow and `cash_out_cents` as the sum of *every* outflow. Neither is customer
+revenue and neither is a paid business expense — a private capital contribution, a tax
+refund and a transfer between the owner's own accounts all sit inside `cash_in_cents`.
+
+`src/lib/ownerFinance/paymentFlows.ts` is the one place that decides which rows mean
+what, so no two surfaces can disagree:
+
+| Figure | Definition | Label used |
+| --- | --- | --- |
+| Customer collections | `direction='inflow' AND kind='income'` | „Kundenzahlungen {Jahr}" |
+| Paid operating expenses | `direction='outflow' AND kind='expense'` | „Bezahlte Betriebsausgaben" |
+| Total liquidity inflows | every inflow, all kinds | „Liquiditätszuflüsse" |
+| Total liquidity outflows | every outflow, all kinds | „Liquiditätsabflüsse" |
+| Net liquidity flow | inflows − outflows | „Netto-Zahlungsfluss" — never an operating result |
+
+Consequences visible in the product: the Command Center's lead KPI is collections, not
+`cash_in_cents`; the overview's monthly bars are named as liquidity because they include
+every kind; the reserve panel is „Netto-Zahlungsfluss nach Rücklagenziel (Planung)"
+rather than an available balance, because opening balances and out-of-period payments are
+not in it; and the „Zuletzt passiert" feed presents only `kind='income'` inflows as a
+payment, links one to its invoice only when the row carries `invoice_id`, and never
+routes a contribution, refund or transfer to an invoice surface.
+
+`paymentFlows.test.ts` holds the regression suite. Its fixture carries one row of every
+kind, in both directions where the trigger permits, and was mutation-tested: relaxing
+`isBusinessCollection` to direction alone fails 9 of its 20 assertions.
 
 One presentational change worth naming: the invoice list's "Offene Forderungen" total now
 clamps a legacy overpaid invoice at zero instead of contributing a negative. The column
@@ -146,6 +181,16 @@ destinations (derived from the navigation model, owner-filtered), actions that a
 routes, and customers from a real `owner_list_customers` read that runs once on first
 open. There is no global server search, so the palette never implies one — if the
 customer read fails (a non-owner), the empty state names only what it actually searched.
+
+**Create actions really create.** „Neuen Kunden anlegen", „Neue Rechnung" and „Ausgabe
+erfassen" navigate to the surface that owns the form with the `?create=1` route intent
+from `src/pages/admin/routeIntent.ts`; that page's `useCreateIntent` opens the dialog it
+already has and removes the parameter with a history replacement, so a refresh does not
+reopen it, Back leaves the page, and the plain list URL opens nothing. The palette never
+renders a second form and never writes — there is one create path per record type.
+„Neues Angebot" needs no intent: `/admin/finance/offers/new` is a real route.
+`createIntent.test.tsx` mounts each real destination at the URL the command produces and
+requires that page's own composer to be on screen.
 
 ## Running the QA
 

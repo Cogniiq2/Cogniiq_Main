@@ -1,3 +1,4 @@
+import { isBusinessCollection } from '@/lib/ownerFinance/paymentFlows';
 import type {
   OwnerCustomerListRow, OwnerExpense, OwnerInvoice, OwnerOffer, OwnerSubscription,
 } from '@/lib/ownerFinance/types';
@@ -178,7 +179,9 @@ export function buildAttention(input: AttentionInput, today: string): AttentionI
       kind: 'expense_review',
       tone: 'neutral',
       title: `${plural(pendingExpenses.length, 'Ausgabe', 'Ausgaben')} zur Prüfung`,
-      meta: 'Belege oder Zuordnung fehlen noch',
+      // `review_status = 'pending'` says only that nobody has reviewed the row yet. It
+      // does not state that a receipt or an assignment is missing, so neither does this.
+      meta: 'Noch nicht geprüft',
       to: '/admin/finance/expenses',
       rank: 2300,
     });
@@ -280,34 +283,50 @@ export interface RecentItem {
   date: string;
   title: string;
   meta: string;
-  to: string;
+  /**
+   * Where the event can actually be inspected. Absent when the ledger row has no record
+   * page of its own — an unlinked payment is shown, but not sent to a list it is not in.
+   */
+  to?: string;
   tone: 'positive' | 'neutral' | 'attention';
 }
 
 /**
  * What actually happened, newest first. Payments received, invoices issued, offers
  * accepted — the events that moved the business, not a change log of every field.
+ *
+ * Only `kind = 'income'` inflows appear as a payment. The other inflow kinds — a private
+ * capital contribution, a tax refund, a transfer between the owner's own accounts — are
+ * real cash movements but not business events, and showing them here as
+ * "Zahlungseingang" (let alone linking them to the invoice list) would claim a customer
+ * paid when none did. They are left out; the liquidity figures on the finance overview
+ * are where they belong.
  */
 export function buildRecent(
   input: {
     invoices: OwnerInvoice[];
     offers: OwnerOffer[];
-    payments: { id: string; payment_date: string | null; direction: string; amount_cents: number; invoice_id: string | null }[];
+    payments: { id: string; payment_date: string | null; direction: string; kind: string; amount_cents: number; invoice_id: string | null }[];
   },
   limit = 8,
 ): RecentItem[] {
   const items: RecentItem[] = [];
 
   for (const payment of input.payments) {
-    if (!payment.payment_date || payment.direction !== 'inflow') continue;
+    if (!payment.payment_date) continue;
+    if (!isBusinessCollection(payment)) continue;
+    const invoice = payment.invoice_id
+      ? input.invoices.find((i) => i.id === payment.invoice_id)
+      : undefined;
     items.push({
       id: `pay-${payment.id}`,
       date: payment.payment_date,
       title: 'Zahlungseingang verbucht',
-      meta: payment.invoice_id
-        ? (input.invoices.find((i) => i.id === payment.invoice_id)?.invoice_number ?? 'Rechnung')
-        : 'Ohne Rechnungsbezug',
-      to: payment.invoice_id ? `/admin/finance/invoices/${payment.invoice_id}` : '/admin/finance/invoices',
+      meta: payment.invoice_id ? (invoice?.invoice_number ?? 'Rechnung') : 'Ohne Rechnungsbezug',
+      // Only an invoice-linked payment has a destination. Without a link there is no
+      // payments workspace to open, so the entry stays a statement rather than becoming
+      // a link into a list the payment does not appear in.
+      to: payment.invoice_id ? `/admin/finance/invoices/${payment.invoice_id}` : undefined,
       tone: 'positive',
     });
   }
@@ -378,26 +397,9 @@ export function summarisePipeline(offers: OwnerOffer[]): PipelineSummary {
   };
 }
 
-/** Monthly cash in/out from booked payments — the series behind the pulse sparkline. */
-export function monthlyCashSeries(
-  payments: { payment_date: string | null; direction: string; amount_cents: number }[],
-): { inflow: number[]; outflow: number[]; net: number[] } {
-  const inflow = Array.from({ length: 12 }, () => 0);
-  const outflow = Array.from({ length: 12 }, () => 0);
-  for (const payment of payments) {
-    if (!payment.payment_date) continue;
-    const index = Number(payment.payment_date.slice(5, 7)) - 1;
-    if (index < 0 || index > 11) continue;
-    if (payment.direction === 'inflow') inflow[index] += payment.amount_cents;
-    else outflow[index] += payment.amount_cents;
-  }
-  let running = 0;
-  const net = inflow.map((value, index) => {
-    running += value - outflow[index];
-    return running;
-  });
-  return { inflow, outflow, net };
-}
+// The monthly cash series moved to `paymentFlows.ts` as `monthlyPaymentFlows`, which
+// separates customer collections from total liquidity instead of returning one pair of
+// series that two pages then labelled differently.
 
 /** Open receivables split by how late they are. Same buckets the overview aging uses. */
 export function receivableAging(invoices: OwnerInvoice[], today: string): {

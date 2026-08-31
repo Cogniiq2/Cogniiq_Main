@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  buildAttention, buildRecent, buildUpcoming, daysBetween, monthlyCashSeries, openAmountCents,
+  buildAttention, buildRecent, buildUpcoming, daysBetween, openAmountCents,
   receivableAging, summarisePipeline,
 } from '@/lib/ownerFinance/commandCenter';
 import type { OwnerCustomerListRow, OwnerExpense, OwnerInvoice, OwnerOffer, OwnerSubscription } from '@/lib/ownerFinance/types';
@@ -245,8 +245,8 @@ describe('buildRecent', () => {
       invoices: [],
       offers: [offer({ id: 'o', offer_number: 'AN-1', accepted_at: '2026-08-10T00:00:00Z' })],
       payments: [
-        { id: 'p1', payment_date: '2026-08-20', direction: 'inflow', amount_cents: 1000, invoice_id: null },
-        { id: 'p2', payment_date: '2026-08-25', direction: 'outflow', amount_cents: 500, invoice_id: null },
+        { id: 'p1', payment_date: '2026-08-20', direction: 'inflow', kind: 'income', amount_cents: 1000, invoice_id: null },
+        { id: 'p2', payment_date: '2026-08-25', direction: 'outflow', kind: 'expense', amount_cents: 500, invoice_id: null },
       ],
     });
     expect(items.map((i) => i.date)).toEqual(['2026-08-20', '2026-08-10']);
@@ -265,19 +265,6 @@ describe('summarisePipeline', () => {
     expect(summary.openCount).toBe(2);
     expect(summary.openOneTimeGrossCents).toBe(150000);
     expect(summary.openRecurringMonthlyGrossCents).toBe(5000);
-  });
-});
-
-describe('monthlyCashSeries', () => {
-  it('accumulates net cash across the year and separates direction', () => {
-    const series = monthlyCashSeries([
-      { payment_date: '2026-01-15', direction: 'inflow', amount_cents: 1000 },
-      { payment_date: '2026-02-15', direction: 'outflow', amount_cents: 400 },
-      { payment_date: '2026-03-15', direction: 'inflow', amount_cents: 200 },
-    ]);
-    expect(series.inflow[0]).toBe(1000);
-    expect(series.outflow[1]).toBe(400);
-    expect(series.net.slice(0, 4)).toEqual([1000, 600, 800, 800]);
   });
 });
 

@@ -315,16 +315,26 @@ const OFFERS = [
 
 /* ---------------------------------------------------------------- payments */
 
+// Every `kind` the check constraint permits appears here, in both directions where the
+// trigger allows it. The finance surfaces must show customer collections and paid
+// operating expenses apart from private capital, the tax account and transfers, and a
+// fixture that only contained income and expense rows could not reveal a mislabel.
 const PAYMENTS = [
-  { id: 'p1', payment_date: iso(4, 21), direction: 'inflow', amount_cents: 535500, invoice_id: 'i6' },
-  { id: 'p2', payment_date: iso(5, 18), direction: 'inflow', amount_cents: 380800, invoice_id: 'i7' },
-  { id: 'p3', payment_date: iso(6, 9), direction: 'inflow', amount_cents: 208250, invoice_id: 'i8' },
-  { id: 'p4', payment_date: iso(8, 12), direction: 'inflow', amount_cents: 190000, invoice_id: 'i3' },
-  { id: 'p5', payment_date: iso(4, 4), direction: 'outflow', amount_cents: 71400, invoice_id: null },
-  { id: 'p6', payment_date: iso(5, 5), direction: 'outflow', amount_cents: 64260, invoice_id: null },
-  { id: 'p7', payment_date: iso(6, 5), direction: 'outflow', amount_cents: 83300, invoice_id: null },
-  { id: 'p8', payment_date: iso(7, 5), direction: 'outflow', amount_cents: 59500, invoice_id: null },
-  { id: 'p9', payment_date: iso(8, 5), direction: 'outflow', amount_cents: 76160, invoice_id: null },
+  { id: 'p1', payment_date: iso(4, 21), direction: 'inflow', kind: 'income', amount_cents: 535500, invoice_id: 'i6' },
+  { id: 'p2', payment_date: iso(5, 18), direction: 'inflow', kind: 'income', amount_cents: 380800, invoice_id: 'i7' },
+  { id: 'p3', payment_date: iso(6, 9), direction: 'inflow', kind: 'income', amount_cents: 208250, invoice_id: 'i8' },
+  { id: 'p4', payment_date: iso(8, 12), direction: 'inflow', kind: 'income', amount_cents: 190000, invoice_id: 'i3' },
+  { id: 'p5', payment_date: iso(4, 4), direction: 'outflow', kind: 'expense', amount_cents: 71400, invoice_id: null },
+  { id: 'p6', payment_date: iso(5, 5), direction: 'outflow', kind: 'expense', amount_cents: 64260, invoice_id: null },
+  { id: 'p7', payment_date: iso(6, 5), direction: 'outflow', kind: 'expense', amount_cents: 83300, invoice_id: null },
+  { id: 'p8', payment_date: iso(7, 5), direction: 'outflow', kind: 'expense', amount_cents: 59500, invoice_id: null },
+  { id: 'p9', payment_date: iso(8, 5), direction: 'outflow', kind: 'expense', amount_cents: 76160, invoice_id: null },
+  { id: 'p10', payment_date: iso(3, 2), direction: 'inflow', kind: 'owner_contribution', amount_cents: 750000, invoice_id: null },
+  { id: 'p11', payment_date: iso(7, 28), direction: 'outflow', kind: 'owner_withdrawal', amount_cents: 250000, invoice_id: null },
+  { id: 'p12', payment_date: iso(6, 20), direction: 'outflow', kind: 'tax_payment', amount_cents: 118000, invoice_id: null },
+  { id: 'p13', payment_date: iso(2, 14), direction: 'inflow', kind: 'tax_refund', amount_cents: 42000, invoice_id: null },
+  { id: 'p14', payment_date: iso(8, 1), direction: 'inflow', kind: 'transfer', amount_cents: 100000, invoice_id: null },
+  { id: 'p15', payment_date: iso(8, 1), direction: 'outflow', kind: 'transfer', amount_cents: 100000, invoice_id: null },
 ];
 
 /* ---------------------------------------------------------------- expenses */
@@ -412,8 +422,12 @@ const PERIOD_SUMMARY = {
   outstanding_cents: 1074430,
   overdue_cents: 508130,
   overdue_count: 2,
-  cash_in_cents: 1314550,
-  cash_out_cents: 354620,
+  // The RPC sums ALL inflows and ALL outflows regardless of kind, so these match the
+  // whole PAYMENTS ledger above — income 1.314.550 plus 750.000 owner contribution,
+  // 42.000 tax refund and a 100.000 transfer; expenses 354.620 plus 250.000 withdrawal,
+  // 118.000 tax payment and the other side of that transfer.
+  cash_in_cents: 2206550,
+  cash_out_cents: 822620,
   expense_net_cents: 240400,
   expense_gross_cents: 286076,
   expense_input_vat_cents: 45676,

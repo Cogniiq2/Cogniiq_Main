@@ -8,6 +8,7 @@ import {
   type Column, type SortDirection, type StatItem,
 } from '@/components/dashboard';
 import { expenseReviewTone, paymentStatusTone } from '@/pages/owner/ownerUi';
+import { useCreateIntent } from '@/pages/admin/routeIntent';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import {
   createOwnerExpense, deleteDraftExpense, loadCategories, loadExpenses, loadVendors,
@@ -61,6 +62,9 @@ export function ExpensesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [composerOpen, setComposerOpen] = useState(false);
+  // ⌘K's create action navigates here with ?create=1; this opens the dialog this page
+  // already owns. Without the intent nothing opens — the plain list URL stays a list.
+  useCreateIntent(() => setComposerOpen(true));
   const [payFor, setPayFor] = useState<OwnerExpense | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<OwnerExpense | null>(null);
   const [filter, setFilter] = useState('all');
