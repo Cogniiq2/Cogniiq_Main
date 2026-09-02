@@ -111,3 +111,40 @@ PSQL -d fin -q -f "$MIG/20260904120000_owner_expense_bulk_import.sql" >/dev/null
 PSQL -d fin -f "$SQLDIR/expense-bulk-import-tests.sql" >/dev/null
 PSQL -d fin -f "$SQLDIR/finance-multipay-tests.sql" >/dev/null
 echo "migration convergence: 20260904120000 re-applied cleanly and all suites still pass"
+
+# ---------------------------------------------------------------------------
+# MIGRATION SAFETY on hostile HISTORICAL data.
+#
+# The supplier-document uniqueness guard cannot be created over a table that already
+# contains two expenses for one supplier document. The required behaviour is to STOP and
+# name the exact conflict -- never to merge, delete, archive or renumber an accounting
+# record to make the constraint fit. This scenario manufactures that history (with the index
+# dropped, which is the only way such rows can exist) and asserts both halves: the migration
+# fails, and the two conflicting rows are still there, byte for byte.
+# ---------------------------------------------------------------------------
+PSQL -d fin -q <<'SQL' >/dev/null
+drop index if exists public.owner_expenses_supplier_document_uniq;
+insert into public.owner_expenses (business_entity_id, vendor_id, category_id,
+  supplier_invoice_number, invoice_date, currency, notes)
+select (select id from public.owner_business_entities where slug = 'cogniiq'),
+       (select id from public.owner_vendors order by name limit 1),
+       (select id from public.owner_expense_categories where key = 'ai_api'),
+       n.number, date '2026-06-01', 'EUR', 'historical-conflict-probe'
+  from (values ('HIST-CONFLICT-1'), ('  hist-conflict-1  ')) as n(number);
+SQL
+
+CONFLICT_LOG="$WORKBASE/preflight.log"
+if PSQL -d fin -f "$MIG/20260904120000_owner_expense_bulk_import.sql" >"$CONFLICT_LOG" 2>&1; then
+  echo "FAIL: the migration applied over pre-existing duplicate supplier documents"; exit 1
+fi
+grep -q 'duplicate supplier documents' "$CONFLICT_LOG"   || { echo "FAIL: the migration did not name the conflict"; cat "$CONFLICT_LOG"; exit 1; }
+grep -q 'HIST-CONFLICT-1\|hist-conflict-1' "$CONFLICT_LOG"   || { echo "FAIL: the migration did not report the EXACT conflicting document"; cat "$CONFLICT_LOG"; exit 1; }
+
+SURVIVORS=$(PSQL -d fin -At -c   "select count(*) from public.owner_expenses where notes = 'historical-conflict-probe';")
+[ "$SURVIVORS" = "2" ]   || { echo "FAIL: the migration MODIFIED accounting records (expected 2 rows, found $SURVIVORS)"; exit 1; }
+echo "migration safety: pre-existing duplicates ABORT the migration and are left untouched"
+
+# And once a human has resolved the conflict, the same migration applies cleanly.
+PSQL -d fin -q -c   "delete from public.owner_expenses where notes = 'historical-conflict-probe' and supplier_invoice_number <> 'HIST-CONFLICT-1';" >/dev/null
+PSQL -d fin -q -f "$MIG/20260904120000_owner_expense_bulk_import.sql" >/dev/null
+echo "migration safety: after the conflict is resolved by hand, the migration applies cleanly"

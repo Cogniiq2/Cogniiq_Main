@@ -20,8 +20,11 @@
 -- WHAT THIS MIGRATION ADDS
 -- ------------------------
 --   * owner_resolve_import_vendors  — preview-time, deterministic, NEVER fuzzy.
+--   * owner_check_expense_documents — preview-time duplicate probe, read-only.
 --   * owner_bulk_import_expenses    — one call, one transaction, all-or-nothing.
 --   * `expense` as an import record type, so the cross-batch duplicate guard covers it.
+--   * a UNIQUE supplier-document identity on owner_expenses, so one supplier invoice can
+--     never be booked (and its Vorsteuer claimed) twice — see section 1b.
 --   * a guard on owner_bulk_import_finance so an expense payload sent to the REVENUE
 --     importer is refused rather than silently dropped.
 --
@@ -65,6 +68,97 @@ alter table public.owner_finance_import_records
 
 create index if not exists owner_finance_import_records_expense_idx
   on public.owner_finance_import_records (expense_id);
+
+commit;
+
+-- ---------------------------------------------------------------------------
+-- 1b. THE SUPPLIER-DOCUMENT IDENTITY — the accounting safety net.
+--
+-- WHY THIS EXISTS
+-- ---------------
+-- The cross-batch guard in owner_finance_import_records is keyed on
+-- (business_entity_id, record_type, client_import_id). client_import_id is a label the
+-- PASTE chooses, not a property of the supplier's document. The same OpenAI invoice
+-- INV-123 pasted once as Q2EXP-001 and again as Q2EXP-099 therefore passed the guard twice
+-- and booked the expense, the payment, the deductible net AND the Vorsteuer twice. A second
+-- input-VAT claim on one supplier document is a tax defect, not a UI annoyance.
+--
+-- THE IDENTITY, STATED ONCE
+-- -------------------------
+--   (business_entity_id, vendor_id, lower(btrim(supplier_invoice_number)))
+--
+-- Deliberately scoped:
+--   * business_entity_id is IN — two entities may each hold their own copy of a supplier
+--     document and each is entitled to its own booking.
+--   * vendor_id is IN — "INV-123" from two different suppliers is two different documents.
+--     Different vendors sharing an invoice number must NOT collide.
+--   * the number is normalised by btrim + lower ONLY. No fuzzy matching, no similarity, no
+--     stripping of separators: "RE-2026/4711" and "RE20264711" stay two documents until a
+--     human says otherwise. Both btrim(text) and lower(text) are IMMUTABLE, so the
+--     expression is indexable.
+--
+-- WHAT IS DELIBERATELY OUT
+-- ------------------------
+-- Rows with no supplier_invoice_number (or a blank one) and rows with no vendor_id carry no
+-- document identity and are NOT in the index. Manufacturing one from vendor + amount + date
+-- would invent an accounting fact: two identical 9,99 € monthly charges from the same
+-- supplier are two real expenses, and blocking the second would lose a deduction the owner
+-- is entitled to. Those rows keep the client_import_id guard and nothing more, and the
+-- import says so in the preview instead of pretending to protect them.
+--
+-- archived_at is NOT in the predicate. Archiving is a soft flag; loadExpenses() reads
+-- archived rows back and the aggregation layer does not exclude them, so an archived expense
+-- still carries its Vorsteuer. Letting an archived row drop out of the index would reopen
+-- exactly the double-claim this closes. The correction path for a genuinely wrong import is
+-- the hard delete (delete_owner_draft_expense), which removes the row and its claim together
+-- and frees the slot honestly.
+-- ---------------------------------------------------------------------------
+begin;
+
+-- Pre-flight. If historical data already contains two expenses that share one supplier
+-- document, the index below cannot be created. We surface the EXACT conflicts and stop.
+-- We do not merge, delete, archive, renumber or otherwise touch a single existing row:
+-- deciding which of two conflicting bookings is the real one is an accounting judgement
+-- with tax consequences, and a migration is the wrong place to guess.
+do $$
+declare v_conflicts text;
+begin
+  select string_agg(
+           format('entity=%s vendor=%s invoice=%L count=%s', d.business_entity_id, d.vendor_id, d.doc_key, d.n),
+           E'\n' order by d.n desc)
+    into v_conflicts
+  from (
+    select x.business_entity_id,
+           x.vendor_id,
+           lower(btrim(x.supplier_invoice_number)) as doc_key,
+           count(*) as n
+      from public.owner_expenses x
+     where x.vendor_id is not null
+       and x.supplier_invoice_number is not null
+       and btrim(x.supplier_invoice_number) <> ''
+     group by 1, 2, 3
+    having count(*) > 1
+  ) d;
+
+  if v_conflicts is not null then
+    raise exception using
+      errcode = 'unique_violation',
+      message = 'owner_expenses already contains duplicate supplier documents; the uniqueness guard cannot be applied',
+      detail  = v_conflicts,
+      hint    = 'Resolve each listed (business entity, vendor, supplier invoice number) group by hand before re-running this migration. This migration intentionally does not modify, merge or delete accounting records.';
+  end if;
+end $$;
+
+-- The race-safe backstop. SELECT-before-INSERT inside owner_bulk_import_expenses closes the
+-- ordinary case with a readable message; two imports of the same document running
+-- concurrently would both pass that SELECT and only this index stops the second one.
+-- It also binds every OTHER write path -- create_owner_expense, a direct RPC call, a manual
+-- INSERT -- to the same rule, which a function-local check never could.
+create unique index if not exists owner_expenses_supplier_document_uniq
+  on public.owner_expenses (business_entity_id, vendor_id, lower(btrim(supplier_invoice_number)))
+  where vendor_id is not null
+    and supplier_invoice_number is not null
+    and btrim(supplier_invoice_number) <> '';
 
 commit;
 
@@ -119,6 +213,69 @@ grant execute on function public.owner_resolve_import_vendors(uuid, jsonb) to au
 commit;
 
 -- ---------------------------------------------------------------------------
+-- 2b. Preview-time SUPPLIER-DOCUMENT probe.
+--
+--    Read-only. Answers exactly one question per pasted row: how many expenses this entity
+--    already holds for (vendor, normalised supplier invoice number). The preview turns a
+--    count of 1 into "already booked" and a count above 1 into an accounting-data
+--    inconsistency the owner must look at — it never picks one.
+--
+--    This is a courtesy, not the guarantee. A preview can go stale between the check and
+--    the confirmation, and nothing forces a caller through it at all, so the identical rule
+--    is enforced again inside owner_bulk_import_expenses and, last, by the unique index
+--    from section 1b. Removing this function would cost a good error message, not safety.
+--
+--    Normalisation here is byte-for-byte the section 1b expression: lower(btrim(...)).
+--    If these two ever disagree the preview would clear a row the import then rejects.
+-- ---------------------------------------------------------------------------
+begin;
+
+create or replace function public.owner_check_expense_documents(p_entity uuid, p_documents jsonb)
+returns jsonb language plpgsql security definer stable set search_path = public, pg_temp as $$
+declare v_doc jsonb; v_rows jsonb := '[]'::jsonb; v_vendor uuid; v_number text; v_key text; v_count int;
+begin
+  if not public.is_platform_owner() then raise exception 'Owner access required'; end if;
+  if p_entity is null then raise exception 'business entity is required'; end if;
+  if not exists (select 1 from public.owner_business_entities where id = p_entity) then
+    raise exception 'unknown business entity';
+  end if;
+  if p_documents is null or jsonb_typeof(p_documents) <> 'array' then
+    raise exception 'documents must be an array';
+  end if;
+  if jsonb_array_length(p_documents) > 100 then raise exception 'at most 100 documents per check'; end if;
+
+  for v_doc in select * from jsonb_array_elements(p_documents) loop
+    v_vendor := nullif(v_doc->>'vendor_id','')::uuid;
+    v_number := v_doc->>'supplier_invoice_number';
+    v_key    := nullif(lower(btrim(coalesce(v_number, ''))), '');
+
+    -- No vendor or no invoice number means no document identity. We report zero matches
+    -- rather than inventing one from the amount, the date or the description.
+    if v_vendor is null or v_key is null then
+      v_count := 0;
+    else
+      select count(*) into v_count
+        from public.owner_expenses x
+       where x.business_entity_id = p_entity
+         and x.vendor_id = v_vendor
+         and lower(btrim(x.supplier_invoice_number)) = v_key;
+    end if;
+
+    v_rows := v_rows || jsonb_build_object(
+      'client_import_id', v_doc->>'client_import_id',
+      'vendor_id', v_vendor,
+      'supplier_invoice_number', v_number,
+      'match_count', v_count);
+  end loop;
+  return v_rows;
+end;
+$$;
+revoke execute on function public.owner_check_expense_documents(uuid, jsonb) from public, anon;
+grant execute on function public.owner_check_expense_documents(uuid, jsonb) to authenticated, service_role;
+
+commit;
+
+-- ---------------------------------------------------------------------------
 -- 3. THE atomic expense import.
 --
 --    One function call = one transaction = all-or-nothing. If the eighteenth expense is
@@ -141,6 +298,10 @@ declare
   v_net_total bigint := 0; v_vat_total bigint := 0; v_gross_total bigint := 0;
   v_input_vat bigint := 0; v_paid_total bigint := 0;
   v_vendors_created jsonb := '[]'::jsonb; v_created jsonb := '[]'::jsonb;
+  -- Supplier-document identity bookkeeping for THIS payload. v_seen_docs maps
+  -- "<vendor_id>|<normalised invoice number>" to the client_import_id that claimed it, so a
+  -- document pasted twice under two different client_import_ids is named in the error.
+  v_seen_docs jsonb := '{}'::jsonb; v_doc_number text; v_doc_key text; v_doc_match int;
   exp record; v_result jsonb;
 begin
   if not public.is_platform_owner() then raise exception 'Owner access required'; end if;
@@ -232,11 +393,53 @@ begin
     select id into v_cat from public.owner_expense_categories where key = v_key;
     if v_cat is null then raise exception 'expense %: unknown expense category "%"', v_cid, v_key; end if;
 
+    -- ---- SUPPLIER-DOCUMENT DUPLICATE GUARD (see section 1b) ---------------
+    --
+    -- THE authoritative check. It runs AFTER vendor resolution -- the identity is
+    -- (entity, resolved vendor, normalised number), and the vendor is only known here --
+    -- and BEFORE the insert, so a duplicate never becomes an expense, a payment, a
+    -- deductible net or a Vorsteuer claim, not even for the instant before a rollback.
+    --
+    -- client_import_id is deliberately NOT part of this. A supplier document pasted a
+    -- second time under a fresh client_import_id is the exact defect being closed; letting
+    -- the label vary the identity is what made it possible.
+    v_doc_number := nullif(btrim(coalesce(v_item->>'supplier_invoice_number', '')), '');
+    v_doc_key := case when v_doc_number is null then null else v_vendor::text || '|' || lower(v_doc_number) end;
+
+    if v_doc_key is not null then
+      -- (a) the same document twice inside THIS payload. Rows already inserted by this loop
+      --     would also be caught by (b), but naming the other pasted row is the useful error.
+      if v_seen_docs ? v_doc_key then
+        raise exception 'expense %: supplier invoice "%" from this vendor is already in this import (row %) — the same document cannot be imported twice',
+          v_cid, v_doc_number, v_seen_docs->>v_doc_key;
+      end if;
+
+      -- (b) the same document already in the books, from ANY earlier batch and under ANY
+      --     client_import_id.
+      select count(*) into v_doc_match
+        from public.owner_expenses x
+       where x.business_entity_id = v_entity
+         and x.vendor_id = v_vendor
+         and lower(btrim(x.supplier_invoice_number)) = lower(v_doc_number);
+
+      if v_doc_match = 1 then
+        raise exception 'expense %: supplier invoice "%" from this vendor is already recorded — importing it again would claim the input VAT twice',
+          v_cid, v_doc_number;
+      elsif v_doc_match > 1 then
+        -- Pre-existing data that the section 1b index would have refused. We never guess
+        -- which of them is the real booking, and we never repair one by adding a third.
+        raise exception 'expense %: supplier invoice "%" from this vendor already exists % times in the books — inconsistent accounting data, please resolve it before importing',
+          v_cid, v_doc_number, v_doc_match;
+      end if;
+
+      v_seen_docs := v_seen_docs || jsonb_build_object(v_doc_key, v_cid);
+    end if;
+
     insert into public.owner_expenses (business_entity_id, vendor_id, category_id,
       supplier_invoice_number, invoice_date, service_date, due_date, currency,
       review_status, review_reason, notes, created_by)
     values (v_entity, v_vendor, v_cat,
-      nullif(v_item->>'supplier_invoice_number',''),
+      v_doc_number,
       (v_item->>'invoice_date')::date,
       nullif(v_item->>'service_date','')::date,
       nullif(v_item->>'due_date','')::date,

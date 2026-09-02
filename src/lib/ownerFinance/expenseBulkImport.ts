@@ -131,6 +131,59 @@ const inBp = (v: unknown): v is number => isInt(v) && v >= 0 && v <= 10000;
 /** Normalisation used for vendor name matching. Must agree with the server's lower(trim(...)). */
 export const normalizeVendorName = (name: string): string => name.trim().toLowerCase();
 
+/**
+ * Normalisation of a SUPPLIER INVOICE NUMBER, for duplicate-document detection.
+ *
+ * Conservative and deterministic: surrounding whitespace is trimmed and the comparison is
+ * case-insensitive, and that is the whole of it. No separators are stripped, no fuzzy or
+ * similarity matching happens anywhere on this path — "RE-2026/4711" and "RE20264711" are
+ * two different documents until a human says otherwise.
+ *
+ * This MUST stay byte-for-byte equivalent to the server's `lower(btrim(...))`, which is both
+ * the expression of the `owner_expenses_supplier_document_uniq` index and the comparison
+ * inside owner_bulk_import_expenses. If they drift, the preview clears rows the import then
+ * refuses.
+ */
+export const normalizeSupplierInvoiceNumber = (value: unknown): string | null => {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed ? trimmed.toLowerCase() : null;
+};
+
+/**
+ * The identity of a supplier DOCUMENT, or null when the row does not have one.
+ *
+ * A document is identified by its vendor plus its supplier invoice number, and by nothing
+ * else. Amount, date and description are deliberately excluded: two identical 9,99 €
+ * monthly charges from the same supplier are two real expenses, and manufacturing an
+ * identity out of them would silently drop a deduction the owner is entitled to.
+ *
+ * The business entity is not part of the key here because a preview only ever covers one
+ * entity; the server key includes it so that two entities may each hold their own copy of
+ * the same supplier document.
+ */
+export const supplierDocumentKey = (
+  vendorRef: string | null | undefined,
+  supplierInvoiceNumber: unknown,
+): string | null => {
+  const number = normalizeSupplierInvoiceNumber(supplierInvoiceNumber);
+  const vendor = typeof vendorRef === 'string' ? vendorRef.trim() : '';
+  if (!number || !vendor) return null;
+  return `${vendor}|${number}`;
+};
+
+/**
+ * How a row is addressed for duplicate purposes before the server has resolved its vendor.
+ *
+ * A row that already carries a vendor_id is keyed by that id; a row carrying only a name is
+ * keyed by the normalised name. Both are stable identities of the same supplier, so pasting
+ * one document twice is caught in the preview whether or not resolution has run yet.
+ */
+const vendorRefOf = (vendor: BulkExpenseVendorInput): string | null =>
+  vendor.vendor_id?.trim()
+    ? `id:${vendor.vendor_id.trim()}`
+    : (vendor.name?.trim() ? `name:${normalizeVendorName(vendor.name)}` : null);
+
 const emptyPreview: ExpenseImportPreview = {
   ok: false, errors: [], warnings: [], expenseCount: 0, paymentCount: 0,
   netCents: 0, vatCents: 0, inputVatCents: 0, grossCents: 0, paidCents: 0,
@@ -376,6 +429,17 @@ export function parseExpenseBulkImport(
       errors.push({ row, message: `Zahlungen (${money(rowPaid)}) übersteigen den Ausgabenbetrag (${money(rowGross)})` });
     }
 
+    // A row with no supplier invoice number has NO document identity, and we refuse to
+    // manufacture one out of vendor + amount + date: two identical monthly charges from one
+    // supplier are two real expenses. Such a row keeps only the client_import_id guard, and
+    // the preview says so rather than implying a protection that is not there.
+    if (typeof e.supplier_invoice_number !== 'string' || !e.supplier_invoice_number.trim()) {
+      warnings.push({
+        row,
+        message: 'Keine supplier_invoice_number — Dublettenprüfung auf Belegebene nicht möglich (es greift nur der Schutz über client_import_id)',
+      });
+    }
+
     for (const forbidden of ['net_total_cents', 'vat_total_cents', 'gross_total_cents', 'input_vat_cents', 'amount_paid_cents', 'payment_status']) {
       if (forbidden in e) {
         warnings.push({ row, message: `„${forbidden}" wird ignoriert — dieser Wert wird serverseitig berechnet` });
@@ -388,7 +452,10 @@ export function parseExpenseBulkImport(
     out.push({
       client_import_id: row,
       vendor: { vendor_id: vendorId, name: vendorName || null, country_code: countryCode, vat_id: vatId },
-      supplier_invoice_number: typeof e.supplier_invoice_number === 'string' ? e.supplier_invoice_number : null,
+      // Trimmed to match what the server persists (nullif(btrim(...),'')), so the preview's
+      // document identity and the stored row's are the same string.
+      supplier_invoice_number: typeof e.supplier_invoice_number === 'string' && e.supplier_invoice_number.trim()
+        ? e.supplier_invoice_number.trim() : null,
       invoice_date: String(e.invoice_date ?? ''),
       service_date: isIsoDate(e.service_date) ? e.service_date : null,
       due_date: isIsoDate(e.due_date) ? e.due_date : null,
@@ -400,7 +467,9 @@ export function parseExpenseBulkImport(
     });
   });
 
-  return {
+  // One supplier document pasted twice in the same batch is refused HERE, before any
+  // network call, because it needs none: the identity is already in the payload.
+  return detectDuplicateSupplierDocuments({
     ok: errors.length === 0,
     errors,
     warnings,
@@ -415,7 +484,130 @@ export function parseExpenseBulkImport(
       source: 'paste',
       expenses: out,
     },
-  };
+  });
+}
+
+/**
+ * Refuse a supplier document that appears twice inside ONE pasted batch.
+ *
+ * The cross-batch guard is keyed on client_import_id, which is a label the paste chooses.
+ * Two rows may therefore name the same supplier invoice under two different labels and
+ * still look distinct to it. They are not distinct: they are one document, and importing
+ * both books the expense, the payment, the deductible net and the Vorsteuer twice.
+ *
+ * ALL rows sharing a document are flagged, not just the later ones — the owner has to see
+ * every row involved to know which one to delete. Rows with no supplier invoice number, or
+ * with no vendor at all, have no document identity and are left alone here.
+ *
+ * Idempotent: safe to run before and after vendor resolution (resolution can collapse an
+ * explicit vendor_id and a vendor name onto one supplier), because an error it already
+ * emitted is not emitted a second time.
+ */
+export function detectDuplicateSupplierDocuments(preview: ExpenseImportPreview): ExpenseImportPreview {
+  if (!preview.payload) return preview;
+
+  const rowsByKey = new Map<string, string[]>();
+  for (const row of preview.payload.expenses) {
+    const key = supplierDocumentKey(vendorRefOf(row.vendor), row.supplier_invoice_number);
+    if (!key) continue;
+    const bucket = rowsByKey.get(key);
+    if (bucket) bucket.push(row.client_import_id);
+    else rowsByKey.set(key, [row.client_import_id]);
+  }
+
+  const errors = [...preview.errors];
+  const seen = new Set(errors.map((e) => `${e.row}\u0000${e.message}`));
+  for (const [, rows] of rowsByKey) {
+    if (rows.length < 2) continue;
+    for (const row of rows) {
+      const others = rows.filter((r) => r !== row);
+      const message = `Dieselbe Lieferantenrechnung kommt in diesem Import mehrfach vor (auch: ${others.join(', ')}) — ein Beleg darf nur einmal gebucht werden`;
+      const dedupe = `${row}\u0000${message}`;
+      if (seen.has(dedupe)) continue;
+      seen.add(dedupe);
+      errors.push({ row, message });
+    }
+  }
+
+  if (errors.length === preview.errors.length) return preview;
+  return { ...preview, errors, ok: false };
+}
+
+/** What the server's supplier-document probe returns for one pasted row. */
+export interface SupplierDocumentMatch {
+  client_import_id: string | null;
+  vendor_id: string | null;
+  supplier_invoice_number: string | null;
+  /** How many expenses the entity ALREADY holds for this (vendor, invoice number). */
+  match_count: number;
+}
+
+/**
+ * Refuse a supplier document the entity has ALREADY booked, whatever client_import_id the
+ * paste gives it this time.
+ *
+ * This consumes the read-only server probe; it is a good error message, not the guarantee.
+ * A preview goes stale, and nothing forces a caller through it, so the identical rule is
+ * enforced again inside owner_bulk_import_expenses and, last, by the
+ * owner_expenses_supplier_document_uniq index.
+ *
+ *   exactly one existing match → the row is BLOCKED as already recorded
+ *   more than one              → BLOCKED as inconsistent accounting data; we never pick one
+ */
+export function applyExistingDocumentMatches(
+  preview: ExpenseImportPreview,
+  matches: SupplierDocumentMatch[],
+): ExpenseImportPreview {
+  if (!preview.payload) return preview;
+
+  const byKey = new Map<string, number>();
+  for (const m of matches) {
+    const key = supplierDocumentKey(m.vendor_id ? `id:${m.vendor_id}` : null, m.supplier_invoice_number);
+    if (!key) continue;
+    byKey.set(key, Math.max(byKey.get(key) ?? 0, m.match_count));
+  }
+
+  const errors = [...preview.errors];
+  for (const row of preview.payload.expenses) {
+    const key = supplierDocumentKey(vendorRefOf(row.vendor), row.supplier_invoice_number);
+    if (!key) continue;
+    const count = byKey.get(key) ?? 0;
+    if (count === 1) {
+      errors.push({
+        row: row.client_import_id,
+        message: `Lieferantenrechnung „${String(row.supplier_invoice_number ?? '').trim()}" dieses Lieferanten ist bereits erfasst — ein erneuter Import würde die Vorsteuer doppelt geltend machen`,
+      });
+    } else if (count > 1) {
+      errors.push({
+        row: row.client_import_id,
+        message: `Lieferantenrechnung „${String(row.supplier_invoice_number ?? '').trim()}" dieses Lieferanten existiert bereits ${count}-mal — inkonsistente Buchhaltungsdaten, bitte vor dem Import klären`,
+      });
+    }
+  }
+
+  if (errors.length === preview.errors.length) return preview;
+  return { ...preview, errors, ok: false };
+}
+
+/**
+ * The rows the server probe needs: one entry per expense that HAS a document identity.
+ *
+ * Only rows whose vendor is already resolved to an id can be probed — the probe compares
+ * against stored vendor_ids. A row still carrying only a name is a vendor the import will
+ * create, so by construction the entity holds no expense for it yet.
+ */
+export function supplierDocumentsToCheck(
+  preview: ExpenseImportPreview,
+): Array<{ client_import_id: string; vendor_id: string; supplier_invoice_number: string }> {
+  if (!preview.payload) return [];
+  const out: Array<{ client_import_id: string; vendor_id: string; supplier_invoice_number: string }> = [];
+  for (const row of preview.payload.expenses) {
+    const vendorId = row.vendor.vendor_id?.trim();
+    const number = typeof row.supplier_invoice_number === 'string' ? row.supplier_invoice_number.trim() : '';
+    if (!vendorId || !number) continue;
+    out.push({ client_import_id: row.client_import_id, vendor_id: vendorId, supplier_invoice_number: number });
+  }
+  return out;
 }
 
 /** What the server's vendor resolver returns for one pasted name. */
@@ -479,13 +671,16 @@ export function applyVendorResolutions(
   // warning strings. The preview gives them their own panel — "Neuer Lieferant wird angelegt:
   // …" — because a new supplier is a decision the owner is making, not a caveat to skim past,
   // and a consumer that needs the names should read them as names.
-  return {
+  // Re-run in-batch document detection: resolution can bind a row that named a vendor and a
+  // row that gave the vendor_id outright onto ONE supplier, making them the same document
+  // for the first time. The pass is idempotent, so nothing is reported twice.
+  return detectDuplicateSupplierDocuments({
     ...preview,
     errors,
     ok: errors.length === 0,
     vendorsToCreate: [...toCreate.values()],
     payload: { ...preview.payload, expenses },
-  };
+  });
 }
 
 /** The template the "Beispiel einfügen" button writes into the textarea. */

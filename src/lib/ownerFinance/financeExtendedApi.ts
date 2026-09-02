@@ -313,6 +313,42 @@ export async function resolveImportVendors(
   return { resolutions: (data as VendorResolutionRow[]) ?? [], error: null, backendMissing: false };
 }
 
+export interface SupplierDocumentMatchRow {
+  client_import_id: string | null;
+  vendor_id: string | null;
+  supplier_invoice_number: string | null;
+  match_count: number;
+}
+
+/**
+ * Ask the server, at PREVIEW time, which pasted rows are supplier documents the entity has
+ * already booked.
+ *
+ * Read-only, and NOT the guarantee: a preview goes stale and nothing forces a caller through
+ * it, so owner_bulk_import_expenses re-checks the identical rule inside the transaction and
+ * the owner_expenses_supplier_document_uniq index backs both of them against a race. This
+ * call exists so the owner reads "Beleg bereits erfasst" before confirming rather than a
+ * constraint violation afterwards.
+ *
+ * Failure is RETURNED, not thrown, exactly like the vendor resolver.
+ */
+export async function checkExpenseDocuments(
+  entityId: string,
+  documents: Array<{ client_import_id: string; vendor_id: string; supplier_invoice_number: string }>,
+): Promise<{ matches: SupplierDocumentMatchRow[]; error: string | null; backendMissing: boolean }> {
+  const { data, error } = await supabase.rpc('owner_check_expense_documents', {
+    p_entity: entityId, p_documents: documents,
+  });
+  if (error) {
+    return {
+      matches: [],
+      error: describeSupabaseError(error, 'Die Dublettenprüfung konnte nicht ausgeführt werden.'),
+      backendMissing: isMissingBackendError(error),
+    };
+  }
+  return { matches: (data as SupplierDocumentMatchRow[]) ?? [], error: null, backendMissing: false };
+}
+
 export interface ExpenseImportResult {
   batch_id: string;
   expense_count: number;

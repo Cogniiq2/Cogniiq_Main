@@ -30,16 +30,39 @@ const CATEGORIES = [
 /** Every RPC the page may reach, recorded so "wrote nothing" is checked, not assumed. */
 const calls: Array<{ fn: string; args: Record<string, unknown> }> = [];
 
+/**
+ * The server's answers, per test.
+ *
+ * `knownVendorId` makes a pasted supplier RESOLVE instead of being previewed as a creation
+ * — the duplicate probe only ever asks about rows whose vendor already exists.
+ * `documentMatches` is what owner_check_expense_documents reports for those rows.
+ */
+const server = { knownVendorId: null as string | null, documentMatches: 0, probeFails: false };
+
 const rpc = vi.fn(async (fn: string, args: Record<string, unknown>) => {
   calls.push({ fn, args });
   switch (fn) {
     case 'owner_workspace_state':
       return { data: { folders: [], items: [] }, error: null };
     case 'owner_resolve_import_vendors':
-      // Every pasted supplier is unknown here, so each one is previewed as a creation.
+      // By default every pasted supplier is unknown, so each is previewed as a creation.
       return {
         data: (args.p_names as string[]).map((name) => ({
-          name, vendor_id: null, match_count: 0, ambiguous: false,
+          name,
+          vendor_id: server.knownVendorId,
+          match_count: server.knownVendorId ? 1 : 0,
+          ambiguous: false,
+        })),
+        error: null,
+      };
+    case 'owner_check_expense_documents':
+      if (server.probeFails) return { data: null, error: { message: 'connection lost' } };
+      return {
+        data: (args.p_documents as Array<Record<string, unknown>>).map((d) => ({
+          client_import_id: d.client_import_id,
+          vendor_id: d.vendor_id,
+          supplier_invoice_number: d.supplier_invoice_number,
+          match_count: server.documentMatches,
         })),
         error: null,
       };
@@ -129,6 +152,9 @@ async function paste(_user: ReturnType<typeof userEvent.setup>, dialog: HTMLElem
 beforeEach(() => {
   calls.length = 0;
   rpc.mockClear();
+  server.knownVendorId = null;
+  server.documentMatches = 0;
+  server.probeFails = false;
 });
 
 describe('the Schnellimport action', () => {
@@ -291,5 +317,79 @@ describe('confirmation', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Prüfen' }));
     await within(dialog).findByText(/Ausgaben bereit/);
     expect(within(dialog).getByRole('button', { name: 'Import bestätigen' })).toBeEnabled();
+  });
+});
+
+/* ------------------------------------------ supplier-document duplicate protection */
+
+describe('a supplier document the books already hold', () => {
+  it('is asked about, refused, and makes confirmation impossible', async () => {
+    // The reported defect: the same supplier invoice under a fresh client_import_id. The
+    // vendor is KNOWN here (otherwise there is nothing booked to collide with) and the
+    // server reports one existing expense for it.
+    server.knownVendorId = 'v-openai';
+    server.documentMatches = 1;
+
+    const user = userEvent.setup();
+    renderPage();
+    const dialog = await openImport(user);
+    await paste(user, dialog, expenseImportTemplate());
+    await user.click(within(dialog).getByRole('button', { name: 'Prüfen' }));
+
+    // Every row of the template is the same already-booked supplier, so all three block.
+    expect(await within(dialog).findAllByText(/bereits erfasst/)).toHaveLength(3);
+    expect(within(dialog).getByRole('button', { name: 'Import nicht möglich' })).toBeDisabled();
+    // The probe ran, and the preview still wrote nothing.
+    expect(calls.some((c) => c.fn === 'owner_check_expense_documents')).toBe(true);
+    expect(writeRpcs()).toEqual([]);
+  });
+
+  it('is checked with the resolved vendor and the trimmed document number', async () => {
+    server.knownVendorId = 'v-openai';
+    server.documentMatches = 0;
+
+    const user = userEvent.setup();
+    renderPage();
+    const dialog = await openImport(user);
+    await paste(user, dialog, expenseImportTemplate());
+    await user.click(within(dialog).getByRole('button', { name: 'Prüfen' }));
+    await within(dialog).findByText(/Ausgaben bereit/);
+
+    const probe = calls.find((c) => c.fn === 'owner_check_expense_documents');
+    expect(probe).toBeDefined();
+    const documents = probe!.args.p_documents as Array<Record<string, string>>;
+    // Every row of the template carries a supplier invoice number, so every row is probed.
+    expect(documents).toHaveLength(3);
+    expect(documents.every((d) => d.vendor_id === 'v-openai')).toBe(true);
+    expect(documents.map((d) => d.supplier_invoice_number))
+      .toEqual(['RE-2026-4711', 'INV-9F2A1C', 'DE-INV-2026-88213']);
+    // Nothing was blocked, so the import remains available.
+    expect(within(dialog).getByRole('button', { name: 'Import bestätigen' })).toBeEnabled();
+  });
+
+  it('is NOT probed when the vendor does not exist yet — nothing can be booked against it', async () => {
+    const user = userEvent.setup();
+    renderPage();
+    const dialog = await openImport(user);
+    await paste(user, dialog, expenseImportTemplate());
+    await user.click(within(dialog).getByRole('button', { name: 'Prüfen' }));
+    await within(dialog).findByText(/Ausgaben bereit/);
+    expect(calls.some((c) => c.fn === 'owner_check_expense_documents')).toBe(false);
+  });
+
+  it('treats a failed duplicate check as an ERROR, never as "no duplicates"', async () => {
+    // A preview that could not check for duplicates must not read like one that found none.
+    server.knownVendorId = 'v-openai';
+    server.probeFails = true;
+
+    const user = userEvent.setup();
+    renderPage();
+    const dialog = await openImport(user);
+    await paste(user, dialog, expenseImportTemplate());
+    await user.click(within(dialog).getByRole('button', { name: 'Prüfen' }));
+
+    await within(dialog).findByText(/Dublettenprüfung fehlgeschlagen/);
+    expect(within(dialog).getByRole('button', { name: 'Import nicht möglich' })).toBeDisabled();
+    expect(writeRpcs()).toEqual([]);
   });
 });

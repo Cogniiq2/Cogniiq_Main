@@ -12,9 +12,11 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  applyVendorResolutions, expenseImportTemplate, parseExpenseBulkImport,
-  normalizeVendorName, EXPENSE_VAT_TREATMENTS, BULK_IMPORT_MAX_EXPENSES,
-  type VendorResolution,
+  applyExistingDocumentMatches, applyVendorResolutions, detectDuplicateSupplierDocuments,
+  expenseImportTemplate, parseExpenseBulkImport, supplierDocumentsToCheck,
+  normalizeSupplierInvoiceNumber, normalizeVendorName, supplierDocumentKey,
+  EXPENSE_VAT_TREATMENTS, BULK_IMPORT_MAX_EXPENSES,
+  type SupplierDocumentMatch, type VendorResolution,
 } from '@/lib/ownerFinance/expenseBulkImport';
 import { parseBulkImport } from '@/lib/ownerFinance/bulkImport';
 import { computeExpenseLine } from '@/lib/ownerFinance/tax';
@@ -463,5 +465,265 @@ describe('the Q2/2026 payload that production rejected', () => {
     expect(JSON.stringify(r.payload)).not.toContain('organization_id');
     // The credit row still blocks; vendor resolution does not rescue it.
     expect(r.ok).toBe(false);
+  });
+});
+
+/* -------------------------------------------- supplier-document duplicate protection */
+
+// THE production blocker this section exists for:
+//
+//   The cross-batch guard is keyed on (business_entity_id, record_type, client_import_id).
+//   client_import_id is a label the PASTE chooses, not a property of the supplier's
+//   document, so the same OpenAI invoice INV-123 pasted once as Q2EXP-001 and again as
+//   Q2EXP-099 passed that guard twice — booking the expense, the payment, the deductible
+//   net AND the Vorsteuer twice.
+//
+// The identity enforced instead is (business entity, resolved vendor, normalised supplier
+// invoice number) and nothing else. These tests pin both halves: what it MUST block, and
+// what it must NOT — a guard that also refuses legitimate expenses is its own defect.
+
+const OPENAI = '55555555-5555-5555-5555-555555555555';
+const AMAZON = '66666666-6666-6666-6666-666666666666';
+
+const supplierDoc = (over: Record<string, unknown> = {}) => expense({
+  vendor: { vendor_id: OPENAI },
+  supplier_invoice_number: 'INV-123',
+  ...over,
+});
+const parseDocs = (...rows: Array<Record<string, unknown>>) =>
+  parse(JSON.stringify({ schema_version: 1, expenses: rows }));
+
+describe('normalisation is conservative and deterministic', () => {
+  // (G) Trim + case-fold, and NOTHING else. Anything cleverer here is fuzzy matching by
+  // another name, and fuzzy matching on document identity misfiles deductible spend.
+  it.each([
+    ['INV-123', 'inv-123'],
+    ['  INV-123  ', 'inv-123'],
+    ['inv-123', 'inv-123'],
+    ['InV-123', 'inv-123'],
+    ['\tINV-123\n', 'inv-123'],
+  ])('normalises %j to %j', (raw, expected) => {
+    expect(normalizeSupplierInvoiceNumber(raw)).toBe(expected);
+  });
+
+  it('treats blank and non-string invoice numbers as NO identity', () => {
+    for (const blank of ['', '   ', '\t', null, undefined, 42, {}]) {
+      expect(normalizeSupplierInvoiceNumber(blank)).toBeNull();
+    }
+  });
+
+  it('does not strip separators — punctuation is part of the document number', () => {
+    expect(normalizeSupplierInvoiceNumber('RE-2026/4711'))
+      .not.toBe(normalizeSupplierInvoiceNumber('RE20264711'));
+  });
+
+  it('has no identity without BOTH a vendor and an invoice number', () => {
+    expect(supplierDocumentKey(`id:${OPENAI}`, 'INV-123')).toBe(`id:${OPENAI}|inv-123`);
+    expect(supplierDocumentKey(null, 'INV-123')).toBeNull();
+    expect(supplierDocumentKey(`id:${OPENAI}`, '   ')).toBeNull();
+    expect(supplierDocumentKey(`id:${OPENAI}`, null)).toBeNull();
+  });
+
+  it('mirrors the server: the parsed payload carries the TRIMMED number', () => {
+    const p = parseDocs(supplierDoc({ supplier_invoice_number: '  INV-123  ' }));
+    expect(p.payload!.expenses[0].supplier_invoice_number).toBe('INV-123');
+  });
+});
+
+describe('(B) the same supplier document twice in ONE pasted batch is refused', () => {
+  it('blocks BOTH rows even though the client_import_ids differ', () => {
+    const p = parseDocs(
+      supplierDoc({ client_import_id: 'Q2EXP-001' }),
+      supplierDoc({ client_import_id: 'Q2EXP-099' }),
+    );
+    expect(p.ok).toBe(false);
+    // Every row involved is named — the owner has to see both to know which to delete.
+    const rows = p.errors.filter((e) => /mehrfach vor/.test(e.message)).map((e) => e.row).sort();
+    expect(rows).toEqual(['Q2EXP-001', 'Q2EXP-099']);
+    expect(messages(p)).toMatch(/nur einmal gebucht/);
+  });
+
+  it('blocks across case and whitespace differences in the number', () => {
+    const p = parseDocs(
+      supplierDoc({ client_import_id: 'A', supplier_invoice_number: 'INV-123' }),
+      supplierDoc({ client_import_id: 'B', supplier_invoice_number: '  inv-123 ' }),
+    );
+    expect(p.ok).toBe(false);
+    expect(messages(p)).toMatch(/mehrfach vor/);
+  });
+
+  it('blocks when the vendor is given by NAME rather than id', () => {
+    const p = parseDocs(
+      supplierDoc({ client_import_id: 'A', vendor: { name: 'OpenAI Ireland Limited' } }),
+      supplierDoc({ client_import_id: 'B', vendor: { name: '  openai ireland limited ' } }),
+    );
+    expect(p.ok).toBe(false);
+    expect(messages(p)).toMatch(/mehrfach vor/);
+  });
+
+  it('blocks after resolution binds a name row and an id row onto ONE vendor', () => {
+    // Neither row is a duplicate of the other until the server says the name IS that vendor.
+    const p = parseDocs(
+      supplierDoc({ client_import_id: 'A', vendor: { vendor_id: OPENAI } }),
+      supplierDoc({ client_import_id: 'B', vendor: { name: 'OpenAI Ireland Limited' } }),
+    );
+    expect(p.ok).toBe(true);
+    const r = applyVendorResolutions(p, [
+      { name: 'OpenAI Ireland Limited', vendor_id: OPENAI, match_count: 1, ambiguous: false },
+    ]);
+    expect(r.ok).toBe(false);
+    expect(messages(r)).toMatch(/mehrfach vor/);
+  });
+
+  it('is idempotent — a second pass reports nothing new', () => {
+    const p = parseDocs(
+      supplierDoc({ client_import_id: 'A' }),
+      supplierDoc({ client_import_id: 'B' }),
+    );
+    expect(detectDuplicateSupplierDocuments(p).errors).toHaveLength(p.errors.length);
+  });
+});
+
+describe('(C, D, E) what the guard must NOT block', () => {
+  it('(C) allows the SAME invoice number from two DIFFERENT vendors', () => {
+    const p = parseDocs(
+      supplierDoc({ client_import_id: 'A', vendor: { vendor_id: OPENAI } }),
+      supplierDoc({ client_import_id: 'B', vendor: { vendor_id: AMAZON } }),
+    );
+    expect(messages(p)).not.toMatch(/mehrfach vor/);
+    expect(p.ok).toBe(true);
+  });
+
+  it('(C) allows the same invoice number from two differently NAMED vendors', () => {
+    const p = parseDocs(
+      supplierDoc({ client_import_id: 'A', vendor: { name: 'OpenAI Ireland Limited' } }),
+      supplierDoc({ client_import_id: 'B', vendor: { name: 'Amazon Marketplace' } }),
+    );
+    expect(p.ok).toBe(true);
+  });
+
+  it('(D) allows the same vendor with DIFFERENT invoice numbers', () => {
+    const p = parseDocs(
+      supplierDoc({ client_import_id: 'A', supplier_invoice_number: 'INV-123' }),
+      supplierDoc({ client_import_id: 'B', supplier_invoice_number: 'INV-124' }),
+    );
+    expect(p.ok).toBe(true);
+  });
+
+  it('(E) the entity is part of the identity, so it never leaks across entities', () => {
+    // The preview covers one entity, so a cross-entity collision cannot even be expressed
+    // here; what IS asserted is that the entity travels with the payload the server keys on.
+    const other = '22222222-2222-2222-2222-222222222222';
+    const raw = JSON.stringify({ schema_version: 1, expenses: [supplierDoc()] });
+    expect(parseExpenseBulkImport(raw, ENTITY, CATEGORIES).payload!.business_entity_id).toBe(ENTITY);
+    expect(parseExpenseBulkImport(raw, other, CATEGORIES).payload!.business_entity_id).toBe(other);
+  });
+
+  it('two identical amounts from one supplier on one day are TWO expenses, not a duplicate', () => {
+    // The guard is document identity, never amount+date+vendor. Two 9,99 € charges are two
+    // real deductions and blocking the second would cost the owner one of them.
+    const p = parseDocs(
+      supplierDoc({ client_import_id: 'A', supplier_invoice_number: 'INV-1' }),
+      supplierDoc({ client_import_id: 'B', supplier_invoice_number: 'INV-2' }),
+    );
+    expect(p.ok).toBe(true);
+    expect(p.expenseCount).toBe(2);
+  });
+});
+
+describe('(F) a missing supplier_invoice_number never gets a fabricated identity', () => {
+  it('warns that document-level duplicate detection is unavailable', () => {
+    const p = parseDocs(supplierDoc({ supplier_invoice_number: undefined }));
+    expect(p.ok).toBe(true);
+    expect(warningsOf(p)).toMatch(/Dublettenprüfung auf Belegebene nicht möglich/);
+    expect(warningsOf(p)).toMatch(/client_import_id/);
+  });
+
+  it.each([undefined, null, '', '   '])('does NOT block two numberless rows (%j)', (blank) => {
+    const p = parseDocs(
+      supplierDoc({ client_import_id: 'A', supplier_invoice_number: blank }),
+      supplierDoc({ client_import_id: 'B', supplier_invoice_number: blank }),
+    );
+    expect(messages(p)).not.toMatch(/mehrfach vor/);
+    expect(p.ok).toBe(true);
+  });
+
+  it('never sends a numberless row to the server probe', () => {
+    const p = parseDocs(
+      supplierDoc({ client_import_id: 'A', supplier_invoice_number: null }),
+      supplierDoc({ client_import_id: 'B', supplier_invoice_number: 'INV-9' }),
+    );
+    expect(supplierDocumentsToCheck(p)).toEqual([
+      { client_import_id: 'B', vendor_id: OPENAI, supplier_invoice_number: 'INV-9' },
+    ]);
+  });
+
+  it('a row whose vendor will be CREATED is not probed — nothing is booked against it yet', () => {
+    const p = parseDocs(supplierDoc({ vendor: { name: 'Brand-new GmbH' } }));
+    expect(supplierDocumentsToCheck(p)).toEqual([]);
+  });
+
+  it('(I) client_import_id duplicate protection still works on its own', () => {
+    const p = parseDocs(
+      supplierDoc({ client_import_id: 'SAME', supplier_invoice_number: null }),
+      supplierDoc({ client_import_id: 'SAME', supplier_invoice_number: null }),
+    );
+    expect(p.ok).toBe(false);
+    expect(messages(p)).toMatch(/client_import_id kommt mehrfach vor/);
+  });
+});
+
+describe('(A) a document the books already hold is refused, whatever the client_import_id', () => {
+  const alreadyBooked = (count: number): SupplierDocumentMatch[] => ([
+    { client_import_id: 'Q2EXP-099', vendor_id: OPENAI, supplier_invoice_number: 'INV-123', match_count: count },
+  ]);
+
+  it('blocks the row when the entity already has exactly one such expense', () => {
+    // This is the reported defect verbatim: INV-123 was imported as Q2EXP-001, and comes
+    // back as Q2EXP-099.
+    const p = parseDocs(supplierDoc({ client_import_id: 'Q2EXP-099' }));
+    expect(p.ok).toBe(true);
+    const r = applyExistingDocumentMatches(p, alreadyBooked(1));
+    expect(r.ok).toBe(false);
+    expect(messages(r)).toMatch(/bereits erfasst/);
+    expect(messages(r)).toMatch(/Vorsteuer doppelt/);
+  });
+
+  it('blocks and names an inconsistency when the books already hold MORE than one', () => {
+    const r = applyExistingDocumentMatches(parseDocs(supplierDoc()), alreadyBooked(3));
+    expect(r.ok).toBe(false);
+    expect(messages(r)).toMatch(/bereits 3-mal/);
+    expect(messages(r)).toMatch(/inkonsistente Buchhaltungsdaten/i);
+  });
+
+  it('leaves the row alone when the books hold none', () => {
+    const r = applyExistingDocumentMatches(parseDocs(supplierDoc()), alreadyBooked(0));
+    expect(r.ok).toBe(true);
+    expect(r.errors).toHaveLength(0);
+  });
+
+  it('matches the stored document across case and whitespace', () => {
+    const p = parseDocs(supplierDoc({ supplier_invoice_number: ' inv-123 ' }));
+    const r = applyExistingDocumentMatches(p, alreadyBooked(1));
+    expect(r.ok).toBe(false);
+  });
+
+  it('does not block a DIFFERENT vendor carrying the same number', () => {
+    const p = parseDocs(supplierDoc({ vendor: { vendor_id: AMAZON } }));
+    expect(applyExistingDocumentMatches(p, alreadyBooked(1)).ok).toBe(true);
+  });
+
+  it('does not block a DIFFERENT number from the same vendor', () => {
+    const p = parseDocs(supplierDoc({ supplier_invoice_number: 'INV-124' }));
+    expect(applyExistingDocumentMatches(p, alreadyBooked(1)).ok).toBe(true);
+  });
+
+  it('(J) supplier credits stay refused — the duplicate guard rescues nothing', () => {
+    const p = parseDocs(supplierDoc({
+      lines: [{ description: 'Gutschrift', net_cents: -1933, vat_rate_bp: 1900, vat_treatment: 'domestic_standard' }],
+    }));
+    expect(p.ok).toBe(false);
+    expect(messages(p)).toMatch(/Lieferantengutschrift/);
+    expect(applyExistingDocumentMatches(p, alreadyBooked(0)).ok).toBe(false);
   });
 });

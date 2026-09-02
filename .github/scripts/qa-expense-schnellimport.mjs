@@ -68,12 +68,28 @@ if (!chromiumPath) {
 function createImportServer() {
   const vendors = [{ id: 'v-elm', name: 'Elm-Haustechnik' }];
   const calls = [];
+  // The supplier documents the "books" already hold, keyed exactly as the migration's
+  // owner_expenses_supplier_document_uniq index is: entity + vendor + lower(btrim(number)).
+  const documents = new Set();
+  const docKey = (entity, vendorId, number) => {
+    const n = typeof number === 'string' ? number.trim().toLowerCase() : '';
+    return entity && vendorId && n ? `${entity}|${vendorId}|${n}` : null;
+  };
 
   return {
     calls,
     vendors,
+    documents,
     handle(fn, body) {
       calls.push(fn);
+      if (fn === 'owner_check_expense_documents') {
+        return (body.p_documents ?? []).map((d) => ({
+          client_import_id: d.client_import_id ?? null,
+          vendor_id: d.vendor_id ?? null,
+          supplier_invoice_number: d.supplier_invoice_number ?? null,
+          match_count: documents.has(docKey(body.p_entity, d.vendor_id, d.supplier_invoice_number)) ? 1 : 0,
+        }));
+      }
       if (fn === 'owner_resolve_import_vendors') {
         return (body.p_names ?? []).map((name) => {
           const hits = vendors.filter((v) => v.name.trim().toLowerCase() === String(name).trim().toLowerCase());
@@ -89,6 +105,7 @@ function createImportServer() {
         const rows = body.p_payload?.expenses ?? [];
         let net = 0, vat = 0, gross = 0, paid = 0, payments = 0;
         const created = [];
+        const batchKeys = [];
         for (const row of rows) {
           for (const line of row.lines ?? []) {
             const n = Number(line.net_cents) || 0;
@@ -101,10 +118,25 @@ function createImportServer() {
           }
           for (const p of row.payments ?? []) { paid += Number(p.amount_cents) || 0; payments += 1; }
           const name = row.vendor?.name;
-          if (name && !vendors.some((v) => v.name.toLowerCase() === name.toLowerCase())) {
-            vendors.push({ id: `v-${vendors.length}`, name });
-            created.push(name);
+          let vendorId = row.vendor?.vendor_id ?? null;
+          if (!vendorId && name) {
+            const hit = vendors.find((v) => v.name.trim().toLowerCase() === name.trim().toLowerCase());
+            if (hit) {
+              vendorId = hit.id;
+            } else {
+              vendorId = `v-${vendors.length}`;
+              vendors.push({ id: vendorId, name });
+              created.push(name);
+            }
           }
+          // The server is authoritative, so the double refuses here too: a preview that
+          // went stale between Prüfen and Import bestätigen must not get a second booking.
+          const key = docKey(body.p_payload?.business_entity_id, vendorId, row.supplier_invoice_number);
+          if (key && documents.has(key)) {
+            return { __error: `expense ${row.client_import_id}: supplier invoice "${row.supplier_invoice_number}" from this vendor is already recorded` };
+          }
+          if (key) documents.add(key);
+          batchKeys.push(key);
         }
         return {
           batch_id: 'batch-1', expense_count: rows.length, payment_count: payments,
@@ -118,7 +150,9 @@ function createImportServer() {
 }
 
 const importServer = createImportServer();
-const IMPORT_FNS = new Set(['owner_resolve_import_vendors', 'owner_bulk_import_expenses']);
+const IMPORT_FNS = new Set([
+  'owner_resolve_import_vendors', 'owner_check_expense_documents', 'owner_bulk_import_expenses',
+]);
 // Folders are answered as an empty-but-valid workspace: this suite is about the import,
 // and folder behaviour has its own runner.
 const WORKSPACE_FNS = new Set(['owner_workspace_state']);
@@ -195,9 +229,13 @@ async function preparePage(page) {
       if (rpc && IMPORT_FNS.has(rpc[1])) {
         let body = {};
         try { body = JSON.parse(Buffer.from(request.postData ?? '{}', 'utf8').toString()); } catch { /* empty */ }
+        const answer = importServer.handle(rpc[1], body);
+        // A refusal comes back exactly as PostgREST delivers a raised exception, so the
+        // browser takes the real error path rather than a hand-waved one.
+        const refused = answer && typeof answer === 'object' && '__error' in answer;
         await page.send('Fetch.fulfillRequest', {
-          requestId, responseCode: 200, responseHeaders: headers,
-          body: b64(JSON.stringify(importServer.handle(rpc[1], body))),
+          requestId, responseCode: refused ? 400 : 200, responseHeaders: headers,
+          body: b64(JSON.stringify(refused ? { message: answer.__error, code: 'P0001' } : answer)),
         });
         return;
       }
@@ -432,6 +470,63 @@ try {
     if (imports !== 1) bad('confirm: expected exactly ONE atomic import call', `saw ${imports}`);
     else ok('confirmation runs exactly one atomic import RPC');
     await screenshot(page, `${OUT_DIR}/04-after-import.png`);
+
+    // 5b. THE DUPLICATE GUARD, in the browser.
+    //
+    //     The exact reported defect: the SAME supplier documents are pasted a second time
+    //     under fresh client_import_ids. The cross-batch guard cannot see it — the labels
+    //     are new — so the supplier-document identity has to, and the owner must read that
+    //     before confirming, not a constraint violation afterwards.
+    await wait(600);
+    await run(page, `window.__qa.click(window.__qa.button('Schnellimport'))`);
+    await wait(600);
+    await run(page, `window.__qa.click(window.__qa.button('Beispiel einfügen'))`);
+    await wait(400);
+    // Same documents, different labels.
+    await run(page, `(() => {
+      const el = window.__qa.textarea();
+      const doc = JSON.parse(el.value);
+      doc.expenses.forEach((e, i) => { e.client_import_id = 'WIEDERHOLT-' + (i + 1); });
+      const setter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+      setter.call(el, JSON.stringify(doc, null, 2));
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      return true;
+    })()`);
+    await wait(400);
+    const importsBeforeRepaste = importServer.calls.filter((c) => c === 'owner_bulk_import_expenses').length;
+    await run(page, `window.__qa.click(window.__qa.button('Prüfen'))`);
+    await wait(1500);
+    const repaste = await run(page, `({
+      text: window.__qa.dialogText(),
+      confirmEnabled: !(window.__qa.button('Import bestätigen')?.disabled ?? true),
+      overflow: window.__qa.overflow(),
+    })`);
+    const importsAfterRepaste = importServer.calls.filter((c) => c === 'owner_bulk_import_expenses').length;
+    const probed = importServer.calls.filter((c) => c === 'owner_check_expense_documents').length;
+
+    if (probed === 0) bad('duplicate: the preview never asked the server about the documents');
+    else ok('the preview asks the server which supplier documents are already booked');
+    if (repaste.confirmEnabled) bad('duplicate: confirmation was still offered', repaste.text.slice(0, 400));
+    else ok('re-pasting already-imported documents makes confirmation IMPOSSIBLE');
+    if (!repaste.text.includes('bereits erfasst')) {
+      bad('duplicate: the preview does not say the document is already recorded', repaste.text.slice(0, 400));
+    } else ok('the preview names the documents as already recorded');
+    if (!repaste.text.includes('Vorsteuer doppelt')) {
+      bad('duplicate: the preview does not state the tax consequence', repaste.text.slice(0, 400));
+    } else ok('and states why: the Vorsteuer would be claimed twice');
+    if (importsAfterRepaste !== importsBeforeRepaste) {
+      bad('duplicate: the preview WROTE', `${importsAfterRepaste - importsBeforeRepaste} import call(s)`);
+    } else ok('the duplicate preview writes nothing');
+    if (repaste.overflow > 0) bad('duplicate: horizontal overflow', `${repaste.overflow}px`);
+    await screenshot(page, `${OUT_DIR}/05-duplicate-refused.png`);
+
+    // Escape rather than a named button: the preview state offers "Zurück" and
+    // "Import bestätigen", and the point here is only to get back to the overview.
+    await pressEscape(page);
+    await wait(800);
+    if (await run(page, `Boolean(window.__qa.dialog())`)) {
+      bad('duplicate: the dialog did not close after the refused preview');
+    } else ok('the refused duplicate preview closes without writing anything');
 
     // 6. The folder overview is unchanged and opening a folder still works.
     await wait(600);

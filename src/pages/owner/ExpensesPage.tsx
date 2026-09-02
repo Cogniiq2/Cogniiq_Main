@@ -26,11 +26,12 @@ import {
 import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
 import { computeExpenseLine, eligibleInputVat } from '@/lib/ownerFinance/tax';
 import {
-  applyVendorResolutions, expenseImportTemplate, parseExpenseBulkImport,
+  applyExistingDocumentMatches, applyVendorResolutions, expenseImportTemplate,
+  parseExpenseBulkImport, supplierDocumentsToCheck,
   type ExpenseImportPreview,
 } from '@/lib/ownerFinance/expenseBulkImport';
 import {
-  OWNER_EXPENSE_IMPORT_MIGRATION, resolveImportVendors, runExpenseBulkImport,
+  OWNER_EXPENSE_IMPORT_MIGRATION, checkExpenseDocuments, resolveImportVendors, runExpenseBulkImport,
 } from '@/lib/ownerFinance/financeExtendedApi';
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
 import { formatDateDe } from '@/lib/ownerFinance/exports';
@@ -810,6 +811,31 @@ function ExpenseImportModal({ open, entityId, categoryKeys, onClose, onDone, onE
         }
       } catch (e: unknown) {
         p = { ...p, ok: false, errors: [...p.errors, { row: '—', message: `Lieferantenabgleich fehlgeschlagen: ${describeSupabaseError(e)}` }] };
+      }
+    }
+    // Supplier-document duplicates the entity has ALREADY booked. This runs after vendor
+    // resolution because the identity is (vendor, supplier invoice number) and the vendor is
+    // only known once resolution has bound it. Rows still awaiting a vendor that will be
+    // CREATED are skipped by construction: there is nothing booked against a vendor that
+    // does not exist yet.
+    //
+    // A failure here is an ERROR, never a silent pass. The preview is the owner's last look
+    // at the numbers before confirming, and "we could not check for duplicates" must not
+    // read like "no duplicates".
+    const documents = p.payload ? supplierDocumentsToCheck(p) : [];
+    if (documents.length > 0) {
+      try {
+        const { matches, error, backendMissing } = await checkExpenseDocuments(entityId, documents);
+        if (error) {
+          const message = backendMissing
+            ? `Der Ausgaben-Schnellimport ist in dieser Umgebung noch nicht installiert. Bitte die Migration ${OWNER_EXPENSE_IMPORT_MIGRATION} anwenden.`
+            : `Dublettenprüfung fehlgeschlagen: ${error}`;
+          p = { ...p, ok: false, errors: [...p.errors, { row: '—', message }] };
+        } else {
+          p = applyExistingDocumentMatches(p, matches);
+        }
+      } catch (e: unknown) {
+        p = { ...p, ok: false, errors: [...p.errors, { row: '—', message: `Dublettenprüfung fehlgeschlagen: ${describeSupabaseError(e)}` }] };
       }
     }
     setChecking(false);

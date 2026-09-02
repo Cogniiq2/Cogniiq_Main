@@ -14,6 +14,9 @@
 --   * all-or-nothing rollback, including the vendor a failed batch would have created
 --   * idempotency replay and cross-batch duplicate client_import_id refusal
 --   * the negative supplier credit is REFUSED, never coerced
+--   * SUPPLIER-DOCUMENT DUPLICATES: the same (entity, vendor, supplier invoice number) can
+--     never be booked twice -- not under a different client_import_id, not twice in one
+--     payload, and not by a direct INSERT that bypasses the import function entirely
 --   * the revenue importer refuses an expense payload and vice versa
 --   * non-owner and anon reach none of it
 --   * owner_automation_jobs stays empty throughout — no customer can be contacted
@@ -429,6 +432,325 @@ begin
    where routine_name in ('owner_bulk_import_expenses','owner_resolve_import_vendors')
      and grantee = 'anon';
   perform pg_temp.want(n = 0, 'anon holds EXECUTE on neither new function');
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- 10b. THE SUPPLIER-DOCUMENT DUPLICATE GUARD.
+--
+-- THE PRODUCTION BLOCKER: the cross-batch guard is keyed on
+-- (business_entity_id, record_type, client_import_id). client_import_id is a label the
+-- PASTE chooses, so the SAME OpenAI invoice INV-123 pasted once as Q2EXP-001 and again as
+-- Q2EXP-099 slipped through and booked the expense, the payment, the deductible net and the
+-- VORSTEUER twice. These assertions execute that exact scenario.
+--
+-- Both halves are asserted: what must be refused, and what must NOT be. A guard that also
+-- blocks legitimate spending is its own accounting defect.
+-- ---------------------------------------------------------------------------
+
+-- A clean slate for this section only, so the counts below mean what they say. This is the
+-- throwaway test cluster; nothing here runs anywhere else.
+set session_replication_role = replica;
+delete from public.owner_finance_import_records;
+delete from public.owner_finance_import_batches;
+delete from public.owner_payments;
+delete from public.owner_expense_lines;
+delete from public.owner_expenses;
+delete from public.owner_vendors;
+delete from public.owner_finance_requests;
+set session_replication_role = origin;
+
+insert into public.owner_vendors (id, name, country_code)
+values ('aaaaaaaa-0000-0000-0000-0000000000d1', 'OpenAI Ireland Limited', 'IE'),
+       ('aaaaaaaa-0000-0000-0000-0000000000d2', 'Amazon Marketplace', 'DE');
+
+-- A SECOND business entity, for the cross-entity assertion (E). Two entities may each hold
+-- their own copy of a supplier document and each is entitled to its own booking.
+insert into public.owner_business_entities (id, slug, display_name)
+values ('bbbbbbbb-0000-0000-0000-0000000000e2', 'dup-guard-entity-2', 'Duplicate Guard Entity 2')
+on conflict (id) do nothing;
+
+create or replace function pg_temp.dup_expense(p_cid text, p_vendor uuid, p_number text)
+returns jsonb language sql as $$
+  select jsonb_build_object(
+    'client_import_id', p_cid,
+    'vendor', jsonb_build_object('vendor_id', p_vendor),
+    'supplier_invoice_number', p_number,
+    'invoice_date', '2026-04-14',
+    'currency', 'EUR',
+    'category_key', 'ai_api',
+    'lines', jsonb_build_array(jsonb_build_object(
+      'description', 'API-Nutzung', 'net_cents', 1933,
+      'vat_rate_bp', 1900, 'vat_treatment', 'domestic_standard')),
+    'payments', jsonb_build_array(jsonb_build_object(
+      'payment_date', '2026-04-14', 'amount_cents', 2300)))
+$$;
+
+create or replace function pg_temp.entity_payload(p_entity uuid, p_expenses jsonb)
+returns jsonb language sql as $$
+  select jsonb_build_object('schema_version', 1, 'business_entity_id', p_entity,
+    'source', 'sql-test', 'expenses', p_expenses)
+$$;
+
+-- (A) The reported defect, executed. Same entity, same vendor, same supplier invoice, a
+--     DIFFERENT client_import_id.
+do $$
+declare blocked boolean := false; msg text;
+begin
+  perform public.owner_bulk_import_expenses(gen_random_uuid(), pg_temp.payload(
+    jsonb_build_array(pg_temp.dup_expense('Q2EXP-001', 'aaaaaaaa-0000-0000-0000-0000000000d1', 'INV-123'))));
+  perform pg_temp.want((select count(*) from public.owner_expenses) = 1, 'the first import of INV-123 succeeded');
+
+  begin
+    perform public.owner_bulk_import_expenses(gen_random_uuid(), pg_temp.payload(
+      jsonb_build_array(pg_temp.dup_expense('Q2EXP-099', 'aaaaaaaa-0000-0000-0000-0000000000d1', 'INV-123'))));
+  exception when others then blocked := true; msg := sqlerrm;
+  end;
+
+  perform pg_temp.want(blocked,
+    '(A) the SAME supplier invoice under a DIFFERENT client_import_id is REFUSED');
+  perform pg_temp.want(msg like '%bereits%' or msg like '%already recorded%',
+    '(A) and the refusal names the document as already recorded: ' || coalesce(msg, '<none>'));
+
+  -- The load-bearing assertion. Nothing about the second attempt survived.
+  perform pg_temp.want((select count(*) from public.owner_expenses) = 1,
+    '(A) still exactly ONE expense — no second booking');
+  perform pg_temp.want((select count(*) from public.owner_payments) = 1,
+    '(A) still exactly ONE payment — the outflow was not doubled');
+  perform pg_temp.want((select sum(input_vat_cents) from public.owner_expenses) = 367,
+    '(A) Vorsteuer is still 3,67 — the input VAT was NOT claimed twice');
+  perform pg_temp.want((select sum(deductible_net_cents) from public.owner_expenses) = 1933,
+    '(A) the deductible net was not doubled either');
+end $$;
+
+-- (I) The pre-existing client_import_id guard still works on its own terms.
+do $$
+declare blocked boolean := false;
+begin
+  begin
+    -- Same client_import_id, a DIFFERENT document. Only the old guard can catch this.
+    perform public.owner_bulk_import_expenses(gen_random_uuid(), pg_temp.payload(
+      jsonb_build_array(pg_temp.dup_expense('Q2EXP-001', 'aaaaaaaa-0000-0000-0000-0000000000d2', 'OTHER-1'))));
+  exception when others then blocked := true;
+  end;
+  perform pg_temp.want(blocked, '(I) the cross-batch client_import_id guard still refuses a replay');
+  perform pg_temp.want((select count(*) from public.owner_expenses) = 1, '(I) and nothing was written');
+end $$;
+
+-- (B) The same supplier document twice inside ONE payload, under two client_import_ids.
+do $$
+declare blocked boolean := false; msg text;
+begin
+  begin
+    perform public.owner_bulk_import_expenses(gen_random_uuid(), pg_temp.payload(jsonb_build_array(
+      pg_temp.dup_expense('BATCH-A', 'aaaaaaaa-0000-0000-0000-0000000000d2', 'IN-BATCH-1'),
+      pg_temp.dup_expense('BATCH-B', 'aaaaaaaa-0000-0000-0000-0000000000d2', 'IN-BATCH-1'))));
+  exception when others then blocked := true; msg := sqlerrm;
+  end;
+  perform pg_temp.want(blocked, '(B) the same document twice in ONE payload is REFUSED');
+  perform pg_temp.want(msg like '%already in this import%',
+    '(B) and the error names the other pasted row: ' || coalesce(msg, '<none>'));
+  -- All-or-nothing: the FIRST row of the pair must not survive the refusal of the second.
+  perform pg_temp.want((select count(*) from public.owner_expenses) = 1,
+    '(B) atomic — the first row of the duplicate pair rolled back with the second');
+end $$;
+
+-- (G) Normalisation is trim + case-fold, and it is enforced, not merely computed.
+do $$
+declare blocked boolean := false;
+begin
+  begin
+    perform public.owner_bulk_import_expenses(gen_random_uuid(), pg_temp.payload(
+      jsonb_build_array(pg_temp.dup_expense('CASE-1', 'aaaaaaaa-0000-0000-0000-0000000000d1', '  inv-123 '))));
+  exception when others then blocked := true;
+  end;
+  perform pg_temp.want(blocked, '(G) "  inv-123 " is the same document as "INV-123"');
+  perform pg_temp.want((select count(*) from public.owner_expenses) = 1, '(G) and nothing was written');
+end $$;
+
+-- (C) DIFFERENT vendors sharing an invoice number are DIFFERENT documents.
+do $$
+begin
+  perform public.owner_bulk_import_expenses(gen_random_uuid(), pg_temp.payload(
+    jsonb_build_array(pg_temp.dup_expense('OTHER-VENDOR', 'aaaaaaaa-0000-0000-0000-0000000000d2', 'INV-123'))));
+  perform pg_temp.want((select count(*) from public.owner_expenses) = 2,
+    '(C) the same invoice number from a DIFFERENT vendor was allowed');
+end $$;
+
+-- (D) The same vendor with DIFFERENT invoice numbers is not a duplicate.
+do $$
+begin
+  perform public.owner_bulk_import_expenses(gen_random_uuid(), pg_temp.payload(
+    jsonb_build_array(pg_temp.dup_expense('NEXT-DOC', 'aaaaaaaa-0000-0000-0000-0000000000d1', 'INV-124'))));
+  perform pg_temp.want((select count(*) from public.owner_expenses) = 3,
+    '(D) the same vendor with a different invoice number was allowed');
+end $$;
+
+-- (E) A DIFFERENT business entity may hold its own copy of the same supplier document.
+do $$
+begin
+  perform public.owner_bulk_import_expenses(gen_random_uuid(), pg_temp.entity_payload(
+    'bbbbbbbb-0000-0000-0000-0000000000e2',
+    jsonb_build_array(pg_temp.dup_expense('ENTITY-2', 'aaaaaaaa-0000-0000-0000-0000000000d1', 'INV-123'))));
+  perform pg_temp.want((select count(*) from public.owner_expenses) = 4,
+    '(E) the same supplier document in a DIFFERENT business entity was allowed');
+  perform pg_temp.want(
+    (select count(*) from public.owner_expenses
+      where vendor_id = 'aaaaaaaa-0000-0000-0000-0000000000d1' and lower(btrim(supplier_invoice_number)) = 'inv-123') = 2,
+    '(E) each entity holds exactly one copy of INV-123');
+end $$;
+
+-- (F) NO supplier invoice number → no fabricated identity. Two rows that are identical in
+--     vendor, amount and date are TWO REAL EXPENSES: a supplier billing 19,33 € twice on one
+--     day is two deductions, and blocking the second would cost the owner one of them.
+do $$
+begin
+  perform public.owner_bulk_import_expenses(gen_random_uuid(), pg_temp.payload(
+    jsonb_build_array(pg_temp.dup_expense('NO-NUM-1', 'aaaaaaaa-0000-0000-0000-0000000000d1', null))));
+  perform public.owner_bulk_import_expenses(gen_random_uuid(), pg_temp.payload(
+    jsonb_build_array(pg_temp.dup_expense('NO-NUM-2', 'aaaaaaaa-0000-0000-0000-0000000000d1', null))));
+  perform pg_temp.want((select count(*) from public.owner_expenses) = 6,
+    '(F) two numberless expenses from one vendor on one day both imported');
+  perform pg_temp.want(
+    (select count(*) from public.owner_expenses where supplier_invoice_number is not null and btrim(supplier_invoice_number) = '') = 0,
+    '(F) no blank-string document number was invented');
+end $$;
+
+-- A blank-string number is treated as ABSENT, not as a document called "".
+do $$
+begin
+  perform public.owner_bulk_import_expenses(gen_random_uuid(), pg_temp.payload(
+    jsonb_build_array(pg_temp.dup_expense('BLANK-1', 'aaaaaaaa-0000-0000-0000-0000000000d2', '   '))));
+  perform public.owner_bulk_import_expenses(gen_random_uuid(), pg_temp.payload(
+    jsonb_build_array(pg_temp.dup_expense('BLANK-2', 'aaaaaaaa-0000-0000-0000-0000000000d2', ''))));
+  perform pg_temp.want((select count(*) from public.owner_expenses) = 8,
+    'a blank supplier invoice number carries no identity and does not collide');
+  perform pg_temp.want(
+    (select count(*) from public.owner_expenses
+      where supplier_invoice_number is not null and btrim(supplier_invoice_number) = '') = 0,
+    'a blank number is stored as NULL, never as a document called ""');
+end $$;
+
+-- The stored number is TRIMMED, so what is compared is what is stored.
+do $$
+begin
+  perform public.owner_bulk_import_expenses(gen_random_uuid(), pg_temp.payload(
+    jsonb_build_array(pg_temp.dup_expense('TRIMMED', 'aaaaaaaa-0000-0000-0000-0000000000d2', '  RE-77  '))));
+  perform pg_temp.want(
+    exists (select 1 from public.owner_expenses where supplier_invoice_number = 'RE-77'),
+    'the supplier invoice number is stored trimmed');
+end $$;
+
+-- (H) THE DATABASE-LEVEL SAFEGUARD. Every check above lives inside
+--     owner_bulk_import_expenses. This one bypasses that function entirely -- a direct
+--     INSERT, exactly what a stale preview, a hand-written RPC call or two concurrent
+--     imports racing past the same SELECT would amount to -- and must still be refused.
+do $$
+declare blocked boolean := false; msg text; v_cat uuid;
+begin
+  select id into v_cat from public.owner_expense_categories where key = 'ai_api';
+  begin
+    insert into public.owner_expenses (business_entity_id, vendor_id, category_id,
+      supplier_invoice_number, invoice_date, currency)
+    values (current_setting('t.entity')::uuid, 'aaaaaaaa-0000-0000-0000-0000000000d1', v_cat,
+      'INV-123', date '2026-04-14', 'EUR');
+  exception when unique_violation then blocked := true; msg := sqlerrm;
+  end;
+  perform pg_temp.want(blocked,
+    '(H) a DIRECT INSERT bypassing the import function is refused by the database');
+  perform pg_temp.want(msg like '%owner_expenses_supplier_document_uniq%',
+    '(H) by the supplier-document unique index specifically: ' || coalesce(msg, '<none>'));
+
+  -- The same INSERT with a different CASE must also be refused: the index is on the
+  -- normalised expression, not on the raw text.
+  blocked := false;
+  begin
+    insert into public.owner_expenses (business_entity_id, vendor_id, category_id,
+      supplier_invoice_number, invoice_date, currency)
+    values (current_setting('t.entity')::uuid, 'aaaaaaaa-0000-0000-0000-0000000000d1', v_cat,
+      '  Inv-123  ', date '2026-04-14', 'EUR');
+  exception when unique_violation then blocked := true;
+  end;
+  perform pg_temp.want(blocked, '(H) and the index normalises case and whitespace too');
+
+  -- And it must NOT block a legitimate direct insert.
+  insert into public.owner_expenses (business_entity_id, vendor_id, category_id,
+    supplier_invoice_number, invoice_date, currency)
+  values (current_setting('t.entity')::uuid, 'aaaaaaaa-0000-0000-0000-0000000000d1', v_cat,
+    'INV-999', date '2026-04-14', 'EUR');
+  perform pg_temp.want(true, '(H) an unrelated direct insert still succeeds');
+
+  -- Two numberless rows are not a unique-index collision either.
+  insert into public.owner_expenses (business_entity_id, vendor_id, category_id, invoice_date, currency)
+  values (current_setting('t.entity')::uuid, 'aaaaaaaa-0000-0000-0000-0000000000d1', v_cat, date '2026-04-14', 'EUR'),
+         (current_setting('t.entity')::uuid, 'aaaaaaaa-0000-0000-0000-0000000000d1', v_cat, date '2026-04-14', 'EUR');
+  perform pg_temp.want(true, '(H) NULL supplier invoice numbers do not collide in the index');
+end $$;
+
+-- The preview probe agrees with the importer, row for row.
+do $$
+declare r jsonb;
+begin
+  r := public.owner_check_expense_documents(current_setting('t.entity')::uuid, jsonb_build_array(
+    jsonb_build_object('client_import_id','P1','vendor_id','aaaaaaaa-0000-0000-0000-0000000000d1','supplier_invoice_number','INV-123'),
+    jsonb_build_object('client_import_id','P2','vendor_id','aaaaaaaa-0000-0000-0000-0000000000d1','supplier_invoice_number','  inv-123  '),
+    jsonb_build_object('client_import_id','P3','vendor_id','aaaaaaaa-0000-0000-0000-0000000000d2','supplier_invoice_number','INV-123'),
+    jsonb_build_object('client_import_id','P4','vendor_id','aaaaaaaa-0000-0000-0000-0000000000d1','supplier_invoice_number','NEVER-SEEN'),
+    jsonb_build_object('client_import_id','P5','vendor_id','aaaaaaaa-0000-0000-0000-0000000000d1','supplier_invoice_number',null)));
+
+  perform pg_temp.want((r->0->>'match_count')::int = 1, 'probe: INV-123 is already booked');
+  perform pg_temp.want((r->1->>'match_count')::int = 1, 'probe: normalisation matches the index');
+  perform pg_temp.want((r->2->>'match_count')::int = 1, 'probe: the other vendor has its own INV-123');
+  perform pg_temp.want((r->3->>'match_count')::int = 0, 'probe: an unseen document is clear');
+  perform pg_temp.want((r->4->>'match_count')::int = 0, 'probe: a numberless row is never a duplicate');
+  perform pg_temp.want((r->0->>'client_import_id') = 'P1', 'probe: rows come back addressable');
+end $$;
+
+-- (J) Supplier credits stay refused. The duplicate work rescued nothing.
+do $$
+declare blocked boolean := false; msg text; before int;
+begin
+  select count(*) into before from public.owner_expenses;
+  begin
+    perform public.owner_bulk_import_expenses(gen_random_uuid(), pg_temp.payload(jsonb_build_array(
+      jsonb_build_object('client_import_id','CREDIT-1',
+        'vendor', jsonb_build_object('vendor_id','aaaaaaaa-0000-0000-0000-0000000000d1'),
+        'supplier_invoice_number','CREDIT-NOTE-1',
+        'invoice_date','2026-04-20', 'category_key','ai_api',
+        'lines', jsonb_build_array(jsonb_build_object(
+          'description','Gutschrift','net_cents',-1933,
+          'vat_rate_bp',1900,'vat_treatment','domestic_standard'))))));
+  exception when others then blocked := true; msg := sqlerrm;
+  end;
+  perform pg_temp.want(blocked, '(J) a supplier credit is still REFUSED');
+  perform pg_temp.want(msg like '%supplier credits%', '(J) with the credit-note message, not a duplicate one');
+  perform pg_temp.want((select count(*) from public.owner_expenses) = before, '(J) and nothing was written');
+end $$;
+
+-- The probe is owner-gated like every other RPC here.
+do $$
+declare ok1 boolean := false; n int;
+begin
+  perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000000902', false);
+  begin
+    perform public.owner_check_expense_documents(current_setting('t.entity')::uuid, '[]'::jsonb);
+  exception when others then ok1 := sqlerrm like '%Owner access required%';
+  end;
+  perform pg_temp.want(ok1, 'a non-owner cannot run the supplier-document probe');
+  perform set_config('request.jwt.claim.sub', current_setting('t.owner'), false);
+
+  select count(*) into n from information_schema.role_routine_grants
+   where routine_name = 'owner_check_expense_documents' and grantee = 'anon';
+  perform pg_temp.want(n = 0, 'anon holds EXECUTE on the probe either');
+end $$;
+
+-- The probe is READ-ONLY. It is declared STABLE, so the database itself forbids it writing.
+do $$
+declare v text;
+begin
+  select case p.provolatile when 's' then 'stable' when 'i' then 'immutable' else 'volatile' end
+    into v from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+   where n.nspname = 'public' and p.proname = 'owner_check_expense_documents';
+  perform pg_temp.want(v = 'stable', 'the supplier-document probe is STABLE — it cannot write');
 end $$;
 
 -- ---------------------------------------------------------------------------
