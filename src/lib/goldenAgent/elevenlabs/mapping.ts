@@ -164,8 +164,9 @@ export function buildAgentBody(input: AgentBodyInput): Record<string, unknown> {
       guardrails: {
         version: '1',
         prompt_injection: { is_enabled: true },
+        // Verified against the live API: a `retry` trigger action requires blocking execution.
         content: {
-          execution_mode: 'streaming',
+          execution_mode: 'blocking',
           config: { self_harm: { is_enabled: true, threshold: 'medium' }, harassment: { is_enabled: false, threshold: 'medium' } },
           trigger_action: { type: 'retry' },
         },
