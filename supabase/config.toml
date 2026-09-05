@@ -1,2 +1,12 @@
 [functions.sync-oura]
 verify_jwt = false
+
+# Golden Agent runtime endpoints: called by the ElevenLabs platform, which cannot present a
+# Supabase JWT. Each request is authenticated inside the function instead — receptionist-tools by
+# a per-receptionist bearer token (hash stored in ai_receptionist_tool_bindings), receptionist-postcall
+# by the ElevenLabs HMAC webhook signature.
+[functions.receptionist-tools]
+verify_jwt = false
+
+[functions.receptionist-postcall]
+verify_jwt = false

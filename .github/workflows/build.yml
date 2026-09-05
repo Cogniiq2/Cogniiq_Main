@@ -286,6 +286,11 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
         run: bash supabase/tests/run_owner_finance_smoke.sh
 
+      - name: Run AI receptionist platform smoke test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+        run: bash supabase/tests/run_ai_receptionist_platform_smoke.sh
+
   customer-platform-sql-tests:
     runs-on: ubuntu-latest
     steps:
