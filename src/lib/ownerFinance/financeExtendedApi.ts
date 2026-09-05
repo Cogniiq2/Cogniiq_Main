@@ -271,3 +271,120 @@ export async function resolveImportCustomers(
   }
   return { resolutions: (data as CustomerResolution[]) ?? [], error: null, backendMissing: false };
 }
+
+/* --------------------------------------------------------- Expense bulk import */
+
+/** Migration that provisions the Ausgaben-Schnellimport. */
+export const OWNER_EXPENSE_IMPORT_MIGRATION = '20260904120000_owner_expense_bulk_import.sql';
+
+export interface VendorResolutionRow {
+  name: string;
+  vendor_id: string | null;
+  match_count: number;
+  ambiguous: boolean;
+}
+
+/**
+ * Resolve VENDOR names to ids at PREVIEW time.
+ *
+ * This is the supplier counterpart of resolveImportCustomers and must never be swapped for
+ * it: Amazon and OpenAI are vendors, and looking them up in the customer table is precisely
+ * the defect this path exists to fix. A name matching two vendors comes back `ambiguous`
+ * with no id and the import UI stops that row; a name matching none is reported as a vendor
+ * the import would CREATE, which the preview names before anything is written.
+ *
+ * Failure is RETURNED, not thrown, so a missing migration reaches the owner as a sentence
+ * about the migration rather than a stringified PostgREST object.
+ */
+export async function resolveImportVendors(
+  entityId: string,
+  names: string[],
+): Promise<{ resolutions: VendorResolutionRow[]; error: string | null; backendMissing: boolean }> {
+  const { data, error } = await supabase.rpc('owner_resolve_import_vendors', {
+    p_entity: entityId, p_names: names,
+  });
+  if (error) {
+    return {
+      resolutions: [],
+      error: describeSupabaseError(error, 'Der Lieferantenabgleich konnte nicht ausgeführt werden.'),
+      backendMissing: isMissingBackendError(error),
+    };
+  }
+  return { resolutions: (data as VendorResolutionRow[]) ?? [], error: null, backendMissing: false };
+}
+
+export interface SupplierDocumentMatchRow {
+  client_import_id: string | null;
+  vendor_id: string | null;
+  supplier_invoice_number: string | null;
+  match_count: number;
+}
+
+/**
+ * Ask the server, at PREVIEW time, which pasted rows are supplier documents the entity has
+ * already booked.
+ *
+ * Read-only, and NOT the guarantee: a preview goes stale and nothing forces a caller through
+ * it, so owner_bulk_import_expenses re-checks the identical rule inside the transaction and
+ * the owner_expenses_supplier_document_uniq index backs both of them against a race. This
+ * call exists so the owner reads "Beleg bereits erfasst" before confirming rather than a
+ * constraint violation afterwards.
+ *
+ * Failure is RETURNED, not thrown, exactly like the vendor resolver.
+ */
+export async function checkExpenseDocuments(
+  entityId: string,
+  documents: Array<{ client_import_id: string; vendor_id: string; supplier_invoice_number: string }>,
+): Promise<{ matches: SupplierDocumentMatchRow[]; error: string | null; backendMissing: boolean }> {
+  const { data, error } = await supabase.rpc('owner_check_expense_documents', {
+    p_entity: entityId, p_documents: documents,
+  });
+  if (error) {
+    return {
+      matches: [],
+      error: describeSupabaseError(error, 'Die Dublettenprüfung konnte nicht ausgeführt werden.'),
+      backendMissing: isMissingBackendError(error),
+    };
+  }
+  return { matches: (data as SupplierDocumentMatchRow[]) ?? [], error: null, backendMissing: false };
+}
+
+export interface ExpenseImportResult {
+  batch_id: string;
+  expense_count: number;
+  payment_count: number;
+  net_cents: number;
+  vat_cents: number;
+  gross_cents: number;
+  input_vat_cents: number;
+  paid_cents: number;
+  vendors_created: string[];
+  expenses: Array<{
+    client_import_id: string; expense_id: string; vendor_id: string | null;
+    payment_status: string; gross_total_cents: number;
+  }>;
+}
+
+/**
+ * Run the atomic expense import.
+ *
+ * One RPC, one transaction, all-or-nothing — including any vendor the call creates. The
+ * browser never loops createOwnerExpense/recordExpensePayment, because a loop that fails on
+ * row 18 leaves 17 expenses behind and no way to tell which.
+ */
+export async function runExpenseBulkImport(
+  payload: unknown,
+): Promise<{ result: ExpenseImportResult | null; error: string | null; backendMissing: boolean }> {
+  const { data, error } = await supabase.rpc('owner_bulk_import_expenses', {
+    p_idempotency_key: secureUuid(),
+    p_payload: payload,
+  });
+  if (error) {
+    return {
+      result: null,
+      error: describeSupabaseError(error, 'Der Ausgaben-Import konnte nicht ausgeführt werden.'),
+      backendMissing: isMissingBackendError(error),
+    };
+  }
+  return { result: (data as ExpenseImportResult) ?? null, error: null, backendMissing: false };
+}

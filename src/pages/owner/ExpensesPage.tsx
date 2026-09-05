@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FolderInput, Plus, Receipt, Trash2 } from 'lucide-react';
+import { FileUp, FolderInput, Plus, Receipt, Trash2 } from 'lucide-react';
 
 import {
   Button, Card, Checkbox, DataTable, EmptyState, ErrorState, FilterChips, IconButton,
@@ -19,12 +19,20 @@ import { expenseReviewTone, paymentStatusTone } from '@/pages/owner/ownerUi';
 import { useCreateIntent } from '@/pages/admin/routeIntent';
 import { useOwnerEntity } from '@/pages/owner/ownerContext';
 import {
-  createOwnerExpense, loadCategories, loadExpenses, loadVendors,
+  createOwnerExpense, describeSupabaseError, loadCategories, loadExpenses, loadVendors,
   markExpenseReviewed, recordExpensePayment,
   type ExpenseLineInput,
 } from '@/lib/ownerFinance/api';
 import { loadAdminClients } from '@/lib/clientPlatform/adminApi';
 import { computeExpenseLine, eligibleInputVat } from '@/lib/ownerFinance/tax';
+import {
+  applyExistingDocumentMatches, applyVendorResolutions, expenseImportTemplate,
+  parseExpenseBulkImport, supplierDocumentsToCheck,
+  type ExpenseImportPreview,
+} from '@/lib/ownerFinance/expenseBulkImport';
+import {
+  OWNER_EXPENSE_IMPORT_MIGRATION, checkExpenseDocuments, resolveImportVendors, runExpenseBulkImport,
+} from '@/lib/ownerFinance/financeExtendedApi';
 import { formatCents, parseAmountToCents } from '@/lib/clientPlatform/validation';
 import { formatDateDe } from '@/lib/ownerFinance/exports';
 import type { OwnerExpense, OwnerExpenseCategory, OwnerVendor } from '@/lib/ownerFinance/types';
@@ -70,6 +78,7 @@ export function ExpensesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [composerOpen, setComposerOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   // ⌘K's create action navigates here with ?create=1; this opens the dialog this page
   // already owns. Without the intent nothing opens — the plain list URL stays a list.
   useCreateIntent(() => setComposerOpen(true));
@@ -343,6 +352,9 @@ export function ExpensesPage() {
                 { value: 'all', label: 'Alle Ausgaben', count: expenses.length },
               ]}
             />
+            {/* Page-level import action. It sits beside "Ausgabe erfassen" in the header rather
+                than inside the list, so it stays reachable from the folder overview too. */}
+            <Button variant="secondary" icon={FileUp} onClick={() => setImportOpen(true)} disabled={!entity}>Schnellimport</Button>
             <Button icon={Plus} onClick={() => setComposerOpen(true)} disabled={!entity}>Ausgabe erfassen</Button>
           </>
         }
@@ -510,6 +522,19 @@ export function ExpensesPage() {
         resourcePlural="Belege"
         onClose={() => setPurgeTarget(null)}
         onDone={() => { setSelected(new Set()); void load(); }}
+      />
+
+      <ExpenseImportModal
+        open={importOpen}
+        entityId={entity?.id ?? null}
+        // Only real keys are passed: an environment whose category rows predate the `key`
+        // column would otherwise hand the parser a list of undefineds and make every valid
+        // category look unknown. An empty list means "defer key validation to the server",
+        // which is authoritative either way.
+        categoryKeys={categories.map((c) => c.key).filter((k): k is string => typeof k === 'string' && k.length > 0)}
+        onClose={() => setImportOpen(false)}
+        onDone={(msg) => { setImportOpen(false); toast.success('Import abgeschlossen', msg); void load(); }}
+        onError={(msg) => toast.error('Import fehlgeschlagen', msg)}
       />
 
     </>
@@ -735,6 +760,210 @@ function ExpensePaymentDialog({ expense, onClose, onDone, onError }: {
         <Field id="expPayRef" label="Referenz" value={reference} onChange={setReference} placeholder="Verwendungszweck" />
       </div>
       {err ? <p className="mt-3 text-[13px] text-red-600">{err}</p> : null}
+    </Modal>
+  );
+}
+
+/* --------------------------------------------------------- Ausgaben-Schnellimport */
+
+/**
+ * PASTE → PARSE → VALIDATE → RESOLVE VENDORS/CATEGORIES → PREVIEW → CONFIRM → atomic import.
+ *
+ * There is deliberately no paste-and-write path: nothing is written until the owner has seen
+ * the totals, every vendor the import would CREATE, and every problem. The field takes the
+ * documented expense JSON only; pasted SQL is refused outright rather than forwarded.
+ *
+ * Suppliers are resolved against owner_vendors, never against customers. That distinction is
+ * the whole point of this dialog — an imported OpenAI receipt must not create a Cogniiq
+ * customer named OpenAI.
+ */
+function ExpenseImportModal({ open, entityId, categoryKeys, onClose, onDone, onError }: {
+  open: boolean;
+  entityId: string | null;
+  categoryKeys: string[];
+  onClose: () => void;
+  onDone: (message: string) => void;
+  onError: (message: string) => void;
+}) {
+  const [raw, setRaw] = useState('');
+  const [preview, setPreview] = useState<ExpenseImportPreview | null>(null);
+  const [checking, setChecking] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => { if (open) { setRaw(''); setPreview(null); } }, [open]);
+
+  const check = async () => {
+    if (!entityId) return;
+    setChecking(true);
+    let p = parseExpenseBulkImport(raw, entityId, categoryKeys);
+    // Vendor names are resolved server-side so the preview can state — before anything is
+    // written — which suppliers are unknown (and will be created) or ambiguous (and block).
+    if (p.payload && p.unresolvedVendorNames.length > 0) {
+      try {
+        const { resolutions, error, backendMissing } = await resolveImportVendors(entityId, p.unresolvedVendorNames);
+        if (error) {
+          const message = backendMissing
+            ? `Der Ausgaben-Schnellimport ist in dieser Umgebung noch nicht installiert. Bitte die Migration ${OWNER_EXPENSE_IMPORT_MIGRATION} anwenden.`
+            : `Lieferantenabgleich fehlgeschlagen: ${error}`;
+          p = { ...p, ok: false, errors: [...p.errors, { row: '—', message }] };
+        } else {
+          p = applyVendorResolutions(p, resolutions);
+        }
+      } catch (e: unknown) {
+        p = { ...p, ok: false, errors: [...p.errors, { row: '—', message: `Lieferantenabgleich fehlgeschlagen: ${describeSupabaseError(e)}` }] };
+      }
+    }
+    // Supplier-document duplicates the entity has ALREADY booked. This runs after vendor
+    // resolution because the identity is (vendor, supplier invoice number) and the vendor is
+    // only known once resolution has bound it. Rows still awaiting a vendor that will be
+    // CREATED are skipped by construction: there is nothing booked against a vendor that
+    // does not exist yet.
+    //
+    // A failure here is an ERROR, never a silent pass. The preview is the owner's last look
+    // at the numbers before confirming, and "we could not check for duplicates" must not
+    // read like "no duplicates".
+    const documents = p.payload ? supplierDocumentsToCheck(p) : [];
+    if (documents.length > 0) {
+      try {
+        const { matches, error, backendMissing } = await checkExpenseDocuments(entityId, documents);
+        if (error) {
+          const message = backendMissing
+            ? `Der Ausgaben-Schnellimport ist in dieser Umgebung noch nicht installiert. Bitte die Migration ${OWNER_EXPENSE_IMPORT_MIGRATION} anwenden.`
+            : `Dublettenprüfung fehlgeschlagen: ${error}`;
+          p = { ...p, ok: false, errors: [...p.errors, { row: '—', message }] };
+        } else {
+          p = applyExistingDocumentMatches(p, matches);
+        }
+      } catch (e: unknown) {
+        p = { ...p, ok: false, errors: [...p.errors, { row: '—', message: `Dublettenprüfung fehlgeschlagen: ${describeSupabaseError(e)}` }] };
+      }
+    }
+    setChecking(false);
+    setPreview(p);
+  };
+
+  const confirm = async () => {
+    if (!preview?.ok || !preview.payload) return;
+    setBusy(true);
+    const { result, error, backendMissing } = await runExpenseBulkImport(preview.payload);
+    setBusy(false);
+    if (error || !result) {
+      onError(backendMissing
+        ? `Der Ausgaben-Schnellimport ist in dieser Umgebung noch nicht installiert. Bitte die Migration ${OWNER_EXPENSE_IMPORT_MIGRATION} anwenden.`
+        : (error ?? 'Unbekannter Fehler'));
+      return;
+    }
+    const vendorNote = result.vendors_created?.length
+      ? ` ${result.vendors_created.length} neue(r) Lieferant(en) angelegt.`
+      : '';
+    onDone(`${result.expense_count} Ausgaben und ${result.payment_count} Zahlungen importiert.${vendorNote}`);
+  };
+
+  const money = (c: number) => formatCents(c, 'EUR');
+
+  return (
+    <Modal open={open} onClose={busy ? () => {} : onClose} title="Ausgaben-Schnellimport" size="lg">
+      <div className="space-y-4">
+        <SectionHeader
+          title="Strukturierter JSON-Import"
+          description="Historische Belege mit Lieferant, USt-Behandlung und Zahlungen in einem Schritt. Es wird ausschließlich das dokumentierte JSON-Format akzeptiert — kein SQL."
+          action={
+            <Button size="sm" variant="ghost" onClick={() => { setRaw(expenseImportTemplate()); setPreview(null); }}>
+              Beispiel einfügen
+            </Button>
+          }
+        />
+
+        <InfoBanner tone="info" title="Lieferanten, keine Kunden">
+          Belege werden gegen die Lieferantenliste abgeglichen. Es entsteht dabei kein Kunde,
+          keine Rechnung und keine Rechnungsnummer.
+        </InfoBanner>
+
+        <textarea
+          value={raw}
+          onChange={(e) => { setRaw(e.target.value); setPreview(null); }}
+          rows={10}
+          spellCheck={false}
+          aria-label="Ausgaben-JSON"
+          placeholder='{ "schema_version": 1, "expenses": [ … ] }'
+          className="w-full rounded-xl border border-gray-200 bg-white p-3 font-mono text-[12px] text-gray-900 outline-none focus:border-gray-400"
+        />
+
+        {!preview ? (
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={onClose}>Abbrechen</Button>
+            <Button onClick={() => void check()} loading={checking} disabled={!raw.trim() || !entityId}>Prüfen</Button>
+          </div>
+        ) : (
+          <>
+            <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-4">
+              <p className="text-[13px] font-semibold text-gray-950">
+                {preview.expenseCount} Ausgaben · {preview.paymentCount} Zahlungen
+              </p>
+              <dl className="mt-3 grid gap-1.5 text-[13px] sm:grid-cols-2">
+                <div className="flex justify-between"><dt className="text-gray-500">Netto</dt><dd className="tabular-nums text-gray-800">{money(preview.netCents)}</dd></div>
+                <div className="flex justify-between"><dt className="text-gray-500">USt</dt><dd className="tabular-nums text-gray-800">{money(preview.vatCents)}</dd></div>
+                <div className="flex justify-between"><dt className="text-gray-500">Vorsteuer</dt><dd className="tabular-nums text-gray-800">{money(preview.inputVatCents)}</dd></div>
+                <div className="flex justify-between"><dt className="text-gray-500">Brutto</dt><dd className="tabular-nums font-semibold text-gray-950">{money(preview.grossCents)}</dd></div>
+                <div className="flex justify-between"><dt className="text-gray-500">Bezahlt</dt><dd className="tabular-nums text-emerald-700">{money(preview.paidCents)}</dd></div>
+              </dl>
+              <p className="mt-3 text-[11px] text-gray-400">
+                Beträge sind eine Vorschau. Netto, USt, Vorsteuer, Brutto und Zahlungsstatus
+                werden beim Import serverseitig neu berechnet.
+              </p>
+            </div>
+
+            {preview.vendorsToCreate.length > 0 ? (
+              <div className="rounded-xl border border-sky-100 bg-sky-50/70 p-3">
+                <p className="text-[13px] font-semibold text-sky-900">
+                  {preview.vendorsToCreate.length} neue(r) Lieferant(en) werden angelegt
+                </p>
+                <ul className="mt-2 space-y-1 text-[12px] text-sky-800">
+                  {preview.vendorsToCreate.map((v) => (
+                    <li key={v.name}>Neuer Lieferant wird angelegt: {v.name}{v.country_code ? ` (${v.country_code})` : ''}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
+            {preview.errors.length > 0 ? (
+              <div className="rounded-xl border border-red-100 bg-red-50/70 p-3">
+                <p className="text-[13px] font-semibold text-red-800">{preview.errors.length} Problem(e) — Import nicht möglich</p>
+                <ul className="mt-2 space-y-1 break-words text-[12px] text-red-700">
+                  {preview.errors.slice(0, 12).map((e, i) => <li key={i}><span className="font-medium">{e.row}:</span> {e.message}</li>)}
+                  {preview.errors.length > 12 ? <li className="text-red-500">… und {preview.errors.length - 12} weitere</li> : null}
+                </ul>
+              </div>
+            ) : (
+              <div className="rounded-xl border border-emerald-100 bg-emerald-50/70 px-3 py-2 text-[13px] text-emerald-800">
+                ✓ {preview.expenseCount} Ausgaben bereit
+              </div>
+            )}
+
+            {preview.warnings.length > 0 ? (
+              <div className="rounded-xl border border-amber-100 bg-amber-50/70 p-3">
+                <p className="text-[13px] font-semibold text-amber-800">Hinweise</p>
+                <ul className="mt-2 space-y-1 break-words text-[12px] text-amber-700">
+                  {preview.warnings.slice(0, 8).map((w, i) => <li key={i}><span className="font-medium">{w.row}:</span> {w.message}</li>)}
+                  {preview.warnings.length > 8 ? <li className="text-amber-600">… und {preview.warnings.length - 8} weitere</li> : null}
+                </ul>
+              </div>
+            ) : null}
+
+            <p className="text-[12px] leading-relaxed text-gray-400">
+              Der Import läuft in einer einzigen Transaktion: entweder alle Belege oder keiner.
+              Neue Lieferanten entstehen dabei im selben Vorgang. Es wird nichts versendet.
+            </p>
+
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => setPreview(null)} disabled={busy}>Zurück</Button>
+              <Button onClick={() => void confirm()} loading={busy} disabled={!preview.ok}>
+                {preview.ok ? 'Import bestätigen' : 'Import nicht möglich'}
+              </Button>
+            </div>
+          </>
+        )}
+      </div>
     </Modal>
   );
 }

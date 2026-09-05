@@ -220,6 +220,29 @@ export const ALLOWED_MIGRATIONS = [
     ],
     description: 'Admin Center — workspace folders, Papierkorb and the owner delete preflight',
   },
+  {
+    file: '20260904120000_owner_expense_bulk_import.sql',
+    version: '20260904120000',
+    // Real dependencies, every one an object this SQL actually references:
+    //  - 20260710120000: is_platform_owner(), the gate every RPC here opens with
+    //  - 20260722120000: owner_business_entities, owner_expenses, owner_expense_lines,
+    //    owner_expense_categories (the seeded stable keys, incl. review_required),
+    //    owner_vendors, owner_payments, owner_finance_requests and
+    //    owner_claim_idempotency() -- the whole canonical expense model this import writes
+    //    through, plus the recalc/validate triggers that derive every monetary column
+    //  - 20260828120000: owner_finance_import_batches / owner_finance_import_records (whose
+    //    record_type CHECK this widens and to which it adds expense_id) and
+    //    owner_bulk_import_finance, which this migration replaces verbatim except for one
+    //    added guard. Applying this before 20260828120000 would fail on missing tables and
+    //    would create a bulk importer that migration would then silently overwrite.
+    // It does NOT depend on 20260829120000: advance payments are an INVOICE concept and no
+    // expense object here touches owner_apply_invoice_payments. It does NOT depend on
+    // 20260903120000 either: folders and the Papierkorb organise expenses but this import
+    // writes none of their tables. Listing a version this SQL does not reference would make
+    // the dependency gate assert something untrue.
+    requires: ['20260710120000', '20260722120000', '20260828120000'],
+    description: 'Admin Center — atomic EXPENSE Schnellimport with vendor resolution (Ausgaben)',
+  },
 ];
 
 /**

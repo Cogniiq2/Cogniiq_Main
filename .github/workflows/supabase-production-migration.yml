@@ -46,6 +46,7 @@ on:
           - 20260901120000_owner_invoice_preflight_array_fix.sql
           - 20260902120000_receptionist_leads_pii_rls.sql
           - 20260903120000_owner_workspace_organization.sql
+          - 20260904120000_owner_expense_bulk_import.sql
         default: 20260826120000_owner_historical_paid_invoice.sql
       mode:
         description: Audit history, run a dry run, or apply the migration
@@ -123,6 +124,7 @@ jobs:
             20260901120000_owner_invoice_preflight_array_fix.sql) ;;
             20260902120000_receptionist_leads_pii_rls.sql) ;;
             20260903120000_owner_workspace_organization.sql) ;;
+            20260904120000_owner_expense_bulk_import.sql) ;;
             *)
               echo "Refusing to act on a migration that is not on the production allowlist: $SELECTED_MIGRATION"
               exit 1
