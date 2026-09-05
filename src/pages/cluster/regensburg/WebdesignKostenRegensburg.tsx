@@ -11,9 +11,9 @@ const config: ClusterPageConfig = {
   cityHub: "/regensburg",
   topic: "Webdesign Kosten",
   seo: {
-    title: "Webdesign Kosten Regensburg 2025 – Was kostet eine Website? | Cogniiq",
+    title: "Webdesign Kosten Regensburg – Was kostet eine Website? | Cogniiq",
     description:
-      "Webdesign Kosten in Regensburg: Was kostet eine professionelle Website in Regensburg 2025? Preisrahmen, Pakete und Einflussfaktoren – transparent erklärt von Cogniiq.",
+      "Webdesign Kosten in Regensburg: Was kostet eine professionelle Website in Regensburg? Preisrahmen, Pakete und Einflussfaktoren – transparent erklärt von Cogniiq.",
     canonical: `${base}/regensburg/webdesign-kosten`,
     keywords:
       "Webdesign Kosten Regensburg, Website erstellen Kosten Regensburg, Homepage Kosten Regensburg, Webdesign Preis Regensburg",

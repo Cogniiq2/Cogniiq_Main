@@ -11,9 +11,9 @@ const config: ClusterPageConfig = {
   cityHub: "/bayreuth",
   topic: "Webdesign Kosten",
   seo: {
-    title: "Webdesign Kosten Bayreuth 2025 – Was kostet eine Website? | Cogniiq",
+    title: "Webdesign Kosten Bayreuth – Was kostet eine Website? | Cogniiq",
     description:
-      "Webdesign Kosten in Bayreuth: Was kostet eine professionelle Website in Bayreuth 2025? Preisrahmen, Pakete und Einflussfaktoren – transparent erklärt von Cogniiq.",
+      "Webdesign Kosten in Bayreuth: Was kostet eine professionelle Website in Bayreuth? Preisrahmen, Pakete und Einflussfaktoren – transparent erklärt von Cogniiq.",
     canonical: `${base}/bayreuth/webdesign-kosten`,
     keywords:
       "Webdesign Kosten Bayreuth, Website erstellen Kosten Bayreuth, Homepage Kosten Bayreuth, Webdesign Preis Bayreuth, Website Preis Bayreuth",
