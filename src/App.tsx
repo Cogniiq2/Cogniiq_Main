@@ -415,6 +415,7 @@ const CommandCenterPage = lazyNamed(() => import('./pages/admin/CommandCenterPag
 const TaskDashboardContent = lazyNamed(() => import('./pages/admin/tasks/TaskDashboardContent'), 'TaskDashboardContent');
 const ExecutionContent = lazyNamed(() => import('./pages/ExecutionPage'), 'ExecutionContent');
 const OuraAnalyticsContent = lazyNamed(() => import('./pages/OuraAnalyticsPage'), 'OuraAnalyticsContent');
+const ReceptionistsModule = lazyNamed(() => import('./pages/admin/receptionists/ReceptionistsModule'), 'ReceptionistsModule');
 const FinanceModule = lazyNamed(() => import('./pages/admin/finance/FinanceModule'), 'FinanceModule');
 const PublicDocumentPortal = lazyNamed(() => import('./pages/public/PublicDocumentPortal'), 'PublicDocumentPortal');
 const ClientsListPage = lazyNamed(() => import('./pages/admin/clients/ClientsListPage'), 'ClientsListPage');
@@ -544,6 +545,7 @@ export function AppInner() {
           <Route path="/admin/solutions" element={<AdminSolutionsPage />} />
           <Route path="/admin/invitations" element={<AdminInvitationsPage />} />
           <Route path="/admin/finance/*" element={<FinanceModule />} />
+          <Route path="/admin/receptionists/*" element={<ReceptionistsModule />} />
           <Route path="/admin/*" element={<Navigate to="/admin" replace />} />
         </Route>
 

@@ -32,6 +32,8 @@ const MOUNTED_ROUTES = [
   '/admin/clients/new',
   '/admin/solutions',
   '/admin/invitations',
+  // /admin/receptionists/* is one nested router; only its list destination is a nav target.
+  '/admin/receptionists',
   // /admin/finance/* is one nested router; its own destinations are listed explicitly.
   '/admin/finance/overview',
   '/admin/finance/customers',

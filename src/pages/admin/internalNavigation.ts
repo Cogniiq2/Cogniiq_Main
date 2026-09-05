@@ -1,5 +1,5 @@
 import {
-  Building2, FileSignature, FileText, Gauge, HardDrive, LayoutDashboard, LayoutGrid, Mail,
+  Bot, Building2, FileSignature, FileText, Gauge, HardDrive, LayoutDashboard, LayoutGrid, Mail,
   Receipt, Repeat, ScrollText, Settings, ShieldCheck, TrendingUp, Users, Wallet, type LucideIcon,
 } from 'lucide-react';
 
@@ -31,7 +31,7 @@ import type { ShellSection, ShellSubNavGroup } from '@/components/dashboard';
 // Analytics (personal health data) and the standalone Task/Execution OS leave the business
 // navigation without leaving the application.
 
-export type ModuleKey = 'home' | 'customers' | 'finance' | 'tasks' | 'oura';
+export type ModuleKey = 'home' | 'customers' | 'receptionists' | 'finance' | 'tasks' | 'oura';
 
 interface ModuleSubNavGroup extends ShellSubNavGroup {
   /** Withheld from non-owners. The route stays owner-gated regardless. */
@@ -109,6 +109,17 @@ const MODULES: ModuleConfig[] = [
         ],
       },
     ],
+  },
+  {
+    key: 'receptionists',
+    label: 'AI Receptionists',
+    href: '/admin/receptionists',
+    icon: Bot,
+    title: 'AI Receptionists',
+    keywords: 'receptionist telefonassistent golden agent elevenlabs evaluation anrufe',
+    ownerOnly: true,
+    matches: (p) => p === '/admin/receptionists' || p.startsWith('/admin/receptionists/'),
+    subNav: [],
   },
   {
     key: 'finance',
@@ -201,7 +212,7 @@ export function getActiveModule(pathname: string): ModuleConfig {
   return MODULES.find((m) => m.matches(pathname)) ?? HOME_MODULE;
 }
 
-const DISPLAY_ORDER: ModuleKey[] = ['home', 'customers', 'finance', 'tasks', 'oura'];
+const DISPLAY_ORDER: ModuleKey[] = ['home', 'customers', 'receptionists', 'finance', 'tasks', 'oura'];
 
 export function getSections(pathname: string, opts: { isOwner: boolean }): ShellSection[] {
   const active = getActiveModule(pathname);
