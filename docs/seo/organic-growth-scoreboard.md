@@ -148,6 +148,28 @@ eine Änderung der Messbedingungen von A1 und wird deshalb hier datiert; ein
 Sprung ab Tag 7 nach dem Merge ist der Linkstruktur zuzurechnen, nicht dem
 Inhalt.
 
+### Bekannte Störgröße für die eingefrorenen Experimente (2026-09-05)
+
+Die Footer-Spalte „Leitfäden für Praxen" fügt der geteilten Shell zwei neue
+sitewide Links hinzu (71 → 73 Shell-Anker je Seite). Der Experiment-Guard sieht
+das nicht und soll es auch nicht: Sein Body-Fingerabdruck endet an `<main>`, und
+seine Inbound-Prüfung zählt Vorkommen der geschützten Pfade — beide sind
+unverändert, der Guard ist zu Recht grün.
+
+Kausal bleibt trotzdem eine Änderung: `/ki-telefonassistent-arzt` und
+`/kosten-ki-telefonassistent` stehen selbst in der Shell, ihr Anteil an der
+internen Verlinkung sinkt also um rund 3 % auf allen 93 Seiten. Zusätzlich steht
+die Arzt-Karte auf `/praxen` jetzt in einem Raster mit drei statt zwei Karten
+neben einer neuen Zahnarzt-Karte; Anker und Ziel sind unverändert, die
+Klickverteilung ist es nicht.
+
+Beides ist klein gegenüber dem Rauschen einer Positionsmessung und war die
+bewusste Alternative dazu, die Beiträge des Clusters unverlinkt zu lassen. Es
+steht hier, damit eine Bewegung in den beiden Messreihen ab dem Merge-Datum
+nicht dem Experiment zugeschrieben wird. Wer die Störgröße ausschließen will,
+nimmt die Footer-Spalte heraus: Beide Beiträge haben kontextuelle Inbound-Links
+aus Seiteninhalten und sind auch ohne sie nicht verwaist.
+
 ### A2 · `/ki-telefonassistent` (bestehende Hub-Seite)
 
 Verändert wurde nur ein kontextueller interner Verweis. Die Seite wird

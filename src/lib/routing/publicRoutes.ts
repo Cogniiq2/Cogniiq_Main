@@ -211,7 +211,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
     description: "Wie eine Praxis einen KI-Telefonassistenten einführt: welche Anrufe infrage kommen, wie die Übergabe geklärt wird und was vor der Freigabe geprüft gehört.",
     keywords: "KI Telefonassistent in der Praxis einführen, KI Telefonassistent Praxis einführen, Einführung KI Telefonassistent, Telefonassistent Praxis Freigabe",
     indexable: true,
-    sitemap: { lastmod: "2026-08-29", changefreq: "monthly", priority: "0.85" },
+    sitemap: { lastmod: "2026-09-05", changefreq: "monthly", priority: "0.85" },
   },
   // Zweiter Fachbeitrag im Cluster: die Zahnarztpraxis. Operativ (welche
   // Anrufe, welche Regel je Anlass, was immer beim Team bleibt), nicht als

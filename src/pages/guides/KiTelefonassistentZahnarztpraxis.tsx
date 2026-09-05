@@ -94,7 +94,7 @@ const ANLAESSE: Array<{
     regel: "uebernimmt",
     text: "Der häufigste Anruf, der an einem besetzten Telefon verloren geht. Der Assistent nimmt die Absage nach Ihren Regeln entgegen; der frei werdende Termin ist für Ihr Team sofort sichtbar.",
     festlegen:
-      "Ab wann eine Absage als kurzfristig gilt, welche Termine sofort ans Team gemeldet werden und wer die Nachbesetzung übernimmt. Die Regeln zu Ausfallhonoraren erklärt ein Mensch, nicht der Assistent.",
+      "Ab wann eine Absage als kurzfristig gilt, welche Absagen Ihr Team zuerst ansehen soll und wer die Nachbesetzung übernimmt. Die Regeln zu Ausfallhonoraren erklärt ein Mensch, nicht der Assistent.",
   },
   {
     anlass: "Rückruf nach einer Recall-Erinnerung",
@@ -156,9 +156,9 @@ const ANLAESSE: Array<{
 const PRUEFFAELLE: string[] = [
   "Jemand hat Schmerzen und möchte „heute noch“ kommen – der Assistent gibt keine Einschätzung ab und leitet weiter oder gibt die festgelegte Ansage aus",
   "Eine Frage zum Heil- und Kostenplan – der Assistent verspricht keine Auskunft, sondern nimmt den Rückrufwunsch auf",
-  "Eine Absage für einen langen Behandlungstermin am nächsten Morgen – die Meldung an das Team kommt sofort an",
+  "Eine Absage für einen langen Behandlungstermin am nächsten Morgen – der frei werdende Termin ist sofort sichtbar",
   "Ein Rückruf auf eine Recall-Erinnerung – der Bezug steht im Ergebnis, der Termin liegt im richtigen Zeitfenster",
-  "Eine Absage für eine andere Person – die Angaben, die Sie dafür festgelegt haben, werden abgefragt, bevor die Absage gilt",
+  "Eine Absage für eine andere Person – der Assistent hält sich an die Regel, die Sie für diesen Fall festgelegt haben",
   "Das Labor ruft an – der Anruf landet dort, wo Sie ihn haben wollen, nicht in der Terminlogik",
   "Jemand meldet sich außerhalb der Sprechzeit mit einer Nachblutung – die Notdienst-Ansage ist aktuell und vollständig",
 ];
@@ -449,9 +449,10 @@ export function KiTelefonassistentZahnarztpraxis() {
                   Berechtigung.
                 </strong>{" "}
                 Eine Absage greift in Ihren Kalender ein. Legen Sie fest, welche Angaben
-                dafür abgefragt werden – etwa Name und Geburtsdatum – und ob eine Absage für
-                eine andere Person überhaupt angenommen wird. Dass eine falsche Angabe
-                abgewiesen wird, gehört zu den Fällen, die vor der Freigabe geprüft werden.
+                dafür abgefragt werden und ob eine Absage für eine andere Person überhaupt
+                angenommen wird. Welche Angaben Ihr Assistent abfragen kann und woran sie
+                sich prüfen lassen, hängt daran, was die Übergabe in Ihr System hergibt –
+                das steht vor dem Angebot fest, nicht danach.
               </li>
               <li>
                 <strong className="font-semibold text-gray-900 dark:text-gray-100">
