@@ -13,6 +13,24 @@ export interface BlogArticle {
   faqItems?: { question: string; answer: string }[];
   relatedSlugs: string[];
   canonical: string;
+  /**
+   * The service pages this article's reader is actually looking for next.
+   * Rendered as a contextual "Passende Leistung" block on the article — the
+   * only editorial links from the blog into the money pages. Targets must be
+   * indexable manifest routes and must never point at a frozen search
+   * experiment (src/lib/routing/protectedExperiments.ts); blog-data.test.ts
+   * enforces both.
+   */
+  serviceLinks: ServiceLink[];
+}
+
+export interface ServiceLink {
+  /** Anchor text. Names the page's topic, not a call to action. */
+  label: string;
+  /** Site-relative path of an indexable public route. */
+  href: string;
+  /** One sentence on why this page follows from the article. */
+  note: string;
 }
 
 export interface BlogSection {
@@ -35,14 +53,14 @@ export const BLOG_CATEGORIES = [
 export const BLOG_ARTICLES: BlogArticle[] = [
   {
     slug: "ki-automatisierung-kleine-unternehmen",
-    title: "KI-Automatisierung für kleine Unternehmen: Der komplette Leitfaden 2025",
-    metaTitle: "KI-Automatisierung für kleine Unternehmen 2025 | Leitfaden",
+    title: "KI-Automatisierung für kleine Unternehmen: Der komplette Leitfaden",
+    metaTitle: "KI-Automatisierung für kleine Unternehmen | Leitfaden",
     metaDescription:
       "KI-Automatisierung für kleine Unternehmen: Welche Prozesse sich lohnen, was es kostet und wie der Einstieg gelingt. Mit konkreten Beispielen aus der Praxis.",
     category: "KI-Automatisierung",
     readingTime: 9,
     publishedAt: "2025-01-20",
-    updatedAt: "2025-03-01",
+    updatedAt: "2026-09-05",
     excerpt:
       "Viele Inhaber kleiner Unternehmen verbringen einen erheblichen Teil ihrer Arbeitszeit mit Aufgaben, die eine KI in Sekunden erledigen könnte. Dieser Leitfaden zeigt, wo der Hebel am größten ist.",
     heroKeyword: "KI-Automatisierung kleine Unternehmen",
@@ -147,17 +165,21 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "prozessautomatisierung-roi",
     ],
     canonical: "https://cogniiq.de/blog/ki-automatisierung-kleine-unternehmen",
+    serviceLinks: [
+      { label: "Prozessautomatisierung für Unternehmen", href: "/prozessautomatisierung", note: "Wie Cogniiq wiederkehrende Abläufe in Betrieben aufnimmt, abbildet und automatisiert." },
+      { label: "Was kostet Automatisierung?", href: "/kosten-automatisierung", note: "Kostenrahmen und Einflussfaktoren, bevor Sie ein Projekt anfragen." },
+    ],
   },
   {
     slug: "ki-telefonassistent-arztpraxis",
     title: "KI-Telefonassistent für Arztpraxen: Weniger Stress, mehr freie Leitungen",
-    metaTitle: "KI-Telefonassistent Arztpraxis 2025 | Vorteile & Kosten",
+    metaTitle: "KI-Telefonassistent Arztpraxis | Vorteile & Kosten",
     metaDescription:
       "Wie ein KI-Telefonassistent Arztpraxen dabei hilft, verpasste Anrufe zu reduzieren, Termine automatisch zu buchen und das Praxisteam zu entlasten.",
     category: "KI-Telefonassistent",
     readingTime: 7,
     publishedAt: "2025-01-28",
-    updatedAt: "2025-02-20",
+    updatedAt: "2026-09-05",
     excerpt:
       "Eine Arztpraxis mit hohem Anrufaufkommen verliert ohne funktionierendes Telefonmanagement Patienten. Der KI-Telefonassistent übernimmt Annahme, strukturierte Aufnahme und Terminbuchung – auch außerhalb der Öffnungszeiten.",
     heroKeyword: "KI-Telefonassistent Arztpraxis",
@@ -243,17 +265,21 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "ki-telefonassistent-restaurant",
     ],
     canonical: "https://cogniiq.de/blog/ki-telefonassistent-arztpraxis",
+    serviceLinks: [
+      { label: "KI Telefonassistent für Praxen", href: "/praxen", note: "Anrufannahme mit Ihren Ansagen und Regeln, strukturierte Übergabe an das Praxisteam." },
+      { label: "KI-Telefonassistent in der Praxis einführen", href: "/ki-telefonassistent-einfuehren", note: "Der Ablauf von der Rufumleitung bis zur Freigabe, Schritt für Schritt." },
+    ],
   },
   {
     slug: "webdesign-konversion-tipps",
     title: "Webdesign für mehr Anfragen: 8 Konversionsfaktoren, die wirklich zählen",
-    metaTitle: "Webdesign für mehr Anfragen & Konversion 2025 | 8 Tipps",
+    metaTitle: "Webdesign für mehr Anfragen & Konversion | 8 Tipps",
     metaDescription:
       "Warum viele Unternehmenswebsites keine Anfragen generieren – und wie Sie mit gezielten Webdesign-Entscheidungen die Konversionsrate deutlich steigern können.",
     category: "Webdesign",
     readingTime: 8,
     publishedAt: "2025-02-03",
-    updatedAt: "2025-03-05",
+    updatedAt: "2026-09-05",
     excerpt:
       "Die meisten Unternehmenswebsites sind Visitenkarten – keine Verkaufsmaschinen. Dieser Artikel erklärt, welche acht Design- und Inhaltsentscheidungen den größten Einfluss auf Anfragen haben.",
     heroKeyword: "Webdesign Konversion",
@@ -336,17 +362,21 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "website-ohne-anfragen",
     ],
     canonical: "https://cogniiq.de/blog/webdesign-konversion-tipps",
+    serviceLinks: [
+      { label: "Webdesign von Cogniiq", href: "/webdesign", note: "Websites, die auf Anfragen ausgelegt sind – Struktur, Ladezeit und Nutzerführung." },
+      { label: "Website bringt keine Anfragen?", href: "/keine-anfragen-website", note: "Die typischen Ursachen im Überblick und was sich daran ändern lässt." },
+    ],
   },
   {
     slug: "lokales-seo-unternehmen",
     title: "Lokales SEO für Unternehmen: Wie Sie in Google Maps und lokalen Suchen erscheinen",
-    metaTitle: "Lokales SEO für Unternehmen 2025 | Google Maps & lokale Suche",
+    metaTitle: "Lokales SEO für Unternehmen | Google Maps & lokale Suche",
     metaDescription:
       "Lokales SEO erklärt: Wie Unternehmen in Google Maps sichtbar werden, welche Faktoren wirklich zählen und welche Fehler die meisten Betriebe machen.",
     category: "Local SEO",
     readingTime: 10,
     publishedAt: "2025-02-10",
-    updatedAt: "2025-03-10",
+    updatedAt: "2026-09-05",
     excerpt:
       "Wenn jemand 'Zahnarzt Bayreuth' oder 'Restaurant München Innenstadt' googelt, erscheinen die ersten drei Ergebnisse in einem Kartenblock. Wer dort nicht ist, existiert für diesen Suchenden nicht.",
     heroKeyword: "Lokales SEO Unternehmen",
@@ -442,17 +472,21 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "website-ohne-anfragen",
     ],
     canonical: "https://cogniiq.de/blog/lokales-seo-unternehmen",
+    serviceLinks: [
+      { label: "Lokales SEO in Bayreuth", href: "/bayreuth/lokales-seo", note: "Google-Unternehmensprofil, lokale Landingpages und Bewertungen für Betriebe in Bayreuth." },
+      { label: "Webdesign von Cogniiq", href: "/webdesign", note: "Die Website als Grundlage lokaler Sichtbarkeit." },
+    ],
   },
   {
     slug: "prozessautomatisierung-roi",
     title: "Prozessautomatisierung ROI: So messen Sie den echten Nutzen",
-    metaTitle: "Prozessautomatisierung ROI berechnen 2025 | Leitfaden",
+    metaTitle: "Prozessautomatisierung ROI berechnen | Leitfaden",
     metaDescription:
       "Wie Sie den Return on Investment einer Prozessautomatisierung korrekt berechnen – mit Formel, konkreten Beispielen und typischen Kostenfallen.",
     category: "KI-Automatisierung",
     readingTime: 7,
     publishedAt: "2025-02-17",
-    updatedAt: "2025-03-08",
+    updatedAt: "2026-09-05",
     excerpt:
       "Viele Unternehmen scheuen die Investition in Automatisierung, weil sie den Nutzen nicht greifbar machen können. Dieser Artikel zeigt, wie ein einfaches ROI-Modell in unter 30 Minuten aufgestellt werden kann.",
     heroKeyword: "Prozessautomatisierung ROI",
@@ -529,6 +563,10 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "digitalisierung-mittelstand",
     ],
     canonical: "https://cogniiq.de/blog/prozessautomatisierung-roi",
+    serviceLinks: [
+      { label: "Prozessautomatisierung für Unternehmen", href: "/prozessautomatisierung", note: "Welche Abläufe Cogniiq automatisiert und wie ein Projekt abläuft." },
+      { label: "Was kostet Automatisierung?", href: "/kosten-automatisierung", note: "Die Kostenseite der ROI-Rechnung: Einrichtung, Betrieb, Abhängigkeiten." },
+    ],
   },
   {
     slug: "verpasste-anrufe-kosten",
@@ -539,7 +577,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     category: "KI-Telefonassistent",
     readingTime: 6,
     publishedAt: "2025-02-24",
-    updatedAt: "2025-03-12",
+    updatedAt: "2026-09-05",
     excerpt:
       "Was ein verpasster Anruf kostet, hängt vom Auftragswert ab – rechnen Sie mit Ihren eigenen Zahlen. Dieser Artikel zeigt, wie die Kalkulation funktioniert.",
     heroKeyword: "verpasste Anrufe Kosten",
@@ -608,17 +646,21 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "ki-telefonassistent-restaurant",
     ],
     canonical: "https://cogniiq.de/blog/verpasste-anrufe-kosten",
+    serviceLinks: [
+      { label: "KI Telefonassistent", href: "/ki-telefonassistent", note: "Erreichbar, wenn niemand abnehmen kann – konfiguriert auf Ihren Betrieb." },
+      { label: "Verpasste Anrufe kosten Umsatz", href: "/verpasste-anrufe-verlust", note: "Wo Anrufe verloren gehen und welche Gegenmaßnahmen sich rechnen." },
+    ],
   },
   {
     slug: "ki-telefonassistent-restaurant",
     title: "KI-Telefonassistent für Restaurants: Mehr Reservierungen, weniger Arbeit",
-    metaTitle: "KI-Telefonassistent Restaurant 2025 | Reservierungen automatisieren",
+    metaTitle: "KI-Telefonassistent Restaurant | Reservierungen automatisieren",
     metaDescription:
       "Wie Restaurants mit einem KI-Telefonassistenten Reservierungen automatisch annehmen, Wartelisten führen und Gäste nachqualifizieren – ohne zusätzliches Personal.",
     category: "KI-Telefonassistent",
     readingTime: 6,
     publishedAt: "2025-03-03",
-    updatedAt: "2025-03-14",
+    updatedAt: "2026-09-05",
     excerpt:
       "Freitagabend, 19 Uhr: Das Restaurant ist voll, das Telefon klingelt, aber das Team hat beide Hände voll. Ein KI-Telefonassistent nimmt die Anrufe an, die sonst verloren gingen – auch in der Stoßzeit.",
     heroKeyword: "KI-Telefonassistent Restaurant",
@@ -694,17 +736,21 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "ki-automatisierung-kleine-unternehmen",
     ],
     canonical: "https://cogniiq.de/blog/ki-telefonassistent-restaurant",
+    serviceLinks: [
+      { label: "KI-Telefonassistent für Restaurants", href: "/ki-telefonassistent-restaurant", note: "Reservierungsanfragen annehmen, auch während des Service." },
+      { label: "KI Telefonassistent", href: "/ki-telefonassistent", note: "Funktionsweise, Grenzen und Einrichtung im Überblick." },
+    ],
   },
   {
     slug: "website-ohne-anfragen",
     title: "Warum Ihre Website keine Anfragen bringt – und wie Sie das ändern",
-    metaTitle: "Website bringt keine Anfragen? Ursachen & Lösungen 2025",
+    metaTitle: "Website bringt keine Anfragen? Ursachen & Lösungen",
     metaDescription:
       "Die häufigsten Gründe, warum Unternehmenswebsites keine Anfragen generieren – und konkrete Schritte, um das in wenigen Wochen zu ändern.",
     category: "Webdesign",
     readingTime: 7,
     publishedAt: "2025-03-06",
-    updatedAt: "2025-03-15",
+    updatedAt: "2026-09-05",
     excerpt:
       "Eine Website zu haben und eine Website zu haben, die Anfragen bringt, sind zwei verschiedene Dinge. Die meisten Unternehmenswebsites gehören zur ersten Kategorie.",
     heroKeyword: "Website keine Anfragen",
@@ -775,17 +821,21 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "ki-automatisierung-kleine-unternehmen",
     ],
     canonical: "https://cogniiq.de/blog/website-ohne-anfragen",
+    serviceLinks: [
+      { label: "Website bringt keine Anfragen?", href: "/keine-anfragen-website", note: "Die Problemseite zum Thema mit konkreten Prüfpunkten." },
+      { label: "Webdesign von Cogniiq", href: "/webdesign", note: "Websites, die auf Anfragen ausgelegt sind." },
+    ],
   },
   {
     slug: "digitalisierung-mittelstand",
     title: "Digitalisierung im Mittelstand: Wo anfangen, was vermeiden",
-    metaTitle: "Digitalisierung Mittelstand 2025 | Wo anfangen & was vermeiden",
+    metaTitle: "Digitalisierung Mittelstand | Wo anfangen & was vermeiden",
     metaDescription:
       "Digitalisierung im deutschen Mittelstand: Ein praxisorientierter Einstiegsleitfaden, der zeigt, welche Maßnahmen wirklich Wirkung haben – und welche Fallen es zu vermeiden gilt.",
     category: "Digitalisierung",
     readingTime: 9,
     publishedAt: "2025-03-10",
-    updatedAt: "2025-03-16",
+    updatedAt: "2026-09-05",
     excerpt:
       "Viele Mittelständler wissen, dass sie digitalisieren müssen – aber nicht, womit sie anfangen sollen. Dieser Leitfaden gibt eine klare Priorisierung.",
     heroKeyword: "Digitalisierung Mittelstand",
@@ -866,17 +916,21 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "webdesign-konversion-tipps",
     ],
     canonical: "https://cogniiq.de/blog/digitalisierung-mittelstand",
+    serviceLinks: [
+      { label: "Automatisierung für Unternehmen", href: "/automatisierung-unternehmen", note: "Wo Automatisierung im Mittelstand ansetzt und was Cogniiq dafür baut." },
+      { label: "Prozessautomatisierung", href: "/prozessautomatisierung", note: "Abläufe aufnehmen, abbilden, automatisieren." },
+    ],
   },
   {
     slug: "webdesign-agentur-auswahl",
     title: "Webdesign-Agentur auswählen: 7 Kriterien, die wirklich zählen",
-    metaTitle: "Webdesign Agentur auswählen 2025 | 7 entscheidende Kriterien",
+    metaTitle: "Webdesign Agentur auswählen | 7 entscheidende Kriterien",
     metaDescription:
       "Wie finden Sie die richtige Webdesign-Agentur für Ihr Unternehmen? 7 konkrete Auswahlkriterien, die vor überteuerten Projekten und schlechten Ergebnissen schützen.",
     category: "Webdesign",
     readingTime: 7,
     publishedAt: "2025-03-13",
-    updatedAt: "2025-03-16",
+    updatedAt: "2026-09-05",
     excerpt:
       "Eine schlechte Wahl bei der Webdesign-Agentur kostet Zeit, Geld und Nerven. Diese sieben Kriterien helfen, die richtige Agentur zu finden – bevor der Vertrag unterschrieben ist.",
     heroKeyword: "Webdesign Agentur auswählen",
@@ -958,6 +1012,10 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "website-ohne-anfragen",
     ],
     canonical: "https://cogniiq.de/blog/webdesign-agentur-auswahl",
+    serviceLinks: [
+      { label: "Webdesign von Cogniiq", href: "/webdesign", note: "Wie Cogniiq Websites plant und umsetzt – zum Abgleich mit den sieben Kriterien." },
+      { label: "Webdesign Kosten", href: "/kosten-webdesign", note: "Was eine professionelle Website kostet und wovon der Preis abhängt." },
+    ],
   },
 ];
 

@@ -344,6 +344,46 @@ export function BlogPostPage() {
                 </motion.div>
               )}
 
+              {article.serviceLinks.length > 0 && (
+                <motion.aside
+                  aria-labelledby="passende-leistung"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-40px" }}
+                  variants={fadeUp}
+                  custom={0}
+                  className="mt-12 pt-10 border-t border-gray-100 dark:border-gray-800"
+                >
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-400 mb-2">
+                    Weiterlesen bei Cogniiq
+                  </p>
+                  <h2
+                    id="passende-leistung"
+                    className="text-xl font-bold text-gray-900 dark:text-gray-50 mb-5"
+                  >
+                    Passende Leistung
+                  </h2>
+                  <ul className="grid sm:grid-cols-2 gap-4 list-none p-0 m-0">
+                    {article.serviceLinks.map((link) => (
+                      <li key={link.href}>
+                        <Link
+                          to={link.href}
+                          className="group block h-full rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/40 p-5 transition-colors hover:border-gray-300 dark:hover:border-gray-600"
+                        >
+                          <span className="inline-flex items-center gap-1.5 text-[14.5px] font-semibold text-gray-900 dark:text-gray-100">
+                            {link.label}
+                            <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+                          </span>
+                          <span className="mt-1.5 block text-[13px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                            {link.note}
+                          </span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </motion.aside>
+              )}
+
               <motion.div
                 initial="hidden"
                 whileInView="visible"
