@@ -132,6 +132,14 @@
   </url>
 
   <url>
+    <loc>https://cogniiq.de/ki-telefonassistent-zahnarztpraxis</loc>
+    <lastmod>2026-09-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/ki-telefonassistent-zahnarztpraxis"/>
+  </url>
+
+  <url>
     <loc>https://cogniiq.de/deutschland</loc>
     <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>
@@ -629,7 +637,7 @@
 
   <url>
     <loc>https://cogniiq.de/blog/ki-telefonassistent-arztpraxis</loc>
-    <lastmod>2026-07-23</lastmod>
+    <lastmod>2026-09-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.60</priority>
     <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/blog/ki-telefonassistent-arztpraxis"/>

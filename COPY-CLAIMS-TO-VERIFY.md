@@ -197,3 +197,25 @@ der geprüften, eng gefassten Fassung.
   nicht die Erreichbarkeit einer einzelnen Praxis am Telefon.
 - Beide Zahlen betreffen **keine Telefonassistenten**. Der Beitrag sagt das an
   beiden Stellen ausdrücklich dazu.
+
+
+# Nachtrag 2026-09-05 — offene Punkte der Seite `/ki-telefonassistent-zahnarztpraxis`
+
+Die Seite zitiert Produktzusagen ausschließlich aus `FAKTEN`, `GRENZEN` und
+`ANBINDUNG`. Neu sind Aussagen über das eigene Vorgehen, als Vorschlag
+formuliert:
+
+| # | Aussage | Fundstelle | Status |
+|---|---|---|---|
+| Z20 | Der Anrufanlass-Katalog (neun Anlässe mit Regel „übernimmt / immer Mensch / entscheidet die Praxis") ist der Ausgangspunkt einer Einrichtung in einer Zahnarztpraxis | `KiTelefonassistentZahnarztpraxis.tsx`, Konstante `ANLAESSE` | offen — Bestätigung des Inhabers; als Vorschlag formuliert |
+| Z21 | Die sieben zahnärztlichen Prüffälle ergänzen die vier Prüfgruppen aus Z14 | ebd., Konstante `PRUEFFAELLE` | offen — Fallkategorien, keine Zusage über Ergebnisse |
+| Z22 | Die drei Zeitmuster (Überlauf, Behandlungsfenster, außerhalb der Sprechzeit) | ebd., Abschnitt „Behandlungszeit" | nach Review als „kommen als Ausgangspunkt infrage" formuliert — keine Erfahrungsaussage mehr; Bestätigung des Inhabers, dass alle drei konfigurierbar sind, weiterhin sinnvoll |
+| Z23 | Abfrage von Angaben vor einer Absage („etwa Name und Geburtsdatum") | ebd., Abschnitt „Absagen" | nach Review als Festlegung der Praxis formuliert, nicht als Produktmechanik; deckt sich mit Prüfgruppe „Verwechslung und Zugriff" |
+| Z24 | Ausgehende Anrufe (Recall, Nachbesetzung) | ebd., FAQ und Grenzen | nach Review **keine Aussage** in beide Richtungen: „nicht Gegenstand dieses Beitrags und hier nicht zugesagt". Inhaber entscheidet, ob ein FAKTEN-Satz dazu aufgenommen wird |
+| Z25 | SMS-/E-Mail-Terminbestätigung als Produktfunktion | `SolutionShowcase.tsx`, `CostComparisonSection.tsx`, `KiCTASection.tsx`, `AutomatisierungArzt.tsx` (nicht Teil dieser Änderung) | offen — im Blogbeitrag entfernt, weil kein FAKTEN-Satz existiert; auf den genannten Seiten steht die Aussage weiterhin. Bestätigen und in `FAKTEN` aufnehmen oder dort ebenfalls entfernen |
+
+Blogbeitrag `/blog/ki-telefonassistent-arztpraxis` (2026-09-05): entfernt wurden
+„Terminbestätigung und -erinnerung per SMS oder E-Mail" (Funktion nicht
+belegt), „DSGVO-Protokoll: automatisch" (Klasse §7.7-nah) und die Formulierung
+„vollständig übernehmen" (COPY-BRIEF §5.9). Die Aussage zum vzbv-Marktcheck
+bleibt (freigegebene Statistik, COPY-BRIEF §5.7).

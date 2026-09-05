@@ -56,3 +56,43 @@ adressiert einen Engpass, der nicht besteht.
 
 Der größte verbleibende Engpass ist **externe Autorität und Positionierung**,
 nicht Technik und nicht Textmenge. Siehe `authority-acquisition-plan.md`.
+
+
+---
+
+## Nachtrag 2026-09-05 — zweite Recherche, gleiche Einschränkung
+
+Recherche am 2026-09-05 über eine Websuche mit US-Lokalisierung. **Keine
+Seite konnte geöffnet werden** (Egress-Policy blockierte jede getestete
+Domain, darunter kbv.de, gesetze-im-internet.de, eur-lex.europa.eu,
+developers.google.com, redmedical.de, medatixx.de, fonio.ai). Es gilt
+`VERIFIKATION.md` unverändert: Domains und Seitentypen belastbar, Positionen
+nicht, Inhalte fremder Seiten nicht.
+
+Zwölf Anfragen wurden geprüft; cogniiq.de erschien in keinem der 18
+Ergebnissätze.
+
+| Anfrage | Seitentypen | Einschätzung |
+|---|---|---|
+| KI Telefonassistent Zahnarztpraxis | 5 Hersteller-LP (fonio, Doctolib, Dr. Flex, Ordicall, Safina), 2 Vergleich (medizinio, abrechnungsstelle), 1 Fachpresse (Spitta Dentalwelt) | keine operative Seite; **gewählt** |
+| Telefonassistent Zahnarztpraxis Erfahrungen | Hersteller-Vergleiche und -Blogs | leer, aber ohne Kundenfreigabe **blockiert** |
+| Zahnarztpraxis Telefon entlasten | Hersteller-LP, generische Praxis-Tipps (med2day) | operative Lücke; über A3 mit abgedeckt |
+| Recall Zahnarztpraxis Telefon | ZWP (Recht), Recall-Anbieter, Callcenter | Outbound-Recall wird nicht angeboten; nur Inbound-Aspekt in A3 |
+| KI Telefonassistent Arztpraxis einführen Checkliste | Hersteller-Blogs, u. a. one100 „erste 7 Tage" | vom bestehenden Leitfaden A1 abgedeckt |
+| KI Telefonassistent testen vor Go-live | generische Vergleichsseiten | vom Leitfaden A1 (Prüfgruppen) abgedeckt; keine eigene Seite |
+| … Datenschutz § 203 StGB | 8 von 9 Hersteller-Rechtsratgeber | gesättigt, Primärquellen nicht öffenbar → **blockiert** |
+| … PVS Anbindung Schnittstelle | Dr. Flex (drei URLs), Vergleiche, tomedo-Forum | **blockiert** (Belege, OWNER-INPUT B) |
+| … Terminabsage Arztpraxis | viele kleine Hersteller-Blogs, ein Doctolib-Hilfeartikel | als Abschnitt in A3 aufgenommen |
+| Montagmorgen Anmeldung überlastet | Agentur- und Herstellerblogs | Problemseite `/verpasste-anrufe-verlust` besteht; nicht verfolgt |
+| … Grenzen / was kann er nicht | Hersteller-Blogs, Ärzteblatt-Meldung | kein Hersteller listet konkret; in A3 und auf Produktseite abgedeckt |
+| Telefonassistent Physiotherapie | physiospezialisierte Anbieter, zwei Vergleichsportale | außerhalb der Positionierung |
+
+Wettbewerberzahlen aus Snippets („74 % vollautomatisiert", „12 % → unter 3 %
+No-Shows", „80–120 Anrufe/Tag") sind **nicht** verwendbar.
+
+Quellen-Ledger (nur Snippet, Seite nicht geöffnet, 2026-09-05): fonio.ai,
+info.doctolib.de, dr-flex.de, safina.ai, ordicall.ai, praxisping.de,
+helmke-digital.com, foxifai.com, vokaro.net, telfo.ai, voice-one.ai,
+medizinio.de, abrechnungsstelle.com, praxisconcierge.de, drwait.de,
+med2day.com, dentalwelt.spitta.de, zwp-online.info, one100.ai,
+aerzteblatt.de, doctolib.zendesk.com, forum.tomedo.de.

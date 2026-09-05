@@ -12,6 +12,14 @@ export interface BlogArticle {
   sections: BlogSection[];
   faqItems?: { question: string; answer: string }[];
   relatedSlugs: string[];
+  /**
+   * Weiterführende Seiten außerhalb des Blogs — die Leistungs- oder
+   * Leitfadenseite, die das Thema des Beitrags kanonisch besitzt. Crawler-
+   * sichtbar gerendert, damit ein informativer Beitrag Autorität an die Seite
+   * weitergibt, die sie tragen soll, statt als Sackgasse zu enden. Nie auf
+   * eingefrorene Experimentrouten zeigen (src/lib/routing/protectedExperiments.ts).
+   */
+  weiterfuehrend?: { to: string; label: string; text: string }[];
   canonical: string;
 }
 
@@ -150,22 +158,22 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   },
   {
     slug: "ki-telefonassistent-arztpraxis",
-    title: "KI-Telefonassistent für Arztpraxen: Weniger Stress, mehr freie Leitungen",
-    metaTitle: "KI-Telefonassistent Arztpraxis 2025 | Vorteile & Kosten",
+    title: "KI-Telefonassistent für Arztpraxen: was er übernimmt – und was beim Team bleibt",
+    metaTitle: "KI-Telefonassistent für Arztpraxen: was er übernimmt, was beim Team bleibt | Cogniiq",
     metaDescription:
-      "Wie ein KI-Telefonassistent Arztpraxen dabei hilft, verpasste Anrufe zu reduzieren, Termine automatisch zu buchen und das Praxisteam zu entlasten.",
+      "Was ein KI-Telefonassistent in der Arztpraxis übernimmt, was immer beim Team bleibt und woran die Anbindung an die Praxissoftware hängt.",
     category: "KI-Telefonassistent",
     readingTime: 7,
     publishedAt: "2025-01-28",
-    updatedAt: "2025-02-20",
+    updatedAt: "2026-09-05",
     excerpt:
-      "Eine Arztpraxis mit hohem Anrufaufkommen verliert ohne funktionierendes Telefonmanagement Patienten. Der KI-Telefonassistent übernimmt Annahme, strukturierte Aufnahme und Terminbuchung – auch außerhalb der Öffnungszeiten.",
+      "Eine Arztpraxis mit hohem Anrufaufkommen verliert ohne funktionierendes Telefonmanagement Patienten. Ein KI-Telefonassistent übernimmt die Annahme und die strukturierte Aufnahme klar benennbarer Anliegen – auch außerhalb der Öffnungszeiten. Was eine Einschätzung verlangt, bleibt beim Team.",
     heroKeyword: "KI-Telefonassistent Arztpraxis",
     sections: [
       {
         type: "p",
         content:
-          "Das Telefon in einer Arztpraxis steht selten still. Ein großer Teil der Anrufe sind Terminanfragen – Aufgaben, die eine gut konfigurierte KI vollständig übernehmen kann. Der Rest, also Notfälle, komplexe Fragen oder spezifische Anliegen, bleibt beim Team.",
+          "Das Telefon in einer Arztpraxis steht selten still. Ein großer Teil der Anrufe sind Terminwünsche, Absagen und Rezeptbestellungen – Anliegen mit festen Angaben, die ein gut eingerichteter Telefonassistent aufnehmen kann. Der Rest – Notfallhinweise, medizinische Fragen, Beschwerden – bleibt beim Team.",
       },
       {
         type: "h2",
@@ -177,12 +185,13 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "ul",
         heading: "Was ein KI-Telefonassistent für Arztpraxen übernimmt",
         items: [
-          "Anrufannahme ohne Warteschleife – auch bei parallelen Anrufen",
+          "Anrufannahme auch dann, wenn die Anmeldung besetzt ist – mehrere Anrufe gleichzeitig",
           "Terminwünsche strukturiert erfassen – und, wo die vorhandene Praxissoftware eine geeignete Schnittstelle bietet, direkt an sie übergeben",
-          "Terminbestätigung und -erinnerung per SMS oder E-Mail",
-          "Beantwortung häufiger Fragen (Öffnungszeiten, Parkplatz, Zuzahlung, Impftermine)",
-          "Weiterleitung dringlicher Anliegen ans Praxisteam",
-          "Rückrufwunsch erfassen und Ticket erstellen",
+          "Terminstornierungen und Verschiebungen entgegennehmen – frei werdende Termine sind sofort sichtbar",
+          "Rezept- und Überweisungswünsche strukturiert erfassen, zur Bearbeitung durch das Team",
+          "Beantwortung wiederkehrender Fragen (Sprechzeiten, Anfahrt, Urlaubsvertretung, benötigte Unterlagen)",
+          "Rückrufwünsche mit Anliegen und Rückrufnummer auf die Rückrufliste setzen",
+          "Notfallhinweise und dringende Anliegen sofort an das Praxisteam weiterleiten – ohne Einschätzung durch das System",
         ],
       },
       {
@@ -199,25 +208,25 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       },
       {
         type: "h2",
-        heading: "Kosten und ROI in der Praxis",
+        heading: "Was ein KI-Telefonassistent für die Praxis kostet",
         content:
           "Was ein KI-Telefonassistent für Ihre Praxis kostet, hängt vom Anrufaufkommen ab; die aktuellen Tarife stehen auf der Kostenseite. Demgegenüber stehen entlastete Personalstunden sowie Patienten, die sonst zur Konkurrenz wechseln würden. Wann sich das rechnet, hängt von Anrufaufkommen und Praxisstruktur ab – rechnen Sie mit Ihren eigenen Zahlen.",
       },
       {
         type: "table",
-        heading: "Vergleich: Rezeptionskraft vs. KI-Telefonassistent",
+        heading: "Vergleich: Anmeldung und KI-Telefonassistent",
         rows: [
-          { label: "Erreichbarkeit", value: "Rezeption: Mo–Fr 8–17 Uhr | KI: auch außerhalb der Öffnungszeiten" },
-          { label: "Reaktionszeit", value: "Rezeption: je nach Auslastung Warteschleife | KI: ohne Warteschleife" },
-          { label: "Parallelgespräche", value: "Rezeption: 1 | KI: mehrere gleichzeitig" },
-          { label: "DSGVO-Protokoll", value: "Manuell | Automatisch" },
+          { label: "Erreichbarkeit", value: "Anmeldung: zu den Sprechzeiten | Assistent: auch außerhalb der Öffnungszeiten" },
+          { label: "Parallelgespräche", value: "Anmeldung: ein Gespräch je Leitung | Assistent: mehrere gleichzeitig" },
+          { label: "Einschätzung eines Anliegens", value: "Anmeldung: ja | Assistent: nie – er erkennt und übergibt" },
+          { label: "Ergebnis eines Anrufs", value: "Anmeldung: Notiz oder direkte Bearbeitung | Assistent: strukturierter Eintrag mit Anliegen, Name, Rückrufnummer, Terminwunsch" },
         ],
       },
       {
         type: "h2",
         heading: "Fazit: Wann lohnt sich der KI-Telefonassistent für Arztpraxen?",
         content:
-          "Wenn in Ihrer Praxis regelmäßig Anrufe unbeantwortet bleiben und Ihre Rezeptionskraft überlastet ist, kann ein KI-Telefonassistent spürbar entlasten. Besonders in der Hochsaison – Grippezeit, Impfkampagnen – ist die Entlastung messbar.",
+          "Wenn in Ihrer Praxis regelmäßig Anrufe unbeantwortet bleiben und die Anmeldung unter ständiger Unterbrechung arbeitet, kann ein KI-Telefonassistent zu Stoßzeiten und außerhalb der Sprechzeiten spürbar entlasten. Er ersetzt die Anmeldung nicht. Ob sich die Einführung trägt, entscheidet sich an der Liste der Anrufanlässe, die vorher steht – und daran, dass alles, was eine Einschätzung verlangt, beim Team bleibt.",
       },
     ],
     faqItems: [
@@ -229,18 +238,30 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         question: "Was passiert bei Notfällen?",
         answer:
-          "Das System erkennt Notfallsignale in der Sprache des Anrufenden und leitet sofort ans Team weiter oder wählt einen festgelegten Notfallkontakt.",
+          "Notfälle werden erkannt und sofort weitergeleitet – an das Team, den Bereitschaftsdienst oder mit der klaren Ansage, den Notruf 112 zu wählen. Eine Bewertung des Notfalls durch das System findet nicht statt.",
       },
       {
         question: "Sprechen Patienten lieber mit einem Menschen?",
         answer:
-          "Das ist unterschiedlich. Die Akzeptanz steigt deutlich, wenn die Praxis den Assistenten selbst ankündigt, das System schnell und korrekt reagiert und jederzeit ein klarer Weg zu einem Menschen offensteht.",
+          "Das ist unterschiedlich. Was hilft: Die Praxis kündigt den Assistenten selbst an, er gibt sich zu Beginn des Gesprächs als KI-System zu erkennen, reagiert schnell und korrekt, und ein Weg zu einem Menschen steht jederzeit offen.",
       },
     ],
     relatedSlugs: [
       "ki-automatisierung-kleine-unternehmen",
       "verpasste-anrufe-kosten",
       "ki-telefonassistent-restaurant",
+    ],
+    weiterfuehrend: [
+      {
+        to: "/praxen",
+        label: "Der KI-Empfang für Arzt- und Zahnarztpraxen",
+        text: "Was der Empfang übernimmt, was immer ein Mensch macht, wie er eingerichtet wird und was er kostet.",
+      },
+      {
+        to: "/ki-telefonassistent-einfuehren",
+        label: "Einen KI-Telefonassistenten in der Praxis einführen",
+        text: "Welche Anrufe infrage kommen, wie die Übergabe geklärt wird und was vor der Freigabe geprüft gehört.",
+      },
     ],
     canonical: "https://cogniiq.de/blog/ki-telefonassistent-arztpraxis",
   },

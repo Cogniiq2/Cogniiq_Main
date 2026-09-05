@@ -213,6 +213,19 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
     indexable: true,
     sitemap: { lastmod: "2026-08-29", changefreq: "monthly", priority: "0.85" },
   },
+  // Zweiter Fachbeitrag im Cluster: die Zahnarztpraxis. Operativ (welche
+  // Anrufe, welche Regel je Anlass, was immer beim Team bleibt), nicht als
+  // weitere Branchen-Landingpage. Kommerzieller Eigentümer der Praxis-Intention
+  // bleibt /praxen; dieser Beitrag verweist dorthin. Verlinkt absichtlich NICHT
+  // auf die eingefrorenen Experimentrouten.
+  {
+    path: "/ki-telefonassistent-zahnarztpraxis",
+    title: "KI-Telefonassistent in der Zahnarztpraxis: Anrufe und Grenzen | Cogniiq",
+    description: "Welche Anrufe einer Zahnarztpraxis ein KI-Telefonassistent übernimmt, welche beim Team bleiben – und wie Absagen, Recall-Rückrufe und Behandlungszeit geregelt werden.",
+    keywords: "KI Telefonassistent Zahnarztpraxis, Telefonassistent Zahnarzt, Zahnarztpraxis Telefon entlasten, Terminabsage Zahnarztpraxis Telefon",
+    indexable: true,
+    sitemap: { lastmod: "2026-09-05", changefreq: "monthly", priority: "0.85" },
+  },
 
   // ─── GEO HUBS ────────────────────────────────────────────────────────────────
   {
@@ -740,10 +753,10 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/blog/ki-telefonassistent-arztpraxis",
-    title: "KI-Telefonassistent Arztpraxis 2025 | Vorteile & Kosten",
-    description: "Wie ein KI-Telefonassistent Arztpraxen dabei hilft, verpasste Anrufe zu eliminieren, Termine automatisch zu buchen und das Praxisteam zu entlasten.",
+    title: "KI-Telefonassistent für Arztpraxen: was er übernimmt, was beim Team bleibt | Cogniiq",
+    description: "Was ein KI-Telefonassistent in der Arztpraxis übernimmt, was immer beim Team bleibt und woran die Anbindung an die Praxissoftware hängt.",
     indexable: true,
-    sitemap: { lastmod: "2026-07-23", changefreq: "monthly", priority: "0.60" },
+    sitemap: { lastmod: "2026-09-05", changefreq: "monthly", priority: "0.60" },
   },
   {
     path: "/blog/webdesign-konversion-tipps",

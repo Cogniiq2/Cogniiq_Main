@@ -1,5 +1,31 @@
 # COPY-SEO-CHANGELOG — Copy Overhaul KI-Telefonassistent-Cluster
 
+## 2026-09-05 — Zahnarzt-Fachbeitrag, Blog-Neuausrichtung, Linkpfade
+
+- **Neu** `/ki-telefonassistent-zahnarztpraxis` (indexierbar, Sitemap
+  lastmod 2026-09-05): operativer Fachbeitrag mit Anrufanlass-Katalog und Regel je
+  Anlass, Behandlungszeit-Mustern, Absage-Regeln, zahnärztlichen Prüffällen,
+  Grenzen. Article-Schema mit derselben verantwortlichen Person wie im
+  sichtbaren Kasten; **kein** FAQ-Schema. Breadcrumb auf `/praxen`.
+- **Geändert** `/blog/ki-telefonassistent-arztpraxis`: Titel/Description in
+  Manifest und `blog-data.ts` ohne Jahreszahl; unbelegte Aussagen entfernt;
+  Anliegenliste auf `ANLIEGEN_UEBERNIMMT`-Wortlaut; Notfall-Antwort auf
+  `GRENZEN`-Wortlaut; Block „Weiterführend" (`/praxen`,
+  `/ki-telefonassistent-einfuehren`); `updatedAt`/`lastmod` 2026-09-05.
+- **Geändert** `/praxen`: dritte Karte „Zahnarztpraxen" im Wegweiser;
+  kontextueller Verweis auf den Einführungsleitfaden unter dem
+  Anliegen-Katalog.
+- **Geändert** Footer: Spalte „Wissen" um „Leitfäden für Praxen" (Einführung,
+  Zahnarztpraxis) ergänzt.
+- **Blog-Datenmodell:** optionales Feld `weiterfuehrend` in `BlogArticle`,
+  gerendert ohne Bewegungs-Wrapper (crawlersichtbar).
+- **Guard:** `test-prerender-output.mjs` §10 — jede indexierbare Seite braucht
+  einen Inbound-Link von einer anderen vorgerenderten Seite; Seiten mit
+  ausschließlich Shell-Links werden protokolliert.
+- **Nicht angefasst:** die sechs eingefrorenen Routen; kein neuer Link auf
+  `/ki-telefonassistent-arzt` oder `/kosten-ki-telefonassistent`.
+
+
 Stand: 2026-08-16 · Branch `claude/cogniiq-copy-overhaul-mjkdf4`
 Regelbasis: Brief §8 (SEO erhalten und stärken). URLs, Canonicals, Redirects,
 Schema-Typen und Routing wurden nicht verändert.

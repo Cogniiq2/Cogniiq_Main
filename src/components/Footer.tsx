@@ -314,6 +314,16 @@ export function Footer() {
                       { text: "Live-Demo", to: "/ki-telefonassistent/demo" },
                     ],
                   },
+                  {
+                    // Die beiden Fachbeiträge des Praxis-Clusters. Hier, weil sie
+                    // sonst nur aus je einer Seite verlinkt wären; die Anker
+                    // beschreiben den Inhalt, nicht das Zielkeyword.
+                    label: "Leitfäden für Praxen",
+                    links: [
+                      { text: "Einführung in der Praxis", to: "/ki-telefonassistent-einfuehren" },
+                      { text: "Zahnarztpraxis: Anrufe und Regeln", to: "/ki-telefonassistent-zahnarztpraxis" },
+                    ],
+                  },
                 ]}
               />
 
