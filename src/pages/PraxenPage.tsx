@@ -115,6 +115,11 @@ const segmentLinks = [
     text: "Montagsflut an der Anmeldung, Rezeptbestellungen, Stornierungen",
   },
   {
+    label: "Zahnarztpraxen",
+    href: "/ki-telefonassistent-zahnarztpraxis",
+    text: "Anrufe während der Behandlung, kurzfristige Absagen, Recall-Rückrufe — und was immer beim Team bleibt",
+  },
+  {
     label: "Therapiepraxen",
     href: "/ki-telefonassistent-praxis",
     text: "Erreichbar bleiben, während Sie behandeln — ohne besetzten Empfang",
@@ -361,6 +366,17 @@ export function PraxenPage() {
                 </ul>
               </div>
             </div>
+            <p className={`${PROSE} mt-8`}>
+              Wo die Trennlinie in Ihrer Praxis verläuft, entscheiden Sie. Wie Sie sie
+              ziehen und was vor der Freigabe geprüft gehört, steht im{" "}
+              <Link
+                to="/ki-telefonassistent-einfuehren"
+                className="underline underline-offset-4 hover:no-underline text-gray-900 dark:text-gray-100"
+              >
+                Leitfaden zur Einführung in der Praxis
+              </Link>
+              .
+            </p>
           </div>
         </section>
 
@@ -654,7 +670,7 @@ export function PraxenPage() {
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">
               Für Ihre Praxisform
             </h2>
-            <div className="grid sm:grid-cols-2 gap-5 mb-12">
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 mb-12">
               {segmentLinks.map((s) => (
                 <Link
                   key={s.href}

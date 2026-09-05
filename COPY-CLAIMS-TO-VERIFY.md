@@ -197,3 +197,29 @@ der geprüften, eng gefassten Fassung.
   nicht die Erreichbarkeit einer einzelnen Praxis am Telefon.
 - Beide Zahlen betreffen **keine Telefonassistenten**. Der Beitrag sagt das an
   beiden Stellen ausdrücklich dazu.
+
+
+# Nachtrag 2026-09-05 — offene Punkte der Seite `/ki-telefonassistent-zahnarztpraxis`
+
+Die Seite zitiert Produktzusagen ausschließlich aus `FAKTEN`, `GRENZEN` und
+`ANBINDUNG`. Neu sind Aussagen über das eigene Vorgehen, als Vorschlag
+formuliert:
+
+| # | Aussage | Fundstelle | Status |
+|---|---|---|---|
+| Z20 | Der Anrufanlass-Katalog (neun Anlässe mit Regel „übernimmt / immer Mensch / entscheidet die Praxis") ist der Ausgangspunkt einer Einrichtung in einer Zahnarztpraxis | `KiTelefonassistentZahnarztpraxis.tsx`, Konstante `ANLAESSE` | offen — Bestätigung des Inhabers; als Vorschlag formuliert |
+| Z21 | Die sieben zahnärztlichen Prüffälle ergänzen die vier Prüfgruppen aus Z14 | ebd., Konstante `PRUEFFAELLE` | offen — Fallkategorien, keine Zusage über Ergebnisse |
+| Z22 | Die drei Zeitmuster (Überlauf, Behandlungsfenster, außerhalb der Sprechzeit) | ebd., Abschnitt „Behandlungszeit" | nach Review als „kommen als Ausgangspunkt infrage" formuliert — keine Erfahrungsaussage mehr; Bestätigung des Inhabers, dass alle drei konfigurierbar sind, weiterhin sinnvoll |
+| Z23 | Abfrage und Prüfung von Angaben vor einer Absage | ebd., Abschnitt „Absagen" | **geschlossen 2026-09-05 (Review).** Das Beispiel „Name und Geburtsdatum" ist entfernt: Das Geburtsdatum steht in keinem der vier gespeicherten Felder (`ANBINDUNG.heute.punkte`, `FAKTEN.keineAufzeichnung`) und ist ohne Inhaber-Freigabe keine zusagbare Datenkategorie. Ebenfalls entfernt: „Dass eine falsche Angabe abgewiesen wird" — eine Prüfung gegen einen Datensatz setzt die Anbindung voraus, die `NICHT_PASSEND` vor der Systemprüfung ausdrücklich nicht zusagt. Die Stelle verweist jetzt auf das Ergebnis der Anbindungsprüfung |
+| Z24 | Ausgehende Anrufe (Recall, Nachbesetzung) | ebd., FAQ und Grenzen | nach Review **keine Aussage** in beide Richtungen: „nicht Gegenstand dieses Beitrags und hier nicht zugesagt". Inhaber entscheidet, ob ein FAKTEN-Satz dazu aufgenommen wird |
+| Z25 | SMS-/E-Mail-Terminbestätigung als Produktfunktion | `SolutionShowcase.tsx`, `CostComparisonSection.tsx`, `KiCTASection.tsx`, `AutomatisierungArzt.tsx` (nicht Teil dieser Änderung) | offen — im Blogbeitrag entfernt, weil kein FAKTEN-Satz existiert; auf den genannten Seiten steht die Aussage weiterhin. Bestätigen und in `FAKTEN` aufnehmen oder dort ebenfalls entfernen |
+
+| Z26 | „welche Termine sofort ans Team gemeldet werden" / „die Meldung an das Team kommt sofort an" | ebd., Abschnitt „Absagen" und `PRUEFFAELLE` | **geschlossen 2026-09-05 (Review).** `ANLIEGEN_UEBERNIMMT` deckt „frei werdende Termine sind sofort **sichtbar**" — eine aktive Benachrichtigung deckt kein FAKTEN-Satz, und `ANBINDUNG.heute` beschreibt die Liste ausdrücklich als asynchron („arbeitet die Liste ab, wenn es in den Ablauf passt"). Wortlaut auf „sichtbar" gezogen |
+| Z27 | „wie der Bezug zur Erinnerung im Ergebnis vermerkt wird" (Recall) und „vermerkt den Zeitpunkt" (Absage) | ebd., `ANLAESSE` und Abschnitt „Absagen" | offen — beides sind Felder über die vier aus `ANBINDUNG.heute.punkte` hinaus. Als Konfigurationsfrage formuliert, nicht als Zusage; Inhaber bestätigt, ob das Ergebnis weitere Felder trägt, oder die beiden Stellen entfallen |
+| Z28 | Die Seite formuliert die Zeilen „Übernimmt der Assistent" frei nach `ANLIEGEN_UEBERNIMMT`, statt sie wie `GRENZEN` wörtlich zu zitieren | ebd., `ANLAESSE` | offen — kein inhaltlicher Fehler, aber die Seite bricht den Build nur bei Drift in `GRENZEN`, nicht bei Drift in `ANLIEGEN_UEBERNIMMT`. Beim nächsten Anfassen dieselbe Guard-Konstruktion nachziehen |
+
+Blogbeitrag `/blog/ki-telefonassistent-arztpraxis` (2026-09-05): entfernt wurden
+„Terminbestätigung und -erinnerung per SMS oder E-Mail" (Funktion nicht
+belegt), „DSGVO-Protokoll: automatisch" (Klasse §7.7-nah) und die Formulierung
+„vollständig übernehmen" (COPY-BRIEF §5.9). Die Aussage zum vzbv-Marktcheck
+bleibt (freigegebene Statistik, COPY-BRIEF §5.7).
