@@ -106,23 +106,25 @@ async function failureBranch(session: Session, scenario: Scenario, result: Extra
 async function bookingFlow(session: Session, scenario: Scenario, serviceIdOverride?: string): Promise<AppointmentSummary | null> {
   const plan = scenario.plan ?? {};
   const config = session.config;
-  let serviceId = serviceIdOverride ?? plan.serviceId ?? 'erstgespraech';
+  const fallbackService = config.services.find((s) => s.bookable && s.newCallersAllowed !== false) ?? config.services.find((s) => s.bookable) ?? config.services[0];
+  let serviceId = serviceIdOverride ?? plan.serviceId ?? fallbackService?.id ?? 'unknown';
   let service = findService(config, serviceId);
   if (service && !service.bookable) {
     agent(session, `${service.name} kann ich telefonisch leider nicht buchen; ${service.description ?? 'das wird nur nach Rücksprache vergeben'}. Ich nehme gerne einen Rückruf für Sie auf.`);
     await offerCallback(session, scenario, `Wunsch: ${service.name}`, false);
     return null;
   }
-  if (service && service.newCallersAllowed === false && !scenario.caller.isExistingCustomer) {
-    agent(session, `Für ${service.name} müssten Sie bereits Patient bei uns sein. Für neue Patienten starten wir mit einem Erstgespräch – soll ich das für Sie buchen?`);
-    user(session, 'Ja, dann bitte ein Erstgespräch.');
-    serviceId = 'erstgespraech';
+  if (service && service.newCallersAllowed === false && !scenario.caller.isExistingCustomer && fallbackService && fallbackService.id !== service.id) {
+    agent(session, `Für ${service.name} müssten Sie bereits Kunde bei uns sein. Für neue Kunden starten wir mit ${fallbackService.name} – soll ich das für Sie buchen?`);
+    user(session, `Ja, dann bitte ${fallbackService.name}.`);
+    serviceId = fallbackService.id;
     service = findService(config, serviceId);
   }
   if (!service) {
-    agent(session, 'Welche Leistung möchten Sie buchen – ein Erstgespräch, einen Kontrolltermin oder eine Blutabnahme?');
-    user(session, 'Ein Erstgespräch.');
-    serviceId = 'erstgespraech';
+    agent(session, `Welche Leistung möchten Sie buchen – ${config.services.slice(0, 3).map((s) => s.name).join(', ')}?`);
+    user(session, `${fallbackService?.name ?? 'Die erste'}.`);
+    serviceId = fallbackService?.id ?? serviceId;
+    service = fallbackService;
   }
   const chosenLocation = plan.locationId;
   if (!chosenLocation && config.locations.length > 1) {
@@ -360,7 +362,8 @@ export async function runReferenceConversation(config: ClientConfig, scenario: S
   const session: Session = { config, runtime, turns: [], conversationId: `ref_${scenario.id}`, events, english: scenario.caller.language === 'en' && config.additionalLanguages.includes('en') };
   const plan = scenario.plan ?? {};
 
-  agent(session, session.english ? 'Good day, Praxis Musterstadt, this is the AI phone assistant. How can I help you?' : 'Guten Tag bei Praxis Musterstadt. Sie sprechen mit dem KI-Telefonassistenten. Wie kann ich Ihnen helfen?');
+  const company = config.spokenName ?? config.companyName;
+  agent(session, session.english ? `Good day, ${company}, this is the AI phone assistant. How can I help you?` : `Guten Tag bei ${company}. Sie sprechen mit dem KI-Telefonassistenten. Wie kann ich Ihnen helfen?`);
   user(session, scenario.opening);
 
   switch (scenario.category) {
@@ -390,7 +393,7 @@ export async function runReferenceConversation(config: ClientConfig, scenario: S
       break;
     }
     case 'irrelevant': {
-      agent(session, 'Dabei kann ich leider nicht helfen – ich bin der Telefonassistent der Praxis und kümmere mich um Termine und Fragen rund um die Praxis. Kann ich Ihnen damit weiterhelfen?');
+      agent(session, `Dabei kann ich leider nicht helfen – ich bin der Telefonassistent von ${company} und kümmere mich um Termine und Fragen dazu. Kann ich Ihnen damit weiterhelfen?`);
       await call(session, 'log_conversation_event', { event_type: 'out_of_scope_request', intent: 'other' });
       user(session, 'Nein, danke.');
       agent(session, 'Dann einen schönen Tag noch.');
@@ -428,7 +431,7 @@ export async function runReferenceConversation(config: ClientConfig, scenario: S
         agent(session, faq?.answer ?? 'Dazu liegt mir leider nichts vor.');
       } else if (classification.class === 'configured' && classification.reference === 'locations') {
         const question = (plan.question ?? scenario.opening).toLowerCase();
-        const location = config.locations.find((l) => question.includes(l.name.toLowerCase().split(' ').pop() ?? '')) ?? config.locations[0];
+        const location = config.locations.find((l) => question.includes(l.name.toLowerCase())) ?? config.locations.find((l) => question.includes(l.name.toLowerCase().split(' ').pop() ?? '')) ?? config.locations[0];
         agent(session, `Die ${location.name} finden Sie in der ${location.address.street}, ${location.address.postalCode} ${location.address.city}.${location.address.publicTransport ? ` Mit dem ÖPNV: ${location.address.publicTransport}.` : ''}`);
       } else {
         agent(session, 'Das kann ich Ihnen gerade nicht zuverlässig sagen, dazu liegt mir nichts vor. Ich nehme gerne einen Rückruf auf, dann klärt das Team das für Sie.');
@@ -518,8 +521,8 @@ export async function runReferenceConversation(config: ClientConfig, scenario: S
     case 'poor_transcription':
     case 'confused_caller':
     case 'non_native_german': {
-      const guess = resolveServiceId(config, plan.serviceId ?? '') ?? plan.serviceId;
-      agent(session, `Ich habe Sie nicht ganz verstanden. Geht es um ${guess === 'kontrolle' ? 'einen Kontrolltermin' : guess === 'labor' ? 'eine Blutabnahme' : 'ein Erstgespräch, weil Sie neu bei uns sind'}?`);
+      const guess = findService(config, resolveServiceId(config, plan.serviceId ?? '') ?? plan.serviceId ?? '') ?? config.services[0];
+      agent(session, `Ich habe Sie nicht ganz verstanden. Geht es um ${guess?.name ?? 'einen Termin'}?`);
       user(session, 'Ja, genau.');
       await bookingFlow(session, scenario);
       break;

@@ -42,30 +42,40 @@ function normalise(text: string): string {
   return text.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim();
 }
 
-const STOPWORDS = new Set(['gibt', 'ihnen', 'eine', 'einen', 'einem', 'einer', 'kann', 'muss', 'sind', 'wann', 'dass', 'bitte', 'haben', 'habe', 'gerne', 'welche', 'welcher', 'sich', 'auch', 'nicht', 'oder', 'doch', 'noch', 'nach', 'über', 'mich', 'mein', 'meine', 'meinen', 'ihre', 'ihren', 'denn', 'wird', 'werden', 'darf', 'soll', 'sollte', 'könnte', 'wie', 'was', 'wer', 'bei', 'brauche', 'bekomme', 'bekommen', 'möchte', 'hätte', 'wollen', 'will', 'mal', 'nochmal']);
+const STOPWORDS = new Set(['gibt', 'ihnen', 'eine', 'einen', 'einem', 'einer', 'kann', 'muss', 'sind', 'wann', 'dass', 'bitte', 'haben', 'habe', 'gerne', 'welche', 'welcher', 'sich', 'auch', 'nicht', 'oder', 'doch', 'noch', 'nach', 'über', 'mich', 'mein', 'meine', 'meinen', 'ihre', 'ihren', 'denn', 'wird', 'werden', 'darf', 'soll', 'sollte', 'könnte', 'wie', 'was', 'wer', 'bei', 'brauche', 'bekomme', 'bekommen', 'möchte', 'hätte', 'wollen', 'will', 'mal', 'nochmal', 'fürs', 'zur', 'zum', 'beim', 'vor', 'etwas', 'sein', 'kommen', 'muss', 'darf', 'ich', 'ihnen', 'kann']);
 
 function tokens(text: string): string[] {
   return normalise(text).split(' ').filter((token) => token.length > 3 && !STOPWORDS.has(token));
 }
 
-/** Overlap score between a question and a FAQ (question + variants), 0..1. */
+/** Jaccard overlap between the content tokens of a question and a FAQ (question + variants), 0..1. */
 export function faqMatchScore(faq: FaqEntry, question: string): number {
   const q = new Set(tokens(question));
   if (q.size === 0) return 0;
   const candidates = [faq.question, ...(faq.variants ?? [])];
   let best = 0;
   for (const candidate of candidates) {
-    const c = tokens(candidate);
-    if (c.length === 0) continue;
-    const overlap = c.filter((token) => q.has(token)).length;
-    if (overlap === 0 || (overlap < 2 && c.length > 1)) continue;
-    best = Math.max(best, overlap / Math.max(c.length, 1));
+    const c = new Set(tokens(candidate));
+    if (c.size === 0) continue;
+    let overlap = 0;
+    for (const token of c) if (q.has(token)) overlap += 1;
+    if (overlap === 0) continue;
+    best = Math.max(best, overlap / (c.size + q.size - overlap));
   }
   return best;
 }
 
 export function classifyKnowledgeRequest(config: ClientConfig, question: string): KnowledgeClassification {
   const text = normalise(question);
+
+  // A FAQ the customer explicitly approved outranks the generic escalation heuristics: the
+  // customer decided this question has a safe standard answer.
+  let bestFaq: { id: string; score: number } | null = null;
+  for (const faq of config.faqs) {
+    const score = faqMatchScore(faq, question);
+    if (score >= 0.5 && (!bestFaq || score > bestFaq.score)) bestFaq = { id: faq.id, score };
+  }
+  if (bestFaq) return { class: 'configured', reference: `faq:${bestFaq.id}`, reason: `faq match ${bestFaq.score.toFixed(2)}` };
 
   for (const topic of config.alwaysEscalateTopics ?? []) {
     if (text.includes(normalise(topic))) return { class: 'must_escalate', reference: topic, reason: 'client-configured escalation topic' };
@@ -77,12 +87,6 @@ export function classifyKnowledgeRequest(config: ClientConfig, question: string)
     if (patterns.some((pattern) => pattern.test(question))) return { class: 'tool_required', reference: tool, reason: 'live or personal data' };
   }
 
-  let bestFaq: { id: string; score: number } | null = null;
-  for (const faq of config.faqs) {
-    const score = faqMatchScore(faq, question);
-    if (score >= 0.5 && (!bestFaq || score > bestFaq.score)) bestFaq = { id: faq.id, score };
-  }
-  if (bestFaq) return { class: 'configured', reference: `faq:${bestFaq.id}`, reason: `faq match ${bestFaq.score.toFixed(2)}` };
 
   if (/[öo]ffnungszeit|ge[öo]ffnet|geschlossen|feiertag|wann.*(auf|offen)/i.test(question)) return { class: 'configured', reference: 'opening_hours', reason: 'configured hours' };
   if (/adresse|\bwo\b.*\b(sind|seid|ist|liegt|finde)\b|anfahrt|park|standort|wie komme ich/i.test(question)) return { class: 'configured', reference: 'locations', reason: 'configured locations' };

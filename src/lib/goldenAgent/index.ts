@@ -17,6 +17,7 @@ export { MockBookingProvider } from './adapters/mockBookingProvider.ts';
 export { N8nBookingProvider } from './adapters/n8nBookingProvider.ts';
 export * from './evaluation/types.ts';
 export { buildScenarioCatalog, EVAL_NOW, scenarioCategoriesCovered } from './evaluation/scenarios.ts';
+export { generateCustomerScenarios } from './evaluation/customerScenarios.ts';
 export { evaluateTranscript, runOfflineEvaluation, summarize, detectOutcome } from './evaluation/runner.ts';
 export { runReferenceConversation } from './evaluation/referencePolicy.ts';
 export { compileSimulationTest, normaliseElevenLabsTranscript, toolIdsFromWorkspace, EVAL_TEST_NAME_PREFIX } from './evaluation/elevenlabsEvaluation.ts';

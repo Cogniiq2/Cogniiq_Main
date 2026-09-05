@@ -1,0 +1,3 @@
+{
+  "//": "Deliberately empty of options. Its only job is to stop Deno's config discovery here, so that `deno check` and `supabase functions serve` do not walk up to the repository's Vite tsconfig.json — whose `baseUrl` fails under the TypeScript version Deno 2.9.5 ships (TS5101). No permissions, tasks, imports or compilerOptions are declared, because none is needed and each would be a second place where this function's behaviour is configured."
+}
