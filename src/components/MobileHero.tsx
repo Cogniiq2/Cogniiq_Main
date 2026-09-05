@@ -1,9 +1,17 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 const EASE_CIRC: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
+// The hero's calls to action are the most prominent navigation on the site.
+// They shipped as <button onClick={navigate(...)}>, which emits no href: the
+// prerendered homepage therefore passed no crawlable link to /kontakt or
+// /leistungen, the buttons did nothing at all without JavaScript, and neither
+// could be middle-clicked, opened in a new tab or copied. Routing through a
+// real <Link> keeps the client-side transition while emitting <a href>.
+const MotionLink = motion.create(Link);
 
 function useParticles(count: number) {
   return useMemo(() => Array.from({ length: count }, (_, i) => ({
@@ -336,7 +344,6 @@ function ScrollCue() {
 }
 
 export function MobileHero() {
-  const navigate = useNavigate();
   const sectionRef = useRef<HTMLElement>(null);
   const [ripples, setRipples] = useState<Array<{ id: number; x: number; y: number }>>([]);
   const rippleId = useRef(0);
@@ -492,15 +499,22 @@ export function MobileHero() {
           className="cq-rise w-full flex flex-col gap-3 mt-4"
           style={{ animationDelay: '3.1s', animationDuration: '0.7s' }}
         >
-          <motion.button
-            onClick={() => navigate('/kontakt')}
+          <MotionLink
+            to="/kontakt"
             className="w-full relative overflow-hidden"
             style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              // A <button> centres its own label; an <a> does not. Without this
+              // a wrapped second line goes hard left — invisible today because
+              // the German labels happen to fit on one line at 320px, one copy
+              // edit away from not.
+              textAlign: 'center',
+              textDecoration: 'none',
               minHeight: 54,
               borderRadius: 14,
               background: '#0d1821',
-              border: 'none',
-              cursor: 'pointer',
               fontSize: '15px',
               fontWeight: 600,
               color: '#ffffff',
@@ -509,8 +523,15 @@ export function MobileHero() {
             }}
             whileTap={{ scale: 0.975 }}
           >
+            {/* Decorative tap highlight. framer-motion gives any element with a
+                `whileTap` gesture tabIndex=0 unless it is told otherwise, which
+                put an empty gradient <div> into the tab order between the two
+                calls to action. The gesture (and the visual) are kept; only the
+                focusability is opted out of. */}
             <motion.div
               className="absolute inset-0"
+              aria-hidden="true"
+              tabIndex={-1}
               style={{ background: 'linear-gradient(135deg, rgba(46,111,143,0.15) 0%, transparent 60%)' }}
               initial={{ opacity: 0 }}
               whileTap={{ opacity: 1 }}
@@ -525,17 +546,25 @@ export function MobileHero() {
                 <path d="M6 3L11 8L6 13" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
               </motion.svg>
             </span>
-          </motion.button>
+          </MotionLink>
 
-          <motion.button
-            onClick={() => navigate('/leistungen')}
+          <MotionLink
+            to="/leistungen"
             className="w-full"
             style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              // A <button> centres its own label; an <a> does not. Without this
+              // a wrapped second line goes hard left — invisible today because
+              // the German labels happen to fit on one line at 320px, one copy
+              // edit away from not.
+              textAlign: 'center',
+              textDecoration: 'none',
               minHeight: 48,
               borderRadius: 14,
               background: 'rgba(255,255,255,0.7)',
               border: '1px solid rgba(15,23,42,0.1)',
-              cursor: 'pointer',
               fontSize: '14px',
               fontWeight: 500,
               color: '#374151',
@@ -546,7 +575,7 @@ export function MobileHero() {
             whileTap={{ scale: 0.975 }}
           >
             Leistungen entdecken
-          </motion.button>
+          </MotionLink>
         </div>
 
         {/* Guarantee strip */}

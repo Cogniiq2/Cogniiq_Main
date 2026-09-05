@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   ArrowRight,
   PhoneCall,
@@ -239,6 +239,12 @@ function DeferredSplineScene() {
   );
 }
 
+// Both hero calls to action were <button onClick={() => navigate(...)}>. A button
+// emits no href, so the homepage's most prominent module passed no crawlable link
+// to /kontakt or /ki-telefonassistent, did nothing without JavaScript, and could
+// not be opened in a new tab. A real <Link> keeps the client-side transition.
+const MotionLink = motion.create(Link);
+
 const services = [
   { icon: PhoneCall, label: 'KI-Telefonassistent', href: '/ki-telefonassistent' },
   { icon: Globe, label: 'Webdesign', href: '/webdesign-agentur-deutschland' },
@@ -252,7 +258,6 @@ const proof = [
 export function DesktopHero() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true });
-  const navigate = useNavigate();
 
   // Travel distance for the sweep line below — measured, not a percentage; see
   // the comment at its motion.div.
@@ -416,13 +421,12 @@ export function DesktopHero() {
             transition={{ duration: 0.6, delay: 1.5, ease: E }}
           >
             <div className="flex items-center gap-3">
-              <motion.button
-                type="button"
-                onClick={() => navigate('/kontakt')}
+              <MotionLink
+                to="/kontakt"
                 // The primary action is the one element on a public page that carries
                 // a filled signal colour — it was previously near-black, identical in
                 // weight to every secondary control on the page.
-                className="group relative flex items-center gap-3 overflow-hidden rounded-xl bg-pub-signal px-7 py-3.5 text-[13.5px] font-semibold text-white transition-colors hover:bg-pub-signal-ink"
+                className="group relative flex items-center gap-3 overflow-hidden rounded-xl bg-pub-signal px-7 py-3.5 text-[13.5px] font-semibold text-white no-underline transition-colors hover:bg-pub-signal-ink"
                 whileHover={{ scale: 1.015 }}
                 whileTap={{ scale: 0.975 }}
                 aria-label="Unverbindliches Erstgespräch vereinbaren"
@@ -440,12 +444,11 @@ export function DesktopHero() {
                   className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-sky-500/40 via-sky-500/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
                   aria-hidden="true"
                 />
-              </motion.button>
+              </MotionLink>
 
-              <button
-                type="button"
-                onClick={() => navigate('/ki-telefonassistent')}
-                className="group flex items-center gap-1.5 text-[13px] font-medium text-pub-ink-3 transition-colors hover:text-pub-ink"
+              <Link
+                to="/ki-telefonassistent"
+                className="group flex items-center gap-1.5 text-[13px] font-medium text-pub-ink-3 no-underline transition-colors hover:text-pub-ink"
                 // Was "Demo anhören" / "…anhören", navigating to a text page. There is
                 // no audio: the Stimmprobe module cannot render until asset F1 exists.
                 // Promising a recording and delivering prose breaks trust at exactly
@@ -454,7 +457,7 @@ export function DesktopHero() {
               >
                 So funktioniert der Empfang
                 <ArrowRight className="h-3 w-3 text-pub-ink-4 transition-colors group-hover:text-pub-ink-2" aria-hidden="true" />
-              </button>
+              </Link>
             </div>
           </motion.div>
 

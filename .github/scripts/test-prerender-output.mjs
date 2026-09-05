@@ -459,6 +459,142 @@ if (/<lastmod>/.test(sitemap)) {
   }
 }
 
+/**
+ * Offset just past the `</section>` that closes the <section> opening at
+ * `openIndex`, counting nested sections. Returns -1 if it is never closed.
+ */
+function matchingSectionEnd(html, openIndex) {
+  const token = /<\/?section[\s>]/g;
+  token.lastIndex = openIndex;
+  let depth = 0;
+  for (let m = token.exec(html); m; m = token.exec(html)) {
+    depth += m[0][1] === '/' ? -1 : 1;
+    if (depth === 0) return m.index + '</section>'.length;
+  }
+  return -1;
+}
+
+// ─── 10. the homepage hero is crawlable and works without JavaScript ─────────
+// The hero is the most prominent module on the site and the only one that links
+// to the two pages the business cares about. Both of its calls to action shipped
+// as <button onClick={() => navigate(...)}>: a button carries no href, so the
+// prerendered homepage passed NO link to /kontakt at all, the CTA did nothing
+// without JavaScript, and it could not be opened in a new tab or copied.
+//
+// This asserts the shape of the served bytes, not of the React tree, because the
+// React tree was never the thing that was wrong — a <button> renders perfectly
+// and still exports no link. It also pins the canonical H1, which the hero owns:
+// the homepage is rendered from MobileHero at build time and swapped to
+// DesktopHero after hydration, so "how many H1s does / actually ship" is a
+// question only the artifact can answer.
+//
+// SCOPE: this covers the MOBILE hero only, and structurally cannot cover the
+// desktop one. HeroSection seeds isDesktop=false unconditionally, so the build
+// only ever prerenders MobileHero and DesktopHero never reaches dist/ — which
+// is also the version Googlebot indexes, under mobile-first indexing. The
+// desktop hero's calls to action are asserted where they actually exist: in a
+// real browser at a desktop width, in test-browser-hydration.mjs.
+{
+  const homepage = read(join(DIST, 'index.html'));
+  const rootMatch = homepage.match(/<div id="root">([\s\S]*)<\/div>\s*<\/body>/);
+
+  if (!rootMatch) {
+    fail('homepage: could not locate the prerendered #root markup');
+  } else {
+    const root = rootMatch[1];
+
+    // The hero region is exactly the <section> that CONTAINS the H1 — from its
+    // opening tag to its OWN matching close, found by counting nesting depth.
+    //
+    // Neither shortcut works here. A fixed byte window passes vacuously: the
+    // pre-fix homepage had an unrelated /kontakt link a few thousand bytes
+    // below the hero. Ending at "the next <section>" is the same bug with a
+    // different constant — on the real artifact that over-reaches the hero's
+    // own </section> by ~4.3kB and swallows the trust strip that follows it,
+    // so a hero with no anchors at all still passes. Both were demonstrated by
+    // mutating dist/index.html, not reasoned about.
+    const h1Index = root.indexOf('<h1');
+    if (h1Index === -1) {
+      fail('homepage: no <h1> in the prerendered markup');
+    } else {
+      const heroStart = root.lastIndexOf('<section', h1Index);
+      const heroEnd = heroStart === -1 ? -1 : matchingSectionEnd(root, heroStart);
+
+      if (heroStart === -1 || heroEnd === -1) {
+        // Never silently widen the window: an unbounded region is exactly how
+        // this assertion would start passing for the wrong reason.
+        fail('homepage: could not delimit the hero <section> around the <h1>');
+      } else {
+      const heroRegion = root.slice(heroStart, heroEnd);
+
+      const h1Count = (root.match(/<h1[\s>]/g) || []).length;
+      if (h1Count !== 1) {
+        fail(`homepage ships ${h1Count} <h1> elements; exactly 1 is required`);
+      } else {
+        ok('homepage ships exactly one <h1>');
+      }
+
+      // Exact canonical headline. <br> and the per-word <span> wrappers used by
+      // the entrance animation are stripped; the non-breaking spaces that hold
+      // the words together are normalised back to ordinary spaces.
+      const h1Inner = (root.match(/<h1[^>]*>([\s\S]*?)<\/h1>/) || [])[1] || '';
+      const h1Text = h1Inner
+        .replace(/<br\s*\/?>/gi, ' ')
+        .replace(/<[^>]+>/g, '')
+        .replace(/ /g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      const CANONICAL_H1 = 'Digitale Systeme, die Unternehmen führen.';
+      if (h1Text !== CANONICAL_H1) {
+        fail(`homepage <h1> is ${JSON.stringify(h1Text)}; must be exactly ${JSON.stringify(CANONICAL_H1)}`);
+      } else {
+        ok('homepage <h1> is the canonical headline');
+      }
+
+      // The actual regression guard: real hrefs, in the served HTML, in the hero.
+      const heroHrefs = [...heroRegion.matchAll(/<a\s[^>]*href="([^"]+)"/g)].map((m) => m[1]);
+      for (const target of ['/kontakt', '/leistungen']) {
+        if (!heroHrefs.includes(target)) {
+          fail(
+            `homepage hero exports no crawlable <a href="${target}"> — ` +
+              'a call to action routed through onClick/navigate() is invisible to a crawler ' +
+              'and inert without JavaScript'
+          );
+        }
+      }
+      if (heroHrefs.includes('/kontakt') && heroHrefs.includes('/leistungen')) {
+        ok('homepage hero exports crawlable links to /kontakt and /leistungen');
+      }
+
+      // A <button> in the hero is the defect itself reappearing. The hero has no
+      // legitimate button: nothing in it submits, toggles or opens anything.
+      const heroButtons = (heroRegion.match(/<button[\s>]/g) || []).length;
+      if (heroButtons > 0) {
+        fail(
+          `homepage hero contains ${heroButtons} <button> element(s); ` +
+            'hero navigation must be anchors so it is crawlable and works without JavaScript'
+        );
+      } else {
+        ok('homepage hero contains no navigation buttons');
+      }
+
+      // framer-motion marks any element carrying whileTap/whileHover as
+      // tabIndex=0. On a decorative overlay that puts an empty gradient <div>
+      // into the keyboard tab order, inside the control it decorates.
+      const focusableDecorations = (heroRegion.match(/<div[^>]*\stabindex="0"/g) || []).length;
+      if (focusableDecorations > 0) {
+        fail(
+          `homepage hero has ${focusableDecorations} focusable decorative <div>(s) (tabindex="0") — ` +
+            'these are keyboard traps between the real controls'
+        );
+      } else {
+        ok('homepage hero has no focusable decorative elements');
+      }
+      }
+    }
+  }
+}
+
 // ─── Result ──────────────────────────────────────────────────────────────────
 if (failures.length) {
   console.error('\n✗ Prerender output verification FAILED:');

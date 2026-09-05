@@ -262,6 +262,81 @@ async function run() {
       if (zeroMetric) fail(`${route.path}: fabricated zero metric in the rendered DOM ("${zeroMetric[0].trim()}")`);
     }
 
+    // ── the DESKTOP hero's calls to action ──
+    // This is the only place the desktop hero exists. HeroSection seeds
+    // isDesktop=false unconditionally so the build always prerenders
+    // MobileHero; DesktopHero is a lazy chunk that only mounts after hydration
+    // above 1024px, and therefore never reaches dist/. The prerender-output
+    // test consequently cannot see it: reverting DesktopHero's CTAs to
+    // <button onClick={navigate}> passes every assertion there.
+    //
+    // Both hero CTAs must be real anchors. A button carries no href, so it is
+    // invisible to a crawler, inert without JavaScript, and cannot be opened in
+    // a new tab.
+    {
+      await page.send('Emulation.setDeviceMetricsOverride', {
+        width: 1440,
+        height: 900,
+        deviceScaleFactor: 1,
+        mobile: false,
+      });
+      await page.send('Page.navigate', { url: `${server.origin}/` });
+
+      // Poll rather than sleep a fixed amount: DesktopHero is a lazy chunk
+      // behind hydration + matchMedia, and its Suspense fallback is MobileHero,
+      // so "the mobile headline is on screen" is indistinguishable from "not
+      // finished yet". Wait for the desktop headline itself.
+      const readHero = async () => {
+        const { result } = await page.send('Runtime.evaluate', {
+          expression: `(() => {
+            const h1 = document.querySelector('h1');
+            const hero = h1 && h1.closest('section');
+            if (!hero) return { error: 'no hero <section> around the <h1>' };
+            return {
+              h1: (h1.innerText || '').replace(/\\s+/g, ' ').trim(),
+              hrefs: [...hero.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')),
+              buttons: hero.querySelectorAll('button').length,
+            };
+          })()`,
+          returnByValue: true,
+        });
+        return result.value || {};
+      };
+
+      let hero = {};
+      const deadline = Date.now() + 20_000;
+      do {
+        await new Promise((r) => setTimeout(r, 250));
+        hero = await readHero();
+      } while (!/Erreichbar/.test(hero.h1 || '') && Date.now() < deadline);
+
+      if (hero.error) {
+        fail(`desktop hero: ${hero.error}`);
+      } else if (!/Erreichbar/.test(hero.h1)) {
+        // Guard against the assertion silently grading the mobile hero: if the
+        // desktop variant never mounted, everything below would pass for the
+        // wrong reason.
+        fail(`desktop hero did not mount at 1440px (h1 was "${hero.h1}") — the check below would be vacuous`);
+      } else {
+        for (const target of ['/kontakt', '/ki-telefonassistent']) {
+          if (!hero.hrefs.includes(target)) {
+            fail(
+              `desktop hero exports no crawlable <a href="${target}"> — ` +
+                'a call to action routed through onClick/navigate() is inert without JavaScript'
+            );
+          }
+        }
+        if (hero.buttons > 0) {
+          fail(`desktop hero contains ${hero.buttons} <button> element(s); hero navigation must be anchors`);
+        }
+        if (hero.hrefs.includes('/kontakt') && hero.hrefs.includes('/ki-telefonassistent') && !hero.buttons) {
+          ok('desktop hero exports crawlable links to /kontakt and /ki-telefonassistent');
+        }
+      }
+
+      await page.send('Emulation.clearDeviceMetricsOverride');
+    }
+
     if (!failures.length) ok('post-hydration metadata correct on every route');
   } finally {
     await close();
