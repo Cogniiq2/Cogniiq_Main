@@ -813,8 +813,7 @@
       "src/pages/industries/WebdesignSport.tsx": 1,
       "src/pages/pillars/WebdesignAgenturDeutschland.tsx": 2,
       "src/pages/problems/KeineAnfragenWebsitePage.tsx": 1,
-      "public/sitemap.xml": 2,
-      "functions/_middleware.ts": 2
+      "public/sitemap.xml": 2
     },
     "/bayreuth/website-relaunch": {
       "src/App.tsx": 1,
@@ -828,8 +827,7 @@
       "src/pages/cluster/bayreuth/WebsiteErstellenBayreuth.tsx": 1,
       "src/pages/cluster/bayreuth/WebsiteRelaunchBayreuth.tsx": 2,
       "src/pages/pillars/WebdesignAgenturDeutschland.tsx": 1,
-      "public/sitemap.xml": 2,
-      "functions/_middleware.ts": 2
+      "public/sitemap.xml": 2
     },
     "/regensburg/website-relaunch": {
       "src/App.tsx": 1,
@@ -844,8 +842,7 @@
       "src/pages/cluster/regensburg/WebdesignKostenRegensburg.tsx": 1,
       "src/pages/cluster/regensburg/WebsiteErstellenRegensburg.tsx": 1,
       "src/pages/cluster/regensburg/WebsiteRelaunchRegensburg.tsx": 2,
-      "public/sitemap.xml": 2,
-      "functions/_middleware.ts": 2
+      "public/sitemap.xml": 2
     },
     "/muenchen/webdesign-kosten": {
       "src/App.tsx": 1,
@@ -859,8 +856,7 @@
       "src/pages/cluster/muenchen/WebdesignKostenMuenchen.tsx": 2,
       "src/pages/cluster/muenchen/WebsiteErstellenMuenchen.tsx": 2,
       "src/pages/cluster/muenchen/WebsiteRelaunchMuenchen.tsx": 1,
-      "public/sitemap.xml": 2,
-      "functions/_middleware.ts": 2
+      "public/sitemap.xml": 2
     },
     "/ki-telefonassistent-arzt": {
       "src/App.tsx": 1,
@@ -882,8 +878,7 @@
       "src/pages/problems/VerpassteAnrufePage.tsx": 1,
       "src/pages/problems/ZuVielManuelleArbeitPage.tsx": 1,
       "src/prerender.hydration.test.tsx": 1,
-      "public/sitemap.xml": 2,
-      "functions/_middleware.ts": 2
+      "public/sitemap.xml": 2
     },
     "/kosten-ki-telefonassistent": {
       "src/App.tsx": 1,
@@ -907,8 +902,7 @@
       "src/pages/problems/KeineTerminbuchungPage.tsx": 1,
       "src/pages/problems/VerpassteAnrufePage.tsx": 1,
       "src/prerender.hydration.test.tsx": 1,
-      "public/sitemap.xml": 2,
-      "functions/_middleware.ts": 2
+      "public/sitemap.xml": 2
     }
   }
 }

@@ -3,7 +3,7 @@
 // SEO + consent consistency checks (Phase 0).
 //
 // Prevents drift between the route table (src/App.tsx + CITY_SERVICE_CONFIGS),
-// the edge middleware metadata (functions/_middleware.ts), the sitemap
+// the edge middleware (must carry no metadata), the sitemap
 // (public/sitemap.xml) and the blog data (src/lib/blog-data.ts); verifies the
 // legal routes exist; and guards the consent contract (no Google tag before
 // consent). Runs in CI via .github/workflows/build.yml. No runtime deps.
@@ -66,12 +66,20 @@ const orphanSitemap = sitemapPaths.filter((p) => !isRoute(p));
 if (orphanSitemap.length) fail(`Sitemap URLs with no matching route: ${orphanSitemap.join(', ')}`);
 else ok('every sitemap URL resolves to a real route');
 
-// ─── 3. Middleware metadata keys ⇄ routes ────────────────────────────────────
+// ─── 3. Middleware carries NO route metadata ─────────────────────────────────
+// functions/_middleware.ts runs on every Cloudflare Pages request. It once held
+// a second copy of the route metadata and rewrote <title>, description and
+// canonical at the edge; that copy drifted from the manifest on 5 titles and
+// 25 descriptions and overrode the prerendered head — including two frozen
+// search experiments. The prerendered document is the only source of truth, so
+// the middleware must never again carry or write per-route metadata.
 const middleware = read('functions/_middleware.ts');
-const mwKeys = [...middleware.matchAll(/^\s*'(\/[^']*)':\s*\{/gm)].map((m) => m[1]);
-const orphanMw = mwKeys.filter((p) => !isRoute(p));
-if (orphanMw.length) fail(`Middleware seoConfig keys with no matching route: ${orphanMw.join(', ')}`);
-else ok(`all ${mwKeys.length} middleware metadata keys map to real routes`);
+const mwKeys = [...middleware.matchAll(/^\s*'(\/[^']*)':\s*\{\s*title:/gm)].map((m) => m[1]);
+if (mwKeys.length) fail(`functions/_middleware.ts carries route metadata again (${mwKeys.length} entries) — the prerendered head is the only source of truth`);
+else ok('middleware carries no route metadata map');
+const mwRewritesHead = /<meta\\s\+name="description"|<link\\s\+rel="canonical"|og:title|twitter:title/.test(middleware);
+if (mwRewritesHead) fail('functions/_middleware.ts rewrites public head metadata (description/canonical/og/twitter) — remove it, the prerender owns the head');
+else ok('middleware does not rewrite public head metadata');
 
 // ─── 3b. Route manifest ⇄ runtime router (BIDIRECTIONAL) ─────────────────────
 // src/lib/routing/publicRoutes.ts is the authoritative SEO/prerender/sitemap
@@ -153,13 +161,6 @@ if (/new Date\(|Date\.now\(/.test(manifestSrc)) fail('The manifest must not comp
 else if (!manifestLastmods.length) fail('No lastmod values found in the manifest');
 else ok(`${manifestLastmods.length} hand-maintained lastmod values, none computed at build time`);
 
-// 3b-vii. The manifest must not drift from the (inert on Netlify) Cloudflare
-// middleware while that file still exists. functions/_middleware.ts is NOT
-// modified by this gate; this only prevents the two from disagreeing.
-const mwNotInManifest = mwKeys.filter((p) => !manifestPaths.includes(p));
-if (mwNotInManifest.length) {
-  fail(`functions/_middleware.ts has metadata for routes missing from the manifest: ${mwNotInManifest.join(', ')}`);
-} else ok('middleware metadata keys are a subset of the manifest (no drift)');
 
 // ─── 3c. Netlify routing + headers ───────────────────────────────────────────
 const redirectsSrc = read('public/_redirects');
@@ -261,7 +262,7 @@ for (const legal of ['/impressum', '/datenschutz']) {
   else ok(`legal route ${legal} present in route table + sitemap`);
 }
 
-// ─── 5. Blog slugs ⇄ sitemap ⇄ middleware ────────────────────────────────────
+// ─── 5. Blog slugs ⇄ sitemap ⇄ manifest ────────────────────────────────────
 const blogData = read('src/lib/blog-data.ts');
 const blogSlugs = [
   ...blogData.matchAll(/canonical:\s*"https:\/\/cogniiq\.de\/blog\/([^"]+)"/g),
@@ -270,7 +271,6 @@ const sitemapBlog = sitemapPaths.filter((p) => p.startsWith('/blog/')).map((p) =
 
 for (const slug of blogSlugs) {
   if (!sitemapBlog.includes(slug)) fail(`Blog post ${slug} missing from sitemap`);
-  if (!mwKeys.includes(`/blog/${slug}`)) fail(`Blog post ${slug} missing middleware metadata`);
 }
 for (const slug of sitemapBlog) {
   if (!blogSlugs.includes(slug)) fail(`Sitemap references unknown blog post ${slug}`);
@@ -292,7 +292,7 @@ if (blogSlugs.length === manifestBlog.length && !manifestBlog.some((s) => !blogS
   ok(`all ${manifestBlog.length} blog slugs match between blog-data.ts and the manifest`);
 }
 if (blogSlugs.length && !failures.some((f) => f.includes('Blog') || f.includes('blog post')))
-  ok(`all ${blogSlugs.length} blog posts consistent across data, sitemap and middleware`);
+  ok(`all ${blogSlugs.length} blog posts consistent across data, sitemap and manifest`);
 
 // ─── 6. Consent contract ─────────────────────────────────────────────────────
 const indexHtml = read('index.html');
