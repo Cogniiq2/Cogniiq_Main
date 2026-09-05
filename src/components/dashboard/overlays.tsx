@@ -12,6 +12,17 @@ import { border, radius, surface, text, zIndex } from './tokens';
 function useFocusTrap(active: boolean, onClose: () => void) {
   const ref = useRef<HTMLDivElement>(null);
 
+  // `onClose` is held in a ref rather than being an effect dependency, and that is the whole
+  // point of this indirection. Callers pass an inline arrow (`onClose={() => setOpen(false)}`),
+  // so its identity changes on EVERY render of the parent. As a dependency it re-ran the effect
+  // below on every such render — and that effect's teardown restores focus to whatever was
+  // focused before the dialog opened. A background reload, a toast, any unrelated re-render
+  // behind an open dialog therefore yanked the caret out of the field the owner was typing in
+  // and silently dropped the rest of their input. Keyed on `active` alone, the trap is set up
+  // once when the dialog opens and torn down once when it closes.
+  const onCloseRef = useRef(onClose);
+  useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
+
   useEffect(() => {
     if (!active) return;
     const node = ref.current;
@@ -19,6 +30,12 @@ function useFocusTrap(active: boolean, onClose: () => void) {
 
     const focusFirst = () => {
       if (!node) return;
+      // Moving focus into the dialog is only correct while focus is still OUTSIDE it. This runs
+      // a frame late so the portal can mount, and by then the owner may already have clicked or
+      // tabbed into a field — the first focusable node here is the "Schließen" button, so firing
+      // unconditionally pulled the caret out of whatever they had started typing and dropped the
+      // rest of their input. If focus already sits inside the dialog, it is where it belongs.
+      if (node.contains(document.activeElement)) return;
       const focusable = node.querySelector<HTMLElement>(
         'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])',
       );
@@ -34,7 +51,7 @@ function useFocusTrap(active: boolean, onClose: () => void) {
         // Radix portals its content into a popper wrapper, so its presence is the reliable signal.
         if (document.querySelector('[data-radix-popper-content-wrapper]')) return;
         event.stopPropagation();
-        onClose();
+        onCloseRef.current();
         return;
       }
       if (event.key !== 'Tab' || !node) return;
@@ -58,7 +75,7 @@ function useFocusTrap(active: boolean, onClose: () => void) {
       document.body.style.overflow = overflow;
       previouslyFocused?.focus?.();
     };
-  }, [active, onClose]);
+  }, [active]);
 
   return ref;
 }
