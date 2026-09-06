@@ -1,0 +1,105 @@
+import { describe, expect, it } from 'vitest';
+
+import type { PrivateBarProduct } from './catalog';
+import {
+  MAX_DISTINCT_LINES,
+  MAX_QUANTITY_PER_PRODUCT,
+  formatEuro,
+  isPurchasable,
+  isValidQuantity,
+  itemCount,
+  priceLines,
+  totalCents,
+} from './pricing';
+
+const base: PrivateBarProduct = {
+  id: 'x',
+  name: 'X',
+  shortLabel: 'X',
+  category: 'wine',
+  origin: null,
+  volume: null,
+  priceCents: 450,
+  image: null,
+  available: true,
+  sortOrder: 1,
+};
+
+describe('isPurchasable', () => {
+  it('requires availability and a configured, positive price', () => {
+    expect(isPurchasable(base)).toBe(true);
+    expect(isPurchasable({ ...base, priceCents: null })).toBe(false);
+    expect(isPurchasable({ ...base, priceCents: 0 })).toBe(false);
+    expect(isPurchasable({ ...base, available: false })).toBe(false);
+  });
+});
+
+describe('isValidQuantity', () => {
+  it('accepts whole numbers inside the bounds only', () => {
+    expect(isValidQuantity(1)).toBe(true);
+    expect(isValidQuantity(MAX_QUANTITY_PER_PRODUCT)).toBe(true);
+    expect(isValidQuantity(0)).toBe(false);
+    expect(isValidQuantity(-1)).toBe(false);
+    expect(isValidQuantity(1.5)).toBe(false);
+    expect(isValidQuantity(MAX_QUANTITY_PER_PRODUCT + 1)).toBe(false);
+    expect(isValidQuantity(Number.NaN)).toBe(false);
+  });
+});
+
+describe('priceLines', () => {
+  it('rejects an empty selection', () => {
+    expect(priceLines([])).toEqual({ ok: false, reason: 'empty_selection' });
+  });
+
+  it('rejects an unknown product rather than skipping it', () => {
+    const result = priceLines([{ productId: 'not-a-product', quantity: 1 }]);
+    expect(result).toEqual({ ok: false, reason: 'unknown_product' });
+  });
+
+  it('rejects every product in the current catalogue while no price is configured', () => {
+    // Guards the launch condition: nothing can be ordered before real prices land.
+    const result = priceLines([{ productId: 'bayreuther-hell', quantity: 1 }]);
+    expect(result).toEqual({ ok: false, reason: 'product_not_purchasable' });
+  });
+
+  it('rejects duplicate lines and oversized selections', () => {
+    expect(priceLines([
+      { productId: 'bayreuther-hell', quantity: 1 },
+      { productId: 'bayreuther-hell', quantity: 1 },
+    ])).toEqual({ ok: false, reason: 'duplicate_line' });
+
+    const tooMany = Array.from({ length: MAX_DISTINCT_LINES + 1 }, (_, i) => ({
+      productId: `p-${i}`,
+      quantity: 1,
+    }));
+    expect(priceLines(tooMany)).toEqual({ ok: false, reason: 'too_many_lines' });
+  });
+});
+
+describe('totals', () => {
+  it('multiplies in integer cents and never in floating point', () => {
+    const lines = [
+      { product: base, quantity: 3, unitAmountCents: 450, amountCents: 1350 },
+      { product: base, quantity: 1, unitAmountCents: 1990, amountCents: 1990 },
+    ];
+    expect(totalCents(lines)).toBe(3340);
+    expect(Number.isInteger(totalCents(lines))).toBe(true);
+  });
+
+  it('counts items, not lines', () => {
+    expect(itemCount([
+      { productId: 'a', quantity: 2 },
+      { productId: 'b', quantity: 1 },
+    ])).toBe(3);
+  });
+});
+
+describe('formatEuro', () => {
+  it('formats German currency from integer cents', () => {
+    // Intl separates the amount from the symbol with a no-break space, which
+    // varies by ICU build, so it is normalised rather than hard-coded.
+    const normalise = (value: string) => value.replace(/\s/g, ' ');
+    expect(normalise(formatEuro(1350))).toBe('13,50 €');
+    expect(normalise(formatEuro(0))).toBe('0,00 €');
+  });
+});

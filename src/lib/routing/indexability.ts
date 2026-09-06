@@ -30,6 +30,15 @@ export function isDocumentSurface(pathname: string): boolean {
   return isUnder(pathname, '/d');
 }
 
+// BoLaGio Private Bar (/private-bar, /private-bar/success, /private-bar/cancel).
+// A standalone guest surface hosted here temporarily: prerendered so a scanned QR code paints
+// immediately, but never indexed and never in the sitemap. It is NOT a private application surface
+// — it carries no Cogniiq chrome at all — so it has its own predicate rather than joining
+// isPrivateSurface(), whose consumers also apply Cogniiq document titles.
+export function isPrivateBarSurface(pathname: string): boolean {
+  return isUnder(pathname, '/private-bar');
+}
+
 export function isPrivateSurface(pathname: string): boolean {
   return (
     isUnder(pathname, '/app') ||

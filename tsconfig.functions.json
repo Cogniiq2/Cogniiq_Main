@@ -1,0 +1,31 @@
+{
+  /* Cloudflare Pages Functions.
+   *
+   * tsconfig.app.json includes only src/, so until now nothing under functions/
+   * was ever typechecked — including the middleware that serves every route.
+   * This project covers the Functions and the framework-free modules they
+   * import from src/, so `npm run typecheck` sees the code Cloudflare actually
+   * bundles and runs.
+   *
+   * No @cloudflare/workers-types dependency: the handlers declare the narrow
+   * context/env shapes they use, exactly as functions/_middleware.ts already
+   * does. WebWorker lib provides Request/Response/URL/crypto. */
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "WebWorker"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowJs": true,
+    "checkJs": false,
+    "types": [],
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true
+  },
+  "include": ["functions/**/*.ts", "src/private-bar/catalog.ts", "src/private-bar/pricing.ts"]
+}

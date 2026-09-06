@@ -40,6 +40,24 @@ export async function onRequest(context: CloudflarePagesContext) {
   let pathname = url.pathname;
 
   // ============================================================
+  // API PASS-THROUGH.
+  //
+  // Everything below this point reads the downstream response with
+  // response.text() and asserts that it is a complete HTML document. An
+  // API route function answers with JSON, so without this guard
+  // describeDocumentProblem() reports "asset is application/json, not
+  // HTML" and this middleware replaces a valid 200 JSON body with a 500.
+  //
+  // Deliberately narrow: ONLY paths under "/api/". No Cogniiq route begins
+  // with that prefix (public/robots.txt already disallows it), so no
+  // existing surface changes behaviour. Bare "/api" is NOT excluded — it is
+  // not an endpoint and keeps the 404 document.
+  // ============================================================
+  if (pathname.startsWith('/api/')) {
+    return context.next();
+  }
+
+  // ============================================================
   // CRITICAL GUARD: never process file/asset requests.
   //
   // Any path with a file extension (.js, .css, .png, .xml, ...)

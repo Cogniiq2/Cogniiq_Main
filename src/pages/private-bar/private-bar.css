@@ -1,0 +1,525 @@
+/* ───────────────────────────────────────────────────────────────────────────
+   BoLaGio Private Bar — self-contained design system.
+
+   Scoped entirely under .pb-root. It defines its own tokens rather than
+   inheriting Cogniiq's: this surface is a different brand and must be
+   removable without leaving anything behind. No global selector is declared
+   here, and no Cogniiq token is read or redefined.
+
+   Motion budget: transform/opacity/clip-path only, 150–420 ms, no continuous
+   animation, no scroll-driven effects. Every animation is CSS so the page is
+   complete without JavaScript and cannot shift layout.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+.pb-root {
+  /* ── surface ── */
+  --pb-ivory: #f7f4ee;
+  --pb-ivory-deep: #f1ece3;
+  --pb-surface: #fcfaf6;
+
+  /* ── ink ── */
+  --pb-ink: #1b1917;
+  --pb-ink-soft: #4a453d;
+  --pb-muted: #857c6e;
+
+  /* ── line & accent (restrained champagne/brass) ── */
+  --pb-hairline: #e3ddd1;
+  --pb-hairline-strong: #d3cabb;
+  --pb-champagne: #a98b55;
+
+  /* ── type ── */
+  --pb-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua",
+    Georgia, "Times New Roman", serif;
+  --pb-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+
+  /* ── spacing scale (4 pt base) ── */
+  --pb-1: 0.25rem;
+  --pb-2: 0.5rem;
+  --pb-3: 0.75rem;
+  --pb-4: 1rem;
+  --pb-6: 1.5rem;
+  --pb-8: 2rem;
+  --pb-12: 3rem;
+  --pb-16: 4rem;
+  --pb-24: 6rem;
+
+  /* ── motion ── */
+  --pb-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --pb-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --pb-fast: 180ms;
+  --pb-base: 260ms;
+  --pb-slow: 420ms;
+
+  min-height: 100dvh;
+  background-color: var(--pb-ivory);
+  color: var(--pb-ink);
+  font-family: var(--pb-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  padding-bottom: calc(var(--pb-16) + env(safe-area-inset-bottom, 0px));
+}
+
+/* A quiet warm gradient, painted once. Not animated. */
+.pb-root::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 60% at 50% 0%,
+    rgba(255, 255, 255, 0.85) 0%,
+    rgba(247, 244, 238, 0) 60%
+  );
+  z-index: 0;
+}
+
+.pb-page {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 30rem;
+  margin: 0 auto;
+  padding: 0 var(--pb-6);
+}
+
+/* ── typography ────────────────────────────────────────────────────────────── */
+.pb-eyebrow {
+  font-family: var(--pb-sans);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--pb-muted);
+  margin: 0;
+}
+
+.pb-wordmark {
+  font-family: var(--pb-display);
+  font-weight: 400;
+  font-size: clamp(2.25rem, 12vw, 3rem);
+  line-height: 1;
+  letter-spacing: -0.015em;
+  color: var(--pb-ink);
+  margin: 0;
+}
+
+.pb-display {
+  font-family: var(--pb-display);
+  font-weight: 400;
+  font-size: clamp(1.5rem, 7vw, 2rem);
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.pb-body {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--pb-ink-soft);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.pb-meta {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pb-muted);
+  margin: 0;
+}
+
+/* ── header ────────────────────────────────────────────────────────────────── */
+.pb-header {
+  padding-top: calc(var(--pb-16) + env(safe-area-inset-top, 0px));
+  padding-bottom: var(--pb-12);
+  text-align: center;
+}
+
+.pb-header__rule {
+  width: 1px;
+  height: var(--pb-8);
+  margin: var(--pb-6) auto 0;
+  background: linear-gradient(to bottom, var(--pb-champagne), rgba(169, 139, 85, 0));
+}
+
+.pb-header__product {
+  margin-top: var(--pb-3);
+  font-family: var(--pb-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--pb-champagne);
+}
+
+/* ── sections ──────────────────────────────────────────────────────────────── */
+.pb-section {
+  padding-block: var(--pb-12);
+}
+
+.pb-section + .pb-section {
+  padding-top: 0;
+}
+
+.pb-section__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--pb-4);
+  margin-bottom: var(--pb-6);
+}
+
+.pb-section__head::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: var(--pb-hairline);
+}
+
+/* One category and its products. The vertical rhythm between groups is what
+   keeps a category heading from reading as a caption for the row above it. */
+.pb-group {
+  margin-top: var(--pb-8);
+}
+
+.pb-group + .pb-group {
+  margin-top: var(--pb-16);
+}
+
+.pb-group__head {
+  margin-bottom: var(--pb-6);
+}
+
+.pb-intro__body {
+  margin-top: var(--pb-4);
+}
+
+/* ── product grid ──────────────────────────────────────────────────────────── */
+.pb-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--pb-8) var(--pb-4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pb-product {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The frame reserves its space before anything loads: aspect-ratio + explicit
+   width/height on the image means this page cannot shift. */
+.pb-frame {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: 2px;
+  background:
+    radial-gradient(75% 55% at 50% 38%, #ffffff 0%, rgba(255, 255, 255, 0) 70%),
+    linear-gradient(to bottom, var(--pb-surface) 0%, var(--pb-ivory-deep) 100%);
+  border: 1px solid var(--pb-hairline);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The plinth: a soft contact shadow the bottle sits on. */
+.pb-frame::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 12%;
+  width: 46%;
+  height: 6px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(27, 25, 23, 0.16) 0%, rgba(27, 25, 23, 0) 70%);
+}
+
+.pb-frame__image {
+  position: relative;
+  z-index: 1;
+  width: auto;
+  height: 82%;
+  max-width: 78%;
+  object-fit: contain;
+}
+
+.pb-frame--pending {
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.pb-frame__pending {
+  position: relative;
+  z-index: 1;
+  margin-bottom: var(--pb-4);
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--pb-muted);
+}
+
+.pb-product__name {
+  font-family: var(--pb-display);
+  font-size: 1rem;
+  line-height: 1.3;
+  margin: var(--pb-4) 0 0;
+  color: var(--pb-ink);
+  text-wrap: balance;
+}
+
+.pb-product__meta {
+  margin-top: var(--pb-1);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--pb-muted);
+}
+
+.pb-product__price {
+  margin-top: var(--pb-2);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--pb-ink-soft);
+}
+
+.pb-product__price--pending {
+  color: var(--pb-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+}
+
+/* ── closing mark ──────────────────────────────────────────────────────────── */
+.pb-close {
+  padding-top: var(--pb-16);
+  text-align: center;
+}
+
+.pb-close__rule {
+  width: 2.5rem;
+  height: 1px;
+  margin: 0 auto var(--pb-6);
+  background-color: var(--pb-hairline-strong);
+}
+
+.pb-close__mark {
+  font-family: var(--pb-display);
+  font-size: 1.125rem;
+  letter-spacing: 0.02em;
+  color: var(--pb-muted);
+}
+
+/* ── status surfaces (success / cancel) ────────────────────────────────────── */
+.pb-status {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--pb-16) var(--pb-6)
+    calc(var(--pb-16) + env(safe-area-inset-bottom, 0px));
+}
+
+.pb-status__mark {
+  font-family: var(--pb-display);
+  font-size: 1.5rem;
+  letter-spacing: 0.01em;
+  color: var(--pb-ink);
+}
+
+.pb-status__product {
+  margin-top: var(--pb-2);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--pb-champagne);
+}
+
+.pb-status__heading {
+  margin-top: var(--pb-12);
+  font-family: var(--pb-display);
+  font-size: clamp(1.5rem, 7vw, 1.875rem);
+  line-height: 1.2;
+  color: var(--pb-ink);
+}
+
+.pb-status__body {
+  margin-top: var(--pb-4);
+  max-width: 24rem;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--pb-ink-soft);
+  text-wrap: pretty;
+}
+
+/* A single, slow breath — the only indeterminate indicator on the surface. */
+.pb-pulse {
+  width: 3px;
+  height: 3px;
+  margin-top: var(--pb-8);
+  border-radius: 50%;
+  background-color: var(--pb-champagne);
+  animation: pb-pulse 2400ms var(--pb-ease) infinite;
+}
+
+@keyframes pb-pulse {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.6);
+  }
+}
+
+.pb-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin-top: var(--pb-8);
+  padding: 0 var(--pb-6);
+  border: 1px solid var(--pb-hairline-strong);
+  border-radius: 2px;
+  background-color: transparent;
+  color: var(--pb-ink);
+  font-family: var(--pb-sans);
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: border-color var(--pb-fast) var(--pb-ease),
+    background-color var(--pb-fast) var(--pb-ease);
+}
+
+.pb-link:hover {
+  border-color: var(--pb-champagne);
+  background-color: rgba(169, 139, 85, 0.06);
+}
+
+.pb-root :focus-visible {
+  outline: 2px solid var(--pb-champagne);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ── entrance ──────────────────────────────────────────────────────────────── */
+/* The overture is a fixed overlay: it never participates in layout, so it can
+   never shift the page. It removes itself with CSS alone — no JavaScript is
+   required for the page to become usable. */
+.pb-overture {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--pb-ivory);
+  animation: pb-overture-out 520ms var(--pb-ease) 760ms both;
+}
+
+.pb-overture__mark {
+  font-family: var(--pb-display);
+  font-size: clamp(2.25rem, 12vw, 3rem);
+  line-height: 1;
+  color: var(--pb-ink);
+  animation: pb-rise 560ms var(--pb-ease-out) both;
+}
+
+.pb-overture__product {
+  margin-top: var(--pb-3);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--pb-champagne);
+  animation: pb-resolve 620ms var(--pb-ease-out) 220ms both;
+}
+
+.pb-overture--instant {
+  display: none;
+}
+
+@keyframes pb-overture-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes pb-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes pb-resolve {
+  from {
+    opacity: 0;
+    letter-spacing: 0.5em;
+  }
+  to {
+    opacity: 1;
+    letter-spacing: 0.34em;
+  }
+}
+
+/* Content rises behind the overture, so the transition into the catalogue is
+   continuous rather than a cut. */
+.pb-enter {
+  animation: pb-rise 520ms var(--pb-ease-out) both;
+}
+
+.pb-enter--1 { animation-delay: 820ms; }
+.pb-enter--2 { animation-delay: 900ms; }
+.pb-enter--3 { animation-delay: 980ms; }
+.pb-enter--4 { animation-delay: 1060ms; }
+
+/* Staggered product entrance, capped so a long catalogue never feels slow. */
+.pb-grid > .pb-product { animation: pb-rise 460ms var(--pb-ease-out) both; }
+.pb-grid > .pb-product:nth-child(1) { animation-delay: 1040ms; }
+.pb-grid > .pb-product:nth-child(2) { animation-delay: 1090ms; }
+.pb-grid > .pb-product:nth-child(3) { animation-delay: 1140ms; }
+.pb-grid > .pb-product:nth-child(4) { animation-delay: 1190ms; }
+.pb-grid > .pb-product:nth-child(n + 5) { animation-delay: 1240ms; }
+
+/* ── responsive ────────────────────────────────────────────────────────────── */
+@media (min-width: 40rem) {
+  .pb-page { max-width: 44rem; padding-inline: var(--pb-8); }
+  .pb-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--pb-12) var(--pb-6); }
+}
+
+@media (min-width: 64rem) {
+  .pb-page { max-width: 60rem; }
+  .pb-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .pb-header { padding-top: var(--pb-24); }
+}
+
+/* ── reduced motion ────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .pb-root *,
+  .pb-root *::before,
+  .pb-root *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+
+  .pb-overture { display: none; }
+  .pb-pulse { opacity: 0.6; }
+}

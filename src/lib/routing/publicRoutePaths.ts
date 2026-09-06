@@ -108,6 +108,9 @@ export const PUBLIC_ROUTE_PATHS: readonly string[] = [
   "/blog/webdesign-agentur-auswahl",
   "/impressum",
   "/datenschutz",
+  "/private-bar",
+  "/private-bar/success",
+  "/private-bar/cancel",
   "/anfrage-erhalten",
 ];
 

@@ -80,6 +80,22 @@
   X-Robots-Tag: noindex, nofollow, noarchive
   Cache-Control: no-cache, must-revalidate
 
+# BoLaGio Private Bar — a standalone guest surface hosted here temporarily. It is
+# prerendered (so a scanned QR code paints immediately) and therefore reachable
+# by a crawler, but it has no public address: the manifest marks it
+# `indexable: false`, which keeps it out of public/sitemap.xml and writes a
+# noindex robots meta into the prerendered document. These rules repeat that at
+# the edge for crawlers that never execute JavaScript.
+#
+# It is deliberately NOT Disallow-ed in public/robots.txt: a crawler must be able
+# to fetch a URL in order to see its noindex.
+/private-bar
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-cache, must-revalidate
+/private-bar/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-cache, must-revalidate
+
 # The 404 document is served for every unknown public URL. It must never be
 # indexed under any of those URLs.
 /404.html

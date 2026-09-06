@@ -19,7 +19,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.functions.json",
     "seo:baseline": "SEO_RECORD_PROTECTED_BASELINE=1 vitest run src/protectedExperiments.test.tsx"
   },
   "dependencies": {

@@ -236,7 +236,22 @@ async function probe(path) {
 }
 
 const PRIVATE = ['/app/login', '/admin/finance', '/d/test-token'];
-const REPORT = [...PRIVATE, '/app-shell', '/app-shell.html', '/', '/leistungen', '/completely-unknown-url'];
+// The Private Bar is a prerendered, noindex guest surface; /api/* is the JSON
+// contract that functions/_middleware.ts must pass through untouched.
+const PRIVATE_BAR = ['/private-bar', '/private-bar/success', '/private-bar/cancel'];
+const API = ['/api/private-bar/status?order=00000000-0000-4000-8000-000000000000'];
+const REPORT = [
+  ...PRIVATE,
+  ...PRIVATE_BAR,
+  ...API,
+  '/api',
+  '/apix',
+  '/app-shell',
+  '/app-shell.html',
+  '/',
+  '/leistungen',
+  '/completely-unknown-url',
+];
 
 console.log('\n--- observed Pages responses ---');
 const seen = {};
@@ -294,6 +309,82 @@ check(seen['/completely-unknown-url'].status === 404,
 check(seen['/completely-unknown-url'].body !== HOMEPAGE,
   'an unknown URL does not serve the homepage',
   'an unknown URL served the homepage');
+
+// ── The Private Bar surface ─────────────────────────────────────────────────
+// Prerendered (so a scanned QR code paints immediately), never indexed, and
+// carrying none of the Cogniiq shell.
+for (const path of PRIVATE_BAR) {
+  const r = seen[path];
+  check(r.status === 200, `${path} -> 200`, `${path} -> ${r.status}`);
+  check(
+    !r.emptyRoot && r.bytes > 1000,
+    `${path} is prerendered, not an empty shell`,
+    `${path} served an empty #root (${r.bytes} bytes) — the QR code would open a white page`
+  );
+  check(
+    /noindex/.test(r.robots),
+    `${path} is noindex at the server`,
+    `${path} has no noindex X-Robots-Tag`
+  );
+  check(
+    /<meta name="robots" content="noindex/.test(r.body),
+    `${path} carries a noindex robots meta in the served document`,
+    `${path} document is missing its noindex robots meta`
+  );
+  check(
+    !/Cogniiq/i.test(r.body.replace(/<head>[\s\S]*?<\/head>/i, '')),
+    `${path} renders no Cogniiq branding in the document body`,
+    `${path} contains Cogniiq branding in its rendered body`
+  );
+}
+
+// ── /api/* passes through the middleware as JSON ────────────────────────────
+// Without the narrow /api/ guard in functions/_middleware.ts, every one of these
+// responses is read as HTML, fails describeDocumentProblem() and is replaced by
+// a 500 — so this is the regression test for that guard.
+for (const path of API) {
+  const r = seen[path];
+  check(
+    /application\/json/i.test(r.contentType),
+    `${path} answers with JSON, not HTML`,
+    `${path} answered with "${r.contentType || '-'}" — the middleware converted it`
+  );
+  check(
+    r.status !== 500,
+    `${path} is not turned into a 500 by the middleware`,
+    `${path} -> 500: the middleware treated a JSON response as a broken document`
+  );
+  check(
+    (() => {
+      try {
+        const parsed = JSON.parse(r.body);
+        return typeof parsed === 'object' && parsed !== null;
+      } catch {
+        return false;
+      }
+    })(),
+    `${path} returns a parseable JSON object`,
+    `${path} body is not JSON: ${r.body.slice(0, 80)}`
+  );
+  // No payment configuration exists in a build environment, so the endpoint must
+  // fail closed rather than proceed.
+  check(
+    r.status === 503,
+    `${path} fails closed (503) with no payment configuration present`,
+    `${path} -> ${r.status}, expected 503 not_configured`
+  );
+}
+
+// The guard is scoped to "/api/" and nothing else: neither the bare prefix nor a
+// path that merely starts with the same letters may escape HTML handling.
+for (const path of ['/api', '/apix']) {
+  const r = seen[path];
+  check(
+    r.status === 404 && /html/i.test(r.contentType),
+    `${path} still receives the HTML 404 document (the guard is narrow)`,
+    `${path} -> ${r.status} ${r.contentType} — the /api/ guard is too broad`
+  );
+}
 
 // No response may ever be a blank 200 document.
 for (const [path, r] of Object.entries(seen)) {

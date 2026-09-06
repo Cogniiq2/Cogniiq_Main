@@ -835,6 +835,30 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   // Reachable and prerendered (so it is not a hard 404 and not an empty shell),
   // but held out of every index: it is the post-submission confirmation page,
   // already Disallow-ed in public/robots.txt.
+  // BoLaGio Private Bar. Not a Cogniiq page: a standalone guest surface hosted
+  // here temporarily while the BoLaGio site is built. It is in this manifest for
+  // one reason only — so the three routes are PRERENDERED and a scanned QR code
+  // paints instantly instead of waiting for the SPA shell. `indexable: false`
+  // keeps all three out of the sitemap and serves them noindex; public/_headers
+  // repeats that at the edge for crawlers that do not run JavaScript.
+  {
+    path: "/private-bar",
+    title: "BoLaGio · Private Bar",
+    description: "Die Auswahl in Ihrer BoLaGio Wohnung — in Ruhe ansehen und festhalten, was Sie genossen haben.",
+    indexable: false,
+  },
+  {
+    path: "/private-bar/success",
+    title: "Zahlung · BoLaGio Private Bar",
+    description: "Bestätigung Ihrer Zahlung für die BoLaGio Private Bar.",
+    indexable: false,
+  },
+  {
+    path: "/private-bar/cancel",
+    title: "Zahlung abgebrochen · BoLaGio Private Bar",
+    description: "Die Zahlung wurde nicht abgeschlossen — zurück zur Auswahl der BoLaGio Private Bar.",
+    indexable: false,
+  },
   {
     path: "/anfrage-erhalten",
     title: "Anfrage erhalten – wir melden uns | Cogniiq",

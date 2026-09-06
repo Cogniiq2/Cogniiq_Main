@@ -22,6 +22,7 @@ import {
   DOCUMENT_ROBOTS,
   PRIVATE_ROBOTS,
   isDocumentSurface,
+  isPrivateBarSurface,
   isPrivateSurface,
   privateDocumentTitle,
 } from './lib/routing/indexability';
@@ -84,6 +85,16 @@ function RouteIndexabilityManager() {
       return;
     }
 
+    // The BoLaGio Private Bar is a known, prerendered route, so the check below
+    // would otherwise hand it the public "index, follow" default. It is a guest
+    // surface with no public address: the hydrated head must keep the noindex
+    // that the prerendered document already carries. Its title is owned by the
+    // surface itself (PrivateBarShell), not by Cogniiq.
+    if (isPrivateBarSurface(pathname)) {
+      setMeta('robots', PRIVATE_ROBOTS);
+      return;
+    }
+
     // An unknown URL is answered by Netlify with the 404 document. Search engines
     // execute JavaScript, so the *hydrated* head has to agree with that: keep it
     // noindex rather than letting the public default make a 404 look indexable.
@@ -130,7 +141,9 @@ function PublicThemeManager() {
 
 function PublicStructuredData() {
   const { pathname } = useLocation();
-  if (isPrivateSurface(pathname) || isDocumentSurface(pathname)) return null;
+  if (isPrivateSurface(pathname) || isDocumentSurface(pathname) || isPrivateBarSurface(pathname)) {
+    return null;
+  }
   return <LocalBusinessSchema />;
 }
 
@@ -404,6 +417,18 @@ const LogoShowcasePage = lazyNamed(() => import('./pages/LogoShowcasePage'), 'Lo
 const BlogIndexPage = lazyNamed(() => import('./pages/blog/BlogIndexPage'), 'BlogIndexPage');
 const BlogPostPage = lazyNamed(() => import('./pages/blog/BlogPostPage'), 'BlogPostPage');
 const ScanPage = lazyNamed(() => import('./pages/ScanPage'), 'ScanPage');
+
+// BoLaGio Private Bar — a standalone guest surface, not a Cogniiq page. Lazy so its
+// design system and catalogue never enter the entry chunk that marketing visitors download.
+const PrivateBarPage = lazyNamed(() => import('./pages/private-bar/PrivateBarPage'), 'PrivateBarPage');
+const PrivateBarSuccessPage = lazyNamed(
+  () => import('./pages/private-bar/PrivateBarSuccessPage'),
+  'PrivateBarSuccessPage'
+);
+const PrivateBarCancelPage = lazyNamed(
+  () => import('./pages/private-bar/PrivateBarCancelPage'),
+  'PrivateBarCancelPage'
+);
 // Admin workspace shell. Lazy so the admin dashboard design system (dashboard tokens,
 // primitives, overlays, SidebarShell, RailAccount, internalNavigation) is not part of the
 // entry chunk that every anonymous marketing visitor downloads. It is a layout-route
@@ -498,6 +523,17 @@ export function AppInner() {
             ProtectedRoute (the Supabase link itself is the credential). Marked noindex by
             RouteIndexabilityManager, which treats every /auth/* path as private. */}
         <Route path="/auth/confirmed" element={<AuthConfirmationPage />} />
+
+        {/* BoLaGio Private Bar. A standalone guest experience for one apartment, hosted here
+            temporarily while the BoLaGio site is built. Registered OUTSIDE PublicLayout on
+            purpose — exactly like /d/:token — so no Cogniiq navigation, footer, consent banner,
+            structured data or branding can render inside it. It carries no link back into
+            Cogniiq. Prerendered but noindex (src/lib/routing/publicRoutes.ts + public/_headers),
+            and absent from the sitemap. Removing this block plus src/pages/private-bar and
+            src/private-bar removes the whole surface. */}
+        <Route path="/private-bar" element={<PrivateBarPage />} />
+        <Route path="/private-bar/success" element={<PrivateBarSuccessPage />} />
+        <Route path="/private-bar/cancel" element={<PrivateBarCancelPage />} />
 
         {/* Post-login role resolution — waits for the DB-backed role, then routes safely. */}
         <Route path="/auth/continue" element={<RoleLandingPage />} />
@@ -684,7 +720,9 @@ export function AppInner() {
 // gate SEO metadata and structured data above.
 function ConsentBannerGate() {
   const { pathname } = useLocation();
-  if (isPrivateSurface(pathname) || isDocumentSurface(pathname)) return null;
+  if (isPrivateSurface(pathname) || isDocumentSurface(pathname) || isPrivateBarSurface(pathname)) {
+    return null;
+  }
   return <ConsentBanner />;
 }
 
