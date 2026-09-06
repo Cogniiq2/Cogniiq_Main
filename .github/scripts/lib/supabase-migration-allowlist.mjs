@@ -243,6 +243,23 @@ export const ALLOWED_MIGRATIONS = [
     requires: ['20260710120000', '20260722120000', '20260828120000'],
     description: 'Admin Center — atomic EXPENSE Schnellimport with vendor resolution (Ausgaben)',
   },
+  {
+    file: '20260905120000_ai_receptionist_platform.sql',
+    version: '20260905120000',
+    // Real dependencies, every one an object this SQL actually references (verified by
+    // grepping the migration for every `public.*` identifier it touches):
+    //  - 20260710120000: is_platform_admin(), is_platform_owner(), request_is_service_role(),
+    //    set_updated_at() (used on two new touch triggers), and public.organizations (the FK
+    //    every new table carries)
+    //  - 20260721120000: organization_has_accessible_solution(uuid, text), the entitlement
+    //    helper both customer-read RLS policies call
+    // It does NOT depend on the receptionist persistence chain (20260711120000) or the
+    // service-onboarding chain (20260830120000/20260830121000/20260830122000): this migration
+    // creates its own ai_receptionist_* tables and touches none of theirs. Listing a version
+    // this SQL does not reference would make the dependency gate assert something untrue.
+    requires: ['20260710120000', '20260721120000'],
+    description: 'AI Receptionist platform — tenant-scoped Golden Agent persistence (calls, tool bindings, evaluations)',
+  },
 ];
 
 /**
