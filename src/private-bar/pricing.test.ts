@@ -56,10 +56,13 @@ describe('priceLines', () => {
     expect(result).toEqual({ ok: false, reason: 'unknown_product' });
   });
 
-  it('rejects every product in the current catalogue while no price is configured', () => {
-    // Guards the launch condition: nothing can be ordered before real prices land.
-    const result = priceLines([{ productId: 'bayreuther-hell', quantity: 1 }]);
-    expect(result).toEqual({ ok: false, reason: 'product_not_purchasable' });
+  it('prices a line from the catalogue', () => {
+    const result = priceLines([{ productId: 'bayreuther-hell', quantity: 2 }]);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const unit = result.lines[0].unitAmountCents;
+    expect(unit).toBeGreaterThan(0);
+    expect(result.lines[0].amountCents).toBe(unit * 2);
   });
 
   it('rejects duplicate lines and oversized selections', () => {

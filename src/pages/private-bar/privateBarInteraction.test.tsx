@@ -1,50 +1,35 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// The live catalogue carries no configured prices yet, so nothing in it can be
-// ordered — by design. The selection experience is therefore exercised against
-// a priced fixture catalogue; every other module under test is the real one.
+// A small fixture catalogue keeps the interaction tests independent of the live
+// price list; everything else under test — cart, stock ceilings, confirmation,
+// payment handoff — is the real implementation.
 vi.mock('@/private-bar/catalog', async () => {
   const actual = await vi.importActual<typeof import('@/private-bar/catalog')>('@/private-bar/catalog');
+  const make = (
+    id: string,
+    name: string,
+    category: 'sparkling' | 'wine' | 'beer' | 'water',
+    priceCents: number,
+    sortOrder: number
+  ) => ({
+    id,
+    name,
+    shortLabel: name,
+    category,
+    origin: null,
+    volume: null,
+    priceCents,
+    image: null,
+    available: true,
+    sortOrder,
+  });
   const catalogue = [
-    {
-      id: 'fixture-prosecco',
-      name: 'Fixture Prosecco',
-      shortLabel: 'Fixture Prosecco',
-      category: 'sparkling' as const,
-      origin: null,
-      volume: null,
-      priceCents: 1290,
-      image: null,
-      available: true,
-      sortOrder: 10,
-    },
-    {
-      id: 'fixture-beer',
-      name: 'Fixture Beer',
-      shortLabel: 'Fixture Beer',
-      category: 'beer' as const,
-      origin: null,
-      volume: null,
-      priceCents: 360,
-      image: null,
-      available: true,
-      sortOrder: 20,
-    },
-    {
-      id: 'fixture-unpriced',
-      name: 'Fixture Unpriced',
-      shortLabel: 'Fixture Unpriced',
-      category: 'wine' as const,
-      origin: null,
-      volume: null,
-      priceCents: null,
-      image: null,
-      available: true,
-      sortOrder: 30,
-    },
+    make('fixture-prosecco', 'Fixture Prosecco', 'sparkling', 1290, 10),
+    make('fixture-wine', 'Fixture Wine', 'wine', 2400, 20),
+    make('fixture-beer', 'Fixture Beer', 'beer', 360, 30),
   ];
   return {
     ...actual,
@@ -53,15 +38,69 @@ vi.mock('@/private-bar/catalog', async () => {
     availableProducts: () => catalogue,
     productsByCategory: () => [
       { category: 'sparkling' as const, products: [catalogue[0]] },
-      { category: 'wine' as const, products: [catalogue[2]] },
-      { category: 'beer' as const, products: [catalogue[1]] },
+      { category: 'wine' as const, products: [catalogue[1]] },
+      { category: 'beer' as const, products: [catalogue[2]] },
     ],
   };
 });
 
 const { PrivateBarPage } = await import('./PrivateBarPage');
-const { CART_STORAGE_KEY } = await import('@/private-bar/cart');
 const { strings } = await import('@/private-bar/strings');
+const { PAYPAL_PAYMENT_URL } = await import('@/private-bar/config');
+
+const PROSECCO = 'fixture-prosecco';
+const BEER = 'fixture-beer';
+
+interface Recorded {
+  url: string;
+  body: unknown;
+}
+
+let recorded: Recorded[] = [];
+
+/** Stands in for our own two endpoints. */
+function stubApi(options: {
+  stock?: Record<string, number>;
+  inventoryFails?: boolean;
+  confirm?: (body: Record<string, unknown>) => Response;
+}) {
+  const stock = options.stock ?? { [PROSECCO]: 5, 'fixture-wine': 5, [BEER]: 5 };
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (url: string, init?: RequestInit) => {
+      const body = init?.body ? JSON.parse(String(init.body)) : undefined;
+      recorded.push({ url, body });
+
+      if (url.includes('/api/private-bar/inventory')) {
+        if (options.inventoryFails) return new Response('nope', { status: 502 });
+        return new Response(JSON.stringify({ apartmentId: 'a', stock }), { status: 200 });
+      }
+      if (url.includes('/api/private-bar/confirm-order')) {
+        if (options.confirm) return options.confirm(body as Record<string, unknown>);
+        const items = (body as { items: { productId: string; quantity: number }[] }).items;
+        const priced = items.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          unitAmountCents: item.productId === PROSECCO ? 1290 : 360,
+          amountCents: (item.productId === PROSECCO ? 1290 : 360) * item.quantity,
+        }));
+        return new Response(
+          JSON.stringify({
+            orderId: 'order-1',
+            clientOrderId: (body as { clientOrderId: string }).clientOrderId,
+            totalCents: priced.reduce((sum, i) => sum + i.amountCents, 0),
+            currency: 'EUR',
+            status: 'awaiting_payment',
+            items: priced,
+            stock,
+          }),
+          { status: 200 }
+        );
+      }
+      throw new Error(`unexpected fetch: ${url}`);
+    })
+  );
+}
 
 function renderPage() {
   return render(
@@ -74,168 +113,241 @@ function renderPage() {
 const addButton = (name: string) => screen.getByRole('button', { name: strings.catalogue.addAria(name) });
 const plusButton = (name: string) => screen.getByRole('button', { name: strings.catalogue.increaseAria(name) });
 const minusButton = (name: string) => screen.getByRole('button', { name: strings.catalogue.decreaseAria(name) });
+const bar = () => screen.findByRole('button', { name: new RegExp(strings.bar.ariaLabel) });
+
+/** Waits for inventory to arrive, which is what enables the add controls. */
+async function waitForInventory() {
+  await screen.findByRole('heading', { level: 1 });
+  await waitFor(() => expect(addButton('Fixture Prosecco')).toBeEnabled());
+}
 
 beforeEach(() => {
+  recorded = [];
   window.localStorage.clear();
 });
 
-describe('selection', () => {
-  it('adds a product and reveals the action surface with the running total', async () => {
-    const user = userEvent.setup();
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
+describe('live inventory', () => {
+  it('offers nothing until stock is known, then enables what is in the apartment', async () => {
+    stubApi({ stock: { [PROSECCO]: 2, 'fixture-wine': 0, [BEER]: 1 } });
     renderPage();
+    await waitForInventory();
 
-    // Nothing selected: no action surface at all.
-    expect(screen.queryByRole('button', { name: strings.bar.ariaLabel })).toBeNull();
-
-    await user.click(addButton('Fixture Prosecco'));
-
-    const bar = await screen.findByRole('button', { name: strings.bar.ariaLabel });
-    expect(within(bar).getByText('1 Artikel')).toBeInTheDocument();
-    expect(within(bar).getByText(/12,90/)).toBeInTheDocument();
+    expect(addButton('Fixture Prosecco')).toBeInTheDocument();
+    // Sold out: shown, priced, and not orderable.
+    expect(screen.queryByRole('button', { name: strings.catalogue.addAria('Fixture Wine') })).toBeNull();
+    expect(screen.getAllByText(strings.catalogue.unavailable).length).toBe(1);
   });
 
-  it('replaces the add affordance with a quantity control and totals in integer cents', async () => {
+  it('caps the quantity at one for the last bottle', async () => {
     const user = userEvent.setup();
+    stubApi({ stock: { [PROSECCO]: 1, 'fixture-wine': 5, [BEER]: 5 } });
     renderPage();
+    await waitForInventory();
+
+    await user.click(addButton('Fixture Prosecco'));
+    expect(plusButton('Fixture Prosecco')).toBeDisabled();
+    await user.click(plusButton('Fixture Prosecco'));
+    expect(within(await bar()).getByText('1 Artikel')).toBeInTheDocument();
+  });
+
+  it('caps the quantity at the available count', async () => {
+    const user = userEvent.setup();
+    stubApi({ stock: { [PROSECCO]: 3, 'fixture-wine': 5, [BEER]: 5 } });
+    renderPage();
+    await waitForInventory();
 
     await user.click(addButton('Fixture Prosecco'));
     await user.click(plusButton('Fixture Prosecco'));
-    await user.click(addButton('Fixture Beer'));
-
-    const bar = await screen.findByRole('button', { name: strings.bar.ariaLabel });
-    // 2 × 12,90 + 1 × 3,60 = 29,40
-    expect(within(bar).getByText('3 Artikel')).toBeInTheDocument();
-    expect(within(bar).getByText(/29,40/)).toBeInTheDocument();
+    await user.click(plusButton('Fixture Prosecco'));
+    expect(plusButton('Fixture Prosecco')).toBeDisabled();
+    expect(within(await bar()).getByText('3 Artikel')).toBeInTheDocument();
   });
 
-  it('returns a product to its unselected state at quantity zero', async () => {
-    const user = userEvent.setup();
-    renderPage();
-
-    await user.click(addButton('Fixture Prosecco'));
-    await user.click(minusButton('Fixture Prosecco'));
-
-    expect(addButton('Fixture Prosecco')).toBeInTheDocument();
-    await waitFor(() =>
-      expect(screen.queryByRole('button', { name: strings.bar.ariaLabel })).toBeNull()
+  it('trims a stored selection when stock has fallen since', async () => {
+    window.localStorage.setItem(
+      'bolagio:private-bar:cart:v1',
+      JSON.stringify([{ productId: PROSECCO, quantity: 4 }])
     );
+    stubApi({ stock: { [PROSECCO]: 1, 'fixture-wine': 5, [BEER]: 5 } });
+    renderPage();
+    // The product stays selected (at the reduced quantity), so the add control
+    // never returns — the action surface is what reports the trim.
+    expect(within(await bar()).getByText('1 Artikel')).toBeInTheDocument();
   });
 
-  it('offers no way to order a product without a configured price', () => {
+  it('says so calmly when inventory cannot be loaded, and offers a retry', async () => {
+    stubApi({ inventoryFails: true });
     renderPage();
-    expect(screen.queryByRole('button', { name: strings.catalogue.addAria('Fixture Unpriced') })).toBeNull();
-    expect(screen.getByText(strings.catalogue.priceUnconfigured)).toBeInTheDocument();
-  });
-
-  it('persists the selection and restores it on the next visit', async () => {
-    const user = userEvent.setup();
-    const first = renderPage();
-    await user.click(addButton('Fixture Prosecco'));
-    await waitFor(() =>
-      expect(window.localStorage.getItem(CART_STORAGE_KEY)).toContain('fixture-prosecco')
-    );
-    first.unmount();
-
-    renderPage();
-    const bar = await screen.findByRole('button', { name: strings.bar.ariaLabel });
-    expect(within(bar).getByText('1 Artikel')).toBeInTheDocument();
-  });
-
-  it('ignores a corrupted stored selection instead of failing to render', async () => {
-    window.localStorage.setItem(CART_STORAGE_KEY, '{"lines":"broken"');
-    renderPage();
-    expect(await screen.findByRole('heading', { level: 1 })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: strings.bar.ariaLabel })).toBeNull();
+    expect(await screen.findByText(strings.errors.inventoryUnavailable)).toBeInTheDocument();
+    // Fails closed: nothing can be selected while availability is unknown.
+    expect(screen.queryByRole('button', { name: strings.catalogue.addAria('Fixture Prosecco') })).toBeNull();
+    expect(screen.getByRole('button', { name: strings.errors.retry })).toBeInTheDocument();
   });
 });
 
-describe('review sheet', () => {
+describe('confirmation', () => {
   async function openSheet(user: ReturnType<typeof userEvent.setup>) {
     await user.click(addButton('Fixture Prosecco'));
-    await user.click(await screen.findByRole('button', { name: strings.bar.ariaLabel }));
+    await user.click(await bar());
     return screen.findByRole('dialog');
   }
 
-  it('opens with the selection, the total and the payment section', async () => {
+  it('sends only ids and quantities — never a price or a total', async () => {
     const user = userEvent.setup();
+    stubApi({});
     renderPage();
+    await waitForInventory();
     const dialog = await openSheet(user);
 
-    expect(within(dialog).getByText(strings.sheet.title)).toBeInTheDocument();
-    expect(within(dialog).getByText('Fixture Prosecco')).toBeInTheDocument();
-    expect(within(dialog).getByText(strings.sheet.totalLabel)).toBeInTheDocument();
-    expect(within(dialog).getAllByText(/12,90/).length).toBeGreaterThan(0);
-    expect(within(dialog).getByText(strings.payment.heading)).toBeInTheDocument();
+    await user.click(within(dialog).getByRole('button', { name: strings.payment.confirmCta }));
+    await waitFor(() => expect(recorded.some((r) => r.url.includes('confirm-order'))).toBe(true));
+
+    const sent = recorded.find((r) => r.url.includes('confirm-order'))!.body as Record<string, unknown>;
+    expect(sent.items).toEqual([{ productId: PROSECCO, quantity: 1 }]);
+    expect(JSON.stringify(sent)).not.toMatch(/total|price|amount/i);
+    expect(typeof sent.clientOrderId).toBe('string');
   });
 
-  it('edits quantities from inside the sheet', async () => {
+  it('moves to the payment step, freezes the order and empties the selection', async () => {
     const user = userEvent.setup();
+    stubApi({});
     renderPage();
+    await waitForInventory();
     const dialog = await openSheet(user);
+    await user.click(within(dialog).getByRole('button', { name: strings.payment.confirmCta }));
 
-    await user.click(within(dialog).getByRole('button', { name: strings.catalogue.increaseAria('Fixture Prosecco') }));
-    await waitFor(() => expect(within(dialog).getAllByText(/25,80/).length).toBeGreaterThan(0));
+    expect(await within(dialog).findByText(strings.payment.confirmedNote)).toBeInTheDocument();
+    // The confirmed order is a record now: no quantity controls remain.
+    expect(within(dialog).queryByRole('button', { name: /eine Einheit/ })).toBeNull();
+    expect(within(dialog).getByRole('link', { name: strings.payment.paypal })).toBeInTheDocument();
+    expect(window.localStorage.getItem('bolagio:private-bar:cart:v1')).toBeNull();
+    expect(window.localStorage.getItem('bolagio:private-bar:order:v1')).toContain('order-1');
   });
 
-  it('empties to a designed state rather than a blank panel', async () => {
+  it('reuses one idempotency key across a retry, so stock cannot be taken twice', async () => {
     const user = userEvent.setup();
+    let attempt = 0;
+    stubApi({
+      confirm: (body) => {
+        attempt += 1;
+        if (attempt === 1) return new Response('boom', { status: 500 });
+        return new Response(
+          JSON.stringify({
+            orderId: 'order-1',
+            clientOrderId: body.clientOrderId,
+            totalCents: 1290,
+            currency: 'EUR',
+            status: 'awaiting_payment',
+            items: [{ productId: PROSECCO, quantity: 1, unitAmountCents: 1290, amountCents: 1290 }],
+            stock: { [PROSECCO]: 4 },
+          }),
+          { status: 200 }
+        );
+      },
+    });
     renderPage();
+    await waitForInventory();
     const dialog = await openSheet(user);
 
-    await user.click(within(dialog).getByRole('button', { name: strings.catalogue.decreaseAria('Fixture Prosecco') }));
+    await user.click(within(dialog).getByRole('button', { name: strings.payment.confirmCta }));
+    expect(await within(dialog).findByText(strings.errors.confirmFailed)).toBeInTheDocument();
+
+    await user.click(within(dialog).getByRole('button', { name: strings.payment.confirmCta }));
+    await within(dialog).findByText(strings.payment.confirmedNote);
+
+    const ids = recorded
+      .filter((r) => r.url.includes('confirm-order'))
+      .map((r) => (r.body as { clientOrderId: string }).clientOrderId);
+    expect(ids).toHaveLength(2);
+    expect(ids[0]).toBe(ids[1]);
+  });
+
+  it('reconciles the selection when stock changed under it, without decrementing', async () => {
+    const user = userEvent.setup();
+    stubApi({
+      stock: { [PROSECCO]: 2, 'fixture-wine': 5, [BEER]: 5 },
+      confirm: () =>
+        new Response(JSON.stringify({ error: 'out_of_stock', stock: { [PROSECCO]: 0 } }), { status: 409 }),
+    });
+    renderPage();
+    await waitForInventory();
+    const dialog = await openSheet(user);
+
+    await user.click(within(dialog).getByRole('button', { name: strings.payment.confirmCta }));
+    expect(await within(dialog).findByText(strings.errors.stockChanged)).toBeInTheDocument();
+    // Nothing was confirmed, and the selection now matches reality.
+    expect(within(dialog).queryByText(strings.payment.confirmedNote)).toBeNull();
     expect(await within(dialog).findByText(strings.sheet.emptyHeading)).toBeInTheDocument();
   });
 
-  it('closes on Escape and returns focus to the control that opened it', async () => {
+  it('restores a confirmed order after a reload instead of creating a second one', async () => {
     const user = userEvent.setup();
-    renderPage();
-    await openSheet(user);
+    stubApi({});
+    const first = renderPage();
+    await waitForInventory();
+    const dialog = await openSheet(user);
+    await user.click(within(dialog).getByRole('button', { name: strings.payment.confirmCta }));
+    await within(dialog).findByText(strings.payment.confirmedNote);
+    first.unmount();
 
-    await user.keyboard('{Escape}');
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    // Radix restores focus after the close transition, so this settles a tick later.
-    await waitFor(() =>
-      expect(document.activeElement).toBe(screen.getByRole('button', { name: strings.bar.ariaLabel }))
-    );
+    recorded = [];
+    renderPage();
+    const reopened = await screen.findByRole('button', {
+      name: new RegExp(strings.bar.ariaLabelConfirmed),
+    });
+    expect(within(reopened).getByText(strings.bar.openAmount)).toBeInTheDocument();
+    expect(recorded.some((r) => r.url.includes('confirm-order'))).toBe(false);
   });
 
-  it('clears the selection only when the guest asks for it', async () => {
+  it('starts a fresh order only when the guest asks for one', async () => {
     const user = userEvent.setup();
+    stubApi({});
     renderPage();
+    await waitForInventory();
     const dialog = await openSheet(user);
+    await user.click(within(dialog).getByRole('button', { name: strings.payment.confirmCta }));
+    await within(dialog).findByText(strings.payment.confirmedNote);
 
-    await user.click(within(dialog).getByRole('button', { name: strings.sheet.clear }));
+    await user.click(within(dialog).getByRole('button', { name: strings.payment.newSelection }));
     expect(await within(dialog).findByText(strings.sheet.emptyHeading)).toBeInTheDocument();
-    await waitFor(() => expect(window.localStorage.getItem(CART_STORAGE_KEY)).toBeNull());
+    expect(window.localStorage.getItem('bolagio:private-bar:order:v1')).toBeNull();
   });
 });
 
 describe('payment handoff', () => {
-  it('keeps the PayPal control disabled while no link is configured', async () => {
-    const user = userEvent.setup();
-    renderPage();
+  async function confirmAndOpenPayment(user: ReturnType<typeof userEvent.setup>) {
     await user.click(addButton('Fixture Prosecco'));
-    await user.click(await screen.findByRole('button', { name: strings.bar.ariaLabel }));
+    await user.click(await bar());
     const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('button', { name: strings.payment.confirmCta }));
+    await within(dialog).findByText(strings.payment.confirmedNote);
+    return dialog;
+  }
 
-    const paypal = within(dialog).getByRole('button', { name: strings.payment.paypal });
-    expect(paypal).toBeDisabled();
-    expect(within(dialog).queryByRole('link', { name: strings.payment.paypal })).toBeNull();
-    expect(within(dialog).getByText(strings.payment.paypalUnavailable)).toBeInTheDocument();
-    // Never a placeholder destination.
-    expect(dialog.querySelector('a[href]')).toBeNull();
+  it('opens the exact configured PayPal link, with nothing appended', async () => {
+    const user = userEvent.setup();
+    stubApi({});
+    renderPage();
+    await waitForInventory();
+    const dialog = await confirmAndOpenPayment(user);
+
+    const link = within(dialog).getByRole('link', { name: strings.payment.paypal });
+    expect(link).toHaveAttribute('href', 'https://www.paypal.com/ncp/payment/G6BPUTG3WZQEE');
+    expect(link).toHaveAttribute('href', PAYPAL_PAYMENT_URL);
+    expect(link).toHaveAttribute('rel', expect.stringContaining('noopener'));
   });
 
-  it('copies the plain amount and acknowledges it in place, without a browser dialog', async () => {
-    // user-event installs its own clipboard stub, which is the one the component
-    // will reach — so the assertion reads back from it rather than from a spy.
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
-
+  it('copies the plain German amount and acknowledges it in place', async () => {
     const user = userEvent.setup();
+    stubApi({});
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
     renderPage();
-    await user.click(addButton('Fixture Prosecco'));
-    await user.click(await screen.findByRole('button', { name: strings.bar.ariaLabel }));
-    const dialog = await screen.findByRole('dialog');
+    await waitForInventory();
+    const dialog = await confirmAndOpenPayment(user);
 
     await user.click(within(dialog).getByRole('button', { name: /Betrag/ }));
     await expect(navigator.clipboard.readText()).resolves.toBe('12,90');
@@ -243,21 +355,55 @@ describe('payment handoff', () => {
     expect(alertSpy).not.toHaveBeenCalled();
   });
 
-  it('never claims that a payment happened', async () => {
+  it('keeps the confirmed order after PayPal is opened and claims nothing about payment', async () => {
     const user = userEvent.setup();
-    const { container } = renderPage();
-    await user.click(addButton('Fixture Prosecco'));
-    await user.click(await screen.findByRole('button', { name: strings.bar.ariaLabel }));
-    await screen.findByRole('dialog');
+    stubApi({});
+    renderPage();
+    await waitForInventory();
+    const dialog = await confirmAndOpenPayment(user);
 
-    const text = `${container.textContent ?? ''}${document.body.textContent ?? ''}`;
+    const link = within(dialog).getByRole('link', { name: strings.payment.paypal });
+    // jsdom cannot navigate; the click handler is what the interface reacts to.
+    link.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(await within(dialog).findByText(strings.payment.handedOff)).toBeInTheDocument();
+    expect(window.localStorage.getItem('bolagio:private-bar:order:v1')).toContain('order-1');
+
+    const text = `${document.body.textContent ?? ''}`;
     for (const forbidden of [
-      /zahlung (erhalten|bestätigt|eingegangen)/i,
+      /zahlung (erhalten|bestätigt|eingegangen|erfolgreich)/i,
       /erfolgreich bezahlt/i,
-      /payment (confirmed|received)/i,
-      /bezahlt\b(?!en)/i,
+      /payment (confirmed|received|successful)/i,
     ]) {
       expect(text).not.toMatch(forbidden);
     }
+  });
+
+  it('closes on Escape and returns focus to the control that opened it', async () => {
+    const user = userEvent.setup();
+    stubApi({});
+    renderPage();
+    await waitForInventory();
+    await user.click(addButton('Fixture Prosecco'));
+    await user.click(await bar());
+    await screen.findByRole('dialog');
+
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(async () => expect(document.activeElement).toBe(await bar()));
+  });
+
+  it('returns a product to its unselected state at quantity zero', async () => {
+    const user = userEvent.setup();
+    stubApi({});
+    renderPage();
+    await waitForInventory();
+
+    await user.click(addButton('Fixture Beer'));
+    await user.click(minusButton('Fixture Beer'));
+    expect(addButton('Fixture Beer')).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: new RegExp(strings.bar.ariaLabel) })).toBeNull()
+    );
   });
 });

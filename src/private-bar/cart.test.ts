@@ -33,6 +33,7 @@ const {
   parseCart,
   quantityOf,
   readStoredCart,
+  reconcileCart,
   remove,
   setQuantity,
   writeStoredCart,
@@ -85,6 +86,47 @@ describe('cart operations', () => {
   it('removes a line outright', () => {
     const cart = increment(increment([], 'wine-a'), 'wine-b');
     expect(remove(cart, 'wine-a').map((l) => l.productId)).toEqual(['wine-b']);
+  });
+});
+
+describe('live stock as a ceiling', () => {
+  it('never lets a quantity exceed what the apartment holds', () => {
+    expect(quantityOf(setQuantity([], 'wine-a', 5, 3), 'wine-a')).toBe(3);
+    expect(quantityOf(increment(increment([], 'wine-a', 1), 'wine-a', 1), 'wine-a')).toBe(1);
+  });
+
+  it('adds nothing at all when stock is zero', () => {
+    expect(setQuantity([], 'wine-a', 2, 0)).toEqual([]);
+    expect(increment([], 'wine-a', 0)).toEqual([]);
+  });
+
+  it('applies the per-product maximum when stock is not yet known', () => {
+    expect(quantityOf(setQuantity([], 'wine-a', 999), 'wine-a')).toBe(MAX_QUANTITY_PER_PRODUCT);
+  });
+});
+
+describe('reconcileCart', () => {
+  it('leaves a selection that still fits alone', () => {
+    const cart = [{ productId: 'wine-a', quantity: 2 }];
+    const result = reconcileCart(cart, { 'wine-a': 5 });
+    expect(result.changed).toBe(false);
+    expect(result.cart).toBe(cart);
+  });
+
+  it('trims a line to what is left', () => {
+    const result = reconcileCart([{ productId: 'wine-a', quantity: 4 }], { 'wine-a': 2 });
+    expect(result.changed).toBe(true);
+    expect(result.cart).toEqual([{ productId: 'wine-a', quantity: 2 }]);
+  });
+
+  it('drops a product that has sold out or vanished from inventory', () => {
+    const cart = [
+      { productId: 'wine-a', quantity: 1 },
+      { productId: 'wine-b', quantity: 1 },
+    ];
+    const result = reconcileCart(cart, { 'wine-a': 1 });
+    expect(result.changed).toBe(true);
+    expect(result.cart).toEqual([{ productId: 'wine-a', quantity: 1 }]);
   });
 });
 

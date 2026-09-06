@@ -16,11 +16,14 @@ import { AnimatedAmount } from './AnimatedAmount';
 export function CheckoutBar({
   itemCount,
   totalCents,
+  confirmed,
   onOpen,
   buttonRef,
 }: {
   itemCount: number;
   totalCents: number;
+  /** True once the selection has been confirmed and only payment is left. */
+  confirmed: boolean;
   onOpen: () => void;
   /** The sheet returns focus here when it closes. */
   buttonRef?: RefObject<HTMLButtonElement>;
@@ -32,14 +35,16 @@ export function CheckoutBar({
         type="button"
         className="pb-bar__button"
         onClick={onOpen}
-        aria-label={strings.bar.ariaLabel}
+        aria-label={confirmed ? strings.bar.ariaLabelConfirmed : strings.bar.ariaLabel}
       >
         <span className="pb-bar__left">
-          <span className="pb-bar__count">{strings.bar.items(itemCount)}</span>
+          <span className="pb-bar__count">
+            {confirmed ? strings.bar.openAmount : strings.bar.items(itemCount)}
+          </span>
           <AnimatedAmount amountCents={totalCents} className="pb-bar__total" />
         </span>
         <span className="pb-bar__action">
-          {strings.bar.action}
+          {confirmed ? strings.bar.actionConfirmed : strings.bar.action}
           <span className="pb-bar__arrow" aria-hidden="true">
             →
           </span>

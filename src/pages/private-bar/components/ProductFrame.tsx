@@ -16,13 +16,16 @@ export function ProductFrame({
   product,
   eager,
   selected = false,
+  dimmed = false,
 }: {
   product: PrivateBarProduct;
   eager: boolean;
   selected?: boolean;
+  /** Sold out: the photograph recedes rather than disappearing. */
+  dimmed?: boolean;
 }) {
   const { image } = product;
-  const className = selected ? 'pb-frame is-selected' : 'pb-frame';
+  const className = `pb-frame${selected ? ' is-selected' : ''}${dimmed ? ' is-dimmed' : ''}`;
 
   if (!image) {
     return (

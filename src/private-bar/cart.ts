@@ -40,11 +40,25 @@ function isOrderable(productId: string): boolean {
   return product !== undefined && isPurchasable(product);
 }
 
-/** Sets an absolute quantity. 0 (or less) removes the line. */
-export function setQuantity(cart: Cart, productId: string, quantity: number): Cart {
+/**
+ * Sets an absolute quantity. 0 (or less) removes the line.
+ *
+ * `limit` is live stock for this product. It is a hard ceiling: a guest can
+ * never select more than the apartment physically holds. Undefined means stock
+ * is not known yet, in which case only the per-product maximum applies — the
+ * authoritative check is the atomic confirmation in the database either way.
+ */
+export function setQuantity(
+  cart: Cart,
+  productId: string,
+  quantity: number,
+  limit?: number
+): Cart {
   if (!isOrderable(productId)) return cart;
 
-  const clamped = Math.min(Math.max(Math.trunc(quantity), 0), MAX_QUANTITY_PER_PRODUCT);
+  const ceiling =
+    typeof limit === 'number' ? Math.min(MAX_QUANTITY_PER_PRODUCT, Math.max(0, Math.trunc(limit))) : MAX_QUANTITY_PER_PRODUCT;
+  const clamped = Math.min(Math.max(Math.trunc(quantity), 0), ceiling);
   const without = cart.filter((line) => line.productId !== productId);
   if (clamped === 0) return without;
   if (!cart.some((line) => line.productId === productId) && without.length >= MAX_DISTINCT_LINES) {
@@ -62,12 +76,44 @@ export function quantityOf(cart: Cart, productId: string): number {
   return cart.find((line) => line.productId === productId)?.quantity ?? 0;
 }
 
-export function increment(cart: Cart, productId: string): Cart {
-  return setQuantity(cart, productId, quantityOf(cart, productId) + 1);
+export function increment(cart: Cart, productId: string, limit?: number): Cart {
+  return setQuantity(cart, productId, quantityOf(cart, productId) + 1, limit);
 }
 
 export function decrement(cart: Cart, productId: string): Cart {
   return setQuantity(cart, productId, quantityOf(cart, productId) - 1);
+}
+
+/**
+ * Brings a selection back in line with what is actually in the apartment.
+ *
+ * Called whenever fresh stock arrives — on load, and again after a confirmation
+ * was refused because stock moved. Quantities are trimmed to what is available
+ * and lines whose product is gone are dropped; `changed` says whether the guest
+ * needs to be told.
+ */
+export function reconcileCart(
+  cart: Cart,
+  stock: Readonly<Record<string, number>>
+): { readonly cart: Cart; readonly changed: boolean } {
+  let changed = false;
+  const lines: CartLine[] = [];
+
+  for (const line of cart) {
+    const available = Math.max(0, Math.trunc(stock[line.productId] ?? 0));
+    if (available === 0) {
+      changed = true;
+      continue;
+    }
+    if (line.quantity > available) {
+      changed = true;
+      lines.push({ productId: line.productId, quantity: available });
+      continue;
+    }
+    lines.push(line);
+  }
+
+  return { cart: changed ? lines : cart, changed };
 }
 
 export function remove(cart: Cart, productId: string): Cart {

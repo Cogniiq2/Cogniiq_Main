@@ -15,11 +15,11 @@
 //   • Metadata that is not established from the supplied source material stays
 //     `null`. Origin, volume, vintage, classification and tasting notes are not
 //     inferred, guessed or generated.
-//   • `category: 'unclassified'` is used where the product name alone does not
-//     prove a category. It is corrected when the owner confirms, not before.
+//   • Categories are the owner's own classification. Nothing here is inferred
+//     from a product name.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type ProductCategory = 'wine' | 'sparkling' | 'beer' | 'water' | 'unclassified';
+export type ProductCategory = 'sparkling' | 'wine' | 'beer' | 'water';
 
 export interface ProductImage {
   /** Base path without extension or width suffix, e.g. "/private-bar/products/ploner-marell". */
@@ -54,28 +54,52 @@ export interface PrivateBarProduct {
 
 export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
   {
+    id: 'stella-rossa-prosecco-doc-brut',
+    name: 'Stella Rossa Prosecco DOC Brut',
+    shortLabel: 'Stella Rossa Prosecco',
+    category: 'sparkling',
+    origin: null,
+    volume: null,
+    priceCents: 2200,
+    image: null,
+    available: true,
+    sortOrder: 10,
+  },
+  {
+    id: 'ploner-marell',
+    name: 'Ploner Marell Brut',
+    shortLabel: 'Ploner Marell Brut',
+    category: 'sparkling',
+    origin: null,
+    volume: null,
+    priceCents: 3900,
+    image: null,
+    available: true,
+    sortOrder: 20,
+  },
+  {
     id: 'masseria-borgo-dei-trulli-primitivo',
     name: 'Masseria Borgo dei Trulli Primitivo',
     shortLabel: 'Borgo dei Trulli Primitivo',
     category: 'wine',
     origin: null,
     volume: null,
-    priceCents: null,
+    priceCents: 1600,
     image: null,
     available: true,
-    sortOrder: 10,
+    sortOrder: 30,
   },
   {
     id: 'covo-moro',
     name: 'Covo Moro',
     shortLabel: 'Covo Moro',
-    category: 'unclassified',
+    category: 'wine',
     origin: null,
     volume: null,
-    priceCents: null,
+    priceCents: 1900,
     image: null,
     available: true,
-    sortOrder: 20,
+    sortOrder: 40,
   },
   {
     id: 'ploner-sauvignon',
@@ -84,10 +108,10 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     category: 'wine',
     origin: null,
     volume: null,
-    priceCents: null,
+    priceCents: 2900,
     image: null,
     available: true,
-    sortOrder: 30,
+    sortOrder: 50,
   },
   {
     id: 'tiefenbrunner-merus-gewuerztraminer-2022',
@@ -96,31 +120,7 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     category: 'wine',
     origin: null,
     volume: null,
-    priceCents: null,
-    image: null,
-    available: true,
-    sortOrder: 40,
-  },
-  {
-    id: 'ploner-marell',
-    name: 'Ploner Marell',
-    shortLabel: 'Ploner Marell',
-    category: 'unclassified',
-    origin: null,
-    volume: null,
-    priceCents: null,
-    image: null,
-    available: true,
-    sortOrder: 50,
-  },
-  {
-    id: 'stella-rossa-prosecco-doc-brut',
-    name: 'Stella Rossa Prosecco DOC Brut',
-    shortLabel: 'Stella Rossa Prosecco',
-    category: 'sparkling',
-    origin: null,
-    volume: null,
-    priceCents: null,
+    priceCents: 2400,
     image: null,
     available: true,
     sortOrder: 60,
@@ -129,10 +129,10 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     id: 'biancavigna-2022',
     name: 'BiancaVigna 2022',
     shortLabel: 'BiancaVigna 2022',
-    category: 'unclassified',
+    category: 'wine',
     origin: null,
     volume: null,
-    priceCents: null,
+    priceCents: 2400,
     image: null,
     available: true,
     sortOrder: 70,
@@ -143,8 +143,8 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     shortLabel: 'Bayreuther Hell',
     category: 'beer',
     origin: null,
-    volume: null,
-    priceCents: null,
+    volume: '0,5 l',
+    priceCents: 450,
     image: null,
     available: true,
     sortOrder: 80,
@@ -155,8 +155,8 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     shortLabel: 'S.Pellegrino',
     category: 'water',
     origin: null,
-    volume: null,
-    priceCents: null,
+    volume: '0,75 l',
+    priceCents: 450,
     image: null,
     available: true,
     sortOrder: 90,
@@ -164,13 +164,7 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
 ];
 
 /** Display order for the catalogue sections. */
-export const CATEGORY_ORDER: readonly ProductCategory[] = [
-  'sparkling',
-  'wine',
-  'beer',
-  'water',
-  'unclassified',
-];
+export const CATEGORY_ORDER: readonly ProductCategory[] = ['sparkling', 'wine', 'beer', 'water'];
 
 export function productById(id: string): PrivateBarProduct | undefined {
   return PRIVATE_BAR_CATALOG.find((product) => product.id === id);

@@ -25,8 +25,15 @@ describe('PayPal configuration', () => {
     expect(resolvePaypalUrl('TODO')).toBeNull();
   });
 
-  it('ships unconfigured: no placeholder URL and no invented cash location', () => {
-    expect(PAYPAL_PAYMENT_URL).toBeNull();
+  it('carries the owner-supplied link verbatim, with nothing appended', () => {
+    // The PayPal page is configured for a customer-entered amount, so no amount,
+    // currency or other parameter may be attached to it.
+    expect(PAYPAL_PAYMENT_URL).toBe('https://www.paypal.com/ncp/payment/G6BPUTG3WZQEE');
+    expect(PAYPAL_PAYMENT_URL).not.toMatch(/[?&]/);
+    expect(resolvePaypalUrl()).toBe(PAYPAL_PAYMENT_URL);
+  });
+
+  it('invents no cash location', () => {
     expect(CASH_LOCATION).toBeNull();
   });
 });

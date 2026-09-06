@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { resolvePaypalUrl } from '../../../private-bar/config';
+import { CASH_LOCATION, resolvePaypalUrl } from '../../../private-bar/config';
 import { amountForCopy, formatEuro } from '../../../private-bar/pricing';
 import { strings } from '../../../private-bar/strings';
 
@@ -9,7 +9,7 @@ import { strings } from '../../../private-bar/strings';
  *
  * The async Clipboard API needs a secure context and a permission that can be
  * refused; the textarea fallback is what makes the control work anyway. Neither
- * path logs: a failed copy is answered in the interface, not in the console.
+ * path logs — a failed copy is answered in the interface, not in the console.
  */
 async function copyText(text: string): Promise<boolean> {
   try {
@@ -39,33 +39,41 @@ async function copyText(text: string): Promise<boolean> {
 }
 
 /**
- * The payment surface.
+ * The payment surface, shown once the selection has been confirmed.
  *
- * This version owns no payment lifecycle: it states the amount precisely, hands
- * the guest to PayPal through the one configured link, and never learns — or
- * claims — what happened afterwards. The selection is deliberately NOT cleared
- * on handoff.
+ * The PayPal page is configured for a customer-entered amount, so this panel's
+ * job is to make the exact figure impossible to miss and effortless to carry
+ * over: it is stated large, and one control puts it on the clipboard as a plain
+ * German decimal ("29,50").
  *
- * With no link configured the PayPal control is disabled rather than pointed at
- * a placeholder, and the cash alternative still stands on its own.
+ * Nothing here learns the outcome. Opening PayPal produces one line saying the
+ * payment is completed there — never that it was received.
  */
-export function PaymentPanel({ totalCents, cashLocation }: { totalCents: number; cashLocation?: string | null }) {
+export function PaymentPanel({
+  totalCents,
+  onNewSelection,
+}: {
+  totalCents: number;
+  onNewSelection: () => void;
+}) {
   const paypalUrl = resolvePaypalUrl();
   const formatted = formatEuro(totalCents);
-  const [copied, setCopied] = useState(false);
+  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>('idle');
   const [handedOff, setHandedOff] = useState(false);
   const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => () => {
-    if (copyTimer.current) clearTimeout(copyTimer.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (copyTimer.current) clearTimeout(copyTimer.current);
+    },
+    []
+  );
 
   const onCopy = useCallback(async () => {
     const ok = await copyText(amountForCopy(totalCents));
-    if (!ok) return;
-    setCopied(true);
+    setCopyState(ok ? 'copied' : 'failed');
     if (copyTimer.current) clearTimeout(copyTimer.current);
-    copyTimer.current = setTimeout(() => setCopied(false), 2200);
+    copyTimer.current = setTimeout(() => setCopyState('idle'), ok ? 2200 : 5000);
   }, [totalCents]);
 
   return (
@@ -107,20 +115,19 @@ export function PaymentPanel({ totalCents, cashLocation }: { totalCents: number;
 
       <button
         type="button"
-        className={copied ? 'pb-copy is-copied' : 'pb-copy'}
+        className={copyState === 'copied' ? 'pb-copy is-copied' : 'pb-copy'}
         onClick={onCopy}
         aria-label={strings.payment.copyAmountAria(formatted)}
       >
         <span className="pb-copy__label">
-          {copied ? strings.payment.copied : strings.payment.copyAmount}
+          {copyState === 'copied' ? strings.payment.copied : strings.payment.copyAmount}
         </span>
       </button>
 
-      {/* The handoff acknowledgement. It says only that nothing further is
-          required here — never that a payment was received, because this site
-          has no way of knowing that. */}
+      {/* Never a claim about the payment: only that it is finished in PayPal,
+          and that the selection is safe here in the meantime. */}
       <p className="pb-pay__handoff" role="status" aria-live="polite">
-        {handedOff ? strings.payment.handedOff : ''}
+        {copyState === 'failed' ? strings.payment.copyFailed : handedOff ? strings.payment.handedOff : ''}
       </p>
 
       <div className="pb-pay__divider" aria-hidden="true">
@@ -131,9 +138,13 @@ export function PaymentPanel({ totalCents, cashLocation }: { totalCents: number;
         <h4 className="pb-cash__heading">{strings.payment.cashHeading}</h4>
         <p className="pb-cash__body">
           {strings.payment.cashBody}
-          {cashLocation ? ` ${cashLocation}` : ''}
+          {CASH_LOCATION ? ` ${CASH_LOCATION}` : ''}
         </p>
       </div>
+
+      <button type="button" className="pb-clear" onClick={onNewSelection}>
+        {strings.payment.newSelection}
+      </button>
     </section>
   );
 }

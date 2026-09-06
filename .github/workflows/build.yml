@@ -261,6 +261,11 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
         run: bash supabase/tests/run_phase0_migration_smoke.sh
 
+      - name: Run Private Bar inventory smoke test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+        run: bash supabase/tests/run_private_bar_inventory_smoke.sh
+
       - name: Run receptionist persistence migration smoke test
         env:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres

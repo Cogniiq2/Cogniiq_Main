@@ -12,12 +12,15 @@ export function QuantityStepper({
   quantity,
   onIncrease,
   onDecrease,
+  canIncrease = true,
   size = 'default',
 }: {
   name: string;
   quantity: number;
   onIncrease: () => void;
   onDecrease: () => void;
+  /** False at the last bottle in the apartment: the control says so by being spent. */
+  canIncrease?: boolean;
   size?: 'default' | 'compact';
 }) {
   return (
@@ -43,6 +46,7 @@ export function QuantityStepper({
         type="button"
         className="pb-stepper__button"
         onClick={onIncrease}
+        disabled={!canIncrease}
         aria-label={strings.catalogue.increaseAria(name)}
       >
         <span aria-hidden="true">+</span>

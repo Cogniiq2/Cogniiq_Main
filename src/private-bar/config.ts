@@ -1,23 +1,28 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Private Bar configuration — CLIENT SIDE ONLY.
+// Private Bar configuration — the single place every operator-set value lives.
 //
-// This temporary version owns no payment lifecycle. The guest is handed off to
-// PayPal through one link, and PayPal handles everything from there: this site
-// creates no order, sees no callback, and can therefore never state that a
-// payment has happened.
+// This version owns no payment lifecycle. The guest is handed off to PayPal
+// through one link, and PayPal handles everything from there: this site sees no
+// callback and can therefore never state that a payment has happened.
 //
-// Every value the operator has to set lives here, in one place.
+// Framework-free on purpose: functions/api/private-bar/* imports
+// PRIVATE_BAR_APARTMENT_ID from here, so nothing in this file may reach for
+// `import.meta.env`, the DOM or React.
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * The exact PayPal link, verbatim, as supplied by the owner.
  *
- * `null` until it is supplied — and null is a working state, not a broken one:
- * the payment section renders its unconfigured variant and the PayPal control
- * stays disabled. A placeholder URL is never used, and no PayPal parameters are
- * invented: whatever the owner pastes here is what the guest opens.
+ * It is a PayPal Business payment page configured for a customer-entered amount
+ * ("Vom Kunden festgelegter Preis"), so NOTHING is appended to it — no amount,
+ * no currency, no undocumented parameter. This site computes the exact total and
+ * shows it (and offers to copy it); the guest enters it in PayPal.
+ *
+ * `null` is a working state, not a broken one: the payment control renders
+ * disabled rather than pointing anywhere. A placeholder URL is never used.
  */
-export const PAYPAL_PAYMENT_URL: string | null = null;
+export const PAYPAL_PAYMENT_URL: string | null =
+  'https://www.paypal.com/ncp/payment/G6BPUTG3WZQEE';
 
 /**
  * Guards against a half-configured deployment.
@@ -54,11 +59,14 @@ export function resolvePaypalUrl(url: string | null = PAYPAL_PAYMENT_URL): strin
 export const CASH_LOCATION: string | null = null;
 
 /**
- * The apartment this deployment serves.
+ * The apartment this deployment serves — the ONE place this id is written.
  *
- * Internal: it is not rendered anywhere in the guest interface. It exists so a
- * second apartment is a data change rather than a rebuild.
+ * It keys the inventory rows in Supabase (private_bar_inventory.apartment_id)
+ * and every order, so it must match the value used by the seed in
+ * supabase/migrations/20260906120000_private_bar_inventory.sql. The repository
+ * has no pre-existing canonical property id (Cogniiq's organizations are
+ * customer accounts, not BoLaGio apartments), so this is the canonical one.
+ *
+ * Internal: never rendered in the guest interface.
  */
-export const APARTMENT = {
-  id: 'bolagio-apartment-1',
-} as const;
+export const PRIVATE_BAR_APARTMENT_ID = 'bolagio-apartment-1';

@@ -1,6 +1,6 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // The full route table is mounted here, so the modules the tree touches at import time are stubbed
 // exactly as in src/App.routing.test.tsx.
@@ -39,6 +39,19 @@ vi.mock('@/lib/supabase', () => ({
 }));
 
 const { AppInner, AppShell } = await import('@/App');
+
+// The page asks its own API for stock on mount. These tests are about isolation
+// and indexability, so the endpoint is stubbed with an empty apartment.
+beforeEach(() => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async () => new Response(JSON.stringify({ apartmentId: 'test', stock: {} }), { status: 200 }))
+  );
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 const { isPrivateBarSurface, PRIVATE_ROBOTS, DEFAULT_ROBOTS } = await import(
   '@/lib/routing/indexability'
 );
@@ -139,16 +152,24 @@ describe('Private Bar routes', () => {
     }
   });
 
-  it('shows no price and offers no purchase control while no price is configured', async () => {
-    // The live catalogue currently carries `priceCents: null` throughout, so the
-    // guest can browse but cannot order. Nothing invents an amount to fill the gap.
+  it('prices every product from the catalogue and from nowhere else', async () => {
     renderAt('/private-bar');
     await screen.findByRole('heading', { level: 1 });
-    expect(screen.queryByText(/€/)).toBeNull();
-    expect(screen.queryByRole('button', { name: /hinzufügen/i })).toBeNull();
-    expect(screen.getAllByText(strings.catalogue.priceUnconfigured).length).toBe(
-      PRIVATE_BAR_CATALOG.length
+    for (const product of PRIVATE_BAR_CATALOG) {
+      expect(product.priceCents, `${product.id} has no price`).toBeGreaterThan(0);
+    }
+    // Every price on the page is a formatted euro amount, never a placeholder.
+    expect(screen.queryByText(strings.catalogue.priceUnconfigured)).toBeNull();
+    expect(screen.getAllByText(/€/).length).toBeGreaterThanOrEqual(PRIVATE_BAR_CATALOG.length);
+  });
+
+  it('offers nothing while stock is unknown — availability fails closed', async () => {
+    renderAt('/private-bar');
+    await screen.findByRole('heading', { level: 1 });
+    await waitFor(() =>
+      expect(screen.getAllByText(strings.catalogue.unavailable).length).toBe(PRIVATE_BAR_CATALOG.length)
     );
+    expect(screen.queryByRole('button', { name: /hinzufügen/i })).toBeNull();
   });
 
   it('is in the route manifest as non-indexable, so it is prerendered but never in the sitemap', () => {

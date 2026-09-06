@@ -26,7 +26,9 @@ export const strings = {
   catalogue: {
     heading: 'Die Auswahl',
     priceUnconfigured: 'Preis folgt',
-    unavailable: 'Zurzeit nicht verfügbar',
+    unavailable: 'Nicht verfügbar',
+    lastOne: 'Letzte Flasche',
+    remaining: (count: number) => (count === 1 ? 'Noch 1 verfügbar' : `Noch ${count} verfügbar`),
     imagePending: 'Foto folgt',
     imagePendingAlt: 'Produktfoto folgt',
     add: 'Hinzufügen',
@@ -41,15 +43,19 @@ export const strings = {
     wine: 'Wein',
     beer: 'Bier',
     water: 'Wasser & Refreshments',
-    unclassified: 'Weitere Auswahl',
   } satisfies Record<ProductCategory, string>,
   bar: {
     items: (count: number) => (count === 1 ? '1 Artikel' : `${count} Artikel`),
     action: 'Auswahl ansehen',
-    ariaLabel: 'Auswahl ansehen und bezahlen',
+    ariaLabel: 'Auswahl ansehen und bestätigen',
+    /** After confirmation only the payment is outstanding. */
+    openAmount: 'Offener Betrag',
+    actionConfirmed: 'Zur Zahlung',
+    ariaLabelConfirmed: 'Offenen Betrag ansehen und bezahlen',
   },
   sheet: {
     title: 'Ihre Auswahl',
+    confirmedTitle: 'Ihre Entnahme',
     close: 'Schließen',
     remove: 'Entfernen',
     removeAria: (name: string) => `${name} aus der Auswahl entfernen`,
@@ -60,29 +66,50 @@ export const strings = {
   },
   payment: {
     heading: 'Bezahlung',
+    /** The step that actually marks the drinks as taken. */
+    confirmHeading: 'Auswahl bestätigen',
+    confirmBody:
+      'Mit der Bestätigung markieren Sie die ausgewählten Getränke als entnommen. Anschließend begleichen Sie den Gesamtbetrag bequem über PayPal.',
+    confirmCta: 'Auswahl bestätigen',
+    confirmPending: 'Einen Moment …',
+    confirmedNote: 'Ihre Auswahl ist vermerkt.',
     paypal: 'Mit PayPal bezahlen',
     paypalNote: (amount: string) =>
-      `Der Gesamtbetrag beträgt ${amount}. PayPal öffnet sich in einem eigenen, gesicherten Fenster.`,
+      `Der Gesamtbetrag beträgt ${amount}. PayPal öffnet sich in einem eigenen, gesicherten Fenster — bitte geben Sie den Betrag dort ein.`,
     /** Shown when no PayPal link is configured for this apartment. */
     paypalUnavailable: 'Für diese Wohnung ist derzeit kein PayPal-Konto hinterlegt.',
     copyAmount: 'Betrag kopieren',
     copyAmountAria: (amount: string) => `Betrag ${amount} kopieren`,
     copied: 'Kopiert',
+    copyFailed: 'Bitte notieren Sie den Betrag kurz von Hand.',
     /**
-     * Shown after the guest has opened PayPal. Says nothing about whether the
-     * payment happened — this site never learns that — only that nothing
-     * further is required here.
+     * Shown after the guest has opened PayPal. Says only that the payment is
+     * completed in PayPal — this site never learns whether it was, and no
+     * wording here may suggest otherwise.
      */
     handedOff:
-      'Vielen Dank. Sobald Sie die Zahlung in PayPal abgeschlossen haben, ist für Sie nichts weiter zu tun.',
+      'Fast geschafft. Schließen Sie die Zahlung einfach in PayPal ab. Ihre Auswahl bleibt hier gespeichert.',
+    newSelection: 'Weitere Auswahl starten',
     or: 'oder',
     cashHeading: 'Bar bezahlen',
     cashBody: 'Sie können den genauen Betrag auch in bar hinterlegen.',
   },
+  errors: {
+    /** The selection could not be confirmed because stock moved underneath it. */
+    stockChanged:
+      'Ein Artikel Ihrer Auswahl ist inzwischen nicht mehr verfügbar. Ihre Auswahl wurde aktualisiert.',
+    /** The confirmation could not be completed — network, timeout, anything. */
+    confirmFailed:
+      'Das hat gerade nicht geklappt. Bitte versuchen Sie es in einem Moment noch einmal.',
+    /** Inventory could not be loaded at all. */
+    inventoryUnavailable:
+      'Die Verfügbarkeit lässt sich gerade nicht abrufen. Bitte laden Sie die Seite in einem Moment neu.',
+    retry: 'Erneut versuchen',
+  },
   guestExperience: {
     eyebrow: 'BoLaGio Guest Experience',
     heading: 'Ihr Aufenthalt. Ein privater digitaler Service.',
-    body: 'Die Private Bar ist der erste Teil eines neuen, persönlichen Service für unsere Gäste. Der vollständige Umfang wird gerade vorbereitet und steht Ihnen voraussichtlich in rund einer Woche zur Verfügung — von ausgewählten Speisen bis zur persönlichen Anfrage, direkt aus Ihrer Wohnung.',
+    body: 'Die Private Bar ist der erste Teil eines neuen, persönlichen Service für unsere Gäste. Weitere Bereiche stehen in Kürze bereit — von ausgewählten Speisen bis zur persönlichen Anfrage, direkt aus Ihrer Wohnung.',
     items: [
       {
         title: 'Private Bar',
