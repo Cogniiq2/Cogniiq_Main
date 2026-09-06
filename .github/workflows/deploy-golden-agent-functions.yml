@@ -1,0 +1,114 @@
+name: Deploy Golden Agent Edge Functions
+
+# Manual-only deployment of the three Golden Agent receptionist Edge Functions:
+# receptionist-admin, receptionist-tools, receptionist-postcall. Nothing else.
+#
+# This workflow deliberately does NOT touch database migrations and does NOT run on push —
+# it exists purely so the three functions above can be pushed to Supabase from a chosen
+# branch without going anywhere near the migration workflow's allowlist/backup machinery.
+# It also never calls the ElevenLabs API: the functions are deployed as code only, no
+# ElevenLabs agent, tool or webhook configuration is read or written here.
+#
+# The function list is a fixed, hard-coded allowlist (not a workflow_dispatch input), so a
+# manual run can never be pointed at an unrelated function by typing a different name.
+#
+# The functions import shared TypeScript from src/lib/goldenAgent via relative paths
+# (e.g. ../../../src/lib/goldenAgent/server/toolsHandler.ts), so deployment runs from a full
+# checkout of the selected ref at the repository root — never an isolated per-function
+# directory — so the Supabase CLI's bundler can resolve those imports.
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: >-
+          Git branch, tag, or commit SHA to deploy the three functions from. Defaults to this
+          Golden Agent feature branch; change it only when you intend to deploy from elsewhere.
+        required: true
+        default: claude/golden-agent-platform-vh7939
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-golden-agent-functions
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy Golden Agent functions
+    runs-on: ubuntu-latest
+    env:
+      # Must equal the version pinned on supabase/setup-cli below.
+      SUPABASE_CLI_VERSION: 2.116.0
+      # Fixed allowlist of functions this workflow is allowed to touch. Not derived from any
+      # input, so there is no way to make a manual run deploy anything else.
+      GOLDEN_AGENT_FUNCTIONS: "receptionist-admin receptionist-tools receptionist-postcall"
+
+    steps:
+      - name: Checkout selected source ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref }}
+
+      # Safety gate: fail closed if any required secret is missing, before touching Supabase.
+      - name: Verify required Supabase secrets are configured
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$SUPABASE_ACCESS_TOKEN"
+          test -n "$SUPABASE_PROJECT_ID"
+          test -n "$SUPABASE_DB_PASSWORD"
+
+      # Safety gate: every function this workflow is about to deploy must actually exist in
+      # the checked-out ref, so a stale allowlist entry fails loudly instead of silently
+      # deploying whatever happens to remain.
+      - name: Verify Golden Agent function directories exist
+        run: |
+          set -euo pipefail
+          for fn in $GOLDEN_AGENT_FUNCTIONS; do
+            if [ ! -d "supabase/functions/$fn" ]; then
+              echo "Refusing to deploy: supabase/functions/$fn does not exist on ref '${{ inputs.source_ref }}'."
+              exit 1
+            fi
+          done
+
+      - name: Set up Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: ${{ env.SUPABASE_CLI_VERSION }}
+
+      - name: Link Supabase project
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: supabase link --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD"
+
+      # Deployed from the repository root (not a per-function or sparse checkout) so the
+      # CLI's bundler can resolve each function's relative imports into src/lib/goldenAgent.
+      # No --no-verify-jwt / config overrides here: JWT verification for these functions is
+      # controlled by supabase/config.toml, which this workflow does not modify.
+      - name: Deploy Golden Agent functions
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          for fn in $GOLDEN_AGENT_FUNCTIONS; do
+            echo "Deploying $fn from ref '${{ inputs.source_ref }}'..."
+            supabase functions deploy "$fn" --project-ref "$SUPABASE_PROJECT_ID"
+          done
+
+      - name: Report deployed functions
+        env:
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          echo "Deployed from ref: ${{ inputs.source_ref }}"
+          for fn in $GOLDEN_AGENT_FUNCTIONS; do
+            echo "  - $fn: https://$SUPABASE_PROJECT_ID.supabase.co/functions/v1/$fn"
+          done
