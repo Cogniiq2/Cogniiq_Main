@@ -5,6 +5,7 @@
 // in the dashboard as a diff before it is applied.
 
 import type { ClientConfig, DeploymentStage } from '../clientConfig.ts';
+import { contentFingerprint } from '../fingerprint.ts';
 import type { ComposedPrompt } from '../prompt.ts';
 import { TOOL_DEFINITIONS, TOOL_NAMES } from '../toolContracts.ts';
 import type { ParamSpec, ToolName } from '../toolContracts.ts';
@@ -20,11 +21,37 @@ export function agentDisplayName(config: ClientConfig, stage: DeploymentStage = 
   return `Cogniiq · ${config.companyName} · ${stage.toUpperCase()}`;
 }
 
+/**
+ * Short, stable, workspace-unique discriminator for a client.
+ *
+ * NOT a prefix of the client id. Organization uuids are not uniformly distributed — sequential,
+ * seeded and test ids routinely share their first bytes — and two customers whose ids collide in a
+ * prefix would end up sharing tool names in one ElevenLabs workspace. Reconciliation matches by
+ * managed name, so a name collision means one customer adopting another customer's tool: a
+ * cross-tenant provisioning bug. Hashing the WHOLE id removes the structure that causes it.
+ */
+export function clientDiscriminator(config: ClientConfig): string {
+  return contentFingerprint(config.clientId).replace(/-/g, '').slice(0, 8);
+}
+
+/**
+ * The marker every resource this platform manages carries in its provider-side name. It makes a
+ * resource attributable to exactly one (client, stage) pair, which is what lets a retry after a
+ * partial failure ADOPT what already exists instead of creating a second copy.
+ */
+export function managedSuffix(config: ClientConfig, stage: DeploymentStage = config.stage): string {
+  return `[cq:${clientDiscriminator(config)}:${stage}]`;
+}
+
+/** Deterministic knowledge document name. Same config + same stage + same document key ⇒ same name. */
+export function knowledgeResourceName(config: ClientConfig, stage: DeploymentStage, baseName: string): string {
+  return `${baseName} ${managedSuffix(config, stage)}`.slice(0, 240);
+}
+
 export function toolResourceName(config: ClientConfig, tool: ToolName): string {
   // ElevenLabs tool names: ^[a-zA-Z0-9_-]{1,64}$ and the LLM sees them, so the universal tool name
-  // must stay the visible prefix; the client suffix keeps workspace-level uniqueness.
-  const suffix = config.clientId.replace(/-/g, '').slice(0, 8);
-  return `${tool}__${suffix}`.slice(0, 64);
+  // must stay the visible prefix; the client discriminator keeps workspace-level uniqueness.
+  return `${tool}__${clientDiscriminator(config)}`.slice(0, 64);
 }
 
 /** The LLM-visible tool name must be the universal one; the suffix is stripped by the runtime. */
