@@ -848,18 +848,6 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
     indexable: false,
   },
   {
-    path: "/private-bar/success",
-    title: "Zahlung · BoLaGio Private Bar",
-    description: "Bestätigung Ihrer Zahlung für die BoLaGio Private Bar.",
-    indexable: false,
-  },
-  {
-    path: "/private-bar/cancel",
-    title: "Zahlung abgebrochen · BoLaGio Private Bar",
-    description: "Die Zahlung wurde nicht abgeschlossen — zurück zur Auswahl der BoLaGio Private Bar.",
-    indexable: false,
-  },
-  {
     path: "/anfrage-erhalten",
     title: "Anfrage erhalten – wir melden uns | Cogniiq",
     description: "Ihre Anfrage ist bei uns eingegangen. Wir melden uns in der Regel innerhalb eines Werktags mit einem konkreten Vorschlag für das weitere Vorgehen.",

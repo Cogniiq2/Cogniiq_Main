@@ -1,43 +1,64 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Private Bar deployment configuration — CLIENT SIDE ONLY.
+// Private Bar configuration — CLIENT SIDE ONLY.
 //
-// This module reads Vite build-time environment variables and must therefore
-// never be imported by anything under functions/ (the Pages Functions bundle
-// has no `import.meta.env`). ./catalog.ts and ./pricing.ts stay framework-free
-// precisely so they can be shared with the server; this file cannot be.
+// This temporary version owns no payment lifecycle. The guest is handed off to
+// PayPal through one link, and PayPal handles everything from there: this site
+// creates no order, sees no callback, and can therefore never state that a
+// payment has happened.
 //
-// ── PAYMENT ENABLEMENT ──────────────────────────────────────────────────────
-// Whether checkout is exposed is a DEPLOYMENT decision, not a source-code edit.
-//
-//   VITE_PRIVATE_BAR_CHECKOUT_ENABLED   "true" exposes the payment controls.
-//                                       Non-secret build flag, set per
-//                                       Cloudflare Pages environment. Absent or
-//                                       anything other than "true" => disabled.
-//
-// This flag governs the UI only, and is NOT a security boundary. The server
-// fails closed independently: functions/api/private-bar/* return
-// 503 `not_configured` unless every server-side variable below is present, so
-// even a wrongly enabled frontend cannot produce a checkout.
-//
-//   N8N_PRIVATE_BAR_CHECKOUT_URL   n8n webhook that creates a checkout session
-//   N8N_PRIVATE_BAR_STATUS_URL     n8n webhook that reports order status
-//   PRIVATE_BAR_SHARED_SECRET      HMAC-SHA256 key for Function -> n8n requests
-//
-// Those three are Cloudflare Pages **secrets**. They are never prefixed VITE_,
-// never read here, and can never reach the client bundle.
+// Every value the operator has to set lives here, in one place.
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** True only for the exact string "true". Any other value keeps checkout hidden. */
-export const CHECKOUT_UI_ENABLED: boolean =
-  import.meta.env.VITE_PRIVATE_BAR_CHECKOUT_ENABLED === 'true';
+/**
+ * The exact PayPal link, verbatim, as supplied by the owner.
+ *
+ * `null` until it is supplied — and null is a working state, not a broken one:
+ * the payment section renders its unconfigured variant and the PayPal control
+ * stays disabled. A placeholder URL is never used, and no PayPal parameters are
+ * invented: whatever the owner pastes here is what the guest opens.
+ */
+export const PAYPAL_PAYMENT_URL: string | null = null;
 
 /**
- * The apartment this deployment serves. Centralised so a second apartment is a
- * data change, not a rebuild. The value is echoed to the server, which accepts
- * it only if it is in its own allowlist.
+ * Guards against a half-configured deployment.
+ *
+ * Only an absolute https URL on PayPal's own domains is accepted, so a
+ * placeholder, a relative path or a typo fails closed instead of sending a
+ * guest somewhere unintended.
+ */
+export function resolvePaypalUrl(url: string | null = PAYPAL_PAYMENT_URL): string | null {
+  if (!url) return null;
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return null;
+  }
+  if (parsed.protocol !== 'https:') return null;
+  const host = parsed.hostname.toLowerCase();
+  const allowed =
+    host === 'paypal.me' ||
+    host === 'www.paypal.me' ||
+    host === 'paypal.com' ||
+    host.endsWith('.paypal.com');
+  return allowed ? parsed.toString() : null;
+}
+
+/**
+ * Where cash can be left, in the owner's own words.
+ *
+ * `null` until supplied, and the cash paragraph is written to read correctly
+ * without it — no location is invented. Set it to a complete sentence, e.g.
+ * "Sie finden das Kuvert in der obersten Schublade der Kommode."
+ */
+export const CASH_LOCATION: string | null = null;
+
+/**
+ * The apartment this deployment serves.
+ *
+ * Internal: it is not rendered anywhere in the guest interface. It exists so a
+ * second apartment is a data change rather than a rebuild.
  */
 export const APARTMENT = {
   id: 'bolagio-apartment-1',
-  /** Not rendered anywhere yet — the guest-facing name is still to be confirmed. */
-  displayName: null as string | null,
 } as const;

@@ -27,5 +27,5 @@
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true
   },
-  "include": ["functions/**/*.ts", "src/private-bar/catalog.ts", "src/private-bar/pricing.ts"]
+  "include": ["functions/**/*.ts"]
 }

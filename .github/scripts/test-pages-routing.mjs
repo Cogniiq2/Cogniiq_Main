@@ -236,14 +236,15 @@ async function probe(path) {
 }
 
 const PRIVATE = ['/app/login', '/admin/finance', '/d/test-token'];
-// The Private Bar is a prerendered, noindex guest surface; /api/* is the JSON
-// contract that functions/_middleware.ts must pass through untouched.
-const PRIVATE_BAR = ['/private-bar', '/private-bar/success', '/private-bar/cancel'];
-const API = ['/api/private-bar/status?order=00000000-0000-4000-8000-000000000000'];
+// The Private Bar is a prerendered, noindex guest surface. It has exactly ONE
+// route: payment is handed to PayPal externally, so there is no provider return
+// and no surface that could imply a payment was verified.
+const PRIVATE_BAR = ['/private-bar'];
+const PRIVATE_BAR_GONE = ['/private-bar/success', '/private-bar/cancel'];
 const REPORT = [
   ...PRIVATE,
   ...PRIVATE_BAR,
-  ...API,
+  ...PRIVATE_BAR_GONE,
   '/api',
   '/apix',
   '/app-shell',
@@ -338,45 +339,51 @@ for (const path of PRIVATE_BAR) {
   );
 }
 
-// ── /api/* passes through the middleware as JSON ────────────────────────────
-// Without the narrow /api/ guard in functions/_middleware.ts, every one of these
-// responses is read as HTML, fails describeDocumentProblem() and is replaced by
-// a 500 — so this is the regression test for that guard.
-for (const path of API) {
+// A payment-return surface must not exist at all: nothing may be served at a URL
+// whose very name would suggest this site confirmed a payment.
+for (const path of PRIVATE_BAR_GONE) {
   const r = seen[path];
   check(
-    /application\/json/i.test(r.contentType),
-    `${path} answers with JSON, not HTML`,
-    `${path} answered with "${r.contentType || '-'}" — the middleware converted it`
-  );
-  check(
-    r.status !== 500,
-    `${path} is not turned into a 500 by the middleware`,
-    `${path} -> 500: the middleware treated a JSON response as a broken document`
-  );
-  check(
-    (() => {
-      try {
-        const parsed = JSON.parse(r.body);
-        return typeof parsed === 'object' && parsed !== null;
-      } catch {
-        return false;
-      }
-    })(),
-    `${path} returns a parseable JSON object`,
-    `${path} body is not JSON: ${r.body.slice(0, 80)}`
-  );
-  // No payment configuration exists in a build environment, so the endpoint must
-  // fail closed rather than proceed.
-  check(
-    r.status === 503,
-    `${path} fails closed (503) with no payment configuration present`,
-    `${path} -> ${r.status}, expected 503 not_configured`
+    r.status === 404,
+    `${path} does not exist (404) — no payment-return surface is served`,
+    `${path} -> ${r.status}: a payment-return surface is still being served`
   );
 }
 
-// The guard is scoped to "/api/" and nothing else: neither the bare prefix nor a
-// path that merely starts with the same letters may escape HTML handling.
+// ── the /api/ pass-through in functions/_middleware.ts ──────────────────────
+// The middleware reads every other extensionless response as HTML and asserts it
+// is a complete document, so a JSON reply from a Pages Function would be
+// replaced by a 500. No API route is deployed today — with none deployed, an
+// /api/ URL 404s either way, so the RUNTIME cannot distinguish the guard's
+// presence. What can be asserted at runtime is its narrowness (below); the guard
+// itself is asserted against the source.
+{
+  const middleware = readFileSync(join(ROOT, 'functions/_middleware.ts'), 'utf8');
+  const guard = /if \(pathname\.startsWith\('\/api\/'\)\) \{\s*return context\.next\(\);/.test(
+    middleware
+  );
+  check(
+    guard,
+    'functions/_middleware.ts passes /api/ through before its HTML handling',
+    'functions/_middleware.ts lost the /api/ pass-through — a JSON API response would become a 500'
+  );
+  const guardIndex = middleware.indexOf("pathname.startsWith('/api/')");
+  // The STATEMENT, not the word: the guard's own comment mentions response.text().
+  const textIndex = middleware.indexOf('let html = await response.text()');
+  check(
+    guardIndex > -1 && textIndex > -1 && guardIndex < textIndex,
+    'the /api/ guard runs before the response body is read as HTML',
+    'the /api/ guard is positioned after the HTML handling, where it cannot help'
+  );
+  check(
+    !/startsWith\('\/api'\)/.test(middleware),
+    'the guard matches "/api/" exactly, never the bare "/api" prefix',
+    'the guard matches a broader prefix than /api/'
+  );
+}
+
+// The guard must not swallow ordinary routes: neither the bare prefix nor a path
+// that merely starts with the same letters may escape the HTML handling.
 for (const path of ['/api', '/apix']) {
   const r = seen[path];
   check(

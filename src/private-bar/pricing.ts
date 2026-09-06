@@ -105,3 +105,18 @@ const EURO_FORMAT = new Intl.NumberFormat('de-DE', {
 export function formatEuro(amountCents: number): string {
   return EURO_FORMAT.format(amountCents / 100);
 }
+
+/**
+ * The amount as the guest will type it into a payment form: a plain German
+ * decimal, no currency symbol, no thousands separator ("18,50").
+ *
+ * Derived with integer arithmetic rather than by dividing, so the string is
+ * exact for every value rather than for most of them.
+ */
+export function amountForCopy(amountCents: number): string {
+  const sign = amountCents < 0 ? '-' : '';
+  const absolute = Math.abs(Math.trunc(amountCents));
+  const euros = Math.trunc(absolute / 100);
+  const cents = absolute % 100;
+  return `${sign}${euros},${String(cents).padStart(2, '0')}`;
+}

@@ -15,15 +15,22 @@ import type { PrivateBarProduct } from '../../../private-bar/catalog';
 export function ProductFrame({
   product,
   eager,
+  selected = false,
 }: {
   product: PrivateBarProduct;
   eager: boolean;
+  selected?: boolean;
 }) {
   const { image } = product;
+  const className = selected ? 'pb-frame is-selected' : 'pb-frame';
 
   if (!image) {
     return (
-      <div className="pb-frame pb-frame--pending" role="img" aria-label={strings.catalogue.imagePendingAlt}>
+      <div
+        className={`${className} pb-frame--pending`}
+        role="img"
+        aria-label={strings.catalogue.imagePendingAlt}
+      >
         <span className="pb-frame__pending">{strings.catalogue.imagePending}</span>
       </div>
     );
@@ -32,7 +39,7 @@ export function ProductFrame({
   const srcSet = image.widths.map((width) => `${image.basePath}-${width}.webp ${width}w`).join(', ');
 
   return (
-    <div className="pb-frame">
+    <div className={className}>
       <img
         className="pb-frame__image"
         src={`${image.basePath}-${image.widths[0]}.webp`}

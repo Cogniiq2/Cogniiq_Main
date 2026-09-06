@@ -109,8 +109,6 @@ export const PUBLIC_ROUTE_PATHS: readonly string[] = [
   "/impressum",
   "/datenschutz",
   "/private-bar",
-  "/private-bar/success",
-  "/private-bar/cancel",
   "/anfrage-erhalten",
 ];
 

@@ -421,14 +421,6 @@ const ScanPage = lazyNamed(() => import('./pages/ScanPage'), 'ScanPage');
 // BoLaGio Private Bar — a standalone guest surface, not a Cogniiq page. Lazy so its
 // design system and catalogue never enter the entry chunk that marketing visitors download.
 const PrivateBarPage = lazyNamed(() => import('./pages/private-bar/PrivateBarPage'), 'PrivateBarPage');
-const PrivateBarSuccessPage = lazyNamed(
-  () => import('./pages/private-bar/PrivateBarSuccessPage'),
-  'PrivateBarSuccessPage'
-);
-const PrivateBarCancelPage = lazyNamed(
-  () => import('./pages/private-bar/PrivateBarCancelPage'),
-  'PrivateBarCancelPage'
-);
 // Admin workspace shell. Lazy so the admin dashboard design system (dashboard tokens,
 // primitives, overlays, SidebarShell, RailAccount, internalNavigation) is not part of the
 // entry chunk that every anonymous marketing visitor downloads. It is a layout-route
@@ -529,11 +521,12 @@ export function AppInner() {
             purpose — exactly like /d/:token — so no Cogniiq navigation, footer, consent banner,
             structured data or branding can render inside it. It carries no link back into
             Cogniiq. Prerendered but noindex (src/lib/routing/publicRoutes.ts + public/_headers),
-            and absent from the sitemap. Removing this block plus src/pages/private-bar and
-            src/private-bar removes the whole surface. */}
+            and absent from the sitemap.
+            ONE route by design: this version hands payment to PayPal and never learns the
+            outcome, so there is no provider return to receive and no success or cancel surface
+            that could imply a payment was verified. Removing this line plus src/pages/private-bar
+            and src/private-bar removes the whole surface. */}
         <Route path="/private-bar" element={<PrivateBarPage />} />
-        <Route path="/private-bar/success" element={<PrivateBarSuccessPage />} />
-        <Route path="/private-bar/cancel" element={<PrivateBarCancelPage />} />
 
         {/* Post-login role resolution — waits for the DB-backed role, then routes safely. */}
         <Route path="/auth/continue" element={<RoleLandingPage />} />

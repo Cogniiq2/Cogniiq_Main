@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -47,7 +47,10 @@ const { PUBLIC_ROUTES } = await import('@/lib/routing/publicRoutes');
 const { PRIVATE_BAR_CATALOG } = await import('@/private-bar/catalog');
 const { strings } = await import('@/private-bar/strings');
 
-const PRIVATE_BAR_PATHS = ['/private-bar', '/private-bar/success', '/private-bar/cancel'];
+// One route by design: this version hands payment to PayPal and never learns the
+// outcome, so there is no provider return to receive and no surface that could
+// imply a payment was verified.
+const PRIVATE_BAR_PATHS = ['/private-bar'];
 
 function renderAt(path: string) {
   return render(
@@ -115,20 +118,34 @@ describe('Private Bar routes', () => {
     });
   });
 
-  it('never claims a payment on the success surface', async () => {
-    renderAt('/private-bar/success');
-    expect(
-      await screen.findByRole('heading', { level: 1, name: strings.success.unavailableHeading })
-    ).toBeInTheDocument();
-    expect(screen.queryByText(strings.success.paidHeading)).toBeNull();
-    expect(screen.queryByText(strings.success.paidBody)).toBeNull();
+  it('registers no payment-return surfaces', async () => {
+    for (const path of ['/private-bar/success', '/private-bar/cancel']) {
+      const view = renderAt(path);
+      // The catch-all answers instead: these routes do not exist.
+      await waitFor(() => expect(screen.queryByText(strings.intro.heading)).toBeNull());
+      view.unmount();
+    }
   });
 
-  it('shows no price and no purchase control while no price is configured', async () => {
+  it('renders the Guest Experience preview without claiming the service is live', async () => {
+    renderAt('/private-bar');
+    expect(await screen.findByText(strings.guestExperience.heading)).toBeInTheDocument();
+    // "Private Bar" is also the header's product line, so the rows are read from
+    // the section itself rather than from the whole document.
+    const section = screen.getByRole('region', { name: strings.guestExperience.heading });
+    for (const item of strings.guestExperience.items) {
+      expect(within(section).getByText(item.title)).toBeInTheDocument();
+      expect(within(section).getAllByText(item.status).length).toBeGreaterThan(0);
+    }
+  });
+
+  it('shows no price and offers no purchase control while no price is configured', async () => {
+    // The live catalogue currently carries `priceCents: null` throughout, so the
+    // guest can browse but cannot order. Nothing invents an amount to fill the gap.
     renderAt('/private-bar');
     await screen.findByRole('heading', { level: 1 });
     expect(screen.queryByText(/€/)).toBeNull();
-    expect(screen.queryAllByRole('button')).toHaveLength(0);
+    expect(screen.queryByRole('button', { name: /hinzufügen/i })).toBeNull();
     expect(screen.getAllByText(strings.catalogue.priceUnconfigured).length).toBe(
       PRIVATE_BAR_CATALOG.length
     );
@@ -144,13 +161,19 @@ describe('Private Bar routes', () => {
   });
 
   it('uses the same document title as the manifest writes into the prerendered head', () => {
-    const titles = {
-      '/private-bar': strings.documentTitles.bar,
-      '/private-bar/success': strings.documentTitles.success,
-      '/private-bar/cancel': strings.documentTitles.cancel,
-    } as const;
-    for (const [path, title] of Object.entries(titles)) {
-      expect(PUBLIC_ROUTES.find((r) => r.path === path)?.title).toBe(title);
+    expect(PUBLIC_ROUTES.find((r) => r.path === '/private-bar')?.title).toBe(strings.documentTitle);
+  });
+
+  it('states no payment outcome anywhere in the served surface', async () => {
+    const { container } = renderAt('/private-bar');
+    await screen.findByRole('heading', { level: 1 });
+    const text = container.textContent ?? '';
+    for (const forbidden of [
+      /zahlung (erhalten|bestätigt|eingegangen)/i,
+      /erfolgreich bezahlt/i,
+      /payment (confirmed|received)/i,
+    ]) {
+      expect(text).not.toMatch(forbidden);
     }
   });
 

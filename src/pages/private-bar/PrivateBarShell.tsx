@@ -18,7 +18,16 @@ const IVORY = '#f7f4ee';
  * footer, consent banner, structured data or branding exists anywhere in this
  * tree. Everything visible on this surface is defined in this directory.
  */
-export function PrivateBarShell({ title, children }: { title: string; children: ReactNode }) {
+export function PrivateBarShell({
+  title,
+  children,
+  barVisible = false,
+}: {
+  title: string;
+  children: ReactNode;
+  /** Reserves room at the foot of the page while the action surface is shown. */
+  barVisible?: boolean;
+}) {
   useEffect(() => {
     // The prerendered document already carries this exact title; this restores it
     // after a client-side navigation between the bar and its return surfaces.
@@ -35,7 +44,7 @@ export function PrivateBarShell({ title, children }: { title: string; children: 
   }, [title]);
 
   return (
-    <div className="pb-root">
+    <div className={barVisible ? 'pb-root has-bar' : 'pb-root'}>
       {/*
         dangerouslySetInnerHTML, not a text child, and that is load-bearing.
         React ESCAPES a text child during server rendering, so `font-family:
