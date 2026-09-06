@@ -44,3 +44,6 @@ supabase/.branches/
 # Logical production backup bundle produced by the Supabase production migration
 # workflow. Database dumps are NEVER committed; they exist only as a run artifact.
 production-backup/
+
+# Local git worktrees created for background agent sessions.
+.claude/worktrees/
