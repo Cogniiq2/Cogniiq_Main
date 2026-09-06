@@ -157,7 +157,12 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     origin: null,
     volume: '0,75 l',
     priceCents: 450,
-    image: null,
+    image: {
+      basePath: '/private-bar/products/s-pellegrino',
+      width: 240,
+      height: 839,
+      widths: [240, 480],
+    },
     available: true,
     sortOrder: 90,
   },

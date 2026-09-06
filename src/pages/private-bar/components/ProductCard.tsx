@@ -42,54 +42,64 @@ export function ProductCard({
   const remaining = available - quantity;
 
   return (
-    <li className={`pb-product${selected ? ' is-selected' : ''}${soldOut ? ' is-sold-out' : ''}`}>
-      <ProductFrame product={product} eager={eager} selected={selected} dimmed={soldOut} />
+    // The entrance reveal and the hover lift both animate `transform`, and an
+    // `animation-fill-mode: both` keyframe permanently pins that property once
+    // it finishes — a later CSS transition on the SAME element and property is
+    // silently overridden by the filled animation. Splitting them onto two
+    // elements (the li's one-time entrance vs. the inner card's hover lift)
+    // keeps both independent: nested transforms compose without conflict.
+    <li className={`pb-product${soldOut ? ' is-sold-out' : ''}`}>
+      <div className="pb-product__inner">
+        <ProductFrame product={product} eager={eager} selected={selected} dimmed={soldOut} />
 
-      <h3 className="pb-product__name">{product.name}</h3>
-      {meta ? <p className="pb-product__meta">{meta}</p> : null}
+        <h3 className="pb-product__name">{product.name}</h3>
+        {meta ? <p className="pb-product__meta">{meta}</p> : null}
 
-      <div className="pb-product__foot">
-        {priced ? (
-          <span className="pb-product__price">{formatEuro(product.priceCents as number)}</span>
-        ) : (
-          <span className="pb-product__price pb-product__price--pending">
-            {strings.catalogue.priceUnconfigured}
-          </span>
-        )}
-
-        {priced && soldOut ? <span className="pb-product__state">{strings.catalogue.unavailable}</span> : null}
-
-        {priced && !soldOut ? (
-          selected ? (
-            <QuantityStepper
-              name={product.name}
-              quantity={quantity}
-              canIncrease={quantity < available}
-              onIncrease={onIncrease}
-              onDecrease={onDecrease}
-            />
+        <div className="pb-product__foot">
+          {priced ? (
+            <span className="pb-product__price">{formatEuro(product.priceCents as number)}</span>
           ) : (
-            <button
-              type="button"
-              className="pb-add"
-              onClick={onAdd}
-              aria-label={strings.catalogue.addAria(product.name)}
-            >
-              {strings.catalogue.add}
-            </button>
-          )
-        ) : null}
-      </div>
+            <span className="pb-product__price pb-product__price--pending">
+              {strings.catalogue.priceUnconfigured}
+            </span>
+          )}
 
-      {/* Always rendered, so the cards in a row keep a shared baseline whether or
-          not they have something to say about what is left. */}
-      <p className="pb-product__hint">
-        {priced && !soldOut && remaining <= 2
-          ? remaining <= 0
-            ? strings.catalogue.lastOne
-            : strings.catalogue.remaining(remaining)
-          : ''}
-      </p>
+          {priced && soldOut ? (
+            <span className="pb-product__state">{strings.catalogue.unavailable}</span>
+          ) : null}
+
+          {priced && !soldOut ? (
+            selected ? (
+              <QuantityStepper
+                name={product.name}
+                quantity={quantity}
+                canIncrease={quantity < available}
+                onIncrease={onIncrease}
+                onDecrease={onDecrease}
+              />
+            ) : (
+              <button
+                type="button"
+                className="pb-add"
+                onClick={onAdd}
+                aria-label={strings.catalogue.addAria(product.name)}
+              >
+                {strings.catalogue.add}
+              </button>
+            )
+          ) : null}
+        </div>
+
+        {/* Always rendered, so the cards in a row keep a shared baseline whether
+            or not they have something to say about what is left. */}
+        <p className="pb-product__hint">
+          {priced && !soldOut && remaining <= 2
+            ? remaining <= 0
+              ? strings.catalogue.lastOne
+              : strings.catalogue.remaining(remaining)
+            : ''}
+        </p>
+      </div>
     </li>
   );
 }

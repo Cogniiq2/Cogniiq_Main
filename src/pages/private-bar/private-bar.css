@@ -225,8 +225,19 @@
 }
 
 .pb-product {
+  /* The card-level hover lift lives here, on the li — deliberately kept free
+     of the entrance keyframe below. An `animation-fill-mode: both` keyframe
+     permanently occupies `transform` on whatever element it targets, which
+     would silently swallow this transition if both lived on the same element.
+     transform is the one property that never costs layout, so the whole card
+     can float toward the guest without ever triggering a reflow. */
+  transition: transform var(--pb-base) var(--pb-ease-out);
+}
+
+.pb-product__inner {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .pb-product__name {
@@ -249,6 +260,9 @@
   justify-content: center;
   transition: border-color var(--pb-base) var(--pb-ease),
     box-shadow var(--pb-base) var(--pb-ease);
+  /* box-shadow is painted outside this box, so it is unaffected by the
+     overflow:hidden above that clips the photograph itself. */
+  box-shadow: 0 0 0 0 rgba(27, 25, 23, 0);
 }
 
 /* Selected: the champagne hairline answers, quietly. */
@@ -1163,13 +1177,14 @@
 .pb-enter--3 { animation-delay: 980ms; }
 .pb-enter--4 { animation-delay: 1060ms; }
 
-/* Staggered product entrance, capped so a long catalogue never feels slow. */
-.pb-grid > .pb-product { animation: pb-rise 460ms var(--pb-ease-out) both; }
-.pb-grid > .pb-product:nth-child(1) { animation-delay: 1040ms; }
-.pb-grid > .pb-product:nth-child(2) { animation-delay: 1090ms; }
-.pb-grid > .pb-product:nth-child(3) { animation-delay: 1140ms; }
-.pb-grid > .pb-product:nth-child(4) { animation-delay: 1190ms; }
-.pb-grid > .pb-product:nth-child(n + 5) { animation-delay: 1240ms; }
+/* Staggered product entrance, capped so a long catalogue never feels slow.
+   Targets the INNER card, not the li — see the note on .pb-product above. */
+.pb-grid > .pb-product > .pb-product__inner { animation: pb-rise 460ms var(--pb-ease-out) both; }
+.pb-grid > .pb-product:nth-child(1) > .pb-product__inner { animation-delay: 1040ms; }
+.pb-grid > .pb-product:nth-child(2) > .pb-product__inner { animation-delay: 1090ms; }
+.pb-grid > .pb-product:nth-child(3) > .pb-product__inner { animation-delay: 1140ms; }
+.pb-grid > .pb-product:nth-child(4) > .pb-product__inner { animation-delay: 1190ms; }
+.pb-grid > .pb-product:nth-child(n + 5) > .pb-product__inner { animation-delay: 1240ms; }
 
 /* ── keyframes ─────────────────────────────────────────────────────────────── */
 @keyframes pb-overture-out {
@@ -1283,9 +1298,24 @@
   .pb-service { border-top: 1px solid var(--pb-hairline); border-bottom: 1px solid var(--pb-hairline); }
 }
 
-/* A very subtle lift, only where a real pointer can hover. Never on touch. */
+/* The signature card interaction: the whole card rises a few pixels toward the
+   guest, the frame gains a soft, ambient shadow to sell the lift, and the
+   photograph itself answers with the faintest extra scale — three properties
+   moving together on transform/opacity/box-shadow only, so it costs nothing but
+   a composite. Gated to real pointers with a hover channel: a touchscreen tap
+   is a selection, never a hover, so this never fires on the primary device.
+   Never applied to a sold-out card — there is nothing to invite there. */
 @media (hover: hover) and (pointer: fine) {
-  .pb-product:hover .pb-frame__image {
+  .pb-product:not(.is-sold-out):hover {
+    transform: translate3d(0, -6px, 0);
+  }
+
+  .pb-product:not(.is-sold-out):hover .pb-frame {
+    border-color: var(--pb-hairline-strong);
+    box-shadow: 0 22px 32px -18px rgba(27, 25, 23, 0.22), 0 4px 10px -6px rgba(27, 25, 23, 0.1);
+  }
+
+  .pb-product:not(.is-sold-out):hover .pb-frame__image {
     transform: translate3d(0, -3px, 0) scale(1.015);
   }
 }
