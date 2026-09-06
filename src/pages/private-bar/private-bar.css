@@ -1307,16 +1307,24 @@
    Never applied to a sold-out card — there is nothing to invite there. */
 @media (hover: hover) and (pointer: fine) {
   .pb-product:not(.is-sold-out):hover {
-    transform: translate3d(0, -6px, 0);
+    transform: translate3d(0, -3px, 0);
   }
 
   .pb-product:not(.is-sold-out):hover .pb-frame {
     border-color: var(--pb-hairline-strong);
-    box-shadow: 0 22px 32px -18px rgba(27, 25, 23, 0.22), 0 4px 10px -6px rgba(27, 25, 23, 0.1);
+    box-shadow: 0 16px 26px -16px rgba(27, 25, 23, 0.2), 0 3px 8px -5px rgba(27, 25, 23, 0.09);
   }
 
   .pb-product:not(.is-sold-out):hover .pb-frame__image {
-    transform: translate3d(0, -3px, 0) scale(1.015);
+    /* Coordinated with the card's own lift above rather than a second,
+       unrelated motion: a hair of extra translate plus the faintest scale,
+       so the bottle answers the card instead of competing with it. The base
+       rule's --pb-slow duration is right for the deliberate "added to cart"
+       bump (.is-selected) elsewhere on this element; the hover response gets
+       its own, snappier timing so it lands inside the same ~260ms window as
+       the card lift rather than trailing it. */
+    transition: transform var(--pb-base) var(--pb-ease-out);
+    transform: translate3d(0, -2px, 0) scale(1.01);
   }
 }
 

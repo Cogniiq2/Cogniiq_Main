@@ -61,7 +61,12 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     origin: null,
     volume: null,
     priceCents: 2200,
-    image: null,
+    image: {
+      basePath: '/private-bar/products/stella-rossa-prosecco-doc-brut',
+      width: 240,
+      height: 751,
+      widths: [240, 480],
+    },
     available: true,
     sortOrder: 10,
   },
@@ -73,7 +78,12 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     origin: null,
     volume: null,
     priceCents: 3900,
-    image: null,
+    image: {
+      basePath: '/private-bar/products/ploner-marell',
+      width: 240,
+      height: 816,
+      widths: [240, 480],
+    },
     available: true,
     sortOrder: 20,
   },
@@ -90,9 +100,14 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     sortOrder: 30,
   },
   {
+    // Guest-facing name corrected: the photographed bottle is actually
+    // "Vescovo Moro Rosso I.G.P.", not "Covo Moro". The technical id stays
+    // "covo-moro" deliberately — Supabase inventory rows and existing orders
+    // already key on it, and renaming it would need a data migration for a
+    // display-only correction.
     id: 'covo-moro',
-    name: 'Covo Moro',
-    shortLabel: 'Covo Moro',
+    name: 'Vescovo Moro Rosso I.G.P.',
+    shortLabel: 'Vescovo Moro Rosso',
     category: 'wine',
     origin: null,
     volume: null,
@@ -109,7 +124,12 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     origin: null,
     volume: null,
     priceCents: 2900,
-    image: null,
+    image: {
+      basePath: '/private-bar/products/ploner-sauvignon',
+      width: 240,
+      height: 810,
+      widths: [240, 480],
+    },
     available: true,
     sortOrder: 50,
   },
@@ -133,7 +153,12 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     origin: null,
     volume: null,
     priceCents: 2400,
-    image: null,
+    image: {
+      basePath: '/private-bar/products/biancavigna-2022',
+      width: 240,
+      height: 780,
+      widths: [240, 480],
+    },
     available: true,
     sortOrder: 70,
   },
@@ -145,7 +170,12 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     origin: null,
     volume: '0,5 l',
     priceCents: 450,
-    image: null,
+    image: {
+      basePath: '/private-bar/products/bayreuther-hell',
+      width: 240,
+      height: 724,
+      widths: [240, 480],
+    },
     available: true,
     sortOrder: 80,
   },

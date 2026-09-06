@@ -9,6 +9,11 @@ import type { PrivateBarProduct } from '../../../private-bar/catalog';
  * frame owns a fixed 3:4 ratio and the image carries its intrinsic
  * width/height, which is what keeps cumulative layout shift at zero.
  *
+ * The photograph's alt is empty on purpose: ProductCard renders the product
+ * name as a visible heading immediately below the frame, so the image is
+ * decorative relative to that heading and a screen reader announcing the name
+ * twice in a row for every card would be noise, not information.
+ *
  * While a prepared photograph is unavailable the frame renders empty with a
  * discreet note. No bottle artwork is ever drawn or approximated.
  */
@@ -50,7 +55,7 @@ export function ProductFrame({
         sizes="(min-width: 64rem) 14rem, (min-width: 40rem) 13rem, 42vw"
         width={image.width}
         height={image.height}
-        alt={product.name}
+        alt=""
         loading={eager ? 'eager' : 'lazy'}
         decoding="async"
       />
