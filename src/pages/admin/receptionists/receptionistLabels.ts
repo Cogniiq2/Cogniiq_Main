@@ -1,5 +1,5 @@
 import type { BadgeTone } from '@/components/dashboard';
-import type { DeploymentStage } from '@/lib/goldenAgent';
+import type { DeploymentStage, ProvisioningPhase } from '@/lib/goldenAgent';
 
 export const STAGE_LABEL: Record<DeploymentStage, string> = {
   dev: 'DEV', evaluation: 'EVALUATION', staging: 'STAGING', live: 'LIVE', paused: 'PAUSIERT',
@@ -23,6 +23,15 @@ export function formatDateTimeDe(value: string | null | undefined): string {
   if (Number.isNaN(date.getTime())) return value;
   return new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Berlin' }).format(date);
 }
+
+export const PROVISIONING_TONE: Record<ProvisioningPhase, BadgeTone> = {
+  config_invalid: 'danger',
+  not_provisioned: 'neutral',
+  partially_provisioned: 'warning',
+  provisioning_failed: 'danger',
+  provisioned: 'success',
+  provider_drift: 'warning',
+};
 
 export const OUTCOME_LABEL: Record<string, string> = {
   booked: 'Gebucht', rescheduled: 'Verschoben', cancelled: 'Storniert', answered: 'Beantwortet', escalated: 'Eskaliert',

@@ -6,14 +6,15 @@ import {
   Button, DefinitionGrid, EmptyState, ErrorState, InfoBanner, Panel, Select, StatusBadge, Tabs, Textarea, TableSkeleton, WorkspaceHeader, useToast,
 } from '@/components/dashboard';
 import {
-  TOOL_DEFINITIONS, TOOL_NAMES, buildKnowledgeDocuments, composeGoldenAgentPrompt, findKnowledgeGaps, validateClientConfig, generateCustomerScenarios,
-  type ClientConfig, type ConfigIssue, type DeploymentStage, type KnowledgeGap,
+  EVALUATION_MODE_MEANING, TOOL_DEFINITIONS, TOOL_NAMES, buildKnowledgeDocuments, composeGoldenAgentPrompt, describeProvisioning,
+  findKnowledgeGaps, validateClientConfig, generateCustomerScenarios,
+  type ClientConfig, type ConfigIssue, type DeploymentStage, type KnowledgeGap, type ProvisioningStatus, type ToolName,
 } from '@/lib/goldenAgent';
 import {
-  adminAction, getReceptionist, listCallEvents, listCalls, listConfigVersions, listEvaluationResults, listEvaluationRuns,
+  AdminActionError, adminAction, getReceptionist, listCallEvents, listCalls, listConfigVersions, listEvaluationResults, listEvaluationRuns,
   type CallEventRow, type CallRow, type ConfigVersionRow, type EvaluationResultRow, type EvaluationRunRow, type ReceptionistDetail,
 } from '@/lib/goldenAgent/dashboard/receptionistApi';
-import { OUTCOME_LABEL, STAGE_LABEL, STAGE_OPTIONS, STAGE_TONE, formatDateTimeDe } from './receptionistLabels';
+import { OUTCOME_LABEL, PROVISIONING_TONE, STAGE_LABEL, STAGE_OPTIONS, STAGE_TONE, formatDateTimeDe } from './receptionistLabels';
 
 const TABS = [
   { value: 'overview', label: 'Overview' },
@@ -30,6 +31,47 @@ type TabKey = (typeof TABS)[number]['value'];
 
 function errorMessage(e: unknown): string {
   return e instanceof Error ? e.message : 'Unbekannter Fehler';
+}
+
+/**
+ * What the operator should do about a failed admin action. The edge function already returns an
+ * actionable sentence; this only adds the retry hint the classification carries, so the dashboard
+ * never reduces a permission problem to "Fehler 502".
+ */
+function actionAdvice(e: unknown): string | null {
+  if (!(e instanceof AdminActionError)) return null;
+  const details = e.details as { kind?: string; retryable?: boolean } | null;
+  if (!details?.kind) return null;
+  if (details.kind === 'authentication' || details.kind === 'permission') {
+    return 'Das ist eine Berechtigung des ElevenLabs-API-Keys, kein Fehler in der Konfiguration. Nach dem Anpassen des Keys genügt ein erneuter Klick auf Provisionieren — bereits erstellte Ressourcen werden wiederverwendet.';
+  }
+  if (details.retryable) return 'Vorübergehend: erneut provisionieren. Der Lauf setzt auf dem Vorhandenen auf.';
+  return null;
+}
+
+/** The provisioning state, derived from stored facts only — never from a green toast. */
+function provisioningOf(detail: ReceptionistDetail, config: ClientConfig | null, toolDrift?: string[]): ProvisioningStatus {
+  const state = detail.provider_state as { toolIds?: Partial<Record<ToolName, string>> };
+  return describeProvisioning({
+    configValid: config !== null,
+    providerAgentId: detail.provider_agent_id,
+    toolIds: state?.toolIds ?? {},
+    lastSyncedAt: detail.last_synced_at,
+    lastSyncError: detail.last_sync_error,
+    toolDrift,
+  });
+}
+
+/** Shown wherever the dashboard could otherwise be read as "bookings are real". */
+function MockBookingWarning({ config }: { config: ClientConfig | null }) {
+  if (!config || config.bookingIntegration.provider !== 'mock') return null;
+  return (
+    <InfoBanner tone="warning" title="Buchungsanbindung ist der In-Memory-Mock — es entstehen KEINE echten Termine.">
+      Jede Buchung, Umbuchung und Stornierung landet in einem flüchtigen Speicher des Edge-Functions-Prozesses und ist nach einem Neustart weg.
+      Nichts davon erreicht ein Kundensystem. Vor STAGING/LIVE muss <code>bookingIntegration.provider</code> auf <code>n8n_webhook</code> stehen
+      und der n8n-Workflow den Vertrag aus <code>docs/golden-agent-n8n-contract.md</code> erfüllen.
+    </InfoBanner>
+  );
 }
 
 function GapList({ gaps }: { gaps: KnowledgeGap[] }) {
@@ -112,19 +154,29 @@ export function ReceptionistDetailPage() {
 
 function OverviewTab({ detail, config, gaps }: { detail: ReceptionistDetail; config: ClientConfig | null; gaps: KnowledgeGap[] }) {
   const prompt = useMemo(() => (config ? composeGoldenAgentPrompt(config) : null), [config]);
+  const provisioning = provisioningOf(detail, config);
   return (
     <div className="grid gap-5 lg:grid-cols-2">
-      <Panel title="Status">
+      <div className="lg:col-span-2"><MockBookingWarning config={config} /></div>
+      <Panel title="Status" action={<StatusBadge label={provisioning.label} tone={PROVISIONING_TONE[provisioning.phase]} />}>
         <DefinitionGrid columns={2} items={[
           { label: 'Stage', value: STAGE_LABEL[detail.stage] },
+          { label: 'Provisionierung', value: `${provisioning.label} · ${provisioning.toolsProvisioned}/${provisioning.toolsExpected} Tools` },
           { label: 'ElevenLabs Agent', value: detail.provider_agent_id ? <code className="text-[12px]">{detail.provider_agent_id}</code> : 'nicht provisioniert' },
           { label: 'Config-Version', value: `v${detail.config_version}` },
           { label: 'Prompt-Version', value: detail.prompt_version ?? '—' },
-          { label: 'Letzter Sync', value: formatDateTimeDe(detail.last_synced_at) },
-          { label: 'Sync-Fehler', value: detail.last_sync_error ?? 'keiner' },
+          { label: 'Letzter erfolgreicher Sync', value: formatDateTimeDe(detail.last_synced_at) },
           { label: 'Buchungsanbindung', value: config?.bookingIntegration.provider ?? '—' },
           { label: 'Sprachen', value: config ? [config.primaryLanguage, ...config.additionalLanguages].join(', ') : '—' },
         ]} />
+        {provisioning.nextAction ? <p className="mt-3 text-[13px] text-[var(--cq-fg-muted)]">Nächster Schritt: {provisioning.nextAction}</p> : null}
+        {detail.last_sync_error ? (
+          <div className="mt-3">
+            <InfoBanner tone="danger" title="Letzter Provisionierungsfehler">
+              <p>{detail.last_sync_error}</p>
+            </InfoBanner>
+          </div>
+        ) : null}
       </Panel>
       <Panel title="Onboarding-Status" description="Was fehlt, bevor der Agent DEV verlassen darf.">
         <GapList gaps={gaps} />
@@ -241,27 +293,52 @@ function AgentTab({ detail, config, onChanged }: { detail: ReceptionistDetail; c
   const [status, setStatus] = useState<Record<string, unknown> | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [newToken, setNewToken] = useState<string | null>(null);
+  const [warnings, setWarnings] = useState<string[]>([]);
   const [showPrompt, setShowPrompt] = useState(false);
+
+  const [failure, setFailure] = useState<{ message: string; advice: string | null } | null>(null);
 
   const run = useCallback(async (label: string, body: Record<string, unknown>, after?: (result: Record<string, unknown>) => void) => {
     setBusy(label);
     try {
       const result = await adminAction({ ...body, receptionistId: detail.id });
+      setFailure(null);
       after?.(result);
     } catch (e) {
-      toast.error(`${label} fehlgeschlagen`, errorMessage(e));
+      // The full, actionable sentence stays on the page; the toast is only the headline. An
+      // operator must not have to catch a disappearing toast to learn which permission is missing.
+      setFailure({ message: errorMessage(e), advice: actionAdvice(e) });
+      toast.error(`${label} fehlgeschlagen`, errorMessage(e).slice(0, 120));
     } finally {
       setBusy(null);
     }
   }, [detail.id, toast]);
 
+  const provisioning = provisioningOf(detail, config, Array.isArray(status?.toolDrift) ? (status.toolDrift as string[]) : undefined);
   const provisionLabel = detail.provider_agent_id ? 'Agent synchronisieren' : 'Agent erstellen (DEV)';
   return (
     <div className="grid gap-5 lg:grid-cols-2">
-      <Panel title="Provisionierung" description="Cogniiq Dashboard → Cogniiq Backend → ElevenLabs API. Kein Claude zur Laufzeit.">
+      <div className="lg:col-span-2 space-y-3">
+        <MockBookingWarning config={config} />
+        {failure ? (
+          <InfoBanner tone="danger" title="Provisionierung fehlgeschlagen">
+            <p>{failure.message}</p>
+            {failure.advice ? <p className="mt-2">{failure.advice}</p> : null}
+          </InfoBanner>
+        ) : null}
+      </div>
+      <Panel
+        title="Provisionierung"
+        description="Cogniiq Dashboard → Cogniiq Backend → ElevenLabs API. Kein Claude zur Laufzeit."
+        action={<StatusBadge label={provisioning.label} tone={PROVISIONING_TONE[provisioning.phase]} />}
+      >
+        <p className="mb-3 text-[13px] text-[var(--cq-fg-muted)]">
+          {provisioning.toolsProvisioned}/{provisioning.toolsExpected} Tools hinterlegt · Agent {detail.provider_agent_id ? 'vorhanden' : 'fehlt'}
+          {provisioning.nextAction ? ` · ${provisioning.nextAction}` : ''}
+        </p>
         <div className="flex flex-wrap gap-2">
           <Button variant="secondary" onClick={() => { void run('Plan', { action: 'plan' }, (r) => setPlan(r.plan as Record<string, unknown>)); }} loading={busy === 'Plan'} disabled={!config}>Plan anzeigen</Button>
-          <Button onClick={() => { void run('Provisionierung', { action: 'provision', allowLiveChanges: detail.stage === 'live' ? window.confirm('Dieser Agent ist LIVE. Änderungen wirklich anwenden?') : false }, (r) => { if (typeof r.newToolToken === 'string') setNewToken(r.newToolToken); toast.success('Agent provisioniert', `${(r.created as string[]).length} erstellt, ${(r.updated as string[]).length} aktualisiert`); void onChanged(); }); }} loading={busy === 'Provisionierung'} disabled={!config}>{provisionLabel}</Button>
+          <Button onClick={() => { void run('Provisionierung', { action: 'provision', allowLiveChanges: detail.stage === 'live' ? window.confirm('Dieser Agent ist LIVE. Änderungen wirklich anwenden?') : false }, (r) => { if (typeof r.newToolToken === 'string') setNewToken(r.newToolToken); setWarnings((r.warnings as string[]) ?? []); toast.success('Agent provisioniert', `${(r.created as string[]).length} erstellt, ${(r.updated as string[]).length} aktualisiert`); void onChanged(); }); }} loading={busy === 'Provisionierung'} disabled={!config}>{provisionLabel}</Button>
           <Button variant="ghost" onClick={() => { void run('Status', { action: 'status' }, setStatus); }} loading={busy === 'Status'} disabled={!detail.provider_agent_id}>Status aus ElevenLabs lesen</Button>
         </div>
         {newToken ? (
@@ -271,6 +348,11 @@ function AgentTab({ detail, config, onChanged }: { detail: ReceptionistDetail; c
               <pre className="mt-2 overflow-x-auto rounded bg-[var(--cq-sunken)] p-2 text-[11px]">{newToken}</pre>
             </InfoBanner>
           </div>
+        ) : null}
+        {warnings.length > 0 ? (
+          <ul className="mt-4 list-disc space-y-1 pl-5 text-[12.5px] text-amber-700">
+            {warnings.map((w) => <li key={w}>{w}</li>)}
+          </ul>
         ) : null}
         {plan ? (
           <div className="mt-4 space-y-2 text-[13px]">
@@ -341,6 +423,7 @@ function ToolsTab({ detail, config }: { detail: ReceptionistDetail; config: Clie
   const state = detail.provider_state as { toolIds?: Record<string, string>; toolSecretIds?: Record<string, string> };
   return (
     <div className="space-y-5">
+      <MockBookingWarning config={config} />
       <Panel title="Buchungsanbindung" description="Golden Agent → generisches Tool → Kunden-Adapter → Kundensystem.">
         <DefinitionGrid columns={2} items={[
           { label: 'Provider', value: config?.bookingIntegration.provider ?? '—' },
@@ -409,12 +492,26 @@ function EvaluationsTab({ detail, config }: { detail: ReceptionistDetail; config
   const failures = results.filter((r) => !r.passed);
   return (
     <div className="space-y-5">
-      <Panel title="Evaluation starten" description={`Generierte Suite für diesen Kunden: ${scenarioCount} Szenarien. Offline prüft Tool-Verträge und Regeln deterministisch; die ElevenLabs-Simulation lässt ein LLM den Anrufer spielen.`}>
+      <MockBookingWarning config={config} />
+      <Panel title="Evaluation starten" description={`Generierte Suite für diesen Kunden: ${scenarioCount} Szenarien.`}>
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => { void act('Offline-Evaluation', { action: 'run_offline_evaluation' }); }} loading={busy === 'Offline-Evaluation'} disabled={!config}>Offline-Suite ausführen</Button>
           <Button variant="secondary" onClick={() => { void act('Simulationstests anlegen', { action: 'create_simulation_tests' }); }} loading={busy === 'Simulationstests anlegen'} disabled={!detail.provider_agent_id}>ElevenLabs-Tests anlegen</Button>
           <Button variant="secondary" onClick={() => { void act('Simulation starten', { action: 'run_simulation_tests' }); }} loading={busy === 'Simulation starten'} disabled={!detail.provider_agent_id}>ElevenLabs-Simulation starten</Button>
         </div>
+        {/* The three modes prove different things. Saying so here is the difference between an
+            honest readiness review and a green dashboard that means nothing. */}
+        <dl className="mt-4 space-y-2 text-[12.5px]">
+          {Object.entries(EVALUATION_MODE_MEANING).map(([mode, meaning]) => (
+            <div key={mode} className="rounded border border-[var(--cq-border)] p-2">
+              <dt className="font-medium">
+                {meaning.label}
+                <StatusBadge label={meaning.provesLiveBehaviour ? 'belegt Live-Verhalten' : 'belegt KEIN Live-Verhalten'} tone={meaning.provesLiveBehaviour ? 'info' : 'warning'} />
+              </dt>
+              <dd className="text-[var(--cq-fg-muted)]">{meaning.evidence}</dd>
+            </div>
+          ))}
+        </dl>
       </Panel>
       <div className="grid gap-5 lg:grid-cols-[1fr_2fr]">
         <Panel title="Läufe" count={runs.length} flush>
@@ -423,7 +520,7 @@ function EvaluationsTab({ detail, config }: { detail: ReceptionistDetail; config
               {runs.map((run) => (
                 <li key={run.id}>
                   <button type="button" onClick={() => setSelected(run)} className={`w-full border-t border-[var(--cq-border)] p-3 text-left text-[12.5px] hover:bg-[var(--cq-hover)] ${selected?.id === run.id ? 'bg-[var(--cq-sunken)]' : ''}`}>
-                    <div className="flex items-center justify-between gap-2"><span className="font-medium">{run.mode}</span><StatusBadge label={run.status} tone={run.status === 'completed' ? (run.failed === 0 ? 'success' : 'warning') : run.status === 'failed' ? 'danger' : 'info'} /></div>
+                    <div className="flex items-center justify-between gap-2"><span className="font-medium">{EVALUATION_MODE_MEANING[run.mode]?.label ?? run.mode}</span><StatusBadge label={run.status} tone={run.status === 'completed' ? (run.failed === 0 ? 'success' : 'warning') : run.status === 'failed' ? 'danger' : 'info'} /></div>
                     <div className="text-[var(--cq-fg-muted)]">{formatDateTimeDe(run.created_at)} · {run.passed}/{run.total} bestanden · Config v{run.config_version ?? '?'}</div>
                     {run.status === 'running' && run.mode === 'elevenlabs_simulation' && run.provider_invocation_id ? (
                       <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); void act('Ergebnisse abrufen', { action: 'fetch_simulation_results', runId: run.id, invocationId: run.provider_invocation_id }); }}>Ergebnisse abrufen</Button>
@@ -434,7 +531,18 @@ function EvaluationsTab({ detail, config }: { detail: ReceptionistDetail; config
             </ul>
           )}
         </Panel>
-        <Panel title={selected ? `Ergebnisse · ${selected.mode}` : 'Ergebnisse'} description={selected ? `${failures.length} Fehlschläge, ${results.length - failures.length} bestanden. Jede Dimension einzeln, nichts hinter einer Gesamtnote versteckt.` : 'Lauf links auswählen.'}>
+        <Panel
+          title={selected ? `Ergebnisse · ${EVALUATION_MODE_MEANING[selected.mode]?.label ?? selected.mode}` : 'Ergebnisse'}
+          description={selected ? `${failures.length} Fehlschläge, ${results.length - failures.length} bestanden. Jede Dimension einzeln, nichts hinter einer Gesamtnote versteckt.` : 'Lauf links auswählen.'}
+        >
+          {selected && EVALUATION_MODE_MEANING[selected.mode] ? (
+            <div className="mb-3">
+              <InfoBanner tone={EVALUATION_MODE_MEANING[selected.mode].provesLiveBehaviour ? 'info' : 'warning'} title={`Was dieser Lauf belegt — und was nicht (${EVALUATION_MODE_MEANING[selected.mode].label})`}>
+                {EVALUATION_MODE_MEANING[selected.mode].evidence}
+              </InfoBanner>
+            </div>
+          ) : null}
+          {selected?.error ? <div className="mb-3"><InfoBanner tone="danger" title="Lauf fehlgeschlagen">{selected.error}</InfoBanner></div> : null}
           {selected?.summary?.byDimension ? (
             <div className="mb-3 grid grid-cols-3 gap-2 text-[12px]">
               {Object.entries(selected.summary.byDimension).map(([dim, stats]) => <div key={dim} className="rounded border border-[var(--cq-border)] p-2"><div className="text-[var(--cq-fg-muted)]">{dim}</div><div className="font-semibold">{stats.passed}/{stats.applicable}</div></div>)}
