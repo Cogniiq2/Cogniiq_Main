@@ -381,6 +381,72 @@ if (/<lastmod>/.test(sitemap)) {
   } else ok('lastmod values come from the manifest, not the build date');
 }
 
+// ─── 8b. every indexable page is reachable through a crawler-visible link ──────
+// An indexable route that no other prerendered page links to is discoverable
+// only through the sitemap. The manifest ⇄ sitemap ⇄ router checks cannot see
+// that, because a page can be perfectly declared and still orphaned. Two levels:
+//
+//   - FAIL when an indexable route has no inbound <a href> from any OTHER
+//     prerendered indexable document at all (true orphan).
+//   - REPORT (not fail) the routes whose only inbound links come from the shared
+//     shell (navigation/footer) and none from a page body. That is the honest
+//     picture of contextual link equity and is what an SEO change should move;
+//     it is printed so a regression is visible in the CI log without turning
+//     every footer decision into a red build.
+//
+// "Body" is <main>; the shell is everything else. Breadcrumbs render inside
+// <main>, so a child page's breadcrumb counts as a body link to its parent —
+// intended: it is crawler-visible page content, not the shared shell. Fragment and query parts are
+// dropped, a trailing slash is normalised, absolute cogniiq.de URLs count like
+// relative ones. Links from a page to itself do not count.
+{
+  const indexable = report.routes.filter((r) => r.indexable && existsSync(join(ROOT, r.file)));
+  const inboundAny = new Map();
+  const inboundBody = new Map();
+  const normalise = (href) => {
+    let h = href.replace(/^https?:\/\/(www\.)?cogniiq\.de/, '');
+    if (!h.startsWith('/')) return null;
+    h = h.split(/[?#]/)[0].replace(/\/+$/, '');
+    return h === '' ? '/' : h;
+  };
+  const collect = (fragment, from, target) => {
+    for (const m of fragment.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)) {
+      const to = normalise(m[1]);
+      if (!to || to === from) continue;
+      if (!target.has(to)) target.set(to, new Set());
+      target.get(to).add(from);
+    }
+  };
+  for (const route of indexable) {
+    const html = read(join(ROOT, route.file));
+    const main = (html.match(/<main[\s\S]*?<\/main>/) || [''])[0];
+    collect(html, route.path, inboundAny);
+    collect(main, route.path, inboundBody);
+  }
+
+  const orphans = indexable.filter((r) => !(inboundAny.get(r.path)?.size > 0)).map((r) => r.path);
+  const shellOnly = indexable
+    .filter((r) => inboundAny.get(r.path)?.size > 0 && !(inboundBody.get(r.path)?.size > 0))
+    .map((r) => r.path);
+
+  if (orphans.length) {
+    fail(
+      `${orphans.length} indexable route(s) have no inbound link from any other prerendered page: ` +
+        orphans.join(', ')
+    );
+  } else {
+    ok(`all ${indexable.length} indexable pages are linked from at least one other prerendered page`);
+  }
+  if (shellOnly.length) {
+    console.log(
+      `  · ${shellOnly.length} indexable route(s) are linked only from the navigation/footer shell, ` +
+        `not from any page body: ${shellOnly.join(', ')}`
+    );
+  } else {
+    ok('every indexable page also has at least one contextual (in-body) inbound link');
+  }
+}
+
 // ─── 9. one metadata source, end to end ──────────────────────────────────────
 // Not an "SEO rule about byte identity". The invariant is provenance: a route's
 // title and description are declared once, in PUBLIC_ROUTES, and everything that

@@ -314,6 +314,41 @@ export function BlogPostPage() {
                 ))}
               </motion.div>
 
+              {/*
+                Weiterführende Seiten außerhalb des Blogs. Ohne Bewegungs-Wrapper,
+                damit die Links im vorgerenderten HTML stehen und nicht erst nach
+                der Hydration erscheinen — der Sinn dieses Blocks ist, dass ein
+                Crawler sie liest.
+              */}
+              {article.weiterfuehrend && article.weiterfuehrend.length > 0 && (
+                <nav
+                  aria-labelledby="weiterfuehrend-heading"
+                  className="mt-12 pt-10 border-t border-gray-100 dark:border-gray-800"
+                >
+                  <h2
+                    id="weiterfuehrend-heading"
+                    className="text-xl font-bold text-gray-900 dark:text-gray-50 mb-6"
+                  >
+                    Weiterführend
+                  </h2>
+                  <ul className="space-y-5">
+                    {article.weiterfuehrend.map((w) => (
+                      <li key={w.to}>
+                        <Link
+                          to={w.to}
+                          className="text-[15.5px] font-semibold text-gray-900 dark:text-gray-100 underline underline-offset-4 hover:no-underline"
+                        >
+                          {w.label}
+                        </Link>
+                        <p className="text-[14px] text-gray-600 dark:text-gray-300 leading-relaxed mt-1">
+                          {w.text}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+              )}
+
               {article.faqItems && article.faqItems.length > 0 && (
                 <motion.div
                   initial="hidden"

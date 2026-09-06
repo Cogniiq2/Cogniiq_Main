@@ -90,7 +90,7 @@ const PFAD = "/ki-telefonassistent-einfuehren";
 const CANONICAL = canonicalFor(PFAD);
 
 const VEROEFFENTLICHT = "2026-08-29";
-const AKTUALISIERT = "2026-08-29";
+const AKTUALISIERT = "2026-09-05";
 
 /**
  * Prüfkategorien vor der Freigabe.
@@ -739,6 +739,17 @@ export function KiTelefonassistentEinfuehren() {
               </Link>
               <span className="block text-gray-600 dark:text-gray-400">
                 Dieselbe Sache aus Sicht einer Praxis, mit den Anliegen Ihres Alltags.
+              </span>
+            </li>
+            <li>
+              <Link
+                to="/ki-telefonassistent-zahnarztpraxis"
+                className="underline underline-offset-4 hover:no-underline font-semibold text-gray-900 dark:text-gray-100"
+              >
+                KI-Telefonassistent in der Zahnarztpraxis
+              </Link>
+              <span className="block text-gray-600 dark:text-gray-400">
+                Die Anrufanlässe einer Zahnarztpraxis, die Regel je Anlass und was dort immer beim Team bleibt.
               </span>
             </li>
             <li>
