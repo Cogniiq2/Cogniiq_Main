@@ -154,7 +154,7 @@ describe('receptionist-admin handler', () => {
       },
       async insertConfigVersion(row) { versions.push(row); },
       async findActiveBinding(receptionistId, environment) { const b = bindings.find((x) => x.receptionistId === receptionistId && x.environment === environment && x.active); return b ? { id: b.id } : null; },
-      async revokeBindings(receptionistId, environment) { for (const b of bindings) if (b.receptionistId === receptionistId && b.environment === environment) b.active = false; },
+      async revokeBindings(receptionistId, environment, exceptBindingId) { for (const b of bindings) if (b.receptionistId === receptionistId && b.environment === environment && b.id !== exceptBindingId) b.active = false; },
       async insertBinding(row) { const id = `b${++seq}`; bindings.push({ id, receptionistId: row.receptionistId, environment: row.environment, active: true, tokenHash: row.tokenHash }); return { id }; },
       async insertEvaluationRun(row) { const id = `run${++seq}`; runs.push({ id, status: row.status }); return { id }; },
       async updateEvaluationRun(id, patch) { const run = runs.find((r) => r.id === id)!; if (patch.status) run.status = patch.status; },
