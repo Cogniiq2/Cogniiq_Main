@@ -11,6 +11,8 @@ export * from './openingHours.ts';
 export * from './knowledge.ts';
 export * from './prompt.ts';
 export * from './agentFactory.ts';
+export * from './provisioningState.ts';
+export { contentFingerprint } from './fingerprint.ts';
 export * from './elevenlabs/mapping.ts';
 export type { BookingProvider, ProviderContext, CallerIdentity } from './adapters/bookingProvider.ts';
 export { MockBookingProvider } from './adapters/mockBookingProvider.ts';

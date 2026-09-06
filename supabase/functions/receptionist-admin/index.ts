@@ -69,9 +69,9 @@ serve(async (request: Request): Promise<Response> => {
       return { id: (data as { id: string }).id };
     },
     async getReceptionist(id) {
-      const { data } = await admin.from('ai_receptionists').select('id, organization_id, name, stage, client_config, config_version, provider_state, provider_agent_id').eq('id', id).maybeSingle();
+      const { data } = await admin.from('ai_receptionists').select('id, organization_id, name, stage, client_config, config_version, provider_state, provider_agent_id, last_synced_at, last_sync_error').eq('id', id).maybeSingle();
       if (!data) return null;
-      return { id: data.id, organizationId: data.organization_id, name: data.name, stage: data.stage, clientConfig: data.client_config, configVersion: data.config_version, providerState: data.provider_state, providerAgentId: data.provider_agent_id };
+      return { id: data.id, organizationId: data.organization_id, name: data.name, stage: data.stage, clientConfig: data.client_config, configVersion: data.config_version, providerState: data.provider_state, providerAgentId: data.provider_agent_id, lastSyncedAt: data.last_synced_at, lastSyncError: data.last_sync_error };
     },
     async updateReceptionist(id, patch) {
       const row: Record<string, unknown> = {};
@@ -95,8 +95,11 @@ serve(async (request: Request): Promise<Response> => {
       const { data } = await admin.from('ai_receptionist_tool_bindings').select('id').eq('receptionist_id', receptionistId).eq('environment', environment).eq('active', true).limit(1).maybeSingle();
       return data ? { id: data.id } : null;
     },
-    async revokeBindings(receptionistId, environment) {
-      await admin.from('ai_receptionist_tool_bindings').update({ active: false, revoked_at: new Date().toISOString() }).eq('receptionist_id', receptionistId).eq('environment', environment).eq('active', true);
+    async revokeBindings(receptionistId, environment, exceptBindingId) {
+      let query = admin.from('ai_receptionist_tool_bindings').update({ active: false, revoked_at: new Date().toISOString() }).eq('receptionist_id', receptionistId).eq('environment', environment).eq('active', true);
+      if (exceptBindingId) query = query.neq('id', exceptBindingId);
+      const { error } = await query;
+      if (error) throw new Error(`revoke bindings: ${error.message}`);
     },
     async insertBinding(row) {
       const data = must(await admin.from('ai_receptionist_tool_bindings').insert({ receptionist_id: row.receptionistId, organization_id: row.organizationId, environment: row.environment, token_hash: row.tokenHash, label: row.label }).select('id').single(), 'insert binding');
