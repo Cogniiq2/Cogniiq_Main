@@ -17,6 +17,7 @@ import { N8nBookingProvider } from '../adapters/n8nBookingProvider.ts';
 import type { BookingProvider } from '../adapters/bookingProvider.ts';
 import { ToolRuntime } from '../toolRuntime.ts';
 import type { ToolCallEvent } from '../toolRuntime.ts';
+import { contentFingerprint } from '../fingerprint.ts';
 import { isToolName } from '../toolContracts.ts';
 import { bearerFrom, jsonResponse, scrubForLog, sha256Hex } from './shared.ts';
 
@@ -60,7 +61,7 @@ export interface ToolsHandlerDependencies {
   now?: () => Date;
 }
 
-export function providerForConfig(config: ClientConfig, deps: ToolsHandlerDependencies, receptionistId: string): BookingProvider | { error: string } {
+export function providerForConfig(config: ClientConfig, deps: ToolsHandlerDependencies, receptionistId: string, onDiagnostic?: (message: string) => void): BookingProvider | { error: string } {
   const integration = config.bookingIntegration;
   switch (integration.provider) {
     case 'mock': {
@@ -78,7 +79,7 @@ export function providerForConfig(config: ClientConfig, deps: ToolsHandlerDepend
       if (!integration.baseUrl || !integration.secretEnvVar) return { error: 'n8n integration is not fully configured' };
       const secret = deps.resolveSecret(integration.secretEnvVar);
       if (!secret) return { error: `secret ${integration.secretEnvVar} is not set on the server` };
-      return new N8nBookingProvider({ baseUrl: integration.baseUrl, secret });
+      return new N8nBookingProvider({ baseUrl: integration.baseUrl, secret, onDiagnostic });
     }
     case 'none':
       return new MockBookingProvider({ faults: {} });
@@ -138,7 +139,10 @@ export async function handleToolsRequest(request: Request, deps: ToolsHandlerDep
   }
   const conversationId = request.headers.get('X-Cogniiq-Conversation')?.trim() || (typeof (body as Record<string, unknown>).conversation_id === 'string' ? String((body as Record<string, unknown>).conversation_id) : '') || 'no-conversation';
 
-  const provider = providerForConfig(config, deps, receptionist.id);
+  // Integration diagnostics are written as system events (operator-visible) and never returned to
+  // the voice runtime, so a misconfigured n8n secret cannot become something the agent says.
+  const diagnostics: string[] = [];
+  const provider = providerForConfig(config, deps, receptionist.id, (message) => { diagnostics.push(message); });
   if ('error' in provider) {
     await deps.recordEvent({ receptionistId: receptionist.id, organizationId: receptionist.organizationId, conversationId, eventType: 'system', detail: provider.error });
     return jsonResponse({ ok: false, code: 'provider_unavailable', message: 'Das Buchungssystem ist nicht angebunden.', retryable: false, next_action: 'offer_callback' }, 200);
@@ -157,13 +161,18 @@ export async function handleToolsRequest(request: Request, deps: ToolsHandlerDep
   // One runtime per receptionist + config fingerprint so idempotency keys and mock state survive across calls.
   const perDeps = runtimeCache.get(deps) ?? new Map();
   runtimeCache.set(deps, perDeps);
-  const fingerprint = `${receptionist.id}:${JSON.stringify(receptionist.clientConfig).length}`;
+  // A content hash, not a length: two different configurations of the same size must not share a
+  // cached runtime, or a saved configuration change would silently not take effect.
+  const fingerprint = `${receptionist.id}:${contentFingerprint(JSON.stringify(receptionist.clientConfig))}`;
   let entry = perDeps.get(receptionist.id);
   if (!entry || entry.fingerprint !== fingerprint) {
     entry = { fingerprint, runtime: new ToolRuntime(config, { provider, onEvent, now: deps.now, hash: sha256Hex }) };
     perDeps.set(receptionist.id, entry);
   }
   const result = await entry.runtime.execute({ conversationId, tool, arguments: body });
+  for (const message of diagnostics.splice(0)) {
+    await deps.recordEvent({ receptionistId: receptionist.id, organizationId: receptionist.organizationId, conversationId, eventType: 'system', toolName: isToolName(tool) ? tool : undefined, detail: message.slice(0, 480) });
+  }
   await deps.touchBinding?.(binding.bindingId);
   return jsonResponse(result, 200);
 }

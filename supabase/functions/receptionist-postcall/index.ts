@@ -30,6 +30,11 @@ const deps: PostCallDependencies = {
       summary: call.summary ?? null, analysis: call.analysis,
     }, { onConflict: 'receptionist_id,provider_conversation_id' });
   },
+  async deletePriorEvents(receptionistId, conversationId) {
+    // Only this conversation's post-call summary event; the live tool_call rows stay.
+    await admin.from('ai_receptionist_call_events').delete()
+      .eq('receptionist_id', receptionistId).eq('provider_conversation_id', conversationId).eq('event_type', 'post_call');
+  },
   async recordEvents(events) {
     if (events.length === 0) return;
     await admin.from('ai_receptionist_call_events').insert(events.map((e) => ({

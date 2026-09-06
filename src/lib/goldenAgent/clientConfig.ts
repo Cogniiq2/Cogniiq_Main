@@ -51,7 +51,7 @@ export interface Address {
 }
 
 export interface ClientLocation {
-  /** Stable key used in tool calls and knowledge (e.g. "leipzig-markt"). */
+  /** Stable key used in tool calls and knowledge (e.g. "standort-mitte"). */
   id: string;
   name: string;
   address: Address;
