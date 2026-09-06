@@ -151,7 +151,12 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     origin: null,
     volume: null,
     priceCents: 2400,
-    image: null,
+    image: {
+      basePath: '/private-bar/products/tiefenbrunner-merus-gewuerztraminer-2022',
+      width: 240,
+      height: 826,
+      widths: [240, 480],
+    },
     available: true,
     sortOrder: 60,
   },
