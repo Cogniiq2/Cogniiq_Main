@@ -495,22 +495,72 @@ language sql stable security definer set search_path = public, pg_temp as $$
    where p_scope = 'offer' and a.offer_id = p_id and a.signature_storage_path is not null;
 $$;
 
-/** Removes the collected objects. Guarded: a bare smoke database has no storage schema. */
-create or replace function public.owner_purge_delete_storage(p_paths jsonb)
-returns int language plpgsql security definer set search_path = public, pg_temp as $$
-declare v_removed int := 0;
-begin
-  if to_regclass('storage.objects') is null then return 0; end if;
-  if p_paths is null or jsonb_array_length(p_paths) = 0 then return 0; end if;
+/**
+ * Removes the collected objects and reports exactly what happened to each one.
+ *
+ * IMPORTANT LIMIT, stated here because it cannot be detected from inside this function: this
+ * DELETEs the `storage.objects` METADATA ROW. On a real Supabase project the object's actual
+ * bytes live in a separate backend (S3 or equivalent) behind the Storage API service, which is
+ * what genuinely removes them when a client calls `storage.from(bucket).remove(paths)`. A plain
+ * SQL DELETE against `storage.objects`, run directly against Postgres the way every function in
+ * this file runs, does NOT call that service and does NOT by itself guarantee the underlying
+ * file is gone — only that Postgres no longer has a row pointing at it. Whether the hosted
+ * project also deletes the backing bytes on this DELETE depends on infrastructure this migration
+ * cannot see or configure (a storage-side trigger or sync, if one exists). This function can
+ * only ever report what IS SQL-visible: expected vs. deleted vs. already-missing metadata rows.
+ * A drain worker calling the real Storage API for any row whose bytes need confirming — using
+ * the same pg_net + Vault + Edge Function pattern already wired for the automation worker in
+ * 20260723127000 — is the way to close that gap for real; this file does not attempt it.
+ *
+ * Guarded: a bare smoke database has no storage schema.
+ */
+-- The return type changed (int -> jsonb) partway through this migration's own history; DROP
+-- first so `create or replace` never fails with "cannot change return type of existing
+-- function" against an environment that already ran an earlier draft of this file.
+drop function if exists public.owner_purge_delete_storage(jsonb);
 
-  -- Bucket-scoped: a path is unique within its bucket, never across the project.
-  execute $q$
-    delete from storage.objects o
-    using jsonb_to_recordset($1) as p(bucket_id text, object_name text)
-    where o.bucket_id = p.bucket_id and o.name = p.object_name
-  $q$ using p_paths;
-  get diagnostics v_removed = row_count;
-  return v_removed;
+create or replace function public.owner_purge_delete_storage(p_paths jsonb)
+returns jsonb language plpgsql security definer set search_path = public, pg_temp as $$
+declare
+  v_expected int; v_deleted int := 0; v_present int;
+  v_objects jsonb := '[]'::jsonb; v_deleted_paths jsonb;
+begin
+  v_expected := coalesce(jsonb_array_length(p_paths), 0);
+  if to_regclass('storage.objects') is null or v_expected = 0 then
+    return jsonb_build_object('expected', v_expected, 'deleted', 0, 'already_missing', 0, 'objects', '[]'::jsonb);
+  end if;
+
+  -- Which of the expected rows are actually there BEFORE the delete, so "already missing" is
+  -- measured against reality rather than assumed to be whatever the DELETE did not touch.
+  select coalesce(jsonb_agg(jsonb_build_object('bucket_id', o.bucket_id, 'object_name', o.name)), '[]'::jsonb)
+    into v_deleted_paths
+  from storage.objects o
+  join jsonb_to_recordset(p_paths) as p(bucket_id text, object_name text)
+    on o.bucket_id = p.bucket_id and o.name = p.object_name;
+  v_present := coalesce(jsonb_array_length(v_deleted_paths), 0);
+
+  if v_present > 0 then
+    -- Bucket-scoped: a path is unique within its bucket, never across the project.
+    execute $q$
+      delete from storage.objects o
+      using jsonb_to_recordset($1) as p(bucket_id text, object_name text)
+      where o.bucket_id = p.bucket_id and o.name = p.object_name
+    $q$ using p_paths;
+    get diagnostics v_deleted = row_count;
+  end if;
+
+  select coalesce(jsonb_agg(jsonb_build_object(
+           'bucket_id', p.bucket_id, 'object_name', p.object_name,
+           'status', case when e.object_name is not null then 'deleted' else 'already_missing' end)),
+         '[]'::jsonb)
+    into v_objects
+  from jsonb_to_recordset(p_paths) as p(bucket_id text, object_name text)
+  left join jsonb_to_recordset(v_deleted_paths) as e(bucket_id text, object_name text)
+    on e.bucket_id = p.bucket_id and e.object_name = p.object_name;
+
+  return jsonb_build_object(
+    'expected', v_expected, 'deleted', v_deleted,
+    'already_missing', v_expected - v_present, 'objects', v_objects);
 end;
 $$;
 
@@ -576,15 +626,108 @@ commit;
 -- ---------------------------------------------------------------------------
 begin;
 
+/**
+ * Merges one nested owner_purge_destroy_row() result into an accumulator.
+ *
+ * Every plain numeric key (a table name, `_storage_objects`) sums normally. `_storage_cleanup`
+ * is structured — expected/deleted/already_missing/objects — and is merged field-by-field with
+ * its `objects` arrays concatenated, so a customer-level tombstone ends up with the SAME level
+ * of storage-cleanup detail a single invoice's own tombstone gets, for every invoice and offer
+ * the cascade actually touched, not just the customer's own direct dependents.
+ *
+ * Without this, the customer recursion in owner_purge_destroy_row used to `perform` (discard)
+ * each nested call's result and track only how many children were processed — real work, but an
+ * incomplete audit trail: the tombstone could not show which Storage objects were touched by a
+ * cascaded invoice, only that "N invoices were nested".
+ */
+create or replace function public.owner_purge_merge_counts(p_acc jsonb, p_next jsonb)
+returns jsonb language plpgsql immutable set search_path = public, pg_temp as $$
+declare v_out jsonb; k text; v_acc_sc jsonb; v_next_sc jsonb;
+begin
+  v_out := coalesce(p_acc, '{}'::jsonb);
+  if p_next is null then return v_out; end if;
+
+  for k in select jsonb_object_keys(p_next) loop
+    if k = '_storage_cleanup' then continue; end if;  -- merged separately below
+    if jsonb_typeof(p_next -> k) = 'number' then
+      v_out := v_out || jsonb_build_object(k, coalesce((v_out ->> k)::bigint, 0) + (p_next ->> k)::bigint);
+    end if;
+  end loop;
+
+  if p_next ? '_storage_cleanup' then
+    v_acc_sc := coalesce(v_out -> '_storage_cleanup', jsonb_build_object(
+      'expected', 0, 'deleted', 0, 'already_missing', 0, 'objects', '[]'::jsonb));
+    v_next_sc := p_next -> '_storage_cleanup';
+    v_out := v_out || jsonb_build_object('_storage_cleanup', jsonb_build_object(
+      'expected', coalesce((v_acc_sc ->> 'expected')::int, 0) + coalesce((v_next_sc ->> 'expected')::int, 0),
+      'deleted', coalesce((v_acc_sc ->> 'deleted')::int, 0) + coalesce((v_next_sc ->> 'deleted')::int, 0),
+      'already_missing', coalesce((v_acc_sc ->> 'already_missing')::int, 0) + coalesce((v_next_sc ->> 'already_missing')::int, 0),
+      'objects', coalesce(v_acc_sc -> 'objects', '[]'::jsonb) || coalesce(v_next_sc -> 'objects', '[]'::jsonb)));
+  end if;
+
+  return v_out;
+end;
+$$;
+
 create or replace function public.owner_purge_destroy_row(
   p_scope text, p_id uuid, p_allow_accounting boolean default false)
 returns jsonb language plpgsql security definer set search_path = public, pg_temp as $$
 declare
-  r record; v_root text; v_sql text; v_n bigint;
-  v_counts jsonb := '{}'::jsonb; v_paths jsonb; v_storage int := 0; v_child uuid;
+  r record; v_root text; v_sql text; v_n bigint; v_locked uuid; v_rel jsonb;
+  v_counts jsonb := '{}'::jsonb; v_paths jsonb; v_storage jsonb; v_child uuid;
 begin
   v_root := public.owner_force_delete_table(p_scope);
   if v_root is null then raise exception 'scope_not_supported'; end if;
+
+  -- ---------------------------------------------------------------------
+  -- THE race-condition gate. Read this before anything below it.
+  --
+  -- Everything that decided this record was safe to destroy — the preflight in
+  -- owner_workspace_purge_items, the manifest the confirmation dialog showed —
+  -- ran as a separate, earlier statement. Under READ COMMITTED (Postgres's
+  -- default and what every function here runs at), a concurrent transaction
+  -- can commit a new payment, a new issuance, a new finalized offer in the gap
+  -- between that check and this one — and owner_payments carries no BEFORE
+  -- DELETE guard at all, so a payment that lands in that gap would otherwise
+  -- be swept into the dependency-map deletes below with nothing to stop it.
+  -- This was proven empirically (two real concurrent sessions, not a sequential
+  -- simulation) before this gate existed: a payment recorded mid-purge was
+  -- destroyed silently, the RPC reported success, and the payment appears in
+  -- `destroyed` as if it had always been part of the purge.
+  --
+  -- The fix is the standard Postgres pattern for exactly this shape of race:
+  -- lock the root row FOR UPDATE FIRST, before reading or deleting anything.
+  -- From here on, any concurrent statement that would change what this record
+  -- IS — a payment insert, an invoice issuance, an offer finalization, a new
+  -- child row referencing this id via a foreign key — must itself acquire at
+  -- least a FOR KEY SHARE lock on this row (Postgres does this automatically
+  -- for every FK-validating INSERT/UPDATE against a referenced row, precisely
+  -- to guard against the referenced row disappearing mid-flight). FOR KEY
+  -- SHARE conflicts with FOR UPDATE, so any such statement now blocks until
+  -- this transaction ends — it can never commit invisibly inside the window.
+  --
+  -- With the row genuinely locked, the relevance check below sees a state that
+  -- cannot change out from under it: nothing new can have committed since the
+  -- lock was taken, and nothing can commit before this transaction resolves.
+  -- For tier 1 (p_allow_accounting = false) a newly-relevant record aborts the
+  -- whole purge rather than proceeding on the stale answer. Tier 2 does not
+  -- abort — it is the path that destroys relevant records on purpose — but it
+  -- still takes the lock, so its own dependency deletes and the counts it
+  -- returns are exact rather than a race-widened undercount.
+  execute format('select id from public.%I where id = $1 for update', v_root)
+    into v_locked using p_id;
+  if v_locked is null then
+    -- Already gone — a concurrent purge of the same record, most likely.
+    -- Idempotent: nothing to destroy, nothing to report.
+    return '{}'::jsonb;
+  end if;
+
+  if not p_allow_accounting then
+    v_rel := public.owner_record_accounting_relevance(p_scope, p_id);
+    if v_rel is not null and (v_rel ->> 'relevant')::boolean then
+      raise exception 'purge_race_accounting_relevant';
+    end if;
+  end if;
 
   if p_allow_accounting then
     perform set_config('cogniiq.force_delete_id', p_id::text, true);
@@ -601,12 +744,16 @@ begin
     for v_child in select id from public.owner_invoices where owner_customer_id = p_id loop
       v_counts := v_counts || jsonb_build_object('_nested_invoice',
         coalesce((v_counts ->> '_nested_invoice')::bigint, 0) + 1);
-      perform public.owner_purge_destroy_row('invoice', v_child, p_allow_accounting);
+      -- Captured and merged, not discarded: a customer-level tombstone needs the same
+      -- storage-cleanup detail a single invoice's own tombstone gets.
+      v_counts := public.owner_purge_merge_counts(v_counts,
+        public.owner_purge_destroy_row('invoice', v_child, p_allow_accounting));
     end loop;
     for v_child in select id from public.owner_offers where owner_customer_id = p_id loop
       v_counts := v_counts || jsonb_build_object('_nested_offer',
         coalesce((v_counts ->> '_nested_offer')::bigint, 0) + 1);
-      perform public.owner_purge_destroy_row('offer', v_child, p_allow_accounting);
+      v_counts := public.owner_purge_merge_counts(v_counts,
+        public.owner_purge_destroy_row('offer', v_child, p_allow_accounting));
     end loop;
     -- The token is transaction-local but the recursion above cleared it on its
     -- way out; re-arm it for this row's own dependents.
@@ -641,8 +788,21 @@ begin
 
   perform public.owner_purge_assert_no_orphans(p_scope, p_id);
 
+  -- `_storage_objects` stays a plain count for manifestLines/BlastRadiusPanel, which only ever
+  -- render a number. `_storage_cleanup` carries the full expected/deleted/already-missing detail
+  -- into the tombstone, which is where it becomes a visible, permanent, queryable record rather
+  -- than a number nobody can act on later. See owner_purge_delete_storage for what "deleted"
+  -- can and cannot mean here.
+  --
+  -- MERGED, not assigned: for a customer, the recursion above already merged each nested
+  -- invoice/offer's own storage-cleanup detail into v_counts. This level's OWN storage cleanup
+  -- (v_paths collected at the top of this call, empty for 'customer' — a customer row carries no
+  -- storage path itself) has to be folded in on top of that, not replace it; a plain assignment
+  -- here silently discarded every nested invoice's storage-cleanup record.
   v_storage := public.owner_purge_delete_storage(v_paths);
-  v_counts := v_counts || jsonb_build_object('_storage_objects', v_storage);
+  v_counts := public.owner_purge_merge_counts(v_counts, jsonb_build_object(
+    '_storage_objects', coalesce((v_storage ->> 'deleted')::int, 0),
+    '_storage_cleanup', v_storage));
 
   perform set_config('cogniiq.force_delete_id', '', true);
   return v_counts;
@@ -696,6 +856,204 @@ begin
   return v_out;
 end;
 $$;
+
+commit;
+
+-- ---------------------------------------------------------------------------
+-- 6b. The blast-radius report. What the emergency confirmation dialog shows.
+--
+--     owner_purge_manifest (above) answers "which tables, how many rows" — the
+--     ordinary Papierkorb dialog needs exactly that, and no more, because tier 1
+--     never touches a record with money or a number attached. The EMERGENCY
+--     confirmation is different: an owner about to destroy real accounting
+--     evidence has to be able to judge the blast radius in terms the business
+--     actually uses — how much money, which invoice numbers — not a table name
+--     and a row count.
+--
+--     One recursive shape for every scope, so the UI never branches on which
+--     fields exist. For 'customer' it sums across every invoice and offer via
+--     the SAME per-scope computation used standalone — one function, walked
+--     twice at different roots, rather than a second parallel implementation
+--     that could drift from the first.
+--
+--     Advance payments linked directly via owner_payments.owner_customer_id
+--     (never through an invoice_id — record_owner_invoice_payment never sets
+--     that column) are added once at the customer level. They are not
+--     reachable through the invoice recursion at all, so there is no double
+--     count to guard against.
+-- ---------------------------------------------------------------------------
+begin;
+
+create or replace function public.owner_purge_blast_radius(p_scope text, p_id uuid)
+returns jsonb language plpgsql stable security definer set search_path = public, pg_temp as $$
+declare
+  v_inv_count int := 0; v_inv_gross bigint := 0; v_inv_numbers text[] := array[]::text[];
+  v_pay_count int := 0; v_pay_total bigint := 0;
+  v_off_count int := 0; v_off_numbers text[] := array[]::text[];
+  v_gen_count int := 0; v_fin_count int := 0; v_portal_count int := 0; v_storage_count int := 0;
+  v_row record; v_sub jsonb; v_direct_pay_count int; v_direct_pay_total bigint;
+begin
+  if p_scope = 'customer' then
+    for v_row in select id from public.owner_invoices where owner_customer_id = p_id loop
+      v_sub := public.owner_purge_blast_radius('invoice', v_row.id);
+      v_inv_count        := v_inv_count        + (v_sub -> 'invoices' ->> 'count')::int;
+      v_inv_gross         := v_inv_gross         + (v_sub -> 'invoices' ->> 'gross_total_cents')::bigint;
+      v_inv_numbers       := v_inv_numbers       || array(select jsonb_array_elements_text(v_sub -> 'invoices' -> 'numbers'));
+      v_pay_count         := v_pay_count         + (v_sub -> 'payments' ->> 'count')::int;
+      v_pay_total         := v_pay_total         + (v_sub -> 'payments' ->> 'total_cents')::bigint;
+      v_gen_count         := v_gen_count         + (v_sub -> 'generated_documents' ->> 'count')::int;
+      v_fin_count         := v_fin_count         + (v_sub -> 'finance_documents' ->> 'count')::int;
+      v_portal_count      := v_portal_count      + (v_sub -> 'portal_documents' ->> 'count')::int;
+      v_storage_count     := v_storage_count     + (v_sub -> 'storage_objects' ->> 'count')::int;
+    end loop;
+    for v_row in select id from public.owner_offers where owner_customer_id = p_id loop
+      v_sub := public.owner_purge_blast_radius('offer', v_row.id);
+      v_off_count         := v_off_count         + (v_sub -> 'offers' ->> 'count')::int;
+      v_off_numbers       := v_off_numbers       || array(select jsonb_array_elements_text(v_sub -> 'offers' -> 'numbers'));
+      v_gen_count         := v_gen_count         + (v_sub -> 'generated_documents' ->> 'count')::int;
+      v_portal_count      := v_portal_count      + (v_sub -> 'portal_documents' ->> 'count')::int;
+      v_storage_count     := v_storage_count     + (v_sub -> 'storage_objects' ->> 'count')::int;
+    end loop;
+
+    select count(*), coalesce(sum(amount_cents), 0) into v_direct_pay_count, v_direct_pay_total
+      from public.owner_payments where owner_customer_id = p_id;
+    v_pay_count := v_pay_count + v_direct_pay_count;
+    v_pay_total := v_pay_total + v_direct_pay_total;
+
+    return jsonb_build_object(
+      'invoices', jsonb_build_object('count', v_inv_count, 'gross_total_cents', v_inv_gross, 'numbers', to_jsonb(v_inv_numbers)),
+      'payments', jsonb_build_object('count', v_pay_count, 'total_cents', v_pay_total),
+      'offers', jsonb_build_object('count', v_off_count, 'numbers', to_jsonb(v_off_numbers)),
+      'generated_documents', jsonb_build_object('count', v_gen_count),
+      'finance_documents', jsonb_build_object('count', v_fin_count),
+      'portal_documents', jsonb_build_object('count', v_portal_count),
+      'storage_objects', jsonb_build_object('count', v_storage_count));
+  end if;
+
+  declare
+    v_number text; v_gross bigint; v_found boolean := false;
+  begin
+    if p_scope = 'invoice' then
+      select invoice_number, gross_total_cents into v_number, v_gross
+        from public.owner_invoices where id = p_id;
+      v_found := found;
+      if v_found then
+        v_inv_count := 1; v_inv_gross := coalesce(v_gross, 0);
+        if v_number is not null then v_inv_numbers := array[v_number]; end if;
+      end if;
+      select count(*), coalesce(sum(amount_cents), 0) into v_pay_count, v_pay_total
+        from public.owner_payments where invoice_id = p_id;
+
+    elsif p_scope = 'offer' then
+      select offer_number into v_number from public.owner_offers where id = p_id;
+      v_found := found;
+      if v_found then
+        v_off_count := 1;
+        if v_number is not null then v_off_numbers := array[v_number]; end if;
+      end if;
+
+    elsif p_scope = 'expense' then
+      -- Reuses the "invoices" bucket's shape (count / gross / numbers) rather than adding a
+      -- fifth near-identical field: the UI labels it by scope, and an expense has exactly the
+      -- same three facts worth showing (how many, how much, which supplier reference).
+      select supplier_invoice_number, gross_total_cents into v_number, v_gross
+        from public.owner_expenses where id = p_id;
+      v_found := found;
+      if v_found then
+        v_inv_count := 1; v_inv_gross := coalesce(v_gross, 0);
+        if v_number is not null then v_inv_numbers := array[v_number]; end if;
+      end if;
+      select count(*), coalesce(sum(amount_cents), 0) into v_pay_count, v_pay_total
+        from public.owner_payments where expense_id = p_id;
+    end if;
+  end;
+
+  select count(*) into v_gen_count from public.owner_generated_documents
+   where (p_scope = 'invoice' and source_resource_type = 'owner_invoices' and source_resource_id = p_id)
+      or (p_scope = 'offer' and source_resource_type = 'owner_offers' and source_resource_id = p_id);
+
+  select count(*) into v_fin_count from public.owner_finance_documents
+   where (p_scope = 'invoice' and invoice_id = p_id) or (p_scope = 'expense' and expense_id = p_id);
+
+  select count(*) into v_portal_count from public.customer_documents d
+    join public.owner_generated_documents g on g.id = d.owner_generated_document_id
+   where (p_scope = 'invoice' and g.source_resource_type = 'owner_invoices' and g.source_resource_id = p_id)
+      or (p_scope = 'offer' and g.source_resource_type = 'owner_offers' and g.source_resource_id = p_id);
+
+  select count(*) into v_storage_count from public.owner_purge_storage_paths(p_scope, p_id);
+
+  return jsonb_build_object(
+    'invoices', jsonb_build_object('count', v_inv_count, 'gross_total_cents', v_inv_gross, 'numbers', to_jsonb(v_inv_numbers)),
+    'payments', jsonb_build_object('count', v_pay_count, 'total_cents', v_pay_total),
+    'offers', jsonb_build_object('count', v_off_count, 'numbers', to_jsonb(v_off_numbers)),
+    'generated_documents', jsonb_build_object('count', v_gen_count),
+    'finance_documents', jsonb_build_object('count', v_fin_count),
+    'portal_documents', jsonb_build_object('count', v_portal_count),
+    'storage_objects', jsonb_build_object('count', v_storage_count));
+end;
+$$;
+
+commit;
+
+-- ---------------------------------------------------------------------------
+-- 6c. owner_force_delete_preview, restated.
+--
+--     Originally defined in 20260910120000. Two correctness fixes to what the
+--     confirmation dialog shows BEFORE the owner types the phrase:
+--
+--       1. `manifest` now comes from owner_purge_manifest, built on the same
+--          explicit owner_purge_dependencies map the real destroyer walks —
+--          not the older pg_constraint-only owner_force_delete_manifest,
+--          which never followed SET NULL keys (owner_payments.invoice_id,
+--          owner_finance_documents.invoice_id) or the polymorphic
+--          owner_generated_documents (no foreign key at all). For a customer
+--          with issued invoices, that walker undercounted the very rows the
+--          confirmation dialog exists to surface: payments and generated
+--          documents went unreported while still being destroyed for real.
+--          Two divergent manifest implementations for one destructive action
+--          was itself the defect; one is now the only one that exists.
+--       2. `blast_radius` is new: the same tree, rolled up into money and
+--          reference numbers rather than table names, because "3 rows in
+--          owner_invoices" does not let an owner judge a blast radius the
+--          way "3 Rechnungen, €4.280,00, RE-2026-0091 / …" does.
+-- ---------------------------------------------------------------------------
+begin;
+
+create or replace function public.owner_force_delete_preview(p_scope text, p_resource_id uuid)
+returns jsonb language plpgsql stable security definer set search_path = public, pg_temp as $$
+declare v_table text; v_summary jsonb;
+begin
+  if not public.is_platform_owner() then raise exception 'Owner access required'; end if;
+  v_table := public.owner_force_delete_table(p_scope);
+  if v_table is null then
+    return jsonb_build_object('resource_id', p_resource_id, 'found', false, 'reason', 'scope_not_supported');
+  end if;
+
+  v_summary := public.owner_force_delete_summary(p_scope, p_resource_id);
+  if v_summary is null then
+    return jsonb_build_object('resource_id', p_resource_id, 'found', false, 'reason', 'not_found');
+  end if;
+
+  return jsonb_build_object(
+    'resource_id', p_resource_id, 'found', true,
+    'label', v_summary ->> 'label',
+    'summary', v_summary,
+    'manifest', public.owner_purge_manifest(p_scope, p_resource_id),
+    'blast_radius', public.owner_purge_blast_radius(p_scope, p_resource_id));
+end;
+$$;
+
+/**
+ * The customer-scoped counterpart to owner_force_delete_preview / useForceDeletePreviews.
+ *
+ * A customer force-delete is invoked with a single id (owner_force_delete_customer takes one
+ * p_customer_id, not an array), so it has never gone through the generic
+ * `owner_force_delete_preview('customer', id)` path used for invoices/offers/expenses — checking
+ * confirms `owner_force_delete_table('customer')` resolves fine and `owner_force_delete_summary`
+ * handles 'customer', so the generic function already works for this scope with no changes.
+ * This comment exists only so a future reader does not go looking for a customer-specific preview
+ * function that was never needed: `owner_force_delete_preview('customer', p_customer_id)` is it.
+ */
 
 commit;
 
@@ -768,7 +1126,7 @@ create or replace function public.owner_workspace_purge_items(
   p_entity uuid, p_scope text, p_resource_ids uuid[], p_reason text default null)
 returns jsonb language plpgsql security definer set search_path = public, pg_temp as $$
 declare
-  v_out jsonb := '[]'::jsonb; v_id uuid; v_plan jsonb; v_rel jsonb;
+  v_out jsonb := '[]'::jsonb; v_id uuid; v_plan jsonb; v_summary jsonb;
   v_outcome text; v_error text; v_destroyed jsonb; v_trashed boolean; v_reason text;
 begin
   if not public.is_platform_owner() then raise exception 'Owner access required'; end if;
@@ -800,21 +1158,38 @@ begin
           v_outcome := 'blocked'; v_error := 'accounting_protected';
 
         else
-          v_rel := public.owner_record_accounting_relevance(p_scope, v_id);
-          insert into public.owner_deletion_tombstones
-            (business_entity_id, scope, resource_id, label, summary, destroyed, reason, deleted_by)
-          values (p_entity, p_scope, v_id, v_rel ->> 'label',
-                  coalesce(public.owner_force_delete_summary(p_scope, v_id), v_rel),
-                  v_plan -> 'manifest', v_reason, auth.uid());
+          -- "What it was", captured now while it still exists — but the decision to
+          -- destroy it is NOT this preflight. owner_purge_destroy_row locks the row
+          -- and re-runs the same relevance check itself before touching anything;
+          -- this read is display material for the tombstone, nothing more.
+          v_summary := coalesce(
+            public.owner_force_delete_summary(p_scope, v_id),
+            public.owner_record_accounting_relevance(p_scope, v_id));
 
           -- p_allow_accounting stays FALSE: the guards remain armed, so a bug in
-          -- the eligibility rules cannot become a destroyed invoice.
+          -- the eligibility rules cannot become a destroyed invoice. If a
+          -- concurrent transaction made the record accounting-relevant after this
+          -- preflight ran, owner_purge_destroy_row's own lock-and-recheck catches
+          -- it and raises purge_race_accounting_relevant — caught below, nothing
+          -- destroyed, no tombstone written for a purge that did not happen.
           v_destroyed := public.owner_purge_destroy_row(p_scope, v_id, false);
+
+          -- Written AFTER, from what actually happened rather than a pre-purge
+          -- estimate: v_destroyed is owner_purge_destroy_row's own row counts,
+          -- not the manifest the confirmation dialog showed a moment earlier.
+          insert into public.owner_deletion_tombstones
+            (business_entity_id, scope, resource_id, label, summary, destroyed, reason, deleted_by)
+          values (p_entity, p_scope, v_id, v_summary ->> 'label', v_summary,
+                  v_destroyed, v_reason, auth.uid());
           v_outcome := 'hard_deleted';
         end if;
       end if;
     exception when others then
-      v_outcome := 'failed'; v_error := sqlstate;
+      if sqlerrm like '%purge_race_accounting_relevant%' then
+        v_outcome := 'blocked'; v_error := 'accounting_protected';
+      else
+        v_outcome := 'failed'; v_error := sqlstate;
+      end if;
     end;
 
     v_out := v_out || jsonb_build_array(jsonb_build_object(
@@ -874,13 +1249,20 @@ begin
           v_outcome := 'hard_deleted';
         else
           v_rel := public.owner_record_accounting_relevance(p_scope, v_id);
+
+          -- p_allow_accounting = true: this IS the path allowed to destroy an
+          -- accounting-relevant record, so owner_purge_destroy_row's lock still
+          -- runs but never aborts on relevance here. The lock still matters —
+          -- it is what makes v_destroyed below an exact count rather than a
+          -- race-widened undercount if something committed mid-purge.
+          v_destroyed := public.owner_purge_destroy_row(p_scope, v_id, true);
+
+          -- Tombstone written AFTER destruction, from what actually happened.
           insert into public.owner_deletion_tombstones
             (business_entity_id, scope, resource_id, label, summary, destroyed, reason, deleted_by)
           values (p_entity, p_scope, v_id, v_summary ->> 'label',
                   v_summary || jsonb_build_object('accounting_relevance', v_rel),
-                  public.owner_purge_manifest(p_scope, v_id), v_reason, auth.uid());
-
-          v_destroyed := public.owner_purge_destroy_row(p_scope, v_id, true);
+                  v_destroyed, v_reason, auth.uid());
           v_outcome := 'hard_deleted';
         end if;
       end if;
@@ -916,13 +1298,20 @@ begin
   v_summary := public.owner_force_delete_summary('customer', p_customer_id);
   v_rel := public.owner_record_accounting_relevance('customer', p_customer_id);
 
+  -- The row is already locked (SELECT ... FOR UPDATE above), and
+  -- owner_purge_destroy_row re-locks and, for its own cascaded children,
+  -- individually re-locks each invoice and offer it recurses into — so a
+  -- payment or issuance racing in on any of them mid-cascade cannot slip
+  -- through uncounted. p_allow_accounting = true: this path may destroy an
+  -- accounting-relevant customer on purpose, so it never aborts on relevance.
+  v_destroyed := public.owner_purge_destroy_row('customer', p_customer_id, true);
+
+  -- Tombstone written AFTER destruction, from what actually happened.
   insert into public.owner_deletion_tombstones
     (business_entity_id, scope, resource_id, label, summary, destroyed, reason, deleted_by)
   values (c.business_entity_id, 'customer', p_customer_id, v_summary ->> 'label',
           v_summary || jsonb_build_object('accounting_relevance', v_rel),
-          public.owner_purge_manifest('customer', p_customer_id), v_reason, auth.uid());
-
-  v_destroyed := public.owner_purge_destroy_row('customer', p_customer_id, true);
+          v_destroyed, v_reason, auth.uid());
 
   return jsonb_build_object('customer_id', p_customer_id, 'deleted', true,
     'label', v_summary ->> 'label', 'destroyed', v_destroyed);
@@ -951,13 +1340,28 @@ begin
   v_reason := coalesce(nullif(btrim(coalesce(p_reason, '')), ''), 'Kunde ohne Buchhaltungsrelevanz');
   v_summary := public.owner_force_delete_summary('customer', p_customer_id);
 
+  begin
+    -- The customer row is already locked above; owner_purge_destroy_row's cascade
+    -- individually locks and re-checks each invoice and offer it recurses into.
+    -- If any of them turns out to have become accounting-relevant since the
+    -- check just above — a payment or issuance racing in mid-cascade — the
+    -- destroyer raises purge_race_accounting_relevant and nothing is destroyed;
+    -- caught here and reported the same way the up-front check above is.
+    v_destroyed := public.owner_purge_destroy_row('customer', p_customer_id, false);
+  exception when others then
+    if sqlerrm like '%purge_race_accounting_relevant%' then
+      return jsonb_build_object('customer_id', p_customer_id, 'deleted', false,
+        'eligibility', 'accounting_protected',
+        'reasons', to_jsonb(array['became_accounting_relevant_during_purge']::text[]));
+    end if;
+    raise;
+  end;
+
+  -- Tombstone written AFTER destruction, from what actually happened.
   insert into public.owner_deletion_tombstones
     (business_entity_id, scope, resource_id, label, summary, destroyed, reason, deleted_by)
   values (c.business_entity_id, 'customer', p_customer_id, v_summary ->> 'label',
-          coalesce(v_summary, v_rel), public.owner_purge_manifest('customer', p_customer_id),
-          v_reason, auth.uid());
-
-  v_destroyed := public.owner_purge_destroy_row('customer', p_customer_id, false);
+          coalesce(v_summary, v_rel), v_destroyed, v_reason, auth.uid());
 
   return jsonb_build_object('customer_id', p_customer_id, 'deleted', true,
     'eligibility', 'purgeable', 'label', v_summary ->> 'label', 'destroyed', v_destroyed);
@@ -985,8 +1389,10 @@ begin;
 create or replace function public.guard_customer_document_no_hard_delete_if_published()
 returns trigger language plpgsql security definer set search_path = '' as $$
 begin
+  -- Both the token AND is_platform_owner() are required — see owner_guard_generated_document
+  -- for why the second check is added even though the token is not independently reachable.
   if old.published_at is not null
-     and coalesce(public.owner_force_delete_token(), '') = ''
+     and (coalesce(public.owner_force_delete_token(), '') = '' or not public.is_platform_owner())
   then
     raise exception 'document % has been published and cannot be deleted; archive it instead', old.id;
   end if;
@@ -1027,8 +1433,14 @@ begin
   if tg_op = 'DELETE' then
     -- Finalized documents are evidence: no hard delete for ANY role (archive instead),
     -- except inside an owner-authorised emergency purge.
+    --
+    -- Both the token AND is_platform_owner() are required, matching owner_guard_invoice. The
+    -- token alone is not reachable by an ordinary client (set_config on this GUC is never
+    -- exposed through PostgREST — nothing in the public schema surfaces it), but the second
+    -- check costs nothing and means a stale or leaked token can never be sufficient by itself,
+    -- for whoever might one day read this trigger in isolation.
     if old.status = 'finalized'
-       and coalesce(public.owner_force_delete_token(), '') = ''
+       and (coalesce(public.owner_force_delete_token(), '') = '' or not public.is_platform_owner())
     then
       raise exception 'finalized documents cannot be deleted (evidence)';
     end if;
@@ -1066,8 +1478,11 @@ begin
     'public.owner_purge_storage_paths(text, uuid)',
     'public.owner_purge_delete_storage(jsonb)',
     'public.owner_purge_assert_no_orphans(text, uuid)',
+    'public.owner_purge_merge_counts(jsonb, jsonb)',
     'public.owner_purge_destroy_row(text, uuid, boolean)',
     'public.owner_purge_manifest(text, uuid)',
+    'public.owner_purge_blast_radius(text, uuid)',
+    'public.owner_force_delete_preview(text, uuid)',
     'public.owner_workspace_purge_preflight_one(text, uuid)',
     'public.owner_workspace_purge_preflight(text, uuid[])',
     'public.owner_workspace_purge_items(uuid, text, uuid[], text)',

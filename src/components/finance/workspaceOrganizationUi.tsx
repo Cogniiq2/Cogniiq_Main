@@ -23,9 +23,11 @@ import {
   FORCE_DELETE_PHRASE, forceDeleteErrorText, forcePurgeWorkspaceItems, forceResultToast,
   loadForceDeletePreview, manifestLines, scopeTable,
   describeAccountingReasons, loadPurgePreflight, purgeResultToast, purgeWorkspaceItems,
-  type DeletePlan, type FolderCounts, type FolderSelection, type ForceDeletePreview,
-  type PurgePlan, type WorkspaceFolder, type WorkspaceScope, type WorkspaceState,
+  type BlastRadius, type DeletePlan, type FolderCounts, type FolderSelection,
+  type ForceDeletePreview, type PurgePlan, type WorkspaceFolder, type WorkspaceScope,
+  type WorkspaceState,
 } from '@/lib/ownerFinance/workspaceOrganization';
+import { formatCentsCurrencyDe } from '@/lib/ownerFinance/exports';
 
 /**
  * The folder / Papierkorb / delete surface, shared by every owner collection that has one.
@@ -1141,6 +1143,75 @@ export function PurgeDialog({
  * that quietly omits a table the owner has never heard of, is worse than none: the whole point
  * is that nothing about what disappears is a surprise afterwards.
  */
+/**
+ * The blast radius, stated the way the owner asked for it: invoice count and total, payment
+ * count and total, offer count, document counts, Storage objects — with reference numbers where
+ * they exist. Every field this renders is one Lazar named explicitly as the minimum a
+ * confirmation dialog must show before an owner types the phrase.
+ *
+ * Zero-count rows are omitted; a purely structural emergency purge (no invoices, no payments)
+ * should not pad the dialog with a wall of "0 ×" lines.
+ */
+function BlastRadiusPanel({ blastRadius: b }: { blastRadius: BlastRadius }) {
+  const rows: { label: string; value: string; numbers?: string[] }[] = [];
+  if (b.invoices.count > 0) {
+    rows.push({
+      label: b.invoices.count === 1 ? 'Rechnung' : 'Rechnungen',
+      value: `${b.invoices.count} · ${formatCentsCurrencyDe(b.invoices.grossTotalCents)} brutto`,
+      numbers: b.invoices.numbers,
+    });
+  }
+  if (b.payments.count > 0) {
+    rows.push({
+      label: b.payments.count === 1 ? 'Zahlung' : 'Zahlungen',
+      value: `${b.payments.count} · ${formatCentsCurrencyDe(b.payments.totalCents)}`,
+    });
+  }
+  if (b.offers.count > 0) {
+    rows.push({
+      label: b.offers.count === 1 ? 'Angebot' : 'Angebote',
+      value: String(b.offers.count),
+      numbers: b.offers.numbers,
+    });
+  }
+  if (b.generatedDocuments.count > 0) {
+    rows.push({ label: 'Erzeugte PDFs', value: String(b.generatedDocuments.count) });
+  }
+  if (b.financeDocuments.count > 0) {
+    rows.push({ label: 'Hochgeladene Belege', value: String(b.financeDocuments.count) });
+  }
+  if (b.portalDocuments.count > 0) {
+    rows.push({ label: 'Kundenportal-Dokumente', value: String(b.portalDocuments.count) });
+  }
+  if (b.storageObjects.count > 0) {
+    rows.push({ label: 'Dateien im Dateispeicher', value: String(b.storageObjects.count) });
+  }
+
+  if (rows.length === 0) {
+    return (
+      <p className="mt-3 text-[var(--cq-fg-subtle)]">
+        Keine Rechnungen, Zahlungen, Angebote oder Dokumente betroffen.
+      </p>
+    );
+  }
+
+  return (
+    <div className={cn('mt-3 space-y-2 rounded-[10px] p-3', 'bg-red-50 dark:bg-red-950/20', border.hairline)}>
+      {rows.map((row) => (
+        <div key={row.label}>
+          <div className="flex items-baseline justify-between gap-3">
+            <span className="font-medium text-[var(--cq-fg)]">{row.label}</span>
+            <span className="text-right text-[13px] text-[var(--cq-fg)]">{row.value}</span>
+          </div>
+          {row.numbers && row.numbers.length > 0 ? (
+            <p className="mt-0.5 text-[12px] text-[var(--cq-fg-subtle)]">{row.numbers.join(' · ')}</p>
+          ) : null}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function ForceDeleteConfirmModal({
   open, heading, previews, primaryTable, onClose, onRun, busyLabel,
 }: {
@@ -1177,6 +1248,33 @@ export function ForceDeleteConfirmModal({
     }
     return manifestLines(merged, primaryTable);
   }, [previews, primaryTable]);
+
+  // The same tree, in money and reference numbers — what the owner actually needs to judge a
+  // blast radius before typing the phrase. Summed the same way as `lines`, from the same server
+  // walk (owner_purge_dependencies), so the two can never disagree with each other.
+  const blastRadius = useMemo<BlastRadius | null>(() => {
+    const rows = (previews ?? []).map((p) => p.blastRadius).filter((b): b is BlastRadius => Boolean(b));
+    if (rows.length === 0) return null;
+    return rows.reduce<BlastRadius>((acc, r) => ({
+      invoices: {
+        count: acc.invoices.count + r.invoices.count,
+        grossTotalCents: acc.invoices.grossTotalCents + r.invoices.grossTotalCents,
+        numbers: [...acc.invoices.numbers, ...r.invoices.numbers],
+      },
+      payments: { count: acc.payments.count + r.payments.count, totalCents: acc.payments.totalCents + r.payments.totalCents },
+      offers: { count: acc.offers.count + r.offers.count, numbers: [...acc.offers.numbers, ...r.offers.numbers] },
+      generatedDocuments: { count: acc.generatedDocuments.count + r.generatedDocuments.count },
+      financeDocuments: { count: acc.financeDocuments.count + r.financeDocuments.count },
+      portalDocuments: { count: acc.portalDocuments.count + r.portalDocuments.count },
+      storageObjects: { count: acc.storageObjects.count + r.storageObjects.count },
+    }), {
+      invoices: { count: 0, grossTotalCents: 0, numbers: [] },
+      payments: { count: 0, totalCents: 0 },
+      offers: { count: 0, numbers: [] },
+      generatedDocuments: { count: 0 }, financeDocuments: { count: 0 },
+      portalDocuments: { count: 0 }, storageObjects: { count: 0 },
+    });
+  }, [previews]);
 
   const phraseOk = phrase.trim() === FORCE_DELETE_PHRASE;
   const reasonOk = reason.trim().length >= 3;
@@ -1235,7 +1333,16 @@ export function ForceDeleteConfirmModal({
         ) : (
           <>
             {label ? <p className="mt-3 font-medium text-[var(--cq-fg)]">{label}</p> : null}
-            <p className="mt-3 font-medium text-[var(--cq-fg)]">Endgültig entfernt werden:</p>
+
+            {/*
+              The blast radius, in the terms the business uses — money and reference numbers —
+              ahead of the raw table/row list below it. This is what "understand the blast radius
+              before entering the confirmation phrase" means: a table name and a row count do not
+              let anyone judge what "3 rows in owner_invoices" costs.
+            */}
+            {blastRadius ? <BlastRadiusPanel blastRadius={blastRadius} /> : null}
+
+            <p className="mt-4 font-medium text-[var(--cq-fg)]">Endgültig entfernt werden (technische Ansicht):</p>
             <ul className="mt-1.5 space-y-1">
               {lines.map((line) => (
                 <li key={line.table} className="flex gap-2">

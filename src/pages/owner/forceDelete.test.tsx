@@ -121,6 +121,15 @@ const rpcImpl = async (fn: string, args: Record<string, unknown>): RpcReply => {
           resource_id: args.p_resource_id, found: true, label: PAID.invoice_number,
           summary: { label: PAID.invoice_number, status: 'paid' },
           manifest: { owner_invoices: 1, owner_payments: 2, _storage_objects: 1 },
+          blast_radius: {
+            invoices: { count: 1, gross_total_cents: 119000, numbers: [PAID.invoice_number] },
+            payments: { count: 2, total_cents: 50000 },
+            offers: { count: 0, numbers: [] },
+            generated_documents: { count: 1 },
+            finance_documents: { count: 0 },
+            portal_documents: { count: 0 },
+            storage_objects: { count: 1 },
+          },
         },
         error: null,
       };
@@ -288,6 +297,22 @@ describe('tier 2 — the emergency purge', () => {
       p_reason: 'Testdatensatz', p_confirmation: FORCE_DELETE_PHRASE,
     });
     expect(purgeCalls).toHaveLength(0);
+  });
+
+  it('states the blast radius in money and reference numbers, not just table names', async () => {
+    const user = userEvent.setup();
+    renderTrash();
+    await screen.findAllByText(/RE-2026-0100/);
+
+    const dialog = await clickFirst(user, 'Notfall-Löschung');
+    await within(dialog).findByText('1 × Rechnung');
+
+    // The invoice's gross total and its own number — what "1 × Rechnung" is actually worth,
+    // which is the number an owner needs to judge a blast radius before typing the phrase.
+    expect(within(dialog).getByText(/1\.190,00/)).toBeInTheDocument();
+    expect(within(dialog).getAllByText(PAID.invoice_number).length).toBeGreaterThan(0);
+    // Two payments, shown as a count and a total rather than folded into the invoice line.
+    expect(within(dialog).getByText(/^2 · /)).toBeInTheDocument();
   });
 
   it('reports a server refusal in the dialog and leaves the record alone', async () => {

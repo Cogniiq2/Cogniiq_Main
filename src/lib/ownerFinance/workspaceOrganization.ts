@@ -424,7 +424,43 @@ export interface ForceDeletePreview {
   summary: Record<string, unknown>;
   /** Table name -> number of rows that will cease to exist. */
   manifest: Record<string, number>;
+  /** The same tree in money and reference numbers, not table names. Never null when found. */
+  blastRadius: BlastRadius | null;
   reason: string | null;
+}
+
+/**
+ * What "destroy this" means in terms the business actually uses. Computed by
+ * owner_purge_blast_radius, which walks the exact same owner_purge_dependencies map the real
+ * destroyer does — this can never under-report what owner_purge_manifest also reports, because
+ * both read from the same source of truth.
+ */
+export interface BlastRadius {
+  invoices: { count: number; grossTotalCents: number; numbers: string[] };
+  payments: { count: number; totalCents: number };
+  offers: { count: number; numbers: string[] };
+  generatedDocuments: { count: number };
+  financeDocuments: { count: number };
+  portalDocuments: { count: number };
+  storageObjects: { count: number };
+}
+
+function toBlastRadius(raw: unknown): BlastRadius | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const r = raw as Record<string, { count?: number; total_cents?: number; gross_total_cents?: number; numbers?: string[] }>;
+  const n = (v: number | undefined) => v ?? 0;
+  return {
+    invoices: {
+      count: n(r.invoices?.count), grossTotalCents: n(r.invoices?.gross_total_cents),
+      numbers: r.invoices?.numbers ?? [],
+    },
+    payments: { count: n(r.payments?.count), totalCents: n(r.payments?.total_cents) },
+    offers: { count: n(r.offers?.count), numbers: r.offers?.numbers ?? [] },
+    generatedDocuments: { count: n(r.generated_documents?.count) },
+    financeDocuments: { count: n(r.finance_documents?.count) },
+    portalDocuments: { count: n(r.portal_documents?.count) },
+    storageObjects: { count: n(r.storage_objects?.count) },
+  };
 }
 
 /**
@@ -533,7 +569,7 @@ export async function loadForceDeletePreview(
   if (error) return { preview: null, error: error.message };
   const row = data as {
     resource_id?: string; found?: boolean; label?: string | null; reason?: string | null;
-    summary?: Record<string, unknown>; manifest?: Record<string, number>;
+    summary?: Record<string, unknown>; manifest?: Record<string, number>; blast_radius?: unknown;
   } | null;
   if (!row) return { preview: null, error: 'unknown' };
   return {
@@ -543,6 +579,7 @@ export async function loadForceDeletePreview(
       label: row.label ?? null,
       summary: row.summary ?? {},
       manifest: row.manifest ?? {},
+      blastRadius: toBlastRadius(row.blast_radius),
       reason: row.reason ?? null,
     },
     error: null,
