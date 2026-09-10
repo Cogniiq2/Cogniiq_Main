@@ -109,8 +109,6 @@ const HUMAN_CAPABILITIES = [
   { label: 'Gleichzeitige Anrufe', human: false, ki: true },
   { label: 'Kein Urlaub, keine Krankheit', human: false, ki: true },
   { label: 'Empathische Sonderfälle', human: true, ki: false },
-  { label: 'Kalender-/CRM-Integration', human: false, ki: true },
-  { label: 'Sofortige Bestätigung (SMS/Mail)', human: false, ki: true },
   { label: 'Auftragsverarbeitungsvertrag nach Art. 28 DSGVO', human: true, ki: true },
 ];
 
@@ -333,10 +331,9 @@ export function CostComparisonSection() {
                 </p>
                 {[
                   'Anrufannahme außerhalb der Öffnungszeiten — kein Besetztzeichen',
-                  'Automatische Terminbuchung',
-                  'Integration Kalender & CRM',
-                  'Sofortbestätigung per SMS oder Mail',
-                  'Mehrere Anrufe gleichzeitig, ohne Warteschleife',
+                  'Terminwunsch und Anliegen strukturiert aufgenommen',
+                  'Anbindung an Kalender oder Praxissystem wird vorab geprüft',
+                  'Bis zu 10 Anrufe gleichzeitig, ohne Warteschleife',
                   'Keine Gesprächsaufzeichnung — nur das strukturierte Ergebnis',
                   'Laufende Optimierung inklusive',
                 ].map((feature) => (

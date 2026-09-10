@@ -39,9 +39,9 @@ const callPreview = [
   { from: 'caller', text: 'Guten Tag, ich würde gerne einen Termin buchen.' },
   { from: 'ai', text: 'Guten Tag! Sehr gerne. Haben Sie einen bestimmten Tag im Kopf?' },
   { from: 'caller', text: 'Am besten Donnerstag Nachmittag.' },
-  { from: 'ai', text: 'Donnerstag, 14:30 Uhr wäre frei. Soll ich den Termin für Sie buchen?' },
-  { from: 'caller', text: 'Ja, perfekt.' },
-  { from: 'ai', text: 'Erledigt. Sie erhalten eine Bestätigungs-SMS. Bis Donnerstag!' },
+  { from: 'ai', text: 'Donnerstag Nachmittag notiere ich. Unter welcher Nummer erreicht Sie das Team für die Bestätigung?' },
+  { from: 'caller', text: '0921 123456.' },
+  { from: 'ai', text: 'Danke. Ihr Terminwunsch für Donnerstagnachmittag geht mit Ihrer Rückrufnummer an das Team.' },
 ];
 
 export function KiCTASection() {
@@ -236,7 +236,7 @@ export function KiCTASection() {
                   animate={{ opacity: [1, 0.3, 1] }}
                   transition={{ duration: 1.2, repeat: Infinity }}
                 />
-                Termin automatisch gebucht & bestätigt
+                Terminwunsch strukturiert an das Team übergeben
               </div>
             </motion.div>
 
