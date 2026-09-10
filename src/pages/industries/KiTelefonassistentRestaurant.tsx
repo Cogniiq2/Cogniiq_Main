@@ -5,7 +5,7 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 const config: NationalIndustryPageConfig = {
   seo: {
     title: "KI Telefonassistent für Restaurants | Automatische Tischreservierung | Cogniiq",
-    description: "KI Telefonassistent für Restaurants: Tischreservierungen entgegennehmen, bestätigen und erinnern – auch während des Service, abends und am Wochenende.",
+    description: "KI Telefonassistent für Restaurants: Tischreservierungen auch während des Service, abends und am Wochenende entgegennehmen und strukturiert an Ihr Team übergeben.",
     canonical: `${BUSINESS_INFO.website}/ki-telefonassistent-restaurant`,
     keywords: "KI Telefonassistent Restaurant, automatische Reservierung, KI Rezeptionistin Gastronomie, Telefonservice Restaurant",
   },
@@ -73,7 +73,7 @@ const config: NationalIndustryPageConfig = {
       {
         step: "03",
         title: "Bestätigen und den Tisch sichern",
-        description: "Der Gast erhält eine Buchungsbestätigung und einen Tag vorher eine Erinnerung mit Bestätigungslink. Nicht bestätigte Reservierungen werden erneut erinnert – so bleibt der Tisch planbar.",
+        description: "Bestätigung und Erinnerung mit Bestätigungslink richten wir als Teil Ihres Ablaufs ein — sie gehören nicht zum Standardumfang. Wo der Versandweg steht, wird nicht bestätigten Reservierungen erneut erinnert, damit der Tisch planbar bleibt.",
       },
     ],
   },

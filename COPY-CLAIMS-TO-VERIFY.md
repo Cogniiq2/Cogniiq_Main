@@ -65,10 +65,40 @@ Webdesign-Produkt und keine Aussage über eine PVS-Anbindung. Ebenso nicht die
 Link-Labels „Keine automatische Terminbuchung" (`RelatedPages.tsx:32`,
 `IndustryPage.tsx:723`) — sie benennen ein Kundenproblem, keine Zusage.
 
-**Inhaber-Entscheidung, die den Rest erst entscheidbar macht:** Kann der
-Assistent Termine in ein Kundensystem schreiben, und wenn ja unter welcher
-Bedingung — und versendet Cogniiq Bestätigungen per SMS oder E-Mail? Solange das
-offen ist, ist die einzige belegte Fassung die aus `FAKTEN.keineAnbindung`.
+**Inhaber-Entscheidung — beantwortet am 10.09.2026.** Die Frage, die den Rest
+erst entscheidbar machte, ist geklärt:
+
+- `BOOKING_WRITE` = **ONLY AFTER VERIFIED CUSTOMER INTEGRATION**
+- `SMS_EMAIL_CONFIRMATION` = **ONLY FOR SPECIFIC CUSTOMER WORKFLOWS**
+
+Wortlaut, Herleitung und die ausdrücklich **nicht** betroffenen Fälle stehen in
+`OWNER-INPUT.md` → „Nachtrag 10.09.2026". Kanonisch im Code:
+`FAKTEN.terminaufnahme` und `FAKTEN.bestaetigungen`.
+
+### Z25 · Abarbeitung am 10.09.2026 (Branch `claude/seo-gsc-growth-2026-09-10`)
+
+| Fundstelle | Route | Ergebnis |
+|---|---|---|
+| `publicRoutes.ts:606` „bucht Termine ins System" | `/ki-telefonassistent-arzt` | **DEFERRED — MEASUREMENT.** Eingefrorenes Experiment; unverändert. Mit dem Experimentende zu korrigieren |
+| `publicRoutes.ts:250` | `/bayern/ki-telefonassistent` | **REWRITE** → „erfasst Terminwünsche nach Ihren Regeln". Ändert das SERP-Snippet |
+| `publicRoutes.ts:614` „bestätigen und erinnern" | `/ki-telefonassistent-restaurant` | **REWRITE** → Snippet an den korrigierten Seitenkörper angeglichen. Neu erhoben, nicht Teil der ursprünglichen Liste |
+| `seo-data.ts:117` | Organisations-/Service-Schema | **REWRITE** → „erfasst Terminwünsche strukturiert" |
+| `KiTelefonassistentPage.tsx:756` | `/ki-telefonassistent` | **REWRITE** → „Nimmt Terminwünsche nach Ihren Regeln auf" |
+| `BayernKiTelefonassistentPage.tsx` (4 Stellen) | `/bayern/ki-telefonassistent` | **REWRITE** — alle vier |
+| `LeistungenPage.tsx` | `/leistungen` | **REWRITE.** Zusätzlich „Vollständige Synchronisation mit Kalender und CRM" entfernt — der stärkste Verstoß der Seite und in der ursprünglichen Liste nicht erfasst. Ebenso die unbelegten „48 Stunden" |
+| `UeberUnsPage.tsx` | `/ueber-uns` | **REWRITE**, inkl. „Synchronisation mit Kalender und CRM-Systemen" |
+| `problems/VerpassteAnrufePage.tsx:48` | `/verpasste-anrufe-verlust` | **REWRITE** |
+| `blog-data.ts:605` | Blogbeitrag verpasste Anrufe | **REWRITE** |
+| `KiTelefonassistentHotel.tsx` (3 Stellen) | `/ki-telefonassistent-hotel` | **REWRITE.** Neu erhoben. Die Seite versprach im Fließtext den Systemeintrag unbedingt („trägt sie in Ihr System ein", „Buchung direkt ins System"), während ihr eigenes FAQ die Schnittstellenprüfung korrekt beschrieb — ein Widerspruch auf derselben Seite |
+| `KiTelefonassistentRestaurant.tsx:76` | `/ki-telefonassistent-restaurant` | **REWRITE** — Bestätigung/Erinnerung als eingerichteter Ablauf, nicht als Standardumfang |
+| `SolutionShowcase.tsx:206` | geteilte Komponente | **REWRITE.** Neu erhoben. Der Demo-Dialog sagte eine SMS-Erinnerung als Selbstverständlichkeit zu |
+| `KiTelefonassistentDemoPage.tsx`, `BayernPage.tsx`, `DeutschlandPage.tsx` | – | **KEIN BEFUND MEHR** auf `main` @ `d9d4361`; durch PR #87 erledigt |
+| `industries/AutomatisierungRestaurant.tsx:51`, `standorte-service-configs.ts:203` | Automatisierungsprodukt | **KEEP.** Gegenstand dieses Produkts ist das Einrichten kundenspezifischer Abläufe — genau der von `SMS_EMAIL_CONFIRMATION` erlaubte Fall |
+| `KiTelefonassistentRestaurant.tsx:30` | `/ki-telefonassistent-restaurant` | **KEEP.** Beschreibt die Marktmechanik von Erinnerungssystemen, nicht eine Zusage von Cogniiq |
+| „Online-Terminbuchung" auf Webdesign-Seiten, Kontaktformular-Bestätigungsmails | Webdesign-Produkt | **KEEP** — unverändert kein Verstoß, siehe oben |
+
+Damit ist Z25 abgeschlossen, mit **einer** protokollierten Ausnahme:
+`/ki-telefonassistent-arzt`.
 
 **Stand 18.08.2026:** Z6, Z7, Z10 und Z11 sind bereinigt, Z12 teilweise —
 Einzelheiten in `MERGE-READINESS.md` §4a. Es galt: nur Entfernung unbelegter

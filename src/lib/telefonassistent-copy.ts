@@ -151,6 +151,34 @@ export const FAKTEN = {
   // Kein Pauschalversprechen und keine Pauschalabsage: beides wäre eine Aussage
   // über ein System, das wir noch nicht gesehen haben. Namen einzelner
   // Praxisverwaltungssysteme stehen hier bewusst nicht (OWNER-INPUT B3).
+  /*
+    Inhaber-Bestaetigung 10.09.2026 — BOOKING_WRITE: "ONLY AFTER VERIFIED
+    CUSTOMER INTEGRATION". Damit ist die Frage entschieden, die
+    COPY-CLAIMS-TO-VERIFY.md Z25 als blockierend gefuehrt hat: Der Assistent
+    darf NICHT als System beschrieben werden, das Termine allgemein oder
+    automatisch in ein Kunden-, Praxis- oder Kalendersystem schreibt. Diese
+    Faehigkeit darf nur dort beschrieben werden, wo die kundenspezifische
+    Anbindung technisch geprueft ist.
+
+    Der Umfang ist genau dieser. Er wird nicht erweitert. Was universell und
+    belegt gilt, ist die Aufnahme des Terminwunsches — nicht der Schreibvorgang.
+  */
+  terminaufnahme:
+    "Terminwünsche nimmt der Assistent nach Ihren Regeln auf: Er vergibt den Termin im vereinbarten Rahmen oder legt ihn Ihrem Team zur Bestätigung vor. Ob ein Termin zusätzlich direkt in Ihr Praxis- oder Kalendersystem geschrieben wird, hängt an dessen Schnittstelle — wir prüfen sie vor dem Angebot und richten die Übergabe erst ein, wenn sie für Ihr System nachweislich trägt.",
+
+  /*
+    Inhaber-Bestaetigung 10.09.2026 — SMS_EMAIL_CONFIRMATION: "ONLY FOR
+    SPECIFIC CUSTOMER WORKFLOWS". SMS- und E-Mail-Bestaetigungen sind also
+    keine Standardfunktion des Telefonassistenten. Oeffentliche Copy darf sie
+    nicht als fuer jeden Kunden enthalten darstellen.
+
+    Nicht hiervon beruehrt: Bestaetigungsmails eines Kontaktformulars auf einer
+    von Cogniiq gebauten WEBSITE. Das ist das Webdesign-Produkt und keine
+    Aussage ueber den Telefonassistenten (COPY-CLAIMS-TO-VERIFY.md Z25).
+  */
+  bestaetigungen:
+    "Bestätigungen und Erinnerungen per SMS oder E-Mail gehören nicht zum Standardumfang. Sie lassen sich als Teil eines für Sie eingerichteten Ablaufs umsetzen — was dafür nötig ist und was es kostet, steht vor dem Vertragsschluss im Angebot.",
+
   keineAnbindung:
     "Eine Standardanbindung, die auf jedes Praxisverwaltungssystem sofort passt, gibt es nicht — deshalb prüfen wir Ihr konkretes System vor dem Angebot: ob es eine geeignete Schnittstelle gibt, ob wir dafür Zugang oder eine Freigabe bekommen, welche Vorgänge sie zulässt und ob Dritte dafür Gebühren verlangen. Wo das trägt, übergeben wir Termine und Ergebnisse direkt in Ihr System. Wo es nicht trägt, steht das Ergebnis strukturiert im Cogniiq-Dashboard und wir legen den Übergabeweg vorher gemeinsam fest.",
 };

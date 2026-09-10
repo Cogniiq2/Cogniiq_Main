@@ -45,7 +45,7 @@ const config: ProblemPageConfig = {
   },
   solution: {
     headline: "Der KI Telefonassistent: Anrufe werden angenommen statt verpasst.",
-    text: "Ein KI Telefonassistent nimmt eingehende Anrufe sofort entgegen – auch zu Stoßzeiten und außerhalb regulärer Geschäftszeiten, ohne Warteschleife, ohne Personalaufwand. Er versteht Kundenanliegen, beantwortet Fragen und bucht Termine automatisch.",
+    text: "Ein KI Telefonassistent nimmt eingehende Anrufe sofort entgegen – auch zu Stoßzeiten und außerhalb regulärer Geschäftszeiten, ohne Warteschleife, ohne Personalaufwand. Er versteht Kundenanliegen, beantwortet Fragen und erfasst Terminwünsche nach Ihren Regeln.",
     bullets: [
       "Anrufe werden sofort und professionell entgegengenommen – auch zu Stoßzeiten",
       "Erreichbar auch abends, am Wochenende und an Feiertagen",

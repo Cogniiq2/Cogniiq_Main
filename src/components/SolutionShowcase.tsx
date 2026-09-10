@@ -203,7 +203,7 @@ const SCENARIOS: Scenario[] = [
       { role: 'caller', text: 'Gibt es noch Plätze im Yoga-Kurs am Dienstag?' },
       { role: 'ai', text: 'Hi! Der Yoga-Kurs Dienstag 18:00 Uhr hat noch 2 freie Plätze. Soll ich Sie direkt einbuchen?' },
       { role: 'caller', text: 'Ja bitte, für diese Woche und alle weiteren Dienstage.' },
-      { role: 'ai', text: 'Eingetragen — dauerhaft jeden Dienstag 18:00 Uhr. Sie erhalten immer montags eine Erinnerung per SMS.' },
+      { role: 'ai', text: 'Notiert — dauerhaft jeden Dienstag 18:00 Uhr. Auf Wunsch erinnern wir Sie montags über den Kanal, den Sie festlegen.' },
       { role: 'caller', text: 'Super, danke!' },
       { role: 'ai', text: 'Gern! Falls ein Kurs ausfällt, werden Sie sofort benachrichtigt und können alternativ buchen.' },
     ],

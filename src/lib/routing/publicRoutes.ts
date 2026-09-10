@@ -247,7 +247,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/bayern/ki-telefonassistent",
     title: "KI-Telefonassistent Bayern | AI-Rezeptionistin für bayerische Unternehmen – Cogniiq",
-    description: "Der KI-Telefonassistent für Unternehmen in Bayern: nimmt Anrufe an, bucht Termine, beantwortet Fragen – auch außerhalb regulärer Geschäftszeiten. Persönliche Einrichtung durch Cogniiq in Bayreuth.",
+    description: "Der KI-Telefonassistent für Unternehmen in Bayern: nimmt Anrufe an, erfasst Terminwünsche nach Ihren Regeln, beantwortet Fragen – auch außerhalb regulärer Geschäftszeiten. Persönliche Einrichtung durch Cogniiq in Bayreuth.",
     keywords: "KI Telefonassistent Bayern, AI Rezeptionistin Bayern, KI Telefon Bayern",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.82" },
@@ -611,7 +611,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/ki-telefonassistent-restaurant",
     title: "KI-Telefonassistent für Restaurants | Reservierungen automatisch annehmen – Cogniiq",
-    description: "KI Telefonassistent für Restaurants: Tischreservierungen entgegennehmen, bestätigen und erinnern – auch während des Service, abends und am Wochenende.",
+    description: "KI Telefonassistent für Restaurants: Tischreservierungen auch während des Service, abends und am Wochenende entgegennehmen und strukturiert an Ihr Team übergeben.",
     keywords: "KI Telefonassistent Restaurant, Reservierungen KI, AI Rezeptionistin Restaurant, Gastronomie Automatisierung",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.85" },
