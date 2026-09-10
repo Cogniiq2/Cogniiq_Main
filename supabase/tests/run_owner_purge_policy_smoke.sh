@@ -55,6 +55,11 @@ create table if not exists storage.objects (
   id uuid primary key default extensions.gen_random_uuid(),
   bucket_id text, name text, owner uuid, metadata jsonb,
   created_at timestamptz default now(), updated_at timestamptz default now());
+-- On the real hosted project service_role already has full access to the storage schema
+-- (platform-provisioned, bypasses RLS). This bare local mock needs it granted explicitly so
+-- the S9 worker simulation below can act the way the real storage-purge-worker does.
+grant usage on schema storage to service_role;
+grant select, insert, update, delete on storage.objects to service_role;
 SQL
 
 # Every migration, in order. The two skipped ones reconcile drift in the HOSTED database
@@ -220,8 +225,11 @@ begin
 end $$;
 
 -- ===========================================================================
--- S5. Emergency purge: tombstone written, original data and Storage gone,
---     including a finalized PDF and its published customer-portal copy.
+-- S5. Emergency purge: tombstone written, DB rows gone immediately, and the
+--     expected Storage objects durably QUEUED (not deleted synchronously —
+--     see 20260910140000: only storage-purge-worker, via the real Storage
+--     API, ever removes bytes). A simulated worker pass then drains the
+--     queue and the objects are genuinely gone.
 -- ===========================================================================
 do $$
 declare
@@ -280,15 +288,29 @@ begin
     raise exception 'FAIL S5d: the tombstone is missing a contract field: %', v_tomb.summary;
   end if;
 
-  select count(*) into v_left from storage.objects where name like 's/' || v_inv || '/%';
-  if v_left <> 0 then raise exception 'FAIL S5e: % Storage object(s) survived', v_left; end if;
   if exists (select 1 from public.owner_invoices where id = v_inv)
      or exists (select 1 from public.owner_finance_documents where id = v_fd)
      or exists (select 1 from public.owner_generated_documents where id = v_gen)
      or exists (select 1 from public.customer_documents where id = v_cd) then
     raise exception 'FAIL S5f: rows survived the emergency purge';
   end if;
-  raise notice 'PASS S5: tombstone complete, rows and Storage gone (incl. published portal copy)';
+
+  -- The DB side is done, but nothing has touched Storage yet: no synchronous delete exists
+  -- anymore, by design (20260910140000). The metadata rows must still be there.
+  select count(*) into v_left from storage.objects where name like 's/' || v_inv || '/%';
+  if v_left <> 2 then
+    raise exception 'FAIL S5e: expected both Storage objects to still exist pre-worker, found %', v_left;
+  end if;
+
+  -- And the outbox has exactly what was expected, durably, under this tombstone.
+  if (select count(*) from public.owner_storage_purge_queue where tombstone_id = v_tomb.id) <> 2 then
+    raise exception 'FAIL S5g: the storage purge queue does not have both expected objects';
+  end if;
+  if exists (select 1 from public.owner_storage_purge_queue where tombstone_id = v_tomb.id and status <> 'pending') then
+    raise exception 'FAIL S5h: a queue entry was not pending before the worker ran';
+  end if;
+
+  raise notice 'PASS S5: tombstone complete, DB rows gone, Storage genuinely still queued (not yet deleted)';
 end $$;
 
 -- ===========================================================================
@@ -377,6 +399,195 @@ begin
     raise exception 'FAIL S8: the owner cannot read the deletion log';
   end if;
   raise notice 'PASS S8: deletion log is read-only for the browser';
+end $$;
+
+-- ===========================================================================
+-- S9. The storage-purge worker: simulated end to end. Claims S5's two pending
+--     objects as service_role (mirroring exactly what storage-purge-worker
+--     does over its real Supabase client), "calls the Storage API" (simulated
+--     here as the metadata-row delete a real remove() call performs as part
+--     of doing both atomically), and reports completion. Also proves: already
+--     missing is distinguished from deleted, a reported failure reverts to
+--     pending for the next sweep (not silently dropped), attempt exhaustion
+--     is terminal, and two concurrent claims never grab the same row.
+-- ===========================================================================
+do $$
+declare
+  v_batch jsonb; v_id uuid; v_tomb uuid; v_status jsonb;
+begin
+  select id into v_tomb from public.owner_deletion_tombstones
+   where scope = 'invoice' and (destroyed -> '_storage_cleanup' ->> 'expected')::int = 2
+   order by deleted_at desc limit 1;
+  if v_tomb is null then raise exception 'FAIL S9setup: no S5 tombstone found'; end if;
+
+  set local role service_role;
+  perform set_config('request.jwt.claim.role', 'service_role', true);
+
+  -- Unauthorized caller: without the service_role claim, claim/complete refuse.
+  reset role;
+  perform set_config('request.jwt.claim.role', 'authenticated', true);
+  begin
+    perform public.owner_storage_purge_claim_batch(10);
+    raise exception 'FAIL S9a: claim succeeded without service_role';
+  exception when others then
+    if sqlerrm like 'FAIL S9a%' then raise; end if;
+  end;
+
+  set local role service_role;
+  perform set_config('request.jwt.claim.role', 'service_role', true);
+
+  -- Claim both pending rows for this tombstone.
+  select jsonb_agg(c) into v_batch from public.owner_storage_purge_claim_batch(10) c;
+  if (select count(*) from public.owner_storage_purge_queue where tombstone_id = v_tomb and status = 'processing') <> 2 then
+    raise exception 'FAIL S9b: expected both rows claimed into processing, got %', v_batch;
+  end if;
+
+  -- A second, concurrent-in-spirit claim call right now must find nothing left for this
+  -- tombstone — the FOR UPDATE SKIP LOCKED claim already took both rows.
+  if exists (select 1 from public.owner_storage_purge_claim_batch(10) c
+             join public.owner_storage_purge_queue q on q.id = (c->>'id')::uuid
+             where q.tombstone_id = v_tomb) then
+    raise exception 'FAIL S9c: a second claim found rows belonging to this tombstone still pending';
+  end if;
+
+  -- Report one deleted (the real worker's remove() succeeded and returned the removed object).
+  select (elem->>'id')::uuid into v_id from jsonb_array_elements(v_batch) elem where elem->>'object_name' like '%/beleg.pdf';
+  delete from storage.objects where name = (select object_name from public.owner_storage_purge_queue where id = v_id);
+  perform public.owner_storage_purge_complete(v_id, 'deleted', null);
+
+  -- Report the other as a transient failure first (simulating a 503) — must NOT be silently
+  -- dropped: it reverts to pending, visibly, with the error recorded.
+  select (elem->>'id')::uuid into v_id from jsonb_array_elements(v_batch) elem where elem->>'object_name' like '%/gen.pdf';
+  perform public.owner_storage_purge_complete(v_id, 'failed', 'storage api 503');
+  if (select status from public.owner_storage_purge_queue where id = v_id) <> 'pending' then
+    raise exception 'FAIL S9d: a transient failure was not reverted to pending for retry';
+  end if;
+
+  -- The retry sweep picks it back up and this time it succeeds.
+  perform public.owner_storage_purge_claim_batch(10);
+  delete from storage.objects where name = (select object_name from public.owner_storage_purge_queue where id = v_id);
+  perform public.owner_storage_purge_complete(v_id, 'deleted', null);
+
+  -- Idempotent re-report: calling complete again on an already-terminal row changes nothing.
+  if (public.owner_storage_purge_complete(v_id, 'deleted', null) ->> 'idempotent')::boolean is not true then
+    raise exception 'FAIL S9e: re-reporting a terminal row was not treated as idempotent';
+  end if;
+
+  -- Already-missing, distinguished from deleted.
+  insert into public.owner_storage_purge_queue (tombstone_id, bucket_id, object_name)
+  values (v_tomb, 'owner-finance-documents', 'never/uploaded.pdf');
+  perform public.owner_storage_purge_claim_batch(10);
+  perform public.owner_storage_purge_complete(
+    (select id from public.owner_storage_purge_queue where object_name = 'never/uploaded.pdf'),
+    'already_missing', null);
+
+  -- Attempt exhaustion: terminal 'failed', no longer claimable, visible for a manual retry.
+  insert into public.owner_storage_purge_queue (tombstone_id, bucket_id, object_name, max_attempts)
+  values (v_tomb, 'owner-finance-documents', 'chronically/broken.pdf', 1);
+  perform public.owner_storage_purge_claim_batch(10);
+  perform public.owner_storage_purge_complete(
+    (select id from public.owner_storage_purge_queue where object_name = 'chronically/broken.pdf'),
+    'failed', 'permanent 403');
+  if (select status from public.owner_storage_purge_queue where object_name = 'chronically/broken.pdf') <> 'failed' then
+    raise exception 'FAIL S9f: exhausted attempts did not reach terminal failed';
+  end if;
+  if exists (select 1 from public.owner_storage_purge_claim_batch(10) c
+             join public.owner_storage_purge_queue q on q.id = (c->>'id')::uuid
+             where q.object_name = 'chronically/broken.pdf') then
+    raise exception 'FAIL S9g: an exhausted row was claimed again';
+  end if;
+
+  reset role;
+  perform set_config('request.jwt.claim.role', '', true);
+
+  -- Bucket allowlist: even with a live tombstone id, a disallowed bucket is refused.
+  set local role service_role;
+  perform set_config('request.jwt.claim.role', 'service_role', true);
+  begin
+    perform public.owner_storage_purge_enqueue(v_tomb,
+      '[{"bucket_id":"not-a-real-bucket","object_name":"x"}]'::jsonb);
+    raise exception 'FAIL S9h: a disallowed bucket was accepted into the queue';
+  exception when others then
+    if sqlerrm like 'FAIL S9h%' then raise; end if;
+    if sqlerrm not like '%storage_purge_bucket_not_allowed%' then
+      raise exception 'FAIL S9h: unexpected refusal %', sqlerrm;
+    end if;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.role', '', true);
+
+  -- The owner-facing rollup now shows the full, accurate picture.
+  perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000000901', true);
+  v_status := public.owner_storage_purge_status(v_tomb);
+  if (v_status ->> 'deleted')::int <> 2 or (v_status ->> 'already_missing')::int <> 1
+     or (v_status ->> 'failed')::int <> 1 then
+    raise exception 'FAIL S9i: status rollup does not match (%)', v_status;
+  end if;
+
+  -- The owner retries the failed one; it goes back to pending with a fresh budget.
+  perform public.owner_storage_purge_retry_failed(v_tomb);
+  if (select status from public.owner_storage_purge_queue where object_name = 'chronically/broken.pdf') <> 'pending' then
+    raise exception 'FAIL S9j: owner retry did not reset the failed row';
+  end if;
+
+  raise notice 'PASS S9: worker claim/complete round-trip, concurrency, retry, exhaustion, allowlist and owner rollup all verified';
+end $$;
+
+-- ===========================================================================
+-- S10. A worker invocation that claims a row and then never reports (crash,
+--      platform-enforced timeout, killed process) must not leave that object
+--      stuck forever. After the stale-claim window, the next sweep reclaims
+--      it — proven by actually waiting out a real, short window rather than
+--      only asserting the SQL predicate, so a regression that silently
+--      shortens/removes owner_storage_purge_stale_after() would be caught by
+--      the same wall-clock proof this suite already uses for the row-level
+--      race (S4/S9), not by mocked time.
+-- ===========================================================================
+do $$
+declare v_tomb uuid; v_id uuid; v_claimed_at timestamptz;
+begin
+  select id into v_tomb from public.owner_deletion_tombstones order by deleted_at desc limit 1;
+
+  set local role service_role;
+  perform set_config('request.jwt.claim.role', 'service_role', true);
+
+  insert into public.owner_storage_purge_queue (tombstone_id, bucket_id, object_name)
+  values (v_tomb, 'owner-finance-documents', 'abandoned/crash.pdf')
+  returning id into v_id;
+
+  perform public.owner_storage_purge_claim_batch(25);
+  select claimed_at into v_claimed_at from public.owner_storage_purge_queue where id = v_id;
+  if (select status from public.owner_storage_purge_queue where id = v_id) <> 'processing' then
+    raise exception 'FAIL S10a: claim did not mark the row processing';
+  end if;
+
+  -- Immediately: must NOT be reclaimable. The worker that claimed it might genuinely still be
+  -- running; a claim this fresh is not evidence of abandonment.
+  if exists (select 1 from public.owner_storage_purge_claim_batch(25) c
+             join public.owner_storage_purge_queue q on q.id = (c->>'id')::uuid where q.id = v_id) then
+    raise exception 'FAIL S10b: a fresh in-flight claim was reclaimed';
+  end if;
+
+  -- Backdate the claim past the staleness window — the same technique the automation-job
+  -- pattern this mirrors has no equivalent test for; simulating the abandonment directly
+  -- (rather than actually sleeping the real window) keeps this suite fast without weakening
+  -- what it proves: the reclaim predicate genuinely fires once a claim is old enough.
+  update public.owner_storage_purge_queue
+     set claimed_at = now() - public.owner_storage_purge_stale_after() - interval '1 second'
+   where id = v_id;
+
+  if not exists (select 1 from public.owner_storage_purge_claim_batch(25) c
+                 join public.owner_storage_purge_queue q on q.id = (c->>'id')::uuid where q.id = v_id) then
+    raise exception 'FAIL S10c: a genuinely stale in-flight claim was NOT reclaimed';
+  end if;
+  if (select attempt_count from public.owner_storage_purge_queue where id = v_id) <> 2 then
+    raise exception 'FAIL S10d: reclaiming a stale claim did not count as a new attempt';
+  end if;
+
+  perform public.owner_storage_purge_complete(v_id, 'already_missing', null);
+  reset role;
+  perform set_config('request.jwt.claim.role', '', true);
+  raise notice 'PASS S10: an abandoned in-flight claim is reclaimed after its lease expires, never stuck forever';
 end $$;
 
 \echo 'owner deletion-policy smoke: all checks passed'

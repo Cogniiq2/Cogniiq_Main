@@ -310,7 +310,7 @@ describe('tier 2 — the emergency purge', () => {
     // The invoice's gross total and its own number — what "1 × Rechnung" is actually worth,
     // which is the number an owner needs to judge a blast radius before typing the phrase.
     expect(within(dialog).getByText(/1\.190,00/)).toBeInTheDocument();
-    expect(within(dialog).getAllByText(PAID.invoice_number).length).toBeGreaterThan(0);
+    expect(within(dialog).getAllByText(PAID.invoice_number as string).length).toBeGreaterThan(0);
     // Two payments, shown as a count and a total rather than folded into the invoice line.
     expect(within(dialog).getByText(/^2 · /)).toBeInTheDocument();
   });

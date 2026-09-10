@@ -132,7 +132,9 @@ export type DeleteAction =
   | 'archive_and_trash'
   | 'trash_only'
   | 'blocked'
-  /** Only ever returned by the force purge — never by the ordinary preflight. */
+  /** Only ever returned by the tier-1 Papierkorb purge (owner_workspace_purge_items). */
+  | 'purge'
+  /** Only ever returned by the tier-2 emergency purge — never by the ordinary preflight. */
   | 'force_delete';
 
 export interface DeletePlan {
@@ -828,4 +830,77 @@ export function purgeResultToast(
       ? `${failed} ${failed === 1 ? 'Datensatz wurde' : 'Datensätze wurden'} als buchhaltungsrelevant beibehalten.`
       : undefined,
   };
+}
+
+/* ================================================================ storage purge status
+ *
+ * Real Storage-byte deletion is asynchronous by design (20260910140000_owner_storage_purge_
+ * worker.sql): the purge RPCs write a durable outbox row in the same transaction as the DB
+ * destruction, and storage-purge-worker — a separate Edge Function, invoked every minute,
+ * holding the service-role key — is the only thing that ever calls the real Storage API to
+ * remove bytes. Neither the purge RPC's own return value nor this module's earlier
+ * `_storage_cleanup` reporting can claim Storage is DONE synchronously; this is the queryable
+ * live status for a purge whose tombstone id you have.
+ */
+
+export interface StoragePurgeObjectStatus {
+  bucketId: string;
+  objectName: string;
+  status: 'pending' | 'processing' | 'deleted' | 'already_missing' | 'failed';
+  attemptCount: number;
+  lastError: string | null;
+}
+
+export interface StoragePurgeStatus {
+  expected: number;
+  deleted: number;
+  alreadyMissing: number;
+  failed: number;
+  pending: number;
+  /** True once every expected object is `deleted` or `already_missing` — never while any is `failed`. */
+  allResolved: boolean;
+  objects: StoragePurgeObjectStatus[];
+}
+
+/** The live rollup for one tombstone's Storage cleanup: what the worker has actually done so far. */
+export async function loadStoragePurgeStatus(
+  tombstoneId: string,
+): Promise<{ status: StoragePurgeStatus | null; error: string | null }> {
+  const { data, error } = await supabase.rpc('owner_storage_purge_status', { p_tombstone_id: tombstoneId });
+  if (error) return { status: null, error: error.message };
+  const row = data as {
+    expected?: number; deleted?: number; already_missing?: number; failed?: number; pending?: number;
+    all_resolved?: boolean;
+    objects?: { bucket_id: string; object_name: string; status: string; attempt_count: number; last_error: string | null }[];
+  } | null;
+  if (!row) return { status: null, error: 'unknown' };
+  return {
+    status: {
+      expected: row.expected ?? 0,
+      deleted: row.deleted ?? 0,
+      alreadyMissing: row.already_missing ?? 0,
+      failed: row.failed ?? 0,
+      pending: row.pending ?? 0,
+      allResolved: Boolean(row.all_resolved),
+      objects: (row.objects ?? []).map((o) => ({
+        bucketId: o.bucket_id, objectName: o.object_name,
+        status: o.status as StoragePurgeObjectStatus['status'],
+        attemptCount: o.attempt_count, lastError: o.last_error,
+      })),
+    },
+    error: null,
+  };
+}
+
+/**
+ * Forces an immediate retry of every entry stuck at `failed` for one tombstone — resetting each
+ * back to `pending` with a fresh attempt budget, so the next worker sweep (within a minute)
+ * picks it straight back up. Returns how many entries were reset.
+ */
+export async function retryStoragePurge(
+  tombstoneId: string,
+): Promise<{ retried: number; error: string | null }> {
+  const { data, error } = await supabase.rpc('owner_storage_purge_retry_failed', { p_tombstone_id: tombstoneId });
+  if (error) return { retried: 0, error: error.message };
+  return { retried: typeof data === 'number' ? data : 0, error: null };
 }
