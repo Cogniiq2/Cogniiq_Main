@@ -105,7 +105,7 @@ function MiniSlider({ label, hint, tooltip, value, min, max, step, unit, onChang
 
 const HUMAN_CAPABILITIES = [
   { label: 'Anrufe annehmen', human: true, ki: true },
-  { label: 'Terminbuchung außerhalb der Öffnungszeiten', human: false, ki: true },
+  { label: 'Terminwünsche außerhalb der Öffnungszeiten aufnehmen', human: false, ki: true },
   { label: 'Gleichzeitige Anrufe', human: false, ki: true },
   { label: 'Kein Urlaub, keine Krankheit', human: false, ki: true },
   { label: 'Empathische Sonderfälle', human: true, ki: false },
@@ -333,7 +333,7 @@ export function CostComparisonSection() {
                   'Anrufannahme außerhalb der Öffnungszeiten — kein Besetztzeichen',
                   'Terminwunsch und Anliegen strukturiert aufgenommen',
                   'Anbindung an Kalender oder Praxissystem wird vorab geprüft',
-                  'Bis zu 10 Anrufe gleichzeitig, ohne Warteschleife',
+                  'Zehn Anrufe gleichzeitig, ohne Warteschleife',
                   'Keine Gesprächsaufzeichnung — nur das strukturierte Ergebnis',
                   'Laufende Optimierung inklusive',
                 ].map((feature) => (

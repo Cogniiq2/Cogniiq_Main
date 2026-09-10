@@ -678,7 +678,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "No-Show-Prävention durch automatische Erinnerungen",
         content:
-          "No-Shows kosten Restaurants bares Geld. Der KI-Assistent sendet automatisch 24 Stunden vor der Reservierung eine Erinnerung per SMS oder WhatsApp und ermöglicht die einfache Stornierung – Erinnerungen am Vortag wirken No-Shows entgegen.",
+          "No-Shows kosten Restaurants bares Geld. Eine Erinnerung vor der Reservierung samt einfacher Stornierung lässt sich als Ablauf einrichten; auf welchem Weg sie den Gast erreicht, hängt an den Systemen des Betriebs und wird vor dem Angebot geprüft.",
       },
       {
         type: "table",

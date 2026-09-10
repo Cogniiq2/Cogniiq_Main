@@ -47,13 +47,13 @@ const config: IndustryPageConfig = {
       icon: "phone",
       title: "KI-Telefonassistent für Münchner Praxen",
       description:
-        "Der KI-Telefonassistent nimmt Patientenanrufe automatisch an, beantwortet Fragen zu Öffnungszeiten, Fachrichtungen und Formalitäten, bucht Termine direkt ins System ein und leitet komplexe Anliegen strukturiert an Ihr Team weiter – auch außerhalb der Sprechzeiten, ohne Warteschleife, auch bei hohem Anrufaufkommen.",
+        "Der KI-Telefonassistent nimmt Patientenanrufe entgegen, beantwortet Fragen zu Öffnungszeiten, Fachrichtungen und Formalitäten, erfasst Terminwünsche mit Name und Rückrufnummer und leitet komplexe Anliegen strukturiert an Ihr Team weiter – auch außerhalb der Sprechzeiten, ohne Warteschleife. Ob Termine direkt in Ihr Praxisverwaltungssystem übergeben werden können, prüfen wir vor dem Angebot.",
     },
     {
       icon: "zap",
       title: "Praxis-Automatisierung München",
       description:
-        "Terminbestätigungen, Erinnerungs-SMS, Recall-Kampagnen und Patientenkommunikation laufen automatisiert ab. Besonders in großstädtischen Praxen mit hohem Durchsatz reduziert das den administrativen Aufwand, und Erinnerungen wirken No-Shows entgegen.",
+        "Terminbestätigungen, Erinnerungen, Recall und Patientenkommunikation lassen sich als Abläufe einrichten, statt sie von Hand zu erledigen. Welche davon möglich sind, hängt an den Systemen Ihrer Praxis – das prüfen wir vor dem Angebot und sagen keinen Versandweg zu, den wir dort nicht gesehen haben.",
     },
   ],
   useCases: [
@@ -65,7 +65,7 @@ const config: IndustryPageConfig = {
     {
       title: "Automatische Terminerinnerungen",
       description:
-        "Patienten erhalten kurz vor dem Termin automatisch eine Erinnerung per SMS oder E-Mail. Erinnerungen wirken No-Shows entgegen – gerade in gut ausgelasteten Münchner Praxen ein spürbarer Effizienzgewinn.",
+        "Eine Erinnerung kurz vor dem Termin lässt sich als Ablauf einrichten. Auf welchem Weg sie Ihre Patienten erreicht, hängt an Ihren Systemen und steht nach der Prüfung im Angebot.",
     },
     {
       title: "Rezeption entlasten bei Stoßzeiten",

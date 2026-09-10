@@ -43,7 +43,7 @@ const services = [
     number: '02',
     title: 'KI-Telefonassistent',
     description:
-      'Nimmt Anrufe entgegen, wenn Ihr Team gebunden ist – bucht Termine nach Ihren Regeln und beantwortet Fragen in natürlicher Sprache, auch außerhalb der Öffnungszeiten.',
+      'Nimmt Anrufe entgegen, wenn Ihr Team gebunden ist – erfasst Terminwünsche nach Ihren Regeln und beantwortet Fragen in natürlicher Sprache, auch außerhalb der Öffnungszeiten.',
     icon: PhoneCall,
     link: '/ki-telefonassistent',
     cityLinks: [

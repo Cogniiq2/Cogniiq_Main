@@ -71,7 +71,7 @@ const SCENARIOS: Scenario[] = [
       points: [
         'Anrufe werden angenommen, wenn die Anmeldung gebunden ist — auch außerhalb der Öffnungszeiten',
         'Terminwunsch mit Name und Rückrufnummer strukturiert aufgenommen',
-        'Ergebnis geht an das Praxisteam — im Dashboard oder, wo die Prüfung das trägt, in Ihr System',
+        'Ergebnis geht strukturiert an das Praxisteam, im Dashboard oder in Ihrem System',
         'Rezeptionistin konzentriert sich auf Patienten',
         'Angenommene Gespräche protokolliert & nachvollziehbar',
       ],
@@ -84,7 +84,9 @@ const SCENARIOS: Scenario[] = [
       { role: 'caller', text: 'Allgemeinmedizin bitte, möglichst diese Woche.' },
       { role: 'ai', text: 'Kein Problem. Für die Allgemeinsprechstunde nimmt die Anmeldung Wunschzeiten entgegen — passt Ihnen Donnerstagvormittag oder Freitagnachmittag besser?' },
       { role: 'caller', text: 'Donnerstagvormittag passt gut.' },
-      { role: 'ai', text: 'Donnerstagvormittag notiere ich mit Ihrer Rückrufnummer für die Anmeldung. Noch etwas, wobei ich helfen kann?' },
+      { role: 'ai', text: 'Donnerstagvormittag notiere ich. Unter welcher Nummer erreicht Sie die Anmeldung für die Bestätigung?' },
+      { role: 'caller', text: '0151 2345678.' },
+      { role: 'ai', text: 'Danke. Ihr Terminwunsch geht mit Ihrer Rückrufnummer an die Anmeldung. Noch etwas, wobei ich helfen kann?' },
     ],
   },
   {
@@ -96,12 +98,12 @@ const SCENARIOS: Scenario[] = [
       points: [
         'Service nimmt Telefon an — Gäste warten',
         'Reservierungen landen auf Zetteln & gehen verloren',
-        'Keine Erinnerungen → hohe No-Show-Rate',
+        'Nach Feierabend nimmt niemand Reservierungen entgegen',
         'Abends & sonntags ist niemand erreichbar',
         'Stammgäste genervt, wechseln zur Konkurrenz',
       ],
-      stat: 'Spürbar',
-      statLabel: 'mehr No-Shows ohne Erinnerungssystem',
+      stat: 'Abends zu',
+      statLabel: 'niemand nimmt Reservierungen an, wenn der Service läuft',
     },
     solution: {
       service: 'KI Telefonassistent',
@@ -110,7 +112,7 @@ const SCENARIOS: Scenario[] = [
       points: [
         'Reservierungen auch außerhalb der Öffnungszeiten entgegennehmen',
         'Reservierungswunsch mit Personenzahl und Rückrufnummer strukturiert aufgenommen',
-        'Auch bei mehreren Anrufen gleichzeitig — bis zu zehn, ohne Warteschleife',
+        'Zehn Anrufe gleichzeitig, ohne Warteschleife',
         'Service-Team fokussiert auf Gäste vor Ort',
         'Jede Reservierung strukturiert dokumentiert — kein Zettel geht verloren',
       ],
@@ -119,11 +121,13 @@ const SCENARIOS: Scenario[] = [
     },
     chat: [
       { role: 'caller', text: 'Guten Abend, kann ich für Samstag einen Tisch reservieren?' },
-      { role: 'ai', text: 'Guten Abend, herzlich willkommen! Für wie viele Personen darf ich reservieren?' },
+      { role: 'ai', text: 'Guten Abend, herzlich willkommen! Für wie viele Personen darf ich den Wunsch notieren?' },
       { role: 'caller', text: 'Für 4 Personen, am liebsten 19:30 Uhr.' },
-      { role: 'ai', text: 'Samstag 19:30\u00A0Uhr für 4 Personen notiere ich als Wunsch. Haben Sie besondere Wünsche — Fenstertisch oder Allergieinformationen?' },
+      { role: 'ai', text: 'Samstag 19:30 Uhr für 4 Personen notiere ich als Wunsch. Haben Sie besondere Wünsche — Fenstertisch oder Allergieinformationen?' },
       { role: 'caller', text: 'Einen Fenstertisch wäre toll.' },
-      { role: 'ai', text: 'Fenstertisch ist notiert. Unter welcher Nummer erreicht Sie das Team, falls es zur Reservierung eine Rückfrage gibt?' },
+      { role: 'ai', text: 'Fenstertisch ist notiert. Unter welcher Nummer erreicht Sie das Team für die Bestätigung?' },
+      { role: 'caller', text: '0151 2345678.' },
+      { role: 'ai', text: 'Danke. Ihr Reservierungswunsch geht mit allen Angaben an den Service. Einen schönen Abend!' },
     ],
   },
   {

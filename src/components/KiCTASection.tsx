@@ -39,8 +39,8 @@ const callPreview = [
   { from: 'caller', text: 'Guten Tag, ich würde gerne einen Termin buchen.' },
   { from: 'ai', text: 'Guten Tag! Sehr gerne. Haben Sie einen bestimmten Tag im Kopf?' },
   { from: 'caller', text: 'Am besten Donnerstag Nachmittag.' },
-  { from: 'ai', text: 'Donnerstag Nachmittag notiere ich. Unter welcher Nummer erreicht Sie das Team für die Bestätigung?' },
-  { from: 'caller', text: '0921 123456.' },
+  { from: 'ai', text: 'Donnerstagnachmittag notiere ich. Unter welcher Nummer erreicht Sie das Team für die Bestätigung?' },
+  { from: 'caller', text: '0151 2345678.' },
   { from: 'ai', text: 'Danke. Ihr Terminwunsch für Donnerstagnachmittag geht mit Ihrer Rückrufnummer an das Team.' },
 ];
 
@@ -101,13 +101,13 @@ export function KiCTASection() {
               >
                 Erreichbar, wenn niemand frei ist.
                 <br />
-                <span className="text-gray-500">Termine gebucht, Anliegen erfasst.</span>
+                <span className="text-gray-500">Terminwünsche notiert, Anliegen erfasst.</span>
               </h2>
 
               <p className="text-[14.5px] text-gray-400 leading-[1.72] max-w-[420px] mb-7">
                 Anrufe kommen, wenn Ihr Team gebunden ist — und landen im Besetztzeichen.
-                Der KI-Telefonassistent nimmt diese Anrufe an, bucht Termine nach Ihren
-                Regeln und übergibt Anliegen strukturiert an Ihr Team.
+                Der KI-Telefonassistent nimmt diese Anrufe an, erfasst Terminwünsche nach
+                Ihren Regeln und übergibt sie strukturiert an Ihr Team.
               </p>
 
               {/* Trust checkmarks */}
