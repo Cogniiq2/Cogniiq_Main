@@ -99,6 +99,137 @@ Nach dem Experiment zu prüfen — alles **Claim-Hygiene**, kein SEO-Gewinn:
 
 ---
 
+# GSC-Befunde 10.09.2026 zu eingefrorenen Routen
+
+Quelle: die beiden Search-Console-Exporte vom 2026-09-10 (3 Monate
+2026-06-09–2026-09-08, 28 Tage 2026-08-12–2026-09-08). Aggregatwerte, kein
+Query×Seite-Beleg. Alles hier ist **HIGH-EV — DEFERRED UNTIL EXPERIMENT END**
+und wurde nicht angefasst.
+
+## Seiten-Aggregate der sechs eingefrorenen Routen
+
+| Route | 3M Impr. | 3M Pos. | 28D Impr. | 28D Pos. | Klicks 3M |
+|---|---:|---:|---:|---:|---:|
+| `/regensburg/webdesign` | 4.519 | 54,5 | 2.347 | 51,4 | 0 |
+| `/bayreuth/webdesign` | 1.858 | 51,1 | 853 | 52,0 | 0 |
+| `/ki-telefonassistent-arzt` | 1.258 | 40,1 | 543 | 31,7 | 0 |
+| `/kosten-ki-telefonassistent` | 802 | 29,6 | 364 | 31,2 | 0 |
+| `/muenchen/webdesign-kosten` | 420 | 34,6 | 268 | 37,2 | 0 |
+| `/regensburg/website-relaunch` | 364 | 12,3 | 358 | 12,2 | 1 |
+| `/bayreuth/website-relaunch` | 139 | 14,7 | 131 | 14,4 | 0 |
+
+`/regensburg/webdesign` steht in `PROTECTED_EXPERIMENT_PATHS` nicht — nur
+`/regensburg/website-relaunch` tut das. Die Zeile steht hier trotzdem, weil sie
+für die Einordnung der übrigen Regensburg-Zahlen gebraucht wird.
+
+## Die größte eingefrorene Chance: das Telefonassistent-Arzt-Cluster
+
+Die Query-Familie rund um den KI-Telefonassistenten für Praxen ist die
+volumenstärkste **kommerzielle** Nicht-Marken-Familie der Domain und liegt
+positionsmäßig deutlich näher an der ersten Seite als die Webdesign-Familien:
+
+| Query | 3M Impr. | 3M Pos. | 28D Impr. | 28D Pos. |
+|---|---:|---:|---:|---:|
+| ki telefonassistent arztpraxis | 342 | 38,8 | 148 | 33,1 |
+| telefonassistent arztpraxis | 316 | 39,4 | 147 | 31,6 |
+| ki telefonassistent kosten | 302 | 30,2 | 151 | 34,3 |
+| ki-telefonassistent kosten | 165 | 29,6 | 75 | 33,4 |
+| telefonassistent praxis | 150 | 40,0 | 58 | 31,2 |
+| telefonassistent arzt | 147 | 34,2 | 54 | 26,8 |
+| was kostet ein ki-telefonassistent? | 77 | 28,7 | 32 | 33,6 |
+| ki telefonassistent praxis | 64 | 40,8 | 19 | 33,7 |
+| ki-telefonassistent arztpraxis | 58 | 38,6 | 32 | 32,6 |
+
+Zusammen rund 1.000 Impressionen in 28 Tagen. Die beiden Seiten, die diese
+Intention plausibel besitzen — `/ki-telefonassistent-arzt` und
+`/kosten-ki-telefonassistent` — sind **beide eingefroren**. Das ist der
+Kernbefund dieses Laufs: Die attraktivste Query-Familie der Domain ist genau
+die, an der derzeit nicht gearbeitet werden darf.
+
+Die Positionen verbessern sich im 28-Tage-Fenster gegenüber dem 3-Monats-Schnitt
+(z. B. 38,8 → 33,1) — die Seiten bewegen sich also ohne Zutun. Das ist ein
+zusätzlicher Grund, den Freeze auszuhalten statt ihn abzukürzen: Eine Änderung
+jetzt wäre von dieser laufenden Bewegung nicht mehr zu trennen.
+
+**Nach dem Experiment zuerst:** die Besitzfrage aus dem Abschnitt
+`/ki-telefonassistent-arzt` oben entscheiden (diese Route vs. `/praxen` vs.
+`/ki-telefonassistent-praxis`) — und erst danach am Text arbeiten. Auffällig:
+`/ki-telefonassistent-praxis` fällt von 514 Impressionen (3M) auf **1** (28D),
+während `/ki-telefonassistent-arzt` im selben Zeitraum stabil bleibt. Das ist
+mit Aggregaten nicht beweisbar, passt aber zu dem Bild, dass Google die
+Besitzfrage gerade selbst entscheidet.
+
+## Faktische Altlast auf einer eingefrorenen Route
+
+Die Description von `/ki-telefonassistent-arzt` im Routen-Manifest sagt „bucht
+Termine ins System". Nach der Inhaber-Bestätigung vom 10.09.2026
+(`BOOKING_WRITE` = nur nach geprüfter Kundenintegration) ist das als
+Standardzusage nicht haltbar. Die Route ist eingefroren, die Aussage steht aber
+im **SERP-Snippet** einer Seite mit 543 Impressionen in 28 Tagen — also vor
+Augen, die nie klicken müssen, um sie zu lesen.
+
+Freeze und Aussagenrichtigkeit stehen hier gegeneinander. Diese Sitzung hat die
+Route **nicht** angefasst und legt die Entscheidung dem Inhaber vor. Vollständige
+Einordnung in `COPY-CLAIMS-TO-VERIFY.md` → „Z25 · Nachtrag 10.09.2026".
+
+---
+
+# Kannibalisierungs-HYPOTHESEN 10.09.2026
+
+Ausdrücklich **Hypothesen**. `Queries.csv` und `Pages.csv` sind getrennte
+Aggregate und belegen nie, dass zwei URLs auf dieselbe Query ranken. Grundlage
+ist Repository-Architektur plus Semantik, nicht Messung. **Nichts davon
+rechtfertigt eine Zusammenlegung von URLs, solange kein Query×Seite-Export
+vorliegt.**
+
+1. **Regensburg-Webdesign.** `/regensburg` (2.623 Impr., Pos. 75,8 im 28-Tage-Fenster)
+   und `/regensburg/webdesign` (2.347 Impr., Pos. 51,4) sind zusammen die
+   größte Impressionsmenge der Domain. Queries wie „webdesign regensburg" (700
+   Impr., Pos. 57,8), „regensburg webdesign" (286, 57,8) und „webdesign agentur
+   regensburg" (435, 47,4) passen semantisch auf beide. Zwei Seiten auf
+   Position 51 und 76 für eine Familie sehen nach geteilter Autorität aus —
+   sind aber genauso gut mit „die Domain ist für diese Familie schlicht zu
+   schwach" erklärbar. **Nicht entscheidbar ohne Query×Seite.**
+2. **Kosten-Automatisierung.** `/kosten-automatisierung` (Pos. 35,2 → 16,3) und
+   `/muenchen/automatisierung` (Pos. 37,2 → 23,3) verlieren beide stark an
+   Impressionen (127 → 33 bzw. 163 → 41), während ihre Positionen sich
+   verbessern. Muster passt zu einer Neuzuordnung durch Google innerhalb des
+   Automatisierungs-Clusters. Beobachten, nicht anfassen.
+3. **Hotel vs. Gastronomie.** `/webdesign-hotel` und `/webdesign-gastronomie`
+   teilen sich die Query „internetagentur hotel/hotels" **nicht** erkennbar —
+   die Gastronomie-Queries sind lexikalisch klar getrennt (gastronomie,
+   restaurant) und ranken deutlich schlechter (Pos. 48–76 gegen 20–45).
+   Hypothese geprüft und **verworfen**: Die beiden Seiten konkurrieren nach
+   Datenlage nicht. Deshalb war es zulässig, in diesem Lauf nur die
+   Hotel-Seite anzufassen.
+
+---
+
+# Technischer Befund am Rande: FAQ-Antworten stehen nicht im SSR-Körper
+
+Aufgefallen bei der Prüfung des gerenderten Outputs von `/webdesign-hotel`, gilt
+aber für **alle** Seiten mit dem FAQ-Accordion (`NationalIndustryPage`,
+`IndustryPage` und Verwandte): Die Antworten hängen an
+`const [open, setOpen] = useState(false)` und `{open && (...)}`. Im
+vorgerenderten HTML steht deshalb nur die **Frage** (im Button), die **Antwort**
+ausschließlich im `FAQPage`-JSON-LD.
+
+Nachprüfbar an `dist/webdesign-hotel.html`: „Boutique- und Landhotels" kommt
+genau **einmal** vor (JSON-LD), die zugehörige Frage **zweimal** (Button +
+JSON-LD).
+
+Das ist kein Fehler — JSON-LD wird ausgewertet — aber es heißt, dass FAQ-Text
+für die Bewertung des Seitenkörpers praktisch nicht zählt. Wer über FAQ-Einträge
+Intent abdecken will, deckt ihn nur strukturiert ab. In diesem Lauf wurde
+deshalb die Betriebstypen-Aufzählung zusätzlich in `solution.text` gezogen, wo
+sie im SSR-Körper landet.
+
+**Empfehlung für einen eigenen, kleinen PR** (nicht hier, weil es eine geteilte
+Komponente ist und sechs eingefrorene Routen dieselbe Komponente rendern): Die
+Antwort immer rendern und nur per CSS/`hidden` ein- und ausklappen, statt sie
+bedingt zu mounten. Das würde die Fingerprints **aller** eingefrorenen Routen
+verändern und darf deshalb erst nach dem Experimentende geschehen.
+
 ## Nicht experimentbezogen, aber hier notiert
 
 > **Stand 2026-09-10: erledigt bis auf eine Zeile.** Alle Fundstellen unten

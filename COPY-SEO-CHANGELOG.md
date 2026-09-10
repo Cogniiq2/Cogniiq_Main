@@ -1,5 +1,37 @@
 # COPY-SEO-CHANGELOG — Copy Overhaul KI-Telefonassistent-Cluster
 
+## 2026-09-10 (2) — GSC-Auswertung: Hotellerie-Intent, Titel-Deckung, Claim-Nachzügler
+
+Grundlage: zwei echte Search-Console-Exporte (3 Monate 2026-06-09–2026-09-08,
+28 Tage 2026-08-12–2026-09-08), am selben Tag an die Sitzung angehängt. Zahlen,
+Attributionsgrenzen und Messpunkte in `docs/seo/organic-growth-scoreboard.md`.
+
+- **Geändert** `/webdesign-hotel`: Titel und Description im Manifest und in der
+  Seiten-Config auf „Internetagentur für Hotellerie" gezogen; Tagline ergänzt;
+  neuer Problem-Abschnitt „Die allgemeine Webagentur kennt die Buchungsstrecke
+  nicht"; Lösungsabsatz um die Betriebstypen (Stadt-/Business-, Boutique-/Land-,
+  Pension/Gästehaus, Ferienwohnung) erweitert; zwei FAQ-Einträge zur
+  Agenturauswahl und zur Betriebsgröße. Anlass: rund 480 Impressionen je 28 Tage
+  auf Agentur-/Hotellerie-Queries (Pos. 27–69), die die Seite inhaltlich nicht
+  bediente.
+- **Geändert** `/verpasste-anrufe-verlust`: Manifest-Titel auf „Verpasste
+  Anrufe: Was sie Unternehmen wirklich kosten" — Deckung der Kopf-Query
+  „verpasste anrufe kosten unternehmen" (Pos. 11,2; beste kommerzielle
+  Nicht-Marken-Platzierung der Domain). Seiten-Config auf denselben Wortlaut
+  gezogen, weil der Prerenderer den Head aus dem Manifest schreibt und ein
+  abweichender Client-Titel nach der Hydration umgesprungen wäre.
+- **Claim-Korrektur** `/verpasste-anrufe-verlust`: `solution.bullets` enthielt
+  weiterhin „Termine automatisch in den Kalender eingetragen" — Nachzügler aus
+  dem Durchgang vom selben Tag, der nur `solution.text` derselben Seite
+  korrigiert hatte. Wortlaut an `FAKTEN.terminaufnahme` angeglichen
+  (`BOOKING_WRITE` = nur nach geprüfter Kundenintegration).
+- **Nicht angefasst:** die sechs eingefrorenen Routen und ihre eingehenden
+  Linkzahlen; `/webdesign-gastronomie` (bewusst, damit die Hotel-Änderung
+  zurechenbar bleibt); `/automatisierung-restaurant` und
+  `/keine-terminbuchung-online` (SMS/E-Mail — wartet auf Inhaber-Entscheidung, siehe
+  `COPY-CLAIMS-TO-VERIFY.md`).
+- **Keine** neue URL. Keine Sitemap-Änderung (90 indexierbare URLs unverändert).
+
 ## 2026-09-05 — Zahnarzt-Fachbeitrag, Blog-Neuausrichtung, Linkpfade
 
 - **Neu** `/ki-telefonassistent-zahnarztpraxis` (indexierbar, Sitemap
