@@ -21,7 +21,7 @@
 // see src/lib/routing/protectedExperiments.ts for why.
 // ─────────────────────────────────────────────────────────────────────────────
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
-import { dirname, join, relative } from 'node:path';
+import { dirname, join, relative, sep } from 'node:path';
 import { afterAll, describe, expect, it, vi } from 'vitest';
 
 // Same Supabase stub as src/entry-server.test.tsx: the marketing shell reads the
@@ -109,7 +109,12 @@ function collectSources(dir: string, out = new Map<string, string>()): Map<strin
     }
     if (!/\.(tsx?|mts|mjs|json|html|xml|txt|_redirects|_headers)$/.test(entry) && !/^_(redirects|headers)$/.test(entry))
       continue;
-    const key = relative(REPO_ROOT, full);
+    // Separators normalised to '/' because BOTH lookups below are keyed that way:
+    // EXCLUDED_FROM_SCAN above and every key in the committed baseline fixture. On
+    // Windows `relative()` returns backslashes, so without this the exclusion set
+    // stops matching — the guard's own three files get counted, the occurrence map
+    // shifts, and the failure reads like link drift rather than a path bug.
+    const key = relative(REPO_ROOT, full).split(sep).join('/');
     if (EXCLUDED_FROM_SCAN.has(key)) continue;
     out.set(key, readFileSync(full, 'utf8'));
   }
