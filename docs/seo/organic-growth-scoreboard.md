@@ -239,7 +239,7 @@ Damit das Ergebnis nicht im Nachhinein schöngeredet werden kann, hier vorab:
 
 ---
 
-## B · Claim-Bereinigung Startseite und `/webdesign-arzt-bayreuth` (2026-09-10)
+## B · Claim-Bereinigung Telefonassistent-Mechanik (2026-09-10)
 
 Keine Ranking-Wette, sondern die Beseitigung eines Widerspruchs **innerhalb der
 eigenen Domain**: Der Healthcare-Cluster wurde im August auf
@@ -256,17 +256,26 @@ Wettbewerb vorhält — auf der meistbesuchten eigenen Seite und auf einer
 Gesundheitsseite.
 
 - **Geändert am:** 2026-09-10
-- **Ziel-Query-Familie:** keine. Titel, Description, Canonical, Robots und
-  JSON-LD beider Routen sind unverändert; geändert wurde ausschließlich
-  Fließtext in `<main>`.
+- **Ziel-Query-Familie:** keine. Titel, Description, Canonical und Robots aller
+  betroffenen Routen sind unverändert.
+- **Ausnahme, die ausdrücklich hierher gehört:** Auf den drei Arzt-Webdesign-Seiten
+  hat sich **JSON-LD sehr wohl geändert**. `IndustryPage.tsx:146` reicht `config.faq`
+  an `PageSEO` weiter, das daraus `FAQPage`-Markup erzeugt (`PageSEO.tsx:189`), und
+  `config.seo.description` steht in der `Service`-Beschreibung (`IndustryPage.tsx:130`).
+  Geänderte FAQ-Antworten sind damit Rich-Result-relevant. Eine frühere Fassung
+  dieses Abschnitts behauptete das Gegenteil; das war falsch.
+- Sonst geändert wurde ausschließlich Fließtext in `<main>`.
 - **Hypothese:** Wirkung primär auf Vertrauen und Konversion, nicht auf
   Positionen. Eine indirekte Wirkung über Nutzersignale ist möglich, aber nicht
   von der übrigen Arbeit trennbar und wird hier **nicht** behauptet.
 - **Erfolg:** Tag 90 keine Verschlechterung von `/` und
   `/webdesign-arzt-bayreuth` gegenüber Baseline.
-- **Scheitern:** Tag 28 Impressionen einer der beiden Routen mehr als ein
-  Drittel unter Baseline → Textkürzung als Ursache prüfen (beide Seiten haben
-  Fließtext verloren, `/webdesign-arzt-bayreuth` am meisten).
+- **Scheitern:** Tag 28 Impressionen einer der Routen mehr als ein Drittel unter
+  Baseline → nicht mit „Textkürzung" erklären: Gemessen am Diff hat
+  `/webdesign-arzt-bayreuth` rund 600 Zeichen **gewonnen**, die Startseite netto
+  rund 170. Zu prüfen wäre dann die Wortwahl selbst, nicht die Textmenge —
+  insbesondere der Wegfall von „Terminbuchung" als Begriff auf den drei
+  Arzt-Webdesign-Seiten.
 
 | Route | Messpunkt | Datum | Impressionen | Klicks | CTR | Ø Position |
 |---|---|---|---:|---:|---:|---:|
@@ -275,12 +284,33 @@ Gesundheitsseite.
 | `/` | Tag 90 | | | | | |
 | `/webdesign-arzt-bayreuth` | Baseline (0) | 2026-09-10 | | | | |
 | `/webdesign-arzt-bayreuth` | Tag 28 | | | | | |
-| `/webdesign-arzt-bayreuth` | Tag 90 | | | | | |
+| `/webdesign-arzt-bayreuth` | Tag 90 | | | | |
+| `/webdesign-arzt-muenchen` | Baseline (0) | 2026-09-10 | | | | |
+| `/webdesign-arzt-muenchen` | Tag 90 | | | | | |
+| `/webdesign-arzt-regensburg` | Baseline (0) | 2026-09-10 | | | | |
+| `/webdesign-arzt-regensburg` | Tag 90 | | | | | |
+| `/ki-telefonassistent-restaurant` | Baseline (0) | 2026-09-10 | | | | |
+| `/ki-telefonassistent-restaurant` | Tag 90 | | | | | | |
 
 > Die Baseline-Zeilen sind leer, weil in dieser Session **kein** GSC-Export
 > vorlag. Sie sind vor dem ersten Messpunkt aus der Search Console für den
 > Zeitraum 2026-08-14 bis 2026-09-10 nachzutragen. Keine geschätzte Zahl
 > eintragen.
+
+### Bewusst NICHT in diesem Branch
+
+Ein Suchlauf über `src/**` zeigte dieselbe Buchungs-/SMS-Zusage auf rund einem
+Dutzend weiterer Routen, darunter zwei `<meta name="description">`. Sie sind
+vollständig in `COPY-CLAIMS-TO-VERIFY.md` (§Z25-Bestandsaufnahme) erfasst und
+gehören in einen eigenen Branch: Eine Änderung des SERP-Snippets mehrerer Routen
+im selben Commit wie diese Copy-Bereinigung macht jede spätere Bewegung
+unzuordenbar.
+
+Eine Fundstelle ist dabei **DEFERRED — MEASUREMENT**: Die Manifest-Description
+von `/ki-telefonassistent-arzt` (`publicRoutes.ts:606`) sagt „bucht Termine ins
+System". Die Aussage ist unbelegt, die Route ist aber ein laufendes Experiment.
+Sie wird mit dem Experimentende korrigiert — das ist der Preis der Messung und
+gehört ausdrücklich protokolliert, statt stillschweigend hingenommen zu werden.
 
 ### Mitgeändert, ohne eigene Messreihe
 

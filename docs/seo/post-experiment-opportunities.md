@@ -103,9 +103,10 @@ Nach dem Experiment zu prüfen — alles **Claim-Hygiene**, kein SEO-Gewinn:
 
 > **Stand 2026-09-10: erledigt bis auf eine Zeile.** Alle Fundstellen unten
 > außer `standorte-service-configs.ts:357` sind auf Branch
-> `claude/seo-growth-max-2026-09-10` bereinigt. Zeile `:357` gehört zu
-> `/bayreuth/webdesign` und bleibt eingefroren — sie ist der einzige offene
-> Punkt dieser Tabelle.
+> `claude/seo-growth-max-2026-09-10` bereinigt — alle sieben Zeilen.
+> `standorte-service-configs.ts:357` (Hosting-FAQ, §7.7-nah) steht **nicht** in
+> dieser Tabelle, sondern im Abschnitt `/bayreuth/webdesign` weiter oben; die
+> Route ist eingefroren und wurde zu Recht nicht angefasst.
 
 Diese Punkte betreffen **nicht** eingefrorene Routen und könnten sofort
 angegangen werden. Sie stehen hier, weil sie in derselben Prüfung aufgefallen

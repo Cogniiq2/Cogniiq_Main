@@ -33,6 +33,43 @@ eine Bestätigung.
 | Z12 | **Blog-Orientierungspreise** — der einzige Betrag, der den bestätigten `TARIFE` widersprach (200–450 € für den Telefonassistenten), ist am 18.08.2026 entfernt. Offen bleiben die Webdesign- und Automatisierungsbeträge (150–500 €, 2.500–8.000 € u. a.) | `blog-data.ts` | Bestätigen oder entfernen |
 | Z13 | **Gründer-Spezialisierungen** | `AboutSection` — heute neutral „Gründer" | Erst nach Bestätigung wieder personenbezogen ausweisen |
 
+### Z25 · Bestandsaufnahme der offenen Fundstellen (Stand 2026-09-10)
+
+Vollständig erhoben mit einem Suchlauf über `src/**` nach den Mustern
+„bucht Termine", „Termine gebucht", „automatische Terminbuchung",
+„Bestätigungs-/Erinnerungs-SMS" und „per SMS oder E-Mail". Die Liste ist die
+Arbeitsgrundlage für einen **eigenen Branch** — bewusst nicht mehr für diesen,
+weil zwei der Fundstellen `<meta name="description">` und damit das
+SERP-Snippet mehrerer Routen ändern. Gebündelt mit der Claim-Bereinigung wäre
+danach nicht mehr zuzuordnen, was eine Bewegung verursacht hat.
+
+| Fundstelle | Route | Einordnung |
+|---|---|---|
+| `publicRoutes.ts:606` — „bucht Termine ins System" | `/ki-telefonassistent-arzt` | **DEFERRED — MEASUREMENT.** Die Route ist ein eingefrorenes Experiment. Die Aussage ist unbelegt und steht trotzdem im Snippet; sie ist mit dem Experimentende zu korrigieren, nicht vorher |
+| `publicRoutes.ts:250` — „nimmt Anrufe an, bucht Termine" | `/bayern/ki-telefonassistent` | offen; ändert das SERP-Snippet |
+| `seo-data.ts:117` — „bucht Termine direkt ins System" | Organisations-/Service-Schema | offen; strukturierte Daten |
+| `KiTelefonassistentPage.tsx:756` — „Bucht Termine nach Ihren Regeln in Ihren Kalender" | `/ki-telefonassistent` | offen; Hub-Seite des Clusters |
+| `BayernKiTelefonassistentPage.tsx:128, 194, 310, 420` | `/bayern/ki-telefonassistent` | offen; vier Stellen, darunter „bucht Termine direkt in Ihren Kalender" |
+| `KiTelefonassistentDemoPage.tsx:37, 487` | `/ki-telefonassistent/demo` | offen |
+| `LeistungenPage.tsx:62` — „Automatische Terminbuchung, Bestätigung und Erinnerung" | `/leistungen` | offen |
+| `UeberUnsPage.tsx:60` — „Automatische Terminbuchung und Bestätigung" | `/ueber-uns` | offen |
+| `BayernPage.tsx:120`, `DeutschlandPage.tsx:147` | `/bayern`, `/deutschland` (Regionalseiten) | offen |
+| `problems/VerpassteAnrufePage.tsx:48` — „bucht Termine automatisch" | `/verpasste-anrufe-verlust` | offen |
+| `blog-data.ts:605` — „bucht Termine direkt" | Blogbeitrag verpasste Anrufe | offen |
+| `industries/AutomatisierungRestaurant.tsx:51` — „Erinnerungs-SMS/-E-Mail" | `/automatisierung-restaurant` | Automatisierungsprodukt — gehört zur Inhaber-Entscheidung unten, nicht zur Telefonassistent-Klasse |
+
+**Ausdrücklich nicht auf dieser Liste**, weil kein Verstoß: „Online-Terminbuchung"
+als Funktion einer von Cogniiq gebauten **Website** (z. B.
+`WebdesignArztMuenchen.tsx:134`, `WebdesignArztRegensburg.tsx:204`). Das ist das
+Webdesign-Produkt und keine Aussage über eine PVS-Anbindung. Ebenso nicht die
+Link-Labels „Keine automatische Terminbuchung" (`RelatedPages.tsx:32`,
+`IndustryPage.tsx:723`) — sie benennen ein Kundenproblem, keine Zusage.
+
+**Inhaber-Entscheidung, die den Rest erst entscheidbar macht:** Kann der
+Assistent Termine in ein Kundensystem schreiben, und wenn ja unter welcher
+Bedingung — und versendet Cogniiq Bestätigungen per SMS oder E-Mail? Solange das
+offen ist, ist die einzige belegte Fassung die aus `FAKTEN.keineAnbindung`.
+
 **Stand 18.08.2026:** Z6, Z7, Z10 und Z11 sind bereinigt, Z12 teilweise —
 Einzelheiten in `MERGE-READINESS.md` §4a. Es galt: nur Entfernung unbelegter
 Zusagen, keine Copy-Überarbeitung. Die eigentliche Copy der Nicht-Healthcare-
@@ -212,7 +249,7 @@ formuliert:
 | Z22 | Die drei Zeitmuster (Überlauf, Behandlungsfenster, außerhalb der Sprechzeit) | ebd., Abschnitt „Behandlungszeit" | nach Review als „kommen als Ausgangspunkt infrage" formuliert — keine Erfahrungsaussage mehr; Bestätigung des Inhabers, dass alle drei konfigurierbar sind, weiterhin sinnvoll |
 | Z23 | Abfrage und Prüfung von Angaben vor einer Absage | ebd., Abschnitt „Absagen" | **geschlossen 2026-09-05 (Review).** Das Beispiel „Name und Geburtsdatum" ist entfernt: Das Geburtsdatum steht in keinem der vier gespeicherten Felder (`ANBINDUNG.heute.punkte`, `FAKTEN.keineAufzeichnung`) und ist ohne Inhaber-Freigabe keine zusagbare Datenkategorie. Ebenfalls entfernt: „Dass eine falsche Angabe abgewiesen wird" — eine Prüfung gegen einen Datensatz setzt die Anbindung voraus, die `NICHT_PASSEND` vor der Systemprüfung ausdrücklich nicht zusagt. Die Stelle verweist jetzt auf das Ergebnis der Anbindungsprüfung |
 | Z24 | Ausgehende Anrufe (Recall, Nachbesetzung) | ebd., FAQ und Grenzen | nach Review **keine Aussage** in beide Richtungen: „nicht Gegenstand dieses Beitrags und hier nicht zugesagt". Inhaber entscheidet, ob ein FAKTEN-Satz dazu aufgenommen wird |
-| Z25 | SMS-/E-Mail-Terminbestätigung als Produktfunktion | `SolutionShowcase.tsx`, `CostComparisonSection.tsx`, `KiCTASection.tsx`, `WebdesignArztBayreuth.tsx` | **teilweise geschlossen 2026-09-10.** Im gesamten **Telefonassistent**-Teil entfernt: Startseite (Vergleichstabelle, Leistungsliste, beide Demo-Dialoge, CTA-Dialog) und `/webdesign-arzt-bayreuth`. Ersetzt durch die belegte Mechanik — Terminwunsch mit Name und Rückrufnummer strukturiert aufgenommen, Übergabe ans Team im Dashboard oder, wo die Systemprüfung sie trägt, in das Praxissystem (`FAKTEN.keineAufzeichnung`, `FAKTEN.keineAnbindung`). **Offen bleiben** die Blöcke Immobilien und Sport/Fitness in `SolutionShowcase.tsx` (Zeilen um 150 und 190) sowie `AutomatisierungArzt.tsx`: Das sind Aussagen über das **Automatisierungs-/Website-Produkt**, nicht über den Telefonassistenten — ein eigens gebauter Ablauf kann Bestätigungen versenden. `FAKTEN` regelt diese Produktlinie nicht, deshalb entscheidet hier der Inhaber und nicht die Copy-Runde: **BLOCKED — OWNER INPUT** |
+| Z25 | Terminbuchung und SMS-/E-Mail-Bestätigung als Produktfunktion des Telefonassistenten | siehe Bestandsaufnahme unten | **teilweise geschlossen 2026-09-10.** Bereinigt sind: die vollständige Startseite (`ServicesSection`, `SolutionShowcase`, `CostComparisonSection`, `KiCTASection` — alle vier rendern ausschließlich dort), die drei Arzt-Webdesign-Seiten Bayreuth/München/Regensburg, `/ki-telefonassistent-restaurant` und der Restaurant-Blogbeitrag. **Nicht bereinigt** ist der Rest der Website; die vollständige Liste steht direkt unter dieser Tabelle. Die frühere Fassung dieser Zeile behauptete, der Telefonassistent-Teil sei vollständig geschlossen — das war falsch |
 
 | Z26 | „welche Termine sofort ans Team gemeldet werden" / „die Meldung an das Team kommt sofort an" | ebd., Abschnitt „Absagen" und `PRUEFFAELLE` | **geschlossen 2026-09-05 (Review).** `ANLIEGEN_UEBERNIMMT` deckt „frei werdende Termine sind sofort **sichtbar**" — eine aktive Benachrichtigung deckt kein FAKTEN-Satz, und `ANBINDUNG.heute` beschreibt die Liste ausdrücklich als asynchron („arbeitet die Liste ab, wenn es in den Ablauf passt"). Wortlaut auf „sichtbar" gezogen |
 | Z27 | „wie der Bezug zur Erinnerung im Ergebnis vermerkt wird" (Recall) und „vermerkt den Zeitpunkt" (Absage) | ebd., `ANLAESSE` und Abschnitt „Absagen" | offen — beides sind Felder über die vier aus `ANBINDUNG.heute.punkte` hinaus. Als Konfigurationsfrage formuliert, nicht als Zusage; Inhaber bestätigt, ob das Ergebnis weitere Felder trägt, oder die beiden Stellen entfallen |

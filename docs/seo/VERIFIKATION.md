@@ -93,5 +93,6 @@ warum dieser Abschnitt hier steht.
   Content-Wette wäre unbelegt priorisiert — deshalb wurde am 2026-09-10 **keine
   neue indexierbare Seite** angelegt.
 - **Verwaiste indexierbare Seiten:** keine. Die schwächste Klasse sind die
-  Blogbeiträge mit je drei Quelltext-Verweisen (Listing plus Manifest), alle
-  übrigen Routen liegen darüber.
+  Blogbeiträge mit je vier Quelltext-Verweisen (`blog-data.ts`,
+  `publicRoutePaths.ts`, `publicRoutes.ts`, `public/sitemap.xml`) — also ohne
+  kontextuellen Verweis aus einem Seitentext; alle übrigen Routen liegen darüber.
