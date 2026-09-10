@@ -4,7 +4,7 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 
 const config: ProblemPageConfig = {
   seo: {
-    title: "Verpasste Anrufe kosten Unternehmen täglich Aufträge | Cogniiq",
+    title: "Verpasste Anrufe: Was sie Unternehmen wirklich kosten | Cogniiq",
     description: "Verpasste Anrufe bedeuten verpasste Aufträge. Erfahren Sie, wie viel Ihr Unternehmen durch unbeantworte Anrufe verliert – und wie KI dieses Problem dauerhaft löst.",
     canonical: `${BUSINESS_INFO.website}/verpasste-anrufe-verlust`,
   },
@@ -49,7 +49,7 @@ const config: ProblemPageConfig = {
     bullets: [
       "Anrufe werden sofort und professionell entgegengenommen – auch zu Stoßzeiten",
       "Erreichbar auch abends, am Wochenende und an Feiertagen",
-      "Termine automatisch in den Kalender eingetragen",
+      "Terminwünsche nach Ihren Regeln erfasst – der Eintrag ins Kalender- oder Praxissystem erst, wenn dessen Schnittstelle geprüft ist",
       "Skaliert mit Ihrem Unternehmen ohne Mehrkosten",
     ],
   },
