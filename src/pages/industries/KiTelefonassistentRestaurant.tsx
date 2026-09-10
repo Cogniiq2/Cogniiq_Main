@@ -5,7 +5,7 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 const config: NationalIndustryPageConfig = {
   seo: {
     title: "KI Telefonassistent für Restaurants | Automatische Tischreservierung | Cogniiq",
-    description: "KI Telefonassistent für Restaurants: Tischreservierungen auch während des Service, abends und am Wochenende entgegennehmen und strukturiert an Ihr Team übergeben.",
+    description: "KI Telefonassistent für Restaurants: Tischreservierungen entgegennehmen und strukturiert an Ihr Team übergeben – auch während des Service und am Wochenende.",
     canonical: `${BUSINESS_INFO.website}/ki-telefonassistent-restaurant`,
     keywords: "KI Telefonassistent Restaurant, automatische Reservierung, KI Rezeptionistin Gastronomie, Telefonservice Restaurant",
   },

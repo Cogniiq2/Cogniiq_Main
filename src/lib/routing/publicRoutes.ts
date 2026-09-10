@@ -611,7 +611,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/ki-telefonassistent-restaurant",
     title: "KI-Telefonassistent für Restaurants | Reservierungen automatisch annehmen – Cogniiq",
-    description: "KI Telefonassistent für Restaurants: Tischreservierungen auch während des Service, abends und am Wochenende entgegennehmen und strukturiert an Ihr Team übergeben.",
+    description: "KI Telefonassistent für Restaurants: Tischreservierungen entgegennehmen und strukturiert an Ihr Team übergeben – auch während des Service und am Wochenende.",
     keywords: "KI Telefonassistent Restaurant, Reservierungen KI, AI Rezeptionistin Restaurant, Gastronomie Automatisierung",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.85" },
