@@ -460,6 +460,12 @@ export const manifestTableLabel: Record<string, string> = {
   owner_revenue_contract_postings: 'Vertragsbuchung',
   owner_service_engagements: 'Onboarding',
   customer_project_invoices: 'Projektverknüpfung',
+  customer_documents: 'Kundenportal-Dokument',
+  owner_automation_jobs: 'Versandauftrag',
+  owner_elster_submissions: 'ELSTER-Übermittlung',
+  owner_workspace_item_state: 'Ablage-Zustand',
+  // Not a table: the purge counts Storage files under this key so the dialog can name them.
+  _storage_objects: 'Datei im Dateispeicher',
 };
 
 export interface ManifestLine {
@@ -595,6 +601,194 @@ export function forceResultToast(
     title: done.length === 1 ? 'Endgültig gelöscht' : `${done.length} endgültig gelöscht`,
     detail: failed
       ? `${failed} ${failed === 1 ? 'Eintrag konnte' : 'Einträge konnten'} nicht gelöscht werden.`
+      : undefined,
+  };
+}
+
+/* ============================================================ purge policy
+ *
+ * Two tiers, and the difference between them is the whole point.
+ *
+ * TIER 1 — `purgeWorkspaceItems`. A trashed record that never became accounting-relevant: a
+ * draft nobody issued, an offer nobody finalized, an unpaid expense with no document. Destroyed
+ * completely, behind a plain confirmation.
+ *
+ * TIER 2 — `forcePurgeWorkspaceItems`. The emergency escape hatch for a record that IS
+ * accounting-relevant. Same destruction, but it demands the typed phrase and a written reason.
+ *
+ * Eligibility is its own server decision (`owner_workspace_purge_preflight`), deliberately NOT the
+ * delete preflight. That one answers "what may Löschen do to a row still in the list", and its
+ * `hard_delete` answer is consumed by the delete itself before the row can ever reach the trash —
+ * which is exactly why asking it again from the Papierkorb could never say yes.
+ *
+ * Migration: 20260910130000_owner_purge_policy.sql
+ */
+
+export const PURGE_POLICY_MIGRATION = '20260910130000_owner_purge_policy.sql';
+
+export type PurgeEligibility =
+  | 'purgeable'
+  | 'accounting_protected'
+  | 'not_found'
+  | 'scope_not_supported';
+
+export interface PurgePlan {
+  resourceId: string;
+  eligibility: PurgeEligibility;
+  /** Stable codes naming what made the record accounting-relevant. Empty when it is not. */
+  reasons: string[];
+  label: string | null;
+  /** Table name -> rows that will cease to exist. `_storage_objects` counts files. */
+  manifest: Record<string, number>;
+}
+
+/** German for the codes owner_record_accounting_relevance returns. */
+export const accountingReasonLabel: Record<string, string> = {
+  invoice_number_allocated: 'Rechnungsnummer vergeben',
+  issued: 'gestellt',
+  status_issued: 'gestellt',
+  status_paid: 'bezahlt',
+  status_partially_paid: 'teilweise bezahlt',
+  status_overdue: 'überfällig',
+  status_cancelled: 'storniert',
+  status_credited: 'gutgeschrieben',
+  has_payments: 'Zahlungen erfasst',
+  money_received: 'Zahlungseingang gebucht',
+  money_paid: 'bereits bezahlt',
+  has_documents: 'Belege verknüpft',
+  has_generated_documents: 'erzeugte Dokumente vorhanden',
+  published_to_customer_portal: 'im Kundenportal veröffentlicht',
+  linked_to_customer_project: 'mit einem Kundenprojekt verknüpft',
+  finalized: 'verbindlich finalisiert',
+  offer_number_allocated: 'Angebotsnummer vergeben',
+  converted_to_invoice: 'in eine Rechnung überführt',
+  has_access_tokens: 'Freigabe-Links vergeben',
+  has_acceptance_evidence: 'Annahme-Nachweis vorhanden',
+  has_revenue_contract: 'Umsatzvertrag daran gekoppelt',
+  has_issued_invoices: 'gestellte Rechnungen vorhanden',
+  has_binding_offers: 'verbindliche Angebote vorhanden',
+  has_subscriptions: 'Abonnements vorhanden',
+  has_revenue_contracts: 'Umsatzverträge vorhanden',
+  not_found: 'Datensatz nicht gefunden',
+  scope_not_supported: 'für diesen Datentyp nicht vorgesehen',
+};
+
+export function describeAccountingReasons(reasons: string[]): string[] {
+  // Deduplicated: `issued` and `status_issued` both mean the same thing to a reader, and the
+  // server legitimately returns both.
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const code of reasons) {
+    const label = accountingReasonLabel[code];
+    if (!label || seen.has(label)) continue;
+    seen.add(label);
+    out.push(label);
+  }
+  return out;
+}
+
+function toPurgePlans(raw: unknown): PurgePlan[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((entry) => {
+    const row = entry as {
+      resource_id: string; eligibility: PurgeEligibility; reasons?: string[];
+      label?: string | null; manifest?: Record<string, number>;
+    };
+    return {
+      resourceId: row.resource_id,
+      eligibility: row.eligibility,
+      reasons: row.reasons ?? [],
+      label: row.label ?? null,
+      manifest: row.manifest ?? {},
+    };
+  });
+}
+
+/**
+ * Purge eligibility for a set of trashed records, in ONE request. This is what the Papierkorb
+ * renders from — never `plan.action === 'hard_delete'`, which no trashed row can satisfy.
+ */
+export async function loadPurgePreflight(
+  scope: string, resourceIds: string[],
+): Promise<{ plans: PurgePlan[]; error: string | null }> {
+  const { data, error } = await supabase.rpc('owner_workspace_purge_preflight', {
+    p_scope: scope, p_resource_ids: resourceIds,
+  });
+  if (error) return { plans: [], error: error.message };
+  return { plans: toPurgePlans(data), error: null };
+}
+
+/**
+ * Tier 1. Permanently deletes trashed records that never became accounting-relevant, with every
+ * dependent row and every Storage file. The server refuses anything else — this cannot become a
+ * back door to an issued invoice, and the database guards stay armed behind it either way.
+ */
+export async function purgeWorkspaceItems(
+  entityId: string, scope: WorkspaceScope, resourceIds: string[], reason?: string | null,
+): Promise<{ results: DeleteResult[]; error: string | null }> {
+  const { data, error } = await supabase.rpc('owner_workspace_purge_items', {
+    p_entity: entityId, p_scope: scope, p_resource_ids: resourceIds, p_reason: reason ?? null,
+  });
+  if (error) return { results: [], error: error.message };
+  return { results: toResults(data), error: null };
+}
+
+/** Tier 1 for a customer: archived, and with no financial history at all. */
+export async function purgeCustomer(
+  customerId: string, reason?: string | null,
+): Promise<{ deleted: boolean; eligibility: PurgeEligibility | null; label: string | null; error: string | null }> {
+  const { data, error } = await supabase.rpc('owner_purge_customer', {
+    p_customer_id: customerId, p_reason: reason ?? null,
+  });
+  if (error) return { deleted: false, eligibility: null, label: null, error: error.message };
+  const row = data as { deleted?: boolean; eligibility?: PurgeEligibility; label?: string | null } | null;
+  return {
+    deleted: Boolean(row?.deleted),
+    eligibility: row?.eligibility ?? null,
+    label: row?.label ?? null,
+    error: null,
+  };
+}
+
+/** Accounting relevance for one record, for surfaces that have no workspace trash (customers). */
+export async function loadAccountingRelevance(
+  scope: string, resourceId: string,
+): Promise<{ relevant: boolean | null; reasons: string[]; label: string | null; error: string | null }> {
+  const { data, error } = await supabase.rpc('owner_record_accounting_relevance', {
+    p_scope: scope, p_id: resourceId,
+  });
+  if (error) return { relevant: null, reasons: [], label: null, error: error.message };
+  const row = data as { relevant?: boolean; reasons?: string[]; label?: string | null } | null;
+  if (!row) return { relevant: null, reasons: [], label: null, error: null };
+  return {
+    relevant: Boolean(row.relevant),
+    reasons: row.reasons ?? [],
+    label: row.label ?? null,
+    error: null,
+  };
+}
+
+/** What the toast says after a tier-1 purge, including the honest refusal. */
+export function purgeResultToast(
+  results: DeleteResult[],
+): { tone: 'success' | 'error'; title: string; detail?: string } {
+  const done = results.filter((r) => r.outcome === 'hard_deleted');
+  const protectedCount = results.filter((r) => r.error === 'accounting_protected').length;
+  if (done.length === 0) {
+    return {
+      tone: 'error',
+      title: 'Nichts gelöscht',
+      detail: protectedCount
+        ? 'Buchhaltungsrelevante Datensätze können hier nicht gelöscht werden.'
+        : 'Der Server hat die Aktion abgelehnt.',
+    };
+  }
+  const failed = results.length - done.length;
+  return {
+    tone: failed ? 'error' : 'success',
+    title: done.length === 1 ? 'Endgültig gelöscht' : `${done.length} endgültig gelöscht`,
+    detail: failed
+      ? `${failed} ${failed === 1 ? 'Datensatz wurde' : 'Datensätze wurden'} als buchhaltungsrelevant beibehalten.`
       : undefined,
   };
 }

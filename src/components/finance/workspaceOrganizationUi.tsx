@@ -22,8 +22,9 @@ import {
   describeReasons,
   FORCE_DELETE_PHRASE, forceDeleteErrorText, forcePurgeWorkspaceItems, forceResultToast,
   loadForceDeletePreview, manifestLines, scopeTable,
+  describeAccountingReasons, loadPurgePreflight, purgeResultToast, purgeWorkspaceItems,
   type DeletePlan, type FolderCounts, type FolderSelection, type ForceDeletePreview,
-  type WorkspaceFolder, type WorkspaceScope, type WorkspaceState,
+  type PurgePlan, type WorkspaceFolder, type WorkspaceScope, type WorkspaceState,
 } from '@/lib/ownerFinance/workspaceOrganization';
 
 /**
@@ -931,36 +932,194 @@ export function WorkspaceDeleteDialog({
 /* ============================================================ trash notes */
 
 /**
- * The Papierkorb row actions.
+ * The Papierkorb row actions, driven by PURGE ELIGIBILITY.
  *
- * "Endgültig löschen" is now offered for EVERY row in the Papierkorb, which is the fix for a
- * defect rather than a relaxation of the rules. The button used to be rendered only where the
- * preflight said `hard_delete` — but `owner_workspace_delete_items` hard-deletes such a record
- * on the spot instead of trashing it, so no row that reaches the Papierkorb ever satisfied that
- * condition. Every row showed "muss erhalten bleiben" and the Papierkorb had no exit at all.
+ * The rule they used to use — `plan.action === 'hard_delete'` from the DELETE preflight — could
+ * never be true here. owner_workspace_delete_items hard-deletes such a record instead of trashing
+ * it, so nothing that reaches the Papierkorb has ever satisfied it and every row showed a refusal
+ * with no way past it.
  *
- * What replaces it is not a silent bypass. Where the preflight still says a record should be
- * retained, the row keeps saying so, and the button opens the force-delete dialog — which states
- * exactly what will be destroyed, requires the typed phrase and a written reason, and records a
- * tombstone. The rule became a warning the owner can overrule deliberately, instead of a wall.
+ * Eligibility is a different question, asked of the record as it is now: did this ever become
+ * accounting-relevant? A draft nobody issued did not, and gets a plain permanent delete. An issued
+ * invoice did, and keeps its refusal — plus the emergency escape hatch, visibly separate and
+ * visibly heavier, because destroying accounting evidence should never look like tidying up.
  */
-export function TrashRowActions({ plan, onRestore, onPurge }: {
-  plan: DeletePlan | undefined;
+export function TrashRowActions({ plan, onRestore, onPurge, onForcePurge }: {
+  plan: PurgePlan | undefined;
   onRestore: () => void;
-  /** Opens the force-delete confirmation. It never deletes anything by itself. */
+  /** Tier 1: the record never became accounting-relevant. */
   onPurge: () => void;
+  /** Tier 2: the emergency purge. Absent means the surface does not offer one. */
+  onForcePurge?: () => void;
 }) {
-  const retained = plan !== undefined && plan.action !== 'hard_delete';
+  const eligibility = plan?.eligibility;
+  const reasons = describeAccountingReasons(plan?.reasons ?? []);
+
   return (
     <div className="flex items-center justify-end gap-2">
-      {retained ? (
-        <span className={cn('max-w-[200px] text-right', text.hint)}>
-          Sollte aus Nachweis-/Buchhaltungsgründen erhalten bleiben.
+      {eligibility === 'accounting_protected' ? (
+        <span className={cn('max-w-[240px] text-right', text.hint)} title={reasons.join(' · ')}>
+          Buchhaltungsrelevant{reasons.length ? `: ${reasons[0]}` : ''}
         </span>
       ) : null}
       <Button size="sm" variant="secondary" icon={RotateCcw} onClick={onRestore}>Wiederherstellen</Button>
-      <Button size="sm" variant="ghost" icon={Trash2} onClick={onPurge}>Endgültig löschen</Button>
+      {eligibility === 'purgeable' ? (
+        <Button size="sm" variant="ghost" icon={Trash2} onClick={onPurge}>Endgültig löschen</Button>
+      ) : eligibility === 'accounting_protected' && onForcePurge ? (
+        <Button size="sm" variant="ghost" icon={AlertTriangle} onClick={onForcePurge}>Notfall-Löschung</Button>
+      ) : null}
     </div>
+  );
+}
+
+/**
+ * Purge eligibility for everything visible in the Papierkorb, in ONE request.
+ *
+ * Per row would be the N+1 this whole feature exists to avoid, so the visible set is resolved in
+ * a single call and indexed by resource id.
+ */
+export function useTrashPurgePlans(
+  scope: WorkspaceScope, resourceIds: string[], active: boolean,
+): Record<string, PurgePlan> {
+  const [plans, setPlans] = useState<Record<string, PurgePlan>>({});
+  const key = resourceIds.join(',');
+
+  useEffect(() => {
+    if (!active || resourceIds.length === 0) { setPlans({}); return; }
+    let cancelled = false;
+    void loadPurgePreflight(scope, resourceIds).then(({ plans: next }) => {
+      if (cancelled) return;
+      const indexed: Record<string, PurgePlan> = {};
+      for (const plan of next) indexed[plan.resourceId] = plan;
+      setPlans(indexed);
+    });
+    return () => { cancelled = true; };
+    // The contents are the input, not the array identity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scope, key, active]);
+
+  return plans;
+}
+
+/* ============================================== tier 1: ordinary purge */
+
+/**
+ * The Papierkorb's ordinary permanent delete.
+ *
+ * No typed phrase and no mandatory reason, because this record never became accounting-relevant —
+ * demanding a ceremony for deleting a draft is how a safety measure turns into noise people learn
+ * to click through. What it does keep is the manifest: the owner still sees exactly what
+ * disappears, including the Storage files, before confirming.
+ */
+export function PurgeDialog({
+  open, org, resourceIds, plans, onClose, onDone, resourceSingular, resourcePlural,
+}: {
+  open: boolean;
+  org: WorkspaceOrganization;
+  resourceIds: string[];
+  /** Already loaded by the trash view; re-asking per dialog would be a second round trip. */
+  plans: Record<string, PurgePlan>;
+  onClose: () => void;
+  onDone: () => void;
+  resourceSingular: string;
+  resourcePlural: string;
+}) {
+  const toast = useToast();
+  const [reason, setReason] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [failure, setFailure] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setReason('');
+    setFailure(null);
+  }, [open]);
+
+  const selected = useMemo(
+    () => resourceIds.map((id) => plans[id]).filter((p): p is PurgePlan => Boolean(p)),
+    // Contents, not identity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [resourceIds.join(','), plans],
+  );
+
+  const lines = useMemo(() => {
+    const merged: Record<string, number> = {};
+    for (const plan of selected) {
+      for (const [table, count] of Object.entries(plan.manifest)) {
+        merged[table] = (merged[table] ?? 0) + count;
+      }
+    }
+    return manifestLines(merged, scopeTable[org.scope]);
+  }, [selected, org.scope]);
+
+  const run = async () => {
+    if (!org.entityId) return;
+    setBusy(true);
+    setFailure(null);
+    const { results, error } = await purgeWorkspaceItems(
+      org.entityId, org.scope, resourceIds, reason.trim() || null,
+    );
+    setBusy(false);
+    if (error) { setFailure('Der Server hat die Aktion abgelehnt. Es wurde nichts verändert.'); return; }
+    const payload = purgeResultToast(results);
+    await org.reload();
+    onClose();
+    onDone();
+    if (payload.tone === 'success') toast.success(payload.title, payload.detail);
+    else toast.error(payload.title, payload.detail);
+  };
+
+  const label = selected.length === 1 ? selected[0].label : null;
+
+  return (
+    <Modal
+      open={open}
+      onClose={busy ? () => {} : onClose}
+      title={resourceIds.length === 1
+        ? `${resourceSingular} endgültig löschen?`
+        : `${resourceIds.length} ${resourcePlural} endgültig löschen?`}
+      size="sm"
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose} disabled={busy}>Abbrechen</Button>
+          <Button variant="danger" onClick={() => void run()} loading={busy}>Endgültig löschen</Button>
+        </>
+      }
+    >
+      <div className={text.body}>
+        <p>
+          Dieser Datensatz war nie buchhaltungsrelevant — nicht gestellt, nicht finalisiert, keine
+          Zahlung. Er wird vollständig aus der Datenbank und dem Dateispeicher entfernt und kann
+          nicht wiederhergestellt werden.
+        </p>
+
+        {label ? <p className="mt-3 font-medium text-[var(--cq-fg)]">{label}</p> : null}
+
+        <p className="mt-3 font-medium text-[var(--cq-fg)]">Endgültig entfernt werden:</p>
+        <ul className="mt-1.5 space-y-1">
+          {lines.map((line) => (
+            <li key={line.table} className="flex gap-2">
+              <span aria-hidden="true" className="text-[var(--cq-fg-subtle)]">·</span>
+              <span>{line.count} × {line.label}</span>
+            </li>
+          ))}
+          {lines.length === 0 ? <li className="text-[var(--cq-fg-subtle)]">Nur der Datensatz selbst.</li> : null}
+        </ul>
+
+        <div className="mt-4">
+          <Field
+            id="purge-reason"
+            label="Grund (optional, wird protokolliert)"
+            value={reason}
+            onChange={setReason}
+            placeholder="z. B. Testdatensatz"
+            disabled={busy}
+          />
+        </div>
+
+        {failure ? <p className="mt-3 text-[13px] text-red-600">{failure}</p> : null}
+      </div>
+    </Modal>
   );
 }
 

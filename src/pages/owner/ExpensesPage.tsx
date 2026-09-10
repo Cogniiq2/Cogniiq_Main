@@ -8,10 +8,10 @@ import {
   type Column, type SortDirection, type StatItem,
 } from '@/components/dashboard';
 import {
-  ForceDeleteDialog, MoveToFolderDialog, RowOrganizeMenu, TrashRowActions, WorkspaceBulkBar,
-  WorkspaceDeleteDialog,
+  ForceDeleteDialog, MoveToFolderDialog, PurgeDialog, RowOrganizeMenu, TrashRowActions,
+  WorkspaceBulkBar, WorkspaceDeleteDialog,
   WorkspaceFolderContextHeader, WorkspaceFolderOverview,
-  emptyFolderCopy, restoreFromTrash, useTrashPlans, useWorkspaceOrganization,
+  emptyFolderCopy, restoreFromTrash, useTrashPurgePlans, useWorkspaceOrganization,
 } from '@/components/finance/workspaceOrganizationUi';
 import {
   FOLDER_TRASH, filterByFolder, folderCounts,
@@ -92,6 +92,8 @@ export function ExpensesPage() {
   const [moveTargets, setMoveTargets] = useState<string[]>([]);
   const [deleteTargets, setDeleteTargets] = useState<string[]>([]);
   const [purgeTarget, setPurgeTarget] = useState<string | null>(null);
+  /* The emergency purge is a separate target so the two dialogs can never both be open. */
+  const [forceTarget, setForceTarget] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [tableSort, setTableSort] = useState<{ key: string; direction: SortDirection } | null>(null);
   const [includeIds, setIncludeIds] = useState(false);
@@ -164,7 +166,7 @@ export function ExpensesPage() {
 
   // An empty CUSTOM folder says so, rather than borrowing the page's "no match" wording.
   const folderEmpty = emptyFolderCopy(org, folderRailCounts);
-  const trashPlans = useTrashPlans('expense', inTrash ? filtered.map((e) => e.id) : [], inTrash);
+  const trashPlans = useTrashPurgePlans('expense', inTrash ? filtered.map((e) => e.id) : [], inTrash);
 
   // A selection only ever means what is currently on screen.
   useEffect(() => { setSelected(new Set()); }, [org.view, filter]);
@@ -270,6 +272,7 @@ export function ExpensesPage() {
               plan={trashPlans[e.id]}
               onRestore={() => void restore([e.id])}
               onPurge={() => setPurgeTarget(e.id)}
+              onForcePurge={() => setForceTarget(e.id)}
             />
           ) : (
             <>
@@ -512,15 +515,28 @@ export function ExpensesPage() {
         onDone={() => { setSelected(new Set()); void load(); }}
       />
 
-      {/* The Papierkorb's real, irreversible delete. Reachable only from the trash, and only
-          behind a typed phrase and a written reason that is stored in the deletion log. */}
-      <ForceDeleteDialog
+      {/* Tier 1: the Papierkorb's ordinary permanent delete, for a record that never became
+          accounting-relevant. The server refuses anything else. */}
+      <PurgeDialog
         open={Boolean(purgeTarget)}
         org={org}
         resourceIds={purgeTarget ? [purgeTarget] : []}
+        plans={trashPlans}
         resourceSingular="Beleg"
         resourcePlural="Belege"
         onClose={() => setPurgeTarget(null)}
+        onDone={() => { setSelected(new Set()); void load(); }}
+      />
+
+      {/* Tier 2: the emergency purge for a record that IS accounting-relevant. Typed phrase,
+          written reason, tombstone. Never what "Löschen" does. */}
+      <ForceDeleteDialog
+        open={Boolean(forceTarget)}
+        org={org}
+        resourceIds={forceTarget ? [forceTarget] : []}
+        resourceSingular="Beleg"
+        resourcePlural="Belege"
+        onClose={() => setForceTarget(null)}
         onDone={() => { setSelected(new Set()); void load(); }}
       />
 
