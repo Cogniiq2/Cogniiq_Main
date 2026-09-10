@@ -8,7 +8,8 @@ import {
   type Column, type SortDirection, type StatItem,
 } from '@/components/dashboard';
 import {
-  MoveToFolderDialog, RowOrganizeMenu, TrashRowActions, WorkspaceBulkBar, WorkspaceDeleteDialog,
+  ForceDeleteDialog, MoveToFolderDialog, RowOrganizeMenu, TrashRowActions, WorkspaceBulkBar,
+  WorkspaceDeleteDialog,
   WorkspaceFolderContextHeader, WorkspaceFolderOverview,
   emptyFolderCopy, restoreFromTrash, useTrashPlans, useWorkspaceOrganization,
 } from '@/components/finance/workspaceOrganizationUi';
@@ -511,12 +512,11 @@ export function ExpensesPage() {
         onDone={() => { setSelected(new Set()); void load(); }}
       />
 
-      {/* The Papierkorb's permanent delete. The server re-runs the preflight and still refuses
-          anything that must be retained, so this can never become a bypass. */}
-      <WorkspaceDeleteDialog
+      {/* The Papierkorb's real, irreversible delete. Reachable only from the trash, and only
+          behind a typed phrase and a written reason that is stored in the deletion log. */}
+      <ForceDeleteDialog
         open={Boolean(purgeTarget)}
         org={org}
-        mode="purge"
         resourceIds={purgeTarget ? [purgeTarget] : []}
         resourceSingular="Beleg"
         resourcePlural="Belege"

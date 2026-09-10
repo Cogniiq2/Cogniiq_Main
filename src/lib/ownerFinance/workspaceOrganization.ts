@@ -131,7 +131,9 @@ export type DeleteAction =
   | 'cancel_and_trash'
   | 'archive_and_trash'
   | 'trash_only'
-  | 'blocked';
+  | 'blocked'
+  /** Only ever returned by the force purge — never by the ordinary preflight. */
+  | 'force_delete';
 
 export interface DeletePlan {
   resourceId: string;
@@ -391,13 +393,208 @@ export async function restoreWorkspaceItems(
   return { restored: (data as { restored?: number })?.restored ?? 0, error: null };
 }
 
-/** "Endgültig löschen" from the Papierkorb. The server re-runs the preflight and may still refuse. */
-export async function purgeWorkspaceItems(
+/* ================================================================ force delete
+ *
+ * The second, irreversible path. Everything above this line describes the ordinary
+ * "Löschen", which is honest about refusing to destroy a numbered document. This is what the
+ * owner reaches for when that refusal is not what they want — a test invoice, a duplicate, a
+ * record that must genuinely leave the system rather than sit in the Papierkorb forever.
+ *
+ * It exists because the original purge could never run: `owner_workspace_delete_items` hard-deletes
+ * anything the preflight calls `hard_delete` instead of trashing it, so no record in the Papierkorb
+ * ever satisfies the condition `owner_workspace_purge_items` required. See
+ * 20260910120000_owner_force_delete.sql.
+ *
+ * The server enforces all four guards — trashed (or archived) first, the typed phrase, a reason of
+ * at least three characters, and a tombstone written in the same transaction. Nothing here may
+ * assume any of them; the UI restates them because it is the honest thing to show, not because it
+ * is what makes them true.
+ */
+
+/** The phrase the owner must type. Must match `owner_force_delete_phrase()` exactly. */
+export const FORCE_DELETE_PHRASE = 'ENDGÜLTIG LÖSCHEN';
+
+export const FORCE_DELETE_MIGRATION = '20260910120000_owner_force_delete.sql';
+
+export interface ForceDeletePreview {
+  resourceId: string;
+  found: boolean;
+  label: string | null;
+  /** The record as it was, straight from the server. Rendered read-only. */
+  summary: Record<string, unknown>;
+  /** Table name -> number of rows that will cease to exist. */
+  manifest: Record<string, number>;
+  reason: string | null;
+}
+
+/**
+ * German for a physical table name.
+ *
+ * The manifest is a catalog walk, so it can name a table this map has never heard of. That is
+ * deliberate and must stay non-fatal: an unknown table is shown under its own name rather than
+ * hidden, because hiding a row count in a destruction confirmation is the one thing this dialog
+ * may never do.
+ */
+export const manifestTableLabel: Record<string, string> = {
+  owner_invoices: 'Rechnung',
+  owner_invoice_lines: 'Rechnungsposition',
+  owner_invoice_versions: 'Rechnungsversion',
+  owner_offers: 'Angebot',
+  owner_offer_lines: 'Angebotsposition',
+  owner_offer_versions: 'Angebotsversion',
+  owner_offer_acceptance_events: 'Annahme-Nachweis',
+  owner_expenses: 'Beleg',
+  owner_expense_lines: 'Belegposition',
+  owner_payments: 'Zahlung',
+  owner_finance_documents: 'Dokument',
+  owner_generated_documents: 'Erzeugtes PDF',
+  owner_document_access_tokens: 'Freigabe-Link',
+  owner_document_access_events: 'Zugriffsereignis',
+  owner_customers: 'Kunde',
+  owner_customer_tasks: 'Aufgabe',
+  owner_customer_activity: 'Aktivität',
+  owner_customer_services: 'Kundenservice',
+  owner_subscriptions: 'Abonnement',
+  owner_revenue_contracts: 'Umsatzvertrag',
+  owner_revenue_contract_lines: 'Vertragsposition',
+  owner_revenue_contract_postings: 'Vertragsbuchung',
+  owner_service_engagements: 'Onboarding',
+  customer_project_invoices: 'Projektverknüpfung',
+};
+
+export interface ManifestLine {
+  table: string;
+  label: string;
+  count: number;
+}
+
+/**
+ * The manifest as sorted, human lines. The record's own table comes first — it is the thing the
+ * owner asked to delete — and the dependents follow by descending count.
+ */
+export function manifestLines(
+  manifest: Record<string, number>, primaryTable?: string,
+): ManifestLine[] {
+  return Object.entries(manifest)
+    .filter(([, count]) => count > 0)
+    .map(([table, count]) => ({ table, label: manifestTableLabel[table] ?? table, count }))
+    .sort((a, b) => {
+      if (a.table === primaryTable) return -1;
+      if (b.table === primaryTable) return 1;
+      return b.count - a.count || a.label.localeCompare(b.label, 'de');
+    });
+}
+
+/** The physical table behind a scope, so `manifestLines` can put it first. Mirrors the SQL. */
+export const scopeTable: Record<string, string> = {
+  invoice: 'owner_invoices',
+  offer: 'owner_offers',
+  expense: 'owner_expenses',
+  customer: 'owner_customers',
+};
+
+/**
+ * Stable server codes turned into something the owner can act on. Anything the server did not
+ * name explicitly stays generic rather than leaking a Postgres message into the dialog.
+ */
+export function forceDeleteErrorText(message: string | null | undefined): string {
+  if (!message) return 'Der Datensatz konnte nicht gelöscht werden.';
+  if (message.includes('force_delete_confirmation_required')) {
+    return `Bitte tippen Sie „${FORCE_DELETE_PHRASE}" exakt so ein.`;
+  }
+  if (message.includes('force_delete_reason_required')) return 'Bitte geben Sie einen Grund an.';
+  if (message.includes('force_delete_requires_archived')) {
+    return 'Der Kunde muss zuerst archiviert werden.';
+  }
+  if (message.includes('force_delete_protected_table')) {
+    return 'Dieser Datensatz ist strukturell geschützt und kann nicht gelöscht werden.';
+  }
+  if (message.includes('force_delete_depth_exceeded')) {
+    return 'Der Datensatz hat zu viele verknüpfte Ebenen. Bitte löschen Sie die Verknüpfungen zuerst.';
+  }
+  if (message.includes('Owner access required')) return 'Keine Berechtigung.';
+  if (message.includes('customer not found')) return 'Kunde nicht gefunden.';
+  return 'Der Datensatz konnte nicht gelöscht werden.';
+}
+
+/** Read-only. Answers "what exactly disappears if I confirm this?" and destroys nothing. */
+export async function loadForceDeletePreview(
+  scope: string, resourceId: string,
+): Promise<{ preview: ForceDeletePreview | null; error: string | null }> {
+  const { data, error } = await supabase.rpc('owner_force_delete_preview', {
+    p_scope: scope, p_resource_id: resourceId,
+  });
+  if (error) return { preview: null, error: error.message };
+  const row = data as {
+    resource_id?: string; found?: boolean; label?: string | null; reason?: string | null;
+    summary?: Record<string, unknown>; manifest?: Record<string, number>;
+  } | null;
+  if (!row) return { preview: null, error: 'unknown' };
+  return {
+    preview: {
+      resourceId: row.resource_id ?? resourceId,
+      found: Boolean(row.found),
+      label: row.label ?? null,
+      summary: row.summary ?? {},
+      manifest: row.manifest ?? {},
+      reason: row.reason ?? null,
+    },
+    error: null,
+  };
+}
+
+/**
+ * Destroys the records for real. Only reachable for something already in the Papierkorb — the
+ * server checks that itself and returns `blocked` with `not_trashed` otherwise.
+ */
+export async function forcePurgeWorkspaceItems(
   entityId: string, scope: WorkspaceScope, resourceIds: string[],
+  reason: string, confirmation: string,
 ): Promise<{ results: DeleteResult[]; error: string | null }> {
-  const { data, error } = await supabase.rpc('owner_workspace_purge_items', {
+  const { data, error } = await supabase.rpc('owner_force_purge_items', {
     p_entity: entityId, p_scope: scope, p_resource_ids: resourceIds,
+    p_reason: reason, p_confirmation: confirmation,
   });
   if (error) return { results: [], error: error.message };
   return { results: toResults(data), error: null };
+}
+
+/**
+ * The customer counterpart. The archive is the customer's Papierkorb, so the server refuses
+ * anything that is not archived yet — the two-step rule is the same one, spelled differently.
+ */
+export async function forceDeleteCustomer(
+  customerId: string, reason: string, confirmation: string,
+): Promise<{ deleted: boolean; label: string | null; error: string | null }> {
+  const { data, error } = await supabase.rpc('owner_force_delete_customer', {
+    p_customer_id: customerId, p_reason: reason, p_confirmation: confirmation,
+  });
+  if (error) return { deleted: false, label: null, error: error.message };
+  const row = data as { deleted?: boolean; label?: string | null } | null;
+  return { deleted: Boolean(row?.deleted), label: row?.label ?? null, error: null };
+}
+
+/** What the toast says after a force purge — plainly, with no softening. */
+export function forceResultToast(
+  results: DeleteResult[],
+): { tone: 'success' | 'error'; title: string; detail?: string } {
+  const done = results.filter((r) => r.outcome === 'hard_deleted');
+  const notTrashed = results.filter((r) => r.error === 'not_trashed');
+  if (done.length === 0) {
+    return {
+      tone: 'error',
+      title: 'Nichts gelöscht',
+      detail: notTrashed.length
+        ? 'Nur Einträge im Papierkorb können endgültig gelöscht werden.'
+        : 'Der Server hat die Aktion abgelehnt.',
+    };
+  }
+  const failed = results.length - done.length;
+  return {
+    tone: failed ? 'error' : 'success',
+    title: done.length === 1 ? 'Endgültig gelöscht' : `${done.length} endgültig gelöscht`,
+    detail: failed
+      ? `${failed} ${failed === 1 ? 'Eintrag konnte' : 'Einträge konnten'} nicht gelöscht werden.`
+      : undefined,
+  };
 }

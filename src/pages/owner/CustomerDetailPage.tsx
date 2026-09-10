@@ -19,6 +19,12 @@ import { formatOfferAmount } from '@/lib/ownerFinance/offerAmountDisplay';
 import {
   customerStatusLabel, customerStatusTone, customerDisplayName, offerStatusLabel, offerStatusTone,
 } from '@/lib/ownerFinance/customerLabels';
+import {
+  ForceDeleteConfirmModal, useForceDeletePreviews,
+} from '@/components/finance/workspaceOrganizationUi';
+import {
+  FORCE_DELETE_PHRASE, forceDeleteCustomer, forceDeleteErrorText, scopeTable,
+} from '@/lib/ownerFinance/workspaceOrganization';
 import { CustomerFormDialog } from '@/components/finance/CustomerFormDialog';
 import { CustomerTaskChecklist } from '@/components/finance/CustomerTaskChecklist';
 import { CustomerProjectPanel } from '@/components/finance/CustomerProjectPanel';
@@ -77,6 +83,7 @@ export function CustomerDetailPage() {
   const [completeOpen, setCompleteOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [forceDeleteOpen, setForceDeleteOpen] = useState(false);
   /* Reported by the services panel so the edit dialog can show which services are already
      provisioned — and refuse to offer them for removal there. */
   const [activeServices, setActiveServices] = useState<ServiceKey[]>([]);
@@ -163,6 +170,24 @@ export function CustomerDetailPage() {
     ].filter(Boolean).join(' und ');
     toast.success('Kunde gelöscht', removed ? `Mitgelöscht: ${removed}.` : undefined);
     navigate('/admin/finance/customers');
+  };
+
+  /*
+    The irreversible counterpart. The server requires the customer to be archived, the exact
+    phrase and a reason, and writes an append-only tombstone before anything is destroyed — so
+    none of those guards is restated here as a condition, only as the copy the dialog shows.
+  */
+  const forcePreviews = useForceDeletePreviews('customer', customerId ? [customerId] : [], forceDeleteOpen);
+
+  const runForceDelete = async (reason: string): Promise<string | null> => {
+    if (!customerId) return 'Kein Kunde ausgewählt.';
+    const { deleted, label, error: err } = await forceDeleteCustomer(customerId, reason, FORCE_DELETE_PHRASE);
+    if (err) return forceDeleteErrorText(err);
+    if (!deleted) return forceDeleteErrorText(null);
+    setForceDeleteOpen(false);
+    toast.success('Endgültig gelöscht', label ? `${label} wurde vollständig entfernt.` : undefined);
+    navigate('/admin/finance/customers');
+    return null;
   };
 
   if (loading) {
@@ -362,23 +387,34 @@ export function CustomerDetailPage() {
               <Button variant="ghost" icon={Archive} onClick={() => setArchiveOpen(true)}>Archivieren</Button>
             )}
             {/*
-              Deletion is offered only when it is actually possible. A customer
-              with protected financial records gets archiving instead — the
-              button explains why rather than failing on click.
+              The safe delete is offered only when it is actually possible: a customer with
+              protected financial records gets archiving instead, and the button says why rather
+              than failing on click.
+
+              The archived state is also the second step for the irreversible one. An archived
+              customer can be destroyed for real — invoices, offers, onboarding and all — behind
+              the typed phrase and a logged reason. That is the only way out for a test customer
+              that has an issued invoice hanging off it, which the safe path can never delete.
             */}
-            <Button
-              variant="ghost"
-              icon={Trash2}
-              onClick={() => setDeleteOpen(true)}
-              disabled={!detail.delete_blockers.deletable}
-              title={
-                detail.delete_blockers.deletable
-                  ? undefined
-                  : `Nicht löschbar: ${blockerSentence(detail.delete_blockers)}. Archivieren Sie den Kunden stattdessen.`
-              }
-            >
-              Löschen
-            </Button>
+            {c.status === 'archived' ? (
+              <Button variant="ghost" icon={Trash2} onClick={() => setForceDeleteOpen(true)}>
+                Endgültig löschen
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                icon={Trash2}
+                onClick={() => setDeleteOpen(true)}
+                disabled={!detail.delete_blockers.deletable}
+                title={
+                  detail.delete_blockers.deletable
+                    ? undefined
+                    : `Nicht löschbar: ${blockerSentence(detail.delete_blockers)}. Archivieren Sie den Kunden zuerst, um ihn endgültig löschen zu können.`
+                }
+              >
+                Löschen
+              </Button>
+            )}
           </>
         }
       />
@@ -664,6 +700,21 @@ export function CustomerDetailPage() {
             ) : null}
           </>
         } />
+
+      {/*
+        The irreversible one. It is reachable only from the archived state, and it destroys the
+        customer together with everything the RESTRICT foreign keys make a structural dependent —
+        issued invoices, finalized offers, subscriptions, onboarding. The manifest inside the
+        dialog names every one of those before the owner confirms; nothing here summarises it.
+      */}
+      <ForceDeleteConfirmModal
+        open={forceDeleteOpen}
+        heading="Kunde endgültig löschen?"
+        previews={forcePreviews}
+        primaryTable={scopeTable.customer}
+        onClose={() => setForceDeleteOpen(false)}
+        onRun={runForceDelete}
+      />
     </>
   );
 }

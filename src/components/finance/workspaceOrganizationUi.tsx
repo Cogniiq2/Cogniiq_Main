@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import {
   ChevronLeft, Folder, FolderInput, FolderOpen, FolderPlus, LayoutList, MoreHorizontal,
-  Pencil, RotateCcw, Trash2, X, type LucideIcon,
+  AlertTriangle, Pencil, RotateCcw, Trash2, X, type LucideIcon,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -17,11 +17,13 @@ import {
   EMPTY_WORKSPACE_STATE, FOLDER_ALL, FOLDER_TRASH, FOLDER_UNFILED,
   createWorkspaceFolder, deleteWorkspaceFolder, deleteWorkspaceItems,
   folderErrorText, loadWorkspaceState, moveWorkspaceItems, preflightWorkspaceDelete,
-  purgeWorkspaceItems, renameWorkspaceFolder, restoreWorkspaceItems, resultToast,
+  renameWorkspaceFolder, restoreWorkspaceItems, resultToast,
   summarisePlans, summaryLines, validateFolderName,
   describeReasons,
-  type DeletePlan, type FolderCounts, type FolderSelection, type WorkspaceFolder,
-  type WorkspaceScope, type WorkspaceState,
+  FORCE_DELETE_PHRASE, forceDeleteErrorText, forcePurgeWorkspaceItems, forceResultToast,
+  loadForceDeletePreview, manifestLines, scopeTable,
+  type DeletePlan, type FolderCounts, type FolderSelection, type ForceDeletePreview,
+  type WorkspaceFolder, type WorkspaceScope, type WorkspaceState,
 } from '@/lib/ownerFinance/workspaceOrganization';
 
 /**
@@ -821,7 +823,7 @@ const confirmLabelFor: Record<string, string> = {
  * actionable — nothing is optimistically hidden before the server has confirmed it.
  */
 export function WorkspaceDeleteDialog({
-  open, org, resourceIds, onClose, onDone, resourceSingular, resourcePlural, mode = 'delete',
+  open, org, resourceIds, onClose, onDone, resourceSingular, resourcePlural,
 }: {
   open: boolean;
   org: WorkspaceOrganization;
@@ -830,8 +832,6 @@ export function WorkspaceDeleteDialog({
   onDone: () => void;
   resourceSingular: string;
   resourcePlural: string;
-  /** `purge` is the Papierkorb's "Endgültig löschen"; it only ever hard-deletes. */
-  mode?: 'delete' | 'purge';
 }) {
   const toast = useToast();
   const [plans, setPlans] = useState<DeletePlan[] | null>(null);
@@ -860,9 +860,7 @@ export function WorkspaceDeleteDialog({
     if (!org.entityId) return;
     setBusy(true);
     setFailure(null);
-    const { results, error } = mode === 'purge'
-      ? await purgeWorkspaceItems(org.entityId, org.scope, resourceIds)
-      : await deleteWorkspaceItems(org.entityId, org.scope, resourceIds);
+    const { results, error } = await deleteWorkspaceItems(org.entityId, org.scope, resourceIds);
     setBusy(false);
     if (error) { setFailure('Der Server hat die Aktion abgelehnt. Es wurde nichts verändert.'); return; }
     const toastPayload = resultToast(results);
@@ -873,18 +871,13 @@ export function WorkspaceDeleteDialog({
     else toast.error(toastPayload.title, toastPayload.detail);
   };
 
-  const actionable = mode === 'purge'
-    ? (summary?.hardDelete ?? 0) > 0
-    : (summary ? summary.total - summary.blocked > 0 : false);
+  const actionable = summary ? summary.total - summary.blocked > 0 : false;
 
-  const title = mode === 'purge'
-    ? 'Endgültig löschen?'
-    : single ? (singleTitle[single.action] ?? 'Entfernen?')
+  const title = single
+    ? (singleTitle[single.action] ?? 'Entfernen?')
     : `${resourceIds.length} ${resourcePlural} entfernen?`;
 
-  const confirmLabel = mode === 'purge'
-    ? 'Endgültig löschen'
-    : single ? (confirmLabelFor[single.action] ?? 'Entfernen') : 'Entfernen';
+  const confirmLabel = single ? (confirmLabelFor[single.action] ?? 'Entfernen') : 'Entfernen';
 
   return (
     <Modal
@@ -896,7 +889,7 @@ export function WorkspaceDeleteDialog({
         <>
           <Button variant="secondary" onClick={onClose} disabled={busy}>Abbrechen</Button>
           <Button
-            variant={single?.action === 'hard_delete' || mode === 'purge' ? 'danger' : 'primary'}
+            variant={single?.action === 'hard_delete' ? 'danger' : 'primary'}
             onClick={() => void run()}
             loading={busy}
             disabled={!plans || !actionable}
@@ -938,27 +931,262 @@ export function WorkspaceDeleteDialog({
 /* ============================================================ trash notes */
 
 /**
- * The Papierkorb row actions. "Endgültig löschen" appears ONLY where the server preflight says
- * a hard delete is genuinely available — a button that would always refuse is worse than no
- * button. Where it is absent, the row states why, once, without lecturing.
+ * The Papierkorb row actions.
+ *
+ * "Endgültig löschen" is now offered for EVERY row in the Papierkorb, which is the fix for a
+ * defect rather than a relaxation of the rules. The button used to be rendered only where the
+ * preflight said `hard_delete` — but `owner_workspace_delete_items` hard-deletes such a record
+ * on the spot instead of trashing it, so no row that reaches the Papierkorb ever satisfied that
+ * condition. Every row showed "muss erhalten bleiben" and the Papierkorb had no exit at all.
+ *
+ * What replaces it is not a silent bypass. Where the preflight still says a record should be
+ * retained, the row keeps saying so, and the button opens the force-delete dialog — which states
+ * exactly what will be destroyed, requires the typed phrase and a written reason, and records a
+ * tombstone. The rule became a warning the owner can overrule deliberately, instead of a wall.
  */
 export function TrashRowActions({ plan, onRestore, onPurge }: {
   plan: DeletePlan | undefined;
   onRestore: () => void;
+  /** Opens the force-delete confirmation. It never deletes anything by itself. */
   onPurge: () => void;
 }) {
-  const purgeable = plan?.action === 'hard_delete';
+  const retained = plan !== undefined && plan.action !== 'hard_delete';
   return (
-    <div className="flex items-center justify-end gap-1.5">
-      <Button size="sm" variant="secondary" icon={RotateCcw} onClick={onRestore}>Wiederherstellen</Button>
-      {purgeable ? (
-        <Button size="sm" variant="ghost" icon={Trash2} onClick={onPurge}>Endgültig löschen</Button>
-      ) : (
-        <span className={cn('max-w-[220px] text-right', text.hint)}>
-          Muss aus Nachweis-/Buchhaltungsgründen erhalten bleiben.
+    <div className="flex items-center justify-end gap-2">
+      {retained ? (
+        <span className={cn('max-w-[200px] text-right', text.hint)}>
+          Sollte aus Nachweis-/Buchhaltungsgründen erhalten bleiben.
         </span>
-      )}
+      ) : null}
+      <Button size="sm" variant="secondary" icon={RotateCcw} onClick={onRestore}>Wiederherstellen</Button>
+      <Button size="sm" variant="ghost" icon={Trash2} onClick={onPurge}>Endgültig löschen</Button>
     </div>
+  );
+}
+
+/* ==================================================== force delete dialog */
+
+/**
+ * The irreversible confirmation, shared by every surface that offers one.
+ *
+ * Three things make it safe enough to exist, and all three are the server's — this component
+ * only refuses to hide them:
+ *
+ *   - it is reachable only after the record was already removed once (Papierkorb, or the
+ *     customer archive), so nothing is destroyed straight out of a working list;
+ *   - the exact phrase has to be typed, so nothing reaches it by a misclick;
+ *   - a written reason is mandatory and is stored in an append-only tombstone alongside the
+ *     record's number, totals and dates.
+ *
+ * The manifest is shown in full and in advance. A destruction confirmation that summarises, or
+ * that quietly omits a table the owner has never heard of, is worse than none: the whole point
+ * is that nothing about what disappears is a surprise afterwards.
+ */
+export function ForceDeleteConfirmModal({
+  open, heading, previews, primaryTable, onClose, onRun, busyLabel,
+}: {
+  open: boolean;
+  heading: string;
+  /** `null` while the previews are still loading. */
+  previews: ForceDeletePreview[] | null;
+  /** The record's own table, so it heads the manifest instead of sorting by count. */
+  primaryTable?: string;
+  onClose: () => void;
+  /** Performs the destruction. Returns a rendered German error, or null on success. */
+  onRun: (reason: string) => Promise<string | null>;
+  busyLabel?: string;
+}) {
+  const [phrase, setPhrase] = useState('');
+  const [reason, setReason] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [failure, setFailure] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setPhrase('');
+    setReason('');
+    setFailure(null);
+  }, [open]);
+
+  // Summed across the selection, so a bulk delete states one total rather than N lists.
+  const lines = useMemo(() => {
+    const merged: Record<string, number> = {};
+    for (const preview of previews ?? []) {
+      for (const [table, count] of Object.entries(preview.manifest)) {
+        merged[table] = (merged[table] ?? 0) + count;
+      }
+    }
+    return manifestLines(merged, primaryTable);
+  }, [previews, primaryTable]);
+
+  const phraseOk = phrase.trim() === FORCE_DELETE_PHRASE;
+  const reasonOk = reason.trim().length >= 3;
+
+  const run = async () => {
+    if (!phraseOk || !reasonOk) return;
+    setBusy(true);
+    setFailure(null);
+    const error = await onRun(reason.trim());
+    setBusy(false);
+    if (error) setFailure(error);
+  };
+
+  const label = previews?.length === 1 ? previews[0].label : null;
+
+  return (
+    <Modal
+      open={open}
+      onClose={busy ? () => {} : onClose}
+      title={heading}
+      size="sm"
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose} disabled={busy}>Abbrechen</Button>
+          <Button
+            variant="danger"
+            onClick={() => void run()}
+            loading={busy}
+            disabled={!previews || !phraseOk || !reasonOk}
+          >
+            {busyLabel ?? 'Endgültig löschen'}
+          </Button>
+        </>
+      }
+    >
+      <div className={text.body}>
+        <div className="flex gap-2.5">
+          <AlertTriangle size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-red-600" />
+          <p>
+            Diese Aktion ist <strong>nicht umkehrbar</strong>. Der Datensatz wird vollständig aus der
+            Datenbank und aus dem Dateispeicher entfernt — nicht ausgeblendet, nicht archiviert.
+          </p>
+        </div>
+
+        <p className="mt-3 text-[var(--cq-fg-subtle)]">
+          Nummer, Beträge, Datum und Empfänger werden vorher in einem unveränderlichen
+          Löschprotokoll festgehalten. Prüfen Sie selbst, ob eine gesetzliche Aufbewahrungspflicht
+          (§ 147 AO, § 14b UStG) dem Löschen entgegensteht.
+        </p>
+
+        {!previews ? (
+          <div className="mt-3 flex items-center gap-2">
+            <Spinner className="h-4 w-4" />
+            <span>Wird geprüft …</span>
+          </div>
+        ) : (
+          <>
+            {label ? <p className="mt-3 font-medium text-[var(--cq-fg)]">{label}</p> : null}
+            <p className="mt-3 font-medium text-[var(--cq-fg)]">Endgültig entfernt werden:</p>
+            <ul className="mt-1.5 space-y-1">
+              {lines.map((line) => (
+                <li key={line.table} className="flex gap-2">
+                  <span aria-hidden="true" className="text-[var(--cq-fg-subtle)]">·</span>
+                  <span>{line.count} × {line.label}</span>
+                </li>
+              ))}
+              {lines.length === 0 ? <li className="text-[var(--cq-fg-subtle)]">Nichts gefunden.</li> : null}
+            </ul>
+          </>
+        )}
+
+        <div className="mt-4 space-y-3">
+          <Field
+            id="force-delete-reason"
+            label="Grund (wird protokolliert)"
+            value={reason}
+            onChange={setReason}
+            placeholder="z. B. Testdatensatz, Dublette"
+            disabled={busy}
+            required
+          />
+          <Field
+            id="force-delete-phrase"
+            label={`Zur Bestätigung „${FORCE_DELETE_PHRASE}" eingeben`}
+            value={phrase}
+            onChange={setPhrase}
+            placeholder={FORCE_DELETE_PHRASE}
+            disabled={busy}
+            required
+          />
+        </div>
+
+        {failure ? <p className="mt-3 text-[13px] text-red-600">{failure}</p> : null}
+      </div>
+    </Modal>
+  );
+}
+
+/**
+ * Loads one preview per record.
+ *
+ * Per record rather than per batch on purpose: the manifest is a catalog walk rooted at a single
+ * row, and merging them server-side would hide which record carries which dependents from a
+ * caller that wanted to show exactly that.
+ */
+export function useForceDeletePreviews(
+  scope: string, resourceIds: string[], active: boolean,
+): ForceDeletePreview[] | null {
+  const [previews, setPreviews] = useState<ForceDeletePreview[] | null>(null);
+  const key = resourceIds.join(',');
+
+  useEffect(() => {
+    if (!active || resourceIds.length === 0) { setPreviews(null); return; }
+    let cancelled = false;
+    setPreviews(null);
+    void Promise.all(resourceIds.map((id) => loadForceDeletePreview(scope, id)))
+      .then((entries) => {
+        if (cancelled) return;
+        setPreviews(entries.map((e) => e.preview).filter((p): p is ForceDeletePreview => Boolean(p)));
+      });
+    return () => { cancelled = true; };
+    // Contents, not array identity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scope, key, active]);
+
+  return previews;
+}
+
+/** The Papierkorb's "Endgültig löschen" for invoices, offers and expenses. */
+export function ForceDeleteDialog({
+  open, org, resourceIds, onClose, onDone, resourceSingular, resourcePlural,
+}: {
+  open: boolean;
+  org: WorkspaceOrganization;
+  resourceIds: string[];
+  onClose: () => void;
+  onDone: () => void;
+  resourceSingular: string;
+  resourcePlural: string;
+}) {
+  const toast = useToast();
+  const previews = useForceDeletePreviews(org.scope, resourceIds, open);
+
+  const run = async (reason: string): Promise<string | null> => {
+    if (!org.entityId) return 'Kein Mandant ausgewählt.';
+    const { results, error } = await forcePurgeWorkspaceItems(
+      org.entityId, org.scope, resourceIds, reason, FORCE_DELETE_PHRASE,
+    );
+    if (error) return forceDeleteErrorText(error);
+    const payload = forceResultToast(results);
+    await org.reload();
+    onClose();
+    onDone();
+    if (payload.tone === 'success') toast.success(payload.title, payload.detail);
+    else toast.error(payload.title, payload.detail);
+    return null;
+  };
+
+  return (
+    <ForceDeleteConfirmModal
+      open={open}
+      heading={resourceIds.length === 1
+        ? `${resourceSingular} endgültig löschen?`
+        : `${resourceIds.length} ${resourcePlural} endgültig löschen?`}
+      previews={previews}
+      primaryTable={scopeTable[org.scope]}
+      onClose={onClose}
+      onRun={run}
+    />
   );
 }
 

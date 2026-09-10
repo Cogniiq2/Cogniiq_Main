@@ -203,8 +203,20 @@ describe('every operation goes through an owner-gated RPC', () => {
       { p_entity: 'e1', p_scope: 'expense', p_resource_ids: ['a'], p_reason: null }],
     ['restoreWorkspaceItems', () => w.restoreWorkspaceItems('e1', 'expense', ['a']), 'owner_workspace_restore_items',
       { p_entity: 'e1', p_scope: 'expense', p_resource_ids: ['a'] }],
-    ['purgeWorkspaceItems', () => w.purgeWorkspaceItems('e1', 'invoice', ['a']), 'owner_workspace_purge_items',
-      { p_entity: 'e1', p_scope: 'invoice', p_resource_ids: ['a'] }],
+    // The Papierkorb's permanent delete. It replaces purgeWorkspaceItems, whose RPC could never
+    // act on anything that reached the trash, and it carries the two arguments that make an
+    // irreversible call deliberate rather than reachable by accident.
+    ['forcePurgeWorkspaceItems',
+      () => w.forcePurgeWorkspaceItems('e1', 'invoice', ['a'], 'Testdatensatz', w.FORCE_DELETE_PHRASE),
+      'owner_force_purge_items',
+      { p_entity: 'e1', p_scope: 'invoice', p_resource_ids: ['a'], p_reason: 'Testdatensatz',
+        p_confirmation: w.FORCE_DELETE_PHRASE }],
+    ['forceDeleteCustomer',
+      () => w.forceDeleteCustomer('c1', 'Testkunde', w.FORCE_DELETE_PHRASE),
+      'owner_force_delete_customer',
+      { p_customer_id: 'c1', p_reason: 'Testkunde', p_confirmation: w.FORCE_DELETE_PHRASE }],
+    ['loadForceDeletePreview', () => w.loadForceDeletePreview('invoice', 'a'), 'owner_force_delete_preview',
+      { p_scope: 'invoice', p_resource_id: 'a' }],
   ])('%s → %s', async (_label, call, fnName, args) => {
     await call();
     expect(rpc).toHaveBeenCalledWith(fnName, args);

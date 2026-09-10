@@ -460,10 +460,17 @@ describe('the Papierkorb', () => {
     await open(user, 'Papierkorb');
     await waitFor(() => expect(visibleRefs()).toHaveLength(1));
 
-    // A record that must be retained shows no permanent-delete button — it says why instead.
+    // A record that should be retained still SAYS so — the warning is the part that stays.
     // Rendered once in the table row and once in the mobile card — both, never neither.
     expect(await screen.findAllByText(/Nachweis-\/Buchhaltungsgründen erhalten bleiben/)).toHaveLength(2);
-    expect(screen.queryByRole('button', { name: 'Endgültig löschen' })).not.toBeInTheDocument();
+
+    // But it is no longer a dead end. "Endgültig löschen" is offered for every row in the
+    // Papierkorb, because the old condition (`plan.action === 'hard_delete'`) could never hold
+    // for a trashed record: anything hard-deletable is destroyed by the ordinary delete instead
+    // of being trashed, so the button was unreachable on every row that ever reached this view.
+    // What guards the destruction now is the confirmation dialog and the server, not a hidden
+    // button — see the force-delete tests.
+    expect(screen.getAllByRole('button', { name: 'Endgültig löschen' }).length).toBeGreaterThan(0);
 
     await user.click(screen.getAllByRole('button', { name: 'Wiederherstellen' })[0]);
     await waitFor(() => expect(server.items.get('x4')?.trashed_at).toBeNull());
