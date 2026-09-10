@@ -10,7 +10,7 @@ const config: ProblemPageConfig = {
   },
   h1: "Zu viel manuelle Arbeit im Unternehmen: Automatisierung löst das Problem",
   tagline: "Problem · Manuelle Prozesse · Automatisierung",
-  intro: "Deutschlands Unternehmen verbringen täglich Stunden mit Aufgaben, die sich als Ablauf einrichten lassen. Jede Stunde manuelle Arbeit ist eine verlorene Stunde, die besser in Wachstum investiert wäre.",
+  intro: "Deutschlands Unternehmen verbringen täglich Stunden mit Aufgaben, die sich als wiederkehrende Abläufe einrichten lassen. Jede Stunde manuelle Arbeit ist eine verlorene Stunde, die besser in Wachstum investiert wäre.",
   problem: {
     headline: "Welche manuellen Prozesse Unternehmen täglich Zeit kosten",
     points: [

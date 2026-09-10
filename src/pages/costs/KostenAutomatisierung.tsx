@@ -24,9 +24,9 @@ const config: CostPageConfig = {
       description: "Verbindung mehrerer Systeme (CRM, Buchhaltung, Kalender, E-Mail) mit automatisierten Workflows. Dokumentiert, wartbar und skalierbar.",
     },
     {
-      label: "Vollständige Digitalisierung",
+      label: "Durchgehende Digitalisierung",
       range: "ab 5.000 €",
-      description: "Umfassende Automatisierung der Kernprozesse eines Unternehmens: Onboarding, Lead-Management, Kommunikation, Abrechnung und Reporting laufen als eingerichtete Abläufe statt als Handarbeit.",
+      description: "Umfassende Automatisierung der Kernprozesse eines Unternehmens: Onboarding, Lead-Management, Kommunikation, Abrechnung und Reporting laufen als eingerichtete Abläufe statt in Handarbeit.",
     },
   ],
   priceFactors: [
