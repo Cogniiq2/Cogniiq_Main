@@ -38,6 +38,32 @@ Grundlage: `.claude/COPY-BRIEF-2.md` (Phase 0). Antworten des Inhabers vom
 
 ---
 
+## Nachtrag 10.09.2026 — Terminbuchung und Bestätigungen (abschließend)
+
+Der Inhaber hat die beiden Fragen beantwortet, die `COPY-CLAIMS-TO-VERIFY.md`
+Z25 als blockierend geführt hat. **Diese Antworten sind abschließend. Ihr Umfang
+wird nicht erweitert, auch nicht sinngemäß.**
+
+| Schlüssel | Antwort des Inhabers | Was daraus für die Website folgt |
+|---|---|---|
+| `BOOKING_WRITE` | **ONLY AFTER VERIFIED CUSTOMER INTEGRATION** | Der Assistent darf **nicht** als System dargestellt werden, das Termine allgemein oder automatisch in ein Kunden-, Praxis- oder Kalendersystem schreibt. Diese Fähigkeit darf nur dort beschrieben werden, wo die kundenspezifische Anbindung technisch geprüft ist. Universell belegt ist die **Aufnahme** des Terminwunsches, nicht der Schreibvorgang |
+| `SMS_EMAIL_CONFIRMATION` | **ONLY FOR SPECIFIC CUSTOMER WORKFLOWS** | SMS- und E-Mail-Bestätigungen sind **keine** Standardfunktion des KI-Telefonassistenten. Generische bzw. öffentliche Copy darf sie nicht als für jeden Kunden enthalten darstellen. Sie dürfen als Bestandteil eines konkret eingerichteten Kundenablaufs beschrieben werden |
+
+**Kanonische Fassung im Code:** `FAKTEN.terminaufnahme` und
+`FAKTEN.bestaetigungen` in `src/lib/telefonassistent-copy.ts`. Wer diese Frage
+erneut aufwirft, liest zuerst dort.
+
+**Ausdrücklich nicht betroffen** — und deshalb nicht "mit zu korrigieren":
+
+- **Online-Terminbuchung als Funktion einer von Cogniiq gebauten Website.** Das
+  ist das Webdesign-Produkt und keine Aussage über eine PVS-Anbindung.
+- **Bestätigungs-Mails eines Kontaktformulars** auf einer solchen Website.
+- **Das Automatisierungsprodukt**, dessen Gegenstand gerade das Einrichten
+  kundenspezifischer Abläufe ist — das ist der von `SMS_EMAIL_CONFIRMATION`
+  ausdrücklich erlaubte Fall, kein Verstoß gegen ihn.
+
+---
+
 ## Die ursprünglichen Fragen
 
 Zur Nachvollziehbarkeit unverändert erhalten. Leer gebliebene Felder bedeuten:

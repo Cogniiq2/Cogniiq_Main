@@ -247,7 +247,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/bayern/ki-telefonassistent",
     title: "KI-Telefonassistent Bayern | AI-Rezeptionistin für bayerische Unternehmen – Cogniiq",
-    description: "Der KI-Telefonassistent für Unternehmen in Bayern: nimmt Anrufe an, bucht Termine, beantwortet Fragen – auch außerhalb regulärer Geschäftszeiten. Persönliche Einrichtung durch Cogniiq in Bayreuth.",
+    description: "Der KI-Telefonassistent für Unternehmen in Bayern: nimmt Anrufe an und erfasst Terminwünsche nach Ihren Regeln – auch außerhalb regulärer Geschäftszeiten.",
     keywords: "KI Telefonassistent Bayern, AI Rezeptionistin Bayern, KI Telefon Bayern",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.82" },
@@ -291,7 +291,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/bayreuth/ki-telefonassistent",
     title: "KI Telefonassistent Bayreuth – AI Rezeption & Anrufannahme | Cogniiq",
-    description: "KI Telefonassistent Bayreuth: Anrufannahme, Terminbuchung und Weiterleitung für lokale Unternehmen. Auch außerhalb der Öffnungszeiten, ohne Gesprächsaufzeichnung, in zwei Wochen eingerichtet und bereit zur Freigabe.",
+    description: "KI Telefonassistent Bayreuth: Anrufannahme, Terminaufnahme und Weiterleitung für lokale Unternehmen. Auch außerhalb der Öffnungszeiten, ohne Gesprächsaufzeichnung, in zwei Wochen eingerichtet und bereit zur Freigabe.",
     keywords: "KI Telefonassistent Bayreuth, AI Rezeptionistin Bayreuth, KI Telefon Bayreuth",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "weekly", priority: "0.9" },
@@ -427,7 +427,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/regensburg/ki-telefonassistent",
     title: "KI Telefonassistent Regensburg – AI Rezeption & Anrufannahme | Cogniiq",
-    description: "KI Telefonassistent Regensburg: Anrufannahme, Terminbuchung und Weiterleitung für Praxen, Gastronomie und Dienstleister. Auch außerhalb der Öffnungszeiten, ohne Gesprächsaufzeichnung, in zwei Wochen eingerichtet und bereit zur Freigabe.",
+    description: "KI Telefonassistent Regensburg: Anrufannahme, Terminaufnahme und Weiterleitung für Praxen, Gastronomie und Dienstleister. Auch außerhalb der Öffnungszeiten, ohne Gesprächsaufzeichnung, in zwei Wochen eingerichtet und bereit zur Freigabe.",
     keywords: "KI Telefonassistent Regensburg, AI Rezeptionistin Regensburg, KI Telefon Regensburg",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "weekly", priority: "0.9" },
@@ -611,7 +611,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/ki-telefonassistent-restaurant",
     title: "KI-Telefonassistent für Restaurants | Reservierungen automatisch annehmen – Cogniiq",
-    description: "KI Telefonassistent für Restaurants: Tischreservierungen entgegennehmen, bestätigen und erinnern – auch während des Service, abends und am Wochenende.",
+    description: "KI Telefonassistent für Restaurants: Tischreservierungen entgegennehmen und strukturiert an Ihr Team übergeben – auch während des Service und am Wochenende.",
     keywords: "KI Telefonassistent Restaurant, Reservierungen KI, AI Rezeptionistin Restaurant, Gastronomie Automatisierung",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.85" },

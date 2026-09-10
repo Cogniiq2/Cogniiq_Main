@@ -133,7 +133,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         name: "Wellness & Beauty",
         problem: "Kosmetikstudios und Friseursalons erhalten Buchungsanfragen zu jeder Tageszeit, haben aber während der Behandlung keine Hand frei für das Telefon.",
-        solution: "Der Assistent nimmt Terminwünsche an und trägt sie nach Ihren Regeln in den Kalender ein – ohne die laufende Behandlung zu unterbrechen.",
+        solution: "Der Assistent nimmt Terminwünsche nach Ihren Regeln auf und übergibt sie strukturiert – ohne die laufende Behandlung zu unterbrechen.",
       },
     ],
     localScenarios: [
@@ -525,7 +525,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       },
       {
         title: "Restaurant in der Altstadt",
-        description: "Reservierungsanfragen von Gästen aus aller Welt, viele abends nach Küchenschluss. Der Assistent nimmt sie auch außerhalb der Servicezeiten an und trägt sie nach Vorgabe in den Kalender ein – das Serviceteam bleibt beim Gast.",
+        description: "Reservierungsanfragen von Gästen aus aller Welt, viele abends nach Küchenschluss. Der Assistent nimmt sie auch außerhalb der Servicezeiten nach Ihren Vorgaben auf und übergibt sie strukturiert – das Serviceteam bleibt beim Gast.",
       },
       {
         title: "Physio-Praxis im Stadtgebiet",
@@ -805,7 +805,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     localIntro: {
       paragraphs: [
         "In München sitzen Privatpraxen, Kanzleien, Beratungen, Immobilienbüros, Hotels und Gastronomie dicht beieinander und konkurrieren um dieselben Kunden – und um dieselben Fachkräfte. Anrufer erwarten schnelle Reaktion, ein erheblicher Teil spricht Englisch, und dauerhaft besetzte Telefonplätze sind bei Münchner Personalkosten schwer darstellbar.",
-        "Der Telefonassistent nimmt Anrufe an, wenn Ihr Team gebunden ist oder der Betrieb geschlossen hat – morgens vor Öffnung, abends, am Wochenende, in Urlaubszeiten. Wiederkehrende Fragen beantwortet er nach Ihren Vorgaben, Termine trägt er nach Ihren Regeln ein, komplexe Anliegen übergibt er strukturiert an das zuständige Teammitglied. Mehrsprachige Konfiguration ist möglich – üblicherweise Deutsch und Englisch, weitere Sprachen auf Anfrage.",
+        "Der Telefonassistent nimmt Anrufe an, wenn Ihr Team gebunden ist oder der Betrieb geschlossen hat – morgens vor Öffnung, abends, am Wochenende, in Urlaubszeiten. Wiederkehrende Fragen beantwortet er nach Ihren Vorgaben, Terminwünsche erfasst er nach Ihren Regeln, komplexe Anliegen übergibt er strukturiert an das zuständige Teammitglied. Mehrsprachige Konfiguration ist möglich – üblicherweise Deutsch und Englisch, weitere Sprachen auf Anfrage.",
         "Entscheidend ist dabei nicht die Technik, sondern der Zuschnitt: Ein Assistent überzeugt erst, wenn die Ansagen zum Haus passen, die Regeln den Abläufen folgen und das Ergebnis im richtigen System ankommt. Deshalb beginnt jedes Projekt mit einem Aufnahmegespräch über Ihre tatsächlichen Anrufe – und endet erst nach einer Testphase, in der Sie den Assistenten selbst gehört und freigegeben haben.",
         `Cogniiq betreut Münchner Projekte vollständig remote; persönliche Termine im Raum München sind auf Anfrage möglich. Ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört dazu, Gespräche werden nicht aufgezeichnet. Die Kosten sind fest vereinbart – ein Monatsbetrag für ein definiertes Minutenkontingent, darüber ${FAKTEN.mehrpreisProMinute}/Min. und gedeckelt auf die Obergrenze Ihres Tarifs.`,
         "Als Teil einer digitalen Gesamtaufstellung lässt sich der Telefonassistent mit [Prozessautomatisierung für München](/muenchen/automatisierung) und [Webdesign für München](/muenchen/webdesign) kombinieren – Anfragen annehmen, verarbeiten und sichtbar sein greifen ineinander.",
@@ -823,7 +823,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         industry: "Privatpraxen & Spezialisten",
         title: "Terminannahme außerhalb der Sprechzeiten",
-        description: "Privatpatienten erwarten schnelle Reaktion – auch abends und auf Englisch. Der Assistent nimmt Terminwünsche außerhalb der Sprechzeiten an und trägt sie nach Ihren Regeln ein. Medizinische Auskünfte gibt er nicht; dringende Anliegen gehen sofort an einen Menschen.",
+        description: "Privatpatienten erwarten schnelle Reaktion – auch abends und auf Englisch. Der Assistent nimmt Terminwünsche außerhalb der Sprechzeiten nach Ihren Regeln auf. Medizinische Auskünfte gibt er nicht; dringende Anliegen gehen sofort an einen Menschen.",
       },
       {
         industry: "Gastronomie & Premium Dining",

@@ -53,7 +53,7 @@ const services = [
     ],
     features: [
       'Anrufannahme in natürlicher Sprache',
-      'Terminbuchung & -änderung in Echtzeit',
+      'Terminwünsche und Änderungen sofort erfasst',
       'Anbindung an Kalender & CRM – vorab geprüft',
       'Erreichbar auch außerhalb der Öffnungszeiten',
     ],

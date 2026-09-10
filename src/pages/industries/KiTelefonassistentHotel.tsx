@@ -11,7 +11,7 @@ const config: NationalIndustryPageConfig = {
   },
   h1: "KI Telefonassistent für Hotels & Pensionen",
   tagline: "Hotellerie · Rezeption auch nachts · Direktbuchungen stärken",
-  intro: "Reisende buchen spät abends – um 22 Uhr, nach dem Feierabend, wenn die Rezeption längst geschlossen ist. Wer in diesem Moment nicht erreichbar ist, verliert die Direktbuchung häufig an ein Buchungsportal – inklusive der fälligen Provision. Der KI Telefonassistent nimmt Buchungsanfragen auch außerhalb der Rezeptionszeiten entgegen und trägt sie nach Ihren Vorgaben in Ihr System ein.",
+  intro: "Reisende buchen spät abends – um 22 Uhr, nach dem Feierabend, wenn die Rezeption längst geschlossen ist. Wer in diesem Moment nicht erreichbar ist, verliert die Direktbuchung häufig an ein Buchungsportal – inklusive der fälligen Provision. Der KI Telefonassistent nimmt Buchungsanfragen auch außerhalb der Rezeptionszeiten entgegen und erfasst sie strukturiert nach Ihren Vorgaben. Ob die Anfrage zusätzlich direkt in Ihr PMS eingetragen wird, hängt an dessen Schnittstelle — wir prüfen sie vor dem Angebot.",
   serviceSlug: "ki-telefonassistent",
   serviceLabel: "KI Telefonassistent",
   costLink: "/kosten-ki-telefonassistent",
@@ -49,7 +49,7 @@ const config: NationalIndustryPageConfig = {
   benefits: [
     "Erreichbar auch nachts und am Wochenende – Buchungsanfragen werden angenommen statt verpasst",
     "Direktbuchung statt Portalprovision – der Unterschied bleibt im Haus",
-    "Bestätigung und Buchungsdokumentation in Ihrem System",
+    "Buchungsanfragen strukturiert dokumentiert — im Cogniiq-Dashboard und, wo die geprüfte Schnittstelle Ihres PMS das trägt, direkt in Ihrem System",
     // [[CLAIM: verify — Sprachumfang (Deutsch/Englisch, weitere) bestätigen]]
     "Mehrsprachig möglich: üblicherweise Deutsch und Englisch, weitere Sprachen auf Anfrage",
     "Sonderwünsche und Gruppenanfragen strukturiert erfasst",
@@ -75,8 +75,8 @@ const config: NationalIndustryPageConfig = {
       },
       {
         step: "03",
-        title: "Buchung direkt ins System, Gast bestätigt",
-        description: "Die Buchung wird in Ihr System eingetragen, der Gast erhält eine schriftliche Bestätigung. Was automatisch läuft und was das Team noch prüft, legen Sie fest.",
+        title: "Übergabe an Ihr Haus, Gast erhält Rückmeldung",
+        description: "Die Anfrage steht strukturiert bereit; wo die vorab geprüfte Schnittstelle Ihres PMS das trägt, wird sie direkt dort eingetragen. Ob der Gast eine schriftliche Bestätigung erhält, richten wir als Teil Ihres Ablaufs ein. Was automatisch läuft und was das Team noch prüft, legen Sie fest.",
       },
     ],
   },

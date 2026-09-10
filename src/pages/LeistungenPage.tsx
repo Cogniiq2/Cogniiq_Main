@@ -59,9 +59,9 @@ const SERVICES = [
     tagline: "Anrufannahme in natürlicher Sprache — auch außerhalb regulärer Geschäftszeiten.",
     benefits: [
       "Anrufannahme in natürlicher Sprache, auch außerhalb der Öffnungszeiten",
-      "Automatische Terminbuchung, Bestätigung und Erinnerung",
+      "Terminwünsche nach Ihren Regeln aufnehmen, vergeben oder zur Bestätigung vorlegen",
       "Intelligente Weiterleitung bei komplexen Anfragen",
-      "Vollständige Synchronisation mit Kalender und CRM",
+      "Übergabe in Kalender oder CRM, wo die Schnittstelle Ihres Systems das trägt",
     ],
     usecases: ["Praxis & Klinik", "Gastronomie & Hotel"],
     cities: [
@@ -106,9 +106,9 @@ const SERVICES = [
 const OUTCOMES = [
   { metric: "Erreichbar auch dann, wenn niemand abnehmen kann", context: "Der KI-Assistent nimmt ab — auch nachts, am Wochenende und bei Stoßzeiten" },
   { metric: "Terminbuchung ohne Rückruf", context: "Patienten, Gäste und Kunden buchen direkt — ohne auf eine Antwort zu warten" },
-  { metric: "Automatische Terminerinnerungen", context: "Automatische Erinnerungen mit Bestätigungslink bis zu 48 Stunden vorher" },
+  { metric: "Terminerinnerungen im eingerichteten Ablauf", context: "Erinnerungen mit Bestätigungslink, wo wir den Versandweg für Sie eingerichtet haben" },
   { metric: "Mehr qualifizierte Anfragen", context: "SEO-optimierte Websites, die gefunden werden — und Besucher in Kunden verwandeln" },
-  { metric: "Stunden Verwaltung eingespart", context: "Bestätigungen, Erinnerungen, Follow-ups und CRM-Pflege laufen ohne manuellen Aufwand" },
+  { metric: "Stunden Verwaltung eingespart", context: "Bestätigungen, Erinnerungen, Follow-ups und CRM-Pflege laufen in den Abläufen, die wir für Sie einrichten" },
 ];
 
 const SYSTEM_PANELS = [

@@ -323,3 +323,58 @@ Punkte stammen aus der Sammelliste in `post-experiment-opportunities.md`.
 
 `/bayreuth/webdesign` steht auf derselben Liste und wurde **nicht** angefasst —
 die Route ist eingefroren.
+
+---
+
+## 2026-09-10 · Claim-Korrektur Terminbuchung/Bestätigungen (Branch `claude/seo-gsc-growth-2026-09-10`)
+
+**Art der Änderung:** Wahrheitskorrektur, **keine** Ranking-Maßnahme. Es wurde
+keine Seite auf ein Keyword hin optimiert. Erwartete Wirkung auf Positionen:
+keine. Zwei SERP-Snippets ändern sich trotzdem und werden deshalb beobachtet.
+
+**Auslöser:** Inhaber-Antworten vom 10.09.2026 (`BOOKING_WRITE`,
+`SMS_EMAIL_CONFIRMATION`) — siehe `OWNER-INPUT.md` „Nachtrag 10.09.2026".
+Vollständige Fundstellenliste in `COPY-CLAIMS-TO-VERIFY.md` § „Z25 · Abarbeitung".
+
+### Beobachtete Flächen
+
+| URL | Was sich ändert | Hypothese | Erfolgskriterium | Abbruchkriterium |
+|---|---|---|---|---|
+| `/bayern/ki-telefonassistent` | Manifest-Description: „bucht Termine" → „erfasst Terminwünsche nach Ihren Regeln"; zugleich von 203 auf 154 Zeichen gekürzt, damit die Erreichbarkeitszusage wieder ins Snippet passt | Snippet bleibt gleichwertig oder wird besser, weil der Haken nicht mehr abgeschnitten wird | CTR nach 28 Tagen mindestens im bisherigen Schwankungsbereich | CTR-Rückgang über die übliche Schwankung hinaus → Formulierung nachschärfen, **nicht** die Aussage zurücknehmen |
+| `/ki-telefonassistent-restaurant` | Manifest-Description: „bestätigen und erinnern" entfällt, 156 Zeichen | wie oben | wie oben | wie oben |
+| `/bayreuth/ki-telefonassistent` | Manifest-Description: „Terminbuchung" → „Terminaufnahme" | wie oben | wie oben | wie oben |
+| `/regensburg/ki-telefonassistent` | Manifest-Description: „Terminbuchung" → „Terminaufnahme" | wie oben | wie oben | wie oben |
+| `/leistungen`, `/ueber-uns`, `/ki-telefonassistent`, `/ki-telefonassistent-hotel`, `/ki-telefonassistent/demo`, `/bayern`, `/deutschland`, `/ki-agentur-deutschland`, `/verpasste-anrufe-verlust`, Startseite | nur Seitenkörper bzw. JSON-LD, kein `<head>` | keine Snippet-Wirkung; nur Konversionsrelevanz | keine Verschlechterung | – |
+
+| Messpunkt | Datum | Impressionen | Klicks | CTR | Ø Position |
+|---|---|---:|---:|---:|---:|
+| Baseline (0) | **offen — siehe unten** | | | | |
+| Tag 7 | | | | | |
+| Tag 14 | | | | | |
+| Tag 28 | | | | | |
+| Tag 56 | | | | | |
+
+### Warum die Baseline leer ist
+
+Die Baseline ist bewusst **nicht** gefüllt. Der Lauf vom 10.09.2026 hatte keinen
+Zugriff auf die Search-Console-Exporte: Die Sitzung lief in einem Cloud-Container
+ohne das `~/Downloads` des Inhabers; ein vollständiger Dateisystem-Durchlauf fand
+keine der ZIP-Dateien. Eine Baseline aus Erinnerung oder aus Stichprobenwerten zu
+rekonstruieren wäre eine erfundene Messung — genau das, was diese Tabelle
+verhindern soll.
+
+**Einzutragen ist der Seiten-Aggregatwert (`Pages.csv`) der oben genannten URLs
+für das Fenster, das am 2026-09-10 endet.** Query-Werte gehören nicht in diese
+Tabelle: `Queries.csv` und `Pages.csv` sind getrennte Aggregate und ergeben kein
+Query×Seite-Paar.
+
+### Was der nächste Lauf braucht
+
+1. Die GSC-Exporte **im Repository-Container erreichbar** (Anhang an die Sitzung
+   oder Ablage in einem lesbaren Pfad) — ohne sie sind Abschnitte zur
+   GSC-Auswertung nicht durchführbar.
+2. Nach Möglichkeit einen **Query×Seite-Export** (GSC-UI: Seitenfilter setzen,
+   dann Queries exportieren). Erst damit lässt sich Kannibalisierung belegen
+   statt vermuten.
+3. Einen echten **Vorperioden-Export** für Queries, falls Veränderung über die
+   Zeit bewertet werden soll.

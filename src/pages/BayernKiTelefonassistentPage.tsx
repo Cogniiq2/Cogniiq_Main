@@ -61,7 +61,7 @@ const USE_CASES = [
   {
     icon: Stethoscope,
     industry: "Arztpraxen & Heilberufe",
-    desc: "Patientenanfragen, Terminbuchungen und Auskünfte automatisieren – mehr Zeit für die Patientenversorgung.",
+    desc: "Patientenanfragen, Terminwünsche und Auskünfte automatisiert erfassen – mehr Zeit für die Patientenversorgung.",
   },
   {
     icon: Briefcase,
@@ -111,7 +111,7 @@ export function BayernKiTelefonassistentPage() {
       {
         "@type": "Service",
         name: "KI Telefonassistent für Unternehmen in Bayern",
-        description: "KI Telefonassistent für bayerische Unternehmen: Anrufe automatisch beantworten, Termine buchen, auch außerhalb regulärer Geschäftszeiten erreichbar.",
+        description: "KI Telefonassistent für bayerische Unternehmen: Anrufe automatisch beantworten, Terminwünsche nach Ihren Regeln erfassen, auch außerhalb regulärer Geschäftszeiten erreichbar.",
         url: `${BUSINESS_INFO.website}/bayern/ki-telefonassistent`,
         provider: { "@id": `${BUSINESS_INFO.website}/#localbusiness` },
         areaServed: { "@type": "State", name: "Bayern" },
@@ -125,7 +125,7 @@ export function BayernKiTelefonassistentPage() {
     <>
       <PageSEO
         title="KI Telefonassistent für Unternehmen in Bayern | Cogniiq"
-        description="KI Telefonassistent für bayerische Unternehmen: nimmt Anrufe an, bucht Termine nach Ihren Regeln und entlastet Ihr Team – auch außerhalb der Öffnungszeiten, ohne Gesprächsaufzeichnung."
+        description="KI Telefonassistent für bayerische Unternehmen: nimmt Anrufe an, erfasst Terminwünsche nach Ihren Regeln und entlastet Ihr Team – auch außerhalb der Öffnungszeiten, ohne Gesprächsaufzeichnung."
         canonical={`${BUSINESS_INFO.website}/bayern/ki-telefonassistent`}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
@@ -191,8 +191,8 @@ function HeroSection() {
           </h1>
 
           <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed max-w-2xl mb-10">
-            Beantwortet Anrufe automatisch, spricht mit Ihren Kunden und bucht Termine
-            direkt in Ihren Kalender – für bayerische Unternehmen, auch außerhalb der Öffnungszeiten.
+            Beantwortet Anrufe automatisch, spricht mit Ihren Kunden und erfasst Terminwünsche
+            nach Ihren Regeln – für bayerische Unternehmen, auch außerhalb der Öffnungszeiten.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 mb-12">
@@ -216,7 +216,7 @@ function HeroSection() {
             {[
               { icon: MapPin, label: "Bayernweit verfügbar" },
               { icon: Clock, label: "Auch außerhalb der Öffnungszeiten erreichbar" },
-              { icon: Calendar, label: "Termine automatisch" },
+              { icon: Calendar, label: "Termine nach Ihren Regeln" },
               { icon: Shield, label: "Keine Gesprächsaufzeichnung" },
             ].map((item, i) => (
               <motion.div
@@ -289,7 +289,7 @@ function IntroSection() {
               </p>
               <p>
                 Das Ergebnis: Anrufe werden angenommen, wenn Ihr Team gebunden ist.
-                Termine werden nach Ihren Regeln gebucht. Ihr Team konzentriert sich
+                Terminwünsche werden nach Ihren Regeln erfasst. Ihr Team konzentriert sich
                 auf die Arbeit, für die es gebraucht wird.
               </p>
             </div>
@@ -307,10 +307,10 @@ function IntroSection() {
               { icon: Phone, label: "Nimmt eingehende Anrufe automatisch entgegen" },
               { icon: Zap, label: "Versteht Kundenanfragen auf Hochdeutsch" },
               { icon: CheckCircle2, label: "Beantwortet Fragen und gibt Informationen weiter" },
-              { icon: Calendar, label: "Bucht Termine direkt in Ihren Kalender" },
+              { icon: Calendar, label: "Nimmt Terminwünsche nach Ihren Regeln auf" },
               { icon: Clock, label: "Erreichbar auch an Feiertagen in Bayern" },
               { icon: Shield, label: "Keine Gesprächsaufzeichnung" },
-              { icon: Zap, label: "Integration mit CRM und Automationen" },
+              { icon: Zap, label: "Übergabe an CRM und Automationen, wo die geprüfte Schnittstelle das trägt" },
             ].map((feat, i) => (
               <motion.div
                 key={i}
@@ -417,7 +417,7 @@ function BenefitsSection() {
             {
               icon: Calendar,
               title: "Termine nach Ihren Regeln",
-              desc: "Der Assistent bucht Termine in Ihren Kalender oder legt sie zur Bestätigung vor – nach den Regeln, die Sie vorgeben.",
+              desc: "Der Assistent vergibt Termine im vereinbarten Rahmen oder legt sie Ihrem Team zur Bestätigung vor – nach den Regeln, die Sie vorgeben.",
             },
             {
               icon: Clock,

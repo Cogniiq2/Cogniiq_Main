@@ -86,6 +86,13 @@ const faqItems = [
       "Er nimmt Terminwünsche, Stornierungen und Rückrufbitten auf, beantwortet wiederkehrende Fragen und erfasst Anliegen strukturiert. Medizinische oder fachliche Beratung gibt er grundsätzlich nicht. Dringende Anliegen und alles, was Sie festlegen, gehen sofort an einen Menschen. Diese Grenzen definieren Sie im Anliegen-Katalog — vor dem Start.",
   },
   {
+    // Kanonische Fassung der Inhaber-Antwort vom 10.09.2026 (BOOKING_WRITE,
+    // SMS_EMAIL_CONFIRMATION). Der Umfang steht in FAKTEN und wird hier nicht
+    // neu formuliert — siehe OWNER-INPUT.md „Nachtrag 10.09.2026".
+    question: "Bucht der Assistent Termine direkt in mein System — und verschickt er Bestätigungen?",
+    answer: `${FAKTEN.terminaufnahme} ${FAKTEN.bestaetigungen}`,
+  },
+  {
     question: "Wie kommt das Gesprächsergebnis bei meinem Team an?",
     answer:
       "Jedes Gespräch endet in einer strukturierten Zusammenfassung: Anliegen, Rückrufnummer, gewünschter Termin, nächster Schritt. Ihr Team liest das Ergebnis dort, wo es ohnehin arbeitet — statt Sprachnachrichten abzuhören und von Hand zu übertragen.",
@@ -173,7 +180,7 @@ const OBJECTIONS = [
   {
     icon: Calendar,
     q: "Kann er Termine buchen?",
-    a: "Ja, nach Ihren Regeln: Er prüft Ihren Kalender und trägt Termine direkt ein oder legt sie zur Bestätigung vor – kompatibel mit Google Calendar, Outlook und weiteren Systemen.",
+    a: "Er nimmt Terminwünsche nach Ihren Regeln auf, vergibt sie im vereinbarten Rahmen oder legt sie Ihrem Team zur Bestätigung vor. Ob er einen Termin zusätzlich direkt in Ihren Kalender schreibt, hängt an dessen Schnittstelle – wir prüfen sie vor dem Angebot.",
   },
   {
     icon: BellRing,
@@ -753,7 +760,7 @@ function SolutionSection() {
   const capabilities = [
     { icon: PhoneCall, label: "Nimmt Anrufe entgegen, wenn Ihr Team gebunden ist" },
     { icon: MessageSquare, label: "Beantwortet wiederkehrende Fragen nach Ihren Vorgaben" },
-    { icon: Calendar, label: "Bucht Termine nach Ihren Regeln in Ihren Kalender" },
+    { icon: Calendar, label: "Nimmt Terminwünsche nach Ihren Regeln auf" },
     { icon: CheckCircle2, label: "Erfasst Anliegen strukturiert – mit Rückrufnummer und nächstem Schritt" },
     { icon: Shield, label: "Leitet dringende Anrufe sofort an einen Menschen weiter" },
     { icon: Clock, label: "Erreichbar auch abends, am Wochenende und an Feiertagen" },

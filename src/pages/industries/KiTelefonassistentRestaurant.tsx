@@ -5,13 +5,13 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 const config: NationalIndustryPageConfig = {
   seo: {
     title: "KI Telefonassistent für Restaurants | Automatische Tischreservierung | Cogniiq",
-    description: "KI Telefonassistent für Restaurants: Tischreservierungen entgegennehmen, bestätigen und erinnern – auch während des Service, abends und am Wochenende.",
+    description: "KI Telefonassistent für Restaurants: Tischreservierungen entgegennehmen und strukturiert an Ihr Team übergeben – auch während des Service und am Wochenende.",
     canonical: `${BUSINESS_INFO.website}/ki-telefonassistent-restaurant`,
     keywords: "KI Telefonassistent Restaurant, automatische Reservierung, KI Rezeptionistin Gastronomie, Telefonservice Restaurant",
   },
   h1: "KI Telefonassistent für Restaurants & Gastronomie",
   tagline: "Gastronomie · Tischreservierung · auch außerhalb der Öffnungszeiten",
-  intro: "Freitagabend, 19:30 Uhr: Die Küche läuft auf Hochtouren, jeder Tisch ist besetzt – und das Telefon klingelt. Niemand kann abnehmen. Der Anrufer will für Samstag reservieren. Er legt auf und ruft das Restaurant nebenan an. Mit dem KI Telefonassistenten wäre sein Anruf angenommen worden: Tisch reserviert, Bestätigung erhalten – und am Samstagabend säße er als Gast bei Ihnen.",
+  intro: "Freitagabend, 19:30 Uhr: Die Küche läuft auf Hochtouren, jeder Tisch ist besetzt – und das Telefon klingelt. Niemand kann abnehmen. Der Anrufer will für Samstag reservieren. Er legt auf und ruft das Restaurant nebenan an. Mit dem KI Telefonassistenten wäre sein Anruf angenommen worden: Reservierungswunsch aufgenommen, an Ihr Team übergeben – und am Samstagabend säße er als Gast bei Ihnen.",
   serviceSlug: "ki-telefonassistent",
   serviceLabel: "KI Telefonassistent",
   costLink: "/kosten-ki-telefonassistent",
@@ -50,7 +50,7 @@ const config: NationalIndustryPageConfig = {
     "Tischreservierungen entgegennehmen – auch während des Service",
     "Jeder Reservierungswunsch strukturiert dokumentiert",
     "Erreichbar auch abends, nachts und am Wochenende",
-    "Automatische Erinnerung am Vortag wirkt No-Shows entgegen",
+    "Erinnerung am Vortag wirkt No-Shows entgegen, wo wir den Versandweg für Sie einrichten",
     // [[CLAIM: verify — Sprachumfang bestätigen]]
     "Mehrsprachig konfigurierbar: üblicherweise Deutsch und Englisch",
     "Anbindung an gängige Reservierungssysteme wird vor dem Angebot geprüft",
@@ -72,8 +72,8 @@ const config: NationalIndustryPageConfig = {
       },
       {
         step: "03",
-        title: "Bestätigen und den Tisch sichern",
-        description: "Der Gast erhält eine Buchungsbestätigung und einen Tag vorher eine Erinnerung mit Bestätigungslink. Nicht bestätigte Reservierungen werden erneut erinnert – so bleibt der Tisch planbar.",
+        title: "Den Tisch planbar halten",
+        description: "Bestätigung und Erinnerung mit Bestätigungslink gehören nicht zum Standardumfang; wir richten sie als Teil Ihres Ablaufs ein. Ist der Versandweg eingerichtet, erinnern wir erneut an nicht bestätigte Reservierungen, damit der Tisch planbar bleibt.",
       },
     ],
   },

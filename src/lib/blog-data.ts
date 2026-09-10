@@ -602,7 +602,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         type: "h2",
         heading: "Wie ein KI-Telefonassistent den Verlust stoppt",
         content:
-          "Ein KI-Telefonassistent nimmt Anrufe ohne Warteschleife an – auch zu Stoßzeiten und bei parallelen Gesprächen. Er qualifiziert den Anruf, bucht Termine direkt und gibt kritische Informationen sofort weiter. Das Ergebnis: Anrufe werden angenommen statt verpasst.",
+          "Ein KI-Telefonassistent nimmt Anrufe ohne Warteschleife an – auch zu Stoßzeiten und bei parallelen Gesprächen. Er qualifiziert den Anruf, erfasst Terminwünsche strukturiert und gibt kritische Informationen sofort weiter. Das Ergebnis: Anrufe werden angenommen statt verpasst.",
       },
       {
         type: "h2",

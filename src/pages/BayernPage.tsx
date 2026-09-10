@@ -20,7 +20,7 @@ const SERVICES_OVERVIEW = [
     title: "KI-Telefonassistent Bayern",
     slug: "ki-telefonassistent",
     description:
-      "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, für Praxen, Gastronomie und Dienstleister in ganz Bayern.",
+      "Automatische Anrufannahme, Terminaufnahme und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, für Praxen, Gastronomie und Dienstleister in ganz Bayern.",
     benefits: [
       "Erreichbar auch dann, wenn niemand abnehmen kann",
       "Entlastung von Routinegesprächen",
@@ -117,7 +117,7 @@ const INDUSTRIES = [
   {
     name: "Arztpraxen & Therapeuten",
     description:
-      "Praxen in Bayern entlasten ihr Team durch automatische Terminbuchung am Telefon, reduzieren Anrufspitzen und erscheinen bei lokalen Suchanfragen prominent.",
+      "Praxen in Bayern entlasten ihr Team durch automatische Terminaufnahme am Telefon, reduzieren Anrufspitzen und erscheinen bei lokalen Suchanfragen prominent.",
   },
   {
     name: "Dienstleister & Beratung",
