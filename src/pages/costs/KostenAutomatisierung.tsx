@@ -26,7 +26,7 @@ const config: CostPageConfig = {
     {
       label: "Vollständige Digitalisierung",
       range: "ab 5.000 €",
-      description: "Umfassende Automatisierung aller Kernprozesse eines Unternehmens. Onboarding, Lead-Management, Kommunikation, Abrechnung und Reporting vollständig automatisiert.",
+      description: "Umfassende Automatisierung der Kernprozesse eines Unternehmens: Onboarding, Lead-Management, Kommunikation, Abrechnung und Reporting laufen als eingerichtete Abläufe statt als Handarbeit.",
     },
   ],
   priceFactors: [
@@ -68,7 +68,7 @@ const config: CostPageConfig = {
     },
     {
       title: "Onboarding-Automatisierung, Agentur",
-      description: "Vollautomatisches Kunden-Onboarding: Willkommens-Mail, Vertragsversand, Kalender-Setup und Projektanlage im Projektmanagement-Tool.",
+      description: "Kunden-Onboarding als durchgehender Ablauf: Willkommens-Mail, Vertragsversand, Kalender-Setup und Projektanlage im Projektmanagement-Tool.",
       investment: "2.000 – 3.500 €",
     },
     {

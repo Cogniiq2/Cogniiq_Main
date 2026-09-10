@@ -10,7 +10,7 @@ const config: ProblemPageConfig = {
   },
   h1: "Zu viel manuelle Arbeit im Unternehmen: Automatisierung löst das Problem",
   tagline: "Problem · Manuelle Prozesse · Automatisierung",
-  intro: "Deutschlands Unternehmen verbringen täglich Stunden mit Aufgaben, die vollständig automatisiert werden könnten. Jede Stunde manuelle Arbeit ist eine verlorene Stunde, die besser in Wachstum investiert wäre.",
+  intro: "Deutschlands Unternehmen verbringen täglich Stunden mit Aufgaben, die sich als Ablauf einrichten lassen. Jede Stunde manuelle Arbeit ist eine verlorene Stunde, die besser in Wachstum investiert wäre.",
   problem: {
     headline: "Welche manuellen Prozesse Unternehmen täglich Zeit kosten",
     points: [
@@ -48,7 +48,7 @@ const config: ProblemPageConfig = {
     headline: "Automatisierung, die sofort Zeit freisetzt.",
     text: "Cogniiq automatisiert die zeitaufwändigsten Prozesse Ihres Unternehmens – vollständig dokumentiert. Die meisten Workflows sind in 1–3 Wochen live.",
     bullets: [
-      "Lead-Management vollständig automatisiert",
+      "Lead-Management als durchgehender Ablauf",
       "Terminbestätigung und Erinnerungen automatisch",
       "Rechnungsstellung und Mahnwesen automatisiert",
       "Daten zwischen Systemen automatisch synchronisiert",
