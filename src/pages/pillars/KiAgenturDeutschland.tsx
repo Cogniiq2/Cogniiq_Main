@@ -17,7 +17,7 @@ const SERVICES = [
   {
     icon: Phone,
     title: "KI-Telefonassistent",
-    description: "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, mehrsprachig. Erreichbar auch dann, wenn niemand abnehmen kann – ohne Warteschleife.",
+    description: "Automatische Anrufannahme, Terminaufnahme und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, mehrsprachig. Erreichbar auch dann, wenn niemand abnehmen kann – ohne Warteschleife.",
     benefits: [
       "Integration in bestehende Kalender",
       "Mehrsprachig auf Anfrage",
@@ -81,7 +81,7 @@ const INDUSTRIES = [
   { name: "Arztpraxen & Therapeuten", href: "/ki-telefonassistent-arzt", description: "Terminautomatisierung für Praxen." },
   { name: "Gastronomie & Restaurants", href: "/ki-telefonassistent-restaurant", description: "Reservierungen außerhalb der Öffnungszeiten, mehrsprachig." },
   { name: "Hotels & Pensionen", href: "/ki-telefonassistent-hotel", description: "Rund-um-die-Uhr-Rezeption, PMS-Integration." },
-  { name: "Therapiepraxen", href: "/ki-telefonassistent-praxis", description: "Terminbuchung, Folgetermine, No-Show-Reduktion." },
+  { name: "Therapiepraxen", href: "/ki-telefonassistent-praxis", description: "Terminaufnahme, Folgetermine, No-Show-Reduktion." },
   { name: "Automatisierung Restaurant", href: "/automatisierung-restaurant", description: "Reservierungen, Lieferanten, Kommunikation." },
   { name: "Automatisierung Arzt", href: "/automatisierung-arzt", description: "Terminbestätigung, Warteliste, DSGVO." },
 ];

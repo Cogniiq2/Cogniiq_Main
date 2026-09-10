@@ -180,7 +180,7 @@ const OBJECTIONS = [
   {
     icon: Calendar,
     q: "Kann er Termine buchen?",
-    a: "Ja, nach Ihren Regeln: Er prüft Ihren Kalender und trägt Termine direkt ein oder legt sie zur Bestätigung vor – kompatibel mit Google Calendar, Outlook und weiteren Systemen.",
+    a: "Er nimmt Terminwünsche nach Ihren Regeln auf, vergibt sie im vereinbarten Rahmen oder legt sie Ihrem Team zur Bestätigung vor. Ob er einen Termin zusätzlich direkt in Ihren Kalender schreibt, hängt an dessen Schnittstelle – wir prüfen sie vor dem Angebot.",
   },
   {
     icon: BellRing,

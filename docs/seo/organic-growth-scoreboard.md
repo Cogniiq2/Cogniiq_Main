@@ -340,9 +340,11 @@ Vollständige Fundstellenliste in `COPY-CLAIMS-TO-VERIFY.md` § „Z25 · Abarbe
 
 | URL | Was sich ändert | Hypothese | Erfolgskriterium | Abbruchkriterium |
 |---|---|---|---|---|
-| `/bayern/ki-telefonassistent` | Manifest-Description: „bucht Termine" → „erfasst Terminwünsche nach Ihren Regeln" | Snippet bleibt gleichwertig; CTR bewegt sich nicht messbar | CTR nach 28 Tagen innerhalb des bisherigen Schwankungsbereichs | CTR-Rückgang, der über die übliche Schwankung hinausgeht → Formulierung nachschärfen, **nicht** die Aussage zurücknehmen |
-| `/ki-telefonassistent-restaurant` | Manifest-Description: „bestätigen und erinnern" entfällt | wie oben | wie oben | wie oben |
-| `/leistungen`, `/ueber-uns`, `/ki-telefonassistent`, `/ki-telefonassistent-hotel`, `/verpasste-anrufe-verlust` | nur Seitenkörper, kein `<head>` | keine Snippet-Wirkung; nur Konversionsrelevanz | keine Verschlechterung | – |
+| `/bayern/ki-telefonassistent` | Manifest-Description: „bucht Termine" → „erfasst Terminwünsche nach Ihren Regeln"; zugleich von 203 auf 154 Zeichen gekürzt, damit die Erreichbarkeitszusage wieder ins Snippet passt | Snippet bleibt gleichwertig oder wird besser, weil der Haken nicht mehr abgeschnitten wird | CTR nach 28 Tagen mindestens im bisherigen Schwankungsbereich | CTR-Rückgang über die übliche Schwankung hinaus → Formulierung nachschärfen, **nicht** die Aussage zurücknehmen |
+| `/ki-telefonassistent-restaurant` | Manifest-Description: „bestätigen und erinnern" entfällt, 156 Zeichen | wie oben | wie oben | wie oben |
+| `/bayreuth/ki-telefonassistent` | Manifest-Description: „Terminbuchung" → „Terminaufnahme" | wie oben | wie oben | wie oben |
+| `/regensburg/ki-telefonassistent` | Manifest-Description: „Terminbuchung" → „Terminaufnahme" | wie oben | wie oben | wie oben |
+| `/leistungen`, `/ueber-uns`, `/ki-telefonassistent`, `/ki-telefonassistent-hotel`, `/ki-telefonassistent/demo`, `/bayern`, `/deutschland`, `/ki-agentur-deutschland`, `/verpasste-anrufe-verlust`, Startseite | nur Seitenkörper bzw. JSON-LD, kein `<head>` | keine Snippet-Wirkung; nur Konversionsrelevanz | keine Verschlechterung | – |
 
 | Messpunkt | Datum | Impressionen | Klicks | CTR | Ø Position |
 |---|---|---:|---:|---:|---:|

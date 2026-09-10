@@ -57,7 +57,7 @@ const COMPETENCIES = [
     tagline: "Anrufe werden angenommen statt verpasst. Terminwünsche kommen strukturiert an.",
     points: [
       "Anrufannahme in natürlicher Sprache, auch außerhalb der Öffnungszeiten",
-      "Terminwünsche nach Ihren Regeln aufnehmen und vergeben oder vorlegen",
+      "Terminwünsche nach Ihren Regeln aufnehmen, vergeben oder zur Bestätigung vorlegen",
       "Intelligente Weiterleitung und Eskalationslogik",
       "Übergabe in Kalender oder CRM, wo die Schnittstelle Ihres Systems das trägt",
     ],

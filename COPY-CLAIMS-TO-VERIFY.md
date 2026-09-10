@@ -92,13 +92,55 @@ Wortlaut, Herleitung und die ausdrücklich **nicht** betroffenen Fälle stehen i
 | `KiTelefonassistentHotel.tsx` (3 Stellen) | `/ki-telefonassistent-hotel` | **REWRITE.** Neu erhoben. Die Seite versprach im Fließtext den Systemeintrag unbedingt („trägt sie in Ihr System ein", „Buchung direkt ins System"), während ihr eigenes FAQ die Schnittstellenprüfung korrekt beschrieb — ein Widerspruch auf derselben Seite |
 | `KiTelefonassistentRestaurant.tsx:76` | `/ki-telefonassistent-restaurant` | **REWRITE** — Bestätigung/Erinnerung als eingerichteter Ablauf, nicht als Standardumfang |
 | `SolutionShowcase.tsx:206` | geteilte Komponente | **REWRITE.** Neu erhoben. Der Demo-Dialog sagte eine SMS-Erinnerung als Selbstverständlichkeit zu |
-| `KiTelefonassistentDemoPage.tsx`, `BayernPage.tsx`, `DeutschlandPage.tsx` | – | **KEIN BEFUND MEHR** auf `main` @ `d9d4361`; durch PR #87 erledigt |
+| `KiTelefonassistentDemoPage.tsx:37, 216, 487` | `/ki-telefonassistent/demo` | **REWRITE** |
+| `BayernPage.tsx:23, 120` | `/bayern` | **REWRITE** |
+| `DeutschlandPage.tsx:35, 147` | `/deutschland` | **REWRITE** |
 | `industries/AutomatisierungRestaurant.tsx:51`, `standorte-service-configs.ts:203` | Automatisierungsprodukt | **KEEP.** Gegenstand dieses Produkts ist das Einrichten kundenspezifischer Abläufe — genau der von `SMS_EMAIL_CONFIRMATION` erlaubte Fall |
 | `KiTelefonassistentRestaurant.tsx:30` | `/ki-telefonassistent-restaurant` | **KEEP.** Beschreibt die Marktmechanik von Erinnerungssystemen, nicht eine Zusage von Cogniiq |
 | „Online-Terminbuchung" auf Webdesign-Seiten, Kontaktformular-Bestätigungsmails | Webdesign-Produkt | **KEEP** — unverändert kein Verstoß, siehe oben |
 
+### Nachtrag: die erste Fassung dieser Tabelle war falsch
+
+Der erste Durchgang am 10.09.2026 suchte nach „bucht Termine", „Termine
+gebucht" und „automatische Terminbuchung" — aber nie nach dem Substantiv
+**„Terminbuchung"** allein und nie nach **„trägt … ein"**. Auf dieser Grundlage
+wurden `KiTelefonassistentDemoPage.tsx`, `BayernPage.tsx` und
+`DeutschlandPage.tsx` als „kein Befund mehr" eingetragen, obwohl alle drei die
+Aussage unverändert trugen. Die Zeile ist oben korrigiert; festgehalten wird der
+Fehler, weil ein zu enges Suchmuster hier zweimal dieselbe Lücke erzeugt hat.
+
+Der zweite Durchgang lief über die volle Synonymklasse und fand zusätzlich:
+
+| Fundstelle | Route | Ergebnis |
+|---|---|---|
+| `KiTelefonassistentPage.tsx:182` — „Er prüft Ihren Kalender und trägt Termine direkt ein … kompatibel mit Google Calendar, Outlook" | `/ki-telefonassistent` | **REWRITE.** Unbedingte Schreibzusage **und** Produktnamen — Letzteres verstößt zusätzlich gegen OWNER-INPUT B3 |
+| `BayernKiTelefonassistentPage.tsx:114` (JSON-LD), `:219`, `:292`, `:64` | `/bayern/ki-telefonassistent` | **REWRITE.** Die erste Fassung korrigierte vier Stellen der Seite und ließ die strukturierten Daten stehen — genau der Fehler, den Z9 benennt |
+| `standorte-service-configs.ts:136, 528, 808, 826` — „trägt sie nach Ihren Regeln in den Kalender ein" | Stadt-Cluster | **REWRITE** |
+| `publicRoutes.ts:294, 430` — „Anrufannahme, Terminbuchung und Weiterleitung" | `/bayreuth/ki-telefonassistent`, `/regensburg/ki-telefonassistent` | **REWRITE.** Ändert zwei weitere SERP-Snippets |
+| `ServicesSection.tsx:56` — „Terminbuchung & -änderung in Echtzeit" | Startseite (geteilte Komponente) | **REWRITE.** Stand direkt unter der bereits korrigierten Kartenbeschreibung |
+| `KiAgenturDeutschland.tsx:20, 84` | `/ki-agentur-deutschland` | **REWRITE** |
+| `KiTelefonassistentRestaurant.tsx:14, 53, 75` | `/ki-telefonassistent-restaurant` | **REWRITE.** Intro und Benefit versprachen weiter unbedingt, was der Prozessschritt inzwischen einschränkte |
+
+**Bewusst nicht geändert, mit Begründung:**
+
+- `LeistungenPage.tsx:108, 120, 133, 156` (`OUTCOMES`, `SYSTEM_PANELS`) — die
+  Panels beschreiben **gebaute Gesamtsysteme**; ihr Stack nennt jeweils Website,
+  Reservierungs- bzw. Terminlogik und Automatisierung. Erinnerungen und
+  Bestätigungen entstehen dort im eingerichteten Ablauf — der von
+  `SMS_EMAIL_CONFIRMATION` ausdrücklich erlaubte Fall, kein Verstoß.
+- `KiTelefonassistentPage.tsx:182` — die **Frage** „Kann er Termine buchen?"
+  bleibt; sie ist die Frage des Besuchers. Korrigiert wurde die Antwort.
+- `WebdesignArzt.tsx`, `standorte-service-configs.ts:393, 756`,
+  `KostenWebdesign.tsx`, `cluster/**` — Webdesign-Produkt.
+- Meta-`keywords` (`KiTelefonassistentPraxis.tsx:12`) — von Suchmaschinen
+  ignoriert und keine sichtbare Zusage.
+- `PraxenPage.tsx:249` — beschreibt das Scheitern von Patienten (vzbv-Erhebung),
+  keine Zusage von Cogniiq.
+- `serviceOnboarding/catalog.ts`, `app/customerPortalModel.ts` — interne
+  Owner-/Kundenoberflächen, keine öffentliche Werbeaussage.
+
 Damit ist Z25 abgeschlossen, mit **einer** protokollierten Ausnahme:
-`/ki-telefonassistent-arzt`.
+`/ki-telefonassistent-arzt` (eingefrorenes Experiment, `publicRoutes.ts:605–607`).
 
 **Stand 18.08.2026:** Z6, Z7, Z10 und Z11 sind bereinigt, Z12 teilweise —
 Einzelheiten in `MERGE-READINESS.md` §4a. Es galt: nur Entfernung unbelegter

@@ -61,7 +61,7 @@ const USE_CASES = [
   {
     icon: Stethoscope,
     industry: "Arztpraxen & Heilberufe",
-    desc: "Patientenanfragen, Terminbuchungen und Auskünfte automatisieren – mehr Zeit für die Patientenversorgung.",
+    desc: "Patientenanfragen, Terminwünsche und Auskünfte automatisiert erfassen – mehr Zeit für die Patientenversorgung.",
   },
   {
     icon: Briefcase,
@@ -111,7 +111,7 @@ export function BayernKiTelefonassistentPage() {
       {
         "@type": "Service",
         name: "KI Telefonassistent für Unternehmen in Bayern",
-        description: "KI Telefonassistent für bayerische Unternehmen: Anrufe automatisch beantworten, Termine buchen, auch außerhalb regulärer Geschäftszeiten erreichbar.",
+        description: "KI Telefonassistent für bayerische Unternehmen: Anrufe automatisch beantworten, Terminwünsche nach Ihren Regeln erfassen, auch außerhalb regulärer Geschäftszeiten erreichbar.",
         url: `${BUSINESS_INFO.website}/bayern/ki-telefonassistent`,
         provider: { "@id": `${BUSINESS_INFO.website}/#localbusiness` },
         areaServed: { "@type": "State", name: "Bayern" },
@@ -216,7 +216,7 @@ function HeroSection() {
             {[
               { icon: MapPin, label: "Bayernweit verfügbar" },
               { icon: Clock, label: "Auch außerhalb der Öffnungszeiten erreichbar" },
-              { icon: Calendar, label: "Termine automatisch" },
+              { icon: Calendar, label: "Termine nach Ihren Regeln" },
               { icon: Shield, label: "Keine Gesprächsaufzeichnung" },
             ].map((item, i) => (
               <motion.div
@@ -289,7 +289,7 @@ function IntroSection() {
               </p>
               <p>
                 Das Ergebnis: Anrufe werden angenommen, wenn Ihr Team gebunden ist.
-                Termine werden nach Ihren Regeln gebucht. Ihr Team konzentriert sich
+                Terminwünsche werden nach Ihren Regeln erfasst. Ihr Team konzentriert sich
                 auf die Arbeit, für die es gebraucht wird.
               </p>
             </div>

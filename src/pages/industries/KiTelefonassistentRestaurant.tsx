@@ -11,7 +11,7 @@ const config: NationalIndustryPageConfig = {
   },
   h1: "KI Telefonassistent für Restaurants & Gastronomie",
   tagline: "Gastronomie · Tischreservierung · auch außerhalb der Öffnungszeiten",
-  intro: "Freitagabend, 19:30 Uhr: Die Küche läuft auf Hochtouren, jeder Tisch ist besetzt – und das Telefon klingelt. Niemand kann abnehmen. Der Anrufer will für Samstag reservieren. Er legt auf und ruft das Restaurant nebenan an. Mit dem KI Telefonassistenten wäre sein Anruf angenommen worden: Tisch reserviert, Bestätigung erhalten – und am Samstagabend säße er als Gast bei Ihnen.",
+  intro: "Freitagabend, 19:30 Uhr: Die Küche läuft auf Hochtouren, jeder Tisch ist besetzt – und das Telefon klingelt. Niemand kann abnehmen. Der Anrufer will für Samstag reservieren. Er legt auf und ruft das Restaurant nebenan an. Mit dem KI Telefonassistenten wäre sein Anruf angenommen worden: Reservierungswunsch aufgenommen, an Ihr Team übergeben – und am Samstagabend säße er als Gast bei Ihnen.",
   serviceSlug: "ki-telefonassistent",
   serviceLabel: "KI Telefonassistent",
   costLink: "/kosten-ki-telefonassistent",
@@ -50,7 +50,7 @@ const config: NationalIndustryPageConfig = {
     "Tischreservierungen entgegennehmen – auch während des Service",
     "Jeder Reservierungswunsch strukturiert dokumentiert",
     "Erreichbar auch abends, nachts und am Wochenende",
-    "Automatische Erinnerung am Vortag wirkt No-Shows entgegen",
+    "Erinnerung am Vortag wirkt No-Shows entgegen, wo wir den Versandweg für Sie einrichten",
     // [[CLAIM: verify — Sprachumfang bestätigen]]
     "Mehrsprachig konfigurierbar: üblicherweise Deutsch und Englisch",
     "Anbindung an gängige Reservierungssysteme wird vor dem Angebot geprüft",
@@ -72,8 +72,8 @@ const config: NationalIndustryPageConfig = {
       },
       {
         step: "03",
-        title: "Bestätigen und den Tisch sichern",
-        description: "Bestätigung und Erinnerung mit Bestätigungslink richten wir als Teil Ihres Ablaufs ein — sie gehören nicht zum Standardumfang. Wo der Versandweg steht, wird nicht bestätigten Reservierungen erneut erinnert, damit der Tisch planbar bleibt.",
+        title: "Den Tisch planbar halten",
+        description: "Bestätigung und Erinnerung mit Bestätigungslink gehören nicht zum Standardumfang; wir richten sie als Teil Ihres Ablaufs ein. Ist der Versandweg eingerichtet, erinnern wir erneut an nicht bestätigte Reservierungen, damit der Tisch planbar bleibt.",
       },
     ],
   },

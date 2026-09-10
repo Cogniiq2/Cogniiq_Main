@@ -32,7 +32,7 @@ const SERVICES = [
     title: "KI-Telefonassistent Deutschland",
     slug: "ki-telefonassistent",
     description:
-      "Automatische Anrufannahme, Terminbuchung und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, mehrsprachig. Für Praxen, Gastronomie, Dienstleister und Handwerk in ganz Deutschland.",
+      "Automatische Anrufannahme, Terminaufnahme und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, mehrsprachig. Für Praxen, Gastronomie, Dienstleister und Handwerk in ganz Deutschland.",
     benefits: [
       "Erreichbar auch dann, wenn niemand abnehmen kann",
       "Mehrsprachig auf Anfrage",
@@ -144,7 +144,7 @@ const INDUSTRIES = [
   },
   {
     name: "Arztpraxen & Therapeuten",
-    description: "Praxen entlasten ihr Team durch automatische Terminbuchung und erscheinen prominent bei lokalen Suchanfragen.",
+    description: "Praxen entlasten ihr Team durch automatische Terminaufnahme und erscheinen prominent bei lokalen Suchanfragen.",
   },
   {
     name: "Dienstleister & Beratung",
