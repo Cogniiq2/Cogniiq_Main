@@ -444,13 +444,15 @@ erst in diesem Fenster in den Index gekommen bzw. sichtbar geworden.
 - **Aggregat-Baseline (Seite):** 814 Impressionen · Ø Position 36,0 · 0 Klicks
   (28 Tage bis 2026-09-08).
 - **Hypothese:** Die Seite war zu 100 % auf OTA-Provision und Direktbuchung
-  gerahmt und enthielt kein einziges Wort zur **Anbieterauswahl** — weder
-  „Internetagentur" noch „Hotellerie" als Segment, noch die Betriebstypen
-  (Stadthotel, Boutiquehotel, Landhotel, Pension, Gästehaus,
-  Ferienwohnungs-Vermieter). Rund 480 Impressionen pro Monat suchen aber genau
+  gerahmt und enthielt nichts zur **Anbieterauswahl**: „Internetagentur" kam
+  auf der Seite gar nicht vor, „Hotellerie" nur als einzelnes Tagline-Wort und
+  in den Keywords, und die Betriebstypen (Stadthotel, Boutiquehotel, Landhotel,
+  Pension, Gästehaus, Ferienwohnungs-Vermieter) fehlten vollständig.
+  Rund 480 Impressionen je 28 Tage suchen aber genau
   danach. Wird dieser Intent im Titel, in der Description und im **gerenderten
-  Fließtext** bedient, sollte die Familie aus Position 27–69 in Richtung
-  Position 20 wandern.
+  Fließtext** bedient, sollte die Familie aus ihrer heutigen Spanne
+  (Pos. 27,0 bis 68,8; volumengewichtet rund 45) in Richtung Position 20
+  wandern.
 - **Mechanismus:** Begriffsdeckung plus Informationsgewinn. Neu und inhaltlich
   eigenständig sind der Abschnitt „Die allgemeine Webagentur kennt die
   Buchungsstrecke nicht" (Belegungskalender, Ratenlogik, Mindestaufenthalt,
@@ -476,8 +478,16 @@ erst in diesem Fenster in den Index gekommen bzw. sichtbar geworden.
 - **Query-Familie (`Queries.csv`):** „verpasste anrufe kosten unternehmen"
   39 Impr. Pos. 11,2 (3 Monate) bzw. 28 Impr. Pos. 12,1 (28 Tage) ·
   „verpasste anrufe" 15 Impr. Pos. 23,6 · „entgangene anrufe" 3 Impr. Pos. 24,7.
-- **Warum überhaupt:** Position 11,2 ist die **beste Nicht-Marken-Platzierung
-  der gesamten Domain** mit kommerzieller Absicht. Der Titel im Manifest lautete
+- **Warum überhaupt:** Position 11,2 ist eine der besten
+  Nicht-Marken-Platzierungen der Domain mit klarer kommerzieller Absicht — aber
+  **nicht die beste**. Besser stehen im 3-Monats-Fenster unter anderem
+  „webentwicklung bayreuth" (178 Impr., Pos. 9,2), „web development" (138 Impr.,
+  Pos. 6,1), „it-dienstleistungen" (17 Impr., Pos. 5,2) und „website relaunch
+  münchen" (25 Impr., Pos. 10,2). Von diesen ist „webentwicklung bayreuth" die
+  eigentlich interessantere Zeile: bessere Position **und** 4,5-fache Menge.
+  Sie ist in diesem Lauf nicht angefasst worden, weil ihre wahrscheinliche
+  Zielseite `/bayreuth/webdesign` ist — und die läuft als eingefrorenes
+  Experiment. Der Titel im Manifest lautete
   „Verpasste Anrufe kosten täglich Umsatz – So hören Sie damit auf" und enthielt
   das Wort „Unternehmen" nicht, obwohl es in der Kopf-Query steht und in der H1
   der Seite bereits vorkam.

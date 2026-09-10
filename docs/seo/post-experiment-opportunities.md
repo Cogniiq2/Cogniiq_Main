@@ -106,7 +106,7 @@ Quelle: die beiden Search-Console-Exporte vom 2026-09-10 (3 Monate
 Query×Seite-Beleg. Alles hier ist **HIGH-EV — DEFERRED UNTIL EXPERIMENT END**
 und wurde nicht angefasst.
 
-## Seiten-Aggregate der sechs eingefrorenen Routen
+## Seiten-Aggregate der eingefrorenen Routen (plus eine Vergleichszeile)
 
 | Route | 3M Impr. | 3M Pos. | 28D Impr. | 28D Pos. | Klicks 3M |
 |---|---:|---:|---:|---:|---:|
@@ -140,7 +140,11 @@ positionsmäßig deutlich näher an der ersten Seite als die Webdesign-Familien:
 | ki telefonassistent praxis | 64 | 40,8 | 19 | 33,7 |
 | ki-telefonassistent arztpraxis | 58 | 38,6 | 32 | 32,6 |
 
-Zusammen rund 1.000 Impressionen in 28 Tagen. Die beiden Seiten, die diese
+Diese neun Zeilen summieren sich auf **716** Impressionen in 28 Tagen (1.621 in
+drei Monaten). Nimmt man die vollständige Familie aller Queries mit
+„telefonassistent" hinzu — 73 Zeilen, überwiegend Longtail —, sind es **943**.
+Die frühere Fassung dieses Absatzes sagte „rund 1.000" direkt unter der Tabelle
+und ließ damit die Tabellensumme größer erscheinen, als sie ist. Die beiden Seiten, die diese
 Intention plausibel besitzen — `/ki-telefonassistent-arzt` und
 `/kosten-ki-telefonassistent` — sind **beide eingefroren**. Das ist der
 Kernbefund dieses Laufs: Die attraktivste Query-Familie der Domain ist genau
@@ -199,9 +203,11 @@ vorliegt.**
    teilen sich die Query „internetagentur hotel/hotels" **nicht** erkennbar —
    die Gastronomie-Queries sind lexikalisch klar getrennt (gastronomie,
    restaurant) und ranken deutlich schlechter (Pos. 48–76 gegen 20–45).
-   Hypothese geprüft und **verworfen**: Die beiden Seiten konkurrieren nach
-   Datenlage nicht. Deshalb war es zulässig, in diesem Lauf nur die
-   Hotel-Seite anzufassen.
+   Hypothese **nicht gestützt** — was nach der Vorbemerkung oben auch das
+   Höchste ist, was Aggregate hergeben: „widerlegt" wäre hier ein
+   Denkfehler, weil dieselben Daten die Frage nicht entscheiden können. Die
+   lexikalische Trennung reicht aber, um in diesem Lauf nur die Hotel-Seite
+   anzufassen, ohne eine gemeinsame Query-Familie zu stören.
 
 ---
 
@@ -214,9 +220,14 @@ aber für **alle** Seiten mit dem FAQ-Accordion (`NationalIndustryPage`,
 vorgerenderten HTML steht deshalb nur die **Frage** (im Button), die **Antwort**
 ausschließlich im `FAQPage`-JSON-LD.
 
-Nachprüfbar an `dist/webdesign-hotel.html`: „Boutique- und Landhotels" kommt
-genau **einmal** vor (JSON-LD), die zugehörige Frage **zweimal** (Button +
-JSON-LD).
+Nachprüfbar an `dist/webdesign-hotel.html` am Antworttext selbst: „Den
+Unterschied macht nicht das Design" kommt genau **einmal** vor (JSON-LD), die
+zugehörige Frage **zweimal** (Button + JSON-LD).
+
+Nicht als Beleg taugt „Boutique- und Landhotels": Der Begriff steht seit diesem
+Lauf zusätzlich in `solution.text` und damit im sichtbaren Körper — er kommt
+deshalb zweimal vor, aus einem anderen Grund. Genau deshalb ist die
+Betriebstypen-Aufzählung dorthin gezogen worden.
 
 Das ist kein Fehler — JSON-LD wird ausgewertet — aber es heißt, dass FAQ-Text
 für die Bewertung des Seitenkörpers praktisch nicht zählt. Wer über FAQ-Einträge

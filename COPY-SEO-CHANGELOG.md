@@ -16,15 +16,26 @@ Attributionsgrenzen und Messpunkte in `docs/seo/organic-growth-scoreboard.md`.
   bediente.
 - **Geändert** `/verpasste-anrufe-verlust`: Manifest-Titel auf „Verpasste
   Anrufe: Was sie Unternehmen wirklich kosten" — Deckung der Kopf-Query
-  „verpasste anrufe kosten unternehmen" (Pos. 11,2; beste kommerzielle
-  Nicht-Marken-Platzierung der Domain). Seiten-Config auf denselben Wortlaut
-  gezogen, weil der Prerenderer den Head aus dem Manifest schreibt und ein
-  abweichender Client-Titel nach der Hydration umgesprungen wäre.
+  „verpasste anrufe kosten unternehmen" (Pos. 11,2; eine der besten
+  kommerziellen Nicht-Marken-Platzierungen der Domain — nicht die beste,
+  siehe Scoreboard M2).
+  Seiten-Config auf denselben Wortlaut gezogen. Wirksam ist ausschließlich das
+  Manifest: Der Prerenderer schreibt den Head daraus, und `PageSEO.tsx:104`
+  liest im Client `routeMetadata?.title ?? titleProp` — das Manifest gewinnt
+  also auch nach der Hydration. Ein abweichender Wert in der Seiten-Config wäre
+  toter Code gewesen, kein sichtbarer Fehler; angeglichen wurde er, damit
+  niemand ihn später für die wirksame Stelle hält.
 - **Claim-Korrektur** `/verpasste-anrufe-verlust`: `solution.bullets` enthielt
   weiterhin „Termine automatisch in den Kalender eingetragen" — Nachzügler aus
   dem Durchgang vom selben Tag, der nur `solution.text` derselben Seite
-  korrigiert hatte. Wortlaut an `FAKTEN.terminaufnahme` angeglichen
-  (`BOOKING_WRITE` = nur nach geprüfter Kundenintegration).
+  korrigiert hatte. Bedingung an `FAKTEN.terminaufnahme` angeglichen:
+  geschrieben wird erst, wenn die Schnittstelle es **nachweislich trägt**
+  (`BOOKING_WRITE` = nur nach geprüfter Kundenintegration). Bewusst nicht
+  „wenn die Schnittstelle geprüft ist" — das wäre auch von einer Prüfung
+  erfüllt, die negativ ausfällt. Einschränkung: Die Seite importiert
+  `telefonassistent-copy.ts` nicht, der Satz ist eine Paraphrase ohne Guard.
+  Eine Bindung wie in `GRENZEN` wäre die saubere Lösung und gehört beim
+  nächsten Anfassen dieser Seite nachgezogen.
 - **Nicht angefasst:** die sechs eingefrorenen Routen und ihre eingehenden
   Linkzahlen; `/webdesign-gastronomie` (bewusst, damit die Hotel-Änderung
   zurechenbar bleibt); `/automatisierung-restaurant` und
