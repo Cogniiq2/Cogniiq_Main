@@ -54,3 +54,45 @@ schlechter als sie nicht zu veröffentlichen.
 Die Recherche ist damit **Vorarbeit**, nicht Ergebnis. Der teure Teil — das
 Wettbewerbsbild, die Lückenanalyse, die Quellenliste — ist erledigt. Offen ist
 der Verifikationsschritt, der Netzzugang oder Herstellerkontakt braucht.
+
+---
+
+## Nachprüfung 2026-09-10 — die Sperre besteht weiter
+
+Zweite automatisierte Session, gleiche Frage: Ist der Verifikationsschritt
+inzwischen möglich? **Nein.**
+
+| Kanal | Ergebnis am 2026-09-10 |
+|---|---|
+| `curl` auf `redmedical.de`, `kbv.de` | `CONNECT tunnel failed, response 403` — `connect_rejected` (Egress-Policy) |
+| Seitenabruf-Werkzeug (`WebFetch`) auf `hilfe.redmedical.de`, `redmedical.de`, `google.com` | `EGRESS_BLOCKED` für **jede** Domain |
+| Suchmaschine (Trefferliste + Snippets) | funktioniert, US-lokalisiert |
+
+Damit gilt die Regel oben unverändert: Es wurde erneut **keine einzige
+Primärquelle geöffnet**. Die Snippets bestätigen nur, dass die RED interchange
+API existiert und FHIR-basiert ist — sie belegen **nicht**, welche Ressourcen
+sie führt und ob ein externes System einen Termin anlegen, verschieben oder
+stornieren kann. Genau diese eine Frage entscheidet über die Seite.
+
+**Konsequenz für die nächste Session:** Die PVS-Recherche ist nicht durch mehr
+Modellzeit lösbar. Sie braucht genau eines von beidem:
+
+1. eine Umgebung, in der die Hersteller-Dokumentation abrufbar ist, oder
+2. Herstellerkontakt durch den Inhaber (Anfrage an RED Medical, medatixx,
+   zollsoft/tomedo, CGM).
+
+Bis dahin bleibt `pvs-integration-recherche.md` Vorarbeit, und eine
+Integrations-Autoritätsseite bleibt gesperrt — **BLOCKED — EVIDENCE**. Ein
+dritter Anlauf mit denselben Mitteln ist verlorene Kapazität; das ist der Grund,
+warum dieser Abschnitt hier steht.
+
+### Ebenfalls geprüft und negativ
+
+- **Google-Search-Console-Exporte:** im Repository nicht vorhanden. Es gibt
+  keine Nachfrage-Evidenz (Query × Page × Impressionen × Position). Jede
+  Content-Wette wäre unbelegt priorisiert — deshalb wurde am 2026-09-10 **keine
+  neue indexierbare Seite** angelegt.
+- **Verwaiste indexierbare Seiten:** keine. Die schwächste Klasse sind die
+  Blogbeiträge mit je vier Quelltext-Verweisen (`blog-data.ts`,
+  `publicRoutePaths.ts`, `publicRoutes.ts`, `public/sitemap.xml`) — also ohne
+  kontextuellen Verweis aus einem Seitentext; alle übrigen Routen liegen darüber.

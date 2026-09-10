@@ -236,3 +236,90 @@ Damit das Ergebnis nicht im Nachhinein schöngeredet werden kann, hier vorab:
 - **Tag 90:** keine Query aus dem Cluster in den Top 50 und keine verweisende
   Domain hinzugekommen → die Annahme „Autorität ist der Engpass" bestätigt sich,
   und die Arbeit gehört off-site, nicht in weitere Seiten.
+
+---
+
+## B · Claim-Bereinigung Telefonassistent-Mechanik (2026-09-10)
+
+Keine Ranking-Wette, sondern die Beseitigung eines Widerspruchs **innerhalb der
+eigenen Domain**: Der Healthcare-Cluster wurde im August auf
+`FAKTEN.keineAnbindung` gezogen — „eine Standardanbindung, die auf jedes
+Praxisverwaltungssystem sofort passt, gibt es nicht" —, die Startseite und
+`/webdesign-arzt-bayreuth` liefen jedoch weiter mit der Fassung davor: „Integration
+Kalender & CRM", „Automatische Terminbuchung", „Sofortbestätigung per SMS oder
+Mail", „bucht Termine direkt in Ihren Kalender ein" und, am deutlichsten, die
+FAQ-Antwort „In den meisten Fällen ja. Der KI-Telefonassistent von Cogniiq kann an
+gängige Praxisverwaltungssysteme und Kalendertools angebunden werden."
+
+Das ist dieselbe Vereinfachung, die `pvs-integration-recherche.md` dem
+Wettbewerb vorhält — auf der meistbesuchten eigenen Seite und auf einer
+Gesundheitsseite.
+
+- **Geändert am:** 2026-09-10
+- **Ziel-Query-Familie:** keine. Titel, Description, Canonical und Robots aller
+  betroffenen Routen sind unverändert.
+- **Ausnahme, die ausdrücklich hierher gehört:** Auf den drei Arzt-Webdesign-Seiten
+  hat sich **JSON-LD sehr wohl geändert**. `IndustryPage.tsx:146` reicht `config.faq`
+  an `PageSEO` weiter, das daraus `FAQPage`-Markup erzeugt (`PageSEO.tsx:189`), und
+  `config.seo.description` steht in der `Service`-Beschreibung (`IndustryPage.tsx:130`).
+  Geänderte FAQ-Antworten sind damit Rich-Result-relevant. Eine frühere Fassung
+  dieses Abschnitts behauptete das Gegenteil; das war falsch.
+- Sonst geändert wurde ausschließlich Fließtext in `<main>`.
+- **Hypothese:** Wirkung primär auf Vertrauen und Konversion, nicht auf
+  Positionen. Eine indirekte Wirkung über Nutzersignale ist möglich, aber nicht
+  von der übrigen Arbeit trennbar und wird hier **nicht** behauptet.
+- **Erfolg:** Tag 90 keine Verschlechterung von `/` und
+  `/webdesign-arzt-bayreuth` gegenüber Baseline.
+- **Scheitern:** Tag 28 Impressionen einer der Routen mehr als ein Drittel unter
+  Baseline → nicht mit „Textkürzung" erklären: Gemessen am Diff hat
+  `/webdesign-arzt-bayreuth` rund 600 Zeichen **gewonnen**, die Startseite netto
+  rund 170. Zu prüfen wäre dann die Wortwahl selbst, nicht die Textmenge —
+  insbesondere der Wegfall von „Terminbuchung" als Begriff auf den drei
+  Arzt-Webdesign-Seiten.
+
+| Route | Messpunkt | Datum | Impressionen | Klicks | CTR | Ø Position |
+|---|---|---|---:|---:|---:|---:|
+| `/` | Baseline (0) | 2026-09-10 | | | | |
+| `/` | Tag 28 | | | | | |
+| `/` | Tag 90 | | | | | |
+| `/webdesign-arzt-bayreuth` | Baseline (0) | 2026-09-10 | | | | |
+| `/webdesign-arzt-bayreuth` | Tag 28 | | | | | |
+| `/webdesign-arzt-bayreuth` | Tag 90 | | | | |
+| `/webdesign-arzt-muenchen` | Baseline (0) | 2026-09-10 | | | | |
+| `/webdesign-arzt-muenchen` | Tag 90 | | | | | |
+| `/webdesign-arzt-regensburg` | Baseline (0) | 2026-09-10 | | | | |
+| `/webdesign-arzt-regensburg` | Tag 90 | | | | | |
+| `/ki-telefonassistent-restaurant` | Baseline (0) | 2026-09-10 | | | | |
+| `/ki-telefonassistent-restaurant` | Tag 90 | | | | | | |
+
+> Die Baseline-Zeilen sind leer, weil in dieser Session **kein** GSC-Export
+> vorlag. Sie sind vor dem ersten Messpunkt aus der Search Console für den
+> Zeitraum 2026-08-14 bis 2026-09-10 nachzutragen. Keine geschätzte Zahl
+> eintragen.
+
+### Bewusst NICHT in diesem Branch
+
+Ein Suchlauf über `src/**` zeigte dieselbe Buchungs-/SMS-Zusage auf rund einem
+Dutzend weiterer Routen, darunter zwei `<meta name="description">`. Sie sind
+vollständig in `COPY-CLAIMS-TO-VERIFY.md` (§Z25-Bestandsaufnahme) erfasst und
+gehören in einen eigenen Branch: Eine Änderung des SERP-Snippets mehrerer Routen
+im selben Commit wie diese Copy-Bereinigung macht jede spätere Bewegung
+unzuordenbar.
+
+Eine Fundstelle ist dabei **DEFERRED — MEASUREMENT**: Die Manifest-Description
+von `/ki-telefonassistent-arzt` (`publicRoutes.ts:606`) sagt „bucht Termine ins
+System". Die Aussage ist unbelegt, die Route ist aber ein laufendes Experiment.
+Sie wird mit dem Experimentende korrigiert — das ist der Preis der Messung und
+gehört ausdrücklich protokolliert, statt stillschweigend hingenommen zu werden.
+
+### Mitgeändert, ohne eigene Messreihe
+
+`/bayreuth/ki-telefonassistent` und `/regensburg/ki-telefonassistent`
+(„wird jeder angenommen" → an `FAKTEN.gleichzeitigeAnrufe` gebunden: bis zu 10),
+`/bayreuth/automatisierung` („nahezu jede Software", „marktführenden"),
+`/kosten-automatisierung` und `/zu-viel-manuelle-arbeit` (verbotene Absolutheit
+„vollständig automatisiert", COPY-BRIEF §5.9). Jeweils einzelne Sätze; die
+Punkte stammen aus der Sammelliste in `post-experiment-opportunities.md`.
+
+`/bayreuth/webdesign` steht auf derselben Liste und wurde **nicht** angefasst —
+die Route ist eingefroren.

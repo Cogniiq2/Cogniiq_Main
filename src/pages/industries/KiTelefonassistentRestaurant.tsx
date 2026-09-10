@@ -44,11 +44,11 @@ const config: NationalIndustryPageConfig = {
   ],
   solution: {
     headline: "Reservierungen annehmen, während der Service läuft",
-    text: "Der KI Telefonassistent nimmt Reservierungen entgegen, prüft Verfügbarkeit und bestätigt per SMS oder E-Mail. Automatische Erinnerungen am Vortag wirken No-Shows entgegen. Ihr Serviceteam bleibt bei den Gästen, die bereits am Tisch sitzen.",
+    text: "Der KI Telefonassistent nimmt Reservierungswünsche entgegen, erfasst Personenzahl, Zeitwunsch und Rückrufnummer und übergibt sie strukturiert an den Service. Zehn Anrufe gleichzeitig, ohne Warteschleife. Ihr Serviceteam bleibt bei den Gästen, die bereits am Tisch sitzen.",
   },
   benefits: [
     "Tischreservierungen entgegennehmen – auch während des Service",
-    "Bestätigung per SMS oder E-Mail an den Gast",
+    "Jeder Reservierungswunsch strukturiert dokumentiert",
     "Erreichbar auch abends, nachts und am Wochenende",
     "Automatische Erinnerung am Vortag wirkt No-Shows entgegen",
     // [[CLAIM: verify — Sprachumfang bestätigen]]
@@ -107,8 +107,8 @@ const config: NationalIndustryPageConfig = {
       answer: "Ja. Allergien, Hochstuhlbedarf, Fensterwunsch, Geburtstag – alles wird während des Gesprächs erfasst und im Reservierungssystem dokumentiert, sodass der Service optimal vorbereitet ist.",
     },
     {
-      question: "Wie wirksam sind die automatischen Erinnerungen gegen No-Shows?",
-      answer: "Automatische Erinnerungen per SMS oder E-Mail 24 Stunden vor dem Besuch helfen dabei, No-Shows spürbar zu reduzieren. Der genaue Zeitpunkt und der Inhalt werden für Ihr Restaurant individuell konfiguriert.",
+      question: "Verschickt der Assistent Erinnerungen an Gäste?",
+      answer: "Das sagen wir nicht pauschal zu. Eine Erinnerung vor dem Besuch lässt sich als Ablauf einrichten; auf welchem Weg sie den Gast erreicht, hängt an den Systemen, die Sie einsetzen. Wir sehen uns das vor dem Angebot an und schreiben das Ergebnis hinein.",
     },
     {
       question: "Lässt sich der Assistent auch auf Festspiel- und Eventzeiten vorbereiten?",

@@ -82,7 +82,7 @@ const config: IndustryPageConfig = {
         "Alles aus Start",
         "KI-Telefonassistent (Anrufannahme außerhalb der Sprechzeiten)",
         "Automatische Terminverwaltung & Kalenderintegration",
-        "Erinnerungs-SMS / E-Mail für Patienten",
+        "Terminerinnerungen im vor dem Angebot geprüften Umfang",
         "Monatliches Reporting & Optimierungsgespräch",
       ],
     },
@@ -91,9 +91,9 @@ const config: IndustryPageConfig = {
       tagline: "Vollständige Digitalisierung der Praxisabläufe",
       deliverables: [
         "Alles aus Growth",
-        "Automatisierte Recall-Kampagnen & Nachsorge",
+        "Recall und Nachsorge als eingerichteter Ablauf, im geprüften Umfang",
         "Integration in bestehende Praxissoftware",
-        "Patientenkommunikation via SMS-Workflow",
+        "Patientenkommunikation als eingerichteter Ablauf",
         "Laufende Betreuung, Updates & Priorisierung",
       ],
     },
@@ -118,13 +118,13 @@ const config: IndustryPageConfig = {
       icon: "phone",
       title: "KI-Telefonassistent für Arztpraxen in Regensburg",
       description:
-        "Der KI-Telefonassistent nimmt Patientenanrufe automatisch an, beantwortet Fragen zu Öffnungszeiten, Fachrichtungen und Formalitäten, bucht Termine direkt ins System ein und leitet komplexe Anliegen strukturiert weiter – auch außerhalb der Sprechzeiten, ohne Warteschleife.",
+        "Der KI-Telefonassistent nimmt Patientenanrufe entgegen, beantwortet Fragen zu Öffnungszeiten, Fachrichtungen und Formalitäten, erfasst Terminwünsche mit Name und Rückrufnummer und leitet komplexe Anliegen strukturiert an Ihr Team weiter – auch außerhalb der Sprechzeiten, ohne Warteschleife. Ob Termine direkt in Ihr Praxisverwaltungssystem übergeben werden können, prüfen wir vor dem Angebot.",
     },
     {
       icon: "zap",
       title: "Praxis-Automatisierung Regensburg",
       description:
-        "Terminbestätigungen, Erinnerungs-SMS, Recall-Kampagnen und Patientenkommunikation laufen automatisiert ab. Weniger Aufwand für das Team, weniger No-Shows, konsistentere Patientenerfahrung.",
+        "Terminbestätigungen, Erinnerungen, Recall und Patientenkommunikation lassen sich als Abläufe einrichten, statt sie von Hand zu erledigen. Welche davon möglich sind, hängt an den Systemen Ihrer Praxis – das prüfen wir vor dem Angebot und sagen keinen Versandweg zu, den wir dort nicht gesehen haben.",
     },
   ],
   useCases: [
@@ -136,7 +136,7 @@ const config: IndustryPageConfig = {
     {
       title: "Automatische Terminerinnerungen",
       description:
-        "Kurz vor dem Termin erhalten Patienten automatisch eine Erinnerung per SMS oder E-Mail. No-Show-Rate sinkt messbar, Praxiskalender bleibt gefüllt.",
+        "Eine Erinnerung kurz vor dem Termin lässt sich als Ablauf einrichten. Auf welchem Weg sie Ihre Patienten erreicht, hängt an Ihren Systemen und steht nach der Prüfung im Angebot.",
     },
     {
       title: "Rezeption entlasten bei Stoßzeiten",

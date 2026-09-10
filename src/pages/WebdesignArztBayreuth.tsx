@@ -17,11 +17,11 @@ const config: IndustryPageConfig = {
     // ✓ Brand appended at the end — not eating into keyword space
     title: "Praxis Website Bayreuth & KI-Telefonassistent | Cogniiq",
 
-    // ✓ 148 chars — under the 155-char Google display limit
+    // Google-Anzeigelänge: gekürzt anzeigen, der Kern steht vorn.
     // ✓ Contains primary keyword, city, unique value prop, and implicit CTA
     // ✓ Addresses the core buyer fear (verpasste Anrufe / Terminverlust)
     description:
-      "Praxis Website Bayreuth mit KI-Telefonassistent: Cogniiq automatisiert Anrufannahme, Terminbuchung und Patientenkommunikation für Arztpraxen – in zwei Wochen eingerichtet und bereit zur Freigabe.",
+      "Praxis Website Bayreuth mit KI-Telefonassistent: Cogniiq übernimmt die Anrufannahme, erfasst Terminwünsche strukturiert und übergibt sie an Ihr Team – in zwei Wochen eingerichtet und bereit zur Freigabe.",
 
     canonical: `${base}/webdesign-arzt-bayreuth`,
 
@@ -88,7 +88,7 @@ const config: IndustryPageConfig = {
       // 14 Kalendertage bis zur Übergabe zur Freigabe — nie bis zum Go-live, der an
       // der Kundenfreigabe hängt (FAKTEN.uebergabeGarantie).
       description:
-        "Praxis-Website, KI-Telefonassistent und Automatisierungsworkflows werden vollständig von Cogniiq aufgebaut und konfiguriert. Keine IT-Kenntnisse erforderlich, keine interne Projektarbeit. Sie erhalten alles betriebsbereit – inklusive DSGVO-Dokumentation und lokalem Support in Bayreuth.",
+        "Cogniiq baut und konfiguriert Praxis-Website, KI-Telefonassistent und Automatisierungsabläufe. Keine IT-Kenntnisse erforderlich, keine interne Projektarbeit. Sie erhalten alles betriebsbereit, mit lokalem Support in Bayreuth.",
     },
     {
       step: "Schritt 3",
@@ -137,20 +137,20 @@ const config: IndustryPageConfig = {
       tagline: "Praxis-Website + KI-Telefonassistent für Erreichbarkeit außerhalb der Sprechzeiten",
       deliverables: [
         "Alles aus Start",
-        "KI-Telefonassistent: Anrufannahme außerhalb der Sprechzeiten und automatische Terminbuchung",
-        "Kalenderintegration und strukturierte Weiterleitung dringender Anliegen",
-        "Automatische Terminerinnerungen per SMS und E-Mail (No-Show-Reduktion)",
+        "KI-Telefonassistent: Anrufannahme außerhalb der Sprechzeiten, Terminwünsche strukturiert aufgenommen",
+        "Übergabe an Ihr Praxisverwaltungssystem, soweit dessen Schnittstelle sie trägt",
+        "Strukturierte Weiterleitung dringender Anliegen an Ihr Team",
         "Monatliches Reporting und Optimierungsgespräch mit Cogniiq",
       ],
     },
     {
       name: "Premium",
-      tagline: "Vollständige Digitalisierung Ihrer Praxisabläufe in Bayreuth",
+      tagline: "Website, Telefonassistent und Praxisabläufe als ein System in Bayreuth",
       deliverables: [
         "Alles aus Growth",
-        "Automatisierte Recall-Kampagnen und Nachsorge-Kommunikation",
-        "Integration in bestehende Praxisverwaltungssoftware (individuelle Abstimmung)",
-        "Patientenkommunikation per SMS-Workflow und E-Mail-Sequenz",
+        "Recall und Nachsorge-Kommunikation als eingerichteter Ablauf, im vor dem Angebot geprüften Umfang",
+        "Anbindung an Ihre Praxisverwaltungssoftware, soweit die Prüfung Ihres Systems sie trägt",
+        "Patientenkommunikation als eingerichteter Ablauf, im geprüften Umfang",
         "Laufende Betreuung, Content-Updates und priorisierter Support durch Cogniiq",
       ],
     },
@@ -184,19 +184,19 @@ const config: IndustryPageConfig = {
       icon: "phone",
       // ✓ Exact-match local keyword as title: "KI-Telefonassistent Arztpraxis Bayreuth"
       title: "KI-Telefonassistent für Arztpraxen in Bayreuth",
-      // ✓ Specific capabilities listed (Öffnungszeiten, Fachrichtungen, Terminbuchung, Weiterleitung)
+      // Fähigkeiten benannt (Öffnungszeiten, Fachrichtungen, Terminwunsch, Weiterleitung).
       // ✓ "außerhalb der Sprechzeiten", "ohne Warteschleife" — both are high-intent search terms
       description:
-        "Der KI-Telefonassistent von Cogniiq nimmt Patientenanrufe automatisch entgegen, beantwortet Fragen zu Öffnungszeiten, Fachrichtungen, Rezeptbestellungen und Praxisformalitäten, bucht Termine direkt in Ihren Praxiskalender ein und leitet dringende oder komplexe Anliegen strukturiert an Ihr Team weiter – auch außerhalb der Sprechzeiten, ohne Warteschleife und datenschutzorientiert umgesetzt.",
+        "Der KI-Telefonassistent von Cogniiq nimmt Patientenanrufe entgegen, beantwortet Fragen zu Öffnungszeiten, Fachrichtungen, Rezeptbestellungen und Praxisformalitäten, nimmt Terminwünsche mit Name und Rückrufnummer strukturiert auf und leitet dringende oder komplexe Anliegen an Ihr Team weiter – auch außerhalb der Sprechzeiten und ohne Warteschleife. Ob sich Termine direkt in Ihr Praxisverwaltungssystem übergeben lassen, prüfen wir vor dem Angebot an Ihrem konkreten System; wo das nicht trägt, steht das Ergebnis strukturiert im Cogniiq-Dashboard.",
     },
     {
       icon: "zap",
       // ✓ "Praxis-Automatisierung Bayreuth" is an underserved, low-competition long-tail keyword
       title: "Praxis-Automatisierung Bayreuth",
-      // ✓ Specific outputs (Terminbestätigungen, Erinnerungs-SMS, Recall-Kampagnen) match
-      //   what practice managers actually search for solutions to
+      // Belegbarkeitsgrenze: welche dieser Abläufe möglich sind, hängt am System der Praxis.
+      //   Deshalb hier als Prüfgegenstand formuliert, nicht als laufende Cogniiq-Funktion.
       description:
-        "Terminbestätigungen, Erinnerungs-SMS, Recall-Kampagnen und Patientenkommunikation laufen bei Cogniiq vollständig automatisiert ab. Das reduziert den täglichen Verwaltungsaufwand Ihres Praxisteams in Bayreuth, Erinnerungen wirken No-Shows entgegen, und Patienten erhalten eine konsistente, professionelle Kommunikation – ohne zusätzlichen Personalaufwand.",
+        "Terminbestätigungen, Erinnerungen, Recall-Kampagnen und Patientenkommunikation lassen sich als Abläufe einrichten, statt sie täglich von Hand zu erledigen. Welche davon in Ihrer Praxis in Bayreuth möglich sind, hängt an den Systemen, die Sie einsetzen – das sehen wir uns vor dem Angebot an. Das Ziel ist weniger Verwaltungsaufwand für Ihr Team und eine konsistente Kommunikation gegenüber Patienten.",
     },
   ],
 
@@ -205,14 +205,14 @@ const config: IndustryPageConfig = {
   // ✓ Each description is expanded to 50–70 words for crawlable semantic depth
   useCases: [
     {
-      title: "Online-Terminbuchung für Arztpraxen in Bayreuth – auch außerhalb der Sprechzeiten",
+      title: "Terminwünsche rund um die Uhr annehmen – Arztpraxen in Bayreuth",
       description:
-        "Patienten buchen Termine direkt über Ihre Praxis-Website oder per KI-Telefonassistent – auch abends, am Wochenende und an Feiertagen. Kein Anruf notwendig, kein Personal gebunden. Die Terminbuchung ist in Ihren bestehenden Praxiskalender integriert und kann auf einzelne Fachrichtungen, Ärzte und Zeitfenster eingegrenzt werden. Neue Patienten in Bayreuth finden Ihre Praxis und buchen, ohne den Umweg über das Telefon.",
+        "Patienten geben ihren Terminwunsch über Ihre Praxis-Website oder am Telefon ab – auch abends, am Wochenende und an Feiertagen, ohne dass Personal gebunden ist. Die Anfrage lässt sich auf einzelne Fachrichtungen, Ärzte und Zeitfenster eingrenzen. Ob die Anfrage direkt in Ihrem bestehenden Praxiskalender landet, hängt an dessen Schnittstelle; das prüfen wir an Ihrem System, bevor wir ein Angebot machen.",
     },
     {
-      title: "Automatische Terminerinnerungen – No-Shows in Arztpraxen reduzieren",
+      title: "Terminerinnerungen für Arztpraxen – was sich einrichten lässt",
       description:
-        "Kurz vor dem vereinbarten Termin erhalten Ihre Patienten automatisch eine Erinnerung per SMS oder E-Mail. Die Erinnerung enthält Datum, Uhrzeit und bei Bedarf Hinweise zur Vorbereitung. Automatische Terminerinnerungen helfen Praxen dabei, No-Shows spürbar zu reduzieren. Der gesamte Prozess läuft automatisch – ohne Aufwand für Ihre Rezeption in Bayreuth.",
+        "Eine Erinnerung vor dem Termin – mit Datum, Uhrzeit und bei Bedarf Hinweisen zur Vorbereitung – lässt sich als Ablauf einrichten, statt sie von Hand zu verschicken. Auf welchem Weg das geht und was Ihr Praxisverwaltungssystem dafür hergibt, sehen wir uns vor dem Angebot an. Wir sagen keinen Versandweg zu, den wir an Ihrem System nicht geprüft haben.",
     },
     {
       title: "Rezeptionsüberlastung in Stoßzeiten entlasten – KI übernimmt Routineanrufe",
@@ -240,10 +240,10 @@ const config: IndustryPageConfig = {
   // ✓ Each benefit is specific enough to be credible, broad enough to match multiple searches
   benefits: [
     "Erreichbar auch dann, wenn niemand abnehmen kann: Der KI-Telefonassistent nimmt auch bei vollem Betrieb und außerhalb der Öffnungszeiten Patientenanrufe entgegen",
-    "Rezeption entlastet: Routineanfragen laufen automatisiert – Ihr Team konzentriert sich auf Patienten, die wirklich Beratung benötigen",
+    "Rezeption entlastet: Routineanfragen nimmt der Assistent entgegen – Ihr Team konzentriert sich auf Patienten, die wirklich Beratung benötigen",
     "Mehr neue Patienten durch eine suchmaschinenoptimierte Praxis-Website, die bei Google-Suchen in Bayreuth sichtbar rankt",
     "Höhere Patientenzufriedenheit durch sofortige Reaktion auf Anrufe und Anfragen – auch außerhalb der Sprechzeiten, ohne Warteschleife",
-    "Weniger No-Shows und Terminausfälle durch automatische Erinnerungen per SMS und E-Mail",
+    "Terminerinnerungen richten wir in dem Umfang ein, den Ihr System nachweislich hergibt",
     "Professioneller erster Eindruck: moderne Website und sofortige Gesprächsannahme signalisieren Qualität, bevor der Patient die Praxis betritt",
     "In zwei Wochen eingerichtet und bereit zur Freigabe: keine lange Projektlaufzeit, kein IT-Aufwand auf Ihrer Seite, alles schlüsselfertig von Cogniiq",
   ],
@@ -255,8 +255,8 @@ const config: IndustryPageConfig = {
   //   (4) "Als Unternehmen mit Sitz in Bayreuth" is a local entity signal for Google
   localContext: [
     "Bayreuth ist ein wachsender Gesundheitsstandort mit einer dichten Praxislandschaft – von Allgemeinmedizin und Fachpraxen über Zahnarztpraxen bis zu Physiotherapie- und Psychotherapieeinrichtungen im Stadtgebiet und im Umland von Oberfranken. Der Wettbewerb um neue Patienten ist messbar gestiegen: Praxen mit moderner Website und digitaler Erreichbarkeit gewinnen Neupatienten, die bei Google nach 'Arzt Bayreuth' oder ihrer Fachrichtung suchen – Praxen ohne digitale Präsenz verlieren sie.",
-    "Gleichzeitig begrenzt der Fachkräftemangel im medizinischen Verwaltungsbereich die Personalkapazitäten in Bayreuther Praxen. Jede Stunde, die das Rezeptionsteam mit Routineanrufen verbringt, fehlt im direkten Patientenkontakt. Cogniiq entwickelt für Arztpraxen in Bayreuth maßgeschneiderte Digitallösungen: eine hochperformante Praxis-Website mit integrierter Online-Terminbuchung, einen KI-Telefonassistenten, der die Rezeption auch außerhalb der Sprechzeiten entlastet, sowie Automatisierungssysteme für Terminerinnerungen und strukturierte Patientenkommunikation.",
-    "Als Unternehmen mit Sitz in Bayreuth kennen wir die lokalen Besonderheiten, die Praxisstruktur in der Region und die spezifischen Anforderungen bayerischer Datenschutzpraxis. Die Einrichtung aller Lösungen wird vollständig von Cogniiq übernommen – ohne IT-Aufwand auf Praxisseite. Wir sind für persönliche Abstimmungen direkt erreichbar – per Video-Call oder vor Ort in Bayreuth.",
+    "Gleichzeitig begrenzt der Fachkräftemangel im medizinischen Verwaltungsbereich die Personalkapazitäten in Bayreuther Praxen. Jede Stunde, die das Rezeptionsteam mit Routineanrufen verbringt, fehlt im direkten Patientenkontakt. Cogniiq entwickelt für Arztpraxen in Bayreuth maßgeschneiderte Digitallösungen: eine schnelle Praxis-Website mit strukturierter Terminanfrage, einen KI-Telefonassistenten, der die Rezeption auch außerhalb der Sprechzeiten entlastet, und Abläufe für Terminerinnerungen und Patientenkommunikation in dem Umfang, den die Prüfung Ihrer Systeme trägt.",
+    "Als Unternehmen mit Sitz in Bayreuth kennen wir die lokalen Besonderheiten, die Praxisstruktur in der Region und die spezifischen Anforderungen bayerischer Datenschutzpraxis. Die Einrichtung übernimmt Cogniiq – ohne IT-Aufwand auf Praxisseite. Wir sind für persönliche Abstimmungen direkt erreichbar – per Video-Call oder vor Ort in Bayreuth.",
   ],
 
   // ✓ Internal links kept structurally identical — no changes to href values
@@ -297,19 +297,19 @@ const config: IndustryPageConfig = {
       question:
         "Wie funktioniert der KI-Telefonassistent für Arztpraxen in Bayreuth?",
       answer:
-        "Der KI-Telefonassistent nimmt eingehende Patientenanrufe automatisch entgegen und führt ein natürliches Gespräch. Er beantwortet Fragen zu Öffnungszeiten, Fachrichtungen, Rezeptbestellungen und Praxisformalitäten, bucht Termine direkt in Ihren Kalender ein und leitet dringende oder komplexe Anliegen strukturiert an Ihr Praxisteam weiter. Das System ist auch nachts, am Wochenende und an Feiertagen aktiv.",
+        "Der KI-Telefonassistent nimmt eingehende Patientenanrufe entgegen und führt ein natürliches Gespräch. Er beantwortet Fragen zu Öffnungszeiten, Fachrichtungen, Rezeptbestellungen und Praxisformalitäten, nimmt Terminwünsche mit Name und Rückrufnummer strukturiert auf und leitet dringende oder komplexe Anliegen an Ihr Praxisteam weiter. Ob der Termin direkt in Ihrem Kalender landet, hängt an dessen Schnittstelle und wird vor dem Angebot geprüft. Zu Beginn jedes Anrufs gibt sich der Assistent als KI-System zu erkennen (Art. 50 KI-Verordnung).",
     },
     {
       question:
         "Funktioniert der KI-Telefonassistent mit meiner bestehenden Praxissoftware?",
       answer:
-        "In den meisten Fällen ja. Der KI-Telefonassistent von Cogniiq kann an gängige Praxisverwaltungssysteme und Kalendertools angebunden werden. Die technische Integration klären wir individuell im kostenlosen Erstgespräch – ohne Vorab-Verpflichtung. Praxen in Bayreuth erhalten dabei direkten lokalen Support von Cogniiq.",
+        "Eine Standardanbindung, die auf jedes Praxisverwaltungssystem sofort passt, gibt es nicht. Wir prüfen deshalb Ihr konkretes System vor dem Angebot: ob es eine geeignete Schnittstelle gibt, ob wir dafür Zugang oder eine Freigabe bekommen, welche Vorgänge sie zulässt und ob Dritte dafür Gebühren verlangen. Das Ergebnis steht im Angebot. Trägt es nicht, kommt das strukturierte Ergebnis ins Cogniiq-Dashboard, und den Übergabeweg legen wir vorher gemeinsam fest.",
     },
     {
       question:
         "Wie lange dauert die Einrichtung für eine Arztpraxis in Bayreuth?",
       answer:
-        "Die vollständige Einrichtung wird von Cogniiq komplett übernommen. Sie müssen keine technischen Kenntnisse mitbringen und keinen internen IT-Aufwand einplanen. Sie erhalten Website, KI-Telefonassistent und Automatisierungssysteme schlüsselfertig – inklusive DSGVO-Dokumentation und einer Einführung durch Ihr Cogniiq-Team vor Ort oder per Video-Call in Bayreuth.",
+        "Die Einrichtung übernimmt Cogniiq. Sie müssen keine technischen Kenntnisse mitbringen und keinen internen IT-Aufwand einplanen. Sie erhalten Website, KI-Telefonassistent und Automatisierungsabläufe betriebsbereit, mit einer Einführung durch Ihr Cogniiq-Team vor Ort oder per Video-Call in Bayreuth.",
     },
     {
       question:
