@@ -101,6 +101,12 @@ Nach dem Experiment zu prüfen — alles **Claim-Hygiene**, kein SEO-Gewinn:
 
 ## Nicht experimentbezogen, aber hier notiert
 
+> **Stand 2026-09-10: erledigt bis auf eine Zeile.** Alle Fundstellen unten
+> außer `standorte-service-configs.ts:357` sind auf Branch
+> `claude/seo-growth-max-2026-09-10` bereinigt. Zeile `:357` gehört zu
+> `/bayreuth/webdesign` und bleibt eingefroren — sie ist der einzige offene
+> Punkt dieser Tabelle.
+
 Diese Punkte betreffen **nicht** eingefrorene Routen und könnten sofort
 angegangen werden. Sie stehen hier, weil sie in derselben Prüfung aufgefallen
 sind und sonst verloren gingen. Sie waren nicht Teil dieses PRs, weil sie

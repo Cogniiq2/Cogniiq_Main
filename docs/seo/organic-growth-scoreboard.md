@@ -236,3 +236,60 @@ Damit das Ergebnis nicht im Nachhinein schöngeredet werden kann, hier vorab:
 - **Tag 90:** keine Query aus dem Cluster in den Top 50 und keine verweisende
   Domain hinzugekommen → die Annahme „Autorität ist der Engpass" bestätigt sich,
   und die Arbeit gehört off-site, nicht in weitere Seiten.
+
+---
+
+## B · Claim-Bereinigung Startseite und `/webdesign-arzt-bayreuth` (2026-09-10)
+
+Keine Ranking-Wette, sondern die Beseitigung eines Widerspruchs **innerhalb der
+eigenen Domain**: Der Healthcare-Cluster wurde im August auf
+`FAKTEN.keineAnbindung` gezogen — „eine Standardanbindung, die auf jedes
+Praxisverwaltungssystem sofort passt, gibt es nicht" —, die Startseite und
+`/webdesign-arzt-bayreuth` liefen jedoch weiter mit der Fassung davor: „Integration
+Kalender & CRM", „Automatische Terminbuchung", „Sofortbestätigung per SMS oder
+Mail", „bucht Termine direkt in Ihren Kalender ein" und, am deutlichsten, die
+FAQ-Antwort „In den meisten Fällen ja. Der KI-Telefonassistent von Cogniiq kann an
+gängige Praxisverwaltungssysteme und Kalendertools angebunden werden."
+
+Das ist dieselbe Vereinfachung, die `pvs-integration-recherche.md` dem
+Wettbewerb vorhält — auf der meistbesuchten eigenen Seite und auf einer
+Gesundheitsseite.
+
+- **Geändert am:** 2026-09-10
+- **Ziel-Query-Familie:** keine. Titel, Description, Canonical, Robots und
+  JSON-LD beider Routen sind unverändert; geändert wurde ausschließlich
+  Fließtext in `<main>`.
+- **Hypothese:** Wirkung primär auf Vertrauen und Konversion, nicht auf
+  Positionen. Eine indirekte Wirkung über Nutzersignale ist möglich, aber nicht
+  von der übrigen Arbeit trennbar und wird hier **nicht** behauptet.
+- **Erfolg:** Tag 90 keine Verschlechterung von `/` und
+  `/webdesign-arzt-bayreuth` gegenüber Baseline.
+- **Scheitern:** Tag 28 Impressionen einer der beiden Routen mehr als ein
+  Drittel unter Baseline → Textkürzung als Ursache prüfen (beide Seiten haben
+  Fließtext verloren, `/webdesign-arzt-bayreuth` am meisten).
+
+| Route | Messpunkt | Datum | Impressionen | Klicks | CTR | Ø Position |
+|---|---|---|---:|---:|---:|---:|
+| `/` | Baseline (0) | 2026-09-10 | | | | |
+| `/` | Tag 28 | | | | | |
+| `/` | Tag 90 | | | | | |
+| `/webdesign-arzt-bayreuth` | Baseline (0) | 2026-09-10 | | | | |
+| `/webdesign-arzt-bayreuth` | Tag 28 | | | | | |
+| `/webdesign-arzt-bayreuth` | Tag 90 | | | | | |
+
+> Die Baseline-Zeilen sind leer, weil in dieser Session **kein** GSC-Export
+> vorlag. Sie sind vor dem ersten Messpunkt aus der Search Console für den
+> Zeitraum 2026-08-14 bis 2026-09-10 nachzutragen. Keine geschätzte Zahl
+> eintragen.
+
+### Mitgeändert, ohne eigene Messreihe
+
+`/bayreuth/ki-telefonassistent` und `/regensburg/ki-telefonassistent`
+(„wird jeder angenommen" → an `FAKTEN.gleichzeitigeAnrufe` gebunden: bis zu 10),
+`/bayreuth/automatisierung` („nahezu jede Software", „marktführenden"),
+`/kosten-automatisierung` und `/zu-viel-manuelle-arbeit` (verbotene Absolutheit
+„vollständig automatisiert", COPY-BRIEF §5.9). Jeweils einzelne Sätze; die
+Punkte stammen aus der Sammelliste in `post-experiment-opportunities.md`.
+
+`/bayreuth/webdesign` steht auf derselben Liste und wurde **nicht** angefasst —
+die Route ist eingefroren.

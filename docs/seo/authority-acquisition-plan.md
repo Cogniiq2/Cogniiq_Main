@@ -72,6 +72,11 @@ Exact-Match-Domain, was auf eine niedrige Messlatte hindeutet.
 - **Aufwand:** mittel. **Wert:** mittel bis hoch.
 - **Nötiger Inhalt:** dentalspezifische operative Inhalte (Anrufspitzen während
   der Behandlung, Prophylaxe-Recall, Notdienst-Routing).
+- **Stand 2026-09-10:** Der Inhalt liegt seit PR #85 vor
+  (`/ki-telefonassistent-zahnarztpraxis`). Damit ist Punkt 4 **nicht mehr durch
+  fehlenden Inhalt blockiert**, sondern nur noch durch die Messung: Die Route
+  wird seit dem 2026-09-05 beobachtet (`organic-growth-scoreboard.md` A3).
+  Off-site-Ansprache dazu ist ab sofort möglich und verändert die Messung nicht.
 
 ### 5. Bestandskunden als belegbare Referenz
 Der stärkste verfügbare Vertrauensbeweis und zugleich der einzige, der
