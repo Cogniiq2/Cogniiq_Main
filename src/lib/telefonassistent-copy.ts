@@ -37,6 +37,10 @@
 export const FAKTEN = {
   // ── Zahlen ──
   mehrpreisProMinute: `0,39\u00A0€`,
+  /** Numerischer Zwilling von `mehrpreisProMinute` — für Rechenlogik, damit
+   *  niemand den Anzeigestring zurück in eine Zahl parsen muss. Gegen den
+   *  String abgesichert in `telefonassistent-copy.test.ts`. */
+  mehrpreisProMinuteEur: 0.39,
   /*
     Korrigiert am 23.08.2026 von 7 auf 14 (Inhaber).
 
@@ -527,6 +531,25 @@ export interface Tarif {
   /** Obergrenze inklusive Mehrverbrauch. */
   obergrenze: string;
   einrichtung: string;
+  /*
+    NUMERISCHE ZWILLINGE der drei Beträge darüber.
+
+    Warum additiv und nicht statt der Strings: Die Strings sind das, was auf der
+    Seite steht, inklusive schmalem geschütztem Leerzeichen — und die Preisseite
+    ist ein eingefrorenes Experiment, dessen gerenderte Bytes sich nicht ändern
+    dürfen. Die Strings bleiben deshalb unangetastet.
+
+    Warum überhaupt Zahlen: Der ältere Praxis-Rechner parst die Strings zurück
+    in Zahlen (`betragZuZahl`). Das ist eine Geschäftslogik, die an einer
+    Anzeigeformatierung hängt — ein Tausenderpunkt an der falschen Stelle wäre
+    ein stiller Rechenfehler. Neue Rechner lesen ausschließlich diese Felder.
+
+    `telefonassistent-copy.test.ts` hält beide Darstellungen aneinander: Weicht
+    eine Zahl von ihrem String ab, schlägt der Test an.
+  */
+  monatlichEur: number;
+  obergrenzeEur: number;
+  einrichtungEur: number;
 }
 
 export const TARIFE: Tarif[] = [
@@ -537,6 +560,9 @@ export const TARIFE: Tarif[] = [
     monatlich: "300\u00A0€",
     obergrenze: "500\u00A0€",
     einrichtung: "1.490\u00A0€",
+    monatlichEur: 300,
+    obergrenzeEur: 500,
+    einrichtungEur: 1490,
   },
   {
     name: "Praxis",
@@ -545,6 +571,9 @@ export const TARIFE: Tarif[] = [
     monatlich: "500\u00A0€",
     obergrenze: "800\u00A0€",
     einrichtung: "2.490\u00A0€",
+    monatlichEur: 500,
+    obergrenzeEur: 800,
+    einrichtungEur: 2490,
   },
   {
     name: "MVZ",
@@ -553,6 +582,9 @@ export const TARIFE: Tarif[] = [
     monatlich: "800\u00A0€",
     obergrenze: "1.400\u00A0€",
     einrichtung: "3.490\u00A0€",
+    monatlichEur: 800,
+    obergrenzeEur: 1400,
+    einrichtungEur: 3490,
   },
 ];
 
@@ -573,6 +605,34 @@ export const DECKELUNG = {
     "Und Sie bleiben nicht im falschen Tarif sitzen: Liegt Ihr Aufkommen dauerhaft höher, ordnen wir Sie dem Tarif zu, der für Ihren Bedarf am günstigsten ist und nicht dauerhaft an seiner Obergrenze läuft. Wer Monat für Monat den Zuschlag zahlt, zahlt zu viel — dann gehört er in den nächsten Tarif.",
   nichtProBehandler:
     "Abgerechnet wird pro Praxis, nicht pro Behandler. Ob bei Ihnen zwei oder sieben Personen behandeln, ändert am Monatsbetrag nichts.",
+};
+
+/*
+  NUMERIK ZU SPRACHEN — additiv, damit Rechner nicht den Anzeigetext parsen.
+
+  Was der Satz eindeutig sagt und was hier abgebildet ist:
+    - Deutsch ist enthalten und kostet nichts extra.
+    - Jede weitere Sprache: 79 € im Monat.
+    - Ab drei weiteren Sprachen: 230 € im Monat statt 3 × 79 € = 237 €.
+
+  „ab drei Sprachen" ist als DREI ZUSATZSPRACHEN gelesen, weil nur diese
+  Lesart wirtschaftlich aufgeht: Bei zwei Zusatzsprachen wären 2 × 79 € = 158 €
+  günstiger als das Paket, ein Paket also sinnlos. Bei drei kippt es (237 € >
+  230 €).
+
+  NICHT abgebildet, weil der Satz es nicht eindeutig festlegt — siehe
+  OWNER-INPUT: ob „bis zu fünf Sprachen gleichzeitig" Deutsch mitzählt, und ob
+  der Sprachaufschlag INNERHALB der Tarif-Obergrenze liegt oder daneben. Der
+  Rechner rät das nicht, sondern weist den Aufschlag als eigene Zeile aus und
+  sagt dazu, dass die Zuordnung zur Obergrenze im Angebot steht.
+*/
+export const SPRACHEN_PREISE = {
+  /** Monatspreis je zusätzlicher Sprache unterhalb der Paketschwelle. */
+  proSpracheEur: 79,
+  /** Ab dieser Anzahl ZUSATZsprachen gilt der Paketpreis. */
+  paketAbZusatzsprachen: 3,
+  /** Monatlicher Paketpreis ab der Schwelle. */
+  paketEur: 230,
 };
 
 export const SPRACHEN = {
@@ -1005,6 +1065,136 @@ export const KOMPAKT_EINRICHTUNG: KompaktBlock & {
 // Standardfunktion (SMS_EMAIL_CONFIRMATION).
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────────────────────
+// PRODUKTWAHRHEIT, KORRIGIERT AM 11.09.2026 (Inhaber-Review der Preview)
+//
+// DIE ALTE AUSLEGUNG WAR ZU DEFENSIV UND VERKAUFTE DAS PRODUKT UNTER WERT.
+//
+// Aus BOOKING_WRITE („only after verified customer integration") war in der
+// Copy die Aussage geworden, der Assistent NEHME Terminwünsche nur AUF und ein
+// Mitarbeiter erledige sie danach. Das beschreibt einen Anrufbeantworter mit
+// Transkript, nicht dieses Produkt. Der Inhaber hat das am 11.09.2026
+// ausdrücklich korrigiert.
+//
+// DIE BEIDEN REGELN, DIE AB JETZT GELTEN — sie sind NICHT dieselbe Regel:
+//
+//   AUTOMATISIERTE_ABWICKLUNG = ZUGESICHERTE PRODUKTFÄHIGKEIT
+//     Der Assistent führt konfigurierte Routineabläufe vollständig zu Ende:
+//     Termin buchen, verschieben, absagen, konfigurierte Fragen beantworten.
+//     Das darf die Copy als Fähigkeit des Produkts sagen — mit „buchen",
+//     „verschieben", „absagen", nicht ersatzweise mit „aufnehmen".
+//
+//   SYSTEM_SCHREIBZUGRIFF = KUNDENSPEZIFISCH UND PRÜFPFLICHTIG
+//     Ob dieser Ablauf direkt in DAS SYSTEM DES KUNDEN schreibt (Kalender,
+//     PVS, CRM, Buchungssystem), hängt an dessen Schnittstelle. Diese
+//     Anbindung wird je Kunde umgesetzt und technisch verifiziert, bevor sie
+//     zugesagt wird. Es gibt keine Zusage „funktioniert mit jeder Software".
+//
+// RICHTIG: „Der Assistent bucht, verschiebt und storniert Termine automatisch.
+//           Direkter Schreibzugriff auf Ihr System wird für Ihr System
+//           eingerichtet und verifiziert; ohne Anbindung greift der vereinbarte
+//           Fallback."
+// FALSCH:  „Der Assistent nimmt Terminwünsche auf, Ihr Team bestätigt."
+// FALSCH:  „Der Kern des Produkts ist die strukturierte Übergabe."
+// FALSCH:  „Schreibt automatisch in jedes Kalender-, PVS- oder CRM-System."
+//
+// AN KÜNFTIGE BEARBEITER: Ein Kommentar in dieser Datei hat die Seite einmal
+// auf Nachrichtenannahme zurückgefahren. Wer „buchen" wieder gegen „aufnehmen"
+// tauscht, macht denselben Fehler erneut. Die Prüffrage lautet nicht „steht da
+// buchen?", sondern „steht die Anbindungsbedingung dort, wo Schreibzugriff auf
+// ein Kundensystem behauptet wird?".
+//
+// NICHT ÜBERKORRIGIEREN: keine Aussage wie „übernimmt jeden Anruf", „Ihr Team
+// telefoniert nie wieder", „100 % automatisiert", „garantierte Ersparnis" oder
+// „von einem Menschen nicht zu unterscheiden".
+//
+// Die älteren Konstanten FAKTEN.terminaufnahme und FAKTEN.bestaetigungen
+// bleiben WORTGLEICH bestehen: Sie werden von eingefrorenen Experimentrouten
+// gerendert und dürfen sich dort nicht bewegen. Für die generische Seite gelten
+// stattdessen die Konstanten unten.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Die eine Stelle, an der die Fähigkeit und ihre Bedingung zusammen stehen.
+ * Überall, wo die Seite von Buchen, Verschieben oder Stornieren spricht, gehört
+ * `qualifikation` in Lese- oder Sichtweite — nicht ans Seitenende.
+ */
+export const ABWICKLUNG = {
+  faehigkeit:
+    "Der Assistent führt die Abläufe, die Sie freigeben, im Gespräch zu Ende: Er bucht Termine, verschiebt sie, nimmt Absagen entgegen und beantwortet Ihre konfigurierten Fragen — ohne dass danach jemand die Anfrage noch einmal anfassen muss.",
+  qualifikation:
+    "Wo ein Ablauf direkt in Ihr System schreibt — Kalender, Buchungssystem, CRM oder Branchensoftware —, richten wir diese Anbindung für Ihr System ein und verifizieren sie vor dem Go-live. Eine Standardanbindung, die auf jede Software sofort passt, gibt es nicht: Wir prüfen Ihre vor dem Angebot und schreiben das Ergebnis hinein. Trägt sie einen Ablauf nicht, greift der Weg, den wir vorher gemeinsam festgelegt haben.",
+  /** Kurzform für Bildunterschriften und Badges. */
+  kurz: "Bei eingerichteter und verifizierter Systemanbindung.",
+  /** Noch kürzer, für die Fußzeile einer Beispieldarstellung. */
+  badge: "Beispiel mit verifizierter Kalenderanbindung",
+};
+
+/**
+ * Was nach dem Anliegen passiert — drei Wege, in der Reihenfolge ihrer
+ * Häufigkeit im Normalbetrieb. Ersetzt die frühere Rahmung „Die Übergabe
+ * entscheidet. Deshalb ist sie der Kern.": Der Unterschied zu anderen Systemen
+ * ist nicht die Qualität der Übergabe, sondern dass die meisten Routineanrufe
+ * gar keine mehr brauchen.
+ */
+export const DREI_WEGE = {
+  headline: "Was passiert, nachdem der Anrufer sein Anliegen gesagt hat",
+  intro:
+    "Drei Wege, und der erste ist im Normalbetrieb der häufigste. Welcher Anlass welchen Weg nimmt, legen Sie vor dem Start fest — nicht wir.",
+  wege: [
+    {
+      kennung: "A",
+      title: "Erledigt",
+      text: "Der Assistent führt den Ablauf im Gespräch zu Ende: Termin gebucht, verschoben oder storniert. Der Anrufer legt mit einem Ergebnis auf, nicht mit einem Versprechen. Bei Ihnen entsteht keine Aufgabe.",
+      fussnote: "Für Abläufe, die in Ihr System schreiben, gilt die eingerichtete und verifizierte Anbindung.",
+    },
+    {
+      kennung: "B",
+      title: "Beantwortet",
+      text: "Öffnungszeiten, Anfahrt, Zuständigkeiten, benötigte Unterlagen, Status einer Sache: Der Assistent beantwortet die Fragen, die Sie ihm vorgegeben haben, direkt im Gespräch. Auch hier bleibt nichts liegen.",
+      fussnote: null as string | null,
+    },
+    {
+      kennung: "C",
+      title: "Übergeben",
+      text: "Dringend, sensibel, strittig oder außerhalb dessen, was Sie freigegeben haben: Dann übernimmt ein Mensch — sofort weitergeleitet, wo jemand erreichbar ist, sonst als strukturierter Eintrag mit Anliegen, Rückrufnummer und Kontext. Das ist der Ausnahmeweg, nicht der Regelfall.",
+      fussnote: null,
+    },
+  ],
+};
+
+/**
+ * Natürliches Gespräch — vom Inhaber als Kernunterscheidungsmerkmal bestätigt.
+ *
+ * Die Grenze ist nicht verhandelbar: Es wird NICHT behauptet, der Anrufer merke
+ * den Unterschied zu einem Menschen nicht. Die Offenlegung nach Art. 50 KI-VO
+ * steht am Anfang jedes Anrufs und ist nicht abschaltbar. Die Aussage lautet
+ * „natürlich klingend UND erkennbar KI" — nicht „heimlich menschlich".
+ */
+export const GESPRAECH = {
+  headline: "Ein Gespräch, kein Tastenmenü",
+  intro:
+    "Der Anrufer sagt sein Anliegen so, wie er es sagen würde, wenn jemand abhebt. Kein Durchnummerieren von Menüpunkten, keine Ansage, die man sich merken muss, keine Warteschleife.",
+  punkte: [
+    {
+      title: "Frei formulieren statt Menü drücken",
+      text: "Der Assistent hört zu, fragt nach, wenn etwas fehlt, und kommt auch dann weiter, wenn der Anrufer vom erwarteten Ablauf abweicht oder zwei Dinge auf einmal will.",
+    },
+    {
+      title: "Ihre Gesprächslogik, nicht ein Standardbaum",
+      text: "Was der Assistent fragt, anbietet und entscheidet, folgt den Regeln Ihres Betriebs — nicht einer Vorlage, an die Sie sich anpassen müssten.",
+    },
+    {
+      title: "Ihre Stimme, Ihr Ton",
+      text: "Stimme, Begrüßungssatz und Formulierungen wählen Sie aus. Der Assistent klingt nach Ihrem Empfang, nicht nach Ansagetext.",
+    },
+    {
+      title: "Natürlich klingend und trotzdem transparent",
+      text: "Im ersten Satz sagt der Assistent, dass er ein KI-System ist (Art. 50 KI-Verordnung). Das lässt sich nicht abschalten, und wir behaupten nicht, der Unterschied zu einem Menschen sei unhörbar. Wer lieber mit einer Person spricht, wird weitergeleitet.",
+    },
+  ],
+};
+
 /**
  * Definition und Abgrenzung. Der Begriff wird auf der Seite bisher nirgends
  * erklärt — weder gegenüber der Mailbox noch gegenüber dem Tastenmenü, obwohl
@@ -1014,19 +1204,19 @@ export const KOMPAKT_EINRICHTUNG: KompaktBlock & {
 export const WAS_IST = {
   headline: "Was ein KI-Telefonassistent ist — und was er nicht ist",
   definition:
-    "Ein KI-Telefonassistent ist eine Software, die eingehende Anrufe selbst annimmt, in natürlicher Sprache mit dem Anrufer spricht und das Anliegen strukturiert erfasst. Er hört zu, stellt Rückfragen, beantwortet wiederkehrende Fragen nach Ihren Vorgaben und entscheidet nach Regeln, die Sie vorher festlegen, was mit dem Gespräch passiert: selbst bearbeiten, an einen Menschen übergeben oder als Rückrufwunsch notieren. Gebräuchlich sind für dieselbe Sache auch die Begriffe KI-Anrufassistent, AI-Telefonassistent, digitaler Telefonassistent, KI-Telefonservice oder KI-Telefonzentrale.",
+    "Ein KI-Telefonassistent ist eine Software, die eingehende Anrufe selbst annimmt und in natürlicher Sprache mit dem Anrufer spricht. Der entscheidende Unterschied liegt darin, was danach passiert: Ein guter Assistent notiert das Anliegen nicht nur, er erledigt es. Er bucht den Termin, verschiebt ihn, nimmt die Absage entgegen und beantwortet die Fragen, die Sie ihm vorgegeben haben — im selben Gespräch, ohne dass danach jemand die Anfrage noch einmal in die Hand nimmt. Nur was Sie ausgenommen haben oder was der Assistent nicht abschließen kann, geht an einen Menschen. Gebräuchlich sind für dieselbe Sache auch die Begriffe KI-Anrufassistent, AI-Telefonassistent, digitaler Telefonassistent, KI-Telefonservice oder KI-Telefonzentrale.",
   abgrenzungen: [
     {
       gegen: "Anrufbeantworter und Mailbox",
-      text: "Die Mailbox nimmt auf, sie versteht nichts. Jemand muss abhören, zurückrufen und von Hand übertragen. Der Assistent führt stattdessen ein Gespräch und liefert am Ende ein lesbares Ergebnis mit Anliegen, Name, Rückrufnummer und nächstem Schritt.",
+      text: "Die Mailbox nimmt auf, sie versteht nichts. Jemand muss abhören, zurückrufen und den Termin selbst eintragen — die Arbeit ist nicht weg, sie ist verschoben. Der Assistent führt das Gespräch und schließt den Vorgang ab, statt Ihnen eine Nachricht zu hinterlassen.",
     },
     {
       gegen: "Tastenmenü und Warteschleife",
-      text: "Ein Tastenmenü zwingt den Anrufer in Ihre Struktur — „für Termine die 1“. Wer kein passendes Feld findet, legt auf. Der Assistent fragt offen nach dem Anliegen und ordnet es selbst ein, auch wenn der Anrufer vom erwarteten Ablauf abweicht.",
+      text: "Ein Tastenmenü zwingt den Anrufer in Ihre Struktur und endet fast immer doch bei einem Menschen. Wer kein passendes Feld findet, legt auf. Der Assistent fragt offen nach dem Anliegen, versteht auch Abweichungen vom erwarteten Ablauf und führt den Vorgang selbst zu Ende.",
     },
     {
       gegen: "Telefonservice mit externen Mitarbeitenden",
-      text: "Ein externer Telefondienst kostet pro Gespräch und kennt Ihren Betrieb nur aus einem Leitfaden. Der Assistent arbeitet mit einem festen Kontingent, nimmt mehrere Anrufe gleichzeitig an und folgt Regeln, die Sie selbst geschrieben haben.",
+      text: "Ein externer Telefondienst kostet pro Gespräch, kennt Ihren Betrieb nur aus einem Leitfaden und reicht die meisten Anliegen als Notiz an Sie zurück. Der Assistent arbeitet mit einem festen Kontingent, nimmt mehrere Anrufe gleichzeitig an und schließt Termine im vereinbarten Rahmen selbst ab.",
     },
     {
       gegen: "Chatbot auf der Website",
@@ -1050,20 +1240,20 @@ export const ANBIETER_CHECKLISTE: Array<{
   cogniiq: string;
 }> = [
   {
-    frage: "Wohin geht das Gesprächsergebnis — und wer überträgt es?",
+    frage: "Erledigt das System den Anruf — oder erzeugt es eine neue Aufgabe?",
     warum:
-      "Das ist der Punkt, an dem die meisten Einführungen scheitern. Das Gespräch läuft gut, das Ergebnis landet in einer E-Mail, und jemand tippt es von Hand ab. Die Arbeit ist dann nicht verschwunden, sie ist nur umgezogen.",
+      "Das ist der Punkt, an dem die meisten Einführungen scheitern. Das Gespräch läuft gut, das Ergebnis landet in einer E-Mail, und jemand tippt es von Hand ab. Die Arbeit ist dann nicht verschwunden, sie ist nur umgezogen — und der Betrieb schaltet das System nach ein paar Wochen wieder ab.",
     cogniiq:
-      "Jedes Gespräch endet als strukturierter Eintrag: Anliegen, Name, Rückrufnummer, Terminwunsch, nächster Schritt. Wohin dieser Eintrag geht, klären wir vor der Unterschrift und schreiben das Ergebnis ins Angebot — statt es danach zu klären.",
+      "Für die Abläufe, die Sie freigeben, ist der Anruf mit dem Auflegen erledigt: Termin gebucht, verschoben oder storniert, Frage beantwortet. Nur Ausnahmen und alles, was Sie ausgenommen haben, gehen an einen Menschen — dann vollständig und lesbar, nicht als Sprachnachricht.",
   },
   {
-    frage: "Schreibt der Assistent wirklich in mein System — oder klingt es nur so?",
+    frage: "Ist die Anbindung an mein System geprüft — oder nur behauptet?",
     warum:
-      "„Bucht Termine automatisch in Ihren Kalender“ steht auf fast jeder Anbieterseite. Ob das für Ihr konkretes System gilt, hängt an dessen Schnittstelle, an Zugängen, an Freigaben und manchmal an Gebühren Dritter. Eine Zusage vor der Prüfung ist keine Zusage.",
-    cogniiq: FAKTEN.terminaufnahme,
+      "„Bucht Termine automatisch in Ihren Kalender“ steht auf fast jeder Anbieterseite. Buchen können die meisten; die Frage ist, ob es in IHREM System landet. Das hängt an dessen Schnittstelle, an Zugängen, an Freigaben und manchmal an Gebühren Dritter. Eine Zusage vor der Prüfung ist keine Zusage.",
+    cogniiq: `${ABWICKLUNG.qualifikation} Wir sagen Ihnen also vor der Unterschrift, welche Abläufe bei Ihnen automatisch durchlaufen und welche nicht.`,
   },
   {
-    frage: "Was passiert, wenn der Assistent nicht weiterkommt?",
+    frage: "Wie sauber ist der Weg zum Menschen, wenn er gebraucht wird?",
     warum:
       "Ein System ohne sauberen Übergang zum Menschen erzeugt genau die Anrufe, die Sie vermeiden wollten — verärgerte Rückrufe. Fragen Sie nach, woran ein Anbieter Dringlichkeit erkennt und was danach passiert.",
     cogniiq:
@@ -1096,15 +1286,23 @@ export const ANBIETER_CHECKLISTE: Array<{
  * generischen Seite war das der letzte verbliebene Medizinbezug und stand
  * ausgerechnet im wichtigsten Beweisabschnitt der Seite.
  */
+/**
+ * Der AUSNAHMEWEG (Weg C aus DREI_WEGE), nicht der Kern des Produkts.
+ *
+ * Diese Konstante hieß einmal „Die Übergabe entscheidet. Deshalb ist sie der
+ * Kern." Das war die zentrale Fehlrahmung der Seite: Sie machte die Notiz zum
+ * Produkt. Sie bleibt wertvoll — aber nur für die Anrufe, die ein Mensch
+ * übernehmen muss.
+ */
 export const GENERISCH_UEBERGABE = {
-  headline: "Und wer trägt das dann bei Ihnen ein?",
+  headline: "Und wenn doch ein Mensch ran muss?",
   paragraphs: [
-    "Der übliche Weg sieht so aus: Der Assistent nimmt den Anruf an, und jemand aus Ihrem Team überträgt das Ergebnis anschließend von Hand in Kalender, CRM oder Branchensoftware. Das ist der Grund, warum viele Betriebe solche Systeme nach wenigen Wochen wieder abschalten — die Arbeit ist nicht verschwunden, sie ist nur umgezogen.",
-    "Wir prüfen vor der Einrichtung, welche Schnittstelle Ihr System bietet, und bauen die Übergabe darauf auf. Wo eine Anbindung technisch trägt, landet das Anliegen direkt dort, wo Sie ohnehin arbeiten. Wo sie nicht trägt, sagen wir Ihnen das vorher — und nicht nach der Unterschrift.",
+    "Nicht jeder Anruf ist Routine. Für alles, was Sie ausgenommen haben, was strittig ist oder was der Assistent nicht abschließen kann, ist der Übergang an einen Menschen der Teil, an dem solche Systeme sonst scheitern: Das Gespräch läuft gut, und am Ende steht doch wieder eine Sprachnachricht, die jemand abhören und abtippen muss.",
+    "Deshalb ist auch der Ausnahmeweg vorher festgelegt. Wo jemand erreichbar ist, wird sofort weitergeleitet. Sonst steht das Anliegen vollständig und lesbar da, wo Ihr Team ohnehin arbeitet — und niemand muss ein Gespräch rekonstruieren.",
   ],
   wasAnkommt: {
-    headline: "Was nach jedem Anruf im Dashboard steht",
-    items: ["Anliegen", "Name", "Rückrufnummer", "Terminwunsch", "Nächster Schritt"],
+    headline: "Was bei einer Übergabe ankommt",
+    items: ["Anliegen", "Name", "Rückrufnummer", "Worum es konkret geht", "Warum übergeben wurde"],
     hinweis:
       "Strukturiert, nicht als Audiodatei — Gespräche werden nicht aufgezeichnet.",
   },
@@ -1140,28 +1338,29 @@ export const GENERISCH_SAEULEN: Array<{ title: string; description: string }> = 
     description: `Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihr Betrieb am Telefon spricht. Bis zu ${FAKTEN.gleichzeitigeAnrufe} Anrufe können gleichzeitig laufen, ohne dass jemand ein Besetztzeichen hört. Anrufer erfahren im ersten Satz, dass ein KI-System spricht — und können jederzeit zu einem Menschen wechseln.`,
   },
   {
-    title: "Die Übergabe klären wir vor der Unterschrift",
+    title: "Die Anbindung klären wir vor der Unterschrift",
     description:
-      "Jedes Gespräch endet als strukturierter Eintrag: Anliegen, Name, Rückrufnummer, Terminwunsch. Vor der Einrichtung prüfen wir, welche Schnittstelle Ihr Kalender, Ihr CRM oder Ihre Branchensoftware bietet, und bauen die Übergabe darauf auf. Wo eine Anbindung trägt, landet das Anliegen direkt dort, wo Sie ohnehin arbeiten. Wo sie nicht trägt, sagen wir Ihnen das vorher — und nicht nach der Unterschrift.",
+      "Damit ein Termin nicht nur zugesagt, sondern auch eingetragen ist, muss der Assistent in Ihr System schreiben dürfen. Vor der Einrichtung prüfen wir, welche Schnittstelle Ihr Kalender, Ihr Buchungssystem, Ihr CRM oder Ihre Branchensoftware bietet, richten sie ein und verifizieren sie. Trägt sie, schließt der Assistent den Vorgang direkt dort ab. Trägt sie einen Ablauf nicht, legen wir vorher gemeinsam fest, was stattdessen passiert — und sagen es Ihnen vor der Unterschrift, nicht danach.",
   },
 ];
 
 /** Branchenoffene Fassung des Anliegen-Katalogs. */
 export const GENERISCH_UEBERNIMMT: string[] = [
-  "Terminwünsche aufnehmen und nach Ihren Regeln vergeben oder Ihrem Team zur Bestätigung vorlegen",
-  "Absagen und Verschiebungen entgegennehmen — frei werdende Termine sind sofort sichtbar",
+  "Termine im Gespräch buchen — im Rahmen der Regeln, die Sie freigegeben haben",
+  "Termine verschieben und Absagen abschließen; der frei gewordene Platz ist sofort wieder vergeben",
   "Wiederkehrende Fragen beantworten: Öffnungszeiten, Anfahrt, Zuständigkeiten, benötigte Unterlagen",
-  "Erstanfragen qualifizieren: worum es geht, wie dringend es ist, wer zurückrufen soll",
-  "Rückrufwünsche mit Anliegen und Rückrufnummer auf eine Rückrufliste setzen",
-  "Anrufer an die zuständige Person oder Abteilung weiterleiten, wenn dort jemand erreichbar ist",
+  "Erstanfragen qualifizieren und, wo vorgesehen, direkt einen Gesprächstermin vergeben",
+  "Auf Wunsch in weiteren Sprachen sprechen und die Sprache mitten im Gespräch wechseln",
+  "Anrufer an die zuständige Person weiterleiten, wenn die Regel das vorsieht und dort jemand erreichbar ist",
 ];
 
 export const GENERISCH_IMMER_MENSCH: string[] = [
-  "Fachliche Beratung jeder Art — der Assistent gibt keine Auskunft, für die Ihr Urteil nötig ist",
   "Dringende Anliegen: erkannt an den Signalwörtern, die Sie festlegen, und sofort weitergeleitet — ohne eigene Einschätzung durch das System",
+  "Fachliche Entscheidungen, für die Ihr Urteil nötig ist",
   "Beschwerden und emotionale Gespräche",
-  "Preis- und Vertragszusagen",
-  "Alles, was Sie im Anliegen-Katalog als Chefsache markieren",
+  "Preis- und Vertragszusagen außerhalb dessen, was Sie freigegeben haben",
+  "Anliegen, die außerhalb des freigegebenen Katalogs liegen oder die der Assistent nicht abschließen kann",
+  "Anrufer, die ausdrücklich einen Menschen möchten, wo Ihre Regel das vorsieht",
 ];
 
 /** Branchenoffene Fassung von GRENZEN. Inhaltlich identisch, ohne Medizinbezug. */
@@ -1170,12 +1369,13 @@ export const GENERISCH_GRENZEN = {
   intro:
     "Ein Telefonassistent, der alles verspricht, hat entweder keine Grenzen definiert oder verschweigt sie. Unsere stehen hier.",
   points: [
-    "Kein Ersatz für Ihr Team. Der Assistent nimmt Anrufe an, die sonst verloren gingen — die Entscheidungen über Termine, Zusagen und Ausnahmen bleiben bei Ihren Mitarbeiterinnen und Mitarbeitern.",
+    "Kein Ersatz für Ihr Team. Routineabläufe schließt der Assistent ab; Entscheidungen außerhalb der freigegebenen Regeln, Ausnahmen und alles Strittige bleiben bei Ihren Mitarbeiterinnen und Mitarbeitern.",
     "Keine fachliche Beratung und keine Bewertung von Dringlichkeit. Er erkennt die Signalwörter, die Sie festlegen, und leitet dann weiter — beurteilen tut er nicht.",
+    "Er handelt nur innerhalb dessen, was Sie freigegeben haben. Welcher Anlass automatisch abgeschlossen wird und wo die Grenze liegt, entscheiden Sie im Anliegen-Katalog — nicht das System.",
     `${FAKTEN.keineAnbindung} Das Ergebnis der Prüfung steht im Angebot, mit allen dafür bekannten Kosten für den vereinbarten Umfang — auch denen einer Schnittstelle, die Dritte berechnen.`,
     FAKTEN.bestaetigungen,
     "Gespräche werden nicht aufgezeichnet. Wenn Sie später den genauen Wortlaut eines Anrufs brauchen, gibt es ihn nicht — Sie haben das strukturierte Ergebnis, nicht die Aufnahme.",
-    "Der Assistent übernimmt nicht alle Anrufe. Realistisch ist Entlastung zu Stoßzeiten und außerhalb der Öffnungszeiten — nicht die vollständige Übernahme Ihrer Telefonie.",
+    "Der Assistent übernimmt nicht alle Anrufe. Was er vollständig abschließt, sind die Routineabläufe, die Sie freigegeben haben — nicht Ihre gesamte Telefonie. Wie groß dieser Anteil in Ihrem Betrieb ist, hängt an Ihren Anrufanlässen; wir nennen dafür keine Quote, die wir nicht gemessen haben.",
   ],
 };
 
@@ -1185,8 +1385,8 @@ export const GENERISCH_NICHT_PASSEND = {
   intro:
     "Ein Erstgespräch lohnt sich nicht für jeden Betrieb. In diesen Konstellationen raten wir ab:",
   points: [
-    "Sie brauchen die Zusage, dass Termine automatisch in Ihrem Kalender oder Ihrer Branchensoftware stehen, schon bevor Ihr System geprüft ist. Fällt die Prüfung negativ aus, sagen wir das vor der Unterschrift — eine Zusage vorab bekommen Sie von uns nicht.",
-    "Sie erwarten, dass die Telefonie vollständig ohne Ihr Team läuft. Der Assistent entlastet — er ersetzt keinen Empfang und keine fachliche Entscheidung.",
+    "Sie brauchen die Zusage, dass der Assistent in Ihre Branchensoftware schreibt, schon bevor wir Ihr System gesehen haben. Buchen, Verschieben und Stornieren kann er; ob das direkt in Ihrem System landet, hängt an dessen Schnittstelle. Das prüfen wir vor dem Angebot und schreiben das Ergebnis hinein — eine Zusage ins Blaue bekommen Sie von uns nicht.",
+    "Sie erwarten, dass die Telefonie vollständig ohne Ihr Team läuft. Routineabläufe schließt der Assistent ab, aber Ausnahmen, Beschwerden und fachliche Entscheidungen bleiben bei Menschen — wer null Telefonbeteiligung erwartet, wird enttäuscht.",
     "Ihr Anrufaufkommen ist gering und Ihr Team gut erreichbar. Dann löst der Assistent kein Problem, das Sie haben — und ein System ohne Problem ist nur ein Kostenpunkt.",
     "Sie möchten, dass Anrufer nicht erfahren, dass ein KI-System spricht. Diese Transparenz ist für uns nicht verhandelbar — rechtlich wie inhaltlich.",
   ],

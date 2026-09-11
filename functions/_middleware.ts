@@ -109,10 +109,10 @@ export async function onRequest(context: CloudflarePagesContext) {
     // VERALTET-Liste in telefonassistent-copy.test.ts). Beides stand im
     // SERP-Snippet, also vor Augen, die dafür nicht klicken mussten.
     '/ki-telefonassistent': {
-      title: 'KI Telefonassistent für Unternehmen – Anrufannahme | Cogniiq',
-      description: 'KI Telefonassistent für Unternehmen: nimmt Anrufe an, beantwortet Fragen und erfasst Anliegen nach Ihren Regeln. Keine Gesprächsaufzeichnung, gedeckelte Rechnung.',
+      title: 'KI Telefonassistent für Unternehmen – Anrufe erledigen | Cogniiq',
+      description: 'KI Telefonassistent, der Anrufe nicht nur annimmt: bucht, verschiebt und storniert Termine im Gespräch und beantwortet Ihre Fragen. Mit Preisrechner, ohne Anmeldung.',
       canonical: 'https://cogniiq.de/ki-telefonassistent',
-      keywords: 'KI Telefonassistent, KI Telefonassistent für Unternehmen, KI Anrufassistent, digitaler Telefonassistent, KI Telefonservice, automatische Anrufannahme',
+      keywords: 'KI Telefonassistent, KI Telefonassistent für Unternehmen, KI Anrufassistent, digitaler Telefonassistent, KI Telefonservice, Anrufe automatisieren',
     },
     '/ki-telefonassistent/demo': {
       title: 'KI-Telefonassistent Demo | Live-Vorführung AI-Rezeptionistin – Cogniiq',

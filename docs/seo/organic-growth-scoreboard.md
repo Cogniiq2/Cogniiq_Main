@@ -267,6 +267,42 @@ Konversionsereignisse an GA4 (nur mit Analytics-Einwilligung). Vorher gab es
 keine; eine „Steigerung" der Konversionen gegenüber der Zeit davor ist deshalb
 bedeutungslos. Die erste verwertbare Reihe beginnt mit dem Merge.
 
+### A5 · Nachtrag 11.09.2026 (2): Produktpositionierung korrigiert, Rechner ergänzt
+
+Die Messreihe A5 startet mit **dieser** Fassung, nicht mit der wenige Stunden
+älteren. Grund: Der Inhaber hat im Preview-Review festgestellt, dass die erste
+Fassung das Produkt unter Wert verkaufte (Assistent als Erfassungssystem statt
+als abwickelndes System). Head, H1 und der gesamte Seitenkörper sind daraufhin
+erneut geändert worden. Ein Vergleich gegen die Zwischenfassung wäre
+bedeutungslos — sie war nie live.
+
+**Zusätzliche Hypothese (H4 Produktkategorie).** Die Seite konkurrierte in der
+SERP mit Anbietern, die Terminbuchung und Automatisierung versprechen, und
+beschrieb sich selbst als Anrufannahme. Wer den Kopfbegriff sucht, sucht nach
+Automatisierung; ein Snippet über Anrufannahme beantwortet eine kleinere Frage
+als die gestellte. Titel und Description sagen jetzt „erledigen" statt
+„annehmen".
+
+**Zusätzliche Hypothese (H5 Preistransparenz als Konversionshebel).** Der
+Markt beantwortet die Preisfrage fast nie ohne Verkaufsgespräch. Ein Rechner
+ohne E-Mail-Gate beantwortet sie sofort und macht die Transparenz selbst zum
+Argument. Erwartet wird **kein** Ranking-Effekt, sondern ein Effekt auf
+Verweildauer und Demo-Anfragen.
+
+**Kannibalisierung ausgeschlossen — und woran das zu prüfen ist.** Titel,
+Description und H1 dieser Seite enthalten keinen Preisbegriff; der Rechner
+trägt genau eine H2 und keine Tariftabelle. Die Preisintention bleibt bei der
+eingefrorenen Kostenseite. **Prüfpunkt Tag 28:** Falls `/ki-telefonassistent`
+für Queries wie „ki telefonassistent kosten" oder „ki telefonassistent preise"
+Impressionen aufnimmt, während die Kostenseite dort verliert, ist das der
+Kannibalisierungsfall — dann die H2 des Rechnerabschnitts entschärfen, nicht
+den Rechner entfernen.
+
+**Neue Konversionsereignisse:** `price_calculator_completed`,
+`roi_calculator_completed` (beide nur mit Analytics-Einwilligung, ohne jede
+Eingabezahl). Auch hier gilt: Vorher gab es keine Messung, ein Vorher-Nachher
+dieser Ereignisse ist also bedeutungslos; die Reihe beginnt mit dem Merge.
+
 ### Befund: Middleware und Routen-Manifest driften auf 29 Routen auseinander (2026-09-11)
 
 `functions/_middleware.ts` überschreibt an der Edge `<title>`, `description`,

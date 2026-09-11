@@ -14,6 +14,7 @@ import {
   Stethoscope,
   Wrench,
   UtensilsCrossed,
+  CheckCheck,
   Chrome as Home,
   Languages,
   Briefcase,
@@ -22,14 +23,19 @@ import {
   ChevronDown,
   Lock,
   FileText,
+  GitMerge,
   ListChecks,
+  RotateCcw,
 } from "lucide-react";
+import { lazy, Suspense } from "react";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO, PHONE_HREF } from "@/lib/seo-data";
 import { trackEvent } from "@/lib/consent";
 import {
+  ABWICKLUNG,
   ANBIETER_CHECKLISTE,
   BETREUUNG,
+  DREI_WEGE,
   EINRICHTUNG_SCHRITTE,
   FAKTEN,
   GENERISCH_DATENSCHUTZ_PUNKTE,
@@ -40,10 +46,22 @@ import {
   GENERISCH_SAEULEN,
   GENERISCH_UEBERGABE,
   GENERISCH_UEBERNIMMT,
+  GESPRAECH,
+  SPRACHEN,
   UMKEHRBARKEIT,
   WAS_IST,
 } from "@/lib/telefonassistent-copy";
 import { StimmprobeSection } from "@/components/StimmprobeSection";
+
+/*
+  Der Rechner ist der einzige nennenswert interaktive Teil der Seite und für das
+  Ranking irrelevant — er wird deshalb nachgeladen, damit er das erste Rendering
+  nicht verzögert. Überschrift und erklärender Text stehen statisch im HTML und
+  bleiben im Prerender enthalten; nur die Bedienelemente kommen später.
+*/
+const TelefonRechner = lazy(() =>
+  import("@/components/TelefonRechner").then((m) => ({ default: m.TelefonRechner }))
+);
 
 /**
  * DIESE SEITE IST DIE GENERISCHE, BRANCHENOFFENE SEITE DES CLUSTERS.
@@ -55,22 +73,36 @@ import { StimmprobeSection } from "@/components/StimmprobeSection";
  * Seite — und für Google war die dominante Entität „Arztpraxis", also genau die
  * Intention, die die Arzt-Segmentseite und `/praxen` bereits besitzen.
  *
- * Deshalb gilt hier ab jetzt: Diese Seite benutzt ausschließlich die
+ * Deshalb gilt hier: Diese Seite benutzt ausschließlich die
  * `GENERISCH_*`-Bausteine. Praxisspezifische Bausteine (PATIENTEN_SICHT,
  * TEAM_BLOCK, SAEULEN, GRENZEN, ANLIEGEN_*, DATENSCHUTZ_PUNKTE) gehören auf die
  * Praxisseiten und werden hier nicht wieder eingebaut. Wer eine medizinische
  * Formulierung auf dieser Seite braucht, braucht in Wahrheit die Praxisseite.
  *
- * PRODUKTWAHRHEIT — die drei Regeln, an denen diese Seite zweimal gescheitert
- * war und die jede Änderung wieder einhalten muss:
- *   1. BOOKING_WRITE: Kein Text und kein Bildbeispiel darf behaupten, der
- *      Assistent schreibe Termine in Kalender, CRM oder Branchensoftware. Was
- *      universell gilt, ist die AUFNAHME des Terminwunsches — `FAKTEN.terminaufnahme`.
- *   2. SMS_EMAIL_CONFIRMATION: Bestätigungen per SMS oder E-Mail sind kein
+ * PRODUKTWAHRHEIT — korrigiert am 11.09.2026 nach dem Inhaber-Review der
+ * Preview. Die vorherige Fassung dieser Seite war ZU DEFENSIV und verkaufte das
+ * Produkt unter Wert: Sie beschrieb einen Assistenten, der Terminwünsche
+ * aufnimmt, damit ein Mitarbeiter sie danach erledigt. Das ist nicht dieses
+ * Produkt. Die geltenden Regeln stehen ausführlich am Block „PRODUKTWAHRHEIT,
+ * KORRIGIERT AM 11.09.2026" in `telefonassistent-copy.ts`; kurz:
+ *   1. AUTOMATISIERTE ABWICKLUNG IST EINE ZUGESICHERTE FÄHIGKEIT. Der Assistent
+ *      bucht, verschiebt und storniert Termine und beantwortet konfigurierte
+ *      Fragen im Gespräch. Die Copy darf und soll das so sagen — „buchen" ist
+ *      hier richtig, „aufnehmen" wäre falsch.
+ *   2. SCHREIBZUGRIFF AUF EIN KUNDENSYSTEM IST KUNDENSPEZIFISCH. Wo ein Ablauf
+ *      in Kalender, CRM, Buchungssystem oder Branchensoftware schreibt, wird
+ *      diese Anbindung je Kunde eingerichtet und verifiziert. Wo die Seite von
+ *      Schreibzugriff spricht, gehört `ABWICKLUNG.qualifikation` bzw.
+ *      `ABWICKLUNG.kurz` in Lese- oder Sichtweite. Nie „funktioniert mit jeder
+ *      Software".
+ *   3. SMS_EMAIL_CONFIRMATION: Bestätigungen per SMS oder E-Mail sind kein
  *      Standardumfang — `FAKTEN.bestaetigungen`.
- *   3. Keine Aussage zu Hosting, Serverstandort, EU-Verarbeitung oder
+ *   4. Keine Aussage zu Hosting, Serverstandort, EU-Verarbeitung oder
  *      „DSGVO-konform", solange die AVV mit den Infrastruktur-Anbietern nicht
  *      signiert sind (Inhaber-Antwort B).
+ *   5. NICHT ÜBERKORRIGIEREN: kein „übernimmt jeden Anruf", kein „100 %
+ *      automatisiert", keine garantierte Ersparnis, kein „von einem Menschen
+ *      nicht zu unterscheiden".
  *
  * EINGEFRORENE EXPERIMENTE: Diese Datei verweist GENAU EINMAL auf die
  * Arzt-Segmentseite und GENAU ZWEIMAL auf die Kostenseite. Diese Anzahl ist
@@ -119,12 +151,12 @@ const faqItems = [
   {
     question: "Was ist ein KI-Telefonassistent?",
     answer:
-      "Eine Software, die eingehende Anrufe selbst annimmt, in natürlicher Sprache mit dem Anrufer spricht und das Anliegen strukturiert erfasst. Sie beantwortet wiederkehrende Fragen nach Ihren Vorgaben und entscheidet nach Regeln, die Sie vorher festlegen, ob sie das Gespräch selbst bearbeitet, an einen Menschen übergibt oder als Rückrufwunsch notiert. Gebräuchlich sind für dieselbe Sache auch die Begriffe KI-Anrufassistent, AI-Telefonassistent, digitaler Telefonassistent, KI-Telefonservice oder KI-Telefonzentrale.",
+      "Eine Software, die eingehende Anrufe selbst annimmt und in natürlicher Sprache mit dem Anrufer spricht. Der Unterschied zwischen einem guten und einem mittelmäßigen System liegt darin, was danach passiert: Ein guter Assistent notiert das Anliegen nicht nur, er erledigt es — er bucht den Termin, verschiebt ihn, nimmt die Absage entgegen und beantwortet Ihre konfigurierten Fragen im selben Gespräch. Nur Ausnahmen gehen an einen Menschen. Gebräuchlich sind für dieselbe Sache auch die Begriffe KI-Anrufassistent, AI-Telefonassistent, digitaler Telefonassistent, KI-Telefonservice oder KI-Telefonzentrale.",
   },
   {
     question: "Worin unterscheidet sich ein KI-Telefonassistent von Mailbox und Tastenmenü?",
     answer:
-      "Die Mailbox nimmt auf, sie versteht nichts — jemand muss abhören, zurückrufen und von Hand übertragen. Ein Tastenmenü zwingt den Anrufer in Ihre Struktur; wer kein passendes Feld findet, legt auf. Der Assistent führt stattdessen ein Gespräch, ordnet das Anliegen selbst ein, auch wenn der Anrufer vom erwarteten Ablauf abweicht, und liefert am Ende ein lesbares Ergebnis.",
+      "Die Mailbox nimmt auf, sie versteht nichts — jemand muss abhören, zurückrufen und den Termin selbst eintragen. Ein Tastenmenü zwingt den Anrufer in Ihre Struktur und endet fast immer doch bei einem Menschen. Der Assistent führt stattdessen ein Gespräch, versteht auch Abweichungen vom erwarteten Ablauf und schließt den Vorgang selbst ab, statt eine Nachricht zu hinterlassen.",
   },
   {
     question: "Kommen Anrufer mit der Stimme eines Sprachassistenten zurecht?",
@@ -138,24 +170,26 @@ const faqItems = [
   {
     question: "Was übernimmt der Assistent — und was bewusst nicht?",
     answer:
-      "Er nimmt Terminwünsche, Absagen und Rückrufbitten auf, beantwortet wiederkehrende Fragen und erfasst Anliegen strukturiert. Fachliche Beratung gibt er grundsätzlich nicht. Dringende Anliegen und alles, was Sie festlegen, gehen sofort an einen Menschen. Diese Grenzen definieren Sie im Anliegen-Katalog — vor dem Start.",
+      "Er bucht, verschiebt und storniert Termine im Rahmen Ihrer Regeln und beantwortet die Fragen, die Sie ihm vorgegeben haben — er schließt diese Vorgänge ab, statt sie weiterzureichen. Fachliche Beratung gibt er grundsätzlich nicht. Dringende, sensible und strittige Anliegen sowie alles außerhalb des freigegebenen Katalogs gehen an einen Menschen. Wo diese Grenze verläuft, legen Sie im Anliegen-Katalog fest — vor dem Start.",
   },
   {
     // Kanonische Fassung der Inhaber-Antwort vom 10.09.2026 (BOOKING_WRITE,
     // SMS_EMAIL_CONFIRMATION). Der Umfang steht in FAKTEN und wird hier nicht
     // neu formuliert — siehe OWNER-INPUT.md „Nachtrag 10.09.2026".
+    // Die Kernfrage dieser Seite. Sie trennt die beiden Regeln sauber: die
+    // Fähigkeit (zugesichert) von der Systemanbindung (kundenspezifisch).
     question: "Bucht der Assistent Termine direkt in mein System — und verschickt er Bestätigungen?",
-    answer: `${FAKTEN.terminaufnahme} ${FAKTEN.bestaetigungen}`,
+    answer: `${ABWICKLUNG.faehigkeit} ${ABWICKLUNG.qualifikation} ${FAKTEN.bestaetigungen}`,
   },
   {
-    question: "Was passiert, wenn der Assistent ein Anliegen nicht versteht?",
+    question: "Was passiert, wenn der Assistent ein Anliegen nicht abschließen kann?",
     answer:
-      "Dann versucht er nicht, es trotzdem zu lösen. Er fragt nach, und wenn das Anliegen weiterhin unklar bleibt oder außerhalb Ihres Anliegen-Katalogs liegt, erfasst er Name, Rückrufnummer und den Gesprächsinhalt und übergibt an Ihr Team. Wer ausdrücklich einen Menschen möchte, wird auf Wunsch weitergeleitet, sofern dort jemand erreichbar ist.",
+      "Dann versucht er es nicht trotzdem. Er fragt nach, und wenn das Anliegen unklar bleibt oder außerhalb des freigegebenen Katalogs liegt, übergibt er an Ihr Team — mit Name, Rückrufnummer, Gesprächsinhalt und dem Grund der Übergabe. Wer ausdrücklich einen Menschen möchte, wird weitergeleitet, sofern dort jemand erreichbar ist. Dieser Weg ist die Ausnahme, nicht der Normalfall.",
   },
   {
-    question: "Wie kommt das Gesprächsergebnis bei meinem Team an?",
+    question: "Bekommt mein Team trotzdem jeden Anruf zu sehen?",
     answer:
-      "Jedes Gespräch endet in einer strukturierten Zusammenfassung: Anliegen, Rückrufnummer, gewünschter Termin, nächster Schritt. Ihr Team liest das Ergebnis dort, wo es ohnehin arbeitet — statt Sprachnachrichten abzuhören und von Hand zu übertragen.",
+      "Nein — und das ist der Punkt. Abläufe, die der Assistent abschließt, erzeugen bei Ihnen keine Aufgabe; Sie sehen sie im Dashboard, müssen aber nichts tun. Nur übergebene Anrufe verlangen eine Reaktion, und die stehen dann vollständig da: Anliegen, Rückrufnummer, worum es geht und warum übergeben wurde. Wer trotzdem jeden Vorgang gegenlesen möchte, kann das — es ist nur nicht nötig.",
   },
   {
     question: "Worauf müssen Sie bei DSGVO und KI Telefonassistent achten?",
@@ -171,6 +205,15 @@ const faqItems = [
   {
     question: "Wie aufwändig ist die Einrichtung für mich?",
     answer: `Ihr Aufwand konzentriert sich auf das Aufnahmegespräch: Sie beschreiben Ihre Anrufe, wir bauen daraus Regeln und Ansagen. Konfiguration, Anbindung und Tests übernehmen wir. ${FAKTEN.uebergabeGarantie} ${FAKTEN.freigabeNachUebergabe}`,
+  },
+  {
+    question: "In welchen Sprachen spricht der Assistent?",
+    answer: `Deutsch ist enthalten. ${SPRACHEN.text} Welche Sprachen für Ihren Betrieb sinnvoll sind, legen Sie bei der Einrichtung fest.`,
+  },
+  {
+    question: "Merken Anrufer, dass sie mit einer KI sprechen?",
+    answer:
+      "Ja — und das sollen sie. Der Assistent sagt im ersten Satz, dass er ein KI-System ist (Art. 50 KI-Verordnung); abschalten lässt sich das nicht. Wir behaupten nicht, dass der Unterschied zu einem Menschen unhörbar wäre. Was wir sagen: Es ist ein Gespräch und kein Tastenmenü — der Anrufer formuliert frei, der Assistent fragt nach, und wer lieber mit einer Person spricht, wird weitergeleitet.",
   },
   {
     question: "Was kostet ein KI Telefonassistent?",
@@ -202,41 +245,49 @@ const PROBLEMS = [
 ];
 
 /**
- * Branchenbeispiele. Formulierungen bewusst ohne Schreibzugriff-Zusage
- * (BOOKING_WRITE): „aufnehmen", „erfassen", „übergeben" — nie „buchen" oder
- * „in den Kalender eintragen". Die vorherige Fassung sagte an drei Stellen
- * „buchen" und war damit eine universelle Zusage, die das Produkt nicht deckt.
+ * Branchenbeispiele.
+ *
+ * Diese Liste sagte bis zum 11.09.2026 durchgehend „aufnehmen", „erfassen",
+ * „zur Bestätigung übergeben" — das Ergebnis der zu defensiven
+ * BOOKING_WRITE-Auslegung. Jede Zeile beschrieb damit eine Aufgabe, die beim
+ * Kunden ankommt, statt einer, die verschwindet.
+ *
+ * Die Regel für diese Liste lautet jetzt: Jede Branche nennt EIN Ergebnis, das
+ * der Assistent im Gespräch abschließt, und wo nötig die Ausnahme. Wo ein
+ * Ergebnis einen Schreibzugriff auf ein Kundensystem voraussetzt, steht die
+ * Bedingung im Abschnittsfuß — nicht in jeder einzelnen Karte, das läse sich
+ * wie ein Haftungsausschluss.
  */
 const USE_CASES = [
   {
     icon: Wrench,
     industry: "Handwerk & Bau",
-    desc: "Terminanfragen und Störungsmeldungen aufnehmen, während Sie auf der Baustelle sind — mit Rückrufnummer und Dringlichkeit.",
+    desc: "Qualifiziert die Anfrage, beantwortet Standardfragen und vergibt den Montagetermin im vereinbarten Rahmen. Störungen und Notfälle gehen sofort an Sie.",
   },
   {
     icon: Briefcase,
     industry: "Kanzleien & Dienstleister",
-    desc: "Erstanfragen qualifizieren, Mandanten- und Kundendaten erfassen, Rückrufwünsche strukturiert weitergeben.",
+    desc: "Beantwortet Routinefragen, qualifiziert Erstanfragen und vergibt Besprechungstermine nach Ihren Regeln. Mandatsfragen bleiben beim Menschen.",
   },
   {
     icon: Home,
     industry: "Immobilien & Hausverwaltung",
-    desc: "Besichtigungs- und Exposé-Anfragen entgegennehmen, Schadensmeldungen erfassen — auch außerhalb der Bürozeiten.",
+    desc: "Vergibt Besichtigungstermine aus den Slots, die Sie freigeben, und nimmt Schadensmeldungen vollständig auf — auch außerhalb der Bürozeiten.",
   },
   {
     icon: UtensilsCrossed,
     industry: "Gastronomie & Hotellerie",
-    desc: "Reservierungs- und Buchungsanfragen aufnehmen, während der Service läuft, und an Ihr Team zur Bestätigung übergeben.",
+    desc: "Beantwortet wiederkehrende Fragen und wickelt Reservierungen samt Änderung und Absage ab, während der Service läuft. Sonderwünsche gehen an Sie.",
   },
   {
     icon: Stethoscope,
     industry: "Praxen & Gesundheit",
-    desc: "Terminwünsche, Absagen und Rezeptanfragen strukturiert aufnehmen — spürbare Entlastung für die Anmeldung zu Stoßzeiten.",
+    desc: "Bucht, verschiebt und storniert Termine nach Ihren Regeln und entlastet die Anmeldung zu Stoßzeiten. Medizinische Fragen und Notfälle nie — die gehen immer an Menschen.",
   },
   {
     icon: Building2,
     industry: "Agenturen & Beratung",
-    desc: "Erstgespräche terminieren, Anliegen erfassen und an den richtigen Ansprechpartner weiterleiten.",
+    desc: "Qualifiziert Erstanfragen und vergibt Erstgespräche direkt im Anruf, statt einen Rückruf zu versprechen.",
   },
 ];
 
@@ -247,11 +298,12 @@ export function KiTelefonassistentPage() {
       {
         "@type": "Service",
         name: "KI Telefonassistent für Unternehmen",
-        // Beschreibt ausschließlich, was universell zugesagt ist. Die frühere
-        // Fassung sagte „Termine bucht" und behauptete damit im strukturierten
-        // Datensatz genau den Schreibzugriff, den BOOKING_WRITE ausschließt.
+        // Beschreibt die Fähigkeit UND ihre Bedingung in einem Satz. Die
+        // Fassung davor sagte nur „erfasst Terminwünsche strukturiert" und gab
+        // im strukturierten Datensatz ein Erfassungssystem an, wo ein
+        // abwickelndes System steht.
         description:
-          "KI Telefonassistent für Unternehmen: nimmt Anrufe an, beantwortet wiederkehrende Fragen nach Ihren Vorgaben und erfasst Anliegen und Terminwünsche strukturiert – auch außerhalb regulärer Geschäftszeiten.",
+          "KI Telefonassistent für Unternehmen: führt Anrufe in natürlicher Sprache, bucht, verschiebt und storniert Termine im Gespräch und beantwortet konfigurierte Fragen – auch außerhalb regulärer Geschäftszeiten. Direkter Eintrag in Kalender- oder Branchensoftware nach eingerichteter und verifizierter Anbindung.",
         serviceType: "KI-Telefonassistent",
         areaServed: { "@type": "Country", name: "Deutschland" },
         url: `${BUSINESS_INFO.website}/ki-telefonassistent`,
@@ -284,8 +336,8 @@ export function KiTelefonassistentPage() {
   return (
     <>
       <PageSEO
-        title="KI Telefonassistent für Unternehmen – Anrufannahme | Cogniiq"
-        description="KI Telefonassistent für Unternehmen: nimmt Anrufe an, beantwortet Fragen und erfasst Anliegen nach Ihren Regeln. Keine Gesprächsaufzeichnung, gedeckelte Rechnung."
+        title="KI Telefonassistent für Unternehmen – Anrufe erledigen | Cogniiq"
+        description="KI Telefonassistent, der Anrufe nicht nur annimmt: bucht, verschiebt und storniert Termine im Gespräch und beantwortet Ihre Fragen. Mit Preisrechner, ohne Anmeldung."
         canonical={`${BUSINESS_INFO.website}/ki-telefonassistent`}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
@@ -295,29 +347,47 @@ export function KiTelefonassistentPage() {
       <main className="min-h-screen">
         {/*
           Reihenfolge als Kaufentscheidung gelesen, nicht als Modulliste:
-          Verstehen → Problem → Lösung → Ablauf → Beweis der Übergabe →
-          Grenzen → Kaufkriterien → Einrichtung → Betreuung → Preis → Ausstieg →
-          Datenschutz → Branchen → offene Fragen → Abschluss.
 
-          Entfernt gegenüber der Fassung vom 10.09.2026, weil doppelt oder
-          praxisspezifisch: PatientenSicht (M20), TeamBlock (M21),
-          FailurePatterns (M3 — steckt jetzt als „Warum das zählt" in der
-          Anbieter-Checkliste), Säulen als eigener Abschnitt, der zweite
-          CTA-Block und die Einwand-Karten (deckungsgleich mit der FAQ).
+            verstehen, was es ist
+            → warum das Problem meines ist
+            → wie das Gespräch wirklich klingt
+            → was danach passiert (drei Wege, erledigt zuerst)
+            → was es konkret kann
+            → wo die Grenze verläuft und was ein Mensch macht
+            → woran ich einen guten Anbieter erkenne
+            → was es bei mir kostet und ob es sich rechnet
+            → wie die Einführung läuft und wer betreut
+            → wie ich wieder herauskomme, Datenschutz, Branchen
+            → offene Fragen → Abschluss
+
+          Die Rechner stehen bewusst NICHT oben: Wer noch nicht weiß, was das
+          System leistet, kann mit einem Preis nichts anfangen. Sie stehen aber
+          VOR Einrichtung und Betreuung, weil die Preisfrage im Kopf sitzt,
+          sobald die Fähigkeiten klar sind, und alles danach sonst ungelesen
+          bleibt.
+
+          Neu am 11.09.2026: GespraechSection (natürliches Gespräch als
+          Hauptunterscheidungsmerkmal), DreiWegeSection (ersetzt die Rahmung
+          „Die Übergabe ist der Kern"), SprachenSection, RechnerSection.
+          CallSummarySection ist vom Kern zum Ausnahmeweg geworden und daher
+          hinter die drei Wege gerückt.
         */}
         <HeroSection />
         <CredentialStrip />
         <WasIstSection />
         <ProblemSection />
+        <GespraechSection />           {/* Natürliches Gespräch — Differenzierer */}
         <StimmprobeSection />          {/* M13 Stimmprobe (asset-gated) */}
+        <DreiWegeSection />            {/* Erledigt · Beantwortet · Übergeben */}
         <SolutionSection />
         <CallFlowSection />
-        <CallSummarySection />         {/* M14 Die Übergabe */}
+        <CallSummarySection />         {/* Der Ausnahmeweg im Detail */}
         <AnliegenKatalogSection />     {/* M8 Anliegen-Katalog + M15 Grenzen */}
+        <SprachenSection />
         <AnbieterCheckSection />       {/* Kaufkriterien — der eigenständige Beitrag */}
+        <RechnerSection />             {/* Preis- und Wirtschaftlichkeitsrechner */}
         <SetupSection />               {/* M17 Einrichtung */}
         <BetreuungSection />           {/* M18 Betreuung */}
-        <PreisLogikSection />          {/* M10 Preis & Deckelung */}
         <UmkehrbarkeitSection />       {/* M19 Umkehrbarkeit */}
         <NichtPassendSection />        {/* M16 Wann wir nicht passen */}
         <DatenschutzTeaserSection />   {/* M7 Datenschutz kurz */}
@@ -375,28 +445,31 @@ function HeroSection() {
             </div>
 
             {/*
-              Die H1 nennt den gesuchten Begriff zuerst und das Versprechen
-              unmittelbar danach. Die vorherige Fassung begann mit „Erreichbar,
-              wenn niemand abnehmen kann." und stellte den Begriff in den
-              hellgrauen zweiten Teil — verständlich erst nach dem zweiten Satz.
+              Die H1 nennt den gesuchten Begriff zuerst und danach das, was das
+              Produkt vom Wettbewerb trennt: nicht annehmen, sondern erledigen.
+              Die Fassung bis zum 11.09.2026 sagte „Anrufe annehmen, wenn Ihr
+              Team keine Hand frei hat" — das beschreibt einen Anrufdienst und
+              verkaufte damit ein abwickelndes System unter Wert.
             */}
             <h1 className="text-[2.5rem] sm:text-5xl lg:text-[3.4rem] font-bold text-gray-900 dark:text-gray-100 leading-[1.07] tracking-tight mb-6">
               KI-Telefonassistent für Unternehmen:{" "}
               <span className="text-gray-400 dark:text-gray-500 font-light">
-                Anrufe annehmen, wenn Ihr Team keine Hand frei hat.
+                Anrufe nicht nur annehmen. Anliegen erledigen.
               </span>
             </h1>
 
             <p className="text-lg text-gray-600 dark:text-gray-400 leading-[1.7] max-w-xl mb-3">
-              Der Telefonassistent von Cogniiq nimmt Anrufe zu Stoßzeiten und
-              außerhalb der Öffnungszeiten entgegen, spricht in natürlicher
-              Sprache mit dem Anrufer, beantwortet wiederkehrende Fragen nach
-              Ihren Vorgaben und erfasst jedes Anliegen strukturiert — mit
-              Rückrufnummer und nächstem Schritt.
+              Der Telefonassistent von Cogniiq führt ein echtes Gespräch — kein
+              Tastenmenü — und bringt das Anliegen zu Ende: Er bucht Termine,
+              verschiebt sie, nimmt Absagen entgegen und beantwortet die Fragen,
+              die Sie ihm vorgegeben haben. Auf Wunsch in mehreren Sprachen. Nur
+              Ausnahmen und alles, was Sie ausgenommen haben, gehen an einen
+              Menschen.
             </p>
             <p className="text-sm text-gray-400 dark:text-gray-500 mb-10 max-w-lg leading-relaxed">
-              Mit Ihrer Stimmauswahl, Ihren Gesprächsregeln und einer Übergabe,
-              die wir vor der Unterschrift mit Ihnen klären.
+              Schreibt ein Ablauf direkt in Ihren Kalender oder Ihre
+              Branchensoftware, richten wir diese Anbindung für Ihr System ein
+              und verifizieren sie vorher.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 mb-4">
@@ -410,10 +483,11 @@ function HeroSection() {
 
             <div className="flex flex-wrap gap-x-7 gap-y-2.5">
               {[
-                "Keine Gesprächsaufzeichnung",
+                "Bucht, verschiebt und storniert Termine",
+                "Natürliches Gespräch statt Tastenmenü",
+                "Mehrsprachig, Wechsel im Gespräch",
                 `${FAKTEN.gleichzeitigeAnrufe} Anrufe gleichzeitig`,
-                "Ihre Stimmauswahl, Ihre Regeln",
-                "Festes Kontingent mit Obergrenze",
+                "Keine Gesprächsaufzeichnung",
               ].map((item) => (
                 <motion.div
                   key={item}
@@ -439,24 +513,30 @@ function HeroSection() {
 /**
  * Das Gesprächsbeispiel im Hero.
  *
- * Die vorherige Fassung endete mit „Eingetragen. Sie erhalten eine Bestätigung
- * per E-Mail." und der Fußzeile „Termin automatisch gespeichert · Kalender
- * aktualisiert". Das waren zwei Zusagen auf einmal, die das Produkt nicht
- * universell hält: Schreibzugriff auf ein Kundensystem (BOOKING_WRITE) und eine
- * E-Mail-Bestätigung als Standardfunktion (SMS_EMAIL_CONFIRMATION). Ein Bild
- * behauptet dasselbe wie ein Satz, nur schneller.
+ * Zwei Fassungen waren hier bereits falsch, in entgegengesetzte Richtungen.
  *
- * Die neue Fassung zeigt stattdessen das, was universell gilt und zugleich das
- * stärkste Argument ist: die Offenlegung nach Art. 50 im ersten Satz, ein
- * Gespräch in natürlicher Sprache, und ein Ergebnis, das beim Team landet.
+ * Die erste endete mit „Eingetragen. Sie erhalten eine Bestätigung per E-Mail."
+ * und „Kalender aktualisiert" — eine universelle Schreibzusage plus eine
+ * E-Mail-Bestätigung als Standardfunktion. Beides zu viel.
+ *
+ * Die zweite endete mit „Mein Kollege bestätigt Ihnen den Termin." Das war zu
+ * wenig: Sie zeigte ausgerechnet im Hero ein System, das eine Aufgabe erzeugt,
+ * statt eine zu erledigen — genau das Missverständnis, das der Inhaber am
+ * 11.09.2026 beanstandet hat.
+ *
+ * Diese Fassung zeigt den Normalfall des Produkts: Offenlegung nach Art. 50 im
+ * ersten Satz, ein Gespräch, in dem der Anrufer frei formuliert und mitten im
+ * Verlauf umdisponiert, und ein abgeschlossener Vorgang. Die Bedingung dafür
+ * steht als Badge am Beispiel, nicht im Kleingedruckten: Ein Beispiel, das
+ * Schreibzugriff zeigt, muss sagen, dass dieser Zugriff eingerichtet ist.
  */
 function HeroCallPanel() {
   const turns = [
     { role: "ai", text: "Guten Tag, hier ist der digitale Empfang. Ich bin ein KI-Assistent — wie kann ich helfen?" },
-    { role: "customer", text: "Ich hätte gern einen Termin für eine Erstberatung." },
-    { role: "ai", text: "Gerne. Würde Ihnen Dienstagvormittag passen?" },
-    { role: "customer", text: "Ja, das passt gut." },
-    { role: "ai", text: "Notiert: Erstberatung, Dienstagvormittag. Mein Kollege bestätigt Ihnen den Termin. Unter welcher Nummer sind Sie erreichbar?" },
+    { role: "customer", text: "Ich habe morgen um zehn einen Termin, den schaffe ich nicht. Geht auch Donnerstag?" },
+    { role: "ai", text: "Kein Problem. Donnerstag hätte ich 9:30 Uhr oder 14:00 Uhr frei." },
+    { role: "customer", text: "Lieber halb zehn." },
+    { role: "ai", text: "Erledigt — Ihr Termin steht jetzt auf Donnerstag, 9:30 Uhr. Der Termin morgen ist storniert. Kann ich sonst noch etwas für Sie tun?" },
   ];
 
   return (
@@ -497,12 +577,15 @@ function HeroCallPanel() {
 
         <div className="px-5 py-3.5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-800/40">
           <div className="flex items-start gap-2">
-            <FileText size={13} className="text-emerald-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
-            <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">
-              Ergebnis: Anliegen, Terminwunsch und Rückrufnummer — strukturiert
-              für Ihr Team
+            <CheckCheck size={13} className="text-emerald-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <span className="text-sm text-gray-600 dark:text-gray-300 font-semibold">
+              Termin verschoben · im Gespräch erledigt
             </span>
           </div>
+          <p className="mt-1.5 text-[13px] text-gray-500 dark:text-gray-500 leading-[1.5]">
+            {ABWICKLUNG.badge}. Ohne Anbindung greift der Weg, den Sie vorher
+            festgelegt haben.
+          </p>
         </div>
       </div>
 
@@ -520,7 +603,7 @@ function CredentialStrip() {
   const items = [
     { label: "Festes Minutenkontingent", detail: `Darüber ${FAKTEN.mehrpreisProMinute}/Min., gedeckelt auf die Obergrenze Ihres Tarifs` },
     { label: "Rufumleitung", detail: "Anrufe laufen auf die vereinbarte Nummer" },
-    { label: "Strukturierte Übergabe", detail: "Anliegen landen bei Ihrem Team" },
+    { label: "Termine im Gespräch", detail: "Gebucht, verschoben oder storniert — bei eingerichteter Anbindung" },
     // „Europäische Server" ist eine Aussage zum Verarbeitungsort und damit
     // untersagt, solange die AVV mit den Infrastruktur-Anbietern nicht
     // unterzeichnet sind (Inhaber-Antwort B, ASSETS-REQUIRED §B2.2).
@@ -666,12 +749,12 @@ function ProblemSection() {
 function SolutionSection() {
   const capabilities = [
     { icon: PhoneCall, label: "Nimmt Anrufe entgegen, wenn Ihr Team gebunden ist" },
-    { icon: MessageSquare, label: "Beantwortet wiederkehrende Fragen nach Ihren Vorgaben" },
-    { icon: Calendar, label: "Nimmt Terminwünsche nach Ihren Regeln auf" },
-    { icon: CheckCircle2, label: "Erfasst Anliegen strukturiert – mit Rückrufnummer und nächstem Schritt" },
+    { icon: Calendar, label: "Bucht Termine im Gespräch – im Rahmen der Regeln, die Sie freigeben" },
+    { icon: RotateCcw, label: "Verschiebt Termine und schließt Absagen ab; der Platz ist sofort wieder frei" },
+    { icon: MessageSquare, label: "Beantwortet Ihre konfigurierten Fragen selbst, statt sie weiterzureichen" },
+    { icon: Languages, label: "Spricht auf Wunsch weitere Sprachen – und wechselt sie mitten im Gespräch" },
     { icon: Shield, label: "Leitet dringende Anrufe sofort an einen Menschen weiter" },
     { icon: Clock, label: "Erreichbar auch abends, am Wochenende und an Feiertagen" },
-    { icon: Languages, label: "Spricht auf Wunsch weitere Sprachen – und wechselt sie mitten im Gespräch" },
   ];
 
   return (
@@ -703,6 +786,9 @@ function SolutionSection() {
                 </div>
               ))}
             </div>
+            <p className="text-[15px] text-gray-500 dark:text-gray-500 leading-[1.6] mb-8 max-w-lg p-4 rounded-xl bg-white dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800">
+              {ABWICKLUNG.qualifikation}
+            </p>
             <PrimaryCta />
           </motion.div>
 
@@ -745,25 +831,23 @@ function CallFlowSection() {
     {
       number: "02",
       icon: MessageSquare,
-      title: "Gespräch & Anliegen erfassen",
-      desc: "Der Assistent erfragt das Anliegen in natürlicher Sprache und beantwortet wiederkehrende Fragen nach Ihren Vorgaben.",
+      title: "Anliegen im Gespräch klären",
+      desc: "Der Anrufer formuliert frei, der Assistent fragt nach, wenn etwas fehlt — auch wenn jemand vom erwarteten Ablauf abweicht oder zwei Dinge auf einmal will.",
       detail: "Auf Ihren Betrieb konfiguriert",
     },
     {
       number: "03",
       icon: Calendar,
-      title: "Nach Ihren Regeln entscheiden",
-      // Vorher: „Termin buchen oder weiterleiten … werden geprüft und
-      // eingetragen." — das las sich als Schreibzugriff auf ein Kundensystem.
-      desc: "Terminwünsche nimmt er im vereinbarten Rahmen auf oder legt sie Ihrem Team zur Bestätigung vor. Dringende und komplexe Anliegen gehen sofort an einen Menschen.",
-      detail: "Ihre Regeln entscheiden",
+      title: "Vorgang abschließen",
+      desc: "Der Assistent führt den freigegebenen Ablauf zu Ende: Termin gebucht, verschoben oder storniert, Frage beantwortet. Der Anrufer bekommt das Ergebnis noch im Gespräch bestätigt.",
+      detail: "Bei eingerichteter Systemanbindung",
     },
     {
       number: "04",
-      icon: FileText,
-      title: "Zusammenfassung & Übergabe",
-      desc: "Jedes Gespräch endet in einer strukturierten Zusammenfassung: Anliegen, Rückrufnummer, nächster Schritt – lesbar dort, wo Ihr Team arbeitet.",
-      detail: "Kein Abtippen, kein Zettel",
+      icon: GitMerge,
+      title: "Nur die Ausnahme geht weiter",
+      desc: "Dringend, sensibel, strittig oder außerhalb Ihres Katalogs: Dann übernimmt ein Mensch — sofort weitergeleitet oder als vollständiger Eintrag mit Anliegen, Rückrufnummer und Grund der Übergabe.",
+      detail: "Ausnahmeweg, nicht Regelfall",
     },
   ];
 
@@ -783,6 +867,10 @@ function CallFlowSection() {
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15]">
             Was passiert, wenn ein Kunde anruft
           </h2>
+          <p className="mt-4 text-gray-500 dark:text-gray-400 leading-[1.7]">
+            Vier Schritte, von denen der dritte der entscheidende ist: Der
+            Vorgang ist am Ende des Gesprächs erledigt, nicht notiert.
+          </p>
         </motion.div>
 
         <div className="relative">
@@ -839,17 +927,19 @@ function CallSummarySection() {
             variants={fadeUp}
           >
             <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
-              Nach jedem Gespräch
+              Der Ausnahmeweg
             </p>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-5">
-              Die Übergabe entscheidet.
-              <br className="hidden sm:block" /> Deshalb ist sie der Kern.
+              {GENERISCH_UEBERGABE.headline}
             </h2>
             <div className="text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7] mb-8 max-w-lg space-y-4">
               {GENERISCH_UEBERGABE.paragraphs.map((absatz, i) => (
                 <p key={i}>{absatz}</p>
               ))}
             </div>
+            <p className="text-[15px] font-semibold text-gray-800 dark:text-gray-200 mb-3">
+              {GENERISCH_UEBERGABE.wasAnkommt.headline}
+            </p>
             <ul className="space-y-3">
               {GENERISCH_UEBERGABE.wasAnkommt.items.map((item) => (
                 <li key={item} className="flex items-start gap-3 text-[17px] text-gray-600 dark:text-gray-400">
@@ -858,6 +948,9 @@ function CallSummarySection() {
                 </li>
               ))}
             </ul>
+            <p className="mt-4 text-[15px] text-gray-500 dark:text-gray-500 leading-[1.6]">
+              {GENERISCH_UEBERGABE.wasAnkommt.hinweis}
+            </p>
           </motion.div>
 
           <motion.div
@@ -907,13 +1000,13 @@ function CallSummarySection() {
                     Anliegen
                   </p>
                   <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                    Erstberatung zur Automatisierung der Telefonie. Interessiert an Terminbuchungslösung.
+                    Erstberatung zur Automatisierung der Telefonie. Wunschtermin im Gespräch vergeben.
                   </p>
                 </div>
 
                 <div className="px-3.5 py-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/40">
                   <p className="text-sm text-emerald-600 dark:text-emerald-500 font-semibold uppercase tracking-widest mb-1">
-                    Terminwunsch
+                    Termin gebucht
                   </p>
                   <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
                     Di., 18. März · 10:30&nbsp;Uhr · Beratungsgespräch
@@ -922,19 +1015,25 @@ function CallSummarySection() {
 
                 <div className="px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700">
                   <p className="text-sm text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-widest mb-1.5">
-                    Nächster Schritt
+                    Offen für Ihr Team
                   </p>
                   <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed">
-                    Unterlagen zur Telefonassistenz vorbereiten · Termin bestätigen
+                    Nichts. Der Vorgang ist im Gespräch abgeschlossen.
                   </p>
                 </div>
               </div>
 
-              <div className="px-5 py-3.5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-800/30 flex items-center gap-2">
-                <Users size={13} className="text-gray-400" aria-hidden="true" />
-                <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">
-                  Eintrag im Dashboard · von Ihrem Team zu bestätigen
-                </span>
+              <div className="px-5 py-3.5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-800/30">
+                <div className="flex items-center gap-2">
+                  <CheckCheck size={13} className="text-emerald-500" aria-hidden="true" />
+                  <span className="text-sm text-gray-600 dark:text-gray-300 font-semibold">
+                    Im Gespräch erledigt
+                  </span>
+                </div>
+                <p className="mt-1.5 text-[13px] text-gray-500 dark:text-gray-500 leading-[1.5]">
+                  {ABWICKLUNG.kurz} Ohne Anbindung landet derselbe Vorgang als
+                  vollständiger Eintrag bei Ihrem Team.
+                </p>
               </div>
             </div>
           </motion.div>
@@ -1228,6 +1327,238 @@ function SetupSection() {
   );
 }
 
+/**
+ * Natürliches Gespräch — vom Inhaber als Kernunterscheidungsmerkmal bestätigt
+ * und auf der Seite bis zum 11.09.2026 praktisch unsichtbar.
+ *
+ * Steht bewusst VOR den drei Wegen: Ob ein Anruf automatisch abgeschlossen
+ * wird, interessiert erst, wenn man glaubt, dass das Gespräch überhaupt trägt.
+ */
+function GespraechSection() {
+  return (
+    <section className="py-24 bg-white dark:bg-gray-950" aria-labelledby="gespraech-heading">
+      <div className="max-w-6xl mx-auto px-6 lg:px-8">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          variants={fadeUp}
+          className="max-w-2xl mb-12"
+        >
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+            Wie es klingt
+          </p>
+          <h2
+            id="gespraech-heading"
+            className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4"
+          >
+            {GESPRAECH.headline}
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 leading-[1.7]">{GESPRAECH.intro}</p>
+        </motion.div>
+
+        <div className="grid sm:grid-cols-2 gap-5">
+          {GESPRAECH.punkte.map((punkt) => (
+            <motion.div
+              key={punkt.title}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-30px" }}
+              variants={fadeUp}
+              className="p-6 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800"
+            >
+              <h3 className="text-[17px] font-semibold text-gray-900 dark:text-gray-100 mb-2 leading-snug">
+                {punkt.title}
+              </h3>
+              <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7]">
+                {punkt.text}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Die drei Wege nach dem Anliegen — der Abschnitt, der die Fehlrahmung der
+ * Vorgängerfassung ersetzt.
+ *
+ * Weg A steht zuerst und trägt die Auszeichnung, weil er der Normalfall ist.
+ * Weg C ist bewusst optisch leiser gesetzt: Er ist wichtig, aber er ist die
+ * Ausnahme, und eine Gestaltung, die alle drei gleich gewichtet, würde genau
+ * den Eindruck erzeugen, den diese Seite loswerden soll.
+ */
+function DreiWegeSection() {
+  return (
+    <section className="py-24 bg-gray-50 dark:bg-gray-900/40" aria-labelledby="wege-heading">
+      <div className="max-w-6xl mx-auto px-6 lg:px-8">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          variants={fadeUp}
+          className="max-w-2xl mb-12"
+        >
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+            Das Ergebnis
+          </p>
+          <h2
+            id="wege-heading"
+            className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4"
+          >
+            {DREI_WEGE.headline}
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 leading-[1.7]">{DREI_WEGE.intro}</p>
+        </motion.div>
+
+        <ol className="grid lg:grid-cols-3 gap-5">
+          {DREI_WEGE.wege.map((weg, i) => {
+            const hervorgehoben = i === 0;
+            return (
+              <motion.li
+                key={weg.kennung}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-30px" }}
+                variants={fadeUp}
+                className={`p-7 rounded-2xl border ${
+                  hervorgehoben
+                    ? "bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 shadow-[0_2px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_20px_rgba(0,0,0,0.25)]"
+                    : "bg-white/60 dark:bg-gray-900/40 border-gray-100 dark:border-gray-800"
+                }`}
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <span
+                    className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${
+                      hervorgehoben
+                        ? "bg-emerald-500 text-white"
+                        : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700"
+                    }`}
+                    aria-hidden="true"
+                  >
+                    {weg.kennung}
+                  </span>
+                  <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100">
+                    {weg.title}
+                  </h3>
+                  {hervorgehoben && (
+                    <span className="ml-auto text-[12px] font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-500">
+                      Normalfall
+                    </span>
+                  )}
+                </div>
+                <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7]">
+                  {weg.text}
+                </p>
+                {weg.fussnote && (
+                  <p className="mt-3 text-[14px] text-gray-500 dark:text-gray-500 leading-[1.55]">
+                    {weg.fussnote}
+                  </p>
+                )}
+              </motion.li>
+            );
+          })}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Mehrsprachigkeit. Die Zahlen stehen ausschließlich in `SPRACHEN` — hier wird
+ * kein Betrag getippt, damit Preisseite, Rechner und dieser Abschnitt nicht
+ * auseinanderlaufen können.
+ */
+function SprachenSection() {
+  const { PROSE, H2C } = KettenStile();
+  return (
+    <section className="py-24 bg-white dark:bg-gray-950">
+      <div className="max-w-3xl mx-auto px-6 lg:px-8">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+          Mehrsprachig
+        </p>
+        <h2 className={H2C}>Wenn nicht jeder Anrufer Deutsch spricht</h2>
+        <p className={`${PROSE} mb-4`}>
+          Für Betriebe mit internationalen Kunden, Lieferanten oder Gästen ist
+          das oft der Punkt, an dem ein Anruf heute abbricht: Niemand im Team
+          kann gerade in der passenden Sprache antworten, und der Anrufer legt
+          auf. Der Assistent nimmt das Gespräch in der Sprache an, in der es
+          geführt wird, und wechselt sie mitten im Gespräch, wenn der Anrufer
+          wechselt.
+        </p>
+        <p className={PROSE}>{SPRACHEN.text}</p>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Preis- und Wirtschaftlichkeitsrechner.
+ *
+ * WARUM AUF DIESER SEITE. Der Inhaber will, dass niemand ein Verkaufsgespräch
+ * führen muss, um zu erfahren, was das System ungefähr kostet. Die Rechner
+ * beantworten die Frage „was heißt das für MICH" — das ist eine
+ * Konversionsfunktion, keine redaktionelle Preisseite.
+ *
+ * WARUM DAS DIE KOSTENSEITE NICHT KANNIBALISIERT. Titel, Description und H1
+ * dieser Seite enthalten keinen Preisbegriff; dieser Abschnitt trägt genau eine
+ * H2 und keine Tariftabelle, keine Preisliste und keinen redaktionellen
+ * Preisratgeber. Die vollständigen Tarife, die Vertragsbedingungen und die
+ * Preisintention bleiben bei der dafür vorgesehenen Kostenseite, auf die der
+ * Absatz unten verweist.
+ *
+ * ACHTUNG BEI ÄNDERUNGEN: Der Verweis am Ende dieses Abschnitts ist EINER von
+ * GENAU ZWEI Verweisen dieser Datei auf die Kostenseite. Diese Anzahl ist Teil
+ * der Messbedingungen eines laufenden, eingefrorenen Experiments. Einen Verweis
+ * hinzuzufügen oder zu entfernen lässt den Build fehlschlagen.
+ */
+function RechnerSection() {
+  const { PROSE, H2C, TEXT_LINK } = KettenStile();
+  return (
+    <section className="py-24 bg-gray-50 dark:bg-gray-900/40" aria-labelledby="rechner-heading">
+      <div className="max-w-4xl mx-auto px-6 lg:px-8">
+        {/* Statisch im HTML, damit Überschrift und Einordnung im Prerender
+            stehen — der interaktive Teil darunter wird nachgeladen. */}
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+          Transparenz
+        </p>
+        <h2 id="rechner-heading" className={H2C}>
+          Was das bei Ihrem Anrufaufkommen kostet — und ob es sich rechnet
+        </h2>
+        <p className={`${PROSE} mb-4`}>{GENERISCH_DECKELUNG.text}</p>
+        <p className={`${PROSE} mb-4`}>{GENERISCH_DECKELUNG.tarifwechsel}</p>
+        <p className={`${PROSE} mb-10`}>
+          Rechnen Sie es selbst durch. Keine E-Mail, keine Anmeldung, kein
+          Ergebnis, das erst nach einem Klick erscheint — und jede Position
+          steht einzeln, auch die, die vor der technischen Prüfung noch nicht
+          feststeht.
+        </p>
+
+        <Suspense
+          fallback={
+            <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50 p-8 text-[16px] text-gray-500 dark:text-gray-400">
+              Rechner wird geladen …
+            </div>
+          }
+        >
+          <TelefonRechner />
+        </Suspense>
+
+        <Link
+          to="/kosten-ki-telefonassistent"
+          onClick={() => trackEvent("cta_kosten_click", "Rechner")}
+          className={TEXT_LINK}
+        >
+          Alle Tarife, Vertragsbedingungen und Preisangaben im Detail
+          <ArrowRight size={15} aria-hidden="true" />
+        </Link>
+      </div>
+    </section>
+  );
+}
+
 function BetreuungSection() {
   const { PROSE, H2C, CARD } = KettenStile();
   return (
@@ -1253,28 +1584,6 @@ function BetreuungSection() {
             ))}
           </dl>
         </div>
-      </div>
-    </section>
-  );
-}
-
-function PreisLogikSection() {
-  const { PROSE, H2C, TEXT_LINK } = KettenStile();
-  return (
-    <section className="py-24 bg-gray-50 dark:bg-gray-900/40">
-      <div className="max-w-3xl mx-auto px-6 lg:px-8">
-        <h2 className={H2C}>{GENERISCH_DECKELUNG.headline}</h2>
-        <p className={`${PROSE} mb-4`}>{GENERISCH_DECKELUNG.text}</p>
-        <p className={`${PROSE} mb-4`}>{GENERISCH_DECKELUNG.tarifwechsel}</p>
-        <p className={PROSE}>{GENERISCH_DECKELUNG.preisgarantie}</p>
-        <Link
-          to="/kosten-ki-telefonassistent"
-          onClick={() => trackEvent("cta_kosten_click", "Preislogik")}
-          className={TEXT_LINK}
-        >
-          Alle Preisangaben im Detail
-          <ArrowRight size={15} aria-hidden="true" />
-        </Link>
       </div>
     </section>
   );
@@ -1368,6 +1677,12 @@ function UseCasesSection() {
             Eingesetzt in Branchen mit
             <br className="hidden sm:block" /> hohem Telefonaufkommen
           </h2>
+          <p className="mt-4 text-gray-500 dark:text-gray-400 leading-[1.7]">
+            Welche Anlässe der Assistent bei Ihnen abschließt, legen Sie im
+            Anliegen-Katalog fest. Abläufe, die in Ihren Kalender oder Ihre
+            Branchensoftware schreiben, setzen die eingerichtete und
+            verifizierte Anbindung voraus.
+          </p>
         </motion.div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1565,10 +1880,11 @@ function FinalCtaSection() {
                 <br className="hidden sm:block" /> gemeinsam durch.
               </h2>
               <p className="text-[17px] text-gray-500 dark:text-gray-400 max-w-lg mx-auto mb-8 leading-[1.7]">
-                In einer kurzen Demo hören Sie, wie der Assistent Anrufe
-                entgegennimmt, und wir skizzieren Ihren Empfang am Telefon — mit
-                Ihren Anrufanlässen, Ihren Regeln und Ihrer Übergabe. Danach
-                entscheiden Sie in Ruhe.
+                In einer kurzen Demo hören Sie, wie der Assistent ein Gespräch
+                führt und einen Termin abschließt. Danach gehen wir Ihre
+                Anrufanlässe durch und sagen Ihnen, welche davon bei Ihnen
+                automatisch durchlaufen würden — und welche nicht. Entscheiden
+                Sie in Ruhe.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">

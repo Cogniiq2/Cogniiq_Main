@@ -325,7 +325,12 @@ export type ConversionEvent =
   | 'cta_demo_click'
   | 'cta_kontakt_click'
   | 'cta_telefon_click'
-  | 'cta_kosten_click';
+  | 'cta_kosten_click'
+  // Die Rechner melden NUR, dass gerechnet wurde. Anrufaufkommen, Stundensätze
+  // und Deckungsbeiträge sind Geschäftszahlen des Besuchers; sie bleiben im
+  // Browser und haben in keinem Parameter dieser Funktion etwas zu suchen.
+  | 'price_calculator_completed'
+  | 'roi_calculator_completed';
 
 export function trackEvent(event: ConversionEvent, label?: string) {
   if (typeof window === 'undefined') return;

@@ -156,9 +156,14 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
     // und nicht das Produkt; sie stand bei 155 Impressionen in 28 Tagen auf
     // Position ~37 ohne einen einzigen Klick.
     path: "/ki-telefonassistent",
-    title: "KI Telefonassistent für Unternehmen – Anrufannahme | Cogniiq",
-    description: "KI Telefonassistent für Unternehmen: nimmt Anrufe an, beantwortet Fragen und erfasst Anliegen nach Ihren Regeln. Keine Gesprächsaufzeichnung, gedeckelte Rechnung.",
-    keywords: "KI Telefonassistent, KI Telefonassistent für Unternehmen, KI Anrufassistent, digitaler Telefonassistent, KI Telefonservice, automatische Anrufannahme",
+    // Zweite Korrektur am 11.09.2026, nach dem Inhaber-Review der Preview:
+    // „Anrufannahme" und „erfasst Anliegen" beschrieben ein Erfassungssystem
+    // und verkauften ein abwickelndes System unter Wert. Der Head sagt jetzt,
+    // was das Produkt tut — erledigen statt annehmen — ohne daraus eine
+    // universelle Integrationszusage zu machen.
+    title: "KI Telefonassistent für Unternehmen – Anrufe erledigen | Cogniiq",
+    description: "KI Telefonassistent, der Anrufe nicht nur annimmt: bucht, verschiebt und storniert Termine im Gespräch und beantwortet Ihre Fragen. Mit Preisrechner, ohne Anmeldung.",
+    keywords: "KI Telefonassistent, KI Telefonassistent für Unternehmen, KI Anrufassistent, digitaler Telefonassistent, KI Telefonservice, Anrufe automatisieren",
     indexable: true,
     sitemap: { lastmod: "2026-09-11", changefreq: "monthly", priority: "0.92" },
   },

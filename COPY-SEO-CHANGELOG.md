@@ -1,5 +1,88 @@
 # COPY-SEO-CHANGELOG — Copy Overhaul KI-Telefonassistent-Cluster
 
+## 2026-09-11 (3) — Produktwahrheit korrigiert: `/ki-telefonassistent` verkaufte unter Wert
+
+Anlass: Inhaber-Review der Preview. Die Seite beschrieb ein System, das
+Terminwünsche **aufnimmt**, damit ein Mitarbeiter sie **danach erledigt**. Das
+ist nicht das Produkt. Der Assistent führt konfigurierte Routineabläufe im
+Gespräch zu Ende.
+
+**Ursache.** `BOOKING_WRITE` („only after verified customer integration") war
+zu defensiv ausgelegt worden — als Verbot des Wortes „buchen" statt als
+Bedingung für Schreibzugriff auf ein Kundensystem. Aus einer Integrationsregel
+war eine Produktbeschreibung geworden.
+
+**Die zwei Regeln, die ab jetzt getrennt gelten** (ausgeschrieben im Block
+„PRODUKTWAHRHEIT, KORRIGIERT AM 11.09.2026" in `telefonassistent-copy.ts`):
+
+| | Status |
+|---|---|
+| `AUTOMATISIERTE_ABWICKLUNG` — buchen, verschieben, stornieren, Fragen beantworten | **zugesicherte Produktfähigkeit**, darf so benannt werden |
+| `SYSTEM_SCHREIBZUGRIFF` — direkt in Kalender/PVS/CRM/Buchungssystem | **kundenspezifisch**, wird je Kunde eingerichtet und verifiziert |
+
+**Korrigierte Fundstellen** (jede war eine eigene Unterverkaufsaussage):
+
+| Stelle | Vorher | Nachher |
+|---|---|---|
+| `title` (Manifest + Edge) | `… – Anrufannahme \| Cogniiq` | `… – Anrufe erledigen \| Cogniiq` |
+| `description` | „nimmt Anrufe an … erfasst Anliegen" | „bucht, verschiebt und storniert Termine im Gespräch" |
+| H1 | „Anrufe annehmen, wenn Ihr Team keine Hand frei hat." | „Anrufe nicht nur annehmen. Anliegen erledigen." |
+| Hero-Gespräch | endete mit „Mein Kollege bestätigt Ihnen den Termin." | Anrufer verschiebt im Gespräch; Ergebnis „Termin verschoben · im Gespräch erledigt" + Badge zur Anbindung |
+| Dashboard-Karte | „Terminwunsch" / „Nächster Schritt: Termin bestätigen" | „Termin gebucht" / „Offen für Ihr Team: Nichts." |
+| Ablauf 03/04 | „Nach Ihren Regeln entscheiden" → „Zusammenfassung & Übergabe" | „Vorgang abschließen" → „Nur die Ausnahme geht weiter" |
+| Abschnitt M14 | „Die Übergabe entscheidet. Deshalb ist sie der Kern." | „Und wenn doch ein Mensch ran muss?" — als Ausnahmeweg |
+| Fähigkeitenliste | „Nimmt Terminwünsche auf", „Erfasst Anliegen strukturiert" | „Bucht Termine im Gespräch", „Verschiebt Termine und schließt Absagen ab" |
+| Branchenkarten | durchgehend „aufnehmen/erfassen/übergeben" | je Branche ein abgeschlossenes Ergebnis + die Ausnahme |
+| Anliegen-Katalog | „aufnehmen und zur Bestätigung vorlegen" | „im Gespräch buchen", „Absagen abschließen" |
+| Vertrauensstreifen | „Strukturierte Übergabe · Anliegen landen bei Ihrem Team" | „Termine im Gespräch · gebucht, verschoben oder storniert" |
+| `Service`-JSON-LD | „erfasst Anliegen und Terminwünsche strukturiert" | Fähigkeit + Anbindungsbedingung in einem Satz |
+| FAQ | 6 Antworten in der Erfassungslogik | auf Abwicklung gezogen; zwei neue Fragen (Sprachen, Art. 50) |
+
+**Nicht überkorrigiert.** Kein „übernimmt jeden Anruf", kein „100 %
+automatisiert", kein „funktioniert mit jeder Software", keine garantierte
+Ersparnis, kein „von einem Menschen nicht zu unterscheiden". Die
+Anbindungsbedingung (`ABWICKLUNG.qualifikation`) steht an jeder Stelle, an der
+die Seite Schreibzugriff behauptet — im Hero-Badge, an der Fähigkeitenliste, in
+der Dashboard-Fußzeile, im Branchen-Abschnittsfuß, im Kaufkriterium 2 und in
+der FAQ.
+
+**Neu auf der Seite**
+
+- **„Ein Gespräch, kein Tastenmenü"** — natürliches Gespräch als
+  Hauptunterscheidungsmerkmal, mit der Grenze: natürlich klingend UND nach
+  Art. 50 erkennbar KI. Keine Täuschungsbehauptung.
+- **„Was passiert, nachdem der Anrufer sein Anliegen gesagt hat"** — drei Wege
+  (Erledigt · Beantwortet · Übergeben). Weg A ist optisch der Normalfall, Weg C
+  bewusst leiser: Eine Gestaltung, die alle drei gleich gewichtet, hätte die
+  alte Fehlrahmung wiederhergestellt.
+- **Mehrsprachigkeit** als eigener Abschnitt, Zahlen ausschließlich aus `SPRACHEN`.
+- **Preis- und Wirtschaftlichkeitsrechner** (siehe unten).
+
+**Rechner.** `src/lib/telefonassistent-rechner.ts` ist reine, getestete
+Arithmetik ohne React; `src/components/TelefonRechner.tsx` ist Darstellung ohne
+einen einzigen Betrag als Literal. Alle Zahlen aus `TARIFE`,
+`FAKTEN.mehrpreisProMinuteEur`, `SPRACHEN_PREISE`. Kein E-Mail-Gate, kein
+Countdown, kein verstecktes Add-on; Rechnung läuft lokal im Browser, Eingaben
+verlassen ihn nicht.
+
+**Bewusst NICHT gerechnet**, weil die Quelle es nicht eindeutig festlegt:
+der 20-%-Aufschlag für monatliche Kündbarkeit (Bemessungsgrundlage offen) und
+die Frage, ob der Sprachaufschlag innerhalb der Tarif-Obergrenze liegt. Beides
+erscheint als Regel im Text, nicht als Rechenweg. Unbekannte Positionen — die
+kundenspezifische Anbindung — werden als „noch offen" ausgewiesen, **nie als 0**.
+
+**Numerische Zwillinge.** `TARIFE` trägt zusätzlich `monatlichEur`,
+`obergrenzeEur`, `einrichtungEur`; `FAKTEN` zusätzlich
+`mehrpreisProMinuteEur`; neu `SPRACHEN_PREISE`. Rein additiv — die
+Anzeigestrings sind byte-identisch geblieben, weshalb die eingefrorene
+Preisseite unverändert rendert. Ein Test hält Zahl und String aneinander.
+
+**Eingefrorene Experimente unberührt.** Fingerprint-Suite grün; die
+Vorkommenszahlen der geschützten Pfade in der Seite bleiben exakt 1 und 2, alle
+neuen Dateien enthalten sie gar nicht. Die Preisseite selbst wurde nicht
+angefasst und bleibt Eigentümerin der Preisintention.
+
+
 ## 2026-09-11 (2) — `/ki-telefonassistent` als generische kommerzielle Seite neu gefasst
 
 Anlass: Search Console, Seite `/ki-telefonassistent`, 2026-08-12 – 2026-09-08 —
