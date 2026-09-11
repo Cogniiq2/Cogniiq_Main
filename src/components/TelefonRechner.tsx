@@ -22,9 +22,10 @@
 // KEINE NEUE ABHÄNGIGKEIT. Vier Grundrechenarten brauchen keine Bibliothek und
 // kein Diagramm.
 // ─────────────────────────────────────────────────────────────────────────────
-import { useId, useMemo, useState } from "react";
+import { useCallback, useId, useMemo, useRef, useState } from "react";
 import { ArrowRight, Info } from "lucide-react";
 import { trackEvent } from "@/lib/consent";
+import { RECHNER_LINK } from "@/lib/rechner-anker";
 import {
   ABWICKLUNG,
   FAKTEN,
@@ -52,15 +53,24 @@ import {
 const START_ANRUFE = 300;
 const START_DAUER = 2;
 /*
-  Voreingestellter Automatisierungsanteil.
+  KEIN VORGABEWERT FÜR DEN ROUTINEANTEIL — und das ist der Kern der Korrektur
+  vom 11.09.2026.
 
-  Dies ist die Schätzung des BESUCHERS, keine gemessene Übernahmequote von
-  Cogniiq. Die eigene Quote ist nicht erhoben (OWNER-INPUT F4 offen), deshalb
-  steht hier der zurückhaltende Wert aus der einzigen dokumentierten Spanne und
-  daneben ein Satz, der genau das sagt. Nicht nach oben setzen, solange F4 offen
-  ist: Der Wert steht als Vorgabe vor jedem Besucher.
+  Hier standen 20 %. Die Zahl wurde als „Automatisierungsgrad" beschriftet und
+  las sich damit als Aussage über Cogniiq: der Assistent schafft ein Fünftel.
+  Das ist falsch und verkauft das Produkt weit unter Wert. Einen KONFIGURIERTEN
+  Routineablauf wickelt der Assistent vollständig ab — bis zu 100 % der
+  konfigurierten Routineanrufe, von der Annahme über das Gespräch bis zum
+  abgeschlossenen Vorgang, ohne dass daraus eine Aufgabe für einen Menschen
+  entsteht. Ausnahmen bleiben Ausnahmen: Notfälle, Anliegen außerhalb des
+  konfigurierten Umfangs, bewusst menschlich gehaltene Fälle.
+
+  Was tatsächlich schwankt, ist etwas anderes: WELCHER ANTEIL DER ANRUFE EINES
+  BETRIEBS überhaupt zu diesen Routineabläufen gehört. Das ist eine Eigenschaft
+  des Anrufmix des Kunden, keine Leistungsgrenze des Systems — und deshalb eine
+  Zahl, die nur der Kunde kennt. Sie startet leer. Ein Vorschlagswert wäre hier
+  wieder eine Behauptung im Gewand einer Bequemlichkeit.
 */
-const START_AUTOMATISIERUNG = 20;
 
 const CARD =
   "rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50";
@@ -176,12 +186,48 @@ function Zeile({
   );
 }
 
-export function TelefonRechner() {
+/**
+ * Darstellungsvariante — UND NUR DARSTELLUNG.
+ *
+ * `voll` ist die Fassung der Flaggschiff-Seite: jede Preisposition einzeln,
+ * Sprachwahl, vollständiger Rechenweg.
+ *
+ * `kompakt` ist die Fassung für Seiten, auf denen der Rechner nicht die
+ * Hauptsache ist. Sie lässt Zeilen WEG, sie rechnet nicht anders: Dieselben
+ * Eingaben laufen durch dieselben Funktionen aus
+ * `src/lib/telefonassistent-rechner.ts` und ergeben denselben Tarif, dieselben
+ * Monatskosten und denselben Nettoeffekt. `rechner-konsistenz.test.tsx` prüft
+ * genau das — zwei Fassungen, die bei gleicher Eingabe verschiedene Zahlen
+ * zeigen, wären schlimmer als gar kein zweiter Rechner.
+ */
+export type RechnerVariante = "voll" | "kompakt";
+
+export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVariante } = {}) {
+  const kompakt = variante === "kompakt";
+  /*
+    „Gerechnet" wird EINMAL je Besuch gemeldet, beim ersten Eingriff in ein
+    Feld — nicht bei jedem Tastendruck und nicht bei jeder Reglerbewegung. Ein
+    Ereignis je Schieberpixel wäre Ereignismüll, der keine Auswertung trägt.
+    Gemeldet wird weiterhin nur DASS, nie WOMIT.
+  */
+  const preisGemeldet = useRef(false);
+  const roiGemeldet = useRef(false);
+  const meldePreisStart = useCallback(() => {
+    if (preisGemeldet.current) return;
+    preisGemeldet.current = true;
+    trackEvent("price_calculator_started");
+  }, []);
+  const meldeRoiStart = useCallback(() => {
+    if (roiGemeldet.current) return;
+    roiGemeldet.current = true;
+    trackEvent("roi_calculator_started");
+  }, []);
+
   const [anrufe, setAnrufe] = useState<number | null>(START_ANRUFE);
   const [dauer, setDauer] = useState<number | null>(START_DAUER);
   const [sprachen, setSprachen] = useState<Zusatzsprachen>(0);
   const [stundenkosten, setStundenkosten] = useState<number | null>(null);
-  const [automatisierung, setAutomatisierung] = useState<number | null>(START_AUTOMATISIERUNG);
+  const [routineanteil, setRoutineanteil] = useState<number | null>(null);
   const [chancenOffen, setChancenOffen] = useState(false);
   const [verpasst, setVerpasst] = useState<number | null>(null);
   const [chancenAnteil, setChancenAnteil] = useState<number | null>(null);
@@ -214,12 +260,12 @@ export function TelefonRechner() {
       berechneWirtschaftlichkeit(
         volumen,
         preis,
-        { stundenkostenEur: stundenkosten, automatisierbarProzent: automatisierung ?? 0 },
+        { stundenkostenEur: stundenkosten, routineanteilProzent: routineanteil },
         chancen
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
-      anrufe, dauer, preis, stundenkosten, automatisierung, chancenOffen,
+      anrufe, dauer, preis, stundenkosten, routineanteil, chancenOffen,
       verpasst, chancenAnteil, abschluss, deckungsbeitrag, rueckgewinn,
     ]
   );
@@ -241,7 +287,7 @@ export function TelefonRechner() {
           <Zahlenfeld
             label="Anrufe pro Monat"
             wert={anrufe}
-            onChange={setAnrufe}
+            onChange={(v) => { meldePreisStart(); setAnrufe(v); }}
             min={0}
             max={3000}
             step={10}
@@ -250,7 +296,7 @@ export function TelefonRechner() {
           <Zahlenfeld
             label="Durchschnittliche Gesprächsdauer"
             wert={dauer}
-            onChange={setDauer}
+            onChange={(v) => { meldePreisStart(); setDauer(v); }}
             min={0}
             max={15}
             step={0.5}
@@ -258,6 +304,7 @@ export function TelefonRechner() {
           />
         </div>
 
+        {!kompakt && (
         <fieldset className="mt-6">
           <legend className={LABEL}>Sprachen</legend>
           <p className={`${HINT} mt-1 mb-3`}>{SPRACHEN.text}</p>
@@ -274,7 +321,7 @@ export function TelefonRechner() {
                 key={wert}
                 type="button"
                 aria-pressed={sprachen === wert}
-                onClick={() => setSprachen(wert)}
+                onClick={() => { meldePreisStart(); setSprachen(wert); }}
                 className={`px-4 py-2.5 rounded-lg text-[15px] font-medium border transition-colors ${
                   sprachen === wert
                     ? "border-gray-900 dark:border-gray-100 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
@@ -286,6 +333,7 @@ export function TelefonRechner() {
             ))}
           </div>
         </fieldset>
+        )}
       </div>
 
       {/* ── Ergebnis 1: Preis ───────────────────────────────────────────── */}
@@ -294,8 +342,8 @@ export function TelefonRechner() {
           Was das bei Ihnen kostet
         </h3>
         <p className={`${HINT} mb-5`}>
-          Keine E-Mail nötig. Keine versteckten Annahmen — jede Position steht
-          einzeln, auch die, die noch nicht feststeht.
+          Sofort, ohne E-Mail. Keine Kostenposition wird still weggelassen: Was
+          noch nicht feststeht, steht als offen in der Liste — nicht als Null.
         </p>
 
         <Zeile
@@ -318,11 +366,16 @@ export function TelefonRechner() {
         ) : (
           <>
             <Zeile label="Passender Tarif" wert={s.tarif.name} />
+            {!kompakt && (
             <Zeile
               label="Enthaltene Minuten"
               wert={`${zahl(s.tarif.minuten)} Min.`}
             />
+            )}
+            {!kompakt && (
             <Zeile label="Monatlicher Grundpreis" wert={s.tarif.monatlich} />
+            )}
+            {!kompakt && (
             <Zeile
               label="Mehrverbrauch"
               wert={
@@ -336,6 +389,8 @@ export function TelefonRechner() {
                   : undefined
               }
             />
+            )}
+            {!kompakt && (
             <Zeile
               label="Telefonie pro Monat"
               wert={eur(s.telefonieMonatlichEur, 2)}
@@ -345,6 +400,7 @@ export function TelefonRechner() {
                   : `Obergrenze dieses Tarifs: ${s.tarif.obergrenze} — mehr wird es in keinem Monat.`
               }
             />
+            )}
             {preis.sprachenMonatlichEur > 0 && (
               <Zeile
                 label={
@@ -392,7 +448,7 @@ export function TelefonRechner() {
         </h3>
         <p className={`${HINT} mb-6`}>
           Diese Rechnung läuft ausschließlich mit Ihren Angaben. Wir setzen
-          keinen Stundensatz und keine Einsparquote für Sie ein.
+          weder einen Stundensatz noch einen Routineanteil für Sie ein.
         </p>
 
         <div className="grid sm:grid-cols-2 gap-6 mb-6">
@@ -400,7 +456,7 @@ export function TelefonRechner() {
             label="Vollkosten einer Arbeitsstunde"
             hinweis="Bruttolohn plus Arbeitgeberkosten der Person, die sonst ans Telefon geht."
             wert={stundenkosten}
-            onChange={setStundenkosten}
+            onChange={(v) => { meldeRoiStart(); setStundenkosten(v); }}
             min={0}
             max={150}
             step={1}
@@ -409,22 +465,26 @@ export function TelefonRechner() {
             platzhalter="z. B. 35"
           />
           <Zahlenfeld
-            label="Davon automatisierbare Routineanrufe"
-            hinweis="Ihre Einschätzung. Wir behaupten hier keine Übernahmequote — die hängt an Ihren Anrufanlässen, und eine eigene gemessene Quote veröffentlichen wir nicht."
-            wert={automatisierung}
-            onChange={setAutomatisierung}
+            label="Anteil Ihrer Anrufe, die zu konfigurierten Routineabläufen gehören"
+            hinweis="Ihre Einschätzung Ihres Anrufmix — nicht unsere Erfolgsquote. Diese Routineabläufe wickelt der Cogniiq-Telefonassistent vollständig automatisiert ab. Ausnahmen und bewusst menschlich gehaltene Fälle werden nach Ihren Regeln eskaliert."
+            wert={routineanteil}
+            onChange={(v) => { meldeRoiStart(); setRoutineanteil(v); }}
             min={0}
             max={100}
             step={5}
             einheit="%"
+            schieber={false}
+            platzhalter="z. B. 60"
           />
         </div>
 
         {!wirtschaft.rechenbar ? (
           <p className="text-[16px] text-gray-500 dark:text-gray-400 leading-[1.7] p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-            Tragen Sie oben die Vollkosten einer Arbeitsstunde ein — ohne diesen
-            Wert bleibt diese Rechnung leer. Wir setzen hier keinen typischen
-            Betrag ein.
+            Tragen Sie oben beide Werte ein — Vollkosten einer Arbeitsstunde und
+            den Anteil Ihrer Anrufe, der zu konfigurierten Routineabläufen
+            gehört. Ohne diese beiden Angaben bleibt die Rechnung leer: Wir
+            setzen hier weder einen typischen Stundensatz noch einen
+            Routineanteil für Sie ein.
           </p>
         ) : (
           <div aria-live="polite">
@@ -434,9 +494,9 @@ export function TelefonRechner() {
               hinweis="Gesprächsminuten ÷ 60"
             />
             <Zeile
-              label="Davon potenziell automatisierbar"
+              label="Davon konfigurierte Routineabläufe"
               wert={`${zahl(wirtschaft.automatisierbareStundenProMonat, 1)} Std.`}
-              hinweis={`Telefonzeit × ${zahl(automatisierung ?? 0)} %`}
+              hinweis={`Telefonzeit × ${zahl(routineanteil ?? 0)} % — diese Abläufe wickelt der Assistent vollständig ab, bis zu 100 % der konfigurierten Routineanrufe. Was nicht dazugehört, bleibt bei Ihnen.`}
             />
             <Zeile
               label="Gegenwert dieser Arbeitszeit"
@@ -600,6 +660,21 @@ export function TelefonRechner() {
         Besucher beim Tippen keine Ereignislawine erzeugt.
       */}
       <div className="flex flex-col sm:flex-row gap-3">
+        {/*
+          In der kompakten Fassung führt der erste Weg auf die vollständige
+          Fassung, nicht auf ein Formular: Wer hier rechnet, will erst zu Ende
+          rechnen. Der Demo-Weg bleibt daneben stehen und behält sein Gewicht.
+        */}
+        {kompakt && (
+          <a
+            href={RECHNER_LINK}
+            onClick={() => trackEvent("calculator_anchor_click", "Kompaktrechner")}
+            className="inline-flex items-center justify-center gap-2.5 px-7 py-4 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200 rounded-xl font-semibold text-[15px] hover:border-gray-500 dark:hover:border-gray-500 transition-colors"
+          >
+            Vollständigen Rechner öffnen
+            <ArrowRight size={14} aria-hidden="true" />
+          </a>
+        )}
         <a
           href="/ki-telefonassistent/demo"
           onClick={() => {

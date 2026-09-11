@@ -223,7 +223,7 @@ describe("Wirtschaftlichkeit", () => {
     const r = berechneWirtschaftlichkeit(
       volumen,
       preis,
-      { stundenkostenEur: null, automatisierbarProzent: 30 },
+      { stundenkostenEur: null, routineanteilProzent: 30 },
       KEINE_CHANCEN
     );
     expect(r.rechenbar).toBe(false);
@@ -235,7 +235,7 @@ describe("Wirtschaftlichkeit", () => {
     const r = berechneWirtschaftlichkeit(
       volumen,
       preis,
-      { stundenkostenEur: 30, automatisierbarProzent: 50 },
+      { stundenkostenEur: 30, routineanteilProzent: 50 },
       KEINE_CHANCEN
     );
     expect(r.telefonstundenProMonat).toBeCloseTo((300 * 2) / 60, 10); // 10 h
@@ -247,7 +247,7 @@ describe("Wirtschaftlichkeit", () => {
     const r = berechneWirtschaftlichkeit(
       volumen,
       preis,
-      { stundenkostenEur: 200, automatisierbarProzent: 50 },
+      { stundenkostenEur: 200, routineanteilProzent: 50 },
       KEINE_CHANCEN
     );
     const kosten = preis.monatlichGesamtEur as number;
@@ -260,7 +260,7 @@ describe("Wirtschaftlichkeit", () => {
     const r = berechneWirtschaftlichkeit(
       volumen,
       preis,
-      { stundenkostenEur: 10, automatisierbarProzent: 10 },
+      { stundenkostenEur: 10, routineanteilProzent: 10 },
       KEINE_CHANCEN
     );
     expect(r.nettoProMonatEur).toBeLessThan(0);
@@ -271,7 +271,7 @@ describe("Wirtschaftlichkeit", () => {
     const r = berechneWirtschaftlichkeit(
       volumen,
       preis,
-      { stundenkostenEur: 50, automatisierbarProzent: 0 },
+      { stundenkostenEur: 50, routineanteilProzent: 0 },
       KEINE_CHANCEN
     );
     expect(r.zeitwertProMonatEur).toBe(0);
@@ -281,7 +281,7 @@ describe("Wirtschaftlichkeit", () => {
     const r = berechneWirtschaftlichkeit(
       volumen,
       preis,
-      { stundenkostenEur: 50, automatisierbarProzent: 400 },
+      { stundenkostenEur: 50, routineanteilProzent: 400 },
       KEINE_CHANCEN
     );
     expect(r.automatisierbareStundenProMonat).toBeCloseTo(r.telefonstundenProMonat, 10);
@@ -292,7 +292,7 @@ describe("Wirtschaftlichkeit", () => {
     const r = berechneWirtschaftlichkeit(
       gross,
       berechnePreis(gross, 0),
-      { stundenkostenEur: 50, automatisierbarProzent: 30 },
+      { stundenkostenEur: 50, routineanteilProzent: 30 },
       KEINE_CHANCEN
     );
     expect(r.nettoProMonatEur).toBe(UNBEKANNT);
@@ -304,7 +304,7 @@ describe("Wirtschaftlichkeit", () => {
 describe("Optionale Chancenrechnung", () => {
   const volumen = { anrufeProMonat: 300, minutenProAnruf: 2 };
   const preis = berechnePreis(volumen, 0);
-  const basis = { stundenkostenEur: 40, automatisierbarProzent: 30 };
+  const basis = { stundenkostenEur: 40, routineanteilProzent: 30 };
 
   it("bleibt leer, solange ein einziges Feld fehlt", () => {
     const teil: ChancenEingabe = {

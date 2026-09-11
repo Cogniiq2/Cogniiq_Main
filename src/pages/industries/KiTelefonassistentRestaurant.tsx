@@ -44,7 +44,7 @@ const config: NationalIndustryPageConfig = {
   ],
   solution: {
     headline: "Reservierungen annehmen, während der Service läuft",
-    text: "Der KI Telefonassistent nimmt Reservierungswünsche entgegen, erfasst Personenzahl, Zeitwunsch und Rückrufnummer und übergibt sie strukturiert an den Service. Zehn Anrufe gleichzeitig, ohne Warteschleife. Ihr Serviceteam bleibt bei den Gästen, die bereits am Tisch sitzen.",
+    text: "Der KI Telefonassistent nimmt Reservierungswünsche entgegen, erfasst Personenzahl, Zeitwunsch und Rückrufnummer und übergibt sie strukturiert an den Service. Mehrere Anrufe zur selben Zeit, ohne Warteschleife. Ihr Serviceteam bleibt bei den Gästen, die bereits am Tisch sitzen.",
   },
   benefits: [
     "Tischreservierungen entgegennehmen – auch während des Service",
@@ -76,6 +76,12 @@ const config: NationalIndustryPageConfig = {
         description: "Bestätigung und Erinnerung mit Bestätigungslink gehören nicht zum Standardumfang; wir richten sie als Teil Ihres Ablaufs ein. Ist der Versandweg eingerichtet, erinnern wir erneut an nicht bestätigte Reservierungen, damit der Tisch planbar bleibt.",
       },
     ],
+  },
+  rechner: {
+    ankertext: "Was kostet das bei Ihrer Reservierungsmenge?",
+    kontext: "Restaurant",
+    einleitung:
+      "Der Preis richtet sich nach Ihren Gesprächsminuten, nicht nach der Zahl der Plätze. Rechnen Sie ihn mit Ihrem eigenen Aufkommen aus — sofort und ohne Anfrage.",
   },
   cityLinks: [
     { label: "KI Telefonassistent Bayreuth", href: "/bayreuth/ki-telefonassistent" },

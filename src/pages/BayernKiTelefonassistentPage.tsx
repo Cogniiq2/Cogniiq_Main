@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Phone, Clock, Calendar, CircleCheck as CheckCircle2, MapPin, Zap, Users, Shield, Wrench, Stethoscope, Chrome as Home, Briefcase, Building2 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
+import { RechnerCta } from "@/components/RechnerCta";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -211,6 +212,20 @@ function HeroSection() {
               <ArrowRight size={15} />
             </Link>
           </div>
+
+          {/*
+            Bayerische Betriebe, die hier landen, fragen als erstes nach dem
+            Preis — und die Seite hat bis hierher keinen genannt, weil er vom
+            Anrufaufkommen abhängt. Der Verweis führt auf den Rechner, nicht auf
+            eine weitere Preisseite: Die Preisintention bleibt dort, wo sie
+            hingehört, hier steht nur das Werkzeug.
+          */}
+          <RechnerCta
+            variante="zeile"
+            ankertext="Kosten ohne Anfrage berechnen"
+            kontext="Bayern"
+            className="mb-8"
+          />
 
           <div className="flex flex-wrap gap-6">
             {[

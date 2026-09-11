@@ -1,478 +1,234 @@
-import { motion, useInView, animate } from 'framer-motion';
-import { useRef, useState, useEffect, useCallback } from 'react';
+// ─────────────────────────────────────────────────────────────────────────────
+// Mensch vs. KI-Empfang — ein VERGLEICH, kein Rechner (Stand 11.09.2026).
+//
+// WAS HIER VORHER STAND UND WARUM ES WEG MUSSTE.
+//
+// Diese Datei war der zweite Rechner der Startseite. Sie hatte eigene Regler
+// für Personalkosten, einen eigenen Wochenfaktor (4,3, während der Praxis-
+// Rechner mit 4,33 rechnete) und — das Schwerwiegendste — eine eigene
+// Preisbehauptung:
+//
+//     const KI_PRICE_MONTHLY = 297;
+//
+// 297 € stand in keiner Tarifliste. Die veröffentlichten Tarife beginnen bei
+// 300 € und richten sich nach dem Minutenkontingent; für einen Besucher mit
+// 800 Anrufen im Monat rechnet das kanonische Modell etwas völlig anderes aus.
+// Die Seite behauptete damit einen Preis, den sie im selben Atemzug an anderer
+// Stelle widerlegte, und leitete daraus eine „Ersparnis" und eine
+// „Jahresersparnis" ab — zwei große grüne Zahlen auf einer erfundenen Basis.
+//
+// WAS JETZT HIER STEHT. Der Vergleich, der tatsächlich trägt: was ein Mensch
+// am Empfang leisten kann und was ein Assistent leisten kann, Eigenschaft für
+// Eigenschaft, mit den Grenzen beider Seiten offen benannt. Keine Zahl, die
+// nicht aus `telefonassistent-copy.ts` kommt.
+//
+// WER DEN PREIS WISSEN WILL, bekommt ihn eine Sektion weiter oben — aus dem
+// einen Rechenkern des Projekts, mit den eigenen Zahlen des Besuchers. Der
+// Verweis unten führt dorthin.
+// ─────────────────────────────────────────────────────────────────────────────
+import { motion, useInView } from 'framer-motion';
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  ArrowRight, CircleCheck as CheckCircle, X, Info,
-  User, Bot, TrendingDown,
-} from 'lucide-react';
-import { type Industry, INDUSTRY_PRESETS } from '@/lib/roi-presets';
+import { ArrowRight, Calculator, CircleCheck as CheckCircle, X, User, Bot } from 'lucide-react';
+import { trackEvent } from '@/lib/consent';
+import { RECHNER_LINK, RECHNER_VERSPRECHEN } from '@/lib/rechner-anker';
+import { FAKTEN } from '@/lib/telefonassistent-copy';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
-const INDUSTRY_ICONS: Record<Industry, string> = {
-  Arztpraxis:     '🏥',
-  Gastronomie:    '🍽️',
-  Dienstleistung: '⚙️',
-  Immobilien:     '🏢',
-};
+/*
+  Der Vergleich ist bewusst in beide Richtungen ehrlich. Eine Tabelle, in der
+  eine Spalte durchgehend gewinnt, liest sich als Werbung und wird nicht
+  geglaubt — und wäre hier auch falsch: Es gibt Anliegen, die ein Mensch besser
+  auffängt, und die stehen als solche drin.
+*/
+const VERGLEICH: Array<{ label: string; mensch: boolean; ki: boolean; hinweis?: string }> = [
+  { label: 'Anrufe zu den Öffnungszeiten annehmen', mensch: true, ki: true },
+  { label: 'Anrufe außerhalb der Öffnungszeiten annehmen', mensch: false, ki: true },
+  { label: 'Mehrere Anrufe zur selben Zeit annehmen', mensch: false, ki: true },
+  {
+    label: 'Konfigurierte Routineabläufe vollständig abwickeln',
+    mensch: true,
+    ki: true,
+    hinweis: 'Termin buchen, verschieben, absagen, vorgegebene Fragen beantworten — ohne dass daraus eine Aufgabe für einen Menschen entsteht.',
+  },
+  {
+    label: 'Anliegen außerhalb des konfigurierten Umfangs entscheiden',
+    mensch: true,
+    ki: false,
+    hinweis: 'Der Assistent eskaliert diese Fälle nach Ihren Regeln, statt sie zu raten.',
+  },
+  {
+    label: 'Notfälle und heikle Situationen einschätzen',
+    mensch: true,
+    ki: false,
+    hinweis: 'Notfälle werden erkannt und sofort weitergeleitet, nie eingeschätzt.',
+  },
+  { label: 'Kein Urlaub, keine Krankheit, keine Pause', mensch: false, ki: true },
+  { label: 'Auftragsverarbeitungsvertrag nach Art. 28 DSGVO', mensch: true, ki: true },
+];
 
-// [[CLAIM: verify — 297 € ist ein Beispielwert und weicht von den publizierten
-// Preisstaffeln (99/199–399/499 €) ab; vom Inhaber vereinheitlichen (OWNER-INPUT A1)]]
-const KI_PRICE_MONTHLY = 297;
-
-function AnimatedNumber({ value, prefix = '', suffix = '', decimals = 0 }: { value: number; prefix?: string; suffix?: string; decimals?: number }) {
-  const [display, setDisplay] = useState(value);
-  const prevValue = useRef(value);
-  useEffect(() => {
-    const controls = animate(prevValue.current, value, {
-      duration: 0.7,
-      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-      onUpdate: (v) => setDisplay(parseFloat(v.toFixed(decimals))),
-      onComplete: () => { prevValue.current = value; },
-    });
-    return () => controls.stop();
-  }, [value, decimals]);
-
-  const formatted = decimals > 0
-    ? display.toLocaleString('de-DE', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
-    : Math.round(display).toLocaleString('de-DE');
-
-  return <span>{prefix}{formatted}{suffix}</span>;
-}
-
-interface SliderProps {
-  label: string;
-  hint?: string;
-  tooltip?: string;
-  value: number;
-  min: number;
-  max: number;
-  step: number;
-  unit: string;
-  onChange: (v: number) => void;
-}
-
-function MiniSlider({ label, hint, tooltip, value, min, max, step, unit, onChange }: SliderProps) {
-  const pct = ((value - min) / (max - min)) * 100;
-  const [showTip, setShowTip] = useState(false);
-
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-1.5">
-        <div className="flex items-center gap-1.5">
-          <span className="text-[12.5px] font-medium text-gray-700">{label}</span>
-          {hint && <span className="text-[11px] text-gray-400">{hint}</span>}
-          {tooltip && (
-            <div className="relative flex-shrink-0">
-              <button
-                type="button"
-                onMouseEnter={() => setShowTip(true)}
-                onMouseLeave={() => setShowTip(false)}
-                className="text-gray-300 hover:text-gray-500 transition-colors"
-              >
-                <Info size={11} />
-              </button>
-              {showTip && (
-                <div className="absolute left-6 top-0 z-20 w-52 bg-gray-900 text-white text-[11px] leading-relaxed rounded-lg px-3 py-2 shadow-xl">
-                  {tooltip}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-        <span className="text-[13px] font-bold text-gray-900 tabular-nums">
-          {value.toLocaleString('de-DE')} {unit}
-        </span>
-      </div>
-      <div className="relative h-1 bg-gray-100 rounded-full">
-        <div
-          className="absolute left-0 top-0 h-full bg-gray-700 rounded-full transition-all duration-150"
-          style={{ width: `${pct}%` }}
-        />
-        <input
-          type="range"
-          min={min}
-          max={max}
-          step={step}
-          value={value}
-          onChange={(e) => onChange(Number(e.target.value))}
-          className="absolute inset-0 w-full opacity-0 cursor-pointer h-full"
-        />
-      </div>
-    </div>
-  );
-}
-
-const HUMAN_CAPABILITIES = [
-  { label: 'Anrufe annehmen', human: true, ki: true },
-  { label: 'Terminwünsche außerhalb der Öffnungszeiten aufnehmen', human: false, ki: true },
-  { label: 'Gleichzeitige Anrufe', human: false, ki: true },
-  { label: 'Kein Urlaub, keine Krankheit', human: false, ki: true },
-  { label: 'Empathische Sonderfälle', human: true, ki: false },
-  { label: 'Auftragsverarbeitungsvertrag nach Art. 28 DSGVO', human: true, ki: true },
+const MENSCH_GRENZEN = [
+  'Nur zu den Zeiten erreichbar, zu denen jemand am Platz ist',
+  'Ein Gespräch zur selben Zeit, danach besetzt',
+  'Urlaub, Krankheit und Stoßzeiten fallen auf den Rest des Teams zurück',
+  'Zusätzliches Aufkommen kostet zusätzliche Stunden',
 ];
 
 export function CostComparisonSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.06 });
 
-  const [industry, setIndustry] = useState<Industry>('Arztpraxis');
-
-  const preset = INDUSTRY_PRESETS[industry];
-  const [humanHours, setHumanHours] = useState(preset.adminHours);
-  const [humanRate, setHumanRate] = useState(preset.hourlyRate);
-  const [humanAbsence, setHumanAbsence] = useState(15);
-
-  const applyPreset = useCallback((ind: Industry) => {
-    const p = INDUSTRY_PRESETS[ind];
-    setHumanHours(p.adminHours);
-    setHumanRate(p.hourlyRate);
-  }, []);
-
-  const handleIndustryChange = (ind: Industry) => {
-    setIndustry(ind);
-    applyPreset(ind);
-  };
-
-  const humanBaseCost = Math.round(humanHours * 4.3 * humanRate);
-  const humanAbsenceCost = Math.round((humanAbsence / 100) * humanBaseCost);
-  const humanTotalMonth = humanBaseCost + humanAbsenceCost;
-
-  const kiMonthly = KI_PRICE_MONTHLY;
-  const saving = humanTotalMonth - kiMonthly;
-  const savingPercent = humanTotalMonth > 0 ? Math.round((saving / humanTotalMonth) * 100) : 0;
-  const annualSaving = saving * 12;
-
   return (
     <section
       ref={ref}
-      className="py-28 bg-white border-t border-gray-100 overflow-hidden"
+      className="py-28 bg-white dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 overflow-hidden"
       aria-labelledby="cost-compare-heading"
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto px-6 lg:px-8">
 
-        {/* ─── Header ─── */}
-<div className="max-w-2xl mb-14">
-  <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-gray-400 mb-5">
-    Direktvergleich
-  </p>
-
-  <h2
-    id="cost-compare-heading"
-    className="text-4xl lg:text-5xl font-bold text-gray-900 leading-[1.06] tracking-[-0.022em] mb-5"
-  >
-    Menschlicher Assistent
-    <br />
-    <span className="text-gray-200">vs. KI-Telefonassistent</span>
-  </h2>
-
-  <p className="text-[15.5px] text-gray-500 leading-[1.72]">
-    Stellen Sie Ihre Personalkosten ein — und sehen Sie sofort, was der Unterschied
-    für Ihr Unternehmen bedeutet. Die Zahlen sind Ihre, nicht unsere.
-  </p>
-</div>
-        {/* ─── Industry selector ─── */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.08, ease: EASE }}
-          className="flex flex-wrap gap-2 mb-10"
-        >
-          <span className="text-[12px] text-gray-400 self-center mr-1">Branche:</span>
-          {(Object.keys(INDUSTRY_PRESETS) as Industry[]).map((ind) => (
-            <button
-              key={ind}
-              type="button"
-              onClick={() => handleIndustryChange(ind)}
-              className={`inline-flex items-center gap-1.5 text-[12px] font-semibold px-3.5 py-1.5 rounded-xl border transition-all duration-200 ${
-                industry === ind
-                  ? 'bg-gray-950 text-white border-gray-950'
-                  : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400 hover:text-gray-700'
-              }`}
-            >
-              <span>{INDUSTRY_ICONS[ind]}</span>
-              {ind}
-            </button>
-          ))}
-        </motion.div>
+        <div className="max-w-2xl mb-14">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-gray-400 mb-5">
+            Direktvergleich
+          </p>
+          <h2
+            id="cost-compare-heading"
+            className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-[1.06] tracking-[-0.022em] mb-5"
+          >
+            Menschlicher Empfang
+            <br />
+            <span className="text-gray-300 dark:text-gray-600">und KI-Telefonassistent</span>
+          </h2>
+          <p className="text-[15.5px] text-gray-500 dark:text-gray-400 leading-[1.72]">
+            Der Vergleich nach Eigenschaften, in beide Richtungen. Was der
+            Assistent bei Ihrem Anrufaufkommen kostet, rechnen Sie eine Sektion
+            weiter oben mit Ihren eigenen Zahlen aus — hier steht bewusst kein
+            Beispielpreis, der für Ihren Betrieb ohnehin nicht gälte.
+          </p>
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.65, delay: 0.12, ease: EASE }}
-          className="grid lg:grid-cols-[1fr_1fr_400px] gap-5 items-start"
+          transition={{ duration: 0.65, delay: 0.1, ease: EASE }}
+          className="grid lg:grid-cols-[1fr_320px] gap-6 items-start"
         >
 
-          {/* ─── COLUMN 1: Human assistant ─── */}
-          <div className="bg-gray-50 border border-gray-200 rounded-2xl overflow-hidden">
-            <div className="px-8 py-6 border-b border-gray-200 bg-gray-100/50">
-              <div className="flex items-center gap-3 mb-1">
-                <div className="w-8 h-8 rounded-xl bg-white border border-gray-200 flex items-center justify-center">
-                  <User size={14} className="text-gray-500" />
-                </div>
-                <h3 className="text-[15px] font-bold text-gray-800">Menschlicher Assistent</h3>
-              </div>
-              <p className="text-[11.5px] text-gray-500">Ihre heutige Situation — personalisierbar</p>
+          {/* ─── Eigenschaftsvergleich ─── */}
+          <div className="bg-white dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 rounded-2xl p-7 sm:p-8">
+            <div className="flex justify-end gap-6 pb-3 mb-2 border-b border-gray-100 dark:border-gray-800">
+              <span className="text-[10px] uppercase tracking-wider text-gray-400 flex items-center gap-1">
+                <User size={10} aria-hidden="true" /> Mensch
+              </span>
+              <span className="text-[10px] uppercase tracking-wider text-gray-400 flex items-center gap-1">
+                <Bot size={10} aria-hidden="true" /> Assistent
+              </span>
             </div>
-
-            <div className="px-8 py-6 space-y-6">
-              <MiniSlider
-                label="Admin-Stunden / Woche"
-                hint="für Telefon & Koordination"
-                tooltip="Wie viele Stunden verbringt Ihr Personal pro Woche mit Telefonie und Terminverwaltung?"
-                value={humanHours}
-                min={2} max={40} step={1} unit="h"
-                onChange={setHumanHours}
-              />
-              <MiniSlider
-                label="Stundensatz (inkl. AG-Kosten)"
-                tooltip="Bruttogehalt + Sozialabgaben + Nebenkosten. Typisch: 25–50 €/h."
-                value={humanRate}
-                min={12} max={80} step={1} unit="€/h"
-                onChange={setHumanRate}
-              />
-              <MiniSlider
-                label="Ausfallquote"
-                hint="Urlaub, Krankheit, Pausen"
-                tooltip="Wie viel Prozent der Arbeitszeit ist Ihr Assistent durch Urlaub, Krankheit oder Pausen nicht erreichbar? Der Startwert ist ein frei änderbares Beispiel, keine Branchenstatistik."
-                value={humanAbsence}
-                min={0} max={40} step={1} unit="%"
-                onChange={setHumanAbsence}
-              />
-
-              <div className="pt-2 border-t border-gray-200 space-y-2.5">
-                <div className="flex justify-between text-[12.5px]">
-                  <span className="text-gray-500">Grundkosten / Monat</span>
-                  <span className="font-semibold text-gray-700 tabular-nums">
-                    <AnimatedNumber value={humanBaseCost} suffix=" €" />
-                  </span>
+            {VERGLEICH.map((zeile, i) => (
+              <div
+                key={zeile.label}
+                className={`flex items-start justify-between gap-6 py-3.5 ${
+                  i > 0 ? 'border-t border-gray-100 dark:border-gray-800' : ''
+                }`}
+              >
+                <div className="min-w-0">
+                  <span className="text-[13.5px] text-gray-700 dark:text-gray-300">{zeile.label}</span>
+                  {zeile.hinweis && (
+                    <p className="text-[12px] text-gray-400 dark:text-gray-500 mt-0.5 leading-relaxed">
+                      {zeile.hinweis}
+                    </p>
+                  )}
                 </div>
-                <div className="flex justify-between text-[12.5px]">
-                  <span className="text-gray-500">Ausfallkosten / Monat</span>
-                  <span className="font-semibold text-gray-700 tabular-nums">
-                    + <AnimatedNumber value={humanAbsenceCost} suffix=" €" />
-                  </span>
-                </div>
-                <div className="flex justify-between pt-2 border-t border-gray-200">
-                  <span className="text-[14px] font-bold text-gray-900">Gesamt / Monat</span>
-                  <span className="text-[20px] font-bold text-gray-900 tabular-nums">
-                    <AnimatedNumber value={humanTotalMonth} suffix=" €" />
-                  </span>
+                <div className="flex items-center gap-6 flex-shrink-0 pt-0.5">
+                  <Marke an={zeile.mensch} />
+                  <Marke an={zeile.ki} gruen />
                 </div>
               </div>
-
-              <div className="space-y-2 pt-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-400 mb-3">
-                  Einschränkungen
-                </p>
-                {[
-                  'Nur zu Öffnungszeiten erreichbar',
-                  'Kein Anruf nach Feierabend',
-                  'Krank, Urlaub, Stoßzeiten',
-                  'Teuer in der Skalierung',
-                ].map((limit) => (
-                  <div key={limit} className="flex items-center gap-2.5">
-                    <div className="w-4 h-4 rounded-full bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0">
-                      <X size={8} className="text-red-400" />
-                    </div>
-                    <span className="text-[12px] text-gray-500">{limit}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            ))}
           </div>
 
-          {/* ─── COLUMN 2: KI assistant ─── */}
-          <div className="bg-gray-950 border border-white/[0.06] rounded-2xl overflow-hidden relative">
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{ background: 'radial-gradient(ellipse at 60% 0%, rgba(2,132,199,0.10) 0%, transparent 55%)' }}
-            />
-            <div
-              className="absolute top-0 left-0 right-0 h-px"
-              style={{ background: 'linear-gradient(90deg, transparent, rgba(2,132,199,0.4), rgba(16,185,129,0.2), transparent)' }}
-            />
-
-            <div data-review-claim="preis-beispielwert" className="relative px-8 py-6 border-b border-white/[0.06]">
-              <div className="flex items-center gap-3 mb-1">
-                <div className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
-                  <Bot size={14} className="text-sky-400" />
-                </div>
-                <h3 className="text-[15px] font-bold text-white">Cogniiq KI-Assistent</h3>
-                <span className="ml-auto text-[9.5px] font-semibold text-emerald-400/70 bg-emerald-500/10 border border-emerald-500/15 px-2 py-0.5 rounded-full">
-                  Empfohlen
-                </span>
-              </div>
-              <p className="text-[11.5px] text-gray-500">Beispielwert. Fester Monatsbetrag, im Angebot verbindlich.</p>
-            </div>
-
-            <div className="relative px-8 py-6">
-              {/* Fixed price display */}
-              <div className="mb-6 pb-6 border-b border-white/[0.05]">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-600 mb-3">
-                  Monatliche Investition
-                </p>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-[42px] font-bold text-white tabular-nums leading-none">
-                    {KI_PRICE_MONTHLY}&nbsp;€
-                  </span>
-                  <span className="text-[13px] text-gray-500">/ Monat</span>
-                </div>
-                {/* [[CLAIM: verify — Vertragskonditionen (kündbar monatlich) OWNER-INPUT A4/A5]] */}
-                <p className="text-[11.5px] text-gray-600 mt-2">
-                  Einmalige Einrichtung wird im Angebot ausgewiesen · Laufzeit und Kündigung stehen im Vertrag
-                </p>
-              </div>
-
-              {/* What's included */}
-              <div className="space-y-2 mb-6">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-600 mb-3">
-                  Was enthalten ist
-                </p>
-                {[
-                  'Anrufannahme außerhalb der Öffnungszeiten — kein Besetztzeichen',
-                  'Terminwunsch und Anliegen strukturiert aufgenommen',
-                  'Anbindung an Kalender oder Praxissystem wird vorab geprüft',
-                  'Zehn Anrufe gleichzeitig, ohne Warteschleife',
-                  'Keine Gesprächsaufzeichnung — nur das strukturierte Ergebnis',
-                  'Laufende Optimierung inklusive',
-                ].map((feature) => (
-                  <div key={feature} className="flex items-center gap-2.5">
-                    <div className="w-4 h-4 rounded-full bg-emerald-500/10 border border-emerald-500/15 flex items-center justify-center flex-shrink-0">
-                      <CheckCircle size={8} className="text-emerald-400" />
-                    </div>
-                    <span className="text-[12px] text-gray-400">{feature}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Simulated cost total */}
-              <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4">
-                <div className="flex justify-between pt-2">
-                  <span className="text-[14px] font-bold text-gray-300">Gesamt / Monat</span>
-                  <span className="text-[20px] font-bold text-white tabular-nums">
-                    {KI_PRICE_MONTHLY}&nbsp;€
-                  </span>
-                </div>
-                <p className="text-[10.5px] text-gray-700 mt-1.5">
-                  Fixpreis. Keine Überraschungen.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* ─── COLUMN 3: Saving summary ─── */}
+          {/* ─── Seitenspalte ─── */}
           <div className="flex flex-col gap-4">
-
-            {/* Savings card */}
-            <div className="relative bg-emerald-950/80 border border-emerald-900/40 rounded-2xl p-7 overflow-hidden">
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(16,185,129,0.15) 0%, transparent 60%)' }}
-              />
-              <div
-                className="absolute top-0 left-0 right-0 h-px"
-                style={{ background: 'linear-gradient(90deg, transparent, rgba(16,185,129,0.5), transparent)' }}
-              />
-
-              <div className="relative">
-                <div className="flex items-center gap-2 mb-4">
-                  <TrendingDown size={13} className="text-emerald-400" />
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-700">
-                    Ihre Ersparnis
-                  </p>
-                </div>
-
-                <p className="text-[13px] text-emerald-300/70 mb-1">Sie sparen jeden Monat</p>
-                <p className="text-[40px] font-bold text-emerald-300 tabular-nums leading-none mb-1">
-                  <AnimatedNumber value={Math.max(saving, 0)} suffix=" €" />
-                </p>
-                <p className="text-[12px] text-emerald-500/60 mb-6">
-                  = <AnimatedNumber value={Math.max(savingPercent, 0)} suffix="%" /> weniger als heute
-                </p>
-
-                <div className="flex items-baseline gap-1.5 bg-emerald-900/40 border border-emerald-800/40 rounded-xl p-4">
-                  <div>
-                    <p className="text-[10px] text-emerald-600 uppercase tracking-wide font-semibold mb-1">
-                      Jahresersparnis
-                    </p>
-                    <p className="text-[26px] font-bold text-emerald-300 tabular-nums leading-none">
-                      <AnimatedNumber value={Math.max(annualSaving, 0)} suffix=" €" />
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Capability comparison */}
-            <div className="bg-white border border-gray-100 rounded-2xl p-6">
+            <div className="bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 rounded-2xl p-6">
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-400 mb-4">
-                Leistungsvergleich
+                Woran ein reiner Personalempfang hängt
               </p>
-              <div className="space-y-0">
-                {HUMAN_CAPABILITIES.map((cap, i) => (
-                  <div
-                    key={cap.label}
-                    className={`flex items-center justify-between py-2.5 ${i > 0 ? 'border-t border-gray-100' : ''}`}
-                  >
-                    <span className="text-[12px] text-gray-600">{cap.label}</span>
-                    <div className="flex items-center gap-3 flex-shrink-0">
-                      <div
-                        className={`w-5 h-5 rounded-full flex items-center justify-center ${cap.human ? 'bg-gray-100' : 'bg-red-50'}`}
-                      >
-                        {cap.human
-                          ? <CheckCircle size={9} className="text-gray-400" />
-                          : <X size={8} className="text-red-400" />
-                        }
-                      </div>
-                      <div
-                        className={`w-5 h-5 rounded-full flex items-center justify-center ${cap.ki ? 'bg-emerald-50' : 'bg-gray-50'}`}
-                      >
-                        {cap.ki
-                          ? <CheckCircle size={9} className="text-emerald-500" />
-                          : <X size={8} className="text-gray-300" />
-                        }
-                      </div>
-                    </div>
+              <div className="space-y-2.5">
+                {MENSCH_GRENZEN.map((grenze) => (
+                  <div key={grenze} className="flex items-start gap-2.5">
+                    <X size={11} className="text-gray-400 flex-shrink-0 mt-1" aria-hidden="true" />
+                    <span className="text-[12.5px] text-gray-600 dark:text-gray-400 leading-relaxed">
+                      {grenze}
+                    </span>
                   </div>
                 ))}
-                <div className="flex justify-end gap-5 pt-3 border-t border-gray-100">
-                  <span className="text-[10px] text-gray-400 flex items-center gap-1">
-                    <User size={9} /> Mensch
-                  </span>
-                  <span className="text-[10px] text-emerald-600 flex items-center gap-1">
-                    <Bot size={9} /> KI
-                  </span>
-                </div>
               </div>
             </div>
 
-            {/* CTA */}
-            <div className="bg-gray-950 rounded-2xl p-6 relative overflow-hidden">
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{ background: 'radial-gradient(ellipse at 70% 20%, rgba(2,132,199,0.08) 0%, transparent 55%)' }}
-              />
-              <div className="relative">
-                <p className="text-[14px] font-bold text-white mb-1.5">
-                  KI-Assistent live nach Ihrer Freigabe
-                </p>
-                <p className="text-[12px] text-gray-500 mb-5 leading-relaxed">
-                  Klare Vertragskonditionen · persönliche Einrichtung
-                </p>
-                <Link
-                  to="/kontakt"
-                  className="group w-full inline-flex items-center justify-center gap-2.5 bg-white text-gray-900 font-semibold text-[13px] rounded-xl h-11 px-5 hover:bg-gray-50 transition-colors"
-                >
-                  Nächster Schritt
-                  <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
-                </Link>
-              </div>
+            {/*
+              Der Verweis auf den Rechner steht bewusst HIER: Wer bis hierher
+              gelesen hat, hat die Leistungsfrage geklärt und stellt als
+              nächstes die Preisfrage. Das Versprechen daneben ist das, was sich
+              belegen lässt — nicht „keine versteckten Kosten", denn Gebühren
+              Dritter für eine Schnittstelle stehen erst nach der technischen
+              Prüfung fest.
+            */}
+            <div className="bg-gray-950 dark:bg-gray-900 rounded-2xl p-6">
+              <p className="text-[14px] font-bold text-white mb-1.5">
+                Was kostet das bei Ihnen?
+              </p>
+              <p className="text-[12px] text-gray-400 mb-5 leading-relaxed">
+                {RECHNER_VERSPRECHEN}
+              </p>
+              <a
+                href={RECHNER_LINK}
+                onClick={() => trackEvent('calculator_anchor_click', 'Direktvergleich')}
+                className="group w-full inline-flex items-center justify-center gap-2.5 bg-white text-gray-900 font-semibold text-[13px] rounded-xl h-11 px-5 hover:bg-gray-100 transition-colors"
+              >
+                <Calculator size={13} aria-hidden="true" />
+                Eigenen Preis berechnen
+              </a>
+              <p className="text-[11px] text-gray-500 mt-3 leading-relaxed">
+                {FAKTEN.preisgarantie}
+              </p>
             </div>
+
+            <Link
+              to="/kontakt"
+              onClick={() => trackEvent('cta_kontakt_click', 'Direktvergleich')}
+              className="group inline-flex items-center justify-center gap-2.5 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-semibold text-[13px] rounded-xl h-11 px-5 hover:border-gray-400 transition-colors"
+            >
+              Kostenloses Erstgespräch
+              <ArrowRight size={13} aria-hidden="true" className="transition-transform group-hover:translate-x-1" />
+            </Link>
           </div>
 
         </motion.div>
       </div>
     </section>
+  );
+}
+
+function Marke({ an, gruen = false }: { an: boolean; gruen?: boolean }) {
+  return (
+    <div
+      className={`w-5 h-5 rounded-full flex items-center justify-center ${
+        an
+          ? gruen
+            ? 'bg-emerald-50 dark:bg-emerald-500/10'
+            : 'bg-gray-100 dark:bg-gray-800'
+          : 'bg-gray-50 dark:bg-gray-800/50'
+      }`}
+    >
+      {an ? (
+        <CheckCircle
+          size={9}
+          className={gruen ? 'text-emerald-500' : 'text-gray-400'}
+          aria-label="ja"
+        />
+      ) : (
+        <X size={8} className="text-gray-300 dark:text-gray-600" aria-label="nein" />
+      )}
+    </div>
   );
 }

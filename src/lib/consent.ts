@@ -329,7 +329,10 @@ export type ConversionEvent =
   // Die Rechner melden NUR, dass gerechnet wurde. Anrufaufkommen, Stundensätze
   // und Deckungsbeiträge sind Geschäftszahlen des Besuchers; sie bleiben im
   // Browser und haben in keinem Parameter dieser Funktion etwas zu suchen.
+  | 'calculator_anchor_click'
+  | 'price_calculator_started'
   | 'price_calculator_completed'
+  | 'roi_calculator_started'
   | 'roi_calculator_completed';
 
 export function trackEvent(event: ConversionEvent, label?: string) {

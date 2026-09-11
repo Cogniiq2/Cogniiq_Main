@@ -87,6 +87,12 @@ const config: NationalIndustryPageConfig = {
       },
     ],
   },
+  rechner: {
+    ankertext: "Kosten und Wirtschaftlichkeit selbst prüfen",
+    kontext: "Praxis",
+    einleitung:
+      "Bevor Sie ein Angebot anfordern: Der Rechner nennt den passenden Tarif für Ihr Anrufaufkommen, die einmalige Einrichtung und — mit Ihren eigenen Stundenkosten — ab wann sich das trägt.",
+  },
   cityLinks: [
     { label: "KI Telefonassistent Bayreuth", href: "/bayreuth/ki-telefonassistent" },
     { label: "KI Telefonassistent München", href: "/muenchen/ki-telefonassistent" },

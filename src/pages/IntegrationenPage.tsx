@@ -21,6 +21,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
+import { RechnerCta } from "@/components/RechnerCta";
 import { ANBINDUNG, CTA, FAKTEN, UEBERGABE } from "@/lib/telefonassistent-copy";
 
 const base = BUSINESS_INFO.website;
@@ -222,6 +223,23 @@ export function IntegrationenPage() {
               <ArrowRight size={16} aria-hidden="true" />
             </Link>
             <p className="mt-4 text-[15px] text-gray-500 dark:text-gray-500">{CTA.microcopy}</p>
+          </div>
+        </section>
+
+        {/*
+          Der Rechner gehört genau auf DIESE Seite, und zwar aus einem Grund,
+          der nirgends sonst so gilt: Er weist die Anbindungskosten als offene
+          Position aus, statt sie auf null zu setzen. Das ist dieselbe Haltung,
+          die diese Seite vertritt — und die einzige ehrliche Antwort auf die
+          Frage, die ein Besucher hier stellt.
+        */}
+        <section className={`${SECTION} border-t border-gray-100 dark:border-gray-800`}>
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
+            <RechnerCta
+              ankertext="Laufende Kosten jetzt berechnen"
+              kontext="Integrationen"
+              einleitung="Was eine kundenspezifische Anbindung kostet, steht erst nach der technischen Prüfung fest — auch Gebühren, die Dritte für eine Schnittstelle verlangen. Der Rechner weist diese Position deshalb als offen aus und nicht als null. Alles Übrige — Tarif, Monatsbetrag, Einrichtung — können Sie sofort ausrechnen."
+            />
           </div>
         </section>
 

@@ -5,6 +5,31 @@
 // erklärender Text stehen dort statisch im HTML, damit sie im Prerender
 // enthalten bleiben.
 //
+// EINGEFROREN. Diese Komponente bedient seit dem 11.09.2026 nur noch EINE
+// Seite: die Kostenseite, ein laufendes SEO-Experiment, dessen gerenderte Bytes
+// bis zum Ende der Messung unverändert bleiben müssen. `/praxen` zeigt seither
+// den kanonischen Rechner (`TelefonRechner`).
+//
+// Daraus folgt für Änderungen hier:
+//   • Kein sichtbarer Text, kein Bauteil, keine Reihenfolge wird angefasst,
+//     solange das Experiment läuft. `src/protectedExperiments.test.tsx` fängt
+//     jeden Versuch ab.
+//   • Der voreingestellte Automatisierungsgrad von 20 % überlebt AUSSCHLIESSLICH
+//     hier, und ausschließlich als eingefrorene Anzeige. Er ist inhaltlich
+//     überholt: Einen konfigurierten Routineablauf wickelt der Assistent
+//     vollständig ab. Auf jeder nicht eingefrorenen Fläche ist dieser Vorgabewert
+//     entfernt. Sobald das Experiment endet, wird diese Komponente durch
+//     `TelefonRechner` ersetzt und gelöscht — notiert in
+//     docs/seo/post-experiment-opportunities.md.
+//
+// DIE ARITHMETIK IST TROTZDEM VEREINHEITLICHT. Tarifwahl, Mehrverbrauch und
+// Deckelung kamen aus einer zweiten, handgeschriebenen Rechnung, die die
+// ANZEIGESTRINGS der Preisseite mit `betragZuZahl` zurück in Zahlen parste —
+// Geschäftslogik, die an einer Tausenderpunkt-Formatierung hing. Sie kommen
+// jetzt aus `src/lib/telefonassistent-rechner.ts`, dem einen Rechenkern des
+// Projekts. Die gerenderten Zahlen sind dieselben; `rechner-konsistenz.test.ts`
+// hält beide Seiten aneinander.
+//
 // Regeln, die hier bindend sind:
 // - Zwei getrennte Kennzahlen. Angenommene Anrufe und eingesparte
 //   Bearbeitungszeit werden NIE zu einer Zahl zusammengefasst.
@@ -15,14 +40,15 @@
 // - Alle Tarifzahlen aus TARIFE — keine Zahl wird hier erneut getippt.
 // ─────────────────────────────────────────────────────────────────────────────
 import { useState } from "react";
-import { RECHNER, TARIFE, type Tarif } from "@/lib/telefonassistent-copy";
+import { FAKTEN, RECHNER, type Tarif } from "@/lib/telefonassistent-copy";
+import {
+  WOCHEN_PRO_MONAT,
+  anrufeProMonatAusWoche,
+  waehleSzenario,
+} from "@/lib/telefonassistent-rechner";
 
-/** Wochen je Monat, gerundet. */
-const WOCHEN_PRO_MONAT = 4.33;
 /** Gesprächsdauer je Anruf — dieselbe Annahme wie auf der Preisseite. */
 const MINUTEN_PRO_ANRUF = 2;
-/** Preis je Minute über dem Kontingent. */
-const MEHRPREIS_PRO_MINUTE = 0.39;
 /** Unteres Ende des Reglers. Der Voreinstellwert steht in AUTOMATISIERUNG_STANDARD. */
 const AUTOMATISIERUNG_MIN = 10;
 /**
@@ -57,10 +83,6 @@ function zahl(v: number): string {
   return Math.round(v).toLocaleString("de-DE");
 }
 
-function betragZuZahl(betrag: string): number {
-  return Number(betrag.replace(/[^\d,]/g, "").replace(/\./g, "").replace(",", "."));
-}
-
 interface TarifErgebnis {
   tarif: Tarif;
   monatlich: number;
@@ -69,48 +91,28 @@ interface TarifErgebnis {
 }
 
 /**
- * Tarifwahl — bildet die Zusage der Preisseite exakt ab:
+ * Dünne Hülle um `waehleSzenario` aus dem kanonischen Rechenkern.
  *
- *   1. Über dem Kontingent kostet jede Minute 0,39 €.
- *   2. Nach oben ist jeder Tarif auf seine ausgewiesene Obergrenze gedeckelt.
- *   3. Bei dauerhaft höherem Aufkommen wechseln wir in den passenden Tarif,
- *      damit der Kunde nicht Monat für Monat den Zuschlag zahlt.
+ * Die Regel selbst steht dort und ist dort einzeln getestet: günstigster Tarif,
+ * dessen Obergrenze bei diesem Bedarf NICHT greift. Hier bleibt nur die
+ * Anpassung an die Felder, die diese Komponente rendert.
  *
- * Aus Punkt 3 folgt die Regel: Wir nehmen den günstigsten Tarif, dessen
- * Obergrenze bei diesem Bedarf NICHT erreicht wird — denn ein dauerhaft am
- * Deckel laufender Tarif ist genau der Zustand, den Punkt 3 ausschließt. Ist
- * bei jedem Tarif der Deckel erreicht, bleibt der größte mit seiner
- * Obergrenze.
- *
- * Ohne Punkt 3 würde die Deckelung den kleinsten Tarif bei hohem Verbrauch zum
- * günstigsten machen; mit Punkt 3 wählt der Rechner das, was der Kunde
- * tatsächlich bekommt.
+ * DER EINE UNTERSCHIED ZUR ALTEN FASSUNG. Lief bei JEDEM Tarif der Deckel, gab
+ * die alte Rechnung den größten Tarif mit seiner Obergrenze aus — also einen
+ * Listenpreis für ein Aufkommen, für das die Liste keinen mehr vorsieht, und
+ * damit genau den Dauerzustand am Anschlag, den `DECKELUNG.tarifwechsel`
+ * ausschließt. Der Kern gibt dort `null` zurück, und diese Komponente zeigt
+ * dann den individuellen Fall an, statt eine zu billige Zahl zu nennen. Der
+ * Startzustand der Seite ist davon nicht berührt.
  */
-function waehleTarif(minutenBedarf: number): TarifErgebnis {
-  const kandidaten = TARIFE.map((t) => {
-    const ueber = Math.max(0, minutenBedarf - t.minuten);
-    const obergrenze = betragZuZahl(t.obergrenze);
-    const roh = betragZuZahl(t.monatlich) + ueber * MEHRPREIS_PRO_MINUTE;
-    return {
-      tarif: t,
-      monatlich: Math.min(roh, obergrenze),
-      mehrverbrauchMinuten: ueber,
-      einrichtung: betragZuZahl(t.einrichtung),
-      amDeckel: roh >= obergrenze,
-    };
-  });
-
-  const ohneDeckel = kandidaten.filter((k) => !k.amDeckel);
-  const gewaehlt =
-    ohneDeckel.length > 0
-      ? ohneDeckel.reduce((a, b) => (b.monatlich < a.monatlich ? b : a))
-      : kandidaten[kandidaten.length - 1];
-
+function waehleTarif(minutenBedarf: number): TarifErgebnis | null {
+  const szenario = waehleSzenario(minutenBedarf);
+  if (!szenario) return null;
   return {
-    tarif: gewaehlt.tarif,
-    monatlich: gewaehlt.monatlich,
-    mehrverbrauchMinuten: gewaehlt.mehrverbrauchMinuten,
-    einrichtung: gewaehlt.einrichtung,
+    tarif: szenario.tarif,
+    monatlich: szenario.telefonieMonatlichEur,
+    mehrverbrauchMinuten: szenario.mehrverbrauchMinuten,
+    einrichtung: szenario.tarif.einrichtungEur,
   };
 }
 
@@ -184,7 +186,7 @@ export function PraxisRechnerWidget() {
   // Teil der Rechnung NICHT berechnet und NICHT geschätzt.
   const [terminwertEingabe, setTerminwertEingabe] = useState("");
 
-  const anrufeProMonat = anrufeProWoche * WOCHEN_PRO_MONAT;
+  const anrufeProMonat = anrufeProMonatAusWoche(anrufeProWoche);
   const heuteAngenommen = anrufeProMonat * (1 - verpasstProzent / 100);
   const zusaetzlichAngenommen = anrufeProMonat - heuteAngenommen;
 
@@ -196,7 +198,17 @@ export function PraxisRechnerWidget() {
 
   // Cogniiq-Kosten, vollständig gegengerechnet.
   const minutenBedarf = anrufeProMonat * MINUTEN_PRO_ANRUF;
-  const { tarif, monatlich, mehrverbrauchMinuten, einrichtung } = waehleTarif(minutenBedarf);
+  const gewaehlt = waehleTarif(minutenBedarf);
+  /*
+    Fällt die Tarifwahl aus (jeder Listentarif liefe dauerhaft am Deckel), gibt
+    es keinen Listenpreis — und damit keine Gegenrechnung. Die Zahlen werden
+    dann auf 0 gesetzt und die Blöcke, die sie zeigen, blenden sich aus; eine
+    ausgedachte Zahl wäre an dieser Stelle die teurere Lösung.
+  */
+  const tarif = gewaehlt?.tarif ?? null;
+  const monatlich = gewaehlt?.monatlich ?? 0;
+  const mehrverbrauchMinuten = gewaehlt?.mehrverbrauchMinuten ?? 0;
+  const einrichtung = gewaehlt?.einrichtung ?? 0;
   const einrichtungProMonat = einrichtung / 12;
   const kostenProMonat = monatlich + einrichtungProMonat;
 
@@ -377,16 +389,27 @@ export function PraxisRechnerWidget() {
           <p className="text-[14px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-500 mb-4">
             3 · Was Cogniiq kostet
           </p>
-          <Zeile label={`Tarif ${tarif.name}`} wert={`${eur(monatlich)} / Monat`} />
-          {mehrverbrauchMinuten > 0 && (
-            <Zeile
-              label="darin Mehrverbrauch"
-              wert={`${zahl(mehrverbrauchMinuten)} Min., gedeckelt auf ${tarif.obergrenze}`}
-            />
+          {tarif === null ? (
+            <p className="text-[16px] text-gray-600 dark:text-gray-400 leading-[1.6]">
+              Bei diesem Aufkommen liefe auch der größte Listentarif dauerhaft an
+              seiner Obergrenze — genau der Zustand, den die Tarifzuordnung
+              ausschließt. Dafür gilt kein Listenpreis; das Kontingent wird
+              individuell vereinbart und im Erstgespräch beziffert.
+            </p>
+          ) : (
+            <>
+              <Zeile label={`Tarif ${tarif.name}`} wert={`${eur(monatlich)} / Monat`} />
+              {mehrverbrauchMinuten > 0 && (
+                <Zeile
+                  label="darin Mehrverbrauch"
+                  wert={`${zahl(mehrverbrauchMinuten)} Min., gedeckelt auf ${tarif.obergrenze}`}
+                />
+              )}
+              <Zeile label="Einrichtung, einmalig" wert={tarif.einrichtung} />
+              <Zeile label="Einrichtung, auf zwölf Monate verteilt" wert={`${eur(einrichtungProMonat)} / Monat`} />
+              <Zeile label="Kosten im ersten Jahr" wert={`${eur(kostenProMonat)} / Monat`} />
+            </>
           )}
-          <Zeile label="Einrichtung, einmalig" wert={tarif.einrichtung} />
-          <Zeile label="Einrichtung, auf zwölf Monate verteilt" wert={`${eur(einrichtungProMonat)} / Monat`} />
-          <Zeile label="Kosten im ersten Jahr" wert={`${eur(kostenProMonat)} / Monat`} />
         </div>
 
         {/* Ergebnis */}
@@ -457,24 +480,28 @@ export function PraxisRechnerWidget() {
               {automatisierungProzent}&nbsp;% davon = {zahl(stunden)}&nbsp;Stunden. Mal{" "}
               {zahl(stundenkosten)}&nbsp;€/h ergibt {eur(wert)}.
             </p>
-            <p>
-              <strong className="font-semibold text-gray-900 dark:text-gray-100">
-                Tarifwahl:
-              </strong>{" "}
-              {zahl(anrufeProMonat)} Anrufe × {MINUTEN_PRO_ANRUF} Min. ={" "}
-              {zahl(minutenBedarf)} Min. Bedarf. Gewählt wird der günstigste Tarif,
-              der bei diesem Bedarf nicht dauerhaft an seiner Obergrenze läuft:{" "}
-              {tarif.name} mit {zahl(tarif.minuten)} Min.
-              {mehrverbrauchMinuten > 0 &&
-                ` Darüber ${zahl(mehrverbrauchMinuten)} Min. zu ${MEHRPREIS_PRO_MINUTE.toLocaleString("de-DE", { minimumFractionDigits: 2 })}\u00A0€, gedeckelt auf ${tarif.obergrenze}.`}
-            </p>
-            <p>
-              <strong className="font-semibold text-gray-900 dark:text-gray-100">
-                Kosten:
-              </strong>{" "}
-              {eur(monatlich)} monatlich plus {tarif.einrichtung} Einrichtung, auf zwölf
-              Monate verteilt = {eur(kostenProMonat)} im Monat.
-            </p>
+            {tarif !== null && (
+              <>
+                <p>
+                  <strong className="font-semibold text-gray-900 dark:text-gray-100">
+                    Tarifwahl:
+                  </strong>{" "}
+                  {zahl(anrufeProMonat)} Anrufe × {MINUTEN_PRO_ANRUF} Min. ={" "}
+                  {zahl(minutenBedarf)} Min. Bedarf. Gewählt wird der günstigste Tarif,
+                  der bei diesem Bedarf nicht dauerhaft an seiner Obergrenze läuft:{" "}
+                  {tarif.name} mit {zahl(tarif.minuten)} Min.
+                  {mehrverbrauchMinuten > 0 &&
+                    ` Darüber ${zahl(mehrverbrauchMinuten)} Min. zu ${FAKTEN.mehrpreisProMinute}, gedeckelt auf ${tarif.obergrenze}.`}
+                </p>
+                <p>
+                  <strong className="font-semibold text-gray-900 dark:text-gray-100">
+                    Kosten:
+                  </strong>{" "}
+                  {eur(monatlich)} monatlich plus {tarif.einrichtung} Einrichtung, auf zwölf
+                  Monate verteilt = {eur(kostenProMonat)} im Monat.
+                </p>
+              </>
+            )}
             <p>
               <strong className="font-semibold text-gray-900 dark:text-gray-100">
                 Woher der Automatisierungsgrad kommt:

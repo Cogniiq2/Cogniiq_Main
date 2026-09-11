@@ -36,6 +36,21 @@ import { FAKTEN, SPRACHEN_PREISE, TARIFE, type Tarif } from "@/lib/telefonassist
 const MINUTEN_PRO_STUNDE = 60;
 const MONATE_PRO_JAHR = 12;
 
+/**
+ * Wochen je Monat. EINE Zahl für das ganze Projekt.
+ *
+ * Vorher standen 4,3 (Startseite) und 4,33 (Praxis-Rechner) nebeneinander.
+ * Zwei Rechner, dieselbe Eingabe, zwei Ergebnisse — genau die Sorte stiller
+ * Widerspruch, die ein Besucher findet, wenn er beide Seiten öffnet. 4,33 ist
+ * der genauere Wert (365 ÷ 7 ÷ 12 = 4,345); er gilt ab hier überall.
+ */
+export const WOCHEN_PRO_MONAT = 4.33;
+
+/** Wochenaufkommen in Monatsaufkommen. Ein Ort, eine Umrechnung. */
+export function anrufeProMonatAusWoche(anrufeProWoche: number): number {
+  return Math.max(0, anrufeProWoche || 0) * WOCHEN_PRO_MONAT;
+}
+
 // ── Eingaben ────────────────────────────────────────────────────────────────
 
 export interface VolumenEingabe {
@@ -197,9 +212,27 @@ export interface WirtschaftlichkeitEingabe {
    *  Wert wird NICHTS gerechnet: Es gibt keinen Vorschlagswert, den wir für
    *  einen beliebigen Betrieb belegen könnten. */
   stundenkostenEur: number | null;
-  /** Anteil der Anrufe, den der Nutzer für automatisierbar hält, in Prozent.
-   *  Schätzung des Nutzers, keine Aussage über eine gemessene Übernahmequote. */
-  automatisierbarProzent: number;
+  /*
+    ROUTINEANTEIL — der eine Prozentsatz dieses Rechners, und ausdrücklich
+    NICHT „wie viel Prozent schafft Cogniiq".
+
+    Was hier gefragt wird: Welcher Anteil der eingehenden Anrufe gehört
+    überhaupt zu den Abläufen, die für diesen Betrieb konfiguriert werden
+    (Termin buchen, verschieben, absagen, vorgegebene Fragen beantworten).
+    Das ist eine Eigenschaft des ANRUFMIX DES KUNDEN.
+
+    Was NICHT hier steht: die Fähigkeit des Assistenten. Einen konfigurierten
+    Routineablauf wickelt er vollständig ab — bis zu 100 % der konfigurierten
+    Routineanrufe. Ausnahmen (Notfälle, Anliegen außerhalb des konfigurierten
+    Umfangs, bewusst menschlich gehaltene Fälle) gehen nach den Regeln des
+    Kunden an einen Menschen. Zwei verschiedene Zahlen, die nie zu einer
+    verschmolzen werden dürfen.
+
+    `null` bedeutet: der Besucher hat nichts eingetragen, und wir tragen auch
+    nichts für ihn ein. Der frühere Vorgabewert von 20 % war eine Aussage über
+    das eigene Produkt im Gewand einer Bequemlichkeit — und dazu eine falsche.
+  */
+  routineanteilProzent: number | null;
 }
 
 /** Optionale zweite Ebene: Anrufe, die heute gar nicht ankommen. Wird NUR
@@ -221,6 +254,9 @@ export interface WirtschaftlichkeitErgebnis {
   rechenbar: boolean;
   telefonstundenProMonat: number;
   automatisierbareStundenProMonat: number;
+  /** Telefonzeit, die auf konfigurierte Routineabläufe entfällt. Diese Abläufe
+   *  wickelt der Assistent vollständig ab; die Zahl sagt nichts darüber, wie
+   *  viel Prozent ALLER Anrufe das sind — das steht in der Eingabe. */
   /** Gegenwert der potenziell freigesetzten Arbeitszeit. AUSDRÜCKLICH NICHT
    *  „eingesparte Personalkosten": Freigewordene Zeit wird nur dann zu Geld,
    *  wenn der Betrieb sie auch wirklich abbaut oder anders einsetzt. */
@@ -266,11 +302,12 @@ export function berechneWirtschaftlichkeit(
   chancen: ChancenEingabe
 ): WirtschaftlichkeitErgebnis {
   const telefonstunden = minutenProMonat(volumen) / MINUTEN_PRO_STUNDE;
-  const anteil = Math.max(0, Math.min(100, eingabe.automatisierbarProzent || 0)) / 100;
+  const anteil = Math.max(0, Math.min(100, eingabe.routineanteilProzent ?? 0)) / 100;
   const automatisierbareStunden = telefonstunden * anteil;
 
   const stundenkosten = eingabe.stundenkostenEur;
-  const rechenbar = stundenkosten !== null && stundenkosten > 0;
+  const rechenbar =
+    stundenkosten !== null && stundenkosten > 0 && eingabe.routineanteilProzent !== null;
   const zeitwert = rechenbar ? automatisierbareStunden * stundenkosten : 0;
   const chancenProMonat = chancenwert(chancen);
 

@@ -1,5 +1,56 @@
 # COPY-SEO-CHANGELOG — Copy Overhaul KI-Telefonassistent-Cluster
 
+## 2026-09-11 (4) — Ein Rechenkern statt vier Rechnern
+
+Anlass: Der neue Preis- und Wirtschaftlichkeitsrechner auf
+`/ki-telefonassistent` ist freigegeben. Er sollte zur Konversionsfunktion des
+Clusters werden — und dafür musste zuerst der Widerspruch weg, den vier
+unabhängige Rechnungen erzeugten.
+
+**Was sich widersprochen hat.**
+
+| Fundstelle | Widerspruch |
+|---|---|
+| `CostComparisonSection` | `KI_PRICE_MONTHLY = 297` — ein Festpreis, der in keiner Tarifliste steht. Daraus abgeleitet: „Ihre Ersparnis" und „Jahresersparnis" |
+| `ROICalculator` + `CostComparisonSection` | 4,3 Wochen je Monat, während der Praxis-Rechner mit 4,33 rechnete |
+| `ROICalculator` | `verpasste Anrufe × Ø-Umsatz = entgangener Umsatz` — jeder verpasste Anruf als verlorener Auftrag |
+| `roi-presets.ts` | Frei gewählte Beispielwerte für Umsatz je Anruf, Verpasstquote und Stundensatz, vorbelegt in einem Ergebnis, das autoritativ aussieht |
+| `PraxisRechnerWidget` | Eigene Tarifrechnung, eigener Mehrpreis je Minute, `betragZuZahl` (Anzeigestrings zurück in Zahlen), Vorgabewert „Automatisierungsgrad 20 %" |
+| `KostenKiTelefonassistent` | `toNumber(t.monatlich)` — Angebots-Schema aus Anzeigestrings geparst |
+
+**Was jetzt gilt.** `src/lib/telefonassistent-rechner.ts` ist der einzige
+Rechenkern: Tarifwahl, Deckelung, Mehrverbrauch, Sprachaufschlag, Zeitwert,
+Chancenwert, Nettoeffekt, Amortisation, Wochenfaktor. Jede öffentliche
+Darstellung konsumiert ihn. `rechner-konsistenz.test.tsx` prüft beides —
+die Arithmetik **und** den Quelltext, damit eine neu eingeführte Konstante
+sofort auffällt statt erst im nächsten Widerspruch.
+
+| Fläche | Vorher | Jetzt |
+|---|---|---|
+| `/ki-telefonassistent` | `TelefonRechner` (voll) | unverändert, plus stabiler Anker `#preis-roi-rechner` und Hero-Verweis |
+| Startseite | `ROICalculator` + `CostComparisonSection` | `TelefonRechnerSection` (kompakt) + Eigenschaftsvergleich ohne eigene Rechnung |
+| `/praxen` | `PraxisRechnerSection` | `TelefonRechnerSection` (voll) |
+| `/kosten-ki-telefonassistent` | `PraxisRechnerSection` | **unverändert** (eingefrorenes Experiment) — Arithmetik intern auf den Kern umgestellt, gerenderte Bytes identisch |
+
+**Produktwahrheit Automatisierung.** Der Vorgabewert „20 % Automatisierungsgrad"
+war kein Zurückhalten, sondern ein Fehler: Er las sich als Aussage darüber, wie
+viel Cogniiq schafft. Zugesichert ist das Gegenteil — ein konfigurierter
+Routineablauf wird vollständig abgewickelt, bis zu 100 % der konfigurierten
+Routineanrufe. Was schwankt, ist der Anteil der Anrufe eines Betriebs, der
+überhaupt dazugehört; danach fragt der Rechner jetzt, ohne einen Wert
+vorzugeben.
+
+**Gleichzeitigkeit.** „10 gleichzeitige Anrufe" ist auf allen nicht
+eingefrorenen Flächen durch eine Fassung ohne Zahl ersetzt. Begründung und
+offene Inhaberfrage: OWNER-INPUT B11a.
+
+**GA4.** Unverändert in diesem Durchgang. Der Branch trägt weiterhin
+`G-K7BS3LKT6H`; die Korrektur auf `G-NDN9J2G5LM` ist in `main` noch nicht
+gelandet und gehört in ihren eigenen Commit. Neu sind ausschließlich grobe
+Ereignisnamen (`calculator_anchor_click`, `price_calculator_started`,
+`roi_calculator_started`) — ohne jeden Eingabewert.
+
+
 ## 2026-09-11 (3) — Produktwahrheit korrigiert: `/ki-telefonassistent` verkaufte unter Wert
 
 Anlass: Inhaber-Review der Preview. Die Seite beschrieb ein System, das

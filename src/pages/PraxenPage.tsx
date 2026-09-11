@@ -20,7 +20,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { StimmprobeSection } from "@/components/StimmprobeSection";
-import { PraxisRechnerSection } from "@/components/PraxisRechnerSection";
+import { TelefonRechnerSection } from "@/components/TelefonRechnerSection";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 import {
   ANLIEGEN_IMMER_MENSCH,
@@ -45,6 +45,7 @@ import {
   TEAM_BLOCK,
   UEBERGABE,
   UMKEHRBARKEIT,
+  RECHNER,
 } from "@/lib/telefonassistent-copy";
 
 const base = BUSINESS_INFO.website;
@@ -576,7 +577,19 @@ export function PraxenPage() {
 
         {/* ── Rechner: steht NACH dem Preisblock, damit der Leser Tarife und
             Deckelung kennt, bevor er rechnet (Inhaber-Vorgabe). ── */}
-        <PraxisRechnerSection />
+        {/*
+          Seit dem 11.09.2026 rechnet auch diese Seite mit dem kanonischen
+          Rechner. Vorher stand hier `PraxisRechnerSection` mit einem
+          voreingestellten „Automatisierungsgrad" von 20 % — einer Zahl, die sich
+          als Aussage über Cogniiq las und das Produkt damit weit unter Wert
+          verkaufte. Die alte Komponente bedient nur noch die eingefrorene
+          Kostenseite und verschwindet mit deren Experiment.
+        */}
+        <TelefonRechnerSection
+          headline={RECHNER.headline}
+          intro={[RECHNER.intro, RECHNER.rahmungRoutine]}
+          nachsatz={RECHNER.anbindungsHinweis}
+        />
 
         {/* ── 14 · M19 Umkehrbarkeit ── */}
         <section className={SECTION_ALT}>

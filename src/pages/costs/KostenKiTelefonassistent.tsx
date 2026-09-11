@@ -40,10 +40,17 @@ import {
 const base = BUSINESS_INFO.website;
 const url = `${base}/kosten-ki-telefonassistent`;
 
-/** Numerische Beträge für das Schema — aus denselben Konstanten abgeleitet. */
-function toNumber(betrag: string): number {
-  return Number(betrag.replace(/[^\d,]/g, "").replace(/\./g, "").replace(",", "."));
-}
+/*
+  Die numerischen Beträge des Angebots-Schemas kommen aus den numerischen
+  Zwillingen in TARIFE (`monatlichEur`, `einrichtungEur`).
+
+  Hier stand bis zum 11.09.2026 ein `toNumber`, das die ANZEIGESTRINGS zurück
+  in Zahlen parste — Geschäftslogik, die an einer Tausenderpunkt-Formatierung
+  hing. Ein Punkt an der falschen Stelle hätte einen falschen Preis in
+  strukturierte Daten geschrieben, ohne dass im sichtbaren Text etwas auffällt.
+  Die ausgegebenen Zahlen sind dieselben; diese Seite ist ein eingefrorenes
+  Experiment, und ihre gerenderten Bytes ändern sich dadurch nicht.
+*/
 
 const breadcrumbs = [
   { name: "Home", url: base },
@@ -115,7 +122,7 @@ const schema = {
           url,
           priceSpecification: {
             "@type": "UnitPriceSpecification",
-            price: toNumber(t.monatlich),
+            price: t.monatlichEur,
             priceCurrency: "EUR",
             unitCode: "MON",
             billingDuration: 1,
@@ -130,7 +137,7 @@ const schema = {
           url,
           priceSpecification: {
             "@type": "PriceSpecification",
-            price: toNumber(t.einrichtung),
+            price: t.einrichtungEur,
             priceCurrency: "EUR",
           },
         })),

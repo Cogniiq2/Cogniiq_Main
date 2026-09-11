@@ -278,3 +278,38 @@ Höchste Priorität davon bleibt unverändert **Z0** aus
 `COPY-CLAIMS-TO-VERIFY.md`: der Vorgabewert des Praxis-Rechners. Er steht
 weiterhin vor jedem Besucher der Preisseite und hängt an einer Messung, die
 noch aussteht.
+
+---
+
+## Nach dem Ende des Preisseiten-Experiments (aufgenommen 11.09.2026)
+
+Diese Punkte sind **fertig entschieden und absichtlich nicht umgesetzt**, weil
+sie die gerenderten Bytes eines laufenden Experiments verändern würden. Sie
+gehören in eine eigene, kontrollierte Änderung, sobald die Messung endet.
+
+| # | Was | Warum es wartet |
+|---|---|---|
+| P1 | Den kanonischen Rechner (`TelefonRechnerSection` + `TelefonRechner`) auf der Preisseite montieren, bevorzugt in einer preis-zuerst-Fassung | Die Seite rendert heute `PraxisRechnerSection`. Ein Austausch verändert Text, Bauteile und Reihenfolge im `<main>` |
+| P2 | `PraxisRechnerWidget` und `PraxisRechnerSection` löschen | Sie bedienen nach dem 11.09.2026 nur noch diese eine Seite. Ihre Arithmetik ist bereits auf `telefonassistent-rechner.ts` umgestellt, ihre Anzeige ist eingefroren |
+| P3 | Den voreingestellten „Automatisierungsgrad" von 20 % entfernen | Er überlebt ausschließlich in `PraxisRechnerWidget` und damit ausschließlich auf dieser Seite. Auf jeder anderen Fläche ist er entfernt; die Ausnahme ist in `rechner-konsistenz.test.tsx` als `EINGEFROREN` benannt und fällt mit P2 weg |
+| P4 | `RECHNER.rahmung` durch `RECHNER.rahmungRoutine` ersetzen | `rahmung` beschreibt einen Vorgabewert, den der kanonische Rechner nicht mehr setzt. `/praxen` nutzt bereits die korrigierte Fassung; die Preisseite bekommt sie mit P1/P2 |
+| P5 | `NICHT_EXTRA` — „10 gleichzeitige Anrufe in jedem Tarif" | Siehe unten. Die Zahl ist auf allen nicht eingefrorenen Flächen durch `FAKTEN.gleichzeitigeAnrufeSatz` ersetzt. Hier steht sie noch, weil die Seite eingefroren ist — **nicht**, weil sie belegt wäre |
+
+### Zur Gleichzeitigkeit (Grundlage für P5)
+
+Öffentliche ElevenAgents-Preisangaben, geprüft am 11.09.2026: Die
+Gleichzeitigkeit ist eine **Workspace-Grenze**, die sich alle Agenten eines
+Kontos teilen — Free 4, Starter 6, Creator 10, Pro 20, Scale 30, Business 40,
+Enterprise nach Vereinbarung; „Burst" hebt sie je Agent auf das Dreifache bei
+doppeltem Minutenpreis.
+
+Daraus folgt: Eine Konto-Obergrenze von 10 ist **keine** Zusage von zehn
+Gesprächen je Kunde, sobald mehr als ein Kunde gleichzeitig telefoniert. Sie
+wäre es nur bei einer eigenen Umgebung je Kunde oder bei vertraglich
+reservierter Kapazität. Im Repository ist weder das eine noch das andere
+dokumentiert: Das Kunden-Onboarding erfasst eine Agent-ID und eine Umgebung
+(EU/US), aber kein Kapazitäts- oder Tarifmerkmal.
+
+Bis der Inhaber die Bereitstellung bestätigt (OWNER-INPUT B11), gilt überall
+die Fassung ohne Zahl. Wird sie bestätigt, kann die Zahl zurück — dann aber
+belegt, und mit einer Aussage dazu, was bei Überlauf geschieht (B9).

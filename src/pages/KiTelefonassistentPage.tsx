@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
+  Calculator,
   ArrowRight,
   Phone,
   Clock,
@@ -31,6 +32,7 @@ import { lazy, Suspense } from "react";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO, PHONE_HREF } from "@/lib/seo-data";
 import { trackEvent } from "@/lib/consent";
+import { RECHNER_ANKER } from "@/lib/rechner-anker";
 import {
   ABWICKLUNG,
   ANBIETER_CHECKLISTE,
@@ -476,17 +478,46 @@ function HeroSection() {
               <PrimaryCta />
               <PhoneCta />
             </div>
-            <p className="text-sm text-gray-400 dark:text-gray-500 mb-10">
+            <p className="text-sm text-gray-400 dark:text-gray-500 mb-5">
               Sie schildern kurz Ihre Anrufe, wir schlagen einen Termin für die
               Demo vor. Kostenlos, unverbindlich, ca. 15&nbsp;Minuten.
             </p>
+
+            {/*
+              DRITTER WEG, BEWUSST DRITTER RANG.
+
+              Die Hierarchie bleibt, wie der Inhaber sie freigegeben hat: Demo
+              zuerst, Telefon daneben, danach dieser Verweis — als Textlink,
+              nicht als dritter Button. Ein dritter Button würde den primären
+              CTA optisch einholen und die Entscheidung verwässern.
+
+              Warum er trotzdem oben steht: Ein Teil dieser Besucher will vor
+              jedem Gespräch wissen, was das kostet, und verlässt die Seite,
+              wenn die Antwort erst nach 1.500 Pixeln kommt. Der Sprung führt
+              auf denselben Rechner weiter unten — keine zweite Seite, kein
+              zweites Formular, keine zweite Rechnung.
+            */}
+            <div className="mb-10">
+              <a
+                href={`#${RECHNER_ANKER}`}
+                onClick={() => trackEvent("calculator_anchor_click", "Hero")}
+                className="inline-flex items-center gap-2 text-[15px] font-semibold text-gray-900 dark:text-gray-100 underline decoration-gray-300 dark:decoration-gray-600 underline-offset-4 hover:decoration-gray-900 dark:hover:decoration-gray-100 transition-colors"
+              >
+                <Calculator size={15} aria-hidden="true" />
+                Preis &amp; Wirtschaftlichkeit sofort berechnen
+              </a>
+              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1.5">
+                Sofort · ohne E-Mail · jede Position einzeln, auch die, die vor
+                der technischen Prüfung noch offen ist
+              </p>
+            </div>
 
             <div className="flex flex-wrap gap-x-7 gap-y-2.5">
               {[
                 "Bucht, verschiebt und storniert Termine",
                 "Natürliches Gespräch statt Tastenmenü",
                 "Mehrsprachig, Wechsel im Gespräch",
-                `${FAKTEN.gleichzeitigeAnrufe} Anrufe gleichzeitig`,
+                FAKTEN.gleichzeitigeAnrufeKurz,
                 "Keine Gesprächsaufzeichnung",
               ].map((item) => (
                 <motion.div
@@ -1517,7 +1548,19 @@ function SprachenSection() {
 function RechnerSection() {
   const { PROSE, H2C, TEXT_LINK } = KettenStile();
   return (
-    <section className="py-24 bg-gray-50 dark:bg-gray-900/40" aria-labelledby="rechner-heading">
+    <section
+      /*
+        STABILER ANKER. Jeder Verweis auf den Rechner — aus dem Hero dieser
+        Seite und von den Seiten, auf denen die Preisfrage natürlich aufkommt —
+        zielt auf diese ID. Sie ist Teil der öffentlichen Oberfläche: Wer sie
+        umbenennt, bricht Links auf anderen Seiten, ohne dass eine Datei
+        rot wird. `RECHNER_ANKER` hält sie an einer Stelle, und
+        `rechner-konsistenz.test.tsx` prüft, dass jeder Verweis darauf trifft.
+      */
+      id={RECHNER_ANKER}
+      className="py-24 bg-gray-50 dark:bg-gray-900/40 scroll-mt-24"
+      aria-labelledby="rechner-heading"
+    >
       <div className="max-w-4xl mx-auto px-6 lg:px-8">
         {/* Statisch im HTML, damit Überschrift und Einordnung im Prerender
             stehen — der interaktive Teil darunter wird nachgeladen. */}

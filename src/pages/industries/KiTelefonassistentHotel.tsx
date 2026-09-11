@@ -80,6 +80,12 @@ const config: NationalIndustryPageConfig = {
       },
     ],
   },
+  rechner: {
+    ankertext: "Preis für Ihr Anrufaufkommen berechnen",
+    kontext: "Hotel",
+    einleitung:
+      "Hotels unterscheiden sich im Anrufaufkommen stärker als in fast jeder anderen Branche. Statt eines Beispielpreises, der für Ihr Haus ohnehin nicht gälte: Tragen Sie Ihre eigenen Zahlen ein.",
+  },
   cityLinks: [
     { label: "KI Telefonassistent Bayreuth", href: "/bayreuth/ki-telefonassistent" },
     { label: "KI Telefonassistent München", href: "/muenchen/ki-telefonassistent" },

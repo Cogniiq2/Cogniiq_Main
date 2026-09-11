@@ -64,7 +64,44 @@ export const FAKTEN = {
   monatlichAufschlag: `20\u00A0%`,
   erreichbarkeit: "täglich 6–20\u00A0Uhr",
   antwortzeit: "spätestens innerhalb von 24\u00A0Stunden",
+  /*
+    GLEICHZEITIGE ANRUFE — eingefroren, nicht bestätigt. Stand 11.09.2026.
+
+    Die 10 stammen aus der Inhaber-Antwort zu Abschnitt B. Die Recherche zum
+    Kapazitätsanbieter (ElevenAgents, offizielle Preisseite, 11.09.2026) zeigt
+    aber: Die Gleichzeitigkeit ist dort eine WORKSPACE-Grenze, die sich ALLE
+    Agenten eines Kontos teilen — Free 4, Starter 6, Creator 10, Pro 20,
+    Scale 30, Business 40, Enterprise nach Vereinbarung. Eine Konto-Obergrenze
+    von 10 ist damit keine Zusage von 10 Gesprächen JE KUNDE, sobald mehr als
+    ein Kunde gleichzeitig telefoniert; sie wäre es nur bei einer eigenen
+    Umgebung je Kunde oder einer vertraglich reservierten Kapazität. Weder das
+    eine noch das andere ist im Repository dokumentiert: Das Onboarding erfasst
+    eine Agent-ID und eine Umgebung (EU/US), aber kein Kapazitäts- oder
+    Tarifmerkmal.
+
+    Konsequenz, bis der Inhaber die Bereitstellung bestätigt (OWNER-INPUT B11):
+      • Auf allen NICHT eingefrorenen Flächen steht `gleichzeitigeAnrufeSatz` —
+        eine Aussage ohne Zahl, die in jedem Fall stimmt.
+      • Diese Zahl wird NUR noch von `NICHT_EXTRA` verwendet, und das steht
+        ausschließlich auf der eingefrorenen Kostenseite. Sie wird dort nicht
+        angefasst, weil deren gerenderte Bytes die Messbedingung eines
+        laufenden Experiments sind — und nicht, weil sie belegt wäre.
+      • Sobald das Experiment endet, ist diese Zahl entweder belegt oder sie
+        verschwindet auch dort.
+  */
   gleichzeitigeAnrufe: 10,
+
+  /*
+    Die belastbare Fassung: Sie sagt zu, was in jeder Bereitstellung gilt —
+    mehrere Gespräche zur selben Zeit statt eines Besetztzeichens — und
+    verspricht keine Zahl, die von einer Konto-Obergrenze abhängt. Bewusst auch
+    KEIN „kein Anruf geht verloren": Ob Überlauf, Warteschlange oder
+    Rückfallnummer eingerichtet sind, hängt am Setup (OWNER-INPUT B9/B11).
+  */
+  gleichzeitigeAnrufeSatz:
+    "Mehrere Anrufe zur selben Zeit — die Kapazität wird auf Ihr Aufkommen ausgelegt und im Angebot ausgewiesen.",
+  /** Kurzform für Aufzählungen und Merkmalslisten. */
+  gleichzeitigeAnrufeKurz: "Mehrere Anrufe zur selben Zeit",
 
   // ── Sätze, die wörtlich wiederverwendet werden ──
   /** Deckelung. Nennt die Obergrenzen einzeln, weil die Regel „nie mehr als der
@@ -197,7 +234,7 @@ export const SAEULEN: Array<{ title: string; description: string }> = [
   {
     title: "Klingt wie Ihr Empfang, nicht wie ein Automat",
     description:
-      "Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihre Praxis am Telefon spricht. Zehn Anrufe können gleichzeitig laufen, ohne dass jemand ein Besetztzeichen hört. Anrufer erfahren im ersten Satz, dass ein KI-System spricht — und können jederzeit zu einem Menschen wechseln.",
+      "Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihre Praxis am Telefon spricht. Mehrere Anrufe können zur selben Zeit laufen, ohne dass jemand ein Besetztzeichen hört. Anrufer erfahren im ersten Satz, dass ein KI-System spricht — und können jederzeit zu einem Menschen wechseln.",
   },
   {
     title: "Die Übergabe klären wir vor der Unterschrift",
@@ -286,7 +323,7 @@ export const TEAM_BLOCK = {
   text: "Das Telefon klingelt nicht mehr in dem Moment, in dem eine Patientin am Tresen steht. Wiederkehrende Anliegen — Terminwunsch, Stornierung, Rezeptbestellung — kommen als strukturierte Einträge an, nicht als Klingeln zwischen zwei Handgriffen. Ihr Team entscheidet weiterhin über jeden Termin und jede Rückmeldung; es wird nur seltener dabei unterbrochen.",
   points: [
     "Weniger Unterbrechungen zu Stoßzeiten — der Tresen hat Vorrang",
-    "Zehn Anrufe gleichzeitig: niemand hört mehr ein Besetztzeichen, auch am Montagmorgen nicht",
+    "Mehrere Anrufe zur selben Zeit: niemand hört mehr ein Besetztzeichen, auch am Montagmorgen nicht",
     "Jeder Anruf kommt strukturiert an: Anliegen, Name, Rückrufnummer, Terminwunsch — statt Notizzettel",
     "Rückrufliste statt Daueralarm: abarbeiten, wenn es in den Ablauf passt",
     "Ihr Team behält die Kontrolle — jede Regel und jede Ansage lässt sich ändern",
@@ -873,18 +910,27 @@ export const VERTRAG = {
  * Copy des Praxis-Rechners (COPY-BRIEF-3 §6). Die Zahlen des Rechners kommen
  * aus TARIFE; hier stehen ausschließlich die Texte.
  *
- * Zum Automatisierungsgrad: Dieser Text nennt bewusst KEINE Prozentzahl.
- * Der einzige Vorgabewert ist AUTOMATISIERUNG_STANDARD in PraxisRechnerWidget;
- * der Wert ist im Rechner frei einstellbar und dort für jeden Besucher ablesbar.
+ * ZUR AUTOMATISIERUNG, Stand 11.09.2026. Der Begriff „Automatisierungsgrad"
+ * hat diesen Rechner zwei Fassungen lang in die Irre geführt: Erst stand hier
+ * „voreingestellt sind 90 %", während das Widget mit 20 % startete; dann wurde
+ * die Prosa entschärft und die 20 % blieben als Vorgabewert stehen. Beide Male
+ * las sich die Zahl als Aussage darüber, wie viel Cogniiq schafft.
  *
- * Vorher stand hier "voreingestellt sind 90 %", während das Widget mit 20 %
- * startete — der Besucher las also eine Zahl und sah unmittelbar darunter eine
- * andere. Eine Zahl an zwei Stellen zu pflegen hat genau diesen Ausgang; die
- * Prosa beschreibt den Regler deshalb, statt ihn zu duplizieren.
+ * Der Inhaber hat die Produktwahrheit am 11.09.2026 klargestellt, und sie ist
+ * das Gegenteil einer Einschränkung: Einen KONFIGURIERTEN Routineablauf wickelt
+ * der Assistent vollständig ab — annehmen, sprechen, buchen, verschieben,
+ * absagen, abschließen — bis zu 100 % der konfigurierten Routineanrufe, ohne
+ * dass daraus eine Aufgabe für einen Menschen entsteht. Ausnahmen bleiben
+ * Ausnahmen: Notfälle, Anliegen außerhalb des konfigurierten Umfangs, bewusst
+ * menschlich gehaltene Fälle, ausdrückliche Eskalationsregeln.
  *
- * [[CLAIM: verify — gemessene Übernahmequote (OWNER-INPUT F4) ist weiterhin
- * unbeantwortet. Solange das so ist, darf hier keine Übernahmequote als Aussage
- * über das eigene Produkt stehen: diese Zielgruppe rechnet solche Zahlen nach.]]
+ * Was schwankt, ist eine ANDERE Zahl: der Anteil der Anrufe eines Betriebs, der
+ * überhaupt zu diesen Routineabläufen gehört. Das ist eine Eigenschaft des
+ * Anrufmix des Kunden, keine Leistungsgrenze des Systems — und deshalb eine
+ * Zahl, die nur der Kunde kennt. Der kanonische Rechner setzt dafür keinen
+ * Vorgabewert ein. Eine gemessene eigene Übernahmequote wird weiterhin NICHT
+ * veröffentlicht (OWNER-INPUT F4 offen); sie wird für diese Trennung auch nicht
+ * gebraucht.
  */
 export const RECHNER = {
   headline: "Was spart eine Praxis durch einen KI Telefonassistenten?",
@@ -905,6 +951,31 @@ export const RECHNER = {
     "Der wirtschaftliche Nutzen liegt meist nicht in der eingesparten Zeit, sondern in den Anrufen, die heute gar nicht ankommen. Was ein gewonnener Termin für Ihre Praxis wert ist, wissen nur Sie — deshalb rechnen wir diesen Teil nicht ohne Ihre Angabe.",
   terminwertLeer:
     "Solange dieses Feld leer bleibt, bleibt dieser Teil der Rechnung leer. Wir setzen hier keinen typischen Wert ein.",
+
+  /*
+    FASSUNG FÜR /praxen, ab 11.09.2026 — und der Grund, warum `rahmung`
+    unangetastet daneben stehen bleibt.
+
+    `rahmung` beschreibt einen voreingestellten „Automatisierungsgrad". Den
+    setzt der kanonische Rechner nicht mehr, und die dahinterliegende Lesart war
+    falsch: Einen konfigurierten Routineablauf wickelt der Assistent vollständig
+    ab. Was schwankt, ist der Anteil der Anrufe eines Betriebs, der überhaupt zu
+    solchen Abläufen gehört.
+
+    Ersetzt wird `rahmung` trotzdem nicht, sondern ergänzt: Der Satz steht auf
+    der Kostenseite, einem laufenden SEO-Experiment, dessen gerenderte Bytes bis
+    zum Ende der Messung unverändert bleiben müssen. Diese Fassung gilt auf
+    `/praxen`; die Kostenseite bekommt sie in einer eigenen, kontrollierten
+    Änderung, sobald das Experiment endet.
+  */
+  rahmungRoutine:
+    "Der Rechner zieht unsere eigenen Kosten ab — Monatspreis und Einrichtung. Für den Anteil Ihrer Anrufe, der zu konfigurierten Routineabläufen gehört, setzen wir bewusst keinen Wert ein: Wie groß dieser Anteil bei Ihnen ist, wissen nur Sie. Der Rechenweg bleibt vollständig nachvollziehbar.",
+
+  /** Erklärung neben dem Routineanteil-Feld. Trennt Fähigkeit und Anrufmix. */
+  routineanteilErklaerung:
+    "Diese Routineabläufe kann der Cogniiq-Telefonassistent vollständig automatisiert abwickeln. Ausnahmen und bewusst menschlich gehaltene Fälle werden nach Ihren Regeln eskaliert.",
+  routineanteilLeer:
+    "Solange dieses Feld leer bleibt, bleibt die Zeitrechnung leer. Wir setzen hier keinen Anteil für Sie ein.",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1335,7 +1406,7 @@ export const GENERISCH_SAEULEN: Array<{ title: string; description: string }> = 
   },
   {
     title: "Klingt wie Ihr Empfang, nicht wie ein Automat",
-    description: `Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihr Betrieb am Telefon spricht. Bis zu ${FAKTEN.gleichzeitigeAnrufe} Anrufe können gleichzeitig laufen, ohne dass jemand ein Besetztzeichen hört. Anrufer erfahren im ersten Satz, dass ein KI-System spricht — und können jederzeit zu einem Menschen wechseln.`,
+    description: `Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihr Betrieb am Telefon spricht. Mehrere Anrufe können zur selben Zeit laufen, ohne dass jemand ein Besetztzeichen hört; die Kapazität wird auf Ihr Aufkommen ausgelegt. Anrufer erfahren im ersten Satz, dass ein KI-System spricht — und können jederzeit zu einem Menschen wechseln.`,
   },
   {
     title: "Die Anbindung klären wir vor der Unterschrift",

@@ -379,3 +379,15 @@ Blogbeitrag `/blog/ki-telefonassistent-arztpraxis` (2026-09-05): entfernt wurden
 belegt), „DSGVO-Protokoll: automatisch" (Klasse §7.7-nah) und die Formulierung
 „vollständig übernehmen" (COPY-BRIEF §5.9). Die Aussage zum vzbv-Marktcheck
 bleibt (freigegebene Statistik, COPY-BRIEF §5.7).
+
+
+## Z30 · Rechner-Vereinheitlichung, 11.09.2026
+
+| # | Aussage | Status |
+|---|---|---|
+| F1 | Kostenvergleich 297 €/Monat | **erledigt.** `CostComparisonSection` rechnet nicht mehr, sondern vergleicht Eigenschaften. Es gibt keinen zweiten Preis mehr; `rechner-konsistenz.test.tsx` schlägt an, sobald 297 € irgendwo im Produktionsquelltext auftaucht |
+| Z0 / F4 | Vorgabewert „Automatisierungsgrad" 20 % | **erledigt auf allen lebenden Flächen.** Der kanonische Rechner setzt für den Routineanteil GAR KEINEN Wert mehr ein. Die Zahl überlebt ausschließlich im eingefrorenen `PraxisRechnerWidget` und damit ausschließlich auf der Preisseite (post-experiment-opportunities P3). Eine gemessene eigene Übernahmequote wird weiterhin nicht veröffentlicht und für die Rechnung auch nicht gebraucht |
+| — | Automatisierungs-Semantik | **neu und vom Inhaber bestätigt (11.09.2026):** Ein konfigurierter Routineablauf wird vollständig abgewickelt — bis zu 100 % der konfigurierten Routineanrufe. Ausnahmen (Notfälle, Anliegen außerhalb des konfigurierten Umfangs, bewusst menschliche Fälle, Eskalationsregeln) bleiben menschlich. Die Eingabe im Rechner fragt den ANTEIL DER ANRUFE DES KUNDEN ab, der zu solchen Abläufen gehört — nicht eine Erfolgsquote von Cogniiq |
+| A8 / F7 | „Mehrere Anrufe gleichzeitig", beziffert mit 10 | **zurückgestuft.** Die Bezifferung war nicht durch eine dokumentierte Bereitstellung gedeckt; die Gleichzeitigkeit des Sprachdienstes ist eine Konto-Grenze, keine Kundenzusage. Siehe OWNER-INPUT B11a. Bis zur Bestätigung steht überall die Fassung ohne Zahl |
+| — | „kein Anruf geht verloren" | **wird nicht behauptet.** Überlauf, Warteschlange und Rückfallnummer hängen am Setup (B9/B11) und sind nicht dokumentiert |
+| F10 | Tarifzuordnung nach günstigstem Gesamtpreis | **unverändert offen** — die Zusage muss vertraglich und im Abrechnungsprozess gedeckt sein. Neu ist nur, dass sie jetzt an genau einer Stelle im Code steht (`waehleSzenario`) und nicht mehr an zweien |

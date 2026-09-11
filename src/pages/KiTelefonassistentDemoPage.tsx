@@ -14,6 +14,7 @@ import {
   Check,
 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
+import { RechnerCta } from "@/components/RechnerCta";
 import { N8N_ENDPOINTS } from "@/config/externalEndpoints";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 
@@ -323,6 +324,24 @@ export function KiTelefonassistentDemoPage() {
                         Zurück zur Übersicht
                         <ArrowRight size={13} />
                       </Link>
+
+                      {/*
+                        Der Rechner steht AUSSCHLIESSLICH im Erfolgszustand,
+                        nie neben dem Formular. Neben dem Formular wäre er ein
+                        zweiter Weg im Moment der Entscheidung und würde genau
+                        die Abschlüsse kosten, für die diese Seite existiert.
+                        Hier, nach dem Absenden, ist er reiner Gewinn: Die
+                        Wartezeit bis zur Rückmeldung füllt sich mit der
+                        Antwort auf die Frage, die im Gespräch ohnehin kommt.
+                      */}
+                      <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                        <RechnerCta
+                          variante="zeile"
+                          ankertext="Bis dahin: Preis schon mal selbst berechnen"
+                          kontext="Demo bestätigt"
+                          className="text-left sm:text-center"
+                        />
+                      </div>
                     </motion.div>
                   ) : (
                     <motion.div

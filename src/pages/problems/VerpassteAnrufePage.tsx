@@ -53,6 +53,12 @@ const config: ProblemPageConfig = {
       "Skaliert mit Ihrem Unternehmen ohne Mehrkosten",
     ],
   },
+  rechner: {
+    ankertext: "Was kostet das bei meinem Anrufvolumen?",
+    kontext: "Verpasste Anrufe",
+    einleitung:
+      "Diese Seite rechnet Ihnen bewusst nicht vor, was verpasste Anrufe Sie kosten — das hängt an Ihrem Auftragswert und Ihrer Abschlussquote, und beides kennen wir nicht. Der Rechner auf der Produktseite rechnet mit Ihren Zahlen: erst der Preis für Ihr Anrufaufkommen, dann optional der Gegenwert der Anrufe, die heute niemanden erreichen.",
+  },
   serviceLinks: [
     { label: "KI Telefonassistent", href: "/ki-telefonassistent" },
     { label: "KI Telefonassistent Arztpraxis", href: "/ki-telefonassistent-arzt" },
