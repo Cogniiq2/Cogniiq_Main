@@ -19,6 +19,13 @@ import { formatOfferAmount } from '@/lib/ownerFinance/offerAmountDisplay';
 import {
   customerStatusLabel, customerStatusTone, customerDisplayName, offerStatusLabel, offerStatusTone,
 } from '@/lib/ownerFinance/customerLabels';
+import {
+  ForceDeleteConfirmModal, useForceDeletePreviews,
+} from '@/components/finance/workspaceOrganizationUi';
+import {
+  FORCE_DELETE_PHRASE, describeAccountingReasons, forceDeleteCustomer, forceDeleteErrorText,
+  loadAccountingRelevance, purgeCustomer, scopeTable,
+} from '@/lib/ownerFinance/workspaceOrganization';
 import { CustomerFormDialog } from '@/components/finance/CustomerFormDialog';
 import { CustomerTaskChecklist } from '@/components/finance/CustomerTaskChecklist';
 import { CustomerProjectPanel } from '@/components/finance/CustomerProjectPanel';
@@ -77,6 +84,10 @@ export function CustomerDetailPage() {
   const [completeOpen, setCompleteOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [forceDeleteOpen, setForceDeleteOpen] = useState(false);
+  const [purgeOpen, setPurgeOpen] = useState(false);
+  /* null while unknown. Decides which of the two permanent deletes an archived customer gets. */
+  const [relevance, setRelevance] = useState<{ relevant: boolean; reasons: string[] } | null>(null);
   /* Reported by the services panel so the edit dialog can show which services are already
      provisioned — and refuse to offer them for removal there. */
   const [activeServices, setActiveServices] = useState<ServiceKey[]>([]);
@@ -163,6 +174,57 @@ export function CustomerDetailPage() {
     ].filter(Boolean).join(' und ');
     toast.success('Kunde gelöscht', removed ? `Mitgelöscht: ${removed}.` : undefined);
     navigate('/admin/finance/customers');
+  };
+
+  /*
+    The irreversible counterpart. The server requires the customer to be archived, the exact
+    phrase and a reason, and writes an append-only tombstone before anything is destroyed — so
+    none of those guards is restated here as a condition, only as the copy the dialog shows.
+  */
+  const forcePreviews = useForceDeletePreviews('customer', customerId ? [customerId] : [], forceDeleteOpen);
+
+  /*
+    Which permanent delete an archived customer is offered. A customer with no financial history
+    at all — the test record — takes the ordinary purge; one with issued invoices, payments,
+    binding offers or subscriptions takes the emergency path or nothing.
+
+    Asked of the server rather than derived from delete_blockers: the blockers answer "may the
+    safe delete run", which is a narrower question and would classify a customer with a finalized
+    offer as merely undeletable rather than as accounting-relevant.
+  */
+  useEffect(() => {
+    if (!customerId || detail?.customer.status !== 'archived') { setRelevance(null); return; }
+    let cancelled = false;
+    void loadAccountingRelevance('customer', customerId).then(({ relevant, reasons }) => {
+      if (cancelled || relevant === null) return;
+      setRelevance({ relevant, reasons });
+    });
+    return () => { cancelled = true; };
+  }, [customerId, detail?.customer.status]);
+
+  const confirmPurge = async () => {
+    if (!customerId) return;
+    // The label comes back from the RPC rather than from `name`, which is declared further down
+    // this component and past its early returns.
+    const { deleted, label, error: err } = await purgeCustomer(customerId, 'Kunde ohne Buchhaltungsrelevanz');
+    setPurgeOpen(false);
+    if (err || !deleted) {
+      toast.error('Löschen nicht möglich', err ? forceDeleteErrorText(err) : 'Der Kunde ist doch buchhaltungsrelevant.');
+      return;
+    }
+    toast.success('Endgültig gelöscht', label ? `${label} wurde vollständig entfernt.` : undefined);
+    navigate('/admin/finance/customers');
+  };
+
+  const runForceDelete = async (reason: string): Promise<string | null> => {
+    if (!customerId) return 'Kein Kunde ausgewählt.';
+    const { deleted, label, error: err } = await forceDeleteCustomer(customerId, reason, FORCE_DELETE_PHRASE);
+    if (err) return forceDeleteErrorText(err);
+    if (!deleted) return forceDeleteErrorText(null);
+    setForceDeleteOpen(false);
+    toast.success('Endgültig gelöscht', label ? `${label} wurde vollständig entfernt.` : undefined);
+    navigate('/admin/finance/customers');
+    return null;
   };
 
   if (loading) {
@@ -362,23 +424,48 @@ export function CustomerDetailPage() {
               <Button variant="ghost" icon={Archive} onClick={() => setArchiveOpen(true)}>Archivieren</Button>
             )}
             {/*
-              Deletion is offered only when it is actually possible. A customer
-              with protected financial records gets archiving instead — the
-              button explains why rather than failing on click.
+              The safe delete is offered only when it is actually possible: a customer with
+              protected financial records gets archiving instead, and the button says why rather
+              than failing on click.
+
+              The archived state is also the second step for the irreversible one. An archived
+              customer can be destroyed for real — invoices, offers, onboarding and all — behind
+              the typed phrase and a logged reason. That is the only way out for a test customer
+              that has an issued invoice hanging off it, which the safe path can never delete.
             */}
-            <Button
-              variant="ghost"
-              icon={Trash2}
-              onClick={() => setDeleteOpen(true)}
-              disabled={!detail.delete_blockers.deletable}
-              title={
-                detail.delete_blockers.deletable
-                  ? undefined
-                  : `Nicht löschbar: ${blockerSentence(detail.delete_blockers)}. Archivieren Sie den Kunden stattdessen.`
-              }
-            >
-              Löschen
-            </Button>
+            {c.status === 'archived' && relevance && !relevance.relevant ? (
+              /* No financial history at all: the ordinary permanent delete. */
+              <Button variant="ghost" icon={Trash2} onClick={() => setPurgeOpen(true)}>
+                Endgültig löschen
+              </Button>
+            ) : c.status === 'archived' && relevance?.relevant ? (
+              /* Issued invoices, payments, binding offers or subscriptions: emergency only. */
+              <Button
+                variant="ghost"
+                icon={Trash2}
+                onClick={() => setForceDeleteOpen(true)}
+                title={`Buchhaltungsrelevant: ${describeAccountingReasons(relevance.reasons).join(', ')}`}
+              >
+                Notfall-Löschung
+              </Button>
+            ) : c.status === 'archived' ? (
+              /* Relevance still loading: no destructive button until the server has answered. */
+              <Button variant="ghost" icon={Trash2} disabled>Endgültig löschen</Button>
+            ) : (
+              <Button
+                variant="ghost"
+                icon={Trash2}
+                onClick={() => setDeleteOpen(true)}
+                disabled={!detail.delete_blockers.deletable}
+                title={
+                  detail.delete_blockers.deletable
+                    ? undefined
+                    : `Nicht löschbar: ${blockerSentence(detail.delete_blockers)}. Archivieren Sie den Kunden zuerst, um ihn endgültig löschen zu können.`
+                }
+              >
+                Löschen
+              </Button>
+            )}
           </>
         }
       />
@@ -664,6 +751,43 @@ export function CustomerDetailPage() {
             ) : null}
           </>
         } />
+
+      {/*
+        The irreversible one. It is reachable only from the archived state, and it destroys the
+        customer together with everything the RESTRICT foreign keys make a structural dependent —
+        issued invoices, finalized offers, subscriptions, onboarding. The manifest inside the
+        dialog names every one of those before the owner confirms; nothing here summarises it.
+      */}
+      {/*
+        Tier 1 for a customer: archived, and with nothing accounting-relevant anywhere on it. The
+        server re-checks both, so this dialog states the consequence rather than guarding it.
+      */}
+      <ConfirmDialog
+        open={purgeOpen} onClose={() => setPurgeOpen(false)} onConfirm={confirmPurge}
+        tone="danger" title="Kunde endgültig löschen?" confirmLabel="Endgültig löschen"
+        message={
+          <>
+            <p>
+              <span className="font-semibold text-[var(--cq-fg)]">{name}</span> hat keine
+              buchhaltungsrelevante Historie — keine gestellte Rechnung, keine Zahlung, kein
+              verbindliches Angebot, kein Abonnement.
+            </p>
+            <p className="mt-2">
+              Der Kunde wird mit allen Entwürfen, Aufgaben, Notizen, Onboarding-Daten und Dateien
+              vollständig aus der Datenbank entfernt. Diese Aktion kann nicht rückgängig gemacht
+              werden.
+            </p>
+          </>
+        } />
+
+      <ForceDeleteConfirmModal
+        open={forceDeleteOpen}
+        heading="Kunde endgültig löschen?"
+        previews={forcePreviews}
+        primaryTable={scopeTable.customer}
+        onClose={() => setForceDeleteOpen(false)}
+        onRun={runForceDelete}
+      />
     </>
   );
 }

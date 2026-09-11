@@ -131,7 +131,11 @@ export type DeleteAction =
   | 'cancel_and_trash'
   | 'archive_and_trash'
   | 'trash_only'
-  | 'blocked';
+  | 'blocked'
+  /** Only ever returned by the tier-1 Papierkorb purge (owner_workspace_purge_items). */
+  | 'purge'
+  /** Only ever returned by the tier-2 emergency purge — never by the ordinary preflight. */
+  | 'force_delete';
 
 export interface DeletePlan {
   resourceId: string;
@@ -391,13 +395,512 @@ export async function restoreWorkspaceItems(
   return { restored: (data as { restored?: number })?.restored ?? 0, error: null };
 }
 
-/** "Endgültig löschen" from the Papierkorb. The server re-runs the preflight and may still refuse. */
-export async function purgeWorkspaceItems(
+/* ================================================================ force delete
+ *
+ * The second, irreversible path. Everything above this line describes the ordinary
+ * "Löschen", which is honest about refusing to destroy a numbered document. This is what the
+ * owner reaches for when that refusal is not what they want — a test invoice, a duplicate, a
+ * record that must genuinely leave the system rather than sit in the Papierkorb forever.
+ *
+ * It exists because the original purge could never run: `owner_workspace_delete_items` hard-deletes
+ * anything the preflight calls `hard_delete` instead of trashing it, so no record in the Papierkorb
+ * ever satisfies the condition `owner_workspace_purge_items` required. See
+ * 20260910120000_owner_force_delete.sql.
+ *
+ * The server enforces all four guards — trashed (or archived) first, the typed phrase, a reason of
+ * at least three characters, and a tombstone written in the same transaction. Nothing here may
+ * assume any of them; the UI restates them because it is the honest thing to show, not because it
+ * is what makes them true.
+ */
+
+/** The phrase the owner must type. Must match `owner_force_delete_phrase()` exactly. */
+export const FORCE_DELETE_PHRASE = 'ENDGÜLTIG LÖSCHEN';
+
+export const FORCE_DELETE_MIGRATION = '20260910120000_owner_force_delete.sql';
+
+export interface ForceDeletePreview {
+  resourceId: string;
+  found: boolean;
+  label: string | null;
+  /** The record as it was, straight from the server. Rendered read-only. */
+  summary: Record<string, unknown>;
+  /** Table name -> number of rows that will cease to exist. */
+  manifest: Record<string, number>;
+  /** The same tree in money and reference numbers, not table names. Never null when found. */
+  blastRadius: BlastRadius | null;
+  reason: string | null;
+}
+
+/**
+ * What "destroy this" means in terms the business actually uses. Computed by
+ * owner_purge_blast_radius, which walks the exact same owner_purge_dependencies map the real
+ * destroyer does — this can never under-report what owner_purge_manifest also reports, because
+ * both read from the same source of truth.
+ */
+export interface BlastRadius {
+  invoices: { count: number; grossTotalCents: number; numbers: string[] };
+  payments: { count: number; totalCents: number };
+  offers: { count: number; numbers: string[] };
+  generatedDocuments: { count: number };
+  financeDocuments: { count: number };
+  portalDocuments: { count: number };
+  storageObjects: { count: number };
+}
+
+function toBlastRadius(raw: unknown): BlastRadius | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const r = raw as Record<string, { count?: number; total_cents?: number; gross_total_cents?: number; numbers?: string[] }>;
+  const n = (v: number | undefined) => v ?? 0;
+  return {
+    invoices: {
+      count: n(r.invoices?.count), grossTotalCents: n(r.invoices?.gross_total_cents),
+      numbers: r.invoices?.numbers ?? [],
+    },
+    payments: { count: n(r.payments?.count), totalCents: n(r.payments?.total_cents) },
+    offers: { count: n(r.offers?.count), numbers: r.offers?.numbers ?? [] },
+    generatedDocuments: { count: n(r.generated_documents?.count) },
+    financeDocuments: { count: n(r.finance_documents?.count) },
+    portalDocuments: { count: n(r.portal_documents?.count) },
+    storageObjects: { count: n(r.storage_objects?.count) },
+  };
+}
+
+/**
+ * German for a physical table name.
+ *
+ * The manifest is a catalog walk, so it can name a table this map has never heard of. That is
+ * deliberate and must stay non-fatal: an unknown table is shown under its own name rather than
+ * hidden, because hiding a row count in a destruction confirmation is the one thing this dialog
+ * may never do.
+ */
+export const manifestTableLabel: Record<string, string> = {
+  owner_invoices: 'Rechnung',
+  owner_invoice_lines: 'Rechnungsposition',
+  owner_invoice_versions: 'Rechnungsversion',
+  owner_offers: 'Angebot',
+  owner_offer_lines: 'Angebotsposition',
+  owner_offer_versions: 'Angebotsversion',
+  owner_offer_acceptance_events: 'Annahme-Nachweis',
+  owner_expenses: 'Beleg',
+  owner_expense_lines: 'Belegposition',
+  owner_payments: 'Zahlung',
+  owner_finance_documents: 'Dokument',
+  owner_generated_documents: 'Erzeugtes PDF',
+  owner_document_access_tokens: 'Freigabe-Link',
+  owner_document_access_events: 'Zugriffsereignis',
+  owner_customers: 'Kunde',
+  owner_customer_tasks: 'Aufgabe',
+  owner_customer_activity: 'Aktivität',
+  owner_customer_services: 'Kundenservice',
+  owner_subscriptions: 'Abonnement',
+  owner_revenue_contracts: 'Umsatzvertrag',
+  owner_revenue_contract_lines: 'Vertragsposition',
+  owner_revenue_contract_postings: 'Vertragsbuchung',
+  owner_service_engagements: 'Onboarding',
+  customer_project_invoices: 'Projektverknüpfung',
+  customer_documents: 'Kundenportal-Dokument',
+  owner_automation_jobs: 'Versandauftrag',
+  owner_elster_submissions: 'ELSTER-Übermittlung',
+  owner_workspace_item_state: 'Ablage-Zustand',
+  // Not a table: the purge counts Storage files under this key so the dialog can name them.
+  _storage_objects: 'Datei im Dateispeicher',
+};
+
+export interface ManifestLine {
+  table: string;
+  label: string;
+  count: number;
+}
+
+/**
+ * The manifest as sorted, human lines. The record's own table comes first — it is the thing the
+ * owner asked to delete — and the dependents follow by descending count.
+ */
+export function manifestLines(
+  manifest: Record<string, number>, primaryTable?: string,
+): ManifestLine[] {
+  return Object.entries(manifest)
+    .filter(([, count]) => count > 0)
+    .map(([table, count]) => ({ table, label: manifestTableLabel[table] ?? table, count }))
+    .sort((a, b) => {
+      if (a.table === primaryTable) return -1;
+      if (b.table === primaryTable) return 1;
+      return b.count - a.count || a.label.localeCompare(b.label, 'de');
+    });
+}
+
+/** The physical table behind a scope, so `manifestLines` can put it first. Mirrors the SQL. */
+export const scopeTable: Record<string, string> = {
+  invoice: 'owner_invoices',
+  offer: 'owner_offers',
+  expense: 'owner_expenses',
+  customer: 'owner_customers',
+};
+
+/**
+ * Stable server codes turned into something the owner can act on. Anything the server did not
+ * name explicitly stays generic rather than leaking a Postgres message into the dialog.
+ */
+export function forceDeleteErrorText(message: string | null | undefined): string {
+  if (!message) return 'Der Datensatz konnte nicht gelöscht werden.';
+  if (message.includes('force_delete_confirmation_required')) {
+    return `Bitte tippen Sie „${FORCE_DELETE_PHRASE}" exakt so ein.`;
+  }
+  if (message.includes('force_delete_reason_required')) return 'Bitte geben Sie einen Grund an.';
+  if (message.includes('force_delete_requires_archived')) {
+    return 'Der Kunde muss zuerst archiviert werden.';
+  }
+  if (message.includes('force_delete_protected_table')) {
+    return 'Dieser Datensatz ist strukturell geschützt und kann nicht gelöscht werden.';
+  }
+  if (message.includes('force_delete_depth_exceeded')) {
+    return 'Der Datensatz hat zu viele verknüpfte Ebenen. Bitte löschen Sie die Verknüpfungen zuerst.';
+  }
+  if (message.includes('Owner access required')) return 'Keine Berechtigung.';
+  if (message.includes('customer not found')) return 'Kunde nicht gefunden.';
+  return 'Der Datensatz konnte nicht gelöscht werden.';
+}
+
+/** Read-only. Answers "what exactly disappears if I confirm this?" and destroys nothing. */
+export async function loadForceDeletePreview(
+  scope: string, resourceId: string,
+): Promise<{ preview: ForceDeletePreview | null; error: string | null }> {
+  const { data, error } = await supabase.rpc('owner_force_delete_preview', {
+    p_scope: scope, p_resource_id: resourceId,
+  });
+  if (error) return { preview: null, error: error.message };
+  const row = data as {
+    resource_id?: string; found?: boolean; label?: string | null; reason?: string | null;
+    summary?: Record<string, unknown>; manifest?: Record<string, number>; blast_radius?: unknown;
+  } | null;
+  if (!row) return { preview: null, error: 'unknown' };
+  return {
+    preview: {
+      resourceId: row.resource_id ?? resourceId,
+      found: Boolean(row.found),
+      label: row.label ?? null,
+      summary: row.summary ?? {},
+      manifest: row.manifest ?? {},
+      blastRadius: toBlastRadius(row.blast_radius),
+      reason: row.reason ?? null,
+    },
+    error: null,
+  };
+}
+
+/**
+ * Destroys the records for real. Only reachable for something already in the Papierkorb — the
+ * server checks that itself and returns `blocked` with `not_trashed` otherwise.
+ */
+export async function forcePurgeWorkspaceItems(
   entityId: string, scope: WorkspaceScope, resourceIds: string[],
+  reason: string, confirmation: string,
 ): Promise<{ results: DeleteResult[]; error: string | null }> {
-  const { data, error } = await supabase.rpc('owner_workspace_purge_items', {
+  const { data, error } = await supabase.rpc('owner_force_purge_items', {
     p_entity: entityId, p_scope: scope, p_resource_ids: resourceIds,
+    p_reason: reason, p_confirmation: confirmation,
   });
   if (error) return { results: [], error: error.message };
   return { results: toResults(data), error: null };
+}
+
+/**
+ * The customer counterpart. The archive is the customer's Papierkorb, so the server refuses
+ * anything that is not archived yet — the two-step rule is the same one, spelled differently.
+ */
+export async function forceDeleteCustomer(
+  customerId: string, reason: string, confirmation: string,
+): Promise<{ deleted: boolean; label: string | null; error: string | null }> {
+  const { data, error } = await supabase.rpc('owner_force_delete_customer', {
+    p_customer_id: customerId, p_reason: reason, p_confirmation: confirmation,
+  });
+  if (error) return { deleted: false, label: null, error: error.message };
+  const row = data as { deleted?: boolean; label?: string | null } | null;
+  return { deleted: Boolean(row?.deleted), label: row?.label ?? null, error: null };
+}
+
+/** What the toast says after a force purge — plainly, with no softening. */
+export function forceResultToast(
+  results: DeleteResult[],
+): { tone: 'success' | 'error'; title: string; detail?: string } {
+  const done = results.filter((r) => r.outcome === 'hard_deleted');
+  const notTrashed = results.filter((r) => r.error === 'not_trashed');
+  if (done.length === 0) {
+    return {
+      tone: 'error',
+      title: 'Nichts gelöscht',
+      detail: notTrashed.length
+        ? 'Nur Einträge im Papierkorb können endgültig gelöscht werden.'
+        : 'Der Server hat die Aktion abgelehnt.',
+    };
+  }
+  const failed = results.length - done.length;
+  return {
+    tone: failed ? 'error' : 'success',
+    title: done.length === 1 ? 'Endgültig gelöscht' : `${done.length} endgültig gelöscht`,
+    detail: failed
+      ? `${failed} ${failed === 1 ? 'Eintrag konnte' : 'Einträge konnten'} nicht gelöscht werden.`
+      : undefined,
+  };
+}
+
+/* ============================================================ purge policy
+ *
+ * Two tiers, and the difference between them is the whole point.
+ *
+ * TIER 1 — `purgeWorkspaceItems`. A trashed record that never became accounting-relevant: a
+ * draft nobody issued, an offer nobody finalized, an unpaid expense with no document. Destroyed
+ * completely, behind a plain confirmation.
+ *
+ * TIER 2 — `forcePurgeWorkspaceItems`. The emergency escape hatch for a record that IS
+ * accounting-relevant. Same destruction, but it demands the typed phrase and a written reason.
+ *
+ * Eligibility is its own server decision (`owner_workspace_purge_preflight`), deliberately NOT the
+ * delete preflight. That one answers "what may Löschen do to a row still in the list", and its
+ * `hard_delete` answer is consumed by the delete itself before the row can ever reach the trash —
+ * which is exactly why asking it again from the Papierkorb could never say yes.
+ *
+ * Migration: 20260910130000_owner_purge_policy.sql
+ */
+
+export const PURGE_POLICY_MIGRATION = '20260910130000_owner_purge_policy.sql';
+
+export type PurgeEligibility =
+  | 'purgeable'
+  | 'accounting_protected'
+  | 'not_found'
+  | 'scope_not_supported';
+
+export interface PurgePlan {
+  resourceId: string;
+  eligibility: PurgeEligibility;
+  /** Stable codes naming what made the record accounting-relevant. Empty when it is not. */
+  reasons: string[];
+  label: string | null;
+  /** Table name -> rows that will cease to exist. `_storage_objects` counts files. */
+  manifest: Record<string, number>;
+}
+
+/** German for the codes owner_record_accounting_relevance returns. */
+export const accountingReasonLabel: Record<string, string> = {
+  invoice_number_allocated: 'Rechnungsnummer vergeben',
+  issued: 'gestellt',
+  status_issued: 'gestellt',
+  status_paid: 'bezahlt',
+  status_partially_paid: 'teilweise bezahlt',
+  status_overdue: 'überfällig',
+  status_cancelled: 'storniert',
+  status_credited: 'gutgeschrieben',
+  has_payments: 'Zahlungen erfasst',
+  money_received: 'Zahlungseingang gebucht',
+  money_paid: 'bereits bezahlt',
+  has_documents: 'Belege verknüpft',
+  has_generated_documents: 'erzeugte Dokumente vorhanden',
+  published_to_customer_portal: 'im Kundenportal veröffentlicht',
+  linked_to_customer_project: 'mit einem Kundenprojekt verknüpft',
+  finalized: 'verbindlich finalisiert',
+  offer_number_allocated: 'Angebotsnummer vergeben',
+  converted_to_invoice: 'in eine Rechnung überführt',
+  has_access_tokens: 'Freigabe-Links vergeben',
+  has_acceptance_evidence: 'Annahme-Nachweis vorhanden',
+  has_revenue_contract: 'Umsatzvertrag daran gekoppelt',
+  has_issued_invoices: 'gestellte Rechnungen vorhanden',
+  has_binding_offers: 'verbindliche Angebote vorhanden',
+  has_subscriptions: 'Abonnements vorhanden',
+  has_revenue_contracts: 'Umsatzverträge vorhanden',
+  not_found: 'Datensatz nicht gefunden',
+  scope_not_supported: 'für diesen Datentyp nicht vorgesehen',
+};
+
+export function describeAccountingReasons(reasons: string[]): string[] {
+  // Deduplicated: `issued` and `status_issued` both mean the same thing to a reader, and the
+  // server legitimately returns both.
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const code of reasons) {
+    const label = accountingReasonLabel[code];
+    if (!label || seen.has(label)) continue;
+    seen.add(label);
+    out.push(label);
+  }
+  return out;
+}
+
+function toPurgePlans(raw: unknown): PurgePlan[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((entry) => {
+    const row = entry as {
+      resource_id: string; eligibility: PurgeEligibility; reasons?: string[];
+      label?: string | null; manifest?: Record<string, number>;
+    };
+    return {
+      resourceId: row.resource_id,
+      eligibility: row.eligibility,
+      reasons: row.reasons ?? [],
+      label: row.label ?? null,
+      manifest: row.manifest ?? {},
+    };
+  });
+}
+
+/**
+ * Purge eligibility for a set of trashed records, in ONE request. This is what the Papierkorb
+ * renders from — never `plan.action === 'hard_delete'`, which no trashed row can satisfy.
+ */
+export async function loadPurgePreflight(
+  scope: string, resourceIds: string[],
+): Promise<{ plans: PurgePlan[]; error: string | null }> {
+  const { data, error } = await supabase.rpc('owner_workspace_purge_preflight', {
+    p_scope: scope, p_resource_ids: resourceIds,
+  });
+  if (error) return { plans: [], error: error.message };
+  return { plans: toPurgePlans(data), error: null };
+}
+
+/**
+ * Tier 1. Permanently deletes trashed records that never became accounting-relevant, with every
+ * dependent row and every Storage file. The server refuses anything else — this cannot become a
+ * back door to an issued invoice, and the database guards stay armed behind it either way.
+ */
+export async function purgeWorkspaceItems(
+  entityId: string, scope: WorkspaceScope, resourceIds: string[], reason?: string | null,
+): Promise<{ results: DeleteResult[]; error: string | null }> {
+  const { data, error } = await supabase.rpc('owner_workspace_purge_items', {
+    p_entity: entityId, p_scope: scope, p_resource_ids: resourceIds, p_reason: reason ?? null,
+  });
+  if (error) return { results: [], error: error.message };
+  return { results: toResults(data), error: null };
+}
+
+/** Tier 1 for a customer: archived, and with no financial history at all. */
+export async function purgeCustomer(
+  customerId: string, reason?: string | null,
+): Promise<{ deleted: boolean; eligibility: PurgeEligibility | null; label: string | null; error: string | null }> {
+  const { data, error } = await supabase.rpc('owner_purge_customer', {
+    p_customer_id: customerId, p_reason: reason ?? null,
+  });
+  if (error) return { deleted: false, eligibility: null, label: null, error: error.message };
+  const row = data as { deleted?: boolean; eligibility?: PurgeEligibility; label?: string | null } | null;
+  return {
+    deleted: Boolean(row?.deleted),
+    eligibility: row?.eligibility ?? null,
+    label: row?.label ?? null,
+    error: null,
+  };
+}
+
+/** Accounting relevance for one record, for surfaces that have no workspace trash (customers). */
+export async function loadAccountingRelevance(
+  scope: string, resourceId: string,
+): Promise<{ relevant: boolean | null; reasons: string[]; label: string | null; error: string | null }> {
+  const { data, error } = await supabase.rpc('owner_record_accounting_relevance', {
+    p_scope: scope, p_id: resourceId,
+  });
+  if (error) return { relevant: null, reasons: [], label: null, error: error.message };
+  const row = data as { relevant?: boolean; reasons?: string[]; label?: string | null } | null;
+  if (!row) return { relevant: null, reasons: [], label: null, error: null };
+  return {
+    relevant: Boolean(row.relevant),
+    reasons: row.reasons ?? [],
+    label: row.label ?? null,
+    error: null,
+  };
+}
+
+/** What the toast says after a tier-1 purge, including the honest refusal. */
+export function purgeResultToast(
+  results: DeleteResult[],
+): { tone: 'success' | 'error'; title: string; detail?: string } {
+  const done = results.filter((r) => r.outcome === 'hard_deleted');
+  const protectedCount = results.filter((r) => r.error === 'accounting_protected').length;
+  if (done.length === 0) {
+    return {
+      tone: 'error',
+      title: 'Nichts gelöscht',
+      detail: protectedCount
+        ? 'Buchhaltungsrelevante Datensätze können hier nicht gelöscht werden.'
+        : 'Der Server hat die Aktion abgelehnt.',
+    };
+  }
+  const failed = results.length - done.length;
+  return {
+    tone: failed ? 'error' : 'success',
+    title: done.length === 1 ? 'Endgültig gelöscht' : `${done.length} endgültig gelöscht`,
+    detail: failed
+      ? `${failed} ${failed === 1 ? 'Datensatz wurde' : 'Datensätze wurden'} als buchhaltungsrelevant beibehalten.`
+      : undefined,
+  };
+}
+
+/* ================================================================ storage purge status
+ *
+ * Real Storage-byte deletion is asynchronous by design (20260910140000_owner_storage_purge_
+ * worker.sql): the purge RPCs write a durable outbox row in the same transaction as the DB
+ * destruction, and storage-purge-worker — a separate Edge Function, invoked every minute,
+ * holding the service-role key — is the only thing that ever calls the real Storage API to
+ * remove bytes. Neither the purge RPC's own return value nor this module's earlier
+ * `_storage_cleanup` reporting can claim Storage is DONE synchronously; this is the queryable
+ * live status for a purge whose tombstone id you have.
+ */
+
+export interface StoragePurgeObjectStatus {
+  bucketId: string;
+  objectName: string;
+  status: 'pending' | 'processing' | 'deleted' | 'already_missing' | 'failed';
+  attemptCount: number;
+  lastError: string | null;
+}
+
+export interface StoragePurgeStatus {
+  expected: number;
+  deleted: number;
+  alreadyMissing: number;
+  failed: number;
+  pending: number;
+  /** True once every expected object is `deleted` or `already_missing` — never while any is `failed`. */
+  allResolved: boolean;
+  objects: StoragePurgeObjectStatus[];
+}
+
+/** The live rollup for one tombstone's Storage cleanup: what the worker has actually done so far. */
+export async function loadStoragePurgeStatus(
+  tombstoneId: string,
+): Promise<{ status: StoragePurgeStatus | null; error: string | null }> {
+  const { data, error } = await supabase.rpc('owner_storage_purge_status', { p_tombstone_id: tombstoneId });
+  if (error) return { status: null, error: error.message };
+  const row = data as {
+    expected?: number; deleted?: number; already_missing?: number; failed?: number; pending?: number;
+    all_resolved?: boolean;
+    objects?: { bucket_id: string; object_name: string; status: string; attempt_count: number; last_error: string | null }[];
+  } | null;
+  if (!row) return { status: null, error: 'unknown' };
+  return {
+    status: {
+      expected: row.expected ?? 0,
+      deleted: row.deleted ?? 0,
+      alreadyMissing: row.already_missing ?? 0,
+      failed: row.failed ?? 0,
+      pending: row.pending ?? 0,
+      allResolved: Boolean(row.all_resolved),
+      objects: (row.objects ?? []).map((o) => ({
+        bucketId: o.bucket_id, objectName: o.object_name,
+        status: o.status as StoragePurgeObjectStatus['status'],
+        attemptCount: o.attempt_count, lastError: o.last_error,
+      })),
+    },
+    error: null,
+  };
+}
+
+/**
+ * Forces an immediate retry of every entry stuck at `failed` for one tombstone — resetting each
+ * back to `pending` with a fresh attempt budget, so the next worker sweep (within a minute)
+ * picks it straight back up. Returns how many entries were reset.
+ */
+export async function retryStoragePurge(
+  tombstoneId: string,
+): Promise<{ retried: number; error: string | null }> {
+  const { data, error } = await supabase.rpc('owner_storage_purge_retry_failed', { p_tombstone_id: tombstoneId });
+  if (error) return { retried: 0, error: error.message };
+  return { retried: typeof data === 'number' ? data : 0, error: null };
 }

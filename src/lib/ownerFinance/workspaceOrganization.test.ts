@@ -203,8 +203,20 @@ describe('every operation goes through an owner-gated RPC', () => {
       { p_entity: 'e1', p_scope: 'expense', p_resource_ids: ['a'], p_reason: null }],
     ['restoreWorkspaceItems', () => w.restoreWorkspaceItems('e1', 'expense', ['a']), 'owner_workspace_restore_items',
       { p_entity: 'e1', p_scope: 'expense', p_resource_ids: ['a'] }],
-    ['purgeWorkspaceItems', () => w.purgeWorkspaceItems('e1', 'invoice', ['a']), 'owner_workspace_purge_items',
-      { p_entity: 'e1', p_scope: 'invoice', p_resource_ids: ['a'] }],
+    // The Papierkorb's permanent delete. It replaces purgeWorkspaceItems, whose RPC could never
+    // act on anything that reached the trash, and it carries the two arguments that make an
+    // irreversible call deliberate rather than reachable by accident.
+    ['forcePurgeWorkspaceItems',
+      () => w.forcePurgeWorkspaceItems('e1', 'invoice', ['a'], 'Testdatensatz', w.FORCE_DELETE_PHRASE),
+      'owner_force_purge_items',
+      { p_entity: 'e1', p_scope: 'invoice', p_resource_ids: ['a'], p_reason: 'Testdatensatz',
+        p_confirmation: w.FORCE_DELETE_PHRASE }],
+    ['forceDeleteCustomer',
+      () => w.forceDeleteCustomer('c1', 'Testkunde', w.FORCE_DELETE_PHRASE),
+      'owner_force_delete_customer',
+      { p_customer_id: 'c1', p_reason: 'Testkunde', p_confirmation: w.FORCE_DELETE_PHRASE }],
+    ['loadForceDeletePreview', () => w.loadForceDeletePreview('invoice', 'a'), 'owner_force_delete_preview',
+      { p_scope: 'invoice', p_resource_id: 'a' }],
   ])('%s → %s', async (_label, call, fnName, args) => {
     await call();
     expect(rpc).toHaveBeenCalledWith(fnName, args);
@@ -235,5 +247,76 @@ describe('every operation goes through an owner-gated RPC', () => {
     expect(rpc).toHaveBeenCalledTimes(1);
     expect(loaded.folders).toEqual([{ id: 'f1', name: 'A', sortOrder: 0, createdAt: '2026-01-01' }]);
     expect(loaded.items.r1).toEqual({ resourceId: 'r1', folderId: 'f1', trashedAt: null });
+  });
+});
+
+describe('the emergency-purge blast radius', () => {
+  it('turns the server tree into money and reference numbers, camelCased and typed', async () => {
+    rpc.mockResolvedValue({
+      data: {
+        resource_id: 'c1', found: true, label: 'Blast Radius GmbH',
+        summary: { label: 'Blast Radius GmbH' },
+        manifest: { owner_customers: 1, owner_invoices: 2 },
+        blast_radius: {
+          invoices: { count: 2, gross_total_cents: 297500, numbers: ['RE-2026-0001', 'RE-2026-0002'] },
+          payments: { count: 1, total_cents: 100000 },
+          offers: { count: 1, numbers: ['AN-2026-0007'] },
+          generated_documents: { count: 3 },
+          finance_documents: { count: 1 },
+          portal_documents: { count: 1 },
+          storage_objects: { count: 4 },
+        },
+      },
+      error: null,
+    } as never);
+
+    const { preview } = await w.loadForceDeletePreview('customer', 'c1');
+    expect(preview?.blastRadius).toEqual({
+      invoices: { count: 2, grossTotalCents: 297500, numbers: ['RE-2026-0001', 'RE-2026-0002'] },
+      payments: { count: 1, totalCents: 100000 },
+      offers: { count: 1, numbers: ['AN-2026-0007'] },
+      generatedDocuments: { count: 3 },
+      financeDocuments: { count: 1 },
+      portalDocuments: { count: 1 },
+      storageObjects: { count: 4 },
+    });
+  });
+
+  it('never throws on a missing or malformed blast_radius — the manifest still renders', async () => {
+    rpc.mockResolvedValue({
+      data: { resource_id: 'i1', found: true, label: 'RE-1', summary: {}, manifest: { owner_invoices: 1 } },
+      error: null,
+    } as never);
+    const { preview } = await w.loadForceDeletePreview('invoice', 'i1');
+    expect(preview?.blastRadius).toBeNull();
+    expect(preview?.manifest).toEqual({ owner_invoices: 1 });
+  });
+});
+
+describe('a race-detected refusal reads the same as an ordinary protection', () => {
+  // owner_workspace_purge_items and owner_purge_customer both catch
+  // purge_race_accounting_relevant (raised by owner_purge_destroy_row's own lock-and-recheck,
+  // inside the SAME transaction as the destroy, when a payment or issuance landed on the record
+  // between the preflight and the destroy) and report it exactly like the ordinary up-front
+  // refusal — so the UI needs no separate branch for "it became relevant while you were
+  // confirming" versus "it was already relevant".
+  it('purgeResultToast treats a race-blocked purge the same as accounting_protected', () => {
+    const result: DeleteResult = {
+      resourceId: 'i1', action: 'purge', outcome: 'blocked', reasons: [], error: 'accounting_protected',
+    };
+    expect(w.purgeResultToast([result])).toMatchObject({
+      tone: 'error', title: 'Nichts gelöscht',
+      detail: 'Buchhaltungsrelevante Datensätze können hier nicht gelöscht werden.',
+    });
+  });
+
+  it('purgeCustomer surfaces eligibility=accounting_protected without a PostgREST error', async () => {
+    rpc.mockResolvedValue({
+      data: { customer_id: 'c1', deleted: false, eligibility: 'accounting_protected',
+        reasons: ['became_accounting_relevant_during_purge'] },
+      error: null,
+    } as never);
+    const res = await w.purgeCustomer('c1', 'Testkunde');
+    expect(res).toMatchObject({ deleted: false, eligibility: 'accounting_protected', error: null });
   });
 });

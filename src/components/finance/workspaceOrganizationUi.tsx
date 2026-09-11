@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import {
   ChevronLeft, Folder, FolderInput, FolderOpen, FolderPlus, LayoutList, MoreHorizontal,
-  Pencil, RotateCcw, Trash2, X, type LucideIcon,
+  AlertTriangle, Pencil, RotateCcw, Trash2, X, type LucideIcon,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -17,12 +17,17 @@ import {
   EMPTY_WORKSPACE_STATE, FOLDER_ALL, FOLDER_TRASH, FOLDER_UNFILED,
   createWorkspaceFolder, deleteWorkspaceFolder, deleteWorkspaceItems,
   folderErrorText, loadWorkspaceState, moveWorkspaceItems, preflightWorkspaceDelete,
-  purgeWorkspaceItems, renameWorkspaceFolder, restoreWorkspaceItems, resultToast,
+  renameWorkspaceFolder, restoreWorkspaceItems, resultToast,
   summarisePlans, summaryLines, validateFolderName,
   describeReasons,
-  type DeletePlan, type FolderCounts, type FolderSelection, type WorkspaceFolder,
-  type WorkspaceScope, type WorkspaceState,
+  FORCE_DELETE_PHRASE, forceDeleteErrorText, forcePurgeWorkspaceItems, forceResultToast,
+  loadForceDeletePreview, manifestLines, scopeTable,
+  describeAccountingReasons, loadPurgePreflight, purgeResultToast, purgeWorkspaceItems,
+  type BlastRadius, type DeletePlan, type FolderCounts, type FolderSelection,
+  type ForceDeletePreview, type PurgePlan, type WorkspaceFolder, type WorkspaceScope,
+  type WorkspaceState,
 } from '@/lib/ownerFinance/workspaceOrganization';
+import { formatCentsCurrencyDe } from '@/lib/ownerFinance/exports';
 
 /**
  * The folder / Papierkorb / delete surface, shared by every owner collection that has one.
@@ -821,7 +826,7 @@ const confirmLabelFor: Record<string, string> = {
  * actionable — nothing is optimistically hidden before the server has confirmed it.
  */
 export function WorkspaceDeleteDialog({
-  open, org, resourceIds, onClose, onDone, resourceSingular, resourcePlural, mode = 'delete',
+  open, org, resourceIds, onClose, onDone, resourceSingular, resourcePlural,
 }: {
   open: boolean;
   org: WorkspaceOrganization;
@@ -830,8 +835,6 @@ export function WorkspaceDeleteDialog({
   onDone: () => void;
   resourceSingular: string;
   resourcePlural: string;
-  /** `purge` is the Papierkorb's "Endgültig löschen"; it only ever hard-deletes. */
-  mode?: 'delete' | 'purge';
 }) {
   const toast = useToast();
   const [plans, setPlans] = useState<DeletePlan[] | null>(null);
@@ -860,9 +863,7 @@ export function WorkspaceDeleteDialog({
     if (!org.entityId) return;
     setBusy(true);
     setFailure(null);
-    const { results, error } = mode === 'purge'
-      ? await purgeWorkspaceItems(org.entityId, org.scope, resourceIds)
-      : await deleteWorkspaceItems(org.entityId, org.scope, resourceIds);
+    const { results, error } = await deleteWorkspaceItems(org.entityId, org.scope, resourceIds);
     setBusy(false);
     if (error) { setFailure('Der Server hat die Aktion abgelehnt. Es wurde nichts verändert.'); return; }
     const toastPayload = resultToast(results);
@@ -873,18 +874,13 @@ export function WorkspaceDeleteDialog({
     else toast.error(toastPayload.title, toastPayload.detail);
   };
 
-  const actionable = mode === 'purge'
-    ? (summary?.hardDelete ?? 0) > 0
-    : (summary ? summary.total - summary.blocked > 0 : false);
+  const actionable = summary ? summary.total - summary.blocked > 0 : false;
 
-  const title = mode === 'purge'
-    ? 'Endgültig löschen?'
-    : single ? (singleTitle[single.action] ?? 'Entfernen?')
+  const title = single
+    ? (singleTitle[single.action] ?? 'Entfernen?')
     : `${resourceIds.length} ${resourcePlural} entfernen?`;
 
-  const confirmLabel = mode === 'purge'
-    ? 'Endgültig löschen'
-    : single ? (confirmLabelFor[single.action] ?? 'Entfernen') : 'Entfernen';
+  const confirmLabel = single ? (confirmLabelFor[single.action] ?? 'Entfernen') : 'Entfernen';
 
   return (
     <Modal
@@ -896,7 +892,7 @@ export function WorkspaceDeleteDialog({
         <>
           <Button variant="secondary" onClick={onClose} disabled={busy}>Abbrechen</Button>
           <Button
-            variant={single?.action === 'hard_delete' || mode === 'purge' ? 'danger' : 'primary'}
+            variant={single?.action === 'hard_delete' ? 'danger' : 'primary'}
             onClick={() => void run()}
             loading={busy}
             disabled={!plans || !actionable}
@@ -938,27 +934,525 @@ export function WorkspaceDeleteDialog({
 /* ============================================================ trash notes */
 
 /**
- * The Papierkorb row actions. "Endgültig löschen" appears ONLY where the server preflight says
- * a hard delete is genuinely available — a button that would always refuse is worse than no
- * button. Where it is absent, the row states why, once, without lecturing.
+ * The Papierkorb row actions, driven by PURGE ELIGIBILITY.
+ *
+ * The rule they used to use — `plan.action === 'hard_delete'` from the DELETE preflight — could
+ * never be true here. owner_workspace_delete_items hard-deletes such a record instead of trashing
+ * it, so nothing that reaches the Papierkorb has ever satisfied it and every row showed a refusal
+ * with no way past it.
+ *
+ * Eligibility is a different question, asked of the record as it is now: did this ever become
+ * accounting-relevant? A draft nobody issued did not, and gets a plain permanent delete. An issued
+ * invoice did, and keeps its refusal — plus the emergency escape hatch, visibly separate and
+ * visibly heavier, because destroying accounting evidence should never look like tidying up.
  */
-export function TrashRowActions({ plan, onRestore, onPurge }: {
-  plan: DeletePlan | undefined;
+export function TrashRowActions({ plan, onRestore, onPurge, onForcePurge }: {
+  plan: PurgePlan | undefined;
   onRestore: () => void;
+  /** Tier 1: the record never became accounting-relevant. */
   onPurge: () => void;
+  /** Tier 2: the emergency purge. Absent means the surface does not offer one. */
+  onForcePurge?: () => void;
 }) {
-  const purgeable = plan?.action === 'hard_delete';
+  const eligibility = plan?.eligibility;
+  const reasons = describeAccountingReasons(plan?.reasons ?? []);
+
   return (
-    <div className="flex items-center justify-end gap-1.5">
-      <Button size="sm" variant="secondary" icon={RotateCcw} onClick={onRestore}>Wiederherstellen</Button>
-      {purgeable ? (
-        <Button size="sm" variant="ghost" icon={Trash2} onClick={onPurge}>Endgültig löschen</Button>
-      ) : (
-        <span className={cn('max-w-[220px] text-right', text.hint)}>
-          Muss aus Nachweis-/Buchhaltungsgründen erhalten bleiben.
+    <div className="flex items-center justify-end gap-2">
+      {eligibility === 'accounting_protected' ? (
+        <span className={cn('max-w-[240px] text-right', text.hint)} title={reasons.join(' · ')}>
+          Buchhaltungsrelevant{reasons.length ? `: ${reasons[0]}` : ''}
         </span>
-      )}
+      ) : null}
+      <Button size="sm" variant="secondary" icon={RotateCcw} onClick={onRestore}>Wiederherstellen</Button>
+      {eligibility === 'purgeable' ? (
+        <Button size="sm" variant="ghost" icon={Trash2} onClick={onPurge}>Endgültig löschen</Button>
+      ) : eligibility === 'accounting_protected' && onForcePurge ? (
+        <Button size="sm" variant="ghost" icon={AlertTriangle} onClick={onForcePurge}>Notfall-Löschung</Button>
+      ) : null}
     </div>
+  );
+}
+
+/**
+ * Purge eligibility for everything visible in the Papierkorb, in ONE request.
+ *
+ * Per row would be the N+1 this whole feature exists to avoid, so the visible set is resolved in
+ * a single call and indexed by resource id.
+ */
+export function useTrashPurgePlans(
+  scope: WorkspaceScope, resourceIds: string[], active: boolean,
+): Record<string, PurgePlan> {
+  const [plans, setPlans] = useState<Record<string, PurgePlan>>({});
+  const key = resourceIds.join(',');
+
+  useEffect(() => {
+    if (!active || resourceIds.length === 0) { setPlans({}); return; }
+    let cancelled = false;
+    void loadPurgePreflight(scope, resourceIds).then(({ plans: next }) => {
+      if (cancelled) return;
+      const indexed: Record<string, PurgePlan> = {};
+      for (const plan of next) indexed[plan.resourceId] = plan;
+      setPlans(indexed);
+    });
+    return () => { cancelled = true; };
+    // The contents are the input, not the array identity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scope, key, active]);
+
+  return plans;
+}
+
+/* ============================================== tier 1: ordinary purge */
+
+/**
+ * The Papierkorb's ordinary permanent delete.
+ *
+ * No typed phrase and no mandatory reason, because this record never became accounting-relevant —
+ * demanding a ceremony for deleting a draft is how a safety measure turns into noise people learn
+ * to click through. What it does keep is the manifest: the owner still sees exactly what
+ * disappears, including the Storage files, before confirming.
+ */
+export function PurgeDialog({
+  open, org, resourceIds, plans, onClose, onDone, resourceSingular, resourcePlural,
+}: {
+  open: boolean;
+  org: WorkspaceOrganization;
+  resourceIds: string[];
+  /** Already loaded by the trash view; re-asking per dialog would be a second round trip. */
+  plans: Record<string, PurgePlan>;
+  onClose: () => void;
+  onDone: () => void;
+  resourceSingular: string;
+  resourcePlural: string;
+}) {
+  const toast = useToast();
+  const [reason, setReason] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [failure, setFailure] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setReason('');
+    setFailure(null);
+  }, [open]);
+
+  const selected = useMemo(
+    () => resourceIds.map((id) => plans[id]).filter((p): p is PurgePlan => Boolean(p)),
+    // Contents, not identity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [resourceIds.join(','), plans],
+  );
+
+  const lines = useMemo(() => {
+    const merged: Record<string, number> = {};
+    for (const plan of selected) {
+      for (const [table, count] of Object.entries(plan.manifest)) {
+        merged[table] = (merged[table] ?? 0) + count;
+      }
+    }
+    return manifestLines(merged, scopeTable[org.scope]);
+  }, [selected, org.scope]);
+
+  const run = async () => {
+    if (!org.entityId) return;
+    setBusy(true);
+    setFailure(null);
+    const { results, error } = await purgeWorkspaceItems(
+      org.entityId, org.scope, resourceIds, reason.trim() || null,
+    );
+    setBusy(false);
+    if (error) { setFailure('Der Server hat die Aktion abgelehnt. Es wurde nichts verändert.'); return; }
+    const payload = purgeResultToast(results);
+    await org.reload();
+    onClose();
+    onDone();
+    if (payload.tone === 'success') toast.success(payload.title, payload.detail);
+    else toast.error(payload.title, payload.detail);
+  };
+
+  const label = selected.length === 1 ? selected[0].label : null;
+
+  return (
+    <Modal
+      open={open}
+      onClose={busy ? () => {} : onClose}
+      title={resourceIds.length === 1
+        ? `${resourceSingular} endgültig löschen?`
+        : `${resourceIds.length} ${resourcePlural} endgültig löschen?`}
+      size="sm"
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose} disabled={busy}>Abbrechen</Button>
+          <Button variant="danger" onClick={() => void run()} loading={busy}>Endgültig löschen</Button>
+        </>
+      }
+    >
+      <div className={text.body}>
+        <p>
+          Dieser Datensatz war nie buchhaltungsrelevant — nicht gestellt, nicht finalisiert, keine
+          Zahlung. Er wird vollständig aus der Datenbank und dem Dateispeicher entfernt und kann
+          nicht wiederhergestellt werden.
+        </p>
+
+        {label ? <p className="mt-3 font-medium text-[var(--cq-fg)]">{label}</p> : null}
+
+        <p className="mt-3 font-medium text-[var(--cq-fg)]">Endgültig entfernt werden:</p>
+        <ul className="mt-1.5 space-y-1">
+          {lines.map((line) => (
+            <li key={line.table} className="flex gap-2">
+              <span aria-hidden="true" className="text-[var(--cq-fg-subtle)]">·</span>
+              <span>{line.count} × {line.label}</span>
+            </li>
+          ))}
+          {lines.length === 0 ? <li className="text-[var(--cq-fg-subtle)]">Nur der Datensatz selbst.</li> : null}
+        </ul>
+
+        <div className="mt-4">
+          <Field
+            id="purge-reason"
+            label="Grund (optional, wird protokolliert)"
+            value={reason}
+            onChange={setReason}
+            placeholder="z. B. Testdatensatz"
+            disabled={busy}
+          />
+        </div>
+
+        {failure ? <p className="mt-3 text-[13px] text-red-600">{failure}</p> : null}
+      </div>
+    </Modal>
+  );
+}
+
+/* ==================================================== force delete dialog */
+
+/**
+ * The irreversible confirmation, shared by every surface that offers one.
+ *
+ * Three things make it safe enough to exist, and all three are the server's — this component
+ * only refuses to hide them:
+ *
+ *   - it is reachable only after the record was already removed once (Papierkorb, or the
+ *     customer archive), so nothing is destroyed straight out of a working list;
+ *   - the exact phrase has to be typed, so nothing reaches it by a misclick;
+ *   - a written reason is mandatory and is stored in an append-only tombstone alongside the
+ *     record's number, totals and dates.
+ *
+ * The manifest is shown in full and in advance. A destruction confirmation that summarises, or
+ * that quietly omits a table the owner has never heard of, is worse than none: the whole point
+ * is that nothing about what disappears is a surprise afterwards.
+ */
+/**
+ * The blast radius, stated the way the owner asked for it: invoice count and total, payment
+ * count and total, offer count, document counts, Storage objects — with reference numbers where
+ * they exist. Every field this renders is one Lazar named explicitly as the minimum a
+ * confirmation dialog must show before an owner types the phrase.
+ *
+ * Zero-count rows are omitted; a purely structural emergency purge (no invoices, no payments)
+ * should not pad the dialog with a wall of "0 ×" lines.
+ */
+function BlastRadiusPanel({ blastRadius: b }: { blastRadius: BlastRadius }) {
+  const rows: { label: string; value: string; numbers?: string[] }[] = [];
+  if (b.invoices.count > 0) {
+    rows.push({
+      label: b.invoices.count === 1 ? 'Rechnung' : 'Rechnungen',
+      value: `${b.invoices.count} · ${formatCentsCurrencyDe(b.invoices.grossTotalCents)} brutto`,
+      numbers: b.invoices.numbers,
+    });
+  }
+  if (b.payments.count > 0) {
+    rows.push({
+      label: b.payments.count === 1 ? 'Zahlung' : 'Zahlungen',
+      value: `${b.payments.count} · ${formatCentsCurrencyDe(b.payments.totalCents)}`,
+    });
+  }
+  if (b.offers.count > 0) {
+    rows.push({
+      label: b.offers.count === 1 ? 'Angebot' : 'Angebote',
+      value: String(b.offers.count),
+      numbers: b.offers.numbers,
+    });
+  }
+  if (b.generatedDocuments.count > 0) {
+    rows.push({ label: 'Erzeugte PDFs', value: String(b.generatedDocuments.count) });
+  }
+  if (b.financeDocuments.count > 0) {
+    rows.push({ label: 'Hochgeladene Belege', value: String(b.financeDocuments.count) });
+  }
+  if (b.portalDocuments.count > 0) {
+    rows.push({ label: 'Kundenportal-Dokumente', value: String(b.portalDocuments.count) });
+  }
+  if (b.storageObjects.count > 0) {
+    rows.push({ label: 'Dateien im Dateispeicher', value: String(b.storageObjects.count) });
+  }
+
+  if (rows.length === 0) {
+    return (
+      <p className="mt-3 text-[var(--cq-fg-subtle)]">
+        Keine Rechnungen, Zahlungen, Angebote oder Dokumente betroffen.
+      </p>
+    );
+  }
+
+  return (
+    <div className={cn('mt-3 space-y-2 rounded-[10px] p-3', 'bg-red-50 dark:bg-red-950/20', border.hairline)}>
+      {rows.map((row) => (
+        <div key={row.label}>
+          <div className="flex items-baseline justify-between gap-3">
+            <span className="font-medium text-[var(--cq-fg)]">{row.label}</span>
+            <span className="text-right text-[13px] text-[var(--cq-fg)]">{row.value}</span>
+          </div>
+          {row.numbers && row.numbers.length > 0 ? (
+            <p className="mt-0.5 text-[12px] text-[var(--cq-fg-subtle)]">{row.numbers.join(' · ')}</p>
+          ) : null}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function ForceDeleteConfirmModal({
+  open, heading, previews, primaryTable, onClose, onRun, busyLabel,
+}: {
+  open: boolean;
+  heading: string;
+  /** `null` while the previews are still loading. */
+  previews: ForceDeletePreview[] | null;
+  /** The record's own table, so it heads the manifest instead of sorting by count. */
+  primaryTable?: string;
+  onClose: () => void;
+  /** Performs the destruction. Returns a rendered German error, or null on success. */
+  onRun: (reason: string) => Promise<string | null>;
+  busyLabel?: string;
+}) {
+  const [phrase, setPhrase] = useState('');
+  const [reason, setReason] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [failure, setFailure] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setPhrase('');
+    setReason('');
+    setFailure(null);
+  }, [open]);
+
+  // Summed across the selection, so a bulk delete states one total rather than N lists.
+  const lines = useMemo(() => {
+    const merged: Record<string, number> = {};
+    for (const preview of previews ?? []) {
+      for (const [table, count] of Object.entries(preview.manifest)) {
+        merged[table] = (merged[table] ?? 0) + count;
+      }
+    }
+    return manifestLines(merged, primaryTable);
+  }, [previews, primaryTable]);
+
+  // The same tree, in money and reference numbers — what the owner actually needs to judge a
+  // blast radius before typing the phrase. Summed the same way as `lines`, from the same server
+  // walk (owner_purge_dependencies), so the two can never disagree with each other.
+  const blastRadius = useMemo<BlastRadius | null>(() => {
+    const rows = (previews ?? []).map((p) => p.blastRadius).filter((b): b is BlastRadius => Boolean(b));
+    if (rows.length === 0) return null;
+    return rows.reduce<BlastRadius>((acc, r) => ({
+      invoices: {
+        count: acc.invoices.count + r.invoices.count,
+        grossTotalCents: acc.invoices.grossTotalCents + r.invoices.grossTotalCents,
+        numbers: [...acc.invoices.numbers, ...r.invoices.numbers],
+      },
+      payments: { count: acc.payments.count + r.payments.count, totalCents: acc.payments.totalCents + r.payments.totalCents },
+      offers: { count: acc.offers.count + r.offers.count, numbers: [...acc.offers.numbers, ...r.offers.numbers] },
+      generatedDocuments: { count: acc.generatedDocuments.count + r.generatedDocuments.count },
+      financeDocuments: { count: acc.financeDocuments.count + r.financeDocuments.count },
+      portalDocuments: { count: acc.portalDocuments.count + r.portalDocuments.count },
+      storageObjects: { count: acc.storageObjects.count + r.storageObjects.count },
+    }), {
+      invoices: { count: 0, grossTotalCents: 0, numbers: [] },
+      payments: { count: 0, totalCents: 0 },
+      offers: { count: 0, numbers: [] },
+      generatedDocuments: { count: 0 }, financeDocuments: { count: 0 },
+      portalDocuments: { count: 0 }, storageObjects: { count: 0 },
+    });
+  }, [previews]);
+
+  const phraseOk = phrase.trim() === FORCE_DELETE_PHRASE;
+  const reasonOk = reason.trim().length >= 3;
+
+  const run = async () => {
+    if (!phraseOk || !reasonOk) return;
+    setBusy(true);
+    setFailure(null);
+    const error = await onRun(reason.trim());
+    setBusy(false);
+    if (error) setFailure(error);
+  };
+
+  const label = previews?.length === 1 ? previews[0].label : null;
+
+  return (
+    <Modal
+      open={open}
+      onClose={busy ? () => {} : onClose}
+      title={heading}
+      size="sm"
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose} disabled={busy}>Abbrechen</Button>
+          <Button
+            variant="danger"
+            onClick={() => void run()}
+            loading={busy}
+            disabled={!previews || !phraseOk || !reasonOk}
+          >
+            {busyLabel ?? 'Endgültig löschen'}
+          </Button>
+        </>
+      }
+    >
+      <div className={text.body}>
+        <div className="flex gap-2.5">
+          <AlertTriangle size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-red-600" />
+          <p>
+            Diese Aktion ist <strong>nicht umkehrbar</strong>. Der Datensatz wird vollständig aus der
+            Datenbank und aus dem Dateispeicher entfernt — nicht ausgeblendet, nicht archiviert.
+          </p>
+        </div>
+
+        <p className="mt-3 text-[var(--cq-fg-subtle)]">
+          Nummer, Beträge, Datum und Empfänger werden vorher in einem unveränderlichen
+          Löschprotokoll festgehalten. Prüfen Sie selbst, ob eine gesetzliche Aufbewahrungspflicht
+          (§ 147 AO, § 14b UStG) dem Löschen entgegensteht.
+        </p>
+
+        {!previews ? (
+          <div className="mt-3 flex items-center gap-2">
+            <Spinner className="h-4 w-4" />
+            <span>Wird geprüft …</span>
+          </div>
+        ) : (
+          <>
+            {label ? <p className="mt-3 font-medium text-[var(--cq-fg)]">{label}</p> : null}
+
+            {/*
+              The blast radius, in the terms the business uses — money and reference numbers —
+              ahead of the raw table/row list below it. This is what "understand the blast radius
+              before entering the confirmation phrase" means: a table name and a row count do not
+              let anyone judge what "3 rows in owner_invoices" costs.
+            */}
+            {blastRadius ? <BlastRadiusPanel blastRadius={blastRadius} /> : null}
+
+            <p className="mt-4 font-medium text-[var(--cq-fg)]">Endgültig entfernt werden (technische Ansicht):</p>
+            <ul className="mt-1.5 space-y-1">
+              {lines.map((line) => (
+                <li key={line.table} className="flex gap-2">
+                  <span aria-hidden="true" className="text-[var(--cq-fg-subtle)]">·</span>
+                  <span>{line.count} × {line.label}</span>
+                </li>
+              ))}
+              {lines.length === 0 ? <li className="text-[var(--cq-fg-subtle)]">Nichts gefunden.</li> : null}
+            </ul>
+          </>
+        )}
+
+        <div className="mt-4 space-y-3">
+          <Field
+            id="force-delete-reason"
+            label="Grund (wird protokolliert)"
+            value={reason}
+            onChange={setReason}
+            placeholder="z. B. Testdatensatz, Dublette"
+            disabled={busy}
+            required
+          />
+          <Field
+            id="force-delete-phrase"
+            label={`Zur Bestätigung „${FORCE_DELETE_PHRASE}" eingeben`}
+            value={phrase}
+            onChange={setPhrase}
+            placeholder={FORCE_DELETE_PHRASE}
+            disabled={busy}
+            required
+          />
+        </div>
+
+        {failure ? <p className="mt-3 text-[13px] text-red-600">{failure}</p> : null}
+      </div>
+    </Modal>
+  );
+}
+
+/**
+ * Loads one preview per record.
+ *
+ * Per record rather than per batch on purpose: the manifest is a catalog walk rooted at a single
+ * row, and merging them server-side would hide which record carries which dependents from a
+ * caller that wanted to show exactly that.
+ */
+export function useForceDeletePreviews(
+  scope: string, resourceIds: string[], active: boolean,
+): ForceDeletePreview[] | null {
+  const [previews, setPreviews] = useState<ForceDeletePreview[] | null>(null);
+  const key = resourceIds.join(',');
+
+  useEffect(() => {
+    if (!active || resourceIds.length === 0) { setPreviews(null); return; }
+    let cancelled = false;
+    setPreviews(null);
+    void Promise.all(resourceIds.map((id) => loadForceDeletePreview(scope, id)))
+      .then((entries) => {
+        if (cancelled) return;
+        setPreviews(entries.map((e) => e.preview).filter((p): p is ForceDeletePreview => Boolean(p)));
+      });
+    return () => { cancelled = true; };
+    // Contents, not array identity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scope, key, active]);
+
+  return previews;
+}
+
+/** The Papierkorb's "Endgültig löschen" for invoices, offers and expenses. */
+export function ForceDeleteDialog({
+  open, org, resourceIds, onClose, onDone, resourceSingular, resourcePlural,
+}: {
+  open: boolean;
+  org: WorkspaceOrganization;
+  resourceIds: string[];
+  onClose: () => void;
+  onDone: () => void;
+  resourceSingular: string;
+  resourcePlural: string;
+}) {
+  const toast = useToast();
+  const previews = useForceDeletePreviews(org.scope, resourceIds, open);
+
+  const run = async (reason: string): Promise<string | null> => {
+    if (!org.entityId) return 'Kein Mandant ausgewählt.';
+    const { results, error } = await forcePurgeWorkspaceItems(
+      org.entityId, org.scope, resourceIds, reason, FORCE_DELETE_PHRASE,
+    );
+    if (error) return forceDeleteErrorText(error);
+    const payload = forceResultToast(results);
+    await org.reload();
+    onClose();
+    onDone();
+    if (payload.tone === 'success') toast.success(payload.title, payload.detail);
+    else toast.error(payload.title, payload.detail);
+    return null;
+  };
+
+  return (
+    <ForceDeleteConfirmModal
+      open={open}
+      heading={resourceIds.length === 1
+        ? `${resourceSingular} endgültig löschen?`
+        : `${resourceIds.length} ${resourcePlural} endgültig löschen?`}
+      previews={previews}
+      primaryTable={scopeTable[org.scope]}
+      onClose={onClose}
+      onRun={run}
+    />
   );
 }
 

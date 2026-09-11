@@ -130,6 +130,20 @@ const rpcImpl = async (fn: string, args: Record<string, unknown>) => {
     }
     case 'owner_workspace_delete_preflight':
       return { data: (args.p_resource_ids as string[]).map(planFor), error: null };
+    // Purge eligibility is a SEPARATE server decision from the delete preflight. x4 is the
+    // record this suite trashes, and it is accounting-relevant, so the Papierkorb must offer it
+    // the emergency path rather than the ordinary permanent delete.
+    case 'owner_workspace_purge_preflight':
+      return {
+        data: (args.p_resource_ids as string[]).map((id) => ({
+          resource_id: id,
+          eligibility: id === 'x4' ? 'accounting_protected' : 'purgeable',
+          reasons: id === 'x4' ? ['has_payments'] : [],
+          label: id,
+          manifest: { owner_expenses: 1 },
+        })),
+        error: null,
+      };
     case 'owner_workspace_delete_items': {
       const ids = args.p_resource_ids as string[];
       server.deleteCalls.push(ids);
@@ -460,10 +474,16 @@ describe('the Papierkorb', () => {
     await open(user, 'Papierkorb');
     await waitFor(() => expect(visibleRefs()).toHaveLength(1));
 
-    // A record that must be retained shows no permanent-delete button — it says why instead.
+    // An accounting-relevant record still SAYS so, and it says WHY rather than just refusing.
     // Rendered once in the table row and once in the mobile card — both, never neither.
-    expect(await screen.findAllByText(/Nachweis-\/Buchhaltungsgründen erhalten bleiben/)).toHaveLength(2);
+    expect(await screen.findAllByText(/Buchhaltungsrelevant/)).toHaveLength(2);
+
+    // It is no longer a dead end either. The ordinary permanent delete is correctly absent —
+    // this record is protected — but the emergency path is offered, visibly separate. The old
+    // rule (`plan.action === 'hard_delete'`) could never hold for ANY trashed row, so every row
+    // showed a refusal with nothing behind it.
     expect(screen.queryByRole('button', { name: 'Endgültig löschen' })).not.toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: 'Notfall-Löschung' }).length).toBeGreaterThan(0);
 
     await user.click(screen.getAllByRole('button', { name: 'Wiederherstellen' })[0]);
     await waitFor(() => expect(server.items.get('x4')?.trashed_at).toBeNull());
