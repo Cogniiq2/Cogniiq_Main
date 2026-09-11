@@ -584,9 +584,9 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/webdesign-hotel",
-    title: "Webdesign für Hotels & Pensionen | Direktbuchungen steigern – Cogniiq",
-    description: "Professionelle Hotel-Websites: Direktbuchungssystem, Zimmerpräsentation, SEO für mehr organische Buchungen. Weniger OTA-Provisionen, mehr Direktgäste.",
-    keywords: "Webdesign Hotel, Website Hotel erstellen, Hotel Direktbuchungen, Pension Website",
+    title: "Webdesign für Hotels | Internetagentur für Hotellerie – Cogniiq",
+    description: "Internetagentur für Hotellerie: Hotel-Websites mit Direktbuchungsstrecke, Zimmerpräsentation und lokalem SEO – für Stadthotels, Boutiquehotels und Pensionen.",
+    keywords: "Webdesign Hotel, Internetagentur Hotellerie, Webdesigner Hotel, Website Hotel erstellen, Hotel Direktbuchungen, Pension Website",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.85" },
   },
@@ -696,7 +696,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   // ─── PROBLEM-BASED LANDING PAGES ─────────────────────────────────────────────
   {
     path: "/verpasste-anrufe-verlust",
-    title: "Verpasste Anrufe kosten täglich Umsatz – So hören Sie damit auf | Cogniiq",
+    title: "Verpasste Anrufe: Was sie Unternehmen wirklich kosten | Cogniiq",
     description: "Verpasste Anrufe sind verlorene Aufträge. Der KI-Telefonassistent von Cogniiq nimmt Anrufe an, wenn Ihr Team gebunden ist – auch abends und am Wochenende.",
     keywords: "Verpasste Anrufe, Anrufe verpassen Unternehmen, KI Telefonassistent Lösung, telefonische Erreichbarkeit",
     indexable: true,

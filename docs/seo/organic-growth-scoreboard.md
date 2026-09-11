@@ -354,19 +354,179 @@ Vollständige Fundstellenliste in `COPY-CLAIMS-TO-VERIFY.md` § „Z25 · Abarbe
 | Tag 28 | | | | | |
 | Tag 56 | | | | | |
 
-### Warum die Baseline leer ist
+## GSC-Baseline 10.09.2026 — echte Werte
 
-Die Baseline ist bewusst **nicht** gefüllt. Der Lauf vom 10.09.2026 hatte keinen
+Quelle: zwei Search-Console-Exporte (Suchtyp Web), am 2026-09-10 an die Sitzung
+angehängt und im Container ausgepackt. Zeiträume **aus `Filters.csv` und
+`Chart.csv` der Dateien selbst** gelesen, nicht aus der Aufgabenstellung:
+
+| Export | Filter-Angabe | Tatsächliche Tage laut `Chart.csv` |
+|---|---|---|
+| A | Last 3 months | 2026-06-09 – 2026-09-08 (92 Tage) |
+| B | Last 28 days | 2026-08-12 – 2026-09-08 (28 Tage) |
+
+Beide enden am 2026-09-08. Die letzten beiden Tage vor dem Export fehlen, wie
+bei GSC üblich.
+
+| Kennzahl | 3 Monate | 28 Tage |
+|---|---:|---:|
+| Impressionen (`Chart.csv`) | 28.783 | 12.675 |
+| Klicks (`Chart.csv`) | 30 | 14 |
+| CTR | 0,10 % | 0,11 % |
+| Marken-Impressionen (`Queries.csv`) | 58 | 18 |
+| Marken-Klicks (`Queries.csv`) | 9 von 12 | 5 von 7 |
+| Nicht-Marken-Impressionen (`Queries.csv`) | 27.089 | 12.036 |
+| Nicht-Marken-Klicks (`Queries.csv`) | 3 | 2 |
+
+**Drei Zahlenfallen, die beim Weiterschreiben nicht verrutschen dürfen:**
+
+1. `Chart.csv`, `Queries.csv` und `Pages.csv` summieren sich **nicht** auf
+   denselben Wert (28.783 / 27.147 / 32.093 Impressionen im 3-Monats-Fenster).
+   Das ist kein Fehler im Export, sondern GSC-Aggregation auf drei verschiedenen
+   Achsen. Nie Zahlen aus zwei dieser Dateien in einer Zeile mischen.
+2. `Queries.csv` des 3-Monats-Exports ist bei **exakt 1000 Zeilen gekappt**. Die
+   Query-Summen oben sind damit Untergrenzen, keine Vollerhebung.
+3. Die Klick-Spalten stehen unterschiedlich: 12 Klicks in `Queries.csv` gegen 30
+   in `Pages.csv` (3 Monate). Auch das ist Aggregationsdifferenz.
+
+**Der Zustand in einem Satz:** Die Domain sammelt fünfstellige Impressionen bei
+einer Ø-Position um 50 und praktisch ohne Klicks. Von den 30 Klicks im
+3-Monats-Fenster sind 9 markengetrieben; nicht-markenbezogen sind es 3. Das ist
+kein CTR-Problem — bei Position 50 ist eine CTR nahe null das erwartete
+Ergebnis. Es ist ein Positionsproblem.
+
+### Seiten-Baseline der in diesem Lauf geänderten URLs
+
+Aus `Pages.csv`. **Seiten-Aggregat, kein Query×Seite-Paar.**
+
+| URL | 3M Impr. | 3M Pos. | 28D Impr. | 28D Pos. | Klicks |
+|---|---:|---:|---:|---:|---:|
+| `/webdesign-hotel` | 814 | 36,0 | 814 | 36,0 | 0 |
+| `/verpasste-anrufe-verlust` | 122 | 15,5 | 59 | 18,5 | 0 |
+
+Bemerkenswert an der ersten Zeile: 3-Monats- und 28-Tage-Wert sind **identisch**.
+Alle 814 Impressionen dieser URL fielen in die letzten 28 Tage. Die Seite ist
+erst in diesem Fenster in den Index gekommen bzw. sichtbar geworden.
+
+---
+
+## Messpunkte dieses Laufs
+
+### M1 · `/webdesign-hotel` — Intent „Internetagentur für Hotellerie"
+
+- **URL:** `https://cogniiq.de/webdesign-hotel`
+- **Query-Familie (aus `Queries.csv`, 28-Tage-Fenster):**
+
+  | Query | Impr. | Ø Pos. |
+  |---|---:|---:|
+  | internetagentur hotel | 193 | 44,7 |
+  | internetagentur hotels | 124 | 44,0 |
+  | website für hotellerie | 47 | 64,9 |
+  | webdesigner hotel | 38 | 27,0 |
+  | hotel webdesigners | 24 | 36,6 |
+  | hotel webdesign agentur | 23 | 27,7 |
+  | hotel website erstellen lassen | 22 | 68,8 |
+  | internetagentur für hotels | 6 | 47,7 |
+  | webdesign agentur für hotels | 3 | 36,0 |
+  | **Summe Agentur-/Hotellerie-Intent** | **480** | — |
+
+  Danebenliegend, bereits besser platziert und **nicht** Ziel der Änderung, aber
+  betroffen: „hotel webdesign" 120 Impr. Pos. 20,2 · „webdesign hotel" 74 Impr.
+  Pos. 20,9 · „webdesign für hotels" 74 Impr. Pos. 26,5 · „webdesign hotels"
+  25 Impr. Pos. 18,8.
+
+- **Attributionsgrenze:** Dass diese Queries auf `/webdesign-hotel` fallen, ist
+  eine **begründete Annahme, kein Beleg**. `Queries.csv` und `Pages.csv` sind
+  getrennte Aggregate. Die Annahme stützt sich darauf, dass `/webdesign-hotel`
+  die einzige Hotel-Webdesign-URL der Domain ist und ihre 814 Impressionen im
+  selben 28-Tage-Fenster entstanden wie die Query-Familie. Ein Query×Seite-Export
+  würde das entscheiden.
+- **Aggregat-Baseline (Seite):** 814 Impressionen · Ø Position 36,0 · 0 Klicks
+  (28 Tage bis 2026-09-08).
+- **Hypothese:** Die Seite war zu 100 % auf OTA-Provision und Direktbuchung
+  gerahmt und enthielt nichts zur **Anbieterauswahl**: „Internetagentur" kam
+  auf der Seite gar nicht vor, „Hotellerie" nur als einzelnes Tagline-Wort und
+  in den Keywords, und die Betriebstypen (Stadthotel, Boutiquehotel, Landhotel,
+  Pension, Gästehaus, Ferienwohnungs-Vermieter) fehlten vollständig.
+  Rund 480 Impressionen je 28 Tage suchen aber genau
+  danach. Wird dieser Intent im Titel, in der Description und im **gerenderten
+  Fließtext** bedient, sollte die Familie aus ihrer heutigen Spanne
+  (Pos. 27,0 bis 68,8; volumengewichtet rund 45) in Richtung Position 20
+  wandern.
+- **Mechanismus:** Begriffsdeckung plus Informationsgewinn. Neu und inhaltlich
+  eigenständig sind der Abschnitt „Die allgemeine Webagentur kennt die
+  Buchungsstrecke nicht" (Belegungskalender, Ratenlogik, Mindestaufenthalt,
+  Stornofristen, Übergabe an das Buchungssystem) und die Betriebstypen-Einordnung
+  im Lösungsabsatz. Beides steht im SSR-Körper, nicht nur im JSON-LD.
+- **Umgesetzt:** 2026-09-10.
+- **Erfolgskriterium:**
+  - Tag 7: keine Bewertung. Titeländerungen brauchen einen Re-Crawl.
+  - Tag 14: Ø Position der Seite **unter 34,0** (von 36,0), Impressionen nicht
+    gefallen.
+  - Tag 28: mindestens eine Query der Agentur-Familie **unter Position 25**;
+    Seiten-Ø unter 30.
+  - Tag 56: erste Klicks auf der Seite (> 0), oder mindestens eine Query der
+    Familie in den Top 20.
+  - **Abbruchkriterium:** Fällt die Ø Position bis Tag 28 auf über 40 oder
+    verlieren „hotel webdesign" / „webdesign hotel" ihre Position-20-Nähe, ist
+    die Titeländerung zurückzunehmen — dann hat die Umgewichtung dem
+    bestehenden Ranking mehr geschadet als der neue Intent gebracht hat.
+
+### M2 · `/verpasste-anrufe-verlust` — Titel auf die Kopf-Query gezogen
+
+- **URL:** `https://cogniiq.de/verpasste-anrufe-verlust`
+- **Query-Familie (`Queries.csv`):** „verpasste anrufe kosten unternehmen"
+  39 Impr. Pos. 11,2 (3 Monate) bzw. 28 Impr. Pos. 12,1 (28 Tage) ·
+  „verpasste anrufe" 15 Impr. Pos. 23,6 · „entgangene anrufe" 3 Impr. Pos. 24,7.
+- **Warum überhaupt:** Position 11,2 ist eine der besten
+  Nicht-Marken-Platzierungen der Domain mit klarer kommerzieller Absicht — aber
+  **nicht die beste**. Besser stehen im 3-Monats-Fenster unter anderem
+  „webentwicklung bayreuth" (178 Impr., Pos. 9,2), „web development" (138 Impr.,
+  Pos. 6,1), „it-dienstleistungen" (17 Impr., Pos. 5,2) und „website relaunch
+  münchen" (25 Impr., Pos. 10,2). Von diesen ist „webentwicklung bayreuth" die
+  eigentlich interessantere Zeile: bessere Position **und** 4,5-fache Menge.
+  Sie ist in diesem Lauf nicht angefasst worden, weil ihre wahrscheinliche
+  Zielseite `/bayreuth/webdesign` ist — und die läuft als eingefrorenes
+  Experiment. Der Titel im Manifest lautete
+  „Verpasste Anrufe kosten täglich Umsatz – So hören Sie damit auf" und enthielt
+  das Wort „Unternehmen" nicht, obwohl es in der Kopf-Query steht und in der H1
+  der Seite bereits vorkam.
+- **Aggregat-Baseline (Seite):** 59 Impressionen · Ø Position 18,5 · 0 Klicks
+  (28 Tage bis 2026-09-08).
+- **Hypothese:** Titel-Query-Deckung an einer Position knapp außerhalb der ersten
+  Seite. Das Volumen ist klein — die Änderung ist als billiger Test einer
+  Positionsschwelle gedacht, nicht als Wachstumstreiber.
+- **Ehrliche Einordnung:** Dies ist **keine CTR-Chance**. Bei Position 11–18 ist
+  eine CTR von 0 der Normalfall; wer hier eine CTR-Verbesserung behauptet,
+  verwechselt Position mit Snippet.
+- **Umgesetzt:** 2026-09-10.
+- **Erfolgskriterium:** Tag 14 Position der Seite unter 16 · Tag 28 unter 12 ·
+  Tag 56 erster Klick. Bei Verschlechterung über Position 22 zurücknehmen.
+
+### Nicht vergessen: die Gegenprobe
+
+Beide Änderungen laufen gleichzeitig, aber auf **verschiedenen Query-Familien**
+und verschiedenen URLs. Sie sind damit getrennt zurechenbar. Eine dritte
+gleichzeitige Änderung an derselben Familie wäre es nicht gewesen — deshalb ist
+`/webdesign-gastronomie` in diesem Lauf bewusst unangetastet geblieben, obwohl
+sie zur selben Branchenlogik gehört.
+
+---
+
+### Warum die Baseline bis zum 10.09.2026 leer war — erledigt
+
+Der Lauf vom 10.09.2026 (Branch `claude/seo-gsc-growth-2026-09-10`) hatte keinen
 Zugriff auf die Search-Console-Exporte: Die Sitzung lief in einem Cloud-Container
-ohne das `~/Downloads` des Inhabers; ein vollständiger Dateisystem-Durchlauf fand
-keine der ZIP-Dateien. Eine Baseline aus Erinnerung oder aus Stichprobenwerten zu
-rekonstruieren wäre eine erfundene Messung — genau das, was diese Tabelle
-verhindern soll.
+ohne das `~/Downloads` des Inhabers. Die Baseline blieb deshalb bewusst leer,
+statt aus Erinnerung rekonstruiert zu werden.
 
-**Einzutragen ist der Seiten-Aggregatwert (`Pages.csv`) der oben genannten URLs
-für das Fenster, das am 2026-09-10 endet.** Query-Werte gehören nicht in diese
-Tabelle: `Queries.csv` und `Pages.csv` sind getrennte Aggregate und ergeben kein
-Query×Seite-Paar.
+**Erledigt am 10.09.2026, zweiter Lauf** (`claude/seo-gsc-opportunities-2026-09-10`):
+Die Exporte wurden direkt an die Sitzung angehängt. Die echten Werte stehen oben
+unter „GSC-Baseline 10.09.2026". Die Tabelle „Ausgangslage (historische
+Referenz)" weiter oben stammt weiterhin aus einer Aufgabenstellung ohne
+benannten Zeitraum und ist **nicht** als Vergleichsgröße zu verwenden; sie bleibt
+nur stehen, damit nachvollziehbar ist, gegen welche Zahl früher argumentiert
+wurde.
 
 ### Was der nächste Lauf braucht
 
@@ -378,3 +538,21 @@ Query×Seite-Paar.
    statt vermuten.
 3. Einen echten **Vorperioden-Export** für Queries, falls Veränderung über die
    Zeit bewertet werden soll.
+
+**Stand nach dem 10.09.2026:** Punkt 1 ist erledigt. Punkt 2 und 3 sind weiter
+offen und in dieser Reihenfolge wertvoll:
+
+- **Query×Seite für `/webdesign-hotel`** (in der GSC-UI Seitenfilter auf die URL
+  setzen, dann Queries exportieren). Das ist der einzige Export, der aus der
+  Annahme in M1 einen Beleg macht — und zugleich der einzige, der die
+  Kannibalisierungs-Hypothesen in `docs/seo/post-experiment-opportunities.md`
+  entscheiden kann.
+- **Query×Seite für `/regensburg/webdesign` und `/regensburg`.** Beide Seiten
+  bekommen zusammen rund 5.000 Impressionen in 28 Tagen auf offensichtlich
+  überlappende Regensburg-Queries. Ob das eine Kannibalisierung ist oder zwei
+  saubere Intents, lässt sich mit den vorliegenden Aggregaten **nicht**
+  beantworten.
+- **Ein Vorperioden-Query-Export**, um zu trennen, was gewachsen ist und was
+  nur neu im Index steht. Ohne ihn ist der auffälligste Befund dieses Laufs —
+  die Hotel-Familie ist zu ~95 % in den letzten 28 Tagen entstanden — nur aus
+  dem Vergleich zweier Fenster erschlossen.

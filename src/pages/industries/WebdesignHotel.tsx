@@ -4,13 +4,13 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 
 const config: NationalIndustryPageConfig = {
   seo: {
-    title: "Webdesign für Hotels & Pensionen | Direktbuchungen steigern | Cogniiq",
-    description: "Webdesign für Hotels: Mehr Direktbuchungen, weniger OTA-Provision. Hotel-Website mit Buchungssystem, Local SEO und überzeugender Zimmerpräsentation – damit Gäste direkt bei Ihnen buchen.",
+    title: "Webdesign für Hotels | Internetagentur für Hotellerie – Cogniiq",
+    description: "Internetagentur für Hotellerie: Hotel-Websites mit Direktbuchungsstrecke, Zimmerpräsentation und lokalem SEO – für Stadthotels, Boutiquehotels und Pensionen.",
     canonical: `${BUSINESS_INFO.website}/webdesign-hotel`,
-    keywords: "Webdesign Hotel, Hotel Website erstellen, Pension Website, Direktbuchungen steigern, Webdesign Hotellerie",
+    keywords: "Webdesign Hotel, Internetagentur Hotellerie, Webdesigner Hotel, Website Hotel erstellen, Hotel Direktbuchungen, Pension Website",
   },
   h1: "Webdesign für Hotels & Pensionen",
-  tagline: "Hotellerie · Direktbuchungen · weniger OTA-Abhängigkeit",
+  tagline: "Internetagentur für Hotellerie · Direktbuchungen · weniger OTA-Abhängigkeit",
   intro: "Reisende vergleichen abends auf dem Sofa – oft zwischen Ihrer Website und dem Booking.com-Eintrag nebenan. Wer in diesem Moment nicht überzeugt, verliert die Buchung an die OTA – inklusive der fälligen Provision. Eine starke Hotel-Website ist keine Ergänzung zum OTA-Auftritt – sie ist das Instrument, mit dem Direktbuchungen zurückgewonnen werden.",
   serviceSlug: "leistungen",
   serviceLabel: "Webdesign Leistungen",
@@ -38,13 +38,17 @@ const config: NationalIndustryPageConfig = {
       description: "Messen, Festspiele, Feiertage und Events treiben die Suchnachfrage für Hotels in einer Stadt massiv. Wer für diese Suchbegriffe nicht sichtbar ist, überlässt die profitabelsten Nächte den Portalen.",
     },
     {
+      title: "Die allgemeine Webagentur kennt die Buchungsstrecke nicht",
+      description: "Eine gestalterisch gute Website ist noch keine Hotel-Website. Wer Belegungskalender, Ratenlogik, Mindestaufenthalt, Stornofristen und die Übergabe an das Buchungssystem nicht kennt, baut eine Broschüre mit einem Link zur OTA. Der Unterschied zeigt sich nicht im Layout, sondern in der Direktbuchungsquote sechs Monate nach dem Go-live.",
+    },
+    {
       title: "Gruppenanfragen und Events werden nicht systematisch erfasst",
       description: "Tagungen, Hochzeiten und Gruppenreisen haben höhere Durchschnittswerte als Einzelbuchungen – aber auch komplexere Anforderungen. Ohne strukturiertes Anfrage-Formular gehen diese Anfragen unter oder landen beim Wettbewerb.",
     },
   ],
   solution: {
     headline: "Eine Hotel-Website, die Direktbuchungen zurückholt.",
-    text: "Cogniiq entwickelt Hotel-Websites, die Gäste überzeugen, bevor sie auf 'Weiter zu Booking.com' klicken. Mit eingebettetem Buchungssystem, überzeugender Zimmerpräsentation und Local SEO – damit Direktbuchungen nicht die Ausnahme sind, sondern die Regel.",
+    text: "Cogniiq arbeitet als Internetagentur für die Hotellerie: für Stadt- und Businesshotels, Boutique- und Landhotels, Pensionen und Gästehäuser sowie Ferienwohnungs-Vermieter mit mehreren Einheiten. Wir entwickeln Hotel-Websites, die Gäste überzeugen, bevor sie auf 'Weiter zu Booking.com' klicken – mit eingebundener Buchungsstrecke, überzeugender Zimmerpräsentation und Local SEO, damit Direktbuchungen nicht die Ausnahme sind, sondern die Regel.",
   },
   benefits: [
     "Integriertes Direktbuchungssystem – kein OTA-Umweg nötig",
@@ -90,6 +94,14 @@ const config: NationalIndustryPageConfig = {
     { label: "Webdesign Sport", href: "/webdesign-sport" },
   ],
   faq: [
+    {
+      question: "Was macht eine Internetagentur für Hotellerie anders als eine allgemeine Webagentur?",
+      answer: "Den Unterschied macht nicht das Design, sondern das, was hinter der Buchen-Schaltfläche liegt. Eine Hotellerie-Agentur plant die Website entlang der Buchungsstrecke: Welche Zimmerkategorien und Raten sollen sichtbar sein, wie greifen Belegungskalender und Mindestaufenthalt ineinander, an welcher Stelle übernimmt das Buchungssystem, und was passiert mit Anfragen, die keine Standardbuchung sind – Gruppen, Tagungen, Langzeitaufenthalte. Dazu kommt die Parity-Frage: Ihre eigene Website darf gegenüber dem OTA-Eintrag nicht schlechter dastehen. Diese Punkte klären wir vor dem Angebot, nicht während der Umsetzung.",
+    },
+    {
+      question: "Für welche Betriebe eignet sich das – auch für kleine Häuser und Pensionen?",
+      answer: "Ja. Stadt- und Businesshotels, Boutique- und Landhotels, Pensionen und Gästehäuser sowie Ferienwohnungs-Vermieter mit mehreren Einheiten arbeiten mit derselben Grundstruktur; unterschiedlich sind Umfang und Buchungssystem. Ein Haus mit acht Zimmern braucht keine Kanalmanager-Anbindung, sondern eine schnelle, mobile Buchungsstrecke und ein sauberes Google-Business-Profil. Ein Tagungshotel braucht zusätzlich den strukturierten Gruppen- und Veranstaltungsweg. Welche Variante für Sie trägt, entscheiden wir anhand Ihrer heutigen Buchungsverteilung – nicht anhand der Zimmerzahl.",
+    },
     {
       question: "Wie viel Provision kann durch mehr Direktbuchungen eingespart werden?",
       answer: "Buchungsportale nehmen pro Buchung eine Provision, die je nach Plattform und Vertrag deutlich ins Gewicht fällt. Jede Buchung, die stattdessen direkt über Ihre eigene Website eingeht, spart diese Provision vollständig ein. Wie stark sich das rechnet, hängt von Zimmerpreis, Belegung und Ihrem heutigen Direktbuchungsanteil ab – das rechnen wir im Erstgespräch gemeinsam für Ihr Haus durch. Die Website amortisiert sich in der Regel innerhalb von 6–12 Monaten.",

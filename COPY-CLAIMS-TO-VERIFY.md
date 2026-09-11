@@ -88,6 +88,27 @@ Wortlaut, Herleitung und die ausdrücklich **nicht** betroffenen Fälle stehen i
 | `LeistungenPage.tsx` | `/leistungen` | **REWRITE.** Zusätzlich „Vollständige Synchronisation mit Kalender und CRM" entfernt — der stärkste Verstoß der Seite und in der ursprünglichen Liste nicht erfasst. Ebenso die unbelegten „48 Stunden" |
 | `UeberUnsPage.tsx` | `/ueber-uns` | **REWRITE**, inkl. „Synchronisation mit Kalender und CRM-Systemen" |
 | `problems/VerpassteAnrufePage.tsx:48` | `/verpasste-anrufe-verlust` | **REWRITE** |
+
+### Z25 · Nachtrag 10.09.2026 (Branch `claude/seo-gsc-opportunities-2026-09-10`)
+
+| Fundstelle | Route | Ergebnis |
+|---|---|---|
+| `problems/VerpassteAnrufePage.tsx:52` — „Termine automatisch in den Kalender eingetragen" | `/verpasste-anrufe-verlust` | **REWRITE — Nachzügler.** Der Durchgang vom selben Tag hatte auf dieser Seite `solution.text` (Zeile 48) korrigiert, die darunterliegende Aufzählung `solution.bullets` aber nicht. Ergebnis war ein Widerspruch im selben Block: Der Fließtext sagte „erfasst Terminwünsche nach Ihren Regeln", der Aufzählungspunkt unmittelbar darunter sagte den Kalendereintrag unbedingt zu. Wortlaut jetzt an `FAKTEN.terminaufnahme` angeglichen |
+
+**Weiterhin offen und ausdrücklich nicht angefasst:**
+
+- `publicRoutes.ts` (Description `/ki-telefonassistent-arzt`) — „bucht Termine ins
+  System". Eingefrorenes Experiment, siehe `docs/seo/post-experiment-opportunities.md`.
+  Dies ist die **einzige** verbliebene Fundstelle der Klasse `BOOKING_WRITE`, die
+  ein Suchender ohne Klick zu sehen bekommt: Sie steht im SERP-Snippet einer
+  Seite, die im 28-Tage-Fenster 543 Impressionen hatte. Der Freeze und die
+  Aussagenrichtigkeit stehen hier gegeneinander — das ist eine Inhaber-Entscheidung
+  und keine, die eine SEO-Sitzung für sich treffen darf.
+- `industries/AutomatisierungRestaurant.tsx:51` und
+  `problems/KeineTerminbuchungPage.tsx:53` — SMS-/E-Mail-Erinnerungen. Beide
+  gehören laut der Einordnung oben zur Klasse „Automatisierungs-/Webdesign-Produkt"
+  und nicht zum Telefonassistenten; sie warten auf dieselbe Inhaber-Entscheidung.
+  Bewusst nicht mitkorrigiert: Eine Korrektur ohne diese Entscheidung wäre geraten.
 | `blog-data.ts:605` | Blogbeitrag verpasste Anrufe | **REWRITE** |
 | `KiTelefonassistentHotel.tsx` (3 Stellen) | `/ki-telefonassistent-hotel` | **REWRITE.** Neu erhoben. Die Seite versprach im Fließtext den Systemeintrag unbedingt („trägt sie in Ihr System ein", „Buchung direkt ins System"), während ihr eigenes FAQ die Schnittstellenprüfung korrekt beschrieb — ein Widerspruch auf derselben Seite |
 | `KiTelefonassistentRestaurant.tsx:76` | `/ki-telefonassistent-restaurant` | **REWRITE** — Bestätigung/Erinnerung als eingerichteter Ablauf, nicht als Standardumfang |
