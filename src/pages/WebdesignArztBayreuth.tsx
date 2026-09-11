@@ -185,9 +185,11 @@ const config: IndustryPageConfig = {
       // ✓ Exact-match local keyword as title: "KI-Telefonassistent Arztpraxis Bayreuth"
       title: "KI-Telefonassistent für Arztpraxen in Bayreuth",
       // Fähigkeiten benannt (Öffnungszeiten, Fachrichtungen, Terminwunsch, Weiterleitung).
-      // ✓ "außerhalb der Sprechzeiten", "ohne Warteschleife" — both are high-intent search terms
+      // ✓ "außerhalb der Sprechzeiten" bleibt als hochintentionaler Suchbegriff.
+      //   "ohne Warteschleife" ist am 11.09.2026 entfallen: eine unbedingte Zusage,
+      //   die an einer endlichen Gleichzeitigkeit hängt (OWNER-INPUT B11a).
       description:
-        "Der KI-Telefonassistent von Cogniiq nimmt Patientenanrufe entgegen, beantwortet Fragen zu Öffnungszeiten, Fachrichtungen, Rezeptbestellungen und Praxisformalitäten, nimmt Terminwünsche mit Name und Rückrufnummer strukturiert auf und leitet dringende oder komplexe Anliegen an Ihr Team weiter – auch außerhalb der Sprechzeiten und ohne Warteschleife. Ob sich Termine direkt in Ihr Praxisverwaltungssystem übergeben lassen, prüfen wir vor dem Angebot an Ihrem konkreten System; wo das nicht trägt, steht das Ergebnis strukturiert im Cogniiq-Dashboard.",
+        "Der KI-Telefonassistent von Cogniiq nimmt Patientenanrufe entgegen, beantwortet Fragen zu Öffnungszeiten, Fachrichtungen, Rezeptbestellungen und Praxisformalitäten und erledigt die freigegebenen Terminabläufe im Gespräch – Termin vergeben, verschieben, absagen. Auch außerhalb der Sprechzeiten und auch mehrere Anrufe zur selben Zeit. Dringende, fachliche oder komplexe Anliegen leitet er an Ihr Team weiter. Ob sich Termine direkt in Ihr Praxisverwaltungssystem schreiben lassen, prüfen wir vor dem Angebot an Ihrem konkreten System; wo das nicht trägt, steht der fertige Vorgang im Cogniiq-Dashboard.",
     },
     {
       icon: "zap",
@@ -242,7 +244,7 @@ const config: IndustryPageConfig = {
     "Erreichbar auch dann, wenn niemand abnehmen kann: Der KI-Telefonassistent nimmt auch bei vollem Betrieb und außerhalb der Öffnungszeiten Patientenanrufe entgegen",
     "Rezeption entlastet: Routineanfragen nimmt der Assistent entgegen – Ihr Team konzentriert sich auf Patienten, die wirklich Beratung benötigen",
     "Mehr neue Patienten durch eine suchmaschinenoptimierte Praxis-Website, die bei Google-Suchen in Bayreuth sichtbar rankt",
-    "Höhere Patientenzufriedenheit durch sofortige Reaktion auf Anrufe und Anfragen – auch außerhalb der Sprechzeiten, ohne Warteschleife",
+    "Höhere Patientenzufriedenheit durch sofortige Reaktion auf Anrufe und Anfragen – auch außerhalb der Sprechzeiten, auch bei mehreren Anrufen zur selben Zeit",
     "Terminerinnerungen richten wir in dem Umfang ein, den Ihr System nachweislich hergibt",
     "Professioneller erster Eindruck: moderne Website und sofortige Gesprächsannahme signalisieren Qualität, bevor der Patient die Praxis betritt",
     "In zwei Wochen eingerichtet und bereit zur Freigabe: keine lange Projektlaufzeit, kein IT-Aufwand auf Ihrer Seite, alles schlüsselfertig von Cogniiq",

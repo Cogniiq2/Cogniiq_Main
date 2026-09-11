@@ -112,7 +112,7 @@ const SCENARIOS: Scenario[] = [
       points: [
         'Reservierungen auch außerhalb der Öffnungszeiten entgegennehmen',
         'Reservierungswunsch mit Personenzahl und Rückrufnummer strukturiert aufgenommen',
-        'Mehrere Anrufe zur selben Zeit, ohne Warteschleife',
+        'Mehrere Anrufe zur selben Zeit statt Besetztzeichen',
         'Service-Team fokussiert auf Gäste vor Ort',
         'Jede Reservierung strukturiert dokumentiert — kein Zettel geht verloren',
       ],

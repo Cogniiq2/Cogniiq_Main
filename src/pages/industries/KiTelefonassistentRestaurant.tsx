@@ -5,13 +5,13 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 const config: NationalIndustryPageConfig = {
   seo: {
     title: "KI Telefonassistent für Restaurants | Automatische Tischreservierung | Cogniiq",
-    description: "KI Telefonassistent für Restaurants: Tischreservierungen entgegennehmen und strukturiert an Ihr Team übergeben – auch während des Service und am Wochenende.",
+    description: "KI Telefonassistent für Restaurants: Reservierungen im Gespräch abschließen statt nur aufnehmen – auch während des Service und am Wochenende. Anbindung an Ihr Reservierungssystem wird vorab geprüft.",
     canonical: `${BUSINESS_INFO.website}/ki-telefonassistent-restaurant`,
     keywords: "KI Telefonassistent Restaurant, automatische Reservierung, KI Rezeptionistin Gastronomie, Telefonservice Restaurant",
   },
   h1: "KI Telefonassistent für Restaurants & Gastronomie",
   tagline: "Gastronomie · Tischreservierung · auch außerhalb der Öffnungszeiten",
-  intro: "Freitagabend, 19:30 Uhr: Die Küche läuft auf Hochtouren, jeder Tisch ist besetzt – und das Telefon klingelt. Niemand kann abnehmen. Der Anrufer will für Samstag reservieren. Er legt auf und ruft das Restaurant nebenan an. Mit dem KI Telefonassistenten wäre sein Anruf angenommen worden: Reservierungswunsch aufgenommen, an Ihr Team übergeben – und am Samstagabend säße er als Gast bei Ihnen.",
+  intro: "Freitagabend, 19:30 Uhr: Die Küche läuft auf Hochtouren, jeder Tisch ist besetzt – und das Telefon klingelt. Niemand kann abnehmen. Der Anrufer will für Samstag reservieren. Er legt auf und ruft das Restaurant nebenan an. Mit dem KI Telefonassistenten wäre das Gespräch geführt und die Reservierung erledigt gewesen – Datum, Personenzahl, Sonderwünsche, fertig, ohne dass jemand im Service sie danach noch eintragen muss. In Ihr Reservierungssystem eingetragen wird sie, sobald dessen Schnittstelle eingerichtet und verifiziert ist; ohne tragfähige Schnittstelle greift der Weg, den Sie vorher festlegen.",
   serviceSlug: "ki-telefonassistent",
   serviceLabel: "KI Telefonassistent",
   costLink: "/kosten-ki-telefonassistent",
@@ -43,12 +43,13 @@ const config: NationalIndustryPageConfig = {
     },
   ],
   solution: {
-    headline: "Reservierungen annehmen, während der Service läuft",
-    text: "Der KI Telefonassistent nimmt Reservierungswünsche entgegen, erfasst Personenzahl, Zeitwunsch und Rückrufnummer und übergibt sie strukturiert an den Service. Mehrere Anrufe zur selben Zeit, ohne Warteschleife. Ihr Serviceteam bleibt bei den Gästen, die bereits am Tisch sitzen.",
+    headline: "Reservieren, während der Service läuft — und zwar zu Ende",
+    text: "Der KI Telefonassistent führt das Reservierungsgespräch und schließt es ab: Datum, Uhrzeit, Personenzahl, Sonderwünsche und Allergien klärt er im Gespräch und trägt die Reservierung in Ihr System ein, sobald dessen Schnittstelle eingerichtet und verifiziert ist. Aus einem Anruf wird dann keine Notiz für später, sondern ein gebuchter Tisch. Trägt Ihr System den Eintrag nicht, steht die vollständige Reservierung für den Service bereit — das ist der vereinbarte Rückfallweg, nicht der Normalfall. Mehrere Anrufe zur selben Zeit; Ihr Serviceteam bleibt bei den Gästen, die schon am Tisch sitzen.",
   },
   benefits: [
-    "Tischreservierungen entgegennehmen – auch während des Service",
-    "Jeder Reservierungswunsch strukturiert dokumentiert",
+    "Tischreservierungen im Gespräch abschließen – auch während des Service",
+    "Eintrag in Ihr Reservierungssystem, wo dessen geprüfte Schnittstelle das trägt",
+    "Ohne tragfähige Schnittstelle: vollständige Reservierung für den Service, als vereinbarter Rückfallweg",
     "Erreichbar auch abends, nachts und am Wochenende",
     "Erinnerung am Vortag wirkt No-Shows entgegen, wo wir den Versandweg für Sie einrichten",
     // [[CLAIM: verify — Sprachumfang bestätigen]]
@@ -63,12 +64,12 @@ const config: NationalIndustryPageConfig = {
       {
         step: "01",
         title: "Gast ruft an",
-        description: "Der Assistent nimmt sofort ab – auf Deutsch oder Englisch, professionell und freundlich. Kein Besetztzeichen, keine Warteschleife, egal wie voll das Restaurant gerade ist.",
+        description: "Der Assistent nimmt an – auf Deutsch oder Englisch, professionell und freundlich. Auch mehrere Anrufe zur selben Zeit, unabhängig davon, wie voll das Restaurant gerade ist. Die Kapazität wird auf Ihr Aufkommen ausgelegt und im Angebot ausgewiesen.",
       },
       {
         step: "02",
-        title: "Reservierung aufnehmen",
-        description: "Datum, Uhrzeit, Personenzahl, Sonderwünsche und Allergien werden vollständig erfasst und direkt in das Reservierungssystem eingetragen.",
+        title: "Reservierung abschließen",
+        description: "Datum, Uhrzeit, Personenzahl, Sonderwünsche und Allergien klärt der Assistent im Gespräch und schließt die Reservierung ab. In Ihr Reservierungssystem eingetragen wird sie, sobald wir dessen Schnittstelle eingerichtet und verifiziert haben — was dafür geht, prüfen wir vor dem Angebot. Ohne tragfähige Schnittstelle steht die fertige Reservierung für den Service bereit.",
       },
       {
         step: "03",
@@ -110,7 +111,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Kann der Assistent Sonderwünsche und Allergien aufnehmen?",
-      answer: "Ja. Allergien, Hochstuhlbedarf, Fensterwunsch, Geburtstag – alles wird während des Gesprächs erfasst und im Reservierungssystem dokumentiert, sodass der Service optimal vorbereitet ist.",
+      answer: "Ja. Allergien, Hochstuhlbedarf, Fensterwunsch, Geburtstag – der Assistent fragt nach, klärt sie im Gespräch und hängt sie an die Reservierung. Im Reservierungssystem stehen sie, sobald dessen geprüfte Schnittstelle den Eintrag trägt; sonst stehen sie vollständig beim Vorgang für den Service. So oder so ist der Service vorbereitet.",
     },
     {
       question: "Verschickt der Assistent Erinnerungen an Gäste?",

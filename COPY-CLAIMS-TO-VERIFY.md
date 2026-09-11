@@ -391,3 +391,14 @@ bleibt (freigegebene Statistik, COPY-BRIEF §5.7).
 | A8 / F7 | „Mehrere Anrufe gleichzeitig", beziffert mit 10 | **zurückgestuft.** Die Bezifferung war nicht durch eine dokumentierte Bereitstellung gedeckt; die Gleichzeitigkeit des Sprachdienstes ist eine Konto-Grenze, keine Kundenzusage. Siehe OWNER-INPUT B11a. Bis zur Bestätigung steht überall die Fassung ohne Zahl |
 | — | „kein Anruf geht verloren" | **wird nicht behauptet.** Überlauf, Warteschlange und Rückfallnummer hängen am Setup (B9/B11) und sind nicht dokumentiert |
 | F10 | Tarifzuordnung nach günstigstem Gesamtpreis | **unverändert offen** — die Zusage muss vertraglich und im Abrechnungsprozess gedeckt sein. Neu ist nur, dass sie jetzt an genau einer Stelle im Code steht (`waehleSzenario`) und nicht mehr an zweien |
+
+
+## Z31 · Wirtschaftlichkeit und Produktwahrheit, 11.09.2026 (2)
+
+| # | Aussage | Status |
+|---|---|---|
+| — | Negativer Nettoeffekt aus unvollständigen Angaben | **behoben.** Fehlende Chancenangaben gingen als 0 in die Rechnung ein. Der Rechner kennt jetzt einen ausdrücklichen Zustand „unvollständig" und zeigt dort KEINE Zahl — weder negativ noch positiv. Ein vollständiges negatives Ergebnis wird unverändert gezeigt |
+| H3 | „ab drei Sprachen 230 €", „bis zu fünf Sprachen" | **offen und jetzt wirksam.** Der Rechner beziffert nur die eindeutigen Fälle und weist den Rest als offene Position aus, inklusive der Monatssumme. Zwei ja/nein-Fragen an den Inhaber, siehe OWNER-INPUT H3 |
+| — | Produktbild „aufnehmen und übergeben" auf Segmentseiten | **korrigiert** auf `/praxen`, `/ki-telefonassistent-praxis`, `/ki-telefonassistent-restaurant`, `/ki-telefonassistent-hotel` und in 13 Stadt-Konfigurationen. Normalfall ist die Abwicklung im Gespräch; die Übergabe ist als Rückfallweg und Ausnahme benannt |
+| A8 / F7 / B11a | „ohne Warteschleife", „kein Besetztzeichen", „egal wie voll" | **entfernt** auf allen nicht eingefrorenen Flächen und durch einen Test gesperrt. Verbleibende Stelle: eingefrorene Arzt-Route (post-experiment P10) |
+| — | BOOKING_WRITE-Dokumentation | **korrigiert.** Der Kommentar leitete aus der Anbindungsbedingung eine Produktbeschreibung ab („universell gilt die Aufnahme des Terminwunsches"). Jetzt stehen beide Regeln getrennt: `AUTOMATED_WORKFLOW_COMPLETION` als zugesicherte Fähigkeit, `SYSTEM_SCHREIBZUGRIFF` als kundenspezifische Bedingung |

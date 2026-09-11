@@ -1,5 +1,69 @@
 # COPY-SEO-CHANGELOG — Copy Overhaul KI-Telefonassistent-Cluster
 
+## 2026-09-11 (5) — Vollständige Wirtschaftlichkeit, einheitliche Produktwahrheit
+
+Zwei Befunde aus dem Inhaber-Review der Preview, beide mit demselben Muster:
+Eine Teilinformation stand da, wo eine vollständige hingehört.
+
+**1 · Der Rechner zeigte ein negatives Ergebnis aus einem halben Modell.**
+Die Chancenökonomie — verpasste Anrufe, echte Chancen, Abschlussquote,
+Deckungsbeitrag, zurückgewinnbarer Anteil — lag hinter einem zugeklappten
+„Optional"-Bereich. Fehlte sie, ging sie als **0** in den Nettoeffekt ein.
+Ein Besucher mit 400 Anrufen, 35 €/h und 60 % Routineanteil las deshalb
+`350 € − 495 € = −145 € / Monat`, bevor er zu dem Posten befragt worden war,
+der in vielen Betrieben das Vorzeichen dreht. Die Zahl war nicht konservativ,
+sondern falsch — und sie las sich als „Cogniiq rechnet sich nicht".
+
+Jetzt gibt es drei Zustände, im Typsystem erzwungen:
+
+| Zustand | Was angezeigt wird |
+|---|---|
+| unvollständig | „Wirtschaftlichkeit noch nicht vollständig berechnet" + welche Angaben fehlen. Zwischenstand „Potenzial aus Arbeitszeit" bleibt sichtbar. **Keine Zahl**, in keine Richtung |
+| vollständig positiv | Monatseffekt, Jahreseffekt inklusive Einrichtung, Amortisation |
+| vollständig negativ | Genau dasselbe, unverändert. Wer alles beantwortet hat und schlecht dasteht, sieht das |
+
+`0 verpasste Anrufe` ist dabei eine **vollständige Antwort** (Chancenwert 0),
+kein leeres Feld — ein danach negatives Ergebnis wird gezeigt.
+
+Die Chancenfelder stehen nicht mehr hinter einem Ausklapper, sondern als
+Schritt 2 im normalen Ablauf. Im Ausklapper steht jetzt, was die Rechnung
+bewusst NICHT enthält (Wachstum, Saison, Mehrstandort, Nacharbeit, Anbindung).
+
+**2 · Der Sprachaufschlag wurde aus Plausibilität abgeleitet.** „Ab drei
+Sprachen 230 € für bis zu fünf Sprachen" legt nicht fest, ob Deutsch mitzählt.
+Der Rechner beziffert deshalb nur noch die eindeutigen Fälle (0 und eine
+Zusatzsprache) und weist den Rest als offene Position aus — inklusive der
+Monatssumme, die ohne ihn niedriger wäre als die spätere Rechnung.
+Offen bis OWNER-INPUT H3.
+
+**3 · Produktwahrheit vereinheitlicht.** Vier Seiten beschrieben noch das alte
+Bild — Anruf annehmen, Anliegen erfassen, Mitarbeiter erledigt es danach:
+
+| Seite | Vorher | Jetzt |
+|---|---|---|
+| `/ki-telefonassistent-restaurant` | ein Abschnitt „übergibt strukturiert an den Service", ein anderer „direkt in das Reservierungssystem eingetragen" — zwei Modelle nebeneinander | Reservierung wird im Gespräch abgeschlossen und bei verifizierter Schnittstelle eingetragen; ohne sie greift der benannte Rückfallweg |
+| `/ki-telefonassistent-hotel` | „Buchungsanfragen strukturiert aufgenommen", „Übergabe an Ihr Haus" | freigegebene Buchungsabläufe im Gespräch abgeschlossen; Gruppen und Veranstaltungen eskalieren ausdrücklich als Ausnahme |
+| `/ki-telefonassistent-praxis` | Rückrufliste als Produkt, „erfasst Terminwünsche strukturiert" | Termin vergeben, verschieben, absagen im Gespräch; die Liste trägt nur noch die Ausnahmen |
+| `/praxen` | Service-Schema und Meta-Description versprachen „strukturierte Übergabe" | Abwicklung zuerst, Übergabe als Ausnahmeweg |
+
+Dazu 13 Stadt-Service-Konfigurationen und acht weitere Flächen.
+
+**4 · Unbedingte Erreichbarkeitszusagen entfernt.** „ohne Warteschleife",
+„kein Besetztzeichen", „egal wie voll", „jeder Anruf wird angenommen" hängen an
+einer endlichen Gleichzeitigkeit, deren Bereitstellung je Kunde nicht
+dokumentiert ist (B11a), und an einem Überlaufverhalten, das offen ist (B9).
+Sie stehen nur noch auf der eingefrorenen Arzt-Route; ein Test hält das fest.
+
+**Eingefrorene Routen:** unverändert, Fingerabdrücke byte-identisch. Wo eine
+geteilte Konstante von einer Experimentroute gerendert wird, steht die
+korrigierte Fassung daneben (`UEBERGABE_ABWICKLUNG`, `TEAM_BLOCK.textAbwicklung`,
+`ANLIEGEN_UEBERNIMMT_ABWICKLUNG`) — Liste in
+docs/seo/post-experiment-opportunities.md.
+
+**GA4:** unverändert. Der Branch trägt weiterhin `G-K7BS3LKT6H`; die Korrektur
+auf `G-NDN9J2G5LM` landet als eigener PR.
+
+
 ## 2026-09-11 (4) — Ein Rechenkern statt vier Rechnern
 
 Anlass: Der neue Preis- und Wirtschaftlichkeitsrechner auf

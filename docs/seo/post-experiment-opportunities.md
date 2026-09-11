@@ -313,3 +313,37 @@ dokumentiert: Das Kunden-Onboarding erfasst eine Agent-ID und eine Umgebung
 Bis der Inhaber die Bereitstellung bestätigt (OWNER-INPUT B11), gilt überall
 die Fassung ohne Zahl. Wird sie bestätigt, kann die Zahl zurück — dann aber
 belegt, und mit einer Aussage dazu, was bei Überlauf geschieht (B9).
+
+### Nachtrag 11.09.2026 (2) — eingefrorene Copy mit überholtem Produktbild
+
+Der Rechner- und Produktwahrheits-Durchgang hat weitere Konstanten gefunden,
+die inhaltlich überholt sind, aber von einer Experimentroute gerendert werden.
+Sie bleiben **wortgleich** stehen; die korrigierte Fassung existiert jeweils
+daneben und wird von den nicht eingefrorenen Seiten verwendet.
+
+| # | Eingefrorene Konstante | Korrigierte Fassung | Was daran überholt ist |
+|---|---|---|---|
+| P6 | `UEBERGABE` | `UEBERGABE_ABWICKLUNG` | Der erste Absatz beschreibt den üblichen Weg ANDERER Systeme („der Assistent nimmt an, Ihre MFA überträgt danach von Hand") und wurde als Normalfall dieses Produkts gelesen |
+| P7 | `TEAM_BLOCK.text` (via `KOMPAKT_TEAM.text`) | `TEAM_BLOCK.textAbwicklung` | Beschreibt Routineanliegen als „strukturierte Einträge", also als Aufgaben, die danach jemand erledigt |
+| P8 | `ANLIEGEN_UEBERNIMMT` (via `KOMPAKT_ANLIEGEN.punkte`) | `ANLIEGEN_UEBERNIMMT_ABWICKLUNG` | „Terminwünsche AUFNEHMEN und … vergeben" stellt die Aufnahme vor die Vergabe |
+| P9 | `FAKTEN.terminaufnahme` | `ABWICKLUNG.faehigkeit` + `ABWICKLUNG.qualifikation` | Nennt die Aufnahme als das universell Zugesicherte; die Abwicklung ist die zugesicherte Fähigkeit, die Anbindung die Bedingung |
+| P10 | `/ki-telefonassistent-arzt`, Ablaufschritt 01 | — | „ohne Besetztzeichen, ohne Warteschleife" ist eine unbedingte Zusage. Auf allen anderen Flächen entfernt (OWNER-INPUT B11a/B9); hier bleibt sie bis zum Ende der Messung stehen |
+
+`rechner-konsistenz.test.tsx` führt diese Ausnahmen namentlich in
+`EINGEFROREN_QUELLEN`. Endet ein Experiment, verschwindet der Eintrag dort
+zusammen mit der eingefrorenen Fassung — der Test schlägt dann an, wenn jemand
+die alte Formulierung wiederherstellt.
+
+### Nachtrag 11.09.2026 (3) — Sprachpreis
+
+Der Rechner beziffert den Sprachaufschlag nur noch dort, wo die Preisliste
+eindeutig ist: Deutsch enthalten (0 €), eine Zusatzsprache 79 €. Ab zwei
+Zusatzsprachen steht er als offene Position, weil „ab drei Sprachen … für bis zu
+fünf Sprachen" nicht festlegt, ob Deutsch mitzählt. Die frühere Fassung leitete
+das aus wirtschaftlicher Plausibilität ab (ein Paket bei zwei Zusatzsprachen
+wäre teurer als der Einzelpreis, also müssten drei ZUSATZsprachen gemeint sein).
+Plausibel, aber kein Beleg — und ein zu niedrig ausgewiesener Monatsbetrag ist
+der teuerste Fehler, den ein Preisrechner machen kann.
+
+Sobald OWNER-INPUT H3 beantwortet ist, kann `sprachenAufschlagEur` die
+Paketschwelle wieder rechnen. Bis dahin gilt: offen ausweisen, nie als 0.

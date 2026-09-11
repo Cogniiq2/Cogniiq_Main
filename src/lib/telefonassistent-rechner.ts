@@ -73,6 +73,38 @@ export type Zusatzsprachen = 0 | 1 | 2 | 3;
 export const UNBEKANNT = "unbekannt" as const;
 export type Betrag = number | typeof UNBEKANNT;
 
+/*
+  Ein Ergebnis, das NICHT „null" und NICHT „negativ" ist, sondern „noch nicht
+  vollständig gerechnet".
+
+  Der Unterschied ist der Kern der Korrektur vom 11.09.2026 (zweiter Durchgang).
+  Vorher galt: fehlende Chancenangaben = Chancenwert 0. Damit stand dem
+  Cogniiq-Monatsbetrag nur der Zeitwert gegenüber, und die Überschrift zeigte
+  eine negative Zahl — bevor der Besucher überhaupt gefragt worden war, welche
+  Anrufe ihn heute nicht erreichen. Das ist der Posten, der in vielen Betrieben
+  der größte ist. Eine Rechnung, die ihn stillschweigend auf null setzt, ist
+  kein konservatives Ergebnis, sondern ein falsches — und sie sagt dem Besucher
+  „rechnet sich nicht", wo sie „mir fehlen noch Angaben" sagen müsste.
+
+  `UNVOLLSTAENDIG` erzwingt diese Unterscheidung im Typsystem: Solange ein
+  Pflichtfeld fehlt, gibt es für Nettoeffekt, Jahreseffekt und Amortisation
+  KEINE Zahl — weder eine negative noch eine positive. Die Oberfläche kann
+  daraus nichts anderes machen als einen neutralen Hinweis.
+*/
+export const UNVOLLSTAENDIG = "unvollstaendig" as const;
+export type Wirtschaftsbetrag = number | typeof UNBEKANNT | typeof UNVOLLSTAENDIG;
+
+/*
+  Ein Preis, den die Quelle nicht eindeutig festlegt.
+
+  Unterschied zu UNBEKANNT: UNBEKANNT steht für etwas, das erst nach einer
+  Prüfung feststeht (die Systemanbindung). OFFEN steht für etwas, das
+  feststeht — aber in unserer eigenen Preisliste zwei Lesarten zulässt. Beides
+  darf nie als 0 erscheinen, und beides gehört benannt statt geraten.
+*/
+export const OFFEN = "offen" as const;
+export type Preisbetrag = number | typeof OFFEN;
+
 export interface TarifSzenario {
   tarif: Tarif;
   /** Minuten über dem Kontingent; 0, wenn das Kontingent reicht. */
@@ -93,10 +125,13 @@ export interface PreisErgebnis {
   minutenProMonat: number;
   /** Nur bei modus === 'standard' gesetzt. */
   szenario: TarifSzenario | null;
-  /** Aufschlag für Zusatzsprachen, monatlich. 0 bei „nur Deutsch". */
-  sprachenMonatlichEur: number;
-  /** Ob der Sprachpaketpreis greift (statt Preis je Sprache). */
-  sprachenAlsPaket: boolean;
+  /** Aufschlag für Zusatzsprachen, monatlich. 0 bei „nur Deutsch",
+   *  `OFFEN`, wo die Preisliste zwei Lesarten zulässt (siehe
+   *  `sprachenAufschlagEur`). */
+  sprachenMonatlichEur: Preisbetrag;
+  /** true, wenn der Aufschlag nicht eindeutig ableitbar ist und im Angebot
+   *  ausgewiesen wird. Dann ist auch `monatlichGesamtEur` nicht bezifferbar. */
+  sprachenOffen: boolean;
   /** Einmalige Einrichtung. 'unbekannt' im individuellen Modus. */
   einrichtungEur: Betrag;
   /** Wiederkehrend je Monat = Telefonie + Sprachen. 'unbekannt' im
@@ -157,19 +192,43 @@ export function waehleSzenario(minuten: number): TarifSzenario | null {
 }
 
 /**
- * Monatlicher Sprachaufschlag. Unterhalb der Paketschwelle je Sprache, ab der
- * Schwelle der Paketpreis. Deutsch ist enthalten und zählt nicht mit.
+ * Monatlicher Sprachaufschlag — und die Stelle, an der der Rechner bewusst
+ * AUFHÖRT zu rechnen.
+ *
+ * Eindeutig ist die Quelle nur an zwei Punkten:
+ *   • Deutsch ist enthalten und kostet nichts extra.
+ *   • „Jede weitere Sprache kostet 79 € im Monat."
+ *
+ * Nicht eindeutig ist der Paketpreis. „Ab drei Sprachen sind es 230 € im Monat
+ * für bis zu fünf Sprachen gleichzeitig" lässt offen, ob „drei Sprachen"
+ * DEUTSCH MITZÄHLT (also zwei Zusatzsprachen die Schwelle wären) oder drei
+ * ZUSATZsprachen meint — und dieselbe Frage stellt sich bei der Obergrenze
+ * „bis zu fünf".
+ *
+ * Die frühere Fassung entschied das per Wirtschaftslogik: Bei zwei
+ * Zusatzsprachen wären 2 × 79 € = 158 € günstiger als 230 €, ein Paket an
+ * dieser Stelle also sinnlos — daraus wurde „ab drei ZUSATZsprachen"
+ * abgeleitet. Das Argument ist plausibel und trotzdem kein Beleg: Aus einer
+ * Preisliste eine Vertragsbedingung zu erschließen, weil die andere Lesart
+ * unwirtschaftlich wäre, ist genau die Sorte stille Annahme, die dieser
+ * Rechner nicht treffen darf. Der Kunde bekommt am Ende, was im Vertrag steht,
+ * nicht was hier plausibel war.
+ *
+ * Deshalb: unterhalb der Paketfrage wird gerechnet, ab der Paketfrage steht
+ * `OFFEN` — sichtbar als eigene Position, niemals als 0.
+ * Offen bleibt es, bis OWNER-INPUT H3 beantwortet ist.
  */
 export function sprachenAufschlagEur(zusatzsprachen: Zusatzsprachen): {
-  betrag: number;
-  alsPaket: boolean;
+  betrag: Preisbetrag;
+  offen: boolean;
 } {
   const n = Math.max(0, Math.min(SPRACHEN_PREISE.paketAbZusatzsprachen, zusatzsprachen));
-  if (n === 0) return { betrag: 0, alsPaket: false };
-  if (n >= SPRACHEN_PREISE.paketAbZusatzsprachen) {
-    return { betrag: SPRACHEN_PREISE.paketEur, alsPaket: true };
-  }
-  return { betrag: n * SPRACHEN_PREISE.proSpracheEur, alsPaket: false };
+  if (n === 0) return { betrag: 0, offen: false };
+  // Eine Zusatzsprache liegt unter jeder Lesart der Paketschwelle. Erst ab
+  // zwei greift die Mehrdeutigkeit: Zählt Deutsch mit, wäre hier bereits das
+  // Paket fällig; zählt es nicht mit, sind es 2 × der Einzelpreis.
+  if (n === 1) return { betrag: SPRACHEN_PREISE.proSpracheEur, offen: false };
+  return { betrag: OFFEN, offen: true };
 }
 
 export function berechnePreis(
@@ -186,7 +245,7 @@ export function berechnePreis(
       minutenProMonat: minuten,
       szenario: null,
       sprachenMonatlichEur: sprachen.betrag,
-      sprachenAlsPaket: sprachen.alsPaket,
+      sprachenOffen: sprachen.offen,
       einrichtungEur: UNBEKANNT,
       monatlichGesamtEur: UNBEKANNT,
       anbindungEur: UNBEKANNT,
@@ -198,9 +257,16 @@ export function berechnePreis(
     minutenProMonat: minuten,
     szenario,
     sprachenMonatlichEur: sprachen.betrag,
-    sprachenAlsPaket: sprachen.alsPaket,
+    sprachenOffen: sprachen.offen,
     einrichtungEur: szenario.tarif.einrichtungEur,
-    monatlichGesamtEur: szenario.telefonieMonatlichEur + sprachen.betrag,
+    /*
+      Steht der Sprachaufschlag offen, ist die Summe NICHT bezifferbar. Sie
+      ohne ihn auszuweisen wäre der teuerste Fehler dieses Rechners: eine
+      Monatssumme, die niedriger ist als die Rechnung, die der Kunde später
+      bekommt. Lieber keine Zahl als eine zu niedrige.
+    */
+    monatlichGesamtEur:
+      sprachen.betrag === OFFEN ? UNBEKANNT : szenario.telefonieMonatlichEur + sprachen.betrag,
     anbindungEur: UNBEKANNT,
   };
 }
@@ -235,64 +301,145 @@ export interface WirtschaftlichkeitEingabe {
   routineanteilProzent: number | null;
 }
 
-/** Optionale zweite Ebene: Anrufe, die heute gar nicht ankommen. Wird NUR
- *  gerechnet, wenn der Nutzer alle Felder ausfüllt. */
+/**
+ * Die Chancenrechnung — Anrufe, die heute niemanden erreichen.
+ *
+ * NICHT MEHR OPTIONAL (Stand 11.09.2026). Diese Felder standen hinter einem
+ * zugeklappten „Optional"-Bereich, den die meisten Besucher nie geöffnet haben.
+ * Damit lag der in vielen Betrieben GRÖSSTE wirtschaftliche Posten außerhalb
+ * der Rechnung, während der Cogniiq-Monatsbetrag drinstand — das Ergebnis war
+ * systematisch zu negativ. Sie gehören in den normalen Ablauf.
+ */
 export interface ChancenEingabe {
+  /** Relevante Anrufe je Monat, die heute nicht oder nicht rechtzeitig
+   *  bearbeitet werden. Angabe des Besuchers; wir schätzen keine Quote. */
   verpassteAnrufeProMonat: number | null;
-  /** Anteil der verpassten Anrufe, der überhaupt eine Chance darstellt, in %. */
+  /** Anteil davon, der überhaupt eine echte Chance darstellt, in %. */
   davonChancenProzent: number | null;
   /** Anteil der Chancen, der zum Abschluss führt, in %. */
   abschlussquoteProzent: number | null;
   /** Deckungsbeitrag je gewonnenem Fall — bewusst nicht „Umsatz". */
   deckungsbeitragEur: number | null;
-  /** Anteil, den der Nutzer selbst für zurückgewinnbar hält, in %. */
+  /** Anteil, den der Besucher selbst für zurückgewinnbar hält, in %. */
   rueckgewinnbarProzent: number | null;
 }
 
+/** Die Felder, die eine vollständige Wirtschaftlichkeitsrechnung braucht.
+ *  Die Oberfläche zählt sie, um zu sagen, wie viele noch fehlen. */
+export type FehlendeAngabe =
+  | "stundenkosten"
+  | "routineanteil"
+  | "verpassteAnrufe"
+  | "chancenanteil"
+  | "abschlussquote"
+  | "deckungsbeitrag"
+  | "rueckgewinnbar";
+
 export interface WirtschaftlichkeitErgebnis {
-  /** false, solange die Pflichtangaben fehlen — dann wird nichts angezeigt. */
-  rechenbar: boolean;
+  /** Zeitpotenzial rechenbar: Stundenkosten UND Routineanteil liegen vor.
+   *  Reicht für „Potenzial aus Arbeitszeit" — NICHT für ein Gesamtergebnis. */
+  zeitpotenzialRechenbar: boolean;
+  /** Chancenrechnung rechenbar. Siehe `chancenwert` für die Null-Regel. */
+  chancenRechenbar: boolean;
+  /** Beide Teilrechnungen liegen vor. Erst dann darf ein Nettoeffekt,
+   *  ein Jahreseffekt oder eine Amortisation angezeigt werden — in welche
+   *  Richtung auch immer er ausfällt. */
+  vollstaendig: boolean;
+  /** Was noch fehlt, in der Reihenfolge des Formulars. */
+  fehlendeAngaben: readonly FehlendeAngabe[];
+
   telefonstundenProMonat: number;
-  automatisierbareStundenProMonat: number;
   /** Telefonzeit, die auf konfigurierte Routineabläufe entfällt. Diese Abläufe
    *  wickelt der Assistent vollständig ab; die Zahl sagt nichts darüber, wie
    *  viel Prozent ALLER Anrufe das sind — das steht in der Eingabe. */
+  routinestundenProMonat: number;
   /** Gegenwert der potenziell freigesetzten Arbeitszeit. AUSDRÜCKLICH NICHT
    *  „eingesparte Personalkosten": Freigewordene Zeit wird nur dann zu Geld,
-   *  wenn der Betrieb sie auch wirklich abbaut oder anders einsetzt. */
-  zeitwertProMonatEur: number;
-  /** Nur gesetzt, wenn ALLE Chancenfelder ausgefüllt sind. */
+   *  wenn der Betrieb sie auch wirklich abbaut oder anders einsetzt.
+   *  `null`, solange Stundenkosten oder Routineanteil fehlen. */
+  zeitwertProMonatEur: number | null;
+  /** `null`, solange ein Pflichtfeld der Chancenrechnung fehlt. */
   chancenwertProMonatEur: number | null;
-  /** Cogniiq, wiederkehrend. 'unbekannt' im individuellen Preismodus. */
+
+  /** Cogniiq, wiederkehrend. `UNBEKANNT` im individuellen Preismodus und bei
+   *  offenem Sprachaufschlag. */
   kostenProMonatEur: Betrag;
   einrichtungEur: Betrag;
-  /** Zeitwert + Chancenwert − Cogniiq-Monatskosten. */
-  nettoProMonatEur: Betrag;
-  /** Erstes Jahr inklusive Einrichtung — die Einrichtung wird NICHT
-   *  weggelassen, um die Zahl schöner zu machen. */
-  ersteJahrNettoEur: Betrag;
-  /** Monate bis die Einrichtung hereingeholt ist. null, wenn der Nettoeffekt
-   *  null oder negativ ist — dann gibt es keine Amortisation, und eine
-   *  auszuweisen wäre eine Division durch eine Annahme. */
+  /** Monatsbetrag × 12 + Einrichtung. Die Einrichtung wird NICHT weggelassen. */
+  ersteJahrKostenEur: Betrag;
+
+  /** Zeitwert + Chancenwert − Cogniiq-Monatskosten.
+   *  `UNVOLLSTAENDIG`, solange nicht alle Pflichtangaben vorliegen —
+   *  nie eine Zahl aus einem halben Modell. */
+  nettoProMonatEur: Wirtschaftsbetrag;
+  /** Erstes Jahr inklusive Einrichtung. */
+  ersteJahrNettoEur: Wirtschaftsbetrag;
+  /** Monate bis die Einrichtung hereingeholt ist. `null`, wenn die Rechnung
+   *  unvollständig ist ODER der Nettoeffekt null oder negativ ist — dann gibt
+   *  es keine Amortisation, und eine auszuweisen wäre eine Division durch eine
+   *  Annahme. */
   amortisationMonate: number | null;
 }
 
-function chancenwert(c: ChancenEingabe): number | null {
-  const werte = [
-    c.verpassteAnrufeProMonat,
-    c.davonChancenProzent,
-    c.abschlussquoteProzent,
-    c.deckungsbeitragEur,
-    c.rueckgewinnbarProzent,
+/**
+ * Chancenwert und die Frage, welche Felder wirklich Pflicht sind.
+ *
+ * KEINE VERPASSTEN ANRUFE IST EINE VOLLSTÄNDIGE ANTWORT. Trägt jemand 0 ein,
+ * ist der Chancenwert 0 — und zwar als ERGEBNIS, nicht als Lücke. Die vier
+ * Folgefelder werden dann nicht mehr gebraucht: Null Anrufe mal irgendetwas
+ * bleibt null. Dieser Betrieb bekommt danach womöglich ein negatives
+ * Gesamtergebnis, und das ist dann die Wahrheit und wird gezeigt.
+ *
+ * Dasselbe gilt für einen Deckungsbeitrag von 0: eine Angabe, kein fehlender
+ * Wert. Was NICHT gilt: ein leeres Feld als 0 zu lesen.
+ */
+function chancenAuswertung(c: ChancenEingabe): {
+  wert: number | null;
+  fehlend: FehlendeAngabe[];
+} {
+  const fehlt = (v: number | null | undefined) => v === null || v === undefined || Number.isNaN(v);
+
+  if (fehlt(c.verpassteAnrufeProMonat)) {
+    return { wert: null, fehlend: ["verpassteAnrufe"] };
+  }
+  const anrufe = c.verpassteAnrufeProMonat as number;
+  if (anrufe <= 0) return { wert: 0, fehlend: [] };
+
+  const paare: Array<[FehlendeAngabe, number | null]> = [
+    ["chancenanteil", c.davonChancenProzent],
+    ["abschlussquote", c.abschlussquoteProzent],
+    ["deckungsbeitrag", c.deckungsbeitragEur],
+    ["rueckgewinnbar", c.rueckgewinnbarProzent],
   ];
-  // Alles oder nichts: Eine Teilrechnung mit stillen Standardwerten wäre genau
-  // die Sorte ROI-Widget, die diese Seite nicht sein soll.
-  if (werte.some((v) => v === null || v === undefined || Number.isNaN(v))) return null;
-  const [anrufe, chancen, quote, db, rueck] = werte as number[];
-  if (anrufe <= 0 || db <= 0) return 0;
-  return (
-    anrufe * (chancen / 100) * (quote / 100) * db * (rueck / 100)
-  );
+  const fehlend = paare.filter(([, v]) => fehlt(v)).map(([name]) => name);
+  if (fehlend.length > 0) return { wert: null, fehlend };
+
+  const anteil = (v: number | null) => Math.max(0, Math.min(100, v as number)) / 100;
+  const db = Math.max(0, c.deckungsbeitragEur as number);
+
+  /*
+    Der konservative Trichter. Jeder Faktor nimmt etwas weg, und jeder ist eine
+    Angabe des Besuchers:
+
+      verpasste relevante Anrufe
+      × Anteil echter Chancen        (nicht jeder Anrufer wollte etwas kaufen)
+      × Abschluss-/Buchungsquote     (nicht jede Chance wird ein Auftrag)
+      × Deckungsbeitrag je Fall      (nicht Umsatz — was übrig bleibt)
+      × zurückgewinnbarer Anteil     (nicht jeder Verlorene wäre zu halten)
+
+    Das ist bewusst deutlich weniger als „verpasster Anruf × Umsatz". Wer die
+    größere Zahl will, muss die Faktoren selbst hochsetzen und sieht dabei, was
+    er annimmt.
+  */
+  return {
+    wert:
+      anrufe *
+      anteil(c.davonChancenProzent) *
+      anteil(c.abschlussquoteProzent) *
+      db *
+      anteil(c.rueckgewinnbarProzent),
+    fehlend: [],
+  };
 }
 
 export function berechneWirtschaftlichkeit(
@@ -303,50 +450,98 @@ export function berechneWirtschaftlichkeit(
 ): WirtschaftlichkeitErgebnis {
   const telefonstunden = minutenProMonat(volumen) / MINUTEN_PRO_STUNDE;
   const anteil = Math.max(0, Math.min(100, eingabe.routineanteilProzent ?? 0)) / 100;
-  const automatisierbareStunden = telefonstunden * anteil;
+  const routinestunden = telefonstunden * anteil;
 
   const stundenkosten = eingabe.stundenkostenEur;
-  const rechenbar =
-    stundenkosten !== null && stundenkosten > 0 && eingabe.routineanteilProzent !== null;
-  const zeitwert = rechenbar ? automatisierbareStunden * stundenkosten : 0;
-  const chancenProMonat = chancenwert(chancen);
+  const zeitFehlend: FehlendeAngabe[] = [];
+  if (stundenkosten === null || Number.isNaN(stundenkosten)) zeitFehlend.push("stundenkosten");
+  if (eingabe.routineanteilProzent === null || Number.isNaN(eingabe.routineanteilProzent)) {
+    zeitFehlend.push("routineanteil");
+  }
+  const zeitpotenzialRechenbar = zeitFehlend.length === 0;
+  const zeitwert = zeitpotenzialRechenbar
+    ? routinestunden * Math.max(0, stundenkosten as number)
+    : null;
 
+  const { wert: chancenwertProMonat, fehlend: chancenFehlend } = chancenAuswertung(chancen);
+  const chancenRechenbar = chancenwertProMonat !== null;
+
+  const fehlendeAngaben = [...zeitFehlend, ...chancenFehlend];
   const kosten = preis.monatlichGesamtEur;
   const einrichtung = preis.einrichtungEur;
+  const preisBekannt = kosten !== UNBEKANNT && einrichtung !== UNBEKANNT;
 
-  if (kosten === UNBEKANNT || einrichtung === UNBEKANNT) {
+  const basis = {
+    zeitpotenzialRechenbar,
+    chancenRechenbar,
+    fehlendeAngaben,
+    telefonstundenProMonat: telefonstunden,
+    routinestundenProMonat: routinestunden,
+    zeitwertProMonatEur: zeitwert,
+    chancenwertProMonatEur: chancenwertProMonat,
+    kostenProMonatEur: kosten,
+    einrichtungEur: einrichtung,
+  };
+
+  /*
+    Ohne bezifferbaren Preis gibt es nichts, wogegen sich rechnen ließe — im
+    individuellen Tarif und bei offenem Sprachaufschlag. Das Zeitpotenzial
+    bleibt trotzdem stehen: Es hängt nicht am Preis.
+  */
+  if (!preisBekannt) {
     return {
-      rechenbar,
-      telefonstundenProMonat: telefonstunden,
-      automatisierbareStundenProMonat: automatisierbareStunden,
-      zeitwertProMonatEur: zeitwert,
-      chancenwertProMonatEur: chancenProMonat,
-      kostenProMonatEur: UNBEKANNT,
-      einrichtungEur: UNBEKANNT,
+      ...basis,
+      vollstaendig: false,
+      ersteJahrKostenEur: UNBEKANNT,
       nettoProMonatEur: UNBEKANNT,
       ersteJahrNettoEur: UNBEKANNT,
       amortisationMonate: null,
     };
   }
 
-  const nutzen = zeitwert + (chancenProMonat ?? 0);
-  const netto = nutzen - kosten;
-  const ersteJahr = nutzen * MONATE_PRO_JAHR - (kosten * MONATE_PRO_JAHR + einrichtung);
+  const kostenZahl = kosten as number;
+  const einrichtungZahl = einrichtung as number;
+  const ersteJahrKosten = kostenZahl * MONATE_PRO_JAHR + einrichtungZahl;
+
+  /*
+    DIE REGEL, UM DIE ES IN DIESEM RECHNER GEHT.
+
+    Fehlt auch nur eine Pflichtangabe, gibt es KEINEN Nettoeffekt — weder einen
+    negativen noch einen positiven. Vorher wurde ein fehlender Chancenwert als
+    0 gelesen; die Überschrift zeigte dann „−180 € / Monat", obwohl der
+    Besucher zu dem Posten, der das Vorzeichen dreht, noch gar nicht befragt
+    worden war. Eine unvollständige negative Zahl ist keine ehrliche Zahl,
+    sondern eine falsche Aussage über das Produkt.
+
+    Eine VOLLSTÄNDIGE negative Zahl dagegen wird gezeigt, unverändert. Das ist
+    der Unterschied zwischen Zurückhaltung und Schönrechnen.
+  */
+  const vollstaendig = zeitpotenzialRechenbar && chancenRechenbar;
+  if (!vollstaendig) {
+    return {
+      ...basis,
+      vollstaendig: false,
+      ersteJahrKostenEur: ersteJahrKosten,
+      nettoProMonatEur: UNVOLLSTAENDIG,
+      ersteJahrNettoEur: UNVOLLSTAENDIG,
+      amortisationMonate: null,
+    };
+  }
+
+  const nutzen = (zeitwert as number) + (chancenwertProMonat as number);
+  const netto = nutzen - kostenZahl;
+  const ersteJahr = nutzen * MONATE_PRO_JAHR - ersteJahrKosten;
 
   return {
-    rechenbar,
-    telefonstundenProMonat: telefonstunden,
-    automatisierbareStundenProMonat: automatisierbareStunden,
-    zeitwertProMonatEur: zeitwert,
-    chancenwertProMonatEur: chancenProMonat,
-    kostenProMonatEur: kosten,
-    einrichtungEur: einrichtung,
+    ...basis,
+    vollstaendig: true,
+    ersteJahrKostenEur: ersteJahrKosten,
     nettoProMonatEur: netto,
     ersteJahrNettoEur: ersteJahr,
     // Keine Amortisation bei nicht-positivem Nettoeffekt. Eine Zahl wie
     // „−14 Monate" oder „Infinity" ist keine Aussage, sondern ein Rechenfehler,
     // der als Ergebnis auftritt.
-    amortisationMonate: rechenbar && netto > 0 ? einrichtung / netto : null,
+    amortisationMonate: netto > 0 ? einrichtungZahl / netto : null,
   };
 }
 

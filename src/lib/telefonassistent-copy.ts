@@ -193,16 +193,36 @@ export const FAKTEN = {
   // über ein System, das wir noch nicht gesehen haben. Namen einzelner
   // Praxisverwaltungssysteme stehen hier bewusst nicht (OWNER-INPUT B3).
   /*
-    Inhaber-Bestaetigung 10.09.2026 — BOOKING_WRITE: "ONLY AFTER VERIFIED
-    CUSTOMER INTEGRATION". Damit ist die Frage entschieden, die
-    COPY-CLAIMS-TO-VERIFY.md Z25 als blockierend gefuehrt hat: Der Assistent
-    darf NICHT als System beschrieben werden, das Termine allgemein oder
-    automatisch in ein Kunden-, Praxis- oder Kalendersystem schreibt. Diese
-    Faehigkeit darf nur dort beschrieben werden, wo die kundenspezifische
-    Anbindung technisch geprueft ist.
+    BOOKING_WRITE, RICHTIG GELESEN — korrigiert am 11.09.2026.
 
-    Der Umfang ist genau dieser. Er wird nicht erweitert. Was universell und
-    belegt gilt, ist die Aufnahme des Terminwunsches — nicht der Schreibvorgang.
+    Die Inhaber-Bestaetigung vom 10.09.2026 lautet: "ONLY AFTER VERIFIED
+    CUSTOMER INTEGRATION". Der Satz, der frueher hier stand, hat daraus
+    gemacht: "was universell gilt, ist die AUFNAHME des Terminwunsches — nicht
+    der Schreibvorgang". Das war eine Fehlleseung mit Folgen: Aus einer
+    Bedingung fuer den SCHREIBZUGRIFF AUF FREMDSYSTEME wurde eine
+    Produktbeschreibung, und die Copy fiel auf einen Anrufbeantworter mit
+    Transkript zurueck.
+
+    Die beiden Regeln sind getrennt (ausgeschrieben im Block
+    "PRODUKTWAHRHEIT, KORRIGIERT AM 11.09.2026" weiter unten):
+
+      AUTOMATED_WORKFLOW_COMPLETION = ZUGESICHERTE PRODUKTFAEHIGKEIT
+        Konfigurierte Routineablaeufe wickelt der Assistent im Gespraech
+        vollstaendig ab — buchen, verschieben, absagen, konfigurierte Fragen
+        beantworten —, ohne dass daraus eine Aufgabe fuer einen Menschen wird.
+
+      SYSTEM_SCHREIBZUGRIFF = KUNDENSPEZIFISCH UND PRUEFPFLICHTIG
+        Ob dieser Ablauf direkt in das System des Kunden schreibt, haengt an
+        dessen Schnittstelle; die wird je Kunde eingerichtet und verifiziert.
+        Ohne sie greift der vorher vereinbarte Fallback — als AUSNAHME, nicht
+        als Normalfall.
+
+    Der String unten bleibt trotzdem WORTGLEICH: Er wird von einer
+    eingefrorenen Experimentroute gerendert, deren Bytes sich bis zum Ende der
+    Messung nicht bewegen duerfen. Fuer die nicht eingefrorenen Flaechen gilt
+    `ABWICKLUNG` weiter unten. Endet das Experiment, wird auch dieser String
+    auf die korrigierte Fassung gezogen — notiert in
+    docs/seo/post-experiment-opportunities.md.
   */
   terminaufnahme:
     "Terminwünsche nimmt der Assistent nach Ihren Regeln auf: Er vergibt den Termin im vereinbarten Rahmen oder legt ihn Ihrem Team zur Bestätigung vor. Ob ein Termin zusätzlich direkt in Ihr Praxis- oder Kalendersystem geschrieben wird, hängt an dessen Schnittstelle — wir prüfen sie vor dem Angebot und richten die Übergabe erst ein, wenn sie für Ihr System nachweislich trägt.",
@@ -321,11 +341,23 @@ export const EINRICHTUNG_SCHRITTE: Array<{
 export const TEAM_BLOCK = {
   headline: "Was sich für Ihr Team am ersten Tag ändert",
   text: "Das Telefon klingelt nicht mehr in dem Moment, in dem eine Patientin am Tresen steht. Wiederkehrende Anliegen — Terminwunsch, Stornierung, Rezeptbestellung — kommen als strukturierte Einträge an, nicht als Klingeln zwischen zwei Handgriffen. Ihr Team entscheidet weiterhin über jeden Termin und jede Rückmeldung; es wird nur seltener dabei unterbrochen.",
+  /*
+    KORRIGIERTE FASSUNG für die nicht eingefrorenen Seiten.
+
+    `text` daneben ist wortgleich eingefroren: `KOMPAKT_TEAM.text` leitet sich
+    davon ab und wird von einer Experimentroute gerendert. Inhaltlich ist die
+    alte Fassung überholt — sie beschreibt Routineanliegen als „strukturierte
+    Einträge", also als Aufgaben, die danach jemand erledigt. Genau das tun sie
+    im Normalbetrieb nicht mehr.
+  */
+  textAbwicklung:
+    "Das Telefon klingelt nicht mehr in dem Moment, in dem eine Patientin am Tresen steht. Wiederkehrende Anliegen — Termin vergeben, verschieben, stornieren, freigegebene Fragen beantworten — sind erledigt, bevor der Anrufer auflegt; sie erscheinen als abgeschlossener Vorgang und nicht als Aufgabe. Auf der Liste Ihres Teams steht nur, was Sie ausgenommen haben: fachliche Fragen, Rezept- und Überweisungswünsche, strittige Fälle. Den Rahmen legen Sie fest, und Sie können ihn jederzeit ändern.",
   points: [
     "Weniger Unterbrechungen zu Stoßzeiten — der Tresen hat Vorrang",
     "Mehrere Anrufe zur selben Zeit: niemand hört mehr ein Besetztzeichen, auch am Montagmorgen nicht",
-    "Jeder Anruf kommt strukturiert an: Anliegen, Name, Rückrufnummer, Terminwunsch — statt Notizzettel",
-    "Rückrufliste statt Daueralarm: abarbeiten, wenn es in den Ablauf passt",
+    "Freigegebene Routineabläufe sind im Gespräch erledigt — sie landen gar nicht erst auf einer Liste",
+    "Was übrig bleibt, kommt strukturiert an: Anliegen, Name, Rückrufnummer, Terminwunsch — statt Notizzettel",
+    "Eine kurze Liste echter Ausnahmen statt Daueralarm: abarbeiten, wenn es in den Ablauf passt",
     "Ihr Team behält die Kontrolle — jede Regel und jede Ansage lässt sich ändern",
     FAKTEN.aenderungen.replace(/\.$/, ""),
   ],
@@ -358,6 +390,22 @@ export const ANLIEGEN_UEBERNIMMT: string[] = [
   "Rezept- und Überweisungswünsche strukturiert erfassen, zur Bearbeitung durch Ihr Team",
   "Wiederkehrende Fragen beantworten: Sprechzeiten, Anfahrt, Urlaubsvertretung, benötigte Unterlagen",
   "Rückrufwünsche mit Anliegen und Rückrufnummer auf die Rückrufliste setzen",
+];
+
+/*
+  KORRIGIERTE FASSUNG des Anliegen-Katalogs — für die nicht eingefrorenen Seiten.
+
+  `ANLIEGEN_UEBERNIMMT` bleibt wortgleich: `KOMPAKT_ANLIEGEN.punkte` schneidet
+  die ersten drei Zeilen heraus und wird von einer Experimentroute gerendert.
+  Die alte Formulierung „Terminwünsche AUFNEHMEN und … vergeben" stellt die
+  Aufnahme vor die Vergabe und liest sich damit als Notizdienst. Die korrigierte
+  Fassung nennt die Abwicklung zuerst; die Vorlage zur Bestätigung bleibt als
+  das erhalten, was sie ist — eine Option, die die Praxis wählt.
+*/
+export const ANLIEGEN_UEBERNIMMT_ABWICKLUNG: string[] = [
+  "Termine im Gespräch vergeben — im Rahmen, den Sie festlegen; wo Sie eine Bestätigung wünschen, legt er sie vor",
+  "Termine verschieben und stornieren — im Gespräch erledigt, frei werdende Termine sind sofort wieder vergebbar",
+  ...ANLIEGEN_UEBERNIMMT.slice(2),
 ];
 
 export const ANLIEGEN_IMMER_MENSCH: string[] = [
@@ -440,7 +488,7 @@ export const ANBINDUNG = {
     headline: "Was heute läuft",
     frage: "Was passiert nach einem Anruf?",
     absaetze: [
-      "Jeder Anruf endet als strukturierter Eintrag im Cogniiq-Dashboard: Anliegen, Name, Rückrufnummer, Terminwunsch. Ihr Team sieht auf einen Blick, worum es ging, und arbeitet die Liste ab, wenn es in den Ablauf passt.",
+      "Ein freigegebener Routineablauf endet im Gespräch: Der Termin ist vergeben, verschoben oder storniert, und im Dashboard steht er als erledigter Vorgang — nicht als Aufgabe. Alles andere endet als strukturierter Eintrag: Anliegen, Name, Rückrufnummer, Terminwunsch. Ihr Team sieht auf einen Blick, worum es ging, und arbeitet diese kürzere Liste ab, wenn es in den Ablauf passt.",
       "Das ist bewusst kein Postfach mit Sprachnachrichten. Der Unterschied ist die Arbeit danach: Eine Mailbox müssen Sie abhören, mitschreiben und einordnen — ein strukturierter Eintrag ist bereits sortiert. Bleibt der Übertrag ins Praxissystem, weil keine Schnittstelle trägt, ist es ein Übertrag, kein Rekonstruieren des Gesprächs.",
       "Weil nichts aufgezeichnet wird, gibt es auch keine Audiodatei zum Abhören. Das ist eine Entscheidung, keine Lücke: Es entsteht keine Aufnahme, die aufbewahrt, geschützt und irgendwann gelöscht werden müsste.",
     ],
@@ -789,6 +837,21 @@ export const BETREUUNG_NACH_GOLIVE = {
  * M14 · Die Übergabe — der dokumentierte Abbruchgrund Nr. 1. Beschreibt den
  * heutigen Weg ohne Beschönigung (Inhaber-Antwort B).
  */
+/*
+  EINGEFROREN — WORTGLEICH LASSEN.
+
+  `UEBERGABE` wird von `TelefonassistentBeweiskette` gerendert und damit von
+  einer eingefrorenen Experimentroute. Jede Änderung an diesen Strings bewegt
+  deren gerenderte Bytes und zerstört die Messung; `protectedExperiments.test.tsx`
+  fängt das ab.
+
+  Inhaltlich ist die Fassung überholt: Ihr erster Satz beschreibt den ÜBLICHEN
+  WEG ANDERER SYSTEME („der Assistent nimmt an, Ihre MFA überträgt danach von
+  Hand") und wurde als Beschreibung DIESES Produkts gelesen. Die korrigierte
+  Fassung steht direkt darunter in `UEBERGABE_ABWICKLUNG` und wird von den
+  nicht eingefrorenen Seiten verwendet. Endet das Experiment, ersetzt sie diese
+  hier — notiert in docs/seo/post-experiment-opportunities.md.
+*/
 export const UEBERGABE = {
   headline: "Und wer tippt das dann bei Ihnen ein?",
   paragraphs: [
@@ -803,6 +866,36 @@ export const UEBERGABE = {
   },
   // [[ASSET: Screenshot des Dashboards nach einem Anruf — Spezifikation in
   // ASSETS-REQUIRED.md. Bis zur Lieferung bleibt der Bild-Slot ungerendert.]]
+};
+
+/**
+ * Die korrigierte Praxis-Fassung von `UEBERGABE` — für alle NICHT eingefrorenen
+ * Seiten (`/praxen`, `/integrationen`).
+ *
+ * Der Unterschied ist die Reihenfolge, und sie entscheidet, was der Leser für
+ * das Produkt hält. `UEBERGABE` beginnt mit der Handübertragung durch die MFA;
+ * gemeint war der übliche Weg ANDERER Systeme, gelesen wurde es als Normalfall
+ * hier. Diese Fassung nennt zuerst, was im Normalbetrieb passiert — der Anruf
+ * ist erledigt, bevor der Anrufer auflegt —, dann die Abgrenzung, dann die
+ * Bedingung für Schreibzugriff auf ein Kundensystem.
+ *
+ * Die Übergabe bleibt vollständig beschrieben. Sie ist wertvoll, aber sie ist
+ * der AUSNAHMEWEG: für fachliche Fragen, Ausnahmen und Abläufe, die eine
+ * Schnittstelle nicht trägt.
+ */
+export const UEBERGABE_ABWICKLUNG = {
+  headline: "Und wer tippt das dann bei Ihnen ein?",
+  paragraphs: [
+    "Im Normalfall niemand. Was Sie freigegeben haben, wickelt der Assistent im Gespräch ab: Termin vergeben, verschieben, absagen, freigegebene Fragen beantworten. Der Vorgang ist fertig, bevor der Anrufer auflegt — er wird nicht zu einer Aufgabe, die jemand später abtippt.",
+    "Das unterscheidet den Empfang von den Systemen, die viele Praxen nach wenigen Wochen wieder abschalten: Dort nimmt eine Maschine den Anruf an, und die Arbeit ist nicht verschwunden, sondern nur umgezogen — von der Anmeldung auf die Abendliste.",
+    "Die Bedingung dafür ist technisch und wird vorher geklärt: Wo ein Ablauf direkt in Ihr Praxissystem schreibt, prüfen wir dessen Schnittstelle vor der Einrichtung und verifizieren die Anbindung vor dem Go-live. Trägt sie einen Ablauf nicht, greift der Weg, den wir vorher gemeinsam festgelegt haben — dann steht der fertige Vorgang für Ihr Team bereit. Das ist der Rückfallweg, nicht der Normalfall, und Sie erfahren vor der Unterschrift, welcher Ihrer Abläufe welchen Weg nimmt.",
+  ],
+  wasAnkommt: {
+    headline: "Was bei einer Übergabe im Dashboard steht",
+    items: ["Anliegen", "Name", "Rückrufnummer", "Terminwunsch", "Warum übergeben wurde"],
+    hinweis:
+      "Strukturiert, nicht als Audiodatei — Gespräche werden nicht aufgezeichnet. Abläufe, die durchlaufen, erscheinen als erledigt und nicht als Aufgabe.",
+  },
 };
 
 /**

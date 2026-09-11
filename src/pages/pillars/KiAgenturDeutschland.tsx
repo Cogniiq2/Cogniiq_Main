@@ -17,7 +17,7 @@ const SERVICES = [
   {
     icon: Phone,
     title: "KI-Telefonassistent",
-    description: "Automatische Anrufannahme, Terminaufnahme und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, mehrsprachig. Erreichbar auch dann, wenn niemand abnehmen kann – ohne Warteschleife.",
+    description: "Automatische Anrufannahme, Terminvergabe und Weiterleitung – auch außerhalb regulärer Geschäftszeiten, mehrsprachig. Freigegebene Routineabläufe werden im Gespräch abgeschlossen, mehrere Anrufe zur selben Zeit.",
     benefits: [
       "Integration in bestehende Kalender",
       "Mehrsprachig auf Anfrage",

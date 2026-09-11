@@ -222,7 +222,25 @@ Liegt der monatliche Sprachaufschlag **innerhalb** der Obergrenze des Tarifs
 als eigene Zeile aus und sagt dazu, dass die Zuordnung im Angebot steht — er
 rechnet ihn weder still in die Obergrenze hinein noch still darüber hinaus.
 
-### H3 · Bedeutung von „bis zu fünf Sprachen gleichzeitig"
+### H3 · Bedeutung von „ab drei Sprachen" und „bis zu fünf Sprachen gleichzeitig"
+
+> **ERNEUT GEÖFFNET am 11.09.2026 — blockiert eine Zahl im öffentlichen Rechner.**
+> Der Preisrechner beziffert den Sprachaufschlag seither nur noch dort, wo die
+> Preisliste eindeutig ist: nur Deutsch (0 €) und eine Zusatzsprache (79 €). Ab
+> zwei Zusatzsprachen weist er die Position als offen aus und nennt keine
+> Monatssumme mehr.
+>
+> **Zwei Fragen, beide mit ja/nein beantwortbar:**
+> 1. Meint „ab drei Sprachen sind es 230 € im Monat" drei Sprachen INKLUSIVE
+>    Deutsch (die Schwelle läge dann bei zwei Zusatzsprachen) oder drei
+>    ZUSATZsprachen neben Deutsch?
+> 2. Zählt Deutsch bei „bis zu fünf Sprachen gleichzeitig" mit?
+>
+> Bis dahin bleibt die Position offen. Sie auf 0 zu setzen wäre falsch, und sie
+> zu raten hieße, eine Vertragsbedingung aus wirtschaftlicher Plausibilität zu
+> erschließen — der Kunde bekommt am Ende, was im Vertrag steht.
+
+
 
 `SPRACHEN` sagt: „Jede weitere Sprache kostet 79 € im Monat; ab drei Sprachen
 sind es 230 € im Monat für bis zu fünf Sprachen gleichzeitig."

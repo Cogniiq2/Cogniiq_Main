@@ -22,7 +22,7 @@ import { ArrowRight, ChevronRight } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 import { RechnerCta } from "@/components/RechnerCta";
-import { ANBINDUNG, CTA, FAKTEN, UEBERGABE } from "@/lib/telefonassistent-copy";
+import { ANBINDUNG, CTA, FAKTEN, UEBERGABE_ABWICKLUNG } from "@/lib/telefonassistent-copy";
 
 const base = BUSINESS_INFO.website;
 const url = `${base}/integrationen`;
@@ -134,7 +134,7 @@ export function IntegrationenPage() {
             </div>
             <div className={`${CARD} mt-8`}>
               <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                {UEBERGABE.wasAnkommt.headline}
+                {UEBERGABE_ABWICKLUNG.wasAnkommt.headline}
               </h3>
               <ul className="space-y-3">
                 {ANBINDUNG.heute.punkte.map((p) => (

@@ -17,12 +17,14 @@ import {
   minutenProMonat,
   sprachenAufschlagEur,
   waehleSzenario,
+  OFFEN,
   type ChancenEingabe,
 } from "./telefonassistent-rechner";
 
 const [BASIS, PRAXIS, MVZ] = TARIFE;
 
-/** Keine Chancenangaben — die optionale Ebene bleibt dann ungerechnet. */
+/** Keine Chancenangaben — die Rechnung bleibt damit UNVOLLSTÄNDIG. Nicht zu
+ *  verwechseln mit `KEINE_VERPASSTEN`: dort hat der Besucher geantwortet. */
 const KEINE_CHANCEN: ChancenEingabe = {
   verpassteAnrufeProMonat: null,
   davonChancenProzent: null,
@@ -30,6 +32,10 @@ const KEINE_CHANCEN: ChancenEingabe = {
   deckungsbeitragEur: null,
   rueckgewinnbarProzent: null,
 };
+
+/** Der Besucher gibt an, keine relevanten Anrufe zu verpassen. Das ist eine
+ *  VOLLSTÄNDIGE Antwort — Chancenwert 0, Rechnung rechenbar. */
+const KEINE_VERPASSTEN: ChancenEingabe = { ...KEINE_CHANCEN, verpassteAnrufeProMonat: 0 };
 
 describe("Die numerischen Zwillinge stimmen mit den Anzeigetexten überein", () => {
   // Der Grund, warum es beide Darstellungen geben darf: Sie können nicht
@@ -157,26 +163,36 @@ describe("Tarifwahl und Deckelung", () => {
 });
 
 describe("Sprachaufschlag", () => {
+  /*
+    Die Quelle ist nur zum Teil eindeutig, und der Rechner hört genau dort auf.
+
+    Eindeutig: Deutsch ist enthalten, jede weitere Sprache kostet 79 €.
+    Nicht eindeutig: „ab drei Sprachen sind es 230 € … für bis zu fünf Sprachen"
+    — ob Deutsch mitzählt, steht nirgends. Die frühere Fassung entschied das
+    per Wirtschaftslogik (bei zwei Zusatzsprachen wäre ein Paket unwirtschaftlich,
+    also müssen drei ZUSATZsprachen gemeint sein). Plausibel, aber kein Beleg;
+    der Kunde bekommt, was im Vertrag steht.
+  */
   it("nur Deutsch kostet nichts extra", () => {
-    expect(sprachenAufschlagEur(0)).toEqual({ betrag: 0, alsPaket: false });
+    expect(sprachenAufschlagEur(0)).toEqual({ betrag: 0, offen: false });
   });
 
-  it("eine und zwei Zusatzsprachen werden je Sprache berechnet", () => {
+  it("eine Zusatzsprache ist eindeutig und wird beziffert", () => {
     expect(sprachenAufschlagEur(1)).toEqual({
       betrag: SPRACHEN_PREISE.proSpracheEur,
-      alsPaket: false,
-    });
-    expect(sprachenAufschlagEur(2)).toEqual({
-      betrag: 2 * SPRACHEN_PREISE.proSpracheEur,
-      alsPaket: false,
+      offen: false,
     });
   });
 
-  it("ab drei Zusatzsprachen gilt der Paketpreis", () => {
-    expect(sprachenAufschlagEur(3)).toEqual({
-      betrag: SPRACHEN_PREISE.paketEur,
-      alsPaket: true,
-    });
+  it("ab zwei Zusatzsprachen bleibt der Aufschlag offen statt geraten", () => {
+    expect(sprachenAufschlagEur(2)).toEqual({ betrag: OFFEN, offen: true });
+    expect(sprachenAufschlagEur(3)).toEqual({ betrag: OFFEN, offen: true });
+  });
+
+  it("zeigt einen offenen Aufschlag nie als 0", () => {
+    for (const n of [2, 3] as const) {
+      expect(sprachenAufschlagEur(n).betrag).not.toBe(0);
+    }
   });
 });
 
@@ -189,12 +205,22 @@ describe("Preisergebnis", () => {
     expect(p.monatlichGesamtEur).toBe(p.szenario!.telefonieMonatlichEur);
   });
 
-  it("addiert den Sprachaufschlag zur Monatssumme", () => {
+  it("addiert einen eindeutigen Sprachaufschlag zur Monatssumme", () => {
     const ohne = berechnePreis({ anrufeProMonat: 200, minutenProAnruf: 2 }, 0);
-    const mit = berechnePreis({ anrufeProMonat: 200, minutenProAnruf: 2 }, 2);
+    const mit = berechnePreis({ anrufeProMonat: 200, minutenProAnruf: 2 }, 1);
     expect(mit.monatlichGesamtEur).toBe(
-      (ohne.monatlichGesamtEur as number) + 2 * SPRACHEN_PREISE.proSpracheEur
+      (ohne.monatlichGesamtEur as number) + SPRACHEN_PREISE.proSpracheEur
     );
+  });
+
+  it("nennt KEINE Monatssumme, solange der Sprachaufschlag offen ist", () => {
+    const p = berechnePreis({ anrufeProMonat: 200, minutenProAnruf: 2 }, 2);
+    // Die Telefonie steht fest …
+    expect(p.szenario!.telefonieMonatlichEur).toBeGreaterThan(0);
+    // … die Summe nicht. Sie ohne den offenen Posten auszuweisen wäre eine
+    // Zahl, die niedriger ist als die spätere Rechnung des Kunden.
+    expect(p.sprachenOffen).toBe(true);
+    expect(p.monatlichGesamtEur).toBe(UNBEKANNT);
   });
 
   it("null Anrufe ergeben den kleinsten Tarif und keine Fehlerwerte", () => {
@@ -210,7 +236,8 @@ describe("Preisergebnis", () => {
     expect(p.modus).toBe("individuell");
     expect(p.monatlichGesamtEur).toBe(UNBEKANNT);
     expect(p.einrichtungEur).toBe(UNBEKANNT);
-    // Der Sprachaufschlag bleibt bekannt, auch wenn der Tarif es nicht ist.
+    // Der eindeutige Sprachaufschlag bleibt bekannt, auch wenn der Tarif es
+    // nicht ist — zwei verschiedene Gründe für „keine Zahl".
     expect(p.sprachenMonatlichEur).toBe(SPRACHEN_PREISE.proSpracheEur);
   });
 });
@@ -226,8 +253,8 @@ describe("Wirtschaftlichkeit", () => {
       { stundenkostenEur: null, routineanteilProzent: 30 },
       KEINE_CHANCEN
     );
-    expect(r.rechenbar).toBe(false);
-    expect(r.zeitwertProMonatEur).toBe(0);
+    expect(r.zeitpotenzialRechenbar).toBe(false);
+    expect(r.zeitwertProMonatEur).toBeNull();
     expect(r.amortisationMonate).toBeNull();
   });
 
@@ -239,7 +266,7 @@ describe("Wirtschaftlichkeit", () => {
       KEINE_CHANCEN
     );
     expect(r.telefonstundenProMonat).toBeCloseTo((300 * 2) / 60, 10); // 10 h
-    expect(r.automatisierbareStundenProMonat).toBeCloseTo(5, 10);
+    expect(r.routinestundenProMonat).toBeCloseTo(5, 10);
     expect(r.zeitwertProMonatEur).toBeCloseTo(150, 10);
   });
 
@@ -248,7 +275,7 @@ describe("Wirtschaftlichkeit", () => {
       volumen,
       preis,
       { stundenkostenEur: 200, routineanteilProzent: 50 },
-      KEINE_CHANCEN
+      KEINE_VERPASSTEN
     );
     const kosten = preis.monatlichGesamtEur as number;
     const einrichtung = preis.einrichtungEur as number;
@@ -261,7 +288,7 @@ describe("Wirtschaftlichkeit", () => {
       volumen,
       preis,
       { stundenkostenEur: 10, routineanteilProzent: 10 },
-      KEINE_CHANCEN
+      KEINE_VERPASSTEN
     );
     expect(r.nettoProMonatEur).toBeLessThan(0);
     expect(r.amortisationMonate).toBeNull();
@@ -284,7 +311,7 @@ describe("Wirtschaftlichkeit", () => {
       { stundenkostenEur: 50, routineanteilProzent: 400 },
       KEINE_CHANCEN
     );
-    expect(r.automatisierbareStundenProMonat).toBeCloseTo(r.telefonstundenProMonat, 10);
+    expect(r.routinestundenProMonat).toBeCloseTo(r.telefonstundenProMonat, 10);
   });
 
   it("im individuellen Preismodus bleibt der Nettoeffekt unbekannt", () => {
@@ -339,7 +366,7 @@ describe("Optionale Chancenrechnung", () => {
       deckungsbeitragEur: 200,
       rueckgewinnbarProzent: 50,
     };
-    const ohne = berechneWirtschaftlichkeit(volumen, preis, basis, KEINE_CHANCEN);
+    const ohne = berechneWirtschaftlichkeit(volumen, preis, basis, KEINE_VERPASSTEN);
     const mit = berechneWirtschaftlichkeit(volumen, preis, basis, voll);
     expect((mit.nettoProMonatEur as number) - (ohne.nettoProMonatEur as number)).toBeCloseTo(600, 10);
   });

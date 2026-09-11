@@ -5,13 +5,13 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 const config: NationalIndustryPageConfig = {
   seo: {
     title: "KI Telefonassistent für Hotels & Pensionen | Rezeption auch nachts | Cogniiq",
-    description: "KI Telefonassistent für Hotels: erreichbar auch außerhalb der Rezeptionszeiten, Buchungsanfragen und Gästefragen strukturiert aufgenommen. Direktbuchungen stärken.",
+    description: "KI Telefonassistent für Hotels: erreichbar auch außerhalb der Rezeptionszeiten. Freigegebene Buchungsabläufe werden im Gespräch abgewickelt, Gruppenanfragen gehen an Ihr Haus. Direktbuchungen stärken.",
     canonical: `${BUSINESS_INFO.website}/ki-telefonassistent-hotel`,
     keywords: "KI Telefonassistent Hotel, Rezeption außerhalb der Öffnungszeiten, automatische Zimmerbuchung, KI Rezeptionistin Hotel, Telefonservice Hotellerie",
   },
   h1: "KI Telefonassistent für Hotels & Pensionen",
   tagline: "Hotellerie · Rezeption auch nachts · Direktbuchungen stärken",
-  intro: "Reisende buchen spät abends – um 22 Uhr, nach dem Feierabend, wenn die Rezeption längst geschlossen ist. Wer in diesem Moment nicht erreichbar ist, verliert die Direktbuchung häufig an ein Buchungsportal – inklusive der fälligen Provision. Der KI Telefonassistent nimmt Buchungsanfragen auch außerhalb der Rezeptionszeiten entgegen und erfasst sie strukturiert nach Ihren Vorgaben. Ob die Anfrage zusätzlich direkt in Ihr PMS eingetragen wird, hängt an dessen Schnittstelle — wir prüfen sie vor dem Angebot.",
+  intro: "Reisende buchen spät abends – um 22 Uhr, nach dem Feierabend, wenn die Rezeption längst geschlossen ist. Wer in diesem Moment nicht erreichbar ist, verliert die Direktbuchung häufig an ein Buchungsportal – inklusive der fälligen Provision. Der KI Telefonassistent führt das Buchungsgespräch auch außerhalb der Rezeptionszeiten: Er erklärt Zimmertypen, klärt Termin, Personenzahl und Sonderwünsche und wickelt den freigegebenen Buchungsablauf ab. In Ihr PMS eingetragen wird die Buchung, sobald dessen Schnittstelle eingerichtet und verifiziert ist — wir prüfen sie vor dem Angebot. Gruppen- und Veranstaltungsanfragen gehen bewusst an Ihr Haus: Dort entscheidet ein Mensch.",
   serviceSlug: "ki-telefonassistent",
   serviceLabel: "KI Telefonassistent",
   costLink: "/kosten-ki-telefonassistent",
@@ -49,7 +49,8 @@ const config: NationalIndustryPageConfig = {
   benefits: [
     "Erreichbar auch nachts und am Wochenende – Buchungsanfragen werden angenommen statt verpasst",
     "Direktbuchung statt Portalprovision – der Unterschied bleibt im Haus",
-    "Buchungsanfragen strukturiert dokumentiert — im Cogniiq-Dashboard und, wo die geprüfte Schnittstelle Ihres PMS das trägt, direkt in Ihrem System",
+    "Freigegebene Buchungsabläufe im Gespräch abgeschlossen — eingetragen in Ihrem PMS, wo dessen geprüfte Schnittstelle das trägt",
+    "Ohne tragfähige Schnittstelle: vollständiger Vorgang für die Rezeption, als vereinbarter Rückfallweg",
     // [[CLAIM: verify — Sprachumfang (Deutsch/Englisch, weitere) bestätigen]]
     "Mehrsprachig möglich: üblicherweise Deutsch und Englisch, weitere Sprachen auf Anfrage",
     "Sonderwünsche und Gruppenanfragen strukturiert erfasst",
@@ -66,17 +67,17 @@ const config: NationalIndustryPageConfig = {
       {
         step: "01",
         title: "Gast ruft an",
-        description: "Ob um 10 Uhr morgens oder 23 Uhr abends – der Assistent ist sofort erreichbar, auf Deutsch oder Englisch, ohne Besetztzeichen und ohne Warteschleife.",
+        description: "Ob um 10 Uhr morgens oder 23 Uhr abends – der Assistent nimmt an, auf Deutsch oder Englisch, auch mehrere Anrufe zur selben Zeit. Die Kapazität wird auf Ihr Aufkommen ausgelegt und im Angebot ausgewiesen.",
       },
       {
         step: "02",
         title: "Verfügbarkeit prüfen, Zimmer empfehlen",
-        description: "Zimmerverfügbarkeit prüfen, Zimmertypen erklären, Preise kommunizieren, Sonderwünsche aufnehmen – nach Ihren Vorgaben und in der Sprache des Gastes.",
+        description: "Zimmerverfügbarkeit prüfen, Zimmertypen erklären, Preise kommunizieren, Sonderwünsche klären – nach Ihren Vorgaben und in der Sprache des Gastes. Was Sie freigegeben haben, wickelt der Assistent im selben Gespräch ab.",
       },
       {
         step: "03",
-        title: "Übergabe an Ihr Haus, Gast erhält Rückmeldung",
-        description: "Die Anfrage steht strukturiert bereit; wo die vorab geprüfte Schnittstelle Ihres PMS das trägt, wird sie direkt dort eingetragen. Ob der Gast eine schriftliche Bestätigung erhält, richten wir als Teil Ihres Ablaufs ein. Was automatisch läuft und was das Team noch prüft, legen Sie fest.",
+        title: "Buchung abschließen — oder gezielt eskalieren",
+        description: "Trägt die vorab geprüfte Schnittstelle Ihres PMS den Eintrag, schließt der Assistent den freigegebenen Buchungsablauf im Gespräch ab; für den Gast ist die Sache damit erledigt. Ohne tragfähige Schnittstelle steht der vollständige Vorgang für die Rezeption bereit — als vereinbarter Rückfallweg. Gruppen, Veranstaltungen und alles, was Sie ausgenommen haben, gehen in jedem Fall an Ihr Haus. Ob der Gast eine schriftliche Bestätigung erhält, richten wir als Teil Ihres Ablaufs ein.",
       },
     ],
   },
@@ -112,7 +113,7 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Was passiert bei komplexen Gruppenanfragen?",
-      answer: "Gruppenanfragen werden strukturiert aufgenommen – Zimmerzahl, An- und Abreise, Sonderwünsche, Veranstaltungsräume – und mit Gesprächsprotokoll an den zuständigen Mitarbeiter übergeben. Die Entscheidung über das Angebot bleibt beim Team.",
+      answer: "Gruppen- und Veranstaltungsanfragen sind bewusst KEIN Routineablauf: Zimmerkontingente, Raten und Veranstaltungsräume sind Verhandlungssache. Der Assistent klärt im Gespräch, was sich klären lässt – Zimmerzahl, An- und Abreise, Sonderwünsche, Raumbedarf – und gibt den Vorgang mit Gesprächsprotokoll an den zuständigen Mitarbeiter. Das ist eine Eskalation nach Ihren Regeln, nicht der Normalweg einer Einzelbuchung: Die wickelt der Assistent ab.",
     },
     {
       question: "Kann der Assistent Late Check-out, Frühstück und weitere Extras verkaufen?",

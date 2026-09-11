@@ -427,7 +427,7 @@ function BenefitsSection() {
             {
               icon: Phone,
               title: "Erreichbar, wenn niemand abnehmen kann",
-              desc: "Anrufe werden angenommen, auch wenn Ihr Team auf der Baustelle, beim Patienten oder im Termin ist – ohne Besetztzeichen, ohne Warteschleife.",
+              desc: "Anrufe werden angenommen, auch wenn Ihr Team auf der Baustelle, beim Patienten oder im Termin ist – mehrere zur selben Zeit, und freigegebene Abläufe gleich zu Ende gebracht.",
             },
             {
               icon: Calendar,
