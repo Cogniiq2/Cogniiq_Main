@@ -422,8 +422,8 @@ export async function onRequest(context: CloudflarePagesContext) {
       keywords: 'Webdesign Immobilien Regensburg, Immobilienmakler Website Regensburg, Immobilien Webdesign Regensburg',
     },
     '/ki-telefonassistent-arzt': {
-      title: 'KI-Telefonassistent für Arztpraxen | Termine automatisch buchen – Cogniiq',
-      description: 'Der KI-Telefonassistent für Praxen: nimmt Patientenanrufe an, bucht Termine ins System, beantwortet häufige Fragen – auch außerhalb der Sprechzeiten, ohne Praxismitarbeiterin am Telefon.',
+      title: 'KI-Telefonassistent für Arztpraxen | Terminwünsche aufnehmen – Cogniiq',
+      description: 'Der KI-Telefonassistent für Praxen: nimmt Patientenanrufe an und erfasst Terminwünsche nach Ihren Regeln – auch außerhalb der Sprechzeiten. Eintrag ins Praxissystem nach geprüfter Anbindung.',
       canonical: 'https://cogniiq.de/ki-telefonassistent-arzt',
       keywords: 'KI Telefonassistent Arzt, AI Rezeptionistin Praxis, Terminbuchung Praxis KI, Arztpraxis Automatisierung',
     },

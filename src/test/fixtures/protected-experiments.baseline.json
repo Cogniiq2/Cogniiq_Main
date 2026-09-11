@@ -534,8 +534,8 @@
     },
     "/ki-telefonassistent-arzt": {
       "path": "/ki-telefonassistent-arzt",
-      "title": "KI-Telefonassistent für Arztpraxen | Termine automatisch buchen – Cogniiq",
-      "description": "Der KI-Telefonassistent für Praxen: nimmt Patientenanrufe an, bucht Termine ins System, beantwortet häufige Fragen – auch außerhalb der Sprechzeiten, ohne Praxismitarbeiterin am Telefon.",
+      "title": "KI-Telefonassistent für Arztpraxen | Terminwünsche aufnehmen – Cogniiq",
+      "description": "Der KI-Telefonassistent für Praxen: nimmt Patientenanrufe an und erfasst Terminwünsche nach Ihren Regeln – auch außerhalb der Sprechzeiten. Eintrag ins Praxissystem nach geprüfter Anbindung.",
       "keywords": "KI Telefonassistent Arzt, AI Rezeptionistin Praxis, Terminbuchung Praxis KI, Arztpraxis Automatisierung",
       "canonical": "https://cogniiq.de/ki-telefonassistent-arzt",
       "robots": "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
@@ -583,9 +583,9 @@
       "textLength": 15133,
       "textDigest": "54b2cb00d96d3042",
       "jsonLd": [
-        "551b2ad7e448d940",
         "6ba75b9d00b1ab9d",
         "729f524ca6dfd16e",
+        "c78b13f6e7c7dfcb",
         "e934e18cf44ecc7a",
         "fd6b54fbf6cfd007"
       ],

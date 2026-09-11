@@ -97,13 +97,8 @@ Wortlaut, Herleitung und die ausdrücklich **nicht** betroffenen Fälle stehen i
 
 **Weiterhin offen und ausdrücklich nicht angefasst:**
 
-- `publicRoutes.ts` (Description `/ki-telefonassistent-arzt`) — „bucht Termine ins
-  System". Eingefrorenes Experiment, siehe `docs/seo/post-experiment-opportunities.md`.
-  Dies ist die **einzige** verbliebene Fundstelle der Klasse `BOOKING_WRITE`, die
-  ein Suchender ohne Klick zu sehen bekommt: Sie steht im SERP-Snippet einer
-  Seite, die im 28-Tage-Fenster 543 Impressionen hatte. Der Freeze und die
-  Aussagenrichtigkeit stehen hier gegeneinander — das ist eine Inhaber-Entscheidung
-  und keine, die eine SEO-Sitzung für sich treffen darf.
+- ~~`publicRoutes.ts` (Description `/ki-telefonassistent-arzt`) — „bucht Termine ins
+  System"~~ — **ERLEDIGT 11.09.2026**, siehe „Z25 · Nachtrag 11.09.2026" unten.
 - `industries/AutomatisierungRestaurant.tsx:51` und
   `problems/KeineTerminbuchungPage.tsx:53` — SMS-/E-Mail-Erinnerungen. Beide
   gehören laut der Einordnung oben zur Klasse „Automatisierungs-/Webdesign-Produkt"
@@ -119,6 +114,37 @@ Wortlaut, Herleitung und die ausdrücklich **nicht** betroffenen Fälle stehen i
 | `industries/AutomatisierungRestaurant.tsx:51`, `standorte-service-configs.ts:203` | Automatisierungsprodukt | **KEEP.** Gegenstand dieses Produkts ist das Einrichten kundenspezifischer Abläufe — genau der von `SMS_EMAIL_CONFIRMATION` erlaubte Fall |
 | `KiTelefonassistentRestaurant.tsx:30` | `/ki-telefonassistent-restaurant` | **KEEP.** Beschreibt die Marktmechanik von Erinnerungssystemen, nicht eine Zusage von Cogniiq |
 | „Online-Terminbuchung" auf Webdesign-Seiten, Kontaktformular-Bestätigungsmails | Webdesign-Produkt | **KEEP** — unverändert kein Verstoß, siehe oben |
+
+### Z25 · Nachtrag 11.09.2026 (Branch `claude/fix-arzt-claim-integrity-2026-09-11`)
+
+| Fundstelle | Route | Ergebnis |
+|---|---|---|
+| `publicRoutes.ts:605-606` und `functions/_middleware.ts:425-426` — Titel „Termine automatisch buchen", Description „bucht Termine ins System" | `/ki-telefonassistent-arzt` | **REWRITE.** Damit ist die letzte öffentlich sichtbare Fundstelle der Klasse `BOOKING_WRITE` geschlossen |
+
+Der Vermerk **DEFERRED — MEASUREMENT** vom 10.09.2026 ist damit aufgehoben. Die
+Abwägung, die dort als Inhaber-Entscheidung offengelassen wurde, ist zugunsten
+der Aussagenrichtigkeit entschieden: Eine falsche Zusage im SERP-Snippet einer
+Seite mit 543 Impressionen je 28 Tage bleibt nicht stehen, damit eine Messreihe
+sauber bleibt.
+
+Wortlaut neu — an `FAKTEN.terminaufnahme` gebunden, ohne pauschale PVS-/Kalender-Schreibzusage:
+
+- Titel: `KI-Telefonassistent für Arztpraxen | Terminwünsche aufnehmen – Cogniiq`
+- Description: `Der KI-Telefonassistent für Praxen: nimmt Patientenanrufe an und erfasst Terminwünsche nach Ihren Regeln – auch außerhalb der Sprechzeiten. Eintrag ins Praxissystem nach geprüfter Anbindung.`
+
+„Eintrag ins Praxissystem **nach** geprüfter Anbindung" ist bewusst als
+Bedingung formuliert und nicht als Zusage mit Zeitplan: Der Schreibvorgang wird
+weiterhin nur dort beschrieben, wo die kundenspezifische Schnittstelle geprüft
+ist. Universell belegt bleibt allein die **Aufnahme** des Terminwunsches.
+
+Das Experiment auf dieser Route ist dadurch kontaminiert. Das ist protokolliert,
+nicht kaschiert: `docs/seo/organic-growth-scoreboard.md` → „Kontamination
+`/ki-telefonassistent-arzt` (2026-09-11)". Seitenkörper, H1, interne Links,
+Ankertexte und Keyword-Targeting wurden **nicht** angefasst.
+
+**Weiterhin offen:** `industries/AutomatisierungRestaurant.tsx:51` und
+`problems/KeineTerminbuchungPage.tsx:53` (SMS-/E-Mail-Erinnerungen) — unverändert
+wartend auf dieselbe Inhaber-Entscheidung wie am 10.09.2026 festgehalten.
 
 ### Nachtrag: die erste Fassung dieser Tabelle war falsch
 
