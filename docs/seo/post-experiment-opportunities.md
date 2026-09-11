@@ -172,9 +172,18 @@ Standardzusage nicht haltbar. Die Route ist eingefroren, die Aussage steht aber
 im **SERP-Snippet** einer Seite mit 543 Impressionen in 28 Tagen — also vor
 Augen, die nie klicken müssen, um sie zu lesen.
 
-Freeze und Aussagenrichtigkeit stehen hier gegeneinander. Diese Sitzung hat die
-Route **nicht** angefasst und legt die Entscheidung dem Inhaber vor. Vollständige
+Freeze und Aussagenrichtigkeit stehen hier gegeneinander. Vollständige
 Einordnung in `COPY-CLAIMS-TO-VERIFY.md` → „Z25 · Nachtrag 10.09.2026".
+
+**Erledigt am 11.09.2026** (Branch `claude/fix-arzt-claim-integrity-2026-09-11`).
+Die Abwägung ist zugunsten der Aussagenrichtigkeit entschieden: Titel und
+Description im Manifest und in `functions/_middleware.ts` sind korrigiert, das
+Experiment ist damit **kontaminiert** und als solches protokolliert — Wortlaut
+alt/neu, Umfang und Konsequenz für die Auswertung in
+`docs/seo/organic-growth-scoreboard.md` → „Kontamination `/ki-telefonassistent-arzt`
+(2026-09-11)". Der Seitenkörper wurde nicht angefasst; die offene Besitzfrage
+(`/ki-telefonassistent-arzt` vs. `/praxen` vs. `/ki-telefonassistent-praxis`)
+bleibt unberührt und weiterhin Folgearbeit.
 
 ---
 

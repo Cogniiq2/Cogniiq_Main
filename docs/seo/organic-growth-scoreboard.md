@@ -210,12 +210,57 @@ ihnen scheitern am Test in `src/protectedExperiments.test.tsx`.
 | `/bayreuth/website-relaunch` | | | | Titel-Experiment „Performance" seit 2026-08-29 |
 | `/regensburg/website-relaunch` | | | | |
 | `/muenchen/webdesign-kosten` | | | | |
-| `/ki-telefonassistent-arzt` | | | | |
+| `/ki-telefonassistent-arzt` | | | | **KONTAMINIERT 11.09.2026** — Head durch Claim-Integritätskorrektur geändert, siehe Abschnitt unten. Messreihe ab hier unterbrochen |
 | `/kosten-ki-telefonassistent` | | | | |
 
 Sobald ein Experiment ausgewertet ist: Ergebnis hier festhalten, Route aus
 `PROTECTED_EXPERIMENT_PATHS` entfernen und die Folgearbeit aus
 `docs/seo/post-experiment-opportunities.md` einplanen.
+
+### Kontamination `/ki-telefonassistent-arzt` (2026-09-11)
+
+**Das Experiment ist ab dem 11.09.2026 kontaminiert.** Es wird nicht so getan,
+als sei die Route unberührt geblieben: Titel und Description im Head haben sich
+geändert, also hat sich das geändert, was ein Suchender in der SERP liest. Jede
+Bewegung von Impressionen, CTR oder Position ab diesem Datum ist nicht mehr vom
+laufenden Experiment zu trennen.
+
+**Grund:** Aussagenrichtigkeit schlägt Messung. Der Head trug eine Zusage, die
+nach der Inhaber-Bestätigung vom 10.09.2026 (`BOOKING_WRITE` = **ONLY AFTER
+VERIFIED CUSTOMER INTEGRATION**, `OWNER-INPUT.md`) unhaltbar ist. Sie stand im
+SERP-Snippet einer Seite mit 543 Impressionen je 28 Tage — vor Augen, die nie
+klicken müssen, um sie zu lesen. Ein falsches öffentliches Versprechen für die
+Sauberkeit einer Messreihe stehen zu lassen, ist die falsche Abwägung; sie war
+als offene Inhaber-Entscheidung protokolliert und ist damit entschieden.
+
+**Vorher → nachher** (Route-Manifest `src/lib/routing/publicRoutes.ts`, dazu
+spiegelbildlich `functions/_middleware.ts`):
+
+| Feld | Alt | Neu |
+|---|---|---|
+| `title` | `KI-Telefonassistent für Arztpraxen \| Termine automatisch buchen – Cogniiq` | `KI-Telefonassistent für Arztpraxen \| Terminwünsche aufnehmen – Cogniiq` |
+| `description` | `Der KI-Telefonassistent für Praxen: nimmt Patientenanrufe an, bucht Termine ins System, beantwortet häufige Fragen – auch außerhalb der Sprechzeiten, ohne Praxismitarbeiterin am Telefon.` | `Der KI-Telefonassistent für Praxen: nimmt Patientenanrufe an und erfasst Terminwünsche nach Ihren Regeln – auch außerhalb der Sprechzeiten. Eintrag ins Praxissystem nach geprüfter Anbindung.` |
+
+**Umfang der Änderung — bewusst nichts darüber hinaus.** Kein H1, kein
+Seitenkörper, keine internen Links, kein Ankertext, kein Keyword-Targeting,
+keine Sitemap-Priorität, keine `lastmod`. Der Beweis dafür steht in
+`src/test/fixtures/protected-experiments.baseline.json`: Im neu aufgenommenen
+Fingerprint bewegen sich exakt `title`, `description` und **ein**
+JSON-LD-Digest (der Block, der die Description einbettet). `textLength`,
+`textDigest`, `h1`, `headings`, `outgoingLinks` und sämtliche
+`inboundOccurrences` sind unverändert — der Seitenkörper ist byte-identisch
+geblieben. Der Guard wurde nicht abgeschwächt: `PROTECTED_EXPERIMENT_PATHS`
+enthält die Route weiterhin, und der Baseline-Eintrag wurde über den dafür
+vorgesehenen Weg (`npm run seo:baseline`) neu aufgenommen, nicht von Hand
+gelockert.
+
+**Konsequenz für die Auswertung.** Die Route bleibt eingefroren. Ein Vergleich
+über den 11.09.2026 hinweg ist unzulässig; wer diese Route auswertet, braucht
+eine neue Baseline ab diesem Datum. Der Titelwechsel („Termine automatisch
+buchen" → „Terminwünsche aufnehmen") ist der stärkere der beiden Eingriffe und
+kann für sich genommen die CTR bewegen. Bei einem CTR-Rückgang gilt dieselbe
+Regel wie am 10.09.2026: **Formulierung nachschärfen, nicht die Aussage
+zurücknehmen.**
 
 ## Autorität
 
@@ -311,6 +356,11 @@ von `/ki-telefonassistent-arzt` (`publicRoutes.ts:606`) sagt „bucht Termine in
 System". Die Aussage ist unbelegt, die Route ist aber ein laufendes Experiment.
 Sie wird mit dem Experimentende korrigiert — das ist der Preis der Messung und
 gehört ausdrücklich protokolliert, statt stillschweigend hingenommen zu werden.
+
+> **Überholt am 11.09.2026.** Die Korrektur wurde nicht bis zum Experimentende
+> aufgeschoben: Aussagenrichtigkeit hat Vorrang vor der Sauberkeit der Messreihe.
+> Das Experiment gilt ab dem 11.09.2026 als kontaminiert — Abschnitt
+> „Kontamination `/ki-telefonassistent-arzt` (2026-09-11)" oben.
 
 ### Mitgeändert, ohne eigene Messreihe
 

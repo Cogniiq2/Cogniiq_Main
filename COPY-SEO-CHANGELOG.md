@@ -1,5 +1,41 @@
 # COPY-SEO-CHANGELOG — Copy Overhaul KI-Telefonassistent-Cluster
 
+## 2026-09-11 — Claim-Integrität `/ki-telefonassistent-arzt` (eingefrorene Route)
+
+Wahrheitskorrektur, **keine** Ranking-Maßnahme. Kein Keyword-Targeting, keine
+Strukturarbeit, keine Optimierung irgendeiner Art. Genau ein Head, genau zwei
+Felder.
+
+- **Claim-Korrektur** `/ki-telefonassistent-arzt`: Manifest-Titel „Termine
+  automatisch buchen" → „Terminwünsche aufnehmen"; Manifest-Description „bucht
+  Termine ins System" → „erfasst Terminwünsche nach Ihren Regeln", ergänzt um
+  die Bedingung „Eintrag ins Praxissystem nach geprüfter Anbindung". Damit an
+  `FAKTEN.terminaufnahme` und an `BOOKING_WRITE` = **ONLY AFTER VERIFIED
+  CUSTOMER INTEGRATION** (`OWNER-INPUT.md`, 10.09.2026) gebunden. Dies war die
+  letzte öffentlich sichtbare Fundstelle dieser Klasse.
+- **Mitgezogen** `functions/_middleware.ts`: dieselben zwei Felder, damit die
+  Edge-Metadaten nicht vom Manifest abweichen. Der Head auf Netlify kommt aus
+  dem Manifest; die Middleware wäre sonst eine zweite, falsche Wahrheit.
+- **Baseline neu aufgenommen** `src/test/fixtures/protected-experiments.baseline.json`
+  über `npm run seo:baseline` — nicht von Hand. Es bewegen sich exakt `title`,
+  `description` und ein JSON-LD-Digest (der Block, der die Description
+  einbettet). `textDigest`, `textLength`, `h1`, `headings`, `outgoingLinks` und
+  alle `inboundOccurrences` sind unverändert. Der Guard ist unangetastet: Die
+  Route steht weiterhin in `PROTECTED_EXPERIMENT_PATHS`.
+- **Experiment kontaminiert.** Die Route ist ein laufendes, eingefrorenes
+  Experiment; der geänderte Head macht jede Bewegung ab dem 11.09.2026
+  unzuordenbar. Das wird nicht weggeschrieben: Wortlaut alt/neu, Begründung,
+  Umfang und Konsequenz für die Auswertung stehen in
+  `docs/seo/organic-growth-scoreboard.md` → „Kontamination
+  `/ki-telefonassistent-arzt` (2026-09-11)".
+- **Nicht angefasst:** Seitenkörper, H1, Tagline, FAQ, JSON-LD-Quelltext,
+  interne Links, Ankertexte, `keywords`, Sitemap-Eintrag und `lastmod` dieser
+  Route; die übrigen fünf eingefrorenen Routen; die offene Besitzfrage
+  `/ki-telefonassistent-arzt` vs. `/praxen` vs. `/ki-telefonassistent-praxis`;
+  `/automatisierung-restaurant` und `/keine-terminbuchung-online` (SMS/E-Mail,
+  weiterhin Inhaber-Entscheidung).
+- **Keine** neue URL, keine Sitemap-Änderung.
+
 ## 2026-09-10 (2) — GSC-Auswertung: Hotellerie-Intent, Titel-Deckung, Claim-Nachzügler
 
 Grundlage: zwei echte Search-Console-Exporte (3 Monate 2026-06-09–2026-09-08,
