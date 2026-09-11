@@ -304,7 +304,7 @@ else ok('index.html loads no Google tag before consent');
 
 // Neither product id may be hard-coded into the static document: both load only
 // through the consent-gated loader.
-if (/G-K7BS3LKT6H/.test(indexHtml))
+if (/G-NDN9J2G5LM/.test(indexHtml))
   fail('index.html must NOT contain the GA4 measurement id (loads only after analytics consent)');
 else ok('index.html contains no GA4 measurement id');
 if (/AW-17946397271/.test(indexHtml))
@@ -315,7 +315,7 @@ const consent = read('src/lib/consent.ts');
 const consentChecks = [
   [/googletagmanager\.com\/gtag\/js/, 'consent.ts loads gtag.js dynamically'],
   [/AW-17946397271/, 'consent.ts references the Google Ads id'],
-  [/G-K7BS3LKT6H/, 'consent.ts references the GA4 measurement id'],
+  [/G-NDN9J2G5LM/, 'consent.ts references the GA4 measurement id'],
   // Consent Mode v2 defaults: every signal denied before any choice.
   [/ad_storage:\s*'denied'/, "consent.ts sets ad_storage default 'denied'"],
   [/ad_user_data:\s*'denied'/, "consent.ts sets ad_user_data default 'denied'"],
@@ -365,7 +365,7 @@ const legalText = read('src/lib/legal-content.tsx');
 const privacyChecks = [
   [/Google Analytics/, 'privacy policy discloses Google Analytics'],
   [/analytics_storage/, 'privacy policy names the analytics_storage signal'],
-  [/_ga_K7BS3LKT6H/, 'privacy policy names the actual GA4 cookie'],
+  [/_ga_NDN9J2G5LM/, 'privacy policy names the actual GA4 cookie'],
   [/§ 25\s*\n?\s*Abs\. 1 TDDDG|§ 25 Abs\. 1 TDDDG/, 'privacy policy cites § 25 Abs. 1 TDDDG'],
   [/Art\. 6 Abs\. 1 lit\. a DSGVO/, 'privacy policy cites consent as the legal basis'],
   [/cogniiq_consent_v2/, 'privacy policy names the current consent storage key'],

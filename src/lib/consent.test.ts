@@ -12,7 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // The module holds load/config guards in module scope, so every test re-imports
 // it via vi.resetModules() to get a clean instance.
 
-const GA4_ID = 'G-K7BS3LKT6H';
+const GA4_ID = 'G-NDN9J2G5LM';
 const ADS_ID = 'AW-17946397271';
 
 type GtagCall = unknown[];
