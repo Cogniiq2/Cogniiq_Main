@@ -1,5 +1,94 @@
 # COPY-SEO-CHANGELOG — Copy Overhaul KI-Telefonassistent-Cluster
 
+## 2026-09-11 (2) — `/ki-telefonassistent` als generische kommerzielle Seite neu gefasst
+
+Anlass: Search Console, Seite `/ki-telefonassistent`, 2026-08-12 – 2026-09-08 —
+**155 Impressionen, 0 Klicks, Ø Position 37,2**, verteilt auf den Kopfbegriff
+(`ki telefonassistent`, `telefonassistent`, `ki telefon`) und seine Varianten
+(`ki anrufassistent`, `ki telefonservice`, `ki telefonzentrale`,
+`ki telefonassistent für unternehmen`, `ai telefonassistent`,
+`digitaler telefonassistent`). Die Seite ist also indexiert und thematisch
+verstanden — sie ist nur nicht die beste Antwort auf diese Intention.
+
+**Befund.** Der Grund stand im Seitenkörper: Die generische Seite benutzte die
+Praxis-Bausteine des Clusters mit. Ihre Überschriften handelten von
+Patientinnen, vom Praxisteam und von medizinischer Triage, eine Statistik
+sprach über Versicherte, der Preisabsatz rechnete „pro Praxis, nicht pro
+Behandler". Für jemanden, der einen Telefonassistenten für Handwerk, Kanzlei,
+Hausverwaltung oder Gastronomie sucht, war das die falsche Seite; für Google
+war die dominante Entität dieser Seite „Arztpraxis" — also genau die Intention,
+die die Arzt-Segmentseite und `/praxen` bereits besitzen. Drei Seiten stritten
+um eine Intention und die generische Seite bediente ihre eigene nicht.
+
+**Head — die schwerwiegendste Fundstelle.** `functions/_middleware.ts`
+überschreibt den vorgerenderten `<head>` an der Edge und war für diese Route
+vom Manifest abgedriftet. Ausgeliefert wurde: „… **bucht Termine direkt ins
+System** … **Einsatzbereit in 7 Tagen**." Das ist eine universelle
+Schreibzusage (durch `BOOKING_WRITE` seit dem 10.09.2026 ausgeschlossen) plus
+die am 23.08.2026 korrigierte Frist — beides im SERP-Snippet, also vor Augen,
+die dafür nicht klicken mussten. Manifest und Middleware sind jetzt wortgleich:
+
+| Feld | Alt (Edge) | Neu |
+|---|---|---|
+| `title` | `KI-Telefonassistent für Unternehmen \| Nie wieder verpasste Anrufe – Cogniiq` | `KI Telefonassistent für Unternehmen – Anrufannahme \| Cogniiq` |
+| `description` | `… nimmt jeden Anruf an, bucht Termine direkt ins System … Einsatzbereit in 7 Tagen.` | `… nimmt Anrufe an, beantwortet Fragen und erfasst Anliegen nach Ihren Regeln. Keine Gesprächsaufzeichnung, gedeckelte Rechnung.` |
+
+**Produktwahrheit im Seitenkörper.** Vier weitere Fundstellen derselben Klasse
+korrigiert, drei davon in Bildern statt in Sätzen — ein Screenshot behauptet
+dasselbe wie ein Satz, nur schneller:
+
+- Hero-Gesprächsbeispiel: „Eingetragen. Sie erhalten eine Bestätigung per
+  E-Mail." + Fußzeile „Termin automatisch gespeichert · Kalender aktualisiert"
+  → Gespräch endet mit Aufnahme des Terminwunsches und Bestätigung durch das
+  Team; neu ist die Offenlegung nach Art. 50 im ersten Satz und das Label
+  „Nachgestelltes Beispiel".
+- Dashboard-Karte: Feld „Vereinbart" → „Terminwunsch", Fußzeile „von Ihrem Team
+  zu übertragen" → „zu bestätigen".
+- Ablaufschritt 03 „Termin buchen … werden geprüft und eingetragen" → „Nach
+  Ihren Regeln entscheiden".
+- Branchenkarten: dreimal „buchen" / „in den Kalender buchen" / „Rückrufe
+  automatisch einplanen" → aufnehmen, erfassen, übergeben.
+- `Service`-JSON-LD: `description` sagte „Termine bucht".
+
+**Struktur.** 22 Abschnitte → 18, bei mehr Inhalt. Entfernt, weil doppelt oder
+praxisspezifisch: Patientensicht (M20), Praxisteam (M21), Säulen als eigener
+Abschnitt, der zweite CTA-Block und die sechs Einwand-Karten (deckungsgleich
+mit der FAQ). Zusammengelegt: Anliegen-Katalog + Grenzen. Neu:
+
+- **„Was ein KI-Telefonassistent ist — und was er nicht ist"** — Definition und
+  vier Abgrenzungen (Mailbox, Tastenmenü, externer Telefondienst, Chatbot). Die
+  Seite erklärte den gesuchten Begriff bisher nirgends.
+- **„Sechs Fragen, an denen sich ein KI-Telefonassistent entscheidet"** —
+  Kaufkriterien mit der eigenen Antwort daneben. Die Begründungsspalte ist die
+  frühere Sektion „Warum bisherige Versuche gescheitert sind": Jedes Kriterium
+  ist ein reales Scheiternsmuster. Kein Wettbewerbervergleich (§ 2.3 UWG), keine
+  Vergleichsseite — die Intention „KI Telefonassistent Vergleich" wird laut
+  Scoreboard bewusst nicht verfolgt.
+
+**Konversion.** Ein primärer Weg statt vier gleichrangiger Buttons. Die
+Beschriftung „Kostenlose Demo ansehen" war unzutreffend — unter
+`/ki-telefonassistent/demo` steht ein Formular, mit dem ein Termin **angefragt**
+wird; sie heißt jetzt „Demo-Termin anfragen". Sekundär die Telefonnummer, weil
+ein Telefonprodukt einen Telefonweg verdient.
+
+**Neue generische Copy-Bausteine** in `src/lib/telefonassistent-copy.ts`
+(`WAS_IST`, `ANBIETER_CHECKLISTE`, `GENERISCH_*`) — rein additiv. Die
+Praxis-Bausteine sind unverändert; keine Praxisseite ändert dadurch ein Wort.
+
+**Messung.** `trackEvent` in `src/lib/consent.ts`: eine Funktion, geschlossener
+Ereignisname, kein PII-Parameter, verworfen ohne Analytics-Einwilligung. Bis
+hierher meldete keine öffentliche Seite eine Konversionshandlung.
+
+**Eingefrorene Experimente unberührt.** Fingerprints unverändert; die
+Vorkommenszahlen der geschützten Pfade in dieser Datei bleiben exakt 1 (Arzt)
+und 2 (Kosten) — deshalb stehen die beiden Pfade in den Kommentaren der Seite
+bewusst nicht ausgeschrieben.
+
+**Nicht angefasst:** die sechs eingefrorenen Routen; die 28 weiteren Routen mit
+Middleware-/Manifest-Drift (siehe Scoreboard, Folgearbeit); die Besitzfrage im
+Arzt-Cluster; die Praxis-Bausteine der Copy-Bibliothek.
+
+
 ## 2026-09-11 — Claim-Integrität `/ki-telefonassistent-arzt` (eingefrorene Route)
 
 Wahrheitskorrektur, **keine** Ranking-Maßnahme. Kein Keyword-Targeting, keine

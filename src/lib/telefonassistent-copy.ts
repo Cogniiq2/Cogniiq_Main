@@ -975,3 +975,228 @@ export const KOMPAKT_EINRICHTUNG: KompaktBlock & {
     href: "/praxen",
   },
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GENERISCHE FASSUNG FÜR /ki-telefonassistent
+//
+// WARUM ES DIESEN BLOCK GIBT
+//
+// Alles oberhalb ist für Arztpraxen geschrieben: MFA, Anmeldung, Rezept,
+// Überweisung, Notruf 112, § 203 StGB, „pro Praxis, nicht pro Behandler".
+// Das ist richtig — für /praxen und die beiden Arzt- bzw. Praxis-Seiten des
+// Clusters, die genau diese Intention bedienen.
+//
+// Die generische Seite /ki-telefonassistent hat diese Bausteine mitbenutzt und
+// las sich dadurch wie eine Praxisseite: Überschriften über Patientinnen, über
+// das Praxisteam, über medizinische Triage. Für jemanden, der „KI
+// Telefonassistent für Unternehmen" sucht — Handwerk, Kanzlei, Hausverwaltung,
+// Gastronomie — ist das die falsche Seite, und für Google war die dominante
+// Entität dieser Seite „Arztpraxis" statt „Telefonassistent für Unternehmen".
+// Damit stand die generische Seite im Wettbewerb mit der Praxisseite um
+// dieselbe Intention und gewann keine von beiden.
+//
+// Diese Konstanten sind deshalb die BRANCHENOFFENE Fassung derselben
+// Kernaussagen. Sie ersetzen die Praxis-Fassung nicht und werden von den
+// Praxisseiten nicht importiert — deren Wortlaut bleibt unverändert.
+//
+// Es gelten dieselben Regeln wie oben: keine erfundenen Zahlen, keine Aussage
+// zu Hosting oder Serverstandort, kein Schreibzugriff auf fremde Systeme ohne
+// geprüfte Anbindung (BOOKING_WRITE), keine SMS-/E-Mail-Bestätigung als
+// Standardfunktion (SMS_EMAIL_CONFIRMATION).
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Definition und Abgrenzung. Der Begriff wird auf der Seite bisher nirgends
+ * erklärt — weder gegenüber der Mailbox noch gegenüber dem Tastenmenü, obwohl
+ * genau das die erste Frage eines Käufers ist, der den Begriff zum ersten Mal
+ * gesucht hat.
+ */
+export const WAS_IST = {
+  headline: "Was ein KI-Telefonassistent ist — und was er nicht ist",
+  definition:
+    "Ein KI-Telefonassistent ist eine Software, die eingehende Anrufe selbst annimmt, in natürlicher Sprache mit dem Anrufer spricht und das Anliegen strukturiert erfasst. Er hört zu, stellt Rückfragen, beantwortet wiederkehrende Fragen nach Ihren Vorgaben und entscheidet nach Regeln, die Sie vorher festlegen, was mit dem Gespräch passiert: selbst bearbeiten, an einen Menschen übergeben oder als Rückrufwunsch notieren. Gebräuchlich sind für dieselbe Sache auch die Begriffe KI-Anrufassistent, AI-Telefonassistent, digitaler Telefonassistent, KI-Telefonservice oder KI-Telefonzentrale.",
+  abgrenzungen: [
+    {
+      gegen: "Anrufbeantworter und Mailbox",
+      text: "Die Mailbox nimmt auf, sie versteht nichts. Jemand muss abhören, zurückrufen und von Hand übertragen. Der Assistent führt stattdessen ein Gespräch und liefert am Ende ein lesbares Ergebnis mit Anliegen, Name, Rückrufnummer und nächstem Schritt.",
+    },
+    {
+      gegen: "Tastenmenü und Warteschleife",
+      text: "Ein Tastenmenü zwingt den Anrufer in Ihre Struktur — „für Termine die 1“. Wer kein passendes Feld findet, legt auf. Der Assistent fragt offen nach dem Anliegen und ordnet es selbst ein, auch wenn der Anrufer vom erwarteten Ablauf abweicht.",
+    },
+    {
+      gegen: "Telefonservice mit externen Mitarbeitenden",
+      text: "Ein externer Telefondienst kostet pro Gespräch und kennt Ihren Betrieb nur aus einem Leitfaden. Der Assistent arbeitet mit einem festen Kontingent, nimmt mehrere Anrufe gleichzeitig an und folgt Regeln, die Sie selbst geschrieben haben.",
+    },
+    {
+      gegen: "Chatbot auf der Website",
+      text: "Ein Chatbot erreicht nur, wer ohnehin auf Ihrer Website ist. Der Anruf bleibt für viele Kunden der erste Weg — und ist der Kanal, an dem ein besetztes Zeichen sofort einen Auftrag kostet.",
+    },
+  ],
+};
+
+/**
+ * Der Abschnitt, der die Seite von Anbieterlisten und Wettbewerbsseiten
+ * unterscheidet: Kaufkriterien, die für JEDEN Anbieter gelten, mit der eigenen
+ * Antwort daneben. Jedes Kriterium ist zugleich ein reales Scheiternsmuster —
+ * deshalb steht die Begründung vor der eigenen Antwort und nicht dahinter.
+ *
+ * `cogniiq` darf nur Aussagen enthalten, die auf dieser Website belegt sind.
+ * Keine Aussage über Hosting, Serverstandort oder „DSGVO-konform".
+ */
+export const ANBIETER_CHECKLISTE: Array<{
+  frage: string;
+  warum: string;
+  cogniiq: string;
+}> = [
+  {
+    frage: "Wohin geht das Gesprächsergebnis — und wer überträgt es?",
+    warum:
+      "Das ist der Punkt, an dem die meisten Einführungen scheitern. Das Gespräch läuft gut, das Ergebnis landet in einer E-Mail, und jemand tippt es von Hand ab. Die Arbeit ist dann nicht verschwunden, sie ist nur umgezogen.",
+    cogniiq:
+      "Jedes Gespräch endet als strukturierter Eintrag: Anliegen, Name, Rückrufnummer, Terminwunsch, nächster Schritt. Wohin dieser Eintrag geht, klären wir vor der Unterschrift und schreiben das Ergebnis ins Angebot — statt es danach zu klären.",
+  },
+  {
+    frage: "Schreibt der Assistent wirklich in mein System — oder klingt es nur so?",
+    warum:
+      "„Bucht Termine automatisch in Ihren Kalender“ steht auf fast jeder Anbieterseite. Ob das für Ihr konkretes System gilt, hängt an dessen Schnittstelle, an Zugängen, an Freigaben und manchmal an Gebühren Dritter. Eine Zusage vor der Prüfung ist keine Zusage.",
+    cogniiq: FAKTEN.terminaufnahme,
+  },
+  {
+    frage: "Was passiert, wenn der Assistent nicht weiterkommt?",
+    warum:
+      "Ein System ohne sauberen Übergang zum Menschen erzeugt genau die Anrufe, die Sie vermeiden wollten — verärgerte Rückrufe. Fragen Sie nach, woran ein Anbieter Dringlichkeit erkennt und was danach passiert.",
+    cogniiq:
+      "Dringende Anliegen und alles, was Sie als Chefsache markieren, gehen sofort an einen Menschen. Wer lieber mit einer Person spricht, wird auf Wunsch jederzeit weitergeleitet. Der Assistent versucht nicht, Fälle zu lösen, die in menschliche Hände gehören.",
+  },
+  {
+    frage: "Was steht am Monatsende auf der Rechnung?",
+    warum:
+      "Minutenpreise ohne Obergrenze verschieben das Mengenrisiko auf Sie. Ein einzelner Ausnahmemonat — Rückrufwelle, Störung, Kampagne — kann eine Abrechnung sprengen, die im Normalbetrieb unauffällig war.",
+    cogniiq: `Jeder Tarif enthält ein festes Minutenkontingent und ist nach oben auf eine ausgewiesene Obergrenze gedeckelt. ${FAKTEN.preisgarantie} Die Zahlen stehen vollständig auf der Kostenseite, nicht erst im Gespräch.`,
+  },
+  {
+    frage: "Was passiert mit dem, was Anrufer sagen?",
+    warum:
+      "Vier Fragen entscheiden, und Sie sollten sie jedem Anbieter stellen: Wird das Gespräch aufgezeichnet und wie lange gespeichert? Werden Ihre Daten zum Training von Modellen verwendet? Gibt es einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO? Und erfährt der Anrufer, dass er mit einem KI-System spricht?",
+    cogniiq: `${FAKTEN.keineAufzeichnung} ${FAKTEN.keinTraining} Einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO stellen wir jedem Kunden bereit. Der Assistent gibt sich zu Beginn jedes Anrufs als KI-System zu erkennen; abschalten lässt sich das nicht.`,
+  },
+  {
+    frage: "Wer ändert die Ansage, wenn sich nächste Woche etwas ändert?",
+    warum:
+      "Viele Systeme werden einmal eingerichtet und dann sich selbst überlassen. Ändern sich Öffnungszeiten oder Abläufe, veraltet die Konfiguration — und niemand fühlt sich zuständig.",
+    cogniiq: `Öffnungszeiten, Urlaubsansagen und aktuelle Hinweise ändern Sie selbst im Kundendashboard. ${FAKTEN.aenderungen} Für Änderungen an Gesprächslogik und Regeln haben Sie einen festen Ansprechpartner, kein Ticketsystem.`,
+  },
+];
+
+/**
+ * Branchenoffene Fassung von UEBERGABE.
+ *
+ * Die Praxis-Fassung nennt „Ihre MFA" und „ins Praxissystem" — auf der
+ * generischen Seite war das der letzte verbliebene Medizinbezug und stand
+ * ausgerechnet im wichtigsten Beweisabschnitt der Seite.
+ */
+export const GENERISCH_UEBERGABE = {
+  headline: "Und wer trägt das dann bei Ihnen ein?",
+  paragraphs: [
+    "Der übliche Weg sieht so aus: Der Assistent nimmt den Anruf an, und jemand aus Ihrem Team überträgt das Ergebnis anschließend von Hand in Kalender, CRM oder Branchensoftware. Das ist der Grund, warum viele Betriebe solche Systeme nach wenigen Wochen wieder abschalten — die Arbeit ist nicht verschwunden, sie ist nur umgezogen.",
+    "Wir prüfen vor der Einrichtung, welche Schnittstelle Ihr System bietet, und bauen die Übergabe darauf auf. Wo eine Anbindung technisch trägt, landet das Anliegen direkt dort, wo Sie ohnehin arbeiten. Wo sie nicht trägt, sagen wir Ihnen das vorher — und nicht nach der Unterschrift.",
+  ],
+  wasAnkommt: {
+    headline: "Was nach jedem Anruf im Dashboard steht",
+    items: ["Anliegen", "Name", "Rückrufnummer", "Terminwunsch", "Nächster Schritt"],
+    hinweis:
+      "Strukturiert, nicht als Audiodatei — Gespräche werden nicht aufgezeichnet.",
+  },
+};
+
+/**
+ * Branchenoffene Fassung von DECKELUNG.
+ *
+ * `DECKELUNG.text` nennt eine Grippewelle als Lastspitze und
+ * `DECKELUNG.nichtProBehandler` rechnet „pro Praxis, nicht pro Behandler" —
+ * beides sind Praxisaussagen. Die Abrechnungseinheit wird hier NICHT
+ * verallgemeinert („pro Betrieb, nicht pro Mitarbeiter" wäre eine Aussage, die
+ * der Inhaber so nicht getroffen hat); sie entfällt auf der generischen Seite
+ * und steht weiterhin dort, wo sie belegt ist. Die Obergrenze selbst gilt
+ * unabhängig von der Branche und bleibt deshalb wörtlich erhalten.
+ */
+export const GENERISCH_DECKELUNG = {
+  headline: "Zuerst die Obergrenze, dann der Preis",
+  text: `Jeder Tarif enthält ein festes Minutenkontingent. ${FAKTEN.deckelung} Mehr zahlen Sie in diesem Monat nicht — eine Rückrufwelle oder eine Kampagne kann Ihre Rechnung also bewegen, aber nicht sprengen.`,
+  tarifwechsel: DECKELUNG.tarifwechsel,
+  preisgarantie: FAKTEN.preisgarantie,
+};
+
+/** Branchenoffene Fassung von SAEULEN. */
+export const GENERISCH_SAEULEN: Array<{ title: string; description: string }> = [
+  {
+    title: "Auf Ihre Anrufe konfiguriert, nicht von der Stange",
+    description:
+      "Vor dem Start nehmen wir Ihre tatsächlichen Anrufanlässe auf: Terminwunsch, Absage, Angebotsanfrage, Statusfrage, Reklamation, Rückrufbitte. Für jeden Anlass legen Sie fest, was der Assistent erledigt und was immer bei Ihrem Team landet. Das Ergebnis ist Ihre Gesprächsführung — nicht ein Standardablauf, an den Sie sich anpassen müssen.",
+  },
+  {
+    title: "Klingt wie Ihr Empfang, nicht wie ein Automat",
+    description: `Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihr Betrieb am Telefon spricht. Bis zu ${FAKTEN.gleichzeitigeAnrufe} Anrufe können gleichzeitig laufen, ohne dass jemand ein Besetztzeichen hört. Anrufer erfahren im ersten Satz, dass ein KI-System spricht — und können jederzeit zu einem Menschen wechseln.`,
+  },
+  {
+    title: "Die Übergabe klären wir vor der Unterschrift",
+    description:
+      "Jedes Gespräch endet als strukturierter Eintrag: Anliegen, Name, Rückrufnummer, Terminwunsch. Vor der Einrichtung prüfen wir, welche Schnittstelle Ihr Kalender, Ihr CRM oder Ihre Branchensoftware bietet, und bauen die Übergabe darauf auf. Wo eine Anbindung trägt, landet das Anliegen direkt dort, wo Sie ohnehin arbeiten. Wo sie nicht trägt, sagen wir Ihnen das vorher — und nicht nach der Unterschrift.",
+  },
+];
+
+/** Branchenoffene Fassung des Anliegen-Katalogs. */
+export const GENERISCH_UEBERNIMMT: string[] = [
+  "Terminwünsche aufnehmen und nach Ihren Regeln vergeben oder Ihrem Team zur Bestätigung vorlegen",
+  "Absagen und Verschiebungen entgegennehmen — frei werdende Termine sind sofort sichtbar",
+  "Wiederkehrende Fragen beantworten: Öffnungszeiten, Anfahrt, Zuständigkeiten, benötigte Unterlagen",
+  "Erstanfragen qualifizieren: worum es geht, wie dringend es ist, wer zurückrufen soll",
+  "Rückrufwünsche mit Anliegen und Rückrufnummer auf eine Rückrufliste setzen",
+  "Anrufer an die zuständige Person oder Abteilung weiterleiten, wenn dort jemand erreichbar ist",
+];
+
+export const GENERISCH_IMMER_MENSCH: string[] = [
+  "Fachliche Beratung jeder Art — der Assistent gibt keine Auskunft, für die Ihr Urteil nötig ist",
+  "Dringende Anliegen: erkannt an den Signalwörtern, die Sie festlegen, und sofort weitergeleitet — ohne eigene Einschätzung durch das System",
+  "Beschwerden und emotionale Gespräche",
+  "Preis- und Vertragszusagen",
+  "Alles, was Sie im Anliegen-Katalog als Chefsache markieren",
+];
+
+/** Branchenoffene Fassung von GRENZEN. Inhaltlich identisch, ohne Medizinbezug. */
+export const GENERISCH_GRENZEN = {
+  headline: "Was unser Empfang nicht macht",
+  intro:
+    "Ein Telefonassistent, der alles verspricht, hat entweder keine Grenzen definiert oder verschweigt sie. Unsere stehen hier.",
+  points: [
+    "Kein Ersatz für Ihr Team. Der Assistent nimmt Anrufe an, die sonst verloren gingen — die Entscheidungen über Termine, Zusagen und Ausnahmen bleiben bei Ihren Mitarbeiterinnen und Mitarbeitern.",
+    "Keine fachliche Beratung und keine Bewertung von Dringlichkeit. Er erkennt die Signalwörter, die Sie festlegen, und leitet dann weiter — beurteilen tut er nicht.",
+    `${FAKTEN.keineAnbindung} Das Ergebnis der Prüfung steht im Angebot, mit allen dafür bekannten Kosten für den vereinbarten Umfang — auch denen einer Schnittstelle, die Dritte berechnen.`,
+    FAKTEN.bestaetigungen,
+    "Gespräche werden nicht aufgezeichnet. Wenn Sie später den genauen Wortlaut eines Anrufs brauchen, gibt es ihn nicht — Sie haben das strukturierte Ergebnis, nicht die Aufnahme.",
+    "Der Assistent übernimmt nicht alle Anrufe. Realistisch ist Entlastung zu Stoßzeiten und außerhalb der Öffnungszeiten — nicht die vollständige Übernahme Ihrer Telefonie.",
+  ],
+};
+
+/** Branchenoffene Fassung von NICHT_PASSEND. */
+export const GENERISCH_NICHT_PASSEND = {
+  headline: "Wann wir nicht die richtige Lösung sind",
+  intro:
+    "Ein Erstgespräch lohnt sich nicht für jeden Betrieb. In diesen Konstellationen raten wir ab:",
+  points: [
+    "Sie brauchen die Zusage, dass Termine automatisch in Ihrem Kalender oder Ihrer Branchensoftware stehen, schon bevor Ihr System geprüft ist. Fällt die Prüfung negativ aus, sagen wir das vor der Unterschrift — eine Zusage vorab bekommen Sie von uns nicht.",
+    "Sie erwarten, dass die Telefonie vollständig ohne Ihr Team läuft. Der Assistent entlastet — er ersetzt keinen Empfang und keine fachliche Entscheidung.",
+    "Ihr Anrufaufkommen ist gering und Ihr Team gut erreichbar. Dann löst der Assistent kein Problem, das Sie haben — und ein System ohne Problem ist nur ein Kostenpunkt.",
+    "Sie möchten, dass Anrufer nicht erfahren, dass ein KI-System spricht. Diese Transparenz ist für uns nicht verhandelbar — rechtlich wie inhaltlich.",
+  ],
+};
+
+/** Branchenoffene Datenschutzpunkte: ohne § 203 StGB und ohne DSFA-Praxisbezug. */
+export const GENERISCH_DATENSCHUTZ_PUNKTE: string[] = [
+  FAKTEN.keineAufzeichnung,
+  FAKTEN.keinTraining,
+  "Der Assistent gibt sich zu Beginn jedes Anrufs als KI-System zu erkennen (Art. 50 KI-Verordnung). Ihre Anruferinnen und Anrufer wissen von der ersten Sekunde an, mit wem sie sprechen — abschalten lässt sich das nicht.",
+  "Einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO stellen wir jedem Kunden bereit",
+  "Welche Unterlagen Ihr Datenschutzbeauftragter für seine Bewertung braucht, liefern wir zu — die Bewertung selbst nehmen wir ihm nicht ab",
+];

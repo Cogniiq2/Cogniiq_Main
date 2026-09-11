@@ -147,12 +147,20 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
 
   {
+    // Der generische kommerzielle Eigentümer des Kopfbegriffs. Titel und
+    // Description am 11.09.2026 auf die Intention gezogen, die die Search
+    // Console für diese URL tatsächlich zeigt: „ki telefonassistent",
+    // „telefonassistent", „ki telefonassistent für unternehmen", „ki telefon",
+    // „ki telefonservice", „ki telefonzentrale", „ki anrufassistent".
+    // Die alte Fassung („individuell konfiguriert") beschrieb eine Eigenschaft
+    // und nicht das Produkt; sie stand bei 155 Impressionen in 28 Tagen auf
+    // Position ~37 ohne einen einzigen Klick.
     path: "/ki-telefonassistent",
-    title: "KI Telefonassistent – individuell konfiguriert | Cogniiq",
-    description: "KI Telefonassistent mit Ihrer Stimmauswahl, Ihren Regeln und strukturierter Übergabe an Ihr Team. Festes Minutenkontingent mit Obergrenze, keine Gesprächsaufzeichnung.",
-    keywords: "KI Telefonassistent, AI Rezeptionistin, KI Telefon Unternehmen, Anruf automatisieren, Telefonie außerhalb der Geschäftszeiten",
+    title: "KI Telefonassistent für Unternehmen – Anrufannahme | Cogniiq",
+    description: "KI Telefonassistent für Unternehmen: nimmt Anrufe an, beantwortet Fragen und erfasst Anliegen nach Ihren Regeln. Keine Gesprächsaufzeichnung, gedeckelte Rechnung.",
+    keywords: "KI Telefonassistent, KI Telefonassistent für Unternehmen, KI Anrufassistent, digitaler Telefonassistent, KI Telefonservice, automatische Anrufannahme",
     indexable: true,
-    sitemap: { lastmod: "2026-06-30", changefreq: "monthly", priority: "0.92" },
+    sitemap: { lastmod: "2026-09-11", changefreq: "monthly", priority: "0.92" },
   },
   {
     path: "/webdesign",

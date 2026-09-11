@@ -182,6 +182,122 @@ Verbesserung zu behaupten.
 | Tag 28 | | | | |
 | Tag 90 | | | | |
 
+### A5 · `/ki-telefonassistent` — Neufassung als generische kommerzielle Seite (2026-09-11)
+
+Dies ist ein eigener Messfall und **löst A2 ab**: A2 maß eine Seite, an der nur
+ein Link geändert worden war. Ab dem 11.09.2026 sind Head, Seitenkörper und
+Konversionsführung geändert; ein Vergleich über dieses Datum hinweg ist nur mit
+dieser Notiz zulässig.
+
+- **Zielintention (primär):** `ki telefonassistent`, `ki-telefonassistent`,
+  `telefonassistent`, `ki telefonassistent für unternehmen`, `ki telefon`,
+  `telefon ki`, `telefonassistent ki`
+- **Sekundär (Varianten, je < 10 Impressionen):** `ki anrufassistent`,
+  `ki telefonservice`, `ki telefonzentrale`, `ai telefonassistent`,
+  `digitaler telefonassistent`
+- **Intent-Typ:** kommerziell mit informationellem Vorlauf. Die SERP-Recherche
+  vom 2026-09-11 zeigt eine gemischte Seite: Produktseiten finanzierter
+  Anbieter (fonio.ai, Parloa, Cognigy, Synthflow, VITAS, famulor, sipgate,
+  Placetel, IONOS) **und** Anbieterlisten („Die 7 besten Anbieter", „Top 11",
+  „Vergleich 2026"). Alle Produktseiten behaupten dasselbe — Terminbuchung,
+  CRM-Integration, DSGVO-Konformität, 24/7 — ohne Prüfbarkeit. Recherchedatum
+  und Domains sind hier festgehalten; die Snippets sind **kein** Faktenbeleg.
+
+**Baseline (GSC, 2026-08-12 – 2026-09-08, Seite `/ki-telefonassistent`):**
+155 Impressionen · 0 Klicks · CTR 0 % · Ø Position 37,2.
+Bester Einzelwert: `ki telefonservice` Position 29,0 (2 Impressionen);
+volumenstärkste Query: `ki telefonassistent` 42 Impressionen, Position 34,3.
+
+**Hypothese (H1 Intent-Passung).** Die Seite war indexiert und thematisch
+verstanden, aber für die eigene Intention nicht die beste Antwort: Sie benutzte
+die Praxis-Copy des Clusters mit und hatte als dominante Entität „Arztpraxis" —
+also die Intention, die die Arzt-Segmentseite und `/praxen` besitzen. Drei
+Seiten stritten um eine Intention; die generische bediente ihre eigene nicht.
+Die Neufassung nimmt die generische Seite aus diesem Streit heraus.
+
+**Hypothese (H2 Informationsgewinn).** Gegen Produktseiten, die alle dasselbe
+behaupten, und gegen Listen, die diese Behauptungen nur nebeneinanderstellen,
+fehlt die Ebene dazwischen: woran ein Käufer erkennt, ob eine Behauptung trägt.
+Der neue Abschnitt „Sechs Fragen, an denen sich ein KI-Telefonassistent
+entscheidet" liefert genau das, mit der eigenen Antwort daneben. Dazu eine
+Definition mit vier Abgrenzungen (Mailbox, Tastenmenü, externer Telefondienst,
+Chatbot), die der Seite bisher vollständig fehlte.
+
+**Hypothese (H3 SERP-Darstellung).** Der an der Edge ausgelieferte Head war vom
+Manifest abgedriftet und sagte „bucht Termine direkt ins System … Einsatzbereit
+in 7 Tagen" — falsch und zugleich ohne Bezug zur gesuchten Intention. Beides ist
+korrigiert. **Ein CTR-Effekt ist bei Position 37 nicht erwartbar**; die Änderung
+war zuerst eine Wahrheitskorrektur.
+
+**Erfolg (kumulativ, nicht einzeln):**
+- Tag 28: Ø Position der primären Query-Gruppe besser als 30 **und**
+  Impressionen nicht unter 120 gefallen.
+- Tag 56: mindestens eine primäre Query in den Top 20; erste Klicks > 0.
+- Tag 90: `ki telefonassistent` oder `ki telefonassistent für unternehmen`
+  stabil in den Top 20; mindestens eine organische Anfrage über diese Seite.
+
+**Scheitern:**
+- Tag 28 Impressionen unter 100 **und** Position schlechter als 40 → die
+  Entpraxifizierung hat Relevanzsignale gekostet; dann zuerst prüfen, ob die
+  verlorenen Impressionen Arzt-Queries waren (dann ist der Verlust gewollt und
+  müsste bei `/praxen` bzw. der Arzt-Seite ankommen), bevor irgendetwas
+  zurückgenommen wird.
+- Tag 90 weiterhin 0 Klicks bei Position < 20 → dann ist das SERP-Snippet das
+  Problem, nicht die Seite.
+
+**Nicht ableiten.** Eine Bewegung vor Tag 28 ist kein Signal (Regel 1). Diese
+Seite wird nicht nach wenigen Tagen erneut angefasst.
+
+| Messpunkt | Datum | Impressionen | Klicks | CTR | Ø Position | Beste Query | Position |
+|---|---|---:|---:|---:|---:|---|---:|
+| Baseline (0) | 2026-09-08 | 155 | 0 | 0 % | 37,2 | ki telefonservice | 29,0 |
+| Tag 7 | | | | | | | |
+| Tag 14 | | | | | | | |
+| Tag 28 | | | | | | | |
+| Tag 56 | | | | | | | |
+| Tag 90 | | | | | | | |
+
+**Störgröße 1 — Nachbarseiten.** `/praxen`, die Arzt-Segmentseite und
+`/ki-telefonassistent-praxis` können Impressionen aufnehmen, die diese Seite
+abgibt. Sie gehören mitgemessen, sonst liest sich eine gewollte Verschiebung
+wie ein Verlust.
+
+**Störgröße 2 — Konversionsmessung.** Seit dem 11.09.2026 meldet die Seite
+Konversionsereignisse an GA4 (nur mit Analytics-Einwilligung). Vorher gab es
+keine; eine „Steigerung" der Konversionen gegenüber der Zeit davor ist deshalb
+bedeutungslos. Die erste verwertbare Reihe beginnt mit dem Merge.
+
+### Befund: Middleware und Routen-Manifest driften auf 29 Routen auseinander (2026-09-11)
+
+`functions/_middleware.ts` überschreibt an der Edge `<title>`, `description`,
+`canonical`, `keywords` und die OG-/Twitter-Felder des vorgerenderten
+Dokuments. Der Manifest-Wert ist damit **nicht** das, was ein Crawler liest —
+der Middleware-Wert ist es.
+
+Ein Abgleich am 2026-09-11 ergab: von 86 Routen, die in beiden Dateien stehen,
+tragen **29** unterschiedliche Titel oder Descriptions. Betroffen sind unter
+anderem `/`, `/leistungen`, `/webdesign`, `/verpasste-anrufe-verlust`,
+`/referenzen` — **und zwei eingefrorene Experimente**. Für diese beiden heißt
+das: Der Fingerprint friert den Manifest-Head ein, ausgeliefert wird ein
+anderer. Der Guard ist deshalb nicht falsch, aber er misst nicht, was in der
+SERP steht.
+
+`.github/scripts/test-seo-consistency.mjs` prüft nur, ob jeder
+Middleware-Pfad im Manifest vorkommt — nicht, ob die Strings übereinstimmen.
+
+**Folgearbeit (nicht in diesem Durchgang erledigt, bewusst):**
+1. Eine Paritätsprüfung Middleware ↔ Manifest in die SEO-Konsistenzprüfung
+   aufnehmen, damit diese Klasse nicht erneut entsteht.
+2. Die 29 Abweichungen einzeln entscheiden — *welcher* der beiden Werte der
+   richtige ist, ist je Route eine inhaltliche Frage, keine mechanische.
+3. Die beiden eingefrorenen Routen dabei **zuletzt** und nur mit derselben
+   Abwägung wie bei der Kontamination vom 11.09.2026: Eine Korrektur ändert das
+   SERP-Snippet eines laufenden Experiments.
+
+In diesem Durchgang wurde genau eine Route angeglichen: `/ki-telefonassistent`,
+weil ihr ausgelieferter Head eine Zusage trug, die `BOOKING_WRITE` ausschließt,
+und eine Frist, die am 23.08.2026 korrigiert worden war.
+
 ## Query-Cluster
 
 Ein Cluster gilt als „gewonnen", wenn eine Cogniiq-URL dafür stabil in den
@@ -190,7 +306,7 @@ Top 10 steht — nicht bei einem einzelnen guten Tag.
 | Cluster | Kanonischer Eigentümer | Status 2026-08-29 | Ziel 90 Tage |
 |---|---|---|---|
 | KI Telefonassistent einführen | `/ki-telefonassistent-einfuehren` | neu | Top 20 |
-| KI Telefonassistent (Kopf) | `/ki-telefonassistent` | Position ≫ 50 | keine Erwartung |
+| KI Telefonassistent (Kopf) | `/ki-telefonassistent` | Ø 37,2 · 155 Impr. · 0 Klicks (28 T bis 2026-09-08) | Top 20 bis Tag 90 — Messfall A5 |
 | KI Telefonassistent Praxis/Arztpraxis | `/praxen` (Unterstützer: `/blog/ki-telefonassistent-arztpraxis` seit 2026-09-05) | schwach | Top 50 |
 | KI Telefonassistent Zahnarztpraxis | `/ki-telefonassistent-zahnarztpraxis` (kommerziell: `/praxen`) | neu 2026-09-05 | Top 50 |
 | Was ein KI Telefonassistent nicht kann / Grenzen | `/ki-telefonassistent` (Abschnitt Grenzen); zahnärztlich `/ki-telefonassistent-zahnarztpraxis` | unbekannt | Beobachten, keine eigene Seite |
