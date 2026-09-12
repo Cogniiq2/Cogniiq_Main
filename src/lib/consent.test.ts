@@ -12,8 +12,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // The module holds load/config guards in module scope, so every test re-imports
 // it via vi.resetModules() to get a clean instance.
 
-const GA4_ID = 'G-K7BS3LKT6H';
+const GA4_ID = 'G-NDN9J2G5LM';
 const ADS_ID = 'AW-17946397271';
+// Retired stream. Production traffic must never reach it again: it must never
+// be configured, bootstrapped or pushed to the dataLayer.
+const RETIRED_GA4_ID = 'G-K7BS3LKT6H';
+// The cookie the retired stream left on returning visitors' browsers. It is a
+// COOKIE NAME only — cleaned up on withdrawal, never configured as a stream.
+const ACTIVE_GA_COOKIE = '_ga_NDN9J2G5LM';
+const LEGACY_GA_COOKIE = '_ga_K7BS3LKT6H';
 
 type GtagCall = unknown[];
 
@@ -259,5 +266,87 @@ describe('stored decisions are restored on a later visit', () => {
     expect(second.hasDecision()).toBe(true);
     expect(configuredIds()).toContain(GA4_ID);
     expect(configuredIds()).not.toContain(ADS_ID);
+  });
+});
+
+describe('GA4 stream identity and cookie cleanup', () => {
+  /** Captures every `document.cookie = …` write instead of letting jsdom apply it. */
+  function captureCookieWrites() {
+    const writes: string[] = [];
+    const spy = vi.spyOn(document, 'cookie', 'set').mockImplementation((value: string) => {
+      writes.push(value);
+    });
+    return { writes, restore: () => spy.mockRestore() };
+  }
+
+  it('bootstraps and configures the production stream, never the retired one', async () => {
+    const { initConsent, setConsent } = await loadModule();
+    initConsent();
+    setConsent({ marketing: 'denied', analytics: 'granted' });
+
+    expect(configuredIds()).toContain(GA4_ID);
+    expect(configuredIds()).not.toContain(RETIRED_GA4_ID);
+
+    const src = tagScripts()[0]?.src ?? '';
+    expect(src).toContain(GA4_ID);
+    expect(src).not.toContain(RETIRED_GA4_ID);
+    expect(JSON.stringify(readDataLayer())).not.toContain(RETIRED_GA4_ID);
+  });
+
+  it('clears the per-stream GA cookie of the ACTIVE stream when analytics is withdrawn', async () => {
+    const { initConsent, setConsent } = await loadModule();
+    initConsent();
+    setConsent({ marketing: 'granted', analytics: 'granted' });
+
+    const { writes, restore } = captureCookieWrites();
+    // Withdraw analytics only; marketing stays granted.
+    setConsent({ marketing: 'granted', analytics: 'denied' });
+    restore();
+
+    const cleared = writes.map((w) => w.split('=')[0]);
+    expect(cleared).toContain('_ga');
+    expect(cleared).toContain('_gid');
+    // Active stream cookie, derived from the single-source-of-truth GA4_ID.
+    expect(cleared).toContain(ACTIVE_GA_COOKIE);
+    expect(ACTIVE_GA_COOKIE).toBe(`_ga_${GA4_ID.replace(/^G-/, '')}`);
+    // Historical cookie from the retired stream is swept too, so a returning
+    // visitor keeps no stale analytics cookie after withdrawing consent.
+    expect(cleared).toContain(LEGACY_GA_COOKIE);
+    // Analytics-only withdrawal must not touch advertising cookies.
+    expect(cleared).not.toContain('_gcl_au');
+    expect(cleared).not.toContain('_gcl_aw');
+    expect(cleared).not.toContain('_gac_gb');
+    // Every write must be an expiry, never a cookie being set.
+    for (const w of writes) expect(w).toContain('expires=Thu, 01 Jan 1970 00:00:00 GMT');
+  });
+
+  it('revoke clears both the advertising and the active-stream analytics cookies', async () => {
+    const { initConsent, grantAll, revokeConsent } = await loadModule();
+    initConsent();
+    grantAll();
+
+    const { writes, restore } = captureCookieWrites();
+    revokeConsent();
+    restore();
+
+    const cleared = writes.map((w) => w.split('=')[0]);
+    expect(cleared).toContain('_gcl_au');
+    expect(cleared).toContain('_ga');
+    expect(cleared).toContain('_gid');
+    expect(cleared).toContain(ACTIVE_GA_COOKIE);
+    expect(cleared).toContain(LEGACY_GA_COOKIE);
+  });
+
+  it('sweeping the legacy cookie never configures or pings the retired stream', async () => {
+    const { initConsent, grantAll, revokeConsent } = await loadModule();
+    initConsent();
+    grantAll();
+    revokeConsent();
+
+    // The legacy entry is a cookie name, not a measurement id: it must never
+    // reach gtag as a config target or as any dataLayer payload.
+    expect(configuredIds()).not.toContain(RETIRED_GA4_ID);
+    expect(JSON.stringify(readDataLayer())).not.toContain(RETIRED_GA4_ID);
+    expect(tagScripts().map((t) => t.src).join(' ')).not.toContain(RETIRED_GA4_ID);
   });
 });

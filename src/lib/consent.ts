@@ -19,7 +19,8 @@
 //   • ON rejection: the Google tag library stays completely unloaded.
 //   • ON later visits: the saved choice is restored before deciding to load.
 //   • ON revoke: consent is updated to denied and the first-party cookies the
-//     site can reach are removed for whichever purpose was withdrawn.
+//     site can reach are removed for whichever purpose was withdrawn. The
+//     analytics sweep also covers cookie names left by a retired GA4 stream.
 //
 // URL passthrough is intentionally NOT enabled.
 //
@@ -29,7 +30,7 @@
 // Google Ads conversion tag id (was hard-coded in index.html before Phase 0).
 const GOOGLE_ADS_ID = 'AW-17946397271';
 // GA4 measurement id. Loaded ONLY under analytics consent — never in index.html.
-const GA4_ID = 'G-K7BS3LKT6H';
+const GA4_ID = 'G-NDN9J2G5LM';
 
 const gtagSrc = (id: string) => `https://www.googletagmanager.com/gtag/js?id=${id}`;
 
@@ -195,8 +196,15 @@ function removeCookies(names: string[]) {
 }
 
 const AD_COOKIES = ['_gcl_au', '_gcl_aw', '_gcl_gb', '_gcl_dc', '_gac_gb'];
-// GA4 writes _ga plus a per-stream _ga_<STREAM_ID> cookie.
-const ANALYTICS_COOKIES = ['_ga', `_ga_${GA4_ID.replace(/^G-/, '')}`, '_gid'];
+// GA4 writes _ga plus a per-stream _ga_<STREAM_ID> cookie. The active stream's
+// cookie name is DERIVED from GA4_ID, which stays the single source of truth.
+const ACTIVE_ANALYTICS_COOKIES = ['_ga', `_ga_${GA4_ID.replace(/^G-/, '')}`, '_gid'];
+// Cookie names left behind by a retired GA4 stream, so a visitor who consented
+// under the previous deployment does not keep a stale analytics cookie until
+// its natural expiry after withdrawing consent. These are COOKIE NAMES ONLY:
+// the retired stream is never configured and never receives an event.
+const LEGACY_ANALYTICS_COOKIES = ['_ga_K7BS3LKT6H'];
+const ANALYTICS_COOKIES = [...ACTIVE_ANALYTICS_COOKIES, ...LEGACY_ANALYTICS_COOKIES];
 
 function removeGoogleAdCookies() {
   removeCookies(AD_COOKIES);
