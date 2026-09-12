@@ -29,7 +29,7 @@
 // Google Ads conversion tag id (was hard-coded in index.html before Phase 0).
 const GOOGLE_ADS_ID = 'AW-17946397271';
 // GA4 measurement id. Loaded ONLY under analytics consent — never in index.html.
-const GA4_ID = 'G-K7BS3LKT6H';
+const GA4_ID = 'G-NDN9J2G5LM';
 
 const gtagSrc = (id: string) => `https://www.googletagmanager.com/gtag/js?id=${id}`;
 

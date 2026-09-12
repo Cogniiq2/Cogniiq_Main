@@ -187,7 +187,7 @@ export function DatenschutzContent() {
         Zeitpunkt und Dauer des Aufrufs, ungefährer Standort (in der Regel auf Basis der IP-Adresse
         abgeleitet), technische Angaben zu Gerät, Betriebssystem, Browser und Spracheinstellung
         sowie eine pseudonyme Kennung, die in den Cookies <code>_ga</code> und{' '}
-        <code>_ga_K7BS3LKT6H</code> gespeichert wird. Diese Daten sind{' '}
+        <code>_ga_NDN9J2G5LM</code> gespeichert wird. Diese Daten sind{' '}
         <strong>pseudonym, aber nicht anonym</strong>: Über die Kennung können wiederkehrende
         Aufrufe desselben Browsers zusammengeführt werden. Wir übermitteln keine Klardaten wie Namen,
         E-Mail-Adressen oder Inhalte von Kontaktformularen an Google. Welche weiteren automatischen
