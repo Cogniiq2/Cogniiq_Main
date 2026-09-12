@@ -32,9 +32,14 @@ const faqItems = [
       "Einfache Workflows sind in 1–3 Wochen live. Komplexe Systeme mit mehreren Integrationen dauern 4–8 Wochen. Wir liefern Quick-Wins zuerst – damit Sie schnell erste Entlastung spüren.",
   },
   {
-    question: "Welche Tools und Systeme können integriert werden?",
+    question: "Welche Tools und Systeme können angebunden werden?",
+    // Die frühere Antwort zählte neun Produktnamen auf und sagte „alle gängigen
+    // Tools" zu. Das ist das Muster „funktioniert mit allem": eine Zusage über
+    // Software Dritter, für die keine geprüfte Anbindung vorliegt. Genau deshalb
+    // ist /integrationen noindex. Die Antwort nennt jetzt die Bedingung statt
+    // einer Liste — dieselbe Logik wie dort.
     answer:
-      "Wir integrieren alle gängigen Tools: Google Workspace, Microsoft 365, HubSpot, Salesforce, Calendly, Stripe, Shopify, Lexoffice, Datev und viele weitere. Auch individuelle API-Integrationen sind möglich.",
+      "Das entscheidet die Schnittstelle Ihres Systems, nicht eine Liste. Vor dem Angebot prüfen wir für Ihre konkreten Systeme, welche Schnittstelle es gibt, welcher Zugang nötig ist, welche Vorgänge damit möglich sind und welche Kosten Dritte dafür verlangen. Das Ergebnis steht im Angebot — auch dann, wenn es negativ ausfällt.",
   },
   {
     question: "Was kostet Prozessautomatisierung?",
@@ -155,7 +160,10 @@ export function ProzessautomatisierungHub() {
               {
                 icon: GitMerge,
                 title: "System-Integration",
-                points: ["CRM, ERP, Kalender verbinden", "Bidirektionale Datensynchronisation", "API-Integrationen für alle gängigen Tools"],
+                // „für alle gängigen Tools" ist dasselbe Muster wie die frühere
+                // Integrations-FAQ oben: eine Zusage über Software Dritter ohne
+                // geprüfte Anbindung. Der Satz nennt jetzt die Bedingung.
+                points: ["CRM, ERP, Kalender verbinden", "Bidirektionale Datensynchronisation", "API-Anbindung, wo Ihr System eine geeignete Schnittstelle hat"],
               },
               {
                 icon: BarChart2,

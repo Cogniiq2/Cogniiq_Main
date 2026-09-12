@@ -9,6 +9,7 @@ Verifikationsschritt auf eine öffentliche Seite übernommen werden.
 | Datei | Inhalt |
 |---|---|
 | `VERIFIKATION.md` | Wie belastbar die Angaben hier sind — zuerst lesen. |
+| `ARCHITEKTUR.md` | Suchintentions-Architektur: welche Seite welche Intention besitzen darf. Quelle der Wahrheit für jede Routenentscheidung. |
 | `serp-landschaft-2026-08.md` | Wettbewerbsbild der deutschen SERPs, Recherchestand August 2026. |
 | `pvs-integration-recherche.md` | Was „PVS-Integration" bei KI-Telefonassistenten tatsächlich bedeutet. |
 | `authority-acquisition-plan.md` | Externe Autorität: konkrete Ansatzpunkte, priorisiert. |

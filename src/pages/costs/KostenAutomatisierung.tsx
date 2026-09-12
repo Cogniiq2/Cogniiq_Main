@@ -10,8 +10,12 @@ const config: CostPageConfig = {
   },
   h1: "Was kostet Automatisierung für Unternehmen?",
   intro: "Prozessautomatisierung ist eine der effizientesten Investitionen für Unternehmen, die täglich Zeit durch manuelle Abläufe verlieren. Hier finden Sie transparente Preisübersichten und konkrete Beispiele – damit Sie den ROI vor der Entscheidung einschätzen können.",
-  serviceLink: "/leistungen",
-  serviceLinkLabel: "Automatisierung Leistungen",
+  // Zeigte auf /leistungen, die Übersicht über alle drei Systeme. Wer hier nach
+  // Automatisierungskosten liest, will als nächstes die Automatisierungs-Leistung
+  // selbst sehen, nicht die Servicelandkarte — und /prozessautomatisierung ist
+  // der kanonische Eigentümer dieser Intention (docs/seo/ARCHITEKTUR.md).
+  serviceLink: "/prozessautomatisierung",
+  serviceLinkLabel: "Prozessautomatisierung ansehen",
   priceRanges: [
     {
       label: "Einzel-Workflow",

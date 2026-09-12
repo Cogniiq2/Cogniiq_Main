@@ -393,6 +393,9 @@ if (/<lastmod>/.test(sitemap)) {
 //     picture of contextual link equity and is what an SEO change should move;
 //     it is printed so a regression is visible in the CI log without turning
 //     every footer decision into a red build.
+//   - EXCEPT for the three core commercial pillars, where shell-only FAILS.
+//     See PILLARS_REQUIRING_CONTEXTUAL_LINKS below for why the advisory alone
+//     was not enough.
 //
 // "Body" is <main>; the shell is everything else. Breadcrumbs render inside
 // <main>, so a child page's breadcrumb counts as a body link to its parent —
@@ -437,10 +440,37 @@ if (/<lastmod>/.test(sitemap)) {
   } else {
     ok(`all ${indexable.length} indexable pages are linked from at least one other prerendered page`);
   }
-  if (shellOnly.length) {
+  // For most routes shell-only stays a REPORT line, for the reason above. For the
+  // three core commercial pillars it is a FAILURE.
+  //
+  // The advisory was doing its job and nobody was reading it: on 2026-09-12 it
+  // had been naming /prozessautomatisierung — the declared national owner of the
+  // automation intent, and the second business priority — as reachable only from
+  // the footer, with /webdesign one contextual link above it. A line in a passing
+  // build's log is not a guard. These three are where authority is supposed to
+  // concentrate, so losing their contextual links is a regression, not a note.
+  const PILLARS_REQUIRING_CONTEXTUAL_LINKS = [
+    '/ki-telefonassistent',
+    '/prozessautomatisierung',
+    '/webdesign',
+  ];
+  const unlinkedPillars = PILLARS_REQUIRING_CONTEXTUAL_LINKS.filter((p) =>
+    shellOnly.includes(p)
+  );
+  if (unlinkedPillars.length) {
+    fail(
+      `core commercial pillar(s) linked only from the navigation/footer shell: ${unlinkedPillars.join(', ')}. ` +
+        'A pillar needs inbound links from inside other pages\' <main>; see docs/seo/ARCHITEKTUR.md.'
+    );
+  } else {
+    ok(`all ${PILLARS_REQUIRING_CONTEXTUAL_LINKS.length} core pillars have contextual inbound links`);
+  }
+
+  const remainingShellOnly = shellOnly.filter((p) => !unlinkedPillars.includes(p));
+  if (remainingShellOnly.length) {
     console.log(
-      `  · ${shellOnly.length} indexable route(s) are linked only from the navigation/footer shell, ` +
-        `not from any page body: ${shellOnly.join(', ')}`
+      `  · ${remainingShellOnly.length} indexable route(s) are linked only from the navigation/footer shell, ` +
+        `not from any page body: ${remainingShellOnly.join(', ')}`
     );
   } else {
     ok('every indexable page also has at least one contextual (in-body) inbound link');

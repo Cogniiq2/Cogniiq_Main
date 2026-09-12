@@ -56,6 +56,9 @@ const config: ProblemPageConfig = {
     ],
   },
   serviceLinks: [
+    // Siehe /digitale-automatisierung-unternehmen: der Pillar dieser Intention
+    // war vor dieser Änderung kontextuell nicht verlinkt.
+    { label: "Prozessautomatisierung", href: "/prozessautomatisierung" },
     { label: "Automatisierung für Unternehmen", href: "/automatisierung-unternehmen" },
     { label: "KI Telefonassistent Arztpraxis", href: "/ki-telefonassistent-arzt" },
     { label: "Automatisierung Kosten", href: "/kosten-automatisierung" },

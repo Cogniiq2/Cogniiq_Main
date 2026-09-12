@@ -82,6 +82,8 @@ const config: NationalIndustryPageConfig = {
     { label: "Automatisierung Deutschland", href: "/automatisierung-unternehmen" },
   ],
   relatedLinks: [
+    // Siehe AutomatisierungArzt.tsx: Pillar-Anbindung der Branchenseiten.
+    { label: "Prozessautomatisierung", href: "/prozessautomatisierung" },
     { label: "KI Telefonassistent Restaurant", href: "/ki-telefonassistent-restaurant" },
     { label: "Webdesign Gastronomie", href: "/webdesign-gastronomie" },
     { label: "Kosten Automatisierung", href: "/kosten-automatisierung" },

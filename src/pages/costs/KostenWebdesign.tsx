@@ -10,8 +10,12 @@ const config: CostPageConfig = {
   },
   h1: "Was kostet Webdesign? Kosten & Preise",
   intro: "Die Kosten für eine Website hängen von vielen Faktoren ab. Hier finden Sie eine transparente Übersicht über typische Preisspannen, Einflussfaktoren und konkrete Beispielprojekte – damit Sie eine fundierte Entscheidung treffen können.",
-  serviceLink: "/leistungen",
-  serviceLinkLabel: "Webdesign Leistungen",
+  // Wie bei /kosten-automatisierung: die Kostenseite gehört an den Pillar ihrer
+  // eigenen Intention, nicht an die Übersicht aller drei Systeme. /webdesign ist
+  // der kanonische Eigentümer (docs/seo/ARCHITEKTUR.md) und hatte vor dieser
+  // Änderung genau einen kontextuellen eingehenden Link auf der ganzen Domain.
+  serviceLink: "/webdesign",
+  serviceLinkLabel: "Webdesign ansehen",
   priceRanges: [
     {
       label: "Einfach",

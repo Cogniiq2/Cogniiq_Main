@@ -102,6 +102,11 @@ const COST_LINKS = [
 ];
 
 const RELATED_LINKS = [
+  // Wie im Automatisierungs-Cluster: diese Seite und /webdesign bedienen beide
+  // „webdesign agentur". /webdesign ist der kanonische Eigentümer des generischen
+  // Kopfbegriffs, hatte aber bis 2026-09-12 genau einen kontextuellen eingehenden
+  // Link der ganzen Domain — und keinen von hier (docs/seo/ARCHITEKTUR.md).
+  { label: "Webdesign für Unternehmen", href: "/webdesign" },
   { label: "KI Agentur Deutschland", href: "/ki-agentur-deutschland" },
   { label: "Automatisierung für Unternehmen", href: "/automatisierung-unternehmen" },
   { label: "KI Telefonassistent", href: "/ki-telefonassistent" },

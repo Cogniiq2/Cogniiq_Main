@@ -416,3 +416,51 @@ der teuerste Fehler, den ein Preisrechner machen kann.
 
 Sobald OWNER-INPUT H3 beantwortet ist, kann `sprachenAufschlagEur` die
 Paketschwelle wieder rechnen. Bis dahin gilt: offen ausweisen, nie als 0.
+
+---
+
+## Nachtrag 12.09.2026 — `/bayreuth/website-relaunch`: das Titelexperiment hat nie begonnen
+
+Aufgefallen im Architekturlauf (`claude/seo-architecture-max-2026-09-12`). Der
+am 11.09.2026 protokollierte Middleware-Drift hatte eine Folge, die damals nicht
+zu Ende gedacht war: `functions/_middleware.ts` überschrieb den vorgerenderten
+`<head>` an der Edge, und für diese Route wich sie im **Titel** ab.
+
+| Feld | Manifest (eingefroren, seit 29.08.2026) | Tatsächlich ausgeliefert |
+|---|---|---|
+| `title` | `Website Relaunch Bayreuth – Mehr Performance & bessere Rankings \| Cogniiq` | `Website Relaunch Bayreuth – Alte Website modernisieren \| Cogniiq` |
+
+Der Guard in `src/protectedExperiments.test.tsx` liest den Head aus dem
+**Manifest** — wie sein eigener Kopfkommentar sagt — und die Bindung
+„Manifest = gelieferter Head" sollte `scripts/prerender.mjs` garantieren. Die
+Middleware hat genau diese Bindung gebrochen. Der Fingerprint war korrekt und
+stabil; er hat nur etwas anderes eingefroren als das, was in der SERP stand.
+
+**Das Titel-Experiment seit dem 29.08.2026 hat damit keine Daten.** Zwei Wochen
+Messung beziehen sich auf den alten Titel.
+
+**Was im Architekturlauf getan wurde:** nichts an der Auslieferung. Die
+Middleware-Tabelle ist entfernt, aber für genau diese Route ist ein
+dokumentierter Override geblieben (`frozenHeadOverrides` in
+`functions/_middleware.ts`), damit die gelieferten Bytes sich nicht ändern. Ein
+Wechsel auf den Manifestwert wäre ein **Start** des Experiments, kein
+Fortsetzen — und damit eine Entscheidung, die dem Inhaber gehört.
+
+**Offene Inhaber-Entscheidung, zwei Möglichkeiten:**
+
+1. **Ausliefern.** Override entfernen, Manifestwert geht live, neue Baseline ab
+   Deploy, 28 Tage messen. Dann läuft das Experiment erstmals wirklich.
+2. **Für ungültig erklären.** Manifesttitel auf „Alte Website modernisieren"
+   zurücknehmen, Override entfernen (beide Seiten sind dann identisch), Route
+   aus `PROTECTED_EXPERIMENT_PATHS` graduieren. Ehrlicher, wenn die
+   Titel-Hypothese nicht mehr interessiert.
+
+Solange keine Entscheidung fällt, bleibt der Override stehen und
+`.github/scripts/test-seo-consistency.mjs` erzwingt, dass er eine **eingefrorene**
+Route betrifft. Graduiert die Route ohne Entfernen des Overrides, schlägt die
+Prüfung fehl — so kann dieser Zustand nicht in Vergessenheit geraten.
+
+Dieselbe Prüfung wurde für die übrigen vier eingefrorenen Routen durchgeführt:
+`/bayreuth/webdesign`, `/muenchen/webdesign-kosten`, `/regensburg/website-relaunch`
+und `/ki-telefonassistent-arzt` trugen auf beiden Seiten identische Werte. Für
+sie ändert der Wegfall der Tabelle nichts, und ihre Messreihen bleiben gültig.

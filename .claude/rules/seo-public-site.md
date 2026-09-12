@@ -20,9 +20,11 @@ Durable rules for any change that affects what a crawler sees. The copy briefs
 
 ## Before changing a public page
 
-1. Read `docs/seo/organic-growth-scoreboard.md` (query-cluster owners, live
-   measurements) and `docs/seo/post-experiment-opportunities.md` (deferred ideas)
-   before proposing anything. Most obvious ideas were already assessed.
+1. Read `docs/seo/ARCHITEKTUR.md` FIRST — it says which page is allowed to own
+   which search intent, and no route may be added, retargeted or consolidated
+   against it. Then `docs/seo/organic-growth-scoreboard.md` (live measurements)
+   and `docs/seo/post-experiment-opportunities.md` (deferred ideas). Most obvious
+   ideas were already assessed.
 2. `PROTECTED_EXPERIMENT_PATHS` in `src/lib/routing/protectedExperiments.ts` is
    the authoritative list of frozen routes. Never change their head, body,
    JSON-LD, outgoing links, or the number of places in the source tree that
@@ -31,7 +33,12 @@ Durable rules for any change that affects what a crawler sees. The copy briefs
    as `DEFERRED — EXPERIMENT` in the post-experiment doc.
 3. One route manifest: `src/lib/routing/publicRoutes.ts` (title, description,
    indexability, sitemap) mirrored path-for-path in `publicRoutePaths.ts` and
-   registered in `src/App.tsx`. Blog posts additionally carry the same title in
+   registered in `src/App.tsx`. It is the ONLY source of the delivered `<head>`:
+   `functions/_middleware.ts` must never carry per-route title, description,
+   canonical or keywords again (it did until 2026-09-12 and had drifted on 29 of
+   86 routes, silently overriding reviewed values at the edge — see
+   `docs/seo/ARCHITEKTUR.md` §7), and page components must resolve through
+   `src/lib/routing/routeMetadata.ts`. Blog posts additionally carry the same title in
    `src/lib/blog-data.ts`. Regenerate `public/sitemap.xml` with `npm run sitemap`;
    never hand-edit it, never invent `lastmod`.
 4. Product facts come only from `FAKTEN`, `GRENZEN`, `ANLIEGEN_*`, `ANBINDUNG`

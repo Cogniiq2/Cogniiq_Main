@@ -66,12 +66,61 @@ const orphanSitemap = sitemapPaths.filter((p) => !isRoute(p));
 if (orphanSitemap.length) fail(`Sitemap URLs with no matching route: ${orphanSitemap.join(', ')}`);
 else ok('every sitemap URL resolves to a real route');
 
-// ─── 3. Middleware metadata keys ⇄ routes ────────────────────────────────────
+// ─── 3. Edge middleware head overrides ⇄ routes + frozen experiments ─────────
 const middleware = read('functions/_middleware.ts');
 const mwKeys = [...middleware.matchAll(/^\s*'(\/[^']*)':\s*\{/gm)].map((m) => m[1]);
 const orphanMw = mwKeys.filter((p) => !isRoute(p));
-if (orphanMw.length) fail(`Middleware seoConfig keys with no matching route: ${orphanMw.join(', ')}`);
-else ok(`all ${mwKeys.length} middleware metadata keys map to real routes`);
+if (orphanMw.length) fail(`Middleware head-override keys with no matching route: ${orphanMw.join(', ')}`);
+else ok(`all ${mwKeys.length} middleware head-override keys map to real routes`);
+
+// The edge Function must not become a second source of truth for the <head>
+// again. It carried a full per-route title/description table until 2026-09-12
+// and had drifted from the manifest on 29 of 86 shared routes — so the string a
+// crawler read was the stale edge copy, including claims that had been
+// deliberately retracted elsewhere. The prerendered head is written AND
+// validated from the manifest by scripts/prerender.mjs; anything the edge
+// rewrites on top of it can only drift from it.
+//
+// The one sanctioned exception is a route whose frozen experiment is measured
+// against the bytes a crawler has actually been receiving. Those keys must be
+// protected paths, and the map must empty itself as experiments graduate.
+const protectedSrc = read('src/lib/routing/protectedExperiments.ts');
+const protectedPaths = [
+  ...(protectedSrc
+    .match(/PROTECTED_EXPERIMENT_PATHS: readonly string\[\] = \[([\s\S]*?)\];/) ?? [, ''])[1]
+    .matchAll(/'([^']+)'/g),
+].map((m) => m[1]);
+
+if (!protectedPaths.length) {
+  fail('Could not read PROTECTED_EXPERIMENT_PATHS from src/lib/routing/protectedExperiments.ts');
+} else ok(`${protectedPaths.length} protected experiment paths read`);
+
+if (!/const frozenHeadOverrides: Record<string, \{ title\?: string; description\?: string \}>/.test(middleware)) {
+  fail(
+    'functions/_middleware.ts no longer declares frozenHeadOverrides — if the head-override mechanism was ' +
+      'renamed or reintroduced as a general metadata table, this guard must be updated deliberately.'
+  );
+} else ok('middleware declares exactly one head-override mechanism (frozenHeadOverrides)');
+
+// `canonical:` and `keywords:` in the edge Function are the signature of the old
+// table. The head's canonical comes from the manifest via prerender, which also
+// asserts it per route; an edge copy is how it silently diverged before.
+for (const field of ['canonical', 'keywords']) {
+  if (new RegExp(`^\\s*${field}:`, 'm').test(middleware)) {
+    fail(
+      `functions/_middleware.ts sets "${field}" per route again. The manifest owns the head; ` +
+        'see the frozenHeadOverrides comment in that file.'
+    );
+  } else ok(`middleware carries no per-route "${field}"`);
+}
+
+const unprotectedOverrides = mwKeys.filter((p) => !protectedPaths.includes(p));
+if (unprotectedOverrides.length) {
+  fail(
+    `Middleware head overrides for routes that are NOT frozen experiments: ${unprotectedOverrides.join(', ')}. ` +
+      'A non-frozen route takes its head from the manifest.'
+  );
+} else ok(`all ${mwKeys.length} middleware head overrides are frozen experiment routes`);
 
 // ─── 3b. Route manifest ⇄ runtime router (BIDIRECTIONAL) ─────────────────────
 // src/lib/routing/publicRoutes.ts is the authoritative SEO/prerender/sitemap
@@ -261,7 +310,7 @@ for (const legal of ['/impressum', '/datenschutz']) {
   else ok(`legal route ${legal} present in route table + sitemap`);
 }
 
-// ─── 5. Blog slugs ⇄ sitemap ⇄ middleware ────────────────────────────────────
+// ─── 5. Blog slugs ⇄ sitemap ⇄ manifest ──────────────────────────────────────
 const blogData = read('src/lib/blog-data.ts');
 const blogSlugs = [
   ...blogData.matchAll(/canonical:\s*"https:\/\/cogniiq\.de\/blog\/([^"]+)"/g),
@@ -270,7 +319,8 @@ const sitemapBlog = sitemapPaths.filter((p) => p.startsWith('/blog/')).map((p) =
 
 for (const slug of blogSlugs) {
   if (!sitemapBlog.includes(slug)) fail(`Blog post ${slug} missing from sitemap`);
-  if (!mwKeys.includes(`/blog/${slug}`)) fail(`Blog post ${slug} missing middleware metadata`);
+  // The edge Function no longer carries per-route head metadata; the manifest
+  // does, and the manifest ⇄ blog-data parity is asserted a few lines below.
 }
 for (const slug of sitemapBlog) {
   if (!blogSlugs.includes(slug)) fail(`Sitemap references unknown blog post ${slug}`);
