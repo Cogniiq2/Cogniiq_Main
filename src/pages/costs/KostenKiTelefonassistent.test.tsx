@@ -178,28 +178,32 @@ describe('Preisseite — Sprachpreise so sicher wie die Rechnung, nicht sicherer
 
 describe('Preisseite — Messung bleibt unverändert', () => {
   /*
-    WAS HIER ABSICHTLICH NICHT GEPRÜFT WIRD: die GA4-Measurement-ID.
+    DIE GA4-LÜCKE IST GESCHLOSSEN, 12.09.2026.
 
-    Die Korrektur auf den Produktions-Stream `G-NDN9J2G5LM` liegt auf dem
-    eigenen Zweig `claude/fix-ga4-stream-id-2026-09-12` und ist zum Zeitpunkt
-    dieses Commits NICHT in `origin/main` und damit auch nicht in diesem Zweig.
-    Eine Zusicherung auf die neue ID würde hier also fehlschlagen, und eine
-    Zusicherung auf die alte ID würde den falschen Wert festschreiben — beides
-    wäre schlechter als die Lücke zu benennen.
+    Bis zur Zusammenführung stand hier eine begründete Auslassung: Die
+    Korrektur auf den Produktions-Stream `G-NDN9J2G5LM` lag auf dem eigenen
+    Zweig `claude/fix-ga4-stream-id-2026-09-12` und war weder in `origin/main`
+    noch in diesem Zweig. Eine Zusicherung auf die neue ID wäre damals
+    fehlgeschlagen, eine auf die alte hätte den falschen Wert festgeschrieben.
 
-    Sobald die GA4-Korrektur in `main` ist und dieser Zweig sie mitbringt,
-    gehört genau eine Zeile hierher:
+    Die Korrektur ist über PR #92 in `main` gelandet und mit der Zusammenführung
+    von `origin/main` in diesen Zweig gekommen. Damit gilt hier genau die Zeile,
+    die der Kommentar angekündigt hat — sie steht jetzt unten.
 
-      expect(consent).toContain('G-NDN9J2G5LM');
-
-    Der Zweig der GA4-Korrektur prüft das bereits in
-    `src/lib/consent.test.ts`, inklusive Cookie-Cleanup.
+    `src/lib/consent.test.ts` prüft dieselbe ID zusätzlich im Verhalten,
+    einschließlich Cookie-Cleanup für den stillgelegten Stream.
   */
   it('ändert die Analytics-Konfiguration dieses Zweigs nicht', async () => {
     const consent = (await import('@/lib/consent?raw')) as unknown as { default: string };
     const quelle = consent.default;
     // Ads bleibt unangetastet — diese Aufgabe fasst Werbung nicht an.
     expect(quelle).toContain('AW-17946397271');
+    // Der aktive GA4-Stream ist der Produktions-Stream.
+    expect(quelle).toContain('G-NDN9J2G5LM');
+    // Der stillgelegte Stream darf ausschließlich als Cookie-Name überleben —
+    // nie als konfigurierte Measurement-ID.
+    expect(quelle).not.toContain("GA4_ID = 'G-K7BS3LKT6H'");
+    expect(quelle).toContain("LEGACY_ANALYTICS_COOKIES = ['_ga_K7BS3LKT6H']");
     // Und der Rechner bleibt in der Messung grob: keine Geschäftszahl geht raus.
     expect(quelle).toContain("CONSENT_STORAGE_KEY = 'cogniiq_consent_v2'");
   });

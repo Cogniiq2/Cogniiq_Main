@@ -1,5 +1,40 @@
 # COPY-SEO-CHANGELOG — Copy Overhaul KI-Telefonassistent-Cluster
 
+## 2026-09-12 — Zusammenführung: GA4-Korrektur aus `main` in den KI-Zweig
+
+Keine Copy-Änderung, keine Preisänderung, kein Rechner-Umbau. Dieser Eintrag
+hält nur fest, was durch das Zusammenführen von `origin/main`
+(`48499df`) in diesen Zweig dazugekommen ist.
+
+**Was aus `main` kam** (PR #92, Commits `cf43131` und `181d810`):
+`src/lib/consent.ts`, `src/lib/consent.test.ts`, `src/lib/legal-content.tsx`
+und `.github/scripts/test-seo-consistency.mjs`. Der aktive GA4-Stream ist
+damit `G-NDN9J2G5LM`. Google Ads bleibt `AW-17946397271`.
+
+**Konflikte:** keiner. `src/lib/consent.ts` wurde automatisch
+zusammengeführt — dieser Zweig hatte am Dateiende die groben
+Rechner-Ereignisse ergänzt, `main` oben die Measurement-ID und das
+Cookie-Aufräumen. Zwei getrennte Regionen, keine gemeinsame Zeile.
+
+**Der stillgelegte Stream `G-K7BS3LKT6H`** wird nirgends konfiguriert,
+gebootstrappt oder mit einem Ereignis bedient. Er überlebt ausschließlich als
+Cookie-Name in `LEGACY_ANALYTICS_COOKIES = ['_ga_K7BS3LKT6H']`, damit ein
+Besucher, der unter der alten Auslieferung zugestimmt hat, sein Cookie beim
+Widerruf tatsächlich loswird — plus in Regressionstests und in dieser
+historischen Dokumentation.
+
+**Analytics-Widerruf** entfernt `_ga`, `_gid`, `_ga_NDN9J2G5LM` und
+`_ga_K7BS3LKT6H` — und fasst Werbe-Cookies nicht an. Die beiden Zwecke bleiben
+getrennte Entscheidungen, Speicherschlüssel weiterhin `cogniiq_consent_v2`.
+
+**Nachgezogen:** Die Auslassung in
+`src/pages/costs/KostenKiTelefonassistent.test.tsx` war an die Bedingung
+„sobald die Korrektur in `main` ist" geknüpft. Die Bedingung ist eingetreten,
+also prüft der Test jetzt die aktive ID und dass der stillgelegte Stream nur
+noch als Cookie-Name vorkommt. Zwei Changelog-Absätze, die „der Branch trägt
+weiterhin `G-K7BS3LKT6H`" im Präsens behaupteten, sind auf die Vergangenheit
+korrigiert; die Einträge selbst bleiben als Historie stehen.
+
 ## 2026-09-11 (5) — Vollständige Wirtschaftlichkeit, einheitliche Produktwahrheit
 
 Zwei Befunde aus dem Inhaber-Review der Preview, beide mit demselben Muster:
@@ -60,8 +95,9 @@ korrigierte Fassung daneben (`UEBERGABE_ABWICKLUNG`, `TEAM_BLOCK.textAbwicklung`
 `ANLIEGEN_UEBERNIMMT_ABWICKLUNG`) — Liste in
 docs/seo/post-experiment-opportunities.md.
 
-**GA4:** unverändert. Der Branch trägt weiterhin `G-K7BS3LKT6H`; die Korrektur
-auf `G-NDN9J2G5LM` landet als eigener PR.
+**GA4:** in diesem Durchgang unverändert. Der Branch trug zu diesem Zeitpunkt
+noch `G-K7BS3LKT6H`; die Korrektur auf `G-NDN9J2G5LM` landete als eigener PR
+(#92) und ist seit der Zusammenführung vom 12.09.2026 in diesem Zweig.
 
 
 ## 2026-09-11 (4) — Ein Rechenkern statt vier Rechnern
@@ -108,9 +144,11 @@ vorzugeben.
 eingefrorenen Flächen durch eine Fassung ohne Zahl ersetzt. Begründung und
 offene Inhaberfrage: OWNER-INPUT B11a.
 
-**GA4.** Unverändert in diesem Durchgang. Der Branch trägt weiterhin
-`G-K7BS3LKT6H`; die Korrektur auf `G-NDN9J2G5LM` ist in `main` noch nicht
-gelandet und gehört in ihren eigenen Commit. Neu sind ausschließlich grobe
+**GA4.** Unverändert in diesem Durchgang. Der Branch trug zu diesem Zeitpunkt
+noch `G-K7BS3LKT6H`; die Korrektur auf `G-NDN9J2G5LM` war in `main` noch nicht
+gelandet und gehörte in ihren eigenen Commit. Sie ist am 12.09.2026 über PR #92
+nach `main` und von dort in diesen Zweig gekommen — siehe den Eintrag
+„Zusammenführung" unten. Neu sind ausschließlich grobe
 Ereignisnamen (`calculator_anchor_click`, `price_calculator_started`,
 `roi_calculator_started`) — ohne jeden Eingabewert.
 
