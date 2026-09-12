@@ -14,9 +14,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const GA4_ID = 'G-NDN9J2G5LM';
 const ADS_ID = 'AW-17946397271';
-// Retired stream. Production traffic must never reach it again, and it must
-// never be the source of the _ga_<STREAM_ID> cookie name used for cleanup.
+// Retired stream. Production traffic must never reach it again: it must never
+// be configured, bootstrapped or pushed to the dataLayer.
 const RETIRED_GA4_ID = 'G-K7BS3LKT6H';
+// The cookie the retired stream left on returning visitors' browsers. It is a
+// COOKIE NAME only — cleaned up on withdrawal, never configured as a stream.
+const ACTIVE_GA_COOKIE = '_ga_NDN9J2G5LM';
+const LEGACY_GA_COOKIE = '_ga_K7BS3LKT6H';
 
 type GtagCall = unknown[];
 
@@ -302,11 +306,16 @@ describe('GA4 stream identity and cookie cleanup', () => {
     const cleared = writes.map((w) => w.split('=')[0]);
     expect(cleared).toContain('_ga');
     expect(cleared).toContain('_gid');
-    expect(cleared).toContain(`_ga_${GA4_ID.replace(/^G-/, '')}`);
-    // The retired stream's cookie is NOT part of the active cleanup set.
-    expect(cleared).not.toContain(`_ga_${RETIRED_GA4_ID.replace(/^G-/, '')}`);
+    // Active stream cookie, derived from the single-source-of-truth GA4_ID.
+    expect(cleared).toContain(ACTIVE_GA_COOKIE);
+    expect(ACTIVE_GA_COOKIE).toBe(`_ga_${GA4_ID.replace(/^G-/, '')}`);
+    // Historical cookie from the retired stream is swept too, so a returning
+    // visitor keeps no stale analytics cookie after withdrawing consent.
+    expect(cleared).toContain(LEGACY_GA_COOKIE);
     // Analytics-only withdrawal must not touch advertising cookies.
     expect(cleared).not.toContain('_gcl_au');
+    expect(cleared).not.toContain('_gcl_aw');
+    expect(cleared).not.toContain('_gac_gb');
     // Every write must be an expiry, never a cookie being set.
     for (const w of writes) expect(w).toContain('expires=Thu, 01 Jan 1970 00:00:00 GMT');
   });
@@ -322,7 +331,22 @@ describe('GA4 stream identity and cookie cleanup', () => {
 
     const cleared = writes.map((w) => w.split('=')[0]);
     expect(cleared).toContain('_gcl_au');
-    expect(cleared).toContain(`_ga_${GA4_ID.replace(/^G-/, '')}`);
-    expect(cleared).not.toContain(`_ga_${RETIRED_GA4_ID.replace(/^G-/, '')}`);
+    expect(cleared).toContain('_ga');
+    expect(cleared).toContain('_gid');
+    expect(cleared).toContain(ACTIVE_GA_COOKIE);
+    expect(cleared).toContain(LEGACY_GA_COOKIE);
+  });
+
+  it('sweeping the legacy cookie never configures or pings the retired stream', async () => {
+    const { initConsent, grantAll, revokeConsent } = await loadModule();
+    initConsent();
+    grantAll();
+    revokeConsent();
+
+    // The legacy entry is a cookie name, not a measurement id: it must never
+    // reach gtag as a config target or as any dataLayer payload.
+    expect(configuredIds()).not.toContain(RETIRED_GA4_ID);
+    expect(JSON.stringify(readDataLayer())).not.toContain(RETIRED_GA4_ID);
+    expect(tagScripts().map((t) => t.src).join(' ')).not.toContain(RETIRED_GA4_ID);
   });
 });
