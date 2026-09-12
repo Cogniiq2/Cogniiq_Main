@@ -108,6 +108,32 @@ export const FAKTEN = {
    *  nächsthöhere Tarif" für MVZ nicht trägt (dort 1.400 €, Enterprise ab 5.000 €). */
   deckelung: `Über dem Minutenkontingent kostet jede weitere Minute 0,39\u00A0€. Nach oben ist jeder Tarif auf seine ausgewiesene Obergrenze gedeckelt: Basis auf 500\u00A0€ im Monat, Praxis auf 800\u00A0€, MVZ auf 1.400\u00A0€.`,
 
+  /*
+    WORAUF SICH DIE OBERGRENZE BEZIEHT — Korrektur vom 12.09.2026.
+
+    `deckelung` (oben) beschreibt die Regel korrekt: Der TARIF ist gedeckelt.
+    Daraus wurde an mehreren Stellen ein Satz über die GESAMTRECHNUNG —
+    „Mehr zahlen Sie in diesem Monat nicht", „Mehr als die ausgewiesene
+    Obergrenze kostet es nie". Das ist zu weit: Die Preislogik deckelt
+    nachweislich Grundpreis plus Mehrverbrauch. Ob Zusatzsprachen, der
+    Aufschlag für monatliche Kündbarkeit und individuell vereinbarte
+    Anbindungskosten INNERHALB dieser Grenze liegen, sagt unsere eigene
+    Quelle nicht — der Rechner weist sie deshalb seit jeher als eigene
+    Positionen aus, während die Prosa sie stillschweigend mit eingeschlossen
+    hat. Zwei Flächen, zwei Aussagen, und die großzügigere stand im Fließtext.
+
+    `deckelungGeltung` benennt den Geltungsbereich, ohne die Gegenbehauptung
+    aufzustellen: Es steht hier NICHT, dass die Zusatzposten außerhalb der
+    Obergrenze liegen — auch das gäbe die Quelle nicht her. Es steht, dass
+    die Telefonie-Obergrenze allein die Endsumme nicht festlegt und das
+    Angebot die offenen Positionen schließt.
+  */
+  deckelungGeltung:
+    "Gedeckelt ist damit der Telefoniepreis — Grundpreis plus Mehrverbrauch. Zusatzsprachen, der Aufschlag für monatliche Kündbarkeit sowie individuell vereinbarte Integrations- oder Drittanbieterkosten weisen wir separat aus, soweit sie anfallen; ob sie in die Obergrenze fallen, legt Ihr Angebot fest. Die Telefonie-Obergrenze allein ist deshalb noch nicht Ihre Endsumme.",
+
+  /** Kurzform für Kacheln und Tabellen: nennt den Bezug mit, in vier Wörtern. */
+  deckelungKurz: "Telefonie gedeckelt: Grundpreis + Mehrverbrauch",
+
   /** Tarifzuordnung. Beschreibt nicht nur den Rechner, sondern die Zusage an den
    *  Kunden — siehe COPY-CLAIMS-TO-VERIFY F10. */
   tarifzuordnung:
@@ -684,8 +710,10 @@ export const TARIF_ENTERPRISE =
 export const DECKELUNG = {
   headline: "Zuerst die Obergrenze, dann der Preis",
   text:
-    `Jeder Tarif enthält ein festes Minutenkontingent. ${FAKTEN.deckelung} Mehr zahlen Sie in diesem Monat nicht — eine Grippewelle kann Ihre Rechnung also bewegen, aber nicht sprengen.`,
-  hinweis: "Mehr als die ausgewiesene Obergrenze kostet es nie.",
+    `Jeder Tarif enthält ein festes Minutenkontingent. ${FAKTEN.deckelung} Eine Grippewelle kann Ihre Telefonierechnung also bewegen, aber nicht sprengen.`,
+  /** Der Geltungsbereich steht direkt neben der Zusage, nicht im Kleingedruckten. */
+  geltung: FAKTEN.deckelungGeltung,
+  hinweis: "Für Grundpreis und Mehrverbrauch kostet es nie mehr als die ausgewiesene Obergrenze.",
   tarifwechsel:
     "Und Sie bleiben nicht im falschen Tarif sitzen: Liegt Ihr Aufkommen dauerhaft höher, ordnen wir Sie dem Tarif zu, der für Ihren Bedarf am günstigsten ist und nicht dauerhaft an seiner Obergrenze läuft. Wer Monat für Monat den Zuschlag zahlt, zahlt zu viel — dann gehört er in den nächsten Tarif.",
   nichtProBehandler:
@@ -1494,7 +1522,8 @@ export const GENERISCH_UEBERGABE = {
  */
 export const GENERISCH_DECKELUNG = {
   headline: "Zuerst die Obergrenze, dann der Preis",
-  text: `Jeder Tarif enthält ein festes Minutenkontingent. ${FAKTEN.deckelung} Mehr zahlen Sie in diesem Monat nicht — eine Rückrufwelle oder eine Kampagne kann Ihre Rechnung also bewegen, aber nicht sprengen.`,
+  text: `Jeder Tarif enthält ein festes Minutenkontingent. ${FAKTEN.deckelung} Eine Rückrufwelle oder eine Kampagne kann Ihre Telefonierechnung also bewegen, aber nicht sprengen.`,
+  geltung: FAKTEN.deckelungGeltung,
   tarifwechsel: DECKELUNG.tarifwechsel,
   preisgarantie: FAKTEN.preisgarantie,
 };

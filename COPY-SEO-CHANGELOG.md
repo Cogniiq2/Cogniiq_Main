@@ -1,5 +1,93 @@
 # COPY-SEO-CHANGELOG — Copy Overhaul KI-Telefonassistent-Cluster
 
+## 2026-09-12 (2) — Zwei Personallesarten, und die Obergrenze sagt, wofür sie gilt
+
+Zwei Befunde aus dem Inhaber-Review, beide derselbe Fehlertyp: Eine Aussage
+galt für einen Teil und wurde für das Ganze gelesen.
+
+### 1 · Der Rechner unterschätzte echte Personalersparnis
+
+Bisher gab es genau eine Personalrechnung: `Telefonstunden × Routineanteil ×
+Vollkosten je Stunde`. Die ist **mathematisch nicht falsch** — sie bewertet
+korrekt die *freigesetzte Zeit*. Sie beantwortet nur nicht die zweite Frage:
+Eine Empfangskraft wird für ihren **Dienstplan** bezahlt, nicht für die
+Minuten, in denen sie spricht. Wo Cogniiq eine Stelle tatsächlich überflüssig
+macht oder eine Einstellung vermeidet, ist die Ersparnis der Wegfall einer
+Personalposition — nicht „5 Stunden × 35 €".
+
+Die naheliegende Korrektur wäre der schlimmere Fehler gewesen: das ganze
+Gehalt als Ersparnis zu verbuchen. Bleibt die Person beschäftigt und macht
+andere wertvolle Arbeit, spart der Betrieb keinen Cent Lohnkosten.
+
+Deshalb **zwei Modi, nie beide zugleich**:
+
+| Modus | Frage | Formel | Ergebniszeile |
+|---|---|---|---|
+| A · Kapazität | Person bleibt, Zeit wird frei | Telefonstunden × Routineanteil × Vollkosten/Std. (unverändert) | „Wert der freigesetzten Arbeitszeit" |
+| B · Personalkosten | Position entfällt oder entsteht nicht | monatliche Vollkosten × vermeidbarer Anteil | „Tatsächlich vermeidbare Personalkosten" |
+
+Modus B fragt nach **Arbeitgeber-Vollkosten** (nicht Brutto, nicht Netto) und
+nach dem **realistisch vermeidbaren Anteil** (0–100 %). Beide ohne Vorbelegung:
+Ein Gehalt zu raten wäre eine Behauptung über den Betrieb des Besuchers.
+Beispiel: 4.000 € × 75 % = 3.000 € echte Ersparnis pro Monat.
+
+**Keine Doppelzählung.** Beide Modi bewerten dieselbe Arbeitskapazität. Der
+Kern hat genau EIN Feld, das in die Summe eingeht (`arbeitsnutzenProMonatEur`);
+die jeweils andere Größe ist `null`. Die Konstruktoren `kapazitaetsEingabe()`
+und `personalkostenEingabe()` nullen die Felder des anderen Modus — ein
+Aufrufer *kann* nicht beide befüllen. Der Chancenwert bleibt ein eigener
+Posten und wird zu jedem Modus genau einmal addiert.
+
+**Vorgabe ist Modus A**, und zwar weil er der zurückhaltendere ist. Modus B
+ergibt in fast jedem Betrieb das größere Ergebnis; ihn vorzubelegen hieße,
+einem Besucher, der nur klickt, eine Lohnersparnis unterzuschieben, die er
+womöglich nicht hat. Die Auswahl ist optisch neutral — keine Option ist als
+„empfohlen" markiert.
+
+Die Zustandslogik gilt unverändert je Modus: Fehlt in A der Stundensatz oder
+der Routineanteil, in B die Monatsvollkosten oder der vermeidbare Anteil,
+gibt es **kein Gesamtergebnis — weder positiv noch negativ**. `0 %` ist wie
+`0 verpasste Anrufe` eine vollständige Antwort, keine Lücke.
+
+### 2 · Die Obergrenze galt für die Telefonie, nicht für die Rechnung
+
+`szenarioFuer()` deckelt nachweislich `min(Grundpreis + Mehrverbrauch,
+Obergrenze)`. Der Fließtext machte daraus „Mehr zahlen Sie in diesem Monat
+nicht" und „Mehr als die ausgewiesene Obergrenze kostet es nie" — während
+derselbe Rechner Zusatzsprachen, den 20-%-Aufschlag und die Anbindung als
+eigene, teils offene Positionen auswies. Zwei Flächen, zwei Aussagen, und die
+großzügigere stand in der Prosa.
+
+Korrigiert auf `/kosten-ki-telefonassistent`, `/ki-telefonassistent`,
+`/praxen` und im Rechner. Neue Konstante `FAKTEN.deckelungGeltung`:
+
+> Gedeckelt ist damit der Telefoniepreis — Grundpreis plus Mehrverbrauch.
+> Zusatzsprachen, der Aufschlag für monatliche Kündbarkeit sowie individuell
+> vereinbarte Integrations- oder Drittanbieterkosten weisen wir separat aus,
+> soweit sie anfallen; ob sie in die Obergrenze fallen, legt Ihr Angebot fest.
+> Die Telefonie-Obergrenze allein ist deshalb noch nicht Ihre Endsumme.
+
+Bewusst **nicht** behauptet: dass diese Posten *außerhalb* der Obergrenze
+liegen. Das gibt die Quelle genauso wenig her wie das Gegenteil — es wäre
+derselbe Fehler mit umgekehrtem Vorzeichen. Vollständige Aufstellung in
+`docs/preis-wahrheitstabelle.md`.
+
+**`FAKTEN.deckelung` selbst bleibt unangetastet** — die Konstante wird von der
+eingefrorenen Route `/ki-telefonassistent-arzt` gerendert. Der Geltungssatz
+steht als eigene Konstante daneben, wie schon bei `UEBERGABE_ABWICKLUNG`.
+
+**Keine Preisänderung.** 300/500/800 €, 1.490/2.490/3.490 €, 0,39 €/Minute,
+500/800/1.400 € Obergrenzen, 79 € je Zusatzsprache, Enterprise ab 5.000 €,
+20 % Aufschlag — alle unverändert und durch Tests gegen stille Änderung
+gesichert. OWNER-INPUT H3 bleibt offen.
+
+**GA4:** unverändert `G-NDN9J2G5LM`, Ads `AW-17946397271`, Consent unberührt.
+Kein Personalwert verlässt den Browser — die Analytics-Wache erlaubt in
+`trackEvent()` weiterhin ausschließlich feste Zeichenketten.
+
+**Eingefrorene Routen:** alle fünf Fingerabdrücke byte-identisch,
+`npm run seo:baseline` nicht ausgeführt.
+
 ## 2026-09-12 — Zusammenführung: GA4-Korrektur aus `main` in den KI-Zweig
 
 Keine Copy-Änderung, keine Preisänderung, kein Rechner-Umbau. Dieser Eintrag

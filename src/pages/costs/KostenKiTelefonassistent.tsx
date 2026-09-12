@@ -228,7 +228,11 @@ export function KostenKiTelefonassistent() {
         <section className={SECTION_ALT}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>{DECKELUNG.headline}</h2>
-            <p className={`${PROSE} mb-6`}>{DECKELUNG.text}</p>
+            <p className={`${PROSE} mb-4`}>{DECKELUNG.text}</p>
+            {/* Der Geltungsbereich steht DIREKT hinter der Zusage, nicht als
+                Fußnote: Eine Obergrenze, deren Bezug erst drei Absätze später
+                kommt, wird als Gesamtdeckel gelesen. */}
+            <p className={`${PROSE} mb-6`}>{DECKELUNG.geltung}</p>
             <div className={CARD}>
               <p className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-4">
                 {DECKELUNG.hinweis}
@@ -241,7 +245,7 @@ export function KostenKiTelefonassistent() {
                   >
                     <span>Tarif {t.name}</span>
                     <span className="tabular-nums text-gray-900 dark:text-gray-100 font-medium">
-                      höchstens {t.obergrenze} im Monat
+                      Telefonie höchstens {t.obergrenze} im Monat
                     </span>
                   </li>
                 ))}

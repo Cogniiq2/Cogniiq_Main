@@ -273,11 +273,70 @@ export function berechnePreis(
 
 // ── Wirtschaftlichkeit ──────────────────────────────────────────────────────
 
+/*
+  DIE ZWEI WIRTSCHAFTLICHEN LESARTEN VON PERSONAL — Korrektur vom 12.09.2026.
+
+  Bis hierher kannte der Rechner nur EINE: Telefonstunden × Routineanteil ×
+  Vollkosten je Stunde. Diese Rechnung ist nicht falsch, aber sie beantwortet
+  nur eine von zwei Fragen. Sie bewertet die FREIGESETZTE ZEIT — den Gegenwert
+  der Minuten, in denen jemand sonst am Telefon gewesen wäre.
+
+  Der Inhaber hat zu Recht eingewandt: Eine Empfangskraft wird für ihren
+  ganzen Dienstplan bezahlt, nicht für die Minuten, in denen sie spricht. Wo
+  Cogniiq eine Stelle tatsächlich überflüssig macht, eine Einstellung
+  vermeidet oder einen externen Telefonservice ersetzt, ist die Ersparnis
+  nicht „5 Stunden × 35 €", sondern der Wegfall einer Personalposition.
+
+  Die naheliegende „Korrektur" — einfach das ganze Gehalt als Ersparnis zu
+  verbuchen — wäre der schlimmere Fehler: Bleibt die Person beschäftigt und
+  macht weiterhin wertvolle andere Arbeit, spart der Betrieb keinen Cent
+  Lohnkosten. Dann ist der Nutzen Kapazität, nicht Cash.
+
+  Deshalb zwei Modi, die der Besucher selbst wählt, und NIE beide zugleich:
+
+    kapazitaet     Die Person bleibt. Bewertet wird die freigesetzte Zeit.
+                   Formel unverändert. Heißt ausdrücklich NICHT „eingesparte
+                   Personalkosten".
+
+    personalkosten Eine Personalposition entfällt oder entsteht gar nicht
+                   erst. Bewertet wird der Teil der monatlichen Vollkosten,
+                   der dadurch tatsächlich wegfällt.
+
+  Beide Modi bewerten DIESELBE Arbeitskapazität. Sie zu addieren hieße, sie
+  zweimal zu verkaufen — siehe `arbeitsnutzenProMonatEur`.
+*/
+export type PersonalModus = "kapazitaet" | "personalkosten";
+
 export interface WirtschaftlichkeitEingabe {
+  /** Welche der beiden Lesarten gilt. Eine Entscheidung des Besuchers; es gibt
+   *  keine „richtige", und der Rechner bevorzugt keine. */
+  modus: PersonalModus;
   /** Vollkosten einer Arbeitsstunde in Euro — Angabe des Nutzers. Ohne diesen
    *  Wert wird NICHTS gerechnet: Es gibt keinen Vorschlagswert, den wir für
-   *  einen beliebigen Betrieb belegen könnten. */
+   *  einen beliebigen Betrieb belegen könnten. NUR im Modus `kapazitaet`. */
   stundenkostenEur: number | null;
+  /*
+    MODUS `personalkosten` — die beiden Felder, die eine echte Lohnersparnis
+    beziffern.
+
+    Warum die Telefonminuten hier NICHT vorkommen: Der ganze Punkt dieses
+    Modus ist, dass die Personalkosten am Dienstplan hängen und nicht an der
+    Sprechzeit. Die Vollkosten über Telefonminuten zu verteilen würde genau
+    den Denkfehler wiederholen, den der Modus behebt. Das Anrufaufkommen
+    bleibt trotzdem relevant — für den Cogniiq-Preis und für die
+    Chancenrechnung.
+  */
+  /** Monatliche ARBEITGEBER-Vollkosten der heutigen bzw. vermiedenen
+   *  Telefon-/Empfangsbesetzung. Kein Netto-, kein Bruttogehalt. Ohne
+   *  Vorbelegung: Ein Gehalt zu raten wäre eine Aussage über den Betrieb des
+   *  Besuchers. NUR im Modus `personalkosten`. */
+  personalkostenProMonatEur: number | null;
+  /** Anteil dieser Kosten, der durch Cogniiq tatsächlich entfällt oder gar
+   *  nicht erst entsteht, in %. 0 bis 100. Ohne Vorbelegung.
+   *  100 % = die Position entfällt vollständig. 0 % = es ändert sich an der
+   *  Lohnsumme nichts; dann ist der Arbeitsnutzen null, und das ist ein
+   *  Ergebnis, keine Lücke. NUR im Modus `personalkosten`. */
+  vermeidbarerAnteilProzent: number | null;
   /*
     ROUTINEANTEIL — der eine Prozentsatz dieses Rechners, und ausdrücklich
     NICHT „wie viel Prozent schafft Cogniiq".
@@ -299,6 +358,42 @@ export interface WirtschaftlichkeitEingabe {
     das eigene Produkt im Gewand einer Bequemlichkeit — und dazu eine falsche.
   */
   routineanteilProzent: number | null;
+}
+
+/*
+  Zwei Konstruktoren statt eines Objektliterals mit vier Feldern, von denen
+  je zwei immer `null` sind. Sie machen am Aufrufort sichtbar, WELCHE Lesart
+  gerechnet wird, und sie machen es unmöglich, versehentlich Felder beider
+  Modi gleichzeitig zu füllen — die Felder des jeweils anderen Modus setzt der
+  Konstruktor hart auf `null`.
+*/
+
+/** Modus A — die Person bleibt, bewertet wird freigesetzte Zeit. */
+export function kapazitaetsEingabe(
+  stundenkostenEur: number | null,
+  routineanteilProzent: number | null
+): WirtschaftlichkeitEingabe {
+  return {
+    modus: "kapazitaet",
+    stundenkostenEur,
+    routineanteilProzent,
+    personalkostenProMonatEur: null,
+    vermeidbarerAnteilProzent: null,
+  };
+}
+
+/** Modus B — eine Personalposition entfällt oder entsteht nicht. */
+export function personalkostenEingabe(
+  personalkostenProMonatEur: number | null,
+  vermeidbarerAnteilProzent: number | null
+): WirtschaftlichkeitEingabe {
+  return {
+    modus: "personalkosten",
+    stundenkostenEur: null,
+    routineanteilProzent: null,
+    personalkostenProMonatEur,
+    vermeidbarerAnteilProzent,
+  };
 }
 
 /**
@@ -329,6 +424,8 @@ export interface ChancenEingabe {
 export type FehlendeAngabe =
   | "stundenkosten"
   | "routineanteil"
+  | "personalkostenMonat"
+  | "vermeidbarerAnteil"
   | "verpassteAnrufe"
   | "chancenanteil"
   | "abschlussquote"
@@ -336,9 +433,16 @@ export type FehlendeAngabe =
   | "rueckgewinnbar";
 
 export interface WirtschaftlichkeitErgebnis {
-  /** Zeitpotenzial rechenbar: Stundenkosten UND Routineanteil liegen vor.
-   *  Reicht für „Potenzial aus Arbeitszeit" — NICHT für ein Gesamtergebnis. */
-  zeitpotenzialRechenbar: boolean;
+  /** Welche Lesart gerechnet wurde. Die Oberfläche beschriftet das Ergebnis
+   *  danach — „Wert der freigesetzten Arbeitszeit" ist etwas anderes als
+   *  „tatsächlich vermeidbare Personalkosten", und ein Besucher darf das eine
+   *  nie für das andere halten. */
+  personalModus: PersonalModus;
+  /** Der Arbeitsnutzen des GEWÄHLTEN Modus ist rechenbar. Im Modus
+   *  `kapazitaet`: Stundenkosten UND Routineanteil liegen vor. Im Modus
+   *  `personalkosten`: Monatsvollkosten UND vermeidbarer Anteil liegen vor.
+   *  Reicht für den Zwischenstand — NICHT für ein Gesamtergebnis. */
+  arbeitsnutzenRechenbar: boolean;
   /** Chancenrechnung rechenbar. Siehe `chancenwert` für die Null-Regel. */
   chancenRechenbar: boolean;
   /** Beide Teilrechnungen liegen vor. Erst dann darf ein Nettoeffekt,
@@ -356,8 +460,23 @@ export interface WirtschaftlichkeitErgebnis {
   /** Gegenwert der potenziell freigesetzten Arbeitszeit. AUSDRÜCKLICH NICHT
    *  „eingesparte Personalkosten": Freigewordene Zeit wird nur dann zu Geld,
    *  wenn der Betrieb sie auch wirklich abbaut oder anders einsetzt.
-   *  `null`, solange Stundenkosten oder Routineanteil fehlen. */
+   *  `null`, solange Stundenkosten oder Routineanteil fehlen — und IMMER
+   *  `null` im Modus `personalkosten`, wo diese Lesart nicht gilt. */
   zeitwertProMonatEur: number | null;
+  /** Tatsächlich vermeidbare Personalkosten je Monat: Monatsvollkosten ×
+   *  vermeidbarer Anteil. `null`, solange eines der beiden Felder fehlt — und
+   *  IMMER `null` im Modus `kapazitaet`. */
+  personalersparnisProMonatEur: number | null;
+  /*
+    DER EINE ARBEITSNUTZEN, DER IN DIE SUMME GEHT.
+
+    Das ist die Stelle, an der Doppelzählung strukturell ausgeschlossen ist:
+    Nicht die Oberfläche entscheidet, was addiert wird, und es gibt keine
+    Addition zweier Arbeitsposten. Es gibt genau EIN Feld, und es trägt je
+    nach Modus entweder den Zeitwert ODER die Personalersparnis. Die jeweils
+    andere Größe ist `null` und kommt in keiner Summe vor.
+  */
+  arbeitsnutzenProMonatEur: number | null;
   /** `null`, solange ein Pflichtfeld der Chancenrechnung fehlt. */
   chancenwertProMonatEur: number | null;
 
@@ -368,7 +487,7 @@ export interface WirtschaftlichkeitErgebnis {
   /** Monatsbetrag × 12 + Einrichtung. Die Einrichtung wird NICHT weggelassen. */
   ersteJahrKostenEur: Betrag;
 
-  /** Zeitwert + Chancenwert − Cogniiq-Monatskosten.
+  /** Arbeitsnutzen (ein Modus) + Chancenwert − Cogniiq-Monatskosten.
    *  `UNVOLLSTAENDIG`, solange nicht alle Pflichtangaben vorliegen —
    *  nie eine Zahl aus einem halben Modell. */
   nettoProMonatEur: Wirtschaftsbetrag;
@@ -452,32 +571,68 @@ export function berechneWirtschaftlichkeit(
   const anteil = Math.max(0, Math.min(100, eingabe.routineanteilProzent ?? 0)) / 100;
   const routinestunden = telefonstunden * anteil;
 
-  const stundenkosten = eingabe.stundenkostenEur;
-  const zeitFehlend: FehlendeAngabe[] = [];
-  if (stundenkosten === null || Number.isNaN(stundenkosten)) zeitFehlend.push("stundenkosten");
-  if (eingabe.routineanteilProzent === null || Number.isNaN(eingabe.routineanteilProzent)) {
-    zeitFehlend.push("routineanteil");
+  const fehlt = (v: number | null | undefined) =>
+    v === null || v === undefined || Number.isNaN(v);
+
+  /*
+    DER ARBEITSNUTZEN — genau ein Modus, genau eine Zahl.
+
+    Beide Zweige liefern in ihr eigenes Feld, und nur der gewählte Zweig füllt
+    `arbeitsnutzen`. Der jeweils andere bleibt `null`. Es gibt in dieser
+    Funktion keine Zeile, die Zeitwert und Personalersparnis addiert — und das
+    ist Absicht, nicht Zufall: Beide bewerten dieselbe Arbeitskapazität.
+  */
+  const arbeitFehlend: FehlendeAngabe[] = [];
+  let zeitwert: number | null = null;
+  let personalersparnis: number | null = null;
+
+  if (eingabe.modus === "kapazitaet") {
+    const stundenkosten = eingabe.stundenkostenEur;
+    if (fehlt(stundenkosten)) arbeitFehlend.push("stundenkosten");
+    if (fehlt(eingabe.routineanteilProzent)) arbeitFehlend.push("routineanteil");
+    if (arbeitFehlend.length === 0) {
+      zeitwert = routinestunden * Math.max(0, stundenkosten as number);
+    }
+  } else {
+    const monatskosten = eingabe.personalkostenProMonatEur;
+    if (fehlt(monatskosten)) arbeitFehlend.push("personalkostenMonat");
+    if (fehlt(eingabe.vermeidbarerAnteilProzent)) arbeitFehlend.push("vermeidbarerAnteil");
+    if (arbeitFehlend.length === 0) {
+      /*
+        0 % ist eine ANGABE, kein fehlender Wert — genau wie „0 verpasste
+        Anrufe". Wer sagt, dass sich an seiner Lohnsumme nichts ändert, hat
+        vollständig geantwortet; der Arbeitsnutzen ist dann null und das
+        Gesamtergebnis fällt womöglich negativ aus. Das ist die Wahrheit für
+        diesen Betrieb und wird gezeigt.
+      */
+      const quote = Math.max(0, Math.min(100, eingabe.vermeidbarerAnteilProzent as number)) / 100;
+      personalersparnis = Math.max(0, monatskosten as number) * quote;
+    }
   }
-  const zeitpotenzialRechenbar = zeitFehlend.length === 0;
-  const zeitwert = zeitpotenzialRechenbar
-    ? routinestunden * Math.max(0, stundenkosten as number)
-    : null;
+
+  const arbeitsnutzenRechenbar = arbeitFehlend.length === 0;
+  /** Die EINE Größe, die in die Summe eingeht. Nie eine Addition der beiden. */
+  const arbeitsnutzen: number | null =
+    eingabe.modus === "kapazitaet" ? zeitwert : personalersparnis;
 
   const { wert: chancenwertProMonat, fehlend: chancenFehlend } = chancenAuswertung(chancen);
   const chancenRechenbar = chancenwertProMonat !== null;
 
-  const fehlendeAngaben = [...zeitFehlend, ...chancenFehlend];
+  const fehlendeAngaben = [...arbeitFehlend, ...chancenFehlend];
   const kosten = preis.monatlichGesamtEur;
   const einrichtung = preis.einrichtungEur;
   const preisBekannt = kosten !== UNBEKANNT && einrichtung !== UNBEKANNT;
 
   const basis = {
-    zeitpotenzialRechenbar,
+    personalModus: eingabe.modus,
+    arbeitsnutzenRechenbar,
     chancenRechenbar,
     fehlendeAngaben,
     telefonstundenProMonat: telefonstunden,
     routinestundenProMonat: routinestunden,
     zeitwertProMonatEur: zeitwert,
+    personalersparnisProMonatEur: personalersparnis,
+    arbeitsnutzenProMonatEur: arbeitsnutzen,
     chancenwertProMonatEur: chancenwertProMonat,
     kostenProMonatEur: kosten,
     einrichtungEur: einrichtung,
@@ -516,7 +671,7 @@ export function berechneWirtschaftlichkeit(
     Eine VOLLSTÄNDIGE negative Zahl dagegen wird gezeigt, unverändert. Das ist
     der Unterschied zwischen Zurückhaltung und Schönrechnen.
   */
-  const vollstaendig = zeitpotenzialRechenbar && chancenRechenbar;
+  const vollstaendig = arbeitsnutzenRechenbar && chancenRechenbar;
   if (!vollstaendig) {
     return {
       ...basis,
@@ -528,7 +683,13 @@ export function berechneWirtschaftlichkeit(
     };
   }
 
-  const nutzen = (zeitwert as number) + (chancenwertProMonat as number);
+  /*
+    Gesamtnutzen = EIN Arbeitsnutzen + Chancenwert. Die Chancen sind ein
+    eigenständiger Posten: Sie entstehen aus Anrufen, die heute niemanden
+    erreichen, und hängen an keiner der beiden Personallesarten. Sie dürfen
+    deshalb zu jedem der beiden Modi addiert werden — aber genau einmal.
+  */
+  const nutzen = (arbeitsnutzen as number) + (chancenwertProMonat as number);
   const netto = nutzen - kostenZahl;
   const ersteJahr = nutzen * MONATE_PRO_JAHR - ersteJahrKosten;
 

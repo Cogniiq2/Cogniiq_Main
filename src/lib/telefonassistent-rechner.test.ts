@@ -14,6 +14,8 @@ import {
   UNBEKANNT,
   berechnePreis,
   berechneWirtschaftlichkeit,
+  kapazitaetsEingabe,
+  personalkostenEingabe,
   minutenProMonat,
   sprachenAufschlagEur,
   waehleSzenario,
@@ -277,10 +279,10 @@ describe("Wirtschaftlichkeit", () => {
     const r = berechneWirtschaftlichkeit(
       volumen,
       preis,
-      { stundenkostenEur: null, routineanteilProzent: 30 },
+      kapazitaetsEingabe(null, 30),
       KEINE_CHANCEN
     );
-    expect(r.zeitpotenzialRechenbar).toBe(false);
+    expect(r.arbeitsnutzenRechenbar).toBe(false);
     expect(r.zeitwertProMonatEur).toBeNull();
     expect(r.amortisationMonate).toBeNull();
   });
@@ -289,7 +291,7 @@ describe("Wirtschaftlichkeit", () => {
     const r = berechneWirtschaftlichkeit(
       volumen,
       preis,
-      { stundenkostenEur: 30, routineanteilProzent: 50 },
+      kapazitaetsEingabe(30, 50),
       KEINE_CHANCEN
     );
     expect(r.telefonstundenProMonat).toBeCloseTo((300 * 2) / 60, 10); // 10 h
@@ -301,7 +303,7 @@ describe("Wirtschaftlichkeit", () => {
     const r = berechneWirtschaftlichkeit(
       volumen,
       preis,
-      { stundenkostenEur: 200, routineanteilProzent: 50 },
+      kapazitaetsEingabe(200, 50),
       KEINE_VERPASSTEN
     );
     const kosten = preis.monatlichGesamtEur as number;
@@ -314,7 +316,7 @@ describe("Wirtschaftlichkeit", () => {
     const r = berechneWirtschaftlichkeit(
       volumen,
       preis,
-      { stundenkostenEur: 10, routineanteilProzent: 10 },
+      kapazitaetsEingabe(10, 10),
       KEINE_VERPASSTEN
     );
     expect(r.nettoProMonatEur).toBeLessThan(0);
@@ -325,7 +327,7 @@ describe("Wirtschaftlichkeit", () => {
     const r = berechneWirtschaftlichkeit(
       volumen,
       preis,
-      { stundenkostenEur: 50, routineanteilProzent: 0 },
+      kapazitaetsEingabe(50, 0),
       KEINE_CHANCEN
     );
     expect(r.zeitwertProMonatEur).toBe(0);
@@ -335,7 +337,7 @@ describe("Wirtschaftlichkeit", () => {
     const r = berechneWirtschaftlichkeit(
       volumen,
       preis,
-      { stundenkostenEur: 50, routineanteilProzent: 400 },
+      kapazitaetsEingabe(50, 400),
       KEINE_CHANCEN
     );
     expect(r.routinestundenProMonat).toBeCloseTo(r.telefonstundenProMonat, 10);
@@ -346,7 +348,7 @@ describe("Wirtschaftlichkeit", () => {
     const r = berechneWirtschaftlichkeit(
       gross,
       berechnePreis(gross, 0),
-      { stundenkostenEur: 50, routineanteilProzent: 30 },
+      kapazitaetsEingabe(50, 30),
       KEINE_CHANCEN
     );
     expect(r.nettoProMonatEur).toBe(UNBEKANNT);
@@ -358,7 +360,7 @@ describe("Wirtschaftlichkeit", () => {
 describe("Optionale Chancenrechnung", () => {
   const volumen = { anrufeProMonat: 300, minutenProAnruf: 2 };
   const preis = berechnePreis(volumen, 0);
-  const basis = { stundenkostenEur: 40, routineanteilProzent: 30 };
+  const basis = kapazitaetsEingabe(40, 30);
 
   it("bleibt leer, solange ein einziges Feld fehlt", () => {
     const teil: ChancenEingabe = {
@@ -408,5 +410,195 @@ describe("Optionale Chancenrechnung", () => {
     };
     const r = berechneWirtschaftlichkeit(volumen, preis, basis, keine);
     expect(r.chancenwertProMonatEur).toBe(0);
+  });
+});
+
+/* ───────────────────────────────────────────────────────────────────────────
+   DIE ZWEI PERSONALLESARTEN — Korrektur vom 12.09.2026.
+
+   Der alte Rechner kannte nur „Telefonstunden × Stundensatz". Diese Rechnung
+   ist mathematisch korrekt und beantwortet trotzdem nur eine von zwei Fragen:
+   Sie bewertet freigesetzte ZEIT. Wo Cogniiq eine Stelle tatsächlich
+   überflüssig macht oder eine Einstellung vermeidet, ist die Ersparnis der
+   Wegfall einer Personalposition — und die hängt am Dienstplan, nicht an der
+   Sprechzeit.
+
+   Was hier geprüft wird, ist vor allem die Grenze zwischen den beiden: Sie
+   bewerten DIESELBE Arbeitskapazität und dürfen deshalb nie zusammen in einer
+   Summe stehen.
+   ────────────────────────────────────────────────────────────────────────── */
+describe("Personallesart A — Kapazität (die Person bleibt)", () => {
+  const volumen = { anrufeProMonat: 300, minutenProAnruf: 2 }; // 600 Min. = 10 Std.
+  const preis = berechnePreis(volumen, 0);
+
+  it("bewertet 10 Routinestunden × 35 €/h mit 350 €", () => {
+    // 10 Telefonstunden × 100 % Routineanteil = 10 Routinestunden.
+    const r = berechneWirtschaftlichkeit(
+      volumen,
+      preis,
+      kapazitaetsEingabe(35, 100),
+      KEINE_VERPASSTEN
+    );
+    expect(r.telefonstundenProMonat).toBeCloseTo(10, 10);
+    expect(r.routinestundenProMonat).toBeCloseTo(10, 10);
+    expect(r.zeitwertProMonatEur).toBeCloseTo(350, 10);
+    expect(r.arbeitsnutzenProMonatEur).toBeCloseTo(350, 10);
+    // Die Personallesart B ist in diesem Modus nicht bloß 0, sondern NICHT DA.
+    expect(r.personalersparnisProMonatEur).toBeNull();
+    expect(r.personalModus).toBe("kapazitaet");
+  });
+
+  it("meldet den Modus im Ergebnis, damit die Oberfläche richtig beschriftet", () => {
+    const r = berechneWirtschaftlichkeit(
+      volumen,
+      preis,
+      kapazitaetsEingabe(35, 100),
+      KEINE_VERPASSTEN
+    );
+    expect(r.personalModus).toBe("kapazitaet");
+  });
+});
+
+describe("Personallesart B — tatsächlich vermeidbare Personalkosten", () => {
+  const volumen = { anrufeProMonat: 300, minutenProAnruf: 2 };
+  const preis = berechnePreis(volumen, 0);
+  const modusB = (kosten: number | null, anteil: number | null) =>
+    berechneWirtschaftlichkeit(volumen, preis, personalkostenEingabe(kosten, anteil), KEINE_VERPASSTEN);
+
+  it("4.000 € Vollkosten × 75 % vermeidbar = 3.000 €", () => {
+    const r = modusB(4000, 75);
+    expect(r.personalersparnisProMonatEur).toBeCloseTo(3000, 10);
+    expect(r.arbeitsnutzenProMonatEur).toBeCloseTo(3000, 10);
+    expect(r.personalModus).toBe("personalkosten");
+  });
+
+  it("vollständiger Wegfall der Position: 4.000 € × 100 % = 4.000 €", () => {
+    expect(modusB(4000, 100).personalersparnisProMonatEur).toBeCloseTo(4000, 10);
+  });
+
+  it("keine vermeidbare Lohnsumme: 4.000 € × 0 % = 0 € — und das ist VOLLSTÄNDIG", () => {
+    const r = modusB(4000, 0);
+    expect(r.personalersparnisProMonatEur).toBe(0);
+    expect(r.arbeitsnutzenRechenbar).toBe(true);
+    // Eine 0 aus einer Angabe ist ein Ergebnis, kein fehlendes Feld — genau
+    // wie „0 verpasste Anrufe". Die Rechnung ist damit vollständig, und ein
+    // danach negatives Gesamtergebnis ist die Wahrheit für diesen Betrieb.
+    expect(r.vollstaendig).toBe(true);
+    expect(typeof r.nettoProMonatEur).toBe("number");
+  });
+
+  it("verteilt KEINE Vollkosten auf Telefonminuten — das Anrufaufkommen ändert die Ersparnis nicht", () => {
+    /*
+      Der eigentliche Inhalt dieser Lesart: Die Empfangskraft wird für ihren
+      Dienstplan bezahlt. Verdoppelt sich das Anrufaufkommen, ändert das den
+      Cogniiq-Preis — aber nicht die Lohnsumme, die wegfällt.
+    */
+    const wenig = { anrufeProMonat: 100, minutenProAnruf: 2 };
+    const viel = { anrufeProMonat: 400, minutenProAnruf: 2 };
+    const a = berechneWirtschaftlichkeit(
+      wenig,
+      berechnePreis(wenig, 0),
+      personalkostenEingabe(4000, 75),
+      KEINE_VERPASSTEN
+    );
+    const b = berechneWirtschaftlichkeit(
+      viel,
+      berechnePreis(viel, 0),
+      personalkostenEingabe(4000, 75),
+      KEINE_VERPASSTEN
+    );
+    expect(a.personalersparnisProMonatEur).toBeCloseTo(3000, 10);
+    expect(b.personalersparnisProMonatEur).toBeCloseTo(3000, 10);
+  });
+
+  it("ohne Monatsvollkosten: unvollständig, kein Gesamtergebnis", () => {
+    const r = modusB(null, 75);
+    expect(r.arbeitsnutzenRechenbar).toBe(false);
+    expect(r.vollstaendig).toBe(false);
+    expect(r.fehlendeAngaben).toContain("personalkostenMonat");
+    expect(typeof r.nettoProMonatEur).not.toBe("number");
+    expect(typeof r.ersteJahrNettoEur).not.toBe("number");
+    expect(r.amortisationMonate).toBeNull();
+  });
+
+  it("ohne vermeidbaren Anteil: unvollständig, kein Gesamtergebnis", () => {
+    const r = modusB(4000, null);
+    expect(r.arbeitsnutzenRechenbar).toBe(false);
+    expect(r.vollstaendig).toBe(false);
+    expect(r.fehlendeAngaben).toContain("vermeidbarerAnteil");
+    expect(typeof r.nettoProMonatEur).not.toBe("number");
+  });
+
+  it("verlangt in diesem Modus KEINEN Stundensatz und KEINEN Routineanteil", () => {
+    // Die Mode-A-Felder dürfen die Vollständigkeit hier nicht blockieren.
+    const r = modusB(4000, 75);
+    expect(r.fehlendeAngaben).not.toContain("stundenkosten");
+    expect(r.fehlendeAngaben).not.toContain("routineanteil");
+    expect(r.vollstaendig).toBe(true);
+  });
+});
+
+describe("Keine Doppelzählung der Arbeitskapazität", () => {
+  const volumen = { anrufeProMonat: 300, minutenProAnruf: 2 };
+  const preis = berechnePreis(volumen, 0);
+
+  it("Modus B addiert den Zeitwert NICHT dazu", () => {
+    const r = berechneWirtschaftlichkeit(
+      volumen,
+      preis,
+      personalkostenEingabe(4000, 75),
+      KEINE_VERPASSTEN
+    );
+    // 3.000 € — nicht 3.000 € + 350 €.
+    expect(r.arbeitsnutzenProMonatEur).toBeCloseTo(3000, 10);
+    expect(r.zeitwertProMonatEur).toBeNull();
+  });
+
+  it("Modus A addiert die Personalersparnis NICHT dazu", () => {
+    const r = berechneWirtschaftlichkeit(
+      volumen,
+      preis,
+      kapazitaetsEingabe(35, 100),
+      KEINE_VERPASSTEN
+    );
+    expect(r.arbeitsnutzenProMonatEur).toBeCloseTo(350, 10);
+    expect(r.personalersparnisProMonatEur).toBeNull();
+  });
+
+  it("der Konstruktor macht es unmöglich, Felder beider Modi zu füllen", () => {
+    /*
+      Die strukturelle Absicherung: Nicht die Oberfläche entscheidet, was in
+      die Summe geht. Die Konstruktoren nullen die Felder des jeweils anderen
+      Modus — ein Aufrufer KANN nicht beide Lesarten gleichzeitig befüllen.
+    */
+    const a = kapazitaetsEingabe(35, 100);
+    expect(a.personalkostenProMonatEur).toBeNull();
+    expect(a.vermeidbarerAnteilProzent).toBeNull();
+    const b = personalkostenEingabe(4000, 75);
+    expect(b.stundenkostenEur).toBeNull();
+    expect(b.routineanteilProzent).toBeNull();
+  });
+
+  it("in beiden Modi gilt: Nutzen = genau ein Arbeitsposten + Chancenwert", () => {
+    const chancen = {
+      verpassteAnrufeProMonat: 40,
+      davonChancenProzent: 50,
+      abschlussquoteProzent: 50,
+      deckungsbeitragEur: 100,
+      rueckgewinnbarProzent: 50,
+    };
+    // 40 × 0,5 × 0,5 × 100 € × 0,5 = 500 €
+    const chancenwert = 500;
+    const volumen2 = { anrufeProMonat: 300, minutenProAnruf: 2 };
+    const preis2 = berechnePreis(volumen2, 0);
+    const kosten = preis2.monatlichGesamtEur as number;
+
+    const a = berechneWirtschaftlichkeit(volumen2, preis2, kapazitaetsEingabe(35, 100), chancen);
+    expect(a.chancenwertProMonatEur).toBeCloseTo(chancenwert, 10);
+    expect(a.nettoProMonatEur as number).toBeCloseTo(350 + chancenwert - kosten, 10);
+
+    const b = berechneWirtschaftlichkeit(volumen2, preis2, personalkostenEingabe(4000, 75), chancen);
+    expect(b.chancenwertProMonatEur).toBeCloseTo(chancenwert, 10);
+    expect(b.nettoProMonatEur as number).toBeCloseTo(3000 + chancenwert - kosten, 10);
   });
 });

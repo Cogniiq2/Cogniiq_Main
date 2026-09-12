@@ -37,6 +37,9 @@ import {
   UNBEKANNT,
   berechnePreis,
   berechneWirtschaftlichkeit,
+  kapazitaetsEingabe,
+  personalkostenEingabe,
+  type PersonalModus,
   eur,
   zahl,
   type ChancenEingabe,
@@ -199,12 +202,62 @@ function Zeile({
 const FEHLT_LABEL: Record<FehlendeAngabe, string> = {
   stundenkosten: "Vollkosten einer Arbeitsstunde",
   routineanteil: "Anteil Ihrer Routineabläufe",
+  personalkostenMonat: "monatliche Vollkosten der Telefon-/Empfangsbesetzung",
+  vermeidbarerAnteil: "tatsächlich vermeidbarer Anteil dieser Kosten",
   verpassteAnrufe: "heute nicht bearbeitete relevante Anrufe",
   chancenanteil: "Anteil echter Chancen",
   abschlussquote: "Abschluss- bzw. Buchungsquote",
   deckungsbeitrag: "Deckungsbeitrag je gewonnenem Fall",
   rueckgewinnbar: "realistisch zurückgewinnbarer Anteil",
 };
+
+/**
+ * Die Wahl zwischen den beiden wirtschaftlichen Lesarten.
+ *
+ * BEWUSST NEUTRAL GESTALTET. Beide Karten sind gleich groß, gleich
+ * formuliert und tragen dieselbe Betonung; die aktive ist markiert, nicht
+ * empfohlen. Es gibt kein „empfohlen", kein Häkchen-Icon an der einen und
+ * keinen Hinweis, dass die eine mehr Ersparnis ergibt. Modus B ergibt in
+ * fast jedem Betrieb das größere Ergebnis — genau deshalb darf die
+ * Oberfläche nicht dorthin schieben. Die Frage ist eine Tatsachenfrage über
+ * den Betrieb des Besuchers, keine Präferenz.
+ *
+ * `role="radio"` statt zweier Buttons ohne Semantik: Für die Tastatur- und
+ * Screenreader-Bedienung ist das eine Auswahl aus zwei sich ausschließenden
+ * Möglichkeiten, und genau so wird sie angesagt.
+ */
+function ModusWahl({
+  aktiv,
+  titel,
+  erklaerung,
+  onClick,
+}: {
+  aktiv: boolean;
+  titel: string;
+  erklaerung: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={aktiv}
+      onClick={onClick}
+      className={`text-left rounded-xl border p-5 transition-colors min-h-[44px] ${
+        aktiv
+          ? "border-gray-900 dark:border-gray-100 bg-gray-50 dark:bg-gray-800/60"
+          : "border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500"
+      }`}
+    >
+      <span className="block text-[16px] font-semibold text-gray-900 dark:text-gray-100 leading-[1.45]">
+        {titel}
+      </span>
+      <span className="block text-[14px] text-gray-600 dark:text-gray-400 leading-[1.6] mt-2">
+        {erklaerung}
+      </span>
+    </button>
+  );
+}
 
 /** Nummerierte Zwischenüberschrift. Macht den Ablauf als Ablauf lesbar, ohne
  *  einen Assistenten mit Seitenwechseln zu bauen — alles bleibt auf einer
@@ -260,8 +313,20 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
   const [anrufe, setAnrufe] = useState<number | null>(START_ANRUFE);
   const [dauer, setDauer] = useState<number | null>(START_DAUER);
   const [sprachen, setSprachen] = useState<Zusatzsprachen>(0);
+  /*
+    PERSONALMODUS — die wirtschaftliche Lesart, die der Besucher wählt.
+
+    Vorbelegt ist `kapazitaet`, und zwar NICHT weil sie die richtige wäre,
+    sondern weil sie die ZURÜCKHALTENDERE ist: Sie bewertet nur freigesetzte
+    Zeit und behauptet keine Lohnersparnis. Mit `personalkosten` als Vorgabe
+    würde der Rechner einem Besucher, der nur klickt, das größere Ergebnis
+    unterschieben. Die Vorgabe darf nie die sein, die besser aussieht.
+  */
+  const [personalModus, setPersonalModus] = useState<PersonalModus>("kapazitaet");
   const [stundenkosten, setStundenkosten] = useState<number | null>(null);
   const [routineanteil, setRoutineanteil] = useState<number | null>(null);
+  const [personalkostenMonat, setPersonalkostenMonat] = useState<number | null>(null);
+  const [vermeidbarerAnteil, setVermeidbarerAnteil] = useState<number | null>(null);
   const [verpasst, setVerpasst] = useState<number | null>(null);
   const [chancenAnteil, setChancenAnteil] = useState<number | null>(null);
   const [abschluss, setAbschluss] = useState<number | null>(null);
@@ -285,17 +350,28 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
     rueckgewinnbarProzent: rueckgewinn,
   };
 
+  /*
+    Der Kern bekommt AUSSCHLIESSLICH die Felder des gewählten Modus — die des
+    anderen setzt der Konstruktor auf `null`. Ein Besucher, der erst Modus A
+    ausfüllt und dann auf B wechselt, kann deshalb nicht versehentlich beide
+    Arbeitsposten in einer Summe landen lassen. Seine Eingaben bleiben im
+    State erhalten, damit ein Rückwechsel nichts vernichtet; in die Rechnung
+    geht immer nur eine Lesart.
+  */
   const wirtschaft = useMemo(
     () =>
       berechneWirtschaftlichkeit(
         volumen,
         preis,
-        { stundenkostenEur: stundenkosten, routineanteilProzent: routineanteil },
+        personalModus === "kapazitaet"
+          ? kapazitaetsEingabe(stundenkosten, routineanteil)
+          : personalkostenEingabe(personalkostenMonat, vermeidbarerAnteil),
         chancen
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
-      anrufe, dauer, preis, stundenkosten, routineanteil,
+      anrufe, dauer, preis, personalModus, stundenkosten, routineanteil,
+      personalkostenMonat, vermeidbarerAnteil,
       verpasst, chancenAnteil, abschluss, deckungsbeitrag, rueckgewinn,
     ]
   );
@@ -426,8 +502,8 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
               wert={eur(s.telefonieMonatlichEur, 2)}
               hinweis={
                 s.amDeckel
-                  ? `Auf die Obergrenze Ihres Tarifs gedeckelt (${s.tarif.obergrenze}). Läuft ein Tarif dauerhaft am Deckel, ordnen wir Sie dem günstigeren nächsten Tarif zu.`
-                  : `Obergrenze dieses Tarifs: ${s.tarif.obergrenze} — mehr wird es in keinem Monat.`
+                  ? `Auf die Telefonie-Obergrenze Ihres Tarifs gedeckelt (${s.tarif.obergrenze}) — sie gilt für Grundpreis und Mehrverbrauch. Läuft ein Tarif dauerhaft am Deckel, ordnen wir Sie dem günstigeren nächsten Tarif zu.`
+                  : `Telefonie-Obergrenze dieses Tarifs: ${s.tarif.obergrenze}. Mehr als das kosten Grundpreis und Mehrverbrauch in keinem Monat — Zusatzsprachen und Anbindung stehen als eigene Positionen darunter.`
               }
             />
             )}
@@ -501,41 +577,102 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
         <p className={`${HINT} mb-7`}>
           Zwei Schritte, dann steht die vollständige Rechnung. Sie läuft
           ausschließlich mit Ihren Angaben — wir setzen weder einen Stundensatz
-          noch einen Routineanteil, eine Abschlussquote oder einen
-          Deckungsbeitrag für Sie ein. Felder, die Sie nicht wissen, lassen Sie
-          leer; dann rechnen wir diesen Teil nicht.
+          noch einen Routineanteil, weder Personalkosten noch eine
+          Abschlussquote oder einen Deckungsbeitrag für Sie ein. Felder, die
+          Sie nicht wissen, lassen Sie leer; dann rechnen wir diesen Teil
+          nicht.
         </p>
 
-        {/* ── Schritt 1: Personalkosten ─────────────────────────────────── */}
-        <Schritt nummer={1} titel="Was Sie die Telefonzeit heute kostet" />
-        <div className="grid sm:grid-cols-2 gap-6 mb-6">
-          <Zahlenfeld
-            label="Vollkosten einer Arbeitsstunde"
-            hinweis="Bruttolohn plus Arbeitgeberkosten der Person, die sonst ans Telefon geht."
-            wert={stundenkosten}
-            onChange={(v) => { meldeRoiStart(); setStundenkosten(v); }}
-            min={0}
-            max={150}
-            step={1}
-            einheit="€ / Stunde"
-            schieber={false}
-            platzhalter="z. B. 35"
+        {/* ── Schritt 1: Was mit der Personalsituation tatsächlich passiert ──
+            Die Frage steht VOR den Zahlen, weil sie entscheidet, welche Zahlen
+            überhaupt sinnvoll sind. Wer sie überspringt, rechnet sonst
+            Telefonminuten gegen ein Monatsgehalt — oder bucht ein Gehalt als
+            Ersparnis, das weiterhin gezahlt wird. ──────────────────────── */}
+        <Schritt nummer={1} titel="Was passiert bei Ihnen mit der Besetzung?" />
+        <p className={`${HINT} mb-5`}>
+          Davon hängt ab, was wirtschaftlich überhaupt zählt. Beide Wege sind
+          legitim; welcher zutrifft, wissen nur Sie. Wir rechnen immer nur
+          einen von beiden — freigesetzte Zeit und wegfallende Personalkosten
+          bewerten dieselbe Arbeitskapazität und dürfen nicht addiert werden.
+        </p>
+        <div className="grid sm:grid-cols-2 gap-4 mb-7" role="radiogroup" aria-label="Wirtschaftliche Lesart der Personalsituation">
+          <ModusWahl
+            aktiv={personalModus === "kapazitaet"}
+            titel="Mitarbeiter bleibt — Zeit wird für andere Aufgaben frei"
+            erklaerung="Der Rechner bewertet ausschließlich die Arbeitszeit, die Cogniiq freimacht. Keine Aussage über Ihre Lohnsumme."
+            onClick={() => { meldeRoiStart(); setPersonalModus("kapazitaet"); }}
           />
-          <Zahlenfeld
-            label="Anteil Ihrer Anrufe, die zu konfigurierten Routineabläufen gehören"
-            hinweis="Ihre Einschätzung Ihres Anrufmix — nicht unsere Erfolgsquote. Diese Routineabläufe wickelt der Cogniiq-Telefonassistent vollständig ab: annehmen, sprechen, buchen, verschieben, absagen, abschließen. Ausnahmen und bewusst menschlich gehaltene Fälle werden nach Ihren Regeln eskaliert."
-            wert={routineanteil}
-            onChange={(v) => { meldeRoiStart(); setRoutineanteil(v); }}
-            min={0}
-            max={100}
-            step={5}
-            einheit="%"
-            schieber={false}
-            platzhalter="z. B. 60"
+          <ModusWahl
+            aktiv={personalModus === "personalkosten"}
+            titel="Personalkosten sinken oder eine Einstellung wird vermieden"
+            erklaerung="Nur wählen, wenn monatliche Personalkosten tatsächlich wegfallen oder gar nicht erst entstehen — etwa eine reduzierte Stelle, eine vermiedene Nachbesetzung oder ein gekündigter externer Telefonservice."
+            onClick={() => { meldeRoiStart(); setPersonalModus("personalkosten"); }}
           />
         </div>
 
-        {wirtschaft.zeitpotenzialRechenbar && (
+        {personalModus === "kapazitaet" ? (
+          <div className="grid sm:grid-cols-2 gap-6 mb-6">
+            <Zahlenfeld
+              label="Vollkosten einer Arbeitsstunde"
+              hinweis="Bruttolohn plus Arbeitgeberkosten der Person, die sonst ans Telefon geht."
+              wert={stundenkosten}
+              onChange={(v) => { meldeRoiStart(); setStundenkosten(v); }}
+              min={0}
+              max={150}
+              step={1}
+              einheit="€ / Stunde"
+              schieber={false}
+              platzhalter="z. B. 35"
+            />
+            <Zahlenfeld
+              label="Anteil Ihrer Anrufe, die zu konfigurierten Routineabläufen gehören"
+              hinweis="Ihre Einschätzung Ihres Anrufmix — nicht unsere Erfolgsquote. Diese Routineabläufe wickelt der Cogniiq-Telefonassistent vollständig ab: annehmen, sprechen, buchen, verschieben, absagen, abschließen. Ausnahmen und bewusst menschlich gehaltene Fälle werden nach Ihren Regeln eskaliert."
+              wert={routineanteil}
+              onChange={(v) => { meldeRoiStart(); setRoutineanteil(v); }}
+              min={0}
+              max={100}
+              step={5}
+              einheit="%"
+              schieber={false}
+              platzhalter="z. B. 60"
+            />
+          </div>
+        ) : (
+          /*
+            KEINE TELEFONMINUTEN IN DIESEM MODUS. Das ist der ganze Punkt: Die
+            Empfangskraft wird für ihren Dienstplan bezahlt, nicht für die
+            Minuten, in denen sie spricht. Die Vollkosten über die Sprechzeit
+            zu verteilen würde denselben Denkfehler wiederholen.
+          */
+          <div className="grid sm:grid-cols-2 gap-6 mb-6">
+            <Zahlenfeld
+              label="Monatliche Vollkosten der heutigen bzw. vermiedenen Telefon-/Empfangsbesetzung"
+              hinweis="Arbeitgeber-Vollkosten, nicht Netto- und nicht Bruttogehalt: Bruttolohn plus Arbeitgeberanteile, Umlagen und sonstige Personalnebenkosten. Bei einem externen Telefonservice: der monatliche Rechnungsbetrag. Wir setzen hier bewusst nichts ein."
+              wert={personalkostenMonat}
+              onChange={(v) => { meldeRoiStart(); setPersonalkostenMonat(v); }}
+              min={0}
+              max={20000}
+              step={100}
+              einheit="€ / Monat"
+              schieber={false}
+              platzhalter="z. B. 4.000"
+            />
+            <Zahlenfeld
+              label="Welcher Anteil dieser Kosten entfällt oder wird durch Cogniiq tatsächlich vermieden?"
+              hinweis="Ihre Einschätzung. 100 % nur, wenn die Position vollständig wegfällt oder gar nicht erst besetzt wird. Bleibt ein Teil der Stelle für andere Aufgaben bestehen, gehört nur der wegfallende Teil hierher. 0 % ist eine gültige Antwort — dann ändert sich an Ihrer Lohnsumme nichts."
+              wert={vermeidbarerAnteil}
+              onChange={(v) => { meldeRoiStart(); setVermeidbarerAnteil(v); }}
+              min={0}
+              max={100}
+              step={5}
+              einheit="%"
+              schieber={false}
+              platzhalter="z. B. 75"
+            />
+          </div>
+        )}
+
+        {wirtschaft.arbeitsnutzenRechenbar && (
           <div
             className="mb-8 rounded-xl bg-gray-50 dark:bg-gray-800/50 px-5 py-4"
             aria-live="polite"
@@ -546,24 +683,49 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
               Das hier ist EIN Posten von zweien.
             */}
             <p className="text-[13px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
-              Zwischenstand · Potenzial aus Arbeitszeit
+              {personalModus === "kapazitaet"
+                ? "Zwischenstand · Wert der freigesetzten Arbeitszeit"
+                : "Zwischenstand · Tatsächlich vermeidbare Personalkosten"}
             </p>
-            <Zeile
-              label="Telefonzeit pro Monat"
-              wert={`${zahl(wirtschaft.telefonstundenProMonat, 1)} Std.`}
-              hinweis="Gesprächsminuten ÷ 60"
-            />
-            <Zeile
-              label="Davon konfigurierte Routineabläufe"
-              wert={`${zahl(wirtschaft.routinestundenProMonat, 1)} Std.`}
-              hinweis={`Telefonzeit × ${zahl(routineanteil ?? 0)} % — diese Abläufe wickelt der Assistent vollständig ab, bis zu 100 % der konfigurierten Routineanrufe. Was nicht dazugehört, bleibt bei Ihnen.`}
-            />
-            <Zeile
-              label="Gegenwert dieser Arbeitszeit"
-              wert={eur(wirtschaft.zeitwertProMonatEur ?? 0)}
-              stark
-              hinweis="Freigesetzte Arbeitszeit ist nicht automatisch eingesparte Personalkosten. Zu Geld wird sie erst, wenn Sie sie tatsächlich abbauen oder anders einsetzen."
-            />
+            {personalModus === "kapazitaet" ? (
+              <>
+                <Zeile
+                  label="Telefonzeit pro Monat"
+                  wert={`${zahl(wirtschaft.telefonstundenProMonat, 1)} Std.`}
+                  hinweis="Gesprächsminuten ÷ 60"
+                />
+                <Zeile
+                  label="Davon konfigurierte Routineabläufe"
+                  wert={`${zahl(wirtschaft.routinestundenProMonat, 1)} Std.`}
+                  hinweis={`Telefonzeit × ${zahl(routineanteil ?? 0)} % — diese Abläufe wickelt der Assistent vollständig ab, bis zu 100 % der konfigurierten Routineanrufe. Was nicht dazugehört, bleibt bei Ihnen.`}
+                />
+                <Zeile
+                  label="Wert der freigesetzten Arbeitszeit"
+                  wert={eur(wirtschaft.zeitwertProMonatEur ?? 0)}
+                  stark
+                  hinweis="Freigesetzte Arbeitszeit ist nicht automatisch eingesparte Personalkosten. Zu Geld wird sie erst, wenn Sie sie tatsächlich abbauen oder anders einsetzen."
+                />
+              </>
+            ) : (
+              <>
+                <Zeile
+                  label="Monatliche Vollkosten der Besetzung"
+                  wert={eur(personalkostenMonat ?? 0)}
+                  hinweis="Ihre Angabe — Arbeitgeber-Vollkosten, nicht Brutto- oder Nettogehalt."
+                />
+                <Zeile
+                  label="Davon tatsächlich vermeidbar"
+                  wert={`${zahl(vermeidbarerAnteil ?? 0)} %`}
+                  hinweis="Ihre Angabe. Nur der Teil, der durch Cogniiq wirklich entfällt oder gar nicht erst entsteht."
+                />
+                <Zeile
+                  label="Tatsächlich vermeidbare Personalkosten"
+                  wert={eur(wirtschaft.personalersparnisProMonatEur ?? 0)}
+                  stark
+                  hinweis={`${eur(personalkostenMonat ?? 0)} × ${zahl(vermeidbarerAnteil ?? 0)} %. Diese Rechnung verteilt keine Vollkosten auf Telefonminuten — genau darum geht es in dieser Lesart: Die Besetzung wird für den Dienstplan bezahlt, nicht für die Sprechzeit.`}
+                />
+              </>
+            )}
           </div>
         )}
 
@@ -680,10 +842,10 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
               </h4>
               <p className="text-[16px] text-gray-600 dark:text-gray-400 leading-[1.7] mb-4">
                 Ihre bisherige Rechnung berücksichtigt noch nicht alle
-                wirtschaftlichen Effekte. Ergänzen Sie die Angaben zu
-                verpassten beziehungsweise nicht bearbeiteten Anrufen, damit wir
-                den vollständigen Vergleich berechnen können. Bis dahin zeigen
-                wir kein Gesamtergebnis — weder ein gutes noch ein schlechtes.
+                wirtschaftlichen Effekte. Ergänzen Sie die unten genannten
+                Angaben, damit wir den vollständigen Vergleich berechnen
+                können. Bis dahin zeigen wir kein Gesamtergebnis — weder ein
+                gutes noch ein schlechtes.
               </p>
               <p className="text-[16px] font-medium text-gray-800 dark:text-gray-200">
                 Es {wirtschaft.fehlendeAngaben.length === 1 ? "fehlt noch eine Angabe" : `fehlen noch ${zahl(wirtschaft.fehlendeAngaben.length)} Angaben`}:{" "}
@@ -695,20 +857,43 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
               <h4 className="text-[17px] font-semibold text-gray-900 dark:text-gray-100 mb-4">
                 Ihr wirtschaftliches Gesamtergebnis
               </h4>
+              {/*
+                DIE BESCHRIFTUNG IST HIER DIE EIGENTLICHE ARBEIT. „Wert der
+                freigesetzten Arbeitszeit" und „tatsächlich vermeidbare
+                Personalkosten" sind wirtschaftlich zwei verschiedene Dinge,
+                und ein Besucher darf das eine nie für das andere halten. Es
+                steht genau EINE Arbeitszeile hier — welche, sagt der Modus.
+              */}
               <Zeile
-                label="Potenzial aus Arbeitszeit"
-                wert={eur(wirtschaft.zeitwertProMonatEur ?? 0)}
+                label={
+                  wirtschaft.personalModus === "kapazitaet"
+                    ? "Wert der freigesetzten Arbeitszeit"
+                    : "Tatsächlich vermeidbare Personalkosten"
+                }
+                wert={eur(wirtschaft.arbeitsnutzenProMonatEur ?? 0)}
+                hinweis={
+                  wirtschaft.personalModus === "kapazitaet"
+                    ? "Kapazität, nicht Kassenstand: Diese Zeit wird erst zu Geld, wenn Sie sie tatsächlich abbauen oder anders einsetzen."
+                    : "Lohnkosten, die durch Cogniiq wegfallen oder gar nicht erst entstehen — nach Ihrer eigenen Einschätzung des vermeidbaren Anteils."
+                }
               />
               <Zeile
-                label="Potenzial aus zurückgewonnenen Anfragen"
+                label="Wert zurückgewonnener Chancen"
                 wert={eur(wirtschaft.chancenwertProMonatEur ?? 0)}
+              />
+              <Zeile
+                label="Gesamter monatlicher Nutzen"
+                wert={eur(
+                  (wirtschaft.arbeitsnutzenProMonatEur ?? 0) +
+                    (wirtschaft.chancenwertProMonatEur ?? 0)
+                )}
               />
               <Zeile
                 label="Cogniiq pro Monat"
                 wert={`− ${eur(wirtschaft.kostenProMonatEur, 2)}`}
               />
               <Zeile
-                label="Rechnerischer Nettoeffekt pro Monat"
+                label="Nettoeffekt pro Monat"
                 wert={eur(wirtschaft.nettoProMonatEur as number)}
                 stark
                 hinweis={

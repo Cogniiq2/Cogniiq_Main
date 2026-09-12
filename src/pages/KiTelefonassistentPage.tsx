@@ -1594,6 +1594,7 @@ function RechnerSection() {
           Was das bei Ihrem Anrufaufkommen kostet — und ob es sich rechnet
         </h2>
         <p className={`${PROSE} mb-4`}>{GENERISCH_DECKELUNG.text}</p>
+        <p className={`${PROSE} mb-4`}>{GENERISCH_DECKELUNG.geltung}</p>
         <p className={`${PROSE} mb-4`}>{GENERISCH_DECKELUNG.tarifwechsel}</p>
         <p className={`${PROSE} mb-10`}>
           Rechnen Sie es selbst durch. Keine E-Mail, keine Anmeldung, kein

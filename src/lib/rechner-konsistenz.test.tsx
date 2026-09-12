@@ -37,6 +37,8 @@ import {
   anrufeProMonatAusWoche,
   berechnePreis,
   berechneWirtschaftlichkeit,
+  kapazitaetsEingabe,
+  personalkostenEingabe,
   UNVOLLSTAENDIG,
   waehleSzenario,
 } from '@/lib/telefonassistent-rechner';
@@ -211,7 +213,7 @@ describe('Wirtschaftlichkeit — eine Definition, drei Zustände', () => {
     deckungsbeitragEur: 200,
     rueckgewinnbarProzent: 50,
   };
-  const ZEIT = { stundenkostenEur: 40, routineanteilProzent: 60 };
+  const ZEIT = kapazitaetsEingabe(40, 60);
 
   // ── Zustand 1: unvollständig ──────────────────────────────────────────
   /*
@@ -241,7 +243,7 @@ describe('Wirtschaftlichkeit — eine Definition, drei Zustände', () => {
       berechneWirtschaftlichkeit(
         volumen,
         preis,
-        { stundenkostenEur: null, routineanteilProzent: null },
+        kapazitaetsEingabe(null, null),
         KEINE_CHANCEN
       ).fehlendeAngaben
     ).toEqual(['stundenkosten', 'routineanteil', 'verpassteAnrufe']);
@@ -257,7 +259,7 @@ describe('Wirtschaftlichkeit — eine Definition, drei Zustände', () => {
 
   it('zeigt das Zeitpotenzial auch dann, wenn die Gesamtrechnung noch fehlt', () => {
     const r = berechneWirtschaftlichkeit(volumen, preis, ZEIT, KEINE_CHANCEN);
-    expect(r.zeitpotenzialRechenbar).toBe(true);
+    expect(r.arbeitsnutzenRechenbar).toBe(true);
     expect(r.zeitwertProMonatEur).toBeGreaterThan(0);
     expect(r.vollstaendig).toBe(false);
   });
@@ -266,20 +268,20 @@ describe('Wirtschaftlichkeit — eine Definition, drei Zustände', () => {
     const ohneSatz = berechneWirtschaftlichkeit(
       volumen,
       preis,
-      { stundenkostenEur: null, routineanteilProzent: 60 },
+      kapazitaetsEingabe(null, 60),
       VOLLER_TRICHTER
     );
-    expect(ohneSatz.zeitpotenzialRechenbar).toBe(false);
+    expect(ohneSatz.arbeitsnutzenRechenbar).toBe(false);
     expect(ohneSatz.zeitwertProMonatEur).toBeNull();
     expect(ohneSatz.nettoProMonatEur).toBe(UNVOLLSTAENDIG);
 
     const ohneAnteil = berechneWirtschaftlichkeit(
       volumen,
       preis,
-      { stundenkostenEur: 40, routineanteilProzent: null },
+      kapazitaetsEingabe(40, null),
       VOLLER_TRICHTER
     );
-    expect(ohneAnteil.zeitpotenzialRechenbar).toBe(false);
+    expect(ohneAnteil.arbeitsnutzenRechenbar).toBe(false);
     expect(ohneAnteil.nettoProMonatEur).toBe(UNVOLLSTAENDIG);
   });
 
@@ -298,7 +300,7 @@ describe('Wirtschaftlichkeit — eine Definition, drei Zustände', () => {
     const r = berechneWirtschaftlichkeit(
       volumen,
       preis,
-      { stundenkostenEur: 60, routineanteilProzent: 80 },
+      kapazitaetsEingabe(60, 80),
       VOLLER_TRICHTER
     );
     expect(r.vollstaendig).toBe(true);
@@ -318,7 +320,7 @@ describe('Wirtschaftlichkeit — eine Definition, drei Zustände', () => {
     const r = berechneWirtschaftlichkeit(
       volumen,
       preis,
-      { stundenkostenEur: 12, routineanteilProzent: 5 },
+      kapazitaetsEingabe(12, 5),
       { ...VOLLER_TRICHTER, verpassteAnrufeProMonat: 1, deckungsbeitragEur: 10 }
     );
     expect(r.vollstaendig).toBe(true);
@@ -349,7 +351,7 @@ describe('Wirtschaftlichkeit — eine Definition, drei Zustände', () => {
     const r = berechneWirtschaftlichkeit(
       volumen,
       preis,
-      { stundenkostenEur: 60, routineanteilProzent: 80 },
+      kapazitaetsEingabe(60, 80),
       VOLLER_TRICHTER
     );
     const ohneEinrichtung = (r.nettoProMonatEur as number) * 12;
@@ -365,7 +367,7 @@ describe('Wirtschaftlichkeit — eine Definition, drei Zustände', () => {
     const r = berechneWirtschaftlichkeit(
       riesig,
       berechnePreis(riesig, 0),
-      { stundenkostenEur: 50, routineanteilProzent: 70 },
+      kapazitaetsEingabe(50, 70),
       VOLLER_TRICHTER
     );
     expect(r.nettoProMonatEur).toBe('unbekannt');
@@ -402,7 +404,7 @@ describe('Wirtschaftlichkeit — eine Definition, drei Zustände', () => {
           const r = berechneWirtschaftlichkeit(
             volumen,
             preis,
-            { stundenkostenEur, routineanteilProzent },
+            kapazitaetsEingabe(stundenkostenEur, routineanteilProzent),
             c
           );
           if (r.vollstaendig) {
@@ -687,5 +689,144 @@ describe('Analytics', () => {
   it('meldet den Rechenstart höchstens einmal je Besuch', () => {
     expect(rechner).toMatch(/preisGemeldet\.current/);
     expect(rechner).toMatch(/roiGemeldet\.current/);
+  });
+});
+
+/* ───────────────────────────────────────────────────────────────────────────
+   DIE PERSONALLESARTEN GELTEN AUF BEIDEN FLÄCHEN GLEICH.
+
+   `/ki-telefonassistent` und `/kosten-ki-telefonassistent` rendern denselben
+   `TelefonRechner` und damit denselben Kern. Diese Suite hält fest, dass die
+   Korrektur vom 12.09.2026 nicht an einer Fläche vorbeigeht — und dass
+   niemand einen zweiten Personalrechner danebenstellt.
+   ────────────────────────────────────────────────────────────────────────── */
+describe('Personallesarten — ein Kern, beide Flächen', () => {
+  const volumen = { anrufeProMonat: 300, minutenProAnruf: 2 };
+  const preis = berechnePreis(volumen, 0);
+  const chancen = {
+    verpassteAnrufeProMonat: 40,
+    davonChancenProzent: 50,
+    abschlussquoteProzent: 50,
+    deckungsbeitragEur: 100,
+    rueckgewinnbarProzent: 50,
+  };
+
+  it('rechnet beide Modi genau einmal — es gibt keine zweite Implementierung', () => {
+    /*
+      Die Arithmetik darf ausschließlich in telefonassistent-rechner.ts stehen.
+      Eine Kopie der Personalformel in einer Seite oder einem Bauteil wäre
+      genau die Gabelung, die dieser Rechner überwunden hat.
+    */
+    for (const [pfad, inhalt] of PRODUKTION) {
+      if (pfad === 'src/lib/telefonassistent-rechner.ts') continue;
+      expect(
+        /vermeidbarerAnteilProzent\s*(as number)?\s*\)?\s*\/\s*100/.test(inhalt),
+        `${pfad} rechnet die Personalersparnis selbst nach`
+      ).toBe(false);
+    }
+  });
+
+  it('genau eine Fläche definiert die Modi, alle anderen importieren sie', () => {
+    const kern = QUELLEN.get('src/lib/telefonassistent-rechner.ts')!;
+    expect(kern).toContain('export type PersonalModus');
+    for (const [pfad, inhalt] of PRODUKTION) {
+      if (pfad === 'src/lib/telefonassistent-rechner.ts') continue;
+      expect(
+        /type PersonalModus\s*=/.test(inhalt),
+        `${pfad} definiert PersonalModus ein zweites Mal`
+      ).toBe(false);
+    }
+  });
+
+  it('liefert bei gleicher Eingabe in beiden Modi stabile, verschiedene Ergebnisse', () => {
+    const a = berechneWirtschaftlichkeit(volumen, preis, kapazitaetsEingabe(35, 100), chancen);
+    const b = berechneWirtschaftlichkeit(volumen, preis, personalkostenEingabe(4000, 75), chancen);
+    expect(a.vollstaendig).toBe(true);
+    expect(b.vollstaendig).toBe(true);
+    // Verschieden — weil sie wirtschaftlich Verschiedenes messen.
+    expect(a.arbeitsnutzenProMonatEur).not.toBeCloseTo(b.arbeitsnutzenProMonatEur as number, 5);
+    // Aber der Chancenposten ist in beiden identisch: Er hängt an keiner Lesart.
+    expect(a.chancenwertProMonatEur).toBeCloseTo(b.chancenwertProMonatEur as number, 10);
+  });
+
+  it('der Rechner übergibt dem Kern immer nur die Felder EINES Modus', () => {
+    const rechner = QUELLEN.get('src/components/TelefonRechner.tsx')!;
+    // Die Konstruktoren sind der einzige Weg in die Wirtschaftlichkeitsrechnung.
+    expect(rechner).toMatch(/kapazitaetsEingabe\(/);
+    expect(rechner).toMatch(/personalkostenEingabe\(/);
+    // Kein handgebautes Eingabeobjekt, das beide Lesarten zugleich füllen könnte.
+    expect(rechner).not.toMatch(/stundenkostenEur:\s*\w+,\s*routineanteilProzent:/);
+  });
+
+  it('meldet keinen Personalwert an GA4', () => {
+    const rechner = QUELLEN.get('src/components/TelefonRechner.tsx')!;
+    const aufrufe = [...rechner.matchAll(/trackEvent\(([^)]*)\)/g)].map((m) => m[1]);
+    for (const argumente of aufrufe) {
+      for (const verboten of [
+        'personalkosten',
+        'vermeidbar',
+        'stundenkosten',
+        'personalersparnis',
+        'arbeitsnutzen',
+        'netto',
+        'roiWert',
+      ]) {
+        expect(
+          argumente.toLowerCase().includes(verboten.toLowerCase()),
+          `trackEvent(${argumente}) überträgt „${verboten}"`
+        ).toBe(false);
+      }
+    }
+  });
+
+  it('setzt für keinen der Personalwerte einen Vorgabewert', () => {
+    const rechner = QUELLEN.get('src/components/TelefonRechner.tsx')!;
+    // Beide Mode-B-Felder starten leer. Ein vorbelegtes Gehalt wäre eine
+    // Behauptung über den Betrieb des Besuchers.
+    expect(rechner).toMatch(/useState<number \| null>\(null\);?\s*$/m);
+    expect(rechner).toContain('const [personalkostenMonat, setPersonalkostenMonat] = useState<number | null>(null)');
+    expect(rechner).toContain('const [vermeidbarerAnteil, setVermeidbarerAnteil] = useState<number | null>(null)');
+  });
+
+  it('startet im zurückhaltenderen Modus, nicht im ertragreicheren', () => {
+    /*
+      Modus B ergibt in fast jedem Betrieb das größere Ergebnis. Die Vorgabe
+      darf deshalb nie B sein: Ein Besucher, der nur klickt, bekäme sonst die
+      Lohnersparnis untergeschoben, die er vielleicht gar nicht hat.
+    */
+    const rechner = QUELLEN.get('src/components/TelefonRechner.tsx')!;
+    expect(rechner).toContain('useState<PersonalModus>("kapazitaet")');
+  });
+});
+
+describe('Obergrenze — die Prosa sagt, worauf sie sich bezieht', () => {
+  const copy = QUELLEN.get('src/lib/telefonassistent-copy.ts')!;
+
+  it('behauptet in keiner gerenderten Konstante eine Obergrenze für die Endsumme', () => {
+    /*
+      Geprüft wird der Quelltext OHNE Kommentare: Die Begründung der Korrektur
+      zitiert die alten Sätze absichtlich, und dieses Zitat darf die Wache
+      nicht auslösen.
+    */
+    const ohneKommentare = nurCode(copy);
+    for (const satz of [
+      'Mehr zahlen Sie in diesem Monat nicht',
+      'Mehr als die ausgewiesene Obergrenze kostet es nie',
+    ]) {
+      expect(ohneKommentare, `„${satz}" steht wieder in einer Konstante`).not.toContain(satz);
+    }
+  });
+
+  it('hält den Geltungsbereich an genau einer Stelle', () => {
+    expect(copy).toContain('deckelungGeltung:');
+    const treffer = [...copy.matchAll(/Die Telefonie-Obergrenze allein ist deshalb noch nicht Ihre Endsumme/g)];
+    expect(treffer).toHaveLength(1);
+  });
+
+  it('verortet die Zusatzposten nicht außerhalb der Obergrenze', () => {
+    // Die Quelle sagt nicht, dass sie darüber liegen — nur, dass das Angebot
+    // es festlegt. Die Gegenbehauptung wäre derselbe Fehler mit umgekehrtem
+    // Vorzeichen.
+    expect(copy).not.toMatch(/zusätzlich zur Obergrenze|kommen zur Obergrenze hinzu|liegen außerhalb der Obergrenze/);
   });
 });
