@@ -303,7 +303,7 @@ export function ScanPage() {
               title="Automatisierungen"
               text="Wir verbinden Website, Kalender, Zahlung, E-Mail, CRM und interne Prozesse zu einem sauberen System."
               btnLabel="Mehr erfahren"
-              to="/automatisierung-unternehmen"
+              to="/prozessautomatisierung"
               delay={0.16}
             />
             <NavCard

@@ -430,7 +430,11 @@ describe('Wochen je Monat', () => {
 
   it('taucht als Zahlenliteral in keinem Bauteil erneut auf', () => {
     for (const [pfad, inhalt] of PRODUKTION) {
-      if (pfad === 'src/lib/telefonassistent-rechner.ts') continue;
+      // Seit dem 12.09.2026 die einzige erlaubte Stelle. Vorher stand die Zahl
+      // in telefonassistent-rechner.ts; sie ist dorthin gezogen, damit der
+      // Automatisierungs-Rechner sie lesen kann, ohne das Preismodell des
+      // Telefonassistenten in sein Bündel zu ziehen.
+      if (pfad === 'src/lib/zeitrechnung.ts') continue;
       expect(
         /(^|[^\d.])4\.3{1,2}([^\d]|$)/.test(inhalt),
         `${pfad} tippt einen eigenen Wochenfaktor; er gehört in telefonassistent-rechner.ts`
@@ -828,5 +832,94 @@ describe('Obergrenze — die Prosa sagt, worauf sie sich bezieht', () => {
     // es festlegt. Die Gegenbehauptung wäre derselbe Fehler mit umgekehrtem
     // Vorzeichen.
     expect(copy).not.toMatch(/zusätzlich zur Obergrenze|kommen zur Obergrenze hinzu|liegen außerhalb der Obergrenze/);
+  });
+});
+
+/* ──────────────────────────────────────────────────────────────────────────
+   7 · DER AUTOMATISIERUNGS-RECHNER (/kosten-automatisierung)
+
+   Zweiter öffentlicher Rechner seit dem 12.09.2026. Er darf drei Dinge nicht
+   tun, und alle drei sind Wiederholungen von Fehlern, die diese Datei schon
+   einmal abstellen musste:
+
+     1. Arithmetik im Bauteil statt im Kern.
+     2. Einen eigenen Wochenfaktor oder Vorgabewert tippen.
+     3. Zahlen des Besuchers an GA4 melden.
+
+   Punkt 3 ist der wichtigste. Die Ereignisnamen sind eine geschlossene Union,
+   und `trackEvent` nimmt neben dem Namen nur ein handgeschriebenes Label — es
+   gibt also keinen Parameter, durch den ein Betrag geraten könnte. Geprüft
+   wird trotzdem der Aufrufort: dass dort nichts steht, was nach einer Variablen
+   aussieht. Ein Typ schützt vor Versehen, nicht vor einer späteren Erweiterung.
+   ────────────────────────────────────────────────────────────────────────── */
+describe('Automatisierungs-Rechner', () => {
+  const KERN = 'src/lib/automatisierung-rechner.ts';
+  const BAUTEIL = 'src/components/AutomatisierungRechner.tsx';
+
+  it('rechnet ausschließlich im Kern, nie im Bauteil', () => {
+    const bauteil = nurCode(QUELLEN.get(BAUTEIL)!);
+    // Die Kernfunktion ist der einzige Weg zu einem Ergebnis.
+    expect(bauteil).toMatch(/berechneWirtschaftlichkeit\(/);
+    // Und keine der Formeln steht hier noch einmal.
+    for (const formel of [
+      /reduzierbarerAnteilProzent\s*(as number)?\s*\)?\s*\/\s*100/,
+      /vermeidbarerAnteilProzent\s*(as number)?\s*\)?\s*\/\s*100/,
+      /einmaligEur\s*\/\s*/,
+      /\*\s*12\b/,
+    ]) {
+      expect(formel.test(bauteil), `${BAUTEIL} rechnet selbst: ${formel}`).toBe(false);
+    }
+  });
+
+  it('liest den Wochenfaktor aus der gemeinsamen Quelle', () => {
+    const kern = QUELLEN.get(KERN)!;
+    expect(kern).toMatch(/from "@\/lib\/zeitrechnung"/);
+    // Kein Betrag und kein Faktor als Literal im Kern.
+    expect(/(^|[^\d.])4\.3{1,2}([^\d]|$)/.test(nurCode(kern))).toBe(false);
+  });
+
+  it('setzt keinen einzigen Wirtschaftswert voreingestellt', () => {
+    const bauteil = nurCode(QUELLEN.get(BAUTEIL)!);
+    /*
+      Jeder Zustand startet auf null. Ein `useState<number | null>(45)` wäre
+      eine Behauptung über den Betrieb des Besuchers — genau der Fehler, den
+      der Telefon-Rechner am 11.09.2026 abgelegt hat.
+    */
+    const zustaende = [...bauteil.matchAll(/useState<number \| null>\(([^)]*)\)/g)].map((m) => m[1].trim());
+    expect(zustaende.length).toBeGreaterThan(4);
+    for (const start of zustaende) {
+      expect(start, `${BAUTEIL} belegt ein Zahlenfeld vor`).toBe('null');
+    }
+  });
+
+  it('meldet an GA4 nur Ereignisnamen und handgeschriebene Label', () => {
+    const bauteil = nurCode(QUELLEN.get(BAUTEIL)!);
+    const aufrufe = [...bauteil.matchAll(/trackEvent\(([^)]*)\)/g)].map((m) => m[1]);
+    expect(aufrufe.length).toBeGreaterThan(0);
+    for (const argumente of aufrufe) {
+      // Jedes Argument muss ein String-Literal sein. Ein Bezeichner an dieser
+      // Stelle wäre der Weg, auf dem eine Geschäftszahl das Haus verlässt.
+      for (const arg of argumente.split(',').map((a) => a.trim()).filter(Boolean)) {
+        expect(/^"[^"]*"$/.test(arg), `${BAUTEIL}: trackEvent(… ${arg} …) übergibt kein Literal`).toBe(true);
+      }
+    }
+  });
+
+  it('nennt keine der Rechengrößen in einem Ereignisnamen', () => {
+    const consent = nurCode(QUELLEN.get('src/lib/consent.ts')!);
+    const union = consent.slice(consent.indexOf('export type ConversionEvent'), consent.indexOf('export function trackEvent'));
+    expect(union).toMatch(/'automation_roi_started'/);
+    expect(union).toMatch(/'automation_roi_completed'/);
+    expect(union).toMatch(/'automation_cta_clicked'/);
+    for (const verboten of [/stunden/i, /kosten_?eur/i, /invest/i, /amortis/i, /netto/i, /ersparnis/i, /roi_wert/i]) {
+      expect(verboten.test(union), `ConversionEvent enthält einen Namen mit ${verboten}`).toBe(false);
+    }
+  });
+
+  it('verriegelt das Ergebnis hinter keinem Formular', () => {
+    const bauteil = QUELLEN.get(BAUTEIL)!;
+    for (const gate of [/<form/, /type="email"/, /type="tel"/, /E-Mail-Adresse eingeben/]) {
+      expect(gate.test(bauteil), `${BAUTEIL} verriegelt den Rechner mit ${gate}`).toBe(false);
+    }
   });
 });

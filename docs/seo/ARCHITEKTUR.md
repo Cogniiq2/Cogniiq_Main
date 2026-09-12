@@ -158,38 +158,80 @@ Quellenprüfung), „KI Telefonassistent PVS/Schnittstelle" (blockiert),
 
 ## 4 · Prozessautomatisierung (Geschäftspriorität 2)
 
-### 4.1 Vier nationale Seiten für eine Intention
+### 4.1 Die Eigentümerfrage ist entschieden (12.09.2026)
 
-| Route | Titel-Intention | Rolle | Zeichen | Kontext-Links vorher → nachher |
+**Inhaber-Entscheidung: `/automatisierung-unternehmen` wird in
+`/prozessautomatisierung` überführt.** Folgemission F2 ist damit umgesetzt.
+
+| Route | Titel-Intention | Rolle | Zeichen (vorher) | Status |
 |---|---|---|---:|---|
-| `/prozessautomatisierung` | „prozessautomatisierung", „geschäftsprozesse automatisieren" | **PILLAR** (erklärt) | 2.746 | **0 → 8** |
-| `/automatisierung-unternehmen` | „automatisierung für unternehmen", „ki automatisierung unternehmen" | PILLAR (faktisch) | 7.769 | 22 → 22 |
-| `/digitale-automatisierung-unternehmen` | „digitale automatisierung unternehmen" | PROBLEM | 2.555 | 3 |
-| `/zu-viel-manuelle-arbeit` | „zu viel manuelle arbeit" | PROBLEM | 2.581 | 23 |
+| `/prozessautomatisierung` | „prozessautomatisierung", „geschäftsprozesse automatisieren", „unternehmensprozesse automatisieren", „workflow automatisierung", „ki automatisierung unternehmen" | **PILLAR** (erklärt **und** verlinkt) | 2.746 | Neu aufgebaut, Sitemap-Priorität 0.92 → **0.95** |
+| ~~`/automatisierung-unternehmen`~~ | — | **ZURÜCKGEZOGEN** | 7.769 | **301** auf den Pillar, aus Manifest, Router und Sitemap entfernt |
+| `/digitale-automatisierung-unternehmen` | „digitale automatisierung unternehmen" | PROBLEM | 2.555 | **unverändert** — ausdrücklich NICHT Teil der Konsolidierung |
+| `/zu-viel-manuelle-arbeit` | „zu viel manuelle arbeit" | PROBLEM | 2.581 | unverändert, verweist auf den Pillar |
 
-Die ersten beiden Zeilen sind **die Kannibalisierung dieses Clusters**: zwei
-nationale Seiten, beide auf „Automatisierung für Unternehmen" getitelt, beide
-mit „KI-Workflows" in der Description. Die erklärte Eigentümerin ist die
-dünnste Seite des Clusters und war bis zum 12.09.2026 kontextuell unverlinkt;
-die faktische Eigentümerin steht in der Hauptnavigation.
+**Warum diese Richtung.** Der exakte Kopfbegriff steht in URL und Titel, die
+Sitemap-Priorität war bereits die höhere (0.92 gegen 0.90), und die
+Mission-Zielfamilie heißt „Prozessautomatisierung". Die Gegenrichtung wäre
+verteidigbar gewesen, hätte aber den exakten Begriff aufgegeben.
 
-**Empfehlung (Folgemission F2, Inhaber-Entscheidung):**
-`/automatisierung-unternehmen` in `/prozessautomatisierung` überführen —
-Inhalt portieren, 301 setzen, die saubere URL behalten. Begründung: exakter
-Kopfbegriff in URL und Titel, höhere Sitemap-Priorität, und die
-Mission-Zielfamilie heißt „Prozessautomatisierung". Die Gegenrichtung
-(`/prozessautomatisierung` aufgeben) wäre verteidigbar, verliert aber den
-exakten Begriff.
+**Was die Konsolidierung technisch umfasst.** Die Regel steht in
+`src/lib/routing/legacyRedirects.ts`; `.github/scripts/test-seo-consistency.mjs`
+und `src/lib/routing/legacyRedirects.test.ts` halten vier Zusagen:
 
-**In diesem Durchgang bewusst nicht getan:** keine Umwidmung, keine 301, kein
-Link von `/automatisierung-unternehmen` entfernt. Der Pillar wurde nur aus der
-Waisenlage geholt, damit die Entscheidung nicht unter Zeitdruck fällt.
+1. `public/_redirects` beantwortet beide Formen (`/automatisierung-unternehmen`
+   und `/automatisierung-unternehmen/`) mit **301** auf `/prozessautomatisierung`
+   — eine Weiterleitung, keine Kette, kein Canonical.
+2. Die alte URL steht in **keinem** Manifest, in keinem `<Route>` und in keiner
+   Sitemap — sonst würde sie weiter als 200 ausgeliefert und die Regel wäre
+   wirkungslos.
+3. Das Ziel ist eine indexierbare Manifest-Route mit selbstreferenziellem
+   Canonical und Sitemap-Eintrag.
+4. **Keine lebende Seite verlinkt die alte URL.** Geprüft für alle 92
+   vorgerenderten Dokumente in `src/prerender.hydration.test.tsx`.
+
+**Die eine Ausnahme zu Punkt 4.** `/bayreuth/webdesign` ist ein eingefrorenes
+Suchexperiment; seine ausgehenden Anker gehören zum gemessenen Fingerabdruck.
+Diese eine Seite trägt die alte Adresse in ihrem Fuß-Verweisstreifen weiter —
+als Datum in ihrer eigenen Konfiguration (`legacyAutomationLink`), nicht als
+Sonderfall im Bauteil. Ein interner Link auf eine 301 wird verfolgt und
+konsolidiert; der Verlust ist rechnerisch eine Weiterleitung. Er verschwindet,
+sobald das Experiment endet — vermerkt in `post-experiment-opportunities.md`.
+
+**Was mit dem Inhalt der zurückgezogenen Seite geschah.** Nicht kopiert. Jede
+Aussage wurde einzeln auf ihre Quelle geprüft; das Ergebnis steht in
+`preisaudit-automatisierung.md`. Von 7.769 Zeichen überlebte die **Struktur**
+(Leistungsbild, Ablaufmuster, Branchen- und Stadtverweise), nicht die
+Substanz: „Quick-Wins in 1–3 Wochen", eine Liste von elf Fremdprodukten als
+Kompatibilitätszusage, Preisstaffeln ohne Bestätigung, „ohne Fehler" und „was
+früher 30 Minuten dauerte, passiert jetzt in Sekunden" sind ersatzlos
+entfallen.
+
+**Was der Pillar jetzt ist.** Er beantwortet sechzehn Käuferfragen in der
+Reihenfolge, in der sie gestellt werden: was Prozessautomatisierung ist, welche
+Prozesse sich eignen, welche ausdrücklich **nicht**, wo ein KI-Schritt etwas
+beiträgt und wo deterministische Regeln genügen, sechs Ablaufmuster mit dem
+Punkt, an dem ein Mensch die Kontrolle behält, wie Systeme verbunden werden und
+was gilt, wenn eines keine geeignete Schnittstelle hat, sieben
+Absicherungsmechanismen, elf Umsetzungsschritte, die Preislogik in vier Sätzen
+mit Verweis auf die Kostenseite, Branchen und Standorte, und der nächste
+Schritt.
+
+**Zwei Abschnitte, die diese Seite von den Wettbewerbern trennen** und die
+bewusst gegen den Verkaufsinstinkt geschrieben sind: „Was nicht automatisiert
+gehört" (sechs Fälle) und „Was passiert, wenn etwas schiefgeht" (sieben
+Mechanismen, ausdrücklich **nicht** alle in jedem Projekt).
+
+**Preis-Intention bleibt bei `/kosten-automatisierung`.** Der Pillar fasst die
+Preislogik in vier Sätzen und verweist. Eine ausgebaute Preisstrecke auf dem
+Pillar würde die Kostenseite kannibalisieren — und die ist die einzige Seite
+dieses Clusters, die heute schon in Reichweite der ersten Ergebnisseite steht.
 
 ### 4.2 Unterstützer
 
 | Route | Intention | Rolle | Notiz |
 |---|---|---|---|
-| `/kosten-automatisierung` | „automatisierung kosten", „was kostet prozessautomatisierung" | **KOSTEN** (Eigentümer) | Pos. 35,2 → 16,3 bei fallenden Impressionen |
+| `/kosten-automatisierung` | „automatisierung kosten", „was kostet prozessautomatisierung", „automatisierung projekt kosten" | **KOSTEN** (Eigentümer) | Pos. 35,2 → 16,3 bei fallenden Impressionen · **12.09.2026 neu aufgebaut**: alle zwölf unbelegten Beträge entfernt, acht Kostentreiber, einmalig/laufend getrennt, „wann es sich NICHT lohnt", Wirtschaftlichkeitsrechner ohne Lead-Gate |
 | `/automatisierung-arzt` | „automatisierung arztpraxis" | SEGMENT | Überlappt mit `/ki-telefonassistent-arzt` in der Terminintention |
 | `/automatisierung-restaurant` | „automatisierung restaurant/gastronomie" | SEGMENT | |
 | `/automatisierung-immobilien` | „automatisierung immobilienmakler" | SEGMENT | |
@@ -263,7 +305,7 @@ Keyword-Werkzeug, sondern eine Aussage über Identität.
 
 | # | Seite A | Seite B | Überlappende Query-Familie | Absichtlich? | Gewinner | B soll stattdessen | Links verstärken den Richtigen? |
 |---|---|---|---|---|---|---|---|
-| K1 | `/prozessautomatisierung` | `/automatisierung-unternehmen` | „automatisierung für unternehmen", „prozessautomatisierung", „ki automatisierung" | **Nein** | A (erklärt) | In A überführen (F2) | Nein → nach diesem Durchgang: A 8, B 22. Noch nicht gelöst |
+| ~~K1~~ | `/prozessautomatisierung` | ~~`/automatisierung-unternehmen`~~ | „automatisierung für unternehmen", „prozessautomatisierung", „ki automatisierung" | **Nein** | A | **GELÖST 12.09.2026** — B per 301 in A überführt, F2 umgesetzt (§4.1) | Ja: B existiert nicht mehr, alle 22 Links zeigen auf A (eine Ausnahme, eingefroren) |
 | K2 | `/webdesign` | `/webdesign-agentur-deutschland` | „webdesign agentur" | Nein | A generisch, B national | B schärft auf „deutschlandweit/remote" | Nein → A 4, B 19 |
 | K3 | `/praxen` | `/ki-telefonassistent-arzt`, `/ki-telefonassistent-praxis` | „ki telefonassistent praxis/arztpraxis" | Teilweise | A kommerziell | `-praxis` ist Konsolidierungskandidat | Teilweise · B FROZEN (F3) |
 | K4 | `/kosten-webdesign` | `/bayreuth,/muenchen,/regensburg + /webdesign-kosten` | „webdesign kosten <stadt>" | Ja, lokal vs. national | je nach Ortsbezug | unverändert | Ja · `/muenchen/webdesign-kosten` FROZEN |
@@ -400,7 +442,7 @@ nicht mehr geschützt.
 | # | Mission | Warum zuerst / Warum wartet |
 |---|---|---|
 | **F1** | **Messreihen korrigieren.** M1, M2 und das Relaunch-Titelexperiment im Scoreboard als ungültig kennzeichnen und ab dem Deploy dieses Branches neu starten. Für `/bayreuth/website-relaunch` entscheiden: ausliefern oder für ungültig erklären. | Ohne das wird gegen Zahlen argumentiert, die nie eine Auslieferung hatten. Kostet nichts, verhindert eine falsche Entscheidung. |
-| **F2** | **Automatisierungs-Cluster entscheiden.** `/automatisierung-unternehmen` in `/prozessautomatisierung` überführen, 301, Inhalt portieren — **Inhaber-Entscheidung**, keine Konsolidierung ohne Freigabe. | Größte ungenutzte Strukturchance: zwei nationale Seiten teilen eine Kopf-Intention, und die Geschäftspriorität 2 hängt daran. |
+| ~~**F2**~~ | **ERLEDIGT 12.09.2026.** `/automatisierung-unternehmen` per 301 in `/prozessautomatisierung` überführt, Pillar neu aufgebaut, Kostenseite von zwölf unbelegten Beträgen befreit und um einen Wirtschaftlichkeitsrechner ergänzt. Einzelheiten §4.1, Herkunftsprüfung `preisaudit-automatisierung.md`. | Größte ungenutzte Strukturchance: zwei nationale Seiten teilten eine Kopf-Intention, und die Geschäftspriorität 2 hing daran. |
 | **F3** | **Praxis-Telefon-Cluster entscheiden**, nach Ende des Arzt-Experiments: `/praxen` vs. `/ki-telefonassistent-arzt` vs. `/ki-telefonassistent-praxis`. Erst Besitz, dann Text. | Volumenstärkste kommerzielle Query-Familie der Domain, und sie bewegt sich ohne Zutun. |
 | **F4** | **`/<stadt>/website-erstellen` und `/<stadt>/landingpage` prüfen** — Query×Seite-Export beschaffen, dann über Merge in `/<stadt>/webdesign` entscheiden. | 6 Routen, ~24.000 Zeichen Pflegeaufwand für ungeklärten Nutzen. Braucht Daten, nicht Meinung. |
 | **F5** | **FAQ-Antworten in den SSR-Körper** (rendern und per CSS klappen, statt bedingt mounten). | Hebt den bewertbaren Körper **aller** FAQ-Seiten. Ändert die Fingerprints aller eingefrorenen Routen — daher erst nach Experimentende. |

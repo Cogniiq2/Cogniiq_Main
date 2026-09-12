@@ -303,6 +303,69 @@ if (!catchAllRule || catchAllRule[0] !== '/*' || catchAllRule[1] !== '/404.html'
   fail('public/_redirects must end with "/* /404.html 404" so unknown public URLs get a real 404');
 } else ok('unknown public URLs fall through to a real 404');
 
+// ─── 3d. Retired routes are 301s, not ghosts ─────────────────────────────────
+//
+// A consolidation fails in four quiet ways, and all four look fine on the page
+// that survived: the rule is missing, the rule points somewhere that is itself
+// retired (a chain), the retired URL is still prerendered as a 200 (two
+// documents on one intent, which is the problem the consolidation was meant to
+// end), or it is still in the sitemap (the domain keeps nominating a URL it no
+// longer serves). Each is checked against src/lib/routing/legacyRedirects.ts,
+// which is the only place a retired route is declared.
+const legacySrc = read('src/lib/routing/legacyRedirects.ts');
+const legacyBody = legacySrc.slice(legacySrc.indexOf('LEGACY_REDIRECTS'));
+const legacyPairs = [...legacyBody.matchAll(/^\s*'(\/[^']*)':\s*'(\/[^']*)',/gm)].map((m) => [m[1], m[2]]);
+
+if (!legacyPairs.length) {
+  ok('no retired routes declared');
+} else {
+  const legacySources = legacyPairs.map(([from]) => from);
+  for (const [from, to] of legacyPairs) {
+    // BOTH forms. A live route's trailing-slash variant is normalised by the
+    // host itself; a retired one has nothing left to normalise to, so without
+    // the slashed rule "/route/" answers 404 and any crawler that recorded that
+    // variant loses the signal instead of following it.
+    for (const form of [from, `${from}/`]) {
+      const rule = redirectRules.find((r) => r[0] === form);
+      if (!rule) {
+        fail(`retired route ${form} has no rule in public/_redirects`);
+      } else if (rule[1] !== to || rule[2] !== '301') {
+        fail(`public/_redirects serves ${form} as "${rule.slice(1).join(' ')}"; expected "${to} 301"`);
+      } else ok(`retired ${form} -> ${to} (301)`);
+    }
+
+    if (legacySources.includes(to)) {
+      fail(`redirect chain: ${from} -> ${to}, and ${to} is itself retired`);
+    }
+    if (manifestPaths.includes(from)) {
+      fail(`retired route ${from} is still in the route manifest — it would be prerendered as a 200`);
+    }
+    if (literalRoutes.includes(from)) {
+      fail(`retired route ${from} is still a <Route> in src/App.tsx`);
+    }
+    if (sitemapPaths.includes(from)) {
+      fail(`retired route ${from} is still in public/sitemap.xml`);
+    }
+    const target = manifestEntries.find((e) => e.path === to);
+    if (!target) fail(`redirect target ${to} is not a route in the manifest`);
+    else if (!target.indexable) fail(`redirect target ${to} is noindex — a 301 must land on an indexable page`);
+    else if (!sitemapPaths.includes(to)) fail(`redirect target ${to} is missing from the sitemap`);
+    else ok(`redirect target ${to} is indexable, in the manifest and in the sitemap`);
+  }
+
+  // Ordering: a rule below the catch-all never runs.
+  const catchAllIndex = redirectRules.findIndex((r) => r[0] === '/*');
+  for (const [from] of legacyPairs) {
+    for (const form of [from, `${from}/`]) {
+      const i = redirectRules.findIndex((r) => r[0] === form);
+      if (catchAllIndex !== -1 && i !== -1 && i > catchAllIndex) {
+        fail(`redirect rule for ${form} sits below the catch-all and would never run`);
+      }
+    }
+  }
+  ok('every retired-route rule sits above the catch-all');
+}
+
 // ─── 4. Legal routes exist (route table + sitemap) ───────────────────────────
 for (const legal of ['/impressum', '/datenschutz']) {
   if (!literalRoutes.includes(legal)) fail(`Legal route ${legal} missing from src/App.tsx`);

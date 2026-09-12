@@ -464,3 +464,37 @@ Dieselbe Prüfung wurde für die übrigen vier eingefrorenen Routen durchgeführ
 `/bayreuth/webdesign`, `/muenchen/webdesign-kosten`, `/regensburg/website-relaunch`
 und `/ki-telefonassistent-arzt` trugen auf beiden Seiten identische Werte. Für
 sie ändert der Wegfall der Tabelle nichts, und ihre Messreihen bleiben gültig.
+
+---
+
+## P-A · Der letzte interne Link auf eine zurückgezogene URL
+
+**Aufgeschoben — Experiment · angelegt 12.09.2026**
+
+Mit der Konsolidierung des Automatisierungs-Clusters (`ARCHITEKTUR.md` §4.1)
+beantwortet die Domain `/automatisierung-unternehmen` mit einem 301 auf
+`/prozessautomatisierung`. Sechzehn interne Verweise wurden umgestellt; einer
+steht noch.
+
+**Wo.** Der Fuß-Verweisstreifen der Stadt-×-Leistung-Seiten, der auf **einer**
+dieser Seiten noch die alte Adresse trägt: derjenigen, die als eingefrorenes
+Suchexperiment geführt wird. Ihre ausgehenden Anker sind Teil des gemessenen
+Fingerabdrucks — eine geänderte Zieladresse wäre eine Änderung an den Bytes,
+gegen die gemessen wird, und damit das Ende dieser Messreihe.
+
+**Wie es gehalten wird.** Nicht als Sonderfall im Bauteil, sondern als Feld
+`legacyAutomationLink` in der Konfiguration genau dieser Seite
+(`src/lib/standorte-service-configs.ts`). Alle anderen Stadt-×-Leistung-Seiten
+lesen den Vorgabewert `/prozessautomatisierung`. Der Pfad der geschützten Route
+wird dabei bewusst **nirgends neu ausgeschrieben** — der Freeze zählt jede
+Erwähnung im Quellbaum, Kommentare eingeschlossen.
+
+**Was das kostet.** Rechnerisch eine Weiterleitung: Ein interner Link auf eine
+301 wird verfolgt und konsolidiert. Kein Ranking-Signal geht verloren, es
+entsteht nur ein überflüssiger Sprung auf einer von 92 Seiten.
+
+**Zu tun, sobald das Experiment endet.** `legacyAutomationLink` aus der
+Konfiguration entfernen (nicht: auf den Pillar setzen — die Vorgabe erledigt
+das). Danach hat keine lebende Seite mehr eine Verbindung zur zurückgezogenen
+URL, und der Test „leaves no unfrozen page linking at a retired URL" in
+`src/prerender.hydration.test.tsx` gilt ohne Ausnahme.

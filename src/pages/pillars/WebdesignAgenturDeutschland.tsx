@@ -108,7 +108,7 @@ const RELATED_LINKS = [
   // Link der ganzen Domain — und keinen von hier (docs/seo/ARCHITEKTUR.md).
   { label: "Webdesign für Unternehmen", href: "/webdesign" },
   { label: "KI Agentur Deutschland", href: "/ki-agentur-deutschland" },
-  { label: "Automatisierung für Unternehmen", href: "/automatisierung-unternehmen" },
+  { label: "Automatisierung für Unternehmen", href: "/prozessautomatisierung" },
   { label: "KI Telefonassistent", href: "/ki-telefonassistent" },
   { label: "Leistungen", href: "/leistungen" },
   { label: "Kontakt", href: "/kontakt" },

@@ -202,7 +202,7 @@ export function Footer() {
                       { text: "Alle Leistungen", to: "/leistungen" },
                       { text: "KI-Telefonassistent", to: "/ki-telefonassistent" },
                       { text: "Webdesign", to: "/webdesign" },
-                      { text: "Automatisierung", to: "/automatisierung-unternehmen" },
+                      { text: "Automatisierung", to: "/prozessautomatisierung" },
                       { text: "Prozessautomatisierung", to: "/prozessautomatisierung" },
                       { text: "Für Arzt- und Zahnarztpraxen", to: "/praxen" },
                     ],
@@ -352,7 +352,7 @@ export function Footer() {
             Wir entwickeln operative Systeme:{" "}
             <Link to="/ki-telefonassistent" className="hover:text-gray-500 dark:hover:text-white/40 transition-colors">KI-Telefonassistenten</Link>,{" "}
             <Link to="/webdesign-agentur-deutschland" className="hover:text-gray-500 dark:hover:text-white/40 transition-colors">hochkonvertierende Websites</Link> und{" "}
-            <Link to="/automatisierung-unternehmen" className="hover:text-gray-500 dark:hover:text-white/40 transition-colors">Prozessautomatisierung</Link>{" "}
+            <Link to="/prozessautomatisierung" className="hover:text-gray-500 dark:hover:text-white/40 transition-colors">Prozessautomatisierung</Link>{" "}
             für{" "}
             <Link to="/muenchen" className="hover:text-gray-500 dark:hover:text-white/40 transition-colors">München</Link>,{" "}
             <Link to="/regensburg" className="hover:text-gray-500 dark:hover:text-white/40 transition-colors">Regensburg</Link>,{" "}

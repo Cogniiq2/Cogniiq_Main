@@ -31,7 +31,6 @@ export const PUBLIC_ROUTE_PATHS: readonly string[] = [
   "/prozessautomatisierung",
   "/webdesign-agentur-deutschland",
   "/ki-agentur-deutschland",
-  "/automatisierung-unternehmen",
   "/ki-telefonassistent/demo",
   "/ki-telefonassistent-einfuehren",
   "/ki-telefonassistent-zahnarztpraxis",

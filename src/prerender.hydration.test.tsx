@@ -35,6 +35,8 @@ vi.mock('@/lib/supabase', () => ({
 const { ThemeProvider } = await import('./components/theme-provider');
 const App = (await import('./App')).default;
 const { PUBLIC_ROUTES, isKnownPublicRoute } = await import('./lib/routing/publicRoutes');
+const { isLegacyRedirectSource } = await import('./lib/routing/legacyRedirects');
+const { isProtectedExperiment } = await import('./lib/routing/protectedExperiments');
 const { publicLinkTargets, problemLinkTargets } = await import('./test/internalLinks');
 
 const DIST = join(process.cwd(), 'dist');
@@ -177,7 +179,34 @@ describe.skipIf(!hasBuild)('prerendered pages link only to published routes', ()
       const html = prerenderedRoot(route.path);
       expect(html, `no prerendered output for ${route.path}`).not.toBeNull();
       for (const target of publicLinkTargets(html!)) {
-        if (!isKnownPublicRoute(target)) offenders.push(`${route.path} -> ${target}`);
+        if (isKnownPublicRoute(target) || isLegacyRedirectSource(target)) continue;
+        offenders.push(`${route.path} -> ${target}`);
+      }
+    }
+    expect(offenders).toEqual([]);
+  }, 60_000);
+
+  /*
+    A link to a retired URL is not broken — it answers 301 — so the check above
+    lets it pass. That is exactly why this second check exists: without it,
+    "retired" would quietly become a place links may keep pointing, and a
+    consolidation would leak its own benefit one edit at a time.
+
+    Exactly one kind of page may still carry such a link: a FROZEN search
+    experiment. Its outgoing anchors are part of the measured fingerprint, so
+    changing an href there would end the measurement rather than continue it.
+    The exception is expressed as that rule, not as a list of paths — naming a
+    protected route in this file would itself count as a change to its inbound
+    link topology (src/protectedExperiments.test.tsx counts every mention in the
+    source tree, comments included).
+  */
+  it('leaves no unfrozen page linking at a retired URL', () => {
+    const offenders: string[] = [];
+    for (const route of PUBLIC_ROUTES) {
+      if (isProtectedExperiment(route.path)) continue;
+      const html = prerenderedRoot(route.path);
+      for (const target of publicLinkTargets(html ?? '')) {
+        if (isLegacyRedirectSource(target)) offenders.push(`${route.path} -> ${target}`);
       }
     }
     expect(offenders).toEqual([]);

@@ -41,6 +41,31 @@ export interface CityServiceConfig {
   serviceSlug: ServiceSlug;
   route: string;
   locationNote?: string;
+  /*
+    EINGEFRORENE ALT-URL IM FUSSVERWEIS — genau eine Seite, genau ein Grund.
+
+    Der Verweisstreifen am Fuß jeder Stadt-x-Leistung-Seite zeigt seit dem
+    12.09.2026 auf `/prozessautomatisierung`; `/automatisierung-unternehmen`
+    ist per 301 dorthin überführt (src/lib/routing/legacyRedirects.ts).
+
+    Genau eine Stadt-x-Leistung-Seite läuft jedoch als eingefrorenes
+    Suchexperiment (PROTECTED_EXPERIMENT_PATHS in
+    src/lib/routing/protectedExperiments.ts nennt sie). Zu ihrem Fingerabdruck
+    gehören die ausgehenden Anker samt Zieladresse — die Messung gilt nur,
+    solange die ausgelieferten Bytes unverändert bleiben. Diese eine Seite trägt
+    deshalb weiterhin die alte Adresse, und zwar als DATEN in ihrer eigenen
+    Konfiguration statt als Sonderfall im Bauteil: Die Bedingung steht dort, wo
+    auch steht, warum diese Seite besonders ist.
+
+    Der Pfad wird hier bewusst NICHT genannt. Der Freeze zählt jede Erwähnung
+    einer geschützten Route im Quellbaum, Kommentare eingeschlossen; ihn hier
+    auszuschreiben wäre selbst eine Änderung an ihrer Link-Topologie.
+
+    Suchtechnisch kostet das nichts — ein interner Link auf eine 301 wird
+    verfolgt und konsolidiert. Er verschwindet, sobald das Experiment endet;
+    vermerkt in docs/seo/post-experiment-opportunities.md.
+  */
+  legacyAutomationLink?: string;
   seo: {
     title: string;
     description: string;

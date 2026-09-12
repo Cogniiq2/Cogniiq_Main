@@ -873,3 +873,105 @@ auf Inhaltsarbeit. Die Liste steht in `docs/seo/ARCHITEKTUR.md` §7.
 - **`src/pages/pillars/AutomatisierungUnternehmen.tsx:278`** („zur vollständig
   automatisierten Geschäftsstruktur") bleibt stehen — Grenzfall, gehört in eine
   Copy-Prüfung und nicht in einen Architekturlauf.
+
+---
+
+## M23 · Automatisierungs-Cluster konsolidiert (12.09.2026)
+
+Branch `claude/prozessautomatisierung-pillar-max-2026-09-12`, Basis `56707c2`.
+Setzt Folgemission **F2** aus `ARCHITEKTUR.md` §4.1 um. **Tag 0 der Messung ist
+der Deploy dieses Branches**, nicht dieses Datum.
+
+### Datenlage — ehrlich benannt
+
+**Für diesen Durchgang stand kein Search-Console-Zugang zur Verfügung.** Weder
+ein API-Zugriff noch ein frischer Export lag in der Arbeitsumgebung vor; es
+gibt in diesem Repository auch keine eingecheckte CSV. Die Zahlen unten sind
+deshalb **übernommen** aus den Exporten vom **10.09.2026** (3 Monate
+2026-06-09–2026-09-08, 28 Tage 2026-08-12–2026-09-08), so wie sie
+`ARCHITEKTUR.md` §4 festhält — und nicht neu erhoben.
+
+Das ist eine Einschränkung, keine Formalie: Der letzte gemessene Zeitraum endet
+vier Tage vor diesem Durchgang. **Vor dem ersten Messpunkt nach dem Deploy ist
+die Baseline gegen einen frischen, exakt benannten Export zu ersetzen** — sonst
+wird gegen Zahlen gemessen, deren Fenster niemand mehr kennt (Regel 4 dieses
+Dokuments).
+
+| URL | 28-Tage-Impressionen | Ø Position | Quelle |
+|---|---:|---:|---|
+| `/prozessautomatisierung` | **keine Zeile im Export** | — | unter der Sichtbarkeitsschwelle (M3) |
+| `/automatisierung-unternehmen` | keine belastbare Zeile | — | „fast keine organische Substanz" (Missionsbefund), 22 interne Links waren ihr Gewicht |
+| `/kosten-automatisierung` | vorhanden | **35,2 → 16,3** bei fallenden Impressionen | `ARCHITEKTUR.md` §4.2 |
+
+**Die historischen Werte der zurückgezogenen URL bleiben hier stehen**, damit
+die Entwicklung nach dem 301 interpretierbar bleibt. Eine URL, deren Historie
+mit ihr verschwindet, macht jede spätere Auswertung unmöglich: Man sieht dann
+nur noch, dass der Pillar gewonnen hat, und weiß nicht, ob er gewonnen oder nur
+geerbt hat.
+
+### Was geändert wurde
+
+1. **301** `/automatisierung-unternehmen` → `/prozessautomatisierung` (beide
+   Formen, mit und ohne Schrägstrich). Alte Route aus Manifest, Router und
+   Sitemap entfernt, Seitenkomponente gelöscht.
+2. **16 interne Links** auf die alte URL umgestellt (Navigation, Footer,
+   Desktop-Hero, vier Branchenseiten, vier Problemseiten, zwei Pillar-Seiten,
+   Scan-Seite, Kostenseite, Organisationsschema, KI-Flaggschiff). Eine
+   verbleibende Ausnahme auf der eingefrorenen Route `/bayreuth/webdesign`
+   (§4.1).
+3. **Hauptnavigation**: Der Automatisierungs-Einstieg zeigt jetzt auf den
+   Pillar statt auf die zurückgezogene Seite.
+4. **Pillar neu aufgebaut**: von 2.746 auf rund 16.000 Zeichen, sechzehn
+   Käuferfragen, sechs Ablaufmuster, elf Umsetzungsschritte, ein Abschnitt
+   „was nicht automatisiert gehört" und einer zur Ausnahmebehandlung.
+5. **Kostenseite neu aufgebaut**: zwölf unbelegte Beträge entfernt
+   (`preisaudit-automatisierung.md`), acht Kostentreiber, einmalig und laufend
+   getrennt, „wann es sich NICHT lohnt", und ein Wirtschaftlichkeitsrechner
+   ohne Lead-Gate.
+
+### Zielquery-Familien
+
+| Seite | Familie |
+|---|---|
+| `/prozessautomatisierung` | prozessautomatisierung · prozessautomatisierung für unternehmen · geschäftsprozesse automatisieren · unternehmensprozesse automatisieren · workflow automatisierung · ki automatisierung unternehmen · automatisierung für unternehmen (geerbt) |
+| `/kosten-automatisierung` | automatisierung kosten · automatisierung projekt kosten · was kostet prozessautomatisierung · prozessautomatisierung preis · roi automatisierung berechnen |
+
+### Hypothesen
+
+- **H1 (Konsolidierung).** Zwei Seiten auf eine Kopfintention teilten die
+  Autorität. Mit einer Seite und 22 eingehenden Links statt 8 sollte der
+  Pillar in Query-Familien eintreten, in denen die Domain bisher gar nicht
+  vorkam.
+- **H2 (Substanz).** Links allein machen aus 2.746 Zeichen keinen Pillar
+  (M3 sagte das ausdrücklich). Erst die inhaltliche Tiefe macht die Seite zu
+  einer möglichen Antwort.
+- **H3 (Kostenseite).** Die Seite steht bei Ø 16,3 und damit am dichtesten an
+  der ersten Ergebnisseite. Ein Rechner ohne Gate und ein „wann es sich nicht
+  lohnt" adressieren dieselbe Absicht direkter als eine Preisstaffel, die
+  ohnehin nicht belegt war.
+
+### Erfolgskriterien
+
+| Zeitpunkt | `/prozessautomatisierung` | `/kosten-automatisierung` |
+|---|---|---|
+| Tag 28 | überhaupt Impressionen auf „prozessautomatisierung" oder „geschäftsprozesse automatisieren" | Ø Position nicht schlechter als vor dem Deploy |
+| Tag 56 | Seiten-Ø unter 60 | mindestens eine Query der Familie unter Position 10 |
+| Tag 90 | mindestens eine Query der Familie unter Position 30 | ein Klick auf eine Nicht-Marken-Kostenquery |
+
+### Abbruch- und Warnkriterien
+
+- **Warnung:** Verliert `/kosten-automatisierung` bis Tag 28 Position, ohne dass
+  der Pillar gewinnt, ist die Intentionstrennung nicht sauber — dann zuerst die
+  Überschneidung „was kostet Prozessautomatisierung" prüfen, bevor irgendetwas
+  weiter geändert wird.
+- **Abbruch:** Erreicht bis Tag 56 keine der beiden Seiten eine Impression auf
+  einer der Zielfamilien, liegt das Problem nicht an der Struktur, sondern an
+  der Domain-Autorität insgesamt — dann greift
+  `authority-acquisition-plan.md`, nicht die nächste Seitenüberarbeitung.
+
+### Was hier bewusst NICHT steht
+
+Keine Signifikanzaussage. Zwei Seiten mit dreistelligen Impressionen tragen
+keine statistische Auswertung; was hier gemessen wird, ist Richtung und
+Größenordnung, nicht Signifikanz. Und **keine Erfolgsmeldung vor Tag 28**
+(Regel 1).
