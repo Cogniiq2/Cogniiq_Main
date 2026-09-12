@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
+import { RechnerCta } from "@/components/RechnerCta";
 import { StimmprobeSection } from "@/components/StimmprobeSection";
 import {
   BeweisketteMitte,
@@ -59,6 +60,17 @@ export interface NationalIndustryPageConfig {
     title: string;
     steps: Array<{ step: string; title: string; description: string }>;
   };
+  /*
+    Optionaler Verweis auf den Preis- und Wirtschaftlichkeitsrechner.
+
+    OPT-IN, und das aus zwei Gründen. Erstens trägt diese Vorlage dreizehn
+    Seiten, darunter Webdesign- und Automatisierungsseiten, auf denen die
+    Telefonie-Preisfrage schlicht nicht aufkommt. Zweitens trägt sie
+    auch die Arzt-Segmentseite, ein eingefrorenes SEO-Experiment: Ein
+    Vorgabewert hier würde dort einen Link erzeugen und die Messbedingung
+    zerstören. Kein Vorgabewert, keine automatische Verteilung.
+  */
+  rechner?: { ankertext: string; kontext: string; einleitung: string };
   cityLinks: Array<{ label: string; href: string }>;
   relatedLinks: Array<{ label: string; href: string }>;
   faq: Array<{ question: string; answer: string }>;
@@ -508,6 +520,20 @@ export function NationalIndustryPage({ config }: Props) {
                 Kostenlos · Unverbindlich · Keine Vorkenntnisse nötig
               </p>
             </motion.div>
+
+            {/*
+              Der Rechner steht NEBEN dem Erstgespräch, nicht davor: Wer lieber
+              erst selbst nachrechnet, bekommt hier den Weg dazu, ohne dass der
+              primäre CTA an Gewicht verliert.
+            */}
+            {config.rechner && (
+              <RechnerCta
+                ankertext={config.rechner.ankertext}
+                kontext={config.rechner.kontext}
+                einleitung={config.rechner.einleitung}
+                className="mt-10 max-w-2xl mx-auto"
+              />
+            )}
           </div>
         </section>
 

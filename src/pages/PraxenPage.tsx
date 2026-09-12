@@ -20,11 +20,11 @@ import { Link } from "react-router-dom";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { StimmprobeSection } from "@/components/StimmprobeSection";
-import { PraxisRechnerSection } from "@/components/PraxisRechnerSection";
+import { TelefonRechnerSection } from "@/components/TelefonRechnerSection";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 import {
   ANLIEGEN_IMMER_MENSCH,
-  ANLIEGEN_UEBERNIMMT,
+  ANLIEGEN_UEBERNIMMT_ABWICKLUNG,
   BETREUUNG,
   CTA,
   DATENSCHUTZ_PUNKTE,
@@ -43,8 +43,9 @@ import {
   TARIFE,
   TARIF_ENTERPRISE,
   TEAM_BLOCK,
-  UEBERGABE,
+  UEBERGABE_ABWICKLUNG,
   UMKEHRBARKEIT,
+  RECHNER,
 } from "@/lib/telefonassistent-copy";
 
 const base = BUSINESS_INFO.website;
@@ -101,7 +102,7 @@ const schema = {
       "@type": "Service",
       name: "KI Telefonassistent für Praxen",
       description:
-        "Telefonische Anrufannahme für Arzt-, Zahnarzt- und Therapiepraxen: mit eigener Stimmauswahl, praxiseigenen Regeln und strukturierter Übergabe an das Praxisteam.",
+        "Telefonempfang für Arzt-, Zahnarzt- und Therapiepraxen: mit eigener Stimmauswahl und praxiseigenen Regeln. Freigegebene Routineabläufe — Termin vergeben, verschieben, absagen — wickelt der Assistent im Gespräch ab; Ausnahmen und fachliche Fragen gehen an das Praxisteam.",
       url: `${base}/praxen`,
       provider: { "@type": "Organization", name: BUSINESS_INFO.name, url: base },
     },
@@ -154,7 +155,7 @@ export function PraxenPage() {
     <>
       <PageSEO
         title="KI Telefonassistent für Praxen – Ihr Empfang | Cogniiq"
-        description="Ein Empfang am Telefon für Ihre Praxis: Ihre Stimmauswahl, Ihre Regeln, strukturierte Übergabe. Keine Triage, Kontingent mit Obergrenze, in zwei Wochen eingerichtet und bereit zur Freigabe."
+        description="Ein Empfang am Telefon für Ihre Praxis: Ihre Stimmauswahl, Ihre Regeln. Termine werden im Gespräch vergeben, verschoben und abgesagt; Ausnahmen gehen an Ihr Team. Keine Triage, Kontingent mit Obergrenze, in zwei Wochen eingerichtet und bereit zur Freigabe."
         canonical={`${base}/praxen`}
         breadcrumbs={breadcrumbs}
         faqItems={faqItems}
@@ -199,9 +200,12 @@ export function PraxenPage() {
                   bleiben für den Abend liegen.
                 </p>
                 <p>
-                  Der Praxis-Empfang von Cogniiq nimmt die Anrufe an, die sonst ins
-                  Leere laufen — mit Ihrer Stimmauswahl, nach Ihren Regeln, mit
-                  einer Übergabe, die wir vor der Unterschrift mit Ihnen klären.
+                  Der Praxis-Empfang von Cogniiq nimmt diese Anrufe nicht nur an,
+                  sondern bringt sie zu Ende: Termin vergeben, verschoben oder
+                  abgesagt, freigegebene Fragen beantwortet — mit Ihrer
+                  Stimmauswahl und nach Ihren Regeln. Was fachlich ist oder was Sie
+                  ausgenommen haben, geht an Ihr Team; welcher Ablauf welchen Weg
+                  nimmt, klären wir vor der Unterschrift.
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
@@ -315,16 +319,16 @@ export function PraxenPage() {
         {/* ── 7 · M14 Die Übergabe ── */}
         <section className={SECTION_ALT}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
-            <h2 className={H2}>{UEBERGABE.headline}</h2>
+            <h2 className={H2}>{UEBERGABE_ABWICKLUNG.headline}</h2>
             <div className={`${PROSE} space-y-5`}>
-              {UEBERGABE.paragraphs.map((p, i) => (
+              {UEBERGABE_ABWICKLUNG.paragraphs.map((p, i) => (
                 <p key={i}>{p}</p>
               ))}
             </div>
             <div className={`${CARD} mt-8`}>
-              <h3 className={H3}>{UEBERGABE.wasAnkommt.headline}</h3>
+              <h3 className={H3}>{UEBERGABE_ABWICKLUNG.wasAnkommt.headline}</h3>
               <ul className="space-y-2.5 mb-4">
-                {UEBERGABE.wasAnkommt.items.map((item) => (
+                {UEBERGABE_ABWICKLUNG.wasAnkommt.items.map((item) => (
                   <li key={item} className={`flex items-start gap-3 ${PROSE}`}>
                     <span className={DOT} />
                     {item}
@@ -332,7 +336,7 @@ export function PraxenPage() {
                 ))}
               </ul>
               <p className="text-[15px] text-gray-500 dark:text-gray-500 leading-[1.6]">
-                {UEBERGABE.wasAnkommt.hinweis}
+                {UEBERGABE_ABWICKLUNG.wasAnkommt.hinweis}
               </p>
             </div>
           </div>
@@ -346,7 +350,7 @@ export function PraxenPage() {
               <div className={CARD_ALT}>
                 <h3 className={H3}>Übernimmt der Assistent</h3>
                 <ul className="space-y-3">
-                  {ANLIEGEN_UEBERNIMMT.map((item, i) => (
+                  {ANLIEGEN_UEBERNIMMT_ABWICKLUNG.map((item, i) => (
                     <li key={i} className={`flex items-start gap-3 ${PROSE}`}>
                       <span className={DOT} />
                       {item}
@@ -402,7 +406,7 @@ export function PraxenPage() {
         <section className={SECTION}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>{TEAM_BLOCK.headline}</h2>
-            <p className={`${PROSE} mb-8`}>{TEAM_BLOCK.text}</p>
+            <p className={`${PROSE} mb-8`}>{TEAM_BLOCK.textAbwicklung}</p>
             <ul className="space-y-4">
               {TEAM_BLOCK.points.map((point, i) => (
                 <li key={i} className={`flex items-start gap-3 ${PROSE}`}>
@@ -510,6 +514,7 @@ export function PraxenPage() {
           <div className="max-w-4xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>{DECKELUNG.headline}</h2>
             <p className={`${PROSE} mb-4`}>{DECKELUNG.text}</p>
+            <p className={`${PROSE} mb-4`}>{DECKELUNG.geltung}</p>
             <p className={`${PROSE} mb-4`}>{DECKELUNG.tarifwechsel}</p>
             <p className={`${PROSE} mb-10`}>{DECKELUNG.nichtProBehandler}</p>
 
@@ -576,7 +581,19 @@ export function PraxenPage() {
 
         {/* ── Rechner: steht NACH dem Preisblock, damit der Leser Tarife und
             Deckelung kennt, bevor er rechnet (Inhaber-Vorgabe). ── */}
-        <PraxisRechnerSection />
+        {/*
+          Seit dem 11.09.2026 rechnet auch diese Seite mit dem kanonischen
+          Rechner. Vorher stand hier `PraxisRechnerSection` mit einem
+          voreingestellten „Automatisierungsgrad" von 20 % — einer Zahl, die sich
+          als Aussage über Cogniiq las und das Produkt damit weit unter Wert
+          verkaufte. Die alte Komponente bedient nur noch die eingefrorene
+          Kostenseite und verschwindet mit deren Experiment.
+        */}
+        <TelefonRechnerSection
+          headline={RECHNER.headline}
+          intro={[RECHNER.intro, RECHNER.rahmungRoutine]}
+          nachsatz={RECHNER.anbindungsHinweis}
+        />
 
         {/* ── 14 · M19 Umkehrbarkeit ── */}
         <section className={SECTION_ALT}>

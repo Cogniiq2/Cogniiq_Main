@@ -47,7 +47,7 @@ const config: IndustryPageConfig = {
       icon: "phone",
       title: "KI-Telefonassistent für Münchner Praxen",
       description:
-        "Der KI-Telefonassistent nimmt Patientenanrufe entgegen, beantwortet Fragen zu Öffnungszeiten, Fachrichtungen und Formalitäten, erfasst Terminwünsche mit Name und Rückrufnummer und leitet komplexe Anliegen strukturiert an Ihr Team weiter – auch außerhalb der Sprechzeiten, ohne Warteschleife. Ob Termine direkt in Ihr Praxisverwaltungssystem übergeben werden können, prüfen wir vor dem Angebot.",
+        "Der KI-Telefonassistent nimmt Patientenanrufe entgegen, beantwortet Fragen zu Öffnungszeiten, Fachrichtungen und Formalitäten und erledigt die freigegebenen Terminabläufe im Gespräch – auch außerhalb der Sprechzeiten, auch mehrere Anrufe zur selben Zeit. Komplexe und fachliche Anliegen leitet er strukturiert an Ihr Team weiter. Ob Termine direkt in Ihr Praxisverwaltungssystem geschrieben werden können, prüfen wir vor dem Angebot.",
     },
     {
       icon: "zap",
@@ -70,7 +70,7 @@ const config: IndustryPageConfig = {
     {
       title: "Rezeption entlasten bei Stoßzeiten",
       description:
-        "Montags früh und während der Mittagspause ist die Rezeption in Münchner Praxen chronisch überlastet. Der KI-Telefonassistent nimmt parallel Anrufe entgegen, ohne Warteschleife – Anfragen werden strukturiert erfasst.",
+        "Montags früh und während der Mittagspause ist die Rezeption in Münchner Praxen chronisch überlastet. Der KI-Telefonassistent nimmt mehrere Anrufe zur selben Zeit entgegen und erledigt die freigegebenen Terminabläufe im Gespräch.",
     },
     {
       title: "Patientenanfragen über die Website qualifizieren",
@@ -136,7 +136,7 @@ const config: IndustryPageConfig = {
     {
       question: "Was passiert mit Anrufen außerhalb meiner Öffnungszeiten?",
       answer:
-        "Der KI-Telefonassistent ist auch außerhalb der Sprechzeiten aktiv. Er beantwortet häufige Fragen, notiert Terminwünsche und leitet dringende Anliegen entsprechend weiter – ohne Warteschleife, ohne Anrufbeantworter.",
+        "Der KI-Telefonassistent ist auch außerhalb der Sprechzeiten aktiv. Er beantwortet häufige Fragen, vergibt und verschiebt Termine im vereinbarten Rahmen und leitet dringende Anliegen entsprechend weiter – kein Anrufbeantworter, sondern ein geführtes Gespräch.",
     },
   ],
 };

@@ -18,9 +18,10 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
-import { PraxisRechnerSection } from "@/components/PraxisRechnerSection";
+import { TelefonRechnerSection } from "@/components/TelefonRechnerSection";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 import {
+  ABWICKLUNG,
   BETREUUNG,
   CTA,
   DECKELUNG,
@@ -30,6 +31,7 @@ import {
   BETREUUNG_NACH_GOLIVE,
   NICHT_EXTRA,
   PERSONALKOSTEN_ANKER,
+  RECHNER,
   SPRACHEN,
   TARIFE,
   TARIF_ENTERPRISE,
@@ -40,10 +42,17 @@ import {
 const base = BUSINESS_INFO.website;
 const url = `${base}/kosten-ki-telefonassistent`;
 
-/** Numerische Beträge für das Schema — aus denselben Konstanten abgeleitet. */
-function toNumber(betrag: string): number {
-  return Number(betrag.replace(/[^\d,]/g, "").replace(/\./g, "").replace(",", "."));
-}
+/*
+  Die numerischen Beträge des Angebots-Schemas kommen aus den numerischen
+  Zwillingen in TARIFE (`monatlichEur`, `einrichtungEur`).
+
+  Hier stand bis zum 11.09.2026 ein `toNumber`, das die ANZEIGESTRINGS zurück
+  in Zahlen parste — Geschäftslogik, die an einer Tausenderpunkt-Formatierung
+  hing. Ein Punkt an der falschen Stelle hätte einen falschen Preis in
+  strukturierte Daten geschrieben, ohne dass im sichtbaren Text etwas auffällt.
+  Die ausgegebenen Zahlen sind dieselben; diese Seite ist ein eingefrorenes
+  Experiment, und ihre gerenderten Bytes ändern sich dadurch nicht.
+*/
 
 const breadcrumbs = [
   { name: "Home", url: base },
@@ -83,9 +92,11 @@ const faqItems = [
       `${FAKTEN.laufzeit} ${FAKTEN.kuendigung} ${FAKTEN.preisgarantie}`,
   },
   {
+    // Die Beträge stehen NUR in SPRACHEN. Hier stand bis zum 12.09.2026 eine
+    // zweite, abgetippte Fassung, die einen Paketpreis als feststehend nannte —
+    // während der Rechner dieselbe Konstellation schon als offen auswies.
     question: "Was kostet eine weitere Sprache?",
-    answer:
-      "79 € im Monat je Sprache. Ab drei Sprachen sind es 230 € im Monat für bis zu fünf Sprachen gleichzeitig. Der Assistent kann die Sprache mitten im Gespräch wechseln.",
+    answer: SPRACHEN.text,
   },
 ];
 
@@ -103,8 +114,18 @@ const schema = {
     {
       "@type": "Service",
       name: "KI Telefonassistent für Praxen",
+      /*
+        Beschreibung an den sichtbaren Text gezogen, 12.09.2026.
+
+        Vorher: „Telefonische Anrufannahme für Praxen …" — das beschrieb einen
+        Anrufbeantworter mit Notiz und widersprach damit dem, was die Seite
+        sichtbar zusagt. Die Fassung unten nennt dieselbe Leistung wie der
+        Fließtext und trägt die Anbindungsbedingung mit, statt eine universelle
+        Integration zu behaupten. Keine Keyword-Liste, keine erfundenen
+        Systemnamen: Was hier steht, steht auch auf der Seite.
+      */
       description:
-        "Telefonische Anrufannahme für Praxen mit festem Minutenkontingent, gedeckelter Monatsrechnung und einmaliger Einrichtung.",
+        "KI-Telefonassistent für Praxen: Der Assistent nimmt Anrufe an, führt freigegebene Routineabläufe im Gespräch zu Ende — Termin buchen, verschieben, absagen, konfigurierte Fragen beantworten — und übergibt Ausnahmen an Ihr Team. Festes Minutenkontingent, gedeckelte Monatsrechnung, einmalige Einrichtung. Direkter Schreibzugriff auf ein Praxis- oder Kalendersystem setzt eine für dieses System eingerichtete und verifizierte Anbindung voraus.",
       url,
       provider: { "@type": "Organization", name: BUSINESS_INFO.name, url: base },
       offers: [
@@ -115,7 +136,7 @@ const schema = {
           url,
           priceSpecification: {
             "@type": "UnitPriceSpecification",
-            price: toNumber(t.monatlich),
+            price: t.monatlichEur,
             priceCurrency: "EUR",
             unitCode: "MON",
             billingDuration: 1,
@@ -130,7 +151,7 @@ const schema = {
           url,
           priceSpecification: {
             "@type": "PriceSpecification",
-            price: toNumber(t.einrichtung),
+            price: t.einrichtungEur,
             priceCurrency: "EUR",
           },
         })),
@@ -207,7 +228,11 @@ export function KostenKiTelefonassistent() {
         <section className={SECTION_ALT}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>{DECKELUNG.headline}</h2>
-            <p className={`${PROSE} mb-6`}>{DECKELUNG.text}</p>
+            <p className={`${PROSE} mb-4`}>{DECKELUNG.text}</p>
+            {/* Der Geltungsbereich steht DIREKT hinter der Zusage, nicht als
+                Fußnote: Eine Obergrenze, deren Bezug erst drei Absätze später
+                kommt, wird als Gesamtdeckel gelesen. */}
+            <p className={`${PROSE} mb-6`}>{DECKELUNG.geltung}</p>
             <div className={CARD}>
               <p className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-4">
                 {DECKELUNG.hinweis}
@@ -220,7 +245,7 @@ export function KostenKiTelefonassistent() {
                   >
                     <span>Tarif {t.name}</span>
                     <span className="tabular-nums text-gray-900 dark:text-gray-100 font-medium">
-                      höchstens {t.obergrenze} im Monat
+                      Telefonie höchstens {t.obergrenze} im Monat
                     </span>
                   </li>
                 ))}
@@ -299,14 +324,39 @@ export function KostenKiTelefonassistent() {
           </div>
         </section>
 
+        {/* ── 3 · Der Rechner, direkt nach den Tarifen ────────────────────────
+            Bis zum 12.09.2026 stand hier gar nichts: Der Rechner lag neun
+            Abschnitte weiter unten, hinter Einrichtung, Testphase, Sprachen,
+            Vertrag und „was nicht extra kostet". Wer „was kostet ein KI
+            Telefonassistent" sucht, will genau diese eine Frage beantwortet
+            haben — und zwar für den eigenen Betrieb, nicht erst nachdem er die
+            Vertragsbedingungen gelesen hat. Deckelung und Tarife stehen
+            weiterhin davor, damit die Zahlen im Rechner in einen Rahmen fallen,
+            den der Leser schon kennt.
+
+            Es ist derselbe `TelefonRechner` wie auf /ki-telefonassistent, /praxen
+            und der Startseite: eine Rechnung, eine Quelle. Dieser Rahmen ist
+            reine Darstellung — Überschrift und Einleitung sind seitenspezifisch,
+            die Arithmetik kommt aus src/lib/telefonassistent-rechner.ts. ── */}
+        <TelefonRechnerSection
+          tone="alt"
+          headline="Was kostet das bei Ihrem Anrufaufkommen?"
+          intro={[
+            "Tragen Sie Ihr Anrufaufkommen ein. Der Rechner nennt den passenden Tarif, den Monatsbetrag und die einmalige Einrichtung — sofort, ohne E-Mail und ohne Verkaufsgespräch.",
+            "Danach können Sie weiterrechnen, ob sich das für Ihren Betrieb trägt. Für die wirtschaftlichen Felder setzen wir bewusst keine Werte ein: Stundenkosten, Routineanteil und verpasste Anrufe kennen nur Sie. Solange etwas fehlt, nennt der Rechner das Zeitpotenzial und sagt, was noch fehlt — er rechnet kein Ergebnis aus einem halben Modell.",
+            "Was vor der technischen Prüfung nicht feststeht, etwa die Anbindung an Ihr System, steht als offene Position in der Liste. Nicht als Null.",
+          ]}
+          nachsatz={RECHNER.anbindungsHinweis}
+        />
+
         {/* ── 5 · Einrichtung als Projekt + Zwei-Wochen-Garantie ── */}
-        <section className={SECTION_ALT}>
+        <section className={SECTION}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>Wofür zahlen Sie die Einrichtung?</h2>
             <p className={`${PROSE} mb-10`}>{EINRICHTUNG_PROJEKT.intro}</p>
             <ol className="space-y-4">
               {EINRICHTUNG_PROJEKT.schritte.map((s) => (
-                <li key={s.nummer} className={`${CARD} flex items-start gap-5`}>
+                <li key={s.nummer} className={`${CARD_ALT} flex items-start gap-5`}>
                   <span className="text-[15px] font-bold text-gray-400 dark:text-gray-500 tabular-nums mt-1 flex-shrink-0">
                     {s.nummer}
                   </span>
@@ -352,7 +402,7 @@ export function KostenKiTelefonassistent() {
         </section>
 
         {/* ── 6 · Testphase als Vetorecht ── */}
-        <section className={SECTION}>
+        <section className={SECTION_ALT}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>Können Sie den Empfang vorher testen?</h2>
             <p className={`${PROSE} mb-5`}>
@@ -366,16 +416,24 @@ export function KostenKiTelefonassistent() {
         </section>
 
         {/* ── Begriffsklärung: hält „AI Rezeptionist" als Synonym auf der Seite ── */}
-        <section className={SECTION_ALT}>
+        <section className={SECTION}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>Was kostet ein AI Rezeptionist im Vergleich?</h2>
             <div className={`${PROSE} space-y-5`}>
               <p>
                 AI Rezeptionist, KI Telefonassistent, digitale Rezeption,
-                Telefonannahme mit KI — gemeint ist überall dasselbe: ein System,
-                das ans Telefon geht, das Anliegen aufnimmt und strukturiert
-                weitergibt. Die Begriffe unterscheiden sich, die Preisfrage nicht.
+                Telefonannahme mit KI — gemeint ist überall dasselbe Produkt, und
+                die Preisfrage stellt sich für alle diese Begriffe gleich.
               </p>
+              <p>
+                {ABWICKLUNG.faehigkeit} Ein Routineanruf wird damit nicht zu einer
+                Aufgabe, die danach noch jemand erledigen muss. An einen Menschen
+                gehen die Fälle, die dorthin gehören: Notfälle, Beschwerden und
+                sensible Anliegen, fachliche Entscheidungen, alles außerhalb der
+                freigegebenen Abläufe und alles, was Sie bewusst menschlich halten
+                wollen.
+              </p>
+              <p>{ABWICKLUNG.qualifikation}</p>
               <p>
                 Worin sich Angebote tatsächlich unterscheiden, ist die
                 Abrechnungsform. Verbreitet ist die Abrechnung pro Anruf oder pro
@@ -389,7 +447,7 @@ export function KostenKiTelefonassistent() {
         </section>
 
         {/* ── 7 · Zusätzliche Sprachen ── */}
-        <section className={SECTION}>
+        <section className={SECTION_ALT}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>Was kostet eine weitere Sprache?</h2>
             <p className={PROSE}>{SPRACHEN.text}</p>
@@ -397,7 +455,7 @@ export function KostenKiTelefonassistent() {
         </section>
 
         {/* ── 8 · Laufzeit, Kündigung, Preisgarantie ── */}
-        <section className={SECTION_ALT}>
+        <section className={SECTION}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>{VERTRAG.headline}</h2>
             <dl className="space-y-5">
@@ -414,7 +472,7 @@ export function KostenKiTelefonassistent() {
         </section>
 
         {/* ── 9 · Was nicht extra kostet ── */}
-        <section className={SECTION}>
+        <section className={SECTION_ALT}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <h2 className={H2}>{NICHT_EXTRA.headline}</h2>
             <p className={`${PROSE} mb-8`}>{NICHT_EXTRA.intro}</p>
@@ -436,9 +494,6 @@ export function KostenKiTelefonassistent() {
             </p>
           </div>
         </section>
-
-        {/* ── Rechner: nach "Was nicht extra kostet", vor der FAQ ── */}
-        <PraxisRechnerSection tone="alt" />
 
         {/* ── 10 · FAQ zum Preis, unbequeme Fragen zuerst ── */}
         <section className={SECTION}>

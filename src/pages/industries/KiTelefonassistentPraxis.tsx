@@ -7,14 +7,14 @@ const config: NationalIndustryPageConfig = {
   seo: {
     title: "KI Telefonassistent für Therapiepraxen | Cogniiq",
     description:
-      "KI Telefonassistent für Physio-, Ergo- und Logopädie-Praxen: erreichbar bleiben, während Sie behandeln. Terminwünsche strukturiert erfasst, ohne Gesprächsaufzeichnung.",
+      "KI Telefonassistent für Physio-, Ergo- und Logopädie-Praxen: erreichbar bleiben, während Sie behandeln. Termine werden im Gespräch vergeben, verschoben und abgesagt – ohne Gesprächsaufzeichnung.",
     canonical: `${BUSINESS_INFO.website}/ki-telefonassistent-praxis`,
     keywords: "KI Telefonassistent Praxis, Physiotherapie Telefonannahme, telefonische Erreichbarkeit Therapiepraxis, Terminbuchung Therapeut",
   },
   h1: "KI Telefonassistent für Therapeuten & Praxen",
   tagline: "Physio · Ergo · Logo · Erreichbar ohne besetzten Empfang",
   intro:
-    "Ihre Hände sind am Patienten, und das Telefon klingelt im Flur. Nach Feierabend sitzen Sie über der Rückrufliste – falls die Mailbox überhaupt verwertbare Nachrichten enthält. Viele Therapiepraxen besetzen den Empfang nur wenige Stunden pro Woche; den Rest erledigt die Inhaberin abends selbst. Der KI Telefonassistent nimmt die Anrufe an, während Sie behandeln, erfasst Terminwünsche strukturiert und legt sie Ihnen so vor, dass der Rückruf in Minuten erledigt ist – oder gar nicht mehr nötig.",
+    "Ihre Hände sind am Patienten, und das Telefon klingelt im Flur. Nach Feierabend sitzen Sie über der Rückrufliste – falls die Mailbox überhaupt verwertbare Nachrichten enthält. Viele Therapiepraxen besetzen den Empfang nur wenige Stunden pro Woche; den Rest erledigt die Inhaberin abends selbst. Der KI Telefonassistent führt diese Gespräche, während Sie behandeln, und bringt sie zu Ende: Termin vergeben, verschoben oder abgesagt, freigegebene Fragen beantwortet. Aus dem Anruf wird kein Eintrag auf Ihrer Abendliste, sondern ein erledigter Vorgang. Was fachlich ist, bleibt bei Ihnen – dafür gibt es die Rückrufliste weiterhin, aber nur dafür.",
   serviceSlug: "ki-telefonassistent",
   serviceLabel: "KI Telefonassistent",
   costLink: "/kosten-ki-telefonassistent",
@@ -23,7 +23,7 @@ const config: NationalIndustryPageConfig = {
     {
       title: "Behandlung und Telefon konkurrieren um dieselben Hände",
       description:
-        "Eine Sitzung lässt sich nicht unterbrechen, um einen Terminwunsch aufzunehmen. Jeder Anruf während der Behandlung landet auf der Mailbox – oder nirgends.",
+        "Eine Sitzung lässt sich nicht unterbrechen, um einen Termin zu vergeben. Jeder Anruf während der Behandlung landet auf der Mailbox – oder nirgends.",
     },
     {
       title: "Die Rückrufliste gehört dem Feierabend",
@@ -52,12 +52,13 @@ const config: NationalIndustryPageConfig = {
     },
   ],
   solution: {
-    headline: "Erreichbar bleiben, ohne den Empfang zu besetzen",
-    text: "Der Assistent nimmt Anrufe an, während Sie behandeln: Er erfasst Terminwünsche, nimmt Absagen entgegen und beantwortet wiederkehrende Fragen nach Ihren Vorgaben. Fachliche und therapeutische Auskünfte gibt er nicht – solche Anliegen landen mit Rückrufnummer und Kontext auf Ihrer Liste. Sie entscheiden abends nicht mehr, wen Sie zuerst zurückrufen müssen, sondern sehen es.",
+    headline: "Erreichbar bleiben — und den Anruf zu Ende bringen",
+    text: "Der Assistent führt die Gespräche, während Sie behandeln, und erledigt sie im vereinbarten Rahmen: Er vergibt Termine, verschiebt sie, nimmt Absagen entgegen und beantwortet die Fragen, die Sie freigegeben haben. Wo wir die Schnittstelle Ihrer Praxissoftware eingerichtet und verifiziert haben, steht der Termin danach dort; ohne tragfähige Schnittstelle steht der fertige Vorgang für Sie bereit — als vereinbarter Rückfallweg, nicht als Normalfall. Fachliche und therapeutische Auskünfte gibt er grundsätzlich nicht: Solche Anliegen und alles, was Sie ausgenommen haben, kommen mit Rückrufnummer und Kontext zu Ihnen. Der Unterschied zu vorher ist nicht die bessere Liste, sondern die kürzere.",
   },
   benefits: [
     "Anrufe werden angenommen, während Sie behandeln – ohne dass jemand am Empfang sitzt",
-    "Terminwünsche und Absagen kommen als strukturierte Einträge an – mit Name, Nummer und Anliegen",
+    "Termine werden im Gespräch vergeben, verschoben und abgesagt – im Rahmen, den Sie festlegen",
+    "Eintrag in Ihre Praxissoftware, wo deren geprüfte Schnittstelle das trägt; sonst steht der fertige Vorgang für Sie bereit",
     "Frei werdende Termine sind sofort sichtbar und können neu vergeben werden",
     "Wiederkehrende Fragen zu Zeiten, Anfahrt oder Unterlagen beantwortet der Assistent nach Ihren Vorgaben",
     "Ihre Stimmauswahl, Ihr Begrüßungssatz, Ihre Formulierungen – Anrufer erfahren im ersten Satz, dass ein KI-System spricht",
@@ -75,17 +76,23 @@ const config: NationalIndustryPageConfig = {
       },
       {
         step: "02",
-        title: "Anliegen strukturiert erfassen",
+        title: "Anliegen im Gespräch erledigen",
         description:
-          "Terminwunsch, Absage oder Frage zur Praxis: Der Assistent bearbeitet, was Sie freigegeben haben – nach Ihren Zeitfenstern und Regeln. Therapeutische Fragen nimmt er nur auf, beantwortet sie aber nicht.",
+          "Termin, Verschiebung, Absage oder Frage zur Praxis: Der Assistent wickelt ab, was Sie freigegeben haben – nach Ihren Zeitfenstern und Regeln, im selben Gespräch. Therapeutische Fragen beantwortet er grundsätzlich nicht; sie nimmt er auf und gibt sie an Sie.",
       },
       {
         step: "03",
-        title: "Übergabe statt Rückruf-Marathon",
+        title: "Was übrig bleibt — und was nicht",
         description:
-          "Alle Anliegen stehen als sortierte Liste im Dashboard – mit Name, Rückrufnummer und Terminwunsch. Was sich ohne Sie klären ließ, ist geklärt; den Rest arbeiten Sie in Minuten ab, statt abends die Mailbox zu rekonstruieren.",
+          "Der freigegebene Ablauf ist erledigt, bevor der Anrufer auflegt; er erscheint auf keiner Liste mehr. Auf Ihrer Liste steht nur noch, was dort hingehört: therapeutische Fragen, unklare Anliegen und alles, was Sie bewusst ausgenommen haben – mit Name, Rückrufnummer und Kontext. Statt abends die Mailbox zu rekonstruieren, arbeiten Sie eine kurze Liste echter Ausnahmen ab.",
       },
     ],
+  },
+  rechner: {
+    ankertext: "Kosten und Wirtschaftlichkeit selbst prüfen",
+    kontext: "Praxis",
+    einleitung:
+      "Bevor Sie ein Angebot anfordern: Der Rechner nennt den passenden Tarif für Ihr Anrufaufkommen, die einmalige Einrichtung und — mit Ihren eigenen Stundenkosten — ab wann sich das trägt.",
   },
   cityLinks: [
     { label: "KI Telefonassistent Bayreuth", href: "/bayreuth/ki-telefonassistent" },
@@ -119,9 +126,9 @@ const config: NationalIndustryPageConfig = {
       answer: `Vier Punkte entscheiden, und Sie sollten sie bei jedem Anbieter abfragen: Wird das Gespräch aufgezeichnet und wie lange gespeichert. Werden Ihre Daten zum Training von Modellen verwendet. Gibt es einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO. Und wie wird die Schweigepflicht nach § 203 StGB vertraglich abgebildet. Bei uns: ${DATENSCHUTZ_PUNKTE.join(". ").replace(/\.\.$/, ".")}.`,
     },
     {
-      question: "Was passiert mit Anliegen, die der Assistent nicht klären kann?",
+      question: "Was passiert mit Anliegen, die der Assistent nicht klären soll?",
       answer:
-        "Therapeutische Fragen, unklare Anliegen und alles, was Sie festgelegt haben, nimmt der Assistent nur strukturiert auf – mit Name, Rückrufnummer und Anliegen. Sie sehen die Liste, wenn Sie aus der Behandlung kommen, und entscheiden selbst über jede Rückmeldung.",
+        "Das ist der Ausnahmeweg, nicht der Normalfall: Termine, Verschiebungen und Absagen erledigt der Assistent im Gespräch. Therapeutische Fragen, unklare Anliegen und alles, was Sie ausgenommen haben, nimmt er dagegen nur auf – mit Name, Rückrufnummer und Anliegen – und gibt sie an Sie. Diese Liste sehen Sie, wenn Sie aus der Behandlung kommen, und entscheiden selbst über jede Rückmeldung. Sie ist deutlich kürzer als eine Mailbox, weil der Routineteil gar nicht mehr darauf landet.",
     },
     {
       question: "Kann ich den Assistenten hören, bevor ich mich entscheide?",

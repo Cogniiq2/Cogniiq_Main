@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Phone, Clock, Calendar, CircleCheck as CheckCircle2, MapPin, Zap, Users, Shield, Wrench, Stethoscope, Chrome as Home, Briefcase, Building2 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
+import { RechnerCta } from "@/components/RechnerCta";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -212,6 +213,20 @@ function HeroSection() {
             </Link>
           </div>
 
+          {/*
+            Bayerische Betriebe, die hier landen, fragen als erstes nach dem
+            Preis — und die Seite hat bis hierher keinen genannt, weil er vom
+            Anrufaufkommen abhängt. Der Verweis führt auf den Rechner, nicht auf
+            eine weitere Preisseite: Die Preisintention bleibt dort, wo sie
+            hingehört, hier steht nur das Werkzeug.
+          */}
+          <RechnerCta
+            variante="zeile"
+            ankertext="Kosten ohne Anfrage berechnen"
+            kontext="Bayern"
+            className="mb-8"
+          />
+
           <div className="flex flex-wrap gap-6">
             {[
               { icon: MapPin, label: "Bayernweit verfügbar" },
@@ -412,7 +427,7 @@ function BenefitsSection() {
             {
               icon: Phone,
               title: "Erreichbar, wenn niemand abnehmen kann",
-              desc: "Anrufe werden angenommen, auch wenn Ihr Team auf der Baustelle, beim Patienten oder im Termin ist – ohne Besetztzeichen, ohne Warteschleife.",
+              desc: "Anrufe werden angenommen, auch wenn Ihr Team auf der Baustelle, beim Patienten oder im Termin ist – mehrere zur selben Zeit, und freigegebene Abläufe gleich zu Ende gebracht.",
             },
             {
               icon: Calendar,

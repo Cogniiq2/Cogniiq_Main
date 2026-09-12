@@ -49,7 +49,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     localIntro: {
       paragraphs: [
         "Bayreuth ist eine Mittelstadt in Oberfranken. Arzt- und Zahnarztpraxen, Therapiepraxen, Gastronomie, Sportanlagen und Handwerksbetriebe prägen den Ort. So unterschiedlich diese Betriebe sind – am Telefon teilen sie dasselbe Problem: Die Anrufe kommen gebündelt zu Stoßzeiten, genau dann, wenn das Personal in Behandlung, Service oder Kundengespräch gebunden ist.",
-        "Der Telefonassistent nimmt die Anrufe an, die sonst ins Leere laufen: morgens vor Öffnung, in der Mittagspause, nach Feierabend, am Wochenende. Wiederkehrende Fragen zu Zeiten, Anfahrt oder Verfügbarkeit beantwortet er nach Ihren Vorgaben. Terminwünsche trägt er nach Ihren Regeln ein oder legt sie zur Bestätigung vor. Alles andere übergibt er strukturiert an Ihr Team – mit Rückrufnummer, Anliegen und nächstem Schritt.",
+        "Der Telefonassistent nimmt die Anrufe an, die sonst ins Leere laufen: morgens vor Öffnung, in der Mittagspause, nach Feierabend, am Wochenende – und bringt sie im vereinbarten Rahmen zu Ende. Termine vergibt, verschiebt und storniert er nach Ihren Regeln, wiederkehrende Fragen beantwortet er nach Ihren Vorgaben. Wo ein Ablauf in Ihr System schreibt, richten wir die Anbindung für Ihr System ein und verifizieren sie vorher. Ausnahmen, strittige Fälle und alles, was Sie ausgenommen haben, übergibt er strukturiert an Ihr Team – mit Rückrufnummer, Anliegen und nächstem Schritt.",
         "Ehrlich betrachtet: Viele Betriebe haben Telefonassistenten schon ausprobiert und wieder abgeschafft. Selten lag es daran, dass die Technik den Anrufer nicht verstand. Gescheitert ist meist, was danach kam – das Ergebnis landete nirgends, die Stimme klang nach Automat, und niemand passte das System an den Betrieb an. Um genau diese drei Punkte herum ist unser Assistent gebaut: Übergabe zuerst, Ansagen mit Ihrem Ton, laufende Anpassung als Teil des Betriebs.",
         `Die Einrichtung übernimmt Cogniiq vollständig; Ihre Anrufe werden auf den Assistenten umgeleitet. ${FAKTEN.uebergabeGarantie} Als Anbieter mit Hauptsitz in Bayreuth sind wir direkt erreichbar – mit festem Ansprechpartner statt Ticketsystem, auf Wunsch auch mit Terminen vor Ort.`,
         "Ob Hausarztpraxis in der Innenstadt, Restaurant zur Festspielzeit oder Handwerksbetrieb im Umland: Der Anliegen-Katalog wird auf Ihren Betrieb zugeschnitten und wächst mit, wenn sich Zeiten oder Abläufe ändern. Ergänzend unterstützen wir mit [Automatisierung in Bayreuth](/bayreuth/automatisierung) und [Webdesign in Bayreuth](/bayreuth/webdesign).",
@@ -67,7 +67,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         industry: "Arztpraxis & Therapiepraxis",
         title: "Entlastung für die Anmeldung zu Stoßzeiten",
-        description: "Der Assistent nimmt Terminwünsche, Stornierungen und Rezeptbestellungen an, wenn die Anmeldung gebunden ist, und übergibt sie als strukturierte Einträge. Medizinische Auskünfte gibt er nicht; Notfall-Hinweise gehen sofort an einen Menschen.",
+        description: "Der Assistent erledigt Terminvergabe, Verschiebungen und Stornierungen im vereinbarten Rahmen, wenn die Anmeldung gebunden ist; Rezeptbestellungen nimmt er nach Ihren Regeln entgegen. Medizinische Auskünfte gibt er nicht, es gibt keine Triage; Notfall-Hinweise gehen sofort an einen Menschen. Was Sie ausgenommen haben, kommt als strukturierter Eintrag zu Ihrem Team.",
       },
       {
         industry: "Sport & Padel",
@@ -90,7 +90,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { question: "Was kostet der KI Telefonassistent?", answer: `Sie zahlen einen festen Monatsbetrag für ein Minutenkontingent. ${FAKTEN.deckelung} ${FAKTEN.tarifzuordnung} Nach dem Erstgespräch erhalten Sie ein schriftliches Angebot, in dem auch Einmalposten wie die Einrichtung offen ausgewiesen sind.` },
       { question: "Wie schnell ist der Empfang einsatzbereit?", answer: `${FAKTEN.uebergabeGarantie} ${FAKTEN.startDefinition} Enthalten sind Erstgespräch, Ihre Vorgaben, der Aufbau und zwei Tage Testphase. ${FAKTEN.freigabeNachUebergabe} ${FAKTEN.pruefzeitNeutral}` },
       { question: "Was unterscheidet den Assistenten von einem Telefonmenü oder Chatbot?", answer: "Ein Telefonmenü zwingt Anrufer in starre Optionen und Tastennavigation. Der Assistent arbeitet mit gesprochener Sprache: Er erfragt das Anliegen, beantwortet freigegebene Fragen und nimmt alles andere strukturiert auf – ohne dass sich jemand durch ein Menü drücken muss." },
-      { question: "Können mehrere Anrufe gleichzeitig ankommen?", answer: "Ja. Der Assistent nimmt zehn Anrufe gleichzeitig an – ohne Warteschleife. Das ist gerade zu Stoßzeiten der eigentliche Unterschied zum klassischen Empfang mit einer Leitung." },
+      { question: "Können mehrere Anrufe gleichzeitig ankommen?", answer: "Ja. Der Assistent nimmt mehrere Anrufe zur selben Zeit an, statt sie in eine Warteschleife zu stellen; die Kapazität wird auf Ihr Aufkommen ausgelegt und im Angebot ausgewiesen. Das ist gerade zu Stoßzeiten der eigentliche Unterschied zum klassischen Empfang mit einer Leitung." },
       { question: "Was passiert bei einem technischen Ausfall?", answer: "Für den Störungsfall wird ein Fallback eingerichtet: Anrufe laufen dann auf eine von Ihnen benannte Nummer oder auf eine klare Ansage mit dem nächsten Schritt. Diesen Weg legen wir gemeinsam bei der Einrichtung fest." },
       // „binden wir an" behauptete bestehende Standardanbindungen. Es gibt keine
       // Liste unterstützter Systeme (ANBINDUNG.nichtBehauptet) — die Prüfung ist
@@ -108,12 +108,12 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         name: "Arztpraxen & Zahnarztpraxen",
         problem: "Montags und nach Feiertagen trifft die Anrufflut die Anmeldung, während dort bereits Patienten stehen. Wer nicht durchkommt, versucht es oft bei der nächsten Praxis.",
-        solution: "Der Assistent nimmt Terminwünsche und Stornierungen an, wenn die Anmeldung gebunden ist, und übergibt sie als strukturierte Einträge. Medizinische Auskünfte gibt er nicht; Notfall-Hinweise gehen sofort an einen Menschen.",
+        solution: "Der Assistent erledigt Terminvergabe und Stornierungen im vereinbarten Rahmen, wenn die Anmeldung gebunden ist. Medizinische Auskünfte gibt er nicht, es gibt keine Triage; Notfall-Hinweise gehen sofort an einen Menschen. Was Sie ausgenommen haben, kommt als strukturierter Eintrag zu Ihrem Team.",
       },
       {
         name: "Physiotherapie & Heilpraktiker",
         problem: "Praxen mit kleinen Teams haben niemanden, der dauerhaft ans Telefon gehen kann. Anrufe zwischen Behandlungen und nach Feierabend landen auf der Mailbox – oder nirgends.",
-        solution: "Der Assistent nimmt Terminwünsche und Absagen während der Behandlungszeiten an und legt sie als sortierte Liste vor – der Rückruf-Marathon am Abend entfällt weitgehend.",
+        solution: "Der Assistent vergibt Termine und nimmt Absagen während der Behandlungszeiten entgegen – im Gespräch erledigt, nicht als Notiz für später. Auf der Abendliste steht nur noch, was Sie bewusst ausgenommen haben.",
       },
       {
         name: "Gastronomie & Restaurants",
@@ -133,13 +133,13 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         name: "Wellness & Beauty",
         problem: "Kosmetikstudios und Friseursalons erhalten Buchungsanfragen zu jeder Tageszeit, haben aber während der Behandlung keine Hand frei für das Telefon.",
-        solution: "Der Assistent nimmt Terminwünsche nach Ihren Regeln auf und übergibt sie strukturiert – ohne die laufende Behandlung zu unterbrechen.",
+        solution: "Der Assistent vergibt, verschiebt und storniert Termine nach Ihren Regeln – im Gespräch abgeschlossen, ohne die laufende Behandlung zu unterbrechen.",
       },
     ],
     localScenarios: [
       {
         title: "Hausarztpraxis in der Innenstadt",
-        description: "Montagmorgen: Am Tresen stehen Patienten, das Telefon klingelt ohne Pause, die Anmeldung entscheidet im Sekundentakt, wer warten muss. Mit dem Telefonassistenten würden Terminwünsche und Rezeptbestellungen strukturiert aufgenommen – und das Team könnte sich den Patienten im Wartezimmer widmen.",
+        description: "Montagmorgen: Am Tresen stehen Patienten, das Telefon klingelt ohne Pause, die Anmeldung entscheidet im Sekundentakt, wer warten muss. Mit dem Telefonassistenten wären Terminvergabe, Verschiebungen und Stornierungen im Gespräch erledigt – und das Team könnte sich den Patienten im Wartezimmer widmen.",
       },
       {
         title: "Restaurant im Festspielviertel",
@@ -147,7 +147,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       },
       {
         title: "Physiotherapiepraxis im Gewerbegebiet",
-        description: "Drei Therapeuten, kein besetzter Empfang: Während der Behandlungen nimmt niemand ab, abends arbeitet die Inhaberin die Mailbox ab. Mit dem Assistenten kämen Terminwünsche und Absagen als sortierte Liste an – und frei werdende Termine könnten neu vergeben werden.",
+        description: "Drei Therapeuten, kein besetzter Empfang: Während der Behandlungen nimmt niemand ab, abends arbeitet die Inhaberin die Mailbox ab. Mit dem Assistenten wären Terminvergabe und Absagen im Gespräch erledigt – und frei werdende Termine könnten sofort neu vergeben werden.",
       },
       {
         title: "Padel-Anlage am Stadtrand",
@@ -436,7 +436,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     localIntro: {
       paragraphs: [
         "Regensburg ist Universitätsstadt mit Uniklinikum, hat eine Altstadt, die zum UNESCO-Welterbe zählt, und ganzjährigen Tourismus. Diese Mischung prägt auch das Telefon: Anfragen kommen zu jeder Tages- und Abendzeit, in der Tourismussaison und zu Semesterbeginn deutlich mehr – das Personal in Praxen, Küchen und Werkstätten wächst aber nicht mit.",
-        "Der Telefonassistent nimmt Anrufe an, wenn Ihr Team gebunden ist oder der Betrieb geschlossen hat. Wiederkehrende Fragen zu Zeiten, Preisen oder Verfügbarkeit beantwortet er nach Ihren Vorgaben, Terminwünsche trägt er nach Ihren Regeln ein oder legt sie zur Bestätigung vor. Komplexe und dringende Anliegen übergibt er sofort und strukturiert an einen Menschen – mit Rückrufnummer, Anliegen und nächstem Schritt.",
+        "Der Telefonassistent nimmt Anrufe an, wenn Ihr Team gebunden ist oder der Betrieb geschlossen hat – und bringt den freigegebenen Ablauf im Gespräch zu Ende. Wiederkehrende Fragen zu Zeiten, Preisen oder Verfügbarkeit beantwortet er nach Ihren Vorgaben, Termine vergibt, verschiebt und storniert er nach Ihren Regeln. Wo ein Ablauf in Ihr System schreibt, richten wir die Anbindung ein und verifizieren sie vorher. Komplexe und dringende Anliegen übergibt er sofort und strukturiert an einen Menschen – mit Rückrufnummer, Anliegen und nächstem Schritt.",
         "Dabei gilt, was sich am Markt gezeigt hat: Ein Telefonassistent überzeugt nicht dadurch, dass er Anrufer versteht, sondern dadurch, dass das Ergebnis danach im richtigen System ankommt und die Ansagen zum Betrieb passen. Beides steht deshalb im Zentrum der Einrichtung – vor dem Start hören Sie den Assistenten selbst und geben ihn erst dann frei.",
         `Die Einrichtung läuft im Hintergrund: Ihre Anrufe werden auf den Assistenten umgeleitet, Ihr Team muss nichts Neues lernen. ${FAKTEN.uebergabeGarantie} Ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gehört dazu, ${FAKTEN.keineAufzeichnung}`,
         "Für Betriebe im Raum Regensburg, die ihre Abläufe weiter entlasten möchten, ergänzt der Telefonassistent die [Automatisierung für Regensburg](/regensburg/automatisierung) und das [Webdesign für Regensburg](/regensburg/webdesign) – Anfragen annehmen, verarbeiten und sichtbar sein greifen dabei ineinander.",
@@ -449,7 +449,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       // angebunden werden können, entscheidet die Prüfung des konkreten Systems
       // vor dem Angebot (FAKTEN.keineAnbindung).
       "Jedes Gespräch endet als strukturierter Eintrag im Dashboard – kein Abhören, kein Rekonstruieren; ob Ihr System angebunden werden kann und was eine Schnittstelle kostet, prüfen wir vor dem Angebot",
-      "Auch bei Anrufspitzen in der Tourismussaison wird jeder Anruf angenommen – ohne Warteschleife",
+      "Auch bei Anrufspitzen in der Tourismussaison mehrere Anrufe zur selben Zeit – die Kapazität wird auf Ihr Aufkommen ausgelegt",
       "Keine Gesprächsaufzeichnung, kein Training mit Ihren Daten – Auftragsverarbeitungsvertrag nach Art. 28 DSGVO inklusive",
       "Persönliche Betreuung mit festem Ansprechpartner – kein Ticketsystem",
     ],
@@ -457,7 +457,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         industry: "Praxen im Klinikumfeld",
         title: "Entlastung für die Anmeldung zu Stoßzeiten",
-        description: "Rund um das Uniklinikum liegen viele Praxen – und montags, nach Feiertagen und in Infektwellen steht das Telefon kaum still. Der Assistent nimmt Terminwünsche und Stornierungen strukturiert auf; medizinische Auskünfte gibt er nicht, Notfall-Hinweise gehen sofort an einen Menschen.",
+        description: "Rund um das Uniklinikum liegen viele Praxen – und montags, nach Feiertagen und in Infektwellen steht das Telefon kaum still. Der Assistent erledigt Terminvergabe und Stornierungen im vereinbarten Rahmen; medizinische Auskünfte gibt er nicht, es gibt keine Triage, Notfall-Hinweise gehen sofort an einen Menschen.",
       },
       {
         industry: "Gastronomie & Tourismus",
@@ -473,7 +473,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     processSteps: TELEFONASSISTENT_PROZESS,
     faq: [
       { question: "Versteht der Assistent Dialekte – auch Bayerisch?", answer: "Regionale Ausdrücke und Dialekt versteht der Assistent in aller Regel gut; bei sehr starkem Dialekt fragt er nach, statt zu raten. In der Testphase prüfen wir das mit echten Szenarien aus Ihrem Alltag – bevor der erste Anrufer ihn hört." },
-      { question: "Funktioniert der Assistent auch bei hohem Anrufaufkommen in der Tourismussaison?", answer: "Ja. Der Assistent nimmt zehn Anrufe gleichzeitig an – ohne Warteschleife. Das ist gerade in der Hauptsaison der Unterschied zu einer einzelnen besetzten Leitung." },
+      { question: "Funktioniert der Assistent auch bei hohem Anrufaufkommen in der Tourismussaison?", answer: "Ja. Der Assistent nimmt mehrere Anrufe zur selben Zeit an, statt sie in eine Warteschleife zu stellen; die Kapazität wird auf Ihr Aufkommen ausgelegt und im Angebot ausgewiesen. Das ist gerade in der Hauptsaison der Unterschied zu einer einzelnen besetzten Leitung." },
       { question: "Kann er Anrufe auf verschiedene Mitarbeiter weiterleiten?", answer: "Ja. Weiterleitungsregeln werden nach Thema, Uhrzeit und Verfügbarkeit konfiguriert – Sie legen fest, welches Anliegen bei wem landet." },
       { question: "Was passiert bei einem technischen Ausfall?", answer: "Für den Störungsfall wird ein Fallback eingerichtet: Anrufe laufen dann auf eine von Ihnen benannte Nummer oder auf eine klare Ansage mit dem nächsten Schritt. Diesen Weg legen wir gemeinsam bei der Einrichtung fest." },
       { question: "Worauf müssen Sie bei DSGVO und KI Telefonassistent achten?", answer: "Vier Punkte entscheiden, und Sie sollten sie bei jedem Anbieter abfragen: Wird das Gespräch aufgezeichnet und wie lange gespeichert. Werden Ihre Daten zum Training von Modellen verwendet. Gibt es einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO. Und wie wird die Schweigepflicht nach § 203 StGB vertraglich abgebildet. Bei uns: Gespräche werden nicht aufgezeichnet – gespeichert wird ausschließlich das strukturierte Ergebnis. Ihre Daten werden nicht zum Training von Modellen verwendet. Einen AVV nach Art. 28 DSGVO stellen wir jedem Kunden bereit. Cogniiq und alle Mitarbeitenden werden vertraglich auf das Berufsgeheimnis nach § 203 StGB verpflichtet. Der Assistent gibt sich zu Beginn jedes Anrufs als KI-System zu erkennen. Bei der Dokumentation für Ihren Datenschutzbeauftragten unterstützen wir." },
@@ -495,7 +495,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         name: "Arztpraxen & Klinikumfeld",
         problem: "In Praxen rund um das Uniklinikum ist die Leitung montags und nach Feiertagen dauerbesetzt, während am Tresen bereits Patienten warten. Wer nicht durchkommt, versucht es oft bei der nächsten Praxis.",
-        solution: "Der Assistent nimmt Terminwünsche und Stornierungen strukturiert auf und beantwortet wiederkehrende Fragen nach Ihren Vorgaben. Medizinische Auskünfte gibt er nicht; Notfall-Hinweise gehen sofort an einen Menschen.",
+        solution: "Der Assistent erledigt Terminvergabe und Stornierungen im vereinbarten Rahmen und beantwortet wiederkehrende Fragen nach Ihren Vorgaben. Medizinische Auskünfte gibt er nicht, es gibt keine Triage; Notfall-Hinweise gehen sofort an einen Menschen.",
       },
       {
         name: "Gastronomie & Altstadt",
@@ -515,13 +515,13 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       {
         name: "Physio, Therapie & Wellness",
         problem: "Kleinen Praxen fehlt das Personal, das zwischen Behandlungen dauerhaft ans Telefon geht. Termine werden verzögert vergeben oder gehen verloren.",
-        solution: "Der Assistent nimmt Terminwünsche und Absagen während der Behandlungszeiten an – nach Ihren Zeitfenstern und Regeln – und entlastet das Praxisteam spürbar.",
+        solution: "Der Assistent vergibt Termine und nimmt Absagen während der Behandlungszeiten entgegen – nach Ihren Zeitfenstern und Regeln, im Gespräch abgeschlossen statt als Notiz für später.",
       },
     ],
     localScenarios: [
       {
         title: "Hausarztpraxis nahe dem Klinikum",
-        description: "Montagmorgen: Die Leitung ist dauerbesetzt, am Tresen warten Patienten, die Anmeldung kommt nicht hinterher. Mit dem Telefonassistenten würden Terminwünsche und Stornierungen strukturiert aufgenommen – das Team könnte sich auf akute Fälle und die Patienten vor Ort konzentrieren.",
+        description: "Montagmorgen: Die Leitung ist dauerbesetzt, am Tresen warten Patienten, die Anmeldung kommt nicht hinterher. Mit dem Telefonassistenten wären Terminvergabe und Stornierungen im Gespräch erledigt – das Team könnte sich auf akute Fälle und die Patienten vor Ort konzentrieren.",
       },
       {
         title: "Restaurant in der Altstadt",
@@ -842,7 +842,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
       { question: "Betreut Cogniiq Projekte in München vollständig remote?", answer: "Ja. Alle Projektphasen – Aufnahmegespräch, Ansagen, Testphase, laufende Anpassung – funktionieren remote. Persönliche Termine im Raum München sind auf Anfrage möglich." },
       { question: "Was kostet der KI Telefonassistent für ein Münchner Unternehmen?", answer: `Dieselben Konditionen wie überall: ein fester Monatsbetrag für ein Minutenkontingent. ${FAKTEN.deckelung} Nach dem Erstgespräch erhalten Sie ein schriftliches Angebot mit allen Posten.` },
       { question: "Kommen unsere Kunden mit einer Computerstimme klar?", answer: "Nicht alle sofort – das nehmen wir ernst. Sie wählen die Stimme, formulieren den Begrüßungssatz und legen die Formulierungen fest. Anrufer erfahren im ersten Satz, dass ein KI-System spricht, und können jederzeit zu einem Menschen wechseln." },
-      { question: "Was passiert bei mehreren Anrufen gleichzeitig?", answer: "Jeder Anruf wird angenommen, auch wenn mehrere parallel eingehen – ohne Warteschleife. Gerade zu Stoßzeiten wie Messen oder Ferienbeginn ist das der Unterschied zu einer einzelnen Leitung." },
+      { question: "Was passiert bei mehreren Anrufen gleichzeitig?", answer: "Mehrere Anrufe werden zur selben Zeit angenommen, statt in eine Warteschleife zu laufen; die Kapazität wird auf Ihr Aufkommen ausgelegt und im Angebot ausgewiesen. Gerade zu Stoßzeiten wie Messen oder Ferienbeginn ist das der Unterschied zu einer einzelnen Leitung." },
       { question: "Wie schnell ist die Einrichtung?", answer: `${FAKTEN.uebergabeGarantie} ${FAKTEN.startDefinition} Enthalten sind Erstgespräch, Ihre Vorgaben, der Aufbau und zwei Tage Testphase. ${FAKTEN.freigabeNachUebergabe} ${FAKTEN.pruefzeitNeutral}` },
       { question: "Kann der Assistent für mehrere Standorte konfiguriert werden?", answer: "Ja. Für Unternehmen mit mehreren Standorten im Großraum können separate Regeln und Ansagen pro Standort eingerichtet werden – mit einheitlichem Standard, wo Sie ihn wollen." },
       { question: "Passt der Assistent zu Privatmedizin oder gehobener Gastronomie?", answer: "Ton, Ansagen und Gesprächsführung werden auf das Niveau Ihres Hauses abgestimmt und vor dem Start von Ihnen freigegeben. Was der Assistent übernimmt und was beim Team bleibt, legen Sie im Anliegen-Katalog fest." },

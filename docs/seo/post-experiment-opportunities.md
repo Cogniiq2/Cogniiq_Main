@@ -2,7 +2,8 @@
 
 Angelegt: 2026-08-29 · Basis-Commit `0652c2e`
 
-Sechs Routen laufen als Suchexperimente und sind eingefroren. Dieses Dokument
+Fünf Routen laufen als Suchexperimente und sind eingefroren (bis 2026-09-12
+waren es sechs). Dieses Dokument
 sammelt, was an ihnen auffällt, **damit es nicht am Experiment vorbei umgesetzt
 wird**. Nichts hier darf angefasst werden, solange die Route in
 `PROTECTED_EXPERIMENT_PATHS` steht (`src/lib/routing/protectedExperiments.ts`).
@@ -15,11 +16,27 @@ jede dieser Routen verwiesen wird.
 ## Ablauf, wenn ein Experiment endet
 
 1. Ergebnis in `docs/seo/organic-growth-scoreboard.md` festhalten.
-2. Pfad aus `PROTECTED_EXPERIMENT_PATHS` entfernen.
-3. `npm run seo:baseline` ausführen, damit die Fixture die verbleibenden Routen
-   abbildet.
+2. Pfad aus `PROTECTED_EXPERIMENT_PATHS` entfernen und in
+   `GRADUATED_EXPERIMENT_PATHS` eintragen.
+3. Den Eintrag der Route aus
+   `src/test/fixtures/protected-experiments.baseline.json` **von Hand**
+   entfernen — beide Abschnitte, `fingerprints` und `inboundOccurrences`.
 4. Die Punkte unten in einem eigenen, kleinen PR umsetzen — nicht gebündelt mit
    anderer Arbeit, damit die Wirkung zurechenbar bleibt.
+
+### Warum Schritt 3 nicht `npm run seo:baseline` heisst
+
+Hier stand bis zum 2026-09-12 „`npm run seo:baseline` ausführen, damit die
+Fixture die verbleibenden Routen abbildet". Das ist der gefährlichste Satz, der
+in dieser Datei stehen kann: Das Kommando nimmt die Fingerabdrücke ALLER noch
+eingefrorenen Routen neu auf. Endet ein Experiment, während an einer anderen
+Route unbeabsichtigt etwas gewandert ist, schreibt dieser Schritt die Drift
+stillschweigend als neuen Soll-Zustand fest — und die Wache, die genau das
+verhindern soll, bestätigt danach den Schaden.
+
+Eine Route zu graduieren heisst, **einen** Eintrag zu löschen. Die anderen
+Fingerabdrücke bleiben Byte für Byte stehen und werden weiter geprüft. Genau so
+ist es bei `/kosten-ki-telefonassistent` gemacht worden.
 
 ---
 
@@ -85,17 +102,69 @@ Nach dem Experiment zu prüfen — alles **Claim-Hygiene**, kein SEO-Gewinn:
   und lässt sich vorher nicht angehen, weil zwei der drei Seiten eingefroren
   sind.
 
-## `/kosten-ki-telefonassistent`
+## `/kosten-ki-telefonassistent` — GRADUIERT am 2026-09-12
 
-- Claim-Scan sauber.
-- `src/components/Navigation.tsx:362` setzt
-  `GEMESSEN_NUR_NACH_HYDRATION = '/kosten-ki-telefonassistent'` als expliziten
-  Experiment-Schutz. Diese Zeile gehört mit dem Experiment ausgewertet und
-  danach entfernt oder begründet beibehalten.
-- Der neue Einführungsleitfaden verweist bei Kostenfragen bewusst **nicht**
-  hierher, obwohl es der naheliegende Verweis wäre. Nach dem Experiment gehört
-  dieser Verweis ergänzt — er ist inhaltlich richtig und fehlt derzeit nur,
-  weil er die eingehende Linkstruktur der Messung verändert hätte.
+> **Experiment ended by owner decision 2026-09-12 because the frozen
+> implementation preserved superseded calculator economics and product truth.**
+
+Der Inhaber hat die Cloudflare-Vorschau der eingefrorenen Fassung geprüft und
+das Experiment daraufhin beendet. Der Freeze hielt nicht eine neutrale
+Messbedingung fest, sondern einen überholten Stand:
+
+- den Alt-Rechner `PraxisRechnerWidget` mit einem voreingestellten
+  „Automatisierungsgrad" von 20 % — eine Zahl, die sich als Aussage über
+  Cogniiq las, statt als Frage nach dem Anrufmix des Kunden;
+- ein ROI-Modell, das aus einem **unvollständigen** Datensatz ein negatives
+  Ergebnis zeigen konnte (beobachtet: „Bleibt im ersten Jahr −648 € / Monat");
+- Beispielwerte, die wie Branchenstatistik aussahen (120 Anrufe/Woche, 20 %
+  nicht angenommen, 3 Minuten Bearbeitung, 18 €/h);
+- die überholte Produktaussage „ein System, das ans Telefon geht, das Anliegen
+  aufnimmt und strukturiert weitergibt".
+
+Eine Messung ist nur so lange schützenswert, wie die gemessene Seite eine ist,
+zu der wir stehen. Das war hier nicht mehr der Fall.
+
+### Was mit der Graduierung erledigt wurde
+
+- Alt-Rechner von der Seite entfernt; die Seite rechnet mit dem kanonischen
+  `TelefonRechner` (`TelefonRechnerSection`) und damit mit derselben Arithmetik
+  wie `/ki-telefonassistent`, `/praxen` und die Startseite.
+- `PraxisRechnerSection`, `PraxisRechnerWidget` und dessen Test gelöscht — keine
+  Route nutzte sie noch. Damit sind auch die Ausnahmen in
+  `rechner-konsistenz.test.tsx` weggefallen, die nur existierten, um das Widget
+  am Leben zu halten.
+- Rechner von Position 10 auf Position 3 der Seite gezogen (direkt hinter
+  Deckelung und Tarifen): Er beginnt jetzt nach ~15 % statt nach ~90 % des
+  Seitentexts.
+- Produktwahrheit korrigiert — `ABWICKLUNG.faehigkeit` plus
+  `ABWICKLUNG.qualifikation`, statt „nimmt auf und gibt strukturiert weiter".
+- Service-Schema an den sichtbaren Text gezogen; Offer-Preise weiter aus den
+  numerischen Tarifkonstanten.
+- Sprachpreise: der Paketpreis wird nicht mehr als feststehend genannt, solange
+  OWNER-INPUT H3 offen ist (siehe unten).
+- `GEMESSEN_NUR_NACH_HYDRATION` in `src/components/Navigation.tsx` ersatzlos
+  entfernt — die Preisseite steht jetzt wie jedes andere Ziel im vorgerenderten
+  Menü.
+
+### Sprachpreise — OWNER-INPUT H3 bleibt offen
+
+Der sichtbare Text nannte „ab drei Sprachen sind es 230 € im Monat für bis zu
+fünf Sprachen gleichzeitig" als Tatsache, während `sprachenAufschlagEur()`
+dieselbe Konstellation bereits als OFFEN auswies. Der statische Text war damit
+**sicherer als der Rechenkern**. Jetzt gilt auf allen Flächen dieselbe Fassung:
+Deutsch enthalten, eine weitere Sprache 79 €/Monat, ab zwei Zusatzsprachen ein
+Paketpreis im schriftlichen Angebot. `SPRACHEN_PREISE.paketEur` bleibt als Datum
+stehen, hat aber absichtlich keinen Konsumenten in der Produktion.
+
+### Noch offen für diese Route
+
+- Der Einführungsleitfaden verweist bei Kostenfragen weiterhin **nicht**
+  hierher. Der Verweis ist inhaltlich richtig und fehlte nur, weil er die
+  eingehende Linkstruktur der Messung verändert hätte. Er kann jetzt ergänzt
+  werden — bewusst NICHT in diesem Commit, damit die Wirkung der Graduierung
+  zurechenbar bleibt.
+- B11a/B9 (Gleichzeitigkeit, Überlauf) bleiben offen; die Seite macht dazu
+  keine Zusage.
 
 ---
 
@@ -278,3 +347,72 @@ Höchste Priorität davon bleibt unverändert **Z0** aus
 `COPY-CLAIMS-TO-VERIFY.md`: der Vorgabewert des Praxis-Rechners. Er steht
 weiterhin vor jedem Besucher der Preisseite und hängt an einer Messung, die
 noch aussteht.
+
+---
+
+## Nach dem Ende des Preisseiten-Experiments (aufgenommen 11.09.2026)
+
+Diese Punkte sind **fertig entschieden und absichtlich nicht umgesetzt**, weil
+sie die gerenderten Bytes eines laufenden Experiments verändern würden. Sie
+gehören in eine eigene, kontrollierte Änderung, sobald die Messung endet.
+
+| # | Was | Warum es wartet |
+|---|---|---|
+| P1 | Den kanonischen Rechner (`TelefonRechnerSection` + `TelefonRechner`) auf der Preisseite montieren, bevorzugt in einer preis-zuerst-Fassung | Die Seite rendert heute `PraxisRechnerSection`. Ein Austausch verändert Text, Bauteile und Reihenfolge im `<main>` |
+| P2 | `PraxisRechnerWidget` und `PraxisRechnerSection` löschen | Sie bedienen nach dem 11.09.2026 nur noch diese eine Seite. Ihre Arithmetik ist bereits auf `telefonassistent-rechner.ts` umgestellt, ihre Anzeige ist eingefroren |
+| P3 | Den voreingestellten „Automatisierungsgrad" von 20 % entfernen | Er überlebt ausschließlich in `PraxisRechnerWidget` und damit ausschließlich auf dieser Seite. Auf jeder anderen Fläche ist er entfernt; die Ausnahme ist in `rechner-konsistenz.test.tsx` als `EINGEFROREN` benannt und fällt mit P2 weg |
+| P4 | `RECHNER.rahmung` durch `RECHNER.rahmungRoutine` ersetzen | `rahmung` beschreibt einen Vorgabewert, den der kanonische Rechner nicht mehr setzt. `/praxen` nutzt bereits die korrigierte Fassung; die Preisseite bekommt sie mit P1/P2 |
+| P5 | `NICHT_EXTRA` — „10 gleichzeitige Anrufe in jedem Tarif" | Siehe unten. Die Zahl ist auf allen nicht eingefrorenen Flächen durch `FAKTEN.gleichzeitigeAnrufeSatz` ersetzt. Hier steht sie noch, weil die Seite eingefroren ist — **nicht**, weil sie belegt wäre |
+
+### Zur Gleichzeitigkeit (Grundlage für P5)
+
+Öffentliche ElevenAgents-Preisangaben, geprüft am 11.09.2026: Die
+Gleichzeitigkeit ist eine **Workspace-Grenze**, die sich alle Agenten eines
+Kontos teilen — Free 4, Starter 6, Creator 10, Pro 20, Scale 30, Business 40,
+Enterprise nach Vereinbarung; „Burst" hebt sie je Agent auf das Dreifache bei
+doppeltem Minutenpreis.
+
+Daraus folgt: Eine Konto-Obergrenze von 10 ist **keine** Zusage von zehn
+Gesprächen je Kunde, sobald mehr als ein Kunde gleichzeitig telefoniert. Sie
+wäre es nur bei einer eigenen Umgebung je Kunde oder bei vertraglich
+reservierter Kapazität. Im Repository ist weder das eine noch das andere
+dokumentiert: Das Kunden-Onboarding erfasst eine Agent-ID und eine Umgebung
+(EU/US), aber kein Kapazitäts- oder Tarifmerkmal.
+
+Bis der Inhaber die Bereitstellung bestätigt (OWNER-INPUT B11), gilt überall
+die Fassung ohne Zahl. Wird sie bestätigt, kann die Zahl zurück — dann aber
+belegt, und mit einer Aussage dazu, was bei Überlauf geschieht (B9).
+
+### Nachtrag 11.09.2026 (2) — eingefrorene Copy mit überholtem Produktbild
+
+Der Rechner- und Produktwahrheits-Durchgang hat weitere Konstanten gefunden,
+die inhaltlich überholt sind, aber von einer Experimentroute gerendert werden.
+Sie bleiben **wortgleich** stehen; die korrigierte Fassung existiert jeweils
+daneben und wird von den nicht eingefrorenen Seiten verwendet.
+
+| # | Eingefrorene Konstante | Korrigierte Fassung | Was daran überholt ist |
+|---|---|---|---|
+| P6 | `UEBERGABE` | `UEBERGABE_ABWICKLUNG` | Der erste Absatz beschreibt den üblichen Weg ANDERER Systeme („der Assistent nimmt an, Ihre MFA überträgt danach von Hand") und wurde als Normalfall dieses Produkts gelesen |
+| P7 | `TEAM_BLOCK.text` (via `KOMPAKT_TEAM.text`) | `TEAM_BLOCK.textAbwicklung` | Beschreibt Routineanliegen als „strukturierte Einträge", also als Aufgaben, die danach jemand erledigt |
+| P8 | `ANLIEGEN_UEBERNIMMT` (via `KOMPAKT_ANLIEGEN.punkte`) | `ANLIEGEN_UEBERNIMMT_ABWICKLUNG` | „Terminwünsche AUFNEHMEN und … vergeben" stellt die Aufnahme vor die Vergabe |
+| P9 | `FAKTEN.terminaufnahme` | `ABWICKLUNG.faehigkeit` + `ABWICKLUNG.qualifikation` | Nennt die Aufnahme als das universell Zugesicherte; die Abwicklung ist die zugesicherte Fähigkeit, die Anbindung die Bedingung |
+| P10 | `/ki-telefonassistent-arzt`, Ablaufschritt 01 | — | „ohne Besetztzeichen, ohne Warteschleife" ist eine unbedingte Zusage. Auf allen anderen Flächen entfernt (OWNER-INPUT B11a/B9); hier bleibt sie bis zum Ende der Messung stehen |
+
+`rechner-konsistenz.test.tsx` führt diese Ausnahmen namentlich in
+`EINGEFROREN_QUELLEN`. Endet ein Experiment, verschwindet der Eintrag dort
+zusammen mit der eingefrorenen Fassung — der Test schlägt dann an, wenn jemand
+die alte Formulierung wiederherstellt.
+
+### Nachtrag 11.09.2026 (3) — Sprachpreis
+
+Der Rechner beziffert den Sprachaufschlag nur noch dort, wo die Preisliste
+eindeutig ist: Deutsch enthalten (0 €), eine Zusatzsprache 79 €. Ab zwei
+Zusatzsprachen steht er als offene Position, weil „ab drei Sprachen … für bis zu
+fünf Sprachen" nicht festlegt, ob Deutsch mitzählt. Die frühere Fassung leitete
+das aus wirtschaftlicher Plausibilität ab (ein Paket bei zwei Zusatzsprachen
+wäre teurer als der Einzelpreis, also müssten drei ZUSATZsprachen gemeint sein).
+Plausibel, aber kein Beleg — und ein zu niedrig ausgewiesener Monatsbetrag ist
+der teuerste Fehler, den ein Preisrechner machen kann.
+
+Sobald OWNER-INPUT H3 beantwortet ist, kann `sprachenAufschlagEur` die
+Paketschwelle wieder rechnen. Bis dahin gilt: offen ausweisen, nie als 0.

@@ -1,5 +1,5 @@
 {
-  "_comment": "Recorded by `npm run seo:baseline`. Frozen fingerprints of the six live SEO experiments; see src/lib/routing/protectedExperiments.ts. Do not hand-edit, and do not regenerate to make a failing build pass — a diff here means a protected page moved.",
+  "_comment": "Recorded by `npm run seo:baseline`. Frozen fingerprints of the five live SEO experiments; see src/lib/routing/protectedExperiments.ts. Do not hand-edit, and do not regenerate to make a failing build pass — a diff here means a protected page moved.",
   "fingerprints": {
     "/bayreuth/webdesign": {
       "path": "/bayreuth/webdesign",
@@ -699,92 +699,8 @@
           "text": "Webdesign Arzt"
         }
       ]
-    },
-    "/kosten-ki-telefonassistent": {
-      "path": "/kosten-ki-telefonassistent",
-      "title": "Was kostet ein KI Telefonassistent? Preise | Cogniiq",
-      "description": "Was kostet ein KI Telefonassistent für Praxen? Tarife ab 300 € im Monat mit festem Minutenkontingent, gedeckelter Rechnung und Zwei-Wochen-Garantie.",
-      "keywords": "KI Telefonassistent Kosten, AI Rezeptionist Preis, KI Telefonie Kosten, Automatisierung Kosten",
-      "canonical": "https://cogniiq.de/kosten-ki-telefonassistent",
-      "robots": "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
-      "indexable": true,
-      "sitemap": "2026-03-14|monthly|0.88",
-      "h1": [
-        "Was kostet ein KI Telefonassistent?"
-      ],
-      "headings": [
-        "h1:Was kostet ein KI Telefonassistent?",
-        "h2:Zuerst die Obergrenze, dann der Preis",
-        "h2:Welcher Tarif passt zu wie vielen Anrufen?",
-        "h3:Nicht pro Behandler",
-        "h2:Wofür zahlen Sie die Einrichtung?",
-        "h3:Erstgespräch",
-        "h3:Angebot",
-        "h3:Unterschrift",
-        "h3:Rechnung und Zugang",
-        "h3:Ihre Vorgaben",
-        "h3:Aufbau",
-        "h3:Übergabe zur Freigabe· spätestens zwei Wochen nach dem Start",
-        "h3:Testphase und Go-live· 2 Tage Test",
-        "h3:Die Zwei-Wochen-Garantie",
-        "h3:Nach dem Go-live hört die Arbeit nicht auf",
-        "h2:Können Sie den Empfang vorher testen?",
-        "h2:Was kostet ein AI Rezeptionist im Vergleich?",
-        "h2:Was kostet eine weitere Sprache?",
-        "h2:Laufzeit, Kündigung und Preisgarantie",
-        "h2:Was nicht extra kostet",
-        "h2:Was spart eine Praxis durch einen KI Telefonassistenten?",
-        "h2:Häufige Fragen zum Preis",
-        "h3:Kann die Rechnung teurer werden als der Tarif?",
-        "h3:Was kostet ein KI Telefonassistent für eine Praxis pro Monat?",
-        "h3:Warum kostet die Einrichtung so viel?",
-        "h3:Ist die Testphase kostenlos?",
-        "h3:Wird pro Behandler abgerechnet?",
-        "h3:Wie lange bin ich gebunden und wie kündige ich?",
-        "h3:Was kostet eine weitere Sprache?",
-        "h2:Ihr Angebot: schriftlich, aufgeschlüsselt, ohne Überraschungen",
-        "h2:Weiterlesen"
-      ],
-      "textLength": 15749,
-      "textDigest": "70a8df9a1b25d994",
-      "jsonLd": [
-        "07462b27c9aa167c",
-        "0d00c9ea8232966c",
-        "74a7c10094c4ce5a",
-        "c75e3cf24c241e84",
-        "fd6b54fbf6cfd007"
-      ],
-      "outgoingLinks": [
-        {
-          "href": "/",
-          "text": "Home"
-        },
-        {
-          "href": "/ki-telefonassistent-arzt",
-          "text": "KI Telefonassistent für Arztpraxen"
-        },
-        {
-          "href": "/ki-telefonassistent-praxis",
-          "text": "KI Telefonassistent für Therapiepraxen"
-        },
-        {
-          "href": "/ki-telefonassistent",
-          "text": "Wie der Empfang am Telefon arbeitet"
-        },
-        {
-          "href": "/kontakt",
-          "text": "Unverbindliches Erstgespräch vereinbaren"
-        },
-        {
-          "href": "/praxen",
-          "text": "Der Praxis-Empfang im Überblick"
-        },
-        {
-          "href": "/praxen",
-          "text": "Für Praxen"
-        }
-      ]
     }
+
   },
   "inboundOccurrences": {
     "/bayreuth/webdesign": {
@@ -884,31 +800,7 @@
       "src/prerender.hydration.test.tsx": 1,
       "public/sitemap.xml": 2,
       "functions/_middleware.ts": 2
-    },
-    "/kosten-ki-telefonassistent": {
-      "src/App.tsx": 1,
-      "src/components/Footer.tsx": 1,
-      "src/components/Navigation.tsx": 2,
-      "src/lib/navigation-data.ts": 1,
-      "src/lib/routing/publicRoutePaths.ts": 1,
-      "src/lib/routing/publicRoutes.ts": 1,
-      "src/lib/telefonassistent-copy.ts": 1,
-      "src/pages/IntegrationenPage.tsx": 1,
-      "src/pages/KiTelefonassistentPage.tsx": 2,
-      "src/pages/LeistungenPage.tsx": 1,
-      "src/pages/PraxenPage.tsx": 1,
-      "src/pages/costs/KostenKiTelefonassistent.tsx": 2,
-      "src/pages/industries/KiTelefonassistentArzt.tsx": 2,
-      "src/pages/industries/KiTelefonassistentHotel.tsx": 2,
-      "src/pages/industries/KiTelefonassistentPraxis.tsx": 2,
-      "src/pages/industries/KiTelefonassistentRestaurant.tsx": 2,
-      "src/pages/pillars/AutomatisierungUnternehmen.tsx": 1,
-      "src/pages/pillars/KiAgenturDeutschland.tsx": 1,
-      "src/pages/problems/KeineTerminbuchungPage.tsx": 1,
-      "src/pages/problems/VerpassteAnrufePage.tsx": 1,
-      "src/prerender.hydration.test.tsx": 1,
-      "public/sitemap.xml": 2,
-      "functions/_middleware.ts": 2
     }
+
   }
 }

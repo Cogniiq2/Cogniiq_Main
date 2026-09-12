@@ -1,5 +1,418 @@
 # COPY-SEO-CHANGELOG — Copy Overhaul KI-Telefonassistent-Cluster
 
+## 2026-09-12 (2) — Zwei Personallesarten, und die Obergrenze sagt, wofür sie gilt
+
+Zwei Befunde aus dem Inhaber-Review, beide derselbe Fehlertyp: Eine Aussage
+galt für einen Teil und wurde für das Ganze gelesen.
+
+### 1 · Der Rechner unterschätzte echte Personalersparnis
+
+Bisher gab es genau eine Personalrechnung: `Telefonstunden × Routineanteil ×
+Vollkosten je Stunde`. Die ist **mathematisch nicht falsch** — sie bewertet
+korrekt die *freigesetzte Zeit*. Sie beantwortet nur nicht die zweite Frage:
+Eine Empfangskraft wird für ihren **Dienstplan** bezahlt, nicht für die
+Minuten, in denen sie spricht. Wo Cogniiq eine Stelle tatsächlich überflüssig
+macht oder eine Einstellung vermeidet, ist die Ersparnis der Wegfall einer
+Personalposition — nicht „5 Stunden × 35 €".
+
+Die naheliegende Korrektur wäre der schlimmere Fehler gewesen: das ganze
+Gehalt als Ersparnis zu verbuchen. Bleibt die Person beschäftigt und macht
+andere wertvolle Arbeit, spart der Betrieb keinen Cent Lohnkosten.
+
+Deshalb **zwei Modi, nie beide zugleich**:
+
+| Modus | Frage | Formel | Ergebniszeile |
+|---|---|---|---|
+| A · Kapazität | Person bleibt, Zeit wird frei | Telefonstunden × Routineanteil × Vollkosten/Std. (unverändert) | „Wert der freigesetzten Arbeitszeit" |
+| B · Personalkosten | Position entfällt oder entsteht nicht | monatliche Vollkosten × vermeidbarer Anteil | „Tatsächlich vermeidbare Personalkosten" |
+
+Modus B fragt nach **Arbeitgeber-Vollkosten** (nicht Brutto, nicht Netto) und
+nach dem **realistisch vermeidbaren Anteil** (0–100 %). Beide ohne Vorbelegung:
+Ein Gehalt zu raten wäre eine Behauptung über den Betrieb des Besuchers.
+Beispiel: 4.000 € × 75 % = 3.000 € echte Ersparnis pro Monat.
+
+**Keine Doppelzählung.** Beide Modi bewerten dieselbe Arbeitskapazität. Der
+Kern hat genau EIN Feld, das in die Summe eingeht (`arbeitsnutzenProMonatEur`);
+die jeweils andere Größe ist `null`. Die Konstruktoren `kapazitaetsEingabe()`
+und `personalkostenEingabe()` nullen die Felder des anderen Modus — ein
+Aufrufer *kann* nicht beide befüllen. Der Chancenwert bleibt ein eigener
+Posten und wird zu jedem Modus genau einmal addiert.
+
+**Vorgabe ist Modus A**, und zwar weil er der zurückhaltendere ist. Modus B
+ergibt in fast jedem Betrieb das größere Ergebnis; ihn vorzubelegen hieße,
+einem Besucher, der nur klickt, eine Lohnersparnis unterzuschieben, die er
+womöglich nicht hat. Die Auswahl ist optisch neutral — keine Option ist als
+„empfohlen" markiert.
+
+Die Zustandslogik gilt unverändert je Modus: Fehlt in A der Stundensatz oder
+der Routineanteil, in B die Monatsvollkosten oder der vermeidbare Anteil,
+gibt es **kein Gesamtergebnis — weder positiv noch negativ**. `0 %` ist wie
+`0 verpasste Anrufe` eine vollständige Antwort, keine Lücke.
+
+### 2 · Die Obergrenze galt für die Telefonie, nicht für die Rechnung
+
+`szenarioFuer()` deckelt nachweislich `min(Grundpreis + Mehrverbrauch,
+Obergrenze)`. Der Fließtext machte daraus „Mehr zahlen Sie in diesem Monat
+nicht" und „Mehr als die ausgewiesene Obergrenze kostet es nie" — während
+derselbe Rechner Zusatzsprachen, den 20-%-Aufschlag und die Anbindung als
+eigene, teils offene Positionen auswies. Zwei Flächen, zwei Aussagen, und die
+großzügigere stand in der Prosa.
+
+Korrigiert auf `/kosten-ki-telefonassistent`, `/ki-telefonassistent`,
+`/praxen` und im Rechner. Neue Konstante `FAKTEN.deckelungGeltung`:
+
+> Gedeckelt ist damit der Telefoniepreis — Grundpreis plus Mehrverbrauch.
+> Zusatzsprachen, der Aufschlag für monatliche Kündbarkeit sowie individuell
+> vereinbarte Integrations- oder Drittanbieterkosten weisen wir separat aus,
+> soweit sie anfallen; ob sie in die Obergrenze fallen, legt Ihr Angebot fest.
+> Die Telefonie-Obergrenze allein ist deshalb noch nicht Ihre Endsumme.
+
+Bewusst **nicht** behauptet: dass diese Posten *außerhalb* der Obergrenze
+liegen. Das gibt die Quelle genauso wenig her wie das Gegenteil — es wäre
+derselbe Fehler mit umgekehrtem Vorzeichen. Vollständige Aufstellung in
+`docs/preis-wahrheitstabelle.md`.
+
+**`FAKTEN.deckelung` selbst bleibt unangetastet** — die Konstante wird von der
+eingefrorenen Route `/ki-telefonassistent-arzt` gerendert. Der Geltungssatz
+steht als eigene Konstante daneben, wie schon bei `UEBERGABE_ABWICKLUNG`.
+
+**Keine Preisänderung.** 300/500/800 €, 1.490/2.490/3.490 €, 0,39 €/Minute,
+500/800/1.400 € Obergrenzen, 79 € je Zusatzsprache, Enterprise ab 5.000 €,
+20 % Aufschlag — alle unverändert und durch Tests gegen stille Änderung
+gesichert. OWNER-INPUT H3 bleibt offen.
+
+**GA4:** unverändert `G-NDN9J2G5LM`, Ads `AW-17946397271`, Consent unberührt.
+Kein Personalwert verlässt den Browser — die Analytics-Wache erlaubt in
+`trackEvent()` weiterhin ausschließlich feste Zeichenketten.
+
+**Eingefrorene Routen:** alle fünf Fingerabdrücke byte-identisch,
+`npm run seo:baseline` nicht ausgeführt.
+
+## 2026-09-12 — Zusammenführung: GA4-Korrektur aus `main` in den KI-Zweig
+
+Keine Copy-Änderung, keine Preisänderung, kein Rechner-Umbau. Dieser Eintrag
+hält nur fest, was durch das Zusammenführen von `origin/main`
+(`48499df`) in diesen Zweig dazugekommen ist.
+
+**Was aus `main` kam** (PR #92, Commits `cf43131` und `181d810`):
+`src/lib/consent.ts`, `src/lib/consent.test.ts`, `src/lib/legal-content.tsx`
+und `.github/scripts/test-seo-consistency.mjs`. Der aktive GA4-Stream ist
+damit `G-NDN9J2G5LM`. Google Ads bleibt `AW-17946397271`.
+
+**Konflikte:** keiner. `src/lib/consent.ts` wurde automatisch
+zusammengeführt — dieser Zweig hatte am Dateiende die groben
+Rechner-Ereignisse ergänzt, `main` oben die Measurement-ID und das
+Cookie-Aufräumen. Zwei getrennte Regionen, keine gemeinsame Zeile.
+
+**Der stillgelegte Stream `G-K7BS3LKT6H`** wird nirgends konfiguriert,
+gebootstrappt oder mit einem Ereignis bedient. Er überlebt ausschließlich als
+Cookie-Name in `LEGACY_ANALYTICS_COOKIES = ['_ga_K7BS3LKT6H']`, damit ein
+Besucher, der unter der alten Auslieferung zugestimmt hat, sein Cookie beim
+Widerruf tatsächlich loswird — plus in Regressionstests und in dieser
+historischen Dokumentation.
+
+**Analytics-Widerruf** entfernt `_ga`, `_gid`, `_ga_NDN9J2G5LM` und
+`_ga_K7BS3LKT6H` — und fasst Werbe-Cookies nicht an. Die beiden Zwecke bleiben
+getrennte Entscheidungen, Speicherschlüssel weiterhin `cogniiq_consent_v2`.
+
+**Nachgezogen:** Die Auslassung in
+`src/pages/costs/KostenKiTelefonassistent.test.tsx` war an die Bedingung
+„sobald die Korrektur in `main` ist" geknüpft. Die Bedingung ist eingetreten,
+also prüft der Test jetzt die aktive ID und dass der stillgelegte Stream nur
+noch als Cookie-Name vorkommt. Zwei Changelog-Absätze, die „der Branch trägt
+weiterhin `G-K7BS3LKT6H`" im Präsens behaupteten, sind auf die Vergangenheit
+korrigiert; die Einträge selbst bleiben als Historie stehen.
+
+## 2026-09-11 (5) — Vollständige Wirtschaftlichkeit, einheitliche Produktwahrheit
+
+Zwei Befunde aus dem Inhaber-Review der Preview, beide mit demselben Muster:
+Eine Teilinformation stand da, wo eine vollständige hingehört.
+
+**1 · Der Rechner zeigte ein negatives Ergebnis aus einem halben Modell.**
+Die Chancenökonomie — verpasste Anrufe, echte Chancen, Abschlussquote,
+Deckungsbeitrag, zurückgewinnbarer Anteil — lag hinter einem zugeklappten
+„Optional"-Bereich. Fehlte sie, ging sie als **0** in den Nettoeffekt ein.
+Ein Besucher mit 400 Anrufen, 35 €/h und 60 % Routineanteil las deshalb
+`350 € − 495 € = −145 € / Monat`, bevor er zu dem Posten befragt worden war,
+der in vielen Betrieben das Vorzeichen dreht. Die Zahl war nicht konservativ,
+sondern falsch — und sie las sich als „Cogniiq rechnet sich nicht".
+
+Jetzt gibt es drei Zustände, im Typsystem erzwungen:
+
+| Zustand | Was angezeigt wird |
+|---|---|
+| unvollständig | „Wirtschaftlichkeit noch nicht vollständig berechnet" + welche Angaben fehlen. Zwischenstand „Potenzial aus Arbeitszeit" bleibt sichtbar. **Keine Zahl**, in keine Richtung |
+| vollständig positiv | Monatseffekt, Jahreseffekt inklusive Einrichtung, Amortisation |
+| vollständig negativ | Genau dasselbe, unverändert. Wer alles beantwortet hat und schlecht dasteht, sieht das |
+
+`0 verpasste Anrufe` ist dabei eine **vollständige Antwort** (Chancenwert 0),
+kein leeres Feld — ein danach negatives Ergebnis wird gezeigt.
+
+Die Chancenfelder stehen nicht mehr hinter einem Ausklapper, sondern als
+Schritt 2 im normalen Ablauf. Im Ausklapper steht jetzt, was die Rechnung
+bewusst NICHT enthält (Wachstum, Saison, Mehrstandort, Nacharbeit, Anbindung).
+
+**2 · Der Sprachaufschlag wurde aus Plausibilität abgeleitet.** „Ab drei
+Sprachen 230 € für bis zu fünf Sprachen" legt nicht fest, ob Deutsch mitzählt.
+Der Rechner beziffert deshalb nur noch die eindeutigen Fälle (0 und eine
+Zusatzsprache) und weist den Rest als offene Position aus — inklusive der
+Monatssumme, die ohne ihn niedriger wäre als die spätere Rechnung.
+Offen bis OWNER-INPUT H3.
+
+**3 · Produktwahrheit vereinheitlicht.** Vier Seiten beschrieben noch das alte
+Bild — Anruf annehmen, Anliegen erfassen, Mitarbeiter erledigt es danach:
+
+| Seite | Vorher | Jetzt |
+|---|---|---|
+| `/ki-telefonassistent-restaurant` | ein Abschnitt „übergibt strukturiert an den Service", ein anderer „direkt in das Reservierungssystem eingetragen" — zwei Modelle nebeneinander | Reservierung wird im Gespräch abgeschlossen und bei verifizierter Schnittstelle eingetragen; ohne sie greift der benannte Rückfallweg |
+| `/ki-telefonassistent-hotel` | „Buchungsanfragen strukturiert aufgenommen", „Übergabe an Ihr Haus" | freigegebene Buchungsabläufe im Gespräch abgeschlossen; Gruppen und Veranstaltungen eskalieren ausdrücklich als Ausnahme |
+| `/ki-telefonassistent-praxis` | Rückrufliste als Produkt, „erfasst Terminwünsche strukturiert" | Termin vergeben, verschieben, absagen im Gespräch; die Liste trägt nur noch die Ausnahmen |
+| `/praxen` | Service-Schema und Meta-Description versprachen „strukturierte Übergabe" | Abwicklung zuerst, Übergabe als Ausnahmeweg |
+
+Dazu 13 Stadt-Service-Konfigurationen und acht weitere Flächen.
+
+**4 · Unbedingte Erreichbarkeitszusagen entfernt.** „ohne Warteschleife",
+„kein Besetztzeichen", „egal wie voll", „jeder Anruf wird angenommen" hängen an
+einer endlichen Gleichzeitigkeit, deren Bereitstellung je Kunde nicht
+dokumentiert ist (B11a), und an einem Überlaufverhalten, das offen ist (B9).
+Sie stehen nur noch auf der eingefrorenen Arzt-Route; ein Test hält das fest.
+
+**Eingefrorene Routen:** unverändert, Fingerabdrücke byte-identisch. Wo eine
+geteilte Konstante von einer Experimentroute gerendert wird, steht die
+korrigierte Fassung daneben (`UEBERGABE_ABWICKLUNG`, `TEAM_BLOCK.textAbwicklung`,
+`ANLIEGEN_UEBERNIMMT_ABWICKLUNG`) — Liste in
+docs/seo/post-experiment-opportunities.md.
+
+**GA4:** in diesem Durchgang unverändert. Der Branch trug zu diesem Zeitpunkt
+noch `G-K7BS3LKT6H`; die Korrektur auf `G-NDN9J2G5LM` landete als eigener PR
+(#92) und ist seit der Zusammenführung vom 12.09.2026 in diesem Zweig.
+
+
+## 2026-09-11 (4) — Ein Rechenkern statt vier Rechnern
+
+Anlass: Der neue Preis- und Wirtschaftlichkeitsrechner auf
+`/ki-telefonassistent` ist freigegeben. Er sollte zur Konversionsfunktion des
+Clusters werden — und dafür musste zuerst der Widerspruch weg, den vier
+unabhängige Rechnungen erzeugten.
+
+**Was sich widersprochen hat.**
+
+| Fundstelle | Widerspruch |
+|---|---|
+| `CostComparisonSection` | `KI_PRICE_MONTHLY = 297` — ein Festpreis, der in keiner Tarifliste steht. Daraus abgeleitet: „Ihre Ersparnis" und „Jahresersparnis" |
+| `ROICalculator` + `CostComparisonSection` | 4,3 Wochen je Monat, während der Praxis-Rechner mit 4,33 rechnete |
+| `ROICalculator` | `verpasste Anrufe × Ø-Umsatz = entgangener Umsatz` — jeder verpasste Anruf als verlorener Auftrag |
+| `roi-presets.ts` | Frei gewählte Beispielwerte für Umsatz je Anruf, Verpasstquote und Stundensatz, vorbelegt in einem Ergebnis, das autoritativ aussieht |
+| `PraxisRechnerWidget` | Eigene Tarifrechnung, eigener Mehrpreis je Minute, `betragZuZahl` (Anzeigestrings zurück in Zahlen), Vorgabewert „Automatisierungsgrad 20 %" |
+| `KostenKiTelefonassistent` | `toNumber(t.monatlich)` — Angebots-Schema aus Anzeigestrings geparst |
+
+**Was jetzt gilt.** `src/lib/telefonassistent-rechner.ts` ist der einzige
+Rechenkern: Tarifwahl, Deckelung, Mehrverbrauch, Sprachaufschlag, Zeitwert,
+Chancenwert, Nettoeffekt, Amortisation, Wochenfaktor. Jede öffentliche
+Darstellung konsumiert ihn. `rechner-konsistenz.test.tsx` prüft beides —
+die Arithmetik **und** den Quelltext, damit eine neu eingeführte Konstante
+sofort auffällt statt erst im nächsten Widerspruch.
+
+| Fläche | Vorher | Jetzt |
+|---|---|---|
+| `/ki-telefonassistent` | `TelefonRechner` (voll) | unverändert, plus stabiler Anker `#preis-roi-rechner` und Hero-Verweis |
+| Startseite | `ROICalculator` + `CostComparisonSection` | `TelefonRechnerSection` (kompakt) + Eigenschaftsvergleich ohne eigene Rechnung |
+| `/praxen` | `PraxisRechnerSection` | `TelefonRechnerSection` (voll) |
+| `/kosten-ki-telefonassistent` | `PraxisRechnerSection` | **unverändert** (eingefrorenes Experiment) — Arithmetik intern auf den Kern umgestellt, gerenderte Bytes identisch |
+
+**Produktwahrheit Automatisierung.** Der Vorgabewert „20 % Automatisierungsgrad"
+war kein Zurückhalten, sondern ein Fehler: Er las sich als Aussage darüber, wie
+viel Cogniiq schafft. Zugesichert ist das Gegenteil — ein konfigurierter
+Routineablauf wird vollständig abgewickelt, bis zu 100 % der konfigurierten
+Routineanrufe. Was schwankt, ist der Anteil der Anrufe eines Betriebs, der
+überhaupt dazugehört; danach fragt der Rechner jetzt, ohne einen Wert
+vorzugeben.
+
+**Gleichzeitigkeit.** „10 gleichzeitige Anrufe" ist auf allen nicht
+eingefrorenen Flächen durch eine Fassung ohne Zahl ersetzt. Begründung und
+offene Inhaberfrage: OWNER-INPUT B11a.
+
+**GA4.** Unverändert in diesem Durchgang. Der Branch trug zu diesem Zeitpunkt
+noch `G-K7BS3LKT6H`; die Korrektur auf `G-NDN9J2G5LM` war in `main` noch nicht
+gelandet und gehörte in ihren eigenen Commit. Sie ist am 12.09.2026 über PR #92
+nach `main` und von dort in diesen Zweig gekommen — siehe den Eintrag
+„Zusammenführung" unten. Neu sind ausschließlich grobe
+Ereignisnamen (`calculator_anchor_click`, `price_calculator_started`,
+`roi_calculator_started`) — ohne jeden Eingabewert.
+
+
+## 2026-09-11 (3) — Produktwahrheit korrigiert: `/ki-telefonassistent` verkaufte unter Wert
+
+Anlass: Inhaber-Review der Preview. Die Seite beschrieb ein System, das
+Terminwünsche **aufnimmt**, damit ein Mitarbeiter sie **danach erledigt**. Das
+ist nicht das Produkt. Der Assistent führt konfigurierte Routineabläufe im
+Gespräch zu Ende.
+
+**Ursache.** `BOOKING_WRITE` („only after verified customer integration") war
+zu defensiv ausgelegt worden — als Verbot des Wortes „buchen" statt als
+Bedingung für Schreibzugriff auf ein Kundensystem. Aus einer Integrationsregel
+war eine Produktbeschreibung geworden.
+
+**Die zwei Regeln, die ab jetzt getrennt gelten** (ausgeschrieben im Block
+„PRODUKTWAHRHEIT, KORRIGIERT AM 11.09.2026" in `telefonassistent-copy.ts`):
+
+| | Status |
+|---|---|
+| `AUTOMATISIERTE_ABWICKLUNG` — buchen, verschieben, stornieren, Fragen beantworten | **zugesicherte Produktfähigkeit**, darf so benannt werden |
+| `SYSTEM_SCHREIBZUGRIFF` — direkt in Kalender/PVS/CRM/Buchungssystem | **kundenspezifisch**, wird je Kunde eingerichtet und verifiziert |
+
+**Korrigierte Fundstellen** (jede war eine eigene Unterverkaufsaussage):
+
+| Stelle | Vorher | Nachher |
+|---|---|---|
+| `title` (Manifest + Edge) | `… – Anrufannahme \| Cogniiq` | `… – Anrufe erledigen \| Cogniiq` |
+| `description` | „nimmt Anrufe an … erfasst Anliegen" | „bucht, verschiebt und storniert Termine im Gespräch" |
+| H1 | „Anrufe annehmen, wenn Ihr Team keine Hand frei hat." | „Anrufe nicht nur annehmen. Anliegen erledigen." |
+| Hero-Gespräch | endete mit „Mein Kollege bestätigt Ihnen den Termin." | Anrufer verschiebt im Gespräch; Ergebnis „Termin verschoben · im Gespräch erledigt" + Badge zur Anbindung |
+| Dashboard-Karte | „Terminwunsch" / „Nächster Schritt: Termin bestätigen" | „Termin gebucht" / „Offen für Ihr Team: Nichts." |
+| Ablauf 03/04 | „Nach Ihren Regeln entscheiden" → „Zusammenfassung & Übergabe" | „Vorgang abschließen" → „Nur die Ausnahme geht weiter" |
+| Abschnitt M14 | „Die Übergabe entscheidet. Deshalb ist sie der Kern." | „Und wenn doch ein Mensch ran muss?" — als Ausnahmeweg |
+| Fähigkeitenliste | „Nimmt Terminwünsche auf", „Erfasst Anliegen strukturiert" | „Bucht Termine im Gespräch", „Verschiebt Termine und schließt Absagen ab" |
+| Branchenkarten | durchgehend „aufnehmen/erfassen/übergeben" | je Branche ein abgeschlossenes Ergebnis + die Ausnahme |
+| Anliegen-Katalog | „aufnehmen und zur Bestätigung vorlegen" | „im Gespräch buchen", „Absagen abschließen" |
+| Vertrauensstreifen | „Strukturierte Übergabe · Anliegen landen bei Ihrem Team" | „Termine im Gespräch · gebucht, verschoben oder storniert" |
+| `Service`-JSON-LD | „erfasst Anliegen und Terminwünsche strukturiert" | Fähigkeit + Anbindungsbedingung in einem Satz |
+| FAQ | 6 Antworten in der Erfassungslogik | auf Abwicklung gezogen; zwei neue Fragen (Sprachen, Art. 50) |
+
+**Nicht überkorrigiert.** Kein „übernimmt jeden Anruf", kein „100 %
+automatisiert", kein „funktioniert mit jeder Software", keine garantierte
+Ersparnis, kein „von einem Menschen nicht zu unterscheiden". Die
+Anbindungsbedingung (`ABWICKLUNG.qualifikation`) steht an jeder Stelle, an der
+die Seite Schreibzugriff behauptet — im Hero-Badge, an der Fähigkeitenliste, in
+der Dashboard-Fußzeile, im Branchen-Abschnittsfuß, im Kaufkriterium 2 und in
+der FAQ.
+
+**Neu auf der Seite**
+
+- **„Ein Gespräch, kein Tastenmenü"** — natürliches Gespräch als
+  Hauptunterscheidungsmerkmal, mit der Grenze: natürlich klingend UND nach
+  Art. 50 erkennbar KI. Keine Täuschungsbehauptung.
+- **„Was passiert, nachdem der Anrufer sein Anliegen gesagt hat"** — drei Wege
+  (Erledigt · Beantwortet · Übergeben). Weg A ist optisch der Normalfall, Weg C
+  bewusst leiser: Eine Gestaltung, die alle drei gleich gewichtet, hätte die
+  alte Fehlrahmung wiederhergestellt.
+- **Mehrsprachigkeit** als eigener Abschnitt, Zahlen ausschließlich aus `SPRACHEN`.
+- **Preis- und Wirtschaftlichkeitsrechner** (siehe unten).
+
+**Rechner.** `src/lib/telefonassistent-rechner.ts` ist reine, getestete
+Arithmetik ohne React; `src/components/TelefonRechner.tsx` ist Darstellung ohne
+einen einzigen Betrag als Literal. Alle Zahlen aus `TARIFE`,
+`FAKTEN.mehrpreisProMinuteEur`, `SPRACHEN_PREISE`. Kein E-Mail-Gate, kein
+Countdown, kein verstecktes Add-on; Rechnung läuft lokal im Browser, Eingaben
+verlassen ihn nicht.
+
+**Bewusst NICHT gerechnet**, weil die Quelle es nicht eindeutig festlegt:
+der 20-%-Aufschlag für monatliche Kündbarkeit (Bemessungsgrundlage offen) und
+die Frage, ob der Sprachaufschlag innerhalb der Tarif-Obergrenze liegt. Beides
+erscheint als Regel im Text, nicht als Rechenweg. Unbekannte Positionen — die
+kundenspezifische Anbindung — werden als „noch offen" ausgewiesen, **nie als 0**.
+
+**Numerische Zwillinge.** `TARIFE` trägt zusätzlich `monatlichEur`,
+`obergrenzeEur`, `einrichtungEur`; `FAKTEN` zusätzlich
+`mehrpreisProMinuteEur`; neu `SPRACHEN_PREISE`. Rein additiv — die
+Anzeigestrings sind byte-identisch geblieben, weshalb die eingefrorene
+Preisseite unverändert rendert. Ein Test hält Zahl und String aneinander.
+
+**Eingefrorene Experimente unberührt.** Fingerprint-Suite grün; die
+Vorkommenszahlen der geschützten Pfade in der Seite bleiben exakt 1 und 2, alle
+neuen Dateien enthalten sie gar nicht. Die Preisseite selbst wurde nicht
+angefasst und bleibt Eigentümerin der Preisintention.
+
+
+## 2026-09-11 (2) — `/ki-telefonassistent` als generische kommerzielle Seite neu gefasst
+
+Anlass: Search Console, Seite `/ki-telefonassistent`, 2026-08-12 – 2026-09-08 —
+**155 Impressionen, 0 Klicks, Ø Position 37,2**, verteilt auf den Kopfbegriff
+(`ki telefonassistent`, `telefonassistent`, `ki telefon`) und seine Varianten
+(`ki anrufassistent`, `ki telefonservice`, `ki telefonzentrale`,
+`ki telefonassistent für unternehmen`, `ai telefonassistent`,
+`digitaler telefonassistent`). Die Seite ist also indexiert und thematisch
+verstanden — sie ist nur nicht die beste Antwort auf diese Intention.
+
+**Befund.** Der Grund stand im Seitenkörper: Die generische Seite benutzte die
+Praxis-Bausteine des Clusters mit. Ihre Überschriften handelten von
+Patientinnen, vom Praxisteam und von medizinischer Triage, eine Statistik
+sprach über Versicherte, der Preisabsatz rechnete „pro Praxis, nicht pro
+Behandler". Für jemanden, der einen Telefonassistenten für Handwerk, Kanzlei,
+Hausverwaltung oder Gastronomie sucht, war das die falsche Seite; für Google
+war die dominante Entität dieser Seite „Arztpraxis" — also genau die Intention,
+die die Arzt-Segmentseite und `/praxen` bereits besitzen. Drei Seiten stritten
+um eine Intention und die generische Seite bediente ihre eigene nicht.
+
+**Head — die schwerwiegendste Fundstelle.** `functions/_middleware.ts`
+überschreibt den vorgerenderten `<head>` an der Edge und war für diese Route
+vom Manifest abgedriftet. Ausgeliefert wurde: „… **bucht Termine direkt ins
+System** … **Einsatzbereit in 7 Tagen**." Das ist eine universelle
+Schreibzusage (durch `BOOKING_WRITE` seit dem 10.09.2026 ausgeschlossen) plus
+die am 23.08.2026 korrigierte Frist — beides im SERP-Snippet, also vor Augen,
+die dafür nicht klicken mussten. Manifest und Middleware sind jetzt wortgleich:
+
+| Feld | Alt (Edge) | Neu |
+|---|---|---|
+| `title` | `KI-Telefonassistent für Unternehmen \| Nie wieder verpasste Anrufe – Cogniiq` | `KI Telefonassistent für Unternehmen – Anrufannahme \| Cogniiq` |
+| `description` | `… nimmt jeden Anruf an, bucht Termine direkt ins System … Einsatzbereit in 7 Tagen.` | `… nimmt Anrufe an, beantwortet Fragen und erfasst Anliegen nach Ihren Regeln. Keine Gesprächsaufzeichnung, gedeckelte Rechnung.` |
+
+**Produktwahrheit im Seitenkörper.** Vier weitere Fundstellen derselben Klasse
+korrigiert, drei davon in Bildern statt in Sätzen — ein Screenshot behauptet
+dasselbe wie ein Satz, nur schneller:
+
+- Hero-Gesprächsbeispiel: „Eingetragen. Sie erhalten eine Bestätigung per
+  E-Mail." + Fußzeile „Termin automatisch gespeichert · Kalender aktualisiert"
+  → Gespräch endet mit Aufnahme des Terminwunsches und Bestätigung durch das
+  Team; neu ist die Offenlegung nach Art. 50 im ersten Satz und das Label
+  „Nachgestelltes Beispiel".
+- Dashboard-Karte: Feld „Vereinbart" → „Terminwunsch", Fußzeile „von Ihrem Team
+  zu übertragen" → „zu bestätigen".
+- Ablaufschritt 03 „Termin buchen … werden geprüft und eingetragen" → „Nach
+  Ihren Regeln entscheiden".
+- Branchenkarten: dreimal „buchen" / „in den Kalender buchen" / „Rückrufe
+  automatisch einplanen" → aufnehmen, erfassen, übergeben.
+- `Service`-JSON-LD: `description` sagte „Termine bucht".
+
+**Struktur.** 22 Abschnitte → 18, bei mehr Inhalt. Entfernt, weil doppelt oder
+praxisspezifisch: Patientensicht (M20), Praxisteam (M21), Säulen als eigener
+Abschnitt, der zweite CTA-Block und die sechs Einwand-Karten (deckungsgleich
+mit der FAQ). Zusammengelegt: Anliegen-Katalog + Grenzen. Neu:
+
+- **„Was ein KI-Telefonassistent ist — und was er nicht ist"** — Definition und
+  vier Abgrenzungen (Mailbox, Tastenmenü, externer Telefondienst, Chatbot). Die
+  Seite erklärte den gesuchten Begriff bisher nirgends.
+- **„Sechs Fragen, an denen sich ein KI-Telefonassistent entscheidet"** —
+  Kaufkriterien mit der eigenen Antwort daneben. Die Begründungsspalte ist die
+  frühere Sektion „Warum bisherige Versuche gescheitert sind": Jedes Kriterium
+  ist ein reales Scheiternsmuster. Kein Wettbewerbervergleich (§ 2.3 UWG), keine
+  Vergleichsseite — die Intention „KI Telefonassistent Vergleich" wird laut
+  Scoreboard bewusst nicht verfolgt.
+
+**Konversion.** Ein primärer Weg statt vier gleichrangiger Buttons. Die
+Beschriftung „Kostenlose Demo ansehen" war unzutreffend — unter
+`/ki-telefonassistent/demo` steht ein Formular, mit dem ein Termin **angefragt**
+wird; sie heißt jetzt „Demo-Termin anfragen". Sekundär die Telefonnummer, weil
+ein Telefonprodukt einen Telefonweg verdient.
+
+**Neue generische Copy-Bausteine** in `src/lib/telefonassistent-copy.ts`
+(`WAS_IST`, `ANBIETER_CHECKLISTE`, `GENERISCH_*`) — rein additiv. Die
+Praxis-Bausteine sind unverändert; keine Praxisseite ändert dadurch ein Wort.
+
+**Messung.** `trackEvent` in `src/lib/consent.ts`: eine Funktion, geschlossener
+Ereignisname, kein PII-Parameter, verworfen ohne Analytics-Einwilligung. Bis
+hierher meldete keine öffentliche Seite eine Konversionshandlung.
+
+**Eingefrorene Experimente unberührt.** Fingerprints unverändert; die
+Vorkommenszahlen der geschützten Pfade in dieser Datei bleiben exakt 1 (Arzt)
+und 2 (Kosten) — deshalb stehen die beiden Pfade in den Kommentaren der Seite
+bewusst nicht ausgeschrieben.
+
+**Nicht angefasst:** die sechs eingefrorenen Routen; die 28 weiteren Routen mit
+Middleware-/Manifest-Drift (siehe Scoreboard, Folgearbeit); die Besitzfrage im
+Arzt-Cluster; die Praxis-Bausteine der Copy-Bibliothek.
+
+
 ## 2026-09-11 — Claim-Integrität `/ki-telefonassistent-arzt` (eingefrorene Route)
 
 Wahrheitskorrektur, **keine** Ranking-Maßnahme. Kein Keyword-Targeting, keine

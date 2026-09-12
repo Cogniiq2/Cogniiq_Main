@@ -24,7 +24,7 @@ const trust = [
 // source and were removed rather than re-sourced.
 const facts = [
   { stat: 'Auch nachts', label: 'Anrufannahme außerhalb der Öffnungszeiten', icon: PhoneMissed, color: '#ef4444' },
-  { stat: 'Parallel', label: 'Mehrere Anrufe gleichzeitig, ohne Warteschleife', icon: PhoneCall, color: '#f59e0b' },
+  { stat: 'Parallel', label: 'Mehrere Anrufe zur selben Zeit statt Besetztzeichen', icon: PhoneCall, color: '#f59e0b' },
   { stat: 'Strukturiert', label: 'Anliegen kommen mit Rückrufnummer bei Ihrem Team an', icon: Mic, color: '#22c55e' },
 ];
 

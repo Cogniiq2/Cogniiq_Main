@@ -114,7 +114,7 @@ export const SERVICES = [
   {
     id: "ai-receptionist",
     name: "KI-Telefonassistent",
-    description: "KI-Telefonassistent für Praxen, Restaurants und Dienstleister – nimmt Anrufe ohne Warteschleife entgegen und erfasst Terminwünsche strukturiert.",
+    description: "KI-Telefonassistent für Praxen, Restaurants und Dienstleister – nimmt mehrere Anrufe zur selben Zeit entgegen und erledigt freigegebene Routineabläufe im Gespräch.",
     category: "AI Receptionist",
     url: `${BUSINESS_INFO.website}/ki-telefonassistent`,
   },

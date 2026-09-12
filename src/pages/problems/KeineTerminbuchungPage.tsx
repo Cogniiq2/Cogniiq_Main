@@ -54,6 +54,12 @@ const config: ProblemPageConfig = {
       "Optional: KI-Telefonassistent für telefonische Buchungen",
     ],
   },
+  rechner: {
+    ankertext: "Eigene Kosten und Nutzen durchrechnen",
+    kontext: "Keine Terminbuchung",
+    einleitung:
+      "Bevor Sie ein Angebot anfragen: Rechnen Sie selbst nach, was ein Assistent bei Ihrem Terminaufkommen kostet und ab wann er sich trägt.",
+  },
   serviceLinks: [
     { label: "KI Telefonassistent", href: "/ki-telefonassistent" },
     { label: "KI Telefonassistent Arztpraxis", href: "/ki-telefonassistent-arzt" },

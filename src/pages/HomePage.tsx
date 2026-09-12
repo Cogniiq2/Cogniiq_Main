@@ -5,12 +5,7 @@ import { TrustStrip } from '@/components/TrustStrip';
 import { StatsSection } from '@/components/StatsSection';
 import { PageSEO } from '@/components/PageSEO';
 import { PAGE_META, BUSINESS_INFO } from '@/lib/seo-data';
-
-const ROICalculator = lazy(() =>
-  import('@/components/ROICalculator').then((module) => ({
-    default: module.ROICalculator,
-  }))
-);
+import { TelefonRechnerSection } from '@/components/TelefonRechnerSection';
 
 const CostComparisonSection = lazy(() =>
   import('@/components/CostComparisonSection').then((module) => ({
@@ -96,8 +91,34 @@ export function HomePage() {
       <TrustStrip />
       <StatsSection />
 
+      {/*
+        EIN wirtschaftlicher Rechenweg auf dieser Seite, nicht zwei.
+
+        Hier standen `ROICalculator` und `CostComparisonSection` untereinander:
+        zwei Rechner, zwei Wochenfaktoren (4,3 und 4,33), zwei Vorstellungen
+        davon, was Cogniiq kostet — der eine leitete den Preis aus den Tarifen
+        ab, der andere behauptete einen Festpreis von 297 €, der in keiner
+        Tarifliste steht. Ein Besucher, der beide bedient, findet den
+        Widerspruch in unter einer Minute.
+
+        Jetzt rechnet genau ein Bauteil, und zwar dasselbe wie auf
+        /ki-telefonassistent: kompakte Darstellung, identische Formeln,
+        identische Zahlen. `CostComparisonSection` rechnet nicht mehr, sondern
+        vergleicht — Mensch und Assistent nach Eigenschaften, ohne eigene
+        Preisbehauptung.
+      */}
+      <TelefonRechnerSection
+        headline="Was kostet das bei Ihrem Anrufaufkommen — und rechnet es sich?"
+        intro={[
+          'Tragen Sie Ihr Anrufaufkommen ein. Der Rechner nennt den passenden Tarif, die wiederkehrenden Kosten und die einmalige Einrichtung — sofort, ohne E-Mail und ohne Verkaufsgespräch.',
+          'Was vor der technischen Prüfung noch nicht feststeht, etwa die Anbindung an Ihr System, steht als offene Position in der Liste. Nicht als Null.',
+        ]}
+        variante="kompakt"
+        tone="alt"
+        headingClassName="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-[1.06] tracking-[-0.022em] mb-6"
+      />
+
       <Suspense fallback={<SectionFallback />}>
-        <ROICalculator />
         <CostComparisonSection />
         <SolutionShowcase />
         <ProblemSection />

@@ -45,13 +45,19 @@ const config: ProblemPageConfig = {
   },
   solution: {
     headline: "Der KI Telefonassistent: Anrufe werden angenommen statt verpasst.",
-    text: "Ein KI Telefonassistent nimmt eingehende Anrufe sofort entgegen – auch zu Stoßzeiten und außerhalb regulärer Geschäftszeiten, ohne Warteschleife, ohne Personalaufwand. Er versteht Kundenanliegen, beantwortet Fragen und erfasst Terminwünsche nach Ihren Regeln.",
+    text: "Ein KI Telefonassistent nimmt eingehende Anrufe entgegen – auch zu Stoßzeiten und außerhalb regulärer Geschäftszeiten, mehrere zur selben Zeit und ohne zusätzliches Personal. Er versteht das Anliegen, beantwortet freigegebene Fragen und vergibt, verschiebt oder storniert Termine nach Ihren Regeln, statt sie nur zu notieren.",
     bullets: [
       "Anrufe werden sofort und professionell entgegengenommen – auch zu Stoßzeiten",
       "Erreichbar auch abends, am Wochenende und an Feiertagen",
       "Terminwünsche werden nach Ihren Regeln aufgenommen – ins Kalender- oder Praxissystem geschrieben wird erst, wenn dessen Schnittstelle das nachweislich trägt",
       "Skaliert mit Ihrem Unternehmen ohne Mehrkosten",
     ],
+  },
+  rechner: {
+    ankertext: "Was kostet das bei meinem Anrufvolumen?",
+    kontext: "Verpasste Anrufe",
+    einleitung:
+      "Diese Seite rechnet Ihnen bewusst nicht vor, was verpasste Anrufe Sie kosten — das hängt an Ihrem Auftragswert und Ihrer Abschlussquote, und beides kennen wir nicht. Der Rechner auf der Produktseite rechnet mit Ihren Zahlen: erst der Preis für Ihr Anrufaufkommen, dann optional der Gegenwert der Anrufe, die heute niemanden erreichen.",
   },
   serviceLinks: [
     { label: "KI Telefonassistent", href: "/ki-telefonassistent" },

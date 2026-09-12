@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, ChevronRight, TriangleAlert as AlertTriangle, TrendingDown, CircleCheck as CheckCircle2 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { BUSINESS_INFO } from "@/lib/seo-data";
+import { RechnerCta } from "@/components/RechnerCta";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -36,6 +37,17 @@ export interface ProblemPageConfig {
     bullets: string[];
   };
   serviceLinks: Array<{ label: string; href: string }>;
+  /*
+    Optionaler Verweis auf den Preis- und Wirtschaftlichkeitsrechner.
+
+    Optional und NICHT vorbelegt: Diese Vorlage trägt mehrere Problemseiten, und
+    ein Vorgabewert hier hieße, den Verweis auf alle gleichzeitig zu setzen —
+    mit identischem Ankertext. Genau das ist das Muster, das eine
+    Konversionshilfe in Linkspam verwandelt. Jede Seite entscheidet selbst, ob
+    die Preisfrage an dieser Stelle natürlich aufkommt, und formuliert den Anker
+    aus ihrem eigenen Text heraus.
+  */
+  rechner?: { ankertext: string; kontext: string; einleitung: string };
 }
 
 interface Props {
@@ -235,6 +247,24 @@ export function ProblemPage({ config }: Props) {
             </div>
           </div>
         </section>
+
+        {/*
+          Der Rechner steht NACH der Lösung und VOR der Linkliste. Vorher wäre
+          er eine Ablenkung — wer das Problem noch nicht erkannt hat, rechnet
+          nicht. Danach, in der Linkliste, ginge er zwischen acht Verweisen
+          unter. Hier ist der Punkt, an dem die Frage von selbst kommt.
+        */}
+        {config.rechner && (
+          <section className="py-16 bg-white dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 transition-colors duration-300">
+            <div className="max-w-5xl mx-auto px-6 lg:px-8">
+              <RechnerCta
+                ankertext={config.rechner.ankertext}
+                kontext={config.rechner.kontext}
+                einleitung={config.rechner.einleitung}
+              />
+            </div>
+          </section>
+        )}
 
         <section className="py-16 bg-white dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800 transition-colors duration-300">
           <div className="max-w-5xl mx-auto px-6 lg:px-8">

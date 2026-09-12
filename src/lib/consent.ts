@@ -303,3 +303,54 @@ export function revokeConsent() {
 export function openConsentSettings() {
   window.dispatchEvent(new CustomEvent(OPEN_CONSENT_EVENT));
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Conversion measurement.
+//
+// Until now nothing on the public site reported a conversion action, so the CRO
+// work on the commercial pages could not be evaluated at all: GA4 saw sessions
+// and nothing else. This is the smallest addition that changes that, and it is
+// deliberately NOT a tracking layer — one function, no queue, no PII, no
+// identifiers of its own.
+//
+// It is bound to the same contract as everything else in this module: the event
+// is dropped unless the ANALYTICS purpose is granted. It never loads the tag,
+// never configures a product and never pushes anything before a decision — a
+// dropped event leaves `dataLayer` untouched, so the "no Google request before
+// consent" guarantee is unaffected.
+//
+// WHAT MAY BE PASSED: a stable, hand-written event name and, at most, the page
+// path and a short hand-written label (which CTA, which section). Never a form
+// value, a name, an e-mail address, a phone number, free text a visitor typed,
+// or anything else that could identify a person. There is no parameter through
+// which such a value could be passed without writing it into a call site on
+// purpose.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** The conversion actions the public site reports. Closed set on purpose: a
+ *  free-form string would drift into per-page names that no report can group. */
+export type ConversionEvent =
+  | 'cta_demo_click'
+  | 'cta_kontakt_click'
+  | 'cta_telefon_click'
+  | 'cta_kosten_click'
+  // Die Rechner melden NUR, dass gerechnet wurde. Anrufaufkommen, Stundensätze
+  // und Deckungsbeiträge sind Geschäftszahlen des Besuchers; sie bleiben im
+  // Browser und haben in keinem Parameter dieser Funktion etwas zu suchen.
+  | 'calculator_anchor_click'
+  | 'price_calculator_started'
+  | 'price_calculator_completed'
+  | 'roi_calculator_started'
+  | 'roi_calculator_completed';
+
+export function trackEvent(event: ConversionEvent, label?: string) {
+  if (typeof window === 'undefined') return;
+  if (getStoredConsent()?.analytics !== 'granted') return;
+  gtag('event', event, {
+    // Both values are written by a call site in this repository, never read
+    // from user input. `location.pathname` carries no query string for exactly
+    // that reason — a stray ?email=… must not reach GA4.
+    page_path: window.location.pathname,
+    ...(label ? { cta_label: label } : {}),
+  });
+}

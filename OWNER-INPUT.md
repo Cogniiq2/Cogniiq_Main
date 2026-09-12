@@ -111,6 +111,7 @@ Gruppe G (eine Ankreuz-Entscheidung) und Gruppe C1 (Art.-50-Ansage).
 | B9 | Verhalten bei Störung/Ausfall: Was passiert technisch konkret (Weiterleitung auf Backup-Nummer? Ansage? automatisch?) | | Fallback-FAQ auf allen Seiten muss raus — Einwand #9 bleibt unbeantwortet |
 | B10 | Unterstützte Sprachen heute (nicht geplant): welche? | | „mehrsprachig möglich, üblicherweise Deutsch und Englisch" muss raus (München/Regensburg) |
 | B11 | Wie viele Anrufe können tatsächlich parallel angenommen werden? | | „mehrere Anrufe gleichzeitig ohne Warteschleife" wird abgeschwächt |
+| **B11a** | **ERNEUT GEÖFFNET am 11.09.2026 — die einzige offene Entscheidung aus dem Rechner-Durchgang.** Die Gleichzeitigkeit des eingesetzten Sprachdienstes (ElevenAgents) ist laut dessen öffentlicher Preisseite eine **Workspace-Grenze**, die sich ALLE Agenten eines Kontos teilen: Free 4, Starter 6, Creator 10, Pro 20, Scale 30, Business 40, Enterprise nach Vereinbarung. Damit ist „10 gleichzeitige Anrufe" eine Konto-Obergrenze, keine Zusage JE KUNDE, sobald zwei Kunden zur selben Zeit telefonieren. **Frage: Wird je Kunde eine eigene Umgebung bereitgestellt oder eine Mindestkapazität vertraglich reserviert? Wenn ja: welche, und ab welchem Tarif?** | | Die Zahl 10 bleibt auf allen nicht eingefrorenen Flächen entfernt; es steht `FAKTEN.gleichzeitigeAnrufeSatz` („Mehrere Anrufe zur selben Zeit — die Kapazität wird auf Ihr Aufkommen ausgelegt und im Angebot ausgewiesen."). Auf der eingefrorenen Preisseite steht sie bis zum Ende der Messung weiter, siehe docs/seo/post-experiment-opportunities.md P5 |
 | B12 | Dashboard zur Selbstpflege (Öffnungszeiten, Urlaubsansagen): existiert es heute, was kann es? | | Selbstpflege-Versprechen (P1/§5.5-6) muss von Service-, Arzt- und Bayreuth-Seite entfernt werden |
 | B13 | Eigene, selbst aufgesprochene Ansagen der Praxis: heute möglich? Wie läuft die Aufnahme? | | Kernversprechen P2 („Ihre Stimme") muss überall abgeschwächt werden auf „abgestimmte Ansagen" |
 | B14 | Notfall-Routing (Team / Bereitschaftsdienst / 112-Ansage) frei konfigurierbar? | | Notfall-Beschreibung wird auf das Minimum reduziert |
@@ -189,3 +190,80 @@ Praxis beitragen.
 3. **Phase 3:** Restseiten (Bayern, Demo, Hotel/Restaurant-Ehrlichkeitspass, Homepage je nach G).
 4. **Phase 4:** Umsetzung der Positionierungs-Entscheidung G.
 5. **Phase 5:** `SEO-BASELINE.md`, Schema-Erweiterung, Review-Banner (`VITE_REVIEW_MODE`, standardmäßig aus).
+
+---
+
+## Nachtrag 11.09.2026 (2) — offene Punkte aus dem Preisrechner
+
+Der Preisrechner auf `/ki-telefonassistent` rechnet bewusst NICHT, was die
+vorhandenen Quellen nicht eindeutig festlegen. Alle drei Punkte sind heute im
+Rechner als Regel im Text sichtbar und nicht als Zahl — sobald sie beantwortet
+sind, kann die Arithmetik sie aufnehmen.
+
+### H1 · Bemessungsgrundlage des 20-%-Aufschlags (monatliche Kündbarkeit)
+
+`FAKTEN.laufzeit` sagt: „Die Laufzeit beträgt 12 Monate; wer monatlich kündbar
+bleiben möchte, zahlt 20 % Aufschlag." **Worauf** bemisst sich der Aufschlag?
+
+- nur auf den Grundpreis des Tarifs
+- auf Grundpreis **und** Mehrverbrauch
+- auf die Obergrenze
+- zusätzlich auf den Sprachaufschlag
+- zusätzlich auf die Einrichtungsgebühr
+
+Fünf Lesarten, fünf verschiedene Rechnungen. Der Rechner zeigt den Aufschlag
+deshalb als Vertragsregel an und bietet keinen Schalter dafür. Sobald die
+Grundlage feststeht, wird daraus ein Schalter.
+
+### H2 · Sprachaufschlag und Tarif-Obergrenze
+
+Liegt der monatliche Sprachaufschlag **innerhalb** der Obergrenze des Tarifs
+(also gedeckelt) oder **daneben** (also zusätzlich)? Der Rechner weist ihn heute
+als eigene Zeile aus und sagt dazu, dass die Zuordnung im Angebot steht — er
+rechnet ihn weder still in die Obergrenze hinein noch still darüber hinaus.
+
+### H3 · Bedeutung von „ab drei Sprachen" und „bis zu fünf Sprachen gleichzeitig"
+
+> **ERNEUT GEÖFFNET am 11.09.2026 — blockiert eine Zahl im öffentlichen Rechner.**
+> Der Preisrechner beziffert den Sprachaufschlag seither nur noch dort, wo die
+> Preisliste eindeutig ist: nur Deutsch (0 €) und eine Zusatzsprache (79 €). Ab
+> zwei Zusatzsprachen weist er die Position als offen aus und nennt keine
+> Monatssumme mehr.
+>
+> **Zwei Fragen, beide mit ja/nein beantwortbar:**
+> 1. Meint „ab drei Sprachen sind es 230 € im Monat" drei Sprachen INKLUSIVE
+>    Deutsch (die Schwelle läge dann bei zwei Zusatzsprachen) oder drei
+>    ZUSATZsprachen neben Deutsch?
+> 2. Zählt Deutsch bei „bis zu fünf Sprachen gleichzeitig" mit?
+>
+> Bis dahin bleibt die Position offen. Sie auf 0 zu setzen wäre falsch, und sie
+> zu raten hieße, eine Vertragsbedingung aus wirtschaftlicher Plausibilität zu
+> erschließen — der Kunde bekommt am Ende, was im Vertrag steht.
+
+
+
+`SPRACHEN` sagt: „Jede weitere Sprache kostet 79 € im Monat; ab drei Sprachen
+sind es 230 € im Monat für bis zu fünf Sprachen gleichzeitig."
+
+- „ab drei Sprachen" ist als **drei ZUSATZsprachen** gelesen, weil nur diese
+  Lesart wirtschaftlich aufgeht (2 × 79 € = 158 € wäre günstiger als ein Paket
+  zu 230 €; erst 3 × 79 € = 237 € macht das Paket sinnvoll). **Bitte bestätigen.**
+- Zählt „fünf Sprachen" Deutsch mit — also Deutsch + vier, oder Deutsch + fünf?
+  Der Rechner bietet deshalb oberhalb des Pakets keine weitere Stufe an.
+
+### H4 · Gemessene Übernahmequote (weiterhin offen, siehe F4)
+
+Der Wirtschaftlichkeitsrechner lässt den Anteil automatisierbarer Anrufe vom
+Besucher eintragen und nennt daneben ausdrücklich, dass Cogniiq keine eigene
+Quote behauptet. Der Startwert bleibt bei 20 % — dem oberen Rand der einzigen
+dokumentierten Spanne —, solange F4 unbeantwortet ist. **Nicht anheben, bevor
+eine gemessene Zahl vorliegt:** Der Wert steht als Vorgabe vor jedem Besucher.
+
+### H5 · Stimmprobe fehlt weiterhin (Asset)
+
+Die Seite argumentiert jetzt prominent mit natürlichem Gespräch als
+Hauptunterscheidungsmerkmal — hat dafür aber kein Hörbeispiel.
+`StimmprobeSection` ist vorhanden und rendert nichts, solange
+`STIMMPROBE.src` null ist. Eine freigegebene, nachgestellte Audiodatei wäre der
+stärkste einzelne Beleg auf dieser Seite (Spezifikation in
+`ASSETS-REQUIRED.md`). Es wird keine Stimme erfunden oder eingekauft.

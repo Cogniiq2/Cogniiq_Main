@@ -97,11 +97,22 @@ export async function onRequest(context: CloudflarePagesContext) {
       canonical: 'https://cogniiq.de/kontakt',
       keywords: 'Cogniiq Kontakt, KI Erstgespräch, Webdesign Anfrage, Automatisierung Anfrage',
     },
+    // WORTGLEICH mit dem Routen-Manifest (src/lib/routing/publicRoutes.ts).
+    // Dieser Block überschreibt den vorgerenderten <head> an der Edge — er ist
+    // also das, was ein Crawler tatsächlich liest, nicht das Manifest.
+    //
+    // Die Fassung bis zum 11.09.2026 war an beiden Stellen falsch und nicht nur
+    // veraltet: Sie sagte „bucht Termine direkt ins System" (eine universelle
+    // Schreibzusage, die BOOKING_WRITE seit der Inhaber-Bestätigung vom
+    // 10.09.2026 ausschließt) und „Einsatzbereit in 7 Tagen" (die Frist, die am
+    // 23.08.2026 auf zwei Wochen korrigiert wurde — siehe FAKTEN und die
+    // VERALTET-Liste in telefonassistent-copy.test.ts). Beides stand im
+    // SERP-Snippet, also vor Augen, die dafür nicht klicken mussten.
     '/ki-telefonassistent': {
-      title: 'KI-Telefonassistent für Unternehmen | Nie wieder verpasste Anrufe – Cogniiq',
-      description: 'Der KI-Telefonassistent von Cogniiq nimmt jeden Anruf an, bucht Termine direkt ins System und beantwortet Fragen – auch außerhalb regulärer Geschäftszeiten, ohne Wartezeit. Einsatzbereit in 7 Tagen.',
+      title: 'KI Telefonassistent für Unternehmen – Anrufe erledigen | Cogniiq',
+      description: 'KI Telefonassistent, der Anrufe nicht nur annimmt: bucht, verschiebt und storniert Termine im Gespräch und beantwortet Ihre Fragen. Mit Preisrechner, ohne Anmeldung.',
       canonical: 'https://cogniiq.de/ki-telefonassistent',
-      keywords: 'KI Telefonassistent, AI Rezeptionistin, KI Telefon Unternehmen, Anruf automatisieren, Telefonie außerhalb der Geschäftszeiten',
+      keywords: 'KI Telefonassistent, KI Telefonassistent für Unternehmen, KI Anrufassistent, digitaler Telefonassistent, KI Telefonservice, Anrufe automatisieren',
     },
     '/ki-telefonassistent/demo': {
       title: 'KI-Telefonassistent Demo | Live-Vorführung AI-Rezeptionistin – Cogniiq',

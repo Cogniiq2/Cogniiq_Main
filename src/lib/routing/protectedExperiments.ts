@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // FROZEN SEO EXPERIMENTS.
 //
-// Six public routes are running live search experiments. Their measurement is
+// Five public routes are running live search experiments. Their measurement is
 // only valid while the page the crawler sees stays byte-identical, so they are
 // frozen: no change to title, description, canonical, robots, H1, body copy,
 // JSON-LD, outgoing links or anchor text, and no change to how many places in
@@ -48,6 +48,31 @@
 
 import { canonicalFor, routeFor, DEFAULT_ROUTE_ROBOTS, NOINDEX_ROUTE_ROBOTS } from './publicRoutes';
 
+/*
+  GRADUATED — /kosten-ki-telefonassistent, 2026-09-12.
+
+  Experiment ended by owner decision 2026-09-12 because the frozen
+  implementation preserved superseded calculator economics and product truth.
+
+  The freeze was doing the opposite of its job on that route: it held a
+  calculator whose defaults read as a claim about Cogniiq (a 20 %
+  "Automatisierungsgrad"), an ROI model that could show a negative first-year
+  result from an INCOMPLETE set of inputs, and message-taking product wording
+  the owner has since corrected everywhere else. A measurement is only worth
+  protecting while the thing being measured is one we still stand behind.
+
+  Graduating is not the same as re-baselining: the route's entry was removed
+  from src/test/fixtures/protected-experiments.baseline.json by hand, in this
+  commit, and the five remaining fingerprints were left untouched. `npm run
+  seo:baseline` was deliberately NOT run — it would have re-recorded the other
+  five against whatever the tree happens to render today and quietly dissolved
+  the guarantee for all of them.
+
+  What did NOT change: the route stays indexable, canonical to itself, in the
+  sitemap, and the owner of generic KI-Telefonassistent cost/price intent.
+  Follow-up recorded in docs/seo/post-experiment-opportunities.md.
+*/
+
 /** The frozen routes. Every entry must also be a path in PUBLIC_ROUTES. */
 export const PROTECTED_EXPERIMENT_PATHS: readonly string[] = [
   '/bayreuth/webdesign',
@@ -55,8 +80,15 @@ export const PROTECTED_EXPERIMENT_PATHS: readonly string[] = [
   '/regensburg/website-relaunch',
   '/muenchen/webdesign-kosten',
   '/ki-telefonassistent-arzt',
-  '/kosten-ki-telefonassistent',
 ];
+
+/**
+ * Routes that WERE protected and have been formally graduated. Kept as data,
+ * not as a comment, so a test can assert a graduated route is not silently
+ * re-frozen and — the failure that actually matters — that a route was not
+ * dropped from protection without landing here.
+ */
+export const GRADUATED_EXPERIMENT_PATHS: readonly string[] = ['/kosten-ki-telefonassistent'];
 
 const PROTECTED = new Set(PROTECTED_EXPERIMENT_PATHS);
 
