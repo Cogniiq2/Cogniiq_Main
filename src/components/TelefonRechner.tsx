@@ -499,11 +499,11 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
           Und was bringt es Ihnen?
         </h3>
         <p className={`${HINT} mb-7`}>
-          Zwei Fragen, dann steht die Rechnung. Sie läuft ausschließlich mit
-          Ihren Angaben — wir setzen weder einen Stundensatz noch einen
-          Routineanteil, eine Abschlussquote oder einen Deckungsbeitrag für Sie
-          ein. Felder, die Sie nicht wissen, lassen Sie leer; dann rechnen wir
-          diesen Teil nicht.
+          Zwei Schritte, dann steht die vollständige Rechnung. Sie läuft
+          ausschließlich mit Ihren Angaben — wir setzen weder einen Stundensatz
+          noch einen Routineanteil, eine Abschlussquote oder einen
+          Deckungsbeitrag für Sie ein. Felder, die Sie nicht wissen, lassen Sie
+          leer; dann rechnen wir diesen Teil nicht.
         </p>
 
         {/* ── Schritt 1: Personalkosten ─────────────────────────────────── */}
