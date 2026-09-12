@@ -66,534 +66,75 @@ export async function onRequest(context: CloudflarePagesContext) {
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
   );
 
-  const seoConfig: Record<string, { title: string; description: string; canonical: string; keywords?: string }> = {
-    '/': {
-      title: 'Cogniiq – KI-Telefonassistent, Webdesign & Automatisierung für Unternehmen in Bayern',
-      description: 'Cogniiq entwickelt operative KI-Systeme für Unternehmen in Bayern: KI-Telefonassistent, hochkonvertierende Websites und Prozessautomatisierung. Kein Anruf geht verloren. Erste Systeme in ein bis zwei Wochen einsatzbereit.',
-      canonical: 'https://cogniiq.de/',
-      keywords: 'AI Agentur Bayern, KI Telefonassistent, Webdesign Agentur Bayern, Prozessautomatisierung, Cogniiq',
-    },
-    '/leistungen': {
-      title: 'Leistungen | KI-Telefonassistent, Webdesign & Automatisierung – Cogniiq',
-      description: 'Drei operative Systeme für Ihr Unternehmen: KI-Telefonassistent, der jeden Anruf beantwortet – Webdesign, das konvertiert – Automatisierung, die manuelle Arbeit eliminiert.',
-      canonical: 'https://cogniiq.de/leistungen',
-      keywords: 'KI Leistungen, Webdesign Leistungen, Automatisierung Leistungen, Cogniiq Services',
-    },
-    '/ueber-uns': {
-      title: 'Über Uns | KI-Agentur Bayreuth – Lazar & Djordje Popovic – Cogniiq',
-      description: 'Cogniiq wurde von Lazar und Djordje Popovic in Bayreuth gegründet. Wir bauen operative KI-Systeme – keine Beratungsfolien, keine generischen Pakete. Direkter Kontakt, messbare Ergebnisse.',
-      canonical: 'https://cogniiq.de/ueber-uns',
-      keywords: 'Cogniiq Team, AI Agentur Gründer, Lazar Popovic, Djordje Popovic, Bayreuth',
-    },
-    '/faq': {
-      title: 'FAQ – Kosten, Ablauf & KI-Systeme | Cogniiq Bayreuth',
-      description: 'Antworten zu KI-Telefonassistent, Webdesign-Kosten, Projektstart und Automatisierung. Was kostet ein Projekt? Wie schnell geht es? Was ist realistisch? Hier, konkret.',
-      canonical: 'https://cogniiq.de/faq',
-      keywords: 'FAQ KI Agentur, Webdesign Kosten FAQ, Automatisierung FAQ, Cogniiq Fragen',
-    },
-    '/kontakt': {
-      title: 'Kostenloses Erstgespräch vereinbaren – Cogniiq | KI-Agentur Bayern',
-      description: '30 Minuten – wir schauen uns Ihre konkrete Situation an und zeigen, wo KI-Telefonie, Webdesign oder Automatisierung sofort wirkt. Kein Pitch. Kein Standardangebot.',
-      canonical: 'https://cogniiq.de/kontakt',
-      keywords: 'Cogniiq Kontakt, KI Erstgespräch, Webdesign Anfrage, Automatisierung Anfrage',
-    },
-    // WORTGLEICH mit dem Routen-Manifest (src/lib/routing/publicRoutes.ts).
-    // Dieser Block überschreibt den vorgerenderten <head> an der Edge — er ist
-    // also das, was ein Crawler tatsächlich liest, nicht das Manifest.
-    //
-    // Die Fassung bis zum 11.09.2026 war an beiden Stellen falsch und nicht nur
-    // veraltet: Sie sagte „bucht Termine direkt ins System" (eine universelle
-    // Schreibzusage, die BOOKING_WRITE seit der Inhaber-Bestätigung vom
-    // 10.09.2026 ausschließt) und „Einsatzbereit in 7 Tagen" (die Frist, die am
-    // 23.08.2026 auf zwei Wochen korrigiert wurde — siehe FAKTEN und die
-    // VERALTET-Liste in telefonassistent-copy.test.ts). Beides stand im
-    // SERP-Snippet, also vor Augen, die dafür nicht klicken mussten.
-    '/ki-telefonassistent': {
-      title: 'KI Telefonassistent für Unternehmen – Anrufe erledigen | Cogniiq',
-      description: 'KI Telefonassistent, der Anrufe nicht nur annimmt: bucht, verschiebt und storniert Termine im Gespräch und beantwortet Ihre Fragen. Mit Preisrechner, ohne Anmeldung.',
-      canonical: 'https://cogniiq.de/ki-telefonassistent',
-      keywords: 'KI Telefonassistent, KI Telefonassistent für Unternehmen, KI Anrufassistent, digitaler Telefonassistent, KI Telefonservice, Anrufe automatisieren',
-    },
-    '/ki-telefonassistent/demo': {
-      title: 'KI-Telefonassistent Demo | Live-Vorführung AI-Rezeptionistin – Cogniiq',
-      description: 'Testen Sie den KI-Telefonassistenten von Cogniiq live. Hören Sie, wie die AI-Rezeptionistin Anrufe annimmt, Termine bucht und Fragen beantwortet – auch außerhalb regulärer Geschäftszeiten.',
-      canonical: 'https://cogniiq.de/ki-telefonassistent/demo',
-      keywords: 'KI Telefonassistent Demo, AI Rezeptionistin testen, KI Telefon Demo, Cogniiq Demo',
-    },
-    '/webdesign': {
-      title: 'Webdesign Agentur – Hochkonvertierende Websites für Unternehmen | Cogniiq',
-      description: 'Cogniiq entwickelt individuelle Websites, die bei Google ranken und Besucher in Anfragen verwandeln. Kein Template, kein Baukasten – sauberer Code, Core Web Vitals, Local SEO.',
-      canonical: 'https://cogniiq.de/webdesign',
-      keywords: 'Webdesign Agentur, Website erstellen lassen, professionelle Website, SEO Webdesign, Core Web Vitals',
-    },
-    '/prozessautomatisierung': {
-      title: 'Prozessautomatisierung für Unternehmen | KI-Workflows – Cogniiq',
-      description: 'Cogniiq automatisiert wiederkehrende Prozesse: Buchungen, Lead-Nachverfolgung, E-Mail-Workflows und mehr. Weniger manuelle Arbeit, mehr Kapazität für das Wesentliche.',
-      canonical: 'https://cogniiq.de/prozessautomatisierung',
-      keywords: 'Prozessautomatisierung, KI Automatisierung, Workflow Automatisierung, AI Workflows, Automatisierung Unternehmen',
-    },
-    '/webdesign-agentur-deutschland': {
-      title: 'Webdesign Agentur Deutschland | Individuelle Websites national – Cogniiq',
-      description: 'Cogniiq ist Ihre Webdesign Agentur für ganz Deutschland. Wir entwickeln individuelle, SEO-optimierte Websites die konvertieren – remote oder persönlich in Bayern.',
-      canonical: 'https://cogniiq.de/webdesign-agentur-deutschland',
-      keywords: 'Webdesign Agentur Deutschland, Website Agentur Deutschland, professionelle Website Deutschland',
-    },
-    '/ki-agentur-deutschland': {
-      title: 'KI Agentur Deutschland | AI-Systeme für Unternehmen – Cogniiq',
-      description: 'Cogniiq ist Ihre KI-Agentur für ganz Deutschland. KI-Telefonassistenten, Chatbots und Automatisierungssysteme – entwickelt für den deutschen Markt, einsatzbereit in ein bis zwei Wochen.',
-      canonical: 'https://cogniiq.de/ki-agentur-deutschland',
-      keywords: 'KI Agentur Deutschland, AI Agentur Deutschland, KI Systeme Unternehmen, Artificial Intelligence Deutschland',
-    },
-    '/automatisierung-unternehmen': {
-      title: 'Automatisierung für Unternehmen | KI-gestützte Workflows – Cogniiq',
-      description: 'Automatisieren Sie wiederkehrende Aufgaben in Ihrem Unternehmen. Cogniiq entwickelt KI-gestützte Workflows für Gastronomie, Praxen, Immobilien und Handwerk.',
-      canonical: 'https://cogniiq.de/automatisierung-unternehmen',
-      keywords: 'Automatisierung Unternehmen, KI Workflows, Business Automation, Prozessoptimierung KI',
-    },
-    '/kosten-webdesign': {
-      title: 'Webdesign Kosten 2025 – Was kostet eine professionelle Website? | Cogniiq',
-      description: 'Was kostet Webdesign wirklich? Preise für individuelle Websites, Ladezeiten, SEO-Optimierung und Wartung. Transparente Kostenübersicht von der AI-Agentur Cogniiq.',
-      canonical: 'https://cogniiq.de/kosten-webdesign',
-      keywords: 'Webdesign Kosten, Website Preise, Was kostet Webdesign, Homepage Kosten 2025',
-    },
-    '/kosten-ki-telefonassistent': {
-      title: 'KI-Telefonassistent Kosten – Was kostet ein AI Rezeptionist? | Cogniiq',
-      description: 'Transparente Preisübersicht für KI-Telefonassistenten: Einrichtung, monatliche Kosten, ROI-Berechnung. Was kostet ein AI-Rezeptionist für Praxen, Restaurants und Dienstleister?',
-      canonical: 'https://cogniiq.de/kosten-ki-telefonassistent',
-      keywords: 'KI Telefonassistent Kosten, AI Rezeptionist Preis, KI Telefonie Kosten, Automatisierung Kosten',
-    },
-    '/kosten-automatisierung': {
-      title: 'Automatisierung Kosten – Was kostet Prozessautomatisierung? | Cogniiq',
-      description: 'Realistische Kostenübersicht für Prozessautomatisierung: von einfachen Workflows bis zu komplexen KI-Systemen. ROI und Amortisierungszeiten für verschiedene Unternehmensgrößen.',
-      canonical: 'https://cogniiq.de/kosten-automatisierung',
-      keywords: 'Automatisierung Kosten, Prozessautomatisierung Preis, KI Automation Kosten, Workflow Automatisierung Kosten',
-    },
-    '/deutschland': {
-      title: 'AI-Systeme & Webdesign für Unternehmen in Deutschland | Cogniiq',
-      description: 'Cogniiq entwickelt KI-Telefonassistenten, hochkonvertierende Websites und Automatisierungssysteme für Unternehmen in ganz Deutschland. Remote oder persönlich in Bayern.',
-      canonical: 'https://cogniiq.de/deutschland',
-      keywords: 'AI Agentur Deutschland, Webdesign Deutschland, KI Systeme Deutschland, Automatisierung Deutschland',
-    },
-    '/bayern': {
-      title: 'AI-Systeme & Webdesign für Unternehmen in Bayern | Cogniiq',
-      description: 'Cogniiq betreut Unternehmen in Bayern mit KI-Telefonassistenten, Webdesign und Automatisierung. Persönliche Betreuung in Bayreuth, München, Nürnberg und Regensburg.',
-      canonical: 'https://cogniiq.de/bayern',
-      keywords: 'AI Agentur Bayern, Webdesign Bayern, KI Telefonassistent Bayern, Automatisierung Bayern',
-    },
-    '/bayern/ki-telefonassistent': {
-      title: 'KI-Telefonassistent Bayern | AI-Rezeptionistin für bayerische Unternehmen – Cogniiq',
-      description: 'Der KI-Telefonassistent für Unternehmen in Bayern: nimmt Anrufe an, bucht Termine, beantwortet Fragen – auch außerhalb regulärer Geschäftszeiten. Persönliche Einrichtung durch Cogniiq in Bayreuth.',
-      canonical: 'https://cogniiq.de/bayern/ki-telefonassistent',
-      keywords: 'KI Telefonassistent Bayern, AI Rezeptionistin Bayern, KI Telefon Bayern',
-    },
-    '/bayreuth': {
-      title: 'AI-Systeme & Webdesign in Bayreuth | KI-Telefonassistent & Automatisierung – Cogniiq',
-      description: 'Cogniiq – Ihre AI-Agentur in Bayreuth. KI-Telefonassistent, hochkonvertierende Websites und Prozessautomatisierung für Unternehmen in Oberfranken. Persönliche Betreuung vor Ort.',
-      canonical: 'https://cogniiq.de/bayreuth',
-      keywords: 'AI Agentur Bayreuth, Webdesign Bayreuth, KI Telefonassistent Bayreuth, Automatisierung Bayreuth',
-    },
-    '/muenchen': {
-      title: 'AI-Systeme & Webdesign in München | KI-Telefonassistent & Automatisierung – Cogniiq',
-      description: 'Cogniiq betreut Unternehmen in München mit KI-Telefonassistenten, Webdesign und Prozessautomatisierung. Kein Template, kein Overhead – Systeme, die täglich arbeiten.',
-      canonical: 'https://cogniiq.de/muenchen',
-      keywords: 'AI Agentur München, Webdesign München, KI Telefonassistent München, Automatisierung München',
-    },
-    '/regensburg': {
-      title: 'AI-Systeme & Webdesign in Regensburg | KI-Telefonassistent & Automatisierung – Cogniiq',
-      description: 'Cogniiq entwickelt KI-Telefonassistenten, Webdesign und Automatisierungslösungen für Unternehmen in Regensburg. Persönliche Betreuung, erste Systeme in ein bis zwei Wochen einsatzbereit.',
-      canonical: 'https://cogniiq.de/regensburg',
-      keywords: 'AI Agentur Regensburg, Webdesign Regensburg, KI Telefonassistent Regensburg, Automatisierung Regensburg',
-    },
-    '/bayreuth/webdesign': {
-      title: 'Webdesign Agentur Bayreuth – Website erstellen & SEO | Cogniiq',
-      description: 'Webdesign Bayreuth: Individuelle Websites für lokale Unternehmen. Schnell, SEO-optimiert, Mobile-First. Keine Templates – professionelle Webentwicklung mit lokalem Ansprechpartner.',
-      canonical: 'https://cogniiq.de/bayreuth/webdesign',
-      keywords: 'Webdesign Bayreuth, Webdesign Agentur Bayreuth, Website erstellen Bayreuth, Homepage Bayreuth',
-    },
-    '/muenchen/webdesign': {
-      title: 'Webdesign Agentur München – Website erstellen ohne Agentur-Overhead | Cogniiq',
-      description: 'Webdesign München: Individuelle Websites für Startups, Mittelstand und Premium-Segment. Enterprise-Qualität ohne Münchner Agenturpreise. SEO-optimiert, schnell, mehrsprachig.',
-      canonical: 'https://cogniiq.de/muenchen/webdesign',
-      keywords: 'Webdesign München, Webdesign Agentur München, Website erstellen München, Homepage München',
-    },
-    '/regensburg/webdesign': {
-      title: 'Webdesign Agentur Regensburg – Website erstellen & SEO | Cogniiq',
-      description: 'Webdesign Regensburg: Individuelle Websites für Unternehmen, Praxen und Gastronomie. Schnell, lokal SEO-optimiert, Mobile-First. Website Agentur mit persönlicher Betreuung.',
-      canonical: 'https://cogniiq.de/regensburg/webdesign',
-      keywords: 'Webdesign Regensburg, Webdesign Agentur Regensburg, Website erstellen Regensburg, Homepage Regensburg',
-    },
-    '/bayreuth/webdesign-kosten': {
-      title: 'Webdesign Kosten Bayreuth – Preise für Websites in der Region | Cogniiq',
-      description: 'Was kostet Webdesign in Bayreuth? Transparente Preisübersicht für individuelle Websites, SEO-Pakete und Wartung. Kostenloser Kostenvoranschlag für Ihr Projekt.',
-      canonical: 'https://cogniiq.de/bayreuth/webdesign-kosten',
-      keywords: 'Webdesign Kosten Bayreuth, Website Preise Bayreuth, Homepage Kosten Bayreuth',
-    },
-    '/bayreuth/website-erstellen': {
-      title: 'Website erstellen lassen in Bayreuth | Professionell & schnell – Cogniiq',
-      description: 'Website in Bayreuth erstellen lassen: individuelle Entwicklung, SEO von Anfang an, DSGVO-konform. Go-Live in 7–14 Tagen. Persönliche Betreuung in Bayreuth.',
-      canonical: 'https://cogniiq.de/bayreuth/website-erstellen',
-      keywords: 'Website erstellen Bayreuth, Homepage erstellen Bayreuth, Webseite erstellen Bayreuth',
-    },
-    '/bayreuth/landingpage': {
-      title: 'Landingpage Bayreuth – Conversion-optimierte Seiten für Kampagnen | Cogniiq',
-      description: 'Professionelle Landingpages für Unternehmen in Bayreuth. Für Google Ads, Social Media und lokale Kampagnen – mit klarem CTA, schnell geladen und messbar.',
-      canonical: 'https://cogniiq.de/bayreuth/landingpage',
-      keywords: 'Landingpage Bayreuth, Landing Page erstellen Bayreuth, Kampagnenseite Bayreuth',
-    },
+  // ===========================================================================
+  // FROZEN-EXPERIMENT HEAD OVERRIDES — the only per-route <head> data left here.
+  //
+  // Until 2026-09-12 this Function carried a 560-line copy of every route's
+  // title, description, canonical and keywords and rewrote the prerendered
+  // <head> with it on every request. That copy was a second source of truth for
+  // facts the route manifest already owns, and it had drifted on 29 of 86 shared
+  // routes — so the value a crawler read was the stale edge copy, not the
+  // reviewed manifest value. Among the suppressed values were claim corrections
+  // (BOOKING_WRITE, blanket "DSGVO-konform", "kein Anruf geht verloren") and two
+  // titles whose search experiments therefore never reached a crawler at all.
+  //
+  // The table is gone rather than merely corrected. scripts/prerender.mjs writes
+  // the head from the manifest AND validates it per route (title, description,
+  // canonical, robots), with proper HTML escaping that this Function's raw string
+  // interpolation never had. Rewriting that output at the edge could only drift
+  // from it again. Same direction of truth as src/lib/routing/routeMetadata.ts,
+  // which removed the third copy (the one in the page components) for the same
+  // reason: the manifest wins, never the consumer.
+  //
+  // What remains below is a deliberate, shrinking exception. A route running a
+  // frozen search experiment is measured against the bytes a crawler has been
+  // receiving, and for these routes that is the edge value, not the manifest
+  // value. Aligning them would silently restart a running measurement, so the
+  // delivered bytes are held until the experiment is evaluated. Every key MUST
+  // be in PROTECTED_EXPERIMENT_PATHS, and the map MUST be emptied when the last
+  // experiment graduates — both asserted in .github/scripts/test-seo-consistency.mjs.
+  //
+  // WHY EVERY FROZEN ROUTE IS STILL NAMED IN THIS FILE
+  //
+  // The freeze rule (.claude/rules/seo-public-site.md) counts how many places in
+  // the source tree mention a protected path, comments included — removing a
+  // mention is itself a change to a frozen route. Each of the five is therefore
+  // still named here, now stating what this Function does to its head instead of
+  // carrying a copy of it. That is also the fact a future reader needs: whether
+  // what a crawler receives for that route is the manifest value or a held one.
+  //
+  //   /bayreuth/webdesign ........... edge and manifest already agreed before the
+  //                                   table was removed, so nothing is held and
+  //                                   the delivered head is unchanged.
+  //   /regensburg/website-relaunch .. same: the two values were identical.
+  //   /muenchen/webdesign-kosten .... same: the two values were identical.
+  //   /ki-telefonassistent-arzt ..... same, and expected — its head was aligned
+  //                                   in both files by the claim-integrity fix of
+  //                                   2026-09-11.
+  //   /bayreuth/website-relaunch .... the one that DIVERGED. Held below.
+  //
+  // Verified route by route on 2026-09-12 against the removed table: the only
+  // divergence among the five was the title of the relaunch route in Bayreuth.
+  // /bayreuth/webdesign, /muenchen/webdesign-kosten, /regensburg/website-relaunch
+  // and /ki-telefonassistent-arzt were byte-identical on both sides, which is why
+  // dropping the table changes nothing a crawler sees for them.
+  //
+  // The held one: the manifest carries the 2026-08-29 "Performance & bessere
+  // Rankings" title experiment, while the edge has been serving the older "Alte
+  // Website modernisieren" throughout — so that experiment has never actually
+  // reached a crawler. Aligning it now would start it, not continue it. Recorded
+  // in docs/seo/post-experiment-opportunities.md; the owner decides whether to
+  // ship it (a deliberate reset) or void it. Until then this route's SERP snippet
+  // does not move.
+  // ===========================================================================
+  const frozenHeadOverrides: Record<string, { title?: string; description?: string }> = {
     '/bayreuth/website-relaunch': {
       title: 'Website Relaunch Bayreuth – Alte Website modernisieren | Cogniiq',
-      description: 'Website Relaunch in Bayreuth: Ihre bestehende Website modernisieren ohne Rankingverlust. Neues Design, bessere Performance, stärkeres SEO – persönliche Betreuung.',
-      canonical: 'https://cogniiq.de/bayreuth/website-relaunch',
-      keywords: 'Website Relaunch Bayreuth, Website modernisieren Bayreuth, Homepage Relaunch Bayreuth',
-    },
-    '/bayreuth/lokales-seo': {
-      title: 'Lokales SEO Bayreuth – Google Maps & lokale Suche optimieren | Cogniiq',
-      description: 'Lokales SEO für Unternehmen in Bayreuth: Google Maps Optimierung, lokale Suchanfragen, NAP-Konsistenz. Mehr Kunden aus der Region durch bessere lokale Sichtbarkeit.',
-      canonical: 'https://cogniiq.de/bayreuth/lokales-seo',
-      keywords: 'Lokales SEO Bayreuth, Google Maps Bayreuth, Local SEO Bayreuth, Lokale Suche Bayreuth',
-    },
-    '/muenchen/webdesign-kosten': {
-      title: 'Webdesign Kosten München – Preise für professionelle Websites | Cogniiq',
-      description: 'Was kostet Webdesign in München? Ehrliche Preisübersicht für individuelle Website-Entwicklung im Münchner Markt. Jetzt kostenlosen Kostenvoranschlag anfragen.',
-      canonical: 'https://cogniiq.de/muenchen/webdesign-kosten',
-      keywords: 'Webdesign Kosten München, Website Preise München, Homepage Kosten München',
-    },
-    '/muenchen/website-erstellen': {
-      title: 'Website erstellen lassen in München | Professionell & schnell – Cogniiq',
-      description: 'Website in München erstellen lassen: maßgeschneiderte Entwicklung, SEO, DSGVO-konform. Keine Templates, kein Baukasten – Go-Live in 7–14 Tagen.',
-      canonical: 'https://cogniiq.de/muenchen/website-erstellen',
-      keywords: 'Website erstellen München, Homepage erstellen München, Webseite erstellen München',
-    },
-    '/muenchen/landingpage': {
-      title: 'Landingpage München – Conversion-starke Seiten für den Münchner Markt | Cogniiq',
-      description: 'Professionelle Landingpages für Unternehmen in München. Optimiert für Google Ads, Social Media Kampagnen und lokale Suchanfragen im Münchner Raum.',
-      canonical: 'https://cogniiq.de/muenchen/landingpage',
-      keywords: 'Landingpage München, Landing Page München, Kampagnenseite München',
-    },
-    '/muenchen/website-relaunch': {
-      title: 'Website Relaunch München – Modernisierung ohne Rankingverlust | Cogniiq',
-      description: 'Website Relaunch in München: bestehende Seite modernisieren, Performance verbessern, SEO sichern. Professionelle Umsetzung für Münchner Unternehmen.',
-      canonical: 'https://cogniiq.de/muenchen/website-relaunch',
-      keywords: 'Website Relaunch München, Homepage Relaunch München, Website modernisieren München',
-    },
-    '/muenchen/lokales-seo': {
-      title: 'Lokales SEO München – Google Maps & lokale Sichtbarkeit | Cogniiq',
-      description: 'Lokales SEO für Münchner Unternehmen: Google Maps Optimierung, lokale Suchanfragen und NAP-Konsistenz für mehr Kunden aus München.',
-      canonical: 'https://cogniiq.de/muenchen/lokales-seo',
-      keywords: 'Lokales SEO München, Google Maps München, Local SEO München, Lokale Suche München',
-    },
-    '/regensburg/webdesign-kosten': {
-      title: 'Webdesign Kosten Regensburg – Transparente Preise für Websites | Cogniiq',
-      description: 'Was kostet Webdesign in Regensburg? Realistische Preisübersicht für professionelle Websites in Regensburg und Ostbayern. Jetzt Kostenvoranschlag anfragen.',
-      canonical: 'https://cogniiq.de/regensburg/webdesign-kosten',
-      keywords: 'Webdesign Kosten Regensburg, Website Preise Regensburg, Homepage Kosten Regensburg',
-    },
-    '/regensburg/website-erstellen': {
-      title: 'Website erstellen lassen in Regensburg | Professionell & schnell – Cogniiq',
-      description: 'Website in Regensburg erstellen lassen: individuelle Entwicklung, SEO von Anfang an, DSGVO-konform. Persönliche Betreuung vor Ort in Regensburg.',
-      canonical: 'https://cogniiq.de/regensburg/website-erstellen',
-      keywords: 'Website erstellen Regensburg, Homepage erstellen Regensburg, Webseite erstellen Regensburg',
-    },
-    '/regensburg/landingpage': {
-      title: 'Landingpage Regensburg – Conversion-optimierte Seiten | Cogniiq',
-      description: 'Professionelle Landingpages für Unternehmen in Regensburg. Für Google Ads, Social Media und lokale Kampagnen – schnell, messbar, conversion-stark.',
-      canonical: 'https://cogniiq.de/regensburg/landingpage',
-      keywords: 'Landingpage Regensburg, Landing Page Regensburg, Kampagnenseite Regensburg',
-    },
-    '/regensburg/website-relaunch': {
-      title: 'Website Relaunch Regensburg – Modernisierung ohne Rankingverlust | Cogniiq',
-      description: 'Website Relaunch in Regensburg: alte Website modernisieren, Performance verbessern, lokales SEO optimieren. Professionelle Umsetzung für Unternehmen in Ostbayern.',
-      canonical: 'https://cogniiq.de/regensburg/website-relaunch',
-      keywords: 'Website Relaunch Regensburg, Homepage Relaunch Regensburg, Website modernisieren Regensburg',
-    },
-    '/regensburg/lokales-seo': {
-      title: 'Lokales SEO Regensburg – Google Maps & lokale Suche | Cogniiq',
-      description: 'Lokales SEO für Unternehmen in Regensburg: Google Maps Optimierung, lokale Suchanfragen, mehr Sichtbarkeit in Ostbayern. Messbare Ergebnisse durch technisches SEO.',
-      canonical: 'https://cogniiq.de/regensburg/lokales-seo',
-      keywords: 'Lokales SEO Regensburg, Google Maps Regensburg, Local SEO Regensburg',
-    },
-    '/bayreuth/ki-telefonassistent': {
-      title: 'KI Telefonassistent Bayreuth – AI Rezeption & Anrufannahme | Cogniiq',
-      description: 'KI Telefonassistent Bayreuth: Automatische Anrufannahme, Terminbuchung & Weiterleitung für lokale Unternehmen. Auch außerhalb der Öffnungszeiten, in zwei Wochen eingerichtet und bereit zur Freigabe.',
-      canonical: 'https://cogniiq.de/bayreuth/ki-telefonassistent',
-      keywords: 'KI Telefonassistent Bayreuth, AI Rezeptionistin Bayreuth, KI Telefon Bayreuth',
-    },
-    '/bayreuth/automatisierung': {
-      title: 'Prozessautomatisierung Bayreuth | KI-Workflows für lokale Unternehmen – Cogniiq',
-      description: 'Prozessautomatisierung für Unternehmen in Bayreuth: Buchungen, Lead-Nachverfolgung, Workflows. Cogniiq automatisiert manuelle Prozesse – persönlich betreut in Oberfranken.',
-      canonical: 'https://cogniiq.de/bayreuth/automatisierung',
-      keywords: 'Automatisierung Bayreuth, Prozessautomatisierung Bayreuth, KI Workflows Bayreuth',
-    },
-    '/muenchen/ki-telefonassistent': {
-      title: 'KI Telefonassistent München – AI Rezeption & Telefonservice | Cogniiq',
-      description: 'KI Telefonassistent München: Automatische Anrufannahme, Terminbuchung & Weiterleitung für Unternehmen. Auch außerhalb der Öffnungszeiten, mehrsprachig, DSGVO-konform. Ohne Münchner Agentur-Overhead.',
-      canonical: 'https://cogniiq.de/muenchen/ki-telefonassistent',
-      keywords: 'KI Telefonassistent München, AI Rezeptionistin München, KI Telefon München',
-    },
-    '/muenchen/automatisierung': {
-      title: 'Prozessautomatisierung München | KI-Workflows für Münchner Unternehmen – Cogniiq',
-      description: 'Prozessautomatisierung für Unternehmen in München: KI-gestützte Workflows für Buchungen, Leads und Kundenkommunikation. Weniger manueller Aufwand, mehr Kapazität.',
-      canonical: 'https://cogniiq.de/muenchen/automatisierung',
-      keywords: 'Automatisierung München, Prozessautomatisierung München, KI Workflows München',
-    },
-    '/regensburg/ki-telefonassistent': {
-      title: 'KI Telefonassistent Regensburg – AI Rezeption & Anrufannahme | Cogniiq',
-      description: 'KI Telefonassistent Regensburg: Automatische Anrufannahme, Terminbuchung & Weiterleitung für Praxen, Gastronomie und Dienstleister. Auch außerhalb der Öffnungszeiten, in zwei Wochen eingerichtet und bereit zur Freigabe.',
-      canonical: 'https://cogniiq.de/regensburg/ki-telefonassistent',
-      keywords: 'KI Telefonassistent Regensburg, AI Rezeptionistin Regensburg, KI Telefon Regensburg',
-    },
-    '/regensburg/automatisierung': {
-      title: 'Prozessautomatisierung Regensburg | KI-Workflows für lokale Unternehmen – Cogniiq',
-      description: 'Prozessautomatisierung für Unternehmen in Regensburg und Ostbayern: Buchungen, Leads, Workflows automatisieren. Cogniiq entwickelt KI-Systeme, die täglich arbeiten.',
-      canonical: 'https://cogniiq.de/regensburg/automatisierung',
-      keywords: 'Automatisierung Regensburg, Prozessautomatisierung Regensburg, KI Workflows Regensburg',
-    },
-    '/webdesign-arzt': {
-      title: 'Webdesign für Ärzte & Praxen | Patientengewinnung online – Cogniiq',
-      description: 'Professionelle Websites für Arztpraxen und medizinische Einrichtungen. DSGVO-konform, mit Online-Terminbuchung, lokales SEO für mehr Neupatienten.',
-      canonical: 'https://cogniiq.de/webdesign-arzt',
-      keywords: 'Webdesign Arzt, Website Praxis, Arztwebsite erstellen, Webdesign Praxis, Patientenakquise Online',
-    },
-    '/webdesign-gastronomie': {
-      title: 'Webdesign für Restaurants & Gastronomie | Online Reservierungen – Cogniiq',
-      description: 'Websites für Restaurants, Cafés und Gastronomie: mit Online-Reservierung, Speisekarte, Google Maps. Mehr Tischreservierungen durch professionelles Webdesign.',
-      canonical: 'https://cogniiq.de/webdesign-gastronomie',
-      keywords: 'Webdesign Restaurant, Website Gastronomie, Webdesign Café, Restaurant Website erstellen',
-    },
-    '/webdesign-immobilien': {
-      title: 'Webdesign für Immobilienmakler | Objekte präsentieren & Leads gewinnen – Cogniiq',
-      description: 'Websites für Immobilienmakler und Immobilienbüros: Objektpräsentation, Anfragen-Formulare, lokales SEO. Mehr qualifizierte Anfragen durch professionelles Webdesign.',
-      canonical: 'https://cogniiq.de/webdesign-immobilien',
-      keywords: 'Webdesign Immobilien, Website Immobilienmakler, Immobilien Website erstellen',
-    },
-    '/webdesign-hotel': {
-      title: 'Webdesign für Hotels & Pensionen | Direktbuchungen steigern – Cogniiq',
-      description: 'Professionelle Hotel-Websites: Direktbuchungssystem, Zimmerpräsentation, SEO für mehr organische Buchungen. Weniger OTA-Provisionen, mehr Direktgäste.',
-      canonical: 'https://cogniiq.de/webdesign-hotel',
-      keywords: 'Webdesign Hotel, Website Hotel erstellen, Hotel Direktbuchungen, Pension Website',
-    },
-    '/webdesign-sport': {
-      title: 'Webdesign für Sportvereine & Fitnessstudios | Mitgliederwachstum – Cogniiq',
-      description: 'Websites für Sportvereine, Fitnessstudios und Trainingsanbieter: mit Online-Anmeldung, Kursplan, Mitgliederbereichen. Mehr Mitglieder durch digitale Präsenz.',
-      canonical: 'https://cogniiq.de/webdesign-sport',
-      keywords: 'Webdesign Sportverein, Website Fitnessstudio, Webdesign Sport, Vereinswebsite',
-    },
-    '/webdesign-arzt-bayreuth': {
-      title: 'Webdesign für Ärzte in Bayreuth | Praxis-Website erstellen – Cogniiq',
-      description: 'Webdesign für Arztpraxen in Bayreuth: DSGVO-konforme Praxis-Websites mit Online-Terminbuchung, Patienteninformationen und lokalem SEO für mehr Neupatienten in Bayreuth.',
-      canonical: 'https://cogniiq.de/webdesign-arzt-bayreuth',
-      keywords: 'Webdesign Arzt Bayreuth, Praxis Website Bayreuth, Arztwebsite Bayreuth',
-    },
-    '/webdesign-gastronomie-bayreuth': {
-      title: 'Webdesign für Restaurants in Bayreuth | Online Reservierungen – Cogniiq',
-      description: 'Webdesign für Restaurants und Gastronomie in Bayreuth: Online-Reservierung, Speisekarte digital, Google Maps. Mehr Gäste durch professionelle Website.',
-      canonical: 'https://cogniiq.de/webdesign-gastronomie-bayreuth',
-      keywords: 'Webdesign Restaurant Bayreuth, Gastronomie Website Bayreuth, Restaurant Website Bayreuth',
-    },
-    '/webdesign-immobilien-bayreuth': {
-      title: 'Webdesign für Immobilienmakler in Bayreuth | Leads gewinnen – Cogniiq',
-      description: 'Websites für Immobilienmakler in Bayreuth: Objektpräsentation, Anfragen-Formulare, lokales SEO. Mehr qualifizierte Immobilienanfragen durch professionelles Webdesign.',
-      canonical: 'https://cogniiq.de/webdesign-immobilien-bayreuth',
-      keywords: 'Webdesign Immobilien Bayreuth, Immobilienmakler Website Bayreuth, Immobilien Webdesign Bayreuth',
-    },
-    '/webdesign-arzt-muenchen': {
-      title: 'Webdesign für Ärzte in München | Praxis-Website erstellen – Cogniiq',
-      description: 'Webdesign für Arztpraxen in München: DSGVO-konforme Websites mit Online-Terminbuchung und lokalem SEO für mehr Neupatienten in München.',
-      canonical: 'https://cogniiq.de/webdesign-arzt-muenchen',
-      keywords: 'Webdesign Arzt München, Praxis Website München, Arztwebsite München',
-    },
-    '/webdesign-gastronomie-muenchen': {
-      title: 'Webdesign für Restaurants in München | Online Reservierungen – Cogniiq',
-      description: 'Webdesign für Restaurants und Gastronomie in München: Online-Reservierung, digitale Speisekarte, Google Maps. Mehr Gäste für Ihr Münchner Restaurant.',
-      canonical: 'https://cogniiq.de/webdesign-gastronomie-muenchen',
-      keywords: 'Webdesign Restaurant München, Gastronomie Website München, Restaurant Website München',
-    },
-    '/webdesign-immobilien-muenchen': {
-      title: 'Webdesign für Immobilienmakler in München | Leads gewinnen – Cogniiq',
-      description: 'Websites für Immobilienmakler in München: Objektpräsentation, Anfragen, lokales SEO. Mehr qualifizierte Immobilienanfragen in der Münchner Immobilienbranche.',
-      canonical: 'https://cogniiq.de/webdesign-immobilien-muenchen',
-      keywords: 'Webdesign Immobilien München, Immobilienmakler Website München, Immobilien Webdesign München',
-    },
-    '/webdesign-arzt-regensburg': {
-      title: 'Webdesign für Ärzte in Regensburg | Praxis-Website erstellen – Cogniiq',
-      description: 'Webdesign für Arztpraxen in Regensburg: DSGVO-konforme Praxis-Websites mit Online-Terminbuchung und lokalem SEO für mehr Neupatienten in Regensburg.',
-      canonical: 'https://cogniiq.de/webdesign-arzt-regensburg',
-      keywords: 'Webdesign Arzt Regensburg, Praxis Website Regensburg, Arztwebsite Regensburg',
-    },
-    '/webdesign-gastronomie-regensburg': {
-      title: 'Webdesign für Restaurants in Regensburg | Online Reservierungen – Cogniiq',
-      description: 'Webdesign für Restaurants und Gastronomie in Regensburg: Online-Reservierung, Speisekarte, Google Maps. Mehr Gäste durch professionelle Website in Ostbayern.',
-      canonical: 'https://cogniiq.de/webdesign-gastronomie-regensburg',
-      keywords: 'Webdesign Restaurant Regensburg, Gastronomie Website Regensburg, Restaurant Website Regensburg',
-    },
-    '/webdesign-immobilien-regensburg': {
-      title: 'Webdesign für Immobilienmakler in Regensburg | Leads gewinnen – Cogniiq',
-      description: 'Websites für Immobilienmakler in Regensburg: Objektpräsentation, Anfragen-Formulare, lokales SEO für mehr Immobilienanfragen in Regensburg und Ostbayern.',
-      canonical: 'https://cogniiq.de/webdesign-immobilien-regensburg',
-      keywords: 'Webdesign Immobilien Regensburg, Immobilienmakler Website Regensburg, Immobilien Webdesign Regensburg',
-    },
-    '/ki-telefonassistent-arzt': {
-      title: 'KI-Telefonassistent für Arztpraxen | Terminwünsche aufnehmen – Cogniiq',
-      description: 'Der KI-Telefonassistent für Praxen: nimmt Patientenanrufe an und erfasst Terminwünsche nach Ihren Regeln – auch außerhalb der Sprechzeiten. Eintrag ins Praxissystem nach geprüfter Anbindung.',
-      canonical: 'https://cogniiq.de/ki-telefonassistent-arzt',
-      keywords: 'KI Telefonassistent Arzt, AI Rezeptionistin Praxis, Terminbuchung Praxis KI, Arztpraxis Automatisierung',
-    },
-    '/ki-telefonassistent-restaurant': {
-      title: 'KI-Telefonassistent für Restaurants | Reservierungen automatisch annehmen – Cogniiq',
-      description: 'KI-Telefonassistent für Restaurants: Tischreservierungen automatisch annehmen, Fragen beantworten, Öffnungszeiten mitteilen – kein Anruf geht mehr verloren.',
-      canonical: 'https://cogniiq.de/ki-telefonassistent-restaurant',
-      keywords: 'KI Telefonassistent Restaurant, Reservierungen KI, AI Rezeptionistin Restaurant, Gastronomie Automatisierung',
-    },
-    '/ki-telefonassistent-hotel': {
-      title: 'KI-Telefonassistent für Hotels | Buchungsanfragen auch nachts bearbeiten – Cogniiq',
-      description: 'KI-Telefonassistent für Hotels: Buchungsanfragen annehmen, Zimmerverfügbarkeiten mitteilen, Fragen beantworten – auch außerhalb der Rezeptionszeiten, ohne zusätzliches Personal.',
-      canonical: 'https://cogniiq.de/ki-telefonassistent-hotel',
-      keywords: 'KI Telefonassistent Hotel, AI Rezeptionistin Hotel, Hotel Automatisierung, Buchungen KI Hotel',
-    },
-    '/ki-telefonassistent-praxis': {
-      title: 'KI-Telefonassistent für medizinische Praxen | Terminverwaltung automatisieren – Cogniiq',
-      description: 'KI-Telefonassistent für Arzt- und Facharztpraxen: Termine buchen, Rezeptanfragen bearbeiten, Patientenkommunikation automatisieren – DSGVO-konform.',
-      canonical: 'https://cogniiq.de/ki-telefonassistent-praxis',
-      keywords: 'KI Telefonassistent Praxis, Praxis Telefonassistent, Terminverwaltung Praxis KI, AI Praxis',
-    },
-    '/automatisierung-restaurant': {
-      title: 'Automatisierung für Restaurants | Bestellungen, Reservierungen & mehr – Cogniiq',
-      description: 'Prozessautomatisierung für Restaurants: Reservierungen, Bestellungen, Dienstpläne und Kundenkommunikation automatisieren. Mehr Zeit für das Wesentliche.',
-      canonical: 'https://cogniiq.de/automatisierung-restaurant',
-      keywords: 'Automatisierung Restaurant, Gastronomie Automatisierung, KI Restaurant, Bestellsystem Automatisierung',
-    },
-    '/automatisierung-arzt': {
-      title: 'Automatisierung für Arztpraxen | Terminbuchung & Kommunikation – Cogniiq',
-      description: 'Prozessautomatisierung für Arztpraxen: Terminbuchung, Erinnerungen, Patientenkommunikation und Dokumentenverwaltung automatisieren. Mehr Zeit für Patienten.',
-      canonical: 'https://cogniiq.de/automatisierung-arzt',
-      keywords: 'Automatisierung Arztpraxis, Praxis Automatisierung, Terminbuchung Automatisierung, Arzt KI Systeme',
-    },
-    '/automatisierung-immobilien': {
-      title: 'Automatisierung für Immobilienmakler | Lead-Nachverfolgung & CRM – Cogniiq',
-      description: 'Prozessautomatisierung für Immobilienmakler: Lead-Nachverfolgung, Expose-Versand, Besichtigungen und Kundenkommunikation automatisieren. Mehr Abschlüsse, weniger Aufwand.',
-      canonical: 'https://cogniiq.de/automatisierung-immobilien',
-      keywords: 'Automatisierung Immobilien, Immobilienmakler KI, Lead-Nachverfolgung Immobilien, CRM Automatisierung Immobilien',
-    },
-    '/automatisierung-sport': {
-      title: 'Automatisierung für Sportvereine & Studios | Mitgliederverwaltung KI – Cogniiq',
-      description: 'Prozessautomatisierung für Sportvereine und Fitnessstudios: Mitgliederverwaltung, Anmeldungen, Kursplanung und Zahlungen automatisieren.',
-      canonical: 'https://cogniiq.de/automatisierung-sport',
-      keywords: 'Automatisierung Sportverein, Fitnessstudio Automatisierung, Mitgliederverwaltung KI, Sport Digitalisierung',
-    },
-    '/verpasste-anrufe-verlust': {
-      title: 'Verpasste Anrufe kosten täglich Umsatz – So hören Sie damit auf | Cogniiq',
-      description: 'Jeder verpasste Anruf ist ein verlorener Auftrag. Der KI-Telefonassistent von Cogniiq stellt sicher, dass kein Anruf mehr unbeantwortet bleibt – auch nachts und am Wochenende.',
-      canonical: 'https://cogniiq.de/verpasste-anrufe-verlust',
-      keywords: 'Verpasste Anrufe, Anrufe verpassen Unternehmen, KI Telefonassistent lösung, nie wieder verpasste Anrufe',
-    },
-    '/keine-anfragen-website': {
-      title: 'Warum Ihre Website keine Anfragen bringt – und wie Sie das ändern | Cogniiq',
-      description: 'Eine schöne Website bringt noch keine Anfragen. Hier sind die echten Gründe warum Besucher abspringen – und wie Cogniiq das technisch und inhaltlich löst.',
-      canonical: 'https://cogniiq.de/keine-anfragen-website',
-      keywords: 'Website keine Anfragen, Website konvertiert nicht, Webdesign Conversion Problem, Websitebesucher keine Kunden',
-    },
-    '/keine-terminbuchung-online': {
-      title: 'Keine Online-Terminbuchung? Das kostet Sie täglich Patienten & Kunden | Cogniiq',
-      description: 'Ohne Online-Terminbuchung verlieren Sie Patienten und Kunden an Wettbewerber. Cogniiq integriert Terminbuchungssysteme in Ihre Website – in wenigen Tagen.',
-      canonical: 'https://cogniiq.de/keine-terminbuchung-online',
-      keywords: 'Keine Online Terminbuchung, Terminbuchung Website, Online Buchungssystem integrieren',
-    },
-    '/zu-viel-manuelle-arbeit': {
-      title: 'Zu viel manuelle Arbeit im Unternehmen? KI löst das | Cogniiq',
-      description: 'Wiederkehrende manuelle Aufgaben bremsen Ihr Wachstum. Cogniiq automatisiert Buchungen, Kommunikation und Verwaltung mit KI – damit Ihr Team sich auf das Wesentliche konzentriert.',
-      canonical: 'https://cogniiq.de/zu-viel-manuelle-arbeit',
-      keywords: 'Manuelle Arbeit automatisieren, Prozesse automatisieren, KI gegen manuelle Aufgaben, Automatisierung KMU',
-    },
-    '/digitale-automatisierung-unternehmen': {
-      title: 'Digitale Automatisierung für Unternehmen – Praxisnah & sofort einsetzbar | Cogniiq',
-      description: 'Digitale Automatisierung für KMU: Vom Erstgespräch bis zum laufenden System in ein bis zwei Wochen. Cogniiq entwickelt Automatisierungssysteme, die wirklich eingesetzt werden.',
-      canonical: 'https://cogniiq.de/digitale-automatisierung-unternehmen',
-      keywords: 'Digitale Automatisierung, Automatisierung KMU, KI Digitalisierung Unternehmen, Digital Transformation',
-    },
-    '/referenzen': {
-      title: 'Referenzen & Projektbeispiele | Cogniiq KI- und Webdesign-Projekte',
-      description: 'Echte Projekte, messbare Ergebnisse: Webdesign, KI-Telefonassistenten und Automatisierungslösungen von Cogniiq für Unternehmen in Bayern und Deutschland.',
-      canonical: 'https://cogniiq.de/referenzen',
-      keywords: 'Cogniiq Referenzen, Webdesign Projekte, KI Projekte, Automatisierung Beispiele',
-    },
-    '/bewertungen': {
-      title: 'Bewertungen & Kundenstimmen | Cogniiq AI-Agentur Bayern',
-      description: 'Was Kunden über Cogniiq sagen: echte Bewertungen zu Webdesign, KI-Telefonassistenten und Automatisierung. Überzeugen Sie sich von unserer Arbeit.',
-      canonical: 'https://cogniiq.de/bewertungen',
-      keywords: 'Cogniiq Bewertungen, Kundenstimmen AI Agentur, Webdesign Bewertungen, KI Telefonassistent Erfahrungen',
-    },
-    '/blog': {
-      title: 'Blog – KI, Webdesign & Automatisierung für Unternehmen | Cogniiq',
-      description: 'Praktisches Wissen zu KI-Systemen, Webdesign und Prozessautomatisierung: Praxistipps, Fallstudien und Brancheneinblicke für Unternehmer in Bayern.',
-      canonical: 'https://cogniiq.de/blog',
-      keywords: 'Cogniiq Blog, KI Unternehmen Blog, Webdesign Tipps, Automatisierung Blog',
-    },
-    // Legal pages (crawlable, indexable).
-    '/impressum': {
-      title: 'Impressum | Cogniiq',
-      description: 'Impressum von Cogniiq – Anbieterkennzeichnung gemäß § 5 DDG, Kontaktangaben und rechtliche Hinweise.',
-      canonical: 'https://cogniiq.de/impressum',
-    },
-    '/datenschutz': {
-      title: 'Datenschutzerklärung | Cogniiq',
-      description: 'Datenschutzerklärung von Cogniiq: Welche Daten wir verarbeiten, Hosting, Kontaktanfragen, Google Ads mit Einwilligung (Consent Mode v2) und Ihre Rechte.',
-      canonical: 'https://cogniiq.de/datenschutz',
-    },
-    // Blog posts. Metadata mirrors src/lib/blog-data.ts; consistency is enforced
-    // by .github/scripts/test-seo-consistency.mjs (blog slugs ⇄ sitemap ⇄ middleware).
-    '/blog/ki-automatisierung-kleine-unternehmen': {
-      title: 'KI-Automatisierung für kleine Unternehmen 2025 | Leitfaden',
-      description: 'KI-Automatisierung für kleine Unternehmen: Welche Prozesse sich lohnen, was es kostet und wie der Einstieg gelingt. Mit konkreten Beispielen aus der Praxis.',
-      canonical: 'https://cogniiq.de/blog/ki-automatisierung-kleine-unternehmen',
-    },
-    '/blog/ki-telefonassistent-arztpraxis': {
-      title: 'KI-Telefonassistent Arztpraxis 2025 | Vorteile & Kosten',
-      description: 'Wie ein KI-Telefonassistent Arztpraxen dabei hilft, verpasste Anrufe zu eliminieren, Termine automatisch zu buchen und das Praxisteam zu entlasten.',
-      canonical: 'https://cogniiq.de/blog/ki-telefonassistent-arztpraxis',
-    },
-    '/blog/webdesign-konversion-tipps': {
-      title: 'Webdesign für mehr Anfragen & Konversion 2025 | 8 Tipps',
-      description: 'Warum viele Unternehmenswebsites keine Anfragen generieren – und wie Sie mit gezielten Webdesign-Entscheidungen die Konversionsrate verdoppeln können.',
-      canonical: 'https://cogniiq.de/blog/webdesign-konversion-tipps',
-    },
-    '/blog/lokales-seo-unternehmen': {
-      title: 'Lokales SEO für Unternehmen 2025 | Google Maps & lokale Suche',
-      description: 'Lokales SEO erklärt: Wie Unternehmen in Google Maps sichtbar werden, welche Faktoren wirklich zählen und welche Fehler die meisten Betriebe machen.',
-      canonical: 'https://cogniiq.de/blog/lokales-seo-unternehmen',
-    },
-    '/blog/prozessautomatisierung-roi': {
-      title: 'Prozessautomatisierung ROI berechnen 2025 | Leitfaden',
-      description: 'Wie Sie den Return on Investment einer Prozessautomatisierung korrekt berechnen – mit Formel, konkreten Beispielen und typischen Kostenfallen.',
-      canonical: 'https://cogniiq.de/blog/prozessautomatisierung-roi',
-    },
-    '/blog/verpasste-anrufe-kosten': {
-      title: 'Verpasste Anrufe Kosten berechnen | KI-Telefonassistent',
-      description: 'Wie teuer sind verpasste Anrufe wirklich? Eine ehrliche Kalkulation mit Durchschnittswerten aus deutschen KMU – und wie ein KI-Telefonassistent den Verlust stoppt.',
-      canonical: 'https://cogniiq.de/blog/verpasste-anrufe-kosten',
-    },
-    '/blog/ki-telefonassistent-restaurant': {
-      title: 'KI-Telefonassistent Restaurant 2025 | Reservierungen automatisieren',
-      description: 'Wie Restaurants mit einem KI-Telefonassistenten Reservierungen automatisch annehmen, Wartelisten führen und Gäste nachqualifizieren – ohne Personal.',
-      canonical: 'https://cogniiq.de/blog/ki-telefonassistent-restaurant',
-    },
-    '/blog/website-ohne-anfragen': {
-      title: 'Website bringt keine Anfragen? Ursachen & Lösungen 2025',
-      description: 'Die häufigsten Gründe, warum Unternehmenswebsites keine Anfragen generieren – und konkrete Schritte, um das in wenigen Wochen zu ändern.',
-      canonical: 'https://cogniiq.de/blog/website-ohne-anfragen',
-    },
-    '/blog/digitalisierung-mittelstand': {
-      title: 'Digitalisierung Mittelstand 2025 | Wo anfangen & was vermeiden',
-      description: 'Digitalisierung im deutschen Mittelstand: Ein praxisorientierter Einstiegsleitfaden, der zeigt, welche Maßnahmen wirklich Wirkung haben – und welche Fallen es zu vermeiden gilt.',
-      canonical: 'https://cogniiq.de/blog/digitalisierung-mittelstand',
-    },
-    '/blog/webdesign-agentur-auswahl': {
-      title: 'Webdesign Agentur auswählen 2025 | 7 entscheidende Kriterien',
-      description: 'Wie finden Sie die richtige Webdesign-Agentur für Ihr Unternehmen? 7 konkrete Auswahlkriterien, die vor überteuerten Projekten und schlechten Ergebnissen schützen.',
-      canonical: 'https://cogniiq.de/blog/webdesign-agentur-auswahl',
     },
   };
 
-  const config = seoConfig[pathname];
+  const frozenHead = frozenHeadOverrides[pathname];
+
   let response = await context.next();
   let status = 200;
 
@@ -680,27 +221,32 @@ export async function onRequest(context: CloudflarePagesContext) {
     });
   }
 
-  if (!config) {
+  // The prerendered head is already the manifest's, validated per route by
+  // scripts/prerender.mjs. Serve it untouched unless this route is holding a
+  // frozen experiment's delivered bytes.
+  if (!frozenHead) {
     return new Response(html, {
       status,
       headers,
     });
   }
 
-  html = html.replace(/<title>[^<]*<\/title>/, `<title>${config.title}</title>`);
-  html = html.replace(/(<meta\s+name="description"\s+content=")[^"]*/i, `$1${config.description}`);
-  html = html.replace(/(<link\s+rel="canonical"\s+href=")[^"]*/i, `$1${config.canonical}`);
-  html = html.replace(/(<link\s+rel="alternate"\s+hreflang="de-DE"\s+href=")[^"]*/gi, `$1${config.canonical}`);
-  html = html.replace(/(<link\s+rel="alternate"\s+hreflang="x-default"\s+href=")[^"]*/gi, `$1${config.canonical}`);
-  html = html.replace(/(<meta\s+property="og:url"\s+content=")[^"]*/i, `$1${config.canonical}`);
-  html = html.replace(/(<meta\s+property="og:title"\s+content=")[^"]*/i, `$1${config.title}`);
-  html = html.replace(/(<meta\s+property="og:description"\s+content=")[^"]*/i, `$1${config.description}`);
-  html = html.replace(/(<meta\s+name="twitter:title"\s+content=")[^"]*/i, `$1${config.title}`);
-  html = html.replace(/(<meta\s+name="twitter:description"\s+content=")[^"]*/i, `$1${config.description}`);
-  html = html.replace(/(<meta\s+name="twitter:url"\s+content=")[^"]*/i, `$1${config.canonical}`);
+  if (frozenHead.title) {
+    html = html.replace(/<title>[^<]*<\/title>/, `<title>${frozenHead.title}</title>`);
+    html = html.replace(/(<meta\s+property="og:title"\s+content=")[^"]*/i, `$1${frozenHead.title}`);
+    html = html.replace(/(<meta\s+name="twitter:title"\s+content=")[^"]*/i, `$1${frozenHead.title}`);
+  }
 
-  if (config.keywords) {
-    html = html.replace(/(<meta\s+name="keywords"\s+content=")[^"]*/i, `$1${config.keywords}`);
+  if (frozenHead.description) {
+    html = html.replace(/(<meta\s+name="description"\s+content=")[^"]*/i, `$1${frozenHead.description}`);
+    html = html.replace(
+      /(<meta\s+property="og:description"\s+content=")[^"]*/i,
+      `$1${frozenHead.description}`
+    );
+    html = html.replace(
+      /(<meta\s+name="twitter:description"\s+content=")[^"]*/i,
+      `$1${frozenHead.description}`
+    );
   }
 
   return new Response(html, {

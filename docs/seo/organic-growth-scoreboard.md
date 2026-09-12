@@ -758,3 +758,118 @@ offen und in dieser Reihenfolge wertvoll:
   nur neu im Index steht. Ohne ihn ist der auffälligste Befund dieses Laufs —
   die Hotel-Familie ist zu ~95 % in den letzten 28 Tagen entstanden — nur aus
   dem Vergleich zweier Fenster erschlossen.
+
+---
+
+## 2026-09-12 · Architekturlauf (Branch `claude/seo-architecture-max-2026-09-12`)
+
+Vollständige Intentionskarte, Kannibalisierungsmatrix und Strategievergleich:
+**`docs/seo/ARCHITEKTUR.md`** — ab jetzt die Quelle dafür, welche Seite welche
+Suchintention besitzen darf. Hier stehen nur die Messfolgen.
+
+### Befund, der drei laufende Messreihen ungültig macht
+
+Der am 11.09.2026 protokollierte Drift zwischen `functions/_middleware.ts` und
+dem Routen-Manifest war kein Kosmetikproblem. Die Middleware überschrieb den
+vorgerenderten `<head>` an der Edge, und **die Edge gewann**. Auf 29 von 86
+gemeinsamen Routen trug sie durchgehend die Copy **vor** der Überarbeitung.
+
+Damit ist **nie ausgeliefert worden**, was diese Messreihen messen wollten:
+
+| Messpunkt | Route | Geplanter Titel | Tatsächlich im SERP |
+|---|---|---|---|
+| M1 (10.09.2026) | `/webdesign-hotel` | „Internetagentur für Hotellerie" | „Direktbuchungen steigern" (alt) |
+| M2 (10.09.2026) | `/verpasste-anrufe-verlust` | Titel auf die Kopf-Query | alte Fassung |
+| Titel-Experiment (29.08.2026) | `/bayreuth/website-relaunch` | „Mehr Performance & bessere Rankings" | „Alte Website modernisieren" (alt) |
+| Neuausrichtung (05.09.2026) | `/blog/ki-telefonassistent-arztpraxis` | Fassung vom 05.09. | alte Fassung, Titel mit „2025" |
+
+**M1 und M2 sind UNGÜLTIG, nicht gescheitert.** Ihre Erfolgs- und
+Abbruchkriterien sind gegen eine Auslieferung formuliert, die es nicht gab. Sie
+sind mit dem Deploy dieses Branches **neu zu starten**; die Baselines vom
+10.09.2026 (`/webdesign-hotel` 814 Impr., Pos. 36,0 · `/verpasste-anrufe-verlust`
+59 Impr., Pos. 18,5) bleiben gültig, weil sie den alten Titel gemessen haben —
+der bis zum 12.09.2026 tatsächlich ausgeliefert wurde. Tag 0 der Messung ist
+der Deploy dieses Branches, nicht der 10.09.2026.
+
+**Das Titel-Experiment auf `/bayreuth/website-relaunch` hat nie begonnen.** Die
+Route ist eingefroren und wird gegen die Bytes gemessen, die ein Crawler
+bekommen hat — also gegen den alten Titel. Der Edge-Override wird deshalb
+bewusst **gehalten**, statt jetzt auf den Manifestwert zu wechseln: das wäre ein
+Start, kein Fortsetzen. **Offene Inhaber-Entscheidung:** Titel ausliefern
+(bewusster Reset, neue Baseline ab Deploy) oder Experiment für ungültig
+erklären und den Manifestwert zurücknehmen.
+
+Nicht vergessen: 29 Routen haben mit diesem Branch einen **neuen**
+SERP-Snippet, weil erstmals der geprüfte Manifestwert ausgeliefert wird. Eine
+CTR-Bewegung auf diesen Routen ab dem Deploy ist darauf zurückzuführen und nicht
+auf Inhaltsarbeit. Die Liste steht in `docs/seo/ARCHITEKTUR.md` §7.
+
+### M3 · `/prozessautomatisierung` — aus der Waisenlage geholt
+
+- **Baseline (Architektur, nicht GSC):** 0 kontextuelle eingehende Links,
+  erreichbar nur über den Footer. 2.746 Zeichen gerenderter Körper — die
+  dünnste Seite des Automatisierungs-Clusters. Keine GSC-Zeile in den Exporten
+  vom 10.09.2026, also unter der Sichtbarkeitsschwelle.
+- **Umgesetzt 2026-09-12:** 8 kontextuelle eingehende Links aus dem
+  Automatisierungs-Cluster (`/kosten-automatisierung` als Service-Ziel,
+  `/zu-viel-manuelle-arbeit`, `/digitale-automatisierung-unternehmen`, die vier
+  Branchenseiten, `/automatisierung-unternehmen`). Kein Link von
+  `/automatisierung-unternehmen` entfernt — die Eigentümerfrage (K1) bleibt
+  offen und wird nicht per Linkumbau vorentschieden.
+- **Hypothese:** Eine Seite, auf die kein Seitenkörper verweist, wird als
+  Footer-Anhang bewertet. Mit eingehenden Links aus thematisch passenden Körpern
+  sollte sie überhaupt erst in die Query-Familie „Prozessautomatisierung"
+  eintreten.
+- **Ehrliche Einordnung:** Links allein machen aus 2.746 Zeichen keinen Pillar.
+  Das ist die Voraussetzung, nicht die Maßnahme. Die Maßnahme ist F2.
+- **Erfolgskriterium:** Tag 28 überhaupt eine Impression auf
+  „prozessautomatisierung" oder „geschäftsprozesse automatisieren" · Tag 56
+  Seiten-Ø unter 60 · Tag 90 eine Query der Familie unter Position 30.
+- **Abbruchkriterium:** Verliert `/automatisierung-unternehmen` bis Tag 28
+  Impressionen, ohne dass `/prozessautomatisierung` welche gewinnt, ist die
+  Autorität geteilt statt verschoben — dann ist K1 sofort zu entscheiden (F2)
+  und nicht weiter zu beobachten.
+
+### M4 · `/webdesign` — kontextuelle Links von 1 auf 4
+
+- **Baseline:** 1 kontextueller eingehender Link, 3.103 Zeichen, **34**
+  ausgehende Links. Verteilt Autorität, bekommt keine.
+- **Umgesetzt 2026-09-12:** Service-Ziel von `/kosten-webdesign` (war
+  `/leistungen`), Service-Link von `/keine-anfragen-website` (war `/leistungen`),
+  Verwandten-Link von `/webdesign-agentur-deutschland`.
+- **Hypothese:** dieselbe wie M3. Zusätzlich wird K2 sichtbar gemacht: der
+  nationale Ableger erkennt den generischen Eigentümer erstmals an.
+- **Erfolgskriterium:** Tag 28 Seiten-Ø verbessert gegenüber dem ersten
+  Messpunkt nach dem Deploy · Tag 56 eine „webdesign agentur"-Query unter
+  Position 40.
+- **Abbruchkriterium:** Fällt `/webdesign-agentur-deutschland` (19 eingehende
+  Links) messbar, während `/webdesign` nicht gewinnt, ist K2 zu entscheiden
+  statt weiter zu beobachten.
+- **Gegenprobe:** `/leistungen` verliert zwei eingehende Links (58 → 56). Bei
+  56 Links ohne eigene kommerzielle Kopf-Intention ist das ohne erwartete
+  Wirkung; fällt die Seite dennoch auf, gehört die Änderung hierher notiert.
+
+### Mitgeändert, ohne eigene Messreihe
+
+| Fundstelle | Alt | Neu | Grund |
+|---|---|---|---|
+| `src/pages/ProzessautomatisierungHub.tsx` (FAQ) | „Wir integrieren alle gängigen Tools: Google Workspace, Microsoft 365, HubSpot, Salesforce, Calendly, Stripe, Shopify, Lexoffice, Datev und viele weitere." | Bedingung statt Liste: Schnittstellenprüfung vor dem Angebot | Zusage über Software Dritter ohne geprüfte Anbindung — dasselbe Muster, wegen dem `/integrationen` noindex ist. Stand im `FAQPage`-JSON-LD und damit öffentlich. |
+| `src/pages/ProzessautomatisierungHub.tsx`, `src/pages/pillars/AutomatisierungUnternehmen.tsx` | „API-Integrationen für alle gängigen Tools" | „API-Anbindung, wo Ihr System eine geeignete Schnittstelle hat" | dieselbe Klasse, im sichtbaren SSR-Körper |
+
+### Nicht angefasst — bewusst
+
+- **`/ki-telefonassistent`.** Kein Titel, keine H1, kein Hero, kein Rechner,
+  kein Preismodell, keine Abschnittsreihenfolge, keine Neupositionierung. Die
+  Überarbeitung vom 11.09.2026 braucht ~28 gesetzte GSC-Tage; dieser Lauf setzt
+  sie nicht zurück. Die Seite hat 32 kontextuelle eingehende Links und braucht
+  architektonisch nichts.
+- **Die fünf eingefrorenen Routen.** Fingerprints, gelieferte Heads und
+  Erwähnungszahlen unverändert; `protected-experiments.baseline.json` nicht
+  angefasst, `npm run seo:baseline` nicht gelaufen. Nachweis in
+  `docs/seo/ARCHITEKTUR.md` §9.
+- **Keine Konsolidierung, keine 301, kein Canonical auf eine fremde URL, keine
+  Route entfernt.** K1 und K3 sind entschieden dokumentiert und warten auf
+  Inhaber-Freigabe bzw. Experimentende.
+- **`src/pages/pillars/AutomatisierungUnternehmen.tsx:278`** („zur vollständig
+  automatisierten Geschäftsstruktur") bleibt stehen — Grenzfall, gehört in eine
+  Copy-Prüfung und nicht in einen Architekturlauf.

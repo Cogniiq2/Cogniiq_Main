@@ -29,7 +29,9 @@ const SERVICES = [
     title: "System-Integration",
     description: "CRM, ERP, Kalender, E-Mail-Marketing und Buchungssysteme verbinden – Daten fließen automatisch, keine manuelle Doppelerfassung.",
     benefits: [
-      "API-Integrationen für alle gängigen Tools",
+      // Siehe ProzessautomatisierungHub.tsx: „für alle gängigen Tools" ist eine
+      // Zusage über Software Dritter ohne geprüfte Anbindung.
+      "API-Anbindung, wo Ihr System eine geeignete Schnittstelle hat",
       "Bidirektionale Datensynchronisation",
       "Fehlerüberwachung und Alerting",
     ],
@@ -101,6 +103,12 @@ const COST_LINKS = [
 ];
 
 const RELATED_LINKS = [
+  // Diese Seite und /prozessautomatisierung bedienen dieselbe Intention — das ist
+  // die offene Eigentümerfrage im Automatisierungs-Cluster
+  // (docs/seo/ARCHITEKTUR.md, Folgemission F2). Bis sie entschieden ist, steht
+  // hier wenigstens die Verbindung: Diese Seite erklärt, was automatisiert wird,
+  // der Pillar ordnet das Leistungsbild ein.
+  { label: "Prozessautomatisierung", href: "/prozessautomatisierung" },
   { label: "KI Agentur Deutschland", href: "/ki-agentur-deutschland" },
   { label: "Webdesign Agentur Deutschland", href: "/webdesign-agentur-deutschland" },
   { label: "KI Telefonassistent", href: "/ki-telefonassistent" },

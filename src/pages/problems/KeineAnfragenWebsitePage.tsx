@@ -57,7 +57,9 @@ const config: ProblemPageConfig = {
     ],
   },
   serviceLinks: [
-    { label: "Webdesign Leistungen", href: "/leistungen" },
+    // War /leistungen (Übersicht aller drei Systeme). Wer diese Problemseite
+    // liest, sucht die Webdesign-Leistung selbst; /webdesign ist ihr Eigentümer.
+    { label: "Webdesign für Unternehmen", href: "/webdesign" },
     { label: "Webdesign Kosten", href: "/kosten-webdesign" },
     { label: "Webdesign Agentur Deutschland", href: "/webdesign-agentur-deutschland" },
     { label: "Webdesign Bayreuth", href: "/bayreuth/webdesign" },

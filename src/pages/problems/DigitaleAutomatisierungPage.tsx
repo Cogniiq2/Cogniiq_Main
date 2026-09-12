@@ -55,6 +55,10 @@ const config: ProblemPageConfig = {
     ],
   },
   serviceLinks: [
+    // /prozessautomatisierung ist der kanonische Eigentümer dieser Intention und
+    // hatte vor dieser Änderung keinen einzigen kontextuellen eingehenden Link —
+    // nur Navigation und Footer (docs/seo/ARCHITEKTUR.md).
+    { label: "Prozessautomatisierung", href: "/prozessautomatisierung" },
     { label: "Automatisierung für Unternehmen", href: "/automatisierung-unternehmen" },
     { label: "Automatisierung Kosten", href: "/kosten-automatisierung" },
     { label: "KI Agentur Deutschland", href: "/ki-agentur-deutschland" },

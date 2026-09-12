@@ -83,6 +83,9 @@ const config: NationalIndustryPageConfig = {
     { label: "Automatisierung Deutschland", href: "/automatisierung-unternehmen" },
   ],
   relatedLinks: [
+    // Der Pillar der Automatisierungs-Intention, den die Branchenseiten bis
+    // 2026-09-12 nirgends kontextuell verlinkt haben (docs/seo/ARCHITEKTUR.md).
+    { label: "Prozessautomatisierung", href: "/prozessautomatisierung" },
     { label: "KI Telefonassistent Arzt", href: "/ki-telefonassistent-arzt" },
     { label: "KI Telefonassistent Praxis", href: "/ki-telefonassistent-praxis" },
     { label: "Webdesign Arzt", href: "/webdesign-arzt" },
