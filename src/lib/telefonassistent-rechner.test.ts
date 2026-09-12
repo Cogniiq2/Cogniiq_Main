@@ -53,13 +53,40 @@ describe("Die numerischen Zwillinge stimmen mit den Anzeigetexten überein", () 
     expect(alsZahl(FAKTEN.mehrpreisProMinute)).toBe(FAKTEN.mehrpreisProMinuteEur);
   });
 
-  it("Die Sprachpreise stehen so auch im Fließtext", () => {
+  it("Der eindeutige Sprachpreis steht so auch im Fließtext", () => {
+    // Bekannt und zusagbar: der Preis für EINE weitere Sprache.
     expect(SPRACHEN.text).toContain(String(SPRACHEN_PREISE.proSpracheEur));
-    expect(SPRACHEN.text).toContain(String(SPRACHEN_PREISE.paketEur));
+  });
+
+  it("nennt den unbestätigten Paketpreis NICHT als feststehenden Betrag", () => {
+    /*
+      OWNER-INPUT H3 ist offen: ob „ab drei Sprachen" zwei oder drei
+      ZUSATZsprachen meint und ob „bis zu fünf" Deutsch mitzählt. Bis zum
+      12.09.2026 nannte dieser Fließtext „230 €" trotzdem als Tatsache —
+      während `sprachenAufschlagEur` dieselbe Konstellation schon als OFFEN
+      auswies. Der sichtbare Text darf nicht sicherer sein als die Rechnung.
+    */
+    expect(SPRACHEN.text).not.toContain(String(SPRACHEN_PREISE.paketEur));
+    // Und er verschweigt die Mehrkosten auch nicht.
+    expect(SPRACHEN.text).toMatch(/Paketpreis/);
+    expect(SPRACHEN.text).toMatch(/Angebot/);
+  });
+
+  it("weist ab zwei Zusatzsprachen einen offenen Betrag aus, keinen geratenen", () => {
+    expect(sprachenAufschlagEur(0)).toEqual({ betrag: 0, offen: false });
+    expect(sprachenAufschlagEur(1)).toEqual({
+      betrag: SPRACHEN_PREISE.proSpracheEur,
+      offen: false,
+    });
+    for (const n of [2, 3] as const) {
+      const a = sprachenAufschlagEur(n);
+      expect(a.offen, `${n} Zusatzsprachen müssen offen bleiben`).toBe(true);
+      expect(typeof a.betrag).not.toBe("number");
+    }
   });
 
   it("Das Sprachpaket ist günstiger als Einzelpreise ab der Schwelle", () => {
-    // Genau diese Ungleichung begründet die Lesart „ab DREI ZUSATZsprachen"
+    // Diese Ungleichung ist der Grund, WARUM die Lesart überhaupt strittig ist
     // (siehe Kommentar an SPRACHEN_PREISE). Kippt sie, ist die Lesart falsch.
     const einzeln = SPRACHEN_PREISE.paketAbZusatzsprachen * SPRACHEN_PREISE.proSpracheEur;
     expect(SPRACHEN_PREISE.paketEur).toBeLessThan(einzeln);

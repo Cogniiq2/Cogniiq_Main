@@ -1,5 +1,10 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// REGRESSION GUARD FOR THE SIX FROZEN SEO EXPERIMENTS.
+// REGRESSION GUARD FOR THE FIVE FROZEN SEO EXPERIMENTS.
+//
+// /kosten-ki-telefonassistent was the sixth until 2026-09-12, when the owner
+// ended that experiment; see GRADUATED_EXPERIMENT_PATHS and the block above
+// PROTECTED_EXPERIMENT_PATHS for why, and note that its baseline entry was
+// removed by hand rather than by re-recording the fixture.
 //
 // These routes are measuring live search performance. The measurement is only
 // valid while the crawled page stays identical, so this test re-renders each of
@@ -42,9 +47,12 @@ vi.mock('@/lib/supabase', () => ({
 
 const { render } = await import('./entry-server');
 const { PUBLIC_ROUTES } = await import('./lib/routing/publicRoutes');
-const { PROTECTED_EXPERIMENT_PATHS, fingerprintExperiment, countPathOccurrences } = await import(
-  './lib/routing/protectedExperiments'
-);
+const {
+  PROTECTED_EXPERIMENT_PATHS,
+  GRADUATED_EXPERIMENT_PATHS,
+  fingerprintExperiment,
+  countPathOccurrences,
+} = await import('./lib/routing/protectedExperiments');
 
 // vitest resolves import.meta.url to a Vite '/@fs/...' URL, which is not a
 // filesystem path. The runner's cwd is the repo root (vitest.config.ts sits
@@ -141,12 +149,11 @@ afterAll(() => {
 });
 
 describe('the frozen SEO experiments have not drifted', () => {
-  it('freezes exactly the six documented routes, all of them real', () => {
+  it('freezes exactly the five documented routes, all of them real', () => {
     expect([...PROTECTED_EXPERIMENT_PATHS].sort()).toEqual([
       '/bayreuth/webdesign',
       '/bayreuth/website-relaunch',
       '/ki-telefonassistent-arzt',
-      '/kosten-ki-telefonassistent',
       '/muenchen/webdesign-kosten',
       '/regensburg/website-relaunch',
     ]);
@@ -157,6 +164,40 @@ describe('the frozen SEO experiments have not drifted', () => {
     expect(Object.keys(baseline.fingerprints).sort()).toEqual(
       [...PROTECTED_EXPERIMENT_PATHS].sort()
     );
+  });
+
+  /*
+    The cost page is UNPROTECTED ON PURPOSE, and that is worth a test rather
+    than a comment.
+
+    Two different accidents are covered here. Re-adding the path to
+    PROTECTED_EXPERIMENT_PATHS would re-freeze a page the owner deliberately
+    unfroze — and, because the fixture no longer carries its fingerprint, the
+    first test above would fail with a confusing "baseline keys differ" instead
+    of saying what happened. Dropping some OTHER route from protection without
+    recording it in GRADUATED_EXPERIMENT_PATHS is the reverse accident: a freeze
+    that quietly evaporates.
+  */
+  it('treats /kosten-ki-telefonassistent as graduated, not as protected', () => {
+    expect(GRADUATED_EXPERIMENT_PATHS).toContain('/kosten-ki-telefonassistent');
+    expect(PROTECTED_EXPERIMENT_PATHS).not.toContain('/kosten-ki-telefonassistent');
+    // It is still a real, public route — graduating ended the freeze, not the page.
+    expect(PUBLIC_ROUTES.some((r) => r.path === '/kosten-ki-telefonassistent')).toBe(true);
+    // And the fixture must not still carry a fingerprint nobody asserts against.
+    if (!RECORDING) {
+      expect(Object.keys(baseline.fingerprints)).not.toContain('/kosten-ki-telefonassistent');
+      expect(Object.keys(baseline.inboundOccurrences)).not.toContain(
+        '/kosten-ki-telefonassistent'
+      );
+    }
+  });
+
+  it('keeps every graduated route out of the protected set', () => {
+    for (const path of GRADUATED_EXPERIMENT_PATHS) {
+      expect(PROTECTED_EXPERIMENT_PATHS, `${path} is both graduated and frozen`).not.toContain(
+        path
+      );
+    }
   });
 
   // One `it` per route so a failure names the page that moved rather than

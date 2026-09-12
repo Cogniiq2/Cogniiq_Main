@@ -710,19 +710,45 @@ export const DECKELUNG = {
   der Sprachaufschlag INNERHALB der Tarif-Obergrenze liegt oder daneben. Der
   Rechner rät das nicht, sondern weist den Aufschlag als eigene Zeile aus und
   sagt dazu, dass die Zuordnung zur Obergrenze im Angebot steht.
+
+  SICHTBARER TEXT UND RECHNER GEZOGEN, 12.09.2026 — OWNER-INPUT H3 offen.
+
+  Bis zum 12.09.2026 stand in `SPRACHEN.text` „ab drei Sprachen sind es 230 €
+  im Monat für bis zu fünf Sprachen gleichzeitig" als feststehende Tatsache,
+  während `sprachenAufschlagEur()` genau diese Konfiguration schon als OFFEN
+  auswies. Der statische Text war damit SICHERER als der Rechenkern — und zwar
+  bei der Zahl, die ein Kunde später auf seiner Rechnung wiederfindet.
+
+  Was bekannt ist und hier zugesagt werden darf:
+    • Deutsch ist enthalten und kostet nichts extra.
+    • EINE weitere Sprache: 79 € im Monat.
+
+  Was offen ist, solange H3 nicht bestätigt ist:
+    • ob „ab drei Sprachen" drei Sprachen INSGESAMT (also zwei zusätzliche)
+      oder drei ZUSÄTZLICHE Sprachen meint,
+    • ob „bis zu fünf Sprachen" Deutsch mitzählt.
+  Beide Lesarten treffen sich schon bei ZWEI Zusatzsprachen, also genau dort,
+  wo der Rechner OFFEN sagt. Ab dort nennt der sichtbare Text deshalb keinen
+  Betrag mehr, sondern verweist auf den Paketpreis im schriftlichen Angebot.
+  Verschwiegen wird nichts: Dass weitere Sprachen Geld kosten, steht im Satz.
+
+  `paketEur` bleibt als Datum stehen — es ist die Zahl, die der Inhaber genannt
+  hat —, ist aber ABSICHTLICH ohne Konsument in der Produktion: kein sichtbarer
+  Text und keine Rechnung leiten daraus einen Betrag ab, bevor H3 geklärt ist.
 */
 export const SPRACHEN_PREISE = {
   /** Monatspreis je zusätzlicher Sprache unterhalb der Paketschwelle. */
   proSpracheEur: 79,
   /** Ab dieser Anzahl ZUSATZsprachen gilt der Paketpreis. */
   paketAbZusatzsprachen: 3,
-  /** Monatlicher Paketpreis ab der Schwelle. */
+  /** Monatlicher Paketpreis ab der Schwelle — UNBESTÄTIGT (OWNER-INPUT H3).
+   *  Wird bewusst nirgends angezeigt und in keine Rechnung eingesetzt. */
   paketEur: 230,
 };
 
 export const SPRACHEN = {
   headline: "Weitere Sprachen",
-  text: "Deutsch ist enthalten. Jede weitere Sprache kostet 79\u00A0€ im Monat; ab drei Sprachen sind es 230\u00A0€ im Monat für bis zu fünf Sprachen gleichzeitig. Der Assistent kann die Sprache mitten im Gespräch wechseln.",
+  text: "Deutsch ist enthalten und kostet nichts extra. Eine weitere Sprache kostet 79\u00A0€ im Monat. Ab zwei zusätzlichen Sprachen gilt ein Paketpreis, dessen genaue Staffelung wir Ihnen im schriftlichen Angebot nennen — wir setzen hier keinen Betrag ein, den wir nicht für jede Konstellation belegen können. Der Assistent kann die Sprache mitten im Gespräch wechseln.",
 };
 
 /**
@@ -1029,37 +1055,20 @@ export const RECHNER = {
   headline: "Was spart eine Praxis durch einen KI Telefonassistenten?",
   intro:
     "Stellen Sie die Regler auf Ihre Praxis ein. Der Rechner trennt bewusst zwei Dinge, die oft in einer Zahl verschwinden: wie viele Anrufe überhaupt angenommen werden — und wie viel Bearbeitungszeit dabei tatsächlich eingespart wird. Das ist nicht dasselbe.",
-  rahmung:
-    "Der Rechner startet bewusst mit einem zurückhaltenden Automatisierungsgrad und zieht unsere eigenen Kosten ab — Monatspreis und Einrichtung. Stellen Sie den Grad auf den Wert ein, den Sie für Ihre Praxis für realistisch halten; der Rechenweg bleibt vollständig nachvollziehbar.",
-  label: "Rechnung mit Ihren Angaben — keine Zusage.",
   anbindungsHinweis:
     "Der Wert steigt, wo eine Anbindung an Ihr Praxisverwaltungssystem möglich ist: Dann entfällt auch das Übertragen von Hand. Was für Ihr System geht, prüfen wir vor dem Angebot.",
-  stundenkostenQuelle:
-    "Vorschlagswert abgeleitet aus dem MFA-Tarifgehalt 2026 (ab 2.939,59\u00A0€ brutto im Monat) bei angenommenen 38,5 Wochenstunden — ohne Arbeitgeberkosten. Passen Sie den Wert an Ihre Praxis an.",
-  stundenkostenSource: "Gehaltstarifvertrag MFA (Virchowbund), 2026",
-  startwertHinweis:
-    "Alle Startwerte sind frei gewählte Beispiele, keine Branchenstatistik.",
-  terminwertLabel: "Was ist Ihnen ein gewonnener Termin wert?",
-  terminwertKontext:
-    "Der wirtschaftliche Nutzen liegt meist nicht in der eingesparten Zeit, sondern in den Anrufen, die heute gar nicht ankommen. Was ein gewonnener Termin für Ihre Praxis wert ist, wissen nur Sie — deshalb rechnen wir diesen Teil nicht ohne Ihre Angabe.",
-  terminwertLeer:
-    "Solange dieses Feld leer bleibt, bleibt dieser Teil der Rechnung leer. Wir setzen hier keinen typischen Wert ein.",
-
   /*
-    FASSUNG FÜR /praxen, ab 11.09.2026 — und der Grund, warum `rahmung`
-    unangetastet daneben stehen bleibt.
+    DIE FASSUNG FÜR ALLE FLÄCHEN, seit 12.09.2026.
 
-    `rahmung` beschreibt einen voreingestellten „Automatisierungsgrad". Den
-    setzt der kanonische Rechner nicht mehr, und die dahinterliegende Lesart war
-    falsch: Einen konfigurierten Routineablauf wickelt der Assistent vollständig
-    ab. Was schwankt, ist der Anteil der Anrufe eines Betriebs, der überhaupt zu
-    solchen Abläufen gehört.
-
-    Ersetzt wird `rahmung` trotzdem nicht, sondern ergänzt: Der Satz steht auf
-    der Kostenseite, einem laufenden SEO-Experiment, dessen gerenderte Bytes bis
-    zum Ende der Messung unverändert bleiben müssen. Diese Fassung gilt auf
-    `/praxen`; die Kostenseite bekommt sie in einer eigenen, kontrollierten
-    Änderung, sobald das Experiment endet.
+    Daneben stand bis zum 12.09.2026 `rahmung` — „startet bewusst mit einem
+    zurückhaltenden Automatisierungsgrad". Diese Fassung blieb nur deshalb
+    stehen, weil die Kostenseite ein eingefrorenes SEO-Experiment war und ihre
+    gerenderten Bytes sich nicht bewegen durften. Mit dem Ende dieses
+    Experiments (Inhaber-Entscheidung 12.09.2026) ist sie ersatzlos entfernt:
+    Die Lesart war falsch. Einen konfigurierten Routineablauf wickelt der
+    Assistent vollständig ab; was schwankt, ist der Anteil der Anrufe eines
+    Betriebs, der überhaupt zu solchen Abläufen gehört. Es gibt keinen
+    „Automatisierungsgrad" mehr, den wir voreinstellen.
   */
   rahmungRoutine:
     "Der Rechner zieht unsere eigenen Kosten ab — Monatspreis und Einrichtung. Für den Anteil Ihrer Anrufe, der zu konfigurierten Routineabläufen gehört, setzen wir bewusst keinen Wert ein: Wie groß dieser Anteil bei Ihnen ist, wissen nur Sie. Der Rechenweg bleibt vollständig nachvollziehbar.",

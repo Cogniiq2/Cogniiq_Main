@@ -128,6 +128,115 @@ function PublicThemeManager() {
   return null;
 }
 
+/**
+ * Bringt einen Fragment-Link (`/pfad#ziel`) wirklich an sein Ziel.
+ *
+ * WARUM DAS NÖTIG IST. Jede Route dieser Anwendung wird lazy geladen. Beim
+ * ersten Aufruf einer URL MIT Fragment passiert deshalb folgendes: Der Browser
+ * parst das vorgerenderte Dokument, versucht zum Anker zu springen, React
+ * hydriert — und ersetzt den Baum für die Dauer des Nachladens durch den
+ * Suspense-Platzhalter. Die Dokumenthöhe bricht dabei zusammen, der anstehende
+ * Sprung verfällt, und wenn der Abschnitt Sekundenbruchteile später wieder da
+ * ist, scrollt niemand mehr. Gemessen am 12.09.2026 an
+ * `/ki-telefonassistent#preis-roi-rechner`: Bei 390 px Breite blieb
+ * `scrollY` auf 0, bei 1280 px bei 583 px — das Ziel lag bei ~20.000 bzw.
+ * ~10.000 px. Der Besucher landete oben und sah den Rechner nie.
+ *
+ * Betroffen ist nicht nur diese eine Seite: `RECHNER_LINK` wird von mehreren
+ * Seiten aus verwendet, und jeder dieser Verweise war damit wirkungslos.
+ *
+ * WIE ES BEHOBEN IST. Nach der Navigation wird das Ziel für ein kurzes,
+ * begrenztes Fenster gesucht und dann angesprungen. Das Fenster ist nötig, weil
+ * das Element erst nach dem Chunk existiert; es ist BEGRENZT, damit hier kein
+ * Zustand entsteht, der dauerhaft am Scrollen des Besuchers mitregiert.
+ *
+ * Sobald der Besucher selbst scrollt, wird abgebrochen — ein Sprung, der einer
+ * bereits begonnenen Lesebewegung in die Quere kommt, ist schlimmer als kein
+ * Sprung. Die Abstandhaltung zur klebenden Navigation macht `scroll-mt-*` am
+ * Ziel, nicht diese Funktion.
+ */
+function HashScrollManager() {
+  const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    if (!hash || hash === '#') return;
+    const id = decodeURIComponent(hash.slice(1));
+    if (!id) return;
+
+    let abgebrochen = false;
+    const abbrechen = () => {
+      abgebrochen = true;
+    };
+    // `wheel`/`touchstart`/`keydown` sind Absichtserklärungen des Besuchers.
+    // Ein `scroll`-Listener wäre falsch: Den löst dieser Sprung selbst aus.
+    window.addEventListener('wheel', abbrechen, { passive: true, once: true });
+    window.addEventListener('touchstart', abbrechen, { passive: true, once: true });
+    window.addEventListener('keydown', abbrechen, { once: true });
+
+    /*
+      WARUM HIER NACHGEHALTEN WIRD, statt einmal zu springen.
+
+      Ein einzelner Sprung genügt nicht, und das war der erste Fehlversuch am
+      12.09.2026: Das Ziel steht im vorgerenderten HTML, ist also schon im
+      ersten Frame da — der Sprung gelingt, und Millisekunden später ersetzt die
+      Hydration den Baum durch den Suspense-Platzhalter der lazy geladenen
+      Route. Die Dokumenthöhe bricht zusammen, die Scrollposition wird
+      zurückgesetzt, und der wiederhergestellte Abschnitt steht danach wieder
+      ausserhalb des Sichtfelds.
+
+      Deshalb wird die Position über ein kurzes Fenster GEHALTEN: Solange das
+      Ziel nicht dort steht, wo es stehen soll, wird nachgezogen. Erst wenn es
+      einige Frames hintereinander ruhig liegt, ist die Sache erledigt.
+    */
+    const FENSTER_MS = 2500;
+    const RUHIGE_FRAMES = 5;
+    const TOLERANZ_PX = 4;
+    const start = Date.now();
+    let frame = 0;
+    let ruhig = 0;
+
+    const versuchen = () => {
+      if (abgebrochen) return;
+      if (Date.now() - start > FENSTER_MS) return;
+
+      const ziel = document.getElementById(id);
+      if (!ziel) {
+        // Noch nicht da — das Ziel kommt mit dem Route-Chunk.
+        ruhig = 0;
+        frame = requestAnimationFrame(versuchen);
+        return;
+      }
+
+      // `scroll-margin-top` des Ziels ist die gewollte Lücke zur klebenden
+      // Navigation. getBoundingClientRect().top soll genau darauf liegen.
+      const abstand = parseFloat(getComputedStyle(ziel).scrollMarginTop) || 0;
+      const ist = ziel.getBoundingClientRect().top;
+
+      if (Math.abs(ist - abstand) <= TOLERANZ_PX) {
+        ruhig += 1;
+        if (ruhig >= RUHIGE_FRAMES) return;
+      } else {
+        ruhig = 0;
+        ziel.scrollIntoView({ behavior: 'auto', block: 'start' });
+      }
+      frame = requestAnimationFrame(versuchen);
+    };
+    frame = requestAnimationFrame(versuchen);
+
+    return () => {
+      abgebrochen = true;
+      cancelAnimationFrame(frame);
+      window.removeEventListener('wheel', abbrechen);
+      window.removeEventListener('touchstart', abbrechen);
+      window.removeEventListener('keydown', abbrechen);
+    };
+    // `pathname` gehört dazu: derselbe Hash auf einer anderen Seite ist ein
+    // neues Ziel.
+  }, [pathname, hash]);
+
+  return null;
+}
+
 function PublicStructuredData() {
   const { pathname } = useLocation();
   if (isPrivateSurface(pathname) || isDocumentSurface(pathname)) return null;
@@ -706,6 +815,7 @@ export function AppShell() {
       <PublicThemeManager />
       <RouteIndexabilityManager />
       <CanonicalManager />
+      <HashScrollManager />
       <PublicStructuredData />
       <AppInner />
       <ConsentBannerGate />

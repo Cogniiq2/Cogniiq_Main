@@ -2,7 +2,8 @@
 
 Angelegt: 2026-08-29 · Basis-Commit `0652c2e`
 
-Sechs Routen laufen als Suchexperimente und sind eingefroren. Dieses Dokument
+Fünf Routen laufen als Suchexperimente und sind eingefroren (bis 2026-09-12
+waren es sechs). Dieses Dokument
 sammelt, was an ihnen auffällt, **damit es nicht am Experiment vorbei umgesetzt
 wird**. Nichts hier darf angefasst werden, solange die Route in
 `PROTECTED_EXPERIMENT_PATHS` steht (`src/lib/routing/protectedExperiments.ts`).
@@ -15,11 +16,27 @@ jede dieser Routen verwiesen wird.
 ## Ablauf, wenn ein Experiment endet
 
 1. Ergebnis in `docs/seo/organic-growth-scoreboard.md` festhalten.
-2. Pfad aus `PROTECTED_EXPERIMENT_PATHS` entfernen.
-3. `npm run seo:baseline` ausführen, damit die Fixture die verbleibenden Routen
-   abbildet.
+2. Pfad aus `PROTECTED_EXPERIMENT_PATHS` entfernen und in
+   `GRADUATED_EXPERIMENT_PATHS` eintragen.
+3. Den Eintrag der Route aus
+   `src/test/fixtures/protected-experiments.baseline.json` **von Hand**
+   entfernen — beide Abschnitte, `fingerprints` und `inboundOccurrences`.
 4. Die Punkte unten in einem eigenen, kleinen PR umsetzen — nicht gebündelt mit
    anderer Arbeit, damit die Wirkung zurechenbar bleibt.
+
+### Warum Schritt 3 nicht `npm run seo:baseline` heisst
+
+Hier stand bis zum 2026-09-12 „`npm run seo:baseline` ausführen, damit die
+Fixture die verbleibenden Routen abbildet". Das ist der gefährlichste Satz, der
+in dieser Datei stehen kann: Das Kommando nimmt die Fingerabdrücke ALLER noch
+eingefrorenen Routen neu auf. Endet ein Experiment, während an einer anderen
+Route unbeabsichtigt etwas gewandert ist, schreibt dieser Schritt die Drift
+stillschweigend als neuen Soll-Zustand fest — und die Wache, die genau das
+verhindern soll, bestätigt danach den Schaden.
+
+Eine Route zu graduieren heisst, **einen** Eintrag zu löschen. Die anderen
+Fingerabdrücke bleiben Byte für Byte stehen und werden weiter geprüft. Genau so
+ist es bei `/kosten-ki-telefonassistent` gemacht worden.
 
 ---
 
@@ -85,17 +102,69 @@ Nach dem Experiment zu prüfen — alles **Claim-Hygiene**, kein SEO-Gewinn:
   und lässt sich vorher nicht angehen, weil zwei der drei Seiten eingefroren
   sind.
 
-## `/kosten-ki-telefonassistent`
+## `/kosten-ki-telefonassistent` — GRADUIERT am 2026-09-12
 
-- Claim-Scan sauber.
-- `src/components/Navigation.tsx:362` setzt
-  `GEMESSEN_NUR_NACH_HYDRATION = '/kosten-ki-telefonassistent'` als expliziten
-  Experiment-Schutz. Diese Zeile gehört mit dem Experiment ausgewertet und
-  danach entfernt oder begründet beibehalten.
-- Der neue Einführungsleitfaden verweist bei Kostenfragen bewusst **nicht**
-  hierher, obwohl es der naheliegende Verweis wäre. Nach dem Experiment gehört
-  dieser Verweis ergänzt — er ist inhaltlich richtig und fehlt derzeit nur,
-  weil er die eingehende Linkstruktur der Messung verändert hätte.
+> **Experiment ended by owner decision 2026-09-12 because the frozen
+> implementation preserved superseded calculator economics and product truth.**
+
+Der Inhaber hat die Cloudflare-Vorschau der eingefrorenen Fassung geprüft und
+das Experiment daraufhin beendet. Der Freeze hielt nicht eine neutrale
+Messbedingung fest, sondern einen überholten Stand:
+
+- den Alt-Rechner `PraxisRechnerWidget` mit einem voreingestellten
+  „Automatisierungsgrad" von 20 % — eine Zahl, die sich als Aussage über
+  Cogniiq las, statt als Frage nach dem Anrufmix des Kunden;
+- ein ROI-Modell, das aus einem **unvollständigen** Datensatz ein negatives
+  Ergebnis zeigen konnte (beobachtet: „Bleibt im ersten Jahr −648 € / Monat");
+- Beispielwerte, die wie Branchenstatistik aussahen (120 Anrufe/Woche, 20 %
+  nicht angenommen, 3 Minuten Bearbeitung, 18 €/h);
+- die überholte Produktaussage „ein System, das ans Telefon geht, das Anliegen
+  aufnimmt und strukturiert weitergibt".
+
+Eine Messung ist nur so lange schützenswert, wie die gemessene Seite eine ist,
+zu der wir stehen. Das war hier nicht mehr der Fall.
+
+### Was mit der Graduierung erledigt wurde
+
+- Alt-Rechner von der Seite entfernt; die Seite rechnet mit dem kanonischen
+  `TelefonRechner` (`TelefonRechnerSection`) und damit mit derselben Arithmetik
+  wie `/ki-telefonassistent`, `/praxen` und die Startseite.
+- `PraxisRechnerSection`, `PraxisRechnerWidget` und dessen Test gelöscht — keine
+  Route nutzte sie noch. Damit sind auch die Ausnahmen in
+  `rechner-konsistenz.test.tsx` weggefallen, die nur existierten, um das Widget
+  am Leben zu halten.
+- Rechner von Position 10 auf Position 3 der Seite gezogen (direkt hinter
+  Deckelung und Tarifen): Er beginnt jetzt nach ~15 % statt nach ~90 % des
+  Seitentexts.
+- Produktwahrheit korrigiert — `ABWICKLUNG.faehigkeit` plus
+  `ABWICKLUNG.qualifikation`, statt „nimmt auf und gibt strukturiert weiter".
+- Service-Schema an den sichtbaren Text gezogen; Offer-Preise weiter aus den
+  numerischen Tarifkonstanten.
+- Sprachpreise: der Paketpreis wird nicht mehr als feststehend genannt, solange
+  OWNER-INPUT H3 offen ist (siehe unten).
+- `GEMESSEN_NUR_NACH_HYDRATION` in `src/components/Navigation.tsx` ersatzlos
+  entfernt — die Preisseite steht jetzt wie jedes andere Ziel im vorgerenderten
+  Menü.
+
+### Sprachpreise — OWNER-INPUT H3 bleibt offen
+
+Der sichtbare Text nannte „ab drei Sprachen sind es 230 € im Monat für bis zu
+fünf Sprachen gleichzeitig" als Tatsache, während `sprachenAufschlagEur()`
+dieselbe Konstellation bereits als OFFEN auswies. Der statische Text war damit
+**sicherer als der Rechenkern**. Jetzt gilt auf allen Flächen dieselbe Fassung:
+Deutsch enthalten, eine weitere Sprache 79 €/Monat, ab zwei Zusatzsprachen ein
+Paketpreis im schriftlichen Angebot. `SPRACHEN_PREISE.paketEur` bleibt als Datum
+stehen, hat aber absichtlich keinen Konsumenten in der Produktion.
+
+### Noch offen für diese Route
+
+- Der Einführungsleitfaden verweist bei Kostenfragen weiterhin **nicht**
+  hierher. Der Verweis ist inhaltlich richtig und fehlte nur, weil er die
+  eingehende Linkstruktur der Messung verändert hätte. Er kann jetzt ergänzt
+  werden — bewusst NICHT in diesem Commit, damit die Wirkung der Graduierung
+  zurechenbar bleibt.
+- B11a/B9 (Gleichzeitigkeit, Überlauf) bleiben offen; die Seite macht dazu
+  keine Zusage.
 
 ---
 

@@ -27,8 +27,11 @@ const CLUSTER = [
   "src/pages/industries/KiTelefonassistentPraxis.tsx",
   "src/pages/IntegrationenPage.tsx",
   "src/pages/DatenschutzSicherheitPage.tsx",
-  "src/components/PraxisRechnerWidget.tsx",
-  "src/components/PraxisRechnerSection.tsx",
+  // PraxisRechnerWidget/-Section standen hier bis zum 12.09.2026. Sie sind mit
+  // dem Ende des Kostenseiten-Experiments gelöscht; die Kostenseite rechnet
+  // seither mit `TelefonRechner`.
+  "src/components/TelefonRechner.tsx",
+  "src/components/TelefonRechnerSection.tsx",
   "src/components/CityServicePage.tsx",
   "src/components/TelefonassistentKompaktSection.tsx",
   "src/components/TelefonassistentBeweiskette.tsx",

@@ -357,10 +357,6 @@ function NavDropdownTrigger({
   );
 }
 
-/** Siehe die ausführliche Begründung in LeistungenPanel. Nach dem Readout der
- *  Messung vom 29.08.2026 ersatzlos entfernen. */
-const GEMESSEN_NUR_NACH_HYDRATION = '/kosten-ki-telefonassistent';
-
 const PANEL_FLAECHE =
   'absolute top-full left-0 right-0 bg-white/[0.98] dark:bg-gray-950/[0.98] backdrop-blur-xl border-b border-gray-100 dark:border-white/[0.05]';
 
@@ -384,24 +380,20 @@ function LeistungenPanel({
   );
   const [gewaehlt, setGewaehlt] = useState(startIndex);
 
-  // Bis zum Readout der Messung vom 29.08.2026 erscheint dieses eine Ziel nicht
-  // im vorgerenderten Menü, sondern erst nach der Hydration.
-  //
-  // GRUND: /kosten-ki-telefonassistent wird gerade gemessen. Vor dieser
-  // Umstellung stand es in genau einem crawlerseitig sichtbaren Verweis je
-  // Dokument (Footer). Wäre es auch im nun servergerenderten Menü, hätte jedes
-  // der 91 Dokumente plötzlich zwei — 117 statt 208 Vorkommen insgesamt —, und
-  // eine spätere Bewegung ließe sich nicht mehr dem gemessenen Anker statt der
-  // neuen Menüverlinkung zuschreiben.
-  //
-  // Für Besucher ändert sich nichts: Vor dieser Umstellung existierte der
-  // Verweis ohnehin erst nach der Hydration, weil das Panel gar nicht
-  // servergerendert wurde. Genau dieser Zustand bleibt für dieses eine Ziel.
-  //
-  // ENTFERNEN nach dem Readout: diese Konstante und die Filterung unten
-  // löschen, dann steht die Preisseite wie jedes andere Menüziel im Dokument.
-  const [hydriert, setHydriert] = useState(false);
-  useEffect(() => setHydriert(true), []);
+  /*
+    HIER STAND EIN EXPERIMENT-SCHUTZ — entfernt am 12.09.2026.
+
+    /kosten-ki-telefonassistent erschien bis dahin absichtlich nicht im
+    vorgerenderten Menü, sondern erst nach der Hydration: Die Route wurde
+    gemessen, und ein zweiter crawlerseitig sichtbarer Verweis je Dokument
+    hätte die Zuordnung einer späteren Bewegung unmöglich gemacht.
+
+    Das Experiment ist durch Inhaber-Entscheidung beendet (siehe
+    GRADUATED_EXPERIMENT_PATHS). Die Preisseite steht damit wie jedes andere
+    Menüziel im Dokument, und der Sonderfall ist ersatzlos weg — genau wie es
+    docs/seo/post-experiment-opportunities.md für diesen Zeitpunkt vorgesehen
+    hat.
+  */
 
   // Das Panel wird nicht mehr bei jedem Öffnen neu eingehängt, also setzt es
   // die vorgewählte Leistung beim Öffnen selbst zurück. Ohne das bliebe für
@@ -502,11 +494,9 @@ function LeistungenPanel({
                   ))}
                 </div>
                 <div className="mt-6 pt-5 border-t border-gray-100 dark:border-white/[0.06] space-y-0.5">
-                  {leistung.abschluss
-                    .filter((n) => hydriert || n.href !== GEMESSEN_NUR_NACH_HYDRATION)
-                    .map((n) => (
-                      <PanelLink key={n.href} {...n} isActive={currentPath === n.href} onClick={onNavigate} quiet />
-                    ))}
+                  {leistung.abschluss.map((n) => (
+                    <PanelLink key={n.href} {...n} isActive={currentPath === n.href} onClick={onNavigate} quiet />
+                  ))}
                 </div>
               </div>
             ))}

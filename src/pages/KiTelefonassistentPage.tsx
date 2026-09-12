@@ -362,11 +362,28 @@ export function KiTelefonassistentPage() {
             → wie ich wieder herauskomme, Datenschutz, Branchen
             → offene Fragen → Abschluss
 
-          Die Rechner stehen bewusst NICHT oben: Wer noch nicht weiß, was das
-          System leistet, kann mit einem Preis nichts anfangen. Sie stehen aber
-          VOR Einrichtung und Betreuung, weil die Preisfrage im Kopf sitzt,
-          sobald die Fähigkeiten klar sind, und alles danach sonst ungelesen
-          bleibt.
+          Der Rechner steht bewusst NICHT oben: Wer noch nicht weiß, was das
+          System leistet, kann mit einem Preis nichts anfangen.
+
+          ER STEHT ABER AUCH NICHT MEHR HINTER DEN KAUFKRITERIEN — korrigiert am
+          12.09.2026, nachdem der Inhaber die Vorschau geprüft und den Rechner
+          auf dieser Seite gar nicht gefunden hat. Er lag als 14. von 23
+          Abschnitten hinter Sprachen und Anbieter-Check: im vorgerenderten
+          Dokument begann er erst nach knapp 60 % des Seitentexts, rund 3.000
+          Wörter tief. Technisch war alles in Ordnung — SSR, Chunk und Anker
+          stimmten. Die Diagnose war reine Platzierung.
+
+          Jetzt steht er direkt hinter dem Anliegen-Katalog und den Grenzen.
+          Das ist der früheste Punkt, an dem der Leser beides weiß: was der
+          Assistent abwickelt und wo die Grenze verläuft. Sprachen und
+          Anbieter-Check folgen danach — beides ist Vertiefung und darf hinter
+          der Preisfrage liegen, sie aber nicht mehr verdecken. Den
+          Sprachaufschlag erklärt der Rechner ohnehin in seiner eigenen
+          Eingabe.
+
+          Zusätzlich führt aus dem Hero ein sekundärer Button auf
+          `#preis-roi-rechner`, damit der Sprung auch ohne Scrollen erreichbar
+          ist.
 
           Neu am 11.09.2026: GespraechSection (natürliches Gespräch als
           Hauptunterscheidungsmerkmal), DreiWegeSection (ersetzt die Rahmung
@@ -385,9 +402,9 @@ export function KiTelefonassistentPage() {
         <CallFlowSection />
         <CallSummarySection />         {/* Der Ausnahmeweg im Detail */}
         <AnliegenKatalogSection />     {/* M8 Anliegen-Katalog + M15 Grenzen */}
+        <RechnerSection />             {/* Preis- und Wirtschaftlichkeitsrechner */}
         <SprachenSection />
         <AnbieterCheckSection />       {/* Kaufkriterien — der eigenständige Beitrag */}
-        <RechnerSection />             {/* Preis- und Wirtschaftlichkeitsrechner */}
         <SetupSection />               {/* M17 Einrichtung */}
         <BetreuungSection />           {/* M18 Betreuung */}
         <UmkehrbarkeitSection />       {/* M19 Umkehrbarkeit */}
@@ -484,31 +501,37 @@ function HeroSection() {
             </p>
 
             {/*
-              DRITTER WEG, BEWUSST DRITTER RANG.
+              DER ZWEITE WEG: SELBST RECHNEN — ab 12.09.2026 ein Button.
 
-              Die Hierarchie bleibt, wie der Inhaber sie freigegeben hat: Demo
-              zuerst, Telefon daneben, danach dieser Verweis — als Textlink,
-              nicht als dritter Button. Ein dritter Button würde den primären
-              CTA optisch einholen und die Entscheidung verwässern.
+              Hier stand bis dahin ein Textlink, ausdrücklich „dritter Rang",
+              damit er den primären Demo-CTA nicht optisch einholt. Die
+              Rangfolge war richtig, die Umsetzung zu leise: Der Inhaber hat den
+              Rechner in der Vorschau nicht gefunden — weder über diesen Link
+              noch durch Scrollen.
 
-              Warum er trotzdem oben steht: Ein Teil dieser Besucher will vor
-              jedem Gespräch wissen, was das kostet, und verlässt die Seite,
-              wenn die Antwort erst nach 1.500 Pixeln kommt. Der Sprung führt
-              auf denselben Rechner weiter unten — keine zweite Seite, kein
-              zweites Formular, keine zweite Rechnung.
+              Die Hierarchie bleibt deshalb erhalten, aber sichtbar gestuft:
+              Demo ist gefüllt und dunkel, dieser Weg ist eine Kontur. Ein
+              Umriss-Button konkurriert nicht mit einer Vollfläche, ist aber als
+              Bedienelement erkennbar — anders als eine Unterstreichung in einem
+              Absatz voller Links.
+
+              Warum er oben steht: Ein Teil dieser Besucher will vor jedem
+              Gespräch wissen, was das kostet, und verlässt die Seite, wenn die
+              Antwort erst nach 1.500 Pixeln kommt. Der Sprung führt auf
+              denselben Rechner weiter unten — keine zweite Seite, kein zweites
+              Formular, keine zweite Rechnung.
             */}
             <div className="mb-10">
               <a
                 href={`#${RECHNER_ANKER}`}
                 onClick={() => trackEvent("calculator_anchor_click", "Hero")}
-                className="inline-flex items-center gap-2 text-[15px] font-semibold text-gray-900 dark:text-gray-100 underline decoration-gray-300 dark:decoration-gray-600 underline-offset-4 hover:decoration-gray-900 dark:hover:decoration-gray-100 transition-colors"
+                className="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-xl border border-gray-300 dark:border-gray-700 bg-white/60 dark:bg-transparent text-[15px] font-semibold text-gray-900 dark:text-gray-100 hover:border-gray-900 dark:hover:border-gray-100 hover:bg-white dark:hover:bg-gray-900/40 transition-colors"
               >
                 <Calculator size={15} aria-hidden="true" />
-                Preis &amp; Wirtschaftlichkeit sofort berechnen
+                Preis &amp; Wirtschaftlichkeit berechnen
               </a>
-              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1.5">
-                Sofort · ohne E-Mail · jede Position einzeln, auch die, die vor
-                der technischen Prüfung noch offen ist
+              <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+                Sofort · ohne E-Mail · mit Ihren eigenen Zahlen
               </p>
             </div>
 

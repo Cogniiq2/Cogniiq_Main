@@ -37,7 +37,6 @@ import {
   anrufeProMonatAusWoche,
   berechnePreis,
   berechneWirtschaftlichkeit,
-  minutenProMonat,
   UNVOLLSTAENDIG,
   waehleSzenario,
 } from '@/lib/telefonassistent-rechner';
@@ -80,16 +79,21 @@ const PRODUKTION: Array<[string, string]> = [...QUELLEN]
 /** Die Dateien, in denen Beträge legitim als Literal stehen dürfen. */
 const KANONISCHE_ZAHLENQUELLEN = new Set(['src/lib/telefonassistent-copy.ts']);
 
-/**
- * Die eingefrorene Preisseite.
- *
- * `PraxisRechnerWidget` bedient nur noch dieses eine, laufende SEO-Experiment.
- * Seine Anzeige darf sich bis zum Ende der Messung nicht ändern — deshalb
- * überlebt dort der voreingestellte Automatisierungsgrad von 20 %. Seine
- * ARITHMETIK ist trotzdem vereinheitlicht, und genau das prüft diese Suite
- * weiter unten. Endet das Experiment, verschwindet die Ausnahme mit der Datei.
- */
-const EINGEFROREN = 'src/components/PraxisRechnerWidget.tsx';
+/*
+  BIS ZUM 12.09.2026 stand hier eine Ausnahme:
+
+    const EINGEFROREN = 'src/components/PraxisRechnerWidget.tsx';
+
+  Dieses Widget war der letzte Ort, an dem ein voreingestellter
+  „Automatisierungsgrad" von 20 % überlebte — geduldet, weil es nur noch die
+  eingefrorene Kostenseite bediente und deren gerenderte Bytes die
+  Messbedingung eines laufenden Experiments waren.
+
+  Das Experiment ist durch Inhaber-Entscheidung beendet, die Kostenseite rechnet
+  mit dem kanonischen `TelefonRechner`, und das Widget ist gelöscht. Die
+  Ausnahme ist damit ersatzlos weg: Es gibt keine Fläche mehr, auf der ein
+  Vorgabewert für den Automatisierungsgrad erlaubt wäre.
+*/
 
 // ── 1 · Der Preis ist überall derselbe ──────────────────────────────────────
 
@@ -495,9 +499,9 @@ describe('Beträge stehen an genau einer Stelle', () => {
 // ── 5 · Die Automatisierungs-Semantik ───────────────────────────────────────
 
 describe('Automatisierung — Fähigkeit und Anrufmix bleiben getrennt', () => {
-  it('setzt auf keiner lebenden Fläche einen Automatisierungsgrad voreingestellt', () => {
+  it('setzt auf keiner Fläche einen Automatisierungsgrad voreingestellt', () => {
+    // Ohne Ausnahme: jede Produktionsdatei, keine geduldete Fläche mehr.
     for (const [pfad, inhalt] of PRODUKTION) {
-      if (pfad === EINGEFROREN) continue;
       expect(
         /AUTOMATISIERUNG_STANDARD|START_AUTOMATISIERUNG/.test(inhalt),
         `${pfad} setzt wieder einen Vorgabewert für den Automatisierungsgrad`
@@ -552,50 +556,56 @@ describe('Rechner-Anker', () => {
     // Die Inbound-Zählung in protectedExperiments.test.tsx deckt die
     // Gegenrichtung ab. Diese Prüfung deckt die Hinrichtung: ein CTA, der auf
     // einer eingefrorenen Seite landet, verändert deren gerenderte Bytes.
-    for (const pfad of [
-      'src/pages/industries/KiTelefonassistentArzt.tsx',
-      'src/pages/costs/KostenKiTelefonassistent.tsx',
-    ]) {
+    // Die Kostenseite steht hier seit dem 12.09.2026 nicht mehr: Sie ist keine
+    // eingefrorene Route mehr und TRÄGT den Rechner jetzt selbst.
+    for (const pfad of ['src/pages/industries/KiTelefonassistentArzt.tsx']) {
       const inhalt = QUELLEN.get(pfad)!;
       expect(inhalt).not.toMatch(/RechnerCta|rechner-anker|rechner:/);
     }
   });
 });
 
-// ── 7 · Der eingefrorene Rechner widerspricht dem Kern nicht ────────────────
+// ── 7 · Die Kostenseite rechnet mit dem kanonischen Kern ───────────────────
 
-describe('Eingefrorener Praxis-Rechner — Paritätswache', () => {
-  const widget = QUELLEN.get(EINGEFROREN)!;
+describe('Kostenseite — ein Rechner, kein zweiter', () => {
+  const seite = QUELLEN.get('src/pages/costs/KostenKiTelefonassistent.tsx')!;
 
-  it('bezieht Tarifwahl und Deckelung aus dem kanonischen Rechenkern', () => {
-    expect(widget).toMatch(/from "@\/lib\/telefonassistent-rechner"/);
-    expect(widget).toMatch(/waehleSzenario/);
+  /*
+    Abschnitt 7 hiess bis zum 12.09.2026 „Der eingefrorene Rechner widerspricht
+    dem Kern nicht" und bewachte die Parität zwischen `PraxisRechnerWidget` und
+    dem Rechenkern. Das Widget ist gelöscht; zu bewachen ist jetzt das
+    Gegenteil — dass die Kostenseite sich keinen eigenen Rechner zurückholt.
+  */
+  it('rendert den kanonischen Rechner und nicht das gelöschte Praxis-Widget', () => {
+    expect(seite).toMatch(/TelefonRechnerSection/);
+    expect(seite).not.toMatch(/PraxisRechner/);
   });
 
-  it('hat keine eigene Tarifarithmetik und keinen eigenen Minutenpreis mehr', () => {
-    const ohneKommentare = widget
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/\/\/.*$/gm, '');
+  it('rechnet selbst nichts — kein eigener Tarif, kein eigener Minutenpreis', () => {
+    const ohneKommentare = nurCode(seite);
+    expect(ohneKommentare).not.toMatch(/berechnePreis|berechneWirtschaftlichkeit/);
+    expect(ohneKommentare).not.toMatch(/waehleSzenario|minutenProMonat/);
     expect(ohneKommentare).not.toMatch(/MEHRPREIS_PRO_MINUTE\s*=/);
     expect(ohneKommentare).not.toMatch(/function betragZuZahl/);
-    expect(ohneKommentare).not.toMatch(/obergrenzeEur\s*\)/);
   });
 
-  it('kommt im Startzustand der Seite auf denselben Tarif wie der Kern', () => {
+  it('stellt den Rechner vor die erklärenden Abschnitte, nicht dahinter', () => {
     /*
-      Der Startzustand ist der Teil, der in die gerenderten Bytes der
-      eingefrorenen Seite eingeht: 120 Anrufe je Woche, zwei Gesprächsminuten je
-      Anruf. Wandert dieses Ergebnis, wandert die Seite — und das fällt sonst
-      erst der Fingerabdruck-Wache auf, ohne Hinweis auf die Ursache.
+      Preisintention: Der Besucher will „was kostet mich das" beantwortet
+      haben. Deckelung und Tarife dürfen davor stehen — Einrichtung, Vertrag,
+      FAQ und „was nicht extra kostet" nicht mehr. Vorher lag der Rechner
+      hinter allen vier.
     */
-    const minuten = minutenProMonat({
-      anrufeProMonat: anrufeProMonatAusWoche(120),
-      minutenProAnruf: 2,
-    });
-    const szenario = waehleSzenario(minuten);
-    expect(szenario).not.toBeNull();
-    expect(szenario!.tarif.name).toBe('Praxis');
-    expect(szenario!.amDeckel).toBe(false);
+    const rechner = seite.indexOf('<TelefonRechnerSection');
+    const tarife = seite.indexOf('Welcher Tarif passt zu wie vielen Anrufen?');
+    const einrichtung = seite.indexOf('Wofür zahlen Sie die Einrichtung?');
+    const faq = seite.indexOf('Häufige Fragen zum Preis');
+    for (const [name, pos] of [['Tarife', tarife], ['Einrichtung', einrichtung], ['FAQ', faq]] as const) {
+      expect(pos, `Abschnitt ${name} nicht gefunden`).toBeGreaterThan(-1);
+    }
+    expect(rechner).toBeGreaterThan(tarife);
+    expect(rechner).toBeLessThan(einrichtung);
+    expect(rechner).toBeLessThan(faq);
   });
 });
 
@@ -609,11 +619,10 @@ describe('Produktwahrheit — Abwicklung ist der Normalfall, Übergabe die Ausna
     Ausnahme weg — die Nachträge stehen in
     docs/seo/post-experiment-opportunities.md.
   */
-  const EINGEFROREN_QUELLEN = new Set([
-    'src/pages/industries/KiTelefonassistentArzt.tsx',
-    'src/pages/costs/KostenKiTelefonassistent.tsx',
-    'src/components/PraxisRechnerWidget.tsx',
-  ]);
+  // Seit dem 12.09.2026 ist nur noch EINE Route eingefroren. Die Kostenseite
+  // ist graduiert und wird ab hier wie jede lebende Fläche geprüft; das Widget
+  // existiert nicht mehr.
+  const EINGEFROREN_QUELLEN = new Set(['src/pages/industries/KiTelefonassistentArzt.tsx']);
   const LEBEND = PRODUKTION.filter(([pfad]) => !EINGEFROREN_QUELLEN.has(pfad));
 
   it('verspricht nirgends eine unbedingte Erreichbarkeit ohne Warteschleife', () => {
