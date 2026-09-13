@@ -1,11 +1,9 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, type ComponentType, type LazyExoticComponent } from 'react';
 import { BrowserRouter as Router, Navigate, Outlet, Routes, Route, useLocation } from 'react-router-dom';
 
-import { PageReveal } from './components/PageReveal';
 import { Navigation } from './components/Navigation';
 import { ReviewModeBanner } from './components/ReviewModeBanner';
 import { Footer } from './components/Footer';
-import { PremiumFooterReveal } from './components/PremiumFooterReveal';
 import { LocalBusinessSchema } from './components/LocalBusinessSchema';
 import { CanonicalManager } from './components/CanonicalManager';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -550,20 +548,22 @@ const AuthConfirmationPage = lazyNamed(
 
 function PublicLayout() {
   return (
-    <PageReveal>
-      <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-        <Navigation />
-        <main id="main-content">
-          <Suspense fallback={<PageFallback />}>
-            <Outlet />
-          </Suspense>
-        </main>
-        <PremiumFooterReveal>
-          <Footer />
-        </PremiumFooterReveal>
-        <ReviewModeBanner />
-      </div>
-    </PageReveal>
+    <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-pub-ink focus:px-5 focus:py-3 focus:text-sm focus:font-semibold focus:text-white focus:outline-none focus:ring-2 focus:ring-pub-signal focus:ring-offset-2"
+      >
+        Zum Inhalt
+      </a>
+      <Navigation />
+      <main id="main-content" tabIndex={-1}>
+        <Suspense fallback={<PageFallback />}>
+          <Outlet />
+        </Suspense>
+      </main>
+      <Footer />
+      <ReviewModeBanner />
+    </div>
   );
 }
 

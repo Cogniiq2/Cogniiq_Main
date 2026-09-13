@@ -67,8 +67,10 @@
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  html {
-    scroll-behavior: smooth;
+  /* Anchor targets clear the fixed 72px navigation. Native (instant) scrolling
+     is kept: smooth scrolling fought keyboard users and screenshot tooling. */
+  [id] {
+    scroll-margin-top: 88px;
   }
 
   /* ───────────────────────────────────────────────────────────────────────────
@@ -109,13 +111,9 @@
     hyphens: auto;
   }
 
-  *,
-  *::before,
-  *::after {
-    transition-property: background-color, border-color, color;
-    transition-duration: 0.3s;
-    transition-timing-function: ease;
-  }
+  /* The former document-wide `* { transition: color 0.3s }` rule is gone:
+     interactive elements declare their own 120–160ms transitions, and text
+     no longer lags behind theme or hover changes. */
 
   /* ───────────────────────────────────────────────────────────────────────────
      The Admin Center opts OUT of the document-wide transition above.
@@ -257,8 +255,8 @@ html.cq-public-light {
   --pub-ink-3:      #5b6773;
   --pub-ink-4:      #8a95a1;
 
-  --pub-paper:      #fbfaf7;
-  --pub-paper-2:    #f4f2ed;
+  --pub-paper:      #ffffff;
+  --pub-paper-2:    #f6f6f5;
   --pub-card:       #ffffff;
 
   --pub-signal:     #1c4fd8;

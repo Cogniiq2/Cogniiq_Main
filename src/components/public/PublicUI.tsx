@@ -29,7 +29,7 @@ import { cn } from '@/lib/utils';
 */
 export const pubFocus =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal ' +
-  'focus-visible:ring-offset-2 focus-visible:ring-offset-pub-paper';
+  'focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 
 /* ------------------------------------------------------------------ button */
 
@@ -42,12 +42,14 @@ type PubButtonSize = 'md' | 'lg';
   primaries are visible at once, one of them is wrong.
 */
 const variantClass: Record<PubButtonVariant, string> = {
+  // Ink, not signal: the black pill is the one button shape the identity already
+  // owns (navigation CTA). Signal blue stays reserved for links and focus.
   primary:
-    'bg-pub-signal text-white border border-transparent ' +
-    'hover:bg-pub-signal-ink active:bg-pub-signal-ink',
+    'bg-pub-ink text-white border border-transparent ' +
+    'hover:bg-[#1f2933] active:bg-pub-ink',
   secondary:
-    'bg-transparent text-pub-ink border border-pub-ink/25 ' +
-    'hover:border-pub-ink/50 hover:bg-pub-ink/[0.03]',
+    'bg-white text-pub-ink border border-pub-ink/20 ' +
+    'hover:border-pub-ink/45 hover:bg-pub-paper-2',
   quiet:
     'bg-transparent text-pub-ink-2 border border-transparent ' +
     'hover:text-pub-ink hover:bg-pub-ink/[0.04]',
@@ -57,11 +59,11 @@ const variantClass: Record<PubButtonVariant, string> = {
 // below the touch-target minimum. These two sizes both clear it.
 const sizeClass: Record<PubButtonSize, string> = {
   md: 'h-11 px-5 text-[14.5px]',
-  lg: 'h-13 px-7 text-[15.5px]',
+  lg: 'h-12 px-7 text-[15.5px]',
 };
 
 const buttonBase = cn(
-  'inline-flex items-center justify-center gap-2 rounded-xl font-semibold whitespace-nowrap',
+  'inline-flex items-center justify-center gap-2 rounded-full font-semibold whitespace-nowrap',
   'transition-colors duration-150 ease-[cubic-bezier(0.22,1,0.36,1)]',
   'disabled:cursor-not-allowed disabled:opacity-55',
   pubFocus,
@@ -154,10 +156,10 @@ export function IconTile({
 
 /* ------------------------------------------------------------------ eyebrow */
 
-/** Uppercase section label. `ink-4` is legible here because it is never body copy. */
+/** Uppercase section label. ink-3 (5.9:1): small uppercase text is still normal text for WCAG. */
 export function PubEyebrow({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <p className={cn('text-[11.5px] font-semibold uppercase tracking-[0.15em] text-pub-ink-4', className)}>
+    <p className={cn('text-[12px] font-semibold uppercase tracking-[0.14em] text-pub-ink-3', className)}>
       {children}
     </p>
   );

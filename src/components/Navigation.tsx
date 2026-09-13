@@ -32,10 +32,9 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronDown, ArrowUpRight, ArrowRight } from 'lucide-react';
+import { PubLinkButton } from '@/components/public/PublicUI';
 import { Logo } from './Logo';
 import { PremiumMobileNav } from './ui/premium-mobile-nav';
-import { ScrollProgress } from './ScrollProgress';
-import { SectionRail } from './SectionRail';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   HAUPTSITZ_SLUG,
@@ -45,7 +44,6 @@ import {
   istAktiv,
 } from '@/lib/navigation-data';
 
-const ease = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 /** §1.4: höchstens 180 ms, nur Deckkraft und kleine Verschiebung. */
 const panelMotion = {
@@ -164,13 +162,10 @@ export function Navigation() {
     <>
       <motion.nav
         ref={navRef}
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6, ease }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-[background-color,border-color] duration-200 ${
           isScrolled
-            ? 'bg-white/[0.97] dark:bg-gray-950/[0.97] backdrop-blur-xl border-b border-gray-100/80 dark:border-white/[0.05] shadow-[0_1px_0_0_rgba(0,0,0,0.04)]'
-            : 'bg-transparent'
+            ? 'bg-white/[0.97] dark:bg-gray-950/[0.97] backdrop-blur-xl border-b border-pub-hairline'
+            : 'bg-white/80 border-b border-transparent'
         }`}
         role="navigation"
         aria-label="Hauptnavigation"
@@ -233,14 +228,9 @@ export function Navigation() {
                 isActive={activePath.startsWith('/app')}
                 className="min-w-[104px] text-center"
               />
-              <Link
-                to="/kontakt"
-                className="group relative flex items-center gap-1.5 px-5 py-2.5 bg-gray-950 dark:bg-white text-white dark:text-gray-950 text-sm font-semibold tracking-wide rounded-full overflow-hidden transition-colors duration-200"
-              >
-                <span className="relative z-10">Erstgespräch</span>
-                <ArrowUpRight size={14} className="relative z-10" />
-                <div className="absolute inset-0 bg-gray-800 dark:bg-gray-100 translate-y-full group-hover:translate-y-0 transition-transform duration-200 ease-out" />
-              </Link>
+              <PubLinkButton to="/kontakt" variant="primary" size="md" icon={ArrowUpRight} iconTrailing className="text-sm">
+                Erstgespräch
+              </PubLinkButton>
             </motion.div>
 
           </div>
@@ -271,10 +261,9 @@ export function Navigation() {
       </motion.nav>
 
       <PremiumMobileNav />
-      <ScrollProgress />
-      {/* Section orientation for every public page, not just the homepage. The rail
-          hides itself on pages with fewer than three qualifying sections. */}
-      <SectionRail />
+      {/* ScrollProgress and SectionRail are no longer mounted: the percentage chip
+          was clipped at the viewport edge and the rail label overlapped hero content
+          between 1280 and 1536px on every public page. */}
     </>
   );
 }
