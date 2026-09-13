@@ -1,6 +1,7 @@
 import { ArrowRight, Globe, PhoneCall, ShieldCheck, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+import { MobileHeroBeispiel } from '@/components/MobileHeroBeispiel';
 import { PubLinkButton } from '@/components/public/PublicUI';
 
 /*
@@ -24,8 +25,8 @@ export function MobileHero() {
       className="relative w-full overflow-hidden bg-white"
       aria-label="Cogniiq — Operative KI-Systeme"
     >
-      <div className="relative z-10 mx-auto w-full max-w-[640px] px-6 pb-14 pt-28 sm:px-8">
-        <div className="cq-rise mb-6 flex flex-wrap items-center gap-x-4 gap-y-1.5" style={{ animationDelay: '0.1s', animationDuration: '0.42s' }}>
+      <div className="relative z-10 mx-auto w-full max-w-[640px] px-6 pb-14 pt-24 sm:px-8">
+        <div className="cq-rise mb-3 flex flex-wrap items-center gap-x-4 gap-y-1.5" style={{ animationDelay: '0.1s', animationDuration: '0.42s' }}>
           {services.map(({ icon: Icon, label, href }) => (
             <Link
               key={label}
@@ -38,20 +39,24 @@ export function MobileHero() {
           ))}
         </div>
 
-        <h1 className="mb-4 text-[clamp(30px,8.2vw,42px)] font-bold leading-[1.06] tracking-[-0.022em] text-pub-ink">
+        {/*
+          Sized to the actual glyph run, not to a round number. The headline keeps
+          its two deliberate lines, and the longer of them — „Erreichbar, wenn" —
+          measures ~9.2× the font size in this face. With the 24px gutters that
+          caps the type at ~29.6px on a 320px viewport and ~37px at 390px, so the
+          slope below stays just under both. Raising it to a flat 40px everywhere
+          is what made the headline wrap to four ragged lines on a small phone.
+        */}
+        <h1 className="mb-4 text-[clamp(28px,9.05vw,40px)] font-bold leading-[1.06] tracking-[-0.022em] text-pub-ink">
           <span className="cq-rise block" style={{ animationDelay: '0.16s', animationDuration: '0.42s' }}>Erreichbar, wenn</span>
           <span className="cq-rise block" style={{ animationDelay: '0.24s', animationDuration: '0.42s' }}>niemand frei ist.</span>
         </h1>
 
-        <p className="cq-rise mb-4 text-[19px] font-medium leading-[1.3] tracking-[-0.01em] text-pub-ink-3" style={{ animationDelay: '0.32s', animationDuration: '0.42s' }}>
-          Auch nachts. Auch samstags.
+        <p className="cq-rise mb-5 max-w-[42ch] text-[17px] font-medium leading-[1.45] tracking-[-0.01em] text-pub-ink-2" style={{ animationDelay: '0.32s', animationDuration: '0.42s' }}>
+          Anfragen verstehen. Anliegen strukturiert erfassen.
         </p>
 
-        <p className="cq-rise mb-8 max-w-[46ch] text-[16.5px] leading-[1.65] text-pub-ink-2" style={{ animationDelay: '0.4s', animationDuration: '0.42s' }}>
-          Ihr KI-Telefonassistent nimmt Anrufe an, wenn Ihr Team gebunden ist —
-          abends, am Wochenende, zu Stoßzeiten. Anliegen kommen strukturiert
-          bei Ihnen an, statt auf der Mailbox zu enden.
-        </p>
+        <MobileHeroBeispiel className="cq-rise mb-5" style={{ animationDelay: '0.4s', animationDuration: '0.42s' }} />
 
         <div className="cq-rise flex flex-col gap-3 sm:flex-row" style={{ animationDelay: '0.48s', animationDuration: '0.42s' }}>
           <PubLinkButton to="/kontakt" variant="primary" size="lg" icon={ArrowRight} iconTrailing className="w-full sm:w-auto">
