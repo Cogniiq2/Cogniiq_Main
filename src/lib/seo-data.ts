@@ -102,7 +102,7 @@ export const SERVICES = [
     name: "Hochkonvertierende Websites",
     description: "Moderne, schnelle Websites mit Fokus auf Conversion und lokalem SEO – gebaut für Unternehmen, die Anfragen brauchen, nicht nur Besucher.",
     category: "Webdesign",
-    url: `${BUSINESS_INFO.website}/webdesign-agentur-deutschland`,
+    url: `${BUSINESS_INFO.website}/webdesign`,
   },
   {
     id: "ai-automation",

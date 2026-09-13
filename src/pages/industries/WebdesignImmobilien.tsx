@@ -80,7 +80,7 @@ const config: NationalIndustryPageConfig = {
     { label: "Webdesign Immobilien München", href: "/webdesign-immobilien-muenchen" },
     { label: "Webdesign Immobilien Regensburg", href: "/webdesign-immobilien-regensburg" },
     { label: "Webdesign Bayern", href: "/bayern" },
-    { label: "Webdesign Deutschland", href: "/webdesign-agentur-deutschland" },
+    { label: "Webdesign für Unternehmen", href: "/webdesign" },
   ],
   relatedLinks: [
     { label: "Automatisierung Immobilien", href: "/automatisierung-immobilien" },

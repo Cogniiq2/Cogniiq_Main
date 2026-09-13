@@ -101,7 +101,7 @@ const COST_LINKS = [
 ];
 
 const RELATED_LINKS = [
-  { label: "Webdesign Agentur Deutschland", href: "/webdesign-agentur-deutschland" },
+  { label: "Webdesign für Unternehmen", href: "/webdesign" },
   { label: "Automatisierung Unternehmen", href: "/prozessautomatisierung" },
   { label: "KI Telefonassistent", href: "/ki-telefonassistent" },
   { label: "Deutschland", href: "/deutschland" },

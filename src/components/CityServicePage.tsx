@@ -723,7 +723,7 @@ function CTASection({ config }: { config: CityServiceConfig }) {
           <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400 dark:text-gray-500">
             <Link to="/ki-telefonassistent" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">KI-Telefonassistent</Link>
             <span aria-hidden="true">·</span>
-            <Link to="/webdesign-agentur-deutschland" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Webdesign Agentur</Link>
+            <Link to={config.legacyWebdesignLink ?? "/webdesign"} className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Webdesign Agentur</Link>
             <span aria-hidden="true">·</span>
             <Link to={config.legacyAutomationLink ?? "/prozessautomatisierung"} className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Automatisierung</Link>
             <span aria-hidden="true">·</span>

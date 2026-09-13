@@ -50,6 +50,17 @@ export const LEGACY_REDIRECTS: Readonly<Record<string, string>> = {
     that survived the audit was rebuilt into the pillar, not copied into it.
   */
   '/automatisierung-unternehmen': '/prozessautomatisierung',
+
+  /*
+    2026-09-13 — NOT yet: `/webdesign-agentur-deutschland` -> `/webdesign`.
+
+    The consolidation is decided (docs/seo/ARCHITEKTUR.md §5.1, K2: same head
+    intent, 5 impressions in 28 days, almost all branded) but deferred: the
+    retiring page carries anchors into two FROZEN experiments
+    (src/lib/routing/protectedExperiments.ts), and deleting it would change
+    their measured inbound topology. It lands here when those experiments
+    graduate — follow-up F9.
+  */
 };
 
 const SOURCES: ReadonlySet<string> = new Set(Object.keys(LEGACY_REDIRECTS));

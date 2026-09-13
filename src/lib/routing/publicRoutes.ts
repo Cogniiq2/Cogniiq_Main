@@ -169,11 +169,20 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/webdesign",
-    title: "Webdesign Agentur – Hochkonvertierende Websites für Unternehmen | Cogniiq",
-    description: "Cogniiq entwickelt individuelle Websites, die bei Google sichtbar sind und Besucher zu Anfragen führen: sauberer Code, Core Web Vitals, Local SEO.",
-    keywords: "Webdesign Agentur, Website erstellen lassen, professionelle Website, SEO Webdesign, Core Web Vitals",
+    /*
+      Kanonischer Eigentümer der nationalen Webdesign-Kopfintention seit der
+      Konsolidierung vom 13.09.2026: /webdesign-agentur-deutschland ist per 301
+      hierher überführt (src/lib/routing/legacyRedirects.ts). Der Titel nennt
+      die eine Intention („Webdesign Agentur … für Unternehmen") und stapelt
+      keine Varianten mehr; „hochkonvertierend" war eine Ergebniszusage ohne
+      Messung und ist entfallen (docs/seo/preisaudit-webdesign.md). Priorität
+      auf 0.95 wie beim Automatisierungs-Pillar: eine nationale Seite, nicht zwei.
+    */
+    title: "Webdesign Agentur – Websites für Unternehmen | Cogniiq",
+    description: "Was eine Website bei Cogniiq umfasst, wer Inhalte liefert, wie SEO, Performance, Tracking und Barrierefreiheit ins Projekt kommen, was den Preis bestimmt und wie ein Projekt bis zum Go-live abläuft.",
+    keywords: "Webdesign Agentur, Webdesign für Unternehmen, Website erstellen lassen, professionelle Website, Firmenwebsite",
     indexable: true,
-    sitemap: { lastmod: "2026-06-30", changefreq: "monthly", priority: "0.92" },
+    sitemap: { lastmod: "2026-09-13", changefreq: "monthly", priority: "0.95" },
   },
   {
     path: "/prozessautomatisierung",
@@ -192,6 +201,11 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/webdesign-agentur-deutschland",
+    /*
+      Bleibt vorerst live (13.09.2026): Konsolidierung in /webdesign ist
+      beschlossen und aufgeschoben, weil die Seite Anker auf zwei eingefrorene
+      Experimente trägt (docs/seo/ARCHITEKTUR.md §5.1, F9).
+    */
     title: "Webdesign Agentur Deutschland | Individuelle Websites national – Cogniiq",
     description: "Cogniiq ist Ihre Webdesign Agentur für ganz Deutschland. Wir entwickeln individuelle, SEO-optimierte Websites die konvertieren – remote oder persönlich in Bayern.",
     keywords: "Webdesign Agentur Deutschland, Website Agentur Deutschland, professionelle Website Deutschland",
@@ -268,7 +282,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   // ─── CITY LANDING PAGES ──────────────────────────────────────────────────────
   {
     path: "/bayreuth",
-    title: "AI-Systeme & Webdesign in Bayreuth | KI-Telefonassistent & Automatisierung – Cogniiq",
+    title: "Cogniiq in Bayreuth – KI-Telefonassistent, Websites & Automatisierung",
     description: "Cogniiq – Ihre AI-Agentur in Bayreuth. KI-Telefonassistent, hochkonvertierende Websites und Prozessautomatisierung für Unternehmen in Oberfranken. Persönliche Betreuung vor Ort.",
     keywords: "AI Agentur Bayreuth, Webdesign Bayreuth, KI Telefonassistent Bayreuth, Automatisierung Bayreuth",
     indexable: true,
@@ -276,7 +290,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/muenchen",
-    title: "AI-Systeme & Webdesign in München | KI-Telefonassistent & Automatisierung – Cogniiq",
+    title: "Cogniiq in München – KI-Telefonassistent, Websites & Automatisierung",
     description: "Cogniiq betreut Unternehmen in München mit KI-Telefonassistenten, Webdesign und Prozessautomatisierung – remote, mit festem Ansprechpartner und Festpreis.",
     keywords: "AI Agentur München, Webdesign München, KI Telefonassistent München, Automatisierung München",
     indexable: true,
@@ -284,7 +298,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/regensburg",
-    title: "AI-Systeme & Webdesign in Regensburg | KI-Telefonassistent & Automatisierung – Cogniiq",
+    title: "Cogniiq in Regensburg – KI-Telefonassistent, Websites & Automatisierung",
     description: "Cogniiq entwickelt KI-Telefonassistenten, Webdesign und Automatisierungslösungen für Unternehmen in Regensburg. Persönliche Betreuung.",
     keywords: "AI Agentur Regensburg, Webdesign Regensburg, KI Telefonassistent Regensburg, Automatisierung Regensburg",
     indexable: true,
@@ -352,8 +366,13 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/bayreuth/lokales-seo",
-    title: "Lokales SEO Bayreuth – Google Maps & lokale Suche optimieren | Cogniiq",
-    description: "Lokales SEO für Unternehmen in Bayreuth: Google Maps Optimierung, lokale Suchanfragen, NAP-Konsistenz. Mehr Kunden aus der Region durch bessere lokale Sichtbarkeit.",
+    /*
+      Eigentümer der Familie „seo bayreuth" / „seo agentur bayreuth" seit dem
+      13.09.2026 (docs/seo/ARCHITEKTUR.md §5.4). Der Titel führt deshalb mit
+      dem Kopfbegriff, nicht mit „Google Maps".
+    */
+    title: "SEO Bayreuth – Lokales SEO & Google-Sichtbarkeit für Unternehmen | Cogniiq",
+    description: "SEO für Unternehmen in Bayreuth: Google-Business-Profil, lokale Suchanfragen, strukturierte Daten und NAP-Konsistenz. Was lokales SEO umfasst, wann es sich lohnt und wie Cogniiq es umsetzt.",
     keywords: "Lokales SEO Bayreuth, Google Maps Bayreuth, Local SEO Bayreuth, Lokale Suche Bayreuth",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.78" },
@@ -682,11 +701,18 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   // ─── COST / PRICING PAGES ────────────────────────────────────────────────────
   {
     path: "/kosten-webdesign",
-    title: "Webdesign Kosten 2025 – Was kostet eine professionelle Website? | Cogniiq",
-    description: "Was kostet Webdesign wirklich? Preise für individuelle Websites, Ladezeiten, SEO-Optimierung und Wartung. Transparente Kostenübersicht von der AI-Agentur Cogniiq.",
-    keywords: "Webdesign Kosten, Website Preise, Was kostet Webdesign, Homepage Kosten 2025",
+    /*
+      Jahreszahl entfernt (war „2025"): Die Seite trägt keinen jährlich
+      gepflegten Datensatz, also gehört kein Jahr in den Titel — ein Jahr
+      ohne Datensatz ist Titelkosmetik (.claude/rules/seo-public-site.md).
+      Die Staffeln und Beispielbeträge, die bis zum 13.09.2026 hier standen,
+      hatten keine Quelle und sind entfernt (docs/seo/preisaudit-webdesign.md).
+    */
+    title: "Was kostet eine Website? Webdesign Kosten & Preistreiber | Cogniiq",
+    description: "Was eine professionelle Website kostet, hängt an Seitenumfang, Inhalten, Design, Schnittstellen, Barrierefreiheit und Betreuung. Alle Preistreiber erklärt, einmalig und laufend getrennt — ohne Fantasiepreise.",
+    keywords: "Webdesign Kosten, Website Kosten, Was kostet eine Website, Homepage Kosten, Website Preise",
     indexable: true,
-    sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.88" },
+    sitemap: { lastmod: "2026-09-13", changefreq: "monthly", priority: "0.88" },
   },
   {
     path: "/kosten-ki-telefonassistent",
