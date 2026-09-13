@@ -6,13 +6,13 @@ import { FAQQuestionModal } from './FAQQuestionModal';
 
 const faqs = [
   {
-    question: 'Was kostet ein Projekt mit euch?',
+    question: 'Was kostet ein Projekt mit Cogniiq?',
     answer:
       'Das hängt von Ziel und Umfang ab. Wir arbeiten nicht mit pauschalen Paketpreisen, sondern mit individuellen Angeboten – abgestimmt auf Ihre Prozesse und Systeme. Das Erstgespräch und eine erste Einschätzung sind kostenlos.',
     category: 'Kosten',
   },
   {
-    question: 'Wie schnell könnt ihr starten?',
+    question: 'Wie schnell können Sie starten?',
     // Kanonisch: 14 Kalendertage ab dem Start bis zur Übergabe zur Freigabe
     // (FAKTEN.uebergabeGarantie). Der Go-live hängt an der Kundenfreigabe und
     // darf hier nie mit einer Frist verbunden werden.
@@ -21,7 +21,7 @@ const faqs = [
     category: 'Ablauf',
   },
   {
-    question: 'Könnt ihr bestehende Systeme übernehmen und verbessern?',
+    question: 'Übernehmen Sie bestehende Systeme und verbessern sie?',
     answer:
       'Ja. Wir analysieren bestehende Websites, Buchungssysteme und Automationen und modernisieren sie gezielt – anstatt alles neu zu bauen. Wir setzen dort an, wo der größte Hebel liegt.',
     category: 'Leistungen',
@@ -33,19 +33,19 @@ const faqs = [
     category: 'Betrieb',
   },
   {
-    question: 'Arbeitet ihr nur in Bayreuth und Regensburg?',
+    question: 'Arbeiten Sie nur in Bayreuth und Regensburg?',
     answer:
       'Nein. Wir arbeiten vollständig remote in ganz Deutschland und darüber hinaus. Persönliche Vor-Ort-Termine sind im Raum Bayreuth, Regensburg und München möglich.',
     category: 'Region',
   },
   {
-    question: 'Für welche Unternehmensgrößen seid ihr geeignet?',
+    question: 'Für welche Unternehmensgrößen sind Sie geeignet?',
     answer:
       'Für Unternehmen ab ca. 5 Mitarbeitern, die operative Prozesse skalieren wollen. Wir arbeiten sowohl mit mittelständischen Unternehmen als auch mit wachsenden Scale-ups zusammen.',
     category: 'Zielgruppe',
   },
   {
-    question: 'Was unterscheidet euch von einer klassischen Webdesign-Agentur?',
+    question: 'Was unterscheidet Cogniiq von einer klassischen Webdesign-Agentur?',
     answer:
       'Wir bauen keine Websites – wir bauen Systeme. Jedes Projekt ist darauf ausgelegt, operative Kosten zu senken, Prozesse zu automatisieren und mehr Anfragen zu bringen. Design ist Mittel, nicht Zweck.',
     category: 'Positionierung',

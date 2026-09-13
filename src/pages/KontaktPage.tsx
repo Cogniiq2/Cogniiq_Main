@@ -2,7 +2,8 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, ChevronRight, Globe, Phone, Zap, Mail, MapPin, Clock, CircleCheck as CheckCircle2 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
-import { BUSINESS_INFO, PHONE_HREF, getGoogleMapsUrl, getGoogleMapsEmbedUrl } from "@/lib/seo-data";
+import { BUSINESS_INFO, PHONE_HREF, getGoogleMapsUrl } from "@/lib/seo-data";
+import { ConsentMapEmbed } from "@/components/ConsentMapEmbed";
 import { ContactSection } from "@/components/ContactSection";
 
 const fadeUp = {
@@ -445,17 +446,7 @@ export function KontaktPage() {
                 custom={0.1}
                 className="rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden min-h-[320px]"
               >
-                <iframe
-                  src={getGoogleMapsEmbedUrl()}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0, minHeight: "320px" }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Cogniiq Standort Bayreuth"
-                  className="grayscale hover:grayscale-0 transition-all duration-500"
-                />
+                <ConsentMapEmbed minHeight={320} />
               </motion.div>
             </div>
           </div>

@@ -1,18 +1,16 @@
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { MonitorSmartphone, PhoneCall, Bot, Workflow, ArrowRight, CircleCheck as CheckCircle, TrendingUp } from 'lucide-react';
+import { MonitorSmartphone, PhoneCall, Bot, Workflow, ArrowRight } from 'lucide-react';
 
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
+import { IconTile, PubEyebrow, PubLinkButton } from '@/components/public/PublicUI';
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.65, delay, ease: EASE },
-  }),
-};
+// Typical starting situations; formerly the ProblemSection cards on the homepage.
+// Kept as links so the problem pages stay reachable from the start page.
+const situations = [
+  { label: 'Verpasste Anrufe', href: '/verpasste-anrufe-verlust' },
+  { label: 'Keine Anfragen über die Website', href: '/keine-anfragen-website' },
+  { label: 'Zu viel manuelle Arbeit', href: '/zu-viel-manuelle-arbeit' },
+  { label: 'Digitale Automatisierung im Unternehmen', href: '/digitale-automatisierung-unternehmen' },
+];
 
 const services = [
   {
@@ -107,230 +105,92 @@ const services = [
 ];
 
 export function ServicesSection() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.08 });
-
   return (
-    <section
-      id="leistungen"
-      ref={ref}
-      className="py-28 bg-white"
-      aria-labelledby="services-heading"
-    >
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-20">
-          <motion.div
-            initial="hidden"
-            animate={isInView ? 'visible' : 'hidden'}
-            variants={fadeUp}
-            custom={0}
-            className="max-w-xl"
-          >
-            <p className="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-gray-400 mb-5">
-              Leistungen
-            </p>
-            <h2
-              id="services-heading"
-              className="text-4xl lg:text-5xl font-bold text-gray-900 leading-[1.08] tracking-tight"
-            >
-              Vier Systeme,
-              <br />
-              <span className="text-gray-300">die täglich für Sie arbeiten.</span>
+    <section id="leistungen" className="border-t border-pub-hairline-soft bg-white py-20 lg:py-28" aria-labelledby="services-heading">
+      <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
+        <div className="mb-10 flex flex-col gap-6 lg:mb-14 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <PubEyebrow className="mb-4">Leistungen</PubEyebrow>
+            <h2 id="services-heading" className="text-[clamp(30px,3.2vw,40px)] font-bold leading-[1.1] tracking-[-0.02em] text-pub-ink">
+              Vier Leistungen, die täglich für Sie arbeiten.
             </h2>
-          </motion.div>
-          <motion.div
-            initial="hidden"
-            animate={isInView ? 'visible' : 'hidden'}
-            variants={fadeUp}
-            custom={0.1}
-            className="flex flex-col gap-3 max-w-sm"
-          >
-            <p className="text-[14.5px] text-gray-500 leading-relaxed">
-              Kein System für sich allein. Jedes Stück zahlt direkt auf Anfragen, Buchungen
-              und weniger manuelle Arbeit ein.
-            </p>
-            <Link
-              to="/leistungen"
-              className="font-medium text-[13px] text-gray-700 hover:text-gray-900 transition-colors underline underline-offset-2 decoration-gray-200 w-fit"
-            >
-              Alle Details & Preise ansehen →
-            </Link>
-          </motion.div>
+          </div>
+          <PubLinkButton to="/leistungen" variant="secondary" size="md" icon={ArrowRight} iconTrailing className="self-start lg:self-auto">
+            Alle Leistungen &amp; Details ansehen
+          </PubLinkButton>
         </div>
 
-        <div className="grid lg:grid-cols-2 border border-gray-100 rounded-2xl overflow-hidden">
-          {services.map((service, index) => {
+        <div className="grid gap-4 md:grid-cols-2">
+          {services.map((service) => {
             const Icon = service.icon;
-            const isRight = index % 2 === 1;
-            const isBottom = index >= 2;
             return (
-              <motion.article
-                key={index}
-                initial="hidden"
-                animate={isInView ? 'visible' : 'hidden'}
-                variants={fadeUp}
-                custom={index * 0.08}
-                className={`relative group p-10 transition-colors duration-300 ${
-                  service.featured ? 'bg-gray-950' : 'bg-white hover:bg-gray-50/50'
-                } ${isRight ? 'border-l border-gray-100' : ''} ${
-                  isBottom ? 'border-t border-gray-100' : ''
+              <article
+                key={service.number}
+                className={`flex flex-col rounded-2xl border p-6 sm:p-8 ${
+                  service.featured
+                    ? 'border-white/[0.06] bg-pub-ink text-white'
+                    : 'border-pub-hairline bg-white'
                 }`}
               >
-                {service.featured && (
-                  <span className="absolute top-8 right-8 text-[9px] font-semibold uppercase tracking-[0.15em] px-2.5 py-1 rounded-full bg-sky-500/10 border border-sky-400/20 text-sky-300">
-                    Im Fokus
-                  </span>
-                )}
-
-                <div className="flex items-start justify-between mb-8">
-                  <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                      service.featured
-                        ? 'bg-white/[0.06] border border-white/[0.08]'
-                        : 'bg-gray-100 group-hover:bg-gray-200 transition-colors'
-                    }`}
-                  >
-                    <Icon
-                      size={17}
-                      className={service.featured ? 'text-white/40' : 'text-gray-500'}
-                    />
-                  </div>
-                  <span
-                    className={`text-[11px] font-bold tracking-[0.22em] tabular-nums ${
-                      service.featured ? 'text-white/10' : 'text-gray-200'
-                    }`}
-                  >
+                <div className="mb-5 flex items-center justify-between">
+                  <IconTile icon={Icon} size="md" className={service.featured ? '!bg-white/[0.08] !text-white !ring-white/10' : ''} />
+                  <span className={`text-[12px] font-semibold tabular-nums tracking-[0.14em] ${service.featured ? 'text-white/50' : 'text-pub-ink-3'}`}>
                     {service.number}
                   </span>
                 </div>
-
-                <h3
-                  className={`text-[18px] font-bold mb-3 leading-snug tracking-tight ${
-                    service.featured ? 'text-white' : 'text-gray-900'
-                  }`}
-                >
+                <h3 className={`mb-3 text-[22px] font-semibold leading-[1.25] tracking-[-0.012em] ${service.featured ? 'text-white' : 'text-pub-ink'}`}>
                   {service.title}
                 </h3>
-
-                <p
-                  className={`text-[13.5px] leading-relaxed mb-5 ${
-                    service.featured ? 'text-gray-500' : 'text-gray-500'
-                  }`}
-                >
+                <p className={`mb-6 text-[15px] leading-[1.6] ${service.featured ? 'text-white/75' : 'text-pub-ink-2'}`}>
                   {service.description}
                 </p>
-
-                {/* ROI highlight */}
-                <div className={`flex items-center gap-3 mb-6 px-4 py-2.5 rounded-xl ${
-                  service.featured
-                    ? 'bg-white/[0.04] border border-white/[0.06]'
-                    : 'bg-gray-50 border border-gray-100'
-                }`}>
-                  <TrendingUp size={13} className={service.featured ? 'text-emerald-400' : 'text-emerald-500'} />
-                  <div>
-                    <span className={`text-[20px] font-bold tracking-tight tabular-nums ${
-                      service.featured ? 'text-white/80' : 'text-gray-900'
-                    }`}>{service.roi.value}</span>
-                    <span className={`text-[12px] ml-2 ${
-                      service.featured ? 'text-gray-500' : 'text-gray-500'
-                    }`}>{service.roi.label}</span>
-                  </div>
-                </div>
-
-                <div className="space-y-2.5 mb-7">
-                  {service.features.map((feature, fi) => (
-                    <div key={fi} className="flex items-center gap-2.5">
-                      <CheckCircle
-                        size={11}
-                        className={`flex-shrink-0 ${service.featured ? 'text-emerald-400/60' : 'text-emerald-500'}`}
-                      />
-                      <span
-                        className={`text-[13px] ${
-                          service.featured ? 'text-gray-400' : 'text-gray-600'
-                        }`}
-                      >
-                        {feature}
-                      </span>
-                    </div>
+                <ul className={`mb-7 space-y-2 text-[14px] leading-snug ${service.featured ? 'text-white/70' : 'text-pub-ink-2'}`}>
+                  {service.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2.5">
+                      <span className={`mt-[8px] h-1.5 w-1.5 shrink-0 rounded-full ${service.featured ? 'bg-white/40' : 'bg-pub-ink/35'}`} aria-hidden="true" />
+                      {f}
+                    </li>
                   ))}
-                </div>
-
-                {service.cityLinks.length > 0 && (
-                  <div
-                    className={`pt-4 border-t mb-6 ${
-                      service.featured ? 'border-white/[0.06]' : 'border-gray-100'
-                    }`}
+                </ul>
+                <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-3">
+                  <Link
+                    to={service.link}
+                    className={`inline-flex h-11 items-center gap-1.5 text-[14.5px] font-semibold underline-offset-4 hover:underline focus-visible:outline-none focus-visible:rounded-full focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 ${service.featured ? 'text-white focus-visible:ring-offset-pub-ink' : 'text-pub-ink'}`}
                   >
-                    <p
-                      className={`text-[10px] font-semibold uppercase tracking-[0.15em] mb-2.5 ${
-                        service.featured ? 'text-gray-700' : 'text-gray-300'
-                      }`}
-                    >
-                      Verfügbar in
-                    </p>
-                    <div className="flex flex-wrap gap-1.5">
+                    {service.cta}
+                    <ArrowRight size={15} aria-hidden="true" />
+                  </Link>
+                  {service.cityLinks.length > 0 && (
+                    <span className={`flex flex-wrap items-center gap-x-3 text-[13px] ${service.featured ? 'text-white/55' : 'text-pub-ink-3'}`}>
                       {service.cityLinks.map((cl) => (
                         <Link
                           key={cl.href}
                           to={cl.href}
-                          className={`text-[11px] font-medium px-2.5 py-1 rounded-lg border transition-all ${
-                            service.featured
-                              ? 'border-white/[0.07] text-gray-500 hover:border-white/15 hover:text-gray-300'
-                              : 'border-gray-100 text-gray-500 hover:border-gray-300 hover:text-gray-800'
-                          }`}
+                          className={`inline-flex h-11 items-center hover:underline focus-visible:outline-none focus-visible:rounded-full focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 ${service.featured ? 'hover:text-white focus-visible:ring-offset-pub-ink' : 'hover:text-pub-ink'}`}
                         >
                           {cl.label}
                         </Link>
                       ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Result proof bar */}
-                <div className={`flex items-start gap-2 mb-6 text-[11.5px] leading-snug ${
-                  service.featured ? 'text-gray-600' : 'text-gray-400'
-                }`}>
-                  <span className="flex-shrink-0 mt-px">✦</span>
-                  <span>{service.result}</span>
+                    </span>
+                  )}
                 </div>
-
-                <Link
-                  to={service.link}
-                  className={`group/link inline-flex items-center gap-2 text-[12.5px] font-semibold transition-all px-5 py-2.5 rounded-xl border ${
-                    service.featured
-                      ? 'bg-white text-gray-900 border-white hover:bg-gray-100'
-                      : 'bg-gray-950 text-white border-gray-950 hover:bg-gray-800'
-                  }`}
-                >
-                  {service.cta}
-                  <ArrowRight
-                    size={12}
-                    className="transition-transform duration-200 group-hover/link:translate-x-1"
-                  />
-                </Link>
-              </motion.article>
+              </article>
             );
           })}
         </div>
 
-        <motion.div
-          initial="hidden"
-          animate={isInView ? 'visible' : 'hidden'}
-          variants={fadeUp}
-          custom={0.4}
-          className="mt-8 flex justify-center"
-        >
-          <Link
-            to="/leistungen"
-            className="group inline-flex items-center gap-2 text-[13px] font-semibold text-gray-400 hover:text-gray-900 transition-colors"
-          >
-            Alle Leistungen & Details ansehen
-            <ArrowRight
-              size={13}
-              className="transition-transform duration-200 group-hover:translate-x-1"
-            />
-          </Link>
-        </motion.div>
+        <div className="mt-10 flex flex-col gap-3 border-t border-pub-hairline-soft pt-8 sm:flex-row sm:items-center sm:gap-6">
+          <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-pub-ink-3">Typische Ausgangslagen</p>
+          <ul className="flex flex-wrap gap-x-6 gap-y-1">
+            {situations.map((s) => (
+              <li key={s.href}>
+                <Link to={s.href} className="inline-flex h-11 items-center text-[14.5px] text-pub-ink-2 underline-offset-4 hover:text-pub-ink hover:underline focus-visible:outline-none focus-visible:rounded-full focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2">
+                  {s.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   );

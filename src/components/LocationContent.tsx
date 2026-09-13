@@ -1,6 +1,7 @@
 import { MapPin, Users, Building2, Zap, Clock, Phone, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
-import { BUSINESS_INFO, PHONE_HREF, getGoogleMapsUrl, getGoogleMapsEmbedUrl } from "@/lib/seo-data";
+import { BUSINESS_INFO, PHONE_HREF, getGoogleMapsUrl } from "@/lib/seo-data";
+import { ConsentMapEmbed } from "@/components/ConsentMapEmbed";
 import { motion } from "framer-motion";
 
 const SERVICE_CITIES: Array<{ label: string; href: string }> = [
@@ -308,22 +309,7 @@ export function LocationContent() {
               </a>
             </div>
 
-            <div
-              className="relative rounded-xl overflow-hidden shadow-md h-[300px] md:h-[380px] ring-1 ring-gray-200 dark:ring-gray-700"
-              aria-label={`Karte: ${BUSINESS_INFO.name}, ${BUSINESS_INFO.address.streetAddress}, ${BUSINESS_INFO.address.postalCode} ${BUSINESS_INFO.address.addressLocality}`}
-            >
-              <iframe
-                title={`Standort von ${BUSINESS_INFO.name} in ${BUSINESS_INFO.address.addressLocality}`}
-                src={getGoogleMapsEmbedUrl()}
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                className="w-full h-full"
-              />
-            </div>
+            <ConsentMapEmbed minHeight={340} />
           </div>
         </motion.div>
 

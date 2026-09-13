@@ -1,6 +1,7 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { PubLinkButton } from '@/components/public/PublicUI';
 import {
   ArrowRight,
   PhoneCall,
@@ -17,42 +18,12 @@ const LazySplineScene = lazy(() =>
   }))
 );
 
-const E: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
-
-function Particles() {
-  const pts = useMemo(
-    () =>
-      Array.from({ length: 12 }, (_, i) => ({
-        id: i,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        s: Math.random() * 1.6 + 0.4,
-        dur: Math.random() * 10 + 8,
-        delay: Math.random() * 6,
-      })),
-    []
-  );
-
-  return (
-    <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-      {pts.map((p) => (
-        <motion.div
-          key={p.id}
-          className="absolute rounded-full bg-sky-400/20"
-          style={{ width: p.s, height: p.s, left: `${p.x}%`, top: `${p.y}%` }}
-          animate={{ y: [0, -28, 0], opacity: [0, 0.18, 0] }}
-          transition={{ duration: p.dur, repeat: Infinity, delay: p.delay, ease: 'easeInOut' }}
-        />
-      ))}
-    </div>
-  );
-}
 
 function SplineFallback() {
   return (
     <div
-      className="w-full h-full rounded-[2rem] bg-gradient-to-br from-sky-50 via-white to-emerald-50 border border-gray-100"
+      className="h-full w-full rounded-[2rem] border border-pub-hairline-soft bg-gradient-to-br from-white via-[#f8f8f7] to-[#f1f1ef]"
       aria-hidden="true"
     />
   );
@@ -245,279 +216,94 @@ const services = [
   { icon: Zap, label: 'Automatisierung', href: '/prozessautomatisierung' },
 ];
 
-const proof = [
-  { value: 'Auch nachts', label: 'Erreichbarkeit', sub: 'Anrufannahme außerhalb der Öffnungszeiten' },
-];
 
 export function DesktopHero() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true });
-  const navigate = useNavigate();
-
-  // Travel distance for the sweep line below — measured, not a percentage; see
-  // the comment at its motion.div.
-  const sweepRef = useRef<HTMLDivElement>(null);
-  const [sweepTravel, setSweepTravel] = useState(0);
-
-  useEffect(() => {
-    const section = sweepRef.current?.parentElement;
-    if (section) setSweepTravel(section.getBoundingClientRect().height);
-  }, []);
 
   return (
     <section
       ref={ref}
-      className="relative w-full min-h-screen flex items-center overflow-hidden bg-white"
+      className="relative w-full overflow-hidden bg-white"
       aria-label="Cogniiq — Operative KI-Systeme"
     >
-      <div
-        className="absolute inset-0 pointer-events-none"
-        aria-hidden="true"
-        style={{
-          background:
-            'radial-gradient(ellipse 65% 75% at 72% 50%, rgba(2,132,199,0.05) 0%, transparent 65%), radial-gradient(ellipse 45% 45% at 8% 15%, rgba(16,185,129,0.03) 0%, transparent 55%)',
-        }}
-      />
+      <div className="relative z-10 mx-auto grid w-full max-w-[1200px] grid-cols-12 items-center gap-6 px-8 pb-16 pt-32 lg:px-10 lg:pb-20 lg:pt-36 xl:pb-24">
+        <div className="col-span-12 lg:col-span-6">
+          <div className="cq-rise mb-7 flex flex-wrap items-center gap-x-5 gap-y-2" style={{ animationDelay: '0.1s', animationDuration: '0.42s' }}>
+            {services.map(({ icon: Icon, label, href }) => (
+              <Link
+                key={label}
+                to={href}
+                className="group inline-flex h-9 items-center gap-1.5 text-[13px] font-medium text-pub-ink-3 transition-colors duration-150 hover:text-pub-ink focus-visible:outline-none focus-visible:rounded-full focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
+              >
+                <Icon className="h-3.5 w-3.5 text-pub-ink-3 transition-colors group-hover:text-pub-ink" strokeWidth={1.75} aria-hidden="true" />
+                {label}
+              </Link>
+            ))}
+          </div>
 
-      <div
-        className="absolute top-0 left-0 right-0 h-px"
-        aria-hidden="true"
-        style={{ background: 'linear-gradient(90deg, transparent, rgba(2,132,199,0.15), transparent)' }}
-      />
-
-      {/* Transform-driven sweep, not `top`: animating `top` moved a painted,
-          positioned element every frame, which the browser records as a layout
-          shift. Distance is measured because `y: '100%'` would resolve against
-          the line's own 1px height, and the line stays 1px so it never promotes
-          the hero content into a composited layer. Mirrors ScanBeam in MobileHero. */}
-      <motion.div
-        ref={sweepRef}
-        className="absolute top-0 left-0 right-0 h-px z-30 pointer-events-none"
-        aria-hidden="true"
-        style={{
-          background:
-            'linear-gradient(90deg, transparent 5%, rgba(3,105,161,0.12) 30%, rgba(2,132,199,0.22) 50%, rgba(3,105,161,0.12) 70%, transparent 95%)',
-        }}
-        initial={{ y: 0, opacity: 0 }}
-        animate={sweepTravel ? { y: [0, sweepTravel], opacity: [0, 1, 1, 0] } : { opacity: 0 }}
-        transition={{ duration: 2.8, delay: 0.3, ease: E }}
-      />
-
-      <Particles />
-
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-8 lg:px-12 flex items-center gap-4 pt-20">
-        <div className="flex-1 max-w-[580px]">
-          <motion.div
-            className="flex items-center gap-2 mb-8"
-            initial={{ opacity: 0, y: 8 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.4, ease: E }}
-          >
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-50 border border-gray-100">
-              <motion.div
-                className="w-1.5 h-1.5 rounded-full bg-emerald-500"
-                aria-hidden="true"
-                animate={{ opacity: [1, 0.4, 1], scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-              <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-gray-500">
-                Operative KI-Systeme
+          <h1 className="mb-6 text-[clamp(40px,4vw,58px)] font-bold leading-[1.05] tracking-[-0.024em] text-pub-ink">
+            {['Erreichbar, wenn', 'niemand frei ist.'].map((text, i) => (
+              <span
+                key={text}
+                className="cq-rise block"
+                style={{ animationDelay: `${0.16 + i * 0.08}s`, animationDuration: '0.42s' }}
+              >
+                {text}
               </span>
-            </div>
-          </motion.div>
-
-          <h1 className="mb-6">
-            {[
-              { text: 'Erreichbar,', color: 'text-pub-ink', delay: 0.2 },
-              { text: 'wenn niemand frei ist.', color: 'text-pub-ink', delay: 0.28 },
-              // This line shipped as `text-gray-200` — #e5e7eb on white, a measured
-              // 1.24:1. The third line of the H1 was invisible on the most important
-              // surface of the site. ink-3 is the lightest value that still clears AA.
-              { text: 'Auch nachts. Auch samstags.', color: 'text-pub-ink-3', delay: 0.36 },
-            ].map(({ text, color, delay }) => (
-              <div key={text}>
-                {/* The headline is the LCP element. It started at `opacity: 0` and
-                    was faded in by framer-motion once the hero had mounted, so the
-                    largest paint waited on hydration *and then* on the animation —
-                    measured at ~1.1s after the headline already existed in the DOM.
-                    Chrome does not treat an element as an LCP candidate while its
-                    opacity is 0. This is the same transform-only entrance the rest
-                    of the site uses (.cq-rise), so the text is painted and readable
-                    on its first frame; easing, stagger and duration are unchanged.
-                    The wrapper's `overflow-hidden` clip is gone with the opacity
-                    fade: it existed for an earlier slide-from-outside version and
-                    would now crop the headline on that first frame. */}
-                <div
-                  className={`cq-rise text-[clamp(42px,5vw,66px)] font-bold tracking-[-0.026em] leading-[1.05] ${color}`}
-                  style={{ animationDelay: `${delay}s`, animationDuration: '0.42s' }}
-                >
-                  {text}
-                </div>
-              </div>
             ))}
           </h1>
 
-          <motion.p
-            className="text-[16px] text-gray-500 leading-[1.78] max-w-[430px] mb-8"
-            initial={{ opacity: 0, y: 12 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.75, delay: 1.05, ease: E }}
+          <p
+            className="cq-rise mb-5 text-[clamp(20px,1.7vw,24px)] font-medium leading-[1.3] tracking-[-0.012em] text-pub-ink-3"
+            style={{ animationDelay: '0.32s', animationDuration: '0.42s' }}
+          >
+            Auch nachts. Auch samstags.
+          </p>
+
+          <p
+            className="cq-rise mb-9 max-w-[52ch] text-[17px] leading-[1.65] text-pub-ink-2"
+            style={{ animationDelay: '0.4s', animationDuration: '0.42s' }}
           >
             Ihr KI-Telefonassistent nimmt Anrufe an, wenn Ihr Team gebunden ist —
             abends, am Wochenende, zu Stoßzeiten. Anliegen kommen strukturiert
             bei Ihnen an, statt auf der Mailbox zu enden.
-          </motion.p>
+          </p>
 
-          <motion.div
-            className="inline-flex items-center gap-2.5 mb-8 px-4 py-2.5 bg-white border rounded-xl"
-            style={{
-              borderColor: '#e5e7eb',
-              boxShadow: '0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.025)',
-            }}
-            initial={{ opacity: 0, y: 8 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 1.18, ease: E }}
+          <div
+            className="cq-rise flex flex-wrap items-center gap-3"
+            style={{ animationDelay: '0.48s', animationDuration: '0.42s' }}
           >
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" aria-hidden="true" />
-            {/* Kanonisch: Frist bis zur Übergabe zur Freigabe, nicht bis zum Go-live
-                (FAKTEN.uebergabeGarantie). Der Go-live hängt an der Kundenfreigabe. */}
-            <span className="text-[12px] font-semibold text-gray-700">
-              Go-Live nach Ihrer Freigabe
-            </span>
-          </motion.div>
+            <PubLinkButton to="/kontakt" variant="primary" size="lg" icon={ArrowRight} iconTrailing>
+              Erstgespräch vereinbaren
+            </PubLinkButton>
+            <PubLinkButton to="#preis-roi-rechner" variant="secondary" size="lg">
+              Preis berechnen
+            </PubLinkButton>
+          </div>
 
-          <motion.div
-            className="flex items-center gap-2 mb-10"
-            initial={{ opacity: 0 }}
-            animate={inView ? { opacity: 1 } : {}}
-            transition={{ duration: 0.5, delay: 1.28, ease: E }}
+          <p
+            data-review-claim="go-live-zeitraum"
+            className="cq-rise mt-6 flex items-center gap-2 text-[14px] text-pub-ink-3"
+            style={{ animationDelay: '0.56s', animationDuration: '0.42s' }}
           >
-            {services.map(({ icon: Icon, label, href }, i) => (
-              <motion.a
-                key={label}
-                href={href}
-                className="group flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-100 bg-gray-50 hover:bg-sky-50 hover:border-sky-200 transition-all cursor-pointer"
-                initial={{ opacity: 0, y: 6 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.4, delay: 1.32 + i * 0.08, ease: E }}
-              >
-                <Icon className="w-3 h-3 text-sky-500 group-hover:text-sky-600 transition-colors" aria-hidden="true" />
-                <span className="text-[11.5px] font-medium text-gray-600 group-hover:text-gray-900 transition-colors whitespace-nowrap">
-                  {label}
-                </span>
-              </motion.a>
-            ))}
-          </motion.div>
-
-          <motion.div
-            className="flex flex-col gap-4"
-            initial={{ opacity: 0, y: 10 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 1.5, ease: E }}
-          >
-            <div className="flex items-center gap-3">
-              <motion.button
-                type="button"
-                onClick={() => navigate('/kontakt')}
-                // The primary action is the one element on a public page that carries
-                // a filled signal colour — it was previously near-black, identical in
-                // weight to every secondary control on the page.
-                className="group relative flex items-center gap-3 overflow-hidden rounded-xl bg-pub-signal px-7 py-3.5 text-[13.5px] font-semibold text-white transition-colors hover:bg-pub-signal-ink"
-                whileHover={{ scale: 1.015 }}
-                whileTap={{ scale: 0.975 }}
-                aria-label="Unverbindliches Erstgespräch vereinbaren"
-              >
-                <span className="relative whitespace-nowrap">Unverbindliches Erstgespräch vereinbaren</span>
-                <motion.div
-                  className="relative"
-                  aria-hidden="true"
-                  animate={{ x: [0, 4, 0] }}
-                  transition={{ duration: 2.5, repeat: Infinity, delay: 3, ease: 'easeInOut' }}
-                >
-                  <ArrowRight className="w-3.5 h-3.5 text-white/70 group-hover:text-white transition-colors" />
-                </motion.div>
-                <div
-                  className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-sky-500/40 via-sky-500/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
-                  aria-hidden="true"
-                />
-              </motion.button>
-
-              <button
-                type="button"
-                onClick={() => navigate('/ki-telefonassistent')}
-                className="group flex items-center gap-1.5 text-[13px] font-medium text-pub-ink-3 transition-colors hover:text-pub-ink"
-                // Was "Demo anhören" / "…anhören", navigating to a text page. There is
-                // no audio: the Stimmprobe module cannot render until asset F1 exists.
-                // Promising a recording and delivering prose breaks trust at exactly
-                // the moment of curiosity. Restore the audio label with the asset.
-                aria-label="So funktioniert der KI-Telefonassistent"
-              >
-                So funktioniert der Empfang
-                <ArrowRight className="h-3 w-3 text-pub-ink-4 transition-colors group-hover:text-pub-ink-2" aria-hidden="true" />
-              </button>
-            </div>
-          </motion.div>
-
-          <motion.div data-review-claim="go-live-zeitraum"
-            className="mt-10 pt-8 border-t border-gray-100 grid grid-cols-1 gap-6"
-            initial={{ opacity: 0 }}
-            animate={inView ? { opacity: 1 } : {}}
-            transition={{ duration: 0.8, delay: 1.85, ease: E }}
-          >
-            {proof.map(({ value, label, sub }, i) => (
-              <motion.div
-                key={label}
-                className="flex flex-col gap-0.5"
-                initial={{ opacity: 0, y: 8 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.5, delay: 1.95 + i * 0.1, ease: E }}
-              >
-                <span className="text-[28px] font-bold text-gray-900 tabular-nums tracking-tight leading-none">
-                  {value}
-                </span>
-                <span className="text-[12px] font-semibold text-gray-700 mt-1.5">{label}</span>
-                <span className="text-[11px] text-gray-400 leading-tight">{sub}</span>
-              </motion.div>
-            ))}
-          </motion.div>
+            <ShieldCheck className="h-4 w-4 text-pub-verify" strokeWidth={1.75} aria-hidden="true" />
+            Kostenlos und unverbindlich · Go-Live erst nach Ihrer Freigabe
+          </p>
         </div>
 
+        {/* The 3D scene keeps its component, scene, gates and interaction exactly;
+            only the container proportions changed. */}
         <motion.div
-          className="flex-1 h-[600px] lg:h-[700px] xl:h-[800px] relative"
+          className="relative col-span-12 h-[520px] lg:col-span-6 lg:h-[640px] xl:h-[700px]"
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
-          transition={{ duration: 1.6, delay: 0.4 }}
+          transition={{ duration: 1.2, delay: 0.3 }}
           aria-hidden="true"
         >
           <DeferredSplineScene />
         </motion.div>
       </div>
-
-      <div
-        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-        aria-hidden="true"
-        style={{ background: 'linear-gradient(to bottom, transparent, white)' }}
-      />
-
-      <motion.div
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 z-10"
-        aria-hidden="true"
-        initial={{ opacity: 0 }}
-        animate={inView ? { opacity: 1 } : {}}
-        transition={{ delay: 3.2, duration: 1 }}
-      >
-        <motion.div
-          className="w-5 h-8 rounded-full border border-gray-200 flex items-start justify-center p-1"
-          animate={{ opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: 2.2, repeat: Infinity }}
-        >
-          <motion.div
-            className="w-1 h-1.5 rounded-full bg-gray-400"
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        </motion.div>
-      </motion.div>
     </section>
   );
 }

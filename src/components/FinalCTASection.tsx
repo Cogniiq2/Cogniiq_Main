@@ -34,9 +34,9 @@ export function FinalCTASection() {
     <section
       ref={ref}
       aria-labelledby="final-cta-heading"
-      className="py-32 bg-white border-t border-gray-100 overflow-hidden"
+      className="py-20 lg:py-28 bg-white border-t border-pub-hairline-soft overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
         <div className="grid lg:grid-cols-[1fr_440px] gap-16 lg:gap-20 items-start">
 
           {/* ─── Left: Copy + proof ─── */}
@@ -45,17 +45,17 @@ export function FinalCTASection() {
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.75, ease: EASE }}
           >
-            <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-gray-400 mb-5">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-pub-ink-3 mb-5">
               Der erste Schritt
             </p>
 
             <h2
               id="final-cta-heading"
-              className="text-4xl lg:text-[3.4rem] font-bold text-gray-900 leading-[1.04] tracking-[-0.024em] mb-6"
+              className="text-[clamp(30px,3.2vw,44px)] font-bold text-pub-ink leading-[1.08] tracking-[-0.02em] mb-6"
             >
-              30&nbsp;Minuten, die zeigen,
+              Besprechen wir,
               <br />
-              <span className="text-gray-200">was bei Ihnen möglich ist.</span>
+              <span className="text-pub-ink-3">was bei Ihnen möglich ist.</span>
             </h2>
 
             <p className="text-[16px] text-gray-500 leading-[1.75] mb-8 max-w-lg">
@@ -105,29 +105,13 @@ export function FinalCTASection() {
             transition={{ duration: 0.75, delay: 0.14, ease: EASE }}
             className="lg:sticky lg:top-28"
           >
-            <div className="bg-gray-950 rounded-2xl overflow-hidden relative">
-              {/* Ambient glow */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: 'radial-gradient(ellipse at 65% 15%, rgba(2,132,199,0.10) 0%, transparent 55%), radial-gradient(ellipse at 20% 85%, rgba(16,185,129,0.06) 0%, transparent 50%)',
-                }}
-              />
-              {/* Top accent line */}
-              <div
-                className="absolute top-0 left-0 right-0 h-px"
-                style={{ background: 'linear-gradient(90deg, transparent, rgba(2,132,199,0.4), rgba(16,185,129,0.2), transparent)' }}
-              />
+            <div className="bg-pub-ink rounded-2xl overflow-hidden relative">
 
               <div className="relative p-10">
                 {/* Header */}
                 <div className="flex items-center gap-2 mb-6">
-                  <motion.div
-                    className="w-1.5 h-1.5 rounded-full bg-emerald-500"
-                    animate={{ opacity: [1, 0.3, 1] }}
-                    transition={{ duration: 1.8, repeat: Infinity }}
-                  />
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-gray-500">
+                  <span className="w-1.5 h-1.5 rounded-full bg-pub-verify" aria-hidden="true" />
+                  <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-white/60">
                     Kostenloses Erstgespräch
                   </span>
                 </div>
@@ -135,30 +119,26 @@ export function FinalCTASection() {
                 <h3 className="text-[24px] font-bold text-white leading-tight tracking-tight mb-2">
                   Gespräch vereinbaren
                 </h3>
-                <p className="text-[13px] text-gray-500 mb-8 leading-relaxed">
+                <p className="text-[13.5px] text-white/60 mb-8 leading-relaxed">
                   30 Min · keine Vorbereitung nötig · kein Sales-Pitch
                 </p>
 
                 {/* Primary CTA */}
                 <Link
                   to="/kontakt"
-                  className="group w-full flex items-center justify-between gap-3 bg-white text-gray-900 font-semibold text-[14px] px-6 py-4 rounded-xl hover:bg-gray-50 transition-all mb-3"
-                  style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
+                  className="group mb-3 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white px-6 text-[15px] font-semibold text-pub-ink transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
                 >
-                  <div className="flex items-center gap-2.5">
-                    <Calendar size={14} className="text-gray-500" />
-                    Jetzt Gespräch buchen
-                  </div>
-                  <ArrowRight size={14} className="text-gray-400 transition-transform group-hover:translate-x-1" />
+                  <Calendar size={15} className="text-pub-ink-3" aria-hidden="true" />
+                  Erstgespräch vereinbaren
                 </Link>
 
                 {/* Secondary CTA */}
                 <Link
-                  to="/leistungen"
-                  className="group w-full flex items-center justify-between gap-3 bg-white/[0.04] border border-white/[0.07] text-gray-400 font-medium text-[13px] px-6 py-3.5 rounded-xl hover:bg-white/[0.07] hover:text-gray-200 transition-all mb-8"
+                  to="/ki-telefonassistent/demo"
+                  className="group mb-8 flex h-11 w-full items-center justify-center gap-2 rounded-full border border-white/15 px-6 text-[14px] font-medium text-white/75 transition-colors hover:border-white/30 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
                 >
-                  Leistungen & Preise ansehen
-                  <ArrowRight size={13} className="text-gray-600 transition-transform group-hover:translate-x-1 group-hover:text-gray-400" />
+                  Demo-Termin anfragen
+                  <ArrowRight size={14} aria-hidden="true" />
                 </Link>
 
                 {/* Divider */}
@@ -171,7 +151,7 @@ export function FinalCTASection() {
                       <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/15 flex items-center justify-center flex-shrink-0">
                         <Icon size={9} className="text-emerald-400" />
                       </div>
-                      <span className="text-[12px] text-gray-500">{text}</span>
+                      <span className="text-[13px] text-white/70">{text}</span>
                     </div>
                   ))}
                 </div>
