@@ -338,8 +338,6 @@ const WebdesignImmobilienRegensburg = lazyNamed(
 );
 
 // Trust / proof pages
-const ReferenzenPage = lazyNamed(() => import('./pages/ReferenzenPage'), 'ReferenzenPage');
-const BewertungenPage = lazyNamed(() => import('./pages/BewertungenPage'), 'BewertungenPage');
 
 // Bayreuth cluster
 const WebdesignKostenBayreuth = lazyNamed(
@@ -692,8 +690,6 @@ export function AppInner() {
           entries and rendered industry wording ("Webdesign-Betriebe in <Stadt>") on pages
           that address a city audience, not the webdesign trade. */}
 
-      <Route path="/referenzen" element={<ReferenzenPage />} />
-      <Route path="/bewertungen" element={<BewertungenPage />} />
 
       <Route path="/bayreuth/webdesign-kosten" element={<WebdesignKostenBayreuth />} />
       <Route path="/bayreuth/website-erstellen" element={<WebsiteErstellenBayreuth />} />

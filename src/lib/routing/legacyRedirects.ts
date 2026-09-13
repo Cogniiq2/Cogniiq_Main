@@ -33,6 +33,25 @@
  */
 export const LEGACY_REDIRECTS: Readonly<Record<string, string>> = {
   /*
+    2026-09-14 — /referenzen and /bewertungen retired, owner decision.
+
+    Both pages existed to hold proof (case studies, testimonials) the site does
+    not have yet; each said so explicitly rather than fabricating either.
+    HONESTY-AUDIT.md and COPY-CLAIMS-TO-VERIFY.md (F3) already tracked why: the
+    one real testimonial in the codebase named a real association without
+    documented consent and was pulled from rendering — both pages then reached
+    the same conclusion the owner has now made final by removing them: no page
+    for proof that does not exist yet.
+
+    /ueber-uns survives as the target for both. It is the page a visitor
+    looking for "how this company works" or "who is behind it" lands on next,
+    and it is exactly what /referenzen ("Arbeitsweise & Projektverständnis")
+    and /bewertungen ("woran Sie unsere Arbeit stattdessen prüfen können")
+    pointed toward without a page of their own.
+  */
+  '/referenzen': '/ueber-uns',
+  '/bewertungen': '/ueber-uns',
+  /*
     2026-09-12 — the automation cluster's owner question, decided.
 
     `/automatisierung-unternehmen` and `/prozessautomatisierung` were two

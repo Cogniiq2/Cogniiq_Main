@@ -170,7 +170,7 @@ const config: ClusterPageConfig = {
     { label: "Website Relaunch Bayreuth", href: "/bayreuth/website-relaunch" },
     { label: "Landingpage Bayreuth", href: "/bayreuth/landingpage" },
     { label: "Lokales SEO Bayreuth", href: "/bayreuth/lokales-seo" },
-    { label: "Referenzen", href: "/referenzen" },
+    { label: "Über uns", href: "/ueber-uns" },
   ],
 };
 

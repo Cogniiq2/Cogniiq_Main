@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Chrome as Home, Briefcase, Users, CircleHelp as HelpCircle, Mail, MapPin, ChevronDown, X, ArrowRight, Star, BookOpen, UserRound } from 'lucide-react';
+import { Chrome as Home, Briefcase, Users, CircleHelp as HelpCircle, Mail, MapPin, ChevronDown, X, ArrowRight, BookOpen, UserRound } from 'lucide-react';
 import { LEISTUNGEN, LEISTUNGEN_AUSWEG, STANDORTE, HAUPTSITZ_SLUG } from '@/lib/navigation-data';
 import { Logo } from '@/components/Logo';
 import { useAuth } from '@/contexts/AuthContext';
 
 
 
-type NavSection = 'home' | 'leistungen' | 'standorte' | 'ueber-uns' | 'faq' | 'referenzen' | 'blog' | 'kontakt';
+type NavSection = 'home' | 'leistungen' | 'standorte' | 'ueber-uns' | 'faq' | 'blog' | 'kontakt';
 
 function getActiveSection(pathname: string): NavSection {
   if (pathname === '/') return 'home';
@@ -28,7 +28,6 @@ function getActiveSection(pathname: string): NavSection {
   ) return 'standorte';
   if (pathname === '/ueber-uns') return 'ueber-uns';
   if (pathname === '/faq') return 'faq';
-  if (pathname === '/referenzen') return 'referenzen';
   if (pathname.startsWith('/blog')) return 'blog';
   if (pathname === '/kontakt') return 'kontakt';
   return 'home';
@@ -338,15 +337,6 @@ export function PremiumMobileNav() {
                       isActive={activeSection === 'faq'}
                       delay={0.16}
                       onClick={() => go('/faq')}
-                    />
-
-                    {/* REFERENZEN */}
-                    <NavRow
-                      icon={Star}
-                      label="Referenzen"
-                      isActive={activeSection === 'referenzen'}
-                      delay={0.20}
-                      onClick={() => go('/referenzen')}
                     />
 
                     {/* BLOG */}

@@ -250,8 +250,6 @@ export function Footer() {
                     label: "",
                     links: [
                       { text: "Über uns", to: "/ueber-uns" },
-                      { text: "Referenzen", to: "/referenzen" },
-                      { text: "Bewertungen", to: "/bewertungen" },
                       { text: "Kontakt", to: "/kontakt" },
                     ],
                   },

@@ -160,7 +160,7 @@ const config: ClusterPageConfig = {
     { label: "Website Relaunch Regensburg", href: "/regensburg/website-relaunch" },
     { label: "Landingpage Regensburg", href: "/regensburg/landingpage" },
     { label: "Lokales SEO Regensburg", href: "/regensburg/lokales-seo" },
-    { label: "Referenzen", href: "/referenzen" },
+    { label: "Über uns", href: "/ueber-uns" },
   ],
 };
 

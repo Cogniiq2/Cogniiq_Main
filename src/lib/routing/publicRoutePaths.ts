@@ -21,8 +21,6 @@ export const PUBLIC_ROUTE_PATHS: readonly string[] = [
   "/kontakt",
   "/ueber-uns",
   "/faq",
-  "/referenzen",
-  "/bewertungen",
   "/praxen",
   "/integrationen",
   "/datenschutz-sicherheit",

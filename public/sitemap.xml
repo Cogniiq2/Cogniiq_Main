@@ -44,22 +44,6 @@
   </url>
 
   <url>
-    <loc>https://cogniiq.de/referenzen</loc>
-    <lastmod>2026-03-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.80</priority>
-    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/referenzen"/>
-  </url>
-
-  <url>
-    <loc>https://cogniiq.de/bewertungen</loc>
-    <lastmod>2026-03-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
-    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/bewertungen"/>
-  </url>
-
-  <url>
     <loc>https://cogniiq.de/praxen</loc>
     <lastmod>2026-08-16</lastmod>
     <changefreq>monthly</changefreq>
