@@ -1,5 +1,39 @@
 # COPY-SEO-CHANGELOG — Copy Overhaul KI-Telefonassistent-Cluster
 
+## 2026-09-13 — Korrektur: die Häufigkeitsschwelle war selbst eine erfundene Zahl
+
+Aus dem Inhaber-Review am Durchgang vom 12.09.2026. Beim Entfernen von zwölf
+unbelegten Beträgen war eine **neue** unbelegte Zahl entstanden — in der Liste
+„was nicht automatisiert gehört":
+
+- `/prozessautomatisierung`: „Was zwölfmal im Jahr passiert, holt die
+  Investition kaum herein."
+- `/kosten-automatisierung`: „Ein Ablauf, der zwölfmal im Jahr läuft, holt
+  selbst eine kleine Investition kaum herein."
+
+**Warum das falsch war.** Häufigkeit allein entscheidet über Wirtschaftlichkeit
+gar nichts. Ein Vorgang, der viermal im Jahr läuft, dabei aber Facharbeit
+bindet, hohen Wert trägt oder fehlerkritisch ist, kann sich tragen — und ein
+täglicher Trivialvorgang eine große Umsetzung nicht rechtfertigen. „Zwölfmal"
+war eine Grenze ohne Grundlage, also derselbe Fehlertyp wie die Beträge, die
+einen Tag zuvor entfernt worden waren, nur in der Gegenrichtung: Sie hätte
+Vorhaben abgeschreckt, die sich gerechnet hätten.
+
+**Was jetzt dort steht.** Seltenheit ist ein Faktor der Rechnung, nicht ihr
+Ergebnis. Beide Seiten sagen das jetzt ausdrücklich — und verweisen auf die
+einzige Instanz, die es entscheiden kann: den Rechner mit den Zahlen des
+Besuchers.
+
+Im selben Zug zwei kleinere Zahlen derselben Art ersetzt: „in zehn Sätzen
+vollständig aufschreiben" → „in wenigen Sätzen" (beide Seiten), und eine
+Selbstauskunft „die Logik in vier Sätzen", die den eigenen Abschnitt falsch
+zählte.
+
+Nichts anderes geändert: Konsolidierung, 301, Seitenstruktur,
+Rechnerformeln, zwei Arbeitslesarten, „leer ist nicht null",
+Analytik-Privatheit und die geschützten Experimente sind unberührt.
+
+
 ## 2026-09-12 (3) — Automatisierungs-Cluster: eine Seite statt zwei, und zwölf Beträge weniger
 
 Branch `claude/prozessautomatisierung-pillar-max-2026-09-12`. Setzt Folgemission

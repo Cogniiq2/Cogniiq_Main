@@ -882,32 +882,65 @@ Branch `claude/prozessautomatisierung-pillar-max-2026-09-12`, Basis `56707c2`.
 Setzt Folgemission **F2** aus `ARCHITEKTUR.md` §4.1 um. **Tag 0 der Messung ist
 der Deploy dieses Branches**, nicht dieses Datum.
 
-### Datenlage — ehrlich benannt
+### Baseline — vom Inhaber aus der Search Console erhoben (13.09.2026)
 
-**Für diesen Durchgang stand kein Search-Console-Zugang zur Verfügung.** Weder
-ein API-Zugriff noch ein frischer Export lag in der Arbeitsumgebung vor; es
-gibt in diesem Repository auch keine eingecheckte CSV. Die Zahlen unten sind
-deshalb **übernommen** aus den Exporten vom **10.09.2026** (3 Monate
-2026-06-09–2026-09-08, 28 Tage 2026-08-12–2026-09-08), so wie sie
-`ARCHITEKTUR.md` §4 festhält — und nicht neu erhoben.
+**Herkunft, damit sie nicht später verwechselt wird.** Die Zahlen unten hat der
+**Inhaber** im Owner-Review aus der verbundenen Search-Console-Property
+`sc-domain:cogniiq.de` abgefragt und weitergegeben. **Claude hat die Search
+Console nicht abgefragt** — im Umsetzungsdurchgang vom 12.09.2026 stand dort
+weder ein API-Zugang noch ein Export zur Verfügung, und die damalige Fassung
+dieses Abschnitts führte deshalb nur übernommene Werte aus `ARCHITEKTUR.md` §4.
+Diese Fassung ersetzt sie durch gemessene.
 
-Das ist eine Einschränkung, keine Formalie: Der letzte gemessene Zeitraum endet
-vier Tage vor diesem Durchgang. **Vor dem ersten Messpunkt nach dem Deploy ist
-die Baseline gegen einen frischen, exakt benannten Export zu ersetzen** — sonst
-wird gegen Zahlen gemessen, deren Fenster niemand mehr kennt (Regel 4 dieses
-Dokuments).
+**Zeitraum: 2026-08-14 bis 2026-09-10**, letzter vollständig abgeschlossener
+Zeitraum zum Zeitpunkt der Abfrage. Jede Zahl unten gilt für genau dieses
+Fenster; ein späterer Vergleich, der ein anderes Fenster benutzt, ist kein
+Vergleich.
 
-| URL | 28-Tage-Impressionen | Ø Position | Quelle |
-|---|---:|---:|---|
-| `/prozessautomatisierung` | **keine Zeile im Export** | — | unter der Sichtbarkeitsschwelle (M3) |
-| `/automatisierung-unternehmen` | keine belastbare Zeile | — | „fast keine organische Substanz" (Missionsbefund), 22 interne Links waren ihr Gewicht |
-| `/kosten-automatisierung` | vorhanden | **35,2 → 16,3** bei fallenden Impressionen | `ARCHITEKTUR.md` §4.2 |
+#### Seiten
 
-**Die historischen Werte der zurückgezogenen URL bleiben hier stehen**, damit
-die Entwicklung nach dem 301 interpretierbar bleibt. Eine URL, deren Historie
-mit ihr verschwindet, macht jede spätere Auswertung unmöglich: Man sieht dann
-nur noch, dass der Pillar gewonnen hat, und weiß nicht, ob er gewonnen oder nur
-geerbt hat.
+| URL | Klicks | Impressionen | Ø Position |
+|---|---:|---:|---:|
+| `/prozessautomatisierung` | 0 | **23** | **38,43** |
+| `/automatisierung-unternehmen` (zurückgezogen) | 0 | **8** | **66,62** |
+| `/kosten-automatisierung` | 0 | **37** | **16,24** |
+
+**Die Zeile der zurückgezogenen URL bleibt dauerhaft stehen.** 8 Impressionen
+bei Position 66,62 sind der Maßstab, an dem sich nach dem 301 beurteilen lässt,
+ob Signale gewandert sind oder nur verschwunden. Eine URL, deren Historie mit
+ihr gelöscht wird, macht genau diese Frage unbeantwortbar.
+
+**Was die Zahlen bestätigen.** Der Pillar stand bei 23 Impressionen auf Position
+38,43 — sichtbar, aber weit von der ersten Ergebnisseite. Die zurückgezogene
+Seite hatte mit 8 Impressionen auf 66,62 tatsächlich **fast keine organische
+Substanz**: Ihr Gewicht lag in 22 internen Links, nicht in Rankings. Das ist die
+empirische Bestätigung dafür, dass die Konsolidierungsrichtung (Pillar behalten,
+die andere zurückziehen) die richtige war — die stärkere Seite überlebt.
+
+#### Queries der Kostenseite (dasselbe Fenster)
+
+| Query | Impressionen | Klicks | Ø Position |
+|---|---:|---:|---:|
+| `automatisierung kosten` | 12 | 0 | **13,0** |
+| `automatisierung projekt kosten` | 6 | 0 | **17,17** |
+| `automatisierungstechnik kosten` | 4 | 0 | **15,5** |
+| `automatisierungslösung preis` | 2 | 0 | **20,5** |
+| `welche kosten sind mit automatisierungstechnologien verbunden?` | 2 | 0 | **11,0** |
+| `automatisierung überall preis` | 4 | 0 | 34,25 |
+| `automatisierung preisauszeichnung` | 1 | 0 | 14,0 |
+
+**Warum das die Reihenfolge der Arbeit rechtfertigt.** Fünf Kostenqueries stehen
+zwischen Position 11 und 20,5 — also am Fuß der ersten Ergebnisseite, bei null
+Klicks. Das ist die kürzeste Distanz zu messbarem Ergebnis, die dieses Cluster
+hat, und der Grund, warum die Kostenseite in diesem Durchgang eine eigene
+Überarbeitung samt Rechner bekommen hat statt nur eines Linkumbaus.
+
+**Zwei Einschränkungen, die dabei mitzudenken sind.** Erstens sind das
+zweistellige Impressionszahlen: Positionsangaben aus 2–12 Impressionen
+schwanken stark und tragen keine Feinsteuerung. Zweitens ist
+`automatisierungstechnik kosten` erkennbar **Industrieautomatisierung** —
+eine andere Branche. Diese Query wird beobachtet, aber die Seite wird **nicht**
+auf sie hin getextet; ein Klick von dort wäre kein qualifizierter Besucher.
 
 ### Was geändert wurde
 
@@ -931,43 +964,64 @@ geerbt hat.
 
 ### Zielquery-Familien
 
-| Seite | Familie |
+| Seite | Primärcluster |
 |---|---|
-| `/prozessautomatisierung` | prozessautomatisierung · prozessautomatisierung für unternehmen · geschäftsprozesse automatisieren · unternehmensprozesse automatisieren · workflow automatisierung · ki automatisierung unternehmen · automatisierung für unternehmen (geerbt) |
-| `/kosten-automatisierung` | automatisierung kosten · automatisierung projekt kosten · was kostet prozessautomatisierung · prozessautomatisierung preis · roi automatisierung berechnen |
+| `/prozessautomatisierung` | prozessautomatisierung · prozessautomatisierung für unternehmen · geschäftsprozesse automatisieren · unternehmensprozesse automatisieren · workflow automatisierung · ki automatisierung unternehmen · automatisierung für unternehmen (von der zurückgezogenen URL geerbt) |
+| `/kosten-automatisierung` | automatisierung kosten · prozessautomatisierung kosten · automatisierung projekt kosten · automatisierungslösung preis · eng verwandte Kostenintentionen (siehe Query-Tabelle oben) |
+
+**Die Copy wird nicht auf diese Zeichenketten hin umgeschrieben.** Die Liste ist
+Messraster, nicht Textvorlage — eine Seite, die ihre Zielqueries wörtlich
+wiederholt, gewinnt keine Position und verliert Leser.
 
 ### Hypothesen
 
 - **H1 (Konsolidierung).** Zwei Seiten auf eine Kopfintention teilten die
-  Autorität. Mit einer Seite und 22 eingehenden Links statt 8 sollte der
-  Pillar in Query-Familien eintreten, in denen die Domain bisher gar nicht
-  vorkam.
-- **H2 (Substanz).** Links allein machen aus 2.746 Zeichen keinen Pillar
+  Autorität. Mit einer Seite und 20 statt 8 kontextuellen eingehenden Links
+  sollte der Pillar über seine 23 Impressionen hinauskommen.
+- **H2 (Substanz).** Links allein machen aus 6.605 Zeichen keinen Pillar
   (M3 sagte das ausdrücklich). Erst die inhaltliche Tiefe macht die Seite zu
-  einer möglichen Antwort.
-- **H3 (Kostenseite).** Die Seite steht bei Ø 16,3 und damit am dichtesten an
-  der ersten Ergebnisseite. Ein Rechner ohne Gate und ein „wann es sich nicht
-  lohnt" adressieren dieselbe Absicht direkter als eine Preisstaffel, die
-  ohnehin nicht belegt war.
+  einer möglichen Antwort auf die Kopfqueries.
+- **H3 (Kostenseite).** Fünf Queries zwischen Position 11 und 20,5, null
+  Klicks. Ein Rechner ohne Gate und ein ehrliches „wann es sich nicht lohnt"
+  adressieren diese Absicht direkter als eine Preisstaffel, die ohnehin nicht
+  belegt war.
 
-### Erfolgskriterien
+### Beobachtungsfenster und Beurteilung
 
-| Zeitpunkt | `/prozessautomatisierung` | `/kosten-automatisierung` |
-|---|---|---|
-| Tag 28 | überhaupt Impressionen auf „prozessautomatisierung" oder „geschäftsprozesse automatisieren" | Ø Position nicht schlechter als vor dem Deploy |
-| Tag 56 | Seiten-Ø unter 60 | mindestens eine Query der Familie unter Position 10 |
-| Tag 90 | mindestens eine Query der Familie unter Position 30 | ein Klick auf eine Nicht-Marken-Kostenquery |
+**Fenster: Tag 28, Tag 56 und Tag 90 nach dem Deploy**, jeweils gegen einen
+GSC-Zeitraum gleicher Länge wie die Baseline (28 Tage), damit die Zahlen
+vergleichbar sind.
+
+Beurteilt wird an vier Fragen — **nicht an Rangzielen**. „Top 3 in 28 Tagen"
+wäre eine Zahl, die niemand einlösen kann und die bei Verfehlung nur dazu
+führt, dass die nächste Messung weggelassen wird:
+
+1. **Konsolidieren die Impressionen auf den Pillar?** Bezugspunkt ist die Summe
+   der beiden Seiten vor dem Deploy (23 + 8 = 31). Liegt der Pillar danach
+   deutlich darüber, ist Autorität gewandert; liegt er darunter, ist sie
+   verloren gegangen.
+2. **Gewinnt die Kostenseite Impressionen und erste Klicks?** Sie startet bei
+   37 Impressionen und **null** Klicks. Der erste Klick auf eine
+   Nicht-Marken-Kostenquery ist das aussagekräftigste einzelne Ereignis dieses
+   Experiments.
+3. **Verbessert sich die Ø Position des Kostenclusters?** Gemessen an den fünf
+   genannten Queries einzeln, nicht am Seiten-Ø — ein Seitenmittel verdeckt
+   genau die Bewegung, auf die es ankommt.
+4. **Verschwindet die zurückgezogene URL, und wandern ihre Signale?** Erwartet
+   wird, dass `/automatisierung-unternehmen` aus dem Index fällt. Fällt sie
+   heraus, **ohne** dass der Pillar gewinnt, war die Konsolidierung ein
+   Verlustgeschäft — dann ist das der Befund, und er wird so notiert.
 
 ### Abbruch- und Warnkriterien
 
-- **Warnung:** Verliert `/kosten-automatisierung` bis Tag 28 Position, ohne dass
-  der Pillar gewinnt, ist die Intentionstrennung nicht sauber — dann zuerst die
-  Überschneidung „was kostet Prozessautomatisierung" prüfen, bevor irgendetwas
-  weiter geändert wird.
-- **Abbruch:** Erreicht bis Tag 56 keine der beiden Seiten eine Impression auf
-  einer der Zielfamilien, liegt das Problem nicht an der Struktur, sondern an
-  der Domain-Autorität insgesamt — dann greift
-  `authority-acquisition-plan.md`, nicht die nächste Seitenüberarbeitung.
+- **Warnung:** Verliert `/kosten-automatisierung` bis Tag 28 Position im
+  Kostencluster, ohne dass der Pillar gewinnt, ist die Intentionstrennung nicht
+  sauber — dann zuerst die Überschneidung „was kostet Prozessautomatisierung"
+  zwischen beiden Seiten prüfen, bevor irgendetwas weiter geändert wird.
+- **Abbruch:** Bewegt sich bis Tag 56 auf keiner der beiden Seiten etwas,
+  liegt das Problem nicht an der Struktur, sondern an der Domain-Autorität
+  insgesamt — dann greift `authority-acquisition-plan.md`, nicht die nächste
+  Seitenüberarbeitung.
 
 ### Was hier bewusst NICHT steht
 

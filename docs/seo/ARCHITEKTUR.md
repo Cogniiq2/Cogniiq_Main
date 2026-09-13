@@ -163,6 +163,14 @@ Quellenprüfung), „KI Telefonassistent PVS/Schnittstelle" (blockiert),
 **Inhaber-Entscheidung: `/automatisierung-unternehmen` wird in
 `/prozessautomatisierung` überführt.** Folgemission F2 ist damit umgesetzt.
 
+**Empirisch bestätigt (Inhaber-Abfrage `sc-domain:cogniiq.de`, Zeitraum
+2026-08-14 bis 2026-09-10):** Der Pillar stand bei 23 Impressionen auf Ø 38,43,
+die zurückgezogene Seite bei **8 Impressionen auf Ø 66,62**. Die Richtung der
+Konsolidierung ist damit nicht nur begründet, sondern gemessen — die
+aufgegebene Seite trug fast keine organische Substanz, ihr Gewicht lag in 22
+internen Links. Vollständige Baseline samt Query-Ebene und Beurteilungsfragen:
+`organic-growth-scoreboard.md` §M23.
+
 | Route | Titel-Intention | Rolle | Zeichen (vorher) | Status |
 |---|---|---|---:|---|
 | `/prozessautomatisierung` | „prozessautomatisierung", „geschäftsprozesse automatisieren", „unternehmensprozesse automatisieren", „workflow automatisierung", „ki automatisierung unternehmen" | **PILLAR** (erklärt **und** verlinkt) | 2.746 | Neu aufgebaut, Sitemap-Priorität 0.92 → **0.95** |
@@ -231,7 +239,7 @@ dieses Clusters, die heute schon in Reichweite der ersten Ergebnisseite steht.
 
 | Route | Intention | Rolle | Notiz |
 |---|---|---|---|
-| `/kosten-automatisierung` | „automatisierung kosten", „was kostet prozessautomatisierung", „automatisierung projekt kosten" | **KOSTEN** (Eigentümer) | Pos. 35,2 → 16,3 bei fallenden Impressionen · **12.09.2026 neu aufgebaut**: alle zwölf unbelegten Beträge entfernt, acht Kostentreiber, einmalig/laufend getrennt, „wann es sich NICHT lohnt", Wirtschaftlichkeitsrechner ohne Lead-Gate |
+| `/kosten-automatisierung` | „automatisierung kosten", „was kostet prozessautomatisierung", „automatisierung projekt kosten" | **KOSTEN** (Eigentümer) | 37 Impr., Ø 16,24 (2026-08-14–09-10, Inhaber-Abfrage); fünf Kostenqueries zwischen Pos. 11 und 20,5 bei null Klicks — die kürzeste Distanz zu messbarem Ergebnis im Cluster · **12.09.2026 neu aufgebaut**: alle zwölf unbelegten Beträge entfernt, acht Kostentreiber, einmalig/laufend getrennt, „wann es sich NICHT lohnt", Wirtschaftlichkeitsrechner ohne Lead-Gate |
 | `/automatisierung-arzt` | „automatisierung arztpraxis" | SEGMENT | Überlappt mit `/ki-telefonassistent-arzt` in der Terminintention |
 | `/automatisierung-restaurant` | „automatisierung restaurant/gastronomie" | SEGMENT | |
 | `/automatisierung-immobilien` | „automatisierung immobilienmakler" | SEGMENT | |

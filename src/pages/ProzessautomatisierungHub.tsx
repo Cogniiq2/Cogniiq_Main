@@ -31,7 +31,7 @@
 // der nächste Schritt ist. Die Abschnitte unten sind genau diese Fragen.
 //
 // PREIS-INTENTION BLEIBT BEI /kosten-automatisierung. Diese Seite erklärt die
-// Preislogik in vier Sätzen und verweist; eine ausgebaute Preisstrecke hier
+// Preislogik knapp und verweist; eine ausgebaute Preisstrecke hier
 // würde die Kostenseite kannibalisieren, die als einzige Seite dieses Clusters
 // heute schon in Reichweite der ersten Ergebnisseite steht.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -88,7 +88,7 @@ const GEEIGNET = [
   },
   {
     titel: "Die Regeln sind aufschreibbar",
-    text: "Wer den Ablauf in zehn Sätzen vollständig beschreiben kann, hat einen guten Kandidaten. Wenn drei Beteiligte drei Versionen erzählen, ist zuerst der Ablauf zu klären.",
+    text: "Wer den Ablauf in wenigen Sätzen vollständig beschreiben kann, hat einen guten Kandidaten. Wenn drei Beteiligte drei Versionen erzählen, ist zuerst der Ablauf zu klären.",
   },
   {
     titel: "Die Eingangsdaten sind brauchbar",
@@ -106,8 +106,17 @@ const GEEIGNET = [
 
 const UNGEEIGNET = [
   {
-    titel: "Der Vorgang kommt selten vor",
-    text: "Was zwölfmal im Jahr passiert, holt die Investition kaum herein. Der Aufwand für Aufnahme, Tests und Betrieb bleibt derselbe wie bei einem täglichen Ablauf.",
+    /*
+      KEINE HÄUFIGKEITSSCHWELLE. Hier stand „Was zwölfmal im Jahr passiert, holt
+      die Investition kaum herein" — eine erfundene Grenze, die als allgemeine
+      Regel wirtschaftlich falsch ist. Häufigkeit allein entscheidet nichts: Ein
+      Vorgang, der viermal im Jahr läuft, dabei aber zwei Tage Facharbeit bindet,
+      teuer ist oder fehlerkritisch, kann sich tragen — und ein täglicher
+      Trivialvorgang eine große Umsetzung nicht rechtfertigen. Was zählt, ist
+      Aufwand × Wert × Risiko je Durchlauf gegen Investition und laufende Kosten.
+    */
+    titel: "Selten — und je Durchlauf klein",
+    text: "Je seltener ein Vorgang vorkommt und je geringer der Aufwand pro Durchlauf ist, desto schwieriger trägt sich eine Automatisierung: Aufnahme, Tests und Betrieb kosten dasselbe wie bei einem täglichen Ablauf. Selten allein ist aber kein Ausschlusskriterium — ein einzelner Vorgang kann sehr zeitaufwendig, teuer oder fehlerkritisch sein. Entscheidend ist die Rechnung mit den konkreten Zahlen.",
   },
   {
     titel: "Die Regeln ändern sich ständig",
@@ -778,7 +787,7 @@ export function ProzessautomatisierungHub() {
         <Abschnitt
           id="kosten"
           titel="Was es kostet"
-          lead="Die ausführliche Antwort steht auf der Kostenseite — hier die Logik in vier Sätzen."
+          lead="Die ausführliche Antwort steht auf der Kostenseite — hier die Logik in Kürze."
           dunkel
         >
           <motion.div

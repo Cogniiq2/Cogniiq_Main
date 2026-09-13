@@ -79,7 +79,7 @@ const H1 = "Was kostet Prozessautomatisierung?";
 const KOSTENTREIBER = [
   {
     titel: "Wie eindeutig der Ablauf beschreibbar ist",
-    text: "Ein Ablauf, den Sie in zehn Sätzen vollständig aufschreiben können, ist günstig zu automatisieren. Einer, bei dem drei Personen drei verschiedene Versionen erzählen, wird zuerst zu einer Klärungsaufgabe — und die kostet Zeit, bevor eine Zeile Konfiguration entsteht.",
+    text: "Ein Ablauf, den Sie in wenigen Sätzen vollständig aufschreiben können, liegt am günstigen Ende. Einer, bei dem drei Personen drei verschiedene Versionen erzählen, wird zuerst zu einer Klärungsaufgabe — und die kostet Zeit, bevor eine Zeile Konfiguration entsteht.",
   },
   {
     titel: "Zahl und Art der Entscheidungspunkte",
@@ -143,8 +143,13 @@ const UMFAENGE = [
 
 const NICHT_SINNVOLL = [
   {
+    /*
+      KEINE HÄUFIGKEITSSCHWELLE — siehe die gleichlautende Korrektur auf
+      /prozessautomatisierung. „Zwölfmal im Jahr" war eine erfundene Grenze.
+      Häufigkeit ist ein Faktor der Rechnung, nicht ihr Ergebnis.
+    */
     titel: "Der Vorgang kommt selten vor",
-    text: "Ein Ablauf, der zwölfmal im Jahr läuft, holt selbst eine kleine Investition kaum herein. Wer ihn trotzdem automatisiert, kauft Bequemlichkeit — das ist legitim, aber es ist keine Wirtschaftlichkeitsrechnung.",
+    text: "Bei seltenen Vorgängen ist die Wirtschaftlichkeit besonders genau zu prüfen. Entscheidend ist nicht die Häufigkeit allein, sondern Aufwand, Wert und Risiko je Durchlauf im Verhältnis zu Investition und laufenden Kosten. Ein seltener, aber sehr aufwendiger oder fehlerkritischer Vorgang kann sich tragen. Der Rechner weiter unten bildet genau diesen Vergleich mit Ihren Zahlen ab.",
   },
   {
     titel: "Die Regeln ändern sich ständig",
@@ -686,7 +691,7 @@ export function KostenAutomatisierung() {
         <Abschnitt
           id="dagegen"
           titel="Wann sich Automatisierung nicht lohnt"
-          lead="Sechs Fälle, in denen die ehrliche Antwort nein lautet. Wer sie kennt, spart sich ein Projekt, das niemandem nützt — und erkennt umgekehrt schneller, welcher seiner Abläufe der richtige ist."
+          lead="Sechs Fälle, in denen die ehrliche Antwort nein lautet oder die Rechnung sehr genau zu prüfen ist. Wer sie kennt, spart sich ein Projekt, das niemandem nützt — und erkennt umgekehrt schneller, welcher seiner Abläufe der richtige ist."
         >
           <div className="grid md:grid-cols-2 gap-4">
             {NICHT_SINNVOLL.map((n, i) => (
