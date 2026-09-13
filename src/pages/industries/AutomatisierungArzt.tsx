@@ -80,7 +80,7 @@ const config: NationalIndustryPageConfig = {
     { label: "Automatisierung München", href: "/muenchen/automatisierung" },
     { label: "Automatisierung Regensburg", href: "/regensburg/automatisierung" },
     { label: "Automatisierung Bayern", href: "/bayern" },
-    { label: "Automatisierung Deutschland", href: "/automatisierung-unternehmen" },
+    { label: "Automatisierung Deutschland", href: "/prozessautomatisierung" },
   ],
   relatedLinks: [
     // Der Pillar der Automatisierungs-Intention, den die Branchenseiten bis

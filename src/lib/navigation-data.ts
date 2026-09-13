@@ -91,7 +91,7 @@ export const LEISTUNGEN: NavLeistung[] = [
   {
     key: "automatisierung",
     label: "Automatisierung",
-    href: "/automatisierung-unternehmen",
+    href: "/prozessautomatisierung",
     claim: "Wiederkehrende Abläufe laufen ohne Handarbeit.",
     nischen: [
       { label: "Für Arztpraxen", href: "/automatisierung-arzt" },
@@ -145,7 +145,12 @@ export const AKTIV_PRAEFIXE = {
   leistungen: [
     "/ki-telefonassistent",
     "/webdesign",
+    // Beide Schreibweisen: die Branchenseiten heißen /automatisierung-<branche>,
+    // der Pillar seit der Konsolidierung vom 12.09.2026 /prozessautomatisierung.
+    // Ohne die zweite Zeile verlöre der Pillar seine eigene Hervorhebung in der
+    // Navigation — ausgerechnet die Seite, auf die sie jetzt zeigt.
     "/automatisierung",
+    "/prozessautomatisierung",
     "/kosten-",
     "/leistungen",
     "/praxen",

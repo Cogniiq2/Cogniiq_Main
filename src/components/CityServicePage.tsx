@@ -725,7 +725,7 @@ function CTASection({ config }: { config: CityServiceConfig }) {
             <span aria-hidden="true">·</span>
             <Link to="/webdesign-agentur-deutschland" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Webdesign Agentur</Link>
             <span aria-hidden="true">·</span>
-            <Link to="/automatisierung-unternehmen" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Automatisierung</Link>
+            <Link to={config.legacyAutomationLink ?? "/prozessautomatisierung"} className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Automatisierung</Link>
             <span aria-hidden="true">·</span>
             <Link to="/verpasste-anrufe-verlust" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Verpasste Anrufe</Link>
             <span aria-hidden="true">·</span>

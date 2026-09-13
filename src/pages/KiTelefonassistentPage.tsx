@@ -1883,7 +1883,7 @@ function InternalLinksSection() {
         { label: "Was ein KI Telefonassistent kostet", href: "/kosten-ki-telefonassistent" },
         { label: "Anbindung an bestehende Systeme", href: "/integrationen" },
         { label: "Was verpasste Anrufe kosten", href: "/verpasste-anrufe-verlust" },
-        { label: "Automatisierung für Unternehmen", href: "/automatisierung-unternehmen" },
+        { label: "Automatisierung für Unternehmen", href: "/prozessautomatisierung" },
       ],
     },
   ];

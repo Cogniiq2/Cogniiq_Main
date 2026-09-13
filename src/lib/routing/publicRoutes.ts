@@ -177,11 +177,18 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/prozessautomatisierung",
-    title: "Prozessautomatisierung für Unternehmen | KI-Workflows – Cogniiq",
-    description: "Cogniiq automatisiert wiederkehrende Prozesse: Buchungen, Lead-Nachverfolgung, E-Mail-Workflows und mehr. Weniger manuelle Arbeit, mehr Kapazität für das Wesentliche.",
-    keywords: "Prozessautomatisierung, KI Automatisierung, Workflow Automatisierung, AI Workflows, Automatisierung Unternehmen",
+    /*
+      Kanonischer Eigentümer der nationalen Automatisierungs-Kopfintention seit
+      der Konsolidierung vom 12.09.2026: /automatisierung-unternehmen ist per
+      301 hierher überführt (src/lib/routing/legacyRedirects.ts). Priorität auf
+      0.95 angehoben — sie stand auf 0.92 neben der 0.90 der zurückgezogenen
+      Seite; jetzt gibt es nur noch diese eine, und sie ist Geschäftspriorität 2.
+    */
+    title: "Prozessautomatisierung für Unternehmen | Abläufe automatisieren – Cogniiq",
+    description: "Welche Prozesse sich automatisieren lassen, welche nicht, wie Ausnahmen und Schnittstellen behandelt werden und wie eine Umsetzung abläuft. Prozessautomatisierung für Unternehmen in Deutschland.",
+    keywords: "Prozessautomatisierung, Geschäftsprozesse automatisieren, Unternehmensprozesse automatisieren, KI Automatisierung Unternehmen, Workflow Automatisierung, Automatisierung für Unternehmen",
     indexable: true,
-    sitemap: { lastmod: "2026-06-30", changefreq: "monthly", priority: "0.92" },
+    sitemap: { lastmod: "2026-09-12", changefreq: "monthly", priority: "0.95" },
   },
   {
     path: "/webdesign-agentur-deutschland",
@@ -198,14 +205,6 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
     keywords: "KI Agentur Deutschland, AI Agentur Deutschland, KI Systeme Unternehmen, Artificial Intelligence Deutschland",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.92" },
-  },
-  {
-    path: "/automatisierung-unternehmen",
-    title: "Automatisierung für Unternehmen | KI-gestützte Workflows – Cogniiq",
-    description: "Automatisieren Sie wiederkehrende Aufgaben in Ihrem Unternehmen. Cogniiq entwickelt KI-gestützte Workflows für Gastronomie, Praxen, Immobilien und Handwerk.",
-    keywords: "Automatisierung Unternehmen, KI Workflows, Business Automation, Prozessoptimierung KI",
-    indexable: true,
-    sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.90" },
   },
   {
     path: "/ki-telefonassistent/demo",
@@ -699,11 +698,16 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/kosten-automatisierung",
-    title: "Automatisierung Kosten – Was kostet Prozessautomatisierung? | Cogniiq",
-    description: "Realistische Kostenübersicht für Prozessautomatisierung: von einfachen Workflows bis zu komplexen KI-Systemen. ROI und Amortisierungszeiten für verschiedene Unternehmensgrößen.",
-    keywords: "Automatisierung Kosten, Prozessautomatisierung Preis, KI Automation Kosten, Workflow Automatisierung Kosten",
+    // Titel und Description neu am 12.09.2026: Die alte Fassung versprach eine
+    // „Kostenübersicht" samt „Amortisierungszeiten", und die Seite lieferte
+    // dafür unbestätigte Beträge. Beides ist entfernt (siehe
+    // docs/seo/preisaudit-automatisierung.md); der Titel nennt jetzt, was die
+    // Seite wirklich hat — die Preistreiber und einen Rechner.
+    title: "Was kostet Prozessautomatisierung? Kosten, Preistreiber & Rechner | Cogniiq",
+    description: "Was eine Prozessautomatisierung kostet, hängt an Ausnahmen, Schnittstellen und Absicherung. Alle Preistreiber erklärt, einmalige und laufende Kosten getrennt — plus Rechner für Ihren Prozess.",
+    keywords: "Automatisierung Kosten, Prozessautomatisierung Kosten, Automatisierung Preis, Workflow Automatisierung Kosten, Automatisierung Projekt Kosten",
     indexable: true,
-    sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.88" },
+    sitemap: { lastmod: "2026-09-12", changefreq: "monthly", priority: "0.88" },
   },
 
   // ─── PROBLEM-BASED LANDING PAGES ─────────────────────────────────────────────

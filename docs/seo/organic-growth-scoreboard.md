@@ -873,3 +873,159 @@ auf Inhaltsarbeit. Die Liste steht in `docs/seo/ARCHITEKTUR.md` §7.
 - **`src/pages/pillars/AutomatisierungUnternehmen.tsx:278`** („zur vollständig
   automatisierten Geschäftsstruktur") bleibt stehen — Grenzfall, gehört in eine
   Copy-Prüfung und nicht in einen Architekturlauf.
+
+---
+
+## M23 · Automatisierungs-Cluster konsolidiert (12.09.2026)
+
+Branch `claude/prozessautomatisierung-pillar-max-2026-09-12`, Basis `56707c2`.
+Setzt Folgemission **F2** aus `ARCHITEKTUR.md` §4.1 um. **Tag 0 der Messung ist
+der Deploy dieses Branches**, nicht dieses Datum.
+
+### Baseline — vom Inhaber aus der Search Console erhoben (13.09.2026)
+
+**Herkunft, damit sie nicht später verwechselt wird.** Die Zahlen unten hat der
+**Inhaber** im Owner-Review aus der verbundenen Search-Console-Property
+`sc-domain:cogniiq.de` abgefragt und weitergegeben. **Claude hat die Search
+Console nicht abgefragt** — im Umsetzungsdurchgang vom 12.09.2026 stand dort
+weder ein API-Zugang noch ein Export zur Verfügung, und die damalige Fassung
+dieses Abschnitts führte deshalb nur übernommene Werte aus `ARCHITEKTUR.md` §4.
+Diese Fassung ersetzt sie durch gemessene.
+
+**Zeitraum: 2026-08-14 bis 2026-09-10**, letzter vollständig abgeschlossener
+Zeitraum zum Zeitpunkt der Abfrage. Jede Zahl unten gilt für genau dieses
+Fenster; ein späterer Vergleich, der ein anderes Fenster benutzt, ist kein
+Vergleich.
+
+#### Seiten
+
+| URL | Klicks | Impressionen | Ø Position |
+|---|---:|---:|---:|
+| `/prozessautomatisierung` | 0 | **23** | **38,43** |
+| `/automatisierung-unternehmen` (zurückgezogen) | 0 | **8** | **66,62** |
+| `/kosten-automatisierung` | 0 | **37** | **16,24** |
+
+**Die Zeile der zurückgezogenen URL bleibt dauerhaft stehen.** 8 Impressionen
+bei Position 66,62 sind der Maßstab, an dem sich nach dem 301 beurteilen lässt,
+ob Signale gewandert sind oder nur verschwunden. Eine URL, deren Historie mit
+ihr gelöscht wird, macht genau diese Frage unbeantwortbar.
+
+**Was die Zahlen bestätigen.** Der Pillar stand bei 23 Impressionen auf Position
+38,43 — sichtbar, aber weit von der ersten Ergebnisseite. Die zurückgezogene
+Seite hatte mit 8 Impressionen auf 66,62 tatsächlich **fast keine organische
+Substanz**: Ihr Gewicht lag in 22 internen Links, nicht in Rankings. Das ist die
+empirische Bestätigung dafür, dass die Konsolidierungsrichtung (Pillar behalten,
+die andere zurückziehen) die richtige war — die stärkere Seite überlebt.
+
+#### Queries der Kostenseite (dasselbe Fenster)
+
+| Query | Impressionen | Klicks | Ø Position |
+|---|---:|---:|---:|
+| `automatisierung kosten` | 12 | 0 | **13,0** |
+| `automatisierung projekt kosten` | 6 | 0 | **17,17** |
+| `automatisierungstechnik kosten` | 4 | 0 | **15,5** |
+| `automatisierungslösung preis` | 2 | 0 | **20,5** |
+| `welche kosten sind mit automatisierungstechnologien verbunden?` | 2 | 0 | **11,0** |
+| `automatisierung überall preis` | 4 | 0 | 34,25 |
+| `automatisierung preisauszeichnung` | 1 | 0 | 14,0 |
+
+**Warum das die Reihenfolge der Arbeit rechtfertigt.** Fünf Kostenqueries stehen
+zwischen Position 11 und 20,5 — also am Fuß der ersten Ergebnisseite, bei null
+Klicks. Das ist die kürzeste Distanz zu messbarem Ergebnis, die dieses Cluster
+hat, und der Grund, warum die Kostenseite in diesem Durchgang eine eigene
+Überarbeitung samt Rechner bekommen hat statt nur eines Linkumbaus.
+
+**Zwei Einschränkungen, die dabei mitzudenken sind.** Erstens sind das
+zweistellige Impressionszahlen: Positionsangaben aus 2–12 Impressionen
+schwanken stark und tragen keine Feinsteuerung. Zweitens ist
+`automatisierungstechnik kosten` erkennbar **Industrieautomatisierung** —
+eine andere Branche. Diese Query wird beobachtet, aber die Seite wird **nicht**
+auf sie hin getextet; ein Klick von dort wäre kein qualifizierter Besucher.
+
+### Was geändert wurde
+
+1. **301** `/automatisierung-unternehmen` → `/prozessautomatisierung` (beide
+   Formen, mit und ohne Schrägstrich). Alte Route aus Manifest, Router und
+   Sitemap entfernt, Seitenkomponente gelöscht.
+2. **16 interne Links** auf die alte URL umgestellt (Navigation, Footer,
+   Desktop-Hero, vier Branchenseiten, vier Problemseiten, zwei Pillar-Seiten,
+   Scan-Seite, Kostenseite, Organisationsschema, KI-Flaggschiff). Eine
+   verbleibende Ausnahme auf der eingefrorenen Route `/bayreuth/webdesign`
+   (§4.1).
+3. **Hauptnavigation**: Der Automatisierungs-Einstieg zeigt jetzt auf den
+   Pillar statt auf die zurückgezogene Seite.
+4. **Pillar neu aufgebaut**: von 2.746 auf rund 16.000 Zeichen, sechzehn
+   Käuferfragen, sechs Ablaufmuster, elf Umsetzungsschritte, ein Abschnitt
+   „was nicht automatisiert gehört" und einer zur Ausnahmebehandlung.
+5. **Kostenseite neu aufgebaut**: zwölf unbelegte Beträge entfernt
+   (`preisaudit-automatisierung.md`), acht Kostentreiber, einmalig und laufend
+   getrennt, „wann es sich NICHT lohnt", und ein Wirtschaftlichkeitsrechner
+   ohne Lead-Gate.
+
+### Zielquery-Familien
+
+| Seite | Primärcluster |
+|---|---|
+| `/prozessautomatisierung` | prozessautomatisierung · prozessautomatisierung für unternehmen · geschäftsprozesse automatisieren · unternehmensprozesse automatisieren · workflow automatisierung · ki automatisierung unternehmen · automatisierung für unternehmen (von der zurückgezogenen URL geerbt) |
+| `/kosten-automatisierung` | automatisierung kosten · prozessautomatisierung kosten · automatisierung projekt kosten · automatisierungslösung preis · eng verwandte Kostenintentionen (siehe Query-Tabelle oben) |
+
+**Die Copy wird nicht auf diese Zeichenketten hin umgeschrieben.** Die Liste ist
+Messraster, nicht Textvorlage — eine Seite, die ihre Zielqueries wörtlich
+wiederholt, gewinnt keine Position und verliert Leser.
+
+### Hypothesen
+
+- **H1 (Konsolidierung).** Zwei Seiten auf eine Kopfintention teilten die
+  Autorität. Mit einer Seite und 20 statt 8 kontextuellen eingehenden Links
+  sollte der Pillar über seine 23 Impressionen hinauskommen.
+- **H2 (Substanz).** Links allein machen aus 6.605 Zeichen keinen Pillar
+  (M3 sagte das ausdrücklich). Erst die inhaltliche Tiefe macht die Seite zu
+  einer möglichen Antwort auf die Kopfqueries.
+- **H3 (Kostenseite).** Fünf Queries zwischen Position 11 und 20,5, null
+  Klicks. Ein Rechner ohne Gate und ein ehrliches „wann es sich nicht lohnt"
+  adressieren diese Absicht direkter als eine Preisstaffel, die ohnehin nicht
+  belegt war.
+
+### Beobachtungsfenster und Beurteilung
+
+**Fenster: Tag 28, Tag 56 und Tag 90 nach dem Deploy**, jeweils gegen einen
+GSC-Zeitraum gleicher Länge wie die Baseline (28 Tage), damit die Zahlen
+vergleichbar sind.
+
+Beurteilt wird an vier Fragen — **nicht an Rangzielen**. „Top 3 in 28 Tagen"
+wäre eine Zahl, die niemand einlösen kann und die bei Verfehlung nur dazu
+führt, dass die nächste Messung weggelassen wird:
+
+1. **Konsolidieren die Impressionen auf den Pillar?** Bezugspunkt ist die Summe
+   der beiden Seiten vor dem Deploy (23 + 8 = 31). Liegt der Pillar danach
+   deutlich darüber, ist Autorität gewandert; liegt er darunter, ist sie
+   verloren gegangen.
+2. **Gewinnt die Kostenseite Impressionen und erste Klicks?** Sie startet bei
+   37 Impressionen und **null** Klicks. Der erste Klick auf eine
+   Nicht-Marken-Kostenquery ist das aussagekräftigste einzelne Ereignis dieses
+   Experiments.
+3. **Verbessert sich die Ø Position des Kostenclusters?** Gemessen an den fünf
+   genannten Queries einzeln, nicht am Seiten-Ø — ein Seitenmittel verdeckt
+   genau die Bewegung, auf die es ankommt.
+4. **Verschwindet die zurückgezogene URL, und wandern ihre Signale?** Erwartet
+   wird, dass `/automatisierung-unternehmen` aus dem Index fällt. Fällt sie
+   heraus, **ohne** dass der Pillar gewinnt, war die Konsolidierung ein
+   Verlustgeschäft — dann ist das der Befund, und er wird so notiert.
+
+### Abbruch- und Warnkriterien
+
+- **Warnung:** Verliert `/kosten-automatisierung` bis Tag 28 Position im
+  Kostencluster, ohne dass der Pillar gewinnt, ist die Intentionstrennung nicht
+  sauber — dann zuerst die Überschneidung „was kostet Prozessautomatisierung"
+  zwischen beiden Seiten prüfen, bevor irgendetwas weiter geändert wird.
+- **Abbruch:** Bewegt sich bis Tag 56 auf keiner der beiden Seiten etwas,
+  liegt das Problem nicht an der Struktur, sondern an der Domain-Autorität
+  insgesamt — dann greift `authority-acquisition-plan.md`, nicht die nächste
+  Seitenüberarbeitung.
+
+### Was hier bewusst NICHT steht
+
+Keine Signifikanzaussage. Zwei Seiten mit dreistelligen Impressionen tragen
+keine statistische Auswertung; was hier gemessen wird, ist Richtung und
+Größenordnung, nicht Signifikanz. Und **keine Erfolgsmeldung vor Tag 28**
+(Regel 1).

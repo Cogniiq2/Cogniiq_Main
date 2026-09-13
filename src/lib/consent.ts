@@ -341,7 +341,17 @@ export type ConversionEvent =
   | 'price_calculator_started'
   | 'price_calculator_completed'
   | 'roi_calculator_started'
-  | 'roi_calculator_completed';
+  | 'roi_calculator_completed'
+  // Der Wirtschaftlichkeitsrechner auf /kosten-automatisierung. Eigene Namen
+  // statt der generischen `roi_calculator_*`, weil sonst zwei Rechner mit
+  // verschiedenen Eingaben in einer Kennzahl zusammenfielen und keine Auswertung
+  // sie wieder trennen könnte. Auch hier gilt: gemeldet wird DASS gerechnet
+  // wurde. Stunden, Stundensätze, Investitionssummen, laufende Kosten,
+  // Reduktionsanteile, Nettoeffekt und Amortisationsdauer sind Geschäftszahlen
+  // des Besuchers und verlassen den Browser nicht.
+  | 'automation_roi_started'
+  | 'automation_roi_completed'
+  | 'automation_cta_clicked';
 
 export function trackEvent(event: ConversionEvent, label?: string) {
   if (typeof window === 'undefined') return;

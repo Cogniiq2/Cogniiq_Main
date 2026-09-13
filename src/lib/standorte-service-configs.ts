@@ -297,6 +297,9 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     service: "Webdesign",
     serviceSlug: "webdesign",
     route: "/bayreuth/webdesign",
+    // Eingefrorenes Suchexperiment: siehe `legacyAutomationLink` in
+    // src/lib/standorte-data.ts. Einzige Seite mit dieser Ausnahme.
+    legacyAutomationLink: "/automatisierung-unternehmen",
     seo: {
       title: "Webdesign Agentur Bayreuth – Website erstellen & SEO | Cogniiq",
       description: "Webdesign Bayreuth: Individuelle Websites für lokale Unternehmen. Schnell, SEO-optimiert, Mobile-First. Keine Templates – professionelle Webentwicklung mit lokalem Ansprechpartner.",

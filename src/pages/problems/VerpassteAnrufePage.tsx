@@ -64,7 +64,7 @@ const config: ProblemPageConfig = {
     { label: "KI Telefonassistent Arztpraxis", href: "/ki-telefonassistent-arzt" },
     { label: "KI Telefonassistent Kosten", href: "/kosten-ki-telefonassistent" },
     { label: "KI Agentur Deutschland", href: "/ki-agentur-deutschland" },
-    { label: "Automatisierung Unternehmen", href: "/automatisierung-unternehmen" },
+    { label: "Automatisierung Unternehmen", href: "/prozessautomatisierung" },
     { label: "Kontakt", href: "/kontakt" },
   ],
 };

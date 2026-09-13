@@ -42,6 +42,35 @@
 #      every unknown URL with the homepage shell at HTTP 200, which turned the
 #      entire unknown URL space into a soft 404.
 
+# ── RETIRED ROUTES -> 301 ────────────────────────────────────────────────────
+# One line pair per entry in src/lib/routing/legacyRedirects.ts, which explains
+# WHY each URL was retired. .github/scripts/test-seo-consistency.mjs holds the
+# two files in agreement and additionally asserts that no target is itself a
+# source (no redirect chain), that every target is an indexable manifest route,
+# and that no source survives in public/sitemap.xml.
+#
+# WHY EACH SOURCE APPEARS TWICE. Cloudflare answers the trailing-slash variant
+# of a LIVE route with its own 307 to the canonical form, so "/route/" resolves.
+# A retired route has no file left to resolve to, so without the second rule
+# "/automatisierung-unternehmen/" would answer 404 — and any crawler or link
+# that ever recorded the slashed variant would hit a dead end instead of
+# following the 301. Both forms are listed rather than relying on a splat: a
+# splat would also swallow "/automatisierung-unternehmen/anything".
+#
+# WHY THESE SIT FIRST. First matching rule wins, and Cloudflare evaluates rules
+# above any splat faster (it says so on startup). The private-shell rules below
+# address disjoint paths, so nothing here can shadow them.
+#
+# They are only consulted because the retired route is no longer prerendered: a
+# static file still on disk is served before any rule here, which is why
+# retiring a route means removing it from PUBLIC_ROUTES, not merely adding a
+# rule.
+#
+# 301, not 302: the point is to move the signal permanently.
+
+/automatisierung-unternehmen    /prozessautomatisierung   301
+/automatisierung-unternehmen/   /prozessautomatisierung   301
+
 /app                /app-shell     200
 /app/*              /app-shell     200
 /admin              /app-shell     200

@@ -59,7 +59,7 @@ const config: ProblemPageConfig = {
     // hatte vor dieser Änderung keinen einzigen kontextuellen eingehenden Link —
     // nur Navigation und Footer (docs/seo/ARCHITEKTUR.md).
     { label: "Prozessautomatisierung", href: "/prozessautomatisierung" },
-    { label: "Automatisierung für Unternehmen", href: "/automatisierung-unternehmen" },
+    { label: "Automatisierung für Unternehmen", href: "/prozessautomatisierung" },
     { label: "Automatisierung Kosten", href: "/kosten-automatisierung" },
     { label: "KI Agentur Deutschland", href: "/ki-agentur-deutschland" },
     { label: "Zu viel manuelle Arbeit", href: "/zu-viel-manuelle-arbeit" },

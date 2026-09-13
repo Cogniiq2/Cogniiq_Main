@@ -63,7 +63,7 @@ const config: ProblemPageConfig = {
   serviceLinks: [
     { label: "KI Telefonassistent", href: "/ki-telefonassistent" },
     { label: "KI Telefonassistent Arztpraxis", href: "/ki-telefonassistent-arzt" },
-    { label: "Automatisierung Unternehmen", href: "/automatisierung-unternehmen" },
+    { label: "Automatisierung Unternehmen", href: "/prozessautomatisierung" },
     { label: "KI Telefonassistent Kosten", href: "/kosten-ki-telefonassistent" },
     { label: "Webdesign mit Terminbuchung", href: "/leistungen" },
     { label: "Kontakt", href: "/kontakt" },

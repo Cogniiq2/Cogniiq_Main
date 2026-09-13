@@ -109,7 +109,7 @@ export const SERVICES = [
     name: "Prozessautomatisierung",
     description: "Automatisierte Workflows für Buchungen, Lead-Nachverfolgung und Geschäftsprozesse – damit manuelle Arbeit aufhört, Zeit zu kosten.",
     category: "AI Automation",
-    url: `${BUSINESS_INFO.website}/automatisierung-unternehmen`,
+    url: `${BUSINESS_INFO.website}/prozessautomatisierung`,
   },
   {
     id: "ai-receptionist",

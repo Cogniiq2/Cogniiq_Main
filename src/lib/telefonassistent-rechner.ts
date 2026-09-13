@@ -34,17 +34,17 @@ import { FAKTEN, SPRACHEN_PREISE, TARIFE, type Tarif } from "@/lib/telefonassist
 
 /** Minuten pro Stunde — benannt, damit die Formeln lesbar bleiben. */
 const MINUTEN_PRO_STUNDE = 60;
-const MONATE_PRO_JAHR = 12;
 
-/**
- * Wochen je Monat. EINE Zahl für das ganze Projekt.
- *
- * Vorher standen 4,3 (Startseite) und 4,33 (Praxis-Rechner) nebeneinander.
- * Zwei Rechner, dieselbe Eingabe, zwei Ergebnisse — genau die Sorte stiller
- * Widerspruch, die ein Besucher findet, wenn er beide Seiten öffnet. 4,33 ist
- * der genauere Wert (365 ÷ 7 ÷ 12 = 4,345); er gilt ab hier überall.
- */
-export const WOCHEN_PRO_MONAT = 4.33;
+/*
+  Wochen je Monat und Monate je Jahr stehen seit dem 12.09.2026 in
+  `src/lib/zeitrechnung.ts` — einem Modul ohne Abhängigkeiten, das auch der
+  Automatisierungs-Rechner liest, ohne dafür das Preismodell des
+  Telefonassistenten mitzuladen. Hier unverändert weiterexportiert, damit für
+  bestehende Aufrufer und Tests nichts umzuschreiben ist; die Zahl selbst steht
+  weiterhin an genau einer Stelle.
+*/
+export { WOCHEN_PRO_MONAT } from "@/lib/zeitrechnung";
+import { MONATE_PRO_JAHR, WOCHEN_PRO_MONAT } from "@/lib/zeitrechnung";
 
 /** Wochenaufkommen in Monatsaufkommen. Ein Ort, eine Umrechnung. */
 export function anrufeProMonatAusWoche(anrufeProWoche: number): number {

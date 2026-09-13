@@ -498,10 +498,6 @@ const KiAgenturDeutschland = lazyNamed(
   () => import('./pages/pillars/KiAgenturDeutschland'),
   'KiAgenturDeutschland'
 );
-const AutomatisierungUnternehmen = lazyNamed(
-  () => import('./pages/pillars/AutomatisierungUnternehmen'),
-  'AutomatisierungUnternehmen'
-);
 
 // Legal pages
 const ImpressumPage = lazyNamed(() => import('./pages/legal/ImpressumPage'), 'ImpressumPage');
@@ -759,7 +755,6 @@ export function AppInner() {
 
       <Route path="/webdesign-agentur-deutschland" element={<WebdesignAgenturDeutschland />} />
       <Route path="/ki-agentur-deutschland" element={<KiAgenturDeutschland />} />
-      <Route path="/automatisierung-unternehmen" element={<AutomatisierungUnternehmen />} />
 
       <Route path="/impressum" element={<ImpressumPage />} />
       <Route path="/datenschutz" element={<DatenschutzPage />} />

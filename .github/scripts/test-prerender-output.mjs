@@ -13,6 +13,16 @@ import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
+// Retired-route declarations and the trailing-slash contract that reads them
+// live in one shared module, so this gate and test-seo-consistency.mjs cannot
+// disagree about the same line again. See that file's header for the conflict
+// this was extracted from.
+import {
+  LEGACY_REDIRECTS_SOURCE,
+  checkNetlifyTrailingSlashRules,
+  parseLegacyRedirects,
+} from '../../scripts/lib/legacy-redirect-rules.mjs';
+
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DIST = join(ROOT, 'dist');
 
@@ -326,14 +336,38 @@ for (const route of report.routes) {
       ok(`Netlify mode: exactly one forced 200 rewrite for each of ${nonRoot.length} non-root public routes`);
     }
 
-    // No trailing-slash canonicalisation may be generated: Netlify states
-    // redirects cannot reliably add or remove a trailing slash, and a forced
-    // "/route/ -> /route" rule can loop.
-    const slashRules = rules.filter((r) => r[0].endsWith('/') && r[0] !== '/' && r[0] !== '/*');
+    // Trailing-slash rules: forbidden as CANONICALISATION, required as MIGRATION.
+    //
+    // The ban is unchanged for what it was written against — a generated
+    // "/live-route/ -> /live-route" rule. Netlify documents that redirects
+    // cannot reliably add or remove a trailing slash, and such a rule can loop.
+    // A live route's slashed variant is consolidated by its canonical tag
+    // instead, which is why none may be generated.
+    //
+    // What the ban never meant to catch is the slashed form of a RETIRED route.
+    // There is no live document to canonicalise to; without the rule the
+    // slashed variant answers 404 and the migration loses exactly the old
+    // backlinks it exists to carry. That case is allowed only when the
+    // declaration in legacyRedirects.ts backs it, and it is then held to the
+    // full contract — declared target, plain 301, not forced, non-slash twin
+    // present and identical, no chain.
+    //
+    // The rule itself is NOT special-cased here: the check reads the
+    // declaration, so a future entry is covered automatically and an
+    // undeclared slashed rule keeps failing.
+    const legacyPairs = parseLegacyRedirects(read(join(ROOT, LEGACY_REDIRECTS_SOURCE)));
+    const slashFailures = checkNetlifyTrailingSlashRules(rules, legacyPairs);
+    const declaredSlashRules = rules.filter(
+      (r) => r[0].endsWith('/') && r[0] !== '/' && r[0] !== '/*'
+    ).length;
     const forcedRedirects = rules.filter((r) => /^30[128]!$/.test(r[2] || ''));
-    if (slashRules.length) fail(`generated trailing-slash rules must not exist: ${slashRules.map((r) => r[0]).join(', ')}`);
+    if (slashFailures.length) for (const f of slashFailures) fail(f);
     else if (forcedRedirects.length) fail(`forced redirect rules must not exist: ${forcedRedirects.map((r) => r[0]).join(', ')}`);
-    else ok('Netlify mode: no trailing-slash rules and no forced redirects generated');
+    else {
+      ok(
+        `Netlify mode: no generated trailing-slash canonicalisation rules; ${declaredSlashRules} declared legacy 301 migration(s) valid; no forced redirects`
+      );
+    }
 
     if (report.generatedNetlifyRules !== nonRoot.length) {
       fail(`report says ${report.generatedNetlifyRules} generated rules, expected ${nonRoot.length}`);

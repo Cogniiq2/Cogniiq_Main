@@ -1,5 +1,117 @@
 # COPY-SEO-CHANGELOG — Copy Overhaul KI-Telefonassistent-Cluster
 
+## 2026-09-13 — Korrektur: die Häufigkeitsschwelle war selbst eine erfundene Zahl
+
+Aus dem Inhaber-Review am Durchgang vom 12.09.2026. Beim Entfernen von zwölf
+unbelegten Beträgen war eine **neue** unbelegte Zahl entstanden — in der Liste
+„was nicht automatisiert gehört":
+
+- `/prozessautomatisierung`: „Was zwölfmal im Jahr passiert, holt die
+  Investition kaum herein."
+- `/kosten-automatisierung`: „Ein Ablauf, der zwölfmal im Jahr läuft, holt
+  selbst eine kleine Investition kaum herein."
+
+**Warum das falsch war.** Häufigkeit allein entscheidet über Wirtschaftlichkeit
+gar nichts. Ein Vorgang, der viermal im Jahr läuft, dabei aber Facharbeit
+bindet, hohen Wert trägt oder fehlerkritisch ist, kann sich tragen — und ein
+täglicher Trivialvorgang eine große Umsetzung nicht rechtfertigen. „Zwölfmal"
+war eine Grenze ohne Grundlage, also derselbe Fehlertyp wie die Beträge, die
+einen Tag zuvor entfernt worden waren, nur in der Gegenrichtung: Sie hätte
+Vorhaben abgeschreckt, die sich gerechnet hätten.
+
+**Was jetzt dort steht.** Seltenheit ist ein Faktor der Rechnung, nicht ihr
+Ergebnis. Beide Seiten sagen das jetzt ausdrücklich — und verweisen auf die
+einzige Instanz, die es entscheiden kann: den Rechner mit den Zahlen des
+Besuchers.
+
+Im selben Zug zwei kleinere Zahlen derselben Art ersetzt: „in zehn Sätzen
+vollständig aufschreiben" → „in wenigen Sätzen" (beide Seiten), und eine
+Selbstauskunft „die Logik in vier Sätzen", die den eigenen Abschnitt falsch
+zählte.
+
+Nichts anderes geändert: Konsolidierung, 301, Seitenstruktur,
+Rechnerformeln, zwei Arbeitslesarten, „leer ist nicht null",
+Analytik-Privatheit und die geschützten Experimente sind unberührt.
+
+
+## 2026-09-12 (3) — Automatisierungs-Cluster: eine Seite statt zwei, und zwölf Beträge weniger
+
+Branch `claude/prozessautomatisierung-pillar-max-2026-09-12`. Setzt Folgemission
+F2 aus `docs/seo/ARCHITEKTUR.md` um — auf ausdrückliche Inhaber-Entscheidung.
+
+### 1 · `/automatisierung-unternehmen` ist zurückgezogen
+
+301 auf `/prozessautomatisierung`, beide URL-Formen, eine Weiterleitung ohne
+Kette. Die alte Route ist aus Manifest, Router und Sitemap entfernt und ihre
+Seitenkomponente gelöscht — ein Canonical hätte zwei indexierbare Dokumente
+stehen lassen, und genau die waren das Problem.
+
+Sechzehn interne Verweise zeigen jetzt auf den Pillar. Einer bleibt bewusst
+stehen: auf einer eingefrorenen Experimentroute, deren ausgehende Anker Teil
+der Messung sind (`docs/seo/post-experiment-opportunities.md`, P-A).
+
+### 2 · Was vom Inhalt der alten Seite übrig blieb
+
+Die **Struktur**, nicht die Substanz. Von 12.023 gerenderten Zeichen wurde
+nichts übernommen, was keine Quelle deckte:
+
+- „Quick-Wins in 1–3 Wochen live" (vier Stellen) — unbestätigt, Z6
+- „Mittlere Projekte in 3–6 Wochen" — unbestätigt
+- „30–60 € pro Stunde in Personalkosten" — unbestätigt; der Stundensatz ist
+  jetzt eine **Eingabe** des Besuchers
+- elf Produktnamen plus „und Hunderte weitere" — eine Zusage über fremde
+  Software; ersetzt durch fünf Prüffragen je System
+- „ohne Fehler", „skalierbar ohne Mehrpersonal", „was früher 30 Minuten
+  dauerte, passiert jetzt in Sekunden" — Absolutheit ohne Beleg
+- „Fehlerüberwachung für **alle** kritischen Workflows" — umgeschrieben: die
+  Absicherung wird je Ablauf festgelegt und steht im Angebot
+
+Vollständige Herkunftsprüfung Zeile für Zeile:
+`docs/seo/preisaudit-automatisierung.md`.
+
+### 3 · Der Pillar beantwortet jetzt sechzehn Käuferfragen
+
+Von 6.605 auf 27.380 gerenderte Zeichen. Neu unter anderem: welche Prozesse
+sich eignen und welche **ausdrücklich nicht**, der Unterschied zwischen
+deterministischen Schritten und KI-Schritten, sechs Ablaufmuster mit jeweils
+dem Punkt, an dem ein Mensch die Kontrolle behält, sieben
+Absicherungsmechanismen (mit dem Hinweis, dass **nicht jeder Ablauf jeden**
+enthält), elf Umsetzungsschritte — und keine einzige Zeitzusage, weil keine
+belegt ist.
+
+### 4 · Die Kostenseite nennt keinen erfundenen Preis mehr
+
+Zwölf unbelegte Beträge entfernt und **nicht ersetzt**: drei Preisstaffeln,
+zwei Wartungspreise, vier Beispielprojektpreise, „amortisiert sich in 3–6
+Monaten", „ein Workflow für 500–1.000 € spart täglich eine Stunde", und der
+`Offer.price` im strukturierten Datensatz.
+
+An ihre Stelle tritt, was einer Kaufentscheidung tatsächlich hilft: acht
+Kostentreiber als Eigenschaften **des Prozesses** (nicht des Angebots),
+einmalige und laufende Kosten getrennt, vier Umfangszuschnitte ohne Beträge,
+sechs Fälle, in denen sich Automatisierung **nicht** lohnt — und ein
+Wirtschaftlichkeitsrechner.
+
+### 5 · Der Rechner: leer ist nicht null
+
+Derselbe Grundsatz wie im Telefon-Rechner, hier noch wichtiger, weil auch die
+Investitionssumme eine Eingabe ist. Kein Feld ist vorbelegt. Solange eine
+Pflichtangabe fehlt, steht dort „Wirtschaftlichkeit noch nicht vollständig
+berechnet" — nie eine 0 und nie ein Betrag aus einem halben Modell. Eine
+eingetragene 0 gilt dagegen als Angabe.
+
+Zwei Lesarten, nie beide zugleich: „Wert freigesetzter Arbeitszeit" (die
+Mitarbeit bleibt) und „tatsächlich vermeidbare Personalkosten" (eine Position
+entfällt). Freigesetzte Zeit heißt an keiner Stelle „eingesparte
+Personalkosten".
+
+Keine Amortisationsdauer bei nicht positivem Nettoeffekt — dort steht „trägt
+sich nicht". Kein Formular, keine E-Mail, kein Gate vor dem Ergebnis. Und
+keine Zahl an GA4: gemeldet wird `automation_roi_started`,
+`automation_roi_completed`, `automation_cta_clicked` — dass gerechnet wurde,
+nie womit.
+
+
 ## 2026-09-12 (2) — Zwei Personallesarten, und die Obergrenze sagt, wofür sie gilt
 
 Zwei Befunde aus dem Inhaber-Review, beide derselbe Fehlertyp: Eine Aussage
