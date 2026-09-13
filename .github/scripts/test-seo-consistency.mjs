@@ -12,6 +12,15 @@ import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
+// Shared with .github/scripts/test-prerender-output.mjs. Both gates make
+// statements about the same declared retired routes, and a second copy of this
+// parser is exactly how they came to contradict each other once already.
+import {
+  LEGACY_REDIRECTS_SOURCE,
+  parseLegacyRedirects,
+  slashVariant,
+} from '../../scripts/lib/legacy-redirect-rules.mjs';
+
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (p) => readFileSync(join(ROOT, p), 'utf8');
 
@@ -312,9 +321,7 @@ if (!catchAllRule || catchAllRule[0] !== '/*' || catchAllRule[1] !== '/404.html'
 // end), or it is still in the sitemap (the domain keeps nominating a URL it no
 // longer serves). Each is checked against src/lib/routing/legacyRedirects.ts,
 // which is the only place a retired route is declared.
-const legacySrc = read('src/lib/routing/legacyRedirects.ts');
-const legacyBody = legacySrc.slice(legacySrc.indexOf('LEGACY_REDIRECTS'));
-const legacyPairs = [...legacyBody.matchAll(/^\s*'(\/[^']*)':\s*'(\/[^']*)',/gm)].map((m) => [m[1], m[2]]);
+const legacyPairs = parseLegacyRedirects(read(LEGACY_REDIRECTS_SOURCE));
 
 if (!legacyPairs.length) {
   ok('no retired routes declared');
@@ -325,7 +332,7 @@ if (!legacyPairs.length) {
     // host itself; a retired one has nothing left to normalise to, so without
     // the slashed rule "/route/" answers 404 and any crawler that recorded that
     // variant loses the signal instead of following it.
-    for (const form of [from, `${from}/`]) {
+    for (const form of [from, slashVariant(from)]) {
       const rule = redirectRules.find((r) => r[0] === form);
       if (!rule) {
         fail(`retired route ${form} has no rule in public/_redirects`);
@@ -356,7 +363,7 @@ if (!legacyPairs.length) {
   // Ordering: a rule below the catch-all never runs.
   const catchAllIndex = redirectRules.findIndex((r) => r[0] === '/*');
   for (const [from] of legacyPairs) {
-    for (const form of [from, `${from}/`]) {
+    for (const form of [from, slashVariant(from)]) {
       const i = redirectRules.findIndex((r) => r[0] === form);
       if (catchAllIndex !== -1 && i !== -1 && i > catchAllIndex) {
         fail(`redirect rule for ${form} sits below the catch-all and would never run`);
