@@ -108,7 +108,32 @@
   blockquote,
   figcaption {
     overflow-wrap: break-word;
-    hyphens: auto;
+  }
+
+  /* Silbentrennung nur dort, wo sie gebraucht wird.
+
+     Sie kam gegen den horizontalen Überlauf schmaler Spalten und löst ihn dort
+     weiterhin. Ab der Breite, auf der eine Zeile ohnehin ein langes Wort trägt,
+     richtet sie Schaden an: Der Browser trennt dann auch, wo Platz ist, und
+     eine Desktop-Überschrift las „Con-version" und „An-meldung". Unterhalb von
+     1024px bleibt sie aktiv, darüber wird natürlich umbrochen;
+     `overflow-wrap: break-word` oben bleibt in jeder Breite die Notbremse für
+     Wörter, die in keine Spalte passen. */
+  @media (max-width: 1023px) {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    li,
+    dt,
+    dd,
+    blockquote,
+    figcaption {
+      hyphens: auto;
+    }
   }
 
   /* The former document-wide `* { transition: color 0.3s }` rule is gone:

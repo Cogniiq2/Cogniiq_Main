@@ -69,15 +69,23 @@ export function HomePage() {
         <ServicesSection />
       </Suspense>
 
+      {/*
+        Auf der Startseite steht die PREISFRAGE, nicht der ganze Rechenweg.
+        Hier lagen vorher Tarifzeilen, Personalszenarien, Routineanteil,
+        verpasste Anrufe, Annahmen und mehrere Hinweisblöcke über rund fünf
+        Bildschirme zwischen Produkt und Abschluss. Der vollständige
+        Wirtschaftlichkeitsteil steht unverändert auf /ki-telefonassistent und
+        ist von hier aus einen Klick entfernt — dieselbe Komponente, dieselben
+        Formeln, dieselben Quellpreise.
+      */}
       <TelefonRechnerSection
-        headline="Was kostet das bei Ihrem Anrufaufkommen — und rechnet es sich?"
+        headline="Was kostet Ihr Telefonassistent?"
         intro={[
-          'Tragen Sie Ihr Anrufaufkommen ein. Der Rechner nennt den passenden Tarif, die wiederkehrenden Kosten und die einmalige Einrichtung — sofort, ohne E-Mail und ohne Verkaufsgespräch.',
-          'Was vor der technischen Prüfung noch nicht feststeht, etwa die Anbindung an Ihr System, steht als offene Position in der Liste. Nicht als Null.',
+          'Tragen Sie Ihr Anrufaufkommen ein. Der Rechner nennt sofort den passenden Tarif, die wiederkehrenden Kosten und die einmalige Einrichtung — ohne E-Mail und ohne Verkaufsgespräch.',
         ]}
         variante="kompakt"
         tone="alt"
-        headingClassName="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-[1.06] tracking-[-0.022em] mb-6"
+        headingClassName="text-[clamp(30px,3.2vw,40px)] font-bold text-pub-ink leading-[1.1] tracking-[-0.02em] mb-5"
       />
 
       <Suspense fallback={<SectionFallback />}>

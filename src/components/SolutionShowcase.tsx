@@ -1,5 +1,4 @@
 import { useId, useRef, useState, type KeyboardEvent } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Stethoscope,
   Utensils,
@@ -8,6 +7,7 @@ import {
   PhoneCall,
   Calendar,
   ArrowRight,
+  ChevronDown,
   Zap,
 } from 'lucide-react';
 
@@ -238,14 +238,27 @@ const SUMMARIES: Record<Industry, { label: string; value: string }[]> = {
   ],
 };
 
+/*
+  Der Ausschnitt zeigt genug, damit das Gespräch verständlich ist: Anliegen,
+  Rückfrage, Antwort, Abschluss des ersten Schritts. Das vollständige Protokoll
+  bleibt einen Klick entfernt — es ist Beleg, nicht Einstieg, und acht
+  Nachrichten haben auf der Startseite zwischen Produkt und Preis mehr Platz
+  belegt als die Ergebnisdarstellung, um die es geht.
+*/
+const AUSSCHNITT_LAENGE = 4;
+
 export function SolutionShowcase() {
   const [activeIndustry, setActiveIndustry] = useState<Industry>('Arztpraxis');
+  const [transkriptOffen, setTranskriptOffen] = useState(false);
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const baseId = useId();
 
   const scenario = SCENARIOS.find((s) => s.label === activeIndustry)!;
   const SvcIcon = scenario.solution.serviceIcon;
   const summary = SUMMARIES[activeIndustry];
+  const hatMehr = scenario.chat.length > AUSSCHNITT_LAENGE;
+  const sichtbareNachrichten =
+    transkriptOffen || !hatMehr ? scenario.chat : scenario.chat.slice(0, AUSSCHNITT_LAENGE);
 
   const onTabKey = (e: KeyboardEvent<HTMLButtonElement>, index: number) => {
     const last = SCENARIOS.length - 1;
@@ -257,6 +270,7 @@ export function SolutionShowcase() {
     if (next === null) return;
     e.preventDefault();
     setActiveIndustry(SCENARIOS[next].label);
+    setTranskriptOffen(false);
     tabRefs.current[next]?.focus();
   };
 
@@ -275,9 +289,9 @@ export function SolutionShowcase() {
             Vom Anruf zum Ergebnis.
           </h2>
           <p className="max-w-[58ch] text-[17px] leading-[1.6] text-pub-ink-2">
-            Wählen Sie Ihre Branche. Links das Gespräch, wie der Assistent es führt,
-            rechts das, was danach bei Ihrem Team ankommt: strukturiert, mit
-            Rückrufnummer, zur Bestätigung durch einen Menschen.
+            Links ein Ausschnitt aus dem Gespräch, rechts das, was danach bei Ihrem
+            Team ankommt: strukturiert, mit Rückrufnummer, zur Bestätigung durch
+            einen Menschen.
           </p>
         </div>
 
@@ -295,7 +309,7 @@ export function SolutionShowcase() {
                 aria-selected={isActive}
                 aria-controls={`${baseId}-panel`}
                 tabIndex={isActive ? 0 : -1}
-                onClick={() => setActiveIndustry(s.label)}
+                onClick={() => { setActiveIndustry(s.label); setTranskriptOffen(false); }}
                 onKeyDown={(e) => onTabKey(e, i)}
                 className={`inline-flex h-11 items-center gap-2 rounded-full border px-4 text-[14px] font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 ${
                   isActive
@@ -316,25 +330,25 @@ export function SolutionShowcase() {
           aria-labelledby={`${baseId}-tab-${SCENARIOS.findIndex((s) => s.label === activeIndustry)}`}
           className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]"
         >
-          {/* Conversation */}
+          {/* Conversation — excerpt by default, full transcript on request */}
           <div className="flex flex-col rounded-2xl border border-white/[0.06] bg-pub-ink p-6 sm:p-8">
             <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-white/60">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-white/70">
                 Beispielgespräch · {scenario.label}
               </p>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-2.5 py-1 text-[11.5px] font-medium text-white/60">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-2.5 py-1 text-[11.5px] font-medium text-white/70">
                 <SvcIcon size={12} aria-hidden="true" />
                 {scenario.solution.service}
               </span>
             </div>
             <ol className="space-y-3">
-              {scenario.chat.map((msg, i) => {
+              {sichtbareNachrichten.map((msg, i) => {
                 const isAi = msg.role === 'ai';
                 return (
                   <li key={`${activeIndustry}-${i}`} className={`flex ${isAi ? 'justify-start' : 'justify-end'}`}>
                     <p
                       className={`max-w-[85%] rounded-2xl px-4 py-3 text-[14px] leading-[1.55] ${
-                        isAi ? 'rounded-tl-md bg-white/[0.07] text-white/90' : 'rounded-tr-md bg-white text-pub-ink'
+                        isAi ? 'rounded-tl-md bg-white/[0.09] text-white/90' : 'rounded-tr-md bg-white text-pub-ink'
                       }`}
                     >
                       <span className="sr-only">{isAi ? 'Assistent: ' : 'Anrufer: '}</span>
@@ -344,6 +358,31 @@ export function SolutionShowcase() {
                 );
               })}
             </ol>
+            {hatMehr && (
+              <div className="mt-5 border-t border-white/[0.08] pt-4">
+                <button
+                  type="button"
+                  onClick={() => setTranskriptOffen((v) => !v)}
+                  aria-expanded={transkriptOffen}
+                  aria-controls={`${baseId}-transkript`}
+                  className="inline-flex h-11 items-center gap-2 text-[14.5px] font-semibold text-white/85 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
+                >
+                  {transkriptOffen
+                    ? 'Ausschnitt zeigen'
+                    : 'Vollständiges Beispielgespräch ansehen'}
+                  <ChevronDown
+                    size={15}
+                    aria-hidden="true"
+                    className={`transition-transform duration-200 ${transkriptOffen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                <p className="mt-1 text-[13px] text-white/60">
+                  {transkriptOffen
+                    ? `Alle ${scenario.chat.length} Nachrichten.`
+                    : `Ausschnitt — ${AUSSCHNITT_LAENGE} von ${scenario.chat.length} Nachrichten.`}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Summary + what changes */}
@@ -366,34 +405,17 @@ export function SolutionShowcase() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-pub-hairline-soft bg-pub-paper-2 p-6 sm:p-8">
-              <p className="mb-4 text-[12px] font-semibold uppercase tracking-[0.14em] text-pub-ink-3">
-                {scenario.solution.title}
-              </p>
-              <ul className="space-y-2.5">
-                {scenario.solution.points.map((point) => (
-                  <li key={point} className="flex items-start gap-3 text-[14.5px] leading-[1.55] text-pub-ink-2">
-                    <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-pub-ink/40" aria-hidden="true" />
-                    {point}
-                  </li>
-                ))}
-              </ul>
-            </div>
           </div>
         </div>
 
         <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[15px] text-pub-ink-2">
-            So funktioniert der Empfang im Detail, mit Grenzen und Übergaberegeln:
+          <p className="max-w-[54ch] text-[15px] leading-[1.6] text-pub-ink-2">
+            Welche Anliegen der Assistent übernimmt, wo er an einen Menschen
+            übergibt und was er ausdrücklich nicht tut, steht auf der Produktseite.
           </p>
-          <div className="flex flex-wrap gap-3">
-            <PubLinkButton to="/ki-telefonassistent" variant="secondary" size="md" icon={ArrowRight} iconTrailing>
-              KI-Telefonassistent ansehen
-            </PubLinkButton>
-            <Link to="/kontakt" className="inline-flex h-11 items-center text-[14.5px] font-semibold text-pub-ink-2 underline-offset-4 hover:text-pub-ink hover:underline focus-visible:outline-none focus-visible:rounded-full focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2">
-              Kostenloses Erstgespräch
-            </Link>
-          </div>
+          <PubLinkButton to="/ki-telefonassistent" variant="secondary" size="md" icon={ArrowRight} iconTrailing className="shrink-0">
+            KI-Telefonassistent ansehen
+          </PubLinkButton>
         </div>
       </div>
     </section>

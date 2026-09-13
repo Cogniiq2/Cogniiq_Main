@@ -43,16 +43,16 @@ export function TelefonRechnerSection({
   return (
     <section
       id={id}
-      className={`${tone === "alt" ? "py-24 bg-gray-50 dark:bg-gray-900/40" : "py-24"} ${
+      className={`${tone === "alt" ? "border-t border-pub-hairline-soft bg-pub-paper-2 py-20 dark:bg-gray-900/40 lg:py-28" : "py-20 lg:py-28"} ${
         id ? "scroll-mt-24" : ""
       }`}
       aria-labelledby={headingId}
     >
-      <div className="max-w-5xl mx-auto px-6 lg:px-8">
+      <div className={`mx-auto px-6 lg:px-10 ${variante === "kompakt" ? "max-w-[1200px]" : "max-w-5xl"}`}>
         <h2 id={headingId} className={headingClassName}>
           {headline}
         </h2>
-        <div className="text-[17px] text-gray-600 dark:text-gray-400 leading-[1.7] space-y-5 mb-10 max-w-3xl">
+        <div className="mb-10 max-w-[58ch] space-y-5 text-[17px] leading-[1.65] text-pub-ink-2 dark:text-gray-400">
           {intro.map((absatz) => (
             <p key={absatz}>{absatz}</p>
           ))}

@@ -5,6 +5,13 @@ import { IconTile, PubEyebrow, PubLinkButton } from '@/components/public/PublicU
 
 // Typical starting situations; formerly the ProblemSection cards on the homepage.
 // Kept as links so the problem pages stay reachable from the start page.
+/*
+  Drei statt vier Merkmale je Leistung. Die vierte Zeile wiederholte in jeder
+  Karte, was der Beschreibungssatz schon sagt — vier Karten mit je einem Absatz
+  und vier Aufzählungspunkten lasen sich als Agenturvorlage, nicht als Auswahl.
+*/
+const MERKMALE_JE_LEISTUNG = 3;
+
 const situations = [
   { label: 'Verpasste Anrufe', href: '/verpasste-anrufe-verlust' },
   { label: 'Keine Anfragen über die Website', href: '/keine-anfragen-website' },
@@ -34,7 +41,7 @@ const services = [
     // No performance figures here: any number would imply a measured customer average.
     roi: { value: 'SEO-ready', label: 'ab dem ersten Entwurf' },
     result: 'Individuell entwickelt, auf lokale Sichtbarkeit und Conversion ausgelegt',
-    cta: 'Website anfragen',
+    cta: 'Webdesign-Leistungen ansehen',
     featured: false,
   },
   {
@@ -57,7 +64,7 @@ const services = [
     ],
     roi: { value: 'Auch nachts', label: 'Anrufannahme' },
     result: 'Der Assistent nimmt Anrufe auch außerhalb der Öffnungszeiten entgegen — abends, nachts und am Wochenende',
-    cta: 'Demo ansehen',
+    cta: 'KI-Telefonassistent ansehen',
     featured: true,
   },
   {
@@ -76,7 +83,7 @@ const services = [
     ],
     roi: { value: 'CRM', label: 'Übergabe inklusive' },
     result: 'Anfragen werden automatisch vorqualifiziert und strukturiert übergeben',
-    cta: 'Mehr erfahren',
+    cta: 'Chatbot-Leistungen ansehen',
     featured: false,
   },
   {
@@ -99,16 +106,22 @@ const services = [
     ],
     roi: { value: 'Automatisch', label: 'statt Handarbeit' },
     result: 'Wiederkehrende Abläufe laufen ohne manuelle Zwischenschritte',
-    cta: 'Workflows besprechen',
+    cta: 'Automatisierung ansehen',
     featured: false,
   },
 ];
 
 export function ServicesSection() {
+  const [featured, ...weitere] = [
+    services.find((x) => x.featured)!,
+    ...services.filter((x) => !x.featured),
+  ];
+  const FeaturedIcon = featured.icon;
+
   return (
     <section id="leistungen" className="border-t border-pub-hairline-soft bg-white py-20 lg:py-28" aria-labelledby="services-heading">
       <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
-        <div className="mb-10 flex flex-col gap-6 lg:mb-14 lg:flex-row lg:items-end lg:justify-between">
+        <div className="mb-10 flex flex-col gap-6 lg:mb-12 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <PubEyebrow className="mb-4">Leistungen</PubEyebrow>
             <h2 id="services-heading" className="text-[clamp(30px,3.2vw,40px)] font-bold leading-[1.1] tracking-[-0.02em] text-pub-ink">
@@ -120,58 +133,104 @@ export function ServicesSection() {
           </PubLinkButton>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          {services.map((service) => {
+        {/*
+          Eine Leistung trägt das Gewicht, drei stehen daneben. Vier gleich große
+          Kästen nebeneinander sind eine Liste, keine Auswahl — und die Anfrage,
+          die diese Seite trägt, kommt aus einer davon.
+        */}
+        <article className="mb-4 overflow-hidden rounded-2xl border border-white/[0.06] bg-pub-ink text-white">
+          <div className="grid gap-8 p-6 sm:p-9 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center lg:gap-14">
+            <div>
+              <div className="mb-5 flex items-center gap-3">
+                <IconTile icon={FeaturedIcon} size="md" className="!bg-white/[0.08] !text-white !ring-white/10" />
+                <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-white/60">
+                  Meistgefragt
+                </span>
+              </div>
+              <h3 className="mb-3 text-[clamp(24px,2.4vw,30px)] font-semibold leading-[1.2] tracking-[-0.015em]">
+                {featured.title}
+              </h3>
+              <p className="max-w-[52ch] text-[16px] leading-[1.65] text-white/75">{featured.description}</p>
+              <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
+                <Link
+                  to={featured.link}
+                  className="inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-[15px] font-semibold text-pub-ink transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
+                >
+                  {featured.cta}
+                  <ArrowRight size={15} aria-hidden="true" />
+                </Link>
+                <Link
+                  to="/ki-telefonassistent/demo"
+                  className="inline-flex h-11 items-center text-[14.5px] font-medium text-white/75 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
+                >
+                  Demo-Termin anfragen
+                </Link>
+              </div>
+            </div>
+            <ul className="space-y-3 text-[15px] leading-snug text-white/80 lg:border-l lg:border-white/10 lg:pl-12">
+              {featured.features.slice(0, MERKMALE_JE_LEISTUNG).map((f) => (
+                <li key={f} className="flex items-start gap-3">
+                  <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-white/45" aria-hidden="true" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </div>
+          {featured.cityLinks.length > 0 && (
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/[0.07] px-6 py-3 sm:px-9">
+              <span className="text-[12.5px] text-white/50">Vor Ort</span>
+              {featured.cityLinks.map((cl) => (
+                <Link
+                  key={cl.href}
+                  to={cl.href}
+                  className="inline-flex h-11 items-center text-[13.5px] text-white/70 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
+                >
+                  {cl.label}
+                </Link>
+              ))}
+            </div>
+          )}
+        </article>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          {weitere.map((service) => {
             const Icon = service.icon;
             return (
-              <article
-                key={service.number}
-                className={`flex flex-col rounded-2xl border p-6 sm:p-8 ${
-                  service.featured
-                    ? 'border-white/[0.06] bg-pub-ink text-white'
-                    : 'border-pub-hairline bg-white'
-                }`}
-              >
-                <div className="mb-5 flex items-center justify-between">
-                  <IconTile icon={Icon} size="md" className={service.featured ? '!bg-white/[0.08] !text-white !ring-white/10' : ''} />
-                  <span className={`text-[12px] font-semibold tabular-nums tracking-[0.14em] ${service.featured ? 'text-white/50' : 'text-pub-ink-3'}`}>
-                    {service.number}
-                  </span>
-                </div>
-                <h3 className={`mb-3 text-[22px] font-semibold leading-[1.25] tracking-[-0.012em] ${service.featured ? 'text-white' : 'text-pub-ink'}`}>
+              <article key={service.number} className="flex flex-col rounded-2xl border border-pub-hairline bg-white p-6">
+                <IconTile icon={Icon} size="sm" className="mb-5" />
+                <h3 className="mb-2.5 text-[19px] font-semibold leading-[1.25] tracking-[-0.01em] text-pub-ink">
                   {service.title}
                 </h3>
-                <p className={`mb-6 text-[15px] leading-[1.6] ${service.featured ? 'text-white/75' : 'text-pub-ink-2'}`}>
-                  {service.description}
-                </p>
-                <ul className={`mb-7 space-y-2 text-[14px] leading-snug ${service.featured ? 'text-white/70' : 'text-pub-ink-2'}`}>
-                  {service.features.map((f) => (
+                <p className="mb-5 text-[15px] leading-[1.6] text-pub-ink-2">{service.description}</p>
+                <ul className="mb-6 space-y-2 text-[14px] leading-snug text-pub-ink-2">
+                  {service.features.slice(0, MERKMALE_JE_LEISTUNG).map((f) => (
                     <li key={f} className="flex items-start gap-2.5">
-                      <span className={`mt-[8px] h-1.5 w-1.5 shrink-0 rounded-full ${service.featured ? 'bg-white/40' : 'bg-pub-ink/35'}`} aria-hidden="true" />
+                      <span className="mt-[8px] h-1.5 w-1.5 shrink-0 rounded-full bg-pub-ink/30" aria-hidden="true" />
                       {f}
                     </li>
                   ))}
                 </ul>
-                <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-3">
+                <div className="mt-auto">
                   <Link
                     to={service.link}
-                    className={`inline-flex h-11 items-center gap-1.5 text-[14.5px] font-semibold underline-offset-4 hover:underline focus-visible:outline-none focus-visible:rounded-full focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 ${service.featured ? 'text-white focus-visible:ring-offset-pub-ink' : 'text-pub-ink'}`}
+                    className="inline-flex h-11 items-center gap-1.5 text-[14.5px] font-semibold text-pub-ink underline-offset-4 hover:underline focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
                   >
                     {service.cta}
                     <ArrowRight size={15} aria-hidden="true" />
                   </Link>
                   {service.cityLinks.length > 0 && (
-                    <span className={`flex flex-wrap items-center gap-x-3 text-[13px] ${service.featured ? 'text-white/55' : 'text-pub-ink-3'}`}>
+                    <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-pub-hairline-soft pt-3">
+                      <span className="text-[12.5px] text-pub-ink-3">Vor Ort</span>
                       {service.cityLinks.map((cl) => (
                         <Link
                           key={cl.href}
                           to={cl.href}
-                          className={`inline-flex h-11 items-center hover:underline focus-visible:outline-none focus-visible:rounded-full focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 ${service.featured ? 'hover:text-white focus-visible:ring-offset-pub-ink' : 'hover:text-pub-ink'}`}
+                          className="inline-flex h-11 items-center text-[13.5px] text-pub-ink-3 underline-offset-4 transition-colors hover:text-pub-ink hover:underline focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
                         >
                           {cl.label}
                         </Link>
                       ))}
-                    </span>
+                    </div>
                   )}
                 </div>
               </article>
@@ -179,7 +238,7 @@ export function ServicesSection() {
           })}
         </div>
 
-        <div className="mt-10 flex flex-col gap-3 border-t border-pub-hairline-soft pt-8 sm:flex-row sm:items-center sm:gap-6">
+        <div className="mt-8 flex flex-col gap-3 border-t border-pub-hairline-soft pt-6 sm:flex-row sm:items-center sm:gap-6">
           <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-pub-ink-3">Typische Ausgangslagen</p>
           <ul className="flex flex-wrap gap-x-6 gap-y-1">
             {situations.map((s) => (
