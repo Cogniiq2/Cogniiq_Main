@@ -73,7 +73,7 @@ export function LogoShowcasePage() {
           transition={{ duration: 0.5 }}
           className="mb-16 text-center"
         >
-          <p className="text-[11px] font-mono tracking-[0.18em] uppercase text-gray-400 dark:text-gray-500 mb-3">
+          <p className="text-[11px] font-mono tracking-[0.18em] uppercase text-pub-ink-3 dark:text-gray-500 mb-3">
             Logo Konzepte
           </p>
           <h1 className="text-[28px] font-semibold tracking-tight text-gray-950 dark:text-white mb-2">
@@ -112,7 +112,7 @@ export function LogoShowcasePage() {
                 <span className="text-[15px] font-semibold text-gray-800 dark:text-gray-200 tracking-tight">
                   {c.name}
                 </span>
-                <span className="ml-auto text-[12px] text-gray-400 dark:text-gray-600">
+                <span className="ml-auto text-[12px] text-pub-ink-3 dark:text-gray-600">
                   {selected === c.id ? "Ausgewählt ✓" : "Auswählen"}
                 </span>
               </div>
@@ -139,7 +139,7 @@ export function LogoShowcasePage() {
                   {c.marks.map((m, mi) => (
                     <li key={mi} className="flex items-start gap-2">
                       <span className="mt-[5px] w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600 flex-shrink-0" />
-                      <span className="text-[12px] text-gray-400 dark:text-gray-500">{m}</span>
+                      <span className="text-[12px] text-pub-ink-3 dark:text-gray-500">{m}</span>
                     </li>
                   ))}
                 </ul>
@@ -155,7 +155,7 @@ export function LogoShowcasePage() {
           transition={{ delay: 0.5 }}
           className="mt-12 p-5 rounded-xl border border-gray-100 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.02]"
         >
-          <p className="text-[12px] text-gray-400 dark:text-gray-500 text-center leading-relaxed">
+          <p className="text-[12px] text-pub-ink-3 dark:text-gray-500 text-center leading-relaxed">
             Das aktuelle Logo in der Navigationsleiste ist <strong className="text-gray-600 dark:text-gray-300">Konzept 4 "Signal Node"</strong> — die verfeinerte Weiterentwicklung des bestehenden Marks.
             <br />
             Um ein anderes zu testen, ändere in <code className="font-mono text-[11px] px-1.5 py-0.5 bg-gray-100 dark:bg-white/[0.06] rounded">Navigation.tsx</code> den Wert von <code className="font-mono text-[11px] px-1.5 py-0.5 bg-gray-100 dark:bg-white/[0.06] rounded">concept=</code> auf 1–5.

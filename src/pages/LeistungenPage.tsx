@@ -343,7 +343,7 @@ function SubNav() {
                   className={`px-4 h-full text-xs font-medium tracking-wide transition-colors whitespace-nowrap border-b-2 ${
                     active === item.anchor
                       ? "border-gray-900 dark:border-gray-100 text-gray-900 dark:text-gray-100"
-                      : "border-transparent text-gray-400 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400"
+                      : "border-transparent text-pub-ink-3 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400"
                   }`}
                 >
                   {item.label}
@@ -418,7 +418,7 @@ export function LeistungenPage() {
           <div className="max-w-[780px] mx-auto">
             <motion.nav
               aria-label="Breadcrumb"
-              className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-600 mb-12"
+              className="flex items-center gap-1.5 text-xs text-pub-ink-3 dark:text-gray-600 mb-12"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4 }}
@@ -448,7 +448,7 @@ export function LeistungenPage() {
             </motion.p>
 
             <motion.p
-              className="text-xs text-gray-400 dark:text-gray-600 tracking-wide mb-9 font-light italic"
+              className="text-xs text-pub-ink-3 dark:text-gray-600 tracking-wide mb-9 font-light italic"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.28 }}
@@ -543,7 +543,7 @@ export function LeistungenPage() {
                           <span className="text-[11px] font-mono text-gray-300 dark:text-gray-700">
                             {service.index}
                           </span>
-                          <Icon size={16} className="text-gray-400 dark:text-gray-600" />
+                          <Icon size={16} className="text-pub-ink-3 dark:text-gray-600" />
                         </div>
                         <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 tracking-tight mb-4">
                           {service.name}
@@ -566,7 +566,7 @@ export function LeistungenPage() {
                             <Link
                               key={link.href}
                               to={link.href}
-                              className="inline-flex items-center gap-2 text-xs text-gray-400 dark:text-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors group"
+                              className="inline-flex items-center gap-2 text-xs text-pub-ink-3 dark:text-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors group"
                             >
                               <span className="w-3 h-px bg-gray-300 dark:bg-gray-700 group-hover:w-5 transition-all duration-200" />
                               {link.label}
@@ -700,7 +700,7 @@ export function LeistungenPage() {
                   custom={i * 0.08}
                   className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-8 flex flex-col"
                 >
-                  <p className="text-[10px] font-semibold tracking-[0.2em] uppercase text-gray-400 dark:text-gray-600 mb-4">
+                  <p className="text-[10px] font-semibold tracking-[0.2em] uppercase text-pub-ink-3 dark:text-gray-600 mb-4">
                     Systembeispiel
                   </p>
                   <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-6">
@@ -946,13 +946,13 @@ export function LeistungenPage() {
             >
               <Link
                 to="/bayern"
-                className="text-xs text-gray-400 dark:text-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors underline underline-offset-4"
+                className="text-xs text-pub-ink-3 dark:text-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors underline underline-offset-4"
               >
                 Bayern Hub
               </Link>
               <Link
                 to="/deutschland"
-                className="text-xs text-gray-400 dark:text-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors underline underline-offset-4"
+                className="text-xs text-pub-ink-3 dark:text-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors underline underline-offset-4"
               >
                 Deutschland Hub
               </Link>
@@ -1013,7 +1013,7 @@ export function LeistungenPage() {
               <p className="text-gray-500 dark:text-gray-400 text-lg font-light mb-3 max-w-md mx-auto">
                 Kostenloses Erstgespräch. Konkrete Systemeinschätzung.
               </p>
-              <p className="text-xs text-gray-400 dark:text-gray-600 tracking-wide mb-14">
+              <p className="text-xs text-pub-ink-3 dark:text-gray-600 tracking-wide mb-14">
                 30–45 Min. &middot; keine Vorbereitung nötig &middot; keine Verkaufspräsentation
               </p>
 
@@ -1033,7 +1033,7 @@ export function LeistungenPage() {
                 </Link>
               </div>
 
-              <p className="mt-12 text-xs text-gray-400 dark:text-gray-600 tracking-wide">
+              <p className="mt-12 text-xs text-pub-ink-3 dark:text-gray-600 tracking-wide">
                 {BUSINESS_INFO.name} &middot; {BUSINESS_INFO.address.addressLocality} &middot; {BUSINESS_INFO.contact.email}
               </p>
             </motion.div>
@@ -1043,7 +1043,7 @@ export function LeistungenPage() {
         {/* ── BREADCRUMB (bottom) ────────────────────────────────────────── */}
         <div className="border-t border-gray-100 dark:border-gray-800 px-6 lg:px-8 py-4">
           <div className="max-w-[1100px] mx-auto">
-            <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-600">
+            <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-pub-ink-3 dark:text-gray-600">
               <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-400 transition-colors">
                 Home
               </Link>

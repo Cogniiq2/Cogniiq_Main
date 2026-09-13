@@ -168,7 +168,7 @@ export function PraxenPage() {
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <nav
               aria-label="Breadcrumb"
-              className="flex items-center gap-1.5 text-[14px] text-gray-400 dark:text-gray-500 mb-10"
+              className="flex items-center gap-1.5 text-[14px] text-pub-ink-3 dark:text-gray-500 mb-10"
             >
               <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                 Home
@@ -183,7 +183,7 @@ export function PraxenPage() {
               <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-[1.12] tracking-tight mb-7">
                 Am Tresen steht eine Patientin.
                 <br />
-                <span className="text-gray-400 dark:text-gray-500 font-light">
+                <span className="text-pub-ink-3 dark:text-gray-500 font-light">
                   Und das Telefon klingelt trotzdem.
                 </span>
               </h1>
@@ -426,7 +426,7 @@ export function PraxenPage() {
             <ol className="space-y-4">
               {EINRICHTUNG_PROJEKT.schritte.map((s) => (
                 <li key={s.nummer} className={`${CARD} flex items-start gap-5`}>
-                  <span className="text-[15px] font-bold text-gray-400 dark:text-gray-500 tabular-nums mt-1 flex-shrink-0">
+                  <span className="text-[15px] font-bold text-pub-ink-3 dark:text-gray-500 tabular-nums mt-1 flex-shrink-0">
                     {s.nummer}
                   </span>
                   <div>

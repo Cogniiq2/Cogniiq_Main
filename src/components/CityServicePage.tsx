@@ -174,7 +174,7 @@ function HeroSection({ config, breadcrumbs }: { config: CityServiceConfig; bread
       <div className="max-w-5xl mx-auto px-6 lg:px-8">
         <motion.nav
           aria-label="Breadcrumb"
-          className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8 flex-wrap"
+          className="cq-rise flex items-center gap-1.5 text-sm text-pub-ink-3 dark:text-gray-500 mb-8 flex-wrap"
         >
           {breadcrumbs.map((crumb, i) => (
             <span key={crumb.url} className="flex items-center gap-1.5">
@@ -567,7 +567,7 @@ function BranchenSection({ config }: { config: CityServiceConfig }) {
               </div>
               <div className="space-y-3">
                 <div>
-                  <p className="text-sm font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">
+                  <p className="text-sm font-semibold text-pub-ink-3 dark:text-gray-500 uppercase tracking-widest mb-1">
                     Herausforderung
                   </p>
                   <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed">
@@ -623,7 +623,7 @@ function LocalSzenarienSection({ config }: { config: CityServiceConfig }) {
               className="flex gap-4 p-6 rounded-2xl bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
             >
               <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                <Lightbulb size={15} className="text-gray-400 dark:text-gray-500" />
+                <Lightbulb size={15} className="text-pub-ink-3 dark:text-gray-500" />
               </div>
               <div>
                 <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">
@@ -720,7 +720,7 @@ function CTASection({ config }: { config: CityServiceConfig }) {
             </Link>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-400 dark:text-gray-500">
+          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-center gap-4 text-sm text-pub-ink-3 dark:text-gray-500">
             <Link to="/ki-telefonassistent" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">KI-Telefonassistent</Link>
             <span aria-hidden="true">·</span>
             <Link to="/webdesign-agentur-deutschland" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Webdesign Agentur</Link>

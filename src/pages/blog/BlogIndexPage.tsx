@@ -79,7 +79,7 @@ export function BlogIndexPage() {
                   className="cq-rise text-4xl sm:text-5xl lg:text-[3rem] font-bold text-gray-900 dark:text-gray-50 leading-[1.08] tracking-[-0.022em] mb-4"
                 >
                   KI, Webdesign &<br />
-                  <span className="text-gray-400 dark:text-gray-500 font-light">Automatisierung</span>
+                  <span className="text-pub-ink-3 dark:text-gray-500 font-light">Automatisierung</span>
                 </motion.h1>
 
                 <motion.p
@@ -91,7 +91,7 @@ export function BlogIndexPage() {
               </div>
 
               <motion.div
-                className="cq-rise flex items-center gap-1.5 text-[12px] text-gray-400 dark:text-gray-500"
+                className="cq-rise flex items-center gap-1.5 text-[12px] text-pub-ink-3 dark:text-gray-500"
               >
                 <span className="font-semibold text-gray-900 dark:text-gray-100 text-lg">
                   {BLOG_ARTICLES.length}
@@ -234,7 +234,7 @@ export function BlogIndexPage() {
                         </div>
                         <ArrowRight
                           size={13}
-                          className="text-gray-300 dark:text-gray-600 group-hover:text-gray-700 dark:group-hover:text-gray-300 group-hover:translate-x-0.5 transition-all duration-200"
+                          className="text-pub-ink-3 dark:text-gray-600 group-hover:text-gray-700 dark:group-hover:text-gray-300 group-hover:translate-x-0.5 transition-all duration-200"
                         />
                       </div>
                     </div>

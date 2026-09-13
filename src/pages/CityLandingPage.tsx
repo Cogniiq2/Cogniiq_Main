@@ -133,7 +133,7 @@ export function CityLandingPage({ citySlug }: Props) {
           <div className="max-w-5xl mx-auto px-6 lg:px-8">
             <motion.nav
               aria-label="Breadcrumb"
-              className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8"
+              className="cq-rise flex items-center gap-1.5 text-sm text-pub-ink-3 dark:text-gray-500 mb-8"
             >
               <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Home</Link>
               <ChevronRight size={12} />
@@ -156,7 +156,7 @@ export function CityLandingPage({ citySlug }: Props) {
                 {config.intro}
               </p>
 
-              <p className="text-sm text-gray-400 dark:text-gray-500 mb-10">
+              <p className="text-sm text-pub-ink-3 dark:text-gray-500 mb-10">
                 {config.tagline}
               </p>
 
@@ -300,7 +300,7 @@ export function CityLandingPage({ citySlug }: Props) {
                             to={s.href}
                             className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors group"
                           >
-                            <CheckCircle2 size={13} className="text-gray-300 dark:text-gray-600 group-hover:text-gray-500 transition-colors flex-shrink-0" />
+                            <CheckCircle2 size={13} className="text-pub-ink-3 dark:text-gray-600 group-hover:text-gray-500 transition-colors flex-shrink-0" />
                             {s.label}
                           </Link>
                         </li>

@@ -128,7 +128,7 @@ export function ServicesSection() {
               Vier Leistungen, die täglich für Sie arbeiten.
             </h2>
           </div>
-          <PubLinkButton to="/leistungen" variant="secondary" size="md" icon={ArrowRight} iconTrailing className="self-start lg:self-auto">
+          <PubLinkButton to="/leistungen" variant="secondary" size="md" icon={ArrowRight} iconTrailing className="h-auto min-h-11 max-w-full self-start whitespace-normal py-2.5 text-left lg:self-auto">
             Alle Leistungen &amp; Details ansehen
           </PubLinkButton>
         </div>

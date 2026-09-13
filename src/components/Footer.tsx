@@ -44,12 +44,12 @@ function FooterCol({ title, sections, delay = 0 }: FooterColProps) {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
       >
-        <span className="text-[11px] font-semibold tracking-[0.14em] uppercase text-gray-400 dark:text-white/40">
+        <span className="text-[11px] font-semibold tracking-[0.14em] uppercase text-pub-ink-3 dark:text-white/40">
           {title}
         </span>
         <ChevronDown
           size={13}
-          className={`lg:hidden text-gray-300 dark:text-white/30 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          className={`lg:hidden text-pub-ink-3 dark:text-white/30 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
         />
       </button>
 
@@ -57,7 +57,7 @@ function FooterCol({ title, sections, delay = 0 }: FooterColProps) {
         {sections.map((section) => (
           <div key={section.label}>
             {section.label && (
-              <p className="text-[10px] font-semibold tracking-[0.16em] uppercase text-gray-300 dark:text-white/25 mb-2.5">
+              <p className="text-[10px] font-semibold tracking-[0.16em] uppercase text-pub-ink-3 dark:text-white/25 mb-2.5">
                 {section.label}
               </p>
             )}
@@ -122,7 +122,7 @@ export function Footer() {
                   className="flex items-center gap-3 text-[13px] text-gray-500 dark:text-white/45 hover:text-gray-900 dark:hover:text-white transition-colors group"
                 >
                   <span className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-white/[0.06] flex items-center justify-center flex-shrink-0 group-hover:bg-gray-200 dark:group-hover:bg-white/10 transition-colors">
-                    <Mail size={12} className="text-gray-400 dark:text-white/50" />
+                    <Mail size={12} className="text-pub-ink-3 dark:text-white/50" />
                   </span>
                   {BUSINESS_INFO.contact.email}
                 </a>
@@ -133,7 +133,7 @@ export function Footer() {
                   className="flex items-center gap-3 text-[13px] text-gray-500 dark:text-white/45 hover:text-gray-900 dark:hover:text-white transition-colors group"
                 >
                   <span className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-white/[0.06] flex items-center justify-center flex-shrink-0 group-hover:bg-gray-200 dark:group-hover:bg-white/10 transition-colors">
-                    <Phone size={12} className="text-gray-400 dark:text-white/50" />
+                    <Phone size={12} className="text-pub-ink-3 dark:text-white/50" />
                   </span>
                   {BUSINESS_INFO.contact.phoneDisplay}
                 </a>
@@ -148,7 +148,7 @@ export function Footer() {
                   className="flex items-start gap-3 text-[13px] text-gray-500 dark:text-white/45 hover:text-gray-900 dark:hover:text-white transition-colors group"
                 >
                   <span className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-white/[0.06] flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-gray-200 dark:group-hover:bg-white/10 transition-colors">
-                    <MapPin size={12} className="text-gray-400 dark:text-white/50" />
+                    <MapPin size={12} className="text-pub-ink-3 dark:text-white/50" />
                   </span>
                   <span>
                     <span itemProp="streetAddress">{BUSINESS_INFO.address.streetAddress}</span>
@@ -168,7 +168,7 @@ export function Footer() {
                 {["Festpreis", "Aus Bayreuth"].map((t) => (
                   <span
                     key={t}
-                    className="px-2.5 py-1 rounded-md text-sm font-medium bg-gray-100 dark:bg-white/[0.06] text-gray-500 dark:text-white/35 border border-gray-200 dark:border-white/[0.06]"
+                    className="px-2.5 py-1 rounded-md text-sm font-medium bg-gray-100 dark:bg-white/[0.06] text-pub-ink-2 dark:text-white/35 border border-gray-200 dark:border-white/[0.06]"
                   >
                     {t}
                   </span>
@@ -339,7 +339,7 @@ export function Footer() {
         {/* ─── SEO PARAGRAPH ─── */}
         <div className="max-w-7xl mx-auto px-6 lg:px-10 py-5">
           <motion.p
-            className="text-[11px] leading-loose text-gray-300 dark:text-white/20 max-w-4xl"
+            className="text-[11px] leading-loose text-pub-ink-3 dark:text-white/20 max-w-4xl"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -375,26 +375,26 @@ export function Footer() {
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease }}
           >
-            <p className="text-[12px] text-gray-400 dark:text-white/20">
+            <p className="text-[12px] text-pub-ink-3 dark:text-white/20">
               © {year} {BUSINESS_INFO.name} · Alle Rechte vorbehalten
             </p>
             <div className="flex flex-wrap items-center gap-6">
               <Link
                 to="/impressum"
-                className="text-[12px] text-gray-400 dark:text-white/25 hover:text-gray-700 dark:hover:text-white/55 transition-colors"
+                className="text-[12px] text-pub-ink-3 dark:text-white/25 hover:text-gray-700 dark:hover:text-white/55 transition-colors"
               >
                 Impressum
               </Link>
               <Link
                 to="/datenschutz"
-                className="text-[12px] text-gray-400 dark:text-white/25 hover:text-gray-700 dark:hover:text-white/55 transition-colors"
+                className="text-[12px] text-pub-ink-3 dark:text-white/25 hover:text-gray-700 dark:hover:text-white/55 transition-colors"
               >
                 Datenschutz
               </Link>
               <button
                 type="button"
                 onClick={openConsentSettings}
-                className="text-[12px] text-gray-400 dark:text-white/25 hover:text-gray-700 dark:hover:text-white/55 transition-colors"
+                className="text-[12px] text-pub-ink-3 dark:text-white/25 hover:text-gray-700 dark:hover:text-white/55 transition-colors"
               >
                 Cookie-Einstellungen
               </button>

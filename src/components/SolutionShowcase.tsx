@@ -331,7 +331,7 @@ export function SolutionShowcase() {
           className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]"
         >
           {/* Conversation — excerpt by default, full transcript on request */}
-          <div className="flex flex-col rounded-2xl border border-white/[0.06] bg-pub-ink p-6 sm:p-8">
+          <div className="flex min-w-0 flex-col rounded-2xl border border-white/[0.06] bg-pub-ink p-5 sm:p-8">
             <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
               <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-white/70">
                 Beispielgespräch · {scenario.label}
@@ -347,7 +347,7 @@ export function SolutionShowcase() {
                 return (
                   <li key={`${activeIndustry}-${i}`} className={`flex ${isAi ? 'justify-start' : 'justify-end'}`}>
                     <p
-                      className={`max-w-[85%] rounded-2xl px-4 py-3 text-[14px] leading-[1.55] ${
+                      className={`max-w-[92%] rounded-2xl px-4 py-3 text-[14px] leading-[1.55] sm:max-w-[85%] ${
                         isAi ? 'rounded-tl-md bg-white/[0.09] text-white/90' : 'rounded-tr-md bg-white text-pub-ink'
                       }`}
                     >
@@ -386,14 +386,14 @@ export function SolutionShowcase() {
           </div>
 
           {/* Summary + what changes */}
-          <div className="flex flex-col gap-5">
-            <div className="rounded-2xl border border-pub-hairline bg-white p-6 shadow-[0_12px_32px_rgba(11,15,20,0.06)] sm:p-8">
+          <div className="flex min-w-0 flex-col gap-5">
+            <div className="rounded-2xl border border-pub-hairline bg-white p-5 shadow-[0_12px_32px_rgba(11,15,20,0.06)] sm:p-8">
               <p className="mb-5 text-[12px] font-semibold uppercase tracking-[0.14em] text-pub-ink-3">
                 Beispiel einer Gesprächszusammenfassung
               </p>
               <dl className="divide-y divide-pub-hairline-soft">
                 {summary.map(({ label, value }) => (
-                  <div key={label} className="grid grid-cols-[120px_1fr] gap-4 py-3 sm:grid-cols-[150px_1fr]">
+                  <div key={label} className="grid gap-1 py-3 min-[380px]:grid-cols-[120px_1fr] min-[380px]:gap-4 sm:grid-cols-[150px_1fr]">
                     <dt className="text-[13.5px] text-pub-ink-3">{label}</dt>
                     <dd className="text-[15px] font-medium leading-snug text-pub-ink">{value}</dd>
                   </div>
@@ -413,7 +413,7 @@ export function SolutionShowcase() {
             Welche Anliegen der Assistent übernimmt, wo er an einen Menschen
             übergibt und was er ausdrücklich nicht tut, steht auf der Produktseite.
           </p>
-          <PubLinkButton to="/ki-telefonassistent" variant="secondary" size="md" icon={ArrowRight} iconTrailing className="shrink-0">
+          <PubLinkButton to="/ki-telefonassistent" variant="secondary" size="md" icon={ArrowRight} iconTrailing className="h-auto min-h-11 max-w-full whitespace-normal py-2.5 text-center sm:shrink-0">
             KI-Telefonassistent ansehen
           </PubLinkButton>
         </div>

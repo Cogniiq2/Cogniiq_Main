@@ -88,7 +88,7 @@ export function ProblemPage({ config }: Props) {
           <div className="max-w-5xl mx-auto px-6 lg:px-8">
             <motion.nav
               aria-label="Breadcrumb"
-              className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8"
+              className="cq-rise flex items-center gap-1.5 text-sm text-pub-ink-3 dark:text-gray-500 mb-8"
             >
               <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Home</Link>
               <ChevronRight size={12} />
@@ -148,7 +148,7 @@ export function ProblemPage({ config }: Props) {
                   custom={i * 0.07}
                   className="flex items-start gap-3 p-5 rounded-xl bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
                 >
-                  <AlertTriangle size={15} className="flex-shrink-0 mt-0.5 text-gray-400 dark:text-gray-500" />
+                  <AlertTriangle size={15} className="flex-shrink-0 mt-0.5 text-pub-ink-3 dark:text-gray-500" />
                   <span className="text-sm text-gray-700 dark:text-gray-300">{point}</span>
                 </motion.div>
               ))}
@@ -182,7 +182,7 @@ export function ProblemPage({ config }: Props) {
                   custom={i * 0.08}
                   className="flex gap-4 p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
                 >
-                  <TrendingDown size={18} className="flex-shrink-0 mt-0.5 text-gray-400 dark:text-gray-500" />
+                  <TrendingDown size={18} className="flex-shrink-0 mt-0.5 text-pub-ink-3 dark:text-gray-500" />
                   <div>
                     <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">{item.title}</h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{item.description}</p>
@@ -203,7 +203,7 @@ export function ProblemPage({ config }: Props) {
                 variants={fadeUp}
                 custom={0}
               >
-                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
+                <p className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-4">
                   Die Lösung
                 </p>
                 <h2 id="solution-heading" className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-tight mb-6">
@@ -276,7 +276,7 @@ export function ProblemPage({ config }: Props) {
               custom={0}
               className="mb-8"
             >
-              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+              <p className="text-xs font-semibold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500">
                 Passende Lösungen
               </p>
             </motion.div>
@@ -333,7 +333,7 @@ export function ProblemPage({ config }: Props) {
                   Alle Leistungen
                 </Link>
               </div>
-              <p className="mt-6 text-xs text-gray-400 dark:text-gray-500">
+              <p className="mt-6 text-xs text-pub-ink-3 dark:text-gray-500">
                 {BUSINESS_INFO.name} · {BUSINESS_INFO.contact.email} · {BUSINESS_INFO.contact.phoneDisplay}
               </p>
             </motion.div>

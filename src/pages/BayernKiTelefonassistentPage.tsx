@@ -158,7 +158,7 @@ function HeroSection() {
       <div className="relative max-w-6xl mx-auto px-6 lg:px-8">
         <motion.nav
           aria-label="Breadcrumb"
-          className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8 flex-wrap"
+          className="cq-rise flex items-center gap-1.5 text-sm text-pub-ink-3 dark:text-gray-500 mb-8 flex-wrap"
         >
           {breadcrumbs.map((crumb, i) => (
             <span key={crumb.url} className="flex items-center gap-1.5">
@@ -238,7 +238,7 @@ function HeroSection() {
                 key={i}
                 className="cq-rise flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
               >
-                <item.icon size={14} className="text-gray-400 dark:text-gray-500" />
+                <item.icon size={14} className="text-pub-ink-3 dark:text-gray-500" />
                 {item.label}
               </motion.div>
             ))}
@@ -261,7 +261,7 @@ function TrustSection() {
             "Schnelle Implementierung",
           ].map((item, i) => (
             <div key={i} className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-              <CheckCircle2 size={13} className="text-gray-400 dark:text-gray-500 flex-shrink-0" />
+              <CheckCircle2 size={13} className="text-pub-ink-3 dark:text-gray-500 flex-shrink-0" />
               {item}
             </div>
           ))}
@@ -283,7 +283,7 @@ function IntroSection() {
             variants={fadeUp}
             custom={0}
           >
-            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
+            <p className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-4">
               KI Automation in Bayern
             </p>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-tight mb-6">
@@ -363,7 +363,7 @@ function UseCasesSection() {
           custom={0}
           className="max-w-2xl mb-14"
         >
-          <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-4">
             Anwendungsbereiche
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
@@ -414,7 +414,7 @@ function BenefitsSection() {
           custom={0}
           className="max-w-2xl mb-14"
         >
-          <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-4">
             Vorteile
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
@@ -494,7 +494,7 @@ function CitiesSection() {
           custom={0}
           className="mb-8"
         >
-          <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2">
+          <p className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-2">
             Bayernweit verfügbar
           </p>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -513,7 +513,7 @@ function CitiesSection() {
               custom={i * 0.04}
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400"
             >
-              <MapPin size={12} className="text-gray-400 dark:text-gray-500" />
+              <MapPin size={12} className="text-pub-ink-3 dark:text-gray-500" />
               {city}
             </motion.div>
           ))}
@@ -594,7 +594,7 @@ function FAQSection() {
           custom={0}
           className="mb-10"
         >
-          <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-4">
             FAQ
           </p>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
@@ -686,7 +686,7 @@ function FinalCtaSection() {
             ))}
           </div>
 
-          <p className="mt-6 text-xs text-gray-400 dark:text-gray-500">
+          <p className="mt-6 text-xs text-pub-ink-3 dark:text-gray-500">
             {BUSINESS_INFO.name} · {BUSINESS_INFO.address.addressLocality} · {BUSINESS_INFO.contact.email}
           </p>
         </motion.div>

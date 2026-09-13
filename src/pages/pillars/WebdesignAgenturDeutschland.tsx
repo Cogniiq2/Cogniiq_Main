@@ -212,7 +212,7 @@ export function WebdesignAgenturDeutschland() {
           <div className="max-w-5xl mx-auto px-6 lg:px-8">
             <motion.nav
               aria-label="Breadcrumb"
-              className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8"
+              className="cq-rise flex items-center gap-1.5 text-sm text-pub-ink-3 dark:text-gray-500 mb-8"
             >
               <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Home</Link>
               <ChevronRight size={12} />
@@ -436,7 +436,7 @@ export function WebdesignAgenturDeutschland() {
                   className="flex gap-4 p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
                 >
                   <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                    <Lightbulb size={15} className="text-gray-400 dark:text-gray-500" />
+                    <Lightbulb size={15} className="text-pub-ink-3 dark:text-gray-500" />
                   </div>
                   <div>
                     <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">{uc.title}</h3>
@@ -474,7 +474,7 @@ export function WebdesignAgenturDeutschland() {
                 { heading: "Verwandte Themen", links: RELATED_LINKS },
               ].map((col) => (
                 <div key={col.heading}>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">{col.heading}</p>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-3">{col.heading}</p>
                   <ul className="space-y-2">
                     {col.links.map((link) => (
                       <li key={link.href}>
@@ -482,7 +482,7 @@ export function WebdesignAgenturDeutschland() {
                           to={link.href}
                           className="group inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 font-medium transition-colors"
                         >
-                          <ArrowRight size={12} className="text-gray-300 dark:text-gray-600 group-hover:text-gray-500 transition-colors flex-shrink-0" />
+                          <ArrowRight size={12} className="text-pub-ink-3 dark:text-gray-600 group-hover:text-gray-500 transition-colors flex-shrink-0" />
                           {link.label}
                         </Link>
                       </li>
@@ -550,7 +550,7 @@ export function WebdesignAgenturDeutschland() {
                   Webdesign Kosten
                 </Link>
               </div>
-              <p className="mt-6 text-xs text-gray-400 dark:text-gray-500">
+              <p className="mt-6 text-xs text-pub-ink-3 dark:text-gray-500">
                 {BUSINESS_INFO.name} · {BUSINESS_INFO.address.addressLocality} · {BUSINESS_INFO.contact.email}
               </p>
             </motion.div>

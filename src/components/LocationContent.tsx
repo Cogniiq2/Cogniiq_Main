@@ -296,7 +296,7 @@ export function LocationContent() {
         <div
           className="mt-12"
         >
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 text-center mb-4">
+          <p className="text-xs font-semibold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 text-center mb-4">
             Servicegebiete
           </p>
           <div className="flex flex-wrap justify-center gap-2">

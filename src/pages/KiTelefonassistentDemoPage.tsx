@@ -143,7 +143,7 @@ export function KiTelefonassistentDemoPage() {
           <div className="max-w-6xl mx-auto px-6 lg:px-8">
             <motion.nav
               aria-label="Breadcrumb"
-              className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8 flex-wrap"
+              className="cq-rise flex items-center gap-1.5 text-sm text-pub-ink-3 dark:text-gray-500 mb-8 flex-wrap"
             >
               {breadcrumbs.map((crumb, i) => (
                 <span key={crumb.url} className="flex items-center gap-1.5">
@@ -196,7 +196,7 @@ export function KiTelefonassistentDemoPage() {
                 </div>
 
                 <div className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800">
-                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
+                  <p className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-3">
                     So läuft die Demo ab
                   </p>
                   <ol className="space-y-2.5">
@@ -444,7 +444,7 @@ export function KiTelefonassistentDemoPage() {
               variants={fadeUp}
               custom={0}
             >
-              <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
+              <p className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-4">
                 Das erwartet Sie in der Demo
               </p>
               <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-10">

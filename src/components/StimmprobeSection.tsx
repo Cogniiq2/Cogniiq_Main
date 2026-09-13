@@ -59,7 +59,7 @@ export function StimmprobeSection() {
   return (
     <section className="py-20 bg-gray-50 dark:bg-gray-900/40" aria-labelledby="stimmprobe-heading">
       <div className="max-w-3xl mx-auto px-6 lg:px-8">
-        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-pub-ink-3 dark:text-gray-500 mb-4">
           Stimmprobe
         </p>
         <h2
@@ -92,7 +92,7 @@ export function StimmprobeSection() {
               <p className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 truncate">
                 {STIMMPROBE.caption}
               </p>
-              <p className="text-[12px] text-gray-400 dark:text-gray-500 tabular-nums">
+              <p className="text-[12px] text-pub-ink-3 dark:text-gray-500 tabular-nums">
                 {formatTime(position)} / {formatTime(duration)}
               </p>
             </div>
@@ -110,7 +110,7 @@ export function StimmprobeSection() {
 
           {STIMMPROBE.transcript.length > 0 && (
             <div className="mt-5 pt-5 border-t border-gray-100 dark:border-gray-800 space-y-2.5">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-pub-ink-3 dark:text-gray-500">
                 Transkript
               </p>
               {STIMMPROBE.transcript.map((line, i) => (

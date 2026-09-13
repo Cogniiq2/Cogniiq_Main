@@ -242,9 +242,9 @@ export function WebdesignHub() {
                   <MapPin size={16} className="text-blue-500 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-gray-900 dark:text-white text-sm group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{label}</p>
-                    <p className="text-xs text-gray-400 dark:text-white/35 mt-0.5">{sub}</p>
+                    <p className="text-xs text-pub-ink-3 dark:text-white/35 mt-0.5">{sub}</p>
                   </div>
-                  <ChevronRight size={14} className="ml-auto text-gray-300 dark:text-white/20 group-hover:text-blue-400 mt-0.5 transition-colors" />
+                  <ChevronRight size={14} className="ml-auto text-pub-ink-3 dark:text-white/20 group-hover:text-blue-400 mt-0.5 transition-colors" />
                 </Link>
               </motion.div>
             ))}
@@ -271,7 +271,7 @@ export function WebdesignHub() {
                 <Link to={href} className="group flex items-center gap-3 p-4 rounded-xl border border-gray-100 dark:border-white/[0.06] hover:border-blue-200 dark:hover:border-blue-500/20 bg-white dark:bg-transparent hover:bg-blue-50/50 dark:hover:bg-blue-500/[0.04] transition-all">
                   <Icon size={16} className="text-blue-500 flex-shrink-0" />
                   <span className="text-sm font-medium text-gray-700 dark:text-white/65 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{label}</span>
-                  <ArrowRight size={13} className="ml-auto text-gray-300 dark:text-white/20 group-hover:text-blue-400 transition-colors" />
+                  <ArrowRight size={13} className="ml-auto text-pub-ink-3 dark:text-white/20 group-hover:text-blue-400 transition-colors" />
                 </Link>
               </motion.div>
             ))}

@@ -211,7 +211,7 @@ export function BeweisketteUnten() {
             <li key={titel} className={`${BODY} flex gap-4`}>
               <span
                 aria-hidden="true"
-                className="shrink-0 text-[15px] font-semibold text-gray-400 dark:text-gray-500 tabular-nums w-5"
+                className="shrink-0 text-[15px] font-semibold text-pub-ink-3 dark:text-gray-500 tabular-nums w-5"
               >
                 {i + 1}
               </span>

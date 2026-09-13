@@ -291,7 +291,7 @@ export function BlogPostPage() {
                 {formatDate(article.publishedAt)}
               </span>
               {article.updatedAt !== article.publishedAt && (
-                <span className="text-gray-300 dark:text-gray-600 text-[11px]">
+                <span className="text-pub-ink-3 dark:text-gray-600 text-[11px]">
                   Aktualisiert: {formatDate(article.updatedAt)}
                 </span>
               )}
@@ -503,7 +503,7 @@ export function BlogPostPage() {
                         </span>
                         <ArrowRight
                           size={13}
-                          className="text-gray-300 dark:text-gray-600 group-hover:text-gray-600 dark:group-hover:text-gray-300 group-hover:translate-x-0.5 transition-all duration-200"
+                          className="text-pub-ink-3 dark:text-gray-600 group-hover:text-gray-600 dark:group-hover:text-gray-300 group-hover:translate-x-0.5 transition-all duration-200"
                         />
                       </div>
                     </Link>

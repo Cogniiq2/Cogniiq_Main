@@ -79,7 +79,7 @@ const START_DAUER = 2;
 const CARD =
   "rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50";
 const LABEL = "text-[15px] font-medium text-gray-800 dark:text-gray-200";
-const HINT = "text-[14px] text-gray-500 dark:text-gray-500 leading-[1.55]";
+const HINT = "text-[14px] text-pub-ink-3 dark:text-gray-500 leading-[1.55]";
 const ZEILE =
   "flex items-baseline justify-between gap-6 py-2.5 border-b border-gray-100 dark:border-gray-800 last:border-0";
 

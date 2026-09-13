@@ -474,7 +474,7 @@ function LeistungenPanel({
                 aria-labelledby={`nav-tab-${leistung.key}`}
                 hidden={i !== gewaehlt}
               >
-                <p className="text-sm font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-5">
+                <p className="text-sm font-semibold uppercase tracking-[0.1em] text-pub-ink-3 dark:text-gray-500 mb-5">
                   {leistung.label} für
                 </p>
                 <div className="space-y-0.5">
@@ -527,7 +527,7 @@ function StandortePanel({
     >
       <div className="max-w-6xl mx-auto px-6 lg:px-8 py-8">
         <div className="max-w-xs">
-          <p className="text-sm font-semibold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.1em] text-pub-ink-3 dark:text-gray-500 mb-4">
             Städte
           </p>
           <div className="space-y-0.5">
@@ -576,7 +576,7 @@ function PanelLink({
       }`}
     >
       <span>{label}</span>
-      {note && <span className="text-sm text-gray-400 dark:text-gray-500">{note}</span>}
+      {note && <span className="text-sm text-pub-ink-3 dark:text-gray-500">{note}</span>}
     </Link>
   );
 }

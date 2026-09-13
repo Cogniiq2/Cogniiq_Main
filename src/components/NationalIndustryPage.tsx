@@ -185,7 +185,7 @@ export function NationalIndustryPage({ config }: Props) {
           <div className="max-w-6xl mx-auto px-6 lg:px-8">
             <motion.nav
               aria-label="Breadcrumb"
-              className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-10 flex-wrap"
+              className="cq-rise flex items-center gap-1.5 text-sm text-pub-ink-3 dark:text-gray-500 mb-10 flex-wrap"
             >
               <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Home</Link>
               <ChevronRight size={10} />
@@ -257,8 +257,8 @@ export function NationalIndustryPage({ config }: Props) {
                     ))}
                   </div>
                   <div className="px-5 py-3.5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-800/30 flex items-center gap-2">
-                    <Lock size={11} className="text-gray-300 dark:text-gray-600 flex-shrink-0" />
-                    <span className="text-sm text-gray-400 dark:text-gray-500">Auftragsverarbeitungsvertrag nach Art. 28 DSGVO · keine Gesprächsaufzeichnung</span>
+                    <Lock size={11} className="text-pub-ink-3 dark:text-gray-600 flex-shrink-0" />
+                    <span className="text-sm text-pub-ink-3 dark:text-gray-500">Auftragsverarbeitungsvertrag nach Art. 28 DSGVO · keine Gesprächsaufzeichnung</span>
                   </div>
                 </div>
               </motion.div>
@@ -290,7 +290,7 @@ export function NationalIndustryPage({ config }: Props) {
               variants={fadeUp}
               className="max-w-2xl mb-14"
             >
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
                 Das Problem
               </p>
               <h2 id="problems-heading" className="text-3xl lg:text-[2.2rem] font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4">
@@ -340,7 +340,7 @@ export function NationalIndustryPage({ config }: Props) {
                 viewport={{ once: true, margin: "-60px" }}
                 variants={fadeUp}
               >
-                <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+                <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
                   Die Lösung
                 </p>
                 <h2 id="solution-heading" className="text-3xl lg:text-[2.1rem] font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-5">
@@ -356,7 +356,7 @@ export function NationalIndustryPage({ config }: Props) {
                   Lösung anfragen
                   <ArrowRight size={14} />
                 </Link>
-                <p className="mt-3 text-sm text-gray-400 dark:text-gray-500">
+                <p className="mt-3 text-sm text-pub-ink-3 dark:text-gray-500">
                   Kostenlos · Unverbindlich · Ca. 15&nbsp;Minuten
                 </p>
               </motion.div>
@@ -396,7 +396,7 @@ export function NationalIndustryPage({ config }: Props) {
               variants={fadeUp}
               className="max-w-2xl mb-16"
             >
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
                 Ablauf
               </p>
               <h2 id="workflow-heading" className="text-3xl lg:text-[2.1rem] font-bold text-gray-900 dark:text-gray-100 leading-[1.15]">
@@ -417,7 +417,7 @@ export function NationalIndustryPage({ config }: Props) {
                     className="relative"
                   >
                     <div className="relative z-10 w-14 h-14 rounded-2xl bg-gray-50 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 flex items-center justify-center mb-5 flex-shrink-0">
-                      <span className="text-sm font-bold font-mono text-gray-400 dark:text-gray-500">
+                      <span className="text-sm font-bold font-mono text-pub-ink-3 dark:text-gray-500">
                         {String(i + 1).padStart(2, "0")}
                       </span>
                     </div>
@@ -450,7 +450,7 @@ export function NationalIndustryPage({ config }: Props) {
                 viewport={{ once: true, margin: "-60px" }}
                 variants={fadeUp}
               >
-                <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+                <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
                   Klare Grenzen
                 </p>
                 <h2
@@ -516,7 +516,7 @@ export function NationalIndustryPage({ config }: Props) {
                   <ArrowRight size={13} />
                 </Link>
               </div>
-              <p className="text-sm text-gray-400 dark:text-gray-500">
+              <p className="text-sm text-pub-ink-3 dark:text-gray-500">
                 Kostenlos · Unverbindlich · Keine Vorkenntnisse nötig
               </p>
             </motion.div>
@@ -547,7 +547,7 @@ export function NationalIndustryPage({ config }: Props) {
               variants={fadeUp}
               className="mb-8"
             >
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-2">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-2">
                 Verfügbarkeit
               </p>
               <h2 id="cities-heading" className="text-xl font-bold text-gray-900 dark:text-gray-100">
@@ -579,7 +579,7 @@ export function NationalIndustryPage({ config }: Props) {
             </div>
 
             <div className="pt-6 border-t border-gray-100 dark:border-gray-800">
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
                 Weiterführende Seiten
               </p>
               <div className="flex flex-wrap gap-2.5">
@@ -596,7 +596,7 @@ export function NationalIndustryPage({ config }: Props) {
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/60 text-[15px] font-medium text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 group"
                     >
                       {link.label}
-                      <ArrowRight size={11} className="text-gray-300 dark:text-gray-600 group-hover:text-gray-500 transition-colors" />
+                      <ArrowRight size={11} className="text-pub-ink-3 dark:text-gray-600 group-hover:text-gray-500 transition-colors" />
                     </Link>
                   </motion.div>
                 ))}
@@ -615,7 +615,7 @@ export function NationalIndustryPage({ config }: Props) {
               variants={fadeUp}
               className="mb-10"
             >
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
                 FAQ
               </p>
               <h2 id="faq-heading" className="text-3xl font-bold text-gray-900 dark:text-gray-100">
@@ -661,7 +661,7 @@ export function NationalIndustryPage({ config }: Props) {
                   {config.costLinkLabel}
                 </Link>
               </div>
-              <p className="text-sm text-gray-400 dark:text-gray-500">
+              <p className="text-sm text-pub-ink-3 dark:text-gray-500">
                 {BUSINESS_INFO.name} · {BUSINESS_INFO.contact.email} · {BUSINESS_INFO.contact.phoneDisplay}
               </p>
             </motion.div>

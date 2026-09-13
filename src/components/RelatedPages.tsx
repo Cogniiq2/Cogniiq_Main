@@ -73,7 +73,7 @@ export function RelatedPages({ config }: RelatedPagesProps) {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <MapPin size={15} className="text-gray-400" />
-              <span className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+              <span className="text-xs font-semibold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500">
                 {config.service} auch verfügbar in
               </span>
             </div>
@@ -95,7 +95,7 @@ export function RelatedPages({ config }: RelatedPagesProps) {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Zap size={15} className="text-gray-400" />
-              <span className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+              <span className="text-xs font-semibold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500">
                 Weitere Leistungen in {config.city}
               </span>
             </div>
@@ -117,7 +117,7 @@ export function RelatedPages({ config }: RelatedPagesProps) {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Globe size={15} className="text-gray-400" />
-              <span className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+              <span className="text-xs font-semibold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500">
                 Regionaler Überblick
               </span>
             </div>
@@ -164,7 +164,7 @@ export function RelatedPages({ config }: RelatedPagesProps) {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Building2 size={15} className="text-gray-400" />
-                <span className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+                <span className="text-xs font-semibold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500">
                   {config.service} nach Branche
                 </span>
               </div>
@@ -186,7 +186,7 @@ export function RelatedPages({ config }: RelatedPagesProps) {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <AlertTriangle size={15} className="text-gray-400" />
-              <span className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+              <span className="text-xs font-semibold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500">
                 Häufige Probleme – direkt adressiert
               </span>
             </div>
@@ -213,7 +213,7 @@ export function RelatedPages({ config }: RelatedPagesProps) {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="mt-10 pt-8 border-t border-gray-100 dark:border-gray-800"
         >
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-5">
+          <p className="text-xs font-semibold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-5">
             Alle Leistungen in Bayern
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -233,13 +233,13 @@ export function RelatedPages({ config }: RelatedPagesProps) {
                         to={link.href}
                         className={`group inline-flex items-center gap-1.5 text-sm transition-colors ${
                           link.href === config.route
-                            ? "text-gray-400 dark:text-gray-600 pointer-events-none"
+                            ? "text-pub-ink-3 dark:text-gray-600 pointer-events-none"
                             : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 font-medium"
                         }`}
                         aria-current={link.href === config.route ? "page" : undefined}
                       >
                         {link.href !== config.route && (
-                          <ArrowRight size={12} className="text-gray-300 dark:text-gray-600 group-hover:text-gray-500 transition-colors flex-shrink-0" />
+                          <ArrowRight size={12} className="text-pub-ink-3 dark:text-gray-600 group-hover:text-gray-500 transition-colors flex-shrink-0" />
                         )}
                         {link.href === config.route && (
                           <span className="w-3 h-px bg-gray-300 dark:bg-gray-600 inline-block flex-shrink-0" />
