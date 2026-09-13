@@ -292,7 +292,7 @@ export function AutomatisierungRechner() {
   return (
     <div id={AUTOMATISIERUNG_RECHNER_ANKER} className="scroll-mt-28">
       <div className={`${CARD} p-6 lg:p-8`}>
-        <p className="text-[14px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2">
+        <p className="text-[14px] font-semibold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-2">
           Wirtschaftlichkeit rechnen
         </p>
         <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">
@@ -495,7 +495,7 @@ export function AutomatisierungRechner() {
             </>
           ) : (
             <div className="mt-4 flex items-start gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4">
-              <Info size={16} className="flex-shrink-0 mt-0.5 text-gray-400 dark:text-gray-500" />
+              <Info size={16} className="flex-shrink-0 mt-0.5 text-pub-ink-3 dark:text-gray-500" />
               <div>
                 <p className="text-[16px] font-semibold text-gray-900 dark:text-gray-100">
                   Wirtschaftlichkeit noch nicht vollständig berechnet

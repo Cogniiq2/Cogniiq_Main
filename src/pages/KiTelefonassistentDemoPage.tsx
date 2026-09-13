@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -10,13 +11,11 @@ import {
   Shield,
   Zap,
   Building2,
-  ChevronDown,
-  Check,
 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { RechnerCta } from "@/components/RechnerCta";
 import { N8N_ENDPOINTS } from "@/config/externalEndpoints";
-import { BUSINESS_INFO } from "@/lib/seo-data";
+import { BUSINESS_INFO, PHONE_HREF } from "@/lib/seo-data";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -43,13 +42,13 @@ const DEMO_BENEFITS = [
 ];
 
 const INDUSTRIES = [
-  { value: "Handwerk / Bau", label: "Handwerk / Bau", icon: "🔧" },
-  { value: "Arztpraxis / Heilberufe", label: "Arztpraxis / Heilberufe", icon: "⚕️" },
-  { value: "Dienstleistungen", label: "Dienstleistungen", icon: "💼" },
-  { value: "Immobilien", label: "Immobilien", icon: "🏠" },
-  { value: "Agentur / Beratung", label: "Agentur / Beratung", icon: "📊" },
-  { value: "Gastro / Hotel", label: "Gastro / Hotel", icon: "🍽️" },
-  { value: "Sonstige", label: "Sonstige", icon: "✦" },
+  { value: "Handwerk / Bau", label: "Handwerk / Bau" },
+  { value: "Arztpraxis / Heilberufe", label: "Arztpraxis / Heilberufe" },
+  { value: "Dienstleistungen", label: "Dienstleistungen" },
+  { value: "Immobilien", label: "Immobilien" },
+  { value: "Agentur / Beratung", label: "Agentur / Beratung" },
+  { value: "Gastro / Hotel", label: "Gastro / Hotel" },
+  { value: "Sonstige", label: "Sonstige" },
 ];
 
 const COMPANY_SIZES = [
@@ -60,98 +59,6 @@ const COMPANY_SIZES = [
   { value: "200+ Mitarbeiter", label: "200+ Mitarbeiter", sub: "Großunternehmen" },
 ];
 
-interface PremiumSelectProps {
-  value: string;
-  onChange: (val: string) => void;
-  placeholder: string;
-  options: Array<{ value: string; label: string; icon?: string; sub?: string }>;
-}
-
-function PremiumSelect({ value, onChange, placeholder, options }: PremiumSelectProps) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  const selected = options.find((o) => o.value === value);
-
-  return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((p) => !p)}
-        className={`w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-lg border text-sm transition-all duration-200 text-left
-          ${open
-            ? "border-gray-400 dark:border-gray-500 bg-white dark:bg-gray-800/80 shadow-sm"
-            : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 hover:border-gray-300 dark:hover:border-gray-600"
-          }`}
-      >
-        <span className={selected ? "text-gray-900 dark:text-gray-100 flex items-center gap-2" : "text-gray-400 dark:text-gray-500"}>
-          {selected ? (
-            <>
-              {selected.icon && <span className="text-base leading-none">{selected.icon}</span>}
-              {selected.label}
-            </>
-          ) : placeholder}
-        </span>
-        <ChevronDown
-          size={14}
-          className={`flex-shrink-0 text-gray-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-        />
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -6, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.98 }}
-            transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
-            className="absolute z-50 top-full mt-1.5 left-0 right-0 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden"
-          >
-            <div className="p-1.5 space-y-0.5 max-h-56 overflow-y-auto">
-              {options.map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => { onChange(opt.value); setOpen(false); }}
-                  className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors duration-150 text-left group
-                    ${value === opt.value
-                      ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60"
-                    }`}
-                >
-                  <span className="flex items-center gap-2.5 min-w-0">
-                    {opt.icon && (
-                      <span className="text-base leading-none flex-shrink-0">{opt.icon}</span>
-                    )}
-                    <span className="flex flex-col min-w-0">
-                      <span className="font-medium truncate">{opt.label}</span>
-                      {opt.sub && (
-                        <span className="text-xs text-gray-400 dark:text-gray-500 font-normal">{opt.sub}</span>
-                      )}
-                    </span>
-                  </span>
-                  {value === opt.value && (
-                    <Check size={13} className="flex-shrink-0 text-gray-600 dark:text-gray-400" />
-                  )}
-                </button>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
 
 export function KiTelefonassistentDemoPage() {
   const [name, setName] = useState("");
@@ -164,9 +71,13 @@ export function KiTelefonassistentDemoPage() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
+  const [error, setError] = useState<string | null>(null);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
+    setError(null);
 
     const payload = {
       name,
@@ -182,19 +93,26 @@ export function KiTelefonassistentDemoPage() {
       page_url: window.location.href,
     };
 
+    // Success is shown only after the endpoint acknowledged the request
+    // (readable 2xx). A network error, CORS failure or non-2xx response keeps
+    // the form and its inputs visible and offers phone and e-mail instead.
+    // Previously every outcome, including a failed fetch, showed success.
     try {
-      await fetch(N8N_ENDPOINTS.receptionistDemo, {
+      const res = await fetch(N8N_ENDPOINTS.receptionistDemo, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-    } catch (error) {
-      console.warn("Receptionist demo submission failed", error);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setSent(true);
+    } catch (err) {
+      console.warn("Receptionist demo submission failed", err);
+      setError(
+        "Wir konnten den Eingang Ihrer Anfrage nicht bestätigen. Bitte versuchen Sie es erneut oder schreiben Sie uns direkt."
+      );
+    } finally {
+      setLoading(false);
     }
-
-    setSent(true);
-    setLoading(false);
-    window.location.href = "https://cogniiq.de/anfrage-erhalten";
   }
 
   const schema = {
@@ -225,7 +143,7 @@ export function KiTelefonassistentDemoPage() {
           <div className="max-w-6xl mx-auto px-6 lg:px-8">
             <motion.nav
               aria-label="Breadcrumb"
-              className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8 flex-wrap"
+              className="cq-rise flex items-center gap-1.5 text-sm text-pub-ink-3 dark:text-gray-500 mb-8 flex-wrap"
             >
               {breadcrumbs.map((crumb, i) => (
                 <span key={crumb.url} className="flex items-center gap-1.5">
@@ -253,13 +171,14 @@ export function KiTelefonassistentDemoPage() {
                   Kostenlos · Unverbindlich
                 </div>
 
-                <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-tight tracking-tight mb-5">
-                  KI Telefonassistent Demo
+                <h1 className="text-[clamp(30px,8vw,40px)] lg:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-tight tracking-tight mb-5">
+                  Demo-Termin anfragen
                 </h1>
 
                 <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed mb-10">
-                  Erleben Sie live, wie Ihre KI Anrufe beantwortet und Termine
-                  automatisch bucht – individuell für Ihr Unternehmen konfiguriert.
+                  Sie schildern Ihre Anrufe, wir zeigen Ihnen den Assistenten per Video
+                  an einem Beispiel aus Ihrer Branche und besprechen, wie er für Ihr
+                  Unternehmen konfiguriert würde.
                 </p>
 
                 <div className="space-y-3 mb-10">
@@ -277,7 +196,7 @@ export function KiTelefonassistentDemoPage() {
                 </div>
 
                 <div className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800">
-                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
+                  <p className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-3">
                     So läuft die Demo ab
                   </p>
                   <ol className="space-y-2.5">
@@ -417,26 +336,38 @@ export function KiTelefonassistentDemoPage() {
 
                         <div className="grid sm:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
+                            <label htmlFor="demo-industry" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
                               Branche
                             </label>
-                            <PremiumSelect
-                              value={industry}
-                              onChange={setIndustry}
-                              placeholder="Bitte wählen"
-                              options={INDUSTRIES}
-                            />
+                            <Select value={industry} onValueChange={setIndustry}>
+                              <SelectTrigger id="demo-industry" aria-label="Branche" className="h-11 rounded-lg border-gray-200 bg-gray-50 text-sm dark:border-gray-700 dark:bg-gray-800/60">
+                                <SelectValue placeholder="Bitte wählen" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {INDUSTRIES.map((opt) => (
+                                  <SelectItem key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
                           <div>
-                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
+                            <label htmlFor="demo-size" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
                               Unternehmensgröße
                             </label>
-                            <PremiumSelect
-                              value={size}
-                              onChange={setSize}
-                              placeholder="Bitte wählen"
-                              options={COMPANY_SIZES}
-                            />
+                            <Select value={size} onValueChange={setSize}>
+                              <SelectTrigger id="demo-size" aria-label="Unternehmensgröße" className="h-11 rounded-lg border-gray-200 bg-gray-50 text-sm dark:border-gray-700 dark:bg-gray-800/60">
+                                <SelectValue placeholder="Bitte wählen" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {COMPANY_SIZES.map((opt) => (
+                                  <SelectItem key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
                         </div>
 
@@ -453,20 +384,46 @@ export function KiTelefonassistentDemoPage() {
                           />
                         </div>
 
+                        {error && (
+                          <div
+                            role="alert"
+                            className="rounded-xl border border-[#b42318]/25 bg-[#fef3f2] px-4 py-3 text-sm leading-relaxed text-[#8a1c12]"
+                          >
+                            <p className="font-semibold">{error}</p>
+                            <p className="mt-1">
+                              Telefon:{" "}
+                              <a href={PHONE_HREF} className="underline underline-offset-2">
+                                {BUSINESS_INFO.contact.phoneDisplay}
+                              </a>{" "}
+                              · E-Mail:{" "}
+                              <a href={`mailto:${BUSINESS_INFO.contact.email}`} className="underline underline-offset-2">
+                                {BUSINESS_INFO.contact.email}
+                              </a>
+                            </p>
+                          </div>
+                        )}
+
                         <button
                           type="submit"
                           disabled={loading}
-                          className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+                          aria-busy={loading}
+                          className="w-full flex items-center justify-center gap-2 h-12 px-6 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-full font-semibold text-[15px] hover:bg-gray-700 dark:hover:bg-white transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
                         >
                           {loading ? (
                             <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                           ) : (
                             <Phone size={15} />
                           )}
-                          {loading ? "Wird gesendet…" : "Kostenlose Demo anfragen"}
+                          {loading ? "Wird gesendet…" : "Demo-Termin anfragen"}
                         </button>
 
-                        <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
+                        <p className="text-[13px] text-gray-600 dark:text-gray-400 text-center leading-relaxed">
+                          Ihre Daten werden ausschließlich zur Bearbeitung Ihrer Anfrage verwendet und niemals an Dritte weitergegeben.{" "}
+                          <Link to="/datenschutz" className="underline underline-offset-2 hover:text-gray-900 dark:hover:text-white">
+                            Datenschutzerklärung
+                          </Link>
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-500 text-center">
                           Kein Verkaufsdruck · Kostenlos · Rückmeldung innerhalb von 24&nbsp;Stunden
                         </p>
                       </form>
@@ -487,7 +444,7 @@ export function KiTelefonassistentDemoPage() {
               variants={fadeUp}
               custom={0}
             >
-              <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
+              <p className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-4">
                 Das erwartet Sie in der Demo
               </p>
               <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-10">

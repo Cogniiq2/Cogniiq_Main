@@ -97,7 +97,7 @@ export function CostComparisonSection() {
           >
             Menschlicher Empfang
             <br />
-            <span className="text-gray-300 dark:text-gray-600">und KI-Telefonassistent</span>
+            <span className="text-pub-ink-3 dark:text-gray-600">und KI-Telefonassistent</span>
           </h2>
           <p className="text-[15.5px] text-gray-500 dark:text-gray-400 leading-[1.72]">
             Der Vergleich nach Eigenschaften, in beide Richtungen. Was der
@@ -134,7 +134,7 @@ export function CostComparisonSection() {
                 <div className="min-w-0">
                   <span className="text-[13.5px] text-gray-700 dark:text-gray-300">{zeile.label}</span>
                   {zeile.hinweis && (
-                    <p className="text-[12px] text-gray-400 dark:text-gray-500 mt-0.5 leading-relaxed">
+                    <p className="text-[12px] text-pub-ink-3 dark:text-gray-500 mt-0.5 leading-relaxed">
                       {zeile.hinweis}
                     </p>
                   )}
@@ -227,7 +227,7 @@ function Marke({ an, gruen = false }: { an: boolean; gruen?: boolean }) {
           aria-label="ja"
         />
       ) : (
-        <X size={8} className="text-gray-300 dark:text-gray-600" aria-label="nein" />
+        <X size={8} className="text-pub-ink-3 dark:text-gray-600" aria-label="nein" />
       )}
     </div>
   );

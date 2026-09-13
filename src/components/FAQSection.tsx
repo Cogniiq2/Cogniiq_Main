@@ -6,13 +6,13 @@ import { FAQQuestionModal } from './FAQQuestionModal';
 
 const faqs = [
   {
-    question: 'Was kostet ein Projekt mit euch?',
+    question: 'Was kostet ein Projekt mit Cogniiq?',
     answer:
       'Das hängt von Ziel und Umfang ab. Wir arbeiten nicht mit pauschalen Paketpreisen, sondern mit individuellen Angeboten – abgestimmt auf Ihre Prozesse und Systeme. Das Erstgespräch und eine erste Einschätzung sind kostenlos.',
     category: 'Kosten',
   },
   {
-    question: 'Wie schnell könnt ihr starten?',
+    question: 'Wie schnell können Sie starten?',
     // Kanonisch: 14 Kalendertage ab dem Start bis zur Übergabe zur Freigabe
     // (FAKTEN.uebergabeGarantie). Der Go-live hängt an der Kundenfreigabe und
     // darf hier nie mit einer Frist verbunden werden.
@@ -21,7 +21,7 @@ const faqs = [
     category: 'Ablauf',
   },
   {
-    question: 'Könnt ihr bestehende Systeme übernehmen und verbessern?',
+    question: 'Übernehmen Sie bestehende Systeme und verbessern sie?',
     answer:
       'Ja. Wir analysieren bestehende Websites, Buchungssysteme und Automationen und modernisieren sie gezielt – anstatt alles neu zu bauen. Wir setzen dort an, wo der größte Hebel liegt.',
     category: 'Leistungen',
@@ -33,19 +33,19 @@ const faqs = [
     category: 'Betrieb',
   },
   {
-    question: 'Arbeitet ihr nur in Bayreuth und Regensburg?',
+    question: 'Arbeiten Sie nur in Bayreuth und Regensburg?',
     answer:
       'Nein. Wir arbeiten vollständig remote in ganz Deutschland und darüber hinaus. Persönliche Vor-Ort-Termine sind im Raum Bayreuth, Regensburg und München möglich.',
     category: 'Region',
   },
   {
-    question: 'Für welche Unternehmensgrößen seid ihr geeignet?',
+    question: 'Für welche Unternehmensgrößen sind Sie geeignet?',
     answer:
       'Für Unternehmen ab ca. 5 Mitarbeitern, die operative Prozesse skalieren wollen. Wir arbeiten sowohl mit mittelständischen Unternehmen als auch mit wachsenden Scale-ups zusammen.',
     category: 'Zielgruppe',
   },
   {
-    question: 'Was unterscheidet euch von einer klassischen Webdesign-Agentur?',
+    question: 'Was unterscheidet Cogniiq von einer klassischen Webdesign-Agentur?',
     answer:
       'Wir bauen keine Websites – wir bauen Systeme. Jedes Projekt ist darauf ausgelegt, operative Kosten zu senken, Prozesse zu automatisieren und mehr Anfragen zu bringen. Design ist Mittel, nicht Zweck.',
     category: 'Positionierung',
@@ -101,7 +101,7 @@ export function FAQSection() {
             transition={{ duration: 0.7, ease: EASE }}
             className="lg:col-span-4 lg:sticky lg:top-32"
           >
-            <p className="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-gray-400 dark:text-gray-500 mb-5">
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-pub-ink-3 dark:text-gray-500 mb-5">
               FAQ
             </p>
             <h2
@@ -110,7 +110,7 @@ export function FAQSection() {
             >
               Häufige
               <br />
-              <span className="text-gray-400 dark:text-gray-600">Fragen.</span>
+              <span className="text-pub-ink-3 dark:text-gray-600">Fragen.</span>
             </h2>
             <p className="text-base text-gray-500 dark:text-gray-400 leading-relaxed mb-8 max-w-xs">
               Alles Wichtige zu Prozess,{' '}
@@ -142,7 +142,7 @@ export function FAQSection() {
                   <span className="text-xl font-bold text-gray-900 dark:text-gray-100 tabular-nums min-w-[52px] tracking-tight">
                     {stat.count}
                   </span>
-                  <span className="text-xs text-gray-400 dark:text-gray-500">{stat.label}</span>
+                  <span className="text-xs text-pub-ink-3 dark:text-gray-500">{stat.label}</span>
                 </div>
               ))}
             </div>
@@ -173,7 +173,7 @@ export function FAQSection() {
                     className="w-full flex items-start justify-between gap-6 py-6 text-left"
                   >
                     <div className="flex items-start gap-4 flex-1 min-w-0">
-                      <span className="text-[11px] font-medium text-gray-300 dark:text-gray-600 tabular-nums flex-shrink-0 pt-0.5 min-w-[20px]">
+                      <span className="text-[11px] font-medium text-pub-ink-3 dark:text-gray-600 tabular-nums flex-shrink-0 pt-0.5 min-w-[20px]">
                         {String(i + 1).padStart(2, '0')}
                       </span>
                       <span className="text-[15px] font-medium text-gray-900 dark:text-gray-100 leading-snug tracking-tight">
@@ -211,7 +211,7 @@ export function FAQSection() {
                           <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
                             {faq.answer}
                           </p>
-                          <span className="inline-block mt-3 text-[10px] font-semibold tracking-[0.14em] uppercase text-gray-300 dark:text-gray-600">
+                          <span className="inline-block mt-3 text-[10px] font-semibold tracking-[0.14em] uppercase text-pub-ink-3 dark:text-gray-600">
                             {faq.category}
                           </span>
                         </div>
@@ -232,7 +232,7 @@ export function FAQSection() {
                 <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 tracking-tight">
                   Noch eine offene Frage?
                 </p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                <p className="text-xs text-pub-ink-3 dark:text-gray-500 mt-0.5">
                   Wir antworten direkt – kein Formular-Chaos.
                 </p>
               </div>

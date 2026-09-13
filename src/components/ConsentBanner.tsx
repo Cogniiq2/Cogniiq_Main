@@ -113,7 +113,7 @@ export function ConsentBanner() {
           role="dialog"
           aria-modal="false"
           aria-label="Cookie-Einwilligung"
-          className="fixed inset-x-0 bottom-24 z-[60] mx-3 rounded-2xl border border-gray-200 bg-white/95 shadow-lg backdrop-blur-md dark:border-white/10 dark:bg-gray-950/95 lg:mx-0 lg:rounded-none lg:border-x-0 lg:border-b-0 lg:border-t lg:bottom-0 lg:shadow-none"
+          className="fixed inset-x-0 bottom-3 z-[60] mx-3 max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-2xl border border-gray-200 bg-white/95 shadow-lg backdrop-blur-md dark:border-white/10 dark:bg-gray-950/95 lg:mx-0 lg:rounded-none lg:border-x-0 lg:border-b-0 lg:border-t lg:bottom-0 lg:shadow-none"
         >
           <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-5 sm:py-4 lg:px-8">
             {/* Tighter type below sm purely to reduce how much of a 844px phone
@@ -141,21 +141,21 @@ export function ConsentBanner() {
               <button
                 type="button"
                 onClick={() => setShowSettings(true)}
-                className="rounded-lg border border-gray-300 px-4 py-2 text-[13px] font-medium text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-900 dark:border-white/15 dark:text-gray-300 dark:hover:text-white"
+                className="inline-flex h-11 items-center rounded-full border border-gray-300 px-5 text-[13.5px] font-medium text-gray-700 transition-colors hover:border-gray-400 hover:text-gray-900 dark:border-white/15 dark:text-gray-300 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
               >
                 Einstellungen
               </button>
               <button
                 type="button"
                 onClick={reject}
-                className="rounded-lg border border-gray-300 px-5 py-2 text-[13px] font-semibold text-gray-800 transition-colors hover:border-gray-400 hover:bg-gray-50 dark:border-white/15 dark:text-gray-100 dark:hover:bg-white/[0.06]"
+                className="inline-flex h-11 items-center rounded-full border border-gray-300 px-5 text-[13.5px] font-semibold text-gray-800 transition-colors hover:border-gray-400 hover:bg-gray-50 dark:border-white/15 dark:text-gray-100 dark:hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
               >
                 Ablehnen
               </button>
               <button
                 type="button"
                 onClick={accept}
-                className="rounded-lg bg-gray-900 px-5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-gray-700 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+                className="inline-flex h-11 items-center rounded-full bg-gray-900 px-5 text-[13.5px] font-semibold text-white transition-colors hover:bg-gray-700 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
               >
                 Alle akzeptieren
               </button>

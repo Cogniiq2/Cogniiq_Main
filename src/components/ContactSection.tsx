@@ -102,7 +102,7 @@ function ProgressBar({ step }: { step: number }) {
             </motion.div>
             <span
               className="text-[11px] font-medium hidden sm:block transition-colors"
-              style={{ color: i === step ? '#111827' : '#9ca3af' }}
+              style={{ color: i === step ? '#111827' : '#5b6773' }}
             >
               {s.short}
             </span>
@@ -436,7 +436,7 @@ export function ContactSection() {
         >
           <div className="flex items-center gap-2 mb-5">
             <Sparkles size={11} className="text-gray-300" />
-            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-gray-400">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-pub-ink-3">
               Analysegespräch
             </p>
           </div>
@@ -469,7 +469,7 @@ export function ContactSection() {
             className="lg:col-span-4 flex flex-col gap-8"
           >
             <div>
-              <p className="text-[9.5px] font-semibold uppercase tracking-[0.2em] text-gray-400 mb-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-pub-ink-3 mb-5">
                 Nach Ihrer Anfrage
               </p>
               <div className="flex flex-col">
@@ -480,7 +480,7 @@ export function ContactSection() {
                   >
                     <div className="flex flex-col items-center gap-1 flex-shrink-0 pt-0.5">
                       <span
-                        className="text-gray-300 tabular-nums font-medium"
+                        className="text-pub-ink-3 tabular-nums font-medium"
                         style={{ fontSize: '11px', letterSpacing: '0.04em', minWidth: '22px' }}
                       >
                         {s.n}
@@ -491,7 +491,7 @@ export function ContactSection() {
                     </div>
                     <div>
                       <p className="text-[13.5px] font-medium text-gray-800 leading-snug">{s.label}</p>
-                      <p className="text-[11.5px] text-gray-400 mt-0.5">{s.sub}</p>
+                      <p className="text-[12px] text-pub-ink-3 mt-0.5">{s.sub}</p>
                     </div>
                   </div>
                 ))}
@@ -499,7 +499,7 @@ export function ContactSection() {
             </div>
 
             <div className="border border-gray-100 rounded-xl p-5 bg-gray-50/60">
-              <p className="text-[9.5px] font-semibold uppercase tracking-[0.18em] text-gray-400 mb-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-pub-ink-3 mb-3">
                 Für wen
               </p>
               <p className="text-[13px] text-gray-500 leading-[1.68]">
@@ -518,7 +518,7 @@ export function ContactSection() {
 
             {/* DSGVO Trust Badges */}
             <div>
-              <p className="text-[9.5px] font-semibold uppercase tracking-[0.18em] text-gray-400 mb-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-pub-ink-3 mb-3">
                 Datenschutz & Sicherheit
               </p>
               <div className="grid grid-cols-2 gap-2">
@@ -532,7 +532,7 @@ export function ContactSection() {
                   </div>
                 ))}
               </div>
-              <p className="text-[10.5px] text-gray-400 mt-3 leading-relaxed">
+              <p className="text-[12.5px] text-pub-ink-3 mt-3 leading-relaxed">
                 Ihre Daten werden ausschließlich zur Bearbeitung Ihrer Anfrage verwendet und niemals an Dritte weitergegeben.
               </p>
             </div>
@@ -555,7 +555,7 @@ export function ContactSection() {
                 <h3 className="text-[15px] font-bold text-gray-900 leading-tight">
                   {STEPS[step].label}
                 </h3>
-                <p className="text-[12px] text-gray-400 mt-0.5">
+                <p className="text-[12.5px] text-pub-ink-3 mt-0.5">
                   Schritt {step + 1} von {STEPS.length}
                 </p>
               </div>
@@ -586,9 +586,10 @@ export function ContactSection() {
                       type="button"
                       onClick={handleNext}
                       disabled={!canAdvance()}
-                      className="flex items-center gap-2.5 text-white"
+                      className="flex items-center gap-2.5"
                       style={{
-                        background: canAdvance() ? '#111827' : '#d1d5db',
+                        background: canAdvance() ? '#111827' : '#e5e7eb',
+                        color: canAdvance() ? '#ffffff' : '#374151',
                         fontSize: '13.5px',
                         fontWeight: 600,
                         letterSpacing: '0.01em',

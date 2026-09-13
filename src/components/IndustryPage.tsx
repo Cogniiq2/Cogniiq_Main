@@ -184,7 +184,7 @@ function HeroSection({
       <div className="max-w-5xl mx-auto px-6 lg:px-8">
         <nav
           aria-label="Breadcrumb"
-          className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8 flex-wrap"
+          className="cq-rise flex items-center gap-1.5 text-sm text-pub-ink-3 dark:text-gray-500 mb-8 flex-wrap"
         >
           {breadcrumbs.map((crumb, i) => (
             <span key={crumb.url} className="flex items-center gap-1.5">
@@ -308,7 +308,7 @@ function EngpaesseSection({ config, items }: { config: IndustryPageConfig; items
             >
               <AlertCircle
                 size={16}
-                className="flex-shrink-0 mt-0.5 text-gray-400 dark:text-gray-500"
+                className="flex-shrink-0 mt-0.5 text-pub-ink-3 dark:text-gray-500"
               />
               <span className="text-sm text-gray-700 dark:text-gray-300">{item}</span>
             </motion.div>
@@ -362,7 +362,7 @@ function SolutionSection({
               custom={i * 0.1}
               className="relative bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-6"
             >
-              <div className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
+              <div className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-3">
                 {step.step}
               </div>
               <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-2">
@@ -420,15 +420,15 @@ function WorkflowSection({
           className="bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden"
         >
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">Ausgangslage</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-1">Ausgangslage</p>
             <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{workflow.trigger}</p>
           </div>
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">Vorgehen</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-1">Vorgehen</p>
             <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{workflow.process}</p>
           </div>
           <div className="p-6">
-            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">Ergebnis</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-1">Ergebnis</p>
             <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{workflow.result}</p>
           </div>
         </motion.div>
@@ -482,8 +482,8 @@ function PaketeSection({
             >
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <Package size={14} className="text-gray-400 dark:text-gray-500" />
-                  <span className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+                  <Package size={14} className="text-pub-ink-3 dark:text-gray-500" />
+                  <span className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500">
                     {paket.name}
                   </span>
                 </div>
@@ -616,7 +616,7 @@ function UseCasesSection({ config }: { config: IndustryPageConfig }) {
               className="flex gap-4 p-6 rounded-2xl bg-white dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/50"
             >
               <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center">
-                <Lightbulb size={15} className="text-gray-400 dark:text-gray-500" />
+                <Lightbulb size={15} className="text-pub-ink-3 dark:text-gray-500" />
               </div>
               <div>
                 <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">
@@ -735,7 +735,7 @@ function InternalLinksSection({ config }: { config: IndustryPageConfig }) {
             variants={fadeUp}
             custom={0}
           >
-            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
+            <p className="text-xs font-semibold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-4">
               Verwandte Seiten
             </p>
             <div className="flex flex-wrap gap-2">
@@ -759,7 +759,7 @@ function InternalLinksSection({ config }: { config: IndustryPageConfig }) {
             variants={fadeUp}
             custom={0.1}
           >
-            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
+            <p className="text-xs font-semibold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-4">
               Häufige Probleme – direkt adressiert
             </p>
             <ul className="space-y-2">
@@ -866,7 +866,7 @@ function CTASection({ config }: { config: IndustryPageConfig }) {
               Cogniiq {config.city}
             </Link>
           </div>
-          <p className="mt-6 text-xs text-gray-400 dark:text-gray-500">
+          <p className="mt-6 text-xs text-pub-ink-3 dark:text-gray-500">
             {BUSINESS_INFO.name} · {BUSINESS_INFO.address.addressLocality} ·{" "}
             {BUSINESS_INFO.contact.email}
           </p>

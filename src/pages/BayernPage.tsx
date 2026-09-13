@@ -265,7 +265,7 @@ export function BayernPage() {
           <div className="max-w-5xl mx-auto px-6 lg:px-8">
             <motion.nav
               aria-label="Breadcrumb"
-              className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8"
+              className="cq-rise flex items-center gap-1.5 text-sm text-pub-ink-3 dark:text-gray-500 mb-8"
             >
               <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Home</Link>
               <ChevronRight size={12} />
@@ -528,7 +528,7 @@ export function BayernPage() {
                   className="p-5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50"
                 >
                   <div className="flex items-center gap-2 mb-3">
-                    <Building2 size={14} className="text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                    <Building2 size={14} className="text-pub-ink-3 dark:text-gray-500 flex-shrink-0" />
                     <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{industry.name}</h3>
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{industry.description}</p>
@@ -569,7 +569,7 @@ export function BayernPage() {
                   className="flex gap-4 p-6 rounded-2xl bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
                 >
                   <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                    <Lightbulb size={15} className="text-gray-400 dark:text-gray-500" />
+                    <Lightbulb size={15} className="text-pub-ink-3 dark:text-gray-500" />
                   </div>
                   <div>
                     <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">{scenario.title}</h3>
@@ -653,14 +653,14 @@ export function BayernPage() {
               custom={0.3}
               className="mt-10 p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
             >
-              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
+              <p className="text-xs font-semibold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-4">
                 Weitere Regionen & Städte in Bayern
               </p>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
                 {ADDITIONAL_CITIES.map((city, i) => (
                   <div key={i} className="flex flex-col gap-0.5">
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{city.name}</span>
-                    <span className="text-xs text-gray-400 dark:text-gray-500">{city.note}</span>
+                    <span className="text-xs text-pub-ink-3 dark:text-gray-500">{city.note}</span>
                   </div>
                 ))}
               </div>
@@ -770,7 +770,7 @@ export function BayernPage() {
                   Alle Leistungen
                 </Link>
               </div>
-              <p className="mt-6 text-xs text-gray-400 dark:text-gray-500">
+              <p className="mt-6 text-xs text-pub-ink-3 dark:text-gray-500">
                 {BUSINESS_INFO.name} · {BUSINESS_INFO.address.addressLocality} · {BUSINESS_INFO.contact.email}
               </p>
             </motion.div>

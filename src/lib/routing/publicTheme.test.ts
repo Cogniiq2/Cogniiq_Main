@@ -35,8 +35,8 @@ describe('public light theme surface classification', () => {
     for (const path of [
       '/',
       '/leistungen',
-      '/bewertungen',
-      '/referenzen',
+      '/faq',
+      '/prozessautomatisierung',
       '/ueber-uns',
       '/kontakt',
       '/bayreuth/webdesign',

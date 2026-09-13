@@ -443,13 +443,13 @@ export function ProzessautomatisierungHub() {
         {/* ── HERO ── */}
         <section className="pt-28 pb-16 px-6 lg:px-10">
           <div className="max-w-5xl mx-auto">
-            <nav aria-label="Breadcrumb" className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-white/35 mb-8">
+            <nav aria-label="Breadcrumb" className="cq-rise flex items-center gap-1.5 text-sm text-pub-ink-3 dark:text-white/35 mb-8">
               <Link to="/" className="hover:text-gray-600 dark:hover:text-white/60 transition-colors">Home</Link>
               <ChevronRight size={12} />
               <span className="text-gray-600 dark:text-white/60">Prozessautomatisierung</span>
             </nav>
 
-            <motion.p className="cq-rise text-xs font-semibold tracking-[0.18em] uppercase text-emerald-600 dark:text-emerald-400 mb-4">
+            <motion.p className="cq-rise text-xs font-semibold tracking-[0.18em] uppercase text-pub-verify dark:text-emerald-400 mb-4">
               Prozessautomatisierung · Deutschland
             </motion.p>
             <motion.h1 className="cq-rise cq-rise-d1 text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 dark:text-white leading-[1.08] mb-6 max-w-4xl">
@@ -477,7 +477,7 @@ export function ProzessautomatisierungHub() {
             <div className="cq-rise cq-rise-d3 flex flex-wrap gap-4">
               <Link
                 to="/kontakt"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-colors"
+                className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-pub-ink hover:bg-[#1f2933] text-white font-semibold text-[15px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
               >
                 Prozess besprechen <ArrowRight size={15} />
               </Link>
@@ -530,7 +530,7 @@ export function ProzessautomatisierungHub() {
                   "Kein Ablauf ohne Menschen. Ausnahmen, Freigaben und Grenzfälle bleiben besetzt — das ist die Voraussetzung dafür, dass der Rest laufen darf.",
                 ].map((p) => (
                   <li key={p} className="flex items-start gap-2 text-sm text-gray-600 dark:text-white/55 leading-relaxed">
-                    <XCircle size={14} className="text-gray-400 dark:text-white/30 mt-1 flex-shrink-0" />
+                    <XCircle size={14} className="text-pub-ink-3 dark:text-white/30 mt-1 flex-shrink-0" />
                     {p}
                   </li>
                 ))}
@@ -576,7 +576,7 @@ export function ProzessautomatisierungHub() {
                 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={i * 0.05}
                 className="flex gap-3 p-5 rounded-xl border border-gray-100 dark:border-white/[0.06] bg-white dark:bg-white/[0.02]"
               >
-                <XCircle size={15} className="text-gray-400 dark:text-white/30 mt-0.5 flex-shrink-0" />
+                <XCircle size={15} className="text-pub-ink-3 dark:text-white/30 mt-0.5 flex-shrink-0" />
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">{u.titel}</h3>
                   <p className="text-sm text-gray-500 dark:text-white/50 leading-relaxed">{u.text}</p>
@@ -670,7 +670,7 @@ export function ProzessautomatisierungHub() {
                   ))}
                 </ol>
                 <div className="pt-3 border-t border-gray-100 dark:border-white/[0.06]">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-white/30 mb-1">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-pub-ink-3 dark:text-white/30 mb-1">
                     Wo der Mensch die Kontrolle behält
                   </p>
                   <p className="text-sm text-gray-500 dark:text-white/50 leading-relaxed">{mensch}</p>
@@ -779,7 +779,7 @@ export function ProzessautomatisierungHub() {
                 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={i * 0.04}
                 className="flex gap-4 p-5 rounded-xl border border-gray-100 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.02]"
               >
-                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 text-white text-[13px] font-bold flex items-center justify-center">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-pub-verify text-white text-[13px] font-bold flex items-center justify-center">
                   {i + 1}
                 </span>
                 <div>
@@ -826,7 +826,7 @@ export function ProzessautomatisierungHub() {
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 to="/kosten-automatisierung"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-colors"
+                className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-pub-ink hover:bg-[#1f2933] text-white font-semibold text-[15px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
               >
                 Kosten, Preistreiber und Rechner <ArrowRight size={15} />
               </Link>
@@ -846,7 +846,7 @@ export function ProzessautomatisierungHub() {
                 <Link to={href} className="group flex items-center gap-3 p-4 rounded-xl border border-gray-100 dark:border-white/[0.06] hover:border-emerald-200 dark:hover:border-emerald-500/20 bg-gray-50 dark:bg-white/[0.02] hover:bg-emerald-50/50 dark:hover:bg-emerald-500/[0.04] transition-all">
                   <Icon size={16} className="text-emerald-500 flex-shrink-0" />
                   <span className="text-sm font-medium text-gray-700 dark:text-white/65 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">{label}</span>
-                  <ArrowRight size={13} className="ml-auto text-gray-300 dark:text-white/20 group-hover:text-emerald-400 transition-colors" />
+                  <ArrowRight size={13} className="ml-auto text-pub-ink-3 dark:text-white/20 group-hover:text-emerald-400 transition-colors" />
                 </Link>
               </motion.div>
             ))}
@@ -859,9 +859,9 @@ export function ProzessautomatisierungHub() {
                   <MapPin size={16} className="text-emerald-500 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-gray-900 dark:text-white text-sm group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">{label}</p>
-                    <p className="text-xs text-gray-400 dark:text-white/35 mt-0.5">{sub}</p>
+                    <p className="text-xs text-pub-ink-3 dark:text-white/35 mt-0.5">{sub}</p>
                   </div>
-                  <ChevronRight size={14} className="ml-auto text-gray-300 dark:text-white/20 group-hover:text-emerald-400 mt-0.5 transition-colors" />
+                  <ChevronRight size={14} className="ml-auto text-pub-ink-3 dark:text-white/20 group-hover:text-emerald-400 mt-0.5 transition-colors" />
                 </Link>
               </motion.div>
             ))}
@@ -921,7 +921,7 @@ export function ProzessautomatisierungHub() {
               <div className="flex flex-wrap justify-center gap-4">
                 <Link
                   to="/kontakt"
-                  className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition-colors"
+                  className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-pub-verify hover:bg-[#185939] text-white font-semibold transition-colors"
                 >
                   Erstgespräch vereinbaren <ArrowRight size={16} />
                 </Link>

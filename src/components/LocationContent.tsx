@@ -1,7 +1,7 @@
 import { MapPin, Users, Building2, Zap, Clock, Phone, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
-import { BUSINESS_INFO, PHONE_HREF, getGoogleMapsUrl, getGoogleMapsEmbedUrl } from "@/lib/seo-data";
-import { motion } from "framer-motion";
+import { BUSINESS_INFO, PHONE_HREF, getGoogleMapsUrl } from "@/lib/seo-data";
+import { ConsentMapEmbed } from "@/components/ConsentMapEmbed";
 
 const SERVICE_CITIES: Array<{ label: string; href: string }> = [
   { label: "Bayreuth", href: "/bayreuth" },
@@ -52,12 +52,12 @@ const LOKAL_LINKS = [
 function InternalLink({ href, label }: { href: string; label: string }) {
   const isExternal = href === "#";
   if (isExternal) {
-    return <span className="text-[#515A61] dark:text-sky-400 font-medium">{label}</span>;
+    return <span className="font-medium text-pub-ink-2 dark:text-gray-300">{label}</span>;
   }
   return (
     <Link
       to={href}
-      className="text-[#515A61] dark:text-sky-400 hover:text-[#3a4147] dark:hover:text-sky-300 font-medium underline underline-offset-2 decoration-[#515A61]/30 dark:decoration-sky-400/30 hover:decoration-[#515A61] dark:hover:decoration-sky-300 transition-colors"
+      className="font-medium text-pub-ink underline decoration-pub-hairline underline-offset-2 transition-colors hover:decoration-pub-ink focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 dark:text-gray-200"
     >
       {label}
     </Link>
@@ -69,7 +69,7 @@ export function LocationContent() {
     <section
       id="standort"
       aria-labelledby="location-heading"
-      className="py-20 bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-gray-900 transition-colors duration-300"
+      className="border-t border-pub-hairline-soft bg-white py-16 dark:bg-gray-950 lg:py-20"
       itemScope
       itemType="https://schema.org/LocalBusiness"
     >
@@ -99,21 +99,18 @@ export function LocationContent() {
         <meta itemProp="longitude" content={BUSINESS_INFO.geo.longitude} />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
+      <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
+        <div
+          className="mb-10 max-w-3xl"
         >
           <h2
             id="location-heading"
-            className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4"
+            className="mb-4 text-[clamp(26px,2.6vw,34px)] font-bold leading-[1.15] tracking-[-0.018em] text-gray-900 dark:text-gray-100"
           >
             Ihre AI &amp; Webdesign Agentur in{" "}
-            <span className="text-[#515A61] dark:text-sky-400">Bayreuth</span>
+            <span className="text-pub-ink-3">Bayreuth</span>
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+          <p className="text-[16.5px] leading-[1.6] text-pub-ink-2 dark:text-gray-400">
             Als AI- und Webdesign-Agentur in Bayreuth entwickelt Cogniiq Websites,{" "}
             <InternalLink href="/bayreuth/ki-telefonassistent" label="KI-Telefonassistenten" />{" "}
             und{" "}
@@ -122,25 +119,21 @@ export function LocationContent() {
             <InternalLink href="/bayreuth/webdesign" label="Webdesign Bayreuth" />,
             künstliche Intelligenz und Prozessautomatisierung zu einem durchgängigen digitalen Vertriebssystem.
           </p>
-        </motion.div>
+        </div>
 
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0 }}
-            className="relative p-6 rounded-2xl transition-colors duration-300 bg-[#515A61] dark:bg-gray-800 text-white shadow-lg"
+        <div className="mb-10 grid gap-x-10 gap-y-8 border-y border-pub-hairline-soft py-8 md:grid-cols-3">
+          <div
+            className="relative"
           >
-            <span className="absolute top-4 right-4 text-[10px] font-semibold uppercase tracking-widest bg-white/20 dark:bg-white/10 px-2 py-0.5 rounded-full text-white">
+            <span className="absolute right-0 top-0 rounded-full border border-pub-hairline px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-pub-ink-3">
               Hauptsitz
             </span>
-            <MapPin size={32} className="mb-4 text-white" />
-            <h3 className="text-xl font-semibold mb-2 text-white">Bayreuth</h3>
-            <p className="text-gray-100 mb-5">
+            <MapPin size={20} className="mb-3 text-pub-ink-3" aria-hidden="true" />
+            <h3 className="mb-2 text-[19px] font-semibold text-pub-ink dark:text-gray-100">Bayreuth</h3>
+            <p className="mb-4 text-[15px] leading-[1.6] text-pub-ink-2 dark:text-gray-400">
               Unser Hauptsitz im Herzen von Bayreuth. Persönliche Beratung vor Ort jederzeit möglich.
             </p>
-            <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-2">
+            <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-pub-ink-3">
               Leistungen in Bayreuth
             </p>
             <ul className="space-y-1.5">
@@ -148,28 +141,24 @@ export function LocationContent() {
                 <li key={s.href}>
                   <Link
                     to={s.href}
-                    className="text-sm text-white/80 hover:text-white transition-colors underline underline-offset-2 decoration-white/30 hover:decoration-white"
+                    className="text-[14.5px] text-pub-ink-2 underline decoration-pub-hairline underline-offset-2 transition-colors hover:text-pub-ink hover:decoration-pub-ink focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 dark:text-gray-400"
                   >
                     {s.label}
                   </Link>
                 </li>
               ))}
             </ul>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="relative p-6 rounded-2xl transition-colors duration-300 bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
+          <div
+            className="relative"
           >
-            <Building2 size={32} className="mb-4 text-[#515A61] dark:text-sky-400" />
-            <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">Bayern</h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-5">
+            <Building2 size={20} className="mb-3 text-pub-ink-3" aria-hidden="true" />
+            <h3 className="mb-2 text-[19px] font-semibold text-pub-ink dark:text-gray-100">Bayern</h3>
+            <p className="mb-4 text-[15px] leading-[1.6] text-pub-ink-2 dark:text-gray-400">
               Wir betreuen Unternehmen in ganz Bayern – von München bis Nürnberg, von Augsburg bis Regensburg.
             </p>
-            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+            <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-pub-ink-3">
               Leistungen in Bayern
             </p>
             <ul className="space-y-1.5">
@@ -177,28 +166,24 @@ export function LocationContent() {
                 <li key={s.href}>
                   <Link
                     to={s.href}
-                    className="text-sm text-[#515A61] dark:text-sky-400 hover:text-[#3a4147] dark:hover:text-sky-300 transition-colors underline underline-offset-2 decoration-[#515A61]/30 dark:decoration-sky-400/30 hover:decoration-[#515A61] dark:hover:decoration-sky-300"
+                    className="text-[14.5px] text-pub-ink-2 underline decoration-pub-hairline underline-offset-2 transition-colors hover:text-pub-ink hover:decoration-pub-ink focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 dark:text-gray-400"
                   >
                     {s.label}
                   </Link>
                 </li>
               ))}
             </ul>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="relative p-6 rounded-2xl transition-colors duration-300 bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
+          <div
+            className="relative"
           >
-            <Users size={32} className="mb-4 text-[#515A61] dark:text-sky-400" />
-            <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">Deutschland</h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-5">
+            <Users size={20} className="mb-3 text-pub-ink-3" aria-hidden="true" />
+            <h3 className="mb-2 text-[19px] font-semibold text-pub-ink dark:text-gray-100">Deutschland</h3>
+            <p className="mb-4 text-[15px] leading-[1.6] text-pub-ink-2 dark:text-gray-400">
               Remote-Zusammenarbeit mit Kunden in ganz Deutschland und darüber hinaus.
             </p>
-            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+            <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-pub-ink-3">
               Digitale Leistungen
             </p>
             <ul className="space-y-1.5">
@@ -206,44 +191,40 @@ export function LocationContent() {
                 <li key={s.label}>
                   <Link
                     to={s.href}
-                    className="text-sm text-[#515A61] dark:text-sky-400 hover:text-[#3a4147] dark:hover:text-sky-300 transition-colors underline underline-offset-2 decoration-[#515A61]/30 dark:decoration-sky-400/30 hover:decoration-[#515A61] dark:hover:decoration-sky-300"
+                    className="text-[14.5px] text-pub-ink-2 underline decoration-pub-hairline underline-offset-2 transition-colors hover:text-pub-ink hover:decoration-pub-ink focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 dark:text-gray-400"
                   >
                     {s.label}
                   </Link>
                 </li>
               ))}
             </ul>
-          </motion.div>
+          </div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
-          className="bg-white dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-lg p-8 md:p-12 transition-colors duration-300"
+        <div
+          className="rounded-2xl border border-pub-hairline bg-white p-6 dark:bg-gray-900/40 sm:p-8"
         >
-          <div className="grid md:grid-cols-2 gap-12 items-start">
+          <div className="grid items-start gap-10 md:grid-cols-2">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Zap size={24} className="text-[#515A61] dark:text-sky-400" />
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                <Zap size={20} className="text-pub-ink-3" aria-hidden="true" />
+                <h3 className="text-[21px] font-semibold tracking-[-0.012em] text-pub-ink dark:text-gray-100">
                   Lokal verwurzelt, digital vernetzt
                 </h3>
               </div>
               <p className="text-gray-600 dark:text-gray-400 mb-5 leading-relaxed">
                 Als <strong className="text-gray-800 dark:text-gray-200">AI- und Webdesign-Agentur in Bayreuth</strong> verstehen
                 wir die Anforderungen lokaler Unternehmen. Gleichzeitig betreuen wir Kunden in{" "}
-                <Link to="/muenchen" className="font-medium text-[#515A61] dark:text-sky-400 hover:underline">München</Link>{" "}
+                <Link to="/muenchen" className="font-medium text-pub-ink underline decoration-pub-hairline underline-offset-2 hover:decoration-pub-ink focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 dark:text-gray-200">München</Link>{" "}
                 und{" "}
-                <Link to="/regensburg" className="font-medium text-[#515A61] dark:text-sky-400 hover:underline">Regensburg</Link>{" "}
+                <Link to="/regensburg" className="font-medium text-pub-ink underline decoration-pub-hairline underline-offset-2 hover:decoration-pub-ink focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 dark:text-gray-200">Regensburg</Link>{" "}
                 mit denselben hochwertigen Systemen.
               </p>
               <p className="text-gray-600 dark:text-gray-400 mb-5 leading-relaxed">
                 In Regensburg lassen sich{" "}
                 <Link
                   to="/regensburg/website-relaunch"
-                  className="font-medium text-[#515A61] dark:text-sky-400 hover:underline"
+                  className="font-medium text-pub-ink underline decoration-pub-hairline underline-offset-2 hover:decoration-pub-ink focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 dark:text-gray-200"
                 >
                   bestehende Websites modernisieren
                 </Link>{" "}
@@ -253,12 +234,12 @@ export function LocationContent() {
                 Unsere Kernleistungen stehen für alle drei Standorte zur Verfügung:
               </p>
 
-              <div className="grid grid-cols-1 gap-1.5 mb-6">
+              <div className="mb-6 grid grid-cols-1 gap-x-6 gap-y-1.5 sm:grid-cols-2">
                 {LOKAL_LINKS.map((link) => (
                   <Link
                     key={link.href}
                     to={link.href}
-                    className="text-sm text-[#515A61] dark:text-sky-400 hover:text-[#3a4147] dark:hover:text-sky-300 font-medium underline underline-offset-2 decoration-[#515A61]/30 dark:decoration-sky-400/30 hover:decoration-[#515A61] dark:hover:decoration-sky-300 transition-colors"
+                    className="text-[14.5px] font-medium text-pub-ink-2 underline decoration-pub-hairline underline-offset-2 transition-colors hover:text-pub-ink hover:decoration-pub-ink focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 dark:text-gray-400"
                   >
                     {link.label}
                   </Link>
@@ -270,7 +251,7 @@ export function LocationContent() {
                   href={getGoogleMapsUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-[#515A61] dark:text-sky-400 hover:text-[#434A51] dark:hover:text-sky-300 font-medium transition-colors"
+                  className="inline-flex items-center gap-2 font-medium text-pub-ink-2 transition-colors hover:text-pub-ink focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 dark:text-gray-400"
                   aria-label={`Cogniiq auf Google Maps öffnen: ${BUSINESS_INFO.address.streetAddress}, ${BUSINESS_INFO.address.postalCode} ${BUSINESS_INFO.address.addressLocality}`}
                 >
                   <MapPin size={16} />
@@ -282,14 +263,14 @@ export function LocationContent() {
 
                 <a
                   href={PHONE_HREF}
-                  className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
+                  className="flex items-center gap-2 text-pub-ink-2 transition-colors hover:text-pub-ink focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 dark:text-gray-400"
                   aria-label={`Cogniiq anrufen: ${BUSINESS_INFO.contact.phoneDisplay}`}
                 >
                   <Phone size={16} />
                   <span>{BUSINESS_INFO.contact.phoneDisplay}</span>
                 </a>
 
-                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-500 text-sm">
+                <div className="flex items-center gap-2 text-[14.5px] text-pub-ink-3">
                   <Clock size={15} />
                   <span>
                     Mo–Fr {BUSINESS_INFO.businessHours.opens} – {BUSINESS_INFO.businessHours.closes}&nbsp;Uhr
@@ -301,39 +282,21 @@ export function LocationContent() {
                 href={getGoogleMapsUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#515A61] dark:bg-gray-700 hover:bg-[#434A51] dark:hover:bg-gray-600 text-white rounded-xl font-medium text-sm transition-colors"
+                className="inline-flex h-11 items-center gap-2 rounded-full border border-pub-ink/20 bg-white px-5 text-[14.5px] font-semibold text-pub-ink transition-colors hover:border-pub-ink/45 hover:bg-pub-paper-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 dark:border-gray-700 dark:bg-transparent dark:text-gray-200"
               >
                 <ExternalLink size={15} />
                 In Google Maps öffnen
               </a>
             </div>
 
-            <div
-              className="relative rounded-xl overflow-hidden shadow-md h-[300px] md:h-[380px] ring-1 ring-gray-200 dark:ring-gray-700"
-              aria-label={`Karte: ${BUSINESS_INFO.name}, ${BUSINESS_INFO.address.streetAddress}, ${BUSINESS_INFO.address.postalCode} ${BUSINESS_INFO.address.addressLocality}`}
-            >
-              <iframe
-                title={`Standort von ${BUSINESS_INFO.name} in ${BUSINESS_INFO.address.addressLocality}`}
-                src={getGoogleMapsEmbedUrl()}
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                className="w-full h-full"
-              />
-            </div>
+            <ConsentMapEmbed minHeight={340} />
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+        <div
           className="mt-12"
         >
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 text-center mb-4">
+          <p className="text-xs font-semibold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 text-center mb-4">
             Servicegebiete
           </p>
           <div className="flex flex-wrap justify-center gap-2">
@@ -350,7 +313,7 @@ export function LocationContent() {
                 <Link
                   key={city.label}
                   to={city.href}
-                  className="px-3 py-1 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-[#515A61] dark:text-sky-400 hover:border-[#515A61] dark:hover:border-sky-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-full transition-colors duration-300 font-medium"
+                  className="rounded-full border border-pub-hairline bg-white px-3 py-1 text-[14px] font-medium text-pub-ink-2 transition-colors hover:border-pub-ink/40 hover:text-pub-ink dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
                   itemProp="areaServed"
                 >
                   {city.label}
@@ -361,7 +324,7 @@ export function LocationContent() {
               &amp; ganz Deutschland
             </span>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

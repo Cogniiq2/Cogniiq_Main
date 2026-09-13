@@ -70,6 +70,10 @@
 
 /automatisierung-unternehmen    /prozessautomatisierung   301
 /automatisierung-unternehmen/   /prozessautomatisierung   301
+/referenzen                     /ueber-uns                301
+/referenzen/                    /ueber-uns                301
+/bewertungen                    /ueber-uns                301
+/bewertungen/                   /ueber-uns                301
 
 /app                /app-shell     200
 /app/*              /app-shell     200

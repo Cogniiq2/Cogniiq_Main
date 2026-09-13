@@ -1,5 +1,5 @@
 {
-  "_comment": "Recorded by `npm run seo:baseline`. Frozen fingerprints of the five live SEO experiments; see src/lib/routing/protectedExperiments.ts. Do not hand-edit, and do not regenerate to make a failing build pass — a diff here means a protected page moved.",
+  "_comment": "Recorded by `npm run seo:baseline`. Frozen fingerprints of the six live SEO experiments; see src/lib/routing/protectedExperiments.ts. Do not hand-edit, and do not regenerate to make a failing build pass — a diff here means a protected page moved.",
   "fingerprints": {
     "/bayreuth/webdesign": {
       "path": "/bayreuth/webdesign",
@@ -452,8 +452,8 @@
         "h2:Weiterführende Seiten",
         "h2:Kostenloses Erstgespräch für Unternehmen in München"
       ],
-      "textLength": 7516,
-      "textDigest": "59cb50917e02bfd3",
+      "textLength": 7514,
+      "textDigest": "3577073c0d364caf",
       "jsonLd": [
         "0b087d937878939b",
         "372eb831b836cdd6",
@@ -527,8 +527,8 @@
           "text": "München"
         },
         {
-          "href": "/referenzen",
-          "text": "Referenzen"
+          "href": "/ueber-uns",
+          "text": "Über uns"
         }
       ]
     },
@@ -700,7 +700,6 @@
         }
       ]
     }
-
   },
   "inboundOccurrences": {
     "/bayreuth/webdesign": {
@@ -801,6 +800,5 @@
       "public/sitemap.xml": 2,
       "functions/_middleware.ts": 2
     }
-
   }
 }

@@ -79,7 +79,7 @@ export function TestimonialBlock({
             >
               <Quote
                 size={20}
-                className="text-gray-300 dark:text-gray-600 flex-shrink-0"
+                className="text-pub-ink-3 dark:text-gray-600 flex-shrink-0"
               />
               <p className="text-base leading-relaxed text-gray-700 dark:text-gray-300">
                 "{t.quote}"

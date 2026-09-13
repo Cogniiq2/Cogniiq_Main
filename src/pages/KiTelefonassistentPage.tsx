@@ -470,9 +470,10 @@ function HeroSection() {
               Team keine Hand frei hat" — das beschreibt einen Anrufdienst und
               verkaufte damit ein abwickelndes System unter Wert.
             */}
-            <h1 className="text-[2.5rem] sm:text-5xl lg:text-[3.4rem] font-bold text-gray-900 dark:text-gray-100 leading-[1.07] tracking-tight mb-6">
-              KI-Telefonassistent für Unternehmen:{" "}
-              <span className="text-gray-400 dark:text-gray-500 font-light">
+            <h1 className="text-[clamp(30px,8vw,40px)] sm:text-5xl lg:text-[3.2rem] font-bold text-gray-900 dark:text-gray-100 leading-[1.07] tracking-[-0.022em] mb-6">
+              KI-Telefon&shy;assistent für Unternehmen:{" "}
+              {/* Second half in ink-3 (5.9:1), not gray-400/font-light (2.8:1). */}
+              <span className="text-pub-ink-3 dark:text-gray-400 font-normal">
                 Anrufe nicht nur annehmen. Anliegen erledigen.
               </span>
             </h1>
@@ -485,7 +486,7 @@ function HeroSection() {
               Ausnahmen und alles, was Sie ausgenommen haben, gehen an einen
               Menschen.
             </p>
-            <p className="text-sm text-gray-400 dark:text-gray-500 mb-10 max-w-lg leading-relaxed">
+            <p className="text-sm text-pub-ink-3 dark:text-gray-500 mb-10 max-w-lg leading-relaxed">
               Schreibt ein Ablauf direkt in Ihren Kalender oder Ihre
               Branchensoftware, richten wir diese Anbindung für Ihr System ein
               und verifizieren sie vorher.
@@ -495,7 +496,7 @@ function HeroSection() {
               <PrimaryCta />
               <PhoneCta />
             </div>
-            <p className="text-sm text-gray-400 dark:text-gray-500 mb-5">
+            <p className="text-sm text-pub-ink-3 dark:text-gray-500 mb-5">
               Sie schildern kurz Ihre Anrufe, wir schlagen einen Termin für die
               Demo vor. Kostenlos, unverbindlich, ca. 15&nbsp;Minuten.
             </p>
@@ -530,7 +531,7 @@ function HeroSection() {
                 <Calculator size={15} aria-hidden="true" />
                 Preis &amp; Wirtschaftlichkeit berechnen
               </a>
-              <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+              <p className="text-sm text-pub-ink-3 dark:text-gray-500 mt-2">
                 Sofort · ohne E-Mail · mit Ihren eigenen Zahlen
               </p>
             </div>
@@ -601,7 +602,7 @@ function HeroCallPanel() {
           <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
             Eingehender Anruf
           </span>
-          <span className="ml-auto text-sm text-gray-400 dark:text-gray-500 font-mono">10:24</span>
+          <span className="ml-auto text-sm text-pub-ink-3 dark:text-gray-500 font-mono">10:24</span>
         </div>
 
         <p className="px-5 pt-4 text-[13px] text-gray-500 dark:text-gray-500">
@@ -619,7 +620,7 @@ function HeroCallPanel() {
                 }`}
               >
                 {msg.role === "ai" && (
-                  <span className="block text-sm font-bold text-gray-400 dark:text-gray-500 mb-1 uppercase tracking-widest">
+                  <span className="block text-sm font-bold text-pub-ink-3 dark:text-gray-500 mb-1 uppercase tracking-widest">
                     KI Assistent
                   </span>
                 )}
@@ -644,8 +645,8 @@ function HeroCallPanel() {
       </div>
 
       <div className="mt-3 flex items-center gap-2 px-1">
-        <Lock size={11} className="text-gray-300 dark:text-gray-600 flex-shrink-0" aria-hidden="true" />
-        <span className="text-sm text-gray-400 dark:text-gray-500">
+        <Lock size={11} className="text-pub-ink-3 dark:text-gray-600 flex-shrink-0" aria-hidden="true" />
+        <span className="text-sm text-pub-ink-3 dark:text-gray-500">
           Keine Gesprächsaufzeichnung · AVV nach Art. 28 DSGVO
         </span>
       </div>
@@ -675,7 +676,7 @@ function CredentialStrip() {
               <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
                 {item.label}
               </span>
-              <span className="hidden sm:inline text-sm text-gray-400 dark:text-gray-500">
+              <span className="hidden sm:inline text-sm text-pub-ink-3 dark:text-gray-500">
                 · {item.detail}
               </span>
             </div>
@@ -706,7 +707,7 @@ function WasIstSection() {
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
           >
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
               Grundlagen
             </p>
             <h2
@@ -758,7 +759,7 @@ function ProblemSection() {
           variants={fadeUp}
           className="max-w-2xl mb-14"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
             Das Problem
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4">
@@ -784,7 +785,7 @@ function ProblemSection() {
               className="p-6 rounded-2xl bg-white dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800"
             >
               <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center mb-4">
-                <item.icon size={17} className="text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                <item.icon size={17} className="text-pub-ink-3 dark:text-gray-500" aria-hidden="true" />
               </div>
               <h3 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100 mb-2 leading-snug">
                 {item.title}
@@ -821,7 +822,7 @@ function SolutionSection() {
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
           >
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
               Die Lösung
             </p>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-5">
@@ -915,7 +916,7 @@ function CallFlowSection() {
           variants={fadeUp}
           className="max-w-2xl mb-16"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
             Ablauf
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15]">
@@ -946,7 +947,7 @@ function CallFlowSection() {
                   </div>
                 </div>
                 <div className="mb-1 flex items-center gap-2">
-                  <span className="text-sm font-bold tracking-[0.2em] text-gray-300 dark:text-gray-600 uppercase">
+                  <span className="text-sm font-bold tracking-[0.2em] text-pub-ink-3 dark:text-gray-600 uppercase">
                     {step.number}
                   </span>
                 </div>
@@ -956,7 +957,7 @@ function CallFlowSection() {
                 <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed mb-3">
                   {step.desc}
                 </p>
-                <span className="inline-flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 font-medium">
+                <span className="inline-flex items-center gap-1.5 text-sm text-pub-ink-3 dark:text-gray-500 font-medium">
                   <span className="w-1 h-1 rounded-full bg-emerald-400" />
                   {step.detail}
                 </span>
@@ -980,7 +981,7 @@ function CallSummarySection() {
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
           >
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
               Der Ausnahmeweg
             </p>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-5">
@@ -1021,7 +1022,7 @@ function CallSummarySection() {
                     Beispiel eines Dashboard-Eintrags
                   </span>
                 </div>
-                <span className="text-sm text-gray-400 dark:text-gray-500 font-mono">
+                <span className="text-sm text-pub-ink-3 dark:text-gray-500 font-mono">
                   Heute · 18:47
                 </span>
               </div>
@@ -1032,7 +1033,7 @@ function CallSummarySection() {
               <div className="p-5 space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700">
-                    <p className="text-sm text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-widest mb-1">
+                    <p className="text-sm text-pub-ink-3 dark:text-gray-500 font-semibold uppercase tracking-widest mb-1">
                       Anrufer
                     </p>
                     <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
@@ -1040,7 +1041,7 @@ function CallSummarySection() {
                     </p>
                   </div>
                   <div className="px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700">
-                    <p className="text-sm text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-widest mb-1">
+                    <p className="text-sm text-pub-ink-3 dark:text-gray-500 font-semibold uppercase tracking-widest mb-1">
                       Dauer
                     </p>
                     <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
@@ -1050,7 +1051,7 @@ function CallSummarySection() {
                 </div>
 
                 <div className="px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700">
-                  <p className="text-sm text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-widest mb-1.5">
+                  <p className="text-sm text-pub-ink-3 dark:text-gray-500 font-semibold uppercase tracking-widest mb-1.5">
                     Anliegen
                   </p>
                   <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
@@ -1059,7 +1060,7 @@ function CallSummarySection() {
                 </div>
 
                 <div className="px-3.5 py-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/40">
-                  <p className="text-sm text-emerald-600 dark:text-emerald-500 font-semibold uppercase tracking-widest mb-1">
+                  <p className="text-sm text-pub-verify dark:text-emerald-500 font-semibold uppercase tracking-widest mb-1">
                     Termin gebucht
                   </p>
                   <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
@@ -1068,7 +1069,7 @@ function CallSummarySection() {
                 </div>
 
                 <div className="px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700">
-                  <p className="text-sm text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-widest mb-1.5">
+                  <p className="text-sm text-pub-ink-3 dark:text-gray-500 font-semibold uppercase tracking-widest mb-1.5">
                     Offen für Ihr Team
                   </p>
                   <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed">
@@ -1132,7 +1133,7 @@ function AnliegenKatalogSection() {
           variants={fadeUp}
           className="max-w-2xl mb-12"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
             Anliegen-Katalog
           </p>
           <h2
@@ -1246,7 +1247,7 @@ function AnbieterCheckSection() {
           variants={fadeUp}
           className="max-w-2xl mb-12"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
             Auswahlhilfe
           </p>
           <h2
@@ -1291,7 +1292,7 @@ function AnbieterCheckSection() {
                       </p>
                     </div>
                     <div className="lg:border-l lg:border-gray-200 lg:dark:border-gray-800 lg:pl-10">
-                      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-2.5">
+                      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-2.5">
                         Unsere Antwort
                       </p>
                       <p className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.7]">
@@ -1320,7 +1321,7 @@ function SetupSection() {
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
           >
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
               Implementierung
             </p>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15] mb-4">
@@ -1399,7 +1400,7 @@ function GespraechSection() {
           variants={fadeUp}
           className="max-w-2xl mb-12"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
             Wie es klingt
           </p>
           <h2
@@ -1455,7 +1456,7 @@ function DreiWegeSection() {
           variants={fadeUp}
           className="max-w-2xl mb-12"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
             Das Ergebnis
           </p>
           <h2
@@ -1498,7 +1499,7 @@ function DreiWegeSection() {
                     {weg.title}
                   </h3>
                   {hervorgehoben && (
-                    <span className="ml-auto text-[12px] font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-500">
+                    <span className="ml-auto text-[12px] font-semibold uppercase tracking-wider text-pub-verify dark:text-emerald-500">
                       Normalfall
                     </span>
                   )}
@@ -1530,7 +1531,7 @@ function SprachenSection() {
   return (
     <section className="py-24 bg-white dark:bg-gray-950">
       <div className="max-w-3xl mx-auto px-6 lg:px-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
           Mehrsprachig
         </p>
         <h2 className={H2C}>Wenn nicht jeder Anrufer Deutsch spricht</h2>
@@ -1587,7 +1588,7 @@ function RechnerSection() {
       <div className="max-w-4xl mx-auto px-6 lg:px-8">
         {/* Statisch im HTML, damit Überschrift und Einordnung im Prerender
             stehen — der interaktive Teil darunter wird nachgeladen. */}
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
           Transparenz
         </p>
         <h2 id="rechner-heading" className={H2C}>
@@ -1683,7 +1684,7 @@ function NichtPassendSection() {
   return (
     <section className="py-20 bg-gray-50 dark:bg-gray-900/40">
       <div className="max-w-3xl mx-auto px-6 lg:px-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+        <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
           Ehrliche Beratung
         </p>
         <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.2] mb-4">
@@ -1737,7 +1738,7 @@ function UseCasesSection() {
           variants={fadeUp}
           className="max-w-2xl mb-14"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
             Anwendungsbereiche
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15]">
@@ -1794,7 +1795,7 @@ function FAQSectionBlock() {
           variants={fadeUp}
           className="mb-12"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-4">
+          <p className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-4">
             FAQ
           </p>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15]">
@@ -1895,13 +1896,13 @@ function InternalLinksSection() {
             gleichrangige h2 am Seitenende („Nach Branche", „Nach Region",
             „Verwandte Themen") hätten die Gliederung mit Navigationslabels
             beendet statt mit Inhalt. */}
-        <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-gray-400 dark:text-gray-500 mb-7">
+        <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-pub-ink-3 dark:text-gray-500 mb-7">
           Weiterführende Seiten
         </h2>
         <div className="grid sm:grid-cols-3 gap-8">
           {cols.map((col) => (
             <div key={col.heading}>
-              <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-gray-400 dark:text-gray-500 mb-3">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-pub-ink-3 dark:text-gray-500 mb-3">
                 {col.heading}
               </h3>
               <ul className="space-y-2">
@@ -1914,7 +1915,7 @@ function InternalLinksSection() {
                       <ArrowRight
                         size={11}
                         aria-hidden="true"
-                        className="text-gray-300 dark:text-gray-600 group-hover:text-gray-500 transition-colors flex-shrink-0"
+                        className="text-pub-ink-3 dark:text-gray-600 group-hover:text-gray-500 transition-colors flex-shrink-0"
                       />
                       {link.label}
                     </Link>
@@ -1966,7 +1967,7 @@ function FinalCtaSection() {
                 </Link>
               </div>
 
-              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-gray-400 dark:text-gray-500 mb-6">
+              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-pub-ink-3 dark:text-gray-500 mb-6">
                 <span className="inline-flex items-center gap-1.5">
                   <ListChecks size={12} aria-hidden="true" /> Ca. 15&nbsp;Minuten
                 </span>
@@ -1975,7 +1976,7 @@ function FinalCtaSection() {
                 <span>Keine Vorkenntnisse nötig</span>
               </div>
 
-              <p className="text-sm text-gray-400 dark:text-gray-500">
+              <p className="text-sm text-pub-ink-3 dark:text-gray-500">
                 {BUSINESS_INFO.name} · {BUSINESS_INFO.contact.email} ·{" "}
                 <a
                   href={PHONE_HREF}

@@ -267,7 +267,7 @@ export function DeutschlandPage() {
           <div className="max-w-5xl mx-auto px-6 lg:px-8">
             <motion.nav
               aria-label="Breadcrumb"
-              className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8"
+              className="cq-rise flex items-center gap-1.5 text-sm text-pub-ink-3 dark:text-gray-500 mb-8"
             >
               <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Home</Link>
               <ChevronRight size={12} />
@@ -484,7 +484,7 @@ export function DeutschlandPage() {
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <MapPin size={14} className={region.highlight ? "text-[#515A61] dark:text-sky-400" : "text-gray-400 dark:text-gray-500"} />
+                    <MapPin size={14} className={region.highlight ? "text-[#515A61] dark:text-sky-400" : "text-pub-ink-3 dark:text-gray-500"} />
                     {region.href ? (
                       <Link
                         to={region.href}
@@ -619,7 +619,7 @@ export function DeutschlandPage() {
                   className="p-5 rounded-xl bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50"
                 >
                   <div className="flex items-center gap-2 mb-3">
-                    <Building2 size={14} className="text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                    <Building2 size={14} className="text-pub-ink-3 dark:text-gray-500 flex-shrink-0" />
                     <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{industry.name}</h3>
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{industry.description}</p>
@@ -660,7 +660,7 @@ export function DeutschlandPage() {
                   className="flex gap-4 p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
                 >
                   <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                    <Lightbulb size={15} className="text-gray-400 dark:text-gray-500" />
+                    <Lightbulb size={15} className="text-pub-ink-3 dark:text-gray-500" />
                   </div>
                   <div>
                     <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">{scenario.title}</h3>
@@ -729,7 +729,7 @@ export function DeutschlandPage() {
                 },
               ].map((col) => (
                 <div key={col.service}>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-3">
                     {col.service}
                   </p>
                   <ul className="space-y-2">
@@ -739,7 +739,7 @@ export function DeutschlandPage() {
                           to={link.href}
                           className="group inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 font-medium transition-colors"
                         >
-                          <ArrowRight size={12} className="text-gray-300 dark:text-gray-600 group-hover:text-gray-500 transition-colors flex-shrink-0" />
+                          <ArrowRight size={12} className="text-pub-ink-3 dark:text-gray-600 group-hover:text-gray-500 transition-colors flex-shrink-0" />
                           {link.label}
                         </Link>
                       </li>
@@ -820,7 +820,7 @@ export function DeutschlandPage() {
                   Alle Leistungen
                 </Link>
               </div>
-              <p className="mt-6 text-xs text-gray-400 dark:text-gray-500">
+              <p className="mt-6 text-xs text-pub-ink-3 dark:text-gray-500">
                 {BUSINESS_INFO.name} · {BUSINESS_INFO.address.addressLocality} · {BUSINESS_INFO.contact.email}
               </p>
             </motion.div>

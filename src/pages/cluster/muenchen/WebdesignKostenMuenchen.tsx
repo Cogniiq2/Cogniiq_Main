@@ -160,7 +160,7 @@ const config: ClusterPageConfig = {
     { label: "Website Relaunch München", href: "/muenchen/website-relaunch" },
     { label: "Landingpage München", href: "/muenchen/landingpage" },
     { label: "Lokales SEO München", href: "/muenchen/lokales-seo" },
-    { label: "Referenzen", href: "/referenzen" },
+    { label: "Über uns", href: "/ueber-uns" },
   ],
 };
 

@@ -127,7 +127,7 @@ export function CostPage({ config }: CostPageProps) {
           <div className="max-w-5xl mx-auto px-6 lg:px-8">
             <motion.nav
               aria-label="Breadcrumb"
-              className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8"
+              className="cq-rise flex items-center gap-1.5 text-sm text-pub-ink-3 dark:text-gray-500 mb-8"
             >
               <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Home</Link>
               <ChevronRight size={12} />
@@ -209,7 +209,7 @@ export function CostPage({ config }: CostPageProps) {
                   custom={i * 0.1}
                   className="bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-6"
                 >
-                  <div className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2">
+                  <div className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-2">
                     {range.label}
                   </div>
                   <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
@@ -230,7 +230,7 @@ export function CostPage({ config }: CostPageProps) {
               custom={0.3}
               className="mt-8 p-5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 flex items-start gap-3"
             >
-              <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-gray-400 dark:text-gray-500" />
+              <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-pub-ink-3 dark:text-gray-500" />
               <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                 Alle Preise sind Richtwerte. Das tatsächliche Angebot hängt von Ihrem individuellen Bedarf ab. Das Erstgespräch ist kostenlos und unverbindlich.
               </p>
@@ -312,7 +312,7 @@ export function CostPage({ config }: CostPageProps) {
                     <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{project.description}</p>
                   </div>
                   <div className="px-6 py-4 flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Investition</span>
+                    <span className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500">Investition</span>
                     <span className="text-sm font-bold text-gray-900 dark:text-gray-100">{project.investment}</span>
                   </div>
                 </motion.div>
@@ -361,7 +361,7 @@ export function CostPage({ config }: CostPageProps) {
 
             {config.industryLinks.length > 0 && (
               <div className="mt-8">
-                <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">Branchen</p>
+                <p className="text-xs font-semibold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-4">Branchen</p>
                 <div className="flex flex-wrap gap-3">
                   {config.industryLinks.map((link, i) => (
                     <motion.div
@@ -458,7 +458,7 @@ export function CostPage({ config }: CostPageProps) {
                   {config.serviceLinkLabel}
                 </Link>
               </div>
-              <p className="mt-6 text-xs text-gray-400 dark:text-gray-500">
+              <p className="mt-6 text-xs text-pub-ink-3 dark:text-gray-500">
                 {BUSINESS_INFO.name} · {BUSINESS_INFO.contact.email} · {BUSINESS_INFO.contact.phoneDisplay}
               </p>
             </motion.div>

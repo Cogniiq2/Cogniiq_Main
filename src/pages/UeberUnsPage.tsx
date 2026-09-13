@@ -325,7 +325,7 @@ function SubNav() {
                   className={`px-4 h-full text-xs font-medium tracking-wide transition-colors whitespace-nowrap border-b-2 ${
                     active === item.anchor
                       ? "border-gray-900 dark:border-gray-100 text-gray-900 dark:text-gray-100"
-                      : "border-transparent text-gray-400 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400"
+                      : "border-transparent text-pub-ink-3 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400"
                   }`}
                 >
                   {item.label}
@@ -443,7 +443,7 @@ export function UeberUnsPage() {
           <div className="max-w-[780px] mx-auto">
             <nav
               aria-label="Breadcrumb"
-              className="cq-rise flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-600 mb-12"
+              className="cq-rise flex items-center gap-1.5 text-xs text-pub-ink-3 dark:text-gray-600 mb-12"
             >
               <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-400 transition-colors">
                 Home
@@ -462,7 +462,7 @@ export function UeberUnsPage() {
             </p>
 
             <motion.p
-              className="text-xs text-gray-400 dark:text-gray-600 tracking-wide mb-9 font-light italic"
+              className="text-xs text-pub-ink-3 dark:text-gray-600 tracking-wide mb-9 font-light italic"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.28 }}
@@ -557,7 +557,7 @@ export function UeberUnsPage() {
                           <span className="text-[11px] font-mono text-gray-300 dark:text-gray-700">
                             {comp.index}
                           </span>
-                          <Icon size={16} className="text-gray-400 dark:text-gray-600" />
+                          <Icon size={16} className="text-pub-ink-3 dark:text-gray-600" />
                         </div>
                         <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 tracking-tight mb-4">
                           {comp.name}
@@ -626,7 +626,7 @@ export function UeberUnsPage() {
                     custom={i * 0.07}
                     className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-7"
                   >
-                    <Icon size={16} className="text-gray-400 dark:text-gray-600 mb-5" />
+                    <Icon size={16} className="text-pub-ink-3 dark:text-gray-600 mb-5" />
                     <p className="text-base font-bold text-gray-900 dark:text-gray-100 mb-2 leading-snug">
                       {item.title}
                     </p>
@@ -685,7 +685,7 @@ export function UeberUnsPage() {
                       <p className="text-base font-bold text-gray-900 dark:text-gray-100 mb-0.5">
                         {founder.name}
                       </p>
-                      <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-gray-400 dark:text-gray-600">
+                      <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-pub-ink-3 dark:text-gray-600">
                         {founder.focus}
                       </p>
                     </div>
@@ -823,7 +823,7 @@ export function UeberUnsPage() {
                       <ChevronRight size={14} className="opacity-50" />
                     </Link>
                     {hub.note === "Hauptsitz" && (
-                      <span className="text-[10px] font-semibold tracking-[0.15em] uppercase text-gray-400 dark:text-gray-600 border border-gray-200 dark:border-gray-800 px-2 py-0.5">
+                      <span className="text-[10px] font-semibold tracking-[0.15em] uppercase text-pub-ink-3 dark:text-gray-600 border border-gray-200 dark:border-gray-800 px-2 py-0.5">
                         Hauptsitz
                       </span>
                     )}
@@ -857,13 +857,13 @@ export function UeberUnsPage() {
               <div className="flex items-center gap-6">
                 <Link
                   to="/bayern"
-                  className="text-xs text-gray-400 dark:text-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors underline underline-offset-4"
+                  className="text-xs text-pub-ink-3 dark:text-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors underline underline-offset-4"
                 >
                   Bayern Hub
                 </Link>
                 <Link
                   to="/deutschland"
-                  className="text-xs text-gray-400 dark:text-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors underline underline-offset-4"
+                  className="text-xs text-pub-ink-3 dark:text-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors underline underline-offset-4"
                 >
                   Deutschland Hub
                 </Link>
@@ -915,7 +915,7 @@ export function UeberUnsPage() {
                   <p className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-1">
                     {hub.branche}
                   </p>
-                  <p className="text-xs text-gray-400 dark:text-gray-600 mb-5 leading-relaxed">
+                  <p className="text-xs text-pub-ink-3 dark:text-gray-600 mb-5 leading-relaxed">
                     {hub.description}
                   </p>
                   <ul className="space-y-2.5">
@@ -946,7 +946,7 @@ export function UeberUnsPage() {
               <Users size={12} className="text-gray-300 dark:text-gray-700" />
               <Link
                 to="/leistungen"
-                className="text-xs text-gray-400 dark:text-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors underline underline-offset-4"
+                className="text-xs text-pub-ink-3 dark:text-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors underline underline-offset-4"
               >
                 Alle Leistungen ansehen
               </Link>
@@ -1002,12 +1002,12 @@ export function UeberUnsPage() {
               custom={0}
             >
               <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 tracking-tight mb-6">
-                Lass uns dein<br />digitales System aufbauen.
+                Bauen wir Ihr<br />digitales System auf.
               </h2>
               <p className="text-gray-500 dark:text-gray-400 text-lg font-light mb-3 max-w-md mx-auto">
                 Ob Website, Automatisierung oder KI-Integration — wir entwickeln Systeme, die messbar wirken.
               </p>
-              <p className="text-xs text-gray-400 dark:text-gray-600 tracking-wide mb-14">
+              <p className="text-xs text-pub-ink-3 dark:text-gray-600 tracking-wide mb-14">
                 30–45 Min. &middot; keine Vorbereitung nötig &middot; keine Verkaufspräsentation
               </p>
 
@@ -1027,7 +1027,7 @@ export function UeberUnsPage() {
                 </Link>
               </div>
 
-              <p className="mt-12 text-xs text-gray-400 dark:text-gray-600 tracking-wide">
+              <p className="mt-12 text-xs text-pub-ink-3 dark:text-gray-600 tracking-wide">
                 {BUSINESS_INFO.name} &middot; {BUSINESS_INFO.address.addressLocality} &middot; {BUSINESS_INFO.contact.email}
               </p>
             </motion.div>
@@ -1037,7 +1037,7 @@ export function UeberUnsPage() {
         {/* ── BREADCRUMB (bottom) ────────────────────────────────────────── */}
         <div className="border-t border-gray-100 dark:border-gray-800 px-6 lg:px-8 py-4">
           <div className="max-w-[1100px] mx-auto">
-            <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-600">
+            <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-pub-ink-3 dark:text-gray-600">
               <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-400 transition-colors">
                 Home
               </Link>

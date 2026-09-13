@@ -2,7 +2,8 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, ChevronRight, Globe, Phone, Zap, Mail, MapPin, Clock, CircleCheck as CheckCircle2 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
-import { BUSINESS_INFO, PHONE_HREF, getGoogleMapsUrl, getGoogleMapsEmbedUrl } from "@/lib/seo-data";
+import { BUSINESS_INFO, PHONE_HREF, getGoogleMapsUrl } from "@/lib/seo-data";
+import { ConsentMapEmbed } from "@/components/ConsentMapEmbed";
 import { ContactSection } from "@/components/ContactSection";
 
 const fadeUp = {
@@ -111,7 +112,7 @@ export function KontaktPage() {
             <motion.div className="cq-rise flex items-center gap-2 mb-8">
               <Link
                 to="/"
-                className="text-[11px] text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-[12px] text-pub-ink-3 hover:text-pub-ink transition-colors"
               >
                 Start
               </Link>
@@ -140,7 +141,7 @@ export function KontaktPage() {
                 >
                   KI-Systeme für Ihr
                   <br />
-                  <span className="text-gray-200">Unternehmen besprechen</span>
+                  <span className="text-pub-ink-3">Unternehmen besprechen</span>
                 </motion.h1>
 
                 <motion.p className="cq-rise text-[16px] text-gray-500 leading-[1.75] mb-8 max-w-[560px]">
@@ -194,7 +195,7 @@ export function KontaktPage() {
                   />
 
                   <div className="relative">
-                    <p className="text-[9.5px] font-semibold uppercase tracking-[0.22em] text-gray-600 mb-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/60 mb-4">
                       Was Sie mitnehmen
                     </p>
 
@@ -206,7 +207,7 @@ export function KontaktPage() {
                         { n: '04', text: 'Klarer nächster Schritt — kein Pitch' },
                       ].map(({ n, text }) => (
                         <div key={n} className="flex items-start gap-3.5">
-                          <span className="text-[10px] font-medium text-gray-700 tabular-nums mt-0.5 min-w-[20px]">{n}</span>
+                          <span className="text-[11px] font-medium text-white/55 tabular-nums mt-0.5 min-w-[20px]">{n}</span>
                           <p className="text-[13px] text-gray-400 leading-snug">{text}</p>
                         </div>
                       ))}
@@ -220,11 +221,11 @@ export function KontaktPage() {
                         animate={{ opacity: [1, 0.3, 1] }}
                         transition={{ duration: 1.8, repeat: Infinity }}
                       />
-                      <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-500">
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/60">
                         Ablauf
                       </span>
                     </div>
-                    <p className="text-[11.5px] text-gray-600 leading-relaxed">
+                    <p className="text-[12.5px] text-white/70 leading-relaxed">
                       Antwort in der Regel innerhalb von 24&nbsp;Stunden ·
                       kein Formular-Loop — persönliches Gespräch
                     </p>
@@ -246,7 +247,7 @@ export function KontaktPage() {
               custom={0}
               className="mb-12"
             >
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-pub-ink-3 dark:text-gray-500 mb-3">
                 Für wen
               </p>
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">
@@ -303,7 +304,7 @@ export function KontaktPage() {
                 custom={0}
                 className="lg:sticky lg:top-32"
               >
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-3">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-pub-ink-3 dark:text-gray-500 mb-3">
                   Ablauf
                 </p>
                 <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-50 tracking-tight mb-5">
@@ -331,7 +332,7 @@ export function KontaktPage() {
                       <div className="absolute left-[19px] top-10 w-px h-full bg-gradient-to-b from-gray-200 to-transparent dark:from-gray-700" />
                     )}
                     <div className="flex-shrink-0 w-10 h-10 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex items-center justify-center">
-                      <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500 tracking-wide">
+                      <span className="text-[11px] font-bold text-pub-ink-3 dark:text-gray-500 tracking-wide">
                         {step.number}
                       </span>
                     </div>
@@ -366,7 +367,7 @@ export function KontaktPage() {
               custom={0}
               className="mb-12"
             >
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-pub-ink-3 dark:text-gray-500 mb-3">
                 Standort
               </p>
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">
@@ -384,7 +385,7 @@ export function KontaktPage() {
                 className="bg-gray-50 dark:bg-gray-900/40 rounded-2xl border border-gray-100 dark:border-gray-800 p-8 space-y-7"
               >
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500 mb-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-pub-ink-3 dark:text-gray-500 mb-4">
                     Adresse
                   </p>
                   <a
@@ -409,7 +410,7 @@ export function KontaktPage() {
                 </div>
 
                 <div className="border-t border-gray-100 dark:border-gray-800 pt-7 space-y-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500 mb-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-pub-ink-3 dark:text-gray-500 mb-4">
                     Kontakt
                   </p>
                   <a
@@ -445,17 +446,7 @@ export function KontaktPage() {
                 custom={0.1}
                 className="rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden min-h-[320px]"
               >
-                <iframe
-                  src={getGoogleMapsEmbedUrl()}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0, minHeight: "320px" }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Cogniiq Standort Bayreuth"
-                  className="grayscale hover:grayscale-0 transition-all duration-500"
-                />
+                <ConsentMapEmbed minHeight={320} />
               </motion.div>
             </div>
           </div>
@@ -472,7 +463,7 @@ export function KontaktPage() {
               custom={0}
               className="mb-10"
             >
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-pub-ink-3 dark:text-gray-500 mb-3">
                 Regionen & Leistungen
               </p>
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">
@@ -490,7 +481,7 @@ export function KontaktPage() {
                 custom={0.04}
                 className="bg-gray-50 dark:bg-gray-900/40 rounded-2xl border border-gray-100 dark:border-gray-800 p-7"
               >
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500 mb-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-pub-ink-3 dark:text-gray-500 mb-4">
                   Standorte
                 </p>
                 <ul className="space-y-2">
@@ -500,7 +491,7 @@ export function KontaktPage() {
                         to={r.href}
                         className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group"
                       >
-                        <ChevronRight size={13} className="text-gray-300 dark:text-gray-600 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
+                        <ChevronRight size={13} className="text-pub-ink-3 dark:text-gray-600 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
                         {r.label}
                       </Link>
                     </li>
@@ -516,7 +507,7 @@ export function KontaktPage() {
                 custom={0.08}
                 className="bg-gray-50 dark:bg-gray-900/40 rounded-2xl border border-gray-100 dark:border-gray-800 p-7"
               >
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500 mb-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-pub-ink-3 dark:text-gray-500 mb-4">
                   Unsere Systeme
                 </p>
                 <ul className="space-y-2">
@@ -526,7 +517,7 @@ export function KontaktPage() {
                         to={s.href}
                         className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group"
                       >
-                        <ChevronRight size={13} className="text-gray-300 dark:text-gray-600 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
+                        <ChevronRight size={13} className="text-pub-ink-3 dark:text-gray-600 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
                         {s.label}
                       </Link>
                     </li>
@@ -542,7 +533,7 @@ export function KontaktPage() {
                 custom={0.12}
                 className="bg-gray-50 dark:bg-gray-900/40 rounded-2xl border border-gray-100 dark:border-gray-800 p-7"
               >
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500 mb-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-pub-ink-3 dark:text-gray-500 mb-4">
                   Branchen
                 </p>
                 <ul className="space-y-2">
@@ -552,7 +543,7 @@ export function KontaktPage() {
                         to={b.href}
                         className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group"
                       >
-                        <ChevronRight size={13} className="text-gray-300 dark:text-gray-600 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
+                        <ChevronRight size={13} className="text-pub-ink-3 dark:text-gray-600 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
                         {b.label}
                       </Link>
                     </li>
@@ -574,7 +565,7 @@ export function KontaktPage() {
               custom={0}
               className="max-w-[640px]"
             >
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-pub-ink-3 dark:text-gray-500 mb-4">
                 Analysegespräch
               </p>
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-50 tracking-tight mb-5">

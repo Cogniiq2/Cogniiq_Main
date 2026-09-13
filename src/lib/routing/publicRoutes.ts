@@ -97,26 +97,6 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.75" },
   },
-  {
-    path: "/referenzen",
-    title: "Referenzen – Arbeitsweise & Projektverständnis | Cogniiq",
-    description: "Wie Cogniiq arbeitet: Nutzerführung, Geschäftslogik, Verwaltung und Betrieb als ein System. Kundenprojekte veröffentlichen wir nur mit schriftlicher Freigabe.",
-    keywords: "Cogniiq Referenzen, Webdesign Projekte, KI Projekte, Automatisierung Beispiele",
-    indexable: true,
-    sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.80" },
-  },
-  {
-    path: "/bewertungen",
-    title: "Bewertungen & Kundenstimmen | Cogniiq AI-Agentur Bayern",
-    // Die Seite sagt selbst, dass derzeit keine Kundenstimme veröffentlicht ist.
-    // Eine Description, die "echte Bewertungen" verspricht, macht daraus einen
-    // Bait-and-Switch im SERP und untergräbt genau die Ehrlichkeit, die diese
-    // Seite eigentlich demonstriert.
-    description: "Kundenstimmen veröffentlichen wir nur mit schriftlicher Freigabe. Derzeit ist keine veröffentlicht — hier steht, warum, und woran Sie unsere Arbeit stattdessen prüfen können.",
-    keywords: "Cogniiq Bewertungen, Kundenstimmen AI Agentur, Webdesign Bewertungen, KI Telefonassistent Erfahrungen",
-    indexable: true,
-    sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.75" },
-  },
 
   // ─── PILLAR SERVICE PAGES ────────────────────────────────────────────────────
   // ─── HEALTHCARE-EINSTIEG (Positionierung Option B) ───────────────────────────

@@ -327,7 +327,7 @@ export function KostenAutomatisierung() {
           <div className="max-w-5xl mx-auto px-6 lg:px-8">
             <motion.nav
               aria-label="Breadcrumb"
-              className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8"
+              className="cq-rise flex items-center gap-1.5 text-sm text-pub-ink-3 dark:text-gray-500 mb-8"
             >
               <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                 Home
@@ -530,7 +530,7 @@ export function KostenAutomatisierung() {
                   <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{u.text}</p>
                 </div>
                 <div className="px-6 py-4">
-                  <span className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+                  <span className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500">
                     Was den Aufwand treibt
                   </span>
                   <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mt-1">{u.treiber}</p>
@@ -547,7 +547,7 @@ export function KostenAutomatisierung() {
             custom={0.3}
             className="mt-8 p-5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 flex items-start gap-3"
           >
-            <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-gray-400 dark:text-gray-500" />
+            <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-pub-ink-3 dark:text-gray-500" />
             <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
               Diese Zuschnitte sind Beschreibungen von Umfang, keine Angebote und
               keine Kundenprojekte. Ihr Angebot entsteht nach der Prozessaufnahme
@@ -704,7 +704,7 @@ export function KostenAutomatisierung() {
                 custom={i * 0.05}
                 className="flex gap-4 p-5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
               >
-                <XCircle size={16} className="flex-shrink-0 mt-0.5 text-gray-400 dark:text-gray-500" />
+                <XCircle size={16} className="flex-shrink-0 mt-0.5 text-pub-ink-3 dark:text-gray-500" />
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">{n.titel}</h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{n.text}</p>
@@ -812,7 +812,7 @@ export function KostenAutomatisierung() {
             </div>
 
             <div className="mt-8">
-              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
+              <p className="text-xs font-semibold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-4">
                 Branchen
               </p>
               <div className="flex flex-wrap gap-3">
@@ -861,7 +861,7 @@ export function KostenAutomatisierung() {
                   Prozessautomatisierung ansehen
                 </Link>
               </div>
-              <p className="mt-6 text-xs text-gray-400 dark:text-gray-500">
+              <p className="mt-6 text-xs text-pub-ink-3 dark:text-gray-500">
                 {BUSINESS_INFO.name} · {BUSINESS_INFO.contact.email} · {BUSINESS_INFO.contact.phoneDisplay}
               </p>
             </motion.div>

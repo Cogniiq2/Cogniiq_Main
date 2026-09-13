@@ -194,7 +194,7 @@ export function KostenKiTelefonassistent() {
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <nav
               aria-label="Breadcrumb"
-              className="flex items-center gap-1.5 text-[14px] text-gray-400 dark:text-gray-500 mb-10"
+              className="flex items-center gap-1.5 text-[14px] text-pub-ink-3 dark:text-gray-500 mb-10"
             >
               <Link to="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                 Home
@@ -357,7 +357,7 @@ export function KostenKiTelefonassistent() {
             <ol className="space-y-4">
               {EINRICHTUNG_PROJEKT.schritte.map((s) => (
                 <li key={s.nummer} className={`${CARD_ALT} flex items-start gap-5`}>
-                  <span className="text-[15px] font-bold text-gray-400 dark:text-gray-500 tabular-nums mt-1 flex-shrink-0">
+                  <span className="text-[15px] font-bold text-pub-ink-3 dark:text-gray-500 tabular-nums mt-1 flex-shrink-0">
                     {s.nummer}
                   </span>
                   <div>

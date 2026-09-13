@@ -183,7 +183,7 @@ function HeroSection({
       <div className="max-w-5xl mx-auto px-6 lg:px-8">
         <motion.nav
           aria-label="Breadcrumb"
-          className="cq-rise flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 mb-8 flex-wrap"
+          className="cq-rise flex items-center gap-1.5 text-sm text-pub-ink-3 dark:text-gray-500 mb-8 flex-wrap"
         >
           {breadcrumbs.map((crumb, i) => (
             <span key={crumb.url} className="flex items-center gap-1.5">
@@ -243,7 +243,7 @@ function TLDRSection({ config }: { config: ClusterPageConfig }) {
   return (
     <div className="border-y border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300">
       <div className="max-w-5xl mx-auto px-6 lg:px-8 py-8">
-        <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-5">
+        <p className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-5">
           {config.tldr.heading}
         </p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -257,7 +257,7 @@ function TLDRSection({ config }: { config: ClusterPageConfig }) {
               custom={i * 0.06}
               className="flex flex-col gap-1"
             >
-              <span className="text-xs text-gray-400 dark:text-gray-500">{item.label}</span>
+              <span className="text-xs text-pub-ink-3 dark:text-gray-500">{item.label}</span>
               <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{item.value}</span>
             </motion.div>
           ))}
@@ -325,7 +325,7 @@ function PainPointsSection({ config }: { config: ClusterPageConfig }) {
               custom={i * 0.06}
               className="flex items-start gap-3 p-5 rounded-xl bg-white dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/50"
             >
-              <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-gray-400 dark:text-gray-500" />
+              <AlertCircle size={16} className="flex-shrink-0 mt-0.5 text-pub-ink-3 dark:text-gray-500" />
               <span className="text-sm text-gray-700 dark:text-gray-300">{item}</span>
             </motion.div>
           ))}
@@ -368,7 +368,7 @@ function PricingSection({ config }: { config: ClusterPageConfig }) {
               className="bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 flex flex-col gap-5"
             >
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">
+                <p className="text-xs font-bold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500 mb-1">
                   {tier.name}
                 </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{tier.anchor}</p>
@@ -398,7 +398,7 @@ function PricingSection({ config }: { config: ClusterPageConfig }) {
           viewport={{ once: true }}
           variants={fadeUp}
           custom={0.3}
-          className="mt-6 text-xs text-gray-400 dark:text-gray-500"
+          className="mt-6 text-xs text-pub-ink-3 dark:text-gray-500"
         >
           Alle Preisangaben sind Richtwerte. Das individuelle Angebot hängt von Umfang, Zielgruppe und spezifischen Anforderungen ab. Kostenloses Erstgespräch für eine konkrete Einschätzung.
         </motion.p>
@@ -483,7 +483,7 @@ function ComparisonSection({ config }: { config: ClusterPageConfig }) {
                 <tr key={i} className="border-b border-gray-100 dark:border-gray-800/50 last:border-0">
                   <td className="py-3.5 pr-6 text-gray-600 dark:text-gray-400">{row.criterion}</td>
                   <td className="py-3.5 pr-6 text-gray-900 dark:text-gray-100 font-medium">{row.pro}</td>
-                  <td className="py-3.5 text-gray-400 dark:text-gray-500">{row.con}</td>
+                  <td className="py-3.5 text-pub-ink-3 dark:text-gray-500">{row.con}</td>
                 </tr>
               ))}
             </tbody>
@@ -582,7 +582,7 @@ function InternalLinksSection({ config }: { config: ClusterPageConfig }) {
           custom={0}
           className="mb-5"
         >
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-pub-ink-3 dark:text-gray-500">
             Weiterführende Seiten
           </h2>
         </motion.div>
@@ -643,7 +643,7 @@ function CTASection({ config }: { config: ClusterPageConfig }) {
               Webdesign {config.city}
             </Link>
           </div>
-          <p className="mt-6 text-xs text-gray-400 dark:text-gray-500">
+          <p className="mt-6 text-xs text-pub-ink-3 dark:text-gray-500">
             {BUSINESS_INFO.name} · {BUSINESS_INFO.address.addressLocality} · {BUSINESS_INFO.contact.email}
           </p>
         </motion.div>

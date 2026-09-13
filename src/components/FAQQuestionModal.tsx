@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { X, ArrowRight } from 'lucide-react';
 import { N8N_ENDPOINTS } from '@/config/externalEndpoints';
+import { BUSINESS_INFO } from '@/lib/seo-data';
 
 interface Props {
   open: boolean;
@@ -49,6 +50,7 @@ export function FAQQuestionModal({ open, onClose }: Props) {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [fehler, setFehler] = useState<string | null>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
   const set = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -77,22 +79,35 @@ export function FAQQuestionModal({ open, onClose }: Props) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
     setSubmitting(true);
+    setFehler(null);
     const payload = {
       name: form.name.trim(),
       email: form.email.trim(),
       phone: form.phone.trim() || null,
       question: form.message.trim(),
     };
+    /*
+      Erfolg nur bei einer lesbaren 2xx-Antwort. Vorher setzte ein beliebiger
+      Statuscode — 4xx, 5xx — denselben Erfolgszustand wie eine angenommene
+      Frage; nur der ausgeworfene Netzwerkfehler fiel durch, und auch der
+      stumm. Dasselbe Verhalten wie im Kontakt- und im Demo-Formular.
+    */
     try {
-      await fetch(N8N_ENDPOINTS.faqQuestion, {
+      const res = await fetch(N8N_ENDPOINTS.faqQuestion, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setSuccess(true);
     } catch (error) {
       console.warn('FAQ question submission failed', error);
+      setFehler(
+        'Wir konnten den Eingang Ihrer Frage nicht bestätigen. Bitte versuchen Sie es erneut oder schreiben Sie an ' +
+          BUSINESS_INFO.contact.email + '.',
+      );
     } finally {
       setSubmitting(false);
     }
@@ -131,6 +146,7 @@ export function FAQQuestionModal({ open, onClose }: Props) {
                   form={form}
                   set={set}
                   submitting={submitting}
+                  fehler={fehler}
                   onSubmit={handleSubmit}
                   onClose={onClose}
                 />
@@ -147,12 +163,14 @@ function FormView({
   form,
   set,
   submitting,
+  fehler,
   onSubmit,
   onClose,
 }: {
   form: FormState;
   set: (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   submitting: boolean;
+  fehler: string | null;
   onSubmit: (e: React.FormEvent) => void;
   onClose: () => void;
 }) {
@@ -254,14 +272,21 @@ function FormView({
         {/* Divider */}
         <div className="h-px bg-gray-100 -mx-1" />
 
+        {fehler && (
+          <p role="alert" className="rounded-xl border border-[#b42318]/25 bg-[#fef3f2] px-4 py-3 text-[13px] leading-relaxed text-[#8a1c12]">
+            {fehler}
+          </p>
+        )}
+
         {/* Footer row */}
         <div className="flex items-center justify-between gap-4">
-          <p className="text-gray-400 leading-relaxed" style={{ fontSize: '11.5px', maxWidth: '30ch' }}>
+          <p className="text-pub-ink-3 leading-relaxed" style={{ fontSize: '12.5px', maxWidth: '32ch' }}>
             Ihre Daten werden vertraulich behandelt und nicht weitergegeben.
           </p>
           <button
             type="submit"
             disabled={submitting}
+            aria-busy={submitting}
             className="flex-shrink-0 flex items-center gap-2 text-white transition-opacity"
             style={{
               background: '#111827',

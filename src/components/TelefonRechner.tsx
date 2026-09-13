@@ -79,7 +79,7 @@ const START_DAUER = 2;
 const CARD =
   "rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50";
 const LABEL = "text-[15px] font-medium text-gray-800 dark:text-gray-200";
-const HINT = "text-[14px] text-gray-500 dark:text-gray-500 leading-[1.55]";
+const HINT = "text-[14px] text-pub-ink-3 dark:text-gray-500 leading-[1.55]";
 const ZEILE =
   "flex items-baseline justify-between gap-6 py-2.5 border-b border-gray-100 dark:border-gray-800 last:border-0";
 
@@ -115,7 +115,7 @@ function Zahlenfeld({
         {label}
       </label>
       {hinweis && <p className={`${HINT} mt-1`}>{hinweis}</p>}
-      <div className="mt-2 flex items-center gap-3">
+      <div className="mt-2 flex flex-wrap items-center gap-3">
         <input
           id={id}
           type="number"
@@ -144,7 +144,7 @@ function Zahlenfeld({
             step={step}
             value={wert ?? min}
             onChange={(e) => onChange(Number(e.target.value))}
-            className="flex-1 min-w-0 h-11 accent-gray-900 dark:accent-gray-100 cursor-pointer"
+            className="basis-full min-w-0 h-11 accent-gray-900 dark:accent-gray-100 cursor-pointer"
           />
         )}
       </div>
@@ -186,6 +186,30 @@ function Zeile({
       >
         {wert}
       </span>
+    </div>
+  );
+}
+
+/** Betrag mit Vorrang vor dem erklärenden Text — nur in der kompakten Fassung,
+ *  wo zwei Zahlen die Antwort sind und alles andere ihre Bedingung. */
+function Betrag({
+  label,
+  wert,
+  hinweis,
+}: {
+  label: string;
+  wert: string;
+  hinweis?: string;
+}) {
+  return (
+    <div className="min-w-0">
+      <p className="text-[13px] font-semibold uppercase tracking-[0.12em] text-gray-500 dark:text-gray-400">
+        {label}
+      </p>
+      <p className="mt-1.5 text-[clamp(26px,3vw,34px)] font-bold leading-[1.1] tracking-[-0.02em] text-gray-900 dark:text-gray-100 tabular-nums">
+        {wert}
+      </p>
+      {hinweis && <p className={`${HINT} mt-1.5`}>{hinweis}</p>}
     </div>
   );
 }
@@ -280,8 +304,17 @@ function Schritt({ nummer, titel }: { nummer: number; titel: string }) {
  * Sprachwahl, vollständiger Rechenweg.
  *
  * `kompakt` ist die Fassung für Seiten, auf denen der Rechner nicht die
- * Hauptsache ist. Sie lässt Zeilen WEG, sie rechnet nicht anders: Dieselben
- * Eingaben laufen durch dieselben Funktionen aus
+ * Hauptsache ist — heute genau eine: die Startseite. Sie zeigt die PREISFRAGE
+ * („Was kostet das bei meinem Aufkommen?") und lässt den mehrschrittigen
+ * Wirtschaftlichkeitsteil WEG; der Weg dorthin steht als eigener Schritt
+ * darunter und führt auf die vollständige Fassung. Der Grund ist nicht
+ * Geschmack: Der Wirtschaftlichkeitsteil braucht fünf Angaben, die ein
+ * Erstbesucher nicht im Kopf hat, und er stand bisher auf der Startseite über
+ * mehrere Bildschirme zwischen Produkt und Abschluss. Wer ihn will, bekommt
+ * ihn vollständig — eine Fassung, ein Rechenweg.
+ *
+ * Sie lässt also Zeilen und einen ganzen Block WEG, sie rechnet nicht anders:
+ * Dieselben Eingaben laufen durch dieselben Funktionen aus
  * `src/lib/telefonassistent-rechner.ts` und ergeben denselben Tarif, dieselben
  * Monatskosten und denselben Nettoeffekt. `rechner-konsistenz.test.tsx` prüft
  * genau das — zwei Fassungen, die bei gleicher Eingabe verschiedene Zahlen
@@ -380,8 +413,21 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
 
   return (
     <div className="space-y-6">
+      {/*
+        Kompakt stehen Eingabe und Ergebnis auf dem Desktop NEBENEINANDER: Die
+        beiden Mengenangaben sind in einer Sekunde gesetzt, und die Wirkung auf
+        den Preis soll im selben Blickfeld passieren. Auf schmalen Schirmen
+        stapelt dasselbe Markup ohne Sonderfall.
+      */}
+      <div
+        className={
+          kompakt
+            ? "grid gap-5 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-start"
+            : "space-y-6"
+        }
+      >
       {/* ── Mengenangaben, einmal für beide Rechnungen ──────────────────── */}
-      <div className={`${CARD} p-6 sm:p-7`}>
+      <div className={`${CARD} p-6 sm:p-7 ${kompakt ? "lg:h-full" : ""}`}>
         <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-1">
           Ihr Anrufaufkommen
         </h3>
@@ -389,7 +435,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
           Startwerte sind frei gewählte Beispiele, keine Branchenstatistik.
           Tragen Sie ein, was auf Ihren Betrieb zutrifft.
         </p>
-        <div className="grid sm:grid-cols-2 gap-6">
+        <div className={`grid gap-6 ${kompakt ? "sm:grid-cols-2 lg:grid-cols-1" : "sm:grid-cols-2"}`}>
           <Zahlenfeld
             label="Anrufe pro Monat"
             wert={anrufe}
@@ -428,7 +474,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
                 type="button"
                 aria-pressed={sprachen === wert}
                 onClick={() => { meldePreisStart(); setSprachen(wert); }}
-                className={`px-4 py-2.5 rounded-lg text-[15px] font-medium border transition-colors ${
+                className={`inline-flex h-11 items-center rounded-full px-5 text-[15px] font-medium border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 ${
                   sprachen === wert
                     ? "border-gray-900 dark:border-gray-100 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
                     : "border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-500"
@@ -443,7 +489,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
       </div>
 
       {/* ── Ergebnis 1: Preis ───────────────────────────────────────────── */}
-      <div className={`${CARD} p-6 sm:p-7`} aria-live="polite">
+      <div className={`${CARD} p-6 sm:p-7 ${kompakt ? "lg:h-full" : ""}`} aria-live="polite">
         <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-1">
           Was das bei Ihnen kostet
         </h3>
@@ -451,6 +497,35 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
           Sofort, ohne E-Mail. Keine Kostenposition wird still weggelassen: Was
           noch nicht feststeht, steht als offen in der Liste — nicht als Null.
         </p>
+
+        {/*
+          Kompakt zuerst die zwei Beträge, um die es geht, dann ihre
+          Bedingungen. Dieselben Werte wie in den Zeilen darunter, aus
+          derselben Rechnung — hier nur in der Größe, die ihrer Bedeutung für
+          die Entscheidung entspricht.
+        */}
+        {kompakt && s !== null && preis.modus !== "individuell" && (
+          <div className="mb-6 grid gap-5 border-b border-gray-100 dark:border-gray-800 pb-6 sm:grid-cols-2">
+            <Betrag
+              label="Wiederkehrend pro Monat"
+              wert={
+                preis.monatlichGesamtEur === UNBEKANNT
+                  ? eur(s.telefonieMonatlichEur, 2)
+                  : eur(preis.monatlichGesamtEur, 2)
+              }
+              hinweis={
+                preis.monatlichGesamtEur === UNBEKANNT
+                  ? "Telefonie. Der Sprachaufschlag steht erst im Angebot fest und ist hier noch nicht enthalten."
+                  : `Tarif ${s.tarif.name}, inklusive Mehrverbrauch. Gedeckelt auf ${s.tarif.obergrenze}.`
+              }
+            />
+            <Betrag
+              label="Einmalige Einrichtung"
+              wert={s.tarif.einrichtung}
+              hinweis="Zur Hälfte bei Vertragsabschluss, zur Hälfte nach dem Go-live."
+            />
+          </div>
+        )}
 
         <Zeile
           label="Gesprächsminuten pro Monat"
@@ -524,6 +599,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
                 />
               )
             )}
+            {!kompakt && (
             <Zeile
               label="Wiederkehrend pro Monat"
               wert={
@@ -538,11 +614,14 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
                   : undefined
               }
             />
+            )}
+            {!kompakt && (
             <Zeile
               label="Einmalige Einrichtung"
               wert={s.tarif.einrichtung}
               hinweis="Zur Hälfte bei Vertragsabschluss, zur Hälfte nach dem Go-live."
             />
+            )}
           </>
         )}
 
@@ -562,6 +641,8 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
         </p>
       </div>
 
+      </div>
+
       {/* ── Ergebnis 2: Wirtschaftlichkeit ──────────────────────────────
           Der Ablauf ist bewusst fortlaufend und vollständig sichtbar:
           Personalkosten, dann die Anrufe, die heute niemanden erreichen, dann
@@ -570,6 +651,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
           außerhalb der Rechnung, während der Cogniiq-Monatsbetrag drinstand.
           Wer ihn nicht öffnete, bekam eine negative Überschrift aus einem
           halben Modell zu sehen. ────────────────────────────────────────── */}
+      {!kompakt && (
       <div className={`${CARD} p-6 sm:p-7`}>
         <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-1">
           Und was bringt es Ihnen?
@@ -980,6 +1062,8 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
         </p>
       </div>
 
+      )}
+
       <p className={HINT}>
         Alle Zahlen werden in Ihrem Browser gerechnet. Ihre Eingaben werden
         nicht gespeichert, nicht übertragen und nicht an Analysedienste
@@ -995,16 +1079,19 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
         {/*
           In der kompakten Fassung führt der erste Weg auf die vollständige
           Fassung, nicht auf ein Formular: Wer hier rechnet, will erst zu Ende
-          rechnen. Der Demo-Weg bleibt daneben stehen und behält sein Gewicht.
+          rechnen — und dort steht der Wirtschaftlichkeitsteil, der hier
+          bewusst fehlt. Er trägt deshalb hier das Gewicht; der Demo-Weg bleibt
+          daneben stehen. In der vollen Fassung ist es umgekehrt: Dort ist
+          fertig gerechnet, und der nächste Schritt ist das Gespräch.
         */}
         {kompakt && (
           <a
             href={RECHNER_LINK}
             onClick={() => trackEvent("calculator_anchor_click", "Kompaktrechner")}
-            className="inline-flex items-center justify-center gap-2.5 px-7 py-4 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-200 rounded-xl font-semibold text-[15px] hover:border-gray-500 dark:hover:border-gray-500 transition-colors"
+            className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-pub-ink px-7 text-[15px] font-semibold text-white transition-colors hover:bg-[#1f2933] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
           >
-            Vollständigen Rechner öffnen
-            <ArrowRight size={14} aria-hidden="true" />
+            Wirtschaftlichkeit berechnen
+            <ArrowRight size={15} aria-hidden="true" />
           </a>
         )}
         <a
@@ -1014,10 +1101,14 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
             if (wirtschaft.vollstaendig) trackEvent("roi_calculator_completed");
             trackEvent("cta_demo_click", "Rechner");
           }}
-          className="inline-flex items-center justify-center gap-2.5 px-7 py-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[15px] hover:bg-gray-700 dark:hover:bg-white transition-colors"
+          className={
+            kompakt
+              ? "inline-flex h-12 items-center justify-center gap-2.5 rounded-full border border-pub-ink/20 bg-white px-7 text-[15px] font-semibold text-pub-ink transition-colors hover:border-pub-ink/45 hover:bg-pub-paper-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
+              : "inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-pub-ink px-7 text-[15px] font-semibold text-white transition-colors hover:bg-[#1f2933] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
+          }
         >
           Zahlen gemeinsam durchgehen
-          <ArrowRight size={14} aria-hidden="true" />
+          <ArrowRight size={15} aria-hidden="true" />
         </a>
       </div>
     </div>

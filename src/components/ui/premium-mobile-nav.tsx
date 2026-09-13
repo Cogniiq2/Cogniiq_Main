@@ -1,24 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Chrome as Home, Briefcase, Users, CircleHelp as HelpCircle, Mail, MapPin, ChevronDown, X, ArrowRight, Star, BookOpen, UserRound } from 'lucide-react';
+import { Chrome as Home, Briefcase, Users, CircleHelp as HelpCircle, Mail, MapPin, ChevronDown, X, ArrowRight, BookOpen, UserRound } from 'lucide-react';
 import { LEISTUNGEN, LEISTUNGEN_AUSWEG, STANDORTE, HAUPTSITZ_SLUG } from '@/lib/navigation-data';
 import { Logo } from '@/components/Logo';
 import { useAuth } from '@/contexts/AuthContext';
 
 
 
-type NavSection = 'home' | 'leistungen' | 'standorte' | 'ueber-uns' | 'faq' | 'referenzen' | 'blog' | 'kontakt';
-
-// Dieselben drei Ziele wie am Desktop. FAQ, Referenzen und Blog sind aus der
-// Kopfzeile genommen und stehen weiter im Footer, der auf jeder Seite steht.
-const pillItems: { id: NavSection; label: string }[] = [
-  { id: 'home', label: 'Home' },
-  { id: 'leistungen', label: 'Leistungen' },
-  { id: 'standorte', label: 'Standorte' },
-  { id: 'ueber-uns', label: 'Über uns' },
-  { id: 'kontakt', label: 'Kontakt' },
-];
+type NavSection = 'home' | 'leistungen' | 'standorte' | 'ueber-uns' | 'faq' | 'blog' | 'kontakt';
 
 function getActiveSection(pathname: string): NavSection {
   if (pathname === '/') return 'home';
@@ -38,7 +28,6 @@ function getActiveSection(pathname: string): NavSection {
   ) return 'standorte';
   if (pathname === '/ueber-uns') return 'ueber-uns';
   if (pathname === '/faq') return 'faq';
-  if (pathname === '/referenzen') return 'referenzen';
   if (pathname.startsWith('/blog')) return 'blog';
   if (pathname === '/kontakt') return 'kontakt';
   return 'home';
@@ -55,6 +44,25 @@ export function PremiumMobileNav() {
   const { user, isLoading } = useAuth();
   const touchStartY = useRef(0);
   const touchEndY = useRef(0);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
+
+  // Dialog semantics: Escape closes, focus moves into the sheet on open and
+  // returns to the trigger on close.
+  useEffect(() => {
+    if (!isOpen) return;
+    const trigger = triggerRef.current;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setIsOpen(false); };
+    document.addEventListener('keydown', onKey);
+    const t = window.setTimeout(() => {
+      sheetRef.current?.querySelector<HTMLElement>('button, a')?.focus();
+    }, 50);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      window.clearTimeout(t);
+      trigger?.focus();
+    };
+  }, [isOpen]);
 
   // Derived AFTER mount, never during the first render.
   //
@@ -95,56 +103,26 @@ export function PremiumMobileNav() {
 
   const go = (path: string) => { navigate(path); setIsOpen(false); };
 
-  const currentLabel = pillItems.find(i => i.id === activeSection)?.label ?? 'Menu';
 
   return (
     <>
-      {/* TRIGGER PILL */}
-      {/* The horizontal centering lives in the motion transform, NOT in a
-          Tailwind `-translate-x-1/2` class. framer-motion owns the `transform`
-          property of an element it animates and writes it wholesale: animating
-          `y` alone emitted `transform: none` on the settled frame, which
-          discarded the -50% correction while `left: 50%` stayed. The pill was
-          therefore laid out from the viewport's midpoint rather than centred on
-          it, and its full width (187-224px, depending on the active section
-          label) hung off the right edge — giving every page carrying this nav a
-          horizontal scrollbar below the `lg` breakpoint. Keeping `x: '-50%'` in
-          both the initial and animate states makes framer-motion emit the
-          correction itself, so it survives every frame. */}
-      <motion.button
+      {/* TRIGGER — in the header, top right, below `lg`. The former floating
+          bottom pill overlapped page content and the consent banner. */}
+      <button
+        ref={triggerRef}
+        type="button"
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-1/2 z-50 lg:hidden"
-        initial={{ x: '-50%', y: 100, opacity: 0 }}
-        animate={{ x: '-50%', y: 0, opacity: 1 }}
-        transition={{ delay: 0.4, type: 'spring', stiffness: 240, damping: 22 }}
-        whileTap={{ scale: 0.96 }}
+        className="fixed top-[14px] right-4 z-50 lg:hidden inline-flex h-11 items-center gap-2 rounded-full border border-pub-hairline bg-white/95 px-4 text-[14px] font-semibold text-pub-ink shadow-[0_1px_2px_rgba(11,15,20,0.06)] backdrop-blur focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
         aria-label="Navigation öffnen"
+        aria-haspopup="dialog"
+        aria-expanded={isOpen}
       >
-        <div className="relative">
-          <div className="absolute inset-0 rounded-full bg-white/10 blur-xl scale-125 opacity-70" />
-          <div className="relative flex items-center gap-3 bg-gray-950/95 border border-white/[0.08] rounded-full px-5 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl">
-            <div className="flex items-center gap-[5px]">
-              {pillItems.map((item) => (
-                <motion.div
-                  key={item.id}
-                  className="rounded-full"
-                  animate={{
-                    width: activeSection === item.id ? 16 : 4,
-                    backgroundColor: activeSection === item.id ? '#ffffff' : '#4b5563',
-                    height: 4,
-                  }}
-                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
-                />
-              ))}
-            </div>
-            <div className="w-px h-3.5 bg-white/10" />
-            <span className="text-sm font-medium text-white/90 tracking-wide">
-              {currentLabel}
-            </span>
-            <ChevronDown size={13} className="text-white/40" />
-          </div>
-        </div>
-      </motion.button>
+        <span className="flex flex-col gap-[4px]" aria-hidden="true">
+          <span className="block h-[1.5px] w-4 rounded-full bg-current" />
+          <span className="block h-[1.5px] w-4 rounded-full bg-current" />
+        </span>
+        Menü
+      </button>
 
       <AnimatePresence>
         {isOpen && (
@@ -166,11 +144,15 @@ export function PremiumMobileNav() {
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 32, stiffness: 300 }}
               className="fixed inset-x-0 bottom-0 z-[70] lg:hidden"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Navigation"
+              ref={sheetRef}
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
             >
-              <div className="bg-gray-950 rounded-t-[28px] max-h-[88vh] overflow-hidden flex flex-col border border-white/[0.06] border-b-0">
+              <div className="bg-gray-950 rounded-t-[28px] max-h-[88dvh] overflow-hidden flex flex-col border border-white/[0.06] border-b-0 pb-[env(safe-area-inset-bottom)]">
 
                 {/* DRAG HANDLE */}
                 <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
@@ -355,15 +337,6 @@ export function PremiumMobileNav() {
                       isActive={activeSection === 'faq'}
                       delay={0.16}
                       onClick={() => go('/faq')}
-                    />
-
-                    {/* REFERENZEN */}
-                    <NavRow
-                      icon={Star}
-                      label="Referenzen"
-                      isActive={activeSection === 'referenzen'}
-                      delay={0.20}
-                      onClick={() => go('/referenzen')}
                     />
 
                     {/* BLOG */}
