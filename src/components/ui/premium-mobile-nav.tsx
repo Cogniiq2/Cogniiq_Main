@@ -52,6 +52,7 @@ export function PremiumMobileNav() {
   // returns to the trigger on close.
   useEffect(() => {
     if (!isOpen) return;
+    const trigger = triggerRef.current;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setIsOpen(false); };
     document.addEventListener('keydown', onKey);
     const t = window.setTimeout(() => {
@@ -60,7 +61,7 @@ export function PremiumMobileNav() {
     return () => {
       document.removeEventListener('keydown', onKey);
       window.clearTimeout(t);
-      triggerRef.current?.focus();
+      trigger?.focus();
     };
   }, [isOpen]);
 
