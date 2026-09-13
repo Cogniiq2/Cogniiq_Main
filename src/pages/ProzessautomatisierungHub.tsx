@@ -114,9 +114,17 @@ const UNGEEIGNET = [
       teuer ist oder fehlerkritisch, kann sich tragen — und ein täglicher
       Trivialvorgang eine große Umsetzung nicht rechtfertigen. Was zählt, ist
       Aufwand × Wert × Risiko je Durchlauf gegen Investition und laufende Kosten.
+
+      UND KEIN GLEICHSETZEN DER BETRIEBSKOSTEN. In der ersten Korrektur stand
+      noch „Aufnahme, Tests und Betrieb kosten dasselbe wie bei einem täglichen
+      Ablauf". Für Aufnahme, Aufbau und Tests stimmt das ungefähr — das ist
+      Festaufwand. Für den BETRIEB stimmt es nicht: Ausführungshäufigkeit,
+      API-Nutzung, Ausnahmen, Überwachung, Gebühren Dritter und die tatsächliche
+      Komplexität des Ablaufs bewegen ihn. Die beiden Posten werden deshalb
+      getrennt benannt, statt sie in eine Absolutaussage zu ziehen.
     */
     titel: "Selten — und je Durchlauf klein",
-    text: "Je seltener ein Vorgang vorkommt und je geringer der Aufwand pro Durchlauf ist, desto schwieriger trägt sich eine Automatisierung: Aufnahme, Tests und Betrieb kosten dasselbe wie bei einem täglichen Ablauf. Selten allein ist aber kein Ausschlusskriterium — ein einzelner Vorgang kann sehr zeitaufwendig, teuer oder fehlerkritisch sein. Entscheidend ist die Rechnung mit den konkreten Zahlen.",
+    text: "Je seltener ein Vorgang vorkommt und je geringer der Aufwand pro Durchlauf ist, desto schwieriger trägt sich eine Automatisierung. Auch bei seltenen Abläufen fällt ein Grundaufwand für Aufnahme, Aufbau und Tests an; wie hoch der laufende Betriebsaufwand ist, hängt vom konkreten Prozess, seiner Nutzung und den beteiligten Systemen ab. Selten allein ist aber kein Ausschlusskriterium — ein einzelner Vorgang kann sehr zeitaufwendig, teuer oder fehlerkritisch sein. Entscheidend ist die Rechnung mit den konkreten Zahlen.",
   },
   {
     titel: "Die Regeln ändern sich ständig",
