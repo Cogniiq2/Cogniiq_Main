@@ -115,7 +115,7 @@ function Zahlenfeld({
         {label}
       </label>
       {hinweis && <p className={`${HINT} mt-1`}>{hinweis}</p>}
-      <div className="mt-2 flex items-center gap-3">
+      <div className="mt-2 flex flex-wrap items-center gap-3">
         <input
           id={id}
           type="number"
@@ -144,7 +144,7 @@ function Zahlenfeld({
             step={step}
             value={wert ?? min}
             onChange={(e) => onChange(Number(e.target.value))}
-            className="flex-1 min-w-0 h-11 accent-gray-900 dark:accent-gray-100 cursor-pointer"
+            className="basis-full sm:basis-0 sm:flex-1 min-w-0 h-11 accent-gray-900 dark:accent-gray-100 cursor-pointer"
           />
         )}
       </div>

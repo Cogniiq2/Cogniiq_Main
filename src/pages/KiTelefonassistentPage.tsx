@@ -470,9 +470,10 @@ function HeroSection() {
               Team keine Hand frei hat" — das beschreibt einen Anrufdienst und
               verkaufte damit ein abwickelndes System unter Wert.
             */}
-            <h1 className="text-[2.5rem] sm:text-5xl lg:text-[3.4rem] font-bold text-gray-900 dark:text-gray-100 leading-[1.07] tracking-tight mb-6">
-              KI-Telefonassistent für Unternehmen:{" "}
-              <span className="text-gray-400 dark:text-gray-500 font-light">
+            <h1 className="text-[clamp(30px,8vw,40px)] sm:text-5xl lg:text-[3.2rem] font-bold text-gray-900 dark:text-gray-100 leading-[1.07] tracking-[-0.022em] mb-6">
+              KI-Telefon&shy;assistent für Unternehmen:{" "}
+              {/* Second half in ink-3 (5.9:1), not gray-400/font-light (2.8:1). */}
+              <span className="text-pub-ink-3 dark:text-gray-400 font-normal">
                 Anrufe nicht nur annehmen. Anliegen erledigen.
               </span>
             </h1>

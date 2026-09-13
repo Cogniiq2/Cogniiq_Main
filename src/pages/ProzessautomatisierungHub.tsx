@@ -477,7 +477,7 @@ export function ProzessautomatisierungHub() {
             <div className="cq-rise cq-rise-d3 flex flex-wrap gap-4">
               <Link
                 to="/kontakt"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-colors"
+                className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-pub-ink hover:bg-[#1f2933] text-white font-semibold text-[15px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
               >
                 Prozess besprechen <ArrowRight size={15} />
               </Link>
@@ -826,7 +826,7 @@ export function ProzessautomatisierungHub() {
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 to="/kosten-automatisierung"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-colors"
+                className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-pub-ink hover:bg-[#1f2933] text-white font-semibold text-[15px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
               >
                 Kosten, Preistreiber und Rechner <ArrowRight size={15} />
               </Link>

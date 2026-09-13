@@ -141,7 +141,7 @@ export function KontaktPage() {
                 >
                   KI-Systeme für Ihr
                   <br />
-                  <span className="text-gray-200">Unternehmen besprechen</span>
+                  <span className="text-pub-ink-3">Unternehmen besprechen</span>
                 </motion.h1>
 
                 <motion.p className="cq-rise text-[16px] text-gray-500 leading-[1.75] mb-8 max-w-[560px]">

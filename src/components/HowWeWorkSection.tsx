@@ -73,21 +73,21 @@ export function HowWeWorkSection() {
             ))}
           </ol>
 
-          <div className="rounded-2xl border border-pub-hairline bg-white p-6 sm:p-8">
+          <div className="rounded-2xl border border-pub-hairline bg-white p-5 sm:p-8">
             <p className="mb-5 text-[12px] font-semibold uppercase tracking-[0.14em] text-pub-ink-3">Woran Sie uns messen können</p>
             <ul className="divide-y divide-pub-hairline-soft">
               {assurances.map(({ icon, label, sub }) => (
                 <li key={label} className="flex items-start gap-4 py-3.5 first:pt-0 last:pb-0">
                   <IconTile icon={icon} size="sm" />
                   <div>
-                    <p className="text-[15px] font-semibold leading-snug text-pub-ink">{label}</p>
+                    <p className="text-[14.5px] font-semibold leading-snug text-pub-ink">{label}</p>
                     <p className="text-[13.5px] leading-snug text-pub-ink-3">{sub}</p>
                   </div>
                 </li>
               ))}
             </ul>
             <div className="mt-7">
-              <PubLinkButton to="/kontakt" variant="primary" size="md" icon={ArrowRight} iconTrailing>
+              <PubLinkButton to="/kontakt" variant="primary" size="md" icon={ArrowRight} iconTrailing className="w-full whitespace-normal text-center sm:w-auto">
                 Erstgespräch vereinbaren
               </PubLinkButton>
             </div>

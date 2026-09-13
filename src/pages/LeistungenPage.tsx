@@ -682,7 +682,7 @@ export function LeistungenPage() {
                 id="systems-heading"
                 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 tracking-tight mb-4"
               >
-                Reale Systeme im Einsatz
+                Typische Systemarchitekturen
               </h2>
               <p className="text-[15px] text-gray-500 dark:text-gray-400 max-w-md">
                 Typische Systemarchitekturen, die Cogniiq für reale Betriebe umsetzt.

@@ -1002,7 +1002,7 @@ export function UeberUnsPage() {
               custom={0}
             >
               <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 tracking-tight mb-6">
-                Lass uns dein<br />digitales System aufbauen.
+                Bauen wir Ihr<br />digitales System auf.
               </h2>
               <p className="text-gray-500 dark:text-gray-400 text-lg font-light mb-3 max-w-md mx-auto">
                 Ob Website, Automatisierung oder KI-Integration — wir entwickeln Systeme, die messbar wirken.

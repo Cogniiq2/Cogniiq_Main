@@ -70,7 +70,7 @@ export const LEISTUNGEN: NavLeistung[] = [
       { label: "Für Hotels", href: "/ki-telefonassistent-hotel" },
     ],
     abschluss: [
-      { label: "Demo anhören", href: "/ki-telefonassistent/demo" },
+      { label: "Demo-Termin anfragen", href: "/ki-telefonassistent/demo" },
       { label: "Preise", href: "/kosten-ki-telefonassistent" },
     ],
   },
