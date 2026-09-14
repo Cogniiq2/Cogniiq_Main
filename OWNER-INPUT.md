@@ -267,3 +267,67 @@ Hauptunterscheidungsmerkmal — hat dafür aber kein Hörbeispiel.
 `STIMMPROBE.src` null ist. Eine freigegebene, nachgestellte Audiodatei wäre der
 stärkste einzelne Beleg auf dieser Seite (Spezifikation in
 `ASSETS-REQUIRED.md`). Es wird keine Stimme erfunden oder eingekauft.
+
+---
+
+## Nachtrag 14.09.2026 — drei Prüfungen, die nur Sie durchführen können
+
+Alle drei blockieren eine Schlussfolgerung, nicht eine Umsetzung: die Arbeit
+ist gemacht, aber ohne Ihre Antwort bleibt sie unbewertet.
+
+### I1 · Von Google ausgewählter Canonical für `/webdesign` — **blockiert die Diagnose**
+
+`/webdesign` hatte 1.756 Impressionen bis zum 30.08.2026 und **null** an jedem
+Tag vom 01. bis 11.09. Die Seite ist indexierbar, in der Sitemap, auf sich
+selbst kanonisiert und antwortet mit 200. Die stärkste Erklärung ist, dass
+Google sie mit `/webdesign-agentur-deutschland` zusammengelegt hat — **bewiesen
+ist das nicht**, weil der verbundene Zugriff den ausgewählten Canonical nicht
+zurückgegeben hat.
+
+So prüfen: Search Console → URL-Prüfung →
+`https://cogniiq.de/webdesign` → Felder **„Vom Nutzer angegebener Canonical"**
+und **„Von Google ausgewählter Canonical"** notieren. Danach **„Live-URL
+testen"**, weil der letzte bekannte Crawl vom 18.08.2026 stammt und die heutige
+Fassung nicht kennt.
+
+- Weichen die beiden Werte ab → die Zusammenlegung ist belegt, und die
+  aufgeschobene Konsolidierung (F9) wird vorgezogen, sobald die beiden
+  Bayreuther Experimente graduieren.
+- Stimmen sie überein → die Zusammenlegung ist **nicht** die Ursache, und der
+  Einbruch braucht eine andere Erklärung. Dann wird keine weitere Änderung an
+  `/webdesign` vorgenommen, bis eine vorliegt.
+
+### I2 · GA4: gehört der Stream zur Property, und zählt er Seitenwechsel?
+
+GA4 `properties/551863316` meldet für den 15.08.–11.09.2026 null Sitzungen.
+Das beweist **weder**, dass die Implementierung vom 12./13.09. defekt ist,
+**noch**, dass keine Anfragen eingegangen sind.
+
+1. Bestätigen, dass Stream **`G-NDN9J2G5LM`** zu genau dieser Property gehört.
+2. Die Website mit erteilter Analyse-Einwilligung öffnen und im
+   Echtzeitbericht prüfen, ob `page_view` beim ersten Aufruf **und** bei jedem
+   Seitenwechsel **genau einmal** ankommt.
+3. In den Stream-Einstellungen prüfen, ob **„Seitenaufrufe über
+   Browserverlauf-Ereignisse"** aktiviert ist. Die Website ist eine
+   Single-Page-Anwendung: ohne diese Einstellung zählt nur der erste Aufruf.
+
+**Erst wenn Punkt 3 negativ ist**, ist ein manueller Seitenaufruf im Code
+gerechtfertigt. Vorher würde er die Aufrufe verdoppeln. Ads
+`AW-17946397271` bleibt unberührt, der stillgelegte Stream `G-K7BS3LKT6H` wird
+nicht reaktiviert.
+
+### I3 · `lead_submitted` in GA4 als Schlüsselereignis markieren
+
+Seit dem 14.09.2026 meldet die Website ein Ereignis namens **`lead_submitted`**,
+sobald der Endpunkt den Eingang einer Anfrage mit einem lesbaren 2xx bestätigt
+hat — für das Kontaktformular und für das Demo-Formular, jeweils mit dem Label
+`kontakt` bzw. `demo`. Bis dahin kannte GA4 27 Absichtssignale und keinen
+einzigen bestätigten Lead.
+
+Damit es als Conversion zählt, muss es in GA4 unter *Verwaltung →
+Ereignisse* als **Schlüsselereignis** markiert werden. Es erscheint dort erst,
+nachdem es zum ersten Mal ausgelöst wurde.
+
+**Bitte keine Testanfrage über das echte Formular abschicken** — der Endpunkt
+löst eine reale Bearbeitung aus. Das Ereignis erscheint mit der ersten echten
+Anfrage.

@@ -532,3 +532,54 @@ Konfiguration entfernen (nicht: auf den Pillar setzen — die Vorgabe erledigt
 das). Danach hat keine lebende Seite mehr eine Verbindung zur zurückgezogenen
 URL, und der Test „leaves no unfrozen page linking at a retired URL" in
 `src/prerender.hydration.test.tsx` gilt ohne Ausnahme.
+
+---
+
+# Nachtrag 14.09.2026 — F9 bleibt blockiert, drei Cluster auf HALT
+
+## F9 · `/webdesign-agentur-deutschland` → `/webdesign` — weiterhin AUFGESCHOBEN
+
+Am 14.09.2026 erneut geprüft, nicht nur übernommen. Die Konsolidierung bleibt
+richtig und bleibt blockiert — aus zwei unabhängigen Gründen, von denen jeder
+allein reicht:
+
+1. `/bayreuth/webdesign` (eingefroren) trägt in seinem `<main>` den Anker
+   `{ href: "/webdesign-agentur-deutschland", text: "Webdesign Agentur" }`.
+   Er steht so im Fingerabdruck.
+2. `src/pages/pillars/WebdesignAgenturDeutschland.tsx` zählt in
+   `inboundOccurrences` als Quelle für `/bayreuth/webdesign` (2×) und
+   `/bayreuth/website-relaunch` (1×). Die Datei zu entfernen, senkt beide
+   Zählungen — genau der Fall, für den der Riegel gebaut wurde.
+
+Was **statt** der Konsolidierung passiert ist: die Shell zeigt jetzt auf
+`/webdesign` (Desktop-Hero, **Mobile-Hero**, Footer-Fließtext,
+ServicesSection, CityServicePage). Der Zweig hatte den Mobile-Hero übersehen;
+da `/webdesign` laut URL-Prüfung **als MOBILE gecrawlt** wird, war das die
+Hälfte, auf die es ankommt. Die eine eingefrorene Ausnahme behält ihr
+gemessenes Ziel über `legacyWebdesignLink`.
+
+**Auslöser für F9:** Graduierung von `/bayreuth/webdesign` **und**
+`/bayreuth/website-relaunch`. Vorher nicht, auch nicht „nur der Redirect".
+
+## HALT bis mindestens Deploy + 28 Tage
+
+Drei Cluster tragen frische Arbeit, die noch nicht gemessen werden konnte.
+Business-Priorität ist kein Grund, sie erneut anzufassen — sie ist der Grund,
+sie in Ruhe messen zu lassen.
+
+| Cluster | Frische Arbeit | Warum kein Eingriff jetzt |
+|---|---|---|
+| `/ki-telefonassistent` | A5, 13.09.2026 | Fenster läuft |
+| `/prozessautomatisierung` | Pillar-Konsolidierung, PR #95, 13.09.2026 | Fenster läuft |
+| `/kosten-ki-telefonassistent` | graduiert 12.09.2026 | Implementierung erst prüfen, dann ggf. ändern |
+
+Zur naheliegendsten Versuchung, den Titeln der Telefon-Kostenseiten: die
+Nachfrage ist real (164 + 77 Impressionen auf „ki telefonassistent kosten"),
+aber bei Ø-Position 33 ist eine CTR von null die **erwartete Folge der
+Position**. Ein Titel wird auf Position 33 kaum gelesen. Eine Titeländerung
+wäre hier keine Verbesserung, sondern die Zerstörung eines laufenden Fensters
+zugunsten einer Vermutung.
+
+`/verpasste-anrufe-verlust` (Ø 11,59) und `/kosten-automatisierung` (Ø 13,0)
+sind die nächstliegenden Seite-1-Chancen der Domain. Beide bleiben unberührt,
+weil beide frische Arbeit im Ledger tragen.

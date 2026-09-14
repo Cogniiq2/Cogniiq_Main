@@ -1135,3 +1135,166 @@ Keine Signifikanzaussage. Zwei Seiten mit dreistelligen Impressionen tragen
 keine statistische Auswertung; was hier gemessen wird, ist Richtung und
 Größenordnung, nicht Signifikanz. Und **keine Erfolgsmeldung vor Tag 28**
 (Regel 1).
+
+---
+
+# Messpunkt 14.09.2026 — Befund, Ledger und Übergabe
+
+Basis-Commit `ebe326f` (main, PR #96 gemergt 13.09.2026 18:53 UTC).
+Arbeitszweig `claude/brave-euler-kud79d`.
+
+GSC-Grundlage: Property `sc-domain:cogniiq.de`, Web-Suche, letztes vollständiges
+Datum **2026-09-11**, Zeitzone America/Los_Angeles, Zeitraum
+**2026-08-15 bis 2026-09-11 (28 Tage)**. Die Zahlen stammen aus einem
+verbundenen Kontozugriff am 14.09.2026, nicht aus öffentlichen Snippets.
+Sie sind in dieser Sitzung **nicht** nachgeladen worden — sie stehen hier als
+historischer Snapshot und werden beim nächsten Messpunkt gegen frische Daten
+geprüft, nicht überschrieben.
+
+## 1 · Was gesichert ist, was Hypothese ist, was unbekannt bleibt
+
+### Gesichert (aus dem Repository, in dieser Sitzung geprüft)
+
+| Befund | Beleg |
+|---|---|
+| Die Webdesign-Recovery war **nicht** deployt: ein Commit, zehn hinter main, Merge-Base `729e0e4` | `git rev-list --left-right --count` |
+| Sie enthält **keinen** 301 `/webdesign-agentur-deutschland` → `/webdesign` | `legacyRedirects.ts`: bewusst leerer Eintrag mit Begründung |
+| Der Grund dafür gilt weiterhin | `/bayreuth/webdesign` (eingefroren) trägt den Anker `/webdesign-agentur-deutschland`; dessen Pillar zählt als eingehende Quelle für `/bayreuth/webdesign` (2×) und `/bayreuth/website-relaunch` (1×) |
+| `/webdesign` hatte auf main **keinen** kontextuellen Shell-Link für die nationale Intention | Hero, Footer-Fließtext, ServicesSection und CityServicePage zeigten alle auf `/webdesign-agentur-deutschland` |
+| Die unbedingte Relaunch-Zusage „ohne Rankingverlust" stand auf der Live-Seite | `WebdesignHub.tsx:60` vor diesem Merge |
+| Das Kontaktformular reichte `state.submitted` an die Dankeseite — die es nie gelesen hat | `ContactSection.tsx:406` gegen `AnfrageErhaltenPage.tsx` vor diesem Commit |
+| GA4 kannte **27 Absichtssignale und null bestätigte Leads** | alle `trackEvent(`-Aufrufe im Baum |
+| Die fünf eingefrorenen Experimente sind unverändert | `src/protectedExperiments.test.tsx`, 9 Tests grün |
+
+### Hypothese (plausibel, nicht bewiesen)
+
+- **K2 — geteilte Kopfintention als Ursache des `/webdesign`-Einbruchs.** Zwei
+  indexierbare nationale Webdesign-Seiten, beide mit Sitemap-Priorität 0,92,
+  und die intern verlinkte war die andere. Das ist die stärkste verfügbare
+  Erklärung für 1.756 Impressionen bis zum 30.08. und **null** ab dem 01.09.
+  **Sie ist nicht bewiesen.** Ohne Google-gewählten Canonical ist eine
+  Deduplizierung nicht nachweisbar, und der Repository-Verlauf zeigt für den
+  26.08.–04.09. keinen Commit, der `/webdesign` berührt hätte — die Arbeit in
+  diesem Fenster lag im Admin-Bereich. Ein Ursachenwechsel bei Google ist
+  deshalb genauso möglich wie eine Deduplizierung.
+- Ein Algorithmus-Update als Ursache wird **nicht** angenommen. Ein Datum
+  allein ist kein Befund.
+
+### Unbekannt — nicht geschätzt, nicht gefüllt
+
+- **Google-gewählter und nutzerdeklarierter Canonical für `/webdesign`.** Der
+  Connector hat beide nicht geliefert. „Submitted and indexed" beantwortet die
+  Frage nicht.
+- **Letzter Crawl der aktuellen Fassung.** Der bekannte Crawl ist vom
+  18.08.2026 und prüft die heutige Seite nicht.
+- **GA4-Empfang.** Nullwerte vom 15.08.–11.09. beweisen weder einen Defekt der
+  Implementierung vom 12./13.09. noch ausbleibende Anfragen im Geschäft.
+- **Backlink-Stand.** Ohne Backlink-Daten wird kein Defizit als „gemessen"
+  bezeichnet.
+
+### Zum Rückgang von 3.102 auf 2.297 Impressionen
+
+Der Rückgang von rund 26 % zwischen den beiden Sieben-Tage-Fenstern ist **kein**
+Befund über die Arbeit vom 13.09.: er liegt vollständig davor. Die
+Aggregatposition verbesserte sich gleichzeitig von 47,72 auf 39,59, was auch
+ein verschobener Query-Mix erklären kann. Beides bleibt unbewertet.
+
+## 2 · Änderungs- und Messledger
+
+| URL / Cluster | Änderung | Commit | Merge | Deploy | Wirkung | Status | Frühestes Urteil |
+|---|---|---|---|---|---|---|---|
+| `/webdesign` | Pillar neu (2.687 Wörter), Titel/Description neu, Priorität 0,95, „hochkonvertierend" und „ohne Rankingverlust" entfernt | `7c78c25` → `f6ada9d` | 14.09.2026 | **UNBEKANNT** | nationale Webdesign-Intention gewinnt einen Eigentümer mit Substanz | offen | Deploy + 28 d |
+| `/kosten-webdesign` | Kostenseite neu, Jahreszahl raus, unbelegte Staffeln raus | dito | 14.09.2026 | **UNBEKANNT** | Preistreiber statt Fantasiepreise | offen | Deploy + 28 d |
+| Shell-Linktopologie | Hero (Desktop **und** Mobile), Footer, ServicesSection, CityServicePage → `/webdesign` | dito | 14.09.2026 | **UNBEKANNT** | interne Autorität erreicht den erklärten Eigentümer | offen | Deploy + 28 d |
+| `/webdesign-agentur-deutschland` | **unverändert live**, Konsolidierung aufgeschoben (F9) | — | — | — | — | BLOCKIERT durch eingefrorene Experimente | nach deren Graduierung |
+| `/bayreuth`, `/muenchen`, `/regensburg` | Titel und H1 markenführend statt „Webdesign in X" | dito | 14.09.2026 | **UNBEKANNT** | nimmt den Stadt-Hubs den Kopfbegriff, den `/bayreuth/webdesign` misst | offen | Deploy + 28 d |
+| `/bayreuth/lokales-seo` | Titel führt mit „SEO Bayreuth" | dito | 14.09.2026 | **UNBEKANNT** | Eigentümer der Familie „seo bayreuth" | offen | Deploy + 28 d |
+| Stadt-FAQs Regensburg/München | unbelegte Fristen und Preise entfernt | dito | 14.09.2026 | **UNBEKANNT** | faktische Korrektur | **kontaminiert alle Stadtseiten-Messungen ab diesem Deploy** | — |
+| `lead_submitted` | Konversionsereignis bei bestätigtem 2xx | `2e10c37` | 14.09.2026 | **UNBEKANNT** | Anfragen werden erstmals zählbar | offen | erste echte Anfrage |
+| `/ki-telefonassistent` (A5) | Vorarbeit | — | 13.09.2026 | **UNBEKANNT** | — | **HALT** | Deploy + 28 d |
+| `/prozessautomatisierung` | Pillar-Konsolidierung | `729e0e4` (PR #95) | 13.09.2026 | **UNBEKANNT** | — | **HALT** | Deploy + 28 d |
+| `/kosten-ki-telefonassistent` | graduiert 12.09.2026 | — | 12.09.2026 | **UNBEKANNT** | — | **HALT** | Deploy + 28 d |
+
+**Deploy-Datum ist in jeder Zeile UNBEKANNT und wird nach der Freigabe
+eingetragen.** Ein Commit-Datum ist kein Deploy-Datum; der gesamte
+Beurteilungskalender hängt am zweiten, nicht am ersten.
+
+### Korrigierte Altstände
+
+- Die Aufgabenstellung beschreibt die Recovery als „Konsolidierung von
+  `/webdesign-agentur-deutschland` in `/webdesign` per 301". Das ist **nicht**,
+  was der Zweig enthält, und wurde auch jetzt nicht umgesetzt.
+- `/kosten-ki-telefonassistent` ist seit dem 12.09.2026 **graduiert** und kein
+  eingefrorenes Experiment mehr. Ältere Notizen, die es noch als eingefroren
+  führen, sind veraltet.
+- Das Arzt-Experiment ist durch die Faktenkorrektur vom 11.09. kontaminiert,
+  das Bayreuther Relaunch-Titelexperiment hatte eine Middleware-Diskrepanz.
+  Keines von beiden ist ein sauberer Durchlauf.
+- Der GSC-Wizard listet null Experimente. Die Experimente im Repository
+  bestehen unabhängig davon und bleiben bindend.
+
+## 3 · Was bewusst NICHT geändert wurde
+
+- **Kein 301 für `/webdesign-agentur-deutschland`.** Der Pillar zählt als
+  eingehende Quelle für zwei eingefrorene Routen; seine Entfernung würde deren
+  gemessene Topologie kippen. Die Konsolidierung bleibt F9.
+- **Keine neuen Titel für `/ki-telefonassistent`, `/kosten-ki-telefonassistent`
+  oder `/kosten-automatisierung`.** Die Nachfrage ist da (164 + 77 Impressionen
+  auf der Kostenseite), aber bei Ø-Position 33 ist eine niedrige CTR die
+  erwartete Folge der Position, nicht ein Titelproblem. Ein Titelwechsel jetzt
+  würde ein laufendes Fenster zerstören und eine Frage beantworten, die
+  niemand gestellt hat.
+- **`/verpasste-anrufe-verlust` (Position 11,59) und `/kosten-automatisierung`
+  (Position 13,0)** sind die nächstliegenden Chancen und bleiben unberührt:
+  beide tragen frische Arbeit aus dem Ledger.
+- **Kein Wortzahl-Padding, keine wiederholten Stadt-Blöcke**, keine neuen
+  Keyword-Varianten-Seiten.
+
+## 4 · Übergabe an „Cogniiq SEO Autopilot"
+
+Der bestehende Task (täglich 08:00 Europe/Rome, aktiviert) bleibt unverändert —
+kein Duplikat, kein Zeitplanwechsel. Der Scheduler hat keinen nächsten Lauf
+zurückgegeben; es wird keiner erfunden.
+
+**Vor dem ersten Health-Check einzutragen:** das Deploy-Datum.
+
+| Zeitpunkt | Prüfung | Reaktion |
+|---|---|---|
+| Deploy + 0 | `/webdesign`, `/kosten-webdesign`, `/anfrage-erhalten`: HTTP 200, Canonical auf sich selbst, Sitemap-Eintrag, `lead_submitted` im Browser sichtbar | technische Abweichung → sofortiger Rollback |
+| Deploy + 7 | Indexierungsstatus und Crawl-Datum von `/webdesign`; erste `lead_submitted`-Ereignisse | nur Gesundheitsprüfung, **keine** Rangbewertung |
+| Deploy + 14 | Impressionen `/webdesign` gegen null seit 01.09.; Impressionen `/webdesign-agentur-deutschland` | bewegt sich `/webdesign` gar nicht, ist K2 als Ursache geschwächt |
+| Deploy + 28 | Vollauswertung Query × Seite gegen 15.08.–11.09. | erste zulässige Beurteilung |
+| Deploy + 56 | Zweitauswertung; Entscheidung über F9 | bewegt sich nichts, greift `authority-acquisition-plan.md`, nicht die nächste Seitenüberarbeitung |
+
+**Query-Kohorten, getrennt zu führen:** `webdesign agentur`, `website erstellen
+lassen`, `webdesign kosten` / `was kostet eine website`; `seo bayreuth`
+getrennt; Marken-Queries immer separat.
+
+**Erwartete Signale, ehrlich begrenzt.** Erwartet wird, dass `/webdesign`
+überhaupt wieder Impressionen zeigt und dass `lead_submitted` erstmals eine
+zählbare Anfrage liefert. Eine Signifikanzaussage ist bei diesen Mengen nicht
+möglich und wird nicht versprochen: **ein technischer Regress rechtfertigt
+einen sofortigen Rollback, verrauschte Ranglisten allein nicht.**
+Es gilt weiterhin Regel 1: keine Erfolgsmeldung vor Tag 28.
+
+## 5 · Nur der Inhaber kann das prüfen
+
+1. **Canonical für `/webdesign`.** Search Console → URL-Prüfung →
+   `https://cogniiq.de/webdesign` → „Vom Nutzer angegebener Canonical" **und**
+   „Von Google ausgewählter Canonical". Weichen beide ab, ist K2 belegt und F9
+   wird vorgezogen; stimmen sie überein, ist K2 als Ursache erledigt und der
+   Einbruch braucht eine andere Erklärung. Zusätzlich „Live-URL testen", weil
+   der bekannte Crawl vom 18.08. ist.
+2. **GA4-Empfang.** Bestätigen, dass Stream `G-NDN9J2G5LM` zur Property
+   `properties/551863316` gehört. Dann im Echtzeitbericht mit erteilter
+   Analyse-Einwilligung prüfen, ob `page_view` **einmal** je Seitenwechsel
+   ankommt — und ob „Seitenaufrufe über Browserverlauf-Ereignisse" im Stream
+   aktiviert ist. Ist sie es nicht, zählt die Single-Page-Navigation nicht,
+   und **erst dann** ist ein manueller Seitenaufruf im Code gerechtfertigt.
+   Ads `AW-17946397271` unberührt lassen, `G-K7BS3LKT6H` nicht reaktivieren.
+3. **`lead_submitted` als Schlüsselereignis markieren.** Das Ereignis wird
+   gesendet, sobald eine echte Anfrage bestätigt wird; als Conversion zählt es
+   erst nach dieser Markierung in GA4. **Keine Testanfrage über das echte
+   Formular abschicken** — der Endpunkt löst eine reale Bearbeitung aus.
+4. **Proof-Assets.** Siehe `authority-acquisition-plan.md`; ohne sie bleibt die
+   Autoritätsarbeit blockiert. Nichts davon wird erfunden.

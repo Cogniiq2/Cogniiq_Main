@@ -115,3 +115,35 @@ entschieden, nicht über Textlänge.
 
 1 und 6 sofort (geringer Aufwand, kein neuer Inhalt nötig) → 2 und 5 kurzfristig
 → 3 und 4 erst, wenn die PVS-Analyse verifiziert vorliegt → 7 opportunistisch.
+
+---
+
+## Nachtrag 14.09.2026 — die Webdesign-Seite hat jetzt Substanz und null Beweis
+
+`/webdesign` ist seit dem 14.09.2026 ein nationaler Pillar mit rund 2.700
+Wörtern: Leistungsumfang, Zuständigkeiten, Preistreiber, Relaunch-Prüfliste,
+Projektablauf. Was ihm fehlt, ist jede Form von Beleg. Die bestehenden
+Proof-Asset-Fragen (`OWNER-INPUT.md` F1–F5) betreffen ausschließlich den
+Telefonassistenten; für den Webdesign-Cluster ist bisher **keine** gestellt
+worden.
+
+**Ein Backlink-Defizit wird hier ausdrücklich nicht als gemessen bezeichnet.**
+Es liegen keine Backlink-Daten vor. Was unten steht, ist die kleinste Menge an
+belegbarem Material, die eigene Seiten stärkt — unabhängig davon, ob je ein
+externer Link entsteht.
+
+| # | Was der Inhaber liefern muss | Stärkt | Wenn leer |
+|---|---|---|---|
+| W1 | **Eine freigegebene Projektreferenz**: Branche, Ort, Ausgangslage, Umfang, was umgesetzt wurde. Schriftliche Einwilligung, Anonymisierung genügt („Steuerkanzlei, Oberfranken, 14 Seiten, Relaunch") | `/webdesign`, `/kosten-webdesign`, die drei Stadtseiten | Der Pillar beschreibt eine Arbeitsweise, die er nicht zeigen kann |
+| W2 | **Ein echter Relaunch mit Vorher/Nachher-Zahlen** aus GSC oder Analytics der Kundenseite, mit Freigabe | Die Relaunch-Prüfliste auf `/webdesign` und `/…/website-relaunch` | Die Prüfliste bleibt eine Behauptung über Sorgfalt statt ein Beleg für sie |
+| W3 | **Ein Core-Web-Vitals-Messwert einer ausgelieferten Kundenseite** (CrUX oder Lab, mit URL und Datum) | Der Performance-Abschnitt auf `/webdesign` | „Core Web Vitals als Prüfmaß" bleibt unbelegt — richtig formuliert, aber ohne Zahl |
+| W4 | **Ein reales Angebot mit geschwärzten Beträgen** oder die Bestätigung der tatsächlichen Preisspanne | `/kosten-webdesign` | Die Seite erklärt Preistreiber und nennt weiterhin keine Größenordnung |
+| W5 | **Google-Business-Profil vollständig**: Kategorie „Webdesigner", Leistungen, Fotos, erste echte Bewertungen | Punkt 6 oben, „webdesign bayreuth" | Für lokale Webdesign-Queries fehlt der Hebel mit dem besten Aufwand/Wirkung-Verhältnis |
+
+Reihenfolge: **W5 sofort** (kein neuer Inhalt nötig, gehört ohnehin zu Punkt 6),
+dann **W1 und W3** — beide sind aus vorhandener Arbeit zu gewinnen und brauchen
+nur eine Freigabe. W2 und W4 folgen, sobald ein passendes Projekt vorliegt.
+
+Es wird nichts davon erfunden, gerundet oder aus einem Branchendurchschnitt
+abgeleitet. Ohne Quelle bleibt eine Zeile leer und die Seite sagt nichts dazu
+— siehe „Ausdrücklich nicht tun".
