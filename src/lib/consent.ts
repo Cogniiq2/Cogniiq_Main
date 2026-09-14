@@ -351,7 +351,21 @@ export type ConversionEvent =
   // des Besuchers und verlassen den Browser nicht.
   | 'automation_roi_started'
   | 'automation_roi_completed'
-  | 'automation_cta_clicked';
+  | 'automation_cta_clicked'
+  // Die einzige Meldung, die keine Absicht, sondern ein Ergebnis ist: eine
+  // Anfrage, deren Eingang der Endpunkt mit einem lesbaren 2xx bestaetigt hat.
+  //
+  // Sie gehoert an genau die Stelle, an der die Bestaetigung vorliegt — nicht
+  // an den Klick. Ein Klick auf "Senden" ist auch dann ein Klick, wenn der
+  // Webhook 502 antwortet, ein Werbeblocker die Anfrage verwirft oder das Netz
+  // abbricht; alle drei Faelle haben hier frueher als Erfolg gegolten. Wird
+  // dieses Ereignis an einen Klick-Handler gehaengt, misst es wieder Absicht
+  // und die Kennzahl ist still wertlos.
+  //
+  // Der `label` nennt NUR das Formular ('kontakt' | 'demo'). Name, Telefon,
+  // E-Mail, Firma, Branche und Freitext des Besuchers bleiben ausserhalb —
+  // trackEvent hat keinen Parameter, durch den sie versehentlich mitkaemen.
+  | 'lead_submitted';
 
 export function trackEvent(event: ConversionEvent, label?: string) {
   if (typeof window === 'undefined') return;
