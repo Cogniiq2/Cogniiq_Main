@@ -7,7 +7,7 @@ import { PageSEO } from "@/components/PageSEO";
 const suggestions = [
   { label: "Leistungen", href: "/leistungen" },
   { label: "KI-Telefonassistent", href: "/ki-telefonassistent" },
-  { label: "Webdesign Agentur", href: "/webdesign-agentur-deutschland" },
+  { label: "Webdesign", href: "/webdesign" },
   { label: "Über uns", href: "/ueber-uns" },
   { label: "Kontakt", href: "/kontakt" },
 ];

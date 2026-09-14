@@ -26,7 +26,7 @@ const services = [
     description:
       'Kein Baukasten, kein Standard-Theme. Entwickelt auf Basis Ihres Conversion-Ziels – mit SEO-Architektur, Core Web Vitals und klarer Nutzerführung.',
     icon: MonitorSmartphone,
-    link: '/leistungen',
+    link: '/webdesign',
     cityLinks: [
       { label: 'Bayreuth', href: '/bayreuth/webdesign' },
       { label: 'München', href: '/muenchen/webdesign' },

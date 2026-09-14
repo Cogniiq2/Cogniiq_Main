@@ -849,6 +849,112 @@ auf Inhaltsarbeit. Die Liste steht in `docs/seo/ARCHITEKTUR.md` §7.
   56 Links ohne eigene kommerzielle Kopf-Intention ist das ohne erwartete
   Wirkung; fällt die Seite dennoch auf, gehört die Änderung hierher notiert.
 
+## Messpunkte 2026-09-13 — Webdesign-Cluster
+
+Branch `claude/webdesign-recovery-max-2026-09-13`, Basis `56707c2` + PR #95.
+**Tag 0 = Produktions-Deploy dieses Branches** (Datum nach dem Merge hier
+eintragen). Prüfpunkte: Tag 14 nur Indexierung/Auslieferung · Tag 28 erste
+Richtung · Tag 56 Trend · Tag 90 Architektur-Urteil. Vor Tag 28 keine
+Erfolgs- oder Misserfolgsmeldung.
+
+**Quelle der Baseline:** Inhaber-Abfrage der Property `sc-domain:cogniiq.de`
+(nicht Claude, nicht Pages.csv), letzter gesetzter Tag 2026-09-10.
+
+### M5 · `/webdesign` — Pillar neu aufgebaut, `/webdesign-agentur-deutschland` entlinkt (301 aufgeschoben, F9)
+
+- **Baseline (Inhaber-verifiziert, 2026-08-14 → 2026-09-10):**
+
+  | Fenster | Impr. | Klicks | Position |
+  |---|---:|---:|---|
+  | 14.08.–30.08. | 1.815 | 0 | überwiegend 70–90 |
+  | 31.08. | 17 | 0 | |
+  | 01.09.–10.09. | 0/Tag | 0 | — |
+
+  Query-Zusammensetzung vor dem Einbruch: überwiegend lokal/SEO („seo bayreuth"
+  45, „webentwicklung regensburg" 71, „homepage erstellen lassen regensburg"
+  42, „landingpage optimierung regensburg" 32, „seo agentur bayreuth" 32).
+  **1.815 ist keine Zielmarke** — es war Leckage.
+  `/webdesign-agentur-deutschland`: 5 Impressionen, 0 Klicks, fast alle
+  markenbezogen (Pos. 1–3).
+- **M4 (12.09.) ist damit abgelöst**, nicht gescheitert: sein Abbruchkriterium
+  („K2 entscheiden") wurde ausgeführt.
+- **Umgesetzt:** Seite 578 → ~2.300 Wörter, 26 Käuferfragen, 32 → 19
+  Körper-Linkziele, 108 → 93 Links gesamt, Stadt-Unterseiten-Anker entfernt,
+  Titel „Webdesign Agentur – Websites für Unternehmen | Cogniiq"; kontextuelle
+  eingehende Seiten 4 → **21** (Homepage, `/leistungen`, `/deutschland`, fünf
+  Branchenseiten, sechs Stadt-Service-Seiten, Kostenseite, Problemseite, KI-Agentur,
+  zwei Blogbeiträge); `/webdesign-agentur-deutschland` bleibt **vorerst live**,
+  wird aber nur noch von der eingefrorenen `/bayreuth/webdesign` verlinkt
+  (Inhaber-Review 13.09.2026: die 301 würde die Inbound-Topologie zweier
+  Experimente ändern → F9 nach Graduierung).
+- **Hypothese:** Ein Körper, der die nationale Intention vollständig
+  beantwortet und keine lokalen Anker trägt, wird von Google für generische
+  Webdesign-Queries statt für fremde lokale Queries bewertet; 17 zusätzliche
+  Kontextlinks fließen hierher, die Dublette verliert ihre interne Autorität
+  schon vor der 301.
+- **Erfolgskriterium:** Tag 14 URL indexiert, Canonical = self in der
+  URL-Prüfung · Tag 28 überhaupt Impressionen auf einer Query der Familie
+  „webdesign agentur / webdesign für unternehmen / website erstellen lassen"
+  und Anteil lokaler Queries (`<stadt>`-Modifier) an den Impressionen unter 25 %
+  · Tag 56 Seiten-Ø unter 50 · Tag 90 eine Query der Familie unter Position 30
+  und der erste Nicht-Marken-Klick.
+- **Abbruchkriterium:** Tag 56 weiterhin 0 Impressionen bei bestätigter
+  Indexierung → Inhalt ist nicht das Problem; dann URL-Prüfung auf von Google
+  gewähltes Canonical und Backlink-Frage (`authority-acquisition-plan.md`).
+  Verlieren `/bayreuth/webdesign` oder `/regensburg/webdesign` bis Tag 28
+  messbar (Seiten-Ø > +10 Positionen), während `/webdesign` auf ihre lokalen
+  Queries gewinnt, ist die Trennung nicht gelungen und der Pillar-Körper auf
+  Ortsnennungen zu prüfen.
+- **Gegenprobe:** `/webdesign-agentur-deutschland` verliert 18 interne Links,
+  behält aber Seite, Head und Sitemap-Eintrag. Gewinnt sie trotzdem Impressionen,
+  während `/webdesign` keine bekommt, ist F9 vorzuziehen, nicht abzuwarten.
+  Die fünf eingefrorenen Routen: Fingerprints und Inbound-Topologie unverändert
+  (Fixture byte-identisch mit `main`).
+
+### M6 · `/kosten-webdesign` — Preise raus, Preistreiber rein, Jahr raus
+
+- **Baseline:** keine Seitenzahl in der Inhaber-Abfrage vorhanden; Pages.csv
+  (bis 08.09.) führte die Route nicht unter den Top-Seiten. Erste Messung = Tag 28.
+- **Umgesetzt:** Titel „Was kostet eine Website? Webdesign Kosten & Preistreiber"
+  (war „Webdesign Kosten 2025 – …"), `CostPage` abgelöst, 18 unbelegte
+  Beträge/Zusagen entfernt (`preisaudit-webdesign.md` A1–A18), kein Rechner,
+  kein `Offer`-Preis im Schema.
+- **Hypothese:** Die Seite verliert nichts, was sie messbar hatte, und gewinnt
+  die Kostenintention über Vollständigkeit statt über Zahlen.
+- **Erfolgskriterium:** Tag 28 Impressionen auf „webdesign kosten" / „was kostet
+  eine website" · Tag 90 Seiten-Ø unter 40.
+- **Abbruchkriterium:** Tag 56 keinerlei Impression auf eine Kosten-Query bei
+  bestätigter Indexierung → Titel gegen die SERP-Muster in
+  `serp-webdesign-2026-09.md` §2.9 prüfen (Jahreszahl-Framing des Marktes).
+
+### M7 · `/bayreuth/lokales-seo` — Eigentümer für „seo bayreuth"
+
+- **Baseline:** „seo bayreuth" verteilt über sieben URLs (Inhaber-Abfrage);
+  `/webdesign` allein trug 45 Impressionen darauf. Seitenzahl der Route selbst:
+  nicht in der Abfrage.
+- **Umgesetzt:** Titel „SEO Bayreuth – Lokales SEO & Google-Sichtbarkeit für
+  Unternehmen", H1 „SEO in Bayreuth: …", Keywords geführt vom Kopfbegriff,
+  Preis-FAQ ohne Beträge, neuer Kontextlink vom Hub `/bayreuth`.
+- **Erfolgskriterium:** Tag 28 „seo bayreuth" oder „seo agentur bayreuth"
+  landet auf dieser URL (Query×Seite in der GSC-UI) · Tag 90 Position unter 30.
+- **Abbruchkriterium:** Tag 56 fällt die Familie weiter auf `/` oder
+  `/bayreuth` → Hub-Körper und Homepage-Keywords erneut prüfen.
+
+### M8 · Geo-Hubs `/bayreuth`, `/muenchen`, `/regensburg` — Titel ohne „Webdesign <Stadt>"
+
+- **Baseline:** `/regensburg` 2.623 Impr. auf Ø 75,8 (Pages.csv 28D); „webdesign
+  regensburg"-Familie zwischen Hub und Service-Seite geteilt (K6); „webdesign
+  bayreuth" auf `/bayreuth` 30 Impr. (Inhaber-Abfrage).
+- **Umgesetzt:** Titel/H1 „Cogniiq in <Stadt> – KI-Telefonassistent, Websites &
+  Automatisierung", Tagline ohne Exact-Match-Stapel; Service-Anker „Webdesign
+  <Stadt>" bleiben und zeigen auf die Service-Seite.
+- **Hypothese:** Der Hub gibt „webdesign <stadt>" an die Service-Seite ab und
+  behält Marke×Ort.
+- **Erfolgskriterium:** Tag 56 Anteil der Hub-Impressionen auf
+  „webdesign <stadt>"-Queries sinkt, Service-Seite steigt.
+- **Abbruchkriterium:** Hub verliert Impressionen, ohne dass die Service-Seite
+  gewinnt → Autorität ging verloren statt über; dann Tagline zurück.
+
 ### Mitgeändert, ohne eigene Messreihe
 
 | Fundstelle | Alt | Neu | Grund |

@@ -11,15 +11,15 @@ const config: ClusterPageConfig = {
   cityHub: "/bayreuth",
   topic: "Lokales SEO",
   seo: {
-    title: "Lokales SEO Bayreuth – Mehr Google-Sichtbarkeit für lokale Unternehmen | Cogniiq",
+    title: "SEO Bayreuth – Lokales SEO & Google-Sichtbarkeit für Unternehmen | Cogniiq",
     description:
       "Lokales SEO in Bayreuth: Cogniiq optimiert Ihre lokale Sichtbarkeit bei Google. Google Business Profil, strukturierte Daten, lokale Keywords – für nachhaltiges Ranking in Bayreuth.",
     canonical: `${base}/bayreuth/lokales-seo`,
     keywords:
-      "Lokales SEO Bayreuth, Local SEO Bayreuth, Google Business Bayreuth, SEO Agentur Bayreuth, lokale Suchmaschinenoptimierung Bayreuth",
+      "SEO Bayreuth, SEO Agentur Bayreuth, Lokales SEO Bayreuth, Local SEO Bayreuth, Google Business Bayreuth, lokale Suchmaschinenoptimierung Bayreuth",
   },
   hero: {
-    h1: "Lokales SEO in Bayreuth – Mehr Sichtbarkeit bei Google",
+    h1: "SEO in Bayreuth: lokale Sichtbarkeit bei Google für Ihr Unternehmen",
     lead: "Wenn potenzielle Kunden in Bayreuth nach Ihrem Angebot suchen, müssen Sie gefunden werden. Lokales SEO sorgt dafür – durch Google Business Optimierung, strukturierte Daten und lokale Keyword-Strategie.",
     trustTags: ["Bayreuth", "Google Business", "Core Web Vitals", "Strukturierte Daten"],
     ctaLabel: "Kostenloses Erstgespräch",
@@ -88,7 +88,7 @@ const config: ClusterPageConfig = {
     {
       question: "Was kosten lokale SEO-Maßnahmen in Bayreuth?",
       answer:
-        "Einmaliges SEO-Setup (Google Business, On-Page, strukturierte Daten): ab ca. 800 €. Laufende monatliche Betreuung: ab ca. 250 € / Monat. Detailliertes Angebot nach Erstgespräch.",
+        "Das hängt vom Ausgangszustand ab: Ein Google-Business-Profil, das nur ergänzt werden muss, kostet weniger als ein Setup mit neuer Seitenstruktur und strukturierten Daten. Ob einmaliges Setup oder laufende Betreuung sinnvoll ist, klären wir im Erstgespräch; der konkrete Umfang und Preis stehen dann im Angebot.",
     },
     {
       question: "Helfen Bewertungen beim lokalen SEO?",

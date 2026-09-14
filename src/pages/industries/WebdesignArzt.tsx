@@ -80,7 +80,7 @@ const config: NationalIndustryPageConfig = {
     { label: "Webdesign Arzt München", href: "/webdesign-arzt-muenchen" },
     { label: "Webdesign Arzt Regensburg", href: "/webdesign-arzt-regensburg" },
     { label: "Webdesign Bayern", href: "/bayern" },
-    { label: "Webdesign Deutschland", href: "/webdesign-agentur-deutschland" },
+    { label: "Webdesign für Unternehmen", href: "/webdesign" },
   ],
   relatedLinks: [
     { label: "KI Telefonassistent Arzt", href: "/ki-telefonassistent-arzt" },

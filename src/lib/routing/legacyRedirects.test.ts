@@ -30,6 +30,14 @@ describe('zurückgezogene Routen', () => {
     expect(LEGACY_REDIRECTS['/automatisierung-unternehmen']).toBe('/prozessautomatisierung');
   });
 
+  it('hält /webdesign-agentur-deutschland vorerst als lebende Route (F9, aufgeschoben)', () => {
+    // Die Konsolidierung in /webdesign ist beschlossen, aber die Seite trägt
+    // Anker in zwei eingefrorene Experimente. Bis die graduieren, darf hier
+    // kein Eintrag stehen — sonst würde eine gemessene Link-Topologie kippen.
+    expect(LEGACY_REDIRECTS['/webdesign-agentur-deutschland']).toBeUndefined();
+    expect(PUBLIC_ROUTES.some((r) => r.path === '/webdesign-agentur-deutschland')).toBe(true);
+  });
+
   it.each(EINTRAEGE)('%s wird nicht mehr als Seite ausgeliefert', (von) => {
     // Weder im Manifest noch in der Client-Pfadliste: Stünde sie dort, würde
     // sie vorgerendert — und eine Datei auf der Platte wird vor jeder

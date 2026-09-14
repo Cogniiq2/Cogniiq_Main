@@ -356,6 +356,18 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "ki-automatisierung-kleine-unternehmen",
       "website-ohne-anfragen",
     ],
+    weiterfuehrend: [
+      {
+        to: "/webdesign",
+        label: "Webdesign für Unternehmen",
+        text: "Was ein Website-Projekt bei Cogniiq umfasst, wer Inhalte liefert, wie SEO und Tracking hineinkommen und wie es bis zum Go-live abläuft.",
+      },
+      {
+        to: "/keine-anfragen-website",
+        label: "Website bringt keine Anfragen?",
+        text: "Die häufigsten Ursachen, geordnet nach Prüfreihenfolge — und was sich davon ohne Relaunch beheben lässt.",
+      },
+    ],
     canonical: "https://cogniiq.de/blog/webdesign-konversion-tipps",
   },
   {
@@ -977,6 +989,18 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "webdesign-konversion-tipps",
       "lokales-seo-unternehmen",
       "website-ohne-anfragen",
+    ],
+    weiterfuehrend: [
+      {
+        to: "/webdesign",
+        label: "Webdesign für Unternehmen",
+        text: "Leistungsumfang, Ablauf, Zuständigkeiten und die Fälle, in denen Cogniiq nicht der richtige Partner ist — die Kriterien dieses Beitrags, auf eine Agentur angewandt.",
+      },
+      {
+        to: "/kosten-webdesign",
+        label: "Was kostet eine Website?",
+        text: "Die Preistreiber im Einzelnen, einmalige und laufende Kosten getrennt, ohne Fantasiestaffeln.",
+      },
     ],
     canonical: "https://cogniiq.de/blog/webdesign-agentur-auswahl",
   },

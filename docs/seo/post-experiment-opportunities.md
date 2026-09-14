@@ -88,6 +88,40 @@ Nach dem Experiment zu prüfen — alles **Claim-Hygiene**, kein SEO-Gewinn:
 - Die Seite trägt mit 38 Quelltext-Verweisen die meisten internen Links aller
   eingefrorenen Routen. Nach dem Experiment lohnt eine Prüfung, ob diese
   Linkmenge noch der Bedeutung der Seite entspricht.
+- **13.09.2026 · F9, die aufgeschobene 301.** `/webdesign-agentur-deutschland`
+  bleibt nur deshalb live, weil diese Seite (zweimal) und
+  `/bayreuth/website-relaunch` (einmal) von ihr verlinkt werden — sie zu löschen
+  hätte die gemessene Inbound-Topologie beider Experimente geändert. Nach dem
+  Experiment, in dieser Reihenfolge: `LEGACY_REDIRECTS` um
+  `'/webdesign-agentur-deutschland': '/webdesign'` ergänzen, beide Formen in
+  `public/_redirects`, Route aus `publicRoutes.ts`/`publicRoutePaths.ts`/`App.tsx`,
+  `WebdesignAgenturDeutschland.tsx` löschen, `legacyWebdesignLink` aus der
+  Bayreuth-Konfiguration entfernen (wie `legacyAutomationLink`), Sitemap
+  regenerieren, Fixture-Eintrag der Route regulär im Graduierungs-Commit
+  anpassen. Beleg unverändert: 5 Impr., 0 Klicks, markenbezogen.
+- **13.09.2026 · Claim-Hygiene nach dem Muster der Schwesterseiten.** Auf
+  `/regensburg/webdesign` und `/muenchen/webdesign` wurden FAQ-Preise („ab ca.
+  1.500 €", „2.500–5.000 €"), Projektdauern („4–6 Wochen", „8–12 Wochen"),
+  Ladezeitwerte („unter 2 Sekunden") und die CMS-Herstellerliste entfernt
+  (`preisaudit-webdesign.md` D1–D7). Dieselben Aussagen stehen auf dieser Seite
+  weiter (Zeilen 318, 324 und die FAQ in `standorte-service-configs.ts`).
+  **Nach dem Experiment identisch bereinigen.**
+- **13.09.2026 · `BUSINESS_INFO.description`** in `seo-data.ts` sagt
+  „hochkonvertierende Websites" und landet über `LocalBusinessSchema` im
+  JSON-LD **jeder** Seite, also im Fingerprint aller fünf Routen. Der Pillar
+  hat die Ergebniszusage aufgegeben (`preisaudit-webdesign.md` C1); die
+  Organization-Beschreibung kann erst nachziehen, wenn keine Route mehr
+  eingefroren ist.
+- **13.09.2026 · F10, doppeltes JSON-LD (eigener technischer Branch).**
+  `index.html` trägt eine statische Kopie des Organization/WebSite/LocalBusiness-
+  Graphen, den `LocalBusinessSchema.tsx` auf jeder öffentlichen Seite ohnehin
+  ausliefert — jede Seite führt die drei Entitäten doppelt. Dazu der
+  `publisher`-Block in `PageSEO.tsx` (unvollständiges Organization-Objekt ohne
+  Logo, Ursache der Validator-Warnung „Organization is missing required field
+  logo"), der eine `@id`-Referenz sein sollte. Beides ist eine seitenweite
+  Head-Änderung über alle eingefrorenen Routen und die KI-/Automatisierungs-
+  Messgebiete hinweg; sie wurde im Webdesign-Durchgang bewusst **nicht**
+  gebündelt (Inhaber-Review) und wartet auf das Experimentende.
 
 ## `/ki-telefonassistent-arzt`
 
