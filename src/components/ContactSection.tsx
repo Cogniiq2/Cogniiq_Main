@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { PremiumCalendar } from './PremiumCalendar';
 import { N8N_ENDPOINTS } from '@/config/externalEndpoints';
+import { neueLeadKennung } from '@/lib/leadConversion';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
@@ -403,7 +404,16 @@ export function ContactSection() {
       if (!res.ok) throw new Error(`submit failed: ${res.status}`);
       // Only a confirmed 2xx is a conversion. The thank-you page reads this state
       // so it can fire the conversion event without counting failures.
-      navigate('/anfrage-erhalten', { state: { submitted: true } });
+      //
+      // `leadId` identifiziert DIESE Übermittlung. Der History-Eintrag behält
+      // seinen State, solange er existiert — Zurück, Reload und jede zweite
+      // Montage der Dankeseite sehen also erneut `submitted: true`. Ohne eine
+      // Kennung wäre jede dieser Ansichten eine weitere gemeldete Anfrage.
+      // Die Kennung entsteht im Browser, geht nicht an den Endpunkt und nicht
+      // an GA4; sie ist kein Identifikator des Besuchers.
+      navigate('/anfrage-erhalten', {
+        state: { submitted: true, leadId: neueLeadKennung() },
+      });
     } catch {
       setSubmitError(
         'Ihre Anfrage konnte nicht gesendet werden. Bitte versuchen Sie es noch einmal. '

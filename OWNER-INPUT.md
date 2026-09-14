@@ -290,12 +290,30 @@ und **„Von Google ausgewählter Canonical"** notieren. Danach **„Live-URL
 testen"**, weil der letzte bekannte Crawl vom 18.08.2026 stammt und die heutige
 Fassung nicht kennt.
 
-- Weichen die beiden Werte ab → die Zusammenlegung ist belegt, und die
-  aufgeschobene Konsolidierung (F9) wird vorgezogen, sobald die beiden
-  Bayreuther Experimente graduieren.
-- Stimmen sie überein → die Zusammenlegung ist **nicht** die Ursache, und der
-  Einbruch braucht eine andere Erklärung. Dann wird keine weitere Änderung an
-  `/webdesign` vorgenommen, bis eine vorliegt.
+**Was die Antwort belegt — und was nicht.** Diese Prüfung beantwortet eine
+Frage über den Indexzustand, keine Frage über die Ursache des Einbruchs. Beide
+Ausgänge sind enger, als sie wirken:
+
+- **Weichen die beiden Werte ab** → belegt ist damit eine
+  **Canonical-Abweichung**: Google führt `/webdesign` nicht als eigenständiges
+  Dokument. Das ist ein Befund über den Index, **kein Kausalnachweis für den
+  Verkehrseinbruch**. Wann Google diese Auswahl getroffen hat, sagt das Feld
+  nicht; sie kann lange vor dem 01.09. bestanden haben oder unabhängig davon
+  entstanden sein. Die zeitliche Nähe bleibt ein Indiz, kein Beweis. Der Befund
+  rechtfertigt, F9 vorzuziehen, sobald die beiden Bayreuther Experimente
+  graduieren — weil eine Abweichung unabhängig von ihrer Ursache behoben
+  gehört, nicht weil die Ursache damit geklärt wäre.
+- **Stimmen sie überein** → ausgeschlossen ist damit **nur die Deduplizierung
+  auf Canonical-Ebene**. Eine Überschneidung der Suchintention ist damit
+  **nicht** ausgeschlossen: zwei getrennt indexierte URLs können weiterhin um
+  dieselben Queries konkurrieren, Relevanzsignale untereinander aufteilen und
+  je Query abwechselnd ausgespielt werden, ohne dass ein Canonical sie
+  zusammenführt. K2 wäre dann in seiner Canonical-Lesart erledigt, als
+  Intentionskonflikt aber weiterhin offen — zu prüfen an Query × Seite, ob
+  beide URLs für dieselben Queries erscheinen.
+
+In **keinem** der beiden Fälle wird `/webdesign` weiter geändert, bevor die
+Auswertung an Query × Seite vorliegt (Deploy + 28 Tage).
 
 ### I2 · GA4: gehört der Stream zur Property, und zählt er Seitenwechsel?
 

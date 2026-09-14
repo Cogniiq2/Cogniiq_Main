@@ -1177,6 +1177,13 @@ geprüft, nicht überschrieben.
   26.08.–04.09. keinen Commit, der `/webdesign` berührt hätte — die Arbeit in
   diesem Fenster lag im Admin-Bereich. Ein Ursachenwechsel bei Google ist
   deshalb genauso möglich wie eine Deduplizierung.
+
+  **K2 hat zwei Lesarten, die getrennt zu prüfen sind** und nicht miteinander
+  stehen und fallen: die **Canonical-Lesart** (Google führt beide URLs als ein
+  Dokument) beantwortet I1; die **Intentionslesart** (zwei getrennt indexierte
+  URLs konkurrieren um dieselben Queries) beantwortet I1 **nicht** und bleibt
+  auch bei übereinstimmendem Canonical offen. Sie ist nur an Query × Seite zu
+  prüfen: erscheinen beide URLs für dieselben Queries?
 - Ein Algorithmus-Update als Ursache wird **nicht** angenommen. Ein Datum
   allein ist kein Befund.
 
@@ -1281,10 +1288,19 @@ Es gilt weiterhin Regel 1: keine Erfolgsmeldung vor Tag 28.
 
 1. **Canonical für `/webdesign`.** Search Console → URL-Prüfung →
    `https://cogniiq.de/webdesign` → „Vom Nutzer angegebener Canonical" **und**
-   „Von Google ausgewählter Canonical". Weichen beide ab, ist K2 belegt und F9
-   wird vorgezogen; stimmen sie überein, ist K2 als Ursache erledigt und der
-   Einbruch braucht eine andere Erklärung. Zusätzlich „Live-URL testen", weil
-   der bekannte Crawl vom 18.08. ist.
+   „Von Google ausgewählter Canonical". Zusätzlich „Live-URL testen", weil der
+   bekannte Crawl vom 18.08. ist.
+
+   Die Prüfung klärt den **Indexzustand**, nicht die Ursache:
+   - Abweichung → belegt eine **Canonical-Abweichung**, nicht die Ursache des
+     Einbruchs. Das Feld nennt keinen Zeitpunkt; die Nähe zum 01.09. bleibt
+     Indiz. F9 wird nach der Graduierung der Bayreuther Experimente vorgezogen,
+     weil eine Abweichung ohnehin behoben gehört.
+   - Übereinstimmung → schließt **nur die Deduplizierung auf Canonical-Ebene**
+     aus. Eine Intentionsüberschneidung bleibt möglich: zwei getrennt
+     indexierte URLs können dieselben Queries bedienen und sich Signale
+     teilen, ohne zusammengeführt zu werden. K2 ist dann nur in seiner
+     Canonical-Lesart erledigt — zu prüfen an Query × Seite.
 2. **GA4-Empfang.** Bestätigen, dass Stream `G-NDN9J2G5LM` zur Property
    `properties/551863316` gehört. Dann im Echtzeitbericht mit erteilter
    Analyse-Einwilligung prüfen, ob `page_view` **einmal** je Seitenwechsel

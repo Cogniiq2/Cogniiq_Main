@@ -1,9 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
 import { ArrowLeft, CircleCheck as CheckCircle2 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
 import { trackEvent } from "@/lib/consent";
+import { leadAlsGemeldetVormerken } from "@/lib/leadConversion";
 
 
 /*
@@ -23,19 +24,23 @@ import { trackEvent } from "@/lib/consent";
   Lesezeichen, ein Reload oder ein Crawler erreicht sie ohne `state` — und darf
   keine Anfrage erzeugen, die es nicht gab.
 
-  Der Ref-Riegel ist kein Zierat: unter React.StrictMode laeuft der Effekt im
-  Entwicklungsmodus zweimal, und ein doppelt gemeldeter Lead waere hier nicht
-  auffaellig, sondern nur falsch.
+  Geprueft wird zusaetzlich `state.leadId` — die Kennung GENAU DIESER
+  Uebermittlung. Ein Riegel im Bauteil (`useRef`) reicht dafuer nicht, und das
+  ist gemessen, nicht vermutet: eine zweite Montage desselben History-Eintrags
+  meldete damit nachweislich ein zweites Mal. Der Zustand gehoert zum Eintrag,
+  nicht zum Mount — Zurueck und Neuladen legen ihn unveraendert wieder vor,
+  waehrend ein Ref mit der Instanz verschwindet. Die Kennung dagegen wird in
+  `src/lib/leadConversion.ts` genau einmal je Uebermittlung angenommen; eine
+  zweite echte Anfrage bringt eine neue Kennung mit und wird gemeldet.
 */
 export function AnfrageErhaltenPage() {
   const location = useLocation();
-  const gemeldet = useRef(false);
 
   useEffect(() => {
-    if (gemeldet.current) return;
-    const state = location.state as { submitted?: boolean } | null;
+    const state = location.state as { submitted?: boolean; leadId?: unknown } | null;
     if (state?.submitted !== true) return;
-    gemeldet.current = true;
+    if (typeof state.leadId !== "string") return;
+    if (!leadAlsGemeldetVormerken(state.leadId)) return;
     trackEvent("lead_submitted", "kontakt");
   }, [location.state]);
 
