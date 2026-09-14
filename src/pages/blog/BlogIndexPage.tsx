@@ -15,7 +15,7 @@ const fadeUp = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  "KI-Automatisierung": "bg-blue-50 text-blue-700 border-blue-100",
+  "KI-Automatisierung": "bg-pub-accent-wash text-blue-700 border-blue-100",
   "Webdesign": "bg-emerald-50 text-emerald-700 border-emerald-100",
   "KI-Telefonassistent": "bg-amber-50 text-amber-700 border-amber-100",
   "Digitalisierung": "bg-gray-100 text-gray-700 border-gray-200",
@@ -217,7 +217,7 @@ export function BlogIndexPage() {
                     </div>
 
                     <div className="flex flex-col flex-1 p-7">
-                      <h2 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100 leading-[1.45] mb-3 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors">
+                      <h2 className="text-[15px] font-semibold text-gray-900 dark:text-gray-100 leading-[1.45] mb-3 group-hover:text-pub-accent dark:group-hover:text-gray-200 transition-colors">
                         {article.title}
                       </h2>
                       <p className="text-[13px] text-gray-500 dark:text-gray-400 leading-relaxed flex-1 line-clamp-3">
@@ -234,7 +234,7 @@ export function BlogIndexPage() {
                         </div>
                         <ArrowRight
                           size={13}
-                          className="text-pub-ink-3 dark:text-gray-600 group-hover:text-gray-700 dark:group-hover:text-gray-300 group-hover:translate-x-0.5 transition-all duration-200"
+                          className="text-pub-ink-3 dark:text-gray-600 group-hover:text-pub-accent dark:group-hover:text-gray-300 group-hover:translate-x-0.5 transition-all duration-200"
                         />
                       </div>
                     </div>

@@ -213,7 +213,7 @@ export function ServicesSection() {
                 <div className="mt-auto">
                   <Link
                     to={service.link}
-                    className="inline-flex h-11 items-center gap-1.5 text-[14.5px] font-semibold text-pub-ink underline-offset-4 hover:underline focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
+                    className="inline-flex h-11 items-center gap-1.5 text-[14.5px] font-semibold text-pub-accent underline-offset-4 hover:underline focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
                   >
                     {service.cta}
                     <ArrowRight size={15} aria-hidden="true" />
@@ -225,7 +225,7 @@ export function ServicesSection() {
                         <Link
                           key={cl.href}
                           to={cl.href}
-                          className="inline-flex h-11 items-center text-[13.5px] text-pub-ink-3 underline-offset-4 transition-colors hover:text-pub-ink hover:underline focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
+                          className="inline-flex h-11 items-center text-[13.5px] text-pub-ink-3 underline-offset-4 transition-colors hover:text-pub-accent hover:underline focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
                         >
                           {cl.label}
                         </Link>
@@ -243,7 +243,7 @@ export function ServicesSection() {
           <ul className="flex flex-wrap gap-x-6 gap-y-1">
             {situations.map((s) => (
               <li key={s.href}>
-                <Link to={s.href} className="inline-flex h-11 items-center text-[14.5px] text-pub-ink-2 underline-offset-4 hover:text-pub-ink hover:underline focus-visible:outline-none focus-visible:rounded-full focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2">
+                <Link to={s.href} className="inline-flex h-11 items-center text-[14.5px] text-pub-ink-2 underline-offset-4 hover:text-pub-accent hover:underline focus-visible:outline-none focus-visible:rounded-full focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2">
                   {s.label}
                 </Link>
               </li>

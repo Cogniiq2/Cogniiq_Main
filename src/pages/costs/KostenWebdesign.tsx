@@ -295,7 +295,7 @@ export function KostenWebdesign() {
               <span className="text-gray-600 dark:text-white/60">Kosten</span>
             </nav>
 
-            <motion.p className="cq-rise text-xs font-semibold tracking-[0.18em] uppercase text-blue-600 dark:text-blue-400 mb-4">
+            <motion.p className="cq-rise text-xs font-semibold tracking-[0.18em] uppercase text-pub-accent dark:text-blue-400 mb-4">
               Webdesign Kosten
             </motion.p>
             <motion.h1 className="cq-rise cq-rise-d1 text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 dark:text-white leading-[1.08] mb-6 max-w-4xl">
@@ -320,7 +320,7 @@ export function KostenWebdesign() {
               <Link
                 to="/kontakt"
                 onClick={() => trackEvent("cta_kontakt_click", "kosten-webdesign-hero")}
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-pub-accent hover:bg-pub-accent-ink text-white font-semibold text-sm transition-colors"
               >
                 Angebot anfragen <ArrowRight size={15} />
               </Link>
@@ -353,7 +353,7 @@ export function KostenWebdesign() {
                 className="p-5 rounded-2xl bg-white dark:bg-white/[0.02] border border-gray-100 dark:border-white/[0.06]"
               >
                 <div className="flex items-start gap-3">
-                  <Euro size={15} className="text-blue-500 mt-1 flex-shrink-0" />
+                  <Euro size={15} className="text-pub-accent-soft mt-1 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-1.5">{titel}</h3>
                     <p className="text-sm text-gray-500 dark:text-white/55 leading-relaxed">{text}</p>
@@ -373,13 +373,13 @@ export function KostenWebdesign() {
           <div className="grid md:grid-cols-2 gap-6">
             <div className="p-6 rounded-2xl border border-gray-100 dark:border-white/[0.06]">
               <div className="flex items-center gap-2 mb-4">
-                <Euro size={16} className="text-blue-500" />
+                <Euro size={16} className="text-pub-accent-soft" />
                 <h3 className="font-semibold text-gray-900 dark:text-white">Einmalig: das Projekt</h3>
               </div>
               <ul className="space-y-2.5">
                 {EINMALIG.map((p) => (
                   <li key={p} className="flex items-start gap-2.5 text-sm text-gray-600 dark:text-white/60 leading-relaxed">
-                    <CheckCircle2 size={14} className="text-blue-500 mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 size={14} className="text-pub-accent-soft mt-0.5 flex-shrink-0" />
                     {p}
                   </li>
                 ))}
@@ -387,13 +387,13 @@ export function KostenWebdesign() {
             </div>
             <div className="p-6 rounded-2xl border border-gray-100 dark:border-white/[0.06]">
               <div className="flex items-center gap-2 mb-4">
-                <Repeat size={16} className="text-blue-500" />
+                <Repeat size={16} className="text-pub-accent-soft" />
                 <h3 className="font-semibold text-gray-900 dark:text-white">Laufend: der Betrieb</h3>
               </div>
               <ul className="space-y-2.5">
                 {LAUFEND.map((p) => (
                   <li key={p} className="flex items-start gap-2.5 text-sm text-gray-600 dark:text-white/60 leading-relaxed">
-                    <CheckCircle2 size={14} className="text-blue-500 mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 size={14} className="text-pub-accent-soft mt-0.5 flex-shrink-0" />
                     {p}
                   </li>
                 ))}
@@ -451,7 +451,7 @@ export function KostenWebdesign() {
           <ol className="grid sm:grid-cols-2 gap-3">
             {PREIS_SENKEN.map((p, i) => (
               <li key={p} className="flex items-start gap-3 p-4 rounded-xl bg-white dark:bg-white/[0.02] border border-gray-100 dark:border-white/[0.06] text-sm text-gray-600 dark:text-white/60 leading-relaxed">
-                <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-0.5 w-5 flex-shrink-0">
+                <span className="text-xs font-semibold text-pub-accent dark:text-blue-400 mt-0.5 w-5 flex-shrink-0">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 {p}
@@ -473,7 +473,7 @@ export function KostenWebdesign() {
               ["03", "Angebot", "Umfang je Ebene, Zuständigkeiten, Schnittstellen mit Prüfergebnis, einmalige und laufende Beträge getrennt ausgewiesen — und was nicht enthalten ist."],
             ].map(([nr, t, d]) => (
               <div key={nr} className="p-6 rounded-2xl border border-gray-100 dark:border-white/[0.06]">
-                <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-1.5">{nr}</p>
+                <p className="text-xs font-semibold text-pub-accent dark:text-blue-400 mb-1.5">{nr}</p>
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{t}</h3>
                 <p className="text-gray-500 dark:text-white/55">{d}</p>
               </div>
@@ -513,9 +513,9 @@ export function KostenWebdesign() {
               <ul className="space-y-2">
                 {STADT_LINKS.map(({ label, href }) => (
                   <li key={href}>
-                    <Link to={href} className="group flex items-center gap-3 p-3 rounded-xl border border-gray-100 dark:border-white/[0.06] hover:border-blue-200 dark:hover:border-blue-500/20 transition-colors">
-                      <MapPin size={15} className="text-blue-500 flex-shrink-0" />
-                      <span className="text-sm text-gray-700 dark:text-white/65 group-hover:text-blue-600 dark:group-hover:text-blue-400">{label}</span>
+                    <Link to={href} className="group flex items-center gap-3 p-3 rounded-xl border border-gray-100 dark:border-white/[0.06] hover:border-pub-accent-line dark:hover:border-blue-500/20 transition-colors">
+                      <MapPin size={15} className="text-pub-accent-soft flex-shrink-0" />
+                      <span className="text-sm text-gray-700 dark:text-white/65 group-hover:text-pub-accent dark:group-hover:text-blue-400">{label}</span>
                       <ArrowRight size={13} className="ml-auto text-pub-ink-3 dark:text-white/20 group-hover:text-blue-400" />
                     </Link>
                   </li>
@@ -527,8 +527,8 @@ export function KostenWebdesign() {
               <ul className="space-y-2">
                 {BRANCHEN_LINKS.map(({ label, href }) => (
                   <li key={href}>
-                    <Link to={href} className="group flex items-center gap-3 p-3 rounded-xl border border-gray-100 dark:border-white/[0.06] hover:border-blue-200 dark:hover:border-blue-500/20 transition-colors">
-                      <span className="text-sm text-gray-700 dark:text-white/65 group-hover:text-blue-600 dark:group-hover:text-blue-400">Webdesign für {label}</span>
+                    <Link to={href} className="group flex items-center gap-3 p-3 rounded-xl border border-gray-100 dark:border-white/[0.06] hover:border-pub-accent-line dark:hover:border-blue-500/20 transition-colors">
+                      <span className="text-sm text-gray-700 dark:text-white/65 group-hover:text-pub-accent dark:group-hover:text-blue-400">Webdesign für {label}</span>
                       <ArrowRight size={13} className="ml-auto text-pub-ink-3 dark:text-white/20 group-hover:text-blue-400" />
                     </Link>
                   </li>
@@ -553,7 +553,7 @@ export function KostenWebdesign() {
               <Link
                 to="/kontakt"
                 onClick={() => trackEvent("cta_kontakt_click", "kosten-webdesign-abschluss")}
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors"
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-pub-accent hover:bg-pub-accent-ink text-white font-semibold transition-colors"
               >
                 Angebot anfragen <ArrowRight size={16} />
               </Link>

@@ -317,13 +317,13 @@ export function WebdesignAgenturDeutschland() {
                     custom={i * 0.1}
                     className="bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-6"
                   >
-                    <Icon size={24} className="mb-4 text-[#515A61] dark:text-sky-400" />
+                    <Icon size={24} className="mb-4 text-pub-accent-soft dark:text-pub-accent-soft" />
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{service.title}</h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4">{service.description}</p>
                     <ul className="space-y-1.5">
                       {service.benefits.map((b, bi) => (
                         <li key={bi} className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
-                          <CheckCircle2 size={13} className="flex-shrink-0 mt-0.5 text-[#515A61] dark:text-sky-400" />
+                          <CheckCircle2 size={13} className="flex-shrink-0 mt-0.5 text-pub-accent-soft dark:text-pub-accent-soft" />
                           {b}
                         </li>
                       ))}

@@ -377,7 +377,7 @@ function PricingSection({ config }: { config: ClusterPageConfig }) {
               <ul className="space-y-2.5 flex-1">
                 {tier.deliverables.map((item, j) => (
                   <li key={j} className="flex items-start gap-2.5">
-                    <CheckCircle2 size={14} className="flex-shrink-0 mt-0.5 text-[#515A61] dark:text-sky-400" />
+                    <CheckCircle2 size={14} className="flex-shrink-0 mt-0.5 text-pub-accent-soft dark:text-pub-accent-soft" />
                     <span className="text-sm text-gray-600 dark:text-gray-400">{item}</span>
                   </li>
                 ))}
@@ -435,7 +435,7 @@ function DeliverablesSection({ config }: { config: ClusterPageConfig }) {
               custom={i * 0.05}
               className="flex items-start gap-3 p-4 rounded-xl bg-white dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/50"
             >
-              <CheckCircle2 size={15} className="flex-shrink-0 mt-0.5 text-[#515A61] dark:text-sky-400" />
+              <CheckCircle2 size={15} className="flex-shrink-0 mt-0.5 text-pub-accent-soft dark:text-pub-accent-soft" />
               <span className="text-sm text-gray-700 dark:text-gray-300">{item}</span>
             </motion.div>
           ))}

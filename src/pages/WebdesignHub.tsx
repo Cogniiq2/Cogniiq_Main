@@ -380,7 +380,7 @@ export function WebdesignHub() {
               <span className="text-gray-600 dark:text-white/60">Webdesign</span>
             </nav>
 
-            <motion.p className="cq-rise text-xs font-semibold tracking-[0.18em] uppercase text-blue-600 dark:text-blue-400 mb-4">
+            <motion.p className="cq-rise text-xs font-semibold tracking-[0.18em] uppercase text-pub-accent dark:text-blue-400 mb-4">
               Webdesign Agentur · Deutschland
             </motion.p>
             <motion.h1 className="cq-rise cq-rise-d1 text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 dark:text-white leading-[1.08] mb-6 max-w-4xl">
@@ -408,7 +408,7 @@ export function WebdesignHub() {
               <Link
                 to="/kontakt"
                 onClick={() => trackEvent("cta_kontakt_click", "webdesign-hero")}
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-pub-accent hover:bg-pub-accent-ink text-white font-semibold text-sm transition-colors"
               >
                 Website-Projekt besprechen <ArrowRight size={15} />
               </Link>
@@ -482,7 +482,7 @@ export function WebdesignHub() {
               <ul className="space-y-3">
                 {PASST.map((p) => (
                   <li key={p} className="flex items-start gap-2.5 text-sm text-gray-600 dark:text-white/60 leading-relaxed">
-                    <CheckCircle2 size={15} className="text-blue-500 mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 size={15} className="text-pub-accent-soft mt-0.5 flex-shrink-0" />
                     {p}
                   </li>
                 ))}
@@ -536,7 +536,7 @@ export function WebdesignHub() {
             Für die Relaunch-Frage vor Ort gibt es eigene Seiten mit dem jeweiligen Vorgehen:{" "}
             {RELAUNCH_SEITEN.map(({ label, href }, i) => (
               <span key={href}>
-                <Link to={href} className="text-blue-600 dark:text-blue-400 hover:underline">
+                <Link to={href} className="text-pub-accent dark:text-blue-400 hover:underline">
                   Website-Relaunch {label}
                 </Link>
                 {i < RELAUNCH_SEITEN.length - 1 ? ", " : "."}
@@ -562,8 +562,8 @@ export function WebdesignHub() {
                 custom={i * 0.05}
                 className="p-5 rounded-2xl border border-gray-100 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.02]"
               >
-                <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center mb-3">
-                  <Icon size={16} className="text-blue-600 dark:text-blue-400" />
+                <div className="w-9 h-9 rounded-xl bg-pub-accent-wash dark:bg-blue-500/10 flex items-center justify-center mb-3">
+                  <Icon size={16} className="text-pub-accent dark:text-blue-400" />
                 </div>
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{titel}</h3>
                 <ul className="space-y-1.5">
@@ -711,7 +711,7 @@ export function WebdesignHub() {
           <p className="mt-6 text-sm text-gray-500 dark:text-white/50 leading-relaxed max-w-3xl">
             Für Betriebe, bei denen Anfragen vor allem telefonisch eingehen, lässt sich die
             Website in vielen Fällen mit dem{" "}
-            <Link to="/ki-telefonassistent" className="text-blue-600 dark:text-blue-400 hover:underline">
+            <Link to="/ki-telefonassistent" className="text-pub-accent dark:text-blue-400 hover:underline">
               KI-Telefonassistenten
             </Link>{" "}
             verbinden — ob das sinnvoll ist, hängt von Ihrem Anrufaufkommen ab, nicht von der Website.
@@ -728,7 +728,7 @@ export function WebdesignHub() {
           <ol className="grid sm:grid-cols-2 gap-3">
             {RELAUNCH_PRUEFLISTE.map((p, i) => (
               <li key={p} className="flex items-start gap-3 p-4 rounded-xl bg-white dark:bg-white/[0.02] border border-gray-100 dark:border-white/[0.06] text-sm text-gray-600 dark:text-white/60 leading-relaxed">
-                <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-0.5 w-5 flex-shrink-0">
+                <span className="text-xs font-semibold text-pub-accent dark:text-blue-400 mt-0.5 w-5 flex-shrink-0">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 {p}
@@ -762,7 +762,7 @@ export function WebdesignHub() {
             <Link
               to="/kosten-webdesign"
               onClick={() => trackEvent("cta_kosten_click", "webdesign-kosten-abschnitt")}
-              className="inline-flex items-center gap-2 font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+              className="inline-flex items-center gap-2 font-semibold text-pub-accent dark:text-blue-400 hover:underline"
             >
               Alle Preistreiber im Einzelnen <ArrowRight size={14} />
             </Link>
@@ -770,7 +770,7 @@ export function WebdesignHub() {
               Regional:{" "}
               {KOSTEN_LOKAL.map(({ label, href }, i) => (
                 <span key={href}>
-                  <Link to={href} className="text-gray-600 dark:text-white/60 hover:text-blue-600 dark:hover:text-blue-400">
+                  <Link to={href} className="text-gray-600 dark:text-white/60 hover:text-pub-accent dark:hover:text-blue-400">
                     Webdesign-Kosten {label}
                   </Link>
                   {i < KOSTEN_LOKAL.length - 1 ? " · " : ""}
@@ -790,7 +790,7 @@ export function WebdesignHub() {
           <ol className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {ABLAUF.map(({ nr, titel, text }) => (
               <li key={nr} className="p-5 rounded-2xl bg-white dark:bg-white/[0.02] border border-gray-100 dark:border-white/[0.06]">
-                <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-1.5">{nr}</p>
+                <p className="text-xs font-semibold text-pub-accent dark:text-blue-400 mb-1.5">{nr}</p>
                 <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-1.5">{titel}</h3>
                 <p className="text-sm text-gray-500 dark:text-white/55 leading-relaxed">{text}</p>
               </li>
@@ -817,10 +817,10 @@ export function WebdesignHub() {
                   <li key={href}>
                     <Link
                       to={href}
-                      className="group flex items-center gap-3 p-3 rounded-xl border border-gray-100 dark:border-white/[0.06] hover:border-blue-200 dark:hover:border-blue-500/20 transition-colors"
+                      className="group flex items-center gap-3 p-3 rounded-xl border border-gray-100 dark:border-white/[0.06] hover:border-pub-accent-line dark:hover:border-blue-500/20 transition-colors"
                     >
-                      <Icon size={15} className="text-blue-500 flex-shrink-0" />
-                      <span className="text-sm text-gray-700 dark:text-white/65 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                      <Icon size={15} className="text-pub-accent-soft flex-shrink-0" />
+                      <span className="text-sm text-gray-700 dark:text-white/65 group-hover:text-pub-accent dark:group-hover:text-blue-400">
                         Webdesign für {label}
                       </span>
                       <ArrowRight size={13} className="ml-auto text-pub-ink-3 dark:text-white/20 group-hover:text-blue-400" />
@@ -836,11 +836,11 @@ export function WebdesignHub() {
                   <li key={href}>
                     <Link
                       to={href}
-                      className="group flex items-start gap-3 p-3 rounded-xl border border-gray-100 dark:border-white/[0.06] hover:border-blue-200 dark:hover:border-blue-500/20 transition-colors"
+                      className="group flex items-start gap-3 p-3 rounded-xl border border-gray-100 dark:border-white/[0.06] hover:border-pub-accent-line dark:hover:border-blue-500/20 transition-colors"
                     >
-                      <MapPin size={15} className="text-blue-500 mt-0.5 flex-shrink-0" />
+                      <MapPin size={15} className="text-pub-accent-soft mt-0.5 flex-shrink-0" />
                       <span>
-                        <span className="block text-sm text-gray-700 dark:text-white/65 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                        <span className="block text-sm text-gray-700 dark:text-white/65 group-hover:text-pub-accent dark:group-hover:text-blue-400">
                           {label}
                         </span>
                         <span className="block text-xs text-pub-ink-3 dark:text-white/35">{sub}</span>
@@ -878,7 +878,7 @@ export function WebdesignHub() {
           <p className="mt-8 text-sm text-gray-500 dark:text-white/50 leading-relaxed max-w-3xl">
             Ihre Website existiert bereits, bringt aber keine Anfragen? Typische Ursachen
             und ihre Prüfreihenfolge stehen auf der Seite{" "}
-            <Link to="/keine-anfragen-website" className="text-blue-600 dark:text-blue-400 hover:underline">
+            <Link to="/keine-anfragen-website" className="text-pub-accent dark:text-blue-400 hover:underline">
               Website bringt keine Anfragen
             </Link>
             .
@@ -901,7 +901,7 @@ export function WebdesignHub() {
               <Link
                 to="/kontakt"
                 onClick={() => trackEvent("cta_kontakt_click", "webdesign-abschluss")}
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors"
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-pub-accent hover:bg-pub-accent-ink text-white font-semibold transition-colors"
               >
                 Website-Projekt besprechen <ArrowRight size={16} />
               </Link>

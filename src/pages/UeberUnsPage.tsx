@@ -324,7 +324,10 @@ function SubNav() {
                   onClick={() => scrollTo(item.anchor)}
                   className={`px-4 h-full text-xs font-medium tracking-wide transition-colors whitespace-nowrap border-b-2 ${
                     active === item.anchor
-                      ? "border-gray-900 dark:border-gray-100 text-gray-900 dark:text-gray-100"
+                      // Ausgewaehlter Reiter. Die UNTERKANTE traegt den
+                      // Zustand (border-b-2 gegen border-transparent) — Farbe
+                      // verstaerkt sie, ist aber nie das einzige Merkmal.
+                      ? "border-pub-accent dark:border-gray-100 text-pub-accent dark:text-gray-100"
                       : "border-transparent text-pub-ink-3 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400"
                   }`}
                 >

@@ -239,7 +239,7 @@ export function ProblemPage({ config }: Props) {
                     custom={i * 0.06}
                     className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/50"
                   >
-                    <CheckCircle2 size={15} className="text-[#515A61] dark:text-sky-400 flex-shrink-0" />
+                    <CheckCircle2 size={15} className="text-pub-accent-soft dark:text-pub-accent-soft flex-shrink-0" />
                     <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{bullet}</span>
                   </motion.div>
                 ))}

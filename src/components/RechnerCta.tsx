@@ -49,7 +49,7 @@ export function RechnerCta({
       className={
         variante === "karte"
           ? "inline-flex items-center justify-center gap-2.5 px-6 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-[15px] hover:bg-gray-700 dark:hover:bg-white transition-colors"
-          : "inline-flex items-center gap-2 text-[16px] font-semibold text-gray-900 dark:text-gray-100 underline decoration-gray-300 dark:decoration-gray-600 underline-offset-4 hover:decoration-gray-900 dark:hover:decoration-gray-100 transition-colors"
+          : "inline-flex items-center gap-2 text-[16px] font-semibold text-pub-accent dark:text-gray-100 underline decoration-pub-accent-line dark:decoration-gray-600 underline-offset-4 hover:decoration-pub-accent dark:hover:decoration-gray-100 transition-colors"
       }
     >
       <Calculator size={15} aria-hidden="true" />

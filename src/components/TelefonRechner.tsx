@@ -144,7 +144,7 @@ function Zahlenfeld({
             step={step}
             value={wert ?? min}
             onChange={(e) => onChange(Number(e.target.value))}
-            className="basis-full min-w-0 h-11 accent-gray-900 dark:accent-gray-100 cursor-pointer"
+            className="basis-full min-w-0 h-11 accent-pub-accent dark:accent-gray-100 cursor-pointer"
           />
         )}
       </div>

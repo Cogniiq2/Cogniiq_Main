@@ -494,7 +494,7 @@ function PaketeSection({
               <ul className="space-y-2.5">
                 {paket.deliverables.map((item, j) => (
                   <li key={j} className="flex items-start gap-2.5">
-                    <CheckCircle2 size={14} className="flex-shrink-0 mt-0.5 text-[#515A61] dark:text-sky-400" />
+                    <CheckCircle2 size={14} className="flex-shrink-0 mt-0.5 text-pub-accent-soft dark:text-pub-accent-soft" />
                     <span className="text-sm text-gray-600 dark:text-gray-400">{item}</span>
                   </li>
                 ))}
@@ -672,7 +672,7 @@ function BenefitsSection({ config }: { config: IndustryPageConfig }) {
             >
               <CheckCircle2
                 size={18}
-                className="flex-shrink-0 mt-0.5 text-[#515A61] dark:text-sky-400"
+                className="flex-shrink-0 mt-0.5 text-pub-accent-soft dark:text-pub-accent-soft"
               />
               <span className="text-gray-700 dark:text-gray-300">{benefit}</span>
             </motion.li>

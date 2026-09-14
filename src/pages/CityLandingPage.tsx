@@ -230,7 +230,7 @@ export function CityLandingPage({ citySlug }: Props) {
                           Für Unternehmen in {config.city}
                         </p>
                       </div>
-                      <div className="flex items-center gap-1 text-sm font-medium text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors mt-auto">
+                      <div className="flex items-center gap-1 text-sm font-medium text-gray-500 dark:text-gray-400 group-hover:text-pub-accent dark:group-hover:text-gray-100 transition-colors mt-auto">
                         Mehr erfahren
                         <ChevronRight size={14} />
                       </div>
@@ -252,7 +252,7 @@ export function CityLandingPage({ citySlug }: Props) {
                 {config.deepDive.intro}{" "}
                 <Link
                   to={config.deepDive.href}
-                  className="font-medium text-gray-900 dark:text-gray-100 underline underline-offset-2 decoration-gray-300 dark:decoration-gray-600 hover:decoration-gray-900 dark:hover:decoration-gray-100 transition-colors"
+                  className="font-medium text-pub-accent dark:text-gray-100 underline underline-offset-2 decoration-pub-accent-line dark:decoration-gray-600 hover:decoration-gray-900 dark:hover:decoration-gray-100 transition-colors"
                 >
                   {config.deepDive.label}
                 </Link>

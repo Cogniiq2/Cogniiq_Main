@@ -42,7 +42,11 @@ function renderWithLinks(text: string) {
             <Link
               key={i}
               to={match[2]}
-              className="text-gray-800 dark:text-gray-200 underline underline-offset-2 decoration-gray-300 dark:decoration-gray-600 hover:decoration-gray-500 transition-colors"
+              // Kontextlink im Fliesstext — dieselbe Rolle wie auf /webdesign,
+              // also dieselbe Farbe. Die Unterstreichung BLEIBT: sie ist der
+              // Hinweis, der ohne Farbe funktioniert, und ohne sie waere Blau
+              // das einzige Merkmal, an dem ein Link im Absatz zu erkennen ist.
+              className="text-pub-accent underline underline-offset-2 decoration-pub-accent-line hover:decoration-pub-accent transition-colors"
             >
               {match[1]}
             </Link>
@@ -329,7 +333,7 @@ function WarumCogniiq({ config }: { config: CityServiceConfig }) {
               variants={fadeUp}
               className="flex items-start gap-3 p-5 rounded-xl bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50"
             >
-              <CheckCircle2 size={18} className="flex-shrink-0 mt-0.5 text-[#515A61] dark:text-sky-400" />
+              <CheckCircle2 size={18} className="flex-shrink-0 mt-0.5 text-pub-accent-soft dark:text-pub-accent-soft" />
               <span className="text-gray-700 dark:text-gray-300">{point}</span>
             </motion.li>
           ))}
@@ -411,7 +415,7 @@ function UseCasesSection({ config }: { config: CityServiceConfig }) {
               variants={fadeUp}
               className="bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 flex flex-col gap-3"
             >
-              <span className="text-sm font-semibold uppercase tracking-wider text-[#515A61] dark:text-sky-400">
+              <span className="text-sm font-semibold uppercase tracking-wider text-pub-accent dark:text-pub-accent-soft">
                 {useCase.industry}
               </span>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -575,7 +579,7 @@ function BranchenSection({ config }: { config: CityServiceConfig }) {
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-[#515A61] dark:text-sky-400 uppercase tracking-widest mb-1">
+                  <p className="text-sm font-semibold text-pub-accent dark:text-pub-accent-soft uppercase tracking-widest mb-1">
                     Lösung
                   </p>
                   <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">

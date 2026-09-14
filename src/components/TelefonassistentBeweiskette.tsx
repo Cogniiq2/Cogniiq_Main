@@ -123,7 +123,7 @@ function Mehr({ label, href }: { label: string; href: string }) {
   return (
     <Link
       to={href}
-      className="inline-flex items-center gap-2 mt-6 text-[17px] text-gray-700 dark:text-gray-300 underline underline-offset-4 decoration-gray-300 dark:decoration-gray-600 hover:decoration-gray-500 dark:hover:decoration-gray-400 transition-colors"
+      className="inline-flex items-center gap-2 mt-6 text-[17px] text-pub-accent dark:text-gray-300 underline underline-offset-4 decoration-pub-accent-line dark:decoration-gray-600 hover:decoration-pub-accent dark:hover:decoration-gray-400 transition-colors"
     >
       {label}
       <ArrowRight size={16} aria-hidden="true" className="shrink-0" />

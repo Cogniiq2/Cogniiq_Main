@@ -267,7 +267,7 @@ export function CostPage({ config }: CostPageProps) {
                   custom={i * 0.07}
                   className="flex gap-4 p-5 rounded-xl bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
                 >
-                  <CheckCircle2 size={16} className="flex-shrink-0 mt-0.5 text-[#515A61] dark:text-sky-400" />
+                  <CheckCircle2 size={16} className="flex-shrink-0 mt-0.5 text-pub-accent-soft dark:text-pub-accent-soft" />
                   <div>
                     <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">{factor.title}</h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{factor.description}</p>

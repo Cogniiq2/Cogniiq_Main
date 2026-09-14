@@ -279,13 +279,13 @@ function SimpleNavItem({
       <span className={`text-sm font-medium tracking-wide transition-colors duration-200 ${
         isActive
           ? 'text-gray-900 dark:text-gray-100'
-          : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100'
+          : 'text-gray-500 dark:text-gray-400 group-hover:text-pub-accent dark:group-hover:text-gray-100'
       }`}>
         {label}
       </span>
       <span
         aria-hidden="true"
-        className={`absolute bottom-0 left-4 right-4 h-px bg-gray-900 dark:bg-gray-100 origin-left transition-transform duration-200 ease-out ${
+        className={`absolute bottom-0 left-4 right-4 h-px bg-pub-accent dark:bg-gray-100 origin-left transition-transform duration-200 ease-out ${
           isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
         }`}
       />
@@ -327,7 +327,7 @@ function NavDropdownTrigger({
       <span className={`text-sm font-medium tracking-wide transition-colors duration-200 ${
         isActive || isOpen
           ? 'text-gray-900 dark:text-gray-100'
-          : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100'
+          : 'text-gray-500 dark:text-gray-400 group-hover:text-pub-accent dark:group-hover:text-gray-100'
       }`}>
         {label}
       </span>
@@ -338,7 +338,7 @@ function NavDropdownTrigger({
       />
       <span
         aria-hidden="true"
-        className={`absolute bottom-0 left-4 right-4 h-px bg-gray-900 dark:bg-gray-100 origin-left transition-transform duration-200 ease-out ${
+        className={`absolute bottom-0 left-4 right-4 h-px bg-pub-accent dark:bg-gray-100 origin-left transition-transform duration-200 ease-out ${
           isActive || isOpen ? 'scale-x-100' : 'scale-x-0'
         }`}
       />
