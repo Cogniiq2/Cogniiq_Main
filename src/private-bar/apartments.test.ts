@@ -71,13 +71,17 @@ describe('apartment mapping', () => {
 });
 
 describe('product assignment', () => {
-  const DESIGNAPARTS_1 = [
+  /** The five wines are designAparts I's alone. */
+  const DESIGNAPARTS_1_ONLY = [
     'planeta-plumbago-nero-davola-2021',
     'ottella-rosesroses',
     'cavalchina-custoza-2025',
     'nunzio-ghiraldi-il-gruccione',
     'manz-grauburgunder-fruchtecke',
   ];
+  const DESIGNAPARTS_1 = [...DESIGNAPARTS_1_ONLY, 'bayreuther-hell'];
+  /** Sold in both apartments — one product, two shelves. */
+  const SHARED = 'bayreuther-hell';
   const DESIGNAPARTS_2 = [
     'stella-rossa-prosecco-doc-brut',
     'ploner-marell',
@@ -90,27 +94,47 @@ describe('product assignment', () => {
     's-pellegrino',
   ];
 
-  it('sells the five new wines in designAparts I, and only there', () => {
+  it('sells the five wines in designAparts I, and only there', () => {
     expect([...productIdsForApartment('designaparts1')]).toEqual(DESIGNAPARTS_1);
-    for (const id of DESIGNAPARTS_1) {
+    expect(productIdsForApartment('designaparts1')).toHaveLength(6);
+    for (const id of DESIGNAPARTS_1_ONLY) {
       expect(productBelongsToApartment(id, 'designaparts1'), id).toBe(true);
       expect(productBelongsToApartment(id, 'designaparts2'), id).toBe(false);
     }
   });
 
-  it('keeps the existing nine products in designAparts II, and only there', () => {
+  it('sells Bayreuther Hell in BOTH apartments, as one shared product', () => {
+    expect(productBelongsToApartment(SHARED, 'designaparts1')).toBe(true);
+    expect(productBelongsToApartment(SHARED, 'designaparts2')).toBe(true);
+    // One catalogue entry, not two: no second id, no second price.
+    expect(PRIVATE_BAR_CATALOG.filter((p) => p.id === SHARED)).toHaveLength(1);
+    expect(PRIVATE_BAR_CATALOG.filter((p) => p.id.startsWith('bayreuther'))).toHaveLength(1);
+    expect(productById(SHARED)?.priceCents).toBe(450);
+  });
+
+  it('keeps the existing nine products in designAparts II', () => {
     expect([...productIdsForApartment('designaparts2')]).toEqual(DESIGNAPARTS_2);
+    expect(productIdsForApartment('designaparts2')).toHaveLength(9);
     for (const id of DESIGNAPARTS_2) {
       expect(productBelongsToApartment(id, 'designaparts2'), id).toBe(true);
-      expect(productBelongsToApartment(id, 'designaparts1'), id).toBe(false);
+      // Everything except the one shared beer stays designAparts II's alone.
+      expect(productBelongsToApartment(id, 'designaparts1'), id).toBe(id === SHARED);
     }
   });
 
   it('assigns no product that does not exist, and leaves none unassigned', () => {
     const assigned = APARTMENT_KEYS.flatMap((key) => [...productIdsForApartment(key)]);
-    expect(new Set(assigned).size).toBe(assigned.length);
     for (const id of assigned) expect(productById(id), `${id} is not in the catalogue`).toBeDefined();
-    expect([...assigned].sort()).toEqual(PRIVATE_BAR_CATALOG.map((p) => p.id).sort());
+    expect([...new Set(assigned)].sort()).toEqual(PRIVATE_BAR_CATALOG.map((p) => p.id).sort());
+    // Exactly one id is listed twice — the shared beer, and nothing else.
+    expect(assigned.length - new Set(assigned).size).toBe(1);
+  });
+
+  it('lists no product twice within one apartment', () => {
+    for (const key of APARTMENT_KEYS) {
+      const ids = [...productIdsForApartment(key)];
+      expect(new Set(ids).size, `${key} lists a product twice`).toBe(ids.length);
+    }
   });
 
   it('claims nothing for an unknown product id', () => {

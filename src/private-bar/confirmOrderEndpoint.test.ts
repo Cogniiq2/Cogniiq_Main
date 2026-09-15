@@ -109,6 +109,31 @@ describe('POST /api/private-bar/confirm-order', () => {
     expect(payload.status).toBe('awaiting_payment');
   });
 
+  it('bills the shared beer to whichever apartment the guest is standing in', async () => {
+    // One catalogue product, two shelves: the price is identical, but the
+    // decrement must reach only the selected apartment's rows. The RPC's
+    // p_apartment_id is what decides that, so it is what is asserted.
+    for (const [apartment, expected] of [
+      ['designaparts1', APARTMENTS.designaparts1.apartmentId],
+      ['designaparts2', APARTMENTS.designaparts2.apartmentId],
+    ] as const) {
+      const calls = stubSupabase({ rpc: () => okRpc(), stock: () => new Response('[]', { status: 200 }) });
+      const response = await post(validBody({ apartment, items: [{ productId: BEER, quantity: 2 }] }));
+      expect(response.status, apartment).toBe(200);
+
+      const sent = JSON.parse(String(calls.find((c) => c.url.includes('/rpc/'))!.init.body));
+      expect(sent.p_apartment_id, apartment).toBe(expected);
+      expect(sent.p_total_cents).toBe(BEER_PRICE * 2);
+      expect(sent.p_items[0].unit_amount_cents).toBe(BEER_PRICE);
+
+      // The follow-up stock read is scoped to the same apartment, so one
+      // apartment's numbers can never be reported as the other's.
+      const read = calls.find((c) => c.url.includes('private_bar_inventory'))!.url;
+      expect(decodeURIComponent(read)).toContain(`apartment_id=eq.${expected}`);
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('passes the client order id straight through as the idempotency key', async () => {
     const calls = stubSupabase({ rpc: () => okRpc(), stock: () => new Response('[]', { status: 200 }) });
     await post(validBody());
@@ -178,8 +203,9 @@ describe('POST /api/private-bar/confirm-order', () => {
       validBody({ apartment: APARTMENTS.designaparts2.apartmentId }),
       // The product exists and is priced — but designAparts II does not sell it.
       validBody({ items: [{ productId: PLANETA, quantity: 1 }] }),
-      // ...and neither does designAparts I sell designAparts II's beer.
-      validBody({ apartment: 'designaparts1', items: [{ productId: BEER, quantity: 1 }] }),
+      // ...and neither does designAparts I sell designAparts II's water. (The
+      // beer is deliberately stocked in both, so it is not a rejection case.)
+      validBody({ apartment: 'designaparts1', items: [{ productId: 's-pellegrino', quantity: 1 }] }),
     ]) {
       const response = await post(body);
       expect(response.status).toBe(400);

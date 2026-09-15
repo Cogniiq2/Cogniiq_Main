@@ -31,6 +31,8 @@ run_psql -f "$ROOT_DIR/supabase/migrations/20260906120000_private_bar_inventory.
 # safe to replay, and must not reset a count that has since changed.
 run_psql -f "$ROOT_DIR/supabase/migrations/20260915120000_private_bar_designaparts1_inventory.sql"
 run_psql -f "$ROOT_DIR/supabase/migrations/20260915120000_private_bar_designaparts1_inventory.sql"
+run_psql -f "$ROOT_DIR/supabase/migrations/20260915130000_private_bar_designaparts1_bayreuther.sql"
+run_psql -f "$ROOT_DIR/supabase/migrations/20260915130000_private_bar_designaparts1_bayreuther.sql"
 
 run_psql <<'SQL'
 \set ON_ERROR_STOP on
@@ -144,11 +146,12 @@ declare
   v_stock  integer;
   v_before integer;
 begin
-  -- The additive migration seeded five bottles, and replaying it changed nothing.
+  -- The additive migrations seeded five wines and one beer, and replaying them
+  -- changed nothing.
   select count(*) into v_stock from private_bar_inventory where apartment_id = 'bolagio-designaparts-1';
-  if v_stock <> 5 then raise exception 'FAIL 9: designAparts I has % rows, expected 5', v_stock; end if;
+  if v_stock <> 6 then raise exception 'FAIL 9: designAparts I has % rows, expected 6', v_stock; end if;
   select sum(stock) into v_stock from private_bar_inventory where apartment_id = 'bolagio-designaparts-1';
-  if v_stock <> 5 then raise exception 'FAIL 9: designAparts I stock totals %, expected 5', v_stock; end if;
+  if v_stock <> 8 then raise exception 'FAIL 9: designAparts I stock totals %, expected 8 (5 wines + 3 beers)', v_stock; end if;
 
   -- An order in one apartment decrements ONLY that apartment.
   select sum(stock) into v_before from private_bar_inventory where apartment_id = 'bolagio-apartment-1';
@@ -192,7 +195,30 @@ begin
     if sqlerrm not like 'private_bar:out_of_stock%' then raise; end if;
   end;
 
-  raise notice 'private bar inventory: the two apartments are isolated';
+  -- 9b ─ the SHARED product keeps two independent counts.
+  select stock into v_before from private_bar_inventory
+   where apartment_id = 'bolagio-apartment-1' and product_id = 'bayreuther-hell';
+
+  v_result := private_bar_confirm_order(
+    'bolagio-designaparts-1',
+    '88888888-8888-4888-8888-888888888888',
+    '[{"product_id":"bayreuther-hell","quantity":1}]'::jsonb,
+    450, 'EUR');
+  if (v_result ->> 'status') <> 'awaiting_payment' then
+    raise exception 'FAIL 9b: the shared beer could not be bought in designAparts I: %', v_result;
+  end if;
+
+  select stock into v_stock from private_bar_inventory
+   where apartment_id = 'bolagio-designaparts-1' and product_id = 'bayreuther-hell';
+  if v_stock <> 2 then raise exception 'FAIL 9b: designAparts I beer is %, expected 2', v_stock; end if;
+
+  select stock into v_stock from private_bar_inventory
+   where apartment_id = 'bolagio-apartment-1' and product_id = 'bayreuther-hell';
+  if v_stock <> v_before then
+    raise exception 'FAIL 9b: buying in designAparts I moved the designAparts II beer from % to %', v_before, v_stock;
+  end if;
+
+  raise notice 'private bar inventory: the two apartments are isolated, shared product included';
 end $$;
 
 -- 8 ─ the guest-facing roles reach none of it.

@@ -71,8 +71,9 @@ describe('priceLines', () => {
   });
 
   it('rejects a product the selected apartment does not sell', () => {
-    // A real, priced, available product — from the OTHER apartment.
-    expect(priceLines([{ productId: 'bayreuther-hell', quantity: 1 }], OTHER)).toEqual({
+    // A real, priced, available product — from the OTHER apartment. Deliberately
+    // NOT the beer: that one is stocked in both, so it would prove nothing here.
+    expect(priceLines([{ productId: 's-pellegrino', quantity: 1 }], OTHER)).toEqual({
       ok: false,
       reason: 'product_not_in_apartment',
     });
@@ -80,6 +81,18 @@ describe('priceLines', () => {
       ok: false,
       reason: 'product_not_in_apartment',
     });
+  });
+
+  it('prices a shared product identically in both apartments', () => {
+    // Same catalogue entry, same engine: the apartment decides availability,
+    // never the amount.
+    for (const apartment of [APT, OTHER]) {
+      const result = priceLines([{ productId: 'bayreuther-hell', quantity: 2 }], apartment);
+      expect(result.ok, apartment).toBe(true);
+      if (!result.ok) continue;
+      expect(result.lines[0].unitAmountCents).toBe(450);
+      expect(totalCents(result.lines)).toBe(900);
+    }
   });
 
   it('prices designAparts I baskets through this same engine', () => {

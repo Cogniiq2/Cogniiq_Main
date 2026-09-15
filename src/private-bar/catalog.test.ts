@@ -52,15 +52,26 @@ describe('Private Bar catalogue', () => {
     expect(productById('not-a-product')).toBeUndefined();
   });
 
-  it('assigns every catalogue product to exactly one apartment', () => {
-    // A product assigned to neither would be invisible; one assigned to both
-    // would let either apartment sell a bottle only one of them holds.
+  it('assigns every catalogue product to at least one apartment', () => {
+    // A product assigned to neither would be invisible — priced, maintained and
+    // unreachable.
     for (const product of PRIVATE_BAR_CATALOG) {
       const owners = APARTMENT_KEYS.filter((key) =>
         APARTMENTS[key].productIds.includes(product.id)
       );
-      expect(owners, `${product.id} is assigned to ${owners.length} apartments`).toHaveLength(1);
+      expect(owners.length, `${product.id} is assigned to no apartment`).toBeGreaterThan(0);
     }
+  });
+
+  it('shares exactly one product between the apartments, deliberately', () => {
+    // Bayreuther Hell stands in both apartments, so it is ONE catalogue entry
+    // sold in two places — same id, price, card and photograph — rather than a
+    // copy that could drift. Anything else appearing in both lists would be an
+    // accident, so it is asserted rather than tolerated.
+    const shared = PRIVATE_BAR_CATALOG.filter((product) =>
+      APARTMENT_KEYS.every((key) => APARTMENTS[key].productIds.includes(product.id))
+    ).map((product) => product.id);
+    expect(shared).toEqual(['bayreuther-hell']);
   });
 
   it('resolves every assigned product id to a real catalogue entry', () => {
@@ -69,6 +80,20 @@ describe('Private Bar catalogue', () => {
         [...APARTMENTS[key].productIds].sort()
       );
     }
+  });
+
+  it('gives each apartment the catalogue the owner stocked', () => {
+    expect(productsForApartment('designaparts1')).toHaveLength(6);
+    expect(productsForApartment('designaparts2')).toHaveLength(9);
+  });
+
+  it('hands both apartments the identical object for a shared product', () => {
+    // Not a copy: the same catalogue entry, so a price or photograph can only
+    // ever be changed in one place.
+    const inOne = productsForApartment('designaparts1').find((p) => p.id === 'bayreuther-hell');
+    const inTwo = productsForApartment('designaparts2').find((p) => p.id === 'bayreuther-hell');
+    expect(inOne).toBeDefined();
+    expect(inOne).toBe(inTwo);
   });
 
   it('lists available products in sort order', () => {

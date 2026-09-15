@@ -107,9 +107,10 @@ describe('trusted order', () => {
 
   it('refuses a product that belongs to the other apartment', () => {
     // The whole point of the server-side assignment: selecting designAparts I
-    // and posting a designAparts II SKU (or the reverse) buys nothing.
+    // and posting a designAparts II SKU (or the reverse) buys nothing. WATER is
+    // used rather than BEER because the beer is stocked in both.
     expect(
-      buildTrustedOrder(body({ apartment: OTHER, items: [{ productId: BEER, quantity: 1 }] }))
+      buildTrustedOrder(body({ apartment: OTHER, items: [{ productId: WATER, quantity: 1 }] }))
     ).toEqual({ ok: false, reason: 'product_not_in_apartment' });
     expect(buildTrustedOrder(body({ items: [{ productId: PLANETA, quantity: 1 }] }))).toEqual({
       ok: false,
@@ -121,6 +122,25 @@ describe('trusted order', () => {
         body({ items: [{ productId: BEER, quantity: 1 }, { productId: PLANETA, quantity: 1 }] })
       )
     ).toEqual({ ok: false, reason: 'product_not_in_apartment' });
+  });
+
+  it('accepts the shared beer from either apartment, at the same price', () => {
+    for (const apartment of [APARTMENT, OTHER]) {
+      const result = buildTrustedOrder(
+        body({ apartment, items: [{ productId: BEER, quantity: 2 }] })
+      );
+      expect(result.ok, apartment).toBe(true);
+      if (!result.ok) continue;
+      expect(result.order.items[0].unit_amount_cents).toBe(productById(BEER)!.priceCents);
+      expect(result.order.totalCents).toBe(productById(BEER)!.priceCents! * 2);
+    }
+
+    // ...and each order still carries its OWN apartment, so the decrement lands
+    // on the right shelf.
+    const one = buildTrustedOrder(body({ apartment: OTHER, items: [{ productId: BEER, quantity: 1 }] }));
+    const two = buildTrustedOrder(body({ items: [{ productId: BEER, quantity: 1 }] }));
+    expect(one.ok && one.order.apartmentId).toBe('bolagio-designaparts-1');
+    expect(two.ok && two.order.apartmentId).toBe('bolagio-apartment-1');
   });
 
   it('prices the designAparts I wines at exactly the owner-set amounts', () => {

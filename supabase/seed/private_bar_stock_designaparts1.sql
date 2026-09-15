@@ -48,6 +48,14 @@ where apartment_id = 'bolagio-designaparts-1'
 -- Manz Grauburgunder – Edition 95 Jahre Fruchtecke
 
 
+update public.private_bar_inventory
+set stock = 3, updated_at = now()
+where apartment_id = 'bolagio-designaparts-1'
+  and product_id = 'bayreuther-hell';
+-- Bayreuther Hell 0,5 l — the same catalogue product designAparts II sells;
+-- this file only ever touches the designAparts I shelf.
+
+
 -- Verify the resulting inventory:
 select product_id, stock
 from public.private_bar_inventory

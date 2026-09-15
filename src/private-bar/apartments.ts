@@ -27,7 +27,9 @@ export interface ApartmentConfig {
   /** The canonical internal id: private_bar_inventory.apartment_id and
    *  private_bar_orders.apartment_id. Never rendered. */
   readonly apartmentId: string;
-  /** Exactly which catalogue products this apartment may sell. */
+  /** Exactly which catalogue products this apartment may sell. A product may
+   *  appear in both lists (see 'bayreuther-hell'): that is one product sold in
+   *  two places, never a duplicate, and its stock stays per-apartment. */
   readonly productIds: readonly string[];
   /** Order of the two cards in the selection gate. */
   readonly sortOrder: number;
@@ -44,6 +46,10 @@ export const APARTMENTS: Readonly<Record<ApartmentKey, ApartmentConfig>> = {
       'cavalchina-custoza-2025',
       'nunzio-ghiraldi-il-gruccione',
       'manz-grauburgunder-fruchtecke',
+      // Shared with designAparts II on purpose: this is the SAME catalogue
+      // product — one id, one price, one card, one photograph. Only the stock
+      // is per-apartment, because the bottles physically are.
+      'bayreuther-hell',
     ],
     sortOrder: 10,
   },
