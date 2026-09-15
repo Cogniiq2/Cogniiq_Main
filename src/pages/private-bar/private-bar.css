@@ -1459,6 +1459,26 @@
   transform: scale(0.99);
 }
 
+/* ── touch semantics ───────────────────────────────────────────────────────
+   `manipulation` drops the double-tap-to-zoom wait, which is the ~300ms that
+   makes a tap feel like the page is thinking. The highlight is removed because
+   every control here answers a press with its own motion. Both properties do
+   nothing at all to a mouse, so the desktop surface is unchanged.
+   ────────────────────────────────────────────────────────────────────────── */
+.pb-gate__option,
+.pb-apartment__change,
+.pb-add,
+.pb-cta,
+.pb-clear,
+.pb-copy,
+.pb-bar__button,
+.pb-stepper__button,
+.pb-sheet__close,
+.pb-notice__action {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* ── the handoff ───────────────────────────────────────────────────────────
    Choosing an apartment is the one decision this surface asks for, so it is
    answered rather than merely obeyed: the chosen card steps forward and its
@@ -1486,11 +1506,78 @@
   pointer-events: none;
 }
 
+/* Promoted for the length of the handoff only, and only where it earns its
+   keep: the curtain and the two cards, which must keep moving smoothly while
+   the main thread is busy mounting the catalogue behind them. The catalogue's
+   own entrance is left alone — its keyframes already animate translate3d, and
+   a dozen extra layers to build and tear down mid-entrance cost more than they
+   save on a phone. */
+.pb-gate.is-leaving,
+.pb-gate__option.is-chosen,
+.pb-gate__option.is-dismissed,
+.pb-catalogue.is-leaving {
+  will-change: transform, opacity;
+}
+
+/* The departure is in two stages, and never a cross-dissolve: two different
+   headlines fading through each other reads as a fault, however smooth it is.
+   First the gate's own content lifts away while the curtain behind it stays
+   fully opaque, leaving a clean ivory screen. Only then does the curtain itself
+   dissolve, revealing a catalogue that is already rising underneath.
+
+   The first 180ms is the window the catalogue needs to mount and decode its
+   bottles, and the guest spends it watching the card they chose step forward. */
+.pb-gate.is-leaving > * {
+  animation: pb-gate-out 220ms var(--pb-ease) 180ms both;
+}
+
+.pb-gate.is-leaving::after {
+  animation: pb-fade-out 240ms var(--pb-ease) 400ms both;
+}
+
+/* The two screens occupy one cell, so the gate can hold the viewport while the
+   catalogue is built underneath it. The cell takes its height from whichever is
+   present, so the gate-only screen is still exactly one screen tall. */
+.pb-swap {
+  display: grid;
+}
+
+.pb-swap > * {
+  grid-area: 1 / 1;
+  /* Grid items default to min-width:auto, which lets a stacked child size to
+     its own min-content and overflow the cell — here that widened the product
+     grid past the page. Both axes are pinned to the cell instead. */
+  min-width: 0;
+  min-height: 0;
+}
+
+/* The curtain. A pseudo-element rather than a background on the gate itself:
+   the gate's own box must not change at the moment it starts to leave, or its
+   contents would re-centre in front of the guest. This paints ivory across
+   everything beneath the gate and nothing else. */
 .pb-gate.is-leaving {
-  /* Starts a beat after the commit so the chosen card is seen being chosen,
-     and ends exactly when the catalogue mounts — the two movements meet rather
-     than leaving an empty frame between them. */
-  animation: pb-gate-out 260ms var(--pb-ease) 100ms both;
+  position: relative;
+  z-index: 2;
+  /* Without this the gate stretches to the cell, which is now as tall as the
+     catalogue underneath it — and a gate that centres its question inside 3000px
+     puts that question far below the fold. It keeps the box it already had. */
+  align-self: start;
+}
+
+.pb-gate.is-leaving::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 100vw;
+  /* Downward only. The gate and the catalogue share a cell, so the gate's own
+     top edge is exactly where the catalogue begins — everything above it is the
+     header, which is identical in both states and must stay visible rather than
+     blink out behind an ivory sheet. */
+  top: 0;
+  bottom: -100vh;
+  transform: translateX(-50%);
+  background-color: var(--pb-ivory);
+  z-index: -1;
 }
 
 /* ── the catalogue's own arrival ───────────────────────────────────────────
@@ -1500,19 +1587,22 @@
    stands untouched — a reload should still feel like the page opening.
    ────────────────────────────────────────────────────────────────────────── */
 .pb-catalogue--handoff .pb-enter { animation-duration: 560ms; }
-.pb-catalogue--handoff .pb-enter--4 { animation-delay: 0ms; }
-.pb-catalogue--handoff .pb-enter--5 { animation-delay: 90ms; }
-.pb-catalogue--handoff .pb-apartment { animation: pb-rise 520ms var(--pb-ease-out) 160ms both; }
-.pb-catalogue--handoff .pb-guest { animation: pb-rise 520ms var(--pb-ease-out) 340ms both; }
+/* Timed against the curtain, not against the mount: the rise begins exactly as
+   the curtain starts to dissolve, so the catalogue is discovered already in
+   motion rather than found sitting there. */
+.pb-catalogue--handoff .pb-enter--4 { animation-delay: 420ms; }
+.pb-catalogue--handoff .pb-enter--5 { animation-delay: 500ms; }
+.pb-catalogue--handoff .pb-apartment { animation: pb-rise 460ms var(--pb-ease-out) 560ms both; }
+.pb-catalogue--handoff .pb-guest { animation: pb-rise 460ms var(--pb-ease-out) 740ms both; }
 
 .pb-catalogue--handoff .pb-grid > .pb-product > .pb-product__inner {
-  animation-duration: 520ms;
+  animation-duration: 460ms;
 }
-.pb-catalogue--handoff .pb-grid > .pb-product:nth-child(1) > .pb-product__inner { animation-delay: 180ms; }
-.pb-catalogue--handoff .pb-grid > .pb-product:nth-child(2) > .pb-product__inner { animation-delay: 235ms; }
-.pb-catalogue--handoff .pb-grid > .pb-product:nth-child(3) > .pb-product__inner { animation-delay: 290ms; }
-.pb-catalogue--handoff .pb-grid > .pb-product:nth-child(4) > .pb-product__inner { animation-delay: 345ms; }
-.pb-catalogue--handoff .pb-grid > .pb-product:nth-child(n + 5) > .pb-product__inner { animation-delay: 395ms; }
+.pb-catalogue--handoff .pb-grid > .pb-product:nth-child(1) > .pb-product__inner { animation-delay: 540ms; }
+.pb-catalogue--handoff .pb-grid > .pb-product:nth-child(2) > .pb-product__inner { animation-delay: 585ms; }
+.pb-catalogue--handoff .pb-grid > .pb-product:nth-child(3) > .pb-product__inner { animation-delay: 630ms; }
+.pb-catalogue--handoff .pb-grid > .pb-product:nth-child(4) > .pb-product__inner { animation-delay: 675ms; }
+.pb-catalogue--handoff .pb-grid > .pb-product:nth-child(n + 5) > .pb-product__inner { animation-delay: 710ms; }
 
 /* Going back to the gate is the same movement in reverse, and just as short. */
 .pb-catalogue.is-leaving {
@@ -1609,6 +1699,54 @@
 
 .pb-dialog .pb-clear {
   margin-top: var(--pb-4);
+}
+
+/* ── phone ─────────────────────────────────────────────────────────────────
+   Almost every guest meets this surface on a phone, from a QR code, standing
+   in a hallway. Everything below is for that screen alone: the desktop
+   composition above is untouched.
+   ────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 39.999rem) {
+  /* The question owns one screen. The gate fills what the header leaves and
+     centres itself in it, and the closing mark stands down until there is a
+     catalogue to close — so the first thing a guest sees is a composed screen
+     rather than a short block with a footer pressed under it.
+
+     Sized against dvh so it settles correctly when the browser's address bar
+     collapses, and the reserve covers the header plus the page's own tail, so
+     this screen never scrolls: a screen that jiggles under the thumb is the
+     opposite of expensive. */
+  .pb-main--gate {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pb-main--gate .pb-gate {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(100dvh - 20.5rem);
+    padding-block: var(--pb-8);
+  }
+
+  .pb-main--gate .pb-close {
+    display: none;
+  }
+
+  /* Cards deserve the thumb, not the fingertip. */
+  .pb-gate__option {
+    min-height: 6rem;
+  }
+
+  /* The Guest Experience is always below the fold, and laying it out is part of
+     what the handoff has to pay for. Deferring it until it is scrolled near
+     takes that cost out of the animated frames; the reveal still works, because
+     it is driven by its own IntersectionObserver. */
+  .pb-guest {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 40rem;
+  }
 }
 
 /* ── reduced motion ────────────────────────────────────────────────────────── */

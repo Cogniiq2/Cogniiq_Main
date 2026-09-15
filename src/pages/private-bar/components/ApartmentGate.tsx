@@ -19,10 +19,15 @@ import { strings } from '../../../private-bar/strings';
  */
 export function ApartmentGate({
   onSelect,
+  onIntent,
   committing = null,
   quick = false,
 }: {
   onSelect: (apartment: ApartmentKey) => void;
+  /** Called the moment a finger lands, before the tap completes: the guest has
+   *  shown which apartment they mean, which is the earliest honest signal to
+   *  start preparing it. Presentation only — it changes nothing. */
+  onIntent?: (apartment: ApartmentKey) => void;
   committing?: ApartmentKey | null;
   /** Returning to the gate rather than opening the page: there is no overture
    *  left to wait for, so the entrance plays at once. */
@@ -52,6 +57,7 @@ export function ApartmentGate({
                     : 'pb-gate__option'
                 }
                 onClick={() => onSelect(apartment.key)}
+                onPointerDown={() => onIntent?.(apartment.key)}
                 // The decision is already made; a second tap must not read as a
                 // new one, and assistive tech should hear that it is settled.
                 aria-disabled={committing !== null || undefined}
