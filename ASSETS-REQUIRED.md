@@ -235,15 +235,13 @@ verneinen.
 | M21 Praxisteam | ✅ | ✅ | — |
 | M22 Referenz | ❌ (bewusst) | — | A3 |
 
-## E · Flaschenfotos designAparts I (BoLaGio Private Bar)
+## E · Flaschenfotos designAparts I (BoLaGio Private Bar) — ERLEDIGT
 
 | | |
 |---|---|
-| Was | Fünf Produktfotos (Packshots) der fünf Weine, die in **designAparts I** stehen |
-| Schaltet frei | Die fünf Produktkarten auf `/private-bar` zeigen bis dahin den vorhandenen ehrlichen Zustand „Foto folgt" — es wird **kein** generisches Flaschenbild, kein KI-Etikett und kein Fremdprodukt eingesetzt |
-| Warum offen | Die Assets konnten in der Entwicklungsumgebung nicht beschafft werden: sie hat keinen ausgehenden Netzzugang außer zu den Paket-Registries, kann also keine Hersteller- oder Händlerbilder laden |
-| Spezifikation | Wie die neun bestehenden Fotos: freigestellte Flasche auf hellem Grund, WebP, zwei Breiten (240 px und 480 px), Seitenverhältnis wie bisher (Breite 240 px, Höhe je nach Flasche ~720–890 px) · Ablage `public/private-bar/products/` |
-| Dateinamen | `planeta-plumbago-nero-davola-2021-{240,480}.webp` · `ottella-rosesroses-{240,480}.webp` · `cavalchina-custoza-2025-{240,480}.webp` · `nunzio-ghiraldi-il-gruccione-{240,480}.webp` · `manz-grauburgunder-fruchtecke-{240,480}.webp` |
-| Quelle | 1. offizielles Bild des Weinguts, 2. sauberer Händler-Packshot. Nie: Wasserzeichen, falscher Jahrgang, anderes Produkt desselben Weinguts, generierte Etiketten |
-| Einbau | `src/private-bar/catalog.ts` → beim jeweiligen Produkt `image: null` ersetzen durch `{ basePath: '/private-bar/products/<id>', width: 240, height: <echte Höhe der 240-px-Datei>, widths: [240, 480] }` |
+| Stand | Geliefert und eingebaut. Die fünf Flaschen von designAparts I zeigen echte Produktfotografie; `Foto folgt` erscheint auf `/private-bar` nicht mehr. |
+| Quelle | Eigene 4K-Packshots des Eigentümers |
+| Verarbeitung | Studio-Hintergrund freigestellt (randverbundener Schwellenwert-Fill, damit Etiketten unberührt bleiben), auf die Flasche zugeschnitten, WebP in 240 px und 480 px — dieselbe Aufbereitung wie die neun bestehenden Fotos |
+| Ablage | `public/private-bar/products/` |
+| Abgesichert durch | `src/private-bar/productAssets.test.ts` (Datei vorhanden, nicht leer, deklarierte Maße stimmen mit dem WebP-Header überein) |
 

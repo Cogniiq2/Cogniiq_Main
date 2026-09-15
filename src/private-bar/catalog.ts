@@ -219,6 +219,12 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
   // owner's FINAL gross guest-facing amounts and are not derived, marked up or
   // taxed anywhere downstream. Origin, vintage, appellation detail and tasting
   // notes stay null: only what the owner established is stated.
+  //
+  // Photography is the owner's own 4K packshots, cut out of their studio
+  // background and trimmed to the bottle exactly like the nine designAparts II
+  // assets — the frame supplies the ivory ground and scales every bottle to the
+  // same height, so the trim is what keeps the scale consistent. No label was
+  // redrawn, and `height` is the real pixel height of the 240 px file.
   {
     id: 'planeta-plumbago-nero-davola-2021',
     name: "Planeta Plumbago Nero d'Avola Menfi DOC 2021",
@@ -227,7 +233,12 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     origin: null,
     volume: '0,75 l',
     priceCents: 1800,
-    image: null,
+    image: {
+      basePath: '/private-bar/products/planeta-plumbago-nero-davola-2021',
+      width: 240,
+      height: 866,
+      widths: [240, 480],
+    },
     available: true,
     sortOrder: 110,
   },
@@ -239,7 +250,12 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     origin: null,
     volume: '0,75 l',
     priceCents: 1700,
-    image: null,
+    image: {
+      basePath: '/private-bar/products/ottella-rosesroses',
+      width: 240,
+      height: 872,
+      widths: [240, 480],
+    },
     available: true,
     sortOrder: 120,
   },
@@ -251,7 +267,12 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     origin: null,
     volume: '0,75 l',
     priceCents: 1400,
-    image: null,
+    image: {
+      basePath: '/private-bar/products/cavalchina-custoza-2025',
+      width: 240,
+      height: 1020,
+      widths: [240, 480],
+    },
     available: true,
     sortOrder: 130,
   },
@@ -263,7 +284,12 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     origin: null,
     volume: '0,75 l',
     priceCents: 1900,
-    image: null,
+    image: {
+      basePath: '/private-bar/products/nunzio-ghiraldi-il-gruccione',
+      width: 240,
+      height: 880,
+      widths: [240, 480],
+    },
     available: true,
     sortOrder: 140,
   },
@@ -281,7 +307,12 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     origin: null,
     volume: '0,75 l',
     priceCents: 1400,
-    image: null,
+    image: {
+      basePath: '/private-bar/products/manz-grauburgunder-fruchtecke',
+      width: 240,
+      height: 829,
+      widths: [240, 480],
+    },
     available: true,
     sortOrder: 150,
   },

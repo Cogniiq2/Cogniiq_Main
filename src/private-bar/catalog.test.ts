@@ -82,6 +82,22 @@ describe('Private Bar catalogue', () => {
     }
   });
 
+  it('ships prepared photography for every product, and honest metadata with it', () => {
+    // No product is left on the "Foto folgt" state, and every image declares a
+    // real intrinsic size — that is what reserves the layout before the file
+    // arrives and keeps cumulative layout shift at zero.
+    for (const product of PRIVATE_BAR_CATALOG) {
+      const image = product.image;
+      expect(image, `${product.id} has no photograph`).not.toBeNull();
+      if (!image) continue;
+      expect(image.basePath).toBe(`/private-bar/products/${product.id}`);
+      expect(image.widths).toEqual([240, 480]);
+      expect(image.width).toBe(240);
+      expect(Number.isInteger(image.height)).toBe(true);
+      expect(image.height).toBeGreaterThan(240);
+    }
+  });
+
   it('gives each apartment the catalogue the owner stocked', () => {
     expect(productsForApartment('designaparts1')).toHaveLength(6);
     expect(productsForApartment('designaparts2')).toHaveLength(9);
