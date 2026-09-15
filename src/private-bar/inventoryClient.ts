@@ -9,7 +9,7 @@
 // response body and no exception text ever travels further into the interface,
 // which is what keeps the guest-facing copy free of technical language.
 // ─────────────────────────────────────────────────────────────────────────────
-import { PRIVATE_BAR_APARTMENT_ID } from './config';
+import type { ApartmentKey } from './apartments';
 import type { CartLine } from './cart';
 
 export type Stock = Readonly<Record<string, number>>;
@@ -68,8 +68,11 @@ function parseStock(value: unknown): Stock {
   return stock;
 }
 
-export async function fetchInventory(): Promise<InventoryResult> {
-  const body = await requestJson('/api/private-bar/inventory');
+export async function fetchInventory(apartment: ApartmentKey): Promise<InventoryResult> {
+  // The public key only. The canonical internal id is never in the browser.
+  const body = await requestJson(
+    `/api/private-bar/inventory?apartment=${encodeURIComponent(apartment)}`
+  );
   if (!body || typeof body !== 'object' || '__httpError' in body) return { ok: false };
   return { ok: true, stock: parseStock((body as { stock?: unknown }).stock) };
 }
@@ -94,11 +97,12 @@ export function newClientOrderId(): string {
 /**
  * Confirms a selection.
  *
- * Only product ids and quantities are sent: prices and the total are derived on
- * the server. `clientOrderId` is the idempotency key — retrying with the same id
+ * Only the apartment key, product ids and quantities are sent: prices and the
+ * total are derived on the server. `clientOrderId` is the idempotency key — retrying with the same id
  * returns the same order and never decrements stock a second time.
  */
 export async function confirmOrder(
+  apartment: ApartmentKey,
   clientOrderId: string,
   lines: readonly CartLine[]
 ): Promise<ConfirmResult> {
@@ -106,7 +110,7 @@ export async function confirmOrder(
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      apartmentId: PRIVATE_BAR_APARTMENT_ID,
+      apartment,
       clientOrderId,
       items: lines.map((line) => ({ productId: line.productId, quantity: line.quantity })),
     }),

@@ -45,20 +45,32 @@ const { AppInner, AppShell } = await import('@/App');
 beforeEach(() => {
   vi.stubGlobal(
     'fetch',
-    vi.fn(async () => new Response(JSON.stringify({ apartmentId: 'test', stock: {} }), { status: 200 }))
+    vi.fn(async () => new Response(JSON.stringify({ apartment: 'designaparts2', stock: {} }), { status: 200 }))
   );
+  window.sessionStorage.clear();
+  window.localStorage.clear();
+  // The apartment is the first thing the page establishes. These tests are
+  // about the catalogue behind the gate, so it is answered up front; the gate
+  // itself has its own case below.
+  window.sessionStorage.setItem('bolagio:private-bar:apartment:v1', APARTMENT);
 });
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  window.sessionStorage.clear();
 });
 const { isPrivateBarSurface, PRIVATE_ROBOTS, DEFAULT_ROBOTS } = await import(
   '@/lib/routing/indexability'
 );
 const { isKnownPublicRoute } = await import('@/lib/routing/publicRoutePaths');
 const { PUBLIC_ROUTES } = await import('@/lib/routing/publicRoutes');
-const { PRIVATE_BAR_CATALOG } = await import('@/private-bar/catalog');
+const { productsForApartment } = await import('@/private-bar/catalog');
 const { strings } = await import('@/private-bar/strings');
+const { APARTMENTS } = await import('@/private-bar/apartments');
+
+/** These assertions are about the legacy nine-product catalogue. */
+const APARTMENT = 'designaparts2';
+const CATALOGUE = productsForApartment(APARTMENT);
 
 // One route by design: this version hands payment to PayPal and never learns the
 // outcome, so there is no provider return to receive and no surface that could
@@ -74,12 +86,34 @@ function renderAt(path: string) {
 }
 
 describe('Private Bar routes', () => {
+  it('asks which apartment first, and shows no product before the answer', async () => {
+    window.sessionStorage.clear();
+    renderAt('/private-bar');
+    expect(await screen.findByText(strings.apartment.heading)).toBeInTheDocument();
+
+    // No catalogue flash: not one product, price or add control exists yet.
+    for (const product of CATALOGUE) expect(screen.queryByText(product.name)).toBeNull();
+    for (const product of productsForApartment('designaparts1')) {
+      expect(screen.queryByText(product.name)).toBeNull();
+    }
+    expect(screen.queryByText(/€/)).toBeNull();
+    expect(screen.queryByRole('button', { name: /hinzufügen/i })).toBeNull();
+
+    // Both apartments are offered, by label — never by their internal id.
+    for (const apartment of Object.values(APARTMENTS)) {
+      expect(
+        screen.getByRole('button', { name: strings.apartment.chooseAria(apartment.label) })
+      ).toBeInTheDocument();
+      expect(document.body.textContent).not.toContain(apartment.apartmentId);
+    }
+  });
+
   it('renders the catalogue, not the 404 page', async () => {
     renderAt('/private-bar');
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(
       strings.brand.wordmark
     );
-    for (const product of PRIVATE_BAR_CATALOG) {
+    for (const product of CATALOGUE) {
       expect(await screen.findByText(product.name)).toBeInTheDocument();
     }
   });
@@ -155,19 +189,19 @@ describe('Private Bar routes', () => {
   it('prices every product from the catalogue and from nowhere else', async () => {
     renderAt('/private-bar');
     await screen.findByRole('heading', { level: 1 });
-    for (const product of PRIVATE_BAR_CATALOG) {
+    for (const product of CATALOGUE) {
       expect(product.priceCents, `${product.id} has no price`).toBeGreaterThan(0);
     }
     // Every price on the page is a formatted euro amount, never a placeholder.
     expect(screen.queryByText(strings.catalogue.priceUnconfigured)).toBeNull();
-    expect(screen.getAllByText(/€/).length).toBeGreaterThanOrEqual(PRIVATE_BAR_CATALOG.length);
+    expect(screen.getAllByText(/€/).length).toBeGreaterThanOrEqual(CATALOGUE.length);
   });
 
   it('offers nothing while stock is unknown — availability fails closed', async () => {
     renderAt('/private-bar');
     await screen.findByRole('heading', { level: 1 });
     await waitFor(() =>
-      expect(screen.getAllByText(strings.catalogue.unavailable).length).toBe(PRIVATE_BAR_CATALOG.length)
+      expect(screen.getAllByText(strings.catalogue.unavailable).length).toBe(CATALOGUE.length)
     );
     expect(screen.queryByRole('button', { name: /hinzufügen/i })).toBeNull();
   });

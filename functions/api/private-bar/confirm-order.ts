@@ -9,11 +9,13 @@
 // writes carries status 'awaiting_payment' precisely because this architecture
 // cannot verify a payment.
 //
-// Trust boundary, stated plainly: the request body may name product ids and
-// quantities. Every price and the total are derived here, from
-// src/private-bar/catalog.ts. A body carrying its own total is not honoured.
+// Trust boundary, stated plainly: the request body may name an apartment KEY,
+// product ids and quantities. The key is resolved against the allow-list in
+// src/private-bar/apartments.ts (a raw apartment_id is never accepted), every
+// product must belong to that apartment, and every price and the total are
+// derived here from src/private-bar/catalog.ts. A body carrying its own total is
+// not honoured.
 // ─────────────────────────────────────────────────────────────────────────────
-import { PRIVATE_BAR_APARTMENT_ID } from '../../../src/private-bar/config';
 import { buildTrustedOrder } from '../../../src/private-bar/order';
 
 import {
@@ -44,7 +46,9 @@ export async function onRequest(context: PrivateBarContext): Promise<Response> {
     return json({ error: 'malformed_request' }, 400);
   }
 
-  const built = buildTrustedOrder(body, PRIVATE_BAR_APARTMENT_ID);
+  // Resolves the apartment key against the allow-list, verifies every product is
+  // one THIS apartment sells, and prices the order from the trusted catalogue.
+  const built = buildTrustedOrder(body);
   if (!built.ok) return json({ error: built.reason }, 400);
   const { order } = built;
 

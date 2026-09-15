@@ -12,6 +12,7 @@
 // validate is dropped rather than repaired — a wrong quantity is worse than a
 // forgotten one.
 // ─────────────────────────────────────────────────────────────────────────────
+import { productBelongsToApartment, type ApartmentKey } from './apartments';
 import { productById } from './catalog';
 import { MAX_DISTINCT_LINES, MAX_QUANTITY_PER_PRODUCT, isPurchasable, isValidQuantity } from './pricing';
 
@@ -25,8 +26,12 @@ export type Cart = readonly CartLine[];
 export const EMPTY_CART: Cart = [];
 
 /** Version is part of the key: a schema change starts from an empty selection
- *  instead of trying to migrate a shopping list that is worth nothing. */
-export const CART_STORAGE_KEY = 'bolagio:private-bar:cart:v1';
+ *  instead of trying to migrate a shopping list that is worth nothing. The
+ *  apartment is part of it too, so a selection made in one apartment can never
+ *  be read back into the other — a mixed cart is not possible by construction. */
+export function cartStorageKey(apartment: ApartmentKey): string {
+  return `bolagio:private-bar:cart:v2:${apartment}`;
+}
 
 /** Minimal surface of `localStorage`, so tests need no DOM. */
 export interface CartStorage {
@@ -35,9 +40,13 @@ export interface CartStorage {
   removeItem(key: string): void;
 }
 
-function isOrderable(productId: string): boolean {
+function isOrderable(productId: string, apartment: ApartmentKey): boolean {
   const product = productById(productId);
-  return product !== undefined && isPurchasable(product);
+  return (
+    product !== undefined &&
+    productBelongsToApartment(product.id, apartment) &&
+    isPurchasable(product)
+  );
 }
 
 /**
@@ -50,11 +59,12 @@ function isOrderable(productId: string): boolean {
  */
 export function setQuantity(
   cart: Cart,
+  apartment: ApartmentKey,
   productId: string,
   quantity: number,
   limit?: number
 ): Cart {
-  if (!isOrderable(productId)) return cart;
+  if (!isOrderable(productId, apartment)) return cart;
 
   const ceiling =
     typeof limit === 'number' ? Math.min(MAX_QUANTITY_PER_PRODUCT, Math.max(0, Math.trunc(limit))) : MAX_QUANTITY_PER_PRODUCT;
@@ -76,12 +86,17 @@ export function quantityOf(cart: Cart, productId: string): number {
   return cart.find((line) => line.productId === productId)?.quantity ?? 0;
 }
 
-export function increment(cart: Cart, productId: string, limit?: number): Cart {
-  return setQuantity(cart, productId, quantityOf(cart, productId) + 1, limit);
+export function increment(
+  cart: Cart,
+  apartment: ApartmentKey,
+  productId: string,
+  limit?: number
+): Cart {
+  return setQuantity(cart, apartment, productId, quantityOf(cart, productId) + 1, limit);
 }
 
-export function decrement(cart: Cart, productId: string): Cart {
-  return setQuantity(cart, productId, quantityOf(cart, productId) - 1);
+export function decrement(cart: Cart, apartment: ApartmentKey, productId: string): Cart {
+  return setQuantity(cart, apartment, productId, quantityOf(cart, productId) - 1);
 }
 
 /**
@@ -126,7 +141,7 @@ export function remove(cart: Cart, productId: string): Cart {
  * Exported for the storage reader and for tests; it is the only place where
  * untrusted data becomes a Cart.
  */
-export function parseCart(value: unknown): Cart {
+export function parseCart(value: unknown, apartment: ApartmentKey): Cart {
   if (!Array.isArray(value)) return EMPTY_CART;
 
   const seen = new Set<string>();
@@ -136,7 +151,7 @@ export function parseCart(value: unknown): Cart {
     if (typeof entry !== 'object' || entry === null) continue;
     const { productId, quantity } = entry as { productId?: unknown; quantity?: unknown };
     if (typeof productId !== 'string' || typeof quantity !== 'number') continue;
-    if (seen.has(productId) || !isOrderable(productId) || !isValidQuantity(quantity)) continue;
+    if (seen.has(productId) || !isOrderable(productId, apartment) || !isValidQuantity(quantity)) continue;
     if (lines.length >= MAX_DISTINCT_LINES) break;
     seen.add(productId);
     lines.push({ productId, quantity });
@@ -147,29 +162,36 @@ export function parseCart(value: unknown): Cart {
 
 /** Reads the persisted selection. Never throws: storage can be unavailable
  *  (private mode, blocked cookies) and that must not break the page. */
-export function readStoredCart(storage: CartStorage | null | undefined): Cart {
+export function readStoredCart(
+  storage: CartStorage | null | undefined,
+  apartment: ApartmentKey
+): Cart {
   if (!storage) return EMPTY_CART;
   let raw: string | null;
   try {
-    raw = storage.getItem(CART_STORAGE_KEY);
+    raw = storage.getItem(cartStorageKey(apartment));
   } catch {
     return EMPTY_CART;
   }
   if (!raw) return EMPTY_CART;
 
   try {
-    return parseCart(JSON.parse(raw));
+    return parseCart(JSON.parse(raw), apartment);
   } catch {
     return EMPTY_CART;
   }
 }
 
 /** Persists the selection, removing the entry entirely when it is empty. */
-export function writeStoredCart(storage: CartStorage | null | undefined, cart: Cart): void {
+export function writeStoredCart(
+  storage: CartStorage | null | undefined,
+  cart: Cart,
+  apartment: ApartmentKey
+): void {
   if (!storage) return;
   try {
-    if (cart.length === 0) storage.removeItem(CART_STORAGE_KEY);
-    else storage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+    if (cart.length === 0) storage.removeItem(cartStorageKey(apartment));
+    else storage.setItem(cartStorageKey(apartment), JSON.stringify(cart));
   } catch {
     // A full or blocked storage must never interrupt the guest.
   }

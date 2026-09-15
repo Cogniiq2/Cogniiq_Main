@@ -23,6 +23,21 @@ export const strings = {
     heading: 'Willkommen',
     body: 'In Ihrer Wohnung steht eine kleine, sorgfältig zusammengestellte Auswahl für Sie bereit. Bedienen Sie sich, wann immer Ihnen danach ist — und halten Sie hier in Ruhe fest, was Sie genossen haben.',
   },
+  apartment: {
+    /** The selection gate. Shown before any product, on every fresh session. */
+    heading: 'Welches Apartment haben Sie gebucht?',
+    body: 'Damit wir Ihnen die richtige Auswahl anzeigen.',
+    chooseAria: (label: string) => `${label} auswählen`,
+    /** The quiet context line inside the catalogue. */
+    change: 'Apartment ändern',
+    changeAria: (label: string) => `Gewähltes Apartment: ${label}. Apartment ändern`,
+    /** Switching with something already selected. */
+    switchTitle: 'Apartment wechseln?',
+    switchBody: (label: string) =>
+      `Ihre aktuelle Auswahl gilt für ${label} und wird beim Wechsel zurückgesetzt.`,
+    switchConfirm: 'Wechseln und Auswahl zurücksetzen',
+    switchCancel: 'Abbrechen',
+  },
   catalogue: {
     heading: 'Die Auswahl',
     priceUnconfigured: 'Preis folgt',

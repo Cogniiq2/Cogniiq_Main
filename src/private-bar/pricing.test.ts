@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import type { ApartmentKey } from './apartments';
 import type { PrivateBarProduct } from './catalog';
 import {
   MAX_DISTINCT_LINES,
@@ -11,6 +12,10 @@ import {
   priceLines,
   totalCents,
 } from './pricing';
+
+/** bayreuther-hell and the other eight legacy products live here. */
+const APT: ApartmentKey = 'designaparts2';
+const OTHER: ApartmentKey = 'designaparts1';
 
 const base: PrivateBarProduct = {
   id: 'x',
@@ -48,16 +53,16 @@ describe('isValidQuantity', () => {
 
 describe('priceLines', () => {
   it('rejects an empty selection', () => {
-    expect(priceLines([])).toEqual({ ok: false, reason: 'empty_selection' });
+    expect(priceLines([], APT)).toEqual({ ok: false, reason: 'empty_selection' });
   });
 
   it('rejects an unknown product rather than skipping it', () => {
-    const result = priceLines([{ productId: 'not-a-product', quantity: 1 }]);
+    const result = priceLines([{ productId: 'not-a-product', quantity: 1 }], APT);
     expect(result).toEqual({ ok: false, reason: 'unknown_product' });
   });
 
   it('prices a line from the catalogue', () => {
-    const result = priceLines([{ productId: 'bayreuther-hell', quantity: 2 }]);
+    const result = priceLines([{ productId: 'bayreuther-hell', quantity: 2 }], APT);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     const unit = result.lines[0].unitAmountCents;
@@ -65,17 +70,44 @@ describe('priceLines', () => {
     expect(result.lines[0].amountCents).toBe(unit * 2);
   });
 
+  it('rejects a product the selected apartment does not sell', () => {
+    // A real, priced, available product — from the OTHER apartment.
+    expect(priceLines([{ productId: 'bayreuther-hell', quantity: 1 }], OTHER)).toEqual({
+      ok: false,
+      reason: 'product_not_in_apartment',
+    });
+    expect(priceLines([{ productId: 'planeta-plumbago-nero-davola-2021', quantity: 1 }], APT)).toEqual({
+      ok: false,
+      reason: 'product_not_in_apartment',
+    });
+  });
+
+  it('prices designAparts I baskets through this same engine', () => {
+    // 2 × 18,00 € Planeta + 1 × 14,00 € Cavalchina = 50,00 €, derived here
+    // rather than written down: there is no second calculator.
+    const result = priceLines(
+      [
+        { productId: 'planeta-plumbago-nero-davola-2021', quantity: 2 },
+        { productId: 'cavalchina-custoza-2025', quantity: 1 },
+      ],
+      OTHER
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(totalCents(result.lines)).toBe(5000);
+  });
+
   it('rejects duplicate lines and oversized selections', () => {
     expect(priceLines([
       { productId: 'bayreuther-hell', quantity: 1 },
       { productId: 'bayreuther-hell', quantity: 1 },
-    ])).toEqual({ ok: false, reason: 'duplicate_line' });
+    ], APT)).toEqual({ ok: false, reason: 'duplicate_line' });
 
     const tooMany = Array.from({ length: MAX_DISTINCT_LINES + 1 }, (_, i) => ({
       productId: `p-${i}`,
       quantity: 1,
     }));
-    expect(priceLines(tooMany)).toEqual({ ok: false, reason: 'too_many_lines' });
+    expect(priceLines(tooMany, APT)).toEqual({ ok: false, reason: 'too_many_lines' });
   });
 });
 

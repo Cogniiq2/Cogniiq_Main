@@ -1328,6 +1328,178 @@
   }
 }
 
+/* ── apartment selection ───────────────────────────────────────────────────
+   The first step, and on a phone usually the only thing on screen: one
+   question and two targets. Same tokens, same type, same hairlines as the
+   catalogue — it reads as the bar's first page, not as a form in front of it.
+   ────────────────────────────────────────────────────────────────────────── */
+.pb-gate {
+  padding-block: var(--pb-12) var(--pb-16);
+  text-align: center;
+}
+
+.pb-gate__heading {
+  text-wrap: balance;
+}
+
+.pb-gate__body {
+  margin-top: var(--pb-4);
+  max-width: 34ch;
+  margin-inline: auto;
+}
+
+.pb-gate__options {
+  list-style: none;
+  margin: var(--pb-12) auto 0;
+  padding: 0;
+  display: grid;
+  gap: var(--pb-4);
+  max-width: 30rem;
+}
+
+.pb-gate__option {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pb-4);
+  width: 100%;
+  /* Comfortably beyond the 44px minimum: this is the one target a guest hits
+     with a phone in one hand, often standing. */
+  min-height: 5.5rem;
+  padding: var(--pb-6);
+  border: 1px solid var(--pb-hairline-strong);
+  border-radius: 3px;
+  background-color: var(--pb-surface);
+  color: var(--pb-ink);
+  font-family: var(--pb-sans);
+  text-align: left;
+  cursor: pointer;
+  transition: transform var(--pb-fast) var(--pb-ease),
+    border-color var(--pb-fast) var(--pb-ease),
+    box-shadow var(--pb-fast) var(--pb-ease);
+}
+
+.pb-gate__option-label {
+  font-family: var(--pb-display);
+  font-size: clamp(1.25rem, 5.5vw, 1.5rem);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.pb-gate__option-arrow {
+  color: var(--pb-champagne);
+  font-size: 1.125rem;
+  transition: transform var(--pb-base) var(--pb-ease-out);
+}
+
+@media (hover: hover) {
+  .pb-gate__option:hover {
+    border-color: var(--pb-champagne);
+    box-shadow: 0 10px 30px rgba(27, 25, 23, 0.07);
+    transform: translate3d(0, -2px, 0);
+  }
+
+  .pb-gate__option:hover .pb-gate__option-arrow {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+.pb-gate__option:active {
+  transform: scale(0.99);
+}
+
+/* ── apartment context ─────────────────────────────────────────────────────
+   Deliberately subordinate: the guest needs to be able to correct a wrong tap,
+   not to be reminded of a setting.
+   ────────────────────────────────────────────────────────────────────────── */
+.pb-apartment {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--pb-2);
+  margin: var(--pb-6) 0 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--pb-muted);
+}
+
+.pb-apartment__label {
+  color: var(--pb-ink-soft);
+}
+
+.pb-apartment__separator {
+  color: var(--pb-hairline-strong);
+}
+
+.pb-apartment__change {
+  appearance: none;
+  /* The text is small by design, so the tap target is grown with padding
+     rather than with type: 44px of height around a 12px label. */
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--pb-champagne);
+  font-family: var(--pb-sans);
+  font-size: inherit;
+  letter-spacing: inherit;
+  text-underline-offset: 3px;
+  text-decoration: underline;
+  text-decoration-color: var(--pb-champagne-soft);
+  cursor: pointer;
+  transition: text-decoration-color var(--pb-fast) var(--pb-ease);
+}
+
+.pb-apartment__change:hover {
+  text-decoration-color: var(--pb-champagne);
+}
+
+/* ── centred dialog (apartment switch) ─────────────────────────────────────
+   The review sheet rises from the bottom because it is a continuation of the
+   page. This one interrupts a deliberate action, so it sits centred and is
+   small enough to read in one glance.
+   ────────────────────────────────────────────────────────────────────────── */
+.pb-dialog {
+  position: fixed;
+  z-index: 41;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(26rem, calc(100vw - 2 * var(--pb-6)));
+  padding: var(--pb-8) var(--pb-6) var(--pb-6);
+  background-color: var(--pb-ivory);
+  border: 1px solid var(--pb-hairline);
+  border-radius: 6px;
+  box-shadow: 0 24px 60px rgba(27, 25, 23, 0.22);
+  animation: pb-fade-in var(--pb-base) var(--pb-ease-out) both;
+}
+
+.pb-dialog[data-state="closed"] {
+  animation: pb-fade-out var(--pb-fast) var(--pb-ease) both;
+}
+
+.pb-dialog__title {
+  margin: 0;
+  font-family: var(--pb-display);
+  font-size: 1.25rem;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--pb-ink);
+}
+
+.pb-dialog__body {
+  margin: var(--pb-3) 0 var(--pb-8);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--pb-ink-soft);
+  text-wrap: pretty;
+}
+
+.pb-dialog .pb-clear {
+  margin-top: var(--pb-4);
+}
+
 /* ── reduced motion ────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .pb-root *,

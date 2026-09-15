@@ -7,12 +7,18 @@
 // `import.meta.env`) so the Cloudflare Function imports it directly — verified:
 // `wrangler pages functions build` bundles it and inlines the catalogue.
 //
-// THE RULE THIS MODULE EXISTS TO ENFORCE: the browser sends product ids and
-// quantities. Nothing else from the request is ever used to compute money. A
+// THE RULE THIS MODULE EXISTS TO ENFORCE: the browser sends an apartment key,
+// product ids and quantities. Nothing else from the request is ever used to compute money. A
 // body carrying `unitAmountCents`, `total`, `price` or a product name is not
 // rejected for containing them — those fields are simply never read, so
 // {productId, quantity: 2, total: 100} buys nothing at a discount.
 // ─────────────────────────────────────────────────────────────────────────────
+import {
+  productBelongsToApartment,
+  resolveApartment,
+  type ApartmentConfig,
+  type ApartmentKey,
+} from './apartments';
 import { productById } from './catalog';
 import {
   CURRENCY,
@@ -31,6 +37,7 @@ export type OrderRejection =
   | 'too_many_lines'
   | 'duplicate_line'
   | 'unknown_product'
+  | 'product_not_in_apartment'
   | 'product_not_purchasable'
   | 'invalid_quantity';
 
@@ -43,6 +50,9 @@ export interface TrustedOrderItem {
 }
 
 export interface TrustedOrder {
+  /** The public key the browser named, after allow-list resolution. */
+  readonly apartment: ApartmentKey;
+  /** The canonical internal id. This is what reaches p_apartment_id. */
   readonly apartmentId: string;
   readonly clientOrderId: string;
   readonly items: readonly TrustedOrderItem[];
@@ -81,14 +91,19 @@ function readLines(value: unknown): CartLine[] | null {
 /**
  * Validates and prices an untrusted confirmation request.
  *
- * @param body           the parsed JSON request body, entirely untrusted
- * @param knownApartment the apartment this deployment serves
+ * The body names an apartment with its PUBLIC KEY ('designaparts1'). That key is
+ * resolved against the allow-list here — an unknown key, or a canonical internal
+ * id sent in its place, is rejected — and only the resolved config's
+ * `apartmentId` ever reaches the database.
+ *
+ * @param body the parsed JSON request body, entirely untrusted
  */
-export function buildTrustedOrder(body: unknown, knownApartment: string): OrderResult {
+export function buildTrustedOrder(body: unknown): OrderResult {
   if (typeof body !== 'object' || body === null) return { ok: false, reason: 'malformed_request' };
   const record = body as Record<string, unknown>;
 
-  if (record.apartmentId !== knownApartment) return { ok: false, reason: 'unknown_apartment' };
+  const apartment: ApartmentConfig | null = resolveApartment(record.apartment);
+  if (!apartment) return { ok: false, reason: 'unknown_apartment' };
   if (!isValidClientOrderId(record.clientOrderId)) return { ok: false, reason: 'invalid_order_id' };
 
   const lines = readLines(record.items);
@@ -103,6 +118,11 @@ export function buildTrustedOrder(body: unknown, knownApartment: string): OrderR
   for (const line of lines) {
     const product = productById(line.productId);
     if (!product) return { ok: false, reason: 'unknown_product' };
+    // Cross-apartment ordering stops HERE, on the server, not in the interface:
+    // selecting one apartment and posting the other's SKU buys nothing.
+    if (!productBelongsToApartment(product.id, apartment.key)) {
+      return { ok: false, reason: 'product_not_in_apartment' };
+    }
     if (!isPurchasable(product)) return { ok: false, reason: 'product_not_purchasable' };
     if (!isValidQuantity(line.quantity)) return { ok: false, reason: 'invalid_quantity' };
 
@@ -119,7 +139,8 @@ export function buildTrustedOrder(body: unknown, knownApartment: string): OrderR
   return {
     ok: true,
     order: {
-      apartmentId: knownApartment,
+      apartment: apartment.key,
+      apartmentId: apartment.apartmentId,
       clientOrderId: record.clientOrderId,
       items,
       totalCents: items.reduce((sum, item) => sum + item.amount_cents, 0),

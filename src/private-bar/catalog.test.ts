@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
+import { APARTMENTS, APARTMENT_KEYS, type ApartmentKey } from './apartments';
 import {
   CATEGORY_ORDER,
   PRIVATE_BAR_CATALOG,
   availableProducts,
   productById,
   productsByCategory,
+  productsForApartment,
 } from './catalog';
 import { isPurchasable } from './pricing';
+
+const APT: ApartmentKey = 'designaparts2';
 
 describe('Private Bar catalogue', () => {
   it('has unique ids and unique sort orders', () => {
@@ -48,14 +52,33 @@ describe('Private Bar catalogue', () => {
     expect(productById('not-a-product')).toBeUndefined();
   });
 
+  it('assigns every catalogue product to exactly one apartment', () => {
+    // A product assigned to neither would be invisible; one assigned to both
+    // would let either apartment sell a bottle only one of them holds.
+    for (const product of PRIVATE_BAR_CATALOG) {
+      const owners = APARTMENT_KEYS.filter((key) =>
+        APARTMENTS[key].productIds.includes(product.id)
+      );
+      expect(owners, `${product.id} is assigned to ${owners.length} apartments`).toHaveLength(1);
+    }
+  });
+
+  it('resolves every assigned product id to a real catalogue entry', () => {
+    for (const key of APARTMENT_KEYS) {
+      expect(productsForApartment(key).map((p) => p.id).sort()).toEqual(
+        [...APARTMENTS[key].productIds].sort()
+      );
+    }
+  });
+
   it('lists available products in sort order', () => {
-    const orders = availableProducts().map((p) => p.sortOrder);
+    const orders = availableProducts(APT).map((p) => p.sortOrder);
     expect([...orders].sort((a, b) => a - b)).toEqual(orders);
   });
 
   it('groups every available product exactly once, dropping empty sections', () => {
-    const grouped = productsByCategory().flatMap((group) => group.products);
-    expect(grouped.map((p) => p.id).sort()).toEqual(availableProducts().map((p) => p.id).sort());
-    for (const group of productsByCategory()) expect(group.products.length).toBeGreaterThan(0);
+    const grouped = productsByCategory(APT).flatMap((group) => group.products);
+    expect(grouped.map((p) => p.id).sort()).toEqual(availableProducts(APT).map((p) => p.id).sort());
+    for (const group of productsByCategory(APT)) expect(group.products.length).toBeGreaterThan(0);
   });
 });

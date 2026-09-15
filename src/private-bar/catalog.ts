@@ -19,6 +19,8 @@
 //     from a product name.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { APARTMENTS, type ApartmentKey } from './apartments';
+
 export type ProductCategory = 'sparkling' | 'wine' | 'beer' | 'water';
 
 export interface ProductImage {
@@ -211,6 +213,72 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     available: true,
     sortOrder: 90,
   },
+
+  // ── designAparts I ─────────────────────────────────────────────────────────
+  // The five bottles physically present in designAparts I. Prices are the
+  // owner's FINAL gross guest-facing amounts and are not derived, marked up or
+  // taxed anywhere downstream. Origin, vintage, appellation detail and tasting
+  // notes stay null: only what the owner established is stated.
+  {
+    id: 'planeta-plumbago-nero-davola-2021',
+    name: "Planeta Plumbago Nero d'Avola Menfi DOC 2021",
+    shortLabel: 'Planeta Plumbago 2021',
+    category: 'wine',
+    origin: null,
+    volume: '0,75 l',
+    priceCents: 1800,
+    image: null,
+    available: true,
+    sortOrder: 110,
+  },
+  {
+    id: 'ottella-rosesroses',
+    name: 'Ottella RosesRoses Rosato Alto Mincio IGT',
+    shortLabel: 'Ottella RosesRoses',
+    category: 'wine',
+    origin: null,
+    volume: '0,75 l',
+    priceCents: 1700,
+    image: null,
+    available: true,
+    sortOrder: 120,
+  },
+  {
+    id: 'cavalchina-custoza-2025',
+    name: 'Cavalchina Custoza DOC 2025',
+    shortLabel: 'Cavalchina Custoza 2025',
+    category: 'wine',
+    origin: null,
+    volume: '0,75 l',
+    priceCents: 1400,
+    image: null,
+    available: true,
+    sortOrder: 130,
+  },
+  {
+    id: 'nunzio-ghiraldi-il-gruccione',
+    name: 'Nunzio Ghiraldi Il Gruccione Lugana DOC',
+    shortLabel: 'Il Gruccione Lugana',
+    category: 'wine',
+    origin: null,
+    volume: '0,75 l',
+    priceCents: 1900,
+    image: null,
+    available: true,
+    sortOrder: 140,
+  },
+  {
+    id: 'manz-grauburgunder-fruchtecke',
+    name: 'Manz Grauburgunder – Edition 95 Jahre Fruchtecke',
+    shortLabel: 'Manz Grauburgunder',
+    category: 'wine',
+    origin: null,
+    volume: '0,75 l',
+    priceCents: 1400,
+    image: null,
+    available: true,
+    sortOrder: 150,
+  },
 ];
 
 /** Display order for the catalogue sections. */
@@ -220,19 +288,31 @@ export function productById(id: string): PrivateBarProduct | undefined {
   return PRIVATE_BAR_CATALOG.find((product) => product.id === id);
 }
 
-/** Catalogue in display order, physically available products only. */
-export function availableProducts(): readonly PrivateBarProduct[] {
-  return PRIVATE_BAR_CATALOG.filter((product) => product.available).sort(
-    (a, b) => a.sortOrder - b.sortOrder
-  );
+/**
+ * The products ONE apartment may sell, in display order.
+ *
+ * The catalogue is global — one product model, one price list, one card — and
+ * ./apartments.ts is what assigns products to an apartment. An id assigned to an
+ * apartment but missing from the catalogue is skipped rather than fabricated.
+ */
+export function productsForApartment(apartment: ApartmentKey): readonly PrivateBarProduct[] {
+  return APARTMENTS[apartment].productIds
+    .map((id) => productById(id))
+    .filter((product): product is PrivateBarProduct => product !== undefined)
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
+/** This apartment's catalogue in display order, physically available products only. */
+export function availableProducts(apartment: ApartmentKey): readonly PrivateBarProduct[] {
+  return productsForApartment(apartment).filter((product) => product.available);
 }
 
 /** Available products grouped into the sections the catalogue renders. */
-export function productsByCategory(): readonly {
+export function productsByCategory(apartment: ApartmentKey): readonly {
   readonly category: ProductCategory;
   readonly products: readonly PrivateBarProduct[];
 }[] {
-  const products = availableProducts();
+  const products = availableProducts(apartment);
   return CATEGORY_ORDER.map((category) => ({
     category,
     products: products.filter((product) => product.category === category),

@@ -5,8 +5,9 @@ set -euo pipefail
 #
 # Verifies the guarantees that only the database can actually make: an
 # all-or-nothing decrement, idempotency on client_order_id, stock that can never
-# go negative, fail-closed behaviour for products with no inventory row, and a
-# function/table surface that anon and authenticated cannot reach.
+# go negative, fail-closed behaviour for products with no inventory row, strict
+# isolation between the two apartments, and a function/table surface that anon
+# and authenticated cannot reach.
 #
 # Usage: DATABASE_URL=postgres://... bash supabase/tests/run_private_bar_inventory_smoke.sh
 
@@ -26,6 +27,10 @@ drop table if exists public.private_bar_inventory cascade;
 SQL
 
 run_psql -f "$ROOT_DIR/supabase/migrations/20260906120000_private_bar_inventory.sql"
+# The additive second-apartment migration. Applied twice on purpose: it must be
+# safe to replay, and must not reset a count that has since changed.
+run_psql -f "$ROOT_DIR/supabase/migrations/20260915120000_private_bar_designaparts1_inventory.sql"
+run_psql -f "$ROOT_DIR/supabase/migrations/20260915120000_private_bar_designaparts1_inventory.sql"
 
 run_psql <<'SQL'
 \set ON_ERROR_STOP on
@@ -50,7 +55,7 @@ begin
   if (v_result ->> 'status') <> 'awaiting_payment' then
     raise exception 'FAIL 1: unexpected status %', v_result;
   end if;
-  select stock into v_stock from private_bar_inventory where product_id = 'bayreuther-hell';
+  select stock into v_stock from private_bar_inventory where apartment_id = 'bolagio-apartment-1' and product_id = 'bayreuther-hell';
   if v_stock <> 1 then raise exception 'FAIL 1: stock is %, expected 1', v_stock; end if;
 
   -- 2 ─ the same client_order_id is the SAME order: no second decrement.
@@ -62,7 +67,7 @@ begin
   if (v_result ->> 'idempotent') <> 'true' then
     raise exception 'FAIL 2: replay was not reported as idempotent: %', v_result;
   end if;
-  select stock into v_stock from private_bar_inventory where product_id = 'bayreuther-hell';
+  select stock into v_stock from private_bar_inventory where apartment_id = 'bolagio-apartment-1' and product_id = 'bayreuther-hell';
   if v_stock <> 1 then raise exception 'FAIL 2: replay changed stock to %', v_stock; end if;
   select count(*) into v_orders from private_bar_orders;
   if v_orders <> 1 then raise exception 'FAIL 2: % orders exist, expected 1', v_orders; end if;
@@ -78,9 +83,9 @@ begin
   exception when others then
     if sqlerrm not like 'private_bar:out_of_stock%' then raise; end if;
   end;
-  select stock into v_stock from private_bar_inventory where product_id = 'bayreuther-hell';
+  select stock into v_stock from private_bar_inventory where apartment_id = 'bolagio-apartment-1' and product_id = 'bayreuther-hell';
   if v_stock <> 1 then raise exception 'FAIL 3: the available line was decremented anyway (stock %)', v_stock; end if;
-  select stock into v_stock from private_bar_inventory where product_id = 's-pellegrino';
+  select stock into v_stock from private_bar_inventory where apartment_id = 'bolagio-apartment-1' and product_id = 's-pellegrino';
   if v_stock <> 1 then raise exception 'FAIL 3: the unavailable line was decremented (stock %)', v_stock; end if;
   select count(*) into v_orders from private_bar_orders;
   if v_orders <> 1 then raise exception 'FAIL 3: a rejected order was still recorded'; end if;
@@ -103,7 +108,7 @@ begin
     '44444444-4444-4444-8444-444444444444',
     '[{"product_id":"bayreuther-hell","quantity":1}]'::jsonb,
     450, 'EUR');
-  select stock into v_stock from private_bar_inventory where product_id = 'bayreuther-hell';
+  select stock into v_stock from private_bar_inventory where apartment_id = 'bolagio-apartment-1' and product_id = 'bayreuther-hell';
   if v_stock <> 0 then raise exception 'FAIL 5: stock is %, expected 0', v_stock; end if;
   select count(*) into v_orders from private_bar_orders;
   if v_orders <> 2 then raise exception 'FAIL 5: % orders exist, expected 2', v_orders; end if;
@@ -126,10 +131,68 @@ end $$;
 -- 7 ─ the CHECK constraint is the last line of defence against a negative count.
 do $$
 begin
-  update private_bar_inventory set stock = -1 where product_id = 's-pellegrino';
+  update private_bar_inventory set stock = -1 where apartment_id = 'bolagio-apartment-1' and product_id = 's-pellegrino';
   raise exception 'FAIL 7: stock was allowed to go negative';
 exception when check_violation then
   raise notice 'private bar inventory: negative stock rejected by constraint';
+end $$;
+
+-- 9 ─ the two apartments are strictly isolated.
+do $$
+declare
+  v_result jsonb;
+  v_stock  integer;
+  v_before integer;
+begin
+  -- The additive migration seeded five bottles, and replaying it changed nothing.
+  select count(*) into v_stock from private_bar_inventory where apartment_id = 'bolagio-designaparts-1';
+  if v_stock <> 5 then raise exception 'FAIL 9: designAparts I has % rows, expected 5', v_stock; end if;
+  select sum(stock) into v_stock from private_bar_inventory where apartment_id = 'bolagio-designaparts-1';
+  if v_stock <> 5 then raise exception 'FAIL 9: designAparts I stock totals %, expected 5', v_stock; end if;
+
+  -- An order in one apartment decrements ONLY that apartment.
+  select sum(stock) into v_before from private_bar_inventory where apartment_id = 'bolagio-apartment-1';
+  v_result := private_bar_confirm_order(
+    'bolagio-designaparts-1',
+    '66666666-6666-4666-8666-666666666666',
+    '[{"product_id":"planeta-plumbago-nero-davola-2021","quantity":1}]'::jsonb,
+    1800, 'EUR');
+  if (v_result ->> 'status') <> 'awaiting_payment' then
+    raise exception 'FAIL 9: designAparts I order was not accepted: %', v_result;
+  end if;
+
+  select stock into v_stock from private_bar_inventory
+   where apartment_id = 'bolagio-designaparts-1' and product_id = 'planeta-plumbago-nero-davola-2021';
+  if v_stock <> 0 then raise exception 'FAIL 9: designAparts I stock is %, expected 0', v_stock; end if;
+
+  select sum(stock) into v_stock from private_bar_inventory where apartment_id = 'bolagio-apartment-1';
+  if v_stock <> v_before then
+    raise exception 'FAIL 9: designAparts II stock moved from % to %', v_before, v_stock;
+  end if;
+
+  -- The order records the canonical internal id, so the two are distinguishable.
+  if not exists (
+    select 1 from private_bar_orders
+     where client_order_id = '66666666-6666-4666-8666-666666666666'
+       and apartment_id = 'bolagio-designaparts-1'
+  ) then
+    raise exception 'FAIL 9: the order did not record the designAparts I apartment id';
+  end if;
+
+  -- A product the OTHER apartment stocks has no row here: fail closed, even
+  -- though the exact same product_id is available next door.
+  begin
+    v_result := private_bar_confirm_order(
+      'bolagio-designaparts-1',
+      '77777777-7777-4777-8777-777777777777',
+      '[{"product_id":"s-pellegrino","quantity":1}]'::jsonb,
+      450, 'EUR');
+    raise exception 'FAIL 9: a designAparts II product was sold as designAparts I';
+  exception when others then
+    if sqlerrm not like 'private_bar:out_of_stock%' then raise; end if;
+  end;
+
+  raise notice 'private bar inventory: the two apartments are isolated';
 end $$;
 
 -- 8 ─ the guest-facing roles reach none of it.

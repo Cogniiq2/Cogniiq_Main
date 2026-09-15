@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import type { ApartmentKey } from './apartments';
+
 import {
   EMPTY_CART,
   decrement,
@@ -21,10 +23,14 @@ import {
 } from './inventoryClient';
 import { MAX_QUANTITY_PER_PRODUCT, priceLines, totalCents, type PricedLine } from './pricing';
 
-const CONFIRMED_ORDER_KEY = 'bolagio:private-bar:order:v1';
+// Both keys are namespaced by apartment, like the cart: an order confirmed in
+// one apartment is that apartment's business, and switching must never surface
+// it — or its idempotency key — in the other.
+const confirmedOrderKey = (apartment: ApartmentKey) => `bolagio:private-bar:order:v2:${apartment}`;
 /** Written BEFORE the request so a refresh mid-confirmation reuses the same
  *  idempotency key instead of creating a second order. */
-const PENDING_ORDER_ID_KEY = 'bolagio:private-bar:pending-order:v1';
+const pendingOrderIdKey = (apartment: ApartmentKey) =>
+  `bolagio:private-bar:pending-order:v2:${apartment}`;
 
 function storage(): Storage | null {
   try {
@@ -114,7 +120,7 @@ export interface PrivateBarController {
  * during render would both break the build and hand React a different tree than
  * the one it hydrates.
  */
-export function usePrivateBar(): PrivateBarController {
+export function usePrivateBar(apartment: ApartmentKey | null): PrivateBarController {
   const [cart, setCart] = useState<Cart>(EMPTY_CART);
   const [ready, setReady] = useState(false);
   const [stock, setStock] = useState<Stock>({});
@@ -125,24 +131,36 @@ export function usePrivateBar(): PrivateBarController {
   const [inventoryNonce, setInventoryNonce] = useState(0);
   const inFlight = useRef(false);
 
-  // Restore what the guest had.
+  // Restore what the guest had IN THIS APARTMENT. Re-runs on a switch, which is
+  // what makes the two selections independent rather than merely filtered.
   useEffect(() => {
-    setCart(readStoredCart(storage()));
-    setConfirmedOrder(readJson(CONFIRMED_ORDER_KEY, parseConfirmedOrder));
+    setReady(false);
+    if (!apartment) {
+      setCart(EMPTY_CART);
+      setConfirmedOrder(null);
+      setStock({});
+      setInventoryStatus('loading');
+      setConfirmStatus('idle');
+      return;
+    }
+    setCart(readStoredCart(storage(), apartment));
+    setConfirmedOrder(readJson(confirmedOrderKey(apartment), parseConfirmedOrder));
+    setConfirmStatus('idle');
     setReady(true);
-  }, []);
+  }, [apartment]);
 
   useEffect(() => {
-    if (!ready) return; // never overwrite storage with the pre-load empty state
-    writeStoredCart(storage(), cart);
-  }, [cart, ready]);
+    if (!ready || !apartment) return; // never overwrite storage with the pre-load empty state
+    writeStoredCart(storage(), cart, apartment);
+  }, [cart, ready, apartment]);
 
   // Live inventory, and the reconciliation it implies.
   useEffect(() => {
+    if (!apartment) return;
     let cancelled = false;
     setInventoryStatus((current) => (current === 'ready' ? current : 'loading'));
 
-    fetchInventory().then((result) => {
+    fetchInventory(apartment).then((result) => {
       if (cancelled) return;
       if (!result.ok) {
         setInventoryStatus('error');
@@ -160,7 +178,7 @@ export function usePrivateBar(): PrivateBarController {
     return () => {
       cancelled = true;
     };
-  }, [inventoryNonce]);
+  }, [inventoryNonce, apartment]);
 
   const availableFor = useCallback(
     (productId: string) => {
@@ -173,30 +191,31 @@ export function usePrivateBar(): PrivateBarController {
   );
 
   const priced = useMemo(() => {
-    const result = priceLines(cart);
+    if (!apartment) return [];
+    const result = priceLines(cart, apartment);
     return result.ok ? result.lines : [];
-  }, [cart]);
+  }, [cart, apartment]);
 
   const confirm = useCallback(async () => {
-    if (inFlight.current || cart.length === 0) return;
+    if (inFlight.current || cart.length === 0 || !apartment) return;
     inFlight.current = true;
     setConfirmStatus('pending');
 
     // The idempotency key is minted once and persisted before the request. A
     // retry — a second tap, a refresh, a flaky connection — reuses it, and the
     // database answers with the existing order instead of decrementing twice.
-    const existingPending = readJson<string>(PENDING_ORDER_ID_KEY, (value) =>
+    const existingPending = readJson<string>(pendingOrderIdKey(apartment), (value) =>
       typeof value === 'string' ? value : null
     );
     const clientOrderId = existingPending ?? newClientOrderId();
-    writeJson(PENDING_ORDER_ID_KEY, clientOrderId);
+    writeJson(pendingOrderIdKey(apartment), clientOrderId);
 
-    const result = await confirmOrder(clientOrderId, cart);
+    const result = await confirmOrder(apartment, clientOrderId, cart);
     inFlight.current = false;
 
     if (result.ok) {
-      writeJson(PENDING_ORDER_ID_KEY, null);
-      writeJson(CONFIRMED_ORDER_KEY, result.order);
+      writeJson(pendingOrderIdKey(apartment), null);
+      writeJson(confirmedOrderKey(apartment), result.order);
       setConfirmedOrder(result.order);
       setStock(result.stock);
       setCart(EMPTY_CART);
@@ -207,7 +226,7 @@ export function usePrivateBar(): PrivateBarController {
     if (result.reason === 'out_of_stock') {
       // A refused confirmation decremented nothing. Bring the selection back in
       // line with reality and let the guest decide again.
-      writeJson(PENDING_ORDER_ID_KEY, null);
+      writeJson(pendingOrderIdKey(apartment), null);
       setStock(result.stock);
       setCart((current) => reconcileCart(current, result.stock).cart);
       setConfirmStatus('stock_changed');
@@ -216,14 +235,15 @@ export function usePrivateBar(): PrivateBarController {
 
     // A failed attempt keeps its key: retrying must not create a second order.
     setConfirmStatus('failed');
-  }, [cart]);
+  }, [cart, apartment]);
 
   const startNewSelection = useCallback(() => {
-    writeJson(CONFIRMED_ORDER_KEY, null);
+    if (!apartment) return;
+    writeJson(confirmedOrderKey(apartment), null);
     setConfirmedOrder(null);
     setConfirmStatus('idle');
     setInventoryNonce((n) => n + 1);
-  }, []);
+  }, [apartment]);
 
   return {
     stock,
@@ -239,17 +259,28 @@ export function usePrivateBar(): PrivateBarController {
     quantityOf: useCallback((productId: string) => quantityOf(cart, productId), [cart]),
     add: useCallback(
       (productId: string) => {
+        if (!apartment) return;
         setConfirmStatus('idle');
-        setCart((current) => increment(current, productId, availableFor(productId)));
+        setCart((current) => increment(current, apartment, productId, availableFor(productId)));
       },
-      [availableFor]
+      [availableFor, apartment]
     ),
-    subtract: useCallback((productId: string) => {
-      setConfirmStatus('idle');
-      setCart((current) => decrement(current, productId));
-    }, []),
+    subtract: useCallback(
+      (productId: string) => {
+        if (!apartment) return;
+        setConfirmStatus('idle');
+        setCart((current) => decrement(current, apartment, productId));
+      },
+      [apartment]
+    ),
     removeLine: useCallback((productId: string) => setCart((current) => remove(current, productId)), []),
-    clear: useCallback(() => setCart(EMPTY_CART), []),
+    clear: useCallback(() => {
+      // Persisted immediately rather than left to the write effect: clearing is
+      // also what an apartment switch does, and that unmounts this apartment's
+      // state in the same tick — the effect would never get to run.
+      if (apartment) writeStoredCart(storage(), EMPTY_CART, apartment);
+      setCart(EMPTY_CART);
+    }, [apartment]),
     reconciled,
     acknowledgeReconciliation: useCallback(() => setReconciled(false), []),
 

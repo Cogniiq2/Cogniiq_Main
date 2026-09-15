@@ -8,6 +8,7 @@
 //
 // All amounts are integer euro cents. Floating point never touches money.
 // ─────────────────────────────────────────────────────────────────────────────
+import { productBelongsToApartment, type ApartmentKey } from './apartments';
 import { productById, type PrivateBarProduct } from './catalog';
 
 export const CURRENCY = 'EUR' as const;
@@ -48,12 +49,14 @@ export function isValidQuantity(quantity: number): boolean {
  * Resolves cart lines against the catalogue.
  *
  * Anything that cannot be priced with certainty is REJECTED rather than
- * silently dropped or defaulted: an unknown id, an unavailable product, a
- * product without a configured price, a quantity outside the bounds, a
- * duplicated product id, or more distinct lines than allowed.
+ * silently dropped or defaulted: an unknown id, a product the selected
+ * apartment does not sell, an unavailable product, a product without a
+ * configured price, a quantity outside the bounds, a duplicated product id, or
+ * more distinct lines than allowed.
  */
 export function priceLines(
-  lines: readonly CartLine[]
+  lines: readonly CartLine[],
+  apartment: ApartmentKey
 ): { ok: true; lines: readonly PricedLine[] } | { ok: false; reason: string } {
   if (lines.length === 0) return { ok: false, reason: 'empty_selection' };
   if (lines.length > MAX_DISTINCT_LINES) return { ok: false, reason: 'too_many_lines' };
@@ -69,6 +72,11 @@ export function priceLines(
   for (const line of lines) {
     const product = productById(line.productId);
     if (!product) return { ok: false, reason: 'unknown_product' };
+    // A product the other apartment stocks is not orderable here, whatever the
+    // interface offered: apartment assignment is part of pricing a line.
+    if (!productBelongsToApartment(product.id, apartment)) {
+      return { ok: false, reason: 'product_not_in_apartment' };
+    }
     if (!isPurchasable(product)) return { ok: false, reason: 'product_not_purchasable' };
     if (!isValidQuantity(line.quantity)) return { ok: false, reason: 'invalid_quantity' };
 

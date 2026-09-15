@@ -44,12 +44,37 @@ vi.mock('@/private-bar/catalog', async () => {
   };
 });
 
+// The fixture products are what designaparts1 sells in these tests; the other
+// apartment keeps its real (here: irrelevant) assignment.
+vi.mock('@/private-bar/apartments', async () => {
+  const actual = await vi.importActual<typeof import('@/private-bar/apartments')>(
+    '@/private-bar/apartments'
+  );
+  const APARTMENTS = {
+    ...actual.APARTMENTS,
+    designaparts1: {
+      ...actual.APARTMENTS.designaparts1,
+      productIds: ['fixture-prosecco', 'fixture-wine', 'fixture-beer'],
+    },
+  };
+  return {
+    ...actual,
+    APARTMENTS,
+    productBelongsToApartment: (productId: string, key: 'designaparts1' | 'designaparts2') =>
+      APARTMENTS[key].productIds.includes(productId),
+  };
+});
+
 const { PrivateBarPage } = await import('./PrivateBarPage');
+const { APARTMENT_STORAGE_KEY } = await import('@/private-bar/useApartment');
 const { strings } = await import('@/private-bar/strings');
 const { PAYPAL_PAYMENT_URL } = await import('@/private-bar/config');
 
 const PROSECCO = 'fixture-prosecco';
 const BEER = 'fixture-beer';
+const APARTMENT = 'designaparts1';
+const CART_KEY = `bolagio:private-bar:cart:v2:${APARTMENT}`;
+const ORDER_KEY = `bolagio:private-bar:order:v2:${APARTMENT}`;
 
 interface Recorded {
   url: string;
@@ -73,7 +98,7 @@ function stubApi(options: {
 
       if (url.includes('/api/private-bar/inventory')) {
         if (options.inventoryFails) return new Response('nope', { status: 502 });
-        return new Response(JSON.stringify({ apartmentId: 'a', stock }), { status: 200 });
+        return new Response(JSON.stringify({ apartment: APARTMENT, stock }), { status: 200 });
       }
       if (url.includes('/api/private-bar/confirm-order')) {
         if (options.confirm) return options.confirm(body as Record<string, unknown>);
@@ -124,6 +149,10 @@ async function waitForInventory() {
 beforeEach(() => {
   recorded = [];
   window.localStorage.clear();
+  window.sessionStorage.clear();
+  // Most cases are about what happens INSIDE an apartment, so the gate is
+  // already answered. The gate itself has its own describe block below.
+  window.sessionStorage.setItem(APARTMENT_STORAGE_KEY, APARTMENT);
 });
 
 afterEach(() => {
@@ -169,7 +198,7 @@ describe('live inventory', () => {
 
   it('trims a stored selection when stock has fallen since', async () => {
     window.localStorage.setItem(
-      'bolagio:private-bar:cart:v1',
+      CART_KEY,
       JSON.stringify([{ productId: PROSECCO, quantity: 4 }])
     );
     stubApi({ stock: { [PROSECCO]: 1, 'fixture-wine': 5, [BEER]: 5 } });
@@ -208,6 +237,9 @@ describe('confirmation', () => {
 
     const sent = recorded.find((r) => r.url.includes('confirm-order'))!.body as Record<string, unknown>;
     expect(sent.items).toEqual([{ productId: PROSECCO, quantity: 1 }]);
+    // The PUBLIC key only — never a canonical internal apartment id.
+    expect(sent.apartment).toBe(APARTMENT);
+    expect(JSON.stringify(sent)).not.toContain('bolagio-');
     expect(JSON.stringify(sent)).not.toMatch(/total|price|amount/i);
     expect(typeof sent.clientOrderId).toBe('string');
   });
@@ -224,8 +256,8 @@ describe('confirmation', () => {
     // The confirmed order is a record now: no quantity controls remain.
     expect(within(dialog).queryByRole('button', { name: /eine Einheit/ })).toBeNull();
     expect(within(dialog).getByRole('link', { name: strings.payment.paypal })).toBeInTheDocument();
-    expect(window.localStorage.getItem('bolagio:private-bar:cart:v1')).toBeNull();
-    expect(window.localStorage.getItem('bolagio:private-bar:order:v1')).toContain('order-1');
+    expect(window.localStorage.getItem(CART_KEY)).toBeNull();
+    expect(window.localStorage.getItem(ORDER_KEY)).toContain('order-1');
   });
 
   it('reuses one idempotency key across a retry, so stock cannot be taken twice', async () => {
@@ -314,7 +346,7 @@ describe('confirmation', () => {
 
     await user.click(within(dialog).getByRole('button', { name: strings.payment.newSelection }));
     expect(await within(dialog).findByText(strings.sheet.emptyHeading)).toBeInTheDocument();
-    expect(window.localStorage.getItem('bolagio:private-bar:order:v1')).toBeNull();
+    expect(window.localStorage.getItem(ORDER_KEY)).toBeNull();
   });
 });
 
@@ -367,7 +399,7 @@ describe('payment handoff', () => {
     link.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
     expect(await within(dialog).findByText(strings.payment.handedOff)).toBeInTheDocument();
-    expect(window.localStorage.getItem('bolagio:private-bar:order:v1')).toContain('order-1');
+    expect(window.localStorage.getItem(ORDER_KEY)).toContain('order-1');
 
     const text = `${document.body.textContent ?? ''}`;
     for (const forbidden of [
@@ -405,5 +437,99 @@ describe('payment handoff', () => {
     await waitFor(() =>
       expect(screen.queryByRole('button', { name: new RegExp(strings.bar.ariaLabel) })).toBeNull()
     );
+  });
+});
+
+describe('apartment selection', () => {
+  const gateOption = (label: string) =>
+    screen.getByRole('button', { name: strings.apartment.chooseAria(label) });
+
+  it('asks for the apartment first and renders no product until it is answered', async () => {
+    const user = userEvent.setup();
+    window.sessionStorage.clear();
+    stubApi({});
+    renderPage();
+
+    expect(await screen.findByText(strings.apartment.heading)).toBeInTheDocument();
+    expect(screen.queryByText('Fixture Prosecco')).toBeNull();
+    // Nothing is fetched before the apartment is known — there is no apartment
+    // to fetch for, and guessing one would show the wrong stock.
+    expect(recorded).toHaveLength(0);
+
+    await user.click(gateOption('designAparts I'));
+    await waitForInventory();
+    expect(window.sessionStorage.getItem(APARTMENT_STORAGE_KEY)).toBe(APARTMENT);
+    expect(recorded[0].url).toContain(`apartment=${APARTMENT}`);
+  });
+
+  it('returns to the gate when the remembered apartment is not a known one', async () => {
+    window.sessionStorage.setItem(APARTMENT_STORAGE_KEY, 'designaparts9');
+    stubApi({});
+    renderPage();
+
+    expect(await screen.findByText(strings.apartment.heading)).toBeInTheDocument();
+    expect(window.sessionStorage.getItem(APARTMENT_STORAGE_KEY)).toBeNull();
+  });
+
+  it('shows which apartment is in use and switches straight away with an empty selection', async () => {
+    const user = userEvent.setup();
+    stubApi({});
+    renderPage();
+    await waitForInventory();
+
+    const change = screen.getByRole('button', {
+      name: strings.apartment.changeAria('designAparts I'),
+    });
+    expect(change).toBeInTheDocument();
+
+    await user.click(change);
+    // Nothing to lose, so nothing is asked.
+    expect(screen.queryByText(strings.apartment.switchTitle)).toBeNull();
+    expect(await screen.findByText(strings.apartment.heading)).toBeInTheDocument();
+    expect(window.sessionStorage.getItem(APARTMENT_STORAGE_KEY)).toBeNull();
+  });
+
+  it('asks before discarding a selection, and keeps it when the guest declines', async () => {
+    const user = userEvent.setup();
+    stubApi({});
+    renderPage();
+    await waitForInventory();
+    await user.click(addButton('Fixture Prosecco'));
+
+    await user.click(
+      screen.getByRole('button', { name: strings.apartment.changeAria('designAparts I') })
+    );
+    expect(await screen.findByText(strings.apartment.switchTitle)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: strings.apartment.switchCancel }));
+    await waitFor(() => expect(screen.queryByText(strings.apartment.switchTitle)).toBeNull());
+    // Still in the same apartment, still holding the same selection.
+    expect(window.sessionStorage.getItem(APARTMENT_STORAGE_KEY)).toBe(APARTMENT);
+    expect(within(await bar()).getByText('1 Artikel')).toBeInTheDocument();
+  });
+
+  it('clears the selection on a confirmed switch, so a cart can never cross apartments', async () => {
+    const user = userEvent.setup();
+    stubApi({});
+    renderPage();
+    await waitForInventory();
+    await user.click(addButton('Fixture Prosecco'));
+    await bar();
+
+    await user.click(
+      screen.getByRole('button', { name: strings.apartment.changeAria('designAparts I') })
+    );
+    await user.click(
+      await screen.findByRole('button', { name: strings.apartment.switchConfirm })
+    );
+
+    expect(await screen.findByText(strings.apartment.heading)).toBeInTheDocument();
+    // The action surface is gone and the stored selection with it: returning to
+    // this apartment starts from nothing rather than from the old cart.
+    expect(
+      screen.queryByRole('button', { name: new RegExp(strings.bar.ariaLabel) })
+    ).toBeNull();
+    expect(window.localStorage.getItem(CART_KEY)).toBeNull();
+    expect(window.sessionStorage.getItem(APARTMENT_STORAGE_KEY)).toBeNull();
   });
 });

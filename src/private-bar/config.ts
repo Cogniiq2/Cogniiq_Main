@@ -5,10 +5,11 @@
 // through one link, and PayPal handles everything from there: this site sees no
 // callback and can therefore never state that a payment has happened.
 //
-// Framework-free on purpose: functions/api/private-bar/* imports
-// PRIVATE_BAR_APARTMENT_ID from here, so nothing in this file may reach for
+// Framework-free on purpose: this module is reachable from
+// functions/api/private-bar/*, so nothing in it may reach for
 // `import.meta.env`, the DOM or React.
 // ─────────────────────────────────────────────────────────────────────────────
+import { APARTMENTS } from './apartments';
 
 /**
  * The exact PayPal link, verbatim, as supplied by the owner.
@@ -59,14 +60,15 @@ export function resolvePaypalUrl(url: string | null = PAYPAL_PAYMENT_URL): strin
 export const CASH_LOCATION: string | null = null;
 
 /**
- * The apartment this deployment serves — the ONE place this id is written.
+ * Legacy alias for designAparts II's canonical internal id.
  *
- * It keys the inventory rows in Supabase (private_bar_inventory.apartment_id)
- * and every order, so it must match the value used by the seed in
- * supabase/migrations/20260906120000_private_bar_inventory.sql. The repository
- * has no pre-existing canonical property id (Cogniiq's organizations are
- * customer accounts, not BoLaGio apartments), so this is the canonical one.
+ * Apartment ids now live in ./apartments.ts, which is the single place both the
+ * browser and the Cloudflare Functions read them from. This export is kept
+ * because the value itself must not change: 'bolagio-apartment-1' already keys
+ * live inventory rows and real order history, and renaming it for cosmetic
+ * consistency with the guest-facing "designAparts II" would be a data migration
+ * for no benefit.
  *
  * Internal: never rendered in the guest interface.
  */
-export const PRIVATE_BAR_APARTMENT_ID = 'bolagio-apartment-1';
+export const PRIVATE_BAR_APARTMENT_ID = APARTMENTS.designaparts2.apartmentId;

@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 // failure is reduced to guest-safe JSON.
 import { onRequest as confirmOrder } from '../../functions/api/private-bar/confirm-order';
 import { onRequest as inventory } from '../../functions/api/private-bar/inventory';
-import { PRIVATE_BAR_APARTMENT_ID } from './config';
+import { APARTMENTS } from './apartments';
 import { productById } from './catalog';
 
 const ENV = {
@@ -15,6 +15,7 @@ const ENV = {
 
 const ORDER_ID = '11111111-2222-4333-8444-555555555555';
 const BEER = 'bayreuther-hell';
+const PLANETA = 'planeta-plumbago-nero-davola-2021';
 const BEER_PRICE = productById(BEER)!.priceCents!;
 
 interface FetchCall {
@@ -55,7 +56,7 @@ function post(body: unknown, env: Record<string, string> = ENV) {
 
 function validBody(overrides: Record<string, unknown> = {}) {
   return {
-    apartmentId: PRIVATE_BAR_APARTMENT_ID,
+    apartment: 'designaparts2',
     clientOrderId: ORDER_ID,
     items: [{ productId: BEER, quantity: 2 }],
     ...overrides,
@@ -97,6 +98,8 @@ describe('POST /api/private-bar/confirm-order', () => {
     expect(response.status).toBe(200);
     const rpcCall = calls.find((c) => c.url.includes('/rpc/'))!;
     const sent = JSON.parse(String(rpcCall.init.body)) as Record<string, unknown>;
+    // The canonical internal id, resolved from the public key — never the key.
+    expect(sent.p_apartment_id).toBe(APARTMENTS.designaparts2.apartmentId);
     expect(sent.p_total_cents).toBe(BEER_PRICE * 2);
     expect(sent.p_total_cents).not.toBe(1);
     expect((sent.p_items as Array<Record<string, number>>)[0].unit_amount_cents).toBe(BEER_PRICE);
@@ -171,7 +174,12 @@ describe('POST /api/private-bar/confirm-order', () => {
       validBody({ items: [{ productId: 'ghost', quantity: 1 }] }),
       validBody({ items: [{ productId: BEER, quantity: 0 }] }),
       validBody({ clientOrderId: 'nope' }),
-      validBody({ apartmentId: 'another-apartment' }),
+      validBody({ apartment: 'another-apartment' }),
+      validBody({ apartment: APARTMENTS.designaparts2.apartmentId }),
+      // The product exists and is priced — but designAparts II does not sell it.
+      validBody({ items: [{ productId: PLANETA, quantity: 1 }] }),
+      // ...and neither does designAparts I sell designAparts II's beer.
+      validBody({ apartment: 'designaparts1', items: [{ productId: BEER, quantity: 1 }] }),
     ]) {
       const response = await post(body);
       expect(response.status).toBe(400);
@@ -203,40 +211,68 @@ describe('POST /api/private-bar/confirm-order', () => {
   });
 });
 
+function inventoryRequest(query = '?apartment=designaparts2') {
+  return new Request(`https://bolagio.test/api/private-bar/inventory${query}`);
+}
+
 describe('GET /api/private-bar/inventory', () => {
-  it('returns stock for the configured apartment', async () => {
-    stubSupabase({
+  it('returns stock for the requested apartment', async () => {
+    const calls = stubSupabase({
       stock: () =>
         new Response(JSON.stringify([{ product_id: BEER, stock: 4 }, { product_id: 'x', stock: 0 }]), {
           status: 200,
         }),
     });
 
-    const response = await inventory({
-      request: new Request('https://bolagio.test/api/private-bar/inventory'),
-      env: ENV,
-    });
+    const response = await inventory({ request: inventoryRequest(), env: ENV });
     expect(response.status).toBe(200);
     const payload = (await response.json()) as Record<string, unknown>;
-    expect(payload.apartmentId).toBe(PRIVATE_BAR_APARTMENT_ID);
+    // The public key comes back; the canonical internal id stays on the server.
+    expect(payload.apartment).toBe('designaparts2');
+    expect(JSON.stringify(payload)).not.toContain(APARTMENTS.designaparts2.apartmentId);
     expect(payload.stock).toEqual({ [BEER]: 4, x: 0 });
+
+    const filter = calls.find((c) => c.url.includes('private_bar_inventory'))!.url;
+    expect(decodeURIComponent(filter)).toContain(
+      `apartment_id=eq.${APARTMENTS.designaparts2.apartmentId}`
+    );
+  });
+
+  it('reads each apartment from its own canonical id', async () => {
+    const calls = stubSupabase({ stock: () => new Response('[]', { status: 200 }) });
+    await inventory({ request: inventoryRequest('?apartment=designaparts1'), env: ENV });
+    const filter = decodeURIComponent(calls.find((c) => c.url.includes('private_bar_inventory'))!.url);
+    expect(filter).toContain(`apartment_id=eq.${APARTMENTS.designaparts1.apartmentId}`);
+    expect(filter).not.toContain(APARTMENTS.designaparts2.apartmentId);
+  });
+
+  it('fails closed on an unknown apartment, without touching the database', async () => {
+    const stock = vi.fn(() => new Response('[]', { status: 200 }));
+    stubSupabase({ stock });
+    for (const query of [
+      '',
+      '?apartment=',
+      '?apartment=designaparts3',
+      // A raw canonical id is not an accepted input and is never forwarded.
+      `?apartment=${APARTMENTS.designaparts1.apartmentId}`,
+      '?apartment=*',
+    ]) {
+      const response = await inventory({ request: inventoryRequest(query), env: ENV });
+      expect(response.status, `query "${query}" was accepted`).toBe(400);
+      expect(((await response.json()) as Record<string, unknown>).error).toBe('unknown_apartment');
+    }
+    expect(stock).not.toHaveBeenCalled();
   });
 
   it('answers with safe JSON when the database cannot be reached', async () => {
     stubSupabase({ stock: () => new Response('boom', { status: 500 }) });
-    const response = await inventory({
-      request: new Request('https://bolagio.test/api/private-bar/inventory'),
-      env: ENV,
-    });
+    const response = await inventory({ request: inventoryRequest(), env: ENV });
     expect(response.status).toBe(502);
     expect(((await response.json()) as Record<string, unknown>).error).toBe('inventory_unavailable');
   });
 
   it('fails closed without configuration', async () => {
-    const response = await inventory({
-      request: new Request('https://bolagio.test/api/private-bar/inventory'),
-      env: {},
-    });
+    const response = await inventory({ request: inventoryRequest(), env: {} });
     expect(response.status).toBe(503);
   });
 });
