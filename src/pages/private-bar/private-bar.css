@@ -1196,6 +1196,39 @@
   to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
+/* A card is offered rather than dropped in: it rises, settles, and its own
+   weight arrives a hair after its outline. */
+@keyframes pb-offer {
+  from { opacity: 0; transform: translate3d(0, 14px, 0) scale(0.985); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes pb-choice-commit {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  28% { transform: translate3d(0, 1px, 0) scale(0.988); }
+  100% { transform: translate3d(0, -6px, 0) scale(1.012); }
+}
+
+@keyframes pb-choice-arrow {
+  0% { transform: translate3d(0, 0, 0); opacity: 1; }
+  100% { transform: translate3d(10px, 0, 0); opacity: 0; }
+}
+
+@keyframes pb-choice-dismiss {
+  from { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  to { opacity: 0; transform: translate3d(0, 6px, 0) scale(0.985); }
+}
+
+@keyframes pb-gate-out {
+  from { opacity: 1; transform: translate3d(0, 0, 0); }
+  to { opacity: 0; transform: translate3d(0, -14px, 0); }
+}
+
+@keyframes pb-catalogue-out {
+  from { opacity: 1; transform: translate3d(0, 0, 0); }
+  to { opacity: 0; transform: translate3d(0, 10px, 0); }
+}
+
 @keyframes pb-resolve {
   from { opacity: 0; letter-spacing: 0.5em; }
   to { opacity: 1; letter-spacing: 0.34em; }
@@ -1357,6 +1390,23 @@
   max-width: 30rem;
 }
 
+/* The gate arrives as a sentence, not as a block: the question, then the line
+   under it, then each card in turn. .pb-gate itself already carries .pb-enter,
+   so these delays are relative to the same moment the section appears. */
+.pb-gate__heading { animation: pb-rise 560ms var(--pb-ease-out) 1060ms both; }
+.pb-gate__body { animation: pb-rise 560ms var(--pb-ease-out) 1140ms both; }
+.pb-gate__options > li { animation: pb-offer 640ms var(--pb-ease-out) both; }
+.pb-gate__options > li:nth-child(1) { animation-delay: 1240ms; }
+.pb-gate__options > li:nth-child(2) { animation-delay: 1330ms; }
+
+/* Returned to rather than opened into: the overture is long gone, so the same
+   sentence is spoken at once instead of waiting for it. */
+.pb-gate--quick.pb-enter { animation-delay: 0ms; }
+.pb-gate--quick .pb-gate__heading { animation-delay: 30ms; }
+.pb-gate--quick .pb-gate__body { animation-delay: 90ms; }
+.pb-gate--quick .pb-gate__options > li:nth-child(1) { animation-delay: 150ms; }
+.pb-gate--quick .pb-gate__options > li:nth-child(2) { animation-delay: 210ms; }
+
 .pb-gate__option {
   appearance: none;
   display: flex;
@@ -1407,6 +1457,67 @@
 
 .pb-gate__option:active {
   transform: scale(0.99);
+}
+
+/* ── the handoff ───────────────────────────────────────────────────────────
+   Choosing an apartment is the one decision this surface asks for, so it is
+   answered rather than merely obeyed: the chosen card steps forward and its
+   hairline turns to champagne, the other withdraws, and the whole gate lifts
+   away as the catalogue rises into its place. PrivateBarPage holds the
+   apartment change back until this has played (GATE_HANDOFF_MS).
+   ────────────────────────────────────────────────────────────────────────── */
+.pb-gate__option.is-chosen {
+  animation: pb-choice-commit 360ms var(--pb-ease-out) both;
+  border-color: var(--pb-champagne);
+  box-shadow: 0 14px 40px rgba(169, 139, 85, 0.16);
+}
+
+.pb-gate__option.is-chosen .pb-gate__option-arrow {
+  animation: pb-choice-arrow 360ms var(--pb-ease-out) both;
+}
+
+.pb-gate__option.is-dismissed {
+  animation: pb-choice-dismiss 300ms var(--pb-ease) both;
+}
+
+/* Pointer events stop the moment the decision is taken: the commit is already
+   running and a second tap has nothing left to change. */
+.pb-gate.is-leaving .pb-gate__option {
+  pointer-events: none;
+}
+
+.pb-gate.is-leaving {
+  /* Starts a beat after the commit so the chosen card is seen being chosen,
+     and ends exactly when the catalogue mounts — the two movements meet rather
+     than leaving an empty frame between them. */
+  animation: pb-gate-out 260ms var(--pb-ease) 100ms both;
+}
+
+/* ── the catalogue's own arrival ───────────────────────────────────────────
+   Reached through the gate, the catalogue has no overture to wait for, so it
+   uses a quick stagger of its own instead of the load-time one. Reached by
+   reload with a remembered apartment, the original overture-paced timing
+   stands untouched — a reload should still feel like the page opening.
+   ────────────────────────────────────────────────────────────────────────── */
+.pb-catalogue--handoff .pb-enter { animation-duration: 560ms; }
+.pb-catalogue--handoff .pb-enter--4 { animation-delay: 0ms; }
+.pb-catalogue--handoff .pb-enter--5 { animation-delay: 90ms; }
+.pb-catalogue--handoff .pb-apartment { animation: pb-rise 520ms var(--pb-ease-out) 160ms both; }
+.pb-catalogue--handoff .pb-guest { animation: pb-rise 520ms var(--pb-ease-out) 340ms both; }
+
+.pb-catalogue--handoff .pb-grid > .pb-product > .pb-product__inner {
+  animation-duration: 520ms;
+}
+.pb-catalogue--handoff .pb-grid > .pb-product:nth-child(1) > .pb-product__inner { animation-delay: 180ms; }
+.pb-catalogue--handoff .pb-grid > .pb-product:nth-child(2) > .pb-product__inner { animation-delay: 235ms; }
+.pb-catalogue--handoff .pb-grid > .pb-product:nth-child(3) > .pb-product__inner { animation-delay: 290ms; }
+.pb-catalogue--handoff .pb-grid > .pb-product:nth-child(4) > .pb-product__inner { animation-delay: 345ms; }
+.pb-catalogue--handoff .pb-grid > .pb-product:nth-child(n + 5) > .pb-product__inner { animation-delay: 395ms; }
+
+/* Going back to the gate is the same movement in reverse, and just as short. */
+.pb-catalogue.is-leaving {
+  animation: pb-catalogue-out 220ms var(--pb-ease) both;
+  pointer-events: none;
 }
 
 /* ── apartment context ─────────────────────────────────────────────────────
@@ -1517,4 +1628,16 @@
   .pb-overture { display: none; }
   .pb-reveal > * { opacity: 1; transform: none; }
   .pb-frame.is-selected .pb-frame__image { transform: none; }
+
+  /* The handoff is skipped outright for these guests (PrivateBarPage commits
+     the apartment immediately), so the exit states must never be left painted
+     over the content they were animating away. */
+  .pb-gate.is-leaving,
+  .pb-catalogue.is-leaving,
+  .pb-gate__option.is-chosen,
+  .pb-gate__option.is-dismissed {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
 }

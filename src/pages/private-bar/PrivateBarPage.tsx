@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { ApartmentKey } from '../../private-bar/apartments';
 import { productsByCategory } from '../../private-bar/catalog';
@@ -15,6 +15,33 @@ import { GuestExperience } from './components/GuestExperience';
 import { Overture } from './components/Overture';
 import { ProductCard } from './components/ProductCard';
 import { ReviewSheet } from './components/ReviewSheet';
+
+/**
+ * How long the gate is given to hand over to the catalogue.
+ *
+ * The chosen card commits, the gate lifts away, and only then does the
+ * apartment actually change — so the guest sees one continuous movement into
+ * their bar rather than a cut. It is kept in step with the .pb-gate.is-leaving
+ * animation in private-bar.css; changing one means changing the other.
+ */
+const GATE_HANDOFF_MS = 360;
+
+/** The mirror of that, on the way back to the gate. */
+const CATALOGUE_LEAVE_MS = 220;
+
+/** Motion is a courtesy, never a gate. A guest who asked for less gets the
+ *  same destination immediately, with no timer in between. */
+function prefersReducedMotion(): boolean {
+  try {
+    return (
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    );
+  } catch {
+    return false;
+  }
+}
 
 /**
  * BoLaGio · Private Bar.
@@ -38,6 +65,26 @@ export function PrivateBarPage() {
   const [switchOpen, setSwitchOpen] = useState(false);
   const barButtonRef = useRef<HTMLButtonElement>(null);
 
+  // Purely presentational: which card the guest committed to while the gate is
+  // still on screen, and whether the catalogue is on its way out. Neither is
+  // read by the cart, the pricing or the order — they only drive the handoff.
+  const [committing, setCommitting] = useState<ApartmentKey | null>(null);
+  const [leavingCatalogue, setLeavingCatalogue] = useState(false);
+  const handoff = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** True when this catalogue was reached through the gate just now, which is
+   *  what earns it the quick entrance rather than the overture-paced one. */
+  const fromGate = useRef(false);
+  /** The mirror: the gate is being returned to, so it must not wait for an
+   *  overture that finished long ago. */
+  const backToGate = useRef(false);
+
+  useEffect(
+    () => () => {
+      if (handoff.current) clearTimeout(handoff.current);
+    },
+    []
+  );
+
   const apartment = selection.apartment;
   const groups = apartment ? productsByCategory(apartment) : [];
   let rendered = 0;
@@ -59,17 +106,46 @@ export function PrivateBarPage() {
     leaveApartment();
   };
 
-  const leaveApartment = () => {
+  const leaveApartment = useCallback(() => {
     setSwitchOpen(false);
     setSheetOpen(false);
+    fromGate.current = false;
+    backToGate.current = true;
+    // The selection is dropped IMMEDIATELY. Only the picture waits: a cart must
+    // never outlive the decision to leave, however long the animation runs.
     bar.clear();
-    selection.clear();
-  };
 
-  const chooseApartment = (next: ApartmentKey) => {
-    setSheetOpen(false);
-    selection.select(next);
-  };
+    if (prefersReducedMotion()) {
+      selection.clear();
+      return;
+    }
+    setLeavingCatalogue(true);
+    if (handoff.current) clearTimeout(handoff.current);
+    handoff.current = setTimeout(() => {
+      setLeavingCatalogue(false);
+      selection.clear();
+    }, CATALOGUE_LEAVE_MS);
+  }, [bar, selection]);
+
+  const chooseApartment = useCallback(
+    (next: ApartmentKey) => {
+      if (committing) return; // one commit at a time: a second tap changes nothing
+      setSheetOpen(false);
+      fromGate.current = true;
+
+      if (prefersReducedMotion()) {
+        selection.select(next);
+        return;
+      }
+      setCommitting(next);
+      if (handoff.current) clearTimeout(handoff.current);
+      handoff.current = setTimeout(() => {
+        selection.select(next);
+        setCommitting(null);
+      }, GATE_HANDOFF_MS);
+    },
+    [committing, selection]
+  );
 
   return (
     <PrivateBarShell title={strings.documentTitle} barVisible={barVisible}>
@@ -87,9 +163,24 @@ export function PrivateBarPage() {
             carries. A remembered apartment replaces it before paint (see
             useApartmentSelection), not after. */}
         {apartment === null ? (
-          <ApartmentGate onSelect={chooseApartment} />
+          <ApartmentGate
+            onSelect={chooseApartment}
+            committing={committing}
+            quick={backToGate.current}
+          />
         ) : (
-          <>
+          <div
+            className={[
+              'pb-catalogue',
+              // The quick entrance is earned by having just come through the
+              // gate. A remembered apartment keeps the overture-paced one, so
+              // a reload still feels like the page opening rather than a jump.
+              fromGate.current ? 'pb-catalogue--handoff' : '',
+              leavingCatalogue ? 'is-leaving' : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+          >
             <section className="pb-section pb-enter pb-enter--4" aria-labelledby="pb-intro-heading">
               <h2 id="pb-intro-heading" className="pb-display">
                 {strings.intro.heading}
@@ -98,7 +189,7 @@ export function PrivateBarPage() {
               <ApartmentContext apartment={apartment} onChange={requestApartmentChange} />
             </section>
 
-            <section className="pb-section" aria-labelledby="pb-catalogue-heading">
+            <section className="pb-section pb-enter pb-enter--5" aria-labelledby="pb-catalogue-heading">
               <div className="pb-section__head">
                 <h2 id="pb-catalogue-heading" className="pb-eyebrow">
                   {strings.catalogue.heading}
@@ -147,7 +238,7 @@ export function PrivateBarPage() {
             </section>
 
             <GuestExperience />
-          </>
+          </div>
         )}
 
         <div className="pb-close">
