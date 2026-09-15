@@ -159,6 +159,19 @@ describe('prices', () => {
     }
   });
 
+  it('names the Manz bottle as it is actually labelled, without renaming its id', () => {
+    // The physical bottle is a plain "Manz Grauburgunder trocken" — it carries
+    // no visible Fruchtecke edition marking, so the guest-facing name says so.
+    // The id is NOT renamed to match: it already keys a live inventory row, and
+    // a display correction must never become a data migration.
+    const manz = productById('manz-grauburgunder-fruchtecke');
+    expect(manz?.name).toBe('Manz Grauburgunder trocken');
+    expect(manz?.shortLabel).toBe('Manz Grauburgunder trocken');
+    expect(manz?.name).not.toMatch(/Fruchtecke/);
+    expect(manz?.priceCents).toBe(1400);
+    expect(productBelongsToApartment('manz-grauburgunder-fruchtecke', 'designaparts1')).toBe(true);
+  });
+
   it('leaves every designAparts II price exactly as it was', () => {
     // Regression baseline, frozen deliberately: adding a second apartment must
     // not move a single existing amount.

@@ -268,9 +268,15 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     sortOrder: 140,
   },
   {
+    // The id keeps its original spelling deliberately. The physical bottle turned
+    // out to be a plain "Manz Grauburgunder trocken" with no visible Fruchtecke
+    // edition marking, so the GUEST-FACING name was corrected to match what is
+    // actually in the apartment — but the id already keys a Supabase inventory
+    // row, and renaming it for a display-only correction would be a data
+    // migration for no benefit. (Same reasoning as 'covo-moro' above.)
     id: 'manz-grauburgunder-fruchtecke',
-    name: 'Manz Grauburgunder – Edition 95 Jahre Fruchtecke',
-    shortLabel: 'Manz Grauburgunder',
+    name: 'Manz Grauburgunder trocken',
+    shortLabel: 'Manz Grauburgunder trocken',
     category: 'wine',
     origin: null,
     volume: '0,75 l',

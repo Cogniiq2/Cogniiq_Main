@@ -45,7 +45,7 @@ update public.private_bar_inventory
 set stock = 1, updated_at = now()
 where apartment_id = 'bolagio-designaparts-1'
   and product_id = 'manz-grauburgunder-fruchtecke';
--- Manz Grauburgunder – Edition 95 Jahre Fruchtecke
+-- Manz Grauburgunder trocken (id kept as manz-grauburgunder-fruchtecke)
 
 
 update public.private_bar_inventory
