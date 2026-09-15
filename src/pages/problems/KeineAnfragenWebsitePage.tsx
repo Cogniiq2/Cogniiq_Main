@@ -61,7 +61,6 @@ const config: ProblemPageConfig = {
     // liest, sucht die Webdesign-Leistung selbst; /webdesign ist ihr Eigentümer.
     { label: "Webdesign für Unternehmen", href: "/webdesign" },
     { label: "Webdesign Kosten", href: "/kosten-webdesign" },
-    { label: "Webdesign Agentur Deutschland", href: "/webdesign-agentur-deutschland" },
     { label: "Webdesign Bayreuth", href: "/bayreuth/webdesign" },
     { label: "Kontakt", href: "/kontakt" },
   ],

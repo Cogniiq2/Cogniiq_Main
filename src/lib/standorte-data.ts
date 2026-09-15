@@ -66,6 +66,15 @@ export interface CityServiceConfig {
     vermerkt in docs/seo/post-experiment-opportunities.md.
   */
   legacyAutomationLink?: string;
+  /*
+    Dieselbe Figur ein zweites Mal, seit dem 13.09.2026: Der Fußverweis
+    „Webdesign Agentur" zeigt auf den Pillar `/webdesign`;
+    `/webdesign-agentur-deutschland` bleibt vorerst eine lebende Route, deren
+    Konsolidierung in den Pillar beschlossen und aufgeschoben ist (F9). Die
+    eine eingefrorene Seite behält ihr gemessenes Ziel — aus genau dem Grund,
+    der über `legacyAutomationLink` steht.
+  */
+  legacyWebdesignLink?: string;
   seo: {
     title: string;
     description: string;

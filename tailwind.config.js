@@ -81,6 +81,12 @@ export default {
           paper: 'var(--pub-paper)',
           'paper-2': 'var(--pub-paper-2)',
           card: 'var(--pub-card)',
+          // rgb(... / <alpha-value>) so `/40` composes; see index.css.
+          accent: 'rgb(var(--pub-accent) / <alpha-value>)',
+          'accent-ink': 'rgb(var(--pub-accent-ink) / <alpha-value>)',
+          'accent-soft': 'rgb(var(--pub-accent-soft) / <alpha-value>)',
+          'accent-line': 'rgb(var(--pub-accent-line) / <alpha-value>)',
+          'accent-wash': 'rgb(var(--pub-accent-wash) / <alpha-value>)',
           signal: 'var(--pub-signal)',
           'signal-ink': 'var(--pub-signal-ink)',
           'signal-wash': 'var(--pub-signal-wash)',

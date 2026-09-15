@@ -98,7 +98,7 @@ export function StatsSection() {
               <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gray-900 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)]" />
 
               {stat.accent && (
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-sky-500/40" />
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-pub-accent-soft/40" />
               )}
 
               <p

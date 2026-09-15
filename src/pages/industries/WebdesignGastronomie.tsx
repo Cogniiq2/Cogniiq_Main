@@ -80,7 +80,7 @@ const config: NationalIndustryPageConfig = {
     { label: "Webdesign Gastronomie München", href: "/webdesign-gastronomie-muenchen" },
     { label: "Webdesign Gastronomie Regensburg", href: "/webdesign-gastronomie-regensburg" },
     { label: "Webdesign Bayern", href: "/bayern" },
-    { label: "Webdesign Deutschland", href: "/webdesign-agentur-deutschland" },
+    { label: "Webdesign für Unternehmen", href: "/webdesign" },
   ],
   relatedLinks: [
     { label: "KI Telefonassistent Restaurant", href: "/ki-telefonassistent-restaurant" },

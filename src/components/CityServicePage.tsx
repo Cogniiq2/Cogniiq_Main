@@ -42,7 +42,11 @@ function renderWithLinks(text: string) {
             <Link
               key={i}
               to={match[2]}
-              className="text-gray-800 dark:text-gray-200 underline underline-offset-2 decoration-gray-300 dark:decoration-gray-600 hover:decoration-gray-500 transition-colors"
+              // Kontextlink im Fliesstext — dieselbe Rolle wie auf /webdesign,
+              // also dieselbe Farbe. Die Unterstreichung BLEIBT: sie ist der
+              // Hinweis, der ohne Farbe funktioniert, und ohne sie waere Blau
+              // das einzige Merkmal, an dem ein Link im Absatz zu erkennen ist.
+              className="text-pub-accent underline underline-offset-2 decoration-pub-accent-line hover:decoration-pub-accent transition-colors"
             >
               {match[1]}
             </Link>
@@ -329,7 +333,7 @@ function WarumCogniiq({ config }: { config: CityServiceConfig }) {
               variants={fadeUp}
               className="flex items-start gap-3 p-5 rounded-xl bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50"
             >
-              <CheckCircle2 size={18} className="flex-shrink-0 mt-0.5 text-[#515A61] dark:text-sky-400" />
+              <CheckCircle2 size={18} className="flex-shrink-0 mt-0.5 text-pub-accent-soft dark:text-pub-accent-soft" />
               <span className="text-gray-700 dark:text-gray-300">{point}</span>
             </motion.li>
           ))}
@@ -350,7 +354,7 @@ function MidPageCTA({ config }: { config: CityServiceConfig }) {
           variants={fadeUp}
           className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
         >
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <p className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
               {config.service} in {config.city} – kostenloses Erstgespräch
             </p>
@@ -358,7 +362,7 @@ function MidPageCTA({ config }: { config: CityServiceConfig }) {
               30–45&nbsp;Minuten, unverbindlich, mit konkretem Ergebnis.
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Link
               to="/kontakt"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors whitespace-nowrap"
@@ -401,7 +405,7 @@ function UseCasesSection({ config }: { config: CityServiceConfig }) {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-6 cq-shrink-children">
           {config.useCases.map((useCase, i) => (
             <motion.article
               key={i}
@@ -411,7 +415,7 @@ function UseCasesSection({ config }: { config: CityServiceConfig }) {
               variants={fadeUp}
               className="bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 flex flex-col gap-3"
             >
-              <span className="text-sm font-semibold uppercase tracking-wider text-[#515A61] dark:text-sky-400">
+              <span className="text-sm font-semibold uppercase tracking-wider text-pub-accent dark:text-pub-accent-soft">
                 {useCase.industry}
               </span>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -447,7 +451,7 @@ function ProcessSection({ config }: { config: CityServiceConfig }) {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 cq-shrink-children">
           {config.processSteps.map((step, i) => (
             <motion.div
               key={i}
@@ -478,7 +482,7 @@ function LocalRelevanzSection({ config }: { config: CityServiceConfig }) {
   return (
     <section className="py-20 bg-gray-50 dark:bg-gray-900/50 transition-colors duration-300" aria-labelledby="local-heading">
       <div className="max-w-5xl mx-auto px-6 lg:px-8">
-        <div className="grid md:grid-cols-2 gap-12">
+        <div className="grid md:grid-cols-2 gap-12 cq-shrink-children">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -547,7 +551,7 @@ function BranchenSection({ config }: { config: CityServiceConfig }) {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-5">
+        <div className="grid md:grid-cols-2 gap-5 cq-shrink-children">
           {config.industriesExpanded.map((block, i) => (
             <motion.div
               key={i}
@@ -557,7 +561,7 @@ function BranchenSection({ config }: { config: CityServiceConfig }) {
               variants={fadeUp}
               className="p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/50"
             >
-              <div className="flex items-center gap-2.5 mb-4">
+              <div className="flex items-center gap-2.5 mb-4 cq-shrink-children">
                 <div className="w-8 h-8 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
                   <Building2 size={14} className="text-gray-500 dark:text-gray-400" />
                 </div>
@@ -575,7 +579,7 @@ function BranchenSection({ config }: { config: CityServiceConfig }) {
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-[#515A61] dark:text-sky-400 uppercase tracking-widest mb-1">
+                  <p className="text-sm font-semibold text-pub-accent dark:text-pub-accent-soft uppercase tracking-widest mb-1">
                     Lösung
                   </p>
                   <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
@@ -612,7 +616,7 @@ function LocalSzenarienSection({ config }: { config: CityServiceConfig }) {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 cq-shrink-children">
           {config.localScenarios.map((scenario, i) => (
             <motion.div
               key={i}
@@ -620,12 +624,12 @@ function LocalSzenarienSection({ config }: { config: CityServiceConfig }) {
               whileInView="visible"
               viewport={{ once: true }}
               variants={fadeUp}
-              className="flex gap-4 p-6 rounded-2xl bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
+              className="flex gap-4 p-6 rounded-2xl min-w-0 cq-shrink-children bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
             >
               <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
                 <Lightbulb size={15} className="text-pub-ink-3 dark:text-gray-500" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   {scenario.title}
                 </h3>
@@ -723,7 +727,7 @@ function CTASection({ config }: { config: CityServiceConfig }) {
           <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-center gap-4 text-sm text-pub-ink-3 dark:text-gray-500">
             <Link to="/ki-telefonassistent" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">KI-Telefonassistent</Link>
             <span aria-hidden="true">·</span>
-            <Link to="/webdesign-agentur-deutschland" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Webdesign Agentur</Link>
+            <Link to={config.legacyWebdesignLink ?? "/webdesign"} className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Webdesign Agentur</Link>
             <span aria-hidden="true">·</span>
             <Link to={config.legacyAutomationLink ?? "/prozessautomatisierung"} className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Automatisierung</Link>
             <span aria-hidden="true">·</span>

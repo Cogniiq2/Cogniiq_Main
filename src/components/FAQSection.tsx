@@ -116,14 +116,14 @@ export function FAQSection() {
               Alles Wichtige zu Prozess,{' '}
               <Link
                 to="/leistungen"
-                className="font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors underline underline-offset-2 decoration-gray-300 dark:decoration-gray-600"
+                className="font-medium text-pub-accent dark:text-gray-300 hover:text-pub-accent-ink dark:hover:text-gray-100 transition-colors underline underline-offset-2 decoration-pub-accent-line dark:decoration-gray-600"
               >
                 Leistungen
               </Link>{' '}
               und{' '}
               <Link
                 to="/kontakt"
-                className="font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors underline underline-offset-2 decoration-gray-300 dark:decoration-gray-600"
+                className="font-medium text-pub-accent dark:text-gray-300 hover:text-pub-accent-ink dark:hover:text-gray-100 transition-colors underline underline-offset-2 decoration-pub-accent-line dark:decoration-gray-600"
               >
                 Zusammenarbeit
               </Link>{' '}
@@ -183,8 +183,8 @@ export function FAQSection() {
                     <span
                       className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-md border transition-all duration-200 mt-0.5"
                       style={{
-                        background: isOpen ? '#111827' : 'transparent',
-                        borderColor: isOpen ? '#111827' : '#e5e7eb',
+                        background: isOpen ? 'rgb(var(--pub-accent))' : 'transparent',
+                        borderColor: isOpen ? 'rgb(var(--pub-accent))' : '#e5e7eb',
                       }}
                     >
                       <motion.span

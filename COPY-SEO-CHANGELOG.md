@@ -1,5 +1,65 @@
 # COPY-SEO-CHANGELOG — Copy Overhaul KI-Telefonassistent-Cluster
 
+## 2026-09-13 (2) — Webdesign-Cluster: ein nationaler Eigentümer, ein Pillar mit Antworten, achtzehn Beträge weniger
+
+Branch `claude/webdesign-recovery-max-2026-09-13`. Architektur und Befund:
+`docs/seo/ARCHITEKTUR.md` §5 · Messpunkte M5–M8 in
+`docs/seo/organic-growth-scoreboard.md` · Herkunftsprüfung
+`docs/seo/preisaudit-webdesign.md` · SERP-Muster `docs/seo/serp-webdesign-2026-09.md`.
+
+**Entlinkt, nicht zurückgezogen:** `/webdesign-agentur-deutschland` bleibt
+vorerst live. 5 Impressionen in 28 Tagen, fast alle markenbezogen, gleiche
+Intention wie der Pillar (K2) — die 301 ist beschlossen und aufgeschoben (F9),
+weil die Seite Anker in zwei eingefrorene Experimente trägt (Inhaber-Review
+13.09.2026). Alle nicht eingefrorenen internen Links zeigen jetzt auf `/webdesign`.
+
+**`/webdesign` neu geschrieben.** Titel „Webdesign Agentur – Websites für
+Unternehmen | Cogniiq" (war „… Hochkonvertierende Websites …"). H1 „Webdesign
+für Unternehmen: Websites mit einem klaren Auftrag". 578 → ~2.300 Wörter,
+sechsundzwanzig Käuferfragen, darunter „für wen nicht" (sechs Fälle), „neu
+oder Relaunch", „wer liefert Inhalte", Schnittstellen mit dem Fall „wenn es
+nicht geht", Relaunch-Prüfliste, dreizehn Ablaufschritte **ohne Dauern**.
+Entfernt: „Go-Live in 7–14 Tagen", „Ladezeit unter 2 Sek.", „Festpreise",
+„ohne Rankingverlust", „keine Templates", „die bei Google ranken" — und alle
+fünfzehn Stadt-Unterseiten-Anker, die der Seite Impressionen auf fremde lokale
+Queries eingebracht hatten.
+
+**`/kosten-webdesign` neu geschrieben.** Titel ohne Jahreszahl („Was kostet
+eine Website? Webdesign Kosten & Preistreiber"), `CostPage` abgelöst, kein
+Preis, kein Rechner: elf Preistreiber, einmalig/laufend getrennt, vier
+Zuschnitte ohne Betrag, „wann sich eine neue Website nicht lohnt", fünf
+Hebel, drei Schritte zum Angebot.
+
+**Ausgerichtet:** `/bayreuth/lokales-seo` besitzt „seo bayreuth" (Titel, H1,
+Keywords, Hub-Link). Geo-Hubs heißen „Cogniiq in <Stadt> – …" statt
+„AI-Systeme & Webdesign in <Stadt>". Startseite, `/leistungen`, `/deutschland`,
+zwei Blogbeiträge verlinken den Pillar mit „Webdesign für Unternehmen".
+`/regensburg/webdesign`, `/muenchen/webdesign`: FAQ-Preise, -Dauern,
+Herstellerliste, Ladezeitwerte ersetzt.
+
+**Strukturierte Daten:** die neuen Webdesign-Seiten referenzieren den Anbieter
+per `@id` statt als unvollständiges Organization-Objekt. Das Logo
+(`/logo.png`, 512×512) war in der Shared-Quelle bereits vorhanden. Die
+statische Kopie des Organization-Graphen in `index.html` (auf jeder Seite
+doppelt neben `LocalBusinessSchema`) bleibt **vorerst** — ihre Entfernung ist
+eine seitenweite Head-Änderung und eigener Branch (F10).
+
+**Zweiter Durchgang (Inhaber-Review, 13.09.2026):** neue Absoluta und
+unbestätigte Leistungspolitik in den beiden neuen Seiten zurückgenommen —
+„häufigste Grund", „Baukasten löst das günstiger", „Neubau riskiert nichts",
+„bestehende Signale werden mitgenommen", „Cookies laufen erst nach
+Zustimmung", Barrierefreiheit als Pauschalumfang, „Zwanzig Leistungsseiten …
+fünf Seiten", „Domain und Hosting auf Ihren Namen", „Betreuung kein
+Bestandteil des Projektpreises", „Grundlagen gehören zu jedem Projekt",
+„Struktur und Setzen Ihrer Inhalte ja". Überall, wo Cogniiq keine bestätigte
+Politik hat, steht jetzt: Der konkrete Umfang wird im Angebot festgelegt.
+
+**Nicht angefasst:** die fünf eingefrorenen Routen (Fixture byte-identisch
+mit `main`), `/webdesign-agentur-deutschland` selbst, `index.html`, `/ki-telefonassistent`,
+`/prozessautomatisierung`, `/kosten-automatisierung`, `/webdesign-hotel` (nur
+der Pflicht-Link).
+
+
 ## 2026-09-13 — Korrektur: die Häufigkeitsschwelle war selbst eine erfundene Zahl
 
 Aus dem Inhaber-Review am Durchgang vom 12.09.2026. Beim Entfernen von zwölf

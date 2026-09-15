@@ -40,30 +40,35 @@ const CITY_CONFIGS: Record<CitySlug, CityConfig> = {
     city: "Bayreuth",
     region: "Oberfranken",
     canonical: `${BUSINESS_INFO.website}/bayreuth`,
-    title: "AI-Systeme & Webdesign in Bayreuth | Cogniiq",
+    title: "Cogniiq in Bayreuth – KI-Telefonassistent, Websites und Automatisierung",
     description: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungslösungen für Unternehmen in Bayreuth. Persönliche Beratung vor Ort, schnelle Umsetzung, messbare Ergebnisse.",
     intro: "Als AI- und Webdesign-Agentur mit Hauptsitz in Bayreuth betreuen wir Unternehmen in Oberfranken und ganz Bayern mit hochwertigen digitalen Systemen.",
-    tagline: "Webdesign Bayreuth · KI-Telefonassistent Bayreuth · Automatisierung Bayreuth",
+    tagline: "Hauptsitz in Bayreuth · drei Leistungen · ein Ansprechpartner",
+    deepDive: {
+      intro: "Sie haben bereits eine Website, werden in Bayreuth aber nicht gefunden? Dann ist meist nicht das Design das Problem, sondern die lokale Sichtbarkeit:",
+      label: "Lokales SEO für Bayreuth",
+      href: "/bayreuth/lokales-seo",
+    },
   },
   muenchen: {
     slug: "muenchen",
     city: "München",
     region: "Bayern",
     canonical: `${BUSINESS_INFO.website}/muenchen`,
-    title: "AI-Systeme & Webdesign in München | Cogniiq",
+    title: "Cogniiq in München – KI-Telefonassistent, Websites und Automatisierung",
     description: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungslösungen für Unternehmen in München. Hochwertige digitale Systeme für den Münchner Markt.",
     intro: "Cogniiq entwickelt digitale Systeme für Unternehmen in München – von hochkonvertierenden Websites über KI-Telefonassistenten bis zu automatisierten Prozessen.",
-    tagline: "Webdesign München · KI-Telefonassistent München · Automatisierung München",
+    tagline: "Vor Ort in München und remote · drei Leistungen · ein Ansprechpartner",
   },
   regensburg: {
     slug: "regensburg",
     city: "Regensburg",
     region: "Ostbayern",
     canonical: `${BUSINESS_INFO.website}/regensburg`,
-    title: "AI-Systeme & Webdesign in Regensburg | Cogniiq",
+    title: "Cogniiq in Regensburg – KI-Telefonassistent, Websites und Automatisierung",
     description: "Cogniiq entwickelt Websites, KI-Telefonassistenten und Automatisierungslösungen für Unternehmen in Regensburg. Digitale Systeme für die Region Ostbayern.",
     intro: "Cogniiq betreut Unternehmen in Regensburg und der Region Ostbayern mit maßgeschneiderten Websites, KI-Telefonassistenten und Automatisierungslösungen.",
-    tagline: "Webdesign Regensburg · KI-Telefonassistent Regensburg · Automatisierung Regensburg",
+    tagline: "Vor Ort in Regensburg und remote · drei Leistungen · ein Ansprechpartner",
     deepDive: {
       intro: "Sie betreiben bereits eine Website? Häufig ist die Modernisierung der bestehenden Seite der wirtschaftlichere Weg als ein kompletter Neuaufbau:",
       label: "Relaunch der bestehenden Website",
@@ -149,7 +154,7 @@ export function CityLandingPage({ citySlug }: Props) {
               </div>
 
               <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6 tracking-tight leading-tight">
-                AI-Systeme &amp; Webdesign in {config.city}
+                Cogniiq in {config.city}: KI-Telefonassistent, Websites und Automatisierung
               </h1>
 
               <p className="text-xl text-gray-600 dark:text-gray-400 mb-4 max-w-2xl leading-relaxed">
@@ -225,7 +230,7 @@ export function CityLandingPage({ citySlug }: Props) {
                           Für Unternehmen in {config.city}
                         </p>
                       </div>
-                      <div className="flex items-center gap-1 text-sm font-medium text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors mt-auto">
+                      <div className="flex items-center gap-1 text-sm font-medium text-gray-500 dark:text-gray-400 group-hover:text-pub-accent dark:group-hover:text-gray-100 transition-colors mt-auto">
                         Mehr erfahren
                         <ChevronRight size={14} />
                       </div>
@@ -247,7 +252,7 @@ export function CityLandingPage({ citySlug }: Props) {
                 {config.deepDive.intro}{" "}
                 <Link
                   to={config.deepDive.href}
-                  className="font-medium text-gray-900 dark:text-gray-100 underline underline-offset-2 decoration-gray-300 dark:decoration-gray-600 hover:decoration-gray-900 dark:hover:decoration-gray-100 transition-colors"
+                  className="font-medium text-pub-accent dark:text-gray-100 underline underline-offset-2 decoration-pub-accent-line dark:decoration-gray-600 hover:decoration-gray-900 dark:hover:decoration-gray-100 transition-colors"
                 >
                   {config.deepDive.label}
                 </Link>

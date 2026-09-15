@@ -494,7 +494,7 @@ function PaketeSection({
               <ul className="space-y-2.5">
                 {paket.deliverables.map((item, j) => (
                   <li key={j} className="flex items-start gap-2.5">
-                    <CheckCircle2 size={14} className="flex-shrink-0 mt-0.5 text-[#515A61] dark:text-sky-400" />
+                    <CheckCircle2 size={14} className="flex-shrink-0 mt-0.5 text-pub-accent-soft dark:text-pub-accent-soft" />
                     <span className="text-sm text-gray-600 dark:text-gray-400">{item}</span>
                   </li>
                 ))}
@@ -613,12 +613,12 @@ function UseCasesSection({ config }: { config: IndustryPageConfig }) {
               viewport={{ once: true }}
               variants={fadeUp}
               custom={i * 0.08}
-              className="flex gap-4 p-6 rounded-2xl bg-white dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/50"
+              className="flex gap-4 p-6 rounded-2xl min-w-0 cq-shrink-children bg-white dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/50"
             >
               <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center">
                 <Lightbulb size={15} className="text-pub-ink-3 dark:text-gray-500" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   {useCase.title}
                 </h3>
@@ -672,7 +672,7 @@ function BenefitsSection({ config }: { config: IndustryPageConfig }) {
             >
               <CheckCircle2
                 size={18}
-                className="flex-shrink-0 mt-0.5 text-[#515A61] dark:text-sky-400"
+                className="flex-shrink-0 mt-0.5 text-pub-accent-soft dark:text-pub-accent-soft"
               />
               <span className="text-gray-700 dark:text-gray-300">{benefit}</span>
             </motion.li>

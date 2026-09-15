@@ -84,7 +84,7 @@ const config: NationalIndustryPageConfig = {
     { label: "Webdesign München", href: "/muenchen/webdesign" },
     { label: "Webdesign Regensburg", href: "/regensburg/webdesign" },
     { label: "Webdesign Bayern", href: "/bayern" },
-    { label: "Webdesign Deutschland", href: "/webdesign-agentur-deutschland" },
+    { label: "Webdesign für Unternehmen", href: "/webdesign" },
   ],
   relatedLinks: [
     { label: "KI Telefonassistent Hotel", href: "/ki-telefonassistent-hotel" },

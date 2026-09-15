@@ -79,8 +79,8 @@ export function KiCTASection() {
             {/* ─── Main content ─── */}
             <div className="px-10 py-12 lg:px-14 lg:py-14">
               <div className="flex items-center gap-3 mb-8">
-                <div className="w-9 h-9 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
-                  <PhoneCall size={14} className="text-sky-400" />
+                <div className="w-9 h-9 rounded-xl bg-pub-accent-soft/10 border border-pub-accent-soft/20 flex items-center justify-center">
+                  <PhoneCall size={14} className="text-pub-accent-soft" />
                 </div>
                 <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-gray-500">
                   KI Telefonassistent
@@ -204,7 +204,7 @@ export function KiCTASection() {
               className="hidden lg:flex flex-col justify-center px-8 py-14 bg-white/[0.015] border-l border-white/[0.04]"
             >
               <div className="flex items-center gap-2 mb-6">
-                <div className="w-1.5 h-1.5 rounded-full bg-sky-500/70" />
+                <div className="w-1.5 h-1.5 rounded-full bg-pub-accent-soft/70" />
                 <p className="text-[9.5px] font-semibold uppercase tracking-[0.2em] text-gray-600">
                   Beispielgespräch
                 </p>
@@ -221,7 +221,7 @@ export function KiCTASection() {
                     <div
                       className={`max-w-[92%] px-3 py-2 rounded-xl text-[10.5px] leading-snug ${
                         msg.from === 'ai'
-                          ? 'bg-sky-500/10 text-sky-200/80 border border-sky-500/10 rounded-tl-sm'
+                          ? 'bg-pub-accent-soft/10 text-pub-accent-line border border-pub-accent-soft/10 rounded-tl-sm'
                           : 'bg-white/[0.05] text-gray-400 rounded-tr-sm'
                       }`}
                     >

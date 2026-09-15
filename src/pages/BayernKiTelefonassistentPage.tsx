@@ -381,7 +381,7 @@ function UseCasesSection() {
               viewport={{ once: true, margin: "-30px" }}
               variants={fadeUp}
               custom={i * 0.07}
-              className="flex gap-4 p-6 rounded-2xl bg-white dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/50"
+              className="flex gap-4 p-6 rounded-2xl min-w-0 cq-shrink-children bg-white dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/50"
             >
               <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-700/60 border border-gray-200 dark:border-gray-600 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <item.icon size={17} className="text-gray-500 dark:text-gray-400" />

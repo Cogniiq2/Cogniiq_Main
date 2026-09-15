@@ -136,11 +136,11 @@ export function TrustSection() {
                 variants={fadeUp}
                 custom={i * 0.07}
                 className={`group relative bg-white p-8 hover:bg-gray-50/60 transition-colors duration-300 flex flex-col ${
-                  item.highlight ? 'ring-1 ring-inset ring-sky-100' : ''
+                  item.highlight ? 'ring-1 ring-inset ring-pub-accent-line' : ''
                 }`}
               >
                 {item.highlight && (
-                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-sky-400/50" />
+                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-pub-accent-soft/50" />
                 )}
 
                 {/* Hover left bar */}

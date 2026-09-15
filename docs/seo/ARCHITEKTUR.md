@@ -2,7 +2,8 @@
 
 Angelegt: 2026-09-12 · Branch `claude/seo-architecture-max-2026-09-12` ·
 Basis-Commit `3e44c84` · Datenstand Messung: GSC-Exporte vom 2026-09-10
-(3 Monate 2026-06-09–2026-09-08, 28 Tage 2026-08-12–2026-09-08)
+(3 Monate 2026-06-09–2026-09-08, 28 Tage 2026-08-12–2026-09-08) ·
+**§5 neu am 2026-09-13** (Webdesign-Durchgang, Inhaber-Abfrage der Property bis 2026-09-10)
 
 **Zweck.** Eine Regel, die sich ohne dieses Dokument nicht durchhalten lässt:
 
@@ -253,56 +254,170 @@ dieses Clusters, die heute schon in Reichweite der ersten Ergebnisseite steht.
 
 ## 5 · Webdesign (Geschäftspriorität 3)
 
-### 5.1 Die fünf Eigentümerfragen der Mission, beantwortet
+**Stand 2026-09-13** (Branch `claude/webdesign-recovery-max-2026-09-13`). Der
+Abschnitt ist neu geschrieben; die Fassung vom 12.09. steht in der Git-Historie.
+Datenquelle für alle Zahlen hier: **Inhaber-Abfrage der echten Search-Console-
+Property `sc-domain:cogniiq.de`**, letzter gesetzter Tag 2026-09-10 — nicht die
+Pages.csv-Aggregate der Vorläufe.
 
-1. **Generisches `webdesign`** → `/webdesign`. Heute mit 3.103 Zeichen und (vor
-   diesem Durchgang) einem kontextuellen eingehenden Link die schwächste
-   Pillar-Seite der Domain — bei 34 ausgehenden Links. Sie verteilt Autorität
-   und bekommt keine.
-2. **Lokale kommerzielle Intention** → `/<stadt>/webdesign`. Das funktioniert
-   bereits: 27–28 eingehende Links je Seite, und sie sind die
-   impressionsstärksten URLs der Domain (`/regensburg/webdesign` 2.347 Impr. in
-   28 Tagen).
-3. **Kosten-Intention** → `/kosten-webdesign` national, `/<stadt>/webdesign-kosten`
-   lokal. Vier Seiten auf eine Preisfrage ist die zweitgrößte Überlappung der
-   Domain (§6).
-4. **Hotel** → `/webdesign-hotel`, eindeutig und sauber getrennt. Seit 10.09.2026
-   auf „Internetagentur für Hotellerie" gezogen — **hat bis 12.09. nicht
-   gewirkt**, siehe §7.
-5. **Substanzielle Überlappung** → `/webdesign` ↔ `/webdesign-agentur-deutschland`
-   (beide „webdesign agentur"), und `/<stadt>/webdesign` ↔
-   `/<stadt>/website-erstellen` (§6).
+### 5.1 Eigentümer-Hierarchie
 
-| Route | Intention | Rolle | Kontext-Links vorher → nachher |
+| Route | Besitzt (Query-Familie) | Rolle | Status 13.09.2026 |
 |---|---|---|---|
-| `/webdesign` | „webdesign agentur", „website erstellen lassen" | **PILLAR** | **1 → 4** |
-| `/webdesign-agentur-deutschland` | „webdesign agentur deutschland" (national, nicht generisch) | PILLAR (national) | 19 |
-| `/kosten-webdesign` | „webdesign kosten", „was kostet eine website" | **KOSTEN** | 9 |
-| `/webdesign-hotel` | „internetagentur hotel", „webdesign hotel" | SEGMENT | 10 · 814 Impr., Pos. 36,0 |
-| `/webdesign-arzt` | „webdesign arztpraxis" | SEGMENT | 12 |
-| `/webdesign-gastronomie` | „webdesign restaurant/gastronomie" | SEGMENT | 11 |
-| `/webdesign-immobilien` | „webdesign immobilienmakler" | SEGMENT | 11 |
-| `/webdesign-sport` | „webdesign sportverein/fitnessstudio" | SEGMENT | 5 |
-| `/webdesign-{arzt,gastronomie,immobilien}-{bayreuth,muenchen,regensburg}` | „webdesign <branche> <stadt>" | SEGMENT (Branche×Ort) | je 6–7 |
-| `/keine-anfragen-website` | „website bringt keine anfragen" | PROBLEM | 19 |
-| `/blog/webdesign-konversion-tipps`, `/blog/website-ohne-anfragen`, `/blog/webdesign-agentur-auswahl`, `/blog/lokales-seo-unternehmen` | informational | REDAKTION | 1–6 · Titel mit „2025" |
+| `/webdesign` | „webdesign agentur", „webdesign für unternehmen", „website erstellen lassen", „professionelle website", „firmenwebsite" — **national, generisch** | **PILLAR** (erklärt **und** verlinkt) | **neu aufgebaut**: 578 → ~2.300 Wörter, 32 → 19 Körper-Linkziele, 21 kontextuelle eingehende Seiten (vorher 4), Priorität 0.95 |
+| `/webdesign-agentur-deutschland` | — (überlappt vollständig mit `/webdesign`) | PILLAR-DUBLETTE, **KONSOLIDIERUNG AUFGESCHOBEN (F9)** | bleibt **vorerst live**, unverändert; alle nicht eingefrorenen internen Links zeigen jetzt auf `/webdesign`. Einzig `/bayreuth/webdesign` (FROZEN) verlinkt sie weiter |
+| `/kosten-webdesign` | „webdesign kosten", „was kostet eine website", „homepage kosten" — national | **KOSTEN** | neu aufgebaut ohne `CostPage`: 18 unbelegte Beträge/Zusagen entfernt (`preisaudit-webdesign.md`), Titel ohne Jahreszahl |
+| `/<stadt>/webdesign-kosten` | „webdesign kosten <stadt>" | KOSTEN (lokal) | unverändert · `/muenchen/webdesign-kosten` FROZEN |
+| `/bayreuth/webdesign` | „webdesign bayreuth", „webdesign agentur bayreuth", „website erstellen bayreuth" | SEGMENT (Geo) | **FROZEN**, unverändert |
+| `/regensburg/webdesign` | dito Regensburg | SEGMENT (Geo) | FAQ-Preise/-Dauern/Herstellerliste entfernt (D1–D4), sonst unverändert |
+| `/muenchen/webdesign` | dito München | SEGMENT (Geo) | FAQ-Preise/-Dauern, Ladezeitwert entfernt (D5–D7), sonst unverändert |
+| `/webdesign-hotel` | „webdesign hotel", „internetagentur hotel" | SEGMENT (Branche) | **Messpunkt M1**, nur der Pflicht-Link auf den Pillar geändert |
+| `/webdesign-arzt`, `-gastronomie`, `-immobilien`, `-sport` | „webdesign <branche>" | SEGMENT (Branche) | nur der Pflicht-Link auf den Pillar geändert |
+| `/webdesign-{branche}-{stadt}` (9) | „webdesign <branche> <stadt>" | SEGMENT (Branche×Ort) | unverändert |
+| `/<stadt>/website-relaunch` | „website relaunch <stadt>", Relaunch-Intention | SEGMENT (Relaunch) | unverändert · Bayreuth und Regensburg FROZEN |
+| `/<stadt>/website-erstellen`, `/<stadt>/landingpage` | siehe §5.6 | SUPPORT | unverändert (keine Query×Seite-Evidenz) |
+| `/bayreuth/lokales-seo` | **„seo bayreuth", „seo agentur bayreuth", „lokales seo bayreuth"** | SEGMENT (SEO, Geo) | Titel/H1 auf den Kopfbegriff gezogen, Preis-FAQ bereinigt, neuer Kontextlink vom Hub |
+| `/muenchen/lokales-seo`, `/regensburg/lokales-seo` | „lokales seo <stadt>" | SUPPORT | unverändert |
+| `/bayreuth`, `/muenchen`, `/regensburg` | **Marke × Ort** („cogniiq regensburg", Unternehmen-vor-Ort-Suche) | HUB | Titel/H1/Tagline von „AI-Systeme & Webdesign in <Stadt>" auf „Cogniiq in <Stadt> – …" gezogen (§5.5) |
+| `/` | Marke, Entität Bayreuth | HUB | Webdesign-Karte verlinkt jetzt den Pillar statt `/leistungen` |
+| `/leistungen`, `/deutschland` | Übersicht | HUB | je ein Kontextlink „Webdesign für Unternehmen" auf den Pillar |
+| `/keine-anfragen-website` | „website bringt keine anfragen" | PROBLEM | Link auf die zurückgezogene Seite entfernt |
+| `/blog/webdesign-konversion-tipps`, `/blog/webdesign-agentur-auswahl` | informational | REDAKTION | „Weiterführend"-Block auf Pillar bzw. Kostenseite |
 
-### 5.2 Standort-Familien
+### 5.2 GSC-Baseline `/webdesign` (Inhaber-verifiziert)
 
-Je Stadt (`/bayreuth`, `/muenchen`, `/regensburg`) existieren acht
-Unterseiten: `webdesign`, `ki-telefonassistent`, `automatisierung`,
-`webdesign-kosten`, `website-erstellen`, `landingpage`, `website-relaunch`,
-`lokales-seo`. Die drei erstgenannten tragen die Familie (24–28 eingehende
-Links, 9.500–14.000 Zeichen). Die übrigen fünf liegen bei 3.500–5.300 Zeichen
-und 5–6 eingehenden Links.
+Zeitraum 2026-08-14 → 2026-09-10, Property `sc-domain:cogniiq.de`:
 
-Die Geo-Hubs selbst (`/bayreuth` 952, `/muenchen` 946, `/regensburg` 1.151
-Zeichen) sind **die dünnsten indexierbaren Seiten der Domain** bei 15
-eingehenden Links — reine Verteiler. `/regensburg` sammelt dabei 2.623
-Impressionen in 28 Tagen auf Ø Position **75,8**: viel Nachfrage, die auf einer
-Seite landet, die nichts beantwortet.
+| Fenster | Impressionen | Klicks | Position |
+|---|---:|---:|---|
+| 14.08.–30.08. (17 Tage) | **1.815** | 0 | überwiegend 70–90 |
+| 31.08. | 17 | 0 | |
+| 01.09.–10.09. | **0 an jedem Tag** | 0 | — |
 
----
+Die 1.815 Impressionen waren zu einem großen Teil **keine** nationale
+Webdesign-Nachfrage: „seo bayreuth" 45, „webentwicklung regensburg" 71,
+„homepage erstellen lassen regensburg" 42, „landingpage optimierung
+regensburg" 32, „seo agentur bayreuth" 32, dazu „webdesign bad neustadt",
+„webdesign altdorf", „internetagentur erlangen". Position 70–90 auf fremde
+lokale Queries ist keine Autorität. **1.815 ist deshalb keine Zielmarke.**
+Erfolg nach dem Deploy: relevante generische Impressionen, steigende
+Positionen, erste qualifizierte Klicks, weniger lokale Leckage — Messpunkt M5
+im Scoreboard.
+
+### 5.3 Der Einbruch vom 31.08.2026 — was bewiesen ist und was nicht
+
+Geprüft wurden alle Commits vom 20.08. bis 06.09. an Manifest, Middleware,
+Prerender, `_redirects`, `_headers`, Sitemap, Navigation, Footer, PageSEO,
+LocalBusinessSchema, `index.html`, `WebdesignHub.tsx`, `vite.config.ts`, und
+die Merge-Zeitlinie auf `main`:
+
+| Datum (Merge) | Änderung | Wirkung auf `/webdesign` |
+|---|---|---|
+| 24.08. `7a077ca` | Copy-Sweep Garantie, Middleware-Descriptions | `/webdesign` nicht betroffen |
+| 25.08. `a9f6957`, `e1c1cfc`, `035eb0c` | Deploy-Fixes für **private** Deep-Links (`/app-shell`), `_headers` Cache-Control | Nur private Präfixe und `/index.html`; öffentliche Routen unverändert |
+| 29.08. PR #63 `fc0cd3f` | Navigations-Hierarchie: Footer verliert ~40 Stadt×Branche-/Kosten-Links | Zahl der Quelldateien mit Link auf `/webdesign`: **8 → 8** (unverändert) |
+| 29.08. PR #64 `2f7ac20` | LCP: framer `initial opacity:0` → CSS `.cq-rise` (nur `transform`) in `WebdesignHub.tsx` | H1 ab erstem Frame sichtbar; Head, H1-Text, Links byte-identisch (Commit-Nachweis) |
+| 29.08. `55d2e3b` | PageSEO liest Metadaten aus dem Manifest | `/webdesign`: Manifest und Komponente trugen denselben Titel |
+| 30.08. PR #68, #76, #78 | Hero-SSR, Mobile-Typografie, Perf-Docs | `/webdesign` nicht betroffen |
+| 30.08.–06.09. | Middleware-Tabelle `/webdesign`: **identisch** mit Manifest (Titel, Description, Canonical, Keywords) an beiden Enden des Fensters | kein Head-Drift auf dieser Route (der Drift aus §7 betraf 29 **andere** Routen) |
+| 05./06.09. PR #85 | Zahnarzt-Beitrag, Blog | nach dem Einbruch, nicht kausal |
+
+Gelieferter Head (Manifest + Middleware-Overlay, beide gleich), `robots`
+(`index, follow`), Canonical (selbst), Sitemap-Eintrag (`lastmod 2026-06-30`),
+`_redirects`/`_headers` (nur private Präfixe) und Inbound-Topologie waren am
+30.08. und am 06.09. für `/webdesign` identisch mit dem Stand vom 24.08.
+
+**`No repository-side causal event proven.`** Kein Commit im Fenster hat Head,
+Indexierbarkeit, Canonical, Sitemap, Auslieferung oder Verlinkung dieser
+Route verändert. Was das Repository zeigt, ist ein **Zustand**, kein Ereignis:
+eine 578-Wörter-Seite, deren Körper aus 32 Links bestand und deren Impressionen
+auf Queries fielen, die andere Seiten der Domain wörtlich beantworten. Ein
+Impressionsabfall von 137 auf 0 in einem Tag passt zu einer Neubewertung durch
+Google (Deduplizierung gegen die Seiten, die diese Queries besitzen, oder ein
+anderes von Google gewähltes Canonical), nicht zu einem technischen Fehler —
+beweisen kann das nur die URL-Prüfung in der Search Console („von Google
+gewähltes Canonical", letztes Crawldatum). **Empfehlung an den Inhaber:** die
+URL-Prüfung für `/webdesign` mit dem Stand vor dem Deploy dieses Branches
+festhalten.
+
+### 5.4 Bayreuth-SEO: ein Eigentümer statt sieben
+
+„seo bayreuth" verteilte sich auf `/bayreuth/webdesign`, `/bayreuth/lokales-seo`,
+`/bayreuth`, `/webdesign`, `/`, `/bayreuth/website-relaunch` und
+`/deutschland`. Eigentümer ist **`/bayreuth/lokales-seo`** — die einzige Seite,
+deren Körper die Leistung beschreibt. Ausgerichtet wurden Titel („SEO Bayreuth –
+Lokales SEO & Google-Sichtbarkeit für Unternehmen"), H1, Keywords und ein
+neuer Kontextlink aus dem Hub `/bayreuth` („Lokales SEO für Bayreuth"). Von
+`/webdesign` ist der Anker „Lokales SEO Bayreuth" verschwunden, ebenso alle
+anderen 14 Stadt-Unterseiten-Anker. Kein Canonical, kein Entfernen von
+SEO-Bezügen auf den Webdesign-Seiten; `/bayreuth/webdesign` bleibt eingefroren
+und trägt seine SEO-Absätze weiter.
+
+### 5.5 Homepage und Geo-Hubs gegen die Stadt-Webdesign-Seiten
+
+„webdesign bayreuth" fiel auf `/bayreuth/webdesign` (71), `/` (61), `/bayreuth`
+(30) und `/webdesign` (23). Die Homepage trägt „Webdesign" im Titel, „Webdesign
+Agentur Bayreuth" in den Keywords, die Bayreuther Adresse im Organization- und
+LocalBusiness-Schema und „gegründet in Bayreuth" im Körper — legitime Marken-
+und Entitätssignale, die **nicht** entfernt werden. Geändert: die
+Webdesign-Karte der Startseite verlinkt den Pillar statt `/leistungen`; der
+Stadtlink „Bayreuth" → `/bayreuth/webdesign` bleibt. Die drei Geo-Hubs hießen
+„AI-Systeme & Webdesign in <Stadt>" mit der Tagline „Webdesign <Stadt> · …" —
+also ein zweiter Kandidat für „webdesign <stadt>". Sie heißen jetzt „Cogniiq in
+<Stadt> – KI-Telefonassistent, Websites & Automatisierung" und verlinken die
+Stadt-Webdesign-Seite mit dem Anker „Webdesign <Stadt>". `/regensburg` bleibt
+mit 132 Wörtern ein Verteiler; Substanz ist F7, nicht Teil dieses Durchgangs.
+
+### 5.6 Stadt-Mikroseiten — Klassifikation ohne Query×Seite-Export
+
+| Route(n) | Klasse | Begründung |
+|---|---|---|
+| `/<stadt>/website-relaunch` (3) | **A** — eigene Intention + Evidenz | Relaunch-Queries; Regensburg Pos. 12,2 / Bayreuth Pos. 14,4 (28D), zwei davon FROZEN |
+| `/<stadt>/webdesign-kosten` (3) | **A/B** | Kosten×Ort ist eigene Intention; München FROZEN mit 268 Impr. |
+| `/<stadt>/lokales-seo` (3) | **B** (Bayreuth: A, siehe §5.4) | „seo <stadt>" ist eigene Intention; Bayreuth hat GSC-Evidenz, die anderen nicht |
+| `/<stadt>/website-erstellen` (3) | **E** — unzureichende Evidenz | K5-Überlappung mit `/<stadt>/webdesign` bleibt Hypothese; **keine Weiterleitung ohne Query×Seite** (F4) |
+| `/<stadt>/landingpage` (3) | **E** | „landingpage optimierung regensburg" (32 Impr. auf `/webdesign`!) deutet auf Nachfrage — aber auf der falschen Seite; erst Export, dann entscheiden (F4) |
+
+Keine Massenweiterleitung. Keine Route wurde zurückgezogen; die eine beschlossene
+Weiterleitung (F9) wartet auf das Experimentende.
+
+### 5.7 Was auf `/webdesign` jetzt steht
+
+Sechsundzwanzig Käuferfragen in dreizehn Abschnitten: was gebaut wird, für wen
+und **für wen nicht** (sechs Fälle), neu oder Relaunch (drei Entscheidungsfragen),
+die sieben Ebenen eines Projekts, wer Inhalte liefert, Redaktionssystem vs.
+statisch, Suche/Ladezeit/Anfragen/Messung/Einwilligung/Barrierefreiheit mit der
+jeweiligen Grenze, Schnittstellen (vorher prüfen, was wenn nicht), die
+Relaunch-Prüfliste, Preistreiber in vier Sätzen mit Verweis auf
+`/kosten-webdesign`, dreizehn Ablaufschritte **ohne Dauern**, Branchen und
+Standorte, sieben FAQ, ein CTA. CTA-Hierarchie: primär „Website-Projekt
+besprechen" (`cta_kontakt_click`), sekundär „Was eine Website kostet"
+(`cta_kosten_click`), unterstützend Relaunch/Branchen/Standorte. Keine neuen
+Tracking-Ereignisse, keine Formularwerte in Analytics.
+
+Was **nicht** darauf steht, obwohl der Markt es zeigt (`serp-webdesign-2026-09.md`):
+Preisanker, Projektdauern, Bewertungszahlen, Kundenlogos, Herstellerlisten.
+Alles davon ist `BLOCKED — EVIDENCE`, nicht vergessen.
+
+### 5.8 Suchintentions-Trennung — Nachweis über Titel, H1, Körper und Links
+
+| Query-Familie | Eigentümer | Unterstützer (verlinken den Eigentümer) | Dürfen NICHT konkurrieren |
+|---|---|---|---|
+| generisches „webdesign", „webdesign für unternehmen" | `/webdesign` | `/`, `/leistungen`, `/deutschland`, Branchenseiten, Stadt-Service-Seiten, Blog | Geo-Hubs, `/kosten-webdesign` |
+| „webdesign agentur" | `/webdesign` (Titel „Webdesign Agentur – …") | Footer-Absatz, Stadt-Fußverweis „Webdesign Agentur" | `/webdesign-agentur-deutschland` (bleibt bis F9 eine bekannte Dublette, nur noch von einer eingefrorenen Seite verlinkt) |
+| „website erstellen lassen" | `/webdesign` (Keywords, Körper) | `/<stadt>/website-erstellen` lokal | `/` |
+| „website relaunch" | `/<stadt>/website-relaunch` | `/webdesign` (Entscheidungstabelle + Prüfliste, verlinkt alle drei) | `/webdesign` als Relaunch-Seite |
+| „webdesign kosten", „was kostet eine website" | `/kosten-webdesign` | `/webdesign` (vier Sätze + Link), Branchenseiten, Blog | `/webdesign` mit Preistabelle |
+| „webdesign hotel" | `/webdesign-hotel` | `/webdesign` (Branchenliste), Kostenseite | `/webdesign-gastronomie` |
+| „webdesign arzt" | `/webdesign-arzt` | `/webdesign`, `/webdesign-arzt-<stadt>` | `/praxen` |
+| „webdesign bayreuth" | `/bayreuth/webdesign` (FROZEN) | `/`, `/bayreuth` (Anker „Webdesign Bayreuth"), `/webdesign` (Anker „Bayreuth") | `/webdesign` (keine Stadt-Anker mehr), `/bayreuth` (Titel ohne „Webdesign in Bayreuth") |
+| „webdesign regensburg" | `/regensburg/webdesign` | `/regensburg` (Anker), `/webdesign` (Anker „Regensburg") | `/regensburg` (Titel geändert), `/webdesign` |
+| „webdesign münchen" | `/muenchen/webdesign` | `/muenchen`, `/webdesign` | `/muenchen` (Titel geändert) |
+| „seo bayreuth", „seo agentur bayreuth" | `/bayreuth/lokales-seo` | `/bayreuth` (neuer Kontextlink), Bayreuth-Mikroseiten | `/webdesign` (Anker entfernt), `/`, `/deutschland`, `/bayreuth/website-relaunch` |
+| „landingpage <stadt>" | `/<stadt>/landingpage` | — (Mikroseiten untereinander) | `/webdesign` (Anker entfernt) |
+
+Kein Canonical auf eine fremde URL. Die Trennung steht in Titeln, H1s, Körpern
+und Ankern; die eine 301 (F9) folgt nach Experimentende.
 
 ## 6 · Kannibalisierungsmatrix
 
@@ -314,11 +429,11 @@ Keyword-Werkzeug, sondern eine Aussage über Identität.
 | # | Seite A | Seite B | Überlappende Query-Familie | Absichtlich? | Gewinner | B soll stattdessen | Links verstärken den Richtigen? |
 |---|---|---|---|---|---|---|---|
 | ~~K1~~ | `/prozessautomatisierung` | ~~`/automatisierung-unternehmen`~~ | „automatisierung für unternehmen", „prozessautomatisierung", „ki automatisierung" | **Nein** | A | **GELÖST 12.09.2026** — B per 301 in A überführt, F2 umgesetzt (§4.1) | Ja: B existiert nicht mehr, alle 22 Links zeigen auf A (eine Ausnahme, eingefroren) |
-| K2 | `/webdesign` | `/webdesign-agentur-deutschland` | „webdesign agentur" | Nein | A generisch, B national | B schärft auf „deutschlandweit/remote" | Nein → A 4, B 19 |
+| K2 | `/webdesign` | `/webdesign-agentur-deutschland` | „webdesign agentur" | **Nein** | A | **ENTSCHIEDEN, AUFGESCHOBEN (F9, 13.09.2026)** — B hatte 5 Impressionen in 28 Tagen, fast alle markenbezogen, und wird per 301 in A überführt, sobald `/bayreuth/webdesign` und `/bayreuth/website-relaunch` graduieren: B trägt drei Anker in diese Experimente | Ja: A hat 21 kontextuelle eingehende Seiten, B nur noch die eingefrorene |
 | K3 | `/praxen` | `/ki-telefonassistent-arzt`, `/ki-telefonassistent-praxis` | „ki telefonassistent praxis/arztpraxis" | Teilweise | A kommerziell | `-praxis` ist Konsolidierungskandidat | Teilweise · B FROZEN (F3) |
 | K4 | `/kosten-webdesign` | `/bayreuth,/muenchen,/regensburg + /webdesign-kosten` | „webdesign kosten <stadt>" | Ja, lokal vs. national | je nach Ortsbezug | unverändert | Ja · `/muenchen/webdesign-kosten` FROZEN |
 | K5 | `/<stadt>/webdesign` | `/<stadt>/website-erstellen` | „webdesign <stadt>" ↔ „website erstellen <stadt>" | Fraglich | `/<stadt>/webdesign` | `website-erstellen` ist der schwächere Zwilling (F4) | Ja (27 vs. 5–6) |
-| K6 | `/regensburg` | `/regensburg/webdesign` | „webdesign regensburg" (700 Impr., Pos. 57,8) | Nein | `/regensburg/webdesign` | Hub bleibt Verteiler, braucht eigene Substanz | Unklar — **nicht entscheidbar ohne Query×Seite** |
+| K6 | `/regensburg` | `/regensburg/webdesign` | „webdesign regensburg" (700 Impr., Pos. 57,8) | Nein | `/regensburg/webdesign` | **13.09.2026:** Hub auf „Cogniiq in Regensburg" umbenannt, Tagline „Webdesign Regensburg · …" entfernt; Substanz bleibt F7 | Ja: der Hub verlinkt die Service-Seite mit „Webdesign Regensburg" |
 | K7 | `/kosten-automatisierung` | `/muenchen/automatisierung` | „automatisierung kosten" | Nein | `/kosten-automatisierung` | beobachten | Beide verlieren Impressionen bei besserer Position |
 | K8 | `/zu-viel-manuelle-arbeit`, `/digitale-automatisierung-unternehmen` | `/prozessautomatisierung` | „manuelle arbeit automatisieren" | Nein | Pillar | Problemseiten bleiben Einstieg | Nach diesem Durchgang: ja |
 | K9 | `/automatisierung-arzt` | `/ki-telefonassistent-arzt` | „terminbuchung arztpraxis automatisieren" | Teilweise | Telefon-Seite für Anrufe | Automatisierung ohne Telefonfokus | B FROZEN |
@@ -443,6 +558,17 @@ Manifest kommt. Das ist die Angabe, die ein späterer Leser braucht.
 `/kosten-ki-telefonassistent` ist seit dem 12.09.2026 **graduiert** und hier
 nicht mehr geschützt.
 
+**Nachtrag 13.09.2026 (Webdesign-Durchgang).** Alle fünf Fingerprints
+(Head, H1, Überschriften, Text, JSON-LD, ausgehende Anker) und alle
+Erwähnungszahlen unverändert; `src/test/fixtures/protected-experiments.baseline.json`
+ist **byte-identisch** mit `main`, `npm run seo:baseline` nicht gelaufen.
+`/bayreuth/webdesign` behält den Anker „Webdesign Agentur" →
+`/webdesign-agentur-deutschland` als Datum `legacyWebdesignLink` in seiner
+Konfiguration (Muster `legacyAutomationLink`). Genau deshalb bleibt
+`/webdesign-agentur-deutschland` vorerst live (F9): Die Seite verweist zweimal
+auf `/bayreuth/webdesign` und einmal auf `/bayreuth/website-relaunch`; sie zu
+löschen hätte die gemessene Inbound-Topologie beider Experimente geändert.
+
 ---
 
 ## 10 · Folgemissionen, nach erwarteter Wirkung
@@ -456,7 +582,9 @@ nicht mehr geschützt.
 | **F5** | **FAQ-Antworten in den SSR-Körper** (rendern und per CSS klappen, statt bedingt mounten). | Hebt den bewertbaren Körper **aller** FAQ-Seiten. Ändert die Fingerprints aller eingefrorenen Routen — daher erst nach Experimentende. |
 | **F6** | **`/ki-telefonassistent/demo` in die Hydrations-Stichprobe** aufnehmen und den dort vermuteten Fehler beweisen oder ausschließen. | Kleiner, isolierter Branch. Der Verdacht ist derzeit unbelegt; ein Test entscheidet ihn dauerhaft. |
 | **F7** | **Geo-Hubs mit Substanz versehen** (`/regensburg` zuerst: 2.623 Impressionen auf Position 75,8). | Vorhandene Nachfrage auf einer Seite mit 1.151 Zeichen. Eigene Mission, weil es Inhalt und nicht Architektur ist. |
-| **F8** | **`/webdesign` als Pillar ausbauen** — 3.103 Zeichen bei 34 ausgehenden Links sind kein Pillar, und K2 gegen `/webdesign-agentur-deutschland` bleibt sonst ungelöst. | Geschäftspriorität 3; nach F2. |
+| ~~**F8**~~ | **ERLEDIGT 13.09.2026.** `/webdesign` neu aufgebaut, `/kosten-webdesign` von 18 unbelegten Beträgen/Zusagen befreit, Bayreuth-SEO-Eigentümer und Geo-Hub-Titel ausgerichtet. Einzelheiten §5, Herkunftsprüfung `preisaudit-webdesign.md`. | Geschäftspriorität 3; nach F2. |
+| **F9** | **`/webdesign-agentur-deutschland` per 301 in `/webdesign` überführen** — nach Graduierung von `/bayreuth/webdesign` und `/bayreuth/website-relaunch`. Vorgehen wie F2: Eintrag in `LEGACY_REDIRECTS`, beide Formen in `public/_redirects`, Route aus Manifest/Router/Sitemap, Komponente löschen, `legacyWebdesignLink` entfernen. Die Seite trägt Preise, Dauern, „A/B-getestet", „nachweislich besser ranken" (`preisaudit-webdesign.md` B1–B8) — bis dahin **nicht** neu schreiben, nur nicht mehr verlinken. | Entschieden 13.09.2026, aufgeschoben, weil die Seite Anker in zwei eingefrorene Experimente trägt: Löschen würde deren gemessene Inbound-Topologie ändern (Inhaber-Review). GSC-Beleg bleibt gültig: 5 Impr., 0 Klicks, markenbezogen. |
+| **F10** | **Doppeltes Organization/WebSite/LocalBusiness-JSON-LD entfernen** — `index.html` trägt eine statische Kopie des Graphen, den `LocalBusinessSchema.tsx` auf jeder öffentlichen Seite ohnehin ausliefert; dazu die unvollständigen Organization-Knoten in `PageSEO.tsx` (`publisher`) durch `@id`-Referenzen ersetzen. | Seitenweite Head-Änderung, betrifft alle eingefrorenen Routen und die KI-/Automatisierungs-Messgebiete — eigener technischer Branch nach Experimentende, nie gebündelt (Inhaber-Review 13.09.2026). |
 
 ---
 

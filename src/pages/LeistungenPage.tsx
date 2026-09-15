@@ -45,6 +45,7 @@ const SERVICES = [
       { label: "Regensburg", href: "/regensburg" },
     ],
     branchenLinks: [
+      { label: "Webdesign für Unternehmen", href: "/webdesign" },
       { label: "Webdesign Gastronomie", href: "/webdesign-gastronomie" },
       { label: "Webdesign Arzt", href: "/webdesign-arzt" },
       { label: "Webdesign Immobilien", href: "/webdesign-immobilien" },

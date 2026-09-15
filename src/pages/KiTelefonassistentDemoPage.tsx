@@ -16,6 +16,7 @@ import { PageSEO } from "@/components/PageSEO";
 import { RechnerCta } from "@/components/RechnerCta";
 import { N8N_ENDPOINTS } from "@/config/externalEndpoints";
 import { BUSINESS_INFO, PHONE_HREF } from "@/lib/seo-data";
+import { trackEvent } from "@/lib/consent";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -105,6 +106,11 @@ export function KiTelefonassistentDemoPage() {
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setSent(true);
+      // Erst hier, im selben Zweig wie die Erfolgsanzeige: gemeldet wird der
+      // bestaetigte Eingang, nicht der Klick. Nur das Formular wird benannt —
+      // Name, Telefon, E-Mail, Firma, Branche und Freitext aus `payload`
+      // bleiben draussen.
+      trackEvent("lead_submitted", "demo");
     } catch (err) {
       console.warn("Receptionist demo submission failed", err);
       setError(

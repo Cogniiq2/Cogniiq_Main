@@ -94,6 +94,14 @@
      Deliberately NOT `overflow-x: hidden` on a container: that hides the
      symptom, leaves the text clipped and unreadable, and silently breaks
      `position: sticky` inside the same subtree.
+
+     NACHTRAG 15.09.2026 — `span` ergaenzt. Die Liste deckte Textelemente ab,
+     aber auf den Branchen- und Stadtseiten steht laufender Text auch direkt in
+     einem `<span>`: „Auftragsverarbeitungsvertrag nach Art. 28 DSGVO" auf
+     /ki-telefonassistent-arzt setzte so bei 320px einen Boden von 253px unter
+     seine Spalte. `hyphens` und `overflow-wrap` vererben zwar, aber nur von
+     einem Vorfahren, der sie traegt — und ein `<span>` in einem `<div>` hat
+     keinen. Deshalb steht es jetzt in beiden Listen.
      ─────────────────────────────────────────────────────────────────────────── */
   h1,
   h2,
@@ -106,7 +114,8 @@
   dt,
   dd,
   blockquote,
-  figcaption {
+  figcaption,
+  span {
     overflow-wrap: break-word;
   }
 
@@ -131,9 +140,33 @@
     dt,
     dd,
     blockquote,
-    figcaption {
+    figcaption,
+    span {
       hyphens: auto;
     }
+  }
+
+  /* ───────────────────────────────────────────────────────────────────────────
+     `cq-shrink-children` — release a flex/grid container's direct children.
+
+     A flex or grid item's automatic minimum size is `min-width: auto`, i.e. its
+     min-content width. A German compound sets that floor high
+     ("Reservierungsbestätigungen", "Auftragsverarbeitungsvertrag"), the track
+     cannot shrink below it, and the page grows a horizontal scrollbar at 320px.
+     `min-width: 0` on the children lets the track shrink so the text wraps and
+     hyphenates normally. It clips nothing and hides nothing.
+
+     WHY A NAMED CLASS AND NOT Tailwind's `[&>*]:min-w-0` ARBITRARY VARIANT.
+     That variant writes a literal `>` INTO the class attribute. Anything that
+     strips tags with the usual `/<[^>]*>/` stops at that `>` and spills the
+     rest of the attribute into the text it extracts — which is precisely what
+     src/lib/routing/protectedExperiments.ts does to fingerprint a frozen route.
+     Using it added 520 characters of attribute soup to /bayreuth/webdesign's
+     measured text and failed the guard, correctly. A styling change must not be
+     able to move a fingerprint; a class name without angle brackets cannot.
+     ─────────────────────────────────────────────────────────────────────────── */
+  .cq-shrink-children > * {
+    min-width: 0;
   }
 
   /* The former document-wide `* { transition: color 0.3s }` rule is gone:
@@ -287,6 +320,59 @@ html.cq-public-light {
   --pub-signal:     #1c4fd8;
   --pub-signal-ink: #1539a6;
   --pub-signal-wash:#eef2fe;
+
+  /* ── ACCENT RAMP ────────────────────────────────────────────────────────
+     Added 14.09.2026, taken from the rebuilt /webdesign and /kosten-webdesign
+     pages after the owner approved their appearance. The values ARE those
+     pages' blues (Tailwind blue-600/700/500/200/50), lifted verbatim rather
+     than re-picked, so the approved preview and the rest of the site cannot
+     drift apart.
+
+     This is a SECOND role, not a second brand colour, and the distinction is
+     the whole point:
+
+       `signal`  = the ONE primary action in a viewport, plus focus rings.
+                   Rationed. Unchanged by this work.
+       `accent`  = the quiet blue that tells a reader where meaning sits —
+                   a section label, a contextual link, a marker icon, a pale
+                   ground under information worth noticing.
+
+     Without the split, extending the approved look would have meant spending
+     `signal` on eyebrows and icons — exactly what its own rule forbids ("never
+     a section heading, never an icon fill, never a background wash") — and the
+     primary action would have stopped being findable. Two roles keep the
+     rationing intact.
+
+     MEASURED on the public ground (#ffffff / paper-2 #f6f6f5):
+       accent      #2563eb  5.17 / 4.78  → AA for small text
+       accent-ink  #1d4ed8  6.70 / 6.20  → hover and active
+       accent-soft #3b82f6  3.68 / 3.40  → ICONS AND RULES ONLY. Never text:
+                                           it fails 4.5:1 and would look like
+                                           a link that cannot be read.
+       accent-line #bfdbfe  1.42         → hairlines only, never a boundary a
+                                           reader must see to use the page
+       accent-wash #eff6ff  1.09         → ground, never a carrier of meaning
+
+     `accent-soft` and `accent-line` sit below AA for text on purpose: they are
+     non-text, where 3:1 applies to the icon and nothing applies to a decorative
+     hairline. Neither may ever become the only signal for a state — every
+     active, selected and focused element keeps a non-colour cue (weight, an
+     underline, a border, aria-current) so the page still reads without colour
+     vision.
+
+     Declared as SPACE-SEPARATED RGB CHANNELS, unlike the hex `--pub-*` tokens
+     above, because several accent uses need an alpha modifier (a 2px rule at
+     40 %, a tinted icon tile on the dark CTA panel). A Tailwind colour defined
+     as a plain `var(--x)` hex silently IGNORES `/40` — the utility emits an
+     opacity custom property the hex never reads, so the colour lands fully
+     opaque and nothing warns. The channel form with `<alpha-value>` is the
+     pattern that actually composes, so one token serves both the solid and the
+     tinted use instead of forcing a raw literal back into the markup. */
+  --pub-accent:      37 99 235;
+  --pub-accent-ink:  29 78 216;
+  --pub-accent-soft: 59 130 246;
+  --pub-accent-line: 191 219 254;
+  --pub-accent-wash: 239 246 255;
 
   --pub-verify:     #1f6f4a;
   --pub-verify-wash:#edf5f0;

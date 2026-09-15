@@ -442,7 +442,7 @@ export function KostenAutomatisierung() {
                 custom={i * 0.05}
                 className="flex gap-4 p-5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
               >
-                <CheckCircle2 size={16} className="flex-shrink-0 mt-0.5 text-[#515A61] dark:text-sky-400" />
+                <CheckCircle2 size={16} className="flex-shrink-0 mt-0.5 text-pub-accent-soft dark:text-pub-accent-soft" />
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">{f.titel}</h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{f.text}</p>
@@ -493,12 +493,12 @@ export function KostenAutomatisierung() {
                 custom={i * 0.08}
                 className="p-6 rounded-2xl bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
               >
-                <Icon size={22} className="mb-4 text-[#515A61] dark:text-sky-400" />
+                <Icon size={22} className="mb-4 text-pub-accent-soft dark:text-pub-accent-soft" />
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">{titel}</h3>
                 <ul className="space-y-2">
                   {punkte.map((p) => (
                     <li key={p} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                      <CheckCircle2 size={13} className="flex-shrink-0 mt-1 text-[#515A61] dark:text-sky-400" />
+                      <CheckCircle2 size={13} className="flex-shrink-0 mt-1 text-pub-accent-soft dark:text-pub-accent-soft" />
                       {p}
                     </li>
                   ))}
@@ -572,7 +572,7 @@ export function KostenAutomatisierung() {
               custom={0}
               className="p-6 rounded-2xl bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
             >
-              <Plug size={22} className="mb-4 text-[#515A61] dark:text-sky-400" />
+              <Plug size={22} className="mb-4 text-pub-accent-soft dark:text-pub-accent-soft" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
                 Fünf Fragen je System, vor dem Angebot
               </h3>
@@ -585,7 +585,7 @@ export function KostenAutomatisierung() {
                   "Welche Beschränkungen und Kosten verlangt der Anbieter dafür?",
                 ].map((p) => (
                   <li key={p} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <CheckCircle2 size={13} className="flex-shrink-0 mt-1 text-[#515A61] dark:text-sky-400" />
+                    <CheckCircle2 size={13} className="flex-shrink-0 mt-1 text-pub-accent-soft dark:text-pub-accent-soft" />
                     {p}
                   </li>
                 ))}
@@ -600,7 +600,7 @@ export function KostenAutomatisierung() {
               custom={0.08}
               className="p-6 rounded-2xl bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
             >
-              <ShieldAlert size={22} className="mb-4 text-[#515A61] dark:text-sky-400" />
+              <ShieldAlert size={22} className="mb-4 text-pub-accent-soft dark:text-pub-accent-soft" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
                 Wenn die Antwort nein lautet
               </h3>
@@ -615,7 +615,7 @@ export function KostenAutomatisierung() {
                   "Das Vorhaben ist in dieser Form nicht sinnvoll umsetzbar — und das sagen wir vorher.",
                 ].map((p) => (
                   <li key={p} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <CheckCircle2 size={13} className="flex-shrink-0 mt-1 text-[#515A61] dark:text-sky-400" />
+                    <CheckCircle2 size={13} className="flex-shrink-0 mt-1 text-pub-accent-soft dark:text-pub-accent-soft" />
                     {p}
                   </li>
                 ))}

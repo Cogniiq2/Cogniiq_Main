@@ -317,13 +317,13 @@ export function WebdesignAgenturDeutschland() {
                     custom={i * 0.1}
                     className="bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl p-6"
                   >
-                    <Icon size={24} className="mb-4 text-[#515A61] dark:text-sky-400" />
+                    <Icon size={24} className="mb-4 text-pub-accent-soft dark:text-pub-accent-soft" />
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{service.title}</h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4">{service.description}</p>
                     <ul className="space-y-1.5">
                       {service.benefits.map((b, bi) => (
                         <li key={bi} className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
-                          <CheckCircle2 size={13} className="flex-shrink-0 mt-0.5 text-[#515A61] dark:text-sky-400" />
+                          <CheckCircle2 size={13} className="flex-shrink-0 mt-0.5 text-pub-accent-soft dark:text-pub-accent-soft" />
                           {b}
                         </li>
                       ))}
@@ -358,12 +358,12 @@ export function WebdesignAgenturDeutschland() {
                     viewport={{ once: true }}
                     variants={fadeUp}
                     custom={i * 0.07}
-                    className="flex gap-4 p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
+                    className="flex gap-4 p-6 rounded-2xl min-w-0 cq-shrink-children bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
                   >
                     <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
                       <Icon size={16} className="text-gray-500 dark:text-gray-400" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">{item.title}</h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{item.description}</p>
                     </div>
@@ -433,12 +433,12 @@ export function WebdesignAgenturDeutschland() {
                   viewport={{ once: true }}
                   variants={fadeUp}
                   custom={i * 0.09}
-                  className="flex gap-4 p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
+                  className="flex gap-4 p-6 rounded-2xl min-w-0 cq-shrink-children bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
                 >
                   <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
                     <Lightbulb size={15} className="text-pub-ink-3 dark:text-gray-500" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">{uc.title}</h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{uc.description}</p>
                   </div>

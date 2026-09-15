@@ -20,7 +20,7 @@ const fadeUp = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  "KI-Automatisierung": "bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800",
+  "KI-Automatisierung": "bg-pub-accent-wash text-blue-700 border-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800",
   "Webdesign": "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800",
   "KI-Telefonassistent": "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800",
   "Digitalisierung": "bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700",
@@ -129,8 +129,8 @@ function SectionBlock({ section }: { section: BlogSection }) {
           badge: "Achtung",
         },
         info: {
-          wrapper: "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800",
-          icon: <Info size={15} className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />,
+          wrapper: "bg-pub-accent-wash border-blue-200 dark:bg-blue-900/20 dark:border-blue-800",
+          icon: <Info size={15} className="text-pub-accent dark:text-blue-400 flex-shrink-0 mt-0.5" />,
           label: "text-blue-700 dark:text-blue-400",
           text: "text-blue-800 dark:text-blue-300",
           badge: "Info",
@@ -301,7 +301,7 @@ export function BlogPostPage() {
 
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12 lg:py-16">
           <div className="grid lg:grid-cols-[1fr_280px] gap-12 lg:gap-16 items-start">
-            <article className="max-w-3xl">
+            <article className="max-w-3xl min-w-0">
               <motion.p
                 className="cq-rise text-[16px] font-medium text-gray-700 dark:text-gray-200 leading-[1.75] mb-8 border-l-2 border-gray-200 dark:border-gray-700 pl-5"
               >
@@ -336,7 +336,7 @@ export function BlogPostPage() {
                       <li key={w.to}>
                         <Link
                           to={w.to}
-                          className="text-[15.5px] font-semibold text-gray-900 dark:text-gray-100 underline underline-offset-4 hover:no-underline"
+                          className="text-[15.5px] font-semibold text-pub-accent dark:text-gray-100 underline underline-offset-4 hover:no-underline"
                         >
                           {w.label}
                         </Link>
@@ -440,7 +440,7 @@ export function BlogPostPage() {
                           className="group flex items-start gap-3 py-2"
                         >
                           <div className="flex-shrink-0 w-1 h-1 mt-2 rounded-full bg-gray-300 dark:bg-gray-600 group-hover:bg-gray-500 dark:group-hover:bg-gray-400 transition-colors" />
-                          <p className="text-[13px] text-gray-600 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white leading-snug transition-colors">
+                          <p className="text-[13px] text-gray-600 dark:text-gray-300 group-hover:text-pub-accent dark:group-hover:text-white leading-snug transition-colors">
                             {r.title}
                           </p>
                         </Link>
@@ -493,7 +493,7 @@ export function BlogPostPage() {
                       >
                         {r.category}
                       </span>
-                      <h3 className="text-[14.5px] font-semibold text-gray-900 dark:text-gray-100 leading-[1.45] mb-2 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors flex-1">
+                      <h3 className="text-[14.5px] font-semibold text-gray-900 dark:text-gray-100 leading-[1.45] mb-2 group-hover:text-pub-accent dark:group-hover:text-gray-200 transition-colors flex-1">
                         {r.title}
                       </h3>
                       <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">

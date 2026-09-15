@@ -398,7 +398,7 @@ export function KontaktPage() {
                       <MapPin size={14} className="text-gray-500 dark:text-gray-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors">
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-pub-accent dark:group-hover:text-gray-200 transition-colors">
                         {BUSINESS_INFO.address.streetAddress}
                       </p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -420,7 +420,7 @@ export function KontaktPage() {
                     <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center flex-shrink-0 group-hover:border-gray-400 dark:group-hover:border-gray-500 transition-colors">
                       <Mail size={14} className="text-gray-500 dark:text-gray-400" />
                     </div>
-                    <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                    <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-pub-accent dark:group-hover:text-white transition-colors">
                       {BUSINESS_INFO.contact.email}
                     </span>
                   </a>
@@ -431,7 +431,7 @@ export function KontaktPage() {
                     <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center flex-shrink-0 group-hover:border-gray-400 dark:group-hover:border-gray-500 transition-colors">
                       <Phone size={14} className="text-gray-500 dark:text-gray-400" />
                     </div>
-                    <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                    <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-pub-accent dark:group-hover:text-white transition-colors">
                       {BUSINESS_INFO.contact.phoneDisplay}
                     </span>
                   </a>

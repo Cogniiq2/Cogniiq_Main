@@ -139,7 +139,7 @@ export function ProblemSection() {
                 }`}
               >
                 {/* Hover left accent bar */}
-                <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-sky-500 scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-bottom" />
+                <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-pub-accent-soft scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-bottom" />
 
                 <div className="flex items-start justify-between mb-6">
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${

@@ -180,7 +180,7 @@ export function ProblemPage({ config }: Props) {
                   viewport={{ once: true }}
                   variants={fadeUp}
                   custom={i * 0.08}
-                  className="flex gap-4 p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
+                  className="flex gap-4 p-6 rounded-2xl min-w-0 cq-shrink-children bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
                 >
                   <TrendingDown size={18} className="flex-shrink-0 mt-0.5 text-pub-ink-3 dark:text-gray-500" />
                   <div>
@@ -239,7 +239,7 @@ export function ProblemPage({ config }: Props) {
                     custom={i * 0.06}
                     className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/50"
                   >
-                    <CheckCircle2 size={15} className="text-[#515A61] dark:text-sky-400 flex-shrink-0" />
+                    <CheckCircle2 size={15} className="text-pub-accent-soft dark:text-pub-accent-soft flex-shrink-0" />
                     <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{bullet}</span>
                   </motion.div>
                 ))}

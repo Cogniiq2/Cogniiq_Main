@@ -194,7 +194,7 @@ export function NationalIndustryPage({ config }: Props) {
               <span className="text-gray-600 dark:text-gray-300">{config.h1}</span>
             </motion.nav>
 
-            <div className="grid lg:grid-cols-[1fr_380px] gap-16 items-start">
+            <div className="grid lg:grid-cols-[1fr_380px] gap-16 items-start cq-shrink-children">
               <motion.div className="cq-rise">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 text-sm font-medium tracking-wider uppercase mb-8 shadow-sm">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
@@ -301,7 +301,7 @@ export function NationalIndustryPage({ config }: Props) {
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-2 gap-4 cq-shrink-children">
               {config.problems.map((problem, i) => (
                 <motion.div
                   key={i}
@@ -309,7 +309,7 @@ export function NationalIndustryPage({ config }: Props) {
                   whileInView="visible"
                   viewport={{ once: true, margin: "-30px" }}
                   variants={fadeUp}
-                  className="flex gap-4 p-6 rounded-2xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors duration-300 group"
+                  className="flex gap-4 p-6 rounded-2xl min-w-0 cq-shrink-children bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors duration-300 group"
                 >
                   <div className="w-1 rounded-full bg-gray-200 dark:bg-gray-700 flex-shrink-0 mt-1 self-stretch group-hover:bg-gray-300 dark:group-hover:bg-gray-600 transition-colors" />
                   <div>
@@ -333,7 +333,7 @@ export function NationalIndustryPage({ config }: Props) {
         {/* ── SOLUTION ── */}
         <section className="py-24 bg-gray-50 dark:bg-gray-900/40" aria-labelledby="solution-heading">
           <div className="max-w-6xl mx-auto px-6 lg:px-8">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="grid lg:grid-cols-2 gap-16 items-center cq-shrink-children">
               <motion.div
                 initial="hidden"
                 whileInView="visible"
@@ -375,7 +375,7 @@ export function NationalIndustryPage({ config }: Props) {
                     whileInView="visible"
                     viewport={{ once: true }}
                     variants={fadeUp}
-                    className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50 hover:border-gray-200 dark:hover:border-gray-600 transition-colors duration-200"
+                    className="flex items-center gap-4 p-4 rounded-xl cq-shrink-children bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50 hover:border-gray-200 dark:hover:border-gray-600 transition-colors duration-200"
                   >
                     <CheckCircle2 size={14} className="text-emerald-500 flex-shrink-0" />
                     <span className="text-[17px] text-gray-700 dark:text-gray-300 leading-relaxed">{benefit}</span>
@@ -406,7 +406,7 @@ export function NationalIndustryPage({ config }: Props) {
 
             <div className="relative">
               <div className="hidden lg:block absolute top-[28px] left-[calc(16.66%+28px)] right-[calc(16.66%+28px)] h-px border-t border-dashed border-gray-200 dark:border-gray-700" />
-              <div className="grid sm:grid-cols-3 gap-8 lg:gap-12">
+              <div className="grid sm:grid-cols-3 gap-8 lg:gap-12 cq-shrink-children">
                 {config.workflow.steps.map((step, i) => (
                   <motion.div
                     key={i}

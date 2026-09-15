@@ -1,10 +1,49 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ArrowLeft, CircleCheck as CheckCircle2 } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
+import { trackEvent } from "@/lib/consent";
+import { leadAlsGemeldetVormerken } from "@/lib/leadConversion";
 
 
+/*
+  Diese Seite ist die einzige Stelle, an der eine Anfrage ueber das
+  Kontaktformular als abgeschlossen gilt — und deshalb die einzige, die sie
+  melden darf.
+
+  ContactSection navigiert hierher ausschliesslich nach einem gelesenen 2xx des
+  Endpunkts und reicht dabei `state.submitted` mit. Genau dafuer war der
+  Zustand seit jeher gedacht ("so it can fire the conversion event without
+  counting failures"), nur hat ihn niemand gelesen: die Seite hat das Ereignis
+  nie ausgeloest. GA4 kannte damit 27 Absichtssignale und keinen einzigen
+  bestaetigten Lead.
+
+  Der Zustand wird geprueft, nicht der Pfad. /anfrage-erhalten ist eine
+  indexierbare Route in PUBLIC_ROUTES: ein Direktaufruf aus der Suche, ein
+  Lesezeichen, ein Reload oder ein Crawler erreicht sie ohne `state` — und darf
+  keine Anfrage erzeugen, die es nicht gab.
+
+  Geprueft wird zusaetzlich `state.leadId` — die Kennung GENAU DIESER
+  Uebermittlung. Ein Riegel im Bauteil (`useRef`) reicht dafuer nicht, und das
+  ist gemessen, nicht vermutet: eine zweite Montage desselben History-Eintrags
+  meldete damit nachweislich ein zweites Mal. Der Zustand gehoert zum Eintrag,
+  nicht zum Mount — Zurueck und Neuladen legen ihn unveraendert wieder vor,
+  waehrend ein Ref mit der Instanz verschwindet. Die Kennung dagegen wird in
+  `src/lib/leadConversion.ts` genau einmal je Uebermittlung angenommen; eine
+  zweite echte Anfrage bringt eine neue Kennung mit und wird gemeldet.
+*/
 export function AnfrageErhaltenPage() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const state = location.state as { submitted?: boolean; leadId?: unknown } | null;
+    if (state?.submitted !== true) return;
+    if (typeof state.leadId !== "string") return;
+    if (!leadAlsGemeldetVormerken(state.leadId)) return;
+    trackEvent("lead_submitted", "kontakt");
+  }, [location.state]);
+
   return (
     <>
       <PageSEO

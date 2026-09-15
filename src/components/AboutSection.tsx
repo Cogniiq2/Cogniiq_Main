@@ -167,7 +167,7 @@ export function AboutSection() {
                     className="flex items-start gap-4"
                   >
                     <div className="p-2 rounded-lg bg-gray-200/40 flex-shrink-0">
-                      <Icon className="w-5 h-5 text-[#515A61]" />
+                      <Icon className="w-5 h-5 text-pub-accent-soft" />
                     </div>
                     <p className="text-gray-700 leading-relaxed">{highlight.text}</p>
                   </motion.div>
