@@ -301,7 +301,7 @@ export function BlogPostPage() {
 
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12 lg:py-16">
           <div className="grid lg:grid-cols-[1fr_280px] gap-12 lg:gap-16 items-start">
-            <article className="max-w-3xl">
+            <article className="max-w-3xl min-w-0">
               <motion.p
                 className="cq-rise text-[16px] font-medium text-gray-700 dark:text-gray-200 leading-[1.75] mb-8 border-l-2 border-gray-200 dark:border-gray-700 pl-5"
               >

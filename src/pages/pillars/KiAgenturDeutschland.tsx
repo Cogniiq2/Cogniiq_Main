@@ -353,12 +353,12 @@ export function KiAgenturDeutschland() {
                     viewport={{ once: true }}
                     variants={fadeUp}
                     custom={i * 0.07}
-                    className="flex gap-4 p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
+                    className="flex gap-4 p-6 rounded-2xl min-w-0 cq-shrink-children bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
                   >
                     <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
                       <Icon size={16} className="text-gray-500 dark:text-gray-400" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">{item.title}</h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{item.description}</p>
                     </div>
@@ -428,12 +428,12 @@ export function KiAgenturDeutschland() {
                   viewport={{ once: true }}
                   variants={fadeUp}
                   custom={i * 0.09}
-                  className="flex gap-4 p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
+                  className="flex gap-4 p-6 rounded-2xl min-w-0 cq-shrink-children bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
                 >
                   <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
                     <Lightbulb size={15} className="text-pub-ink-3 dark:text-gray-500" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">{uc.title}</h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{uc.description}</p>
                   </div>

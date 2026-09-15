@@ -1314,3 +1314,73 @@ Es gilt weiterhin Regel 1: keine Erfolgsmeldung vor Tag 28.
    Formular abschicken** — der Endpunkt löst eine reale Bearbeitung aus.
 4. **Proof-Assets.** Siehe `authority-acquisition-plan.md`; ohne sie bleibt die
    Autoritätsarbeit blockiert. Nichts davon wird erfunden.
+
+---
+
+# Nachtrag 15.09.2026 — Farb-Rollout und Umbruchkorrekturen als Störgrößen
+
+Zwei Änderungen sind nach dem Messpunkt vom 14.09. dazugekommen. Beide sind
+reine Darstellungsänderungen, und genau deshalb steht dieser Abschnitt hier:
+**sie ändern nichts am Inhalt, aber sie können die Konversionsmessung
+verschieben — und das ist nicht dasselbe.**
+
+## Der Irrtum, den dieser Abschnitt ausräumt
+
+Die fünf eingefrorenen Fingerabdrücke sind unverändert. Daraus folgt genau
+eine Aussage: **der Inhalt ist erhalten** — Titel, Description, Canonical,
+Überschriften, sichtbarer Text, JSON-LD und Anker sind identisch. Ein
+Fingerabdruck liest keine Klassennamen, keine Farben und keine Umbrüche.
+
+Daraus folgt **nicht**, dass ein Konversionsexperiment unberührt geblieben
+ist. Was ein Besucher sieht und anklickt, hat sich sehr wohl geändert:
+
+| Änderung | Warum das die Konversion berühren kann |
+|---|---|
+| Kontextlinks im Fließtext sind jetzt blau statt Tintenfarbe | Ein erkennbarer Link wird häufiger geklickt. Interne Klickpfade und Verweildauer können sich verschieben, ohne dass eine Seite anders rankt |
+| Marker-Icons, Eyebrows, Karten-Hover und Schrittnummern tragen Akzentblau | Lenkt Aufmerksamkeit anders durch die Seite |
+| `/prozessautomatisierung` war grün akzentuiert und ist jetzt blau; die primäre Handlung ist von grün auf das etablierte Schwarz gewechselt | Die auffälligste Einzeländerung. Ein Handlungsknopf, der die Farbe wechselt, ist ein klassischer A/B-Testgegenstand — hier ohne Test geändert |
+| Aktiver Reiter, Navigations-Indikator, FAQ-Marker und die beiden Rechner-Schieber sind blau | Betrifft Bedienelemente, nicht nur Dekoration |
+| Umbruchkorrekturen bei 320/390px | Auf neun Seiten verschwindet ein horizontaler Scrollbalken. Das ist eine **Verbesserung** der mobilen Bedienbarkeit — und damit ebenfalls eine Störgröße: eine steigende Konversion auf diesen Seiten ist danach nicht mehr eindeutig der SEO-Arbeit zuzuschreiben |
+
+## Konsequenz für die Auswertung
+
+1. **`lead_submitted` misst ab dem Deploy eine andere Seite als davor.** Es gibt
+   keinen Vorher-Wert: Das Ereignis existiert erst seit dem 14.09. und hat noch
+   nie gefeuert. Ein Vergleich „vor/nach Farbe" ist deshalb nicht möglich und
+   wird auch nicht behauptet.
+2. **Ranking-Auswertungen bleiben gültig.** Positionen und Impressionen hängen
+   am Inhalt, und der ist unverändert — das ist die Aussage, die der
+   Fingerabdruck trägt.
+3. **CTR- und Konversionsbewegungen sind ab dem Deploy konfundiert.** Wer nach
+   Tag 28 eine veränderte Konversionsrate sieht, kann sie nicht sauber zwischen
+   Inhaltsarbeit, Farbführung und behobenem Mobil-Überlauf aufteilen. Das ist
+   der Preis dafür, beides in einem Release zu bündeln, und er wird hier
+   notiert statt später wegerklärt.
+4. **Sauber trennbar wäre nur ein eigener Test.** Wenn die Wirkung der
+   Handlungsfarbe auf `/prozessautomatisierung` wirklich interessiert, gehört
+   sie in einen A/B-Test gegen die schwarze Variante — nicht in eine
+   Rückrechnung aus diesem Release.
+
+## Betroffene Seiten der Umbruchkorrektur
+
+Gemessen über alle 87 indexierbaren Routen bei 320px und 390px.
+
+Vorher mit horizontalem Überlauf, jetzt sauber:
+`/bayreuth/webdesign` (425px bei 390 **und** 320), `/muenchen/webdesign`,
+`/kosten-automatisierung`, `/webdesign-arzt`, `/deutschland`,
+`/blog/webdesign-agentur-auswahl`, `/webdesign-gastronomie`,
+`/webdesign-immobilien` (auch bei 390), `/webdesign-hotel`, `/webdesign-sport`,
+`/ki-telefonassistent-arzt`, `/ki-telefonassistent-restaurant`,
+`/ki-telefonassistent-hotel`, `/ki-telefonassistent-praxis`,
+`/automatisierung-restaurant`, `/automatisierung-arzt`,
+`/automatisierung-immobilien` (auch bei 390), `/automatisierung-sport`.
+
+Die ursprüngliche Meldung nannte fünf Seiten. Der vollständige Durchlauf über
+alle Routen fand **achtzehn**; die Stichprobe von sechzehn Seitenfamilien hatte
+den Rest schlicht nicht berührt.
+
+## Deploy-Datum
+
+**Weiterhin UNBEKANNT — und wird erst eingetragen, wenn ein Deploy bestätigt
+ist.** Kein Commit-Datum, kein Preview-Datum, kein Merge-Datum. Alle
+Beurteilungsfenster dieses Dokuments zählen ab dem bestätigten Produktivstand.

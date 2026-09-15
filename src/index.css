@@ -94,6 +94,14 @@
      Deliberately NOT `overflow-x: hidden` on a container: that hides the
      symptom, leaves the text clipped and unreadable, and silently breaks
      `position: sticky` inside the same subtree.
+
+     NACHTRAG 15.09.2026 — `span` ergaenzt. Die Liste deckte Textelemente ab,
+     aber auf den Branchen- und Stadtseiten steht laufender Text auch direkt in
+     einem `<span>`: „Auftragsverarbeitungsvertrag nach Art. 28 DSGVO" auf
+     /ki-telefonassistent-arzt setzte so bei 320px einen Boden von 253px unter
+     seine Spalte. `hyphens` und `overflow-wrap` vererben zwar, aber nur von
+     einem Vorfahren, der sie traegt — und ein `<span>` in einem `<div>` hat
+     keinen. Deshalb steht es jetzt in beiden Listen.
      ─────────────────────────────────────────────────────────────────────────── */
   h1,
   h2,
@@ -106,7 +114,8 @@
   dt,
   dd,
   blockquote,
-  figcaption {
+  figcaption,
+  span {
     overflow-wrap: break-word;
   }
 
@@ -131,9 +140,33 @@
     dt,
     dd,
     blockquote,
-    figcaption {
+    figcaption,
+    span {
       hyphens: auto;
     }
+  }
+
+  /* ───────────────────────────────────────────────────────────────────────────
+     `cq-shrink-children` — release a flex/grid container's direct children.
+
+     A flex or grid item's automatic minimum size is `min-width: auto`, i.e. its
+     min-content width. A German compound sets that floor high
+     ("Reservierungsbestätigungen", "Auftragsverarbeitungsvertrag"), the track
+     cannot shrink below it, and the page grows a horizontal scrollbar at 320px.
+     `min-width: 0` on the children lets the track shrink so the text wraps and
+     hyphenates normally. It clips nothing and hides nothing.
+
+     WHY A NAMED CLASS AND NOT Tailwind's `[&>*]:min-w-0` ARBITRARY VARIANT.
+     That variant writes a literal `>` INTO the class attribute. Anything that
+     strips tags with the usual `/<[^>]*>/` stops at that `>` and spills the
+     rest of the attribute into the text it extracts — which is precisely what
+     src/lib/routing/protectedExperiments.ts does to fingerprint a frozen route.
+     Using it added 520 characters of attribute soup to /bayreuth/webdesign's
+     measured text and failed the guard, correctly. A styling change must not be
+     able to move a fingerprint; a class name without angle brackets cannot.
+     ─────────────────────────────────────────────────────────────────────────── */
+  .cq-shrink-children > * {
+    min-width: 0;
   }
 
   /* The former document-wide `* { transition: color 0.3s }` rule is gone:

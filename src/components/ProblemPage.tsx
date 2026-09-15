@@ -180,7 +180,7 @@ export function ProblemPage({ config }: Props) {
                   viewport={{ once: true }}
                   variants={fadeUp}
                   custom={i * 0.08}
-                  className="flex gap-4 p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
+                  className="flex gap-4 p-6 rounded-2xl min-w-0 cq-shrink-children bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700"
                 >
                   <TrendingDown size={18} className="flex-shrink-0 mt-0.5 text-pub-ink-3 dark:text-gray-500" />
                   <div>

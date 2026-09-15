@@ -613,12 +613,12 @@ function UseCasesSection({ config }: { config: IndustryPageConfig }) {
               viewport={{ once: true }}
               variants={fadeUp}
               custom={i * 0.08}
-              className="flex gap-4 p-6 rounded-2xl bg-white dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/50"
+              className="flex gap-4 p-6 rounded-2xl min-w-0 cq-shrink-children bg-white dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/50"
             >
               <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center">
                 <Lightbulb size={15} className="text-pub-ink-3 dark:text-gray-500" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   {useCase.title}
                 </h3>
