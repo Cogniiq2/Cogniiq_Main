@@ -248,6 +248,7 @@ const UeberUnsPage = lazyNamed(() => import('./pages/UeberUnsPage'), 'UeberUnsPa
 const FAQPage = lazyNamed(() => import('./pages/FAQPage'), 'FAQPage');
 const KontaktPage = lazyNamed(() => import('./pages/KontaktPage'), 'KontaktPage');
 const AnfrageErhaltenPage = lazyNamed(() => import('./pages/AnfrageErhaltenPage'), 'AnfrageErhaltenPage');
+const KundenprojektePage = lazyNamed(() => import('./pages/KundenprojektePage'), 'KundenprojektePage');
 
 // Location / hub pages
 const BayernPage = lazyNamed(() => import('./pages/BayernPage'), 'BayernPage');
@@ -662,6 +663,7 @@ export function AppInner() {
       <Route path="/faq" element={<FAQPage />} />
       <Route path="/kontakt" element={<KontaktPage />} />
       <Route path="/anfrage-erhalten" element={<AnfrageErhaltenPage />} />
+      <Route path="/kundenprojekte" element={<KundenprojektePage />} />
 
       <Route path="/ki-telefonassistent" element={<KiTelefonassistentPage />} />
       {/* Healthcare-Einstieg (Positionierung Option B) + freigegebene Neu-Routen.
