@@ -237,7 +237,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/deutschland",
     title: "AI-Systeme & Webdesign für Unternehmen in Deutschland | Cogniiq",
-    description: "Cogniiq entwickelt KI-Telefonassistenten, hochkonvertierende Websites und Automatisierungssysteme für Unternehmen in ganz Deutschland. Remote oder persönlich in Bayern.",
+    description: "Cogniiq entwickelt KI-Telefonassistenten, Websites für Unternehmen und Prozessautomatisierung für Unternehmen in ganz Deutschland. Remote oder persönlich in Bayern.",
     keywords: "AI Agentur Deutschland, Webdesign Deutschland, KI Systeme Deutschland, Automatisierung Deutschland",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.88" },
@@ -797,10 +797,10 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/blog/prozessautomatisierung-roi",
-    title: "Prozessautomatisierung ROI berechnen 2025 | Leitfaden",
-    description: "Wie Sie den Return on Investment einer Prozessautomatisierung korrekt berechnen – mit Formel, konkreten Beispielen und typischen Kostenfallen.",
+    title: "Prozessautomatisierung ROI berechnen | Formel, Amortisation, Kostenfallen",
+    description: "Wie Sie den ROI einer Prozessautomatisierung berechnen: Formel, welche Kosten in die Rechnung gehören, Amortisationszeit statt Prozentwert und wann sich Automatisierung nicht rechnet.",
     indexable: true,
-    sitemap: { lastmod: "2026-07-23", changefreq: "monthly", priority: "0.60" },
+    sitemap: { lastmod: "2026-09-17", changefreq: "monthly", priority: "0.60" },
   },
   {
     path: "/blog/verpasste-anrufe-kosten",
@@ -812,7 +812,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/blog/ki-telefonassistent-restaurant",
     title: "KI-Telefonassistent Restaurant 2025 | Reservierungen automatisieren",
-    description: "Wie Restaurants mit einem KI-Telefonassistenten Reservierungen automatisch annehmen, Wartelisten führen und Gäste nachqualifizieren – ohne Personal.",
+    description: "Wie Restaurants mit einem KI-Telefonassistenten Reservierungsanfragen auch in der Stoßzeit annehmen, was der Assistent übernimmt, was beim Team bleibt und woran die Anbindung an ein Reservierungssystem hängt.",
     indexable: true,
     sitemap: { lastmod: "2026-07-23", changefreq: "monthly", priority: "0.60" },
   },

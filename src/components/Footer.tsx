@@ -202,7 +202,6 @@ export function Footer() {
                       { text: "Alle Leistungen", to: "/leistungen" },
                       { text: "KI-Telefonassistent", to: "/ki-telefonassistent" },
                       { text: "Webdesign", to: "/webdesign" },
-                      { text: "Automatisierung", to: "/prozessautomatisierung" },
                       { text: "Prozessautomatisierung", to: "/prozessautomatisierung" },
                       { text: "Für Arzt- und Zahnarztpraxen", to: "/praxen" },
                     ],

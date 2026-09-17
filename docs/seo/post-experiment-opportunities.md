@@ -583,3 +583,74 @@ zugunsten einer Vermutung.
 `/verpasste-anrufe-verlust` (Ø 11,59) und `/kosten-automatisierung` (Ø 13,0)
 sind die nächstliegenden Seite-1-Chancen der Domain. Beide bleiben unberührt,
 weil beide frische Arbeit im Ledger tragen.
+
+---
+
+# Nachtrag 17.09.2026 — Autoritätslauf: HALT eingehalten, was danach ansteht
+
+Der Lauf `claude/seo-authority-sprint-2026-09-17` hat die drei HALT-Cluster
+**nicht** im Head oder Körper angefasst. Was er stattdessen getan hat, steht in
+`ARCHITEKTUR.md` §13. Hier die Punkte, die **erst nach Deploy + 28 Tagen** der
+jeweiligen Messreihe umgesetzt werden dürfen — fertig beurteilt, damit die
+Entscheidung dann nicht neu erarbeitet werden muss.
+
+## Q1 · `/prozessautomatisierung` — Entitäts- und Intentionslücken (nach M23, Tag 28)
+
+GSC 09/2026: „prozessautomatisierung agentur" Pos. ~57, „prozessautomatisierung
+kundenservice" Pos. ~58,6. Befund am Körper: Die Seite nennt sich nirgends
+„Agentur" (H1 „Geschäftsprozesse automatisieren — mit Ausnahmen, die jemand
+sieht"), und Kundenservice kommt als Prozessfamilie nicht vor; die sechs
+Ablaufmuster sind Buchung, Anfrage, Rechnung, Dokument, Erinnerung, Übergabe.
+
+Vorschlag, in dieser Reihenfolge: (1) Entitätssatz im Einstieg — wer Cogniiq
+ist und dass die Umsetzung als Agenturleistung erfolgt, ohne den Titel zu
+ändern; (2) ein siebtes Ablaufmuster „Kundenanfrage/Kundenservice" nur, wenn
+ein reales Ablaufmuster aus einem Projekt beschreibbar ist — sonst nicht;
+(3) FAQ „Was macht eine Agentur für Prozessautomatisierung?" nur mit dieser
+Substanz. Kein Keyword-Eintrag.
+
+## Q2 · `/ki-telefonassistent` — nach A5, Tag 28
+
+Nichts Neues gegenüber A5. Prüfpunkt Tag 28 bleibt: nimmt der Pillar
+Kosten-Queries auf, während `/kosten-ki-telefonassistent` verliert, dann die
+Rechner-H2 entschärfen. Die neuen eingehenden Links aus zwei Blogbeiträgen
+sind als Störgröße im Scoreboard vermerkt.
+
+## Q3 · `/kosten-ki-telefonassistent` — Praxis-Rahmung gegen generische Kostenquery
+
+175 Impressionen „ki telefonassistent kosten" (generisch) fallen auf eine
+Seite, deren Breadcrumb, Schema-Name und FAQ „für Praxen" sagen und deren
+Tarife Basis/Praxis/MVZ heißen. **Inhaberfrage, keine Copyfrage:** Gelten
+diese Tarife für jeden Betrieb? Wenn ja, kann die Rahmung generisch werden
+(Breadcrumb auf den Pillar, Schema-Name ohne „für Praxen"). Wenn nein, ist die
+Praxis-Rahmung richtig und die generische Kostenquery gehört langfristig an
+einen eigenen Abschnitt des Pillars — nicht an eine zweite Kostenseite.
+`BLOCKED — EVIDENCE` bis zur Antwort.
+
+## Q4 · `/webdesign-agentur-deutschland` — Zwischenschritt vor F9
+
+F9 (301) bleibt an die Graduierung der Bayreuther Experimente gebunden. Eine
+Option, die die gemessene Inbound-Topologie **nicht** ändert, wäre
+`indexable: false` für diese Route: Die Datei bleibt, ihre Anker in die
+eingefrorenen Routen bleiben, nur der Index verliert die Dublette. Der
+Inhaber hat am 14.09. entschieden, vorher nichts zu tun — hier nur als
+bewertete Möglichkeit festgehalten, nicht umgesetzt.
+
+## Q5 · `/bayreuth/webdesign` — nach Graduierung
+
+Dieselben Muster, die auf Regensburg und München am 17.09. entfernt wurden:
+Szenarien mit behaupteten Ergebnissen, Ziel-Suchbegriffe wörtlich im Text.
+Nach dem Experimentende zusammen mit `legacyAutomationLink` und
+`legacyWebdesignLink` bereinigen.
+
+## Q6 · Außerhalb der drei Cluster, aufgefallen
+
+- `/ki-agentur-deutschland` Description nennt „Chatbots" als Leistung; keine
+  Seite der Domain beschreibt ein Chatbot-Produkt. Prüfen oder streichen.
+- `/bayreuth` Description trägt weiterhin „hochkonvertierende Websites"
+  (M8-Fenster, deshalb nicht angefasst; `/deutschland` ist korrigiert).
+- `/blog/lokales-seo-unternehmen` verlinkt keine Leistungsseite; ein
+  Eigentümer für „lokales seo" national existiert nicht (nur
+  `/bayreuth/lokales-seo`, M7-Fenster). Offen lassen, bis M7 ausgewertet ist.
+- Blog-Titel mit „2025" (fünf Beiträge): nur mit echter Aktualisierung
+  entfernen; der ROI-Beitrag ist der Präzedenzfall.

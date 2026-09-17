@@ -1384,3 +1384,122 @@ den Rest schlicht nicht berührt.
 **Weiterhin UNBEKANNT — und wird erst eingetragen, wenn ein Deploy bestätigt
 ist.** Kein Commit-Datum, kein Preview-Datum, kein Merge-Datum. Alle
 Beurteilungsfenster dieses Dokuments zählen ab dem bestätigten Produktivstand.
+
+---
+
+# Messpunkt 17.09.2026 — Autoritätslauf
+
+Basis-Commit `d0f2083` (main). Arbeitszweig
+`claude/seo-authority-sprint-2026-09-17`. GSC-Werte laut Auftrag (Stand bis
+2026-09-14, Query×Seite; in dieser Sitzung nicht selbst nachgeladen, deshalb
+Snapshot ohne Klick-/CTR-Angabe):
+
+| Query | Seite | Impr. | Ø Pos. |
+|---|---|---:|---:|
+| ki telefonassistent | `/ki-telefonassistent` | 153 | 32,7 |
+| ki telefonassistent für unternehmen | `/ki-telefonassistent` | 21 | 29,3 |
+| telefonassistent | `/ki-telefonassistent` | 57 | 36,6 |
+| ki telefonzentrale | `/ki-telefonassistent` | 21 | 32,0 |
+| ki telefonassistent kosten | `/kosten-ki-telefonassistent` | 175 | 30,4 |
+| ki telefonassistent preise | `/kosten-ki-telefonassistent` | 18 | 20,1 |
+| ki telefonassistent arztpraxis | `/ki-telefonassistent-arzt` | 145 | 33,9 |
+| prozessautomatisierung agentur | `/prozessautomatisierung` | — | ~57 |
+| prozessautomatisierung kundenservice | `/prozessautomatisierung` | — | ~58,6 |
+| prozessautomatisierung münchen | (Cluster) | — | ~30 |
+| roi der prozessautomatisierung | `/blog/prozessautomatisierung-roi` | — | 19,7 |
+| roi für prozessautomatisierung | `/blog/prozessautomatisierung-roi` | — | 26,5 |
+| wie berechnet man den roi der automatisierung eines geschäftsprozesses? | `/blog/prozessautomatisierung-roi` | — | ~8 |
+| hotel webdesign / webdesign hotel / webdesign hotels | `/webdesign-hotel` | 158 / 92 / 32 | 19,7 / 20,4 / 18,6 |
+| webdesign agentur regensburg | `/regensburg/webdesign` | 220 | 39,0 |
+| webdesign regensburg | `/regensburg/webdesign` | 310 | 55,0 |
+| website erstellen lassen regensburg | `/regensburg/webdesign` | 175 | 43,6 |
+| webdesign agentur bayreuth | `/bayreuth/webdesign` | 49 | 26,8 |
+
+Die HALT-Zeilen des Messpunkts 14.09. gelten unverändert; A5 und M23 wurden
+**nicht** im Head oder Körper angefasst.
+
+## Messpunkte dieses Laufs
+
+### M9 · Blog → Eigentümer: sechs Beiträge erhalten `weiterfuehrend`
+
+- **Änderung:** `/blog/prozessautomatisierung-roi`, `/blog/ki-automatisierung-kleine-unternehmen`,
+  `/blog/digitalisierung-mittelstand` → `/prozessautomatisierung` (zwei davon
+  zusätzlich → `/kosten-automatisierung`); `/blog/verpasste-anrufe-kosten` →
+  `/ki-telefonassistent`, `/verpasste-anrufe-verlust`;
+  `/blog/ki-telefonassistent-restaurant` → `/ki-telefonassistent-restaurant`,
+  `/ki-telefonassistent`; `/blog/website-ohne-anfragen` → `/keine-anfragen-website`,
+  `/webdesign`. Kein Link auf eine eingefrorene Route.
+- **Hypothese:** Kontextuelle Links aus rankenden Redaktionsseiten geben dem
+  Pillar Autorität, die vorher auf der Redaktionsseite endete; die Beiträge
+  verlieren nichts, weil ihre Intention (informational) unverändert bleibt.
+- **Erfolg (Tag 28 nach Deploy):** `/prozessautomatisierung` Ø Position der
+  Kopfquery-Familie besser als vor dem Deploy; die Beiträge halten ihre
+  Impressionen (±20 %).
+- **Scheitern:** ein Beitrag verliert > 30 % Impressionen ohne Bewegung beim
+  Pillar → Block bleibt, aber Ankertexte prüfen.
+- **Störgröße:** überlagert A5 (`/ki-telefonassistent`) und M23
+  (`/prozessautomatisierung`) — beide haben ab diesem Deploy zusätzliche
+  eingehende Links. Bei der Auswertung Tag 28 getrennt ausweisen: Bewegung mit
+  vs. ohne diese Quellen ist nicht trennbar; das wird hier notiert, nicht
+  später wegerklärt.
+
+### M10 · `/blog/prozessautomatisierung-roi` — inhaltliche Aktualisierung, Titel ohne Jahr
+
+- **Vorher:** 530 Wörter, Titel „… berechnen 2025 | Leitfaden", keine
+  kommerzielle Verlinkung. Beste Query Pos. ~8 (Frageform), Kopfquery 19,7.
+- **Änderung:** vier neue Abschnitte (Kostenseite einmalig/laufend, vier
+  Kostentreiber, Amortisationszeit, wann es sich nicht rechnet), eine neue
+  FAQ, Titel „Prozessautomatisierung ROI berechnen | Formel, Amortisation,
+  Kostenfallen", `lastmod` 2026-09-17.
+- **Erfolg (Tag 28):** „roi der prozessautomatisierung" besser als 19,7;
+  Frageform-Query bleibt Top 10.
+- **Scheitern:** Frageform-Query fällt aus den Top 20 → Titeländerung
+  zurücknehmen (Inhalt bleibt).
+
+### M11 · Shell-Ankertext „Prozessautomatisierung"
+
+- **Änderung:** Navigation, Desktop- und Mobile-Hero-Chip, Footer (Dublette
+  entfernt). Ziel-Pfade unverändert. Außerhalb `<main>`, deshalb kein
+  Fingerabdruck betroffen — die fünf eingefrorenen Baselines laufen grün.
+- **Erwartung:** Entitätssignal für den Pillar auf 90 Dokumenten. Kein
+  eigenes Erfolgskriterium; wird mit M23 ausgewertet.
+
+### M12 · `/regensburg/webdesign`, `/muenchen/webdesign` — Ehrlichkeit und Pillar-Link
+
+- **Änderung:** Szenarien ohne behauptete Ergebnisse, Ziel-Suchbegriffe nicht
+  mehr wörtlich im Text, kontextueller Link auf `/webdesign`,
+  „Google-Unternehmensprofil". Titel/H1/Description unverändert.
+- **Erfolg (Tag 28):** „webdesign regensburg" (310 Impr., Pos. 55) und
+  „webdesign agentur regensburg" (Pos. 39) nicht schlechter; „website
+  erstellen lassen regensburg" (Pos. 43,6) beobachten — diese Query gehört
+  laut K5 eigentlich `/regensburg/website-erstellen` (F4).
+- **Scheitern:** > 5 Positionen Verlust auf beiden Kopfqueries → Text
+  vergleichen, nicht zurückrollen (die entfernten Sätze waren Zusagen ohne
+  Beleg und kommen nicht zurück).
+
+### Mitgeändert, ohne eigene Messreihe
+
+- `/kosten-ki-telefonassistent`: „10 gleichzeitige Anrufe" → „Mehrere Anrufe
+  zur selben Zeit" (Faktenkorrektur laut Graduierungsvermerk; HALT-Zeile
+  bleibt, weil Head, H1 und Struktur unverändert sind).
+- `/blog/ki-telefonassistent-restaurant`: Description ohne „Wartelisten
+  führen, Gäste nachqualifizieren – ohne Personal".
+- `/deutschland`: Description ohne „hochkonvertierende Websites".
+
+### Bewusst NICHT geändert
+
+`/ki-telefonassistent`, `/prozessautomatisierung`, `/kosten-ki-telefonassistent`
+(Head/Körper — HALT), `/webdesign`, `/kosten-webdesign`, `/webdesign-hotel`,
+`/verpasste-anrufe-verlust`, `/kosten-automatisierung`, Geo-Hubs (Ledger
+14.09.), `/webdesign-agentur-deutschland` (F9), alle fünf eingefrorenen
+Routen, `/bayreuth` Description (M8). Keine neue Seite.
+
+## Ledger-Ergänzung
+
+| URL / Cluster | Änderung | Commit | Deploy | Status | Frühestes Urteil |
+|---|---|---|---|---|---|
+| 6 Blogbeiträge | `weiterfuehrend` auf Eigentümer (M9) | dieser Branch | **UNBEKANNT** | offen | Deploy + 28 d |
+| `/blog/prozessautomatisierung-roi` | Inhalt erweitert, Titel ohne Jahr (M10) | dieser Branch | **UNBEKANNT** | offen | Deploy + 28 d |
+| Shell | Ankertext Pillar (M11) | dieser Branch | **UNBEKANNT** | offen | mit M23 |
+| `/regensburg/webdesign`, `/muenchen/webdesign` | Ehrlichkeit, Pillar-Link (M12) | dieser Branch | **UNBEKANNT** | offen | Deploy + 28 d |
+| `/kosten-ki-telefonassistent` | Faktenkorrektur P5 | dieser Branch | **UNBEKANNT** | HALT (unverändert) | Deploy + 28 d |

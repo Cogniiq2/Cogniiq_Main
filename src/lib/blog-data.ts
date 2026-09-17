@@ -154,6 +154,18 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "webdesign-konversion-tipps",
       "prozessautomatisierung-roi",
     ],
+    weiterfuehrend: [
+      {
+        to: "/prozessautomatisierung",
+        label: "Prozessautomatisierung für Unternehmen",
+        text: "Wo ein KI-Schritt etwas beiträgt und wo gewöhnliche Regeln genügen, welche Prozesse nicht automatisiert gehören und wie eine Umsetzung abläuft.",
+      },
+      {
+        to: "/kosten-automatisierung",
+        label: "Was kostet Prozessautomatisierung?",
+        text: "Alle Preistreiber erklärt, einmalige und laufende Kosten getrennt – ohne Fantasiepreise.",
+      },
+    ],
     canonical: "https://cogniiq.de/blog/ki-automatisierung-kleine-unternehmen",
   },
   {
@@ -479,13 +491,13 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   {
     slug: "prozessautomatisierung-roi",
     title: "Prozessautomatisierung ROI: So messen Sie den echten Nutzen",
-    metaTitle: "Prozessautomatisierung ROI berechnen 2025 | Leitfaden",
+    metaTitle: "Prozessautomatisierung ROI berechnen | Formel, Amortisation, Kostenfallen",
     metaDescription:
-      "Wie Sie den Return on Investment einer Prozessautomatisierung korrekt berechnen – mit Formel, konkreten Beispielen und typischen Kostenfallen.",
+      "Wie Sie den ROI einer Prozessautomatisierung berechnen: Formel, welche Kosten in die Rechnung gehören, Amortisationszeit statt Prozentwert und wann sich Automatisierung nicht rechnet.",
     category: "KI-Automatisierung",
     readingTime: 7,
     publishedAt: "2025-02-17",
-    updatedAt: "2025-03-08",
+    updatedAt: "2026-09-17",
     excerpt:
       "Viele Unternehmen scheuen die Investition in Automatisierung, weil sie den Nutzen nicht greifbar machen können. Dieser Artikel zeigt, wie ein einfaches ROI-Modell in unter 30 Minuten aufgestellt werden kann.",
     heroKeyword: "Prozessautomatisierung ROI",
@@ -515,6 +527,22 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       },
       {
         type: "h2",
+        heading: "Welche Kosten in die Rechnung gehören – einmalig und laufend getrennt",
+        content:
+          "Der häufigste Rechenfehler ist nicht die Formel, sondern eine unvollständige Kostenseite. Rechnen Sie zwei Zahlen getrennt: Einmalig fallen die Prozessaufnahme, die Umsetzung, die Anbindung der beteiligten Systeme und die Tests vor dem Go-live an. Laufend kommen Betrieb und Lizenzen der eingesetzten Werkzeuge hinzu, die Pflege bei jeder Änderung am Prozess – und die Zeit, die Menschen weiterhin für die Fälle aufwenden, die der Ablauf als Ausnahme aussortiert. Gerade der letzte Posten wird gern mit null angesetzt und ist es fast nie.",
+      },
+      {
+        type: "ul",
+        heading: "Die vier Kostentreiber, die eine Rechnung kippen können",
+        items: [
+          "Schnittstellen: Hat ein beteiligtes System keine geeignete Schnittstelle, wird die Anbindung zum größten Einzelposten – oder der Prozess läuft nur teilweise automatisch.",
+          "Ausnahmen: Jede Sonderregel, die der Ablauf erkennen und an einen Menschen geben muss, kostet Umsetzung und später Bearbeitungszeit.",
+          "Prozessänderungen: Ändert sich der Ablauf alle paar Wochen, zahlen Sie die Anpassung jedes Mal mit – die Amortisation verschiebt sich.",
+          "Tests und Absicherung: Ein Ablauf, der Rechnungen versendet oder Termine bucht, braucht Prüfschritte und einen Rückweg, wenn etwas schiefgeht. Das ist Aufwand, kein Zubehör.",
+        ],
+      },
+      {
+        type: "h2",
         heading: "Schritt 3: Indirekte Nutzen bewerten",
         content:
           "Schnellere Prozesse bedeuten schnellere Reaktion auf Kundenanfragen, was die Abschlusswahrscheinlichkeit erhöht. Wer auf eine Anfrage schnell antwortet, hat deutlich bessere Chancen auf den Abschluss als wer erst nach 24 Stunden reagiert.",
@@ -533,9 +561,21 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       },
       {
         type: "h2",
+        heading: "Amortisationszeit statt Prozentwert",
+        content:
+          "Ein ROI in Prozent klingt eindrucksvoll, beantwortet aber nicht die Frage, die im Unternehmen gestellt wird: Wann hat sich das bezahlt? Rechnen Sie deshalb zusätzlich die Amortisationszeit: einmalige Kosten geteilt durch den monatlichen Nettonutzen (monatlicher Nutzen minus monatliche laufende Kosten). Das Ergebnis ist eine Zahl in Monaten, die sich mit der erwarteten Lebensdauer des Prozesses vergleichen lässt. Ein Ablauf, der sich nach 20 Monaten trägt, aber in 12 Monaten ersetzt wird, hat einen negativen ROI – egal, was die Prozentformel sagt.",
+      },
+      {
+        type: "h2",
+        heading: "Wann sich Automatisierung nicht rechnet",
+        content:
+          "Die ehrlichste ROI-Berechnung ist die, die auch ein Nein zulässt. Vier Konstellationen, in denen der Nutzen die Kosten meist nicht deckt: Der Prozess läuft selten (wenige Vorgänge pro Woche bei kleinem Zeitaufwand je Vorgang). Der Prozess besteht überwiegend aus Ausnahmen, die ohnehin ein Mensch entscheiden muss. Der Prozess ändert sich häufig, weil Regeln, Zuständigkeiten oder Systeme im Fluss sind. Ein beteiligtes System lässt sich nicht anbinden, und der manuelle Restaufwand frisst die Ersparnis auf. In diesen Fällen ist die richtige Empfehlung, den Prozess zuerst zu vereinfachen – oder ihn manuell zu lassen.",
+      },
+      {
+        type: "h2",
         heading: "Häufige Kostenfallen bei Automatisierungsprojekten",
         content:
-          "Unterschätzte Integrationsarbeit, mangelnde Dokumentation und fehlender Support sind die häufigsten Kostentreiber. Wer bei einem Dienstleister kauft, sollte auf Pauschalen statt Stundenabrechnung für laufende Anpassungen bestehen.",
+          "Unterschätzte Integrationsarbeit, mangelnde Dokumentation und fehlender Support sind die häufigsten Kostentreiber. Klären Sie vor der Beauftragung, wie laufende Anpassungen abgerechnet werden und wer den Ablauf betreut, wenn ein beteiligtes System sich ändert.",
       },
       {
         type: "callout",
@@ -555,11 +595,28 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         answer:
           "Bruttogehalt + Arbeitgeberanteil Sozialversicherung + anteilige Gemeinkosten, dividiert durch tatsächliche Arbeitsstunden pro Jahr (ca. 1.600–1.800 bei Vollzeit).",
       },
+      {
+        question: "Zählt eingesparte Zeit als Ersparnis, wenn niemand entlassen wird?",
+        answer:
+          "Nur, wenn die freigewordene Zeit tatsächlich anders genutzt wird – für Aufgaben, die vorher liegen blieben, oder für Volumen, das ohne zusätzliche Stelle bewältigt wird. Sonst ist es Kapazität, kein Geld. Rechnen Sie in diesem Fall mit dem Wert dessen, was mit der Zeit erledigt wird, nicht mit dem Stundensatz.",
+      },
     ],
     relatedSlugs: [
       "ki-automatisierung-kleine-unternehmen",
       "ki-telefonassistent-arztpraxis",
       "digitalisierung-mittelstand",
+    ],
+    weiterfuehrend: [
+      {
+        to: "/prozessautomatisierung",
+        label: "Prozessautomatisierung für Unternehmen",
+        text: "Welche Prozesse sich eignen, welche nicht, wie Ausnahmen und Schnittstellen behandelt werden und wie eine Umsetzung abläuft – die Leistungsseite zu diesem Beitrag.",
+      },
+      {
+        to: "/kosten-automatisierung",
+        label: "Was kostet Prozessautomatisierung?",
+        text: "Die Kostentreiber im Einzelnen, einmalig und laufend getrennt – mit einem Wirtschaftlichkeitsrechner, der die Formel aus diesem Beitrag auf Ihren Prozess anwendet.",
+      },
     ],
     canonical: "https://cogniiq.de/blog/prozessautomatisierung-roi",
   },
@@ -640,6 +697,18 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "ki-automatisierung-kleine-unternehmen",
       "ki-telefonassistent-restaurant",
     ],
+    weiterfuehrend: [
+      {
+        to: "/ki-telefonassistent",
+        label: "KI-Telefonassistent für Unternehmen",
+        text: "Was der Assistent im Gespräch erledigt, was immer ein Mensch macht, wie die Einrichtung abläuft und was er bei Ihrem Anrufaufkommen kostet.",
+      },
+      {
+        to: "/verpasste-anrufe-verlust",
+        label: "Verpasste Anrufe: Was sie Unternehmen wirklich kosten",
+        text: "Die Problemseite zu diesem Beitrag – warum Anrufe verloren gehen und wie Cogniiq das löst.",
+      },
+    ],
     canonical: "https://cogniiq.de/blog/verpasste-anrufe-kosten",
   },
   {
@@ -647,7 +716,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     title: "KI-Telefonassistent für Restaurants: Mehr Reservierungen, weniger Arbeit",
     metaTitle: "KI-Telefonassistent Restaurant 2025 | Reservierungen automatisieren",
     metaDescription:
-      "Wie Restaurants mit einem KI-Telefonassistenten Reservierungen automatisch annehmen, Wartelisten führen und Gäste nachqualifizieren – ohne zusätzliches Personal.",
+      "Wie Restaurants mit einem KI-Telefonassistenten Reservierungsanfragen auch in der Stoßzeit annehmen, was der Assistent übernimmt, was beim Team bleibt und woran die Anbindung an ein Reservierungssystem hängt.",
     category: "KI-Telefonassistent",
     readingTime: 6,
     publishedAt: "2025-03-03",
@@ -725,6 +794,18 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "verpasste-anrufe-kosten",
       "ki-telefonassistent-arztpraxis",
       "ki-automatisierung-kleine-unternehmen",
+    ],
+    weiterfuehrend: [
+      {
+        to: "/ki-telefonassistent-restaurant",
+        label: "KI-Telefonassistent für Restaurants",
+        text: "Reservierungen entgegennehmen und strukturiert an Ihr Team übergeben – auch während des Service und am Wochenende. Die Leistungsseite für die Gastronomie.",
+      },
+      {
+        to: "/ki-telefonassistent",
+        label: "KI-Telefonassistent für Unternehmen",
+        text: "Aufbau, Grenzen, Einrichtung und Preislogik des Assistenten – branchenübergreifend.",
+      },
     ],
     canonical: "https://cogniiq.de/blog/ki-telefonassistent-restaurant",
   },
@@ -806,6 +887,18 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "webdesign-konversion-tipps",
       "lokales-seo-unternehmen",
       "ki-automatisierung-kleine-unternehmen",
+    ],
+    weiterfuehrend: [
+      {
+        to: "/keine-anfragen-website",
+        label: "Warum Ihre Website keine Anfragen bringt",
+        text: "Die Problemseite zu diesem Beitrag: die technischen und inhaltlichen Ursachen und wie Cogniiq sie löst.",
+      },
+      {
+        to: "/webdesign",
+        label: "Webdesign für Unternehmen",
+        text: "Was eine Website bei Cogniiq umfasst, wie Suche, Ladezeit und Anfragen ins Projekt kommen und wie ein Projekt bis zum Go-live abläuft.",
+      },
     ],
     canonical: "https://cogniiq.de/blog/website-ohne-anfragen",
   },
@@ -897,6 +990,13 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "ki-automatisierung-kleine-unternehmen",
       "prozessautomatisierung-roi",
       "webdesign-konversion-tipps",
+    ],
+    weiterfuehrend: [
+      {
+        to: "/prozessautomatisierung",
+        label: "Prozessautomatisierung für Unternehmen",
+        text: "Der Schritt nach der Digitalisierung: welche Abläufe sich automatisieren lassen, welche nicht, und wie Systeme verbunden werden.",
+      },
     ],
     canonical: "https://cogniiq.de/blog/digitalisierung-mittelstand",
   },

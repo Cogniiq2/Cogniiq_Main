@@ -213,7 +213,7 @@ function DeferredSplineScene() {
 const services = [
   { icon: PhoneCall, label: 'KI-Telefonassistent', href: '/ki-telefonassistent' },
   { icon: Globe, label: 'Webdesign', href: '/webdesign' },
-  { icon: Zap, label: 'Automatisierung', href: '/prozessautomatisierung' },
+  { icon: Zap, label: 'Prozessautomatisierung', href: '/prozessautomatisierung' },
 ];
 
 
