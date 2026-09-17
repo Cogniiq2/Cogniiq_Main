@@ -46,6 +46,7 @@ const ok = (msg) => console.log(`  ✓ ${msg}`);
 
 /** Routes to exercise, with the metadata each must expose AFTER hydration. */
 const ROUTES = [
+  { path: '/kundenprojekte', expect: { indexable: false, canonical: 'https://cogniiq.de/kundenprojekte' } },
   { path: '/', expect: { indexable: true, canonical: 'https://cogniiq.de/' } },
   { path: '/leistungen', expect: { indexable: true, canonical: 'https://cogniiq.de/leistungen' } },
   { path: '/bayreuth/lokales-seo', expect: { indexable: true, canonical: 'https://cogniiq.de/bayreuth/lokales-seo' } },
@@ -245,10 +246,18 @@ async function run() {
         if (!dom.robots || !dom.robots.startsWith('noindex')) {
           fail(`${route.path}: robots is "${dom.robots}" after hydration, expected noindex`);
         }
-        if (dom.canonical) fail(`${route.path}: has canonical "${dom.canonical}" after hydration, expected none`);
-        if (dom.hreflang.length) fail(`${route.path}: has hreflang alternates after hydration, expected none`);
-        if (dom.ogUrl) fail(`${route.path}: has og:url "${dom.ogUrl}" after hydration, expected none`);
-        if (dom.twitterUrl) fail(`${route.path}: has twitter:url after hydration, expected none`);
+        // A real noindex page still has its own address. Only a 404 must
+        // suppress canonical/alternate/social URL claims entirely.
+        if (route.expect.canonical) {
+          if (dom.canonical !== route.expect.canonical) {
+            fail(`${route.path}: canonical is "${dom.canonical}" after hydration, expected "${route.expect.canonical}"`);
+          }
+        } else {
+          if (dom.canonical) fail(`${route.path}: has canonical "${dom.canonical}" after hydration, expected none`);
+          if (dom.hreflang.length) fail(`${route.path}: has hreflang alternates after hydration, expected none`);
+          if (dom.ogUrl) fail(`${route.path}: has og:url "${dom.ogUrl}" after hydration, expected none`);
+          if (dom.twitterUrl) fail(`${route.path}: has twitter:url after hydration, expected none`);
+        }
       }
       if (route.expect.notFoundCopy && !/Diese Seite existiert nicht/.test(dom.rootText)) {
         fail(`${route.path}: does not render the German 404 page after hydration`);

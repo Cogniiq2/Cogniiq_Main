@@ -864,6 +864,13 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
     description: "Ihre Anfrage ist bei uns eingegangen. Wir melden uns in der Regel innerhalb eines Werktags mit einem konkreten Vorschlag für das weitere Vorgehen.",
     indexable: false,
   },
+  // Preview-only project portrait. Publication requires owner release and proof assets.
+  {
+    path: "/kundenprojekte",
+    title: "Kunden & Projekte | Cogniiq",
+    description: "Einblicke in ausgewählte Cogniiq-Projekte: Für BoLaGio in Bayreuth entstehen eine Gästewebsite und eine zentrale Verwaltung für den Hospitality-Betrieb.",
+    indexable: false,
+  },
 ];
 
 /** Canonical URL for a public path. Trailing slash only on the homepage. */

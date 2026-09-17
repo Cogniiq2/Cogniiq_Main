@@ -106,6 +106,7 @@ export const PUBLIC_ROUTE_PATHS: readonly string[] = [
   "/impressum",
   "/datenschutz",
   "/anfrage-erhalten",
+  "/kundenprojekte",
 ];
 
 const PUBLIC_PATHS: ReadonlySet<string> = new Set(PUBLIC_ROUTE_PATHS);
