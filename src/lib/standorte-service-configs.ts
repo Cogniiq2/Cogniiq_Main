@@ -690,7 +690,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
         "Regensburg ist eine Stadt, in der sich digitales Suchverhalten besonders stark ausgeprägt zeigt: Studenten, Touristen und Geschäftsreisende recherchieren Restaurants, Dienstleister und Praxen fast ausschließlich online. Lokale Regensburger suchen Handwerksbetriebe, Praxen und Beratungsdienstleister über Google – und entscheiden auf Basis des ersten digitalen Eindrucks, wen sie kontaktieren. Wer online nicht sichtbar oder nicht überzeugend ist, verliert täglich Kunden.",
         "Cogniiq entwickelt Websites für Regensburg, die in dieser Entscheidung gewinnen. Jede Website wird individuell konzipiert – keine Vorlagen, kein Baukastensystem. Sie ist schnell, für Smartphones optimiert (der überwiegende Teil der Suchanfragen kommt vom Handy), lokal für Regensburg SEO-optimiert und auf Conversion ausgerichtet: Klare Struktur, überzeugende Inhalte, ein Kontaktweg, der wirklich genutzt wird.",
         "Als Webdesign-Agentur mit Bayern-Verwurzelung verstehen wir die Anforderungen des Regensburger Markts: die Mischung aus Tourismus, Universitätspublikum, internationalem Mittelstand und der historischen Altstadt als Markenidentität der Stadt. Websites für Regensburger Unternehmen müssen sowohl lokal verwurzelt als auch international ansprechend sein – und technisch einwandfrei.",
-        "Lokales SEO ist dabei kein Add-on, sondern Grundlage: Wir optimieren jede Website gezielt für Suchanfragen wie 'Webdesign Agentur Regensburg', 'Website erstellen Regensburg' und branchenspezifische lokale Kombinationen. Strukturierte Daten, Google My Business Optimierung und regionale Linkbuilding-Grundlagen sind fester Bestandteil jedes Projekts.",
+        "Was ein Website-Projekt bei Cogniiq umfasst – Ebenen, Zuständigkeiten, Redaktionssystem oder statische Auslieferung, Ablauf bis zum Go-live und die Preistreiber – steht auf der Seite [Webdesign für Unternehmen](/webdesign). Diese Seite hier beschreibt, was davon für Betriebe in Regensburg zählt: die lokale Auffindbarkeit über das Google-Unternehmensprofil und strukturierte Daten, Inhalte für ein gemischtes Publikum aus Einheimischen, Studierenden und Gästen, und ein Kontaktweg, der auch vom Handy aus in einem Schritt funktioniert.",
         "Neben dem Webdesign bieten wir in Regensburg auch den [KI Telefonassistenten für Regensburg](/regensburg/ki-telefonassistent) und [Prozessautomatisierung für Regensburg](/regensburg/automatisierung) an. Wer eine professionelle Website hat, die Anfragen generiert, braucht auch das richtige System, um diese Anfragen effizient zu verarbeiten. Alle Leistungen aus einer Hand, von Cogniiq für den Regensburg-Markt.",
       ],
     },
@@ -768,15 +768,15 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     localScenarios: [
       {
         title: "Hotel in der Regensburger Altstadt",
-        description: "Ein inhabergeführtes Hotel nahe dem Dom hat eine veraltete Website ohne mobiles Design. Buchungen kommen fast ausschließlich über Booking.com. Nach dem Website-Relaunch mit Buchungssystem und lokalem SEO steigen Direktbuchungen – mit deutlich besserer Marge als OTA-Buchungen.",
+        description: "Ein inhabergeführtes Hotel nahe dem Dom hat eine veraltete Website ohne mobiles Design; Buchungen kommen fast ausschließlich über Portale. Der Relaunch bekommt eine eigene Buchungsstrecke, Zimmerseiten mit Preisen und Verfügbarkeit und eine mehrsprachige Fassung – damit Gäste, die das Hotel bereits kennen, direkt buchen können, statt über ein Portal mit Provision.",
       },
       {
         title: "Zahnarztpraxis im Stadtgebiet",
-        description: "Eine Zahnarztpraxis in Regensburg West findet sich bei Google-Suchen nach 'Zahnarzt Regensburg' erst auf Seite 3. Durch eine neue Website mit strukturierten Daten, Google My Business Optimierung und lokalem On-Page-SEO verbessert sie ihre Sichtbarkeit deutlich.",
+        description: "Eine Zahnarztpraxis in Regensburg West ist in der lokalen Suche kaum zu finden. Der Relaunch setzt auf Leistungsseiten mit strukturierten Daten, ein gepflegtes Google-Unternehmensprofil, eine Anfahrt- und Sprechzeitenseite, die auf dem Handy in einem Blick lesbar ist, und eine Terminanfrage mit Datenschutzhinweis. Ob und wie stark sich die Sichtbarkeit bewegt, entscheidet Google – wir versprechen keine Position.",
       },
       {
         title: "Mittelständisches B2B-Unternehmen im Gewerbegebiet",
-        description: "Ein technischer Dienstleister im Gewerbegebiet Regensburg West hat eine Website, die Kompetenz ausstrahlt, aber keine Anfragen generiert. Nach der Überarbeitung mit klarer CTA-Struktur, Fallstudien und verbesserter Leadstrecke steigen qualifizierte Anfragen deutlich.",
+        description: "Ein technischer Dienstleister im Gewerbegebiet Regensburg West hat eine Website, die Kompetenz ausstrahlt, aber keine Anfragen bringt: kein klarer nächster Schritt, kein Formular, das ankommt, keine Messung. Die Überarbeitung setzt einen Kontaktweg je Leistungsseite, ein Formular mit bestätigtem Eingang und eine Auswertung, die zeigt, welche Seite Anfragen bringt – ohne dass wir vorher eine Zahl versprechen.",
       },
     ],
     sameServiceOtherCities: [
@@ -1058,7 +1058,7 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
         "Cogniiq bietet Münchner Unternehmen Entwicklung auf Enterprise-Niveau und direkte Zusammenarbeit mit dem Entwickler Ihrer Website – vollständig remote betreut, mit transparenten Festpreisen. Individuelle Konzeption, technische Präzision, SEO von Anfang an integriert, mehrsprachige Entwicklung auf Wunsch.",
         "Was technisch Standard für uns ist: Kurze Ladezeiten, Core Web Vitals als Prüfmaß, Mobile-First-Design (der überwiegende Teil der Münchner Suchanfragen kommt vom Smartphone), strukturierte Daten für Google und eine dokumentierte Einbindung aller Tools. Diese technischen Grundlagen sind keine Optional-Features – sie sind die Basis, auf der jede Website für den Münchner Markt gebaut sein muss.",
         "Für internationale Unternehmen und Münchner Firmen mit globalen Kunden: Mehrsprachige Website-Entwicklung auf Deutsch und Englisch ist Standard, weitere Sprachen auf Anfrage. Wir kennen die Anforderungen an internationale SEO-Strukturen und setzen sie technisch korrekt um.",
-        "Als Ergänzung zum Webdesign bieten wir in München auch den [KI Telefonassistenten für München](/muenchen/ki-telefonassistent) und [Prozessautomatisierung für München](/muenchen/automatisierung) an. Alle drei Bereiche aus einer Hand – für eine konsistente, leistungsstarke digitale Infrastruktur ohne Schnittstellenprobleme zwischen verschiedenen Agenturen.",
+        "Was ein Website-Projekt bei Cogniiq umfasst – Ebenen, Zuständigkeiten, Redaktionssystem oder statische Auslieferung, Ablauf bis zum Go-live und die Preistreiber – steht auf der Seite [Webdesign für Unternehmen](/webdesign). Als Ergänzung zum Webdesign bieten wir in München auch den [KI Telefonassistenten für München](/muenchen/ki-telefonassistent) und [Prozessautomatisierung für München](/muenchen/automatisierung) an – alle drei Bereiche aus einer Hand, ohne Schnittstellenprobleme zwischen verschiedenen Agenturen.",
       ],
     },
     warumCogniiq: [
@@ -1136,11 +1136,11 @@ export const CITY_SERVICE_CONFIGS: Record<string, CityServiceConfig> = {
     localScenarios: [
       {
         title: "Tech-Startup in Schwabing",
-        description: "Ein B2B-SaaS-Startup in Schwabing hat eine intern gebaute Website, die technisch schwach und nicht für internationale Nutzer optimiert ist. Nach dem Website-Relaunch in Deutsch und Englisch mit klarer Produktpositionierung und SEO-Struktur steigen qualifizierte Demo-Anfragen deutlich.",
+        description: "Ein B2B-SaaS-Startup in Schwabing hat eine intern gebaute Website, die technisch schwach und nicht für internationale Nutzer ausgelegt ist. Der Relaunch bekommt eine deutsche und eine englische Fassung mit korrekter hreflang-Struktur, eine klare Produktpositionierung je Seite und einen Demo-Kontaktweg, dessen Eingang gemessen wird – die Zahl der Anfragen danach ist Ergebnis, kein Versprechen.",
       },
       {
         title: "Privatarztpraxis in der Maxvorstadt",
-        description: "Eine Privatarztpraxis in der Maxvorstadt hat eine veraltete Website ohne Online-Terminbuchung und schlechter Google-Sichtbarkeit. Nach dem Relaunch mit lokaler SEO-Optimierung für 'Privatarzt München' und mehrsprachigem Content steigen Neupatientenanfragen deutlich.",
+        description: "Eine Privatarztpraxis in der Maxvorstadt hat eine veraltete Website ohne Terminanfrage und ohne Leistungsseiten. Der Relaunch setzt auf eine Seite je Leistung mit strukturierten Daten, eine mehrsprachige Fassung für internationale Patientinnen und Patienten und eine Terminanfrage mit Datenschutzhinweis; die Anbindung an ein Terminsystem wird vorher geprüft, nicht vorausgesetzt.",
       },
       {
         title: "Beratungsunternehmen mit internationalen Kunden",

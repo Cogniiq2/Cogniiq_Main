@@ -65,33 +65,26 @@ export const FAKTEN = {
   erreichbarkeit: "täglich 6–20\u00A0Uhr",
   antwortzeit: "spätestens innerhalb von 24\u00A0Stunden",
   /*
-    GLEICHZEITIGE ANRUFE — eingefroren, nicht bestätigt. Stand 11.09.2026.
+    GLEICHZEITIGE ANRUFE — keine Zahl, bis der Inhaber die Bereitstellung
+    bestätigt (OWNER-INPUT B11).
 
-    Die 10 stammen aus der Inhaber-Antwort zu Abschnitt B. Die Recherche zum
-    Kapazitätsanbieter (ElevenAgents, offizielle Preisseite, 11.09.2026) zeigt
-    aber: Die Gleichzeitigkeit ist dort eine WORKSPACE-Grenze, die sich ALLE
-    Agenten eines Kontos teilen — Free 4, Starter 6, Creator 10, Pro 20,
-    Scale 30, Business 40, Enterprise nach Vereinbarung. Eine Konto-Obergrenze
-    von 10 ist damit keine Zusage von 10 Gesprächen JE KUNDE, sobald mehr als
-    ein Kunde gleichzeitig telefoniert; sie wäre es nur bei einer eigenen
-    Umgebung je Kunde oder einer vertraglich reservierten Kapazität. Weder das
-    eine noch das andere ist im Repository dokumentiert: Das Onboarding erfasst
-    eine Agent-ID und eine Umgebung (EU/US), aber kein Kapazitäts- oder
-    Tarifmerkmal.
+    Bis zum 17.09.2026 stand hier `gleichzeitigeAnrufe: 10`. Die 10 stammte aus
+    der Inhaber-Antwort zu Abschnitt B, die Recherche zum Kapazitätsanbieter
+    (ElevenAgents, offizielle Preisseite, 11.09.2026) zeigte aber: Die
+    Gleichzeitigkeit ist dort eine WORKSPACE-Grenze, die sich ALLE Agenten eines
+    Kontos teilen — eine Konto-Obergrenze von 10 ist keine Zusage von 10
+    Gesprächen JE KUNDE, sobald mehr als ein Kunde gleichzeitig telefoniert.
+    Weder eine eigene Umgebung je Kunde noch reservierte Kapazität ist im
+    Repository dokumentiert.
 
-    Konsequenz, bis der Inhaber die Bereitstellung bestätigt (OWNER-INPUT B11):
-      • Auf allen NICHT eingefrorenen Flächen steht `gleichzeitigeAnrufeSatz` —
-        eine Aussage ohne Zahl, die in jedem Fall stimmt.
-      • Diese Zahl wird NUR noch von `NICHT_EXTRA` verwendet, und das steht
-        ausschließlich auf der eingefrorenen Kostenseite. Sie wird dort nicht
-        angefasst, weil deren gerenderte Bytes die Messbedingung eines
-        laufenden Experiments sind — und nicht, weil sie belegt wäre.
-      • Sobald das Experiment endet, ist diese Zahl entweder belegt oder sie
-        verschwindet auch dort.
-  */
-  gleichzeitigeAnrufe: 10,
+    Die Zahl überlebte nur in `NICHT_EXTRA` auf /kosten-ki-telefonassistent,
+    solange diese Route ein eingefrorenes Experiment war. Die Route ist am
+    12.09.2026 graduiert (GRADUATED_EXPERIMENT_PATHS); damit galt die dort
+    festgehaltene Zusage: „entweder belegt oder sie verschwindet auch dort".
+    Belegt ist sie nicht — also weg, zusammen mit ihrem letzten Verbraucher.
+    Kommt die Bestätigung, kommt die Zahl belegt zurück, mit einer Aussage
+    dazu, was bei Überlauf geschieht (B9).
 
-  /*
     Die belastbare Fassung: Sie sagt zu, was in jeder Bereitstellung gilt —
     mehrere Gespräche zur selben Zeit statt eines Besetztzeichens — und
     verspricht keine Zahl, die von einer Konto-Obergrenze abhängt. Bewusst auch
@@ -1021,7 +1014,7 @@ export const NICHT_EXTRA = {
   punkte: [
     `Änderungen an Ansagen, Anliegen und Regeln — unbegrenzt, umgesetzt innerhalb von ${FAKTEN.aenderungTage}\u00A0Tagen`,
     `Ihr fester Ansprechpartner, erreichbar ${FAKTEN.erreichbarkeit}, Antwort ${FAKTEN.antwortzeit}`,
-    `${FAKTEN.gleichzeitigeAnrufe} gleichzeitige Anrufe in jedem Tarif — auch im kleinsten`,
+    `${FAKTEN.gleichzeitigeAnrufeKurz} — in jedem Tarif, auch im kleinsten`,
     "Deutsch als Sprache",
     "Der Auftragsverarbeitungsvertrag nach Art. 28 DSGVO",
     "Die zwei Tage Testphase, sie sind Teil der Einrichtung",

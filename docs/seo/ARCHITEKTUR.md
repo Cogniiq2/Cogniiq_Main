@@ -641,3 +641,112 @@ C bleibt ein legitimes Ziel — **nach** F4, wenn der Export da ist.
    der Erwähnungszahl im Quellbaum** — Kommentare eingeschlossen.
 6. Jede geänderte URL kommt mit Datum, Hypothese und Abbruchkriterium in
    `organic-growth-scoreboard.md`.
+
+---
+
+## 13 · Nachtrag 17.09.2026 — Autoritätslauf (Branch `claude/seo-authority-sprint-2026-09-17`)
+
+Basis-Commit `d0f2083` (main). GSC-Stand laut Auftrag: bis 2026-09-14, als
+Query×Seite-Paare genannt (nicht als Seiten-Aggregate) — die Werte stehen in
+`organic-growth-scoreboard.md`, Messpunkt 17.09.2026.
+
+### 13.1 Schutzkarte, vor der Umsetzung gebaut
+
+| Klasse | Routen | Regel in diesem Lauf |
+|---|---|---|
+| **A** · eingefroren, keine Änderung | `/bayreuth/webdesign`, `/bayreuth/website-relaunch`, `/regensburg/website-relaunch`, `/muenchen/webdesign-kosten`, `/ki-telefonassistent-arzt` | Head, Körper, JSON-LD, Anker und Erwähnungszahl im Quellbaum unverändert; Baseline nicht angefasst |
+| **A′** · HALT (Messfenster läuft, §HALT in `post-experiment-opportunities.md`) | `/ki-telefonassistent` (A5), `/prozessautomatisierung` (M23), `/kosten-ki-telefonassistent` (graduiert 12.09.) | **Kein** Head, keine H1, kein Körpertext geändert. Auf der Kostenseite genau eine Faktenkorrektur (§13.4), wie es die Graduierung vorgesehen hatte |
+| **A″** · Ledger 14.09. (Deploy + 28 d) | `/webdesign`, `/kosten-webdesign`, `/bayreuth`, `/muenchen`, `/regensburg`, `/bayreuth/lokales-seo`, `/webdesign-hotel` (M1), `/verpasste-anrufe-verlust` (M2), `/kosten-automatisierung` | Körper unverändert. Eingehende Links **aus Blogbeiträgen** kommen hinzu (Störgröße, protokolliert) |
+| **C** · frei | Blogbeiträge, `/regensburg/webdesign`, `/muenchen/webdesign` (Stadtseiten-Messung seit 14.09. ohnehin kontaminiert), `/deutschland` | optimiert |
+| **D** · Unterstützer mit indirekter Wirkung | `/webdesign-agentur-deutschland` (Quelle für zwei eingefrorene Routen) | **nicht** angefasst (F9) |
+| **E** · Shell | Navigation, Hero-Chips, Footer | außerhalb `<main>` → kein Fingerabdruck betroffen; Ziel-Pfade unverändert, nur Ankertext |
+
+### 13.2 Befund: Blog als Sackgasse
+
+Vor diesem Lauf verlinkte **kein** Beitrag der Kategorien KI-Automatisierung,
+KI-Telefonassistent und Digitalisierung eine kommerzielle Seite — nur andere
+Beiträge und `/kontakt`. Das betraf auch `/blog/prozessautomatisierung-roi`,
+die einzige Seite des Automatisierungs-Clusters mit einer Seite-1-Query
+(„wie berechnet man den roi der automatisierung eines geschäftsprozesses?",
+Pos. ~8). Ihre Autorität endete auf der Seite selbst. Die Webdesign-Beiträge
+hatten den `weiterfuehrend`-Block seit 13.09.; der Rest nicht.
+
+**Behoben:** sechs Beiträge tragen jetzt `weiterfuehrend` auf ihren Eigentümer
+(Tabelle in §13.3). Kein Beitrag zeigt auf eine eingefrorene Route.
+
+### 13.3 Eigentümerkarte — vorher/nachher
+
+Kein Eigentümer hat gewechselt. Was sich geändert hat, ist, **wer den
+Eigentümer stützt**:
+
+| Query-Familie | Eigentümer (unverändert) | Neue Unterstützer (17.09.) | Bewusst nicht |
+|---|---|---|---|
+| „prozessautomatisierung", „geschäftsprozesse automatisieren" | `/prozessautomatisierung` | `/blog/prozessautomatisierung-roi`, `/blog/ki-automatisierung-kleine-unternehmen`, `/blog/digitalisierung-mittelstand`; Navigation und Hero nennen den Kopfbegriff | Körper (HALT) |
+| „prozessautomatisierung roi", ROI-Fragen | `/blog/prozessautomatisierung-roi` (REDAKTION) | Beitrag inhaltlich erweitert (§13.5), Jahreszahl aus dem Titel — mit echter Aktualisierung, wie §8 es verlangt | — |
+| „automatisierung kosten" | `/kosten-automatisierung` | ROI-Beitrag und KMU-Leitfaden verweisen auf den Rechner | Körper (Ledger) |
+| „ki telefonassistent" + Varianten | `/ki-telefonassistent` | `/blog/verpasste-anrufe-kosten`, `/blog/ki-telefonassistent-restaurant` | Körper (HALT A5) |
+| „verpasste anrufe kosten" | `/verpasste-anrufe-verlust` (PROBLEM) | `/blog/verpasste-anrufe-kosten` verweist als Rechenbeitrag auf die Problemseite — vorher standen beide ohne Verbindung auf verwandten Queries (**K11**, jetzt Hierarchie statt Konkurrenz) | Titel der Problemseite (M2) |
+| „website bringt keine anfragen" | `/keine-anfragen-website` (PROBLEM) | `/blog/website-ohne-anfragen` verweist auf Problemseite und Pillar (**K12**, dito) | — |
+| „ki telefonassistent restaurant" | `/ki-telefonassistent-restaurant` | Blogbeitrag verweist auf Segment und Pillar; Description des Beitrags trug „Wartelisten führen, Gäste nachqualifizieren – ohne Personal" — nicht belegte Fähigkeiten, ersetzt | — |
+| „webdesign regensburg", „webdesign agentur regensburg" | `/regensburg/webdesign` | Körper bereinigt (§13.6) und verweist kontextuell auf den Pillar | Titel/H1 (passen zur Query-Familie) |
+| „webdesign kosten <stadt>" | `/<stadt>/webdesign-kosten` | unverändert | — |
+
+### 13.4 Faktenkorrektur auf der graduierten Kostenseite
+
+`/kosten-ki-telefonassistent` trug unter „Was nicht extra kostet" den Satz
+„10 gleichzeitige Anrufe in jedem Tarif". Die Zahl war seit dem 11.09.2026
+als **nicht belegt** dokumentiert und überlebte nur, weil die Route
+eingefroren war; die Graduierung am 12.09. hatte ausdrücklich festgehalten:
+„entweder belegt oder sie verschwindet auch dort". Sie ist jetzt durch
+`FAKTEN.gleichzeitigeAnrufeKurz` ersetzt („Mehrere Anrufe zur selben Zeit"),
+`FAKTEN.gleichzeitigeAnrufe` ist aus dem Baum entfernt. Titel, Description,
+H1, Reihenfolge und Rechner der Seite sind unverändert (HALT).
+
+Geprüft und **nicht** geändert: Die Praxis-Rahmung der Kostenseite
+(Breadcrumb „Für Praxen", Tarife Basis/Praxis/MVZ, Schema-Name). Die Tarife
+sind laut `telefonassistent-copy.ts` Praxistarife; eine generische Fassung
+wäre eine Preisaussage für Kunden, für die kein Preis dokumentiert ist —
+`BLOCKED — EVIDENCE`, siehe `post-experiment-opportunities.md`.
+
+### 13.5 `/blog/prozessautomatisierung-roi` — echte Aktualisierung
+
+Neu: welche Kosten in die Rechnung gehören (einmalig/laufend getrennt, in
+derselben Systematik wie `/kosten-automatisierung`), die vier Kostentreiber,
+Amortisationszeit als zweite Kennzahl, „wann sich Automatisierung nicht
+rechnet" (vier Konstellationen), eine FAQ zur Frage, ob eingesparte Zeit ohne
+Personalabbau als Ersparnis zählt. Das erfundene Rechenbeispiel bleibt als
+solches gekennzeichnet; keine Cogniiq-Ergebnisse, keine Kundenwerte. Titel
+ohne Jahreszahl, `updatedAt` und Sitemap-`lastmod` auf 2026-09-17.
+
+### 13.6 Stadt-Webdesign-Seiten Regensburg und München
+
+Beide Seiten trugen unter „Beispielszenarien" Texte, die als Ergebnisse
+formuliert waren („steigen Direktbuchungen deutlich", „verbessert sie ihre
+Sichtbarkeit deutlich", „steigen Neupatientenanfragen deutlich") — ohne
+Kundenfreigabe und ohne Messung, also das Muster, das `HONESTY-AUDIT.md`
+§7.7 ausschließt. Regensburg trug zusätzlich einen Absatz, der die eigenen
+Ziel-Suchbegriffe wörtlich aufzählte („Wir optimieren … für Suchanfragen wie
+'Webdesign Agentur Regensburg'"). Beides ersetzt: Szenarien beschreiben jetzt
+die Maßnahme und benennen ausdrücklich, dass das Ergebnis nicht versprochen
+wird; der Absatz erklärt stattdessen, was die Stadtseite gegenüber dem Pillar
+besitzt, und verlinkt `/webdesign` kontextuell. „Google My Business" →
+„Google-Unternehmensprofil". `/bayreuth/webdesign` (eingefroren) trägt dieselben
+Muster weiter — F-Eintrag nach Graduierung.
+
+### 13.7 Shell
+
+Navigation und beide Hero-Chips nannten den Automatisierungs-Pillar
+„Automatisierung", der Footer verlinkte ihn zweimal (einmal „Automatisierung",
+einmal „Prozessautomatisierung"). Jetzt: ein Ankertext, der Kopfbegriff.
+Ziel-Pfade unverändert; der Fuß-Verweisstreifen der Stadt-×-Leistung-Seiten
+(innerhalb `<main>`, Teil des Bayreuther Fingerabdrucks) ist **nicht**
+angefasst.
+
+### 13.8 Technischer Befund
+
+Aus dem vorgerenderten `dist/` (90 indexierbare Routen): Canonicals
+selbstreferenziell, `robots` korrekt, genau eine H1 je Seite, keine
+H1- und keine Titel-Dublette, Sitemap deckungsgleich, `Article` auf allen zehn
+Beiträgen, `BreadcrumbList` auf 90, `FAQPage` auf 71 Seiten. Kein P0-Befund.
+F5 (FAQ-Antworten im SSR-Körper) und F10 (doppeltes Organization-JSON-LD)
+bleiben, weil beide die Fingerabdrücke der eingefrorenen Routen ändern.

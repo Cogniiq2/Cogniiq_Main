@@ -90,7 +90,7 @@ export const LEISTUNGEN: NavLeistung[] = [
   },
   {
     key: "automatisierung",
-    label: "Automatisierung",
+    label: "Prozessautomatisierung",
     href: "/prozessautomatisierung",
     claim: "Wiederkehrende Abläufe laufen ohne Handarbeit.",
     nischen: [
