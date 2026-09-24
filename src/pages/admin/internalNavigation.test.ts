@@ -12,9 +12,9 @@ import {
  *  1. A dead link. Every destination the rail offers must be a route the router
  *     actually resolves — the owner cannot tell "not built yet" from "broken", so the
  *     rail is never allowed to advertise something that is not there.
- *  2. A deleted route. Oura Analytics and the standalone Task/Execution OS left the
- *     rail deliberately; they must keep working when typed, because leaving the
- *     navigation is a presentation decision and destroying a surface is not.
+ *  2. A deleted route. The standalone Task/Execution OS left the rail deliberately;
+ *     it must keep working when typed, because leaving the navigation is a
+ *     presentation decision and destroying a surface is not.
  */
 
 // The /admin routes App.tsx mounts, transcribed. A route added there without a matching
@@ -27,7 +27,6 @@ const MOUNTED_ROUTES = [
   '/admin/tasks/completed',
   '/admin/tasks/revenue',
   '/admin/execution',
-  '/admin/oura-analytics',
   '/admin/clients',
   '/admin/clients/new',
   '/admin/solutions',
@@ -61,9 +60,8 @@ describe('Admin Center navigation contract', () => {
     }
   });
 
-  it('withholds Oura Analytics and the standalone task OS from the business navigation', () => {
+  it('withholds the standalone task OS from the business navigation', () => {
     const hrefs = allNavHrefs();
-    expect(hrefs).not.toContain('/admin/oura-analytics');
     expect(hrefs).not.toContain('/admin/execution');
     expect(hrefs).not.toContain('/admin/tasks');
   });

@@ -59,7 +59,6 @@ ok(a.isPathAuthorized('/admin/clients', ADMIN), 'admin may access CRM');
 ok(a.isPathAuthorized('/admin', ADMIN), 'admin may access /admin');
 ok(!a.isPathAuthorized('/admin', CUSTOMER), 'customer may NOT access /admin');
 ok(a.isPathAuthorized('/app', CUSTOMER), 'customer may access /app');
-ok(a.isPathAuthorized('/admin/oura-analytics', OWNER), 'owner may access oura');
 ok(a.isPathAuthorized('/admin/clients', OWNER), 'owner may access CRM');
 
 // ---- resolvePostLoginDestination ----

@@ -89,7 +89,6 @@ function startDevServer() {
       ...process.env,
       VITE_SUPABASE_URL: SUPABASE,
       VITE_SUPABASE_ANON_KEY: 'qa-anon-key',
-      VITE_OURA_CLIENT_ID: 'qa',
     },
     stdio: ['ignore', 'pipe', 'pipe'],
     detached: true,
@@ -270,8 +269,8 @@ try {
 
   // No dead links, and nothing destroyed by leaving the rail.
   //
-  // Every destination the rail offers must render a real page, and the two surfaces
-  // deliberately withheld from the rail (Oura, the standalone task/execution OS) must
+  // Every destination the rail offers must render a real page, and the surface
+  // deliberately withheld from the rail (the standalone task/execution OS) must
   // still resolve when typed — withheld is a navigation decision, not a deletion.
   await setViewport(page, ALL_VIEWPORTS[0]);
   if (await goto(page, '/admin/finance/overview')) {
@@ -289,7 +288,7 @@ try {
     else bad('navigation: all rail destinations render a page', dead.join(', '));
 
     const unreachable = [];
-    for (const href of ['/admin/oura-analytics', '/admin/execution', '/admin/tasks/today']) {
+    for (const href of ['/admin/execution', '/admin/tasks/today']) {
       await page.send('Page.navigate', { url: `${ORIGIN}${href}` });
       await wait(2500);
       const rendered = await evaluate(page, `Boolean(document.querySelector('main')?.innerText?.trim())`).catch(() => false);

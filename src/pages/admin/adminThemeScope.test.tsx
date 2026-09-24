@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // The internal workspace pins `data-admin-theme="light"` on <html> so the legacy `--admin-*`
-// variables (read only by ExecutionPage and OuraAnalyticsPage) resolve. <html> outlives this
+// variables (read only by ExecutionPage) resolve. <html> outlives this
 // layout in a single-page session, so the attribute has to be removed again on unmount —
 // otherwise every marketing page visited after /admin keeps the admin theme scope for the rest
 // of the session. That leak is invisible in a screenshot, which is why it is asserted here.

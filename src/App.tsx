@@ -519,7 +519,6 @@ const InternalWorkspaceLayout = lazyNamed(
 const CommandCenterPage = lazyNamed(() => import('./pages/admin/CommandCenterPage'), 'CommandCenterPage');
 const TaskDashboardContent = lazyNamed(() => import('./pages/admin/tasks/TaskDashboardContent'), 'TaskDashboardContent');
 const ExecutionContent = lazyNamed(() => import('./pages/ExecutionPage'), 'ExecutionContent');
-const OuraAnalyticsContent = lazyNamed(() => import('./pages/OuraAnalyticsPage'), 'OuraAnalyticsContent');
 const FinanceModule = lazyNamed(() => import('./pages/admin/finance/FinanceModule'), 'FinanceModule');
 const PublicDocumentPortal = lazyNamed(() => import('./pages/public/PublicDocumentPortal'), 'PublicDocumentPortal');
 const ClientsListPage = lazyNamed(() => import('./pages/admin/clients/ClientsListPage'), 'ClientsListPage');
@@ -644,7 +643,6 @@ export function AppInner() {
           <Route path="/admin/tasks/completed" element={<TaskDashboardContent view="completed" />} />
           <Route path="/admin/tasks/revenue" element={<TaskDashboardContent view="revenue" />} />
           <Route path="/admin/execution" element={<ExecutionContent />} />
-          <Route path="/admin/oura-analytics" element={<OuraAnalyticsContent />} />
           <Route path="/admin/clients" element={<ClientsListPage />} />
           <Route path="/admin/clients/new" element={<NewClientWizard />} />
           <Route path="/admin/clients/:organizationId" element={<ClientDetailPage />} />

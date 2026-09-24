@@ -3,7 +3,7 @@
 Cogniiq is one product with three surfaces that share a single Supabase auth session:
 
 - **Customer portal** — `/app/*` (serves customers; stays separate).
-- **Internal workspace** — `/admin/*` (owner + admin): Task Dashboard, Oura Analytics, Client CRM,
+- **Internal workspace** — `/admin/*` (owner + admin): Task Dashboard, Client CRM,
   Finance & Steuern. One shell, one navigation model, one account/logout control.
 - **Public marketing site** — everything else.
 
@@ -54,7 +54,6 @@ Tests: `.github/scripts/test-auth-routing.mjs`.
 - `/admin/*` — pathless layout route `InternalWorkspaceLayout` (one `PlatformAdminRoute`, one
   `DashboardShell`, one `ToastProvider`), with children:
   - `/admin`, `/admin/tasks/{today,overdue,completed,revenue}`, `/admin/execution` → Task Dashboard
-  - `/admin/oura-analytics` → Oura Analytics
   - `/admin/clients`, `/admin/clients/new`, `/admin/clients/:organizationId`, `/admin/solutions`,
     `/admin/invitations` → Client CRM
   - `/admin/finance/*` → `FinanceModule` (owner-only `PlatformOwnerRoute` + readiness gate)
@@ -78,7 +77,7 @@ neither `main` nor `assets` from it — so it plays no part in this routing.
 `InternalWorkspaceLayout` (`src/pages/admin/InternalWorkspace.tsx`) renders the shared
 `DashboardShell` with:
 
-- **Top-level app switch:** Task Dashboard · Oura Analytics · Client CRM · Finance & Steuern. Finance
+- **Top-level app switch:** Task Dashboard · Client CRM · Finance & Steuern. Finance
   is owner-only (hidden from admins). Derived from the URL (`internalNavigation.ts`).
 - **Module sub-navigation** derived from the active module (owner-only sub-nav withheld from
   non-owners even on a typed URL).
@@ -92,5 +91,5 @@ the security boundary.
 One premium light palette across the whole workspace (warm off-white `#f7f7f4`, white cards, graphite
 type, near-black primary buttons, ~20px radii, soft shadows). No dark admin mode, no theme toggle, no
 ambient/scan-line layers, no live clock. The Task Dashboard was rebuilt on the shared dashboard
-primitives; Oura Analytics and Execution OS render inside the shared shell with the legacy admin
+primitives; the Execution OS renders inside the shared shell with the legacy admin
 chrome removed (all data logic, charts and states preserved).
