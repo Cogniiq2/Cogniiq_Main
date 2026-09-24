@@ -11,7 +11,7 @@ import { customerDisplayName } from '@/lib/ownerFinance/customerLabels';
  * Navigation entries are derived from the same module definitions the rail uses, so a
  * destination can never exist in one and not the other — including the owner-only
  * filtering, which is applied here exactly as the rail applies it. Hidden modules
- * (Oura, the standalone task OS) are reachable here on purpose: they left the rail to
+ * (the standalone task OS) are reachable here on purpose: it left the rail to
  * free a top-level slot, not to become unreachable.
  *
  * Actions are routes, never mutations. An action that creates something navigates to the

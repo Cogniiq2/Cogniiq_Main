@@ -198,7 +198,6 @@ function startDevServer() {
       ...process.env,
       VITE_SUPABASE_URL: SUPABASE,
       VITE_SUPABASE_ANON_KEY: 'qa-anon-key',
-      VITE_OURA_CLIENT_ID: 'qa',
     },
     stdio: ['ignore', 'pipe', 'pipe'],
     detached: true,

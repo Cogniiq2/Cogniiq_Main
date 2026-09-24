@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getActiveModule, getSections, getSubNav, isSubNavActive } from '@/pages/admin/internalNavigation';
 import { buildCommandItems, loadCustomerCommandItems } from '@/pages/admin/commandItems';
 
-// The one internal workspace shell shared by every /admin/* module (Tasks, Oura, CRM, Finance).
+// The one internal workspace shell shared by every /admin/* module (Tasks, CRM, Finance).
 // It is protected once by PlatformAdminRoute, renders a single DashboardShell with one account/logout
 // control, and derives the active module + navigation from the URL. Child modules render into the
 // <Outlet/> and never bring their own header or guard (finance keeps its own owner-only boundary).
@@ -20,8 +20,8 @@ export function InternalWorkspaceLayout() {
   //
   // Removed again on unmount. The attribute lives on <html>, which outlives this layout in a
   // single-page session: leaving it behind meant every marketing page visited after /admin still
-  // carried the admin theme scope. Only ExecutionPage and OuraAnalyticsPage read the resulting
-  // `--admin-*` variables, and both render inside this layout, so nothing needs it afterwards.
+  // carried the admin theme scope. Only ExecutionPage reads the resulting `--admin-*` variables,
+  // and it renders inside this layout, so nothing needs it afterwards.
   useEffect(() => {
     const root = document.documentElement;
     root.setAttribute('data-admin-theme', 'light');

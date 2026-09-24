@@ -74,7 +74,6 @@ function startDevServer() {
       ...process.env,
       VITE_SUPABASE_URL: SUPABASE,
       VITE_SUPABASE_ANON_KEY: 'qa-anon-key',
-      VITE_OURA_CLIENT_ID: 'qa',
     },
     stdio: ['ignore', 'pipe', 'pipe'],
     // Own process group: `npx` forks vite, so killing the npx pid alone would
@@ -429,11 +428,11 @@ try {
       if (home?.search) ok('architecture: the rail carries the ⌘K affordance');
       else bad('architecture: the rail carries the ⌘K affordance', 'no trigger found');
 
-      // Oura and the standalone task/execution OS are withheld from the business rail.
-      const withheld = ['/admin/oura-analytics', '/admin/execution', '/admin/tasks'];
+      // The standalone task/execution OS is withheld from the business rail.
+      const withheld = ['/admin/execution', '/admin/tasks'];
       const leaked = withheld.filter((href) => home?.modules.includes(href));
-      if (leaked.length === 0) ok('architecture: Oura and the standalone task OS stay out of the rail');
-      else bad('architecture: Oura and the standalone task OS stay out of the rail', leaked.join(', '));
+      if (leaked.length === 0) ok('architecture: the standalone task OS stays out of the rail');
+      else bad('architecture: the standalone task OS stays out of the rail', leaked.join(', '));
 
       await goto(browser.page, '/admin/finance/overview');
       const bands = await evaluate(browser.page, `(() => {

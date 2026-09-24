@@ -27,11 +27,10 @@ import type { ShellSection, ShellSubNavGroup } from '@/components/dashboard';
 // HIDDEN, NOT DELETED
 // -------------------
 // `hiddenFromNav` withholds a module from the rail while leaving its route, its data and its deep
-// links completely intact — typing the URL still works and nothing is destroyed. It is how Oura
-// Analytics (personal health data) and the standalone Task/Execution OS leave the business
-// navigation without leaving the application.
+// links completely intact — typing the URL still works and nothing is destroyed. It is how the
+// standalone Task/Execution OS leaves the business navigation without leaving the application.
 
-export type ModuleKey = 'home' | 'customers' | 'finance' | 'tasks' | 'oura';
+export type ModuleKey = 'home' | 'customers' | 'finance' | 'tasks';
 
 interface ModuleSubNavGroup extends ShellSubNavGroup {
   /** Withheld from non-owners. The route stays owner-gated regardless. */
@@ -180,19 +179,6 @@ const MODULES: ModuleConfig[] = [
     matches: (p) => p === '/admin/tasks' || p.startsWith('/admin/tasks/') || p === '/admin/execution',
     subNav: [],
   },
-  {
-    key: 'oura',
-    label: 'Oura Analytics',
-    href: '/admin/oura-analytics',
-    icon: LayoutGrid,
-    title: 'Oura Analytics',
-    keywords: 'oura schlaf gesundheit analytics',
-    // Personal health analytics: not part of the business operating system, and every day it sits
-    // in the rail it costs a top-level slot. Route, page and data untouched.
-    hiddenFromNav: true,
-    matches: (p) => p === '/admin/oura-analytics' || p.startsWith('/admin/oura-analytics/'),
-    subNav: [],
-  },
 ];
 
 const HOME_MODULE = MODULES[0];
@@ -201,7 +187,7 @@ export function getActiveModule(pathname: string): ModuleConfig {
   return MODULES.find((m) => m.matches(pathname)) ?? HOME_MODULE;
 }
 
-const DISPLAY_ORDER: ModuleKey[] = ['home', 'customers', 'finance', 'tasks', 'oura'];
+const DISPLAY_ORDER: ModuleKey[] = ['home', 'customers', 'finance', 'tasks'];
 
 export function getSections(pathname: string, opts: { isOwner: boolean }): ShellSection[] {
   const active = getActiveModule(pathname);

@@ -40,15 +40,13 @@ empty page is worse than no link, because the owner cannot tell "not built yet" 
 does not render a page.
 
 **Hidden is not deleted.** `hiddenFromNav` withholds a module from the rail and leaves
-its route, its data and its deep links untouched. Two surfaces use it:
+its route, its data and its deep links untouched. One surface uses it:
 
-- **Oura Analytics** (`/admin/oura-analytics`) — personal health data, not part of the
-  business operating system, and every day it sat in the rail it cost a top-level slot.
 - **The standalone task / execution OS** (`/admin/tasks/*`, `/admin/execution`) — its own
   `tasks` table, unrelated to the customer tasks the business runs on. The Command Center
   surfaces the same queue contextually and links to it; ⌘K reaches it directly.
 
-Both still work when typed, both are asserted to still work, and neither lost a row of
+It still works when typed, it is asserted to still work, and it did not lose a row of
 data.
 
 **Owner-only is presentation, never the boundary.** Finance and the canonical customer
