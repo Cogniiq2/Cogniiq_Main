@@ -352,6 +352,15 @@ export type ConversionEvent =
   | 'automation_roi_started'
   | 'automation_roi_completed'
   | 'automation_cta_clicked'
+  // Der Eignungs- und Vorbereitungscheck auf /ki-telefonassistent-eignungscheck.
+  // Eigene Namen aus demselben Grund wie oben: Er fragt keine Beträge, sondern
+  // Anrufsituation, Anlässe, Team, Systeme und Erwartungen — und nichts davon
+  // verlässt den Browser. Gemeldet wird, dass begonnen wurde, dass ein
+  // vollständiges Ergebnis vorlag und dass aus dem Ergebnis heraus der Weg zum
+  // Erstgespräch gewählt wurde.
+  | 'fit_check_started'
+  | 'fit_check_completed'
+  | 'fit_check_cta_clicked'
   // Die einzige Meldung, die keine Absicht, sondern ein Ergebnis ist: eine
   // Anfrage, deren Eingang der Endpunkt mit einem lesbaren 2xx bestaetigt hat.
   //

@@ -32,6 +32,7 @@ export const PUBLIC_ROUTE_PATHS: readonly string[] = [
   "/ki-telefonassistent/demo",
   "/ki-telefonassistent-einfuehren",
   "/ki-telefonassistent-zahnarztpraxis",
+  "/ki-telefonassistent-eignungscheck",
   "/deutschland",
   "/bayern",
   "/bayern/ki-telefonassistent",

@@ -116,6 +116,14 @@
   </url>
 
   <url>
+    <loc>https://cogniiq.de/ki-telefonassistent-eignungscheck</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="de-DE" href="https://cogniiq.de/ki-telefonassistent-eignungscheck"/>
+  </url>
+
+  <url>
     <loc>https://cogniiq.de/deutschland</loc>
     <lastmod>2026-03-14</lastmod>
     <changefreq>monthly</changefreq>

@@ -232,6 +232,19 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
     indexable: true,
     sitemap: { lastmod: "2026-09-05", changefreq: "monthly", priority: "0.85" },
   },
+  // Werkzeug im Cluster (27.09.2026): Eignungs- und Vorbereitungscheck.
+  // Kein Preisrechner (der bleibt kanonisch auf /ki-telefonassistent und der
+  // Kostenseite), keine Grenzen-Seite (die Intention gehört der Produktseite),
+  // sondern ein Entscheidungswerkzeug mit offengelegter Methodik. Verlinkt
+  // absichtlich NICHT auf die eingefrorenen Experimentrouten.
+  {
+    path: "/ki-telefonassistent-eignungscheck",
+    title: "KI-Telefonassistent Eignungscheck: Passt er zu Ihrem Betrieb? | Cogniiq",
+    description: "In fünf Schritten prüfen, ob ein KI-Telefonassistent zu Ihrem Betrieb passt: Anrufsituation, Anrufanlässe, Team, Systeme, Erwartungen. Ohne Anmeldung, mit offengelegter Methodik und Vorbereitungsliste.",
+    keywords: "KI Telefonassistent Eignung, KI Telefonassistent sinnvoll, Telefonassistent Voraussetzungen, KI Telefonassistent Entscheidung, Eignungscheck",
+    indexable: true,
+    sitemap: { lastmod: "2026-09-27", changefreq: "monthly", priority: "0.85" },
+  },
 
   // ─── GEO HUBS ────────────────────────────────────────────────────────────────
   {

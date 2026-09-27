@@ -654,3 +654,21 @@ Nach dem Experimentende zusammen mit `legacyAutomationLink` und
   `/bayreuth/lokales-seo`, M7-Fenster). Offen lassen, bis M7 ausgewertet ist.
 - Blog-Titel mit „2025" (fünf Beiträge): nur mit echter Aktualisierung
   entfernen; der ROI-Beitrag ist der Präzedenzfall.
+
+---
+
+# Nachtrag 27.09.2026 — Eignungscheck: was auf die Reifung wartet
+
+## R1 · `/ki-telefonassistent-eignungscheck` in die HALT-Routen einbinden — DEFERRED — EXPERIMENT
+
+Der Check ist am 27.09.2026 bewusst ohne Link aus den Routen gebaut worden,
+die gerade gemessen werden. Was danach ansteht, in dieser Reihenfolge:
+
+| # | Was | Wartet auf | Warum nicht jetzt |
+|---|---|---|---|
+| R1.1 | Kontextlink aus dem Abschnitt „Für wen" bzw. „Wann wir nicht passen" auf `/ki-telefonassistent` | A5, Tag 28 | Körperänderung der Produktseite während der Messung |
+| R1.2 | Kontextlink aus `/praxen` (Anliegen-Katalog → „Rohentwurf mit dem Check erstellen") | Ledger 14.09., Tag 28 | HALT |
+| R1.3 | Verweis von `/kosten-ki-telefonassistent` („erst prüfen, ob die Rechnung lohnt") | HALT-Ende | Head/Körper HALT |
+| R1.4 | Minuten aus dem Check per Anker-Parameter in den Preisrechner übernehmen | R1.1 | Verlangt eine Änderung an `TelefonRechner` auf zwei HALT-Routen |
+| R1.5 | Link aus `/ki-telefonassistent-arzt` | Graduierung | Eingefroren; jeder neue Anker bricht den Fingerabdruck |
+| R1.6 | Zweite Fassung des Checks mit Branchenbeispielen (Gastronomie, Handwerk) — nur, wenn die Zahlen von A6 das tragen | A6, Tag 56 | Sonst Städte-/Branchenvervielfachung, die `authority-acquisition-plan.md` ausdrücklich ausschließt |

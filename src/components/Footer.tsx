@@ -315,8 +315,9 @@ export function Footer() {
                     // Die beiden Fachbeiträge des Praxis-Clusters. Hier, weil sie
                     // sonst nur aus je einer Seite verlinkt wären; die Anker
                     // beschreiben den Inhalt, nicht das Zielkeyword.
-                    label: "Leitfäden für Praxen",
+                    label: "Leitfäden und Werkzeuge",
                     links: [
+                      { text: "Eignungscheck: Passt ein Assistent zu Ihnen?", to: "/ki-telefonassistent-eignungscheck" },
                       { text: "Einführung in der Praxis", to: "/ki-telefonassistent-einfuehren" },
                       { text: "Zahnarztpraxis: Anrufe und Regeln", to: "/ki-telefonassistent-zahnarztpraxis" },
                     ],

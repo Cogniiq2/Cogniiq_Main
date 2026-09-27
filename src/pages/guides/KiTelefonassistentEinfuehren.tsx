@@ -754,6 +754,17 @@ export function KiTelefonassistentEinfuehren() {
             </li>
             <li>
               <Link
+                to="/ki-telefonassistent-eignungscheck"
+                className="underline underline-offset-4 hover:no-underline font-semibold text-gray-900 dark:text-gray-100"
+              >
+                Eignungscheck: Passt ein KI-Telefonassistent zu Ihrem Betrieb?
+              </Link>
+              <span className="block text-gray-600 dark:text-gray-400">
+                Fünf Schritte vor der Einführung: Anrufsituation, Anlässe, Team, Systeme, Erwartungen, mit Vorbereitungsliste.
+              </span>
+            </li>
+            <li>
+              <Link
                 to="/ki-telefonassistent/demo"
                 className="underline underline-offset-4 hover:no-underline font-semibold text-gray-900 dark:text-gray-100"
               >

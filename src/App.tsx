@@ -282,6 +282,10 @@ const KiTelefonassistentZahnarztpraxis = lazyNamed(
   () => import('./pages/guides/KiTelefonassistentZahnarztpraxis'),
   'KiTelefonassistentZahnarztpraxis'
 );
+const KiTelefonassistentEignungscheck = lazyNamed(
+  () => import('./pages/guides/KiTelefonassistentEignungscheck'),
+  'KiTelefonassistentEignungscheck'
+);
 const BayernKiTelefonassistentPage = lazyNamed(
   () => import('./pages/BayernKiTelefonassistentPage'),
   'BayernKiTelefonassistentPage'
@@ -671,6 +675,7 @@ export function AppInner() {
       <Route path="/ki-telefonassistent/demo" element={<KiTelefonassistentDemoPage />} />
       <Route path="/ki-telefonassistent-einfuehren" element={<KiTelefonassistentEinfuehren />} />
       <Route path="/ki-telefonassistent-zahnarztpraxis" element={<KiTelefonassistentZahnarztpraxis />} />
+      <Route path="/ki-telefonassistent-eignungscheck" element={<KiTelefonassistentEignungscheck />} />
       <Route path="/bayern/ki-telefonassistent" element={<BayernKiTelefonassistentPage />} />
 
       <Route path="/webdesign" element={<WebdesignHub />} />

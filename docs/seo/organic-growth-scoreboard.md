@@ -1503,3 +1503,80 @@ Routen, `/bayreuth` Description (M8). Keine neue Seite.
 | Shell | Ankertext Pillar (M11) | dieser Branch | **UNBEKANNT** | offen | mit M23 |
 | `/regensburg/webdesign`, `/muenchen/webdesign` | Ehrlichkeit, Pillar-Link (M12) | dieser Branch | **UNBEKANNT** | offen | Deploy + 28 d |
 | `/kosten-ki-telefonassistent` | Faktenkorrektur P5 | dieser Branch | **UNBEKANNT** | HALT (unverändert) | Deploy + 28 d |
+
+---
+
+# Messpunkt 27.09.2026 — Autoritätsasset: Eignungscheck
+
+Basis-Commit `0714484` (main). Arbeitszweig `claude/zen-clarke-m7i4gu`.
+Keine neuen GSC-Werte in dieser Sitzung; die HALT-Zeilen des 17.09. gelten
+unverändert. **Kein Head, kein Körper, kein Link einer HALT- oder
+eingefrorenen Route wurde angefasst** (Nachweis: `src/protectedExperiments.test.tsx`
+grün, Ledger unten).
+
+### A6 · `/ki-telefonassistent-eignungscheck` — NEU, Werkzeug statt Landingpage
+
+- **Was:** Interaktiver Eignungs- und Vorbereitungscheck in fünf Schritten
+  (Anrufsituation, Anrufanlässe, Team und Übergabe, Systeme und Daten,
+  Erwartungen). Regelwerk in `src/lib/eignungscheck.ts` (getestet), Oberfläche
+  `src/components/EignungsCheck.tsx`. Kein Preis, kein Prozentwert, keine
+  Ersparnis, kein Score: je Bereich ein Signal (trägt / offen / hält nicht)
+  mit Begründung, ein Gesamtbild nach offengelegter Regel, eine
+  Vorbereitungsliste, acht anbieterneutrale Fragen. Ergebnis als Klartext
+  kopierbar. Angaben verlassen den Browser nicht.
+- **Warum diese Form:** Preis-/ROI-Rechner existiert kanonisch
+  (`TelefonRechner`, `/ki-telefonassistent`, `/kosten-ki-telefonassistent`);
+  Verpasste-Anrufe-Rechnung existiert dort und auf `/verpasste-anrufe-verlust`
+  (HALT). Die Grenzen-Intention gehört `/ki-telefonassistent` (ARCHITEKTUR §3.1)
+  und wird hier nicht anvisiert: Titel und H1 zielen auf die
+  Entscheidungsfrage („passt er zu Ihrem Betrieb"), nicht auf „was er nicht
+  kann".
+- **Intention:** informational/entscheidend („ki telefonassistent sinnvoll",
+  „… Voraussetzungen", „… geeignet"). Kein bestehender Eigentümer. Kein
+  Stadt-/Branchenbezug.
+- **Eingehende Links:** Footer („Leitfäden und Werkzeuge", Shell, außerhalb
+  `<main>`) + Körper von `/ki-telefonassistent-einfuehren` („Weiterlesen").
+  Bewusst KEIN Link aus `/ki-telefonassistent`, `/praxen`,
+  `/kosten-ki-telefonassistent` (HALT) und keiner aus den fünf eingefrorenen
+  Routen.
+- **Ausgehende Links (Körper, prerendert geprüft):** `/ki-telefonassistent`
+  (3×, dazu 1× der Rechner-Anker `#preis-roi-rechner`),
+  `/kosten-ki-telefonassistent` (2×), `/ki-telefonassistent-einfuehren` (2×),
+  `/ki-telefonassistent/demo`, `/datenschutz-sicherheit`, `/impressum`
+  (Redaktionskasten), `/kontakt` (nur im Ergebnisschritt, clientseitig).
+- **Störgröße:** `/ki-telefonassistent` und `/kosten-ki-telefonassistent`
+  bekommen drei bzw. zwei zusätzliche kontextuelle eingehende Links (überlagert A5
+  und die Kostenseiten-Reihe, wie M9 am 17.09.). Bei Tag 28 getrennt
+  ausweisen. `/ki-telefonassistent-einfuehren` (A1) hat einen zusätzlichen
+  ausgehenden Link im „Weiterlesen"-Block; Head, H1 und übriger Körper
+  unverändert.
+- **Ereignisse:** `fit_check_started`, `fit_check_completed`,
+  `fit_check_cta_clicked` (nur unter Analytics-Einwilligung, keine Eingaben
+  als Parameter; `src/lib/consent.ts`).
+- **Hypothese:** Ein Werkzeug mit offengelegter Methodik wird von
+  Praxisberatern, Fachmedien und Verzeichnissen eher verlinkt als eine
+  weitere Beschreibungsseite, und Besucher, die es durchlaufen, kommen besser
+  vorbereitet ins Erstgespräch (weniger Erstgespräche, die an „geringes
+  Aufkommen" oder „Anbindungszusage vorab" scheitern).
+- **Erfolg (Tag 28 nach Deploy):** Route indexiert; ≥ 1 organische
+  Impression auf einer Entscheidungs-Query; `fit_check_completed` /
+  `fit_check_started` ≥ 40 %; mindestens eine externe Erwähnung oder
+  Verlinkung aus dem Outreach-Plan (`authority-acquisition-plan.md` 1–3) bis
+  Tag 90.
+- **Scheitern:** Route nach 56 Tagen nicht indexiert, oder
+  `fit_check_started` > 0 bei `fit_check_completed` = 0 über 28 Tage (dann ist
+  der Ablauf zu lang: Schritte kürzen, nicht Seite löschen).
+- **Nach Reifung der laufenden Experimente (nicht jetzt):** Kontextlink aus
+  `/ki-telefonassistent` (nach A5, Tag 28) und `/praxen`; Verweis aus
+  `/kosten-ki-telefonassistent` (nach HALT); Übernahme der rechnerischen
+  Minuten in den Preisrechner per Anker-Parameter. Festgehalten in
+  `post-experiment-opportunities.md` R1.
+
+## Ledger-Ergänzung
+
+| URL / Cluster | Änderung | Commit | Deploy | Status | Frühestes Urteil |
+|---|---|---|---|---|---|
+| `/ki-telefonassistent-eignungscheck` | NEU (A6) | dieser Branch | **UNBEKANNT** | offen | Deploy + 28 d |
+| `/ki-telefonassistent-einfuehren` | ein „Weiterlesen"-Eintrag (A6) | dieser Branch | **UNBEKANNT** | offen, mit A1 | Deploy + 28 d |
+| Shell (Footer) | Spalte „Leitfäden und Werkzeuge", ein Link (A6) | dieser Branch | **UNBEKANNT** | — | — |
+| `/ki-telefonassistent`, `/kosten-ki-telefonassistent` | **unverändert**, je 2 neue eingehende Links (Störgröße A6) | — | — | HALT | — |
