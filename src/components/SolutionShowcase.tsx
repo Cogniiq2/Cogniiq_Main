@@ -297,13 +297,25 @@ const AUSSCHNITT_LAENGE = 4;
 
 /*
   Gepinnt wird nur, wenn die ganze Bühne unter der festen Navigation (72 px)
-  Platz hat: Kopfzeile, Tabs, Gespräch und Zusammenfassung brauchen rund
-  800 px. Auf kleineren Bildschirmen — die meisten Laptops — übernimmt die
-  CSS-Scroll-Timeline; nichts wird abgeschnitten, nichts scrollt in sich.
+  Platz hat. Die Media Query ist die Vorbedingung (Desktop, Bewegung erlaubt,
+  keine Zwergfenster); ob es WIRKLICH passt, wird danach GEMESSEN: Ein
+  ResizeObserver vergleicht die Höhe der kompakten Bühne mit dem freien
+  Fensterausschnitt und hebt den Pin auf, sobald ein Pixel fehlen würde.
+  Damit hängt der Modus nicht an einer geratenen Schwelle, sondern am
+  tatsächlichen Inhalt — Laptop-Fenster mit ~700 px freier Höhe bekommen die
+  Erzählung, ein zu kleines Fenster die CSS-Scroll-Timeline, und nichts wird
+  je abgeschnitten.
+
+  Die gepinnte Bühne ist dafür KOMPAKTER gesetzt als der freie Abschnitt:
+  Einleitung und Stationen stehen rechts neben der Überschrift statt darunter,
+  die Abstände sind enger, das Gesprächsfeld hat weniger Innenabstand. Der
+  Inhalt ist derselbe.
 */
 const PINNED_MEDIA =
-  '(min-width: 1024px) and (min-height: 900px) and (prefers-reduced-motion: no-preference)';
+  '(min-width: 1024px) and (min-height: 640px) and (prefers-reduced-motion: no-preference)';
 const NAV_HEIGHT_PX = 72;
+/** Luft zwischen Bühne und Fensterrand, die bei der Messung mitzählt. */
+const STAGE_SLACK_PX = 16;
 
 /** Bildschirmhöhen, die der Abschnitt im gepinnten Modus einnimmt. */
 const STORY_HEIGHT_VH = 260;
@@ -361,18 +373,47 @@ function Beat({
   );
 }
 
-function usePinned(): boolean {
-  const [pinned, setPinned] = useState(false);
+function usePinned(stageRef: React.RefObject<HTMLDivElement>): boolean {
+  const [eligible, setEligible] = useState(false);
+  const [fits, setFits] = useState(true);
+
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return;
     const mq = window.matchMedia(PINNED_MEDIA);
-    const apply = (m: boolean) => startTransition(() => setPinned(m));
+    const apply = (m: boolean) => startTransition(() => setEligible(m));
     apply(mq.matches);
     const handler = (e: MediaQueryListEvent) => apply(e.matches);
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, []);
-  return pinned;
+
+  /*
+    Messung. Läuft nur, wenn die Media Query zutrifft, und beobachtet die
+    Bühne UND das Fenster: Wächst der Inhalt (Tabwechsel, volles Protokoll)
+    oder schrumpft das Fenster, fällt der Pin; passt es wieder, kommt er
+    zurück. `fits` startet mit `true`, damit die kompakte Bühne erst gesetzt
+    wird und dann gemessen werden kann — nicht umgekehrt.
+  */
+  useEffect(() => {
+    if (!eligible || typeof ResizeObserver !== 'function') return;
+    const stage = stageRef.current;
+    if (!stage) return;
+    const measure = () => {
+      const available = window.innerHeight - NAV_HEIGHT_PX - STAGE_SLACK_PX;
+      const next = stage.offsetHeight <= available;
+      startTransition(() => setFits((cur) => (cur === next ? cur : next)));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(stage);
+    window.addEventListener('resize', measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [eligible, stageRef]);
+
+  return eligible && fits;
 }
 
 const spotlight = spotlightHandlers();
@@ -383,7 +424,8 @@ export function SolutionShowcase() {
   const baseId = useId();
 
   const sectionRef = useRef<HTMLElement>(null);
-  const pinned = usePinned();
+  const stageRef = useRef<HTMLDivElement>(null);
+  const pinned = usePinned(stageRef);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end end'],
@@ -420,7 +462,7 @@ export function SolutionShowcase() {
   };
 
   const abschluss = (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className={pinned ? 'flex flex-col items-start gap-2.5' : 'flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'}>
       <p className="max-w-[54ch] text-[15px] leading-[1.6] text-pub-ink-2">
         Welche Anliegen der Assistent übernimmt, wo er an einen Menschen
         übergibt und was er ausdrücklich nicht tut, steht auf der Produktseite.
@@ -447,7 +489,7 @@ export function SolutionShowcase() {
         className={pinned ? 'sticky flex items-center overflow-hidden' : undefined}
         style={pinned ? { top: NAV_HEIGHT_PX, height: `calc(100vh - ${NAV_HEIGHT_PX}px)` } : undefined}
       >
-      <div className={`relative mx-auto w-full max-w-[1200px] px-6 lg:px-10 ${pinned ? 'py-6' : ''}`}>
+      <div ref={stageRef} className={`relative mx-auto w-full max-w-[1200px] px-6 lg:px-10 ${pinned ? 'py-3' : ''}`}>
         {pinned && (
           <motion.div
             aria-hidden="true"
@@ -455,52 +497,45 @@ export function SolutionShowcase() {
             style={{ scaleX: railScale }}
           />
         )}
-        <div className={`flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between ${pinned ? 'mb-8 pt-4' : 'mb-10 lg:mb-14'}`}>
-          <div className="max-w-2xl">
-            <PubEyebrow className="mb-4">Nachgestelltes Beispiel – kein echter Anruf</PubEyebrow>
+        <div
+          className={
+            pinned
+              ? 'mb-5 grid items-end gap-x-10 gap-y-3 pt-3 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]'
+              : 'mb-10 flex flex-col gap-6 lg:mb-14 lg:flex-row lg:items-end lg:justify-between'
+          }
+        >
+          <div className={pinned ? 'min-w-0' : 'max-w-2xl'}>
+            <PubEyebrow className={pinned ? 'mb-2.5' : 'mb-4'}>Nachgestelltes Beispiel – kein echter Anruf</PubEyebrow>
             <h2
               id="showcase-heading"
-              className="mb-4 text-[clamp(30px,3.2vw,40px)] font-bold leading-[1.1] tracking-[-0.02em] text-pub-ink"
+              className={`font-bold leading-[1.1] tracking-[-0.02em] text-pub-ink ${
+                pinned ? 'text-[clamp(28px,2.6vw,36px)]' : 'mb-4 text-[clamp(30px,3.2vw,40px)]'
+              }`}
             >
               Vom Anruf zum Ergebnis.
             </h2>
-            <p className="max-w-[58ch] text-[17px] leading-[1.6] text-pub-ink-2">
+            {!pinned && (
+              <p className="max-w-[58ch] text-[17px] leading-[1.6] text-pub-ink-2">
+                Links ein Ausschnitt aus dem Gespräch, rechts das, was danach bei Ihrem
+                Team ankommt: strukturiert, mit Rückrufnummer, zur Bestätigung durch
+                einen Menschen.
+              </p>
+            )}
+          </div>
+
+          {/* Gepinnt steht die Einleitung RECHTS neben der Überschrift —
+              gleicher Satz, halbe Höhe. */}
+          {pinned && (
+            <p className="min-w-0 max-w-[52ch] text-[15px] leading-[1.55] text-pub-ink-2 lg:justify-self-end">
               Links ein Ausschnitt aus dem Gespräch, rechts das, was danach bei Ihrem
               Team ankommt: strukturiert, mit Rückrufnummer, zur Bestätigung durch
               einen Menschen.
             </p>
-          </div>
-
-          {/* Stationen der Erzählung — nur im gepinnten Modus, nur auf dem
-              Client, rein dekorativ. Die aktive Station trägt Gewicht und
-              einen gefüllten Punkt, nicht nur eine Farbe. */}
-          {pinned && (
-            <ol aria-hidden="true" className="flex shrink-0 items-center gap-5 pb-1">
-              {STAGES.map((label, i) => {
-                const aktiv = i === stage;
-                const vorbei = i < stage;
-                return (
-                  <li key={label} className="flex items-center gap-2">
-                    <span
-                      className={`h-1.5 w-1.5 rounded-full transition-[background-color,transform] duration-300 ${
-                        aktiv ? 'scale-125 bg-pub-ink' : vorbei ? 'bg-pub-ink/60' : 'bg-pub-ink/20'
-                      }`}
-                    />
-                    <span
-                      className={`text-[12px] uppercase tracking-[0.14em] transition-colors duration-300 ${
-                        aktiv ? 'font-semibold text-pub-ink' : 'font-medium text-pub-ink-4'
-                      }`}
-                    >
-                      {label}
-                    </span>
-                  </li>
-                );
-              })}
-            </ol>
           )}
         </div>
 
-        <div role="tablist" aria-label="Branche wählen" className={`flex flex-wrap gap-2 ${pinned ? 'mb-6' : 'mb-8'}`}>
+        <div className={pinned ? 'mb-3 flex flex-wrap items-center justify-between gap-x-8 gap-y-3' : 'mb-8'}>
+        <div role="tablist" aria-label="Branche wählen" className="flex flex-wrap gap-2">
           {SCENARIOS.map((s, i) => {
             const Icon = s.icon;
             const isActive = s.label === activeIndustry;
@@ -516,7 +551,9 @@ export function SolutionShowcase() {
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => { setActiveIndustry(s.label); setTranskriptOffen(false); }}
                 onKeyDown={(e) => onTabKey(e, i)}
-                className={`relative inline-flex h-11 items-center gap-2 rounded-full border px-4 text-[14px] font-semibold transition-colors duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 ${
+                className={`relative inline-flex h-11 items-center gap-2 rounded-full border font-semibold transition-colors duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 ${
+                  pinned ? 'px-3.5 text-[13.5px]' : 'px-4 text-[14px]'
+                } ${
                   isActive
                     ? 'border-transparent text-white'
                     : 'border-pub-ink/15 bg-white text-pub-ink-2 hover:border-pub-ink/40 hover:text-pub-ink'
@@ -540,6 +577,35 @@ export function SolutionShowcase() {
           })}
         </div>
 
+        {/* Stationen der Erzählung — nur im gepinnten Modus, nur auf dem
+            Client, rein dekorativ. Die aktive Station trägt Gewicht und
+            einen gefüllten Punkt, nicht nur eine Farbe. */}
+        {pinned && (
+          <ol aria-hidden="true" className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            {STAGES.map((label, i) => {
+              const aktiv = i === stage;
+              const vorbei = i < stage;
+              return (
+                <li key={label} className="flex items-center gap-2">
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full transition-[background-color,transform] duration-300 ${
+                      aktiv ? 'scale-125 bg-pub-ink' : vorbei ? 'bg-pub-ink/60' : 'bg-pub-ink/20'
+                    }`}
+                  />
+                  <span
+                    className={`text-[12px] uppercase tracking-[0.14em] transition-colors duration-300 ${
+                      aktiv ? 'font-semibold text-pub-ink' : 'font-medium text-pub-ink-4'
+                    }`}
+                  >
+                    {label}
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+        </div>
+
         <div
           id={`${baseId}-panel`}
           role="tabpanel"
@@ -549,9 +615,9 @@ export function SolutionShowcase() {
           {/* Conversation — excerpt by default, full transcript on request */}
           <div
             {...spotlight}
-            className="cq-surface cq-surface-edge relative flex min-w-0 flex-col rounded-[22px] border border-white/[0.06] bg-pub-ink p-5 sm:p-8"
+            className={`cq-surface cq-surface-edge relative flex min-w-0 flex-col rounded-[22px] border border-white/[0.06] bg-pub-ink p-5 ${pinned ? '' : 'sm:p-8'}`}
           >
-            <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+            <div className={`flex flex-wrap items-center justify-between gap-3 ${pinned ? 'mb-4' : 'mb-6'}`}>
               <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-white/70">
                 Beispielgespräch · {scenario.label}
               </p>
@@ -560,7 +626,7 @@ export function SolutionShowcase() {
                 {scenario.solution.service}
               </span>
             </div>
-            <ol className="space-y-3">
+            <ol className={pinned ? 'space-y-2.5' : 'space-y-3'}>
               {sichtbareNachrichten.map((msg, i) => {
                 const isAi = msg.role === 'ai';
                 const von = BEAT.gespraechStart + i * gespraechSchritt;
@@ -576,7 +642,7 @@ export function SolutionShowcase() {
                     className={`flex ${isAi ? 'justify-start' : 'justify-end'} ${pinned ? '' : 'cq-view-rise'}`}
                   >
                     <p
-                      className={`max-w-[92%] rounded-2xl px-4 py-3 text-[14px] leading-[1.55] sm:max-w-[85%] ${
+                      className={`max-w-[92%] rounded-2xl px-4 text-[14px] leading-[1.55] sm:max-w-[85%] ${pinned ? 'py-2.5' : 'py-3'} ${
                         isAi ? 'rounded-tl-md bg-white/[0.09] text-white/90' : 'rounded-tr-md bg-white text-pub-ink'
                       }`}
                     >
@@ -588,13 +654,13 @@ export function SolutionShowcase() {
               })}
             </ol>
             {hatMehr && (
-              <div className="mt-5 border-t border-white/[0.08] pt-4">
+              <div className={`border-t border-white/[0.08] ${pinned ? 'mt-4 pt-3' : 'mt-5 pt-4'}`}>
                 <button
                   type="button"
                   onClick={() => setTranskriptOffen((v) => !v)}
                   aria-expanded={transkriptOffen}
                   aria-controls={`${baseId}-transkript`}
-                  className="group inline-flex h-11 items-center gap-2 text-[14.5px] font-semibold text-white/85 transition-colors hover:text-white focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
+                  className={`group inline-flex items-center gap-2 text-[14.5px] font-semibold text-white/85 ${pinned ? 'h-9' : 'h-11'} transition-colors hover:text-white focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink`}
                 >
                   <span className="cq-underline">
                     {transkriptOffen
@@ -617,12 +683,12 @@ export function SolutionShowcase() {
           </div>
 
           {/* Summary + what changes */}
-          <div className="flex min-w-0 flex-col gap-5">
+          <div className={`flex min-w-0 flex-col ${pinned ? 'gap-4' : 'gap-5'}`}>
             <motion.div
-              className={`rounded-[22px] border border-pub-hairline bg-white p-5 shadow-[0_1px_2px_rgba(11,15,20,0.03),0_24px_60px_-32px_rgba(11,15,20,0.18)] sm:p-8 ${pinned ? '' : 'cq-view-rise'}`}
+              className={`rounded-[22px] border border-pub-hairline bg-white p-5 shadow-[0_1px_2px_rgba(11,15,20,0.03),0_24px_60px_-32px_rgba(11,15,20,0.18)] ${pinned ? 'sm:p-5' : 'cq-view-rise sm:p-8'}`}
               style={pinned ? { opacity: cardOpacity, y: cardY } : undefined}
             >
-              <p className="mb-5 text-[12px] font-semibold uppercase tracking-[0.14em] text-pub-ink-3">
+              <p className={`text-[12px] font-semibold uppercase tracking-[0.14em] text-pub-ink-3 ${pinned ? 'mb-3' : 'mb-5'}`}>
                 Beispiel einer Gesprächszusammenfassung
               </p>
               <dl className="divide-y divide-pub-hairline-soft">
@@ -637,7 +703,7 @@ export function SolutionShowcase() {
                       bis={von + zeilenSchritt * 0.85}
                       aktiv={pinned}
                       index={j}
-                      className="relative grid gap-1 py-3 min-[380px]:grid-cols-[120px_1fr] min-[380px]:gap-4 sm:grid-cols-[150px_1fr]"
+                      className={`relative grid gap-1 min-[380px]:grid-cols-[120px_1fr] min-[380px]:gap-4 sm:grid-cols-[150px_1fr] ${pinned ? 'py-2' : 'py-3'}`}
                     >
                       {/* Letzter Beat: Die Übergabezeile bekommt einen Wash im
                           Verify-Ton — das ist der Moment, in dem der Vorgang
@@ -655,7 +721,7 @@ export function SolutionShowcase() {
                   );
                 })}
               </dl>
-              <p className="mt-5 text-[13px] leading-relaxed text-pub-ink-3">
+              <p className={`text-[13px] leading-relaxed text-pub-ink-3 ${pinned ? 'mt-3' : 'mt-5'}`}>
                 Notiert wird ein Wunsch, keine Buchung. Die Bestätigung bleibt bei Ihrem Team,
                 bis eine Anbindung an Ihr System geprüft und eingerichtet ist.
               </p>
