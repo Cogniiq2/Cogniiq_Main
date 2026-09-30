@@ -100,7 +100,7 @@ describe('Beispiel — Ausschnitt zuerst, vollständiges Protokoll auf Wunsch', 
       // Art. 50 KI-VO: erster Satz des Assistenten, nicht abschaltbar.
       expect(nachrichten[0]).toMatch(/Assistent:.*KI-Assistent/);
       // Die Buchung steht im sichtbaren Ausschnitt, nicht erst im Protokoll.
-      expect(nachrichten.join(' ')).toMatch(/eingetragen|reserviert|gebucht/);
+      expect(nachrichten.join(' ')).toMatch(/eingetragen|reserviert|gebucht/i);
     }
   });
 

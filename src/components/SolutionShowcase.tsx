@@ -12,6 +12,7 @@ import {
   motion,
   useMotionValueEvent,
   useScroll,
+  useSpring,
   useTransform,
   type MotionValue,
 } from 'framer-motion';
@@ -90,15 +91,15 @@ const SCENARIOS: Scenario[] = [
       statLabel: 'Anrufannahme außerhalb der Öffnungszeiten',
     },
     chat: [
-      { role: 'ai', text: 'Praxis Dr. Albrecht, hier spricht der KI-Assistent.' },
-      { role: 'caller', text: 'Maier, geboren am 12. März 1968. Ich bräuchte diese Woche einen Termin, am liebsten vor eins.' },
-      { role: 'ai', text: 'Ich habe Sie gefunden, Frau Maier. Vor eins wären Donnerstag, 9:40 Uhr, oder Freitag, 8:20 Uhr, frei.' },
-      { role: 'caller', text: 'Donnerstag, bitte.' },
-      { role: 'ai', text: 'Donnerstag, 9:40 Uhr, ist für Sie eingetragen. Bitte bringen Sie Ihre Versichertenkarte mit.' },
-      { role: 'caller', text: 'Und wenn ich bis dahin Fieber bekomme – soll ich trotzdem kommen?' },
-      { role: 'ai', text: 'Das darf ich medizinisch nicht beurteilen. Rufen Sie in dem Fall an, dann leite ich Sie direkt an das Praxisteam weiter.' },
-      { role: 'caller', text: 'Gut. Und falls ich verschieben muss?' },
-      { role: 'ai', text: 'Dann rufen Sie einfach wieder an – verschieben oder absagen erledige ich direkt im Gespräch. Auf Wiederhören, Frau Maier.' },
+      { role: 'ai', text: 'Guten Morgen, Praxis Albrecht – Ihr KI-Assistent.' },
+      { role: 'caller', text: 'Maier, geboren am 12.03.1968. Ich bräuchte diese Woche einen Termin, gern vor eins.' },
+      { role: 'ai', text: 'Danke, Frau Maier. Vor eins hätte ich Donnerstag um 9:40 Uhr oder Freitag um 8:20 Uhr.' },
+      { role: 'caller', text: 'Donnerstag ist super.' },
+      { role: 'ai', text: 'Sehr gern – Donnerstag, 9:40 Uhr, ist eingetragen. Denken Sie bitte an Ihre Versichertenkarte.' },
+      { role: 'caller', text: 'Und wenn ich bis dahin Fieber bekomme?' },
+      { role: 'ai', text: 'Das kann ich medizinisch nicht beurteilen. Rufen Sie dann einfach an, ich leite Sie gleich an das Praxisteam weiter.' },
+      { role: 'caller', text: 'Prima. Und falls ich verschieben muss?' },
+      { role: 'ai', text: 'Dann rufen Sie einfach wieder an – das erledige ich direkt im Gespräch. Bis Donnerstag, Frau Maier.' },
     ],
   },
   {
@@ -132,15 +133,15 @@ const SCENARIOS: Scenario[] = [
       statLabel: 'Reservierungsannahme außerhalb der Öffnungszeiten',
     },
     chat: [
-      { role: 'ai', text: 'Trattoria Lume, hier spricht der KI-Assistent.' },
-      { role: 'caller', text: 'Berger hier. Haben Sie Samstag um 20 Uhr einen Tisch für vier? Wir feiern einen Geburtstag.' },
-      { role: 'ai', text: 'Um 20 Uhr sind wir ausgebucht. Um 19:30 Uhr wäre der Ecktisch am Fenster frei – etwas ruhiger zum Feiern.' },
+      { role: 'ai', text: 'Guten Abend, Trattoria Lume – Ihr KI-Assistent.' },
+      { role: 'caller', text: 'Berger hier. Haben Sie Samstag um 20 Uhr einen Tisch für vier? Wir feiern Geburtstag.' },
+      { role: 'ai', text: 'Wie schön. Um 20 Uhr sind wir voll, aber um 19:30 Uhr wäre der ruhige Ecktisch am Fenster frei.' },
       { role: 'caller', text: 'Den nehmen wir. Einer von uns hat eine Nussallergie.' },
-      { role: 'ai', text: 'Samstag, 19:30 Uhr, vier Personen, Ecktisch – ist reserviert. Allergie und Geburtstag sind für die Küche vermerkt.' },
-      { role: 'caller', text: 'Könnten Sie zum Dessert eine Kerze vorbereiten lassen?' },
-      { role: 'ai', text: 'Gern, das steht bei der Reservierung. Der Service weiß Bescheid, wenn Sie kommen.' },
+      { role: 'ai', text: 'Reserviert: Samstag, 19:30 Uhr, Ecktisch für vier. Die Küche weiß von Allergie und Geburtstag.' },
+      { role: 'caller', text: 'Könnten Sie zum Dessert eine Kerze vorbereiten?' },
+      { role: 'ai', text: 'Sehr gern, das steht bei Ihrer Reservierung. Der Service kümmert sich darum.' },
       { role: 'caller', text: 'Und falls wir es doch nicht schaffen?' },
-      { role: 'ai', text: 'Dann rufen Sie kurz an, ich gebe den Tisch wieder frei. Einen schönen Abend, Herr Berger.' },
+      { role: 'ai', text: 'Dann rufen Sie kurz an, ich gebe den Tisch wieder frei. Einen schönen Abend – und alles Gute zum Geburtstag.' },
     ],
   },
   {
@@ -174,13 +175,13 @@ const SCENARIOS: Scenario[] = [
       statLabel: 'qualifizierte Besichtigungen durch automatische Vorqualifizierung',
     },
     chat: [
-      { role: 'ai', text: 'Immobilien Hartmann, hier spricht der KI-Assistent.' },
+      { role: 'ai', text: 'Guten Tag, Immobilien Hartmann – Ihr KI-Assistent.' },
       { role: 'caller', text: 'Keller hier. Ist die 3-Zimmer-Wohnung in der Sonnenstraße noch frei? Zu zweit, Finanzierung steht.' },
-      { role: 'ai', text: 'Ja: 84 m², 3. OG, Aufzug, 1.290 € kalt. Besichtigung wäre Dienstag, 17 Uhr, oder Donnerstag, 18:30 Uhr.' },
-      { role: 'caller', text: 'Donnerstag passt.' },
-      { role: 'ai', text: 'Donnerstag, 18:30 Uhr, ist eingetragen. Der Makler hat Ihre Angaben schon vorliegen.' },
-      { role: 'caller', text: 'Sind Katzen erlaubt?' },
-      { role: 'ai', text: 'Laut Exposé ja. Ich notiere die Frage zusätzlich für den Makler, er bestätigt es Ihnen vor Ort. Bis Donnerstag, Herr Keller.' },
+      { role: 'ai', text: 'Ja, noch frei: 84 m², 3. OG mit Aufzug. Besichtigung ginge Dienstag, 17 Uhr, oder Donnerstag, 18:30 Uhr.' },
+      { role: 'caller', text: 'Donnerstag passt uns gut.' },
+      { role: 'ai', text: 'Wunderbar – Donnerstag, 18:30 Uhr, ist eingetragen. Herr Hartmann hat Ihre Angaben schon vorliegen.' },
+      { role: 'caller', text: 'Eine Frage noch: Sind Katzen erlaubt?' },
+      { role: 'ai', text: 'Laut Exposé ja. Ich gebe die Frage zur Sicherheit an Herrn Hartmann weiter, er bestätigt es Ihnen vor Ort. Bis Donnerstag.' },
     ],
   },
   {
@@ -214,13 +215,13 @@ const SCENARIOS: Scenario[] = [
       statLabel: 'Kündigungen durch aktive, verlässliche Bindung',
     },
     chat: [
-      { role: 'ai', text: 'Studio Kern, hier spricht der KI-Assistent.' },
-      { role: 'caller', text: 'Hallo, Mitgliedsnummer 4471. Ich möchte dauerhaft in den Yoga-Kurs dienstags um 18 Uhr.' },
-      { role: 'ai', text: 'Danke, Frau Yilmaz. 18 Uhr ist dauerhaft voll – um 19:15 Uhr gibt Lena denselben Kurs, dort ist noch Platz.' },
-      { role: 'caller', text: 'Dann 19:15 Uhr. Und falls um 18 Uhr etwas frei wird?' },
-      { role: 'ai', text: 'Ab nächster Woche sind Sie dienstags um 19:15 Uhr gebucht. Für 18 Uhr setze ich Sie auf die Warteliste.' },
+      { role: 'ai', text: 'Hallo, Studio Kern – Ihr KI-Assistent.' },
+      { role: 'caller', text: 'Hi, Mitgliedsnummer 4471. Ich würde gern dauerhaft in Yoga, dienstags um 18 Uhr.' },
+      { role: 'ai', text: 'Hallo Frau Yilmaz. 18 Uhr ist leider voll – um 19:15 Uhr gibt Lena denselben Kurs, da ist noch Platz.' },
+      { role: 'caller', text: 'Dann 19:15 Uhr. Und falls um 18 Uhr was frei wird?' },
+      { role: 'ai', text: 'Gebucht: ab nächster Woche jeden Dienstag um 19:15 Uhr. Für 18 Uhr stehen Sie auf der Warteliste.' },
       { role: 'caller', text: 'Und wenn ich mal nicht kann?' },
-      { role: 'ai', text: 'Dann sagen Sie bis zwei Stunden vorher ab, und Ihr Platz wird für diese Woche frei. Bis Dienstag, Frau Yilmaz.' },
+      { role: 'ai', text: 'Dann einfach bis zwei Stunden vorher absagen, und Ihr Platz ist für die Woche frei. Viel Spaß bei Lena.' },
     ],
   },
 ];
@@ -377,13 +378,19 @@ function stageAt(p: number): number {
   return 3;
 }
 
-/** Ein Element, das zwischen `von` und `bis` des Scrollwegs erscheint. */
+/**
+ * Ein Element, das zwischen `von` und `bis` des (gefederten) Scrollwegs
+ * erscheint. Nachrichten wachsen dabei aus der Ecke, aus der sie kommen —
+ * Anrufer rechts unten, Assistent links unten —, wie in einem Messenger.
+ * Nur Opacity und Transform: kein Layout, keine Neuberechnung beim Scrollen.
+ */
 function Beat({
   progress,
   von,
   bis,
   aktiv,
   index,
+  herkunft = 'mitte',
   as: Tag = 'div',
   className,
   children,
@@ -392,24 +399,44 @@ function Beat({
   von: number;
   bis: number;
   aktiv: boolean;
-  /** Staffelung für die CSS-Scroll-Timeline im nicht gepinnten Modus. */
+  /** Staffelung für die CSS-Scroll-Timeline, solange JavaScript nicht läuft. */
   index: number;
+  herkunft?: 'links' | 'rechts' | 'mitte';
   as?: 'div' | 'li';
   className?: string;
   children: ReactNode;
 }) {
   const opacity = useTransform(progress, [von, bis], [0, 1]);
-  const y = useTransform(progress, [von, bis], [16, 0]);
+  const y = useTransform(progress, [von, bis], [18, 0]);
+  const scale = useTransform(progress, [von, bis], [herkunft === 'mitte' ? 1 : 0.965, 1]);
   const Comp = Tag === 'li' ? motion.li : motion.div;
+  const transformOrigin =
+    herkunft === 'links' ? 'left bottom' : herkunft === 'rechts' ? 'right bottom' : 'center';
   return (
     <Comp
       className={className}
-      style={aktiv ? { opacity, y } : ({ '--cq-i': index } as Record<string, number>)}
+      style={
+        aktiv
+          ? { opacity, y, scale, transformOrigin, willChange: 'transform, opacity' }
+          : ({ '--cq-i': index } as Record<string, number>)
+      }
     >
       {children}
     </Comp>
   );
 }
+
+/*
+  Feder für den Scrollweg. Rohes scrollYProgress springt mit jedem Wheel-
+  Ereignis; die Feder läuft ihm mit etwas Masse nach und macht aus Stufen
+  eine Bewegung. Die Werte sind so gewählt, dass die Verzögerung unter
+  einer Zehntelsekunde bleibt — gefühlt direkt, sichtbar weich.
+*/
+const SCROLL_SPRING = { stiffness: 170, damping: 30, mass: 0.35, restDelta: 0.0005 } as const;
+
+/** Im Fluss: Anteil des Gesprächswegs, auf dem die Nachrichten erscheinen.
+ *  Der Rest gehört der Buchung auf der Karte. */
+const GESPRAECH_FLUSS_ENDE = 0.66;
 
 /*
   ZWEI ZUSTÄNDE, NICHT EINER.
@@ -425,9 +452,26 @@ function Beat({
   immer dieselbe kompakte Bühne gemessen, und der Pin folgt ihr in beide
   Richtungen.
 */
-function useStoryMode(stageRef: React.RefObject<HTMLDivElement>): { compact: boolean; pinned: boolean } {
+function useStoryMode(stageRef: React.RefObject<HTMLDivElement>): {
+  compact: boolean;
+  pinned: boolean;
+  animated: boolean;
+} {
   const [eligible, setEligible] = useState(false);
   const [fits, setFits] = useState(true);
+  // Scrollgesteuerte Beats laufen auf JEDEM Gerät mit erlaubter Bewegung —
+  // gepinnt, wo die Bühne passt, sonst im Fluss. Im Prerender `false`.
+  const [animated, setAnimated] = useState(false);
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const mq = window.matchMedia('(prefers-reduced-motion: no-preference)');
+    const apply = (m: boolean) => startTransition(() => setAnimated(m));
+    apply(mq.matches);
+    const handler = (e: MediaQueryListEvent) => apply(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return;
@@ -458,7 +502,7 @@ function useStoryMode(stageRef: React.RefObject<HTMLDivElement>): { compact: boo
     };
   }, [eligible, stageRef]);
 
-  return { compact: eligible, pinned: eligible && fits };
+  return { compact: eligible, pinned: eligible && fits, animated };
 }
 
 const spotlight = spotlightHandlers();
@@ -470,20 +514,46 @@ export function SolutionShowcase() {
 
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
-  const { compact, pinned } = useStoryMode(stageRef);
+  const chatRef = useRef<HTMLOListElement>(null);
+  const cardRef = useRef<HTMLDListElement>(null);
+  const { compact, pinned, animated } = useStoryMode(stageRef);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end end'],
   });
+  /*
+    FLUSS-MODUS: Ist die Bühne nicht gepinnt (kleinere Fenster, Tablets,
+    Telefone), hängt jede Liste an ihrer EIGENEN Lage im Fenster. Das
+    Gespräch beginnt, wenn seine Oberkante bei 88 % der Fensterhöhe steht,
+    und ist vollständig, wenn seine Unterkante 58 % erreicht — die
+    Nachrichten erscheinen also genau dort, wo das Auge gerade liest.
+  */
+  const chatScroll = useScroll({ target: chatRef, offset: ['start 0.88', 'end 0.58'] });
+  const cardScroll = useScroll({ target: cardRef, offset: ['start 0.88', 'end 0.62'] });
+  const sectionSmooth = useSpring(scrollYProgress, SCROLL_SPRING);
+  const chatSmooth = useSpring(chatScroll.scrollYProgress, SCROLL_SPRING);
+  const cardSmooth = useSpring(cardScroll.scrollYProgress, SCROLL_SPRING);
   const [stage, setStage] = useState(0);
   useMotionValueEvent(scrollYProgress, 'change', (p) => {
     const next = stageAt(p);
     setStage((cur) => (cur === next ? cur : next));
   });
-  const railScale = useTransform(scrollYProgress, [0, 1], [0, 1]);
-  const cardOpacity = useTransform(scrollYProgress, [BEAT.kartenStart, BEAT.zeilenStart], [0.35, 1]);
-  const cardY = useTransform(scrollYProgress, [BEAT.kartenStart, BEAT.zeilenStart], [20, 0]);
-  const statusOpacity = useTransform(scrollYProgress, [BEAT.erledigt, 0.97], [0, 1]);
+  const railScale = useTransform(sectionSmooth, [0, 1], [0, 1]);
+  const cardOpacity = useTransform(sectionSmooth, [BEAT.kartenStart, BEAT.zeilenStart], [0.35, 1]);
+  const cardY = useTransform(sectionSmooth, [BEAT.kartenStart, BEAT.zeilenStart], [20, 0]);
+  const statusPinned = useTransform(sectionSmooth, [BEAT.erledigt, 0.97], [0, 1]);
+  /*
+    REIHENFOLGE IM FLUSS. Nebeneinander (Desktop, nicht gepinnt) steht die
+    Karte höher als das Ende des Gesprächs — sie würde „gebucht" zeigen,
+    bevor der Assistent gebucht hat. Die Zeilen folgen deshalb dem SPÄTEREN
+    von zwei Signalen: dem Ende des Gesprächs (letztes Drittel seines Wegs) und
+    der eigenen Lage der Karte. Nebeneinander entscheidet das Gespräch,
+    untereinander (Telefon) die Karte — ohne Sonderfall im Layout.
+  */
+  const rowsFlow = useTransform([cardSmooth, chatSmooth], ([karte, gespraech]: number[]) =>
+    Math.min(karte, Math.max(0, Math.min(1, (gespraech - GESPRAECH_FLUSS_ENDE) / (1 - GESPRAECH_FLUSS_ENDE)))),
+  );
+  const statusFlow = useTransform(rowsFlow, [0.86, 1], [0, 1]);
 
   const scenario = SCENARIOS.find((s) => s.label === activeIndustry)!;
   const SvcIcon = scenario.solution.serviceIcon;
@@ -669,20 +739,25 @@ export function SolutionShowcase() {
                 {scenario.solution.service}
               </span>
             </div>
-            <ol className={compact ? 'space-y-2.5' : 'space-y-3'}>
+            <ol ref={chatRef} className={compact ? 'space-y-2.5' : 'space-y-3'}>
               {sichtbareNachrichten.map((msg, i) => {
                 const isAi = msg.role === 'ai';
-                const von = BEAT.gespraechStart + i * gespraechSchritt;
+                // Gepinnt: Anteil am Weg des ganzen Abschnitts. Im Fluss:
+                // gleichmäßig über den Weg der Liste selbst verteilt.
+                const flussSchritt = GESPRAECH_FLUSS_ENDE / n;
+                const von = pinned ? BEAT.gespraechStart + i * gespraechSchritt : i * flussSchritt;
+                const bis = pinned ? von + gespraechSchritt * 0.85 : von + flussSchritt * 0.9;
                 return (
                   <Beat
                     key={`${activeIndustry}-${i}`}
                     as="li"
-                    progress={scrollYProgress}
+                    progress={pinned ? sectionSmooth : chatSmooth}
                     von={von}
-                    bis={von + gespraechSchritt * 0.8}
-                    aktiv={pinned}
+                    bis={bis}
+                    aktiv={animated}
+                    herkunft={isAi ? 'links' : 'rechts'}
                     index={i}
-                    className={`flex ${isAi ? 'justify-start' : 'justify-end'} ${pinned ? '' : 'cq-view-rise'}`}
+                    className={`flex ${isAi ? 'justify-start' : 'justify-end'} ${animated ? '' : 'cq-view-rise'}`}
                   >
                     <p
                       className={`max-w-[92%] rounded-2xl px-4 text-[14px] leading-[1.55] sm:max-w-[85%] ${compact ? 'py-2.5' : 'py-3'} ${
@@ -728,7 +803,7 @@ export function SolutionShowcase() {
           {/* Summary + what changes */}
           <div className={`flex min-w-0 flex-col ${compact ? 'gap-4' : 'gap-5'}`}>
             <motion.div
-              className={`rounded-[22px] border border-pub-hairline bg-white p-5 shadow-[0_1px_2px_rgba(11,15,20,0.03),0_24px_60px_-32px_rgba(11,15,20,0.18)] ${compact ? 'sm:p-5' : 'sm:p-8'} ${pinned ? '' : 'cq-view-rise'}`}
+              className={`rounded-[22px] border border-pub-hairline bg-white p-5 shadow-[0_1px_2px_rgba(11,15,20,0.03),0_24px_60px_-32px_rgba(11,15,20,0.18)] ${compact ? 'sm:p-5' : 'sm:p-8'} ${animated ? '' : 'cq-view-rise'}`}
               style={pinned ? { opacity: cardOpacity, y: cardY } : undefined}
             >
               <div className={`flex flex-wrap items-center justify-between gap-x-4 gap-y-2 ${compact ? 'mb-3' : 'mb-5'}`}>
@@ -741,28 +816,30 @@ export function SolutionShowcase() {
                   {ABWICKLUNG.badge}
                 </span>
               </div>
-              <dl className="divide-y divide-pub-hairline-soft">
+              <dl ref={cardRef} className="divide-y divide-pub-hairline-soft">
                 {summary.map(({ label, value }, j) => {
-                  const von = BEAT.zeilenStart + j * zeilenSchritt;
+                  const flussSchritt = 0.86 / summary.length;
+                  const von = pinned ? BEAT.zeilenStart + j * zeilenSchritt : j * flussSchritt;
+                  const bis = pinned ? von + zeilenSchritt * 0.85 : von + flussSchritt * 0.9;
                   const letzte = j === summary.length - 1;
                   return (
                     <Beat
-                      key={label}
-                      progress={scrollYProgress}
+                      key={`${activeIndustry}-${label}`}
+                      progress={pinned ? sectionSmooth : rowsFlow}
                       von={von}
-                      bis={von + zeilenSchritt * 0.85}
-                      aktiv={pinned}
+                      bis={bis}
+                      aktiv={animated}
                       index={j}
                       className={`relative grid gap-1 min-[380px]:grid-cols-[120px_1fr] min-[380px]:gap-4 sm:grid-cols-[150px_1fr] ${compact ? 'py-2' : 'py-3'}`}
                     >
                       {/* Letzter Beat: Die Statuszeile bekommt einen Wash im
                           Accent-Ton — das ist der Moment, in dem der Termin
                           im System steht und der Vorgang erledigt ist. */}
-                      {pinned && letzte && (
+                      {animated && letzte && (
                         <motion.span
                           aria-hidden="true"
                           className="pointer-events-none absolute -inset-x-3 inset-y-0.5 rounded-xl bg-pub-accent-wash ring-1 ring-pub-accent-line"
-                          style={{ opacity: statusOpacity }}
+                          style={{ opacity: pinned ? statusPinned : statusFlow }}
                         />
                       )}
                       <dt className="relative text-[13.5px] text-pub-ink-3">{label}</dt>
