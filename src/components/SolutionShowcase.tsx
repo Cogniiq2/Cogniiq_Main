@@ -29,6 +29,7 @@ import {
 
 import { PubEyebrow, PubLinkButton } from '@/components/public/PublicUI';
 import { spotlightHandlers } from '@/lib/publicMotion';
+import { ABWICKLUNG } from '@/lib/telefonassistent-copy';
 
 type Industry = 'Arztpraxis' | 'Restaurant' | 'Immobilien' | 'Sport & Fitness';
 
@@ -91,14 +92,14 @@ const SCENARIOS: Scenario[] = [
       statLabel: 'Anrufannahme außerhalb der Öffnungszeiten',
     },
     chat: [
-      { role: 'caller', text: 'Hallo, ich würde gerne einen Termin vereinbaren.' },
-      { role: 'ai', text: 'Guten Tag! Hier ist die digitale Assistenz der Praxis. Welchen Arzt möchten Sie besuchen — Allgemein- oder Spezialsprechstunde?' },
-      { role: 'caller', text: 'Allgemeinmedizin bitte, möglichst diese Woche.' },
-      { role: 'ai', text: 'Kein Problem. Für die Allgemeinsprechstunde nimmt die Anmeldung Wunschzeiten entgegen — passt Ihnen Donnerstagvormittag oder Freitagnachmittag besser?' },
-      { role: 'caller', text: 'Donnerstagvormittag passt gut.' },
-      { role: 'ai', text: 'Donnerstagvormittag notiere ich. Unter welcher Nummer erreicht Sie die Anmeldung für die Bestätigung?' },
-      { role: 'caller', text: '0151 2345678.' },
-      { role: 'ai', text: 'Danke. Ihr Terminwunsch geht mit Ihrer Rückrufnummer an die Anmeldung. Noch etwas, wobei ich helfen kann?' },
+      { role: 'caller', text: 'Guten Tag, ich bräuchte diese Woche einen Termin in der Allgemeinsprechstunde.' },
+      { role: 'ai', text: 'Guten Tag, Terminassistenz der Praxis. Frei wäre Donnerstag um 9:40 Uhr oder Montag um 14:10 Uhr. Was passt Ihnen?' },
+      { role: 'caller', text: 'Donnerstag, 9:40 Uhr, bitte. Maier, geboren am 12. März 1968.' },
+      { role: 'ai', text: 'Danke, Frau Maier. Donnerstag, 9:40 Uhr — ist eingetragen. Bitte bringen Sie Ihre Versichertenkarte mit.' },
+      { role: 'caller', text: 'Und falls mir etwas dazwischenkommt?' },
+      { role: 'ai', text: 'Dann rufen Sie einfach wieder an. Verschieben oder absagen erledige ich direkt im Gespräch.' },
+      { role: 'caller', text: 'Danke, das ging schnell.' },
+      { role: 'ai', text: 'Gern. Auf Wiederhören, Frau Maier.' },
     ],
   },
   {
@@ -132,14 +133,14 @@ const SCENARIOS: Scenario[] = [
       statLabel: 'Reservierungsannahme außerhalb der Öffnungszeiten',
     },
     chat: [
-      { role: 'caller', text: 'Guten Abend, kann ich für Samstag einen Tisch reservieren?' },
-      { role: 'ai', text: 'Guten Abend, herzlich willkommen! Für wie viele Personen darf ich den Wunsch notieren?' },
-      { role: 'caller', text: 'Für 4 Personen, am liebsten 19:30 Uhr.' },
-      { role: 'ai', text: 'Samstag 19:30 Uhr für 4 Personen notiere ich als Wunsch. Haben Sie besondere Wünsche — Fenstertisch oder Allergieinformationen?' },
-      { role: 'caller', text: 'Einen Fenstertisch wäre toll.' },
-      { role: 'ai', text: 'Fenstertisch ist notiert. Unter welcher Nummer erreicht Sie das Team für die Bestätigung?' },
-      { role: 'caller', text: '0151 2345678.' },
-      { role: 'ai', text: 'Danke. Ihr Reservierungswunsch geht mit allen Angaben an den Service. Einen schönen Abend!' },
+      { role: 'caller', text: 'Guten Abend, haben Sie am Samstag gegen 19:30 Uhr noch einen Tisch für vier?' },
+      { role: 'ai', text: 'Guten Abend, Reservierungsassistenz. Um 19:30 Uhr ist noch ein Tisch für vier frei, am Fenster sogar. Auf welchen Namen?' },
+      { role: 'caller', text: 'Berger, bitte. Ein Kind ist dabei.' },
+      { role: 'ai', text: 'Berger, Samstag, 19:30 Uhr, vier Personen, Fenstertisch, ein Kinderstuhl — ist reserviert.' },
+      { role: 'caller', text: 'Und falls wir es doch nicht schaffen?' },
+      { role: 'ai', text: 'Dann rufen Sie einfach an, ich gebe den Tisch wieder frei.' },
+      { role: 'caller', text: 'Wunderbar, danke.' },
+      { role: 'ai', text: 'Sehr gern. Einen schönen Abend.' },
     ],
   },
   {
@@ -173,12 +174,12 @@ const SCENARIOS: Scenario[] = [
       statLabel: 'qualifizierte Besichtigungen durch automatische Vorqualifizierung',
     },
     chat: [
-      { role: 'caller', text: 'Ich habe Interesse an der inserierten 3-Zimmer-Wohnung.' },
-      { role: 'ai', text: 'Hallo! Danke für Ihr Interesse. Darf ich Ihnen kurz ein paar Fragen stellen, damit wir den Termin optimal vorbereiten können?' },
-      { role: 'caller', text: 'Ja, natürlich.' },
-      { role: 'ai', text: 'Suchen Sie zur Eigennutzung oder als Kapitalanlage? Und haben Sie bereits eine Finanzierungszusage?' },
-      { role: 'caller', text: 'Eigennutzung, Finanzierung ist bereits in Klärung.' },
-      { role: 'ai', text: 'Hervorragend. Ich schlage Ihnen jetzt drei Besichtigungstermine vor. Welcher passt Ihnen am besten?' },
+      { role: 'caller', text: 'Guten Tag, ich interessiere mich für die 3-Zimmer-Wohnung in der Sonnenstraße. Zur Eigennutzung, die Finanzierung ist geklärt.' },
+      { role: 'ai', text: 'Guten Tag. Die Wohnung ist noch verfügbar. Besichtigungen sind Dienstag um 17:00 Uhr oder Donnerstag um 18:30 Uhr möglich. Was passt Ihnen?' },
+      { role: 'caller', text: 'Donnerstag, 18:30 Uhr.' },
+      { role: 'ai', text: 'Donnerstag, 18:30 Uhr, Sonnenstraße — ist eingetragen. Der Makler hat Ihre Angaben bereits vorliegen.' },
+      { role: 'caller', text: 'Muss ich etwas mitbringen?' },
+      { role: 'ai', text: 'Nur einen Ausweis. Bis Donnerstag.' },
     ],
   },
   {
@@ -212,46 +213,54 @@ const SCENARIOS: Scenario[] = [
       statLabel: 'Kündigungen durch aktive, verlässliche Bindung',
     },
     chat: [
-      { role: 'caller', text: 'Gibt es noch Plätze im Yoga-Kurs am Dienstag?' },
-      { role: 'ai', text: 'Hi! Der Yoga-Kurs Dienstag 18:00 Uhr hat noch 2 freie Plätze. Soll ich Sie auf die Liste setzen?' },
-      { role: 'caller', text: 'Ja bitte, für diese Woche und alle weiteren Dienstage.' },
-      { role: 'ai', text: 'Notiert — dauerhaft jeden Dienstag 18:00 Uhr. Das Team bestätigt Ihnen den Platz.' },
-      { role: 'caller', text: 'Super, danke!' },
-      { role: 'ai', text: 'Gern! Fällt ein Kurs aus, meldet sich das Studio bei Ihnen und nennt Ihnen die Alternativen.' },
+      { role: 'caller', text: 'Hallo, gibt es Dienstag um 18 Uhr noch einen Platz im Yoga-Kurs? Mitgliedsnummer 4471.' },
+      { role: 'ai', text: 'Hallo. Ja, zwei Plätze sind noch frei. Nur diesen Dienstag oder dauerhaft jede Woche?' },
+      { role: 'caller', text: 'Dauerhaft, bitte.' },
+      { role: 'ai', text: 'Yoga, dienstags um 18:00 Uhr, dauerhaft — ist gebucht.' },
+      { role: 'caller', text: 'Und wenn ich einmal nicht kann?' },
+      { role: 'ai', text: 'Dann sagen Sie kurz telefonisch ab, und der Platz wird für diese Woche frei. Bis Dienstag.' },
     ],
   },
 ];
 
 
 /*
-  What the team would receive after each example call. Every value is taken from
-  the transcript above it; nothing is a confirmed booking — the assistant records
-  a wish and hands it over, the team confirms.
+  What stands in the customer's own system after each example call. Every
+  value is taken from the transcript above it. The last row is the status —
+  and the status is "gebucht", not "notiert": the assistant finishes the
+  process in the call, so nobody transfers anything afterwards.
+
+  This is `ABWICKLUNG.faehigkeit` shown rather than told, and it carries its
+  condition in sight: the example runs on a verified calendar connection
+  (`ABWICKLUNG.badge` on the card, `ABWICKLUNG.kurz` in the footnote). That is
+  the owner's binding BOOKING_WRITE answer (OWNER-INPUT.md, 10.09.2026):
+  booking may be shown wherever the customer-specific connection is set up
+  and verified — which is how every Cogniiq deployment is set up.
 */
 const SUMMARIES: Record<Industry, { label: string; value: string }[]> = {
   Arztpraxis: [
     { label: 'Anliegen', value: 'Termin, Allgemeinsprechstunde' },
-    { label: 'Terminwunsch', value: 'Donnerstagvormittag, diese Woche' },
-    { label: 'Rückruf', value: 'Nummer hinterlegt' },
-    { label: 'Übergabe', value: 'An die Anmeldung, zur Bestätigung' },
+    { label: 'Termin', value: 'Donnerstag, 9:40 Uhr' },
+    { label: 'Patientin', value: 'Maier, Bestandspatientin' },
+    { label: 'Status', value: 'Gebucht, nichts nachzutragen' },
   ],
   Restaurant: [
-    { label: 'Anliegen', value: 'Reservierung, Samstag' },
-    { label: 'Wunsch', value: '19:30 Uhr, 4 Personen, Fenstertisch' },
-    { label: 'Rückruf', value: 'Nummer hinterlegt' },
-    { label: 'Übergabe', value: 'An den Service, zur Bestätigung' },
+    { label: 'Reservierung', value: 'Samstag, 19:30 Uhr' },
+    { label: 'Tisch', value: '4 Personen, Fenster, ein Kinderstuhl' },
+    { label: 'Name', value: 'Berger' },
+    { label: 'Status', value: 'Reserviert, nichts nachzutragen' },
   ],
   Immobilien: [
-    { label: 'Anliegen', value: 'Interesse an 3-Zimmer-Wohnung' },
-    { label: 'Vorqualifizierung', value: 'Eigennutzung, Finanzierung in Klärung' },
-    { label: 'Nächster Schritt', value: 'Besichtigungstermin vorgeschlagen' },
-    { label: 'Übergabe', value: 'An den Makler, sortiert' },
+    { label: 'Objekt', value: '3-Zimmer-Wohnung, Sonnenstraße' },
+    { label: 'Vorqualifizierung', value: 'Eigennutzung, Finanzierung geklärt' },
+    { label: 'Besichtigung', value: 'Donnerstag, 18:30 Uhr' },
+    { label: 'Status', value: 'Gebucht, im Kalender des Maklers' },
   ],
   'Sport & Fitness': [
-    { label: 'Anliegen', value: 'Yoga-Kurs, Dienstag 18:00 Uhr' },
-    { label: 'Wunsch', value: 'Dauerhaft, jeden Dienstag' },
-    { label: 'Status', value: 'Auf der Liste, Bestätigung durch das Team' },
-    { label: 'Übergabe', value: 'An das Studio' },
+    { label: 'Kurs', value: 'Yoga, dienstags 18:00 Uhr' },
+    { label: 'Mitglied', value: 'Nr. 4471' },
+    { label: 'Umfang', value: 'Dauerhaft, jede Woche' },
+    { label: 'Status', value: 'Gebucht, im Kurssystem' },
   ],
 };
 
@@ -270,8 +279,8 @@ const AUSSCHNITT_LAENGE = 4;
    ═══════════════════════════════════════════════════════════════════════════
    Auf dem Desktop bleibt der Abschnitt für rund zweieinhalb Bildschirmhöhen
    stehen, und die Scrollposition erzählt den Ablauf: Erst der Anruf, dann das
-   Gespräch Nachricht für Nachricht, dann die Zusammenfassung Zeile für Zeile,
-   zuletzt die Übergabe an das Team. Der Besucher steuert das Tempo selbst —
+   Gespräch Nachricht für Nachricht, dann die Buchung Zeile für Zeile, zuletzt
+   der Status: erledigt — der Termin steht im System, niemand trägt nach. Der Besucher steuert das Tempo selbst —
    nichts läuft von allein, nichts wird übersprungen, und ein Scroll zurück
    spielt die Szene rückwärts.
 
@@ -327,15 +336,15 @@ const BEAT = {
   kartenStart: 0.5,
   zeilenStart: 0.56,
   zeilenEnde: 0.9,
-  uebergabe: 0.9,
+  erledigt: 0.9,
 } as const;
 
-const STAGES = ['Anruf', 'Gespräch', 'Zusammenfassung', 'Übergabe'] as const;
+const STAGES = ['Anruf', 'Gespräch', 'Buchung', 'Erledigt'] as const;
 
 function stageAt(p: number): number {
   if (p < BEAT.gespraechStart) return 0;
   if (p < BEAT.kartenStart) return 1;
-  if (p < BEAT.uebergabe) return 2;
+  if (p < BEAT.erledigt) return 2;
   return 3;
 }
 
@@ -438,7 +447,7 @@ export function SolutionShowcase() {
   const railScale = useTransform(scrollYProgress, [0, 1], [0, 1]);
   const cardOpacity = useTransform(scrollYProgress, [BEAT.kartenStart, BEAT.zeilenStart], [0.35, 1]);
   const cardY = useTransform(scrollYProgress, [BEAT.kartenStart, BEAT.zeilenStart], [20, 0]);
-  const uebergabeOpacity = useTransform(scrollYProgress, [BEAT.uebergabe, 0.97], [0, 1]);
+  const statusOpacity = useTransform(scrollYProgress, [BEAT.erledigt, 0.97], [0, 1]);
 
   const scenario = SCENARIOS.find((s) => s.label === activeIndustry)!;
   const SvcIcon = scenario.solution.serviceIcon;
@@ -464,8 +473,8 @@ export function SolutionShowcase() {
   const abschluss = (
     <div className={pinned ? 'flex flex-col items-start gap-2.5' : 'flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'}>
       <p className="max-w-[54ch] text-[15px] leading-[1.6] text-pub-ink-2">
-        Welche Anliegen der Assistent übernimmt, wo er an einen Menschen
-        übergibt und was er ausdrücklich nicht tut, steht auf der Produktseite.
+        Welche Abläufe der Assistent im Gespräch zu Ende führt, wo er an einen
+        Menschen übergibt und was er ausdrücklich nicht tut, steht auf der Produktseite.
       </p>
       <PubLinkButton to="/ki-telefonassistent" variant="secondary" size="md" icon={ArrowRight} iconTrailing className="h-auto min-h-11 max-w-full whitespace-normal py-2.5 text-center sm:shrink-0">
         KI-Telefonassistent ansehen
@@ -500,7 +509,7 @@ export function SolutionShowcase() {
         <div
           className={
             pinned
-              ? 'mb-5 grid items-end gap-x-10 gap-y-3 pt-3 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]'
+              ? 'mb-5 grid items-end gap-x-10 gap-y-3 pt-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]'
               : 'mb-10 flex flex-col gap-6 lg:mb-14 lg:flex-row lg:items-end lg:justify-between'
           }
         >
@@ -509,16 +518,15 @@ export function SolutionShowcase() {
             <h2
               id="showcase-heading"
               className={`font-bold leading-[1.1] tracking-[-0.02em] text-pub-ink ${
-                pinned ? 'text-[clamp(28px,2.6vw,36px)]' : 'mb-4 text-[clamp(30px,3.2vw,40px)]'
+                pinned ? 'whitespace-nowrap text-[clamp(26px,2.3vw,33px)]' : 'mb-4 text-[clamp(30px,3.2vw,40px)]'
               }`}
             >
-              Vom Anruf zum Ergebnis.
+              Vom Anruf zum gebuchten Termin.
             </h2>
             {!pinned && (
               <p className="max-w-[58ch] text-[17px] leading-[1.6] text-pub-ink-2">
-                Links ein Ausschnitt aus dem Gespräch, rechts das, was danach bei Ihrem
-                Team ankommt: strukturiert, mit Rückrufnummer, zur Bestätigung durch
-                einen Menschen.
+                Links das Gespräch, rechts das, was danach in Ihrem System steht: Der
+                Termin ist gebucht und dokumentiert. Ihr Team muss nichts nachtragen.
               </p>
             )}
           </div>
@@ -527,9 +535,8 @@ export function SolutionShowcase() {
               gleicher Satz, halbe Höhe. */}
           {pinned && (
             <p className="min-w-0 max-w-[52ch] text-[15px] leading-[1.55] text-pub-ink-2 lg:justify-self-end">
-              Links ein Ausschnitt aus dem Gespräch, rechts das, was danach bei Ihrem
-              Team ankommt: strukturiert, mit Rückrufnummer, zur Bestätigung durch
-              einen Menschen.
+              Links das Gespräch, rechts das, was danach in Ihrem System steht: Der
+                Termin ist gebucht und dokumentiert. Ihr Team muss nichts nachtragen.
             </p>
           )}
         </div>
@@ -688,9 +695,16 @@ export function SolutionShowcase() {
               className={`rounded-[22px] border border-pub-hairline bg-white p-5 shadow-[0_1px_2px_rgba(11,15,20,0.03),0_24px_60px_-32px_rgba(11,15,20,0.18)] ${pinned ? 'sm:p-5' : 'cq-view-rise sm:p-8'}`}
               style={pinned ? { opacity: cardOpacity, y: cardY } : undefined}
             >
-              <p className={`text-[12px] font-semibold uppercase tracking-[0.14em] text-pub-ink-3 ${pinned ? 'mb-3' : 'mb-5'}`}>
-                Beispiel einer Gesprächszusammenfassung
-              </p>
+              <div className={`flex flex-wrap items-center justify-between gap-x-4 gap-y-2 ${pinned ? 'mb-3' : 'mb-5'}`}>
+                <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-pub-ink-3">
+                  In Ihrem System
+                </p>
+                {/* Die Bedingung steht am Beispiel selbst, nicht am Seitenende. */}
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-pub-accent-wash px-2.5 py-1 text-[11.5px] font-medium text-pub-accent-ink ring-1 ring-pub-accent-line">
+                  <span className="h-1.5 w-1.5 rounded-full bg-pub-accent-soft" aria-hidden="true" />
+                  {ABWICKLUNG.badge}
+                </span>
+              </div>
               <dl className="divide-y divide-pub-hairline-soft">
                 {summary.map(({ label, value }, j) => {
                   const von = BEAT.zeilenStart + j * zeilenSchritt;
@@ -705,14 +719,14 @@ export function SolutionShowcase() {
                       index={j}
                       className={`relative grid gap-1 min-[380px]:grid-cols-[120px_1fr] min-[380px]:gap-4 sm:grid-cols-[150px_1fr] ${pinned ? 'py-2' : 'py-3'}`}
                     >
-                      {/* Letzter Beat: Die Übergabezeile bekommt einen Wash im
-                          Verify-Ton — das ist der Moment, in dem der Vorgang
-                          beim Team liegt. */}
+                      {/* Letzter Beat: Die Statuszeile bekommt einen Wash im
+                          Accent-Ton — das ist der Moment, in dem der Termin
+                          im System steht und der Vorgang erledigt ist. */}
                       {pinned && letzte && (
                         <motion.span
                           aria-hidden="true"
-                          className="pointer-events-none absolute -inset-x-3 inset-y-0.5 rounded-xl bg-pub-verify-wash ring-1 ring-pub-verify/15"
-                          style={{ opacity: uebergabeOpacity }}
+                          className="pointer-events-none absolute -inset-x-3 inset-y-0.5 rounded-xl bg-pub-accent-wash ring-1 ring-pub-accent-line"
+                          style={{ opacity: statusOpacity }}
                         />
                       )}
                       <dt className="relative text-[13.5px] text-pub-ink-3">{label}</dt>
@@ -722,8 +736,9 @@ export function SolutionShowcase() {
                 })}
               </dl>
               <p className={`text-[13px] leading-relaxed text-pub-ink-3 ${pinned ? 'mt-3' : 'mt-5'}`}>
-                Notiert wird ein Wunsch, keine Buchung. Die Bestätigung bleibt bei Ihrem Team,
-                bis eine Anbindung an Ihr System geprüft und eingerichtet ist.
+                {ABWICKLUNG.kurz} Wir richten sie für Ihren Kalender oder Ihr
+                Buchungssystem ein und prüfen sie vor dem Go-live — der Assistent bucht
+                direkt dort, nicht in einer Liste für Ihr Team.
               </p>
             </motion.div>
 
