@@ -12,6 +12,7 @@ import {
   type ConsentState,
   type ConsentStatus,
 } from '@/lib/consent';
+import { spotlightHandlers } from '@/lib/publicMotion';
 
 // Cookie/consent UI. Renders:
 //   • an equal-choice banner when no decision has been stored yet, and
@@ -22,6 +23,21 @@ import {
 // Statistik (GA4) and Marketing (Google Ads) are INDEPENDENT purposes: each can
 // be granted or denied on its own. "Alle akzeptieren" grants both, and the
 // banner text names both purposes so that single click is informed.
+//
+// DESIGN NOTE. The first layer is a single ink card, not a full-width bar: a
+// bar reads as a browser chrome interruption, a card reads as a considered
+// element of the page. Every word of the notice is unchanged — what it says is
+// a legal question, how it is set is a design one. Both layers mount only
+// after the stored decision has been read, so their entrance animations never
+// touch the prerendered HTML.
+
+const spotlight = spotlightHandlers();
+
+const focusOnInk =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink';
+const focusOnPaper =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2';
+
 export function ConsentBanner() {
   const [showBanner, setShowBanner] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -47,7 +63,7 @@ export function ConsentBanner() {
   // Move focus into the settings dialog and trap Escape-to-close for keyboard users.
   useEffect(() => {
     if (!showSettings) return;
-    const el = dialogRef.current?.querySelector<HTMLElement>('button, a, [tabindex]');
+    const el = dialogRef.current?.querySelector<HTMLElement>('button, a, input, [tabindex]');
     el?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setShowSettings(false);
@@ -98,68 +114,89 @@ export function ConsentBanner() {
     return parts.join(' · ');
   };
 
+  const hasGrant =
+    current !== null && (current.marketing === 'granted' || current.analytics === 'granted');
+
   return (
     <>
       {/* ─── Equal-choice banner (only until a decision exists) ─── */}
       {showBanner && !showSettings && (
-        /* Below lg the banner must clear the floating mobile nav pill
-           (premium-mobile-nav.tsx: `fixed bottom-6 ... z-50`). The banner is
-           z-60, so anchored to bottom-0 it covered the pill outright and
-           elementFromPoint over the nav button returned the banner — the only
-           navigation that exists on mobile was unreachable until the visitor
-           dealt with consent. It now floats above the pill as a card, and only
-           becomes a full-width bottom bar from lg up, where no pill exists. */
+        /* Below lg the card must clear the floating mobile nav pill
+           (premium-mobile-nav.tsx: `fixed bottom-6 ... z-50`). The card is
+           z-60 and anchored to bottom-3, so it floats above the pill instead of
+           covering it — the only navigation that exists on mobile stays
+           reachable while consent is still open. From lg up it becomes a
+           bottom-left card of fixed width, which is where a visitor reading a
+           German-language page has already finished reading the line. */
         <div
           role="dialog"
           aria-modal="false"
           aria-label="Cookie-Einwilligung"
-          className="fixed inset-x-0 bottom-3 z-[60] mx-3 max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-2xl border border-gray-200 bg-white/95 shadow-lg backdrop-blur-md dark:border-white/10 dark:bg-gray-950/95 lg:mx-0 lg:rounded-none lg:border-x-0 lg:border-b-0 lg:border-t lg:bottom-0 lg:shadow-none"
+          {...spotlight}
+          className="cq-consent-in cq-surface cq-surface-edge fixed inset-x-3 bottom-3 z-[60] max-h-[calc(100dvh-1.5rem)] overflow-y-auto overscroll-contain rounded-[22px] bg-pub-ink text-white ring-1 ring-white/[0.08] lg:inset-x-auto lg:bottom-6 lg:left-6 lg:w-[440px]"
         >
-          <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-5 sm:py-4 lg:px-8">
+          <div className="p-5 sm:p-6">
+            <div className="mb-3 flex items-center gap-2.5">
+              <span className="relative flex h-2 w-2" aria-hidden="true">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-white/40" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
+              </span>
+              <p className="text-[11.5px] font-semibold uppercase tracking-[0.16em] text-white/60">
+                Cookies &amp; Einwilligung
+              </p>
+            </div>
+
             {/* Tighter type below sm purely to reduce how much of a 844px phone
                 viewport the first consent layer occupies. Not one word of the notice
                 is removed or clamped: what it says is a legal question, only how
                 much room it takes is a layout one. */}
-            <p className="text-[12px] leading-snug text-gray-600 dark:text-gray-300 sm:text-[13px] sm:leading-relaxed">
+            <p className="text-[12.5px] leading-[1.55] text-white/70 sm:text-[13.5px] sm:leading-[1.6]">
               Wir verwenden technisch notwendige Speicherung – dafür ist keine Einwilligung nötig
               und die Website funktioniert vollständig. Mit Ihrer Einwilligung laden wir zusätzlich{' '}
-              <span className="font-medium text-gray-800 dark:text-gray-100">
+              <span className="font-medium text-white">
                 Google Analytics (Statistik und Nutzungsanalyse)
               </span>
               , um zu verstehen, wie die Website genutzt wird, und sie zu verbessern, sowie{' '}
-              <span className="font-medium text-gray-800 dark:text-gray-100">
+              <span className="font-medium text-white">
                 Google Ads (Marketing: Messung der Werbewirkung)
               </span>
               . „Alle akzeptieren“ erlaubt beides; unter „Einstellungen“ können Sie Statistik und
               Marketing einzeln auswählen. Details in unserer{' '}
-              <Link to="/datenschutz" className="underline hover:text-gray-900 dark:hover:text-white">
+              <Link
+                to="/datenschutz"
+                className={`cq-underline font-medium text-white ${focusOnInk} focus-visible:rounded-sm`}
+              >
                 Datenschutzerklärung
               </Link>
               . Sie können Ihre Wahl jederzeit ändern.
             </p>
-            <div className="flex flex-shrink-0 flex-wrap items-center gap-2 sm:gap-2.5">
-              <button
-                type="button"
-                onClick={() => setShowSettings(true)}
-                className="inline-flex h-11 items-center rounded-full border border-gray-300 px-5 text-[13.5px] font-medium text-gray-700 transition-colors hover:border-gray-400 hover:text-gray-900 dark:border-white/15 dark:text-gray-300 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
-              >
-                Einstellungen
-              </button>
+
+            {/* Reject and accept: same size, same row, same weight of type. The
+                only difference is fill, and the fill does not make one of them
+                the "right" answer. */}
+            <div className="mt-5 grid grid-cols-2 gap-2.5">
               <button
                 type="button"
                 onClick={reject}
-                className="inline-flex h-11 items-center rounded-full border border-gray-300 px-5 text-[13.5px] font-semibold text-gray-800 transition-colors hover:border-gray-400 hover:bg-gray-50 dark:border-white/15 dark:text-gray-100 dark:hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
+                className={`inline-flex h-11 items-center justify-center whitespace-nowrap rounded-full border border-white/25 px-3 text-[13.5px] font-semibold text-white sm:px-4 sm:text-[14px] transition-[background-color,border-color,transform] duration-200 hover:border-white/50 hover:bg-white/[0.06] active:scale-[0.98] ${focusOnInk}`}
               >
                 Ablehnen
               </button>
               <button
                 type="button"
                 onClick={accept}
-                className="inline-flex h-11 items-center rounded-full bg-gray-900 px-5 text-[13.5px] font-semibold text-white transition-colors hover:bg-gray-700 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
+                className={`inline-flex h-11 items-center justify-center whitespace-nowrap rounded-full bg-white px-3 text-[13.5px] font-semibold text-pub-ink sm:px-4 sm:text-[14px] transition-[background-color,transform] duration-200 hover:bg-white/90 active:scale-[0.98] ${focusOnInk}`}
               >
                 Alle akzeptieren
               </button>
             </div>
+            <button
+              type="button"
+              onClick={() => setShowSettings(true)}
+              className={`cq-underline mt-3.5 inline-flex min-h-[32px] items-center text-[13px] font-medium text-white/65 hover:text-white ${focusOnInk} focus-visible:rounded-sm`}
+            >
+              Einstellungen
+            </button>
           </div>
         </div>
       )}
@@ -167,7 +204,7 @@ export function ConsentBanner() {
       {/* ─── Settings / revoke dialog (reopenable any time) ─── */}
       {showSettings && (
         <div
-          className="fixed inset-0 z-[70] flex items-end justify-center bg-black/50 backdrop-blur-sm sm:items-center"
+          className="cq-fade-in fixed inset-0 z-[70] flex items-end justify-center bg-pub-ink/45 backdrop-blur-[6px] sm:items-center sm:p-6"
           onClick={() => setShowSettings(false)}
         >
           <div
@@ -182,82 +219,90 @@ export function ConsentBanner() {
                orientation while "Alle akzeptieren" stayed reachable in the banner
                behind it. Rejecting or refining consent must never be harder to
                reach than accepting it. */
-            className="max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto overscroll-contain rounded-t-2xl bg-white p-6 shadow-2xl dark:bg-gray-950 sm:rounded-2xl"
+            className="cq-sheet-in max-h-[calc(100dvh-2rem)] w-full max-w-[560px] overflow-y-auto overscroll-contain rounded-t-[26px] bg-white text-pub-ink shadow-[0_32px_96px_-24px_rgba(11,15,20,0.5)] ring-1 ring-pub-hairline sm:rounded-[26px]"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="mb-1 text-base font-semibold text-gray-900 dark:text-gray-100">
-              Cookie-Einstellungen
-            </h2>
-            <p className="mb-4 text-[13px] leading-relaxed text-gray-600 dark:text-gray-400">
-              Aktueller Status:{' '}
-              <span className="font-medium text-gray-900 dark:text-gray-200">
-                {statusLabel(current)}
-              </span>
-            </p>
-
-            <div className="mb-5 space-y-3 text-[13px] leading-relaxed text-gray-600 dark:text-gray-400">
-              <div className="rounded-xl border border-gray-200 p-3 dark:border-white/10">
-                <p className="font-medium text-gray-800 dark:text-gray-200">Technisch notwendig</p>
-                <p>
-                  Immer aktiv. Speichert z. B. Ihre Cookie-Auswahl und Anzeige-Einstellungen im
-                  Browser. Kein Tracking. Die Website funktioniert auch ohne die beiden folgenden
-                  Optionen vollständig.
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-gray-200 p-3 dark:border-white/10">
-                <label className="flex cursor-pointer items-start gap-3">
-                  <input
-                    type="checkbox"
-                    checked={draft.analytics === 'granted'}
-                    onChange={toggle('analytics')}
-                    className="mt-0.5 h-4 w-4 flex-shrink-0 rounded border-gray-300 accent-gray-900 dark:border-white/20 dark:accent-white"
-                  />
-                  <span>
-                    <span className="block font-medium text-gray-800 dark:text-gray-200">
-                      Statistik und Nutzungsanalyse – Google Analytics
-                    </span>
-                    <span>
-                      Hilft uns zu verstehen, wie die Website genutzt wird (z. B. welche Seiten
-                      aufgerufen werden), damit wir sie verbessern können. Dabei wird eine
-                      pseudonyme Kennung in einem Cookie gespeichert; die Daten sind nicht
-                      vollständig anonym. Wird ausschließlich nach Ihrer Einwilligung geladen. Beim
-                      Widerruf entfernen wir die zugehörigen First-Party-Cookies, soweit technisch
-                      über die Website möglich. Details in unserer Datenschutzerklärung.
-                    </span>
-                  </span>
-                </label>
-              </div>
-
-              <div className="rounded-xl border border-gray-200 p-3 dark:border-white/10">
-                <label className="flex cursor-pointer items-start gap-3">
-                  <input
-                    type="checkbox"
-                    checked={draft.marketing === 'granted'}
-                    onChange={toggle('marketing')}
-                    className="mt-0.5 h-4 w-4 flex-shrink-0 rounded border-gray-300 accent-gray-900 dark:border-white/20 dark:accent-white"
-                  />
-                  <span>
-                    <span className="block font-medium text-gray-800 dark:text-gray-200">
-                      Marketing – Google Ads
-                    </span>
-                    <span>
-                      Wird nur nach Ihrer Einwilligung geladen und misst die Wirkung unserer
-                      Anzeigen. Beim Widerruf entfernen wir die zugehörigen First-Party-Cookies,
-                      soweit technisch über die Website möglich. Bereits übertragene Daten können
-                      über die Website nicht nachträglich zurückgezogen werden.
-                    </span>
-                  </span>
-                </label>
-              </div>
+            <div className="px-6 pt-6 sm:px-8 sm:pt-8">
+              <p className="mb-2 text-[11.5px] font-semibold uppercase tracking-[0.16em] text-pub-ink-3">
+                Cookies &amp; Einwilligung
+              </p>
+              <h2 className="text-[22px] font-bold leading-tight tracking-[-0.015em] text-pub-ink">
+                Cookie-Einstellungen
+              </h2>
+              <p className="mt-2 text-[13.5px] leading-relaxed text-pub-ink-3">
+                Aktueller Status:{' '}
+                <span className="font-medium text-pub-ink">{statusLabel(current)}</span>
+              </p>
             </div>
 
-            <div className="flex flex-wrap items-center justify-end gap-2.5">
-              {current && (current.marketing === 'granted' || current.analytics === 'granted') ? (
+            <div className="mt-6 divide-y divide-pub-hairline-soft border-y border-pub-hairline-soft">
+              {/* Always-on row. The control is a static "Immer aktiv" mark, not
+                  a disabled switch — a switch that cannot move invites a tap. */}
+              <div className="flex items-start gap-5 px-6 py-5 sm:px-8">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[15px] font-semibold text-pub-ink">Technisch notwendig</p>
+                  <p className="mt-1 text-[13.5px] leading-relaxed text-pub-ink-3">
+                    Immer aktiv. Speichert z. B. Ihre Cookie-Auswahl und Anzeige-Einstellungen im
+                    Browser. Kein Tracking. Die Website funktioniert auch ohne die beiden folgenden
+                    Optionen vollständig.
+                  </p>
+                </div>
+                <span className="mt-0.5 inline-flex h-[26px] shrink-0 items-center rounded-full bg-pub-verify-wash px-2.5 text-[11.5px] font-semibold text-pub-verify">
+                  Immer aktiv
+                </span>
+              </div>
+
+              <label className="flex cursor-pointer items-start gap-5 px-6 py-5 sm:px-8">
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[15px] font-semibold text-pub-ink">
+                    Statistik und Nutzungsanalyse – Google Analytics
+                  </span>
+                  <span className="mt-1 block text-[13.5px] leading-relaxed text-pub-ink-3">
+                    Hilft uns zu verstehen, wie die Website genutzt wird (z. B. welche Seiten
+                    aufgerufen werden), damit wir sie verbessern können. Dabei wird eine
+                    pseudonyme Kennung in einem Cookie gespeichert; die Daten sind nicht
+                    vollständig anonym. Wird ausschließlich nach Ihrer Einwilligung geladen. Beim
+                    Widerruf entfernen wir die zugehörigen First-Party-Cookies, soweit technisch
+                    über die Website möglich. Details in unserer Datenschutzerklärung.
+                  </span>
+                </span>
+                <input
+                  type="checkbox"
+                  checked={draft.analytics === 'granted'}
+                  onChange={toggle('analytics')}
+                  className="sr-only"
+                />
+                <span className="cq-switch mt-0.5" aria-hidden="true" />
+              </label>
+
+              <label className="flex cursor-pointer items-start gap-5 px-6 py-5 sm:px-8">
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[15px] font-semibold text-pub-ink">
+                    Marketing – Google Ads
+                  </span>
+                  <span className="mt-1 block text-[13.5px] leading-relaxed text-pub-ink-3">
+                    Wird nur nach Ihrer Einwilligung geladen und misst die Wirkung unserer
+                    Anzeigen. Beim Widerruf entfernen wir die zugehörigen First-Party-Cookies,
+                    soweit technisch über die Website möglich. Bereits übertragene Daten können
+                    über die Website nicht nachträglich zurückgezogen werden.
+                  </span>
+                </span>
+                <input
+                  type="checkbox"
+                  checked={draft.marketing === 'granted'}
+                  onChange={toggle('marketing')}
+                  className="sr-only"
+                />
+                <span className="cq-switch mt-0.5" aria-hidden="true" />
+              </label>
+            </div>
+
+            <div className="flex flex-col gap-2.5 px-6 py-5 sm:flex-row sm:items-center sm:justify-end sm:px-8 sm:py-6">
+              {hasGrant ? (
                 <button
                   type="button"
                   onClick={revoke}
-                  className="rounded-lg border border-gray-300 px-5 py-2 text-[13px] font-semibold text-gray-800 transition-colors hover:border-gray-400 hover:bg-gray-50 dark:border-white/15 dark:text-gray-100 dark:hover:bg-white/[0.06]"
+                  className={`inline-flex h-11 items-center justify-center rounded-full border border-pub-ink/20 px-5 text-[14px] font-semibold text-pub-ink transition-[border-color,background-color,transform] duration-200 hover:border-pub-ink/45 hover:bg-pub-paper-2 active:scale-[0.98] ${focusOnPaper}`}
                 >
                   Einwilligung widerrufen
                 </button>
@@ -265,7 +310,7 @@ export function ConsentBanner() {
                 <button
                   type="button"
                   onClick={reject}
-                  className="rounded-lg border border-gray-300 px-5 py-2 text-[13px] font-semibold text-gray-800 transition-colors hover:border-gray-400 hover:bg-gray-50 dark:border-white/15 dark:text-gray-100 dark:hover:bg-white/[0.06]"
+                  className={`inline-flex h-11 items-center justify-center rounded-full border border-pub-ink/20 px-5 text-[14px] font-semibold text-pub-ink transition-[border-color,background-color,transform] duration-200 hover:border-pub-ink/45 hover:bg-pub-paper-2 active:scale-[0.98] ${focusOnPaper}`}
                 >
                   Ablehnen
                 </button>
@@ -273,14 +318,14 @@ export function ConsentBanner() {
               <button
                 type="button"
                 onClick={saveSelection}
-                className="rounded-lg border border-gray-300 px-5 py-2 text-[13px] font-semibold text-gray-800 transition-colors hover:border-gray-400 hover:bg-gray-50 dark:border-white/15 dark:text-gray-100 dark:hover:bg-white/[0.06]"
+                className={`inline-flex h-11 items-center justify-center rounded-full border border-pub-ink/20 px-5 text-[14px] font-semibold text-pub-ink transition-[border-color,background-color,transform] duration-200 hover:border-pub-ink/45 hover:bg-pub-paper-2 active:scale-[0.98] ${focusOnPaper}`}
               >
                 Auswahl speichern
               </button>
               <button
                 type="button"
                 onClick={accept}
-                className="rounded-lg bg-gray-900 px-5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-gray-700 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+                className={`inline-flex h-11 items-center justify-center rounded-full bg-pub-ink px-5 text-[14px] font-semibold text-white transition-[background-color,transform] duration-200 hover:bg-[#1f2933] active:scale-[0.98] ${focusOnPaper}`}
               >
                 Alle akzeptieren
               </button>

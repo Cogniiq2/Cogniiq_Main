@@ -817,3 +817,350 @@ html.cq-public-light {
     animation: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PUBLIC MOTION LAYER (`.cq-*`)
+   ═══════════════════════════════════════════════════════════════════════════
+   Shared micro-interaction vocabulary for the public marketing surfaces. One
+   easing, one set of durations, and every effect below animates transform,
+   opacity or a background-position only — nothing here can shift layout, and
+   nothing here hides prerendered content from the first paint: the only
+   opacity animations are scroll-driven (`animation-timeline: view()`), which
+   browsers without support simply ignore and which never apply to the hero.
+
+   Every effect collapses under `prefers-reduced-motion`. */
+
+:root {
+  --cq-pub-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --cq-pub-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ── Magnetic buttons ─────────────────────────────────────────────────────
+   The element follows the pointer by a few pixels (set inline by
+   `useMagnetic`). The transition smooths every pointer sample, which is what
+   makes the pull feel weighted rather than jittery. */
+.cq-magnetic {
+  transition:
+    transform 0.42s var(--cq-pub-ease),
+    color 0.15s var(--cq-pub-ease),
+    background-color 0.15s var(--cq-pub-ease),
+    border-color 0.15s var(--cq-pub-ease),
+    box-shadow 0.3s var(--cq-pub-ease);
+  will-change: transform;
+}
+.cq-magnetic:active {
+  transition-duration: 0.08s;
+}
+
+/* ── Underline that draws in ───────────────────────────────────────────────
+   A 1px rule grows from the left on hover instead of appearing at once. Uses
+   background-size, so it works on wrapped inline text as well. */
+.cq-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size 0.32s var(--cq-pub-ease), color 0.15s var(--cq-pub-ease);
+  padding-bottom: 1px;
+}
+.cq-underline:hover,
+.cq-underline:focus-visible {
+  background-size: 100% 1px;
+}
+
+/* ── Dark surfaces: grain + pointer spotlight ─────────────────────────────
+   `.cq-surface` is applied to the ink-coloured panels. The grain is a static
+   2–3 % SVG noise that keeps large dark areas from banding and reading as
+   flat vector fill. The spotlight is a soft radial highlight that follows the
+   pointer (`--cq-mx`/`--cq-my` set by `useSpotlight`), fading in only while
+   the pointer is over the panel. Both are pure paint.
+
+   The class sets NO `position` of its own — the caller keeps its Tailwind
+   `relative` / `fixed` (a rule here would outrank the utility, since this
+   block is emitted after them). `isolation: isolate` opens a stacking
+   context so the two layers can sit at z-index -1: above the panel's own
+   background, below every child, without touching the children at all. */
+.cq-surface {
+  isolation: isolate;
+}
+.cq-surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(
+    560px circle at var(--cq-mx, 50%) var(--cq-my, 50%),
+    rgba(255, 255, 255, 0.075),
+    transparent 46%
+  );
+  opacity: var(--cq-spot, 0);
+  transition: opacity 0.5s var(--cq-pub-ease);
+}
+.cq-surface::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.035;
+  mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 160px 160px;
+}
+/* 1px "inner light" on the top edge — the one cue that separates a premium
+   dark card from a flat black rectangle. */
+.cq-surface-edge {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 24px 64px -24px rgba(11, 15, 20, 0.45);
+}
+
+/* ── Scroll-driven entrance for below-the-fold content ────────────────────
+   Native CSS scroll-driven animation: the element rises and fades in over the
+   first 35 % of its own entry into the viewport. No JavaScript, no observer,
+   and no `opacity: 0` in browsers that cannot drive it. `--cq-i` staggers
+   siblings by shifting the range start. NEVER on the hero. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .cq-view-rise {
+      animation: cq-view-rise linear both;
+      animation-timeline: view();
+      animation-range: entry calc(0% + var(--cq-i, 0) * 6%) entry calc(38% + var(--cq-i, 0) * 6%);
+    }
+  }
+}
+@keyframes cq-view-rise {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Consent layer ────────────────────────────────────────────────────────
+   Entrance for the first consent layer and its settings sheet. Both are
+   client-only (mounted after the stored decision is read), so an opacity
+   entrance is safe here — nothing in the prerender depends on it. */
+@keyframes cq-consent-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.cq-consent-in {
+  animation: cq-consent-in 0.6s var(--cq-pub-ease) both;
+  animation-delay: 0.35s;
+}
+@keyframes cq-sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.cq-sheet-in {
+  animation: cq-sheet-in 0.36s var(--cq-pub-ease) both;
+}
+@keyframes cq-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.cq-fade-in {
+  animation: cq-fade-in 0.3s ease-out both;
+}
+
+/* ── Toggle switch (consent settings) ─────────────────────────────────────
+   A native checkbox stays in the DOM for the form semantics; the visible
+   control is its label sibling. Checked state is carried by the track colour
+   AND the knob position, so it reads without colour vision. */
+.cq-switch {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 44px;
+  height: 26px;
+  border-radius: 9999px;
+  background: rgba(11, 15, 20, 0.14);
+  transition: background-color 0.25s var(--cq-pub-ease);
+}
+.cq-switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(11, 15, 20, 0.25), 0 0 0 0.5px rgba(11, 15, 20, 0.06);
+  transition: transform 0.3s var(--cq-pub-ease);
+}
+input:checked + .cq-switch {
+  background: var(--pub-ink, #0b0f14);
+}
+input:checked + .cq-switch::after {
+  transform: translateX(18px);
+}
+input:focus-visible + .cq-switch {
+  outline: 2px solid var(--pub-signal, #1c4fd8);
+  outline-offset: 2px;
+}
+
+/* ── Calculator: range slider as an instrument ────────────────────────────
+   Native `<input type="range">` styled so the filled portion of the track
+   reads as the value (`--cq-fill` is set inline), with tick marks every 10 %
+   so a value has a position, not just a number. The thumb grows slightly
+   while held. Both engines need their own pseudo-elements; the rules are kept
+   separate because a single selector list with an unknown pseudo is dropped
+   entirely by the other engine. */
+.cq-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 44px;
+  background: transparent;
+  cursor: pointer;
+  --cq-fill: 0%;
+}
+.cq-range:focus-visible {
+  outline: none;
+}
+.cq-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 9999px;
+  background:
+    linear-gradient(var(--pub-ink, #0b0f14), var(--pub-ink, #0b0f14)) 0 0 / var(--cq-fill) 100% no-repeat,
+    repeating-linear-gradient(to right, transparent 0 calc(10% - 1px), rgba(11, 15, 20, 0.28) calc(10% - 1px) 10%) 0 0 / 100% 100% no-repeat,
+    rgba(11, 15, 20, 0.1);
+}
+.cq-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -9px;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: #fff;
+  border: 1.5px solid var(--pub-ink, #0b0f14);
+  box-shadow: 0 2px 6px rgba(11, 15, 20, 0.18), 0 0 0 0 rgba(28, 79, 216, 0);
+  transition: transform 0.2s var(--cq-pub-ease), box-shadow 0.25s var(--cq-pub-ease);
+}
+.cq-range:hover::-webkit-slider-thumb {
+  transform: scale(1.08);
+}
+.cq-range:active::-webkit-slider-thumb {
+  transform: scale(1.18);
+  box-shadow: 0 2px 6px rgba(11, 15, 20, 0.18), 0 0 0 6px rgba(11, 15, 20, 0.08);
+}
+.cq-range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 2px 6px rgba(11, 15, 20, 0.18), 0 0 0 4px rgba(28, 79, 216, 0.35);
+}
+.cq-range::-moz-range-track {
+  height: 4px;
+  border-radius: 9999px;
+  background:
+    repeating-linear-gradient(to right, transparent 0 calc(10% - 1px), rgba(11, 15, 20, 0.28) calc(10% - 1px) 10%),
+    rgba(11, 15, 20, 0.1);
+}
+.cq-range::-moz-range-progress {
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--pub-ink, #0b0f14);
+}
+.cq-range::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: #fff;
+  border: 1.5px solid var(--pub-ink, #0b0f14);
+  box-shadow: 0 2px 6px rgba(11, 15, 20, 0.18);
+  transition: transform 0.2s var(--cq-pub-ease), box-shadow 0.25s var(--cq-pub-ease);
+}
+.cq-range:active::-moz-range-thumb {
+  transform: scale(1.18);
+  box-shadow: 0 2px 6px rgba(11, 15, 20, 0.18), 0 0 0 6px rgba(11, 15, 20, 0.08);
+}
+.cq-range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 2px 6px rgba(11, 15, 20, 0.18), 0 0 0 4px rgba(28, 79, 216, 0.35);
+}
+
+/* ── Calculator: rolling digits and the tariff change pulse ──────────────
+   `cq-digit-pulse` re-runs whenever the recommended tariff changes (keyed by
+   name): a single soft ring that draws the eye to what just moved. */
+@keyframes cq-tariff-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(11, 15, 20, 0.22);
+  }
+  100% {
+    box-shadow: 0 0 0 12px rgba(11, 15, 20, 0);
+  }
+}
+.cq-tariff-pulse {
+  animation: cq-tariff-pulse 0.9s var(--cq-pub-ease) 1;
+}
+@keyframes cq-value-settle {
+  from {
+    transform: translateY(4px);
+    opacity: 0.55;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+.cq-value-settle {
+  animation: cq-value-settle 0.45s var(--cq-pub-ease) 1;
+}
+
+/* ── Number input with the unit inside the field ─────────────────────────
+   Hides the spin buttons: the slider is the coarse control, the field is for
+   the exact value, and two stacked arrows next to a unit label read as
+   clutter. Keyboard arrows still step the value. */
+.cq-numfield::-webkit-outer-spin-button,
+.cq-numfield::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.cq-numfield {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* ── Scroll story (SolutionShowcase, desktop pinned mode) ────────────────
+   Thin progress hairline across the top of the pinned stage. Width is a
+   transform, driven by framer-motion. */
+.cq-story-rail {
+  transform-origin: left center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cq-magnetic,
+  .cq-underline,
+  .cq-surface::before,
+  .cq-switch,
+  .cq-switch::after,
+  .cq-range::-webkit-slider-thumb,
+  .cq-range::-moz-range-thumb {
+    transition: none;
+  }
+  .cq-consent-in,
+  .cq-sheet-in,
+  .cq-fade-in,
+  .cq-tariff-pulse,
+  .cq-value-settle {
+    animation: none;
+  }
+}

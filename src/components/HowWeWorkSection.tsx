@@ -62,9 +62,13 @@ export function HowWeWorkSection() {
 
         <div className="grid gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
           <ol className="divide-y divide-pub-hairline">
-            {stages.map((stage) => (
-              <li key={stage.number} className="grid grid-cols-[48px_1fr] gap-4 py-6 first:pt-0 sm:grid-cols-[64px_1fr] sm:gap-6">
-                <span className="text-[14px] font-semibold tabular-nums text-pub-ink-3">{stage.number}</span>
+            {stages.map((stage, i) => (
+              <li
+                key={stage.number}
+                style={{ '--cq-i': i } as React.CSSProperties}
+                className="cq-view-rise grid grid-cols-[48px_1fr] gap-4 py-6 first:pt-0 sm:grid-cols-[64px_1fr] sm:gap-6"
+              >
+                <span className="text-[22px] font-semibold leading-none tabular-nums tracking-[-0.02em] text-pub-ink-4">{stage.number}</span>
                 <div>
                   <h3 className="mb-1.5 text-[19px] font-semibold leading-snug tracking-[-0.01em] text-pub-ink">{stage.title}</h3>
                   <p className="max-w-[56ch] text-[15px] leading-[1.6] text-pub-ink-2">{stage.description}</p>
@@ -73,7 +77,7 @@ export function HowWeWorkSection() {
             ))}
           </ol>
 
-          <div className="rounded-2xl border border-pub-hairline bg-white p-5 sm:p-8">
+          <div className="cq-view-rise rounded-[22px] border border-pub-hairline bg-white p-5 shadow-[0_1px_2px_rgba(11,15,20,0.03),0_24px_60px_-32px_rgba(11,15,20,0.16)] sm:p-8">
             <p className="mb-5 text-[12px] font-semibold uppercase tracking-[0.14em] text-pub-ink-3">Woran Sie uns messen können</p>
             <ul className="divide-y divide-pub-hairline-soft">
               {assurances.map(({ icon, label, sub }) => (

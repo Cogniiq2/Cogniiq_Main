@@ -2,6 +2,10 @@ import { Link } from 'react-router-dom';
 import { MonitorSmartphone, PhoneCall, Bot, Workflow, ArrowRight } from 'lucide-react';
 
 import { IconTile, PubEyebrow, PubLinkButton } from '@/components/public/PublicUI';
+import { magneticHandlers, spotlightHandlers } from '@/lib/publicMotion';
+
+const spotlight = spotlightHandlers();
+const magnetic = magneticHandlers(4);
 
 // Typical starting situations; formerly the ProblemSection cards on the homepage.
 // Kept as links so the problem pages stay reachable from the start page.
@@ -138,7 +142,10 @@ export function ServicesSection() {
           Kästen nebeneinander sind eine Liste, keine Auswahl — und die Anfrage,
           die diese Seite trägt, kommt aus einer davon.
         */}
-        <article className="mb-4 overflow-hidden rounded-2xl border border-white/[0.06] bg-pub-ink text-white">
+        <article
+          {...spotlight}
+          className="cq-surface cq-surface-edge cq-view-rise relative mb-4 overflow-hidden rounded-[22px] border border-white/[0.06] bg-pub-ink text-white"
+        >
           <div className="grid gap-8 p-6 sm:p-9 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center lg:gap-14">
             <div>
               <div className="mb-5 flex items-center gap-3">
@@ -154,16 +161,17 @@ export function ServicesSection() {
               <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
                 <Link
                   to={featured.link}
-                  className="inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-[15px] font-semibold text-pub-ink transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
+                  className="group cq-magnetic inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-[15px] font-semibold text-pub-ink hover:bg-gray-100 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
+                  {...magnetic}
                 >
                   {featured.cta}
-                  <ArrowRight size={15} aria-hidden="true" />
+                  <ArrowRight size={15} aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-0.5" />
                 </Link>
                 <Link
                   to="/ki-telefonassistent/demo"
-                  className="inline-flex h-11 items-center text-[14.5px] font-medium text-white/75 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
+                  className="inline-flex h-11 items-center text-[14.5px] font-medium text-white/75 transition-colors hover:text-white focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
                 >
-                  Demo-Termin anfragen
+                  <span className="cq-underline">Demo-Termin anfragen</span>
                 </Link>
               </div>
             </div>
@@ -183,9 +191,9 @@ export function ServicesSection() {
                 <Link
                   key={cl.href}
                   to={cl.href}
-                  className="inline-flex h-11 items-center text-[13.5px] text-white/70 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
+                  className="inline-flex h-11 items-center text-[13.5px] text-white/70 transition-colors hover:text-white focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
                 >
-                  {cl.label}
+                  <span className="cq-underline">{cl.label}</span>
                 </Link>
               ))}
             </div>
@@ -193,10 +201,14 @@ export function ServicesSection() {
         </article>
 
         <div className="grid gap-4 md:grid-cols-3">
-          {weitere.map((service) => {
+          {weitere.map((service, i) => {
             const Icon = service.icon;
             return (
-              <article key={service.number} className="flex flex-col rounded-2xl border border-pub-hairline bg-white p-6">
+              <article
+                key={service.number}
+                style={{ '--cq-i': i } as React.CSSProperties}
+                className="cq-view-rise flex flex-col rounded-[22px] border border-pub-hairline bg-white p-6 transition-[border-color,box-shadow] duration-300 hover:border-pub-ink/25 hover:shadow-[0_1px_2px_rgba(11,15,20,0.03),0_24px_60px_-32px_rgba(11,15,20,0.18)]"
+              >
                 <IconTile icon={Icon} size="sm" className="mb-5" />
                 <h3 className="mb-2.5 text-[19px] font-semibold leading-[1.25] tracking-[-0.01em] text-pub-ink">
                   {service.title}
@@ -213,10 +225,10 @@ export function ServicesSection() {
                 <div className="mt-auto">
                   <Link
                     to={service.link}
-                    className="inline-flex h-11 items-center gap-1.5 text-[14.5px] font-semibold text-pub-accent underline-offset-4 hover:underline focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
+                    className="group inline-flex h-11 items-center gap-1.5 text-[14.5px] font-semibold text-pub-accent focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
                   >
-                    {service.cta}
-                    <ArrowRight size={15} aria-hidden="true" />
+                    <span className="cq-underline">{service.cta}</span>
+                    <ArrowRight size={15} aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-0.5" />
                   </Link>
                   {service.cityLinks.length > 0 && (
                     <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-pub-hairline-soft pt-3">
@@ -225,9 +237,9 @@ export function ServicesSection() {
                         <Link
                           key={cl.href}
                           to={cl.href}
-                          className="inline-flex h-11 items-center text-[13.5px] text-pub-ink-3 underline-offset-4 transition-colors hover:text-pub-accent hover:underline focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
+                          className="inline-flex h-11 items-center text-[13.5px] text-pub-ink-3 transition-colors hover:text-pub-accent focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
                         >
-                          {cl.label}
+                          <span className="cq-underline">{cl.label}</span>
                         </Link>
                       ))}
                     </div>
@@ -243,8 +255,8 @@ export function ServicesSection() {
           <ul className="flex flex-wrap gap-x-6 gap-y-1">
             {situations.map((s) => (
               <li key={s.href}>
-                <Link to={s.href} className="inline-flex h-11 items-center text-[14.5px] text-pub-ink-2 underline-offset-4 hover:text-pub-accent hover:underline focus-visible:outline-none focus-visible:rounded-full focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2">
-                  {s.label}
+                <Link to={s.href} className="inline-flex h-11 items-center text-[14.5px] text-pub-ink-2 transition-colors hover:text-pub-accent focus-visible:outline-none focus-visible:rounded-full focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2">
+                  <span className="cq-underline">{s.label}</span>
                 </Link>
               </li>
             ))}

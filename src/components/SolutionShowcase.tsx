@@ -1,4 +1,20 @@
-import { useId, useRef, useState, type KeyboardEvent } from 'react';
+import {
+  startTransition,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from 'react';
+import {
+  MotionConfig,
+  motion,
+  useMotionValueEvent,
+  useScroll,
+  useTransform,
+  type MotionValue,
+} from 'framer-motion';
 import {
   Stethoscope,
   Utensils,
@@ -12,6 +28,7 @@ import {
 } from 'lucide-react';
 
 import { PubEyebrow, PubLinkButton } from '@/components/public/PublicUI';
+import { spotlightHandlers } from '@/lib/publicMotion';
 
 type Industry = 'Arztpraxis' | 'Restaurant' | 'Immobilien' | 'Sport & Fitness';
 
@@ -247,11 +264,139 @@ const SUMMARIES: Record<Industry, { label: string; value: string }[]> = {
 */
 const AUSSCHNITT_LAENGE = 4;
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCROLL-GESTEUERTE ERZÄHLUNG (Stand 30.09.2026)
+   ═══════════════════════════════════════════════════════════════════════════
+   Auf dem Desktop bleibt der Abschnitt für rund zweieinhalb Bildschirmhöhen
+   stehen, und die Scrollposition erzählt den Ablauf: Erst der Anruf, dann das
+   Gespräch Nachricht für Nachricht, dann die Zusammenfassung Zeile für Zeile,
+   zuletzt die Übergabe an das Team. Der Besucher steuert das Tempo selbst —
+   nichts läuft von allein, nichts wird übersprungen, und ein Scroll zurück
+   spielt die Szene rückwärts.
+
+   Drei Regeln halten das sicher:
+
+   1. NUR AUF DEM CLIENT. `pinned` ist im Prerender und beim ersten Client-
+      Render `false`; erst ein Effekt schaltet es für Desktop-Viewports mit
+      genug Höhe und ohne `prefers-reduced-motion` ein. Im HTML steht also
+      jede Nachricht und jede Zeile vollständig sichtbar — kein `opacity: 0`
+      im Prerender, keine unsichtbaren Inhalte für Crawler oder ohne
+      JavaScript.
+
+   2. UNTER DEM ERSTEN BILDSCHIRM. Der Abschnitt folgt auf den Hero; nichts
+      hier ist LCP-Kandidat.
+
+   3. DERSELBE INHALT. Tabs, Ausschnitt, vollständiges Protokoll und
+      Zusammenfassung sind Wort für Wort dieselben wie ohne Erzählung. Die
+      Erzählung ist eine Darstellungsschicht über dem Markup, keine zweite
+      Fassung. Auf Mobilgeräten und kleinen Bildschirmen übernimmt eine
+      native CSS-Scroll-Timeline (`.cq-view-rise`) den gestaffelten Einstieg
+      — ohne JavaScript und ohne Pinning.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/*
+  Gepinnt wird nur, wenn die ganze Bühne unter der festen Navigation (72 px)
+  Platz hat: Kopfzeile, Tabs, Gespräch und Zusammenfassung brauchen rund
+  800 px. Auf kleineren Bildschirmen — die meisten Laptops — übernimmt die
+  CSS-Scroll-Timeline; nichts wird abgeschnitten, nichts scrollt in sich.
+*/
+const PINNED_MEDIA =
+  '(min-width: 1024px) and (min-height: 900px) and (prefers-reduced-motion: no-preference)';
+const NAV_HEIGHT_PX = 72;
+
+/** Bildschirmhöhen, die der Abschnitt im gepinnten Modus einnimmt. */
+const STORY_HEIGHT_VH = 260;
+
+/* Anteile am Scrollweg, an denen die Beats liegen. */
+const BEAT = {
+  gespraechStart: 0.06,
+  gespraechEnde: 0.5,
+  kartenStart: 0.5,
+  zeilenStart: 0.56,
+  zeilenEnde: 0.9,
+  uebergabe: 0.9,
+} as const;
+
+const STAGES = ['Anruf', 'Gespräch', 'Zusammenfassung', 'Übergabe'] as const;
+
+function stageAt(p: number): number {
+  if (p < BEAT.gespraechStart) return 0;
+  if (p < BEAT.kartenStart) return 1;
+  if (p < BEAT.uebergabe) return 2;
+  return 3;
+}
+
+/** Ein Element, das zwischen `von` und `bis` des Scrollwegs erscheint. */
+function Beat({
+  progress,
+  von,
+  bis,
+  aktiv,
+  index,
+  as: Tag = 'div',
+  className,
+  children,
+}: {
+  progress: MotionValue<number>;
+  von: number;
+  bis: number;
+  aktiv: boolean;
+  /** Staffelung für die CSS-Scroll-Timeline im nicht gepinnten Modus. */
+  index: number;
+  as?: 'div' | 'li';
+  className?: string;
+  children: ReactNode;
+}) {
+  const opacity = useTransform(progress, [von, bis], [0, 1]);
+  const y = useTransform(progress, [von, bis], [16, 0]);
+  const Comp = Tag === 'li' ? motion.li : motion.div;
+  return (
+    <Comp
+      className={className}
+      style={aktiv ? { opacity, y } : ({ '--cq-i': index } as Record<string, number>)}
+    >
+      {children}
+    </Comp>
+  );
+}
+
+function usePinned(): boolean {
+  const [pinned, setPinned] = useState(false);
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const mq = window.matchMedia(PINNED_MEDIA);
+    const apply = (m: boolean) => startTransition(() => setPinned(m));
+    apply(mq.matches);
+    const handler = (e: MediaQueryListEvent) => apply(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return pinned;
+}
+
+const spotlight = spotlightHandlers();
 export function SolutionShowcase() {
   const [activeIndustry, setActiveIndustry] = useState<Industry>('Arztpraxis');
   const [transkriptOffen, setTranskriptOffen] = useState(false);
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const baseId = useId();
+
+  const sectionRef = useRef<HTMLElement>(null);
+  const pinned = usePinned();
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end end'],
+  });
+  const [stage, setStage] = useState(0);
+  useMotionValueEvent(scrollYProgress, 'change', (p) => {
+    const next = stageAt(p);
+    setStage((cur) => (cur === next ? cur : next));
+  });
+  const railScale = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  const cardOpacity = useTransform(scrollYProgress, [BEAT.kartenStart, BEAT.zeilenStart], [0.35, 1]);
+  const cardY = useTransform(scrollYProgress, [BEAT.kartenStart, BEAT.zeilenStart], [20, 0]);
+  const uebergabeOpacity = useTransform(scrollYProgress, [BEAT.uebergabe, 0.97], [0, 1]);
 
   const scenario = SCENARIOS.find((s) => s.label === activeIndustry)!;
   const SvcIcon = scenario.solution.serviceIcon;
@@ -274,28 +419,88 @@ export function SolutionShowcase() {
     tabRefs.current[next]?.focus();
   };
 
+  const abschluss = (
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <p className="max-w-[54ch] text-[15px] leading-[1.6] text-pub-ink-2">
+        Welche Anliegen der Assistent übernimmt, wo er an einen Menschen
+        übergibt und was er ausdrücklich nicht tut, steht auf der Produktseite.
+      </p>
+      <PubLinkButton to="/ki-telefonassistent" variant="secondary" size="md" icon={ArrowRight} iconTrailing className="h-auto min-h-11 max-w-full whitespace-normal py-2.5 text-center sm:shrink-0">
+        KI-Telefonassistent ansehen
+      </PubLinkButton>
+    </div>
+  );
+
+  const n = sichtbareNachrichten.length;
+  const gespraechSchritt = (BEAT.gespraechEnde - BEAT.gespraechStart) / n;
+  const zeilenSchritt = (BEAT.zeilenEnde - BEAT.zeilenStart) / summary.length;
+
   return (
+    <MotionConfig reducedMotion="user">
     <section
-      className="border-t border-pub-hairline-soft bg-white py-20 lg:py-28"
+      ref={sectionRef}
+      className={`relative border-t border-pub-hairline-soft bg-white ${pinned ? '' : 'py-20 lg:py-28'}`}
+      style={pinned ? { height: `${STORY_HEIGHT_VH}vh` } : undefined}
       aria-labelledby="showcase-heading"
     >
-      <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
-        <div className="mb-10 max-w-2xl lg:mb-14">
-          <PubEyebrow className="mb-4">Nachgestelltes Beispiel – kein echter Anruf</PubEyebrow>
-          <h2
-            id="showcase-heading"
-            className="mb-4 text-[clamp(30px,3.2vw,40px)] font-bold leading-[1.1] tracking-[-0.02em] text-pub-ink"
-          >
-            Vom Anruf zum Ergebnis.
-          </h2>
-          <p className="max-w-[58ch] text-[17px] leading-[1.6] text-pub-ink-2">
-            Links ein Ausschnitt aus dem Gespräch, rechts das, was danach bei Ihrem
-            Team ankommt: strukturiert, mit Rückrufnummer, zur Bestätigung durch
-            einen Menschen.
-          </p>
+      <div
+        className={pinned ? 'sticky flex items-center overflow-hidden' : undefined}
+        style={pinned ? { top: NAV_HEIGHT_PX, height: `calc(100vh - ${NAV_HEIGHT_PX}px)` } : undefined}
+      >
+      <div className={`relative mx-auto w-full max-w-[1200px] px-6 lg:px-10 ${pinned ? 'py-6' : ''}`}>
+        {pinned && (
+          <motion.div
+            aria-hidden="true"
+            className="cq-story-rail absolute inset-x-6 top-0 h-px bg-pub-ink lg:inset-x-10"
+            style={{ scaleX: railScale }}
+          />
+        )}
+        <div className={`flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between ${pinned ? 'mb-8 pt-4' : 'mb-10 lg:mb-14'}`}>
+          <div className="max-w-2xl">
+            <PubEyebrow className="mb-4">Nachgestelltes Beispiel – kein echter Anruf</PubEyebrow>
+            <h2
+              id="showcase-heading"
+              className="mb-4 text-[clamp(30px,3.2vw,40px)] font-bold leading-[1.1] tracking-[-0.02em] text-pub-ink"
+            >
+              Vom Anruf zum Ergebnis.
+            </h2>
+            <p className="max-w-[58ch] text-[17px] leading-[1.6] text-pub-ink-2">
+              Links ein Ausschnitt aus dem Gespräch, rechts das, was danach bei Ihrem
+              Team ankommt: strukturiert, mit Rückrufnummer, zur Bestätigung durch
+              einen Menschen.
+            </p>
+          </div>
+
+          {/* Stationen der Erzählung — nur im gepinnten Modus, nur auf dem
+              Client, rein dekorativ. Die aktive Station trägt Gewicht und
+              einen gefüllten Punkt, nicht nur eine Farbe. */}
+          {pinned && (
+            <ol aria-hidden="true" className="flex shrink-0 items-center gap-5 pb-1">
+              {STAGES.map((label, i) => {
+                const aktiv = i === stage;
+                const vorbei = i < stage;
+                return (
+                  <li key={label} className="flex items-center gap-2">
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full transition-[background-color,transform] duration-300 ${
+                        aktiv ? 'scale-125 bg-pub-ink' : vorbei ? 'bg-pub-ink/60' : 'bg-pub-ink/20'
+                      }`}
+                    />
+                    <span
+                      className={`text-[12px] uppercase tracking-[0.14em] transition-colors duration-300 ${
+                        aktiv ? 'font-semibold text-pub-ink' : 'font-medium text-pub-ink-4'
+                      }`}
+                    >
+                      {label}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          )}
         </div>
 
-        <div role="tablist" aria-label="Branche wählen" className="mb-8 flex flex-wrap gap-2">
+        <div role="tablist" aria-label="Branche wählen" className={`flex flex-wrap gap-2 ${pinned ? 'mb-6' : 'mb-8'}`}>
           {SCENARIOS.map((s, i) => {
             const Icon = s.icon;
             const isActive = s.label === activeIndustry;
@@ -311,14 +516,25 @@ export function SolutionShowcase() {
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => { setActiveIndustry(s.label); setTranskriptOffen(false); }}
                 onKeyDown={(e) => onTabKey(e, i)}
-                className={`inline-flex h-11 items-center gap-2 rounded-full border px-4 text-[14px] font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 ${
+                className={`relative inline-flex h-11 items-center gap-2 rounded-full border px-4 text-[14px] font-semibold transition-colors duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 ${
                   isActive
-                    ? 'border-pub-ink bg-pub-ink text-white'
+                    ? 'border-transparent text-white'
                     : 'border-pub-ink/15 bg-white text-pub-ink-2 hover:border-pub-ink/40 hover:text-pub-ink'
                 }`}
               >
-                <Icon size={15} strokeWidth={1.75} aria-hidden="true" className={isActive ? 'text-white/70' : 'text-pub-ink-3'} />
-                {s.label}
+                {/* Die Ink-Füllung ist EIN Element, das zwischen den Tabs
+                    gleitet, statt auf dem einen zu verschwinden und auf dem
+                    anderen zu erscheinen. */}
+                {isActive && (
+                  <motion.span
+                    layoutId={`${baseId}-tab-indicator`}
+                    aria-hidden="true"
+                    className="absolute inset-0 rounded-full bg-pub-ink"
+                    transition={{ type: 'spring', stiffness: 420, damping: 36, mass: 0.8 }}
+                  />
+                )}
+                <Icon size={15} strokeWidth={1.75} aria-hidden="true" className={`relative ${isActive ? 'text-white/70' : 'text-pub-ink-3'}`} />
+                <span className="relative">{s.label}</span>
               </button>
             );
           })}
@@ -331,7 +547,10 @@ export function SolutionShowcase() {
           className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]"
         >
           {/* Conversation — excerpt by default, full transcript on request */}
-          <div className="flex min-w-0 flex-col rounded-2xl border border-white/[0.06] bg-pub-ink p-5 sm:p-8">
+          <div
+            {...spotlight}
+            className="cq-surface cq-surface-edge relative flex min-w-0 flex-col rounded-[22px] border border-white/[0.06] bg-pub-ink p-5 sm:p-8"
+          >
             <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
               <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-white/70">
                 Beispielgespräch · {scenario.label}
@@ -344,8 +563,18 @@ export function SolutionShowcase() {
             <ol className="space-y-3">
               {sichtbareNachrichten.map((msg, i) => {
                 const isAi = msg.role === 'ai';
+                const von = BEAT.gespraechStart + i * gespraechSchritt;
                 return (
-                  <li key={`${activeIndustry}-${i}`} className={`flex ${isAi ? 'justify-start' : 'justify-end'}`}>
+                  <Beat
+                    key={`${activeIndustry}-${i}`}
+                    as="li"
+                    progress={scrollYProgress}
+                    von={von}
+                    bis={von + gespraechSchritt * 0.8}
+                    aktiv={pinned}
+                    index={i}
+                    className={`flex ${isAi ? 'justify-start' : 'justify-end'} ${pinned ? '' : 'cq-view-rise'}`}
+                  >
                     <p
                       className={`max-w-[92%] rounded-2xl px-4 py-3 text-[14px] leading-[1.55] sm:max-w-[85%] ${
                         isAi ? 'rounded-tl-md bg-white/[0.09] text-white/90' : 'rounded-tr-md bg-white text-pub-ink'
@@ -354,7 +583,7 @@ export function SolutionShowcase() {
                       <span className="sr-only">{isAi ? 'Assistent: ' : 'Anrufer: '}</span>
                       {msg.text}
                     </p>
-                  </li>
+                  </Beat>
                 );
               })}
             </ol>
@@ -365,11 +594,13 @@ export function SolutionShowcase() {
                   onClick={() => setTranskriptOffen((v) => !v)}
                   aria-expanded={transkriptOffen}
                   aria-controls={`${baseId}-transkript`}
-                  className="inline-flex h-11 items-center gap-2 text-[14.5px] font-semibold text-white/85 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
+                  className="group inline-flex h-11 items-center gap-2 text-[14.5px] font-semibold text-white/85 transition-colors hover:text-white focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
                 >
-                  {transkriptOffen
-                    ? 'Ausschnitt zeigen'
-                    : 'Vollständiges Beispielgespräch ansehen'}
+                  <span className="cq-underline">
+                    {transkriptOffen
+                      ? 'Ausschnitt zeigen'
+                      : 'Vollständiges Beispielgespräch ansehen'}
+                  </span>
                   <ChevronDown
                     size={15}
                     aria-hidden="true"
@@ -387,37 +618,60 @@ export function SolutionShowcase() {
 
           {/* Summary + what changes */}
           <div className="flex min-w-0 flex-col gap-5">
-            <div className="rounded-2xl border border-pub-hairline bg-white p-5 shadow-[0_12px_32px_rgba(11,15,20,0.06)] sm:p-8">
+            <motion.div
+              className={`rounded-[22px] border border-pub-hairline bg-white p-5 shadow-[0_1px_2px_rgba(11,15,20,0.03),0_24px_60px_-32px_rgba(11,15,20,0.18)] sm:p-8 ${pinned ? '' : 'cq-view-rise'}`}
+              style={pinned ? { opacity: cardOpacity, y: cardY } : undefined}
+            >
               <p className="mb-5 text-[12px] font-semibold uppercase tracking-[0.14em] text-pub-ink-3">
                 Beispiel einer Gesprächszusammenfassung
               </p>
               <dl className="divide-y divide-pub-hairline-soft">
-                {summary.map(({ label, value }) => (
-                  <div key={label} className="grid gap-1 py-3 min-[380px]:grid-cols-[120px_1fr] min-[380px]:gap-4 sm:grid-cols-[150px_1fr]">
-                    <dt className="text-[13.5px] text-pub-ink-3">{label}</dt>
-                    <dd className="text-[15px] font-medium leading-snug text-pub-ink">{value}</dd>
-                  </div>
-                ))}
+                {summary.map(({ label, value }, j) => {
+                  const von = BEAT.zeilenStart + j * zeilenSchritt;
+                  const letzte = j === summary.length - 1;
+                  return (
+                    <Beat
+                      key={label}
+                      progress={scrollYProgress}
+                      von={von}
+                      bis={von + zeilenSchritt * 0.85}
+                      aktiv={pinned}
+                      index={j}
+                      className="relative grid gap-1 py-3 min-[380px]:grid-cols-[120px_1fr] min-[380px]:gap-4 sm:grid-cols-[150px_1fr]"
+                    >
+                      {/* Letzter Beat: Die Übergabezeile bekommt einen Wash im
+                          Verify-Ton — das ist der Moment, in dem der Vorgang
+                          beim Team liegt. */}
+                      {pinned && letzte && (
+                        <motion.span
+                          aria-hidden="true"
+                          className="pointer-events-none absolute -inset-x-3 inset-y-0.5 rounded-xl bg-pub-verify-wash ring-1 ring-pub-verify/15"
+                          style={{ opacity: uebergabeOpacity }}
+                        />
+                      )}
+                      <dt className="relative text-[13.5px] text-pub-ink-3">{label}</dt>
+                      <dd className="relative text-[15px] font-medium leading-snug text-pub-ink">{value}</dd>
+                    </Beat>
+                  );
+                })}
               </dl>
               <p className="mt-5 text-[13px] leading-relaxed text-pub-ink-3">
                 Notiert wird ein Wunsch, keine Buchung. Die Bestätigung bleibt bei Ihrem Team,
                 bis eine Anbindung an Ihr System geprüft und eingerichtet ist.
               </p>
-            </div>
+            </motion.div>
 
+            {/* Gepinnt steht der Abschluss unter der Zusammenfassung, wo die
+                rechte Spalte ohnehin kürzer ist als das Gespräch — so wächst
+                die Bühne nicht über den Bildschirm hinaus. */}
+            {pinned && abschluss}
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="max-w-[54ch] text-[15px] leading-[1.6] text-pub-ink-2">
-            Welche Anliegen der Assistent übernimmt, wo er an einen Menschen
-            übergibt und was er ausdrücklich nicht tut, steht auf der Produktseite.
-          </p>
-          <PubLinkButton to="/ki-telefonassistent" variant="secondary" size="md" icon={ArrowRight} iconTrailing className="h-auto min-h-11 max-w-full whitespace-normal py-2.5 text-center sm:shrink-0">
-            KI-Telefonassistent ansehen
-          </PubLinkButton>
-        </div>
+        {!pinned && <div className="mt-8">{abschluss}</div>}
+      </div>
       </div>
     </section>
+    </MotionConfig>
   );
 }

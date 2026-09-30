@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { magneticHandlers } from '@/lib/publicMotion';
 
 /*
   Shared primitives for the PUBLIC marketing surfaces.
@@ -46,7 +47,7 @@ const variantClass: Record<PubButtonVariant, string> = {
   // owns (navigation CTA). Signal blue stays reserved for links and focus.
   primary:
     'bg-pub-ink text-white border border-transparent ' +
-    'hover:bg-[#1f2933] active:bg-pub-ink',
+    'hover:bg-[#1f2933] hover:shadow-[0_10px_28px_-10px_rgba(11,15,20,0.5)] active:bg-pub-ink active:shadow-none',
   secondary:
     'bg-white text-pub-ink border border-pub-ink/20 ' +
     'hover:border-pub-ink/45 hover:bg-pub-paper-2',
@@ -62,12 +63,27 @@ const sizeClass: Record<PubButtonSize, string> = {
   lg: 'h-12 px-7 text-[15.5px]',
 };
 
+/*
+  Micro-interaction contract, shared by every public button:
+  - `cq-magnetic` + the pointer handlers below: the pill drifts ≤4px toward a
+    hovering pointer and springs back (index.css owns the easing). Inert on
+    touch, under reduced motion, and on the server.
+  - `group` + `cq-btn-icon`: a trailing arrow nudges 2px right on hover, a
+    leading icon nudges left — the button points where it goes.
+  - `active:scale-[0.98]`: a press is a press, not just a colour change.
+*/
 const buttonBase = cn(
-  'inline-flex items-center justify-center gap-2 rounded-full font-semibold whitespace-nowrap',
-  'transition-colors duration-150 ease-[cubic-bezier(0.22,1,0.36,1)]',
+  'group inline-flex items-center justify-center gap-2 rounded-full font-semibold whitespace-nowrap',
+  'cq-magnetic active:scale-[0.98]',
   'disabled:cursor-not-allowed disabled:opacity-55',
   pubFocus,
 );
+
+const iconBase = 'shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]';
+const iconLeadingClass = cn(iconBase, 'group-hover:-translate-x-0.5');
+const iconTrailingClass = cn(iconBase, 'group-hover:translate-x-0.5');
+
+const magnetic = magneticHandlers(4);
 
 interface CommonButtonProps {
   variant?: PubButtonVariant;
@@ -87,10 +103,16 @@ export const PubButton = forwardRef<
   ref,
 ) {
   return (
-    <button ref={ref} type={type} className={cn(buttonBase, variantClass[variant], sizeClass[size], className)} {...rest}>
-      {Icon && !iconTrailing ? <Icon size={17} aria-hidden="true" className="shrink-0" /> : null}
+    <button
+      ref={ref}
+      type={type}
+      className={cn(buttonBase, variantClass[variant], sizeClass[size], className)}
+      {...magnetic}
+      {...rest}
+    >
+      {Icon && !iconTrailing ? <Icon size={17} aria-hidden="true" className={iconLeadingClass} /> : null}
       {children}
-      {Icon && iconTrailing ? <Icon size={17} aria-hidden="true" className="shrink-0" /> : null}
+      {Icon && iconTrailing ? <Icon size={17} aria-hidden="true" className={iconTrailingClass} /> : null}
     </button>
   );
 });
@@ -102,15 +124,15 @@ export function PubLinkButton({
   const cls = cn(buttonBase, variantClass[variant], sizeClass[size], className);
   const inner = (
     <>
-      {Icon && !iconTrailing ? <Icon size={17} aria-hidden="true" className="shrink-0" /> : null}
+      {Icon && !iconTrailing ? <Icon size={17} aria-hidden="true" className={iconLeadingClass} /> : null}
       {children}
-      {Icon && iconTrailing ? <Icon size={17} aria-hidden="true" className="shrink-0" /> : null}
+      {Icon && iconTrailing ? <Icon size={17} aria-hidden="true" className={iconTrailingClass} /> : null}
     </>
   );
   // External and protocol links (tel:, mailto:) must not go through the router.
   const isExternal = /^(https?:|tel:|mailto:)/.test(to);
-  if (isExternal) return <a href={to} className={cls} {...rest}>{inner}</a>;
-  return <Link to={to} className={cls} {...rest}>{inner}</Link>;
+  if (isExternal) return <a href={to} className={cls} {...magnetic} {...rest}>{inner}</a>;
+  return <Link to={to} className={cls} {...magnetic} {...rest}>{inner}</Link>;
 }
 
 /* ------------------------------------------------------------------ icon tile */

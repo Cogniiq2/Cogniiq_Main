@@ -22,8 +22,11 @@
 // KEINE NEUE ABHÄNGIGKEIT. Vier Grundrechenarten brauchen keine Bibliothek und
 // kein Diagramm.
 // ─────────────────────────────────────────────────────────────────────────────
-import { useCallback, useId, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { ArrowRight, Info } from "lucide-react";
+import { magneticHandlers, reducedMotion } from "@/lib/publicMotion";
+
+const magnetic = magneticHandlers(4);
 import { trackEvent } from "@/lib/consent";
 import { RECHNER_LINK } from "@/lib/rechner-anker";
 import {
@@ -76,12 +79,102 @@ const START_DAUER = 2;
   wieder eine Behauptung im Gewand einer Bequemlichkeit.
 */
 
+/*
+  DARSTELLUNG, NICHT RECHNUNG — Stand 30.09.2026.
+
+  Der Rechner ist die Stelle, an der ein Besucher entscheidet. Deshalb verhält
+  er sich wie ein Instrument, nicht wie ein Formular: Der Schieber zeigt seinen
+  Wert als gefüllte Strecke mit Rastermarken, die Einheit steht im Feld, der
+  Betrag rollt auf den neuen Wert, statt zu springen, und der Tarif pulsiert
+  einmal, wenn er wechselt. Keine dieser Bewegungen verändert eine Zahl: Jeder
+  Zwischenwert ist nur Anzeige, das Ergebnis kommt unverändert aus dem Kern.
+  Unter `prefers-reduced-motion` und im Prerender steht sofort der Endwert.
+*/
 const CARD =
-  "rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50";
+  "rounded-[22px] border border-pub-hairline bg-white shadow-[0_1px_2px_rgba(11,15,20,0.03),0_24px_60px_-32px_rgba(11,15,20,0.16)] dark:border-gray-800 dark:bg-gray-900/50";
 const LABEL = "text-[15px] font-medium text-gray-800 dark:text-gray-200";
 const HINT = "text-[14px] text-pub-ink-3 dark:text-gray-500 leading-[1.55]";
 const ZEILE =
   "flex items-baseline justify-between gap-6 py-2.5 border-b border-gray-100 dark:border-gray-800 last:border-0";
+
+/** Rollender Betrag. Zeigt beim Mount und ohne Animationsumgebung sofort den
+ *  Endwert; nur eine ÄNDERUNG wird über ~550 ms hochgezählt. Während des
+ *  Rollens trägt ein `sr-only`-Span den Endwert, damit der `aria-live`-Bereich
+ *  darüber nicht jeden Zwischenwert ansagt; danach steht genau ein Span. */
+function Rollwert({ wert, format }: { wert: number; format: (n: number) => string }) {
+  const [anzeige, setAnzeige] = useState(wert);
+  const [rollt, setRollt] = useState(false);
+  // Der zuletzt GEZEIGTE Wert — auch mitten in einer unterbrochenen Rolle.
+  // Ein neuer Lauf startet von dort, nicht vom alten Ziel.
+  const gezeigt = useRef(wert);
+  const frame = useRef<number | null>(null);
+
+  useEffect(() => {
+    const start = gezeigt.current;
+    if (start === wert) return;
+    if (typeof requestAnimationFrame !== "function" || reducedMotion()) {
+      gezeigt.current = wert;
+      setAnzeige(wert);
+      return;
+    }
+    const dauer = 550;
+    const t0 = performance.now();
+    setRollt(true);
+    const schritt = (t: number) => {
+      const p = Math.min(1, (t - t0) / dauer);
+      const e = 1 - Math.pow(1 - p, 3);
+      const v = p < 1 ? start + (wert - start) * e : wert;
+      gezeigt.current = v;
+      setAnzeige(v);
+      if (p < 1) {
+        frame.current = requestAnimationFrame(schritt);
+      } else {
+        frame.current = null;
+        setRollt(false);
+      }
+    };
+    frame.current = requestAnimationFrame(schritt);
+    return () => {
+      if (frame.current !== null) cancelAnimationFrame(frame.current);
+      frame.current = null;
+    };
+  }, [wert]);
+
+  if (!rollt) return <span>{format(wert)}</span>;
+  return (
+    <>
+      <span aria-hidden="true">{format(anzeige)}</span>
+      <span className="sr-only">{format(wert)}</span>
+    </>
+  );
+}
+
+/** Lässt eine CSS-Animation (`klasse`) genau dann laufen, wenn sich `schluessel`
+ *  ändert — nicht beim ersten Rendern. */
+function PulsBeiWechsel({
+  schluessel,
+  klasse,
+  className,
+  children,
+}: {
+  schluessel: string | number;
+  klasse: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  const [tick, setTick] = useState(0);
+  const vorher = useRef(schluessel);
+  useEffect(() => {
+    if (vorher.current === schluessel) return;
+    vorher.current = schluessel;
+    setTick((t) => t + 1);
+  }, [schluessel]);
+  return (
+    <span key={tick} className={`${className ?? ""} ${tick > 0 ? klasse : ""}`.trim()}>
+      {children}
+    </span>
+  );
+}
 
 /** Zahlenfeld mit optionalem Schieber. Der exakte Wert bleibt immer tippbar —
  *  ein Schieber allein macht präzise Angaben unmöglich. */
@@ -116,25 +209,30 @@ function Zahlenfeld({
       </label>
       {hinweis && <p className={`${HINT} mt-1`}>{hinweis}</p>}
       <div className="mt-2 flex flex-wrap items-center gap-3">
-        <input
-          id={id}
-          type="number"
-          inputMode="decimal"
-          min={min}
-          step={step}
-          value={wert === null ? "" : wert}
-          placeholder={platzhalter}
-          onChange={(e) => {
-            const raw = e.target.value;
-            if (raw === "") return onChange(null);
-            const n = Number(raw);
-            onChange(Number.isFinite(n) ? Math.max(min, n) : null);
-          }}
-          className="w-28 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2.5 text-[16px] font-semibold text-gray-900 dark:text-gray-100 tabular-nums focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-300"
-        />
-        <span className="text-[15px] text-gray-500 dark:text-gray-400 whitespace-nowrap">
-          {einheit}
-        </span>
+        {/* Einheit IM Feld, rechts: Zahl und Einheit sind ein Wert und stehen
+            deshalb in einem Rahmen. Der Rahmen hebt sich beim Fokus, statt nur
+            die Farbe zu wechseln. */}
+        <div className="relative flex h-12 min-w-0 flex-1 basis-[180px] items-center rounded-xl border border-pub-hairline bg-white transition-[border-color,box-shadow] duration-200 focus-within:border-pub-ink focus-within:shadow-[0_0_0_4px_rgba(11,15,20,0.06)] hover:border-pub-ink/35 dark:border-gray-700 dark:bg-gray-900">
+          <input
+            id={id}
+            type="number"
+            inputMode="decimal"
+            min={min}
+            step={step}
+            value={wert === null ? "" : wert}
+            placeholder={platzhalter}
+            onChange={(e) => {
+              const raw = e.target.value;
+              if (raw === "") return onChange(null);
+              const n = Number(raw);
+              onChange(Number.isFinite(n) ? Math.max(min, n) : null);
+            }}
+            className="cq-numfield h-full w-full min-w-0 rounded-xl bg-transparent pl-4 pr-2 text-[17px] font-semibold text-gray-900 tabular-nums placeholder:font-normal placeholder:text-pub-ink-4 focus:outline-none dark:text-gray-100"
+          />
+          <span className="pointer-events-none shrink-0 whitespace-nowrap pr-4 text-[13.5px] font-medium text-pub-ink-3 dark:text-gray-400">
+            {einheit}
+          </span>
+        </div>
         {schieber && (
           <input
             type="range"
@@ -144,7 +242,8 @@ function Zahlenfeld({
             step={step}
             value={wert ?? min}
             onChange={(e) => onChange(Number(e.target.value))}
-            className="basis-full min-w-0 h-11 accent-pub-accent dark:accent-gray-100 cursor-pointer"
+            style={{ "--cq-fill": `${(Math.min(Math.max((wert ?? min) - min, 0), max - min) / (max - min)) * 100}%` } as React.CSSProperties}
+            className="cq-range basis-full min-w-0"
           />
         )}
       </div>
@@ -157,12 +256,32 @@ function Zeile({
   wert,
   stark = false,
   hinweis,
+  pille = false,
 }: {
   label: string;
   wert: string;
   stark?: boolean;
   hinweis?: string;
+  /** Wert als Ink-Pille, die beim Wechsel einmal pulsiert (Tarifname). */
+  pille?: boolean;
 }) {
+  if (pille) {
+    return (
+      <div className={ZEILE}>
+        <div className="min-w-0">
+          <span className="text-[16px] text-gray-600 dark:text-gray-400">{label}</span>
+          {hinweis && <p className={`${HINT} mt-0.5`}>{hinweis}</p>}
+        </div>
+        <PulsBeiWechsel
+          schluessel={wert}
+          klasse="cq-tariff-pulse"
+          className="inline-flex h-8 items-center rounded-full bg-pub-ink px-3.5 text-[14px] font-semibold text-white whitespace-nowrap dark:bg-gray-100 dark:text-gray-900"
+        >
+          {wert}
+        </PulsBeiWechsel>
+      </div>
+    );
+  }
   return (
     <div className={ZEILE}>
       <div className="min-w-0">
@@ -195,19 +314,30 @@ function Zeile({
 function Betrag({
   label,
   wert,
+  betrag,
+  format,
   hinweis,
 }: {
   label: string;
   wert: string;
+  /** Numerischer Wert für die rollende Anzeige; `wert` bleibt der Endtext. */
+  betrag?: number;
+  format?: (n: number) => string;
   hinweis?: string;
 }) {
   return (
     <div className="min-w-0">
-      <p className="text-[13px] font-semibold uppercase tracking-[0.12em] text-gray-500 dark:text-gray-400">
+      <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-pub-ink-3 dark:text-gray-400">
         {label}
       </p>
-      <p className="mt-1.5 text-[clamp(26px,3vw,34px)] font-bold leading-[1.1] tracking-[-0.02em] text-gray-900 dark:text-gray-100 tabular-nums">
-        {wert}
+      <p className="mt-2 text-[clamp(30px,3.4vw,40px)] font-bold leading-[1.05] tracking-[-0.025em] text-gray-900 dark:text-gray-100 tabular-nums">
+        {betrag !== undefined && format ? (
+          <Rollwert wert={betrag} format={format} />
+        ) : (
+          <PulsBeiWechsel schluessel={wert} klasse="cq-value-settle" className="inline-block">
+            {wert}
+          </PulsBeiWechsel>
+        )}
       </p>
       {hinweis && <p className={`${HINT} mt-1.5`}>{hinweis}</p>}
     </div>
@@ -267,9 +397,9 @@ function ModusWahl({
       role="radio"
       aria-checked={aktiv}
       onClick={onClick}
-      className={`text-left rounded-xl border p-5 transition-colors min-h-[44px] ${
+      className={`text-left rounded-2xl border p-5 transition-[border-color,background-color,box-shadow] duration-200 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 ${
         aktiv
-          ? "border-gray-900 dark:border-gray-100 bg-gray-50 dark:bg-gray-800/60"
+          ? "border-gray-900 dark:border-gray-100 bg-gray-50 dark:bg-gray-800/60 shadow-[inset_0_0_0_1px_#0b0f14]"
           : "border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500"
       }`}
     >
@@ -474,7 +604,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
                 type="button"
                 aria-pressed={sprachen === wert}
                 onClick={() => { meldePreisStart(); setSprachen(wert); }}
-                className={`inline-flex h-11 items-center rounded-full px-5 text-[15px] font-medium border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 ${
+                className={`inline-flex h-11 items-center rounded-full px-5 text-[15px] font-medium border transition-[background-color,border-color,color,transform] duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 ${
                   sprachen === wert
                     ? "border-gray-900 dark:border-gray-100 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
                     : "border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-500"
@@ -505,7 +635,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
           die Entscheidung entspricht.
         */}
         {kompakt && s !== null && preis.modus !== "individuell" && (
-          <div className="mb-6 grid gap-5 border-b border-gray-100 dark:border-gray-800 pb-6 sm:grid-cols-2">
+          <div className="mb-6 grid gap-6 border-b border-gray-100 pb-6 dark:border-gray-800 sm:grid-cols-2 sm:gap-8">
             <Betrag
               label="Wiederkehrend pro Monat"
               wert={
@@ -513,6 +643,12 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
                   ? eur(s.telefonieMonatlichEur, 2)
                   : eur(preis.monatlichGesamtEur, 2)
               }
+              betrag={
+                preis.monatlichGesamtEur === UNBEKANNT
+                  ? s.telefonieMonatlichEur
+                  : preis.monatlichGesamtEur
+              }
+              format={(n) => eur(n, 2)}
               hinweis={
                 preis.monatlichGesamtEur === UNBEKANNT
                   ? "Telefonie. Der Sprachaufschlag steht erst im Angebot fest und ist hier noch nicht enthalten."
@@ -535,7 +671,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
 
         {preis.modus === "individuell" || !s ? (
           <>
-            <Zeile label="Passender Tarif" wert="Individuell" />
+            <Zeile label="Passender Tarif" wert="Individuell" pille />
             <p className="pt-4 text-[16px] text-gray-600 dark:text-gray-400 leading-[1.7]">
               Bei diesem Aufkommen liefe auch der größte Listentarif dauerhaft an
               seiner Obergrenze — genau der Zustand, den wir vertraglich
@@ -546,7 +682,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
           </>
         ) : (
           <>
-            <Zeile label="Passender Tarif" wert={s.tarif.name} />
+            <Zeile label="Passender Tarif" wert={s.tarif.name} pille />
             {!kompakt && (
             <Zeile
               label="Enthaltene Minuten"
@@ -756,7 +892,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
 
         {wirtschaft.arbeitsnutzenRechenbar && (
           <div
-            className="mb-8 rounded-xl bg-gray-50 dark:bg-gray-800/50 px-5 py-4"
+            className="mb-8 rounded-2xl bg-pub-paper-2 px-5 py-4 ring-1 ring-pub-hairline-soft dark:bg-gray-800/50"
             aria-live="polite"
           >
             {/*
@@ -876,7 +1012,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
 
         {wirtschaft.chancenRechenbar && (
           <div
-            className="mt-6 rounded-xl bg-gray-50 dark:bg-gray-800/50 px-5 py-4"
+            className="mt-6 rounded-2xl bg-pub-paper-2 px-5 py-4 ring-1 ring-pub-hairline-soft dark:bg-gray-800/50"
             aria-live="polite"
           >
             <p className="text-[13px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
@@ -1088,10 +1224,11 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
           <a
             href={RECHNER_LINK}
             onClick={() => trackEvent("calculator_anchor_click", "Kompaktrechner")}
-            className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-pub-ink px-7 text-[15px] font-semibold text-white transition-colors hover:bg-[#1f2933] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
+            {...magnetic}
+            className="group cq-magnetic inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-pub-ink px-7 text-[15px] font-semibold text-white hover:bg-[#1f2933] hover:shadow-[0_10px_28px_-10px_rgba(11,15,20,0.5)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
           >
             Wirtschaftlichkeit berechnen
-            <ArrowRight size={15} aria-hidden="true" />
+            <ArrowRight size={15} aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-0.5" />
           </a>
         )}
         <a
@@ -1101,14 +1238,15 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
             if (wirtschaft.vollstaendig) trackEvent("roi_calculator_completed");
             trackEvent("cta_demo_click", "Rechner");
           }}
+          {...magnetic}
           className={
             kompakt
-              ? "inline-flex h-12 items-center justify-center gap-2.5 rounded-full border border-pub-ink/20 bg-white px-7 text-[15px] font-semibold text-pub-ink transition-colors hover:border-pub-ink/45 hover:bg-pub-paper-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
-              : "inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-pub-ink px-7 text-[15px] font-semibold text-white transition-colors hover:bg-[#1f2933] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
+              ? "group cq-magnetic inline-flex h-12 items-center justify-center gap-2.5 rounded-full border border-pub-ink/20 bg-white px-7 text-[15px] font-semibold text-pub-ink hover:border-pub-ink/45 hover:bg-pub-paper-2 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
+              : "group cq-magnetic inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-pub-ink px-7 text-[15px] font-semibold text-white hover:bg-[#1f2933] hover:shadow-[0_10px_28px_-10px_rgba(11,15,20,0.5)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
           }
         >
           Zahlen gemeinsam durchgehen
-          <ArrowRight size={15} aria-hidden="true" />
+          <ArrowRight size={15} aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-0.5" />
         </a>
       </div>
     </div>
