@@ -86,8 +86,22 @@ describe('Beispiel — Ausschnitt zuerst, vollständiges Protokoll auf Wunsch', 
 
   it('zeigt einen benannten Ausschnitt statt des ganzen Protokolls', () => {
     zeigen();
-    expect(screen.getByText(/Ausschnitt — 4 von 8 Nachrichten/)).toBeTruthy();
+    expect(screen.getByText(/Ausschnitt — 5 von 9 Nachrichten/)).toBeTruthy();
     expect(screen.queryByText(/rufen Sie einfach wieder an/)).toBeNull();
+  });
+
+  it('bucht in jeder Branche schon im Ausschnitt — und meldet sich als KI-System', async () => {
+    const user = userEvent.setup();
+    zeigen();
+    for (const branche of ['Arztpraxis', 'Restaurant', 'Immobilien', 'Sport & Fitness']) {
+      await user.click(screen.getByRole('tab', { name: new RegExp(branche) }));
+      const panel = screen.getByRole('tabpanel');
+      const nachrichten = within(panel).getAllByRole('listitem').map((li) => li.textContent ?? '');
+      // Art. 50 KI-VO: erster Satz des Assistenten, nicht abschaltbar.
+      expect(nachrichten[0]).toMatch(/Assistent:.*KI-Assistent/);
+      // Die Buchung steht im sichtbaren Ausschnitt, nicht erst im Protokoll.
+      expect(nachrichten.join(' ')).toMatch(/eingetragen|reserviert|gebucht/);
+    }
   });
 
   it('hält den Beispiel-Hinweis neben dem Beispiel sichtbar', () => {
@@ -110,7 +124,7 @@ describe('Beispiel — Ausschnitt zuerst, vollständiges Protokoll auf Wunsch', 
     await user.click(screen.getByRole('button', { name: /Vollständiges Beispielgespräch ansehen/ }));
     await user.click(screen.getByRole('tab', { name: /Restaurant/ }));
     expect(screen.getByRole('tab', { name: /Restaurant/ }).getAttribute('aria-selected')).toBe('true');
-    expect(screen.getByText(/Ausschnitt — 4 von 8 Nachrichten/)).toBeTruthy();
+    expect(screen.getByText(/Ausschnitt — 5 von 9 Nachrichten/)).toBeTruthy();
   });
 
   it('zeigt den Termin als gebucht — und die Bedingung dafür am Beispiel selbst', () => {
