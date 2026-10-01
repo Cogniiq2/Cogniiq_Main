@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, Chrome as Home, Search } from "lucide-react";
 import { PageSEO } from "@/components/PageSEO";
+import { PubButton } from "@/components/public/PublicUI";
+import { openSiteSearch, queryFromPath } from "@/lib/search/openSiteSearch";
 
 const suggestions = [
   { label: "Leistungen", href: "/leistungen" },
@@ -60,10 +62,26 @@ export function NotFoundPage() {
               Diese Seite existiert nicht.
             </p>
 
-            <p className="text-[15px] text-gray-500 dark:text-gray-500 leading-relaxed mb-10">
+            <p className="text-[15px] text-gray-500 dark:text-gray-500 leading-relaxed mb-8">
               Die URL wurde möglicherweise geändert oder entfernt.
-              Versuchen Sie eine der Seiten unten.
+              Suchen Sie die Seite, die Sie meinten – oder wählen Sie eine der Seiten unten.
             </p>
+
+            {/* Öffnet die Seitensuche mit den Wörtern der aufgerufenen URL als
+                Eingabe: „/webdesign-arzt-nuernberg" wird zu „webdesign arzt
+                nuernberg", und die Trefferliste zeigt sofort die nächstliegende
+                Seite. Der Pfad wird erst beim Klick gelesen — das vorgerenderte
+                404-Dokument ist für jede unbekannte URL dasselbe. */}
+            <div className="mb-10">
+              <PubButton
+                variant="secondary"
+                size="lg"
+                icon={Search}
+                onClick={() => openSiteSearch({ query: queryFromPath(window.location.pathname) })}
+              >
+                Seite suchen
+              </PubButton>
+            </div>
 
             <div className="flex flex-wrap justify-center gap-2 mb-10">
               {suggestions.map((s) => (
