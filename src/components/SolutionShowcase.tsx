@@ -355,6 +355,14 @@ const PINNED_MEDIA =
 const NAV_HEIGHT_PX = 72;
 /** Luft zwischen Bühne und Fensterrand, die bei der Messung mitzählt. */
 const STAGE_SLACK_PX = 16;
+/*
+  EINPASSEN STATT AUFGEBEN. Ist die Bühne ein paar Pixel zu hoch für das
+  Fenster, wird sie als Ganzes leicht verkleinert (transform: scale), statt
+  den Pin fallen zu lassen. Vorher hing die ganze Erzählung an einer harten
+  Schwelle: 8 px mehr Inhalt, und auf einem typischen Laptop verschwand sie.
+  Unter diesem Faktor wäre der Text zu klein — dann übernimmt der Fluss.
+*/
+const MIN_FIT_SCALE = 0.78;
 
 /** Bildschirmhöhen, die der Abschnitt im gepinnten Modus einnimmt. */
 const STORY_HEIGHT_VH = 260;
@@ -391,6 +399,7 @@ function Beat({
   aktiv,
   index,
   herkunft = 'mitte',
+  stil = 'fluss',
   as: Tag = 'div',
   className,
   children,
@@ -402,13 +411,22 @@ function Beat({
   /** Staffelung für die CSS-Scroll-Timeline, solange JavaScript nicht läuft. */
   index: number;
   herkunft?: 'links' | 'rechts' | 'mitte';
+  /**
+   * `buehne` — die gepinnte Erzählung: Opacity und 16 px Anstieg am rohen
+   * Scrollweg, exakt die freigegebene Fassung (Stand 19840d0). Kein Scale,
+   * keine Feder: Die Bühne steht still, und die Nachricht folgt dem Finger
+   * ohne Nachlauf.
+   * `fluss` — Telefone und Tablets ohne Pin.
+   */
+  stil?: 'buehne' | 'fluss';
   as?: 'div' | 'li';
   className?: string;
   children: ReactNode;
 }) {
+  const buehne = stil === 'buehne';
   const opacity = useTransform(progress, [von, bis], [0, 1]);
-  const y = useTransform(progress, [von, bis], [18, 0]);
-  const scale = useTransform(progress, [von, bis], [herkunft === 'mitte' ? 1 : 0.965, 1]);
+  const y = useTransform(progress, [von, bis], [buehne ? 16 : 18, 0]);
+  const scale = useTransform(progress, [von, bis], [buehne || herkunft === 'mitte' ? 1 : 0.965, 1]);
   const Comp = Tag === 'li' ? motion.li : motion.div;
   const transformOrigin =
     herkunft === 'links' ? 'left bottom' : herkunft === 'rechts' ? 'right bottom' : 'center';
@@ -416,9 +434,11 @@ function Beat({
     <Comp
       className={className}
       style={
-        aktiv
-          ? { opacity, y, scale, transformOrigin, willChange: 'transform, opacity' }
-          : ({ '--cq-i': index } as Record<string, number>)
+        !aktiv
+          ? ({ '--cq-i': index } as Record<string, number>)
+          : buehne
+            ? { opacity, y }
+            : { opacity, y, scale, transformOrigin, willChange: 'transform, opacity' }
       }
     >
       {children}
@@ -456,9 +476,12 @@ function useStoryMode(stageRef: React.RefObject<HTMLDivElement>): {
   compact: boolean;
   pinned: boolean;
   animated: boolean;
+  fitScale: number;
 } {
   const [eligible, setEligible] = useState(false);
-  const [fits, setFits] = useState(true);
+  // 1 = passt in natürlicher Größe. Gemessen wird die UNSKALIERTE Höhe
+  // (offsetHeight ignoriert transform), daher kein Rückkopplungseffekt.
+  const [fitScale, setFitScale] = useState(1);
   // Scrollgesteuerte Beats laufen auf JEDEM Gerät mit erlaubter Bewegung —
   // gepinnt, wo die Bühne passt, sonst im Fluss. Im Prerender `false`.
   const [animated, setAnimated] = useState(false);
@@ -489,8 +512,11 @@ function useStoryMode(stageRef: React.RefObject<HTMLDivElement>): {
     if (!stage) return;
     const measure = () => {
       const available = window.innerHeight - NAV_HEIGHT_PX - STAGE_SLACK_PX;
-      const next = stage.offsetHeight <= available;
-      startTransition(() => setFits((cur) => (cur === next ? cur : next)));
+      const natural = stage.offsetHeight;
+      // Auf zwei Nachkommastellen gerundet: keine Neuberechnung für
+      // Sub-Pixel-Schwankungen beim Scrollen mobiler Browserleisten.
+      const next = natural > 0 ? Math.min(1, Math.floor((available / natural) * 100) / 100) : 1;
+      startTransition(() => setFitScale((cur) => (cur === next ? cur : next)));
     };
     measure();
     const ro = new ResizeObserver(measure);
@@ -502,7 +528,7 @@ function useStoryMode(stageRef: React.RefObject<HTMLDivElement>): {
     };
   }, [eligible, stageRef]);
 
-  return { compact: eligible, pinned: eligible && fits, animated };
+  return { compact: eligible, pinned: eligible && fitScale >= MIN_FIT_SCALE, animated, fitScale };
 }
 
 const spotlight = spotlightHandlers();
@@ -516,7 +542,7 @@ export function SolutionShowcase() {
   const stageRef = useRef<HTMLDivElement>(null);
   const chatRef = useRef<HTMLOListElement>(null);
   const cardRef = useRef<HTMLDListElement>(null);
-  const { compact, pinned, animated } = useStoryMode(stageRef);
+  const { compact, pinned, animated, fitScale } = useStoryMode(stageRef);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end end'],
@@ -530,7 +556,6 @@ export function SolutionShowcase() {
   */
   const chatScroll = useScroll({ target: chatRef, offset: ['start 0.88', 'end 0.58'] });
   const cardScroll = useScroll({ target: cardRef, offset: ['start 0.88', 'end 0.62'] });
-  const sectionSmooth = useSpring(scrollYProgress, SCROLL_SPRING);
   const chatSmooth = useSpring(chatScroll.scrollYProgress, SCROLL_SPRING);
   const cardSmooth = useSpring(cardScroll.scrollYProgress, SCROLL_SPRING);
   const [stage, setStage] = useState(0);
@@ -538,10 +563,11 @@ export function SolutionShowcase() {
     const next = stageAt(p);
     setStage((cur) => (cur === next ? cur : next));
   });
-  const railScale = useTransform(sectionSmooth, [0, 1], [0, 1]);
-  const cardOpacity = useTransform(sectionSmooth, [BEAT.kartenStart, BEAT.zeilenStart], [0.35, 1]);
-  const cardY = useTransform(sectionSmooth, [BEAT.kartenStart, BEAT.zeilenStart], [20, 0]);
-  const statusPinned = useTransform(sectionSmooth, [BEAT.erledigt, 0.97], [0, 1]);
+  // Die gepinnte Bühne läuft am ROHEN Scrollweg — so wie freigegeben.
+  const railScale = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  const cardOpacity = useTransform(scrollYProgress, [BEAT.kartenStart, BEAT.zeilenStart], [0.35, 1]);
+  const cardY = useTransform(scrollYProgress, [BEAT.kartenStart, BEAT.zeilenStart], [20, 0]);
+  const statusPinned = useTransform(scrollYProgress, [BEAT.erledigt, 0.97], [0, 1]);
   /*
     REIHENFOLGE IM FLUSS. Nebeneinander (Desktop, nicht gepinnt) steht die
     Karte höher als das Ende des Gesprächs — sie würde „gebucht" zeigen,
@@ -604,7 +630,11 @@ export function SolutionShowcase() {
         className={pinned ? 'sticky flex items-center overflow-hidden' : undefined}
         style={pinned ? { top: NAV_HEIGHT_PX, height: `calc(100vh - ${NAV_HEIGHT_PX}px)` } : undefined}
       >
-      <div ref={stageRef} className={`relative mx-auto w-full max-w-[1200px] px-6 lg:px-10 ${compact ? 'py-3' : ''}`}>
+      <div
+        ref={stageRef}
+        className={`relative mx-auto w-full max-w-[1200px] px-6 lg:px-10 ${compact ? 'py-3' : ''}`}
+        style={pinned && fitScale < 1 ? { transform: `scale(${fitScale})`, transformOrigin: 'center center' } : undefined}
+      >
         {pinned && (
           <motion.div
             aria-hidden="true"
@@ -746,12 +776,13 @@ export function SolutionShowcase() {
                 // gleichmäßig über den Weg der Liste selbst verteilt.
                 const flussSchritt = GESPRAECH_FLUSS_ENDE / n;
                 const von = pinned ? BEAT.gespraechStart + i * gespraechSchritt : i * flussSchritt;
-                const bis = pinned ? von + gespraechSchritt * 0.85 : von + flussSchritt * 0.9;
+                const bis = pinned ? von + gespraechSchritt * 0.8 : von + flussSchritt * 0.9;
                 return (
                   <Beat
                     key={`${activeIndustry}-${i}`}
                     as="li"
-                    progress={pinned ? sectionSmooth : chatSmooth}
+                    progress={pinned ? scrollYProgress : chatSmooth}
+                    stil={pinned ? 'buehne' : 'fluss'}
                     von={von}
                     bis={bis}
                     aktiv={animated}
@@ -825,7 +856,8 @@ export function SolutionShowcase() {
                   return (
                     <Beat
                       key={`${activeIndustry}-${label}`}
-                      progress={pinned ? sectionSmooth : rowsFlow}
+                      progress={pinned ? scrollYProgress : rowsFlow}
+                      stil={pinned ? 'buehne' : 'fluss'}
                       von={von}
                       bis={bis}
                       aktiv={animated}
