@@ -89,13 +89,20 @@ const NEBENZIELE = [
 
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 
-/** Position und Form des Auslösers — der Schließen-Knopf übernimmt sie exakt. */
-const knopfKlassen =
-  'fixed top-[14px] right-4 inline-flex h-11 items-center gap-2.5 rounded-full border border-pub-hairline ' +
+/** Form des Auslösers — der Schließen-Knopf übernimmt sie exakt. */
+const knopfForm =
+  'inline-flex h-11 items-center gap-2.5 rounded-full border border-pub-hairline ' +
   'bg-white/95 pl-4 pr-[18px] text-[15px] font-semibold tracking-[-0.005em] text-pub-ink ' +
   'shadow-[0_1px_2px_rgba(11,15,20,0.05)] backdrop-blur transition-colors duration-150 ' +
-  'active:bg-pub-paper-2 lg:hidden ' +
+  'active:bg-pub-paper-2 ' +
   pubFocus;
+
+/**
+ * Position des Auslösers. Der Schließen-Knopf im Dialog steht an derselben
+ * Stelle, sodass sich der Auslöser zu einem X zu verwandeln scheint. Steht ein
+ * Such-Auslöser daneben, sitzt er LINKS vom Menü — die rechte Kante bleibt.
+ */
+const knopfKlassen = `fixed top-[14px] right-4 lg:hidden ${knopfForm}`;
 
 /**
  * Zwei Linien ungleicher Länge, die sich zu einem X drehen. Die ungleiche Länge
@@ -128,7 +135,7 @@ function MenuGlyph({ offen, animiert }: { offen: boolean; animiert: boolean }) {
 
 /* ─── Hauptkomponente ─────────────────────────────────────────────────── */
 
-export function PremiumMobileNav() {
+export function PremiumMobileNav({ sucheAusloeser }: { sucheAusloeser?: ReactNode } = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const [ebene, setEbene] = useState<Ebene>(START);
   // 1 = tiefer, -1 = zurück. Bestimmt nur die Richtung der kleinen Verschiebung.
@@ -257,20 +264,25 @@ export function PremiumMobileNav() {
 
   return (
     <>
-      {/* AUSLÖSER — in der Kopfzeile, oben rechts, unterhalb von `lg`. */}
-      <button
-        ref={triggerRef}
-        type="button"
-        onClick={() => setIsOpen(true)}
-        className={`${knopfKlassen} z-50`}
-        aria-label="Navigation öffnen"
-        aria-haspopup="dialog"
-        aria-expanded={isOpen}
-        aria-controls={isOpen ? dialogId : undefined}
-      >
-        <MenuGlyph offen={false} animiert={false} />
-        Menü
-      </button>
+      {/* AUSLÖSER — in der Kopfzeile, oben rechts, unterhalb von `lg`. Die
+          Suche steht links daneben; „Menü" bleibt ganz rechts, damit der
+          Schließen-Knopf weiterhin genau auf ihm liegt. */}
+      <div className="fixed top-[14px] right-4 z-50 flex items-center gap-2 lg:hidden">
+        {sucheAusloeser}
+        <button
+          ref={triggerRef}
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className={knopfForm}
+          aria-label="Navigation öffnen"
+          aria-haspopup="dialog"
+          aria-expanded={isOpen}
+          aria-controls={isOpen ? dialogId : undefined}
+        >
+          <MenuGlyph offen={false} animiert={false} />
+          Menü
+        </button>
+      </div>
 
       <AnimatePresence>
         {isOpen && (

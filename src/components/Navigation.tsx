@@ -27,8 +27,17 @@
 // GESTALTUNG nach COPY-BRIEF-3 §1: kein Text unter 14 px (vorher 10–13 px),
 // Bewegung höchstens 180 ms und nur Deckkraft plus kleine Verschiebung,
 // Trennung durch Raum, Akzentfarbe ausschließlich für die Handlung.
+//
+// SEITENSUCHE
+//
+// Der dritte Einstiegsweg neben „Was macht ihr?" und „Für wen?": Wer sein
+// Anliegen in eigenen Worten hat („Anrufe gehen verloren"), tippt es ein und
+// bekommt die passende Seite. Der Auslöser steht rechts vor Login und Handlung
+// (Desktop) bzw. neben „Menü" (Mobil); der Dialog wird erst beim ersten Öffnen
+// nachgeladen (components/search/useSiteSearch.ts). Nichts davon steht im
+// vorgerenderten Dokument außer dem Auslöser selbst.
 // ─────────────────────────────────────────────────────────────────────────────
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { Suspense, useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronDown, ArrowUpRight, ArrowRight } from 'lucide-react';
@@ -36,6 +45,8 @@ import { PubLinkButton } from '@/components/public/PublicUI';
 import { Logo } from './Logo';
 import { PremiumMobileNav } from './ui/premium-mobile-nav';
 import { useAuth } from '@/contexts/AuthContext';
+import { SiteSearchTrigger } from './search/SiteSearchTrigger';
+import { LazySiteSearchDialog, useSiteSearch } from './search/useSiteSearch';
 import {
   HAUPTSITZ_SLUG,
   LEISTUNGEN,
@@ -69,6 +80,7 @@ export function Navigation() {
   // Klicken zum Öffnen wäre unmöglich. Zeigen öffnet, ohne die Marke zu setzen;
   // der erste Klick übernimmt das offene Panel, der zweite schließt es.
   const perKlickGeoeffnet = useRef<string | null>(null);
+  const suche = useSiteSearch();
 
   const customerNav = {
     label: !isLoading && user ? 'Dashboard' : 'Kundenlogin',
@@ -215,13 +227,21 @@ export function Navigation() {
               <SimpleNavItem label="Über uns" href="/ueber-uns" isActive={activePath === '/ueber-uns'} />
             </motion.div>
 
-            {/* RECHTS — genau eine Handlung */}
+            {/* RECHTS — Suche, Login, genau eine Handlung */}
             <motion.div
               className="hidden lg:flex items-center gap-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.5 }}
             >
+              <SiteSearchTrigger
+                form="feld"
+                open={suche.open}
+                controls={suche.dialogId}
+                onOpen={() => suche.openSearch()}
+                onWarm={suche.warm}
+                className="mr-1"
+              />
               <SimpleNavItem
                 label={customerNav.label}
                 href={customerNav.href}
@@ -260,7 +280,30 @@ export function Navigation() {
         />
       </motion.nav>
 
-      <PremiumMobileNav />
+      <PremiumMobileNav
+        sucheAusloeser={
+          <SiteSearchTrigger
+            form="knopf"
+            open={suche.open}
+            controls={suche.dialogId}
+            onOpen={() => suche.openSearch()}
+            onWarm={suche.warm}
+          />
+        }
+      />
+
+      {/* Erst nach dem ersten Öffnen eingehängt: Dialog, Index und Wortschatz
+          liegen in einem eigenen Chunk, den der Besucher nur lädt, wenn er sucht. */}
+      {suche.mounted && (
+        <Suspense fallback={null}>
+          <LazySiteSearchDialog
+            open={suche.open}
+            onOpenChange={suche.setOpen}
+            initialQuery={suche.initialQuery}
+            returnFocusTo={suche.returnFocusTo}
+          />
+        </Suspense>
+      )}
       {/* ScrollProgress and SectionRail are no longer mounted: the percentage chip
           was clipped at the viewport edge and the rail label overlapped hero content
           between 1280 and 1536px on every public page. */}
