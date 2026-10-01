@@ -1,17 +1,34 @@
-import { useId, useRef, useState, type KeyboardEvent } from 'react';
+import {
+  startTransition,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from 'react';
+import {
+  MotionConfig,
+  motion,
+  useMotionValueEvent,
+  useScroll,
+  useSpring,
+  useTransform,
+  type MotionValue,
+} from 'framer-motion';
 import {
   Stethoscope,
   Utensils,
   Building2,
   Dumbbell,
   PhoneCall,
-  Calendar,
   ArrowRight,
   ChevronDown,
-  Zap,
 } from 'lucide-react';
 
 import { PubEyebrow, PubLinkButton } from '@/components/public/PublicUI';
+import { spotlightHandlers } from '@/lib/publicMotion';
+import { ABWICKLUNG } from '@/lib/telefonassistent-copy';
 
 type Industry = 'Arztpraxis' | 'Restaurant' | 'Immobilien' | 'Sport & Fitness';
 
@@ -74,14 +91,15 @@ const SCENARIOS: Scenario[] = [
       statLabel: 'Anrufannahme außerhalb der Öffnungszeiten',
     },
     chat: [
-      { role: 'caller', text: 'Hallo, ich würde gerne einen Termin vereinbaren.' },
-      { role: 'ai', text: 'Guten Tag! Hier ist die digitale Assistenz der Praxis. Welchen Arzt möchten Sie besuchen — Allgemein- oder Spezialsprechstunde?' },
-      { role: 'caller', text: 'Allgemeinmedizin bitte, möglichst diese Woche.' },
-      { role: 'ai', text: 'Kein Problem. Für die Allgemeinsprechstunde nimmt die Anmeldung Wunschzeiten entgegen — passt Ihnen Donnerstagvormittag oder Freitagnachmittag besser?' },
-      { role: 'caller', text: 'Donnerstagvormittag passt gut.' },
-      { role: 'ai', text: 'Donnerstagvormittag notiere ich. Unter welcher Nummer erreicht Sie die Anmeldung für die Bestätigung?' },
-      { role: 'caller', text: '0151 2345678.' },
-      { role: 'ai', text: 'Danke. Ihr Terminwunsch geht mit Ihrer Rückrufnummer an die Anmeldung. Noch etwas, wobei ich helfen kann?' },
+      { role: 'ai', text: 'Guten Morgen, Praxis Albrecht – Ihr KI-Assistent.' },
+      { role: 'caller', text: 'Maier, geboren am 12.03.1968. Ich bräuchte diese Woche einen Termin, gern vor eins.' },
+      { role: 'ai', text: 'Danke, Frau Maier. Vor eins hätte ich Donnerstag um 9:40 Uhr oder Freitag um 8:20 Uhr.' },
+      { role: 'caller', text: 'Donnerstag ist super.' },
+      { role: 'ai', text: 'Sehr gern – Donnerstag, 9:40 Uhr, ist eingetragen. Denken Sie bitte an Ihre Versichertenkarte.' },
+      { role: 'caller', text: 'Und wenn ich bis dahin Fieber bekomme?' },
+      { role: 'ai', text: 'Das kann ich medizinisch nicht beurteilen. Rufen Sie dann einfach an, ich leite Sie gleich an das Praxisteam weiter.' },
+      { role: 'caller', text: 'Prima. Und falls ich verschieben muss?' },
+      { role: 'ai', text: 'Dann rufen Sie einfach wieder an – das erledige ich direkt im Gespräch. Bis Donnerstag, Frau Maier.' },
     ],
   },
   {
@@ -115,14 +133,15 @@ const SCENARIOS: Scenario[] = [
       statLabel: 'Reservierungsannahme außerhalb der Öffnungszeiten',
     },
     chat: [
-      { role: 'caller', text: 'Guten Abend, kann ich für Samstag einen Tisch reservieren?' },
-      { role: 'ai', text: 'Guten Abend, herzlich willkommen! Für wie viele Personen darf ich den Wunsch notieren?' },
-      { role: 'caller', text: 'Für 4 Personen, am liebsten 19:30 Uhr.' },
-      { role: 'ai', text: 'Samstag 19:30 Uhr für 4 Personen notiere ich als Wunsch. Haben Sie besondere Wünsche — Fenstertisch oder Allergieinformationen?' },
-      { role: 'caller', text: 'Einen Fenstertisch wäre toll.' },
-      { role: 'ai', text: 'Fenstertisch ist notiert. Unter welcher Nummer erreicht Sie das Team für die Bestätigung?' },
-      { role: 'caller', text: '0151 2345678.' },
-      { role: 'ai', text: 'Danke. Ihr Reservierungswunsch geht mit allen Angaben an den Service. Einen schönen Abend!' },
+      { role: 'ai', text: 'Guten Abend, Trattoria Lume – Ihr KI-Assistent.' },
+      { role: 'caller', text: 'Berger hier. Haben Sie Samstag um 20 Uhr einen Tisch für vier? Wir feiern Geburtstag.' },
+      { role: 'ai', text: 'Wie schön. Um 20 Uhr sind wir voll, aber um 19:30 Uhr wäre der ruhige Ecktisch am Fenster frei.' },
+      { role: 'caller', text: 'Den nehmen wir. Einer von uns hat eine Nussallergie.' },
+      { role: 'ai', text: 'Reserviert: Samstag, 19:30 Uhr, Ecktisch für vier. Die Küche weiß von Allergie und Geburtstag.' },
+      { role: 'caller', text: 'Könnten Sie zum Dessert eine Kerze vorbereiten?' },
+      { role: 'ai', text: 'Sehr gern, das steht bei Ihrer Reservierung. Der Service kümmert sich darum.' },
+      { role: 'caller', text: 'Und falls wir es doch nicht schaffen?' },
+      { role: 'ai', text: 'Dann rufen Sie kurz an, ich gebe den Tisch wieder frei. Einen schönen Abend – und alles Gute zum Geburtstag.' },
     ],
   },
   {
@@ -142,8 +161,8 @@ const SCENARIOS: Scenario[] = [
       statLabel: 'entscheidet der zuerst erreichbare Anbieter',
     },
     solution: {
-      service: 'Automatisierung & KI',
-      serviceIcon: Zap,
+      service: 'KI Telefonassistent',
+      serviceIcon: PhoneCall,
       title: 'Mit KI-Automatisierung',
       points: [
         'Automatische Erstantwort auf eingehende Anfragen',
@@ -156,12 +175,13 @@ const SCENARIOS: Scenario[] = [
       statLabel: 'qualifizierte Besichtigungen durch automatische Vorqualifizierung',
     },
     chat: [
-      { role: 'caller', text: 'Ich habe Interesse an der inserierten 3-Zimmer-Wohnung.' },
-      { role: 'ai', text: 'Hallo! Danke für Ihr Interesse. Darf ich Ihnen kurz ein paar Fragen stellen, damit wir den Termin optimal vorbereiten können?' },
-      { role: 'caller', text: 'Ja, natürlich.' },
-      { role: 'ai', text: 'Suchen Sie zur Eigennutzung oder als Kapitalanlage? Und haben Sie bereits eine Finanzierungszusage?' },
-      { role: 'caller', text: 'Eigennutzung, Finanzierung ist bereits in Klärung.' },
-      { role: 'ai', text: 'Hervorragend. Ich schlage Ihnen jetzt drei Besichtigungstermine vor. Welcher passt Ihnen am besten?' },
+      { role: 'ai', text: 'Guten Tag, Immobilien Hartmann – Ihr KI-Assistent.' },
+      { role: 'caller', text: 'Keller hier. Ist die 3-Zimmer-Wohnung in der Sonnenstraße noch frei? Zu zweit, Finanzierung steht.' },
+      { role: 'ai', text: 'Ja, noch frei: 84 m², 3. OG mit Aufzug. Besichtigung ginge Dienstag, 17 Uhr, oder Donnerstag, 18:30 Uhr.' },
+      { role: 'caller', text: 'Donnerstag passt uns gut.' },
+      { role: 'ai', text: 'Wunderbar – Donnerstag, 18:30 Uhr, ist eingetragen. Herr Hartmann hat Ihre Angaben schon vorliegen.' },
+      { role: 'caller', text: 'Eine Frage noch: Sind Katzen erlaubt?' },
+      { role: 'ai', text: 'Laut Exposé ja. Ich gebe die Frage zur Sicherheit an Herrn Hartmann weiter, er bestätigt es Ihnen vor Ort. Bis Donnerstag.' },
     ],
   },
   {
@@ -181,8 +201,8 @@ const SCENARIOS: Scenario[] = [
       statLabel: 'Kündigungen durch verlässliche Erreichbarkeit und Erinnerungen',
     },
     solution: {
-      service: 'Website & Automatisierung',
-      serviceIcon: Calendar,
+      service: 'KI Telefonassistent',
+      serviceIcon: PhoneCall,
       title: 'Mit KI & Buchungssystem',
       points: [
         'Online-Buchung für alle Kurse & Personal Training',
@@ -195,63 +215,371 @@ const SCENARIOS: Scenario[] = [
       statLabel: 'Kündigungen durch aktive, verlässliche Bindung',
     },
     chat: [
-      { role: 'caller', text: 'Gibt es noch Plätze im Yoga-Kurs am Dienstag?' },
-      { role: 'ai', text: 'Hi! Der Yoga-Kurs Dienstag 18:00 Uhr hat noch 2 freie Plätze. Soll ich Sie auf die Liste setzen?' },
-      { role: 'caller', text: 'Ja bitte, für diese Woche und alle weiteren Dienstage.' },
-      { role: 'ai', text: 'Notiert — dauerhaft jeden Dienstag 18:00 Uhr. Das Team bestätigt Ihnen den Platz.' },
-      { role: 'caller', text: 'Super, danke!' },
-      { role: 'ai', text: 'Gern! Fällt ein Kurs aus, meldet sich das Studio bei Ihnen und nennt Ihnen die Alternativen.' },
+      { role: 'ai', text: 'Hallo, Studio Kern – Ihr KI-Assistent.' },
+      { role: 'caller', text: 'Hi, Mitgliedsnummer 4471. Ich würde gern dauerhaft in Yoga, dienstags um 18 Uhr.' },
+      { role: 'ai', text: 'Hallo Frau Yilmaz. 18 Uhr ist leider voll – um 19:15 Uhr gibt Lena denselben Kurs, da ist noch Platz.' },
+      { role: 'caller', text: 'Dann 19:15 Uhr. Und falls um 18 Uhr was frei wird?' },
+      { role: 'ai', text: 'Gebucht: ab nächster Woche jeden Dienstag um 19:15 Uhr. Für 18 Uhr stehen Sie auf der Warteliste.' },
+      { role: 'caller', text: 'Und wenn ich mal nicht kann?' },
+      { role: 'ai', text: 'Dann einfach bis zwei Stunden vorher absagen, und Ihr Platz ist für die Woche frei. Viel Spaß bei Lena.' },
     ],
   },
 ];
 
 
 /*
-  What the team would receive after each example call. Every value is taken from
-  the transcript above it; nothing is a confirmed booking — the assistant records
-  a wish and hands it over, the team confirms.
+  What stands in the customer's own system after each example call. Every
+  value is taken from the transcript above it. The last row is the status —
+  and the status is "gebucht", not "notiert": the assistant finishes the
+  process in the call, so nobody transfers anything afterwards.
+
+  This is `ABWICKLUNG.faehigkeit` shown rather than told, and it carries its
+  condition in sight: the example runs on a verified calendar connection
+  (`ABWICKLUNG.badge` on the card, `ABWICKLUNG.kurz` in the footnote). That is
+  the owner's binding BOOKING_WRITE answer (OWNER-INPUT.md, 10.09.2026):
+  booking may be shown wherever the customer-specific connection is set up
+  and verified — which is how every Cogniiq deployment is set up.
 */
 const SUMMARIES: Record<Industry, { label: string; value: string }[]> = {
   Arztpraxis: [
-    { label: 'Anliegen', value: 'Termin, Allgemeinsprechstunde' },
-    { label: 'Terminwunsch', value: 'Donnerstagvormittag, diese Woche' },
-    { label: 'Rückruf', value: 'Nummer hinterlegt' },
-    { label: 'Übergabe', value: 'An die Anmeldung, zur Bestätigung' },
+    { label: 'Anliegen', value: 'Sprechstunde, vor 13 Uhr' },
+    { label: 'Termin', value: 'Donnerstag, 9:40 Uhr' },
+    { label: 'Patientin', value: 'Maier, per Geburtsdatum identifiziert' },
+    { label: 'Status', value: 'Gebucht, nichts nachzutragen' },
   ],
   Restaurant: [
-    { label: 'Anliegen', value: 'Reservierung, Samstag' },
-    { label: 'Wunsch', value: '19:30 Uhr, 4 Personen, Fenstertisch' },
-    { label: 'Rückruf', value: 'Nummer hinterlegt' },
-    { label: 'Übergabe', value: 'An den Service, zur Bestätigung' },
+    { label: 'Reservierung', value: 'Samstag, 19:30 Uhr' },
+    { label: 'Tisch', value: '4 Personen, Ecktisch am Fenster' },
+    { label: 'Hinweise', value: 'Nussallergie, Geburtstag mit Kerze' },
+    { label: 'Status', value: 'Reserviert, nichts nachzutragen' },
   ],
   Immobilien: [
-    { label: 'Anliegen', value: 'Interesse an 3-Zimmer-Wohnung' },
-    { label: 'Vorqualifizierung', value: 'Eigennutzung, Finanzierung in Klärung' },
-    { label: 'Nächster Schritt', value: 'Besichtigungstermin vorgeschlagen' },
-    { label: 'Übergabe', value: 'An den Makler, sortiert' },
+    { label: 'Objekt', value: '3 Zimmer, 84 m², Sonnenstraße' },
+    { label: 'Interessent', value: 'Keller, zu zweit, Finanzierung steht' },
+    { label: 'Besichtigung', value: 'Donnerstag, 18:30 Uhr' },
+    { label: 'Status', value: 'Gebucht, im Kalender des Maklers' },
   ],
   'Sport & Fitness': [
-    { label: 'Anliegen', value: 'Yoga-Kurs, Dienstag 18:00 Uhr' },
-    { label: 'Wunsch', value: 'Dauerhaft, jeden Dienstag' },
-    { label: 'Status', value: 'Auf der Liste, Bestätigung durch das Team' },
-    { label: 'Übergabe', value: 'An das Studio' },
+    { label: 'Kurs', value: 'Yoga, dienstags 19:15 Uhr' },
+    { label: 'Mitglied', value: 'Yilmaz, Nr. 4471' },
+    { label: 'Warteliste', value: 'Dienstag, 18:00 Uhr' },
+    { label: 'Status', value: 'Gebucht, ab nächster Woche' },
   ],
 };
 
 /*
-  Der Ausschnitt zeigt genug, damit das Gespräch verständlich ist: Anliegen,
-  Rückfrage, Antwort, Abschluss des ersten Schritts. Das vollständige Protokoll
-  bleibt einen Klick entfernt — es ist Beleg, nicht Einstieg, und acht
-  Nachrichten haben auf der Startseite zwischen Produkt und Preis mehr Platz
-  belegt als die Ergebnisdarstellung, um die es geht.
-*/
-const AUSSCHNITT_LAENGE = 4;
+  WIE DIESE GESPRÄCHE GEBAUT SIND — Stand 30.09.2026.
 
+  Jedes Beispiel zeigt im Ausschnitt einen vollständigen Ablauf in fünf
+  Zügen, so wie ein echtes Gespräch beginnt:
+
+    1. Der Assistent meldet sich mit dem Namen des Betriebs und sagt, dass
+       ein KI-System spricht. Das ist keine Stilfrage: Die Ansage ist nach
+       Art. 50 KI-VO Pflicht, nicht abschaltbar (OWNER-INPUT.md, C), und die
+       Website verspricht sie wörtlich. Ein Beispiel ohne sie widerspräche
+       der eigenen Seite.
+    2. Der Anrufer nennt sein Anliegen samt Randbedingung.
+    3. Der Assistent zeigt, dass er MITDENKT: Er erkennt den Anrufer im
+       System, hält die Randbedingung ein („vor eins"), löst einen Konflikt
+       mit einer besseren Alternative („um 20 Uhr ausgebucht — der Ecktisch
+       um 19:30 Uhr") oder nennt die Fakten aus dem Exposé.
+    4. Der Anrufer wählt.
+    5. Der Assistent bucht und liest den Termin vollständig zurück.
+
+  Das vollständige Gespräch zeigt dann die zweite Hälfte der Kompetenz: wo
+  der Assistent bewusst aufhört (medizinische Fragen gehen an das
+  Praxisteam), was er zusätzlich festhält (Allergie, Warteliste, eine Frage
+  an den Makler) und dass Verschieben und Absagen ebenfalls im Gespräch
+  erledigt werden.
+
+  Grenzen, die jede Zeile einhält: keine medizinische Einschätzung, keine
+  SMS- oder E-Mail-Bestätigung als Standard (SMS_EMAIL_CONFIRMATION),
+  Bestätigung mündlich im Gespräch; Namen, Betriebe und Zahlen sind
+  erfunden, der Abschnitt ist als nachgestelltes Beispiel gekennzeichnet.
+
+  LÄNGE IST TEIL DES ENTWURFS. Im gepinnten Modus muss die Bühne unter die
+  Navigation eines Laptop-Fensters passen; jede Zeile im Ausschnitt ist
+  deshalb auf höchstens zwei Bildschirmzeilen geschrieben.
+*/
+const AUSSCHNITT_LAENGE = 5;
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCROLL-GESTEUERTE ERZÄHLUNG (Stand 30.09.2026)
+   ═══════════════════════════════════════════════════════════════════════════
+   Auf dem Desktop bleibt der Abschnitt für rund zweieinhalb Bildschirmhöhen
+   stehen, und die Scrollposition erzählt den Ablauf: Erst der Anruf, dann das
+   Gespräch Nachricht für Nachricht, dann die Buchung Zeile für Zeile, zuletzt
+   der Status: erledigt — der Termin steht im System, niemand trägt nach. Der Besucher steuert das Tempo selbst —
+   nichts läuft von allein, nichts wird übersprungen, und ein Scroll zurück
+   spielt die Szene rückwärts.
+
+   Drei Regeln halten das sicher:
+
+   1. NUR AUF DEM CLIENT. `pinned` ist im Prerender und beim ersten Client-
+      Render `false`; erst ein Effekt schaltet es für Desktop-Viewports mit
+      genug Höhe und ohne `prefers-reduced-motion` ein. Im HTML steht also
+      jede Nachricht und jede Zeile vollständig sichtbar — kein `opacity: 0`
+      im Prerender, keine unsichtbaren Inhalte für Crawler oder ohne
+      JavaScript.
+
+   2. UNTER DEM ERSTEN BILDSCHIRM. Der Abschnitt folgt auf den Hero; nichts
+      hier ist LCP-Kandidat.
+
+   3. DERSELBE INHALT. Tabs, Ausschnitt, vollständiges Protokoll und
+      Zusammenfassung sind Wort für Wort dieselben wie ohne Erzählung. Die
+      Erzählung ist eine Darstellungsschicht über dem Markup, keine zweite
+      Fassung. Auf Mobilgeräten und kleinen Bildschirmen übernimmt eine
+      native CSS-Scroll-Timeline (`.cq-view-rise`) den gestaffelten Einstieg
+      — ohne JavaScript und ohne Pinning.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/*
+  Gepinnt wird nur, wenn die ganze Bühne unter der festen Navigation (72 px)
+  Platz hat. Die Media Query ist die Vorbedingung (Desktop, Bewegung erlaubt,
+  keine Zwergfenster); ob es WIRKLICH passt, wird danach GEMESSEN: Ein
+  ResizeObserver vergleicht die Höhe der kompakten Bühne mit dem freien
+  Fensterausschnitt und hebt den Pin auf, sobald ein Pixel fehlen würde.
+  Damit hängt der Modus nicht an einer geratenen Schwelle, sondern am
+  tatsächlichen Inhalt — Laptop-Fenster mit ~700 px freier Höhe bekommen die
+  Erzählung, ein zu kleines Fenster die CSS-Scroll-Timeline, und nichts wird
+  je abgeschnitten.
+
+  Die gepinnte Bühne ist dafür KOMPAKTER gesetzt als der freie Abschnitt:
+  Einleitung und Stationen stehen rechts neben der Überschrift statt darunter,
+  die Abstände sind enger, das Gesprächsfeld hat weniger Innenabstand. Der
+  Inhalt ist derselbe.
+*/
+const PINNED_MEDIA =
+  '(min-width: 1024px) and (min-height: 640px) and (prefers-reduced-motion: no-preference)';
+const NAV_HEIGHT_PX = 72;
+/** Luft zwischen Bühne und Fensterrand, die bei der Messung mitzählt. */
+const STAGE_SLACK_PX = 16;
+/*
+  EINPASSEN STATT AUFGEBEN. Ist die Bühne ein paar Pixel zu hoch für das
+  Fenster, wird sie als Ganzes leicht verkleinert (transform: scale), statt
+  den Pin fallen zu lassen. Vorher hing die ganze Erzählung an einer harten
+  Schwelle: 8 px mehr Inhalt, und auf einem typischen Laptop verschwand sie.
+  Unter diesem Faktor wäre der Text zu klein — dann übernimmt der Fluss.
+*/
+const MIN_FIT_SCALE = 0.78;
+
+/** Bildschirmhöhen, die der Abschnitt im gepinnten Modus einnimmt. */
+const STORY_HEIGHT_VH = 260;
+
+/* Anteile am Scrollweg, an denen die Beats liegen. */
+const BEAT = {
+  gespraechStart: 0.06,
+  gespraechEnde: 0.5,
+  kartenStart: 0.5,
+  zeilenStart: 0.56,
+  zeilenEnde: 0.9,
+  erledigt: 0.9,
+} as const;
+
+const STAGES = ['Anruf', 'Gespräch', 'Buchung', 'Erledigt'] as const;
+
+function stageAt(p: number): number {
+  if (p < BEAT.gespraechStart) return 0;
+  if (p < BEAT.kartenStart) return 1;
+  if (p < BEAT.erledigt) return 2;
+  return 3;
+}
+
+/**
+ * Ein Element, das zwischen `von` und `bis` des (gefederten) Scrollwegs
+ * erscheint. Nachrichten wachsen dabei aus der Ecke, aus der sie kommen —
+ * Anrufer rechts unten, Assistent links unten —, wie in einem Messenger.
+ * Nur Opacity und Transform: kein Layout, keine Neuberechnung beim Scrollen.
+ */
+function Beat({
+  progress,
+  von,
+  bis,
+  aktiv,
+  index,
+  herkunft = 'mitte',
+  stil = 'fluss',
+  as: Tag = 'div',
+  className,
+  children,
+}: {
+  progress: MotionValue<number>;
+  von: number;
+  bis: number;
+  aktiv: boolean;
+  /** Staffelung für die CSS-Scroll-Timeline, solange JavaScript nicht läuft. */
+  index: number;
+  herkunft?: 'links' | 'rechts' | 'mitte';
+  /**
+   * `buehne` — die gepinnte Erzählung: Opacity und 16 px Anstieg am rohen
+   * Scrollweg, exakt die freigegebene Fassung (Stand 19840d0). Kein Scale,
+   * keine Feder: Die Bühne steht still, und die Nachricht folgt dem Finger
+   * ohne Nachlauf.
+   * `fluss` — Telefone und Tablets ohne Pin.
+   */
+  stil?: 'buehne' | 'fluss';
+  as?: 'div' | 'li';
+  className?: string;
+  children: ReactNode;
+}) {
+  const buehne = stil === 'buehne';
+  const opacity = useTransform(progress, [von, bis], [0, 1]);
+  const y = useTransform(progress, [von, bis], [buehne ? 16 : 18, 0]);
+  const scale = useTransform(progress, [von, bis], [buehne || herkunft === 'mitte' ? 1 : 0.965, 1]);
+  const Comp = Tag === 'li' ? motion.li : motion.div;
+  const transformOrigin =
+    herkunft === 'links' ? 'left bottom' : herkunft === 'rechts' ? 'right bottom' : 'center';
+  return (
+    <Comp
+      className={className}
+      style={
+        !aktiv
+          ? ({ '--cq-i': index } as Record<string, number>)
+          : buehne
+            ? { opacity, y }
+            : { opacity, y, scale, transformOrigin, willChange: 'transform, opacity' }
+      }
+    >
+      {children}
+    </Comp>
+  );
+}
+
+/*
+  Feder für den Scrollweg. Rohes scrollYProgress springt mit jedem Wheel-
+  Ereignis; die Feder läuft ihm mit etwas Masse nach und macht aus Stufen
+  eine Bewegung. Die Werte sind so gewählt, dass die Verzögerung unter
+  einer Zehntelsekunde bleibt — gefühlt direkt, sichtbar weich.
+*/
+const SCROLL_SPRING = { stiffness: 170, damping: 30, mass: 0.35, restDelta: 0.0005 } as const;
+
+/** Im Fluss: Anteil des Gesprächswegs, auf dem die Nachrichten erscheinen.
+ *  Der Rest gehört der Buchung auf der Karte. */
+const GESPRAECH_FLUSS_ENDE = 0.66;
+
+/*
+  ZWEI ZUSTÄNDE, NICHT EINER.
+
+  `compact` — das Layout. Gilt, sobald der Bildschirm grundsätzlich in Frage
+  kommt (Media Query). Es hängt NICHT an der Messung.
+  `pinned`  — das Verhalten (sticky Bühne, scrollgesteuerte Beats). Gilt nur,
+  wenn die kompakte Bühne tatsächlich unter die Navigation passt.
+
+  Getrennt, weil die Messung sonst sich selbst widerlegt: Hinge das Layout am
+  Pin, wechselte ein zu hoher Tab auf das großzügige freie Layout — und das
+  wäre bei jeder späteren Messung zu hoch, der Pin käme nie zurück. So wird
+  immer dieselbe kompakte Bühne gemessen, und der Pin folgt ihr in beide
+  Richtungen.
+*/
+function useStoryMode(stageRef: React.RefObject<HTMLDivElement>): {
+  compact: boolean;
+  pinned: boolean;
+  animated: boolean;
+  fitScale: number;
+} {
+  const [eligible, setEligible] = useState(false);
+  // 1 = passt in natürlicher Größe. Gemessen wird die UNSKALIERTE Höhe
+  // (offsetHeight ignoriert transform), daher kein Rückkopplungseffekt.
+  const [fitScale, setFitScale] = useState(1);
+  // Scrollgesteuerte Beats laufen auf JEDEM Gerät mit erlaubter Bewegung —
+  // gepinnt, wo die Bühne passt, sonst im Fluss. Im Prerender `false`.
+  const [animated, setAnimated] = useState(false);
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const mq = window.matchMedia('(prefers-reduced-motion: no-preference)');
+    const apply = (m: boolean) => startTransition(() => setAnimated(m));
+    apply(mq.matches);
+    const handler = (e: MediaQueryListEvent) => apply(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const mq = window.matchMedia(PINNED_MEDIA);
+    const apply = (m: boolean) => startTransition(() => setEligible(m));
+    apply(mq.matches);
+    const handler = (e: MediaQueryListEvent) => apply(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  useEffect(() => {
+    if (!eligible || typeof ResizeObserver !== 'function') return;
+    const stage = stageRef.current;
+    if (!stage) return;
+    const measure = () => {
+      const available = window.innerHeight - NAV_HEIGHT_PX - STAGE_SLACK_PX;
+      const natural = stage.offsetHeight;
+      // Auf zwei Nachkommastellen gerundet: keine Neuberechnung für
+      // Sub-Pixel-Schwankungen beim Scrollen mobiler Browserleisten.
+      const next = natural > 0 ? Math.min(1, Math.floor((available / natural) * 100) / 100) : 1;
+      startTransition(() => setFitScale((cur) => (cur === next ? cur : next)));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(stage);
+    window.addEventListener('resize', measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [eligible, stageRef]);
+
+  return { compact: eligible, pinned: eligible && fitScale >= MIN_FIT_SCALE, animated, fitScale };
+}
+
+const spotlight = spotlightHandlers();
 export function SolutionShowcase() {
   const [activeIndustry, setActiveIndustry] = useState<Industry>('Arztpraxis');
   const [transkriptOffen, setTranskriptOffen] = useState(false);
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const baseId = useId();
+
+  const sectionRef = useRef<HTMLElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const chatRef = useRef<HTMLOListElement>(null);
+  const cardRef = useRef<HTMLDListElement>(null);
+  const { compact, pinned, animated, fitScale } = useStoryMode(stageRef);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end end'],
+  });
+  /*
+    FLUSS-MODUS: Ist die Bühne nicht gepinnt (kleinere Fenster, Tablets,
+    Telefone), hängt jede Liste an ihrer EIGENEN Lage im Fenster. Das
+    Gespräch beginnt, wenn seine Oberkante bei 88 % der Fensterhöhe steht,
+    und ist vollständig, wenn seine Unterkante 58 % erreicht — die
+    Nachrichten erscheinen also genau dort, wo das Auge gerade liest.
+  */
+  const chatScroll = useScroll({ target: chatRef, offset: ['start 0.88', 'end 0.58'] });
+  const cardScroll = useScroll({ target: cardRef, offset: ['start 0.88', 'end 0.62'] });
+  const chatSmooth = useSpring(chatScroll.scrollYProgress, SCROLL_SPRING);
+  const cardSmooth = useSpring(cardScroll.scrollYProgress, SCROLL_SPRING);
+  const [stage, setStage] = useState(0);
+  useMotionValueEvent(scrollYProgress, 'change', (p) => {
+    const next = stageAt(p);
+    setStage((cur) => (cur === next ? cur : next));
+  });
+  // Die gepinnte Bühne läuft am ROHEN Scrollweg — so wie freigegeben.
+  const railScale = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  const cardOpacity = useTransform(scrollYProgress, [BEAT.kartenStart, BEAT.zeilenStart], [0.35, 1]);
+  const cardY = useTransform(scrollYProgress, [BEAT.kartenStart, BEAT.zeilenStart], [20, 0]);
+  const statusPinned = useTransform(scrollYProgress, [BEAT.erledigt, 0.97], [0, 1]);
+  /*
+    REIHENFOLGE IM FLUSS. Nebeneinander (Desktop, nicht gepinnt) steht die
+    Karte höher als das Ende des Gesprächs — sie würde „gebucht" zeigen,
+    bevor der Assistent gebucht hat. Die Zeilen folgen deshalb dem SPÄTEREN
+    von zwei Signalen: dem Ende des Gesprächs (letztes Drittel seines Wegs) und
+    der eigenen Lage der Karte. Nebeneinander entscheidet das Gespräch,
+    untereinander (Telefon) die Karte — ohne Sonderfall im Layout.
+  */
+  const rowsFlow = useTransform([cardSmooth, chatSmooth], ([karte, gespraech]: number[]) =>
+    Math.min(karte, Math.max(0, Math.min(1, (gespraech - GESPRAECH_FLUSS_ENDE) / (1 - GESPRAECH_FLUSS_ENDE)))),
+  );
+  const statusFlow = useTransform(rowsFlow, [0.86, 1], [0, 1]);
 
   const scenario = SCENARIOS.find((s) => s.label === activeIndustry)!;
   const SvcIcon = scenario.solution.serviceIcon;
@@ -274,28 +602,83 @@ export function SolutionShowcase() {
     tabRefs.current[next]?.focus();
   };
 
+  const abschluss = (
+    <div className={compact ? 'flex flex-col items-start gap-2.5' : 'flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'}>
+      <p className="max-w-[54ch] text-[15px] leading-[1.6] text-pub-ink-2">
+        Welche Abläufe der Assistent im Gespräch zu Ende führt, wo er an einen
+        Menschen übergibt und was er ausdrücklich nicht tut, steht auf der Produktseite.
+      </p>
+      <PubLinkButton to="/ki-telefonassistent" variant="secondary" size="md" icon={ArrowRight} iconTrailing className="h-auto min-h-11 max-w-full whitespace-normal py-2.5 text-center sm:shrink-0">
+        KI-Telefonassistent ansehen
+      </PubLinkButton>
+    </div>
+  );
+
+  const n = sichtbareNachrichten.length;
+  const gespraechSchritt = (BEAT.gespraechEnde - BEAT.gespraechStart) / n;
+  const zeilenSchritt = (BEAT.zeilenEnde - BEAT.zeilenStart) / summary.length;
+
   return (
+    <MotionConfig reducedMotion="user">
     <section
-      className="border-t border-pub-hairline-soft bg-white py-20 lg:py-28"
+      ref={sectionRef}
+      className={`relative border-t border-pub-hairline-soft bg-white ${pinned ? '' : 'py-20 lg:py-28'}`}
+      style={pinned ? { height: `${STORY_HEIGHT_VH}vh` } : undefined}
       aria-labelledby="showcase-heading"
     >
-      <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
-        <div className="mb-10 max-w-2xl lg:mb-14">
-          <PubEyebrow className="mb-4">Nachgestelltes Beispiel – kein echter Anruf</PubEyebrow>
-          <h2
-            id="showcase-heading"
-            className="mb-4 text-[clamp(30px,3.2vw,40px)] font-bold leading-[1.1] tracking-[-0.02em] text-pub-ink"
-          >
-            Vom Anruf zum Ergebnis.
-          </h2>
-          <p className="max-w-[58ch] text-[17px] leading-[1.6] text-pub-ink-2">
-            Links ein Ausschnitt aus dem Gespräch, rechts das, was danach bei Ihrem
-            Team ankommt: strukturiert, mit Rückrufnummer, zur Bestätigung durch
-            einen Menschen.
-          </p>
+      <div
+        className={pinned ? 'sticky flex items-center overflow-hidden' : undefined}
+        style={pinned ? { top: NAV_HEIGHT_PX, height: `calc(100vh - ${NAV_HEIGHT_PX}px)` } : undefined}
+      >
+      <div
+        ref={stageRef}
+        className={`relative mx-auto w-full max-w-[1200px] px-6 lg:px-10 ${compact ? 'py-3' : ''}`}
+        style={pinned && fitScale < 1 ? { transform: `scale(${fitScale})`, transformOrigin: 'center center' } : undefined}
+      >
+        {pinned && (
+          <motion.div
+            aria-hidden="true"
+            className="cq-story-rail absolute inset-x-6 top-0 h-px bg-pub-ink lg:inset-x-10"
+            style={{ scaleX: railScale }}
+          />
+        )}
+        <div
+          className={
+            compact
+              ? 'mb-5 grid items-end gap-x-10 gap-y-3 pt-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]'
+              : 'mb-10 flex flex-col gap-6 lg:mb-14 lg:flex-row lg:items-end lg:justify-between'
+          }
+        >
+          <div className={compact ? 'min-w-0' : 'max-w-2xl'}>
+            <PubEyebrow className={compact ? 'mb-2.5' : 'mb-4'}>Nachgestelltes Beispiel – kein echter Anruf</PubEyebrow>
+            <h2
+              id="showcase-heading"
+              className={`font-bold leading-[1.1] tracking-[-0.02em] text-pub-ink ${
+                compact ? 'whitespace-nowrap text-[clamp(26px,2.3vw,33px)]' : 'mb-4 text-[clamp(30px,3.2vw,40px)]'
+              }`}
+            >
+              Vom Anruf zum gebuchten Termin.
+            </h2>
+            {!compact && (
+              <p className="max-w-[58ch] text-[17px] leading-[1.6] text-pub-ink-2">
+                Links das Gespräch, rechts das, was danach in Ihrem System steht: Der
+                Termin ist gebucht und dokumentiert. Ihr Team muss nichts nachtragen.
+              </p>
+            )}
+          </div>
+
+          {/* Gepinnt steht die Einleitung RECHTS neben der Überschrift —
+              gleicher Satz, halbe Höhe. */}
+          {compact && (
+            <p className="min-w-0 max-w-[52ch] text-[15px] leading-[1.55] text-pub-ink-2 lg:justify-self-end">
+              Links das Gespräch, rechts das, was danach in Ihrem System steht: Der
+                Termin ist gebucht und dokumentiert. Ihr Team muss nichts nachtragen.
+            </p>
+          )}
         </div>
 
-        <div role="tablist" aria-label="Branche wählen" className="mb-8 flex flex-wrap gap-2">
+        <div className={compact ? 'mb-3 flex flex-wrap items-center justify-between gap-x-8 gap-y-3' : 'mb-8'}>
+        <div role="tablist" aria-label="Branche wählen" className="flex flex-wrap gap-2">
           {SCENARIOS.map((s, i) => {
             const Icon = s.icon;
             const isActive = s.label === activeIndustry;
@@ -311,17 +694,59 @@ export function SolutionShowcase() {
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => { setActiveIndustry(s.label); setTranskriptOffen(false); }}
                 onKeyDown={(e) => onTabKey(e, i)}
-                className={`inline-flex h-11 items-center gap-2 rounded-full border px-4 text-[14px] font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 ${
+                className={`relative inline-flex h-11 items-center gap-2 rounded-full border font-semibold transition-colors duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 ${
+                  compact ? 'px-3.5 text-[13.5px]' : 'px-4 text-[14px]'
+                } ${
                   isActive
-                    ? 'border-pub-ink bg-pub-ink text-white'
+                    ? 'border-transparent text-white'
                     : 'border-pub-ink/15 bg-white text-pub-ink-2 hover:border-pub-ink/40 hover:text-pub-ink'
                 }`}
               >
-                <Icon size={15} strokeWidth={1.75} aria-hidden="true" className={isActive ? 'text-white/70' : 'text-pub-ink-3'} />
-                {s.label}
+                {/* Die Ink-Füllung ist EIN Element, das zwischen den Tabs
+                    gleitet, statt auf dem einen zu verschwinden und auf dem
+                    anderen zu erscheinen. */}
+                {isActive && (
+                  <motion.span
+                    layoutId={`${baseId}-tab-indicator`}
+                    aria-hidden="true"
+                    className="absolute inset-0 rounded-full bg-pub-ink"
+                    transition={{ type: 'spring', stiffness: 420, damping: 36, mass: 0.8 }}
+                  />
+                )}
+                <Icon size={15} strokeWidth={1.75} aria-hidden="true" className={`relative ${isActive ? 'text-white/70' : 'text-pub-ink-3'}`} />
+                <span className="relative">{s.label}</span>
               </button>
             );
           })}
+        </div>
+
+        {/* Stationen der Erzählung — nur im gepinnten Modus, nur auf dem
+            Client, rein dekorativ. Die aktive Station trägt Gewicht und
+            einen gefüllten Punkt, nicht nur eine Farbe. */}
+        {pinned && (
+          <ol aria-hidden="true" className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            {STAGES.map((label, i) => {
+              const aktiv = i === stage;
+              const vorbei = i < stage;
+              return (
+                <li key={label} className="flex items-center gap-2">
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full transition-[background-color,transform] duration-300 ${
+                      aktiv ? 'scale-125 bg-pub-ink' : vorbei ? 'bg-pub-ink/60' : 'bg-pub-ink/20'
+                    }`}
+                  />
+                  <span
+                    className={`text-[12px] uppercase tracking-[0.14em] transition-colors duration-300 ${
+                      aktiv ? 'font-semibold text-pub-ink' : 'font-medium text-pub-ink-4'
+                    }`}
+                  >
+                    {label}
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
+        )}
         </div>
 
         <div
@@ -331,8 +756,11 @@ export function SolutionShowcase() {
           className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]"
         >
           {/* Conversation — excerpt by default, full transcript on request */}
-          <div className="flex min-w-0 flex-col rounded-2xl border border-white/[0.06] bg-pub-ink p-5 sm:p-8">
-            <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <div
+            {...spotlight}
+            className={`cq-surface cq-surface-edge relative flex min-w-0 flex-col rounded-[22px] border border-white/[0.06] bg-pub-ink p-5 ${compact ? '' : 'sm:p-8'}`}
+          >
+            <div className={`flex flex-wrap items-center justify-between gap-3 ${compact ? 'mb-4' : 'mb-6'}`}>
               <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-white/70">
                 Beispielgespräch · {scenario.label}
               </p>
@@ -341,35 +769,53 @@ export function SolutionShowcase() {
                 {scenario.solution.service}
               </span>
             </div>
-            <ol className="space-y-3">
+            <ol ref={chatRef} className={compact ? 'space-y-2.5' : 'space-y-3'}>
               {sichtbareNachrichten.map((msg, i) => {
                 const isAi = msg.role === 'ai';
+                // Gepinnt: Anteil am Weg des ganzen Abschnitts. Im Fluss:
+                // gleichmäßig über den Weg der Liste selbst verteilt.
+                const flussSchritt = GESPRAECH_FLUSS_ENDE / n;
+                const von = pinned ? BEAT.gespraechStart + i * gespraechSchritt : i * flussSchritt;
+                const bis = pinned ? von + gespraechSchritt * 0.8 : von + flussSchritt * 0.9;
                 return (
-                  <li key={`${activeIndustry}-${i}`} className={`flex ${isAi ? 'justify-start' : 'justify-end'}`}>
+                  <Beat
+                    key={`${activeIndustry}-${i}`}
+                    as="li"
+                    progress={pinned ? scrollYProgress : chatSmooth}
+                    stil={pinned ? 'buehne' : 'fluss'}
+                    von={von}
+                    bis={bis}
+                    aktiv={animated}
+                    herkunft={isAi ? 'links' : 'rechts'}
+                    index={i}
+                    className={`flex ${isAi ? 'justify-start' : 'justify-end'} ${animated ? '' : 'cq-view-rise'}`}
+                  >
                     <p
-                      className={`max-w-[92%] rounded-2xl px-4 py-3 text-[14px] leading-[1.55] sm:max-w-[85%] ${
+                      className={`max-w-[92%] rounded-2xl px-4 text-[14px] leading-[1.55] sm:max-w-[85%] ${compact ? 'py-2.5' : 'py-3'} ${
                         isAi ? 'rounded-tl-md bg-white/[0.09] text-white/90' : 'rounded-tr-md bg-white text-pub-ink'
                       }`}
                     >
                       <span className="sr-only">{isAi ? 'Assistent: ' : 'Anrufer: '}</span>
                       {msg.text}
                     </p>
-                  </li>
+                  </Beat>
                 );
               })}
             </ol>
             {hatMehr && (
-              <div className="mt-5 border-t border-white/[0.08] pt-4">
+              <div className={`border-t border-white/[0.08] ${compact ? 'mt-4 pt-3' : 'mt-5 pt-4'}`}>
                 <button
                   type="button"
                   onClick={() => setTranskriptOffen((v) => !v)}
                   aria-expanded={transkriptOffen}
                   aria-controls={`${baseId}-transkript`}
-                  className="inline-flex h-11 items-center gap-2 text-[14.5px] font-semibold text-white/85 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
+                  className={`group inline-flex items-center gap-2 text-[14.5px] font-semibold text-white/85 ${compact ? 'h-9' : 'h-11'} transition-colors hover:text-white focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink`}
                 >
-                  {transkriptOffen
-                    ? 'Ausschnitt zeigen'
-                    : 'Vollständiges Beispielgespräch ansehen'}
+                  <span className="cq-underline">
+                    {transkriptOffen
+                      ? 'Ausschnitt zeigen'
+                      : 'Vollständiges Beispielgespräch ansehen'}
+                  </span>
                   <ChevronDown
                     size={15}
                     aria-hidden="true"
@@ -386,38 +832,72 @@ export function SolutionShowcase() {
           </div>
 
           {/* Summary + what changes */}
-          <div className="flex min-w-0 flex-col gap-5">
-            <div className="rounded-2xl border border-pub-hairline bg-white p-5 shadow-[0_12px_32px_rgba(11,15,20,0.06)] sm:p-8">
-              <p className="mb-5 text-[12px] font-semibold uppercase tracking-[0.14em] text-pub-ink-3">
-                Beispiel einer Gesprächszusammenfassung
-              </p>
-              <dl className="divide-y divide-pub-hairline-soft">
-                {summary.map(({ label, value }) => (
-                  <div key={label} className="grid gap-1 py-3 min-[380px]:grid-cols-[120px_1fr] min-[380px]:gap-4 sm:grid-cols-[150px_1fr]">
-                    <dt className="text-[13.5px] text-pub-ink-3">{label}</dt>
-                    <dd className="text-[15px] font-medium leading-snug text-pub-ink">{value}</dd>
-                  </div>
-                ))}
+          <div className={`flex min-w-0 flex-col ${compact ? 'gap-4' : 'gap-5'}`}>
+            <motion.div
+              className={`rounded-[22px] border border-pub-hairline bg-white p-5 shadow-[0_1px_2px_rgba(11,15,20,0.03),0_24px_60px_-32px_rgba(11,15,20,0.18)] ${compact ? 'sm:p-5' : 'sm:p-8'} ${animated ? '' : 'cq-view-rise'}`}
+              style={pinned ? { opacity: cardOpacity, y: cardY } : undefined}
+            >
+              <div className={`flex flex-wrap items-center justify-between gap-x-4 gap-y-2 ${compact ? 'mb-3' : 'mb-5'}`}>
+                <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-pub-ink-3">
+                  In Ihrem System
+                </p>
+                {/* Die Bedingung steht am Beispiel selbst, nicht am Seitenende. */}
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-pub-accent-wash px-2.5 py-1 text-[11.5px] font-medium text-pub-accent-ink ring-1 ring-pub-accent-line">
+                  <span className="h-1.5 w-1.5 rounded-full bg-pub-accent-soft" aria-hidden="true" />
+                  {ABWICKLUNG.badge}
+                </span>
+              </div>
+              <dl ref={cardRef} className="divide-y divide-pub-hairline-soft">
+                {summary.map(({ label, value }, j) => {
+                  const flussSchritt = 0.86 / summary.length;
+                  const von = pinned ? BEAT.zeilenStart + j * zeilenSchritt : j * flussSchritt;
+                  const bis = pinned ? von + zeilenSchritt * 0.85 : von + flussSchritt * 0.9;
+                  const letzte = j === summary.length - 1;
+                  return (
+                    <Beat
+                      key={`${activeIndustry}-${label}`}
+                      progress={pinned ? scrollYProgress : rowsFlow}
+                      stil={pinned ? 'buehne' : 'fluss'}
+                      von={von}
+                      bis={bis}
+                      aktiv={animated}
+                      index={j}
+                      className={`relative grid gap-1 min-[380px]:grid-cols-[120px_1fr] min-[380px]:gap-4 sm:grid-cols-[150px_1fr] ${compact ? 'py-2' : 'py-3'}`}
+                    >
+                      {/* Letzter Beat: Die Statuszeile bekommt einen Wash im
+                          Accent-Ton — das ist der Moment, in dem der Termin
+                          im System steht und der Vorgang erledigt ist. */}
+                      {animated && letzte && (
+                        <motion.span
+                          aria-hidden="true"
+                          className="pointer-events-none absolute -inset-x-3 inset-y-0.5 rounded-xl bg-pub-accent-wash ring-1 ring-pub-accent-line"
+                          style={{ opacity: pinned ? statusPinned : statusFlow }}
+                        />
+                      )}
+                      <dt className="relative text-[13.5px] text-pub-ink-3">{label}</dt>
+                      <dd className="relative text-[15px] font-medium leading-snug text-pub-ink">{value}</dd>
+                    </Beat>
+                  );
+                })}
               </dl>
-              <p className="mt-5 text-[13px] leading-relaxed text-pub-ink-3">
-                Notiert wird ein Wunsch, keine Buchung. Die Bestätigung bleibt bei Ihrem Team,
-                bis eine Anbindung an Ihr System geprüft und eingerichtet ist.
+              <p className={`text-[13px] leading-relaxed text-pub-ink-3 ${compact ? 'mt-3' : 'mt-5'}`}>
+                {ABWICKLUNG.kurz} Wir richten sie für Ihren Kalender oder Ihr
+                Buchungssystem ein und prüfen sie vor dem Go-live — der Assistent bucht
+                direkt dort, nicht in einer Liste für Ihr Team.
               </p>
-            </div>
+            </motion.div>
 
+            {/* Gepinnt steht der Abschluss unter der Zusammenfassung, wo die
+                rechte Spalte ohnehin kürzer ist als das Gespräch — so wächst
+                die Bühne nicht über den Bildschirm hinaus. */}
+            {compact && abschluss}
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="max-w-[54ch] text-[15px] leading-[1.6] text-pub-ink-2">
-            Welche Anliegen der Assistent übernimmt, wo er an einen Menschen
-            übergibt und was er ausdrücklich nicht tut, steht auf der Produktseite.
-          </p>
-          <PubLinkButton to="/ki-telefonassistent" variant="secondary" size="md" icon={ArrowRight} iconTrailing className="h-auto min-h-11 max-w-full whitespace-normal py-2.5 text-center sm:shrink-0">
-            KI-Telefonassistent ansehen
-          </PubLinkButton>
-        </div>
+        {!compact && <div className="mt-8">{abschluss}</div>}
+      </div>
       </div>
     </section>
+    </MotionConfig>
   );
 }

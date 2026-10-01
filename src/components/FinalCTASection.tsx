@@ -1,5 +1,9 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Calendar, CircleCheck as CheckCircle } from 'lucide-react';
+import { magneticHandlers, spotlightHandlers } from '@/lib/publicMotion';
+
+const spotlight = spotlightHandlers();
+const magnetic = magneticHandlers(4);
 
 
 /*
@@ -69,7 +73,7 @@ export function FinalCTASection() {
           </div>
 
           <div className="cq-rise cq-rise-d1 lg:sticky lg:top-28">
-            <div className="rounded-2xl bg-pub-ink p-8 sm:p-9">
+            <div {...spotlight} className="cq-surface cq-surface-edge relative rounded-[22px] bg-pub-ink p-8 sm:p-9">
               <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-white/60">
                 Kostenloses Erstgespräch
               </p>
@@ -79,7 +83,8 @@ export function FinalCTASection() {
 
               <Link
                 to="/kontakt"
-                className="mb-3 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white px-6 text-[15px] font-semibold text-pub-ink transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
+                {...magnetic}
+                className="cq-magnetic mb-3 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white px-6 text-[15px] font-semibold text-pub-ink hover:bg-gray-100 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
               >
                 <Calendar size={15} className="text-pub-ink-3" aria-hidden="true" />
                 Erstgespräch vereinbaren
@@ -91,10 +96,11 @@ export function FinalCTASection() {
               */}
               <Link
                 to="/ki-telefonassistent/demo"
-                className="flex h-11 w-full items-center justify-center gap-2 rounded-full border border-white/15 px-6 text-[14px] font-medium text-white/75 transition-colors hover:border-white/35 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
+                {...magnetic}
+                className="group cq-magnetic flex h-11 w-full items-center justify-center gap-2 rounded-full border border-white/15 px-6 text-[14px] font-medium text-white/75 hover:border-white/35 hover:text-white active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink"
               >
                 Demo-Termin anfragen
-                <ArrowRight size={14} aria-hidden="true" />
+                <ArrowRight size={14} aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-0.5" />
               </Link>
 
               <div className="mt-7 space-y-2.5 border-t border-white/10 pt-6 text-[13.5px] leading-relaxed text-white/70">

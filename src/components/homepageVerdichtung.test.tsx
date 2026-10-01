@@ -86,8 +86,22 @@ describe('Beispiel — Ausschnitt zuerst, vollständiges Protokoll auf Wunsch', 
 
   it('zeigt einen benannten Ausschnitt statt des ganzen Protokolls', () => {
     zeigen();
-    expect(screen.getByText(/Ausschnitt — 4 von 8 Nachrichten/)).toBeTruthy();
-    expect(screen.queryByText(/Ihr Terminwunsch geht mit Ihrer Rückrufnummer an die Anmeldung/)).toBeNull();
+    expect(screen.getByText(/Ausschnitt — 5 von 9 Nachrichten/)).toBeTruthy();
+    expect(screen.queryByText(/rufen Sie einfach wieder an/)).toBeNull();
+  });
+
+  it('bucht in jeder Branche schon im Ausschnitt — und meldet sich als KI-System', async () => {
+    const user = userEvent.setup();
+    zeigen();
+    for (const branche of ['Arztpraxis', 'Restaurant', 'Immobilien', 'Sport & Fitness']) {
+      await user.click(screen.getByRole('tab', { name: new RegExp(branche) }));
+      const panel = screen.getByRole('tabpanel');
+      const nachrichten = within(panel).getAllByRole('listitem').map((li) => li.textContent ?? '');
+      // Art. 50 KI-VO: erster Satz des Assistenten, nicht abschaltbar.
+      expect(nachrichten[0]).toMatch(/Assistent:.*KI-Assistent/);
+      // Die Buchung steht im sichtbaren Ausschnitt, nicht erst im Protokoll.
+      expect(nachrichten.join(' ')).toMatch(/eingetragen|reserviert|gebucht/i);
+    }
   });
 
   it('hält den Beispiel-Hinweis neben dem Beispiel sichtbar', () => {
@@ -99,9 +113,9 @@ describe('Beispiel — Ausschnitt zuerst, vollständiges Protokoll auf Wunsch', 
     const user = userEvent.setup();
     zeigen();
     await user.click(screen.getByRole('button', { name: /Vollständiges Beispielgespräch ansehen/ }));
-    expect(screen.getByText(/Ihr Terminwunsch geht mit Ihrer Rückrufnummer an die Anmeldung/)).toBeTruthy();
+    expect(screen.getByText(/rufen Sie einfach wieder an/)).toBeTruthy();
     await user.click(screen.getByRole('button', { name: /Ausschnitt zeigen/ }));
-    expect(screen.queryByText(/Ihr Terminwunsch geht mit Ihrer Rückrufnummer an die Anmeldung/)).toBeNull();
+    expect(screen.queryByText(/rufen Sie einfach wieder an/)).toBeNull();
   });
 
   it('wechselt die Branche und beginnt dort wieder mit dem Ausschnitt', async () => {
@@ -110,12 +124,18 @@ describe('Beispiel — Ausschnitt zuerst, vollständiges Protokoll auf Wunsch', 
     await user.click(screen.getByRole('button', { name: /Vollständiges Beispielgespräch ansehen/ }));
     await user.click(screen.getByRole('tab', { name: /Restaurant/ }));
     expect(screen.getByRole('tab', { name: /Restaurant/ }).getAttribute('aria-selected')).toBe('true');
-    expect(screen.getByText(/Ausschnitt — 4 von 8 Nachrichten/)).toBeTruthy();
+    expect(screen.getByText(/Ausschnitt — 5 von 9 Nachrichten/)).toBeTruthy();
   });
 
-  it('nennt das Ergebnis einen Wunsch, keine Buchung', () => {
+  it('zeigt den Termin als gebucht — und die Bedingung dafür am Beispiel selbst', () => {
     zeigen();
-    expect(screen.getByText('Terminwunsch')).toBeTruthy();
-    expect(screen.getByText(/Notiert wird ein Wunsch, keine Buchung/)).toBeTruthy();
+    // Der Assistent bucht im Gespräch; der Status ist „gebucht", nicht „notiert".
+    expect(screen.getByText('Donnerstag, 9:40 Uhr')).toBeTruthy();
+    expect(screen.getByText('Gebucht, nichts nachzutragen')).toBeTruthy();
+    expect(screen.queryByText(/Terminwunsch/)).toBeNull();
+    // BOOKING_WRITE (OWNER-INPUT.md): Buchen wird nur mit der verifizierten
+    // Anbindung gezeigt — Badge und Fußnote stehen am Beispiel, nicht am Seitenende.
+    expect(screen.getByText('Beispiel mit verifizierter Kalenderanbindung')).toBeTruthy();
+    expect(screen.getByText(/Bei eingerichteter und verifizierter Systemanbindung/)).toBeTruthy();
   });
 });
