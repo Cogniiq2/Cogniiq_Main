@@ -43,6 +43,7 @@ import { motion } from 'framer-motion';
 import { ChevronDown, ArrowUpRight, ArrowRight } from 'lucide-react';
 import { PubLinkButton } from '@/components/public/PublicUI';
 import { Logo } from './Logo';
+import { ScrollProgress } from './ScrollProgress';
 import { PremiumMobileNav } from './ui/premium-mobile-nav';
 import { useAuth } from '@/contexts/AuthContext';
 import { SiteSearchTrigger } from './search/SiteSearchTrigger';
@@ -304,9 +305,10 @@ export function Navigation() {
           />
         </Suspense>
       )}
-      {/* ScrollProgress and SectionRail are no longer mounted: the percentage chip
-          was clipped at the viewport edge and the rail label overlapped hero content
-          between 1280 and 1536px on every public page. */}
+      {/* Lesefortschritt: nur die 2-px-Linie, ohne den früheren Prozent-Chip, der am
+          Viewport-Rand abgeschnitten wurde. SectionRail bleibt ausgehängt: Ihr Label
+          überlagerte zwischen 1280 und 1536 px den Hero auf jeder öffentlichen Seite. */}
+      <ScrollProgress />
     </>
   );
 }
