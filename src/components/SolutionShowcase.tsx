@@ -2,6 +2,7 @@ import {
   startTransition,
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
   type KeyboardEvent,
@@ -9,11 +10,14 @@ import {
 } from 'react';
 import {
   MotionConfig,
+  animate,
   motion,
+  useMotionValue,
   useMotionValueEvent,
   useScroll,
   useSpring,
   useTransform,
+  type AnimationPlaybackControls,
   type MotionValue,
 } from 'framer-motion';
 import {
@@ -28,6 +32,15 @@ import {
 
 import { PubEyebrow, PubLinkButton } from '@/components/public/PublicUI';
 import { spotlightHandlers } from '@/lib/publicMotion';
+import {
+  UHR_RUHE,
+  aufZeitplan,
+  enthuellteHoehe,
+  uhrDauer,
+  zeitplanAb,
+  zeitplanFuer,
+  type Zeitplan,
+} from '@/lib/gespraechsuhr';
 import { ABWICKLUNG } from '@/lib/telefonassistent-copy';
 
 type Industry = 'Arztpraxis' | 'Restaurant' | 'Immobilien' | 'Sport & Fitness';
@@ -458,6 +471,55 @@ const SCROLL_SPRING = { stiffness: 170, damping: 30, mass: 0.35, restDelta: 0.00
  *  Der Rest gehört der Buchung auf der Karte. */
 const GESPRAECH_FLUSS_ENDE = 0.66;
 
+/* ═══════════════════════════════════════════════════════════════════════
+   GESPRÄCHSUHR — ein Zeitstrahl für Ausschnitt UND vollständiges Gespräch
+
+   Gemessen am 02.10.2026: Das Aufklappen machte die Bühne 250 px höher
+   (669 → 919 px). Bei 1440×900 schrumpfte deshalb die ganze Bühne auf 88 %,
+   bei 1280×800 fiel der Pin weg — der Abschnitt verlor schlagartig 936 px
+   Höhe, die Seite sprang ans Ende der Erzählung. Zusätzlich wurden die
+   Fenster aller Nachrichten neu auf 9 statt 5 verteilt: Was gerade erschien,
+   sprang auf volle Deckkraft, und wer nach dem Ausschnitt aufklappte, bekam
+   die vier neuen Nachrichten ohne jede Bewegung.
+
+   Die Rechnung liegt in lib/gespraechsuhr.ts (mit Tests).
+
+   Jetzt läuft das Gespräch auf EINER Größe, gemessen in Nachrichten:
+   Nachricht i erscheint, während der Wert von i nach i + 0,8 läuft. Der Wert
+   ist das Minimum aus Scrollweg und Uhr, im Fluss nach unten begrenzt durch
+   einen Boden:
+
+     gespraech = max(boden, min(scrollweg, uhr))
+
+   - Scrollweg (gepinnt): eine stückweise lineare Abbildung des Abschnitts-
+     Fortschritts. Im Ausschnitt exakt die freigegebene Zeitachse
+     (6 % → 50 % für 5 Nachrichten). Beim Aufklappen wird sie AB DER AKTUELLEN
+     STELLE neu geplant: Was schon steht, bleibt; der Rest teilt sich den
+     verbleibenden Weg.
+   - Uhr: in Ruhe unbegrenzt. Beim Umschalten läuft sie von der aktuellen
+     Stelle zum Ziel — so kommen Nachrichten, deren Scrollweg schon hinter
+     dem Besucher liegt, nacheinander an statt alle zugleich.
+   - Boden (Fluss): Was beim Aufklappen schon gelesen wurde, blendet nicht
+     wieder aus, wenn die Liste wächst und sich ihr eigener Fortschritt ändert.
+
+   Gepinnt bleibt die Bühne dabei gleich hoch: Das Gespräch steht in einem
+   Fenster von der Höhe des Ausschnitts und rückt wie ein Messenger nach
+   oben, sobald eine neue Nachricht ankommt. Ebenfalls nur Transform.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/** Abschnitt des Scrollwegs, auf dem das Gespräch läuft. */
+const GESPRAECHSPHASE = { start: BEAT.gespraechStart, ende: BEAT.gespraechEnde } as const;
+/** Anteil einer Nachrichteneinheit, über den eine Nachricht einblendet. */
+const EINBLENDEN_BUEHNE = 0.8;
+const EINBLENDEN_FLUSS = 0.9;
+/** Gleichmäßige Ankunft: sanft an, sanft aus — kein Ruck am Anfang oder Ende. */
+const UHR_EASE = [0.4, 0, 0.2, 1] as const;
+/** Höhe des weichen Ausblendens am oberen Fensterrand. */
+const FENSTER_MASKE_PX = 56;
+
+/** Layout-Effekt im Browser, im Prerender (renderToString) ein normaler Effekt. */
+const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
+
 /*
   ZWEI ZUSTÄNDE, NICHT EINER.
 
@@ -581,12 +643,161 @@ export function SolutionShowcase() {
   );
   const statusFlow = useTransform(rowsFlow, [0.86, 1], [0, 1]);
 
+  /* ── Gesprächsuhr (siehe Kopfkommentar oben) ─────────────────────── */
+  // Eingehängte Nachrichten. Folgt `transkriptOffen` beim Aufklappen sofort,
+  // beim Zuklappen erst, wenn die zusätzlichen Nachrichten ausgeblendet sind.
+  const [anzahl, setAnzahl] = useState(AUSSCHNITT_LAENGE);
+  const anzahlRef = useRef(AUSSCHNITT_LAENGE);
+  const pinnedRef = useRef(pinned);
+  const zeitplanRef = useRef<Zeitplan>(zeitplanFuer(GESPRAECHSPHASE, AUSSCHNITT_LAENGE));
+  const unterkantenRef = useRef<number[]>([]);
+  const uhrLauf = useRef<AnimationPlaybackControls | null>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const ankerRef = useRef<number | null>(null);
+  const uhr = useMotionValue(UHR_RUHE);
+  const boden = useMotionValue(0);
+  const fensterHoehe = useMotionValue(0);
+  // Zählt hoch, wenn sich Zeitplan, Modus oder Messung ändern — Refs lösen
+  // selbst keine Neuberechnung der abgeleiteten Werte aus.
+  const takt = useMotionValue(0);
+  const neuBerechnen = () => takt.set(takt.get() + 1);
+
+  const gespraech = useTransform(
+    [scrollYProgress, chatSmooth, uhr, boden, takt],
+    ([p, fluss, u, b]: number[]) => {
+      const weg = pinnedRef.current
+        ? aufZeitplan(zeitplanRef.current, p)
+        : (fluss * anzahlRef.current) / GESPRAECH_FLUSS_ENDE;
+      return Math.max(b, Math.min(weg, u));
+    },
+  );
+  // Messenger-Versatz: wie weit die Liste im Fenster nach oben gerückt ist.
+  // Ungefedert wie alle Beats der Bühne — folgt dem Finger ohne Nachlauf;
+  // die Uhr liefert beim Umschalten ihre eigene, weiche Kurve.
+  const versatz = useTransform([gespraech, fensterHoehe, takt], ([u, h]: number[]) =>
+    pinnedRef.current && anzahlRef.current > AUSSCHNITT_LAENGE
+      ? Math.max(0, enthuellteHoehe(u, unterkantenRef.current, EINBLENDEN_BUEHNE) - h)
+      : 0,
+  );
+  const listeY = useTransform(versatz, (v) => -v);
+  const fensterMaske = useTransform(versatz, (v) => {
+    const deckung = 1 - Math.min(1, v / FENSTER_MASKE_PX);
+    return `linear-gradient(to bottom, rgba(0,0,0,${deckung.toFixed(3)}) 0px, #000 ${FENSTER_MASKE_PX}px)`;
+  });
+
+  const anzahlSetzen = (n: number) => {
+    anzahlRef.current = n;
+    setAnzahl(n);
+    neuBerechnen();
+  };
+
+  useIsoLayoutEffect(() => {
+    pinnedRef.current = pinned;
+    neuBerechnen();
+  }, [pinned]);
+
+  useEffect(() => () => uhrLauf.current?.stop(), []);
+
+  // Unterkanten der Nachrichten in der Liste. offsetTop/-Height ignorieren
+  // transform — weder Bühnenskalierung noch Messenger-Versatz verfälschen sie.
+  useIsoLayoutEffect(() => {
+    const liste = chatRef.current;
+    if (!liste) return;
+    const messen = () => {
+      const kanten = Array.from(liste.children, (el) => {
+        const li = el as HTMLElement;
+        return li.offsetTop + li.offsetHeight;
+      });
+      unterkantenRef.current = kanten;
+      fensterHoehe.set(kanten[Math.min(AUSSCHNITT_LAENGE, kanten.length) - 1] ?? 0);
+      neuBerechnen();
+    };
+    messen();
+    if (typeof ResizeObserver !== 'function') return;
+    const ro = new ResizeObserver(messen);
+    ro.observe(liste);
+    return () => ro.disconnect();
+  }, [anzahl, activeIndustry, pinned, compact]);
+
+  // Zuklappen im Fluss: Die Liste wird kürzer, der Schalter bleibt, wo er war.
+  useIsoLayoutEffect(() => {
+    const vorher = ankerRef.current;
+    ankerRef.current = null;
+    const knopf = toggleRef.current;
+    if (vorher === null || !knopf || pinnedRef.current) return;
+    const delta = knopf.getBoundingClientRect().top - vorher;
+    if (Math.abs(delta) > 0.5) window.scrollBy({ top: delta, behavior: 'instant' as ScrollBehavior });
+  }, [anzahl]);
+
+  const transkriptUmschalten = () => {
+    const oeffnen = !transkriptOffen;
+    const ziel = oeffnen ? scenario.chat.length : AUSSCHNITT_LAENGE;
+    setTranskriptOffen(oeffnen);
+    uhrLauf.current?.stop();
+
+    if (!animated) {
+      if (!oeffnen && toggleRef.current) ankerRef.current = toggleRef.current.getBoundingClientRect().top;
+      anzahlSetzen(ziel);
+      return;
+    }
+
+    const jetzt = Math.min(gespraech.get(), anzahlRef.current);
+
+    if (oeffnen) {
+      if (pinnedRef.current) {
+        zeitplanRef.current = zeitplanAb(GESPRAECHSPHASE, scrollYProgress.get(), jetzt, ziel);
+        boden.set(0);
+      } else {
+        boden.set(Math.max(boden.get(), jetzt));
+      }
+      uhr.set(jetzt);
+      anzahlSetzen(ziel);
+      uhrLauf.current = animate(uhr, ziel, {
+        duration: uhrDauer(ziel - jetzt),
+        ease: UHR_EASE,
+        onComplete: () => uhr.set(UHR_RUHE),
+      });
+      return;
+    }
+
+    boden.set(Math.min(boden.get(), ziel));
+    const abschliessen = () => {
+      if (pinnedRef.current) {
+        zeitplanRef.current = zeitplanAb(GESPRAECHSPHASE, scrollYProgress.get(), Math.min(gespraech.get(), ziel), ziel);
+      }
+      if (toggleRef.current) ankerRef.current = toggleRef.current.getBoundingClientRect().top;
+      anzahlSetzen(ziel);
+      uhr.set(UHR_RUHE);
+    };
+    if (jetzt <= ziel) {
+      abschliessen();
+      return;
+    }
+    uhr.set(jetzt);
+    uhrLauf.current = animate(uhr, ziel, {
+      duration: uhrDauer(jetzt - ziel) * 0.7,
+      ease: UHR_EASE,
+      onComplete: abschliessen,
+    });
+  };
+
+  const brancheWaehlen = (label: Industry) => {
+    uhrLauf.current?.stop();
+    uhr.set(UHR_RUHE);
+    boden.set(0);
+    zeitplanRef.current = zeitplanFuer(GESPRAECHSPHASE, AUSSCHNITT_LAENGE);
+    setActiveIndustry(label);
+    setTranskriptOffen(false);
+    anzahlSetzen(AUSSCHNITT_LAENGE);
+  };
+
   const scenario = SCENARIOS.find((s) => s.label === activeIndustry)!;
   const SvcIcon = scenario.solution.serviceIcon;
   const summary = SUMMARIES[activeIndustry];
   const hatMehr = scenario.chat.length > AUSSCHNITT_LAENGE;
-  const sichtbareNachrichten =
-    transkriptOffen || !hatMehr ? scenario.chat : scenario.chat.slice(0, AUSSCHNITT_LAENGE);
+  const sichtbareNachrichten = hatMehr ? scenario.chat.slice(0, anzahl) : scenario.chat;
+  // Gepinnt und aufgeklappt: Das Gespräch steht im Messenger-Fenster.
+  const fenster = pinned && animated && anzahl > AUSSCHNITT_LAENGE;
 
   const onTabKey = (e: KeyboardEvent<HTMLButtonElement>, index: number) => {
     const last = SCENARIOS.length - 1;
@@ -597,8 +808,7 @@ export function SolutionShowcase() {
     if (e.key === 'End') next = last;
     if (next === null) return;
     e.preventDefault();
-    setActiveIndustry(SCENARIOS[next].label);
-    setTranskriptOffen(false);
+    brancheWaehlen(SCENARIOS[next].label);
     tabRefs.current[next]?.focus();
   };
 
@@ -614,8 +824,6 @@ export function SolutionShowcase() {
     </div>
   );
 
-  const n = sichtbareNachrichten.length;
-  const gespraechSchritt = (BEAT.gespraechEnde - BEAT.gespraechStart) / n;
   const zeilenSchritt = (BEAT.zeilenEnde - BEAT.zeilenStart) / summary.length;
 
   return (
@@ -692,7 +900,7 @@ export function SolutionShowcase() {
                 aria-selected={isActive}
                 aria-controls={`${baseId}-panel`}
                 tabIndex={isActive ? 0 : -1}
-                onClick={() => { setActiveIndustry(s.label); setTranskriptOffen(false); }}
+                onClick={() => brancheWaehlen(s.label)}
                 onKeyDown={(e) => onTabKey(e, i)}
                 className={`relative inline-flex h-11 items-center gap-2 rounded-full border font-semibold transition-colors duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 ${
                   compact ? 'px-3.5 text-[13.5px]' : 'px-4 text-[14px]'
@@ -769,22 +977,32 @@ export function SolutionShowcase() {
                 {scenario.solution.service}
               </span>
             </div>
-            <ol ref={chatRef} className={compact ? 'space-y-2.5' : 'space-y-3'}>
+            {/* Messenger-Fenster: gepinnt und aufgeklappt so hoch wie der
+                Ausschnitt; die Liste rückt nach oben, oben blendet sie weich aus. */}
+            <motion.div
+              style={
+                fenster
+                  ? { height: fensterHoehe, overflow: 'hidden', maskImage: fensterMaske, WebkitMaskImage: fensterMaske }
+                  : undefined
+              }
+            >
+            <motion.ol
+              ref={chatRef}
+              className={`relative ${compact ? 'space-y-2.5' : 'space-y-3'}`}
+              style={fenster ? { y: listeY } : undefined}
+            >
               {sichtbareNachrichten.map((msg, i) => {
                 const isAi = msg.role === 'ai';
-                // Gepinnt: Anteil am Weg des ganzen Abschnitts. Im Fluss:
-                // gleichmäßig über den Weg der Liste selbst verteilt.
-                const flussSchritt = GESPRAECH_FLUSS_ENDE / n;
-                const von = pinned ? BEAT.gespraechStart + i * gespraechSchritt : i * flussSchritt;
-                const bis = pinned ? von + gespraechSchritt * 0.8 : von + flussSchritt * 0.9;
+                // Einheit: Nachrichten. Gepinnt bildet der Zeitplan den Weg des
+                // Abschnitts darauf ab, im Fluss der Weg der Liste selbst.
                 return (
                   <Beat
                     key={`${activeIndustry}-${i}`}
                     as="li"
-                    progress={pinned ? scrollYProgress : chatSmooth}
+                    progress={gespraech}
                     stil={pinned ? 'buehne' : 'fluss'}
-                    von={von}
-                    bis={bis}
+                    von={i}
+                    bis={i + (pinned ? EINBLENDEN_BUEHNE : EINBLENDEN_FLUSS)}
                     aktiv={animated}
                     herkunft={isAi ? 'links' : 'rechts'}
                     index={i}
@@ -801,12 +1019,14 @@ export function SolutionShowcase() {
                   </Beat>
                 );
               })}
-            </ol>
+            </motion.ol>
+            </motion.div>
             {hatMehr && (
               <div className={`border-t border-white/[0.08] ${compact ? 'mt-4 pt-3' : 'mt-5 pt-4'}`}>
                 <button
+                  ref={toggleRef}
                   type="button"
-                  onClick={() => setTranskriptOffen((v) => !v)}
+                  onClick={transkriptUmschalten}
                   aria-expanded={transkriptOffen}
                   aria-controls={`${baseId}-transkript`}
                   className={`group inline-flex items-center gap-2 text-[14.5px] font-semibold text-white/85 ${compact ? 'h-9' : 'h-11'} transition-colors hover:text-white focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pub-ink`}
