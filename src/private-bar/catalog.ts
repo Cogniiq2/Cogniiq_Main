@@ -316,6 +316,27 @@ export const PRIVATE_BAR_CATALOG: readonly PrivateBarProduct[] = [
     available: true,
     sortOrder: 150,
   },
+  {
+    // The only non-alcoholic item designAparts I stocks. Category 'water'
+    // rather than 'beer': the label reads "Coffeinhaltige Orangenlimonade mit
+    // Cola", so it belongs in the section the catalogue already calls
+    // "Wasser & Refreshments", beside S.Pellegrino.
+    id: 'paulaner-spezi',
+    name: 'Paulaner Spezi',
+    shortLabel: 'Paulaner Spezi',
+    category: 'water',
+    origin: null,
+    volume: '0,5 l',
+    priceCents: 350,
+    image: {
+      basePath: '/private-bar/products/paulaner-spezi',
+      width: 240,
+      height: 951,
+      widths: [240, 480],
+    },
+    available: true,
+    sortOrder: 160,
+  },
 ];
 
 /** Display order for the catalogue sections. */

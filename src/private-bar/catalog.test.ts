@@ -99,7 +99,7 @@ describe('Private Bar catalogue', () => {
   });
 
   it('gives each apartment the catalogue the owner stocked', () => {
-    expect(productsForApartment('designaparts1')).toHaveLength(6);
+    expect(productsForApartment('designaparts1')).toHaveLength(7);
     expect(productsForApartment('designaparts2')).toHaveLength(9);
   });
 

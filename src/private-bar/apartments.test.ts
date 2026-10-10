@@ -71,15 +71,24 @@ describe('apartment mapping', () => {
 });
 
 describe('product assignment', () => {
-  /** The five wines are designAparts I's alone. */
+  /** designAparts I's alone — the five wines and the Spezi. */
   const DESIGNAPARTS_1_ONLY = [
     'planeta-plumbago-nero-davola-2021',
     'ottella-rosesroses',
     'cavalchina-custoza-2025',
     'nunzio-ghiraldi-il-gruccione',
     'manz-grauburgunder-fruchtecke',
+    'paulaner-spezi',
   ];
-  const DESIGNAPARTS_1 = [...DESIGNAPARTS_1_ONLY, 'bayreuther-hell'];
+  const DESIGNAPARTS_1 = [
+    'planeta-plumbago-nero-davola-2021',
+    'ottella-rosesroses',
+    'cavalchina-custoza-2025',
+    'nunzio-ghiraldi-il-gruccione',
+    'manz-grauburgunder-fruchtecke',
+    'bayreuther-hell',
+    'paulaner-spezi',
+  ];
   /** Sold in both apartments — one product, two shelves. */
   const SHARED = 'bayreuther-hell';
   const DESIGNAPARTS_2 = [
@@ -94,9 +103,9 @@ describe('product assignment', () => {
     's-pellegrino',
   ];
 
-  it('sells the five wines in designAparts I, and only there', () => {
+  it('sells the five wines and the Spezi in designAparts I, and only there', () => {
     expect([...productIdsForApartment('designaparts1')]).toEqual(DESIGNAPARTS_1);
-    expect(productIdsForApartment('designaparts1')).toHaveLength(6);
+    expect(productIdsForApartment('designaparts1')).toHaveLength(7);
     for (const id of DESIGNAPARTS_1_ONLY) {
       expect(productBelongsToApartment(id, 'designaparts1'), id).toBe(true);
       expect(productBelongsToApartment(id, 'designaparts2'), id).toBe(false);
@@ -157,6 +166,18 @@ describe('prices', () => {
     for (const [id, cents] of Object.entries(expected)) {
       expect(productById(id)?.priceCents, id).toBe(cents);
     }
+  });
+
+  it('prices the Paulaner Spezi at the owner-set amount', () => {
+    const spezi = productById('paulaner-spezi');
+    expect(spezi?.priceCents).toBe(350);
+    expect(spezi?.volume).toBe('0,5 l');
+    // A refreshment, not a beer: it renders beside S.Pellegrino under
+    // "Wasser & Refreshments".
+    expect(spezi?.category).toBe('water');
+    // designAparts I only — designAparts II does not stock it.
+    expect(productBelongsToApartment('paulaner-spezi', 'designaparts1')).toBe(true);
+    expect(productBelongsToApartment('paulaner-spezi', 'designaparts2')).toBe(false);
   });
 
   it('names the Manz bottle as it is actually labelled, without renaming its id', () => {

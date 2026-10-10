@@ -50,6 +50,7 @@ export const APARTMENTS: Readonly<Record<ApartmentKey, ApartmentConfig>> = {
       // product — one id, one price, one card, one photograph. Only the stock
       // is per-apartment, because the bottles physically are.
       'bayreuther-hell',
+      'paulaner-spezi',
     ],
     sortOrder: 10,
   },

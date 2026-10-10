@@ -56,6 +56,13 @@ where apartment_id = 'bolagio-designaparts-1'
 -- this file only ever touches the designAparts I shelf.
 
 
+update public.private_bar_inventory
+set stock = 4, updated_at = now()
+where apartment_id = 'bolagio-designaparts-1'
+  and product_id = 'paulaner-spezi';
+-- Paulaner Spezi 0,5 l
+
+
 -- Verify the resulting inventory:
 select product_id, stock
 from public.private_bar_inventory

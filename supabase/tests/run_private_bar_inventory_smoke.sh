@@ -33,6 +33,8 @@ run_psql -f "$ROOT_DIR/supabase/migrations/20260915120000_private_bar_designapar
 run_psql -f "$ROOT_DIR/supabase/migrations/20260915120000_private_bar_designaparts1_inventory.sql"
 run_psql -f "$ROOT_DIR/supabase/migrations/20260915130000_private_bar_designaparts1_bayreuther.sql"
 run_psql -f "$ROOT_DIR/supabase/migrations/20260915130000_private_bar_designaparts1_bayreuther.sql"
+run_psql -f "$ROOT_DIR/supabase/migrations/20261010120000_private_bar_designaparts1_paulaner_spezi.sql"
+run_psql -f "$ROOT_DIR/supabase/migrations/20261010120000_private_bar_designaparts1_paulaner_spezi.sql"
 
 run_psql <<'SQL'
 \set ON_ERROR_STOP on
@@ -146,12 +148,12 @@ declare
   v_stock  integer;
   v_before integer;
 begin
-  -- The additive migrations seeded five wines and one beer, and replaying them
-  -- changed nothing.
+  -- The additive migrations seeded five wines, one beer and the Spezi, and
+  -- replaying them changed nothing.
   select count(*) into v_stock from private_bar_inventory where apartment_id = 'bolagio-designaparts-1';
-  if v_stock <> 6 then raise exception 'FAIL 9: designAparts I has % rows, expected 6', v_stock; end if;
+  if v_stock <> 7 then raise exception 'FAIL 9: designAparts I has % rows, expected 7', v_stock; end if;
   select sum(stock) into v_stock from private_bar_inventory where apartment_id = 'bolagio-designaparts-1';
-  if v_stock <> 8 then raise exception 'FAIL 9: designAparts I stock totals %, expected 8 (5 wines + 3 beers)', v_stock; end if;
+  if v_stock <> 12 then raise exception 'FAIL 9: designAparts I stock totals %, expected 12 (5 wines + 3 beers + 4 Spezi)', v_stock; end if;
 
   -- An order in one apartment decrements ONLY that apartment.
   select sum(stock) into v_before from private_bar_inventory where apartment_id = 'bolagio-apartment-1';
