@@ -1,26 +1,27 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Preis- und Wirtschaftlichkeitsrechner für /ki-telefonassistent.
+// Preis- und Nutzenrechner für /ki-telefonassistent.
 //
-// EINE KOMPONENTE, ZWEI ERGEBNISSE. Preis und Wirtschaftlichkeit sind getrennte
-// Rechnungen mit getrennten Ergebnisblöcken und getrenntem Hinweis — aber sie
-// brauchen dieselben zwei Mengenangaben. Wer sie doppelt abfragt, verliert
-// genau die Leute, die er überzeugen will. Die Mengenangaben stehen deshalb
-// einmal oben; darunter rechnen beide Blöcke mit.
+// EINE KOMPONENTE, ZWEI ERGEBNISSE. Preis und Nutzen sind getrennte Rechnungen
+// mit getrennten Ergebnisblöcken — aber sie brauchen dieselben Mengenangaben.
+// Die stehen deshalb einmal oben; darunter rechnen beide Blöcke mit.
 //
 // KEINE ARITHMETIK IN DIESER DATEI. Alles Rechnen steht in
 // `src/lib/telefonassistent-rechner.ts` und ist dort einzeln getestet. Hier
 // stehen Eingaben, Text und Darstellung — und kein einziger Betrag als Literal.
 //
 // KEIN GATE. Kein E-Mail-Feld, kein Countdown, keine versteckte Voreinstellung,
-// kein Ergebnis, das erst nach einem Klick auf einen CTA erscheint. Die
-// Transparenz IST das Verkaufsargument; sie zu verriegeln würde es aufheben.
+// kein Ergebnis, das erst nach einem Klick auf einen CTA erscheint.
+//
+// DREI BAUSTEINE STATT EINES „ROI". Seit dem 23.10.2026 trennt der Rechner,
+// was vorher in einer Zahl verschwand: Zeit (Stunden), tatsächlich entfallende
+// Kosten (Euro) und zusätzliche Termine (Euro, nur mit Kapazität). Nur die
+// beiden Geldbausteine gehen in den Saldo; ein Euro-Zeitwert bleibt daneben
+// stehen. Jeder Baustein ist freiwillig — was nicht gewählt ist, steht nicht
+// in der Rechnung und wird nicht still auf null gesetzt.
 //
 // KEINE ZAHL AN GA4. Die Ereignisse melden, DASS gerechnet wurde, nie WOMIT.
 // Anrufaufkommen, Stundensätze und Deckungsbeiträge sind Geschäftszahlen des
-// Besuchers und verlassen den Browser nicht.
-//
-// KEINE NEUE ABHÄNGIGKEIT. Vier Grundrechenarten brauchen keine Bibliothek und
-// kein Diagramm.
+// Besuchers und verlassen den Browser nicht — auch nicht über die URL.
 // ─────────────────────────────────────────────────────────────────────────────
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { ArrowRight, Info } from "lucide-react";
@@ -38,64 +39,32 @@ import {
 } from "@/lib/telefonassistent-copy";
 import {
   UNBEKANNT,
+  UNVOLLSTAENDIG,
+  berechneNutzen,
   berechnePreis,
-  berechneWirtschaftlichkeit,
-  kapazitaetsEingabe,
-  personalkostenEingabe,
-  type PersonalModus,
   eur,
   zahl,
-  type ChancenEingabe,
   type FehlendeAngabe,
+  type NutzenEingabe,
   type Zusatzsprachen,
 } from "@/lib/telefonassistent-rechner";
 
 /*
-  Startwerte. Bewusst unauffällige Beispielgrößen, die als Beispiel benannt
-  werden — nicht als Branchendurchschnitt, den wir nicht erhoben haben.
-  Stundensatz und Chancenfelder starten LEER: Für sie gibt es keinen Wert, den
-  wir für einen beliebigen Betrieb belegen könnten, und ein Vorschlagswert wäre
-  hier eine Behauptung im Gewand einer Bequemlichkeit.
+  Startwerte für das Aufkommen. Bewusst unauffällige Beispielgrößen, die als
+  Beispiel beschriftet sind — nicht als Branchendurchschnitt, den wir nicht
+  erhoben haben. Alle Nutzenfelder starten LEER: Für sie gibt es keinen Wert,
+  den wir für einen beliebigen Betrieb belegen könnten.
 */
 const START_ANRUFE = 300;
 const START_DAUER = 2;
-/*
-  KEIN VORGABEWERT FÜR DEN ROUTINEANTEIL — und das ist der Kern der Korrektur
-  vom 11.09.2026.
 
-  Hier standen 20 %. Die Zahl wurde als „Automatisierungsgrad" beschriftet und
-  las sich damit als Aussage über Cogniiq: der Assistent schafft ein Fünftel.
-  Das ist falsch und verkauft das Produkt weit unter Wert. Einen KONFIGURIERTEN
-  Routineablauf wickelt der Assistent vollständig ab — bis zu 100 % der
-  konfigurierten Routineanrufe, von der Annahme über das Gespräch bis zum
-  abgeschlossenen Vorgang, ohne dass daraus eine Aufgabe für einen Menschen
-  entsteht. Ausnahmen bleiben Ausnahmen: Notfälle, Anliegen außerhalb des
-  konfigurierten Umfangs, bewusst menschlich gehaltene Fälle.
-
-  Was tatsächlich schwankt, ist etwas anderes: WELCHER ANTEIL DER ANRUFE EINES
-  BETRIEBS überhaupt zu diesen Routineabläufen gehört. Das ist eine Eigenschaft
-  des Anrufmix des Kunden, keine Leistungsgrenze des Systems — und deshalb eine
-  Zahl, die nur der Kunde kennt. Sie startet leer. Ein Vorschlagswert wäre hier
-  wieder eine Behauptung im Gewand einer Bequemlichkeit.
-*/
-
-/*
-  DARSTELLUNG, NICHT RECHNUNG — Stand 30.09.2026.
-
-  Der Rechner ist die Stelle, an der ein Besucher entscheidet. Deshalb verhält
-  er sich wie ein Instrument, nicht wie ein Formular: Der Schieber zeigt seinen
-  Wert als gefüllte Strecke mit Rastermarken, die Einheit steht im Feld, der
-  Betrag rollt auf den neuen Wert, statt zu springen, und der Tarif pulsiert
-  einmal, wenn er wechselt. Keine dieser Bewegungen verändert eine Zahl: Jeder
-  Zwischenwert ist nur Anzeige, das Ergebnis kommt unverändert aus dem Kern.
-  Unter `prefers-reduced-motion` und im Prerender steht sofort der Endwert.
-*/
 const CARD =
   "rounded-[22px] border border-pub-hairline bg-white shadow-[0_1px_2px_rgba(11,15,20,0.03),0_24px_60px_-32px_rgba(11,15,20,0.16)] dark:border-gray-800 dark:bg-gray-900/50";
 const LABEL = "text-[15px] font-medium text-gray-800 dark:text-gray-200";
 const HINT = "text-[14px] text-pub-ink-3 dark:text-gray-500 leading-[1.55]";
 const ZEILE =
   "flex items-baseline justify-between gap-6 py-2.5 border-b border-gray-100 dark:border-gray-800 last:border-0";
+const KASTEN = "rounded-2xl bg-pub-paper-2 px-5 py-4 ring-1 ring-pub-hairline-soft dark:bg-gray-800/50";
 
 /** Rollender Betrag. Zeigt beim Mount und ohne Animationsumgebung sofort den
  *  Endwert; nur eine ÄNDERUNG wird über ~550 ms hochgezählt. Während des
@@ -104,8 +73,6 @@ const ZEILE =
 function Rollwert({ wert, format }: { wert: number; format: (n: number) => string }) {
   const [anzeige, setAnzeige] = useState(wert);
   const [rollt, setRollt] = useState(false);
-  // Der zuletzt GEZEIGTE Wert — auch mitten in einer unterbrochenen Rolle.
-  // Ein neuer Lauf startet von dort, nicht vom alten Ziel.
   const gezeigt = useRef(wert);
   const frame = useRef<number | null>(null);
 
@@ -176,8 +143,17 @@ function PulsBeiWechsel({
   );
 }
 
-/** Zahlenfeld mit optionalem Schieber. Der exakte Wert bleibt immer tippbar —
- *  ein Schieber allein macht präzise Angaben unmöglich. */
+/**
+ * Zahlenfeld mit optionalem Schieber. Der exakte Wert bleibt immer tippbar.
+ *
+ * Validierung an genau einer Stelle: Eingaben werden auf [min, max] geklemmt
+ * und — bei `ganzzahl` — gerundet; das Feld zeigt danach die Zahl, mit der
+ * tatsächlich gerechnet wird, nicht die getippte. Leer bleibt leer (`null`),
+ * eine ungültige Zeichenfolge wird zu leer, nie zu 0. Der Schieber kann ein
+ * kleineres Maximum haben als das Feld (`schieberMax`): Ein Verbund mit
+ * 8.000 Anrufen soll die Zahl eintippen können, ohne dass der Schieber dafür
+ * unbedienbar wird.
+ */
 function Zahlenfeld({
   label,
   hinweis,
@@ -185,7 +161,9 @@ function Zahlenfeld({
   onChange,
   min,
   max,
+  schieberMax,
   step = 1,
+  ganzzahl = false,
   einheit,
   schieber = true,
   platzhalter,
@@ -196,37 +174,46 @@ function Zahlenfeld({
   onChange: (v: number | null) => void;
   min: number;
   max: number;
+  schieberMax?: number;
   step?: number;
+  ganzzahl?: boolean;
   einheit: string;
   schieber?: boolean;
   platzhalter?: string;
 }) {
   const id = useId();
+  const hinweisId = `${id}-hinweis`;
+  const sMax = schieberMax ?? max;
+  const normiere = (raw: string): number | null => {
+    if (raw.trim() === "") return null;
+    const n = Number(raw.replace(",", "."));
+    if (!Number.isFinite(n)) return null;
+    const geklemmt = Math.min(max, Math.max(min, n));
+    return ganzzahl ? Math.round(geklemmt) : geklemmt;
+  };
   return (
     <div>
       <label htmlFor={id} className={LABEL}>
         {label}
       </label>
-      {hinweis && <p className={`${HINT} mt-1`}>{hinweis}</p>}
+      {hinweis && (
+        <p id={hinweisId} className={`${HINT} mt-1`}>
+          {hinweis}
+        </p>
+      )}
       <div className="mt-2 flex flex-wrap items-center gap-3">
-        {/* Einheit IM Feld, rechts: Zahl und Einheit sind ein Wert und stehen
-            deshalb in einem Rahmen. Der Rahmen hebt sich beim Fokus, statt nur
-            die Farbe zu wechseln. */}
         <div className="relative flex h-12 min-w-0 flex-1 basis-[180px] items-center rounded-xl border border-pub-hairline bg-white transition-[border-color,box-shadow] duration-200 focus-within:border-pub-ink focus-within:shadow-[0_0_0_4px_rgba(11,15,20,0.06)] hover:border-pub-ink/35 dark:border-gray-700 dark:bg-gray-900">
           <input
             id={id}
             type="number"
-            inputMode="decimal"
+            inputMode={ganzzahl ? "numeric" : "decimal"}
             min={min}
+            max={max}
             step={step}
             value={wert === null ? "" : wert}
             placeholder={platzhalter}
-            onChange={(e) => {
-              const raw = e.target.value;
-              if (raw === "") return onChange(null);
-              const n = Number(raw);
-              onChange(Number.isFinite(n) ? Math.max(min, n) : null);
-            }}
+            aria-describedby={hinweis ? hinweisId : undefined}
+            onChange={(e) => onChange(normiere(e.target.value))}
             className="cq-numfield h-full w-full min-w-0 rounded-xl bg-transparent pl-4 pr-2 text-[17px] font-semibold text-gray-900 tabular-nums placeholder:font-normal placeholder:text-pub-ink-4 focus:outline-none dark:text-gray-100"
           />
           <span className="pointer-events-none shrink-0 whitespace-nowrap pr-4 text-[13.5px] font-medium text-pub-ink-3 dark:text-gray-400">
@@ -238,11 +225,11 @@ function Zahlenfeld({
             type="range"
             aria-label={`${label} (Schieberegler)`}
             min={min}
-            max={max}
+            max={sMax}
             step={step}
-            value={wert ?? min}
-            onChange={(e) => onChange(Number(e.target.value))}
-            style={{ "--cq-fill": `${(Math.min(Math.max((wert ?? min) - min, 0), max - min) / (max - min)) * 100}%` } as React.CSSProperties}
+            value={Math.min(sMax, wert ?? min)}
+            onChange={(e) => onChange(normiere(e.target.value))}
+            style={{ "--cq-fill": `${(Math.min(Math.max((wert ?? min) - min, 0), sMax - min) / (sMax - min)) * 100}%` } as React.CSSProperties}
             className="cq-range basis-full min-w-0"
           />
         )}
@@ -309,8 +296,7 @@ function Zeile({
   );
 }
 
-/** Betrag mit Vorrang vor dem erklärenden Text — nur in der kompakten Fassung,
- *  wo zwei Zahlen die Antwort sind und alles andere ihre Bedingung. */
+/** Betrag mit Vorrang vor dem erklärenden Text. */
 function Betrag({
   label,
   wert,
@@ -330,7 +316,7 @@ function Betrag({
       <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-pub-ink-3 dark:text-gray-400">
         {label}
       </p>
-      <p className="mt-2 text-[clamp(30px,3.4vw,40px)] font-bold leading-[1.05] tracking-[-0.025em] text-gray-900 dark:text-gray-100 tabular-nums">
+      <p className="mt-2 text-[clamp(26px,3vw,36px)] font-bold leading-[1.05] tracking-[-0.025em] text-gray-900 dark:text-gray-100 tabular-nums break-words">
         {betrag !== undefined && format ? (
           <Rollwert wert={betrag} format={format} />
         ) : (
@@ -344,124 +330,102 @@ function Betrag({
   );
 }
 
-/**
- * Beschriftung der Felder, die für eine vollständige Rechnung nötig sind.
- *
- * Gehört hierher und nicht in den Rechenkern: Der Kern nennt die Felder bei
- * ihrem technischen Namen, die Oberfläche bei dem Namen, den der Besucher im
- * Formular gelesen hat. Beides auseinanderzuhalten heißt, dass die Meldung
- * „es fehlen noch zwei Angaben" auf Felder zeigt, die tatsächlich so
- * beschriftet sind.
- */
+/** Beschriftung der Felder, die ein aktiver Baustein noch braucht. */
 const FEHLT_LABEL: Record<FehlendeAngabe, string> = {
-  stundenkosten: "Vollkosten einer Arbeitsstunde",
-  routineanteil: "Anteil Ihrer Routineabläufe",
-  personalkostenMonat: "monatliche Vollkosten der Telefon-/Empfangsbesetzung",
-  vermeidbarerAnteil: "tatsächlich vermeidbarer Anteil dieser Kosten",
-  verpassteAnrufe: "heute nicht bearbeitete relevante Anrufe",
-  chancenanteil: "Anteil echter Chancen",
-  abschlussquote: "Abschluss- bzw. Buchungsquote",
-  deckungsbeitrag: "Deckungsbeitrag je gewonnenem Fall",
-  rueckgewinnbar: "realistisch zurückgewinnbarer Anteil",
+  anrufeHeuteVomTeam: "Anrufe, die heute Ihr Team führt",
+  minutenProAnrufTeam: "Bearbeitungszeit je Anruf im Team",
+  uebernommenProzent: "übernommener Anteil",
+  entfallendeAusgaben: "tatsächlich entfallende Ausgaben",
+  zusaetzlicheTermine: "zusätzliche wahrgenommene Termine",
+  deckungsbeitrag: "Deckungsbeitrag je Termin",
 };
 
 /**
- * Die Wahl zwischen den beiden wirtschaftlichen Lesarten.
+ * Ein Baustein, den der Besucher ein- oder ausschaltet.
  *
- * BEWUSST NEUTRAL GESTALTET. Beide Karten sind gleich groß, gleich
- * formuliert und tragen dieselbe Betonung; die aktive ist markiert, nicht
- * empfohlen. Es gibt kein „empfohlen", kein Häkchen-Icon an der einen und
- * keinen Hinweis, dass die eine mehr Ersparnis ergibt. Modus B ergibt in
- * fast jedem Betrieb das größere Ergebnis — genau deshalb darf die
- * Oberfläche nicht dorthin schieben. Die Frage ist eine Tatsachenfrage über
- * den Betrieb des Besuchers, keine Präferenz.
- *
- * `role="radio"` statt zweier Buttons ohne Semantik: Für die Tastatur- und
- * Screenreader-Bedienung ist das eine Auswahl aus zwei sich ausschließenden
- * Möglichkeiten, und genau so wird sie angesagt.
+ * `role="checkbox"`: Es sind drei unabhängige Ja/Nein-Entscheidungen, keine
+ * Auswahl aus Alternativen. Keiner ist vorgewählt, keiner als „empfohlen"
+ * markiert — die Kostenbausteine ergeben das größere Ergebnis, und genau
+ * deshalb darf die Oberfläche nicht dorthin schieben.
  */
-function ModusWahl({
+function BausteinWahl({
   aktiv,
+  kennung,
   titel,
   erklaerung,
-  onClick,
+  onToggle,
 }: {
   aktiv: boolean;
+  kennung: string;
   titel: string;
   erklaerung: string;
-  onClick: () => void;
+  onToggle: () => void;
 }) {
   return (
     <button
       type="button"
-      role="radio"
+      role="checkbox"
       aria-checked={aktiv}
-      onClick={onClick}
+      onClick={onToggle}
       className={`text-left rounded-2xl border p-5 transition-[border-color,background-color,box-shadow] duration-200 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2 ${
         aktiv
           ? "border-gray-900 dark:border-gray-100 bg-gray-50 dark:bg-gray-800/60 shadow-[inset_0_0_0_1px_#0b0f14]"
           : "border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500"
       }`}
     >
-      <span className="block text-[16px] font-semibold text-gray-900 dark:text-gray-100 leading-[1.45]">
-        {titel}
+      <span className="flex items-center gap-3">
+        <span
+          aria-hidden="true"
+          className={`flex-shrink-0 w-7 h-7 rounded-full text-[13px] font-bold flex items-center justify-center ${
+            aktiv
+              ? "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
+              : "bg-gray-100 dark:bg-gray-800 text-gray-500"
+          }`}
+        >
+          {kennung}
+        </span>
+        <span className="block text-[16px] font-semibold text-gray-900 dark:text-gray-100 leading-[1.45]">
+          {titel}
+        </span>
       </span>
       <span className="block text-[14px] text-gray-600 dark:text-gray-400 leading-[1.6] mt-2">
         {erklaerung}
       </span>
-    </button>
-  );
-}
-
-/** Nummerierte Zwischenüberschrift. Macht den Ablauf als Ablauf lesbar, ohne
- *  einen Assistenten mit Seitenwechseln zu bauen — alles bleibt auf einer
- *  Seite und jederzeit korrigierbar. */
-function Schritt({ nummer, titel }: { nummer: number; titel: string }) {
-  return (
-    <div className="flex items-center gap-3 mb-4">
-      <span className="flex-shrink-0 w-7 h-7 rounded-full bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-[13px] font-bold flex items-center justify-center">
-        {nummer}
+      <span className="block text-[13px] font-medium mt-2 text-pub-ink-3 dark:text-gray-500">
+        {aktiv ? "Wird berücksichtigt" : "Nicht berücksichtigt"}
       </span>
-      <h4 className="text-[17px] font-semibold text-gray-900 dark:text-gray-100">{titel}</h4>
-    </div>
+    </button>
   );
 }
 
 /**
  * Darstellungsvariante — UND NUR DARSTELLUNG.
  *
- * `voll` ist die Fassung der Flaggschiff-Seite: jede Preisposition einzeln,
- * Sprachwahl, vollständiger Rechenweg.
+ * `voll` ist die Fassung der Flaggschiff- und der Kostenseite: jede
+ * Preisposition einzeln, Tarifvergleich, Sprachwahl, Nutzenbausteine.
  *
  * `kompakt` ist die Fassung für Seiten, auf denen der Rechner nicht die
  * Hauptsache ist — heute genau eine: die Startseite. Sie zeigt die PREISFRAGE
- * („Was kostet das bei meinem Aufkommen?") und lässt den mehrschrittigen
- * Wirtschaftlichkeitsteil WEG; der Weg dorthin steht als eigener Schritt
- * darunter und führt auf die vollständige Fassung. Der Grund ist nicht
- * Geschmack: Der Wirtschaftlichkeitsteil braucht fünf Angaben, die ein
- * Erstbesucher nicht im Kopf hat, und er stand bisher auf der Startseite über
- * mehrere Bildschirme zwischen Produkt und Abschluss. Wer ihn will, bekommt
- * ihn vollständig — eine Fassung, ein Rechenweg.
- *
- * Sie lässt also Zeilen und einen ganzen Block WEG, sie rechnet nicht anders:
- * Dieselben Eingaben laufen durch dieselben Funktionen aus
- * `src/lib/telefonassistent-rechner.ts` und ergeben denselben Tarif, dieselben
- * Monatskosten und denselben Nettoeffekt. `rechner-konsistenz.test.tsx` prüft
- * genau das — zwei Fassungen, die bei gleicher Eingabe verschiedene Zahlen
- * zeigen, wären schlimmer als gar kein zweiter Rechner.
+ * und lässt den Nutzenteil WEG; der Weg dorthin steht als eigener Schritt
+ * darunter und führt auf die vollständige Fassung. Sie rechnet nicht anders:
+ * Dieselben Eingaben laufen durch dieselben Funktionen und ergeben denselben
+ * Tarif und dieselben Monatskosten — `rechner-konsistenz.test.tsx` prüft das.
  */
 export type RechnerVariante = "voll" | "kompakt";
 
 export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVariante } = {}) {
   const kompakt = variante === "kompakt";
   /*
-    „Gerechnet" wird EINMAL je Besuch gemeldet, beim ersten Eingriff in ein
-    Feld — nicht bei jedem Tastendruck und nicht bei jeder Reglerbewegung. Ein
-    Ereignis je Schieberpixel wäre Ereignismüll, der keine Auswertung trägt.
-    Gemeldet wird weiterhin nur DASS, nie WOMIT.
+    Gemeldet wird EINMAL je Besuch, DASS gerechnet wurde — beim ersten Eingriff
+    in ein Preisfeld bzw. beim ersten Einschalten eines Nutzenbausteins. Ein
+    Ereignis je Schieberpixel wäre Ereignismüll. „Berechnet" (ein Ergebnis
+    liegt vor) ist davon getrennt und wird ebenfalls höchstens einmal gemeldet;
+    der Klick auf das Gespräch ist ein drittes, eigenes Ereignis. Nie womit.
   */
   const preisGemeldet = useRef(false);
   const roiGemeldet = useRef(false);
+  const preisBerechnetGemeldet = useRef(false);
+  const roiBerechnetGemeldet = useRef(false);
   const meldePreisStart = useCallback(() => {
     if (preisGemeldet.current) return;
     preisGemeldet.current = true;
@@ -476,79 +440,83 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
   const [anrufe, setAnrufe] = useState<number | null>(START_ANRUFE);
   const [dauer, setDauer] = useState<number | null>(START_DAUER);
   const [sprachen, setSprachen] = useState<Zusatzsprachen>(0);
-  /*
-    PERSONALMODUS — die wirtschaftliche Lesart, die der Besucher wählt.
 
-    Vorbelegt ist `kapazitaet`, und zwar NICHT weil sie die richtige wäre,
-    sondern weil sie die ZURÜCKHALTENDERE ist: Sie bewertet nur freigesetzte
-    Zeit und behauptet keine Lohnersparnis. Mit `personalkosten` als Vorgabe
-    würde der Rechner einem Besucher, der nur klickt, das größere Ergebnis
-    unterschieben. Die Vorgabe darf nie die sein, die besser aussieht.
-  */
-  const [personalModus, setPersonalModus] = useState<PersonalModus>("kapazitaet");
+  // Baustein A — Zeit
+  const [zeitAktiv, setZeitAktiv] = useState(false);
+  const [teamAnrufe, setTeamAnrufe] = useState<number | null>(null);
+  const [teamMinuten, setTeamMinuten] = useState<number | null>(null);
+  const [uebernommen, setUebernommen] = useState<number | null>(null);
+  const [restaufwand, setRestaufwand] = useState<number | null>(null);
   const [stundenkosten, setStundenkosten] = useState<number | null>(null);
-  const [routineanteil, setRoutineanteil] = useState<number | null>(null);
-  const [personalkostenMonat, setPersonalkostenMonat] = useState<number | null>(null);
-  const [vermeidbarerAnteil, setVermeidbarerAnteil] = useState<number | null>(null);
-  const [verpasst, setVerpasst] = useState<number | null>(null);
-  const [chancenAnteil, setChancenAnteil] = useState<number | null>(null);
-  const [abschluss, setAbschluss] = useState<number | null>(null);
+  // Baustein B — Kosten
+  const [kostenAktiv, setKostenAktiv] = useState(false);
+  const [entfallend, setEntfallend] = useState<number | null>(null);
+  // Baustein C — Termine
+  const [termineAktiv, setTermineAktiv] = useState(false);
+  const [zusatzTermine, setZusatzTermine] = useState<number | null>(null);
   const [deckungsbeitrag, setDeckungsbeitrag] = useState<number | null>(null);
-  const [rueckgewinn, setRueckgewinn] = useState<number | null>(null);
+  const [kapazitaet, setKapazitaet] = useState<number | null>(null);
 
+  /*
+    Ein leeres Anruf- oder Dauerfeld ist KEIN Aufkommen von null. Erst wenn
+    beide Felder etwas enthalten, gibt es einen Preis; vorher steht die
+    Aufforderung, nicht „Basis, 300 €".
+  */
+  const volumenVollstaendig = anrufe !== null && dauer !== null;
   const volumen = { anrufeProMonat: anrufe ?? 0, minutenProAnruf: dauer ?? 0 };
-
   const preis = useMemo(() => berechnePreis(volumen, sprachen), [anrufe, dauer, sprachen]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /*
-    Kein Gate mehr zwischen Eingabe und Rechnung: Was der Besucher einträgt,
-    geht direkt in den Kern. Der Kern entscheidet, ob es für eine vollständige
-    Rechnung reicht — nicht ein aufgeklappter oder zugeklappter Bereich.
-  */
-  const chancen: ChancenEingabe = {
-    verpassteAnrufeProMonat: verpasst,
-    davonChancenProzent: chancenAnteil,
-    abschlussquoteProzent: abschluss,
-    deckungsbeitragEur: deckungsbeitrag,
-    rueckgewinnbarProzent: rueckgewinn,
+  const nutzenEingabe: NutzenEingabe = {
+    zeit: {
+      aktiv: zeitAktiv,
+      anrufeHeuteVomTeam: teamAnrufe,
+      minutenProAnrufTeam: teamMinuten,
+      uebernommenProzent: uebernommen,
+      restaufwandProzent: restaufwand,
+      stundenkostenEur: stundenkosten,
+    },
+    kosten: { aktiv: kostenAktiv, entfallendeAusgabenEur: entfallend },
+    termine: {
+      aktiv: termineAktiv,
+      zusaetzlicheTermine: zusatzTermine,
+      deckungsbeitragEur: deckungsbeitrag,
+      freieKapazitaet: kapazitaet,
+    },
   };
-
-  /*
-    Der Kern bekommt AUSSCHLIESSLICH die Felder des gewählten Modus — die des
-    anderen setzt der Konstruktor auf `null`. Ein Besucher, der erst Modus A
-    ausfüllt und dann auf B wechselt, kann deshalb nicht versehentlich beide
-    Arbeitsposten in einer Summe landen lassen. Seine Eingaben bleiben im
-    State erhalten, damit ein Rückwechsel nichts vernichtet; in die Rechnung
-    geht immer nur eine Lesart.
-  */
-  const wirtschaft = useMemo(
-    () =>
-      berechneWirtschaftlichkeit(
-        volumen,
-        preis,
-        personalModus === "kapazitaet"
-          ? kapazitaetsEingabe(stundenkosten, routineanteil)
-          : personalkostenEingabe(personalkostenMonat, vermeidbarerAnteil),
-        chancen
-      ),
+  const nutzen = useMemo(
+    () => berechneNutzen(preis, nutzenEingabe),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
-      anrufe, dauer, preis, personalModus, stundenkosten, routineanteil,
-      personalkostenMonat, vermeidbarerAnteil,
-      verpasst, chancenAnteil, abschluss, deckungsbeitrag, rueckgewinn,
+      preis, zeitAktiv, teamAnrufe, teamMinuten, uebernommen, restaufwand, stundenkosten,
+      kostenAktiv, entfallend, termineAktiv, zusatzTermine, deckungsbeitrag, kapazitaet,
     ]
   );
 
   const s = preis.szenario;
+  const preisSteht = volumenVollstaendig && preis.modus === "standard" && s !== null;
+  const saldo = nutzen.cash.saldoProMonatEur;
+  const saldoSteht = typeof saldo === "number";
+
+  useEffect(() => {
+    if (!preisSteht || preisBerechnetGemeldet.current || !preisGemeldet.current) return;
+    preisBerechnetGemeldet.current = true;
+    trackEvent("price_calculated");
+  }, [preisSteht]);
+  useEffect(() => {
+    if (!saldoSteht || roiBerechnetGemeldet.current) return;
+    roiBerechnetGemeldet.current = true;
+    trackEvent("roi_calculated");
+  }, [saldoSteht]);
+
+  const umfangText = (() => {
+    const fehlt: string[] = [];
+    if (!nutzen.cash.umfang.kosten) fehlt.push("ohne Kostensenkung");
+    if (!nutzen.cash.umfang.termine) fehlt.push("ohne zusätzliche Termine");
+    return fehlt.length ? ` (${fehlt.join(", ")})` : "";
+  })();
 
   return (
     <div className="space-y-6">
-      {/*
-        Kompakt stehen Eingabe und Ergebnis auf dem Desktop NEBENEINANDER: Die
-        beiden Mengenangaben sind in einer Sekunde gesetzt, und die Wirkung auf
-        den Preis soll im selben Blickfeld passieren. Auf schmalen Schirmen
-        stapelt dasselbe Markup ohne Sonderfall.
-      */}
       <div
         className={
           kompakt
@@ -562,27 +530,32 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
           Ihr Anrufaufkommen
         </h3>
         <p className={`${HINT} mb-6`}>
-          Startwerte sind frei gewählte Beispiele, keine Branchenstatistik.
-          Tragen Sie ein, was auf Ihren Betrieb zutrifft.
+          Die Startwerte sind ein Beispiel – bitte anpassen. Sie sind kein
+          Praxisdurchschnitt und keine Branchenstatistik.
         </p>
         <div className={`grid gap-6 ${kompakt ? "sm:grid-cols-2 lg:grid-cols-1" : "sm:grid-cols-2"}`}>
           <Zahlenfeld
-            label="Anrufe pro Monat"
+            label="Anrufe pro Monat, die der Assistent annehmen soll"
             wert={anrufe}
             onChange={(v) => { meldePreisStart(); setAnrufe(v); }}
             min={0}
-            max={3000}
+            max={100000}
+            schieberMax={3000}
             step={10}
+            ganzzahl
             einheit="Anrufe"
+            platzhalter="z. B. 300"
           />
           <Zahlenfeld
-            label="Durchschnittliche Gesprächsdauer"
+            label="Durchschnittliche Gesprächsdauer mit dem Assistenten"
             wert={dauer}
             onChange={(v) => { meldePreisStart(); setDauer(v); }}
             min={0}
-            max={15}
+            max={60}
+            schieberMax={15}
             step={0.5}
             einheit="Minuten"
+            platzhalter="z. B. 2"
           />
         </div>
 
@@ -625,16 +598,17 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
         </h3>
         <p className={`${HINT} mb-5`}>
           Sofort, ohne E-Mail. Keine Kostenposition wird still weggelassen: Was
-          noch nicht feststeht, steht als offen in der Liste — nicht als Null.
+          noch nicht feststeht, steht als offen in der Liste – nicht als Null.
         </p>
 
-        {/*
-          Kompakt zuerst die zwei Beträge, um die es geht, dann ihre
-          Bedingungen. Dieselben Werte wie in den Zeilen darunter, aus
-          derselben Rechnung — hier nur in der Größe, die ihrer Bedeutung für
-          die Entscheidung entspricht.
-        */}
-        {kompakt && s !== null && preis.modus !== "individuell" && (
+        {!volumenVollstaendig ? (
+          <p className="text-[16px] text-gray-600 dark:text-gray-400 leading-[1.7]">
+            Tragen Sie Anrufe pro Monat und Gesprächsdauer ein – erst dann gibt
+            es einen Preis. Ein leeres Feld rechnen wir nicht als null.
+          </p>
+        ) : (
+          <>
+        {kompakt && preisSteht && s && (
           <div className="mb-6 grid gap-6 border-b border-gray-100 pb-6 dark:border-gray-800 sm:grid-cols-2 sm:gap-8">
             <Betrag
               label="Wiederkehrend pro Monat"
@@ -652,7 +626,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
               hinweis={
                 preis.monatlichGesamtEur === UNBEKANNT
                   ? "Telefonie. Der Sprachaufschlag steht erst im Angebot fest und ist hier noch nicht enthalten."
-                  : `Tarif ${s.tarif.name}, inklusive Mehrverbrauch. Gedeckelt auf ${s.tarif.obergrenze}.`
+                  : `Tarif ${s.tarif.name} nach unserer Zuordnungsregel, inklusive Mehrverbrauch. Telefonie gedeckelt auf ${s.tarif.obergrenze}.`
               }
             />
             <Betrag
@@ -666,23 +640,27 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
         <Zeile
           label="Gesprächsminuten pro Monat"
           wert={`${zahl(preis.minutenProMonat)} Min.`}
-          hinweis="Anrufe × durchschnittliche Gesprächsdauer"
+          hinweis="Anrufe × durchschnittliche Gesprächsdauer. Abgerechnet werden die Gespräche, die der Assistent führt."
         />
 
-        {preis.modus === "individuell" || !s ? (
+        {!preisSteht || !s ? (
           <>
-            <Zeile label="Passender Tarif" wert="Individuell" pille />
+            <Zeile label="Tarif nach unserer Zuordnungsregel" wert="Individuell" pille />
             <p className="pt-4 text-[16px] text-gray-600 dark:text-gray-400 leading-[1.7]">
               Bei diesem Aufkommen liefe auch der größte Listentarif dauerhaft an
-              seiner Obergrenze — genau der Zustand, den wir vertraglich
-              ausschließen. Dafür gilt kein Listenpreis: {TARIF_ENTERPRISE} Was
+              seiner Obergrenze. Dafür gilt kein Listenpreis: {TARIF_ENTERPRISE} Was
               es für Ihr Aufkommen konkret ist, rechnen wir im Erstgespräch aus,
               statt es hier zu schätzen.
             </p>
           </>
         ) : (
           <>
-            <Zeile label="Passender Tarif" wert={s.tarif.name} pille />
+            <Zeile
+              label="Tarif nach unserer Zuordnungsregel"
+              wert={s.tarif.name}
+              pille
+              hinweis={`${FAKTEN.tarifzuordnung} Der Rechner wendet diese Regel auf den eingegebenen Monatswert an; ob ein Aufkommen als dauerhaft gilt und ab wann umgestellt wird, legt Ihr Vertrag fest.`}
+            />
             {!kompakt && (
             <Zeile
               label="Enthaltene Minuten"
@@ -713,8 +691,8 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
               wert={eur(s.telefonieMonatlichEur, 2)}
               hinweis={
                 s.amDeckel
-                  ? `Auf die Telefonie-Obergrenze Ihres Tarifs gedeckelt (${s.tarif.obergrenze}) — sie gilt für Grundpreis und Mehrverbrauch. Läuft ein Tarif dauerhaft am Deckel, ordnen wir Sie dem günstigeren nächsten Tarif zu.`
-                  : `Telefonie-Obergrenze dieses Tarifs: ${s.tarif.obergrenze}. Mehr als das kosten Grundpreis und Mehrverbrauch in keinem Monat — Zusatzsprachen und Anbindung stehen als eigene Positionen darunter.`
+                  ? `Auf die Telefonie-Obergrenze dieses Tarifs gedeckelt (${s.tarif.obergrenze}) – sie gilt für Grundpreis und Mehrverbrauch.`
+                  : `Telefonie-Obergrenze dieses Tarifs: ${s.tarif.obergrenze}. Mehr als das kosten Grundpreis und Mehrverbrauch in keinem Monat – Zusatzsprachen und Anbindung stehen als eigene Positionen darunter.`
               }
             />
             )}
@@ -731,23 +709,27 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
                 <Zeile
                   label="Zusatzsprachen pro Monat"
                   wert={eur(preis.sprachenMonatlichEur as number)}
-                  hinweis="Steht als eigene Position. Ob dieser Aufschlag innerhalb der Tarif-Obergrenze liegt, weisen wir im Angebot aus — wir rechnen es hier nicht stillschweigend in die eine oder andere Richtung."
+                  hinweis="Eigene Position. Ob dieser Aufschlag innerhalb der Telefonie-Obergrenze liegt, legt Ihr Angebot fest."
                 />
               )
             )}
             {!kompakt && (
             <Zeile
-              label="Wiederkehrend pro Monat"
+              label="Wiederkehrend pro Monat (bekannte Positionen)"
               wert={
-                preis.monatlichGesamtEur === UNBEKANNT
-                  ? "Telefonie steht fest, Sprachaufschlag im Angebot"
-                  : eur(preis.monatlichGesamtEur, 2)
+                preis.monatlichGesamtEur !== UNBEKANNT
+                  ? eur(preis.monatlichGesamtEur, 2)
+                  : preis.monatlichSpanne
+                    ? `${eur(preis.monatlichSpanne.min, 2)} bis ${eur(preis.monatlichSpanne.max, 2)}`
+                    : "Telefonie steht fest, Sprachaufschlag im Angebot"
               }
               stark
               hinweis={
-                preis.monatlichGesamtEur === UNBEKANNT
-                  ? `Die Telefonie kostet ${eur(s.telefonieMonatlichEur, 2)} im Monat. Eine Summe nennen wir erst, wenn der Sprachaufschlag feststeht — eine Summe ohne ihn wäre niedriger als Ihre spätere Rechnung.`
-                  : undefined
+                preis.monatlichGesamtEur !== UNBEKANNT
+                  ? "Telefonie plus Zusatzsprachen. Ohne Anbindung – die steht darunter als offen."
+                  : preis.monatlichSpanne
+                    ? `Telefonie ${eur(s.telefonieMonatlichEur, 2)} plus Sprachaufschlag ${eur(preis.sprachenMonatlichEur as number)} überschreiten die Obergrenze ${s.tarif.obergrenze}. Fällt der Aufschlag unter die Obergrenze, bleibt es bei ${eur(preis.monatlichSpanne.min, 2)}; steht er daneben, sind es ${eur(preis.monatlichSpanne.max, 2)}. Das legt Ihr Angebot fest – wir wählen hier nicht still eine Lesart.`
+                    : `Die Telefonie kostet ${eur(s.telefonieMonatlichEur, 2)} im Monat. Eine Summe nennen wir erst, wenn der Sprachaufschlag feststeht – eine Summe ohne ihn wäre niedriger als Ihre spätere Rechnung.`
               }
             />
             )}
@@ -764,382 +746,405 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
         <Zeile
           label="Anbindung an Ihr System"
           wert="noch offen"
-          hinweis="Wird vor Vertragsabschluss nach der technischen Prüfung ausgewiesen — einschließlich Gebühren, die Dritte für eine Schnittstelle verlangen. Wir setzen diese Position hier bewusst nicht auf null."
+          hinweis="Wird vor Vertragsabschluss nach der technischen Prüfung ausgewiesen – einschließlich Gebühren, die Dritte für eine Schnittstelle verlangen. Wir setzen diese Position hier bewusst nicht auf null."
         />
+
+        {!kompakt && preisSteht && (
+          <details className="mt-5">
+            <summary className="text-[15px] font-semibold text-gray-700 dark:text-gray-300 cursor-pointer min-h-[44px] flex items-center">
+              So kommt die Zuordnung zustande: alle drei Listentarife bei diesem Aufkommen
+            </summary>
+            <div className="mt-3 overflow-x-auto">
+              <table className="w-full text-[15px] text-left">
+                <thead>
+                  <tr className="text-[13px] uppercase tracking-wider text-pub-ink-3 dark:text-gray-500">
+                    <th scope="col" className="py-2 pr-4 font-semibold">Tarif</th>
+                    <th scope="col" className="py-2 pr-4 font-semibold">Telefonie / Monat</th>
+                    <th scope="col" className="py-2 font-semibold">Stand</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {preis.vergleich.map((v) => (
+                    <tr key={v.tarif.name} className="border-t border-gray-100 dark:border-gray-800">
+                      <th scope="row" className="py-2 pr-4 font-medium text-gray-900 dark:text-gray-100">
+                        {v.tarif.name}
+                      </th>
+                      <td className="py-2 pr-4 tabular-nums">{eur(v.telefonieMonatlichEur, 2)}</td>
+                      <td className="py-2 text-gray-600 dark:text-gray-400">
+                        {v.amDeckel
+                          ? `an der Obergrenze ${v.tarif.obergrenze}`
+                          : v.tarif.name === s?.tarif.name
+                            ? "Zuordnung nach Regel"
+                            : "unter der Obergrenze"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className={`${HINT} mt-3`}>
+              Die Regel wählt den günstigsten Tarif, der bei diesem Aufkommen
+              nicht an seiner Obergrenze läuft. Ein Tarif an der Obergrenze kann
+              in einem einzelnen Spitzenmonat rechnerisch günstiger sein; ob Sie
+              dann in ihm bleiben oder umgestellt werden, regelt Ihr Vertrag.
+              Wir versprechen hier keinen „günstigsten Tarif", sondern zeigen den
+              Rechenweg.
+            </p>
+          </details>
+        )}
 
         <p className={`${HINT} mt-5 flex items-start gap-2`}>
           <Info size={14} className="flex-shrink-0 mt-0.5" aria-hidden="true" />
           <span>
             {FAKTEN.laufzeit} Wie sich dieser Aufschlag im Einzelnen bemisst,
             steht in Ihrem Angebot; diese Rechnung bildet ihn deshalb nicht ab,
-            statt ihn zu raten. {FAKTEN.preisgarantie}
+            statt ihn zu raten. {FAKTEN.preisgarantie} Beträge wie in unserer
+            Preisliste; die Steuerbasis nennt Ihr Angebot.
           </span>
         </p>
+          </>
+        )}
       </div>
 
       </div>
 
-      {/* ── Ergebnis 2: Wirtschaftlichkeit ──────────────────────────────
-          Der Ablauf ist bewusst fortlaufend und vollständig sichtbar:
-          Personalkosten, dann die Anrufe, die heute niemanden erreichen, dann
-          das Ergebnis. Der zweite Block lag früher hinter „Optional
-          erweitern" — und damit lag der in vielen Betrieben größte Posten
-          außerhalb der Rechnung, während der Cogniiq-Monatsbetrag drinstand.
-          Wer ihn nicht öffnete, bekam eine negative Überschrift aus einem
-          halben Modell zu sehen. ────────────────────────────────────────── */}
+      {/* ── Ergebnis 2: Nutzen in drei Bausteinen ───────────────────────── */}
       {!kompakt && (
       <div className={`${CARD} p-6 sm:p-7`}>
         <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-1">
           Und was bringt es Ihnen?
         </h3>
         <p className={`${HINT} mb-7`}>
-          Zwei Schritte, dann steht die vollständige Rechnung. Sie läuft
-          ausschließlich mit Ihren Angaben — wir setzen weder einen Stundensatz
-          noch einen Routineanteil, weder Personalkosten noch eine
-          Abschlussquote oder einen Deckungsbeitrag für Sie ein. Felder, die
-          Sie nicht wissen, lassen Sie leer; dann rechnen wir diesen Teil
-          nicht.
+          Drei Bausteine, jeder freiwillig. Wählen Sie, was Sie betrachten
+          möchten; was Sie nicht wählen, steht nicht in der Rechnung – und wird
+          nicht still auf null gesetzt. Wir setzen keinen Wert für Sie ein.
         </p>
 
-        {/* ── Schritt 1: Was mit der Personalsituation tatsächlich passiert ──
-            Die Frage steht VOR den Zahlen, weil sie entscheidet, welche Zahlen
-            überhaupt sinnvoll sind. Wer sie überspringt, rechnet sonst
-            Telefonminuten gegen ein Monatsgehalt — oder bucht ein Gehalt als
-            Ersparnis, das weiterhin gezahlt wird. ──────────────────────── */}
-        <Schritt nummer={1} titel="Was passiert bei Ihnen mit der Besetzung?" />
-        <p className={`${HINT} mb-5`}>
-          Davon hängt ab, was wirtschaftlich überhaupt zählt. Beide Wege sind
-          legitim; welcher zutrifft, wissen nur Sie. Wir rechnen immer nur
-          einen von beiden — freigesetzte Zeit und wegfallende Personalkosten
-          bewerten dieselbe Arbeitskapazität und dürfen nicht addiert werden.
-        </p>
-        <div className="grid sm:grid-cols-2 gap-4 mb-7" role="radiogroup" aria-label="Wirtschaftliche Lesart der Personalsituation">
-          <ModusWahl
-            aktiv={personalModus === "kapazitaet"}
-            titel="Mitarbeiter bleibt — Zeit wird für andere Aufgaben frei"
-            erklaerung="Der Rechner bewertet ausschließlich die Arbeitszeit, die Cogniiq freimacht. Keine Aussage über Ihre Lohnsumme."
-            onClick={() => { meldeRoiStart(); setPersonalModus("kapazitaet"); }}
+        <div className="grid sm:grid-cols-3 gap-4 mb-7" role="group" aria-label="Bausteine der Nutzenrechnung">
+          <BausteinWahl
+            aktiv={zeitAktiv}
+            kennung="A"
+            titel="Mehr Zeit fürs Praxisteam"
+            erklaerung="Stunden pro Monat, die Ihr Team weniger am Telefon ist. Kein Geldzufluss – ein optionaler Euro-Zeitwert bleibt daneben stehen."
+            onToggle={() => { meldeRoiStart(); setZeitAktiv((v) => !v); }}
           />
-          <ModusWahl
-            aktiv={personalModus === "personalkosten"}
-            titel="Personalkosten sinken oder eine Einstellung wird vermieden"
-            erklaerung="Nur wählen, wenn monatliche Personalkosten tatsächlich wegfallen oder gar nicht erst entstehen — etwa eine reduzierte Stelle, eine vermiedene Nachbesetzung oder ein gekündigter externer Telefonservice."
-            onClick={() => { meldeRoiStart(); setPersonalModus("personalkosten"); }}
+          <BausteinWahl
+            aktiv={kostenAktiv}
+            kennung="B"
+            titel="Weniger laufende Kosten"
+            erklaerung="Ausgaben, die tatsächlich entfallen: ein externer Telefonservice, bezahlte Überstunden, eine wirklich vermiedene Einstellung."
+            onToggle={() => { meldeRoiStart(); setKostenAktiv((v) => !v); }}
+          />
+          <BausteinWahl
+            aktiv={termineAktiv}
+            kennung="C"
+            titel="Zusätzliche Termine"
+            erklaerung="Termine, die ohne Erreichbarkeitslücke zusätzlich zustande kämen – bewertet mit dem Deckungsbeitrag, begrenzt durch freie Kapazität."
+            onToggle={() => { meldeRoiStart(); setTermineAktiv((v) => !v); }}
           />
         </div>
 
-        {personalModus === "kapazitaet" ? (
-          <div className="grid sm:grid-cols-2 gap-6 mb-6">
-            <Zahlenfeld
-              label="Vollkosten einer Arbeitsstunde"
-              hinweis="Bruttolohn plus Arbeitgeberkosten der Person, die sonst ans Telefon geht."
-              wert={stundenkosten}
-              onChange={(v) => { meldeRoiStart(); setStundenkosten(v); }}
-              min={0}
-              max={150}
-              step={1}
-              einheit="€ / Stunde"
-              schieber={false}
-              platzhalter="z. B. 35"
-            />
-            <Zahlenfeld
-              label="Anteil Ihrer Anrufe, die zu konfigurierten Routineabläufen gehören"
-              hinweis="Ihre Einschätzung Ihres Anrufmix — nicht unsere Erfolgsquote. Diese Routineabläufe wickelt der Cogniiq-Telefonassistent vollständig ab: annehmen, sprechen, buchen, verschieben, absagen, abschließen. Ausnahmen und bewusst menschlich gehaltene Fälle werden nach Ihren Regeln eskaliert."
-              wert={routineanteil}
-              onChange={(v) => { meldeRoiStart(); setRoutineanteil(v); }}
-              min={0}
-              max={100}
-              step={5}
-              einheit="%"
-              schieber={false}
-              platzhalter="z. B. 60"
-            />
-          </div>
-        ) : (
-          /*
-            KEINE TELEFONMINUTEN IN DIESEM MODUS. Das ist der ganze Punkt: Die
-            Empfangskraft wird für ihren Dienstplan bezahlt, nicht für die
-            Minuten, in denen sie spricht. Die Vollkosten über die Sprechzeit
-            zu verteilen würde denselben Denkfehler wiederholen.
-          */
-          <div className="grid sm:grid-cols-2 gap-6 mb-6">
-            <Zahlenfeld
-              label="Monatliche Vollkosten der heutigen bzw. vermiedenen Telefon-/Empfangsbesetzung"
-              hinweis="Arbeitgeber-Vollkosten, nicht Netto- und nicht Bruttogehalt: Bruttolohn plus Arbeitgeberanteile, Umlagen und sonstige Personalnebenkosten. Bei einem externen Telefonservice: der monatliche Rechnungsbetrag. Wir setzen hier bewusst nichts ein."
-              wert={personalkostenMonat}
-              onChange={(v) => { meldeRoiStart(); setPersonalkostenMonat(v); }}
-              min={0}
-              max={20000}
-              step={100}
-              einheit="€ / Monat"
-              schieber={false}
-              platzhalter="z. B. 4.000"
-            />
-            <Zahlenfeld
-              label="Welcher Anteil dieser Kosten entfällt oder wird durch Cogniiq tatsächlich vermieden?"
-              hinweis="Ihre Einschätzung. 100 % nur, wenn die Position vollständig wegfällt oder gar nicht erst besetzt wird. Bleibt ein Teil der Stelle für andere Aufgaben bestehen, gehört nur der wegfallende Teil hierher. 0 % ist eine gültige Antwort — dann ändert sich an Ihrer Lohnsumme nichts."
-              wert={vermeidbarerAnteil}
-              onChange={(v) => { meldeRoiStart(); setVermeidbarerAnteil(v); }}
-              min={0}
-              max={100}
-              step={5}
-              einheit="%"
-              schieber={false}
-              platzhalter="z. B. 75"
-            />
-          </div>
-        )}
-
-        {wirtschaft.arbeitsnutzenRechenbar && (
-          <div
-            className="mb-8 rounded-2xl bg-pub-paper-2 px-5 py-4 ring-1 ring-pub-hairline-soft dark:bg-gray-800/50"
-            aria-live="polite"
-          >
-            {/*
-              Zwischenstand, und die Überschrift sagt genau das. NICHT „ROI",
-              nicht „Gesamtersparnis", nicht „wirtschaftlicher Gesamteffekt":
-              Das hier ist EIN Posten von zweien.
-            */}
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
-              {personalModus === "kapazitaet"
-                ? "Zwischenstand · Wert der freigesetzten Arbeitszeit"
-                : "Zwischenstand · Tatsächlich vermeidbare Personalkosten"}
-            </p>
-            {personalModus === "kapazitaet" ? (
-              <>
+        {/* ── A · Zeit ──────────────────────────────────────────────────── */}
+        {zeitAktiv && (
+          <section aria-labelledby="baustein-zeit" className="mb-8">
+            <h4 id="baustein-zeit" className="text-[17px] font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              A · Mehr Zeit fürs Praxisteam
+            </h4>
+            <div className="grid sm:grid-cols-2 gap-6 mb-5">
+              <Zahlenfeld
+                label="Anrufe pro Monat, die heute Ihr Team führt und die der Assistent übernehmen soll"
+                hinweis="Nicht das Aufkommen oben: Darin können Anrufe stecken, die heute niemanden erreichen – die binden heute keine Teamzeit."
+                wert={teamAnrufe}
+                onChange={setTeamAnrufe}
+                min={0} max={100000} step={10} ganzzahl einheit="Anrufe" schieber={false} platzhalter="z. B. 200"
+              />
+              <Zahlenfeld
+                label="Bearbeitungszeit je Anruf im Team"
+                hinweis="Gespräch plus Notieren, Eintragen, Weiterleiten – die menschliche Zeit, nicht die Gesprächsdauer des Assistenten."
+                wert={teamMinuten}
+                onChange={setTeamMinuten}
+                min={0} max={60} step={0.5} einheit="Minuten" schieber={false} platzhalter="z. B. 3"
+              />
+              <Zahlenfeld
+                label="Anteil dieser Anrufe, den der Assistent vollständig übernimmt"
+                hinweis="Ihr Szenario, 0 bis 100 %. 100 % ist eine bewusste Wahl, kein Standard: Was außerhalb der freigegebenen Abläufe liegt, bleibt beim Team."
+                wert={uebernommen}
+                onChange={setUebernommen}
+                min={0} max={100} step={5} ganzzahl einheit="%" schieber={false} platzhalter="z. B. 60"
+              />
+              <Zahlenfeld
+                label="Verbleibender Aufwand je übernommenem Anruf (optional)"
+                hinweis="Kontrolle, Rückfragen, Eskalationen, zusätzlicher Betriebsaufwand – in % der bisherigen Zeit. Leer gelassen rechnen wir ohne Abzug und kennzeichnen das Ergebnis als bedingt."
+                wert={restaufwand}
+                onChange={setRestaufwand}
+                min={0} max={300} step={5} ganzzahl einheit="%" schieber={false} platzhalter="z. B. 15"
+              />
+              <Zahlenfeld
+                label="Vollkosten einer Arbeitsstunde (optional)"
+                hinweis="Nur für den Euro-Zeitwert. Er bleibt eine Vergleichsgröße und geht nicht in den Geldsaldo."
+                wert={stundenkosten}
+                onChange={setStundenkosten}
+                min={0} max={500} step={1} einheit="€ / Stunde" schieber={false} platzhalter="z. B. 35"
+              />
+            </div>
+            {nutzen.zeit.status === "ok" && (
+              <div className={KASTEN} aria-live="polite">
+                <p className="text-[13px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
+                  Zwischenstand · Zeit
+                </p>
                 <Zeile
-                  label="Telefonzeit pro Monat"
-                  wert={`${zahl(wirtschaft.telefonstundenProMonat, 1)} Std.`}
-                  hinweis="Gesprächsminuten ÷ 60"
+                  label="Heutige Teamzeit für diese Anrufe"
+                  wert={`${zahl(nutzen.zeit.heuteStundenProMonat ?? 0, 1)} Std.`}
+                  hinweis="Anrufe × Bearbeitungszeit ÷ 60"
                 />
                 <Zeile
-                  label="Davon konfigurierte Routineabläufe"
-                  wert={`${zahl(wirtschaft.routinestundenProMonat, 1)} Std.`}
-                  hinweis={`Telefonzeit × ${zahl(routineanteil ?? 0)} % — diese Abläufe wickelt der Assistent vollständig ab, bis zu 100 % der konfigurierten Routineanrufe. Was nicht dazugehört, bleibt bei Ihnen.`}
-                />
-                <Zeile
-                  label="Wert der freigesetzten Arbeitszeit"
-                  wert={eur(wirtschaft.zeitwertProMonatEur ?? 0)}
+                  label={nutzen.zeit.bedingt ? "Frei werdende Zeit (bedingt)" : "Frei werdende Zeit"}
+                  wert={`${zahl(nutzen.zeit.nettoStundenProMonat ?? 0, 1)} Std.`}
                   stark
-                  hinweis="Freigesetzte Arbeitszeit ist nicht automatisch eingesparte Personalkosten. Zu Geld wird sie erst, wenn Sie sie tatsächlich abbauen oder anders einsetzen."
+                  hinweis={
+                    nutzen.zeit.bedingt
+                      ? `× ${zahl(uebernommen ?? 0)} % übernommen, ohne Abzug für Restaufwand – ein Potenzial unter der Bedingung, dass nichts nachzuarbeiten ist. Tragen Sie den verbleibenden Aufwand ein, wird daraus eine Netto-Zahl.`
+                      : (nutzen.zeit.nettoStundenProMonat ?? 0) < 0
+                        ? "Negativ: Der verbleibende Aufwand übersteigt die übernommene Zeit – das wäre Mehrarbeit, kein Gewinn."
+                        : `× ${zahl(uebernommen ?? 0)} % übernommen − ${zahl(restaufwand ?? 0)} % Restaufwand.`
+                  }
                 />
-              </>
-            ) : (
-              <>
-                <Zeile
-                  label="Monatliche Vollkosten der Besetzung"
-                  wert={eur(personalkostenMonat ?? 0)}
-                  hinweis="Ihre Angabe — Arbeitgeber-Vollkosten, nicht Brutto- oder Nettogehalt."
-                />
-                <Zeile
-                  label="Davon tatsächlich vermeidbar"
-                  wert={`${zahl(vermeidbarerAnteil ?? 0)} %`}
-                  hinweis="Ihre Angabe. Nur der Teil, der durch Cogniiq wirklich entfällt oder gar nicht erst entsteht."
-                />
-                <Zeile
-                  label="Tatsächlich vermeidbare Personalkosten"
-                  wert={eur(wirtschaft.personalersparnisProMonatEur ?? 0)}
-                  stark
-                  hinweis={`${eur(personalkostenMonat ?? 0)} × ${zahl(vermeidbarerAnteil ?? 0)} %. Diese Rechnung verteilt keine Vollkosten auf Telefonminuten — genau darum geht es in dieser Lesart: Die Besetzung wird für den Dienstplan bezahlt, nicht für die Sprechzeit.`}
-                />
-              </>
+                {nutzen.zeit.zeitwertEur !== null && (
+                  <Zeile
+                    label="Euro-Zeitwert (Vergleichsgröße)"
+                    wert={eur(nutzen.zeit.zeitwertEur)}
+                    hinweis="Frei werdende Zeit × Stundensatz. Kein Geldzufluss: Lohn wird weiter gezahlt, solange die Person bleibt. Dieser Wert steht in keinem Saldo."
+                  />
+                )}
+              </div>
             )}
-          </div>
+          </section>
         )}
 
-        {/* ── Schritt 2: Chancen ────────────────────────────────────────── */}
-        <Schritt nummer={2} titel="Anrufe, die Sie heute nicht erreichen" />
-        <p className={`${HINT} mb-5`}>
-          Für viele Betriebe ist das der größere Posten — und deshalb steht er
-          hier und nicht hinter einem Ausklapper. Wir nehmen ausdrücklich nicht
-          an, dass jeder verpasste Anruf ein verlorener Auftrag war: Sie geben
-          an, wie viel davon realistisch übrig bleibt.
-        </p>
-        <div className="grid sm:grid-cols-2 gap-6">
-          <Zahlenfeld
-            label="Relevante Anrufe pro Monat, die Sie heute nicht oder nicht rechtzeitig bearbeiten"
-            hinweis="Ihre Schätzung. Wir setzen hier keine Verpasstquote ein. Tragen Sie 0 ein, wenn Sie keine verpassen — das ist eine vollständige Angabe, kein leeres Feld."
-            wert={verpasst}
-            onChange={(v) => { meldeRoiStart(); setVerpasst(v); }}
-            min={0}
-            max={500}
-            step={5}
-            einheit="Anrufe"
-            schieber={false}
-            platzhalter="z. B. 40"
-          />
-        </div>
-
-        {/*
-          Die vier Trichterfelder erscheinen erst, wenn es überhaupt etwas zu
-          bewerten gibt. Bei 0 verpassten Anrufen wäre jede weitere Frage
-          sinnlos — und die Rechnung ist dann trotzdem VOLLSTÄNDIG, mit einem
-          Chancenwert von null. Dass danach ein negatives Gesamtergebnis stehen
-          kann, ist kein Fehler, sondern die Antwort für diesen Betrieb.
-        */}
-        {(verpasst ?? 0) > 0 && (
-          <div className="mt-6 grid sm:grid-cols-2 gap-6">
-            <Zahlenfeld
-              label="Davon echte Chancen"
-              hinweis="Wie viele dieser Anrufe wollten wirklich etwas buchen, bestellen oder beauftragen — Werbeanrufe, Rückfragen und Irrläufer zählen nicht mit."
-              wert={chancenAnteil}
-              onChange={(v) => { meldeRoiStart(); setChancenAnteil(v); }}
-              min={0} max={100} step={5} einheit="%" schieber={false} platzhalter="z. B. 50"
-            />
-            <Zahlenfeld
-              label="Abschluss- bzw. Buchungsquote"
-              hinweis="Von den echten Chancen: Wie viele werden bei Ihnen erfahrungsgemäß ein Termin oder ein Auftrag, wenn Sie sie erreichen?"
-              wert={abschluss}
-              onChange={(v) => { meldeRoiStart(); setAbschluss(v); }}
-              min={0} max={100} step={5} einheit="%" schieber={false} platzhalter="z. B. 30"
-            />
-            <Zahlenfeld
-              label="Deckungsbeitrag je gewonnenem Fall"
-              hinweis="Was Ihnen von diesem Auftrag oder Termin ungefähr bleibt, nachdem die direkt damit verbundenen Kosten abgezogen sind — Material, Fremdleistung, variable Kosten. Bewusst nicht der Umsatz: Nur der Deckungsbeitrag sagt, was ein zusätzlicher Fall Ihnen wirklich bringt."
-              wert={deckungsbeitrag}
-              onChange={(v) => { meldeRoiStart(); setDeckungsbeitrag(v); }}
-              min={0} max={5000} step={10} einheit="€" schieber={false} platzhalter="z. B. 200"
-            />
-            <Zahlenfeld
-              label="Davon realistisch zurückgewinnbar"
-              hinweis="Nicht jeder, der niemanden erreicht, wäre zu halten gewesen — manche hatten schon woanders gebucht. Ihre Einschätzung."
-              wert={rueckgewinn}
-              onChange={(v) => { meldeRoiStart(); setRueckgewinn(v); }}
-              min={0} max={100} step={5} einheit="%" schieber={false} platzhalter="z. B. 50"
-            />
-          </div>
+        {/* ── B · Kosten ────────────────────────────────────────────────── */}
+        {kostenAktiv && (
+          <section aria-labelledby="baustein-kosten" className="mb-8">
+            <h4 id="baustein-kosten" className="text-[17px] font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              B · Weniger laufende Kosten
+            </h4>
+            <div className="grid sm:grid-cols-2 gap-6 mb-5">
+              <Zahlenfeld
+                label="Monatliche Ausgaben, die durch den Assistenten tatsächlich entfallen"
+                hinweis="Nur echte Posten: der Rechnungsbetrag eines externen Telefonservices, bezahlte Überstunden am Telefon, eine Einstellung, die dadurch nicht nötig wird. Bleibt Ihr Team beschäftigt, ist 0 die richtige Antwort – und eine gültige."
+                wert={entfallend}
+                onChange={setEntfallend}
+                min={0} max={50000} step={10} einheit="€ / Monat" schieber={false} platzhalter="z. B. 0"
+              />
+            </div>
+            {nutzen.kosten.status === "ok" && (
+              <div className={KASTEN} aria-live="polite">
+                <p className="text-[13px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
+                  Zwischenstand · Kosten
+                </p>
+                <Zeile
+                  label="Tatsächlich entfallende Ausgaben"
+                  wert={eur(nutzen.kosten.ersparnisEur ?? 0)}
+                  stark
+                  hinweis="Ihre Angabe. Wir verteilen keine Vollkosten auf Telefonminuten und setzen keinen Empfang als Standardersparnis an. Bei Teilentlastung prüfen Sie, welche übrigen Aufgaben weiter Personal brauchen."
+                />
+              </div>
+            )}
+          </section>
         )}
 
-        {wirtschaft.chancenRechenbar && (
-          <div
-            className="mt-6 rounded-2xl bg-pub-paper-2 px-5 py-4 ring-1 ring-pub-hairline-soft dark:bg-gray-800/50"
-            aria-live="polite"
-          >
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
-              Zwischenstand · Potenzial aus zurückgewonnenen Anfragen
-            </p>
-            <Zeile
-              label="Zurückgewinnbarer Deckungsbeitrag"
-              wert={eur(wirtschaft.chancenwertProMonatEur ?? 0)}
-              stark
-              hinweis={
-                (verpasst ?? 0) > 0
-                  ? `${zahl(verpasst ?? 0)} Anrufe × ${zahl(chancenAnteil ?? 0)} % echte Chancen × ${zahl(abschluss ?? 0)} % Abschlussquote × ${eur(deckungsbeitrag ?? 0)} Deckungsbeitrag × ${zahl(rueckgewinn ?? 0)} % zurückgewinnbar. Jeder Faktor ist Ihre Angabe.`
-                  : "Sie haben angegeben, dass Sie keine relevanten Anrufe verpassen. Dann gibt es aus diesem Posten nichts zurückzugewinnen — die Rechnung ist damit vollständig."
-              }
-            />
-          </div>
+        {/* ── C · Termine ───────────────────────────────────────────────── */}
+        {termineAktiv && (
+          <section aria-labelledby="baustein-termine" className="mb-8">
+            <h4 id="baustein-termine" className="text-[17px] font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              C · Zusätzliche Termine
+            </h4>
+            <div className="grid sm:grid-cols-2 gap-6 mb-5">
+              <Zahlenfeld
+                label="Zusätzliche Termine pro Monat, die tatsächlich wahrgenommen würden"
+                hinweis="Bereits bereinigt um Wiederholungsanrufe, Patienten, die ohnehin später buchen, Verschiebungen und Ausfälle. Keine Anzahl verpasster Anrufe – ein Anrufversuch ist kein neuer Fall."
+                wert={zusatzTermine}
+                onChange={setZusatzTermine}
+                min={0} max={10000} step={1} ganzzahl einheit="Termine" schieber={false} platzhalter="z. B. 5"
+              />
+              <Zahlenfeld
+                label="Deckungsbeitrag je Termin"
+                hinweis="Was von einem Termin nach Material, Fremdleistung und variablen Kosten bleibt – nicht der Umsatz. Keine pauschalen Patientenwerte."
+                wert={deckungsbeitrag}
+                onChange={setDeckungsbeitrag}
+                min={0} max={10000} step={5} einheit="€" schieber={false} platzhalter="z. B. 40"
+              />
+              <Zahlenfeld
+                label="Freie Behandlungskapazität pro Monat (optional)"
+                hinweis="Wie viele zusätzliche Termine Ihr Kalender tatsächlich aufnimmt. Leer gelassen zeigen wir nur das Anfragepotenzial, keinen realisierbaren Beitrag. 0 ist eine gültige Antwort."
+                wert={kapazitaet}
+                onChange={setKapazitaet}
+                min={0} max={10000} step={1} ganzzahl einheit="Termine" schieber={false} platzhalter="z. B. 8"
+              />
+            </div>
+            {nutzen.termine.status === "ok" && (
+              <div className={KASTEN} aria-live="polite">
+                <p className="text-[13px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
+                  Zwischenstand · Termine
+                </p>
+                <Zeile
+                  label="Anfragepotenzial ohne Kapazitätsgrenze"
+                  wert={eur(nutzen.termine.potenzialEur ?? 0)}
+                  hinweis={`${zahl(zusatzTermine ?? 0)} Termine × ${eur(deckungsbeitrag ?? 0)}.`}
+                />
+                {nutzen.termine.kapazitaetUnbekannt ? (
+                  <Zeile
+                    label="Realisierbarer Beitrag"
+                    wert="offen"
+                    stark
+                    hinweis="Ohne Angabe zur freien Kapazität ist das Potenzial kein realisierter Gewinn. Es geht nicht in den Geldsaldo."
+                  />
+                ) : (
+                  <Zeile
+                    label="Realisierbarer Beitrag"
+                    wert={eur(nutzen.termine.realisierbarEur ?? 0)}
+                    stark
+                    hinweis={
+                      nutzen.termine.kapazitaetBegrenzt
+                        ? `Begrenzt durch Ihre freie Kapazität: ${zahl(nutzen.termine.realisierbareTermine ?? 0)} von ${zahl(zusatzTermine ?? 0)} Terminen sind durchführbar.`
+                        : "Ihre Kapazität reicht für alle genannten Termine."
+                    }
+                  />
+                )}
+              </div>
+            )}
+          </section>
         )}
 
         {/* ── Ergebnis ─────────────────────────────────────────────────── */}
-        <div className="mt-8 pt-7 border-t border-gray-200 dark:border-gray-700" aria-live="polite">
-          {wirtschaft.kostenProMonatEur === UNBEKANNT ? (
+        <div className="mt-2 pt-7 border-t border-gray-200 dark:border-gray-700" aria-live="polite">
+          {!preisSteht || nutzen.cash.bekannteKostenProMonatEur === UNBEKANNT ? (
             <>
               <h4 className="text-[17px] font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                Wirtschaftlichkeit noch nicht berechenbar
+                Geldsaldo noch nicht berechenbar
               </h4>
               <p className="text-[16px] text-gray-600 dark:text-gray-400 leading-[1.7]">
-                Solange der monatliche Betrag nicht feststeht — im individuellen
-                Tarif oder bei noch offenem Sprachaufschlag — gibt es keinen
-                Betrag, gegen den sich rechnen ließe. Ihr Zeit- und
-                Chancenpotenzial oben bleibt davon unberührt; den Nettoeffekt
-                rechnen wir im Erstgespräch mit Ihrer konkreten Zahl.
+                Solange der monatliche Betrag nicht feststeht – ohne vollständiges
+                Aufkommen, im individuellen Tarif, bei offenem Sprachaufschlag
+                oder einer Preisspanne – gibt es keinen Betrag, gegen den sich
+                rechnen ließe. Ihre Zwischenstände oben bleiben davon unberührt;
+                den Saldo rechnen wir im Erstgespräch mit Ihrer konkreten Zahl.
               </p>
             </>
-          ) : !wirtschaft.vollstaendig ? (
-            /*
-              DER NEUTRALE ZUSTAND. Weder positiv noch negativ — und
-              ausdrücklich keine Zahl. Hier stand vorher ein Nettoeffekt, in den
-              ein fehlender Chancenwert als 0 einging; die Überschrift las sich
-              dann als „rechnet sich nicht", obwohl nur die Frage nach den
-              verpassten Anrufen noch unbeantwortet war.
-            */
+          ) : saldo === UNVOLLSTAENDIG ? (
             <>
               <h4 className="text-[17px] font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 Wirtschaftlichkeit noch nicht vollständig berechnet
               </h4>
-              <p className="text-[16px] text-gray-600 dark:text-gray-400 leading-[1.7] mb-4">
-                Ihre bisherige Rechnung berücksichtigt noch nicht alle
-                wirtschaftlichen Effekte. Ergänzen Sie die unten genannten
-                Angaben, damit wir den vollständigen Vergleich berechnen
-                können. Bis dahin zeigen wir kein Gesamtergebnis — weder ein
-                gutes noch ein schlechtes.
-              </p>
-              <p className="text-[16px] font-medium text-gray-800 dark:text-gray-200">
-                Es {wirtschaft.fehlendeAngaben.length === 1 ? "fehlt noch eine Angabe" : `fehlen noch ${zahl(wirtschaft.fehlendeAngaben.length)} Angaben`}:{" "}
-                {wirtschaft.fehlendeAngaben.map((f) => FEHLT_LABEL[f]).join(", ")}.
-              </p>
+              {!zeitAktiv && !kostenAktiv && !termineAktiv ? (
+                <p className="text-[16px] text-gray-600 dark:text-gray-400 leading-[1.7]">
+                  Wählen Sie oben mindestens einen Baustein. Bis dahin zeigen wir
+                  kein Ergebnis – weder ein gutes noch ein schlechtes.
+                </p>
+              ) : (
+                <p className="text-[16px] font-medium text-gray-800 dark:text-gray-200">
+                  {(() => {
+                    const fehlend = [...nutzen.zeit.fehlend, ...nutzen.kosten.fehlend, ...nutzen.termine.fehlend];
+                    return `Es ${fehlend.length === 1 ? "fehlt noch eine Angabe" : `fehlen noch ${zahl(fehlend.length)} Angaben`}: ${fehlend.map((f) => FEHLT_LABEL[f]).join(", ")}.`;
+                  })()}
+                </p>
+              )}
             </>
           ) : (
             <>
-              <h4 className="text-[17px] font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                Ihr wirtschaftliches Gesamtergebnis
+              <h4 className="text-[17px] font-semibold text-gray-900 dark:text-gray-100 mb-5">
+                Ihr Ergebnis
               </h4>
-              {/*
-                DIE BESCHRIFTUNG IST HIER DIE EIGENTLICHE ARBEIT. „Wert der
-                freigesetzten Arbeitszeit" und „tatsächlich vermeidbare
-                Personalkosten" sind wirtschaftlich zwei verschiedene Dinge,
-                und ein Besucher darf das eine nie für das andere halten. Es
-                steht genau EINE Arbeitszeile hier — welche, sagt der Modus.
-              */}
+              <div className="grid gap-6 sm:grid-cols-3 mb-6">
+                <Betrag
+                  label="A · Zeit pro Monat"
+                  wert={
+                    nutzen.zeit.status === "ok"
+                      ? `${zahl(nutzen.zeit.nettoStundenProMonat ?? 0, 1)} Std.`
+                      : "nicht berücksichtigt"
+                  }
+                  hinweis={
+                    nutzen.zeit.status === "ok"
+                      ? nutzen.zeit.bedingt ? "bedingt, ohne Restaufwand" : "netto, nach Restaufwand"
+                      : undefined
+                  }
+                />
+                <Betrag
+                  label="B · Weniger Kosten"
+                  wert={nutzen.kosten.status === "ok" ? eur(nutzen.kosten.ersparnisEur ?? 0) : "nicht berücksichtigt"}
+                  hinweis={nutzen.kosten.status === "ok" ? "tatsächlich entfallende Ausgaben" : undefined}
+                />
+                <Betrag
+                  label="C · Zusätzliche Termine"
+                  wert={
+                    nutzen.termine.status !== "ok"
+                      ? "nicht berücksichtigt"
+                      : nutzen.termine.kapazitaetUnbekannt
+                        ? "Potenzial, offen"
+                        : eur(nutzen.termine.realisierbarEur ?? 0)
+                  }
+                  hinweis={
+                    nutzen.termine.status === "ok"
+                      ? nutzen.termine.kapazitaetUnbekannt
+                        ? "ohne Kapazitätsangabe nicht im Saldo"
+                        : "realisierbarer Deckungsbeitrag"
+                      : undefined
+                  }
+                />
+              </div>
+
               <Zeile
-                label={
-                  wirtschaft.personalModus === "kapazitaet"
-                    ? "Wert der freigesetzten Arbeitszeit"
-                    : "Tatsächlich vermeidbare Personalkosten"
-                }
-                wert={eur(wirtschaft.arbeitsnutzenProMonatEur ?? 0)}
-                hinweis={
-                  wirtschaft.personalModus === "kapazitaet"
-                    ? "Kapazität, nicht Kassenstand: Diese Zeit wird erst zu Geld, wenn Sie sie tatsächlich abbauen oder anders einsetzen."
-                    : "Lohnkosten, die durch Cogniiq wegfallen oder gar nicht erst entstehen — nach Ihrer eigenen Einschätzung des vermeidbaren Anteils."
-                }
+                label="Bekannte laufende Kosten Cogniiq"
+                wert={`− ${eur(nutzen.cash.bekannteKostenProMonatEur as number, 2)}`}
+                hinweis="Telefonie plus Zusatzsprachen. Zuzüglich offener Anbindung – siehe unten."
               />
               <Zeile
-                label="Wert zurückgewonnener Chancen"
-                wert={eur(wirtschaft.chancenwertProMonatEur ?? 0)}
-              />
-              <Zeile
-                label="Gesamter monatlicher Nutzen"
-                wert={eur(
-                  (wirtschaft.arbeitsnutzenProMonatEur ?? 0) +
-                    (wirtschaft.chancenwertProMonatEur ?? 0)
-                )}
-              />
-              <Zeile
-                label="Cogniiq pro Monat"
-                wert={`− ${eur(wirtschaft.kostenProMonatEur, 2)}`}
-              />
-              <Zeile
-                label="Nettoeffekt pro Monat"
-                wert={eur(wirtschaft.nettoProMonatEur as number)}
+                label={`Geldsaldo pro Monat${umfangText}`}
+                wert={eur(saldo as number)}
                 stark
                 hinweis={
-                  (wirtschaft.nettoProMonatEur as number) < 0
-                    ? "Mit Ihren Angaben trägt sich der Empfang rechnerisch nicht. Das ist ein ehrliches Ergebnis und ein guter Grund, das Erstgespräch kurz zu halten — oder es sich zu sparen."
-                    : undefined
+                  (saldo as number) < 0
+                    ? "Negativ: Mit den gewählten Geldbausteinen decken die entfallenden Ausgaben und realisierbaren Termine die bekannten Kosten nicht. Zeitgewinn und Erreichbarkeit sind damit nicht bewertet – sie werden hier aber auch nicht in Euro umgedeutet."
+                    : "Entfallende Ausgaben plus realisierbare Termine minus bekannte laufende Kosten. Der Zeitwert aus A ist nicht enthalten."
                 }
               />
               <Zeile
-                label="Erstes Jahr, inklusive Einrichtung"
-                wert={eur(wirtschaft.ersteJahrNettoEur as number)}
-                hinweis={`Nutzen × 12 − (Monatsbetrag × 12 + Einrichtung ${eur(
-                  wirtschaft.einrichtungEur as number
-                )}) = Nutzen × 12 − ${eur(wirtschaft.ersteJahrKostenEur as number)}. Die Einrichtung steht bewusst im Nenner und wird nicht weggelassen. Kosten einer Systemanbindung sind hier nicht enthalten, weil sie erst nach der technischen Prüfung feststehen.`}
+                label="Erstes Jahr, bekannte Kosten, inklusive Einrichtung"
+                wert={eur(nutzen.cash.ersteJahrSaldoEur as number)}
+                hinweis={`12 gleiche Monate angenommen: 12 × Geldsaldo − Einrichtung ${eur(nutzen.cash.einmaligeKostenEur as number)}. Start- und Anlaufmonat sind nicht gesondert modelliert.`}
               />
               <Zeile
                 label="Einrichtung hereingeholt nach"
                 wert={
-                  wirtschaft.amortisationMonate === null
+                  nutzen.cash.amortisationMonate === null
                     ? "— bei diesen Angaben nicht"
-                    : `${zahl(wirtschaft.amortisationMonate, 1)} Monaten`
+                    : `${zahl(nutzen.cash.amortisationMonate, 1)} Monaten`
                 }
                 hinweis={
-                  wirtschaft.amortisationMonate === null
-                    ? "Der Nettoeffekt ist mit Ihren Angaben null oder negativ. Dann gibt es keine Amortisationszeit, und wir zeigen auch keine."
-                    : undefined
+                  nutzen.cash.amortisationMonate === null
+                    ? "Der Geldsaldo ist null oder negativ. Dann gibt es keine Amortisation, und wir zeigen auch keine."
+                    : "Vereinfachte Modellrechnung: Einrichtung ÷ Geldsaldo, nur aus bekannten Kosten. Offene Anbindungskosten verlängern sie."
                 }
               />
+              <Zeile
+                label="Anbindung an Ihr System"
+                wert="offen"
+                hinweis="Steht erst nach der technischen Prüfung fest und ist in keiner Zeile oben enthalten. Jede Summe hier ist deshalb eine Teilsumme aus bekannten Kosten."
+              />
+              {nutzen.cash.kapazitaetskonflikt && (
+                <p className={`${HINT} mt-4`}>
+                  Hinweis: Sie rechnen mit entfallender Besetzung UND zusätzlichen
+                  Terminen. Prüfen Sie, ob die Kapazität für die neuen Termine
+                  nicht gerade von der Besetzung käme, die wegfällt – dieselbe
+                  Arbeitszeit lässt sich nur einmal verplanen.
+                </p>
+              )}
+              <p className="mt-5 text-[15px] text-gray-700 dark:text-gray-300 leading-[1.65]">
+                Mehr Zeit bedeutet nicht automatisch weniger Lohnkosten. Ob sich
+                Cogniiq finanziell rechnet, hängt von tatsächlich entfallenden
+                Ausgaben und zusätzlichen Terminen ab. Was darüber hinaus zählt –
+                weniger Unterbrechungen, strukturierte Rückrufe, bessere
+                Erreichbarkeit –, ist möglich, aber hier nicht in Euro bewertet.
+              </p>
             </>
           )}
         </div>
@@ -1149,17 +1154,11 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
           <summary className="text-[16px] font-semibold text-gray-700 dark:text-gray-300 cursor-pointer min-h-[44px] flex items-center">
             Was diese Rechnung bewusst nicht enthält
           </summary>
-          {/*
-            HIER gehört das Optionale hin — nicht die Chancenökonomie. Das sind
-            Größen, für die wir keine belastbare Modellierung haben; sie zu
-            schätzen würde das Ergebnis beliebig machen. Sie stehen als Liste
-            da, damit niemand sie für eingerechnet hält.
-          */}
           <ul className="mt-4 space-y-2.5 text-[16px] text-gray-600 dark:text-gray-400 leading-[1.7]">
             <li>
               <strong className="font-semibold text-gray-800 dark:text-gray-200">Wachstum und Saison.</strong>{" "}
               Gerechnet wird ein Durchschnittsmonat. Wer im Sommer das Dreifache
-              telefoniert, verschiebt Tarif und Nutzen — beides.
+              telefoniert, verschiebt Tarif und Nutzen – beides.
             </li>
             <li>
               <strong className="font-semibold text-gray-800 dark:text-gray-200">Mehrere Standorte.</strong>{" "}
@@ -1167,22 +1166,21 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
               Erstgespräch, statt hier zu multiplizieren.
             </li>
             <li>
-              <strong className="font-semibold text-gray-800 dark:text-gray-200">Ein alternatives Personalszenario.</strong>{" "}
-              Was eine zusätzliche Kraft am Empfang kosten würde, hängt an Ihrem
-              Arbeitsmarkt. Diesen Vergleich stellen wir nicht an Ihrer Stelle an.
-            </li>
-            <li>
-              <strong className="font-semibold text-gray-800 dark:text-gray-200">Nacharbeit nach dem Gespräch.</strong>{" "}
-              Die Telefonzeit oben ist die Gesprächszeit. Notieren, Eintragen und
-              Weiterleiten kommen in vielen Betrieben dazu — bei konfigurierten
-              Routineabläufen entfallen sie, hier sind sie trotzdem nicht
-              eingerechnet.
+              <strong className="font-semibold text-gray-800 dark:text-gray-200">Steuern und Liquidität.</strong>{" "}
+              Beträge wie in der Preisliste; ob Umsatzsteuer für Ihre Praxis
+              wirtschaftlich neutral ist, klärt Ihre Steuerberatung, nicht dieser
+              Rechner.
             </li>
             <li>
               <strong className="font-semibold text-gray-800 dark:text-gray-200">Kosten einer Systemanbindung.</strong>{" "}
               Einschließlich der Gebühren, die Dritte für eine Schnittstelle
               verlangen. Sie stehen erst nach der technischen Prüfung fest und
               erscheinen deshalb als offene Position, nicht als null.
+            </li>
+            <li>
+              <strong className="font-semibold text-gray-800 dark:text-gray-200">Gemessene Quoten.</strong>{" "}
+              Keine Zufriedenheits-, Fehler- oder Umsatzquote – wir haben sie
+              nicht erhoben und setzen sie nicht ein.
             </li>
           </ul>
         </details>
@@ -1203,23 +1201,10 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
       <p className={HINT}>
         Alle Zahlen werden in Ihrem Browser gerechnet. Ihre Eingaben werden
         nicht gespeichert, nicht übertragen und nicht an Analysedienste
-        gemeldet.
+        gemeldet – auch der Link zum Gespräch trägt sie nicht mit.
       </p>
 
-      {/*
-        Ereignisse melden, DASS gerechnet wurde — nie womit. Ausgelöst beim
-        Klick auf den Abschluss-CTA, nicht bei jedem Tastendruck, damit ein
-        Besucher beim Tippen keine Ereignislawine erzeugt.
-      */}
       <div className="flex flex-col sm:flex-row gap-3">
-        {/*
-          In der kompakten Fassung führt der erste Weg auf die vollständige
-          Fassung, nicht auf ein Formular: Wer hier rechnet, will erst zu Ende
-          rechnen — und dort steht der Wirtschaftlichkeitsteil, der hier
-          bewusst fehlt. Er trägt deshalb hier das Gewicht; der Demo-Weg bleibt
-          daneben stehen. In der vollen Fassung ist es umgekehrt: Dort ist
-          fertig gerechnet, und der nächste Schritt ist das Gespräch.
-        */}
         {kompakt && (
           <a
             href={RECHNER_LINK}
@@ -1233,11 +1218,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
         )}
         <a
           href="/ki-telefonassistent/demo"
-          onClick={() => {
-            trackEvent("price_calculator_completed");
-            if (wirtschaft.vollstaendig) trackEvent("roi_calculator_completed");
-            trackEvent("cta_demo_click", "Rechner");
-          }}
+          onClick={() => trackEvent("cta_demo_click", "Rechner")}
           {...magnetic}
           className={
             kompakt
@@ -1245,7 +1226,7 @@ export function TelefonRechner({ variante = "voll" }: { variante?: RechnerVarian
               : "group cq-magnetic inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-pub-ink px-7 text-[15px] font-semibold text-white hover:bg-[#1f2933] hover:shadow-[0_10px_28px_-10px_rgba(11,15,20,0.5)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pub-signal focus-visible:ring-offset-2"
           }
         >
-          Zahlen gemeinsam durchgehen
+          {kompakt ? "Zahlen gemeinsam durchgehen" : "Szenario und Anbindung prüfen"}
           <ArrowRight size={15} aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-0.5" />
         </a>
       </div>

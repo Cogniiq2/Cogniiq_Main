@@ -252,6 +252,43 @@ for (const path of REPORT) {
 }
 console.log('--- end ---\n');
 
+// ── HEAD mirrors GET ─────────────────────────────────────────────────────────
+// Production answered HEAD on every prerendered route with
+//   500  X-Cogniiq-Shell-Error: asset body is not an HTML document
+// while GET was 200 (review 2026-10-23): the Function validated the empty
+// body Cloudflare hands it for HEAD. `wrangler pages dev` masks the defect
+// (its asset server gives the Function a body for HEAD), so the unit test
+// src/test/middleware-head.test.ts carries the real reproduction; this block
+// asserts the contract against the Pages runtime: same status, no shell
+// error, no body, for documents, the 404 and a redirect.
+{
+  const HEAD_PATHS = ['/', '/ki-telefonassistent-arzt', '/kosten-ki-telefonassistent', '/praxen',
+    '/app/login', '/completely-unknown-url', '/webdesign-agentur-deutschland', '/sitemap.xml', '/robots.txt'];
+  for (const path of HEAD_PATHS) {
+    const get = await fetch(`${origin}${path}`, { redirect: 'manual' });
+    const head = await fetch(`${origin}${path}`, { method: 'HEAD', redirect: 'manual' });
+    const headBody = await head.text();
+    check(
+      head.status === get.status,
+      `HEAD ${path} -> ${head.status}, same as GET`,
+      `HEAD ${path} -> ${head.status} but GET -> ${get.status}`
+    );
+    check(
+      !head.headers.get('x-cogniiq-shell-error'),
+      `HEAD ${path} carries no shell error`,
+      `HEAD ${path} carries X-Cogniiq-Shell-Error: ${head.headers.get('x-cogniiq-shell-error')}`
+    );
+    check(headBody.length === 0, `HEAD ${path} has no body`, `HEAD ${path} returned ${headBody.length} bytes`);
+    if (get.status >= 300 && get.status < 400) {
+      check(
+        head.headers.get('location') === get.headers.get('location'),
+        `HEAD ${path} redirects where GET redirects`,
+        `HEAD ${path} location=${head.headers.get('location')} but GET location=${get.headers.get('location')}`
+      );
+    }
+  }
+}
+
 // ── The private shell contract ───────────────────────────────────────────────
 for (const path of PRIVATE) {
   const r = seen[path];

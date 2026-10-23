@@ -230,6 +230,40 @@ export function PraxenPage() {
           </div>
         </section>
 
+        {/* ── Wegweiser direkt nach dem Hero: der Hub verteilt, die Segmentseiten
+            vertiefen. Stand bis 23.10.2026 am Seitenende, hinter ~5.000 Wörtern
+            Hausarzt-Strecke, die inzwischen /ki-telefonassistent-arzt trägt. ── */}
+        <section className={`${SECTION} border-t border-gray-100 dark:border-gray-800`} aria-labelledby="praxisform-heading">
+          <div className="max-w-4xl mx-auto px-6 lg:px-8">
+            <h2 id="praxisform-heading" className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+              Welche Praxis sind Sie?
+            </h2>
+            <p className={`${PROSE} mb-8`}>
+              Die Anrufanlässe unterscheiden sich: Rezept und Überweisung in der
+              Arztpraxis, Schmerzpatienten und Recall in der Zahnarztpraxis,
+              Behandlungszeiten ohne Empfang in der Therapiepraxis. Jede Seite
+              beschreibt ihre Anlässe, Regeln und Grenzen. Was alle gemeinsam
+              haben – Kalenderweg, Übergabe, Datenschutz, Einführung –, steht
+              weiter unten auf dieser Seite einmal.
+            </p>
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
+              {segmentLinks.map((s) => (
+                <Link
+                  key={s.href}
+                  to={s.href}
+                  className={`${CARD} block hover:border-gray-300 dark:hover:border-gray-600 transition-colors`}
+                >
+                  <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
+                    {s.label}
+                    <ArrowRight size={15} className="text-gray-400" aria-hidden="true" />
+                  </h3>
+                  <p className={PROSE}>{s.text}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* ── 2 · M2 Was es kostet, nicht erreichbar zu sein ── */}
         <section className={SECTION_ALT}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
@@ -252,8 +286,10 @@ export function PraxenPage() {
             </div>
             <div className={`${CARD} mt-8`}>
               <p className="text-[17px] text-gray-700 dark:text-gray-300 leading-[1.6]">
-                Mehr als ein Drittel der Befragten ist beim Versuch der
-                telefonischen Terminbuchung gescheitert.
+                Mehr als ein Drittel der befragten Nutzerinnen und Nutzer von
+                Arztterminportalen berichtet, bei der telefonischen Terminbuchung
+                gescheitert zu sein – eine Aussage über diese Nutzergruppe, nicht
+                über alle Patientinnen und Patienten.
               </p>
               <p className="text-[14px] text-gray-500 dark:text-gray-500 mt-2">
                 Quelle: vzbv, Marktcheck Arztterminportale, 2025
@@ -687,25 +723,6 @@ export function PraxenPage() {
         {/* ── Wegweiser: nur Gesundheitsinhalte (Positionierung Option B) ── */}
         <section className={`${SECTION} border-t border-gray-100 dark:border-gray-800`}>
           <div className="max-w-4xl mx-auto px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">
-              Für Ihre Praxisform
-            </h2>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 mb-12">
-              {segmentLinks.map((s) => (
-                <Link
-                  key={s.href}
-                  to={s.href}
-                  className={`${CARD} block hover:border-gray-300 dark:hover:border-gray-600 transition-colors`}
-                >
-                  <h3 className="text-[19px] font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
-                    {s.label}
-                    <ArrowRight size={15} className="text-gray-400" aria-hidden="true" />
-                  </h3>
-                  <p className={PROSE}>{s.text}</p>
-                </Link>
-              ))}
-            </div>
-
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
               Praxen in Ihrer Region
             </h2>

@@ -204,7 +204,7 @@ const faqItems = [
   },
   {
     question: "In welchen Sprachen spricht der Assistent?",
-    answer: `Deutsch ist enthalten. ${SPRACHEN.text} Welche Sprachen für Ihren Betrieb sinnvoll sind, legen Sie bei der Einrichtung fest.`,
+    answer: `${SPRACHEN.text} Welche Sprachen für Ihren Betrieb sinnvoll sind, legen Sie bei der Einrichtung fest.`,
   },
   {
     question: "Merken Anrufer, dass sie mit einer KI sprechen?",
@@ -489,13 +489,11 @@ function HeroSection() {
               verschiebt sie, nimmt Absagen entgegen und beantwortet die Fragen,
               die Sie ihm vorgegeben haben. Auf Wunsch in mehreren Sprachen. Nur
               Ausnahmen und alles, was Sie ausgenommen haben, gehen an einen
-              Menschen.
+              Menschen. Schreibt ein Ablauf in Ihren Kalender oder Ihre
+              Branchensoftware, richten wir diese Anbindung vorher ein und
+              prüfen sie, bevor sie live geht.
             </p>
-            <p className="text-sm text-pub-ink-3 dark:text-gray-500 mb-10 max-w-lg leading-relaxed">
-              Schreibt ein Ablauf direkt in Ihren Kalender oder Ihre
-              Branchensoftware, richten wir diese Anbindung für Ihr System ein
-              und verifizieren sie vorher.
-            </p>
+            <div className="mb-10" />
 
             <div className="flex flex-col sm:flex-row gap-3 mb-4">
               <PrimaryCta />
@@ -810,7 +808,7 @@ function SolutionSection() {
   const capabilities = [
     { icon: PhoneCall, label: "Nimmt Anrufe entgegen, wenn Ihr Team gebunden ist" },
     { icon: Calendar, label: "Bucht Termine im Gespräch – im Rahmen der Regeln, die Sie freigeben" },
-    { icon: RotateCcw, label: "Verschiebt Termine und schließt Absagen ab; der Platz ist sofort wieder frei" },
+    { icon: RotateCcw, label: "Verschiebt Termine und schließt Absagen ab; der frei gewordene Platz ist wieder vergebbar" },
     { icon: MessageSquare, label: "Beantwortet Ihre konfigurierten Fragen selbst, statt sie weiterzureichen" },
     { icon: Languages, label: "Spricht auf Wunsch weitere Sprachen – und wechselt sie mitten im Gespräch" },
     { icon: Shield, label: "Leitet dringende Anrufe sofort an einen Menschen weiter" },
@@ -1747,7 +1745,7 @@ function UseCasesSection() {
             Anwendungsbereiche
           </p>
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-[1.15]">
-            Eingesetzt in Branchen mit
+            Geeignet für Branchen mit
             <br className="hidden sm:block" /> hohem Telefonaufkommen
           </h2>
           <p className="mt-4 text-gray-500 dark:text-gray-400 leading-[1.7]">

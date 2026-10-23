@@ -32,12 +32,12 @@ function rechner(variante: 'voll' | 'kompakt') {
 describe('Rechner — kompakt zeigt den Preis, voll zeigt alles', () => {
   it('rechnet in beiden Fassungen denselben Tarif und denselben Monatsbetrag aus denselben Startwerten', () => {
     const { unmount } = rechner('voll');
-    const tarifVoll = screen.getByText('Passender Tarif').closest('div')?.parentElement?.textContent ?? '';
+    const tarifVoll = screen.getByText('Tarif nach unserer Zuordnungsregel').closest('div')?.parentElement?.textContent ?? '';
     const betragVoll = screen.getAllByText(/339,00/)[0]?.textContent;
     unmount();
 
     rechner('kompakt');
-    const tarifKompakt = screen.getByText('Passender Tarif').closest('div')?.parentElement?.textContent ?? '';
+    const tarifKompakt = screen.getByText('Tarif nach unserer Zuordnungsregel').closest('div')?.parentElement?.textContent ?? '';
     const betragKompakt = screen.getAllByText(/339,00/)[0]?.textContent;
 
     expect(tarifKompakt).toContain('Basis');

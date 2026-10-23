@@ -103,7 +103,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/praxen",
     title: "KI Telefonassistent für Praxen – Ihr Empfang | Cogniiq",
-    description: "KI-Telefonassistent für Arzt-, Zahnarzt- und Therapiepraxen: Termine im Gespräch erledigt, Ihre Stimme, Ihre Regeln. Keine Triage, Kontingent mit Obergrenze, Übergabe in zwei Wochen.",
+    description: "KI-Telefonassistent für Arzt-, Zahnarzt- und Therapiepraxen: Wegweiser zur passenden Praxisseite – plus Kalenderweg, Übergabe und Datenschutz für alle.",
     keywords: "KI Telefonassistent Praxis, Praxisempfang Telefon, telefonische Erreichbarkeit Praxis, Anrufannahme Arztpraxis",
     indexable: true,
     sitemap: { lastmod: "2026-08-16", changefreq: "monthly", priority: "0.90" },
@@ -159,7 +159,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
       auf 0.95 wie beim Automatisierungs-Pillar: eine nationale Seite, nicht zwei.
     */
     title: "Webdesign Agentur – Websites für Unternehmen | Cogniiq",
-    description: "Was eine Website bei Cogniiq umfasst, wer Inhalte liefert, wie SEO, Performance, Tracking und Barrierefreiheit ins Projekt kommen, was den Preis bestimmt und wie ein Projekt bis zum Go-live abläuft.",
+    description: "Webdesign für Unternehmen: was eine Website umfasst, wer die Inhalte liefert, was den Preis bestimmt und wie ein Projekt bis zum Go-live abläuft.",
     keywords: "Webdesign Agentur, Webdesign für Unternehmen, Website erstellen lassen, professionelle Website, Firmenwebsite",
     indexable: true,
     sitemap: { lastmod: "2026-09-13", changefreq: "monthly", priority: "0.95" },
@@ -466,7 +466,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/regensburg/website-relaunch",
-    title: "Website Relaunch Regensburg – Modernisierung ohne Rankingverlust | Cogniiq",
+    title: "Website Relaunch Regensburg – Modernisierung & SEO-Migration | Cogniiq",
     description: "Website Relaunch in Regensburg: alte Website modernisieren, Performance verbessern, lokales SEO optimieren. Professionelle Umsetzung für Unternehmen in Ostbayern.",
     keywords: "Website Relaunch Regensburg, Homepage Relaunch Regensburg, Website modernisieren Regensburg",
     indexable: true,
@@ -601,7 +601,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/ki-telefonassistent-arzt",
     title: "KI-Telefonassistent Arztpraxis: Anrufe erledigen | Cogniiq",
-    description: "KI-Telefonassistent für Arztpraxen: Termine im Gespräch vergeben, verschieben, absagen; Rezept- und Überweisungswünsche strukturiert ans Team. Keine Triage.",
+    description: "KI-Telefonassistent für Arztpraxen: Termine im Gespräch vergeben, verschieben, absagen – über den geprüften Kalenderweg. Rezeptwünsche ans Team. Keine Triage.",
     keywords: "KI Telefonassistent Arzt, AI Rezeptionistin Praxis, Terminbuchung Praxis KI, Arztpraxis Automatisierung",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.87" },
@@ -684,7 +684,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/kosten-ki-telefonassistent",
     title: "Was kostet ein KI Telefonassistent? Preise | Cogniiq",
-    description: "Was kostet ein KI Telefonassistent für Praxen? Tarife ab 300 € im Monat mit festem Minutenkontingent, gedeckelter Rechnung und Zwei-Wochen-Garantie.",
+    description: "Was kostet ein KI Telefonassistent für Praxen? Tarife ab 300 € im Monat mit festem Minutenkontingent, gedeckelter Telefonie und Übergabe in zwei Wochen.",
     keywords: "KI Telefonassistent Kosten, AI Rezeptionist Preis, KI Telefonie Kosten, Automatisierung Kosten",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.88" },

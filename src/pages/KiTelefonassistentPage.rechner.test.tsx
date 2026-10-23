@@ -137,7 +137,7 @@ describe('Flaggschiff und Preisseite rechnen mit demselben Kern', () => {
       const t = new DOMParser().parseFromString(markup, 'text/html').querySelector('main')!
         .textContent!.replace(/\s+/g, ' ');
       // Ausgaben des kanonischen Kerns, nicht der Suspense-Platzhalter.
-      expect(t, `${label}: Tarifausgabe fehlt`).toContain('Passender Tarif');
+      expect(t, `${label}: Tarifausgabe fehlt`).toContain('Tarif nach unserer Zuordnungsregel');
       expect(t, `${label}: Minutenausgabe fehlt`).toContain('Gesprächsminuten pro Monat');
       expect(t, `${label}: Unvollständigkeitszustand fehlt`).toContain(
         'Wirtschaftlichkeit noch nicht vollständig berechnet'
@@ -146,7 +146,7 @@ describe('Flaggschiff und Preisseite rechnen mit demselben Kern', () => {
         'Rechner wird geladen'
       );
       // Genau eine Instanz je Seite.
-      expect((t.match(/Passender Tarif/g) ?? []).length, `${label}: doppelter Rechner`).toBe(1);
+      expect((t.match(/Tarif nach unserer Zuordnungsregel/g) ?? []).length, `${label}: doppelter Rechner`).toBe(1);
     }
   }, 60_000);
 });

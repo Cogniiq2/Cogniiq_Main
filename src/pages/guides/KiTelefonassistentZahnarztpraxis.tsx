@@ -38,7 +38,7 @@ import { ANBINDUNG, DATENSCHUTZ_PUNKTE, FAKTEN, GRENZEN, KOMPAKT_KOSTEN } from "
  * Fassung derselben Zusage stehen bleibt.
  */
 const GRENZEN_TRIAGE = GRENZEN.points.find((p) => p.startsWith("Keine medizinische Einschätzung"));
-const GRENZEN_NOTFALL = GRENZEN.points.find((p) => p.startsWith("Notfälle werden erkannt"));
+const GRENZEN_NOTFALL = GRENZEN.points.find((p) => p.startsWith("Hinweise auf einen Notfall"));
 const GRENZEN_NICHT_ALLE = GRENZEN.points.find((p) => p.startsWith("Der Assistent übernimmt nicht alle Anrufe"));
 if (!GRENZEN_TRIAGE || !GRENZEN_NOTFALL || !GRENZEN_NICHT_ALLE) {
   throw new Error(

@@ -87,7 +87,25 @@ export async function onRequest(context: CloudflarePagesContext) {
 
   const frozenHead = frozenHeadOverrides[pathname];
 
-  let response = await context.next();
+  // ============================================================
+  // HEAD is answered from the GET document, minus the body.
+  //
+  // Cloudflare's asset layer honours HEAD and returns the HTML response WITHOUT
+  // a body. Everything below reads the body to validate it is a complete
+  // document (describeDocumentProblem) and to patch the private-shell head, so
+  // a bodyless HEAD reply failed that check and surfaced as
+  //   500  X-Cogniiq-Shell-Error: asset body is not an HTML document
+  // on every prerendered route (observed in review on /ki-telefonassistent-arzt;
+  // GET on the same URL was fine). Resolve HEAD as the equivalent GET, then
+  // strip the body: same status, same headers, Content-Length of the document
+  // that GET would deliver, no entity. Non-document requests never reach this
+  // point (asset guard above), and redirects pass through unchanged below.
+  // ============================================================
+  const isHead = context.request.method === 'HEAD';
+  const fetchAsGet = () =>
+    context.env.ASSETS.fetch(new Request(context.request.url, { method: 'GET' }));
+
+  let response = isHead ? await fetchAsGet() : await context.next();
   let status = 200;
 
   // ============================================================
@@ -134,7 +152,9 @@ export async function onRequest(context: CloudflarePagesContext) {
   );
   if (problem) {
     return new Response(
-      `Cogniiq: cannot serve ${isPrivateSurface ? 'the application shell' : 'this page'} — ${problem}.`,
+      isHead
+        ? null
+        : `Cogniiq: cannot serve ${isPrivateSurface ? 'the application shell' : 'this page'} — ${problem}.`,
       {
         status: 500,
         headers: {
@@ -159,6 +179,15 @@ export async function onRequest(context: CloudflarePagesContext) {
   headers.set('Content-Type', 'text/html; charset=utf-8');
   headers.set('Cache-Control', 'no-cache');
 
+  /** The one place a document leaves this Function: GET with the body, HEAD
+   *  with the same status and headers and no entity. Content-Length is left to
+   *  the runtime: setting it by hand on a bodyless response makes the
+   *  `wrangler pages dev` proxy wait for bytes that never come. */
+  const dokument = (body: string) => {
+    headers.delete('Content-Length');
+    return new Response(isHead ? null : body, { status, headers });
+  };
+
   if (isPrivateSurface) {
     headers.set('X-Robots-Tag', 'noindex, nofollow');
     html = html.replace(
@@ -167,20 +196,14 @@ export async function onRequest(context: CloudflarePagesContext) {
     );
     html = html.replace(/(<meta\s+name="robots"\s+content=")[^"]*/i, '$1noindex, nofollow');
 
-    return new Response(html, {
-      status,
-      headers,
-    });
+    return dokument(html);
   }
 
   // The prerendered head is already the manifest's, validated per route by
   // scripts/prerender.mjs. Serve it untouched unless this route is holding a
   // frozen experiment's delivered bytes.
   if (!frozenHead) {
-    return new Response(html, {
-      status,
-      headers,
-    });
+    return dokument(html);
   }
 
   if (frozenHead.title) {
@@ -201,8 +224,5 @@ export async function onRequest(context: CloudflarePagesContext) {
     );
   }
 
-  return new Response(html, {
-    status,
-    headers,
-  });
+  return dokument(html);
 }

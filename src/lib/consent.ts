@@ -337,11 +337,16 @@ export type ConversionEvent =
   // Die Rechner melden NUR, dass gerechnet wurde. Anrufaufkommen, Stundensätze
   // und Deckungsbeiträge sind Geschäftszahlen des Besuchers; sie bleiben im
   // Browser und haben in keinem Parameter dieser Funktion etwas zu suchen.
+  // `*_started` = erster Eingriff in ein Feld; `*_calculated` = ein Ergebnis
+  // lag tatsächlich vor (Preis bzw. Geldsaldo). Der Klick auf das Gespräch
+  // ist davon getrennt `cta_demo_click`. Bis zum 23.10.2026 hießen die
+  // Ergebnis-Ereignisse `*_completed` und hingen am CTA-Klick — sie maßen
+  // Absicht, nicht Berechnung.
   | 'calculator_anchor_click'
   | 'price_calculator_started'
-  | 'price_calculator_completed'
+  | 'price_calculated'
   | 'roi_calculator_started'
-  | 'roi_calculator_completed'
+  | 'roi_calculated'
   // Der Wirtschaftlichkeitsrechner auf /kosten-automatisierung. Eigene Namen
   // statt der generischen `roi_calculator_*`, weil sonst zwei Rechner mit
   // verschiedenen Eingaben in einer Kennzahl zusammenfielen und keine Auswertung

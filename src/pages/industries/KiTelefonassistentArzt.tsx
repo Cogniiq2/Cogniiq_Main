@@ -41,7 +41,6 @@ import {
   DATENSCHUTZ_PUNKTE,
   FAKTEN,
   GRENZEN,
-  PATIENTEN_SICHT,
   TEAM_BLOCK,
 } from "@/lib/telefonassistent-copy";
 
@@ -55,7 +54,7 @@ const CANONICAL = canonicalFor(PFAD);
  * zweite Fassung derselben Zusage stehen bleibt.
  */
 const GRENZEN_TRIAGE = GRENZEN.points.find((p) => p.startsWith("Keine medizinische Einschätzung"));
-const GRENZEN_NOTFALL = GRENZEN.points.find((p) => p.startsWith("Notfälle werden erkannt"));
+const GRENZEN_NOTFALL = GRENZEN.points.find((p) => p.startsWith("Hinweise auf einen Notfall"));
 const GRENZEN_NICHT_ALLE = GRENZEN.points.find((p) => p.startsWith("Der Assistent übernimmt nicht alle Anrufe"));
 if (!GRENZEN_TRIAGE || !GRENZEN_NOTFALL || !GRENZEN_NICHT_ALLE) {
   throw new Error(
@@ -169,7 +168,7 @@ const FAQ: Array<{ question: string; answer: string }> = [
   },
   {
     question: "Wie steht es um Schweigepflicht und Datenschutz?",
-    answer: `${DATENSCHUTZ_PUNKTE.slice(0, 5).join(". ")}. Ob Ihre Praxis eine Datenschutz-Folgenabschätzung braucht, entscheidet Ihr Datenschutzbeauftragter – wir liefern die Unterlagen zu.`,
+    answer: `${DATENSCHUTZ_PUNKTE.slice(0, 5).map((p) => p.replace(/\.$/, "")).join(". ")}. Ob Ihre Praxis eine Datenschutz-Folgenabschätzung braucht, entscheidet Ihr Datenschutzbeauftragter – wir liefern die Unterlagen zu.`,
   },
   {
     question: "Was kostet ein KI-Telefonassistent für eine Arztpraxis?",
@@ -283,23 +282,13 @@ export function KiTelefonassistentArzt() {
         </div>
       </header>
 
-      {/* ── Patientensicht ─────────────────────────────────────────────────── */}
-      <section className={SECTION_ALT} aria-labelledby="patienten-heading">
-        <div className="max-w-3xl mx-auto px-6 lg:px-8">
-          <h2 id="patienten-heading" className={H2}>
-            {PATIENTEN_SICHT.headline}
-          </h2>
-          <div className={`${PROSE} space-y-5`}>
-            {PATIENTEN_SICHT.paragraphs.map((absatz) => (
-              <p key={absatz}>{absatz}</p>
-            ))}
-            <p>
-              <span className={STRONG}>{PATIENTEN_SICHT.stat.value}</span> {PATIENTEN_SICHT.stat.text}{" "}
-              <span className="text-gray-500 dark:text-gray-500">({PATIENTEN_SICHT.stat.source})</span>
-            </p>
-          </div>
-        </div>
-      </section>
+      {/*
+        Die Patientensicht (Erreichbarkeit aus Sicht der Anrufer, GKV-Zahl)
+        steht einmal auf dem Hub /praxen und wird hier nicht wiederholt —
+        zwei identische Abschnitte auf zwei Seiten derselben Familie waren ein
+        Befund des Reviews vom 23.10.2026. Diese Seite beginnt mit dem, was an
+        der Arztpraxis anders ist.
+      */}
 
       {/* ── Was anders ist ─────────────────────────────────────────────────── */}
       <section className={SECTION} aria-labelledby="anders-heading">
@@ -314,7 +303,7 @@ export function KiTelefonassistentArzt() {
               an Ihrem eigenen Alltag.
             </p>
             <p>
-              <span className={STRONG}>Die Hälfte der Anrufe ist keine Terminfrage.</span> Rezept,
+              <span className={STRONG}>Ein großer Teil der Anrufe ist keine Terminfrage.</span> Rezept,
               Überweisung, Krankschreibung, Befund: Anliegen, die medizinisch entschieden werden
               und trotzdem die Anmeldung binden, weil jemand sie entgegennehmen, notieren und
               weitergeben muss. Ein Assistent, der nur Termine kann, löst in der Arztpraxis nur

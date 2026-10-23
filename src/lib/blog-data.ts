@@ -250,7 +250,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         question: "Was passiert bei Notfällen?",
         answer:
-          "Notfälle werden erkannt und sofort weitergeleitet – an das Team, den Bereitschaftsdienst oder mit der klaren Ansage, den Notruf 112 zu wählen. Eine Bewertung des Notfalls durch das System findet nicht statt.",
+          "Hinweise auf einen Notfall – Signalwörter, die die Praxis festlegt – lösen die hinterlegte Weiterleitung aus: an das Team, den Bereitschaftsdienst oder die Ansage, den Notruf 112 zu wählen. Eine Bewertung des Notfalls durch das System findet nicht statt, und eine Erkennung jedes Notfalls kann kein System versprechen.",
       },
       {
         question: "Sprechen Patienten lieber mit einem Menschen?",

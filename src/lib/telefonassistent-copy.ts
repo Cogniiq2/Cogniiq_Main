@@ -373,7 +373,7 @@ export const TEAM_BLOCK = {
     "Das Telefon klingelt nicht mehr in dem Moment, in dem eine Patientin am Tresen steht. Wiederkehrende Anliegen — Termin vergeben, verschieben, stornieren, freigegebene Fragen beantworten — sind erledigt, bevor der Anrufer auflegt; sie erscheinen als abgeschlossener Vorgang und nicht als Aufgabe. Auf der Liste Ihres Teams steht nur, was Sie ausgenommen haben: fachliche Fragen, Rezept- und Überweisungswünsche, strittige Fälle. Den Rahmen legen Sie fest, und Sie können ihn jederzeit ändern.",
   points: [
     "Weniger Unterbrechungen zu Stoßzeiten — der Tresen hat Vorrang",
-    "Mehrere Anrufe zur selben Zeit: niemand hört mehr ein Besetztzeichen, auch am Montagmorgen nicht",
+    "Mehrere Anrufe zur selben Zeit: deutlich seltener ein Besetztzeichen, auch am Montagmorgen",
     "Freigegebene Routineabläufe sind im Gespräch erledigt — sie landen gar nicht erst auf einer Liste",
     "Was übrig bleibt, kommt strukturiert an: Anliegen, Name, Rückrufnummer, Terminwunsch — statt Notizzettel",
     "Eine kurze Liste echter Ausnahmen statt Daueralarm: abarbeiten, wenn es in den Ablauf passt",
@@ -452,7 +452,7 @@ export const GRENZEN = {
   points: [
     "Keine medizinische Einschätzung, keine Triage, keine Beratung. Der Assistent beurteilt niemals, wie dringend ein gesundheitliches Anliegen ist – zu keinem Zeitpunkt, in keiner Konfiguration.",
     "Kein Ersatz für Ihr Team. Der Assistent nimmt Anrufe an, die sonst verloren gingen – die Entscheidungen über Termine, Rückmeldungen und Ausnahmen bleiben bei Ihren Mitarbeiterinnen und Mitarbeitern.",
-    "Notfälle werden erkannt und sofort weitergeleitet – an Ihr Team, den Bereitschaftsdienst oder mit der klaren Ansage, den Notruf 112 zu wählen. Eine Bewertung des Notfalls findet nicht statt.",
+    "Hinweise auf einen Notfall – Signalwörter und Formulierungen, die Sie festlegen – lösen keinen Routineablauf aus, sondern die hinterlegte Weiterleitung: an Ihr Team, den Bereitschaftsdienst oder die Ansage, den Notruf 112 zu wählen. Eine Bewertung des Notfalls findet nicht statt, und eine Erkennung jedes Notfalls versprechen wir nicht.",
     "Beschwerden, emotionale Gespräche und alles, was Sie im Anliegen-Katalog als Chefsache markieren, landen immer bei einem Menschen.",
     `${FAKTEN.keineAnbindung} Das Ergebnis der Prüfung steht im Angebot, mit allen dafür bekannten Kosten für den vereinbarten Umfang — auch die einer Schnittstelle, die Dritte berechnen.`,
     "Gespräche werden nicht aufgezeichnet. Wenn Sie später den genauen Wortlaut eines Anrufs brauchen, gibt es ihn nicht – Sie haben das strukturierte Ergebnis, nicht die Aufnahme.",
@@ -488,8 +488,8 @@ export const PATIENTEN_SICHT = {
   ],
   stat: {
     value: "39\u00A0%",
-    text: "der Versicherten bewerten die Erreichbarkeit von Praxen außerhalb der Öffnungszeiten als schwierig.",
-    source: "GKV-Spitzenverband, Versichertenbefragung 2025",
+    text: "der befragten Versicherten bewerten die Erreichbarkeit medizinischer Versorgung außerhalb der üblichen Praxisöffnungszeiten als schwierig – eine Aussage über die Versorgung insgesamt, nicht über das Praxistelefon.",
+    source: "GKV-Spitzenverband, Versichertenbefragung 2025, n = 3.520",
   },
 };
 
@@ -894,9 +894,9 @@ export const BETREUUNG_NACH_GOLIVE = {
 export const UEBERGABE_ABWICKLUNG = {
   headline: "Und wer tippt das dann bei Ihnen ein?",
   paragraphs: [
-    "Im Normalfall niemand. Was Sie freigegeben haben, wickelt der Assistent im Gespräch ab: Termin vergeben, verschieben, absagen, freigegebene Fragen beantworten. Der Vorgang ist fertig, bevor der Anrufer auflegt — er wird nicht zu einer Aufgabe, die jemand später abtippt.",
+    "Für die freigegebenen Abläufe niemand. Was Sie freigegeben haben, wickelt der Assistent im Gespräch ab: Termin vergeben, verschieben, absagen, freigegebene Fragen beantworten. Der Vorgang ist fertig, bevor der Anrufer auflegt — er wird nicht zu einer Aufgabe, die jemand später abtippt.",
     "Das unterscheidet den Empfang von den Systemen, die viele Praxen nach wenigen Wochen wieder abschalten: Dort nimmt eine Maschine den Anruf an, und die Arbeit ist nicht verschwunden, sondern nur umgezogen — von der Anmeldung auf die Abendliste.",
-    "Die Bedingung dafür ist technisch und wird vorher geklärt: Wo ein Ablauf direkt in Ihr Praxissystem schreibt, prüfen wir dessen Schnittstelle vor der Einrichtung und verifizieren die Anbindung vor dem Go-live. Trägt sie einen Ablauf nicht, greift der Weg, den wir vorher gemeinsam festgelegt haben — dann steht der fertige Vorgang für Ihr Team bereit. Das ist der Rückfallweg, nicht der Normalfall, und Sie erfahren vor der Unterschrift, welcher Ihrer Abläufe welchen Weg nimmt.",
+    "Die Bedingung dafür ist technisch und wird vorher geklärt: Wo ein Ablauf direkt in Ihr Praxissystem schreibt, prüfen wir dessen Schnittstelle vor der Einrichtung und verifizieren die Anbindung vor dem Go-live. Trägt sie einen Ablauf nicht, greift der Weg, den wir vorher gemeinsam festgelegt haben — dann steht der fertige Vorgang für Ihr Team bereit. Welcher Ihrer Abläufe welchen Weg nimmt, erfahren Sie vor der Unterschrift – nicht danach.",
   ],
   wasAnkommt: {
     headline: "Was bei einer Übergabe im Dashboard steht",

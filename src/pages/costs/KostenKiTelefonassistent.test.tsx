@@ -64,7 +64,7 @@ describe('Preisseite — das Experiment ist beendet', () => {
 describe('Preisseite — ein Rechner, der kanonische', () => {
   it('rendert den kanonischen Rechner und genau einmal', () => {
     // Der Tarifblock des kanonischen Rechners. Zweimal hiesse: zwei Instanzen.
-    expect(text.match(/Passender Tarif/g) ?? []).toHaveLength(1);
+    expect(text.match(/Tarif nach unserer Zuordnungsregel/g) ?? []).toHaveLength(1);
     expect(text).toContain('Gesprächsminuten pro Monat');
   });
 
@@ -108,7 +108,7 @@ describe('Preisseite — ein Rechner, der kanonische', () => {
   it('trägt die Tarife und die Deckelung weiterhin VOR dem Rechner', () => {
     const tarife = text.indexOf('Welcher Tarif passt zu wie vielen Anrufen?');
     expect(tarife).toBeGreaterThan(-1);
-    expect(tarife).toBeLessThan(text.indexOf('Passender Tarif'));
+    expect(tarife).toBeLessThan(text.indexOf('Tarif nach unserer Zuordnungsregel'));
   });
 });
 
