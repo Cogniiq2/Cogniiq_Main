@@ -1,9 +1,9 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // FROZEN SEO EXPERIMENTS.
 //
-// Five public routes are running live search experiments. Their measurement is
-// only valid while the page the crawler sees stays byte-identical, so they are
-// frozen: no change to title, description, canonical, robots, H1, body copy,
+// Public routes running a live search experiment are frozen here (none at the
+// moment — see GRADUATED_EXPERIMENT_PATHS). A measurement is only valid while
+// the page the crawler sees stays byte-identical, so a frozen route allows no change to title, description, canonical, robots, H1, body copy,
 // JSON-LD, outgoing links or anchor text, and no change to how many places in
 // the codebase link INTO them.
 //
@@ -49,38 +49,39 @@
 import { canonicalFor, routeFor, DEFAULT_ROUTE_ROBOTS, NOINDEX_ROUTE_ROBOTS } from './publicRoutes';
 
 /*
-  GRADUATED — /kosten-ki-telefonassistent, 2026-09-12.
+  GRADUATED — all remaining experiments, 2026-10-23 (owner decision).
 
-  Experiment ended by owner decision 2026-09-12 because the frozen
-  implementation preserved superseded calculator economics and product truth.
+  /kosten-ki-telefonassistent graduated first, on 2026-09-12 (see the git
+  history of this block for the reasoning). On 2026-10-23 the owner ended the
+  other five:
 
-  The freeze was doing the opposite of its job on that route: it held a
-  calculator whose defaults read as a claim about Cogniiq (a 20 %
-  "Automatisierungsgrad"), an ROI model that could show a negative first-year
-  result from an INCOMPLETE set of inputs, and message-taking product wording
-  the owner has since corrected everywhere else. A measurement is only worth
-  protecting while the thing being measured is one we still stand behind.
+    /ki-telefonassistent-arzt      contaminated on 2026-09-11 (head changed for a
+                                   claim correction) and the strongest URL of the
+                                   practice query family; the open ownership
+                                   question (F3) needs the body to be editable.
+    /bayreuth/website-relaunch     the title experiment never reached a crawler:
+                                   the edge served the OLD title until 2026-09-12
+                                   and was held on it afterwards. Voided, not
+                                   evaluated; the manifest now carries the title
+                                   crawlers actually received.
+    /bayreuth/webdesign            measured 51–52 on brand-free queries for two
+    /regensburg/website-relaunch   months; the freeze blocked the decided 301 of
+    /muenchen/webdesign-kosten     /webdesign-agentur-deutschland (F9), the
+                                   site-wide nested-<main> fix and the claim
+                                   hygiene their sister pages received on
+                                   2026-09-13/17.
 
-  Graduating is not the same as re-baselining: the route's entry was removed
-  from src/test/fixtures/protected-experiments.baseline.json by hand, in this
-  commit, and the five remaining fingerprints were left untouched. `npm run
-  seo:baseline` was deliberately NOT run — it would have re-recorded the other
-  five against whatever the tree happens to render today and quietly dissolved
-  the guarantee for all of them.
+  Every baseline entry was removed BY HAND from
+  src/test/fixtures/protected-experiments.baseline.json; `npm run seo:baseline`
+  was not run. Results and follow-up are recorded in
+  docs/seo/organic-growth-scoreboard.md (Messpunkt 2026-10-23) and
+  docs/seo/post-experiment-opportunities.md.
 
-  What did NOT change: the route stays indexable, canonical to itself, in the
-  sitemap, and the owner of generic KI-Telefonassistent cost/price intent.
-  Follow-up recorded in docs/seo/post-experiment-opportunities.md.
+  The guard stays in place with an empty list: adding a path here re-arms it.
 */
 
 /** The frozen routes. Every entry must also be a path in PUBLIC_ROUTES. */
-export const PROTECTED_EXPERIMENT_PATHS: readonly string[] = [
-  '/bayreuth/webdesign',
-  '/bayreuth/website-relaunch',
-  '/regensburg/website-relaunch',
-  '/muenchen/webdesign-kosten',
-  '/ki-telefonassistent-arzt',
-];
+export const PROTECTED_EXPERIMENT_PATHS: readonly string[] = [];
 
 /**
  * Routes that WERE protected and have been formally graduated. Kept as data,
@@ -88,7 +89,14 @@ export const PROTECTED_EXPERIMENT_PATHS: readonly string[] = [
  * re-frozen and — the failure that actually matters — that a route was not
  * dropped from protection without landing here.
  */
-export const GRADUATED_EXPERIMENT_PATHS: readonly string[] = ['/kosten-ki-telefonassistent'];
+export const GRADUATED_EXPERIMENT_PATHS: readonly string[] = [
+  '/kosten-ki-telefonassistent',
+  '/ki-telefonassistent-arzt',
+  '/bayreuth/webdesign',
+  '/bayreuth/website-relaunch',
+  '/regensburg/website-relaunch',
+  '/muenchen/webdesign-kosten',
+];
 
 const PROTECTED = new Set(PROTECTED_EXPERIMENT_PATHS);
 

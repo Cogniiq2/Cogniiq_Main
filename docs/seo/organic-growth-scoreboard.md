@@ -1503,3 +1503,26 @@ Routen, `/bayreuth` Description (M8). Keine neue Seite.
 | Shell | Ankertext Pillar (M11) | dieser Branch | **UNBEKANNT** | offen | mit M23 |
 | `/regensburg/webdesign`, `/muenchen/webdesign` | Ehrlichkeit, Pillar-Link (M12) | dieser Branch | **UNBEKANNT** | offen | Deploy + 28 d |
 | `/kosten-ki-telefonassistent` | Faktenkorrektur P5 | dieser Branch | **UNBEKANNT** | HALT (unverändert) | Deploy + 28 d |
+
+---
+
+# Messpunkt 2026-10-23 — Graduierung aller fünf eingefrorenen Routen
+
+Inhaber-Entscheidung vom 2026-10-23 (SEO-Audit, Branch `claude/seo-audit-2026-10`,
+Basis `ed0f8e4`). Datenlage: GSC-Export dieses Durchgangs siehe `SEO_AUDIT_2026.md`
+im Repo-Root; die Aggregate vom 10.09./14.09./17.09. oben bleiben als Historie
+stehen.
+
+| Route | Ergebnis der Messung | Begründung der Graduierung |
+|---|---|---|
+| `/ki-telefonassistent-arzt` | 543 Impr. / Pos. 31,7 (28D bis 08.09.), 145 Impr. „ki telefonassistent arztpraxis" Pos. 33,9 (bis 14.09.). Seit 11.09. kontaminiert. | Stärkste URL der volumenstärksten kommerziellen Query-Familie, Körper seit 11.09. nicht mehr auswertbar; die Besitzfrage F3 braucht editierbaren Text. |
+| `/bayreuth/website-relaunch` | **Ungültig, nie begonnen**: die Edge lieferte bis 12.09. den alten Titel und hielt ihn danach. 131 Impr. / Pos. 14,4 gelten für den ALTEN Titel. | Experiment für ungültig erklärt. Manifest-Titel auf die tatsächlich gecrawlte Fassung („Alte Website modernisieren") gesetzt — für Crawler ändert sich nichts. Description ohne „ohne Rankingverlust" (Ergebniszusage). |
+| `/regensburg/website-relaunch` | 358 Impr. / Pos. 12,2, 1 Klick (28D). Beste Webdesign-Position der Domain. | Kein laufendes Titel-Experiment, nur Beobachtung. Freigegeben, aber **Head bleibt in diesem Durchgang unverändert** (Seite-1-Nähe). |
+| `/bayreuth/webdesign` | 853 Impr. / Pos. 52,0 (28D). | Zwei Monate ohne Bewegung; der Freeze blockierte F9 und die Claim-Hygiene der Schwesterseiten. |
+| `/muenchen/webdesign-kosten` | 268 Impr. / Pos. 37,2 (28D). | dito; blockierte Claim-Hygiene (Preise/Fristen ohne Beleg). |
+
+Vorgehen wie dokumentiert: `PROTECTED_EXPERIMENT_PATHS` leer,
+`GRADUATED_EXPERIMENT_PATHS` trägt alle sechs, Fixture-Einträge von Hand
+entfernt, `npm run seo:baseline` nicht gelaufen, `frozenHeadOverrides` leer.
+Die Folgearbeit aus `post-experiment-opportunities.md` wird in diesem
+Durchgang umgesetzt und je Änderung weiter unten protokolliert.

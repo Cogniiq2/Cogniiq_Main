@@ -338,8 +338,8 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/bayreuth/website-relaunch",
-    title: "Website Relaunch Bayreuth – Mehr Performance & bessere Rankings | Cogniiq",
-    description: "Website Relaunch in Bayreuth: Ihre bestehende Website modernisieren ohne Rankingverlust. Neues Design, bessere Performance, stärkeres SEO – persönliche Betreuung.",
+    title: "Website Relaunch Bayreuth – Alte Website modernisieren | Cogniiq",
+    description: "Website Relaunch in Bayreuth: bestehende Website modernisieren, Weiterleitungen und Inhalte vor dem Umzug geprüft. Neues Design, schnellere Ladezeit, persönliche Betreuung.",
     keywords: "Website Relaunch Bayreuth, Website modernisieren Bayreuth, Homepage Relaunch Bayreuth",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.78" },
