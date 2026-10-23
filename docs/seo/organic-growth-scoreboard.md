@@ -1526,3 +1526,34 @@ Vorgehen wie dokumentiert: `PROTECTED_EXPERIMENT_PATHS` leer,
 entfernt, `npm run seo:baseline` nicht gelaufen, `frozenHeadOverrides` leer.
 Die Folgearbeit aus `post-experiment-opportunities.md` wird in diesem
 Durchgang umgesetzt und je Änderung weiter unten protokolliert.
+
+## Messreihen aus dem Audit-Durchgang 23.10.2026
+
+Alle Zeilen: Commit auf `claude/seo-audit-2026-10`, Deploy **UNBEKANNT**,
+frühestes Urteil Deploy + 28 Tage; Vergleichsbasis sind die 28-Tage-Werte aus der
+Inhaber-Zusammenfassung vom 23.10. (Seite) bzw. der September-Export (Query).
+Scheitern bedeutet immer: Ursache suchen, Texte vergleichen — nicht blind
+zurückrollen, denn entfernte Zusagen ohne Beleg kommen nicht zurück.
+
+| URL | Änderung | Hypothese | Erfolg (Tag 28) | Abbruch |
+|---|---|---|---|---|
+| `/ki-telefonassistent-arzt` | Graduiert, eigenständige Seite, Titel „KI-Telefonassistent Arztpraxis: Anrufe erledigen", 8 FAQs, Service-Schema, Rechner-Link | Als einzige Seite mit der Intention im Titel/H1 und einem operativen Rahmen (welcher Anruf wird erledigt, welcher bleibt beim Team) bewegt sich die Query-Familie „(ki) telefonassistent arzt(praxis)" (≈ 240 Impr./28 d) aus Pos. 34–40 Richtung Pos. ≤ 20 | Seiten-Position < 30 **und** „ki telefonassistent arztpraxis" < 30; erster Klick | Pos. > 40 auf der Seite **oder** Impressionen –50 % bei stabiler Familie → Head gegen die alte Fassung vergleichen, Körper bleibt |
+| `/ki-telefonassistent-praxis` | Titel/Description auf Therapiepraxen | Die Seite hört auf, mit der Arztseite um denselben Kopfbegriff zu konkurrieren; ob die Therapie-Intention überhaupt Nachfrage hat, zeigt der Query×Seite-Export | ≥ 20 Impr./28 d auf Therapie-Queries | 0–5 Impr. nach 56 d → Konsolidierung in `/praxen` per 301 (bereits als Kandidat notiert) |
+| `/praxen` | H1 mit Kopfbegriff, Hub-Description, Eyebrow-Satz | Hub gewinnt „ki telefonassistent praxis" (58 Impr., Pos. 31) ohne der Arztseite Impressionen zu nehmen | Pos. < 25 auf „ki telefonassistent praxis"; Arztseite gleichzeitig nicht schlechter | Arztseite verliert, `/praxen` gewinnt dieselbe Query → Hub-H1 zurück auf Nutzenformulierung |
+| `/kosten-ki-telefonassistent` | Vergleich der Abrechnungsmodelle, Anbieterfragen, generischer Abschnitt, drei Preis-FAQs | Pos. 19 auf „ki telefonassistent kosten" (143 Impr.) ist Seite-2-Grenze; mehr beantwortete Teilfragen (pro Minute, versteckte Kosten, kleine Praxis) heben die Seite auf Seite 1 | Pos. ≤ 12, CTR > 1 % | Pos. > 25 → neue Abschnitte einzeln gegenprüfen (Reihenfolge, nicht Inhalt) |
+| `/ki-telefonassistent-zahnarztpraxis` | **Nur additiv**: zwei Absätze (Datenschutz, Kosten), zwei Weiterlesen-Links | Seite-1-Position (8,9) bleibt; die Absätze beantworten die zwei häufigsten Folgefragen und senken Rückkehr zur SERP | Pos. ≤ 9 gehalten, Klicks ≥ Vorperiode | Pos. > 12 → **die beiden Absätze sofort entfernen** (einzige Änderung, eindeutig zurechenbar) |
+| `/ki-telefonassistent` | Use-Case-Karten verlinken Segmente, Description „Rechner ohne Anmeldung", Branchenliste neu | Mehr kontextuelle Ausgänge zu den Segmenten; eigene Position (Pos. 40, 272 Impr.) unverändert oder besser | Pos. ≤ 35; Segmentseiten erhalten Besuche vom Flagship (Analytics) | Pos. > 48 → Description zurück, Karten bleiben |
+| `/blog/ki-telefonassistent-arztpraxis` | Titel ohne kommerziellen Kopfbegriff, Links auf Eigentümer | Beitrag gibt die kommerzielle Query an die Arztseite ab und hält informationale Impressionen | Arztseite gewinnt die Query; Blog-Impressionen –30 % sind akzeptiert | Beide Seiten verlieren die Query vollständig → Titel prüfen |
+| `/webdesign-agentur-deutschland` → `/webdesign` | 301 | 5 Impr. markenbezogen wandern; keine Veränderung erwartet | `/webdesign` nicht schlechter | — (Redirect bleibt in jedem Fall) |
+| 7 Blogbeiträge | „2025" aus Titeln, `lastmod` = tatsächliches Datum | Keine Verluste durch veraltete Jahreszahl in der SERP | CTR ≥ Vorperiode | — |
+| Seitenweit | JSON-LD dedupliziert, ein `<main>`, x-default nur auf `/`, eine BreadcrumbList, `robots.txt` ohne Widerspruch zu `noindex` | Keine Ranking-Hypothese; Validität in Rich-Results-Test und Search-Console „Verbesserungen" ohne Fehler | 0 Schema-Fehler nach Crawl | Schema-Fehler → Einzelfall beheben |
+| Navigation | Nischen-Slots zeigen auf `/praxen`, Arzt, Zahnarzt, Restaurant, Hotel | Sitewide-Links auf die Eigentümerseiten; keine Messgröße außer Crawl-Tiefe | Eigentümerseiten in GSC „intern verlinkt" ↑ | — |
+
+### Bewusst NICHT geändert (23.10.2026)
+
+`/ki-telefonassistent-zahnarztpraxis` Head/H1/Struktur (Seite 1),
+`/regensburg/website-relaunch` Head (Pos. 11–12), `/webdesign-hotel`
+(1.184 Impr., Pos. 18 — stärkste Webdesign-Impressionen, kein Text angefasst),
+`/prozessautomatisierung`, `/kosten-webdesign`, `/kosten-automatisierung`,
+Homepage-Titel (Positionierungsentscheidung des Inhabers, `SEO_EXTERNAL_ACTIONS.md`
+#17), Stadt-Webdesign-Kostentabellen (W4). Keine neue indexierbare Seite.

@@ -1,5 +1,45 @@
 # COPY-SEO-CHANGELOG — Copy Overhaul KI-Telefonassistent-Cluster
 
+## 2026-10-23 — Technisches SEO-Audit: Praxis-Cluster mit einem Eigentümer je Intention
+
+Branch `claude/seo-audit-2026-10`. Vollständiges Protokoll: `SEO_CHANGELOG.md`,
+Befund `SEO_AUDIT_2026.md`, Eigentümerkarte `SEO_KEYWORD_MAP.md`, Architektur
+`docs/seo/ARCHITEKTUR.md` §14, Messpunkte `docs/seo/organic-growth-scoreboard.md`.
+
+### Metadaten alt → neu
+
+| Route | Feld | Alt | Neu | Keywords erhalten |
+|---|---|---|---|---|
+| `/ki-telefonassistent-arzt` | Titel | KI-Telefonassistent für Arztpraxen \| Terminwünsche aufnehmen – Cogniiq | KI-Telefonassistent Arztpraxis: Anrufe erledigen \| Cogniiq | ja („Arztpraxis" jetzt als Kopfbegriff) |
+| | Description | Der KI-Telefonassistent für Praxen: nimmt Patientenanrufe an und erfasst Terminwünsche nach Ihren Regeln … | KI-Telefonassistent für Arztpraxen: Termine im Gespräch vergeben, verschieben, absagen; Rezept- und Überweisungswünsche strukturiert ans Team. Keine Triage. | ja |
+| | H1 | KI Telefonassistent für Arztpraxen | KI-Telefonassistent für Arztpraxen: Anrufe erledigen, nicht notieren | ja |
+| `/ki-telefonassistent-praxis` | Titel | KI-Telefonassistent für medizinische Praxen \| Terminverwaltung automatisieren – Cogniiq | KI-Telefonassistent für Therapiepraxen \| Cogniiq | **nein — bewusst** (Intention an `/ki-telefonassistent-arzt` abgegeben) |
+| | Description | KI-Telefonassistent für Arzt- und Facharztpraxen: Termine aufnehmen, Rezeptanfragen strukturiert erfassen … | KI-Telefonassistent für Physio-, Ergo- und Logopädie-Praxen: erreichbar bleiben, während Sie behandeln. Termine im Gespräch vergeben, verschieben, absagen – ohne Mitschnitt. | — |
+| `/praxen` | H1 | Am Tresen steht eine Patientin. Und das Telefon klingelt trotzdem. | KI-Telefonassistent für Praxen: ein Empfang am Telefon, der Anliegen erledigt. (Szene als Eyebrow) | ja (+ Kopfbegriff) |
+| | Description | Ein Empfang am Telefon für Ihre Praxis: Ihre Stimmauswahl, Ihre Regeln, strukturierte Übergabe. Keine Triage, Kontingent mit Obergrenze, in zwei Wochen eingerichtet und bereit zur Freigabe. | KI-Telefonassistent für Arzt-, Zahnarzt- und Therapiepraxen: Termine im Gespräch erledigt, Ihre Stimme, Ihre Regeln. Keine Triage, Kontingent mit Obergrenze, Übergabe in zwei Wochen. | ja |
+| `/ki-telefonassistent` | Description | … Mit Preisrechner, ohne Anmeldung. | … Rechner ohne Anmeldung. | ja (158-Zeichen-Grenze) |
+| `/blog/ki-telefonassistent-arztpraxis` | Titel | KI-Telefonassistent für Arztpraxen: was er übernimmt, was beim Team bleibt \| Cogniiq | Telefon in der Arztpraxis: was beim Team bleiben muss \| Cogniiq | **nein — bewusst** (REDAKTION konkurriert nicht mit dem SEGMENT) |
+| | Description | Was ein KI-Telefonassistent in der Arztpraxis übernimmt, was immer beim Team bleibt und woran die Anbindung an die Praxissoftware hängt. | Rezept, Befund, Akuttermin, Krankschreibung: welche Anrufe in einer Arztpraxis ein Mensch führen muss, welche ein Assistent erledigen kann – und woran die Praxissoftware-Anbindung hängt. | teilweise |
+| `/automatisierung-arzt` | Titel | Automatisierung für Arztpraxen \| Terminbuchung & Kommunikation – Cogniiq | Automatisierung für Arztpraxen \| Erinnerungen, Warteliste & Kommunikation – Cogniiq | ja („Terminbuchung" ohne PVS-Beleg entfernt) |
+| `/bayreuth/website-relaunch` | Titel | Website Relaunch Bayreuth – Mehr Performance & bessere Rankings \| Cogniiq (nie ausgeliefert) | Website Relaunch Bayreuth – Alte Website modernisieren \| Cogniiq (= gecrawlte Fassung) | ja |
+| `/keine-terminbuchung`, `/kontakt`, `/deutschland`, `/bayreuth`, `/blog/ki-telefonassistent-restaurant` | Description | „in wenigen Tagen", „30 Minuten", „Chatbots", „hochkonvertierende", „ohne Personal" | ohne unbestätigte Fristen, Dauer, Leistungen und verbotene Wörter | ja |
+| 7 Blogbeiträge | Titel | „… 2025 …" | ohne Jahreszahl; `updatedAt` = tatsächliches Datum; `publishedAt` = erster Commit des Slugs (2026-03-16) | ja |
+| `/webdesign-agentur-deutschland` | — | eigene Seite | 301 → `/webdesign` | Intention beim Pillar |
+
+### Interne Links hinzugefügt
+
+`/ki-telefonassistent` → `/praxen`, `/ki-telefonassistent-restaurant`, Arzt, Zahnarzt,
+Therapie, Hotel · `/ki-telefonassistent-arzt` → `/praxen`, Kosten, Zahnarzt, Einführen,
+Integrationen, Datenschutz · `/kosten-ki-telefonassistent` → Zahnarzt, Einführen,
+`/ki-telefonassistent` · `/ki-telefonassistent-zahnarztpraxis` → Arzt, Kosten ·
+`/blog/ki-telefonassistent-arztpraxis` → Arzt, Kosten · Navigation (Nischen-Slots) →
+`/praxen`, Arzt, Zahnarzt, Restaurant, Hotel.
+
+### Nicht angefasst
+
+`/ki-telefonassistent-zahnarztpraxis` Titel/H1/Struktur (Seite 1), `/kosten-ki-telefonassistent`
+Titel/H1 (Pos. 19), `/regensburg/website-relaunch` Head, `/webdesign-hotel`, Homepage-Titel.
+
 ## 2026-09-13 (2) — Webdesign-Cluster: ein nationaler Eigentümer, ein Pillar mit Antworten, achtzehn Beträge weniger
 
 Branch `claude/webdesign-recovery-max-2026-09-13`. Architektur und Befund:

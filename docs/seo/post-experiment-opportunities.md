@@ -42,6 +42,8 @@ ist es bei `/kosten-ki-telefonassistent` gemacht worden.
 
 ## `/bayreuth/website-relaunch`
 
+> **GRADUIERT 2026-10-23.** Experiment für ungültig erklärt (die Edge lieferte den alten Titel). Manifest-Titel = gecrawlte Fassung, Description ohne Ergebniszusage. Siehe `organic-growth-scoreboard.md` Messpunkt 2026-10-23.
+
 Läuft seit 2026-08-29 mit einem Titel-Experiment (Aufnahme des Begriffs
 „Performance"); Protokoll in
 `docs/SEO-EXPERIMENT-BAYREUTH-PERFORMANCE-TITLE-2026-08-29.md`.
@@ -57,6 +59,8 @@ Läuft seit 2026-08-29 mit einem Titel-Experiment (Aufnahme des Begriffs
 
 ## `/regensburg/website-relaunch`
 
+> **GRADUIERT 2026-10-23.** Head unverändert (Pos. 11–12, Seite-1-Nähe); Claim-Hygiene im Körper umgesetzt (Commit `647911b`).
+
 - Beschreibt Prüfkriterien einer Leistung, darunter „DSGVO-Konformität"
   (`src/pages/cluster/regensburg/WebsiteRelaunchRegensburg.tsx:40`). Das ist
   nach HONESTY-AUDIT §7.7 zulässig, weil es ein Prüfpunkt einer Dienstleistung
@@ -65,6 +69,8 @@ Läuft seit 2026-08-29 mit einem Titel-Experiment (Aufnahme des Begriffs
   fälschlich als Verstoß angestrichen wird.
 
 ## `/muenchen/webdesign-kosten`
+
+> **GRADUIERT 2026-10-23.** Fristen-/Zusagen-Hygiene umgesetzt (`647911b`); die Euro-Tabellen bleiben bis zur Inhaber-Entscheidung W4 stehen (`SEO_EXTERNAL_ACTIONS.md` #7).
 
 Nach dem Experiment zu prüfen — alles **Claim-Hygiene**, kein SEO-Gewinn:
 
@@ -78,6 +84,8 @@ Nach dem Experiment zu prüfen — alles **Claim-Hygiene**, kein SEO-Gewinn:
   keine Aussage über Cogniiq. Geringes Risiko, nur der Vollständigkeit halber.
 
 ## `/bayreuth/webdesign`
+
+> **GRADUIERT 2026-10-23.** F9 damit frei und erledigt (`cb319b3`); `legacyWebdesignLink` aus den Stadtkonfigurationen entfernt.
 
 - `src/lib/standorte-service-configs.ts:357` — „Auf Wunsch organisieren wir das
   Hosting bei einem deutschen oder europäischen Anbieter." Grenzfall zu
@@ -124,6 +132,8 @@ Nach dem Experiment zu prüfen — alles **Claim-Hygiene**, kein SEO-Gewinn:
   gebündelt (Inhaber-Review) und wartet auf das Experimentende.
 
 ## `/ki-telefonassistent-arzt`
+
+> **GRADUIERT 2026-10-23 und neu gebaut** (`6e0ba3d`). Besitzfrage F3 entschieden: diese Route ist Eigentümerin der Arztpraxis-Intention (`ARCHITEKTUR.md` §14.1).
 
 - Claim-Scan sauber: keine verbotene Formulierung gefunden.
 - **Die eigentliche Frage ist die Struktur, nicht der Text.** Diese Route,

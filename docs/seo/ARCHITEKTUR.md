@@ -575,16 +575,16 @@ löschen hätte die gemessene Inbound-Topologie beider Experimente geändert.
 
 | # | Mission | Warum zuerst / Warum wartet |
 |---|---|---|
-| **F1** | **Messreihen korrigieren.** M1, M2 und das Relaunch-Titelexperiment im Scoreboard als ungültig kennzeichnen und ab dem Deploy dieses Branches neu starten. Für `/bayreuth/website-relaunch` entscheiden: ausliefern oder für ungültig erklären. | Ohne das wird gegen Zahlen argumentiert, die nie eine Auslieferung hatten. Kostet nichts, verhindert eine falsche Entscheidung. |
+| ~~**F1**~~ | **ERLEDIGT 23.10.2026** mit der Graduierung aller Routen (§14). **Messreihen korrigieren.** M1, M2 und das Relaunch-Titelexperiment im Scoreboard als ungültig kennzeichnen und ab dem Deploy dieses Branches neu starten. Für `/bayreuth/website-relaunch` entscheiden: ausliefern oder für ungültig erklären. | Ohne das wird gegen Zahlen argumentiert, die nie eine Auslieferung hatten. Kostet nichts, verhindert eine falsche Entscheidung. |
 | ~~**F2**~~ | **ERLEDIGT 12.09.2026.** `/automatisierung-unternehmen` per 301 in `/prozessautomatisierung` überführt, Pillar neu aufgebaut, Kostenseite von zwölf unbelegten Beträgen befreit und um einen Wirtschaftlichkeitsrechner ergänzt. Einzelheiten §4.1, Herkunftsprüfung `preisaudit-automatisierung.md`. | Größte ungenutzte Strukturchance: zwei nationale Seiten teilten eine Kopf-Intention, und die Geschäftspriorität 2 hing daran. |
-| **F3** | **Praxis-Telefon-Cluster entscheiden**, nach Ende des Arzt-Experiments: `/praxen` vs. `/ki-telefonassistent-arzt` vs. `/ki-telefonassistent-praxis`. Erst Besitz, dann Text. | Volumenstärkste kommerzielle Query-Familie der Domain, und sie bewegt sich ohne Zutun. |
+| ~~**F3**~~ | **ENTSCHIEDEN 23.10.2026** (§14.1): `/ki-telefonassistent-arzt` besitzt „Arztpraxis", `/praxen` bleibt Hub, `/ki-telefonassistent-praxis` auf Therapiepraxen umgestellt. **Praxis-Telefon-Cluster entscheiden**, nach Ende des Arzt-Experiments: `/praxen` vs. `/ki-telefonassistent-arzt` vs. `/ki-telefonassistent-praxis`. Erst Besitz, dann Text. | Volumenstärkste kommerzielle Query-Familie der Domain, und sie bewegt sich ohne Zutun. |
 | **F4** | **`/<stadt>/website-erstellen` und `/<stadt>/landingpage` prüfen** — Query×Seite-Export beschaffen, dann über Merge in `/<stadt>/webdesign` entscheiden. | 6 Routen, ~24.000 Zeichen Pflegeaufwand für ungeklärten Nutzen. Braucht Daten, nicht Meinung. |
 | **F5** | **FAQ-Antworten in den SSR-Körper** (rendern und per CSS klappen, statt bedingt mounten). | Hebt den bewertbaren Körper **aller** FAQ-Seiten. Ändert die Fingerprints aller eingefrorenen Routen — daher erst nach Experimentende. |
 | **F6** | **`/ki-telefonassistent/demo` in die Hydrations-Stichprobe** aufnehmen und den dort vermuteten Fehler beweisen oder ausschließen. | Kleiner, isolierter Branch. Der Verdacht ist derzeit unbelegt; ein Test entscheidet ihn dauerhaft. |
 | **F7** | **Geo-Hubs mit Substanz versehen** (`/regensburg` zuerst: 2.623 Impressionen auf Position 75,8). | Vorhandene Nachfrage auf einer Seite mit 1.151 Zeichen. Eigene Mission, weil es Inhalt und nicht Architektur ist. |
 | ~~**F8**~~ | **ERLEDIGT 13.09.2026.** `/webdesign` neu aufgebaut, `/kosten-webdesign` von 18 unbelegten Beträgen/Zusagen befreit, Bayreuth-SEO-Eigentümer und Geo-Hub-Titel ausgerichtet. Einzelheiten §5, Herkunftsprüfung `preisaudit-webdesign.md`. | Geschäftspriorität 3; nach F2. |
-| **F9** | **`/webdesign-agentur-deutschland` per 301 in `/webdesign` überführen** — nach Graduierung von `/bayreuth/webdesign` und `/bayreuth/website-relaunch`. Vorgehen wie F2: Eintrag in `LEGACY_REDIRECTS`, beide Formen in `public/_redirects`, Route aus Manifest/Router/Sitemap, Komponente löschen, `legacyWebdesignLink` entfernen. Die Seite trägt Preise, Dauern, „A/B-getestet", „nachweislich besser ranken" (`preisaudit-webdesign.md` B1–B8) — bis dahin **nicht** neu schreiben, nur nicht mehr verlinken. | Entschieden 13.09.2026, aufgeschoben, weil die Seite Anker in zwei eingefrorene Experimente trägt: Löschen würde deren gemessene Inbound-Topologie ändern (Inhaber-Review). GSC-Beleg bleibt gültig: 5 Impr., 0 Klicks, markenbezogen. |
-| **F10** | **Doppeltes Organization/WebSite/LocalBusiness-JSON-LD entfernen** — `index.html` trägt eine statische Kopie des Graphen, den `LocalBusinessSchema.tsx` auf jeder öffentlichen Seite ohnehin ausliefert; dazu die unvollständigen Organization-Knoten in `PageSEO.tsx` (`publisher`) durch `@id`-Referenzen ersetzen. | Seitenweite Head-Änderung, betrifft alle eingefrorenen Routen und die KI-/Automatisierungs-Messgebiete — eigener technischer Branch nach Experimentende, nie gebündelt (Inhaber-Review 13.09.2026). |
+| ~~**F9**~~ | **ERLEDIGT 23.10.2026** (§14.2). **`/webdesign-agentur-deutschland` per 301 in `/webdesign` überführen** — nach Graduierung von `/bayreuth/webdesign` und `/bayreuth/website-relaunch`. Vorgehen wie F2: Eintrag in `LEGACY_REDIRECTS`, beide Formen in `public/_redirects`, Route aus Manifest/Router/Sitemap, Komponente löschen, `legacyWebdesignLink` entfernen. Die Seite trägt Preise, Dauern, „A/B-getestet", „nachweislich besser ranken" (`preisaudit-webdesign.md` B1–B8) — bis dahin **nicht** neu schreiben, nur nicht mehr verlinken. | Entschieden 13.09.2026, aufgeschoben, weil die Seite Anker in zwei eingefrorene Experimente trägt: Löschen würde deren gemessene Inbound-Topologie ändern (Inhaber-Review). GSC-Beleg bleibt gültig: 5 Impr., 0 Klicks, markenbezogen. |
+| ~~**F10**~~ | **ERLEDIGT 23.10.2026** (§14.2). **Doppeltes Organization/WebSite/LocalBusiness-JSON-LD entfernen** — `index.html` trägt eine statische Kopie des Graphen, den `LocalBusinessSchema.tsx` auf jeder öffentlichen Seite ohnehin ausliefert; dazu die unvollständigen Organization-Knoten in `PageSEO.tsx` (`publisher`) durch `@id`-Referenzen ersetzen. | Seitenweite Head-Änderung, betrifft alle eingefrorenen Routen und die KI-/Automatisierungs-Messgebiete — eigener technischer Branch nach Experimentende, nie gebündelt (Inhaber-Review 13.09.2026). |
 
 ---
 
@@ -750,3 +750,62 @@ H1- und keine Titel-Dublette, Sitemap deckungsgleich, `Article` auf allen zehn
 Beiträgen, `BreadcrumbList` auf 90, `FAQPage` auf 71 Seiten. Kein P0-Befund.
 F5 (FAQ-Antworten im SSR-Körper) und F10 (doppeltes Organization-JSON-LD)
 bleiben, weil beide die Fingerabdrücke der eingefrorenen Routen ändern.
+
+---
+
+## 14 · Nachtrag 23.10.2026 — Audit-Durchgang (Branch `claude/seo-audit-2026-10`)
+
+Basis `ed0f8e4`. Datenlage: Inhaber-Zusammenfassung der Search Console
+(28 Tage: 9 Klicks, 6.448 Impr., Pos. 35,9; Vorperiode 12 / 9.458 / 54,7) plus
+die September-Exporte aus §3–§9. Ein frischer Query×Seite-Export lag in diesem
+Durchgang **nicht** vor; Entscheidungen, die ihn brauchen, stehen in
+`SEO_AUDIT_2026.md` als offen.
+
+### 14.1 F3 entschieden — ein Eigentümer je Praxis-Intention
+
+| Intention | Eigentümer | Rolle | Was sich änderte |
+|---|---|---|---|
+| „ki telefonassistent arztpraxis", „telefonassistent arzt(praxis)" | `/ki-telefonassistent-arzt` | SEGMENT | Graduiert und als eigenständige Seite neu gebaut (Anrufanlass-Rahmen mit Regeln, Datenschutzblock, Kostenverweis, 8 FAQs, Service-Schema). Titel „KI-Telefonassistent Arztpraxis: Anrufe erledigen". |
+| „ki telefonassistent praxis", Praxisempfang allgemein | `/praxen` | HUB | H1 trägt den Kopfbegriff; Description als Überblick über Arzt-, Zahnarzt- und Therapiepraxen; verlinkt alle drei Segmente. |
+| Therapie (Physio, Ergo, Logopädie) | `/ki-telefonassistent-praxis` | SEGMENT | Head per Manifest auf Therapiepraxen umgestellt; konkurriert nicht mehr um „Arztpraxis". Konsolidierung in `/praxen` bleibt Kandidat, sobald Query×Seite-Daten zeigen, dass die Therapie-Intention nicht zurückkommt. |
+| „ki telefonassistent zahnarztpraxis" | `/ki-telefonassistent-zahnarztpraxis` | REDAKTION → Seite 1 | **Unverändert** in Titel, H1 und Struktur; nur zwei additive Absätze (Datenschutz, Kosten) und zwei Weiterlesen-Links. |
+| informational „Telefon in der Arztpraxis" | `/blog/ki-telefonassistent-arztpraxis` | REDAKTION | Titel vom kommerziellen Kopfbegriff weg; `weiterfuehrend` zeigt auf Arzt- und Kostenseite. |
+
+Begründung: Die Arzt-URL ist die stärkste der Familie (543 Impr., Pos. 31,7
+vor der Kontamination; 471 Impr., Pos. 35 laut Inhaber-Zusammenfassung) und
+wurde nur durch den Freeze am Wachsen gehindert. `/praxen` hat den Kopfbegriff
+nie direkt gehalten; als Hub mit Keyword-H1 verliert es nichts. Die
+Therapie-Seite rankte faktisch nicht mehr (1 Impr. in 28 Tagen) und war die
+einzige Quelle echter Kannibalisierung.
+
+### 14.2 Technischer Stand
+
+- **F9 erledigt**: `/webdesign-agentur-deutschland` → 301 `/webdesign`
+  (`LEGACY_REDIRECTS`, `_redirects` beide Formen, Route/Komponente/Sitemap/
+  Lexikon entfernt, `legacyWebdesignLink`/`legacyAutomationLink` aus den
+  Stadtkonfigurationen).
+- **F10 erledigt**: statische JSON-LD-Kopie in `index.html` entfernt;
+  `PageSEO` referenziert `publisher` per `@id`; Blog-Artikel referenzieren
+  Autor/Herausgeber per `@id`; eine `BreadcrumbList` statt zwei; `paymentAccepted`
+  aus `LocalBusinessSchema`.
+- `hreflang x-default` nur noch auf `/`; innere `<main>` in Seitenkomponenten
+  zu `<div>` (ein Landmark je Dokument); `robots.txt` ohne `Disallow
+  /anfrage-erhalten` (Seite ist `noindex`); sieben Blogtitel ohne „2025" mit
+  tatsächlichem `lastmod`.
+- Edge-Head-Override (`frozenHeadOverrides`) ist leer; §7 bleibt als Regel.
+- **Offen** (eigene Branches): Chunk-Preload des Manifests (H4), Hero-CLS
+  (M4), Article/Person-Autorenschaft mit echter Autorenseite (M7),
+  `not_found_handling` in `wrangler`, überlange Anker-Wiederholungen auf
+  Templateseiten, Stadt-Webdesign-Kostentabellen (W4, Inhaber-Entscheidung).
+
+### 14.3 Regeln, die hinzukommen
+
+- Die `/ki-telefonassistent-zahnarztpraxis` ist bis zur nächsten Messung
+  **Seite-1-Gewinner**: Head, H1 und Abschnittsfolge nicht anfassen; nur
+  additive Absätze unterhalb bestehender Abschnitte.
+- `/ki-telefonassistent-arzt` darf jetzt auf den Rechner verlinken; der
+  Test in `rechner-konsistenz.test.tsx` folgt `PROTECTED_EXPERIMENT_PATHS`
+  statt einer getippten Liste.
+- Jede Query×Seite-Auswertung läuft über `scripts/seo/gsc-analyze.mjs`; die
+  Zuordnung Query → Eigentümer steht in `SEO_KEYWORD_MAP.md` (Repo-Root) und
+  wird dort gepflegt, nicht in einzelnen Seitenkommentaren.
