@@ -349,3 +349,52 @@ nachdem es zum ersten Mal ausgelöst wurde.
 **Bitte keine Testanfrage über das echte Formular abschicken** — der Endpunkt
 löst eine reale Bearbeitung aus. Das Ereignis erscheint mit der ersten echten
 Anfrage.
+
+## Nachtrag 23.10.2026 — Tarifregeln, die der Rechner nicht erfinden darf (BLOCKIEREND für die Release-Freigabe)
+
+Der Preis- und Nutzenrechner wendet die veröffentlichte Zuordnungsregel
+(`FAKTEN.tarifzuordnung`) auf einen einzigen eingegebenen Monatswert an und legt
+seit dem 23.10.2026 alle drei Listentarife daneben offen. Einen „günstigsten
+Tarif" verspricht er nicht mehr. Was er weiterhin nicht weiß und deshalb nicht
+sagt, steht hier. Solange diese Punkte offen sind, ist jede Monatssumme eine
+Teilsumme aus bekannten Positionen, und der Stand gilt als NOT READY TO DEPLOY
+(siehe `FINAL_SEO_RELEASE_AUDIT.md`).
+
+### J1 · Wer darf welchen Tarif nutzen?
+Kapazität, Leistungen, Standorte, Behandler, Vertragsgrenzen — oder darf jeder
+Kunde jeden Listentarif wählen und an dessen Obergrenze laufen?
+
+### J2 · Wann ist höherer Verbrauch „dauerhaft"?
+Welcher Zeitraum, welche Schwelle, automatische Umstellung oder neues Angebot, ab
+wann, mit welcher Mitteilung? Bleibt ein einzelner Spitzenmonat im kleineren Tarif
+gedeckelt?
+
+### J3 · Geltung des Deckels
+Gilt die Obergrenze nur für Grundgebühr + Mehrminuten? Liegen Sprach-,
+Integrations- und Kündigungsaufschläge innerhalb oder außerhalb? (Verwandt mit H2.)
+
+### J4 · Bezugsgröße des 20-%-Aufschlags
+Auf welche Positionen genau? (Verwandt mit H1.)
+
+### J5 · Umfang der 24-Monats-Preisgarantie
+Tarifbestandteile, Minutenpreis, Deckel? Der Satz „Innerhalb dieser Zeit ändert
+sich Ihr Monatsbetrag nicht" (`VERTRAG`) liest sich wie eine konstante Rechnung
+trotz schwankendem Verbrauch — ist das gemeint?
+
+### J6 · Branchenbezug
+Sind Basis/Praxis/MVZ reine Praxistarife oder gelten sie für alle Branchen?
+(Identisch mit Q3 aus `SEO_EXTERNAL_ACTIONS.md`.)
+
+### J7 · Sprachpaket
+Zählt Deutsch mit, genaue Staffel, Obergrenze der Sprachen? (Identisch mit H3.)
+
+### J8 · Steuerbasis und Drittkosten
+Netto oder brutto in Preisliste und Rechner? Welche einmaligen oder laufenden
+Integrations-/Drittanbietergebühren gibt es, und welche können tatsächlich null sein?
+
+### J9 · Datenschutz- und Tracking-Aussage am Rechner
+Der Rechner behauptet: „Ihre Eingaben werden nicht gespeichert, nicht übertragen
+und nicht an Analysedienste gemeldet." Der Code hält das ein (nur feste
+Ereignisnamen, keine Werte in URL oder Event; geprüft durch
+`rechner-konsistenz.test.tsx`). Bitte bestätigen, dass kein weiteres Tag-Setup
+(GTM, Ads) Formularfelder oder Seitenzustand mitliest.

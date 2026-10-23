@@ -1,5 +1,7 @@
 # SEO_AUDIT_2026 — cogniiq.de, technical SEO audit and implementation
 
+> **Nachtrag 23.10.2026 (Korrekturdurchgang):** Der Rohdatenexport wurde ausgewertet, drei P0-Fehler des Branches korrigiert (HEAD 500, Tarifempfehlung/Sprachaufschlag, ROI-Amortisation aus Zeitwert) und die Claims nachgezogen. Maßgeblich sind jetzt `FINAL_SEO_RELEASE_AUDIT.md`, `FINAL_SEO_CHANGELOG.md`, `FINAL_KEYWORD_OWNERSHIP.md`, `FINAL_EXTERNAL_AUTHORITY_PLAN.md` und `RELEASE_CHECKLIST.md`. Aussagen in diesem Dokument, die dem widersprechen (z. B. „eine Position vor Seite 1", Desktop-Annahme, Dental-Abbruchregel bei Pos. 12), sind dort korrigiert.
+
 Date 2026-10-23 · Branch `claude/seo-audit-2026-10` (base `ed0f8e4`) · Nothing deployed.
 
 **Data basis and its limits.** The Search Console export for this pass was announced

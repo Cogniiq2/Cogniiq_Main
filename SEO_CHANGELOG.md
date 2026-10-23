@@ -1,5 +1,7 @@
 # SEO_CHANGELOG — Technical SEO audit, 2026-10-23
 
+> **Nachtrag 23.10.2026:** Korrekturen an diesem Branch stehen in `FINAL_SEO_CHANGELOG.md` (Branch `claude/seo-release-fixes-2026-10`).
+
 Branch `claude/seo-audit-2026-10`, base `ed0f8e4` (origin/main). Four commits:
 
 | Commit | Scope |

@@ -1557,3 +1557,18 @@ zurückrollen, denn entfernte Zusagen ohne Beleg kommen nicht zurück.
 `/prozessautomatisierung`, `/kosten-webdesign`, `/kosten-automatisierung`,
 Homepage-Titel (Positionierungsentscheidung des Inhabers, `SEO_EXTERNAL_ACTIONS.md`
 #17), Stadt-Webdesign-Kostentabellen (W4). Keine neue indexierbare Seite.
+
+## Korrekturdurchgang 23.10.2026 (Branch `claude/seo-release-fixes-2026-10`)
+
+Datenbasis: GSC-Export 24.09.–21.10.2026 (ohne Query×Page). Deploy **UNBEKANNT**,
+Baseline = dieses Fenster, frühestes Urteil nach erneutem Crawl + einem
+vergleichbaren 28-Tage-Fenster; bei < 100 Impressionen verlängern.
+
+| URL | Änderung | Hypothese | Führendes Signal | Alternative Ursachen | Rollback-Kriterium |
+|---|---|---|---|---|---|
+| alle prerenderten Routen | HEAD liefert 200 statt 500 | kein Rankingeffekt erwartet; Protokollfehler behoben | URL-Prüfung, Server-Logs ohne `X-Cogniiq-Shell-Error` | — | keiner (Fehlerbehebung) |
+| `/regensburg/website-relaunch` | Title „… Modernisierung & SEO-Migration" statt „… ohne Rankingverlust"; Garantien → Ziele | lokaler Querykern bleibt (Queries Pos. 5,8 / 5,8); Wahrheitskorrektur kostet nichts Messbares | „website relaunch regensburg", „homepage relaunch regensburg" Position | Saison, Mitbewerber | **nicht** zurückrollen (Garantie war falsch); bei > 5 Plätzen Verlust auf beiden Queries Title-Variante ohne Garantie prüfen |
+| `/praxen` | Praxisarten-Router direkt nach dem Hero | Hub verteilt früher; Segmentseiten erhalten Klicks vom Hub | interne Klicks Hub → Segmente; „telefonassistent praxis" Pos. | — | Block ans Ende zurück, wenn Hub-Impressionen –50 % bei stabilen Segmenten |
+| `/ki-telefonassistent-arzt` | Patientensicht-Dopplung entfernt, Claims korrigiert, Description mit Kalenderweg-Bedingung | kein Verlust; CTR-Effekt der Description beobachten | Pos. auf „ki telefonassistent arztpraxis"; CTR | Title-Änderung aus dem SEO-Branch wirkt gleichzeitig | Abschnitt zurück, wenn Impressionen –50 % **und** Praxen gewinnt dieselbe Query |
+| `/ki-telefonassistent`, `/kosten-ki-telefonassistent` | Rechner: drei Bausteine, Tarifvergleich, keine Zeitwert-Amortisation; Descriptions korrigiert | Vertrauen/Conversion, kein Rankingziel | `price_calculated`, `roi_calculated`, `cta_demo_click`, `lead_submitted` getrennt | — | keiner (Richtigkeit) |
+| `/ki-telefonassistent-zahnarztpraxis` | **keine Änderung** | Schutz; Pos. 8,9 ist Seitenmittel, keine Top-10 für das Hauptkeyword | Dental-Queries einzeln | — | nicht automatisch bei Pos. > 12 (85 Impr. zu schwach); nur bei nachhaltiger Verschlechterung vergleichbarer Queries die additiven Absätze vom 23.10. (SEO-Branch) zurücknehmen |
