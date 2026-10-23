@@ -346,7 +346,7 @@ export function KiTelefonassistentPage() {
         additionalSchema={schema}
       />
 
-      <main className="min-h-screen">
+      <div className="min-h-screen">
         {/*
           Reihenfolge als Kaufentscheidung gelesen, nicht als Modulliste:
 
@@ -414,7 +414,7 @@ export function KiTelefonassistentPage() {
         <FAQSectionBlock />            {/* M11 FAQ */}
         <FinalCtaSection />            {/* M12 Nächster Schritt */}
         <InternalLinksSection />
-      </main>
+      </div>
     </>
   );
 }

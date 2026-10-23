@@ -143,7 +143,7 @@ export function CityServicePage({ config }: CityServicePageProps) {
         additionalSchema={localBusinessSchema}
       />
 
-      <main className="min-h-screen">
+      <div className="min-h-screen">
         <HeroSection config={config} breadcrumbs={breadcrumbs} />
         {/* M13 · Stimmprobe — nur Telefonassistent-Stadtseiten; asset-gated,
             rendert ohne Audiodatei nichts. */}
@@ -165,7 +165,7 @@ export function CityServicePage({ config }: CityServicePageProps) {
         <FAQSection config={config} />
         <RelatedPages config={config} />
         <CTASection config={config} />
-      </main>
+      </div>
     </>
   );
 }
@@ -727,9 +727,9 @@ function CTASection({ config }: { config: CityServiceConfig }) {
           <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-center gap-4 text-sm text-pub-ink-3 dark:text-gray-500">
             <Link to="/ki-telefonassistent" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">KI-Telefonassistent</Link>
             <span aria-hidden="true">·</span>
-            <Link to={config.legacyWebdesignLink ?? "/webdesign"} className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Webdesign Agentur</Link>
+            <Link to="/webdesign" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Webdesign Agentur</Link>
             <span aria-hidden="true">·</span>
-            <Link to={config.legacyAutomationLink ?? "/prozessautomatisierung"} className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Automatisierung</Link>
+            <Link to="/prozessautomatisierung" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Automatisierung</Link>
             <span aria-hidden="true">·</span>
             <Link to="/verpasste-anrufe-verlust" className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Verpasste Anrufe</Link>
             <span aria-hidden="true">·</span>

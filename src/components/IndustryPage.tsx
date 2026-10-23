@@ -147,7 +147,7 @@ export function IndustryPage({ config }: IndustryPageProps) {
         additionalSchema={schema}
       />
 
-      <main className="min-h-screen">
+      <div className="min-h-screen">
         <HeroSection config={config} breadcrumbs={breadcrumbs} />
         <TrustStripSection config={config} />
         {config.engpaesse && config.engpaesse.length > 0 && (
@@ -167,7 +167,7 @@ export function IndustryPage({ config }: IndustryPageProps) {
         <InternalLinksSection config={config} />
         <FAQSection config={config} />
         <CTASection config={config} />
-      </main>
+      </div>
     </>
   );
 }

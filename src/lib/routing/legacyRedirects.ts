@@ -71,15 +71,16 @@ export const LEGACY_REDIRECTS: Readonly<Record<string, string>> = {
   '/automatisierung-unternehmen': '/prozessautomatisierung',
 
   /*
-    2026-09-13 — NOT yet: `/webdesign-agentur-deutschland` -> `/webdesign`.
+    2026-10-23 — `/webdesign-agentur-deutschland` -> `/webdesign` (F9).
 
-    The consolidation is decided (docs/seo/ARCHITEKTUR.md §5.1, K2: same head
-    intent, 5 impressions in 28 days, almost all branded) but deferred: the
-    retiring page carries anchors into two FROZEN experiments
-    (src/lib/routing/protectedExperiments.ts), and deleting it would change
-    their measured inbound topology. It lands here when those experiments
-    graduate — follow-up F9.
+    Decided on 2026-09-13 (docs/seo/ARCHITEKTUR.md §5.1, K2: same head intent,
+    5 impressions in 28 days, almost all branded) and deferred only because the
+    retiring page carried anchors into two frozen experiments. Those experiments
+    graduated on 2026-10-23, so the consolidation lands: the national webdesign
+    intent has one owner, and the pillar's 21 contextual inbound pages no longer
+    share it with a duplicate nobody linked.
   */
+  '/webdesign-agentur-deutschland': '/webdesign',
 };
 
 const SOURCES: ReadonlySet<string> = new Set(Object.keys(LEGACY_REDIRECTS));

@@ -74,6 +74,8 @@
 /referenzen/                    /ueber-uns                301
 /bewertungen                    /ueber-uns                301
 /bewertungen/                   /ueber-uns                301
+/webdesign-agentur-deutschland  /webdesign                301
+/webdesign-agentur-deutschland/ /webdesign                301
 
 /app                /app-shell     200
 /app/*              /app-shell     200

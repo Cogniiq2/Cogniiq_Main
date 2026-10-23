@@ -144,7 +144,7 @@ export function KiTelefonassistentDemoPage() {
         additionalSchema={schema}
       />
 
-      <main className="min-h-screen">
+      <div className="min-h-screen">
         <section className="pt-32 pb-20 bg-white dark:bg-gray-950">
           <div className="max-w-6xl mx-auto px-6 lg:px-8">
             <motion.nav
@@ -498,7 +498,7 @@ export function KiTelefonassistentDemoPage() {
             </div>
           </div>
         </section>
-      </main>
+      </div>
     </>
   );
 }

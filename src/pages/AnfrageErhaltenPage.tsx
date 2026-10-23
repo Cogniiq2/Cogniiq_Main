@@ -56,7 +56,7 @@ export function AnfrageErhaltenPage() {
         ]}
       />
 
-      <main className="min-h-screen flex items-center justify-center px-6 py-32">
+      <div className="min-h-screen flex items-center justify-center px-6 py-32">
         <div className="w-full max-w-lg text-center">
           <motion.div className="cq-rise flex justify-center mb-10">
             <div className="relative w-20 h-20">
@@ -88,7 +88,7 @@ export function AnfrageErhaltenPage() {
             </Link>
           </motion.div>
         </div>
-      </main>
+      </div>
     </>
   );
 }

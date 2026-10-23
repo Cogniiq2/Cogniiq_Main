@@ -133,7 +133,7 @@ export function BayernKiTelefonassistentPage() {
         additionalSchema={schema}
       />
 
-      <main className="min-h-screen">
+      <div className="min-h-screen">
         <HeroSection />
         <TrustSection />
         <IntroSection />
@@ -143,7 +143,7 @@ export function BayernKiTelefonassistentPage() {
         <DemoCtaSection />
         <FAQSection />
         <FinalCtaSection />
-      </main>
+      </div>
     </>
   );
 }

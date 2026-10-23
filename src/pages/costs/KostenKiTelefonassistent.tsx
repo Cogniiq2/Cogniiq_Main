@@ -188,7 +188,7 @@ export function KostenKiTelefonassistent() {
         additionalSchema={schema}
       />
 
-      <main className="min-h-screen bg-white dark:bg-gray-950">
+      <div className="min-h-screen bg-white dark:bg-gray-950">
         {/* ── Einstieg: Planbarkeit vor Betrag ── */}
         <section className="pt-32 pb-24">
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
@@ -564,7 +564,7 @@ export function KostenKiTelefonassistent() {
             </ul>
           </div>
         </section>
-      </main>
+      </div>
     </>
   );
 }

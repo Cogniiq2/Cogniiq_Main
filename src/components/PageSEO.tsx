@@ -119,7 +119,14 @@ export function PageSEO({
     } else {
       setLink("canonical", canonical);
       setLink("alternate", canonical, { hreflang: "de-DE" });
-      setLink("alternate", canonical, { hreflang: "x-default" });
+      // x-default names the page a visitor with no matching language gets; on a
+      // single-language site that is only meaningful for the homepage (and the
+      // sitemap only ever declared it there).
+      if (canonical === `${BUSINESS_INFO.website}/`) {
+        setLink("alternate", canonical, { hreflang: "x-default" });
+      } else {
+        removeElements('link[rel="alternate"][hreflang="x-default"]');
+      }
     }
 
     setMeta("og:title", title, "property");
@@ -167,13 +174,11 @@ export function PageSEO({
       "@id": `${BUSINESS_INFO.website}/#website`,
       url: BUSINESS_INFO.website,
       name: BUSINESS_INFO.name,
-      publisher: {
-        "@type": "Organization",
-        "@id": `${BUSINESS_INFO.website}/#organization`,
-        name: BUSINESS_INFO.name,
-      },
+      // Reference only: the full Organization node is emitted once by
+      // LocalBusinessSchema. A second partial copy here produced the validator
+      // warning "Organization is missing required field logo".
+      publisher: { "@id": `${BUSINESS_INFO.website}/#organization` },
     },
-    ...(breadcrumbList ? { breadcrumb: breadcrumbList } : {}),
     inLanguage: "de-DE",
   };
 

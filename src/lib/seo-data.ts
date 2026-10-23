@@ -1,7 +1,7 @@
 export const BUSINESS_INFO = {
   name: "Cogniiq",
   legalName: "Cogniiq, Inhaber Lazar Popovic",
-  description: "AI Agentur und Webdesign Agentur in Bayreuth. Spezialisiert auf KI Automationen, AI Rezeptionistin und hochkonvertierende Websites für Unternehmen in Deutschland.",
+  description: "KI- und Webdesign-Agentur in Bayreuth. KI-Telefonassistent, Websites und Prozessautomatisierung für Unternehmen in Deutschland.",
   // Business start date confirmed by the operator. The previously published "2023"
   // had no supporting record anywhere in the repository.
   foundingDate: "2025-10-15",
@@ -167,7 +167,7 @@ export const LOCATION_PAGES: LocationPage[] = [
     region: "Bayern",
     slug: "",
     title: "AI Agentur & Webdesign Agentur Bayreuth",
-    description: "Cogniiq – Ihre AI Agentur und Webdesign Agentur in Bayreuth. KI Automationen, AI Rezeptionistin und hochkonvertierende Websites direkt vor Ort.",
+    description: "Cogniiq – KI- und Webdesign-Agentur in Bayreuth. KI-Telefonassistent, Websites und Prozessautomatisierung, direkt vor Ort.",
     keywords: ["AI Agentur Bayreuth", "Webdesign Agentur Bayreuth", "KI Automationen Bayreuth"],
     canonical: "https://cogniiq.de",
     isHeadquarters: true,

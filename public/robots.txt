@@ -5,7 +5,6 @@ Disallow: /api/
 Disallow: /_debug/
 Disallow: /preview/
 Disallow: /__/
-Disallow: /anfrage-erhalten
 
 # /admin is deliberately NOT disallowed. It — like /app, /owner, /auth and /d —
 # is served the noindex application shell (public/_headers sets

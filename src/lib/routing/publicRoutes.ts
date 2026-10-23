@@ -180,19 +180,6 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
     sitemap: { lastmod: "2026-09-12", changefreq: "monthly", priority: "0.95" },
   },
   {
-    path: "/webdesign-agentur-deutschland",
-    /*
-      Bleibt vorerst live (13.09.2026): Konsolidierung in /webdesign ist
-      beschlossen und aufgeschoben, weil die Seite Anker auf zwei eingefrorene
-      Experimente trägt (docs/seo/ARCHITEKTUR.md §5.1, F9).
-    */
-    title: "Webdesign Agentur Deutschland | Individuelle Websites national – Cogniiq",
-    description: "Cogniiq ist Ihre Webdesign Agentur für ganz Deutschland. Wir entwickeln individuelle, SEO-optimierte Websites die konvertieren – remote oder persönlich in Bayern.",
-    keywords: "Webdesign Agentur Deutschland, Website Agentur Deutschland, professionelle Website Deutschland",
-    indexable: true,
-    sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.92" },
-  },
-  {
     path: "/ki-agentur-deutschland",
     title: "KI Agentur Deutschland | AI-Systeme für Unternehmen – Cogniiq",
     description: "Cogniiq ist Ihre KI-Agentur für ganz Deutschland. KI-Telefonassistenten, Chatbots und Automatisierungssysteme – entwickelt für den deutschen Markt.",
@@ -769,10 +756,10 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/blog/ki-automatisierung-kleine-unternehmen",
-    title: "KI-Automatisierung für kleine Unternehmen 2025 | Leitfaden",
+    title: "KI-Automatisierung für kleine Unternehmen | Leitfaden",
     description: "KI-Automatisierung für kleine Unternehmen: Welche Prozesse sich lohnen, was es kostet und wie der Einstieg gelingt. Mit konkreten Beispielen aus der Praxis.",
     indexable: true,
-    sitemap: { lastmod: "2026-07-23", changefreq: "monthly", priority: "0.60" },
+    sitemap: { lastmod: "2026-10-23", changefreq: "monthly", priority: "0.60" },
   },
   {
     path: "/blog/ki-telefonassistent-arztpraxis",
@@ -783,17 +770,17 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/blog/webdesign-konversion-tipps",
-    title: "Webdesign für mehr Anfragen & Konversion 2025 | 8 Tipps",
+    title: "Webdesign für mehr Anfragen & Konversion | 8 Tipps",
     description: "Warum viele Unternehmenswebsites keine Anfragen generieren – und wie Sie mit gezielten Webdesign-Entscheidungen die Konversionsrate verdoppeln können.",
     indexable: true,
-    sitemap: { lastmod: "2026-07-23", changefreq: "monthly", priority: "0.60" },
+    sitemap: { lastmod: "2026-10-23", changefreq: "monthly", priority: "0.60" },
   },
   {
     path: "/blog/lokales-seo-unternehmen",
-    title: "Lokales SEO für Unternehmen 2025 | Google Maps & lokale Suche",
+    title: "Lokales SEO für Unternehmen | Google Maps & lokale Suche",
     description: "Lokales SEO erklärt: Wie Unternehmen in Google Maps sichtbar werden, welche Faktoren wirklich zählen und welche Fehler die meisten Betriebe machen.",
     indexable: true,
-    sitemap: { lastmod: "2026-07-23", changefreq: "monthly", priority: "0.60" },
+    sitemap: { lastmod: "2026-10-23", changefreq: "monthly", priority: "0.60" },
   },
   {
     path: "/blog/prozessautomatisierung-roi",
@@ -807,35 +794,35 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
     title: "Verpasste Anrufe Kosten berechnen | KI-Telefonassistent",
     description: "Wie teuer sind verpasste Anrufe wirklich? Eine ehrliche Kalkulation mit Durchschnittswerten aus deutschen KMU – und wie ein KI-Telefonassistent den Verlust stoppt.",
     indexable: true,
-    sitemap: { lastmod: "2026-07-23", changefreq: "monthly", priority: "0.60" },
+    sitemap: { lastmod: "2026-09-17", changefreq: "monthly", priority: "0.60" },
   },
   {
     path: "/blog/ki-telefonassistent-restaurant",
-    title: "KI-Telefonassistent Restaurant 2025 | Reservierungen automatisieren",
+    title: "KI-Telefonassistent Restaurant | Reservierungen automatisieren",
     description: "Wie Restaurants mit einem KI-Telefonassistenten Reservierungsanfragen auch in der Stoßzeit annehmen, was der Assistent übernimmt, was beim Team bleibt und woran die Anbindung an ein Reservierungssystem hängt.",
     indexable: true,
-    sitemap: { lastmod: "2026-07-23", changefreq: "monthly", priority: "0.60" },
+    sitemap: { lastmod: "2026-10-23", changefreq: "monthly", priority: "0.60" },
   },
   {
     path: "/blog/website-ohne-anfragen",
-    title: "Website bringt keine Anfragen? Ursachen & Lösungen 2025",
+    title: "Website bringt keine Anfragen? Ursachen & Lösungen",
     description: "Die häufigsten Gründe, warum Unternehmenswebsites keine Anfragen generieren – und konkrete Schritte, um das in wenigen Wochen zu ändern.",
     indexable: true,
-    sitemap: { lastmod: "2026-07-23", changefreq: "monthly", priority: "0.60" },
+    sitemap: { lastmod: "2026-10-23", changefreq: "monthly", priority: "0.60" },
   },
   {
     path: "/blog/digitalisierung-mittelstand",
-    title: "Digitalisierung Mittelstand 2025 | Wo anfangen & was vermeiden",
+    title: "Digitalisierung Mittelstand | Wo anfangen & was vermeiden",
     description: "Digitalisierung im deutschen Mittelstand: Ein praxisorientierter Einstiegsleitfaden, der zeigt, welche Maßnahmen wirklich Wirkung haben – und welche Fallen es zu vermeiden gilt.",
     indexable: true,
-    sitemap: { lastmod: "2026-07-23", changefreq: "monthly", priority: "0.60" },
+    sitemap: { lastmod: "2026-10-23", changefreq: "monthly", priority: "0.60" },
   },
   {
     path: "/blog/webdesign-agentur-auswahl",
-    title: "Webdesign Agentur auswählen 2025 | 7 entscheidende Kriterien",
+    title: "Webdesign Agentur auswählen | 7 entscheidende Kriterien",
     description: "Wie finden Sie die richtige Webdesign-Agentur für Ihr Unternehmen? 7 konkrete Auswahlkriterien, die vor überteuerten Projekten und schlechten Ergebnissen schützen.",
     indexable: true,
-    sitemap: { lastmod: "2026-07-23", changefreq: "monthly", priority: "0.60" },
+    sitemap: { lastmod: "2026-10-23", changefreq: "monthly", priority: "0.60" },
   },
 
   // ─── LEGAL ───────────────────────────────────────────────────────────────────

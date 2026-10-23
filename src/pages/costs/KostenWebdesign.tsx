@@ -283,7 +283,7 @@ export function KostenWebdesign() {
         additionalSchema={schema}
       />
 
-      <main className="min-h-screen bg-white dark:bg-gray-950">
+      <div className="min-h-screen bg-white dark:bg-gray-950">
         {/* ── HERO — die direkte Antwort zuerst ── */}
         <section className="pt-28 pb-16 px-6 lg:px-10">
           <div className="max-w-5xl mx-auto">
@@ -560,7 +560,7 @@ export function KostenWebdesign() {
             </motion.div>
           </div>
         </section>
-      </main>
+      </div>
     </>
   );
 }

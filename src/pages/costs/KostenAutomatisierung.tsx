@@ -321,7 +321,7 @@ export function KostenAutomatisierung() {
         additionalSchema={schema}
       />
 
-      <main className="min-h-screen">
+      <div className="min-h-screen">
         {/* ── HERO — die direkte Antwort zuerst ── */}
         <section className="pt-32 pb-16 bg-white dark:bg-gray-950 transition-colors duration-300">
           <div className="max-w-5xl mx-auto px-6 lg:px-8">
@@ -867,7 +867,7 @@ export function KostenAutomatisierung() {
             </motion.div>
           </div>
         </section>
-      </main>
+      </div>
     </>
   );
 }

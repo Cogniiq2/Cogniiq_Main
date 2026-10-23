@@ -178,7 +178,7 @@ export function NationalIndustryPage({ config }: Props) {
         additionalSchema={schema}
       />
 
-      <main className="min-h-screen">
+      <div className="min-h-screen">
 
         {/* ── HERO ── */}
         <section className="pt-32 pb-24 bg-white dark:bg-gray-950">
@@ -668,7 +668,7 @@ export function NationalIndustryPage({ config }: Props) {
           </div>
         </section>
 
-      </main>
+      </div>
     </>
   );
 }

@@ -150,7 +150,7 @@ export function ClusterPage({ config }: ClusterPageProps) {
         additionalSchema={schema}
       />
 
-      <main className="min-h-screen">
+      <div className="min-h-screen">
         <HeroSection config={config} breadcrumbs={breadcrumbs} />
         <TLDRSection config={config} />
         <IntroSection config={config} />
@@ -166,7 +166,7 @@ export function ClusterPage({ config }: ClusterPageProps) {
         <FAQSection config={config} />
         <InternalLinksSection config={config} />
         <CTASection config={config} />
-      </main>
+      </div>
     </>
   );
 }

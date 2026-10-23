@@ -39,7 +39,7 @@ export function NotFoundPage() {
         noCanonical
       />
 
-      <main className="min-h-screen flex items-center justify-center px-6 py-32">
+      <div className="min-h-screen flex items-center justify-center px-6 py-32">
         <div className="max-w-xl w-full text-center">
 
           <motion.div
@@ -106,7 +106,7 @@ export function NotFoundPage() {
           </motion.div>
 
         </div>
-      </main>
+      </div>
     </>
   );
 }

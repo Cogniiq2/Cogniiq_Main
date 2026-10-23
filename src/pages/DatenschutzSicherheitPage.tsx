@@ -88,7 +88,7 @@ export function DatenschutzSicherheitPage() {
         noIndex
       />
 
-      <main className="min-h-screen bg-white dark:bg-gray-950">
+      <div className="min-h-screen bg-white dark:bg-gray-950">
         {/* ── Einstieg ── */}
         <section className="pt-32 pb-24">
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
@@ -272,7 +272,7 @@ export function DatenschutzSicherheitPage() {
             </ul>
           </div>
         </section>
-      </main>
+      </div>
     </>
   );
 }

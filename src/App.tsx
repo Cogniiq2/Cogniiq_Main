@@ -486,10 +486,6 @@ const DigitaleAutomatisierungPage = lazyNamed(
 );
 
 // Pillar pages
-const WebdesignAgenturDeutschland = lazyNamed(
-  () => import('./pages/pillars/WebdesignAgenturDeutschland'),
-  'WebdesignAgenturDeutschland'
-);
 const KiAgenturDeutschland = lazyNamed(
   () => import('./pages/pillars/KiAgenturDeutschland'),
   'KiAgenturDeutschland'
@@ -747,7 +743,6 @@ export function AppInner() {
       <Route path="/zu-viel-manuelle-arbeit" element={<ZuVielManuelleArbeitPage />} />
       <Route path="/digitale-automatisierung-unternehmen" element={<DigitaleAutomatisierungPage />} />
 
-      <Route path="/webdesign-agentur-deutschland" element={<WebdesignAgenturDeutschland />} />
       <Route path="/ki-agentur-deutschland" element={<KiAgenturDeutschland />} />
 
       <Route path="/impressum" element={<ImpressumPage />} />
