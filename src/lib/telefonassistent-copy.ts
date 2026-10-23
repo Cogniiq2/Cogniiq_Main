@@ -885,51 +885,12 @@ export const BETREUUNG_NACH_GOLIVE = {
  * heutigen Weg ohne Beschönigung (Inhaber-Antwort B).
  */
 /*
-  EINGEFROREN — WORTGLEICH LASSEN.
-
-  `UEBERGABE` wird von `TelefonassistentBeweiskette` gerendert und damit von
-  einer eingefrorenen Experimentroute. Jede Änderung an diesen Strings bewegt
-  deren gerenderte Bytes und zerstört die Messung; `protectedExperiments.test.tsx`
-  fängt das ab.
-
-  Inhaltlich ist die Fassung überholt: Ihr erster Satz beschreibt den ÜBLICHEN
-  WEG ANDERER SYSTEME („der Assistent nimmt an, Ihre MFA überträgt danach von
-  Hand") und wurde als Beschreibung DIESES Produkts gelesen. Die korrigierte
-  Fassung steht direkt darunter in `UEBERGABE_ABWICKLUNG` und wird von den
-  nicht eingefrorenen Seiten verwendet. Endet das Experiment, ersetzt sie diese
-  hier — notiert in docs/seo/post-experiment-opportunities.md.
+  Bis zum 2026-10-23 stand hier eine ältere Fassung, die wortgleich bleiben
+  musste, weil eine eingefrorene Experimentroute sie renderte. Das Experiment
+  ist graduiert; `UEBERGABE` ist seitdem ein Alias der korrigierten Fassung
+  `UEBERGABE_ABWICKLUNG` unten, damit kein Konsument mehr den überholten
+  „MFA tippt ab"-Normalfall ausliefert.
 */
-export const UEBERGABE = {
-  headline: "Und wer tippt das dann bei Ihnen ein?",
-  paragraphs: [
-    "Der übliche Weg sieht so aus: Der Assistent nimmt den Anruf an, und Ihre MFA überträgt das Ergebnis anschließend von Hand ins Praxissystem. Das ist der Grund, warum viele Praxen solche Systeme nach wenigen Wochen wieder abschalten — die Arbeit ist nicht verschwunden, sie ist nur umgezogen.",
-    "Wir prüfen vor der Einrichtung, welche Schnittstelle Ihr System bietet, und bauen die Übergabe darauf auf. Wo eine Anbindung technisch möglich ist, landet das Anliegen direkt dort, wo Sie ohnehin arbeiten. Wo sie nicht möglich ist, sagen wir Ihnen das vorher — und nicht nach der Unterschrift.",
-  ],
-  wasAnkommt: {
-    headline: "Was nach jedem Anruf im Dashboard steht",
-    items: ["Anliegen", "Name", "Rückrufnummer", "Terminwunsch"],
-    hinweis:
-      "Strukturiert, nicht als Audiodatei — Gespräche werden nicht aufgezeichnet.",
-  },
-  // [[ASSET: Screenshot des Dashboards nach einem Anruf — Spezifikation in
-  // ASSETS-REQUIRED.md. Bis zur Lieferung bleibt der Bild-Slot ungerendert.]]
-};
-
-/**
- * Die korrigierte Praxis-Fassung von `UEBERGABE` — für alle NICHT eingefrorenen
- * Seiten (`/praxen`, `/integrationen`).
- *
- * Der Unterschied ist die Reihenfolge, und sie entscheidet, was der Leser für
- * das Produkt hält. `UEBERGABE` beginnt mit der Handübertragung durch die MFA;
- * gemeint war der übliche Weg ANDERER Systeme, gelesen wurde es als Normalfall
- * hier. Diese Fassung nennt zuerst, was im Normalbetrieb passiert — der Anruf
- * ist erledigt, bevor der Anrufer auflegt —, dann die Abgrenzung, dann die
- * Bedingung für Schreibzugriff auf ein Kundensystem.
- *
- * Die Übergabe bleibt vollständig beschrieben. Sie ist wertvoll, aber sie ist
- * der AUSNAHMEWEG: für fachliche Fragen, Ausnahmen und Abläufe, die eine
- * Schnittstelle nicht trägt.
- */
 export const UEBERGABE_ABWICKLUNG = {
   headline: "Und wer tippt das dann bei Ihnen ein?",
   paragraphs: [
@@ -944,6 +905,9 @@ export const UEBERGABE_ABWICKLUNG = {
       "Strukturiert, nicht als Audiodatei — Gespräche werden nicht aufgezeichnet. Abläufe, die durchlaufen, erscheinen als erledigt und nicht als Aufgabe.",
   },
 };
+
+/** Alias — siehe Kommentar oben. */
+export const UEBERGABE = UEBERGABE_ABWICKLUNG;
 
 /**
  * M18 · Betreuung — Antwort auf den dokumentierten Abbruchgrund (52 % nennen
@@ -1012,7 +976,7 @@ export const NICHT_EXTRA = {
   intro:
     "Diese Posten tauchen auf keiner Rechnung auf, weil sie im Monatsbetrag enthalten sind:",
   punkte: [
-    `Änderungen an Ansagen, Anliegen und Regeln — unbegrenzt, umgesetzt innerhalb von ${FAKTEN.aenderungTage}\u00A0Tagen`,
+    `Kleinere Änderungen an Ansagen, Anliegen und Regeln — umgesetzt innerhalb von ${FAKTEN.aenderungTage}\u00A0Tagen`,
     `Ihr fester Ansprechpartner, erreichbar ${FAKTEN.erreichbarkeit}, Antwort ${FAKTEN.antwortzeit}`,
     `${FAKTEN.gleichzeitigeAnrufeKurz} — in jedem Tarif, auch im kleinsten`,
     "Deutsch als Sprache",

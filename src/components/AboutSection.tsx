@@ -57,7 +57,7 @@ const highlights = [
   {
     icon: Target,
     text:
-      "Seit 2025 konsequenter Fokus auf hochkonvertierende Websites, KI-Automationen und AI-Systeme, die messbar Resultate liefern – nicht nur Eindruck.",
+      "Seit 2025 Fokus auf Websites, KI-Automationen und KI-Systeme für den laufenden Betrieb – gebaut, um im Alltag zu funktionieren, nicht nur Eindruck zu machen.",
   },
   {
     icon: Wrench,

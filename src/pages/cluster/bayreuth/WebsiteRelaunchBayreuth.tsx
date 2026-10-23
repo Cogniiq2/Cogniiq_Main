@@ -29,8 +29,8 @@ const config: ClusterPageConfig = {
     items: [
       { label: "Für wen", value: "Websites älter als 3 Jahre oder mit SEO-Problemen" },
       { label: "Typische Ziele", value: "Mehr Anfragen, bessere Rankings, schnellere Ladezeit" },
-      { label: "Projektdauer", value: "3–8 Wochen" },
-      { label: "Preisrahmen", value: "ab ca. 2.000 €" },
+      { label: "Projektdauer", value: "Nach Umfang – im Konzept festgelegt" },
+      { label: "Preisrahmen", value: "Nach Umfang – im schriftlichen Angebot" },
     ],
   },
   intro: {
@@ -81,12 +81,12 @@ const config: ClusterPageConfig = {
     {
       question: "Was kostet ein Website Relaunch in Bayreuth?",
       answer:
-        "Einfache Relaunches starten ab ca. 2.000 €. Projekte mit vollständiger SEO-Migration, neuem Content und Integrationen liegen typisch bei 3.500 € – 7.000 €. Detailliertes Angebot nach kostenlosem Erstgespräch.",
+        "Das hängt vom Umfang ab: Seitenzahl, Inhalte, Weiterleitungen, Schnittstellen. Eine Zahl vor der Analyse wäre geraten; was den Preis treibt, steht auf unserer Kostenseite, das Angebot kommt nach dem Erstgespräch.",
     },
     {
       question: "Wie lange dauert ein Relaunch?",
       answer:
-        "3–8 Wochen je nach Umfang. Ein klarer Zeitplan wird im Konzept festgelegt. Die alte Website bleibt bis zum Launch vollständig erreichbar.",
+        "Das hängt vom Umfang ab; den Zeitplan legt das Konzept fest. Die alte Website bleibt bis zum Launch erreichbar.",
     },
     {
       question: "Was passiert mit meinen bisherigen Inhalten?",

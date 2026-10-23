@@ -29,8 +29,8 @@ const config: ClusterPageConfig = {
     items: [
       { label: "Für wen", value: "Websites älter als 3 Jahre oder mit Performance-Problemen" },
       { label: "Typische Ziele", value: "Mehr Anfragen, schnellere Ladezeit, bessere Rankings" },
-      { label: "Projektdauer", value: "3–8 Wochen" },
-      { label: "Preisrahmen", value: "ab ca. 2.000 €" },
+      { label: "Projektdauer", value: "Nach Umfang – im Konzept festgelegt" },
+      { label: "Preisrahmen", value: "Nach Umfang – im schriftlichen Angebot" },
     ],
   },
   intro: {
@@ -79,11 +79,11 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Was kostet ein Website Relaunch in Regensburg?",
-      answer: "Einfache Relaunches ab ca. 2.000 €. Mit vollständiger SEO-Migration und neuen Inhalten: 3.500 € – 7.000 €.",
+      answer: "Das hängt vom Umfang ab: Seitenzahl, Inhalte, Weiterleitungen, Schnittstellen. Eine Zahl vor der Analyse wäre geraten; was den Preis treibt, steht auf unserer Kostenseite, das Angebot kommt nach dem Erstgespräch.",
     },
     {
       question: "Wie lange dauert ein Relaunch?",
-      answer: "3–8 Wochen. Die alte Website bleibt bis zum Launch vollständig erreichbar.",
+      answer: "Das hängt vom Umfang ab; den Zeitplan legt das Konzept fest. Die alte Website bleibt bis zum Launch erreichbar.",
     },
     {
       question: "Was passiert mit meinen bestehenden Inhalten?",

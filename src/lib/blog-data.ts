@@ -49,7 +49,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "KI-Automatisierung für kleine Unternehmen: Welche Prozesse sich lohnen, was es kostet und wie der Einstieg gelingt. Mit konkreten Beispielen aus der Praxis.",
     category: "KI-Automatisierung",
     readingTime: 9,
-    publishedAt: "2025-01-20",
+    publishedAt: "2026-03-16",
     updatedAt: "2026-10-23",
     excerpt:
       "Viele Inhaber kleiner Unternehmen verbringen einen erheblichen Teil ihrer Arbeitszeit mit Aufgaben, die eine KI in Sekunden erledigen könnte. Dieser Leitfaden zeigt, wo der Hebel am größten ist.",
@@ -141,7 +141,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       {
         question: "Wie lange dauert die Einrichtung eines Automatisierungssystems?",
         answer:
-          "Einfache Workflows sind in wenigen Tagen live. Komplexere Systeme benötigen zwei bis vier Wochen für Analyse, Aufbau und Testing.",
+          "Einfache Workflows lassen sich schnell einrichten; komplexere Systeme brauchen Zeit für Analyse, Aufbau und Testing – wie viel, hängt an den beteiligten Systemen und ihren Schnittstellen.",
       },
       {
         question: "Ist KI-Automatisierung DSGVO-konform?",
@@ -176,7 +176,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "Was ein KI-Telefonassistent in der Arztpraxis übernimmt, was immer beim Team bleibt und woran die Anbindung an die Praxissoftware hängt.",
     category: "KI-Telefonassistent",
     readingTime: 7,
-    publishedAt: "2025-01-28",
+    publishedAt: "2026-03-16",
     updatedAt: "2026-09-05",
     excerpt:
       "Eine Arztpraxis mit hohem Anrufaufkommen verliert ohne funktionierendes Telefonmanagement Patienten. Ein KI-Telefonassistent übernimmt die Annahme und die strukturierte Aufnahme klar benennbarer Anliegen – auch außerhalb der Öffnungszeiten. Was eine Einschätzung verlangt, bleibt beim Team.",
@@ -261,7 +261,6 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     relatedSlugs: [
       "ki-automatisierung-kleine-unternehmen",
       "verpasste-anrufe-kosten",
-      "ki-telefonassistent-restaurant",
     ],
     weiterfuehrend: [
       {
@@ -285,7 +284,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "Warum viele Unternehmenswebsites keine Anfragen generieren – und wie Sie mit gezielten Webdesign-Entscheidungen die Konversionsrate deutlich steigern können.",
     category: "Webdesign",
     readingTime: 8,
-    publishedAt: "2025-02-03",
+    publishedAt: "2026-03-16",
     updatedAt: "2026-10-23",
     excerpt:
       "Die meisten Unternehmenswebsites sind Visitenkarten – keine Verkaufsmaschinen. Dieser Artikel erklärt, welche acht Design- und Inhaltsentscheidungen den größten Einfluss auf Anfragen haben.",
@@ -390,7 +389,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "Lokales SEO erklärt: Wie Unternehmen in Google Maps sichtbar werden, welche Faktoren wirklich zählen und welche Fehler die meisten Betriebe machen.",
     category: "Local SEO",
     readingTime: 10,
-    publishedAt: "2025-02-10",
+    publishedAt: "2026-03-16",
     updatedAt: "2026-10-23",
     excerpt:
       "Wenn jemand 'Zahnarzt Bayreuth' oder 'Restaurant München Innenstadt' googelt, erscheinen die ersten drei Ergebnisse in einem Kartenblock. Wer dort nicht ist, existiert für diesen Suchenden nicht.",
@@ -496,7 +495,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "Wie Sie den ROI einer Prozessautomatisierung berechnen: Formel, welche Kosten in die Rechnung gehören, Amortisationszeit statt Prozentwert und wann sich Automatisierung nicht rechnet.",
     category: "KI-Automatisierung",
     readingTime: 7,
-    publishedAt: "2025-02-17",
+    publishedAt: "2026-03-16",
     updatedAt: "2026-09-17",
     excerpt:
       "Viele Unternehmen scheuen die Investition in Automatisierung, weil sie den Nutzen nicht greifbar machen können. Dieser Artikel zeigt, wie ein einfaches ROI-Modell in unter 30 Minuten aufgestellt werden kann.",
@@ -628,7 +627,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "Wie teuer sind verpasste Anrufe wirklich? Eine ehrliche Kalkulation zum Nachrechnen mit eigenen Zahlen – und wie ein KI-Telefonassistent dagegen hilft.",
     category: "KI-Telefonassistent",
     readingTime: 6,
-    publishedAt: "2025-02-24",
+    publishedAt: "2026-03-16",
     updatedAt: "2026-09-17",
     excerpt:
       "Was ein verpasster Anruf kostet, hängt vom Auftragswert ab – rechnen Sie mit Ihren eigenen Zahlen. Dieser Artikel zeigt, wie die Kalkulation funktioniert.",
@@ -719,7 +718,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "Wie Restaurants mit einem KI-Telefonassistenten Reservierungsanfragen auch in der Stoßzeit annehmen, was der Assistent übernimmt, was beim Team bleibt und woran die Anbindung an ein Reservierungssystem hängt.",
     category: "KI-Telefonassistent",
     readingTime: 6,
-    publishedAt: "2025-03-03",
+    publishedAt: "2026-03-16",
     updatedAt: "2026-10-23",
     excerpt:
       "Freitagabend, 19 Uhr: Das Restaurant ist voll, das Telefon klingelt, aber das Team hat beide Hände voll. Ein KI-Telefonassistent nimmt die Anrufe an, die sonst verloren gingen – auch in der Stoßzeit.",
@@ -817,7 +816,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "Die häufigsten Gründe, warum Unternehmenswebsites keine Anfragen generieren – und konkrete Schritte, um das in wenigen Wochen zu ändern.",
     category: "Webdesign",
     readingTime: 7,
-    publishedAt: "2025-03-06",
+    publishedAt: "2026-03-16",
     updatedAt: "2026-10-23",
     excerpt:
       "Eine Website zu haben und eine Website zu haben, die Anfragen bringt, sind zwei verschiedene Dinge. Die meisten Unternehmenswebsites gehören zur ersten Kategorie.",
@@ -910,7 +909,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "Digitalisierung im deutschen Mittelstand: Ein praxisorientierter Einstiegsleitfaden, der zeigt, welche Maßnahmen wirklich Wirkung haben – und welche Fallen es zu vermeiden gilt.",
     category: "Digitalisierung",
     readingTime: 9,
-    publishedAt: "2025-03-10",
+    publishedAt: "2026-03-16",
     updatedAt: "2026-10-23",
     excerpt:
       "Viele Mittelständler wissen, dass sie digitalisieren müssen – aber nicht, womit sie anfangen sollen. Dieser Leitfaden gibt eine klare Priorisierung.",
@@ -1008,7 +1007,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
       "Wie finden Sie die richtige Webdesign-Agentur für Ihr Unternehmen? 7 konkrete Auswahlkriterien, die vor überteuerten Projekten und schlechten Ergebnissen schützen.",
     category: "Webdesign",
     readingTime: 7,
-    publishedAt: "2025-03-13",
+    publishedAt: "2026-03-16",
     updatedAt: "2026-10-23",
     excerpt:
       "Eine schlechte Wahl bei der Webdesign-Agentur kostet Zeit, Geld und Nerven. Diese sieben Kriterien helfen, die richtige Agentur zu finden – bevor der Vertrag unterschrieben ist.",

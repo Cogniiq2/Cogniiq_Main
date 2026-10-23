@@ -4,14 +4,14 @@ import { BUSINESS_INFO } from "@/lib/seo-data";
 
 const config: NationalIndustryPageConfig = {
   seo: {
-    title: "Automatisierung für Arztpraxen & Praxisverwaltung | Cogniiq",
+    title: "Automatisierung für Arztpraxen | Erinnerungen, Warteliste & Kommunikation – Cogniiq",
     description: "Praxisautomatisierung: Terminbestätigungen, Patientenerinnerungen und Rezeptanfragen laufen automatisch – ohne zusätzliches Personal. Mehr Zeit für Ihre Patienten.",
     canonical: `${BUSINESS_INFO.website}/automatisierung-arzt`,
     keywords: "Automatisierung Arztpraxis, Praxis Digitalisierung, Patientenkommunikation automatisieren, Praxisverwaltung Automatisierung",
   },
   h1: "Automatisierung für Arztpraxen & Praxisverwaltung",
   tagline: "Arztpraxis · Routineprozesse · Persönliche Betreuung",
-  intro: "Jeden Morgen dasselbe: Terminbestätigungen rausschicken, Rezeptanfragen entgegennehmen, Erinnerungen verschicken, Wartelisten manuell abarbeiten. Jede dieser Aufgaben ist notwendig – aber keine davon braucht einen Menschen. Cogniiq automatisiert diese Routinen vollständig, damit Ihr Team sich auf das konzentriert, was wirklich zählt.",
+  intro: "Jeden Morgen dasselbe: Terminbestätigungen rausschicken, Rezeptanfragen entgegennehmen, Erinnerungen verschicken, Wartelisten manuell abarbeiten. Jede dieser Aufgaben ist notwendig – aber kaum eine braucht durchgehend einen Menschen. Cogniiq automatisiert diese Routinen dort, wo sie sich in feste Regeln fassen lassen, damit Ihr Team sich auf das konzentriert, was wirklich zählt.",
   serviceSlug: "leistungen",
   serviceLabel: "Automatisierung Leistungen",
   costLink: "/kosten-automatisierung",
@@ -44,16 +44,16 @@ const config: NationalIndustryPageConfig = {
   ],
   solution: {
     headline: "Weniger Verwaltung. Mehr Versorgung.",
-    text: "Cogniiq automatisiert die Routineprozesse Ihrer Praxis vollständig: Terminbestätigungen, Erinnerungen, Rezeptanfragen, Wartelistenkontakt und Follow-ups laufen ohne manuellen Aufwand. Das Ergebnis: ein entlastetes Team, weniger Fehler und Patienten, die besser informiert sind.",
+    text: "Cogniiq automatisiert die regelbasierten Routineprozesse Ihrer Praxis: Terminbestätigungen, Erinnerungen, Rezeptanfragen, Wartelistenkontakt und Follow-ups laufen ohne Handarbeit – mit einem Menschen genau an den Stellen, die eine Entscheidung brauchen. Das Ziel: ein entlastetes Team und Patienten, die rechtzeitig informiert sind.",
   },
   benefits: [
     "Terminbestätigung und Erinnerung automatisch",
     "Warteliste wird bei Absagen sofort automatisch kontaktiert",
     "Rezeptanfragen digital strukturiert und weitergeleitet",
-    "Patientendaten systemübergreifend synchronisiert",
+    "Daten zwischen angebundenen Systemen abgeglichen – soweit deren Schnittstellen das tragen",
     "Verarbeitung mit Auftragsverarbeitungsvertrag",
     "Bewertungsanfragen nach jedem Termin automatisch versandt",
-    "Einrichtung in 2–4 Wochen, ohne Praxisunterbrechung",
+    "Einrichtung im laufenden Betrieb, Zeitplan nach der Analyse",
   ],
   workflow: {
     title: "So läuft ein automatisierter Praxis-Tag",
@@ -61,7 +61,7 @@ const config: NationalIndustryPageConfig = {
       {
         step: "01",
         title: "Termin gebucht",
-        description: "Ob über die Website, das Telefon oder den KI-Assistenten – der Termin wird sofort bestätigt, in alle Systeme eingetragen und die Erinnerungssequenz gestartet.",
+        description: "Ob über die Website, das Telefon oder den KI-Assistenten – der Termin wird bestätigt, in die angebundenen Systeme eingetragen und die Erinnerungssequenz gestartet.",
       },
       {
         step: "02",
@@ -71,7 +71,7 @@ const config: NationalIndustryPageConfig = {
       {
         step: "03",
         title: "Nachbereitung & Feedback",
-        description: "Nach dem Besuch: automatischer Follow-up, Bewertungsanfrage und bei Absagen sofortiger Wartelistenkontakt. Keine Lücken, keine vergessenen Schritte.",
+        description: "Nach dem Besuch: automatischer Follow-up, Bewertungsanfrage und bei Absagen sofortiger Wartelistenkontakt. Jeder Schritt ist protokolliert; was nicht automatisch läuft, landet als Aufgabe beim Team.",
       },
     ],
   },
@@ -90,7 +90,7 @@ const config: NationalIndustryPageConfig = {
     { label: "KI Telefonassistent Praxis", href: "/ki-telefonassistent-praxis" },
     { label: "Webdesign Arzt", href: "/webdesign-arzt" },
     { label: "Kosten Automatisierung", href: "/kosten-automatisierung" },
-    { label: "Automatisierung Restaurant", href: "/automatisierung-restaurant" },
+    { label: "KI-Telefonassistent Zahnarztpraxis", href: "/ki-telefonassistent-zahnarztpraxis" },
   ],
   faq: [
     {
@@ -103,11 +103,11 @@ const config: NationalIndustryPageConfig = {
     },
     {
       question: "Was kostet Praxisautomatisierung?",
-      answer: "Einzelne Workflows wie Terminbestätigungen beginnen bei ca. 600–1.200 €. Umfassende Praxisautomatisierungen mit Systemintegration, Wartelistenmanagement und Follow-up-Sequenzen typischerweise 2.000–4.500 €. Das genaue Angebot erhalten Sie nach einem kostenlosen Erstgespräch.",
+      answer: "Das hängt davon ab, wie viele Abläufe angebunden werden und welche Schnittstellen Ihre Praxissoftware bietet. Was den Preis treibt und wie wir rechnen, steht auf der Kostenseite zur Automatisierung; das Angebot erhalten Sie nach einem kostenlosen Erstgespräch – als Betrag, nicht als Spanne.",
     },
     {
       question: "Wie lange dauert die Einrichtung – und merken unsere Patienten etwas davon?",
-      answer: "Einfache Workflows sind in 1–2 Wochen live. Komplexere Setups dauern 3–6 Wochen. Die Umstellung läuft im Hintergrund – Patienten bemerken ausschließlich, dass Kommunikation schneller und zuverlässiger wird.",
+      answer: "Den Zeitplan legen wir nach der Analyse fest; er hängt an den beteiligten Systemen. Die Umstellung läuft im laufenden Praxisbetrieb; für Patienten ändert sich die Art der Nachrichten, nicht der Ansprechpartner.",
     },
     {
       question: "Können wir die Automatisierungen nach der Einrichtung selbst anpassen?",

@@ -76,7 +76,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/kontakt",
     title: "Kostenloses Erstgespräch vereinbaren – Cogniiq | KI-Agentur Bayern",
-    description: "30 Minuten – wir schauen uns Ihre konkrete Situation an und zeigen, wo KI-Telefonie, Webdesign oder Automatisierung sofort wirkt. Kein Pitch. Kein Standardangebot.",
+    description: "Ein kurzes Gespräch – wir schauen uns Ihre konkrete Situation an und zeigen, wo KI-Telefonie, Webdesign oder Automatisierung sofort wirkt. Kein Pitch. Kein Standardangebot.",
     keywords: "Cogniiq Kontakt, KI Erstgespräch, Webdesign Anfrage, Automatisierung Anfrage",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.85" },
@@ -182,7 +182,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/ki-agentur-deutschland",
     title: "KI Agentur Deutschland | AI-Systeme für Unternehmen – Cogniiq",
-    description: "Cogniiq ist Ihre KI-Agentur für ganz Deutschland. KI-Telefonassistenten, Chatbots und Automatisierungssysteme – entwickelt für den deutschen Markt.",
+    description: "Cogniiq ist Ihre KI-Agentur für ganz Deutschland. KI-Telefonassistenten und Automatisierungssysteme – entwickelt für den deutschen Markt.",
     keywords: "KI Agentur Deutschland, AI Agentur Deutschland, KI Systeme Unternehmen, Artificial Intelligence Deutschland",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.92" },
@@ -250,7 +250,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/bayreuth",
     title: "Cogniiq in Bayreuth – KI-Telefonassistent, Websites & Automatisierung",
-    description: "Cogniiq – Ihre AI-Agentur in Bayreuth. KI-Telefonassistent, hochkonvertierende Websites und Prozessautomatisierung für Unternehmen in Oberfranken. Persönliche Betreuung vor Ort.",
+    description: "Cogniiq – Ihre AI-Agentur in Bayreuth. KI-Telefonassistent, Websites und Prozessautomatisierung für Unternehmen in Oberfranken. Persönliche Betreuung vor Ort.",
     keywords: "AI Agentur Bayreuth, Webdesign Bayreuth, KI Telefonassistent Bayreuth, Automatisierung Bayreuth",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.85" },
@@ -642,8 +642,8 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/automatisierung-arzt",
-    title: "Automatisierung für Arztpraxen | Terminbuchung & Kommunikation – Cogniiq",
-    description: "Prozessautomatisierung für Arztpraxen: Terminbuchung, Erinnerungen, Patientenkommunikation und Dokumentenverwaltung automatisieren. Mehr Zeit für Patienten.",
+    title: "Automatisierung für Arztpraxen | Erinnerungen, Warteliste & Kommunikation – Cogniiq",
+    description: "Prozessautomatisierung für Arztpraxen: Terminbestätigungen, Erinnerungen, Wartelistenkontakt und Patientenkommunikation regelbasiert automatisieren – mit Mensch an den Entscheidungsstellen.",
     keywords: "Automatisierung Arztpraxis, Praxis Automatisierung, Terminbuchung Automatisierung, Arzt KI Systeme",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.85" },
@@ -723,7 +723,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/keine-terminbuchung-online",
     title: "Keine Online-Terminbuchung? Das kostet Sie täglich Patienten & Kunden | Cogniiq",
-    description: "Ohne Online-Terminbuchung verlieren Sie Patienten und Kunden an Wettbewerber. Cogniiq integriert Terminbuchungssysteme in Ihre Website – in wenigen Tagen.",
+    description: "Ohne Online-Terminbuchung buchen Patienten und Kunden dort, wo es abends noch geht. Was eine Terminbuchung auf der Website leistet, was sie voraussetzt und wie Cogniiq sie einrichtet.",
     keywords: "Keine Online Terminbuchung, Terminbuchung Website, Online Buchungssystem integrieren",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.80" },

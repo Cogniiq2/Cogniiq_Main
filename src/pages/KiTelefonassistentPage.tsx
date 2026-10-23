@@ -163,7 +163,7 @@ const faqItems = [
   {
     question: "Kommen Anrufer mit der Stimme eines Sprachassistenten zurecht?",
     answer:
-      "Nicht jeder Anrufer mag synthetische Stimmen — das nehmen wir ernst. Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihr Betrieb am Telefon spricht. Anrufer erfahren im ersten Satz, dass ein KI-System spricht, und können jederzeit zu einem Menschen wechseln. In der Startphase werten wir Gespräche mit Ihnen aus und passen an, was nicht sitzt.",
+      "Nicht jeder Anrufer mag synthetische Stimmen — das nehmen wir ernst. Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihr Betrieb am Telefon spricht. Anrufer erfahren im ersten Satz, dass ein KI-System spricht, und können jederzeit zu einem Menschen wechseln.",
   },
   {
     question: "Was ändert sich an meinem Telefonanschluss?",
@@ -197,12 +197,6 @@ const faqItems = [
     question: "Worauf müssen Sie bei DSGVO und KI Telefonassistent achten?",
     answer:
       "Vier Punkte entscheiden, und Sie sollten sie bei jedem Anbieter abfragen: Wird das Gespräch aufgezeichnet und wie lange gespeichert. Werden Ihre Daten zum Training von Modellen verwendet. Gibt es einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO. Und erfährt der Anrufer, dass ein KI-System spricht. Bei uns: Gespräche werden nicht aufgezeichnet – gespeichert wird ausschließlich das strukturierte Ergebnis. Ihre Daten werden nicht zum Training von Modellen verwendet. Einen AVV nach Art. 28 DSGVO stellen wir jedem Kunden bereit. Und der Assistent gibt sich zu Beginn jedes Anrufs als KI-System zu erkennen.",
-  },
-  {
-    question: "Was passiert bei einem technischen Ausfall?",
-    // [[CLAIM: verify — Fallback-Mechanik (Weiterleitung auf Backup-Nummer / Ansage) technisch bestätigen]]
-    answer:
-      "Für den Störungsfall wird ein Fallback eingerichtet: Anrufe laufen dann auf eine von Ihnen benannte Nummer oder auf eine klare Ansage mit dem nächsten Schritt. Wie dieser Weg aussieht, legen wir gemeinsam bei der Einrichtung fest.",
   },
   {
     question: "Wie aufwändig ist die Einrichtung für mich?",
@@ -498,7 +492,7 @@ function HeroSection() {
             </div>
             <p className="text-sm text-pub-ink-3 dark:text-gray-500 mb-5">
               Sie schildern kurz Ihre Anrufe, wir schlagen einen Termin für die
-              Demo vor. Kostenlos, unverbindlich, ca. 15&nbsp;Minuten.
+              Demo vor. Kostenlos und unverbindlich.
             </p>
 
             {/*
@@ -1969,7 +1963,7 @@ function FinalCtaSection() {
 
               <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-pub-ink-3 dark:text-gray-500 mb-6">
                 <span className="inline-flex items-center gap-1.5">
-                  <ListChecks size={12} aria-hidden="true" /> Ca. 15&nbsp;Minuten
+                  <ListChecks size={12} aria-hidden="true" /> Kein Verkaufsgespräch
                 </span>
                 <span>Kostenlos</span>
                 <span>Unverbindlich</span>

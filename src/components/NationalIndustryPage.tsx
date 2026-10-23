@@ -227,7 +227,7 @@ export function NationalIndustryPage({ config }: Props) {
                 </div>
 
                 <div className="flex flex-wrap gap-x-6 gap-y-2">
-                  {["Keine Gesprächsaufzeichnung", "Einrichtung in wenigen Tagen", "Individuelle Konfiguration"].map((item, i) => (
+                  {["Keine Gesprächsaufzeichnung", "Übergabe in zwei Wochen", "Individuelle Konfiguration"].map((item, i) => (
                     <motion.div
                       key={i}
                       className="cq-rise flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
@@ -270,7 +270,7 @@ export function NationalIndustryPage({ config }: Props) {
         <div className="border-y border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-900/30">
           <div className="max-w-6xl mx-auto px-6 lg:px-8 py-3.5">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              {["Deutschland · Remote", "AVV nach Art. 28 DSGVO", "Einrichtung in Tagen", "Individuelle Konfiguration", "Keine IT-Vorkenntnisse nötig"].map((item, i) => (
+              {["Deutschland · Remote", "AVV nach Art. 28 DSGVO", "Übergabe in zwei Wochen", "Individuelle Konfiguration", "Keine IT-Vorkenntnisse nötig"].map((item, i) => (
                 <span key={i} className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
                   <CheckCircle2 size={11} className="text-emerald-500 flex-shrink-0" />
                   {item}
@@ -357,7 +357,7 @@ export function NationalIndustryPage({ config }: Props) {
                   <ArrowRight size={14} />
                 </Link>
                 <p className="mt-3 text-sm text-pub-ink-3 dark:text-gray-500">
-                  Kostenlos · Unverbindlich · Ca. 15&nbsp;Minuten
+                  Kostenlos · Unverbindlich · Kein Verkaufsgespräch
                 </p>
               </motion.div>
 
@@ -498,7 +498,7 @@ export function NationalIndustryPage({ config }: Props) {
               </h2>
               <p className="text-[17px] text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-8 leading-[1.7]">
                 Im kostenlosen Erstgespräch zeigen wir Ihnen, wie die Lösung konkret
-                in Ihrer Branche funktioniert – ohne Verpflichtung, ca. 15&nbsp;Minuten.
+                in Ihrer Branche funktioniert – ohne Verpflichtung.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center mb-5">
                 <Link

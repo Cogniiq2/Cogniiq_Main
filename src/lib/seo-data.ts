@@ -223,7 +223,7 @@ export const PAGE_META = {
   },
   kontakt: {
     title: "Kostenloses Erstgespräch vereinbaren – Cogniiq | KI-Agentur Bayern",
-    description: "30 Minuten – wir schauen uns Ihre konkrete Situation an und zeigen, wo KI-Telefonie, Webdesign oder Automatisierung sofort wirkt. Kein Pitch. Kein Standardangebot.",
+    description: "Ein kurzes Gespräch – wir schauen uns Ihre konkrete Situation an und zeigen, wo KI-Telefonie, Webdesign oder Automatisierung sofort wirkt. Kein Pitch. Kein Standardangebot.",
     canonical: "https://cogniiq.de/kontakt",
   },
 };

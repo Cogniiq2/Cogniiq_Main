@@ -10,7 +10,7 @@ const config: ProblemPageConfig = {
   },
   h1: "Verpasste Anrufe kosten Ihr Unternehmen täglich Aufträge",
   tagline: "Problem · Verpasste Anrufe · Umsatzverlust",
-  intro: "Ein erheblicher Teil der Anrufe bei kleinen und mittleren Unternehmen bleibt unbeantwortet. Dahinter stehen keine abstrakten Zahlen – das sind Kunden, die zum Wettbewerber gegangen sind.",
+  intro: "Wer zu Stoßzeiten nicht abnimmt, erfährt selten, wen er verloren hat: Der Anrufer ruft nicht noch einmal an, er ruft den Nächsten an. Dahinter stehen keine abstrakten Zahlen – das sind Kunden, die zum Wettbewerber gegangen sind.",
   problem: {
     headline: "Warum Unternehmen so viele Anrufe verpassen",
     points: [
@@ -50,7 +50,7 @@ const config: ProblemPageConfig = {
       "Anrufe werden sofort und professionell entgegengenommen – auch zu Stoßzeiten",
       "Erreichbar auch abends, am Wochenende und an Feiertagen",
       "Terminwünsche werden nach Ihren Regeln aufgenommen – ins Kalender- oder Praxissystem geschrieben wird erst, wenn dessen Schnittstelle das nachweislich trägt",
-      "Skaliert mit Ihrem Unternehmen ohne Mehrkosten",
+      "Festes Minutenkontingent, darüber ein fester Minutenpreis mit Obergrenze – planbar statt pro Anruf",
     ],
   },
   rechner: {

@@ -127,7 +127,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Was kostet laufende SEO-Betreuung in München?",
-      answer: "Monatliche Betreuung ab ca. 350 € / Monat. Im Paket 'Website Marktführer' inklusive.",
+      answer: "Laufende Betreuung bieten wir nach Aufwand an; den Monatsbetrag legt das Angebot fest, nicht eine Pauschale vorab.",
     },
     {
       question: "Gibt es versteckte Kosten?",
@@ -135,7 +135,7 @@ const config: ClusterPageConfig = {
     },
     {
       question: "Wie lange dauert ein Webdesign-Projekt in München?",
-      answer: "Launch: 7–14 Tage. Wachstum: 3–6 Wochen. Marktführer: 6–10 Wochen.",
+      answer: "Das hängt vom Paket und von Ihrer Zulieferung ab; den Zeitplan legt das Konzept fest.",
     },
     {
       question: "Was ist in jedem Paket enthalten?",

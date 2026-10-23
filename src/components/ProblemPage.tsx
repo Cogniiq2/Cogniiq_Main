@@ -216,7 +216,7 @@ export function ProblemPage({ config }: Props) {
                   to="/kontakt"
                   className="inline-flex items-center gap-2 px-6 py-3.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-xl font-semibold text-sm hover:bg-gray-700 dark:hover:bg-white transition-colors"
                 >
-                  Problem jetzt lösen
+                  Erstgespräch vereinbaren
                   <ArrowRight size={15} />
                 </Link>
               </motion.div>
@@ -316,7 +316,7 @@ export function ProblemPage({ config }: Props) {
                 Dieses Problem lösen wir gemeinsam.
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-                Im kostenlosen Erstgespräch analysieren wir Ihre konkrete Situation und zeigen Ihnen, welche Lösung den schnellsten ROI liefert.
+                Im kostenlosen Erstgespräch analysieren wir Ihre konkrete Situation und zeigen Ihnen, wo eine Lösung bei Ihnen tatsächlich greift – und wo nicht.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <Link

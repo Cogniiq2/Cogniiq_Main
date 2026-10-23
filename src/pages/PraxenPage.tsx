@@ -59,7 +59,7 @@ const faqItems = [
   {
     question: "Kommen meine Patientinnen und Patienten mit einer Computerstimme klar?",
     answer:
-      "Nicht alle sofort — das nehmen wir ernst. Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihre Praxis am Telefon spricht. Anrufer erfahren im ersten Satz, dass ein KI-System spricht, und können jederzeit zu einem Menschen wechseln. Die ersten Wochen begleiten wir aktiv und ändern, was nicht ankommt.",
+      "Nicht alle sofort — das nehmen wir ernst. Sie wählen die Stimme, formulieren Ihren Begrüßungssatz und legen fest, wie Ihre Praxis am Telefon spricht. Anrufer erfahren im ersten Satz, dass ein KI-System spricht, und können jederzeit zu einem Menschen wechseln.",
   },
   {
     question: "Landet der Termin automatisch in meiner Praxissoftware?",
