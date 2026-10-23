@@ -103,7 +103,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   {
     path: "/praxen",
     title: "KI Telefonassistent für Praxen – Ihr Empfang | Cogniiq",
-    description: "Ein Empfang am Telefon für Ihre Praxis: Ihre Stimmauswahl, Ihre Regeln, strukturierte Übergabe. Keine Triage, Kontingent mit Obergrenze, in zwei Wochen eingerichtet und bereit zur Freigabe.",
+    description: "KI-Telefonassistent für Arzt-, Zahnarzt- und Therapiepraxen: Termine im Gespräch erledigt, Ihre Stimme, Ihre Regeln. Keine Triage, Kontingent mit Obergrenze, Übergabe in zwei Wochen.",
     keywords: "KI Telefonassistent Praxis, Praxisempfang Telefon, telefonische Erreichbarkeit Praxis, Anrufannahme Arztpraxis",
     indexable: true,
     sitemap: { lastmod: "2026-08-16", changefreq: "monthly", priority: "0.90" },
@@ -142,7 +142,7 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
     // was das Produkt tut — erledigen statt annehmen — ohne daraus eine
     // universelle Integrationszusage zu machen.
     title: "KI Telefonassistent für Unternehmen – Anrufe erledigen | Cogniiq",
-    description: "KI Telefonassistent, der Anrufe nicht nur annimmt: bucht, verschiebt und storniert Termine im Gespräch und beantwortet Ihre Fragen. Mit Preisrechner, ohne Anmeldung.",
+    description: "KI Telefonassistent, der Anrufe nicht nur annimmt: bucht, verschiebt und storniert Termine im Gespräch und beantwortet Ihre Fragen. Rechner ohne Anmeldung.",
     keywords: "KI Telefonassistent, KI Telefonassistent für Unternehmen, KI Anrufassistent, digitaler Telefonassistent, KI Telefonservice, Anrufe automatisieren",
     indexable: true,
     sitemap: { lastmod: "2026-09-11", changefreq: "monthly", priority: "0.92" },
@@ -600,8 +600,8 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   // ─── INDUSTRY-SPECIFIC SERVICE PAGES — KI-TELEFONASSISTENT ───────────────────
   {
     path: "/ki-telefonassistent-arzt",
-    title: "KI-Telefonassistent für Arztpraxen | Terminwünsche aufnehmen – Cogniiq",
-    description: "Der KI-Telefonassistent für Praxen: nimmt Patientenanrufe an und erfasst Terminwünsche nach Ihren Regeln – auch außerhalb der Sprechzeiten. Eintrag ins Praxissystem nach geprüfter Anbindung.",
+    title: "KI-Telefonassistent Arztpraxis: Anrufe erledigen | Cogniiq",
+    description: "KI-Telefonassistent für Arztpraxen: Termine im Gespräch vergeben, verschieben, absagen; Rezept- und Überweisungswünsche strukturiert ans Team. Keine Triage.",
     keywords: "KI Telefonassistent Arzt, AI Rezeptionistin Praxis, Terminbuchung Praxis KI, Arztpraxis Automatisierung",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.87" },
@@ -624,8 +624,8 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/ki-telefonassistent-praxis",
-    title: "KI-Telefonassistent für medizinische Praxen | Terminverwaltung automatisieren – Cogniiq",
-    description: "KI-Telefonassistent für Arzt- und Facharztpraxen: Termine aufnehmen, Rezeptanfragen strukturiert erfassen, Anmeldung entlasten – ohne Gesprächsaufzeichnung.",
+    title: "KI-Telefonassistent für Therapiepraxen | Cogniiq",
+    description: "KI-Telefonassistent für Physio-, Ergo- und Logopädie-Praxen: erreichbar bleiben, während Sie behandeln. Termine im Gespräch vergeben, verschieben, absagen – ohne Mitschnitt.",
     keywords: "KI Telefonassistent Praxis, Praxis Telefonassistent, Terminverwaltung Praxis KI, AI Praxis",
     indexable: true,
     sitemap: { lastmod: "2026-03-14", changefreq: "monthly", priority: "0.85" },
@@ -763,8 +763,8 @@ export const PUBLIC_ROUTES: readonly PublicRoute[] = [
   },
   {
     path: "/blog/ki-telefonassistent-arztpraxis",
-    title: "KI-Telefonassistent für Arztpraxen: was er übernimmt, was beim Team bleibt | Cogniiq",
-    description: "Was ein KI-Telefonassistent in der Arztpraxis übernimmt, was immer beim Team bleibt und woran die Anbindung an die Praxissoftware hängt.",
+    title: "Telefon in der Arztpraxis: was beim Team bleiben muss | Cogniiq",
+    description: "Rezept, Befund, Akuttermin, Krankschreibung: welche Anrufe in einer Arztpraxis ein Mensch führen muss, welche ein Assistent erledigen kann – und woran die Praxissoftware-Anbindung hängt.",
     indexable: true,
     sitemap: { lastmod: "2026-09-05", changefreq: "monthly", priority: "0.60" },
   },

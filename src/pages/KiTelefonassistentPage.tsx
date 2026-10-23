@@ -254,7 +254,14 @@ const PROBLEMS = [
  * Bedingung im Abschnittsfuß — nicht in jeder einzelnen Karte, das läse sich
  * wie ein Haftungsausschluss.
  */
-const USE_CASES = [
+const USE_CASES: Array<{
+  icon: typeof Stethoscope;
+  industry: string;
+  desc: string;
+  /** Branchenseite, wenn es eine gibt; sonst endet die Karte bewusst ohne Link. */
+  href?: string;
+  linkLabel?: string;
+}> = [
   {
     icon: Wrench,
     industry: "Handwerk & Bau",
@@ -273,11 +280,15 @@ const USE_CASES = [
   {
     icon: UtensilsCrossed,
     industry: "Gastronomie & Hotellerie",
+    href: "/ki-telefonassistent-restaurant",
+    linkLabel: "Für Restaurants",
     desc: "Beantwortet wiederkehrende Fragen und wickelt Reservierungen samt Änderung und Absage ab, während der Service läuft. Sonderwünsche gehen an Sie.",
   },
   {
     icon: Stethoscope,
     industry: "Praxen & Gesundheit",
+    href: "/praxen",
+    linkLabel: "Für Arzt-, Zahnarzt- und Therapiepraxen",
     desc: "Bucht, verschiebt und storniert Termine nach Ihren Regeln und entlastet die Anmeldung zu Stoßzeiten. Medizinische Fragen und Notfälle nie — die gehen immer an Menschen.",
   },
   {
@@ -1767,6 +1778,14 @@ function UseCasesSection() {
                 <p className="text-[17px] text-gray-600 dark:text-gray-400 leading-relaxed">
                   {item.desc}
                 </p>
+                {"href" in item && item.href && (
+                  <Link
+                    to={item.href}
+                    className="inline-block mt-3 text-[15px] font-semibold text-gray-900 dark:text-gray-100 underline underline-offset-4 hover:no-underline"
+                  >
+                    {item.linkLabel}
+                  </Link>
+                )}
               </div>
             </motion.div>
           ))}
@@ -1857,10 +1876,12 @@ function InternalLinksSection() {
     {
       heading: "Nach Branche",
       links: [
+        { label: "KI Telefonassistent für Praxen – Arzt, Zahnarzt, Therapie", href: "/praxen" },
         { label: "KI Telefonassistent für Arztpraxen", href: "/ki-telefonassistent-arzt" },
+        { label: "KI Telefonassistent in der Zahnarztpraxis", href: "/ki-telefonassistent-zahnarztpraxis" },
+        { label: "KI Telefonassistent für Therapiepraxen", href: "/ki-telefonassistent-praxis" },
         { label: "KI Telefonassistent für Restaurants", href: "/ki-telefonassistent-restaurant" },
         { label: "KI Telefonassistent für Hotels", href: "/ki-telefonassistent-hotel" },
-        { label: "Telefonassistent für medizinische Praxen", href: "/ki-telefonassistent-praxis" },
       ],
     },
     {

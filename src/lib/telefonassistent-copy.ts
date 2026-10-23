@@ -1531,7 +1531,9 @@ export const GENERISCH_GRENZEN = {
     "Kein Ersatz für Ihr Team. Routineabläufe schließt der Assistent ab; Entscheidungen außerhalb der freigegebenen Regeln, Ausnahmen und alles Strittige bleiben bei Ihren Mitarbeiterinnen und Mitarbeitern.",
     "Keine fachliche Beratung und keine Bewertung von Dringlichkeit. Er erkennt die Signalwörter, die Sie festlegen, und leitet dann weiter — beurteilen tut er nicht.",
     "Er handelt nur innerhalb dessen, was Sie freigegeben haben. Welcher Anlass automatisch abgeschlossen wird und wo die Grenze liegt, entscheiden Sie im Anliegen-Katalog — nicht das System.",
-    `${FAKTEN.keineAnbindung} Das Ergebnis der Prüfung steht im Angebot, mit allen dafür bekannten Kosten für den vereinbarten Umfang — auch denen einer Schnittstelle, die Dritte berechnen.`,
+    // Branchenoffener Zwilling von FAKTEN.keineAnbindung: dieselbe Prüfung, ohne
+    // „Praxisverwaltungssystem" — das war der letzte Medizinbezug der Seite.
+    "Eine Standardanbindung, die auf jede Software sofort passt, gibt es nicht — deshalb prüfen wir Ihr konkretes System vor dem Angebot: ob es eine geeignete Schnittstelle gibt, ob wir dafür Zugang oder eine Freigabe bekommen, welche Vorgänge sie zulässt und ob Dritte dafür Gebühren verlangen. Das Ergebnis der Prüfung steht im Angebot, mit allen dafür bekannten Kosten für den vereinbarten Umfang — auch denen einer Schnittstelle, die Dritte berechnen.",
     FAKTEN.bestaetigungen,
     "Gespräche werden nicht aufgezeichnet. Wenn Sie später den genauen Wortlaut eines Anrufs brauchen, gibt es ihn nicht — Sie haben das strukturierte Ergebnis, nicht die Aufnahme.",
     "Der Assistent übernimmt nicht alle Anrufe. Was er vollständig abschließt, sind die Routineabläufe, die Sie freigegeben haben — nicht Ihre gesamte Telefonie. Wie groß dieser Anteil in Ihrem Betrieb ist, hängt an Ihren Anrufanlässen; wir nennen dafür keine Quote, die wir nicht gemessen haben.",

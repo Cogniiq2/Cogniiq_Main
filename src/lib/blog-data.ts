@@ -170,17 +170,17 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   },
   {
     slug: "ki-telefonassistent-arztpraxis",
-    title: "KI-Telefonassistent für Arztpraxen: was er übernimmt – und was beim Team bleibt",
-    metaTitle: "KI-Telefonassistent für Arztpraxen: was er übernimmt, was beim Team bleibt | Cogniiq",
+    title: "Telefon in der Arztpraxis: welche Anrufe beim Team bleiben müssen – und welche nicht",
+    metaTitle: "Telefon in der Arztpraxis: was beim Team bleiben muss | Cogniiq",
     metaDescription:
-      "Was ein KI-Telefonassistent in der Arztpraxis übernimmt, was immer beim Team bleibt und woran die Anbindung an die Praxissoftware hängt.",
+      "Rezept, Befund, Akuttermin, Krankschreibung: welche Anrufe in einer Arztpraxis ein Mensch führen muss, welche ein Assistent erledigen kann – und woran die Praxissoftware-Anbindung hängt.",
     category: "KI-Telefonassistent",
     readingTime: 7,
     publishedAt: "2026-03-16",
     updatedAt: "2026-09-05",
     excerpt:
       "Eine Arztpraxis mit hohem Anrufaufkommen verliert ohne funktionierendes Telefonmanagement Patienten. Ein KI-Telefonassistent übernimmt die Annahme und die strukturierte Aufnahme klar benennbarer Anliegen – auch außerhalb der Öffnungszeiten. Was eine Einschätzung verlangt, bleibt beim Team.",
-    heroKeyword: "KI-Telefonassistent Arztpraxis",
+    heroKeyword: "Telefon in der Arztpraxis",
     sections: [
       {
         type: "p",
@@ -267,6 +267,16 @@ export const BLOG_ARTICLES: BlogArticle[] = [
         to: "/praxen",
         label: "Der KI-Empfang für Arzt- und Zahnarztpraxen",
         text: "Was der Empfang übernimmt, was immer ein Mensch macht, wie er eingerichtet wird und was er kostet.",
+      },
+      {
+        to: "/ki-telefonassistent-arzt",
+        label: "KI-Telefonassistent für Arztpraxen",
+        text: "Die Anrufanlässe einer Arztpraxis einzeln: was der Assistent erledigt, was er aufnimmt, was immer ein Mensch führt.",
+      },
+      {
+        to: "/kosten-ki-telefonassistent",
+        label: "Was ein KI-Telefonassistent kostet",
+        text: "Tarife mit Minutenkontingent und Obergrenze, Einrichtung, Laufzeit – und ein Rechner ohne Anmeldung.",
       },
       {
         to: "/ki-telefonassistent-einfuehren",

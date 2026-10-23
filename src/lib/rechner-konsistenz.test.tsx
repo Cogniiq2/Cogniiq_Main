@@ -32,6 +32,7 @@ import { describe, expect, it } from 'vitest';
 
 import { FAKTEN, SPRACHEN_PREISE, TARIFE } from '@/lib/telefonassistent-copy';
 import { RECHNER_ANKER, RECHNER_LINK, RECHNER_ROUTE } from '@/lib/rechner-anker';
+import { PROTECTED_EXPERIMENT_PATHS } from '@/lib/routing/protectedExperiments';
 import {
   WOCHEN_PRO_MONAT,
   anrufeProMonatAusWoche,
@@ -44,6 +45,16 @@ import {
 } from '@/lib/telefonassistent-rechner';
 
 const REPO_ROOT = process.cwd();
+
+/** Quelle je Route, die jemals in PROTECTED_EXPERIMENT_PATHS stand. */
+const ROUTE_ZU_QUELLE: Record<string, string> = {
+  '/kosten-ki-telefonassistent': 'src/pages/costs/KostenKiTelefonassistent.tsx',
+  '/ki-telefonassistent-arzt': 'src/pages/industries/KiTelefonassistentArzt.tsx',
+  '/bayreuth/webdesign': 'src/components/CityServiceRoute.tsx',
+  '/bayreuth/website-relaunch': 'src/pages/cluster/bayreuth/WebsiteRelaunchBayreuth.tsx',
+  '/regensburg/website-relaunch': 'src/pages/cluster/regensburg/WebsiteRelaunchRegensburg.tsx',
+  '/muenchen/webdesign-kosten': 'src/pages/cluster/muenchen/WebdesignKostenMuenchen.tsx',
+};
 
 function sammle(dir: string, out: Map<string, string> = new Map()): Map<string, string> {
   for (const eintrag of readdirSync(dir)) {
@@ -563,8 +574,13 @@ describe('Rechner-Anker', () => {
     // Gegenrichtung ab. Diese Prüfung deckt die Hinrichtung: ein CTA, der auf
     // einer eingefrorenen Seite landet, verändert deren gerenderte Bytes.
     // Die Kostenseite steht hier seit dem 12.09.2026 nicht mehr: Sie ist keine
-    // eingefrorene Route mehr und TRÄGT den Rechner jetzt selbst.
-    for (const pfad of ['src/pages/industries/KiTelefonassistentArzt.tsx']) {
+    // eingefrorene Route mehr und TRÄGT den Rechner jetzt selbst. Die Arztseite
+    // steht hier seit dem 23.10.2026 nicht mehr: Sie wurde graduiert und
+    // verlinkt den Rechner jetzt bewusst (Kosten sind dort Einwand Nr. 1).
+    // Die Liste folgt PROTECTED_EXPERIMENT_PATHS; solange sie leer ist, prüft
+    // dieser Test nur, dass kein Pfad versehentlich wieder hart getippt wird.
+    const eingefroren = PROTECTED_EXPERIMENT_PATHS.map((route) => ROUTE_ZU_QUELLE[route]).filter(Boolean);
+    for (const pfad of eingefroren) {
       const inhalt = QUELLEN.get(pfad)!;
       expect(inhalt).not.toMatch(/RechnerCta|rechner-anker|rechner:/);
     }

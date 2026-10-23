@@ -37,6 +37,8 @@ import {
   TARIF_ENTERPRISE,
   UMKEHRBARKEIT,
   VERTRAG,
+  ANBIETER_CHECKLISTE,
+  GENERISCH_DECKELUNG,
 } from "@/lib/telefonassistent-copy";
 
 const base = BUSINESS_INFO.website;
@@ -90,6 +92,21 @@ const faqItems = [
     question: "Wie lange bin ich gebunden und wie kündige ich?",
     answer:
       `${FAKTEN.laufzeit} ${FAKTEN.kuendigung} ${FAKTEN.preisgarantie}`,
+  },
+  {
+    question: "Was kostet ein KI Telefonassistent pro Minute?",
+    answer:
+      `Innerhalb des Kontingents nichts extra — die Minuten sind im Monatspreis enthalten. Rechnerisch ergibt das im kleinsten Tarif ${(TARIFE[0].monatlichEur / TARIFE[0].minuten).toLocaleString("de-DE", { style: "currency", currency: "EUR" })} je Kontingentminute (${TARIFE[0].monatlich} für ${TARIFE[0].minuten.toLocaleString("de-DE")}\u00A0Minuten). Über dem Kontingent kostet jede weitere Minute ${FAKTEN.mehrpreisProMinute}, bis zur Obergrenze des Tarifs. Viele Angebote am Markt rechnen stattdessen pro Minute ohne Obergrenze — vergleichen Sie deshalb immer den Spitzenmonat, nicht den Minutenpreis.`,
+  },
+  {
+    question: "Gibt es versteckte Kosten?",
+    answer:
+      `Keine Kostenposition wird still weggelassen: Grundpreis, Mehrverbrauch, Obergrenze, Einrichtung und Zusatzsprachen stehen auf dieser Seite. Zwei Posten stehen bewusst als offen da, weil sie von Ihrem System abhängen: die Anbindung an Ihre Praxissoftware und Gebühren, die Dritte für eine Schnittstelle verlangen. Beides prüfen wir vor dem Angebot und nennen es dort — nicht danach. ${FAKTEN.deckelungGeltung}`,
+  },
+  {
+    question: "Lohnt sich ein KI Telefonassistent für eine kleine Praxis?",
+    answer:
+      "Das hängt an Ihrem Anrufaufkommen, nicht an Ihrer Größe. Der Rechner oben zeigt für Ihre Anrufe pro Monat Tarif, Monatsbetrag und Einrichtung; die Gegenrechnung — was eine nicht besetzte Leitung Sie kostet — kennen nur Sie. Wenn die Anmeldung zu Stoßzeiten regelmäßig nicht abnehmen kann, ist das der Fall, für den der Assistent gebaut ist; wenn Ihr Telefon selten klingelt, raten wir ab.",
   },
   {
     // Die Beträge stehen NUR in SPRACHEN. Hier stand bis zum 12.09.2026 eine
@@ -217,9 +234,10 @@ export function KostenKiTelefonassistent() {
             </h1>
             <p className={PROSE}>
               Bevor ein Betrag fällt, die Antwort auf die Frage, die dahintersteht:
-              Nein, die Rechnung kann nicht aus dem Ruder laufen. Wie weit sie
-              überhaupt steigen kann, steht im nächsten Absatz — und zwar
-              vollständig, nicht in einer Fußnote.
+              Nein, die Telefonierechnung kann nicht aus dem Ruder laufen. Wie
+              weit sie überhaupt steigen kann, steht im nächsten Absatz — und
+              zwar vollständig, nicht in einer Fußnote, einschließlich dessen,
+              was die Obergrenze nicht abdeckt.
             </p>
           </div>
         </section>
@@ -415,32 +433,119 @@ export function KostenKiTelefonassistent() {
           </div>
         </section>
 
-        {/* ── Begriffsklärung: hält „AI Rezeptionist" als Synonym auf der Seite ── */}
+        {/* ── Preismodelle am Markt: Muster, keine Anbieter (COPY-BRIEF §2.3) ── */}
         <section className={SECTION}>
           <div className="max-w-3xl mx-auto px-6 lg:px-8">
-            <h2 className={H2}>Was kostet ein AI Rezeptionist im Vergleich?</h2>
+            <h2 className={H2}>Wie KI-Telefonassistenten am Markt abgerechnet werden</h2>
             <div className={`${PROSE} space-y-5`}>
               <p>
                 AI Rezeptionist, KI Telefonassistent, digitale Rezeption,
                 Telefonannahme mit KI — gemeint ist überall dasselbe Produkt, und
-                die Preisfrage stellt sich für alle diese Begriffe gleich.
+                die Preisfrage stellt sich für alle diese Begriffe gleich. Worin
+                sich Angebote tatsächlich unterscheiden, ist die Abrechnungsform.
+                Vier Muster sind verbreitet; keines davon ist an sich unseriös, aber
+                jedes verteilt das Mengenrisiko anders. Die Tabelle nennt Muster,
+                keine Anbieter und keine Fremdpreise — die ändern sich zu schnell,
+                um sie hier verlässlich zu nennen.
               </p>
+            </div>
+            <div className="mt-8 overflow-x-auto">
+              <table className="w-full text-left text-[16px] text-gray-700 dark:text-gray-300">
+                <caption className="sr-only">Abrechnungsmodelle für KI-Telefonassistenten im Vergleich</caption>
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-gray-800 text-[14px] uppercase tracking-wide text-gray-500">
+                    <th scope="col" className="py-3 pr-4 font-semibold">Modell</th>
+                    <th scope="col" className="py-3 pr-4 font-semibold">Was Sie zahlen</th>
+                    <th scope="col" className="py-3 pr-4 font-semibold">Risiko im Spitzenmonat</th>
+                    <th scope="col" className="py-3 font-semibold">Woran Sie es erkennen</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800 align-top">
+                  <tr>
+                    <th scope="row" className="py-4 pr-4 font-semibold text-gray-900 dark:text-gray-100">Pro Minute, ohne Obergrenze</th>
+                    <td className="py-4 pr-4">Jede Gesprächsminute wird berechnet, oft mit kleinem Grundpreis.</td>
+                    <td className="py-4 pr-4">Hoch: Infektwelle, Rückrufwelle oder Kampagne treiben die Rechnung ohne Deckel.</td>
+                    <td className="py-4">Preis „ab … Cent pro Minute“, kein Kontingent, keine genannte Höchstsumme.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row" className="py-4 pr-4 font-semibold text-gray-900 dark:text-gray-100">Pro Anruf</th>
+                    <td className="py-4 pr-4">Fester Betrag je angenommenem Gespräch, unabhängig von der Dauer.</td>
+                    <td className="py-4 pr-4">Hoch: Viele kurze Anrufe — Absagen, Nachfragen — kosten so viel wie lange.</td>
+                    <td className="py-4">Preis „pro Anruf“ oder „pro Vorgang“; Anrufe, die der Assistent nur weiterleitet, zählen oft mit.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row" className="py-4 pr-4 font-semibold text-gray-900 dark:text-gray-100">Pauschale pro Behandler oder Nebenstelle</th>
+                    <td className="py-4 pr-4">Monatspreis je Person oder Leitung, Anrufe meist inklusive.</td>
+                    <td className="py-4 pr-4">Gering im Monat, aber der Preis wächst mit dem Team statt mit dem Anrufaufkommen.</td>
+                    <td className="py-4">Preis „pro Nutzer“, „pro Arbeitsplatz“ oder „pro Behandler“.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row" className="py-4 pr-4 font-semibold text-gray-900 dark:text-gray-100">Kontingent mit Obergrenze — unser Modell</th>
+                    <td className="py-4 pr-4">Fester Monatspreis für ein Minutenkontingent; Mehrverbrauch zu {FAKTEN.mehrpreisProMinute}/Min., gedeckelt.</td>
+                    <td className="py-4 pr-4">Begrenzt: Die Telefonierechnung kann steigen, aber nur bis zur ausgewiesenen Obergrenze.</td>
+                    <td className="py-4">Kontingent, Minutenpreis und Obergrenze stehen zusammen auf einer Seite — wie oben.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className={`${PROSE} space-y-5 mt-8`}>
               <p>
-                {ABWICKLUNG.faehigkeit} Ein Routineanruf wird damit nicht zu einer
-                Aufgabe, die danach noch jemand erledigen muss. An einen Menschen
-                gehen die Fälle, die dorthin gehören: Notfälle, Beschwerden und
-                sensible Anliegen, fachliche Entscheidungen, alles außerhalb der
-                freigegebenen Abläufe und alles, was Sie bewusst menschlich halten
-                wollen.
+                {ABWICKLUNG.faehigkeit} Das ist der zweite Punkt, an dem Angebote
+                auseinandergehen: Ein System, das Anliegen nur notiert, erzeugt
+                nach jedem Anruf eine Aufgabe für Ihr Team — die Minute ist dann
+                billig, der Anruf nicht. {ABWICKLUNG.qualifikation}
               </p>
-              <p>{ABWICKLUNG.qualifikation}</p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Fragen an jeden Anbieter — die Kaufkriterien aus der Produktseite ── */}
+        <section className={SECTION_ALT}>
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>Welche Fragen Sie jedem Anbieter zum Preis stellen sollten</h2>
+            <p className={`${PROSE} mb-8`}>
+              Der Preis auf der Website ist selten der Preis auf der Rechnung. Diese
+              Fragen gelten für jedes Angebot — auch für unseres; die Antwort von
+              Cogniiq steht jeweils darunter.
+            </p>
+            <dl className="space-y-8">
+              {ANBIETER_CHECKLISTE.filter((k) =>
+                /Rechnung|Anbindung|Ansage|Aufgabe/.test(k.frage)
+              ).map((k) => (
+                <div key={k.frage}>
+                  <dt className="text-[19px] font-semibold text-gray-900 dark:text-gray-100">{k.frage}</dt>
+                  <dd className={`${PROSE} mt-2`}>{k.warum}</dd>
+                  <dd className={`${PROSE} mt-2`}>
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">Bei Cogniiq: </span>
+                    {k.cogniiq}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </section>
+
+        {/* ── Generische Kostenquery: die Tariflogik gilt nicht nur für Praxen ── */}
+        <section className={SECTION}>
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
+            <h2 className={H2}>Gilt das auch außerhalb von Praxen?</h2>
+            <div className={`${PROSE} space-y-5`}>
               <p>
-                Worin sich Angebote tatsächlich unterscheiden, ist die
-                Abrechnungsform. Verbreitet ist die Abrechnung pro Anruf oder pro
-                Minute ohne Obergrenze — planbar ist das nicht, weil ausgerechnet
-                der Monat teuer wird, in dem besonders viel los ist. Unser Modell
-                setzt deshalb an derselben Stelle an: ein Kontingent, ein fester
-                Betrag, eine benannte Obergrenze.
+                Die Tarife auf dieser Seite sind für Praxen formuliert — Kontingente
+                in Patientenanrufen, Abrechnung pro Praxis, der Vergleichswert einer
+                MFA-Stelle. Die Preislogik dahinter ist dieselbe für jeden Betrieb mit
+                hohem Telefonaufkommen: {GENERISCH_DECKELUNG.text}
+              </p>
+              <p>{GENERISCH_DECKELUNG.geltung}</p>
+              <p>
+                Wie der Assistent in Handwerk, Kanzlei, Immobilienverwaltung oder
+                Gastronomie arbeitet und was dort anders ist, steht auf der{" "}
+                <Link to="/ki-telefonassistent" className={TEXT_LINK}>
+                  branchenoffenen Produktseite
+                  <ArrowRight size={15} aria-hidden="true" />
+                </Link>
+                ; das Angebot für Ihren Betrieb nennt Kontingent und Einrichtung
+                konkret, nicht als Spanne.
               </p>
             </div>
           </div>
@@ -550,8 +655,20 @@ export function KostenKiTelefonassistent() {
                 </Link>
               </li>
               <li>
+                <Link to="/ki-telefonassistent-zahnarztpraxis" className={TEXT_LINK}>
+                  KI Telefonassistent in der Zahnarztpraxis
+                  <ArrowRight size={15} aria-hidden="true" />
+                </Link>
+              </li>
+              <li>
                 <Link to="/ki-telefonassistent-praxis" className={TEXT_LINK}>
                   KI Telefonassistent für Therapiepraxen
+                  <ArrowRight size={15} aria-hidden="true" />
+                </Link>
+              </li>
+              <li>
+                <Link to="/ki-telefonassistent-einfuehren" className={TEXT_LINK}>
+                  Einen KI Telefonassistenten in der Praxis einführen
                   <ArrowRight size={15} aria-hidden="true" />
                 </Link>
               </li>

@@ -15,10 +15,9 @@
 // Kommerzieller Eigentümer der Praxis-Intention bleibt /praxen. Dieser Beitrag
 // verweist dorthin (Breadcrumb, Weiterlesen, Cogniiq-Abschnitt).
 //
-// Verweist absichtlich NICHT auf die eingefrorenen Experimentrouten des
-// Clusters (Arzt-Segmentseite, Preisseite): jeder neue Link dorthin würde deren
-// Messung verfälschen; siehe src/lib/routing/protectedExperiments.ts. Die Pfade
-// stehen hier auch nicht im Kommentar, weil der Schutz Quelltext-Vorkommen zählt.
+// Seit dem 2026-10-23 (Graduierung aller Experimente) verweist der Beitrag auch
+// auf die Arzt-Segmentseite und die Kostenseite — vorher hätte jeder neue Link
+// dorthin eine laufende Messung verfälscht.
 //
 // Keine Fremdstatistik, keine Anteile, keine Zahlen außer denen aus FAKTEN.
 // Die Aussagen über den Praxisalltag sind Beschreibungen, keine Erhebung, und
@@ -30,7 +29,7 @@ import { PageSEO } from "@/components/PageSEO";
 import { RedaktionelleVerantwortung, REDAKTION } from "@/components/RedaktionelleVerantwortung";
 import { BUSINESS_INFO } from "@/lib/seo-data";
 import { canonicalFor } from "@/lib/routing/publicRoutes";
-import { ANBINDUNG, FAKTEN, GRENZEN } from "@/lib/telefonassistent-copy";
+import { ANBINDUNG, DATENSCHUTZ_PUNKTE, FAKTEN, GRENZEN, KOMPAKT_KOSTEN } from "@/lib/telefonassistent-copy";
 
 /**
  * Die beiden Grenzen stammen wörtlich aus GRENZEN.points — derselben Quelle wie
@@ -574,6 +573,16 @@ export function KiTelefonassistentZahnarztpraxis() {
             <p>{FAKTEN.keineAufzeichnung}</p>
             <p>{FAKTEN.art50}</p>
             <p>
+              {DATENSCHUTZ_PUNKTE[3]}. {DATENSCHUTZ_PUNKTE[4]}.
+            </p>
+            <p>
+              {KOMPAKT_KOSTEN.text} {FAKTEN.nichtProBehandler}{" "}
+              <Link to="/kosten-ki-telefonassistent" className={LINK}>
+                Alle Tarife, Kontingente und Obergrenzen
+              </Link>
+              .
+            </p>
+            <p>
               Was der Empfang für Arzt-, Zahnarzt- und Therapiepraxen leistet, wie er
               eingerichtet wird und was er kostet, steht auf der{" "}
               <Link to="/praxen" className={LINK}>
@@ -639,6 +648,30 @@ export function KiTelefonassistentZahnarztpraxis() {
               </Link>
               <span className="block text-gray-600 dark:text-gray-400">
                 Trennlinie, Übergabe, Prüfgruppen, Freigabe und die erste Woche im Betrieb.
+              </span>
+            </li>
+            <li>
+              <Link
+                to="/ki-telefonassistent-arzt"
+                className={`${LINK} font-semibold text-gray-900 dark:text-gray-100`}
+              >
+                KI-Telefonassistent für Arztpraxen
+              </Link>
+              <span className="block text-gray-600 dark:text-gray-400">
+                Akuttermin, Rezept, Überweisung, Befund – die Anrufanlässe der Hausarzt- und
+                Facharztpraxis und die Regel je Anlass.
+              </span>
+            </li>
+            <li>
+              <Link
+                to="/kosten-ki-telefonassistent"
+                className={`${LINK} font-semibold text-gray-900 dark:text-gray-100`}
+              >
+                Was ein KI-Telefonassistent kostet
+              </Link>
+              <span className="block text-gray-600 dark:text-gray-400">
+                Tarife mit Minutenkontingent und Obergrenze, Einrichtung, Laufzeit – und ein
+                Rechner ohne Anmeldung.
               </span>
             </li>
             <li>

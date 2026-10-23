@@ -180,11 +180,14 @@ export function PraxenPage() {
             </nav>
 
             <motion.div className="cq-rise">
+              <p className="text-[15px] font-medium uppercase tracking-[0.14em] text-pub-ink-3 dark:text-gray-500 mb-4">
+                Am Tresen steht eine Patientin. Und das Telefon klingelt trotzdem.
+              </p>
               <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-[1.12] tracking-tight mb-7">
-                Am Tresen steht eine Patientin.
+                KI-Telefonassistent für Praxen:
                 <br />
                 <span className="text-pub-ink-3 dark:text-gray-500 font-light">
-                  Und das Telefon klingelt trotzdem.
+                  ein Empfang am Telefon, der Anliegen erledigt.
                 </span>
               </h1>
               <div className={`${PROSE} space-y-5 mb-9`}>
